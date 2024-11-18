@@ -89,9 +89,9 @@ export const AddNewForm = () => {
   useEffect(() => {
     const mergedData = addData?.employeeValue
       .map((candidate) => {
-        const workDetails = workInfoDataDetails.find(
+        const workDetails =workInfoDataDetails? workInfoDataDetails.find(
           (item) => item.empID === candidate.empID
-        );
+        ):{};
         // const empDocsDetails = addData?.employeeDocsValue.find(
         //   (item) => item.empID === candidate.empID
         // );

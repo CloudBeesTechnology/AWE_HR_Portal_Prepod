@@ -130,7 +130,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     applicationUpload, bwnUpload, cvCertifyUpload, loiUpload, myIcUpload, paafCvevUpload, ppUpload, supportDocUpload          
 } = passingValue;
 
-
+const officalEmailValue=officialEmail
   // Grouped Data
   const personalDetails = {
     Name: name,
@@ -145,7 +145,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Contact No": contactNo,
     "Alternate Number": alternateNo,
     Email: email,
-    "Official Email": officialEmail,
+    "Official Email": officalEmailValue,
     "Permanent Address": permanentAddress,
     // ProfilePhoto: profilePhoto,
     "Marital Status": marital,

@@ -15,7 +15,6 @@ import {
   Icon,
   ScrollView,
   Text,
-  TextAreaField,
   TextField,
   useTheme,
 } from "@aws-amplify/ui-react";
@@ -273,7 +272,7 @@ export default function EmpInsuranceCreateForm(props) {
     workmePolicyNo: [],
     travelIns: [],
     accidentIns: [],
-    empInsUpload: [{ type: "JSON" }],
+    empInsUpload: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -818,7 +817,7 @@ export default function EmpInsuranceCreateForm(props) {
         inputFieldRef={empInsUploadRef}
         defaultFieldValue={""}
       >
-        <TextAreaField
+        <TextField
           label="Emp ins upload"
           isRequired={false}
           isReadOnly={false}
@@ -838,7 +837,7 @@ export default function EmpInsuranceCreateForm(props) {
           ref={empInsUploadRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "empInsUpload")}
-        ></TextAreaField>
+        ></TextField>
       </ArrayField>
       <Flex
         justifyContent="space-between"

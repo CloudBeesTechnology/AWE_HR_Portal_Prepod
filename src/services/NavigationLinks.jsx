@@ -127,6 +127,8 @@ const NavigationLinks = () => {
     <Routes>
       {/* Login and Change Password Routes */}
       <Route path="/changePassword" element={<ChangePassword />} />
+      <Route path="/user" Component={User} />
+      <Route path="/addNewForm" Component={AddNewForm} />
 
       {loginAuth && (
         <>

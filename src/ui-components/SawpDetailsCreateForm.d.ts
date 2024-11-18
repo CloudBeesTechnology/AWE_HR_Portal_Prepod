@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -39,7 +39,7 @@ export declare type SawpDetailsCreateFormOverridesProps = {
     empID?: PrimitiveOverrideProps<TextFieldProps>;
     sawpEmpLtrReq?: PrimitiveOverrideProps<TextFieldProps>;
     sawpEmpLtrReci?: PrimitiveOverrideProps<TextFieldProps>;
-    sawpEmpUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    sawpEmpUpload?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type SawpDetailsCreateFormProps = React.PropsWithChildren<{
     overrides?: SawpDetailsCreateFormOverridesProps | undefined | null;

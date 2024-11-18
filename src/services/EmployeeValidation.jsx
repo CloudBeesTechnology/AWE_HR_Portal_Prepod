@@ -450,6 +450,7 @@ export const employeeInfoSchema = Yup.object().shape({
   ),
 
   inducBrief: Yup.string().required("Induction Briefing Date is mandatory"),
+
   inducBriefUp: Yup.mixed()
     .test(
       "fileType",

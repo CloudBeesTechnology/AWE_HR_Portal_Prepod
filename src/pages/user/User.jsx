@@ -63,22 +63,20 @@ export const User = () => {
     setViewForm(!viewForm);
   };
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         const mergedData = empPIData
           .map((emp) => {
-            const userDetails = userData.find(
-              (user) => user.empID === emp.empID
-            );
-            const workInfoValue = workInfoData.find(
-              (work) => work.empID === emp.empID
-            );
+            const userDetails = userData
+              ? userData.find((user) => user.empID === emp.empID)
+              : {};
+            const workInfoValue = workInfoData
+              ? workInfoData.find((work) => work.empID === emp.empID)
+              : {};
             // console.log(workInfoData);
-            
-            if (!userDetails) return null;
-            if (!workInfoValue) return null;
+
+        
             return {
               ...emp,
               ...userDetails,
@@ -96,7 +94,7 @@ export const User = () => {
     };
 
     fetchData();
-  }, [userData, empPIData]);
+  }, [userData, empPIData,workInfoData]);
 
   const searchUserList = async (userData) => {
     try {
@@ -116,22 +114,22 @@ export const User = () => {
       storedValue: storedValue,
       userValue: userData,
       employeeValue: empPIData,
-      workValue:workInfoData
+      workValue: workInfoData,
     };
     navigate("/addNewForm", { state: { editUserData: allValue } });
   };
+console.log(userData);
 
   const handleAddUser = () => {
     const allValue = {
       userValue: userData,
       employeeValue: empPIData,
-      workValue:workInfoData
+      workValue: workInfoData,
     };
     // console.log(allValue);
 
     navigate("/addNewForm", { state: { addUserData: allValue } });
   };
-
 
   return (
     <section className=" flex justify-center px-10 py-20 bg-[#F8F8F8] h-screen relative">
@@ -158,84 +156,82 @@ export const User = () => {
           </div>
         </section>
         <div className="flex flex-col flex-grow">
-        <div className="px-1 ">
-          <table className="w-full mx-auto bg-white pt-10">
-            <thead>
-              <tr className="text_size_5 text-dark_grey ">
-                <th className="px-6 text-start py-3">EMP ID</th>
-                {/* <th className="px-6 text-start  py-3">User ID</th> */}
-                <th className="px-6 text-start  py-3">Name</th>
-                <th className="px-6 text-start py-3">Type</th>
-                <th className="px-6 text-start py-3">Email Id</th>
-                <th className="px-6 text-start py-3">Password</th>
-                <th className="px-6 text-start py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredData && filteredData.length > 0 ? (
-                filteredData.map((val, i) => {
-                  return (
-                    <tr
-                      key={i}
-                      onClick={() => {
-                        ViewFormShow();
-                        setSendData(val);
-                      }}
-                    >
-                      <td className="px-6 py-2">{val.empID}</td>
-                      {/* <td className="px-6 py-2">{val.empID}</td> */}
-                      <td className="px-6 py-2">{val.name}</td>
-                      <td className="px-6 py-2">{val.selectType}</td>
-                      <td className="px-6 py-2">{val.email}</td>
-                      <td className="px-6 w-[200px] py-2 text-center">
-                        <input
-                          type="password"
-                          className="outline-none w-full"
-                          value={val.password}
-                          readOnly
-                        />
-                      </td>
-                      <td className="px-6 py-2">
-                        <div className="flex gap-5">
-                          <span
-                            onClick={() => {
-                              
-                              handleTransferData(val);
-                            }}
-                          >
-                            <RiEditLine />
-                          </span>
-                          <span>
-                            <RiDeleteBin6Line />
-                          </span>
-                          {/* <div
+          <div className="px-1 ">
+            <table className="w-full mx-auto bg-white pt-10">
+              <thead>
+                <tr className="text_size_5 text-dark_grey ">
+                  <th className="px-6 text-start py-3">EMP ID</th>
+                  {/* <th className="px-6 text-start  py-3">User ID</th> */}
+                  <th className="px-6 text-start  py-3">Name</th>
+                  <th className="px-6 text-start py-3">Type</th>
+                  <th className="px-6 text-start py-3">Email Id</th>
+                  <th className="px-6 text-start py-3">Password</th>
+                  <th className="px-6 text-start py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredData && filteredData.length > 0 ? (
+                  filteredData.map((val, i) => {
+                    return (
+                      <tr
+                        key={i}
+                        onClick={() => {
+                          ViewFormShow();
+                          setSendData(val);
+                        }}
+                      >
+                        <td className="px-6 py-2">{val.empID}</td>
+                        {/* <td className="px-6 py-2">{val.empID}</td> */}
+                        <td className="px-6 py-2">{val.name}</td>
+                        <td className="px-6 py-2">{val.selectType}</td>
+                        <td className="px-6 py-2">{val.email}</td>
+                        <td className="px-6 w-[200px] py-2 text-center">
+                          <input
+                            type="password"
+                            className="outline-none w-full"
+                            value={val.password}
+                            readOnly
+                          />
+                        </td>
+                        <td className="px-6 py-2">
+                          <div className="flex gap-5">
+                            <span
+                              onClick={() => {
+                                handleTransferData(val);
+                              }}
+                            >
+                              <RiEditLine />
+                            </span>
+                            <span>
+                              <RiDeleteBin6Line />
+                            </span>
+                            {/* <div
                       className="h-3 w-3 bg-[#08A757] rounded-full "
                       onClick={() => {
                         popUping();
                         ListUserData();
                       }}
                     ></div> */}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td
-                    colSpan="6"
-                    className="px-6 py-6 text-center text-dark_ash text_size_5"
-                  >
-                    No User List Available Here
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td
+                      colSpan="6"
+                      className="px-6 py-6 text-center text-dark_ash text_size_5"
+                    >
+                      No User List Available Here
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
 
-        <div className="flex justify-end mt-auto py-8 px-10">
-          
+          <div className="flex justify-end mt-auto py-8 px-10">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -245,8 +241,7 @@ export const User = () => {
                 }
               }}
             />
-          
-        </div>
+          </div>
         </div>
       </div>
 

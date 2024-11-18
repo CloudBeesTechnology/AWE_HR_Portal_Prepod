@@ -15,7 +15,6 @@ import {
   Icon,
   ScrollView,
   Text,
-  TextAreaField,
   TextField,
   useTheme,
 } from "@aws-amplify/ui-react";
@@ -229,7 +228,7 @@ export default function SawpDetailsCreateForm(props) {
     empID: [{ type: "Required" }],
     sawpEmpLtrReq: [],
     sawpEmpLtrReci: [],
-    sawpEmpUpload: [{ type: "JSON" }],
+    sawpEmpUpload: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -469,7 +468,7 @@ export default function SawpDetailsCreateForm(props) {
         inputFieldRef={sawpEmpUploadRef}
         defaultFieldValue={""}
       >
-        <TextAreaField
+        <TextField
           label="Sawp emp upload"
           isRequired={false}
           isReadOnly={false}
@@ -489,7 +488,7 @@ export default function SawpDetailsCreateForm(props) {
           ref={sawpEmpUploadRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "sawpEmpUpload")}
-        ></TextAreaField>
+        ></TextField>
       </ArrayField>
       <Flex
         justifyContent="space-between"

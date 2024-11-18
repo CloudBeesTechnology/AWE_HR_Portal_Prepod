@@ -28,42 +28,6 @@ export const InsuranceNav = () => {
     });
   }, []);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const mergedData = empPIData
-  //         .map((emp) => {
-  //           const EIDetails = EmpInsuranceData.find(
-  //             (user) => user.empID === emp.empID
-  //           );
-  //           const WIDetails = workInfoData.find(
-  //             (work) => work.empID === emp.empID
-  //           );
-  //           const IDDetails = IDData.find((value) => value.empID === emp.empID);
-
-  //           if (!EIDetails) return null;
-  //           if (!WIDetails) return null;
-  //           if (!IDDetails) return null;
-
-  //           return {
-  //             ...emp,
-  //             ...EIDetails,
-  //             ...WIDetails,
-  //             ...IDDetails,
-  //           };
-  //         })
-  //         .filter(Boolean);
-  //       // console.log(mergedData);
-
-  //       setAllEmpDetails(mergedData);
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, [empPIData, EmpInsuranceData, workInfoData]);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -71,10 +35,10 @@ export const InsuranceNav = () => {
           const EIDetails = EmpInsuranceData
             ? EmpInsuranceData.find((user) => user.empID === emp.empID)
             : {};
-          const WIDetails = workInfoData.find(
+          const WIDetails =workInfoData? workInfoData.find(
             (work) => work.empID === emp.empID
-          ) || {};
-          const IDDetails = IDData.find((value) => value.empID === emp.empID) || {};
+          ) :{};
+          const IDDetails =IDData? IDData.find((value) => value.empID === emp.empID) : {};
   
           // Combine data, giving precedence to existing details
           return {

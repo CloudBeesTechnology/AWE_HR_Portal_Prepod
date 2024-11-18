@@ -15,7 +15,6 @@ import {
   Icon,
   ScrollView,
   Text,
-  TextAreaField,
   TextField,
   useTheme,
 } from "@aws-amplify/ui-react";
@@ -337,9 +336,9 @@ export default function PassportValidUpdateForm(props) {
   const validations = {
     empID: [{ type: "Required" }],
     ppLocation: [],
-    arrivStampUpload: [{ type: "JSON" }],
-    immigEmpUpload: [{ type: "JSON" }],
-    reEntryUpload: [{ type: "JSON" }],
+    arrivStampUpload: [],
+    immigEmpUpload: [],
+    reEntryUpload: [],
     arrivStampExp: [],
     immigRefNo: [],
     ppSubmit: [],
@@ -584,7 +583,7 @@ export default function PassportValidUpdateForm(props) {
         inputFieldRef={arrivStampUploadRef}
         defaultFieldValue={""}
       >
-        <TextAreaField
+        <TextField
           label="Arriv stamp upload"
           isRequired={false}
           isReadOnly={false}
@@ -604,7 +603,7 @@ export default function PassportValidUpdateForm(props) {
           ref={arrivStampUploadRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "arrivStampUpload")}
-        ></TextAreaField>
+        ></TextField>
       </ArrayField>
       <ArrayField
         onChange={async (items) => {
@@ -645,7 +644,7 @@ export default function PassportValidUpdateForm(props) {
         inputFieldRef={immigEmpUploadRef}
         defaultFieldValue={""}
       >
-        <TextAreaField
+        <TextField
           label="Immig emp upload"
           isRequired={false}
           isReadOnly={false}
@@ -665,7 +664,7 @@ export default function PassportValidUpdateForm(props) {
           ref={immigEmpUploadRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "immigEmpUpload")}
-        ></TextAreaField>
+        ></TextField>
       </ArrayField>
       <ArrayField
         onChange={async (items) => {
@@ -706,7 +705,7 @@ export default function PassportValidUpdateForm(props) {
         inputFieldRef={reEntryUploadRef}
         defaultFieldValue={""}
       >
-        <TextAreaField
+        <TextField
           label="Re entry upload"
           isRequired={false}
           isReadOnly={false}
@@ -726,7 +725,7 @@ export default function PassportValidUpdateForm(props) {
           ref={reEntryUploadRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "reEntryUpload")}
-        ></TextAreaField>
+        ></TextField>
       </ArrayField>
       <ArrayField
         onChange={async (items) => {

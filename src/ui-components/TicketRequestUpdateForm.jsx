@@ -124,23 +124,6 @@ export default function TicketRequestUpdateForm(props) {
     setErrors((errors) => ({ ...errors, [fieldName]: validationResponse }));
     return validationResponse;
   };
-  const convertToLocal = (date) => {
-    const df = new Intl.DateTimeFormat("default", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      calendar: "iso8601",
-      numberingSystem: "latn",
-      hourCycle: "h23",
-    });
-    const parts = df.formatToParts(date).reduce((acc, part) => {
-      acc[part.type] = part.value;
-      return acc;
-    }, {});
-    return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`;
-  };
   return (
     <Grid
       as="form"
@@ -287,11 +270,10 @@ export default function TicketRequestUpdateForm(props) {
         label="Emp date"
         isRequired={false}
         isReadOnly={false}
-        type="datetime-local"
-        value={empDate && convertToLocal(new Date(empDate))}
+        type="date"
+        value={empDate}
         onChange={(e) => {
-          let value =
-            e.target.value === "" ? "" : new Date(e.target.value).toISOString();
+          let { value } = e.target;
           if (onChange) {
             const modelFields = {
               empID,
@@ -359,11 +341,10 @@ export default function TicketRequestUpdateForm(props) {
         label="Departure date"
         isRequired={true}
         isReadOnly={false}
-        type="datetime-local"
-        value={departureDate && convertToLocal(new Date(departureDate))}
+        type="date"
+        value={departureDate}
         onChange={(e) => {
-          let value =
-            e.target.value === "" ? "" : new Date(e.target.value).toISOString();
+          let { value } = e.target;
           if (onChange) {
             const modelFields = {
               empID,
@@ -396,11 +377,10 @@ export default function TicketRequestUpdateForm(props) {
         label="Arrival date"
         isRequired={true}
         isReadOnly={false}
-        type="datetime-local"
-        value={arrivalDate && convertToLocal(new Date(arrivalDate))}
+        type="date"
+        value={arrivalDate}
         onChange={(e) => {
-          let value =
-            e.target.value === "" ? "" : new Date(e.target.value).toISOString();
+          let { value } = e.target;
           if (onChange) {
             const modelFields = {
               empID,
@@ -538,11 +518,10 @@ export default function TicketRequestUpdateForm(props) {
         label="Hr date"
         isRequired={false}
         isReadOnly={false}
-        type="datetime-local"
-        value={hrDate && convertToLocal(new Date(hrDate))}
+        type="date"
+        value={hrDate}
         onChange={(e) => {
-          let value =
-            e.target.value === "" ? "" : new Date(e.target.value).toISOString();
+          let { value } = e.target;
           if (onChange) {
             const modelFields = {
               empID,

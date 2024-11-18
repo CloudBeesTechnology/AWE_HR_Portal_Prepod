@@ -60,7 +60,9 @@ export const EmployeeInfo = () => {
     inducBriefUp: null,
   });
   const [profilePhoto, setProfilePhoto] = useState(null);
-  const [inducBriefUp, setInducBriefUp] = useState(null);
+  const [PPLastUP, setPPLastUP] = useState(null);
+ 
+  const [IBLastUP, setIBLastUP] = useState(null);
   const [familyData, setFamilyData] = useState([]);
   const [showTitle, setShowTitle] = useState("");
 
@@ -93,9 +95,9 @@ export const EmployeeInfo = () => {
       try {
         const mergedData = empPIData
           .map((emp) => {
-            const IDDetails = IDData.find((user) => user.empID === emp.empID);
-
-            if (!IDDetails) return null;
+            const IDDetails = IDData
+              ? IDData.find((user) => user.empID === emp.empID)
+              : {};
 
             return {
               ...emp,
@@ -140,7 +142,11 @@ export const EmployeeInfo = () => {
     ];
 
     if (typeof selectedFile === "string") {
-      console.log(selectedFile);
+      if (type === "profilePhoto") {
+        setPPLastUP(selectedFile);
+      } else if (type === "inducBriefUp") {
+        setIBLastUP(selectedFile);
+      }
     } else {
       // Validate file type
       if (!allowedTypes.includes(selectedFile.type)) {
@@ -151,21 +157,11 @@ export const EmployeeInfo = () => {
 
     if (type === "profilePhoto") {
       setProfilePhoto(selectedFile);
-    } else if (type === "inducBriefUp") {
-      setInducBriefUp(selectedFile);
-    }
-
+    } 
     setValue(type, selectedFile);
 
     if (fileTypeValue) {
-      const label = type === "profilePhoto" ? "inducBriefUp" : nameEmp;
-
-      await uploadDocs(
-        fileTypeValue,
-        type,
-        setUploadedDocs,
-        `${nameEmp || " "}`
-      );
+      await uploadDocs(fileTypeValue, type, setUploadedDocs);
 
       setUploadedFileNames((prev) => ({
         ...prev,
@@ -200,6 +196,28 @@ export const EmployeeInfo = () => {
       console.log(err);
     }
   };
+  useEffect(() => {
+    if (
+      (uploadedDocs?.profilePhoto && uploadedDocs.profilePhoto.length > 0) ||
+      (uploadedDocs?.inducBriefUp && uploadedDocs.inducBriefUp.length > 0)
+    ) {
+      if (uploadedDocs.profilePhoto && uploadedDocs.profilePhoto.length > 0) {
+        const lastUploadProf =
+          uploadedDocs.profilePhoto[uploadedDocs.profilePhoto.length - 1]
+            .upload;
+        setPPLastUP(lastUploadProf);
+      }
+
+      if (uploadedDocs.inducBriefUp && uploadedDocs.inducBriefUp.length > 0) {
+        const lastUploadInduc =
+          uploadedDocs.inducBriefUp[uploadedDocs.inducBriefUp.length - 1]
+            .upload;
+        setIBLastUP(lastUploadInduc);
+      }
+    } else {
+      console.log("No uploads found in profilePhoto or inducBriefUp");
+    }
+  }, [uploadedDocs]);
 
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
@@ -210,9 +228,8 @@ export const EmployeeInfo = () => {
     const keysToSet = [
       "empID",
       "driveLic",
-
       "inducBrief",
-      "inducBriefUp",
+      "profilePhoto",
       "myIcNo",
       "nationality",
       "nationalCat",
@@ -221,7 +238,6 @@ export const EmployeeInfo = () => {
       "otherReligion",
       "preEmp",
       "preEmpPeriod",
-      "profilePhoto",
       "race",
       "religion",
       "age",
@@ -268,20 +284,13 @@ export const EmployeeInfo = () => {
     fields.forEach((field) => setValue(field, getLastValue(result[field])));
     const parsedData = JSON.parse(result.familyDetails);
     setFamilyData(parsedData);
-    setUploadedDocs((prev) => ({
-      inducBriefUp: result.inducBriefUp || "",
-      profilePhoto: result.profilePhoto || "",
-    }));
 
-    if (result.inducBriefUp && result.profilePhoto) {
-      setUploadedFileNames((prev) => ({
-        ...prev,
-        inducBriefUp: "Already Updated" || "",
-      }));
-    }
-    if (result.profilePhoto) {
-      handleFileUpload(result.profilePhoto, "profilePhoto");
-    }
+    result.inducBriefUp && setUploadedFileNames((prev) => ({
+      ...prev,
+      inducBriefUp: getFileName(result.inducBriefUp) || "",
+    }));
+    result.profilePhoto && handleFileUpload(result.profilePhoto, "profilePhoto");
+    result.inducBriefUp && handleFileUpload(result.inducBriefUp, "inducBriefUp");    
 
     const uploadFields = [
       "bwnUpload",
@@ -295,10 +304,6 @@ export const EmployeeInfo = () => {
     ];
 
     uploadFields.map((field) => {
-      // console.log(field);
-
-      console.log(result[field]);
-
       if (result && result[field]) {
         try {
           // Parse the field data if it exists
@@ -308,7 +313,6 @@ export const EmployeeInfo = () => {
           const parsedFiles = parsedArray.map((item) =>
             typeof item === "string" ? JSON.parse(item) : item
           );
-          console.log(parsedFiles);
           setValue(field, parsedFiles);
 
           setUploadedFiles((prev) => ({
@@ -328,10 +332,8 @@ export const EmployeeInfo = () => {
         }
       }
     });
-    // console.log(uploadedFiles);
   };
 
-  // console.log(uploadedFiles.bwnUpload);
   function getFileName(url) {
     const urlObj = new URL(url);
     const filePath = urlObj.pathname;
@@ -345,6 +347,7 @@ export const EmployeeInfo = () => {
 
     return fileNameWithExtension;
   }
+
   const onSubmit = async (data) => {
     // console.log(data);
 
@@ -358,8 +361,8 @@ export const EmployeeInfo = () => {
       if (checkingIDTable && checkingPITable) {
         const collectValue = {
           ...data,
-          profilePhoto: uploadedDocs.profilePhoto,
-          inducBriefUp: uploadedDocs.inducBriefUp,
+          profilePhoto: PPLastUP,
+          inducBriefUp: IBLastUP,
           bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
           applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
           cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
@@ -372,7 +375,7 @@ export const EmployeeInfo = () => {
           PITableID: checkingPITable.id,
           IDTable: checkingIDTable.id,
         };
-        // console.log(collectValue);
+        console.log(collectValue);
 
         await UpdateEIValue({ collectValue });
         setShowTitle("Employee Personal Info updated successfully");
@@ -380,8 +383,8 @@ export const EmployeeInfo = () => {
       } else {
         const empValue = {
           ...data,
-          profilePhoto: uploadedDocs.profilePhoto,
-          inducBriefUp: uploadedDocs.inducBriefUp,
+          profilePhoto: PPLastUP,
+          inducBriefUp: IBLastUP,
           bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
           applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
           cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
