@@ -1,0 +1,278 @@
+import { Navigate, Route, Routes } from "react-router-dom";
+import { Dashboard } from "../pages/dashboard/Dashboard";
+import { Employee } from "../pages/employees/Employee";
+import { Training } from "../pages/training/Training";
+import { TimeSheet } from "../pages/timeSheet/TimeSheet";
+import { Reports } from "../pages/reports/Reports";
+import { Recruitments } from "../pages/recruitments/Recruitments";
+import { LeaveManage } from "../pages/leaveManagement/LeaveManage";
+import { BenfitsAndRewards } from "../pages/benfitsAndrewards/BenfitsAndRewards";
+import { Notifications } from "../pages/notifications/Notifications";
+import { Logout } from "../pages/logout/Logout";
+import { ApplicantDetails } from "../pages/recruitments/ApplicatDetails";
+import { PersonalDetails } from "../pages/recruitments/PersonalDetails";
+import { EducationDetails } from "../pages/recruitments/EducationaDetails";
+import { OtherDetails } from "../pages/recruitments/OtherDetails";
+import { RecruTiles } from "../pages/recruitments/RecruTiles";
+import { Candidate } from "../pages/recruitments/Candidate";
+import { Localcandi } from "../pages/recruitments/LocalCandi";
+import { NonlocCandi } from "../pages/recruitments/NonlocCandi";
+import { AddCandidates } from "../pages/recruitments/AddCandidates";
+import { User } from "../pages/user/User";
+import { EmployReq } from "../pages/recruitments/EmployReq";
+import { Status } from "../pages/recruitments/Status";
+import { WorkpassTracking } from "../pages/recruitments/WorkpassTracking";
+import { AllEmployee } from "../pages/employees/AllEmployee";
+import { EmployeeInfo } from "../pages/employees/employeeInfos/EmployeeInfo";
+import { WorkInfo } from "../pages/employees/WorkInfo";
+import { Insurance } from "../pages/employees/insurance/Insurance";
+import { LabourImmigration } from "../pages/employees/medicalDep/LabourImmigration";
+import { TestingAllAwsServices } from "../awsTestingAllProcess/TestingAllAwsServices";
+import { EmpRequisitionForm } from "../pages/recruitments/EmpRequisitionForm";
+import { InsuranceNav } from "../pages/employees/insurance/InsuranceNav";
+import { InsuranceInfo } from "../pages/employees/insurance/InsuranceInfo";
+import { EmployeeInsurance } from "../pages/employees/insurance/EmployeeInsurance";
+import { DependentInsurance } from "../pages/employees/insurance/DependentInsurance";
+import { InsuranceClime } from "../pages/employees/insurance/InsuranceClime";
+import { WorkPass } from "../pages/employees/workPass/WorkPass";
+import { NonLocalAcco } from "../pages/employees/NonLocalAcco";
+import { ChangePassword } from "../pages/changePassword/ChangePassword";
+import { PersonalInformation } from "../pages/profile/PersonalInformation";
+import { Onshore } from "../pages/timeSheet/Onshore";
+import { Offshore } from "../pages/timeSheet/Offshore";
+import { Blng } from "../pages/timeSheet/Blng";
+import { ViewTimeSheet } from "../pages/timeSheet/ViewTimeSheet";
+import { AddCourse } from "../pages/training/trainingForm/AddCourse";
+import { AddEmployeeForm } from "../pages/training/trainingForm/AddEmployeeForm";
+import { TrainingCertificatesForm } from "../pages/training/trainingForm/TrainingCertificatesForm";
+import { WeldingQualificationForm } from "../pages/training/trainingForm/WeldingQualificationForm";
+import { AddNewForm } from "../pages/user/AddUserForm";
+import React, { useEffect, useState } from "react";
+import { generateClient } from "@aws-amplify/api";
+import { listUsers } from "../graphql/queries";
+import { Sawp } from "../pages/employees/workPass/Sawp";
+import { Doe } from "../pages/employees/workPass/Doe";
+import { Nlms } from "../pages/employees/workPass/Nlms";
+import { BankGuarantee } from "../pages/employees/workPass/BankGuarantee";
+import { Jitpa } from "../pages/employees/workPass/Jitpa";
+import { LabourDeposit } from "../pages/employees/workPass/LabourDeposit";
+import { Immigration } from "../pages/employees/workPass/Immigration";
+import { HO } from "../pages/timeSheet/HO";
+import { SBW } from "../pages/timeSheet/SBW";
+import { ORMC } from "../pages/timeSheet/ORMC";
+import { ListofCandi } from "../pages/recruitments/ListofCandi";
+import { ApplyEmployReq } from "../pages/recruitments/ApplyEmployReq"
+import { ProbationForm } from "../pages/reports/ProbationForm";
+
+const client = generateClient();
+
+const NavigationLinks = () => {
+  const loginAuth = localStorage.getItem("userID")?.toUpperCase();
+  const [mainCategories, setMainCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchUserData() {
+      try {
+        // const userID = localStorage.getItem("userID").toUpperCase();
+        const userType = localStorage.getItem("userType");
+        const res = await client.graphql({
+          query: listUsers,
+          variables: {
+            filter: {
+              and: [
+                { empID: { eq: loginAuth } },
+                { selectType: { eq: userType } },
+              ],
+            },
+          },
+        });
+
+        const result = res?.data?.listUsers?.items[0];
+        // console.log(result);
+        const permissionsString = result.setPermissions[0];
+        const categories = extractMainCategories(permissionsString);
+
+        setMainCategories(categories);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchUserData();
+  }, []);
+
+  const extractMainCategories = (permissionsString) => {
+    const regex = /(\w+)=\[/g;
+    const matches = [];
+    let match;
+    while ((match = regex.exec(permissionsString)) !== null) {
+      matches.push(match[1]);
+    }
+    return matches;
+  };
+
+  if (loading) {
+    return (
+      <div>
+        <div className="flex items-center justify-center h-screen">
+          <p className="text-18 font-serif font-bold">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <Routes>
+      {/* Login and Change Password Routes */}
+      <Route path="/changePassword" element={<ChangePassword />} />
+
+      {loginAuth && (
+        <>
+          {mainCategories.map((show, index) => {
+            return (
+              <React.Fragment key={index}>
+                <Route path="/" element={<Navigate to="/dashboard" />} />{" "}
+                <Route
+                  path="/personalInformation"
+                  Component={PersonalInformation}
+                />
+                {show === "Dashboard" && (
+                  <Route path="/Dashboard" Component={Dashboard} />
+                )}
+                {/* User Routes started here */}
+                {show === "User" && (
+                  <>
+                    {" "}
+                    <Route path="/user" Component={User} />
+                    <Route path="/addNewForm" Component={AddNewForm} />
+                  </>
+                )}
+                {/* Recruitments Routes started here */}
+                {show === "Recruitment" && (
+                  <>
+                    <Route path="/recruitment" Component={Recruitments} />
+                    {/* <Route path="/applyemployreq" Component={ApplyEmployReq}/> */}
+                    <Route path="/recrutiles" Component={RecruTiles}>
+                      <Route path="candidate" element={<Candidate />} />
+                      <Route path="applyemployreq" element={<ApplyEmployReq />} />
+                      <Route path="listofcandi" element={<ListofCandi />} />
+                      <Route path="localcandi" element={<Localcandi />} />
+                      <Route path="nonloccandi" element={<NonlocCandi />} />
+                      <Route path="employreq" element={<EmployReq />} />
+                      {/* <Route path="employreq" element={<EmployReq />} /> */}
+                      <Route path="status" element={<Status />} />
+                      <Route
+                        path="workpasstracking"
+                        element={<WorkpassTracking />}
+                      />
+                    </Route>
+                    <Route path="/addCandidates" Component={AddCandidates}>
+                      <Route index element={<ApplicantDetails />} />
+                      <Route
+                        path="personalDetails"
+                        element={<PersonalDetails />}
+                      />
+                      <Route
+                        path="educationDetails"
+                        element={<EducationDetails />}
+                      />
+                      <Route path="otherDetails" element={<OtherDetails />} />
+                    </Route>
+                  </>
+                )}
+                {/*EmployeeRoutes started here */}
+                {show === "Employee" && (
+                  <>
+                    <Route path="/insuranceAdd" Component={InsuranceNav}>
+                      <Route index element={<EmployeeInsurance />} />
+                      <Route
+                        path="dependentInsurance"
+                        element={<DependentInsurance />}
+                      />
+                    </Route>
+
+                    <Route path="/sawp" Component={WorkPass}>
+                      <Route index element={<Sawp />} />
+                      <Route path="doe" element={<Doe />} />
+                      <Route path="nlms" element={<Nlms />} />
+                      <Route path="bankGuarantee" element={<BankGuarantee />} />
+                      <Route path="jitpa" element={<Jitpa />} />
+                      <Route path="labourDeposit" element={<LabourDeposit />} />
+                      <Route path="immigration" element={<Immigration />} />
+                    </Route>
+
+                    <Route path="/allempDetails" Component={AllEmployee} />
+                    <Route path="/employee" Component={Employee} />
+                    <Route
+                      path="/empRequistion"
+                      Component={EmpRequisitionForm}
+                    />
+
+                    <Route path="/employeeInfo" Component={EmployeeInfo} />
+                    <Route path="/workInfo" Component={WorkInfo} />
+                    <Route path="/workPass" Component={WorkPass} />
+                    <Route path="/nonLocalAcco" Component={NonLocalAcco} />
+                    <Route
+                      path="/labourImmigration"
+                      Component={LabourImmigration}
+                    />
+                  </>
+                )}
+                {show === "LeaveManagement" && (
+                  <Route path="/leaveManage" Component={LeaveManage} />
+                )}
+                {show === "Notification" && (
+                  <Route path="/notifications" Component={Notifications} />
+                )}
+                {show === "Report" && (
+                <>
+                  <Route path="/reports" Component={Reports} />
+                  <Route path="/probForm" Component={ProbationForm}/>
+                  </>
+                )}
+                {show === "BenefitsAndRewards" && (
+                  <Route
+                    path="/benfitsAndrewards"
+                    Component={BenfitsAndRewards}
+                  />
+                )}
+                {/* TimeSheetRoutes started here */}
+                {show === "TimeSheet" && (
+                  <>
+                    <Route path="/timeSheet" element={<TimeSheet />} />
+
+                    <Route path="/timesheetHO" element={<HO />} />
+                    <Route path="/timesheetSBW" element={<SBW />} />
+                    <Route path="/timesheetORMC" element={<ORMC />} />
+                    <Route path="/timesheetOffshore" element={<Offshore />} />
+
+                    <Route path="/timesheetBlng" element={<Blng />} />
+                    <Route path="/viewTimesheet" element={<ViewTimeSheet />} />
+                  </>
+                )}
+                {/* Tranining Routes Started here */}
+                {show === "Training" && (
+                  <>
+                    <Route path="/training" Component={Training} />
+                    <Route path="/training/hr" Component={AddCourse} />
+                    <Route path="/trainingReq" Component={AddEmployeeForm} />
+                    <Route
+                      path="/trainingQA"
+                      Component={WeldingQualificationForm}
+                    />
+                  </>
+                )}
+                <Route path="/logout" Component={Logout} />
+                <Route path="/testingAws" Component={TestingAllAwsServices} />
+              </React.Fragment>
+            );
+          })}
+        </>
+      )}
+      <Route path="*" element={<Navigate to="/dashboard" />} />
+    </Routes>
+  );
+};
+export default NavigationLinks;

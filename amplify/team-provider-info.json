@@ -1,0 +1,23 @@
+{
+  "prepod": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-aweadinin-prepod-635ab-authRole",
+      "UnauthRoleArn": "arn:aws:iam::050451362111:role/amplify-aweadinin-prepod-635ab-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::050451362111:role/amplify-aweadinin-prepod-635ab-authRole",
+      "Region": "ap-southeast-1",
+      "DeploymentBucketName": "amplify-aweadinin-prepod-635ab-deployment",
+      "UnauthRoleName": "amplify-aweadinin-prepod-635ab-unauthRole",
+      "StackName": "amplify-aweadinin-prepod-635ab",
+      "StackId": "arn:aws:cloudformation:ap-southeast-1:050451362111:stack/amplify-aweadinin-prepod-635ab/8d4d8e90-a3d0-11ef-b07f-0653c4df5909",
+      "AmplifyAppId": "d185mb3qd7ejdh"
+    },
+    "categories": {
+      "auth": {
+        "aweadinin927c9ded": {}
+      },
+      "storage": {
+        "aweadinistorage": {}
+      }
+    }
+  }
+}

@@ -1,0 +1,195 @@
+import * as XLSX from "xlsx";
+
+export const UploadOffshoreFile = (
+  excelFile,
+  setExcelData,
+  setExcelFile,
+  fileInputRef
+) => {
+  if (excelFile !== null) {
+    const workbook = XLSX.read(excelFile, { type: "buffer" });
+
+    const worksheetNameLength = workbook.SheetNames;
+    console.log("WorkSheet Names :", worksheetNameLength);
+    const allSheets = [];
+
+    worksheetNameLength.forEach((sheetName) => {
+      const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+      allSheets.push({ sheetName, data: sheet });
+    });
+    console.log(allSheets);
+
+    var dataWithDateAndLocation = [];
+
+    // const procedure = (data) => {
+    //   const dataWithDateLocation = data.map((sheet, index) => {
+    //     let date = null;
+    //     let location = null;
+
+    //     sheet.forEach((item) => {
+    //       if (item.date) {
+    //         date = item.date;
+    //       }
+    //       if (item.location) {
+    //         location = item.location;
+    //       }
+    //     });
+
+    //     const processedData = sheet
+    //       .filter((item) => !item.date && !item.location) // Exclude date and location objects to avoid duplicates
+    //       .map((item) => {
+    //         return {
+    //           ...item,
+    //           date: date || "",
+    //           location: location || "",
+    //         };
+    //       });
+
+    //     dataWithDateAndLocation.push(processedData);
+    //   });
+    // };
+
+    const mapKeys = (row, header) => {
+      const mappedObj = {};
+      const valueOccurrences = {};
+
+      Object.keys(header).forEach((key) => {
+        const newKey = header[key];
+
+        if (valueOccurrences[newKey]) {
+          valueOccurrences[newKey] += 1;
+          mappedObj[`${newKey}_${valueOccurrences[newKey]}`] = row[key] || null;
+        } else {
+          valueOccurrences[newKey] = 1;
+          mappedObj[newKey] = row[key] || null;
+        }
+      });
+
+      return mappedObj;
+    };
+
+    const tbodyHeader = [];
+
+    const processedSheets =
+      allSheets &&
+      allSheets.map((sheet) => {
+        const sheetName = sheet.sheetName;
+
+        const location = sheet.data[0];
+        const header = sheet.data[2];
+        const rows = sheet.data.slice(3, 4).map((row) => mapKeys(row, header));
+
+        const pickTbodyHeader = sheet.data[7];
+
+        const pickTbodySubTotalHeader = sheet.data[2];
+
+        const removeKeys = [
+          "138000",
+          "CONTRACT No:",
+          "DAILY TIME SHEET ",
+          "__EMPTY",
+          "__EMPTY_4",
+        ];
+        const trimmedRemoveKeys = removeKeys.map((key) => key.trim());
+
+        const filteredData = Object.fromEntries(
+          Object.entries(pickTbodySubTotalHeader).filter(([key, value]) => {
+            return !trimmedRemoveKeys.includes(key.trim());
+          })
+        );
+
+        const combinedTbodyHeader = {
+          ...pickTbodyHeader,
+          ...filteredData,
+        };
+
+        tbodyHeader.push(combinedTbodyHeader);
+        console.log(combinedTbodyHeader);
+
+        const tbodyRows = sheet.data
+          .slice(8)
+          .map((row) => mapKeys(row, combinedTbodyHeader));
+
+        return {
+          sheetName,
+          rows,
+          tbodyRows,
+          location,
+        };
+      });
+
+    console.log(processedSheets);
+    const finalFilterdData = [];
+
+    processedSheets &&
+      processedSheets.map((sheet, index) => {
+        const date = sheet.rows;
+        const location = sheet.location.__EMPTY;
+        const tbodyData = sheet.tbodyRows;
+
+        const MergeDateLocation = tbodyData.map((val, index) => {
+          return {
+            ...val,
+            date: date.map((m) => m.DATE),
+            location: location,
+          };
+        });
+
+        let totalIndex = MergeDateLocation.findIndex(
+          (item) => item.NAME === "TOTAL"
+        );
+        console.log(tbodyData);
+        console.log(totalIndex);
+        if (totalIndex > -1) {
+          let slicedData = MergeDateLocation.slice(0, totalIndex);
+          console.log(slicedData);
+          let filteredData = slicedData.filter((item) => item.NAME !== null);
+          console.log(filteredData);
+          const filterdData = filteredData.flat();
+
+          finalFilterdData.push(...filterdData);
+        }
+      });
+    function excelDateToJSDate(serial) {
+      const baseDate = new Date(1899, 11, 30);
+
+      const daysToAdd = serial;
+      return new Date(baseDate.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
+    }
+    const result =
+      finalFilterdData &&
+      finalFilterdData.map((getDate) => {
+        const dates = getDate.date.flat();
+        let jsDate = excelDateToJSDate(dates);
+        const formattedDate = jsDate.toLocaleDateString();
+        return {
+          ...getDate,
+          date: formattedDate,
+        };
+      });
+    console.log(result);
+    function cleanKey(key) {
+      if (typeof key !== "string") {
+        return key; // Return value if not a string (e.g., number, object)
+      }
+      return key.replace(/[^a-zA-Z0-9]/g, ""); // Removes all non-alphanumeric characters
+    }
+
+    const formattedData = result.map((item) => {
+      const cleanedItem = {};
+
+      for (const key in item) {
+        const cleanedKey = cleanKey(key).toUpperCase(); // Clean the key
+        cleanedItem[cleanedKey] = item[key]; // Set the value using the cleaned key
+      }
+
+      return cleanedItem;
+    });
+    console.log("formattedData : ", formattedData);
+    setExcelData(formattedData);
+    return tbodyHeader;
+  }
+
+  fileInputRef.current.value = "";
+  setExcelFile(null);
+};

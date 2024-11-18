@@ -1,0 +1,205 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  /* user-select: none; */
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer utilities {
+  .screen-size {
+    @apply max-w-screen-2xl w-[95%] mx-auto;
+  }
+  .center {
+    @apply flex justify-center items-center;
+  }
+  .vertical-center {
+    @apply flex justify-center;
+  }
+  .horizontal-center {
+    @apply flex items-center justify-evenly;
+  }
+  .title {
+    @apply text-[24px] font-semibold;
+  }
+  .text_size_1 {
+    @apply text-3xl font-semibold;
+  }
+  .text_size_2 {
+    @apply text-xl font-semibold;
+  }
+  .text_size_3 {
+    @apply text-lg font-semibold;
+  }
+  .text_size_4 {
+    @apply text-lg font-medium;
+  }
+  .text_size_5 {
+    @apply text-[16px] font-semibold;
+  }
+  .text_size_6 {
+    @apply text-[16px] font-medium;
+  }
+  .text_size_7 {
+    @apply text-sm font-semibold;
+  }
+  .text_size_8 {
+    @apply text-sm font-medium;
+  }
+  .text_size_9 {
+    @apply text-xs font-medium;
+  }
+  .text_size_10 {
+    @apply text-[10px] font-medium;
+  }
+  .text_size_11 {
+    @apply text-[8px] font-medium;
+  }
+  .primary_btn {
+    @apply bg-primary font-bold py-2 px-24 text-dark_grey rounded-md;
+  }
+  .secondary_btn {
+    @apply bg-medium_grey py-2 px-5 text-yellow rounded-md;
+  }
+  .btn_1 {
+    @apply bg-primary py-2 px-10 text-zinc rounded-2xl;
+  }
+  .btn_2 {
+    @apply bg-secondary py-2 px-3 rounded-md text-white;
+  }
+  .input-field {
+    @apply w-full h-[45px] bg-lite_skyBlue px-3 mt-2 border outline-none border-[#dedddd] rounded;
+  }
+
+  .form-group {
+    @apply mb-4;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-spin-slow {
+    animation: spin 3s linear infinite; /* Adjust speed (3s) as needed */
+  }
+}
+
+.scrollBar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollBar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.label-new {
+  display: inline-block;
+  background-color: #ff7f25; /* Orange color */
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 4px 12px;
+  border-radius: 20px 0 20px 0px; /* Rounded on the left side */
+}
+.select-custom {
+  background: url("./assets/drop.png") no-repeat;
+  background-position: right 5% center;
+  background-color: #f5f7fb;
+  background-size: 18px 18px; /* Adjust size if needed */
+  appearance: none; /* Remove default arrow */
+}
+
+/* added by hari --------------------------------------*/
+
+.leaveManagementTable::-webkit-scrollbar {
+  width: 6px;
+  height: 2px;
+}
+
+.leaveManagementTable::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.leaveManagementTable::-webkit-scrollbar-thumb {
+  background: #d6cbcb80;
+}
+
+.leaveManagementTable::-webkit-scrollbar-thumb:hover {
+  background: #f1f1f1;
+}
+
+.empScroll::-webkit-scrollbar {
+  width: 6px;
+  height: 2px;
+}
+
+.empScroll::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.empScroll::-webkit-scrollbar-thumb {
+  background: #d6cbcb80;
+}
+
+.empScroll::-webkit-scrollbar-thumb:hover {
+  background: #f1f1f1;
+}
+
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Adjust the gap between checkbox and label as needed */
+}
+
+/* @media print {
+  /* Styles for print or PDF */
+.checkbox-container {
+  display: flex; /* Ensure layout is preserved */
+  align-items: center; /* Align items */
+}
+
+.your-element {
+  /* Adjust styles specifically for print if necessary */
+  margin: 0; /* Example */
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none; /* Chrome/Safari */
+  margin: 0; /* Remove margin */
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+.export-container {
+  /* text-align: center; Center align all content */
+  margin: 0; /* Remove margins */
+  padding: 0; /* Remove padding */
+  width: 100%; /* Set full width */
+}
+

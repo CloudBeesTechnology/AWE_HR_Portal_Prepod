@@ -1,0 +1,15 @@
+projects:
+  aweadinin:
+    schemaPath: amplify/backend/api/aweadinin/build/schema.graphql
+    includes:
+      - src/graphql/graphqlOperation
+    excludes:
+      - ./amplify/**
+    extensions:
+      amplify:
+        codeGenTarget: javascript
+        generatedFileName: ''
+        docsFilePath: src/graphql
+        region: ap-southeast-1
+        apiId: null
+        maxDepth: 2

@@ -1,0 +1,163 @@
+/***************************************************************************
+ * The contents of this file were generated with Amplify Studio.           *
+ * Please refrain from making any modifications to this file.              *
+ * Any changes to this file will be overwritten when running amplify pull. *
+ **************************************************************************/
+
+import * as React from "react";
+import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+export declare type EscapeHatchProps = {
+    [elementHierarchy: string]: Record<string, unknown>;
+} | null;
+export declare type VariantValues = {
+    [key: string]: string;
+};
+export declare type Variant = {
+    variantValues: VariantValues;
+    overrides: EscapeHatchProps;
+};
+export declare type ValidationResponse = {
+    hasError: boolean;
+    errorMessage?: string;
+};
+export declare type ValidationFunction<T> = (value: T, validationResponse: ValidationResponse) => ValidationResponse | Promise<ValidationResponse>;
+export declare type WPTrackingUpdateFormInputValues = {
+    tempID?: string;
+    supportletterReqDate?: string;
+    supportletterReceiveDate?: string;
+    letterfile?: string;
+    doesubmitdate?: string;
+    doeapprovedate?: string;
+    doeexpirydate?: string;
+    doefile?: string;
+    nlmssubmitdate?: string;
+    submissionrefrenceno?: string;
+    nlmsapprovedate?: string;
+    ldreferenceno?: string;
+    nlmsexpirydate?: string;
+    nlmsfile?: string;
+    bgsubmitdate?: string;
+    bgreceivedate?: string;
+    referenceno?: string;
+    bgamount?: string;
+    bgexpirydate?: string;
+    bgfile?: string;
+    tbapurchasedate?: string;
+    jitpaamount?: string;
+    jitpaexpirydate?: string;
+    receiptno?: string;
+    depositamount?: string;
+    submitdateendorsement?: string;
+    jitpafile?: string;
+    immbdno?: string;
+    docsubmitdate?: string;
+    visaapprovedate?: string;
+    visareferenceno?: string;
+    visaFile?: string;
+    departuredate?: string;
+    arrivaldate?: string;
+    cityname?: string;
+    airfare?: string;
+    airticketfile?: string;
+    agentname?: string;
+    mobSignDate?: string;
+    mobFile?: string;
+};
+export declare type WPTrackingUpdateFormValidationValues = {
+    tempID?: ValidationFunction<string>;
+    supportletterReqDate?: ValidationFunction<string>;
+    supportletterReceiveDate?: ValidationFunction<string>;
+    letterfile?: ValidationFunction<string>;
+    doesubmitdate?: ValidationFunction<string>;
+    doeapprovedate?: ValidationFunction<string>;
+    doeexpirydate?: ValidationFunction<string>;
+    doefile?: ValidationFunction<string>;
+    nlmssubmitdate?: ValidationFunction<string>;
+    submissionrefrenceno?: ValidationFunction<string>;
+    nlmsapprovedate?: ValidationFunction<string>;
+    ldreferenceno?: ValidationFunction<string>;
+    nlmsexpirydate?: ValidationFunction<string>;
+    nlmsfile?: ValidationFunction<string>;
+    bgsubmitdate?: ValidationFunction<string>;
+    bgreceivedate?: ValidationFunction<string>;
+    referenceno?: ValidationFunction<string>;
+    bgamount?: ValidationFunction<string>;
+    bgexpirydate?: ValidationFunction<string>;
+    bgfile?: ValidationFunction<string>;
+    tbapurchasedate?: ValidationFunction<string>;
+    jitpaamount?: ValidationFunction<string>;
+    jitpaexpirydate?: ValidationFunction<string>;
+    receiptno?: ValidationFunction<string>;
+    depositamount?: ValidationFunction<string>;
+    submitdateendorsement?: ValidationFunction<string>;
+    jitpafile?: ValidationFunction<string>;
+    immbdno?: ValidationFunction<string>;
+    docsubmitdate?: ValidationFunction<string>;
+    visaapprovedate?: ValidationFunction<string>;
+    visareferenceno?: ValidationFunction<string>;
+    visaFile?: ValidationFunction<string>;
+    departuredate?: ValidationFunction<string>;
+    arrivaldate?: ValidationFunction<string>;
+    cityname?: ValidationFunction<string>;
+    airfare?: ValidationFunction<string>;
+    airticketfile?: ValidationFunction<string>;
+    agentname?: ValidationFunction<string>;
+    mobSignDate?: ValidationFunction<string>;
+    mobFile?: ValidationFunction<string>;
+};
+export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
+export declare type WPTrackingUpdateFormOverridesProps = {
+    WPTrackingUpdateFormGrid?: PrimitiveOverrideProps<GridProps>;
+    tempID?: PrimitiveOverrideProps<TextFieldProps>;
+    supportletterReqDate?: PrimitiveOverrideProps<TextFieldProps>;
+    supportletterReceiveDate?: PrimitiveOverrideProps<TextFieldProps>;
+    letterfile?: PrimitiveOverrideProps<TextFieldProps>;
+    doesubmitdate?: PrimitiveOverrideProps<TextFieldProps>;
+    doeapprovedate?: PrimitiveOverrideProps<TextFieldProps>;
+    doeexpirydate?: PrimitiveOverrideProps<TextFieldProps>;
+    doefile?: PrimitiveOverrideProps<TextFieldProps>;
+    nlmssubmitdate?: PrimitiveOverrideProps<TextFieldProps>;
+    submissionrefrenceno?: PrimitiveOverrideProps<TextFieldProps>;
+    nlmsapprovedate?: PrimitiveOverrideProps<TextFieldProps>;
+    ldreferenceno?: PrimitiveOverrideProps<TextFieldProps>;
+    nlmsexpirydate?: PrimitiveOverrideProps<TextFieldProps>;
+    nlmsfile?: PrimitiveOverrideProps<TextFieldProps>;
+    bgsubmitdate?: PrimitiveOverrideProps<TextFieldProps>;
+    bgreceivedate?: PrimitiveOverrideProps<TextFieldProps>;
+    referenceno?: PrimitiveOverrideProps<TextFieldProps>;
+    bgamount?: PrimitiveOverrideProps<TextFieldProps>;
+    bgexpirydate?: PrimitiveOverrideProps<TextFieldProps>;
+    bgfile?: PrimitiveOverrideProps<TextFieldProps>;
+    tbapurchasedate?: PrimitiveOverrideProps<TextFieldProps>;
+    jitpaamount?: PrimitiveOverrideProps<TextFieldProps>;
+    jitpaexpirydate?: PrimitiveOverrideProps<TextFieldProps>;
+    receiptno?: PrimitiveOverrideProps<TextFieldProps>;
+    depositamount?: PrimitiveOverrideProps<TextFieldProps>;
+    submitdateendorsement?: PrimitiveOverrideProps<TextFieldProps>;
+    jitpafile?: PrimitiveOverrideProps<TextFieldProps>;
+    immbdno?: PrimitiveOverrideProps<TextFieldProps>;
+    docsubmitdate?: PrimitiveOverrideProps<TextFieldProps>;
+    visaapprovedate?: PrimitiveOverrideProps<TextFieldProps>;
+    visareferenceno?: PrimitiveOverrideProps<TextFieldProps>;
+    visaFile?: PrimitiveOverrideProps<TextFieldProps>;
+    departuredate?: PrimitiveOverrideProps<TextFieldProps>;
+    arrivaldate?: PrimitiveOverrideProps<TextFieldProps>;
+    cityname?: PrimitiveOverrideProps<TextFieldProps>;
+    airfare?: PrimitiveOverrideProps<TextFieldProps>;
+    airticketfile?: PrimitiveOverrideProps<TextFieldProps>;
+    agentname?: PrimitiveOverrideProps<TextFieldProps>;
+    mobSignDate?: PrimitiveOverrideProps<TextFieldProps>;
+    mobFile?: PrimitiveOverrideProps<TextFieldProps>;
+} & EscapeHatchProps;
+export declare type WPTrackingUpdateFormProps = React.PropsWithChildren<{
+    overrides?: WPTrackingUpdateFormOverridesProps | undefined | null;
+} & {
+    id?: string;
+    wPTracking?: any;
+    onSubmit?: (fields: WPTrackingUpdateFormInputValues) => WPTrackingUpdateFormInputValues;
+    onSuccess?: (fields: WPTrackingUpdateFormInputValues) => void;
+    onError?: (fields: WPTrackingUpdateFormInputValues, errorMessage: string) => void;
+    onChange?: (fields: WPTrackingUpdateFormInputValues) => WPTrackingUpdateFormInputValues;
+    onValidate?: WPTrackingUpdateFormValidationValues;
+} & React.CSSProperties>;
+export default function WPTrackingUpdateForm(props: WPTrackingUpdateFormProps): React.ReactElement;
