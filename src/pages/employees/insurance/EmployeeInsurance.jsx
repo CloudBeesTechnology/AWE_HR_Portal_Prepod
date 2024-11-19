@@ -224,15 +224,20 @@ export const EmployeeInsurance = () => {
   }, [searchResultData]);
 
   function getFileName(url) {
+    if (!url) {
+      console.error("Invalid URL:", url);
+      return "";
+    }
+  
     try {
-      const urlObj = new URL(url);
+      const urlObj = new URL(url); // Create URL object
       const filePath = urlObj.pathname;
-
+  
       const decodedUrl = decodeURIComponent(filePath);
-
+  
       // Extract the file name after the last '/' in the path
       const fileNameWithExtension = decodedUrl.split("/").pop();
-
+  
       return fileNameWithExtension;
     } catch (error) {
       console.error("Invalid URL:", url, error);

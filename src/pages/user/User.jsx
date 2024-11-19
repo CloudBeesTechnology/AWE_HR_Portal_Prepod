@@ -118,7 +118,7 @@ export const User = () => {
     };
     navigate("/addNewForm", { state: { editUserData: allValue } });
   };
-console.log(userData);
+// console.log(userData);
 
   const handleAddUser = () => {
     const allValue = {
