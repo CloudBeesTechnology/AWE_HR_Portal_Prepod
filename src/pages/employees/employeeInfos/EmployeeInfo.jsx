@@ -59,9 +59,9 @@ export const EmployeeInfo = () => {
     profilePhoto: null,
     inducBriefUp: null,
   });
-  const [profilePhoto, setProfilePhoto] = useState(null);
+
   const [PPLastUP, setPPLastUP] = useState(null);
- 
+
   const [IBLastUP, setIBLastUP] = useState(null);
   const [familyData, setFamilyData] = useState([]);
   const [showTitle, setShowTitle] = useState("");
@@ -117,8 +117,6 @@ export const EmployeeInfo = () => {
     fetchData();
   }, [empPIData, IDData]);
 
-  const nameEmp = watch("name");
-
   const handleFileUpload = async (e, type) => {
     let selectedFile;
     let fileTypeValue;
@@ -155,9 +153,7 @@ export const EmployeeInfo = () => {
       }
     }
 
-    if (type === "profilePhoto") {
-      setProfilePhoto(selectedFile);
-    } 
+
     setValue(type, selectedFile);
 
     if (fileTypeValue) {
@@ -285,12 +281,15 @@ export const EmployeeInfo = () => {
     const parsedData = JSON.parse(result.familyDetails);
     setFamilyData(parsedData);
 
-    result.inducBriefUp && setUploadedFileNames((prev) => ({
-      ...prev,
-      inducBriefUp: getFileName(result.inducBriefUp) || "",
-    }));
-    result.profilePhoto && handleFileUpload(result.profilePhoto, "profilePhoto");
-    result.inducBriefUp && handleFileUpload(result.inducBriefUp, "inducBriefUp");    
+    result.inducBriefUp &&
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        inducBriefUp: getFileName(result.inducBriefUp) || "",
+      }));
+    result.profilePhoto &&
+      handleFileUpload(result.profilePhoto, "profilePhoto");
+    result.inducBriefUp &&
+      handleFileUpload(result.inducBriefUp, "inducBriefUp");
 
     const uploadFields = [
       "bwnUpload",
@@ -412,7 +411,6 @@ export const EmployeeInfo = () => {
 
   const watchedProfilePhoto = watch("profilePhoto" || "");
   const watchInducBriefUpload = watch("inducBriefUp" || "");
-  const watchSupportDocUpload = watch("supportDocUpload" || "");
 
   return (
     <section className="bg-[#F5F6F1CC] mx-auto p-10">
@@ -452,14 +450,14 @@ export const EmployeeInfo = () => {
             <div className="h-[120px] max-w-[120px] relative rounded-md bg-lite_skyBlue">
               <img
                 src={
-                  profilePhoto instanceof File
-                    ? URL.createObjectURL(profilePhoto)
-                    : typeof profilePhoto === "string" && profilePhoto
-                    ? profilePhoto
+                  PPLastUP instanceof File
+                    ? URL.createObjectURL(PPLastUP)
+                    : typeof PPLastUP === "string" && PPLastUP
+                    ? PPLastUP
                     : watchedProfilePhoto
                     ? watchedProfilePhoto
-                    : uploadedDocs.profilePhoto
-                    ? uploadedDocs.profilePhoto
+                    : PPLastUP
+                    ? PPLastUP
                     : avatar
                 }
                 id="previewImg"
@@ -467,8 +465,7 @@ export const EmployeeInfo = () => {
                 className="object-cover w-full h-full"
                 onError={(e) => (e.target.src = avatar)}
               />
-              {(profilePhoto ||
-                uploadedDocs.profilePhoto ||
+              {(PPLastUP ||
                 watchedProfilePhoto) && (
                 <div
                   className="absolute top-24 -right-3  bg-lite_grey p-[2px] rounded-full cursor-pointer"
@@ -480,8 +477,7 @@ export const EmployeeInfo = () => {
             </div>
 
             {/* Conditionally Render the "Choose Image" button */}
-            {!profilePhoto &&
-              !uploadedDocs.profilePhoto &&
+            {!PPLastUP &&
               !watchedProfilePhoto && (
                 <div className="mt-1 rounded-lg text-center">
                   <button
@@ -494,8 +490,7 @@ export const EmployeeInfo = () => {
                 </div>
               )}
 
-            {!profilePhoto &&
-              !uploadedDocs.profilePhoto &&
+            {!PPLastUP &&
               !watchedProfilePhoto &&
               errors.profilePhoto && (
                 <p className="text-[red] text-[13px] text-center">
@@ -593,7 +588,7 @@ export const EmployeeInfo = () => {
             )}
           </div>
         </div>
-      
+
         <div className="grid grid-cols-4 gap-5 form-group mt-5">
           {uploadFields.map((field, index) => (
             <Controller
