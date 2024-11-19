@@ -25,7 +25,7 @@ package-lock.json
 *.sw?
 
 build/
-dist/
+# dist/
 node_modules/
 
 .secret-*
@@ -41,7 +41,7 @@ node_modules/
 # amplify/backend/amplify-meta.json
 # amplify/backend/.temp
 build/
-dist/
+# dist/
 node_modules/
 # aws-exports.js
 # awsconfiguration.json
@@ -63,7 +63,7 @@ amplify/mock-api-resources
 amplify/backend/amplify-meta.json
 amplify/backend/.temp
 build/
-dist/
+# dist/
 node_modules/
 aws-exports.js
 awsconfiguration.json
