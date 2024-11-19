@@ -31,7 +31,7 @@ export const AddNewForm = () => {
   const workInfoDataDetails = data?.workValue || addData?.workValue;
   // console.log(userDataDetails );
   // console.log(addData?.employeeValue);
-  // console.log(workInfoDataDetails);
+
 
   // console.log(data?.storedValue?.data);
 
@@ -214,7 +214,6 @@ export const AddNewForm = () => {
       } else {
         const createNewUser = {
           empID: data.empID,
-          // password: "AWE001",
           password: data.password,
           selectType: data.selectType,
           setPermissions: dropDownVal,
