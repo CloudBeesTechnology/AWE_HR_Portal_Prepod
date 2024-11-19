@@ -29,8 +29,8 @@ export declare type LabourMedicalInfoUpdateFormInputValues = {
     bruhimsRNo?: string;
     bruneiMAD?: string[];
     bruneiME?: string[];
-    uploadFitness?: string;
-    uploadRegis?: string;
+    uploadFitness?: string[];
+    uploadRegis?: string[];
     uploadBwn?: string[];
     dependPass?: string[];
 };
@@ -57,9 +57,9 @@ export declare type LabourMedicalInfoUpdateFormOverridesProps = {
     bruhimsRNo?: PrimitiveOverrideProps<TextFieldProps>;
     bruneiMAD?: PrimitiveOverrideProps<TextFieldProps>;
     bruneiME?: PrimitiveOverrideProps<TextFieldProps>;
-    uploadFitness?: PrimitiveOverrideProps<TextFieldProps>;
-    uploadRegis?: PrimitiveOverrideProps<TextFieldProps>;
-    uploadBwn?: PrimitiveOverrideProps<TextFieldProps>;
+    uploadFitness?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    uploadRegis?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    uploadBwn?: PrimitiveOverrideProps<TextAreaFieldProps>;
     dependPass?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type LabourMedicalInfoUpdateFormProps = React.PropsWithChildren<{

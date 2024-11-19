@@ -73,7 +73,11 @@ export const WorkInfoFunc = () => {
       // uploadResign,
       // uploadTerminate,
       // uploadLeave,
-      workInfoUploads,
+      WIContract,
+      WIProbation,
+      WIResignation,
+      WITermination,
+      WILeaveEntitle,
       positionRev,
       positionRevDate,
       revSalary,
@@ -91,6 +95,7 @@ export const WorkInfoFunc = () => {
       uploadAL,
       uploadDep,
       sapNo,
+     
     } = workInfoValue;
 
     const totalData = {
@@ -137,7 +142,11 @@ export const WorkInfoFunc = () => {
       otherTermiNotConf,
       reasonResign,
       reasonTerminate,
-      workInfoUploads,
+      WIContract,
+      WIProbation,
+      WIResignation,
+      WITermination,
+      WILeaveEntitle,
     };
 
     const totalData2 = {

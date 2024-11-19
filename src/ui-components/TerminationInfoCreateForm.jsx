@@ -15,6 +15,7 @@ import {
   Icon,
   ScrollView,
   Text,
+  TextAreaField,
   TextField,
   useTheme,
 } from "@aws-amplify/ui-react";
@@ -202,7 +203,11 @@ export default function TerminationInfoCreateForm(props) {
     otherTermiNotProb: "",
     termiNotConf: "",
     otherTermiNotConf: "",
-    workInfoUploads: [],
+    WIContract: [],
+    WIProbation: [],
+    WIResignation: [],
+    WITermination: [],
+    WILeaveEntitle: [],
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [resignDate, setResignDate] = React.useState(initialValues.resignDate);
@@ -237,8 +242,18 @@ export default function TerminationInfoCreateForm(props) {
   const [otherTermiNotConf, setOtherTermiNotConf] = React.useState(
     initialValues.otherTermiNotConf
   );
-  const [workInfoUploads, setWorkInfoUploads] = React.useState(
-    initialValues.workInfoUploads
+  const [WIContract, setWIContract] = React.useState(initialValues.WIContract);
+  const [WIProbation, setWIProbation] = React.useState(
+    initialValues.WIProbation
+  );
+  const [WIResignation, setWIResignation] = React.useState(
+    initialValues.WIResignation
+  );
+  const [WITermination, setWITermination] = React.useState(
+    initialValues.WITermination
+  );
+  const [WILeaveEntitle, setWILeaveEntitle] = React.useState(
+    initialValues.WILeaveEntitle
   );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
@@ -255,13 +270,33 @@ export default function TerminationInfoCreateForm(props) {
     setOtherTermiNotProb(initialValues.otherTermiNotProb);
     setTermiNotConf(initialValues.termiNotConf);
     setOtherTermiNotConf(initialValues.otherTermiNotConf);
-    setWorkInfoUploads(initialValues.workInfoUploads);
-    setCurrentWorkInfoUploadsValue("");
+    setWIContract(initialValues.WIContract);
+    setCurrentWIContractValue("");
+    setWIProbation(initialValues.WIProbation);
+    setCurrentWIProbationValue("");
+    setWIResignation(initialValues.WIResignation);
+    setCurrentWIResignationValue("");
+    setWITermination(initialValues.WITermination);
+    setCurrentWITerminationValue("");
+    setWILeaveEntitle(initialValues.WILeaveEntitle);
+    setCurrentWILeaveEntitleValue("");
     setErrors({});
   };
-  const [currentWorkInfoUploadsValue, setCurrentWorkInfoUploadsValue] =
+  const [currentWIContractValue, setCurrentWIContractValue] =
     React.useState("");
-  const workInfoUploadsRef = React.createRef();
+  const WIContractRef = React.createRef();
+  const [currentWIProbationValue, setCurrentWIProbationValue] =
+    React.useState("");
+  const WIProbationRef = React.createRef();
+  const [currentWIResignationValue, setCurrentWIResignationValue] =
+    React.useState("");
+  const WIResignationRef = React.createRef();
+  const [currentWITerminationValue, setCurrentWITerminationValue] =
+    React.useState("");
+  const WITerminationRef = React.createRef();
+  const [currentWILeaveEntitleValue, setCurrentWILeaveEntitleValue] =
+    React.useState("");
+  const WILeaveEntitleRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
     resignDate: [],
@@ -276,7 +311,11 @@ export default function TerminationInfoCreateForm(props) {
     otherTermiNotProb: [],
     termiNotConf: [],
     otherTermiNotConf: [],
-    workInfoUploads: [],
+    WIContract: [{ type: "JSON" }],
+    WIProbation: [{ type: "JSON" }],
+    WIResignation: [{ type: "JSON" }],
+    WITermination: [{ type: "JSON" }],
+    WILeaveEntitle: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -317,7 +356,11 @@ export default function TerminationInfoCreateForm(props) {
           otherTermiNotProb,
           termiNotConf,
           otherTermiNotConf,
-          workInfoUploads,
+          WIContract,
+          WIProbation,
+          WIResignation,
+          WITermination,
+          WILeaveEntitle,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -393,7 +436,11 @@ export default function TerminationInfoCreateForm(props) {
               otherTermiNotProb,
               termiNotConf,
               otherTermiNotConf,
-              workInfoUploads,
+              WIContract,
+              WIProbation,
+              WIResignation,
+              WITermination,
+              WILeaveEntitle,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -430,7 +477,11 @@ export default function TerminationInfoCreateForm(props) {
               otherTermiNotProb,
               termiNotConf,
               otherTermiNotConf,
-              workInfoUploads,
+              WIContract,
+              WIProbation,
+              WIResignation,
+              WITermination,
+              WILeaveEntitle,
             };
             const result = onChange(modelFields);
             value = result?.resignDate ?? value;
@@ -467,7 +518,11 @@ export default function TerminationInfoCreateForm(props) {
               otherTermiNotProb,
               termiNotConf,
               otherTermiNotConf,
-              workInfoUploads,
+              WIContract,
+              WIProbation,
+              WIResignation,
+              WITermination,
+              WILeaveEntitle,
             };
             const result = onChange(modelFields);
             value = result?.resignNotProb ?? value;
@@ -504,7 +559,11 @@ export default function TerminationInfoCreateForm(props) {
               otherTermiNotProb,
               termiNotConf,
               otherTermiNotConf,
-              workInfoUploads,
+              WIContract,
+              WIProbation,
+              WIResignation,
+              WITermination,
+              WILeaveEntitle,
             };
             const result = onChange(modelFields);
             value = result?.otherResignNotProb ?? value;
@@ -543,7 +602,11 @@ export default function TerminationInfoCreateForm(props) {
               otherTermiNotProb,
               termiNotConf,
               otherTermiNotConf,
-              workInfoUploads,
+              WIContract,
+              WIProbation,
+              WIResignation,
+              WITermination,
+              WILeaveEntitle,
             };
             const result = onChange(modelFields);
             value = result?.resignNotConf ?? value;
@@ -580,7 +643,11 @@ export default function TerminationInfoCreateForm(props) {
               otherTermiNotProb,
               termiNotConf,
               otherTermiNotConf,
-              workInfoUploads,
+              WIContract,
+              WIProbation,
+              WIResignation,
+              WITermination,
+              WILeaveEntitle,
             };
             const result = onChange(modelFields);
             value = result?.otherResignNotConf ?? value;
@@ -619,7 +686,11 @@ export default function TerminationInfoCreateForm(props) {
               otherTermiNotProb,
               termiNotConf,
               otherTermiNotConf,
-              workInfoUploads,
+              WIContract,
+              WIProbation,
+              WIResignation,
+              WITermination,
+              WILeaveEntitle,
             };
             const result = onChange(modelFields);
             value = result?.reasonResign ?? value;
@@ -656,7 +727,11 @@ export default function TerminationInfoCreateForm(props) {
               otherTermiNotProb,
               termiNotConf,
               otherTermiNotConf,
-              workInfoUploads,
+              WIContract,
+              WIProbation,
+              WIResignation,
+              WITermination,
+              WILeaveEntitle,
             };
             const result = onChange(modelFields);
             value = result?.reasonTerminate ?? value;
@@ -693,7 +768,11 @@ export default function TerminationInfoCreateForm(props) {
               otherTermiNotProb,
               termiNotConf,
               otherTermiNotConf,
-              workInfoUploads,
+              WIContract,
+              WIProbation,
+              WIResignation,
+              WITermination,
+              WILeaveEntitle,
             };
             const result = onChange(modelFields);
             value = result?.termiDate ?? value;
@@ -730,7 +809,11 @@ export default function TerminationInfoCreateForm(props) {
               otherTermiNotProb,
               termiNotConf,
               otherTermiNotConf,
-              workInfoUploads,
+              WIContract,
+              WIProbation,
+              WIResignation,
+              WITermination,
+              WILeaveEntitle,
             };
             const result = onChange(modelFields);
             value = result?.termiNotProb ?? value;
@@ -767,7 +850,11 @@ export default function TerminationInfoCreateForm(props) {
               otherTermiNotProb: value,
               termiNotConf,
               otherTermiNotConf,
-              workInfoUploads,
+              WIContract,
+              WIProbation,
+              WIResignation,
+              WITermination,
+              WILeaveEntitle,
             };
             const result = onChange(modelFields);
             value = result?.otherTermiNotProb ?? value;
@@ -806,7 +893,11 @@ export default function TerminationInfoCreateForm(props) {
               otherTermiNotProb,
               termiNotConf: value,
               otherTermiNotConf,
-              workInfoUploads,
+              WIContract,
+              WIProbation,
+              WIResignation,
+              WITermination,
+              WILeaveEntitle,
             };
             const result = onChange(modelFields);
             value = result?.termiNotConf ?? value;
@@ -843,7 +934,11 @@ export default function TerminationInfoCreateForm(props) {
               otherTermiNotProb,
               termiNotConf,
               otherTermiNotConf: value,
-              workInfoUploads,
+              WIContract,
+              WIProbation,
+              WIResignation,
+              WITermination,
+              WILeaveEntitle,
             };
             const result = onChange(modelFields);
             value = result?.otherTermiNotConf ?? value;
@@ -878,50 +973,307 @@ export default function TerminationInfoCreateForm(props) {
               otherTermiNotProb,
               termiNotConf,
               otherTermiNotConf,
-              workInfoUploads: values,
+              WIContract: values,
+              WIProbation,
+              WIResignation,
+              WITermination,
+              WILeaveEntitle,
             };
             const result = onChange(modelFields);
-            values = result?.workInfoUploads ?? values;
+            values = result?.WIContract ?? values;
           }
-          setWorkInfoUploads(values);
-          setCurrentWorkInfoUploadsValue("");
+          setWIContract(values);
+          setCurrentWIContractValue("");
         }}
-        currentFieldValue={currentWorkInfoUploadsValue}
-        label={"Work info uploads"}
-        items={workInfoUploads}
-        hasError={errors?.workInfoUploads?.hasError}
+        currentFieldValue={currentWIContractValue}
+        label={"Wi contract"}
+        items={WIContract}
+        hasError={errors?.WIContract?.hasError}
         runValidationTasks={async () =>
-          await runValidationTasks(
-            "workInfoUploads",
-            currentWorkInfoUploadsValue
-          )
+          await runValidationTasks("WIContract", currentWIContractValue)
         }
-        errorMessage={errors?.workInfoUploads?.errorMessage}
-        setFieldValue={setCurrentWorkInfoUploadsValue}
-        inputFieldRef={workInfoUploadsRef}
+        errorMessage={errors?.WIContract?.errorMessage}
+        setFieldValue={setCurrentWIContractValue}
+        inputFieldRef={WIContractRef}
         defaultFieldValue={""}
       >
-        <TextField
-          label="Work info uploads"
+        <TextAreaField
+          label="Wi contract"
           isRequired={false}
           isReadOnly={false}
-          value={currentWorkInfoUploadsValue}
+          value={currentWIContractValue}
           onChange={(e) => {
             let { value } = e.target;
-            if (errors.workInfoUploads?.hasError) {
-              runValidationTasks("workInfoUploads", value);
+            if (errors.WIContract?.hasError) {
+              runValidationTasks("WIContract", value);
             }
-            setCurrentWorkInfoUploadsValue(value);
+            setCurrentWIContractValue(value);
           }}
           onBlur={() =>
-            runValidationTasks("workInfoUploads", currentWorkInfoUploadsValue)
+            runValidationTasks("WIContract", currentWIContractValue)
           }
-          errorMessage={errors.workInfoUploads?.errorMessage}
-          hasError={errors.workInfoUploads?.hasError}
-          ref={workInfoUploadsRef}
+          errorMessage={errors.WIContract?.errorMessage}
+          hasError={errors.WIContract?.hasError}
+          ref={WIContractRef}
           labelHidden={true}
-          {...getOverrideProps(overrides, "workInfoUploads")}
-        ></TextField>
+          {...getOverrideProps(overrides, "WIContract")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              resignDate,
+              resignNotProb,
+              otherResignNotProb,
+              resignNotConf,
+              otherResignNotConf,
+              reasonResign,
+              reasonTerminate,
+              termiDate,
+              termiNotProb,
+              otherTermiNotProb,
+              termiNotConf,
+              otherTermiNotConf,
+              WIContract,
+              WIProbation: values,
+              WIResignation,
+              WITermination,
+              WILeaveEntitle,
+            };
+            const result = onChange(modelFields);
+            values = result?.WIProbation ?? values;
+          }
+          setWIProbation(values);
+          setCurrentWIProbationValue("");
+        }}
+        currentFieldValue={currentWIProbationValue}
+        label={"Wi probation"}
+        items={WIProbation}
+        hasError={errors?.WIProbation?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("WIProbation", currentWIProbationValue)
+        }
+        errorMessage={errors?.WIProbation?.errorMessage}
+        setFieldValue={setCurrentWIProbationValue}
+        inputFieldRef={WIProbationRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Wi probation"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentWIProbationValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.WIProbation?.hasError) {
+              runValidationTasks("WIProbation", value);
+            }
+            setCurrentWIProbationValue(value);
+          }}
+          onBlur={() =>
+            runValidationTasks("WIProbation", currentWIProbationValue)
+          }
+          errorMessage={errors.WIProbation?.errorMessage}
+          hasError={errors.WIProbation?.hasError}
+          ref={WIProbationRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "WIProbation")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              resignDate,
+              resignNotProb,
+              otherResignNotProb,
+              resignNotConf,
+              otherResignNotConf,
+              reasonResign,
+              reasonTerminate,
+              termiDate,
+              termiNotProb,
+              otherTermiNotProb,
+              termiNotConf,
+              otherTermiNotConf,
+              WIContract,
+              WIProbation,
+              WIResignation: values,
+              WITermination,
+              WILeaveEntitle,
+            };
+            const result = onChange(modelFields);
+            values = result?.WIResignation ?? values;
+          }
+          setWIResignation(values);
+          setCurrentWIResignationValue("");
+        }}
+        currentFieldValue={currentWIResignationValue}
+        label={"Wi resignation"}
+        items={WIResignation}
+        hasError={errors?.WIResignation?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("WIResignation", currentWIResignationValue)
+        }
+        errorMessage={errors?.WIResignation?.errorMessage}
+        setFieldValue={setCurrentWIResignationValue}
+        inputFieldRef={WIResignationRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Wi resignation"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentWIResignationValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.WIResignation?.hasError) {
+              runValidationTasks("WIResignation", value);
+            }
+            setCurrentWIResignationValue(value);
+          }}
+          onBlur={() =>
+            runValidationTasks("WIResignation", currentWIResignationValue)
+          }
+          errorMessage={errors.WIResignation?.errorMessage}
+          hasError={errors.WIResignation?.hasError}
+          ref={WIResignationRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "WIResignation")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              resignDate,
+              resignNotProb,
+              otherResignNotProb,
+              resignNotConf,
+              otherResignNotConf,
+              reasonResign,
+              reasonTerminate,
+              termiDate,
+              termiNotProb,
+              otherTermiNotProb,
+              termiNotConf,
+              otherTermiNotConf,
+              WIContract,
+              WIProbation,
+              WIResignation,
+              WITermination: values,
+              WILeaveEntitle,
+            };
+            const result = onChange(modelFields);
+            values = result?.WITermination ?? values;
+          }
+          setWITermination(values);
+          setCurrentWITerminationValue("");
+        }}
+        currentFieldValue={currentWITerminationValue}
+        label={"Wi termination"}
+        items={WITermination}
+        hasError={errors?.WITermination?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("WITermination", currentWITerminationValue)
+        }
+        errorMessage={errors?.WITermination?.errorMessage}
+        setFieldValue={setCurrentWITerminationValue}
+        inputFieldRef={WITerminationRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Wi termination"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentWITerminationValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.WITermination?.hasError) {
+              runValidationTasks("WITermination", value);
+            }
+            setCurrentWITerminationValue(value);
+          }}
+          onBlur={() =>
+            runValidationTasks("WITermination", currentWITerminationValue)
+          }
+          errorMessage={errors.WITermination?.errorMessage}
+          hasError={errors.WITermination?.hasError}
+          ref={WITerminationRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "WITermination")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              resignDate,
+              resignNotProb,
+              otherResignNotProb,
+              resignNotConf,
+              otherResignNotConf,
+              reasonResign,
+              reasonTerminate,
+              termiDate,
+              termiNotProb,
+              otherTermiNotProb,
+              termiNotConf,
+              otherTermiNotConf,
+              WIContract,
+              WIProbation,
+              WIResignation,
+              WITermination,
+              WILeaveEntitle: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.WILeaveEntitle ?? values;
+          }
+          setWILeaveEntitle(values);
+          setCurrentWILeaveEntitleValue("");
+        }}
+        currentFieldValue={currentWILeaveEntitleValue}
+        label={"Wi leave entitle"}
+        items={WILeaveEntitle}
+        hasError={errors?.WILeaveEntitle?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("WILeaveEntitle", currentWILeaveEntitleValue)
+        }
+        errorMessage={errors?.WILeaveEntitle?.errorMessage}
+        setFieldValue={setCurrentWILeaveEntitleValue}
+        inputFieldRef={WILeaveEntitleRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Wi leave entitle"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentWILeaveEntitleValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.WILeaveEntitle?.hasError) {
+              runValidationTasks("WILeaveEntitle", value);
+            }
+            setCurrentWILeaveEntitleValue(value);
+          }}
+          onBlur={() =>
+            runValidationTasks("WILeaveEntitle", currentWILeaveEntitleValue)
+          }
+          errorMessage={errors.WILeaveEntitle?.errorMessage}
+          hasError={errors.WILeaveEntitle?.hasError}
+          ref={WILeaveEntitleRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "WILeaveEntitle")}
+        ></TextAreaField>
       </ArrayField>
       <Flex
         justifyContent="space-between"

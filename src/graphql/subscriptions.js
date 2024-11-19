@@ -1592,7 +1592,11 @@ export const onCreateTerminationInfo = /* GraphQL */ `
       otherTermiNotProb
       termiNotConf
       otherTermiNotConf
-      workInfoUploads
+      WIContract
+      WIProbation
+      WIResignation
+      WITermination
+      WILeaveEntitle
       createdAt
       updatedAt
       __typename
@@ -1618,7 +1622,11 @@ export const onUpdateTerminationInfo = /* GraphQL */ `
       otherTermiNotProb
       termiNotConf
       otherTermiNotConf
-      workInfoUploads
+      WIContract
+      WIProbation
+      WIResignation
+      WITermination
+      WILeaveEntitle
       createdAt
       updatedAt
       __typename
@@ -1644,7 +1652,11 @@ export const onDeleteTerminationInfo = /* GraphQL */ `
       otherTermiNotProb
       termiNotConf
       otherTermiNotConf
-      workInfoUploads
+      WIContract
+      WIProbation
+      WIResignation
+      WITermination
+      WILeaveEntitle
       createdAt
       updatedAt
       __typename

@@ -15,6 +15,7 @@ import {
   Icon,
   ScrollView,
   Text,
+  TextAreaField,
   TextField,
   useTheme,
 } from "@aws-amplify/ui-react";
@@ -348,11 +349,11 @@ export default function ServiceRecordUpdateForm(props) {
     revAnnualLeave: [],
     revALD: [],
     remarkWI: [],
-    uploadPR: [],
-    uploadSP: [],
-    uploadLP: [],
-    uploadAL: [],
-    uploadDep: [],
+    uploadPR: [{ type: "JSON" }],
+    uploadSP: [{ type: "JSON" }],
+    uploadLP: [{ type: "JSON" }],
+    uploadAL: [{ type: "JSON" }],
+    uploadDep: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -1217,7 +1218,7 @@ export default function ServiceRecordUpdateForm(props) {
         inputFieldRef={uploadPRRef}
         defaultFieldValue={""}
       >
-        <TextField
+        <TextAreaField
           label="Upload pr"
           isRequired={false}
           isReadOnly={false}
@@ -1235,7 +1236,7 @@ export default function ServiceRecordUpdateForm(props) {
           ref={uploadPRRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "uploadPR")}
-        ></TextField>
+        ></TextAreaField>
       </ArrayField>
       <ArrayField
         onChange={async (items) => {
@@ -1278,7 +1279,7 @@ export default function ServiceRecordUpdateForm(props) {
         inputFieldRef={uploadSPRef}
         defaultFieldValue={""}
       >
-        <TextField
+        <TextAreaField
           label="Upload sp"
           isRequired={false}
           isReadOnly={false}
@@ -1296,7 +1297,7 @@ export default function ServiceRecordUpdateForm(props) {
           ref={uploadSPRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "uploadSP")}
-        ></TextField>
+        ></TextAreaField>
       </ArrayField>
       <ArrayField
         onChange={async (items) => {
@@ -1339,7 +1340,7 @@ export default function ServiceRecordUpdateForm(props) {
         inputFieldRef={uploadLPRef}
         defaultFieldValue={""}
       >
-        <TextField
+        <TextAreaField
           label="Upload lp"
           isRequired={false}
           isReadOnly={false}
@@ -1357,7 +1358,7 @@ export default function ServiceRecordUpdateForm(props) {
           ref={uploadLPRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "uploadLP")}
-        ></TextField>
+        ></TextAreaField>
       </ArrayField>
       <ArrayField
         onChange={async (items) => {
@@ -1400,7 +1401,7 @@ export default function ServiceRecordUpdateForm(props) {
         inputFieldRef={uploadALRef}
         defaultFieldValue={""}
       >
-        <TextField
+        <TextAreaField
           label="Upload al"
           isRequired={false}
           isReadOnly={false}
@@ -1418,7 +1419,7 @@ export default function ServiceRecordUpdateForm(props) {
           ref={uploadALRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "uploadAL")}
-        ></TextField>
+        ></TextAreaField>
       </ArrayField>
       <ArrayField
         onChange={async (items) => {
@@ -1461,7 +1462,7 @@ export default function ServiceRecordUpdateForm(props) {
         inputFieldRef={uploadDepRef}
         defaultFieldValue={""}
       >
-        <TextField
+        <TextAreaField
           label="Upload dep"
           isRequired={false}
           isReadOnly={false}
@@ -1479,7 +1480,7 @@ export default function ServiceRecordUpdateForm(props) {
           ref={uploadDepRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "uploadDep")}
-        ></TextField>
+        ></TextAreaField>
       </ArrayField>
       <Flex
         justifyContent="space-between"

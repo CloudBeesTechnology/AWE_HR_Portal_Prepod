@@ -296,9 +296,9 @@ type LabourMedicalInfo @model @auth(rules: [{ allow: public }]) {
   bruhimsRNo: String
   bruneiMAD: [String]
   bruneiME: [String]
-  uploadFitness: String
-  uploadRegis: String
-  uploadBwn: [String]
+  uploadFitness: [AWSJSON]
+  uploadRegis: [AWSJSON]
+  uploadBwn: [AWSJSON]
   dependPass: [AWSJSON]
 }
 
@@ -316,11 +316,11 @@ type ServiceRecord @model @auth(rules: [{ allow: public }]) {
   revAnnualLeave: [String]
   revALD: [String]
   remarkWI: [String]
-  uploadPR: [String]
-  uploadSP: [String]
-  uploadLP: [String]
-  uploadAL: [String]
-  uploadDep: [String]
+  uploadPR: [AWSJSON]
+  uploadSP: [AWSJSON]
+  uploadLP: [AWSJSON]
+  uploadAL: [AWSJSON]
+  uploadDep: [AWSJSON]
 }
 
 type EmpLeaveDetails @model @auth(rules: [{ allow: public }]) {
@@ -359,7 +359,11 @@ type TerminationInfo @model @auth(rules: [{ allow: public }]) {
   otherTermiNotProb: String
   termiNotConf: String
   otherTermiNotConf: String
-  workInfoUploads: [String]
+  WIContract: [AWSJSON]
+  WIProbation: [AWSJSON]
+  WIResignation: [AWSJSON]
+  WITermination: [AWSJSON]
+  WILeaveEntitle: [AWSJSON]
 }
 
 type EmpWorkInfo @model @auth(rules: [{ allow: public }]) {
@@ -586,14 +590,14 @@ type TicketRequest @model @auth(rules: [{ allow: public }]) {
   id: ID!
   empID: String!
   empStatus: String
-  empDate: AWSDate
+  empDate: AWSDateTime
   empRemarks: String
-  departureDate: AWSDate!
-  arrivalDate: AWSDate!
+  departureDate: AWSDateTime!
+  arrivalDate: AWSDateTime!
   destination: String
   remarks: String
   hrStatus: String
-  hrDate: AWSDate
+  hrDate: AWSDateTime
   hrRemarks: String
   hrName: String
 }

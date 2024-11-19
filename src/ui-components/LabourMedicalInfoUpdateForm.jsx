@@ -199,8 +199,8 @@ export default function LabourMedicalInfoUpdateForm(props) {
     bruhimsRNo: "",
     bruneiMAD: [],
     bruneiME: [],
-    uploadFitness: "",
-    uploadRegis: "",
+    uploadFitness: [],
+    uploadRegis: [],
     uploadBwn: [],
     dependPass: [],
   };
@@ -233,8 +233,10 @@ export default function LabourMedicalInfoUpdateForm(props) {
     setCurrentBruneiMADValue("");
     setBruneiME(cleanValues.bruneiME ?? []);
     setCurrentBruneiMEValue("");
-    setUploadFitness(cleanValues.uploadFitness);
-    setUploadRegis(cleanValues.uploadRegis);
+    setUploadFitness(cleanValues.uploadFitness ?? []);
+    setCurrentUploadFitnessValue("");
+    setUploadRegis(cleanValues.uploadRegis ?? []);
+    setCurrentUploadRegisValue("");
     setUploadBwn(cleanValues.uploadBwn ?? []);
     setCurrentUploadBwnValue("");
     setDependPass(cleanValues.dependPass ?? []);
@@ -263,6 +265,12 @@ export default function LabourMedicalInfoUpdateForm(props) {
   const bruneiMADRef = React.createRef();
   const [currentBruneiMEValue, setCurrentBruneiMEValue] = React.useState("");
   const bruneiMERef = React.createRef();
+  const [currentUploadFitnessValue, setCurrentUploadFitnessValue] =
+    React.useState("");
+  const uploadFitnessRef = React.createRef();
+  const [currentUploadRegisValue, setCurrentUploadRegisValue] =
+    React.useState("");
+  const uploadRegisRef = React.createRef();
   const [currentUploadBwnValue, setCurrentUploadBwnValue] = React.useState("");
   const uploadBwnRef = React.createRef();
   const [currentDependPassValue, setCurrentDependPassValue] =
@@ -276,9 +284,9 @@ export default function LabourMedicalInfoUpdateForm(props) {
     bruhimsRNo: [],
     bruneiMAD: [],
     bruneiME: [],
-    uploadFitness: [],
-    uploadRegis: [],
-    uploadBwn: [],
+    uploadFitness: [{ type: "JSON" }],
+    uploadRegis: [{ type: "JSON" }],
+    uploadBwn: [{ type: "JSON" }],
     dependPass: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
@@ -649,13 +657,9 @@ export default function LabourMedicalInfoUpdateForm(props) {
           {...getOverrideProps(overrides, "bruneiME")}
         ></TextField>
       </ArrayField>
-      <TextField
-        label="Upload fitness"
-        isRequired={false}
-        isReadOnly={false}
-        value={uploadFitness}
-        onChange={(e) => {
-          let { value } = e.target;
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
           if (onChange) {
             const modelFields = {
               empID,
@@ -665,31 +669,54 @@ export default function LabourMedicalInfoUpdateForm(props) {
               bruhimsRNo,
               bruneiMAD,
               bruneiME,
-              uploadFitness: value,
+              uploadFitness: values,
               uploadRegis,
               uploadBwn,
               dependPass,
             };
             const result = onChange(modelFields);
-            value = result?.uploadFitness ?? value;
+            values = result?.uploadFitness ?? values;
           }
-          if (errors.uploadFitness?.hasError) {
-            runValidationTasks("uploadFitness", value);
-          }
-          setUploadFitness(value);
+          setUploadFitness(values);
+          setCurrentUploadFitnessValue("");
         }}
-        onBlur={() => runValidationTasks("uploadFitness", uploadFitness)}
-        errorMessage={errors.uploadFitness?.errorMessage}
-        hasError={errors.uploadFitness?.hasError}
-        {...getOverrideProps(overrides, "uploadFitness")}
-      ></TextField>
-      <TextField
-        label="Upload regis"
-        isRequired={false}
-        isReadOnly={false}
-        value={uploadRegis}
-        onChange={(e) => {
-          let { value } = e.target;
+        currentFieldValue={currentUploadFitnessValue}
+        label={"Upload fitness"}
+        items={uploadFitness}
+        hasError={errors?.uploadFitness?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("uploadFitness", currentUploadFitnessValue)
+        }
+        errorMessage={errors?.uploadFitness?.errorMessage}
+        setFieldValue={setCurrentUploadFitnessValue}
+        inputFieldRef={uploadFitnessRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Upload fitness"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUploadFitnessValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.uploadFitness?.hasError) {
+              runValidationTasks("uploadFitness", value);
+            }
+            setCurrentUploadFitnessValue(value);
+          }}
+          onBlur={() =>
+            runValidationTasks("uploadFitness", currentUploadFitnessValue)
+          }
+          errorMessage={errors.uploadFitness?.errorMessage}
+          hasError={errors.uploadFitness?.hasError}
+          ref={uploadFitnessRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "uploadFitness")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
           if (onChange) {
             const modelFields = {
               empID,
@@ -700,23 +727,50 @@ export default function LabourMedicalInfoUpdateForm(props) {
               bruneiMAD,
               bruneiME,
               uploadFitness,
-              uploadRegis: value,
+              uploadRegis: values,
               uploadBwn,
               dependPass,
             };
             const result = onChange(modelFields);
-            value = result?.uploadRegis ?? value;
+            values = result?.uploadRegis ?? values;
           }
-          if (errors.uploadRegis?.hasError) {
-            runValidationTasks("uploadRegis", value);
-          }
-          setUploadRegis(value);
+          setUploadRegis(values);
+          setCurrentUploadRegisValue("");
         }}
-        onBlur={() => runValidationTasks("uploadRegis", uploadRegis)}
-        errorMessage={errors.uploadRegis?.errorMessage}
-        hasError={errors.uploadRegis?.hasError}
-        {...getOverrideProps(overrides, "uploadRegis")}
-      ></TextField>
+        currentFieldValue={currentUploadRegisValue}
+        label={"Upload regis"}
+        items={uploadRegis}
+        hasError={errors?.uploadRegis?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("uploadRegis", currentUploadRegisValue)
+        }
+        errorMessage={errors?.uploadRegis?.errorMessage}
+        setFieldValue={setCurrentUploadRegisValue}
+        inputFieldRef={uploadRegisRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Upload regis"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUploadRegisValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.uploadRegis?.hasError) {
+              runValidationTasks("uploadRegis", value);
+            }
+            setCurrentUploadRegisValue(value);
+          }}
+          onBlur={() =>
+            runValidationTasks("uploadRegis", currentUploadRegisValue)
+          }
+          errorMessage={errors.uploadRegis?.errorMessage}
+          hasError={errors.uploadRegis?.hasError}
+          ref={uploadRegisRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "uploadRegis")}
+        ></TextAreaField>
+      </ArrayField>
       <ArrayField
         onChange={async (items) => {
           let values = items;
@@ -752,7 +806,7 @@ export default function LabourMedicalInfoUpdateForm(props) {
         inputFieldRef={uploadBwnRef}
         defaultFieldValue={""}
       >
-        <TextField
+        <TextAreaField
           label="Upload bwn"
           isRequired={false}
           isReadOnly={false}
@@ -770,7 +824,7 @@ export default function LabourMedicalInfoUpdateForm(props) {
           ref={uploadBwnRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "uploadBwn")}
-        ></TextField>
+        ></TextAreaField>
       </ArrayField>
       <ArrayField
         onChange={async (items) => {

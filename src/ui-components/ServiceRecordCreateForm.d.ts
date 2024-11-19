@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -74,11 +74,11 @@ export declare type ServiceRecordCreateFormOverridesProps = {
     revAnnualLeave?: PrimitiveOverrideProps<TextFieldProps>;
     revALD?: PrimitiveOverrideProps<TextFieldProps>;
     remarkWI?: PrimitiveOverrideProps<TextFieldProps>;
-    uploadPR?: PrimitiveOverrideProps<TextFieldProps>;
-    uploadSP?: PrimitiveOverrideProps<TextFieldProps>;
-    uploadLP?: PrimitiveOverrideProps<TextFieldProps>;
-    uploadAL?: PrimitiveOverrideProps<TextFieldProps>;
-    uploadDep?: PrimitiveOverrideProps<TextFieldProps>;
+    uploadPR?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    uploadSP?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    uploadLP?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    uploadAL?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    uploadDep?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type ServiceRecordCreateFormProps = React.PropsWithChildren<{
     overrides?: ServiceRecordCreateFormOverridesProps | undefined | null;

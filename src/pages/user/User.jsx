@@ -68,15 +68,15 @@ export const User = () => {
       try {
         const mergedData = empPIData
           .map((emp) => {
-            const userDetails = userData
-              ? userData.find((user) => user.empID === emp.empID)
-              : {};
-            const workInfoValue = workInfoData
-              ? workInfoData.find((work) => work.empID === emp.empID)
-              : {};
+            const userDetails = userData.find(
+              (user) => user.empID === emp.empID
+            );
+            const workInfoValue = workInfoData.find(
+              (work) => work.empID === emp.empID
+            );
             // console.log(workInfoData);
-
-        
+            if (!userDetails) return null;
+            if (!workInfoValue) return null;
             return {
               ...emp,
               ...userDetails,
@@ -94,7 +94,7 @@ export const User = () => {
     };
 
     fetchData();
-  }, [userData, empPIData,workInfoData]);
+  }, [userData, empPIData, workInfoData]);
 
   const searchUserList = async (userData) => {
     try {
@@ -118,7 +118,7 @@ export const User = () => {
     };
     navigate("/addNewForm", { state: { editUserData: allValue } });
   };
-// console.log(userData);
+  // console.log(userData);
 
   const handleAddUser = () => {
     const allValue = {

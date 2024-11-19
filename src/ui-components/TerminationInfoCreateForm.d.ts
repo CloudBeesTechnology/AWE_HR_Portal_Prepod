@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -35,7 +35,11 @@ export declare type TerminationInfoCreateFormInputValues = {
     otherTermiNotProb?: string;
     termiNotConf?: string;
     otherTermiNotConf?: string;
-    workInfoUploads?: string[];
+    WIContract?: string[];
+    WIProbation?: string[];
+    WIResignation?: string[];
+    WITermination?: string[];
+    WILeaveEntitle?: string[];
 };
 export declare type TerminationInfoCreateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -51,7 +55,11 @@ export declare type TerminationInfoCreateFormValidationValues = {
     otherTermiNotProb?: ValidationFunction<string>;
     termiNotConf?: ValidationFunction<string>;
     otherTermiNotConf?: ValidationFunction<string>;
-    workInfoUploads?: ValidationFunction<string>;
+    WIContract?: ValidationFunction<string>;
+    WIProbation?: ValidationFunction<string>;
+    WIResignation?: ValidationFunction<string>;
+    WITermination?: ValidationFunction<string>;
+    WILeaveEntitle?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type TerminationInfoCreateFormOverridesProps = {
@@ -69,7 +77,11 @@ export declare type TerminationInfoCreateFormOverridesProps = {
     otherTermiNotProb?: PrimitiveOverrideProps<TextFieldProps>;
     termiNotConf?: PrimitiveOverrideProps<TextFieldProps>;
     otherTermiNotConf?: PrimitiveOverrideProps<TextFieldProps>;
-    workInfoUploads?: PrimitiveOverrideProps<TextFieldProps>;
+    WIContract?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    WIProbation?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    WIResignation?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    WITermination?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    WILeaveEntitle?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type TerminationInfoCreateFormProps = React.PropsWithChildren<{
     overrides?: TerminationInfoCreateFormOverridesProps | undefined | null;

@@ -27,21 +27,81 @@ export const LabourImmigrationSchema = Yup.object().shape({
     "Brunei Medical Appointment Date is mandatory"
   ),
   bruneiME: Yup.string().required("Brunei Medical Fitness Expiry is mandatory"),
-  uploadFitness: Yup.mixed().test(
-    "fileType",
-    "Upload must be a PDF file",
-    (value) => (value ? value.type === "application/pdf" : true)
-  ),
-  uploadRegis: Yup.mixed().test(
-    "fileType",
-    "Upload must be a PDF file",
-    (value) => (value ? value.type === "application/pdf" : true)
-  ),
-  uploadBwn: Yup.mixed().test(
-    "fileType",
-    "Upload must be a PDF file",
-    (value) => (value ? value.type === "application/pdf" : true)
-  ),
+  uploadFitness: Yup.array()
+  .of(
+    Yup.mixed()
+      .test(
+        "fileOrUrl", // Custom test name
+        "Only PDF, image files, or valid URLs are allowed", // Custom error message
+        (value) => {
+          // If value is a file, check for valid file types
+          if (value instanceof File) {
+            return ["application/pdf", "image/jpeg", "image/png"].includes(
+              value.type
+            );
+          }
+
+          // If value is a string, check if it's a valid URL
+          if (typeof value === "string") {
+            return isValidUrl(value); // Check if the string is a valid URL
+          }
+
+          return true; // Return true if neither a file nor a string (invalid type)
+        }
+      )
+      .notRequired()
+  )
+  .notRequired(),
+  uploadRegis: Yup.array()
+  .of(
+    Yup.mixed()
+      .test(
+        "fileOrUrl", // Custom test name
+        "Only PDF, image files, or valid URLs are allowed", // Custom error message
+        (value) => {
+          // If value is a file, check for valid file types
+          if (value instanceof File) {
+            return ["application/pdf", "image/jpeg", "image/png"].includes(
+              value.type
+            );
+          }
+
+          // If value is a string, check if it's a valid URL
+          if (typeof value === "string") {
+            return isValidUrl(value); // Check if the string is a valid URL
+          }
+
+          return true; // Return true if neither a file nor a string (invalid type)
+        }
+      )
+      .notRequired()
+  )
+  .notRequired(),
+  uploadBwn: Yup.array()
+  .of(
+    Yup.mixed()
+      .test(
+        "fileOrUrl", // Custom test name
+        "Only PDF, image files, or valid URLs are allowed", // Custom error message
+        (value) => {
+          // If value is a file, check for valid file types
+          if (value instanceof File) {
+            return ["application/pdf", "image/jpeg", "image/png"].includes(
+              value.type
+            );
+          }
+
+          // If value is a string, check if it's a valid URL
+          if (typeof value === "string") {
+            return isValidUrl(value); // Check if the string is a valid URL
+          }
+
+          return true; // Return true if neither a file nor a string (invalid type)
+        }
+      )
+      .notRequired()
+  )
+  .notRequired(),
   dependPass: Yup.array().of(
     Yup.object().shape({
       dependName: Yup.string().notRequired(),
@@ -101,7 +161,7 @@ export const WorkInfoSchema = Yup.object().shape({
   otherJobCat: Yup.string().when("jobCategory is required", {
     is: (value) => value && value.trim().toLowerCase() === "other",
     then: () => Yup.string().required("Other jobcat is required"),
-    otherwise: () => Yup.string(),
+    otherwise: () => Yup.string().notRequired(),
   }),
   doj: Yup.string()
     .notRequired()
@@ -136,18 +196,20 @@ export const WorkInfoSchema = Yup.object().shape({
       }
     ),
   contractEnd: Yup.string()
-    .required("Contract End date is required")
-    .test(
-      "is-after-doj",
-      "Contract End date must be after Date of Joining",
-      function (value) {
-        const { doj } = this.parent;
-        if (!doj || !value) return true;
-        const dojDate = new Date(doj);
-        const contractEndDate = new Date(value);
-        return contractEndDate > dojDate;
-      }
-    ),
+  .required("Contract End date is required")
+  .test(
+    "is-after-contractStart",
+    "Contract End date must be after Contract Start date",
+    function (value) {
+      const { contractStart } = this.parent;
+      if (!contractStart || !value) return true; // If either is missing, skip validation
+
+      const contractStartDate = new Date(contractStart);
+      const contractEndDate = new Date(value);
+
+      return contractEndDate > contractStartDate; // Contract End must be after Contract Start
+    }
+  ),
   workStatus: Yup.string()
     .required("Employment Work Status is required")
     .notOneOf([""], "Employment Work Status is mandatory"),
@@ -165,18 +227,20 @@ export const WorkInfoSchema = Yup.object().shape({
       }
     ),
   probationEnd: Yup.string()
-    .required("Probation End date is required")
-    .test(
-      "is-after-doj",
-      "Contract End date must be after Date of Joining",
-      function (value) {
-        const { doj } = this.parent;
-        if (!doj || !value) return true;
-        const dojDate = new Date(doj);
-        const contractEndDate = new Date(value);
-        return contractEndDate > dojDate;
-      }
-    ),
+  .required("Probation End date is required")
+  .test(
+    "is-after-probationStart",
+    "Probation End date must be after Probation Start date",
+    function (value) {
+      const { probationStart } = this.parent;
+      if (!probationStart || !value) return true; // If either is missing, skip validation
+
+      const probationStartDate = new Date(probationStart);
+      const probationEndDate = new Date(value);
+
+      return probationEndDate > probationStartDate; // Contract End must be after Contract Start
+    }
+  ),
   workHrs: Yup.string().required("Normal Working Hours are required"),
   workWeek: Yup.string().required("Normal Working Week are required"),
   workMonth: Yup.string().required("Normal Working Month are required"),
@@ -212,7 +276,121 @@ export const WorkInfoSchema = Yup.object().shape({
   mrageLeaveDate: Yup.string().notRequired(),
   compasLeave: Yup.string().notRequired(),
   compasLeaveDate: Yup.string().notRequired(),
-  workInfoUploads: Yup.string().notRequired(),
+  WIProbation: Yup.array()
+  .of(
+    Yup.mixed()
+      .test(
+        "fileOrUrl", // Custom test name
+        "Only PDF", // Custom error message
+        (value) => {
+          // If value is a file, check for valid file types
+          if (value instanceof File) {
+            return ["application/pdf"].includes(
+              value.type
+            );
+          }
+          if (typeof value === "string") {
+            return isValidUrl(value); // Check if the string is a valid URL
+          }
+
+          return true; // Return true if neither a file nor a string (invalid type)
+        }
+      )
+      .notRequired()
+  )
+  .notRequired(),
+  WIResignation: Yup.array()
+  .of(
+    Yup.mixed()
+      .test(
+        "fileOrUrl", // Custom test name
+        "Only PDF", // Custom error message
+        (value) => {
+          // If value is a file, check for valid file types
+          if (value instanceof File) {
+            return ["application/pdf"].includes(
+              value.type
+            );
+          }
+          if (typeof value === "string") {
+            return isValidUrl(value); // Check if the string is a valid URL
+          }
+
+          return true; // Return true if neither a file nor a string (invalid type)
+        }
+      )
+      .notRequired()
+  )
+  .notRequired(),
+  WITermination: Yup.array()
+  .of(
+    Yup.mixed()
+      .test(
+        "fileOrUrl", // Custom test name
+        "Only PDF", // Custom error message
+        (value) => {
+          // If value is a file, check for valid file types
+          if (value instanceof File) {
+            return ["application/pdf"].includes(
+              value.type
+            );
+          }
+          if (typeof value === "string") {
+            return isValidUrl(value); // Check if the string is a valid URL
+          }
+
+          return true; // Return true if neither a file nor a string (invalid type)
+        }
+      )
+      .notRequired()
+  )
+  .notRequired(),
+  WILeaveEntitle: Yup.array()
+  .of(
+    Yup.mixed()
+      .test(
+        "fileOrUrl", // Custom test name
+        "Only PDF", // Custom error message
+        (value) => {
+          // If value is a file, check for valid file types
+          if (value instanceof File) {
+            return ["application/pdf"].includes(
+              value.type
+            );
+          }
+          if (typeof value === "string") {
+            return isValidUrl(value); // Check if the string is a valid URL
+          }
+
+          return true; // Return true if neither a file nor a string (invalid type)
+        }
+      )
+      .notRequired()
+  )
+  .notRequired(),
+  WIContract: Yup.array()
+  .of(
+    Yup.mixed()
+      .test(
+        "fileOrUrl", // Custom test name
+        "Only PDF", // Custom error message
+        (value) => {
+          // If value is a file, check for valid file types
+          if (value instanceof File) {
+            return ["application/pdf"].includes(
+              value.type
+            );
+          }
+          if (typeof value === "string") {
+            return isValidUrl(value); // Check if the string is a valid URL
+          }
+
+          return true; // Return true if neither a file nor a string (invalid type)
+        }
+      )
+      .notRequired()
+  )
+  .notRequired(), 
   positionRev: Yup.string().notRequired(),
   positionRevDate: Yup.string().notRequired(),
   revSalary: Yup.string().notRequired(),
@@ -229,11 +407,11 @@ export const WorkInfoSchema = Yup.object().shape({
     Yup.mixed()
       .test(
         "fileOrUrl", // Custom test name
-        "Only PDF, image files, or valid URLs are allowed", // Custom error message
+        "Only PDF", // Custom error message
         (value) => {
           // If value is a file, check for valid file types
           if (value instanceof File) {
-            return ["application/pdf", "image/jpeg", "image/png"].includes(
+            return ["application/pdf"].includes(
               value.type
             );
           }
@@ -252,11 +430,11 @@ export const WorkInfoSchema = Yup.object().shape({
     Yup.mixed()
       .test(
         "fileOrUrl", // Custom test name
-        "Only PDF, image files, or valid URLs are allowed", // Custom error message
+        "Only PDF", // Custom error message
         (value) => {
           // If value is a file, check for valid file types
           if (value instanceof File) {
-            return ["application/pdf", "image/jpeg", "image/png"].includes(
+            return ["application/pdf"].includes(
               value.type
             );
           }
@@ -275,11 +453,11 @@ export const WorkInfoSchema = Yup.object().shape({
     Yup.mixed()
       .test(
         "fileOrUrl", // Custom test name
-        "Only PDF, image files, or valid URLs are allowed", // Custom error message
+        "Only PDF", // Custom error message
         (value) => {
           // If value is a file, check for valid file types
           if (value instanceof File) {
-            return ["application/pdf", "image/jpeg", "image/png"].includes(
+            return ["application/pdf"].includes(
               value.type
             );
           }
@@ -298,11 +476,11 @@ export const WorkInfoSchema = Yup.object().shape({
     Yup.mixed()
       .test(
         "fileOrUrl", // Custom test name
-        "Only PDF, image files, or valid URLs are allowed", // Custom error message
+        "Only PDF", // Custom error message
         (value) => {
           // If value is a file, check for valid file types
           if (value instanceof File) {
-            return ["application/pdf", "image/jpeg", "image/png"].includes(
+            return ["application/pdf"].includes(
               value.type
             );
           }
@@ -321,11 +499,11 @@ export const WorkInfoSchema = Yup.object().shape({
     Yup.mixed()
       .test(
         "fileOrUrl", // Custom test name
-        "Only PDF, image files, or valid URLs are allowed", // Custom error message
+        "Only PDF", // Custom error message
         (value) => {
           // If value is a file, check for valid file types
           if (value instanceof File) {
-            return ["application/pdf", "image/jpeg", "image/png"].includes(
+            return ["application/pdf"].includes(
               value.type
             );
           }
@@ -358,6 +536,17 @@ export const employeeInfoSchema = Yup.object().shape({
 
   contractType: Yup.string().required("Contract Type mandatory"),
   empType: Yup.string().required("Employee Type mandatory"),
+
+//   contractType: Yup.array()
+//   .of(Yup.string().required("Each Contract Type is mandatory"))
+//   .min(1, "At least one Contract Type is required")
+//   .required("Contract Type is mandatory"),
+
+// empType: Yup.array()
+//   .of(Yup.string().required("Each Employee Type is mandatory"))
+//   .min(1, "At least one Employee Type is required")
+//   .required("Employee Type is mandatory"),
+
 
   name: Yup.string()
     .min(3, "Name must be at least 3 characters") // Minimum length check
@@ -450,7 +639,6 @@ export const employeeInfoSchema = Yup.object().shape({
   ),
 
   inducBrief: Yup.string().required("Induction Briefing Date is mandatory"),
-
   inducBriefUp: Yup.mixed()
     .test(
       "fileType",
