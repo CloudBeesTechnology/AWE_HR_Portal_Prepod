@@ -191,26 +191,7 @@ export const AddNewForm = () => {
           .catch((err) => {
             console.log(err);
           });
-        const username = data.empID;
-        const password = data.password;
-        const email = data.email;
-        await signUp({
-          username,
-          password,
-          options: {
-            userAttributes: {
-              email,
-            },
-            autoSignIn: true, // Attempt to auto-sign in the user after sign-up
-          },
-        })
-          .then((res) => {
-            // console.log("sign up data", res);
-            // reset()
-          })
-          .catch((err) => {
-            console.log("sign up data error", err);
-          });
+      
       } else {
         const createNewUser = {
           empID: data.empID,
@@ -227,7 +208,7 @@ export const AddNewForm = () => {
           })
           .then((res) => {
             // console.log(res);
-            setNotification(true);
+            // setNotification(true);
           })
           .catch((err) => {
             console.log(err);
@@ -257,6 +238,7 @@ export const AddNewForm = () => {
       reset();
       setDropDownVal([]);
       setPermissionData({});
+      setNotification(true);
     } catch (err) {
       console.log(err);
     }

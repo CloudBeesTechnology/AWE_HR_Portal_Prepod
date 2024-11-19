@@ -15,7 +15,7 @@ export const uploadDocs = async (
         path: `${fileType}/${file.name}`,
         data: file,
       }).result;
-      const fileUrl = `https://aweadininstorage20242a2fe-dev.s3.ap-southeast-1.amazonaws.com/${encodeURIComponent(
+      const fileUrl = `https://aweadininstorage2024635ab-prepod.s3.ap-southeast-1.amazonaws.com/${encodeURIComponent(
         result.path
       )}`;
       //   setUploadedDocs((prev) => ({
