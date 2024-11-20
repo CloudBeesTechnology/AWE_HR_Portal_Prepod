@@ -1,6 +1,12 @@
 import React from "react";
+import { useState, useEffect } from "react";
+import { Pagination } from "./Pagination";
 
-export const EmpLeaveBalance = ({ initialData }) => {
+export const EmpLeaveBalance = ({ initialData, userType }) => {
+  const [data, setData] = useState(initialData);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(15);
+
   const heading = [
     "Employee ID",
     "Employee Name",
@@ -8,8 +14,21 @@ export const EmpLeaveBalance = ({ initialData }) => {
     "No of Leave Remaining",
   ];
 
+  useEffect(() => {
+    const filteredData = data;
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const paginatedData = filteredData.slice(
+      startIndex,
+      startIndex + rowsPerPage
+    );
+    setData(paginatedData);
+  }, [currentPage, rowsPerPage]);
+  const filteredResults = data;
+  const totalPages = Math.ceil(filteredResults.length / rowsPerPage);
+
   return (
-    <div className="leaveManagementTable max-h-[calc(70vh-7rem)] max-w-[100%] overflow-y-auto">
+    <section>    
+    <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] max-w-[100%] overflow-y-auto">
     <table className="w-[1150px] ">
       <thead className="bg-black">
         <tr className="bg-[#C5C5C5] rounded-sm">
@@ -47,5 +66,21 @@ export const EmpLeaveBalance = ({ initialData }) => {
       </tbody>
     </table>
     </div>
+    <div className="ml-20 flex justify-center">
+    <div className="w-[60%] flex justify-start mt-4  px-10">
+      {userType !== "SuperAdmin" && userType !== "HR" && (
+           <Pagination
+           currentPage={currentPage}
+           totalPages={totalPages}
+           onPageChange={(newPage) => {
+             if (newPage >= 1 && newPage <= totalPages) {
+               setCurrentPage(newPage);
+             }
+           }}
+         />
+      )}
+    </div>
+  </div>
+</section>
   );
 };

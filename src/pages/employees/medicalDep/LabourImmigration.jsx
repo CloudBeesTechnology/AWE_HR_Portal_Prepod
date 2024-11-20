@@ -1,4 +1,3 @@
-//its working update
 import React, { useEffect, useState, useContext } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Link } from "react-router-dom";
@@ -15,32 +14,28 @@ import { DependentPass } from "./DependentPass";
 import { MedicalPassFunc } from "../../../services/createMethod/MedicalPassFunc";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { DataSupply } from "../../../utils/DataStoredContext";
-import useMedicalUpdate from "../../../hooks/useMedicalUpdate";
+import { UpdateMedical } from "../../../services/updateMethod/UpdateMedicalInfo";
 
-export const LabourImmigration = () => {
+const LabourImmigration = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   const { SubmitMPData } = MedicalPassFunc();
-  const { updateMedicalInfo, loading, error, updatedData } = useMedicalUpdate();
+  const { updateMedicalSubmit } = UpdateMedical();
   const { empPIData, LMIData } = useContext(DataSupply);
-  const [allEmpDetails, setAllEmpDetails] = useState([]);
-  const [userDetails, setUserDetails] = useState([]);
-  const [arrayUploadDocs, setArrayUploadDocs] = useState([]);
-  const [uploadedFileNames, setUploadedFileNames] = useState({
-    uploadFitness: null,
-    uploadRegis: null,
-    uploadBwn: null,
-  });
-  const [docsUploaded, setDocsUploaded] = useState({
-    uploadFitness: null,
-    uploadRegis: null,
-    uploadBwn: null,
-  });
 
+  const [allEmpDetails, setAllEmpDetails] = useState([]);
+  const [arrayUploadDocs, setArrayUploadDocs] = useState([]);
+  const [uploadedFileNames, setUploadedFileNames] = useState({});
+  const [docsUploaded, setDocsUploaded] = useState({
+    uploadFitness: [],
+    uploadRegis: [],
+    uploadBwn: [],
+  });
   const [notification, setNotification] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [dependPassData, setDependPassData] = useState(null);
+  const [showTitle, setShowTitle] = useState("");
 
   const {
     register,
@@ -48,236 +43,248 @@ export const LabourImmigration = () => {
     setValue,
     watch,
     control,
+    getValues,
     formState: { errors },
   } = useForm({
     defaultValues: {
-      dependPass: [
-        {
-          dependName: "",
-          dependPpNo: "",
-          dependPpE: "",
-          relation: "",
-          labourDPBy: "",
-          labourDRNo: "",
-          labourDAmount: "",
-          uploadDp: "",
-          uploadDr: "",
-        },
-      ],
+      uploadFitness: [],
+      uploadRegis: [],
+      uploadBwn: [],
+      dependPass: [],
     },
     resolver: yupResolver(LabourImmigrationSchema),
   });
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "dependPass",
-  });
-
-  // Fetch and merge data for employee and medical info
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const mergedData = LMIData.map((emp) => {
-          const LMDetails = empPIData.find((user) => user.empID === emp.empID);
-          if (!LMDetails) return null;
-          return { ...LMDetails, ...emp };
-        }).filter(Boolean);
+        const mergedData = empPIData
+          .map((emp) => {
+            const LMIDetails = LMIData
+              ? LMIData.find((user) => user.empID === emp.empID)
+              : {};
 
-        setUserDetails(mergedData);
+            return { ...emp, ...LMIDetails };
+          })
+          .filter(Boolean);
+
         setAllEmpDetails(mergedData);
       } catch (err) {
-        console.log(err);
+        // console.error("Error fetching data:", err);
       }
     };
+
     fetchData();
   }, [empPIData, LMIData]);
 
-  // Search result handler
-  const searchResult = (result) => {
-    const selectedEmployee = allEmpDetails.find((emp) => emp.empID === result.empID);
-    if (selectedEmployee) {
-      setSelectedEmployee(selectedEmployee);
-      autoFillForm(selectedEmployee);
-    }
-  };
-//working bri
-
-const autoFillForm = (employeeData) => {
-  // Iterate over the employeeData keys and set their values
-  Object.keys(employeeData).forEach((key) => {
-    if (Array.isArray(employeeData[key])) {
-      setValue(key, employeeData[key][0] || "");
-    } else {
-      setValue(key, employeeData[key]);
-    }
-  });
-
-  if (employeeData.dependPass) {
-    try {
-      let dependPassData = employeeData.dependPass;
-
-      // If dependPass is an array of strings, check for stringified objects or arrays
-      if (Array.isArray(dependPassData) && dependPassData.length > 0) {
-        dependPassData = dependPassData.flatMap(depStr => {
-          try {
-            // Check if the string is a stringified array or a stringified object
-            let parsedData = JSON.parse(depStr);
-
-            // If it's an array of objects, flatten it
-            if (Array.isArray(parsedData)) {
-              return parsedData.map(dep => ({
-                ...dep,
-                uploadDp: dep.uploadDp || "",
-                uploadDr: dep.uploadDr || "",
-              }));
-            }
-
-            // If it's a single object (not an array), make it an array
-            if (typeof parsedData === 'object') {
-              return [{
-                ...parsedData,
-                uploadDp: parsedData.uploadDp || "",
-                uploadDr: parsedData.uploadDr || "",
-              }];
-            }
-
-            return []; // Return empty array if data is neither object nor array
-          } catch (e) {
-            console.error("Error parsing dependPass entry:", depStr, e);
-            return []; // Fallback to empty array if parsing fails
-          }
-        });
-
-        setValue("dependPass", dependPassData); // Set the value with the parsed and normalized data
-      } else {
-        console.warn("dependPass is not an array or is empty");
-        setValue("dependPass", []); // Fallback to empty array if invalid
-      }
-    } catch (error) {
-      console.error("Error handling dependPass data", error);
-      setValue("dependPass", []); // Fallback to empty array on error
-    }
-  }
-  setUploadedFileNames({
-    uploadFitness: employeeData.uploadFitness,
-    uploadRegis: employeeData.uploadRegis,
-    uploadBwn: employeeData.uploadBwn,
-   
-  });
-  setDocsUploaded({
-    uploadFitness: employeeData.uploadFitness,
-    uploadRegis: employeeData.uploadRegis,
-    uploadBwn: employeeData.uploadBwn,
-  });
-};
-
-
-  // Handle file change
-  const handleFileChange = async (e, fieldName, index) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (file.type !== "application/pdf") {
-      alert("Upload must be a PDF file");
+  const handleFileChange = async (e, label) => {
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+    const allowedTypes = ["application/pdf"];
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file ");
       return;
     }
-    setValue(fieldName, file);
-
+    const currentFiles = watch(label) || [];
+    setValue(label, [...currentFiles, selectedFile]);
     try {
-      await uploadDocs(file, fieldName, setDocsUploaded);
+      // Dynamically set field based on label
+      await uploadDocs(selectedFile, label, setDocsUploaded);
       setUploadedFileNames((prev) => ({
         ...prev,
-        [fieldName]: file.name,
+        [label]: selectedFile.name,
       }));
-    } catch (error) {
-      console.error("File upload error:", error);
+    } catch (err) {
+      // console.log(err);
     }
-    
   };
 
-  // Submit form
-  const onSubmit = async (data) => {
-    try {
-      const bruneiMAD = Array.isArray(data.bruneiMAD) ? data.bruneiMAD[0] : data.bruneiMAD;
-      const bruneiME = Array.isArray(data.bruneiME) ? data.bruneiME[0] : data.bruneiME;
+  const getLastValue = (value) =>
+    Array.isArray(value) ? value[value.length - 1] : value;
 
-      const dependPassData = data.dependPass.map((val, index) => {
-        return {
-          dependName: val.dependName,
-          dependPpNo: val.dependPpNo,
-          dependPpE: val.dependPpE,
-          relation: val.relation,
-          labourDPBy: val.labourDPBy,
-          labourDRNo: val.labourDRNo,
-          labourDAmount: val.labourDAmount,
-          uploadDp: arrayUploadDocs[`uploadDp_${index}`] || val.uploadDp || null,
-          uploadDr: arrayUploadDocs[`uploadDr_${index}`] || val.uploadDr || null,
-        };
-      });
+  const searchResult = (result) => {
+    
 
-      const labValue = {
-        ...data,
-        // id: selectedEmployee.id,
-        bruneiMAD,
-        bruneiME,
-        uploadFitness: docsUploaded.uploadFitness,
-        uploadRegis: docsUploaded.uploadRegis,
-        uploadBwn: docsUploaded.uploadBwn,
-        dependPassData: dependPassData,
-      };
+    const keysToSet = ["empID", "overMD", "overME", "bruhimsRD", "bruhimsRNo"];
 
-      // Create or Update logic
-      if (selectedEmployee) {
-        // Update existing employee data using `updateMedicalInfo`
-        await updateMedicalInfo(selectedEmployee.id, labValue);
-        setNotification(true);
-        console.log(selectedEmployee, "Update")
-      } else {
-        // Create new employee data
-        await SubmitMPData({ labValue });
-        setNotification(true);
-        console.log(selectedEmployee, "Create")
+    keysToSet.forEach((key) => {
+      if (result[key]) setValue(key, result[key]);
+    });
+
+    const fields = ["bruneiMAD", "bruneiME"];
+    fields.forEach((field) => setValue(field, getLastValue(result[field])));
+
+    if (result?.dependPass) {
+      try {
+        const parsedData = JSON.parse(result.dependPass);
         
+        
+        setDependPassData(parsedData);
+      } catch (error) {
+        // console.error("Failed to parse dependPass:", error);
+      }
+    }
+
+    const uploadFields = ["uploadFitness", "uploadRegis", "uploadBwn"];
+
+    uploadFields.map((field) => {
+      if (result && result[field]) {
+        try {
+          // Parse the field data if it exists
+          const parsedArray = JSON.parse(result[field]);
+
+          // Then, parse each element inside the array (if it's stringified as well)
+          const parsedFiles = parsedArray.map((item) =>
+            typeof item === "string" ? JSON.parse(item) : item
+          );
+          
+          setValue(field, parsedFiles);
+
+          setDocsUploaded((prev) => ({
+            ...prev,
+            [field]: parsedFiles, // Dynamically set based on field name
+          }));
+
+          setUploadedFileNames((prev) => ({
+            ...prev,
+            [field]:
+              parsedFiles.length > 0
+                ? getFileName(parsedFiles[parsedFiles.length - 1].upload)
+                : "",
+          }));
+        } catch (error) {
+          // console.error(`Failed to parse ${field}:`, error);
+        }
+      }
+    });
+  };
+  function getFileName(url) {
+    const urlObj = new URL(url);
+    const filePath = urlObj.pathname;
+
+    const decodedUrl = decodeURIComponent(filePath);
+
+    // Extract the file name after the last '/' in the path
+    const fileNameWithExtension = decodedUrl.substring(
+      decodedUrl.lastIndexOf("/") + 1
+    );
+
+    return fileNameWithExtension;
+  }
+
+  const onSubmit = async (data) => {
+    // console.log(data);
+    try {
+      const checkingPITable = empPIData.find(
+        (match) => match.empID === data.empID
+      );
+      const checkingIDTable = LMIData.find(
+        (match) => match.empID === data.empID
+      );
+      if (checkingIDTable && checkingPITable) {
+        const LabUpValue = {
+          ...data,
+          uploadFitness: JSON.stringify(docsUploaded.uploadFitness),
+          uploadRegis: JSON.stringify(docsUploaded.uploadRegis),
+          uploadBwn: JSON.stringify(docsUploaded.uploadBwn),
+          dependPass: JSON.stringify(
+            data.dependPass.map((val, index) => {
+              const uploadDp =
+                arrayUploadDocs?.uploadDp?.[index] || val.uploadDp;
+
+              const uploadDr =
+                arrayUploadDocs?.uploadDr?.[index] || val.uploadDr;
+              return {
+                ...val,
+                uploadDp, // Assign the array for uploadDp
+                uploadDr, // Assign the array for uploadDr
+              };
+            })
+          ),
+          LabTable: checkingIDTable.id,
+        };
+        // console.log("Update Method :", LabUpValue);
+
+        await updateMedicalSubmit({ LabUpValue });
+        setShowTitle("Medical and Dependent Info details updated successfully");
+        setNotification(true);
+      } else {
+        const labValue = {
+          ...data,
+          uploadFitness: JSON.stringify(docsUploaded.uploadFitness),
+          uploadRegis: JSON.stringify(docsUploaded.uploadRegis),
+          uploadBwn: JSON.stringify(docsUploaded.uploadBwn),
+          dependPass: JSON.stringify(
+            data.dependPass.map((val, index) => {
+              const uploadDp =
+                arrayUploadDocs?.uploadDp?.[index] || val.uploadDp;
+
+              const uploadDr =
+                arrayUploadDocs?.uploadDr?.[index] || val.uploadDr;
+              return {
+                ...val,
+                uploadDp, // Assign the array for uploadDp
+                uploadDr, // Assign the array for uploadDr
+              };
+            })
+          ),
+        };
+        // console.log("Create Method :", labValue);
+        await SubmitMPData({ labValue });
+        setShowTitle("Medical and Dependent Info details saved successfully");
+        setNotification(true);
       }
     } catch (error) {
-      console.error("Error submitting data:", error);
+      console.log(error);
+
+      console.error(
+        "Error submitting data to AWS:",
+        JSON.stringify(error, null, 2)
+      );
     }
   };
 
-  console.log(selectedEmployee, "Holo")
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="container mx-auto p-10 bg-[#F5F6F1CC]">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="container mx-auto p-10 bg-[#F5F6F1CC]"
+    >
       <div className="w-full flex items-center justify-between">
         <Link to="/employee" className="text-xl flex-1 text-grey">
           <FaArrowLeft />
         </Link>
-        <p className="flex-1 text-center mt-2 text_size_2 uppercase">Medical & Dependent Info</p>
+        <p className="flex-1 text-center mt-2 text_size_2 uppercase">
+          Medical & Dependent Info
+        </p>
         <div className="flex-1">
           <SearchDisplay
-            icon={<IoSearch />}
+            searchIcon2={<IoSearch />}
             searchResult={searchResult}
-            placeholder="Employee Id"
+            placeholder="Employee ID"
             rounded="rounded-lg"
             newFormData={allEmpDetails}
           />
         </div>
       </div>
 
-      {/* Employee ID Field */}
+      {/* Form Fields */}
       <div className="flex justify-end items-center pt-7 pb-2">
-        <FormField
-          label="Employee ID"
-          type="text"
-          name="empID"
-          placeholder="Enter Employee ID"
-          errors={errors}
-          register={register}
-        />
+        <div>
+          <FormField
+            label="Employee ID"
+            type="text"
+            name="empID"
+            placeholder="Enter Employee ID"
+            errors={errors}
+            register={register}
+          />
+        </div>
       </div>
 
-      {/* Medical Info Section */}
       <div className="form-group">
-        <p className="text_size_3 form-group text-medium_grey mb-5">Employee Medical Info</p>
+        <p className="text_size_3 form-group text-medium_grey mb-5">
+          Employee Medical Info
+        </p>
         <div className="grid grid-cols-3 gap-x-4 gap-y-2 mt-2 mb-5">
           {EmpDataPass.medicalFields.map((field, index) => (
             <UploadingFiles
@@ -295,29 +302,33 @@ const autoFillForm = (employeeData) => {
       <hr />
 
       <DependentPass
-        fields={fields}
-        errors={errors}
         register={register}
         UploadingFiles={uploadedFileNames}
-        append={append}
-        remove={remove}
+        setUploadedFileNames={setUploadedFileNames}
+        control={control}
         setValue={setValue}
         setArrayUploadDocs={setArrayUploadDocs}
         arrayUploadDocs={arrayUploadDocs}
-        empID={watch("empID")}
+        errors={errors}
+        watch={watch}
+        value={dependPassData}
+        getValues={getValues}
       />
 
       <div className="center">
-        <button type="submit" className="primary_btn">Submit</button>
+        <button type="submit" className="primary_btn">
+          Submit
+        </button>
       </div>
 
-      {/* {notification && (
+      {/* Notification */}
+      {notification && (
         <SpinLogo
-          text="Medical And Dependent Info details saved successfully"
+          text={showTitle}
           notification={notification}
           path="/labourImmigration"
         />
-      )} */}
+      )}
     </form>
   );
 };

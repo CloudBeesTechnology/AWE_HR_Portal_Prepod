@@ -7,22 +7,23 @@ import {
   listTicketRequests,
   listUsers,
   listInterviewScheduleSchemas,
-  
+  listEmpWorkInfos,
 } from "../graphql/queries";
-import { deleteLeaveStatus, updateLeaveStatus, updateTicketRequest } from "../graphql/mutations";
+import {
+  deleteLeaveStatus,
+  updateLeaveStatus,
+  updateTicketRequest,
+} from "../graphql/mutations";
 
 const client = generateClient();
 
 export const useLeaveManage = () => {
-  const [leaveStatuses, setLeaveStatuses] = useState([]);
-  const [empPersonalInfos, setEmpPersonalInfos] = useState([]);
   const [personalDetails, setPersonalDetails] = useState([]);
   const [mergedData, setMergedData] = useState([]);
   const [ticketMerged, setTicketMerged] = useState([]);
   const [ticketRequests, setTicketRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,7 +42,7 @@ export const useLeaveManage = () => {
           client.graphql({ query: listTicketRequests }),
           client.graphql({ query: listPersonalDetails }),
           client.graphql({ query: listUsers }),
-          client.graphql({ query: listInterviewScheduleSchemas})
+          client.graphql({ query: listInterviewScheduleSchemas }),
         ]);
 
         const fetchedLeaveStatuses =
@@ -50,24 +51,13 @@ export const useLeaveManage = () => {
           empPersonalInfosData?.data?.listEmpPersonalInfos?.items || [];
         const fetchedTicketRequests =
           ticketRequestsData?.data?.listTicketRequests?.items || [];
-        const fetchedPersonalDetails = 
-        PersonalDetailsData?.data?.listPersonalDetails?.items || [];
-        const fetchedUserData = 
-        userData?.data?.listUsers?.items || [];
-        const fetchedInterviewScheduleSchemas = 
-        interviewScheduleSchemasData?.data?.listInterviewScheduleSchemas?.items || [];
-          
+        const fetchedPersonalDetails =
+          PersonalDetailsData?.data?.listPersonalDetails?.items || [];
+        const fetchedUserData = userData?.data?.listUsers?.items || [];
+        const fetchedInterviewScheduleSchemas =
+          interviewScheduleSchemasData?.data?.listInterviewScheduleSchemas
+            ?.items || [];
 
-        console.log("Fetched Leave Statuses:", fetchedLeaveStatuses);
-        console.log(
-          "Fetched Employee Personal Infos:",
-          fetchedEmpPersonalInfos
-        );
-        console.log("Fetched Tickets Request Details:", fetchedTicketRequests);
-        console.log("Fetched Personal Details:", fetchedPersonalDetails);
-        console.log("Fetched User Data:", fetchedUserData);
-        console.log("new", ticketRequestsData)
-        console.log("Interview 2.0", fetchedInterviewScheduleSchemas)
         setTicketRequests(fetchedTicketRequests);
         setPersonalDetails(fetchedPersonalDetails);
 
@@ -89,7 +79,6 @@ export const useLeaveManage = () => {
           ticketRequest: ticketReqMap[leaveStatus.empID] || {},
         }));
 
-        console.log("Merged Data:", merged);
         setMergedData(merged);
       } catch (err) {
         setError(err);
@@ -106,36 +95,42 @@ export const useLeaveManage = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [empPersonalInfosData, ticketRequestsData] = await Promise.all([
-          client.graphql({ query: listEmpPersonalInfos }),
-          client.graphql({ query: listTicketRequests }),
-        ]);
-  
+        const [empPersonalInfosData, ticketRequestsData, empWorkInfosData] =
+          await Promise.all([
+            client.graphql({ query: listEmpPersonalInfos }),
+            client.graphql({ query: listTicketRequests }),
+            client.graphql({ query: listEmpWorkInfos }),
+          ]);
+
         const fetchedEmpPersonalInfos =
           empPersonalInfosData?.data?.listEmpPersonalInfos?.items || [];
         const fetchedTicketRequests =
           ticketRequestsData?.data?.listTicketRequests?.items || [];
-  
-        console.log("Fetched Employee Personal Infos:", fetchedEmpPersonalInfos);
-        console.log("Fetched Ticket Request Details:", fetchedTicketRequests);
-  
+        const fetchedEmpWorkInfos =
+          empWorkInfosData?.data?.listEmpWorkInfos?.items || [];
+
         setTicketRequests(fetchedTicketRequests);
-  
+
         // Create a mapping of employee personal info by empID
         const empInfoMap = fetchedEmpPersonalInfos.reduce((acc, emp) => {
           acc[emp.empID] = emp;
           return acc;
         }, {});
-  
+
+        // Create a mapping of employee work info by empID
+        const empWorkInfoMap = fetchedEmpWorkInfos.reduce((acc, workInfo) => {
+          acc[workInfo.empID] = workInfo;
+          return acc;
+        }, {});
+
         // Merge employee personal info into ticket requests
         const merged = fetchedTicketRequests.map((ticket) => ({
           ...ticket,
           employeeInfo: empInfoMap[ticket.empID] || {}, // Add employee info
+          workInfo: empWorkInfoMap[ticket.empID] || {},
         }));
-  
-        console.log("Merged Data 2.0:", merged);
+
         setTicketMerged(merged);
-       
       } catch (err) {
         setError(err);
         console.error("Error fetching data:", err);
@@ -143,14 +138,9 @@ export const useLeaveManage = () => {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, []);
-
-  useEffect(() => {
-    console.log("2826", ticketMerged);
-  }, [ticketMerged]);
-  
 
   //merge ticket request and empPersonal,
 
@@ -174,8 +164,6 @@ export const useLeaveManage = () => {
     }
   };
 
-  
-
   const handleUpdateLeaveStatus = async (id, updatedData) => {
     setLoading(true);
     try {
@@ -185,9 +173,9 @@ export const useLeaveManage = () => {
           input: { id, ...updatedData },
         },
       });
-  
+
       const updatedLeaveStatus = result.data.updateLeaveStatus;
-  
+
       // Update the local state to reflect the changes
       setMergedData((prevData) =>
         prevData.map((status) =>
@@ -202,22 +190,22 @@ export const useLeaveManage = () => {
     }
   };
 
-  const handleUpdateTicketRequest  = async (id, updatedData) => {
+  const handleUpdateTicketRequest = async (id, updatedData) => {
     setLoading(true);
     try {
       const result = await client.graphql({
         query: updateTicketRequest,
-        variables: { 
+        variables: {
           input: { id, ...updatedData },
         },
       });
-  
+
       const updatedTicketRequest = result.data.updateTicketRequest;
-  
+
       // Update the local state to reflect the changes
       setMergedData((prevData) =>
         prevData.map((request) =>
-          request.id === id ?  updatedTicketRequest : request
+          request.id === id ? updatedTicketRequest : request
         )
       );
     } catch (err) {
@@ -227,8 +215,16 @@ export const useLeaveManage = () => {
       setLoading(false);
     }
   };
-  
 
-
-  return { ticketMerged, mergedData,  ticketRequests, loading, error, handleDeleteLeaveStatus, handleUpdateLeaveStatus, handleUpdateTicketRequest, personalDetails};
+  return {
+    ticketMerged,
+    mergedData,
+    ticketRequests,
+    loading,
+    error,
+    handleDeleteLeaveStatus,
+    handleUpdateLeaveStatus,
+    handleUpdateTicketRequest,
+    personalDetails,
+  };
 };

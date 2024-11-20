@@ -204,6 +204,7 @@ export default function EmpWorkInfoCreateForm(props) {
     otherPosition: [],
     probationStart: "",
     probationEnd: "",
+    probDuration: "",
     position: [],
     relationship: [],
     supervisor: [],
@@ -247,6 +248,9 @@ export default function EmpWorkInfoCreateForm(props) {
   );
   const [probationEnd, setProbationEnd] = React.useState(
     initialValues.probationEnd
+  );
+  const [probDuration, setProbDuration] = React.useState(
+    initialValues.probDuration
   );
   const [position, setPosition] = React.useState(initialValues.position);
   const [relationship, setRelationship] = React.useState(
@@ -294,6 +298,7 @@ export default function EmpWorkInfoCreateForm(props) {
     setCurrentOtherPositionValue("");
     setProbationStart(initialValues.probationStart);
     setProbationEnd(initialValues.probationEnd);
+    setProbDuration(initialValues.probDuration);
     setPosition(initialValues.position);
     setCurrentPositionValue("");
     setRelationship(initialValues.relationship);
@@ -389,6 +394,7 @@ export default function EmpWorkInfoCreateForm(props) {
     otherPosition: [],
     probationStart: [],
     probationEnd: [],
+    probDuration: [],
     position: [{ type: "Required" }],
     relationship: [{ type: "Required" }],
     supervisor: [],
@@ -443,6 +449,7 @@ export default function EmpWorkInfoCreateForm(props) {
           otherPosition,
           probationStart,
           probationEnd,
+          probDuration,
           position,
           relationship,
           supervisor,
@@ -532,6 +539,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -578,6 +586,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -651,6 +660,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -724,6 +734,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -801,6 +812,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -847,6 +859,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -920,6 +933,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -991,6 +1005,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -1062,6 +1077,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -1133,6 +1149,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -1204,6 +1221,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -1277,6 +1295,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -1353,6 +1372,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition: values,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -1430,6 +1450,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart: value,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -1480,6 +1501,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd: value,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -1506,6 +1528,57 @@ export default function EmpWorkInfoCreateForm(props) {
         hasError={errors.probationEnd?.hasError}
         {...getOverrideProps(overrides, "probationEnd")}
       ></TextField>
+      <TextField
+        label="Prob duration"
+        isRequired={false}
+        isReadOnly={false}
+        value={probDuration}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              contractStart,
+              contractEnd,
+              contractPeriod,
+              doj,
+              department,
+              hr,
+              jobCat,
+              jobDesc,
+              manager,
+              otherJobCat,
+              otherDepartment,
+              otherPosition,
+              probationStart,
+              probationEnd,
+              probDuration: value,
+              position,
+              relationship,
+              supervisor,
+              skillPool,
+              salaryType,
+              sapNo,
+              upgradeDate,
+              upgradePosition,
+              workStatus,
+              workHrs,
+              workWeek,
+              workMonth,
+            };
+            const result = onChange(modelFields);
+            value = result?.probDuration ?? value;
+          }
+          if (errors.probDuration?.hasError) {
+            runValidationTasks("probDuration", value);
+          }
+          setProbDuration(value);
+        }}
+        onBlur={() => runValidationTasks("probDuration", probDuration)}
+        errorMessage={errors.probDuration?.errorMessage}
+        hasError={errors.probDuration?.hasError}
+        {...getOverrideProps(overrides, "probDuration")}
+      ></TextField>
       <ArrayField
         onChange={async (items) => {
           let values = items;
@@ -1526,6 +1599,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position: values,
               relationship,
               supervisor,
@@ -1597,6 +1671,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship: values,
               supervisor,
@@ -1670,6 +1745,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor: values,
@@ -1747,6 +1823,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -1793,6 +1870,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -1870,6 +1948,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -1916,6 +1995,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -1989,6 +2069,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -2065,6 +2146,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -2138,6 +2220,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -2209,6 +2292,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,
@@ -2280,6 +2364,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
+              probDuration,
               position,
               relationship,
               supervisor,

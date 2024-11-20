@@ -29,9 +29,8 @@ export const EmployeeInsurance = () => {
   const [notification, setNotification] = useState(false);
   const [uploadedDocs, setUploadedDocs] = useState({ empInsUpload: [] });
   const [inputFields, setInputFields] = useState([{}]); // Tracks each file input field
-  const [empInsUpload, setEmpInsUpload] = useState({
-    empInsUpload: null,
-  });
+
+  const [empInsUpload, setEmpInsUpload] = useState([]);
   const [showTitle, setShowTitle] = useState("");
 
   const {
@@ -115,51 +114,52 @@ export const EmployeeInsurance = () => {
   ];
 
   const handleAddFileClick = () => {
-    setInputFields([...inputFields, {}]); // Add new input field
+    setInputFields((prevFields) => [...prevFields, {}]); // Add new input field
+    setEmpInsUpload((prevUpload) => [...prevUpload, []]);
   };
 
+  // Handle removing a file input field
   const handleRemoveField = (index) => {
-    // Remove the selected field based on index
-    // setInputFields((prevFields) => prevFields.filter((_, i) => i !== index));
-    // setEmpInsUpload((prevUploads) => prevUploads.filter((_, i) => i !== index));
     setInputFields((prevFields) => prevFields.filter((_, i) => i !== index));
-
-    // Remove the corresponding key from empInsUpload (which is an object, not an array)
-    setEmpInsUpload((prevUploads) => {
-      const updatedUploads = { ...prevUploads }; // Create a shallow copy of the current state
-
-      // Remove the key corresponding to the index (e.g., `empInsUpload1`, `empInsUpload2`, etc.)
-      delete updatedUploads[`empInsUpload${index + 1}`];
-
-      return updatedUploads;
-    });
+    setEmpInsUpload((prevUploads) => prevUploads.filter((_, i) => i !== index)); // Remove the corresponding file array
   };
 
   const handleFileChange = async (e, type, index) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
+
     const allowedTypes = ["application/pdf"];
     if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      alert("Upload must be a PDF file");
       return;
     }
-    console.log(selectedFile);
 
-    // setValue("empInsUpload", selectedFile);
-    setValue(`empInsUpload[${index}]`, selectedFile);
+    // Update the file in the correct index using the previous state
+    setEmpInsUpload((prevUpload) => {
+      const updatedFiles = [...prevUpload];
+      updatedFiles[index] = { name: selectedFile.name, file: selectedFile };
+      return updatedFiles;
+    });
 
     try {
-      // Dynamically set field based on label
-      await uploadDocs(selectedFile, type, setUploadedDocs, index);
-      setEmpInsUpload((prev) => ({
-        ...prev,
-        [`empInsUpload${index + 1}`]: selectedFile.name,
-      }));
+      // Assuming uploadDocs uploads the file and returns the URL of the uploaded file
+      const fileUrl = await uploadDocs(
+        selectedFile,
+        type,
+        setUploadedDocs,
+        index
+      );
+      if (fileUrl) {
+        setEmpInsUpload((prevUpload) => {
+          const updatedUrls = [...prevUpload];
+          updatedUrls[index] = [fileUrl]; // Update with the URL instead of the file object
+          return updatedUrls; // Return the updated state
+        });
+      }
     } catch (err) {
-      console.log(err);
+      // console.error("Error uploading file:", err);
     }
   };
-  console.log(uploadedDocs);
 
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
@@ -177,8 +177,7 @@ export const EmployeeInsurance = () => {
         setValue(field.key, getLastValue(searchResultData[field.key]));
       }
     });
-    console.log(searchResultData.empInsUpload);
-    const idx = 0;
+
     const url = searchResultData?.empInsUpload;
 
     if (url) {
@@ -187,94 +186,42 @@ export const EmployeeInsurance = () => {
         const parsedFiles = parsedArray.map((item) =>
           typeof item === "string" ? JSON.parse(item) : item
         );
-
-        setUploadedDocs((prev) => {
-          const updatedEmpInsUpload = [...prev.empInsUpload];
-          updatedEmpInsUpload[idx] = parsedFiles;
-
-          return {
-            ...prev,
-            empInsUpload: updatedEmpInsUpload,
-          };
-        });
-
-        setEmpInsUpload((prev) => {
-          const updatedEmpInsUpload = { ...prev };
-          parsedFiles.forEach((file, idx) => {
-            updatedEmpInsUpload[`empInsUpload${idx + 1}`] =
-              file.length > 0 ? getFileName(file[0]?.upload) : "";
-          });
-          return updatedEmpInsUpload;
-        });
-        if (parsedFiles && parsedFiles.length > 0) {
-          console.log(parsedFiles,"legth");
-          
-          setInputFields(parsedFiles);
-             
-            }
-    
+        setUploadedDocs((prev) => ({
+          ...prev,
+          empInsUpload: parsedFiles,
+        }));
       } catch (error) {
-        console.error("Failed to parse JSON:", error);
+        // console.error("Failed to parse JSON:", error);
       }
     } else {
-      console.warn(
-        "searchResultData?.empInsUpload is undefined or not a valid JSON string."
-      );
+      // console.warn(
+      //   "searchResultData?.empInsUpload is undefined or not a valid JSON string."
+      // );
     }
   }, [searchResultData]);
 
-  function getFileName(url) {
-    if (!url) {
-      console.error("Invalid URL:", url);
-      return "";
-    }
-  
-    try {
-      const urlObj = new URL(url); // Create URL object
-      const filePath = urlObj.pathname;
-  
-      const decodedUrl = decodeURIComponent(filePath);
-  
-      // Extract the file name after the last '/' in the path
-      const fileNameWithExtension = decodedUrl.split("/").pop();
-  
-      return fileNameWithExtension;
-    } catch (error) {
-      console.error("Invalid URL:", url, error);
-      return "";
-    }
-  }
-
   const onSubmit = async (data) => {
-    // console.log(data, "data");
+    const existingEmpInsurance = EmpInsuranceData.find(
+      (match) => match.empID === data.empID
+    );
 
-    try {
-      const checkingEIDTable = EmpInsuranceData.find(
-        (match) => match.empID === data.empID
-      );
-      if (checkingEIDTable) {
-        const empInsValue = {
-          ...data,
-          empInsUpload: JSON.stringify(uploadedDocs.empInsUpload),
-          id: checkingEIDTable.id,
-        };
-        console.log(empInsValue, "update");
-
-        await UpdateEIDataSubmit({ empInsValue });
-        // setShowTitle("Employee Insurance details Updated successfully")
-        // setNotification(true);
-      } else {
-        const empInsValue = {
-          ...data,
-          empInsUpload: JSON.stringify(uploadedDocs.empInsUpload),
-        };
-        console.log(empInsValue, "create");
-        await SubmitMPData({ empInsValue });
-        // setShowTitle("Employee Insurance details saved successfully")
-        // setNotification(true);
-      }
-    } catch (error) {
-      console.error("Error submitting data:", error);
+    if (existingEmpInsurance) {
+      const empInsValue = {
+        ...data,
+        id: existingEmpInsurance.id,
+        empInsUpload: JSON.stringify(uploadedDocs.empInsUpload.flat()), // Flatten if necessary, otherwise keep as it is
+      };
+      await UpdateEIDataSubmit(empInsValue);
+      setShowTitle("Employee Insurance Info updated successfully");
+      setNotification(true);
+    } else {
+      const empInsValue = {
+        ...data,
+        empInsUpload: JSON.stringify(uploadedDocs.empInsUpload.flat()), // Flatten if necessary, otherwise keep as it is
+      };
+      await SubmitMPData(empInsValue);
+      setShowTitle("Employee Insurance Info Saved successfully");
+      setNotification(true);
     }
   };
 
@@ -372,7 +319,7 @@ export const EmployeeInsurance = () => {
               </span>
             </label>
             <p className="text-grey mt-1 text-xs">
-              {empInsUpload[`empInsUpload${index + 1}`] || ""}
+              {empInsUpload[index]?.name || ""}
             </p>
 
             {index === 0 && (

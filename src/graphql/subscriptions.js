@@ -1684,6 +1684,7 @@ export const onCreateEmpWorkInfo = /* GraphQL */ `
       otherPosition
       probationStart
       probationEnd
+      probDuration
       position
       relationship
       supervisor
@@ -1723,6 +1724,7 @@ export const onUpdateEmpWorkInfo = /* GraphQL */ `
       otherPosition
       probationStart
       probationEnd
+      probDuration
       position
       relationship
       supervisor
@@ -1762,6 +1764,7 @@ export const onDeleteEmpWorkInfo = /* GraphQL */ `
       otherPosition
       probationStart
       probationEnd
+      probDuration
       position
       relationship
       supervisor

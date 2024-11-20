@@ -141,12 +141,6 @@ export const WorkDataPass = {
         { label: "Contract Start Date", name: "contractStart", type: "date" },
         { label: "Contract End Date", name: "contractEnd", type: "date" },
         {
-          label: "Employment Work Status",
-          name: "workStatus",
-          type: "select",
-          options: ["", "Probationary", "Active", "Resignation", "Termination"],
-        },
-        {
           label: "Probationary Start Date",
           name: "probationStart",
           type: "date",
@@ -155,6 +149,11 @@ export const WorkDataPass = {
           label: "Probationary End Date",
           name: "probationEnd",
           type: "date",
+        },
+        {
+          label: "Probation Duration",
+          name: "probDuration",
+          type: "text",
         },
         {
           label: "Normal Working Hours Per Day",
@@ -170,6 +169,12 @@ export const WorkDataPass = {
           label: "Normal Working Day per Month",
           name: "workMonth",
           type: "text",
+        },
+        {
+          label: "Employment Work Status",
+          name: "workStatus",
+          type: "select",
+          options: ["", "Probationary", "Active", "Resignation", "Termination"],
         },
         {
           label: "Type of Salary Pay",

@@ -1775,6 +1775,7 @@ export const createEmpWorkInfo = /* GraphQL */ `
       otherPosition
       probationStart
       probationEnd
+      probDuration
       position
       relationship
       supervisor
@@ -1815,6 +1816,7 @@ export const updateEmpWorkInfo = /* GraphQL */ `
       otherPosition
       probationStart
       probationEnd
+      probDuration
       position
       relationship
       supervisor
@@ -1855,6 +1857,7 @@ export const deleteEmpWorkInfo = /* GraphQL */ `
       otherPosition
       probationStart
       probationEnd
+      probDuration
       position
       relationship
       supervisor

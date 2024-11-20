@@ -383,6 +383,7 @@ type EmpWorkInfo @model @auth(rules: [{ allow: public }]) {
   otherPosition: [String]
   probationStart: String
   probationEnd: String
+  probDuration: String
   position: [String!]
   relationship: [String!]
   supervisor: [String]

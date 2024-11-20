@@ -1256,6 +1256,7 @@ export const getEmpWorkInfo = /* GraphQL */ `
       otherPosition
       probationStart
       probationEnd
+      probDuration
       position
       relationship
       supervisor
@@ -1298,6 +1299,7 @@ export const listEmpWorkInfos = /* GraphQL */ `
         otherPosition
         probationStart
         probationEnd
+        probDuration
         position
         relationship
         supervisor

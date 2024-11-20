@@ -37,6 +37,7 @@ export declare type EmpWorkInfoUpdateFormInputValues = {
     otherPosition?: string[];
     probationStart?: string;
     probationEnd?: string;
+    probDuration?: string;
     position?: string[];
     relationship?: string[];
     supervisor?: string[];
@@ -66,6 +67,7 @@ export declare type EmpWorkInfoUpdateFormValidationValues = {
     otherPosition?: ValidationFunction<string>;
     probationStart?: ValidationFunction<string>;
     probationEnd?: ValidationFunction<string>;
+    probDuration?: ValidationFunction<string>;
     position?: ValidationFunction<string>;
     relationship?: ValidationFunction<string>;
     supervisor?: ValidationFunction<string>;
@@ -97,6 +99,7 @@ export declare type EmpWorkInfoUpdateFormOverridesProps = {
     otherPosition?: PrimitiveOverrideProps<TextFieldProps>;
     probationStart?: PrimitiveOverrideProps<TextFieldProps>;
     probationEnd?: PrimitiveOverrideProps<TextFieldProps>;
+    probDuration?: PrimitiveOverrideProps<TextFieldProps>;
     position?: PrimitiveOverrideProps<TextFieldProps>;
     relationship?: PrimitiveOverrideProps<TextFieldProps>;
     supervisor?: PrimitiveOverrideProps<TextFieldProps>;
