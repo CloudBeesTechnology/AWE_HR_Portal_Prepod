@@ -21,7 +21,7 @@ export const MedicalPassFunc = () => {
       uploadRegis: labValue.uploadRegis,
       uploadBwn: [labValue.uploadBwn],
     };
-    // console.log(totalData);
+    // console.log(totalData,"totalData");
 
     try {
       const storedData=   await Promise.all([
@@ -32,10 +32,10 @@ export const MedicalPassFunc = () => {
              },
            })
          ])
-        //  console.log(storedData,"successfully stored data");
+         console.log(storedData,"successfully stored data");
 
        } catch (error) {
-        //  console.error("Error executing GraphQL requests:", error);
+         console.error("Error executing GraphQL requests:", error);
          throw error; // Rethrow error if needed
        }
   }, []);

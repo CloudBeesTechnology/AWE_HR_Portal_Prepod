@@ -1,6 +1,14 @@
 import { FormField } from "../../../utils/FormField"
 
-export const RowEight = ({register,errors}) => {
+export const RowEight = ({register,errors,
+  value,
+  control,
+  setValue,
+  watch,
+  errorValue
+}) => {
+  const watchedppExpiry = watch("ppExpiry", []);
+  const watchedppIssued = watch("ppIssued", []);
   return (
     <div className="grid grid-cols-4 gap-5 form-group">
     <FormField
@@ -17,6 +25,11 @@ export const RowEight = ({register,errors}) => {
       name="ppIssued"
       type="date"
       errors={errors}
+      control={control}
+      watch={watchedppIssued}
+      isArray
+      arrayDate={true}
+      errorValue={errorValue}
     />
 
     <FormField
@@ -25,6 +38,11 @@ export const RowEight = ({register,errors}) => {
       name="ppExpiry"
       type="date"
       errors={errors}
+      control={control}
+      watch={watchedppExpiry}
+      isArray
+      arrayDate={true}
+      errorValue={errorValue}
     />
 
     <FormField

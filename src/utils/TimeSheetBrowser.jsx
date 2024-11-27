@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GoDotFill } from "react-icons/go";
 import { Link } from "react-router-dom";
 import * as XLSX from "xlsx";
@@ -40,7 +40,6 @@ export const TimeSheetBrowser = ({ title }) => {
   // const [convertedStringToArrayObj, setConvertedStringToArrayObj] = useState(
   //   []
   // );
-  const [callBLNGgetMethod, setCallBLNGgetMethod] = useState(false);
 
   const [blngData, setBlngData] = useState();
   const handleCheckboxChange = () => {
@@ -250,7 +249,6 @@ export const TimeSheetBrowser = ({ title }) => {
   //   };
   // }, [callBLNGgetMethod]);
 
-  console.log("convertedStringToArrayObj : ", convertedStringToArrayObj);
   const handleFile = (e) => {
     setFileNameForSuccessful(e.target.files[0].name);
     let fileType = [
@@ -291,68 +289,68 @@ export const TimeSheetBrowser = ({ title }) => {
   // }, [loading]);
   // Onshore
   const UploadFile = () => {
-    // try {
-    if (titleName === "Offshore") {
-      const result = UploadOffshoreFile(
-        excelFile,
-        setExcelData,
-        setExcelFile,
-        fileInputRef,
-        setLoading
-      );
+    try {
+      if (titleName === "Offshore") {
+        const result = UploadOffshoreFile(
+          excelFile,
+          setExcelData,
+          setExcelFile,
+          fileInputRef,
+          setLoading
+        );
 
-      setReturnedTHeader(result);
-      fileInputRef.current.value = "";
-      setExcelFile(null);
-    } else if (titleName === "ORMC") {
-      const result = UploadORMCfile(
-        excelFile,
-        setExcelData,
-        setExcelFile,
-        fileInputRef,
-        setLoading
-      );
-      setReturnedTHeader(result);
-      fileInputRef.current.value = "";
-      setExcelFile(null);
-    } else if (titleName === "SBW") {
-      const result = UploadSBWfile(
-        excelFile,
-        setExcelData,
-        setExcelFile,
-        fileInputRef,
-        setLoading
-      );
-      setReturnedTHeader(result);
-      fileInputRef.current.value = "";
-      setExcelFile(null);
-    } else if (titleName === "HO") {
-      const result = UploadHOfile(
-        excelFile,
-        setExcelData,
-        setExcelFile,
-        fileInputRef,
-        setLoading
-      );
-      setReturnedTHeader(result);
-      fileInputRef.current.value = "";
-      setExcelFile(null);
-    } else if (titleName === "BLNG") {
-      const result = UploadBLNGfile(
-        excelFile,
-        setExcelData,
-        setExcelFile,
-        fileInputRef,
-        setLoading
-      );
-      setReturnedTHeader(result);
+        setReturnedTHeader(result);
+        fileInputRef.current.value = "";
+        setExcelFile(null);
+      } else if (titleName === "ORMC") {
+        const result = UploadORMCfile(
+          excelFile,
+          setExcelData,
+          setExcelFile,
+          fileInputRef,
+          setLoading
+        );
+        setReturnedTHeader(result);
+        fileInputRef.current.value = "";
+        setExcelFile(null);
+      } else if (titleName === "SBW") {
+        const result = UploadSBWfile(
+          excelFile,
+          setExcelData,
+          setExcelFile,
+          fileInputRef,
+          setLoading
+        );
+        setReturnedTHeader(result);
+        fileInputRef.current.value = "";
+        setExcelFile(null);
+      } else if (titleName === "HO") {
+        const result = UploadHOfile(
+          excelFile,
+          setExcelData,
+          setExcelFile,
+          fileInputRef,
+          setLoading
+        );
+        setReturnedTHeader(result);
+        fileInputRef.current.value = "";
+        setExcelFile(null);
+      } else if (titleName === "BLNG") {
+        const result = UploadBLNGfile(
+          excelFile,
+          setExcelData,
+          setExcelFile,
+          fileInputRef,
+          setLoading
+        );
+        setReturnedTHeader(result);
 
-      fileInputRef.current.value = "";
-      setExcelFile(null);
+        fileInputRef.current.value = "";
+        setExcelFile(null);
+      }
+    } catch {
+      console.log("ERROR");
     }
-    // } catch {
-    //   console.log("ERROR");
-    // }
   };
 
   const clearUseRefObject = () => {
@@ -506,9 +504,11 @@ export const TimeSheetBrowser = ({ title }) => {
           /> */}
           {titleName === "Offshore" && (
             <ViewTSTBeforeSave
+              setExcelData={setExcelData}
               excelData={excelData}
               returnedTHeader={returnedTHeader}
               Position={getPosition}
+              titleName={titleName}
             />
           )}
           {titleName === "HO" && (
@@ -575,6 +575,14 @@ export const TimeSheetBrowser = ({ title }) => {
       )}
       {!excelData && getPosition === "Manager" && titleName === "ORMC" && (
         <ViewORMCsheet
+          titleName={titleName}
+          returnedTHeader={null}
+          convertedStringToArrayObj={convertedStringToArrayObj}
+          Position={getPosition}
+        />
+      )}
+      {!excelData && getPosition === "Manager" && titleName === "Offshore" && (
+        <ViewTSTBeforeSave
           titleName={titleName}
           returnedTHeader={null}
           convertedStringToArrayObj={convertedStringToArrayObj}

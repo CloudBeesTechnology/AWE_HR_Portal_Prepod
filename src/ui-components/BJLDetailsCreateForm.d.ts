@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -69,16 +69,16 @@ export declare type BJLDetailsCreateFormOverridesProps = {
     bankAmt?: PrimitiveOverrideProps<TextFieldProps>;
     bankValid?: PrimitiveOverrideProps<TextFieldProps>;
     bankEndorse?: PrimitiveOverrideProps<TextFieldProps>;
-    bankEmpUpload?: PrimitiveOverrideProps<TextFieldProps>;
+    bankEmpUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;
     tbaPurchase?: PrimitiveOverrideProps<TextFieldProps>;
     jitpaAmt?: PrimitiveOverrideProps<TextFieldProps>;
     jpValid?: PrimitiveOverrideProps<TextFieldProps>;
     jpEndorse?: PrimitiveOverrideProps<TextFieldProps>;
-    jpEmpUpload?: PrimitiveOverrideProps<TextFieldProps>;
+    jpEmpUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;
     lbrReceiptNo?: PrimitiveOverrideProps<TextFieldProps>;
     lbrDepoAmt?: PrimitiveOverrideProps<TextFieldProps>;
     lbrDepoSubmit?: PrimitiveOverrideProps<TextFieldProps>;
-    lbrDepoUpload?: PrimitiveOverrideProps<TextFieldProps>;
+    lbrDepoUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type BJLDetailsCreateFormProps = React.PropsWithChildren<{
     overrides?: BJLDetailsCreateFormOverridesProps | undefined | null;

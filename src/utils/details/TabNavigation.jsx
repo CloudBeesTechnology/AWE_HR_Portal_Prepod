@@ -6,10 +6,11 @@ const TabNavigation = ({ activeTab, handleTabClick }) => {
     "Educational Details",
     "Family Details",
     "Medical Details",
-    "Accommodation Details",
+    "Non-Local Accommodation Details",
     "Insurance Details",
     "Work Info",
     "Work Pass",
+    // "Depend Pass"
   ];
 
   return (

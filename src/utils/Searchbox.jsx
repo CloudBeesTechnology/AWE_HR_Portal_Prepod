@@ -17,12 +17,16 @@ export const Searchbox = ({
     // searchHandler(query);
 
     if (query) {
-      const results = allEmpDetails.filter( 
+      const results = allEmpDetails.filter(
         (employee) =>
-          employee.empID?.toLowerCase().includes(query) ||
-          employee.name?.toLowerCase().includes(query) ||
-          employee.position?.toLowerCase().includes(query) ||
-          employee.empBadgeNo?.toLowerCase().includes(query)
+          // employee.empID?.toLowerCase().includes(query) ||
+          // employee.name?.toLowerCase().includes(query) ||
+          // employee.position?.toLowerCase().includes(query) ||
+          // employee.empBadgeNo?.toLowerCase().includes(query)
+          (employee.empID && typeof employee.empID === 'string' && employee.empID.toLowerCase().includes(query)) ||
+          (employee.name && typeof employee.name === 'string' && employee.name.toLowerCase().includes(query)) ||
+          (employee.position && typeof employee.position === 'string' && employee.position.toLowerCase().includes(query)) ||
+          (employee.empBadgeNo && typeof employee.empBadgeNo === 'string' && employee.empBadgeNo.toLowerCase().includes(query))
       );
       searchUserList(results); // If provided, otherwise will be a no-op
     } else {

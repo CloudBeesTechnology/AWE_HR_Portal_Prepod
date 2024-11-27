@@ -10,19 +10,20 @@ import { GoPencil } from "react-icons/go";
 import { Profile } from "../pages/profile/Profile";
 import { generateClient } from "@aws-amplify/api";
 import { listEmpPersonalInfos } from "../graphql/queries";
+import { getUrl } from "@aws-amplify/storage";
 
 const client = generateClient();
- const Navbar = () => {
+const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [userName,setUserName]=useState("")
- 
+  const [userName, setUserName] = useState("");
+
   const [personalInfo, setPersonalInfo] = useState({
     profilePhoto: "",
     name: "",
     email: "",
     contactNo: "",
   });
-  
+
   const [userID, setUserID] = useState("");
 
   const toggleDropdown = () => {
@@ -31,15 +32,14 @@ const client = generateClient();
   const dropdownRef = useRef(null);
 
   const handleClickOutside = (event) => {
-    
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {  
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
       setIsOpen(false);
     }
   };
 
   useEffect(() => {
-    const userType=localStorage.getItem("userType")
-    setUserName(userType)
+    const userType = localStorage.getItem("userType");
+    setUserName(userType);
     // Add event listener to detect clicks outside
     document.addEventListener("mousedown", handleClickOutside);
 
@@ -47,7 +47,7 @@ const client = generateClient();
       // Clean up the event listener
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [])
+  }, []);
 
   const today = new Date();
   const date = today.getDate();
@@ -72,59 +72,91 @@ const client = generateClient();
   // Format the time
   const currentTime = `${hours}:${paddedMinutes}:${paddedSeconds} ${ampm}`;
   // console.log(currentTime);
-setInterval(()=>{
-  currentTime
-},100)
+  setInterval(() => {
+    currentTime;
+  }, 100);
 
-    const handleChange = (e) => {
-      const { name, value } = e.target;
-      setPersonalInfo({ ...personalInfo, [name]: value });
-    };
-  
-  
-    useEffect(() => {
-      const userID = localStorage.getItem("userID");
-      setUserID(userID);
-    }, []);
-  
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const empPersonalInfosData = await client.graphql({
-            query: listEmpPersonalInfos,
-          });
-  
-          const empPersonalInfos = empPersonalInfosData?.data?.listEmpPersonalInfos?.items || [];
-  
-          // Check if any data is fetched
-          if (empPersonalInfos.length === 0) {
-            // console.log("No employee data found.");
-            return;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setPersonalInfo({ ...personalInfo, [name]: value });
+  };
+
+  useEffect(() => {
+    const userID = localStorage.getItem("userID");
+    setUserID(userID);
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const empPersonalInfosData = await client.graphql({
+          query: listEmpPersonalInfos,
+        });
+
+        const empPersonalInfos =
+          empPersonalInfosData?.data?.listEmpPersonalInfos?.items || [];
+
+        // Check if any data is fetched
+        if (empPersonalInfos.length === 0) {
+          // console.log("No employee data found.");
+          return;
+        }
+
+        // Find the employee matching the userID, ignoring case
+        const userPersonalInfo = empPersonalInfos.find(
+          (emp) => emp.empID.toLowerCase() === userID.toLowerCase()
+        );
+
+        if (userPersonalInfo) {
+          const profilePhotoString = userPersonalInfo?.profilePhoto;
+          let fixedProfilePhotoString = profilePhotoString.replace(/=/g, ":");
+          fixedProfilePhotoString = fixedProfilePhotoString.replace(
+            /(\w+)(?=:)/g,
+            '"$1"'
+          ); // Wrap keys in double quotes
+          fixedProfilePhotoString = fixedProfilePhotoString.replace(
+            /(?<=:)([^,}\]]+)(?=[,\}\]])/g,
+            '"$1"'
+          ); // Wrap string values in double quotes
+          if (!fixedProfilePhotoString.startsWith("[")) {
+            fixedProfilePhotoString = `[${fixedProfilePhotoString}]`;
           }
+
+          let profilePhotoArray = [];
+          try {
+            profilePhotoArray = JSON.parse(fixedProfilePhotoString); 
+          } catch (error) {
+            // console.error("Failed to parse JSON:", error);
+          }
+
+          // Step 5: Access the last upload value (if available)
+          const lastUpload =
+            profilePhotoArray?.[profilePhotoArray.length - 1]?.upload;
   
-          // Find the employee matching the userID, ignoring case
-          const userPersonalInfo = empPersonalInfos.find(emp => emp.empID.toLowerCase() === userID.toLowerCase());
-  
-          if (userPersonalInfo) {
-            setPersonalInfo({
-              profilePhoto: userPersonalInfo.profilePhoto, // Set the profile photo
+          const linkToStorageFile = async (pathUrl) => {
+            const result = await getUrl({
+              path: pathUrl,
+            });
+            return setPersonalInfo({
+              profilePhoto: result.url.toString(), // Set the profile photo
               name: userPersonalInfo.name, // Use the name
               email: userPersonalInfo.email,
               contactNo: userPersonalInfo.contactNo || "",
             });
-          } else {
-            console.log(`No matching employee found for userID: ${userID}`);
-          }
-  
-        } catch (err) {
-          console.log("Error fetching employee personal infos:", err);
+          };
+          linkToStorageFile(lastUpload);
+        } else {
+          console.log(`No matching employee found for userID: ${userID}`);
         }
-      };
-  
-      if (userID) {
-        fetchData();
+      } catch (err) {
+        console.log("Error fetching employee personal infos:", err);
       }
-    }, [userID]);
+    };
+
+    if (userID) {
+      fetchData();
+    }
+  }, [userID]);
 
   return (
     <nav className="center bg-medium_white h-28 fixed top-0 w-full z-50 shadow-sm">
@@ -166,7 +198,10 @@ setInterval(()=>{
           </div>
           <div className="flex items-center gap-5 px-5">
             <div className="space-y-2 ">
-              <p className="text-dark_grey text_size_5"> Welcome {personalInfo.name}</p>
+              <p className="text-dark_grey text_size_5">
+                {" "}
+                Welcome {personalInfo.name}
+              </p>
               <article className="flex gap-5 text_size_7 text-dark_grey">
                 <p>{currentDate}</p>
 
@@ -177,7 +212,7 @@ setInterval(()=>{
               <div className="relative">
                 <div
                   className="max-w-10 h-10 w-full rounded-full relative overflow-hidden shadow-md shadow-[#00000033]"
-                   onClick={() => toggleDropdown()}
+                  onClick={() => toggleDropdown()}
                 >
                   <img
                     className="w-full object-cover"
@@ -187,20 +222,23 @@ setInterval(()=>{
                 </div>
                 <p
                   className="absolute -right-2 bottom-0 h-5 w-5 rounded-full bg-[#D9D9D9] center"
-                   onClick={() => toggleDropdown()}
+                  onClick={() => toggleDropdown()}
                 >
                   <GoPencil className="text-xs text-dark_grey" />
                 </p>
               </div>
               {isOpen && (
-                <div ref={dropdownRef} className="absolute top-12 -left-40 bg-white shadow-md  py-2 text-dark_grey text-[15px]  w-[250px]  flex flex-col">
-                 <Profile 
-                 setIsOpen={setIsOpen}
-                 name={personalInfo.name} 
-                 email={personalInfo.email}
-                 profilePhoto={personalInfo.profilePhoto} 
-                 contactNo={personalInfo.contactNo}/>
-                 
+                <div
+                  ref={dropdownRef}
+                  className="absolute top-12 -left-40 bg-white shadow-md  py-2 text-dark_grey text-[15px]  w-[250px]  flex flex-col"
+                >
+                  <Profile
+                    setIsOpen={setIsOpen}
+                    name={personalInfo.name}
+                    email={personalInfo.email}
+                    profilePhoto={personalInfo.profilePhoto}
+                    contactNo={personalInfo.contactNo}
+                  />
                 </div>
               )}
             </div>
@@ -210,4 +248,4 @@ setInterval(()=>{
     </nav>
   );
 };
-export default Navbar
+export default Navbar;

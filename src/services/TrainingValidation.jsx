@@ -2,9 +2,9 @@ import * as Yup from "yup";
 
 // Define validation schema
 export const CourceValidationSchema = Yup.object().shape({
-  courceSelect: Yup.string().required("Course selection is required"),
-  courseNameFields: Yup.array().of(Yup.string().required("Course name is required")),
-  companyFields: Yup.array().of(Yup.string().required("Training company is required")),
+  courseSelect: Yup.string().required("Course selection is required"),
+  courseName: Yup.array().of(Yup.string().required("Course name is required")),
+  company: Yup.array().of(Yup.string().required("Training company is required")),
 });
   
   export const blastingPaintingValidationSchema = Yup.object().shape({
@@ -31,20 +31,14 @@ export const trainingCertificatesValidationSchema = Yup.object().shape({
     empID: Yup.string().required('Employee ID is required'),
     empBadgeNo: Yup.string().required('Employee Badge Number is required'),
     department: Yup.string().notRequired(),
-    courseCode: Yup.string().notRequired(),
+    courseSelect: Yup.string().notRequired(),
     courseName: Yup.string().notRequired(),
     company: Yup.string().notRequired(),
     orgiCertifiDate: Yup.string().notRequired(),
     empName: Yup.string().notRequired(),
     eCertifiDate: Yup.string().notRequired(),
     certifiExpiry: Yup.string().notRequired(),
-    trainingUpCertifi: Yup.mixed()
-    .notRequired()
-    .test(
-      "fileType",
-      "Only PDF files are allowed",
-      (value) => value && /\.(pdf)$/.test(value.name)
-    ),
+    trainingUpCertifi: Yup.string().notRequired(),
   });
 
   export const WeldingValidationSchema = Yup.object().shape({

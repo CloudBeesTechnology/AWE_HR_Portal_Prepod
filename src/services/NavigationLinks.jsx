@@ -25,21 +25,25 @@ import { WorkpassTracking } from "../pages/recruitments/WorkpassTracking";
 import { AllEmployee } from "../pages/employees/AllEmployee";
 import { EmployeeInfo } from "../pages/employees/employeeInfos/EmployeeInfo";
 import { WorkInfo } from "../pages/employees/WorkInfo";
-import  LabourImmigration  from "../pages/employees/medicalDep/LabourImmigration";
-import { TestingAllAwsServices } from "../awsTestingAllProcess/TestingAllAwsServices";
+import { Insurance } from "../pages/employees/insurance/Insurance";
+import LabourImmigration  from "../pages/employees/medicalDep/LabourImmigration";
 import { EmpRequisitionForm } from "../pages/recruitments/EmpRequisitionForm";
 import { InsuranceNav } from "../pages/employees/insurance/InsuranceNav";
+import { InsuranceInfo } from "../pages/employees/insurance/InsuranceInfo";
 import { EmployeeInsurance } from "../pages/employees/insurance/EmployeeInsurance";
 import { DependentInsurance } from "../pages/employees/insurance/DependentInsurance";
+import { InsuranceClime } from "../pages/employees/insurance/InsuranceClime";
 import { WorkPass } from "../pages/employees/workPass/WorkPass";
 import { NonLocalAcco } from "../pages/employees/NonLocalAcco";
 import { ChangePassword } from "../pages/changePassword/ChangePassword";
 import { PersonalInformation } from "../pages/profile/PersonalInformation";
+import { Onshore } from "../pages/timeSheet/Onshore";
 import { Offshore } from "../pages/timeSheet/Offshore";
 import { Blng } from "../pages/timeSheet/Blng";
 import { ViewTimeSheet } from "../pages/timeSheet/ViewTimeSheet";
 import { AddCourse } from "../pages/training/trainingForm/AddCourse";
 import { AddEmployeeForm } from "../pages/training/trainingForm/AddEmployeeForm";
+import { TrainingCertificatesForm } from "../pages/training/trainingForm/TrainingCertificatesForm";
 import { WeldingQualificationForm } from "../pages/training/trainingForm/WeldingQualificationForm";
 import { AddNewForm } from "../pages/user/AddUserForm";
 import React, { useEffect, useState } from "react";
@@ -56,7 +60,7 @@ import { HO } from "../pages/timeSheet/HO";
 import { SBW } from "../pages/timeSheet/SBW";
 import { ORMC } from "../pages/timeSheet/ORMC";
 import { ListofCandi } from "../pages/recruitments/ListofCandi";
-import { ApplyEmployReq } from "../pages/recruitments/ApplyEmployReq"
+import { ApplyEmployReq } from "../pages/recruitments/ApplyEmployReq";
 import { ProbationForm } from "../pages/reports/ProbationForm";
 
 const client = generateClient();
@@ -85,7 +89,7 @@ const NavigationLinks = () => {
 
         const result = res?.data?.listUsers?.items[0];
         // console.log(result);
-        const permissionsString = result.setPermissions[0];
+        const permissionsString = result?.setPermissions[0];
         const categories = extractMainCategories(permissionsString);
 
         setMainCategories(categories);
@@ -124,7 +128,6 @@ const NavigationLinks = () => {
       <Route path="/changePassword" element={<ChangePassword />} />
       <Route path="/user" Component={User} />
       <Route path="/addNewForm" Component={AddNewForm} />
-
       {loginAuth && (
         <>
           {mainCategories.map((show, index) => {
@@ -153,7 +156,10 @@ const NavigationLinks = () => {
                     {/* <Route path="/applyemployreq" Component={ApplyEmployReq}/> */}
                     <Route path="/recrutiles" Component={RecruTiles}>
                       <Route path="candidate" element={<Candidate />} />
-                      <Route path="applyemployreq" element={<ApplyEmployReq />} />
+                      <Route
+                        path="applyemployreq"
+                        element={<ApplyEmployReq />}
+                      />
                       <Route path="listofcandi" element={<ListofCandi />} />
                       <Route path="localcandi" element={<Localcandi />} />
                       <Route path="nonloccandi" element={<NonlocCandi />} />
@@ -224,9 +230,9 @@ const NavigationLinks = () => {
                   <Route path="/notifications" Component={Notifications} />
                 )}
                 {show === "Report" && (
-                <>
-                  <Route path="/reports" Component={Reports} />
-                  <Route path="/probForm" Component={ProbationForm}/>
+                  <>
+                    <Route path="/reports" Component={Reports} />
+                    <Route path="/probForm" Component={ProbationForm} />
                   </>
                 )}
                 {show === "BenefitsAndRewards" && (
@@ -262,7 +268,6 @@ const NavigationLinks = () => {
                   </>
                 )}
                 <Route path="/logout" Component={Logout} />
-                <Route path="/testingAws" Component={TestingAllAwsServices} />
               </React.Fragment>
             );
           })}

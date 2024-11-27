@@ -26,11 +26,12 @@ export const UserVF = ({ data, onclose }) => {
               &times;
             </button>
           </div>
+          {/* QW=SNXE(HE;N */}
           {[
             { label: "UserID", value: data.empID },
             { label: "Name", value: data.name },
             { label: "Type", value: data.selectType },
-            { label: "Email", value: data.email },
+            { label: "Email", value: data.officialEmail },
             {
               label: "Password",
               value: isPasswordVisible ? data.password : "••••••••",

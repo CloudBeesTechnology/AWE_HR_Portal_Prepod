@@ -158,7 +158,8 @@ export const SearchDisplay = ({
             employee.name?.toLowerCase().includes(query) ||
             employee.empID?.toLowerCase().includes(query) ||
             employee.JOBCODE?.toLowerCase().includes(query) ||
-            employee.location?.toLowerCase().includes(query)
+            employee.location?.toLowerCase().includes(query) ||
+            employee.empBadgeNo?.toLowerCase().includes(query)
 
           // employee.email?.toLowerCase().includes(query) ||
           // employee.id?.toLowerCase().includes(query) ||
@@ -207,7 +208,7 @@ export const SearchDisplay = ({
               className="m-2 p-1 hover:bg-grey hover:text-white cursor-pointer flex justify-between items-center transition-all duration-200"
               onClick={() => {
                 if (employee.empID || employee.name) {
-                  setSearchQuery(`${employee.empID} - ${employee.name}`);
+                  setSearchQuery(`${employee.empID} - ${employee.name || ""}`);
                   searchResult(employee);
                   setSearchQuery("");
                 }
@@ -235,6 +236,7 @@ export const SearchDisplay = ({
                 <span className=" text-sm"> {employee.name}</span>
                 <span className=" text-sm">{employee.JOBCODE}</span>
                 <span className=" text-sm">{employee.location}</span>
+           
                 {/* <span className="text-gray-600 text-sm">{employee.email}</span> */}
               </div>
             </li>

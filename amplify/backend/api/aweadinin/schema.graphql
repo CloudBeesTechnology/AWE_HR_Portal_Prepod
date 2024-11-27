@@ -140,7 +140,7 @@ type TrainingCertificates @model @auth(rules: [{ allow: public }]) {
 
 type AddCourse @model @auth(rules: [{ allow: public }]) {
   id: ID!
-  courseSelect: [String!]
+  courseSelect: String!
   courseName: [String!]
   company: [String!]
 }
@@ -161,7 +161,7 @@ type EmpInsurance @model @auth(rules: [{ allow: public }]) {
   workmePolicyNo: [String]
   travelIns: [String]
   accidentIns: [String]
-  empInsUpload: [String]
+  empInsUpload: [AWSJSON]
 }
 
 type SawpDetails @model @auth(rules: [{ allow: public }]) {
@@ -169,7 +169,7 @@ type SawpDetails @model @auth(rules: [{ allow: public }]) {
   empID: String!
   sawpEmpLtrReq: [String]
   sawpEmpLtrReci: [String]
-  sawpEmpUpload: [String]
+  sawpEmpUpload: [AWSJSON]
 }
 
 type DNDetails @model @auth(rules: [{ allow: public }]) {
@@ -179,14 +179,14 @@ type DNDetails @model @auth(rules: [{ allow: public }]) {
   doeEmpApproval: [String]
   doeEmpValid: [String]
   doeEmpRefNo: [String]
-  doeEmpUpload: [String]
+  doeEmpUpload: [AWSJSON]
   permitType: [String]
   nlmsEmpSubmit: [String]
   nlmsEmpSubmitRefNo: [String]
   nlmsEmpApproval: [String]
   nlmsRefNo: [String]
   nlmsEmpValid: [String]
-  nlmsEmpUpload: [String]
+  nlmsEmpUpload: [AWSJSON]
 }
 
 type BJLDetails @model @auth(rules: [{ allow: public }]) {
@@ -198,25 +198,25 @@ type BJLDetails @model @auth(rules: [{ allow: public }]) {
   bankAmt: [String]
   bankValid: [String]
   bankEndorse: [String]
-  bankEmpUpload: [String]
+  bankEmpUpload: [AWSJSON]
   tbaPurchase: [String]
   jitpaAmt: [String]
   jpValid: [String]
   jpEndorse: [String]
-  jpEmpUpload: [String]
+  jpEmpUpload: [AWSJSON]
   lbrReceiptNo: [String]
   lbrDepoAmt: [String]
   lbrDepoSubmit: [String]
-  lbrDepoUpload: [String]
+  lbrDepoUpload: [AWSJSON]
 }
 
 type PassportValid @model @auth(rules: [{ allow: public }]) {
   id: ID!
   empID: String!
   ppLocation: [String]
-  arrivStampUpload: [String]
-  immigEmpUpload: [String]
-  reEntryUpload: [String]
+  arrivStampUpload: [AWSJSON]
+  immigEmpUpload: [AWSJSON]
+  reEntryUpload: [AWSJSON]
   arrivStampExp: [String]
   immigRefNo: String
   ppSubmit: [String]
@@ -329,19 +329,16 @@ type EmpLeaveDetails @model @auth(rules: [{ allow: public }]) {
   annualLeave: [String]
   annualLeaveDate: [String]
   compasLeave: String
-  compasLeaveDate: String
   destinateLeavePass: [String]
   durLeavePass: [String]
   dateLeavePass: [String]
   leavePass: [String]
-  materLeave: [String]
-  materLeaveDate: [String]
+  materLeave: String
   mrageLeave: String
-  mrageLeaveDate: String
-  paterLeave: [String]
-  paterLeaveDate: [String]
+  paterLeave: String
   sickLeave: String
   sickLeaveDate: String
+  hospLeave: String
 }
 
 type TerminationInfo @model @auth(rules: [{ allow: public }]) {
@@ -369,8 +366,8 @@ type TerminationInfo @model @auth(rules: [{ allow: public }]) {
 type EmpWorkInfo @model @auth(rules: [{ allow: public }]) {
   id: ID!
   empID: String!
-  contractStart: [String!]
-  contractEnd: [String!]
+  contractStart: [String]
+  contractEnd: [String]
   contractPeriod: [String]
   doj: String!
   department: [String!]
@@ -381,15 +378,15 @@ type EmpWorkInfo @model @auth(rules: [{ allow: public }]) {
   otherJobCat: [String]
   otherDepartment: [String]
   otherPosition: [String]
-  probationStart: String
-  probationEnd: String
-  probDuration: String
+  probationStart: [String]
+  probationEnd: [String]
+  probDuration: [String]
   position: [String!]
   relationship: [String!]
   supervisor: [String]
   skillPool: String!
   salaryType: [String!]
-  sapNo: String!
+  sapNo: String
   upgradeDate: [String]
   upgradePosition: [String]
   workStatus: [String!]
@@ -585,6 +582,7 @@ type User @model @auth(rules: [{ allow: public }]) {
   selectType: String!
   setPermissions: [String]
   password: String!
+  status: String
 }
 
 type TicketRequest @model @auth(rules: [{ allow: public }]) {
@@ -624,14 +622,4 @@ type LeaveStatus @model @auth(rules: [{ allow: public }]) {
   empStatus: String
   empDate: AWSDateTime
   empRemarks: String
-}
-
-type SampleTest1 @model @auth(rules: [{ allow: public }]) {
-  id: ID!
-  name: String
-  email: String
-  gender: String
-  empID: String
-  password: String
-  tempID: String
 }

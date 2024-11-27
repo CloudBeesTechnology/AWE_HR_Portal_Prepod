@@ -63,6 +63,7 @@ export const UpdateEmpInfo = () => {
       empBadgeNo,
       empType,
       familyDetails,
+      officialEmail,
       gender,
       lang,
       marital,
@@ -93,6 +94,7 @@ export const UpdateEmpInfo = () => {
       empBadgeNo,
       empType,
       familyDetails,
+      officialEmail,
       gender,
       lang,
       marital,
@@ -111,7 +113,6 @@ export const UpdateEmpInfo = () => {
       bwnIcColour,
       bwnIcExpiry,
       driveLic,
-
       inducBrief,
       inducBriefUp,
       myIcNo,
@@ -143,7 +144,7 @@ export const UpdateEmpInfo = () => {
     // console.log(totalData,"totalData");
 
     try {
-      const [idResponse, empInfoResponse] = await Promise.all([
+      const [empInfoResponse, idResponse] = await Promise.all([
         client.graphql({
           query: updateEmpPersonalInfo,
           variables: {

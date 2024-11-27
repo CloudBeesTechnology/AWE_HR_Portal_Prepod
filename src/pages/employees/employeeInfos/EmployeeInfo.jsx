@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FaArrowLeft } from "react-icons/fa";
@@ -26,8 +26,8 @@ import { RowTwelve } from "./RowTwelve";
 import { EmpInfoFunc } from "../../../services/createMethod/EmpInfoFunc";
 import { FormField } from "../../../utils/FormField";
 import { DataSupply } from "../../../utils/DataStoredContext";
-import { Badge } from "@aws-amplify/ui-react";
 import { UpdateEmpInfo } from "../../../services/updateMethod/UpdateEmpInfo";
+import { getUrl } from "@aws-amplify/storage";
 
 export const EmployeeInfo = () => {
   const { SubmitEIData, errorEmpID } = EmpInfoFunc();
@@ -41,6 +41,8 @@ export const EmployeeInfo = () => {
   const [selectedNationality, setSelectedNationality] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedRace, setSelectedRace] = useState("");
+  const [selectContractType, setSelectContractType] = useState([]);
+  const [selectempType, setSelectempType] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState({
     bwnUpload: [],
     applicationUpload: [],
@@ -65,7 +67,10 @@ export const EmployeeInfo = () => {
   const [IBLastUP, setIBLastUP] = useState(null);
   const [familyData, setFamilyData] = useState([]);
   const [showTitle, setShowTitle] = useState("");
-
+  const [bwnIcExpiryDate, setBWNIcExpiryDate] = useState([]);
+  const [ppIssuedDate, setPPIssuedDate] = useState([]);
+  const [ppExpiryDate, setPPExpiryDate] = useState([]);
+  const [errorValue, setErrorValue] = useState([]);
   const handleNationalityChange = (e) => {
     setSelectedNationality(e.target.value);
   };
@@ -78,17 +83,26 @@ export const EmployeeInfo = () => {
 
   const {
     register,
+
     handleSubmit,
     setValue,
     watch,
     control,
     formState: { errors },
   } = useForm({
+    resolver: yupResolver(employeeInfoSchema),
+    mode: "onChange",
     defaultValues: {
       familyDetails: JSON.stringify([]),
+      contractType: [],
+      empType: [],
+      bwnIcExpiry: [],
     },
-    resolver: yupResolver(employeeInfoSchema),
   });
+
+  const contractTypes = watch("contractType");
+  const empTypes = watch("empType");
+  const watchedEmpID = watch("empID");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -118,18 +132,13 @@ export const EmployeeInfo = () => {
   }, [empPIData, IDData]);
 
   const handleFileUpload = async (e, type) => {
-    let selectedFile;
-    let fileTypeValue;
-    // Check if `e` is an event object or a file object
-    if (e.target && e.target.files) {
-      selectedFile = e.target.files[0];
-      fileTypeValue = e.target.files[0];
-    } else if (typeof e === "string") {
-      // Check if the input is a URL (assuming e is a string)
-      selectedFile = e;
-    } else {
-      selectedFile = e;
+    if (!watchedEmpID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
     }
+
+    let selectedFile = e.target.files[0];
 
     // Allowed file types
     const allowedTypes = [
@@ -139,34 +148,29 @@ export const EmployeeInfo = () => {
       "image/jpg",
     ];
 
-    if (typeof selectedFile === "string") {
-      if (type === "profilePhoto") {
-        setPPLastUP(selectedFile);
-      } else if (type === "inducBriefUp") {
-        setIBLastUP(selectedFile);
-      }
-    } else {
-      // Validate file type
-      if (!allowedTypes.includes(selectedFile.type)) {
-        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-        return;
-      }
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
     }
-
 
     setValue(type, selectedFile);
 
-    if (fileTypeValue) {
-      await uploadDocs(fileTypeValue, type, setUploadedDocs);
+    if (selectedFile) {
+      await uploadDocs(selectedFile, type, setUploadedDocs, watchedEmpID);
 
       setUploadedFileNames((prev) => ({
         ...prev,
-        [type]: fileTypeValue.name, // Dynamically store file name
+        [type]: selectedFile.name, // Dynamically store file name
       }));
     }
   };
 
   const handleFileChange = async (e, label) => {
+    if (!watchedEmpID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
+    }
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
     const allowedTypes = [
@@ -183,7 +187,7 @@ export const EmployeeInfo = () => {
     setValue(label, [...currentFiles, selectedFile]);
     try {
       // Dynamically set field based on label
-      await uploadDocs(selectedFile, label, setUploadedFiles);
+      await uploadDocs(selectedFile, label, setUploadedFiles, watchedEmpID);
       setUploadedFileNames((prev) => ({
         ...prev,
         [label]: selectedFile.name,
@@ -192,6 +196,7 @@ export const EmployeeInfo = () => {
       console.log(err);
     }
   };
+
   useEffect(() => {
     if (
       (uploadedDocs?.profilePhoto && uploadedDocs.profilePhoto.length > 0) ||
@@ -201,7 +206,14 @@ export const EmployeeInfo = () => {
         const lastUploadProf =
           uploadedDocs.profilePhoto[uploadedDocs.profilePhoto.length - 1]
             .upload;
-        setPPLastUP(lastUploadProf);
+
+        const linkToStorageFile = async (pathUrl) => {
+          const result = await getUrl({
+            path: pathUrl,
+          });
+          return setPPLastUP(result.url.toString());
+        };
+        linkToStorageFile(lastUploadProf);
       }
 
       if (uploadedDocs.inducBriefUp && uploadedDocs.inducBriefUp.length > 0) {
@@ -215,17 +227,24 @@ export const EmployeeInfo = () => {
     }
   }, [uploadedDocs]);
 
-  const getLastValue = (value) =>
-    Array.isArray(value) ? value[value.length - 1] : value;
+  const getLastValue = (value, field) => {
+    if (field === "contractType" || field === "empType") {
+      return value;
+    }
 
+    // Ensure value is an array for ppExpiry, ppIssued, and bwnIcExpiry
+    if (["ppExpiry", "ppIssued", "bwnIcExpiry"].includes(field)) {
+      return Array.isArray(value) ? value : [value];
+    }
+
+    return Array.isArray(value) ? value : value ? [value] : [];
+  };
   const searchResult = (result) => {
     console.log(result);
-
     const keysToSet = [
       "empID",
       "driveLic",
       "inducBrief",
-      "profilePhoto",
       "myIcNo",
       "nationality",
       "nationalCat",
@@ -240,10 +259,10 @@ export const EmployeeInfo = () => {
       "aTQualify",
       "alternateNo",
       "agent",
+      "dob",
       "cob",
       "ctryOfOrigin",
       "chinese",
-      "dob",
       "educLevel",
       "email",
       "eduDetails",
@@ -257,27 +276,47 @@ export const EmployeeInfo = () => {
       "oCOfOrigin",
       "position",
       "sapNo",
+      "officialEmail",
+      "bwnIcColour",
+      "bwnIcNo",
     ];
 
     keysToSet.forEach((key) => {
       setValue(key, result[key]);
     });
 
-    const fields = [
-      "contactNo",
-      "contractType",
-      "empType",
-      "bwnIcColour",
-      "bwnIcExpiry",
-      "bwnIcNo",
-      "ppNo",
-      "ppIssued",
-      "ppExpiry",
-      "ppDestinate",
+    const changeString = [
       "permanentAddress",
+      "contactNo",
+      "ppNo",
+      "ppDestinate",
     ];
+    changeString.forEach((field) => {
+      const value = result[field]; // Get the backend value
+      if (Array.isArray(value)) {
+        const stringValue = value.join(", "); // Convert array to string for display
+        setValue(field, stringValue); // Show as a string in the frontend
+      } else {
+        setValue(field, value); // Handle non-array values if any
+      }
+    });
 
-    fields.forEach((field) => setValue(field, getLastValue(result[field])));
+    const fields = ["contractType", "empType", "ppExpiry", "ppIssued"];
+
+    // Original
+    // fields.forEach((field) => setValue(field, getLastValue(result[field])));
+    fields.forEach((field) => {
+      const value = getLastValue(result[field], field); // Pass the field name to the function
+      setValue(field, value);
+    });
+
+    setValue(
+      "bwnIcExpiry",
+      Array.isArray(result.bwnIcExpiry)
+        ? result.bwnIcExpiry
+        : [result.bwnIcExpiry]
+    );
+
     const parsedData = JSON.parse(result.familyDetails);
     setFamilyData(parsedData);
 
@@ -286,10 +325,49 @@ export const EmployeeInfo = () => {
         ...prev,
         inducBriefUp: getFileName(result.inducBriefUp) || "",
       }));
-    result.profilePhoto &&
-      handleFileUpload(result.profilePhoto, "profilePhoto");
-    result.inducBriefUp &&
-      handleFileUpload(result.inducBriefUp, "inducBriefUp");
+
+    setValue("profilePhoto", result.profilePhoto.toString());
+    setValue("inducBriefUp", result.inducBriefUp.toString());
+
+    setUploadedDocs((prev) => ({
+      ...prev,
+      profilePhoto: result.profilePhoto,
+      inducBriefUp: result.inducBriefUp,
+    }));
+    const profilePhotoString = result?.profilePhoto;
+    let fixedProfilePhotoString = profilePhotoString.replace(/=/g, ":");
+    fixedProfilePhotoString = fixedProfilePhotoString.replace(
+      /(\w+)(?=:)/g,
+      '"$1"'
+    ); // Wrap keys in double quotes
+    fixedProfilePhotoString = fixedProfilePhotoString.replace(
+      /(?<=:)([^,}\]]+)(?=[,\}\]])/g,
+      '"$1"'
+    ); // Wrap string values in double quotes
+    if (!fixedProfilePhotoString.startsWith("[")) {
+      fixedProfilePhotoString = `[${fixedProfilePhotoString}]`;
+    }
+
+    let profilePhotoArray = [];
+    try {
+      profilePhotoArray = JSON.parse(fixedProfilePhotoString); // Parse the corrected string
+      console.log(profilePhotoArray); // Check if it parsed correctly
+    } catch (error) {
+      console.error("Failed to parse JSON:", error);
+    }
+
+    // Step 5: Access the last upload value (if available)
+    const lastUpload =
+      profilePhotoArray?.[profilePhotoArray.length - 1]?.upload;
+    console.log(lastUpload);
+
+    const linkToStorageFile = async (pathUrl) => {
+      const result = await getUrl({
+        path: pathUrl,
+      });
+      return setPPLastUP(result.url.toString());
+    };
+    linkToStorageFile(lastUpload);
 
     const uploadFields = [
       "bwnUpload",
@@ -333,80 +411,121 @@ export const EmployeeInfo = () => {
     });
   };
 
-  function getFileName(url) {
-    const urlObj = new URL(url);
-    const filePath = urlObj.pathname;
+  const getFileName = (filePath) => {
+    const fileNameWithExtension = filePath.split("/").pop(); // Get file name with extension
+    const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
+    return fileName;
+  };
 
-    const decodedUrl = decodeURIComponent(filePath);
+  const onError = (errors) => {
+    console.log("Validation Errors:", errors);
 
-    // Extract the file name after the last '/' in the path
-    const fileNameWithExtension = decodedUrl.substring(
-      decodedUrl.lastIndexOf("/") + 1
-    );
+    setErrorValue(errors);
+  };
 
-    return fileNameWithExtension;
+  // Refactored function to handle state updates and notify using async/await
+  async function updateStateAndNotify(setState, value) {
+    return new Promise((resolve) => {
+      setState((prev) => {
+        const updatedDates = [...prev, ...(value || [])];
+        const newDates = Array.from(new Set(updatedDates)); // Remove duplicates
+        resolve(newDates); // Resolve the updated state
+        return newDates;
+      });
+    });
   }
-console.log(PPLastUP);
 
+  // Fetching dates and updating states sequentially
+  async function fetchingDate(val, callback) {
+    try {
+      const newBWNIcExpiryDate = await updateStateAndNotify(
+        setBWNIcExpiryDate,
+        val.bwnIcExpiry
+      );
+      const newPPExpiryDate = await updateStateAndNotify(
+        setPPExpiryDate,
+        val.ppExpiry
+      );
+      const newPPIssuedDate = await updateStateAndNotify(
+        setPPIssuedDate,
+        val.ppIssued
+      );
+      callback({
+        bwnIcExpiryDate: newBWNIcExpiryDate,
+        PPExpiryDate: newPPExpiryDate,
+        PPIssuedDate: newPPIssuedDate,
+      });
+    } catch (error) {
+      console.error("Error updating state:", error);
+    }
+  }
+
+  // onSubmit function
   const onSubmit = async (data) => {
-    // console.log(data);
+    data.contractType = contractTypes;
+    data.empType = empTypes;
 
     try {
-      const checkingPITable = empPIData.find(
-        (match) => match.empID === data.empID
-      );
-      const checkingIDTable = IDData.find(
-        (match) => match.empID === data.empID
-      );
-      if (checkingIDTable && checkingPITable) {
-        const collectValue = {
-          ...data,
-          profilePhoto: PPLastUP,
-          inducBriefUp: IBLastUP,
-          bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
-          applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
-          cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
-          loiUpload: JSON.stringify(uploadedFiles.loiUpload),
-          myIcUpload: JSON.stringify(uploadedFiles.myIcUpload),
-          paafCvevUpload: JSON.stringify(uploadedFiles.paafCvevUpload),
-          ppUpload: JSON.stringify(uploadedFiles.ppUpload),
-          supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
-          familyDetails: JSON.stringify(data.familyDetails),
-          PITableID: checkingPITable.id,
-          IDTable: checkingIDTable.id,
-        };
-        console.log(collectValue);
+      // Pass a callback to handle the result after state update
+      await fetchingDate(data, async (updatedDates) => {
+        const checkingPITable = empPIData.find(
+          (match) => match.empID === data.empID
+        );
+        const checkingIDTable = IDData.find(
+          (match) => match.empID === data.empID
+        );
 
-        await UpdateEIValue({ collectValue });
-        setShowTitle("Employee Personal Info updated successfully");
-        setNotification(true);
-      } else {
-        const empValue = {
-          ...data,
-          profilePhoto: PPLastUP,
-          inducBriefUp: IBLastUP,
-          bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
-          applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
-          cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
-          loiUpload: JSON.stringify(uploadedFiles.loiUpload),
-          myIcUpload: JSON.stringify(uploadedFiles.myIcUpload),
-          paafCvevUpload: JSON.stringify(uploadedFiles.paafCvevUpload),
-          ppUpload: JSON.stringify(uploadedFiles.ppUpload),
-          supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
-          familyDetails: JSON.stringify(data.familyDetails),
-        };
-        // console.log(empValue);
-        await SubmitEIData({ empValue });
-        setShowTitle("Employee Personal Info saved successfully");
-        setNotification(true);
-      }
+        let collectValue;
+        if (checkingIDTable && checkingPITable) {
+          collectValue = {
+            ...data,
+            profilePhoto: uploadedDocs.profilePhoto,
+            inducBriefUp: uploadedDocs.inducBriefUp,
+            bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
+            bwnIcExpiry: updatedDates.bwnIcExpiryDate,
+            ppIssued: updatedDates.PPIssuedDate,
+            ppExpiry: updatedDates.PPExpiryDate,
+            applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
+            cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
+            loiUpload: JSON.stringify(uploadedFiles.loiUpload),
+            myIcUpload: JSON.stringify(uploadedFiles.myIcUpload),
+            paafCvevUpload: JSON.stringify(uploadedFiles.paafCvevUpload),
+            ppUpload: JSON.stringify(uploadedFiles.ppUpload),
+            supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
+            familyDetails: JSON.stringify(data.familyDetails),
+            PITableID: checkingPITable.id,
+            IDTable: checkingIDTable.id,
+          };
+          // console.log("AZQ", collectValue);
+          await UpdateEIValue({ collectValue });
+          setShowTitle("Employee Personal Info updated successfully");
+          setNotification(true);
+        } else {
+          const empValue = {
+            ...data,
+            profilePhoto: uploadedDocs.profilePhoto,
+            inducBriefUp: uploadedDocs.inducBriefUp,
+            bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
+            bwnIcExpiry: updatedDates.bwnIcExpiryDate,
+            ppIssued: updatedDates.PPIssuedDate,
+            ppExpiry: updatedDates.PPExpiryDate,
+            applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
+            cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
+            loiUpload: JSON.stringify(uploadedFiles.loiUpload),
+            myIcUpload: JSON.stringify(uploadedFiles.myIcUpload),
+            paafCvevUpload: JSON.stringify(uploadedFiles.paafCvevUpload),
+            ppUpload: JSON.stringify(uploadedFiles.ppUpload),
+            supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
+            familyDetails: JSON.stringify(data.familyDetails),
+          };
+          // console.log("AZ", empValue);
+          await SubmitEIData({ empValue });
+          setShowTitle("Employee Personal Info saved successfully");
+          setNotification(true);
+        }
+      });
     } catch (error) {
-      console.log(error);
-
-      console.error(
-        "Error submitting data to AWS:",
-        JSON.stringify(error, null, 2)
-      );
+      console.error("Error submitting data:", error);
     }
   };
 
@@ -433,12 +552,13 @@ console.log(PPLastUP);
         </div>
       </div>
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSubmit, onError)}
         className=" flex flex-col justify-center "
       >
         {/* Row1 */}
         <div className="flex justify-between items-center py-7 mt-2">
           {/* Upload Image Section */}
+
           <div className="py-2 center flex-col max-w-[160px]">
             <input
               type="file"
@@ -466,8 +586,7 @@ console.log(PPLastUP);
                 className="object-cover w-full h-full"
                 onError={(e) => (e.target.src = avatar)}
               />
-              {(PPLastUP ||
-                watchedProfilePhoto) && (
+              {(PPLastUP || watchedProfilePhoto) && (
                 <div
                   className="absolute top-24 -right-3  bg-lite_grey p-[2px] rounded-full cursor-pointer"
                   onClick={() => document.getElementById("fileInput").click()}
@@ -478,26 +597,23 @@ console.log(PPLastUP);
             </div>
 
             {/* Conditionally Render the "Choose Image" button */}
-            {!PPLastUP &&
-              !watchedProfilePhoto && (
-                <div className="mt-1 rounded-lg text-center">
-                  <button
-                    type="button"
-                    className="text_size_6"
-                    onClick={() => document.getElementById("fileInput").click()}
-                  >
-                    Choose Image
-                  </button>
-                </div>
-              )}
+            {!PPLastUP && !watchedProfilePhoto && (
+              <div className="mt-1 rounded-lg text-center">
+                <button
+                  type="button"
+                  className="text_size_6"
+                  onClick={() => document.getElementById("fileInput").click()}
+                >
+                  Choose Image
+                </button>
+              </div>
+            )}
 
-            {!PPLastUP &&
-              !watchedProfilePhoto &&
-              errors.profilePhoto && (
-                <p className="text-[red] text-[13px] text-center">
-                  {errors?.profilePhoto?.message}
-                </p>
-              )}
+            {!PPLastUP && !watchedProfilePhoto && errors.profilePhoto && (
+              <p className="text-[red] text-[13px] text-center">
+                {errors?.profilePhoto?.message}
+              </p>
+            )}
           </div>
           <div className="max-w-sm">
             <FormField
@@ -515,7 +631,13 @@ console.log(PPLastUP);
           </div>
         </div>
         {/* Row2 */}
-        <RowTwo register={register} errors={errors} watch={watch} />
+        <RowTwo
+          register={register}
+          errors={errors}
+          setValue={setValue}
+          watch={watch}
+          control={control}
+        />
 
         {/* Row3 */}
         <RowThree register={register} errors={errors} />
@@ -543,10 +665,22 @@ console.log(PPLastUP);
         <RowSeven
           register={register}
           errors={errors}
+          control={control}
+          setValue={setValue}
+          watch={watch}
+          errorValue={errorValue}
+
           // value={watch("bwnIcExpiry") || ""}
         />
         {/* Row8 */}
-        <RowEight register={register} errors={errors} />
+        <RowEight
+          register={register}
+          errors={errors}
+          control={control}
+          setValue={setValue}
+          watch={watch}
+          errorValue={errorValue}
+        />
         {/* Row9 */}
         <RowNine register={register} errors={errors} />
         {/* Row10 */}
@@ -578,8 +712,9 @@ console.log(PPLastUP);
                 <GoUpload /> Induction Form
               </span>
             </label>
-            {!uploadedFileNames?.inducBriefUp && !watchInducBriefUpload ? (
-              <p className="text-[red] text-[13px] mt-1">
+
+            {!uploadedFileNames?.inducBriefUp ? (
+              <p className="text-[red] text-[12px] pt-2">
                 {errors?.inducBriefUp?.message}
               </p>
             ) : (

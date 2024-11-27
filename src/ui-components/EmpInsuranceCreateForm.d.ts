@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -54,7 +54,7 @@ export declare type EmpInsuranceCreateFormOverridesProps = {
     workmePolicyNo?: PrimitiveOverrideProps<TextFieldProps>;
     travelIns?: PrimitiveOverrideProps<TextFieldProps>;
     accidentIns?: PrimitiveOverrideProps<TextFieldProps>;
-    empInsUpload?: PrimitiveOverrideProps<TextFieldProps>;
+    empInsUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type EmpInsuranceCreateFormProps = React.PropsWithChildren<{
     overrides?: EmpInsuranceCreateFormOverridesProps | undefined | null;

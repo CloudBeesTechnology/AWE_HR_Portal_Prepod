@@ -29,54 +29,53 @@ const client = generateClient();
   const [error, setError] = useState("");
 
   const Submit = handleSubmit(async (data) => {
-  
     try {
       const username = data.userID;
-      const password = data.password;
-      const { isSignedIn, userId, nextStep } = await signIn({
-        username,
-        password,
+  
+      // Fetch user details first to check status
+      const resultUser = await client.graphql({
+        query: listUsers,
       });
-      const currentUser = await getCurrentUser();
-      if (isSignedIn || currentUser) {
-        const userToStore = currentUser ? currentUser.username : username;
-        localStorage.setItem("userID", userToStore);
-        // console.log(userToStore);
-
-        try {
-          const resultUser = await client.graphql({
-            query: listUsers,
-          })
-
-          const userType = resultUser?.data?.listUsers?.items.find(
-            (val) => val.empID === userToStore.toUpperCase()
-          )?.selectType;
-          localStorage.setItem("userType", userType);
-
-          window.location.href = "/dashboard";
-        } catch (error) {
-          console.error("Error fetching user details:", error);
-          // Handle error (e.g., show an error message)
+  
+      const user = resultUser?.data?.listUsers?.items.find(
+        (val) => val.empID === username.toUpperCase()
+      );
+  
+      // Check if user exists and status is 'Active'
+      if (user && user.status === 'Active') {
+        const password = data.password;
+        const { isSignedIn, userId, nextStep } = await signIn({
+          username,
+          password,
+        });
+  
+        const currentUser = await getCurrentUser();
+        if (isSignedIn || currentUser) {
+          const userToStore = currentUser ? currentUser.username : username;
+          localStorage.setItem("userID", userToStore);
+  
+          // Store userType and redirect to dashboard
+          const userType = user.selectType;
+          if (userType) {
+            localStorage.setItem("userType", userType);
+            window.location.href = "/dashboard";
+          } else {
+            console.error("userType not found");
+            alert("Access denied: Your account is inactive. Please contact the administrator for assistance");
+          }
         }
-
-        // window.location.href = "/dashboard";
+      } else {
+        console.error("User is not active");
+        alert("Access denied: Your account is inactive. Please contact the administrator for assistance");
       }
-      // else {
-      //   if (nextStep.signInStep === "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD") {
-      //     console.log("Redirecting to change password page...");
-      //     window.location.href = "/changePassword";
-      //   } else if (
-      //     nextStep.signInStep === "CONFIRM_SIGN_IN_WITH_CUSTOM_CHALLENGE"
-      //   ) {
-      //     console.log("Custom challenge required, handling...");
-      //   } else {
-      //     console.log("Unknown next step:", nextStep);
-      //   }
-      // }
     } catch (error) {
+      console.error("Error during sign-in process:", error);
       setError(error.message);
     }
   });
+  
+
+  
 
   return (
     // <Authenticator>
@@ -161,15 +160,7 @@ const client = generateClient();
               Login
             </button>
           </div>
-          {/* <hr className="border-[1.5px] text-[#B3B3B3]" />
-          <div className="center">
-            <Link
-              to="/changePassword"
-              className="text-[#7A7A7A] text_size_6 text-center my-5"
-            >
-              Change Password
-            </Link>
-          </div> */}
+      
         </section>
       </div>
     </section>

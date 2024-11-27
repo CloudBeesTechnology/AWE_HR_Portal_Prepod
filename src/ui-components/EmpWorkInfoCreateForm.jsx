@@ -202,9 +202,9 @@ export default function EmpWorkInfoCreateForm(props) {
     otherJobCat: [],
     otherDepartment: [],
     otherPosition: [],
-    probationStart: "",
-    probationEnd: "",
-    probDuration: "",
+    probationStart: [],
+    probationEnd: [],
+    probDuration: [],
     position: [],
     relationship: [],
     supervisor: [],
@@ -297,8 +297,11 @@ export default function EmpWorkInfoCreateForm(props) {
     setOtherPosition(initialValues.otherPosition);
     setCurrentOtherPositionValue("");
     setProbationStart(initialValues.probationStart);
+    setCurrentProbationStartValue("");
     setProbationEnd(initialValues.probationEnd);
+    setCurrentProbationEndValue("");
     setProbDuration(initialValues.probDuration);
+    setCurrentProbDurationValue("");
     setPosition(initialValues.position);
     setCurrentPositionValue("");
     setRelationship(initialValues.relationship);
@@ -352,6 +355,15 @@ export default function EmpWorkInfoCreateForm(props) {
   const [currentOtherPositionValue, setCurrentOtherPositionValue] =
     React.useState("");
   const otherPositionRef = React.createRef();
+  const [currentProbationStartValue, setCurrentProbationStartValue] =
+    React.useState("");
+  const probationStartRef = React.createRef();
+  const [currentProbationEndValue, setCurrentProbationEndValue] =
+    React.useState("");
+  const probationEndRef = React.createRef();
+  const [currentProbDurationValue, setCurrentProbDurationValue] =
+    React.useState("");
+  const probDurationRef = React.createRef();
   const [currentPositionValue, setCurrentPositionValue] = React.useState("");
   const positionRef = React.createRef();
   const [currentRelationshipValue, setCurrentRelationshipValue] =
@@ -380,8 +392,8 @@ export default function EmpWorkInfoCreateForm(props) {
   const workMonthRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
-    contractStart: [{ type: "Required" }],
-    contractEnd: [{ type: "Required" }],
+    contractStart: [],
+    contractEnd: [],
     contractPeriod: [],
     doj: [{ type: "Required" }],
     department: [{ type: "Required" }],
@@ -400,7 +412,7 @@ export default function EmpWorkInfoCreateForm(props) {
     supervisor: [],
     skillPool: [{ type: "Required" }],
     salaryType: [{ type: "Required" }],
-    sapNo: [{ type: "Required" }],
+    sapNo: [],
     upgradeDate: [],
     upgradePosition: [],
     workStatus: [{ type: "Required" }],
@@ -620,7 +632,7 @@ export default function EmpWorkInfoCreateForm(props) {
       >
         <TextField
           label="Contract start"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentContractStartValue}
           onChange={(e) => {
@@ -694,7 +706,7 @@ export default function EmpWorkInfoCreateForm(props) {
       >
         <TextField
           label="Contract end"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentContractEndValue}
           onChange={(e) => {
@@ -1426,13 +1438,9 @@ export default function EmpWorkInfoCreateForm(props) {
           {...getOverrideProps(overrides, "otherPosition")}
         ></TextField>
       </ArrayField>
-      <TextField
-        label="Probation start"
-        isRequired={false}
-        isReadOnly={false}
-        value={probationStart}
-        onChange={(e) => {
-          let { value } = e.target;
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
           if (onChange) {
             const modelFields = {
               empID,
@@ -1448,7 +1456,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherJobCat,
               otherDepartment,
               otherPosition,
-              probationStart: value,
+              probationStart: values,
               probationEnd,
               probDuration,
               position,
@@ -1465,25 +1473,48 @@ export default function EmpWorkInfoCreateForm(props) {
               workMonth,
             };
             const result = onChange(modelFields);
-            value = result?.probationStart ?? value;
+            values = result?.probationStart ?? values;
           }
-          if (errors.probationStart?.hasError) {
-            runValidationTasks("probationStart", value);
-          }
-          setProbationStart(value);
+          setProbationStart(values);
+          setCurrentProbationStartValue("");
         }}
-        onBlur={() => runValidationTasks("probationStart", probationStart)}
-        errorMessage={errors.probationStart?.errorMessage}
-        hasError={errors.probationStart?.hasError}
-        {...getOverrideProps(overrides, "probationStart")}
-      ></TextField>
-      <TextField
-        label="Probation end"
-        isRequired={false}
-        isReadOnly={false}
-        value={probationEnd}
-        onChange={(e) => {
-          let { value } = e.target;
+        currentFieldValue={currentProbationStartValue}
+        label={"Probation start"}
+        items={probationStart}
+        hasError={errors?.probationStart?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("probationStart", currentProbationStartValue)
+        }
+        errorMessage={errors?.probationStart?.errorMessage}
+        setFieldValue={setCurrentProbationStartValue}
+        inputFieldRef={probationStartRef}
+        defaultFieldValue={""}
+      >
+        <TextField
+          label="Probation start"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentProbationStartValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.probationStart?.hasError) {
+              runValidationTasks("probationStart", value);
+            }
+            setCurrentProbationStartValue(value);
+          }}
+          onBlur={() =>
+            runValidationTasks("probationStart", currentProbationStartValue)
+          }
+          errorMessage={errors.probationStart?.errorMessage}
+          hasError={errors.probationStart?.hasError}
+          ref={probationStartRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "probationStart")}
+        ></TextField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
           if (onChange) {
             const modelFields = {
               empID,
@@ -1500,7 +1531,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherDepartment,
               otherPosition,
               probationStart,
-              probationEnd: value,
+              probationEnd: values,
               probDuration,
               position,
               relationship,
@@ -1516,25 +1547,48 @@ export default function EmpWorkInfoCreateForm(props) {
               workMonth,
             };
             const result = onChange(modelFields);
-            value = result?.probationEnd ?? value;
+            values = result?.probationEnd ?? values;
           }
-          if (errors.probationEnd?.hasError) {
-            runValidationTasks("probationEnd", value);
-          }
-          setProbationEnd(value);
+          setProbationEnd(values);
+          setCurrentProbationEndValue("");
         }}
-        onBlur={() => runValidationTasks("probationEnd", probationEnd)}
-        errorMessage={errors.probationEnd?.errorMessage}
-        hasError={errors.probationEnd?.hasError}
-        {...getOverrideProps(overrides, "probationEnd")}
-      ></TextField>
-      <TextField
-        label="Prob duration"
-        isRequired={false}
-        isReadOnly={false}
-        value={probDuration}
-        onChange={(e) => {
-          let { value } = e.target;
+        currentFieldValue={currentProbationEndValue}
+        label={"Probation end"}
+        items={probationEnd}
+        hasError={errors?.probationEnd?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("probationEnd", currentProbationEndValue)
+        }
+        errorMessage={errors?.probationEnd?.errorMessage}
+        setFieldValue={setCurrentProbationEndValue}
+        inputFieldRef={probationEndRef}
+        defaultFieldValue={""}
+      >
+        <TextField
+          label="Probation end"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentProbationEndValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.probationEnd?.hasError) {
+              runValidationTasks("probationEnd", value);
+            }
+            setCurrentProbationEndValue(value);
+          }}
+          onBlur={() =>
+            runValidationTasks("probationEnd", currentProbationEndValue)
+          }
+          errorMessage={errors.probationEnd?.errorMessage}
+          hasError={errors.probationEnd?.hasError}
+          ref={probationEndRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "probationEnd")}
+        ></TextField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
           if (onChange) {
             const modelFields = {
               empID,
@@ -1552,7 +1606,7 @@ export default function EmpWorkInfoCreateForm(props) {
               otherPosition,
               probationStart,
               probationEnd,
-              probDuration: value,
+              probDuration: values,
               position,
               relationship,
               supervisor,
@@ -1567,18 +1621,45 @@ export default function EmpWorkInfoCreateForm(props) {
               workMonth,
             };
             const result = onChange(modelFields);
-            value = result?.probDuration ?? value;
+            values = result?.probDuration ?? values;
           }
-          if (errors.probDuration?.hasError) {
-            runValidationTasks("probDuration", value);
-          }
-          setProbDuration(value);
+          setProbDuration(values);
+          setCurrentProbDurationValue("");
         }}
-        onBlur={() => runValidationTasks("probDuration", probDuration)}
-        errorMessage={errors.probDuration?.errorMessage}
-        hasError={errors.probDuration?.hasError}
-        {...getOverrideProps(overrides, "probDuration")}
-      ></TextField>
+        currentFieldValue={currentProbDurationValue}
+        label={"Prob duration"}
+        items={probDuration}
+        hasError={errors?.probDuration?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("probDuration", currentProbDurationValue)
+        }
+        errorMessage={errors?.probDuration?.errorMessage}
+        setFieldValue={setCurrentProbDurationValue}
+        inputFieldRef={probDurationRef}
+        defaultFieldValue={""}
+      >
+        <TextField
+          label="Prob duration"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentProbDurationValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.probDuration?.hasError) {
+              runValidationTasks("probDuration", value);
+            }
+            setCurrentProbDurationValue(value);
+          }}
+          onBlur={() =>
+            runValidationTasks("probDuration", currentProbDurationValue)
+          }
+          errorMessage={errors.probDuration?.errorMessage}
+          hasError={errors.probDuration?.hasError}
+          ref={probDurationRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "probDuration")}
+        ></TextField>
+      </ArrayField>
       <ArrayField
         onChange={async (items) => {
           let values = items;
@@ -1926,7 +2007,7 @@ export default function EmpWorkInfoCreateForm(props) {
       </ArrayField>
       <TextField
         label="Sap no"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={sapNo}
         onChange={(e) => {

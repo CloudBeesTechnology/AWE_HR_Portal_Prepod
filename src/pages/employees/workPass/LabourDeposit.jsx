@@ -22,10 +22,13 @@ export const LabourDeposit = () => {
   const { UpdateLDData } = UpdateLDFun();
   const { register, handleSubmit,watch, formState: { errors }, setValue } = useForm({
     resolver: yupResolver(LabourDepositSchema),
+    lbrDepoSubmit: [],
+
   });
   
   const [notification, setNotification] = useState(false);
-  const [showTitle,setShowTitle]=useState("")
+  const [showTitle,setShowTitle]=useState("");
+  const [labourDate, setLabourDate] = useState([]);
   const [uploadedFileNames, setUploadedFileNames] = useState({
     lbrDepoUpload: null,
   });
@@ -43,17 +46,54 @@ export const LabourDeposit = () => {
     return ""; 
   };
 
-  const getFileName = (url) => {
-    const urlObj = new URL(url);
-    const filePath = urlObj.pathname;
-    const decodedUrl = decodeURIComponent(filePath);
+  const lbrDates = () => setLabourDate([...lbrDepoSubmit, ""]);
 
-    const fileNameWithExtension = decodedUrl.substring(
-      decodedUrl.lastIndexOf("/") + 1
-    );
-
-    return fileNameWithExtension;
+  const getFileName = (input) => {
+    // Check if input is an object and has the 'upload' property
+    if (typeof input === 'object' && input.upload) {
+      const filePath = input.upload;  // Extract the 'upload' path
+  
+      // Decode the URL path
+      const decodedUrl = decodeURIComponent(filePath);
+  
+      // Extract the file name from the path
+      const fileNameWithExtension = decodedUrl.substring(
+        decodedUrl.lastIndexOf("/") + 1
+      );
+  
+      return fileNameWithExtension;
+    }
+  
+    // If input is a string (URL), use the URL constructor
+    try {
+      const urlObj = new URL(input);  // Attempt to create a URL object
+      const filePath = urlObj.pathname;  // Extract path from URL
+  
+      // Decode the URL path
+      const decodedUrl = decodeURIComponent(filePath);
+  
+      // Extract the file name from the path
+      const fileNameWithExtension = decodedUrl.substring(
+        decodedUrl.lastIndexOf("/") + 1
+      );
+  
+      return fileNameWithExtension;
+    } catch (e) {
+      // Handle invalid URL (fall back to file path processing if URL fails)
+      if (typeof input === 'string') {
+        const decodedUrl = decodeURIComponent(input);
+        const fileNameWithExtension = decodedUrl.substring(
+          decodedUrl.lastIndexOf("/") + 1
+        );
+        return fileNameWithExtension;
+      }
+  
+      // If it's neither an object nor a valid URL string, return undefined or handle as needed
+      return undefined;
+    }
   };
+
+  
 
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
@@ -71,7 +111,7 @@ export const LabourDeposit = () => {
         const parsedFiles = parsedArray.map((item) =>
           typeof item === "string" ? JSON.parse(item) : item
         );
-        console.log(parsedFiles);
+  
         setValue("lbrDepoUpload", parsedFiles);
 
         setUploadLD((prev) => ({
@@ -94,7 +134,7 @@ export const LabourDeposit = () => {
     
   }, [searchResultData, setValue]);
 
-  const handleFileChange = async (e, label) => {
+  const handleFileChange = async (e, label, empID) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
 
@@ -104,6 +144,13 @@ export const LabourDeposit = () => {
       "image/png",
       "image/jpg",
     ];
+
+    if (!empID) {
+      alert("Employee ID is required to upload files.");
+      window.location.reload();
+      return;
+    }
+
     if (!allowedTypes.includes(selectedFile.type)) {
       alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
       return;
@@ -113,7 +160,7 @@ export const LabourDeposit = () => {
     setValue(label, [...currentFiles, selectedFile]);
 
     try {
-      await uploadDocs(selectedFile, label, setUploadLD);
+      await uploadDocs(selectedFile, label, setUploadLD, empID);
       setUploadedFileNames((prev) => ({
         ...prev,
         [label]: selectedFile.name, // Store just the file name
@@ -126,29 +173,39 @@ export const LabourDeposit = () => {
 
 
   const onSubmit = async (data) => {
-    console.log("Form data:", data);
+ 
 
     try {
       let matchedEmployee = null;
       if (empID) {
         matchedEmployee = BJLData.find((val) => val.empID === empID);
-        console.log(matchedEmployee);
-      }
-      const formatDate = (date) => date ? new Date(date).toLocaleDateString('en-CA') : null; // 'en-CA' gives yyyy-mm-dd format
-   
+      
+    
+    const formatDate = (date) => date ? new Date(date).toLocaleDateString('en-CA') : null;
     const lbrDepoSubmit = formatDate(data.lbrDepoSubmit);
+
+    const updatedlbrDate = [
+      ...new Set([
+        ...(matchedEmployee.lbrDepoSubmit || []), // ensure it's an array before spreading
+        lbrDepoSubmit
+      ]),
+    ];
 
       const LDValue = {
         ...data,
-        lbrDepoSubmit,
+        lbrDepoSubmit: updatedlbrDate.map(formatDate),
         lbrDepoUpload: JSON.stringify(uploadLD.lbrDepoUpload),
         id: matchedEmployee ? matchedEmployee.id : null,
       };
-      console.log(LDValue);
+   
 
       await UpdateLDData({ LDValue });
       setShowTitle("Work Pass Labour Deposit Data Stored Successfully")
-      setNotification(true);    
+      setNotification(true);
+    } else {
+      console.log("Employee id not found")
+    }
+
     } catch (error) {
       console.error("Error submitting data:", error);
       console.log(error);
@@ -208,7 +265,7 @@ export const LabourDeposit = () => {
      <div>
         <FileUploadField
           label="Upload File"
-          onChangeFunc={(e) => handleFileChange(e, "lbrDepoUpload")}
+          onChangeFunc={(e) => handleFileChange(e, "lbrDepoUpload", empID)}
           name="lbrDepoUpload"
           register={register}
           error={errors}

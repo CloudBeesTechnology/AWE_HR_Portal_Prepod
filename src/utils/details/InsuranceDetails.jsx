@@ -1,6 +1,11 @@
 import React from "react";
 
-const InsuranceDetails = ({ insuranceInfo, handlePrint, invoiceRef }) => {
+const InsuranceDetails = ({
+  insuranceInfo,
+  depInsurance,
+  handlePrint,
+  invoiceRef,
+}) => {
   return (
     <>
       <section ref={invoiceRef} className="py-3">
@@ -16,15 +21,24 @@ const InsuranceDetails = ({ insuranceInfo, handlePrint, invoiceRef }) => {
             </React.Fragment>
           ))}
         </div>
+        <div className="grid grid-cols-3 gap-y-2 items-center">
+          {depInsurance && Object.entries(depInsurance).length > 0 ? (
+            Object.entries(depInsurance).map(([key, value], index) => (
+              <React.Fragment key={index}>
+                <span className="text-gray-800">{key}</span>
+                <span className="text-gray-500 text-center">:</span>
+                <span className="text-gray-800">{value || "N/A"}</span>
+              </React.Fragment>
+            ))
+          ) : (
+            <React.Fragment>
+              <span className="text-gray-800">No Insurance Data</span>
+              <span className="text-gray-500 text-center">:</span>
+              <span className="text-gray-800">N/A</span>
+            </React.Fragment>
+          )}
+        </div>
       </section>
-      <div className="py-12 mt-2 flex justify-center">
-        <button
-          onClick={handlePrint}
-          className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2"
-        >
-          Print
-        </button>
-      </div>
     </>
   );
 };

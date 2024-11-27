@@ -1496,19 +1496,16 @@ export const onCreateEmpLeaveDetails = /* GraphQL */ `
       annualLeave
       annualLeaveDate
       compasLeave
-      compasLeaveDate
       destinateLeavePass
       durLeavePass
       dateLeavePass
       leavePass
       materLeave
-      materLeaveDate
       mrageLeave
-      mrageLeaveDate
       paterLeave
-      paterLeaveDate
       sickLeave
       sickLeaveDate
+      hospLeave
       createdAt
       updatedAt
       __typename
@@ -1525,19 +1522,16 @@ export const onUpdateEmpLeaveDetails = /* GraphQL */ `
       annualLeave
       annualLeaveDate
       compasLeave
-      compasLeaveDate
       destinateLeavePass
       durLeavePass
       dateLeavePass
       leavePass
       materLeave
-      materLeaveDate
       mrageLeave
-      mrageLeaveDate
       paterLeave
-      paterLeaveDate
       sickLeave
       sickLeaveDate
+      hospLeave
       createdAt
       updatedAt
       __typename
@@ -1554,19 +1548,16 @@ export const onDeleteEmpLeaveDetails = /* GraphQL */ `
       annualLeave
       annualLeaveDate
       compasLeave
-      compasLeaveDate
       destinateLeavePass
       durLeavePass
       dateLeavePass
       leavePass
       materLeave
-      materLeaveDate
       mrageLeave
-      mrageLeaveDate
       paterLeave
-      paterLeaveDate
       sickLeave
       sickLeaveDate
+      hospLeave
       createdAt
       updatedAt
       __typename
@@ -2502,6 +2493,7 @@ export const onCreateUser = /* GraphQL */ `
       selectType
       setPermissions
       password
+      status
       createdAt
       updatedAt
       __typename
@@ -2516,6 +2508,7 @@ export const onUpdateUser = /* GraphQL */ `
       selectType
       setPermissions
       password
+      status
       createdAt
       updatedAt
       __typename
@@ -2530,6 +2523,7 @@ export const onDeleteUser = /* GraphQL */ `
       selectType
       setPermissions
       password
+      status
       createdAt
       updatedAt
       __typename
@@ -2695,60 +2689,6 @@ export const onDeleteLeaveStatus = /* GraphQL */ `
       empStatus
       empDate
       empRemarks
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onCreateSampleTest1 = /* GraphQL */ `
-  subscription OnCreateSampleTest1(
-    $filter: ModelSubscriptionSampleTest1FilterInput
-  ) {
-    onCreateSampleTest1(filter: $filter) {
-      id
-      name
-      email
-      gender
-      empID
-      password
-      tempID
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onUpdateSampleTest1 = /* GraphQL */ `
-  subscription OnUpdateSampleTest1(
-    $filter: ModelSubscriptionSampleTest1FilterInput
-  ) {
-    onUpdateSampleTest1(filter: $filter) {
-      id
-      name
-      email
-      gender
-      empID
-      password
-      tempID
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onDeleteSampleTest1 = /* GraphQL */ `
-  subscription OnDeleteSampleTest1(
-    $filter: ModelSubscriptionSampleTest1FilterInput
-  ) {
-    onDeleteSampleTest1(filter: $filter) {
-      id
-      name
-      email
-      gender
-      empID
-      password
-      tempID
       createdAt
       updatedAt
       __typename

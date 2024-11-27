@@ -25,14 +25,6 @@ const AccommodationDetails = ({
           </div>
         </div>
       </section>
-      <div className="py-12 mt-2 flex justify-center ">
-        <button
-          onClick={handlePrint}
-          className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2"
-        >
-          Print
-        </button>
-      </div>
     </>
   );
 };

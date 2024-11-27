@@ -195,6 +195,7 @@ export default function UserUpdateForm(props) {
     selectType: "",
     setPermissions: [],
     password: "",
+    status: "",
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [selectType, setSelectType] = React.useState(initialValues.selectType);
@@ -202,6 +203,7 @@ export default function UserUpdateForm(props) {
     initialValues.setPermissions
   );
   const [password, setPassword] = React.useState(initialValues.password);
+  const [status, setStatus] = React.useState(initialValues.status);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = userRecord
@@ -212,6 +214,7 @@ export default function UserUpdateForm(props) {
     setSetPermissions(cleanValues.setPermissions ?? []);
     setCurrentSetPermissionsValue("");
     setPassword(cleanValues.password);
+    setStatus(cleanValues.status);
     setErrors({});
   };
   const [userRecord, setUserRecord] = React.useState(userModelProp);
@@ -238,6 +241,7 @@ export default function UserUpdateForm(props) {
     selectType: [{ type: "Required" }],
     setPermissions: [],
     password: [{ type: "Required" }],
+    status: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -269,6 +273,7 @@ export default function UserUpdateForm(props) {
           selectType,
           setPermissions: setPermissions ?? null,
           password,
+          status: status ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -333,6 +338,7 @@ export default function UserUpdateForm(props) {
               selectType,
               setPermissions,
               password,
+              status,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -360,6 +366,7 @@ export default function UserUpdateForm(props) {
               selectType: value,
               setPermissions,
               password,
+              status,
             };
             const result = onChange(modelFields);
             value = result?.selectType ?? value;
@@ -383,6 +390,7 @@ export default function UserUpdateForm(props) {
               selectType,
               setPermissions: values,
               password,
+              status,
             };
             const result = onChange(modelFields);
             values = result?.setPermissions ?? values;
@@ -437,6 +445,7 @@ export default function UserUpdateForm(props) {
               selectType,
               setPermissions,
               password: value,
+              status,
             };
             const result = onChange(modelFields);
             value = result?.password ?? value;
@@ -450,6 +459,34 @@ export default function UserUpdateForm(props) {
         errorMessage={errors.password?.errorMessage}
         hasError={errors.password?.hasError}
         {...getOverrideProps(overrides, "password")}
+      ></TextField>
+      <TextField
+        label="Status"
+        isRequired={false}
+        isReadOnly={false}
+        value={status}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              selectType,
+              setPermissions,
+              password,
+              status: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.status ?? value;
+          }
+          if (errors.status?.hasError) {
+            runValidationTasks("status", value);
+          }
+          setStatus(value);
+        }}
+        onBlur={() => runValidationTasks("status", status)}
+        errorMessage={errors.status?.errorMessage}
+        hasError={errors.status?.hasError}
+        {...getOverrideProps(overrides, "status")}
       ></TextField>
       <Flex
         justifyContent="space-between"

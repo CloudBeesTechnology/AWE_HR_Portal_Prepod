@@ -56,8 +56,6 @@ export { default as ProbFormCreateForm } from "./ProbFormCreateForm";
 export { default as ProbFormUpdateForm } from "./ProbFormUpdateForm";
 export { default as SBWSheetCreateForm } from "./SBWSheetCreateForm";
 export { default as SBWSheetUpdateForm } from "./SBWSheetUpdateForm";
-export { default as SampleTest1CreateForm } from "./SampleTest1CreateForm";
-export { default as SampleTest1UpdateForm } from "./SampleTest1UpdateForm";
 export { default as SawpDetailsCreateForm } from "./SawpDetailsCreateForm";
 export { default as SawpDetailsUpdateForm } from "./SawpDetailsUpdateForm";
 export { default as ServiceRecordCreateForm } from "./ServiceRecordCreateForm";

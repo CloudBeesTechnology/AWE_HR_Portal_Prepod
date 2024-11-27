@@ -6,9 +6,13 @@ import { Pagination } from "../leaveManagement/Pagination";
 import { Link, useNavigate } from "react-router-dom";
 import { UserVF } from "./UserVF";
 import { DataSupply } from "../../utils/DataStoredContext";
+import { UserDelete } from "../../services/deleteMethod/UserDelete";
 
 export const User = () => {
   const { empPIData, userData, workInfoData } = useContext(DataSupply);
+
+  const { SubmitDeletedUser } = UserDelete();
+
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [viewForm, setViewForm] = useState(false);
@@ -21,14 +25,19 @@ export const User = () => {
   // pagination process
   const [currentPage, setCurrentPage] = useState(1); // updated by hari
   const [rowsPerPage, setRowsPerPage] = useState(5); // updated by hari
+  const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
-    // Sort userData globally before slicing for pagination
-    const sortedData = allEmpDetails.sort((a, b) => {
+
+    // Determine the data to paginate (either search results or all employee details)
+    const dataToPaginate =
+      searchResults.length > 0 ? searchResults : allEmpDetails;
+
+    // Sort data globally before slicing for pagination
+    const sortedData = dataToPaginate.sort((a, b) => {
       const regex = /\d+$/;
 
-      // Extract numeric part and pad it
       const numPartA = a.empID.match(regex)
         ? a.empID.match(regex)[0].padStart(5, "0")
         : "";
@@ -36,28 +45,27 @@ export const User = () => {
         ? b.empID.match(regex)[0].padStart(5, "0")
         : "";
 
-      // Extract prefix part and convert to lower case for case-insensitive comparison
       const prefixA = a.empID.replace(regex, "").toLowerCase();
       const prefixB = b.empID.replace(regex, "").toLowerCase();
 
-      // Compare the prefixes first
       if (prefixA !== prefixB) {
         return prefixA.localeCompare(prefixB);
       }
 
-      // If prefixes are the same, compare the numeric parts
       return numPartA.localeCompare(numPartB);
     });
-    // console.log(sortedData, "sorted");
 
     const paginatedData = sortedData.slice(
       startIndex,
       startIndex + rowsPerPage
     );
     setFilteredData(paginatedData);
-  }, [currentPage, rowsPerPage, userDetails]);
+  }, [currentPage, rowsPerPage, allEmpDetails, searchResults]);
 
-  const totalPages = Math.ceil(userDetails.length / rowsPerPage);
+  const totalPages = Math.ceil(
+    (searchResults.length > 0 ? searchResults.length : allEmpDetails.length) /
+      rowsPerPage
+  );
 
   const ViewFormShow = () => {
     setViewForm(!viewForm);
@@ -66,24 +74,24 @@ export const User = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const mergedData = empPIData
+        const mergedData = userData
           .map((emp) => {
-            const userDetails = userData.find(
+            const EmpDetails = empPIData.find(
               (user) => user.empID === emp.empID
             );
-            const workInfoValue = workInfoData.find(
-              (work) => work.empID === emp.empID
-            );
-            // console.log(workInfoData);
-            if (!userDetails) return null;
-            if (!workInfoValue) return null;
+            const workInfoValue = workInfoData
+              ? workInfoData.find((work) => work.empID === emp.empID)
+              : {};
+            if (!EmpDetails) return null;
+
             return {
               ...emp,
-              ...userDetails,
+              ...EmpDetails,
               ...workInfoValue,
             };
           })
-          .filter(Boolean);
+          .filter(Boolean)
+          .filter((user) => user.status === "Active");
         // console.log(mergedData);
 
         setUserDetails(mergedData);
@@ -94,15 +102,11 @@ export const User = () => {
     };
 
     fetchData();
-  }, [userData, empPIData, workInfoData]);
+  }, [userData, empPIData]);
 
-  const searchUserList = async (userData) => {
-    try {
-      const result = await userData;
-      setUserDetails(result);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
+  const searchUserList = (searchResults) => {
+    setSearchResults(searchResults);
+    setCurrentPage(1); // Reset to first page after search
   };
 
   const handleTransferData = async (data) => {
@@ -118,7 +122,6 @@ export const User = () => {
     };
     navigate("/addNewForm", { state: { editUserData: allValue } });
   };
-  // console.log(userData);
 
   const handleAddUser = () => {
     const allValue = {
@@ -129,6 +132,10 @@ export const User = () => {
     // console.log(allValue);
 
     navigate("/addNewForm", { state: { addUserData: allValue } });
+  };
+  const handleDelete = (data) => {
+    const deleteUserData = userData.find((item) => item.empID === data.empID);
+    SubmitDeletedUser({ deleteUserData });
   };
 
   return (
@@ -164,7 +171,7 @@ export const User = () => {
                   {/* <th className="px-6 text-start  py-3">User ID</th> */}
                   <th className="px-6 text-start  py-3">Name</th>
                   <th className="px-6 text-start py-3">Type</th>
-                  <th className="px-6 text-start py-3">Email Id</th>
+                  <th className="px-6 text-start py-3">Official Email Id</th>
                   <th className="px-6 text-start py-3">Password</th>
                   <th className="px-6 text-start py-3">Actions</th>
                 </tr>
@@ -172,6 +179,8 @@ export const User = () => {
               <tbody>
                 {filteredData && filteredData.length > 0 ? (
                   filteredData.map((val, i) => {
+                    // console.log(val);
+
                     return (
                       <tr
                         key={i}
@@ -184,7 +193,7 @@ export const User = () => {
                         {/* <td className="px-6 py-2">{val.empID}</td> */}
                         <td className="px-6 py-2">{val.name}</td>
                         <td className="px-6 py-2">{val.selectType}</td>
-                        <td className="px-6 py-2">{val.email}</td>
+                        <td className="px-6 py-2">{val.officialEmail}</td>
                         <td className="px-6 w-[200px] py-2 text-center">
                           <input
                             type="password"
@@ -202,7 +211,11 @@ export const User = () => {
                             >
                               <RiEditLine />
                             </span>
-                            <span>
+                            <span
+                              onClick={() => {
+                                handleDelete(val);
+                              }}
+                            >
                               <RiDeleteBin6Line />
                             </span>
                             {/* <div
@@ -231,27 +244,23 @@ export const User = () => {
             </table>
           </div>
 
-          <div className="flex justify-end mt-auto py-8 px-10">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={(newPage) => {
-                if (newPage >= 1 && newPage <= totalPages) {
-                  setCurrentPage(newPage);
-                }
-              }}
-            />
+          <div className="flex justify-center mt-auto">
+            <div className="ml-[650px] flex justify-between px-10 py-8">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(newPage) => {
+                  if (newPage >= 1 && newPage <= totalPages) {
+                    setCurrentPage(newPage);
+                  }
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
 
       {viewForm && <UserVF data={sendData} onclose={ViewFormShow} />}
-
-      {/* {popUp && (
-        <div className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2">  list
-          <StatusPopUp setPopUp={setPopUp} />
-        </div>
-      )} */}
     </section>
   );
 };

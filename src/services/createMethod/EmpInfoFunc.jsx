@@ -19,7 +19,6 @@ export const EmpInfoFunc = () => {
       bwnIcColour,
       bwnIcExpiry,
       driveLic,
-
       inducBrief,
       inducBriefUp,
       myIcNo,
@@ -98,6 +97,7 @@ export const EmpInfoFunc = () => {
       empType,
       familyDetails,
       gender,
+      officialEmail,
       lang,
       marital,
       name,
@@ -121,6 +121,7 @@ export const EmpInfoFunc = () => {
       dob,
       educLevel,
       email,
+      officialEmail,
       eduDetails,
       empBadgeNo,
       empType,

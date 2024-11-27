@@ -12,6 +12,8 @@ import { FaWindowClose } from "react-icons/fa";
 import EmployeeDocuments from "./EmployeeDocuments";
 import logo from "../../assets/logo/logo-with-name.svg";
 import { useReactToPrint } from "react-to-print";
+import { FaTimes, FaPrint, FaDownload } from "react-icons/fa";
+import DependPassDetails from "./DependPassDetails";
 
 export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
   const [activeTab, setActiveTab] = useState(0); // Track active tab
@@ -57,7 +59,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
   //   return docObject;
   // };
 
-    const handlePrint = useReactToPrint({
+  const handlePrint = useReactToPrint({
     content: () => invoiceRef.current,
     onBeforePrint: () => console.log("Preparing print..."),
     onAfterPrint: () => console.log("Print complete"),
@@ -79,6 +81,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
 
     // Split the string by commas to get individual key-value pairs
     const docEntries = docString.split(",").map((item) => item.trim());
+
 
     // Process the key-value pairs into an object
     const docObject = docEntries.reduce((acc, entry) => {
@@ -126,29 +129,212 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     return `${day}/${month}/${year}`;
   };
   const {
-    age, email, aTQualify, agent, alternateNo, accidentIns, accommodation, accommodationAddress, bankAmt, bankEmpUpload, bankEndorse, bankRece, bankRefNo, bankSubmit, bankValid, bruhimsRD, bruhimsRNo, bruneiMAD, bruneiME, bwnIcColour, bwnIcExpiry, bwnIcNo, chinese, cob, contactNo, contractType, ctryOfOrigin, dependPass, dob, doeEmpApproval, doeEmpRefNo, doeEmpSubmit, doeEmpUpload, doeEmpValid, driveLic, eduDetails, educLevel, empBadgeNo, empID, empType, empUpDocs, familyDetails, gender, inducBrief, inducBriefUp, jitpaAmt, jpEmpUpload, jpEndorse, jpValid, lang, lbrDepoAmt, lbrDepoSubmit, lbrDepoUpload, lbrReceiptNo, marital, myIcNo, name, nationalCat, nationality, nlmsEmpApproval, nlmsEmpSubmit, nlmsEmpSubmitRefNo, nlmsEmpUpload, nlmsEmpValid, nlmsRefNo, oCOfOrigin, officialEmail, otherNation, otherRace, otherReligion, overMD, overME, permanentAddress, permitType, ppDestinate, ppExpiry, ppIssued, ppNo, preEmp, preEmpPeriod, profilePhoto, race, religion, sawpEmpLtrReci, sawpEmpLtrReq, sawpEmpUpload, tbaPurchase, uploadBwn, uploadFitness, uploadRegis, contractEnd, contractPeriod, contractStart, createdAt, department, doj, hr, id, jobCat, jobDesc, manager, otherDepartment, otherJobCat, otherPosition, position, probationEnd, probationStart, relationship, salaryType, sapNo, skillPool, supervisor, updatedAt, upgradeDate, upgradePosition, workHrs, workMonth, workStatus, workWeek, annualLeave, annualLeaveDate, compasLeave, compasLeaveDate, dateLeavePass, destinateLeavePass, durLeavePass, leavePass, materLeave, materLeaveDate, mrageLeave, mrageLeaveDate, paterLeave, paterLeaveDate, sickLeave, sickLeaveDate, otherResignNotConf, otherResignNotProb, otherTermiNotConf, otherTermiNotProb, reasonResign, reasonTerminate, resignDate, resignNotConf, resignNotProb, termiDate, termiNotConf, termiNotProb, workInfoUploads, depEmp, depEmpDate, positionRev, positionRevDate, remarkWI, revALD, revAnnualLeave, revLeaveDate, revLeavePass, revSalary, revSalaryDate, uploadAL, uploadDep, uploadLP, uploadPR, uploadSP,
-    applicationUpload, bwnUpload, cvCertifyUpload, loiUpload, myIcUpload, paafCvevUpload, ppUpload, supportDocUpload          
-} = passingValue;
+    age,
+    email,
+    aTQualify,
+    agent,
+    alternateNo,
+    accidentIns,
+    accommodation,
+    accommodationAddress,
+    bankAmt,
+    bankEmpUpload,
+    bankEndorse,
+    bankRece,
+    bankRefNo,
+    bankSubmit,
+    bankValid,
+    bruhimsRD,
+    bruhimsRNo,
+    bruneiMAD,
+    bruneiME,
+    bwnIcColour,
+    bwnIcExpiry,
+    bwnIcNo,
+    chinese,
+    cob,
+    contactNo,
+    contractType,
+    ctryOfOrigin,
+    dependPass,
+    dob,
+    doeEmpApproval,
+    doeEmpRefNo,
+    doeEmpSubmit,
+    doeEmpUpload,
+    doeEmpValid,
+    driveLic,
+    eduDetails,
+    educLevel,
+    empBadgeNo,
+    empID,
+    empType,
+    empUpDocs,
+    familyDetails,
+    gender,
+    inducBrief,
+    inducBriefUp,
+    jitpaAmt,
+    jpEmpUpload,
+    jpEndorse,
+    jpValid,
+    lang,
+    lbrDepoAmt,
+    lbrDepoSubmit,
+    lbrDepoUpload,
+    lbrReceiptNo,
+    marital,
+    myIcNo,
+    name,
+    nationalCat,
+    nationality,
+    nlmsEmpApproval,
+    nlmsEmpSubmit,
+    nlmsEmpSubmitRefNo,
+    nlmsEmpUpload,
+    nlmsEmpValid,
+    nlmsRefNo,
+    oCOfOrigin,
+    officialEmail,
+    otherNation,
+    otherRace,
+    otherReligion,
+    overMD,
+    overME,
+    permanentAddress,
+    permitType,
+    ppDestinate,
+    ppExpiry,
+    ppIssued,
+    ppNo,
+    preEmp,
+    preEmpPeriod,
+    profilePhoto,
+    race,
+    religion,
+    sawpEmpLtrReci,
+    sawpEmpLtrReq,
+    sawpEmpUpload,
+    tbaPurchase,
+    uploadBwn,
+    uploadFitness,
+    uploadRegis,
+    contractEnd,
+    contractPeriod,
+    contractStart,
+    createdAt,
+    department,
+    doj,
+    hr,
+    id,
+    jobCat,
+    jobDesc,
+    manager,
+    otherDepartment,
+    otherJobCat,
+    otherPosition,
+    position,
+    probationEnd,
+    probationStart,
+    relationship,
+    salaryType,
+    sapNo,
+    skillPool,
+    supervisor,
+    updatedAt,
+    upgradeDate,
+    upgradePosition,
+    workHrs,
+    workMonth,
+    workStatus,
+    workWeek,
+    annualLeave,
+    annualLeaveDate,
+    compasLeave,
+    compasLeaveDate,
+    dateLeavePass,
+    destinateLeavePass,
+    durLeavePass,
+    leavePass,
+    materLeave,
+    materLeaveDate,
+    mrageLeave,
+    mrageLeaveDate,
+    paterLeave,
+    paterLeaveDate,
+    sickLeave,
+    sickLeaveDate,
+    otherResignNotConf,
+    otherResignNotProb,
+    otherTermiNotConf,
+    otherTermiNotProb,
+    reasonResign,
+    reasonTerminate,
+    resignDate,
+    resignNotConf,
+    resignNotProb,
+    termiDate,
+    termiNotConf,
+    termiNotProb,
+    workInfoUploads,
+    depEmp,
+    depEmpDate,
+    positionRev,
+    positionRevDate,
+    remarkWI,
+    revALD,
+    revAnnualLeave,
+    revLeaveDate,
+    revLeavePass,
+    revSalary,
+    revSalaryDate,
+    uploadAL,
+    uploadDep,
+    uploadLP,
+    uploadPR,
+    uploadSP,
+    applicationUpload,
+    bwnUpload,
+    cvCertifyUpload,
+    loiUpload,
+    myIcUpload,
+    paafCvevUpload,
+    ppUpload,
+    supportDocUpload,
+    WIContract,
+    WILeaveEntitle,
+    WIProbation,
+    WIResignation,
+    WITermination,
+    groupIns,
+    groupInsEffectDate,
+    groupInsEndDate,   
+    travelIns,
+    workmePolicyNo,
+    workmenComp,
+    empInsUpload,
+    depInsurance,
+  } = passingValue;
 
-  // Grouped Data
   const personalDetails = {
-    Name: name,
+    "Name": name,
     "Employee ID": empID,
     "Date Of Birth": formatDate(dob),
-    Age: age,
-    Gender: gender,
-    Nationality: nationality,
-    Race: race,
-    Religion: religion,
-    Position: Array.isArray(position) && position.length > 0 ? position[0] : "Position not available", 
+    "Age": age,
+    "Gender": gender,
+    "Nationality": nationality,
+    "Race": race,
+    "Religion": religion,
+    "Position":
+      Array.isArray(position) && position.length > 0
+        ? position[0]
+        : "Position not available",
     "Contact No": contactNo,
     "Alternate Number": alternateNo,
-    Email: email,
+    "Email": email,
     "Official Email": officialEmail,
-    "Permanent Address": permanentAddress,
-    // ProfilePhoto: profilePhoto,
     "Marital Status": marital,
-    Language: lang,
+    "Language": lang,
     "Driving License": driveLic,
     "National Category": nationalCat,
     "Other Nationality": otherNation,
@@ -161,11 +347,10 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Employee Type": empType,
     "Employee Badge No": empBadgeNo,
     "Sap No": sapNo,
-    Chinese: chinese,
-    Cob: cob,
+    "Chinese": chinese,
+    "Cob": cob,
     "Agent Name": agent,
     "Date of Induction Briefing": formatDate(inducBrief),
-    // "Induction Briefing Upload": inducBriefUp,
     "Brunei IC Colour": bwnIcColour,
     "Brunei IC Expiry": formatDate(bwnIcExpiry),
     "Brunei IC Number": bwnIcNo,
@@ -176,23 +361,10 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Passport Issue Date": formatDate(ppIssued),
     "Previous Employment Details": preEmp,
     "Previous Employment Period": preEmpPeriod,
-//     applicationUpload, 
-// bwnUpload,
-// cvCertifyUpload,
-// loiUpload,
-// myIcUpload,
-// paafCvevUpload,
-// ppUpload,
-// supportDocUpload,
   };
- 
-// Log the position array
-console.log("Position array:", position);
-
-// Log the first element of the position array
 
   const employeeDocument = {
-    EmpUpDocs: empUpDocs,
+    "EmpUpDocs": empUpDocs,
   };
   const educationalDetails = {
     "Education Details": eduDetails,
@@ -221,12 +393,23 @@ console.log("Position array:", position);
   };
 
   const accommodationInfo = {
-    Accommodation: accommodation,
+    "Accommodation": accommodation,
     "Accommodation Address": accommodationAddress,
   };
 
   const insuranceInfo = {
     "Accident Insurance": accidentIns,
+    "Employee Insurance Upload" : empInsUpload,
+    "Group H&S Insurance" : groupIns,
+    "Group H&S Insurance Enrollment Effective Date" : groupInsEffectDate,
+    "Group H&S Insurance Enrollment End Date" : groupInsEndDate,  
+    "Travelling Insurance" : travelIns,
+    "Workmen Policy Number" : workmePolicyNo,
+    "Workmen Compensation Insurance" : workmenComp,
+        
+    // DependentInsurance : {
+    //   "Dependent Insurance" : depInsurance,      
+    // }
   };
 
   const workInfo = {
@@ -234,24 +417,24 @@ console.log("Position array:", position);
       "Contract End Date": formatDate(contractEnd),
       "Contract Period": contractPeriod,
       "Contract Start Date": formatDate(contractStart),
-      Department: department,
+      "Department": department,
       "Date of Joining": formatDate(doj),
       "Employee ID": empID,
       "HR Representative": hr,
       "Job Category": jobCat,
       "Job Description": jobDesc,
-      Manager: manager,
+      "Manager": manager,
       "Other Department": otherDepartment,
       "Other Job Category": otherJobCat,
       "Other Position": otherPosition,
-      Position: position,
+      "Position": position,
       "Probation End Date": formatDate(probationEnd),
       "Probation Start Date": formatDate(probationStart),
       "Relationship Status": relationship,
       "Salary Type": salaryType,
       "SAP Number": sapNo,
       "Skill Pool": skillPool,
-      Supervisor: supervisor,
+      "Supervisor": supervisor,
       "Upgrade Date": formatDate(upgradeDate),
       "Upgrade Position": upgradePosition,
       "Work Hours per Day": workHrs,
@@ -281,7 +464,6 @@ console.log("Position array:", position);
     },
 
     TerminateDetails: {
-  
       "Other Resignation Not Confirmed": otherResignNotConf,
       "Other Resignation Not Probation": otherResignNotProb,
       "Other Termination Not Confirmed": otherTermiNotConf,
@@ -294,10 +476,7 @@ console.log("Position array:", position);
       "Termination Date": termiDate,
       "Termination Not Confirmed": termiNotConf,
       "Termination Not Probation": termiNotProb,
-      "Work Info Uploads": workInfoUploads,
     },
-
-
 
     ServiceRoad: {
       "Dependent Employee": depEmp,
@@ -311,16 +490,9 @@ console.log("Position array:", position);
       "Revised Leave Pass": revLeavePass,
       "Revised Salary": revSalary,
       "Revised Salary Date": formatDate(revSalaryDate),
-      "Upload Annual Leave": uploadAL,
-      "Upload Dependent Info": uploadDep,
-      "Upload Leave Pass": uploadLP,
-      "Upload Position Revision": uploadPR,
-      "Upload Supporting Docs": uploadSP,
     },
   };
 
-  console.log(
-    contractEnd, "positon eeeee")
 
   const workPass = {
     doe: {
@@ -374,130 +546,204 @@ console.log("Position array:", position);
 
     immigration: {
       "Passport no": ppNo,
-     
     },
   };
-
-  console.log(workInfoUploads, "DPLK em");
-
   // const documents = parseDocumentData(passingValue.empUpDocs);
   const documentsTwo = parseDocumentData(passingValue.uploadBwn);
   const documentThree = parseDocumentData(passingValue.workInfoUploads);
-  
+
+  console.log("ghfue", dependPass)
 
   return (
-    <section className="bg-white flex fixed top-0 left-0 bg-grey w-full h-full z-[9999] center">
-      <div className="bg-white py-10 px-10 h-screen w-[85%]">
-        <div className="empScroll border bg-white px-10 overflow-y-auto h-[90vh] space-y-5 rounded-lg w-full">
-          <div className="bg-white mt-6 sticky top-0 flex justify-between items-center z-40">
-            <div className="max-w-[200px] w-full">
-              <img src={logo} alt="Logo not found" />
+    <>
+      <section className="bg-white flex flex-col fixed top-0 left-0 bg-grey w-full h-full z-[9999] center">
+        <div className="bg-white py-10 px-10 h-screen w-[85%]">
+          <div className="empScroll border bg-white px-10 overflow-y-auto h-[90vh] space-y-5 rounded-lg w-full">
+            <div className="bg-white mt-6 sticky top-0 flex justify-between items-center z-40">
+              <div className="max-w-[200px] w-full">
+                <img src={logo} alt="Logo not found" />
+              </div>
+              <h6 className="text-center text-2xl font-medium text-dark_grey">
+                Employee Details
+              </h6>
+              <p onClick={handleFormShow} className="text-2xl text-dark_grey">
+                <FaWindowClose />
+              </p>
             </div>
-            <h6 className="text-center text-2xl font-medium text-dark_grey">
-              Employee Details
-            </h6>
-            <p onClick={handleFormShow} className="text-2xl text-dark_grey">
-              <FaWindowClose />
-            </p>
-          </div>
-          <div className="">
-            <TabNavigation
-              activeTab={activeTab}
-              handleTabClick={handleTabClick}
-            />
-            <div className="mt-5">
-              {activeTab === 0 && (
-                <PersonalDetails
-                  personalDetails={personalDetails}
-                  profilePhoto={profilePhoto}
-                  // documents={documents}
-                  isPdfOpen={isPdfOpen}
-                  viewingDocument={viewingDocument}
-                  pageNumber={pageNumber}
-                  numPages={numPages}
-                  handleViewDocument={handleViewDocument}
-                  handleCloseViewer={handleCloseViewer}
-                  onDocumentLoadSuccess={onDocumentLoadSuccess}
-                  setPageNumber={setPageNumber}
-                  inducBriefUp={inducBriefUp}
-                  applicationUpload={applicationUpload} 
-                  bwnUpload={bwnUpload}
-                  cvCertifyUpload={cvCertifyUpload}
-                  loiUpload={loiUpload}
-                  myIcUpload={myIcUpload}
-                  paafCvevUpload={paafCvevUpload}
-                  ppUpload={ppUpload}
-                  supportDocUpload={supportDocUpload} 
-                />
-              )}
-              {activeTab === 1 && (
-                <EducationalDetails educationalDetails={educationalDetails} handlePrint={handlePrint} invoiceRef={invoiceRef} />
-              )}
-              {activeTab === 2 && (
-                <FamilyDetails familyDetails={familyDetails} handlePrint={handlePrint} invoiceRef={invoiceRef} />
-              )}
-              {activeTab === 3 && (
-                <MedicalDetails
-                  medicalInfo={medicalInfo}
-                  dependenPass={dependenPass}
-                  uploadFitness={uploadFitness}
-                  uploadBwn={uploadBwn}
-                  documentsTwo={documentsTwo}
-                  uploadRegis={uploadRegis}
-                  handlePrint={handlePrint} invoiceRef={invoiceRef} 
-                />
-              )}
-              {activeTab === 4 && (
-                <AccommodationDetails accommodationInfo={accommodationInfo} handlePrint={handlePrint} invoiceRef={invoiceRef} />
-              )}
-              {activeTab === 5 && (
-                <InsuranceDetails insuranceInfo={insuranceInfo} handlePrint={handlePrint} invoiceRef={invoiceRef} />
-              )}
-              {activeTab === 6 && <WorkInfo 
-              workInfo={workInfo}
-              documentThree={documentThree}
-              isPdfOpen={isPdfOpen}
-              viewingDocument={viewingDocument}
-              setViewingDocument={setViewingDocument}
-              pageNumber={pageNumber}
-              numPages={numPages}
-              handleViewDocument={handleViewDocument}
-              handleCloseViewer={handleCloseViewer}
-              onDocumentLoadSuccess={onDocumentLoadSuccess}
-              setPageNumber={setPageNumber}
-              uploadAL={uploadAL}
-              uploadDep={uploadDep}
-              uploadLP={uploadLP}
-              uploadPR={uploadPR}
-              uploadSP={uploadSP}
-              handlePrint={handlePrint} invoiceRef={invoiceRef} 
-               />}
-              {activeTab === 7 && (
-                <WorkPass
-                  workPass={workPass}
-                  doeEmpUpload={doeEmpUpload}
-                  lbrDepoUpload={lbrDepoUpload}
-                  sawpEmpUpload={sawpEmpUpload}
-                  nlmsEmpUpload={nlmsEmpUpload}
-                  bankEmpUpload={bankEmpUpload}
-                  jpEmpUpload={jpEmpUpload}
-                  isPdfOpen={isPdfOpen}
-                  viewingDocument={viewingDocument}
-                  pageNumber={pageNumber}
-                  numPages={numPages}
-                  handleViewDocument={handleViewDocument}
-                  handleCloseViewer={handleCloseViewer}
-                  onDocumentLoadSuccess={onDocumentLoadSuccess}
-                  setPageNumber={setPageNumber}
-                  inducBriefUp={inducBriefUp}
-                  handlePrint={handlePrint} invoiceRef={invoiceRef} 
-                />
-              )}
-              {activeTab === 8 && <EmployeeDocuments empUpDocs={empUpDocs} handlePrint={handlePrint} invoiceRef={invoiceRef} />}
+            <div className="">
+              <TabNavigation
+                activeTab={activeTab}
+                handleTabClick={handleTabClick}
+              />
+              <div className="mt-5">
+                {activeTab === 0 && (
+                  <PersonalDetails
+                    personalDetails={personalDetails}
+                    profilePhoto={profilePhoto}
+                    // documents={documents}
+                    isPdfOpen={isPdfOpen}
+                    viewingDocument={viewingDocument}
+                    pageNumber={pageNumber}
+                    numPages={numPages}
+                    handleViewDocument={handleViewDocument}
+                    handleCloseViewer={handleCloseViewer}
+                    onDocumentLoadSuccess={onDocumentLoadSuccess}
+                    setPageNumber={setPageNumber}
+                    inducBriefUp={inducBriefUp}
+                    applicationUpload={applicationUpload}
+                    bwnUpload={bwnUpload}
+                    cvCertifyUpload={cvCertifyUpload}
+                    loiUpload={loiUpload}
+                    myIcUpload={myIcUpload}
+                    paafCvevUpload={paafCvevUpload}
+                    ppUpload={ppUpload}
+                    supportDocUpload={supportDocUpload}
+                    handlePrint={handlePrint}
+                    invoiceRef={invoiceRef}
+                  />
+                )}
+                {activeTab === 1 && (
+                  <EducationalDetails
+                    educationalDetails={educationalDetails}
+                    handlePrint={handlePrint}
+                    invoiceRef={invoiceRef}
+                  />
+                )}
+                {activeTab === 2 && (
+                  <FamilyDetails
+                    familyDetails={familyDetails}
+                    handlePrint={handlePrint}
+                    invoiceRef={invoiceRef}
+                  />
+                )}
+                {activeTab === 3 && (
+                  <MedicalDetails
+                    medicalInfo={medicalInfo}
+                    dependenPass={dependenPass}
+                    uploadFitness={uploadFitness}
+                    uploadBwn={uploadBwn}
+                    documentsTwo={documentsTwo}
+                    uploadRegis={uploadRegis}
+                    handlePrint={handlePrint}
+                    invoiceRef={invoiceRef}
+                    dependPass={dependPass}
+                  />
+                )}
+                {activeTab === 4 && (
+                  <AccommodationDetails
+                    accommodationInfo={accommodationInfo}
+                    handlePrint={handlePrint}
+                    invoiceRef={invoiceRef}
+                  />
+                )}
+                {activeTab === 5 && (
+                  <InsuranceDetails
+                    insuranceInfo={insuranceInfo}
+                    handlePrint={handlePrint}
+                    invoiceRef={invoiceRef}
+                    depInsurance={depInsurance}
+                    empInsUpload={empInsUpload}
+
+                  />
+                )}
+                {activeTab === 6 && (
+                  <WorkInfo
+                    workInfo={workInfo}
+                    documentThree={documentThree}
+                    isPdfOpen={isPdfOpen}
+                    viewingDocument={viewingDocument}
+                    setViewingDocument={setViewingDocument}
+                    pageNumber={pageNumber}
+                    numPages={numPages}
+                    handleViewDocument={handleViewDocument}
+                    handleCloseViewer={handleCloseViewer}
+                    onDocumentLoadSuccess={onDocumentLoadSuccess}
+                    setPageNumber={setPageNumber}
+                    uploadAL={uploadAL}
+                    uploadDep={uploadDep}
+                    uploadLP={uploadLP}
+                    uploadPR={uploadPR}
+                    uploadSP={uploadSP}
+                    handlePrint={handlePrint}
+                    invoiceRef={invoiceRef}
+                    WIContract={WIContract}
+                    WILeaveEntitle={WILeaveEntitle}
+                    WIProbation={WIProbation}
+                    WIResignation={WIResignation}
+                    WITermination={WITermination}
+                  />
+                )}
+                {activeTab === 7 && (
+                  <WorkPass
+                    workPass={workPass}
+                    doeEmpUpload={doeEmpUpload}
+                    lbrDepoUpload={lbrDepoUpload}
+                    sawpEmpUpload={sawpEmpUpload}
+                    nlmsEmpUpload={nlmsEmpUpload}
+                    bankEmpUpload={bankEmpUpload}
+                    jpEmpUpload={jpEmpUpload}
+                    isPdfOpen={isPdfOpen}
+                    viewingDocument={viewingDocument}
+                    pageNumber={pageNumber}
+                    numPages={numPages}
+                    handleViewDocument={handleViewDocument}
+                    handleCloseViewer={handleCloseViewer}
+                    onDocumentLoadSuccess={onDocumentLoadSuccess}
+                    setPageNumber={setPageNumber}
+                    inducBriefUp={inducBriefUp}
+                    handlePrint={handlePrint}
+                    invoiceRef={invoiceRef}
+                  />
+                )}
+                {/* {activeTab === 8 && (
+                  <EmployeeDocuments
+                    empUpDocs={empUpDocs}
+                    handlePrint={handlePrint}
+                    invoiceRef={invoiceRef}
+                  />
+                )} */}
+                {/* {activeTab === 8 && (
+                  <DependPassDetails 
+                   dependPass={dependPass}
+                   personalDetails={personalDetails}
+                   profilePhoto={profilePhoto}
+                   // documents={documents}
+                   isPdfOpen={isPdfOpen}
+                   viewingDocument={viewingDocument}
+                   pageNumber={pageNumber}
+                   numPages={numPages}
+                   handleViewDocument={handleViewDocument}
+                   handleCloseViewer={handleCloseViewer}
+                   onDocumentLoadSuccess={onDocumentLoadSuccess}
+                   setPageNumber={setPageNumber}
+                   inducBriefUp={inducBriefUp}
+                   applicationUpload={applicationUpload}
+                   bwnUpload={bwnUpload}
+                   cvCertifyUpload={cvCertifyUpload}
+                   loiUpload={loiUpload}
+                   myIcUpload={myIcUpload}
+                   paafCvevUpload={paafCvevUpload}
+                   ppUpload={ppUpload}
+                   supportDocUpload={supportDocUpload}
+                   handlePrint={handlePrint}
+                   invoiceRef={invoiceRef}
+                  />
+                )} */}
+
+              </div>
+              <div className="mt-2 flex justify-center">
+                <button
+                  onClick={handlePrint}
+                  className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
+                >
+                  Print
+                  <FaPrint className="ml-2 mt-1" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 };

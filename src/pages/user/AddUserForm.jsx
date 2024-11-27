@@ -31,7 +31,7 @@ export const AddNewForm = () => {
   const workInfoDataDetails = data?.workValue || addData?.workValue;
   // console.log(userDataDetails );
   // console.log(addData?.employeeValue);
-
+  // console.log(workInfoDataDetails);
 
   // console.log(data?.storedValue?.data);
 
@@ -89,9 +89,9 @@ export const AddNewForm = () => {
   useEffect(() => {
     const mergedData = addData?.employeeValue
       .map((candidate) => {
-        const workDetails =workInfoDataDetails? workInfoDataDetails.find(
+        const workDetails = workInfoDataDetails.find(
           (item) => item.empID === candidate.empID
-        ):{};
+        );
         // const empDocsDetails = addData?.employeeDocsValue.find(
         //   (item) => item.empID === candidate.empID
         // );
@@ -104,7 +104,7 @@ export const AddNewForm = () => {
       })
       .filter((item) => item !== null);
 
-    // console.log("Merged Data:", mergedData);
+    console.log("Merged Data:", mergedData);
     setAllData(mergedData); // Ensure this is called with valid data
     setValue("password", autoPassword);
     setValue("selectType", data?.storedValue?.data?.selectType);
@@ -117,7 +117,7 @@ export const AddNewForm = () => {
 
   const searchResult = (result) => {
     setValue("name", result.name);
-    setValue("email", result.email);
+    setValue("officialEmail", result.officialEmail);
     setValue("empID", result.empID);
     setValue("userID", result.empID);
     setValue("contactNo", getLastValue(result.contactNo));
@@ -176,6 +176,7 @@ export const AddNewForm = () => {
           password: data.password,
           selectType: data.selectType,
           setPermissions: dropDownVal,
+          status: "Active",
         };
         await client
           .graphql({
@@ -191,13 +192,14 @@ export const AddNewForm = () => {
           .catch((err) => {
             console.log(err);
           });
-      
       } else {
         const createNewUser = {
           empID: data.empID,
+          // password: "AWE001",
           password: data.password,
           selectType: data.selectType,
           setPermissions: dropDownVal,
+          status: "Active",
         };
         await client
           .graphql({
@@ -208,7 +210,7 @@ export const AddNewForm = () => {
           })
           .then((res) => {
             // console.log(res);
-            // setNotification(true);
+            setNotification(true);
           })
           .catch((err) => {
             console.log(err);
@@ -216,7 +218,7 @@ export const AddNewForm = () => {
 
         const username = data.empID;
         const password = data.password;
-        const email = data.email;
+        const email = data.officialEmail;
         await signUp({
           username,
           password,
@@ -238,7 +240,6 @@ export const AddNewForm = () => {
       reset();
       setDropDownVal([]);
       setPermissionData({});
-      setNotification(true);
     } catch (err) {
       console.log(err);
     }
@@ -318,16 +319,20 @@ export const AddNewForm = () => {
 
           <div>
             <div>
-              <label className="text_size_5">Email Id</label>
+              <label className="text_size_5">Official Email Id</label>
               <input
-                type="email"
+                type="officialEmail"
                 className="input-field"
-                value={data?.storedValue?.data?.email || watch("email") || ""}
-                {...register("email")}
+                value={
+                  data?.storedValue?.data?.officialEmail ||
+                  watch("officialEmail") ||
+                  ""
+                }
+                {...register("officialEmail")}
               />
             </div>
             <p className="text-[red] text-[12px] mt-1">
-              {errors.email?.message}
+              {errors.officialEmail?.message}
             </p>
           </div>
 
@@ -391,6 +396,7 @@ export const AddNewForm = () => {
                 value={
                   watch("position") ||
                   data?.storedValue?.data?.positionValue ||
+                  data?.employeeValue?.data?.position ||
                   ""
                 }
                 {...register("position")}
@@ -437,7 +443,7 @@ export const AddNewForm = () => {
               <option value="Admin">Admin</option>
               <option value="Manager">Manager</option>
               <option value="HR">HR</option>
-              <option value="Supervisior">Supervisior</option>
+              <option value="Supervisor">Supervisor</option>
               <option value="Training Requestor">Training Requestor</option>
               <option value="TimeKeeper">TimeKeeper</option>
               <option value="QA \ QC">QA \ QC</option>

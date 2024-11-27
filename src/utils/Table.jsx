@@ -121,7 +121,7 @@ export const Table = ({
       <div className="text-center text-grey py-10">No data available.</div>
     );
 
-  console.log("Donut", data);
+  // console.log("Donut", data);
 
   return (
     <div className="overflow-x-auto rounded-lg" ref={tableRef}>

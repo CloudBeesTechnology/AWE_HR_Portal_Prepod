@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from "react";
-import { GoUpload } from "react-icons/go";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { DoeEmpSchema } from "../../../services/EmployeeValidation";
@@ -31,10 +30,17 @@ export const Doe = () => {
     watch,
   } = useForm({
     resolver: yupResolver(DoeEmpSchema),
+    doeEmpSubmit: [],
+    doeEmpApproval: [],
+    doeEmpValid:[],  
   });
-
+ 
+  const [dateOfSubmission, setDateOfSubmission] = useState([]);
+  const [dateOfApproval, setDateOfApproval] = useState([]);
+  const [validUntil, setValidUntil] = useState([]);
   const [notification, setNotification] = useState(false);
   const [showTitle,setShowTitle]=useState("")
+  const [empID, setEmpID] = useState("");
   const [uploadedFileNames, setUploadedFileNames] = useState({
     doeEmpUpload: null,
   });
@@ -51,17 +57,63 @@ export const Doe = () => {
     return ""; 
   };
 
-  const getFileName = (url) => {
-    const urlObj = new URL(url);
-    const filePath = urlObj.pathname;
-    const decodedUrl = decodeURIComponent(filePath);
 
-    const fileNameWithExtension = decodedUrl.substring(
-      decodedUrl.lastIndexOf("/") + 1
-    );
+  const approvalDate = () => setDateOfApproval([...doeEmpApproval, ""]);
+  const submissionDate = () => setDateOfSubmission([...doeEmpSubmit, ""]);
+  const validDate = () => setValidUntil([...doeEmpValid, ""]);
+  
 
-    return fileNameWithExtension;
+  const getFileName = (input) => {
+    // Check if input is an object and has the 'upload' property
+    if (typeof input === 'object' && input.upload) {
+      const filePath = input.upload;  // Extract the 'upload' path
+  
+      // Decode the URL path
+      const decodedUrl = decodeURIComponent(filePath);
+  
+      // Extract the file name from the path
+      const fileNameWithExtension = decodedUrl.substring(
+        decodedUrl.lastIndexOf("/") + 1
+      );
+  
+      return fileNameWithExtension;
+    }
+  
+    // If input is a string (URL), use the URL constructor
+    try {
+      const urlObj = new URL(input);  // Attempt to create a URL object
+      const filePath = urlObj.pathname;  // Extract path from URL
+  
+      // Decode the URL path
+      const decodedUrl = decodeURIComponent(filePath);
+  
+      // Extract the file name from the path
+      const fileNameWithExtension = decodedUrl.substring(
+        decodedUrl.lastIndexOf("/") + 1
+      );
+  
+      return fileNameWithExtension;
+    } catch (e) {
+      // Handle invalid URL (fall back to file path processing if URL fails)
+      if (typeof input === 'string') {
+        const decodedUrl = decodeURIComponent(input);
+        const fileNameWithExtension = decodedUrl.substring(
+          decodedUrl.lastIndexOf("/") + 1
+        );
+        return fileNameWithExtension;
+      }
+  
+      // If it's neither an object nor a valid URL string, return undefined or handle as needed
+      return undefined;
+    }
   };
+  
+  useEffect(() => {
+    const userID = localStorage.getItem("userID");
+    setEmpID(userID);
+    // console.log("Navbar: User ID from localStorage:", userID);
+  }, []);
+
 
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
@@ -79,7 +131,7 @@ export const Doe = () => {
         const parsedFiles = parsedArray.map((item) =>
           typeof item === "string" ? JSON.parse(item) : item
         );
-        console.log(parsedFiles);
+        // console.log(parsedFiles);
         setValue("doeEmpUpload", parsedFiles);
 
         setUploadDoe((prev) => ({
@@ -102,7 +154,7 @@ export const Doe = () => {
     
   }, [searchResultData, setValue]);
 
-  const handleFileChange = async (e, label) => {
+  const handleFileChange = async (e, label, empID) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
 
@@ -112,6 +164,14 @@ export const Doe = () => {
       "image/png",
       "image/jpg",
     ];
+
+        // Check for empID before proceeding with the upload
+  if (!empID) {
+    alert("Employee ID is required to upload files.");
+    window.location.reload()
+    return;
+  }
+
     if (!allowedTypes.includes(selectedFile.type)) {
       alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
       return;
@@ -121,7 +181,7 @@ export const Doe = () => {
     setValue(label, [...currentFiles, selectedFile]);
 
     try {
-      await uploadDocs(selectedFile, label, setUploadDoe);
+      await uploadDocs(selectedFile, label, setUploadDoe, empID);
       setUploadedFileNames((prev) => ({
         ...prev,
         [label]: selectedFile.name, // Store just the file name
@@ -131,51 +191,75 @@ export const Doe = () => {
     }
   };
 
-  const onSubmit = async (data) => {    
-    try {
-      console.log("Form Data:", data);
-      console.log("uploadSawp state:", uploadDoe);
+  // console.log("file doe testing", uploadDoe)
 
-      const checkingEIDTable = DNData.find((match) => match.empID === data.empID);
-      const formatDate = (date) => date ? new Date(date).toLocaleDateString('en-CA') : null; // 'en-CA' gives yyyy-mm-dd format
-   
+const onSubmit = async (data) => {    
+  try {
+
+
+    const checkingEIDTable = DNData.find((match) => match.empID === data.empID);
+    
+    // Helper function to format dates
+    const formatDate = (date) => date ? new Date(date).toLocaleDateString('en-CA') : null; // 'en-CA' gives yyyy-mm-dd format
+    
+    // Format each date individually
     const doeEmpSubmit = formatDate(data.doeEmpSubmit);
     const doeEmpApproval = formatDate(data.doeEmpApproval);
     const doeEmpValid = formatDate(data.doeEmpValid);
 
-      if (checkingEIDTable) {
-        const DoeUpValue = {
-          ...data,
-          doeEmpSubmit,
-          doeEmpApproval,
-          doeEmpValid,
-          doeEmpUpload: JSON.stringify(uploadDoe.doeEmpUpload),
-          id: checkingEIDTable.id,
-        };
-console.log("Update Doe Data:",DoeUpValue);
+    if (checkingEIDTable) {
+   
 
-        await UpdateMPData({ DoeUpValue });
-        setShowTitle("Work Pass DOE Info Update Successfully")
-        setNotification(true);
-      } else {
-        const DoeValue = {
-          ...data,
-          doeEmpSubmit,
-          doeEmpApproval,
-          doeEmpValid,
-          doeEmpUpload: JSON.stringify(uploadDoe.doeEmpUpload),
-        };
-        console.log("Create Doe Data: ",DoeValue);
-        
-        await CrerDoeFunData({ DoeValue });
-        setShowTitle("Work Pass Doe Info  Saved successfully")
-        setNotification(true);
-      }
-    } catch (error) {
-      console.error("Error submitting data:", error);
-      setNotification(true); // Optionally show an error notification
+      const updatedApprovalDate = [
+        ...new Set([
+          ...(checkingEIDTable.doeEmpApproval || []), // ensure it's an array before spreading
+          doeEmpApproval
+        ]),
+      ];
+
+      const updatedValidDate = [
+        ...new Set([
+          ...(checkingEIDTable.doeEmpValid || []), // ensure it's an array before spreading
+          doeEmpValid
+        ]),
+      ];
+
+      const DoeUpValue = {
+        ...data,
+        doeEmpSubmit, // Apply formatDate to each item
+        doeEmpApproval: updatedApprovalDate.map(formatDate), // Apply formatDate to each item
+        doeEmpValid: updatedValidDate.map(formatDate), // Apply formatDate to each item
+        doeEmpUpload: JSON.stringify(uploadDoe.doeEmpUpload), // Ensure this is properly set
+        id: checkingEIDTable.id,
+      };
+
+      // console.log("Updated Doe Data:", DoeUpValue);
+
+      await UpdateMPData({ DoeUpValue });
+      setShowTitle("Work Pass DOE Info Updated Successfully");
+      setNotification(true);
+    } else {
+      // If no entry exists, create new data
+      const DoeValue = {
+        ...data,
+        doeEmpSubmit,
+        doeEmpApproval,
+        doeEmpValid,
+        doeEmpUpload: JSON.stringify(uploadDoe.doeEmpUpload),
+      };
+
+      // console.log("Created Doe Data:", DoeValue);
+
+      await CrerDoeFunData({ DoeValue });
+      setShowTitle("Work Pass DOE Info Saved Successfully");
+      setNotification(true);
     }
-  };
+  } catch (error) {
+    console.error("Error submitting data:", error);
+    
+  }
+};
+
 
 
   return (
@@ -227,7 +311,7 @@ console.log("Update Doe Data:",DoeUpValue);
         />
         <FileUploadField
           label="Upload File"
-          onChangeFunc={(e) => handleFileChange(e, "doeEmpUpload")}
+          onChangeFunc={(e) => handleFileChange(e, "doeEmpUpload", empID)}
           name="doeEmpUpload"
           register={register}
           error={errors}

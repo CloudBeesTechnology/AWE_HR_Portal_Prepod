@@ -21,10 +21,17 @@ export const Jitpa = () => {
   const { UpdateJitpaData } = UpdateJitpaFun();
   const { register, handleSubmit, watch,formState: { errors }, setValue } = useForm({
     resolver: yupResolver(JitpaEmpSchema),
+    tbaPurchase: [],
+    jpValid: [],
+    jpEndorse: [],
   });
   
   const [notification, setNotification] = useState(false);
   const [showTitle,setShowTitle]=useState("")
+  const [jpPurchaseDta,setJpPurchaseDta]=useState("")
+  const [jpValidation,setJpValidation]=useState("")
+  const [jpEndorsement,setJpEndorsement]=useState("")
+
   const [uploadedFileNames, setUploadedFileNames] = useState({
     jpEmpUpload: null,
   });
@@ -41,17 +48,55 @@ export const Jitpa = () => {
     return ""; 
   };
 
-  const getFileName = (url) => {
-    const urlObj = new URL(url);
-    const filePath = urlObj.pathname;
-    const decodedUrl = decodeURIComponent(filePath);
+  const jpPurDate = () => setJpPurchaseDta([...tbaPurchase, ""]);
+  const jpValids = () => setJpValidation([...jpValid, ""]);
+  const jpEndorsements = () => setJpEndorsement([...jpEndorse, ""]);
 
-    const fileNameWithExtension = decodedUrl.substring(
-      decodedUrl.lastIndexOf("/") + 1
-    );
-
-    return fileNameWithExtension;
+  const getFileName = (input) => {
+    // Check if input is an object and has the 'upload' property
+    if (typeof input === 'object' && input.upload) {
+      const filePath = input.upload;  // Extract the 'upload' path
+  
+      // Decode the URL path
+      const decodedUrl = decodeURIComponent(filePath);
+  
+      // Extract the file name from the path
+      const fileNameWithExtension = decodedUrl.substring(
+        decodedUrl.lastIndexOf("/") + 1
+      );
+  
+      return fileNameWithExtension;
+    }
+  
+    // If input is a string (URL), use the URL constructor
+    try {
+      const urlObj = new URL(input);  // Attempt to create a URL object
+      const filePath = urlObj.pathname;  // Extract path from URL
+  
+      // Decode the URL path
+      const decodedUrl = decodeURIComponent(filePath);
+  
+      // Extract the file name from the path
+      const fileNameWithExtension = decodedUrl.substring(
+        decodedUrl.lastIndexOf("/") + 1
+      );
+  
+      return fileNameWithExtension;
+    } catch (e) {
+      // Handle invalid URL (fall back to file path processing if URL fails)
+      if (typeof input === 'string') {
+        const decodedUrl = decodeURIComponent(input);
+        const fileNameWithExtension = decodedUrl.substring(
+          decodedUrl.lastIndexOf("/") + 1
+        );
+        return fileNameWithExtension;
+      }
+  
+      // If it's neither an object nor a valid URL string, return undefined or handle as needed
+      return undefined;
+    }
   };
+  
 
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
@@ -73,7 +118,7 @@ export const Jitpa = () => {
         const parsedFiles = parsedArray.map((item) =>
           typeof item === "string" ? JSON.parse(item) : item
         );
-        console.log(parsedFiles);
+      
         setValue("jpEmpUpload", parsedFiles);
 
         setUploadjitpa((prev) => ({
@@ -96,7 +141,7 @@ export const Jitpa = () => {
     
   }, [searchResultData, setValue]);
 
-  const handleFileChange = async (e, label) => {
+  const handleFileChange = async (e, label, empID) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
 
@@ -106,6 +151,13 @@ export const Jitpa = () => {
       "image/png",
       "image/jpg",
     ];
+
+    if (!empID) {
+      alert("Employee ID is required to upload files.");
+      window.location.reload();
+      return;
+    }
+
     if (!allowedTypes.includes(selectedFile.type)) {
       alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
       return;
@@ -115,7 +167,7 @@ export const Jitpa = () => {
     setValue(label, [...currentFiles, selectedFile]);
 
     try {
-      await uploadDocs(selectedFile, label, setUploadjitpa);
+      await uploadDocs(selectedFile, label, setUploadjitpa, empID);
       setUploadedFileNames((prev) => ({
         ...prev,
         [label]: selectedFile.name, // Store just the file name
@@ -125,37 +177,64 @@ export const Jitpa = () => {
     }
   };
   const empID = watch("empID");
+
+
   const onSubmit = async (data) => {
-    console.log("Form data:", data);
+
+    const formatDate = (date) => date ? new Date(date).toLocaleDateString('en-CA') : null;
+    const tbaPurchase = formatDate(data.tbaPurchase);
+    const jpValid = formatDate(data.jpValid);
+    const jpEndorse = formatDate(data.jpEndorse);
 
     try {
       let matchedEmployee = null;
       if (empID) {
+
         matchedEmployee = BJLData.find((val) => val.empID === empID);
-        console.log(matchedEmployee);
-      }
-      const formatDate = (date) => date ? new Date(date).toLocaleDateString('en-CA') : null; // 'en-CA' gives yyyy-mm-dd format
-   
-    const jpValid = formatDate(data.jpValid);
-    const tbaPurchase = formatDate(data.tbaPurchase);
-    const jpEndorse = formatDate(data.jpEndorse);
+
+        const updatedSubmissionDate = [
+          ...new Set([
+            ...(matchedEmployee.tbaPurchase || []), // ensure it's an array before spreading
+            tbaPurchase
+          ]),
+        ];
+  
+        const updatedEndorseDate = [
+          ...new Set([
+            ...(matchedEmployee.jpEndorse || []), // ensure it's an array before spreading
+              jpEndorse
+          ]),
+        ];
+  
+        const updatedValidDate = [
+          ...new Set([
+            ...(matchedEmployee.jpValid || []), // ensure it's an array before spreading
+             jpValid
+          ]),
+        ];
+  
 
       const JitpaValue = {
         ...data,
-        jpValid,
-      tbaPurchase,
-      jpEndorse,
+        jpValid:updatedValidDate.map(formatDate),
+      tbaPurchase:updatedSubmissionDate.map(formatDate),
+      jpEndorse:updatedEndorseDate.map(formatDate),
       jpEmpUpload: JSON.stringify(uploadjitpa.jpEmpUpload),
         id: matchedEmployee ? matchedEmployee.id : null,
       };
       // console.log(JitpaValue);
+      
+     
 
       await UpdateJitpaData({ JitpaValue });
       setShowTitle("Work Pass JITPA Info Data Stored Successfully")
         setNotification(true);
+    } else {
+      console.log("error")
+    }
     } catch (error) {
       console.error("Error submitting data:", error);
-      console.log(error);
+      
 
       if (error?.errors) {
         error.errors.forEach((err, index) => {
@@ -218,7 +297,7 @@ export const Jitpa = () => {
      <div>
         <FileUploadField
           label="Upload File"
-          onChangeFunc={(e) => handleFileChange(e, "jpEmpUpload")}
+          onChangeFunc={(e) => handleFileChange(e, "jpEmpUpload", empID)}
           name="jpEmpUpload"
           register={register}
           error={errors}

@@ -1115,19 +1115,16 @@ export const getEmpLeaveDetails = /* GraphQL */ `
       annualLeave
       annualLeaveDate
       compasLeave
-      compasLeaveDate
       destinateLeavePass
       durLeavePass
       dateLeavePass
       leavePass
       materLeave
-      materLeaveDate
       mrageLeave
-      mrageLeaveDate
       paterLeave
-      paterLeaveDate
       sickLeave
       sickLeaveDate
+      hospLeave
       createdAt
       updatedAt
       __typename
@@ -1147,19 +1144,16 @@ export const listEmpLeaveDetails = /* GraphQL */ `
         annualLeave
         annualLeaveDate
         compasLeave
-        compasLeaveDate
         destinateLeavePass
         durLeavePass
         dateLeavePass
         leavePass
         materLeave
-        materLeaveDate
         mrageLeave
-        mrageLeaveDate
         paterLeave
-        paterLeaveDate
         sickLeave
         sickLeaveDate
+        hospLeave
         createdAt
         updatedAt
         __typename
@@ -1847,6 +1841,7 @@ export const getUser = /* GraphQL */ `
       selectType
       setPermissions
       password
+      status
       createdAt
       updatedAt
       __typename
@@ -1866,6 +1861,7 @@ export const listUsers = /* GraphQL */ `
         selectType
         setPermissions
         password
+        status
         createdAt
         updatedAt
         __typename
@@ -1984,46 +1980,6 @@ export const listLeaveStatuses = /* GraphQL */ `
         empStatus
         empDate
         empRemarks
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const getSampleTest1 = /* GraphQL */ `
-  query GetSampleTest1($id: ID!) {
-    getSampleTest1(id: $id) {
-      id
-      name
-      email
-      gender
-      empID
-      password
-      tempID
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const listSampleTest1s = /* GraphQL */ `
-  query ListSampleTest1s(
-    $filter: ModelSampleTest1FilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listSampleTest1s(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        name
-        email
-        gender
-        empID
-        password
-        tempID
         createdAt
         updatedAt
         __typename

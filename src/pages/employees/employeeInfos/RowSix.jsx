@@ -29,16 +29,16 @@ export const RowSix = ({
         />
 
         {/* Conditionally render the 'Other Nationality' input field */}
-        {selectedNationality === "Other" ||
-          (otherNation && nation === "Other" && (
-            <FormField
-              label="Other Nationality"
-              register={register}
-              name="otherNation"
-              type="text"
-              errors={errors}
-            />
-          ))}
+        {(selectedNationality === "Other" ||
+          (otherNation && nation === "Other")) && (
+          <FormField
+            label="Other Nationality"
+            register={register}
+            name="otherNation"
+            type="text"
+            errors={errors}
+          />
+        )}
       </div>
 
       <div className="flex flex-1 gap-7">
@@ -54,16 +54,16 @@ export const RowSix = ({
         />
 
         {/* Conditionally render the 'Other Country of Origin' input field */}
-        {selectedCountry === "Other" ||
-          (oCOfOrigin && countryofOrigin === "Other" && (
-            <FormField
-              label="Other Country of Origin"
-              register={register}
-              name="oCOfOrigin"
-              type="text"
-              errors={errors}
-            />
-          ))}
+        {(selectedCountry === "Other" ||
+          (oCOfOrigin && countryofOrigin === "Other")) && (
+          <FormField
+            label="Other Country of Origin"
+            register={register}
+            name="oCOfOrigin"
+            type="text"
+            errors={errors}
+          />
+        )}
       </div>
     </div>
   );

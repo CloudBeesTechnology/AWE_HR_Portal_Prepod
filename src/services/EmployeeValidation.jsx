@@ -1,6 +1,7 @@
 import * as Yup from "yup";
 import { workInfoUploads } from "../utils/DropDownMenus";
 import {
+  dateStringSchema,
   getDepInsuranceValidationSchema,
   getFamilyDetailsValidationSchema,
   isValidUrl,
@@ -17,16 +18,54 @@ export const NonLocalAccovalidationSchema = Yup.object().shape({
 
 export const LabourImmigrationSchema = Yup.object().shape({
   empID: Yup.string().required("Employee ID Number is mandatory"),
-  overMD: Yup.string().required(
-    "Overseas Medical Fitness Issued Date is mandatory"
-  ),
-  overME: Yup.string().required("Overseas Medical Fitness Expiry is mandatory"),
-  bruhimsRD: Yup.string().required("BruHims Registration Date is mandatory"),
-  bruhimsRNo: Yup.string().required("BruHims Registration Number is mandatory"),
-  bruneiMAD: Yup.string().required(
-    "Brunei Medical Appointment Date is mandatory"
-  ),
-  bruneiME: Yup.string().required("Brunei Medical Fitness Expiry is mandatory"),
+  overMD: Yup.date()
+    .nullable() // Allows null or undefined values
+    .notRequired() // Field is optional
+    .test("is-past", "overMD must be a past date", function (value) {
+      if (!value) return true; // Skip validation if the field is empty
+      return new Date(value) < new Date(); // Check if the date is in the past
+    }),
+
+  overME: Yup.date()
+    .nullable() // Allows null or undefined values
+    .notRequired() // Field is optional
+    .test("is-future", "overME must be a future date", function (value) {
+      if (!value) return true; // Skip validation if the field is empty
+      return new Date(value) > new Date(); // Check if the date is in the future
+    }),
+  bruhimsRD: Yup.string().notRequired(),
+  bruhimsRNo: Yup.string().notRequired(),
+  // bruneiMAD: Yup.array()
+  // .of(
+  //   Yup.string().test(
+  //     "is-past-date",
+  //     "Brunei Medical Appointment date must be in the past",
+  //     (value) => {
+  //       if (!value) return true; // Allow empty values
+  //       const [day, month, year] = value.split("-");
+  //       const issuedDate = new Date(`${year}-${month}-${day}`);
+  //       const currentDate = new Date();
+  //       return issuedDate < currentDate; // Check if issued date is in the past
+  //     }
+  //   )
+  // )
+  // .notRequired(),
+
+  // bruneiME: Yup.array()
+  // .of(
+  //   Yup.string().test(
+  //     "is-valid-date",
+  //     "Expiry date must be in the future",
+  //     (value) => {
+  //       if (!value) return true; // Allow empty values
+  //       const date = new Date(value);
+  //       const currentDate = new Date();
+  //       return date > currentDate;
+  //     }
+  //   )
+  // )
+  // .notRequired(),
+
   uploadFitness: Yup.array()
     .of(
       Yup.mixed()
@@ -35,9 +74,7 @@ export const LabourImmigrationSchema = Yup.object().shape({
           "Only PDF allowed", // Custom error message
           (value) => {
             if (value instanceof File) {
-              return ["application/pdf"].includes(
-                value.type
-              );
+              return ["application/pdf"].includes(value.type);
             }
             if (typeof value === "string") {
               return isValidUrl(value); // Check if the string is a valid URL
@@ -58,9 +95,7 @@ export const LabourImmigrationSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf"].includes(
-                value.type
-              );
+              return ["application/pdf"].includes(value.type);
             }
 
             // If value is a string, check if it's a valid URL
@@ -83,9 +118,7 @@ export const LabourImmigrationSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf"].includes(
-                value.type
-              );
+              return ["application/pdf"].includes(value.type);
             }
 
             // If value is a string, check if it's a valid URL
@@ -515,39 +548,34 @@ export const WorkInfoSchema = Yup.object().shape({
 });
 
 export const employeeInfoSchema = Yup.object().shape({
+  // My Command
   empID: Yup.string().required("Employee ID Number is mandatory"),
-  profilePhoto: Yup.mixed()
-    .required("Upload Photo is mandatory")
-    .test(
-      "fileType",
-      "Profile photo must be a JPG, PNG, or a valid URL",
-      (value) =>
-        value
-          ? typeof value === "string"
-            ? /\.(jpg|jpeg|png|pdf)$/.test(value) || isValidUrl(value)
-            : /\.(jpg|jpeg|png|pdf)$/.test(value.name)
-          : false
-    ),
+  profilePhoto: Yup.string().required("Upload Photo is mandatory"),
 
-  contractType: Yup.string().required("Contract Type mandatory"),
-  empType: Yup.string().required("Employee Type mandatory"),
+  // profilePhoto: Yup.mixed()
+  //   .required("Upload Photo is mandatory")
+  //   .test(
+  //     "fileType",
+  //     "Profile photo must be a JPG, PNG",
+  //     (value) =>
+  //       value
+  //         ? typeof value === "string"
+  //           ? /\.(jpg|jpeg|png|pdf)$/.test(value) || isValidUrl(value)
+  //           : /\.(jpg|jpeg|png|pdf)$/.test(value.name)
+  //         : false
+  //   ),
+  contractType: Yup.array()
+    .of(Yup.string().required("Each Contract Type is mandatory"))
+    .min(1, "At least one Contract Type is required")
+    .required("Contract Type is mandatory"),
 
-  //   contractType: Yup.array()
-  //   .of(Yup.string().required("Each Contract Type is mandatory"))
-  //   .min(1, "At least one Contract Type is required")
-  //   .required("Contract Type is mandatory"),
-
-  // empType: Yup.array()
-  //   .of(Yup.string().required("Each Employee Type is mandatory"))
-  //   .min(1, "At least one Employee Type is required")
-  //   .required("Employee Type is mandatory"),
+  empType: Yup.array()
+    .of(Yup.string().required("Each Employee Type is mandatory"))
+    .min(1, "At least one Employee Type is required")
+    .required("Employee Type is mandatory"),
 
   name: Yup.string()
     .min(3, "Name must be at least 3 characters") // Minimum length check
-    .matches(
-      /^[A-Za-z\s]+$/,
-      "Name cannot contain numbers or special characters"
-    ) // Regex to allow only letters and spaces
     .required("Name is mandatory"),
   gender: Yup.string().required("Gender is mandatory"),
   dob: Yup.string()
@@ -578,32 +606,53 @@ export const employeeInfoSchema = Yup.object().shape({
   otherRace: Yup.string().notRequired(),
   bwnIcNo: Yup.string().notRequired(),
   bwnIcColour: Yup.string().notRequired(),
-  bwnIcExpiry: Yup.string()
-    .notRequired() // This allows the field to be optional
-    .test("is-future-date", "Expiry date must be in the future", (value) => {
-      if (!value) return true; // If no value, allow it to pass (since it's not required)
-      const expiryDate = new Date(value);
-      const currentDate = new Date();
-      return expiryDate > currentDate;
-    }),
+  bwnIcExpiry: Yup.array()
+    .of(
+      Yup.string().test(
+        "is-valid-date",
+        "Expiry date must be in the future",
+        (value) => {
+          if (!value) return true; // Allow empty values
+          const date = new Date(value);
+          const currentDate = new Date();
+          return date > currentDate;
+        }
+      )
+    )
+    .notRequired(),
+
   myIcNo: Yup.string().notRequired(),
   ppNo: Yup.string().notRequired(),
-  ppIssued: Yup.string()
-    .notRequired() // This allows the field to be optional
-    .test("is-past-date", "Expiry date must be in the past", (value) => {
-      if (!value) return true; // If no value, allow it to pass (since it's not required)
-      const expiryDate = new Date(value);
-      const currentDate = new Date();
-      return expiryDate < currentDate;
-    }),
-  ppExpiry: Yup.string()
-    .notRequired() // This allows the field to be optional
-    .test("is-future-date", "Expiry date must be in the future", (value) => {
-      if (!value) return true; // If no value, allow it to pass (since it's not required)
-      const expiryDate = new Date(value);
-      const currentDate = new Date();
-      return expiryDate > currentDate;
-    }),
+  ppIssued: Yup.array()
+    .of(
+      Yup.string().test(
+        "is-past-date",
+        "Issued date must be in the past",
+        (value) => {
+          if (!value) return true; // Allow empty values
+          const [day, month, year] = value.split("-");
+          const issuedDate = new Date(`${year}-${month}-${day}`);
+          const currentDate = new Date();
+          return issuedDate < currentDate; // Check if issued date is in the past
+        }
+      )
+    )
+    .notRequired(),
+
+  ppExpiry: Yup.array()
+    .of(
+      Yup.string().test(
+        "is-valid-date",
+        "Expiry date must be in the future",
+        (value) => {
+          if (!value) return true; // Allow empty values
+          const date = new Date(value);
+          const currentDate = new Date();
+          return date > currentDate;
+        }
+      )
+    )
+    .notRequired(),
   ppDestinate: Yup.string().notRequired(),
   contactNo: Yup.string().required("Contact Number is mandatory"),
   permanentAddress: Yup.string().required("Address is mandatory"),
@@ -633,16 +682,7 @@ export const employeeInfoSchema = Yup.object().shape({
   ),
 
   inducBrief: Yup.string().required("Induction Briefing Date is mandatory"),
-  inducBriefUp: Yup.mixed()
-    .test(
-      "fileType",
-      "Only PDF, image files, or URLs are allowed",
-      (value) =>
-        !value ||
-        ["application/pdf", "image/jpeg", "image/png"].includes(value?.type) ||
-        (typeof value === "string" && isValidUrl(value))
-    )
-    .required("Induction Briefing Upload is mandatory"),
+  inducBriefUp: Yup.string().required("Induction Briefing Upload is mandatory"),
 
   preEmp: Yup.string().notRequired(),
   preEmpPeriod: Yup.string().notRequired(),
@@ -1017,26 +1057,45 @@ export const ClaimInsuranceSchema = Yup.object().shape({
 
 export const SawpEmpSchema = Yup.object().shape({
   empID: Yup.string().required("Employee ID is required"),
-  sawpEmpLtrReq: Yup.date()
-    .nullable()
-    .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .required("Requested Date is required")
-    .test("is-not-future-date", "Future Date Not Allowed", (value) => {
-      return !value || value <= new Date();
-    }),
 
-  sawpEmpLtrReci: Yup.date()
-    .nullable()
-    .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .notRequired()
-    .test(
-      "is-after-requested-date",
-      "Received Date cannot be before the Requested Date",
-      function (value) {
-        const { sawpEmpLtrReq } = this.parent;
-        return !value || !sawpEmpLtrReq || value >= sawpEmpLtrReq;
-      }
-    ),
+  sawpEmpLtrReq: Yup.array()
+    .of(
+      Yup.date()
+        .nullable()
+        .transform((value, originalValue) =>
+          originalValue === "" ? null : value
+        )
+        .required("Requested Date is required")
+        .test("is-not-future-date", "Future Date Not Allowed", (value) => {
+          return !value || value <= new Date();
+        })
+    )
+    .required("Requested Dates are required"),
+
+  // Handle sawpEmpLtrReci as an array of dates, ensuring it's after the requested date
+  sawpEmpLtrReci: Yup.array()
+    .of(
+      Yup.date()
+        .nullable()
+        .transform((value, originalValue) =>
+          originalValue === "" ? null : value
+        )
+        .test(
+          "is-after-requested-date",
+          "Received Date cannot be before the Requested Date",
+          function (value) {
+            const { sawpEmpLtrReq } = this.parent;
+            // Check if received date is after any of the requested dates
+            return (
+              !value ||
+              !sawpEmpLtrReq ||
+              sawpEmpLtrReq.every((reqDate) => value >= new Date(reqDate))
+            );
+          }
+        )
+    )
+    .notRequired(),
+
   sawpEmpUpload: Yup.array()
     .of(
       Yup.mixed()
@@ -1202,13 +1261,6 @@ export const NlmsEmpSchema = Yup.object().shape({
         .notRequired()
     )
     .notRequired(),
-  // Yup.mixed()
-  //   .notRequired() // File is optional
-  //   .test("fileSize", "File must be between 7MB", (value) => {
-  //     if (!value) return true; // No file selected, it's valid
-  //     const fileSize = value.size; // File size in bytes
-  //     return fileSize >= 1 * 1024 && fileSize <= 7 * 1024 * 1024; // 1KB to 10MB
-  //   }),
 });
 
 export const BankEmpSchema = Yup.object().shape({

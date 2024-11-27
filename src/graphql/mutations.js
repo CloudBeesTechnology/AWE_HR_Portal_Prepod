@@ -1581,19 +1581,16 @@ export const createEmpLeaveDetails = /* GraphQL */ `
       annualLeave
       annualLeaveDate
       compasLeave
-      compasLeaveDate
       destinateLeavePass
       durLeavePass
       dateLeavePass
       leavePass
       materLeave
-      materLeaveDate
       mrageLeave
-      mrageLeaveDate
       paterLeave
-      paterLeaveDate
       sickLeave
       sickLeaveDate
+      hospLeave
       createdAt
       updatedAt
       __typename
@@ -1611,19 +1608,16 @@ export const updateEmpLeaveDetails = /* GraphQL */ `
       annualLeave
       annualLeaveDate
       compasLeave
-      compasLeaveDate
       destinateLeavePass
       durLeavePass
       dateLeavePass
       leavePass
       materLeave
-      materLeaveDate
       mrageLeave
-      mrageLeaveDate
       paterLeave
-      paterLeaveDate
       sickLeave
       sickLeaveDate
+      hospLeave
       createdAt
       updatedAt
       __typename
@@ -1641,19 +1635,16 @@ export const deleteEmpLeaveDetails = /* GraphQL */ `
       annualLeave
       annualLeaveDate
       compasLeave
-      compasLeaveDate
       destinateLeavePass
       durLeavePass
       dateLeavePass
       leavePass
       materLeave
-      materLeaveDate
       mrageLeave
-      mrageLeaveDate
       paterLeave
-      paterLeaveDate
       sickLeave
       sickLeaveDate
+      hospLeave
       createdAt
       updatedAt
       __typename
@@ -2619,6 +2610,7 @@ export const createUser = /* GraphQL */ `
       selectType
       setPermissions
       password
+      status
       createdAt
       updatedAt
       __typename
@@ -2636,6 +2628,7 @@ export const updateUser = /* GraphQL */ `
       selectType
       setPermissions
       password
+      status
       createdAt
       updatedAt
       __typename
@@ -2653,6 +2646,7 @@ export const deleteUser = /* GraphQL */ `
       selectType
       setPermissions
       password
+      status
       createdAt
       updatedAt
       __typename
@@ -2824,63 +2818,6 @@ export const deleteLeaveStatus = /* GraphQL */ `
       empStatus
       empDate
       empRemarks
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const createSampleTest1 = /* GraphQL */ `
-  mutation CreateSampleTest1(
-    $input: CreateSampleTest1Input!
-    $condition: ModelSampleTest1ConditionInput
-  ) {
-    createSampleTest1(input: $input, condition: $condition) {
-      id
-      name
-      email
-      gender
-      empID
-      password
-      tempID
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const updateSampleTest1 = /* GraphQL */ `
-  mutation UpdateSampleTest1(
-    $input: UpdateSampleTest1Input!
-    $condition: ModelSampleTest1ConditionInput
-  ) {
-    updateSampleTest1(input: $input, condition: $condition) {
-      id
-      name
-      email
-      gender
-      empID
-      password
-      tempID
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const deleteSampleTest1 = /* GraphQL */ `
-  mutation DeleteSampleTest1(
-    $input: DeleteSampleTest1Input!
-    $condition: ModelSampleTest1ConditionInput
-  ) {
-    deleteSampleTest1(input: $input, condition: $condition) {
-      id
-      name
-      email
-      gender
-      empID
-      password
-      tempID
       createdAt
       updatedAt
       __typename

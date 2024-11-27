@@ -26,12 +26,14 @@ export declare type UserCreateFormInputValues = {
     selectType?: string;
     setPermissions?: string[];
     password?: string;
+    status?: string;
 };
 export declare type UserCreateFormValidationValues = {
     empID?: ValidationFunction<string>;
     selectType?: ValidationFunction<string>;
     setPermissions?: ValidationFunction<string>;
     password?: ValidationFunction<string>;
+    status?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type UserCreateFormOverridesProps = {
@@ -40,6 +42,7 @@ export declare type UserCreateFormOverridesProps = {
     selectType?: PrimitiveOverrideProps<TextFieldProps>;
     setPermissions?: PrimitiveOverrideProps<TextFieldProps>;
     password?: PrimitiveOverrideProps<TextFieldProps>;
+    status?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type UserCreateFormProps = React.PropsWithChildren<{
     overrides?: UserCreateFormOverridesProps | undefined | null;

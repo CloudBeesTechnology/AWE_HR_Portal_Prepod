@@ -10,16 +10,13 @@ export const TCDataFun = () => {
     }
     const totalData = {
       empID:TCValue.empID,
-      courseCode:TCValue.courseCode,
-      courseName:TCValue.courseName,
-      company:TCValue.company,
-      certifiExpiry:TCValue.certifiExpiry,
-      department:TCValue.department,
-      empBadgeNo:TCValue.empBadgeNo,
-      employeeName:TCValue.employeeName,
-      eCertifiDate:TCValue.eCertifiDatev,
-      trainingUpCertifi: JSON.stringify(TCValue.trainingUpCertifi),
-      orgiCertifiDate:TCValue.orgiCertifiDate,
+      courseCode:[TCValue.courseCode],
+      courseName:[TCValue.courseName],
+      company:[TCValue.company],
+      certifiExpiry:[TCValue.certifiExpiry],
+      eCertifiDate:[TCValue.eCertifiDate],
+      trainingUpCertifi: [JSON.stringify(TCValue.trainingUpCertifi)],
+      orgiCertifiDate:[TCValue.orgiCertifiDate],
     };
     console.log(totalData);
 

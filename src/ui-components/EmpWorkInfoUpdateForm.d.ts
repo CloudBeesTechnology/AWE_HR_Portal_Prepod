@@ -35,9 +35,9 @@ export declare type EmpWorkInfoUpdateFormInputValues = {
     otherJobCat?: string[];
     otherDepartment?: string[];
     otherPosition?: string[];
-    probationStart?: string;
-    probationEnd?: string;
-    probDuration?: string;
+    probationStart?: string[];
+    probationEnd?: string[];
+    probDuration?: string[];
     position?: string[];
     relationship?: string[];
     supervisor?: string[];

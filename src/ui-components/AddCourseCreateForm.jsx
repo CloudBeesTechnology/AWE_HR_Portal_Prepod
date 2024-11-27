@@ -189,7 +189,7 @@ export default function AddCourseCreateForm(props) {
     ...rest
   } = props;
   const initialValues = {
-    courseSelect: [],
+    courseSelect: "",
     courseName: [],
     company: [],
   };
@@ -201,16 +201,12 @@ export default function AddCourseCreateForm(props) {
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setCourseSelect(initialValues.courseSelect);
-    setCurrentCourseSelectValue("");
     setCourseName(initialValues.courseName);
     setCurrentCourseNameValue("");
     setCompany(initialValues.company);
     setCurrentCompanyValue("");
     setErrors({});
   };
-  const [currentCourseSelectValue, setCurrentCourseSelectValue] =
-    React.useState("");
-  const courseSelectRef = React.createRef();
   const [currentCourseNameValue, setCurrentCourseNameValue] =
     React.useState("");
   const courseNameRef = React.createRef();
@@ -303,55 +299,32 @@ export default function AddCourseCreateForm(props) {
       {...getOverrideProps(overrides, "AddCourseCreateForm")}
       {...rest}
     >
-      <ArrayField
-        onChange={async (items) => {
-          let values = items;
+      <TextField
+        label="Course select"
+        isRequired={true}
+        isReadOnly={false}
+        value={courseSelect}
+        onChange={(e) => {
+          let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              courseSelect: values,
+              courseSelect: value,
               courseName,
               company,
             };
             const result = onChange(modelFields);
-            values = result?.courseSelect ?? values;
+            value = result?.courseSelect ?? value;
           }
-          setCourseSelect(values);
-          setCurrentCourseSelectValue("");
+          if (errors.courseSelect?.hasError) {
+            runValidationTasks("courseSelect", value);
+          }
+          setCourseSelect(value);
         }}
-        currentFieldValue={currentCourseSelectValue}
-        label={"Course select"}
-        items={courseSelect}
-        hasError={errors?.courseSelect?.hasError}
-        runValidationTasks={async () =>
-          await runValidationTasks("courseSelect", currentCourseSelectValue)
-        }
-        errorMessage={errors?.courseSelect?.errorMessage}
-        setFieldValue={setCurrentCourseSelectValue}
-        inputFieldRef={courseSelectRef}
-        defaultFieldValue={""}
-      >
-        <TextField
-          label="Course select"
-          isRequired={true}
-          isReadOnly={false}
-          value={currentCourseSelectValue}
-          onChange={(e) => {
-            let { value } = e.target;
-            if (errors.courseSelect?.hasError) {
-              runValidationTasks("courseSelect", value);
-            }
-            setCurrentCourseSelectValue(value);
-          }}
-          onBlur={() =>
-            runValidationTasks("courseSelect", currentCourseSelectValue)
-          }
-          errorMessage={errors.courseSelect?.errorMessage}
-          hasError={errors.courseSelect?.hasError}
-          ref={courseSelectRef}
-          labelHidden={true}
-          {...getOverrideProps(overrides, "courseSelect")}
-        ></TextField>
-      </ArrayField>
+        onBlur={() => runValidationTasks("courseSelect", courseSelect)}
+        errorMessage={errors.courseSelect?.errorMessage}
+        hasError={errors.courseSelect?.hasError}
+        {...getOverrideProps(overrides, "courseSelect")}
+      ></TextField>
       <ArrayField
         onChange={async (items) => {
           let values = items;

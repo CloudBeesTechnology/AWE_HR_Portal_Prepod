@@ -15,6 +15,7 @@ import {
   Icon,
   ScrollView,
   Text,
+  TextAreaField,
   TextField,
   useTheme,
 } from "@aws-amplify/ui-react";
@@ -324,16 +325,16 @@ export default function BJLDetailsCreateForm(props) {
     bankAmt: [],
     bankValid: [],
     bankEndorse: [],
-    bankEmpUpload: [],
+    bankEmpUpload: [{ type: "JSON" }],
     tbaPurchase: [],
     jitpaAmt: [],
     jpValid: [],
     jpEndorse: [],
-    jpEmpUpload: [],
+    jpEmpUpload: [{ type: "JSON" }],
     lbrReceiptNo: [],
     lbrDepoAmt: [],
     lbrDepoSubmit: [],
-    lbrDepoUpload: [],
+    lbrDepoUpload: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -882,7 +883,7 @@ export default function BJLDetailsCreateForm(props) {
         inputFieldRef={bankEmpUploadRef}
         defaultFieldValue={""}
       >
-        <TextField
+        <TextAreaField
           label="Bank emp upload"
           isRequired={false}
           isReadOnly={false}
@@ -902,7 +903,7 @@ export default function BJLDetailsCreateForm(props) {
           ref={bankEmpUploadRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "bankEmpUpload")}
-        ></TextField>
+        ></TextAreaField>
       </ArrayField>
       <ArrayField
         onChange={async (items) => {
@@ -1191,7 +1192,7 @@ export default function BJLDetailsCreateForm(props) {
         inputFieldRef={jpEmpUploadRef}
         defaultFieldValue={""}
       >
-        <TextField
+        <TextAreaField
           label="Jp emp upload"
           isRequired={false}
           isReadOnly={false}
@@ -1211,7 +1212,7 @@ export default function BJLDetailsCreateForm(props) {
           ref={jpEmpUploadRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "jpEmpUpload")}
-        ></TextField>
+        ></TextAreaField>
       </ArrayField>
       <ArrayField
         onChange={async (items) => {
@@ -1443,7 +1444,7 @@ export default function BJLDetailsCreateForm(props) {
         inputFieldRef={lbrDepoUploadRef}
         defaultFieldValue={""}
       >
-        <TextField
+        <TextAreaField
           label="Lbr depo upload"
           isRequired={false}
           isReadOnly={false}
@@ -1463,7 +1464,7 @@ export default function BJLDetailsCreateForm(props) {
           ref={lbrDepoUploadRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "lbrDepoUpload")}
-        ></TextField>
+        ></TextAreaField>
       </ArrayField>
       <Flex
         justifyContent="space-between"

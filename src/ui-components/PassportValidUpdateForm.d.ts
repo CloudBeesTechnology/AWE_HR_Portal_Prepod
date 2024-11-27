@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -60,9 +60,9 @@ export declare type PassportValidUpdateFormOverridesProps = {
     PassportValidUpdateFormGrid?: PrimitiveOverrideProps<GridProps>;
     empID?: PrimitiveOverrideProps<TextFieldProps>;
     ppLocation?: PrimitiveOverrideProps<TextFieldProps>;
-    arrivStampUpload?: PrimitiveOverrideProps<TextFieldProps>;
-    immigEmpUpload?: PrimitiveOverrideProps<TextFieldProps>;
-    reEntryUpload?: PrimitiveOverrideProps<TextFieldProps>;
+    arrivStampUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    immigEmpUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    reEntryUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;
     arrivStampExp?: PrimitiveOverrideProps<TextFieldProps>;
     immigRefNo?: PrimitiveOverrideProps<TextFieldProps>;
     ppSubmit?: PrimitiveOverrideProps<TextFieldProps>;

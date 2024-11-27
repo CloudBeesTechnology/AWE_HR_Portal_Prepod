@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -59,14 +59,14 @@ export declare type DNDetailsCreateFormOverridesProps = {
     doeEmpApproval?: PrimitiveOverrideProps<TextFieldProps>;
     doeEmpValid?: PrimitiveOverrideProps<TextFieldProps>;
     doeEmpRefNo?: PrimitiveOverrideProps<TextFieldProps>;
-    doeEmpUpload?: PrimitiveOverrideProps<TextFieldProps>;
+    doeEmpUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;
     permitType?: PrimitiveOverrideProps<TextFieldProps>;
     nlmsEmpSubmit?: PrimitiveOverrideProps<TextFieldProps>;
     nlmsEmpSubmitRefNo?: PrimitiveOverrideProps<TextFieldProps>;
     nlmsEmpApproval?: PrimitiveOverrideProps<TextFieldProps>;
     nlmsRefNo?: PrimitiveOverrideProps<TextFieldProps>;
     nlmsEmpValid?: PrimitiveOverrideProps<TextFieldProps>;
-    nlmsEmpUpload?: PrimitiveOverrideProps<TextFieldProps>;
+    nlmsEmpUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type DNDetailsCreateFormProps = React.PropsWithChildren<{
     overrides?: DNDetailsCreateFormOverridesProps | undefined | null;

@@ -9,7 +9,7 @@ export const UserSchema = Yup.object({
   empID: Yup.string().required("Employee ID is required"),
   password: Yup.string().required("Temporary Password is required"),
   selectType: Yup.string().required("Please select a type"),
-  email: Yup.string().required("Email is required"),
+  officialEmail: Yup.string().required("OfficialEmail is required"),
   userID: Yup.string().required("User ID is mandatory"),
   name: Yup.string().required("Name is mandatory"),
   contactNo: Yup.string().required("Contact number is mandatory"),
@@ -368,6 +368,10 @@ export const CvevSchema = Yup.object().shape({
 export const PaafSchema = Yup.object().shape({
   paafApproveDate: Yup.date().required("PAAF approval date is required"),
   paafFile: Yup.mixed().required("PAAF PDF is required"),
+});
+
+export const updateInterviewScheduleSchema = Yup.object().shape({
+  department: Yup.string().required('Department is required'),
 });
 
 export const MobilizationSchema = Yup.object().shape({

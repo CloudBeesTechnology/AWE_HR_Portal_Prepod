@@ -22,12 +22,13 @@ export const DependentInsurance = () => {
   const { UpdateDIData } = UpdateDepInsDataFun();
   const [notification, setNotification] = useState(false);
   const { searchResultData } = useOutletContext();
-
+  const [selectedNationality, setSelectedNationality] = useState("");
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
+    watch,
   } = useForm({
     resolver: yupResolver(DependentInsuranceSchema),
     defaultValues: {
@@ -47,7 +48,7 @@ export const DependentInsurance = () => {
     const newField = { id: Date.now() };
     setDepInsurance((prev) => [...prev, newField]);
   };
-
+  const watchedEmpID = watch("empID");
   const handleRemoveFileClick = (index) => {
     const newFields = depInsurance.filter((_, i) => i !== index);
     setDepInsurance(newFields);
@@ -55,6 +56,11 @@ export const DependentInsurance = () => {
   };
 
   const handleFileChange = async (e, type, index) => {
+    if (!watchedEmpID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/insuranceAdd/dependentInsurance";
+      return;
+    }
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
     // Allowed file types
@@ -67,7 +73,13 @@ export const DependentInsurance = () => {
     setValue(`depInsurance[${index}].depenInfUpload`, selectedFile);
 
     try {
-      await uploadDocs(selectedFile, type, setUploadedDocs, index);
+      await uploadDocs(
+        selectedFile,
+        type,
+        setUploadedDocs,
+        watchedEmpID,
+        index
+      );
 
       setUploadedFileDep((prev) => ({
         ...prev,
@@ -77,14 +89,12 @@ export const DependentInsurance = () => {
       console.log(err);
     }
   };
-  // console.log(uploadedDocs);
-  const extractFileName = (url) => {
-    const decodedUrl = decodeURIComponent(url);
-    const fileNameWithExtension = decodedUrl.split("/").pop(); // Get the last part after '/'
 
-    return fileNameWithExtension;
+  
+
+  const handleNationalityChange = (e) => {
+    setSelectedNationality(e.target.value);
   };
-
   useEffect(() => {
     setValue("empID", searchResultData?.empID);
 
@@ -135,21 +145,13 @@ export const DependentInsurance = () => {
       }
     }
   }, [searchResultData]);
-  console.log(uploadedDocs);
 
-  function getFileName(url) {
-    const urlObj = new URL(url);
-    const filePath = urlObj.pathname;
 
-    const decodedUrl = decodeURIComponent(filePath);
-
-    // Extract the file name after the last '/' in the path
-    const fileNameWithExtension = decodedUrl.substring(
-      decodedUrl.lastIndexOf("/") + 1
-    );
-
-    return fileNameWithExtension;
-  }
+  const getFileName = (filePath) => {
+    const fileNameWithExtension = filePath.split("/").pop(); // Get file name with extension
+    const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
+    return fileName;
+  };
 
   const onSubmit = async (data) => {
     console.log(data);
@@ -173,7 +175,7 @@ export const DependentInsurance = () => {
           id: checkingDITable.id,
         };
 
-        console.log(depValue, "updatex");
+        // console.log(depValue, "updatex");
         await UpdateDIData({ depValue });
         setShowTitle("Dependent Insurance Info Updated successfully");
         setNotification(true);
@@ -189,7 +191,7 @@ export const DependentInsurance = () => {
           }),
         };
 
-        console.log(depValue, "create");
+        // console.log(depValue, "create");
 
         await SubmitMPData({ depValue });
         setShowTitle("Dependent Insurance Info saved successfully");
@@ -287,11 +289,14 @@ export const DependentInsurance = () => {
                 register={register}
                 errors={errors}
                 index={index}
+                watch={watch}
+                selectedNationality={selectedNationality}
+                handleNationalityChange={handleNationalityChange}
               />
 
               <div className="grid grid-cols-3 gap-10">
                 <div>
-                  <label className="flex items-center px-3 py-2 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer">
+                  <label className="flex items-center px-3 py-3 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer">
                     Upload
                     <input
                       type="file"
@@ -309,10 +314,10 @@ export const DependentInsurance = () => {
                     {uploadedFileDep[index]}
                   </p>
                   {errors?.depenInfUpload && (
-      <p className="text-red text-sm">
-        {errors.depenInfUpload.message}
-      </p>
-    )}
+                    <p className="text-red text-sm">
+                      {errors.depenInfUpload.message}
+                    </p>
+                  )}
                 </div>
               </div>
 

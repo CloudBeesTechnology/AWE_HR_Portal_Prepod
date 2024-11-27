@@ -15,6 +15,7 @@ import {
   Icon,
   ScrollView,
   Text,
+  TextAreaField,
   TextField,
   useTheme,
 } from "@aws-amplify/ui-react";
@@ -306,14 +307,14 @@ export default function DNDetailsCreateForm(props) {
     doeEmpApproval: [],
     doeEmpValid: [],
     doeEmpRefNo: [],
-    doeEmpUpload: [],
+    doeEmpUpload: [{ type: "JSON" }],
     permitType: [],
     nlmsEmpSubmit: [],
     nlmsEmpSubmitRefNo: [],
     nlmsEmpApproval: [],
     nlmsRefNo: [],
     nlmsEmpValid: [],
-    nlmsEmpUpload: [],
+    nlmsEmpUpload: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -716,7 +717,7 @@ export default function DNDetailsCreateForm(props) {
         inputFieldRef={doeEmpUploadRef}
         defaultFieldValue={""}
       >
-        <TextField
+        <TextAreaField
           label="Doe emp upload"
           isRequired={false}
           isReadOnly={false}
@@ -736,7 +737,7 @@ export default function DNDetailsCreateForm(props) {
           ref={doeEmpUploadRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "doeEmpUpload")}
-        ></TextField>
+        ></TextAreaField>
       </ArrayField>
       <ArrayField
         onChange={async (items) => {
@@ -1136,7 +1137,7 @@ export default function DNDetailsCreateForm(props) {
         inputFieldRef={nlmsEmpUploadRef}
         defaultFieldValue={""}
       >
-        <TextField
+        <TextAreaField
           label="Nlms emp upload"
           isRequired={false}
           isReadOnly={false}
@@ -1156,7 +1157,7 @@ export default function DNDetailsCreateForm(props) {
           ref={nlmsEmpUploadRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "nlmsEmpUpload")}
-        ></TextField>
+        ></TextAreaField>
       </ArrayField>
       <Flex
         justifyContent="space-between"

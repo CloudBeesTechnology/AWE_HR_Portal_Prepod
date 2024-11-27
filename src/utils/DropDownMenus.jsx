@@ -53,11 +53,22 @@ export const NationalityDD = [
   { value: "Other", label: "Other" },
 ];
 
+// export const ContractTypeDD = [
+//   { value: "Local", label: "LOCAL" },
+//   { value: "LPA", label: "LPA" },
+//   { value: "SAWP", label: "SAWP" },
+// ];
+// export const EmpTypeDD = [
+//   { value: "Onshore", label: "OnShore" },
+//   { value: "Offshore", label: "OffShore" },
+// ];
+
 export const ContractTypeDD = [
-  { value: "Local", label: "LOCAL" },
+  { value: "Local", label: "Local" },
   { value: "LPA", label: "LPA" },
   { value: "SAWP", label: "SAWP" },
 ];
+
 export const EmpTypeDD = [
   { value: "Onshore", label: "OnShore" },
   { value: "Offshore", label: "OffShore" },
@@ -162,7 +173,7 @@ export const JobCatDD = [
 export const workInfoUploads = [
   { label: "Contract", icon: <GoUpload />, title: "WIContract" },
   { label: "Probation", icon: <GoUpload />, title: "WIProbation" },
-  { label: "Resignation", icon: <GoUpload />, title: "WIResignation"},
+  { label: "Resignation", icon: <GoUpload />, title: "WIResignation" },
   { label: "Termination", icon: <GoUpload />, title: "WITermination" },
-  { label: "Leave Entitlement", icon: <GoUpload /> ,title: "WILeaveEntitle"},
+  { label: "Leave Entitlement", icon: <GoUpload />, title: "WILeaveEntitle" },
 ];

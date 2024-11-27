@@ -12,7 +12,7 @@ import { DataSupply } from '../../../utils/DataStoredContext';
 import { useContext } from 'react';
 import { UpdateImmigra } from '../../../services/updateMethod/UpdateImmigra';
 
-export const Immigration = () => {
+export const Immigration = ({empID}) => {
   const { searchResultData } = useOutletContext();
 
   useEffect(() => {
@@ -24,10 +24,23 @@ export const Immigration = () => {
 
   const { register, handleSubmit,watch, formState: { errors }, setValue } = useForm({
     resolver: yupResolver(ImmigEmpSchema),
+    arrivStampExp: [],
+    empPassExp: [],
+    immigApproval: [],
+    ppSubmit: [],
+    reEntryVisaExp: [],
+
   });
   
   const [notification, setNotification] = useState(false);
   const [showTitle,setShowTitle]=useState("")
+  const [arrivStampExps, setArrivStampExp] = useState([]);
+  const [empPassExps, setEmpPassExp] = useState([]);
+  const [immigApprovals, setImmigApproval] = useState([]);
+  const [ppSubmits, setPpSubmit] = useState([]);
+  const [reEntryVisaExps, setReEntryVisaExp] = useState([]);
+
+
   const [uploadedFileNames, setUploadedFileNames] = useState({
     arrivStampUpload: null,
     immigEmpUpload: null,
@@ -50,17 +63,57 @@ export const Immigration = () => {
     return ""; 
   };
 
-  const getFileName = (url) => {
-    const urlObj = new URL(url);
-    const filePath = urlObj.pathname;
-    const decodedUrl = decodeURIComponent(filePath);
+  const arrive = () => setArrivStampExp([...arrivStampExp, ""])
+  const addEmpPassExp = () => setEmpPassExp([...empPassExp, ""]);
+  const addImmigApproval = () => setImmigApproval([...immigApproval, ""]);
+  const addPpSubmit = () => setPpSubmit([...ppSubmit, ""]);
+  const addReEntryVisaExp = () => setReEntryVisaExp([...reEntryVisaExp, ""]);
 
-    const fileNameWithExtension = decodedUrl.substring(
-      decodedUrl.lastIndexOf("/") + 1
-    );
-
-    return fileNameWithExtension;
+  const getFileName = (input) => {
+    // Check if input is an object and has the 'upload' property
+    if (typeof input === 'object' && input.upload) {
+      const filePath = input.upload;  // Extract the 'upload' path
+  
+      // Decode the URL path
+      const decodedUrl = decodeURIComponent(filePath);
+  
+      // Extract the file name from the path
+      const fileNameWithExtension = decodedUrl.substring(
+        decodedUrl.lastIndexOf("/") + 1
+      );
+  
+      return fileNameWithExtension;
+    }
+  
+    // If input is a string (URL), use the URL constructor
+    try {
+      const urlObj = new URL(input);  // Attempt to create a URL object
+      const filePath = urlObj.pathname;  // Extract path from URL
+  
+      // Decode the URL path
+      const decodedUrl = decodeURIComponent(filePath);
+  
+      // Extract the file name from the path
+      const fileNameWithExtension = decodedUrl.substring(
+        decodedUrl.lastIndexOf("/") + 1
+      );
+  
+      return fileNameWithExtension;
+    } catch (e) {
+      // Handle invalid URL (fall back to file path processing if URL fails)
+      if (typeof input === 'string') {
+        const decodedUrl = decodeURIComponent(input);
+        const fileNameWithExtension = decodedUrl.substring(
+          decodedUrl.lastIndexOf("/") + 1
+        );
+        return fileNameWithExtension;
+      }
+  
+      // If it's neither an object nor a valid URL string, return undefined or handle as needed
+      return undefined;
+    }
   };
+  
 
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
@@ -107,7 +160,7 @@ export const Immigration = () => {
     parseUploadField("reEntryUpload");
   }, [searchResultData, setValue]);
   
-  const handleFileChange = async (e, label) => {
+  const handleFileChange = async (e, label, empID) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
 
@@ -117,6 +170,13 @@ export const Immigration = () => {
       "image/png",
       "image/jpg",
     ];
+
+    if (!empID) {
+      alert("Employee ID is required to upload files.");
+      window.location.reload();
+      return;
+    }
+
     if (!allowedTypes.includes(selectedFile.type)) {
       alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
       return;
@@ -126,7 +186,7 @@ export const Immigration = () => {
     setValue(label, [...currentFiles, selectedFile]);
 
     try {
-      await uploadDocs(selectedFile, label, setUploadedImmigrate);
+      await uploadDocs(selectedFile, label, setUploadedImmigrate, empID);
       setUploadedFileNames((prev) => ({
         ...prev,
         [label]: selectedFile.name, // Store just the file name
@@ -150,21 +210,58 @@ export const Immigration = () => {
 
 
       if (checkingEIDTable) {
+
+        const updatedArrivedDate = [
+          ...new Set([
+            ...(checkingEIDTable.arrivStampExp || []), // ensure it's an array before spreading
+            arrivStampExp
+          ]),
+        ];
+
+        const updatedPassportSubmit = [
+          ...new Set([
+            ...(checkingEIDTable.ppSubmit || []),
+            ppSubmit
+          ])
+        ];
+
+        const updatedPassportExpiry = [
+          ...new Set([
+            ...(checkingEIDTable.empPassExp || []),
+            empPassExp
+
+          ])
+        ]
+
+        const updatedImmigration = [
+          ...new Set([
+            ...(checkingEIDTable.immigApproval || []),
+            immigApproval
+          ])
+        ]
+
+        const updatedReEntry = [
+          ...new Set([
+            ...(checkingEIDTable.reEntryVisaExp || []),
+            reEntryVisaExp
+          ])
+        ]
+
         const UpImmiValue = {
           ...data,
-          arrivStampExp,
-          ppSubmit,
-          empPassExp,
-          immigApproval,
-          reEntryVisaExp,
+          arrivStampExp: updatedArrivedDate.map(formatDate),
+          ppSubmit: updatedPassportSubmit.map(formatDate),
+          empPassExp: updatedPassportExpiry.map(formatDate),
+          immigApproval: updatedImmigration.map(formatDate),
+          reEntryVisaExp: updatedReEntry.map(formatDate),
           arrivStampUpload: JSON.stringify(uploadedImmigrate.arrivStampUpload), // Use the uploaded URL
           immigEmpUpload: JSON.stringify(uploadedImmigrate.immigEmpUpload), 
           reEntryUpload: JSON.stringify(uploadedImmigrate.reEntryUpload), 
           id: checkingEIDTable.id,
         };
-        console.log(UpImmiValue);
+        // console.log(UpImmiValue);
         await UpdateImmigraData({ UpImmiValue });
-        setShowTitle("Work Pass Immigration Info Update successfully")
+        setShowTitle("Work Pass Immigration Info Updated successfully")
         setNotification(true);
       } else {
         const ImmiValue = {
@@ -234,7 +331,7 @@ export const Immigration = () => {
         />
         <FileUploadField
           label="Upload File"
-          onChangeFunc={(e) => handleFileChange(e, "arrivStampUpload")}
+          onChangeFunc={(e) => handleFileChange(e, "arrivStampUpload", empID)}
           name="arrivStampUpload"
           register={register}
           error={errors}

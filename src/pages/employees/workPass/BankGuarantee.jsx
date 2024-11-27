@@ -23,10 +23,21 @@ export const BankGuarantee = () => {
   }, []);
   const { register, handleSubmit,watch, formState: { errors }, setValue } = useForm({
     resolver: yupResolver(BankEmpSchema),
+     bankSubmit: [],
+     bankRece: [],
+     bankValid: [],
+     bankEndorse: [],
   });
   
+
+  const [bankSubmits, setBankSubmit] = useState([]);
+  const [bankReces, setBankRece] = useState([]);
+  const [bankValids, setBankValids] = useState([]);
+  const [bankEndorses, setBankEndorse] = useState([]);
+  const [empID, setEmpID] = useState("");
   const [notification, setNotification] = useState(false);
   const [showTitle,setShowTitle]=useState("")
+
   const [uploadedFileNames, setUploadedFileNames] = useState({
     bankEmpUpload: null,
   });
@@ -44,17 +55,75 @@ export const BankGuarantee = () => {
     return ""; 
   };
 
-  const getFileName = (url) => {
-    const urlObj = new URL(url);
-    const filePath = urlObj.pathname;
-    const decodedUrl = decodeURIComponent(filePath);
+  const approvalDate = () => setBankRece([...bankRece, ""]);
+  const submissionDate = () => setBankSubmit([...bankSubmit, ""]);
+  const validDate = () => setBankValids([...bankValid, ""]);
+  const bankEndor = () => setBankEndorse([...bankEndorse, ""]);
 
-    const fileNameWithExtension = decodedUrl.substring(
-      decodedUrl.lastIndexOf("/") + 1
-    );
+  // const getFileName = (url) => {
+  //   const urlObj = new URL(url);
+  //   const filePath = urlObj.pathname;
+  //   const decodedUrl = decodeURIComponent(filePath);
 
-    return fileNameWithExtension;
+  //   const fileNameWithExtension = decodedUrl.substring(
+  //     decodedUrl.lastIndexOf("/") + 1
+  //   );
+
+  //   return fileNameWithExtension;
+  // };
+
+  const getFileName = (input) => {
+    // Check if input is an object and has the 'upload' property
+    if (typeof input === 'object' && input.upload) {
+      const filePath = input.upload;  // Extract the 'upload' path
+  
+      // Decode the URL path
+      const decodedUrl = decodeURIComponent(filePath);
+  
+      // Extract the file name from the path
+      const fileNameWithExtension = decodedUrl.substring(
+        decodedUrl.lastIndexOf("/") + 1
+      );
+  
+      return fileNameWithExtension;
+    }
+  
+    // If input is a string (URL), use the URL constructor
+    try {
+      const urlObj = new URL(input);  // Attempt to create a URL object
+      const filePath = urlObj.pathname;  // Extract path from URL
+  
+      // Decode the URL path
+      const decodedUrl = decodeURIComponent(filePath);
+  
+      // Extract the file name from the path
+      const fileNameWithExtension = decodedUrl.substring(
+        decodedUrl.lastIndexOf("/") + 1
+      );
+  
+      return fileNameWithExtension;
+    } catch (e) {
+      // Handle invalid URL (fall back to file path processing if URL fails)
+      if (typeof input === 'string') {
+        const decodedUrl = decodeURIComponent(input);
+        const fileNameWithExtension = decodedUrl.substring(
+          decodedUrl.lastIndexOf("/") + 1
+        );
+        return fileNameWithExtension;
+      }
+  
+      // If it's neither an object nor a valid URL string, return undefined or handle as needed
+      return undefined;
+    }
   };
+  
+
+  useEffect(() => {
+    const userID = localStorage.getItem("userID");
+    setEmpID(userID);
+    console.log("Navbar: User ID from localStorage:", userID);
+  }, []);
+
 
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
@@ -95,7 +164,7 @@ export const BankGuarantee = () => {
     
   }, [searchResultData, setValue]);
 
-  const handleFileChange = async (e, label) => {
+  const handleFileChange = async (e, label, empID) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
 
@@ -105,6 +174,14 @@ export const BankGuarantee = () => {
       "image/png",
       "image/jpg",
     ];
+
+      // Check for empID before proceeding with the upload
+  if (!empID) {
+    alert("Employee ID is required to upload files.");
+    window.location.reload();
+    return;
+  }
+
     if (!allowedTypes.includes(selectedFile.type)) {
       alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
       return;
@@ -114,7 +191,7 @@ export const BankGuarantee = () => {
     setValue(label, [...currentFiles, selectedFile]);
 
     try {
-      await uploadDocs(selectedFile, label, setUploadBG);
+      await uploadDocs(selectedFile, label, setUploadBG, empID);
       setUploadedFileNames((prev) => ({
         ...prev,
         [label]: selectedFile.name, // Store just the file name
@@ -124,6 +201,7 @@ export const BankGuarantee = () => {
     }
   };
 
+  console.log("file",uploadBG);
 
   const onSubmit = async (data) => {    
     try {
@@ -136,18 +214,48 @@ export const BankGuarantee = () => {
     const bankValid= formatDate(data.bankValid);
  
       if (checkingEIDTable) {
+
+        const updatedSubmissionDate = [
+          ...new Set([
+            ...(checkingEIDTable.bankSubmit || []), // ensure it's an array before spreading
+            bankSubmit
+          ]),
+        ];
+  
+        const updatedReceDate = [
+          ...new Set([
+            ...(checkingEIDTable.bankRece || []), // ensure it's an array before spreading
+            bankRece
+          ]),
+        ];
+  
+        const updatedBankValidDate = [
+          ...new Set([
+            ...(checkingEIDTable.bankValid || []), // ensure it's an array before spreading
+            bankValid
+          ]),
+        ];
+
+        const updatedBankEndorse = [
+          ...new Set([
+            ...(checkingEIDTable.bankEndorse || []), // ensure it's an array before spreading
+            bankEndorse
+          ]),
+        ];
+
+
         const BJLUpValue = {
           ...data,
-          bankEndorse,
-          bankRece,
-          bankSubmit,
-          bankValid,
+          bankEndorse: updatedBankEndorse.map(formatDate),
+          bankRece: updatedReceDate.map(formatDate),
+          bankSubmit: updatedSubmissionDate.map(formatDate),
+          bankValid: updatedBankValidDate.map(formatDate),
           bankEmpUpload: JSON.stringify(uploadBG.bankEmpUpload),
           id: checkingEIDTable.id,
         };
-        console.log(BJLUpValue);
+        // console.log("Updated bank Data:", BJLUpValue);
         await UpdateBJLFun({ BJLUpValue });
-        setShowTitle("Work Pass Bank Guarantee Info Update Successfully")
+        setShowTitle("Work Pass Bank Guarantee Info Updated Successfully")
       setNotification(true);
       } else {
         const BJLValue = {
@@ -159,18 +267,17 @@ export const BankGuarantee = () => {
           bankEmpUpload: JSON.stringify(uploadBG.bankEmpUpload),
  
         };
-        console.log(BJLValue);
+        // console.log(BJLValue);
         
         await BGData({ BJLValue });
         setShowTitle("Work Pass Bank Guarantee Info Saved Successfully")
         setNotification(true);
       }
-      setNotification(true);
+      
     } catch (error) {
       console.log(error);
       
-      console.error("Error submitting data:", error);
-      setNotification(true); // Optionally show an error notification
+     
     }
   };
 
@@ -237,7 +344,7 @@ export const BankGuarantee = () => {
 <div>
         <FileUploadField
           label="Upload File"
-          onChangeFunc={(e) => handleFileChange(e, "bankEmpUpload")}
+          onChangeFunc={(e) => handleFileChange(e, "bankEmpUpload", empID)}
           register={register}
           error={errors}
           fileName={
