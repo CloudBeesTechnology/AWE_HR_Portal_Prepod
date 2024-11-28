@@ -33,38 +33,6 @@ export const ScheduleInter = ({ candidate, onClose, onSave }) => {
     await createSchedule(formattedData);
   });
 
-  // // Handle form submission
-  // const onSubmit = handleSubmit(async (data) => {
-  //   // Format the data before sending it to the backend
-  //   const formattedData = {
-  //     ...data,
-  //     date: new Date(data.date).toISOString().split("T")[0], // Ensure the date is in the correct format
-  //     tempID: candidate.tempID,  // Ensure the candidate's temporary ID is included
-  //     candidateStatus: "pending",  // Default status is 'pending'
-  //   };
-  
-  //   // Log the formatted data to the console before sending it to the backend
-  //   console.log("Formatted Data:", formattedData);
-  
-  //   // Make the API call to store the data
-  //   try {
-  //     const res = await client.graphql({
-  //       query: createInterviewScheduleSchema,
-  //       variables: { input: formattedData },
-  //     });
-  
-  //     // Log the response from the backend to verify the data was stored correctly
-  //     console.log("API Response:", res);
-  
-  //     // Assuming successful API call, set notification to true
-  //     setNotification(true);
-  
-  //   } catch (err) {
-  //     // Log any errors from the API call
-  //     console.log("Error during API call:", err);
-  //   }
-  // });
-  
   return (
     <section className="min-h-screen bg-opacity-80 w-full center">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-[400px] overflow-y-auto ">

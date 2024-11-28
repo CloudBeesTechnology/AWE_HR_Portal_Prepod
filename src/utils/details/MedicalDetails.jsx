@@ -4,6 +4,7 @@ import { Document, Page } from "react-pdf"; // For PDF viewing
 import { FaTimes, FaPrint, FaDownload } from "react-icons/fa"; // Icons for close, print, and download
 import "react-pdf/dist/esm/Page/TextLayer.css";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+import { getUrl } from "@aws-amplify/storage";
 
 const MedicalDetails = ({
   medicalInfo,
@@ -18,6 +19,19 @@ const MedicalDetails = ({
   const [viewingDocument, setViewingDocument] = useState(null); // Track which document is being viewed
   const [pageNumber, setPageNumber] = useState(1);
   const [numPages, setNumPages] = useState(1);
+  const [lastUploadUrl, setPPLastUP] = useState(""); // State to store the last uploaded file's URL
+
+  // Helper function to fetch the cloud URL
+  const linkToStorageFile = async (pathUrl) => {
+    try {
+      const result = await getUrl({ path: pathUrl });
+      console.log("File URL:", result.url.href); // Use .href to extract the URL as a string
+      setPPLastUP(result.url.href); // Store the URL as a string
+      setViewingDocument(pathUrl); // Update the state to show the selected document
+    } catch (error) {
+      console.error("Error fetching the file URL:", error);
+    }
+  };  
 
   // Function to handle closing the viewer
   const handleCloseViewer = () => {
@@ -25,21 +39,32 @@ const MedicalDetails = ({
     setViewingDocument(null);
   };
 
-  // Function to parse documents (handling possible JSON strings)
-    // Function to safely parse document data
-    const parseDocuments = (docData) => {
+     // Function to parse the uploaded document  r.}Y{44pFik2
+     const parseDocuments = (docData) => {
       try {
-        // Check if docData is already an object. If it's a string, attempt to parse it.
-        const parsedData = typeof docData === 'string' ? JSON.parse(docData) : docData;
-        
-        // Ensure the parsedData is an array
-        return Array.isArray(parsedData) ? parsedData : [];
+        // Check if docData is already an object or array
+        if (typeof docData === "string") {
+          docData = JSON.parse(docData); // Parse only if it's a string
+        }
+    
+        // Proceed if docData is an array
+        if (Array.isArray(docData)) {
+          return docData.map((doc) => {
+            if (doc.upload) {
+              doc.fileName = doc.upload.split("/").pop(); // Extract file name from path
+            }
+            return doc;
+          });
+        }
+    
+        // Return empty array if docData is not an array
+        return [];
       } catch (error) {
         console.error("Error parsing document data:", error);
         return [];
       }
     };
-
+    
     
   let dependData = [];
 
@@ -69,81 +94,13 @@ const MedicalDetails = ({
     setNumPages(numPages);
   };
 
-//   const parsedDependPass = medicalInfo.dependPass && Array.isArray(medicalInfo.dependPass)
-//   ? medicalInfo.dependPass
-//       .map((dependStr) => {
-//         // Ensure we are only parsing strings that are JSON strings
-//         return typeof dependStr === "string" ? JSON.parse(dependStr) : dependStr;
-//       })
-//       .flat(Infinity) // This will flatten all nested arrays if necessary
-//   : [];
-
-// // console.log("Parsed DependPass after flattening:", JSON.parse(parsedDependPass));
-
-// // Helper function to check if a string is valid JSON
-// const isValidJson = (str) => {
-//   try {
-//     JSON.parse(str);
-//     return true;
-//   } catch (e) {
-//     return false;
-//   }
-// };
-
-// // Check if parsedDependPass is a valid JSON string
-// let myData = [];
-
-// if (parsedDependPass && isValidJson(parsedDependPass)) {
-//   myData = JSON.parse(parsedDependPass);
-// } else {
-//   console.error("Invalid or empty JSON string:", parsedDependPass);
-// }
-
-
-// // const result= myData.map((m,ind)=>{
-// // return m.uploadDp && m.uploadDr;
-// // });
-
-// // Safely map over `myData` if it's defined and an array
-// const result = Array.isArray(myData) ? myData.map((m, ind) => {
-//   // Check that each item in `myData` contains the expected properties
-//   return m && m.uploadDp && m.uploadDr;
-// }) : [];  // Return an empty array if `myData` is not an array
-
-// // Log the result to verify
-// console.log(result);
-
-
-// // const uploadDpData=result[0].map((val,i)=>{
-// //   return JSON.stringify([val]);
-// // });
-
-
-// // console.log(uploadDpData, "rst")
-// // const uploaddrData=result[0].map((val,i)=>{
-// //   return JSON.stringify([val]);
-// // });
-// // Ensure result[0] is an array before calling .map() on it
-// const uploadDpData = Array.isArray(result[0]) ? result[0].map((val, i) => {
-//   return JSON.stringify([val]);
-// }) : []; // Fallback to an empty array if result[0] is not an array
-
-// console.log(uploadDpData, "rst");
-
-// // Similarly for uploaddrData
-// const uploaddrData = Array.isArray(result[0]) ? result[0].map((val, i) => {
-//   return JSON.stringify([val]);
-// }) : [];
-
-
  // Parse the document data for uploads
  const parsedFitness = parseDocuments(uploadFitness);
  const parsedBwn = parseDocuments(uploadBwn);
  const parsedRegis = parseDocuments(uploadRegis);
  
 
- console.log("dp", dependPass)
- 
+ console.log("dp", dependPass);
 
   // Function to render documents
   const renderDocumentsUnderCategory = (documents, category) => {
@@ -159,7 +116,7 @@ const MedicalDetails = ({
                 Uploaded on: {document.date}
               </span>
               <button
-                onClick={() => setViewingDocument(document.upload)} // Set document to be viewed
+                onClick={() => linkToStorageFile(document.upload)} // Set document to be viewed
                 className="text-blue-600 hover:text-blue-800"
               >
                 View Document
@@ -171,7 +128,7 @@ const MedicalDetails = ({
               <div className="mt-4">
                 <div className="relative bg-white max-w-3xl mx-auto p-6 rounded-lg shadow-lg">
                   <Document
-                    file={document.upload}
+                    file={lastUploadUrl}
                     onLoadSuccess={onDocumentLoadSuccess}
                     className="w-full"
                   >
@@ -213,7 +170,7 @@ const MedicalDetails = ({
                 <div className="flex items-center justify-center gap-6 py-4">
                   <div className="mt-2 flex">
                     <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
-                      <a href={document.upload} download>
+                      <a href={lastUploadUrl} download>
                         Download
                       </a>
                       <FaDownload className="ml-2 mt-1" />
@@ -236,7 +193,7 @@ const MedicalDetails = ({
             {viewingDocument === document.upload && !document.upload.endsWith(".pdf") && (
               <div ref={invoiceRef} className="relative mt-4">
                 <img
-                  src={document.upload}
+                  src={lastUploadUrl}
                   alt="Document Preview"
                   className="w-full h-auto"
                 />
@@ -253,7 +210,7 @@ const MedicalDetails = ({
                 <div className="flex items-center justify-center gap-6 py-4">
                   <div className="mt-2 flex">
                     <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
-                      <a href={document.upload} download>
+                      <a href={lastUploadUrl} download>
                         Download
                       </a>
                       <FaDownload className="ml-2 mt-1" />
@@ -292,6 +249,46 @@ const MedicalDetails = ({
     );
   };
 
+    // Updated rendering for personal details to handle arrays
+    const renderPersonalDetails = () => {
+      return (
+        <div className="grid grid-cols-3 gap-y-4 items-center">
+          {Object.entries(medicalInfo).map(([key, value], index) => (
+            <React.Fragment key={index}>
+              <span className="text-gray-800">{key}</span>
+              <span className="text-center text-gray-700">:</span>
+              <span className="text-gray-800">
+                {Array.isArray(value) ? (
+                  // Step 1: Rearrange the array, making the latest value the first element
+                  value.length > 1 ? (
+                    // Move the last element to the front and map through the array
+                    value
+                      .slice(-1) // Get the last element
+                      .concat(value.slice(0, -1)) // Concatenate the rest of the array after the last element
+                      .map((item, idx) => (
+                        <span
+                          key={idx}
+                          className={`${
+                            idx === 0 ? 'text-[#0CB100]' : '' // Highlight the last value
+                          }`}
+                        >
+                          {item}
+                          {idx < value.length - 1 && ', '} {/* Add a comma except for the last item */}
+                        </span>
+                      ))
+                  ) : (
+                    value
+                  )
+                ) : (
+                  value || "N/A"
+                )}
+              </span>
+            </React.Fragment>
+          ))}
+        </div>
+      );
+    };
+
   return (
     <section ref={invoiceRef} className="py-8 bg-gray-50 rounded-lg">
       <h6 className="uppercase text-xl font-semibold text-dark_grey mb-6">Medical Details:</h6>
@@ -299,18 +296,7 @@ const MedicalDetails = ({
       {/* Personal Info Section */}
       <div className="flex flex-col md:flex-row items-start justify-between gap-8">
         <div className="flex-1">
-          <div className="grid grid-cols-3 gap-y-4 gap-x-2">
-            {Object.entries(medicalInfo).map(([key, value], index) => {
-              if (key === "dependPass") return null; // Skip dependPass, handle separately
-              return (
-                <React.Fragment key={index}>
-                  <span className="text-gray-800">{key}</span>
-                  <span className="text-center text-gray-700">:</span>
-                  <span className="text-gray-800">{value || "N/A"}</span>
-                </React.Fragment>
-              );
-            })}
-          </div>
+           <div className="flex-1">{renderPersonalDetails()}</div>
         </div>
       </div>
 

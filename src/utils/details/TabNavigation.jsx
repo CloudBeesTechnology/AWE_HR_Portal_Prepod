@@ -3,7 +3,7 @@ import React from 'react';
 const TabNavigation = ({ activeTab, handleTabClick }) => {
   const tabs = [
     "Personal Details",
-    "Educational Details",
+    // "Educational Details",
     "Family Details",
     "Medical Details",
     "Non-Local Accommodation Details",

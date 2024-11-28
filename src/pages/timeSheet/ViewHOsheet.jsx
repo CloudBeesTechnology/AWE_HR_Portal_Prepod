@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
-import { createHeadOffice, updateHeadOffice } from "../../graphql/mutations";
+import {
+  createHeadOffice,
+  deleteBlng,
+  deleteHeadOffice,
+  updateHeadOffice,
+} from "../../graphql/mutations";
 import { generateClient } from "@aws-amplify/api";
 import { EditTimeSheet } from "./EditTimeSheet";
 import { PopupForSFApproves } from "./ModelForSuccessMess/PopupForSFApproves";
@@ -9,6 +14,14 @@ import { MdCancel } from "react-icons/md";
 import { SuccessMessage } from "./ModelForSuccessMess/SuccessMessage";
 import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
 import { PopupForMissMatchExcelSheet } from "./ModelForSuccessMess/PopupForMissMatchExcelSheet";
+import {
+  listEmpPersonalInfos,
+  listEmpWorkInfos,
+  listHeadOffices,
+} from "../../graphql/queries";
+import { userTableMerged } from "./customTimeSheet/UserTableMerged";
+import "../../../src/index.css";
+import { useScrollableView } from "./customTimeSheet/UseScrollableView";
 const client = generateClient();
 
 export const ViewHOsheet = ({
@@ -20,6 +33,7 @@ export const ViewHOsheet = ({
   titleName,
 }) => {
   const [data, setData] = useState(null);
+  const [secondaryData, setSecondaryData] = useState(null);
   const [editObject, setEditObject] = useState();
   const [toggleHandler, setToggleHandler] = useState(false);
   const [currentStatus, setCurrentStatus] = useState(null);
@@ -28,65 +42,148 @@ export const ViewHOsheet = ({
   const [userIdentification, setUserIdentification] = useState("");
   const [showStatusCol, setShowStatusCol] = useState(null);
   const [successMess, setSuccessMess] = useState(null);
-  const ITEMS_PER_PAGE = 50; // Initial number of items to display
-  const [visibleData, setVisibleData] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  // const fetchAllData = async () => {
+  //   let allItems = [];
+  //   let nextToken = null;
+
+  //   do {
+  //     const response = await client.graphql({
+  //       query: listHeadOffices,
+  //       variables: { limit: 40000, nextToken }, // Increase limit as needed
+  //     });
+
+  //     const fetchedItems = response?.data?.listHeadOffices?.items || [];
+  //     allItems = [...allItems, ...fetchedItems];
+  //     nextToken = response?.data?.listHeadOffices?.nextToken;
+  //   } while (nextToken); // Fetch until there are no more pages
+
+  //   return allItems;
+  // };
+
+  // useEffect(async () => {
+  //   const result = await fetchAllData();
+  //   console.log(result);
+  // }, []);
+  // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+  // const ITEMS_PER_PAGE = 50; // Initial number of items to display
+  // const [visibleData, setVisibleData] = useState([]);
+  // const [currentPage, setCurrentPage] = useState(1);
+  // %%%%%%%%%%%%%%%
+  // useEffect(() => {
+  //   // Load initial data
+  //   if (data && data.length > 0) {
+  //     console.log("WORKING");
+  //     setVisibleData(data.slice(0, ITEMS_PER_PAGE));
+  //   }
+  // }, [data]);
+  // console.log(titleName);
+  // const loadMoreData = useCallback(() => {
+  //   // Calculate new visible data when user scrolls down
+  //   const nextPage = currentPage + 1;
+  //   const start = currentPage * ITEMS_PER_PAGE;
+  //   const end = start + ITEMS_PER_PAGE;
+  //   const newItems = data.slice(start, end);
+
+  //   setVisibleData((prevData) => [...prevData, ...newItems]);
+  //   setCurrentPage(nextPage);
+  // }, [currentPage, data]);
+
+  // const handleScroll = (e) => {
+  //   const threshold = 5;
+  //   const bottomReached =
+  //     e.target.scrollHeight - e.target.scrollTop <=
+  //     e.target.clientHeight + threshold;
+
+  //   if (bottomReached) {
+  //     if (data && data.length > 0) {
+  //       loadMoreData();
+  //     }
+  //   }
+  // };
+  // &&&&&&&&&&&&&&&&
+
+  // useEffect(() => {
+  //   if (excelData) {
+  //     const fetchData = async () => {
+  //       // setLoading(true);
+
+  //       const dataPromise = new Promise((resolve, reject) => {
+  //         if (excelData) {
+  //           resolve(excelData);
+  //         } else {
+  //           setTimeout(() => {
+  //             reject("No data found after waiting.");
+  //           }, 5000);
+  //         }
+  //       });
+
+  //       const fetchedData = await dataPromise;
+
+  //       try {
+  //         const [empPersonalInfos, empPersonalDocs] = await Promise.all([
+  //           client.graphql({ query: listEmpPersonalInfos }),
+  //           client.graphql({ query: listEmpWorkInfos }),
+  //         ]);
+
+  //         const candidates =
+  //           empPersonalInfos?.data?.listEmpPersonalInfos?.items;
+  //         const interviews = empPersonalDocs?.data?.listEmpWorkInfos?.items;
+
+  //         const mergedData = candidates
+  //           .map((candidate) => {
+  //             const interviewDetails = interviews.find(
+  //               (item) => item.empID === candidate.empID
+  //             );
+
+  //             // Return null if all details are undefined
+  //             if (!interviewDetails) {
+  //               return null;
+  //             }
+
+  //             return {
+  //               ...candidate,
+  //               ...interviewDetails,
+  //             };
+  //           })
+  //           .filter((item) => item !== null);
+  //         console.log(mergedData);
+
+  //         const fetchWorkInfo = async () => {
+  //           const finalData = fetchedData?.map((item) => {
+  //             const workInfoItem = mergedData?.find(
+  //               (info) => info.empBadgeNo === item.BADGE
+  //             );
+  //             return {
+  //               ...item,
+  //               NORMALWORKINGHRSPERDAY: workInfoItem
+  //                 ? workInfoItem.workHrs[0]
+  //                 : null,
+  //             };
+  //           });
+  //           console.log("finalData : ", finalData);
+  //           setData(finalData);
+  //         };
+  //         fetchWorkInfo();
+  //       } catch (err) {
+  //         console.error("Error fetching data:", err.message);
+  //       }
+  //     };
+  //     fetchData();
+  //   }
+  // }, [excelData]);
+  const { handleScroll, visibleData, setVisibleData } = useScrollableView(
+    data,
+    Position
+  );
+  const processedData = userTableMerged(excelData);
+  console.log(Position);
   useEffect(() => {
-    // Load initial data
-    if (data && data.length > 0) {
-      console.log("WORKING");
-      setVisibleData(data.slice(0, ITEMS_PER_PAGE));
+    if (processedData && processedData.length > 0) {
+      setData(processedData);
+      setSecondaryData(processedData)
     }
-  }, [data, currentPage]);
-
-  const loadMoreData = useCallback(() => {
-    // Calculate new visible data when user scrolls down
-    const nextPage = currentPage + 1;
-    const start = currentPage * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE;
-    const newItems = data.slice(start, end);
-
-    setVisibleData((prevData) => [...prevData, ...newItems]);
-    setCurrentPage(nextPage);
-  }, [data]);
-
-  const handleScroll = (e) => {
-    const threshold = 5;
-    const bottomReached =
-      e.target.scrollHeight - e.target.scrollTop <=
-      e.target.clientHeight + threshold;
-
-    if (bottomReached) {
-      if (data && data.length > 0) {
-        loadMoreData();
-      }
-    }
-  };
-  useEffect(() => {
-    if (excelData) {
-      const fetchData = async () => {
-        // setLoading(true);
-        try {
-          const dataPromise = new Promise((resolve, reject) => {
-            if (excelData) {
-              resolve(excelData);
-            } else {
-              setTimeout(() => {
-                reject("No data found after waiting.");
-              }, 5000);
-            }
-          });
-
-          const fetchedData = await dataPromise;
-
-          // setForUpdateBlng(fetchedData);
-          setData(fetchedData);
-        } catch (err) {}
-      };
-      fetchData();
-    }
-  }, [excelData]);
-
+  }, [processedData]);
   useEffect(() => {
     const getPosition = localStorage.getItem("userType");
     if (getPosition === "Manager") {
@@ -96,14 +193,8 @@ export const ViewHOsheet = ({
     }
 
     // console.log(getPosition);
-  }, []);
+  }, [convertedStringToArrayObj]);
   const pendingData = (data) => {
-    // data &&
-    //   data.map((m) => {
-    //     console.log(m);
-    //   });
-    // console.log(data);
-
     if (data && data?.length > 0) {
       setCurrentStatus(true);
 
@@ -131,6 +222,9 @@ export const ViewHOsheet = ({
                 ALLDAYMINUTES: val.allDayMin || "",
                 NETMINUTES: val.netMin || "",
                 TOTALHOURS: val.totalHrs || "",
+                NORMALWORKINGHRSPERDAY: val?.normalWhrsPerDay || 0,
+                WORKINGHOURS: val?.workhrs || 0,
+                OT: val?.OT || 0,
                 TOTALACTUALHOURS: val.totalActHrs || "",
                 jobLocaWhrs: val?.jobLocaWhrs || [],
                 REMARKS: val.remarks || "",
@@ -143,11 +237,21 @@ export const ViewHOsheet = ({
       // console.log(result);
       console.log(result);
       setData(result);
+      setSecondaryData(result);
     }
   };
 
-  const searchResult = (result) => {
-    setData(result);
+  // const searchResult = (result) => {
+  //   setData(result);
+  // };
+  const searchResult = async (searchedData) => {
+    console.log(searchedData);
+    try {
+      const result = await searchedData;
+      setData(result);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
   };
 
   const cleanValue = (value) => {
@@ -322,7 +426,7 @@ export const ViewHOsheet = ({
   const AllfieldData = useTableFieldData(titleName);
 
   const renameKeysFunctionAndSubmit = async () => {
-    if (userIdentification === "TimeKeeper") {
+    if (userIdentification !== "Manager") {
       const result =
         data &&
         data.map((val) => {
@@ -344,6 +448,9 @@ export const ViewHOsheet = ({
             allDayMin: val.ALLDAYMINUTES || "",
             netMin: val.NETMINUTES || "",
             totalHrs: val.TOTALHOURS || "",
+            normalWhrsPerDay: val?.NORMALWORKINGHRSPERDAY || 0,
+            workhrs: val?.WORKINGHOURS || 0,
+            OT: val?.OT || 0,
             totalActHrs: val.TOTALACTUALHOURS || "",
             jobLocaWhrs: val?.jobLocaWhrs || [],
             remarks: val.REMARKS || "",
@@ -467,6 +574,9 @@ export const ViewHOsheet = ({
                 allDayMin: val.ALLDAYMINUTES || 0,
                 netMin: val.NETMINUTES || 0,
                 totalHrs: val.TOTALHOURS || 0,
+                normalWhrsPerDay: val?.NORMALWORKINGHRSPERDAY || 0,
+                workhrs: val?.WORKINGHOURS || 0,
+                OT: val?.OT || 0,
                 totalActHrs: val.TOTALACTUALHOURS || 0,
                 jobLocaWhrs: val?.jobLocaWhrs || [],
                 remarks: val.REMARKS || "",
@@ -520,126 +630,161 @@ export const ViewHOsheet = ({
           <div>
             <div className="flex justify-end mr-7">
               <SearchBoxForTimeSheet
-                excelData={excelData}
+                allEmpDetails={data}
                 searchResult={searchResult}
+                secondaryData={secondaryData}
+                Position={Position}
+                placeholder="Badge or Employee Id"
               />
             </div>
-            <div
-              className="mt-9 overflow-x-auto overflow-y-scroll max-h-[500px]"
-              onScroll={handleScroll}
-            >
-              <table className="table-auto text-center w-full">
-                <thead>
-                  <tr className="bg-lite_grey text-dark_grey text_size_5">
+            <div className="table-container" onScroll={handleScroll}>
+              <table className="styled-table">
+                <thead className="sticky-header">
+                  <tr className="text_size_5">
                     <td className="px-4 flex-1">S No.</td>
                     {AllfieldData?.tableHeader.map((header, index) => (
                       <td key={index} className="px-4 flex-1">
                         {header}
                       </td>
-                    ))}
+                    )) ?? (
+                      <tr>
+                        <td colSpan="100%" className="text-center">
+                          No headers available
+                        </td>
+                      </tr>
+                    )}
                     {showStatusCol === true ? (
                       ""
                     ) : (
-                      <td className="px-5 flex-">STATUS</td>
+                      <td className="px-5 flex-1">STATUS</td>
                     )}
                   </tr>
                 </thead>
                 <tbody>
-                  {visibleData && visibleData?.length > 0 ? (
-                    visibleData.map((value, index) => {
-                      const renderRows = (m, ind) => {
-                        const isStatusPending = m.status === "Pending";
-                        return (
-                          <tr
-                            key={
-                              userIdentification === "Manager"
-                                ? ind + 1
-                                : index + 1
-                            }
-                            className="text-dark_grey h-[40px] text-sm rounded-sm shadow-md border-b-2 border-[#CECECE] bg-white"
-                            onClick={() => {
-                              toggleFunction();
-                              editBLNG(m);
-                            }}
-                          >
-                            <td className="text-center px-4 flex-1">
-                              {userIdentification === "Manager"
-                                ? ind + 1
-                                : index + 1}
-                            </td>
-                            <td className="text-start px-4 flex-1">{m.REC}</td>
-                            <td className="text-center px-4 flex-1">{m.CTR}</td>
-                            <td className="text-center px-4 flex-1">
-                              {m.DEPT}
-                            </td>
-                            <td className="text-center px-4 flex-1">
-                              {m.EMPLOYEEID}
-                            </td>
-                            <td className="text-center px-4 flex-1">
-                              {m.BADGE}
-                            </td>
-                            <td className="text-center px-4 flex-1">
-                              {m.NAME}
-                            </td>
-                            <td className="text-center px-4 flex-1">
-                              {m.DATE}
-                            </td>
-                            <td className="text-center px-4 flex-1">
-                              {m.ONAM}
-                            </td>
-                            <td className="text-center px-4 flex-1">
-                              {m.OFFAM}
-                            </td>
-                            <td className="text-center px-4 flex-1">
-                              {m.ONPM}
-                            </td>
-                            <td className="text-center px-4 flex-1">
-                              {m.OFFPM}
-                            </td>
-                            <td className="text-center px-4 flex-1">{m.IN}</td>
-                            <td className="text-center px-4 flex-1">{m.OUT}</td>
-                            <td className="text-center px-4 flex-1">
-                              {m.TOTALINOUT || 0}
-                            </td>
-                            <td className="text-center px-4 flex-1">
-                              {m.ALLDAYMINUTES || 0}
-                            </td>
-                            <td className="text-center px-4 flex-1">
-                              {m.NETMINUTES || 0}
-                            </td>
-                            <td className="text-center px-4 flex-1">
-                              {m.TOTALHOURS || 0}
-                            </td>
-                            <td className="text-center px-4 flex-1">
-                              {m.TOTALACTUALHOURS || 0}
-                            </td>
-                            <td className="text-center px-4 flex-1">
-                              {m.REMARKS}
-                            </td>
-                            {isStatusPending && (
+                  {visibleData && visibleData?.length > 0
+                    ? visibleData.map((value, index) => {
+                        const renderRows = (m, ind) => {
+                          const isStatusPending = m.status === "Pending";
+                          return (
+                            <tr
+                              key={index + 1}
+                              className="text-dark_grey h-[40px] text-sm rounded-sm shadow-md border-b-2 border-[#CECECE] bg-white"
+                              onClick={() => {
+                                toggleFunction();
+                                editBLNG(m);
+                              }}
+                            >
                               <td className="text-center px-4 flex-1">
-                                {m.status}
+                                {index + 1}
                               </td>
-                            )}
-                          </tr>
-                        );
-                      };
+                              <td className="text-start px-4 flex-1">
+                                {m.REC}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m.CTR}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m.DEPT}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m.EMPLOYEEID}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m.BADGE}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m.NAME}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m.DATE}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m.ONAM}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m.OFFAM}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m.ONPM}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m.OFFPM}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m.IN}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m.OUT}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m.TOTALINOUT || 0}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m.ALLDAYMINUTES || 0}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m.NETMINUTES || 0}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m.TOTALHOURS || 0}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m.NORMALWORKINGHRSPERDAY || 0}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m.TOTALACTUALHOURS || 0}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m.OT || 0}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m.REMARKS}
+                              </td>
 
-                      return userIdentification === "Manager"
-                        ? value.data.map(renderRows)
-                        : userIdentification !== "Manager" && renderRows(value);
-                      // : setData(null);
-                    })
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan="15"
-                        className="px-6 py-6 text-center text-dark_ash text_size_5"
-                      >
-                        <p>No Table Data Available Here</p>
-                      </td>
-                    </tr>
-                  )}
+                              {isStatusPending && (
+                                <td
+                                  className={`text-center px-4 flex-1 ${
+                                    m.status === "Approved"
+                                      ? "text-[#0CB100]"
+                                      : "text_size_8"
+                                  }`}
+                                >
+                                  {m.status}
+                                </td>
+                              )}
+                            </tr>
+                          );
+                        };
+
+                        return userIdentification === "Manager"
+                          ? renderRows(value)
+                          : userIdentification !== "Manager" &&
+                              renderRows(value);
+                        // : setData(null);
+                      })
+                    : (
+                        <tr>
+                          <td
+                            colSpan="15"
+                            className="px-6 py-6 text-center text-dark_ash text_size_5"
+                          >
+                            <p className="px-6 py-6">
+                              No Table Data Available Here
+                            </p>
+                          </td>
+                        </tr>
+                      ) ?? (
+                        <tr>
+                          <td
+                            colSpan="15"
+                            className="px-6 py-6 text-center text-dark_ash text_size_5"
+                          >
+                            <p className="px-6 py-6">
+                              No Table Data Available Here
+                            </p>
+                          </td>
+                        </tr>
+                      )}
                 </tbody>
               </table>
             </div>
@@ -649,9 +794,68 @@ export const ViewHOsheet = ({
               }`}
             >
               <button
-                className="rounded px-3 py-2 bg-[#FEF116] text_size_5 text-dark_grey"
+                className={`rounded px-3 py-2 ${
+                  userIdentification === "Manager" ? "w-40" : "w-52"
+                } bg-[#FEF116] text_size_5 text-dark_grey mb-10`}
                 onClick={() => {
                   renameKeysFunctionAndSubmit();
+
+                  // const fetchData = async () => {
+                  //   console.log("I am calling You");
+                  //   // Fetch the BLNG data using GraphQL
+                  //   const [fetchBLNGdata] = await Promise.all([
+                  //     client.graphql({
+                  //       query: listHeadOffices,
+                  //     }),
+                  //   ]);
+                  //   const BLNGdata =
+                  //     fetchBLNGdata?.data?.listHeadOffices?.items;
+                  //   console.log("BLNGdata : ", BLNGdata);
+
+                  //   const deleteFunction =
+                  //     BLNGdata &&
+                  //     BLNGdata.map(async (m) => {
+                  //       const dailySheet = {
+                  //         id: m.id,
+                  //       };
+
+                  //       await client
+                  //         .graphql({
+                  //           query: deleteHeadOffice,
+                  //           variables: {
+                  //             input: dailySheet,
+                  //           },
+                  //         })
+                  //         .then((res) => {
+                  //           console.log(res);
+                  //         })
+                  //         .catch((err) => {
+                  //           console.log(err);
+                  //         });
+                  //     });
+                  // };
+                  // fetchData();
+                  // FOR DELETE
+                  // const deleteFunction = async () => {
+                  //   const weaklysheet = {
+                  //     id: "3deaccb4-7b1e-43b3-aa94-fd7d4cf46f56",
+                  //   };
+
+                  //   await client
+                  //     .graphql({
+                  //       query: deleteHeadOffice,
+                  //       variables: {
+                  //         input: weaklysheet,
+                  //       },
+                  //     })
+                  //     .then((res) => {
+                  //       console.log(res);
+                  //     })
+                  //     .catch((err) => {
+                  //       console.log(err);
+                  //     });
+                  // };
+                  // deleteFunction();
                 }}
               >
                 {userIdentification === "Manager"

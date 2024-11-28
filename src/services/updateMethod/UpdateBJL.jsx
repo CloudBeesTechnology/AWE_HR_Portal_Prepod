@@ -11,16 +11,16 @@ export const UpdateBJL = () => {
     const totalData = {
         id:BJLUpValue.id,
         empID: BJLUpValue.empID,
-      bankSubmit: [BJLUpValue.bankSubmit],
-      bankRece: [BJLUpValue.bankRece],
+      bankSubmit: BJLUpValue.bankSubmit,
+      bankRece: BJLUpValue.bankRece,
       bankRefNo: [BJLUpValue.bankRefNo],
       bankAmt: [BJLUpValue.bankAmt],
-      bankValid: [BJLUpValue.bankValid],
-      bankEndorse: [BJLUpValue.bankEndorse],
+      bankValid: BJLUpValue.bankValid,
+      bankEndorse: BJLUpValue.bankEndorse,
       bankEmpUpload: [BJLUpValue.bankEmpUpload],
 
     };
-    console.log(totalData);
+  
 
     try {
       const storedData=   await Promise.all([
@@ -31,13 +31,12 @@ export const UpdateBJL = () => {
              },
            })
          ])
-         console.log(storedData,"successfully Updated data");
+        
 
        } catch (error) {
         console.log(error);
         
-         console.error("Error executing GraphQL requests:", error);
-         throw error; // Rethrow error if needed
+       
        }
   }, []);
   return { UpdateBJLFun };

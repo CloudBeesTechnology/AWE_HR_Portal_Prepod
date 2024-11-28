@@ -32,12 +32,12 @@ export const HandleRejectCandidates = () => {
       });
 
       // Handle success
-      console.log("Candidate status updated to 'Inactive' successfully", response);
+      // console.log("Candidate status updated to 'Inactive' successfully", response);
       setIsRejected(true);
       onClose(); // Optionally close the modal after successful update
     } catch (err) {
       setError(err.message || "An error occurred while rejecting the candidate");
-      console.error("Error updating candidate status:", err);
+      // console.error("Error updating candidate status:", err);
     } finally {
       setIsLoading(false);
     }

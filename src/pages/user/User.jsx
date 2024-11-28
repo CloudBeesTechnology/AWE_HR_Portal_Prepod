@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { UserVF } from "./UserVF";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { UserDelete } from "../../services/deleteMethod/UserDelete";
+import { SpinLogo } from "../../utils/SpinLogo";
 
 export const User = () => {
   const { empPIData, userData, workInfoData } = useContext(DataSupply);
@@ -17,15 +18,17 @@ export const User = () => {
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [viewForm, setViewForm] = useState(false);
   const [sendData, setSendData] = useState([]);
-  const [workValue, setWorkValue] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
 
   const navigate = useNavigate();
+
 
   // pagination process
   const [currentPage, setCurrentPage] = useState(1); // updated by hari
   const [rowsPerPage, setRowsPerPage] = useState(5); // updated by hari
   const [searchResults, setSearchResults] = useState([]);
+  const [showTitle, setShowTitle] = useState("");
+  const [notification, setNotification] = useState(false);
 
   useEffect(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
@@ -92,7 +95,6 @@ export const User = () => {
           })
           .filter(Boolean)
           .filter((user) => user.status === "Active");
-        // console.log(mergedData);
 
         setUserDetails(mergedData);
         setAllEmpDetails(mergedData);
@@ -129,13 +131,13 @@ export const User = () => {
       employeeValue: empPIData,
       workValue: workInfoData,
     };
-    // console.log(allValue);
-
     navigate("/addNewForm", { state: { addUserData: allValue } });
   };
-  const handleDelete = (data) => {
+  const handleDelete = async (data) => {
     const deleteUserData = userData.find((item) => item.empID === data.empID);
-    SubmitDeletedUser({ deleteUserData });
+    await SubmitDeletedUser({ deleteUserData });
+    setShowTitle("User deleted successfully");
+    setNotification(true);
   };
 
   return (
@@ -173,6 +175,7 @@ export const User = () => {
                   <th className="px-6 text-start py-3">Type</th>
                   <th className="px-6 text-start py-3">Official Email Id</th>
                   <th className="px-6 text-start py-3">Password</th>
+                  <th className="px-6 text-start py-3">ViewForm</th>
                   <th className="px-6 text-start py-3">Actions</th>
                 </tr>
               </thead>
@@ -185,7 +188,6 @@ export const User = () => {
                       <tr
                         key={i}
                         onClick={() => {
-                          ViewFormShow();
                           setSendData(val);
                         }}
                       >
@@ -194,6 +196,7 @@ export const User = () => {
                         <td className="px-6 py-2">{val.name}</td>
                         <td className="px-6 py-2">{val.selectType}</td>
                         <td className="px-6 py-2">{val.officialEmail}</td>
+
                         <td className="px-6 w-[200px] py-2 text-center">
                           <input
                             type="password"
@@ -201,6 +204,14 @@ export const User = () => {
                             value={val.password}
                             readOnly
                           />
+                        </td>
+                        <td
+                          className="px-6 py-2 text-center text-[blue]"
+                          onClick={() => {
+                            ViewFormShow();
+                          }}
+                        >
+                          View
                         </td>
                         <td className="px-6 py-2">
                           <div className="flex gap-5">
@@ -218,13 +229,6 @@ export const User = () => {
                             >
                               <RiDeleteBin6Line />
                             </span>
-                            {/* <div
-                      className="h-3 w-3 bg-[#08A757] rounded-full "
-                      onClick={() => {
-                        popUping();
-                        ListUserData();
-                      }}
-                    ></div> */}
                           </div>
                         </td>
                       </tr>
@@ -261,6 +265,14 @@ export const User = () => {
       </div>
 
       {viewForm && <UserVF data={sendData} onclose={ViewFormShow} />}
+
+      {notification && (
+          <SpinLogo
+            text={showTitle}
+            notification={notification}
+            path="/user"
+          />
+        )}
     </section>
   );
 };

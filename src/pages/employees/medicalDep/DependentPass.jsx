@@ -15,16 +15,16 @@ export const DependentPass = ({
   control,
   value,
   getValues,
-  
+  setUploadedFileNames,
+  UploadingFiles,
 }) => {
-
   const isInitialMount = useRef(true);
   const [docsUploaded, setDocsUploaded] = useState({});
   const [arrayFileNames, setArrayFileNames] = useState({
     uploadDp: null,
     uploadDr: null,
   });
-  
+
   const { fields, append, remove, replace } = useFieldArray({
     control,
     name: "dependPass",
@@ -33,12 +33,28 @@ export const DependentPass = ({
   useEffect(() => {
     if (isInitialMount.current) {
       if (value && value.length > 0) {
-       const parsedValue = typeof value === "string" ? JSON.parse(value) : value;
-      replace(parsedValue); // Replace fields with parsed data
-      setValue("dependPass", parsedValue); 
-      // console.log(parsedValue,'dfghj');
-      
-      
+        const parsedValue =
+          typeof value === "string" ? JSON.parse(value) : value;
+        const normalizedValue = parsedValue.map((item) => ({
+          ...item,
+          uploadDp: Array.isArray(item.uploadDp)
+            ? item.uploadDp
+            : [
+                typeof item.uploadDp === "string"
+                  ? JSON.parse(item.uploadDp)
+                  : item.uploadDp,
+              ],
+          uploadDr: Array.isArray(item.uploadDr)
+            ? item.uploadDr
+            : [
+                typeof item.uploadDr === "string"
+                  ? JSON.parse(item.uploadDr)
+                  : item.uploadDr,
+              ],
+        }));
+
+        replace(normalizedValue); // Replace fields with parsed data
+        setValue("dependPass", normalizedValue);
       } else {
         append({
           dependName: "",
@@ -55,74 +71,85 @@ export const DependentPass = ({
       }
       isInitialMount.current = false;
     } else if (value && value.length > 0) {
-      // Ensure the fields are replaced when value updates later
       const parsedValue = typeof value === "string" ? JSON.parse(value) : value;
-      replace(parsedValue); // Replace fields with parsed data
-      setValue("dependPass", parsedValue); 
-      console.log(parsedValue,'dfghj');
+      // Ensure uploadDp and uploadDr are arrays
+      const normalizedValue = parsedValue.map((item) => ({
+        ...item,
+        uploadDp: Array.isArray(item.uploadDp)
+          ? item.uploadDp
+          : [
+              typeof item.uploadDp === "string"
+                ? JSON.parse(item.uploadDp)
+                : item.uploadDp,
+            ],
+        uploadDr: Array.isArray(item.uploadDr)
+          ? item.uploadDr
+          : [
+              typeof item.uploadDr === "string"
+                ? JSON.parse(item.uploadDr)
+                : item.uploadDr,
+            ],
+      }));
+
+      replace(normalizedValue); // Replace fields with parsed data
+      setValue("dependPass", normalizedValue);
+
       const uploadFields = ["uploadDp", "uploadDr"];
 
       uploadFields.forEach((field) => {
-        if (parsedValue && Array.isArray(parsedValue)) {
-          parsedValue.forEach((item, idx) => {
+        if (normalizedValue && Array.isArray(normalizedValue)) {
+          normalizedValue.forEach((item, idx) => {
             const url = item?.[field];
-      
+
             // Ensure `url` is an array and not null/undefined
             const parsedFiles = Array.isArray(url)
               ? url.map((fileItem) =>
                   typeof fileItem === "string" ? JSON.parse(fileItem) : fileItem
                 )
               : [];
-      
+
             // Update the `docsUploaded` state
             setDocsUploaded((prev) => {
-              const updatedDepInsurance = Array.isArray(prev[field]) ? [...prev[field]] : [];
+              const updatedDepInsurance = Array.isArray(prev[field])
+                ? [...prev[field]]
+                : [];
               updatedDepInsurance[idx] = parsedFiles;
-      
+
               return {
                 ...prev,
                 [field]: updatedDepInsurance, // Dynamically set field name
               };
             });
-      
+
+            // Check if `parsedFiles` is not empty before getting the file name
+            const fileName =
+              parsedFiles.length > 0 &&
+              parsedFiles[parsedFiles.length - 1].upload
+                ? getFileName(parsedFiles[parsedFiles.length - 1].upload)
+                : "";
+
             // Update the file names state dynamically
             setArrayFileNames((prev) => ({
               ...prev,
-              [`${idx}_${field}`]:
-                parsedFiles.length > 0
-                  ? getFileName(parsedFiles[parsedFiles.length - 1].upload)
-                  : "", // Assign file name dynamically based on index and field
+              [`${idx}_${field}`]: fileName, // Assign file name dynamically based on index and field
             }));
+
+            
           });
         }
       });
-      
     }
   }, [value, append, replace, setValue]);
 
 
-function getFileName(url) {
-  try {
-    if (!url || typeof url !== "string") {
-      throw new Error("Invalid URL");
+  const getFileName = (filePath) => {
+    if (!filePath) {
+      return ""; // Return an empty string if filePath is undefined or null
     }
-
-    const urlObj = new URL(url); // Construct URL object
-    const filePath = urlObj.pathname;
-
-    const decodedUrl = decodeURIComponent(filePath);
-
-    // Extract the file name after the last '/' in the path
-    const fileNameWithExtension = decodedUrl.substring(decodedUrl.lastIndexOf("/") + 1);
-
-    return fileNameWithExtension;
-  } catch (error) {
-    // console.error("Error parsing URL:", error.message, url);
-    return ""; // Return empty string if the URL is invalid
-  }
-}
-
-
+    const fileNameWithExtension = filePath.split("/").pop(); // Get file name with extension
+    const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
+    return fileName;
+  };
   const handleFileChange = async (e, fieldName, index) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -135,11 +162,11 @@ function getFileName(url) {
 
     // Add the new file to the array
     const updatedFiles = [...currentFiles, file];
-  
+
     // Update the value in the form
     setValue(`dependPass[${index}].${fieldName}`, updatedFiles);
-  
-    // setValue(`dependPass[${index}].${fieldName}`, file);
+
+    
     try {
       await uploadDocs(file, fieldName, setDocsUploaded, index);
 
@@ -148,15 +175,13 @@ function getFileName(url) {
         [`${index}_${fieldName}`]: file.name,
       }));
     } catch (error) {
-      // console.error("File upload error:", error);
+      console.error("File upload error:", error);
     }
   };
-// console.log(docsUploaded);
 
   useEffect(() => {
     setArrayUploadDocs(docsUploaded);
   }, [docsUploaded, setArrayUploadDocs]);
-
 
   const handleAddDependPass = () => {
     append({
@@ -184,9 +209,9 @@ function getFileName(url) {
         </button>
       </div>
       {fields.map((field, index) => {
-        // console.log(index);
-        
-        return(
+      
+
+        return (
           <div key={field.id} className="grid grid-cols-4 gap-4 mb-2 relative">
             <FormField
               label="Dependent Name"
@@ -236,7 +261,7 @@ function getFileName(url) {
               errors={errors}
               register={register}
             />
-            
+
             <FormField
               label="Labour Deposit Amount"
               type="number"
@@ -260,7 +285,7 @@ function getFileName(url) {
               error={errors?.dependPass?.[index]?.uploadDr}
               fileName={arrayFileNames[`${index}_uploadDr`] || ""}
             />
-  
+
             {/* Remove button, hidden for the first entry */}
             {index !== 0 && (
               <button
@@ -272,7 +297,7 @@ function getFileName(url) {
               </button>
             )}
           </div>
-        )
+        );
       })}
     </div>
   );

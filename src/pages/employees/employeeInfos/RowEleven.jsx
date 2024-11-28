@@ -90,6 +90,7 @@ export const RowEleven = ({
           <FormField
             label="Contact number"
             type="text"
+            inputmode="numeric"
             name={`familyDetails.${index}.contact`}
             register={register}
             errors={errors}

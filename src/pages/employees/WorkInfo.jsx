@@ -70,6 +70,7 @@ export const WorkInfo = () => {
     WorkDataPass.terminationFields.map((field) => field.name)
   );
   useEffect(() => {
+    console.log(empPIData, "empPIData");
     empPIData.map((items) => {
       if (empID === items.empID) {
         setEmpName(items.name);
@@ -284,6 +285,9 @@ export const WorkInfo = () => {
     ];
 
     uploadFields.map((field) => {
+      // console.log(field);
+
+      console.log(result[field]);
 
       if (result && result[field]) {
         try {
@@ -294,6 +298,7 @@ export const WorkInfo = () => {
           const parsedFiles = parsedArray.map((item) =>
             typeof item === "string" ? JSON.parse(item) : item
           );
+          console.log(parsedFiles);
           setValue(field, parsedFiles);
 
           setNameServiceUp((prev) => ({

@@ -21,6 +21,7 @@ import { UploadBLNGfile } from "../pages/timeSheet/UploadTimeSheet/UploadBLNGfil
 import { listBlngs, listHeadOffices } from "../graphql/queries";
 import { generateClient } from "@aws-amplify/api";
 import { useFetchData } from "../pages/timeSheet/customTimeSheet/UseFetchData";
+import { UploadEditedORMC } from "../pages/timeSheet/uploadManuallyEditedExcel/UploadEditedORMC";
 
 const client = generateClient();
 export const TimeSheetBrowser = ({ title }) => {
@@ -54,6 +55,7 @@ export const TimeSheetBrowser = ({ title }) => {
     }
   }, [isChecked]);
   const { convertedStringToArrayObj, getPosition } = useFetchData(titleName);
+
   // Convert string to array of object
   // useEffect(() => {
   //   const Position = localStorage.getItem("userType");
@@ -288,69 +290,120 @@ export const TimeSheetBrowser = ({ title }) => {
   //   }
   // }, [loading]);
   // Onshore
-  const UploadFile = () => {
-    try {
-      if (titleName === "Offshore") {
-        const result = UploadOffshoreFile(
-          excelFile,
-          setExcelData,
-          setExcelFile,
-          fileInputRef,
-          setLoading
-        );
+  const UploadFile = async () => {
+    // try {
+    if (titleName === "Offshore") {
+      const result = UploadOffshoreFile(
+        excelFile,
+        setExcelData,
+        setExcelFile,
+        fileInputRef,
+        setLoading
+      );
 
-        setReturnedTHeader(result);
-        fileInputRef.current.value = "";
-        setExcelFile(null);
-      } else if (titleName === "ORMC") {
-        const result = UploadORMCfile(
-          excelFile,
-          setExcelData,
-          setExcelFile,
-          fileInputRef,
-          setLoading
-        );
-        setReturnedTHeader(result);
-        fileInputRef.current.value = "";
-        setExcelFile(null);
-      } else if (titleName === "SBW") {
-        const result = UploadSBWfile(
-          excelFile,
-          setExcelData,
-          setExcelFile,
-          fileInputRef,
-          setLoading
-        );
-        setReturnedTHeader(result);
-        fileInputRef.current.value = "";
-        setExcelFile(null);
-      } else if (titleName === "HO") {
-        const result = UploadHOfile(
-          excelFile,
-          setExcelData,
-          setExcelFile,
-          fileInputRef,
-          setLoading
-        );
-        setReturnedTHeader(result);
-        fileInputRef.current.value = "";
-        setExcelFile(null);
-      } else if (titleName === "BLNG") {
-        const result = UploadBLNGfile(
-          excelFile,
-          setExcelData,
-          setExcelFile,
-          fileInputRef,
-          setLoading
-        );
-        setReturnedTHeader(result);
-
-        fileInputRef.current.value = "";
-        setExcelFile(null);
-      }
-    } catch {
-      console.log("ERROR");
+      setReturnedTHeader(result);
+      fileInputRef.current.value = "";
+      setExcelFile(null);
     }
+    // else if (titleName === "ORMC") {
+    //   const { result, checkTrueOrFalse } = UploadORMCfile(
+    //     excelFile,
+    //     setExcelData,
+    //     setExcelFile,
+    //     fileInputRef,
+    //     setLoading
+    //   );
+    //   if (checkTrueOrFalse === true) {
+    //     setReturnedTHeader(result);
+    //   }
+
+    //   if (checkTrueOrFalse === false) {
+    //     const result = await UploadEditedORMC(
+    //       excelFile,
+    //       setExcelData,
+    //       setExcelFile,
+    //       fileInputRef,
+    //       setLoading
+    //     );
+    //     console.log("Yes it works");
+    //     setReturnedTHeader(result);
+    //   }
+
+    //   fileInputRef.current.value = "";
+    //   setExcelFile(null);
+    // }
+    else if (titleName === "ORMC") {
+      // if (!data) {
+      //   console.error("UploadORMCfile returned undefined or null");
+      //   return;
+      // }
+
+      // try {
+      const result = UploadORMCfile(
+        excelFile,
+        setExcelData,
+        setExcelFile,
+        fileInputRef,
+        setLoading
+      );
+      // const { result, checkTrueOrFalse } = data;
+
+      setReturnedTHeader(result);
+
+      // } catch {
+      if (result === false) {
+        const editedResult = await UploadEditedORMC(
+          excelFile,
+          setExcelData,
+          setExcelFile,
+          fileInputRef,
+          setLoading
+        );
+        console.log("Yes it works");
+        console.log();
+        setReturnedTHeader(editedResult);
+      }
+
+      fileInputRef.current.value = "";
+      setExcelFile(null);
+    } else if (titleName === "SBW") {
+      const result = UploadSBWfile(
+        excelFile,
+        setExcelData,
+        setExcelFile,
+        fileInputRef,
+        setLoading
+      );
+      setReturnedTHeader(result);
+      fileInputRef.current.value = "";
+      setExcelFile(null);
+    } else if (titleName === "HO") {
+      const result = UploadHOfile(
+        excelFile,
+        setExcelData,
+        setExcelFile,
+        fileInputRef,
+        setLoading
+      );
+      setReturnedTHeader(result);
+      fileInputRef.current.value = "";
+      setExcelFile(null);
+    } else if (titleName === "BLNG") {
+      const result = UploadBLNGfile(
+        excelFile,
+        setExcelData,
+        setExcelFile,
+        fileInputRef,
+        setLoading
+      );
+      setReturnedTHeader(result);
+
+      fileInputRef.current.value = "";
+      setExcelFile(null);
+    }
+    // } catch {
+    //   console.log("ERROR");
+    // }
   };
 
   const clearUseRefObject = () => {
@@ -370,7 +423,7 @@ export const TimeSheetBrowser = ({ title }) => {
   };
 
   return (
-    <div className="p-10 ">
+    <div className="p-10 bg-[#fafaf6] min-h-screen">
       <div>
         <Link to="/timeSheet" className="text-xl flex-1 text-grey ">
           <FaArrowLeft />
@@ -378,6 +431,7 @@ export const TimeSheetBrowser = ({ title }) => {
       </div>
       <div
       // className={`${(fileName || excelData || closeSavedModel) && "hidden"}`}
+      // className="h-full"
       >
         <div
           className={" m-9 screen-size my-5  flex flex-col items-center gap-3"}

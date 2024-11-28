@@ -1,11 +1,21 @@
 import React from "react";
+import { useEffect } from "react";
 
 const InsuranceDetails = ({
   insuranceInfo,
   depInsurance,
+  DependentInsurance,
   handlePrint,
   invoiceRef,
+ 
 }) => {
+
+  useEffect(() => {
+    // Log insuranceInfo and depInsurance when component is mounted or updated
+    console.log("insuranceInfo:", insuranceInfo);
+    console.log("depInsurance:", depInsurance);
+  }, [insuranceInfo, depInsurance]);
+
   return (
     <>
       <section ref={invoiceRef} className="py-3">

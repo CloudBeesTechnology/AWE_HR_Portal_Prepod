@@ -19,53 +19,35 @@ export const NonLocalAccovalidationSchema = Yup.object().shape({
 export const LabourImmigrationSchema = Yup.object().shape({
   empID: Yup.string().required("Employee ID Number is mandatory"),
   overMD: Yup.date()
-    .nullable() // Allows null or undefined values
-    .notRequired() // Field is optional
-    .test("is-past", "overMD must be a past date", function (value) {
-      if (!value) return true; // Skip validation if the field is empty
-      return new Date(value) < new Date(); // Check if the date is in the past
-    }),
-
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .notRequired(),
+  // .test("is-not-future-date", "Future Date Not Allowed", function (value) {
+  //   return !value || new Date(value) <= new Date();
+  // })
   overME: Yup.date()
-    .nullable() // Allows null or undefined values
-    .notRequired() // Field is optional
-    .test("is-future", "overME must be a future date", function (value) {
-      if (!value) return true; // Skip validation if the field is empty
-      return new Date(value) > new Date(); // Check if the date is in the future
-    }),
-  bruhimsRD: Yup.string().notRequired(),
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .notRequired(),
+  // .test("is-future-date", "Only Future Dates Allowed", function (value) {
+  //   return !value || new Date(value) > new Date();
+  // })
+  bruhimsRD: Yup.date()
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .notRequired(),
   bruhimsRNo: Yup.string().notRequired(),
-  // bruneiMAD: Yup.array()
-  // .of(
-  //   Yup.string().test(
-  //     "is-past-date",
-  //     "Brunei Medical Appointment date must be in the past",
-  //     (value) => {
-  //       if (!value) return true; // Allow empty values
-  //       const [day, month, year] = value.split("-");
-  //       const issuedDate = new Date(`${year}-${month}-${day}`);
-  //       const currentDate = new Date();
-  //       return issuedDate < currentDate; // Check if issued date is in the past
-  //     }
-  //   )
-  // )
-  // .notRequired(),
-
-  // bruneiME: Yup.array()
-  // .of(
-  //   Yup.string().test(
-  //     "is-valid-date",
-  //     "Expiry date must be in the future",
-  //     (value) => {
-  //       if (!value) return true; // Allow empty values
-  //       const date = new Date(value);
-  //       const currentDate = new Date();
-  //       return date > currentDate;
-  //     }
-  //   )
-  // )
-  // .notRequired(),
-
+  bruneiMAD: Yup.date()
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .notRequired(),
+  bruneiME: Yup.date()
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .notRequired(),
+  // .test("is-future-date", "Only Future Dates Allowed", function (value) {
+  //   return !value || new Date(value) > new Date();
+  // })
   uploadFitness: Yup.array()
     .of(
       Yup.mixed()
@@ -167,6 +149,7 @@ export const LabourImmigrationSchema = Yup.object().shape({
           )
         )
         .notRequired(),
+
       uploadDr: Yup.array()
         .of(
           Yup.mixed().test(
@@ -548,22 +531,8 @@ export const WorkInfoSchema = Yup.object().shape({
 });
 
 export const employeeInfoSchema = Yup.object().shape({
-  // My Command
   empID: Yup.string().required("Employee ID Number is mandatory"),
   profilePhoto: Yup.string().required("Upload Photo is mandatory"),
-
-  // profilePhoto: Yup.mixed()
-  //   .required("Upload Photo is mandatory")
-  //   .test(
-  //     "fileType",
-  //     "Profile photo must be a JPG, PNG",
-  //     (value) =>
-  //       value
-  //         ? typeof value === "string"
-  //           ? /\.(jpg|jpeg|png|pdf)$/.test(value) || isValidUrl(value)
-  //           : /\.(jpg|jpeg|png|pdf)$/.test(value.name)
-  //         : false
-  //   ),
   contractType: Yup.array()
     .of(Yup.string().required("Each Contract Type is mandatory"))
     .min(1, "At least one Contract Type is required")
@@ -576,6 +545,10 @@ export const employeeInfoSchema = Yup.object().shape({
 
   name: Yup.string()
     .min(3, "Name must be at least 3 characters") // Minimum length check
+    .matches(
+      /^[A-Za-z\s]+$/,
+      "Name cannot contain numbers or special characters"
+    ) // Regex to allow only letters and spaces
     .required("Name is mandatory"),
   gender: Yup.string().required("Gender is mandatory"),
   dob: Yup.string()
@@ -606,53 +579,30 @@ export const employeeInfoSchema = Yup.object().shape({
   otherRace: Yup.string().notRequired(),
   bwnIcNo: Yup.string().notRequired(),
   bwnIcColour: Yup.string().notRequired(),
-  bwnIcExpiry: Yup.array()
-    .of(
-      Yup.string().test(
-        "is-valid-date",
-        "Expiry date must be in the future",
-        (value) => {
-          if (!value) return true; // Allow empty values
-          const date = new Date(value);
-          const currentDate = new Date();
-          return date > currentDate;
-        }
-      )
-    )
-    .notRequired(),
-
+  bwnIcExpiry: Yup.date()
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .notRequired()
+    .test("is-future-date", "Only Future Dates Allowed", function (value) {
+      return !value || new Date(value) > new Date();
+    }),
   myIcNo: Yup.string().notRequired(),
   ppNo: Yup.string().notRequired(),
-  ppIssued: Yup.array()
-    .of(
-      Yup.string().test(
-        "is-past-date",
-        "Issued date must be in the past",
-        (value) => {
-          if (!value) return true; // Allow empty values
-          const [day, month, year] = value.split("-");
-          const issuedDate = new Date(`${year}-${month}-${day}`);
-          const currentDate = new Date();
-          return issuedDate < currentDate; // Check if issued date is in the past
-        }
-      )
-    )
-    .notRequired(),
+  ppIssued: Yup.date()
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .notRequired()
+    .test("is-not-future-date", "Future Date Not Allowed", function (value) {
+      return !value || new Date(value) <= new Date();
+    }),
 
-  ppExpiry: Yup.array()
-    .of(
-      Yup.string().test(
-        "is-valid-date",
-        "Expiry date must be in the future",
-        (value) => {
-          if (!value) return true; // Allow empty values
-          const date = new Date(value);
-          const currentDate = new Date();
-          return date > currentDate;
-        }
-      )
-    )
-    .notRequired(),
+  ppExpiry: Yup.date()
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .notRequired()
+    .test("is-future-date", "Only Future Dates Allowed", function (value) {
+      return !value || new Date(value) > new Date();
+    }),
   ppDestinate: Yup.string().notRequired(),
   contactNo: Yup.string().required("Contact Number is mandatory"),
   permanentAddress: Yup.string().required("Address is mandatory"),
@@ -682,7 +632,7 @@ export const employeeInfoSchema = Yup.object().shape({
   ),
 
   inducBrief: Yup.string().required("Induction Briefing Date is mandatory"),
-  inducBriefUp: Yup.string().required("Induction Briefing Upload is mandatory"),
+  inducBriefUp: Yup.string().notRequired(),
 
   preEmp: Yup.string().notRequired(),
   preEmpPeriod: Yup.string().notRequired(),
@@ -1057,44 +1007,83 @@ export const ClaimInsuranceSchema = Yup.object().shape({
 
 export const SawpEmpSchema = Yup.object().shape({
   empID: Yup.string().required("Employee ID is required"),
+  sawpEmpLtrReq: Yup.date()
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .required("Requested Date is required")
+    .test("is-not-future-date", "Future Date Not Allowed", (value) => {
+      return !value || value <= new Date();
+    }),
 
-  sawpEmpLtrReq: Yup.array()
-    .of(
-      Yup.date()
-        .nullable()
-        .transform((value, originalValue) =>
-          originalValue === "" ? null : value
-        )
-        .required("Requested Date is required")
-        .test("is-not-future-date", "Future Date Not Allowed", (value) => {
-          return !value || value <= new Date();
-        })
-    )
-    .required("Requested Dates are required"),
+  sawpEmpLtrReci: Yup.date()
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .notRequired()
+    .test(
+      "is-after-requested-date",
+      "Received Date cannot be before the Requested Date",
+      function (value) {
+        const { sawpEmpLtrReq } = this.parent;
+        return !value || !sawpEmpLtrReq || value >= sawpEmpLtrReq;
+      }
+    ),
 
-  // Handle sawpEmpLtrReci as an array of dates, ensuring it's after the requested date
-  sawpEmpLtrReci: Yup.array()
-    .of(
-      Yup.date()
-        .nullable()
-        .transform((value, originalValue) =>
-          originalValue === "" ? null : value
-        )
-        .test(
-          "is-after-requested-date",
-          "Received Date cannot be before the Requested Date",
-          function (value) {
-            const { sawpEmpLtrReq } = this.parent;
-            // Check if received date is after any of the requested dates
-            return (
-              !value ||
-              !sawpEmpLtrReq ||
-              sawpEmpLtrReq.every((reqDate) => value >= new Date(reqDate))
-            );
-          }
-        )
-    )
-    .notRequired(),
+  //   sawpEmpLtrReq: Yup.array()
+  //   .of(
+  //     Yup.date()
+  //       .nullable()
+  //       .transform((value, originalValue) => (originalValue === "" ? null : value))
+  //       .test("is-not-future-date", "Future Date Not Allowed",  (value) => {
+  //         if (!value) return true; // Allow empty values
+
+  //     })
+  //   ),
+
+  //   sawpEmpLtrReci: Yup.array()
+  //   .of(
+  //     Yup.date()
+  //     .nullable()
+  //     .transform((value, originalValue) => (originalValue === "" ? null : value))
+  //     .notRequired()
+  //     .test(
+  //       "is-after-requested-date",
+  //       "Received Date cannot be before the Requested Date",  (value) => {
+  //         if (!value) return true; // Allow empty values
+  //         const date = new Date(value);
+  //         const currentDate = new Date();
+  //         return date > currentDate;
+  //     }),
+  // ),
+
+  // sawpEmpLtrReq: Yup.array()
+  //     .of(
+  //       Yup.date()
+  //         .nullable()
+  //         .transform((value, originalValue) => (originalValue === "" ? null : value))
+  //         .required("Requested Date is required")
+  //         .test("is-not-future-date", "Future Date Not Allowed", (value) => {
+  //           return !value || value <= new Date();
+  //         })
+  //     )
+  //     .required("Requested Dates are required"),
+
+  //   // Handle sawpEmpLtrReci as an array of dates, ensuring it's after the requested date
+  //   sawpEmpLtrReci: Yup.array()
+  //     .of(
+  //       Yup.date()
+  //         .nullable()
+  //         .transform((value, originalValue) => (originalValue === "" ? null : value))
+  //         .test(
+  //           "is-after-requested-date",
+  //           "Received Date cannot be before the Requested Date",
+  //           function (value) {
+  //             const { sawpEmpLtrReq } = this.parent;
+  //             // Check if received date is after any of the requested dates
+  //             return !value || !sawpEmpLtrReq || sawpEmpLtrReq.every(reqDate => value >= new Date(reqDate));
+  //           }
+  //         )
+  //     )
+  //     .notRequired(),
 
   sawpEmpUpload: Yup.array()
     .of(
@@ -1261,6 +1250,13 @@ export const NlmsEmpSchema = Yup.object().shape({
         .notRequired()
     )
     .notRequired(),
+  // Yup.mixed()
+  //   .notRequired() // File is optional
+  //   .test("fileSize", "File must be between 7MB", (value) => {
+  //     if (!value) return true; // No file selected, it's valid
+  //     const fileSize = value.size; // File size in bytes
+  //     return fileSize >= 1 * 1024 && fileSize <= 7 * 1024 * 1024; // 1KB to 10MB
+  //   }),
 });
 
 export const BankEmpSchema = Yup.object().shape({

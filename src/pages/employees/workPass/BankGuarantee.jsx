@@ -30,13 +30,11 @@ export const BankGuarantee = () => {
   });
   
 
-  const [bankSubmits, setBankSubmit] = useState([]);
-  const [bankReces, setBankRece] = useState([]);
-  const [bankValids, setBankValids] = useState([]);
-  const [bankEndorses, setBankEndorse] = useState([]);
-  const [empID, setEmpID] = useState("");
+
+  
   const [notification, setNotification] = useState(false);
   const [showTitle,setShowTitle]=useState("")
+  
 
   const [uploadedFileNames, setUploadedFileNames] = useState({
     bankEmpUpload: null,
@@ -47,6 +45,7 @@ export const BankGuarantee = () => {
 
   
   const watchInducBgUpload = watch("bankEmpUpload", ""); // Watch the bankEmpUpload field
+  const empID = watch("empID");
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
@@ -55,22 +54,6 @@ export const BankGuarantee = () => {
     return ""; 
   };
 
-  const approvalDate = () => setBankRece([...bankRece, ""]);
-  const submissionDate = () => setBankSubmit([...bankSubmit, ""]);
-  const validDate = () => setBankValids([...bankValid, ""]);
-  const bankEndor = () => setBankEndorse([...bankEndorse, ""]);
-
-  // const getFileName = (url) => {
-  //   const urlObj = new URL(url);
-  //   const filePath = urlObj.pathname;
-  //   const decodedUrl = decodeURIComponent(filePath);
-
-  //   const fileNameWithExtension = decodedUrl.substring(
-  //     decodedUrl.lastIndexOf("/") + 1
-  //   );
-
-  //   return fileNameWithExtension;
-  // };
 
   const getFileName = (input) => {
     // Check if input is an object and has the 'upload' property
@@ -118,12 +101,6 @@ export const BankGuarantee = () => {
   };
   
 
-  useEffect(() => {
-    const userID = localStorage.getItem("userID");
-    setEmpID(userID);
-    console.log("Navbar: User ID from localStorage:", userID);
-  }, []);
-
 
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
@@ -131,9 +108,12 @@ export const BankGuarantee = () => {
   useEffect(() => {
     setValue("empID", searchResultData.empID);
     const fields = ["bankSubmit","bankRece","bankRefNo","bankAmt","bankValid","bankEndorse","bankEmpUpload"];
-    fields.forEach((field) =>
-      setValue(field, getLastValue(searchResultData[field]))
-    );
+    
+    fields.forEach((field) => {
+      const value = getLastValue(searchResultData[field], field); // Pass the field name to the function
+      setValue(field, value);
+    });
+
     if (searchResultData && searchResultData.bankEmpUpload) {
       try {
         const parsedArray = JSON.parse(searchResultData.bankEmpUpload);
@@ -141,7 +121,7 @@ export const BankGuarantee = () => {
         const parsedFiles = parsedArray.map((item) =>
           typeof item === "string" ? JSON.parse(item) : item
         );
-        console.log(parsedFiles);
+       
         setValue("bankEmpUpload", parsedFiles);
 
         setUploadBG((prev) => ({
@@ -201,7 +181,7 @@ export const BankGuarantee = () => {
     }
   };
 
-  console.log("file",uploadBG);
+
 
   const onSubmit = async (data) => {    
     try {
@@ -214,49 +194,48 @@ export const BankGuarantee = () => {
     const bankValid= formatDate(data.bankValid);
  
       if (checkingEIDTable) {
-
-        const updatedSubmissionDate = [
-          ...new Set([
-            ...(checkingEIDTable.bankSubmit || []), // ensure it's an array before spreading
-            bankSubmit
-          ]),
-        ];
-  
-        const updatedReceDate = [
-          ...new Set([
-            ...(checkingEIDTable.bankRece || []), // ensure it's an array before spreading
-            bankRece
-          ]),
-        ];
-  
-        const updatedBankValidDate = [
-          ...new Set([
-            ...(checkingEIDTable.bankValid || []), // ensure it's an array before spreading
-            bankValid
-          ]),
-        ];
-
-        const updatedBankEndorse = [
+        const updatedBankEnDate = [
           ...new Set([
             ...(checkingEIDTable.bankEndorse || []), // ensure it's an array before spreading
             bankEndorse
           ]),
         ];
+  
+        const updatedReciDate = [
+          ...new Set([
+            ...(checkingEIDTable.bankRece), // ensure it's an array before spreading
+            bankRece
+          ]),
+        ];
+
+        const updatedValidDate = [
+          ...new Set([
+            ...(checkingEIDTable.bankValid), // ensure it's an array before spreading
+            bankValid
+          ]),
+        ];
 
 
+        const updatedSubmitDate = [
+          ...new Set([
+            ...(checkingEIDTable.bankSubmit), // ensure it's an array before spreading
+            bankSubmit
+          ]),
+        ];
+      
         const BJLUpValue = {
           ...data,
-          bankEndorse: updatedBankEndorse.map(formatDate),
-          bankRece: updatedReceDate.map(formatDate),
-          bankSubmit: updatedSubmissionDate.map(formatDate),
-          bankValid: updatedBankValidDate.map(formatDate),
+          bankEndorse: updatedBankEnDate.map(formatDate),
+          bankRece: updatedReciDate.map(formatDate),
+          bankSubmit: updatedSubmitDate.map(formatDate),
+          bankValid: updatedValidDate.map(formatDate),
           bankEmpUpload: JSON.stringify(uploadBG.bankEmpUpload),
           id: checkingEIDTable.id,
         };
-        // console.log("Updated bank Data:", BJLUpValue);
+   
         await UpdateBJLFun({ BJLUpValue });
         setShowTitle("Work Pass Bank Guarantee Info Updated Successfully")
-      setNotification(true);
+        setNotification(true);
       } else {
         const BJLValue = {
           ...data,
@@ -265,19 +244,18 @@ export const BankGuarantee = () => {
           bankSubmit,
           bankValid,
           bankEmpUpload: JSON.stringify(uploadBG.bankEmpUpload),
- 
         };
-        // console.log(BJLValue);
+
         
         await BGData({ BJLValue });
         setShowTitle("Work Pass Bank Guarantee Info Saved Successfully")
         setNotification(true);
       }
-      
+
     } catch (error) {
       console.log(error);
-      
-     
+
+    
     }
   };
 

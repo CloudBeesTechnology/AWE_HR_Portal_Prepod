@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { LuFilter } from "react-icons/lu";
 import { Table } from "../../utils/Table"; // Reusable table component
@@ -9,12 +9,13 @@ import {
 } from "../../graphql/queries";
 
 import { generateClient } from "@aws-amplify/api";
+import { DataSupply } from "../../utils/DataStoredContext";
 const client = generateClient();
 
 // Column mappings for different statuses
 const columnMapping = {
   "Interview Scheduled": [
-    "TempID",
+    "tempID",
     "Name",
     "Nationality",
     // "Application Form",
@@ -24,7 +25,7 @@ const columnMapping = {
     "Interviewer",
   ],
   "Selected Candidate": [
-    "TempID",
+    "tempID",
     "Name",
     "Nationality",
     "Position",
@@ -32,7 +33,7 @@ const columnMapping = {
     "Status Update",
   ],
   "LOI": [
-    "TempID",
+    "tempID",
     "Name",
     "Nationality",
     "Issue Date",
@@ -42,7 +43,7 @@ const columnMapping = {
     "Status Update",
   ],
   "CVEV_OffShore": [
-    "TempID",
+    "tempID",
     "Name",
     "Nationality",
     "Position",
@@ -51,7 +52,7 @@ const columnMapping = {
     "Status Update",
   ],
   "PAAF_OnShore": [
-    "TempID",
+    "tempID",
     "Name",
     "Nationality",
     "Position",
@@ -60,7 +61,7 @@ const columnMapping = {
     "Status Update",
   ],
   "Mobilization": [
-    "TempID",
+    "tempID",
     "Name",
     "Nationality",
     "Position",
@@ -96,54 +97,59 @@ export const Status = () => {
   const [selectedCandidates, setSelectedCandidates] = useState([]);
   const [mergeData, setMergeData] = useState([]);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const [candidateDatas, interviewDatas] = await Promise.all([
-  //         client.graphql({
-  //           query: listCandidateApplicationForms,
-  //         }),
-  //         client.graphql({
-  //           query: listInterviewScheduleSchemas,
-  //         }),
-  //       ]);
+  const { empPDData, educDetailsData } = useContext(DataSupply);
+// console.log(empPDData);
+// console.log(educDetailsData);
 
-  //       const candidates =
-  //         candidateDatas?.data?.listCandidateApplicationForms?.items;
-  //       const interviews =
-  //         interviewDatas?.data?.listInterviewScheduleSchemas?.items;
-  //       console.log(interviews);
+  // Merge function for context data
+  const mergeContextData = (empPDData, educDetailsData) => {
+    return empPDData.map((piData) => {
+      const edData = educDetailsData.find((item) => item.tempID === piData.tempID) || {};
 
-  //       // Merge candidates and interviews based on tempID
-  //       const mergedData = candidates
-  //         .map((candidate) => {
-  //           const interviewDetails = interviews.find(
-  //             (interview) => interview.tempID === candidate.tempID
-  //           );
+      return {
+        ...piData,
+        ...edData,
+      };
+    });
+  };
 
-  //           if (!interviewDetails) return null; // Return null if no interview details match
+  // Fetch interview data and merge with context
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [interviewDatas] = await Promise.all([
+          client.graphql({
+            query: listInterviewScheduleSchemas,
+          }),
+        ]);
 
-  //           // Spread the interview details into the candidate object
-  //           return {
-  //             ...candidate,
-  //             ...interviewDetails, // Merge interview details at the top level
-  //           };
-  //         })
-  //         .filter((candidate) => candidate !== null);
+        const interviews = interviewDatas?.data?.listInterviewScheduleSchemas?.items || [];
 
-  //       console.log(mergedData);
+        if (empPDData && educDetailsData ) {
+          const merged = mergeContextData(empPDData, educDetailsData);
 
-  //       setMergeData(mergedData); // Set the merged data
-  //       setFilteredData(mergedData); // Initialize the filtered data
-  //       setLoading(false); // Indicate that loading is complete
-  //     } catch (err) {
-  //       setError(err.message); // Handle any errors
-  //       setLoading(false);
-  //     }
-  //   };
+          // Add interview details
+          const mergedWithInterviews = merged.map((candidate) => {
+            const interviewDetails = interviews.find(
+              (interview) => interview.tempID === candidate.tempID
+            );
+            return interviewDetails
+              ? { ...candidate, ...interviewDetails }
+              : candidate;
+          });
 
-  //   fetchData();
-  // }, []);
+          setMergeData(mergedWithInterviews);
+          setFilteredData(mergedWithInterviews);
+          setLoading(false);
+        }
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [empPDData, educDetailsData]);
 
   const handleOptionSelect = (option) => {
     setSelectedOptions((prevSelectedOptions) => {
@@ -305,7 +311,7 @@ export const Status = () => {
     // Function to update the candidate in both mergeData and filteredData
     const updateCandidates = (candidates) =>
       candidates.map((candidate) =>
-        candidate.tempid === updatedCandidate.tempid
+        candidate.tempID === updatedCandidate.tempID
           ? { ...candidate, ...updatedCandidate } // Replace the old candidate data with the updated data
           : candidate
       );
@@ -577,8 +583,8 @@ export const Status = () => {
 //   const closeForm = () => setIsFormVisible(false);
 
 //   const columns = selectedFilters === "Selected Candidate"
-//   ? ["TempId", "Name", "Nationality", "Position", "Department", "Status Update"]
-//   : ["TempId", "Name", "Nationality", "Position", "Date", "Time", "Venue", "Interviewer"];
+//   ? ["tempID", "Name", "Nationality", "Position", "Department", "Status Update"]
+//   : ["tempID", "Name", "Nationality", "Position", "Date", "Time", "Venue", "Interviewer"];
 
 //   useEffect(() => {
 //     const handleClickOutside = (event) => {
@@ -600,7 +606,7 @@ export const Status = () => {
 //   const handleFormSave = (updatedCandidate) => {
 //     // Update the main data array with the updated candidate information
 //     const updatedData = data.map((candidate) =>
-//       candidate.tempid === updatedCandidate.tempid
+//       candidate.tempID === updatedCandidate.tempID
 //         ? { ...candidate, ...updatedCandidate } // Replace the old candidate data with the updated data
 //         : candidate
 //     );
@@ -608,7 +614,7 @@ export const Status = () => {
 //     setData(updatedData); // Update the full data
 //     setFilteredData((prevFilteredData) =>
 //       prevFilteredData.map((candidate) =>
-//         candidate.tempid === updatedCandidate.tempid
+//         candidate.tempID === updatedCandidate.tempID
 //           ? { ...candidate, ...updatedCandidate }
 //           : candidate
 //       )

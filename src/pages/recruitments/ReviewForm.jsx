@@ -1,119 +1,127 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import AweLogo from "../../assets/logo/logo-with-name.svg";
 import { ScheduleInter } from "./Form/ScheduleInter";
 import { updateInterviewScheduleSchema } from "../../graphql/mutations";
-import { updatePersonalDetails } from "../../graphql/mutations";
 import { generateClient } from "@aws-amplify/api";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { useLeaveManage } from "../../hooks/useLeaveManage";
-import { HandleRejectCandidates } from "../../services/updateMethod/HandleRejectCandidates";
+import { DataSupply } from "../../utils/DataStoredContext";
 
 const client=generateClient()
 
 
 export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
   // Pass showDecisionButtons as a prop
+  const { IVSSDetails  } = useContext(DataSupply);
+console.log(IVSSDetails);
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [notification, setNotification] = useState(false);
-
   const {personalDetails} = useLeaveManage();
-  const { isRejected, isLoading, error, rejectCandidate } = HandleRejectCandidates();
 
-
-  // Function to handle opening the Schedule Interview modal
   const handleScheduleInterview = () => {
     setIsScheduleOpen(true);
   };
 
-  // Function to handle closing the Schedule Interview modal
   const closeScheduleInterview = () => {
     setIsScheduleOpen(false);
   };
 
   console.log("hey buddy", personalDetails)
 
-  // const handleRejected = async () => {
-  //   try {
-  //     // Ensure tempID is valid before proceeding
-  //     if (!candidate.id) {
-  //       throw new Error('Candidate ID is missing or invalid');
-  //     }
-      
-  //     const data = {
-  //       id: candidate.id,
-  //       status: "Inactive", // Update status to "Inactive"
-  //     };
-
-  //     const response = await client.graphql({
-  //       query: updatePersonalDetails,  // Use your update mutation here
-  //       variables: { input: data },
-  //     });
-
-  //     // Handle success
-  //     console.log('Candidate status updated to "Inactive" successfully', response);
-  //     setNotification(true);
-  //     onClose();  // Close the review form/modal
-
-  //   } catch (error) {
-  //     console.error('Error updating candidate status:', error.message);
-  //   }
-  // };
-  const handleRejected = () => {
-    rejectCandidate(candidate.id, () => {
-      setNotification(true);  // Set notification to true after successful rejection
-      onClose();  // Close the modal after rejection
-    });
-  };
-
-
-  const handleSelected = async (id) => {
+  const handleRejected = async (dataCandi) => {
     try {
-      // Ensure tempID is valid before proceeding
-      if (!id) {
-        throw new Error('tempID is missing or invalid');
+      if (!Array.isArray(dataCandi)) {
+        throw new Error("dataCandi must be an array.");
       }
-      console.log(id);
-      
-      // Log the input object for debugging
-      const data = {
-        id:id,
-        // Ensure this is the correct field name as per your GraphQL schema
-        candidateStatus: "Selected",
-      };
-      
-      const response = await client.graphql({
-        query: updateInterviewScheduleSchema,  // Replace with your actual GraphQL mutation
-        variables: { input:data },
-      }) .then((res)=>{
-        console.log(res);
   
-        setNotification(true);
-        onClose();
-        
-      }).catch((err)=>{
-        console.log(err);
-        
-      })
-    
-      // Log the response from the mutation
-      console.log('Mutation Response:', response);
+      const matchTempIDs = dataCandi.map((val) => {
+        return IVSSDetails?.find((match) => val.tempID === match?.tempID);
+      });
   
-    } catch (error) {
-      console.error('Error:', error.message);
+      const validMatches = matchTempIDs.filter((item) => item?.id);
+  
+      if (validMatches.length === 0) {
+        console.error("No matching candidates found.");
+        console.log("dataCandi:", dataCandi);
+        console.log("IVSSDetails:", IVSSDetails);
+        return;
+      }
+  
+      for (const match of validMatches) {
+        console.log("Updating candidate with ID:", match.id);
+  
+        const data = {
+          id: match.id,
+          candidateStatus: "Rejected",
+        };
+  
+        try {
+          const response = await client.graphql({
+            query: updateInterviewScheduleSchema,
+            variables: { input: data },
+          });
+  
+          console.log("Update successful for candidate ID", match.id, ":", response);
+          setNotification(true); // Show notification on success
+        } catch (err) {
+          console.error("Error updating candidate ID", match.id, ":", err);
+        }
+      }
+  
+      onClose(); // Close the modal after rejection
+    } catch (err) {
+      console.error("Error in handleRejected function:", err);
     }
   };
   
-      // Handle .then((he response and check if the update was successful
-      // if (response.data && response.data.updateInterviewScheduleSchema) {
-      //   console.log('Candidate status updated to "Selected" successfully');
 
+  const handleSelected = async (dataCandi) => {
+    try {
+      if (!Array.isArray(dataCandi)) {
+        throw new Error("dataCandi must be an array.");
+      }
 
-      //   // Optionally hide the notification after a delay
-      // } else {
-      //   console.error('Failed to update candidate status');
-      // }
+      const matchTempIDs = dataCandi.map((val) => {
+        return IVSSDetails?.find((match) => val.tempID === match?.tempID);
+      });
+
+      const validMatches = matchTempIDs.filter((item) => item?.id);
+
+      if (validMatches.length === 0) {
+        console.log(error);       
+        console.log("dataCandi:", dataCandi);
+        console.log("IVSSDetails:", IVSSDetails);
+        return;
+      }
+
+      for (const match of validMatches) {
+        console.log("Updating candidate with ID:", match.id);
+
+        const data = {
+          id: match.id,
+          candidateStatus: "Selected",
+        };
+
+        try {
+          const response = await client.graphql({
+            query: updateInterviewScheduleSchema,
+            variables: { input: data },
+          });
+
+          console.log("Update successful for candidate ID", match.id, ":", response);
+        } catch (err) {
+          console.log(error);
+
+          console.error("Error updating candidate ID", match.id, ":", err);
+        }
+      }
+    } catch (err) {
+      console.log(error);
+      
+      console.error("Error in handleSelected function:", err);
+    }
+  };
   
-      // // Close any modal or UI component if needed (optional)
      
   useEffect(() => {
     // Disable scrolling on the body when the popup is open
@@ -198,15 +206,20 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             {showDecisionButtons && (
               <>
                 <button
-                  className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
-                  onClick={handleRejected}
-                >
-                  Rejected
-                </button>
+  className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
+  onClick={() => {
+    handleRejected([candidate]); // Pass candidate as an array
+  }}
+>
+  Rejected
+</button>
+
                 <button
                   className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
                   onClick={() => {
-                    handleSelected(candidate.id);
+                    handleSelected([candidate]);
+                    // console.log(candidate);
+                    
                   }}
                 >
                   Selected

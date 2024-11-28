@@ -6,14 +6,13 @@ import FamilyDetails from "./FamilyDetails";
 import MedicalDetails from "./MedicalDetails";
 import AccommodationDetails from "./AccommodationDetails";
 import InsuranceDetails from "./InsuranceDetails";
-import WorkInfo from "./WorkInfo";
-import { WorkPass } from "./WorkPass";
+import WorkInfoView from "./WorkInfoView";
+import { WorkPassView } from "./WorkPassView";
 import { FaWindowClose } from "react-icons/fa";
-import EmployeeDocuments from "./EmployeeDocuments";
 import logo from "../../assets/logo/logo-with-name.svg";
 import { useReactToPrint } from "react-to-print";
 import { FaTimes, FaPrint, FaDownload } from "react-icons/fa";
-import DependPassDetails from "./DependPassDetails";
+
 
 export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
   const [activeTab, setActiveTab] = useState(0); // Track active tab
@@ -119,15 +118,39 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     setCurrentPage(1); // Reset page number when tab changes
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return "N/A";
-    const day = date.getDate().toString().padStart(2, "0"); // Adds leading zero if day is single digit
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // getMonth() returns 0-11, so we add 1
-    const year = date.getFullYear();
+  // const formatDate = (dateString) => {
+  //   const date = new Date(dateString);
+  //   if (isNaN(date.getTime())) return "N/A";
+  //   const day = date.getDate().toString().padStart(2, "0"); // Adds leading zero if day is single digit
+  //   const month = (date.getMonth() + 1).toString().padStart(2, "0"); // getMonth() returns 0-11, so we add 1
+  //   const year = date.getFullYear();
 
+  //   return `${day}/${month}/${year}`;
+  // };
+
+  const formatDate = (dateInput) => {
+    // If dateInput is an array, format each date in the array
+    if (Array.isArray(dateInput)) {
+      return dateInput.map((dateString) => {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return "N/A"; // Return "N/A" if the date is invalid
+        const day = date.getDate().toString().padStart(2, "0"); // Add leading zero if day is single digit
+        const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Add 1 to month since getMonth() returns 0-11
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      });
+    }
+  
+    // If dateInput is a single date, format it
+    const date = new Date(dateInput);
+    if (isNaN(date.getTime())) return "N/A"; // Return "N/A" if the date is invalid
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+  
     return `${day}/${month}/${year}`;
   };
+  
   const {
     age,
     email,
@@ -322,9 +345,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Date Of Birth": formatDate(dob),
     "Age": age,
     "Gender": gender,
-    "Nationality": nationality,
-    "Race": race,
-    "Religion": religion,
+   
     "Position":
       Array.isArray(position) && position.length > 0
         ? position[0]
@@ -336,19 +357,22 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Marital Status": marital,
     "Language": lang,
     "Driving License": driveLic,
-    "National Category": nationalCat,
+    
+    "Race": race,
+    "Other Race": otherRace,
+    "Religion": religion,
+    "Other Religion": otherReligion,
+    "Nationality": nationality, 
     "Other Nationality": otherNation,
+    "National Category": nationalCat,
+    "Country of birth": cob,
     "Country of Origin": ctryOfOrigin,
     "Other country of origin": oCOfOrigin,
-    "Other Race": otherRace,
-    "Other Religion": otherReligion,
-    "Academic / Technical qualification": aTQualify,
     "Contract Type": contractType,
     "Employee Type": empType,
     "Employee Badge No": empBadgeNo,
     "Sap No": sapNo,
-    "Chinese": chinese,
-    "Cob": cob,
+    "Chinese character": chinese,
     "Agent Name": agent,
     "Date of Induction Briefing": formatDate(inducBrief),
     "Brunei IC Colour": bwnIcColour,
@@ -369,6 +393,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
   const educationalDetails = {
     "Education Details": eduDetails,
     "Highlight Education": educLevel,
+    "Academic / Technical qualification": aTQualify,
   };
 
   const familyInfo = {
@@ -385,7 +410,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Brunei Medical Appointment Date": formatDate(bruneiMAD), // medical appointment date
     "Brunei Medical Fitness Expiry": formatDate(bruneiME), // medical expiray
     // "Brunei Medical Details": uploadRegis,
-    dependPass: dependPass,
+    // dependPass: dependPass,
   };
 
   const dependenPass = {
@@ -412,6 +437,10 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     // }
   };
 
+  const DependentInsurance = {
+    "Dependent Insurance" : depInsurance,
+  }
+console.log(depInsurance)
   const workInfo = {
     employeeDetails: {
       "Contract End Date": formatDate(contractEnd),
@@ -500,20 +529,20 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       "Date Of Approval": formatDate(doeEmpApproval),
       "Valid Until": formatDate(doeEmpValid),
       "DOE Reference Number": doeEmpRefNo,
-      "DOE Employee Upload": doeEmpUpload,
+      // "DOE Employee Upload": doeEmpUpload,
     },
 
     labourDeposit: {
       "Labour Deposit Receipt Number": lbrReceiptNo,
       "Deposit Amount": lbrDepoAmt,
       "Date Endorsement Of Labour Deposit": lbrDepoSubmit,
-      "Employee Upload": lbrDepoUpload,
+      // "Employee Upload": lbrDepoUpload,
     },
 
     swap: {
       "Client Support Letter Requested Date": formatDate(sawpEmpLtrReq),
       "Client Support Letter Received Date": formatDate(sawpEmpLtrReci),
-      "SAWP Employee Upload": sawpEmpUpload,
+      // "SAWP Employee Upload": sawpEmpUpload,
     },
 
     national: {
@@ -523,7 +552,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       "Date Of Approval": formatDate(nlmsEmpApproval),
       "LD Reference Number": nlmsRefNo,
       "Valid Until": formatDate(nlmsEmpValid),
-      "Employee Upload": nlmsEmpUpload,
+      // "Employee Upload": nlmsEmpUpload,
     },
 
     bank: {
@@ -532,7 +561,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       "BG Reference Number": bankRefNo,
       "Bank Guarantee Amount": bankAmt,
       "Bank Valid Until": formatDate(bankValid),
-      "Employee Upload": bankEmpUpload,
+      // "Employee Upload": bankEmpUpload,
       "Date Endorsement Of BG": formatDate(bankEndorse),
     },
 
@@ -541,7 +570,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       "JITPA Amount": jitpaAmt,
       "Valid Until": formatDate(jpValid),
       "Date Endorsement Of Jitpa": formatDate(jpEndorse),
-      "Employee Upload": jpEmpUpload,
+      // "Employee Upload": jpEmpUpload,
     },
 
     immigration: {
@@ -551,8 +580,6 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
   // const documents = parseDocumentData(passingValue.empUpDocs);
   const documentsTwo = parseDocumentData(passingValue.uploadBwn);
   const documentThree = parseDocumentData(passingValue.workInfoUploads);
-
-  console.log("ghfue", dependPass)
 
   return (
     <>
@@ -600,23 +627,24 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                     supportDocUpload={supportDocUpload}
                     handlePrint={handlePrint}
                     invoiceRef={invoiceRef}
+                    educationalDetails={educationalDetails}
                   />
                 )}
-                {activeTab === 1 && (
+                {/* {activeTab === 1 && (
                   <EducationalDetails
                     educationalDetails={educationalDetails}
                     handlePrint={handlePrint}
                     invoiceRef={invoiceRef}
                   />
-                )}
-                {activeTab === 2 && (
+                )} */}
+                {activeTab === 1 && (
                   <FamilyDetails
                     familyDetails={familyDetails}
                     handlePrint={handlePrint}
                     invoiceRef={invoiceRef}
                   />
                 )}
-                {activeTab === 3 && (
+                {activeTab === 2 && (
                   <MedicalDetails
                     medicalInfo={medicalInfo}
                     dependenPass={dependenPass}
@@ -629,16 +657,17 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                     dependPass={dependPass}
                   />
                 )}
-                {activeTab === 4 && (
+                {activeTab === 3 && (
                   <AccommodationDetails
                     accommodationInfo={accommodationInfo}
                     handlePrint={handlePrint}
                     invoiceRef={invoiceRef}
                   />
                 )}
-                {activeTab === 5 && (
+                {activeTab === 4 && (
                   <InsuranceDetails
                     insuranceInfo={insuranceInfo}
+                    DependentInsurance={DependentInsurance}
                     handlePrint={handlePrint}
                     invoiceRef={invoiceRef}
                     depInsurance={depInsurance}
@@ -646,8 +675,8 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
 
                   />
                 )}
-                {activeTab === 6 && (
-                  <WorkInfo
+                {activeTab === 5 && (
+                  <WorkInfoView
                     workInfo={workInfo}
                     documentThree={documentThree}
                     isPdfOpen={isPdfOpen}
@@ -673,8 +702,8 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                     WITermination={WITermination}
                   />
                 )}
-                {activeTab === 7 && (
-                  <WorkPass
+                {activeTab === 6 && (
+                  <WorkPassView
                     workPass={workPass}
                     doeEmpUpload={doeEmpUpload}
                     lbrDepoUpload={lbrDepoUpload}
@@ -695,43 +724,9 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                     invoiceRef={invoiceRef}
                   />
                 )}
-                {/* {activeTab === 8 && (
-                  <EmployeeDocuments
-                    empUpDocs={empUpDocs}
-                    handlePrint={handlePrint}
-                    invoiceRef={invoiceRef}
-                  />
-                )} */}
-                {/* {activeTab === 8 && (
-                  <DependPassDetails 
-                   dependPass={dependPass}
-                   personalDetails={personalDetails}
-                   profilePhoto={profilePhoto}
-                   // documents={documents}
-                   isPdfOpen={isPdfOpen}
-                   viewingDocument={viewingDocument}
-                   pageNumber={pageNumber}
-                   numPages={numPages}
-                   handleViewDocument={handleViewDocument}
-                   handleCloseViewer={handleCloseViewer}
-                   onDocumentLoadSuccess={onDocumentLoadSuccess}
-                   setPageNumber={setPageNumber}
-                   inducBriefUp={inducBriefUp}
-                   applicationUpload={applicationUpload}
-                   bwnUpload={bwnUpload}
-                   cvCertifyUpload={cvCertifyUpload}
-                   loiUpload={loiUpload}
-                   myIcUpload={myIcUpload}
-                   paafCvevUpload={paafCvevUpload}
-                   ppUpload={ppUpload}
-                   supportDocUpload={supportDocUpload}
-                   handlePrint={handlePrint}
-                   invoiceRef={invoiceRef}
-                  />
-                )} */}
 
               </div>
-              <div className="mt-2 flex justify-center">
+              <div className="flex justify-center py-6">
                 <button
                   onClick={handlePrint}
                   className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"

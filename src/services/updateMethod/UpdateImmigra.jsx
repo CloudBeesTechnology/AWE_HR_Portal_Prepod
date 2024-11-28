@@ -26,7 +26,7 @@ export const UpdateImmigra = () => {
       reEntryVisaExp: [UpImmiValue.reEntryVisaExp],
       remarkImmig: [UpImmiValue.remarkImmig],
     };
-    console.log(totalData);
+
 
     try {
       const storedData=   await Promise.all([
@@ -37,7 +37,7 @@ export const UpdateImmigra = () => {
              },
            })
          ])
-         console.log(storedData,"successfully stored data");
+        
 
        } catch (error) {
          console.error("Error executing GraphQL requests:", error);

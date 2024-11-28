@@ -40,7 +40,7 @@ export const RecODFunc = () => {
       workExperience
     };
   
-    console.log(totalData);
+    // console.log(totalData);
   
     try {
       await Promise.all([

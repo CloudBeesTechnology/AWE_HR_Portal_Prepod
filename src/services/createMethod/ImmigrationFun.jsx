@@ -36,7 +36,7 @@ export const ImmigrationFun = () => {
              },
            })
          ])
-         console.log(storedData,"successfully stored data");
+        //  console.log(storedData,"successfully stored data");
 
        } catch (error) {
          console.error("Error executing GraphQL requests:", error);

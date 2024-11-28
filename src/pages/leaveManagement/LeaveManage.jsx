@@ -43,10 +43,13 @@ export const LeaveManage = () => {
   useEffect(() => {
     const userID = localStorage.getItem("userID");
     setUserID(userID);
+    console.log("Navbar: User ID from localStorage:", userID);
   }, []);
 
   // Use the custom hook
   const { personalInfo } = useEmployeePersonalInfo(userID);
+
+  console.log("Mergeddata", mergedData);
 
   useEffect(() => {
     // Set initial data when mergedData changes
@@ -104,11 +107,30 @@ export const LeaveManage = () => {
     setCurrentPage(1);
   };
 
+  const handleDateChange = (month, year) => {
+    setSelectedMonth(month);
+    setSelectedYear(year);
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (term) => {
+    setSearchTerm(term);
+    setCurrentPage(1);
+  };
 
   const handleClickForToggle = () => {
     setToggleClick(!toggleClick);
   };
 
+  const handleLimitChange = (e) => {
+    setRowsPerPage(parseInt(e.target.value));
+    setCurrentPage(1);
+  };
+
+  const emptySearch = () => {
+    setSearchTerm("");
+    setData(applyFilters());
+  };
 
   const filteredResults = applyFilters();
   const totalPages = Math.ceil(filteredResults.length / rowsPerPage);
@@ -125,12 +147,24 @@ export const LeaveManage = () => {
     setToggleClick(true);
   };
 
+  // const handleUpdate = (empID, newStatus, remark) => {
+  //   setData((prevData) =>
+  //     prevData.map((item) =>
+  //       item.empID === empID
+  //         ? { ...item, status: newStatus, remark: remark }
+  //         : item
+  //     )
+  //   );
+  //   setSelectedLeaveData(null);
+  //   setToggleClick(false);
+  // };
 
   const handleUpdate = async (empID, newStatus, remark) => {
     try {
       await handleUpdateLeaveStatus(empID, { status: newStatus, remark }); // Use the hook's update function
       setSelectedLeaveData(null);
       setToggleClick(false);
+      console.log("Update successful for:", empID);
     } catch (error) {
       console.error("Error updating leave status:", error);
     }
@@ -153,8 +187,10 @@ export const LeaveManage = () => {
   useEffect(() => {
     const userType = localStorage.getItem("userType");
     setUserType(userType);
+    console.log("UserID from localStorage:", userType);
   }, []);
 
+  console.log(personalInfo, "kol");
   const formatDate = (dateString) => {
     // Check if the dateString is empty or invalid before processing
     if (!dateString || isNaN(new Date(dateString).getTime())) {
@@ -181,6 +217,7 @@ export const LeaveManage = () => {
               onClick={() => {
                 setCount(0);
                 setCurrentPage(1);
+                console.log(count);
               }}
             >
               Request Leave
@@ -219,6 +256,7 @@ export const LeaveManage = () => {
                   onClick={() => {
                     setCount(3);
                     setCurrentPage(1);
+                    console.log(count);
                   }}
                 >
                   Request Tickets
@@ -235,7 +273,9 @@ export const LeaveManage = () => {
               allEmpDetails={mergedData}
               searchIcon2={<IoSearch />}
               placeholder="Employee ID"
+              // emptySearch={emptySearch}
               searchUserList={searchUserList}
+              // onSearchChange={handleSearchChange}
               border="rounded-md"
             />
             {count !== 2 && (
@@ -328,12 +368,26 @@ export const LeaveManage = () => {
             </>
           )}
         </section>
+        {/*       
+        <div className="ml-20 flex justify-center">
+          <div className="w-[60%] flex justify-start mt-4  px-10">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(newPage) => {
+                if (newPage >= 1 && newPage <= totalPages) {
+                  setCurrentPage(newPage);
+                }
+              }}
+            />
+          </div>
+        </div> */}
 
         {/* Pagination section */}
         <div className="ml-20 flex justify-center">
           <div className="w-[60%] flex justify-start mt-4 px-10">
             {/* Conditionally render pagination only for tables other than LMTable and TicketsTable */}
-            {(userType === "SuperAdmin" || userType !== "Supervisior" && userType !== "Manager" && count !== 3) && filteredResults.length > 0  && (
+            {(userType === "SuperAdmin" || userType !== "Supervisor" && userType !== "Manager" && count !== 3) && filteredResults.length > 0  && (
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}

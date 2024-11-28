@@ -17,7 +17,6 @@ export const FormField = ({
   append,
   isArray,
   control,
-  arrayDate,
   errorValue,
   arrayString,
 }) => {
@@ -91,25 +90,6 @@ export const FormField = ({
             </option>
           ))}
         </select>
-      ) : arrayDate && control ? (
-        <Controller
-          name={name}
-          control={control}
-          render={({ field }) => (
-            <div>
-              <input
-                className="input-field border"
-                type="date"
-                {...field}
-                value={field.value || ""}
-                onChange={(e) => {
-                  const dateValue = e.target.value;
-                  field.onChange(isArray ? [dateValue] : dateValue);
-                }}
-              />
-            </div>
-          )}
-        />
       ) : arrayString && control ? (
         <Controller
           name={name}
@@ -129,17 +109,7 @@ export const FormField = ({
             </div>
           )}
         />
-      ) : type === "textarea" ? (
-        <textarea
-          className="input-field border"
-          {...register(name)}
-          rows={4}
-          value={value}
-          onChange={(e) => {
-            if (onChange) onChange(e);
-          }}
-        />
-      ): (
+      ) : (
         <input
           type={type}
           value={value}

@@ -4,15 +4,8 @@ import { FormField } from "../../../utils/FormField";
 export const RowSeven = ({
   register,
   errors,
-  value,
-  control,
-  setValue,
-  watch,
-  errorValue,
-  clearErrors
+ 
 }) => {
-  const watchedDate = watch("bwnIcExpiry", []);
-  const expiryValue = watchedDate.length > 0 ? watchedDate : errorValue || "";
   return (
     <div className="grid grid-cols-4 gap-5 form-group">
       <FormField
@@ -37,14 +30,7 @@ export const RowSeven = ({
         register={register}
         name="bwnIcExpiry"
         type="date"
-        control={control}
-        watch={expiryValue}
-        setValue={setValue}
-        clearErrors={clearErrors}
-        isArray
-        arrayDate={true}
-        errorValue={errorValue}
-      />
+        errors={errors}/>
 
       <FormField
         label="Malaysian IC Number"

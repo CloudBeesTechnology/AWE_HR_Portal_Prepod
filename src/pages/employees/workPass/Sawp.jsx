@@ -53,6 +53,9 @@ export const Sawp = () => {
     }
     return ""; 
   };
+
+  
+
   const getFileName = (input) => {
     // Check if input is an object and has the 'upload' property
     if (typeof input === 'object' && input.upload) {
@@ -99,14 +102,10 @@ export const Sawp = () => {
   };
 
 
-  const getLastValue = (value, field) => {
-    if (field === "sawpEmpLtrReq" || field === "sawpEmpLtrReci") {
-      // Return the entire value if it's contractType or empType
-      return value;
-    }
-    // Otherwise, return the last value if it's an array, or the value itself
-    return Array.isArray(value) ? value[value.length - 1] : value;
-  };
+
+  
+  const getLastValue = (value) =>
+    Array.isArray(value) ? value[value.length - 1] : value;
 
   useEffect(() => {
     setValue("empID", searchResultData.empID);
@@ -126,8 +125,9 @@ export const Sawp = () => {
         const parsedFiles = parsedArray.map((item) =>
           typeof item === "string" ? JSON.parse(item) : item
         );
-        console.log(parsedFiles);
+      
         setValue("sawpEmpUpload", parsedFiles);
+        setEmpID(searchResultData.empID);
 
         setUploadSawp((prev) => ({
           ...prev,
@@ -187,22 +187,9 @@ export const Sawp = () => {
 
   const onSubmit = async (data) => {
     try {
-     // Append the new dates to the existing ones
-      setRequestDate((prev) => {
-        const updatedDates = [
-        ...prev,  // Keep the previous values
-        ...(data.sawpEmpLtrReq || [])  // Append the new ones (ensure it's an array)
-        ]
-        return updatedDates; 
-      });
-      // Append the new dates to the existing ones
-      setRecivedDate((prev) => {
-        const updatedDates = [
-        ...prev,  // Keep the previous values
-      ...(data.sawpEmpLtrReci || [])  // Append the new ones (ensure it's an array)
-        ]
-        return updatedDates; 
-    });
+     
+  
+
   
       const checkingEIDTable = SawpDetails ? SawpDetails.find(
         (match) => match.empID === data.empID
@@ -214,14 +201,29 @@ export const Sawp = () => {
       const sawpEmpLtrReci = formatDate(data.sawpEmpLtrReci);
   
       if (checkingEIDTable) {
+
+        const updatedReqDate = [
+          ...new Set([
+            ...(checkingEIDTable.sawpEmpLtrReq || []), // ensure it's an array before spreading
+            sawpEmpLtrReq
+          ]),
+        ];
+  
+        const updatedReciDate = [
+          ...new Set([
+            ...(checkingEIDTable.sawpEmpLtrReci || []), // ensure it's an array before spreading
+            sawpEmpLtrReci
+          ]),
+        ];
+
         const SawpUpValue = {
           ...data,
-          sawpEmpLtrReq:requestDate,
-          sawpEmpLtrReci:recivedDate,
+          sawpEmpLtrReq:updatedReqDate.map(formatDate),
+          sawpEmpLtrReci:updatedReciDate.map(formatDate),
           sawpEmpUpload: JSON.stringify(uploadSawp.sawpEmpUpload),
           id: checkingEIDTable.id,
         };
-        // console.log("Updating data:", SawpUpValue);
+  
         await SawpUpdateFun({ SawpUpValue });
         setShowTitle("Work Pass SAWP Info Updated Successfully")
         setNotification(true);
@@ -232,7 +234,7 @@ export const Sawp = () => {
           sawpEmpLtrReci,
           sawpEmpUpload: JSON.stringify(uploadSawp.sawpEmpUpload),
         };
-        // console.log("Creating new data:", SawpValue);
+      
         await SubmitMPData({ SawpValue });
         setShowTitle("Work Pass SAWP Info Saved Successfully")
         setNotification(true);
@@ -269,7 +271,8 @@ export const Sawp = () => {
           type="date"
           errors={errors}
           control={control}
-          isArray
+          // arrayDate={true}
+          // isArray
           watch={contractTypes}
         />
         <FormField
@@ -278,7 +281,8 @@ export const Sawp = () => {
           name="sawpEmpLtrReci"
           type="date"
           errors={errors}
-          isArray
+          // isArray
+          // arrayDate={true}
           control={control}
           watch={contractTypes1}
         />

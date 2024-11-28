@@ -35,7 +35,6 @@ const LabourImmigration = () => {
   });
   const [notification, setNotification] = useState(false);
   const [dependPassData, setDependPassData] = useState(null);
-  const [showTitle, setShowTitle] = useState("");
 
   const {
     register,
@@ -70,14 +69,19 @@ const LabourImmigration = () => {
 
         setAllEmpDetails(mergedData);
       } catch (err) {
-        // console.error("Error fetching data:", err);
+        console.error("Error fetching data:", err);
       }
     };
 
     fetchData();
   }, [empPIData, LMIData]);
-
+  const watchedEmpID = watch("empID");
   const handleFileChange = async (e, label) => {
+    if (!watchedEmpID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/labourImmigration";
+      return;
+    }
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
     const allowedTypes = ["application/pdf"];
@@ -89,23 +93,24 @@ const LabourImmigration = () => {
     setValue(label, [...currentFiles, selectedFile]);
     try {
       // Dynamically set field based on label
-      await uploadDocs(selectedFile, label, setDocsUploaded);
+      await uploadDocs(selectedFile, label, setDocsUploaded, watchedEmpID);
       setUploadedFileNames((prev) => ({
         ...prev,
         [label]: selectedFile.name,
       }));
     } catch (err) {
-      // console.log(err);
+      console.log(err);
     }
   };
 
-  const getLastValue = (value) =>
-    Array.isArray(value) ? value[value.length - 1] : value;
+  const getLastValue = (value) => {
+    return Array.isArray(value) ? value[value.length - 1] : value;
+  };
 
   const searchResult = (result) => {
-    
+    // console.log(result);
 
-    const keysToSet = ["empID", "overMD", "overME", "bruhimsRD", "bruhimsRNo"];
+    const keysToSet = ["empID", "bruhimsRNo", "overMD", "overME", "bruhimsRD"];
 
     keysToSet.forEach((key) => {
       if (result[key]) setValue(key, result[key]);
@@ -117,11 +122,9 @@ const LabourImmigration = () => {
     if (result?.dependPass) {
       try {
         const parsedData = JSON.parse(result.dependPass);
-        
-        
         setDependPassData(parsedData);
       } catch (error) {
-        // console.error("Failed to parse dependPass:", error);
+        console.error("Failed to parse dependPass:", error);
       }
     }
 
@@ -137,7 +140,7 @@ const LabourImmigration = () => {
           const parsedFiles = parsedArray.map((item) =>
             typeof item === "string" ? JSON.parse(item) : item
           );
-          
+          // console.log(parsedFiles);
           setValue(field, parsedFiles);
 
           setDocsUploaded((prev) => ({
@@ -153,37 +156,53 @@ const LabourImmigration = () => {
                 : "",
           }));
         } catch (error) {
-          // console.error(`Failed to parse ${field}:`, error);
+          console.error(`Failed to parse ${field}:`, error);
         }
       }
     });
   };
-  function getFileName(url) {
-    const urlObj = new URL(url);
-    const filePath = urlObj.pathname;
-
-    const decodedUrl = decodeURIComponent(filePath);
-
-    // Extract the file name after the last '/' in the path
-    const fileNameWithExtension = decodedUrl.substring(
-      decodedUrl.lastIndexOf("/") + 1
-    );
-
-    return fileNameWithExtension;
-  }
+  const getFileName = (filePath) => {
+    const fileNameWithExtension = filePath.split("/").pop(); // Get file name with extension
+    const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
+    return fileName;
+  };
 
   const onSubmit = async (data) => {
-    // console.log(data);
     try {
       const checkingPITable = empPIData.find(
         (match) => match.empID === data.empID
       );
-      const checkingIDTable = LMIData.find(
+      const checkingLMIDTable = LMIData.find(
         (match) => match.empID === data.empID
       );
-      if (checkingIDTable && checkingPITable) {
+      const formatDate = (date) =>
+        date ? new Date(date).toLocaleDateString("en-CA") : null;
+      const overMD = formatDate(data.overMD);
+      const overME = formatDate(data.overME);
+      const bruhimsRD = formatDate(data.bruhimsRD);
+      const bruneiMAD = formatDate(data.bruneiMAD);
+      const bruneiME = formatDate(data.bruneiME);
+      if (checkingLMIDTable && checkingPITable) {
+        const updateFieldArray = (existingArray, newValue) => [
+          ...new Set([...(existingArray || []), newValue]),
+        ];
+
+        const updatebruneiMAD = updateFieldArray(
+          checkingLMIDTable.bruneiMAD,
+          bruneiMAD
+        );
+        const updatebruneiME = updateFieldArray(
+          checkingLMIDTable.bruneiME,
+          bruneiME
+        );
+
         const LabUpValue = {
           ...data,
+          overMD: overMD,
+          overME: overME,
+          bruhimsRD: bruhimsRD,
+          bruneiMAD: updatebruneiMAD.map(formatDate),
+          bruneiME: updatebruneiME.map(formatDate),
           uploadFitness: JSON.stringify(docsUploaded.uploadFitness),
           uploadRegis: JSON.stringify(docsUploaded.uploadRegis),
           uploadBwn: JSON.stringify(docsUploaded.uploadBwn),
@@ -201,16 +220,25 @@ const LabourImmigration = () => {
               };
             })
           ),
-          LabTable: checkingIDTable.id,
+          LabTable: checkingLMIDTable.id,
         };
         // console.log("Update Method :", LabUpValue);
 
         await updateMedicalSubmit({ LabUpValue });
-        setShowTitle("Medical and Dependent Info details updated successfully");
+        setShowTitle("Employee Personal Info updated successfully");
         setNotification(true);
       } else {
+        const [updatebruneiMAD, updatebruneiME] = [[bruneiMAD], [bruneiME]].map(
+          (arr) => [...new Set(arr)]
+        );
+
         const labValue = {
           ...data,
+          overMD: overMD,
+          overME: overME,
+          bruhimsRD: bruhimsRD,
+          bruneiMAD: updatebruneiMAD.map(formatDate),
+          bruneiME: updatebruneiME.map(formatDate),
           uploadFitness: JSON.stringify(docsUploaded.uploadFitness),
           uploadRegis: JSON.stringify(docsUploaded.uploadRegis),
           uploadBwn: JSON.stringify(docsUploaded.uploadBwn),
@@ -231,16 +259,11 @@ const LabourImmigration = () => {
         };
         // console.log("Create Method :", labValue);
         await SubmitMPData({ labValue });
-        setShowTitle("Medical and Dependent Info details saved successfully");
+        setShowTitle("Employee Personal Info saved successfully");
         setNotification(true);
       }
     } catch (error) {
       console.log(error);
-
-      console.error(
-        "Error submitting data to AWS:",
-        JSON.stringify(error, null, 2)
-      );
     }
   };
 
@@ -324,7 +347,7 @@ const LabourImmigration = () => {
       {/* Notification */}
       {notification && (
         <SpinLogo
-          text={showTitle}
+          text="Medical and Dependent Info details saved successfully"
           notification={notification}
           path="/labourImmigration"
         />

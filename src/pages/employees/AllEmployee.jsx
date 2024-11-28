@@ -28,7 +28,8 @@ export const AllEmployee = () => {
     LMIData,
     EmpInsuranceData,
     depInsuranceData,
-    NLAData
+    NLAData,
+    SawpDetails
   } = useContext(DataSupply);
   const [searchTerm, setSearchTerm] = useState("");
   const [mergeData, setMergeData] = useState([]); // To store merged data
@@ -37,18 +38,39 @@ export const AllEmployee = () => {
   const [error, setError] = useState(null); // To track error state
   const [showForm, setShowForm] = useState(false);
   const [passingValue, setPassingValue] = useState([]);
+  const [filteredEmployees, setFilteredEmployees] = useState(mergeData);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(30);
   const [paginatedData, setPaginatedData] = useState([]);
+  const [data, setData] = useState([])
 
   const handleSearch = (e) => {
-    const term = e.target.value.toLowerCase();
-    setSearchTerm(term);
-
-    setFilteredData(filtered);
+    const query = e.target.value.toLowerCase();
+    if (query) {
+      const results = mergeData.filter(
+        (employee) =>
+          employee.empID?.toLowerCase().includes(query) ||
+          employee.name?.toLowerCase().includes(query) ||
+          employee.position?.toLowerCase().includes(query) ||
+          employee.empBadgeNo?.toLowerCase().includes(query)
+      );
+      setFilteredData(results);
+    } else {
+      setFilteredData(mergeData); // Reset to original data if search query is empty
+    }
   };
+
+  const searchUserList = async (data) => {
+    try {
+      const result = await data;
+      setData(result);
+    } catch (error) {
+      console.error("Error search data", error);
+    }
+  }; 
+
   useEffect(() => {
     // Check if both data sets are available
     if (
@@ -68,7 +90,8 @@ export const AllEmployee = () => {
       LMIData &&
       EmpInsuranceData &&
       depInsuranceData &&
-      NLAData
+      NLAData &&
+      SawpDetails
     ) {
       // Merging all data based on empID
       const allDataValues = empPIData.map((empPIItem) => {
@@ -88,6 +111,7 @@ export const AllEmployee = () => {
         const educDetailsMatch = educDetailsData.find((item) => item.empID === empPIItem.empID) || {};
         const workInfoMatch = workInfoData.find((item) => item.empID === empPIItem.empID) || {};
         const userMatch = userData.find((item) => item.empID === empPIItem.empID) || {};
+        const swapMatch = SawpDetails.find((item) => item.empID === empPIItem.empID) || {};
 
         return {
           ...empPIItem,
@@ -107,15 +131,25 @@ export const AllEmployee = () => {
           ...educDetailsMatch,
           ...workInfoMatch,
           ...userMatch,
+          ...swapMatch,
         };
-      });
+      }).filter(item => item?.empID)  // Only include items with a valid empID
+      .reduce((unique, item) => {
+        // Use a Map to keep unique empIDs and avoid duplicates
+        if (!unique.some(emp => emp.empID === item.empID)) {
+          unique.push(item);
+        }
+        return unique;
+      }, []);  // Initialize with an empty array to store unique items
+  ;
 
       const sorted = allDataValues.sort((a, b) =>
         a.empID.localeCompare(b.empID)
       );
-      console.log(allDataValues, "kjhgfd");
+      // console.log(allDataValues, "kjhgfd");
 
       setMergeData(sorted);
+      setFilteredData(sorted);
 
       if (sorted.length > 0) {
         setLoading(false);
@@ -144,16 +178,17 @@ export const AllEmployee = () => {
     LMIData,
     EmpInsuranceData,
     depInsuranceData,
-    NLAData
+    NLAData,
+    SawpDetails,
   ]);
-  console.log(IDData);
+  // console.log(IDData);
 
   // Handle pagination
   useEffect(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
-    const paginated = mergeData.slice(startIndex, startIndex + rowsPerPage);
+    const paginated = filteredData.slice(startIndex, startIndex + rowsPerPage);
     setPaginatedData(paginated);
-  }, [mergeData, currentPage, rowsPerPage]);
+  }, [filteredData, currentPage, rowsPerPage]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -176,6 +211,8 @@ export const AllEmployee = () => {
     return `${day}/${month}/${year}`;
   };
 
+  // console.log(mergeData, "hey ")
+
   return (
     <section className="bg-[#F5F6F1CC] w-full flex items-center flex-col h-screen pt-14">
       <div className="w-full px-10 flex justify-between items-center mb-10">
@@ -185,10 +222,11 @@ export const AllEmployee = () => {
         <div className="relative">
           <Searchbox
             type="text"
-            placeholder="Search by Name or Position"
-            newFormData={paginatedData}
-            value={searchTerm}
-            onChange={handleSearch}
+            placeholder="Search by Name or Emp ID"
+            allEmpDetails={mergeData}
+            searchUserList={setFilteredData}
+            // value={searchTerm}
+            // onChange={handleSearch}
             className="py-2 px-4 rounded-lg shadow-[0_1px_6px_1px_rgba(0,0,0,0.2)]"
           />
           <img
@@ -210,24 +248,30 @@ export const AllEmployee = () => {
                 <th className="py-4 px-2">Nationality</th>
                 <th className="py-4 px-2 ">Email</th>
                 <th className="py-4 px-2 ">Contact No</th>
-                {/* <th className="py-4 px-2 ">Action</th> */}
+                <th className="py-4 px-2 ">Status</th>
               </tr>
             </thead>
-            <tbody className="bg-white">
+            <tbody className="bg-white text-center text-sm font-semibold text-dark_grey">
               {paginatedData.map((candidate, index) => (
+                
                 <tr
                   key={index}
                   className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)]"
-                  onClick={() => handleFormShow(candidate)}
+                  onClick={() => {
+                    console.log("Clicked candidate data:", candidate);
+                    {handleFormShow(candidate)}
+                  } 
+                }
                 >
-                  <td className=" py-4 px-4 ">{candidate?.empID}</td>
-                  <td className=" py-4 px-4 ">{candidate?.empBadgeNo}</td>
-                  <td className="py-4 px-4 ">{candidate?.name}</td>
-                  <td className="py-4 px-4">{formatDate(candidate?.dob)}</td>
+                  <td className=" py-4 px-4 ">{candidate?.empID || "N/A"}</td>
+                  <td className=" py-4 px-4 ">{candidate?.empBadgeNo || "N/A"}</td>
+                  <td className="py-4 px-4 ">{candidate?.name || "N/A"}</td>
+                  <td className="py-4 px-4">{formatDate(candidate?.dob || "N/A")}</td>
 
-                  <td className="py-4 px-4">{candidate?.nationality}</td>
-                  <td className="py-4 px-4 ">{candidate?.email}</td>
-                  <td className="py-4 px-4 ">{candidate?.contactNo}</td>
+                  <td className="py-4 px-4">{candidate?.nationality || "N/A"}</td>
+                  <td className="py-4 px-4 ">{candidate?.email || "N/A"}</td>
+                  <td className="py-4 px-4 ">{candidate?.contactNo || "N/A"}</td>
+                  <td className="py-4 px-4 ">{candidate?.workStatus || "N/A"}</td>
                   {/* <td className="py-4 px-4 text-dark_skyBlue underline">
                     <button  onClick={() => handleFormShow(candidate)} className="underline">View</button>
                   </td> */}
@@ -248,11 +292,11 @@ export const AllEmployee = () => {
         <div className="ml-[750px] flex justify-between mt-12 px-10">
           <Pagination
             currentPage={currentPage}
-            totalPages={Math.ceil(mergeData.length / rowsPerPage)}
+            totalPages={Math.ceil(filteredData.length / rowsPerPage)}
             onPageChange={(newPage) => {
               if (
                 newPage >= 1 &&
-                newPage <= Math.ceil(mergeData.length / rowsPerPage)
+                newPage <= Math.ceil(filteredData.length / rowsPerPage)
               ) {
                 setCurrentPage(newPage);
               }

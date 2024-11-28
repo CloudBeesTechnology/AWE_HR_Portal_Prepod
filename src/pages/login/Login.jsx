@@ -75,7 +75,61 @@ const client = generateClient();
   });
   
 
+  // const Submit = handleSubmit(async (data) => {
   
+  //   try {
+  //     const username = data.userID;
+  //     const password = data.password;
+  //     const { isSignedIn, userId, nextStep } = await signIn({
+  //       username,
+  //       password,
+  //     });
+  //     const currentUser = await getCurrentUser();
+  //     if (isSignedIn || currentUser) {
+  //       const userToStore = currentUser ? currentUser.username : username;
+  //       localStorage.setItem("userID", userToStore);
+  //       // console.log(userToStore);
+
+  //       try {
+  //         const resultUser = await client.graphql({
+  //           query: listUsers,
+  //         })
+
+  //         const userType = resultUser?.data?.listUsers?.items.find(
+  //           (val) => val.empID === userToStore.toUpperCase()
+  //         )?.selectType;
+  //         if (user && user.selectType && user.status === 'Active') {
+  //           localStorage.setItem("userType", user.selectType);
+  //           window.location.href = "/dashboard";
+  //         } else {
+  //           console.error("User is not active or userType not found");
+  //           // Handle the error (e.g., show an error message)
+  //           alert("Access denied: User is not active or userType not found");
+  //         }
+  //       } catch (error) {
+  //         console.error("Error fetching user details:", error);
+  //         alert("Access denied: User is not active or userType not found");
+  //         // Handle error (e.g., show an error message)
+  //       }
+
+  //       // window.location.href = "/dashboard";
+  //     }
+  //     // else {
+  //     //   if (nextStep.signInStep === "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD") {
+  //     //     console.log("Redirecting to change password page...");
+  //     //     window.location.href = "/changePassword";
+  //     //   } else if (
+  //     //     nextStep.signInStep === "CONFIRM_SIGN_IN_WITH_CUSTOM_CHALLENGE"
+  //     //   ) {
+  //     //     console.log("Custom challenge required, handling...");
+  //     //   } else {
+  //     //     console.log("Unknown next step:", nextStep);
+  //     //   }
+  //     // }
+  //   } catch (error) {
+  //     setError(error.message);
+  //   }
+  // });
 
   return (
     // <Authenticator>
@@ -160,7 +214,15 @@ const client = generateClient();
               Login
             </button>
           </div>
-      
+          {/* <hr className="border-[1.5px] text-[#B3B3B3]" />
+          <div className="center">
+            <Link
+              to="/changePassword"
+              className="text-[#7A7A7A] text_size_6 text-center my-5"
+            >
+              Change Password
+            </Link>
+          </div> */}
         </section>
       </div>
     </section>

@@ -12,7 +12,7 @@ import { DataSupply } from '../../../utils/DataStoredContext';
 import { useContext } from 'react';
 import { UpdateImmigra } from '../../../services/updateMethod/UpdateImmigra';
 
-export const Immigration = ({empID}) => {
+export const Immigration = () => {
   const { searchResultData } = useOutletContext();
 
   useEffect(() => {
@@ -55,6 +55,7 @@ export const Immigration = ({empID}) => {
   const watchInducImmUpAS = watch("arrivStampUpload", ""); // Watch the arrivStampUpload field
   const watchInducImmUpIE = watch("immigEmpUpload", ""); // Watch the arrivStampUpload field
   const watchInducImmUpRE = watch("reEntryUpload", ""); // Watch the arrivStampUpload field
+  const empID = watch("empID");
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
@@ -69,6 +70,7 @@ export const Immigration = ({empID}) => {
   const addPpSubmit = () => setPpSubmit([...ppSubmit, ""]);
   const addReEntryVisaExp = () => setReEntryVisaExp([...reEntryVisaExp, ""]);
 
+  
   const getFileName = (input) => {
     // Check if input is an object and has the 'upload' property
     if (typeof input === 'object' && input.upload) {
@@ -259,7 +261,7 @@ export const Immigration = ({empID}) => {
           reEntryUpload: JSON.stringify(uploadedImmigrate.reEntryUpload), 
           id: checkingEIDTable.id,
         };
-        // console.log(UpImmiValue);
+ 
         await UpdateImmigraData({ UpImmiValue });
         setShowTitle("Work Pass Immigration Info Updated successfully")
         setNotification(true);
@@ -282,7 +284,6 @@ export const Immigration = ({empID}) => {
       }
     } catch (error) {
       console.error("Error submitting data:", error);
-      setNotification(true); // Optionally show an error notification
     }
   };
 

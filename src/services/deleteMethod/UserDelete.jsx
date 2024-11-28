@@ -17,7 +17,7 @@ export const UserDelete = () => {
     id:id,
     status:"InActive"
   }
-  console.log(id);
+  // console.log(id);
   
     try {
       await client
@@ -28,7 +28,8 @@ export const UserDelete = () => {
           },
         })
         .then((res) => {
-          console.log(res, "deleted successfully");
+          // console.log(res, "deleted successfully");
+          // window.location.href="/user"
         });
     } catch (err) {
       console.log("Error deleting user:", err);

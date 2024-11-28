@@ -10,7 +10,7 @@ export const uploadDocs = async (
 ) => {
   try {
     const currentUser = await getCurrentUser();
-    console.log(empID);
+
     
     if (currentUser) {
       const result = await uploadData({
@@ -18,12 +18,12 @@ export const uploadDocs = async (
         data: file,
       }).result;
       const fileUrl = result.path;
-      console.log(fileUrl);
+
       
      
       const uploadDate = new Date().toISOString().split("T")[0];
       if (typeof index === "number") {
-   
+        
         setUploadedDocs((prev) => {
           const updatedUploads = { ...prev };
 
@@ -49,10 +49,10 @@ export const uploadDocs = async (
 
           return updatedUploads;
         });
-     
+       
       } else {
-    
-        console.log("not index");
+       
+      
 
         setUploadedDocs((prev) => ({
           ...prev,

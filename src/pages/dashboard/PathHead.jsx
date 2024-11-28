@@ -15,6 +15,8 @@ export const PathHead = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [LPACount, setLPACount] = useState(0);
   const [SAWPCount, setSAWPCount] = useState(0);
+
+ 
   
   
   // Function to merge and calculate counts
@@ -22,12 +24,10 @@ export const PathHead = () => {
     try {
       const candidates = [...empPIData, ...IDData];
 
+
       setMergeData(candidates);
       
-      // const bruneian = candidates.filter(
-      //   (item) => item.nationality === "Bruneian" || item.nationality === "Brunei PR"
-      // ).length;
-      // setBruneianCount(bruneian);
+   
       const bruneian = candidates.filter(
         (item) => Array.isArray(item.contractType) && item.contractType.includes("Local")
       ).length;

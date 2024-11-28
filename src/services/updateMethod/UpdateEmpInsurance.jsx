@@ -21,7 +21,7 @@ export const UpdateEmpInsDataFun = () => {
         empInsUpload:[empInsValue.empInsUpload],
 
     };
-    console.log(totalData);
+    
 
     try {
       const storedData=   await Promise.all([
@@ -32,13 +32,12 @@ export const UpdateEmpInsDataFun = () => {
              },
            })
          ])
-         console.log(storedData,"successfully Updated data");
+        
 
        } catch (error) {
         console.log(error);
         
-         console.error("Error executing GraphQL requests:", error);
-         throw error; // Rethrow error if needed
+         
        }
   }, []);
   return { UpdateEIDataSubmit };

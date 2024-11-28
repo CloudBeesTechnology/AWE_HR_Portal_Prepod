@@ -4,7 +4,8 @@ export const UploadOffshoreFile = (
   excelFile,
   setExcelData,
   setExcelFile,
-  fileInputRef
+  fileInputRef,
+  setLoading
 ) => {
   if (excelFile !== null) {
     const workbook = XLSX.read(excelFile, { type: "buffer" });
@@ -187,6 +188,7 @@ export const UploadOffshoreFile = (
     });
     console.log("formattedData : ", formattedData);
     setExcelData(formattedData);
+    setLoading(false);
     return tbodyHeader;
   }
 

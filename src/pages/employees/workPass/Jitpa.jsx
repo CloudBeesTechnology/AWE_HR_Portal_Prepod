@@ -40,6 +40,7 @@ export const Jitpa = () => {
   });
 
   const watchInducJitpaUpload = watch("jpEmpUpload", ""); 
+  
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
@@ -118,7 +119,7 @@ export const Jitpa = () => {
         const parsedFiles = parsedArray.map((item) =>
           typeof item === "string" ? JSON.parse(item) : item
         );
-      
+        console.log(parsedFiles);
         setValue("jpEmpUpload", parsedFiles);
 
         setUploadjitpa((prev) => ({
@@ -181,6 +182,7 @@ export const Jitpa = () => {
 
   const onSubmit = async (data) => {
 
+
     const formatDate = (date) => date ? new Date(date).toLocaleDateString('en-CA') : null;
     const tbaPurchase = formatDate(data.tbaPurchase);
     const jpValid = formatDate(data.jpValid);
@@ -191,6 +193,7 @@ export const Jitpa = () => {
       if (empID) {
 
         matchedEmployee = BJLData.find((val) => val.empID === empID);
+  
 
         const updatedSubmissionDate = [
           ...new Set([
@@ -212,7 +215,8 @@ export const Jitpa = () => {
              jpValid
           ]),
         ];
-  
+   
+
 
       const JitpaValue = {
         ...data,
@@ -222,7 +226,7 @@ export const Jitpa = () => {
       jpEmpUpload: JSON.stringify(uploadjitpa.jpEmpUpload),
         id: matchedEmployee ? matchedEmployee.id : null,
       };
-      // console.log(JitpaValue);
+
       
      
 
@@ -234,16 +238,9 @@ export const Jitpa = () => {
     }
     } catch (error) {
       console.error("Error submitting data:", error);
-      
+   
 
-      if (error?.errors) {
-        error.errors.forEach((err, index) => {
-          console.error(`GraphQL Error ${index + 1}:`, err.message);
-          if (err.extensions) {
-            console.error("Error Extensions:", err.extensions);
-          }
-        });
-      }
+     
     }
   };
 

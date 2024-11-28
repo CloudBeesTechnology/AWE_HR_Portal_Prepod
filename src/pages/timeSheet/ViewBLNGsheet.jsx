@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
 import { EditTimeSheet } from "./EditTimeSheet";
 import { generateClient } from "@aws-amplify/api";
@@ -9,11 +9,12 @@ import {
   updateBlng,
 } from "../../graphql/mutations";
 
-import { listEmpWorkInfos } from "../../graphql/queries";
+import { listBlngs, listEmpWorkInfos } from "../../graphql/queries";
 import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
 import { SuccessMessage } from "./ModelForSuccessMess/SuccessMessage";
 import { PopupForMissMatchExcelSheet } from "./ModelForSuccessMess/PopupForMissMatchExcelSheet";
-
+import { useScrollableView } from "./customTimeSheet/UseScrollableView";
+import "../../../src/index.css";
 const client = generateClient();
 
 export const ViewBLNGsheet = ({
@@ -25,53 +26,26 @@ export const ViewBLNGsheet = ({
   Position,
 }) => {
   const [data, setData] = useState(null);
+  const [secondaryData, setSecondaryData] = useState(null);
   const [currentStatus, setCurrentStatus] = useState(null);
 
   const [editObject, setEditObject] = useState();
   const [toggleHandler, setToggleHandler] = useState(false);
-  const [loading, setLoading] = useState(true);
+
   const [userIdentification, setUserIdentification] = useState("");
   const [successMess, setSuccessMess] = useState(null);
 
   const [showStatusCol, setShowStatusCol] = useState(null);
-  const ITEMS_PER_PAGE = 50; // Initial number of items to display
-  const [visibleData, setVisibleData] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    // Load initial data
-    if (data && data.length > 0) {
-      setVisibleData(data.slice(0, ITEMS_PER_PAGE));
-    }
-  }, [data]);
+  const { handleScroll, visibleData, setVisibleData } = useScrollableView(
+    data,
+    Position
+  );
 
-  const loadMoreData = useCallback(() => {
-    // Calculate new visible data when user scrolls down
-    const nextPage = currentPage + 1;
-    const start = currentPage * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE;
-    const newItems = data.slice(start, end);
-
-    setVisibleData((prevData) => [...prevData, ...newItems]);
-    setCurrentPage(nextPage);
-  }, [currentPage, data]);
-
-  const handleScroll = (e) => {
-    const threshold = 5;
-    const bottomReached =
-      e.target.scrollHeight - e.target.scrollTop <=
-      e.target.clientHeight + threshold;
-
-    if (bottomReached) {
-      if (data && data.length > 0) {
-        loadMoreData();
-      }
-    }
-  };
   useEffect(() => {
     if (excelData) {
       const fetchData = async () => {
-        // setLoading(true);
+        // setLoading is removed
         try {
           const dataPromise = new Promise((resolve, reject) => {
             if (excelData) {
@@ -111,12 +85,13 @@ export const ViewBLNGsheet = ({
             });
             console.log("MergedData : ", mergedData);
             setData(mergedData); // Set merged data
+            setSecondaryData(mergedData);
           };
 
           fetchWorkInfo();
         } catch (err) {
         } finally {
-          // setLoading(false);
+          // setLoading is removed ;
         }
       };
       fetchData();
@@ -161,11 +136,30 @@ export const ViewBLNGsheet = ({
             }),
           };
         });
+
+      // if (Position === "Manager") {
+      //   const getData = result.map((val) => {
+      //     return val.data.map((m) => m);
+      //   });
+      //   // console.log("poiuytrelkjh : ", getData.flat().flat());
+      //   // setData(k);
+      //   const finalResult = getData.flat().flat();
+      //   console.log(finalResult);
+      // }
+
       setData(result);
+      setSecondaryData(result);
     }
   };
-  const searchResult = (result) => {
-    setData(result);
+
+  const searchResult = async (searchedData) => {
+    console.log(searchedData);
+    try {
+      const result = await searchedData;
+      setData(result);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
   };
 
   const cleanValue = (value) => {
@@ -177,7 +171,7 @@ export const ViewBLNGsheet = ({
 
   useEffect(() => {
     const checkKeys = async () => {
-      // setLoading(true);
+      // setLoading is removed
       const cleanData = returnedTHeader.map((item) => {
         const cleanedItem = {};
         for (const key in item) {
@@ -221,14 +215,14 @@ export const ViewBLNGsheet = ({
       console.log(result);
       setShowStatusCol(result);
       setCurrentStatus(result); // Assuming setCurrentStatus is defined
-      // setLoading(false);
+      // setLoading is removed ;
     };
     if (returnedTHeader && returnedTHeader.length > 0) {
       checkKeys();
     } else if (!returnedTHeader) {
       const fetchData = async () => {
         setCurrentStatus(true);
-        // setLoading(true);
+        // setLoading is removed
         try {
           const dataPromise = new Promise((resolve, reject) => {
             if (convertedStringToArrayObj) {
@@ -266,7 +260,7 @@ export const ViewBLNGsheet = ({
           }
         } catch (err) {
         } finally {
-          // setLoading(false);
+          // setLoading is removed ;
         }
       };
 
@@ -274,7 +268,7 @@ export const ViewBLNGsheet = ({
       fetchData();
     } else {
       setCurrentStatus(false);
-      setLoading(false);
+      //  setLoading is removed ;
     }
   }, [returnedTHeader, convertedStringToArrayObj]);
 
@@ -289,6 +283,7 @@ export const ViewBLNGsheet = ({
   };
 
   const editNestedData = (data, getObject) => {
+    console.log("Working");
     return data.map((m) => ({
       id: m.id,
       data: m.data.map((val) => {
@@ -322,8 +317,10 @@ export const ViewBLNGsheet = ({
       ? editNestedData(data, getObject)
       : editFlatData(data, getObject);
     // console.log(result);
+
     setData(result);
   };
+
   // const fieldObj = {
   //   FID: null,
   //   NAMEFLAST: null,
@@ -375,8 +372,62 @@ export const ViewBLNGsheet = ({
   // ];
   // useTableFieldData
   const AllFieldData = useTableFieldData(titleName);
-  console.log(AllFieldData);
+
   const renameKeysFunctionAndSubmit = async () => {
+    // if (userIdentification !== "Manager") {
+    //   const result =
+    //     data &&
+    //     data.map((val) => {
+    //       return {
+    //         fid: val?.FID || 0,
+    //         name: val?.NAMEFLAST || "",
+    //         entDate: val?.ENTRANCEDATEUSED || "",
+    //         entDT: val?.ENTRANCEDATETIME || "",
+    //         exitDT: val?.EXITDATETIME || "",
+    //         day: val?.DAYDIFFERENCE || 0,
+    //         avgTotalDay: val?.AVGDAILYTOTALBYDAY || "",
+    //         totalhrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
+    //         workDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
+    //         normalWhrsPerDay: val?.NORMALWORKINGHRSPERDAY || 0,
+    //         workhrs: val?.WORKINGHOURS || 0,
+    //         OT: val?.OT || 0,
+    //         // jobCode: val?.JOBCODE || [],
+    //         // location: val?.LOCATION || [],
+    //         jobLocaWhrs: val?.jobLocaWhrs || "",
+    //         remarks: val?.REMARKS || "",
+    //       };
+    //     });
+    //   console.log(result);
+    //   //   CREATE
+    //   const currentDate = new Date().toLocaleDateString();
+    //   const weaklysheet = {
+    //     weeklySheet: JSON.stringify(result),
+    //     status: "Pending",
+    //     date: currentDate,
+    //   };
+    //   console.log(weaklysheet);
+    //   if (weaklysheet.weeklySheet) {
+    //     console.log(weaklysheet);
+    //     await client
+    //       .graphql({
+    //         query: createBlng,
+    //         variables: {
+    //           input: weaklysheet,
+    //         },
+    //       })
+    //       .then((res) => {
+    //         console.log(res);
+    //         if (res.data.createBlng) {
+    //           toggleSFAMessage(true);
+    //         }
+    //       })
+    //       .catch((err) => {
+    //         console.log(err);
+    //         toggleSFAMessage(false);
+    //       });
+    //   }
+    // }
+
     if (userIdentification === "TimeKeeper") {
       const result =
         data &&
@@ -394,107 +445,53 @@ export const ViewBLNGsheet = ({
             normalWhrsPerDay: val?.NORMALWORKINGHRSPERDAY || 0,
             workhrs: val?.WORKINGHOURS || 0,
             OT: val?.OT || 0,
-            // jobCode: val?.JOBCODE || [],
-            // location: val?.LOCATION || [],
             jobLocaWhrs: val?.jobLocaWhrs || "",
             remarks: val?.REMARKS || "",
           };
         });
-      console.log(result);
-      //   CREATE
+
       const currentDate = new Date().toLocaleDateString();
-      const weaklysheet = {
-        weeklySheet: JSON.stringify(result),
-        status: "Pending",
-        date: currentDate,
-      };
-      console.log(weaklysheet);
-      if (weaklysheet.weeklySheet) {
-        console.log(weaklysheet);
-        await client
-          .graphql({
+
+      // Function to submit a batch
+      const submitBatch = async (batch, batchNumber) => {
+        const weeklySheet = {
+          weeklySheet: JSON.stringify(batch),
+          status: "Pending",
+          date: currentDate,
+        };
+
+        try {
+          console.log(`Submitting batch ${batchNumber}`);
+          console.log(weeklySheet);
+          const res = await client.graphql({
             query: createBlng,
-            variables: {
-              input: weaklysheet,
-            },
-          })
-          .then((res) => {
-            console.log(res);
-            if (res.data.createBlng) {
-              toggleSFAMessage(true);
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-            toggleSFAMessage(false);
+            variables: { input: weeklySheet },
           });
+
+          if (res.data.createBlng) {
+            console.log(`Batch ${batchNumber} submitted successfully`);
+            toggleSFAMessage(true);
+            console.log(res);
+          }
+        } catch (err) {
+          console.log(`Error in batch ${batchNumber}:`, err);
+          toggleSFAMessage(false);
+        }
+      };
+
+      // Batch size
+      const batchSize = 1500;
+
+      // Loop to send data in batches
+      // for (let i = 0; i < result.length; i += batchSize) {
+      //   const batch = result.slice(i, i + batchSize);
+      //   await submitBatch(batch, i / batchSize + 1); // Track batch number
+      // }
+      for (let i = 0; i < result.length; i += batchSize) {
+        const batch = result.slice(i, i + batchSize);
+        await submitBatch(batch, "6785A");
       }
-    }
-    // if (userIdentification === "TimeKeeper") {
-    //   const result =
-    //     data &&
-    //     data.map((val) => {
-    //       return {
-    //         fid: val?.FID || 0,
-    //         name: val?.NAMEFLAST || "",
-    //         entDate: val?.ENTRANCEDATEUSED || "",
-    //         entDT: val?.ENTRANCEDATETIME || "",
-    //         exitDT: val?.EXITDATETIME || "",
-    //         day: val?.DAYDIFFERENCE || 0,
-    //         avgTotalDay: val?.AVGDAILYTOTALBYDAY || "",
-    //         totalhrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
-    //         workDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
-    //         normalWhrsPerDay: val?.NORMALWORKINGHRSPERDAY || 0,
-    //         workhrs: val?.WORKINGHOURS || 0,
-    //         OT: val?.OT || 0,
-    //         jobLocaWhrs: val?.jobLocaWhrs || "",
-    //         remarks: val?.REMARKS || "",
-    //       };
-    //     });
-
-    //   const currentDate = new Date().toLocaleDateString();
-
-    //   // Function to submit a batch
-    //   const submitBatch = async (batch, batchNumber) => {
-    //     const weeklySheet = {
-    //       weeklySheet: JSON.stringify(batch),
-    //       status: "Pending",
-    //       date: currentDate,
-    //     };
-
-    //     try {
-    //       console.log(`Submitting batch ${batchNumber}`);
-    //       console.log(weeklySheet);
-    //       const res = await client.graphql({
-    //         query: createBlng,
-    //         variables: { input: weeklySheet },
-    //       });
-
-    //       if (res.data.createBlng) {
-    //         console.log(`Batch ${batchNumber} submitted successfully`);
-    //         toggleSFAMessage(true);
-    //         console.log(res);
-    //       }
-    //     } catch (err) {
-    //       console.log(`Error in batch ${batchNumber}:`, err);
-    //       toggleSFAMessage(false);
-    //     }
-    //   };
-
-    //   // Batch size
-    //   const batchSize = 1000;
-
-    //   // Loop to send data in batches
-    //   // for (let i = 0; i < result.length; i += batchSize) {
-    //   //   const batch = result.slice(i, i + batchSize);
-    //   //   await submitBatch(batch, i / batchSize + 1); // Track batch number
-    //   // }
-    //   for (let i = 0; i < result.length; i += batchSize) {
-    //     const batch = result.slice(i, i + batchSize);
-    //     await submitBatch(batch);
-    //   }
-    // }
-    else if (userIdentification === "Manager") {
+    } else if (userIdentification === "Manager") {
       const MultipleBLNGfile =
         data &&
         data.map((value) => {
@@ -535,7 +532,7 @@ export const ViewBLNGsheet = ({
           weeklySheet: JSON.stringify(obj.weaklySheet),
           status: "Approved",
         };
-        console.log(finalData);
+        console.log(obj.weaklySheet);
         if (finalData.weeklySheet) {
           // console.log("Work");
           await client
@@ -550,6 +547,7 @@ export const ViewBLNGsheet = ({
               if (res.data.updateBlng) {
                 toggleSFAMessage(true);
                 setVisibleData([]);
+                // setData(null);
                 // setData(null);
               }
             })
@@ -576,34 +574,50 @@ export const ViewBLNGsheet = ({
           <div>
             <div className="flex justify-end mr-7">
               <SearchBoxForTimeSheet
-                excelData={excelData}
+                allEmpDetails={data}
                 searchResult={searchResult}
+                secondaryData={secondaryData}
+                Position={Position}
+                placeholder="FID"
               />
             </div>
             <div
-              className="mt-9 overflow-x-auto overflow-y-scroll max-h-[500px]"
+              // className="mt-9 overflow-x-auto overflow-y-scroll max-h-[500px]"
+              className="table-container"
               onScroll={handleScroll}
             >
-              <table className="table-auto text-center w-full">
-                <thead>
-                  <tr className="bg-lite_grey  text-dark_grey text_size_5">
-                    <td className="px-5 flex-">S No.</td>
-                    {console.log(AllFieldData)}
+              <table
+                className="styled-table"
+                // className="table-auto text-center w-full  border-2 border-lite_grey"
+              >
+                <thead className="sticky-header">
+                  <tr
+                    // className="bg-lite_grey  text-dark_grey text_size_5"
+                    className="text_size_5"
+                  >
+                    <td className="px-4 text-center">S No.</td>
+
                     {AllFieldData?.tableHeader.map((header, index) => (
                       <td key={index} className="px-4 flex-1">
                         {header}
                       </td>
-                    ))}
+                    )) ?? (
+                      <tr>
+                        <td colSpan="100%" className="text-center">
+                          No headers available
+                        </td>
+                      </tr>
+                    )}
                     {showStatusCol === true ? (
                       ""
                     ) : (
-                      <td className="px-5 flex-">STATUS</td>
+                      <td className="px-4 text-center">STATUS</td>
                     )}
                   </tr>
                 </thead>
 
                 <tbody>
-                  {visibleData && visibleData.length > 0 ? (
+                  {visibleData && visibleData?.length > 0 ? (
                     visibleData.map((value, index) => {
                       const renderRows = (rowData, ind) => {
                         const isStatusPending = rowData.status === "Pending";
@@ -612,10 +626,10 @@ export const ViewBLNGsheet = ({
                           <tr
                             key={
                               userIdentification === "Manager"
-                                ? (ind += 1)
+                                ? index + 1
                                 : index + 1
                             }
-                            className="text-dark_grey h-[40px] text-sm rounded-sm shadow-md border-b-2 border-[#CECECE] bg-white"
+                            className="text-dark_grey h-[40px] text-sm rounded-sm shadow-md border-b-2 border-[#CECECE] bg-white "
                             onClick={() => {
                               toggleFunction();
                               editBLNG(rowData);
@@ -623,7 +637,7 @@ export const ViewBLNGsheet = ({
                           >
                             <td className="text-center px-4 flex-1">
                               {userIdentification === "Manager"
-                                ? ind + 1
+                                ? index + 1
                                 : index + 1}
                             </td>
                             <td className="text-start px-4 flex-1">
@@ -666,16 +680,22 @@ export const ViewBLNGsheet = ({
                               {rowData.REMARKS}
                             </td>
                             {isStatusPending && (
-                              <td className="text-center px-4 flex-1">
+                              <td
+                                className={`text-center px-4 flex-1 ${
+                                  rowData.status === "Approved"
+                                    ? "text-[#0CB100]"
+                                    : "text_size_8"
+                                }`}
+                              >
                                 {rowData.status}
                               </td>
                             )}
                           </tr>
                         );
                       };
-
+                      //value.data.map(renderRows)
                       return userIdentification === "Manager"
-                        ? value.data.map(renderRows)
+                        ? renderRows(value)
                         : userIdentification !== "Manager" && renderRows(value);
                       // : setData(null);
                     })
@@ -683,9 +703,11 @@ export const ViewBLNGsheet = ({
                     <tr>
                       <td
                         colSpan="15"
-                        className="px-6 py-6 text-center text-dark_ash text_size_5"
+                        className="text-center text-dark_ash text_size_5"
                       >
-                        <p>No Table Data Available Here</p>
+                        <p className="px-6 py-6">
+                          No Table Data Available Here
+                        </p>
                       </td>
                     </tr>
                   )}
@@ -699,7 +721,9 @@ export const ViewBLNGsheet = ({
               }`}
             >
               <button
-                className="rounded px-3 py-2 bg-[#FEF116] text_size_5 text-dark_grey"
+                className={`rounded px-3 py-2 ${
+                  userIdentification === "Manager" ? "w-40" : "w-52"
+                } bg-[#FEF116] text_size_5 text-dark_grey mb-10`}
                 onClick={() => {
                   renameKeysFunctionAndSubmit();
 
@@ -708,11 +732,10 @@ export const ViewBLNGsheet = ({
                   //   // Fetch the BLNG data using GraphQL
                   //   const [fetchBLNGdata] = await Promise.all([
                   //     client.graphql({
-                  //       query: listHeadOffices,
+                  //       query: listBlngs,
                   //     }),
                   //   ]);
-                  //   const BLNGdata =
-                  //     fetchBLNGdata?.data?.listHeadOffices?.items;
+                  //   const BLNGdata = fetchBLNGdata?.data?.listBlngs?.items;
                   //   console.log("BLNGdata : ", BLNGdata);
 
                   //   const deleteFunction =
@@ -724,7 +747,7 @@ export const ViewBLNGsheet = ({
 
                   //       await client
                   //         .graphql({
-                  //           query: deleteHeadOffice,
+                  //           query: deleteBlng,
                   //           variables: {
                   //             input: dailySheet,
                   //           },

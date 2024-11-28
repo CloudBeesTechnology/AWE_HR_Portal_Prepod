@@ -26,6 +26,7 @@ import { RowTwelve } from "./RowTwelve";
 import { EmpInfoFunc } from "../../../services/createMethod/EmpInfoFunc";
 import { FormField } from "../../../utils/FormField";
 import { DataSupply } from "../../../utils/DataStoredContext";
+import { Badge } from "@aws-amplify/ui-react";
 import { UpdateEmpInfo } from "../../../services/updateMethod/UpdateEmpInfo";
 import { getUrl } from "@aws-amplify/storage";
 
@@ -33,16 +34,12 @@ export const EmployeeInfo = () => {
   const { SubmitEIData, errorEmpID } = EmpInfoFunc();
   const { UpdateEIValue } = UpdateEmpInfo();
   const { empPIData, IDData } = useContext(DataSupply);
-
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
-
-  const [notification, setNotification] = useState(false);
   const [selectedNationality, setSelectedNationality] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedRace, setSelectedRace] = useState("");
-  const [selectContractType, setSelectContractType] = useState([]);
-  const [selectempType, setSelectempType] = useState([]);
+  const [notification, setNotification] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState({
     bwnUpload: [],
     applicationUpload: [],
@@ -67,10 +64,6 @@ export const EmployeeInfo = () => {
   const [IBLastUP, setIBLastUP] = useState(null);
   const [familyData, setFamilyData] = useState([]);
   const [showTitle, setShowTitle] = useState("");
-  const [bwnIcExpiryDate, setBWNIcExpiryDate] = useState([]);
-  const [ppIssuedDate, setPPIssuedDate] = useState([]);
-  const [ppExpiryDate, setPPExpiryDate] = useState([]);
-  const [errorValue, setErrorValue] = useState([]);
   const handleNationalityChange = (e) => {
     setSelectedNationality(e.target.value);
   };
@@ -83,7 +76,6 @@ export const EmployeeInfo = () => {
 
   const {
     register,
-
     handleSubmit,
     setValue,
     watch,
@@ -96,7 +88,6 @@ export const EmployeeInfo = () => {
       familyDetails: JSON.stringify([]),
       contractType: [],
       empType: [],
-      bwnIcExpiry: [],
     },
   });
 
@@ -222,8 +213,6 @@ export const EmployeeInfo = () => {
             .upload;
         setIBLastUP(lastUploadInduc);
       }
-    } else {
-      console.log("No uploads found in profilePhoto or inducBriefUp");
     }
   }, [uploadedDocs]);
 
@@ -232,15 +221,17 @@ export const EmployeeInfo = () => {
       return value;
     }
 
-    // Ensure value is an array for ppExpiry, ppIssued, and bwnIcExpiry
-    if (["ppExpiry", "ppIssued", "bwnIcExpiry"].includes(field)) {
-      return Array.isArray(value) ? value : [value];
-    }
-
     return Array.isArray(value) ? value : value ? [value] : [];
   };
+
+  const getLastArrayValue = (value, field) => {
+    // Check if the value is an array
+    return Array.isArray(value) ? value[value.length - 1] : value;
+  };
+
   const searchResult = (result) => {
-    console.log(result);
+    // console.log(result);
+
     const keysToSet = [
       "empID",
       "driveLic",
@@ -278,18 +269,25 @@ export const EmployeeInfo = () => {
       "sapNo",
       "officialEmail",
       "bwnIcColour",
-      "bwnIcNo",
     ];
 
     keysToSet.forEach((key) => {
       setValue(key, result[key]);
     });
 
+    const fields = ["contractType", "empType"];
+    fields.forEach((field) => setValue(field, getLastValue(result[field])));
+
+    const fieldsArray = ["bwnIcExpiry", "ppExpiry", "ppIssued"];
+    fieldsArray.forEach((field) =>
+      setValue(field, getLastArrayValue(result[field]))
+    );
     const changeString = [
       "permanentAddress",
       "contactNo",
       "ppNo",
       "ppDestinate",
+      "bwnIcNo",
     ];
     changeString.forEach((field) => {
       const value = result[field]; // Get the backend value
@@ -301,22 +299,6 @@ export const EmployeeInfo = () => {
       }
     });
 
-    const fields = ["contractType", "empType", "ppExpiry", "ppIssued"];
-
-    // Original
-    // fields.forEach((field) => setValue(field, getLastValue(result[field])));
-    fields.forEach((field) => {
-      const value = getLastValue(result[field], field); // Pass the field name to the function
-      setValue(field, value);
-    });
-
-    setValue(
-      "bwnIcExpiry",
-      Array.isArray(result.bwnIcExpiry)
-        ? result.bwnIcExpiry
-        : [result.bwnIcExpiry]
-    );
-
     const parsedData = JSON.parse(result.familyDetails);
     setFamilyData(parsedData);
 
@@ -326,32 +308,30 @@ export const EmployeeInfo = () => {
         inducBriefUp: getFileName(result.inducBriefUp) || "",
       }));
 
-    setValue("profilePhoto", result.profilePhoto.toString());
-    setValue("inducBriefUp", result.inducBriefUp.toString());
-
+    setValue("profilePhoto", result?.profilePhoto?.toString());
+    setValue("inducBriefUp", result?.inducBriefUp?.toString());
     setUploadedDocs((prev) => ({
       ...prev,
       profilePhoto: result.profilePhoto,
       inducBriefUp: result.inducBriefUp,
     }));
     const profilePhotoString = result?.profilePhoto;
-    let fixedProfilePhotoString = profilePhotoString.replace(/=/g, ":");
-    fixedProfilePhotoString = fixedProfilePhotoString.replace(
+    let fixedProfilePhotoString = profilePhotoString?.replace(/=/g, ":");
+    fixedProfilePhotoString = fixedProfilePhotoString?.replace(
       /(\w+)(?=:)/g,
       '"$1"'
     ); // Wrap keys in double quotes
-    fixedProfilePhotoString = fixedProfilePhotoString.replace(
+    fixedProfilePhotoString = fixedProfilePhotoString?.replace(
       /(?<=:)([^,}\]]+)(?=[,\}\]])/g,
       '"$1"'
     ); // Wrap string values in double quotes
-    if (!fixedProfilePhotoString.startsWith("[")) {
+    if (!fixedProfilePhotoString?.startsWith("[")) {
       fixedProfilePhotoString = `[${fixedProfilePhotoString}]`;
     }
 
     let profilePhotoArray = [];
     try {
       profilePhotoArray = JSON.parse(fixedProfilePhotoString); // Parse the corrected string
-      console.log(profilePhotoArray); // Check if it parsed correctly
     } catch (error) {
       console.error("Failed to parse JSON:", error);
     }
@@ -359,13 +339,21 @@ export const EmployeeInfo = () => {
     // Step 5: Access the last upload value (if available)
     const lastUpload =
       profilePhotoArray?.[profilePhotoArray.length - 1]?.upload;
-    console.log(lastUpload);
 
     const linkToStorageFile = async (pathUrl) => {
-      const result = await getUrl({
-        path: pathUrl,
-      });
-      return setPPLastUP(result.url.toString());
+      try {
+        getUrl({
+          path: pathUrl,
+        })
+          .then((response) => {
+            return setPPLastUP(response.url.toString());
+          })
+          .catch((e) => {
+            console.log(e, "errors showing");
+          });
+      } catch (err) {
+        console.log(err, "errors");
+      }
     };
     linkToStorageFile(lastUpload);
 
@@ -417,120 +405,104 @@ export const EmployeeInfo = () => {
     return fileName;
   };
 
-  const onError = (errors) => {
-    console.log("Validation Errors:", errors);
-
-    setErrorValue(errors);
-  };
-
-  // Refactored function to handle state updates and notify using async/await
-  async function updateStateAndNotify(setState, value) {
-    return new Promise((resolve) => {
-      setState((prev) => {
-        const updatedDates = [...prev, ...(value || [])];
-        const newDates = Array.from(new Set(updatedDates)); // Remove duplicates
-        resolve(newDates); // Resolve the updated state
-        return newDates;
-      });
-    });
-  }
-
-  // Fetching dates and updating states sequentially
-  async function fetchingDate(val, callback) {
-    try {
-      const newBWNIcExpiryDate = await updateStateAndNotify(
-        setBWNIcExpiryDate,
-        val.bwnIcExpiry
-      );
-      const newPPExpiryDate = await updateStateAndNotify(
-        setPPExpiryDate,
-        val.ppExpiry
-      );
-      const newPPIssuedDate = await updateStateAndNotify(
-        setPPIssuedDate,
-        val.ppIssued
-      );
-      callback({
-        bwnIcExpiryDate: newBWNIcExpiryDate,
-        PPExpiryDate: newPPExpiryDate,
-        PPIssuedDate: newPPIssuedDate,
-      });
-    } catch (error) {
-      console.error("Error updating state:", error);
-    }
-  }
-
-  // onSubmit function
   const onSubmit = async (data) => {
     data.contractType = contractTypes;
     data.empType = empTypes;
 
+    const formatDate = (date) =>
+      date ? new Date(date).toLocaleDateString("en-CA") : null;
+
+    const bwnIcExpiry = formatDate(data.bwnIcExpiry);
+    const ppIssued = formatDate(data.ppIssued);
+    const ppExpiry = formatDate(data.ppExpiry);
+
     try {
-      // Pass a callback to handle the result after state update
-      await fetchingDate(data, async (updatedDates) => {
-        const checkingPITable = empPIData.find(
-          (match) => match.empID === data.empID
+      const checkingPITable = empPIData.find(
+        (match) => match.empID === data.empID
+      );
+      const checkingIDTable = IDData.find(
+        (match) => match.empID === data.empID
+      );
+
+      if (checkingIDTable && checkingPITable) {
+        const updateFieldArray = (existingArray, newValue) => [
+          ...new Set([...(existingArray || []), newValue]),
+        ];
+
+        const updatedbwnIcExpiry = updateFieldArray(
+          checkingIDTable.bwnIcExpiry,
+          bwnIcExpiry
         );
-        const checkingIDTable = IDData.find(
-          (match) => match.empID === data.empID
+        const updatedppExpiry = updateFieldArray(
+          checkingIDTable.ppExpiry,
+          ppExpiry
+        );
+        const updatedppIssued = updateFieldArray(
+          checkingIDTable.ppIssued,
+          ppIssued
         );
 
-        let collectValue;
-        if (checkingIDTable && checkingPITable) {
-          collectValue = {
-            ...data,
-            profilePhoto: uploadedDocs.profilePhoto,
-            inducBriefUp: uploadedDocs.inducBriefUp,
-            bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
-            bwnIcExpiry: updatedDates.bwnIcExpiryDate,
-            ppIssued: updatedDates.PPIssuedDate,
-            ppExpiry: updatedDates.PPExpiryDate,
-            applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
-            cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
-            loiUpload: JSON.stringify(uploadedFiles.loiUpload),
-            myIcUpload: JSON.stringify(uploadedFiles.myIcUpload),
-            paafCvevUpload: JSON.stringify(uploadedFiles.paafCvevUpload),
-            ppUpload: JSON.stringify(uploadedFiles.ppUpload),
-            supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
-            familyDetails: JSON.stringify(data.familyDetails),
-            PITableID: checkingPITable.id,
-            IDTable: checkingIDTable.id,
-          };
-          // console.log("AZQ", collectValue);
-          await UpdateEIValue({ collectValue });
-          setShowTitle("Employee Personal Info updated successfully");
-          setNotification(true);
-        } else {
-          const empValue = {
-            ...data,
-            profilePhoto: uploadedDocs.profilePhoto,
-            inducBriefUp: uploadedDocs.inducBriefUp,
-            bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
-            bwnIcExpiry: updatedDates.bwnIcExpiryDate,
-            ppIssued: updatedDates.PPIssuedDate,
-            ppExpiry: updatedDates.PPExpiryDate,
-            applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
-            cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
-            loiUpload: JSON.stringify(uploadedFiles.loiUpload),
-            myIcUpload: JSON.stringify(uploadedFiles.myIcUpload),
-            paafCvevUpload: JSON.stringify(uploadedFiles.paafCvevUpload),
-            ppUpload: JSON.stringify(uploadedFiles.ppUpload),
-            supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
-            familyDetails: JSON.stringify(data.familyDetails),
-          };
-          // console.log("AZ", empValue);
-          await SubmitEIData({ empValue });
-          setShowTitle("Employee Personal Info saved successfully");
-          setNotification(true);
-        }
-      });
+        const collectValue = {
+          ...data,
+          profilePhoto: uploadedDocs.profilePhoto,
+          inducBriefUp: uploadedDocs.inducBriefUp,
+          bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
+          bwnIcExpiry: updatedbwnIcExpiry,
+          ppIssued: updatedppIssued,
+          ppExpiry: updatedppExpiry,
+          applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
+          cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
+          loiUpload: JSON.stringify(uploadedFiles.loiUpload),
+          myIcUpload: JSON.stringify(uploadedFiles.myIcUpload),
+          paafCvevUpload: JSON.stringify(uploadedFiles.paafCvevUpload),
+          ppUpload: JSON.stringify(uploadedFiles.ppUpload),
+          supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
+          familyDetails: JSON.stringify(data.familyDetails),
+          PITableID: checkingPITable.id,
+          IDTable: checkingIDTable.id,
+        };
+        // console.log("AZQ", collectValue);
+
+        await UpdateEIValue({ collectValue });
+        setShowTitle("Employee Personal Info updated successfully");
+        setNotification(true);
+      } else {
+        const [updatedbwnIcExpiry, updatedppExpiry, updatedppIssued] = [
+          [bwnIcExpiry],
+          [ppExpiry],
+          [ppIssued],
+        ].map((arr) => [...new Set(arr)]);
+
+        const empValue = {
+          ...data,
+          profilePhoto: uploadedDocs.profilePhoto,
+          inducBriefUp: uploadedDocs.inducBriefUp,
+          bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
+          bwnIcExpiry: updatedbwnIcExpiry,
+          ppIssued: updatedppIssued,
+          ppExpiry: updatedppExpiry,
+          applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
+          cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
+          loiUpload: JSON.stringify(uploadedFiles.loiUpload),
+          myIcUpload: JSON.stringify(uploadedFiles.myIcUpload),
+          paafCvevUpload: JSON.stringify(uploadedFiles.paafCvevUpload),
+          ppUpload: JSON.stringify(uploadedFiles.ppUpload),
+          supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
+          familyDetails: JSON.stringify(data.familyDetails),
+        };
+        // console.log("AZ", empValue);
+        await SubmitEIData({ empValue });
+        setShowTitle("Employee Personal Info saved successfully");
+        setNotification(true);
+      }
     } catch (error) {
-      console.error("Error submitting data:", error);
+      console.log(error);
     }
   };
 
   const watchedProfilePhoto = watch("profilePhoto" || "");
   const watchInducBriefUpload = watch("inducBriefUp" || "");
+
 
   return (
     <section className="bg-[#F5F6F1CC] mx-auto p-10">
@@ -552,7 +524,7 @@ export const EmployeeInfo = () => {
         </div>
       </div>
       <form
-        onSubmit={handleSubmit(onSubmit, onError)}
+        onSubmit={handleSubmit(onSubmit)}
         className=" flex flex-col justify-center "
       >
         {/* Row1 */}
@@ -565,7 +537,10 @@ export const EmployeeInfo = () => {
               id="fileInput"
               name="profilePhoto"
               accept=".jpg,.jpeg,.png"
-              onChange={(e) => handleFileUpload(e, "profilePhoto")}
+              onChange={(e) => {
+                handleFileUpload(e, "profilePhoto");
+                console.log(e.target.value);
+              }}
               className="hidden"
             />
             <div className="h-[120px] max-w-[120px] relative rounded-md bg-lite_skyBlue">
@@ -662,25 +637,9 @@ export const EmployeeInfo = () => {
           watch={watch}
         />
         {/* Row7 */}
-        <RowSeven
-          register={register}
-          errors={errors}
-          control={control}
-          setValue={setValue}
-          watch={watch}
-          errorValue={errorValue}
-
-          // value={watch("bwnIcExpiry") || ""}
-        />
+        <RowSeven register={register} errors={errors} />
         {/* Row8 */}
-        <RowEight
-          register={register}
-          errors={errors}
-          control={control}
-          setValue={setValue}
-          watch={watch}
-          errorValue={errorValue}
-        />
+        <RowEight register={register} errors={errors} />
         {/* Row9 */}
         <RowNine register={register} errors={errors} />
         {/* Row10 */}
@@ -713,15 +672,9 @@ export const EmployeeInfo = () => {
               </span>
             </label>
 
-            {!uploadedFileNames?.inducBriefUp ? (
-              <p className="text-[red] text-[12px] pt-2">
-                {errors?.inducBriefUp?.message}
-              </p>
-            ) : (
-              <p className="text-xs mt-1 text-grey">
-                {uploadedFileNames?.inducBriefUp}
-              </p>
-            )}
+            <p className="text-xs mt-1 text-grey">
+              {uploadedFileNames?.inducBriefUp}
+            </p>
           </div>
         </div>
 

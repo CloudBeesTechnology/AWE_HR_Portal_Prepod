@@ -189,10 +189,10 @@ export const WorkInfoFunc = () => {
       uploadDep,
     };
 
-    console.log(totalData, "totalData");
-    console.log(totalData1, "totalData1");
-    console.log(totalData2, "totalData2");
-    console.log(totalData3, "totalData3");
+    // console.log(totalData, "totalData");
+    // console.log(totalData1, "totalData1");
+    // console.log(totalData2, "totalData2");
+    // console.log(totalData3, "totalData3");
 
     try {
       const [Emp, Terminate, Leave, Service] = await Promise.all([
@@ -228,15 +228,12 @@ export const WorkInfoFunc = () => {
         }),
       ])
         .then((res) => {
-          console.log(res);
+          // console.log(res);
         })
         .catch((err) => {
           console.log(err);
         });
-      console.log(Emp);
-      console.log(Terminate);
-      console.log(Leave);
-      console.log(Service);
+     
     } catch (error) {
       //  console.error("Error executing GraphQL requests:", error);
       //  throw error; // Rethrow error if needed

@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { GoUpload } from "react-icons/go";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { DoeEmpSchema } from "../../../services/EmployeeValidation";
@@ -40,7 +41,6 @@ export const Doe = () => {
   const [validUntil, setValidUntil] = useState([]);
   const [notification, setNotification] = useState(false);
   const [showTitle,setShowTitle]=useState("")
-  const [empID, setEmpID] = useState("");
   const [uploadedFileNames, setUploadedFileNames] = useState({
     doeEmpUpload: null,
   });
@@ -49,6 +49,7 @@ export const Doe = () => {
   });
 
   const watchInducDoeUpload = watch("doeEmpUpload", ""); 
+  const empID = watch("empID");
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
@@ -62,6 +63,7 @@ export const Doe = () => {
   const submissionDate = () => setDateOfSubmission([...doeEmpSubmit, ""]);
   const validDate = () => setValidUntil([...doeEmpValid, ""]);
   
+
 
   const getFileName = (input) => {
     // Check if input is an object and has the 'upload' property
@@ -107,12 +109,7 @@ export const Doe = () => {
       return undefined;
     }
   };
-  
-  useEffect(() => {
-    const userID = localStorage.getItem("userID");
-    setEmpID(userID);
-    // console.log("Navbar: User ID from localStorage:", userID);
-  }, []);
+
 
 
   const getLastValue = (value) =>
@@ -131,7 +128,7 @@ export const Doe = () => {
         const parsedFiles = parsedArray.map((item) =>
           typeof item === "string" ? JSON.parse(item) : item
         );
-        // console.log(parsedFiles);
+   
         setValue("doeEmpUpload", parsedFiles);
 
         setUploadDoe((prev) => ({
@@ -191,7 +188,7 @@ export const Doe = () => {
     }
   };
 
-  // console.log("file doe testing", uploadDoe)
+
 
 const onSubmit = async (data) => {    
   try {
@@ -208,7 +205,13 @@ const onSubmit = async (data) => {
     const doeEmpValid = formatDate(data.doeEmpValid);
 
     if (checkingEIDTable) {
-   
+      // If entry exists, update the dates, removing duplicates
+      const updatedSubmissionDate = [
+        ...new Set([
+          ...(checkingEIDTable.doeEmpSubmit || []), // ensure it's an array before spreading
+          doeEmpSubmit
+        ]),
+      ];
 
       const updatedApprovalDate = [
         ...new Set([
@@ -226,14 +229,13 @@ const onSubmit = async (data) => {
 
       const DoeUpValue = {
         ...data,
-        doeEmpSubmit, // Apply formatDate to each item
+        doeEmpSubmit: updatedSubmissionDate.map(formatDate), 
         doeEmpApproval: updatedApprovalDate.map(formatDate), // Apply formatDate to each item
         doeEmpValid: updatedValidDate.map(formatDate), // Apply formatDate to each item
         doeEmpUpload: JSON.stringify(uploadDoe.doeEmpUpload), // Ensure this is properly set
         id: checkingEIDTable.id,
       };
 
-      // console.log("Updated Doe Data:", DoeUpValue);
 
       await UpdateMPData({ DoeUpValue });
       setShowTitle("Work Pass DOE Info Updated Successfully");
@@ -243,12 +245,11 @@ const onSubmit = async (data) => {
       const DoeValue = {
         ...data,
         doeEmpSubmit,
-        doeEmpApproval,
+        doeEmpApproval,    
         doeEmpValid,
         doeEmpUpload: JSON.stringify(uploadDoe.doeEmpUpload),
       };
 
-      // console.log("Created Doe Data:", DoeValue);
 
       await CrerDoeFunData({ DoeValue });
       setShowTitle("Work Pass DOE Info Saved Successfully");
@@ -256,7 +257,7 @@ const onSubmit = async (data) => {
     }
   } catch (error) {
     console.error("Error submitting data:", error);
-    
+
   }
 };
 

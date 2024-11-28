@@ -104,7 +104,6 @@ export const AddNewForm = () => {
       })
       .filter((item) => item !== null);
 
-    console.log("Merged Data:", mergedData);
     setAllData(mergedData); // Ensure this is called with valid data
     setValue("password", autoPassword);
     setValue("selectType", data?.storedValue?.data?.selectType);
@@ -167,7 +166,6 @@ export const AddNewForm = () => {
       const userIDs = await userDataDetails
         .filter((m) => m.empID === data.empID)
         .map((m) => m);
-      console.log(userIDs);
 
       if (desideCreateOrUpdate) {
         const updateUserObject = {
@@ -186,7 +184,6 @@ export const AddNewForm = () => {
             },
           })
           .then((res) => {
-            console.log(res);
             setNotification(true);
           })
           .catch((err) => {
@@ -343,7 +340,6 @@ export const AddNewForm = () => {
                 type="text"
                 className="input-field"
                 value={data?.storedValue?.data?.empID || watch("userID") || ""}
-                // onChange={handleUserIDChange}
                 {...register("userID")}
               />
             </div>
@@ -461,7 +457,6 @@ export const AddNewForm = () => {
               <SPDropDown
                 dropDownData={dropDownData}
                 permissionData={permissionData}
-                // selectedDropDown={fetchedUserData}
               />
             </div>
           </div>
@@ -477,7 +472,7 @@ export const AddNewForm = () => {
       </form>
       {notification && (
         <SpinLogo
-          text="Created an User Successfully"
+          text="Created a User Successfully"
           notification={notification}
           path="/user"
         />

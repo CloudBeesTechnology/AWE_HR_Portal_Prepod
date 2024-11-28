@@ -104,94 +104,6 @@ export const UpdateWIData = () => {
       TDRTable,
     } = workInfoUpValue;
 
-    //   const {
-    //     empID,
-    //     contractStart,
-    //     contractEnd,
-    //     contractPeriod,
-    //     doj,
-    //     department,
-    //     hr,
-    //     jobCat,
-    //     jobDesc,
-    //     manager,
-    //     otherJobCat,
-    //     otherDepartment,
-    //     otherPosition,
-    //     probationStart,
-    //     probationEnd,
-    //     position,
-    //     relationship,
-    //     supervisor,
-    //     skillPool,
-    //     salaryType,
-    //     sapNo,
-    //     upgradeDate,
-    //     upgradePosition,
-    //     workStatus,
-    //     workHrs,
-    //     workWeek,
-    //     workMonth,
-    //   } = workInfoUpValue;
-
-    //   const{
-    //     resignDate,
-    //     resignNotProb,
-    //     otherResignNotProb,
-    //     resignNotConf,
-    //     otherResignNotConf,
-    //     reasonResign,
-    //     reasonTerminate,
-    //     termiDate,
-    //     termiNotProb,
-    //     otherTermiNotProb,
-    //     termiNotConf,
-    //     otherTermiNotConf,
-    //     WIContract,
-    //     WIProbation,
-    //     WIResignation,
-    //     WITermination,
-    //     WILeaveEntitle
-    //   } = workInfoUpValue;
-
-    //   const {
-    //     annualLeave,
-    //     annualLeaveDate,
-    //     compasLeave,
-    //     compasLeaveDate,
-    //     destinateLeavePass,
-    //     durLeavePass,
-    //     dateLeavePass,
-    //     leavePass,
-    //     materLeave,
-    //     materLeaveDate,
-    //     mrageLeave,
-    //     mrageLeaveDate,
-    //     paterLeave,
-    //     paterLeaveDate,
-    //     sickLeave,
-    //     sickLeaveDate
-    //   } = workInfoUpValue;
-
-    //   const {
-    //     depEmpDate,
-    //     depEmp,
-    //     positionRev,
-    //     positionRevDate,
-    //     revSalary,
-    //     revSalaryDate,
-    //     revLeavePass,
-    //     revLeaveDate,
-    //     revAnnualLeave,
-    //     revALD,
-    //     remarkWI,
-    //     uploadPR,
-    //     uploadSP,
-    //     uploadLP,
-    //     uploadAL,
-    //     uploadDep,
-    //  } = workInfoUpValue;
-    // Grouped data for each mutation to handle separately
     const totalData = {
       id: WIDTable,
       empID,
@@ -309,11 +221,7 @@ export const UpdateWIData = () => {
         }),
       ]);
 
-      // Log each response for debugging
-      console.log("Emp Data Updated:", Emp);
-      console.log("Terminate Data Updated:", Terminate);
-      console.log("Leave Data Updated:", Leave);
-      console.log("Service Record Updated:", Service);
+ 
     } catch (error) {
       console.error("Error executing GraphQL requests:", error);
       throw error;

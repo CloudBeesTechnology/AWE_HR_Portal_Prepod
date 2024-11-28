@@ -125,6 +125,11 @@ export const EmployeeInsurance = () => {
   };
 
   const handleFileChange = async (e, type, index) => {
+    if (!watchedEmpID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/insuranceAdd";
+      return;
+    }
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
 
@@ -155,9 +160,10 @@ export const EmployeeInsurance = () => {
           updatedUrls[index] = [fileUrl]; // Update with the URL instead of the file object
           return updatedUrls; // Return the updated state
         });
+       
       }
     } catch (err) {
-      // console.error("Error uploading file:", err);
+      console.error("Error uploading file:", err);
     }
   };
 
@@ -178,6 +184,7 @@ export const EmployeeInsurance = () => {
       }
     });
 
+
     const url = searchResultData?.empInsUpload;
 
     if (url) {
@@ -186,12 +193,13 @@ export const EmployeeInsurance = () => {
         const parsedFiles = parsedArray.map((item) =>
           typeof item === "string" ? JSON.parse(item) : item
         );
+ 
         setUploadedDocs((prev) => ({
           ...prev,
           empInsUpload: parsedFiles,
         }));
       } catch (error) {
-        // console.error("Failed to parse JSON:", error);
+        console.error("Failed to parse JSON:", error);
       }
     } else {
       // console.warn(
@@ -201,6 +209,8 @@ export const EmployeeInsurance = () => {
   }, [searchResultData]);
 
   const onSubmit = async (data) => {
+    // console.log(data, "data");
+
     const existingEmpInsurance = EmpInsuranceData.find(
       (match) => match.empID === data.empID
     );
@@ -211,17 +221,19 @@ export const EmployeeInsurance = () => {
         id: existingEmpInsurance.id,
         empInsUpload: JSON.stringify(uploadedDocs.empInsUpload.flat()), // Flatten if necessary, otherwise keep as it is
       };
-      await UpdateEIDataSubmit(empInsValue);
-      setShowTitle("Employee Insurance Info updated successfully");
-      setNotification(true);
+      // console.log("update", empInsValue);
+      // await UpdateEIDataSubmit(empInsValue);
+      // setShowTitle("Employee Insurance Info updated successfully");
+      // setNotification(true);
     } else {
       const empInsValue = {
         ...data,
         empInsUpload: JSON.stringify(uploadedDocs.empInsUpload.flat()), // Flatten if necessary, otherwise keep as it is
       };
-      await SubmitMPData(empInsValue);
-      setShowTitle("Employee Insurance Info Saved successfully");
-      setNotification(true);
+      // console.log("create", empInsValue);
+      // await SubmitMPData(empInsValue);
+      // setShowTitle("Employee Insurance Info Saved successfully");
+      //   setNotification(true);
     }
   };
 

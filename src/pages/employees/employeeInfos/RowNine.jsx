@@ -26,7 +26,7 @@ export const RowNine = ({register,errors}) => {
       label="Contact Number"
       register={register}
       name="contactNo"
-      type="text"
+      type="number"
       errors={errors}
     />
   </div>

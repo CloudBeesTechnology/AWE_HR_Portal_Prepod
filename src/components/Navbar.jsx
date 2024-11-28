@@ -96,12 +96,6 @@ const Navbar = () => {
         const empPersonalInfos =
           empPersonalInfosData?.data?.listEmpPersonalInfos?.items || [];
 
-        // Check if any data is fetched
-        if (empPersonalInfos.length === 0) {
-          // console.log("No employee data found.");
-          return;
-        }
-
         // Find the employee matching the userID, ignoring case
         const userPersonalInfo = empPersonalInfos.find(
           (emp) => emp.empID.toLowerCase() === userID.toLowerCase()
@@ -124,15 +118,15 @@ const Navbar = () => {
 
           let profilePhotoArray = [];
           try {
-            profilePhotoArray = JSON.parse(fixedProfilePhotoString); 
+            profilePhotoArray = JSON.parse(fixedProfilePhotoString); // Parse the corrected string
           } catch (error) {
-            // console.error("Failed to parse JSON:", error);
+            console.error("Failed to parse JSON:", error);
           }
 
           // Step 5: Access the last upload value (if available)
           const lastUpload =
             profilePhotoArray?.[profilePhotoArray.length - 1]?.upload;
-  
+
           const linkToStorageFile = async (pathUrl) => {
             const result = await getUrl({
               path: pathUrl,
@@ -166,19 +160,7 @@ const Navbar = () => {
             <img className="w-full" src={logo} alt="not found" />
           </div>
         </section>
-        {/* searchbox disable */}
-        {/* <section className="flex-1 flex-grow-1 center">
-          <div className="center w-[90%] gap-3 py-2 px-5 shadow-md shadow-[#00000033] rounded-full bg-white">
-            <span>
-              <IoSearchOutline className="text-ash text-2xl font-semibold" />
-            </span>
-            <input
-              className="outline-none bg-[transparent] text-lg text-ash w-full"
-              type="text"
-              placeholder="Search"
-            />
-          </div>
-        </section> */}
+
         <section className="flex-initial flex item-center gap-5 ">
           <div className="my-auto px-2">
             <span>

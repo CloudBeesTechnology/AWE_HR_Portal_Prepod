@@ -26,7 +26,8 @@ import { AllEmployee } from "../pages/employees/AllEmployee";
 import { EmployeeInfo } from "../pages/employees/employeeInfos/EmployeeInfo";
 import { WorkInfo } from "../pages/employees/WorkInfo";
 import { Insurance } from "../pages/employees/insurance/Insurance";
-import LabourImmigration  from "../pages/employees/medicalDep/LabourImmigration";
+import LabourImmigration from "../pages/employees/medicalDep/LabourImmigration";
+
 import { EmpRequisitionForm } from "../pages/recruitments/EmpRequisitionForm";
 import { InsuranceNav } from "../pages/employees/insurance/InsuranceNav";
 import { InsuranceInfo } from "../pages/employees/insurance/InsuranceInfo";

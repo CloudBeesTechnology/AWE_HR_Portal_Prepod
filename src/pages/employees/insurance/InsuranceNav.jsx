@@ -35,12 +35,11 @@ export const InsuranceNav = () => {
           const EIDetails = EmpInsuranceData
             ? EmpInsuranceData.find((user) => user.empID === emp.empID)
             : {};
-          const WIDetails =workInfoData? workInfoData.find(
+          const WIDetails = workInfoData.find(
             (work) => work.empID === emp.empID
-          ) :{};
-          const IDDetails =IDData? IDData.find((value) => value.empID === emp.empID) : {};
+          ) || {};
+          const IDDetails = IDData.find((value) => value.empID === emp.empID) || {};
   
-          // Combine data, giving precedence to existing details
           return {
             ...emp,
             ...EIDetails,
@@ -92,7 +91,6 @@ export const InsuranceNav = () => {
   }, [location]);
 
   const searchResult = (result) => {
-    // console.log(result);
     setSearchResultData(result);
   };
 
@@ -126,7 +124,7 @@ export const InsuranceNav = () => {
             )}
           </div>
         </div>
-        <div className="flex justify-between border-b m-4 text-[16px] font-semibold">
+        <div className="flex border-b m-4 text-[16px] font-semibold">
           <button
             className={`py-2 px-4 focus:outline-none ${
               activeNavTab === "employeeInsurances"

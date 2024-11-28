@@ -4,6 +4,7 @@ import { SearchDisplay } from "../../utils/SearchDisplay";
 import { FaPlus } from "react-icons/fa6";
 import { FaRegSquarePlus } from "react-icons/fa6";
 import { FaRegSquareMinus } from "react-icons/fa6";
+import "../../../src/index.css";
 export const EditTimeSheet = ({
   editObject,
   toggleFunction,
@@ -20,7 +21,8 @@ export const EditTimeSheet = ({
   const [typeJobcode, setTypeJobcode] = useState([]);
   const [workingHrs, setWorkingHrs] = useState();
   const [allData, setAllData] = useState([]);
-
+  const [warningMess, setWarningMess] = useState(null);
+  const [validationMessages, setValidationMessages] = useState(null);
   const [formData, setFormData] = useState({
     fieldObj,
     // FID: null,
@@ -72,9 +74,13 @@ export const EditTimeSheet = ({
     { id: 2, location: "DAY TRIPPING" },
     { id: 3, location: "Icon Aliza" },
     { id: 4, location: "Icon Valiant" },
-    { id: 5, location: "Khalifa" },
-    { id: 5, location: "Masshor Princess" },
-    { id: 5, location: "MV Falgout" },
+    { id: 6, location: "Khalifa" },
+    { id: 7, location: "Masshor Princess" },
+    { id: 8, location: "MV Falgout" },
+    { id: 9, location: "Offshore" },
+    { id: 10, location: "Head Office" },
+    { id: 11, location: "ORMC" },
+    { id: 12, location: "SBW" },
   ];
 
   useEffect(() => {
@@ -104,6 +110,7 @@ export const EditTimeSheet = ({
           };
         });
         if (resultData) {
+          console.log(resultData);
           setSections(resultData);
         }
       } else {
@@ -125,6 +132,34 @@ export const EditTimeSheet = ({
     }
   }, [editObject]);
 
+  const searchedValueForJOBCODE = (id, searcValue) => {
+    if (searcValue === "") {
+      setSections((prevSections) =>
+        prevSections.map((section) =>
+          section.id === id
+            ? {
+                ...section,
+                LOCATION: searcValue || null,
+              }
+            : section
+        )
+      );
+    }
+  };
+  const searchedValueForLOCATION = (id, searcValue) => {
+    if (searcValue === "") {
+      setSections((prevSections) =>
+        prevSections.map((section) =>
+          section.id === id
+            ? {
+                ...section,
+                LOCATION: searcValue || null,
+              }
+            : section
+        )
+      );
+    }
+  };
   const searchResultForJOBCODE = (jobcode, id) => {
     setJobCode(jobcode);
     console.log(jobcode);
@@ -159,6 +194,7 @@ export const EditTimeSheet = ({
       id: 1,
     },
   ]);
+  console.log(sections);
   const addSection = () => {
     const newId = sections.length + 1;
     const newSection = {
@@ -166,39 +202,29 @@ export const EditTimeSheet = ({
     };
     setSections([...sections, newSection]);
   };
+
   // jobCode
+  // Original
 
-  const handleWorkingHoursChange = useCallback(
-    (id, value, type) => {
-      if (type === "WorkingHrs") {
-        setSections((prevSections) =>
-          prevSections.map((section) =>
-            section.id === id
-              ? {
-                  ...section,
-                  // JOBCODE: section.JOBCODE || jobCode?.JOBCODE || null,
-                  // LOCATION: section.LOCATION || allLocation?.location || null,
-                  WORKINGHRS: value, // Only update WORKINGHRS
-                }
-              : section
-          )
-        );
-      } else if (type === "OvertimeHrs") {
-        setSections((prevSections) =>
-          prevSections.map((section) =>
-            section.id === id
-              ? {
-                  ...section,
-                  OVERTIMEHRS: value,
-                }
-              : section
-          )
-        );
-      }
-    },
+  const handleWorkingHoursChange = useCallback((id, value, type) => {
+    setSections((prevSections) =>
+      prevSections.map((section) =>
+        section.id === id
+          ? {
+              ...section,
+              WORKINGHRS: type === "WorkingHrs" ? value : section.WORKINGHRS,
+              OVERTIMEHRS:
+                type === "WorkingHrs" && (!value || value === "")
+                  ? 0
+                  : type === "OvertimeHrs"
+                  ? value
+                  : section.OVERTIMEHRS,
+            }
+          : section
+      )
+    );
+  }, []);
 
-    []
-  );
   // useEffect(() => {
   //   if (jobCode || allLocation) {
   //     setSections((prevSections) =>
@@ -212,167 +238,353 @@ export const EditTimeSheet = ({
   //     console.log(jobCode, " : ", allLocation);
   //   }
   // }, [jobCode, allLocation]);
+  // useEffect(() => {
+  //   console.log(titleName);
+  //   // if (titleName === "HO") {
+  //   //   const totalWorkingHrs = sections.reduce((total, sec) => {
+  //   //     return parseInt(total) + parseInt(sec.WORKINGHRS) || 0;
+  //   //   }, 0);
+  //   //   if (totalWorkingHrs) {
+  //   //     setFormData((prevData) => ({
+  //   //       ...prevData,
+  //   //       TOTALACTUALHOURS: totalWorkingHrs,
+  //   //     }));
+  //   //   }
+  //   // }
+  //   console.log(sections);
+  //   if (titleName === "HO") {
+  //     {
+  //       const totalWorkingHrs = sections.reduce((total, sec) => {
+  //         return parseInt(total) + parseInt(sec.WORKINGHRS || null);
+  //       }, 0);
+  //       const totalOvertimeHrs = sections.reduce((total, sec) => {
+  //         return parseInt(total) + parseInt(sec.OVERTIMEHRS || null);
+  //       }, 0);
+  //       console.log(totalWorkingHrs);
+  //       if (totalWorkingHrs) {
+  //         setFormData((prevFormData) => {
+  //           const updatedWorkingHours = totalWorkingHrs || 0;
+  //           const calculatedOT =
+  //             updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY <= 0
+  //               ? 0
+  //               : updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY;
+  //           if (
+  //             updatedWorkingHours >
+  //             parseInt(prevFormData.NORMALWORKINGHRSPERDAY)
+  //           ) {
+  //             setWarningMess(true);
+  //           } else {
+  //             setWarningMess(false);
+  //           }
+  //           console.log(updatedWorkingHours);
+  //           return {
+  //             ...prevFormData,
+  //             TOTALACTUALHOURS: updatedWorkingHours,
+  //             OT: calculatedOT,
+  //           };
+  //         });
+  //       }
+  //     }
+
+  //   }
+  // }, [sections,handleWorkingHoursChange]);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     const totalWorkingHrs = sections.reduce((total, sec) => {
+  //       return total + (parseInt(sec.WORKINGHRS) || 0); // Default to 0 if WORKINGHRS is empty
+  //     }, 0);
+  //     if (totalWorkingHrs === 0) {
+  //       setFormData((prevData) => {
+  //         const updatedWorkingHours = prevData.TOTALACTUALHOURS || 0;
+  //         console.log(updatedWorkingHours);
+  //         return {
+  //           ...prevData,
+  //           TOTALACTUALHOURS: updatedWorkingHours || 0, // Ensure a default value of 0
+  //         };
+  //       });
+  //     }
+  //   }, 1000);
+  // }, []);
+
+  // const handleWorkingHoursChange = useCallback((id, value, type) => {
+  //   setSections((prevSections) =>
+  //     prevSections.map((section) =>
+  //       section.id === id
+  //         ? {
+  //             ...section,
+  //             WORKINGHRS:
+  //               type === "OvertimeHrs" && (!value || value === "")
+  //                 ? 0
+  //                 : type === "WorkingHrs"
+  //                 ? value
+  //                 : section.WORKINGHRS,
+  //             OVERTIMEHRS:
+  //               type === "WorkingHrs" && (!value || value === "")
+  //                 ? 0
+  //                 : type === "OvertimeHrs"
+  //                 ? value
+  //                 : section.OVERTIMEHRS,
+  //           }
+  //         : section
+  //     )
+  //   );
+  // }, []);
+
+  // original code
+  // useEffect(() => {
+  //   if (titleName === "HO") {
+  //     const totalWorkingHrs = sections.reduce((total, sec) => {
+  //       return total + (parseInt(sec.WORKINGHRS) || 0); // Default to 0 if WORKINGHRS is empty
+  //     }, 0);
+  //     const totalOvertimeHrs = sections.reduce((total, sec) => {
+  //       return total + (parseInt(sec.OVERTIMEHRS) || 0); // Default to 0 if OVERTIMEHRS is empty
+  //     }, 0);
+  //     console.log(totalWorkingHrs);
+
+  //     setFormData((prevFormData) => {
+  //       const updatedWorkingHours =
+  //         totalWorkingHrs || editObject.TOTALACTUALHOURS;
+  //       const calculatedOT =
+  //         updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY <= 0
+  //           ? 0
+  //           : updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY;
+
+  //       setWarningMess(
+  //         updatedWorkingHours > parseInt(prevFormData.NORMALWORKINGHRSPERDAY)
+  //       );
+  //       console.log(prevFormData.TOTALACTUALHOURS);
+  //       return {
+  //         ...prevFormData,
+  //         TOTALACTUALHOURS: updatedWorkingHours || 0, // Ensure a default value of 0
+  //         OT: updatedWorkingHours === 0 ? 0 : calculatedOT,
+  //       };
+  //     });
+  //   }
+  //   if (titleName === "BLNG") {
+  //     const totalWorkingHrs = sections.reduce((total, sec) => {
+  //       return total + (parseInt(sec.WORKINGHRS) || 0); // Default to 0 if WORKINGHRS is empty
+  //     }, 0);
+  //     const totalOvertimeHrs = sections.reduce((total, sec) => {
+  //       return total + (parseInt(sec.OVERTIMEHRS) || 0); // Default to 0 if OVERTIMEHRS is empty
+  //     }, 0);
+  //     console.log(totalWorkingHrs);
+
+  //     setFormData((prevFormData) => {
+  //       const updatedWorkingHours = totalWorkingHrs || editObject.WORKINGHOURS;
+  //       const calculatedOT =
+  //         updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY <= 0
+  //           ? 0
+  //           : updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY;
+
+  //       setWarningMess(
+  //         updatedWorkingHours > parseInt(prevFormData.NORMALWORKINGHRSPERDAY)
+  //       );
+
+  //       return {
+  //         ...prevFormData,
+  //         WORKINGHOURS: updatedWorkingHours || 0, // Ensure a default value of 0
+  //         OT: updatedWorkingHours === 0 ? 0 : calculatedOT,
+  //       };
+  //     });
+  //   }
+  // }, [sections]);
   useEffect(() => {
-    console.log(titleName);
-    if (titleName === "HO") {
+    const updateFormData = (workingHoursKey, actualHoursKey) => {
       const totalWorkingHrs = sections.reduce((total, sec) => {
-        return parseInt(total) + parseInt(sec.WORKINGHRS) || 0;
+        return total + (parseInt(sec.WORKINGHRS) || 0); // Default to 0 if WORKINGHRS is empty
       }, 0);
-      if (totalWorkingHrs) {
-        setFormData((prevData) => ({
-          ...prevData,
-          TOTALACTUALHOURS: totalWorkingHrs,
-        }));
-      }
+
+      const totalOvertimeHrs = sections.reduce((total, sec) => {
+        return total + (parseInt(sec.OVERTIMEHRS) || 0); // Default to 0 if OVERTIMEHRS is empty
+      }, 0);
+
+      setFormData((prevFormData) => {
+        const updatedWorkingHours =
+          totalWorkingHrs || editObject[workingHoursKey];
+        const calculatedOT =
+          updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY <= 0
+            ? 0
+            : updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY;
+
+        setWarningMess(
+          updatedWorkingHours > parseInt(prevFormData.NORMALWORKINGHRSPERDAY)
+        );
+
+        return {
+          ...prevFormData,
+          [actualHoursKey]: updatedWorkingHours || 0, // Ensure a default value of 0
+          OT: updatedWorkingHours === 0 ? 0 : calculatedOT,
+        };
+      });
+    };
+
+    if (titleName === "HO") {
+      updateFormData("TOTALACTUALHOURS", "TOTALACTUALHOURS");
+    } else if (titleName === "BLNG") {
+      updateFormData("WORKINGHOURS", "WORKINGHOURS");
+    } else {
+      updateFormData("WORKINGHOURS", "WORKINGHOURS");
     }
   }, [sections]);
+
+  // Original
   useEffect(() => {
     //     JOBCODE
 
-    if (titleName === "BLNG") {
-      // if (
-      //   sections[0]?.JOBCODE !== undefined ||
-      //   sections[0]?.LOCATION !== undefined
-      // ) {
-      if (
-        sections.some(
-          (sec) => sec.JOBCODE !== undefined || sec.LOCATION !== undefined
-        )
-      ) {
-        const totalWorkingHrs = sections.reduce((total, sec) => {
-          return parseInt(total) + parseInt(sec.WORKINGHRS || null);
-        }, 0);
-        const totalOvertimeHrs = sections.reduce((total, sec) => {
-          return parseInt(total) + parseInt(sec.OVERTIMEHRS || null);
-        }, 0);
+    // if (titleName === "BLNG") {
+    //   // if (
+    //   //   sections[0]?.JOBCODE !== undefined ||
+    //   //   sections[0]?.LOCATION !== undefined
+    //   // ) {
+    //   if (
+    //     sections.some(
+    //       (sec) => sec.JOBCODE !== undefined || sec.LOCATION !== undefined
+    //     )
+    //   ) {
+    //     const totalWorkingHrs = sections.reduce((total, sec) => {
+    //       return parseInt(total) + parseInt(sec.WORKINGHRS || null);
+    //     }, 0);
+    //     const totalOvertimeHrs = sections.reduce((total, sec) => {
+    //       return parseInt(total) + parseInt(sec.OVERTIMEHRS || null);
+    //     }, 0);
 
-        if (totalWorkingHrs) {
-          setFormData((prevFormData) => {
-            const updatedWorkingHours = totalWorkingHrs || 0;
-            const calculatedOT =
-              updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY <= 0
-                ? "0"
-                : updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY;
+    //     if (totalWorkingHrs) {
+    //       setFormData((prevFormData) => {
+    //         const updatedWorkingHours = totalWorkingHrs || 0;
+    //         const calculatedOT =
+    //           updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY <= 0
+    //             ? 0
+    //             : updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY;
+    //         if (
+    //           updatedWorkingHours >
+    //           parseInt(prevFormData.NORMALWORKINGHRSPERDAY)
+    //         ) {
+    //           setWarningMess(true);
+    //         } else {
+    //           setWarningMess(false);
+    //         }
+    //         console.log(updatedWorkingHours);
+    //         return {
+    //           ...prevFormData,
+    //           WORKINGHOURS: updatedWorkingHours,
+    //           OT: calculatedOT,
+    //         };
+    //       });
+    //     }
 
-            return {
-              ...prevFormData,
-              WORKINGHOURS: updatedWorkingHours,
-              OT: calculatedOT,
-            };
-          });
-        }
+    //     // if (totalWorkingHrs) {
+    //     //   console.log("totalWorkingHrs : ", totalWorkingHrs);
+    //     //   setFormData((prevFormData) => ({
+    //     //     ...prevFormData,
+    //     //     WORKINGHOURS: totalWorkingHrs,
+    //     //     // OT: totalOvertimeHrs,
+    //     //     OT:
+    //     //       prevFormData.WORKINGHOURS - prevFormData.NORMALWORKINGHRSPERDAY <= 0
+    //     //         ? "0"
+    //     //         : prevFormData.WORKINGHOURS - prevFormData.NORMALWORKINGHRSPERDAY,
+    //     //   }));
+    //     // }
+    //     // if (totalWorkingHrs) {
+    //     //   setFormData((prevFormData) => ({
+    //     //     ...prevFormData,
+    //     //     WORKINGHOURS: totalWorkingHrs || 0,
+    //     //     OT: totalOvertimeHrs || 0,
+    //     //   }));
+    //     // }
 
-        // if (totalWorkingHrs) {
-        //   console.log("totalWorkingHrs : ", totalWorkingHrs);
-        //   setFormData((prevFormData) => ({
-        //     ...prevFormData,
-        //     WORKINGHOURS: totalWorkingHrs,
-        //     // OT: totalOvertimeHrs,
-        //     OT:
-        //       prevFormData.WORKINGHOURS - prevFormData.NORMALWORKINGHRSPERDAY <= 0
-        //         ? "0"
-        //         : prevFormData.WORKINGHOURS - prevFormData.NORMALWORKINGHRSPERDAY,
-        //   }));
-        // }
-        // if (totalWorkingHrs) {
-        //   setFormData((prevFormData) => ({
-        //     ...prevFormData,
-        //     WORKINGHOURS: totalWorkingHrs || 0,
-        //     OT: totalOvertimeHrs || 0,
-        //   }));
-        // }
-      }
-    }
-    if (titleName === "SBW") {
-      if (
-        sections.some(
-          (sec) => sec.JOBCODE !== undefined || sec.LOCATION !== undefined
-        )
-      ) {
-        const totalWorkingHrs = sections.reduce((total, sec) => {
-          return parseInt(total) + parseInt(sec.WORKINGHRS || null);
-        }, 0);
+    //     // if (totalWorkingHrs !== undefined) {
+    //     //   setFormData((prevFormData) => {
+    //     //     const updatedWorkingHours = totalWorkingHrs || 0; // Default to 0 if totalWorkingHrs is empty or falsy
+    //     //     const normalWorkingHours =
+    //     //       parseInt(prevFormData.NORMALWORKINGHRSPERDAY) || 0;
 
-        if (totalWorkingHrs) {
-          setFormData((prevFormData) => {
-            const updatedWorkingHours = totalWorkingHrs || 0;
-            // const calculatedOT =
-            //   updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY <= 0
-            //     ? "0"
-            //     : updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY;
+    //     //     const calculatedOT =
+    //     //       updatedWorkingHours > normalWorkingHours
+    //     //         ? updatedWorkingHours - normalWorkingHours
+    //     //         : 0;
 
-            return {
-              ...prevFormData,
-              WORKINGHOURS: updatedWorkingHours,
-              // OT: calculatedOT,
-            };
-          });
-        }
-      }
-    }
+    //     //     setWarningMess(updatedWorkingHours > normalWorkingHours);
 
-    if (titleName === "ORMC") {
-      if (
-        sections.some(
-          (sec) => sec.JOBCODE !== undefined || sec.LOCATION !== undefined
-        )
-      ) {
-        const totalWorkingHrs = sections.reduce((total, sec) => {
-          return parseInt(total) + parseInt(sec.WORKINGHRS || null);
-        }, 0);
-
-        if (totalWorkingHrs) {
-          setFormData((prevFormData) => {
-            const updatedWorkingHours = totalWorkingHrs || 0;
-            // const calculatedOT =
-            //   updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY <= 0
-            //     ? "0"
-            //     : updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY;
-
-            return {
-              ...prevFormData,
-              WORKINGHOURS: updatedWorkingHours,
-              // OT: calculatedOT,
-            };
-          });
-        }
-      }
-    }
-    console.log(sections);
-    if (
-      sections.some(
-        (sec) => sec.JOBCODE !== undefined || sec.LOCATION !== undefined
-      )
-    ) {
-      // Calculate totalOvertimeHrs, defaulting to 0 if OVERTIMEHRS is not present
-      const totalOvertimeHrs = sections.reduce((total, sec) => {
-        return parseInt(total) + parseInt(sec.OVERTIMEHRS || 0);
-      }, 0);
-      console.log(totalOvertimeHrs);
-      // Update formData with totalOvertimeHrs if it exists
-      if (totalOvertimeHrs) {
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          OT: totalOvertimeHrs || 0,
-        }));
-      }
-    }
-
-    // if (
-    //   sections[0].JOBCODE !== undefined ||
-    //   sections[0].LOCATION !== undefined
-    // ) {
-    //   const totalOvertimeHrs = sections.reduce((total, sec) => {
-    //     return parseInt(total) + parseInt(sec.OVERTIMEHRS || null);
-    //   }, 0);
-    //   if (totalOvertimeHrs) {
-    //     setFormData((prevFormData) => ({
-    //       ...prevFormData,
-    //       OT: totalOvertimeHrs || 0,
-    //     }));
+    //     //     return {
+    //     //       ...prevFormData,
+    //     //       WORKINGHOURS: updatedWorkingHours,
+    //     //       OT: calculatedOT.toString(), // Ensure OT is a string
+    //     //     };
+    //     //   });
+    //     // }
     //   }
     // }
+    // if (titleName === "SBW") {
+    //   if (
+    //     sections.some(
+    //       (sec) => sec.JOBCODE !== undefined || sec.LOCATION !== undefined
+    //     )
+    //   ) {
+    //     const totalWorkingHrs = sections.reduce((total, sec) => {
+    //       return parseInt(total) + parseInt(sec.WORKINGHRS || null);
+    //     }, 0);
+
+    //     if (totalWorkingHrs) {
+    //       setFormData((prevFormData) => {
+    //         const updatedWorkingHours = totalWorkingHrs || 0;
+    //         // const calculatedOT =
+    //         //   updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY <= 0
+    //         //     ? "0"
+    //         //     : updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY;
+
+    //         return {
+    //           ...prevFormData,
+    //           WORKINGHOURS: updatedWorkingHours,
+    //           // OT: calculatedOT,
+    //         };
+    //       });
+    //     }
+    //   }
+    // }
+
+    // if (titleName === "ORMC") {
+    //   if (
+    //     sections.some(
+    //       (sec) => sec.JOBCODE !== undefined || sec.LOCATION !== undefined
+    //     )
+    //   ) {
+    //     const totalWorkingHrs = sections.reduce((total, sec) => {
+    //       return parseInt(total) + parseInt(sec.WORKINGHRS || null);
+    //     }, 0);
+
+    //     if (totalWorkingHrs) {
+    //       setFormData((prevFormData) => {
+    //         const updatedWorkingHours = totalWorkingHrs || 0;
+    //         // const calculatedOT =
+    //         //   updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY <= 0
+    //         //     ? "0"
+    //         //     : updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY;
+
+    //         return {
+    //           ...prevFormData,
+    //           WORKINGHOURS: updatedWorkingHours,
+    //           // OT: calculatedOT,
+    //         };
+    //       });
+    //     }
+    //   }
+    // }
+    // console.log(sections);
+
+    // Calculate totalOvertimeHrs, defaulting to 0 if OVERTIMEHRS is not present
+    const totalOvertimeHrs = sections.reduce((total, sec) => {
+      return parseInt(total) + parseInt(sec.OVERTIMEHRS || 0);
+    }, 0);
+    console.log(totalOvertimeHrs);
+    // Update formData with totalOvertimeHrs if it exists
+    if (totalOvertimeHrs) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        OT: totalOvertimeHrs || 0,
+      }));
+    }
   }, [sections]);
+
   const addJCandLocaWhrs = useCallback(() => {
     const getData =
       sections &&
@@ -435,23 +647,63 @@ export const EditTimeSheet = ({
   // }, [sections]);
 
   // Handle form field change
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData({
+  //     ...formData,
+  //     [name]: value,
+  //   });
+
+  //   if (name === "WORKINGHOURS") {
+  //     setFormData((prevData) => ({
+  //       ...prevData,
+  //       OT:
+  //         prevData.WORKINGHOURS - prevData.NORMALWORKINGHRSPERDAY <= 0
+  //           ? "0"
+  //           : prevData.WORKINGHOURS - prevData.NORMALWORKINGHRSPERDAY,
+  //     }));
+  //   }
+  // };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
 
-    if (name === "WORKINGHOURS") {
-      setFormData((prevData) => ({
-        ...prevData,
-        OT:
-          prevData.WORKINGHOURS - prevData.NORMALWORKINGHRSPERDAY <= 0
+    // Update the form field value
+    setFormData((prevFormData) => {
+      const updatedData = {
+        ...prevFormData,
+        [name]: value,
+      };
+
+      //
+      // If WORKINGHOURS field is changed, calculate OT and set a warning message if needed
+      if (name === "WORKINGHOURS" || name === "TOTALACTUALHOURS") {
+        const updatedWorkingHours = parseInt(value) || 0;
+        const normalWorkingHours =
+          parseInt(prevFormData.NORMALWORKINGHRSPERDAY) || 0;
+
+        const calculatedOT =
+          updatedWorkingHours - normalWorkingHours <= 0
             ? "0"
-            : prevData.WORKINGHOURS - prevData.NORMALWORKINGHRSPERDAY,
-      }));
-    }
+            : updatedWorkingHours - normalWorkingHours;
+
+        if (updatedWorkingHours > normalWorkingHours) {
+          setWarningMess(true);
+        } else {
+          setWarningMess(false);
+        }
+
+        return {
+          ...updatedData,
+          // WORKINGHOURS: updatedWorkingHours,
+          OT: calculatedOT,
+        };
+      }
+
+      return updatedData;
+    });
   };
+
   const removeItem = (id) => {
     const result = sections.filter((sec) => {
       if (sec.id !== id) {
@@ -461,7 +713,10 @@ export const EditTimeSheet = ({
     setSections(result);
   };
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 ">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 "
+      // className="table-container z-50 fixed inset-0"
+    >
       <section className="bg-[#FBFBFB] p-5 gap-2 flex flex-col item-center rounded-lg shadow-md border-4 border-[#EBEBEB] h-[600px] w-[900px] overflow-y-auto">
         <div className="flex justify-end">
           <RxCross2
@@ -484,16 +739,26 @@ export const EditTimeSheet = ({
             <p className="text-dark_grey text_size_6 pt-2">
               {tableHeader[index]}
             </p>
+            {/* {console.log(field, " : ", formData[field])} */}
+            <div>
+              <input
+                type="text"
+                name={field}
+                className="border border-dark_grey rounded text-dark_grey text-[16px] outline-none w-full py-1 px-3 cursor-auto"
+                // value={editObject.FID}
+                value={formData[field] || ""}
+                onChange={handleChange}
+                readOnly={index < 10}
+              />
 
-            <input
-              type="text"
-              name={field}
-              className="border border-dark_grey rounded text-dark_grey text-[16px] outline-none w-full py-1 px-3 cursor-auto"
-              // value={editObject.FID}
-              value={formData[field] || ""}
-              onChange={handleChange}
-              readOnly={index < 10}
-            />
+              {/* TOTALACTUALHOURS */}
+              {warningMess &&
+                (field === "WORKINGHOURS" || field === "TOTALACTUALHOURS") && (
+                  <span className="text_size_9 mt-2 text-red">
+                    Working hours exceed the normal working hours per day.
+                  </span>
+                )}
+            </div>
           </div>
         ))}
         {Position === "Manager" && (
@@ -530,6 +795,7 @@ export const EditTimeSheet = ({
                       placeholder="Search Job Code"
                       rounded="rounded"
                       searchResult={searchResultForJOBCODE}
+                      searchedValue={searchedValueForJOBCODE}
                       setDrpValue={section.JOBCODE || null}
                       id={section.id}
                     />
@@ -541,8 +807,14 @@ export const EditTimeSheet = ({
                       rounded="rounded"
                       searchResult={searchResultForLocation}
                       setDrpValue={section.LOCATION || null}
+                      searchedValue={searchedValueForLOCATION}
                       id={section.id}
                     />
+                    {!section.LOCATION && (
+                      <span className="text_size_9 mt-2 text-red">
+                        Location must not be empty.
+                      </span>
+                    )}
                   </div>
                   <div className="w-fit">
                     <input
@@ -555,10 +827,10 @@ export const EditTimeSheet = ({
                           e.target.value,
                           "WorkingHrs"
                         );
-                        // combineAllData(section.id, e.target.value)
                       }}
                       placeholder="Enter Hours"
                       className="border border-lite_grey rounded text-dark_grey text_size_5 outline-none w-full py-2 px-3 cursor-auto"
+                      readOnly={!section.LOCATION}
                     />
                   </div>
                   <div className="w-fit">
@@ -572,10 +844,12 @@ export const EditTimeSheet = ({
                           e.target.value,
                           "OvertimeHrs"
                         );
+
                         // combineAllData(section.id, e.target.value)
                       }}
                       placeholder="Enter Overtime "
                       className="border border-lite_grey rounded text-dark_grey text_size_5 outline-none w-full py-2 px-3 cursor-auto"
+                      readOnly={!section.LOCATION}
                     />
                   </div>
                   <div className="pt-2.5">

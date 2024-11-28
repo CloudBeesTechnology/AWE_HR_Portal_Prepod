@@ -26,7 +26,7 @@ export const UpdateMedical = () => {
       uploadRegis: LabUpValue.uploadRegis,
     };
 
-    console.log("Updating data in LabourMedicalInfo table:", updateData);
+ 
 
     try {
       const updatedData = await client.graphql({
@@ -36,7 +36,7 @@ export const UpdateMedical = () => {
         },
       });
 
-      console.log("Successfully updated data:", updatedData);
+      
       return updatedData; // Return the updated data for further use
     } catch (error) {
       console.error("Error updating LabourMedicalInfo:", error.message);

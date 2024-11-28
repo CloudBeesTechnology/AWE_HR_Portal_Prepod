@@ -36,6 +36,7 @@ export const NewJoineeTable = () => {
   }, [empPIData, IDData, workInfoData]);
 
 
+
   return (
     <div className="bg-white shadow-md rounded-2xl overflow-hidden m-2">
       <div className="bg-lite_grey p-4">

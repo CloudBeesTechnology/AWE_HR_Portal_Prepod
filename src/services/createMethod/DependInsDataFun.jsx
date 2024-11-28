@@ -13,7 +13,7 @@ export const DependInsDataFun = () => {
         depInsurance: JSON.stringify(depValue.depInsurance),
 
     };
-    console.log(totalData);
+    // console.log(totalData);
 
     try {
       const storedData=   await Promise.all([
@@ -24,7 +24,7 @@ export const DependInsDataFun = () => {
              },
            })
          ])
-         console.log(storedData,"successfully stored data");
+        //  console.log(storedData,"successfully stored data");
 
        } catch (error) {
          console.error("Error executing GraphQL requests:", error);

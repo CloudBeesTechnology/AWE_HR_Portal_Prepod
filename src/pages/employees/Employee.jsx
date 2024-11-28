@@ -7,11 +7,11 @@ import image4 from "../../assets/Employee/icon4.svg";
 import image5 from "../../assets/Employee/icon5.svg";
 import image6 from "../../assets/Employee/icon6.svg";
 import image7 from "../../assets/Employee/icon7.svg";
-import usePermission  from "../../hooks/usePermissionDashInside";
+import usePermission from "../../hooks/usePermissionDashInside";
 
 export const Employee = () => {
   const employeePermissions = usePermission("userID", "Employee");
- 
+
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -79,8 +79,9 @@ export const Employee = () => {
 
     // You can add more cards if needed
   ];
-  const filteredCards = cards.filter((card) => employeePermissions.includes(card.title));
-console.log(filteredCards);
+  const filteredCards = cards.filter((card) =>
+    employeePermissions.includes(card.title)
+  );
 
   return (
     <section className=" bg-[#F5F6F1CC] w-full p-10 min-h-screen">

@@ -1,15 +1,15 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import { GoUpload } from 'react-icons/go';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { LabourDepositSchema } from '../../../services/EmployeeValidation'; 
-import { SpinLogo } from '../../../utils/SpinLogo';
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { GoUpload } from "react-icons/go";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { LabourDepositSchema } from "../../../services/EmployeeValidation";
+import { SpinLogo } from "../../../utils/SpinLogo";
 import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
-import { DataSupply } from '../../../utils/DataStoredContext';
-import { UpdateLDFun } from '../../../services/updateMethod/UpdateLDFun';
-import { FormField } from '../../../utils/FormField';
-import { FileUploadField } from '../medicalDep/FileUploadField';
-import { useOutletContext } from 'react-router-dom';
+import { DataSupply } from "../../../utils/DataStoredContext";
+import { UpdateLDFun } from "../../../services/updateMethod/UpdateLDFun";
+import { FormField } from "../../../utils/FormField";
+import { FileUploadField } from "../medicalDep/FileUploadField";
+import { useOutletContext } from "react-router-dom";
 
 export const LabourDeposit = () => {
   const { searchResultData } = useOutletContext();
@@ -20,14 +20,19 @@ export const LabourDeposit = () => {
 
   const { BJLData } = useContext(DataSupply);
   const { UpdateLDData } = UpdateLDFun();
-  const { register, handleSubmit,watch, formState: { errors }, setValue } = useForm({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+    setValue,
+  } = useForm({
     resolver: yupResolver(LabourDepositSchema),
     lbrDepoSubmit: [],
-
   });
-  
+
   const [notification, setNotification] = useState(false);
-  const [showTitle,setShowTitle]=useState("");
+  const [showTitle, setShowTitle] = useState("");
   const [labourDate, setLabourDate] = useState([]);
   const [uploadedFileNames, setUploadedFileNames] = useState({
     lbrDepoUpload: null,
@@ -36,71 +41,68 @@ export const LabourDeposit = () => {
     lbrDepoUpload: [],
   });
 
-
-  const watchInducLdUpload = watch("lbrDepoUpload", ""); 
+  const watchInducLdUpload = watch("lbrDepoUpload", "");
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
       return url.split("/").pop(); // Extract the file name from URL
     }
-    return ""; 
+    return "";
   };
 
   const lbrDates = () => setLabourDate([...lbrDepoSubmit, ""]);
 
   const getFileName = (input) => {
     // Check if input is an object and has the 'upload' property
-    if (typeof input === 'object' && input.upload) {
-      const filePath = input.upload;  // Extract the 'upload' path
-  
+    if (typeof input === "object" && input.upload) {
+      const filePath = input.upload; // Extract the 'upload' path
+
       // Decode the URL path
       const decodedUrl = decodeURIComponent(filePath);
-  
+
       // Extract the file name from the path
       const fileNameWithExtension = decodedUrl.substring(
         decodedUrl.lastIndexOf("/") + 1
       );
-  
+
       return fileNameWithExtension;
     }
-  
+
     // If input is a string (URL), use the URL constructor
     try {
-      const urlObj = new URL(input);  // Attempt to create a URL object
-      const filePath = urlObj.pathname;  // Extract path from URL
-  
+      const urlObj = new URL(input); // Attempt to create a URL object
+      const filePath = urlObj.pathname; // Extract path from URL
+
       // Decode the URL path
       const decodedUrl = decodeURIComponent(filePath);
-  
+
       // Extract the file name from the path
       const fileNameWithExtension = decodedUrl.substring(
         decodedUrl.lastIndexOf("/") + 1
       );
-  
+
       return fileNameWithExtension;
     } catch (e) {
       // Handle invalid URL (fall back to file path processing if URL fails)
-      if (typeof input === 'string') {
+      if (typeof input === "string") {
         const decodedUrl = decodeURIComponent(input);
         const fileNameWithExtension = decodedUrl.substring(
           decodedUrl.lastIndexOf("/") + 1
         );
         return fileNameWithExtension;
       }
-  
+
       // If it's neither an object nor a valid URL string, return undefined or handle as needed
       return undefined;
     }
   };
-
-  
 
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
 
   useEffect(() => {
     setValue("empID", searchResultData.empID);
-    const fields = ["lbrReceiptNo","lbrDepoAmt","lbrDepoSubmit",];
+    const fields = ["lbrReceiptNo", "lbrDepoAmt", "lbrDepoSubmit"];
     fields.forEach((field) =>
       setValue(field, getLastValue(searchResultData[field]))
     );
@@ -111,12 +113,12 @@ export const LabourDeposit = () => {
         const parsedFiles = parsedArray.map((item) =>
           typeof item === "string" ? JSON.parse(item) : item
         );
-  
+
         setValue("lbrDepoUpload", parsedFiles);
 
         setUploadLD((prev) => ({
           ...prev,
-          lbrDepoUpload: parsedFiles, 
+          lbrDepoUpload: parsedFiles,
         }));
 
         setUploadedFileNames((prev) => ({
@@ -127,12 +129,15 @@ export const LabourDeposit = () => {
               : "",
         }));
       } catch (error) {
-        console.error(`Failed to parse ${searchResultData.lbrDepoUpload}:`, error);
+        console.error(
+          `Failed to parse ${searchResultData.lbrDepoUpload}:`,
+          error
+        );
       }
-    
     }
-    
   }, [searchResultData, setValue]);
+
+  const empID = watch("empID");
 
   const handleFileChange = async (e, label, empID) => {
     const selectedFile = e.target.files[0];
@@ -169,61 +174,48 @@ export const LabourDeposit = () => {
       console.log(err);
     }
   };
-  const empID = watch("empID");
-
 
   const onSubmit = async (data) => {
- 
-
     try {
       let matchedEmployee = null;
       if (empID) {
         matchedEmployee = BJLData.find((val) => val.empID === empID);
-      
-    
-    const formatDate = (date) => date ? new Date(date).toLocaleDateString('en-CA') : null;
-    const lbrDepoSubmit = formatDate(data.lbrDepoSubmit);
+        console.log(matchedEmployee);
 
-    const updatedlbrDate = [
-      ...new Set([
-        ...(matchedEmployee.lbrDepoSubmit || []), // ensure it's an array before spreading
-        lbrDepoSubmit
-      ]),
-    ];
+        const formatDate = (date) =>
+          date ? new Date(date).toLocaleDateString("en-CA") : null;
+        const lbrDepoSubmit = formatDate(data.lbrDepoSubmit);
 
-      const LDValue = {
-        ...data,
-        lbrDepoSubmit: updatedlbrDate.map(formatDate),
-        lbrDepoUpload: JSON.stringify(uploadLD.lbrDepoUpload),
-        id: matchedEmployee ? matchedEmployee.id : null,
-      };
-   
+        const updatedlbrDate = [
+          ...new Set([
+            ...(matchedEmployee.lbrDepoSubmit || []), // ensure it's an array before spreading
+            lbrDepoSubmit,
+          ]),
+        ];
 
-      await UpdateLDData({ LDValue });
-      setShowTitle("Work Pass Labour Deposit Data Stored Successfully")
-      setNotification(true);
-    } else {
-      console.log("Employee id not found")
-    }
+        const LDValue = {
+          ...data,
+          lbrDepoSubmit: updatedlbrDate.map(formatDate),
+          lbrDepoUpload: JSON.stringify(uploadLD.lbrDepoUpload),
+          id: matchedEmployee ? matchedEmployee.id : null,
+        };
 
+        await UpdateLDData({ LDValue });
+        setShowTitle("Work Pass Labour Deposit Data Stored Successfully");
+        setNotification(true);
+      } else {
+        console.log("Employee id not found");
+      }
     } catch (error) {
       console.error("Error submitting data:", error);
-      console.log(error);
-
-      if (error?.errors) {
-        error.errors.forEach((err, index) => {
-          console.error(`GraphQL Error ${index + 1}:`, err.message);
-          if (err.extensions) {
-            console.error("Error Extensions:", err.extensions);
-          }
-        });
-      }
     }
   };
 
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="mx-auto min-h-screen p-2 my-10 bg-[#F5F6F1CC]">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="mx-auto min-h-screen p-2 my-10 bg-[#F5F6F1CC]"
+    >
       {/* Employee ID Input */}
       <div className="flex justify-end items-center">
         <div className="max-w-sm">
@@ -239,42 +231,41 @@ export const LabourDeposit = () => {
       </div>
 
       <div className="grid grid-cols-2 mt-10 gap-5">
-
-
-      <FormField
+        <FormField
           label="Labour Deposit Receipt Number"
           register={register}
           name="lbrReceiptNo"
           type="text"
           errors={errors}
         />
-      <FormField
+        <FormField
           label="Deposit Amount"
           register={register}
           name="lbrDepoAmt"
           type="text"
           errors={errors}
         />
-      <FormField
+        <FormField
           label="Date Endorsement Of Labour Deposit"
           register={register}
           name="lbrDepoSubmit"
           type="date"
           errors={errors}
         />
-     <div>
-        <FileUploadField
-          label="Upload File"
-          onChangeFunc={(e) => handleFileChange(e, "lbrDepoUpload", empID)}
-          name="lbrDepoUpload"
-          register={register}
-          error={errors}
-          fileName={
-            uploadedFileNames.lbrDepoUpload ||
-            extractFileName(watchInducLdUpload)
-          }        />
-      </div>
+        <div>
+          <FileUploadField
+            label="Upload File"
+            onChangeFunc={(e) => handleFileChange(e, "lbrDepoUpload", empID)}
+            name="lbrDepoUpload"
+            register={register}
+            error={errors}
+            fileName={
+              uploadedFileNames.lbrDepoUpload ||
+              extractFileName(watchInducLdUpload)
+            }
+          />
         </div>
+      </div>
 
       <div className="center my-10">
         <button type="submit" className="primary_btn">
@@ -282,12 +273,12 @@ export const LabourDeposit = () => {
         </button>
       </div>
       {notification && (
-          <SpinLogo
-            text={showTitle}
-            notification={notification}
-            path="/employee"
-          />
-        )}
+        <SpinLogo
+          text={showTitle}
+          notification={notification}
+          path="/employee"
+        />
+      )}
     </form>
   );
 };

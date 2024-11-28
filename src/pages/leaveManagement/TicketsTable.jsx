@@ -36,6 +36,9 @@ export const TicketsTable = ({
     statusUpdate(allItem, status);
   };
 
+  // const finalData = data
+  //   .filter((item) => item.empStatus !== "Cancelled")
+  //   .filter((item) => item.hrName === personalInfo.name);
 
   const finalData = data
   .filter((item) => item.empStatus !== "Cancelled") // Keep items that aren't cancelled
