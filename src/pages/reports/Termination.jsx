@@ -26,7 +26,7 @@ export const Termination = ({ allData, typeOfReport, reportTitle }) => {
         item.position || "-",
         item.department || "-",
         item.termiDate || "-", // Corrected to display termination date
-        item.reasonOfTermination || "-", 
+        item.termiNotProb || "-", 
       ]);
   };
 

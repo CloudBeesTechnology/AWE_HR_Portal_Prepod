@@ -32,9 +32,9 @@ export const useLeaveManageTwo = () => {
         const fetchedTicketRequests = ticketRequestsData?.data?.listTicketRequests?.items || [];
         const fetchedEmpWorkInfos = empWorkInfosData?.data?.listEmpWorkInfos?.items || [];
   
-        console.log("Fetched Employee Personal Infos:", fetchedEmpPersonalInfos);
-        console.log("Fetched Ticket Request Details:", fetchedTicketRequests);
-        console.log("Fetched Employee Work Infos:", fetchedEmpWorkInfos);
+        // console.log("Fetched Employee Personal Infos:", fetchedEmpPersonalInfos);
+        // console.log("Fetched Ticket Request Details:", fetchedTicketRequests);
+        // console.log("Fetched Employee Work Infos:", fetchedEmpWorkInfos);
   
         // Set ticket requests to state
         setTicketRequests(fetchedTicketRequests);
@@ -75,9 +75,9 @@ export const useLeaveManageTwo = () => {
   }, []); // Empty dependency array means this effect runs only once when the component mounts
   
 
-  useEffect(() => {
-    console.log("28267780", ticketMerged);
-  }, [ticketMerged]);
+  // useEffect(() => {
+  //   console.log("28267780", ticketMerged);
+  // }, [ticketMerged]);
 
 
   return {ticketMerged, ticketRequests, loading, error};

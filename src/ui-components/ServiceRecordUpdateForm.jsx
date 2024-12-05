@@ -203,7 +203,7 @@ export default function ServiceRecordUpdateForm(props) {
     revLeaveDate: [],
     revAnnualLeave: [],
     revALD: [],
-    remarkWI: [],
+    remarkWI: "",
     uploadPR: [],
     uploadSP: [],
     uploadLP: [],
@@ -265,8 +265,7 @@ export default function ServiceRecordUpdateForm(props) {
     setCurrentRevAnnualLeaveValue("");
     setRevALD(cleanValues.revALD ?? []);
     setCurrentRevALDValue("");
-    setRemarkWI(cleanValues.remarkWI ?? []);
-    setCurrentRemarkWIValue("");
+    setRemarkWI(cleanValues.remarkWI);
     setUploadPR(cleanValues.uploadPR ?? []);
     setCurrentUploadPRValue("");
     setUploadSP(cleanValues.uploadSP ?? []);
@@ -324,8 +323,6 @@ export default function ServiceRecordUpdateForm(props) {
   const revAnnualLeaveRef = React.createRef();
   const [currentRevALDValue, setCurrentRevALDValue] = React.useState("");
   const revALDRef = React.createRef();
-  const [currentRemarkWIValue, setCurrentRemarkWIValue] = React.useState("");
-  const remarkWIRef = React.createRef();
   const [currentUploadPRValue, setCurrentUploadPRValue] = React.useState("");
   const uploadPRRef = React.createRef();
   const [currentUploadSPValue, setCurrentUploadSPValue] = React.useState("");
@@ -1116,9 +1113,13 @@ export default function ServiceRecordUpdateForm(props) {
           {...getOverrideProps(overrides, "revALD")}
         ></TextField>
       </ArrayField>
-      <ArrayField
-        onChange={async (items) => {
-          let values = items;
+      <TextField
+        label="Remark wi"
+        isRequired={false}
+        isReadOnly={false}
+        value={remarkWI}
+        onChange={(e) => {
+          let { value } = e.target;
           if (onChange) {
             const modelFields = {
               empID,
@@ -1132,7 +1133,7 @@ export default function ServiceRecordUpdateForm(props) {
               revLeaveDate,
               revAnnualLeave,
               revALD,
-              remarkWI: values,
+              remarkWI: value,
               uploadPR,
               uploadSP,
               uploadLP,
@@ -1140,43 +1141,18 @@ export default function ServiceRecordUpdateForm(props) {
               uploadDep,
             };
             const result = onChange(modelFields);
-            values = result?.remarkWI ?? values;
+            value = result?.remarkWI ?? value;
           }
-          setRemarkWI(values);
-          setCurrentRemarkWIValue("");
+          if (errors.remarkWI?.hasError) {
+            runValidationTasks("remarkWI", value);
+          }
+          setRemarkWI(value);
         }}
-        currentFieldValue={currentRemarkWIValue}
-        label={"Remark wi"}
-        items={remarkWI}
-        hasError={errors?.remarkWI?.hasError}
-        runValidationTasks={async () =>
-          await runValidationTasks("remarkWI", currentRemarkWIValue)
-        }
-        errorMessage={errors?.remarkWI?.errorMessage}
-        setFieldValue={setCurrentRemarkWIValue}
-        inputFieldRef={remarkWIRef}
-        defaultFieldValue={""}
-      >
-        <TextField
-          label="Remark wi"
-          isRequired={false}
-          isReadOnly={false}
-          value={currentRemarkWIValue}
-          onChange={(e) => {
-            let { value } = e.target;
-            if (errors.remarkWI?.hasError) {
-              runValidationTasks("remarkWI", value);
-            }
-            setCurrentRemarkWIValue(value);
-          }}
-          onBlur={() => runValidationTasks("remarkWI", currentRemarkWIValue)}
-          errorMessage={errors.remarkWI?.errorMessage}
-          hasError={errors.remarkWI?.hasError}
-          ref={remarkWIRef}
-          labelHidden={true}
-          {...getOverrideProps(overrides, "remarkWI")}
-        ></TextField>
-      </ArrayField>
+        onBlur={() => runValidationTasks("remarkWI", remarkWI)}
+        errorMessage={errors.remarkWI?.errorMessage}
+        hasError={errors.remarkWI?.hasError}
+        {...getOverrideProps(overrides, "remarkWI")}
+      ></TextField>
       <ArrayField
         onChange={async (items) => {
           let values = items;

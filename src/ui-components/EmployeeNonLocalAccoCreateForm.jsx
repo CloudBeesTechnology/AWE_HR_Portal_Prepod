@@ -219,8 +219,8 @@ export default function EmployeeNonLocalAccoCreateForm(props) {
   const accommodationAddressRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
-    accommodation: [{ type: "Required" }],
-    accommodationAddress: [{ type: "Required" }],
+    accommodation: [],
+    accommodationAddress: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -359,7 +359,7 @@ export default function EmployeeNonLocalAccoCreateForm(props) {
       >
         <TextField
           label="Accommodation"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentAccommodationValue}
           onChange={(e) => {
@@ -411,7 +411,7 @@ export default function EmployeeNonLocalAccoCreateForm(props) {
       >
         <TextField
           label="Accommodation address"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentAccommodationAddressValue}
           onChange={(e) => {

@@ -1,6 +1,6 @@
 projects:
-  aweadinin:
-    schemaPath: amplify/backend/api/aweadinin/build/schema.graphql
+  aweadininprod:
+    schemaPath: amplify/backend/api/aweadininprod/build/schema.graphql
     includes:
       - src/graphql/graphqlOperation
     excludes:

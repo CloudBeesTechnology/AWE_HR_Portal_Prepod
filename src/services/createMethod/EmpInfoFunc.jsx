@@ -77,7 +77,7 @@ export const EmpInfoFunc = () => {
       ppUpload,
       supportDocUpload,
     };
-    // console.log(totalData1,"totalData1 Create");
+    console.log(totalData1,"totalData1 Create");
 
     const {
       age,
@@ -155,7 +155,33 @@ export const EmpInfoFunc = () => {
           },
         }),
       ]);
-     
+      if (idResponse.errors || empInfoResponse.errors) {
+        // Handle errors if any response contains an 'errors' field
+        console.error(
+          "Error in GraphQL request:",
+          idResponse.errors || empInfoResponse.errors
+        );
+        return;
+      }
+
+      // Check if the required data is returned from GraphQL
+      if (idResponse.data && idResponse.data.createIDDetails) {
+        console.log(
+          "ID Details successfully created:",
+          idResponse.data.createIDDetails
+        );
+      } else {
+        console.error("Failed to create ID details");
+      }
+
+      if (empInfoResponse.data && empInfoResponse.data.createEmpPersonalInfo) {
+        console.log(
+          "Employee Personal Info successfully created:",
+          empInfoResponse.data.createEmpPersonalInfo
+        );
+      } else {
+        console.error("Failed to create Employee Personal Info");
+      }
     } catch (error) {
       console.error("Error executing GraphQL requests:", error);
       throw error; // Rethrow error if needed

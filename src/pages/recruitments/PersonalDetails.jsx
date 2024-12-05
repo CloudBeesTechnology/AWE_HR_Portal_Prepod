@@ -1,7 +1,8 @@
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { PersonalSchema } from "../../services/Validation";
-import { LuPlusSquare, LuMinusSquare } from "react-icons/lu";
+import { FaRegMinusSquare } from "react-icons/fa";
+import { CiSquarePlus } from "react-icons/ci";
 import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { generateClient } from "aws-amplify/api";
@@ -331,7 +332,7 @@ export const PersonalDetails = () => {
                 onClick={() => removeFamily(index)} // Remove specific field set
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <LuMinusSquare /> {/* Minus icon */}
+                <FaRegMinusSquare /> {/* Minus icon */}
               </button>
             )}
           </div>
@@ -343,7 +344,7 @@ export const PersonalDetails = () => {
           // onClick={() => appendFamily({})}
           className="absolute top-11 -right-7 text-medium_grey text-[18px]"
         >
-          <LuPlusSquare />
+          <CiSquarePlus />
         </button>
       </div>
 
@@ -433,7 +434,7 @@ export const PersonalDetails = () => {
                 onClick={() => removeEducation(index)} // Remove specific field set
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <LuMinusSquare /> {/* Minus icon */}
+                <FaRegMinusSquare /> {/* Minus icon */}
               </button>
             )}
           </div>
@@ -444,7 +445,7 @@ export const PersonalDetails = () => {
           // onClick={() => appendEducation({})}
           className="absolute top-12 -right-7 text-medium_grey text-[18px]"
         >
-          <LuPlusSquare />
+          <CiSquarePlus />
         </button>
       </div>
 
@@ -498,7 +499,7 @@ export const PersonalDetails = () => {
                 onClick={() => removeEmployment(index)} // Remove specific field set
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <LuMinusSquare /> {/* Minus icon */}
+                <FaRegMinusSquare /> {/* Minus icon */}
               </button>
             )}
           </div>
@@ -509,7 +510,7 @@ export const PersonalDetails = () => {
           // onClick={() => appendEmployment({})}
           className="absolute top-11 -right-7 text-medium_grey text-[18px]"
         >
-          <LuPlusSquare />
+          <CiSquarePlus />
         </button>
       </div>
 

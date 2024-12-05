@@ -1,22 +1,72 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaPencilAlt } from "react-icons/fa";
 import { IoSearch } from "react-icons/io5";
 import { Searchbox } from "../../utils/Searchbox";
 import { RequisitionReviewForm } from '../recruitments/RequisitionReviewForm';
 import { RemarksDialog } from "../recruitments/RemarksDialog";
+import { format } from "date-fns";
+import { listEmpRequisitions } from "../../graphql/queries";
+import { generateClient } from "@aws-amplify/api";
+import { updateEmpRequisition } from '../../graphql/mutations';
+
+const client = generateClient();
 
 export const EmployReq = ({ requestData, onStatusChange, onRequestSelect }) => {
+  const [requisitionData, setRequisitionData] = useState([]);
+  const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRemarksRequest, setSelectedRemarksRequest] = useState(null);
   const [selectedRequest, setSelectedRequest] = useState(null);
 
-  const filteredRequestData = requestData?.filter(
-    (item) =>
-      (item.manager?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (item.department?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (item.position?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (item.project?.toLowerCase() || "").includes(searchTerm.toLowerCase())
-  );
+  // Fetch requisition data
+  const fetchRequisitionData = async () => {
+    try {
+      const response = await client.graphql({ query: listEmpRequisitions });
+      const fetchedData = response?.data?.listEmpRequisitions?.items || [];
+      setRequisitionData(fetchedData);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching requisition data:", err);
+      setError("Failed to fetch requisition data");
+      setRequisitionData([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchRequisitionData();
+  }, []);
+
+  // Handle "View" link click
+  const handleViewClick = (request) => {
+    setSelectedRequest(request);
+    setIsReviewFormVisible(true);
+  };
+
+  // Close the review form
+  const handleReviewFormClose = () => {
+    setSelectedRequest(null);
+    setIsReviewFormVisible(false);
+  };
+
+ // Define updateStatus
+const updateStatus = async (requestId, newStatus) => {
+  try {
+    await client.graphql({
+      query: updateEmpRequisition,
+      variables: {
+        input: {
+          id: requestId,
+          status: newStatus, // Status to be updated ("Approved", "Rejected", etc.)
+        },
+      },
+    });
+    // Refresh the requisition data after updating the status
+    fetchRequisitionData();
+  } catch (err) {
+    console.error("Error updating status:", err);
+  }
+};
 
   const closeRemarksDialog = () => {
     setSelectedRemarksRequest(null);
@@ -25,10 +75,6 @@ export const EmployReq = ({ requestData, onStatusChange, onRequestSelect }) => {
   const saveRemarks = (remarks) => {
     onStatusChange(selectedRemarksRequest.id, remarks);
     setSelectedRemarksRequest(null);
-  };
-
-  const closeModal = () => {
-    setSelectedRequest(null); // Reset selectedRequest when modal closes
   };
 
   return (
@@ -45,63 +91,72 @@ export const EmployReq = ({ requestData, onStatusChange, onRequestSelect }) => {
         />
       </div>
 
-      <div className="overflow-x-auto rounded-lg">
-        <table className="w-full text-left">
-          <thead className="bg-[#939393] text-white rounded-lg">
-            <tr>
-              <th className="pl-4 py-4">Requested Manager</th>
-              <th className="py-4">Department</th>
-              <th className="py-4">Position</th>
-              <th className="py-4">Project</th>
-              <th className="py-4">Quantity</th>
-              <th className="py-4">Received Date</th>
-              <th className="py-4">Submitted Form</th>
-              <th className="py-4">Status Update</th>
-              <th className="py-4">Remarks</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white">
-            {filteredRequestData?.length > 0 ? (
-              filteredRequestData.map((item, index) => (
-                <tr key={index} className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)]">
-                  <td className="pl-4 py-4">{item.manager}</td>
+      {error && <div className="text-[red] text-center mb-4">{error}</div>}
+
+      {requisitionData.length > 0 ? (
+        <div className="overflow-x-auto rounded-lg">
+          <table className="w-full text-left">
+            <thead className="bg-[#939393] text-white rounded-lg">
+              <tr>
+                <th className="pl-4 py-4">Requested Manager</th>
+                <th className="py-4">Department</th>
+                <th className="py-4">Position</th>
+                <th className="py-4">Project</th>
+                <th className="py-4">Quantity</th>
+                <th className="py-4">Received Date</th>
+                <th className="py-4">Submitted Form</th>
+                <th className="py-4">Status Update</th>
+                <th className="py-4">Remarks</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white">
+              {requisitionData.map((item) => (
+                <tr key={item.id} className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)]">
+                  <td className="pl-4 py-4">{item.reqName}</td>
                   <td className="py-4">{item.department}</td>
                   <td className="py-4">{item.position}</td>
                   <td className="py-4">{item.project}</td>
                   <td className="py-4">{item.quantity}</td>
+                  <td className="py-4">{format(new Date(item.createdAt), "dd-MM-yyyy")}</td> 
+                          
+
                   <td className="py-4">
-                    {new Date(item.date).toLocaleDateString("en-GB")}
-                  </td>
-                  <td className="py-4">
-                    <button onClick={() => setSelectedRequest(item)}>
+                    <a
+                      href="#"
+                      className="text-[#2779f5f7] font-semibold underline cursor-pointer"
+                      onClick={() => handleViewClick(item)}
+                    >
                       View
-                    </button>
+                    </a>
                   </td>
-                  <td className={`py-4 font-semibold ${item.status === "Approved" ? "text-[#25a041]" : item.status === "Rejected" ? "text-[#f75a11]" : "text-grey"}`}>
-                    {item.status}
-                  </td>
+                  {/* <td className={`py-4 font-semibold ${
+                    item.status === "Approved" ? "text-[#25a041]" :
+                    item.status === "Rejected" ? "text-[#f75a11]" :
+                    "text-grey"
+                  }`}> */}
+                     <td className="py-4">{item.status ? item.status : "Pending"}</td>   
+                  {/* </td> */}
                   <td className="py-4 flex items-center gap-2">
-                    <span>{item.remarks}</span>
+                    <span>{item.remarkReq}</span>
                     <FaPencilAlt onClick={() => setSelectedRemarksRequest(item)} />
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="9" className="text-center py-4">No Requisitions Found</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="text-center py-4">No Requisitions Found</div>
+      )}
 
-      {selectedRequest && (
+      {isReviewFormVisible && selectedRequest && (
         <RequisitionReviewForm
-          isVisible={!!selectedRequest}
-          onClose={closeModal}
-          requestData={selectedRequest}
-          onStatusChange={onStatusChange}
-        />
+  isVisible={isReviewFormVisible}
+  onClose={handleReviewFormClose}
+  isMdView={true}
+  selectedRequest={selectedRequest}
+  onStatusChange={updateStatus} // Pass the function here
+/>
       )}
 
       <RemarksDialog
@@ -115,209 +170,4 @@ export const EmployReq = ({ requestData, onStatusChange, onRequestSelect }) => {
 };
 
 
-
-
-
-
-
-// import React, { useState, useEffect } from 'react';
-// import { FaPencilAlt } from "react-icons/fa";
-// import { IoSearch } from "react-icons/io5";
-// import { Searchbox } from "../../utils/Searchbox";
-// import { RequisitionReviewForm } from "./RequisitionReviewForm";
-// import { RemarksDialog } from "../recruitments/RemarksDialog";
-
-// export const EmployReq = () => {
-//   const initialRequestData = [
-//     {
-//       manager: "S Prem Kumar",
-//       department: "QA QC",
-//       position: "Coordinator",
-//       project: "Project A",
-//       additional: "Yes",
-//       quantity: "2",
-//       date: "2024-09-15",
-//       status: "Pending",
-//       remarks: "",
-//     },
-//     {
-//       manager: "V K Mathew",
-//       department: "BLNG",
-//       position: "Scaffolder",
-//       project: "Project B",
-//       additional: "No",
-//       quantity: "5",
-//       date: "2024-09-15",
-//       status: "Pending",
-//       remarks: "",
-//     },
-//   ];
-
-//   const [requestData, setRequestData] = useState(initialRequestData);
-//   const [selectedRequest, setSelectedRequest] = useState(null);
-//   const [selectedRemarksRequest, setSelectedRemarksRequest] = useState(null);
-//   const [searchTerm, setSearchTerm] = useState("");
-
-//   useEffect(() => {
-//     if (selectedRequest) {
-//       document.body.style.overflow = 'hidden';
-//     } else {
-//       document.body.style.overflow = 'auto';
-//     }
-//     return () => {
-//       document.body.style.overflow = 'auto';
-//     };
-//   }, [selectedRequest]);
-
-//   const filteredRequestData = requestData?.filter(
-//     (item) =>
-//       item.manager.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//       item.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//       item.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//       item.project.toLowerCase().includes(searchTerm.toLowerCase())
-//   );
-
-//   const handleViewClick = (request) => {
-//     setSelectedRequest(request);
-//   };
-
-//   const closeModal = () => {
-//     setSelectedRequest(null);
-//   };
-
-//   const closeRemarksDialog = () => {
-//     setSelectedRemarksRequest(null);
-//   };
-
-//   const updateStatus = (status) => {
-//     setRequestData((prevData) =>
-//       prevData.map((item) =>
-//         item.manager === selectedRequest.manager && item.date === selectedRequest.date
-//           ? { ...item, status }
-//           : item
-//       )
-//     );
-//   };
-
-//   const saveRemarks = (remarks) => {
-//     setRequestData((prevData) =>
-//       prevData.map((item) =>
-//         item === selectedRemarksRequest ? { ...item, remarks } : item
-//       )
-//     );
-//     setSelectedRemarksRequest(null);
-//   };
-
-//   return (
-//     <section className="screen-size h-screen w-full my-5">
-//       <div className="mb-8 flex justify-between items-center">
-//         <div className="flex-1">
-//           <button className="bg-[#faf362] py-2 px-3 rounded-lg text-[18px] font-semibold">
-//             Employee Requisition Review
-//           </button>
-//         </div>
-//         <div className="flex-1 flex justify-end">
-//           <Searchbox
-//             value={searchTerm}
-//             searchHandler={(term) => setSearchTerm(term)}
-//             searchIcon1={<IoSearch />}
-//             placeholder="name, position"
-//             border="rounded-full"
-//             shadow="shadow-[0_1px_6px_1px_rgba(0,0,0,0.2)]"
-//           />
-//         </div>
-//       </div>
-
-//       <div className="overflow-x-auto rounded-lg">
-//         <table className="w-full text-left">
-//           <thead className="bg-[#939393] text-white rounded-lg">
-//             <tr>
-//               <th className="pl-4 py-4">Requested Manager</th>
-//               <th className="py-4">Department</th>
-//               <th className="py-4">Position</th>
-//               <th className="py-4">Project</th>
-//               <th className="py-4">Quantity</th>
-//               <th className="py-4">Received Date</th>
-//               <th className="py-4">Submitted Form</th>
-//               <th className="py-4">Status Update</th>
-//               <th className="py-4">Remarks</th>
-//             </tr>
-//           </thead>
-//           <tbody className="bg-white">
-//             {filteredRequestData?.length > 0 ? (
-//               filteredRequestData.map((item, index) => (
-//                 <tr
-//                   key={index}
-//                   className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)]"
-//                 >
-//                   <td className="pl-4 py-4">{item.manager}</td>
-//                   <td className="py-4">{item.department}</td>
-//                   <td className="py-4">{item.position}</td>
-//                   <td className="py-4">{item.project}</td>
-//                   <td className="py-4">{item.quantity}</td>
-//                   <td className="py-4">
-//                     {new Date(item.date).toLocaleDateString("en-GB")}
-//                   </td>
-//                   <td className="py-4">
-//                     <a
-//                       href="#"
-//                       className="text-[#2779f5f7] font-semibold underline cursor-pointer"
-//                       onClick={(e) => {
-//                         e.preventDefault();
-//                         handleViewClick(item);
-//                       }}
-//                     >
-//                       View
-//                     </a>
-//                   </td>
-//                   <td
-//                     className={`py-4 font-semibold ${
-//                       item.status === "Approved"
-//                         ? "text-[#25a041]"
-//                         : item.status === "Rejected"
-//                         ? "text-[#f75a11]"
-//                         : "text-grey"
-//                     }`}
-//                   >
-//                     {item.status}
-//                   </td>
-//                   <td className="py-4 flex items-center gap-2">
-//                     <span>{item.remarks}</span>
-//                     <FaPencilAlt
-//                       className="cursor-pointer text-[#ff0000]"
-//                       onClick={() => setSelectedRemarksRequest(item)}
-//                     />
-//                   </td>
-//                 </tr>
-//               ))
-//             ) : (
-//               <tr>
-//                 <td colSpan="9" className="text-center py-4">
-//                   No Requisitions Found
-//                 </td>
-//               </tr>
-//             )}
-//           </tbody>
-//         </table>
-//       </div>
-
-//       {/* Modal for showing requisition form */}
-//       <div>
-//       <RequisitionReviewForm
-//         isVisible={!!selectedRequest} // Ensuring it's either true or false
-//         onClose={closeModal}
-//         requestData={selectedRequest || {}} // Provide default empty object
-//         onStatusChange={updateStatus}
-//        /></div>
-
-//       {/* Modal for showing remarks dialog */}
-//       <RemarksDialog
-//         isOpen={selectedRemarksRequest !== null}
-//         onClose={closeRemarksDialog}
-//         onSave={saveRemarks}
-//         initialRemarks={selectedRemarksRequest?.remarks || ""}
-//       />
-//     </section>
-//   );
-// };
 

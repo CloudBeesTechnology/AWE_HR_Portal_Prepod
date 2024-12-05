@@ -13,7 +13,7 @@ export const NLACreate = () => {
       accommodation: [NLACreValue.accommodation],
       accommodationAddress: [NLACreValue.accommodationAddress],
     };
-    // console.log(totalData);
+    console.log(totalData);
 
     try {
       const storedData=   await Promise.all([
@@ -24,7 +24,7 @@ export const NLACreate = () => {
              },
            })
          ])
-        //  console.log(storedData,"successfully stored data");
+         console.log(storedData,"successfully stored data");
 
        } catch (error) {
          console.error("Error executing GraphQL requests:", error);

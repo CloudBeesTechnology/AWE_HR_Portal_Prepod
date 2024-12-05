@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate, Outlet } from "react-router-dom";
 import { RecDashdetails } from "./RecDashdetails";
+import usePermission from "../../hooks/usePermissionDashInside";
 
 export const RecruTiles = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedTile, setSelectedTile] = useState("");
-
+  const recruitmentPermissions = usePermission("userID", "Recruitment");
   useEffect(() => {
     if (location.pathname.includes("applyemployreq")) {
       setSelectedTile("Apply Employee Requisition");
@@ -29,11 +30,13 @@ export const RecruTiles = () => {
     setSelectedTile(title);
     navigate(path);
   };
-
+  const filteredCards = RecDashdetails.filter((card) =>
+    recruitmentPermissions.includes(card.title)
+  );
   return (
     <section className="h-full bg-[#F5F6F1]">
       <div className="flex flex-wrap justify-center sm:justify-evenly items-center gap-4 py-10 text-black">
-        {RecDashdetails.map((value, index) => (
+        {filteredCards.map((value, index) => (
           <div
             key={index}
             onClick={() => handleTileClick(value.title, value.path)}

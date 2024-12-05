@@ -193,27 +193,34 @@ export default function BlngCreateForm(props) {
     weeklySheet: [],
     date: "",
     status: "",
+    manager: [],
   };
   const [weeklySheet, setWeeklySheet] = React.useState(
     initialValues.weeklySheet
   );
   const [date, setDate] = React.useState(initialValues.date);
   const [status, setStatus] = React.useState(initialValues.status);
+  const [manager, setManager] = React.useState(initialValues.manager);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setWeeklySheet(initialValues.weeklySheet);
     setCurrentWeeklySheetValue("");
     setDate(initialValues.date);
     setStatus(initialValues.status);
+    setManager(initialValues.manager);
+    setCurrentManagerValue("");
     setErrors({});
   };
   const [currentWeeklySheetValue, setCurrentWeeklySheetValue] =
     React.useState("");
   const weeklySheetRef = React.createRef();
+  const [currentManagerValue, setCurrentManagerValue] = React.useState("");
+  const managerRef = React.createRef();
   const validations = {
-    weeklySheet: [{ type: "Required" }, { type: "JSON" }],
-    date: [{ type: "Required" }],
-    status: [{ type: "Required" }],
+    weeklySheet: [{ type: "JSON" }],
+    date: [],
+    status: [],
+    manager: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -244,6 +251,7 @@ export default function BlngCreateForm(props) {
           weeklySheet,
           date,
           status,
+          manager,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -305,6 +313,7 @@ export default function BlngCreateForm(props) {
               weeklySheet: values,
               date,
               status,
+              manager,
             };
             const result = onChange(modelFields);
             values = result?.weeklySheet ?? values;
@@ -326,7 +335,7 @@ export default function BlngCreateForm(props) {
       >
         <TextAreaField
           label="Weekly sheet"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentWeeklySheetValue}
           onChange={(e) => {
@@ -348,7 +357,7 @@ export default function BlngCreateForm(props) {
       </ArrayField>
       <TextField
         label="Date"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={date}
         onChange={(e) => {
@@ -358,6 +367,7 @@ export default function BlngCreateForm(props) {
               weeklySheet,
               date: value,
               status,
+              manager,
             };
             const result = onChange(modelFields);
             value = result?.date ?? value;
@@ -374,7 +384,7 @@ export default function BlngCreateForm(props) {
       ></TextField>
       <TextField
         label="Status"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={status}
         onChange={(e) => {
@@ -384,6 +394,7 @@ export default function BlngCreateForm(props) {
               weeklySheet,
               date,
               status: value,
+              manager,
             };
             const result = onChange(modelFields);
             value = result?.status ?? value;
@@ -398,6 +409,54 @@ export default function BlngCreateForm(props) {
         hasError={errors.status?.hasError}
         {...getOverrideProps(overrides, "status")}
       ></TextField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              weeklySheet,
+              date,
+              status,
+              manager: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.manager ?? values;
+          }
+          setManager(values);
+          setCurrentManagerValue("");
+        }}
+        currentFieldValue={currentManagerValue}
+        label={"Manager"}
+        items={manager}
+        hasError={errors?.manager?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("manager", currentManagerValue)
+        }
+        errorMessage={errors?.manager?.errorMessage}
+        setFieldValue={setCurrentManagerValue}
+        inputFieldRef={managerRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Manager"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentManagerValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.manager?.hasError) {
+              runValidationTasks("manager", value);
+            }
+            setCurrentManagerValue(value);
+          }}
+          onBlur={() => runValidationTasks("manager", currentManagerValue)}
+          errorMessage={errors.manager?.errorMessage}
+          hasError={errors.manager?.hasError}
+          ref={managerRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "manager")}
+        ></TextAreaField>
+      </ArrayField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

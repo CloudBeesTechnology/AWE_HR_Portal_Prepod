@@ -1,0 +1,1093 @@
+{
+  "Parameters": {
+    "DynamoDBModelTableReadIOPS": {
+      "Type": "Number",
+      "Default": 5,
+      "Description": "The number of read IOPS the table should support."
+    },
+    "DynamoDBModelTableWriteIOPS": {
+      "Type": "Number",
+      "Default": 5,
+      "Description": "The number of write IOPS the table should support."
+    },
+    "DynamoDBBillingMode": {
+      "Type": "String",
+      "Default": "PAY_PER_REQUEST",
+      "AllowedValues": [
+        "PAY_PER_REQUEST",
+        "PROVISIONED"
+      ],
+      "Description": "Configure @model types to create DynamoDB tables with PAY_PER_REQUEST or PROVISIONED billing modes."
+    },
+    "DynamoDBEnablePointInTimeRecovery": {
+      "Type": "String",
+      "Default": "false",
+      "AllowedValues": [
+        "true",
+        "false"
+      ],
+      "Description": "Whether to enable Point in Time Recovery on the table."
+    },
+    "DynamoDBEnableServerSideEncryption": {
+      "Type": "String",
+      "Default": "true",
+      "AllowedValues": [
+        "true",
+        "false"
+      ],
+      "Description": "Enable server side encryption powered by KMS."
+    },
+    "referencetotransformerrootstackenv10C5A902Ref": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackGraphQLAPI20497F53ApiId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackS3DeploymentBucket7592718ARef": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypeauth0FunctionQuerygetInsuranceTypeauth0FunctionAppSyncFunction84613F74FunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeMutationcreateInsuranceTypeinit0FunctionMutationcreateInsuranceTypeinit0FunctionAppSyncFunction84DE8DC3FunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeMutationcreateInsuranceTypeauth0FunctionMutationcreateInsuranceTypeauth0FunctionAppSyncFunction3271F8FDFunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeMutationupdateInsuranceTypeinit0FunctionMutationupdateInsuranceTypeinit0FunctionAppSyncFunctionA0D393B0FunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptiononCreateInsuranceTypeauth0FunctionSubscriptiononCreateInsuranceTypeauth0FunctionAppSyncFuncti1417D75E": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptionOnCreateInsuranceTypeDataResolverFnSubscriptionOnCreateInsuranceTypeDataResolverFnAppSyncFunc15969348": {
+      "Type": "String"
+    }
+  },
+  "Conditions": {
+    "HasEnvironmentParameter": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "referencetotransformerrootstackenv10C5A902Ref"
+            },
+            "NONE"
+          ]
+        }
+      ]
+    },
+    "ShouldUseServerSideEncryption": {
+      "Fn::Equals": [
+        {
+          "Ref": "DynamoDBEnableServerSideEncryption"
+        },
+        "true"
+      ]
+    },
+    "ShouldUsePayPerRequestBilling": {
+      "Fn::Equals": [
+        {
+          "Ref": "DynamoDBBillingMode"
+        },
+        "PAY_PER_REQUEST"
+      ]
+    },
+    "ShouldUsePointInTimeRecovery": {
+      "Fn::Equals": [
+        {
+          "Ref": "DynamoDBEnablePointInTimeRecovery"
+        },
+        "true"
+      ]
+    }
+  },
+  "Resources": {
+    "CandIToEMPTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "BillingMode": {
+          "Fn::If": [
+            "ShouldUsePayPerRequestBilling",
+            "PAY_PER_REQUEST",
+            {
+              "Ref": "AWS::NoValue"
+            }
+          ]
+        },
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "PointInTimeRecoverySpecification": {
+          "Fn::If": [
+            "ShouldUsePointInTimeRecovery",
+            {
+              "PointInTimeRecoveryEnabled": true
+            },
+            {
+              "Ref": "AWS::NoValue"
+            }
+          ]
+        },
+        "ProvisionedThroughput": {
+          "Fn::If": [
+            "ShouldUsePayPerRequestBilling",
+            {
+              "Ref": "AWS::NoValue"
+            },
+            {
+              "ReadCapacityUnits": {
+                "Ref": "DynamoDBModelTableReadIOPS"
+              },
+              "WriteCapacityUnits": {
+                "Ref": "DynamoDBModelTableWriteIOPS"
+              }
+            }
+          ]
+        },
+        "SSESpecification": {
+          "SSEEnabled": {
+            "Fn::If": [
+              "ShouldUseServerSideEncryption",
+              true,
+              false
+            ]
+          }
+        },
+        "StreamSpecification": {
+          "StreamViewType": "NEW_AND_OLD_IMAGES"
+        },
+        "TableName": {
+          "Fn::Join": [
+            "",
+            [
+              "CandIToEMP-",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "-",
+              {
+                "Ref": "referencetotransformerrootstackenv10C5A902Ref"
+              }
+            ]
+          ]
+        }
+      },
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete"
+    },
+    "CandIToEMPIAMRoleF7BEA328": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "appsync.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "dynamodb:BatchGetItem",
+                    "dynamodb:BatchWriteItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:DeleteItem",
+                    "dynamodb:GetItem",
+                    "dynamodb:Scan",
+                    "dynamodb:Query",
+                    "dynamodb:UpdateItem",
+                    "dynamodb:ConditionCheckItem",
+                    "dynamodb:DescribeTable",
+                    "dynamodb:GetRecords",
+                    "dynamodb:GetShardIterator"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Sub": [
+                        "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}",
+                        {
+                          "tablename": {
+                            "Fn::Join": [
+                              "",
+                              [
+                                "CandIToEMP-",
+                                {
+                                  "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+                                },
+                                "-",
+                                {
+                                  "Ref": "referencetotransformerrootstackenv10C5A902Ref"
+                                }
+                              ]
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "Fn::Sub": [
+                        "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/*",
+                        {
+                          "tablename": {
+                            "Fn::Join": [
+                              "",
+                              [
+                                "CandIToEMP-",
+                                {
+                                  "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+                                },
+                                "-",
+                                {
+                                  "Ref": "referencetotransformerrootstackenv10C5A902Ref"
+                                }
+                              ]
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "DynamoDBAccess"
+          }
+        ],
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              "CandIToEMPIAMRole75221f-",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "-",
+              {
+                "Ref": "referencetotransformerrootstackenv10C5A902Ref"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "CandIToEMPDataSource": {
+      "Type": "AWS::AppSync::DataSource",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DynamoDBConfig": {
+          "AwsRegion": {
+            "Ref": "AWS::Region"
+          },
+          "TableName": {
+            "Ref": "CandIToEMPTable"
+          }
+        },
+        "Name": "CandIToEMPTable",
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "CandIToEMPIAMRoleF7BEA328",
+            "Arn"
+          ]
+        },
+        "Type": "AMAZON_DYNAMODB"
+      },
+      "DependsOn": [
+        "CandIToEMPIAMRoleF7BEA328"
+      ]
+    },
+    "QueryGetCandIToEMPDataResolverFnQueryGetCandIToEMPDataResolverFnAppSyncFunction5B0A89EC": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "CandIToEMPDataSource",
+            "Name"
+          ]
+        },
+        "FunctionVersion": "2018-05-29",
+        "Name": "QueryGetCandIToEMPDataResolverFn",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Query.getCandIToEMP.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Query.getCandIToEMP.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "CandIToEMPDataSource"
+      ]
+    },
+    "GetCandIToEMPResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "getCandIToEMP",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypeauth0FunctionQuerygetInsuranceTypeauth0FunctionAppSyncFunction84613F74FunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+            },
+            {
+              "Fn::GetAtt": [
+                "QueryGetCandIToEMPDataResolverFnQueryGetCandIToEMPDataResolverFnAppSyncFunction5B0A89EC",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"getCandIToEMP\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+              {
+                "Ref": "CandIToEMPTable"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+        "TypeName": "Query"
+      }
+    },
+    "QueryListCandIToEMPSDataResolverFnQueryListCandIToEMPSDataResolverFnAppSyncFunction8AB9C798": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "CandIToEMPDataSource",
+            "Name"
+          ]
+        },
+        "FunctionVersion": "2018-05-29",
+        "Name": "QueryListCandIToEMPSDataResolverFn",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Query.listCandIToEMPS.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Query.listCandIToEMPS.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "CandIToEMPDataSource"
+      ]
+    },
+    "ListCandIToEMPResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "listCandIToEMPS",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypeauth0FunctionQuerygetInsuranceTypeauth0FunctionAppSyncFunction84613F74FunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+            },
+            {
+              "Fn::GetAtt": [
+                "QueryListCandIToEMPSDataResolverFnQueryListCandIToEMPSDataResolverFnAppSyncFunction8AB9C798",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"listCandIToEMPS\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+              {
+                "Ref": "CandIToEMPTable"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+        "TypeName": "Query"
+      }
+    },
+    "MutationCreateCandIToEMPDataResolverFnMutationCreateCandIToEMPDataResolverFnAppSyncFunction2FDEF46B": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "CandIToEMPDataSource",
+            "Name"
+          ]
+        },
+        "FunctionVersion": "2018-05-29",
+        "Name": "MutationCreateCandIToEMPDataResolverFn",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.createCandIToEMP.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.createCandIToEMP.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "CandIToEMPDataSource"
+      ]
+    },
+    "CreateCandIToEMPResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "createCandIToEMP",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeMutationcreateInsuranceTypeinit0FunctionMutationcreateInsuranceTypeinit0FunctionAppSyncFunction84DE8DC3FunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeMutationcreateInsuranceTypeauth0FunctionMutationcreateInsuranceTypeauth0FunctionAppSyncFunction3271F8FDFunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+            },
+            {
+              "Fn::GetAtt": [
+                "MutationCreateCandIToEMPDataResolverFnMutationCreateCandIToEMPDataResolverFnAppSyncFunction2FDEF46B",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"createCandIToEMP\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+              {
+                "Ref": "CandIToEMPTable"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+        "TypeName": "Mutation"
+      }
+    },
+    "MutationupdateCandIToEMPauth0FunctionMutationupdateCandIToEMPauth0FunctionAppSyncFunction39B70AD6": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "CandIToEMPDataSource",
+            "Name"
+          ]
+        },
+        "FunctionVersion": "2018-05-29",
+        "Name": "MutationupdateCandIToEMPauth0Function",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.updateCandIToEMP.auth.1.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.updateCandIToEMP.auth.1.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "CandIToEMPDataSource"
+      ]
+    },
+    "MutationUpdateCandIToEMPDataResolverFnMutationUpdateCandIToEMPDataResolverFnAppSyncFunctionAC811086": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "CandIToEMPDataSource",
+            "Name"
+          ]
+        },
+        "FunctionVersion": "2018-05-29",
+        "Name": "MutationUpdateCandIToEMPDataResolverFn",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.updateCandIToEMP.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.updateCandIToEMP.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "CandIToEMPDataSource"
+      ]
+    },
+    "UpdateCandIToEMPResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "updateCandIToEMP",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeMutationupdateInsuranceTypeinit0FunctionMutationupdateInsuranceTypeinit0FunctionAppSyncFunctionA0D393B0FunctionId"
+            },
+            {
+              "Fn::GetAtt": [
+                "MutationupdateCandIToEMPauth0FunctionMutationupdateCandIToEMPauth0FunctionAppSyncFunction39B70AD6",
+                "FunctionId"
+              ]
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+            },
+            {
+              "Fn::GetAtt": [
+                "MutationUpdateCandIToEMPDataResolverFnMutationUpdateCandIToEMPDataResolverFnAppSyncFunctionAC811086",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"updateCandIToEMP\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+              {
+                "Ref": "CandIToEMPTable"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+        "TypeName": "Mutation"
+      }
+    },
+    "MutationdeleteCandIToEMPauth0FunctionMutationdeleteCandIToEMPauth0FunctionAppSyncFunction2053D741": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "CandIToEMPDataSource",
+            "Name"
+          ]
+        },
+        "FunctionVersion": "2018-05-29",
+        "Name": "MutationdeleteCandIToEMPauth0Function",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.deleteCandIToEMP.auth.1.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.deleteCandIToEMP.auth.1.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "CandIToEMPDataSource"
+      ]
+    },
+    "MutationDeleteCandIToEMPDataResolverFnMutationDeleteCandIToEMPDataResolverFnAppSyncFunction9B9F02AE": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "CandIToEMPDataSource",
+            "Name"
+          ]
+        },
+        "FunctionVersion": "2018-05-29",
+        "Name": "MutationDeleteCandIToEMPDataResolverFn",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.deleteCandIToEMP.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.deleteCandIToEMP.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "CandIToEMPDataSource"
+      ]
+    },
+    "DeleteCandIToEMPResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "deleteCandIToEMP",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Fn::GetAtt": [
+                "MutationdeleteCandIToEMPauth0FunctionMutationdeleteCandIToEMPauth0FunctionAppSyncFunction2053D741",
+                "FunctionId"
+              ]
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+            },
+            {
+              "Fn::GetAtt": [
+                "MutationDeleteCandIToEMPDataResolverFnMutationDeleteCandIToEMPDataResolverFnAppSyncFunction9B9F02AE",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"deleteCandIToEMP\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+              {
+                "Ref": "CandIToEMPTable"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+        "TypeName": "Mutation"
+      }
+    },
+    "SubscriptiononCreateCandIToEMPResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "onCreateCandIToEMP",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptiononCreateInsuranceTypeauth0FunctionSubscriptiononCreateInsuranceTypeauth0FunctionAppSyncFuncti1417D75E"
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptionOnCreateInsuranceTypeDataResolverFnSubscriptionOnCreateInsuranceTypeDataResolverFnAppSyncFunc15969348"
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onCreateCandIToEMP\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+        "TypeName": "Subscription"
+      }
+    },
+    "SubscriptiononUpdateCandIToEMPResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "onUpdateCandIToEMP",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptiononCreateInsuranceTypeauth0FunctionSubscriptiononCreateInsuranceTypeauth0FunctionAppSyncFuncti1417D75E"
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptionOnCreateInsuranceTypeDataResolverFnSubscriptionOnCreateInsuranceTypeDataResolverFnAppSyncFunc15969348"
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onUpdateCandIToEMP\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+        "TypeName": "Subscription"
+      }
+    },
+    "SubscriptiononDeleteCandIToEMPResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "onDeleteCandIToEMP",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptiononCreateInsuranceTypeauth0FunctionSubscriptiononCreateInsuranceTypeauth0FunctionAppSyncFuncti1417D75E"
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptionOnCreateInsuranceTypeDataResolverFnSubscriptionOnCreateInsuranceTypeDataResolverFnAppSyncFunc15969348"
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onDeleteCandIToEMP\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+        "TypeName": "Subscription"
+      }
+    }
+  },
+  "Outputs": {
+    "GetAttCandIToEMPTableStreamArn": {
+      "Description": "Your DynamoDB table StreamArn.",
+      "Value": {
+        "Fn::GetAtt": [
+          "CandIToEMPTable",
+          "StreamArn"
+        ]
+      },
+      "Export": {
+        "Name": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "GetAtt:CandIToEMPTable:StreamArn"
+            ]
+          ]
+        }
+      }
+    },
+    "GetAttCandIToEMPTableName": {
+      "Description": "Your DynamoDB table name.",
+      "Value": {
+        "Ref": "CandIToEMPTable"
+      },
+      "Export": {
+        "Name": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "GetAtt:CandIToEMPTable:Name"
+            ]
+          ]
+        }
+      }
+    },
+    "GetAttCandIToEMPDataSourceName": {
+      "Description": "Your model DataSource name.",
+      "Value": {
+        "Fn::GetAtt": [
+          "CandIToEMPDataSource",
+          "Name"
+        ]
+      },
+      "Export": {
+        "Name": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "GetAtt:CandIToEMPDataSource:Name"
+            ]
+          ]
+        }
+      }
+    }
+  }
+}

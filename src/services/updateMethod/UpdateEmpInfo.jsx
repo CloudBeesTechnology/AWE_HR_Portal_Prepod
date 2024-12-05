@@ -139,7 +139,7 @@ export const UpdateEmpInfo = () => {
       supportDocUpload,
     };
 
-
+    console.log(totalData1, "totalData1Update");
 
     // console.log(totalData,"totalData");
 
@@ -158,7 +158,19 @@ export const UpdateEmpInfo = () => {
           },
         }),
       ]);
-   
+      console.log(idResponse);
+      console.log(empInfoResponse);
+      if (idResponse.errors) {
+        console.error("Error in idResponse:", idResponse.errors);
+      } else {
+        console.log("idResponse:", idResponse);
+      }
+
+      if (empInfoResponse.errors) {
+        console.error("Error in empInfoResponse:", empInfoResponse.errors);
+      } else {
+        console.log("empInfoResponse:", empInfoResponse);
+      }
     } catch (error) {
       console.error("Error executing GraphQL requests:", error);
       throw error; // Rethrow error if needed

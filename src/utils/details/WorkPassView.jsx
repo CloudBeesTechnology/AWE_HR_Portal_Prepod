@@ -1,9 +1,18 @@
 import React, { useState } from "react";
-import { Document, Page } from "react-pdf";
-import "react-pdf/dist/esm/Page/TextLayer.css";
-import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+// import { Document, Page } from "react-pdf";
+// import "react-pdf/dist/esm/Page/TextLayer.css";
+// import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import { FaTimes, FaPrint, FaDownload } from "react-icons/fa"; // Import "X" icon from react-icons
 import { getUrl } from "@aws-amplify/storage";
+import { Viewer, Worker, Page } from "@react-pdf-viewer/core";
+import "@react-pdf-viewer/core/lib/styles/index.css";
+import { pdfjs } from "react-pdf";
+
+
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.js",
+  import.meta.url
+).toString();
 
 export const WorkPassView = ({
   workPass,
@@ -22,6 +31,11 @@ export const WorkPassView = ({
   setPageNumber,
   handlePrint,
   invoiceRef,
+  formatDate,
+  arrivStampUpload,
+  immigEmpUpload,
+  reEntryUpload,
+  mainRef,
 }) => {
   const [viewingDocument, setViewingDocument] = useState(null); // State to store the currently viewed document URL
   const [lastUploadUrl, setLastUploadUrl] = useState(""); // To store the last uploaded file URL for handling
@@ -39,15 +53,16 @@ export const WorkPassView = ({
   };
 
   const sections = [
-    { name: "Doe", data: workPass.doe,},
+    { name: "SAWP", data: workPass.swap },
+    { name: "Doe", data: workPass.doe },
+    { name: "NLMS", data: workPass.national },
+    { name: "Bank Guarantee", data: workPass.bank },
+    { name: "JITPA", data: workPass.jitpa },
     {
       name: "Labour Deposit",
-      data: workPass.labourDeposit
+      data: workPass.labourDeposit,
     },
-    { name: "SAWP", data: workPass.swap},
-    { name: "National", data: workPass.national},
-    { name: "Bank", data: workPass.bank},
-    { name: "JITPA", data: workPass.jitpa},
+    { name: "Immigration", data: workPass.immigration },
   ];
 
   // Function to handle document view change and retrieve URL from cloud storage
@@ -71,12 +86,12 @@ export const WorkPassView = ({
             className="bg-white rounded-lg shadow-md p-4 mb-4 border border-gray-200"
           >
             <div className="flex justify-between items-center">
-              <span className="text-gray-700">
-                Uploaded on: {document.date}
+              <span className="uppercase font-semibold text-sm">
+                Uploaded on: {formatDate(document.date)}
               </span>
               <button
-                onClick={() => linkToStorageFile(document.upload)} // Set the document URL when clicked
-                className="text-blue-600 hover:text-blue-800"
+                onClick={() => linkToStorageFile(document.upload)} // Fetch the URL for the document
+                className="text-dark_grey font-semibold text-sm"
               >
                 View Document
               </button>
@@ -88,15 +103,13 @@ export const WorkPassView = ({
                 <div className="mt-4">
                   <div className="relative bg-white max-w-3xl mx-auto p-6 rounded-lg shadow-lg">
                     {/* PDF Viewer using react-pdf */}
-                    <div ref={invoiceRef} className="flex justify-center">
-                      <div>
-                        <Document
-                          file={lastUploadUrl}
-                          onLoadSuccess={onDocumentLoadSuccess}
-                          className="w-full"
-                        >
-                          <Page pageNumber={pageNumber} className="mx-auto" />
-                        </Document>
+                    <div className="flex justify-center">
+                      <div ref={invoiceRef}>
+                        <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                          <Viewer fileUrl={lastUploadUrl || ""} />
+                          {/* <Page pageNumber={pageNumber} className="mx-auto" /> */}
+                        </Worker>
+                     
                       </div>
                     </div>
 
@@ -158,12 +171,14 @@ export const WorkPassView = ({
             {/* Image Viewer */}
             {viewingDocument === document.upload &&
               !document.upload.endsWith(".pdf") && (
-                <div ref={invoiceRef} className="relative mt-4">
-                  <img
-                    src={lastUploadUrl}
-                    alt="Document Preview"
-                    className="w-full h-auto"
-                  />
+                <div className="relative mt-4">
+                  <div ref={invoiceRef}>
+                    <img
+                      src={lastUploadUrl} // Use the URL for the image
+                      alt="Document Preview"
+                      className="w-full h-auto"
+                    />
+                  </div>
 
                   <div className="absolute top-2 right-2">
                     <button
@@ -213,123 +228,86 @@ export const WorkPassView = ({
 
     return (
       <div className="py-4">
-        <h6 className="uppercase text-xl font-semibold text-dark_grey ">
-          {categoryName}
-        </h6>
-
-        {/* If documents are available, render them, otherwise show the no documents message */}
+        <h6 className="uppercase text_size_5 my-3">{categoryName}</h6>
         {documents.length > 0 ? (
           renderDocumentsUnderCategory(documents)
         ) : (
-          <p>No documents and images available</p>
+          <p className="text-dark_grey font-semibold text-sm">
+            No documents available
+          </p>
         )}
       </div>
     );
   };
 
-  // Function to render the section data with a check for missing values
-  // const renderSectionData = (data) => {
-  //   return (
-  //     <div className="grid grid-cols-3 gap-y-4 items-center">
-  //       {Object.entries(data).map(([key, value], index) => (
-  //         <React.Fragment key={index}>
-  //           <span className="text-gray-800">{key}</span>
-  //           <span className="text-gray-500 text-center">:</span>
-  //           <span className="text-gray-800">
-  //             {/* Check if the value is an array, like dates, or if it's missing */}
-  //             {Array.isArray(value) ? (
-  //               value.length > 0 ? (
-  //                 value.map((date, i) => (
-  //                   <div key={i} className="text-gray-600">
-  //                     {date}
-  //                   </div>
-  //                 ))
-  //               ) : (
-  //                 <span className="text-gray-500">N/A</span>
-  //               )
-  //             ) : value ? (
-  //               value // Display the value if it's not an array
-  //             ) : (
-  //               <span className="text-gray-500">N/A</span>
-  //             )}
-  //           </span>
-  //         </React.Fragment>
-  //       ))}
-  //     </div>
-  //   );
-  // };
-  const renderSectionData = (data) => {
+  const renderDetails = (details) => {
     return (
-      <div className="grid grid-cols-3 gap-y-4 items-center">
-        {Object.entries(data).map(([key, value], index) => (
+      <div className="grid grid-cols-3 gap-y-4 items-center font-semibold text-sm">
+        {Object.entries(details).map(([key, value], index) => (
+        
           <React.Fragment key={index}>
-            <span className="text-gray-800">{key}</span>
-            <span className="text-gray-500 text-center">:</span>
-            <span className="text-gray-800">
-              {/* Check if the value is an array */}
-              {Array.isArray(value) ? (
-                value.length > 0 ? (
-                  // Step 1: Rearrange the array to put the latest value first
-                  value
-                    .slice(-1) // Get the last element
-                    .concat(value.slice(0, -1)) // Concatenate the rest of the array
-                    .map((date, i) => (
-                      <div
-                        key={i}
-                        className={`text-gray-600 ${
-                          i === 0 ? 'font-bold text-green-600' : ''
-                        }`}
-                      >
-                        {date}
-                        {i < value.length - 1 && ', '}
-                      </div>
-                    ))
-                ) : (
-                  <span className="text-gray-500">N/A</span>
-                )
-              ) : value ? (
-                // Display the value if it's not an array
-                value
-              ) : (
-                <span className="text-gray-500">N/A</span>
-              )}
+            <span className="text-dark_grey">{key}</span>
+            <span className="text-center text-gray-700">:</span>
+            <span className="text-dark_grey">
+              {
+                Array.isArray(value)
+                  ? value.some((v) => v !== null) // Check if the array has any non-null values
+                    ? value
+                        .filter((v) => v !== null) // Remove null values from the array
+                        .slice(-1) // Get the last element
+                        .concat(value.slice(0, -1))
+                        .map((item, idx, arr) => (
+                          <span key={idx}>
+                            <span
+                              className={`${
+                                arr.length > 1 && idx === 0
+                                  ? "rounded-md text-primary"
+                                  : "" // Only highlight the latest value if there are multiple values
+                              }`}
+                            >
+                              {item}
+                            </span>
+                            {idx < value.length - 1 && <span>,&nbsp;</span>}
+                            {/* Add a comma except for the last item */}
+                          </span>
+                        ))
+                    : "N/A" // Show "N/A" if the array only contains null or is empty
+                  : value !== null && value !== undefined && value !== ""
+                  ? value
+                  : "N/A" // Show "N/A" for null or undefined non-array values
+              }
             </span>
           </React.Fragment>
         ))}
       </div>
     );
   };
-  
 
   return (
-    <section ref={invoiceRef} className="py-8 bg-gray-50 rounded-lg">
-      <h6 className="uppercase text-xl font-semibold text-dark_grey mb-6">
-        WorkPass Details:
-      </h6>
+    <section ref={mainRef} className="py-8 bg-gray-50 rounded-lg">
+      <h6 className="uppercase text_size_5 mb-6">WorkPass Details:</h6>
       <div className="space-y-6">
         {sections.map(({ name, data, upload }, index) => (
           <div key={index}>
-            <h6 className="text-lg font-semibold text-dark_grey mb-4">
-              {name}
-            </h6>
+            <h6 className="uppercase text_size_5 my-3">{name}</h6>
             {/* Render the section data */}
-            <div classname="flex-1">{renderSectionData(data)}</div> 
-            
+            <div classname="">{renderDetails(data)}</div>
           </div>
         ))}
       </div>
       {/* Grouped Documents under Categories */}
       <div className="mt-8">
-        <h6 className="uppercase text-xl font-semibold text-dark_grey mb-6">
-          Uploaded Documents:
-        </h6>
+        <h6 className="uppercase text_size_5  my-3">Uploaded Documents:</h6>
         {/* Render Documents for each category */}
-        {renderDocumentCategory(doeEmpUpload, "Doe Employee Upload")}
+        {renderDocumentCategory(sawpEmpUpload, "SAWP")}
+        {renderDocumentCategory(doeEmpUpload, "DOE")}  
+        {renderDocumentCategory(nlmsEmpUpload, "NLMS")}  
+        {renderDocumentCategory(bankEmpUpload, "Bank Guarantee")}
+        {renderDocumentCategory(jpEmpUpload, "JITPA")}
         {renderDocumentCategory(lbrDepoUpload, "Labour Deposit Upload")}
-        {renderDocumentCategory(sawpEmpUpload, "SAWP Employee Upload")}
-        {renderDocumentCategory(nlmsEmpUpload, "National Upload")}
-        {renderDocumentCategory(bankEmpUpload, "Bank Upload")}
-        {renderDocumentCategory(jpEmpUpload, "JITPA Upload")}
+        {renderDocumentCategory(arrivStampUpload, "Immigration Arrival")}
+        {renderDocumentCategory(immigEmpUpload, "Immigration Approval")}
+        {renderDocumentCategory(reEntryUpload, "Immigration Re-Entry Visa")}
       </div>
     </section>
   );

@@ -165,7 +165,6 @@
   background: #f1f1f1;
 }
 
-
 .checkbox-container {
   display: flex;
   align-items: center;
@@ -203,3 +202,34 @@ input[type="number"] {
   width: 100%; /* Set full width */
 }
 
+/* Scrollable table for TSheet %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+.table-container {
+  margin-top: 2.25rem; /* mt-9 */
+  max-height: 500px;
+  overflow-y: scroll; /* Enable vertical scrolling */
+  display: block;
+  width: 100%; /* Ensures full width for the table */
+  scrollbar-width: thin; /* For Firefox (stylish scroll) */
+  /* scrollbar-color: #bfc1c2 #f2f0f0; Scrollbar color (thumb and track) */
+  box-shadow: #9c0f0f;
+}
+
+/* Make the table header sticky */
+.sticky-header {
+  position: sticky;
+  top: 0;
+  background-color: #939393;
+  z-index: 1;
+  text-align: left;
+  box-shadow: 0px 2px 4px rgba(26, 25, 25, 0.1);
+  color: #f0f0f0;
+}
+
+/* Add padding for table cells */
+.styled-table td,
+.styled-table th {
+  padding: 1px 10px;
+  text-align: center;
+  /* background-color: #f7f1f1;  */
+}

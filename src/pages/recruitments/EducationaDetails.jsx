@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { LuPlusSquare, LuMinusSquare } from "react-icons/lu";
+import { FaRegMinusSquare } from "react-icons/fa";
+import { CiSquarePlus } from "react-icons/ci";
+
 import { EducationSchema } from "../../services/Validation"; // Adjust import as necessary
 import { useLocation, useNavigate } from "react-router-dom";
 import { generateClient } from "aws-amplify/api";
@@ -211,7 +213,7 @@ export const EducationDetails = () => {
                 onClick={() => removeCharacterReferee(index)} // Remove specific field set
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <LuMinusSquare />
+                <FaRegMinusSquare />
               </button>
             )}
           </div>
@@ -221,7 +223,7 @@ export const EducationDetails = () => {
           onClick={handleAddReferee} // Add a new referee with isNew: true
           className="absolute top-11 -right-7 text-medium_grey text-[18px]"
         >
-          <LuPlusSquare />
+          <CiSquarePlus />
         </button>
       </div>
 
@@ -272,7 +274,7 @@ export const EducationDetails = () => {
                 onClick={() => removeRelative(index)} // Remove specific field set
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <LuMinusSquare /> {/* Minus icon */}
+                <FaRegMinusSquare /> {/* Minus icon */}
               </button>
             )}
           </div>
@@ -282,7 +284,7 @@ export const EducationDetails = () => {
           onClick={handleAddRelative}
           className="absolute top-11 -right-7 text-medium_grey text-[18px]"
         >
-          <LuPlusSquare />
+          <CiSquarePlus />
         </button>
       </div>
 
@@ -405,7 +407,7 @@ export const EducationDetails = () => {
                 onClick={() => removeEmergency(index)} // Remove specific field set
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <LuMinusSquare /> {/* Minus icon */}
+                <FaRegMinusSquare /> {/* Minus icon */}
               </button>
             )}
           </div>
@@ -415,7 +417,7 @@ export const EducationDetails = () => {
           onClick={handleAddEmergency}
           className="absolute top-11 -right-7 text-medium_grey text-[18px]"
         >
-          <LuPlusSquare />
+          <CiSquarePlus />
         </button>
       </div>
 

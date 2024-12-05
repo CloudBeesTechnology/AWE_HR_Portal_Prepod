@@ -197,6 +197,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
     aTQualify: "",
     alternateNo: "",
     agent: [],
+    bankName: "",
+    bankAccNo: "",
     contactNo: [],
     cob: "",
     contractType: [],
@@ -227,6 +229,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
     initialValues.alternateNo
   );
   const [agent, setAgent] = React.useState(initialValues.agent);
+  const [bankName, setBankName] = React.useState(initialValues.bankName);
+  const [bankAccNo, setBankAccNo] = React.useState(initialValues.bankAccNo);
   const [contactNo, setContactNo] = React.useState(initialValues.contactNo);
   const [cob, setCob] = React.useState(initialValues.cob);
   const [contractType, setContractType] = React.useState(
@@ -272,6 +276,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
     setAlternateNo(cleanValues.alternateNo);
     setAgent(cleanValues.agent ?? []);
     setCurrentAgentValue("");
+    setBankName(cleanValues.bankName);
+    setBankAccNo(cleanValues.bankAccNo);
     setContactNo(cleanValues.contactNo ?? []);
     setCurrentContactNoValue("");
     setCob(cleanValues.cob);
@@ -347,26 +353,28 @@ export default function EmpPersonalInfoUpdateForm(props) {
     aTQualify: [],
     alternateNo: [],
     agent: [],
-    contactNo: [{ type: "Required" }],
+    bankName: [],
+    bankAccNo: [],
+    contactNo: [],
     cob: [],
     contractType: [],
     ctryOfOrigin: [],
     chinese: [],
-    dob: [{ type: "Required" }],
+    dob: [],
     educLevel: [],
-    email: [{ type: "Required" }],
+    email: [],
     eduDetails: [{ type: "JSON" }],
     empBadgeNo: [],
     empType: [],
     familyDetails: [{ type: "JSON" }],
-    gender: [{ type: "Required" }],
+    gender: [],
     lang: [],
-    marital: [{ type: "Required" }],
-    name: [{ type: "Required" }],
+    marital: [],
+    name: [],
     officialEmail: [],
     oCOfOrigin: [],
     profilePhoto: [],
-    permanentAddress: [{ type: "Required" }],
+    permanentAddress: [],
     position: [],
     sapNo: [],
   };
@@ -401,26 +409,28 @@ export default function EmpPersonalInfoUpdateForm(props) {
           aTQualify: aTQualify ?? null,
           alternateNo: alternateNo ?? null,
           agent: agent ?? null,
-          contactNo,
+          bankName: bankName ?? null,
+          bankAccNo: bankAccNo ?? null,
+          contactNo: contactNo ?? null,
           cob: cob ?? null,
           contractType: contractType ?? null,
           ctryOfOrigin: ctryOfOrigin ?? null,
           chinese: chinese ?? null,
-          dob,
+          dob: dob ?? null,
           educLevel: educLevel ?? null,
-          email,
+          email: email ?? null,
           eduDetails: eduDetails ?? null,
           empBadgeNo: empBadgeNo ?? null,
           empType: empType ?? null,
           familyDetails: familyDetails ?? null,
-          gender,
+          gender: gender ?? null,
           lang: lang ?? null,
-          marital,
-          name,
+          marital: marital ?? null,
+          name: name ?? null,
           officialEmail: officialEmail ?? null,
           oCOfOrigin: oCOfOrigin ?? null,
           profilePhoto: profilePhoto ?? null,
-          permanentAddress,
+          permanentAddress: permanentAddress ?? null,
           position: position ?? null,
           sapNo: sapNo ?? null,
         };
@@ -488,6 +498,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -542,6 +554,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -592,6 +606,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify: value,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -642,6 +658,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo: value,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -688,6 +706,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent: values,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -749,6 +769,110 @@ export default function EmpPersonalInfoUpdateForm(props) {
           {...getOverrideProps(overrides, "agent")}
         ></TextField>
       </ArrayField>
+      <TextField
+        label="Bank name"
+        isRequired={false}
+        isReadOnly={false}
+        value={bankName}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              age,
+              aTQualify,
+              alternateNo,
+              agent,
+              bankName: value,
+              bankAccNo,
+              contactNo,
+              cob,
+              contractType,
+              ctryOfOrigin,
+              chinese,
+              dob,
+              educLevel,
+              email,
+              eduDetails,
+              empBadgeNo,
+              empType,
+              familyDetails,
+              gender,
+              lang,
+              marital,
+              name,
+              officialEmail,
+              oCOfOrigin,
+              profilePhoto,
+              permanentAddress,
+              position,
+              sapNo,
+            };
+            const result = onChange(modelFields);
+            value = result?.bankName ?? value;
+          }
+          if (errors.bankName?.hasError) {
+            runValidationTasks("bankName", value);
+          }
+          setBankName(value);
+        }}
+        onBlur={() => runValidationTasks("bankName", bankName)}
+        errorMessage={errors.bankName?.errorMessage}
+        hasError={errors.bankName?.hasError}
+        {...getOverrideProps(overrides, "bankName")}
+      ></TextField>
+      <TextField
+        label="Bank acc no"
+        isRequired={false}
+        isReadOnly={false}
+        value={bankAccNo}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              age,
+              aTQualify,
+              alternateNo,
+              agent,
+              bankName,
+              bankAccNo: value,
+              contactNo,
+              cob,
+              contractType,
+              ctryOfOrigin,
+              chinese,
+              dob,
+              educLevel,
+              email,
+              eduDetails,
+              empBadgeNo,
+              empType,
+              familyDetails,
+              gender,
+              lang,
+              marital,
+              name,
+              officialEmail,
+              oCOfOrigin,
+              profilePhoto,
+              permanentAddress,
+              position,
+              sapNo,
+            };
+            const result = onChange(modelFields);
+            value = result?.bankAccNo ?? value;
+          }
+          if (errors.bankAccNo?.hasError) {
+            runValidationTasks("bankAccNo", value);
+          }
+          setBankAccNo(value);
+        }}
+        onBlur={() => runValidationTasks("bankAccNo", bankAccNo)}
+        errorMessage={errors.bankAccNo?.errorMessage}
+        hasError={errors.bankAccNo?.hasError}
+        {...getOverrideProps(overrides, "bankAccNo")}
+      ></TextField>
       <ArrayField
         onChange={async (items) => {
           let values = items;
@@ -759,6 +883,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo: values,
               cob,
               contractType,
@@ -802,7 +928,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
       >
         <TextField
           label="Contact no"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentContactNoValue}
           onChange={(e) => {
@@ -834,6 +960,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob: value,
               contractType,
@@ -880,6 +1008,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType: values,
@@ -957,6 +1087,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -1007,6 +1139,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -1045,7 +1179,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
       ></TextField>
       <TextField
         label="Dob"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={dob}
         onChange={(e) => {
@@ -1057,6 +1191,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -1107,6 +1243,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -1145,7 +1283,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
       ></TextField>
       <TextField
         label="Email"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={email}
         onChange={(e) => {
@@ -1157,6 +1295,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -1203,6 +1343,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -1280,6 +1422,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -1326,6 +1470,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -1397,6 +1543,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -1462,7 +1610,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
       </ArrayField>
       <TextField
         label="Gender"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={gender}
         onChange={(e) => {
@@ -1474,6 +1622,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -1524,6 +1674,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -1562,7 +1714,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
       ></TextField>
       <TextField
         label="Marital"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={marital}
         onChange={(e) => {
@@ -1574,6 +1726,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -1612,7 +1766,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
       ></TextField>
       <TextField
         label="Name"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={name}
         onChange={(e) => {
@@ -1624,6 +1778,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -1674,6 +1830,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -1724,6 +1882,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -1774,6 +1934,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -1820,6 +1982,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -1866,7 +2030,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
       >
         <TextField
           label="Permanent address"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentPermanentAddressValue}
           onChange={(e) => {
@@ -1896,6 +2060,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,
@@ -1971,6 +2137,8 @@ export default function EmpPersonalInfoUpdateForm(props) {
               aTQualify,
               alternateNo,
               agent,
+              bankName,
+              bankAccNo,
               contactNo,
               cob,
               contractType,

@@ -81,7 +81,7 @@ export const usePersonalInformation = (userID) => {
       fetchData();
     }
   }, [userID]);
-  console.log(personalInfo, "Ih")
+  // console.log(personalInfo, "Ih")
 
   return {
     personalInfo,

@@ -69,7 +69,7 @@ export const TimeSheet = () => {
           text2="Summary"
           borderColor="border-[#107B8E]"
           bgColor="bg-white"
-          link="/viewTimesheet"
+          link="/viewSummary"
         />
       </div>
     </section>

@@ -161,7 +161,7 @@ export default function ProbFormCreateForm(props) {
     setErrors({});
   };
   const validations = {
-    empID: [],
+    empID: [{ type: "Required" }],
     adaptability: [],
     additionalInfo: [],
     attention: [],
@@ -309,7 +309,7 @@ export default function ProbFormCreateForm(props) {
     >
       <TextField
         label="Emp id"
-        isRequired={false}
+        isRequired={true}
         isReadOnly={false}
         value={empID}
         onChange={(e) => {

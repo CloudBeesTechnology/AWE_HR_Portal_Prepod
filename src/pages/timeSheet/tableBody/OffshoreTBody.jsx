@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-export const OffshoreTBody = ({ data, loading, useDownloadFunc }) => {
+export const OffshoreTBody = ({ data, loading, setTableData }) => {
   useEffect(() => {
     if (loading === false) {
       const rows = document.querySelectorAll("tbody tr");
@@ -9,9 +9,14 @@ export const OffshoreTBody = ({ data, loading, useDownloadFunc }) => {
         return Array.from(cells).map((cell) => cell.innerText);
       });
 
-      setTimeout(() => {
-        useDownloadFunc(tableData);
-      }, 1000);
+      const handleDown = () => {
+        setTimeout(() => {
+          if (tableData) {
+            setTableData(tableData);
+          }
+        }, 1000);
+      };
+      handleDown();
     }
   }, [loading, data]);
   return (
@@ -21,19 +26,22 @@ export const OffshoreTBody = ({ data, loading, useDownloadFunc }) => {
             const renderRows = (m, ind) => {
               return (
                 <tr
-                  key={ind}
+                  key={index}
                   className="text-dark_grey h-[53px] bg-white text-sm rounded-sm shadow-md text-start border-b-2 border-[#CECECE]"
                 >
-                  <td className="text-start px-4 flex-1">{ind + 1}</td>
+                  <td className="text-start px-4 flex-1">{index + 1}</td>
                   <td className="text-start px-4 flex-1">{m.name}</td>
                   <td className="text-center px-4 flex-1">{m.no}</td>
                   <td className="text-center px-4 flex-1">{m.location}</td>
                   <td className="text-center px-4 flex-1">{m.date}</td>
                   <td className="text-center px-4 flex-1">{m.ntTotalHrs}</td>
                   <td className="text-center px-4 flex-1">{m.otTotalHrs}</td>
-                  <td className="text-center px-4 flex-1">{m.totalHrs}</td>
-                  <td className="text-center px-4 flex-1">{m.workHrs}</td>
-                  <td className="text-center px-4 flex-1">{m.OT}</td>
+                  <td className="text-center px-4 flex-1">{m.totalHrs || 0}</td>
+                  <td className="text-center px-4 flex-1">
+                    {m.normalWhrsPerDay || 0}
+                  </td>
+                  <td className="text-center px-4 flex-1">{m.workHrs || 0}</td>
+                  <td className="text-center px-4 flex-1">{m.OT || 0}</td>
                   <td className="text-center px-4 flex-1">{m.remarks}</td>
                   <td
                     className={`text-center px-4 flex-1 ${
@@ -45,7 +53,7 @@ export const OffshoreTBody = ({ data, loading, useDownloadFunc }) => {
                 </tr>
               );
             };
-            return value.data.map(renderRows);
+            return renderRows(value);
           })
         : (
             <tr>

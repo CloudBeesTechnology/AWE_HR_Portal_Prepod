@@ -1,6 +1,0 @@
-{
-  "AppSyncApiName": "aweadinin",
-  "DynamoDBBillingMode": "PAY_PER_REQUEST",
-  "DynamoDBEnableServerSideEncryption": false,
-  "AuthModeLastUpdated": "2024-09-25T05:41:26.157Z"
-}

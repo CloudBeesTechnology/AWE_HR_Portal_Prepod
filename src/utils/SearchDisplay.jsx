@@ -1,5 +1,3 @@
-
-
 import React, { useCallback, useEffect, useState } from "react";
 
 export const SearchDisplay = ({
@@ -12,9 +10,10 @@ export const SearchDisplay = ({
   setDrpValue,
   searchedValue,
   id,
+  filteredEmployees,
+  setFilteredEmployees,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [toggleHandle, setToggleHandle] = useState(false);
 
   useEffect(() => {
@@ -26,17 +25,18 @@ export const SearchDisplay = ({
   const toggleFunction = useCallback(() => {
     setToggleHandle(!toggleHandle);
     if (toggleHandle === true) {
-      setFilteredEmployees([]);
+      setFilteredEmployees?.([]);
     } else if (toggleHandle === false) {
-      setFilteredEmployees(newFormData);
+      setFilteredEmployees?.(newFormData);
     }
-    // console.log(filteredEmployees);
+    console.log(filteredEmployees);
   }, [toggleHandle, newFormData]);
 
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
     searchedValue?.(id, query);
+    
     if (query) {
       const results =
         newFormData &&
@@ -48,18 +48,20 @@ export const SearchDisplay = ({
             employee.location?.toLowerCase().includes(query) ||
             employee.empBadgeNo?.toLowerCase().includes(query)
 
+          // employee.email?.toLowerCase().includes(query) ||
+          // employee.id?.toLowerCase().includes(query) ||
+          // employee.name?.toLowerCase().includes(query)
         );
-      setFilteredEmployees(results);
-      // console.log("if FilteredEmployees : ", filteredEmployees);
+      setFilteredEmployees?.(results);
+      // console.log("if FilteredEmployees : ", results);
     } else {
-      console.log("Else FilteredEmployees : ", filteredEmployees);
-      setFilteredEmployees(newFormData);
+      // console.log("Else FilteredEmployees : ", filteredEmployees);
+      setFilteredEmployees?.(newFormData);
     }
   };
 
   return (
     <div className="relative">
-     
       <div
         className={`py-2 w-full text_size_5 border text-grey bg-white border-lite_grey ${rounded} flex items-center px-2 gap-2`}
       >
@@ -82,7 +84,11 @@ export const SearchDisplay = ({
               key={index}
               className="m-2 p-1 hover:bg-grey hover:text-white cursor-pointer flex justify-between items-center transition-all duration-200"
               onClick={() => {
+                console.log(employee);
+                
                 if (employee.empID || employee.name) {
+                  console.log(`${employee.empID} - ${employee.name || "sdfvgh"}`);
+                  
                   setSearchQuery(`${employee.empID} - ${employee.name || ""}`);
                   searchResult(employee);
                   setSearchQuery("");
@@ -91,27 +97,29 @@ export const SearchDisplay = ({
                 if (employee.JOBCODE) {
                   setSearchQuery(employee.JOBCODE);
                   searchResult(employee, id);
-              
+                  // setToggleHandle(!toggleHandle);
+         
                 }
 
                 if (employee.location) {
                   setSearchQuery(employee.location);
-                  console.log(employee.location);
                   searchResult(employee, id);
                 
+                  // setToggleHandle(!toggleHandle);
                 }
                 setToggleHandle(false);
-                setFilteredEmployees([]); // Clear the filtered results
-               
+                setFilteredEmployees?.([]); // Clear the filtered results
+                // searchResult(employee);
+                // setSearchQuery("");
               }}
             >
               <div>
-                <span className=" text-sm">{employee.empID}</span>
-                <span className=" text-sm"> {employee.name}</span>
-                <span className=" text-sm">{employee.JOBCODE}</span>
-                <span className=" text-sm">{employee.location}</span>
-           
-               
+                <span className=" text-sm">{employee?.empID}</span>
+                <span className=" text-sm"> {employee?.name}</span>
+                <span className=" text-sm">{employee?.JOBCODE}</span>
+                <span className=" text-sm">{employee?.location}</span>
+
+                {/* <span className="text-gray-600 text-sm">{employee.email}</span> */}
               </div>
             </li>
           ))}

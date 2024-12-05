@@ -24,12 +24,12 @@ export const Immigration = () => {
 
   const { register, handleSubmit,watch, formState: { errors }, setValue } = useForm({
     resolver: yupResolver(ImmigEmpSchema),
+    
     arrivStampExp: [],
     empPassExp: [],
     immigApproval: [],
     ppSubmit: [],
     reEntryVisaExp: [],
-
   });
   
   const [notification, setNotification] = useState(false);
@@ -64,13 +64,18 @@ export const Immigration = () => {
     return ""; 
   };
 
-  const arrive = () => setArrivStampExp([...arrivStampExp, ""])
-  const addEmpPassExp = () => setEmpPassExp([...empPassExp, ""]);
-  const addImmigApproval = () => setImmigApproval([...immigApproval, ""]);
-  const addPpSubmit = () => setPpSubmit([...ppSubmit, ""]);
-  const addReEntryVisaExp = () => setReEntryVisaExp([...reEntryVisaExp, ""]);
+  // const getFileName = (url) => {
+  //   const urlObj = new URL(url);
+  //   const filePath = urlObj.pathname;
+  //   const decodedUrl = decodeURIComponent(filePath);
 
-  
+  //   const fileNameWithExtension = decodedUrl.substring(
+  //     decodedUrl.lastIndexOf("/") + 1
+  //   );
+
+  //   return fileNameWithExtension;
+  // };
+
   const getFileName = (input) => {
     // Check if input is an object and has the 'upload' property
     if (typeof input === 'object' && input.upload) {
@@ -168,19 +173,10 @@ export const Immigration = () => {
 
     const allowedTypes = [
       "application/pdf",
-      "image/jpeg",
-      "image/png",
-      "image/jpg",
     ];
 
-    if (!empID) {
-      alert("Employee ID is required to upload files.");
-      window.location.reload();
-      return;
-    }
-
     if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      alert("Upload must be a PDF file");
       return;
     }
 
@@ -251,6 +247,7 @@ export const Immigration = () => {
 
         const UpImmiValue = {
           ...data,
+          immigRefNo:"IMMBD/1382",
           arrivStampExp: updatedArrivedDate.map(formatDate),
           ppSubmit: updatedPassportSubmit.map(formatDate),
           empPassExp: updatedPassportExpiry.map(formatDate),
@@ -261,13 +258,14 @@ export const Immigration = () => {
           reEntryUpload: JSON.stringify(uploadedImmigrate.reEntryUpload), 
           id: checkingEIDTable.id,
         };
- 
+      
         await UpdateImmigraData({ UpImmiValue });
-        setShowTitle("Work Pass Immigration Info Updated successfully")
+        setShowTitle("Immigration Info Updated successfully")
         setNotification(true);
       } else {
         const ImmiValue = {
           ...data,
+          immigRefNo:"IMMBD/1382",
           arrivStampExp,
           ppSubmit,
           empPassExp,
@@ -279,11 +277,12 @@ export const Immigration = () => {
         };
         
         await ImmigrationData({ ImmiValue }); 
-        setShowTitle("Work Pass Immigration Info Saved Successfully")
+        setShowTitle("Immigration Info Saved Successfully")
         setNotification(true);
       }
     } catch (error) {
       console.error("Error submitting data:", error);
+      
     }
   };
 
@@ -389,9 +388,7 @@ export const Immigration = () => {
           />
       </div> 
 <hr className='text-lite_grey'/>
-
  <div className="grid grid-cols-2 mt-10 gap-5 ">
-
  <div className="form-group">
           <label className='mb-1 text_size_6 '>Air Ticket Status</label>
           <select 
@@ -465,7 +462,7 @@ export const Immigration = () => {
         <SpinLogo
           text={showTitle}
           notification={notification}
-          path="/employee"
+          path="/sawp/immigration"
         />
       )}
     </form>

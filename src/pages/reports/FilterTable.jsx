@@ -35,10 +35,10 @@ export const FilterTable = ({
                   <tr key={rowIndex} className="text-sm border-b-2 border-[#CECECE]">
                     {row.map((col, colIndex) => (
                       <td key={colIndex} className="border-b-2 text-center border-[#CECECE] p-2">
-                        {col}
+                        {Array.isArray(col) ? `${col[col.length - 1]}` : `${col}`}
                       </td>
                     ))}
-                    {typeOfReport === "Probation Form" && (
+                    {typeOfReport === "Probation Review" && (
                       <td
                         className="border-b-2 text-center border-[#CECECE] p-2 cursor-pointer text-blue-600"
                         onClick={() => handleViewDetails(allData[rowIndex])} // Call the function with the row data

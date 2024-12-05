@@ -285,19 +285,19 @@ export default function TrainingReqUpdateForm(props) {
   const medicalReportRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
-    MRNo: [{ type: "Required" }],
+    MRNo: [],
     medicalName: [],
     medicalExpiry: [],
     medicalAppointDate: [],
     medicalReport: [{ type: "JSON" }],
-    purchaseONo: [{ type: "Required" }],
-    traineeCourseCode: [{ type: "Required" }],
-    traineeCourseName: [{ type: "Required" }],
-    traineeCompany: [{ type: "Required" }],
-    traineeSD: [{ type: "Required" }],
-    traineeED: [{ type: "Required" }],
-    traineeStatus: [{ type: "Required" }],
-    traineeCourseFee: [{ type: "Required" }],
+    purchaseONo: [],
+    traineeCourseCode: [],
+    traineeCourseName: [],
+    traineeCompany: [],
+    traineeSD: [],
+    traineeED: [],
+    traineeStatus: [],
+    traineeCourseFee: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -326,19 +326,19 @@ export default function TrainingReqUpdateForm(props) {
         event.preventDefault();
         let modelFields = {
           empID,
-          MRNo,
+          MRNo: MRNo ?? null,
           medicalName: medicalName ?? null,
           medicalExpiry: medicalExpiry ?? null,
           medicalAppointDate: medicalAppointDate ?? null,
           medicalReport: medicalReport ?? null,
-          purchaseONo,
-          traineeCourseCode,
-          traineeCourseName,
-          traineeCompany,
-          traineeSD,
-          traineeED,
-          traineeStatus,
-          traineeCourseFee,
+          purchaseONo: purchaseONo ?? null,
+          traineeCourseCode: traineeCourseCode ?? null,
+          traineeCourseName: traineeCourseName ?? null,
+          traineeCompany: traineeCompany ?? null,
+          traineeSD: traineeSD ?? null,
+          traineeED: traineeED ?? null,
+          traineeStatus: traineeStatus ?? null,
+          traineeCourseFee: traineeCourseFee ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -429,7 +429,7 @@ export default function TrainingReqUpdateForm(props) {
       ></TextField>
       <TextField
         label="Mr no"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={MRNo}
         onChange={(e) => {
@@ -639,7 +639,7 @@ export default function TrainingReqUpdateForm(props) {
       </ArrayField>
       <TextField
         label="Purchase o no"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={purchaseONo}
         onChange={(e) => {
@@ -676,7 +676,7 @@ export default function TrainingReqUpdateForm(props) {
       ></TextField>
       <TextField
         label="Trainee course code"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={traineeCourseCode}
         onChange={(e) => {
@@ -715,7 +715,7 @@ export default function TrainingReqUpdateForm(props) {
       ></TextField>
       <TextField
         label="Trainee course name"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={traineeCourseName}
         onChange={(e) => {
@@ -754,7 +754,7 @@ export default function TrainingReqUpdateForm(props) {
       ></TextField>
       <TextField
         label="Trainee company"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={traineeCompany}
         onChange={(e) => {
@@ -791,7 +791,7 @@ export default function TrainingReqUpdateForm(props) {
       ></TextField>
       <TextField
         label="Trainee sd"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={traineeSD}
         onChange={(e) => {
@@ -828,7 +828,7 @@ export default function TrainingReqUpdateForm(props) {
       ></TextField>
       <TextField
         label="Trainee ed"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={traineeED}
         onChange={(e) => {
@@ -865,7 +865,7 @@ export default function TrainingReqUpdateForm(props) {
       ></TextField>
       <TextField
         label="Trainee status"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={traineeStatus}
         onChange={(e) => {
@@ -902,7 +902,7 @@ export default function TrainingReqUpdateForm(props) {
       ></TextField>
       <TextField
         label="Trainee course fee"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={traineeCourseFee}
         onChange={(e) => {

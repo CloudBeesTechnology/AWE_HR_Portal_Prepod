@@ -25,11 +25,13 @@ export declare type HeadOfficeCreateFormInputValues = {
     dailySheet?: string[];
     date?: string;
     status?: string;
+    manager?: string[];
 };
 export declare type HeadOfficeCreateFormValidationValues = {
     dailySheet?: ValidationFunction<string>;
     date?: ValidationFunction<string>;
     status?: ValidationFunction<string>;
+    manager?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type HeadOfficeCreateFormOverridesProps = {
@@ -37,6 +39,7 @@ export declare type HeadOfficeCreateFormOverridesProps = {
     dailySheet?: PrimitiveOverrideProps<TextAreaFieldProps>;
     date?: PrimitiveOverrideProps<TextFieldProps>;
     status?: PrimitiveOverrideProps<TextFieldProps>;
+    manager?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type HeadOfficeCreateFormProps = React.PropsWithChildren<{
     overrides?: HeadOfficeCreateFormOverridesProps | undefined | null;

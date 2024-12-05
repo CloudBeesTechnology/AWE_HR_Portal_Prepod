@@ -38,7 +38,8 @@ export const UpdateNlmsData = () => {
         variables: { input: updatedData },
       });
 
-  
+      // // Log the response to confirm the update
+      console.log("Data successfully updated:", response);
     } catch (error) {
       console.error("Error updating data:", error);
       throw error; // Re-throw the error after logging

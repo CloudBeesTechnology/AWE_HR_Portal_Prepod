@@ -216,10 +216,10 @@ export default function UserCreateForm(props) {
     React.useState("");
   const setPermissionsRef = React.createRef();
   const validations = {
-    empID: [{ type: "Required" }],
-    selectType: [{ type: "Required" }],
+    empID: [],
+    selectType: [],
     setPermissions: [],
-    password: [{ type: "Required" }],
+    password: [],
     status: [],
   };
   const runValidationTasks = async (
@@ -308,7 +308,7 @@ export default function UserCreateForm(props) {
     >
       <TextField
         label="Emp id"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={empID}
         onChange={(e) => {
@@ -336,7 +336,7 @@ export default function UserCreateForm(props) {
       ></TextField>
       <TextField
         label="Select type"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={selectType}
         onChange={(e) => {
@@ -415,7 +415,7 @@ export default function UserCreateForm(props) {
       </ArrayField>
       <TextField
         label="Password"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={password}
         onChange={(e) => {

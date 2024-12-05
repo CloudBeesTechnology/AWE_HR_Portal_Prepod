@@ -6,8 +6,9 @@ import {
   listPersonalDetails,
   listTicketRequests,
   listUsers,
-  listInterviewScheduleSchemas,
+  listInterviewSchedules,
   listEmpWorkInfos,
+  listEmpLeaveDetails,
   
 } from "../graphql/queries";
 import { deleteLeaveStatus, updateLeaveStatus, updateTicketRequest } from "../graphql/mutations";
@@ -15,8 +16,8 @@ import { deleteLeaveStatus, updateLeaveStatus, updateTicketRequest } from "../gr
 const client = generateClient();
 
 export const useLeaveManage = () => {
-  const [leaveStatuses, setLeaveStatuses] = useState([]);
-  const [empPersonalInfos, setEmpPersonalInfos] = useState([]);
+  // const [leaveStatuses, setLeaveStatuses] = useState([]);
+  // const [empPersonalInfos, setEmpPersonalInfos] = useState([]);
   const [personalDetails, setPersonalDetails] = useState([]);
   const [mergedData, setMergedData] = useState([]);
   const [ticketMerged, setTicketMerged] = useState([]);
@@ -36,13 +37,17 @@ export const useLeaveManage = () => {
           PersonalDetailsData,
           userData,
           interviewScheduleSchemasData,
+          workInfoData,
+          empLeaveData,
         ] = await Promise.all([
-          client.graphql({ query: listEmailNotifis }),
+          client.graphql({ query: listLeaveStatuses }),
           client.graphql({ query: listEmpPersonalInfos }),
           client.graphql({ query: listTicketRequests }),
           client.graphql({ query: listPersonalDetails }),
           client.graphql({ query: listUsers }),
-          client.graphql({ query: listInterviewScheduleSchemas})
+          client.graphql({ query: listInterviewSchedules}),
+          client.graphql({ query: listEmpWorkInfos}),
+          client.graphql({ query: listEmpLeaveDetails}),
         ]);
 
         const fetchedLeaveStatuses =
@@ -56,19 +61,22 @@ export const useLeaveManage = () => {
         const fetchedUserData = 
         userData?.data?.listUsers?.items || [];
         const fetchedInterviewScheduleSchemas = 
-        interviewScheduleSchemasData?.data?.listInterviewScheduleSchemas?.items || [];
+        interviewScheduleSchemasData?.data?.listInterviewSchedules?.items || [];
+        const fetchedWorkInfo = workInfoData?.data?.listEmpWorkInfos?.items || [];
+        const fetchedLeaveDetails = empLeaveData?.data?.listEmpLeaveDetails?.items || [];
           
 
-        console.log("Fetched Leave Statuses:", fetchedLeaveStatuses);
-        console.log(
-          "Fetched Employee Personal Infos:",
-          fetchedEmpPersonalInfos
-        );
-        console.log("Fetched Tickets Request Details:", fetchedTicketRequests);
-        console.log("Fetched Personal Details:", fetchedPersonalDetails);
-        console.log("Fetched User Data:", fetchedUserData);
-        console.log("new", ticketRequestsData)
-        console.log("Interview 2.0", fetchedInterviewScheduleSchemas)
+        // console.log("Fetched Leave Statuses:", fetchedLeaveStatuses);
+        // console.log(
+        //   "Fetched Employee Personal Infos:",
+        //   fetchedEmpPersonalInfos
+        // );
+        // console.log("Fetched Tickets Request Details:", fetchedTicketRequests);
+        // console.log("Fetched Personal Details:", fetchedPersonalDetails);
+        // console.log("Fetched User Data:", fetchedUserData);
+        // console.log("new", ticketRequestsData)
+        console.log("leave",fetchedLeaveDetails)
+      
         setTicketRequests(fetchedTicketRequests);
         setPersonalDetails(fetchedPersonalDetails);
 
@@ -83,11 +91,23 @@ export const useLeaveManage = () => {
           return acc;
         }, {});
 
+        const workInfoReqMap = fetchedWorkInfo.reduce((acc, emp) => {
+          acc[emp.empID] = emp;
+          return acc;
+        })
+
+        const leaveDetails = fetchedLeaveDetails.reduce((acc, emp) => {
+          acc[emp.empID] = emp;
+          return acc;
+        })
+
         // Merge employee personal info into leave statuses
         const merged = fetchedLeaveStatuses.map((leaveStatus) => ({
           ...leaveStatus,
           employeeInfo: empInfoMap[leaveStatus.empID] || {}, // Add employee info
           ticketRequest: ticketReqMap[leaveStatus.empID] || {},
+          workInfo: workInfoReqMap[leaveStatus.empID] || {},
+          leaveDetails: leaveDetails[leaveStatus.empID] || {},
         }));
 
         console.log("Merged Data:", merged);
@@ -119,9 +139,9 @@ export const useLeaveManage = () => {
           ticketRequestsData?.data?.listTicketRequests?.items || [];
           const fetchedEmpWorkInfos = empWorkInfosData?.data?.listEmpWorkInfos?.items || [];
   
-        console.log("Fetched Employee Personal Infos:", fetchedEmpPersonalInfos);
-        console.log("Fetched Ticket Request Details:", fetchedTicketRequests);
-        console.log("Fetched Employee Work Infos:", fetchedEmpWorkInfos);
+        // console.log("Fetched Employee Personal Infos:", fetchedEmpPersonalInfos);
+        // console.log("Fetched Ticket Request Details:", fetchedTicketRequests);
+        // console.log("Fetched Employee Work Infos:", fetchedEmpWorkInfos);
   
         setTicketRequests(fetchedTicketRequests);
   
@@ -144,8 +164,8 @@ export const useLeaveManage = () => {
           workInfo: empWorkInfoMap[ticket.empID] || {}
         }));
   
-        console.log("Merged Data 4.0:", merged);
-        setTicketMerged(merged);
+        // console.log("Merged Data 4.0:", merged);
+        setTicketMerged(merged, "BRI");
        
       } catch (err) {
         setError(err);
@@ -205,6 +225,8 @@ export const useLeaveManage = () => {
           status.id === id ? updatedLeaveStatus : status
         )
       );
+
+      
     } catch (err) {
       setError(err);
       console.error("Error updating leave status:", err);
@@ -238,8 +260,6 @@ export const useLeaveManage = () => {
       setLoading(false);
     }
   };
-  
-
 
   return { ticketMerged, mergedData,  ticketRequests, loading, error, handleDeleteLeaveStatus, handleUpdateLeaveStatus, handleUpdateTicketRequest, personalDetails};
 };

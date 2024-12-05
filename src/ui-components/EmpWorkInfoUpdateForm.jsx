@@ -417,30 +417,30 @@ export default function EmpWorkInfoUpdateForm(props) {
     contractStart: [],
     contractEnd: [],
     contractPeriod: [],
-    doj: [{ type: "Required" }],
-    department: [{ type: "Required" }],
+    doj: [],
+    department: [],
     hr: [],
-    jobCat: [{ type: "Required" }],
-    jobDesc: [{ type: "Required" }],
-    manager: [{ type: "Required" }],
+    jobCat: [],
+    jobDesc: [],
+    manager: [],
     otherJobCat: [],
     otherDepartment: [],
     otherPosition: [],
     probationStart: [],
     probationEnd: [],
     probDuration: [],
-    position: [{ type: "Required" }],
-    relationship: [{ type: "Required" }],
+    position: [],
+    relationship: [],
     supervisor: [],
-    skillPool: [{ type: "Required" }],
-    salaryType: [{ type: "Required" }],
+    skillPool: [],
+    salaryType: [],
     sapNo: [],
     upgradeDate: [],
     upgradePosition: [],
-    workStatus: [{ type: "Required" }],
-    workHrs: [{ type: "Required" }],
-    workWeek: [{ type: "Required" }],
-    workMonth: [{ type: "Required" }],
+    workStatus: [],
+    workHrs: [],
+    workWeek: [],
+    workMonth: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -472,30 +472,30 @@ export default function EmpWorkInfoUpdateForm(props) {
           contractStart: contractStart ?? null,
           contractEnd: contractEnd ?? null,
           contractPeriod: contractPeriod ?? null,
-          doj,
-          department,
+          doj: doj ?? null,
+          department: department ?? null,
           hr: hr ?? null,
-          jobCat,
-          jobDesc,
-          manager,
+          jobCat: jobCat ?? null,
+          jobDesc: jobDesc ?? null,
+          manager: manager ?? null,
           otherJobCat: otherJobCat ?? null,
           otherDepartment: otherDepartment ?? null,
           otherPosition: otherPosition ?? null,
           probationStart: probationStart ?? null,
           probationEnd: probationEnd ?? null,
           probDuration: probDuration ?? null,
-          position,
-          relationship,
+          position: position ?? null,
+          relationship: relationship ?? null,
           supervisor: supervisor ?? null,
-          skillPool,
-          salaryType,
+          skillPool: skillPool ?? null,
+          salaryType: salaryType ?? null,
           sapNo: sapNo ?? null,
           upgradeDate: upgradeDate ?? null,
           upgradePosition: upgradePosition ?? null,
-          workStatus,
-          workHrs,
-          workWeek,
-          workMonth,
+          workStatus: workStatus ?? null,
+          workHrs: workHrs ?? null,
+          workWeek: workWeek ?? null,
+          workMonth: workMonth ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -822,7 +822,7 @@ export default function EmpWorkInfoUpdateForm(props) {
       </ArrayField>
       <TextField
         label="Doj"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={doj}
         onChange={(e) => {
@@ -925,7 +925,7 @@ export default function EmpWorkInfoUpdateForm(props) {
       >
         <TextField
           label="Department"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentDepartmentValue}
           onChange={(e) => {
@@ -1071,7 +1071,7 @@ export default function EmpWorkInfoUpdateForm(props) {
       >
         <TextField
           label="Job cat"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentJobCatValue}
           onChange={(e) => {
@@ -1143,7 +1143,7 @@ export default function EmpWorkInfoUpdateForm(props) {
       >
         <TextField
           label="Job desc"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentJobDescValue}
           onChange={(e) => {
@@ -1215,7 +1215,7 @@ export default function EmpWorkInfoUpdateForm(props) {
       >
         <TextField
           label="Manager"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentManagerValue}
           onChange={(e) => {
@@ -1734,7 +1734,7 @@ export default function EmpWorkInfoUpdateForm(props) {
       >
         <TextField
           label="Position"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentPositionValue}
           onChange={(e) => {
@@ -1806,7 +1806,7 @@ export default function EmpWorkInfoUpdateForm(props) {
       >
         <TextField
           label="Relationship"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentRelationshipValue}
           onChange={(e) => {
@@ -1902,7 +1902,7 @@ export default function EmpWorkInfoUpdateForm(props) {
       </ArrayField>
       <TextField
         label="Skill pool"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={skillPool}
         onChange={(e) => {
@@ -2005,7 +2005,7 @@ export default function EmpWorkInfoUpdateForm(props) {
       >
         <TextField
           label="Salary type"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentSalaryTypeValue}
           onChange={(e) => {
@@ -2281,7 +2281,7 @@ export default function EmpWorkInfoUpdateForm(props) {
       >
         <TextField
           label="Work status"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentWorkStatusValue}
           onChange={(e) => {
@@ -2355,7 +2355,7 @@ export default function EmpWorkInfoUpdateForm(props) {
       >
         <TextField
           label="Work hrs"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentWorkHrsValue}
           onChange={(e) => {
@@ -2427,7 +2427,7 @@ export default function EmpWorkInfoUpdateForm(props) {
       >
         <TextField
           label="Work week"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentWorkWeekValue}
           onChange={(e) => {
@@ -2499,7 +2499,7 @@ export default function EmpWorkInfoUpdateForm(props) {
       >
         <TextField
           label="Work month"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentWorkMonthValue}
           onChange={(e) => {

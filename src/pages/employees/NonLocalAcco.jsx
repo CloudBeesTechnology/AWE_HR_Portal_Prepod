@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { IoSearch } from "react-icons/io5";
 import { FaArrowLeft } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { SearchDisplay } from '../../utils/SearchDisplay';
 import { NonLocalAccovalidationSchema } from '../../services/EmployeeValidation';
 import { DataSupply } from "../../utils/DataStoredContext";
@@ -15,12 +15,14 @@ import { FormField } from "../../utils/FormField";
 export const NonLocalAcco = () => {
   const { NLADatas, errorEmpID } = NLACreate();
   const { NLAUpdateFun } = NLAUpdate();
-  const { empPIData, NLAData } = useContext(DataSupply);
+  const { empPIData,IDData, NLAData } = useContext(DataSupply);
 
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [notification, setNotification] = useState(false);
-  const navigate = useNavigate();
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [showTitle, setShowTitle] = useState("");
+
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -31,9 +33,10 @@ export const NonLocalAcco = () => {
       try {
         const mergedData = empPIData
           .map((emp) => {
-            const IDDetails = NLAData.find((user) => user.empID === emp.empID);
-            if (!IDDetails) return null;
-            return { ...emp, ...IDDetails };
+            const IDDetails =NLAData?NLAData.find((user) => user.empID === emp.empID): {};
+            const IDDatas =IDData?IDData.find((user) => user.empID === emp.empID): {};
+            // if (!IDDetails ) return null;
+            return { ...emp, ...IDDetails, ...IDDatas };
           })
           .filter(Boolean);
         setUserDetails(mergedData);
@@ -86,14 +89,18 @@ export const NonLocalAcco = () => {
         };
         console.log("Updating data with empID:", data.empID);  // Log before calling the update function
         await NLAUpdateFun({ NLAValue });
+        setShowTitle("Details updated successfully");
+        setNotification(true);
       } else {
         const NLACreValue = {
           ...data,
         };
         console.log("Creating new data for empID:", data.empID);  // Log before calling the create function
         await NLADatas({ NLACreValue });
+        setShowTitle("Details saved successfully");
+        setNotification(true);
       }
-      setNotification(true);
+  
     } catch (error) {
       console.log(error);
       console.error("Error submitting data to AWS:", JSON.stringify(error, null, 2));
@@ -101,7 +108,9 @@ export const NonLocalAcco = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center  p-10">
+    <div className="flex flex-col items-center justify-center  p-10"  onClick={() => {
+      setFilteredEmployees([]);
+    }}>
       <div className="w-full flex items-center justify-between gap-5">
         <Link to="/employee" className="text-xl flex-1 text-grey">
           <FaArrowLeft />
@@ -116,6 +125,8 @@ export const NonLocalAcco = () => {
             searchIcon2={<IoSearch />}
             placeholder="Employee Id"
             rounded="rounded-lg"
+            filteredEmployees={filteredEmployees}
+            setFilteredEmployees={setFilteredEmployees}
           />
         </div>
       </div>
@@ -195,7 +206,7 @@ export const NonLocalAcco = () => {
         
         {notification && (
           <SpinLogo
-            text="Details saved successfully"
+            text={showTitle}
             notification={notification}
             path="/employee"
           />

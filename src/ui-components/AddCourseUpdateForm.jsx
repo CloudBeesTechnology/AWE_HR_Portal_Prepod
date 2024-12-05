@@ -235,9 +235,9 @@ export default function AddCourseUpdateForm(props) {
   const [currentCompanyValue, setCurrentCompanyValue] = React.useState("");
   const companyRef = React.createRef();
   const validations = {
-    courseSelect: [{ type: "Required" }],
-    courseName: [{ type: "Required" }],
-    company: [{ type: "Required" }],
+    courseSelect: [],
+    courseName: [],
+    company: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -265,9 +265,9 @@ export default function AddCourseUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          courseSelect,
-          courseName,
-          company,
+          courseSelect: courseSelect ?? null,
+          courseName: courseName ?? null,
+          company: company ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -321,7 +321,7 @@ export default function AddCourseUpdateForm(props) {
     >
       <TextField
         label="Course select"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={courseSelect}
         onChange={(e) => {
@@ -374,7 +374,7 @@ export default function AddCourseUpdateForm(props) {
       >
         <TextField
           label="Course name"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentCourseNameValue}
           onChange={(e) => {
@@ -423,7 +423,7 @@ export default function AddCourseUpdateForm(props) {
       >
         <TextField
           label="Company"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentCompanyValue}
           onChange={(e) => {

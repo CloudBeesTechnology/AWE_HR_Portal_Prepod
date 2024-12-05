@@ -14,7 +14,7 @@ export const AddCFFun = () => {
       courseName:AddCFCre.courseName,
       company:AddCFCre.company,
     };
-    // console.log(totalData);
+    console.log(totalData);
 
     try {
       const storedData=   await Promise.all([
@@ -25,7 +25,7 @@ export const AddCFFun = () => {
              },
            })
          ])
-        //  console.log(storedData,"successfully stored data");
+         console.log(storedData,"successfully stored data");
 
        } catch (error) {
          console.error("Error executing GraphQL requests:", error);

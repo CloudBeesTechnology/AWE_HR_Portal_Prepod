@@ -15,11 +15,11 @@ const TabNavigation = ({ activeTab, handleTabClick }) => {
 
   return (
     <div className="sticky top-11 bg-white flex justify-between items-center  z-40">
-      <p className="text_size_5">
+      <p className="text_size_5 font-semibold ">
         {tabs.map((tab, index) => (
           <span
             key={index}
-            className={`relative after:absolute after:-bottom-2 after:left-0 after:w-full after:h-1 cursor-pointer ${
+            className={`relative after:absolute after:-bottom-2 after:left-0 after:w-[80%] after:h-1 cursor-pointer ${
               activeTab === index && "after:bg-primary"
             }`}
             onClick={() => handleTabClick(index)}

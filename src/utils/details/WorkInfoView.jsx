@@ -1,10 +1,16 @@
 import React, { useState, useRef } from "react";
-import { Document, Page } from "react-pdf";
-import "react-pdf/dist/esm/Page/TextLayer.css";
-import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+import { Viewer, Worker, Page } from "@react-pdf-viewer/core";
+import "@react-pdf-viewer/core/lib/styles/index.css";
+import { pdfjs } from "react-pdf";
+// import "react-pdf/dist/esm/Page/TextLayer.css";
+// import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import { FaTimes, FaPrint, FaDownload } from "react-icons/fa"; // Import "X" icon from react-icons
-import { useReactToPrint } from "react-to-print";
 import { getUrl } from "@aws-amplify/storage";
+
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.js",
+  import.meta.url
+).toString();
 
 const WorkInfoView = ({
   workInfo,
@@ -25,23 +31,23 @@ const WorkInfoView = ({
   uploadPR,
   uploadSP,
   invoiceRef,
+  formatDate,
+  mainRef,
   handlePrint,
 }) => {
   const [viewingDocument, setViewingDocument] = useState(null); // State to store the currently viewed document URL
   const [lastUploadUrl, setPPLastUP] = useState("");
-   // Helper function to fetch the cloud URL
-   const linkToStorageFile = async (pathUrl) => {
+  // Helper function to fetch the cloud URL
+  const linkToStorageFile = async (pathUrl) => {
     try {
       const result = await getUrl({ path: pathUrl });
-      console.log("File URL:", result.url.href); // Use .href to extract the URL as a string
+      //  console.log("File URL:", result.url.href); // Use .href to extract the URL as a string
       setPPLastUP(result.url.href); // Store the URL as a string
       setViewingDocument(pathUrl); // Update the state to show the selected document
     } catch (error) {
       console.error("Error fetching the file URL:", error);
     }
   };
-
-  console.log(lastUploadUrl, "file")
 
   // Helper function to parse and safely handle data
   const parseDocuments = (docData) => {
@@ -77,12 +83,12 @@ const WorkInfoView = ({
             className="bg-white rounded-lg shadow-md p-4 mb-4 border border-gray-200"
           >
             <div className="flex justify-between items-center">
-              <span className="text-gray-700">
-                Uploaded on: {document.date}
+              <span className="uppercase font-semibold text-sm">
+                Uploaded on: {formatDate(document.date)}
               </span>
               <button
                 onClick={() => linkToStorageFile(document.upload)} // Fetch the URL for the document
-                className="text-blue-600 hover:text-blue-800"
+                className="text-dark_grey font-semibold text-sm"
               >
                 View Document
               </button>
@@ -94,15 +100,19 @@ const WorkInfoView = ({
                 <div className="mt-4">
                   <div className="relative bg-white max-w-3xl mx-auto p-6 rounded-lg shadow-lg">
                     {/* PDF Viewer using react-pdf */}
-                    <div ref={invoiceRef} className="flex justify-center">
-                      <div>
-                        <Document
+                    <div className="flex justify-center">
+                      <div ref={invoiceRef}>
+                        <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                          <Viewer fileUrl={lastUploadUrl || ""} />
+                          {/* <Page pageNumber={pageNumber} className="mx-auto" /> */}
+                        </Worker>
+                        {/* <Document
                           file={lastUploadUrl}
                           onLoadSuccess={onDocumentLoadSuccess}
                           className="w-full"
                         >
                           <Page pageNumber={pageNumber} className=" mx-auto" />
-                        </Document>
+                        </Document> */}
                       </div>
                     </div>
 
@@ -141,7 +151,7 @@ const WorkInfoView = ({
                   <div className="flex items-center justify-center gap-6 py-4">
                     <div className="mt-2 flex">
                       <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
-                        <a href={document.upload} download>
+                        <a href={lastUploadUrl} download>
                           Download
                         </a>
                         <FaDownload className="ml-2 mt-1" />
@@ -150,7 +160,7 @@ const WorkInfoView = ({
                     {/* Print Button */}
                     <div className="mt-2 flex">
                       <button
-                        onClick={() => useReactToPrint()}
+                        onClick={handlePrint}
                         className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
                       >
                         Print
@@ -164,12 +174,14 @@ const WorkInfoView = ({
             {/* Image Viewer */}
             {viewingDocument === document.upload &&
               !document.upload.endsWith(".pdf") && (
-                <div ref={invoiceRef} className="relative mt-4">
-                  <img
-                    src={lastUploadUrl}
-                    alt="Document Preview"
-                    className="w-full h-auto"
-                  />
+                <div className="relative mt-4">
+                  <div ref={invoiceRef}>
+                    <img
+                      src={lastUploadUrl} // Use the URL for the image
+                      alt="Document Preview"
+                      className="w-full h-auto"
+                    />
+                  </div>
 
                   <div className="absolute top-2 right-2">
                     <button
@@ -193,7 +205,7 @@ const WorkInfoView = ({
                     {/* Print Button */}
                     <div className="mt-2 flex">
                       <button
-                        onClick={() => useReactToPrint()}
+                        onClick={handlePrint}
                         className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
                       >
                         Print
@@ -218,90 +230,124 @@ const WorkInfoView = ({
 
     return (
       <div className="py-4">
-        <h6 className="uppercase text-xl font-semibold text-dark_grey ">{categoryName}</h6>
+        <h6 className="uppercase text_size_5 my-3 ">{categoryName}</h6>
         {documents.length > 0 ? (
-          renderDocumentsUnderCategory(documents, categoryName)
+          renderDocumentsUnderCategory(documents)
         ) : (
-          <p>No documents and images available</p>
+          <p className="text-dark_grey font-semibold text-sm">
+            No documents available
+          </p>
         )}
       </div>
     );
   };
 
+  const renderDetails = (details) => {
+    return (
+      <div className="grid grid-cols-3 gap-y-4 items-center font-semibold text-sm">
+        {Object.entries(details).map(([key, value], index) => (
+          <React.Fragment key={index}>
+            <span className="text-dark_grey">{key}</span>
+            <span className="text-center text-gray-700">:</span>
+            <span className="text-dark_grey">
+              {
+                Array.isArray(value)
+                  ? value.some((v) => v !== null) // Check if the array has any non-null values
+                    ? value
+                        .filter((v) => v !== null) // Remove null values from the array
+                        .slice(-1) // Get the last element
+                        .concat(value.slice(0, -1))
+                        .map((item, idx, arr) => (
+                          <span key={idx}>
+                            <span
+                              className={`${
+                                arr.length > 1 && idx === 0
+                                  ? "rounded-md text-primary"
+                                  : "" // Only highlight the latest value if there are multiple values
+                              }`}
+                            >
+                              {item}
+                            </span>
+                            {idx < value.length - 1 && <span>,&nbsp;</span>}
+                            {/* Add a comma except for the last item */}
+                          </span>
+                        ))
+                    : "N/A" // Show "N/A" if the array only contains null or is empty
+                  : value !== null && value !== undefined && value !== ""
+                  ? value
+                  : "N/A" // Show "N/A" for null or undefined non-array values
+              }
+            </span>
+          </React.Fragment>
+        ))}
+      </div>
+    );
+  };
+
   return (
-    <section ref={invoiceRef} className="py-8 bg-gray-50 rounded-lg">
-      <h6 className="uppercase text-xl font-semibold text-dark_grey mb-6">Work Info Details:</h6>
+    <section ref={mainRef} className="py-8 bg-gray-50 rounded-lg">
+      <h6 className="uppercase text_size_5 mb-6">Work Info Details:</h6>
 
       {/* Employee Details */}
       <div className="space-y-6">
-        <h6 className="text-xl font-semibold text-dark_grey">Employee Info</h6>
-        <div className="grid grid-cols-3 gap-y-4 gap-x-2">
-          {Object.entries(workInfo.employeeDetails).map(([key, value], index) => (
-            <React.Fragment key={index}>
-              <span className="text-gray-800">{key}</span>
-              <span className="text-center text-gray-700">:</span>
-              <span className="text-gray-800">{value || "N/A"}</span>
-            </React.Fragment>
-          ))}
+        <h6 className="uppercase text_size_5 my-3">Employee Info</h6>
+
+        <div className="space-y-6">
+          {/* Render the section data */}
+          <div classname="flex-1">
+            {renderDetails(workInfo.employeeDetails)}
+          </div>
         </div>
       </div>
 
       {/* Leave Details */}
       <div className="mt-8">
-        <h6 className="uppercase text-xl font-semibold text-dark_grey mb-6">Leave Details</h6>
-        <div className="grid grid-cols-3 gap-y-4 gap-x-2">
-          {Object.entries(workInfo.LeaveDetails).map(([key, value], index) => (
-            <React.Fragment key={index}>
-              <span className="text-gray-800">{key}</span>
-              <span className="text-center text-gray-700">:</span>
-              <span className="text-gray-800">{value || "N/A"}</span>
-            </React.Fragment>
-          ))}
+        <h6 className="uppercase text_size_5 my-3">Employee Leave Info</h6>
+
+        <div className="space-y-6">
+          {/* Render the section data */}
+          <div classname="flex-1">{renderDetails(workInfo.LeaveDetails)}</div>
         </div>
       </div>
 
       <div className="mt-8">
-        <h6 className="uppercase text-xl font-semibold text-dark_grey mb-6">Service Road Details</h6>
-        <div className="grid grid-cols-3 gap-y-4 gap-x-2">
-          {Object.entries(workInfo.ServiceRoad).map(([key, value], index) => (
-            <React.Fragment key={index}>
-              <span className="text-gray-800">{key}</span>
-              <span className="text-center text-gray-700">:</span>
-              <span className="text-gray-800">{value || "N/A"}</span>
-            </React.Fragment>
-          ))}
+        <h6 className="uppercase text_size_5 my-3">Employee Exit Info</h6>
+
+        <div className="space-y-6">
+          {/* Render the section data */}
+          <div classname="flex-1">
+            {renderDetails(workInfo.TerminateDetails)}
+          </div>
+        </div>
+      </div>
+      <div className="mt-8">
+        <h6 className="uppercase text_size_5  my-3">
+          Employee Exit Info Documents
+        </h6>
+        {renderDocumentCategory(WIContract, "Contract")}
+        {renderDocumentCategory(WILeaveEntitle, "Probation")}
+        {renderDocumentCategory(WIResignation, "Resignation")}
+        {renderDocumentCategory(WITermination, "Termination")}
+        {renderDocumentCategory(WIProbation, "Leave Entitlement")}
+      </div>
+
+      <div className="mt-8">
+        <h6 className="uppercase text_size_5  my-3">Employee Service Record</h6>
+
+        <div className="space-y-6">
+          {/* Render the section data */}
+          <div classname="flex-1">{renderDetails(workInfo.ServiceRoad)}</div>
         </div>
       </div>
 
       {/* Service Road Section */}
       <div className="mt-8">
-        <h6 className="uppercase text-xl font-semibold text-dark_grey mb-6">Service Road</h6>
-        {renderDocumentCategory(uploadAL, "Annual Leave")}
-        {renderDocumentCategory(uploadDep, "Departure Documents")}
-        {renderDocumentCategory(uploadLP, "Leave Pass")}
-        {renderDocumentCategory(uploadPR, "Probation Report")}
-        {renderDocumentCategory(uploadSP, "Sick Pay")}
-      </div>
-
-      <div className="mt-8">
-        <h6 className="uppercase text-xl font-semibold text-dark_grey mb-6">Employee Exit Details</h6>
-        <div className="grid grid-cols-3 gap-y-4 gap-x-2">
-          {Object.entries(workInfo.TerminateDetails).map(([key, value], index) => (
-            <React.Fragment key={index}>
-              <span className="text-gray-800">{key}</span>
-              <span className="text-center text-gray-700">:</span>
-              <span className="text-gray-800">{value || "N/A"}</span>
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
-      <div className="mt-8">
-        <h6 className="uppercase text-xl font-semibold text-dark_grey mb-6">Terminate Documents</h6>
-        {renderDocumentCategory(WIContract, "Annual Leave")}
-        {renderDocumentCategory(WILeaveEntitle, "Departure Documents")}
-        {renderDocumentCategory(WIResignation, "Leave Pass")}
-        {renderDocumentCategory(WITermination, "Probation Report")}
-        {renderDocumentCategory(WIProbation, "Sick Pay")}
+        <h6 className="uppercase text_size_5 my-3">Service Record Documents</h6>
+        {renderDocumentCategory(uploadPR, "Position Revision")}
+        {renderDocumentCategory(uploadSP, "Salary Package Revision")}
+        {renderDocumentCategory(uploadLP, "Leave Passage Revision")}
+        {renderDocumentCategory(uploadAL, "Annual Revision")}
+        {renderDocumentCategory(uploadDep, "Change of Department")}
       </div>
     </section>
   );

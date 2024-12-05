@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-export const HoTBody = ({ data, loading, useDownloadFunc }) => {
+export const HoTBody = ({ data, loading, setTableData }) => {
   useEffect(() => {
     if (loading === false) {
       const rows = document.querySelectorAll("tbody tr");
@@ -8,9 +8,14 @@ export const HoTBody = ({ data, loading, useDownloadFunc }) => {
         const cells = row.querySelectorAll("td");
         return Array.from(cells).map((cell) => cell.innerText);
       });
-      setTimeout(() => {
-        useDownloadFunc(tableData);
-      }, 1000);
+      const handleDown = () => {
+        setTimeout(() => {
+          if (tableData) {
+            setTableData(tableData);
+          }
+        }, 1000);
+      };
+      handleDown();
     }
   }, [loading, data]);
   return (
@@ -20,10 +25,10 @@ export const HoTBody = ({ data, loading, useDownloadFunc }) => {
             const renderRows = (m, ind) => {
               return (
                 <tr
-                  key={ind}
+                  key={index}
                   className="text-dark_grey h-[53px] bg-white text-sm rounded-sm shadow-md text-start border-b-2 border-[#CECECE]"
                 >
-                  <td className="text-start px-4 flex-1">{ind + 1}</td>
+                  <td className="text-start px-4 flex-1">{index + 1}</td>
                   <td className="text-start px-4 flex-1">{m.rec}</td>
                   <td className="text-center px-4 flex-1">{m.ctr}</td>
                   <td className="text-center px-4 flex-1">{m.dept}</td>
@@ -63,7 +68,7 @@ export const HoTBody = ({ data, loading, useDownloadFunc }) => {
                 </tr>
               );
             };
-            return value.data.map(renderRows);
+            return renderRows(value);
           })
         : (
             <tr>

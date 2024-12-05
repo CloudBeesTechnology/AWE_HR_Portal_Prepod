@@ -390,7 +390,7 @@ export default function IDDetailsUpdateForm(props) {
     loiUpload: [{ type: "JSON" }],
     myIcNo: [],
     myIcUpload: [{ type: "JSON" }],
-    nationality: [{ type: "Required" }],
+    nationality: [],
     nationalCat: [],
     otherNation: [],
     otherRace: [],
@@ -403,8 +403,8 @@ export default function IDDetailsUpdateForm(props) {
     ppDestinate: [],
     preEmp: [],
     preEmpPeriod: [],
-    race: [{ type: "Required" }],
-    religion: [{ type: "Required" }],
+    race: [],
+    religion: [],
     supportDocUpload: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
@@ -446,7 +446,7 @@ export default function IDDetailsUpdateForm(props) {
           loiUpload: loiUpload ?? null,
           myIcNo: myIcNo ?? null,
           myIcUpload: myIcUpload ?? null,
-          nationality,
+          nationality: nationality ?? null,
           nationalCat: nationalCat ?? null,
           otherNation: otherNation ?? null,
           otherRace: otherRace ?? null,
@@ -459,8 +459,8 @@ export default function IDDetailsUpdateForm(props) {
           ppDestinate: ppDestinate ?? null,
           preEmp: preEmp ?? null,
           preEmpPeriod: preEmpPeriod ?? null,
-          race,
-          religion,
+          race: race ?? null,
+          religion: religion ?? null,
           supportDocUpload: supportDocUpload ?? null,
         };
         const validationResponses = await Promise.all(
@@ -1334,7 +1334,7 @@ export default function IDDetailsUpdateForm(props) {
       </ArrayField>
       <TextField
         label="Nationality"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={nationality}
         onChange={(e) => {
@@ -2140,7 +2140,7 @@ export default function IDDetailsUpdateForm(props) {
       ></TextField>
       <TextField
         label="Race"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={race}
         onChange={(e) => {
@@ -2192,7 +2192,7 @@ export default function IDDetailsUpdateForm(props) {
       ></TextField>
       <TextField
         label="Religion"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={religion}
         onChange={(e) => {

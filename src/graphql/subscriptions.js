@@ -1,6 +1,261 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreateInsuranceType = /* GraphQL */ `
+  subscription OnCreateInsuranceType(
+    $filter: ModelSubscriptionInsuranceTypeFilterInput
+  ) {
+    onCreateInsuranceType(filter: $filter) {
+      id
+      typeIns
+      insDetails
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateInsuranceType = /* GraphQL */ `
+  subscription OnUpdateInsuranceType(
+    $filter: ModelSubscriptionInsuranceTypeFilterInput
+  ) {
+    onUpdateInsuranceType(filter: $filter) {
+      id
+      typeIns
+      insDetails
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteInsuranceType = /* GraphQL */ `
+  subscription OnDeleteInsuranceType(
+    $filter: ModelSubscriptionInsuranceTypeFilterInput
+  ) {
+    onDeleteInsuranceType(filter: $filter) {
+      id
+      typeIns
+      insDetails
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateGroupHandS = /* GraphQL */ `
+  subscription OnCreateGroupHandS(
+    $filter: ModelSubscriptionGroupHandSFilterInput
+  ) {
+    onCreateGroupHandS(filter: $filter) {
+      id
+      groupHSExp
+      groupHSNo
+      groupHSUpload
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateGroupHandS = /* GraphQL */ `
+  subscription OnUpdateGroupHandS(
+    $filter: ModelSubscriptionGroupHandSFilterInput
+  ) {
+    onUpdateGroupHandS(filter: $filter) {
+      id
+      groupHSExp
+      groupHSNo
+      groupHSUpload
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteGroupHandS = /* GraphQL */ `
+  subscription OnDeleteGroupHandS(
+    $filter: ModelSubscriptionGroupHandSFilterInput
+  ) {
+    onDeleteGroupHandS(filter: $filter) {
+      id
+      groupHSExp
+      groupHSNo
+      groupHSUpload
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateWorkMen = /* GraphQL */ `
+  subscription OnCreateWorkMen($filter: ModelSubscriptionWorkMenFilterInput) {
+    onCreateWorkMen(filter: $filter) {
+      id
+      empStatusType
+      workmenCompExp
+      workmenCompNo
+      workmenComUp
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateWorkMen = /* GraphQL */ `
+  subscription OnUpdateWorkMen($filter: ModelSubscriptionWorkMenFilterInput) {
+    onUpdateWorkMen(filter: $filter) {
+      id
+      empStatusType
+      workmenCompExp
+      workmenCompNo
+      workmenComUp
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteWorkMen = /* GraphQL */ `
+  subscription OnDeleteWorkMen($filter: ModelSubscriptionWorkMenFilterInput) {
+    onDeleteWorkMen(filter: $filter) {
+      id
+      empStatusType
+      workmenCompExp
+      workmenCompNo
+      workmenComUp
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateTravelIns = /* GraphQL */ `
+  subscription OnCreateTravelIns(
+    $filter: ModelSubscriptionTravelInsFilterInput
+  ) {
+    onCreateTravelIns(filter: $filter) {
+      id
+      travelExp
+      travelNo
+      travelUp
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateTravelIns = /* GraphQL */ `
+  subscription OnUpdateTravelIns(
+    $filter: ModelSubscriptionTravelInsFilterInput
+  ) {
+    onUpdateTravelIns(filter: $filter) {
+      id
+      travelExp
+      travelNo
+      travelUp
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteTravelIns = /* GraphQL */ `
+  subscription OnDeleteTravelIns(
+    $filter: ModelSubscriptionTravelInsFilterInput
+  ) {
+    onDeleteTravelIns(filter: $filter) {
+      id
+      travelExp
+      travelNo
+      travelUp
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreatePersonalAccident = /* GraphQL */ `
+  subscription OnCreatePersonalAccident(
+    $filter: ModelSubscriptionPersonalAccidentFilterInput
+  ) {
+    onCreatePersonalAccident(filter: $filter) {
+      id
+      perAccExp
+      perAccNo
+      perAccUp
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdatePersonalAccident = /* GraphQL */ `
+  subscription OnUpdatePersonalAccident(
+    $filter: ModelSubscriptionPersonalAccidentFilterInput
+  ) {
+    onUpdatePersonalAccident(filter: $filter) {
+      id
+      perAccExp
+      perAccNo
+      perAccUp
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeletePersonalAccident = /* GraphQL */ `
+  subscription OnDeletePersonalAccident(
+    $filter: ModelSubscriptionPersonalAccidentFilterInput
+  ) {
+    onDeletePersonalAccident(filter: $filter) {
+      id
+      perAccExp
+      perAccNo
+      perAccUp
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateInsClaim = /* GraphQL */ `
+  subscription OnCreateInsClaim($filter: ModelSubscriptionInsClaimFilterInput) {
+    onCreateInsClaim(filter: $filter) {
+      id
+      empID
+      insuranceClaims
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateInsClaim = /* GraphQL */ `
+  subscription OnUpdateInsClaim($filter: ModelSubscriptionInsClaimFilterInput) {
+    onUpdateInsClaim(filter: $filter) {
+      id
+      empID
+      insuranceClaims
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteInsClaim = /* GraphQL */ `
+  subscription OnDeleteInsClaim($filter: ModelSubscriptionInsClaimFilterInput) {
+    onDeleteInsClaim(filter: $filter) {
+      id
+      empID
+      insuranceClaims
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const onCreateProbForm = /* GraphQL */ `
   subscription OnCreateProbForm($filter: ModelSubscriptionProbFormFilterInput) {
     onCreateProbForm(filter: $filter) {
@@ -140,6 +395,7 @@ export const onCreateEmailNotifi = /* GraphQL */ `
       leaveType
       senderEmail
       receipentEmail
+      receipentEmpID
       status
       message
       createdAt
@@ -158,6 +414,7 @@ export const onUpdateEmailNotifi = /* GraphQL */ `
       leaveType
       senderEmail
       receipentEmail
+      receipentEmpID
       status
       message
       createdAt
@@ -176,6 +433,7 @@ export const onDeleteEmailNotifi = /* GraphQL */ `
       leaveType
       senderEmail
       receipentEmail
+      receipentEmpID
       status
       message
       createdAt
@@ -193,6 +451,7 @@ export const onCreateOffshoreSheet = /* GraphQL */ `
       date
       dailySheet
       status
+      manager
       createdAt
       updatedAt
       __typename
@@ -208,6 +467,7 @@ export const onUpdateOffshoreSheet = /* GraphQL */ `
       date
       dailySheet
       status
+      manager
       createdAt
       updatedAt
       __typename
@@ -223,6 +483,7 @@ export const onDeleteOffshoreSheet = /* GraphQL */ `
       date
       dailySheet
       status
+      manager
       createdAt
       updatedAt
       __typename
@@ -238,6 +499,7 @@ export const onCreateORMCSheet = /* GraphQL */ `
       date
       dailySheet
       status
+      manager
       createdAt
       updatedAt
       __typename
@@ -253,6 +515,7 @@ export const onUpdateORMCSheet = /* GraphQL */ `
       date
       dailySheet
       status
+      manager
       createdAt
       updatedAt
       __typename
@@ -268,6 +531,7 @@ export const onDeleteORMCSheet = /* GraphQL */ `
       date
       dailySheet
       status
+      manager
       createdAt
       updatedAt
       __typename
@@ -281,6 +545,7 @@ export const onCreateSBWSheet = /* GraphQL */ `
       date
       dailySheet
       status
+      manager
       createdAt
       updatedAt
       __typename
@@ -294,6 +559,7 @@ export const onUpdateSBWSheet = /* GraphQL */ `
       date
       dailySheet
       status
+      manager
       createdAt
       updatedAt
       __typename
@@ -307,6 +573,97 @@ export const onDeleteSBWSheet = /* GraphQL */ `
       date
       dailySheet
       status
+      manager
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateBlng = /* GraphQL */ `
+  subscription OnCreateBlng($filter: ModelSubscriptionBlngFilterInput) {
+    onCreateBlng(filter: $filter) {
+      id
+      weeklySheet
+      date
+      status
+      manager
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateBlng = /* GraphQL */ `
+  subscription OnUpdateBlng($filter: ModelSubscriptionBlngFilterInput) {
+    onUpdateBlng(filter: $filter) {
+      id
+      weeklySheet
+      date
+      status
+      manager
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteBlng = /* GraphQL */ `
+  subscription OnDeleteBlng($filter: ModelSubscriptionBlngFilterInput) {
+    onDeleteBlng(filter: $filter) {
+      id
+      weeklySheet
+      date
+      status
+      manager
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateHeadOffice = /* GraphQL */ `
+  subscription OnCreateHeadOffice(
+    $filter: ModelSubscriptionHeadOfficeFilterInput
+  ) {
+    onCreateHeadOffice(filter: $filter) {
+      id
+      dailySheet
+      date
+      status
+      manager
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateHeadOffice = /* GraphQL */ `
+  subscription OnUpdateHeadOffice(
+    $filter: ModelSubscriptionHeadOfficeFilterInput
+  ) {
+    onUpdateHeadOffice(filter: $filter) {
+      id
+      dailySheet
+      date
+      status
+      manager
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteHeadOffice = /* GraphQL */ `
+  subscription OnDeleteHeadOffice(
+    $filter: ModelSubscriptionHeadOfficeFilterInput
+  ) {
+    onDeleteHeadOffice(filter: $filter) {
+      id
+      dailySheet
+      date
+      status
+      manager
       createdAt
       updatedAt
       __typename
@@ -328,6 +685,9 @@ export const onCreateEmpRequisition = /* GraphQL */ `
       reasonForReq
       replacementFor
       tentativeDate
+      status
+      remarkReq
+      reqName
       createdAt
       updatedAt
       __typename
@@ -349,6 +709,9 @@ export const onUpdateEmpRequisition = /* GraphQL */ `
       reasonForReq
       replacementFor
       tentativeDate
+      status
+      remarkReq
+      reqName
       createdAt
       updatedAt
       __typename
@@ -370,51 +733,9 @@ export const onDeleteEmpRequisition = /* GraphQL */ `
       reasonForReq
       replacementFor
       tentativeDate
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onCreateHeadOffice = /* GraphQL */ `
-  subscription OnCreateHeadOffice(
-    $filter: ModelSubscriptionHeadOfficeFilterInput
-  ) {
-    onCreateHeadOffice(filter: $filter) {
-      id
-      dailySheet
-      date
       status
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onUpdateHeadOffice = /* GraphQL */ `
-  subscription OnUpdateHeadOffice(
-    $filter: ModelSubscriptionHeadOfficeFilterInput
-  ) {
-    onUpdateHeadOffice(filter: $filter) {
-      id
-      dailySheet
-      date
-      status
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onDeleteHeadOffice = /* GraphQL */ `
-  subscription OnDeleteHeadOffice(
-    $filter: ModelSubscriptionHeadOfficeFilterInput
-  ) {
-    onDeleteHeadOffice(filter: $filter) {
-      id
-      dailySheet
-      date
-      status
+      remarkReq
+      reqName
       createdAt
       updatedAt
       __typename
@@ -746,8 +1067,8 @@ export const onCreateEmpInsurance = /* GraphQL */ `
       groupIns
       groupInsEffectDate
       groupInsEndDate
-      workmenComp
-      workmePolicyNo
+      empStatusType
+      workmenCompNo
       travelIns
       accidentIns
       empInsUpload
@@ -767,8 +1088,8 @@ export const onUpdateEmpInsurance = /* GraphQL */ `
       groupIns
       groupInsEffectDate
       groupInsEndDate
-      workmenComp
-      workmePolicyNo
+      empStatusType
+      workmenCompNo
       travelIns
       accidentIns
       empInsUpload
@@ -788,8 +1109,8 @@ export const onDeleteEmpInsurance = /* GraphQL */ `
       groupIns
       groupInsEffectDate
       groupInsEndDate
-      workmenComp
-      workmePolicyNo
+      empStatusType
+      workmenCompNo
       travelIns
       accidentIns
       empInsUpload
@@ -1084,45 +1405,6 @@ export const onDeletePassportValid = /* GraphQL */ `
       immigApproval
       reEntryVisaExp
       remarkImmig
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onCreateBlng = /* GraphQL */ `
-  subscription OnCreateBlng($filter: ModelSubscriptionBlngFilterInput) {
-    onCreateBlng(filter: $filter) {
-      id
-      weeklySheet
-      date
-      status
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onUpdateBlng = /* GraphQL */ `
-  subscription OnUpdateBlng($filter: ModelSubscriptionBlngFilterInput) {
-    onUpdateBlng(filter: $filter) {
-      id
-      weeklySheet
-      date
-      status
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onDeleteBlng = /* GraphQL */ `
-  subscription OnDeleteBlng($filter: ModelSubscriptionBlngFilterInput) {
-    onDeleteBlng(filter: $filter) {
-      id
-      weeklySheet
-      date
-      status
       createdAt
       updatedAt
       __typename
@@ -1785,6 +2067,8 @@ export const onCreateEmpPersonalInfo = /* GraphQL */ `
       aTQualify
       alternateNo
       agent
+      bankName
+      bankAccNo
       contactNo
       cob
       contractType
@@ -1824,6 +2108,8 @@ export const onUpdateEmpPersonalInfo = /* GraphQL */ `
       aTQualify
       alternateNo
       agent
+      bankName
+      bankAccNo
       contactNo
       cob
       contractType
@@ -1863,6 +2149,8 @@ export const onDeleteEmpPersonalInfo = /* GraphQL */ `
       aTQualify
       alternateNo
       agent
+      bankName
+      bankAccNo
       contactNo
       cob
       contractType
@@ -2176,63 +2464,72 @@ export const onDeleteLocalMobilization = /* GraphQL */ `
     }
   }
 `;
-export const onCreateInterviewScheduleSchema = /* GraphQL */ `
-  subscription OnCreateInterviewScheduleSchema(
-    $filter: ModelSubscriptionInterviewScheduleSchemaFilterInput
+export const onCreateInterviewSchedule = /* GraphQL */ `
+  subscription OnCreateInterviewSchedule(
+    $filter: ModelSubscriptionInterviewScheduleFilterInput
   ) {
-    onCreateInterviewScheduleSchema(filter: $filter) {
+    onCreateInterviewSchedule(filter: $filter) {
       id
-      date
-      time
+      interDate
+      interTime
       venue
-      interviewType
-      interviewer
+      interType
+      bagdeNo
       message
       tempID
+      manager
       candidateStatus
       department
+      otherDepartment
+      status
       createdAt
       updatedAt
       __typename
     }
   }
 `;
-export const onUpdateInterviewScheduleSchema = /* GraphQL */ `
-  subscription OnUpdateInterviewScheduleSchema(
-    $filter: ModelSubscriptionInterviewScheduleSchemaFilterInput
+export const onUpdateInterviewSchedule = /* GraphQL */ `
+  subscription OnUpdateInterviewSchedule(
+    $filter: ModelSubscriptionInterviewScheduleFilterInput
   ) {
-    onUpdateInterviewScheduleSchema(filter: $filter) {
+    onUpdateInterviewSchedule(filter: $filter) {
       id
-      date
-      time
+      interDate
+      interTime
       venue
-      interviewType
-      interviewer
+      interType
+      bagdeNo
       message
       tempID
+      manager
       candidateStatus
       department
+      otherDepartment
+      status
       createdAt
       updatedAt
       __typename
     }
   }
 `;
-export const onDeleteInterviewScheduleSchema = /* GraphQL */ `
-  subscription OnDeleteInterviewScheduleSchema(
-    $filter: ModelSubscriptionInterviewScheduleSchemaFilterInput
+export const onDeleteInterviewSchedule = /* GraphQL */ `
+  subscription OnDeleteInterviewSchedule(
+    $filter: ModelSubscriptionInterviewScheduleFilterInput
   ) {
-    onDeleteInterviewScheduleSchema(filter: $filter) {
+    onDeleteInterviewSchedule(filter: $filter) {
       id
-      date
-      time
+      interDate
+      interTime
       venue
-      interviewType
-      interviewer
+      interType
+      bagdeNo
       message
       tempID
+      manager
       candidateStatus
       department
+      otherDepartment
+      status
       createdAt
       updatedAt
       __typename
@@ -2548,6 +2845,7 @@ export const onCreateTicketRequest = /* GraphQL */ `
       hrDate
       hrRemarks
       hrName
+      hrEmpID
       createdAt
       updatedAt
       __typename
@@ -2572,6 +2870,7 @@ export const onUpdateTicketRequest = /* GraphQL */ `
       hrDate
       hrRemarks
       hrName
+      hrEmpID
       createdAt
       updatedAt
       __typename
@@ -2596,6 +2895,7 @@ export const onDeleteTicketRequest = /* GraphQL */ `
       hrDate
       hrRemarks
       hrName
+      hrEmpID
       createdAt
       updatedAt
       __typename
@@ -2617,10 +2917,12 @@ export const onCreateLeaveStatus = /* GraphQL */ `
       reason
       medicalCertificate
       supervisorName
+      supervisorEmpID
       supervisorStatus
       supervisorDate
       supervisorRemarks
       managerName
+      managerEmpID
       managerStatus
       managerDate
       managerRemarks
@@ -2648,10 +2950,12 @@ export const onUpdateLeaveStatus = /* GraphQL */ `
       reason
       medicalCertificate
       supervisorName
+      supervisorEmpID
       supervisorStatus
       supervisorDate
       supervisorRemarks
       managerName
+      managerEmpID
       managerStatus
       managerDate
       managerRemarks
@@ -2679,10 +2983,12 @@ export const onDeleteLeaveStatus = /* GraphQL */ `
       reason
       medicalCertificate
       supervisorName
+      supervisorEmpID
       supervisorStatus
       supervisorDate
       supervisorRemarks
       managerName
+      managerEmpID
       managerStatus
       managerDate
       managerRemarks

@@ -241,7 +241,7 @@ export const AllEmployee = () => {
           <table className="w-full rounded-xl table-auto">
             <thead className="bg-[#939393] text-center text-white sticky top-0">
               <tr>
-                <th className=" py-4 px-2 ">Employee Id</th>
+                <th className=" py-4 px-2 ">Employee ID</th>
                 <th className="py-4 px-2 ">Badge No</th>
                 <th className="py-4 px-2">Name</th>
                 <th className="py-4 px-2 ">DOB</th>

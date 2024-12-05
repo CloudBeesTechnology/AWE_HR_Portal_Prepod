@@ -368,7 +368,7 @@ export default function IDDetailsCreateForm(props) {
     loiUpload: [{ type: "JSON" }],
     myIcNo: [],
     myIcUpload: [{ type: "JSON" }],
-    nationality: [{ type: "Required" }],
+    nationality: [],
     nationalCat: [],
     otherNation: [],
     otherRace: [],
@@ -381,8 +381,8 @@ export default function IDDetailsCreateForm(props) {
     ppDestinate: [],
     preEmp: [],
     preEmpPeriod: [],
-    race: [{ type: "Required" }],
-    religion: [{ type: "Required" }],
+    race: [],
+    religion: [],
     supportDocUpload: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
@@ -1314,7 +1314,7 @@ export default function IDDetailsCreateForm(props) {
       </ArrayField>
       <TextField
         label="Nationality"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={nationality}
         onChange={(e) => {
@@ -2120,7 +2120,7 @@ export default function IDDetailsCreateForm(props) {
       ></TextField>
       <TextField
         label="Race"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={race}
         onChange={(e) => {
@@ -2172,7 +2172,7 @@ export default function IDDetailsCreateForm(props) {
       ></TextField>
       <TextField
         label="Religion"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={religion}
         onChange={(e) => {

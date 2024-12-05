@@ -208,7 +208,7 @@ export default function EmpDepInsuranceCreateForm(props) {
     React.useState("");
   const depInsuranceRef = React.createRef();
   const validations = {
-    empID: [{ type: "Required" }],
+    empID: [],
     depInsurance: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
@@ -294,7 +294,7 @@ export default function EmpDepInsuranceCreateForm(props) {
     >
       <TextField
         label="Emp id"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={empID}
         onChange={(e) => {

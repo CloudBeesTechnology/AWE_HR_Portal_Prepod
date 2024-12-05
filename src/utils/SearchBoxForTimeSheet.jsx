@@ -75,16 +75,15 @@ export const SearchBoxForTimeSheet = ({
   Position,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
-
+  console.log("Search EmpId : ", secondaryData);
   const handleSearch = (e) => {
     const query = e.target.value.trim().toUpperCase();
     setSearchQuery(query);
-    console.log(secondaryData);
+
     if (query) {
       const filteredResults =
         secondaryData &&
         secondaryData?.map((employee) => {
-          console.log(employee);
           const checkSearchMatch = (item) => {
             return (
               item?.no?.toString().toUpperCase().includes(query) ||
@@ -92,7 +91,9 @@ export const SearchBoxForTimeSheet = ({
               item?.fid?.toString().toUpperCase().includes(query) ||
               item?.FID?.toString().toUpperCase().includes(query) ||
               item?.badge?.toString().toUpperCase().includes(query) ||
-              item?.BADGE?.toString().toUpperCase().includes(query)
+              item?.BADGE?.toString().toUpperCase().includes(query) ||
+              item?.sapNo?.toString().toUpperCase().includes(query) ||
+              item?.empBadgeNo?.toString().toUpperCase().includes(query)
             );
           };
 
@@ -111,13 +112,15 @@ export const SearchBoxForTimeSheet = ({
             const isMatch = checkSearchMatch(employee);
 
             if (isMatch) {
-              console.log(`TimeKeeper Match Found:`, employee);
+              // console.log(`TimeKeeper Match Found:`, employee);
             }
             return isMatch ? employee : null;
           }
         });
 
-      const validResults = filteredResults.filter((result) => result !== null);
+      const validResults = filteredResults.filter(
+        (result) => result !== null && result !== undefined
+      );
 
       searchResult(validResults);
     } else {

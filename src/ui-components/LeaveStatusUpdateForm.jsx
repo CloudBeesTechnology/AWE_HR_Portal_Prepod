@@ -200,10 +200,12 @@ export default function LeaveStatusUpdateForm(props) {
     reason: "",
     medicalCertificate: "",
     supervisorName: "",
+    supervisorEmpID: "",
     supervisorStatus: "",
     supervisorDate: "",
     supervisorRemarks: "",
     managerName: "",
+    managerEmpID: "",
     managerStatus: "",
     managerDate: "",
     managerRemarks: "",
@@ -224,6 +226,9 @@ export default function LeaveStatusUpdateForm(props) {
   const [supervisorName, setSupervisorName] = React.useState(
     initialValues.supervisorName
   );
+  const [supervisorEmpID, setSupervisorEmpID] = React.useState(
+    initialValues.supervisorEmpID
+  );
   const [supervisorStatus, setSupervisorStatus] = React.useState(
     initialValues.supervisorStatus
   );
@@ -235,6 +240,9 @@ export default function LeaveStatusUpdateForm(props) {
   );
   const [managerName, setManagerName] = React.useState(
     initialValues.managerName
+  );
+  const [managerEmpID, setManagerEmpID] = React.useState(
+    initialValues.managerEmpID
   );
   const [managerStatus, setManagerStatus] = React.useState(
     initialValues.managerStatus
@@ -263,10 +271,12 @@ export default function LeaveStatusUpdateForm(props) {
     setReason(cleanValues.reason);
     setMedicalCertificate(cleanValues.medicalCertificate);
     setSupervisorName(cleanValues.supervisorName);
+    setSupervisorEmpID(cleanValues.supervisorEmpID);
     setSupervisorStatus(cleanValues.supervisorStatus);
     setSupervisorDate(cleanValues.supervisorDate);
     setSupervisorRemarks(cleanValues.supervisorRemarks);
     setManagerName(cleanValues.managerName);
+    setManagerEmpID(cleanValues.managerEmpID);
     setManagerStatus(cleanValues.managerStatus);
     setManagerDate(cleanValues.managerDate);
     setManagerRemarks(cleanValues.managerRemarks);
@@ -296,18 +306,20 @@ export default function LeaveStatusUpdateForm(props) {
   const applyToRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
-    leaveType: [{ type: "Required" }],
-    fromDate: [{ type: "Required" }],
-    toDate: [{ type: "Required" }],
-    days: [{ type: "Required" }],
-    applyTo: [{ type: "Required" }],
-    reason: [{ type: "Required" }],
+    leaveType: [],
+    fromDate: [],
+    toDate: [],
+    days: [],
+    applyTo: [],
+    reason: [],
     medicalCertificate: [],
     supervisorName: [],
+    supervisorEmpID: [],
     supervisorStatus: [],
     supervisorDate: [],
     supervisorRemarks: [],
     managerName: [],
+    managerEmpID: [],
     managerStatus: [],
     managerDate: [],
     managerRemarks: [],
@@ -359,18 +371,20 @@ export default function LeaveStatusUpdateForm(props) {
         event.preventDefault();
         let modelFields = {
           empID,
-          leaveType,
-          fromDate,
-          toDate,
-          days,
-          applyTo,
-          reason,
+          leaveType: leaveType ?? null,
+          fromDate: fromDate ?? null,
+          toDate: toDate ?? null,
+          days: days ?? null,
+          applyTo: applyTo ?? null,
+          reason: reason ?? null,
           medicalCertificate: medicalCertificate ?? null,
           supervisorName: supervisorName ?? null,
+          supervisorEmpID: supervisorEmpID ?? null,
           supervisorStatus: supervisorStatus ?? null,
           supervisorDate: supervisorDate ?? null,
           supervisorRemarks: supervisorRemarks ?? null,
           managerName: managerName ?? null,
+          managerEmpID: managerEmpID ?? null,
           managerStatus: managerStatus ?? null,
           managerDate: managerDate ?? null,
           managerRemarks: managerRemarks ?? null,
@@ -446,10 +460,12 @@ export default function LeaveStatusUpdateForm(props) {
               reason,
               medicalCertificate,
               supervisorName,
+              supervisorEmpID,
               supervisorStatus,
               supervisorDate,
               supervisorRemarks,
               managerName,
+              managerEmpID,
               managerStatus,
               managerDate,
               managerRemarks,
@@ -472,7 +488,7 @@ export default function LeaveStatusUpdateForm(props) {
       ></TextField>
       <TextField
         label="Leave type"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={leaveType}
         onChange={(e) => {
@@ -488,10 +504,12 @@ export default function LeaveStatusUpdateForm(props) {
               reason,
               medicalCertificate,
               supervisorName,
+              supervisorEmpID,
               supervisorStatus,
               supervisorDate,
               supervisorRemarks,
               managerName,
+              managerEmpID,
               managerStatus,
               managerDate,
               managerRemarks,
@@ -514,7 +532,7 @@ export default function LeaveStatusUpdateForm(props) {
       ></TextField>
       <TextField
         label="From date"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         type="datetime-local"
         value={fromDate && convertToLocal(new Date(fromDate))}
@@ -532,10 +550,12 @@ export default function LeaveStatusUpdateForm(props) {
               reason,
               medicalCertificate,
               supervisorName,
+              supervisorEmpID,
               supervisorStatus,
               supervisorDate,
               supervisorRemarks,
               managerName,
+              managerEmpID,
               managerStatus,
               managerDate,
               managerRemarks,
@@ -558,7 +578,7 @@ export default function LeaveStatusUpdateForm(props) {
       ></TextField>
       <TextField
         label="To date"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         type="datetime-local"
         value={toDate && convertToLocal(new Date(toDate))}
@@ -576,10 +596,12 @@ export default function LeaveStatusUpdateForm(props) {
               reason,
               medicalCertificate,
               supervisorName,
+              supervisorEmpID,
               supervisorStatus,
               supervisorDate,
               supervisorRemarks,
               managerName,
+              managerEmpID,
               managerStatus,
               managerDate,
               managerRemarks,
@@ -602,7 +624,7 @@ export default function LeaveStatusUpdateForm(props) {
       ></TextField>
       <TextField
         label="Days"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         type="number"
         step="any"
@@ -622,10 +644,12 @@ export default function LeaveStatusUpdateForm(props) {
               reason,
               medicalCertificate,
               supervisorName,
+              supervisorEmpID,
               supervisorStatus,
               supervisorDate,
               supervisorRemarks,
               managerName,
+              managerEmpID,
               managerStatus,
               managerDate,
               managerRemarks,
@@ -660,10 +684,12 @@ export default function LeaveStatusUpdateForm(props) {
               reason,
               medicalCertificate,
               supervisorName,
+              supervisorEmpID,
               supervisorStatus,
               supervisorDate,
               supervisorRemarks,
               managerName,
+              managerEmpID,
               managerStatus,
               managerDate,
               managerRemarks,
@@ -691,7 +717,7 @@ export default function LeaveStatusUpdateForm(props) {
       >
         <TextField
           label="Apply to"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentApplyToValue}
           onChange={(e) => {
@@ -711,7 +737,7 @@ export default function LeaveStatusUpdateForm(props) {
       </ArrayField>
       <TextField
         label="Reason"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={reason}
         onChange={(e) => {
@@ -727,10 +753,12 @@ export default function LeaveStatusUpdateForm(props) {
               reason: value,
               medicalCertificate,
               supervisorName,
+              supervisorEmpID,
               supervisorStatus,
               supervisorDate,
               supervisorRemarks,
               managerName,
+              managerEmpID,
               managerStatus,
               managerDate,
               managerRemarks,
@@ -769,10 +797,12 @@ export default function LeaveStatusUpdateForm(props) {
               reason,
               medicalCertificate: value,
               supervisorName,
+              supervisorEmpID,
               supervisorStatus,
               supervisorDate,
               supervisorRemarks,
               managerName,
+              managerEmpID,
               managerStatus,
               managerDate,
               managerRemarks,
@@ -813,10 +843,12 @@ export default function LeaveStatusUpdateForm(props) {
               reason,
               medicalCertificate,
               supervisorName: value,
+              supervisorEmpID,
               supervisorStatus,
               supervisorDate,
               supervisorRemarks,
               managerName,
+              managerEmpID,
               managerStatus,
               managerDate,
               managerRemarks,
@@ -838,6 +870,50 @@ export default function LeaveStatusUpdateForm(props) {
         {...getOverrideProps(overrides, "supervisorName")}
       ></TextField>
       <TextField
+        label="Supervisor emp id"
+        isRequired={false}
+        isReadOnly={false}
+        value={supervisorEmpID}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              leaveType,
+              fromDate,
+              toDate,
+              days,
+              applyTo,
+              reason,
+              medicalCertificate,
+              supervisorName,
+              supervisorEmpID: value,
+              supervisorStatus,
+              supervisorDate,
+              supervisorRemarks,
+              managerName,
+              managerEmpID,
+              managerStatus,
+              managerDate,
+              managerRemarks,
+              empStatus,
+              empDate,
+              empRemarks,
+            };
+            const result = onChange(modelFields);
+            value = result?.supervisorEmpID ?? value;
+          }
+          if (errors.supervisorEmpID?.hasError) {
+            runValidationTasks("supervisorEmpID", value);
+          }
+          setSupervisorEmpID(value);
+        }}
+        onBlur={() => runValidationTasks("supervisorEmpID", supervisorEmpID)}
+        errorMessage={errors.supervisorEmpID?.errorMessage}
+        hasError={errors.supervisorEmpID?.hasError}
+        {...getOverrideProps(overrides, "supervisorEmpID")}
+      ></TextField>
+      <TextField
         label="Supervisor status"
         isRequired={false}
         isReadOnly={false}
@@ -855,10 +931,12 @@ export default function LeaveStatusUpdateForm(props) {
               reason,
               medicalCertificate,
               supervisorName,
+              supervisorEmpID,
               supervisorStatus: value,
               supervisorDate,
               supervisorRemarks,
               managerName,
+              managerEmpID,
               managerStatus,
               managerDate,
               managerRemarks,
@@ -899,10 +977,12 @@ export default function LeaveStatusUpdateForm(props) {
               reason,
               medicalCertificate,
               supervisorName,
+              supervisorEmpID,
               supervisorStatus,
               supervisorDate: value,
               supervisorRemarks,
               managerName,
+              managerEmpID,
               managerStatus,
               managerDate,
               managerRemarks,
@@ -941,10 +1021,12 @@ export default function LeaveStatusUpdateForm(props) {
               reason,
               medicalCertificate,
               supervisorName,
+              supervisorEmpID,
               supervisorStatus,
               supervisorDate,
               supervisorRemarks: value,
               managerName,
+              managerEmpID,
               managerStatus,
               managerDate,
               managerRemarks,
@@ -985,10 +1067,12 @@ export default function LeaveStatusUpdateForm(props) {
               reason,
               medicalCertificate,
               supervisorName,
+              supervisorEmpID,
               supervisorStatus,
               supervisorDate,
               supervisorRemarks,
               managerName: value,
+              managerEmpID,
               managerStatus,
               managerDate,
               managerRemarks,
@@ -1010,6 +1094,50 @@ export default function LeaveStatusUpdateForm(props) {
         {...getOverrideProps(overrides, "managerName")}
       ></TextField>
       <TextField
+        label="Manager emp id"
+        isRequired={false}
+        isReadOnly={false}
+        value={managerEmpID}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              leaveType,
+              fromDate,
+              toDate,
+              days,
+              applyTo,
+              reason,
+              medicalCertificate,
+              supervisorName,
+              supervisorEmpID,
+              supervisorStatus,
+              supervisorDate,
+              supervisorRemarks,
+              managerName,
+              managerEmpID: value,
+              managerStatus,
+              managerDate,
+              managerRemarks,
+              empStatus,
+              empDate,
+              empRemarks,
+            };
+            const result = onChange(modelFields);
+            value = result?.managerEmpID ?? value;
+          }
+          if (errors.managerEmpID?.hasError) {
+            runValidationTasks("managerEmpID", value);
+          }
+          setManagerEmpID(value);
+        }}
+        onBlur={() => runValidationTasks("managerEmpID", managerEmpID)}
+        errorMessage={errors.managerEmpID?.errorMessage}
+        hasError={errors.managerEmpID?.hasError}
+        {...getOverrideProps(overrides, "managerEmpID")}
+      ></TextField>
+      <TextField
         label="Manager status"
         isRequired={false}
         isReadOnly={false}
@@ -1027,10 +1155,12 @@ export default function LeaveStatusUpdateForm(props) {
               reason,
               medicalCertificate,
               supervisorName,
+              supervisorEmpID,
               supervisorStatus,
               supervisorDate,
               supervisorRemarks,
               managerName,
+              managerEmpID,
               managerStatus: value,
               managerDate,
               managerRemarks,
@@ -1071,10 +1201,12 @@ export default function LeaveStatusUpdateForm(props) {
               reason,
               medicalCertificate,
               supervisorName,
+              supervisorEmpID,
               supervisorStatus,
               supervisorDate,
               supervisorRemarks,
               managerName,
+              managerEmpID,
               managerStatus,
               managerDate: value,
               managerRemarks,
@@ -1113,10 +1245,12 @@ export default function LeaveStatusUpdateForm(props) {
               reason,
               medicalCertificate,
               supervisorName,
+              supervisorEmpID,
               supervisorStatus,
               supervisorDate,
               supervisorRemarks,
               managerName,
+              managerEmpID,
               managerStatus,
               managerDate,
               managerRemarks: value,
@@ -1155,10 +1289,12 @@ export default function LeaveStatusUpdateForm(props) {
               reason,
               medicalCertificate,
               supervisorName,
+              supervisorEmpID,
               supervisorStatus,
               supervisorDate,
               supervisorRemarks,
               managerName,
+              managerEmpID,
               managerStatus,
               managerDate,
               managerRemarks,
@@ -1199,10 +1335,12 @@ export default function LeaveStatusUpdateForm(props) {
               reason,
               medicalCertificate,
               supervisorName,
+              supervisorEmpID,
               supervisorStatus,
               supervisorDate,
               supervisorRemarks,
               managerName,
+              managerEmpID,
               managerStatus,
               managerDate,
               managerRemarks,
@@ -1241,10 +1379,12 @@ export default function LeaveStatusUpdateForm(props) {
               reason,
               medicalCertificate,
               supervisorName,
+              supervisorEmpID,
               supervisorStatus,
               supervisorDate,
               supervisorRemarks,
               managerName,
+              managerEmpID,
               managerStatus,
               managerDate,
               managerRemarks,

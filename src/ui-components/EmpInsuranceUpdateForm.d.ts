@@ -26,8 +26,8 @@ export declare type EmpInsuranceUpdateFormInputValues = {
     groupIns?: string[];
     groupInsEffectDate?: string[];
     groupInsEndDate?: string[];
-    workmenComp?: string[];
-    workmePolicyNo?: string[];
+    empStatusType?: string;
+    workmenCompNo?: string;
     travelIns?: string[];
     accidentIns?: string[];
     empInsUpload?: string[];
@@ -37,8 +37,8 @@ export declare type EmpInsuranceUpdateFormValidationValues = {
     groupIns?: ValidationFunction<string>;
     groupInsEffectDate?: ValidationFunction<string>;
     groupInsEndDate?: ValidationFunction<string>;
-    workmenComp?: ValidationFunction<string>;
-    workmePolicyNo?: ValidationFunction<string>;
+    empStatusType?: ValidationFunction<string>;
+    workmenCompNo?: ValidationFunction<string>;
     travelIns?: ValidationFunction<string>;
     accidentIns?: ValidationFunction<string>;
     empInsUpload?: ValidationFunction<string>;
@@ -50,8 +50,8 @@ export declare type EmpInsuranceUpdateFormOverridesProps = {
     groupIns?: PrimitiveOverrideProps<TextFieldProps>;
     groupInsEffectDate?: PrimitiveOverrideProps<TextFieldProps>;
     groupInsEndDate?: PrimitiveOverrideProps<TextFieldProps>;
-    workmenComp?: PrimitiveOverrideProps<TextFieldProps>;
-    workmePolicyNo?: PrimitiveOverrideProps<TextFieldProps>;
+    empStatusType?: PrimitiveOverrideProps<TextFieldProps>;
+    workmenCompNo?: PrimitiveOverrideProps<TextFieldProps>;
     travelIns?: PrimitiveOverrideProps<TextFieldProps>;
     accidentIns?: PrimitiveOverrideProps<TextFieldProps>;
     empInsUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;

@@ -231,7 +231,7 @@ export default function EmpDepInsuranceUpdateForm(props) {
     React.useState("");
   const depInsuranceRef = React.createRef();
   const validations = {
-    empID: [{ type: "Required" }],
+    empID: [],
     depInsurance: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
@@ -260,7 +260,7 @@ export default function EmpDepInsuranceUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          empID,
+          empID: empID ?? null,
           depInsurance: depInsurance ?? null,
         };
         const validationResponses = await Promise.all(
@@ -315,7 +315,7 @@ export default function EmpDepInsuranceUpdateForm(props) {
     >
       <TextField
         label="Emp id"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={empID}
         onChange={(e) => {

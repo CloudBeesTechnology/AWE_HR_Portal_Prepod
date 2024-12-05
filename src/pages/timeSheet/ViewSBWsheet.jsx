@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
-import { createSBWSheet, updateSBWSheet } from "../../graphql/mutations";
+import {
+  createSBWSheet,
+  deleteSBWSheet,
+  updateSBWSheet,
+} from "../../graphql/mutations";
 import { SuccessMessage } from "./ModelForSuccessMess/SuccessMessage";
 import { generateClient } from "@aws-amplify/api";
 import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
@@ -8,7 +12,10 @@ import { PopupForMissMatchExcelSheet } from "./ModelForSuccessMess/PopupForMissM
 import { EditTimeSheet } from "./EditTimeSheet";
 import "../../../src/index.css";
 import { useScrollableView } from "./customTimeSheet/UseScrollableView";
-import { userTableMerged } from "./customTimeSheet/UserTableMerged";
+import { useTableMerged } from "./customTimeSheet/UserTableMerged";
+import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
+import { listSBWSheets } from "../../graphql/queries";
+import { PopupForAssignManager } from "./ModelForSuccessMess/PopupForAssignManager";
 const client = generateClient();
 export const ViewSBWsheet = ({
   excelData,
@@ -22,6 +29,7 @@ export const ViewSBWsheet = ({
   const [secondaryData, setSecondaryData] = useState(null);
   const [currentStatus, setCurrentStatus] = useState(null);
   const [editObject, setEditObject] = useState();
+  const [toggleAssignManager, setToggleAssignManager] = useState(false);
   const [toggleHandler, setToggleHandler] = useState(false);
 
   const [loading, setLoading] = useState(true);
@@ -34,18 +42,16 @@ export const ViewSBWsheet = ({
     data,
     Position
   );
-  const processedData = userTableMerged(excelData);
+  const processedData = useTableMerged(excelData);
 
   useEffect(() => {
     if (processedData && processedData.length > 0) {
-      console.log(processedData);
       setData(processedData);
-      setSecondaryData(processedData)
+      setSecondaryData(processedData);
     }
   }, [processedData]);
 
   const searchResult = async (searchedData) => {
-    console.log(searchedData);
     try {
       const result = await searchedData;
       setData(result);
@@ -54,30 +60,31 @@ export const ViewSBWsheet = ({
     }
   };
 
-  useEffect(() => {
-    if (excelData) {
-      const fetchData = async () => {
-        // setLoading(true);
-        try {
-          const dataPromise = new Promise((resolve, reject) => {
-            if (excelData) {
-              resolve(excelData);
-            } else {
-              setTimeout(() => {
-                reject("No data found after waiting.");
-              }, 5000);
-            }
-          });
+  // useEffect(() => {
+  //   if (excelData) {
+  //     const fetchData = async () => {
+  //       // setLoading(true);
+  //       try {
+  //         const dataPromise = new Promise((resolve, reject) => {
+  //           if (excelData) {
+  //             resolve(excelData);
+  //           } else {
+  //             setTimeout(() => {
+  //               reject("No data found after waiting.");
+  //             }, 5000);
+  //           }
+  //         });
 
-          const fetchedData = await dataPromise;
+  //         const fetchedData = await dataPromise;
 
-          // setForUpdateBlng(fetchedData);
-          setData(fetchedData);
-        } catch (err) {}
-      };
-      fetchData();
-    }
-  }, [excelData]);
+  //         // setForUpdateBlng(fetchedData);
+  //         setData(fetchedData);
+  //         setSecondaryData(fetchedData);
+  //       } catch (err) {}
+  //     };
+  //     fetchData();
+  //   }
+  // }, [excelData]);
   // const cleanValue = (value) => {
   //   if (typeof value !== "string") {
   //     return value; // Return value if not a string (e.g., number, object)
@@ -122,6 +129,7 @@ export const ViewSBWsheet = ({
                 jobLocaWhrs: val.jobLocaWhrs || [],
                 REMARKS: val.remarks || "",
                 status: val.status || "",
+                managerData: val?.managerData,
               };
             }),
           };
@@ -282,7 +290,6 @@ export const ViewSBWsheet = ({
       // Usage
       const result = await checkedKeys();
 
-      console.log("Result: ", result);
       setCurrentStatus(result); // Assuming setCurrentStatus is defined
       setShowStatusCol(result);
       // setLoading(false);
@@ -322,12 +329,11 @@ export const ViewSBWsheet = ({
               };
             })
             .filter((item) => item.data && item.data.length > 0);
-          //   const filterPending =
-          // console.log(filterPending);
-          //   console.log(fetchedData);
+
           console.log(filterPending);
           if (userIdentification === "Manager") {
-            pendingData(filterPending);
+            const finalData = await SendDataToManager(filterPending);
+            pendingData(finalData);
           }
         } catch (err) {
         } finally {
@@ -351,7 +357,9 @@ export const ViewSBWsheet = ({
   const toggleSFAMessage = (value) => {
     setSuccessMess(value);
   };
-
+  const toggleFunctionForAssiMana = () => {
+    setToggleAssignManager(!toggleAssignManager);
+  };
   const editNestedData = (data, getObject) => {
     return data.map((m) => ({
       id: m.id,
@@ -382,7 +390,7 @@ export const ViewSBWsheet = ({
     const result = Array.isArray(data[0]?.data)
       ? editNestedData(data, getObject)
       : editFlatData(data, getObject);
-    // console.log(result);
+
     setData(result);
   };
 
@@ -433,8 +441,8 @@ export const ViewSBWsheet = ({
   //   "REMARKS",
   // ];
   const AllFieldData = useTableFieldData(titleName);
-  const renameKeysFunctionAndSubmit = async () => {
-    if (userIdentification === "TimeKeeper") {
+  const renameKeysFunctionAndSubmit = async (managerData) => {
+    if (userIdentification !== "Manager") {
       const result =
         data &&
         data.map((val) => {
@@ -456,11 +464,17 @@ export const ViewSBWsheet = ({
             remarks: val.REMARKS || "",
           };
         });
-      console.log(result);
+
+      const mergeData = [...result];
+      mergeData.unshift(managerData);
+
+      const finalResult = result.map((val) => {
+        return { ...val, managerData };
+      });
       //   CREATE
       const currentDate = new Date().toLocaleDateString();
       const DailySheet = {
-        dailySheet: JSON.stringify(result),
+        dailySheet: JSON.stringify(finalResult),
         status: "Pending",
         date: currentDate,
       };
@@ -474,13 +488,15 @@ export const ViewSBWsheet = ({
             },
           })
           .then((res) => {
-            console.log(res);
             if (res.data.createSBWSheet) {
+              console.log(
+                "res.data.createSBWSheet : ",
+                res.data.createSBWSheet
+              );
               toggleSFAMessage(true);
             }
           })
           .catch((err) => {
-            console.log(err);
             toggleSFAMessage(false);
           });
       }
@@ -525,7 +541,7 @@ export const ViewSBWsheet = ({
           dailySheet: JSON.stringify(obj.dailySheet),
           status: "Approved",
         };
-        console.log(finalData);
+
         if (finalData.dailySheet) {
           // console.log("Work");
           await client
@@ -536,15 +552,17 @@ export const ViewSBWsheet = ({
               },
             })
             .then((res) => {
-              console.log(res);
               if (res.data.updateSBWSheet) {
+                console.log(
+                  "res.data.updateSBWSheet : ",
+                  res.data.updateSBWSheet
+                );
                 toggleSFAMessage(true);
                 setVisibleData([]);
                 // setData(null);
               }
             })
             .catch((err) => {
-              console.log(err);
               toggleSFAMessage(false);
             });
         }
@@ -556,7 +574,7 @@ export const ViewSBWsheet = ({
       <div>
         {currentStatus === true ? (
           <div>
-            <div className="flex justify-end mr-7">
+            <div className="flex justify-end w-full mr-7">
               <SearchBoxForTimeSheet
                 allEmpDetails={data}
                 searchResult={searchResult}
@@ -718,12 +736,47 @@ export const ViewSBWsheet = ({
                   userIdentification === "Manager" ? "w-40" : "w-52"
                 } bg-[#FEF116] text_size_5 text-dark_grey mb-10`}
                 onClick={() => {
-                  renameKeysFunctionAndSubmit();
+                  // const fetchData = async () => {
+                  //   // Fetch the BLNG data using GraphQL
+                  //   const [fetchBLNGdata] = await Promise.all([
+                  //     client.graphql({
+                  //       query: listSBWSheets,
+                  //     }),
+                  //   ]);
+                  //   const BLNGdata = fetchBLNGdata?.data?.listSBWSheets?.items;
+                  //   console.log("BLNGdata : ", BLNGdata);
+                  //   const deleteFunction =
+                  //     BLNGdata &&
+                  //     BLNGdata.map(async (m) => {
+                  //       const dailySheet = {
+                  //         id: m.id,
+                  //       };
+                  //       await client
+                  //         .graphql({
+                  //           query: deleteSBWSheet,
+                  //           variables: {
+                  //             input: dailySheet,
+                  //           },
+                  //         })
+                  //         .then((res) => {
+                  //           console.log(res);
+                  //         })
+                  //         .catch((err) => {
+                  //           console.log(err);
+                  //         });
+                  //     });
+                  // };
+                  // fetchData();
+                  if (userIdentification !== "Manager") {
+                    toggleFunctionForAssiMana();
+                  } else if (userIdentification === "Manager") {
+                    renameKeysFunctionAndSubmit();
+                  }
                 }}
               >
                 {userIdentification === "Manager"
                   ? "Approve"
-                  : "Send For Approval"}
+                  : "Assign Manager"}
               </button>
             </div>
           </div>
@@ -751,6 +804,12 @@ export const ViewSBWsheet = ({
         setExcelData={setExcelData}
         userIdentification={userIdentification}
       />
+      {toggleAssignManager === true && (
+        <PopupForAssignManager
+          toggleFunctionForAssiMana={toggleFunctionForAssiMana}
+          renameKeysFunctionAndSubmit={renameKeysFunctionAndSubmit}
+        />
+      )}
     </div>
   );
 };

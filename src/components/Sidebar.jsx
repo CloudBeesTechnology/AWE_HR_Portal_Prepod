@@ -3,6 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import {
   DashboardIcons,
   EmployeeIcons,
+  InsuranceIcons,
   LeaveIcons,
   LogoutIcons,
   NotificationIcons,
@@ -18,6 +19,7 @@ import { generateClient } from "@aws-amplify/api";
 import { listUsers } from "../graphql/queries";
 import {
   EmployeePaths,
+  InsurancePaths,
   RecruitmentPaths,
   ReportPaths,
   TimePaths,
@@ -88,6 +90,7 @@ const Sidebar = () => {
     "User",
     "Recruitment",
     "Employee",
+    "Insurance",
     "Training",
     "TimeSheet",
     "LeaveManagement",
@@ -186,6 +189,29 @@ const Sidebar = () => {
                     )}
                   </span>
                   Employee
+                </NavLink>
+              )}
+
+
+              {category === "Insurance" && (
+                <NavLink
+                  to="/insuranceHr"
+                  className={() =>
+                    `flex items-center gap-3 py-2 pl-1  rounded-lg ${
+                      isAnyActive(InsurancePaths)
+                        ? "bg-primary text-secondary"
+                        : ""
+                    }`
+                  }
+                >
+                  <span>
+                    {isAnyActive(InsurancePaths) ? (
+                      <InsuranceIcons color="#303030" />
+                    ) : (
+                      <InsuranceIcons color="white" />
+                    )}
+                  </span>
+                  Insurance
                 </NavLink>
               )}
 
@@ -310,27 +336,6 @@ const Sidebar = () => {
             </div>
           );
         })}
-        {/* <div className="pb-10">
-          <NavLink
-            // to="/logout"
-            // className={({ isActive }) =>
-            //   `flex items-center gap-3 py-2 pl-1  rounded-lg ${
-            //     isActive ? "bg-primary text-secondary" : ""
-            //   }`
-            // }
-            className={`flex items-center gap-3 py-2 pl-1  rounded-lg `}
-            onClick={SignOut}
-          >
-            <span>
-              {location.pathname === "/logout" ? (
-                <LogoutIcons color="#303030" />
-              ) : (
-                <LogoutIcons color="white" />
-              )}
-            </span>
-            Logout
-          </NavLink>
-        </div> */}
       </section>
     </aside>
   );

@@ -68,7 +68,22 @@ export const ContractTypeDD = [
   { value: "LPA", label: "LPA" },
   { value: "SAWP", label: "SAWP" },
 ];
+export const RelationshipDD = [
+  { value: "Single", label: "Single" },
+  { value: "Employee & Spouse", label: "Employee & Spouse" },
+  { value: "Employee, Spouse & Children (max 2 pax below age 18)", label: "Employee, Spouse & Children (max 2 pax below age 18)" },
+];
+export const WorkStatusDD = [
+  { value: "Probationary", label: "Probationary" },
+  { value: "Active", label: "Active" },
+  { value: "Resignation", label: "Resignation" },
+  { value: "Termination", label: "Termination" },
+];
 
+export const SalaryPayDD = [
+  { value: "Monthly", label: "Monthly" },
+  { value: "Daily", label: "Daily" },
+];
 export const EmpTypeDD = [
   { value: "Onshore", label: "OnShore" },
   { value: "Offshore", label: "OffShore" },
@@ -126,6 +141,13 @@ export const uploadFields = [
 export const LabourTypeDD = [
   { value: "own", label: "Own" },
   { value: "company", label: "Company" },
+];
+
+
+export const leavePassDD = [
+  { value: "Employee alone", label: "Employee alone" },
+  { value: "Employee & Spouse", label: "Employee & Spouse" },
+  { value: "Employee, Spouse & Children (max 2 pax below age 18)", label: "Employee, Spouse & Children (max 2 pax below age 18)" },
 ];
 
 export const DepartmentDD = [

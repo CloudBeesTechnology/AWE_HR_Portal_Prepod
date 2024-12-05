@@ -1,7 +1,6 @@
-import React, { useContext, useState, useRef, useEffect } from "react";
-
+import React, { useState, useRef, useEffect } from "react";
 import { ReviewForm } from "../pages/recruitments/ReviewForm";
-import { LuFileEdit } from "react-icons/lu";
+import { RiFileEditLine } from "react-icons/ri";
 
 export const Table = ({
   columns,
@@ -121,7 +120,6 @@ export const Table = ({
       <div className="text-center text-grey py-10">No data available.</div>
     );
 
-  // console.log("Donut", data);
 
   return (
     <div className="overflow-x-auto rounded-lg" ref={tableRef}>
@@ -199,7 +197,7 @@ export const Table = ({
                 currentPage === "workpasstracking") &&
                 showEditIcon && (
                   <td className="px-4 py-4 text-[#835c1d]">
-                    <LuFileEdit
+                    <RiFileEditLine
                       className="text-2xl cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation(); // Prevent triggering row click

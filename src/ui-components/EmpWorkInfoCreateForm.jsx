@@ -395,30 +395,30 @@ export default function EmpWorkInfoCreateForm(props) {
     contractStart: [],
     contractEnd: [],
     contractPeriod: [],
-    doj: [{ type: "Required" }],
-    department: [{ type: "Required" }],
+    doj: [],
+    department: [],
     hr: [],
-    jobCat: [{ type: "Required" }],
-    jobDesc: [{ type: "Required" }],
-    manager: [{ type: "Required" }],
+    jobCat: [],
+    jobDesc: [],
+    manager: [],
     otherJobCat: [],
     otherDepartment: [],
     otherPosition: [],
     probationStart: [],
     probationEnd: [],
     probDuration: [],
-    position: [{ type: "Required" }],
-    relationship: [{ type: "Required" }],
+    position: [],
+    relationship: [],
     supervisor: [],
-    skillPool: [{ type: "Required" }],
-    salaryType: [{ type: "Required" }],
+    skillPool: [],
+    salaryType: [],
     sapNo: [],
     upgradeDate: [],
     upgradePosition: [],
-    workStatus: [{ type: "Required" }],
-    workHrs: [{ type: "Required" }],
-    workWeek: [{ type: "Required" }],
-    workMonth: [{ type: "Required" }],
+    workStatus: [],
+    workHrs: [],
+    workWeek: [],
+    workMonth: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -802,7 +802,7 @@ export default function EmpWorkInfoCreateForm(props) {
       </ArrayField>
       <TextField
         label="Doj"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={doj}
         onChange={(e) => {
@@ -905,7 +905,7 @@ export default function EmpWorkInfoCreateForm(props) {
       >
         <TextField
           label="Department"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentDepartmentValue}
           onChange={(e) => {
@@ -1051,7 +1051,7 @@ export default function EmpWorkInfoCreateForm(props) {
       >
         <TextField
           label="Job cat"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentJobCatValue}
           onChange={(e) => {
@@ -1123,7 +1123,7 @@ export default function EmpWorkInfoCreateForm(props) {
       >
         <TextField
           label="Job desc"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentJobDescValue}
           onChange={(e) => {
@@ -1195,7 +1195,7 @@ export default function EmpWorkInfoCreateForm(props) {
       >
         <TextField
           label="Manager"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentManagerValue}
           onChange={(e) => {
@@ -1714,7 +1714,7 @@ export default function EmpWorkInfoCreateForm(props) {
       >
         <TextField
           label="Position"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentPositionValue}
           onChange={(e) => {
@@ -1786,7 +1786,7 @@ export default function EmpWorkInfoCreateForm(props) {
       >
         <TextField
           label="Relationship"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentRelationshipValue}
           onChange={(e) => {
@@ -1882,7 +1882,7 @@ export default function EmpWorkInfoCreateForm(props) {
       </ArrayField>
       <TextField
         label="Skill pool"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={skillPool}
         onChange={(e) => {
@@ -1985,7 +1985,7 @@ export default function EmpWorkInfoCreateForm(props) {
       >
         <TextField
           label="Salary type"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentSalaryTypeValue}
           onChange={(e) => {
@@ -2261,7 +2261,7 @@ export default function EmpWorkInfoCreateForm(props) {
       >
         <TextField
           label="Work status"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentWorkStatusValue}
           onChange={(e) => {
@@ -2335,7 +2335,7 @@ export default function EmpWorkInfoCreateForm(props) {
       >
         <TextField
           label="Work hrs"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentWorkHrsValue}
           onChange={(e) => {
@@ -2407,7 +2407,7 @@ export default function EmpWorkInfoCreateForm(props) {
       >
         <TextField
           label="Work week"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentWorkWeekValue}
           onChange={(e) => {
@@ -2479,7 +2479,7 @@ export default function EmpWorkInfoCreateForm(props) {
       >
         <TextField
           label="Work month"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentWorkMonthValue}
           onChange={(e) => {

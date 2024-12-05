@@ -19,9 +19,11 @@ import {
   listEmpWorkInfos,
   listHeadOffices,
 } from "../../graphql/queries";
-import { userTableMerged } from "./customTimeSheet/UserTableMerged";
+import { useTableMerged } from "./customTimeSheet/UserTableMerged";
 import "../../../src/index.css";
 import { useScrollableView } from "./customTimeSheet/UseScrollableView";
+import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
+import { PopupForAssignManager } from "./ModelForSuccessMess/PopupForAssignManager";
 const client = generateClient();
 
 export const ViewHOsheet = ({
@@ -37,7 +39,7 @@ export const ViewHOsheet = ({
   const [editObject, setEditObject] = useState();
   const [toggleHandler, setToggleHandler] = useState(false);
   const [currentStatus, setCurrentStatus] = useState(null);
-
+  const [toggleAssignManager, setToggleAssignManager] = useState(false);
   const [loading, setLoading] = useState(true);
   const [userIdentification, setUserIdentification] = useState("");
   const [showStatusCol, setShowStatusCol] = useState(null);
@@ -176,12 +178,12 @@ export const ViewHOsheet = ({
     data,
     Position
   );
-  const processedData = userTableMerged(excelData);
-  console.log(Position);
+  const processedData = useTableMerged(excelData);
+
   useEffect(() => {
     if (processedData && processedData.length > 0) {
       setData(processedData);
-      setSecondaryData(processedData)
+      setSecondaryData(processedData);
     }
   }, [processedData]);
   useEffect(() => {
@@ -191,8 +193,6 @@ export const ViewHOsheet = ({
     } else if (getPosition === "TimeKeeper") {
       setUserIdentification("TimeKeeper");
     }
-
-    // console.log(getPosition);
   }, [convertedStringToArrayObj]);
   const pendingData = (data) => {
     if (data && data?.length > 0) {
@@ -229,13 +229,12 @@ export const ViewHOsheet = ({
                 jobLocaWhrs: val?.jobLocaWhrs || [],
                 REMARKS: val.remarks || "",
                 status: val.status || "",
+                managerData: val?.managerData,
               };
             }),
           };
         });
 
-      // console.log(result);
-      console.log(result);
       setData(result);
       setSecondaryData(result);
     }
@@ -245,13 +244,10 @@ export const ViewHOsheet = ({
   //   setData(result);
   // };
   const searchResult = async (searchedData) => {
-    console.log(searchedData);
     try {
       const result = await searchedData;
       setData(result);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
+    } catch (error) {}
   };
 
   const cleanValue = (value) => {
@@ -268,7 +264,7 @@ export const ViewHOsheet = ({
         for (const key in item) {
           cleanedItem[key] = cleanValue(item[key]); // Clean the value, not the key
         }
-        // console.log(cleanedItem);
+
         return cleanedItem;
       });
 
@@ -294,10 +290,7 @@ export const ViewHOsheet = ({
         "REMARKS",
       ];
 
-      // console.log(" requiredKeys : ", requiredKeys);
-      // console.log("returnedTHeader : ", cleanData);
       const result = await new Promise((resolve) => {
-        // Check if all required keys are in the object
         const keyCheckResult =
           cleanData &&
           cleanData.every((m) => {
@@ -313,7 +306,6 @@ export const ViewHOsheet = ({
         resolve(keyCheckResult);
       });
 
-      console.log("Result: ", result);
       setShowStatusCol(result);
       setCurrentStatus(result); // Assuming setCurrentStatus is defined
       setLoading(false);
@@ -353,12 +345,10 @@ export const ViewHOsheet = ({
               };
             })
             .filter((item) => item.data && item.data.length > 0);
-          //   const filterPending =
-          // console.log(filterPending);
-          //   console.log(fetchedData);
-          console.log(filterPending);
+
           if (userIdentification === "Manager") {
-            pendingData(filterPending);
+            const finalData = await SendDataToManager(filterPending);
+            pendingData(finalData);
           }
         } catch (err) {
         } finally {
@@ -385,7 +375,9 @@ export const ViewHOsheet = ({
   const toggleSFAMessage = (value) => {
     setSuccessMess(value);
   };
-
+  const toggleFunctionForAssiMana = () => {
+    setToggleAssignManager(!toggleAssignManager);
+  };
   const editNestedData = (data, getObject) => {
     return data.map((m) => ({
       id: m.id,
@@ -419,13 +411,13 @@ export const ViewHOsheet = ({
     const result = Array.isArray(data[0]?.data)
       ? editNestedData(data, getObject)
       : editFlatData(data, getObject);
-    // console.log(result);
+
     setData(result);
   };
 
   const AllfieldData = useTableFieldData(titleName);
 
-  const renameKeysFunctionAndSubmit = async () => {
+  const renameKeysFunctionAndSubmit = async (managerData) => {
     if (userIdentification !== "Manager") {
       const result =
         data &&
@@ -456,11 +448,17 @@ export const ViewHOsheet = ({
             remarks: val.REMARKS || "",
           };
         });
-      console.log(result);
+
+      const mergeData = [...result]; // Clone result to avoid mutation (optional)
+      mergeData.unshift(managerData);
+
+      const finalResult = result.map((val) => {
+        return { ...val, managerData };
+      });
       //   CREATE
       const currentDate = new Date().toLocaleDateString();
       const DailySheet = {
-        dailySheet: JSON.stringify(result),
+        dailySheet: JSON.stringify(finalResult),
         status: "Pending",
         date: currentDate,
       };
@@ -474,13 +472,15 @@ export const ViewHOsheet = ({
             },
           })
           .then((res) => {
-            console.log(res);
             if (res.data.createHeadOffice) {
+              console.log(
+                "res.data.createHeadOffice : ",
+                res.data.createHeadOffice
+              );
               toggleSFAMessage(true);
             }
           })
           .catch((err) => {
-            console.log(err);
             toggleSFAMessage(false);
           });
       }
@@ -580,6 +580,7 @@ export const ViewHOsheet = ({
                 totalActHrs: val.TOTALACTUALHOURS || 0,
                 jobLocaWhrs: val?.jobLocaWhrs || [],
                 remarks: val.REMARKS || "",
+                managerData: val?.managerData,
               };
             }),
           };
@@ -597,7 +598,7 @@ export const ViewHOsheet = ({
           dailySheet: JSON.stringify(obj.dailySheet),
           status: "Approved",
         };
-        console.log(finalData);
+
         if (finalData.dailySheet) {
           // console.log("Work");
           await client
@@ -608,15 +609,17 @@ export const ViewHOsheet = ({
               },
             })
             .then((res) => {
-              console.log(res);
               if (res.data.updateHeadOffice) {
+                console.log(
+                  "res.data.updateHeadOffice : ",
+                  res.data.updateHeadOffice
+                );
                 toggleSFAMessage(true);
                 setVisibleData([]);
                 // setData(null);
               }
             })
             .catch((err) => {
-              console.log(err);
               toggleSFAMessage(false);
             });
         }
@@ -628,7 +631,7 @@ export const ViewHOsheet = ({
       <div>
         {currentStatus === true ? (
           <div>
-            <div className="flex justify-end mr-7">
+            <div className="flex justify-end w-full mr-7">
               <SearchBoxForTimeSheet
                 allEmpDetails={data}
                 searchResult={searchResult}
@@ -798,69 +801,72 @@ export const ViewHOsheet = ({
                   userIdentification === "Manager" ? "w-40" : "w-52"
                 } bg-[#FEF116] text_size_5 text-dark_grey mb-10`}
                 onClick={() => {
-                  renameKeysFunctionAndSubmit();
+                  if (userIdentification !== "Manager") {
+                    toggleFunctionForAssiMana();
+                    // const fetchData = async () => {
+                    //   console.log("I am calling You");
+                    //   // Fetch the BLNG data using GraphQL
+                    //   const [fetchBLNGdata] = await Promise.all([
+                    //     client.graphql({
+                    //       query: listHeadOffices,
+                    //     }),
+                    //   ]);
+                    //   const BLNGdata =
+                    //     fetchBLNGdata?.data?.listHeadOffices?.items;
+                    //   console.log("BLNGdata : ", BLNGdata);
 
-                  // const fetchData = async () => {
-                  //   console.log("I am calling You");
-                  //   // Fetch the BLNG data using GraphQL
-                  //   const [fetchBLNGdata] = await Promise.all([
-                  //     client.graphql({
-                  //       query: listHeadOffices,
-                  //     }),
-                  //   ]);
-                  //   const BLNGdata =
-                  //     fetchBLNGdata?.data?.listHeadOffices?.items;
-                  //   console.log("BLNGdata : ", BLNGdata);
+                    //   const deleteFunction =
+                    //     BLNGdata &&
+                    //     BLNGdata.map(async (m) => {
+                    //       const dailySheet = {
+                    //         id: m.id,
+                    //       };
 
-                  //   const deleteFunction =
-                  //     BLNGdata &&
-                  //     BLNGdata.map(async (m) => {
-                  //       const dailySheet = {
-                  //         id: m.id,
-                  //       };
+                    //       await client
+                    //         .graphql({
+                    //           query: deleteHeadOffice,
+                    //           variables: {
+                    //             input: dailySheet,
+                    //           },
+                    //         })
+                    //         .then((res) => {
+                    //           console.log(res);
+                    //         })
+                    //         .catch((err) => {
+                    //           console.log(err);
+                    //         });
+                    //     });
+                    // };
+                    // fetchData();
+                    // FOR DELETE
+                    // const deleteFunction = async () => {
+                    //   const weaklysheet = {
+                    //     id: "3deaccb4-7b1e-43b3-aa94-fd7d4cf46f56",
+                    //   };
 
-                  //       await client
-                  //         .graphql({
-                  //           query: deleteHeadOffice,
-                  //           variables: {
-                  //             input: dailySheet,
-                  //           },
-                  //         })
-                  //         .then((res) => {
-                  //           console.log(res);
-                  //         })
-                  //         .catch((err) => {
-                  //           console.log(err);
-                  //         });
-                  //     });
-                  // };
-                  // fetchData();
-                  // FOR DELETE
-                  // const deleteFunction = async () => {
-                  //   const weaklysheet = {
-                  //     id: "3deaccb4-7b1e-43b3-aa94-fd7d4cf46f56",
-                  //   };
-
-                  //   await client
-                  //     .graphql({
-                  //       query: deleteHeadOffice,
-                  //       variables: {
-                  //         input: weaklysheet,
-                  //       },
-                  //     })
-                  //     .then((res) => {
-                  //       console.log(res);
-                  //     })
-                  //     .catch((err) => {
-                  //       console.log(err);
-                  //     });
-                  // };
-                  // deleteFunction();
+                    //   await client
+                    //     .graphql({
+                    //       query: deleteHeadOffice,
+                    //       variables: {
+                    //         input: weaklysheet,
+                    //       },
+                    //     })
+                    //     .then((res) => {
+                    //       console.log(res);
+                    //     })
+                    //     .catch((err) => {
+                    //       console.log(err);
+                    //     });
+                    // };
+                    // deleteFunction();
+                  } else if (userIdentification === "Manager") {
+                    renameKeysFunctionAndSubmit();
+                  }
                 }}
               >
                 {userIdentification === "Manager"
                   ? "Approve"
-                  : "Send For Approval"}
+                  : "Assign Manager"}
                 {/* Send for Approval */}
               </button>
             </div>
@@ -889,6 +895,12 @@ export const ViewHOsheet = ({
         setExcelData={setExcelData}
         userIdentification={userIdentification}
       />
+      {toggleAssignManager === true && (
+        <PopupForAssignManager
+          toggleFunctionForAssiMana={toggleFunctionForAssiMana}
+          renameKeysFunctionAndSubmit={renameKeysFunctionAndSubmit}
+        />
+      )}
       {/* {successMess === true && (
         <PopupForSFApproves
           toggleSFAMessage={toggleSFAMessage}
@@ -986,7 +998,7 @@ export const ViewHOsheet = ({
 //         resolve(keyCheckResult);
 //       });
 
-//       console.log("Result: ", result);
+//
 //       setCurrentStatus(result); // Assuming setCurrentStatus is defined
 //       setLoading(false);
 //     };

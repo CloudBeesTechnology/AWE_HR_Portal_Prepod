@@ -213,9 +213,9 @@ export default function AddCourseCreateForm(props) {
   const [currentCompanyValue, setCurrentCompanyValue] = React.useState("");
   const companyRef = React.createRef();
   const validations = {
-    courseSelect: [{ type: "Required" }],
-    courseName: [{ type: "Required" }],
-    company: [{ type: "Required" }],
+    courseSelect: [],
+    courseName: [],
+    company: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -301,7 +301,7 @@ export default function AddCourseCreateForm(props) {
     >
       <TextField
         label="Course select"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={courseSelect}
         onChange={(e) => {
@@ -354,7 +354,7 @@ export default function AddCourseCreateForm(props) {
       >
         <TextField
           label="Course name"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentCourseNameValue}
           onChange={(e) => {
@@ -403,7 +403,7 @@ export default function AddCourseCreateForm(props) {
       >
         <TextField
           label="Company"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentCompanyValue}
           onChange={(e) => {

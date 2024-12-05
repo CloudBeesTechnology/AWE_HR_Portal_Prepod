@@ -126,7 +126,7 @@ export const VTimeSheetTable = ({
   AllFieldData,
   categoryFilter,
   data,
-  // loading,
+  handleScroll,
 }) => {
   const [loading, setLoading] = useState(true);
   const [tableData, setTableData] = useState(null);
@@ -137,10 +137,6 @@ export const VTimeSheetTable = ({
       }, 5000);
     }
   }, [data]);
-  const useDownloadFunc = (res) => {
-    console.log(res);
-    setTableData(res);
-  };
 
   return (
     <section>
@@ -152,7 +148,7 @@ export const VTimeSheetTable = ({
         {loading && <p>Please wait few seconds...</p>}
       </article>
 
-      <div className="table-container">
+      <div className="table-container" onScroll={handleScroll}>
         {/* <div className="mt-9  max-h-[500px] table-wrp block overflow-x-scroll border-2 border-lite_grey"> */}
         {/* w-[1190px] */}
         {/* <table className="styled-table text-center w-full rounded-md overflow-hidden shadow-md overflow-y-auto"> */}
@@ -179,35 +175,35 @@ export const VTimeSheetTable = ({
             <BlngTBody
               data={data}
               loading={loading}
-              useDownloadFunc={useDownloadFunc}
+              setTableData={setTableData}
             />
           )}
           {categoryFilter === "HO" && (
             <HoTBody
               data={data}
               loading={loading}
-              useDownloadFunc={useDownloadFunc}
+              setTableData={setTableData}
             />
           )}
           {categoryFilter === "SBW" && (
             <SbwTBody
               data={data}
               loading={loading}
-              useDownloadFunc={useDownloadFunc}
+              setTableData={setTableData}
             />
           )}
           {categoryFilter === "ORMC" && (
             <OrmcTBody
               data={data}
               loading={loading}
-              useDownloadFunc={useDownloadFunc}
+              setTableData={setTableData}
             />
           )}
           {categoryFilter === "Offshore" && (
             <OffshoreTBody
               data={data}
               loading={loading}
-              useDownloadFunc={useDownloadFunc}
+              setTableData={setTableData}
             />
           )}
         </table>

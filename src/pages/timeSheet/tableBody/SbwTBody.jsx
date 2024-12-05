@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-export const SbwTBody = ({ data, loading, useDownloadFunc }) => {
+export const SbwTBody = ({ data, loading, setTableData }) => {
   useEffect(() => {
     if (loading === false) {
       const rows = document.querySelectorAll("tbody tr");
@@ -9,11 +9,21 @@ export const SbwTBody = ({ data, loading, useDownloadFunc }) => {
         return Array.from(cells).map((cell) => cell.innerText);
       });
 
-      setTimeout(() => {
-        useDownloadFunc(tableData);
-      }, 1000);
+      const handleDown = () => {
+        setTimeout(() => {
+          if (tableData) {
+            setTableData(tableData);
+          }
+        }, 1000);
+      };
+      handleDown();
     }
   }, [loading, data]);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     DownloadFunc(tableData);
+  //   }, 1000);
+  // }, []);
   return (
     <tbody>
       {loading === false && data && data?.length > 0
@@ -21,10 +31,10 @@ export const SbwTBody = ({ data, loading, useDownloadFunc }) => {
             const renderRows = (m, ind) => {
               return (
                 <tr
-                  key={ind}
+                  key={index}
                   className="text-dark_grey h-[53px] bg-white text-sm rounded-sm shadow-md text-start border-b-2 border-[#CECECE]"
                 >
-                  <td className="text-start px-4 flex-1">{ind + 1}</td>
+                  <td className="text-start px-4 flex-1">{index + 1}</td>
                   <td className="text-start px-4 flex-1">{m.name}</td>
                   <td className="text-center px-4 flex-1">{m.deptDiv}</td>
                   <td className="text-center px-4 flex-1">{m.badge}</td>
@@ -51,7 +61,7 @@ export const SbwTBody = ({ data, loading, useDownloadFunc }) => {
                 </tr>
               );
             };
-            return value.data.map(renderRows);
+            return renderRows(value);
           })
         : (
             <tr>

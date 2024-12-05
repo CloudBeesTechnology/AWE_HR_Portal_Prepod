@@ -14,7 +14,7 @@ export const AddCFUpdate = () => {
         courseName:AddCFUpp.courseName,
         company:AddCFUpp.company,
     };
-    // console.log(totalData);
+    console.log(totalData);
 
     try {
       const storedData=   await Promise.all([
@@ -25,12 +25,13 @@ export const AddCFUpdate = () => {
              },
            })
          ])
-        //  console.log(storedData,"successfully Updated data");
+         console.log(storedData,"successfully Updated data");
 
        } catch (error) {
         console.log(error);
         
-    
+         console.error("Error executing GraphQL requests:", error);
+         throw error; // Rethrow error if needed
        }
   }, []);
   return { AddCUpdateFun };

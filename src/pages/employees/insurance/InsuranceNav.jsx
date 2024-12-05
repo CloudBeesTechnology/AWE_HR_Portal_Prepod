@@ -13,11 +13,12 @@ export const InsuranceNav = () => {
     IDData,
     depInsuranceData,
   } = useContext(DataSupply);
-// console.log(depInsuranceData);
+  // console.log(depInsuranceData);
 
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [activeNavTab, setActiveNavTab] = useState("employeeInsurances");
   const [searchResultData, setSearchResultData] = useState([]);
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -31,32 +32,36 @@ export const InsuranceNav = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const mergedData = empPIData.map((emp) => {
+        const mergedDataEmpInsu = empPIData.map((emp) => {
           const EIDetails = EmpInsuranceData
             ? EmpInsuranceData.find((user) => user.empID === emp.empID)
             : {};
-          const WIDetails = workInfoData.find(
-            (work) => work.empID === emp.empID
-          ) || {};
-          const IDDetails = IDData.find((value) => value.empID === emp.empID) || {};
-  
+          const WIDetails = workInfoData
+            ? workInfoData.find((work) => work.empID === emp.empID)
+            : {};
+          const IDDetails = IDData
+            ? IDData.find((value) => value.empID === emp.empID)
+            : {};
+          const DIDetails = depInsuranceData
+            ? depInsuranceData.find((user) => user.empID === emp.empID)
+            : {};
           return {
             ...emp,
             ...EIDetails,
             ...WIDetails,
             ...IDDetails,
+            ...DIDetails,
           };
         });
-  
-        setAllEmpDetails(mergedData);
+
+        setAllEmpDetails(mergedDataEmpInsu);
       } catch (err) {
         console.log(err);
       }
     };
-  
+
     fetchData();
   }, [empPIData, EmpInsuranceData, workInfoData, IDData]);
-  
 
   const handleNext = () => {
     switch (activeNavTab) {
@@ -91,11 +96,18 @@ export const InsuranceNav = () => {
   }, [location]);
 
   const searchResult = (result) => {
+    console.log(result);
+
     setSearchResultData(result);
   };
 
   return (
-    <section className="w-full bg-[#F5F6F1]">
+    <section
+      className="w-full bg-[#F5F6F1]"
+      onClick={() => {
+        setFilteredEmployees([]);
+      }}
+    >
       <div className="relative mx-auto p-10 h-full">
         <div className="w-full flex items-center justify-between gap-5">
           <Link to="/employee" className="text-xl flex-1 text-grey">
@@ -112,14 +124,18 @@ export const InsuranceNav = () => {
                 searchIcon2={<IoSearch />}
                 placeholder="Employee Id"
                 rounded="rounded-lg"
+                filteredEmployees={filteredEmployees}
+                setFilteredEmployees={setFilteredEmployees}
               />
             ) : (
               <SearchDisplay
                 searchResult={searchResult}
-                newFormData={depInsuranceData}
+                newFormData={allEmpDetails}
                 searchIcon2={<IoSearch />}
                 placeholder="Employee Id"
                 rounded="rounded-lg"
+                filteredEmployees={filteredEmployees}
+                setFilteredEmployees={setFilteredEmployees}
               />
             )}
           </div>

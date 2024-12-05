@@ -1,5 +1,5 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import React, { useContext, useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FaArrowLeft } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -31,6 +31,12 @@ import { UpdateEmpInfo } from "../../../services/updateMethod/UpdateEmpInfo";
 import { getUrl } from "@aws-amplify/storage";
 
 export const EmployeeInfo = () => {
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, []);
   const { SubmitEIData, errorEmpID } = EmpInfoFunc();
   const { UpdateEIValue } = UpdateEmpInfo();
   const { empPIData, IDData } = useContext(DataSupply);
@@ -39,6 +45,8 @@ export const EmployeeInfo = () => {
   const [selectedNationality, setSelectedNationality] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedRace, setSelectedRace] = useState("");
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
+
   const [notification, setNotification] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState({
     bwnUpload: [],
@@ -148,7 +156,6 @@ export const EmployeeInfo = () => {
 
     if (selectedFile) {
       await uploadDocs(selectedFile, type, setUploadedDocs, watchedEmpID);
-
       setUploadedFileNames((prev) => ({
         ...prev,
         [type]: selectedFile.name, // Dynamically store file name
@@ -190,18 +197,16 @@ export const EmployeeInfo = () => {
 
   useEffect(() => {
     if (
-      (uploadedDocs?.profilePhoto && uploadedDocs.profilePhoto.length > 0) ||
+      uploadedDocs?.profilePhoto ||
       (uploadedDocs?.inducBriefUp && uploadedDocs.inducBriefUp.length > 0)
     ) {
-      if (uploadedDocs.profilePhoto && uploadedDocs.profilePhoto.length > 0) {
-        const lastUploadProf =
-          uploadedDocs.profilePhoto[uploadedDocs.profilePhoto.length - 1]
-            .upload;
-
-        const linkToStorageFile = async (pathUrl) => {
+      if (uploadedDocs.profilePhoto) {
+        const lastUploadProf = uploadedDocs.profilePhoto;
+        const linkToStorageFile = async (url) => {
           const result = await getUrl({
-            path: pathUrl,
+            path: url,
           });
+
           return setPPLastUP(result.url.toString());
         };
         linkToStorageFile(lastUploadProf);
@@ -230,7 +235,7 @@ export const EmployeeInfo = () => {
   };
 
   const searchResult = (result) => {
-    // console.log(result);
+    console.log(result);
 
     const keysToSet = [
       "empID",
@@ -311,51 +316,23 @@ export const EmployeeInfo = () => {
     setValue("profilePhoto", result?.profilePhoto?.toString());
     setValue("inducBriefUp", result?.inducBriefUp?.toString());
     setUploadedDocs((prev) => ({
-      ...prev,
       profilePhoto: result.profilePhoto,
       inducBriefUp: result.inducBriefUp,
     }));
     const profilePhotoString = result?.profilePhoto;
-    let fixedProfilePhotoString = profilePhotoString?.replace(/=/g, ":");
-    fixedProfilePhotoString = fixedProfilePhotoString?.replace(
-      /(\w+)(?=:)/g,
-      '"$1"'
-    ); // Wrap keys in double quotes
-    fixedProfilePhotoString = fixedProfilePhotoString?.replace(
-      /(?<=:)([^,}\]]+)(?=[,\}\]])/g,
-      '"$1"'
-    ); // Wrap string values in double quotes
-    if (!fixedProfilePhotoString?.startsWith("[")) {
-      fixedProfilePhotoString = `[${fixedProfilePhotoString}]`;
-    }
-
-    let profilePhotoArray = [];
-    try {
-      profilePhotoArray = JSON.parse(fixedProfilePhotoString); // Parse the corrected string
-    } catch (error) {
-      console.error("Failed to parse JSON:", error);
-    }
-
-    // Step 5: Access the last upload value (if available)
-    const lastUpload =
-      profilePhotoArray?.[profilePhotoArray.length - 1]?.upload;
 
     const linkToStorageFile = async (pathUrl) => {
       try {
-        getUrl({
+        const result = await getUrl({
           path: pathUrl,
-        })
-          .then((response) => {
-            return setPPLastUP(response.url.toString());
-          })
-          .catch((e) => {
-            console.log(e, "errors showing");
-          });
+        });
+
+        return setPPLastUP(result.url.toString());
       } catch (err) {
         console.log(err, "errors");
       }
     };
-    linkToStorageFile(lastUpload);
+    linkToStorageFile(profilePhotoString);
 
     const uploadFields = [
       "bwnUpload",
@@ -404,6 +381,8 @@ export const EmployeeInfo = () => {
     const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
     return fileName;
   };
+  console.log(uploadedDocs.profilePhoto);
+  console.log(uploadedDocs.inducBriefUp,"induc");
 
   const onSubmit = async (data) => {
     data.contractType = contractTypes;
@@ -461,7 +440,7 @@ export const EmployeeInfo = () => {
           PITableID: checkingPITable.id,
           IDTable: checkingIDTable.id,
         };
-        // console.log("AZQ", collectValue);
+        console.log("AZQ Update", collectValue);
 
         await UpdateEIValue({ collectValue });
         setShowTitle("Employee Personal Info updated successfully");
@@ -490,7 +469,7 @@ export const EmployeeInfo = () => {
           supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
           familyDetails: JSON.stringify(data.familyDetails),
         };
-        // console.log("AZ", empValue);
+        console.log("AZ", empValue);
         await SubmitEIData({ empValue });
         setShowTitle("Employee Personal Info saved successfully");
         setNotification(true);
@@ -499,20 +478,25 @@ export const EmployeeInfo = () => {
       console.log(error);
     }
   };
+  console.log(uploadedDocs.profilePhoto);
 
   const watchedProfilePhoto = watch("profilePhoto" || "");
   const watchInducBriefUpload = watch("inducBriefUp" || "");
 
-
   return (
-    <section className="bg-[#F5F6F1CC] mx-auto p-10">
+    <section
+      className="bg-[#F5F6F1CC] mx-auto p-10"
+      onClick={() => {
+        setFilteredEmployees([]);
+      }}
+    >
       <div className="w-full flex items-center justify-between gap-5">
         <Link to="/employee" className="text-xl flex-1 text-grey">
           <FaArrowLeft />
         </Link>
-        <p className="flex-1 text-center mt-2 text_size_2 uppercase">
+        <h5 className="flex-1 text-center mt-2 text_size_2 uppercase">
           Employee Info
-        </p>
+        </h5>
         <div className="flex-1">
           <SearchDisplay
             searchResult={searchResult}
@@ -520,6 +504,8 @@ export const EmployeeInfo = () => {
             searchIcon2={<IoSearch />}
             placeholder="Employee Id"
             rounded="rounded-lg"
+            filteredEmployees={filteredEmployees}
+            setFilteredEmployees={setFilteredEmployees}
           />
         </div>
       </div>
@@ -539,7 +525,6 @@ export const EmployeeInfo = () => {
               accept=".jpg,.jpeg,.png"
               onChange={(e) => {
                 handleFileUpload(e, "profilePhoto");
-                console.log(e.target.value);
               }}
               className="hidden"
             />
@@ -658,8 +643,8 @@ export const EmployeeInfo = () => {
           <RowTwelve register={register} errors={errors} />
 
           <div>
-            <h2 className="text_size_5 mb-2">Upload</h2>
-            <label className="flex items-center px-3 py-2 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer">
+            <h2 className="text_size_5 mb-2">Upload Induction Form</h2>
+            <label className="flex items-center px-3 py-2 p-2.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer">
               <input
                 type="file"
                 {...register("inducBriefUp")}
@@ -667,7 +652,7 @@ export const EmployeeInfo = () => {
                 className="hidden"
                 accept=".pdf, .jpg, .jpeg, .png"
               />
-              <span className="ml-2 flex p-1 gap-10">
+              <span className="ml-2 flex p-1 text-grey gap-10">
                 <GoUpload /> Induction Form
               </span>
             </label>

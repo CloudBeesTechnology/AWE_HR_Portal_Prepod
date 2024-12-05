@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-export const BlngTBody = ({ data, loading, useDownloadFunc }) => {
+export const BlngTBody = ({ data, loading, setTableData }) => {
   useEffect(() => {
     if (loading === false) {
       const rows = document.querySelectorAll("tbody tr");
@@ -8,12 +8,17 @@ export const BlngTBody = ({ data, loading, useDownloadFunc }) => {
         const cells = row.querySelectorAll("td");
         return Array.from(cells).map((cell) => cell.innerText);
       });
-
-      setTimeout(() => {
-        useDownloadFunc(tableData);
-      }, 1000);
+      const handleDown = () => {
+        setTimeout(() => {
+          if (tableData) {
+            setTableData(tableData);
+          }
+        }, 1000);
+      };
+      handleDown();
     }
   }, [loading, data]);
+
   return (
     <tbody className="">
       {loading === false && data && data?.length > 0
@@ -21,10 +26,10 @@ export const BlngTBody = ({ data, loading, useDownloadFunc }) => {
             const renderRows = (rowData, ind) => {
               return (
                 <tr
-                  key={ind}
+                  key={index}
                   className="text-dark_grey h-[53px] bg-white text-sm rounded-sm shadow-md text-start border-b-2 border-[#CECECE]"
                 >
-                  <td className="text-start px-4 flex-1">{ind + 1}</td>
+                  <td className="text-start px-4 flex-1">{index + 1}</td>
                   <td className="text-start px-4 flex-1">{rowData.fid}</td>
                   <td className="text-center px-4 flex-1">{rowData.name}</td>
                   <td className="text-center px-4 flex-1">{rowData.entDate}</td>
@@ -62,7 +67,7 @@ export const BlngTBody = ({ data, loading, useDownloadFunc }) => {
               );
             };
 
-            return value.data.map(renderRows);
+            return renderRows(value);
           })
         : (
             <tr>
@@ -91,7 +96,7 @@ export const BlngTBody = ({ data, loading, useDownloadFunc }) => {
 // import { useEffect } from "react";
 
 // export const BlngTBody = ({ data, loading, useDownloadFunc }) => {
-//   console.log("loading : ", loading);
+
 //   useEffect(() => {
 //     if (loading === false) {
 //       const rows = document.querySelectorAll("tbody tr");

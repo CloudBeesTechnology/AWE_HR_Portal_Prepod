@@ -1,5 +1,3 @@
-
-// export default DataStoredContext;
 import { generateClient } from "@aws-amplify/api";
 import { createContext, useEffect, useState } from "react";
 import {
@@ -21,8 +19,10 @@ import {
   listTerminationInfos,
   listUsers,
   listSawpDetails,
-  listInterviewScheduleSchemas,
   listAddCourses,
+  listInterviewSchedules,
+  listInsClaims,
+  listWorkMen,
 } from "../graphql/queries";
 
 export const DataSupply = createContext();
@@ -36,7 +36,7 @@ const DataStoredContext = ({ children }) => {
     empLeaveStatusData: [],
     empPDData: [],
     IDData: [],
-    workInfoData: [],
+    workInfoData: [],   
     terminateData: [],
     leaveDetailsData: [],
     SRData: [],
@@ -51,6 +51,8 @@ const DataStoredContext = ({ children }) => {
     SawpDetails: [],
     IVSSDetails: [],
     AddCourseDetails: [],
+    insuranceClaimsData:[],
+    workMenDetails:[],
   });
 
   useEffect(() => {
@@ -74,22 +76,26 @@ const DataStoredContext = ({ children }) => {
           { query: listEmpInsurances, key: "EmpInsuranceData" },
           { query: listEmpDepInsurances, key: "depInsuranceData" },
           { query: listSawpDetails, key: "SawpDetails" },
-          { query: listInterviewScheduleSchemas, key: "IVSSDetails" },
+          { query: listInterviewSchedules, key: "IVSSDetails" },
           { query: listEmployeeNonLocalAccos, key: "NLAData" },
           { query: listAddCourses, key: "AddCourseDetails" },
+          { query: listInsClaims, key: "insuranceClaimsData" },
+          { query: listWorkMen, key: "workMenDetails" },
         ];
-
+        const limit = 10000;
         const responses = await Promise.all(
           queries.map(({ query }) =>
-            client.graphql({ query }).catch((error) => {
-              // console.error("GraphQL Error:", error);
+            client.graphql({ query, variables: { limit } }).catch((error) => {
+              console.error("GraphQL Error:", error);
               return { data: { items: [] } }; // fallback for failed query
             })
           )
         );
 
         const newData = queries.reduce((acc, { key }, index) => {
-          const items = responses[index]?.data?.[Object.keys(responses[index].data)[0]]?.items || [];
+          const items =
+            responses[index]?.data?.[Object.keys(responses[index].data)[0]]
+              ?.items || [];
           return { ...acc, [key]: items };
         }, {});
 
@@ -103,9 +109,7 @@ const DataStoredContext = ({ children }) => {
   }, []);
 
   return (
-    <DataSupply.Provider value={dataState}>
-      {children}
-    </DataSupply.Provider>
+    <DataSupply.Provider value={dataState}>{children}</DataSupply.Provider>
   );
 };
 

@@ -22,7 +22,7 @@ export const Filter = ({ AfterFilter }) => {
       <section className="">
         {/* Filter Buttons */}
         <div
-          className="center gap-2 border relative rounded-md p-[9px]  text-sm text-secondary border-[#CDCDCD]"
+          className="center gap-2 border relative rounded-md p-[9px] text-sm text-secondary border-[#CDCDCD]"
           onClick={toggleDropdown}
         >
           <IoFilterOutline />

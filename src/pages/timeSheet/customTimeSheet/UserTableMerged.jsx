@@ -5,7 +5,7 @@ import {
   listEmpWorkInfos,
 } from "../../../graphql/queries";
 const client = generateClient();
-export const userTableMerged = (excelData) => {
+export const useTableMerged = (excelData) => {
   const [data, setData] = useState(null);
   useEffect(() => {
     if (excelData) {
@@ -51,7 +51,6 @@ export const userTableMerged = (excelData) => {
               };
             })
             .filter((item) => item !== null);
-          console.log(mergedData);
 
           const fetchWorkInfo = async () => {
             const finalData = fetchedData?.map((item) => {
@@ -65,7 +64,7 @@ export const userTableMerged = (excelData) => {
                   : null,
               };
             });
-            console.log("finalData : ", finalData);
+            console.log("useTableMergedData : ", finalData);
             setData(finalData);
           };
           fetchWorkInfo();

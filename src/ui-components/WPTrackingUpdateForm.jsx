@@ -223,45 +223,45 @@ export default function WPTrackingUpdateForm(props) {
   React.useEffect(resetStateValues, [wPTrackingRecord]);
   const validations = {
     tempID: [{ type: "Required" }],
-    supportletterReqDate: [{ type: "Required" }],
-    supportletterReceiveDate: [{ type: "Required" }],
-    letterfile: [{ type: "Required" }],
-    doesubmitdate: [{ type: "Required" }],
-    doeapprovedate: [{ type: "Required" }],
-    doeexpirydate: [{ type: "Required" }],
-    doefile: [{ type: "Required" }],
-    nlmssubmitdate: [{ type: "Required" }],
-    submissionrefrenceno: [{ type: "Required" }],
-    nlmsapprovedate: [{ type: "Required" }],
-    ldreferenceno: [{ type: "Required" }],
-    nlmsexpirydate: [{ type: "Required" }],
-    nlmsfile: [{ type: "Required" }],
-    bgsubmitdate: [{ type: "Required" }],
-    bgreceivedate: [{ type: "Required" }],
-    referenceno: [{ type: "Required" }],
-    bgamount: [{ type: "Required" }],
-    bgexpirydate: [{ type: "Required" }],
-    bgfile: [{ type: "Required" }],
-    tbapurchasedate: [{ type: "Required" }],
-    jitpaamount: [{ type: "Required" }],
-    jitpaexpirydate: [{ type: "Required" }],
-    receiptno: [{ type: "Required" }],
-    depositamount: [{ type: "Required" }],
-    submitdateendorsement: [{ type: "Required" }],
-    jitpafile: [{ type: "Required" }],
-    immbdno: [{ type: "Required" }],
-    docsubmitdate: [{ type: "Required" }],
-    visaapprovedate: [{ type: "Required" }],
-    visareferenceno: [{ type: "Required" }],
-    visaFile: [{ type: "Required" }],
-    departuredate: [{ type: "Required" }],
-    arrivaldate: [{ type: "Required" }],
-    cityname: [{ type: "Required" }],
-    airfare: [{ type: "Required" }],
-    airticketfile: [{ type: "Required" }],
-    agentname: [{ type: "Required" }],
-    mobSignDate: [{ type: "Required" }],
-    mobFile: [{ type: "Required" }],
+    supportletterReqDate: [],
+    supportletterReceiveDate: [],
+    letterfile: [],
+    doesubmitdate: [],
+    doeapprovedate: [],
+    doeexpirydate: [],
+    doefile: [],
+    nlmssubmitdate: [],
+    submissionrefrenceno: [],
+    nlmsapprovedate: [],
+    ldreferenceno: [],
+    nlmsexpirydate: [],
+    nlmsfile: [],
+    bgsubmitdate: [],
+    bgreceivedate: [],
+    referenceno: [],
+    bgamount: [],
+    bgexpirydate: [],
+    bgfile: [],
+    tbapurchasedate: [],
+    jitpaamount: [],
+    jitpaexpirydate: [],
+    receiptno: [],
+    depositamount: [],
+    submitdateendorsement: [],
+    jitpafile: [],
+    immbdno: [],
+    docsubmitdate: [],
+    visaapprovedate: [],
+    visareferenceno: [],
+    visaFile: [],
+    departuredate: [],
+    arrivaldate: [],
+    cityname: [],
+    airfare: [],
+    airticketfile: [],
+    agentname: [],
+    mobSignDate: [],
+    mobFile: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -290,45 +290,45 @@ export default function WPTrackingUpdateForm(props) {
         event.preventDefault();
         let modelFields = {
           tempID,
-          supportletterReqDate,
-          supportletterReceiveDate,
-          letterfile,
-          doesubmitdate,
-          doeapprovedate,
-          doeexpirydate,
-          doefile,
-          nlmssubmitdate,
-          submissionrefrenceno,
-          nlmsapprovedate,
-          ldreferenceno,
-          nlmsexpirydate,
-          nlmsfile,
-          bgsubmitdate,
-          bgreceivedate,
-          referenceno,
-          bgamount,
-          bgexpirydate,
-          bgfile,
-          tbapurchasedate,
-          jitpaamount,
-          jitpaexpirydate,
-          receiptno,
-          depositamount,
-          submitdateendorsement,
-          jitpafile,
-          immbdno,
-          docsubmitdate,
-          visaapprovedate,
-          visareferenceno,
-          visaFile,
-          departuredate,
-          arrivaldate,
-          cityname,
-          airfare,
-          airticketfile,
-          agentname,
-          mobSignDate,
-          mobFile,
+          supportletterReqDate: supportletterReqDate ?? null,
+          supportletterReceiveDate: supportletterReceiveDate ?? null,
+          letterfile: letterfile ?? null,
+          doesubmitdate: doesubmitdate ?? null,
+          doeapprovedate: doeapprovedate ?? null,
+          doeexpirydate: doeexpirydate ?? null,
+          doefile: doefile ?? null,
+          nlmssubmitdate: nlmssubmitdate ?? null,
+          submissionrefrenceno: submissionrefrenceno ?? null,
+          nlmsapprovedate: nlmsapprovedate ?? null,
+          ldreferenceno: ldreferenceno ?? null,
+          nlmsexpirydate: nlmsexpirydate ?? null,
+          nlmsfile: nlmsfile ?? null,
+          bgsubmitdate: bgsubmitdate ?? null,
+          bgreceivedate: bgreceivedate ?? null,
+          referenceno: referenceno ?? null,
+          bgamount: bgamount ?? null,
+          bgexpirydate: bgexpirydate ?? null,
+          bgfile: bgfile ?? null,
+          tbapurchasedate: tbapurchasedate ?? null,
+          jitpaamount: jitpaamount ?? null,
+          jitpaexpirydate: jitpaexpirydate ?? null,
+          receiptno: receiptno ?? null,
+          depositamount: depositamount ?? null,
+          submitdateendorsement: submitdateendorsement ?? null,
+          jitpafile: jitpafile ?? null,
+          immbdno: immbdno ?? null,
+          docsubmitdate: docsubmitdate ?? null,
+          visaapprovedate: visaapprovedate ?? null,
+          visareferenceno: visareferenceno ?? null,
+          visaFile: visaFile ?? null,
+          departuredate: departuredate ?? null,
+          arrivaldate: arrivaldate ?? null,
+          cityname: cityname ?? null,
+          airfare: airfare ?? null,
+          airticketfile: airticketfile ?? null,
+          agentname: agentname ?? null,
+          mobSignDate: mobSignDate ?? null,
+          mobFile: mobFile ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -445,7 +445,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Supportletter req date"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={supportletterReqDate}
         onChange={(e) => {
@@ -510,7 +510,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Supportletter receive date"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={supportletterReceiveDate}
         onChange={(e) => {
@@ -578,7 +578,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Letterfile"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={letterfile}
         onChange={(e) => {
@@ -641,7 +641,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Doesubmitdate"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={doesubmitdate}
         onChange={(e) => {
@@ -704,7 +704,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Doeapprovedate"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={doeapprovedate}
         onChange={(e) => {
@@ -767,7 +767,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Doeexpirydate"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={doeexpirydate}
         onChange={(e) => {
@@ -830,7 +830,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Doefile"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={doefile}
         onChange={(e) => {
@@ -893,7 +893,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Nlmssubmitdate"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={nlmssubmitdate}
         onChange={(e) => {
@@ -956,7 +956,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Submissionrefrenceno"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={submissionrefrenceno}
         onChange={(e) => {
@@ -1021,7 +1021,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Nlmsapprovedate"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={nlmsapprovedate}
         onChange={(e) => {
@@ -1084,7 +1084,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Ldreferenceno"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={ldreferenceno}
         onChange={(e) => {
@@ -1147,7 +1147,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Nlmsexpirydate"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={nlmsexpirydate}
         onChange={(e) => {
@@ -1210,7 +1210,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Nlmsfile"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={nlmsfile}
         onChange={(e) => {
@@ -1273,7 +1273,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Bgsubmitdate"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={bgsubmitdate}
         onChange={(e) => {
@@ -1336,7 +1336,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Bgreceivedate"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={bgreceivedate}
         onChange={(e) => {
@@ -1399,7 +1399,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Referenceno"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={referenceno}
         onChange={(e) => {
@@ -1462,7 +1462,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Bgamount"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={bgamount}
         onChange={(e) => {
@@ -1525,7 +1525,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Bgexpirydate"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={bgexpirydate}
         onChange={(e) => {
@@ -1588,7 +1588,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Bgfile"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={bgfile}
         onChange={(e) => {
@@ -1651,7 +1651,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Tbapurchasedate"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={tbapurchasedate}
         onChange={(e) => {
@@ -1714,7 +1714,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Jitpaamount"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={jitpaamount}
         onChange={(e) => {
@@ -1777,7 +1777,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Jitpaexpirydate"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={jitpaexpirydate}
         onChange={(e) => {
@@ -1840,7 +1840,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Receiptno"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={receiptno}
         onChange={(e) => {
@@ -1903,7 +1903,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Depositamount"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={depositamount}
         onChange={(e) => {
@@ -1966,7 +1966,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Submitdateendorsement"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={submitdateendorsement}
         onChange={(e) => {
@@ -2031,7 +2031,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Jitpafile"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={jitpafile}
         onChange={(e) => {
@@ -2094,7 +2094,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Immbdno"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={immbdno}
         onChange={(e) => {
@@ -2157,7 +2157,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Docsubmitdate"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={docsubmitdate}
         onChange={(e) => {
@@ -2220,7 +2220,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Visaapprovedate"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={visaapprovedate}
         onChange={(e) => {
@@ -2283,7 +2283,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Visareferenceno"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={visareferenceno}
         onChange={(e) => {
@@ -2346,7 +2346,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Visa file"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={visaFile}
         onChange={(e) => {
@@ -2409,7 +2409,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Departuredate"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={departuredate}
         onChange={(e) => {
@@ -2472,7 +2472,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Arrivaldate"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={arrivaldate}
         onChange={(e) => {
@@ -2535,7 +2535,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Cityname"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={cityname}
         onChange={(e) => {
@@ -2598,7 +2598,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Airfare"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={airfare}
         onChange={(e) => {
@@ -2661,7 +2661,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Airticketfile"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={airticketfile}
         onChange={(e) => {
@@ -2724,7 +2724,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Agentname"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={agentname}
         onChange={(e) => {
@@ -2787,7 +2787,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Mob sign date"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={mobSignDate}
         onChange={(e) => {
@@ -2850,7 +2850,7 @@ export default function WPTrackingUpdateForm(props) {
       ></TextField>
       <TextField
         label="Mob file"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={mobFile}
         onChange={(e) => {

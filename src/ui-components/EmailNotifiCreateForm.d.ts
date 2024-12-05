@@ -25,7 +25,8 @@ export declare type EmailNotifiCreateFormInputValues = {
     empID?: string;
     leaveType?: string;
     senderEmail?: string;
-    receipentEmail?: string[];
+    receipentEmail?: string;
+    receipentEmpID?: string;
     status?: string;
     message?: string;
 };
@@ -34,6 +35,7 @@ export declare type EmailNotifiCreateFormValidationValues = {
     leaveType?: ValidationFunction<string>;
     senderEmail?: ValidationFunction<string>;
     receipentEmail?: ValidationFunction<string>;
+    receipentEmpID?: ValidationFunction<string>;
     status?: ValidationFunction<string>;
     message?: ValidationFunction<string>;
 };
@@ -44,6 +46,7 @@ export declare type EmailNotifiCreateFormOverridesProps = {
     leaveType?: PrimitiveOverrideProps<TextFieldProps>;
     senderEmail?: PrimitiveOverrideProps<TextFieldProps>;
     receipentEmail?: PrimitiveOverrideProps<TextFieldProps>;
+    receipentEmpID?: PrimitiveOverrideProps<TextFieldProps>;
     status?: PrimitiveOverrideProps<TextFieldProps>;
     message?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;

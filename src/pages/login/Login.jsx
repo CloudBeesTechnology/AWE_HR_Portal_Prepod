@@ -1,25 +1,17 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import rightImage from "../../assets/login/laptop.svg";
 import logo from "../../assets/logo/logo-with-name.svg";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { LoginSchema } from "../../services/Validation";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-
-import { autoSignIn } from "aws-amplify/auth";
-import {
-  confirmSignIn,
-  getCurrentUser,
-  signIn,
-  updatePassword,
-} from "@aws-amplify/auth";
-import { Link } from "react-router-dom";
+import { getCurrentUser, signIn } from "@aws-amplify/auth";
 import { generateClient } from "@aws-amplify/api";
 import { listUsers } from "../../graphql/queries";
 
 const client = generateClient();
 
- const Login = () => {
+const Login = () => {
   const [isVisible, setIsVisible] = useState(false);
   const {
     register,
@@ -31,29 +23,27 @@ const client = generateClient();
   const Submit = handleSubmit(async (data) => {
     try {
       const username = data.userID;
-  
-      // Fetch user details first to check status
+
       const resultUser = await client.graphql({
         query: listUsers,
       });
-  
+
       const user = resultUser?.data?.listUsers?.items.find(
         (val) => val.empID === username.toUpperCase()
       );
-  
-      // Check if user exists and status is 'Active'
-      if (user && user.status === 'Active') {
+
+      if (user && user.status === "Active") {
         const password = data.password;
-        const { isSignedIn, userId, nextStep } = await signIn({
+        const { isSignedIn } = await signIn({
           username,
           password,
         });
-  
+
         const currentUser = await getCurrentUser();
         if (isSignedIn || currentUser) {
           const userToStore = currentUser ? currentUser.username : username;
           localStorage.setItem("userID", userToStore);
-  
+
           // Store userType and redirect to dashboard
           const userType = user.selectType;
           if (userType) {
@@ -61,75 +51,22 @@ const client = generateClient();
             window.location.href = "/dashboard";
           } else {
             console.error("userType not found");
-            alert("Access denied: Your account is inactive. Please contact the administrator for assistance");
+            alert(
+              "Access denied: Your account is inactive. Please contact the administrator for assistance"
+            );
           }
         }
       } else {
         console.error("User is not active");
-        alert("Access denied: Your account is inactive. Please contact the administrator for assistance");
+        alert(
+          "Access denied: Your account is inactive. Please contact the administrator for assistance"
+        );
       }
     } catch (error) {
       console.error("Error during sign-in process:", error);
       setError(error.message);
     }
   });
-  
-
-  // const Submit = handleSubmit(async (data) => {
-  
-  //   try {
-  //     const username = data.userID;
-  //     const password = data.password;
-  //     const { isSignedIn, userId, nextStep } = await signIn({
-  //       username,
-  //       password,
-  //     });
-  //     const currentUser = await getCurrentUser();
-  //     if (isSignedIn || currentUser) {
-  //       const userToStore = currentUser ? currentUser.username : username;
-  //       localStorage.setItem("userID", userToStore);
-  //       // console.log(userToStore);
-
-  //       try {
-  //         const resultUser = await client.graphql({
-  //           query: listUsers,
-  //         })
-
-  //         const userType = resultUser?.data?.listUsers?.items.find(
-  //           (val) => val.empID === userToStore.toUpperCase()
-  //         )?.selectType;
-  //         if (user && user.selectType && user.status === 'Active') {
-  //           localStorage.setItem("userType", user.selectType);
-  //           window.location.href = "/dashboard";
-  //         } else {
-  //           console.error("User is not active or userType not found");
-  //           // Handle the error (e.g., show an error message)
-  //           alert("Access denied: User is not active or userType not found");
-  //         }
-  //       } catch (error) {
-  //         console.error("Error fetching user details:", error);
-  //         alert("Access denied: User is not active or userType not found");
-  //         // Handle error (e.g., show an error message)
-  //       }
-
-  //       // window.location.href = "/dashboard";
-  //     }
-  //     // else {
-  //     //   if (nextStep.signInStep === "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD") {
-  //     //     console.log("Redirecting to change password page...");
-  //     //     window.location.href = "/changePassword";
-  //     //   } else if (
-  //     //     nextStep.signInStep === "CONFIRM_SIGN_IN_WITH_CUSTOM_CHALLENGE"
-  //     //   ) {
-  //     //     console.log("Custom challenge required, handling...");
-  //     //   } else {
-  //     //     console.log("Unknown next step:", nextStep);
-  //     //   }
-  //     // }
-  //   } catch (error) {
-  //     setError(error.message);
-  //   }
-  // });
 
   return (
     // <Authenticator>
@@ -139,7 +76,7 @@ const client = generateClient();
         <img
           className="w-full max-w-[450px]"
           src={rightImage}
-          alt=" Rightside Image not found"
+          alt="Rightside Pic not found"
         />
       </div>
       <div className="flex-1 flex items-center gap-8 py-20 flex-col w-full px-3">
@@ -148,7 +85,7 @@ const client = generateClient();
           <img
             className="w-full max-w-[450px]"
             src={logo}
-            alt=" Logo not found"
+            alt="Logo not found"
           />
         </div>
         <article className="text-center space-y-2">
@@ -230,4 +167,4 @@ const client = generateClient();
   );
 };
 
-export default Login
+export default Login;

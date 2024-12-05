@@ -1,6 +1,7 @@
 import { useFieldArray } from "react-hook-form";
 import { FormField } from "../../../utils/FormField";
-import { LuPlusSquare, LuMinusSquare } from "react-icons/lu";
+import { FaRegMinusSquare } from "react-icons/fa";
+import { CiSquarePlus } from "react-icons/ci";
 import { useEffect, useRef } from "react";
 
 export const RowEleven = ({
@@ -112,7 +113,7 @@ export const RowEleven = ({
               onClick={() => remove(index)}
               className="absolute top-2 -right-8 text-medium_grey text-[18px]"
             >
-              <LuMinusSquare /> {/* Minus icon */}
+              <FaRegMinusSquare /> {/* Minus icon */}
             </button>
           )}
         </div>
@@ -124,7 +125,7 @@ export const RowEleven = ({
         onClick={handleAddFamily}
         className="mt-4 flex items-center text-medium_grey text-[20px] absolute -right-8 top-16"
       >
-        <LuPlusSquare className="mr-2" />
+        <CiSquarePlus className="mr-2" />
       </button>
     </div>
   );

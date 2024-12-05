@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { LabourImmigrationSchema } from "../../../services/EmployeeValidation";
@@ -28,6 +28,7 @@ const LabourImmigration = () => {
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [arrayUploadDocs, setArrayUploadDocs] = useState([]);
   const [uploadedFileNames, setUploadedFileNames] = useState({});
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [docsUploaded, setDocsUploaded] = useState({
     uploadFitness: [],
     uploadRegis: [],
@@ -35,7 +36,7 @@ const LabourImmigration = () => {
   });
   const [notification, setNotification] = useState(false);
   const [dependPassData, setDependPassData] = useState(null);
-
+  const [showTitle, setShowTitle] = useState("");
   const {
     register,
     handleSubmit,
@@ -75,7 +76,9 @@ const LabourImmigration = () => {
 
     fetchData();
   }, [empPIData, LMIData]);
+
   const watchedEmpID = watch("empID");
+
   const handleFileChange = async (e, label) => {
     if (!watchedEmpID) {
       alert("Please enter the Employee ID before uploading files.");
@@ -103,21 +106,88 @@ const LabourImmigration = () => {
     }
   };
 
+  // const getLastValue = (value) => {
+  //   return Array.isArray(value) ? value[value.length - 1] : value;
+  // };
   const getLastValue = (value) => {
-    return Array.isArray(value) ? value[value.length - 1] : value;
+    if (Array.isArray(value)) {
+      const lastValue = value[value.length - 1];
+      // Remove square brackets if present
+      return typeof lastValue === "string" &&
+        lastValue.startsWith("[") &&
+        lastValue.endsWith("]")
+        ? lastValue.slice(1, -1)
+        : lastValue;
+    }
+    return value;
+  };
+
+  const formatDateValue = (dateString) => {
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
+      const [day, month, year] = dateString.split("/");
+      return `${year}-${month}-${day}`;
+    }
+    return dateString;
+  };
+
+  const convertDateFormat = (dateStr) => {
+    const isValidDate = (dateParts) => {
+      const [part1, part2, part3] = dateParts;
+      return (
+        !isNaN(part1) &&
+        !isNaN(part2) &&
+        !isNaN(part3) &&
+        part1 > 0 &&
+        part2 > 0 &&
+        part3 > 0
+      );
+    };
+
+    const dateParts = dateStr.split("/");
+
+    if (dateParts.length !== 3) {
+      throw new Error(`Invalid date format: ${dateStr}`);
+    }
+
+    let day, month, year;
+
+    // Check if the input date string is in MM/DD/YYYY format
+    if (dateParts[0] > 12) {
+      [day, month, year] = dateParts;
+    } else {
+      [month, day, year] = dateParts;
+    }
+
+    // Validate date values
+    if (!isValidDate([day, month, year])) {
+      throw new Error(`Invalid date values: ${dateStr}`);
+    }
+
+    return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
   };
 
   const searchResult = (result) => {
-    // console.log(result);
+    console.log(result);
 
     const keysToSet = ["empID", "bruhimsRNo", "overMD", "overME", "bruhimsRD"];
 
     keysToSet.forEach((key) => {
-      if (result[key]) setValue(key, result[key]);
+      if (result[key]) {
+        let value = result[key];
+        if (key === "overMD" || key === "overME" || key === "bruhimsRD") {
+          value = convertDateFormat(value);
+        }
+        setValue(key, value);
+      }
     });
 
     const fields = ["bruneiMAD", "bruneiME"];
-    fields.forEach((field) => setValue(field, getLastValue(result[field])));
+    // fields.forEach((field) => setValue(field, getLastValue(result[field])));
+    fields.forEach((field) => {
+      const cleanedValue = getLastValue(result[field]);
+      const formattedValue = formatDateValue(cleanedValue);
+      setValue(field, formattedValue);
+    });
 
     if (result?.dependPass) {
       try {
@@ -130,7 +200,7 @@ const LabourImmigration = () => {
 
     const uploadFields = ["uploadFitness", "uploadRegis", "uploadBwn"];
 
-    uploadFields.map((field) => {
+    uploadFields.forEach((field) => {
       if (result && result[field]) {
         try {
           // Parse the field data if it exists
@@ -168,6 +238,8 @@ const LabourImmigration = () => {
   };
 
   const onSubmit = async (data) => {
+    console.log(data);
+
     try {
       const checkingPITable = empPIData.find(
         (match) => match.empID === data.empID
@@ -175,24 +247,41 @@ const LabourImmigration = () => {
       const checkingLMIDTable = LMIData.find(
         (match) => match.empID === data.empID
       );
-      const formatDate = (date) =>
-        date ? new Date(date).toLocaleDateString("en-CA") : null;
+      // const formatDate = (date) =>
+      //   date ? new Date(date).toLocaleDateString("en-CA") : null;
+
+      const formatDate = (dateString) => {
+        if (!dateString || isNaN(new Date(dateString).getTime())) {
+          return; // Return an empty string or a custom message if invalid
+        }
+        const date = new Date(dateString);
+        const day = date.getDate().toString().padStart(2, "0");
+        const month = (date.getMonth() + 1).toString().padStart(2, "0");
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      };
+
       const overMD = formatDate(data.overMD);
       const overME = formatDate(data.overME);
       const bruhimsRD = formatDate(data.bruhimsRD);
       const bruneiMAD = formatDate(data.bruneiMAD);
       const bruneiME = formatDate(data.bruneiME);
+
       if (checkingLMIDTable && checkingPITable) {
-        const updateFieldArray = (existingArray, newValue) => [
-          ...new Set([...(existingArray || []), newValue]),
-        ];
+        const updateFieldArray = (existingArray, newValue) => {
+          if (newValue === "") return existingArray;
+          const updatedArray = [
+            ...new Set([...(existingArray || []), newValue]),
+          ];
+          return updatedArray.length > 0 ? updatedArray : null;
+        };
 
         const updatebruneiMAD = updateFieldArray(
-          checkingLMIDTable.bruneiMAD,
+          checkingLMIDTable?.bruneiMAD,
           bruneiMAD
         );
         const updatebruneiME = updateFieldArray(
-          checkingLMIDTable.bruneiME,
+          checkingLMIDTable?.bruneiME,
           bruneiME
         );
 
@@ -201,8 +290,8 @@ const LabourImmigration = () => {
           overMD: overMD,
           overME: overME,
           bruhimsRD: bruhimsRD,
-          bruneiMAD: updatebruneiMAD.map(formatDate),
-          bruneiME: updatebruneiME.map(formatDate),
+          bruneiMAD: updatebruneiMAD,
+          bruneiME: updatebruneiME,
           uploadFitness: JSON.stringify(docsUploaded.uploadFitness),
           uploadRegis: JSON.stringify(docsUploaded.uploadRegis),
           uploadBwn: JSON.stringify(docsUploaded.uploadBwn),
@@ -222,10 +311,10 @@ const LabourImmigration = () => {
           ),
           LabTable: checkingLMIDTable.id,
         };
-        // console.log("Update Method :", LabUpValue);
+        console.log("Update Method :", LabUpValue);
 
         await updateMedicalSubmit({ LabUpValue });
-        setShowTitle("Employee Personal Info updated successfully");
+        setShowTitle("Medical and Dependent Info details updated successfully");
         setNotification(true);
       } else {
         const [updatebruneiMAD, updatebruneiME] = [[bruneiMAD], [bruneiME]].map(
@@ -237,8 +326,8 @@ const LabourImmigration = () => {
           overMD: overMD,
           overME: overME,
           bruhimsRD: bruhimsRD,
-          bruneiMAD: updatebruneiMAD.map(formatDate),
-          bruneiME: updatebruneiME.map(formatDate),
+          bruneiMAD: updatebruneiMAD,
+          bruneiME: updatebruneiME,
           uploadFitness: JSON.stringify(docsUploaded.uploadFitness),
           uploadRegis: JSON.stringify(docsUploaded.uploadRegis),
           uploadBwn: JSON.stringify(docsUploaded.uploadBwn),
@@ -257,19 +346,27 @@ const LabourImmigration = () => {
             })
           ),
         };
-        // console.log("Create Method :", labValue);
+        console.log("Create Method :", labValue);
         await SubmitMPData({ labValue });
-        setShowTitle("Employee Personal Info saved successfully");
+        setShowTitle("Medical and Dependent Info details saved successfully");
         setNotification(true);
       }
     } catch (error) {
       console.log(error);
+
+      console.error(
+        "Error submitting data to AWS:",
+        JSON.stringify(error, null, 2)
+      );
     }
   };
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
+      onClick={() => {
+        setFilteredEmployees([]);
+      }}
       className="container mx-auto p-10 bg-[#F5F6F1CC]"
     >
       <div className="w-full flex items-center justify-between">
@@ -286,6 +383,8 @@ const LabourImmigration = () => {
             placeholder="Employee ID"
             rounded="rounded-lg"
             newFormData={allEmpDetails}
+            filteredEmployees={filteredEmployees}
+            setFilteredEmployees={setFilteredEmployees}
           />
         </div>
       </div>
@@ -347,7 +446,7 @@ const LabourImmigration = () => {
       {/* Notification */}
       {notification && (
         <SpinLogo
-          text="Medical and Dependent Info details saved successfully"
+          text={showTitle}
           notification={notification}
           path="/labourImmigration"
         />

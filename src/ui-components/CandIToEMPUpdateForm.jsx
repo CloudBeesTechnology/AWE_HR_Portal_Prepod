@@ -302,14 +302,14 @@ export default function CandIToEMPUpdateForm(props) {
     crime: [],
     crimeDesc: [],
     emgDetails: [{ type: "Required" }, { type: "JSON" }],
-    noExperience: [{ type: "Required" }],
-    empStatement: [{ type: "Required" }],
+    noExperience: [],
+    empStatement: [],
     desc: [],
     disease: [],
     diseaseDesc: [],
     liquor: [],
     liquorDesc: [],
-    perIS: [{ type: "Required" }],
+    perIS: [],
     perID: [],
     referees: [{ type: "JSON" }],
     relatives: [{ type: "JSON" }],
@@ -347,14 +347,14 @@ export default function CandIToEMPUpdateForm(props) {
           crime: crime ?? null,
           crimeDesc: crimeDesc ?? null,
           emgDetails,
-          noExperience,
-          empStatement,
+          noExperience: noExperience ?? null,
+          empStatement: empStatement ?? null,
           desc: desc ?? null,
           disease: disease ?? null,
           diseaseDesc: diseaseDesc ?? null,
           liquor: liquor ?? null,
           liquorDesc: liquorDesc ?? null,
-          perIS,
+          perIS: perIS ?? null,
           perID: perID ?? null,
           referees: referees ?? null,
           relatives: relatives ?? null,
@@ -601,7 +601,7 @@ export default function CandIToEMPUpdateForm(props) {
       </ArrayField>
       <TextField
         label="No experience"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={noExperience}
         onChange={(e) => {
@@ -642,7 +642,7 @@ export default function CandIToEMPUpdateForm(props) {
       ></TextField>
       <TextField
         label="Emp statement"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={empStatement}
         onChange={(e) => {
@@ -888,7 +888,7 @@ export default function CandIToEMPUpdateForm(props) {
       ></TextField>
       <TextField
         label="Per is"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={perIS}
         onChange={(e) => {

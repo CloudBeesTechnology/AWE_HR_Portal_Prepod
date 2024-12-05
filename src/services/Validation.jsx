@@ -118,7 +118,7 @@ export const PersonalSchema = (nationality) => {
     ppDestinate: isBruneian
       ? Yup.string().notRequired()
       : Yup.string().required("Passport destination is mandatory"),
-   
+
     alternateNo: Yup.string().notRequired(),
     contactNo: Yup.string().required("Contact Number is mandatory"),
     presentAddress: Yup.string().required("Present Address is mandatory"),
@@ -225,81 +225,81 @@ export const CandidatesSchema = Yup.object().shape({
   supportInfo: Yup.string(),
 
   // File validation for resume (e.g., PDF, Word, Excel, or images)
-uploadResume: Yup.mixed()
-.required("Resume is required")
-.test(
-  "fileType",
-  "Only PDF, Word, Excel, or image formats (JPEG, JPG, PNG, SVG) are allowed",
-  (value) => {
-    return (
-      value &&
-      [
-        "application/pdf", // PDF
-        "application/msword", // Word .doc
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // Word .docx
-        "application/vnd.ms-excel", // Excel .xls
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Excel .xlsx
-        "image/jpeg",
-        "image/jpg",
-        "image/png",
-        "image/svg+xml", // Images
-      ].includes(value.type)
-    );
-  }
-),
+  uploadResume: Yup.mixed()
+    .required("Resume is required")
+    .test(
+      "fileType",
+      "Only PDF, Word, Excel, or image formats (JPEG, JPG, PNG, SVG) are allowed",
+      (value) => {
+        return (
+          value &&
+          [
+            "application/pdf", // PDF
+            "application/msword", // Word .doc
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // Word .docx
+            "application/vnd.ms-excel", // Excel .xls
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Excel .xlsx
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/svg+xml", // Images
+          ].includes(value.type)
+        );
+      }
+    ),
 
-// File validation for certificate (e.g., PDF, Word, Excel, or images)
-uploadCertificate: Yup.mixed()
-.required("Certificate is required")
-.test(
-  "fileType",
-  "Only PDF, Word, Excel, or image formats (JPEG, JPG, PNG, SVG) are allowed",
-  (value) => {
-    return (
-      value &&
-      [
-        "application/pdf", // PDF
-        "application/msword", // Word .doc
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // Word .docx
-        "application/vnd.ms-excel", // Excel .xls
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Excel .xlsx
-        "image/jpeg",
-        "image/jpg",
-        "image/png",
-        "image/svg+xml", // Images
-      ].includes(value.type)
-    );
-  }
-),
+  // File validation for certificate (e.g., PDF, Word, Excel, or images)
+  uploadCertificate: Yup.mixed()
+    .required("Certificate is required")
+    .test(
+      "fileType",
+      "Only PDF, Word, Excel, or image formats (JPEG, JPG, PNG, SVG) are allowed",
+      (value) => {
+        return (
+          value &&
+          [
+            "application/pdf", // PDF
+            "application/msword", // Word .doc
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // Word .docx
+            "application/vnd.ms-excel", // Excel .xls
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Excel .xlsx
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/svg+xml", // Images
+          ].includes(value.type)
+        );
+      }
+    ),
 
-// File validation for passport (e.g., PDF, Word, Excel, or images)
-uploadPp: Yup.mixed()
-.required("Passport is required")
-.test(
-  "fileType",
-  "Only PDF, Word, Excel, or image formats (JPEG, JPG, PNG, SVG) are allowed",
-  (value) => {
-    return (
-      value &&
-      [
-        "application/pdf", // PDF
-        "application/msword", // Word .doc
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // Word .docx
-        "application/vnd.ms-excel", // Excel .xls
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Excel .xlsx
-        "image/jpeg",
-        "image/jpg",
-        "image/png",
-        "image/svg+xml", // Images
-      ].includes(value.type)
-    );
-  }
-),
-
+  // File validation for passport (e.g., PDF, Word, Excel, or images)
+  uploadPp: Yup.mixed()
+    .required("Passport is required")
+    .test(
+      "fileType",
+      "Only PDF, Word, Excel, or image formats (JPEG, JPG, PNG, SVG) are allowed",
+      (value) => {
+        return (
+          value &&
+          [
+            "application/pdf", // PDF
+            "application/msword", // Word .doc
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // Word .docx
+            "application/vnd.ms-excel", // Excel .xls
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Excel .xlsx
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/svg+xml", // Images
+          ].includes(value.type)
+        );
+      }
+    ),
 });
 
 // Define the validation schema using Yup
 export const EmpRequisitionSchema = Yup.object().shape({
+  nameReq: Yup.string().notRequired(),
   department: Yup.string().required("Department is required"),
   project: Yup.string().required("Project is required"),
   position: Yup.string().required("Position is required"),
@@ -314,42 +314,36 @@ export const EmpRequisitionSchema = Yup.object().shape({
     .min(new Date(), "Tentative date must be in the future")
     .required("Tentative date is required")
     .typeError("Please enter a valid date"),
+  status: Yup.string().notRequired(),
+  remarkReq: Yup.string().notRequired(),
 });
 
-export const InterviewSchema = Yup.object().shape({
-  date: Yup.date()
-    .required("Date is required")
-    .typeError("Date is required")
-    .min(
-      new Date(),
-      "The selected date is in the past. Please choose a valid date."
-    ),
-
-  time: Yup.string()
-    .required("Time is required")
-    .matches(
-      /^(0[8-9]|1[0-5]):([0-5]\d)$/,
-      "Please choose a time between 8:00 AM and 4:00 PM."
-    ),
-  venue: Yup.string().required("Venue is required"),
-  interviewer: Yup.string().required("Assigning a manager is required"),
-  interviewType: Yup.string().required("Please select the interview type"),
-  message: Yup.string().required("Message is required"),
-});
 
 export const InterviewScheduleSchema = Yup.object().shape({
-  date: Yup.date().required("Date is required"),
-  time: Yup.string().required("Time is required"),
+  interDate: Yup.date()
+  .required("Date is required")
+  .typeError("Date is required")
+  .min(
+    new Date(),
+    "The selected date is in the past. Please choose a valid date."
+  ),
+  interTime: Yup.string()
+  .required("Time is required")
+  .matches(
+    /^(0[8-9]|1[0-5]):([0-5]\d)$/,
+    "Please choose a time between 8:00 AM and 4:00 PM."
+  ),
   venue: Yup.string().required("Venue is required"),
-  interviewType: Yup.string().required("Interview type is required"),
-  interviewer: Yup.string().required("Interviewer is required"),
+  interType: Yup.string().notRequired(),
+  empBadgeNo: Yup.string().notRequired("Badge Number is required"),
+  manager:  Yup.string().notRequired("Manager is required"),
   message: Yup.string().optional(),
 });
 
 export const SelectedCandidateSchema = Yup.object().shape({
-  name: Yup.string().notRequired(),
   position: Yup.string().notRequired(),
   department: Yup.string().required("Department is required"),
+  otherDepartment: Yup.string().notRequired(),
 });
 
 export const LoiSchema = Yup.object().shape({
@@ -357,7 +351,7 @@ export const LoiSchema = Yup.object().shape({
   loiAcceptDate: Yup.date().optional(),
   loiDeclineDate: Yup.date().optional(),
   declineReason: Yup.string().optional(),
-  loiFile: Yup.mixed().required("LOI PDF is required"),
+  loiFile: Yup.mixed().notRequired(),
 });
 
 export const CvevSchema = Yup.object().shape({
@@ -371,7 +365,9 @@ export const PaafSchema = Yup.object().shape({
 });
 
 export const updateInterviewScheduleSchema = Yup.object().shape({
-  department: Yup.string().required('Department is required'),
+  department: Yup.string().required("Department is required"),
+  otherDepartment: Yup.string().notRequired(),
+
 });
 
 export const MobilizationSchema = Yup.object().shape({
@@ -379,147 +375,21 @@ export const MobilizationSchema = Yup.object().shape({
   mobFile: Yup.mixed().required("Contract PDF is required"),
 });
 
-// export const CandidatesSchema = Yup.object({
-//   profilePhoto: Yup.string()
-//     .matches(/\.(jpg|jpeg|png)$/, "Profile photo must be a JPG or PNG file")
-//     .required("Upload Photo is mandatory"),
-//   position: Yup.string().required("Position is mandatory"),
-//   name: Yup.string()
-//     .min(3, "Name must be at least 3 characters")
-//     .required("Name is mandatory"),
-//   chinese: Yup.string().notRequired(),
-//   gender: Yup.string().required("Gender is mandatory"),
-//   dateOfBirth: Yup.string().required("Date of Birth is mandatory"),
-//   age: Yup.number().required("Age is mandatory"),
-//   countryOfBirth: Yup.string().required("Country Birth is mandatory"),
-//   nationality: Yup.string().required("Nationality is mandatory"),
-//   marital: Yup.string().required("Marital status is mandatory"),
-//   race: Yup.string().required("Race is mandatory"),
-//   religion: Yup.string().required("Religion is mandatory"),
-//   otherRace: Yup.string().when("race", {
-//     is: "other",
-//     then: Yup.string().required("Other Race is required"),
-//     otherwise: Yup.string(),
-//   }),
-//   otherReligion: Yup.string().when("religion", {
-//     is: "other",
-//     then: Yup.string().required("Other religion is required"),
-//     otherwise: Yup.string(),
-//   }),
-//   icNo: Yup.string()
-//     .required("I/C Number is mandatory")
-//     .matches(
-//       /^\d{2}-\d{6}$/,
-//       "I/C Number must be in the format XX-XXXXXX, where X is a digit"
-//     ),
-//   icColour: Yup.string().required("I/C Colour is mandatory"),
-//   passwordNo: Yup.string().required("Password Number is mandatory"),
-//   contactNo: Yup.string().required("Contact Number is mandatory"),
-//   presentAddress: Yup.string().required("Present Address is mandatory"),
-//   permanentAddress: Yup.string().required("Permanent Address is mandatory"),
-//   drivingLicense: Yup.string().notRequired(),
-//   language: Yup.string().required("Language is mandatory"),
-//   familyDetails: Yup.array()
-//     .of(
-//       Yup.object().shape({
-//         name: Yup.string().notRequired(),
-//         relationship: Yup.string().notRequired(),
-//         age: Yup.string().notRequired(),
-//         occupation: Yup.string().notRequired(),
-//         place: Yup.string().notRequired(),
-//       })
-//     )
-//     .notRequired(),
-//   educationDetails: Yup.array()
-//     .of(
-//       Yup.object().shape({
-//         university: Yup.string().required("University Name is mandatory "),
-//         fromDate: Yup.string().required("From Date is mandatory"),
-//         toDate: Yup.string().required("To Date is mandatory"),
-//         degree: Yup.string().required("Degree is mandatory"),
-//       })
-//     )
-//     .required("Atleast one education detail is mandatory"),
-//   workExperience: Yup.array().of(
-//     Yup.object().shape({
-//       fromDate: Yup.string().notRequired(),
-//       toDate: Yup.string().notRequired(),
-//       companyAndAddress: Yup.string().notRequired(),
-//       position: Yup.string().notRequired(),
-//       salary: Yup.string().notRequired(),
-//       reasonLeaving: Yup.string().notRequired(),
-//     })
-//   ),
-//   referees: Yup.array()
-//     .of(
-//       Yup.object().shape({
-//         name: Yup.string().notRequired(),
-//         address: Yup.string().notRequired(),
-//         phoneNumber: Yup.string().notRequired(),
-//         profession: Yup.string().notRequired(),
-//       })
-//     )
-//     .notRequired(),
-//   relatives: Yup.array()
-//     .of(
-//       Yup.object().shape({
-//         name: Yup.string().notRequired(),
-//         position: Yup.string().notRequired(),
-//         relationship: Yup.string().notRequired(),
-//       })
-//     )
-//     .notRequired(),
-//   description: Yup.string().notRequired(),
-//   emergencyContact: Yup.array()
-//     .of(
-//       Yup.object().shape({
-//         name: Yup.string().required("Name is mandatory"),
-//         relationship: Yup.string().required("Relationship is mandatory"),
-//         address: Yup.string().required("Address is mandatory"),
-//         phoneNumber: Yup.string().required("Phone Number is mandatory"),
-//         bloodGroup: Yup.string().required("Blood Group is mandatory"),
-//       })
-//     )
-//     .required("At least one emergency contact is mandatory"),
-//   disease: Yup.string().required("Disease is mandatory"),
-//   liquor: Yup.string().required("Liquor is mandatory"),
-//   crime: Yup.string().required("Crime is mandatory"),
-
-//   diseaseDescription: Yup.string().when("disease", {
-//     is: "yes",
-//     then: Yup.string().required("Please provide details about the disease"),
-//     otherwise: Yup.string(),
-//   }),
-
-//   liquorDescription: Yup.string().when("liquor", {
-//     is: "yes",
-//     then: Yup.string().required(
-//       "Please provide details about liquor consumption"
-//     ),
-//     otherwise: Yup.string(),
-//   }),
-
-//   crimeDescription: Yup.string().when("crime", {
-//     is: "yes",
-//     then: Yup.string().required("Please provide details about the crime"),
-//     otherwise: Yup.string(),
-//   }),
-//   salaryException: Yup.number().required("Salary Exception in  mandatory"),
-//   noticePeriod: Yup.string().notRequired(),
-//   perInterviewStatus:Yup.string(),
-//   perInterviewDescription: Yup.string().when("perInterviewStatus", {
-//     is: "yes",
-//     then: Yup.string().required("Please provide details about the perInterviewStatus"),
-//     otherwise: Yup.string(),
-//   }),
-//   supportInfo: Yup.string().notRequired(),
-//   uploadResume: Yup.string()
-//   .matches(/\.(jpg|jpeg)$/, "Profile photo must be a JPG or PNG file")
-//   .required("Upload Photo is mandatory"),
-//   uploadCerficate: Yup.string()
-//   .matches(/\.(jpg|jpeg)$/, "Profile photo must be a JPG or PNG file")
-//   .required("Upload Photo is mandatory"),
-//   uploadPassport: Yup.string()
-//   .matches(/\.(jpg|jpeg)$/, "Profile photo must be a JPG or PNG file")
-//   .required("Upload Photo is mandatory"),
-// });
+export const hiringJobSchema = Yup.object().shape({
+  jobTitle: Yup.string().notRequired(),
+  location: Yup.string().notRequired(),
+  jobDesc: Yup.string().notRequired(),
+  experience: Yup.string().notRequired(),
+  quantity: Yup.string().notRequired(),
+  startDate: Yup.date()
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .notRequired(),
+  expiryDate: Yup.date()
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .notRequired()
+    .test("is-future-date", "Only Future Dates Allowed", function (value) {
+      return !value || new Date(value) > new Date();
+    }),
+});

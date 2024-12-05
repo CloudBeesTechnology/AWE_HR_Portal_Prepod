@@ -241,8 +241,8 @@ export default function EmployeeNonLocalAccoUpdateForm(props) {
   const accommodationAddressRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
-    accommodation: [{ type: "Required" }],
-    accommodationAddress: [{ type: "Required" }],
+    accommodation: [],
+    accommodationAddress: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -271,8 +271,8 @@ export default function EmployeeNonLocalAccoUpdateForm(props) {
         event.preventDefault();
         let modelFields = {
           empID,
-          accommodation,
-          accommodationAddress,
+          accommodation: accommodation ?? null,
+          accommodationAddress: accommodationAddress ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -379,7 +379,7 @@ export default function EmployeeNonLocalAccoUpdateForm(props) {
       >
         <TextField
           label="Accommodation"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentAccommodationValue}
           onChange={(e) => {
@@ -431,7 +431,7 @@ export default function EmployeeNonLocalAccoUpdateForm(props) {
       >
         <TextField
           label="Accommodation address"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentAccommodationAddressValue}
           onChange={(e) => {

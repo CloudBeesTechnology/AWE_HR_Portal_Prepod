@@ -1,0 +1,1093 @@
+{
+  "Parameters": {
+    "DynamoDBModelTableReadIOPS": {
+      "Type": "Number",
+      "Default": 5,
+      "Description": "The number of read IOPS the table should support."
+    },
+    "DynamoDBModelTableWriteIOPS": {
+      "Type": "Number",
+      "Default": 5,
+      "Description": "The number of write IOPS the table should support."
+    },
+    "DynamoDBBillingMode": {
+      "Type": "String",
+      "Default": "PAY_PER_REQUEST",
+      "AllowedValues": [
+        "PAY_PER_REQUEST",
+        "PROVISIONED"
+      ],
+      "Description": "Configure @model types to create DynamoDB tables with PAY_PER_REQUEST or PROVISIONED billing modes."
+    },
+    "DynamoDBEnablePointInTimeRecovery": {
+      "Type": "String",
+      "Default": "false",
+      "AllowedValues": [
+        "true",
+        "false"
+      ],
+      "Description": "Whether to enable Point in Time Recovery on the table."
+    },
+    "DynamoDBEnableServerSideEncryption": {
+      "Type": "String",
+      "Default": "true",
+      "AllowedValues": [
+        "true",
+        "false"
+      ],
+      "Description": "Enable server side encryption powered by KMS."
+    },
+    "referencetotransformerrootstackenv10C5A902Ref": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackGraphQLAPI20497F53ApiId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackS3DeploymentBucket7592718ARef": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypeauth0FunctionQuerygetInsuranceTypeauth0FunctionAppSyncFunction84613F74FunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeMutationcreateInsuranceTypeinit0FunctionMutationcreateInsuranceTypeinit0FunctionAppSyncFunction84DE8DC3FunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeMutationcreateInsuranceTypeauth0FunctionMutationcreateInsuranceTypeauth0FunctionAppSyncFunction3271F8FDFunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeMutationupdateInsuranceTypeinit0FunctionMutationupdateInsuranceTypeinit0FunctionAppSyncFunctionA0D393B0FunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptiononCreateInsuranceTypeauth0FunctionSubscriptiononCreateInsuranceTypeauth0FunctionAppSyncFuncti1417D75E": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptionOnCreateInsuranceTypeDataResolverFnSubscriptionOnCreateInsuranceTypeDataResolverFnAppSyncFunc15969348": {
+      "Type": "String"
+    }
+  },
+  "Conditions": {
+    "HasEnvironmentParameter": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "referencetotransformerrootstackenv10C5A902Ref"
+            },
+            "NONE"
+          ]
+        }
+      ]
+    },
+    "ShouldUseServerSideEncryption": {
+      "Fn::Equals": [
+        {
+          "Ref": "DynamoDBEnableServerSideEncryption"
+        },
+        "true"
+      ]
+    },
+    "ShouldUsePayPerRequestBilling": {
+      "Fn::Equals": [
+        {
+          "Ref": "DynamoDBBillingMode"
+        },
+        "PAY_PER_REQUEST"
+      ]
+    },
+    "ShouldUsePointInTimeRecovery": {
+      "Fn::Equals": [
+        {
+          "Ref": "DynamoDBEnablePointInTimeRecovery"
+        },
+        "true"
+      ]
+    }
+  },
+  "Resources": {
+    "LocalMobilizationTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "BillingMode": {
+          "Fn::If": [
+            "ShouldUsePayPerRequestBilling",
+            "PAY_PER_REQUEST",
+            {
+              "Ref": "AWS::NoValue"
+            }
+          ]
+        },
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "PointInTimeRecoverySpecification": {
+          "Fn::If": [
+            "ShouldUsePointInTimeRecovery",
+            {
+              "PointInTimeRecoveryEnabled": true
+            },
+            {
+              "Ref": "AWS::NoValue"
+            }
+          ]
+        },
+        "ProvisionedThroughput": {
+          "Fn::If": [
+            "ShouldUsePayPerRequestBilling",
+            {
+              "Ref": "AWS::NoValue"
+            },
+            {
+              "ReadCapacityUnits": {
+                "Ref": "DynamoDBModelTableReadIOPS"
+              },
+              "WriteCapacityUnits": {
+                "Ref": "DynamoDBModelTableWriteIOPS"
+              }
+            }
+          ]
+        },
+        "SSESpecification": {
+          "SSEEnabled": {
+            "Fn::If": [
+              "ShouldUseServerSideEncryption",
+              true,
+              false
+            ]
+          }
+        },
+        "StreamSpecification": {
+          "StreamViewType": "NEW_AND_OLD_IMAGES"
+        },
+        "TableName": {
+          "Fn::Join": [
+            "",
+            [
+              "LocalMobilization-",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "-",
+              {
+                "Ref": "referencetotransformerrootstackenv10C5A902Ref"
+              }
+            ]
+          ]
+        }
+      },
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete"
+    },
+    "LocalMobilizationIAMRoleC407416E": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "appsync.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "dynamodb:BatchGetItem",
+                    "dynamodb:BatchWriteItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:DeleteItem",
+                    "dynamodb:GetItem",
+                    "dynamodb:Scan",
+                    "dynamodb:Query",
+                    "dynamodb:UpdateItem",
+                    "dynamodb:ConditionCheckItem",
+                    "dynamodb:DescribeTable",
+                    "dynamodb:GetRecords",
+                    "dynamodb:GetShardIterator"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::Sub": [
+                        "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}",
+                        {
+                          "tablename": {
+                            "Fn::Join": [
+                              "",
+                              [
+                                "LocalMobilization-",
+                                {
+                                  "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+                                },
+                                "-",
+                                {
+                                  "Ref": "referencetotransformerrootstackenv10C5A902Ref"
+                                }
+                              ]
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "Fn::Sub": [
+                        "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/*",
+                        {
+                          "tablename": {
+                            "Fn::Join": [
+                              "",
+                              [
+                                "LocalMobilization-",
+                                {
+                                  "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+                                },
+                                "-",
+                                {
+                                  "Ref": "referencetotransformerrootstackenv10C5A902Ref"
+                                }
+                              ]
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "DynamoDBAccess"
+          }
+        ],
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              "LocalMobilizationIAM815cab-",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "-",
+              {
+                "Ref": "referencetotransformerrootstackenv10C5A902Ref"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "LocalMobilizationDataSource": {
+      "Type": "AWS::AppSync::DataSource",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DynamoDBConfig": {
+          "AwsRegion": {
+            "Ref": "AWS::Region"
+          },
+          "TableName": {
+            "Ref": "LocalMobilizationTable"
+          }
+        },
+        "Name": "LocalMobilizationTable",
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "LocalMobilizationIAMRoleC407416E",
+            "Arn"
+          ]
+        },
+        "Type": "AMAZON_DYNAMODB"
+      },
+      "DependsOn": [
+        "LocalMobilizationIAMRoleC407416E"
+      ]
+    },
+    "QueryGetLocalMobilizationDataResolverFnQueryGetLocalMobilizationDataResolverFnAppSyncFunction70C843A3": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "LocalMobilizationDataSource",
+            "Name"
+          ]
+        },
+        "FunctionVersion": "2018-05-29",
+        "Name": "QueryGetLocalMobilizationDataResolverFn",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Query.getLocalMobilization.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Query.getLocalMobilization.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "LocalMobilizationDataSource"
+      ]
+    },
+    "GetLocalMobilizationResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "getLocalMobilization",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypeauth0FunctionQuerygetInsuranceTypeauth0FunctionAppSyncFunction84613F74FunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+            },
+            {
+              "Fn::GetAtt": [
+                "QueryGetLocalMobilizationDataResolverFnQueryGetLocalMobilizationDataResolverFnAppSyncFunction70C843A3",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"getLocalMobilization\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+              {
+                "Ref": "LocalMobilizationTable"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+        "TypeName": "Query"
+      }
+    },
+    "QueryListLocalMobilizationsDataResolverFnQueryListLocalMobilizationsDataResolverFnAppSyncFunctionEED0E71F": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "LocalMobilizationDataSource",
+            "Name"
+          ]
+        },
+        "FunctionVersion": "2018-05-29",
+        "Name": "QueryListLocalMobilizationsDataResolverFn",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Query.listLocalMobilizations.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Query.listLocalMobilizations.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "LocalMobilizationDataSource"
+      ]
+    },
+    "ListLocalMobilizationResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "listLocalMobilizations",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypeauth0FunctionQuerygetInsuranceTypeauth0FunctionAppSyncFunction84613F74FunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+            },
+            {
+              "Fn::GetAtt": [
+                "QueryListLocalMobilizationsDataResolverFnQueryListLocalMobilizationsDataResolverFnAppSyncFunctionEED0E71F",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"listLocalMobilizations\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+              {
+                "Ref": "LocalMobilizationTable"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+        "TypeName": "Query"
+      }
+    },
+    "MutationCreateLocalMobilizationDataResolverFnMutationCreateLocalMobilizationDataResolverFnAppSyncFunctionFF766D26": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "LocalMobilizationDataSource",
+            "Name"
+          ]
+        },
+        "FunctionVersion": "2018-05-29",
+        "Name": "MutationCreateLocalMobilizationDataResolverFn",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.createLocalMobilization.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.createLocalMobilization.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "LocalMobilizationDataSource"
+      ]
+    },
+    "CreateLocalMobilizationResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "createLocalMobilization",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeMutationcreateInsuranceTypeinit0FunctionMutationcreateInsuranceTypeinit0FunctionAppSyncFunction84DE8DC3FunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeMutationcreateInsuranceTypeauth0FunctionMutationcreateInsuranceTypeauth0FunctionAppSyncFunction3271F8FDFunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+            },
+            {
+              "Fn::GetAtt": [
+                "MutationCreateLocalMobilizationDataResolverFnMutationCreateLocalMobilizationDataResolverFnAppSyncFunctionFF766D26",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"createLocalMobilization\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+              {
+                "Ref": "LocalMobilizationTable"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+        "TypeName": "Mutation"
+      }
+    },
+    "MutationupdateLocalMobilizationauth0FunctionMutationupdateLocalMobilizationauth0FunctionAppSyncFunctionD16FFAC0": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "LocalMobilizationDataSource",
+            "Name"
+          ]
+        },
+        "FunctionVersion": "2018-05-29",
+        "Name": "MutationupdateLocalMobilizationauth0Function",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.updateLocalMobilization.auth.1.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.updateLocalMobilization.auth.1.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "LocalMobilizationDataSource"
+      ]
+    },
+    "MutationUpdateLocalMobilizationDataResolverFnMutationUpdateLocalMobilizationDataResolverFnAppSyncFunction082BC274": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "LocalMobilizationDataSource",
+            "Name"
+          ]
+        },
+        "FunctionVersion": "2018-05-29",
+        "Name": "MutationUpdateLocalMobilizationDataResolverFn",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.updateLocalMobilization.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.updateLocalMobilization.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "LocalMobilizationDataSource"
+      ]
+    },
+    "UpdateLocalMobilizationResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "updateLocalMobilization",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeMutationupdateInsuranceTypeinit0FunctionMutationupdateInsuranceTypeinit0FunctionAppSyncFunctionA0D393B0FunctionId"
+            },
+            {
+              "Fn::GetAtt": [
+                "MutationupdateLocalMobilizationauth0FunctionMutationupdateLocalMobilizationauth0FunctionAppSyncFunctionD16FFAC0",
+                "FunctionId"
+              ]
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+            },
+            {
+              "Fn::GetAtt": [
+                "MutationUpdateLocalMobilizationDataResolverFnMutationUpdateLocalMobilizationDataResolverFnAppSyncFunction082BC274",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"updateLocalMobilization\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+              {
+                "Ref": "LocalMobilizationTable"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+        "TypeName": "Mutation"
+      }
+    },
+    "MutationdeleteLocalMobilizationauth0FunctionMutationdeleteLocalMobilizationauth0FunctionAppSyncFunction5C926C3C": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "LocalMobilizationDataSource",
+            "Name"
+          ]
+        },
+        "FunctionVersion": "2018-05-29",
+        "Name": "MutationdeleteLocalMobilizationauth0Function",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.deleteLocalMobilization.auth.1.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.deleteLocalMobilization.auth.1.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "LocalMobilizationDataSource"
+      ]
+    },
+    "MutationDeleteLocalMobilizationDataResolverFnMutationDeleteLocalMobilizationDataResolverFnAppSyncFunctionF6A8D8A3": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "LocalMobilizationDataSource",
+            "Name"
+          ]
+        },
+        "FunctionVersion": "2018-05-29",
+        "Name": "MutationDeleteLocalMobilizationDataResolverFn",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.deleteLocalMobilization.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.deleteLocalMobilization.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "LocalMobilizationDataSource"
+      ]
+    },
+    "DeleteLocalMobilizationResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "deleteLocalMobilization",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Fn::GetAtt": [
+                "MutationdeleteLocalMobilizationauth0FunctionMutationdeleteLocalMobilizationauth0FunctionAppSyncFunction5C926C3C",
+                "FunctionId"
+              ]
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+            },
+            {
+              "Fn::GetAtt": [
+                "MutationDeleteLocalMobilizationDataResolverFnMutationDeleteLocalMobilizationDataResolverFnAppSyncFunctionF6A8D8A3",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"deleteLocalMobilization\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+              {
+                "Ref": "LocalMobilizationTable"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+        "TypeName": "Mutation"
+      }
+    },
+    "SubscriptiononCreateLocalMobilizationResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "onCreateLocalMobilization",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptiononCreateInsuranceTypeauth0FunctionSubscriptiononCreateInsuranceTypeauth0FunctionAppSyncFuncti1417D75E"
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptionOnCreateInsuranceTypeDataResolverFnSubscriptionOnCreateInsuranceTypeDataResolverFnAppSyncFunc15969348"
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onCreateLocalMobilization\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+        "TypeName": "Subscription"
+      }
+    },
+    "SubscriptiononUpdateLocalMobilizationResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "onUpdateLocalMobilization",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptiononCreateInsuranceTypeauth0FunctionSubscriptiononCreateInsuranceTypeauth0FunctionAppSyncFuncti1417D75E"
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptionOnCreateInsuranceTypeDataResolverFnSubscriptionOnCreateInsuranceTypeDataResolverFnAppSyncFunc15969348"
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onUpdateLocalMobilization\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+        "TypeName": "Subscription"
+      }
+    },
+    "SubscriptiononDeleteLocalMobilizationResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "onDeleteLocalMobilization",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptiononCreateInsuranceTypeauth0FunctionSubscriptiononCreateInsuranceTypeauth0FunctionAppSyncFuncti1417D75E"
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptionOnCreateInsuranceTypeDataResolverFnSubscriptionOnCreateInsuranceTypeDataResolverFnAppSyncFunc15969348"
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onDeleteLocalMobilization\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+        "TypeName": "Subscription"
+      }
+    }
+  },
+  "Outputs": {
+    "GetAttLocalMobilizationTableStreamArn": {
+      "Description": "Your DynamoDB table StreamArn.",
+      "Value": {
+        "Fn::GetAtt": [
+          "LocalMobilizationTable",
+          "StreamArn"
+        ]
+      },
+      "Export": {
+        "Name": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "GetAtt:LocalMobilizationTable:StreamArn"
+            ]
+          ]
+        }
+      }
+    },
+    "GetAttLocalMobilizationTableName": {
+      "Description": "Your DynamoDB table name.",
+      "Value": {
+        "Ref": "LocalMobilizationTable"
+      },
+      "Export": {
+        "Name": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "GetAtt:LocalMobilizationTable:Name"
+            ]
+          ]
+        }
+      }
+    },
+    "GetAttLocalMobilizationDataSourceName": {
+      "Description": "Your model DataSource name.",
+      "Value": {
+        "Fn::GetAtt": [
+          "LocalMobilizationDataSource",
+          "Name"
+        ]
+      },
+      "Export": {
+        "Name": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "GetAtt:LocalMobilizationDataSource:Name"
+            ]
+          ]
+        }
+      }
+    }
+  }
+}

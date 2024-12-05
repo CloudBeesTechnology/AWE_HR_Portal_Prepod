@@ -67,8 +67,8 @@ export const WeldingQualificationForm = () => {
         weldingUpload:uploadeWQU.weldingUpload
       };
      
-      await SubmitMPData({ TCValue });
-      setNotification(true);
+      // await SubmitMPData({ TCValue });
+      // setNotification(true);
     } catch (error) {
       console.error("Error submitting data:", error);
       if (error?.errors) {

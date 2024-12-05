@@ -25,11 +25,13 @@ export declare type ORMCSheetUpdateFormInputValues = {
     date?: string;
     dailySheet?: string[];
     status?: string;
+    manager?: string[];
 };
 export declare type ORMCSheetUpdateFormValidationValues = {
     date?: ValidationFunction<string>;
     dailySheet?: ValidationFunction<string>;
     status?: ValidationFunction<string>;
+    manager?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type ORMCSheetUpdateFormOverridesProps = {
@@ -37,6 +39,7 @@ export declare type ORMCSheetUpdateFormOverridesProps = {
     date?: PrimitiveOverrideProps<TextFieldProps>;
     dailySheet?: PrimitiveOverrideProps<TextAreaFieldProps>;
     status?: PrimitiveOverrideProps<TextFieldProps>;
+    manager?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type ORMCSheetUpdateFormProps = React.PropsWithChildren<{
     overrides?: ORMCSheetUpdateFormOverridesProps | undefined | null;

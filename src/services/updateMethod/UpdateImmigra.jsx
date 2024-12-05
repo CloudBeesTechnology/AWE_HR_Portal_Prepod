@@ -11,22 +11,22 @@ export const UpdateImmigra = () => {
     const totalData = {
       id:UpImmiValue.id,
       empID: UpImmiValue.empID,
-      ppLocation: [UpImmiValue.ppLocation],
-      arrivStampUpload: [UpImmiValue.arrivStampUpload],
-      immigEmpUpload: [UpImmiValue.immigEmpUpload],
-      reEntryUpload: [UpImmiValue.reEntryUpload],
-      arrivStampExp: [UpImmiValue.arrivStampExp],
+      ppLocation: UpImmiValue.ppLocation,
+      arrivStampUpload: UpImmiValue.arrivStampUpload,
+      immigEmpUpload: UpImmiValue.immigEmpUpload,
+      reEntryUpload: UpImmiValue.reEntryUpload,
+      arrivStampExp: UpImmiValue.arrivStampExp,
       immigRefNo: UpImmiValue.immigRefNo,
-      ppSubmit: [UpImmiValue.ppSubmit],
-      empPassExp: [UpImmiValue.empPassExp],
-      empPassStatus: [UpImmiValue.empPassStatus],
-      airTktStatus: [UpImmiValue.airTktStatus],
-      reEntryVisa: [UpImmiValue.reEntryVisa],
-      immigApproval: [UpImmiValue.immigApproval],
-      reEntryVisaExp: [UpImmiValue.reEntryVisaExp],
-      remarkImmig: [UpImmiValue.remarkImmig],
+      ppSubmit: UpImmiValue.ppSubmit,
+      empPassExp: UpImmiValue.empPassExp,
+      empPassStatus: UpImmiValue.empPassStatus,
+      airTktStatus: UpImmiValue.airTktStatus,
+      reEntryVisa: UpImmiValue.reEntryVisa,
+      immigApproval: UpImmiValue.immigApproval,
+      reEntryVisaExp: UpImmiValue.reEntryVisaExp,
+      remarkImmig: UpImmiValue.remarkImmig,
     };
-
+    console.log(totalData);
 
     try {
       const storedData=   await Promise.all([
@@ -37,7 +37,7 @@ export const UpdateImmigra = () => {
              },
            })
          ])
-        
+         console.log(storedData,"successfully stored data");
 
        } catch (error) {
          console.error("Error executing GraphQL requests:", error);

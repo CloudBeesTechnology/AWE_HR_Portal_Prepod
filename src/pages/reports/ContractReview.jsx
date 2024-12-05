@@ -1,20 +1,45 @@
-import React, { useEffect, useState } from 'react'
-import { FilterTable } from './FilterTable'
+import React, { useEffect, useState } from 'react';
+import { FilterTable } from './FilterTable';
 
-export const ContractReview  = ({allData,typeOfReport,reportTitle}) => {
+export const ContractReview = ({ allData, typeOfReport, reportTitle }) => {
   const [tableBody, setTableBody] = useState([]);
-  const [tableHead, setTableHead] = useState([
-     "Name",
+  const [tableHead] = useState([
+    "Name",
+    "Emp ID",
     "Employee Badge",
     "Nationality",
     "Date of Joined",
     "Department",
-    "workPosition",
-    "Contract Start Date ",
+    "Work Position",
+    "Contract Start Date",
     "Contract End Date",
     "LD Expiry",
-    "Duration of Renewal Contract",,]);
+    "Duration of Renewal Contract",
+  ]);
 
+  const formatDate = (date, type) => {
+    console.log(date, type);
+  
+    // Handle array of dates
+    if (Array.isArray(date)) {
+      if (date.length === 0) return "-"; // Handle empty arrays
+      const lastDate = date[date.length - 1]; // Get the last element
+      return formatDate(lastDate, type); // Recursively format the last date
+    }
+  
+    // Handle single date
+    if (!date) return "-"; // Handle empty or invalid dates
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) return "-"; // Handle invalid date strings
+  
+    // Format date as dd-mm-yyyy
+    const day = String(parsedDate.getDate()).padStart(2, "0");
+    const month = String(parsedDate.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+    const year = parsedDate.getFullYear();
+  
+    return `${day}-${month}-${year}`;
+  };
+  
   const calculateTotalMonths = (startDate, endDate) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -29,53 +54,67 @@ export const ContractReview  = ({allData,typeOfReport,reportTitle}) => {
     );
   };
 
-  // Helper function to calculate remaining balance months
   const calculateBalanceMonths = (startDate, endDate) => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
     const today = new Date(); // Current date
-
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-      return "-"; // Return "-" if any date is invalid
-    }
-
     const totalMonths = calculateTotalMonths(startDate, endDate);
-
     const completedMonths = calculateTotalMonths(startDate, today);
 
-    const balanceMonths = totalMonths - completedMonths;
+    if (typeof totalMonths === "string" || typeof completedMonths === "string") {
+      return "-"; // Return "-" if calculation is invalid
+    }
 
-    return balanceMonths >= 0 ? `${balanceMonths} months` : "-"; // Return "-" if balance is negative
+    const balanceMonths = totalMonths - completedMonths;
+    return (balanceMonths >= 0 && balanceMonths !== 0) ? `${balanceMonths} months` : "Few days more"; // Return "-" if balance is negative
   };
 
   const contractExpiryMergedData = (data) => {
-    return data.map((item) => {
-      const balanceMonths = calculateBalanceMonths(item.contractStart, item.contractEnd);
-      return [
-        item.name || "-",
-        item.empBadgeNo || "-",
-        item.nationality || "-",
-        item.doj || "-",
-        item.department || "-",
-        item.position || "-",
-        item.contractStart || "-",
-        item.contractEnd || "-",
-        item.nlmsEmpValid || "-",
-        balanceMonths || "-",  // Store the calculated balance months
-      ];
-    });
+    const today = new Date(); // Current date for comparison
+  
+    return data
+      .filter((item) => {
+        const contractEndDates = item.contractEnd || []; // Ensure it's an array
+        const lastDate = contractEndDates[contractEndDates.length - 1]; // Get the last date
+        return lastDate && new Date(lastDate) >= today; // Include only valid dates
+      })
+      .map((item) => {
+        const contractEndDates = item.contractEnd || [];
+        const lastDate = contractEndDates[contractEndDates.length - 1]; // Get the last element safely
+        const contractStartDates = item.contractStart || [];
+        const startDate = contractStartDates[contractStartDates.length - 1]; // Get the last element safely
+  
+        const balanceMonths = calculateBalanceMonths(startDate, lastDate);
+  
+        return [
+          item.name || "-",
+          item.empID || "-",
+          item.empBadgeNo || "-",
+          item.nationality || "-",
+          formatDate(item.doj) || "-", // Format Date of Joined
+          item.department || "-",
+          item.position || "-",
+          formatDate(startDate) || "-", // Format Contract Start Date
+          formatDate(lastDate) || "-", // Format Contract End Date
+          formatDate(item.nlmsEmpValid) || "-",
+          balanceMonths, // Store the calculated balance months
+        ];
+      });
   };
+  
 
-  useEffect(()=>{
-    
-      setTableBody(contractExpiryMergedData(allData))
-    },[allData])
-console.log(tableBody);
+  useEffect(() => {
+    if (allData) {
+      setTableBody(contractExpiryMergedData(allData));
+    }
+  }, [allData]);
 
   return (
     <div>
-
-      <FilterTable tableBody={tableBody} tableHead={tableHead} typeOfReport={typeOfReport} reportTitle={reportTitle}/>
+      <FilterTable
+        tableBody={tableBody}
+        tableHead={tableHead}
+        typeOfReport={typeOfReport}
+        reportTitle={reportTitle}
+      />
     </div>
-  )
-}
+  );
+};

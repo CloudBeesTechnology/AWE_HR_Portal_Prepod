@@ -27,6 +27,8 @@ export declare type EmpPersonalInfoUpdateFormInputValues = {
     aTQualify?: string;
     alternateNo?: string;
     agent?: string[];
+    bankName?: string;
+    bankAccNo?: string;
     contactNo?: string[];
     cob?: string;
     contractType?: string[];
@@ -56,6 +58,8 @@ export declare type EmpPersonalInfoUpdateFormValidationValues = {
     aTQualify?: ValidationFunction<string>;
     alternateNo?: ValidationFunction<string>;
     agent?: ValidationFunction<string>;
+    bankName?: ValidationFunction<string>;
+    bankAccNo?: ValidationFunction<string>;
     contactNo?: ValidationFunction<string>;
     cob?: ValidationFunction<string>;
     contractType?: ValidationFunction<string>;
@@ -87,6 +91,8 @@ export declare type EmpPersonalInfoUpdateFormOverridesProps = {
     aTQualify?: PrimitiveOverrideProps<TextFieldProps>;
     alternateNo?: PrimitiveOverrideProps<TextFieldProps>;
     agent?: PrimitiveOverrideProps<TextFieldProps>;
+    bankName?: PrimitiveOverrideProps<TextFieldProps>;
+    bankAccNo?: PrimitiveOverrideProps<TextFieldProps>;
     contactNo?: PrimitiveOverrideProps<TextFieldProps>;
     cob?: PrimitiveOverrideProps<TextFieldProps>;
     contractType?: PrimitiveOverrideProps<TextFieldProps>;

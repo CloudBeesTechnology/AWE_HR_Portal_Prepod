@@ -8,8 +8,7 @@ export const TabConfig = {
         { label: 'Message', field: 'message', type: 'text' },
       ],
       Candidate: [
-        { label: 'Name', field: 'name', type: 'text' },
-        { label: 'Position', field: 'position', type: 'text' },
+        { label: 'Selected Position', field: 'position', type: 'text' },
         { label: 'Selected Department', field: 'department', type: 'text' },
       ],
       LOI: [

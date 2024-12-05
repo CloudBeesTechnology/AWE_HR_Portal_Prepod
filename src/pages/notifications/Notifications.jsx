@@ -1,137 +1,93 @@
 import { useEffect, useState } from "react";
-// import {
-//   listEmployeePersonalDocs,
-//   listEmployeePersonalInfos,
-//   listEmployeeWorkInfos,
-//   listLabourDependentPasses,
-//   listLabourMedicalInfos,
-//   listLabourWorkPasses,
-//   listLeaveWorkInfos,
-//   listTerminationWorkInfos,
-// } from "../../graphql/queries";
+import { listEmailNotifis, listEmpPersonalInfos } from "../../graphql/queries";
 import { generateClient } from "@aws-amplify/api";
 import { Popup } from "./Popup";
 
 export const Notifications = () => {
-  const [mergeData, setMergeData] = useState();
   const [listOfNotifications, setListOfNotifications] = useState([]);
+  const [leaveOfNotifications, setLeaveOfNotifications] = useState([]);
   const [toggleForPopup, setToggleForPopup] = useState(false);
+  const [userID, setUserID] = useState("");
   const [specificNotificationDetails, setSpecificNotificationDetails] =
     useState();
+    const [popupData, setPopupData] = useState();
   const client = generateClient();
 
   const toggleFunction = () => {
     setToggleForPopup(!toggleForPopup);
   };
-  const sendToPopup = (object) => {
+  const sendToPopup = (object, leave) => {
     setSpecificNotificationDetails(object);
+    setPopupData(leave)
+  
   };
+
+  useEffect(() => {
+    const userID = localStorage.getItem("userID");
+    setUserID(userID);
+    // console.log("Navbar: User ID from localStorage:", userID);
+  }, []);
+
+  useEffect(() => {
+    const userID = localStorage.getItem("userID");
+    setUserID(userID);
+    console.log(userID, "userid");
+  }, []);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [
-          empPersonalInfos,
-          empPersonalDocs,
-          labourDependentPasses,
-          labourMedicalInfo,
-          labourWorkPasses,
-          employeeWorkInfo,
-          terminationWorkInfo,
-          leaveWorkInfo,
-        ] = await Promise.all([
-          client.graphql({ query: listEmployeePersonalInfos }),
-          client.graphql({ query: listEmployeePersonalDocs }),
-          client.graphql({ query: listLabourDependentPasses }),
-          client.graphql({ query: listLabourMedicalInfos }),
-          client.graphql({ query: listLabourWorkPasses }),
-          client.graphql({ query: listEmployeeWorkInfos }),
-          client.graphql({ query: listTerminationWorkInfos }),
-          client.graphql({ query: listLeaveWorkInfos }),
-        ]);
+        const emailNotifis = await client.graphql({ query: listEmailNotifis });
+        const leaveNotification = emailNotifis?.data?.listEmailNotifis?.items;
 
-        const candidates =
-          empPersonalInfos?.data?.listEmployeePersonalInfos?.items;
-        const interviews =
-          empPersonalDocs?.data?.listEmployeePersonalDocs?.items;
-        const dependentPasses =
-          labourDependentPasses?.data?.listLabourDependentPasses?.items;
-        const medicalInfo =
-          labourMedicalInfo?.data?.listLabourMedicalInfos?.items;
-        const workPasses = labourWorkPasses?.data?.listLabourWorkPasses?.items;
-        const workInfo = employeeWorkInfo?.data?.listEmployeeWorkInfos?.items;
-        const terminations =
-          terminationWorkInfo?.data?.listTerminationWorkInfos?.items;
-        const leaves = leaveWorkInfo?.data?.listLeaveWorkInfos?.items;
-        // console.log("listEmployeePersonalInfos : ", candidates);
-        // console.log("listEmployeePersonalDocs : ", interviews);
-        // console.log("listLabourDependentPasses : ", dependentPasses);
-        // console.log("listLabourMedicalInfos : ", medicalInfo);
-        // console.log("listLabourWorkPasses : ", workPasses);
-        // console.log("listEmployeeWorkInfos : ", workInfo);
-        // console.log("listTerminationWorkInfos", terminations);
-        // console.log("listLeaveWorkInfos : ", leaves);
-        const mergedData = candidates
-          .map((candidate) => {
-            const interviewDetails = interviews.find(
-              (item) => item.empID === candidate.empID
-            );
-            const dependentPassDetails = dependentPasses.find(
-              (item) => item.empID === candidate.empID
-            );
-            const medicalDetails = medicalInfo.find(
-              (item) => item.empID === candidate.empID
-            );
-            const workPassDetails = workPasses.find(
-              (item) => item.empID === candidate.empID
-            );
-            const workInfoDetails = workInfo.find(
-              (item) => item.empID === candidate.empID
-            );
-            const terminationDetails = terminations.find(
-              (item) => item.empID === candidate.empID
-            );
-            const leaveDetails = leaves.find(
-              (item) => item.empID === candidate.empID
-            );
+        // Log the receipentEmpID for debugging
+        console.log(
+          "Leave Notifications (receipentEmpID):",
+          leaveNotification.map((notification) => notification.receipentEmpID)
+        );
 
-            // Return null if all details are undefined
-            if (
-              !interviewDetails &&
-              !dependentPassDetails &&
-              !medicalDetails &&
-              !workPassDetails &&
-              !workInfoDetails &&
-              !terminationDetails &&
-              !leaveDetails
-            ) {
-              return null;
-            }
+        // Filter leave notifications for the logged-in user, ensuring recipientEmpID is not null or empty
+        const filteredLeaveNotifications = leaveNotification.filter(
+          (notification) => {
+            // Normalize both IDs to lowercase for case-insensitive comparison
+            const recipientEmpID = notification.receipentEmpID
+              ? notification.receipentEmpID.trim().toLowerCase()
+              : "";
+            const loggedInUserID = userID ? userID.trim().toLowerCase() : "";
 
-            return {
-              ...candidate,
-              ...interviewDetails,
-              ...dependentPassDetails,
-              ...medicalDetails,
-              ...workPassDetails,
-              ...workInfoDetails,
-              ...terminationDetails,
-              ...leaveDetails,
-            };
+            // Log for debugging
+            console.log(`Comparing: ${recipientEmpID} === ${loggedInUserID}`);
+
+            // Return the notification if recipientEmpID matches loggedInUserID and is not null or empty
+            return recipientEmpID === loggedInUserID && recipientEmpID !== ""; // Ensures valid recipientEmpID
+          }
+        );
+
+        // Log the filtered leave notifications
+        console.log(
+          "Filtered Leave Notifications:",
+          filteredLeaveNotifications
+        );
+
+        // Set leave notifications in the table
+        const additionalNotifications = filteredLeaveNotifications.map(
+          (notification) => ({
+            empID: notification.empID,
+            name: notification.name, // Adjust according to your data structure
+            subject: notification.leaveType,
+            message: notification.message,
+            date: new Date(notification.createdAt).toLocaleDateString(),
+            type: "Leave Notification",
           })
-          .filter((item) => item !== null); // Filter out null entries
-        console.log(mergedData);
-        setMergeData(mergedData);
+        );
+
+        setLeaveOfNotifications(additionalNotifications);
       } catch (err) {
         console.error("Error fetching data:", err.message);
       }
     };
 
-    // fetchData();
-    return () => {
-      // fetchData();
-      one();
-    };
-  }, []);
+    fetchData();
+  }, [userID]);
 
   const calculateNotificationDate = (expiryDate, monthsBefore) => {
     const date = new Date(expiryDate);
@@ -214,16 +170,6 @@ export const Notifications = () => {
       );
 
       const notificationResults = [];
-      // return {
-      //   empID: emp.empID,
-      //   empBatchNo: emp.employeeBadgeNumber,
-      //   name: emp.name,
-      //   possition: emp.workPosition,
-      //   department: emp.department,
-      //   empPassExpiry: probationExpiryDate,
-      //   date: today.toLocaleDateString(),
-      // };
-      // Check for each condition and push to notificationResults if true
       if (
         today >= probationNotificationDate &&
         today <= new Date(emp.ProbationaryEndDate)
@@ -332,6 +278,10 @@ export const Notifications = () => {
     console.log(flattenedNotifications);
   };
 
+  useEffect(() => {
+    one();
+  }, []);
+
   return (
     <section className="p-10 bg-[#F7F8F4] shadow-md rounded-lg">
       <div className=" bg-white rounded-2xl">
@@ -356,40 +306,22 @@ export const Notifications = () => {
               <th className="p-7 text-left">Date</th>
               <th className="p-7 text-left">Subject</th>
               {/* <th className="p-7 text-left">Title</th> */}
-              <th className="p-7  text-left"></th>
-              <th className="p-7  text-left"></th>
+              <th className="p-7  text-left">Action</th>
+              <th className="p-7  text-left">Status</th>
             </tr>
           </thead>
           <tbody>
-            {listOfNotifications &&
-              listOfNotifications.map((notification, index) => (
+            {leaveOfNotifications &&
+              leaveOfNotifications.map((notification, index) => (
                 <tr key={index} className="border-b last:border-b-0 ">
-                  {/* <td className="p-7">
-                  <input type="checkbox" />
-                </td> */}
                   <td className="p-7">{notification.date}</td>
                   <td className="p-7 text_size_6 text-dark_grey gap-5">
                     {notification.subject} <br />
                     <span className="text-sm text-dark_ash">
-                      Please take immediate action to renew your{" "}
-                      {notification.subject}...
+                  
+                      {notification.message}...
                     </span>
                   </td>
-                  {/* <td className="p-7  flex items-center gap-10">
-                  <span
-                    className="text-yellow border-b ml-1 cursor-pointer"
-                    onClick={toggleFunction}
-                  >
-                    Read More
-                  </span>
-
-                  <div className=" mt-3.5 w-[60px] border label-new ">
-                    <span className="flex justify-center items-center">
-                      {" "}
-                      New
-                    </span>
-                  </div>
-                </td> */}
                   <td className="pr-14 ">
                     <span
                       className="border-b-2 py-1 cursor-pointer"
@@ -416,12 +348,51 @@ export const Notifications = () => {
                 </tr>
               ))}
           </tbody>
+          <tbody>
+            {listOfNotifications &&
+              listOfNotifications.map((notification1, index) => (
+                <tr key={index} className="border-b last:border-b-0 ">
+                  <td className="p-7">{notification1.date}</td>
+                  <td className="p-7 text_size_6 text-dark_grey gap-5">
+                    {notification1.subject} <br />
+                    <span className="text-sm text-dark_ash">
+                      Please take immediate action to renew your{" "}
+                      {notification1.subject}...
+                    </span>
+                  </td>
+                  <td className="pr-14 ">
+                    <span
+                      className="border-b-2 py-1 cursor-pointer"
+                      onClick={() => {
+                        toggleFunction();
+                        sendToPopup(notification1);
+                      }}
+                    >
+                      Read More
+                    </span>
+                  </td>
+                  <td className="px-4">
+                    <div className=" mt-3.5 w-[60px] border label-new ">
+                      <span className="flex justify-center items-center">
+                        New
+                      </span>
+                    </div>
+                  </td>
+                  {/* {notification.isNew && (   
+              <td className=" mt-3.5 w-[60px] border label-new ">
+                   <span className="flex justify-center items-center"> New</span>
+              </td>
+              )} */}
+                </tr>
+              ))}
+          </tbody>
         </table>
       </div>
       {toggleForPopup && (
         <Popup
           toggleFunction={toggleFunction}
           specificNotificationDetails={specificNotificationDetails}
+          popupData={popupData}
         />
       )}
     </section>

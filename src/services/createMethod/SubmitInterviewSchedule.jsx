@@ -1,7 +1,7 @@
 // useCreateInterviewSchedule.js
 import { useState } from 'react';
 import { generateClient } from '@aws-amplify/api';
-import { createInterviewScheduleSchema } from '../../graphql/mutations';
+import { createInterviewSchedule } from '../../graphql/mutations';
 
 const client = generateClient();
 
@@ -17,7 +17,7 @@ export const SubmitInterviewSchedule = () => {
 
     try {
       const res = await client.graphql({
-        query: createInterviewScheduleSchema,
+        query: createInterviewSchedule,
         variables: { input: formattedData },
       });
       console.log("API Response:", res);

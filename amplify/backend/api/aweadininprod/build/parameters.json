@@ -1,0 +1,7 @@
+{
+    "AppSyncApiName": "aweadininprod",
+    "DynamoDBBillingMode": "PAY_PER_REQUEST",
+    "DynamoDBEnableServerSideEncryption": false,
+    "S3DeploymentBucket": "amplify-aweadininprod-prod-954b8-deployment",
+    "S3DeploymentRootKey": "amplify-appsync-files/d1a6c2621d6f04dc504ca6d8494ff4ed10da75a7"
+}

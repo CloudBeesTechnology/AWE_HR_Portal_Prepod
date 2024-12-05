@@ -195,10 +195,12 @@ export default function SBWSheetUpdateForm(props) {
     date: "",
     dailySheet: [],
     status: "",
+    manager: [],
   };
   const [date, setDate] = React.useState(initialValues.date);
   const [dailySheet, setDailySheet] = React.useState(initialValues.dailySheet);
   const [status, setStatus] = React.useState(initialValues.status);
+  const [manager, setManager] = React.useState(initialValues.manager);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = sBWSheetRecord
@@ -208,6 +210,8 @@ export default function SBWSheetUpdateForm(props) {
     setDailySheet(cleanValues.dailySheet ?? []);
     setCurrentDailySheetValue("");
     setStatus(cleanValues.status);
+    setManager(cleanValues.manager ?? []);
+    setCurrentManagerValue("");
     setErrors({});
   };
   const [sBWSheetRecord, setSBWSheetRecord] = React.useState(sBWSheetModelProp);
@@ -229,10 +233,13 @@ export default function SBWSheetUpdateForm(props) {
   const [currentDailySheetValue, setCurrentDailySheetValue] =
     React.useState("");
   const dailySheetRef = React.createRef();
+  const [currentManagerValue, setCurrentManagerValue] = React.useState("");
+  const managerRef = React.createRef();
   const validations = {
-    date: [{ type: "Required" }],
-    dailySheet: [{ type: "Required" }, { type: "JSON" }],
-    status: [{ type: "Required" }],
+    date: [],
+    dailySheet: [{ type: "JSON" }],
+    status: [],
+    manager: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -260,9 +267,10 @@ export default function SBWSheetUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          date,
-          dailySheet,
-          status,
+          date: date ?? null,
+          dailySheet: dailySheet ?? null,
+          status: status ?? null,
+          manager: manager ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -316,7 +324,7 @@ export default function SBWSheetUpdateForm(props) {
     >
       <TextField
         label="Date"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={date}
         onChange={(e) => {
@@ -326,6 +334,7 @@ export default function SBWSheetUpdateForm(props) {
               date: value,
               dailySheet,
               status,
+              manager,
             };
             const result = onChange(modelFields);
             value = result?.date ?? value;
@@ -348,6 +357,7 @@ export default function SBWSheetUpdateForm(props) {
               date,
               dailySheet: values,
               status,
+              manager,
             };
             const result = onChange(modelFields);
             values = result?.dailySheet ?? values;
@@ -369,7 +379,7 @@ export default function SBWSheetUpdateForm(props) {
       >
         <TextAreaField
           label="Daily sheet"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentDailySheetValue}
           onChange={(e) => {
@@ -391,7 +401,7 @@ export default function SBWSheetUpdateForm(props) {
       </ArrayField>
       <TextField
         label="Status"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={status}
         onChange={(e) => {
@@ -401,6 +411,7 @@ export default function SBWSheetUpdateForm(props) {
               date,
               dailySheet,
               status: value,
+              manager,
             };
             const result = onChange(modelFields);
             value = result?.status ?? value;
@@ -415,6 +426,54 @@ export default function SBWSheetUpdateForm(props) {
         hasError={errors.status?.hasError}
         {...getOverrideProps(overrides, "status")}
       ></TextField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              date,
+              dailySheet,
+              status,
+              manager: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.manager ?? values;
+          }
+          setManager(values);
+          setCurrentManagerValue("");
+        }}
+        currentFieldValue={currentManagerValue}
+        label={"Manager"}
+        items={manager}
+        hasError={errors?.manager?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("manager", currentManagerValue)
+        }
+        errorMessage={errors?.manager?.errorMessage}
+        setFieldValue={setCurrentManagerValue}
+        inputFieldRef={managerRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Manager"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentManagerValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.manager?.hasError) {
+              runValidationTasks("manager", value);
+            }
+            setCurrentManagerValue(value);
+          }}
+          onBlur={() => runValidationTasks("manager", currentManagerValue)}
+          errorMessage={errors.manager?.errorMessage}
+          hasError={errors.manager?.hasError}
+          ref={managerRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "manager")}
+        ></TextAreaField>
+      </ArrayField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

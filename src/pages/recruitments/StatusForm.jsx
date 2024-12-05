@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BsCloudUpload } from 'react-icons/bs';
-import { TabConfig } from './TabConfig';
+import { VscClose } from "react-icons/vsc";
 import { InterviewForm } from './ScheduledForm/InterViewForm';
 import { CandidateForm } from './ScheduledForm/CandidateForm';
 import { LOIForm } from './ScheduledForm/LOIForm';
@@ -14,12 +13,15 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
   const [show, setShow] = useState(0);
   return (
     <div className="fixed inset-0 bg-grey bg-opacity-80 z-50 center">
-      <div className="bg-white p-8 rounded-lg w-full max-w-[650px]  overflow-hidden">
-        <h2 className="text-xl font-bold mb-4 p-1 rounded-md bg-[#f7f183ea]">
+      <div className="bg-white p-10 rounded-lg w-full max-w-[700px] overflow-hidden relative">
+    <button onClick={onClose} className=" absolute top-2 right-2 border rounded-full p-1">
+          <VscClose size={20} />
+    </button>
+        <h2 className="text-xl font-bold mb-4 p-2 rounded-md bg-[#f7f183ea]">
           TempID: {candidate?.tempID} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Name: {candidate?.name}
         </h2>
 
-        <article className="flex-1 flex gap-5 text-dark_grey mt-5">
+        <article className="flex-1 flex gap-5 text-black mt-5">
           <h1
             className={`  px-3 py-1 rounded-lg whitespace-nowrap  ${
               show ===0
@@ -90,7 +92,7 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
 {show === 5 && <MobilizationForm/>}
 
 
-        <div className="flex justify-between mt-4">
+        {/* <div className="flex justify-between mt-4">
           <button
             onClick={onClose}
             className="border-2 border-grey hover:bg-slate_grey hover:text-white px-4 py-2 rounded-xl"
@@ -98,7 +100,7 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
             Close
           </button>
 
-        </div>
+        </div> */}
       </div>
     </div>
   );

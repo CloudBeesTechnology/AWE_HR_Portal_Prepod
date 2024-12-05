@@ -10,20 +10,20 @@ export const ImmigrationFun = () => {
     }
     const totalData = {
       empID: ImmiValue.empID,
-      ppLocation: [ImmiValue.ppLocation],
-      arrivStampUpload: [ImmiValue.arrivStampUpload],
-      immigEmpUpload: [ImmiValue.immigEmpUpload],
-      reEntryUpload: [ImmiValue.reEntryUpload],
-      arrivStampExp: [ImmiValue.arrivStampExp],
+      ppLocation: ImmiValue.ppLocation,
+      arrivStampUpload: ImmiValue.arrivStampUpload,
+      immigEmpUpload: ImmiValue.immigEmpUpload,
+      reEntryUpload: ImmiValue.reEntryUpload,
+      arrivStampExp: ImmiValue.arrivStampExp,
       immigRefNo: ImmiValue.immigRefNo,
-      ppSubmit: [ImmiValue.ppSubmit],
-      empPassExp: [ImmiValue.empPassExp],
-      empPassStatus: [ImmiValue.empPassStatus],
-      airTktStatus: [ImmiValue.airTktStatus],
-      reEntryVisa: [ImmiValue.reEntryVisa],
-      immigApproval: [ImmiValue.immigApproval],
-      reEntryVisaExp: [ImmiValue.reEntryVisaExp],
-      remarkImmig: [ImmiValue.remarkImmig],
+      ppSubmit: ImmiValue.ppSubmit,
+      empPassExp: ImmiValue.empPassExp,
+      empPassStatus: ImmiValue.empPassStatus,
+      airTktStatus: ImmiValue.airTktStatus,
+      reEntryVisa: ImmiValue.reEntryVisa,
+      immigApproval: ImmiValue.immigApproval,
+      reEntryVisaExp: ImmiValue.reEntryVisaExp,
+      remarkImmig: ImmiValue.remarkImmig,
     };
     console.log(totalData);
 
@@ -36,7 +36,7 @@ export const ImmigrationFun = () => {
              },
            })
          ])
-        //  console.log(storedData,"successfully stored data");
+         console.log(storedData,"successfully stored data");
 
        } catch (error) {
          console.error("Error executing GraphQL requests:", error);

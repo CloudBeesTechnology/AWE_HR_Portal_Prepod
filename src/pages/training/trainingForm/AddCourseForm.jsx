@@ -1,10 +1,10 @@
 
-
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CourceValidationSchema } from "../../../services/TrainingValidation";
 import { useContext, useState } from "react";
-import { LuPlusSquare } from "react-icons/lu";
+import { CiSquarePlus } from "react-icons/ci";
+
 import { AddCFFun } from "../../../services/createMethod/AddCFFun";
 import { AddCFUpdate } from "../../../services/updateMethod/AddCFUpdate";
 import { DataSupply } from "../../../utils/DataStoredContext";
@@ -44,7 +44,6 @@ console.log(AddCourseDetails);
 
       if (checkingEIDTable) {
         // Combine existing data with new data and remove duplicates
-        
   
         const updatedCourseName = [
           ...new Set([
@@ -134,7 +133,7 @@ console.log(AddCourseDetails);
               onClick={addCourseNameField}
               className="absolute top-10 -right-7 text-medium_grey text-[18px]"
             >
-              <LuPlusSquare />
+              <CiSquarePlus />
             </button>
           </div>
 
@@ -160,7 +159,7 @@ console.log(AddCourseDetails);
               onClick={addCompanyField}
               className="absolute top-10 -right-7 text-medium_grey text-[18px]"
             >
-              <LuPlusSquare />
+              <CiSquarePlus />
             </button>
           </div>
 

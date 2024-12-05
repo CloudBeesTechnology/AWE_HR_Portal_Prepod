@@ -1,304 +1,354 @@
-import React from "react";
-import { useForm, useFieldArray } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { LuPlusSquare } from "react-icons/lu";
-import { GoUpload } from "react-icons/go";
-import { InsuranceInfoSchema } from "../../../services/EmployeeValidation";
+// import React, { useEffect, useState } from 'react';
+// import { useForm, useFieldArray } from "react-hook-form";
+// import { yupResolver } from "@hookform/resolvers/yup";
+// import { LuPlusSquare, LuMinusSquare } from "react-icons/lu";
+// import { FormField } from "../../../utils/FormField";
+// import { FileUploadField } from "../medicalDep/FileUploadField";
+// import { GoUpload } from "react-icons/go";
+// import { InsuranceInfoSchema } from "../../../services/EmployeeValidation";
+// import { SpinLogo } from "../../../utils/SpinLogo";
 
-export const InsuranceInfo = () => {
-  const {
-    register,
-    handleSubmit,
-    control,
-    setValue,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(InsuranceInfoSchema),
-    defaultValues: {
-      groupHSDetails: [{ policyNumber: "", expiryDate: "" }], // Group H&S initialized
-      workmenCompDetails: [{ policyNumber: "", expiryDate: "" }], // Workmen Compensation initialized
-      travellingDetails: [{ policyNumber: "", expiryDate: "" }], // Travelling Insurance initialized
-      personalAccidentDetails: [{ policyNumber: "", expiryDate: "" }], // Personal Accident initialized
-    },
-  });
+// export const InsuranceInfo = () => {
 
-  // Using useFieldArray for each set of insurance details
-  const { fields: groupHSFields, append: appendGroupHS } = useFieldArray({
-    control,
-    name: "groupHSDetails",
-  });
+//   const [notification, setNotification] = useState(false);
 
-  const { fields: workmenCompFields, append: appendWorkmenComp } = useFieldArray({
-    control,
-    name: "workmenCompDetails",
-  });
+//   const {
+//     register,
+//     handleSubmit,
+//     control,
+//     setValue,
+//     formState: { errors },
+//   } = useForm({
+//     resolver: yupResolver(InsuranceInfoSchema),
+//     defaultValues: {
+//       groupHSDetails: [{ groupHSNo: "", groupHSExp: "", isNew: false, groupHSUpload: null }], 
+//       workmenCompDetails: [{ empStatusType: "", workmenCompNo: "", workmenCompExp: "", isNew: false, workmenCompUpload: null }],
+//       travellingDetails: [{ travellingNo: "", travellingExp: "", isNew: false, travellingUpload: null }],
+//       personalAccidentDetails: [{ personalAccNo: "", personalAccExp: "", isNew: false, personalAccUpload: null }],
+//     },
+//   });
 
-  const { fields: travellingFields, append: appendTravelling } = useFieldArray({
-    control,
-    name: "travellingDetails",
-  });
+//   const { fields: groupHSFields, append: appendGroupHS, remove: removeGroupHS } = useFieldArray({
+//     control,
+//     name: "groupHSDetails",
+//   });
 
-  const { fields: personalAccidentFields, append: appendPersonalAccident } = useFieldArray({
-    control,
-    name: "personalAccidentDetails",
-  });
+//   const { fields: workmenCompFields, append: appendWorkmenComp, remove: removeWorkmenComp } = useFieldArray({
+//     control,
+//     name: "workmenCompDetails",
+//   });
 
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    setValue("insInfUpload", file);
+//   const { fields: travellingFields, append: appendTravelling, remove: removeTravelling } = useFieldArray({
+//     control,
+//     name: "travellingDetails",
+//   });
 
-    if (file) {
-      try {
-        await upload(file);
-      } catch (error) {
-        console.log("Error uploading file:", error);
-      }
-    }
-  };
+//   const { fields: personalAccidentFields, append: appendPersonalAccident, remove: removePersonalAccident } = useFieldArray({
+//     control,
+//     name: "personalAccidentDetails",
+//   });
 
-  const upload = async (file) => {
-    try {
-      const result = await uploadData({
-        path: `insInfUpload/AWE001/${file.name}`,
-        data: file,
-      }).result;
-      const filePath = result.path;
-      const encodedFilePath = encodeURIComponent(filePath);
-      const fileUrl = `https://aweadininstorage20242a2fe-dev.s3.ap-southeast-1.amazonaws.com/${encodedFilePath}`;
-      console.log("Uploaded successfully. File URL:", fileUrl);
-    } catch (error) {
-      console.log("Error uploading:", error);
-    }
-  };
+//   const handleFileChange = async (e) => {
+//     const file = e.target.files[0];
+//     setValue("insInfUpload", file);
 
-  const onSubmit = (data) => {
-    console.log("Form Data", data);
-  };
+//     if (file) {
+//       try {
+//         await upload(file);
+//       } catch (error) {
+//         console.log("Error uploading file:", error);
+//       }
+//     }
+//   };
 
-  return (
-  <form onSubmit={handleSubmit(onSubmit)} className="mx-auto min-h-screen p-2 my-10 bg-[#F5F6F1CC]">
+//   const onSubmit = (data) => {
+//     console.log("Form Data", data);
+//     setNotification(true);
 
-{/* Group H&S Insurance Fields */}
-<h3 className="mb-5 text-lg font-bold">Group H&S Insurance</h3>
+//   };
 
-<div className="relative mb-10">
+//   return (
+//   <form onSubmit={handleSubmit(onSubmit)} className="mx-auto min-h-screen py-5 px-10 my-10 bg-[#F5F6F1CC]">
 
-<div className="grid grid-cols-3 gap-5 text-grey text_size_5">
-  <label>Policy Number</label>
-  <label>Expiry Date</label>
-  <label>Upload</label>
-  <div></div>
-</div>
+// <h3 className="mb-5 text-lg font-bold">Group H&S Insurance</h3>
+// <div className="relative mb-5">
+// <div className="grid grid-cols-3 gap-5 text-grey text_size_5">
+//   <label>Policy Number</label>
+//   <label>Expiry Date</label>
+//   <label>Upload</label>
+// </div>
 
-{groupHSFields.map((field, index) => (
-  <div key={field.id} className="grid grid-cols-3 gap-4 items-center">
-    
-    <input
-      type="text"
-      {...register(`groupHSDetails.${index}.policyNumber`)}
-      placeholder="Enter H&S Policy Number"
-      className="mt-2 p-[12px] bg-lite_skyBlue border border-[#dedddd] outline-none rounded"
-    />
+// {groupHSFields.map((field, index) => (
+//   <div key={field.id} className="grid grid-cols-3 gap-4 items-center">
+//     <FormField
+//       name={`groupHSDetails.${index}.groupHSNo`}
+//       type="text"
+//       placeholder="Enter H&S Policy Number"
+//       label=""
+//       register={register}
+//       errors={errors}
+//     />
+//     <FormField
+//       name={`groupHSDetails.${index}.groupHSExp`}
+//       type="date"
+//       label=""
+//       register={register}
+//       errors={errors}
+//       />
+// <div className='mb-2'>
+// <FileUploadField
+//   onChangeFunc={(e) => handleFileChange(e, `groupHSDetails.${index}.groupHSUpload`)}
+//   name={`groupHSDetails.${index}.groupHSUpload`}  
+//   className="mt-2"
+//   error={errors?.groupHSDetails?.[index]?.groupHSUpload?.message}
+// />
+// </div>
+//     {index === 0 ? (
+//       <button
+//         type="button"
+//         onClick={() =>
+//           appendGroupHS({ groupHSNo: "", groupHSExp: "", groupHSUpload: null })
+//         }
+//         className="text-medium_grey text-[25px] absolute -right-9"
+//       >
+//         <LuPlusSquare />
+//       </button>
+//     ) : (
+//       <button
+//         type="button"
+//         onClick={() => removeGroupHS(index)}
+//         className="text-medium_grey text-[25px] absolute -right-9"
+//       >
+//         <LuMinusSquare />
+//       </button>
+//     )}
+//   </div>
+// ))}
+// </div>
 
-    <input
-      type="date"
-      {...register(`groupHSDetails.${index}.expiryDate`)}
-      className="mt-2 p-2.5 bg-lite_skyBlue border border-[#dedddd] outline-none rounded"
-    />
+// <h3 className="mb-5 text-lg font-bold">Workmen Compensation Insurance</h3>
+// <div className="relative mb-5">
 
-    <label className="w-full mt-2 flex items-center px-3 py-4 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer">
-    
-      <input
-        type="file"
-        onChange={handleFileChange}
-        className="hidden"
-        accept=".pdf"
-      />
-      <span className="ml-2">
-        <GoUpload />
-      </span>
-    </label>
-
-    {index === 0 && (
-      <button
-        type="button"
-        onClick={() => appendGroupHS({ policyNumber: "", expiryDate: "" })}
-        className="text-medium_grey text-[25px] absolute -right-8 mt-2"
-      >
-        <LuPlusSquare />
-      </button>
-    )}
-    
-  </div>
+//   <div className="grid grid-cols-4 gap-5 text-grey text_size_5">
+//     <label>Employee Type</label>
+//     <label>Policy Number</label>
+//     <label>Expiry Date</label>
+//     <label>Upload</label>
+//   </div>
   
-))}
-</div>
+//   {workmenCompFields.map((field, index) => (
+//     <div key={field.id} className="grid grid-cols-4 gap-4 items-center">
+      
+//       <FormField
+//         name={`workmenCompDetails.${index}.empStatusType`}
+//         register={register}
+//         type="select"
+//         options={[
+//           { value: 'OffShore', label: 'OffShore' },
+//           { value: 'OnShore', label: 'OnShore' },
+//           { value: 'General', label: 'General' },
+//         ]}
+//         errors={errors}
+//       />
 
-      {/* Workmen Compensation Insurance Fields */}
-      <h3 className=" mb-5 text-lg font-bold">Workmen Compensation Insurance</h3>
-      <div className="relative mb-10 ">
+//       <FormField
+//         name={`workmenCompDetails.${index}.workmenCompNo`}
+//         type="text"
+//         placeholder="Enter Workmen Comp Policy No"
+//         register={register}
+//         errors={errors}
+//       />
 
-      <div className="grid grid-cols-3 gap-5 text-grey text_size_5">
-        <label>Policy Number</label>
-        <label>Expiry Date</label>
-        <label>Upload</label>
-        <div></div>
-      </div>
-      {workmenCompFields.map((field, index) => (
-        <div key={field.id} className="grid grid-cols-3 gap-4 items-center">
-          <input
-            type="text"
-            {...register(`workmenCompDetails.${index}.policyNumber`)}
-            placeholder="Enter Workmen Comp Policy Number"
-            className="mt-2 p-[12px] bg-lite_skyBlue border border-[#dedddd] outline-none rounded"
-          />
-          <input
-            type="date"
-            {...register(`workmenCompDetails.${index}.expiryDate`)}
-            className="mt-2 p-2.5 bg-lite_skyBlue border border-[#dedddd] outline-none rounded"
-          />
+//       <FormField
+//         name={`workmenCompDetails.${index}.workmenCompExp`}
+//         type="date"
+//         register={register}
+//         errors={errors}
+//       />
 
-    <label className="w-full mt-2 flex items-center px-3 py-4 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer">
-    
-    <input
-      type="file"
-      onChange={handleFileChange}
-      className="hidden"
-      accept=".pdf"
-    />
-    <span className="ml-2">
-      <GoUpload />
-    </span>
-  </label>
+//       <div className='mb-2'>
+//       <FileUploadField
+//         name={`workmenCompDetails.${index}.workmenCompUpload`}
+//         onChangeFunc={(e) => handleFileChange(e, `workmenCompDetails.${index}.workmenCompUpload`)}
+//         label=""
+//         error={errors[`workmenCompDetails.${index}.workmenCompUpload`]}
+//      /></div>
+//       {index === 0 ? (
+//         <button
+//           type="button"
+//           onClick={() =>
+//             appendWorkmenComp({
+//               empStatusType: "",
+//               workmenCompNo: "",
+//               workmenCompExp: "",
+//               workmenCompUpload: null })
+//           }
+//           className="text-medium_grey text-[25px] absolute -right-9"
+//         >
+//           <LuPlusSquare />
+//         </button>
+//       ) : (
+//         <button
+//           type="button"
+//           onClick={() => removeWorkmenComp(index)}
+//           className="text-medium_grey text-[25px] absolute -right-9"
+//         >
+//           <LuMinusSquare />
+//         </button>
+//       )}
 
-  {index === 0 && (
-    <button
-      type="button"
-      onClick={() => appendWorkmenComp({ policyNumber: "", expiryDate: "" })}
-      className="text-medium_grey text-[25px] absolute -right-8 mt-2"
-    >
-      <LuPlusSquare />
-    </button>
-  )}
-  
-</div>
-
-))}
-</div>
+//     </div>
+//   ))}
+// </div>
 
 
-      {/* Travelling Insurance Fields */}
-      <h3 className="mb-5 text-lg font-bold">Travelling Insurance</h3>
-      <div className="relative mb-10">
 
-      <div className="grid grid-cols-3 gap-5  text-grey text_size_5">
-        <label>Policy Number</label>
-        <label>Expiry Date</label>
-        <label>Upload</label>
-      <div></div>
-      </div>
-      {travellingFields.map((field, index) => (
-        <div key={field.id} className="grid grid-cols-3 gap-4 items-center">
-          <input
-            type="text"
-            {...register(`travellingDetails.${index}.policyNumber`)}
-            placeholder="Enter Travelling Policy Number"
-            className="mt-2 p-[12px] bg-lite_skyBlue border border-[#dedddd] outline-none rounded"
-          />
-          <input
-            type="date"
-            {...register(`travellingDetails.${index}.expiryDate`)}
-            className="mt-2 p-2.5 bg-lite_skyBlue border border-[#dedddd] outline-none rounded"
-          />
-    <label className="w-full mt-2 flex items-center px-3 py-4 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer">
-    
-    <input
-      type="file"
-      onChange={handleFileChange}
-      className="hidden"
-      accept=".pdf"
-    />
-    <span className="ml-2">
-      <GoUpload />
-    </span>
-  </label>
+// <h3 className="mb-5 text-lg font-bold">Travelling Insurance</h3>
+// <div className="relative mb-10">
 
-  {index === 0 && (
-    <button
-      type="button"
-      onClick={() => appendTravelling({ policyNumber: "", expiryDate: "" })}
-      className="text-medium_grey text-[25px] absolute -right-8 mt-2"
-    >
-      <LuPlusSquare />
-    </button>
-  )}
-  
-</div>
+//   <div className="grid grid-cols-3 gap-5 text-grey text_size_5">
+//     <label>Policy Number</label>
+//     <label>Expiry Date</label>
+//     <label>Upload</label>
+//   </div>
 
-))}
-</div>
+//   {travellingFields.map((field, index) => (
+//     <div key={field.id} className="grid grid-cols-3 gap-4 items-center">
+      
+//       <FormField
+//         name={`travellingDetails.${index}.travellingNo`}
+//         type="text"
+//         placeholder="Enter Travelling Policy Number"
+//         label=""
+//         register={register}
+//         errors={errors}
+//         className="mt-2 p-[12px] bg-lite_skyBlue border border-[#dedddd] outline-none rounded"
+//       />
 
-      {/* Personal Accident Insurance Fields */}
-      <h3 className="mb-3 mt-6 text-lg font-bold">Personal Accident Insurance</h3>
-      <div className="relative mb-10">
+//       <FormField
+//         name={`travellingDetails.${index}.travellingExp`}
+//         type="date"
+//         label=""
+//         register={register}
+//         errors={errors}
+//         className="mt-2 p-2.5 bg-lite_skyBlue border border-[#dedddd] outline-none rounded"
+//       />
 
-      <div className="grid grid-cols-3 gap-5 text-grey text_size_5">
-        <label>Policy Number</label>
-        <label>Expiry Date</label>
-        <label>Upload</label>
-  <div></div>
+//       <div className='mb-2'>
+//       <FileUploadField
+//         name={`travellingDetails.${index}.travellingUpload`}
+//         onChangeFunc={(e) => handleFileChange(e, `travellingDetails.${index}.travellingUpload`)}
+//         error={errors[`travellingDetails.${index}.travellingUpload`]}
+//         className="w-full mt-2 flex items-center px-3 py-4 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer"
+//       /> </div>
 
-      </div>
-      {personalAccidentFields.map((field, index) => (
-        <div key={field.id} className="grid grid-cols-3 gap-4 items-center">
-          <input
-            type="text"
-            {...register(`personalAccidentDetails.${index}.policyNumber`)}
-            placeholder="Enter Personal Accident Policy Number"
-            className="mt-2 p-[12px] bg-lite_skyBlue border border-[#dedddd] outline-none rounded"
-          />
-          <input
-            type="date"
-            {...register(`personalAccidentDetails.${index}.expiryDate`)}
-            className="mt-2 p-2.5 bg-lite_skyBlue border border-[#dedddd] outline-none rounded"
-          />
-    <label className="w-full mt-2 flex items-center px-3 py-4 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer">
-    
-    <input
-      type="file"
-      onChange={handleFileChange}
-      className="hidden"
-      accept=".pdf"
-    />
-    <span className="ml-2">
-      <GoUpload />
-    </span>
-  </label>
 
-  {index === 0 && (
-    <button
-      type="button"
-      onClick={() => appendPersonalAccident({ policyNumber: "", expiryDate: "" })}
-      className="text-medium_grey text-[25px] absolute -right-8 mt-2"
-    >
-      <LuPlusSquare />
-    </button>
-  )}
-  
-</div>
+//       {index === 0 ? (
+//         <button
+//           type="button"
+//           onClick={() =>
+//             appendTravelling({
+//               travellingNo: "",
+//               travellingExp: "",
+//               travellingUpload: null})
+//           }
+//           className="text-medium_grey text-[25px] absolute -right-9"
+//         >
+//           <LuPlusSquare />
+//         </button>
+//       ) : (
+//         <button
+//           type="button"
+//           onClick={() => removeTravelling(index)}
+//           className="text-medium_grey text-[25px] absolute -right-9"
+//         >
+//           <LuMinusSquare />
+//         </button>
+//       )}
 
-))}
-</div>
+//     </div>
+//   ))}
+// </div>
 
-      {/* Submit Button */}
-      <div className="center my-10">
-        <button type="submit" className="primary_btn">
-          Next
-        </button>
-      </div>
-    </form>
-  );
-};
+
+// <h3 className="mb-3 mt-6 text-lg font-bold">Personal Accident Insurance</h3>
+// <div className="relative mb-10">
+
+//   <div className="grid grid-cols-3 gap-5 text-grey text_size_5">
+//     <label>Policy Number</label>
+//     <label>Expiry Date</label>
+//     <label>Upload</label>
+//   </div>
+
+//   {personalAccidentFields.map((field, index) => (
+//     <div key={field.id} className="grid grid-cols-3 gap-4 items-center">
+      
+//       <FormField
+//         name={`personalAccidentDetails.${index}.personalAccNo`}
+//         type="text"
+//         placeholder="Enter Personal Accident Policy Number"
+//         label=""
+//         register={register}
+//         errors={errors}
+//       />
+
+//       <FormField
+//         name={`personalAccidentDetails.${index}.personalAccExp`}
+//         type="date"
+//         label=""
+//         register={register}
+//         errors={errors}
+//       />
+
+//       <div className='mb-2'>
+//       <FileUploadField
+//         name={`personalAccidentDetails.${index}.personalAccUpload`}
+//         onChangeFunc={(e) => handleFileChange(e, `personalAccidentDetails.${index}.personalAccUpload`)}
+//         error={errors[`personalAccidentDetails.${index}.personalAccUpload`]}
+//       /></div>
+//       {index === 0 ? (
+//         <button
+//           type="button"
+//           onClick={() =>
+//             appendPersonalAccident({
+//               personalAccNo: "",
+//               personalAccExp: "",
+//               personalAccUpload: null,
+//               isNew: false,
+//             })
+//           }
+//           className="text-medium_grey text-[25px] absolute -right-9"
+//         >
+//           <LuPlusSquare />
+//         </button>
+//       ) : (
+//         <button
+//           type="button"
+//           onClick={() => removePersonalAccident(index)}
+//           className="text-medium_grey text-[25px] absolute -right-9"
+//         >
+//           <LuMinusSquare />
+//         </button>
+//       )}
+
+//     </div>
+//   ))}
+// </div>
+//       <div className="center my-10">
+//         <button type="submit" className="primary_btn">
+//           Save
+//         </button>
+//       </div>
+//       {notification && (
+//         <SpinLogo
+//           text="Insurance Info Saved Successfully"
+//           notification={notification}
+//           path="/recrutiles/candidate"
+//         />
+//       )}
+//     </form>
+//   );
+// };
 
 
 

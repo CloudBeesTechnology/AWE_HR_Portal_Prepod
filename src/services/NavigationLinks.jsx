@@ -25,15 +25,11 @@ import { WorkpassTracking } from "../pages/recruitments/WorkpassTracking";
 import { AllEmployee } from "../pages/employees/AllEmployee";
 import { EmployeeInfo } from "../pages/employees/employeeInfos/EmployeeInfo";
 import { WorkInfo } from "../pages/employees/WorkInfo";
-import { Insurance } from "../pages/employees/insurance/Insurance";
 import LabourImmigration from "../pages/employees/medicalDep/LabourImmigration";
-
 import { EmpRequisitionForm } from "../pages/recruitments/EmpRequisitionForm";
 import { InsuranceNav } from "../pages/employees/insurance/InsuranceNav";
-import { InsuranceInfo } from "../pages/employees/insurance/InsuranceInfo";
 import { EmployeeInsurance } from "../pages/employees/insurance/EmployeeInsurance";
 import { DependentInsurance } from "../pages/employees/insurance/DependentInsurance";
-import { InsuranceClime } from "../pages/employees/insurance/InsuranceClime";
 import { WorkPass } from "../pages/employees/workPass/WorkPass";
 import { NonLocalAcco } from "../pages/employees/NonLocalAcco";
 import { ChangePassword } from "../pages/changePassword/ChangePassword";
@@ -63,12 +59,22 @@ import { ORMC } from "../pages/timeSheet/ORMC";
 import { ListofCandi } from "../pages/recruitments/ListofCandi";
 import { ApplyEmployReq } from "../pages/recruitments/ApplyEmployReq";
 import { ProbationForm } from "../pages/reports/ProbationForm";
-
+import { ViewSummary } from "../pages/timeSheet/ViewSummary";
+import { HrInsuranceNav } from "../pages/insuranceSid/HrInsuranceNav";
+import { InsuranceClaim } from "../pages/insuranceSid/InsuranceClaim";
+import { GroupHS } from "../pages/insuranceSid/GroupHS";
+import { WorkmenComp } from "../pages/insuranceSid/WorkmenComp";
+import { Travelling } from "../pages/insuranceSid/Travelling";
+import { PersonalAcci } from "../pages/insuranceSid/PersonalAcci";
+import { CreateJob } from "../pages/recruitments/CreateJob";
+import { HiringJob } from "../pages/recruitments/HiringJob";
+import { Insurance } from "../pages/insuranceSid/Insurance";
 const client = generateClient();
 
 const NavigationLinks = () => {
   const loginAuth = localStorage.getItem("userID")?.toUpperCase();
   const [mainCategories, setMainCategories] = useState([]);
+  const [defaultRoute, setDefaultRoute] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -92,8 +98,32 @@ const NavigationLinks = () => {
         // console.log(result);
         const permissionsString = result?.setPermissions[0];
         const categories = extractMainCategories(permissionsString);
+        // console.log(categories.includes("Dashboard"));
 
         setMainCategories(categories);
+        if (categories.includes("Dashboard")) {
+          setDefaultRoute("/dashboard");
+        } else if (categories.includes("User")) {
+          setDefaultRoute("/user");
+        } else if (categories.includes("Recruitment")) {
+          setDefaultRoute("/recruitment");
+        } else if (categories.includes("Employee")) {
+          setDefaultRoute("/employee");
+        } else if (categories.includes("Insurance")) {
+          setDefaultRoute("/insuranceHr");
+        } else if (categories.includes("Training")) {
+          setDefaultRoute("/training");
+        } else if (categories.includes("TimeSheet")) {
+          setDefaultRoute("/timeSheet");
+        } else if (categories.includes("LeaveManagement")) {
+          setDefaultRoute("/leaveManage");
+        } else if (categories.includes("Notification")) {
+          setDefaultRoute("/notifications");
+        } else if (categories.includes("Report")) {
+          setDefaultRoute("/reports");
+        } else if (categories.includes("BenefitsAndRewards")) {
+          setDefaultRoute("/benfitsAndrewards");
+        }
       } catch (error) {
         console.error("Error fetching user data:", error);
       } finally {
@@ -127,14 +157,15 @@ const NavigationLinks = () => {
     <Routes>
       {/* Login and Change Password Routes */}
       <Route path="/changePassword" element={<ChangePassword />} />
-      <Route path="/user" Component={User} />
-      <Route path="/addNewForm" Component={AddNewForm} />
+
       {loginAuth && (
         <>
+          {/* <Route path="/" element={<Navigate to={defaultRoute} />} /> */}
           {mainCategories.map((show, index) => {
             return (
               <React.Fragment key={index}>
-                <Route path="/" element={<Navigate to="/dashboard" />} />{" "}
+                <Route path="/" element={<Navigate to={defaultRoute} />} />
+                {/* <Route path="/" element={<Navigate to="/dashboard" />} />{" "} */}
                 <Route
                   path="/personalInformation"
                   Component={PersonalInformation}
@@ -172,6 +203,8 @@ const NavigationLinks = () => {
                         element={<WorkpassTracking />}
                       />
                     </Route>
+                    <Route path="/hiringJob" element={<HiringJob />} />
+                    <Route path="/postJob" element={<CreateJob />} />
                     <Route path="/addCandidates" Component={AddCandidates}>
                       <Route index element={<ApplicantDetails />} />
                       <Route
@@ -224,6 +257,21 @@ const NavigationLinks = () => {
                     />
                   </>
                 )}
+                {show === "Insurance" && (
+                  <>
+                    <Route path="/insuranceHr" Component={HrInsuranceNav}>
+                      <Route index element={<Insurance />} />
+                      <Route path="groupHS" element={<GroupHS />} />
+                      <Route path="workmenComp" element={<WorkmenComp />} />
+                      <Route path="travelling" element={<Travelling />} />
+                      <Route path="personalAcci" element={<PersonalAcci />} />
+                      <Route
+                        path="insuranceClaim"
+                        element={<InsuranceClaim />}
+                      />
+                    </Route>
+                  </>
+                )}
                 {show === "LeaveManagement" && (
                   <Route path="/leaveManage" Component={LeaveManage} />
                 )}
@@ -254,6 +302,7 @@ const NavigationLinks = () => {
 
                     <Route path="/timesheetBlng" element={<Blng />} />
                     <Route path="/viewTimesheet" element={<ViewTimeSheet />} />
+                    <Route path="/viewSummary" element={<ViewSummary />} />
                   </>
                 )}
                 {/* Tranining Routes Started here */}

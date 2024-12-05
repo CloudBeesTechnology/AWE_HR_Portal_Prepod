@@ -2,7 +2,8 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { FormField } from "../../../utils/FormField";
 import { FileUploadField } from "./FileUploadField";
 import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
-import { LuPlusSquare, LuMinusSquare } from "react-icons/lu";
+import { FaRegMinusSquare } from "react-icons/fa";
+import { CiSquarePlus } from "react-icons/ci";
 import { LabourTypeDD } from "../../../utils/DropDownMenus";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { useFieldArray } from "react-hook-form";
@@ -15,6 +16,7 @@ export const DependentPass = ({
   control,
   value,
   getValues,
+  watch,
   setUploadedFileNames,
   UploadingFiles,
 }) => {
@@ -134,13 +136,15 @@ export const DependentPass = ({
               [`${idx}_${field}`]: fileName, // Assign file name dynamically based on index and field
             }));
 
-            
+            // console.log(
+            //   `File name for field ${field} at index ${idx}:`,
+            //   fileName
+            // );
           });
         }
       });
     }
   }, [value, append, replace, setValue]);
-
 
   const getFileName = (filePath) => {
     if (!filePath) {
@@ -150,7 +154,14 @@ export const DependentPass = ({
     const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
     return fileName;
   };
+  const watchedEmpID = watch("empID");
+
   const handleFileChange = async (e, fieldName, index) => {
+    if (!watchedEmpID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/labourImmigration";
+      return;
+    }
     const file = e.target.files[0];
     if (!file) return;
 
@@ -166,9 +177,9 @@ export const DependentPass = ({
     // Update the value in the form
     setValue(`dependPass[${index}].${fieldName}`, updatedFiles);
 
-    
+    // setValue(`dependPass[${index}].${fieldName}`, file);
     try {
-      await uploadDocs(file, fieldName, setDocsUploaded, index);
+      await uploadDocs(file, fieldName, setDocsUploaded, watchedEmpID, index);
 
       setArrayFileNames((prev) => ({
         ...prev,
@@ -178,6 +189,7 @@ export const DependentPass = ({
       console.error("File upload error:", error);
     }
   };
+  // console.log(docsUploaded);
 
   useEffect(() => {
     setArrayUploadDocs(docsUploaded);
@@ -205,11 +217,11 @@ export const DependentPass = ({
           className="px-3 py-1 rounded"
           onClick={handleAddDependPass}
         >
-          <LuPlusSquare className="text-xl" />
+          <CiSquarePlus className="text-xl" />
         </button>
       </div>
       {fields.map((field, index) => {
-      
+        // console.log(index);
 
         return (
           <div key={field.id} className="grid grid-cols-4 gap-4 mb-2 relative">
@@ -293,7 +305,7 @@ export const DependentPass = ({
                 onClick={() => remove(index)}
                 className="absolute top-0 right-0 text-medium_grey text-[18px]"
               >
-                <LuMinusSquare />
+                <FaRegMinusSquare />
               </button>
             )}
           </div>

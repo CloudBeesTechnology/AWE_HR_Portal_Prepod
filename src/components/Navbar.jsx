@@ -16,6 +16,8 @@ const client = generateClient();
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [userName, setUserName] = useState("");
+  const [currentTimeValue, setCurrentTimeValue] = useState("");
+  const [currentDateValue, setCurrentDateValue] = useState("");
 
   const [personalInfo, setPersonalInfo] = useState({
     profilePhoto: "",
@@ -49,32 +51,35 @@ const Navbar = () => {
     };
   }, []);
 
-  const today = new Date();
-  const date = today.getDate();
-  const month = today.getMonth() + 1;
-  const year = today.getFullYear();
-  const currentDate = `${date}/${month}/${year}`;
-  // console.log(currentDate);
-  let hours = today.getHours();
-  const minutes = today.getMinutes();
-  const seconds = today.getSeconds();
-  // Determine AM or PM
-  const ampm = hours >= 12 ? "PM" : "AM";
+  useEffect(() => {
+    const updateTime = () => {
+      const today = new Date();
+      const date = today.getDate();
+      const month = today.getMonth() + 1;
+      const year = today.getFullYear();
+      const currentDate = `${date}/${month}/${year}`;
+setCurrentDateValue(currentDate)
+      let hours = today.getHours();
+      const minutes = today.getMinutes();
+      const seconds = today.getSeconds();
+      const ampm = hours >= 12 ? "PM" : "AM";
 
-  // Convert 24-hour format to 12-hour format
-  hours = hours % 12;
-  hours = hours ? hours : 12; // The hour '0' should be '12'
+      hours = hours % 12;
+      hours = hours ? hours : 12; // The hour '0' should be '12'
 
-  // Pad minutes and seconds with leading zeroes if needed
-  const paddedMinutes = minutes < 10 ? "0" + minutes : minutes;
-  const paddedSeconds = seconds < 10 ? "0" + seconds : seconds;
+      const paddedMinutes = minutes < 10 ? "0" + minutes : minutes;
+      const paddedSeconds = seconds < 10 ? "0" + seconds : seconds;
 
-  // Format the time
-  const currentTime = `${hours}:${paddedMinutes}:${paddedSeconds} ${ampm}`;
-  // console.log(currentTime);
-  setInterval(() => {
-    currentTime;
-  }, 100);
+      const formattedTime = `${hours}:${paddedMinutes}:${paddedSeconds} ${ampm}`;
+      const formattedDateTime = `${currentDate} ${formattedTime}`;
+      setCurrentTimeValue(formattedDateTime);
+    };
+
+    const intervalId = setInterval(updateTime, 1000); // Update every second
+
+    // Cleanup the interval when the component unmounts
+    return () => clearInterval(intervalId);
+  }, []); // Empty dependency array, so it runs only once when the component mounts
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -96,6 +101,12 @@ const Navbar = () => {
         const empPersonalInfos =
           empPersonalInfosData?.data?.listEmpPersonalInfos?.items || [];
 
+        // Check if any data is fetched
+        if (empPersonalInfos.length === 0) {
+          // console.log("No employee data found.");
+          return;
+        }
+
         // Find the employee matching the userID, ignoring case
         const userPersonalInfo = empPersonalInfos.find(
           (emp) => emp.empID.toLowerCase() === userID.toLowerCase()
@@ -103,42 +114,23 @@ const Navbar = () => {
 
         if (userPersonalInfo) {
           const profilePhotoString = userPersonalInfo?.profilePhoto;
-          let fixedProfilePhotoString = profilePhotoString.replace(/=/g, ":");
-          fixedProfilePhotoString = fixedProfilePhotoString.replace(
-            /(\w+)(?=:)/g,
-            '"$1"'
-          ); // Wrap keys in double quotes
-          fixedProfilePhotoString = fixedProfilePhotoString.replace(
-            /(?<=:)([^,}\]]+)(?=[,\}\]])/g,
-            '"$1"'
-          ); // Wrap string values in double quotes
-          if (!fixedProfilePhotoString.startsWith("[")) {
-            fixedProfilePhotoString = `[${fixedProfilePhotoString}]`;
-          }
-
-          let profilePhotoArray = [];
-          try {
-            profilePhotoArray = JSON.parse(fixedProfilePhotoString); // Parse the corrected string
-          } catch (error) {
-            console.error("Failed to parse JSON:", error);
-          }
-
-          // Step 5: Access the last upload value (if available)
-          const lastUpload =
-            profilePhotoArray?.[profilePhotoArray.length - 1]?.upload;
-
+          // console.log(profilePhotoString);
+          
+          // const trimmedProfilePhotoString = profilePhotoString?.replace(/^public\//, '');
+          // console.log(trimmedProfilePhotoString);
+          
           const linkToStorageFile = async (pathUrl) => {
             const result = await getUrl({
               path: pathUrl,
             });
             return setPersonalInfo({
-              profilePhoto: result.url.toString(), // Set the profile photo
-              name: userPersonalInfo.name, // Use the name
-              email: userPersonalInfo.email,
-              contactNo: userPersonalInfo.contactNo || "",
+              name: userPersonalInfo?.name, // Use the name
+              profilePhoto: result?.url?.toString(), // Set the profile photo
+              email: userPersonalInfo?.email,
+              contactNo: userPersonalInfo?.contactNo || "",
             });
           };
-          linkToStorageFile(lastUpload);
+          linkToStorageFile(profilePhotoString);
         } else {
           console.log(`No matching employee found for userID: ${userID}`);
         }
@@ -160,7 +152,19 @@ const Navbar = () => {
             <img className="w-full" src={logo} alt="not found" />
           </div>
         </section>
-
+        {/* searchbox disable */}
+        {/* <section className="flex-1 flex-grow-1 center">
+          <div className="center w-[90%] gap-3 py-2 px-5 shadow-md shadow-[#00000033] rounded-full bg-white">
+            <span>
+              <IoSearchOutline className="text-ash text-2xl font-semibold" />
+            </span>
+            <input
+              className="outline-none bg-[transparent] text-lg text-ash w-full"
+              type="text"
+              placeholder="Search"
+            />
+          </div>
+        </section> */}
         <section className="flex-initial flex item-center gap-5 ">
           <div className="my-auto px-2">
             <span>
@@ -185,9 +189,9 @@ const Navbar = () => {
                 Welcome {personalInfo.name}
               </p>
               <article className="flex gap-5 text_size_7 text-dark_grey">
-                <p>{currentDate}</p>
+                {/* <p>{currentDateValue}</p> */}
 
-                <p>{currentTime}</p>
+                <p>{currentTimeValue}</p>
               </article>
             </div>
             <div className="relative">
@@ -197,7 +201,7 @@ const Navbar = () => {
                   onClick={() => toggleDropdown()}
                 >
                   <img
-                    className="w-full object-cover"
+                    className="w-full h-full object-cover"
                     src={personalInfo.profilePhoto || avatar}
                     alt="avatar not found"
                   />

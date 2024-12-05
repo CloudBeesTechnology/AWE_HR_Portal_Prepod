@@ -14,12 +14,12 @@ export const MedicalPassFunc = () => {
       overME: labValue.overME,
       bruhimsRD: labValue.bruhimsRD,
       bruhimsRNo: labValue.bruhimsRNo,
-      bruneiMAD: [labValue.bruneiMAD],
-      bruneiME: [labValue.bruneiME],
+      bruneiMAD: labValue.bruneiMAD,
+      bruneiME: labValue.bruneiME,
       dependPass: JSON.stringify(labValue.dependPass),
       uploadFitness: labValue.uploadFitness,
       uploadRegis: labValue.uploadRegis,
-      uploadBwn: [labValue.uploadBwn],
+      uploadBwn: labValue.uploadBwn,
     };
     // console.log(totalData,"totalData");
 
@@ -32,7 +32,7 @@ export const MedicalPassFunc = () => {
              },
            })
          ])
-        //  console.log(storedData,"successfully stored data");
+         console.log(storedData,"successfully stored data");
 
        } catch (error) {
          console.error("Error executing GraphQL requests:", error);

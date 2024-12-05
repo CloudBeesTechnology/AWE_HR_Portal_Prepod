@@ -15,6 +15,8 @@ import { SuccessMessage } from "./ModelForSuccessMess/SuccessMessage";
 import { PopupForMissMatchExcelSheet } from "./ModelForSuccessMess/PopupForMissMatchExcelSheet";
 import { useScrollableView } from "./customTimeSheet/UseScrollableView";
 import "../../../src/index.css";
+import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
+import { PopupForAssignManager } from "./ModelForSuccessMess/PopupForAssignManager";
 const client = generateClient();
 
 export const ViewBLNGsheet = ({
@@ -31,7 +33,7 @@ export const ViewBLNGsheet = ({
 
   const [editObject, setEditObject] = useState();
   const [toggleHandler, setToggleHandler] = useState(false);
-
+  const [toggleAssignManager, setToggleAssignManager] = useState(false);
   const [userIdentification, setUserIdentification] = useState("");
   const [successMess, setSuccessMess] = useState(null);
 
@@ -75,7 +77,7 @@ export const ViewBLNGsheet = ({
               const workInfoItem = workInfo.find(
                 (info) => info.sapNo == item.FID
               );
-              // console.log(workInfoItem);
+
               return {
                 ...item,
                 NORMALWORKINGHRSPERDAY: workInfoItem
@@ -83,7 +85,7 @@ export const ViewBLNGsheet = ({
                   : null,
               };
             });
-            console.log("MergedData : ", mergedData);
+
             setData(mergedData); // Set merged data
             setSecondaryData(mergedData);
           };
@@ -132,6 +134,7 @@ export const ViewBLNGsheet = ({
                 jobLocaWhrs: val.jobLocaWhrs || [],
                 REMARKS: val.remarks || "",
                 status: val.status || "",
+                managerData: val?.managerData,
               };
             }),
           };
@@ -153,7 +156,6 @@ export const ViewBLNGsheet = ({
   };
 
   const searchResult = async (searchedData) => {
-    console.log(searchedData);
     try {
       const result = await searchedData;
       setData(result);
@@ -212,11 +214,12 @@ export const ViewBLNGsheet = ({
         resolve(keyCheckResult);
       });
       // console.log("Result: ", result);
-      console.log(result);
+
       setShowStatusCol(result);
       setCurrentStatus(result); // Assuming setCurrentStatus is defined
       // setLoading is removed ;
     };
+
     if (returnedTHeader && returnedTHeader.length > 0) {
       checkKeys();
     } else if (!returnedTHeader) {
@@ -254,9 +257,11 @@ export const ViewBLNGsheet = ({
           //   const filterPending =
           // console.log(filterPending);
           //   console.log(fetchedData);
-          console.log(filterPending);
+
           if (userIdentification === "Manager") {
-            pendingData(filterPending);
+            const finalData = await SendDataToManager(filterPending);
+
+            pendingData(finalData);
           }
         } catch (err) {
         } finally {
@@ -281,9 +286,10 @@ export const ViewBLNGsheet = ({
   const toggleSFAMessage = (value) => {
     setSuccessMess(value);
   };
-
+  const toggleFunctionForAssiMana = () => {
+    setToggleAssignManager(!toggleAssignManager);
+  };
   const editNestedData = (data, getObject) => {
-    console.log("Working");
     return data.map((m) => ({
       id: m.id,
       data: m.data.map((val) => {
@@ -316,7 +322,6 @@ export const ViewBLNGsheet = ({
     const result = Array.isArray(data[0]?.data)
       ? editNestedData(data, getObject)
       : editFlatData(data, getObject);
-    // console.log(result);
 
     setData(result);
   };
@@ -373,7 +378,7 @@ export const ViewBLNGsheet = ({
   // useTableFieldData
   const AllFieldData = useTableFieldData(titleName);
 
-  const renameKeysFunctionAndSubmit = async () => {
+  const renameKeysFunctionAndSubmit = async (managerData) => {
     // if (userIdentification !== "Manager") {
     //   const result =
     //     data &&
@@ -428,7 +433,7 @@ export const ViewBLNGsheet = ({
     //   }
     // }
 
-    if (userIdentification === "TimeKeeper") {
+    if (userIdentification !== "Manager") {
       const result =
         data &&
         data.map((val) => {
@@ -451,7 +456,12 @@ export const ViewBLNGsheet = ({
         });
 
       const currentDate = new Date().toLocaleDateString();
+      const mergeData = [...result]; // Clone result to avoid mutation (optional)
+      mergeData.unshift(managerData);
 
+      const finalResult = result.map((val) => {
+        return { ...val, managerData };
+      });
       // Function to submit a batch
       const submitBatch = async (batch, batchNumber) => {
         const weeklySheet = {
@@ -461,34 +471,30 @@ export const ViewBLNGsheet = ({
         };
 
         try {
-          console.log(`Submitting batch ${batchNumber}`);
-          console.log(weeklySheet);
           const res = await client.graphql({
             query: createBlng,
             variables: { input: weeklySheet },
           });
 
           if (res.data.createBlng) {
-            console.log(`Batch ${batchNumber} submitted successfully`);
+            console.log("res.data.createBlng : ", res.data.createBlng);
             toggleSFAMessage(true);
-            console.log(res);
           }
         } catch (err) {
-          console.log(`Error in batch ${batchNumber}:`, err);
           toggleSFAMessage(false);
         }
       };
 
       // Batch size
-      const batchSize = 1500;
+      const batchSize = 1000;
 
       // Loop to send data in batches
       // for (let i = 0; i < result.length; i += batchSize) {
       //   const batch = result.slice(i, i + batchSize);
       //   await submitBatch(batch, i / batchSize + 1); // Track batch number
       // }
-      for (let i = 0; i < result.length; i += batchSize) {
-        const batch = result.slice(i, i + batchSize);
+      for (let i = 0; i < finalResult.length; i += batchSize) {
+        const batch = finalResult.slice(i, i + batchSize);
         await submitBatch(batch, "6785A");
       }
     } else if (userIdentification === "Manager") {
@@ -515,6 +521,7 @@ export const ViewBLNGsheet = ({
                 // location: val?.LOCATION || [],
                 jobLocaWhrs: val.jobLocaWhrs || [],
                 remarks: val?.REMARKS || "",
+                managerData: val?.managerData,
               };
             }),
           };
@@ -532,7 +539,7 @@ export const ViewBLNGsheet = ({
           weeklySheet: JSON.stringify(obj.weaklySheet),
           status: "Approved",
         };
-        console.log(obj.weaklySheet);
+
         if (finalData.weeklySheet) {
           // console.log("Work");
           await client
@@ -543,16 +550,14 @@ export const ViewBLNGsheet = ({
               },
             })
             .then((res) => {
-              console.log(res);
               if (res.data.updateBlng) {
                 toggleSFAMessage(true);
                 setVisibleData([]);
-                // setData(null);
+                setData("res.data.updateBlng : ", res.data.updateBlng);
                 // setData(null);
               }
             })
             .catch((err) => {
-              console.log(err);
               toggleSFAMessage(false);
             });
         }
@@ -572,7 +577,7 @@ export const ViewBLNGsheet = ({
       <div>
         {currentStatus === true ? (
           <div>
-            <div className="flex justify-end mr-7">
+            <div className="flex justify-end w-full mr-7 ">
               <SearchBoxForTimeSheet
                 allEmpDetails={data}
                 searchResult={searchResult}
@@ -725,68 +730,68 @@ export const ViewBLNGsheet = ({
                   userIdentification === "Manager" ? "w-40" : "w-52"
                 } bg-[#FEF116] text_size_5 text-dark_grey mb-10`}
                 onClick={() => {
-                  renameKeysFunctionAndSubmit();
-
-                  // const fetchData = async () => {
-                  //   console.log("I am calling You");
-                  //   // Fetch the BLNG data using GraphQL
-                  //   const [fetchBLNGdata] = await Promise.all([
-                  //     client.graphql({
-                  //       query: listBlngs,
-                  //     }),
-                  //   ]);
-                  //   const BLNGdata = fetchBLNGdata?.data?.listBlngs?.items;
-                  //   console.log("BLNGdata : ", BLNGdata);
-
-                  //   const deleteFunction =
-                  //     BLNGdata &&
-                  //     BLNGdata.map(async (m) => {
-                  //       const dailySheet = {
-                  //         id: m.id,
-                  //       };
-
-                  //       await client
-                  //         .graphql({
-                  //           query: deleteBlng,
-                  //           variables: {
-                  //             input: dailySheet,
-                  //           },
-                  //         })
-                  //         .then((res) => {
-                  //           console.log(res);
-                  //         })
-                  //         .catch((err) => {
-                  //           console.log(err);
-                  //         });
-                  //     });
-                  // };
-                  // fetchData();
-                  // FOR DELETE
-                  // const deleteFunction = async () => {
-                  //   const weaklysheet = {
-                  //     id: "388e8f75-fadb-4398-9430-9c250331ac41",
-                  //   };
-
-                  //   await client
-                  //     .graphql({
-                  //       query: deleteBlng,
-                  //       variables: {
-                  //         input: weaklysheet,
-                  //       },
-                  //     })
-                  //     .then((res) => {
-                  //       console.log(res);
-                  //     })
-                  //     .catch((err) => {
-                  //       console.log(err);
-                  //     });
-                  // };
-                  // deleteFunction();
+                  if (userIdentification !== "Manager") {
+                    toggleFunctionForAssiMana();
+                    // const fetchData = async () => {
+                    //   console.log("I am calling You");
+                    //   // Fetch the BLNG data using GraphQL
+                    //   const [fetchBLNGdata] = await Promise.all([
+                    //     client.graphql({
+                    //       query: listBlngs,
+                    //     }),
+                    //   ]);
+                    //   const BLNGdata = fetchBLNGdata?.data?.listBlngs?.items;
+                    //   console.log("BLNGdata : ", BLNGdata);
+                    //   const deleteFunction =
+                    //     BLNGdata &&
+                    //     BLNGdata.map(async (m) => {
+                    //       const dailySheet = {
+                    //         id: m.id,
+                    //       };
+                    //       await client
+                    //         .graphql({
+                    //           query: deleteBlng,
+                    //           variables: {
+                    //             input: dailySheet,
+                    //           },
+                    //         })
+                    //         .then((res) => {
+                    //           console.log(res);
+                    //         })
+                    //         .catch((err) => {
+                    //           console.log(err);
+                    //         });
+                    //     });
+                    // };
+                    // fetchData();
+                    // FOR DELETE
+                    // const deleteFunction = async () => {
+                    //   const weaklysheet = {
+                    //     id: "388e8f75-fadb-4398-9430-9c250331ac41",
+                    //   };
+                    //   await client
+                    //     .graphql({
+                    //       query: deleteBlng,
+                    //       variables: {
+                    //         input: weaklysheet,
+                    //       },
+                    //     })
+                    //     .then((res) => {
+                    //       console.log(res);
+                    //     })
+                    //     .catch((err) => {
+                    //       console.log(err);
+                    //     });
+                    // };
+                    // deleteFunction();
+                  } else if (userIdentification === "Manager") {
+                    renameKeysFunctionAndSubmit();
+                  }
                 }}
               >
                 {userIdentification === "Manager"
                   ? "Approve"
-                  : "Send For Approval"}
+                  : "Assign Manager"}
               </button>
             </div>
           </div>
@@ -814,6 +819,12 @@ export const ViewBLNGsheet = ({
         setExcelData={setExcelData}
         userIdentification={userIdentification}
       />
+      {toggleAssignManager === true && (
+        <PopupForAssignManager
+          toggleFunctionForAssiMana={toggleFunctionForAssiMana}
+          renameKeysFunctionAndSubmit={renameKeysFunctionAndSubmit}
+        />
+      )}
     </div>
   );
 };

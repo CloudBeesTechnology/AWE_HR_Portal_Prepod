@@ -25,11 +25,13 @@ export declare type BlngUpdateFormInputValues = {
     weeklySheet?: string[];
     date?: string;
     status?: string;
+    manager?: string[];
 };
 export declare type BlngUpdateFormValidationValues = {
     weeklySheet?: ValidationFunction<string>;
     date?: ValidationFunction<string>;
     status?: ValidationFunction<string>;
+    manager?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type BlngUpdateFormOverridesProps = {
@@ -37,6 +39,7 @@ export declare type BlngUpdateFormOverridesProps = {
     weeklySheet?: PrimitiveOverrideProps<TextAreaFieldProps>;
     date?: PrimitiveOverrideProps<TextFieldProps>;
     status?: PrimitiveOverrideProps<TextFieldProps>;
+    manager?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type BlngUpdateFormProps = React.PropsWithChildren<{
     overrides?: BlngUpdateFormOverridesProps | undefined | null;

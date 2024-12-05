@@ -13,7 +13,7 @@ export const UpdateDepInsDataFun = () => {
       depInsurance: JSON.stringify(depValue.depInsurance),
       id: depValue.id,
     };
-  
+    console.log(totalData,"updated");
 
     try {
       const storedData = await Promise.all([
@@ -24,7 +24,7 @@ export const UpdateDepInsDataFun = () => {
           },
         }),
       ]);
-     
+      console.log(storedData, "successfully Updated data");
     } catch (error) {
       console.error("Error executing GraphQL requests:", error);
       throw error; // Rethrow error if needed

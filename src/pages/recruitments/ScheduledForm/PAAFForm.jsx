@@ -78,10 +78,10 @@ export const PAAFForm = () => {
               </span>
             </label>
             {uploadedFileName ? (
-              <p className="text-xs mt-1 text-grey">Uploaded: {uploadedFileName}</p>
+              <p className="text-xs mt-1 text-grey">{uploadedFileName}</p>
             ) : (
               errors.paafFile && (
-                <p className="text-red-500 text-xs mt-1">
+                <p className="text-[red] text-xs mt-1">
                   {errors.paafFile.message}
                 </p>
               )
@@ -93,7 +93,7 @@ export const PAAFForm = () => {
       <div className="mt-5 flex justify-center">
         <button
           type="submit"
-          className="py-2 px-5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
+          className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
         >
           Submit
         </button>

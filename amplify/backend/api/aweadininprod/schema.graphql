@@ -1,0 +1,684 @@
+type InsuranceType @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  typeIns: String
+  insDetails: [String]
+}
+
+type GroupHandS @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  groupHSExp: String
+  groupHSNo: String
+  groupHSUpload: [AWSJSON]
+}
+
+type WorkMen @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empStatusType: String
+  workmenCompExp: String
+  workmenCompNo: String
+  workmenComUp: [AWSJSON]
+}
+
+type TravelIns @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  travelExp: String
+  travelNo: String
+  travelUp: [AWSJSON]
+}
+
+type PersonalAccident @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  perAccExp: String
+  perAccNo: String
+  perAccUp: [AWSJSON]
+}
+
+type InsClaim @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String
+  insuranceClaims: [AWSJSON]
+}
+
+type ProbForm @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String!
+  adaptability: String
+  additionalInfo: String
+  attention: String
+  attitude: String
+  commitment: String
+  communication: String
+  deadline: String
+  department: String
+  diligent: String
+  doj: String
+  empBadgeNo: String
+  extendedProbationEndDate: String
+  extensionPeriod: String
+  gmApproved: Boolean
+  gmDate: String
+  hrDate: String
+  hrName: String
+  initiative: String
+  managerApproved: Boolean
+  managerDate: String
+  managerName: String
+  name: String
+  pace: String
+  position: String
+  probationEnd: String
+  quality: String
+  recommendation: String
+  responsibility: String
+  supervisorApproved: Boolean
+  supervisorDate: String
+  supervisorName: String
+  teamwork: String
+}
+
+type EmailNotifi @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String!
+  leaveType: String
+  senderEmail: String
+  receipentEmail: String
+  receipentEmpID: String
+  status: String
+  message: String
+}
+
+type OffshoreSheet @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  date: String
+  dailySheet: [AWSJSON]
+  status: String
+  manager: [AWSJSON]
+}
+
+type ORMCSheet @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  date: String
+  dailySheet: [AWSJSON]
+  status: String
+  manager: [AWSJSON]
+}
+
+type SBWSheet @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  date: String
+  dailySheet: [AWSJSON]
+  status: String
+  manager: [AWSJSON]
+}
+
+type Blng @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  weeklySheet: [AWSJSON]
+  date: String
+  status: String
+  manager: [AWSJSON]
+}
+
+type HeadOffice @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  dailySheet: [AWSJSON]
+  date: String
+  status: String
+  manager: [AWSJSON]
+}
+
+type EmpRequisition @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  department: String
+  justification: String
+  project: String
+  position: String
+  quantity: Int
+  qualification: String
+  reasonForReq: String
+  replacementFor: String
+  tentativeDate: String
+  status: String
+  remarkReq: String
+  reqName: String
+}
+
+type WeldingInfo @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String!
+  department: String
+  diameterRange: String
+  empBadgeNo: String
+  empName: String
+  fillerMetal: String
+  position: String
+  thicknessRange: String
+  weldingStampNor: String
+  wpsNumber: String
+  weldingProcess: String
+  weldingPosition: String
+  WQExpiry: String
+  WQRemarks: String
+  weldingUpload: [AWSJSON]
+  WQRNo: String
+  weldingCode: String
+  weldingMaterial: String
+}
+
+type TrainingReq @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String!
+  MRNo: String
+  medicalName: String
+  medicalExpiry: String
+  medicalAppointDate: String
+  medicalReport: [AWSJSON]
+  purchaseONo: String
+  traineeCourseCode: String
+  traineeCourseName: String
+  traineeCompany: String
+  traineeSD: String
+  traineeED: String
+  traineeStatus: String
+  traineeCourseFee: String
+}
+
+type TrainingCertificates @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String!
+  courseCode: [String]
+  courseName: [String]
+  company: [String]
+  certifiExpiry: [String]
+  eCertifiDate: [String]
+  trainingUpCertifi: [AWSJSON]
+  orgiCertifiDate: [String]
+}
+
+type AddCourse @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  courseSelect: String
+  courseName: [String]
+  company: [String]
+}
+
+type EmpDepInsurance @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String
+  depInsurance: [AWSJSON]
+}
+
+type EmpInsurance @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String!
+  groupIns: [String]
+  groupInsEffectDate: [String]
+  groupInsEndDate: [String]
+  empStatusType: String
+  workmenCompNo: String
+  travelIns: [String]
+  accidentIns: [String]
+  empInsUpload: [AWSJSON]
+}
+
+type SawpDetails @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String!
+  sawpEmpLtrReq: [String]
+  sawpEmpLtrReci: [String]
+  sawpEmpUpload: [AWSJSON]
+}
+
+type DNDetails @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String!
+  doeEmpSubmit: [String]
+  doeEmpApproval: [String]
+  doeEmpValid: [String]
+  doeEmpRefNo: [String]
+  doeEmpUpload: [AWSJSON]
+  permitType: [String]
+  nlmsEmpSubmit: [String]
+  nlmsEmpSubmitRefNo: [String]
+  nlmsEmpApproval: [String]
+  nlmsRefNo: [String]
+  nlmsEmpValid: [String]
+  nlmsEmpUpload: [AWSJSON]
+}
+
+type BJLDetails @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String!
+  bankSubmit: [String]
+  bankRece: [String]
+  bankRefNo: [String]
+  bankAmt: [String]
+  bankValid: [String]
+  bankEndorse: [String]
+  bankEmpUpload: [AWSJSON]
+  tbaPurchase: [String]
+  jitpaAmt: [String]
+  jpValid: [String]
+  jpEndorse: [String]
+  jpEmpUpload: [AWSJSON]
+  lbrReceiptNo: [String]
+  lbrDepoAmt: [String]
+  lbrDepoSubmit: [String]
+  lbrDepoUpload: [AWSJSON]
+}
+
+type PassportValid @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String!
+  ppLocation: [String]
+  arrivStampUpload: [AWSJSON]
+  immigEmpUpload: [AWSJSON]
+  reEntryUpload: [AWSJSON]
+  arrivStampExp: [String]
+  immigRefNo: String
+  ppSubmit: [String]
+  empPassExp: [String]
+  empPassStatus: [String]
+  airTktStatus: [String]
+  reEntryVisa: [String]
+  immigApproval: [String]
+  reEntryVisaExp: [String]
+  remarkImmig: [String]
+}
+
+type WPTracking @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  tempID: String!
+  supportletterReqDate: String
+  supportletterReceiveDate: String
+  letterfile: String
+  doesubmitdate: String
+  doeapprovedate: String
+  doeexpirydate: String
+  doefile: String
+  nlmssubmitdate: String
+  submissionrefrenceno: String
+  nlmsapprovedate: String
+  ldreferenceno: String
+  nlmsexpirydate: String
+  nlmsfile: String
+  bgsubmitdate: String
+  bgreceivedate: String
+  referenceno: String
+  bgamount: String
+  bgexpirydate: String
+  bgfile: String
+  tbapurchasedate: String
+  jitpaamount: String
+  jitpaexpirydate: String
+  receiptno: String
+  depositamount: String
+  submitdateendorsement: String
+  jitpafile: String
+  immbdno: String
+  docsubmitdate: String
+  visaapprovedate: String
+  visareferenceno: String
+  visaFile: String
+  departuredate: String
+  arrivaldate: String
+  cityname: String
+  airfare: String
+  airticketfile: String
+  agentname: String
+  mobSignDate: String
+  mobFile: String
+}
+
+type EmployeeNonLocalAcco @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String!
+  accommodation: [String]
+  accommodationAddress: [String]
+}
+
+type LabourMedicalInfo @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String!
+  overMD: String
+  overME: String
+  bruhimsRD: String
+  bruhimsRNo: String
+  bruneiMAD: [String]
+  bruneiME: [String]
+  uploadFitness: [AWSJSON]
+  uploadRegis: [AWSJSON]
+  uploadBwn: [AWSJSON]
+  dependPass: [AWSJSON]
+}
+
+type ServiceRecord @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String!
+  depEmpDate: [String]
+  depEmp: [String]
+  positionRev: [String]
+  positionRevDate: [String]
+  revSalary: [String]
+  revSalaryDate: [String]
+  revLeavePass: [String]
+  revLeaveDate: [String]
+  revAnnualLeave: [String]
+  revALD: [String]
+  remarkWI: String
+  uploadPR: [AWSJSON]
+  uploadSP: [AWSJSON]
+  uploadLP: [AWSJSON]
+  uploadAL: [AWSJSON]
+  uploadDep: [AWSJSON]
+}
+
+type EmpLeaveDetails @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String!
+  annualLeave: [String]
+  annualLeaveDate: [String]
+  compasLeave: String
+  destinateLeavePass: [String]
+  durLeavePass: [String]
+  dateLeavePass: [String]
+  leavePass: [String]
+  materLeave: String
+  mrageLeave: String
+  paterLeave: String
+  sickLeave: String
+  sickLeaveDate: String
+  hospLeave: String
+}
+
+type TerminationInfo @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String!
+  resignDate: String
+  resignNotProb: String
+  otherResignNotProb: String
+  resignNotConf: String
+  otherResignNotConf: String
+  reasonResign: String
+  reasonTerminate: String
+  termiDate: String
+  termiNotProb: String
+  otherTermiNotProb: String
+  termiNotConf: String
+  otherTermiNotConf: String
+  WIContract: [AWSJSON]
+  WIProbation: [AWSJSON]
+  WIResignation: [AWSJSON]
+  WITermination: [AWSJSON]
+  WILeaveEntitle: [AWSJSON]
+}
+
+type EmpWorkInfo @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String!
+  contractStart: [String]
+  contractEnd: [String]
+  contractPeriod: [String]
+  doj: String
+  department: [String]
+  hr: [String]
+  jobCat: [String]
+  jobDesc: [String]
+  manager: [String]
+  otherJobCat: [String]
+  otherDepartment: [String]
+  otherPosition: [String]
+  probationStart: [String]
+  probationEnd: [String]
+  probDuration: [String]
+  position: [String]
+  relationship: [String]
+  supervisor: [String]
+  skillPool: String
+  salaryType: [String]
+  sapNo: String
+  upgradeDate: [String]
+  upgradePosition: [String]
+  workStatus: [String]
+  workHrs: [String]
+  workWeek: [String]
+  workMonth: [String]
+}
+
+type EmpPersonalInfo @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String!
+  age: Int
+  aTQualify: String
+  alternateNo: String
+  agent: [String]
+  bankName: String
+  bankAccNo: String
+  contactNo: [String]
+  cob: String
+  contractType: [String]
+  ctryOfOrigin: String
+  chinese: String
+  dob: String
+  educLevel: String
+  email: String
+  eduDetails: [AWSJSON]
+  empBadgeNo: String
+  empType: [String]
+  familyDetails: [AWSJSON]
+  gender: String
+  lang: String
+  marital: String
+  name: String
+  officialEmail: String
+  oCOfOrigin: String
+  profilePhoto: String
+  permanentAddress: [String]
+  position: [String]
+  sapNo: String
+}
+
+type IDDetails @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String!
+  applicationUpload: [AWSJSON]
+  bwnIcNo: String
+  bwnIcColour: String
+  bwnIcExpiry: [String]
+  bwnUpload: [AWSJSON]
+  cvCertifyUpload: [AWSJSON]
+  driveLic: String
+  inducBrief: String
+  inducBriefUp: String
+  loiUpload: [AWSJSON]
+  myIcNo: String
+  myIcUpload: [AWSJSON]
+  nationality: String
+  nationalCat: String
+  otherNation: String
+  otherRace: String
+  otherReligion: String
+  ppNo: [String]
+  paafCvevUpload: [AWSJSON]
+  ppIssued: [String]
+  ppExpiry: [String]
+  ppUpload: [AWSJSON]
+  ppDestinate: [String]
+  preEmp: String
+  preEmpPeriod: String
+  race: String
+  religion: String
+  supportDocUpload: [AWSJSON]
+}
+
+type CandIToEMP @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String!
+  crime: String
+  crimeDesc: String
+  emgDetails: [AWSJSON!]
+  noExperience: String
+  empStatement: String
+  desc: String
+  disease: String
+  diseaseDesc: String
+  liquor: String
+  liquorDesc: String
+  perIS: String
+  perID: String
+  referees: [AWSJSON]
+  relatives: [AWSJSON]
+  salaryExpectation: String
+  supportInfo: String
+  workExperience: [AWSJSON]
+}
+
+type LocalMobilization @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  tempID: String
+  mobSignDate: String
+  mobFile: String
+  paafApproveDate: String
+  paafFile: String
+  loiIssueDate: String
+  loiAcceptDate: String
+  loiDeclineDate: String
+  declineReason: String
+  loiFile: String
+  cvecApproveDate: String
+  cvecFile: String
+}
+
+type InterviewSchedule @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  interDate: String
+  interTime: String
+  venue: String
+  interType: String
+  bagdeNo: String
+  message: String
+  tempID: String
+  manager: String
+  candidateStatus: String
+  department: String
+  otherDepartment: String
+  status: String
+
+}
+
+type EducationDetails @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  tempID: String!
+  crime: String
+  crimeDesc: String
+  emgDetails: [AWSJSON]
+  noExperience: String
+  empStatement: String
+  desc: String
+  disease: String
+  diseaseDesc: String
+  liquor: String
+  liquorDesc: String
+  noticePeriod: String
+  perIS: String
+  perIDesc: String
+  referees: [AWSJSON]
+  relatives: [AWSJSON]
+  salaryExpectation: String
+  supportInfo: String
+  uploadResume: String
+  uploadCertificate: String
+  uploadPp: String
+}
+
+type PersonalDetails @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  tempID: String!
+  age: Int
+  alternateNo: String
+  agent: String
+  bwnIcNo: String
+  bwnIcExpiry: String
+  bwnIcColour: String
+  contactNo: String
+  cob: String
+  contractType: String
+  chinese: String
+  dob: String
+  driveLic: String
+  email: String
+  empType: String
+  eduDetails: [AWSJSON]
+  familyDetails: [AWSJSON]
+  gender: String
+  lang: String
+  marital: String
+  name: String
+  nationality: String
+  otherNation: String
+  otherRace: String
+  otherReligion: String
+  ppNo: String
+  ppIssued: String
+  ppExpiry: String
+  ppDestinate: String
+  presentAddress: String
+  permanentAddress: String
+  profilePhoto: String
+  position: String
+  race: String
+  religion: String
+  status: String
+  workExperience: [AWSJSON]
+}
+
+type User @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String
+  selectType: String
+  setPermissions: [String]
+  password: String
+  status: String
+}
+
+type TicketRequest @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: String!
+  empStatus: String
+  empDate: AWSDateTime
+  empRemarks: String
+  departureDate: AWSDateTime
+  arrivalDate: AWSDateTime
+  destination: String
+  remarks: String
+  hrStatus: String
+  hrDate: AWSDateTime
+  hrRemarks: String
+  hrName: String
+  hrEmpID: String
+}
+
+type LeaveStatus @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  empID: ID!
+  leaveType: String
+  fromDate: AWSDateTime
+  toDate: AWSDateTime
+  days: Float
+  applyTo: [String]
+  reason: String
+  medicalCertificate: String
+  supervisorName: String
+  supervisorEmpID: String
+  supervisorStatus: String
+  supervisorDate: AWSDateTime
+  supervisorRemarks: String
+  managerName: String
+  managerEmpID: String
+  managerStatus: String
+  managerDate: AWSDateTime
+  managerRemarks: String
+  empStatus: String
+  empDate: AWSDateTime
+  empRemarks: String
+}

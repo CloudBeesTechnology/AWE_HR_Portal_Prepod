@@ -1,4 +1,6 @@
 import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
+
 export const ExportTableToExcel = (reportTitle, tableData) => {
   // Extract table header (th) data
   try {
@@ -11,7 +13,7 @@ export const ExportTableToExcel = (reportTitle, tableData) => {
 
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet(`${reportTitle}`);
-      console.log(worksheet.name);
+
       // Add header row
       const headerRow = worksheet.addRow(theadData[0]);
       headerRow.height = 30;
@@ -58,11 +60,11 @@ export const ExportTableToExcel = (reportTitle, tableData) => {
         const blob = new Blob([buffer], {
           type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         });
-        console.log(blob);
+
         saveAs(blob, `${reportTitle}.xlsx`);
       });
     }
   } catch (err) {
-    console.log("Error");
+    // console.log("Error");
   }
 };

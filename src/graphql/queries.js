@@ -1,6 +1,212 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getInsuranceType = /* GraphQL */ `
+  query GetInsuranceType($id: ID!) {
+    getInsuranceType(id: $id) {
+      id
+      typeIns
+      insDetails
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listInsuranceTypes = /* GraphQL */ `
+  query ListInsuranceTypes(
+    $filter: ModelInsuranceTypeFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listInsuranceTypes(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        typeIns
+        insDetails
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getGroupHandS = /* GraphQL */ `
+  query GetGroupHandS($id: ID!) {
+    getGroupHandS(id: $id) {
+      id
+      groupHSExp
+      groupHSNo
+      groupHSUpload
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listGroupHandS = /* GraphQL */ `
+  query ListGroupHandS(
+    $filter: ModelGroupHandSFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listGroupHandS(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        groupHSExp
+        groupHSNo
+        groupHSUpload
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getWorkMen = /* GraphQL */ `
+  query GetWorkMen($id: ID!) {
+    getWorkMen(id: $id) {
+      id
+      empStatusType
+      workmenCompExp
+      workmenCompNo
+      workmenComUp
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listWorkMen = /* GraphQL */ `
+  query ListWorkMen(
+    $filter: ModelWorkMenFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listWorkMen(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        empStatusType
+        workmenCompExp
+        workmenCompNo
+        workmenComUp
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getTravelIns = /* GraphQL */ `
+  query GetTravelIns($id: ID!) {
+    getTravelIns(id: $id) {
+      id
+      travelExp
+      travelNo
+      travelUp
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listTravelIns = /* GraphQL */ `
+  query ListTravelIns(
+    $filter: ModelTravelInsFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listTravelIns(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        travelExp
+        travelNo
+        travelUp
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getPersonalAccident = /* GraphQL */ `
+  query GetPersonalAccident($id: ID!) {
+    getPersonalAccident(id: $id) {
+      id
+      perAccExp
+      perAccNo
+      perAccUp
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listPersonalAccidents = /* GraphQL */ `
+  query ListPersonalAccidents(
+    $filter: ModelPersonalAccidentFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listPersonalAccidents(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        perAccExp
+        perAccNo
+        perAccUp
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getInsClaim = /* GraphQL */ `
+  query GetInsClaim($id: ID!) {
+    getInsClaim(id: $id) {
+      id
+      empID
+      insuranceClaims
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listInsClaims = /* GraphQL */ `
+  query ListInsClaims(
+    $filter: ModelInsClaimFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listInsClaims(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        empID
+        insuranceClaims
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getProbForm = /* GraphQL */ `
   query GetProbForm($id: ID!) {
     getProbForm(id: $id) {
@@ -103,6 +309,7 @@ export const getEmailNotifi = /* GraphQL */ `
       leaveType
       senderEmail
       receipentEmail
+      receipentEmpID
       status
       message
       createdAt
@@ -124,6 +331,7 @@ export const listEmailNotifis = /* GraphQL */ `
         leaveType
         senderEmail
         receipentEmail
+        receipentEmpID
         status
         message
         createdAt
@@ -142,6 +350,7 @@ export const getOffshoreSheet = /* GraphQL */ `
       date
       dailySheet
       status
+      manager
       createdAt
       updatedAt
       __typename
@@ -160,6 +369,7 @@ export const listOffshoreSheets = /* GraphQL */ `
         date
         dailySheet
         status
+        manager
         createdAt
         updatedAt
         __typename
@@ -176,6 +386,7 @@ export const getORMCSheet = /* GraphQL */ `
       date
       dailySheet
       status
+      manager
       createdAt
       updatedAt
       __typename
@@ -194,6 +405,7 @@ export const listORMCSheets = /* GraphQL */ `
         date
         dailySheet
         status
+        manager
         createdAt
         updatedAt
         __typename
@@ -210,6 +422,7 @@ export const getSBWSheet = /* GraphQL */ `
       date
       dailySheet
       status
+      manager
       createdAt
       updatedAt
       __typename
@@ -228,6 +441,79 @@ export const listSBWSheets = /* GraphQL */ `
         date
         dailySheet
         status
+        manager
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getBlng = /* GraphQL */ `
+  query GetBlng($id: ID!) {
+    getBlng(id: $id) {
+      id
+      weeklySheet
+      date
+      status
+      manager
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listBlngs = /* GraphQL */ `
+  query ListBlngs(
+    $filter: ModelBlngFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listBlngs(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        weeklySheet
+        date
+        status
+        manager
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getHeadOffice = /* GraphQL */ `
+  query GetHeadOffice($id: ID!) {
+    getHeadOffice(id: $id) {
+      id
+      dailySheet
+      date
+      status
+      manager
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listHeadOffices = /* GraphQL */ `
+  query ListHeadOffices(
+    $filter: ModelHeadOfficeFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listHeadOffices(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        dailySheet
+        date
+        status
+        manager
         createdAt
         updatedAt
         __typename
@@ -250,6 +536,9 @@ export const getEmpRequisition = /* GraphQL */ `
       reasonForReq
       replacementFor
       tentativeDate
+      status
+      remarkReq
+      reqName
       createdAt
       updatedAt
       __typename
@@ -274,40 +563,9 @@ export const listEmpRequisitions = /* GraphQL */ `
         reasonForReq
         replacementFor
         tentativeDate
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const getHeadOffice = /* GraphQL */ `
-  query GetHeadOffice($id: ID!) {
-    getHeadOffice(id: $id) {
-      id
-      dailySheet
-      date
-      status
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const listHeadOffices = /* GraphQL */ `
-  query ListHeadOffices(
-    $filter: ModelHeadOfficeFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listHeadOffices(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        dailySheet
-        date
         status
+        remarkReq
+        reqName
         createdAt
         updatedAt
         __typename
@@ -563,8 +821,8 @@ export const getEmpInsurance = /* GraphQL */ `
       groupIns
       groupInsEffectDate
       groupInsEndDate
-      workmenComp
-      workmePolicyNo
+      empStatusType
+      workmenCompNo
       travelIns
       accidentIns
       empInsUpload
@@ -587,8 +845,8 @@ export const listEmpInsurances = /* GraphQL */ `
         groupIns
         groupInsEffectDate
         groupInsEndDate
-        workmenComp
-        workmePolicyNo
+        empStatusType
+        workmenCompNo
         travelIns
         accidentIns
         empInsUpload
@@ -802,40 +1060,6 @@ export const listPassportValids = /* GraphQL */ `
         immigApproval
         reEntryVisaExp
         remarkImmig
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const getBlng = /* GraphQL */ `
-  query GetBlng($id: ID!) {
-    getBlng(id: $id) {
-      id
-      weeklySheet
-      date
-      status
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const listBlngs = /* GraphQL */ `
-  query ListBlngs(
-    $filter: ModelBlngFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listBlngs(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        weeklySheet
-        date
-        status
         createdAt
         updatedAt
         __typename
@@ -1324,6 +1548,8 @@ export const getEmpPersonalInfo = /* GraphQL */ `
       aTQualify
       alternateNo
       agent
+      bankName
+      bankAccNo
       contactNo
       cob
       contractType
@@ -1370,6 +1596,8 @@ export const listEmpPersonalInfos = /* GraphQL */ `
         aTQualify
         alternateNo
         agent
+        bankName
+        bankAccNo
         contactNo
         cob
         contractType
@@ -1607,47 +1835,53 @@ export const listLocalMobilizations = /* GraphQL */ `
     }
   }
 `;
-export const getInterviewScheduleSchema = /* GraphQL */ `
-  query GetInterviewScheduleSchema($id: ID!) {
-    getInterviewScheduleSchema(id: $id) {
+export const getInterviewSchedule = /* GraphQL */ `
+  query GetInterviewSchedule($id: ID!) {
+    getInterviewSchedule(id: $id) {
       id
-      date
-      time
+      interDate
+      interTime
       venue
-      interviewType
-      interviewer
+      interType
+      bagdeNo
       message
       tempID
+      manager
       candidateStatus
       department
+      otherDepartment
+      status
       createdAt
       updatedAt
       __typename
     }
   }
 `;
-export const listInterviewScheduleSchemas = /* GraphQL */ `
-  query ListInterviewScheduleSchemas(
-    $filter: ModelInterviewScheduleSchemaFilterInput
+export const listInterviewSchedules = /* GraphQL */ `
+  query ListInterviewSchedules(
+    $filter: ModelInterviewScheduleFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    listInterviewScheduleSchemas(
+    listInterviewSchedules(
       filter: $filter
       limit: $limit
       nextToken: $nextToken
     ) {
       items {
         id
-        date
-        time
+        interDate
+        interTime
         venue
-        interviewType
-        interviewer
+        interType
+        bagdeNo
         message
         tempID
+        manager
         candidateStatus
         department
+        otherDepartment
+        status
         createdAt
         updatedAt
         __typename
@@ -1887,6 +2121,7 @@ export const getTicketRequest = /* GraphQL */ `
       hrDate
       hrRemarks
       hrName
+      hrEmpID
       createdAt
       updatedAt
       __typename
@@ -1914,6 +2149,7 @@ export const listTicketRequests = /* GraphQL */ `
         hrDate
         hrRemarks
         hrName
+        hrEmpID
         createdAt
         updatedAt
         __typename
@@ -1936,10 +2172,12 @@ export const getLeaveStatus = /* GraphQL */ `
       reason
       medicalCertificate
       supervisorName
+      supervisorEmpID
       supervisorStatus
       supervisorDate
       supervisorRemarks
       managerName
+      managerEmpID
       managerStatus
       managerDate
       managerRemarks
@@ -1970,10 +2208,12 @@ export const listLeaveStatuses = /* GraphQL */ `
         reason
         medicalCertificate
         supervisorName
+        supervisorEmpID
         supervisorStatus
         supervisorDate
         supervisorRemarks
         managerName
+        managerEmpID
         managerStatus
         managerDate
         managerRemarks

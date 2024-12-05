@@ -22,6 +22,7 @@ import { listBlngs, listHeadOffices } from "../graphql/queries";
 import { generateClient } from "@aws-amplify/api";
 import { useFetchData } from "../pages/timeSheet/customTimeSheet/UseFetchData";
 import { UploadEditedORMC } from "../pages/timeSheet/uploadManuallyEditedExcel/UploadEditedORMC";
+import { UploadEditedSBW } from "../pages/timeSheet/uploadManuallyEditedExcel/UploadEditedSBW";
 
 const client = generateClient();
 export const TimeSheetBrowser = ({ title }) => {
@@ -375,6 +376,18 @@ export const TimeSheetBrowser = ({ title }) => {
         setLoading
       );
       setReturnedTHeader(result);
+
+      if (result === false) {
+        const editedResult = await UploadEditedSBW(
+          excelFile,
+          setExcelData,
+          setExcelFile,
+          fileInputRef,
+          setLoading
+        );
+
+        setReturnedTHeader(editedResult);
+      }
       fileInputRef.current.value = "";
       setExcelFile(null);
     } else if (titleName === "HO") {
@@ -413,13 +426,6 @@ export const TimeSheetBrowser = ({ title }) => {
   const clearFileInput = () => {
     setFileName(""); // Clear the state
     fileInputRef.current.value = ""; // Clear the input reference
-  };
-  const searchAllEmployee = (employee) => {
-    setAfterSearchEmp(employee);
-  };
-
-  const emptySearch = () => {
-    setAfterSearchEmp(arrayOfObjects);
   };
 
   return (

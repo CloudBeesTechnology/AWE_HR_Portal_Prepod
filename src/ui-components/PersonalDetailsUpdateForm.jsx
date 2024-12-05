@@ -369,27 +369,27 @@ export default function PersonalDetailsUpdateForm(props) {
   const workExperienceRef = React.createRef();
   const validations = {
     tempID: [{ type: "Required" }],
-    age: [{ type: "Required" }],
+    age: [],
     alternateNo: [],
     agent: [],
     bwnIcNo: [],
     bwnIcExpiry: [],
     bwnIcColour: [],
-    contactNo: [{ type: "Required" }],
-    cob: [{ type: "Required" }],
-    contractType: [{ type: "Required" }],
+    contactNo: [],
+    cob: [],
+    contractType: [],
     chinese: [],
-    dob: [{ type: "Required" }],
+    dob: [],
     driveLic: [],
-    email: [{ type: "Required" }],
-    empType: [{ type: "Required" }],
-    eduDetails: [{ type: "Required" }, { type: "JSON" }],
+    email: [],
+    empType: [],
+    eduDetails: [{ type: "JSON" }],
     familyDetails: [{ type: "JSON" }],
-    gender: [{ type: "Required" }],
-    lang: [{ type: "Required" }],
-    marital: [{ type: "Required" }],
-    name: [{ type: "Required" }],
-    nationality: [{ type: "Required" }],
+    gender: [],
+    lang: [],
+    marital: [],
+    name: [],
+    nationality: [],
     otherNation: [],
     otherRace: [],
     otherReligion: [],
@@ -397,13 +397,13 @@ export default function PersonalDetailsUpdateForm(props) {
     ppIssued: [],
     ppExpiry: [],
     ppDestinate: [],
-    presentAddress: [{ type: "Required" }],
-    permanentAddress: [{ type: "Required" }],
-    profilePhoto: [{ type: "Required" }],
-    position: [{ type: "Required" }],
-    race: [{ type: "Required" }],
-    religion: [{ type: "Required" }],
-    status: [{ type: "Required" }],
+    presentAddress: [],
+    permanentAddress: [],
+    profilePhoto: [],
+    position: [],
+    race: [],
+    religion: [],
+    status: [],
     workExperience: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
@@ -433,27 +433,27 @@ export default function PersonalDetailsUpdateForm(props) {
         event.preventDefault();
         let modelFields = {
           tempID,
-          age,
+          age: age ?? null,
           alternateNo: alternateNo ?? null,
           agent: agent ?? null,
           bwnIcNo: bwnIcNo ?? null,
           bwnIcExpiry: bwnIcExpiry ?? null,
           bwnIcColour: bwnIcColour ?? null,
-          contactNo,
-          cob,
-          contractType,
+          contactNo: contactNo ?? null,
+          cob: cob ?? null,
+          contractType: contractType ?? null,
           chinese: chinese ?? null,
-          dob,
+          dob: dob ?? null,
           driveLic: driveLic ?? null,
-          email,
-          empType,
-          eduDetails,
+          email: email ?? null,
+          empType: empType ?? null,
+          eduDetails: eduDetails ?? null,
           familyDetails: familyDetails ?? null,
-          gender,
-          lang,
-          marital,
-          name,
-          nationality,
+          gender: gender ?? null,
+          lang: lang ?? null,
+          marital: marital ?? null,
+          name: name ?? null,
+          nationality: nationality ?? null,
           otherNation: otherNation ?? null,
           otherRace: otherRace ?? null,
           otherReligion: otherReligion ?? null,
@@ -461,13 +461,13 @@ export default function PersonalDetailsUpdateForm(props) {
           ppIssued: ppIssued ?? null,
           ppExpiry: ppExpiry ?? null,
           ppDestinate: ppDestinate ?? null,
-          presentAddress,
-          permanentAddress,
-          profilePhoto,
-          position,
-          race,
-          religion,
-          status,
+          presentAddress: presentAddress ?? null,
+          permanentAddress: permanentAddress ?? null,
+          profilePhoto: profilePhoto ?? null,
+          position: position ?? null,
+          race: race ?? null,
+          religion: religion ?? null,
+          status: status ?? null,
           workExperience: workExperience ?? null,
         };
         const validationResponses = await Promise.all(
@@ -582,7 +582,7 @@ export default function PersonalDetailsUpdateForm(props) {
       ></TextField>
       <TextField
         label="Age"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         type="number"
         step="any"
@@ -946,7 +946,7 @@ export default function PersonalDetailsUpdateForm(props) {
       ></TextField>
       <TextField
         label="Contact no"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={contactNo}
         onChange={(e) => {
@@ -1006,7 +1006,7 @@ export default function PersonalDetailsUpdateForm(props) {
       ></TextField>
       <TextField
         label="Cob"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={cob}
         onChange={(e) => {
@@ -1066,7 +1066,7 @@ export default function PersonalDetailsUpdateForm(props) {
       ></TextField>
       <TextField
         label="Contract type"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={contractType}
         onChange={(e) => {
@@ -1186,7 +1186,7 @@ export default function PersonalDetailsUpdateForm(props) {
       ></TextField>
       <TextField
         label="Dob"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={dob}
         onChange={(e) => {
@@ -1306,7 +1306,7 @@ export default function PersonalDetailsUpdateForm(props) {
       ></TextField>
       <TextField
         label="Email"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={email}
         onChange={(e) => {
@@ -1366,7 +1366,7 @@ export default function PersonalDetailsUpdateForm(props) {
       ></TextField>
       <TextField
         label="Emp type"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={empType}
         onChange={(e) => {
@@ -1487,7 +1487,7 @@ export default function PersonalDetailsUpdateForm(props) {
       >
         <TextAreaField
           label="Edu details"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentEduDetailsValue}
           onChange={(e) => {
@@ -1592,7 +1592,7 @@ export default function PersonalDetailsUpdateForm(props) {
       </ArrayField>
       <TextField
         label="Gender"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={gender}
         onChange={(e) => {
@@ -1652,7 +1652,7 @@ export default function PersonalDetailsUpdateForm(props) {
       ></TextField>
       <TextField
         label="Lang"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={lang}
         onChange={(e) => {
@@ -1712,7 +1712,7 @@ export default function PersonalDetailsUpdateForm(props) {
       ></TextField>
       <TextField
         label="Marital"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={marital}
         onChange={(e) => {
@@ -1772,7 +1772,7 @@ export default function PersonalDetailsUpdateForm(props) {
       ></TextField>
       <TextField
         label="Name"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={name}
         onChange={(e) => {
@@ -1832,7 +1832,7 @@ export default function PersonalDetailsUpdateForm(props) {
       ></TextField>
       <TextField
         label="Nationality"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={nationality}
         onChange={(e) => {
@@ -2312,7 +2312,7 @@ export default function PersonalDetailsUpdateForm(props) {
       ></TextField>
       <TextField
         label="Present address"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={presentAddress}
         onChange={(e) => {
@@ -2372,7 +2372,7 @@ export default function PersonalDetailsUpdateForm(props) {
       ></TextField>
       <TextField
         label="Permanent address"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={permanentAddress}
         onChange={(e) => {
@@ -2432,7 +2432,7 @@ export default function PersonalDetailsUpdateForm(props) {
       ></TextField>
       <TextField
         label="Profile photo"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={profilePhoto}
         onChange={(e) => {
@@ -2492,7 +2492,7 @@ export default function PersonalDetailsUpdateForm(props) {
       ></TextField>
       <TextField
         label="Position"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={position}
         onChange={(e) => {
@@ -2552,7 +2552,7 @@ export default function PersonalDetailsUpdateForm(props) {
       ></TextField>
       <TextField
         label="Race"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={race}
         onChange={(e) => {
@@ -2612,7 +2612,7 @@ export default function PersonalDetailsUpdateForm(props) {
       ></TextField>
       <TextField
         label="Religion"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={religion}
         onChange={(e) => {
@@ -2672,7 +2672,7 @@ export default function PersonalDetailsUpdateForm(props) {
       ></TextField>
       <TextField
         label="Status"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={status}
         onChange={(e) => {

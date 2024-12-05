@@ -237,10 +237,10 @@ export default function UserUpdateForm(props) {
     React.useState("");
   const setPermissionsRef = React.createRef();
   const validations = {
-    empID: [{ type: "Required" }],
-    selectType: [{ type: "Required" }],
+    empID: [],
+    selectType: [],
     setPermissions: [],
-    password: [{ type: "Required" }],
+    password: [],
     status: [],
   };
   const runValidationTasks = async (
@@ -269,10 +269,10 @@ export default function UserUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          empID,
-          selectType,
+          empID: empID ?? null,
+          selectType: selectType ?? null,
           setPermissions: setPermissions ?? null,
-          password,
+          password: password ?? null,
           status: status ?? null,
         };
         const validationResponses = await Promise.all(
@@ -327,7 +327,7 @@ export default function UserUpdateForm(props) {
     >
       <TextField
         label="Emp id"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={empID}
         onChange={(e) => {
@@ -355,7 +355,7 @@ export default function UserUpdateForm(props) {
       ></TextField>
       <TextField
         label="Select type"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={selectType}
         onChange={(e) => {
@@ -434,7 +434,7 @@ export default function UserUpdateForm(props) {
       </ArrayField>
       <TextField
         label="Password"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={password}
         onChange={(e) => {

@@ -25,11 +25,13 @@ export declare type OffshoreSheetCreateFormInputValues = {
     date?: string;
     dailySheet?: string[];
     status?: string;
+    manager?: string[];
 };
 export declare type OffshoreSheetCreateFormValidationValues = {
     date?: ValidationFunction<string>;
     dailySheet?: ValidationFunction<string>;
     status?: ValidationFunction<string>;
+    manager?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type OffshoreSheetCreateFormOverridesProps = {
@@ -37,6 +39,7 @@ export declare type OffshoreSheetCreateFormOverridesProps = {
     date?: PrimitiveOverrideProps<TextFieldProps>;
     dailySheet?: PrimitiveOverrideProps<TextAreaFieldProps>;
     status?: PrimitiveOverrideProps<TextFieldProps>;
+    manager?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type OffshoreSheetCreateFormProps = React.PropsWithChildren<{
     overrides?: OffshoreSheetCreateFormOverridesProps | undefined | null;

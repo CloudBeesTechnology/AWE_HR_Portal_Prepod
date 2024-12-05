@@ -3,9 +3,9 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { InterviewScheduleSchema } from "../../../services/Validation";
 import { generateClient } from "@aws-amplify/api";
-import { createInterviewScheduleSchema } from "../../../graphql/mutations";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { SubmitInterviewSchedule } from "../../../services/createMethod/SubmitInterviewSchedule";
+import { FormField } from "../../../utils/FormField";
 
 const client = generateClient();
 
@@ -19,23 +19,24 @@ export const ScheduleInter = ({ candidate, onClose, onSave }) => {
     resolver: yupResolver(InterviewScheduleSchema),
   });
 
-  const { createSchedule, isLoading, error } = SubmitInterviewSchedule();
+  const { createSchedule } = SubmitInterviewSchedule();
 
   const onSubmit = handleSubmit(async (data) => {
     const formattedData = {
       ...data,
-      date: new Date(data.date).toISOString().split("T")[0], // Ensure the date is in the correct format
+      interDate: new Date(data.interDate), // Ensure the date is in the correct format
       tempID: candidate.tempID,  // Ensure the candidate's temporary ID is included
       candidateStatus: "pending",  // Default status is 'pending'
     };
 
     console.log("Formatted Data:", formattedData);
+    // setNotification(true);
     await createSchedule(formattedData);
   });
 
   return (
     <section className="min-h-screen bg-opacity-80 w-full center">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-[400px] overflow-y-auto ">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-[500px] overflow-y-auto ">
         <div className="text-xl relative text-dark_grey text-center font-semibold p-3 rounded-t-lg bg-yellow">
           <p> Schedule Interview</p>
           <button
@@ -48,50 +49,32 @@ export const ScheduleInter = ({ candidate, onClose, onSave }) => {
         </div>
         <div className="p-5">
           <div className="flex flex-row justify-between space-x-8">
-            <div className="mt-2">
-              <label className="text-dark_grey text-[14px] font-normal">
-                Date
-              </label>
-              <input
-                type="date"
-                name="date"
-                {...register("date")}
-                className="w-full p-2 shadow-[0_1px_4px_1px_rgba(0,0,0,0.2)] rounded mt-1"
-              />
-              {errors.date && (
-                <p className="text-[red] mt-1 text-[11px]">
-                  {errors.date.message}
-                </p>
-              )}
-            </div>
-            <div className="mt-2">
-              <label className="text-dark_grey text-[14px] font-normal">
-                Time
-              </label>
-              <input
-                type="time"
-                name="time"
-                {...register("time")}
-                className="w-full p-2 shadow-[0_1px_4px_1px_rgba(0,0,0,0.2)] rounded mt-1"
-              />
-              {errors.time && (
-                <p className="text-[red] mt-1 text-[11px]">
-                  {errors.time.message}
-                </p>
-              )}
-            </div>
+            <FormField
+              name="interDate"
+              type="date"
+              label="Date"
+              register={register}
+              errors={errors}
+            />
+            <FormField
+              name="interTime"
+              type="time"
+              label="Time"
+              register={register}
+              errors={errors}
+            />
           </div>
           <div className="mt-2">
-            <label className="text-dark_grey text-[14px] font-normal">
+            <label className="text-dark_grey text-[16px] underline font-semibold">
               Interview Type
             </label>
             <div className="flex items-center mt-2 space-x-11 pl-4">
               <label className="flex items-center text-[14px] font-normal text-ash">
                 <input
                   type="radio"
-                  name="interviewType"
+                  name="interType"
                   value="Offline"
-                  {...register("interviewType")}
+                  {...register("interType")}
                   className="mr-2"
                 />
                 Offline
@@ -99,67 +82,59 @@ export const ScheduleInter = ({ candidate, onClose, onSave }) => {
               <label className="flex items-center text-[14px] font-normal text-ash">
                 <input
                   type="radio"
-                  name="interviewType"
+                  name="interType"
                   value="Online"
-                  {...register("interviewType")}
+                  {...register("interType")}
                   className="mr-2"
                 />
                 Online
               </label>
             </div>
-            {errors.interviewType && (
+            {errors.interType && (
               <p className="text-[red] text-[11px]">
-                {errors.interviewType.message}
+                {errors.interType.message}
               </p>
             )}
           </div>
-          <div className="mt-2">
-            <label className="text-dark_grey text-[14px] font-normal">
-              Venue
-            </label>
-            <input
-              type="text"
-              name="venue"
-              {...register("venue")}
-              className="w-full p-2 shadow-[0_1px_4px_1px_rgba(0,0,0,0.2)] rounded mt-1 outline-none"
-            />
-            {errors.venue && (
-              <p className="text-[red] mt-1 text-[11px]">
-                {errors.venue.message}
-              </p>
-            )}
-          </div>
-          <div className="mt-2">
-            <label className="text-dark_grey text-[14px] font-normal">
-              Assign Manager
-            </label>
-            <input
-              type="text"
-              name="interviewer"
-              {...register("interviewer")}
-              className="w-full p-2 shadow-[0_1px_4px_1px_rgba(0,0,0,0.2)] rounded mt-1 outline-none"
-            />
-            {errors.interviewer && (
-              <p className="text-[red] mt-1 text-[11px]">
-                {errors.interviewer.message}
-              </p>
-            )}
-          </div>
-          <div className="mt-2">
-            <label className="text-dark_grey text-[14px] font-normal">
-              Message
-            </label>
-            <textarea
-              name="message"
-              {...register("message")}
-              className="w-full p-2 resize-none shadow-[0_1px_4px_1px_rgba(0,0,0,0.2)] rounded mt-1 outline-none"
-            ></textarea>
-            {errors.message && (
-              <p className="text-[red]  text-[11px]">
-                {errors.message.message}
-              </p>
-            )}
-          </div>
+          <FormField
+            name="venue"
+            type="text"
+            label="Venue"
+            placeholder="Enter Venue"
+            register={register}
+            errors={errors}
+          />
+<div className="mt-4">
+  <label className="text-dark_grey text-[16px] underline font-semibold block mb-2">
+    Assign Interviewer :
+  </label>
+  <div className="grid grid-cols-2 gap-4">
+    <FormField
+      name="empBadgeNo"
+      type="text"
+      label="Badge No"
+      placeholder="Enter Badge Number"
+      register={register}
+      errors={errors}
+    />
+    <FormField
+      name="manager"
+      type="text"
+      label="Manager Name"
+      placeholder="Enter Manager Name"
+      register={register}
+      errors={errors}
+    />
+  </div>
+</div>
+          <FormField
+            name="message"
+            type="textarea"
+            label="Message"
+            placeholder="Enter Message"
+            register={register}
+            errors={errors}
+          />
           <div className="text-center mt-1 center">
             <button
               className="border-2 border-[#F7EC3D] text-dark_grey font-medium hover:bg-yellow py-1 px-2 rounded w-32"
@@ -172,7 +147,7 @@ export const ScheduleInter = ({ candidate, onClose, onSave }) => {
           </div>
           {notification && (
             <SpinLogo
-              text="Notification Successfully Sent to HRD"
+              text="Scheduled Notification Sent to HRD & Manager"
               notification={notification}
               path="/recrutiles/listofcandi"
             />

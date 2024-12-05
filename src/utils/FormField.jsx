@@ -65,7 +65,11 @@ export const FormField = ({
         <select
           className="input-field select-custom"
           {...register(name)}
-          value={selectedOption[selectedOption.length - 1]} // Use the first item for the dropdown
+          value={
+            Array.isArray(selectedOption)
+              ? selectedOption[selectedOption?.length - 1] || ""
+              : selectedOption || ""
+          }
           onChange={(e) => {
             handleSelectChange(e);
           }}

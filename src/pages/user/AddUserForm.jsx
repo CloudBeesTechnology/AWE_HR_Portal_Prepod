@@ -12,6 +12,8 @@ import { IoEyeOffOutline, IoEye } from "react-icons/io5";
 import { generateClient } from "@aws-amplify/api";
 import { signUp } from "@aws-amplify/auth";
 import { SpinLogo } from "../../utils/SpinLogo";
+import { Alert } from "@aws-amplify/ui-react";
+import { sendEmail } from "../../services/EmailServices";
 
 const client = generateClient();
 
@@ -26,14 +28,15 @@ export const AddNewForm = () => {
   const addData = location.state?.addUserData;
   const [allData, setAllData] = useState(null);
   const [notification, setNotification] = useState(false);
-
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [showTitle, setShowTitle] = useState("");
   const userDataDetails = data?.userValue || addData?.userValue;
   const workInfoDataDetails = data?.workValue || addData?.workValue;
   // console.log(userDataDetails );
   // console.log(addData?.employeeValue);
   // console.log(workInfoDataDetails);
 
-  // console.log(data?.storedValue?.data);
+  console.log(data?.storedValue?.data);
 
   useEffect(() => {
     window.scrollTo({
@@ -104,6 +107,7 @@ export const AddNewForm = () => {
       })
       .filter((item) => item !== null);
 
+    // console.log("Merged Data:", mergedData);
     setAllData(mergedData); // Ensure this is called with valid data
     setValue("password", autoPassword);
     setValue("selectType", data?.storedValue?.data?.selectType);
@@ -166,6 +170,7 @@ export const AddNewForm = () => {
       const userIDs = await userDataDetails
         .filter((m) => m.empID === data.empID)
         .map((m) => m);
+      // console.log(userIDs);
 
       if (desideCreateOrUpdate) {
         const updateUserObject = {
@@ -184,35 +189,16 @@ export const AddNewForm = () => {
             },
           })
           .then((res) => {
+            // console.log(res);
+            setShowTitle("User saved Successfully");
             setNotification(true);
           })
           .catch((err) => {
             console.log(err);
           });
       } else {
-        const createNewUser = {
-          empID: data.empID,
-          // password: "AWE001",
-          password: data.password,
-          selectType: data.selectType,
-          setPermissions: dropDownVal,
-          status: "Active",
-        };
-        await client
-          .graphql({
-            query: createUser,
-            variables: {
-              input: createNewUser,
-            },
-          })
-          .then((res) => {
-            // console.log(res);
-            setNotification(true);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-
+        const nameperson =
+          data.name.charAt(0).toUpperCase() + data.name.slice(1).toLowerCase();
         const username = data.empID;
         const password = data.password;
         const email = data.officialEmail;
@@ -226,12 +212,42 @@ export const AddNewForm = () => {
             autoSignIn: true, // Attempt to auto-sign in the user after sign-up
           },
         })
-          .then((res) => {
-            // console.log("sign up data", res);
-            // reset()
+          .then(async (res) => {
+            sendEmail(
+              `Verify Your Email Before Logging In`,
+              `Dear ${nameperson},  Please verify your email to activate your account before attempting to log in or change your password.
+You must complete the email verification process using the verification email sent to you earlier. Once verified, you can log in with the credentials provided below:
+Username: ${username} and the Temporary Password: ${password}. Ensure you verify your email first to avoid any issues during login or password changes.
+Best regards,
+[AWE Team]`,
+              "hr_no-reply@adininworks.com",
+              email
+            );
+
+            const createNewUser = {
+              empID: data.empID,
+              password: data.password,
+              selectType: data.selectType,
+              setPermissions: dropDownVal,
+              status: "Active",
+            };
+            await client
+              .graphql({
+                query: createUser,
+                variables: {
+                  input: createNewUser,
+                },
+              })
+              .then((res) => {
+                setShowTitle("Created a User Successfully");
+                setNotification(true);
+              })
+              .catch((err) => {
+                console.log(err);
+              });
           })
           .catch((err) => {
-            console.log("sign up data error", err);
+            alert(err);
           });
       }
       reset();
@@ -243,7 +259,12 @@ export const AddNewForm = () => {
   });
 
   return (
-    <div className="flex items-center justify-center bg-[#F8F8F8] flex-col p-10">
+    <div
+      className="flex items-center justify-center bg-[#F8F8F8] flex-col p-10"
+      onClick={() => {
+        setFilteredEmployees([]);
+      }}
+    >
       <div className="w-full flex items-center justify-between gap-5">
         <Link to="/user" className="text-xl flex-1 text-grey">
           <FaArrowLeft />
@@ -259,6 +280,8 @@ export const AddNewForm = () => {
               searchIcon2={<IoSearch />}
               placeholder="Employee Id"
               rounded="rounded-lg"
+              filteredEmployees={filteredEmployees}
+              setFilteredEmployees={setFilteredEmployees}
             />
           )}
         </div>
@@ -340,6 +363,7 @@ export const AddNewForm = () => {
                 type="text"
                 className="input-field"
                 value={data?.storedValue?.data?.empID || watch("userID") || ""}
+                // onChange={handleUserIDChange}
                 {...register("userID")}
               />
             </div>
@@ -457,6 +481,7 @@ export const AddNewForm = () => {
               <SPDropDown
                 dropDownData={dropDownData}
                 permissionData={permissionData}
+                // selectedDropDown={fetchedUserData}
               />
             </div>
           </div>
@@ -471,11 +496,7 @@ export const AddNewForm = () => {
         </div>
       </form>
       {notification && (
-        <SpinLogo
-          text="Created a User Successfully"
-          notification={notification}
-          path="/user"
-        />
+        <SpinLogo text={showTitle} notification={notification} path="/user" />
       )}
     </div>
   );

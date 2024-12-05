@@ -73,7 +73,7 @@ export const InterviewForm = () => {
                   id={input.field}
                   onChange={(e) => handleFileChange(input.field, e.target.files[0])}
                 />
-                <label htmlFor={input.field} className="flex items-center cursor-pointer text-gray-500">
+                <label htmlFor={input.field} className="flex items-center cursor-pointer text-grey">
                   <BsCloudUpload className="mr-2 text-lg text-[#ab1234]" />
                   {formData.interview[input.field]?.name || 'Upload PDF'}
                 </label>

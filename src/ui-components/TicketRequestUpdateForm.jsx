@@ -37,6 +37,7 @@ export default function TicketRequestUpdateForm(props) {
     hrDate: "",
     hrRemarks: "",
     hrName: "",
+    hrEmpID: "",
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [empStatus, setEmpStatus] = React.useState(initialValues.empStatus);
@@ -56,6 +57,7 @@ export default function TicketRequestUpdateForm(props) {
   const [hrDate, setHrDate] = React.useState(initialValues.hrDate);
   const [hrRemarks, setHrRemarks] = React.useState(initialValues.hrRemarks);
   const [hrName, setHrName] = React.useState(initialValues.hrName);
+  const [hrEmpID, setHrEmpID] = React.useState(initialValues.hrEmpID);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = ticketRequestRecord
@@ -73,6 +75,7 @@ export default function TicketRequestUpdateForm(props) {
     setHrDate(cleanValues.hrDate);
     setHrRemarks(cleanValues.hrRemarks);
     setHrName(cleanValues.hrName);
+    setHrEmpID(cleanValues.hrEmpID);
     setErrors({});
   };
   const [ticketRequestRecord, setTicketRequestRecord] = React.useState(
@@ -98,14 +101,15 @@ export default function TicketRequestUpdateForm(props) {
     empStatus: [],
     empDate: [],
     empRemarks: [],
-    departureDate: [{ type: "Required" }],
-    arrivalDate: [{ type: "Required" }],
+    departureDate: [],
+    arrivalDate: [],
     destination: [],
     remarks: [],
     hrStatus: [],
     hrDate: [],
     hrRemarks: [],
     hrName: [],
+    hrEmpID: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -154,14 +158,15 @@ export default function TicketRequestUpdateForm(props) {
           empStatus: empStatus ?? null,
           empDate: empDate ?? null,
           empRemarks: empRemarks ?? null,
-          departureDate,
-          arrivalDate,
+          departureDate: departureDate ?? null,
+          arrivalDate: arrivalDate ?? null,
           destination: destination ?? null,
           remarks: remarks ?? null,
           hrStatus: hrStatus ?? null,
           hrDate: hrDate ?? null,
           hrRemarks: hrRemarks ?? null,
           hrName: hrName ?? null,
+          hrEmpID: hrEmpID ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -234,6 +239,7 @@ export default function TicketRequestUpdateForm(props) {
               hrDate,
               hrRemarks,
               hrName,
+              hrEmpID,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -269,6 +275,7 @@ export default function TicketRequestUpdateForm(props) {
               hrDate,
               hrRemarks,
               hrName,
+              hrEmpID,
             };
             const result = onChange(modelFields);
             value = result?.empStatus ?? value;
@@ -306,6 +313,7 @@ export default function TicketRequestUpdateForm(props) {
               hrDate,
               hrRemarks,
               hrName,
+              hrEmpID,
             };
             const result = onChange(modelFields);
             value = result?.empDate ?? value;
@@ -341,6 +349,7 @@ export default function TicketRequestUpdateForm(props) {
               hrDate,
               hrRemarks,
               hrName,
+              hrEmpID,
             };
             const result = onChange(modelFields);
             value = result?.empRemarks ?? value;
@@ -357,7 +366,7 @@ export default function TicketRequestUpdateForm(props) {
       ></TextField>
       <TextField
         label="Departure date"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         type="datetime-local"
         value={departureDate && convertToLocal(new Date(departureDate))}
@@ -378,6 +387,7 @@ export default function TicketRequestUpdateForm(props) {
               hrDate,
               hrRemarks,
               hrName,
+              hrEmpID,
             };
             const result = onChange(modelFields);
             value = result?.departureDate ?? value;
@@ -394,7 +404,7 @@ export default function TicketRequestUpdateForm(props) {
       ></TextField>
       <TextField
         label="Arrival date"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         type="datetime-local"
         value={arrivalDate && convertToLocal(new Date(arrivalDate))}
@@ -415,6 +425,7 @@ export default function TicketRequestUpdateForm(props) {
               hrDate,
               hrRemarks,
               hrName,
+              hrEmpID,
             };
             const result = onChange(modelFields);
             value = result?.arrivalDate ?? value;
@@ -450,6 +461,7 @@ export default function TicketRequestUpdateForm(props) {
               hrDate,
               hrRemarks,
               hrName,
+              hrEmpID,
             };
             const result = onChange(modelFields);
             value = result?.destination ?? value;
@@ -485,6 +497,7 @@ export default function TicketRequestUpdateForm(props) {
               hrDate,
               hrRemarks,
               hrName,
+              hrEmpID,
             };
             const result = onChange(modelFields);
             value = result?.remarks ?? value;
@@ -520,6 +533,7 @@ export default function TicketRequestUpdateForm(props) {
               hrDate,
               hrRemarks,
               hrName,
+              hrEmpID,
             };
             const result = onChange(modelFields);
             value = result?.hrStatus ?? value;
@@ -557,6 +571,7 @@ export default function TicketRequestUpdateForm(props) {
               hrDate: value,
               hrRemarks,
               hrName,
+              hrEmpID,
             };
             const result = onChange(modelFields);
             value = result?.hrDate ?? value;
@@ -592,6 +607,7 @@ export default function TicketRequestUpdateForm(props) {
               hrDate,
               hrRemarks: value,
               hrName,
+              hrEmpID,
             };
             const result = onChange(modelFields);
             value = result?.hrRemarks ?? value;
@@ -627,6 +643,7 @@ export default function TicketRequestUpdateForm(props) {
               hrDate,
               hrRemarks,
               hrName: value,
+              hrEmpID,
             };
             const result = onChange(modelFields);
             value = result?.hrName ?? value;
@@ -640,6 +657,42 @@ export default function TicketRequestUpdateForm(props) {
         errorMessage={errors.hrName?.errorMessage}
         hasError={errors.hrName?.hasError}
         {...getOverrideProps(overrides, "hrName")}
+      ></TextField>
+      <TextField
+        label="Hr emp id"
+        isRequired={false}
+        isReadOnly={false}
+        value={hrEmpID}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              empStatus,
+              empDate,
+              empRemarks,
+              departureDate,
+              arrivalDate,
+              destination,
+              remarks,
+              hrStatus,
+              hrDate,
+              hrRemarks,
+              hrName,
+              hrEmpID: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.hrEmpID ?? value;
+          }
+          if (errors.hrEmpID?.hasError) {
+            runValidationTasks("hrEmpID", value);
+          }
+          setHrEmpID(value);
+        }}
+        onBlur={() => runValidationTasks("hrEmpID", hrEmpID)}
+        errorMessage={errors.hrEmpID?.errorMessage}
+        hasError={errors.hrEmpID?.hasError}
+        {...getOverrideProps(overrides, "hrEmpID")}
       ></TextField>
       <Flex
         justifyContent="space-between"

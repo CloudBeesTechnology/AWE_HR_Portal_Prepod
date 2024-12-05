@@ -134,7 +134,7 @@ export const AddCourse = () => {
                 className="primary_btn"
                 onClick={() => setIsModalOpen(true)} // Open the modal
               >
-                Add
+                Add Course
               </button>
             </div>
             <form onSubmit={handleSubmit(onSubmit)}>

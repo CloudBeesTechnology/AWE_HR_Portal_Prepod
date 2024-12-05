@@ -29,14 +29,14 @@ export const Reports = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [loading, setLoading] = useState(true); // Loading state
-console.log(empPIData);
-console.log(empPDData);
-console.log(IDData);
-console.log(workInfoData);
-console.log(terminateData);
-console.log(DNData);
-console.log(PPValidsData);
-console.log(LMIData);
+// console.log(empPIData);
+// console.log(empPDData);
+// console.log(IDData);
+// console.log(workInfoData);
+// console.log(terminateData);
+// console.log(DNData);
+// console.log(PPValidsData);
+// console.log(LMIData);
 
   const mergeData = (empPIData, empPDData, IDData,workInfoData,terminateData,PPValidsData,LMIData,DNData) => {
     return empPIData.map((piData) => {
@@ -104,7 +104,7 @@ console.log(LMIData);
     { title: "Termination" },
     { title: "Probation Review" },
     { title: "Contract Expiry Review" },
-    { title: "Probation Form" },
+    // { title: "Probation Form" },
     { title: "Contract Expiry PDF" },
     { title: "Employment Pass expiry" },
     { title: "LD expiry" },
@@ -190,13 +190,13 @@ console.log(LMIData);
           reportTitle={reportTitle}
         />
       )}
-      {reportTitle === "Probation Form" && (
+      {/* {reportTitle === "Probation Form" && (
         <ProbationPDF
           allData={mergedData}
           typeOfReport={typeOfReport}
           reportTitle={reportTitle}
         />
-      )}
+      )} */}
       {reportTitle === "Contract Expiry Review" && (
         <ContractReview
           allData={mergedData}

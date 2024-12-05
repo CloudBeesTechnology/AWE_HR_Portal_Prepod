@@ -1,5 +1,28 @@
+import { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
-export const PopupForAssignManager = ({ toggleFunctionForAssiMana }) => {
+export const PopupForAssignManager = ({
+  toggleFunctionForAssiMana,
+  renameKeysFunctionAndSubmit,
+}) => {
+  const [formData, setFormData] = useState({
+    mbadgeNo: "",
+    mName: "",
+    mdepartment: "",
+    mfromDate: "",
+    muntilDate: "",
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+  const handleSubmit = () => {
+    renameKeysFunctionAndSubmit(formData);
+    toggleFunctionForAssiMana();
+  };
   return (
     // <section className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 border ">
     //   <header>Assign Manager</header>
@@ -37,16 +60,30 @@ export const PopupForAssignManager = ({ toggleFunctionForAssiMana }) => {
     //   </footer>
     // </section>
     <section className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white w-[90%] max-w-[500px] rounded-lg shadow-lg p-5">
-        {/* Header */}
-        <header className="flex justify-between items-center pb-4 border-b">
-          <h2 className="text-dark_grey text_size_2">Assign Manager</h2>
+      <div className="bg-white w-[90%] max-w-[500px] rounded-lg shadow-lg p-7 ">
+        <div className="flex justify-center pb-5 ">
+          <img
+            className="size-32 h-12 w-full "
+            src="/src/assets/logo/logo-with-name.svg"
+             
+            alt="not found"
+          />
           <RxCross2
             className="text-2xl text-dark_grey cursor-pointer "
             onClick={() => {
               toggleFunctionForAssiMana();
             }}
           />
+        </div>
+        {/* Header */}
+        <header className="flex justify-between items-center pb-4 border-b">
+          <h2 className="text-dark_grey text_size_2">Assign Manager</h2>
+          {/* <RxCross2
+            className="text-2xl text-dark_grey cursor-pointer "
+            onClick={() => {
+              toggleFunctionForAssiMana();
+            }}
+          /> */}
         </header>
 
         {/* Main Content */}
@@ -63,7 +100,10 @@ export const PopupForAssignManager = ({ toggleFunctionForAssiMana }) => {
               <input
                 type="text"
                 id="badgeNo"
-                className="mt-1 block w-full border border-dark_grey outline-none rounded text-sm py-2 px-3"
+                name="mbadgeNo"
+                value={formData.mbadgeNo}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border border-dark_grey outline-none rounded text-sm py-1.5 px-3"
               />
             </div>
 
@@ -78,7 +118,10 @@ export const PopupForAssignManager = ({ toggleFunctionForAssiMana }) => {
               <input
                 type="text"
                 id="managerName"
-                className="mt-1 block w-full border border-dark_grey outline-none rounded text-sm py-2 px-3"
+                name="mName"
+                value={formData.mName}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border border-dark_grey outline-none rounded text-sm py-1.5 px-3"
               />
             </div>
 
@@ -93,10 +136,13 @@ export const PopupForAssignManager = ({ toggleFunctionForAssiMana }) => {
               <input
                 type="text"
                 id="department"
-                className="mt-1 block w-full border border-dark_grey outline-none rounded text-sm py-2 px-3"
+                name="mdepartment"
+                value={formData.mdepartment}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border border-dark_grey outline-none rounded text-sm py-1.5 px-3"
               />
             </div>
-
+            <p className="text-dark_grey text_size_2 ">Timesheet Period : </p>
             {/* Contact No. Field */}
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -104,11 +150,14 @@ export const PopupForAssignManager = ({ toggleFunctionForAssiMana }) => {
                   htmlFor="contactNo"
                   className="block text-sm font-medium text-gray-600"
                 >
-                  Start Date
+                  From
                 </label>
                 <input
                   type="date"
-                  className="mt-1 block w-full border border-dark_grey outline-none rounded text-sm py-2 px-3"
+                  name="mfromDate"
+                  value={formData.mfromDate}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full border border-dark_grey outline-none rounded text-sm py-1.5 px-3"
                 />
               </div>
               <div>
@@ -116,11 +165,14 @@ export const PopupForAssignManager = ({ toggleFunctionForAssiMana }) => {
                   htmlFor="contactNo"
                   className="block text-sm font-medium text-gray-600"
                 >
-                  End Date
+                  Until
                 </label>
                 <input
                   type="date"
-                  className="mt-1 block w-full border border-dark_grey outline-none rounded text-sm py-2 px-3"
+                  name="muntilDate"
+                  value={formData.muntilDate}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full border border-dark_grey outline-none rounded text-sm py-1.5 px-3"
                 />
               </div>
             </div>
@@ -130,12 +182,12 @@ export const PopupForAssignManager = ({ toggleFunctionForAssiMana }) => {
         {/* Footer */}
         <footer className="flex justify-center mt-6 space-x-3">
           <button
-            className="px-5 py-2 bg-[#FEF116] text-dark_grey text_size_3 rounded"
+            className="px-5 py-2 bg-[#FEF116] text_size_5 text-dark_grey rounded"
             onClick={() => {
-              toggleFunctionForAssiMana();
+              handleSubmit();
             }}
           >
-            Save
+            Send for Approval
           </button>
         </footer>
       </div>

@@ -155,7 +155,7 @@ export const FilterMonthAndYear = ({ onDateChange }) => {
           onChange={handleChange}
           dateFormat="MM/dd/yyyy"
           placeholderText="Select a date"
-          className="uppercase outline-none text-sm w-full"
+          className="outline-none w-full text-sm"
           open={isOpen}
           onCalendarClose={() => setIsOpen(false)}
         />

@@ -53,7 +53,7 @@ export const MobilizationForm = () => {
     <form onSubmit={handleSubmit(onSubmit)} className="p-5">
       <div className="grid grid-cols-2 gap-5 mt-5">
         <div>
-          <label htmlFor="mobSignDate">Approval Date</label>
+          <label htmlFor="mobSignDate">Date of Mobilize</label>
           <input
             className="w-full border p-2 rounded mt-1"
             type="date"
@@ -66,7 +66,7 @@ export const MobilizationForm = () => {
           <label>Choose File</label>
           <div className="flex items-center gap-5 mt-1">
             <label className="flex items-center px-3 py-2 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer">
-              Upload File
+              Upload Contract
               <input
                 type="file"
                 className="hidden"
@@ -78,10 +78,10 @@ export const MobilizationForm = () => {
               </span>
             </label>
             {uploadedFileName ? (
-              <p className="text-xs mt-1 text-grey">Uploaded: {uploadedFileName}</p>
+              <p className="text-xs mt-1 text-grey">{uploadedFileName}</p>
             ) : (
               errors.mobFile && (
-                <p className="text-red-500 text-xs mt-1">
+                <p className="text-[red] text-xs mt-1">
                   {errors.mobFile.message}
                 </p>
               )
@@ -93,7 +93,7 @@ export const MobilizationForm = () => {
       <div className="mt-5 flex justify-center">
         <button
           type="submit"
-          className="py-2 px-5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
+          className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
         >
           Submit
         </button>

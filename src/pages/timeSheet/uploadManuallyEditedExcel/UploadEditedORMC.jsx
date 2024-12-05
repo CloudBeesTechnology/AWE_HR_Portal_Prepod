@@ -20,17 +20,14 @@ export const UploadEditedORMC = (
       allSheets.push({ sheetName, data: sheet });
     });
 
-    console.log(allSheets);
     const AddData = [];
 
     const getResult =
       allSheets &&
       allSheets.map((sheet) => {
         const data = sheet.data;
-        console.log(data);
 
         var headerSlicedData = data.slice(1, 2);
-        //   console.log(headerSlicedData);
 
         var name = "";
 
@@ -41,7 +38,6 @@ export const UploadEditedORMC = (
           return foundKey;
         });
 
-        //   console.log(changedHeader);
         const result = changedHeader.flat().flat();
 
         var bodySlicedData = data.slice(2);
@@ -84,7 +80,6 @@ export const UploadEditedORMC = (
       }
     };
 
-    // console.log(tableBodyData);
     function cleanKey(key) {
       if (typeof key !== "string") {
         return key; // Return value if not a string (e.g., number, object)
@@ -102,7 +97,7 @@ export const UploadEditedORMC = (
 
       return cleanedItem;
     });
-    console.log(formattedData);
+
     const updatedDataArray =
       formattedData &&
       formattedData.map((item) => {
@@ -120,8 +115,7 @@ export const UploadEditedORMC = (
 
         return item;
       });
-    console.log(updatedDataArray);
-    // console.log(updatedDataArray);
+
     // const removeTotalEmployees = updatedDataArray.filter(
     //   (val) => !val.NAME?.includes("TOTAL EMPLOYEES")
     // );
@@ -142,7 +136,7 @@ export const UploadEditedORMC = (
       // .filter((obj) => dateFormatRegex.test(obj.DATE)) // Check if DATE is in MM/DD/YYYY format
     }
     const filteredData = filterDataByDateFormat(updatedDataArray);
-    console.log(filteredData);
+
     setExcelData(filteredData);
     // setExcelData(filteHighlightedData);
 
@@ -160,7 +154,7 @@ export const UploadEditedORMC = (
     };
 
     const transformedData = transformData(getResult);
-    console.log(transformedData);
+
     setLoading(false);
     const resultOfTheader = transformedData.flat();
     return resultOfTheader;

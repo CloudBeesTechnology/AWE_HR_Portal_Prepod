@@ -17,37 +17,13 @@ export const NonLocalAccovalidationSchema = Yup.object().shape({
 });
 
 export const LabourImmigrationSchema = Yup.object().shape({
-  empID: Yup.string().required("Employee ID Number is mandatory"),
-  overMD: Yup.date()
-    .nullable()
-    .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .notRequired(),
-  // .test("is-not-future-date", "Future Date Not Allowed", function (value) {
-  //   return !value || new Date(value) <= new Date();
-  // })
-  overME: Yup.date()
-    .nullable()
-    .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .notRequired(),
-  // .test("is-future-date", "Only Future Dates Allowed", function (value) {
-  //   return !value || new Date(value) > new Date();
-  // })
-  bruhimsRD: Yup.date()
-    .nullable()
-    .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .notRequired(),
+  empID: Yup.string().required("Employee ID is mandatory"),
+  overMD: Yup.string().notRequired(),
+  overME: Yup.string().notRequired(),
+  bruhimsRD: Yup.string().notRequired(),
   bruhimsRNo: Yup.string().notRequired(),
-  bruneiMAD: Yup.date()
-    .nullable()
-    .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .notRequired(),
-  bruneiME: Yup.date()
-    .nullable()
-    .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .notRequired(),
-  // .test("is-future-date", "Only Future Dates Allowed", function (value) {
-  //   return !value || new Date(value) > new Date();
-  // })
+  bruneiMAD: Yup.string().notRequired(),
+  bruneiME: Yup.string().notRequired(),
   uploadFitness: Yup.array()
     .of(
       Yup.mixed()
@@ -172,59 +148,66 @@ export const LabourImmigrationSchema = Yup.object().shape({
     })
   ),
 });
-
 export const WorkInfoSchema = Yup.object().shape({
   empID: Yup.string().required("Employee ID is mandatory"),
-  department: Yup.string().required("Department is mandatory"),
-  otherDepartment: Yup.string().when("Department is mandatory", {
-    is: (value) => value && value.trim().toLowerCase() === "other",
-    then: () => Yup.string().required("Other Department is mandatory"),
-    otherwise: () => Yup.string().notRequired(),
-  }),
-  position: Yup.string().required("Position is mandatory"),
-  otherPosition: Yup.string().when("Position is mandatory", {
-    is: (value) => value && value.trim().toLowerCase() === "other",
-    then: () => Yup.string().required("Other Position is mandatory"),
-    otherwise: () => Yup.string().notRequired(),
-  }),
-  jobCat: Yup.string().required("jobCategory is required"),
-  otherJobCat: Yup.string().when("jobCategory is required", {
-    is: (value) => value && value.trim().toLowerCase() === "other",
-    then: () => Yup.string().required("Other jobcat is required"),
-    otherwise: () => Yup.string().notRequired(),
-  }),
-  doj: Yup.string()
-    .required("Date of Join is required")
-    .test("is-past-date", "Date of joining must be in the past", (value) => {
-      if (!value) return true;
-      const dojDate = new Date(value);
-      const currentDate = new Date();
-      return dojDate < currentDate;
-    }),
-  jobDesc: Yup.string().required("Job Description is required"),
-  skillPool: Yup.string().required("Skill Pool is required"),
-  relationship: Yup.string().required("Employee Status is required"),
+  department: Yup.string()
+    .required("Department is mandatory"),
+
+  otherDepartment: Yup.string().notRequired(),
+  position: Yup.string()
+    .required("Position is mandatory"),
+  otherPosition: Yup.string().notRequired(),
+  jobCat: Yup.string()
+    .required("Job Category is mandatory"),
+  otherJobCat: Yup.string().notRequired(),
+
+  // remarkWI
+  // : Yup.array()
+  //   .of(Yup.string().notRequired(),)
+  //
+  //   .notRequired(),
+  // other: Yup.string().when("egory is required", {
+  //   is: (value) => value && value.trim().toLowerCase() === "other",
+  //   then: () => Yup.string().required("Other  is required"),
+  //   otherwise: () => Yup.string().notRequired(),
+  // }),
+  doj: Yup.date()
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .required("Date of Join is mandatory"),
+    // .test("is-past-date", "Date of joining must be in the past", (value) => {
+    //   if (!value) return true;
+    //   const dojDate = new Date(value);
+    //   const currentDate = new Date();
+    //   return dojDate < currentDate;
+    // }),
+  jobDesc: Yup.string().required("Job Description is mandatory"),
+  skillPool: Yup.string().required("Skill Pool is mandatory"),
   hr: Yup.string().notRequired(),
-  manager: Yup.string().notRequired(),
+  manager: Yup.string().required("Manager is mandatory"),
   supervisor: Yup.string().notRequired(),
+  relationship: Yup.string()
+    .required("Employee Status is mandatory"),
+
   upgradePosition: Yup.string().notRequired(),
   upgradeDate: Yup.string().notRequired(),
   contractPeriod: Yup.string().notRequired(),
   contractStart: Yup.string()
-    .notRequired()
-    .test(
-      "is-after-doj",
-      "Contract Start date must be after Date of Joining",
-      function (value) {
-        const { doj } = this.parent;
-        if (!doj || !value) return true;
+  .notRequired()
+  .test(
+    "is-on-or-after-doj",
+    "Contract Start date must be the same as or after Date of Joining",
+    function (value) {
+      const { doj } = this.parent;
+      if (!doj || !value) return true;
 
-        const dojDate = new Date(doj);
-        const contractStartDate = new Date(value);
+      const dojDate = new Date(doj);
+      const contractStartDate = new Date(value);
 
-        return contractStartDate > dojDate;
-      }
-    ),
+      // Check if contractStartDate is the same as or after dojDate
+      return contractStartDate >= dojDate;
+    }
+  ),
   contractEnd: Yup.string()
     .notRequired()
     .test(
@@ -243,17 +226,21 @@ export const WorkInfoSchema = Yup.object().shape({
   workStatus: Yup.string()
     .required("Employment Work Status is required")
     .notOneOf([""], "Employment Work Status is mandatory"),
-  probationStart: Yup.string()
+    probationStart: Yup.string()
     .notRequired()
     .test(
-      "is-after-doj",
-      "Contract Start date must be after Date of Joining",
+      "is-on-or-after-doj-or-contract-start",
+      "Probation Start date must be the same as or after Date of Joining and Contract Start date",
       function (value) {
-        const { doj } = this.parent;
+        const { doj, contractStart } = this.parent;
         if (!doj || !value) return true;
+  
         const dojDate = new Date(doj);
-        const contractStartDate = new Date(value);
-        return contractStartDate > dojDate;
+        const contractStartDate = contractStart ? new Date(contractStart) : dojDate; // Use contractStart if available; otherwise, fall back to doj
+        const probationStartDate = new Date(value);
+  
+        // Check if probationStartDate is the same as or after the earliest of dojDate and contractStartDate
+        return probationStartDate >= dojDate && probationStartDate >= contractStartDate;
       }
     ),
   probationEnd: Yup.string()
@@ -270,264 +257,313 @@ export const WorkInfoSchema = Yup.object().shape({
 
         return probationEndDate > probationStartDate; // Contract End must be after Contract Start
       }
-    ),
+   ),
   probDuration: Yup.string().notRequired(),
-  workHrs: Yup.string().required("Normal Working Hours are required"),
-  workWeek: Yup.string().required("Normal Working Week are required"),
-  workMonth: Yup.string().required("Normal Working Month are required"),
+  workHrs: Yup.string()
+    .required("Normal Working Hours mandatory"),
+  workWeek: Yup.string()
+    .required("Normal Working Week mandatory"),
+  workMonth: Yup.string()
+    .required("Normal Working Month mandatory"),
   salaryType: Yup.string()
     .required("Type of Salary Pay is mandatory")
     .notOneOf([""], "Type of Salary Pay is mandatory"),
 
-  resignDate: Yup.string().notRequired(),
-  termiDate: Yup.string().notRequired(),
-  resignNotProb: Yup.string().notRequired(),
-  otherResignNotProb: Yup.string().notRequired(),
-  termiNotProb: Yup.string().notRequired(),
-  otherTermiNotProb: Yup.string().notRequired(),
-  resignNotConf: Yup.string().notRequired(),
-  otherResignNotConf: Yup.string().notRequired(),
-  termiNotConf: Yup.string().notRequired(),
-  otherTermiNotConf: Yup.string().notRequired(),
-  reasonResign: Yup.string().notRequired(),
-  reasonTerminate: Yup.string().notRequired(),
-  leavePass: Yup.string().notRequired(),
-  dateLeavePass: Yup.string().notRequired(),
-  destinateLeavePass: Yup.string().notRequired(),
-  durLeavePass: Yup.string().notRequired(),
-  annualLeave: Yup.string().required("Annual Leave Entitlement Required"),
-  annualLeaveDate: Yup.string().required("Annual Leave  Date is mandatory"),
-  sickLeave: Yup.string().required("Sick Leave Entitlement Required"),
-  sickLeaveDate: Yup.string().required("Sick Leave  Date is mandatory"),
+  // resignDate: Yup.string().notRequired(),
+  // termiDate: Yup.string().notRequired(),
+  // resignNotProb: Yup.string().notRequired(),
+  // otherResignNotProb: Yup.string().notRequired(),
+  // termiNotProb: Yup.string().notRequired(),
+  // otherTermiNotProb: Yup.string().notRequired(),
+  // resignNotConf: Yup.string().notRequired(),
+  // otherResignNotConf: Yup.string().notRequired(),
+  // termiNotConf: Yup.string().notRequired(),
+  // otherTermiNotConf: Yup.string().notRequired(),
+  // reasonResign: Yup.string().notRequired(),
+  // reasonTerminate: Yup.string().notRequired(),
+  leavePass: Yup.string()
+  .notRequired(),
+  dateLeavePass: Yup.string()
+  .nullable()
+  .transform((value, originalValue) => (originalValue === "" ? null : value))
+  .notRequired(),
+  destinateLeavePass:Yup.string()
+  .notRequired(),
+
+  durLeavePass:Yup.string()
+  .notRequired(),
+
+  annualLeave: Yup.string()
+  .notRequired(),
+
+
+  annualLeaveDate:Yup.date()
+  .nullable()
+  .transform((value, originalValue) => (originalValue === "" ? null : value))
+  .notRequired(),
+  sickLeave: Yup.string().notRequired(),
+  sickLeaveDate: Yup.string().notRequired(),
   materLeave: Yup.string().notRequired(),
-  materLeaveDate: Yup.string().notRequired(),
   paterLeave: Yup.string().notRequired(),
-  paterLeaveDate: Yup.string().notRequired(),
   mrageLeave: Yup.string().notRequired(),
-  mrageLeaveDate: Yup.string().notRequired(),
   compasLeave: Yup.string().notRequired(),
-  compasLeaveDate: Yup.string().notRequired(),
-  WIProbation: Yup.array()
-    .of(
-      Yup.mixed()
-        .test(
-          "fileOrUrl", // Custom test name
-          "Only PDF", // Custom error message
-          (value) => {
-            // If value is a file, check for valid file types
-            if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
-            }
-            if (typeof value === "string") {
-              return isValidUrl(value); // Check if the string is a valid URL
-            }
+  // WIProbation: Yup.array()
+  //   .of(
+  //     Yup.mixed()
+  //       .test(
+  //         "fileOrUrl", // Custom test name
+  //         "Only PDF", // Custom error message
+  //         (value) => {
+  //           // If value is a file, check for valid file types
+  //           if (value instanceof File) {
+  //             return ["application/pdf"].includes(value.type);
+  //           }
+  //           if (typeof value === "string") {
+  //             return isValidUrl(value); // Check if the string is a valid URL
+  //           }
 
-            return true; // Return true if neither a file nor a string (invalid type)
-          }
-        )
-        .notRequired()
-    )
-    .notRequired(),
-  WIResignation: Yup.array()
-    .of(
-      Yup.mixed()
-        .test(
-          "fileOrUrl", // Custom test name
-          "Only PDF", // Custom error message
-          (value) => {
-            // If value is a file, check for valid file types
-            if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
-            }
-            if (typeof value === "string") {
-              return isValidUrl(value); // Check if the string is a valid URL
-            }
+  //           return true; // Return true if neither a file nor a string (invalid type)
+  //         }
+  //       )
+  //       .notRequired()
+  //   )
+  //   .notRequired(),
+  // WIResignation: Yup.array()
+  //   .of(
+  //     Yup.mixed()
+  //       .test(
+  //         "fileOrUrl", // Custom test name
+  //         "Only PDF", // Custom error message
+  //         (value) => {
+  //           // If value is a file, check for valid file types
+  //           if (value instanceof File) {
+  //             return ["application/pdf"].includes(value.type);
+  //           }
+  //           if (typeof value === "string") {
+  //             return isValidUrl(value); // Check if the string is a valid URL
+  //           }
 
-            return true; // Return true if neither a file nor a string (invalid type)
-          }
-        )
-        .notRequired()
-    )
-    .notRequired(),
-  WITermination: Yup.array()
-    .of(
-      Yup.mixed()
-        .test(
-          "fileOrUrl", // Custom test name
-          "Only PDF", // Custom error message
-          (value) => {
-            // If value is a file, check for valid file types
-            if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
-            }
-            if (typeof value === "string") {
-              return isValidUrl(value); // Check if the string is a valid URL
-            }
+  //           return true; // Return true if neither a file nor a string (invalid type)
+  //         }
+  //       )
+  //       .notRequired()
+  //   )
+  //   .notRequired(),
+  // WITermination: Yup.array()
+  //   .of(
+  //     Yup.mixed()
+  //       .test(
+  //         "fileOrUrl", // Custom test name
+  //         "Only PDF", // Custom error message
+  //         (value) => {
+  //           // If value is a file, check for valid file types
+  //           if (value instanceof File) {
+  //             return ["application/pdf"].includes(value.type);
+  //           }
+  //           if (typeof value === "string") {
+  //             return isValidUrl(value); // Check if the string is a valid URL
+  //           }
 
-            return true; // Return true if neither a file nor a string (invalid type)
-          }
-        )
-        .notRequired()
-    )
-    .notRequired(),
-  WILeaveEntitle: Yup.array()
-    .of(
-      Yup.mixed()
-        .test(
-          "fileOrUrl", // Custom test name
-          "Only PDF", // Custom error message
-          (value) => {
-            // If value is a file, check for valid file types
-            if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
-            }
-            if (typeof value === "string") {
-              return isValidUrl(value); // Check if the string is a valid URL
-            }
+  //           return true; // Return true if neither a file nor a string (invalid type)
+  //         }
+  //       )
+  //       .notRequired()
+  //   )
+  //   .notRequired(),
+  // WILeaveEntitle: Yup.array()
+  //   .of(
+  //     Yup.mixed()
+  //       .test(
+  //         "fileOrUrl", // Custom test name
+  //         "Only PDF", // Custom error message
+  //         (value) => {
+  //           // If value is a file, check for valid file types
+  //           if (value instanceof File) {
+  //             return ["application/pdf"].includes(value.type);
+  //           }
+  //           if (typeof value === "string") {
+  //             return isValidUrl(value); // Check if the string is a valid URL
+  //           }
 
-            return true; // Return true if neither a file nor a string (invalid type)
-          }
-        )
-        .notRequired()
-    )
-    .notRequired(),
-  WIContract: Yup.array()
-    .of(
-      Yup.mixed()
-        .test(
-          "fileOrUrl", // Custom test name
-          "Only PDF", // Custom error message
-          (value) => {
-            // If value is a file, check for valid file types
-            if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
-            }
-            if (typeof value === "string") {
-              return isValidUrl(value); // Check if the string is a valid URL
-            }
+  //           return true; // Return true if neither a file nor a string (invalid type)
+  //         }
+  //       )
+  //       .notRequired()
+  //   )
+  //   .notRequired(),
+  // WIContract: Yup.array()
+  //   .of(
+  //     Yup.mixed()
+  //       .test(
+  //         "fileOrUrl", // Custom test name
+  //         "Only PDF", // Custom error message
+  //         (value) => {
+  //           // If value is a file, check for valid file types
+  //           if (value instanceof File) {
+  //             return ["application/pdf"].includes(value.type);
+  //           }
+  //           if (typeof value === "string") {
+  //             return isValidUrl(value); // Check if the string is a valid URL
+  //           }
 
-            return true; // Return true if neither a file nor a string (invalid type)
-          }
-        )
-        .notRequired()
-    )
-    .notRequired(),
-  positionRev: Yup.string().notRequired(),
-  positionRevDate: Yup.string().notRequired(),
-  revSalary: Yup.string().notRequired(),
-  revSalaryDate: Yup.string().notRequired(),
-  revLeavePass: Yup.string().notRequired(),
-  revLeaveDate: Yup.string().notRequired(),
-  revAnnualLeave: Yup.string().notRequired(),
-  revALD: Yup.string().notRequired(),
-  depEmp: Yup.string().notRequired(),
-  depEmpDate: Yup.string().notRequired(),
+  //           return true; // Return true if neither a file nor a string (invalid type)
+  //         }
+  //       )
+  //       .notRequired()
+  //   )
+  //   .notRequired(),
+  // positionRev: Yup.array()
+  //   .of(Yup.string().notRequired(),)
+
+  //   .notRequired(),
+
+  // positionRevDate: Yup.date()
+  // .nullable()
+  // .transform((value, originalValue) => (originalValue === "" ? null : value))
+  // .notRequired(),
+
+  // revSalary: Yup.array()
+  // .of(Yup.string().notRequired(),)
+  // .min(1, "At least one revSalary is required")
+  // .notRequired(),
+  // revSalaryDate:Yup.date()
+  // .nullable()
+  // .transform((value, originalValue) => (originalValue === "" ? null : value))
+  // .notRequired(),
+
+  // revLeavePass: Yup.array()
+  // .of(Yup.string().notRequired(),)
+  // .min(1, "At least one revLeavePass is required")
+  // .notRequired(),
+  // revLeaveDate:Yup.date()
+  // .nullable()
+  // .transform((value, originalValue) => (originalValue === "" ? null : value))
+  // .notRequired(),
+
+  // revAnnualLeave:Yup.array()
+  //   .of(Yup.string().notRequired(),)
+
+  //   .notRequired(),
+  // revALD:Yup.date()
+  // .nullable()
+  // .transform((value, originalValue) => (originalValue === "" ? null : value))
+  // .notRequired(),
+
+  // depEmp: Yup.array()
+  //   .of(Yup.string().notRequired(),)
+
+  //   .notRequired(),
+  // depEmpDate: Yup.date()
+  // .nullable()
+  // .transform((value, originalValue) => (originalValue === "" ? null : value))
+  // .notRequired(),
+
   remarkWI: Yup.string().notRequired(),
-  uploadPR: Yup.array()
-    .of(
-      Yup.mixed()
-        .test(
-          "fileOrUrl", // Custom test name
-          "Only PDF", // Custom error message
-          (value) => {
-            // If value is a file, check for valid file types
-            if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
-            }
-            if (typeof value === "string") {
-              return isValidUrl(value); // Check if the string is a valid URL
-            }
+  // uploadPR: Yup.array()
+  //   .of(
+  //     Yup.mixed()
+  //       .test(
+  //         "fileOrUrl", // Custom test name
+  //         "Only PDF", // Custom error message
+  //         (value) => {
+  //           // If value is a file, check for valid file types
+  //           if (value instanceof File) {
+  //             return ["application/pdf"].includes(value.type);
+  //           }
+  //           if (typeof value === "string") {
+  //             return isValidUrl(value); // Check if the string is a valid URL
+  //           }
 
-            return true; // Return true if neither a file nor a string (invalid type)
-          }
-        )
-        .notRequired()
-    )
-    .notRequired(),
-  uploadSP: Yup.array()
-    .of(
-      Yup.mixed()
-        .test(
-          "fileOrUrl", // Custom test name
-          "Only PDF", // Custom error message
-          (value) => {
-            // If value is a file, check for valid file types
-            if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
-            }
-            if (typeof value === "string") {
-              return isValidUrl(value); // Check if the string is a valid URL
-            }
+  //           return true; // Return true if neither a file nor a string (invalid type)
+  //         }
+  //       )
+  //       .notRequired()
+  //   )
+  //   .notRequired(),
+  // uploadSP: Yup.array()
+  //   .of(
+  //     Yup.mixed()
+  //       .test(
+  //         "fileOrUrl", // Custom test name
+  //         "Only PDF", // Custom error message
+  //         (value) => {
+  //           // If value is a file, check for valid file types
+  //           if (value instanceof File) {
+  //             return ["application/pdf"].includes(value.type);
+  //           }
+  //           if (typeof value === "string") {
+  //             return isValidUrl(value); // Check if the string is a valid URL
+  //           }
 
-            return true; // Return true if neither a file nor a string (invalid type)
-          }
-        )
-        .notRequired()
-    )
-    .notRequired(),
-  uploadLP: Yup.array()
-    .of(
-      Yup.mixed()
-        .test(
-          "fileOrUrl", // Custom test name
-          "Only PDF", // Custom error message
-          (value) => {
-            // If value is a file, check for valid file types
-            if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
-            }
-            if (typeof value === "string") {
-              return isValidUrl(value); // Check if the string is a valid URL
-            }
+  //           return true; // Return true if neither a file nor a string (invalid type)
+  //         }
+  //       )
+  //       .notRequired()
+  //   )
+  //   .notRequired(),
+  // uploadLP: Yup.array()
+  //   .of(
+  //     Yup.mixed()
+  //       .test(
+  //         "fileOrUrl", // Custom test name
+  //         "Only PDF", // Custom error message
+  //         (value) => {
+  //           // If value is a file, check for valid file types
+  //           if (value instanceof File) {
+  //             return ["application/pdf"].includes(value.type);
+  //           }
+  //           if (typeof value === "string") {
+  //             return isValidUrl(value); // Check if the string is a valid URL
+  //           }
 
-            return true; // Return true if neither a file nor a string (invalid type)
-          }
-        )
-        .notRequired()
-    )
-    .notRequired(),
-  uploadAL: Yup.array()
-    .of(
-      Yup.mixed()
-        .test(
-          "fileOrUrl", // Custom test name
-          "Only PDF", // Custom error message
-          (value) => {
-            // If value is a file, check for valid file types
-            if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
-            }
-            if (typeof value === "string") {
-              return isValidUrl(value); // Check if the string is a valid URL
-            }
+  //           return true; // Return true if neither a file nor a string (invalid type)
+  //         }
+  //       )
+  //       .notRequired()
+  //   )
+  //   .notRequired(),
+  // uploadAL: Yup.array()
+  //   .of(
+  //     Yup.mixed()
+  //       .test(
+  //         "fileOrUrl", // Custom test name
+  //         "Only PDF", // Custom error message
+  //         (value) => {
+  //           // If value is a file, check for valid file types
+  //           if (value instanceof File) {
+  //             return ["application/pdf"].includes(value.type);
+  //           }
+  //           if (typeof value === "string") {
+  //             return isValidUrl(value); // Check if the string is a valid URL
+  //           }
 
-            return true; // Return true if neither a file nor a string (invalid type)
-          }
-        )
-        .notRequired()
-    )
-    .notRequired(),
-  uploadDep: Yup.array()
-    .of(
-      Yup.mixed()
-        .test(
-          "fileOrUrl", // Custom test name
-          "Only PDF", // Custom error message
-          (value) => {
-            // If value is a file, check for valid file types
-            if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
-            }
-            if (typeof value === "string") {
-              return isValidUrl(value); // Check if the string is a valid URL
-            }
+  //           return true; // Return true if neither a file nor a string (invalid type)
+  //         }
+  //       )
+  //       .notRequired()
+  //   )
+  //   .notRequired(),
+  // uploadDep: Yup.array()
+  //   .of(
+  //     Yup.mixed()
+  //       .test(
+  //         "fileOrUrl", // Custom test name
+  //         "Only PDF", // Custom error message
+  //         (value) => {
+  //           // If value is a file, check for valid file types
+  //           if (value instanceof File) {
+  //             return ["application/pdf"].includes(value.type);
+  //           }
+  //           if (typeof value === "string") {
+  //             return isValidUrl(value); // Check if the string is a valid URL
+  //           }
 
-            return true; // Return true if neither a file nor a string (invalid type)
-          }
-        )
-        .notRequired()
-    )
-    .notRequired(),
+  //           return true; // Return true if neither a file nor a string (invalid type)
+  //         }
+  //       )
+  //       .notRequired()
+  //   )
+  //   .notRequired(),
 });
 
 export const employeeInfoSchema = Yup.object().shape({
@@ -839,171 +875,258 @@ export const employeeInfoSchema = Yup.object().shape({
     .notRequired(),
 });
 
-// Define the Insurance validation schema
 
-export const AddInsuranceSchema = Yup.object().shape({
-  empID: Yup.string().required("Employee ID Number is mandatory"),
-  insuranceDetails: Yup.array().of(
-    Yup.object().shape({
-      typeInsurance: Yup.string().required("Insurance Type is required"),
-      insuranceCompany: Yup.string().required("Insurance Company is required"),
-    })
-  ),
-});
 
 // Validation EmployeeInsuranceschema Schema using Yup
 export const EmpInsuranceschema = Yup.object().shape({
+  empID: Yup.string().required("Employee ID Number is mandatory"),
   empBadgeNo: Yup.string().required("Employee Badge is required"),
   name: Yup.string().required("Employee Name is required"),
   department: Yup.string().required("Department is required"),
-  position: Yup.string().required("Position is required"),
-  doj: Yup.string().required("Date of Joining is required"),
-  gender: Yup.string().required("Gender is required"),
-  bwnIcNo: Yup.string().required("Brunei I/C Number is required"),
-  ppNo: Yup.string().required("Passport Number is required for non-locals"),
-  dob: Yup.string().required("Date of Birth is required"),
-  marital: Yup.string().required("Marital Status is required"),
-  nationality: Yup.string().required("Nationality is required"),
-  groupIns: Yup.string().required("Group Insurance is required"),
-  groupInsEffectDate: Yup.string().required("Effective Date is required"),
-  groupInsEndDate: Yup.string().required("End Date is required"),
-  workmenComp: Yup.string().required(
-    "Please Select Any Workmen Compensation Insurance"
-  ),
-  workmePolicyNo: Yup.string().notRequired(),
-  travelIns: Yup.string().required("Personal Accident Insurance is required"),
-  accidentIns: Yup.string().required("Personal Accident Insurance is required"),
+  // position: Yup.string().required("Position is required"),
+  // doj: Yup.string().required("Date of Joining is required"),
+  // gender: Yup.string().required("Gender is required"),
+  // bwnIcNo: Yup.string().required("Brunei I/C Number is required"),
+  // ppNo: Yup.string().required("Passport Number is required for non-locals"),
+  // dob: Yup.string().required("Date of Birth is required"),
+  // marital: Yup.string().required("Marital Status is required"),
+  // nationality: Yup.string().required("Nationality is required"),
+  // othernation: Yup.string().notRequired(),
+  // groupIns: Yup.string().required("Group Insurance is required"),
+  // groupInsEffectDate: Yup.string().required("Effective Date is required"),
+  // groupInsEndDate: Yup.string().required("End Date is required"),
+  // empStatusType: Yup.string().required(
+  //   "Please Select Any Workmen Compensation Insurance"
+  // ),
+  // workmenCompNo: Yup.string().notRequired(),
+  // travelIns: Yup.string().required("Personal Accident Insurance is required"),
+  // accidentIns: Yup.string().required("Personal Accident Insurance is required"),
   // empInsUpload: Yup.string().notRequired(),
   // empInsUpload: Yup.array().of(
   //   Yup.object().shape({
-  //     fileName: Yup.string().required("File name is required"),
-  //     url: Yup.string().url("Please enter a valid URL").notRequired(),
-  //   })
-  // ),
-  empInsUpload: Yup.array()
+    //     fileName: Yup.string().required("File name is required"),
+    //     url: Yup.string().url("Please enter a valid URL").notRequired(),
+    //   })
+    // ),
+    empInsUpload: Yup.array()
     .of(
       Yup.mixed()
-        .test(
-          "fileOrUrl", // Custom test name
-          "Only PDF, image files, or valid URLs are allowed", // Custom error message
-          (value) => {
-            // If value is a file, check for valid file types
-            if (value instanceof File) {
-              return ["application/pdf", "image/jpeg", "image/png"].includes(
-                value.type
-              );
-            }
-
-            // If value is a string, check if it's a valid URL
-            if (typeof value === "string") {
-              return isValidUrl(value); // Check if the string is a valid URL
-            }
-
+      .test(
+        "fileOrUrl", // Custom test name
+        "Only PDF, image files, or valid URLs are allowed", // Custom error message
+        (value) => {
+          // If value is a file, check for valid file types
+          if (value instanceof File) {
+            return ["application/pdf", "image/jpeg", "image/png"].includes(
+              value.type
+            );
+          }
+          
+          // If value is a string, check if it's a valid URL
+          if (typeof value === "string") {
+            return isValidUrl(value); // Check if the string is a valid URL
+          }
+          
             return true; // Return true if neither a file nor a string (invalid type)
           }
         )
         .notRequired()
-    )
-    .notRequired(), // Top-level array is not required
-});
+      )
+      .notRequired(), // Top-level array is not required
+    });
+    
+    export const DependentInsuranceSchema = Yup.object().shape({
+      empID: Yup.string().required("Employee ID is required"),
+      depInsurance: Yup.mixed().test(
+        "is-valid-family-details",
+        "Invalid family details",
+        function (value) {
+          const { path, createError } = this;
+          const isValid = getDepInsuranceValidationSchema(value);
+          if (!isValid) {
+            return createError({
+              path,
+              message: "Invalid family details format or content",
+            });
+          }
+          return true;
+        }
+      ),
+    });
 
-// Yup InsuranceInfoSchema validation schema
-export const InsuranceInfoSchema = Yup.object().shape({
-  groupHSNumber: Yup.string().required(
-    "Group H&S Insurance Policy Number is required"
-  ),
-  groupHSExpiry: Yup.string().required(
-    "Group H&S Insurance Policy Expiry is required"
-  ),
-  workmenCompNumber: Yup.string().required(
-    "Workmen Compensation Insurance Number is required"
-  ),
-  workmenCompExpiry: Yup.string().required(
-    "Workmen Compensation Insurance Expiry is required"
-  ),
-  travellingNumber: Yup.string().required(
-    "Travelling Insurance Policy Number is required"
-  ),
-  travellingExpiry: Yup.string().required(
-    "Travelling Insurance Policy Expiry is required"
-  ),
-  personalAccidentNumber: Yup.string().required(
-    "Personal Accident Insurance Policy Number is required"
-  ),
-  personalAccidentExpiry: Yup.string().required(
-    "Personal Accident Insurance Expiry is required"
-  ),
-  groupHSUpload: Yup.mixed()
-    .required("File is required")
-    .test(
-      "fileType",
-      "Only PDF files are allowed",
-      (value) => value && /\.(pdf)$/.test(value.name)
-    ),
-  workmenCompUpload: Yup.mixed()
-    .required("File is required")
-    .test(
-      "fileType",
-      "Only PDF files are allowed",
-      (value) => value && /\.(pdf)$/.test(value.name)
-    ),
-  travellingUpload: Yup.mixed()
-    .required("File is required")
-    .test(
-      "fileType",
-      "Only PDF files are allowed",
-      (value) => value && /\.(pdf)$/.test(value.name)
-    ),
-  personalAccidentUpload: Yup.mixed()
-    .required("File is required")
-    .test(
-      "fileType",
-      "Only PDF files are allowed",
-      (value) => value && /\.(pdf)$/.test(value.name)
-    ),
-});
+    export const AddInsuranceSchema = Yup.object().shape({
+      typeIns: Yup.string().required("Type Insurance is required"),
+      insDetails: Yup.array().of(
+        Yup.object().shape({
+          company: Yup.string().required("Insurance company is required"),
+        })
+      ),
+    });
+    
+    // Yup InsuranceInfoSchema validation schema
+  export const GroupHSSchema = Yup.object().shape({
+      groupHSNo: Yup.string().required("Group HS Number is required"), // Adjusted to .notRequired() as per your initial code
+      groupHSExp: Yup.string().notRequired(), // Adjusted to .notRequired() as per your initial code
+      groupHSUpload: Yup.array()
+      .of(
+        Yup.mixed()
+          .test(
+            "fileOrUrl", // Custom test name
+            "Only PDF or valid URLs are allowed", // Custom error message
+            (value) => {
+              // If value is a file, check for valid file types
+              if (value instanceof File) {
+                return ["application/pdf"].includes(
+                  value.type
+                );
+              }
+              if (typeof value === "string") {
+                return isValidUrl(value); // Check if the string is a valid URL
+              }
+  
+              return true; // Return true if neither a file nor a string (invalid type)
+            }
+          )
+          .notRequired()
+      )
+      .notRequired(),
+    });
+  export const WorkmenCompSchema = Yup.object().shape({
+      empStatusType: Yup.string().required("Employee Status Type is required"),
+      workmenCompNo: Yup.string().notRequired(),
+      workmenCompExp: Yup.string().notRequired(),
+      workmenComUp: Yup.array()
+      .of(
+        Yup.mixed()
+          .test(
+            "fileOrUrl", // Custom test name
+            "Only PDF or valid URLs are allowed", // Custom error message
+            (value) => {
+              // If value is a file, check for valid file types
+              if (value instanceof File) {
+                return ["application/pdf"].includes(
+                  value.type
+                );
+              }
+              if (typeof value === "string") {
+                return isValidUrl(value); // Check if the string is a valid URL
+              }
+  
+              return true; // Return true if neither a file nor a string (invalid type)
+            }
+          )
+          .notRequired()
+      )
+      .notRequired(),
+    });
+  export const TravellingSchema = Yup.object().shape({
+    travelNo: Yup.string().required("Travelling Number is required"),
+    travelExp: Yup.string().notRequired(),
+    travelUp: Yup.array()
+      .of(
+        Yup.mixed()
+          .test(
+            "fileOrUrl", // Custom test name
+            "Only PDF or valid URLs are allowed", // Custom error message
+            (value) => {
+              // If value is a file, check for valid file types
+              if (value instanceof File) {
+                return ["application/pdf"].includes(
+                  value.type
+                );
+              }
+              if (typeof value === "string") {
+                return isValidUrl(value); // Check if the string is a valid URL
+              }
+  
+              return true; // Return true if neither a file nor a string (invalid type)
+            }
+          )
+          .notRequired()
+      )
+      .notRequired(),
+    });
+ export const PersonalAcciSchema = Yup.object().shape({
+  perAccNo: Yup.string().required("Personal Number is required"),
+  perAccExp: Yup.string().notRequired(),
+  perAccUp: Yup.array()
+      .of(
+        Yup.mixed()
+          .test(
+            "fileOrUrl", // Custom test name
+            "Only PDF or valid URLs are allowed", // Custom error message
+            (value) => {
+              // If value is a file, check for valid file types
+              if (value instanceof File) {
+                return ["application/pdf"].includes(
+                  value.type
+                );
+              }
+              if (typeof value === "string") {
+                return isValidUrl(value); // Check if the string is a valid URL
+              }
+  
+              return true; // Return true if neither a file nor a string (invalid type)
+            }
+          )
+          .notRequired()
+      )
+      .notRequired(),
+    });
 
-export const DependentInsuranceSchema = Yup.object().shape({
-  empID: Yup.string().required("Employee ID is required"),
-  depInsurance: Yup.mixed().test(
-    "is-valid-family-details",
-    "Invalid family details",
-    function (value) {
-      const { path, createError } = this;
-      const isValid = getDepInsuranceValidationSchema(value);
-      if (!isValid) {
-        return createError({
-          path,
-          message: "Invalid family details format or content",
-        });
-      }
-      return true;
-    }
-  ),
-});
+    export const ClaimInsuranceSchema = Yup.object().shape({
+      empID: Yup.string().required("Employee ID is required"),
+      insuranceClaims: Yup.mixed().test(
+        "is-valid-family-details",
+        "Invalid family details",
+        function (value) {
+          const { path, createError } = this;
+          const isValid = getDepInsuranceValidationSchema(value);
+          if (!isValid) {
+            return createError({
+              path,
+              message: "Invalid family details format or content",
+            });
+          }
+          return true;
+        }
+      ),
+    });
+// export const ClaimInsuranceSchema = Yup.array().of(
+//   Yup.object().shape({
+//     claimType: Yup.string().required("Insurance claim type is required"),
+//     empBadgeNo: Yup.string().required("Employee Badge No is required"),
+//     claimantName: Yup.string().required("Claimant Name is Required"),
+//     dateSubmitted: Yup.string().required("Please select a date for the claim"),
+//     dateReported: Yup.string().notRequired(),
+//     paymentReceived: Yup.string().notRequired(),
+//     datePaid: Yup.string().notRequired(),
+//     claimUpload: Yup.array()
+//     .of(
+//       Yup.mixed()
+//         .test(
+//           "fileOrUrl", // Custom test name
+//           "Only PDF or valid URLs are allowed", // Custom error message
+//           (value) => {
+//             // If value is a file, check for valid file types
+//             if (value instanceof File) {
+//               return ["application/pdf"].includes(
+//                 value.type
+//               );
+//             }
+//             if (typeof value === "string") {
+//               return isValidUrl(value); // Check if the string is a valid URL
+//             }
 
-export const ClaimInsuranceSchema = Yup.object().shape({
-  claimType: Yup.string().required("Insurance claim type is required"),
-  dateSubmitted: Yup.string().required("Please select a name for the claim"),
-  dateReported: Yup.string().required(
-    "Date reported to Insurance Company is required"
-  ),
-  paymentReceived: Yup.string().required(
-    "Date of payment received from Insurance Company is required"
-  ),
-  datePaid: Yup.string().required("Date paid to Employee is required"),
-  claimUpload: Yup.array()
-    .of(
-      Yup.mixed()
-        .required("File is required")
-        .test(
-          "fileType",
-          "Only PDF files are allowed",
-          (value) => value && /\.(pdf)$/.test(value.name)
-        )
-    )
-    .min(1, "At least one file is required"),
-});
+//             return true; // Return true if neither a file nor a string (invalid type)
+//           }
+//         )
+//         .notRequired()
+//     )
+//     .notRequired(),
+//   })
+// );
+
 
 export const SawpEmpSchema = Yup.object().shape({
   empID: Yup.string().required("Employee ID is required"),

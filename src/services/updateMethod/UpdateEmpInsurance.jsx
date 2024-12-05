@@ -14,14 +14,14 @@ export const UpdateEmpInsDataFun = () => {
         groupIns:[empInsValue.groupIns],
         groupInsEffectDate:[empInsValue.groupInsEffectDate],
         groupInsEndDate:[empInsValue.groupInsEndDate],
-        workmenComp:[empInsValue.workmenComp],
-        workmePolicyNo:[empInsValue.workmePolicyNo],
+        empStatusType:empInsValue.empStatusType,
+        workmenCompNo:empInsValue.workmenCompNo,
         travelIns:[empInsValue.travelIns],
         accidentIns:[empInsValue.accidentIns],
         empInsUpload:[empInsValue.empInsUpload],
 
     };
-    
+    console.log(totalData);
 
     try {
       const storedData=   await Promise.all([
@@ -32,12 +32,13 @@ export const UpdateEmpInsDataFun = () => {
              },
            })
          ])
-        
+         console.log(storedData,"successfully Updated data");
 
        } catch (error) {
         console.log(error);
         
-         
+         console.error("Error executing GraphQL requests:", error);
+         throw error; // Rethrow error if needed
        }
   }, []);
   return { UpdateEIDataSubmit };

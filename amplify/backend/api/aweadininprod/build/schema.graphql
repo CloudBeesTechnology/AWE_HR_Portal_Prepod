@@ -1,0 +1,5574 @@
+type InsuranceType {
+  id: ID!
+  typeIns: String
+  insDetails: [String]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type GroupHandS {
+  id: ID!
+  groupHSExp: String
+  groupHSNo: String
+  groupHSUpload: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type WorkMen {
+  id: ID!
+  empStatusType: String
+  workmenCompExp: String
+  workmenCompNo: String
+  workmenComUp: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type TravelIns {
+  id: ID!
+  travelExp: String
+  travelNo: String
+  travelUp: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type PersonalAccident {
+  id: ID!
+  perAccExp: String
+  perAccNo: String
+  perAccUp: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type InsClaim {
+  id: ID!
+  empID: String
+  insuranceClaims: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type ProbForm {
+  id: ID!
+  empID: String!
+  adaptability: String
+  additionalInfo: String
+  attention: String
+  attitude: String
+  commitment: String
+  communication: String
+  deadline: String
+  department: String
+  diligent: String
+  doj: String
+  empBadgeNo: String
+  extendedProbationEndDate: String
+  extensionPeriod: String
+  gmApproved: Boolean
+  gmDate: String
+  hrDate: String
+  hrName: String
+  initiative: String
+  managerApproved: Boolean
+  managerDate: String
+  managerName: String
+  name: String
+  pace: String
+  position: String
+  probationEnd: String
+  quality: String
+  recommendation: String
+  responsibility: String
+  supervisorApproved: Boolean
+  supervisorDate: String
+  supervisorName: String
+  teamwork: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type EmailNotifi {
+  id: ID!
+  empID: String!
+  leaveType: String
+  senderEmail: String
+  receipentEmail: String
+  receipentEmpID: String
+  status: String
+  message: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type OffshoreSheet {
+  id: ID!
+  date: String
+  dailySheet: [AWSJSON]
+  status: String
+  manager: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type ORMCSheet {
+  id: ID!
+  date: String
+  dailySheet: [AWSJSON]
+  status: String
+  manager: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type SBWSheet {
+  id: ID!
+  date: String
+  dailySheet: [AWSJSON]
+  status: String
+  manager: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type Blng {
+  id: ID!
+  weeklySheet: [AWSJSON]
+  date: String
+  status: String
+  manager: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type HeadOffice {
+  id: ID!
+  dailySheet: [AWSJSON]
+  date: String
+  status: String
+  manager: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type EmpRequisition {
+  id: ID!
+  department: String
+  justification: String
+  project: String
+  position: String
+  quantity: Int
+  qualification: String
+  reasonForReq: String
+  replacementFor: String
+  tentativeDate: String
+  status: String
+  remarkReq: String
+  reqName: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type WeldingInfo {
+  id: ID!
+  empID: String!
+  department: String
+  diameterRange: String
+  empBadgeNo: String
+  empName: String
+  fillerMetal: String
+  position: String
+  thicknessRange: String
+  weldingStampNor: String
+  wpsNumber: String
+  weldingProcess: String
+  weldingPosition: String
+  WQExpiry: String
+  WQRemarks: String
+  weldingUpload: [AWSJSON]
+  WQRNo: String
+  weldingCode: String
+  weldingMaterial: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type TrainingReq {
+  id: ID!
+  empID: String!
+  MRNo: String
+  medicalName: String
+  medicalExpiry: String
+  medicalAppointDate: String
+  medicalReport: [AWSJSON]
+  purchaseONo: String
+  traineeCourseCode: String
+  traineeCourseName: String
+  traineeCompany: String
+  traineeSD: String
+  traineeED: String
+  traineeStatus: String
+  traineeCourseFee: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type TrainingCertificates {
+  id: ID!
+  empID: String!
+  courseCode: [String]
+  courseName: [String]
+  company: [String]
+  certifiExpiry: [String]
+  eCertifiDate: [String]
+  trainingUpCertifi: [AWSJSON]
+  orgiCertifiDate: [String]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type AddCourse {
+  id: ID!
+  courseSelect: String
+  courseName: [String]
+  company: [String]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type EmpDepInsurance {
+  id: ID!
+  empID: String
+  depInsurance: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type EmpInsurance {
+  id: ID!
+  empID: String!
+  groupIns: [String]
+  groupInsEffectDate: [String]
+  groupInsEndDate: [String]
+  empStatusType: String
+  workmenCompNo: String
+  travelIns: [String]
+  accidentIns: [String]
+  empInsUpload: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type SawpDetails {
+  id: ID!
+  empID: String!
+  sawpEmpLtrReq: [String]
+  sawpEmpLtrReci: [String]
+  sawpEmpUpload: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type DNDetails {
+  id: ID!
+  empID: String!
+  doeEmpSubmit: [String]
+  doeEmpApproval: [String]
+  doeEmpValid: [String]
+  doeEmpRefNo: [String]
+  doeEmpUpload: [AWSJSON]
+  permitType: [String]
+  nlmsEmpSubmit: [String]
+  nlmsEmpSubmitRefNo: [String]
+  nlmsEmpApproval: [String]
+  nlmsRefNo: [String]
+  nlmsEmpValid: [String]
+  nlmsEmpUpload: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type BJLDetails {
+  id: ID!
+  empID: String!
+  bankSubmit: [String]
+  bankRece: [String]
+  bankRefNo: [String]
+  bankAmt: [String]
+  bankValid: [String]
+  bankEndorse: [String]
+  bankEmpUpload: [AWSJSON]
+  tbaPurchase: [String]
+  jitpaAmt: [String]
+  jpValid: [String]
+  jpEndorse: [String]
+  jpEmpUpload: [AWSJSON]
+  lbrReceiptNo: [String]
+  lbrDepoAmt: [String]
+  lbrDepoSubmit: [String]
+  lbrDepoUpload: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type PassportValid {
+  id: ID!
+  empID: String!
+  ppLocation: [String]
+  arrivStampUpload: [AWSJSON]
+  immigEmpUpload: [AWSJSON]
+  reEntryUpload: [AWSJSON]
+  arrivStampExp: [String]
+  immigRefNo: String
+  ppSubmit: [String]
+  empPassExp: [String]
+  empPassStatus: [String]
+  airTktStatus: [String]
+  reEntryVisa: [String]
+  immigApproval: [String]
+  reEntryVisaExp: [String]
+  remarkImmig: [String]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type WPTracking {
+  id: ID!
+  tempID: String!
+  supportletterReqDate: String
+  supportletterReceiveDate: String
+  letterfile: String
+  doesubmitdate: String
+  doeapprovedate: String
+  doeexpirydate: String
+  doefile: String
+  nlmssubmitdate: String
+  submissionrefrenceno: String
+  nlmsapprovedate: String
+  ldreferenceno: String
+  nlmsexpirydate: String
+  nlmsfile: String
+  bgsubmitdate: String
+  bgreceivedate: String
+  referenceno: String
+  bgamount: String
+  bgexpirydate: String
+  bgfile: String
+  tbapurchasedate: String
+  jitpaamount: String
+  jitpaexpirydate: String
+  receiptno: String
+  depositamount: String
+  submitdateendorsement: String
+  jitpafile: String
+  immbdno: String
+  docsubmitdate: String
+  visaapprovedate: String
+  visareferenceno: String
+  visaFile: String
+  departuredate: String
+  arrivaldate: String
+  cityname: String
+  airfare: String
+  airticketfile: String
+  agentname: String
+  mobSignDate: String
+  mobFile: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type EmployeeNonLocalAcco {
+  id: ID!
+  empID: String!
+  accommodation: [String]
+  accommodationAddress: [String]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type LabourMedicalInfo {
+  id: ID!
+  empID: String!
+  overMD: String
+  overME: String
+  bruhimsRD: String
+  bruhimsRNo: String
+  bruneiMAD: [String]
+  bruneiME: [String]
+  uploadFitness: [AWSJSON]
+  uploadRegis: [AWSJSON]
+  uploadBwn: [AWSJSON]
+  dependPass: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type ServiceRecord {
+  id: ID!
+  empID: String!
+  depEmpDate: [String]
+  depEmp: [String]
+  positionRev: [String]
+  positionRevDate: [String]
+  revSalary: [String]
+  revSalaryDate: [String]
+  revLeavePass: [String]
+  revLeaveDate: [String]
+  revAnnualLeave: [String]
+  revALD: [String]
+  remarkWI: String
+  uploadPR: [AWSJSON]
+  uploadSP: [AWSJSON]
+  uploadLP: [AWSJSON]
+  uploadAL: [AWSJSON]
+  uploadDep: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type EmpLeaveDetails {
+  id: ID!
+  empID: String!
+  annualLeave: [String]
+  annualLeaveDate: [String]
+  compasLeave: String
+  destinateLeavePass: [String]
+  durLeavePass: [String]
+  dateLeavePass: [String]
+  leavePass: [String]
+  materLeave: String
+  mrageLeave: String
+  paterLeave: String
+  sickLeave: String
+  sickLeaveDate: String
+  hospLeave: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type TerminationInfo {
+  id: ID!
+  empID: String!
+  resignDate: String
+  resignNotProb: String
+  otherResignNotProb: String
+  resignNotConf: String
+  otherResignNotConf: String
+  reasonResign: String
+  reasonTerminate: String
+  termiDate: String
+  termiNotProb: String
+  otherTermiNotProb: String
+  termiNotConf: String
+  otherTermiNotConf: String
+  WIContract: [AWSJSON]
+  WIProbation: [AWSJSON]
+  WIResignation: [AWSJSON]
+  WITermination: [AWSJSON]
+  WILeaveEntitle: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type EmpWorkInfo {
+  id: ID!
+  empID: String!
+  contractStart: [String]
+  contractEnd: [String]
+  contractPeriod: [String]
+  doj: String
+  department: [String]
+  hr: [String]
+  jobCat: [String]
+  jobDesc: [String]
+  manager: [String]
+  otherJobCat: [String]
+  otherDepartment: [String]
+  otherPosition: [String]
+  probationStart: [String]
+  probationEnd: [String]
+  probDuration: [String]
+  position: [String]
+  relationship: [String]
+  supervisor: [String]
+  skillPool: String
+  salaryType: [String]
+  sapNo: String
+  upgradeDate: [String]
+  upgradePosition: [String]
+  workStatus: [String]
+  workHrs: [String]
+  workWeek: [String]
+  workMonth: [String]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type EmpPersonalInfo {
+  id: ID!
+  empID: String!
+  age: Int
+  aTQualify: String
+  alternateNo: String
+  agent: [String]
+  bankName: String
+  bankAccNo: String
+  contactNo: [String]
+  cob: String
+  contractType: [String]
+  ctryOfOrigin: String
+  chinese: String
+  dob: String
+  educLevel: String
+  email: String
+  eduDetails: [AWSJSON]
+  empBadgeNo: String
+  empType: [String]
+  familyDetails: [AWSJSON]
+  gender: String
+  lang: String
+  marital: String
+  name: String
+  officialEmail: String
+  oCOfOrigin: String
+  profilePhoto: String
+  permanentAddress: [String]
+  position: [String]
+  sapNo: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type IDDetails {
+  id: ID!
+  empID: String!
+  applicationUpload: [AWSJSON]
+  bwnIcNo: String
+  bwnIcColour: String
+  bwnIcExpiry: [String]
+  bwnUpload: [AWSJSON]
+  cvCertifyUpload: [AWSJSON]
+  driveLic: String
+  inducBrief: String
+  inducBriefUp: String
+  loiUpload: [AWSJSON]
+  myIcNo: String
+  myIcUpload: [AWSJSON]
+  nationality: String
+  nationalCat: String
+  otherNation: String
+  otherRace: String
+  otherReligion: String
+  ppNo: [String]
+  paafCvevUpload: [AWSJSON]
+  ppIssued: [String]
+  ppExpiry: [String]
+  ppUpload: [AWSJSON]
+  ppDestinate: [String]
+  preEmp: String
+  preEmpPeriod: String
+  race: String
+  religion: String
+  supportDocUpload: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type CandIToEMP {
+  id: ID!
+  empID: String!
+  crime: String
+  crimeDesc: String
+  emgDetails: [AWSJSON!]
+  noExperience: String
+  empStatement: String
+  desc: String
+  disease: String
+  diseaseDesc: String
+  liquor: String
+  liquorDesc: String
+  perIS: String
+  perID: String
+  referees: [AWSJSON]
+  relatives: [AWSJSON]
+  salaryExpectation: String
+  supportInfo: String
+  workExperience: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type LocalMobilization {
+  id: ID!
+  tempID: String
+  mobSignDate: String
+  mobFile: String
+  paafApproveDate: String
+  paafFile: String
+  loiIssueDate: String
+  loiAcceptDate: String
+  loiDeclineDate: String
+  declineReason: String
+  loiFile: String
+  cvecApproveDate: String
+  cvecFile: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type InterviewSchedule {
+  id: ID!
+  interDate: String
+  interTime: String
+  venue: String
+  interType: String
+  bagdeNo: String
+  message: String
+  tempID: String
+  manager: String
+  candidateStatus: String
+  department: String
+  otherDepartment: String
+  status: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type EducationDetails {
+  id: ID!
+  tempID: String!
+  crime: String
+  crimeDesc: String
+  emgDetails: [AWSJSON]
+  noExperience: String
+  empStatement: String
+  desc: String
+  disease: String
+  diseaseDesc: String
+  liquor: String
+  liquorDesc: String
+  noticePeriod: String
+  perIS: String
+  perIDesc: String
+  referees: [AWSJSON]
+  relatives: [AWSJSON]
+  salaryExpectation: String
+  supportInfo: String
+  uploadResume: String
+  uploadCertificate: String
+  uploadPp: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type PersonalDetails {
+  id: ID!
+  tempID: String!
+  age: Int
+  alternateNo: String
+  agent: String
+  bwnIcNo: String
+  bwnIcExpiry: String
+  bwnIcColour: String
+  contactNo: String
+  cob: String
+  contractType: String
+  chinese: String
+  dob: String
+  driveLic: String
+  email: String
+  empType: String
+  eduDetails: [AWSJSON]
+  familyDetails: [AWSJSON]
+  gender: String
+  lang: String
+  marital: String
+  name: String
+  nationality: String
+  otherNation: String
+  otherRace: String
+  otherReligion: String
+  ppNo: String
+  ppIssued: String
+  ppExpiry: String
+  ppDestinate: String
+  presentAddress: String
+  permanentAddress: String
+  profilePhoto: String
+  position: String
+  race: String
+  religion: String
+  status: String
+  workExperience: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type User {
+  id: ID!
+  empID: String
+  selectType: String
+  setPermissions: [String]
+  password: String
+  status: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type TicketRequest {
+  id: ID!
+  empID: String!
+  empStatus: String
+  empDate: AWSDateTime
+  empRemarks: String
+  departureDate: AWSDateTime
+  arrivalDate: AWSDateTime
+  destination: String
+  remarks: String
+  hrStatus: String
+  hrDate: AWSDateTime
+  hrRemarks: String
+  hrName: String
+  hrEmpID: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type LeaveStatus {
+  id: ID!
+  empID: ID!
+  leaveType: String
+  fromDate: AWSDateTime
+  toDate: AWSDateTime
+  days: Float
+  applyTo: [String]
+  reason: String
+  medicalCertificate: String
+  supervisorName: String
+  supervisorEmpID: String
+  supervisorStatus: String
+  supervisorDate: AWSDateTime
+  supervisorRemarks: String
+  managerName: String
+  managerEmpID: String
+  managerStatus: String
+  managerDate: AWSDateTime
+  managerRemarks: String
+  empStatus: String
+  empDate: AWSDateTime
+  empRemarks: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+input ModelStringInput {
+  ne: String
+  eq: String
+  le: String
+  lt: String
+  ge: String
+  gt: String
+  contains: String
+  notContains: String
+  between: [String]
+  beginsWith: String
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+input ModelIntInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelFloatInput {
+  ne: Float
+  eq: Float
+  le: Float
+  lt: Float
+  ge: Float
+  gt: Float
+  between: [Float]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelBooleanInput {
+  ne: Boolean
+  eq: Boolean
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelIDInput {
+  ne: ID
+  eq: ID
+  le: ID
+  lt: ID
+  ge: ID
+  gt: ID
+  contains: ID
+  notContains: ID
+  between: [ID]
+  beginsWith: ID
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+input ModelSubscriptionStringInput {
+  ne: String
+  eq: String
+  le: String
+  lt: String
+  ge: String
+  gt: String
+  contains: String
+  notContains: String
+  between: [String]
+  beginsWith: String
+  in: [String]
+  notIn: [String]
+}
+
+input ModelSubscriptionIntInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+  in: [Int]
+  notIn: [Int]
+}
+
+input ModelSubscriptionFloatInput {
+  ne: Float
+  eq: Float
+  le: Float
+  lt: Float
+  ge: Float
+  gt: Float
+  between: [Float]
+  in: [Float]
+  notIn: [Float]
+}
+
+input ModelSubscriptionBooleanInput {
+  ne: Boolean
+  eq: Boolean
+}
+
+input ModelSubscriptionIDInput {
+  ne: ID
+  eq: ID
+  le: ID
+  lt: ID
+  ge: ID
+  gt: ID
+  contains: ID
+  notContains: ID
+  between: [ID]
+  beginsWith: ID
+  in: [ID]
+  notIn: [ID]
+}
+
+enum ModelAttributeTypes {
+  binary
+  binarySet
+  bool
+  list
+  map
+  number
+  numberSet
+  string
+  stringSet
+  _null
+}
+
+input ModelSizeInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+}
+
+enum ModelSortDirection {
+  ASC
+  DESC
+}
+
+type ModelInsuranceTypeConnection {
+  items: [InsuranceType]!
+  nextToken: String
+}
+
+input ModelInsuranceTypeFilterInput {
+  id: ModelIDInput
+  typeIns: ModelStringInput
+  insDetails: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelInsuranceTypeFilterInput]
+  or: [ModelInsuranceTypeFilterInput]
+  not: ModelInsuranceTypeFilterInput
+}
+
+type Query {
+  getInsuranceType(id: ID!): InsuranceType
+  listInsuranceTypes(filter: ModelInsuranceTypeFilterInput, limit: Int, nextToken: String): ModelInsuranceTypeConnection
+  getGroupHandS(id: ID!): GroupHandS
+  listGroupHandS(filter: ModelGroupHandSFilterInput, limit: Int, nextToken: String): ModelGroupHandSConnection
+  getWorkMen(id: ID!): WorkMen
+  listWorkMen(filter: ModelWorkMenFilterInput, limit: Int, nextToken: String): ModelWorkMenConnection
+  getTravelIns(id: ID!): TravelIns
+  listTravelIns(filter: ModelTravelInsFilterInput, limit: Int, nextToken: String): ModelTravelInsConnection
+  getPersonalAccident(id: ID!): PersonalAccident
+  listPersonalAccidents(filter: ModelPersonalAccidentFilterInput, limit: Int, nextToken: String): ModelPersonalAccidentConnection
+  getInsClaim(id: ID!): InsClaim
+  listInsClaims(filter: ModelInsClaimFilterInput, limit: Int, nextToken: String): ModelInsClaimConnection
+  getProbForm(id: ID!): ProbForm
+  listProbForms(filter: ModelProbFormFilterInput, limit: Int, nextToken: String): ModelProbFormConnection
+  getEmailNotifi(id: ID!): EmailNotifi
+  listEmailNotifis(filter: ModelEmailNotifiFilterInput, limit: Int, nextToken: String): ModelEmailNotifiConnection
+  getOffshoreSheet(id: ID!): OffshoreSheet
+  listOffshoreSheets(filter: ModelOffshoreSheetFilterInput, limit: Int, nextToken: String): ModelOffshoreSheetConnection
+  getORMCSheet(id: ID!): ORMCSheet
+  listORMCSheets(filter: ModelORMCSheetFilterInput, limit: Int, nextToken: String): ModelORMCSheetConnection
+  getSBWSheet(id: ID!): SBWSheet
+  listSBWSheets(filter: ModelSBWSheetFilterInput, limit: Int, nextToken: String): ModelSBWSheetConnection
+  getBlng(id: ID!): Blng
+  listBlngs(filter: ModelBlngFilterInput, limit: Int, nextToken: String): ModelBlngConnection
+  getHeadOffice(id: ID!): HeadOffice
+  listHeadOffices(filter: ModelHeadOfficeFilterInput, limit: Int, nextToken: String): ModelHeadOfficeConnection
+  getEmpRequisition(id: ID!): EmpRequisition
+  listEmpRequisitions(filter: ModelEmpRequisitionFilterInput, limit: Int, nextToken: String): ModelEmpRequisitionConnection
+  getWeldingInfo(id: ID!): WeldingInfo
+  listWeldingInfos(filter: ModelWeldingInfoFilterInput, limit: Int, nextToken: String): ModelWeldingInfoConnection
+  getTrainingReq(id: ID!): TrainingReq
+  listTrainingReqs(filter: ModelTrainingReqFilterInput, limit: Int, nextToken: String): ModelTrainingReqConnection
+  getTrainingCertificates(id: ID!): TrainingCertificates
+  listTrainingCertificates(filter: ModelTrainingCertificatesFilterInput, limit: Int, nextToken: String): ModelTrainingCertificatesConnection
+  getAddCourse(id: ID!): AddCourse
+  listAddCourses(filter: ModelAddCourseFilterInput, limit: Int, nextToken: String): ModelAddCourseConnection
+  getEmpDepInsurance(id: ID!): EmpDepInsurance
+  listEmpDepInsurances(filter: ModelEmpDepInsuranceFilterInput, limit: Int, nextToken: String): ModelEmpDepInsuranceConnection
+  getEmpInsurance(id: ID!): EmpInsurance
+  listEmpInsurances(filter: ModelEmpInsuranceFilterInput, limit: Int, nextToken: String): ModelEmpInsuranceConnection
+  getSawpDetails(id: ID!): SawpDetails
+  listSawpDetails(filter: ModelSawpDetailsFilterInput, limit: Int, nextToken: String): ModelSawpDetailsConnection
+  getDNDetails(id: ID!): DNDetails
+  listDNDetails(filter: ModelDNDetailsFilterInput, limit: Int, nextToken: String): ModelDNDetailsConnection
+  getBJLDetails(id: ID!): BJLDetails
+  listBJLDetails(filter: ModelBJLDetailsFilterInput, limit: Int, nextToken: String): ModelBJLDetailsConnection
+  getPassportValid(id: ID!): PassportValid
+  listPassportValids(filter: ModelPassportValidFilterInput, limit: Int, nextToken: String): ModelPassportValidConnection
+  getWPTracking(id: ID!): WPTracking
+  listWPTrackings(filter: ModelWPTrackingFilterInput, limit: Int, nextToken: String): ModelWPTrackingConnection
+  getEmployeeNonLocalAcco(id: ID!): EmployeeNonLocalAcco
+  listEmployeeNonLocalAccos(filter: ModelEmployeeNonLocalAccoFilterInput, limit: Int, nextToken: String): ModelEmployeeNonLocalAccoConnection
+  getLabourMedicalInfo(id: ID!): LabourMedicalInfo
+  listLabourMedicalInfos(filter: ModelLabourMedicalInfoFilterInput, limit: Int, nextToken: String): ModelLabourMedicalInfoConnection
+  getServiceRecord(id: ID!): ServiceRecord
+  listServiceRecords(filter: ModelServiceRecordFilterInput, limit: Int, nextToken: String): ModelServiceRecordConnection
+  getEmpLeaveDetails(id: ID!): EmpLeaveDetails
+  listEmpLeaveDetails(filter: ModelEmpLeaveDetailsFilterInput, limit: Int, nextToken: String): ModelEmpLeaveDetailsConnection
+  getTerminationInfo(id: ID!): TerminationInfo
+  listTerminationInfos(filter: ModelTerminationInfoFilterInput, limit: Int, nextToken: String): ModelTerminationInfoConnection
+  getEmpWorkInfo(id: ID!): EmpWorkInfo
+  listEmpWorkInfos(filter: ModelEmpWorkInfoFilterInput, limit: Int, nextToken: String): ModelEmpWorkInfoConnection
+  getEmpPersonalInfo(id: ID!): EmpPersonalInfo
+  listEmpPersonalInfos(filter: ModelEmpPersonalInfoFilterInput, limit: Int, nextToken: String): ModelEmpPersonalInfoConnection
+  getIDDetails(id: ID!): IDDetails
+  listIDDetails(filter: ModelIDDetailsFilterInput, limit: Int, nextToken: String): ModelIDDetailsConnection
+  getCandIToEMP(id: ID!): CandIToEMP
+  listCandIToEMPS(filter: ModelCandIToEMPFilterInput, limit: Int, nextToken: String): ModelCandIToEMPConnection
+  getLocalMobilization(id: ID!): LocalMobilization
+  listLocalMobilizations(filter: ModelLocalMobilizationFilterInput, limit: Int, nextToken: String): ModelLocalMobilizationConnection
+  getInterviewSchedule(id: ID!): InterviewSchedule
+  listInterviewSchedules(filter: ModelInterviewScheduleFilterInput, limit: Int, nextToken: String): ModelInterviewScheduleConnection
+  getEducationDetails(id: ID!): EducationDetails
+  listEducationDetails(filter: ModelEducationDetailsFilterInput, limit: Int, nextToken: String): ModelEducationDetailsConnection
+  getPersonalDetails(id: ID!): PersonalDetails
+  listPersonalDetails(filter: ModelPersonalDetailsFilterInput, limit: Int, nextToken: String): ModelPersonalDetailsConnection
+  getUser(id: ID!): User
+  listUsers(filter: ModelUserFilterInput, limit: Int, nextToken: String): ModelUserConnection
+  getTicketRequest(id: ID!): TicketRequest
+  listTicketRequests(filter: ModelTicketRequestFilterInput, limit: Int, nextToken: String): ModelTicketRequestConnection
+  getLeaveStatus(id: ID!): LeaveStatus
+  listLeaveStatuses(filter: ModelLeaveStatusFilterInput, limit: Int, nextToken: String): ModelLeaveStatusConnection
+}
+
+input ModelInsuranceTypeConditionInput {
+  typeIns: ModelStringInput
+  insDetails: ModelStringInput
+  and: [ModelInsuranceTypeConditionInput]
+  or: [ModelInsuranceTypeConditionInput]
+  not: ModelInsuranceTypeConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateInsuranceTypeInput {
+  id: ID
+  typeIns: String
+  insDetails: [String]
+}
+
+input UpdateInsuranceTypeInput {
+  id: ID!
+  typeIns: String
+  insDetails: [String]
+}
+
+input DeleteInsuranceTypeInput {
+  id: ID!
+}
+
+type Mutation {
+  createInsuranceType(input: CreateInsuranceTypeInput!, condition: ModelInsuranceTypeConditionInput): InsuranceType
+  updateInsuranceType(input: UpdateInsuranceTypeInput!, condition: ModelInsuranceTypeConditionInput): InsuranceType
+  deleteInsuranceType(input: DeleteInsuranceTypeInput!, condition: ModelInsuranceTypeConditionInput): InsuranceType
+  createGroupHandS(input: CreateGroupHandSInput!, condition: ModelGroupHandSConditionInput): GroupHandS
+  updateGroupHandS(input: UpdateGroupHandSInput!, condition: ModelGroupHandSConditionInput): GroupHandS
+  deleteGroupHandS(input: DeleteGroupHandSInput!, condition: ModelGroupHandSConditionInput): GroupHandS
+  createWorkMen(input: CreateWorkMenInput!, condition: ModelWorkMenConditionInput): WorkMen
+  updateWorkMen(input: UpdateWorkMenInput!, condition: ModelWorkMenConditionInput): WorkMen
+  deleteWorkMen(input: DeleteWorkMenInput!, condition: ModelWorkMenConditionInput): WorkMen
+  createTravelIns(input: CreateTravelInsInput!, condition: ModelTravelInsConditionInput): TravelIns
+  updateTravelIns(input: UpdateTravelInsInput!, condition: ModelTravelInsConditionInput): TravelIns
+  deleteTravelIns(input: DeleteTravelInsInput!, condition: ModelTravelInsConditionInput): TravelIns
+  createPersonalAccident(input: CreatePersonalAccidentInput!, condition: ModelPersonalAccidentConditionInput): PersonalAccident
+  updatePersonalAccident(input: UpdatePersonalAccidentInput!, condition: ModelPersonalAccidentConditionInput): PersonalAccident
+  deletePersonalAccident(input: DeletePersonalAccidentInput!, condition: ModelPersonalAccidentConditionInput): PersonalAccident
+  createInsClaim(input: CreateInsClaimInput!, condition: ModelInsClaimConditionInput): InsClaim
+  updateInsClaim(input: UpdateInsClaimInput!, condition: ModelInsClaimConditionInput): InsClaim
+  deleteInsClaim(input: DeleteInsClaimInput!, condition: ModelInsClaimConditionInput): InsClaim
+  createProbForm(input: CreateProbFormInput!, condition: ModelProbFormConditionInput): ProbForm
+  updateProbForm(input: UpdateProbFormInput!, condition: ModelProbFormConditionInput): ProbForm
+  deleteProbForm(input: DeleteProbFormInput!, condition: ModelProbFormConditionInput): ProbForm
+  createEmailNotifi(input: CreateEmailNotifiInput!, condition: ModelEmailNotifiConditionInput): EmailNotifi
+  updateEmailNotifi(input: UpdateEmailNotifiInput!, condition: ModelEmailNotifiConditionInput): EmailNotifi
+  deleteEmailNotifi(input: DeleteEmailNotifiInput!, condition: ModelEmailNotifiConditionInput): EmailNotifi
+  createOffshoreSheet(input: CreateOffshoreSheetInput!, condition: ModelOffshoreSheetConditionInput): OffshoreSheet
+  updateOffshoreSheet(input: UpdateOffshoreSheetInput!, condition: ModelOffshoreSheetConditionInput): OffshoreSheet
+  deleteOffshoreSheet(input: DeleteOffshoreSheetInput!, condition: ModelOffshoreSheetConditionInput): OffshoreSheet
+  createORMCSheet(input: CreateORMCSheetInput!, condition: ModelORMCSheetConditionInput): ORMCSheet
+  updateORMCSheet(input: UpdateORMCSheetInput!, condition: ModelORMCSheetConditionInput): ORMCSheet
+  deleteORMCSheet(input: DeleteORMCSheetInput!, condition: ModelORMCSheetConditionInput): ORMCSheet
+  createSBWSheet(input: CreateSBWSheetInput!, condition: ModelSBWSheetConditionInput): SBWSheet
+  updateSBWSheet(input: UpdateSBWSheetInput!, condition: ModelSBWSheetConditionInput): SBWSheet
+  deleteSBWSheet(input: DeleteSBWSheetInput!, condition: ModelSBWSheetConditionInput): SBWSheet
+  createBlng(input: CreateBlngInput!, condition: ModelBlngConditionInput): Blng
+  updateBlng(input: UpdateBlngInput!, condition: ModelBlngConditionInput): Blng
+  deleteBlng(input: DeleteBlngInput!, condition: ModelBlngConditionInput): Blng
+  createHeadOffice(input: CreateHeadOfficeInput!, condition: ModelHeadOfficeConditionInput): HeadOffice
+  updateHeadOffice(input: UpdateHeadOfficeInput!, condition: ModelHeadOfficeConditionInput): HeadOffice
+  deleteHeadOffice(input: DeleteHeadOfficeInput!, condition: ModelHeadOfficeConditionInput): HeadOffice
+  createEmpRequisition(input: CreateEmpRequisitionInput!, condition: ModelEmpRequisitionConditionInput): EmpRequisition
+  updateEmpRequisition(input: UpdateEmpRequisitionInput!, condition: ModelEmpRequisitionConditionInput): EmpRequisition
+  deleteEmpRequisition(input: DeleteEmpRequisitionInput!, condition: ModelEmpRequisitionConditionInput): EmpRequisition
+  createWeldingInfo(input: CreateWeldingInfoInput!, condition: ModelWeldingInfoConditionInput): WeldingInfo
+  updateWeldingInfo(input: UpdateWeldingInfoInput!, condition: ModelWeldingInfoConditionInput): WeldingInfo
+  deleteWeldingInfo(input: DeleteWeldingInfoInput!, condition: ModelWeldingInfoConditionInput): WeldingInfo
+  createTrainingReq(input: CreateTrainingReqInput!, condition: ModelTrainingReqConditionInput): TrainingReq
+  updateTrainingReq(input: UpdateTrainingReqInput!, condition: ModelTrainingReqConditionInput): TrainingReq
+  deleteTrainingReq(input: DeleteTrainingReqInput!, condition: ModelTrainingReqConditionInput): TrainingReq
+  createTrainingCertificates(input: CreateTrainingCertificatesInput!, condition: ModelTrainingCertificatesConditionInput): TrainingCertificates
+  updateTrainingCertificates(input: UpdateTrainingCertificatesInput!, condition: ModelTrainingCertificatesConditionInput): TrainingCertificates
+  deleteTrainingCertificates(input: DeleteTrainingCertificatesInput!, condition: ModelTrainingCertificatesConditionInput): TrainingCertificates
+  createAddCourse(input: CreateAddCourseInput!, condition: ModelAddCourseConditionInput): AddCourse
+  updateAddCourse(input: UpdateAddCourseInput!, condition: ModelAddCourseConditionInput): AddCourse
+  deleteAddCourse(input: DeleteAddCourseInput!, condition: ModelAddCourseConditionInput): AddCourse
+  createEmpDepInsurance(input: CreateEmpDepInsuranceInput!, condition: ModelEmpDepInsuranceConditionInput): EmpDepInsurance
+  updateEmpDepInsurance(input: UpdateEmpDepInsuranceInput!, condition: ModelEmpDepInsuranceConditionInput): EmpDepInsurance
+  deleteEmpDepInsurance(input: DeleteEmpDepInsuranceInput!, condition: ModelEmpDepInsuranceConditionInput): EmpDepInsurance
+  createEmpInsurance(input: CreateEmpInsuranceInput!, condition: ModelEmpInsuranceConditionInput): EmpInsurance
+  updateEmpInsurance(input: UpdateEmpInsuranceInput!, condition: ModelEmpInsuranceConditionInput): EmpInsurance
+  deleteEmpInsurance(input: DeleteEmpInsuranceInput!, condition: ModelEmpInsuranceConditionInput): EmpInsurance
+  createSawpDetails(input: CreateSawpDetailsInput!, condition: ModelSawpDetailsConditionInput): SawpDetails
+  updateSawpDetails(input: UpdateSawpDetailsInput!, condition: ModelSawpDetailsConditionInput): SawpDetails
+  deleteSawpDetails(input: DeleteSawpDetailsInput!, condition: ModelSawpDetailsConditionInput): SawpDetails
+  createDNDetails(input: CreateDNDetailsInput!, condition: ModelDNDetailsConditionInput): DNDetails
+  updateDNDetails(input: UpdateDNDetailsInput!, condition: ModelDNDetailsConditionInput): DNDetails
+  deleteDNDetails(input: DeleteDNDetailsInput!, condition: ModelDNDetailsConditionInput): DNDetails
+  createBJLDetails(input: CreateBJLDetailsInput!, condition: ModelBJLDetailsConditionInput): BJLDetails
+  updateBJLDetails(input: UpdateBJLDetailsInput!, condition: ModelBJLDetailsConditionInput): BJLDetails
+  deleteBJLDetails(input: DeleteBJLDetailsInput!, condition: ModelBJLDetailsConditionInput): BJLDetails
+  createPassportValid(input: CreatePassportValidInput!, condition: ModelPassportValidConditionInput): PassportValid
+  updatePassportValid(input: UpdatePassportValidInput!, condition: ModelPassportValidConditionInput): PassportValid
+  deletePassportValid(input: DeletePassportValidInput!, condition: ModelPassportValidConditionInput): PassportValid
+  createWPTracking(input: CreateWPTrackingInput!, condition: ModelWPTrackingConditionInput): WPTracking
+  updateWPTracking(input: UpdateWPTrackingInput!, condition: ModelWPTrackingConditionInput): WPTracking
+  deleteWPTracking(input: DeleteWPTrackingInput!, condition: ModelWPTrackingConditionInput): WPTracking
+  createEmployeeNonLocalAcco(input: CreateEmployeeNonLocalAccoInput!, condition: ModelEmployeeNonLocalAccoConditionInput): EmployeeNonLocalAcco
+  updateEmployeeNonLocalAcco(input: UpdateEmployeeNonLocalAccoInput!, condition: ModelEmployeeNonLocalAccoConditionInput): EmployeeNonLocalAcco
+  deleteEmployeeNonLocalAcco(input: DeleteEmployeeNonLocalAccoInput!, condition: ModelEmployeeNonLocalAccoConditionInput): EmployeeNonLocalAcco
+  createLabourMedicalInfo(input: CreateLabourMedicalInfoInput!, condition: ModelLabourMedicalInfoConditionInput): LabourMedicalInfo
+  updateLabourMedicalInfo(input: UpdateLabourMedicalInfoInput!, condition: ModelLabourMedicalInfoConditionInput): LabourMedicalInfo
+  deleteLabourMedicalInfo(input: DeleteLabourMedicalInfoInput!, condition: ModelLabourMedicalInfoConditionInput): LabourMedicalInfo
+  createServiceRecord(input: CreateServiceRecordInput!, condition: ModelServiceRecordConditionInput): ServiceRecord
+  updateServiceRecord(input: UpdateServiceRecordInput!, condition: ModelServiceRecordConditionInput): ServiceRecord
+  deleteServiceRecord(input: DeleteServiceRecordInput!, condition: ModelServiceRecordConditionInput): ServiceRecord
+  createEmpLeaveDetails(input: CreateEmpLeaveDetailsInput!, condition: ModelEmpLeaveDetailsConditionInput): EmpLeaveDetails
+  updateEmpLeaveDetails(input: UpdateEmpLeaveDetailsInput!, condition: ModelEmpLeaveDetailsConditionInput): EmpLeaveDetails
+  deleteEmpLeaveDetails(input: DeleteEmpLeaveDetailsInput!, condition: ModelEmpLeaveDetailsConditionInput): EmpLeaveDetails
+  createTerminationInfo(input: CreateTerminationInfoInput!, condition: ModelTerminationInfoConditionInput): TerminationInfo
+  updateTerminationInfo(input: UpdateTerminationInfoInput!, condition: ModelTerminationInfoConditionInput): TerminationInfo
+  deleteTerminationInfo(input: DeleteTerminationInfoInput!, condition: ModelTerminationInfoConditionInput): TerminationInfo
+  createEmpWorkInfo(input: CreateEmpWorkInfoInput!, condition: ModelEmpWorkInfoConditionInput): EmpWorkInfo
+  updateEmpWorkInfo(input: UpdateEmpWorkInfoInput!, condition: ModelEmpWorkInfoConditionInput): EmpWorkInfo
+  deleteEmpWorkInfo(input: DeleteEmpWorkInfoInput!, condition: ModelEmpWorkInfoConditionInput): EmpWorkInfo
+  createEmpPersonalInfo(input: CreateEmpPersonalInfoInput!, condition: ModelEmpPersonalInfoConditionInput): EmpPersonalInfo
+  updateEmpPersonalInfo(input: UpdateEmpPersonalInfoInput!, condition: ModelEmpPersonalInfoConditionInput): EmpPersonalInfo
+  deleteEmpPersonalInfo(input: DeleteEmpPersonalInfoInput!, condition: ModelEmpPersonalInfoConditionInput): EmpPersonalInfo
+  createIDDetails(input: CreateIDDetailsInput!, condition: ModelIDDetailsConditionInput): IDDetails
+  updateIDDetails(input: UpdateIDDetailsInput!, condition: ModelIDDetailsConditionInput): IDDetails
+  deleteIDDetails(input: DeleteIDDetailsInput!, condition: ModelIDDetailsConditionInput): IDDetails
+  createCandIToEMP(input: CreateCandIToEMPInput!, condition: ModelCandIToEMPConditionInput): CandIToEMP
+  updateCandIToEMP(input: UpdateCandIToEMPInput!, condition: ModelCandIToEMPConditionInput): CandIToEMP
+  deleteCandIToEMP(input: DeleteCandIToEMPInput!, condition: ModelCandIToEMPConditionInput): CandIToEMP
+  createLocalMobilization(input: CreateLocalMobilizationInput!, condition: ModelLocalMobilizationConditionInput): LocalMobilization
+  updateLocalMobilization(input: UpdateLocalMobilizationInput!, condition: ModelLocalMobilizationConditionInput): LocalMobilization
+  deleteLocalMobilization(input: DeleteLocalMobilizationInput!, condition: ModelLocalMobilizationConditionInput): LocalMobilization
+  createInterviewSchedule(input: CreateInterviewScheduleInput!, condition: ModelInterviewScheduleConditionInput): InterviewSchedule
+  updateInterviewSchedule(input: UpdateInterviewScheduleInput!, condition: ModelInterviewScheduleConditionInput): InterviewSchedule
+  deleteInterviewSchedule(input: DeleteInterviewScheduleInput!, condition: ModelInterviewScheduleConditionInput): InterviewSchedule
+  createEducationDetails(input: CreateEducationDetailsInput!, condition: ModelEducationDetailsConditionInput): EducationDetails
+  updateEducationDetails(input: UpdateEducationDetailsInput!, condition: ModelEducationDetailsConditionInput): EducationDetails
+  deleteEducationDetails(input: DeleteEducationDetailsInput!, condition: ModelEducationDetailsConditionInput): EducationDetails
+  createPersonalDetails(input: CreatePersonalDetailsInput!, condition: ModelPersonalDetailsConditionInput): PersonalDetails
+  updatePersonalDetails(input: UpdatePersonalDetailsInput!, condition: ModelPersonalDetailsConditionInput): PersonalDetails
+  deletePersonalDetails(input: DeletePersonalDetailsInput!, condition: ModelPersonalDetailsConditionInput): PersonalDetails
+  createUser(input: CreateUserInput!, condition: ModelUserConditionInput): User
+  updateUser(input: UpdateUserInput!, condition: ModelUserConditionInput): User
+  deleteUser(input: DeleteUserInput!, condition: ModelUserConditionInput): User
+  createTicketRequest(input: CreateTicketRequestInput!, condition: ModelTicketRequestConditionInput): TicketRequest
+  updateTicketRequest(input: UpdateTicketRequestInput!, condition: ModelTicketRequestConditionInput): TicketRequest
+  deleteTicketRequest(input: DeleteTicketRequestInput!, condition: ModelTicketRequestConditionInput): TicketRequest
+  createLeaveStatus(input: CreateLeaveStatusInput!, condition: ModelLeaveStatusConditionInput): LeaveStatus
+  updateLeaveStatus(input: UpdateLeaveStatusInput!, condition: ModelLeaveStatusConditionInput): LeaveStatus
+  deleteLeaveStatus(input: DeleteLeaveStatusInput!, condition: ModelLeaveStatusConditionInput): LeaveStatus
+}
+
+input ModelSubscriptionInsuranceTypeFilterInput {
+  id: ModelSubscriptionIDInput
+  typeIns: ModelSubscriptionStringInput
+  insDetails: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionInsuranceTypeFilterInput]
+  or: [ModelSubscriptionInsuranceTypeFilterInput]
+}
+
+type Subscription {
+  onCreateInsuranceType(filter: ModelSubscriptionInsuranceTypeFilterInput): InsuranceType @aws_subscribe(mutations: ["createInsuranceType"])
+  onUpdateInsuranceType(filter: ModelSubscriptionInsuranceTypeFilterInput): InsuranceType @aws_subscribe(mutations: ["updateInsuranceType"])
+  onDeleteInsuranceType(filter: ModelSubscriptionInsuranceTypeFilterInput): InsuranceType @aws_subscribe(mutations: ["deleteInsuranceType"])
+  onCreateGroupHandS(filter: ModelSubscriptionGroupHandSFilterInput): GroupHandS @aws_subscribe(mutations: ["createGroupHandS"])
+  onUpdateGroupHandS(filter: ModelSubscriptionGroupHandSFilterInput): GroupHandS @aws_subscribe(mutations: ["updateGroupHandS"])
+  onDeleteGroupHandS(filter: ModelSubscriptionGroupHandSFilterInput): GroupHandS @aws_subscribe(mutations: ["deleteGroupHandS"])
+  onCreateWorkMen(filter: ModelSubscriptionWorkMenFilterInput): WorkMen @aws_subscribe(mutations: ["createWorkMen"])
+  onUpdateWorkMen(filter: ModelSubscriptionWorkMenFilterInput): WorkMen @aws_subscribe(mutations: ["updateWorkMen"])
+  onDeleteWorkMen(filter: ModelSubscriptionWorkMenFilterInput): WorkMen @aws_subscribe(mutations: ["deleteWorkMen"])
+  onCreateTravelIns(filter: ModelSubscriptionTravelInsFilterInput): TravelIns @aws_subscribe(mutations: ["createTravelIns"])
+  onUpdateTravelIns(filter: ModelSubscriptionTravelInsFilterInput): TravelIns @aws_subscribe(mutations: ["updateTravelIns"])
+  onDeleteTravelIns(filter: ModelSubscriptionTravelInsFilterInput): TravelIns @aws_subscribe(mutations: ["deleteTravelIns"])
+  onCreatePersonalAccident(filter: ModelSubscriptionPersonalAccidentFilterInput): PersonalAccident @aws_subscribe(mutations: ["createPersonalAccident"])
+  onUpdatePersonalAccident(filter: ModelSubscriptionPersonalAccidentFilterInput): PersonalAccident @aws_subscribe(mutations: ["updatePersonalAccident"])
+  onDeletePersonalAccident(filter: ModelSubscriptionPersonalAccidentFilterInput): PersonalAccident @aws_subscribe(mutations: ["deletePersonalAccident"])
+  onCreateInsClaim(filter: ModelSubscriptionInsClaimFilterInput): InsClaim @aws_subscribe(mutations: ["createInsClaim"])
+  onUpdateInsClaim(filter: ModelSubscriptionInsClaimFilterInput): InsClaim @aws_subscribe(mutations: ["updateInsClaim"])
+  onDeleteInsClaim(filter: ModelSubscriptionInsClaimFilterInput): InsClaim @aws_subscribe(mutations: ["deleteInsClaim"])
+  onCreateProbForm(filter: ModelSubscriptionProbFormFilterInput): ProbForm @aws_subscribe(mutations: ["createProbForm"])
+  onUpdateProbForm(filter: ModelSubscriptionProbFormFilterInput): ProbForm @aws_subscribe(mutations: ["updateProbForm"])
+  onDeleteProbForm(filter: ModelSubscriptionProbFormFilterInput): ProbForm @aws_subscribe(mutations: ["deleteProbForm"])
+  onCreateEmailNotifi(filter: ModelSubscriptionEmailNotifiFilterInput): EmailNotifi @aws_subscribe(mutations: ["createEmailNotifi"])
+  onUpdateEmailNotifi(filter: ModelSubscriptionEmailNotifiFilterInput): EmailNotifi @aws_subscribe(mutations: ["updateEmailNotifi"])
+  onDeleteEmailNotifi(filter: ModelSubscriptionEmailNotifiFilterInput): EmailNotifi @aws_subscribe(mutations: ["deleteEmailNotifi"])
+  onCreateOffshoreSheet(filter: ModelSubscriptionOffshoreSheetFilterInput): OffshoreSheet @aws_subscribe(mutations: ["createOffshoreSheet"])
+  onUpdateOffshoreSheet(filter: ModelSubscriptionOffshoreSheetFilterInput): OffshoreSheet @aws_subscribe(mutations: ["updateOffshoreSheet"])
+  onDeleteOffshoreSheet(filter: ModelSubscriptionOffshoreSheetFilterInput): OffshoreSheet @aws_subscribe(mutations: ["deleteOffshoreSheet"])
+  onCreateORMCSheet(filter: ModelSubscriptionORMCSheetFilterInput): ORMCSheet @aws_subscribe(mutations: ["createORMCSheet"])
+  onUpdateORMCSheet(filter: ModelSubscriptionORMCSheetFilterInput): ORMCSheet @aws_subscribe(mutations: ["updateORMCSheet"])
+  onDeleteORMCSheet(filter: ModelSubscriptionORMCSheetFilterInput): ORMCSheet @aws_subscribe(mutations: ["deleteORMCSheet"])
+  onCreateSBWSheet(filter: ModelSubscriptionSBWSheetFilterInput): SBWSheet @aws_subscribe(mutations: ["createSBWSheet"])
+  onUpdateSBWSheet(filter: ModelSubscriptionSBWSheetFilterInput): SBWSheet @aws_subscribe(mutations: ["updateSBWSheet"])
+  onDeleteSBWSheet(filter: ModelSubscriptionSBWSheetFilterInput): SBWSheet @aws_subscribe(mutations: ["deleteSBWSheet"])
+  onCreateBlng(filter: ModelSubscriptionBlngFilterInput): Blng @aws_subscribe(mutations: ["createBlng"])
+  onUpdateBlng(filter: ModelSubscriptionBlngFilterInput): Blng @aws_subscribe(mutations: ["updateBlng"])
+  onDeleteBlng(filter: ModelSubscriptionBlngFilterInput): Blng @aws_subscribe(mutations: ["deleteBlng"])
+  onCreateHeadOffice(filter: ModelSubscriptionHeadOfficeFilterInput): HeadOffice @aws_subscribe(mutations: ["createHeadOffice"])
+  onUpdateHeadOffice(filter: ModelSubscriptionHeadOfficeFilterInput): HeadOffice @aws_subscribe(mutations: ["updateHeadOffice"])
+  onDeleteHeadOffice(filter: ModelSubscriptionHeadOfficeFilterInput): HeadOffice @aws_subscribe(mutations: ["deleteHeadOffice"])
+  onCreateEmpRequisition(filter: ModelSubscriptionEmpRequisitionFilterInput): EmpRequisition @aws_subscribe(mutations: ["createEmpRequisition"])
+  onUpdateEmpRequisition(filter: ModelSubscriptionEmpRequisitionFilterInput): EmpRequisition @aws_subscribe(mutations: ["updateEmpRequisition"])
+  onDeleteEmpRequisition(filter: ModelSubscriptionEmpRequisitionFilterInput): EmpRequisition @aws_subscribe(mutations: ["deleteEmpRequisition"])
+  onCreateWeldingInfo(filter: ModelSubscriptionWeldingInfoFilterInput): WeldingInfo @aws_subscribe(mutations: ["createWeldingInfo"])
+  onUpdateWeldingInfo(filter: ModelSubscriptionWeldingInfoFilterInput): WeldingInfo @aws_subscribe(mutations: ["updateWeldingInfo"])
+  onDeleteWeldingInfo(filter: ModelSubscriptionWeldingInfoFilterInput): WeldingInfo @aws_subscribe(mutations: ["deleteWeldingInfo"])
+  onCreateTrainingReq(filter: ModelSubscriptionTrainingReqFilterInput): TrainingReq @aws_subscribe(mutations: ["createTrainingReq"])
+  onUpdateTrainingReq(filter: ModelSubscriptionTrainingReqFilterInput): TrainingReq @aws_subscribe(mutations: ["updateTrainingReq"])
+  onDeleteTrainingReq(filter: ModelSubscriptionTrainingReqFilterInput): TrainingReq @aws_subscribe(mutations: ["deleteTrainingReq"])
+  onCreateTrainingCertificates(filter: ModelSubscriptionTrainingCertificatesFilterInput): TrainingCertificates @aws_subscribe(mutations: ["createTrainingCertificates"])
+  onUpdateTrainingCertificates(filter: ModelSubscriptionTrainingCertificatesFilterInput): TrainingCertificates @aws_subscribe(mutations: ["updateTrainingCertificates"])
+  onDeleteTrainingCertificates(filter: ModelSubscriptionTrainingCertificatesFilterInput): TrainingCertificates @aws_subscribe(mutations: ["deleteTrainingCertificates"])
+  onCreateAddCourse(filter: ModelSubscriptionAddCourseFilterInput): AddCourse @aws_subscribe(mutations: ["createAddCourse"])
+  onUpdateAddCourse(filter: ModelSubscriptionAddCourseFilterInput): AddCourse @aws_subscribe(mutations: ["updateAddCourse"])
+  onDeleteAddCourse(filter: ModelSubscriptionAddCourseFilterInput): AddCourse @aws_subscribe(mutations: ["deleteAddCourse"])
+  onCreateEmpDepInsurance(filter: ModelSubscriptionEmpDepInsuranceFilterInput): EmpDepInsurance @aws_subscribe(mutations: ["createEmpDepInsurance"])
+  onUpdateEmpDepInsurance(filter: ModelSubscriptionEmpDepInsuranceFilterInput): EmpDepInsurance @aws_subscribe(mutations: ["updateEmpDepInsurance"])
+  onDeleteEmpDepInsurance(filter: ModelSubscriptionEmpDepInsuranceFilterInput): EmpDepInsurance @aws_subscribe(mutations: ["deleteEmpDepInsurance"])
+  onCreateEmpInsurance(filter: ModelSubscriptionEmpInsuranceFilterInput): EmpInsurance @aws_subscribe(mutations: ["createEmpInsurance"])
+  onUpdateEmpInsurance(filter: ModelSubscriptionEmpInsuranceFilterInput): EmpInsurance @aws_subscribe(mutations: ["updateEmpInsurance"])
+  onDeleteEmpInsurance(filter: ModelSubscriptionEmpInsuranceFilterInput): EmpInsurance @aws_subscribe(mutations: ["deleteEmpInsurance"])
+  onCreateSawpDetails(filter: ModelSubscriptionSawpDetailsFilterInput): SawpDetails @aws_subscribe(mutations: ["createSawpDetails"])
+  onUpdateSawpDetails(filter: ModelSubscriptionSawpDetailsFilterInput): SawpDetails @aws_subscribe(mutations: ["updateSawpDetails"])
+  onDeleteSawpDetails(filter: ModelSubscriptionSawpDetailsFilterInput): SawpDetails @aws_subscribe(mutations: ["deleteSawpDetails"])
+  onCreateDNDetails(filter: ModelSubscriptionDNDetailsFilterInput): DNDetails @aws_subscribe(mutations: ["createDNDetails"])
+  onUpdateDNDetails(filter: ModelSubscriptionDNDetailsFilterInput): DNDetails @aws_subscribe(mutations: ["updateDNDetails"])
+  onDeleteDNDetails(filter: ModelSubscriptionDNDetailsFilterInput): DNDetails @aws_subscribe(mutations: ["deleteDNDetails"])
+  onCreateBJLDetails(filter: ModelSubscriptionBJLDetailsFilterInput): BJLDetails @aws_subscribe(mutations: ["createBJLDetails"])
+  onUpdateBJLDetails(filter: ModelSubscriptionBJLDetailsFilterInput): BJLDetails @aws_subscribe(mutations: ["updateBJLDetails"])
+  onDeleteBJLDetails(filter: ModelSubscriptionBJLDetailsFilterInput): BJLDetails @aws_subscribe(mutations: ["deleteBJLDetails"])
+  onCreatePassportValid(filter: ModelSubscriptionPassportValidFilterInput): PassportValid @aws_subscribe(mutations: ["createPassportValid"])
+  onUpdatePassportValid(filter: ModelSubscriptionPassportValidFilterInput): PassportValid @aws_subscribe(mutations: ["updatePassportValid"])
+  onDeletePassportValid(filter: ModelSubscriptionPassportValidFilterInput): PassportValid @aws_subscribe(mutations: ["deletePassportValid"])
+  onCreateWPTracking(filter: ModelSubscriptionWPTrackingFilterInput): WPTracking @aws_subscribe(mutations: ["createWPTracking"])
+  onUpdateWPTracking(filter: ModelSubscriptionWPTrackingFilterInput): WPTracking @aws_subscribe(mutations: ["updateWPTracking"])
+  onDeleteWPTracking(filter: ModelSubscriptionWPTrackingFilterInput): WPTracking @aws_subscribe(mutations: ["deleteWPTracking"])
+  onCreateEmployeeNonLocalAcco(filter: ModelSubscriptionEmployeeNonLocalAccoFilterInput): EmployeeNonLocalAcco @aws_subscribe(mutations: ["createEmployeeNonLocalAcco"])
+  onUpdateEmployeeNonLocalAcco(filter: ModelSubscriptionEmployeeNonLocalAccoFilterInput): EmployeeNonLocalAcco @aws_subscribe(mutations: ["updateEmployeeNonLocalAcco"])
+  onDeleteEmployeeNonLocalAcco(filter: ModelSubscriptionEmployeeNonLocalAccoFilterInput): EmployeeNonLocalAcco @aws_subscribe(mutations: ["deleteEmployeeNonLocalAcco"])
+  onCreateLabourMedicalInfo(filter: ModelSubscriptionLabourMedicalInfoFilterInput): LabourMedicalInfo @aws_subscribe(mutations: ["createLabourMedicalInfo"])
+  onUpdateLabourMedicalInfo(filter: ModelSubscriptionLabourMedicalInfoFilterInput): LabourMedicalInfo @aws_subscribe(mutations: ["updateLabourMedicalInfo"])
+  onDeleteLabourMedicalInfo(filter: ModelSubscriptionLabourMedicalInfoFilterInput): LabourMedicalInfo @aws_subscribe(mutations: ["deleteLabourMedicalInfo"])
+  onCreateServiceRecord(filter: ModelSubscriptionServiceRecordFilterInput): ServiceRecord @aws_subscribe(mutations: ["createServiceRecord"])
+  onUpdateServiceRecord(filter: ModelSubscriptionServiceRecordFilterInput): ServiceRecord @aws_subscribe(mutations: ["updateServiceRecord"])
+  onDeleteServiceRecord(filter: ModelSubscriptionServiceRecordFilterInput): ServiceRecord @aws_subscribe(mutations: ["deleteServiceRecord"])
+  onCreateEmpLeaveDetails(filter: ModelSubscriptionEmpLeaveDetailsFilterInput): EmpLeaveDetails @aws_subscribe(mutations: ["createEmpLeaveDetails"])
+  onUpdateEmpLeaveDetails(filter: ModelSubscriptionEmpLeaveDetailsFilterInput): EmpLeaveDetails @aws_subscribe(mutations: ["updateEmpLeaveDetails"])
+  onDeleteEmpLeaveDetails(filter: ModelSubscriptionEmpLeaveDetailsFilterInput): EmpLeaveDetails @aws_subscribe(mutations: ["deleteEmpLeaveDetails"])
+  onCreateTerminationInfo(filter: ModelSubscriptionTerminationInfoFilterInput): TerminationInfo @aws_subscribe(mutations: ["createTerminationInfo"])
+  onUpdateTerminationInfo(filter: ModelSubscriptionTerminationInfoFilterInput): TerminationInfo @aws_subscribe(mutations: ["updateTerminationInfo"])
+  onDeleteTerminationInfo(filter: ModelSubscriptionTerminationInfoFilterInput): TerminationInfo @aws_subscribe(mutations: ["deleteTerminationInfo"])
+  onCreateEmpWorkInfo(filter: ModelSubscriptionEmpWorkInfoFilterInput): EmpWorkInfo @aws_subscribe(mutations: ["createEmpWorkInfo"])
+  onUpdateEmpWorkInfo(filter: ModelSubscriptionEmpWorkInfoFilterInput): EmpWorkInfo @aws_subscribe(mutations: ["updateEmpWorkInfo"])
+  onDeleteEmpWorkInfo(filter: ModelSubscriptionEmpWorkInfoFilterInput): EmpWorkInfo @aws_subscribe(mutations: ["deleteEmpWorkInfo"])
+  onCreateEmpPersonalInfo(filter: ModelSubscriptionEmpPersonalInfoFilterInput): EmpPersonalInfo @aws_subscribe(mutations: ["createEmpPersonalInfo"])
+  onUpdateEmpPersonalInfo(filter: ModelSubscriptionEmpPersonalInfoFilterInput): EmpPersonalInfo @aws_subscribe(mutations: ["updateEmpPersonalInfo"])
+  onDeleteEmpPersonalInfo(filter: ModelSubscriptionEmpPersonalInfoFilterInput): EmpPersonalInfo @aws_subscribe(mutations: ["deleteEmpPersonalInfo"])
+  onCreateIDDetails(filter: ModelSubscriptionIDDetailsFilterInput): IDDetails @aws_subscribe(mutations: ["createIDDetails"])
+  onUpdateIDDetails(filter: ModelSubscriptionIDDetailsFilterInput): IDDetails @aws_subscribe(mutations: ["updateIDDetails"])
+  onDeleteIDDetails(filter: ModelSubscriptionIDDetailsFilterInput): IDDetails @aws_subscribe(mutations: ["deleteIDDetails"])
+  onCreateCandIToEMP(filter: ModelSubscriptionCandIToEMPFilterInput): CandIToEMP @aws_subscribe(mutations: ["createCandIToEMP"])
+  onUpdateCandIToEMP(filter: ModelSubscriptionCandIToEMPFilterInput): CandIToEMP @aws_subscribe(mutations: ["updateCandIToEMP"])
+  onDeleteCandIToEMP(filter: ModelSubscriptionCandIToEMPFilterInput): CandIToEMP @aws_subscribe(mutations: ["deleteCandIToEMP"])
+  onCreateLocalMobilization(filter: ModelSubscriptionLocalMobilizationFilterInput): LocalMobilization @aws_subscribe(mutations: ["createLocalMobilization"])
+  onUpdateLocalMobilization(filter: ModelSubscriptionLocalMobilizationFilterInput): LocalMobilization @aws_subscribe(mutations: ["updateLocalMobilization"])
+  onDeleteLocalMobilization(filter: ModelSubscriptionLocalMobilizationFilterInput): LocalMobilization @aws_subscribe(mutations: ["deleteLocalMobilization"])
+  onCreateInterviewSchedule(filter: ModelSubscriptionInterviewScheduleFilterInput): InterviewSchedule @aws_subscribe(mutations: ["createInterviewSchedule"])
+  onUpdateInterviewSchedule(filter: ModelSubscriptionInterviewScheduleFilterInput): InterviewSchedule @aws_subscribe(mutations: ["updateInterviewSchedule"])
+  onDeleteInterviewSchedule(filter: ModelSubscriptionInterviewScheduleFilterInput): InterviewSchedule @aws_subscribe(mutations: ["deleteInterviewSchedule"])
+  onCreateEducationDetails(filter: ModelSubscriptionEducationDetailsFilterInput): EducationDetails @aws_subscribe(mutations: ["createEducationDetails"])
+  onUpdateEducationDetails(filter: ModelSubscriptionEducationDetailsFilterInput): EducationDetails @aws_subscribe(mutations: ["updateEducationDetails"])
+  onDeleteEducationDetails(filter: ModelSubscriptionEducationDetailsFilterInput): EducationDetails @aws_subscribe(mutations: ["deleteEducationDetails"])
+  onCreatePersonalDetails(filter: ModelSubscriptionPersonalDetailsFilterInput): PersonalDetails @aws_subscribe(mutations: ["createPersonalDetails"])
+  onUpdatePersonalDetails(filter: ModelSubscriptionPersonalDetailsFilterInput): PersonalDetails @aws_subscribe(mutations: ["updatePersonalDetails"])
+  onDeletePersonalDetails(filter: ModelSubscriptionPersonalDetailsFilterInput): PersonalDetails @aws_subscribe(mutations: ["deletePersonalDetails"])
+  onCreateUser(filter: ModelSubscriptionUserFilterInput): User @aws_subscribe(mutations: ["createUser"])
+  onUpdateUser(filter: ModelSubscriptionUserFilterInput): User @aws_subscribe(mutations: ["updateUser"])
+  onDeleteUser(filter: ModelSubscriptionUserFilterInput): User @aws_subscribe(mutations: ["deleteUser"])
+  onCreateTicketRequest(filter: ModelSubscriptionTicketRequestFilterInput): TicketRequest @aws_subscribe(mutations: ["createTicketRequest"])
+  onUpdateTicketRequest(filter: ModelSubscriptionTicketRequestFilterInput): TicketRequest @aws_subscribe(mutations: ["updateTicketRequest"])
+  onDeleteTicketRequest(filter: ModelSubscriptionTicketRequestFilterInput): TicketRequest @aws_subscribe(mutations: ["deleteTicketRequest"])
+  onCreateLeaveStatus(filter: ModelSubscriptionLeaveStatusFilterInput): LeaveStatus @aws_subscribe(mutations: ["createLeaveStatus"])
+  onUpdateLeaveStatus(filter: ModelSubscriptionLeaveStatusFilterInput): LeaveStatus @aws_subscribe(mutations: ["updateLeaveStatus"])
+  onDeleteLeaveStatus(filter: ModelSubscriptionLeaveStatusFilterInput): LeaveStatus @aws_subscribe(mutations: ["deleteLeaveStatus"])
+}
+
+type ModelGroupHandSConnection {
+  items: [GroupHandS]!
+  nextToken: String
+}
+
+input ModelGroupHandSFilterInput {
+  id: ModelIDInput
+  groupHSExp: ModelStringInput
+  groupHSNo: ModelStringInput
+  groupHSUpload: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelGroupHandSFilterInput]
+  or: [ModelGroupHandSFilterInput]
+  not: ModelGroupHandSFilterInput
+}
+
+input ModelGroupHandSConditionInput {
+  groupHSExp: ModelStringInput
+  groupHSNo: ModelStringInput
+  groupHSUpload: ModelStringInput
+  and: [ModelGroupHandSConditionInput]
+  or: [ModelGroupHandSConditionInput]
+  not: ModelGroupHandSConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateGroupHandSInput {
+  id: ID
+  groupHSExp: String
+  groupHSNo: String
+  groupHSUpload: [AWSJSON]
+}
+
+input UpdateGroupHandSInput {
+  id: ID!
+  groupHSExp: String
+  groupHSNo: String
+  groupHSUpload: [AWSJSON]
+}
+
+input DeleteGroupHandSInput {
+  id: ID!
+}
+
+input ModelSubscriptionGroupHandSFilterInput {
+  id: ModelSubscriptionIDInput
+  groupHSExp: ModelSubscriptionStringInput
+  groupHSNo: ModelSubscriptionStringInput
+  groupHSUpload: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionGroupHandSFilterInput]
+  or: [ModelSubscriptionGroupHandSFilterInput]
+}
+
+type ModelWorkMenConnection {
+  items: [WorkMen]!
+  nextToken: String
+}
+
+input ModelWorkMenFilterInput {
+  id: ModelIDInput
+  empStatusType: ModelStringInput
+  workmenCompExp: ModelStringInput
+  workmenCompNo: ModelStringInput
+  workmenComUp: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelWorkMenFilterInput]
+  or: [ModelWorkMenFilterInput]
+  not: ModelWorkMenFilterInput
+}
+
+input ModelWorkMenConditionInput {
+  empStatusType: ModelStringInput
+  workmenCompExp: ModelStringInput
+  workmenCompNo: ModelStringInput
+  workmenComUp: ModelStringInput
+  and: [ModelWorkMenConditionInput]
+  or: [ModelWorkMenConditionInput]
+  not: ModelWorkMenConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateWorkMenInput {
+  id: ID
+  empStatusType: String
+  workmenCompExp: String
+  workmenCompNo: String
+  workmenComUp: [AWSJSON]
+}
+
+input UpdateWorkMenInput {
+  id: ID!
+  empStatusType: String
+  workmenCompExp: String
+  workmenCompNo: String
+  workmenComUp: [AWSJSON]
+}
+
+input DeleteWorkMenInput {
+  id: ID!
+}
+
+input ModelSubscriptionWorkMenFilterInput {
+  id: ModelSubscriptionIDInput
+  empStatusType: ModelSubscriptionStringInput
+  workmenCompExp: ModelSubscriptionStringInput
+  workmenCompNo: ModelSubscriptionStringInput
+  workmenComUp: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionWorkMenFilterInput]
+  or: [ModelSubscriptionWorkMenFilterInput]
+}
+
+type ModelTravelInsConnection {
+  items: [TravelIns]!
+  nextToken: String
+}
+
+input ModelTravelInsFilterInput {
+  id: ModelIDInput
+  travelExp: ModelStringInput
+  travelNo: ModelStringInput
+  travelUp: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelTravelInsFilterInput]
+  or: [ModelTravelInsFilterInput]
+  not: ModelTravelInsFilterInput
+}
+
+input ModelTravelInsConditionInput {
+  travelExp: ModelStringInput
+  travelNo: ModelStringInput
+  travelUp: ModelStringInput
+  and: [ModelTravelInsConditionInput]
+  or: [ModelTravelInsConditionInput]
+  not: ModelTravelInsConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateTravelInsInput {
+  id: ID
+  travelExp: String
+  travelNo: String
+  travelUp: [AWSJSON]
+}
+
+input UpdateTravelInsInput {
+  id: ID!
+  travelExp: String
+  travelNo: String
+  travelUp: [AWSJSON]
+}
+
+input DeleteTravelInsInput {
+  id: ID!
+}
+
+input ModelSubscriptionTravelInsFilterInput {
+  id: ModelSubscriptionIDInput
+  travelExp: ModelSubscriptionStringInput
+  travelNo: ModelSubscriptionStringInput
+  travelUp: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionTravelInsFilterInput]
+  or: [ModelSubscriptionTravelInsFilterInput]
+}
+
+type ModelPersonalAccidentConnection {
+  items: [PersonalAccident]!
+  nextToken: String
+}
+
+input ModelPersonalAccidentFilterInput {
+  id: ModelIDInput
+  perAccExp: ModelStringInput
+  perAccNo: ModelStringInput
+  perAccUp: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelPersonalAccidentFilterInput]
+  or: [ModelPersonalAccidentFilterInput]
+  not: ModelPersonalAccidentFilterInput
+}
+
+input ModelPersonalAccidentConditionInput {
+  perAccExp: ModelStringInput
+  perAccNo: ModelStringInput
+  perAccUp: ModelStringInput
+  and: [ModelPersonalAccidentConditionInput]
+  or: [ModelPersonalAccidentConditionInput]
+  not: ModelPersonalAccidentConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreatePersonalAccidentInput {
+  id: ID
+  perAccExp: String
+  perAccNo: String
+  perAccUp: [AWSJSON]
+}
+
+input UpdatePersonalAccidentInput {
+  id: ID!
+  perAccExp: String
+  perAccNo: String
+  perAccUp: [AWSJSON]
+}
+
+input DeletePersonalAccidentInput {
+  id: ID!
+}
+
+input ModelSubscriptionPersonalAccidentFilterInput {
+  id: ModelSubscriptionIDInput
+  perAccExp: ModelSubscriptionStringInput
+  perAccNo: ModelSubscriptionStringInput
+  perAccUp: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionPersonalAccidentFilterInput]
+  or: [ModelSubscriptionPersonalAccidentFilterInput]
+}
+
+type ModelInsClaimConnection {
+  items: [InsClaim]!
+  nextToken: String
+}
+
+input ModelInsClaimFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  insuranceClaims: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelInsClaimFilterInput]
+  or: [ModelInsClaimFilterInput]
+  not: ModelInsClaimFilterInput
+}
+
+input ModelInsClaimConditionInput {
+  empID: ModelStringInput
+  insuranceClaims: ModelStringInput
+  and: [ModelInsClaimConditionInput]
+  or: [ModelInsClaimConditionInput]
+  not: ModelInsClaimConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateInsClaimInput {
+  id: ID
+  empID: String
+  insuranceClaims: [AWSJSON]
+}
+
+input UpdateInsClaimInput {
+  id: ID!
+  empID: String
+  insuranceClaims: [AWSJSON]
+}
+
+input DeleteInsClaimInput {
+  id: ID!
+}
+
+input ModelSubscriptionInsClaimFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  insuranceClaims: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionInsClaimFilterInput]
+  or: [ModelSubscriptionInsClaimFilterInput]
+}
+
+type ModelProbFormConnection {
+  items: [ProbForm]!
+  nextToken: String
+}
+
+input ModelProbFormFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  adaptability: ModelStringInput
+  additionalInfo: ModelStringInput
+  attention: ModelStringInput
+  attitude: ModelStringInput
+  commitment: ModelStringInput
+  communication: ModelStringInput
+  deadline: ModelStringInput
+  department: ModelStringInput
+  diligent: ModelStringInput
+  doj: ModelStringInput
+  empBadgeNo: ModelStringInput
+  extendedProbationEndDate: ModelStringInput
+  extensionPeriod: ModelStringInput
+  gmApproved: ModelBooleanInput
+  gmDate: ModelStringInput
+  hrDate: ModelStringInput
+  hrName: ModelStringInput
+  initiative: ModelStringInput
+  managerApproved: ModelBooleanInput
+  managerDate: ModelStringInput
+  managerName: ModelStringInput
+  name: ModelStringInput
+  pace: ModelStringInput
+  position: ModelStringInput
+  probationEnd: ModelStringInput
+  quality: ModelStringInput
+  recommendation: ModelStringInput
+  responsibility: ModelStringInput
+  supervisorApproved: ModelBooleanInput
+  supervisorDate: ModelStringInput
+  supervisorName: ModelStringInput
+  teamwork: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelProbFormFilterInput]
+  or: [ModelProbFormFilterInput]
+  not: ModelProbFormFilterInput
+}
+
+input ModelProbFormConditionInput {
+  empID: ModelStringInput
+  adaptability: ModelStringInput
+  additionalInfo: ModelStringInput
+  attention: ModelStringInput
+  attitude: ModelStringInput
+  commitment: ModelStringInput
+  communication: ModelStringInput
+  deadline: ModelStringInput
+  department: ModelStringInput
+  diligent: ModelStringInput
+  doj: ModelStringInput
+  empBadgeNo: ModelStringInput
+  extendedProbationEndDate: ModelStringInput
+  extensionPeriod: ModelStringInput
+  gmApproved: ModelBooleanInput
+  gmDate: ModelStringInput
+  hrDate: ModelStringInput
+  hrName: ModelStringInput
+  initiative: ModelStringInput
+  managerApproved: ModelBooleanInput
+  managerDate: ModelStringInput
+  managerName: ModelStringInput
+  name: ModelStringInput
+  pace: ModelStringInput
+  position: ModelStringInput
+  probationEnd: ModelStringInput
+  quality: ModelStringInput
+  recommendation: ModelStringInput
+  responsibility: ModelStringInput
+  supervisorApproved: ModelBooleanInput
+  supervisorDate: ModelStringInput
+  supervisorName: ModelStringInput
+  teamwork: ModelStringInput
+  and: [ModelProbFormConditionInput]
+  or: [ModelProbFormConditionInput]
+  not: ModelProbFormConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateProbFormInput {
+  id: ID
+  empID: String!
+  adaptability: String
+  additionalInfo: String
+  attention: String
+  attitude: String
+  commitment: String
+  communication: String
+  deadline: String
+  department: String
+  diligent: String
+  doj: String
+  empBadgeNo: String
+  extendedProbationEndDate: String
+  extensionPeriod: String
+  gmApproved: Boolean
+  gmDate: String
+  hrDate: String
+  hrName: String
+  initiative: String
+  managerApproved: Boolean
+  managerDate: String
+  managerName: String
+  name: String
+  pace: String
+  position: String
+  probationEnd: String
+  quality: String
+  recommendation: String
+  responsibility: String
+  supervisorApproved: Boolean
+  supervisorDate: String
+  supervisorName: String
+  teamwork: String
+}
+
+input UpdateProbFormInput {
+  id: ID!
+  empID: String
+  adaptability: String
+  additionalInfo: String
+  attention: String
+  attitude: String
+  commitment: String
+  communication: String
+  deadline: String
+  department: String
+  diligent: String
+  doj: String
+  empBadgeNo: String
+  extendedProbationEndDate: String
+  extensionPeriod: String
+  gmApproved: Boolean
+  gmDate: String
+  hrDate: String
+  hrName: String
+  initiative: String
+  managerApproved: Boolean
+  managerDate: String
+  managerName: String
+  name: String
+  pace: String
+  position: String
+  probationEnd: String
+  quality: String
+  recommendation: String
+  responsibility: String
+  supervisorApproved: Boolean
+  supervisorDate: String
+  supervisorName: String
+  teamwork: String
+}
+
+input DeleteProbFormInput {
+  id: ID!
+}
+
+input ModelSubscriptionProbFormFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  adaptability: ModelSubscriptionStringInput
+  additionalInfo: ModelSubscriptionStringInput
+  attention: ModelSubscriptionStringInput
+  attitude: ModelSubscriptionStringInput
+  commitment: ModelSubscriptionStringInput
+  communication: ModelSubscriptionStringInput
+  deadline: ModelSubscriptionStringInput
+  department: ModelSubscriptionStringInput
+  diligent: ModelSubscriptionStringInput
+  doj: ModelSubscriptionStringInput
+  empBadgeNo: ModelSubscriptionStringInput
+  extendedProbationEndDate: ModelSubscriptionStringInput
+  extensionPeriod: ModelSubscriptionStringInput
+  gmApproved: ModelSubscriptionBooleanInput
+  gmDate: ModelSubscriptionStringInput
+  hrDate: ModelSubscriptionStringInput
+  hrName: ModelSubscriptionStringInput
+  initiative: ModelSubscriptionStringInput
+  managerApproved: ModelSubscriptionBooleanInput
+  managerDate: ModelSubscriptionStringInput
+  managerName: ModelSubscriptionStringInput
+  name: ModelSubscriptionStringInput
+  pace: ModelSubscriptionStringInput
+  position: ModelSubscriptionStringInput
+  probationEnd: ModelSubscriptionStringInput
+  quality: ModelSubscriptionStringInput
+  recommendation: ModelSubscriptionStringInput
+  responsibility: ModelSubscriptionStringInput
+  supervisorApproved: ModelSubscriptionBooleanInput
+  supervisorDate: ModelSubscriptionStringInput
+  supervisorName: ModelSubscriptionStringInput
+  teamwork: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionProbFormFilterInput]
+  or: [ModelSubscriptionProbFormFilterInput]
+}
+
+type ModelEmailNotifiConnection {
+  items: [EmailNotifi]!
+  nextToken: String
+}
+
+input ModelEmailNotifiFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  leaveType: ModelStringInput
+  senderEmail: ModelStringInput
+  receipentEmail: ModelStringInput
+  receipentEmpID: ModelStringInput
+  status: ModelStringInput
+  message: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelEmailNotifiFilterInput]
+  or: [ModelEmailNotifiFilterInput]
+  not: ModelEmailNotifiFilterInput
+}
+
+input ModelEmailNotifiConditionInput {
+  empID: ModelStringInput
+  leaveType: ModelStringInput
+  senderEmail: ModelStringInput
+  receipentEmail: ModelStringInput
+  receipentEmpID: ModelStringInput
+  status: ModelStringInput
+  message: ModelStringInput
+  and: [ModelEmailNotifiConditionInput]
+  or: [ModelEmailNotifiConditionInput]
+  not: ModelEmailNotifiConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateEmailNotifiInput {
+  id: ID
+  empID: String!
+  leaveType: String
+  senderEmail: String
+  receipentEmail: String
+  receipentEmpID: String
+  status: String
+  message: String
+}
+
+input UpdateEmailNotifiInput {
+  id: ID!
+  empID: String
+  leaveType: String
+  senderEmail: String
+  receipentEmail: String
+  receipentEmpID: String
+  status: String
+  message: String
+}
+
+input DeleteEmailNotifiInput {
+  id: ID!
+}
+
+input ModelSubscriptionEmailNotifiFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  leaveType: ModelSubscriptionStringInput
+  senderEmail: ModelSubscriptionStringInput
+  receipentEmail: ModelSubscriptionStringInput
+  receipentEmpID: ModelSubscriptionStringInput
+  status: ModelSubscriptionStringInput
+  message: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionEmailNotifiFilterInput]
+  or: [ModelSubscriptionEmailNotifiFilterInput]
+}
+
+type ModelOffshoreSheetConnection {
+  items: [OffshoreSheet]!
+  nextToken: String
+}
+
+input ModelOffshoreSheetFilterInput {
+  id: ModelIDInput
+  date: ModelStringInput
+  dailySheet: ModelStringInput
+  status: ModelStringInput
+  manager: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelOffshoreSheetFilterInput]
+  or: [ModelOffshoreSheetFilterInput]
+  not: ModelOffshoreSheetFilterInput
+}
+
+input ModelOffshoreSheetConditionInput {
+  date: ModelStringInput
+  dailySheet: ModelStringInput
+  status: ModelStringInput
+  manager: ModelStringInput
+  and: [ModelOffshoreSheetConditionInput]
+  or: [ModelOffshoreSheetConditionInput]
+  not: ModelOffshoreSheetConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateOffshoreSheetInput {
+  id: ID
+  date: String
+  dailySheet: [AWSJSON]
+  status: String
+  manager: [AWSJSON]
+}
+
+input UpdateOffshoreSheetInput {
+  id: ID!
+  date: String
+  dailySheet: [AWSJSON]
+  status: String
+  manager: [AWSJSON]
+}
+
+input DeleteOffshoreSheetInput {
+  id: ID!
+}
+
+input ModelSubscriptionOffshoreSheetFilterInput {
+  id: ModelSubscriptionIDInput
+  date: ModelSubscriptionStringInput
+  dailySheet: ModelSubscriptionStringInput
+  status: ModelSubscriptionStringInput
+  manager: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionOffshoreSheetFilterInput]
+  or: [ModelSubscriptionOffshoreSheetFilterInput]
+}
+
+type ModelORMCSheetConnection {
+  items: [ORMCSheet]!
+  nextToken: String
+}
+
+input ModelORMCSheetFilterInput {
+  id: ModelIDInput
+  date: ModelStringInput
+  dailySheet: ModelStringInput
+  status: ModelStringInput
+  manager: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelORMCSheetFilterInput]
+  or: [ModelORMCSheetFilterInput]
+  not: ModelORMCSheetFilterInput
+}
+
+input ModelORMCSheetConditionInput {
+  date: ModelStringInput
+  dailySheet: ModelStringInput
+  status: ModelStringInput
+  manager: ModelStringInput
+  and: [ModelORMCSheetConditionInput]
+  or: [ModelORMCSheetConditionInput]
+  not: ModelORMCSheetConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateORMCSheetInput {
+  id: ID
+  date: String
+  dailySheet: [AWSJSON]
+  status: String
+  manager: [AWSJSON]
+}
+
+input UpdateORMCSheetInput {
+  id: ID!
+  date: String
+  dailySheet: [AWSJSON]
+  status: String
+  manager: [AWSJSON]
+}
+
+input DeleteORMCSheetInput {
+  id: ID!
+}
+
+input ModelSubscriptionORMCSheetFilterInput {
+  id: ModelSubscriptionIDInput
+  date: ModelSubscriptionStringInput
+  dailySheet: ModelSubscriptionStringInput
+  status: ModelSubscriptionStringInput
+  manager: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionORMCSheetFilterInput]
+  or: [ModelSubscriptionORMCSheetFilterInput]
+}
+
+type ModelSBWSheetConnection {
+  items: [SBWSheet]!
+  nextToken: String
+}
+
+input ModelSBWSheetFilterInput {
+  id: ModelIDInput
+  date: ModelStringInput
+  dailySheet: ModelStringInput
+  status: ModelStringInput
+  manager: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelSBWSheetFilterInput]
+  or: [ModelSBWSheetFilterInput]
+  not: ModelSBWSheetFilterInput
+}
+
+input ModelSBWSheetConditionInput {
+  date: ModelStringInput
+  dailySheet: ModelStringInput
+  status: ModelStringInput
+  manager: ModelStringInput
+  and: [ModelSBWSheetConditionInput]
+  or: [ModelSBWSheetConditionInput]
+  not: ModelSBWSheetConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateSBWSheetInput {
+  id: ID
+  date: String
+  dailySheet: [AWSJSON]
+  status: String
+  manager: [AWSJSON]
+}
+
+input UpdateSBWSheetInput {
+  id: ID!
+  date: String
+  dailySheet: [AWSJSON]
+  status: String
+  manager: [AWSJSON]
+}
+
+input DeleteSBWSheetInput {
+  id: ID!
+}
+
+input ModelSubscriptionSBWSheetFilterInput {
+  id: ModelSubscriptionIDInput
+  date: ModelSubscriptionStringInput
+  dailySheet: ModelSubscriptionStringInput
+  status: ModelSubscriptionStringInput
+  manager: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionSBWSheetFilterInput]
+  or: [ModelSubscriptionSBWSheetFilterInput]
+}
+
+type ModelBlngConnection {
+  items: [Blng]!
+  nextToken: String
+}
+
+input ModelBlngFilterInput {
+  id: ModelIDInput
+  weeklySheet: ModelStringInput
+  date: ModelStringInput
+  status: ModelStringInput
+  manager: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelBlngFilterInput]
+  or: [ModelBlngFilterInput]
+  not: ModelBlngFilterInput
+}
+
+input ModelBlngConditionInput {
+  weeklySheet: ModelStringInput
+  date: ModelStringInput
+  status: ModelStringInput
+  manager: ModelStringInput
+  and: [ModelBlngConditionInput]
+  or: [ModelBlngConditionInput]
+  not: ModelBlngConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateBlngInput {
+  id: ID
+  weeklySheet: [AWSJSON]
+  date: String
+  status: String
+  manager: [AWSJSON]
+}
+
+input UpdateBlngInput {
+  id: ID!
+  weeklySheet: [AWSJSON]
+  date: String
+  status: String
+  manager: [AWSJSON]
+}
+
+input DeleteBlngInput {
+  id: ID!
+}
+
+input ModelSubscriptionBlngFilterInput {
+  id: ModelSubscriptionIDInput
+  weeklySheet: ModelSubscriptionStringInput
+  date: ModelSubscriptionStringInput
+  status: ModelSubscriptionStringInput
+  manager: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionBlngFilterInput]
+  or: [ModelSubscriptionBlngFilterInput]
+}
+
+type ModelHeadOfficeConnection {
+  items: [HeadOffice]!
+  nextToken: String
+}
+
+input ModelHeadOfficeFilterInput {
+  id: ModelIDInput
+  dailySheet: ModelStringInput
+  date: ModelStringInput
+  status: ModelStringInput
+  manager: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelHeadOfficeFilterInput]
+  or: [ModelHeadOfficeFilterInput]
+  not: ModelHeadOfficeFilterInput
+}
+
+input ModelHeadOfficeConditionInput {
+  dailySheet: ModelStringInput
+  date: ModelStringInput
+  status: ModelStringInput
+  manager: ModelStringInput
+  and: [ModelHeadOfficeConditionInput]
+  or: [ModelHeadOfficeConditionInput]
+  not: ModelHeadOfficeConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateHeadOfficeInput {
+  id: ID
+  dailySheet: [AWSJSON]
+  date: String
+  status: String
+  manager: [AWSJSON]
+}
+
+input UpdateHeadOfficeInput {
+  id: ID!
+  dailySheet: [AWSJSON]
+  date: String
+  status: String
+  manager: [AWSJSON]
+}
+
+input DeleteHeadOfficeInput {
+  id: ID!
+}
+
+input ModelSubscriptionHeadOfficeFilterInput {
+  id: ModelSubscriptionIDInput
+  dailySheet: ModelSubscriptionStringInput
+  date: ModelSubscriptionStringInput
+  status: ModelSubscriptionStringInput
+  manager: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionHeadOfficeFilterInput]
+  or: [ModelSubscriptionHeadOfficeFilterInput]
+}
+
+type ModelEmpRequisitionConnection {
+  items: [EmpRequisition]!
+  nextToken: String
+}
+
+input ModelEmpRequisitionFilterInput {
+  id: ModelIDInput
+  department: ModelStringInput
+  justification: ModelStringInput
+  project: ModelStringInput
+  position: ModelStringInput
+  quantity: ModelIntInput
+  qualification: ModelStringInput
+  reasonForReq: ModelStringInput
+  replacementFor: ModelStringInput
+  tentativeDate: ModelStringInput
+  status: ModelStringInput
+  remarkReq: ModelStringInput
+  reqName: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelEmpRequisitionFilterInput]
+  or: [ModelEmpRequisitionFilterInput]
+  not: ModelEmpRequisitionFilterInput
+}
+
+input ModelEmpRequisitionConditionInput {
+  department: ModelStringInput
+  justification: ModelStringInput
+  project: ModelStringInput
+  position: ModelStringInput
+  quantity: ModelIntInput
+  qualification: ModelStringInput
+  reasonForReq: ModelStringInput
+  replacementFor: ModelStringInput
+  tentativeDate: ModelStringInput
+  status: ModelStringInput
+  remarkReq: ModelStringInput
+  reqName: ModelStringInput
+  and: [ModelEmpRequisitionConditionInput]
+  or: [ModelEmpRequisitionConditionInput]
+  not: ModelEmpRequisitionConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateEmpRequisitionInput {
+  id: ID
+  department: String
+  justification: String
+  project: String
+  position: String
+  quantity: Int
+  qualification: String
+  reasonForReq: String
+  replacementFor: String
+  tentativeDate: String
+  status: String
+  remarkReq: String
+  reqName: String
+}
+
+input UpdateEmpRequisitionInput {
+  id: ID!
+  department: String
+  justification: String
+  project: String
+  position: String
+  quantity: Int
+  qualification: String
+  reasonForReq: String
+  replacementFor: String
+  tentativeDate: String
+  status: String
+  remarkReq: String
+  reqName: String
+}
+
+input DeleteEmpRequisitionInput {
+  id: ID!
+}
+
+input ModelSubscriptionEmpRequisitionFilterInput {
+  id: ModelSubscriptionIDInput
+  department: ModelSubscriptionStringInput
+  justification: ModelSubscriptionStringInput
+  project: ModelSubscriptionStringInput
+  position: ModelSubscriptionStringInput
+  quantity: ModelSubscriptionIntInput
+  qualification: ModelSubscriptionStringInput
+  reasonForReq: ModelSubscriptionStringInput
+  replacementFor: ModelSubscriptionStringInput
+  tentativeDate: ModelSubscriptionStringInput
+  status: ModelSubscriptionStringInput
+  remarkReq: ModelSubscriptionStringInput
+  reqName: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionEmpRequisitionFilterInput]
+  or: [ModelSubscriptionEmpRequisitionFilterInput]
+}
+
+type ModelWeldingInfoConnection {
+  items: [WeldingInfo]!
+  nextToken: String
+}
+
+input ModelWeldingInfoFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  department: ModelStringInput
+  diameterRange: ModelStringInput
+  empBadgeNo: ModelStringInput
+  empName: ModelStringInput
+  fillerMetal: ModelStringInput
+  position: ModelStringInput
+  thicknessRange: ModelStringInput
+  weldingStampNor: ModelStringInput
+  wpsNumber: ModelStringInput
+  weldingProcess: ModelStringInput
+  weldingPosition: ModelStringInput
+  WQExpiry: ModelStringInput
+  WQRemarks: ModelStringInput
+  weldingUpload: ModelStringInput
+  WQRNo: ModelStringInput
+  weldingCode: ModelStringInput
+  weldingMaterial: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelWeldingInfoFilterInput]
+  or: [ModelWeldingInfoFilterInput]
+  not: ModelWeldingInfoFilterInput
+}
+
+input ModelWeldingInfoConditionInput {
+  empID: ModelStringInput
+  department: ModelStringInput
+  diameterRange: ModelStringInput
+  empBadgeNo: ModelStringInput
+  empName: ModelStringInput
+  fillerMetal: ModelStringInput
+  position: ModelStringInput
+  thicknessRange: ModelStringInput
+  weldingStampNor: ModelStringInput
+  wpsNumber: ModelStringInput
+  weldingProcess: ModelStringInput
+  weldingPosition: ModelStringInput
+  WQExpiry: ModelStringInput
+  WQRemarks: ModelStringInput
+  weldingUpload: ModelStringInput
+  WQRNo: ModelStringInput
+  weldingCode: ModelStringInput
+  weldingMaterial: ModelStringInput
+  and: [ModelWeldingInfoConditionInput]
+  or: [ModelWeldingInfoConditionInput]
+  not: ModelWeldingInfoConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateWeldingInfoInput {
+  id: ID
+  empID: String!
+  department: String
+  diameterRange: String
+  empBadgeNo: String
+  empName: String
+  fillerMetal: String
+  position: String
+  thicknessRange: String
+  weldingStampNor: String
+  wpsNumber: String
+  weldingProcess: String
+  weldingPosition: String
+  WQExpiry: String
+  WQRemarks: String
+  weldingUpload: [AWSJSON]
+  WQRNo: String
+  weldingCode: String
+  weldingMaterial: String
+}
+
+input UpdateWeldingInfoInput {
+  id: ID!
+  empID: String
+  department: String
+  diameterRange: String
+  empBadgeNo: String
+  empName: String
+  fillerMetal: String
+  position: String
+  thicknessRange: String
+  weldingStampNor: String
+  wpsNumber: String
+  weldingProcess: String
+  weldingPosition: String
+  WQExpiry: String
+  WQRemarks: String
+  weldingUpload: [AWSJSON]
+  WQRNo: String
+  weldingCode: String
+  weldingMaterial: String
+}
+
+input DeleteWeldingInfoInput {
+  id: ID!
+}
+
+input ModelSubscriptionWeldingInfoFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  department: ModelSubscriptionStringInput
+  diameterRange: ModelSubscriptionStringInput
+  empBadgeNo: ModelSubscriptionStringInput
+  empName: ModelSubscriptionStringInput
+  fillerMetal: ModelSubscriptionStringInput
+  position: ModelSubscriptionStringInput
+  thicknessRange: ModelSubscriptionStringInput
+  weldingStampNor: ModelSubscriptionStringInput
+  wpsNumber: ModelSubscriptionStringInput
+  weldingProcess: ModelSubscriptionStringInput
+  weldingPosition: ModelSubscriptionStringInput
+  WQExpiry: ModelSubscriptionStringInput
+  WQRemarks: ModelSubscriptionStringInput
+  weldingUpload: ModelSubscriptionStringInput
+  WQRNo: ModelSubscriptionStringInput
+  weldingCode: ModelSubscriptionStringInput
+  weldingMaterial: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionWeldingInfoFilterInput]
+  or: [ModelSubscriptionWeldingInfoFilterInput]
+}
+
+type ModelTrainingReqConnection {
+  items: [TrainingReq]!
+  nextToken: String
+}
+
+input ModelTrainingReqFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  MRNo: ModelStringInput
+  medicalName: ModelStringInput
+  medicalExpiry: ModelStringInput
+  medicalAppointDate: ModelStringInput
+  medicalReport: ModelStringInput
+  purchaseONo: ModelStringInput
+  traineeCourseCode: ModelStringInput
+  traineeCourseName: ModelStringInput
+  traineeCompany: ModelStringInput
+  traineeSD: ModelStringInput
+  traineeED: ModelStringInput
+  traineeStatus: ModelStringInput
+  traineeCourseFee: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelTrainingReqFilterInput]
+  or: [ModelTrainingReqFilterInput]
+  not: ModelTrainingReqFilterInput
+}
+
+input ModelTrainingReqConditionInput {
+  empID: ModelStringInput
+  MRNo: ModelStringInput
+  medicalName: ModelStringInput
+  medicalExpiry: ModelStringInput
+  medicalAppointDate: ModelStringInput
+  medicalReport: ModelStringInput
+  purchaseONo: ModelStringInput
+  traineeCourseCode: ModelStringInput
+  traineeCourseName: ModelStringInput
+  traineeCompany: ModelStringInput
+  traineeSD: ModelStringInput
+  traineeED: ModelStringInput
+  traineeStatus: ModelStringInput
+  traineeCourseFee: ModelStringInput
+  and: [ModelTrainingReqConditionInput]
+  or: [ModelTrainingReqConditionInput]
+  not: ModelTrainingReqConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateTrainingReqInput {
+  id: ID
+  empID: String!
+  MRNo: String
+  medicalName: String
+  medicalExpiry: String
+  medicalAppointDate: String
+  medicalReport: [AWSJSON]
+  purchaseONo: String
+  traineeCourseCode: String
+  traineeCourseName: String
+  traineeCompany: String
+  traineeSD: String
+  traineeED: String
+  traineeStatus: String
+  traineeCourseFee: String
+}
+
+input UpdateTrainingReqInput {
+  id: ID!
+  empID: String
+  MRNo: String
+  medicalName: String
+  medicalExpiry: String
+  medicalAppointDate: String
+  medicalReport: [AWSJSON]
+  purchaseONo: String
+  traineeCourseCode: String
+  traineeCourseName: String
+  traineeCompany: String
+  traineeSD: String
+  traineeED: String
+  traineeStatus: String
+  traineeCourseFee: String
+}
+
+input DeleteTrainingReqInput {
+  id: ID!
+}
+
+input ModelSubscriptionTrainingReqFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  MRNo: ModelSubscriptionStringInput
+  medicalName: ModelSubscriptionStringInput
+  medicalExpiry: ModelSubscriptionStringInput
+  medicalAppointDate: ModelSubscriptionStringInput
+  medicalReport: ModelSubscriptionStringInput
+  purchaseONo: ModelSubscriptionStringInput
+  traineeCourseCode: ModelSubscriptionStringInput
+  traineeCourseName: ModelSubscriptionStringInput
+  traineeCompany: ModelSubscriptionStringInput
+  traineeSD: ModelSubscriptionStringInput
+  traineeED: ModelSubscriptionStringInput
+  traineeStatus: ModelSubscriptionStringInput
+  traineeCourseFee: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionTrainingReqFilterInput]
+  or: [ModelSubscriptionTrainingReqFilterInput]
+}
+
+type ModelTrainingCertificatesConnection {
+  items: [TrainingCertificates]!
+  nextToken: String
+}
+
+input ModelTrainingCertificatesFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  courseCode: ModelStringInput
+  courseName: ModelStringInput
+  company: ModelStringInput
+  certifiExpiry: ModelStringInput
+  eCertifiDate: ModelStringInput
+  trainingUpCertifi: ModelStringInput
+  orgiCertifiDate: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelTrainingCertificatesFilterInput]
+  or: [ModelTrainingCertificatesFilterInput]
+  not: ModelTrainingCertificatesFilterInput
+}
+
+input ModelTrainingCertificatesConditionInput {
+  empID: ModelStringInput
+  courseCode: ModelStringInput
+  courseName: ModelStringInput
+  company: ModelStringInput
+  certifiExpiry: ModelStringInput
+  eCertifiDate: ModelStringInput
+  trainingUpCertifi: ModelStringInput
+  orgiCertifiDate: ModelStringInput
+  and: [ModelTrainingCertificatesConditionInput]
+  or: [ModelTrainingCertificatesConditionInput]
+  not: ModelTrainingCertificatesConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateTrainingCertificatesInput {
+  id: ID
+  empID: String!
+  courseCode: [String]
+  courseName: [String]
+  company: [String]
+  certifiExpiry: [String]
+  eCertifiDate: [String]
+  trainingUpCertifi: [AWSJSON]
+  orgiCertifiDate: [String]
+}
+
+input UpdateTrainingCertificatesInput {
+  id: ID!
+  empID: String
+  courseCode: [String]
+  courseName: [String]
+  company: [String]
+  certifiExpiry: [String]
+  eCertifiDate: [String]
+  trainingUpCertifi: [AWSJSON]
+  orgiCertifiDate: [String]
+}
+
+input DeleteTrainingCertificatesInput {
+  id: ID!
+}
+
+input ModelSubscriptionTrainingCertificatesFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  courseCode: ModelSubscriptionStringInput
+  courseName: ModelSubscriptionStringInput
+  company: ModelSubscriptionStringInput
+  certifiExpiry: ModelSubscriptionStringInput
+  eCertifiDate: ModelSubscriptionStringInput
+  trainingUpCertifi: ModelSubscriptionStringInput
+  orgiCertifiDate: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionTrainingCertificatesFilterInput]
+  or: [ModelSubscriptionTrainingCertificatesFilterInput]
+}
+
+type ModelAddCourseConnection {
+  items: [AddCourse]!
+  nextToken: String
+}
+
+input ModelAddCourseFilterInput {
+  id: ModelIDInput
+  courseSelect: ModelStringInput
+  courseName: ModelStringInput
+  company: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelAddCourseFilterInput]
+  or: [ModelAddCourseFilterInput]
+  not: ModelAddCourseFilterInput
+}
+
+input ModelAddCourseConditionInput {
+  courseSelect: ModelStringInput
+  courseName: ModelStringInput
+  company: ModelStringInput
+  and: [ModelAddCourseConditionInput]
+  or: [ModelAddCourseConditionInput]
+  not: ModelAddCourseConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateAddCourseInput {
+  id: ID
+  courseSelect: String
+  courseName: [String]
+  company: [String]
+}
+
+input UpdateAddCourseInput {
+  id: ID!
+  courseSelect: String
+  courseName: [String]
+  company: [String]
+}
+
+input DeleteAddCourseInput {
+  id: ID!
+}
+
+input ModelSubscriptionAddCourseFilterInput {
+  id: ModelSubscriptionIDInput
+  courseSelect: ModelSubscriptionStringInput
+  courseName: ModelSubscriptionStringInput
+  company: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionAddCourseFilterInput]
+  or: [ModelSubscriptionAddCourseFilterInput]
+}
+
+type ModelEmpDepInsuranceConnection {
+  items: [EmpDepInsurance]!
+  nextToken: String
+}
+
+input ModelEmpDepInsuranceFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  depInsurance: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelEmpDepInsuranceFilterInput]
+  or: [ModelEmpDepInsuranceFilterInput]
+  not: ModelEmpDepInsuranceFilterInput
+}
+
+input ModelEmpDepInsuranceConditionInput {
+  empID: ModelStringInput
+  depInsurance: ModelStringInput
+  and: [ModelEmpDepInsuranceConditionInput]
+  or: [ModelEmpDepInsuranceConditionInput]
+  not: ModelEmpDepInsuranceConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateEmpDepInsuranceInput {
+  id: ID
+  empID: String
+  depInsurance: [AWSJSON]
+}
+
+input UpdateEmpDepInsuranceInput {
+  id: ID!
+  empID: String
+  depInsurance: [AWSJSON]
+}
+
+input DeleteEmpDepInsuranceInput {
+  id: ID!
+}
+
+input ModelSubscriptionEmpDepInsuranceFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  depInsurance: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionEmpDepInsuranceFilterInput]
+  or: [ModelSubscriptionEmpDepInsuranceFilterInput]
+}
+
+type ModelEmpInsuranceConnection {
+  items: [EmpInsurance]!
+  nextToken: String
+}
+
+input ModelEmpInsuranceFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  groupIns: ModelStringInput
+  groupInsEffectDate: ModelStringInput
+  groupInsEndDate: ModelStringInput
+  empStatusType: ModelStringInput
+  workmenCompNo: ModelStringInput
+  travelIns: ModelStringInput
+  accidentIns: ModelStringInput
+  empInsUpload: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelEmpInsuranceFilterInput]
+  or: [ModelEmpInsuranceFilterInput]
+  not: ModelEmpInsuranceFilterInput
+}
+
+input ModelEmpInsuranceConditionInput {
+  empID: ModelStringInput
+  groupIns: ModelStringInput
+  groupInsEffectDate: ModelStringInput
+  groupInsEndDate: ModelStringInput
+  empStatusType: ModelStringInput
+  workmenCompNo: ModelStringInput
+  travelIns: ModelStringInput
+  accidentIns: ModelStringInput
+  empInsUpload: ModelStringInput
+  and: [ModelEmpInsuranceConditionInput]
+  or: [ModelEmpInsuranceConditionInput]
+  not: ModelEmpInsuranceConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateEmpInsuranceInput {
+  id: ID
+  empID: String!
+  groupIns: [String]
+  groupInsEffectDate: [String]
+  groupInsEndDate: [String]
+  empStatusType: String
+  workmenCompNo: String
+  travelIns: [String]
+  accidentIns: [String]
+  empInsUpload: [AWSJSON]
+}
+
+input UpdateEmpInsuranceInput {
+  id: ID!
+  empID: String
+  groupIns: [String]
+  groupInsEffectDate: [String]
+  groupInsEndDate: [String]
+  empStatusType: String
+  workmenCompNo: String
+  travelIns: [String]
+  accidentIns: [String]
+  empInsUpload: [AWSJSON]
+}
+
+input DeleteEmpInsuranceInput {
+  id: ID!
+}
+
+input ModelSubscriptionEmpInsuranceFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  groupIns: ModelSubscriptionStringInput
+  groupInsEffectDate: ModelSubscriptionStringInput
+  groupInsEndDate: ModelSubscriptionStringInput
+  empStatusType: ModelSubscriptionStringInput
+  workmenCompNo: ModelSubscriptionStringInput
+  travelIns: ModelSubscriptionStringInput
+  accidentIns: ModelSubscriptionStringInput
+  empInsUpload: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionEmpInsuranceFilterInput]
+  or: [ModelSubscriptionEmpInsuranceFilterInput]
+}
+
+type ModelSawpDetailsConnection {
+  items: [SawpDetails]!
+  nextToken: String
+}
+
+input ModelSawpDetailsFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  sawpEmpLtrReq: ModelStringInput
+  sawpEmpLtrReci: ModelStringInput
+  sawpEmpUpload: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelSawpDetailsFilterInput]
+  or: [ModelSawpDetailsFilterInput]
+  not: ModelSawpDetailsFilterInput
+}
+
+input ModelSawpDetailsConditionInput {
+  empID: ModelStringInput
+  sawpEmpLtrReq: ModelStringInput
+  sawpEmpLtrReci: ModelStringInput
+  sawpEmpUpload: ModelStringInput
+  and: [ModelSawpDetailsConditionInput]
+  or: [ModelSawpDetailsConditionInput]
+  not: ModelSawpDetailsConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateSawpDetailsInput {
+  id: ID
+  empID: String!
+  sawpEmpLtrReq: [String]
+  sawpEmpLtrReci: [String]
+  sawpEmpUpload: [AWSJSON]
+}
+
+input UpdateSawpDetailsInput {
+  id: ID!
+  empID: String
+  sawpEmpLtrReq: [String]
+  sawpEmpLtrReci: [String]
+  sawpEmpUpload: [AWSJSON]
+}
+
+input DeleteSawpDetailsInput {
+  id: ID!
+}
+
+input ModelSubscriptionSawpDetailsFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  sawpEmpLtrReq: ModelSubscriptionStringInput
+  sawpEmpLtrReci: ModelSubscriptionStringInput
+  sawpEmpUpload: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionSawpDetailsFilterInput]
+  or: [ModelSubscriptionSawpDetailsFilterInput]
+}
+
+type ModelDNDetailsConnection {
+  items: [DNDetails]!
+  nextToken: String
+}
+
+input ModelDNDetailsFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  doeEmpSubmit: ModelStringInput
+  doeEmpApproval: ModelStringInput
+  doeEmpValid: ModelStringInput
+  doeEmpRefNo: ModelStringInput
+  doeEmpUpload: ModelStringInput
+  permitType: ModelStringInput
+  nlmsEmpSubmit: ModelStringInput
+  nlmsEmpSubmitRefNo: ModelStringInput
+  nlmsEmpApproval: ModelStringInput
+  nlmsRefNo: ModelStringInput
+  nlmsEmpValid: ModelStringInput
+  nlmsEmpUpload: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelDNDetailsFilterInput]
+  or: [ModelDNDetailsFilterInput]
+  not: ModelDNDetailsFilterInput
+}
+
+input ModelDNDetailsConditionInput {
+  empID: ModelStringInput
+  doeEmpSubmit: ModelStringInput
+  doeEmpApproval: ModelStringInput
+  doeEmpValid: ModelStringInput
+  doeEmpRefNo: ModelStringInput
+  doeEmpUpload: ModelStringInput
+  permitType: ModelStringInput
+  nlmsEmpSubmit: ModelStringInput
+  nlmsEmpSubmitRefNo: ModelStringInput
+  nlmsEmpApproval: ModelStringInput
+  nlmsRefNo: ModelStringInput
+  nlmsEmpValid: ModelStringInput
+  nlmsEmpUpload: ModelStringInput
+  and: [ModelDNDetailsConditionInput]
+  or: [ModelDNDetailsConditionInput]
+  not: ModelDNDetailsConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateDNDetailsInput {
+  id: ID
+  empID: String!
+  doeEmpSubmit: [String]
+  doeEmpApproval: [String]
+  doeEmpValid: [String]
+  doeEmpRefNo: [String]
+  doeEmpUpload: [AWSJSON]
+  permitType: [String]
+  nlmsEmpSubmit: [String]
+  nlmsEmpSubmitRefNo: [String]
+  nlmsEmpApproval: [String]
+  nlmsRefNo: [String]
+  nlmsEmpValid: [String]
+  nlmsEmpUpload: [AWSJSON]
+}
+
+input UpdateDNDetailsInput {
+  id: ID!
+  empID: String
+  doeEmpSubmit: [String]
+  doeEmpApproval: [String]
+  doeEmpValid: [String]
+  doeEmpRefNo: [String]
+  doeEmpUpload: [AWSJSON]
+  permitType: [String]
+  nlmsEmpSubmit: [String]
+  nlmsEmpSubmitRefNo: [String]
+  nlmsEmpApproval: [String]
+  nlmsRefNo: [String]
+  nlmsEmpValid: [String]
+  nlmsEmpUpload: [AWSJSON]
+}
+
+input DeleteDNDetailsInput {
+  id: ID!
+}
+
+input ModelSubscriptionDNDetailsFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  doeEmpSubmit: ModelSubscriptionStringInput
+  doeEmpApproval: ModelSubscriptionStringInput
+  doeEmpValid: ModelSubscriptionStringInput
+  doeEmpRefNo: ModelSubscriptionStringInput
+  doeEmpUpload: ModelSubscriptionStringInput
+  permitType: ModelSubscriptionStringInput
+  nlmsEmpSubmit: ModelSubscriptionStringInput
+  nlmsEmpSubmitRefNo: ModelSubscriptionStringInput
+  nlmsEmpApproval: ModelSubscriptionStringInput
+  nlmsRefNo: ModelSubscriptionStringInput
+  nlmsEmpValid: ModelSubscriptionStringInput
+  nlmsEmpUpload: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionDNDetailsFilterInput]
+  or: [ModelSubscriptionDNDetailsFilterInput]
+}
+
+type ModelBJLDetailsConnection {
+  items: [BJLDetails]!
+  nextToken: String
+}
+
+input ModelBJLDetailsFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  bankSubmit: ModelStringInput
+  bankRece: ModelStringInput
+  bankRefNo: ModelStringInput
+  bankAmt: ModelStringInput
+  bankValid: ModelStringInput
+  bankEndorse: ModelStringInput
+  bankEmpUpload: ModelStringInput
+  tbaPurchase: ModelStringInput
+  jitpaAmt: ModelStringInput
+  jpValid: ModelStringInput
+  jpEndorse: ModelStringInput
+  jpEmpUpload: ModelStringInput
+  lbrReceiptNo: ModelStringInput
+  lbrDepoAmt: ModelStringInput
+  lbrDepoSubmit: ModelStringInput
+  lbrDepoUpload: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelBJLDetailsFilterInput]
+  or: [ModelBJLDetailsFilterInput]
+  not: ModelBJLDetailsFilterInput
+}
+
+input ModelBJLDetailsConditionInput {
+  empID: ModelStringInput
+  bankSubmit: ModelStringInput
+  bankRece: ModelStringInput
+  bankRefNo: ModelStringInput
+  bankAmt: ModelStringInput
+  bankValid: ModelStringInput
+  bankEndorse: ModelStringInput
+  bankEmpUpload: ModelStringInput
+  tbaPurchase: ModelStringInput
+  jitpaAmt: ModelStringInput
+  jpValid: ModelStringInput
+  jpEndorse: ModelStringInput
+  jpEmpUpload: ModelStringInput
+  lbrReceiptNo: ModelStringInput
+  lbrDepoAmt: ModelStringInput
+  lbrDepoSubmit: ModelStringInput
+  lbrDepoUpload: ModelStringInput
+  and: [ModelBJLDetailsConditionInput]
+  or: [ModelBJLDetailsConditionInput]
+  not: ModelBJLDetailsConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateBJLDetailsInput {
+  id: ID
+  empID: String!
+  bankSubmit: [String]
+  bankRece: [String]
+  bankRefNo: [String]
+  bankAmt: [String]
+  bankValid: [String]
+  bankEndorse: [String]
+  bankEmpUpload: [AWSJSON]
+  tbaPurchase: [String]
+  jitpaAmt: [String]
+  jpValid: [String]
+  jpEndorse: [String]
+  jpEmpUpload: [AWSJSON]
+  lbrReceiptNo: [String]
+  lbrDepoAmt: [String]
+  lbrDepoSubmit: [String]
+  lbrDepoUpload: [AWSJSON]
+}
+
+input UpdateBJLDetailsInput {
+  id: ID!
+  empID: String
+  bankSubmit: [String]
+  bankRece: [String]
+  bankRefNo: [String]
+  bankAmt: [String]
+  bankValid: [String]
+  bankEndorse: [String]
+  bankEmpUpload: [AWSJSON]
+  tbaPurchase: [String]
+  jitpaAmt: [String]
+  jpValid: [String]
+  jpEndorse: [String]
+  jpEmpUpload: [AWSJSON]
+  lbrReceiptNo: [String]
+  lbrDepoAmt: [String]
+  lbrDepoSubmit: [String]
+  lbrDepoUpload: [AWSJSON]
+}
+
+input DeleteBJLDetailsInput {
+  id: ID!
+}
+
+input ModelSubscriptionBJLDetailsFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  bankSubmit: ModelSubscriptionStringInput
+  bankRece: ModelSubscriptionStringInput
+  bankRefNo: ModelSubscriptionStringInput
+  bankAmt: ModelSubscriptionStringInput
+  bankValid: ModelSubscriptionStringInput
+  bankEndorse: ModelSubscriptionStringInput
+  bankEmpUpload: ModelSubscriptionStringInput
+  tbaPurchase: ModelSubscriptionStringInput
+  jitpaAmt: ModelSubscriptionStringInput
+  jpValid: ModelSubscriptionStringInput
+  jpEndorse: ModelSubscriptionStringInput
+  jpEmpUpload: ModelSubscriptionStringInput
+  lbrReceiptNo: ModelSubscriptionStringInput
+  lbrDepoAmt: ModelSubscriptionStringInput
+  lbrDepoSubmit: ModelSubscriptionStringInput
+  lbrDepoUpload: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionBJLDetailsFilterInput]
+  or: [ModelSubscriptionBJLDetailsFilterInput]
+}
+
+type ModelPassportValidConnection {
+  items: [PassportValid]!
+  nextToken: String
+}
+
+input ModelPassportValidFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  ppLocation: ModelStringInput
+  arrivStampUpload: ModelStringInput
+  immigEmpUpload: ModelStringInput
+  reEntryUpload: ModelStringInput
+  arrivStampExp: ModelStringInput
+  immigRefNo: ModelStringInput
+  ppSubmit: ModelStringInput
+  empPassExp: ModelStringInput
+  empPassStatus: ModelStringInput
+  airTktStatus: ModelStringInput
+  reEntryVisa: ModelStringInput
+  immigApproval: ModelStringInput
+  reEntryVisaExp: ModelStringInput
+  remarkImmig: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelPassportValidFilterInput]
+  or: [ModelPassportValidFilterInput]
+  not: ModelPassportValidFilterInput
+}
+
+input ModelPassportValidConditionInput {
+  empID: ModelStringInput
+  ppLocation: ModelStringInput
+  arrivStampUpload: ModelStringInput
+  immigEmpUpload: ModelStringInput
+  reEntryUpload: ModelStringInput
+  arrivStampExp: ModelStringInput
+  immigRefNo: ModelStringInput
+  ppSubmit: ModelStringInput
+  empPassExp: ModelStringInput
+  empPassStatus: ModelStringInput
+  airTktStatus: ModelStringInput
+  reEntryVisa: ModelStringInput
+  immigApproval: ModelStringInput
+  reEntryVisaExp: ModelStringInput
+  remarkImmig: ModelStringInput
+  and: [ModelPassportValidConditionInput]
+  or: [ModelPassportValidConditionInput]
+  not: ModelPassportValidConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreatePassportValidInput {
+  id: ID
+  empID: String!
+  ppLocation: [String]
+  arrivStampUpload: [AWSJSON]
+  immigEmpUpload: [AWSJSON]
+  reEntryUpload: [AWSJSON]
+  arrivStampExp: [String]
+  immigRefNo: String
+  ppSubmit: [String]
+  empPassExp: [String]
+  empPassStatus: [String]
+  airTktStatus: [String]
+  reEntryVisa: [String]
+  immigApproval: [String]
+  reEntryVisaExp: [String]
+  remarkImmig: [String]
+}
+
+input UpdatePassportValidInput {
+  id: ID!
+  empID: String
+  ppLocation: [String]
+  arrivStampUpload: [AWSJSON]
+  immigEmpUpload: [AWSJSON]
+  reEntryUpload: [AWSJSON]
+  arrivStampExp: [String]
+  immigRefNo: String
+  ppSubmit: [String]
+  empPassExp: [String]
+  empPassStatus: [String]
+  airTktStatus: [String]
+  reEntryVisa: [String]
+  immigApproval: [String]
+  reEntryVisaExp: [String]
+  remarkImmig: [String]
+}
+
+input DeletePassportValidInput {
+  id: ID!
+}
+
+input ModelSubscriptionPassportValidFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  ppLocation: ModelSubscriptionStringInput
+  arrivStampUpload: ModelSubscriptionStringInput
+  immigEmpUpload: ModelSubscriptionStringInput
+  reEntryUpload: ModelSubscriptionStringInput
+  arrivStampExp: ModelSubscriptionStringInput
+  immigRefNo: ModelSubscriptionStringInput
+  ppSubmit: ModelSubscriptionStringInput
+  empPassExp: ModelSubscriptionStringInput
+  empPassStatus: ModelSubscriptionStringInput
+  airTktStatus: ModelSubscriptionStringInput
+  reEntryVisa: ModelSubscriptionStringInput
+  immigApproval: ModelSubscriptionStringInput
+  reEntryVisaExp: ModelSubscriptionStringInput
+  remarkImmig: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionPassportValidFilterInput]
+  or: [ModelSubscriptionPassportValidFilterInput]
+}
+
+type ModelWPTrackingConnection {
+  items: [WPTracking]!
+  nextToken: String
+}
+
+input ModelWPTrackingFilterInput {
+  id: ModelIDInput
+  tempID: ModelStringInput
+  supportletterReqDate: ModelStringInput
+  supportletterReceiveDate: ModelStringInput
+  letterfile: ModelStringInput
+  doesubmitdate: ModelStringInput
+  doeapprovedate: ModelStringInput
+  doeexpirydate: ModelStringInput
+  doefile: ModelStringInput
+  nlmssubmitdate: ModelStringInput
+  submissionrefrenceno: ModelStringInput
+  nlmsapprovedate: ModelStringInput
+  ldreferenceno: ModelStringInput
+  nlmsexpirydate: ModelStringInput
+  nlmsfile: ModelStringInput
+  bgsubmitdate: ModelStringInput
+  bgreceivedate: ModelStringInput
+  referenceno: ModelStringInput
+  bgamount: ModelStringInput
+  bgexpirydate: ModelStringInput
+  bgfile: ModelStringInput
+  tbapurchasedate: ModelStringInput
+  jitpaamount: ModelStringInput
+  jitpaexpirydate: ModelStringInput
+  receiptno: ModelStringInput
+  depositamount: ModelStringInput
+  submitdateendorsement: ModelStringInput
+  jitpafile: ModelStringInput
+  immbdno: ModelStringInput
+  docsubmitdate: ModelStringInput
+  visaapprovedate: ModelStringInput
+  visareferenceno: ModelStringInput
+  visaFile: ModelStringInput
+  departuredate: ModelStringInput
+  arrivaldate: ModelStringInput
+  cityname: ModelStringInput
+  airfare: ModelStringInput
+  airticketfile: ModelStringInput
+  agentname: ModelStringInput
+  mobSignDate: ModelStringInput
+  mobFile: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelWPTrackingFilterInput]
+  or: [ModelWPTrackingFilterInput]
+  not: ModelWPTrackingFilterInput
+}
+
+input ModelWPTrackingConditionInput {
+  tempID: ModelStringInput
+  supportletterReqDate: ModelStringInput
+  supportletterReceiveDate: ModelStringInput
+  letterfile: ModelStringInput
+  doesubmitdate: ModelStringInput
+  doeapprovedate: ModelStringInput
+  doeexpirydate: ModelStringInput
+  doefile: ModelStringInput
+  nlmssubmitdate: ModelStringInput
+  submissionrefrenceno: ModelStringInput
+  nlmsapprovedate: ModelStringInput
+  ldreferenceno: ModelStringInput
+  nlmsexpirydate: ModelStringInput
+  nlmsfile: ModelStringInput
+  bgsubmitdate: ModelStringInput
+  bgreceivedate: ModelStringInput
+  referenceno: ModelStringInput
+  bgamount: ModelStringInput
+  bgexpirydate: ModelStringInput
+  bgfile: ModelStringInput
+  tbapurchasedate: ModelStringInput
+  jitpaamount: ModelStringInput
+  jitpaexpirydate: ModelStringInput
+  receiptno: ModelStringInput
+  depositamount: ModelStringInput
+  submitdateendorsement: ModelStringInput
+  jitpafile: ModelStringInput
+  immbdno: ModelStringInput
+  docsubmitdate: ModelStringInput
+  visaapprovedate: ModelStringInput
+  visareferenceno: ModelStringInput
+  visaFile: ModelStringInput
+  departuredate: ModelStringInput
+  arrivaldate: ModelStringInput
+  cityname: ModelStringInput
+  airfare: ModelStringInput
+  airticketfile: ModelStringInput
+  agentname: ModelStringInput
+  mobSignDate: ModelStringInput
+  mobFile: ModelStringInput
+  and: [ModelWPTrackingConditionInput]
+  or: [ModelWPTrackingConditionInput]
+  not: ModelWPTrackingConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateWPTrackingInput {
+  id: ID
+  tempID: String!
+  supportletterReqDate: String
+  supportletterReceiveDate: String
+  letterfile: String
+  doesubmitdate: String
+  doeapprovedate: String
+  doeexpirydate: String
+  doefile: String
+  nlmssubmitdate: String
+  submissionrefrenceno: String
+  nlmsapprovedate: String
+  ldreferenceno: String
+  nlmsexpirydate: String
+  nlmsfile: String
+  bgsubmitdate: String
+  bgreceivedate: String
+  referenceno: String
+  bgamount: String
+  bgexpirydate: String
+  bgfile: String
+  tbapurchasedate: String
+  jitpaamount: String
+  jitpaexpirydate: String
+  receiptno: String
+  depositamount: String
+  submitdateendorsement: String
+  jitpafile: String
+  immbdno: String
+  docsubmitdate: String
+  visaapprovedate: String
+  visareferenceno: String
+  visaFile: String
+  departuredate: String
+  arrivaldate: String
+  cityname: String
+  airfare: String
+  airticketfile: String
+  agentname: String
+  mobSignDate: String
+  mobFile: String
+}
+
+input UpdateWPTrackingInput {
+  id: ID!
+  tempID: String
+  supportletterReqDate: String
+  supportletterReceiveDate: String
+  letterfile: String
+  doesubmitdate: String
+  doeapprovedate: String
+  doeexpirydate: String
+  doefile: String
+  nlmssubmitdate: String
+  submissionrefrenceno: String
+  nlmsapprovedate: String
+  ldreferenceno: String
+  nlmsexpirydate: String
+  nlmsfile: String
+  bgsubmitdate: String
+  bgreceivedate: String
+  referenceno: String
+  bgamount: String
+  bgexpirydate: String
+  bgfile: String
+  tbapurchasedate: String
+  jitpaamount: String
+  jitpaexpirydate: String
+  receiptno: String
+  depositamount: String
+  submitdateendorsement: String
+  jitpafile: String
+  immbdno: String
+  docsubmitdate: String
+  visaapprovedate: String
+  visareferenceno: String
+  visaFile: String
+  departuredate: String
+  arrivaldate: String
+  cityname: String
+  airfare: String
+  airticketfile: String
+  agentname: String
+  mobSignDate: String
+  mobFile: String
+}
+
+input DeleteWPTrackingInput {
+  id: ID!
+}
+
+input ModelSubscriptionWPTrackingFilterInput {
+  id: ModelSubscriptionIDInput
+  tempID: ModelSubscriptionStringInput
+  supportletterReqDate: ModelSubscriptionStringInput
+  supportletterReceiveDate: ModelSubscriptionStringInput
+  letterfile: ModelSubscriptionStringInput
+  doesubmitdate: ModelSubscriptionStringInput
+  doeapprovedate: ModelSubscriptionStringInput
+  doeexpirydate: ModelSubscriptionStringInput
+  doefile: ModelSubscriptionStringInput
+  nlmssubmitdate: ModelSubscriptionStringInput
+  submissionrefrenceno: ModelSubscriptionStringInput
+  nlmsapprovedate: ModelSubscriptionStringInput
+  ldreferenceno: ModelSubscriptionStringInput
+  nlmsexpirydate: ModelSubscriptionStringInput
+  nlmsfile: ModelSubscriptionStringInput
+  bgsubmitdate: ModelSubscriptionStringInput
+  bgreceivedate: ModelSubscriptionStringInput
+  referenceno: ModelSubscriptionStringInput
+  bgamount: ModelSubscriptionStringInput
+  bgexpirydate: ModelSubscriptionStringInput
+  bgfile: ModelSubscriptionStringInput
+  tbapurchasedate: ModelSubscriptionStringInput
+  jitpaamount: ModelSubscriptionStringInput
+  jitpaexpirydate: ModelSubscriptionStringInput
+  receiptno: ModelSubscriptionStringInput
+  depositamount: ModelSubscriptionStringInput
+  submitdateendorsement: ModelSubscriptionStringInput
+  jitpafile: ModelSubscriptionStringInput
+  immbdno: ModelSubscriptionStringInput
+  docsubmitdate: ModelSubscriptionStringInput
+  visaapprovedate: ModelSubscriptionStringInput
+  visareferenceno: ModelSubscriptionStringInput
+  visaFile: ModelSubscriptionStringInput
+  departuredate: ModelSubscriptionStringInput
+  arrivaldate: ModelSubscriptionStringInput
+  cityname: ModelSubscriptionStringInput
+  airfare: ModelSubscriptionStringInput
+  airticketfile: ModelSubscriptionStringInput
+  agentname: ModelSubscriptionStringInput
+  mobSignDate: ModelSubscriptionStringInput
+  mobFile: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionWPTrackingFilterInput]
+  or: [ModelSubscriptionWPTrackingFilterInput]
+}
+
+type ModelEmployeeNonLocalAccoConnection {
+  items: [EmployeeNonLocalAcco]!
+  nextToken: String
+}
+
+input ModelEmployeeNonLocalAccoFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  accommodation: ModelStringInput
+  accommodationAddress: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelEmployeeNonLocalAccoFilterInput]
+  or: [ModelEmployeeNonLocalAccoFilterInput]
+  not: ModelEmployeeNonLocalAccoFilterInput
+}
+
+input ModelEmployeeNonLocalAccoConditionInput {
+  empID: ModelStringInput
+  accommodation: ModelStringInput
+  accommodationAddress: ModelStringInput
+  and: [ModelEmployeeNonLocalAccoConditionInput]
+  or: [ModelEmployeeNonLocalAccoConditionInput]
+  not: ModelEmployeeNonLocalAccoConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateEmployeeNonLocalAccoInput {
+  id: ID
+  empID: String!
+  accommodation: [String]
+  accommodationAddress: [String]
+}
+
+input UpdateEmployeeNonLocalAccoInput {
+  id: ID!
+  empID: String
+  accommodation: [String]
+  accommodationAddress: [String]
+}
+
+input DeleteEmployeeNonLocalAccoInput {
+  id: ID!
+}
+
+input ModelSubscriptionEmployeeNonLocalAccoFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  accommodation: ModelSubscriptionStringInput
+  accommodationAddress: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionEmployeeNonLocalAccoFilterInput]
+  or: [ModelSubscriptionEmployeeNonLocalAccoFilterInput]
+}
+
+type ModelLabourMedicalInfoConnection {
+  items: [LabourMedicalInfo]!
+  nextToken: String
+}
+
+input ModelLabourMedicalInfoFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  overMD: ModelStringInput
+  overME: ModelStringInput
+  bruhimsRD: ModelStringInput
+  bruhimsRNo: ModelStringInput
+  bruneiMAD: ModelStringInput
+  bruneiME: ModelStringInput
+  uploadFitness: ModelStringInput
+  uploadRegis: ModelStringInput
+  uploadBwn: ModelStringInput
+  dependPass: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelLabourMedicalInfoFilterInput]
+  or: [ModelLabourMedicalInfoFilterInput]
+  not: ModelLabourMedicalInfoFilterInput
+}
+
+input ModelLabourMedicalInfoConditionInput {
+  empID: ModelStringInput
+  overMD: ModelStringInput
+  overME: ModelStringInput
+  bruhimsRD: ModelStringInput
+  bruhimsRNo: ModelStringInput
+  bruneiMAD: ModelStringInput
+  bruneiME: ModelStringInput
+  uploadFitness: ModelStringInput
+  uploadRegis: ModelStringInput
+  uploadBwn: ModelStringInput
+  dependPass: ModelStringInput
+  and: [ModelLabourMedicalInfoConditionInput]
+  or: [ModelLabourMedicalInfoConditionInput]
+  not: ModelLabourMedicalInfoConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateLabourMedicalInfoInput {
+  id: ID
+  empID: String!
+  overMD: String
+  overME: String
+  bruhimsRD: String
+  bruhimsRNo: String
+  bruneiMAD: [String]
+  bruneiME: [String]
+  uploadFitness: [AWSJSON]
+  uploadRegis: [AWSJSON]
+  uploadBwn: [AWSJSON]
+  dependPass: [AWSJSON]
+}
+
+input UpdateLabourMedicalInfoInput {
+  id: ID!
+  empID: String
+  overMD: String
+  overME: String
+  bruhimsRD: String
+  bruhimsRNo: String
+  bruneiMAD: [String]
+  bruneiME: [String]
+  uploadFitness: [AWSJSON]
+  uploadRegis: [AWSJSON]
+  uploadBwn: [AWSJSON]
+  dependPass: [AWSJSON]
+}
+
+input DeleteLabourMedicalInfoInput {
+  id: ID!
+}
+
+input ModelSubscriptionLabourMedicalInfoFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  overMD: ModelSubscriptionStringInput
+  overME: ModelSubscriptionStringInput
+  bruhimsRD: ModelSubscriptionStringInput
+  bruhimsRNo: ModelSubscriptionStringInput
+  bruneiMAD: ModelSubscriptionStringInput
+  bruneiME: ModelSubscriptionStringInput
+  uploadFitness: ModelSubscriptionStringInput
+  uploadRegis: ModelSubscriptionStringInput
+  uploadBwn: ModelSubscriptionStringInput
+  dependPass: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionLabourMedicalInfoFilterInput]
+  or: [ModelSubscriptionLabourMedicalInfoFilterInput]
+}
+
+type ModelServiceRecordConnection {
+  items: [ServiceRecord]!
+  nextToken: String
+}
+
+input ModelServiceRecordFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  depEmpDate: ModelStringInput
+  depEmp: ModelStringInput
+  positionRev: ModelStringInput
+  positionRevDate: ModelStringInput
+  revSalary: ModelStringInput
+  revSalaryDate: ModelStringInput
+  revLeavePass: ModelStringInput
+  revLeaveDate: ModelStringInput
+  revAnnualLeave: ModelStringInput
+  revALD: ModelStringInput
+  remarkWI: ModelStringInput
+  uploadPR: ModelStringInput
+  uploadSP: ModelStringInput
+  uploadLP: ModelStringInput
+  uploadAL: ModelStringInput
+  uploadDep: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelServiceRecordFilterInput]
+  or: [ModelServiceRecordFilterInput]
+  not: ModelServiceRecordFilterInput
+}
+
+input ModelServiceRecordConditionInput {
+  empID: ModelStringInput
+  depEmpDate: ModelStringInput
+  depEmp: ModelStringInput
+  positionRev: ModelStringInput
+  positionRevDate: ModelStringInput
+  revSalary: ModelStringInput
+  revSalaryDate: ModelStringInput
+  revLeavePass: ModelStringInput
+  revLeaveDate: ModelStringInput
+  revAnnualLeave: ModelStringInput
+  revALD: ModelStringInput
+  remarkWI: ModelStringInput
+  uploadPR: ModelStringInput
+  uploadSP: ModelStringInput
+  uploadLP: ModelStringInput
+  uploadAL: ModelStringInput
+  uploadDep: ModelStringInput
+  and: [ModelServiceRecordConditionInput]
+  or: [ModelServiceRecordConditionInput]
+  not: ModelServiceRecordConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateServiceRecordInput {
+  id: ID
+  empID: String!
+  depEmpDate: [String]
+  depEmp: [String]
+  positionRev: [String]
+  positionRevDate: [String]
+  revSalary: [String]
+  revSalaryDate: [String]
+  revLeavePass: [String]
+  revLeaveDate: [String]
+  revAnnualLeave: [String]
+  revALD: [String]
+  remarkWI: String
+  uploadPR: [AWSJSON]
+  uploadSP: [AWSJSON]
+  uploadLP: [AWSJSON]
+  uploadAL: [AWSJSON]
+  uploadDep: [AWSJSON]
+}
+
+input UpdateServiceRecordInput {
+  id: ID!
+  empID: String
+  depEmpDate: [String]
+  depEmp: [String]
+  positionRev: [String]
+  positionRevDate: [String]
+  revSalary: [String]
+  revSalaryDate: [String]
+  revLeavePass: [String]
+  revLeaveDate: [String]
+  revAnnualLeave: [String]
+  revALD: [String]
+  remarkWI: String
+  uploadPR: [AWSJSON]
+  uploadSP: [AWSJSON]
+  uploadLP: [AWSJSON]
+  uploadAL: [AWSJSON]
+  uploadDep: [AWSJSON]
+}
+
+input DeleteServiceRecordInput {
+  id: ID!
+}
+
+input ModelSubscriptionServiceRecordFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  depEmpDate: ModelSubscriptionStringInput
+  depEmp: ModelSubscriptionStringInput
+  positionRev: ModelSubscriptionStringInput
+  positionRevDate: ModelSubscriptionStringInput
+  revSalary: ModelSubscriptionStringInput
+  revSalaryDate: ModelSubscriptionStringInput
+  revLeavePass: ModelSubscriptionStringInput
+  revLeaveDate: ModelSubscriptionStringInput
+  revAnnualLeave: ModelSubscriptionStringInput
+  revALD: ModelSubscriptionStringInput
+  remarkWI: ModelSubscriptionStringInput
+  uploadPR: ModelSubscriptionStringInput
+  uploadSP: ModelSubscriptionStringInput
+  uploadLP: ModelSubscriptionStringInput
+  uploadAL: ModelSubscriptionStringInput
+  uploadDep: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionServiceRecordFilterInput]
+  or: [ModelSubscriptionServiceRecordFilterInput]
+}
+
+type ModelEmpLeaveDetailsConnection {
+  items: [EmpLeaveDetails]!
+  nextToken: String
+}
+
+input ModelEmpLeaveDetailsFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  annualLeave: ModelStringInput
+  annualLeaveDate: ModelStringInput
+  compasLeave: ModelStringInput
+  destinateLeavePass: ModelStringInput
+  durLeavePass: ModelStringInput
+  dateLeavePass: ModelStringInput
+  leavePass: ModelStringInput
+  materLeave: ModelStringInput
+  mrageLeave: ModelStringInput
+  paterLeave: ModelStringInput
+  sickLeave: ModelStringInput
+  sickLeaveDate: ModelStringInput
+  hospLeave: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelEmpLeaveDetailsFilterInput]
+  or: [ModelEmpLeaveDetailsFilterInput]
+  not: ModelEmpLeaveDetailsFilterInput
+}
+
+input ModelEmpLeaveDetailsConditionInput {
+  empID: ModelStringInput
+  annualLeave: ModelStringInput
+  annualLeaveDate: ModelStringInput
+  compasLeave: ModelStringInput
+  destinateLeavePass: ModelStringInput
+  durLeavePass: ModelStringInput
+  dateLeavePass: ModelStringInput
+  leavePass: ModelStringInput
+  materLeave: ModelStringInput
+  mrageLeave: ModelStringInput
+  paterLeave: ModelStringInput
+  sickLeave: ModelStringInput
+  sickLeaveDate: ModelStringInput
+  hospLeave: ModelStringInput
+  and: [ModelEmpLeaveDetailsConditionInput]
+  or: [ModelEmpLeaveDetailsConditionInput]
+  not: ModelEmpLeaveDetailsConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateEmpLeaveDetailsInput {
+  id: ID
+  empID: String!
+  annualLeave: [String]
+  annualLeaveDate: [String]
+  compasLeave: String
+  destinateLeavePass: [String]
+  durLeavePass: [String]
+  dateLeavePass: [String]
+  leavePass: [String]
+  materLeave: String
+  mrageLeave: String
+  paterLeave: String
+  sickLeave: String
+  sickLeaveDate: String
+  hospLeave: String
+}
+
+input UpdateEmpLeaveDetailsInput {
+  id: ID!
+  empID: String
+  annualLeave: [String]
+  annualLeaveDate: [String]
+  compasLeave: String
+  destinateLeavePass: [String]
+  durLeavePass: [String]
+  dateLeavePass: [String]
+  leavePass: [String]
+  materLeave: String
+  mrageLeave: String
+  paterLeave: String
+  sickLeave: String
+  sickLeaveDate: String
+  hospLeave: String
+}
+
+input DeleteEmpLeaveDetailsInput {
+  id: ID!
+}
+
+input ModelSubscriptionEmpLeaveDetailsFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  annualLeave: ModelSubscriptionStringInput
+  annualLeaveDate: ModelSubscriptionStringInput
+  compasLeave: ModelSubscriptionStringInput
+  destinateLeavePass: ModelSubscriptionStringInput
+  durLeavePass: ModelSubscriptionStringInput
+  dateLeavePass: ModelSubscriptionStringInput
+  leavePass: ModelSubscriptionStringInput
+  materLeave: ModelSubscriptionStringInput
+  mrageLeave: ModelSubscriptionStringInput
+  paterLeave: ModelSubscriptionStringInput
+  sickLeave: ModelSubscriptionStringInput
+  sickLeaveDate: ModelSubscriptionStringInput
+  hospLeave: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionEmpLeaveDetailsFilterInput]
+  or: [ModelSubscriptionEmpLeaveDetailsFilterInput]
+}
+
+type ModelTerminationInfoConnection {
+  items: [TerminationInfo]!
+  nextToken: String
+}
+
+input ModelTerminationInfoFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  resignDate: ModelStringInput
+  resignNotProb: ModelStringInput
+  otherResignNotProb: ModelStringInput
+  resignNotConf: ModelStringInput
+  otherResignNotConf: ModelStringInput
+  reasonResign: ModelStringInput
+  reasonTerminate: ModelStringInput
+  termiDate: ModelStringInput
+  termiNotProb: ModelStringInput
+  otherTermiNotProb: ModelStringInput
+  termiNotConf: ModelStringInput
+  otherTermiNotConf: ModelStringInput
+  WIContract: ModelStringInput
+  WIProbation: ModelStringInput
+  WIResignation: ModelStringInput
+  WITermination: ModelStringInput
+  WILeaveEntitle: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelTerminationInfoFilterInput]
+  or: [ModelTerminationInfoFilterInput]
+  not: ModelTerminationInfoFilterInput
+}
+
+input ModelTerminationInfoConditionInput {
+  empID: ModelStringInput
+  resignDate: ModelStringInput
+  resignNotProb: ModelStringInput
+  otherResignNotProb: ModelStringInput
+  resignNotConf: ModelStringInput
+  otherResignNotConf: ModelStringInput
+  reasonResign: ModelStringInput
+  reasonTerminate: ModelStringInput
+  termiDate: ModelStringInput
+  termiNotProb: ModelStringInput
+  otherTermiNotProb: ModelStringInput
+  termiNotConf: ModelStringInput
+  otherTermiNotConf: ModelStringInput
+  WIContract: ModelStringInput
+  WIProbation: ModelStringInput
+  WIResignation: ModelStringInput
+  WITermination: ModelStringInput
+  WILeaveEntitle: ModelStringInput
+  and: [ModelTerminationInfoConditionInput]
+  or: [ModelTerminationInfoConditionInput]
+  not: ModelTerminationInfoConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateTerminationInfoInput {
+  id: ID
+  empID: String!
+  resignDate: String
+  resignNotProb: String
+  otherResignNotProb: String
+  resignNotConf: String
+  otherResignNotConf: String
+  reasonResign: String
+  reasonTerminate: String
+  termiDate: String
+  termiNotProb: String
+  otherTermiNotProb: String
+  termiNotConf: String
+  otherTermiNotConf: String
+  WIContract: [AWSJSON]
+  WIProbation: [AWSJSON]
+  WIResignation: [AWSJSON]
+  WITermination: [AWSJSON]
+  WILeaveEntitle: [AWSJSON]
+}
+
+input UpdateTerminationInfoInput {
+  id: ID!
+  empID: String
+  resignDate: String
+  resignNotProb: String
+  otherResignNotProb: String
+  resignNotConf: String
+  otherResignNotConf: String
+  reasonResign: String
+  reasonTerminate: String
+  termiDate: String
+  termiNotProb: String
+  otherTermiNotProb: String
+  termiNotConf: String
+  otherTermiNotConf: String
+  WIContract: [AWSJSON]
+  WIProbation: [AWSJSON]
+  WIResignation: [AWSJSON]
+  WITermination: [AWSJSON]
+  WILeaveEntitle: [AWSJSON]
+}
+
+input DeleteTerminationInfoInput {
+  id: ID!
+}
+
+input ModelSubscriptionTerminationInfoFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  resignDate: ModelSubscriptionStringInput
+  resignNotProb: ModelSubscriptionStringInput
+  otherResignNotProb: ModelSubscriptionStringInput
+  resignNotConf: ModelSubscriptionStringInput
+  otherResignNotConf: ModelSubscriptionStringInput
+  reasonResign: ModelSubscriptionStringInput
+  reasonTerminate: ModelSubscriptionStringInput
+  termiDate: ModelSubscriptionStringInput
+  termiNotProb: ModelSubscriptionStringInput
+  otherTermiNotProb: ModelSubscriptionStringInput
+  termiNotConf: ModelSubscriptionStringInput
+  otherTermiNotConf: ModelSubscriptionStringInput
+  WIContract: ModelSubscriptionStringInput
+  WIProbation: ModelSubscriptionStringInput
+  WIResignation: ModelSubscriptionStringInput
+  WITermination: ModelSubscriptionStringInput
+  WILeaveEntitle: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionTerminationInfoFilterInput]
+  or: [ModelSubscriptionTerminationInfoFilterInput]
+}
+
+type ModelEmpWorkInfoConnection {
+  items: [EmpWorkInfo]!
+  nextToken: String
+}
+
+input ModelEmpWorkInfoFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  contractStart: ModelStringInput
+  contractEnd: ModelStringInput
+  contractPeriod: ModelStringInput
+  doj: ModelStringInput
+  department: ModelStringInput
+  hr: ModelStringInput
+  jobCat: ModelStringInput
+  jobDesc: ModelStringInput
+  manager: ModelStringInput
+  otherJobCat: ModelStringInput
+  otherDepartment: ModelStringInput
+  otherPosition: ModelStringInput
+  probationStart: ModelStringInput
+  probationEnd: ModelStringInput
+  probDuration: ModelStringInput
+  position: ModelStringInput
+  relationship: ModelStringInput
+  supervisor: ModelStringInput
+  skillPool: ModelStringInput
+  salaryType: ModelStringInput
+  sapNo: ModelStringInput
+  upgradeDate: ModelStringInput
+  upgradePosition: ModelStringInput
+  workStatus: ModelStringInput
+  workHrs: ModelStringInput
+  workWeek: ModelStringInput
+  workMonth: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelEmpWorkInfoFilterInput]
+  or: [ModelEmpWorkInfoFilterInput]
+  not: ModelEmpWorkInfoFilterInput
+}
+
+input ModelEmpWorkInfoConditionInput {
+  empID: ModelStringInput
+  contractStart: ModelStringInput
+  contractEnd: ModelStringInput
+  contractPeriod: ModelStringInput
+  doj: ModelStringInput
+  department: ModelStringInput
+  hr: ModelStringInput
+  jobCat: ModelStringInput
+  jobDesc: ModelStringInput
+  manager: ModelStringInput
+  otherJobCat: ModelStringInput
+  otherDepartment: ModelStringInput
+  otherPosition: ModelStringInput
+  probationStart: ModelStringInput
+  probationEnd: ModelStringInput
+  probDuration: ModelStringInput
+  position: ModelStringInput
+  relationship: ModelStringInput
+  supervisor: ModelStringInput
+  skillPool: ModelStringInput
+  salaryType: ModelStringInput
+  sapNo: ModelStringInput
+  upgradeDate: ModelStringInput
+  upgradePosition: ModelStringInput
+  workStatus: ModelStringInput
+  workHrs: ModelStringInput
+  workWeek: ModelStringInput
+  workMonth: ModelStringInput
+  and: [ModelEmpWorkInfoConditionInput]
+  or: [ModelEmpWorkInfoConditionInput]
+  not: ModelEmpWorkInfoConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateEmpWorkInfoInput {
+  id: ID
+  empID: String!
+  contractStart: [String]
+  contractEnd: [String]
+  contractPeriod: [String]
+  doj: String
+  department: [String]
+  hr: [String]
+  jobCat: [String]
+  jobDesc: [String]
+  manager: [String]
+  otherJobCat: [String]
+  otherDepartment: [String]
+  otherPosition: [String]
+  probationStart: [String]
+  probationEnd: [String]
+  probDuration: [String]
+  position: [String]
+  relationship: [String]
+  supervisor: [String]
+  skillPool: String
+  salaryType: [String]
+  sapNo: String
+  upgradeDate: [String]
+  upgradePosition: [String]
+  workStatus: [String]
+  workHrs: [String]
+  workWeek: [String]
+  workMonth: [String]
+}
+
+input UpdateEmpWorkInfoInput {
+  id: ID!
+  empID: String
+  contractStart: [String]
+  contractEnd: [String]
+  contractPeriod: [String]
+  doj: String
+  department: [String]
+  hr: [String]
+  jobCat: [String]
+  jobDesc: [String]
+  manager: [String]
+  otherJobCat: [String]
+  otherDepartment: [String]
+  otherPosition: [String]
+  probationStart: [String]
+  probationEnd: [String]
+  probDuration: [String]
+  position: [String]
+  relationship: [String]
+  supervisor: [String]
+  skillPool: String
+  salaryType: [String]
+  sapNo: String
+  upgradeDate: [String]
+  upgradePosition: [String]
+  workStatus: [String]
+  workHrs: [String]
+  workWeek: [String]
+  workMonth: [String]
+}
+
+input DeleteEmpWorkInfoInput {
+  id: ID!
+}
+
+input ModelSubscriptionEmpWorkInfoFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  contractStart: ModelSubscriptionStringInput
+  contractEnd: ModelSubscriptionStringInput
+  contractPeriod: ModelSubscriptionStringInput
+  doj: ModelSubscriptionStringInput
+  department: ModelSubscriptionStringInput
+  hr: ModelSubscriptionStringInput
+  jobCat: ModelSubscriptionStringInput
+  jobDesc: ModelSubscriptionStringInput
+  manager: ModelSubscriptionStringInput
+  otherJobCat: ModelSubscriptionStringInput
+  otherDepartment: ModelSubscriptionStringInput
+  otherPosition: ModelSubscriptionStringInput
+  probationStart: ModelSubscriptionStringInput
+  probationEnd: ModelSubscriptionStringInput
+  probDuration: ModelSubscriptionStringInput
+  position: ModelSubscriptionStringInput
+  relationship: ModelSubscriptionStringInput
+  supervisor: ModelSubscriptionStringInput
+  skillPool: ModelSubscriptionStringInput
+  salaryType: ModelSubscriptionStringInput
+  sapNo: ModelSubscriptionStringInput
+  upgradeDate: ModelSubscriptionStringInput
+  upgradePosition: ModelSubscriptionStringInput
+  workStatus: ModelSubscriptionStringInput
+  workHrs: ModelSubscriptionStringInput
+  workWeek: ModelSubscriptionStringInput
+  workMonth: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionEmpWorkInfoFilterInput]
+  or: [ModelSubscriptionEmpWorkInfoFilterInput]
+}
+
+type ModelEmpPersonalInfoConnection {
+  items: [EmpPersonalInfo]!
+  nextToken: String
+}
+
+input ModelEmpPersonalInfoFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  age: ModelIntInput
+  aTQualify: ModelStringInput
+  alternateNo: ModelStringInput
+  agent: ModelStringInput
+  bankName: ModelStringInput
+  bankAccNo: ModelStringInput
+  contactNo: ModelStringInput
+  cob: ModelStringInput
+  contractType: ModelStringInput
+  ctryOfOrigin: ModelStringInput
+  chinese: ModelStringInput
+  dob: ModelStringInput
+  educLevel: ModelStringInput
+  email: ModelStringInput
+  eduDetails: ModelStringInput
+  empBadgeNo: ModelStringInput
+  empType: ModelStringInput
+  familyDetails: ModelStringInput
+  gender: ModelStringInput
+  lang: ModelStringInput
+  marital: ModelStringInput
+  name: ModelStringInput
+  officialEmail: ModelStringInput
+  oCOfOrigin: ModelStringInput
+  profilePhoto: ModelStringInput
+  permanentAddress: ModelStringInput
+  position: ModelStringInput
+  sapNo: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelEmpPersonalInfoFilterInput]
+  or: [ModelEmpPersonalInfoFilterInput]
+  not: ModelEmpPersonalInfoFilterInput
+}
+
+input ModelEmpPersonalInfoConditionInput {
+  empID: ModelStringInput
+  age: ModelIntInput
+  aTQualify: ModelStringInput
+  alternateNo: ModelStringInput
+  agent: ModelStringInput
+  bankName: ModelStringInput
+  bankAccNo: ModelStringInput
+  contactNo: ModelStringInput
+  cob: ModelStringInput
+  contractType: ModelStringInput
+  ctryOfOrigin: ModelStringInput
+  chinese: ModelStringInput
+  dob: ModelStringInput
+  educLevel: ModelStringInput
+  email: ModelStringInput
+  eduDetails: ModelStringInput
+  empBadgeNo: ModelStringInput
+  empType: ModelStringInput
+  familyDetails: ModelStringInput
+  gender: ModelStringInput
+  lang: ModelStringInput
+  marital: ModelStringInput
+  name: ModelStringInput
+  officialEmail: ModelStringInput
+  oCOfOrigin: ModelStringInput
+  profilePhoto: ModelStringInput
+  permanentAddress: ModelStringInput
+  position: ModelStringInput
+  sapNo: ModelStringInput
+  and: [ModelEmpPersonalInfoConditionInput]
+  or: [ModelEmpPersonalInfoConditionInput]
+  not: ModelEmpPersonalInfoConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateEmpPersonalInfoInput {
+  id: ID
+  empID: String!
+  age: Int
+  aTQualify: String
+  alternateNo: String
+  agent: [String]
+  bankName: String
+  bankAccNo: String
+  contactNo: [String]
+  cob: String
+  contractType: [String]
+  ctryOfOrigin: String
+  chinese: String
+  dob: String
+  educLevel: String
+  email: String
+  eduDetails: [AWSJSON]
+  empBadgeNo: String
+  empType: [String]
+  familyDetails: [AWSJSON]
+  gender: String
+  lang: String
+  marital: String
+  name: String
+  officialEmail: String
+  oCOfOrigin: String
+  profilePhoto: String
+  permanentAddress: [String]
+  position: [String]
+  sapNo: String
+}
+
+input UpdateEmpPersonalInfoInput {
+  id: ID!
+  empID: String
+  age: Int
+  aTQualify: String
+  alternateNo: String
+  agent: [String]
+  bankName: String
+  bankAccNo: String
+  contactNo: [String]
+  cob: String
+  contractType: [String]
+  ctryOfOrigin: String
+  chinese: String
+  dob: String
+  educLevel: String
+  email: String
+  eduDetails: [AWSJSON]
+  empBadgeNo: String
+  empType: [String]
+  familyDetails: [AWSJSON]
+  gender: String
+  lang: String
+  marital: String
+  name: String
+  officialEmail: String
+  oCOfOrigin: String
+  profilePhoto: String
+  permanentAddress: [String]
+  position: [String]
+  sapNo: String
+}
+
+input DeleteEmpPersonalInfoInput {
+  id: ID!
+}
+
+input ModelSubscriptionEmpPersonalInfoFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  age: ModelSubscriptionIntInput
+  aTQualify: ModelSubscriptionStringInput
+  alternateNo: ModelSubscriptionStringInput
+  agent: ModelSubscriptionStringInput
+  bankName: ModelSubscriptionStringInput
+  bankAccNo: ModelSubscriptionStringInput
+  contactNo: ModelSubscriptionStringInput
+  cob: ModelSubscriptionStringInput
+  contractType: ModelSubscriptionStringInput
+  ctryOfOrigin: ModelSubscriptionStringInput
+  chinese: ModelSubscriptionStringInput
+  dob: ModelSubscriptionStringInput
+  educLevel: ModelSubscriptionStringInput
+  email: ModelSubscriptionStringInput
+  eduDetails: ModelSubscriptionStringInput
+  empBadgeNo: ModelSubscriptionStringInput
+  empType: ModelSubscriptionStringInput
+  familyDetails: ModelSubscriptionStringInput
+  gender: ModelSubscriptionStringInput
+  lang: ModelSubscriptionStringInput
+  marital: ModelSubscriptionStringInput
+  name: ModelSubscriptionStringInput
+  officialEmail: ModelSubscriptionStringInput
+  oCOfOrigin: ModelSubscriptionStringInput
+  profilePhoto: ModelSubscriptionStringInput
+  permanentAddress: ModelSubscriptionStringInput
+  position: ModelSubscriptionStringInput
+  sapNo: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionEmpPersonalInfoFilterInput]
+  or: [ModelSubscriptionEmpPersonalInfoFilterInput]
+}
+
+type ModelIDDetailsConnection {
+  items: [IDDetails]!
+  nextToken: String
+}
+
+input ModelIDDetailsFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  applicationUpload: ModelStringInput
+  bwnIcNo: ModelStringInput
+  bwnIcColour: ModelStringInput
+  bwnIcExpiry: ModelStringInput
+  bwnUpload: ModelStringInput
+  cvCertifyUpload: ModelStringInput
+  driveLic: ModelStringInput
+  inducBrief: ModelStringInput
+  inducBriefUp: ModelStringInput
+  loiUpload: ModelStringInput
+  myIcNo: ModelStringInput
+  myIcUpload: ModelStringInput
+  nationality: ModelStringInput
+  nationalCat: ModelStringInput
+  otherNation: ModelStringInput
+  otherRace: ModelStringInput
+  otherReligion: ModelStringInput
+  ppNo: ModelStringInput
+  paafCvevUpload: ModelStringInput
+  ppIssued: ModelStringInput
+  ppExpiry: ModelStringInput
+  ppUpload: ModelStringInput
+  ppDestinate: ModelStringInput
+  preEmp: ModelStringInput
+  preEmpPeriod: ModelStringInput
+  race: ModelStringInput
+  religion: ModelStringInput
+  supportDocUpload: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelIDDetailsFilterInput]
+  or: [ModelIDDetailsFilterInput]
+  not: ModelIDDetailsFilterInput
+}
+
+input ModelIDDetailsConditionInput {
+  empID: ModelStringInput
+  applicationUpload: ModelStringInput
+  bwnIcNo: ModelStringInput
+  bwnIcColour: ModelStringInput
+  bwnIcExpiry: ModelStringInput
+  bwnUpload: ModelStringInput
+  cvCertifyUpload: ModelStringInput
+  driveLic: ModelStringInput
+  inducBrief: ModelStringInput
+  inducBriefUp: ModelStringInput
+  loiUpload: ModelStringInput
+  myIcNo: ModelStringInput
+  myIcUpload: ModelStringInput
+  nationality: ModelStringInput
+  nationalCat: ModelStringInput
+  otherNation: ModelStringInput
+  otherRace: ModelStringInput
+  otherReligion: ModelStringInput
+  ppNo: ModelStringInput
+  paafCvevUpload: ModelStringInput
+  ppIssued: ModelStringInput
+  ppExpiry: ModelStringInput
+  ppUpload: ModelStringInput
+  ppDestinate: ModelStringInput
+  preEmp: ModelStringInput
+  preEmpPeriod: ModelStringInput
+  race: ModelStringInput
+  religion: ModelStringInput
+  supportDocUpload: ModelStringInput
+  and: [ModelIDDetailsConditionInput]
+  or: [ModelIDDetailsConditionInput]
+  not: ModelIDDetailsConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateIDDetailsInput {
+  id: ID
+  empID: String!
+  applicationUpload: [AWSJSON]
+  bwnIcNo: String
+  bwnIcColour: String
+  bwnIcExpiry: [String]
+  bwnUpload: [AWSJSON]
+  cvCertifyUpload: [AWSJSON]
+  driveLic: String
+  inducBrief: String
+  inducBriefUp: String
+  loiUpload: [AWSJSON]
+  myIcNo: String
+  myIcUpload: [AWSJSON]
+  nationality: String
+  nationalCat: String
+  otherNation: String
+  otherRace: String
+  otherReligion: String
+  ppNo: [String]
+  paafCvevUpload: [AWSJSON]
+  ppIssued: [String]
+  ppExpiry: [String]
+  ppUpload: [AWSJSON]
+  ppDestinate: [String]
+  preEmp: String
+  preEmpPeriod: String
+  race: String
+  religion: String
+  supportDocUpload: [AWSJSON]
+}
+
+input UpdateIDDetailsInput {
+  id: ID!
+  empID: String
+  applicationUpload: [AWSJSON]
+  bwnIcNo: String
+  bwnIcColour: String
+  bwnIcExpiry: [String]
+  bwnUpload: [AWSJSON]
+  cvCertifyUpload: [AWSJSON]
+  driveLic: String
+  inducBrief: String
+  inducBriefUp: String
+  loiUpload: [AWSJSON]
+  myIcNo: String
+  myIcUpload: [AWSJSON]
+  nationality: String
+  nationalCat: String
+  otherNation: String
+  otherRace: String
+  otherReligion: String
+  ppNo: [String]
+  paafCvevUpload: [AWSJSON]
+  ppIssued: [String]
+  ppExpiry: [String]
+  ppUpload: [AWSJSON]
+  ppDestinate: [String]
+  preEmp: String
+  preEmpPeriod: String
+  race: String
+  religion: String
+  supportDocUpload: [AWSJSON]
+}
+
+input DeleteIDDetailsInput {
+  id: ID!
+}
+
+input ModelSubscriptionIDDetailsFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  applicationUpload: ModelSubscriptionStringInput
+  bwnIcNo: ModelSubscriptionStringInput
+  bwnIcColour: ModelSubscriptionStringInput
+  bwnIcExpiry: ModelSubscriptionStringInput
+  bwnUpload: ModelSubscriptionStringInput
+  cvCertifyUpload: ModelSubscriptionStringInput
+  driveLic: ModelSubscriptionStringInput
+  inducBrief: ModelSubscriptionStringInput
+  inducBriefUp: ModelSubscriptionStringInput
+  loiUpload: ModelSubscriptionStringInput
+  myIcNo: ModelSubscriptionStringInput
+  myIcUpload: ModelSubscriptionStringInput
+  nationality: ModelSubscriptionStringInput
+  nationalCat: ModelSubscriptionStringInput
+  otherNation: ModelSubscriptionStringInput
+  otherRace: ModelSubscriptionStringInput
+  otherReligion: ModelSubscriptionStringInput
+  ppNo: ModelSubscriptionStringInput
+  paafCvevUpload: ModelSubscriptionStringInput
+  ppIssued: ModelSubscriptionStringInput
+  ppExpiry: ModelSubscriptionStringInput
+  ppUpload: ModelSubscriptionStringInput
+  ppDestinate: ModelSubscriptionStringInput
+  preEmp: ModelSubscriptionStringInput
+  preEmpPeriod: ModelSubscriptionStringInput
+  race: ModelSubscriptionStringInput
+  religion: ModelSubscriptionStringInput
+  supportDocUpload: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionIDDetailsFilterInput]
+  or: [ModelSubscriptionIDDetailsFilterInput]
+}
+
+type ModelCandIToEMPConnection {
+  items: [CandIToEMP]!
+  nextToken: String
+}
+
+input ModelCandIToEMPFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  crime: ModelStringInput
+  crimeDesc: ModelStringInput
+  emgDetails: ModelStringInput
+  noExperience: ModelStringInput
+  empStatement: ModelStringInput
+  desc: ModelStringInput
+  disease: ModelStringInput
+  diseaseDesc: ModelStringInput
+  liquor: ModelStringInput
+  liquorDesc: ModelStringInput
+  perIS: ModelStringInput
+  perID: ModelStringInput
+  referees: ModelStringInput
+  relatives: ModelStringInput
+  salaryExpectation: ModelStringInput
+  supportInfo: ModelStringInput
+  workExperience: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelCandIToEMPFilterInput]
+  or: [ModelCandIToEMPFilterInput]
+  not: ModelCandIToEMPFilterInput
+}
+
+input ModelCandIToEMPConditionInput {
+  empID: ModelStringInput
+  crime: ModelStringInput
+  crimeDesc: ModelStringInput
+  emgDetails: ModelStringInput
+  noExperience: ModelStringInput
+  empStatement: ModelStringInput
+  desc: ModelStringInput
+  disease: ModelStringInput
+  diseaseDesc: ModelStringInput
+  liquor: ModelStringInput
+  liquorDesc: ModelStringInput
+  perIS: ModelStringInput
+  perID: ModelStringInput
+  referees: ModelStringInput
+  relatives: ModelStringInput
+  salaryExpectation: ModelStringInput
+  supportInfo: ModelStringInput
+  workExperience: ModelStringInput
+  and: [ModelCandIToEMPConditionInput]
+  or: [ModelCandIToEMPConditionInput]
+  not: ModelCandIToEMPConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateCandIToEMPInput {
+  id: ID
+  empID: String!
+  crime: String
+  crimeDesc: String
+  emgDetails: [AWSJSON!]
+  noExperience: String
+  empStatement: String
+  desc: String
+  disease: String
+  diseaseDesc: String
+  liquor: String
+  liquorDesc: String
+  perIS: String
+  perID: String
+  referees: [AWSJSON]
+  relatives: [AWSJSON]
+  salaryExpectation: String
+  supportInfo: String
+  workExperience: [AWSJSON]
+}
+
+input UpdateCandIToEMPInput {
+  id: ID!
+  empID: String
+  crime: String
+  crimeDesc: String
+  emgDetails: [AWSJSON!]
+  noExperience: String
+  empStatement: String
+  desc: String
+  disease: String
+  diseaseDesc: String
+  liquor: String
+  liquorDesc: String
+  perIS: String
+  perID: String
+  referees: [AWSJSON]
+  relatives: [AWSJSON]
+  salaryExpectation: String
+  supportInfo: String
+  workExperience: [AWSJSON]
+}
+
+input DeleteCandIToEMPInput {
+  id: ID!
+}
+
+input ModelSubscriptionCandIToEMPFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  crime: ModelSubscriptionStringInput
+  crimeDesc: ModelSubscriptionStringInput
+  emgDetails: ModelSubscriptionStringInput
+  noExperience: ModelSubscriptionStringInput
+  empStatement: ModelSubscriptionStringInput
+  desc: ModelSubscriptionStringInput
+  disease: ModelSubscriptionStringInput
+  diseaseDesc: ModelSubscriptionStringInput
+  liquor: ModelSubscriptionStringInput
+  liquorDesc: ModelSubscriptionStringInput
+  perIS: ModelSubscriptionStringInput
+  perID: ModelSubscriptionStringInput
+  referees: ModelSubscriptionStringInput
+  relatives: ModelSubscriptionStringInput
+  salaryExpectation: ModelSubscriptionStringInput
+  supportInfo: ModelSubscriptionStringInput
+  workExperience: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionCandIToEMPFilterInput]
+  or: [ModelSubscriptionCandIToEMPFilterInput]
+}
+
+type ModelLocalMobilizationConnection {
+  items: [LocalMobilization]!
+  nextToken: String
+}
+
+input ModelLocalMobilizationFilterInput {
+  id: ModelIDInput
+  tempID: ModelStringInput
+  mobSignDate: ModelStringInput
+  mobFile: ModelStringInput
+  paafApproveDate: ModelStringInput
+  paafFile: ModelStringInput
+  loiIssueDate: ModelStringInput
+  loiAcceptDate: ModelStringInput
+  loiDeclineDate: ModelStringInput
+  declineReason: ModelStringInput
+  loiFile: ModelStringInput
+  cvecApproveDate: ModelStringInput
+  cvecFile: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelLocalMobilizationFilterInput]
+  or: [ModelLocalMobilizationFilterInput]
+  not: ModelLocalMobilizationFilterInput
+}
+
+input ModelLocalMobilizationConditionInput {
+  tempID: ModelStringInput
+  mobSignDate: ModelStringInput
+  mobFile: ModelStringInput
+  paafApproveDate: ModelStringInput
+  paafFile: ModelStringInput
+  loiIssueDate: ModelStringInput
+  loiAcceptDate: ModelStringInput
+  loiDeclineDate: ModelStringInput
+  declineReason: ModelStringInput
+  loiFile: ModelStringInput
+  cvecApproveDate: ModelStringInput
+  cvecFile: ModelStringInput
+  and: [ModelLocalMobilizationConditionInput]
+  or: [ModelLocalMobilizationConditionInput]
+  not: ModelLocalMobilizationConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateLocalMobilizationInput {
+  id: ID
+  tempID: String
+  mobSignDate: String
+  mobFile: String
+  paafApproveDate: String
+  paafFile: String
+  loiIssueDate: String
+  loiAcceptDate: String
+  loiDeclineDate: String
+  declineReason: String
+  loiFile: String
+  cvecApproveDate: String
+  cvecFile: String
+}
+
+input UpdateLocalMobilizationInput {
+  id: ID!
+  tempID: String
+  mobSignDate: String
+  mobFile: String
+  paafApproveDate: String
+  paafFile: String
+  loiIssueDate: String
+  loiAcceptDate: String
+  loiDeclineDate: String
+  declineReason: String
+  loiFile: String
+  cvecApproveDate: String
+  cvecFile: String
+}
+
+input DeleteLocalMobilizationInput {
+  id: ID!
+}
+
+input ModelSubscriptionLocalMobilizationFilterInput {
+  id: ModelSubscriptionIDInput
+  tempID: ModelSubscriptionStringInput
+  mobSignDate: ModelSubscriptionStringInput
+  mobFile: ModelSubscriptionStringInput
+  paafApproveDate: ModelSubscriptionStringInput
+  paafFile: ModelSubscriptionStringInput
+  loiIssueDate: ModelSubscriptionStringInput
+  loiAcceptDate: ModelSubscriptionStringInput
+  loiDeclineDate: ModelSubscriptionStringInput
+  declineReason: ModelSubscriptionStringInput
+  loiFile: ModelSubscriptionStringInput
+  cvecApproveDate: ModelSubscriptionStringInput
+  cvecFile: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionLocalMobilizationFilterInput]
+  or: [ModelSubscriptionLocalMobilizationFilterInput]
+}
+
+type ModelInterviewScheduleConnection {
+  items: [InterviewSchedule]!
+  nextToken: String
+}
+
+input ModelInterviewScheduleFilterInput {
+  id: ModelIDInput
+  interDate: ModelStringInput
+  interTime: ModelStringInput
+  venue: ModelStringInput
+  interType: ModelStringInput
+  bagdeNo: ModelStringInput
+  message: ModelStringInput
+  tempID: ModelStringInput
+  manager: ModelStringInput
+  candidateStatus: ModelStringInput
+  department: ModelStringInput
+  otherDepartment: ModelStringInput
+  status: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelInterviewScheduleFilterInput]
+  or: [ModelInterviewScheduleFilterInput]
+  not: ModelInterviewScheduleFilterInput
+}
+
+input ModelInterviewScheduleConditionInput {
+  interDate: ModelStringInput
+  interTime: ModelStringInput
+  venue: ModelStringInput
+  interType: ModelStringInput
+  bagdeNo: ModelStringInput
+  message: ModelStringInput
+  tempID: ModelStringInput
+  manager: ModelStringInput
+  candidateStatus: ModelStringInput
+  department: ModelStringInput
+  otherDepartment: ModelStringInput
+  status: ModelStringInput
+  and: [ModelInterviewScheduleConditionInput]
+  or: [ModelInterviewScheduleConditionInput]
+  not: ModelInterviewScheduleConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateInterviewScheduleInput {
+  id: ID
+  interDate: String
+  interTime: String
+  venue: String
+  interType: String
+  bagdeNo: String
+  message: String
+  tempID: String
+  manager: String
+  candidateStatus: String
+  department: String
+  otherDepartment: String
+  status: String
+}
+
+input UpdateInterviewScheduleInput {
+  id: ID!
+  interDate: String
+  interTime: String
+  venue: String
+  interType: String
+  bagdeNo: String
+  message: String
+  tempID: String
+  manager: String
+  candidateStatus: String
+  department: String
+  otherDepartment: String
+  status: String
+}
+
+input DeleteInterviewScheduleInput {
+  id: ID!
+}
+
+input ModelSubscriptionInterviewScheduleFilterInput {
+  id: ModelSubscriptionIDInput
+  interDate: ModelSubscriptionStringInput
+  interTime: ModelSubscriptionStringInput
+  venue: ModelSubscriptionStringInput
+  interType: ModelSubscriptionStringInput
+  bagdeNo: ModelSubscriptionStringInput
+  message: ModelSubscriptionStringInput
+  tempID: ModelSubscriptionStringInput
+  manager: ModelSubscriptionStringInput
+  candidateStatus: ModelSubscriptionStringInput
+  department: ModelSubscriptionStringInput
+  otherDepartment: ModelSubscriptionStringInput
+  status: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionInterviewScheduleFilterInput]
+  or: [ModelSubscriptionInterviewScheduleFilterInput]
+}
+
+type ModelEducationDetailsConnection {
+  items: [EducationDetails]!
+  nextToken: String
+}
+
+input ModelEducationDetailsFilterInput {
+  id: ModelIDInput
+  tempID: ModelStringInput
+  crime: ModelStringInput
+  crimeDesc: ModelStringInput
+  emgDetails: ModelStringInput
+  noExperience: ModelStringInput
+  empStatement: ModelStringInput
+  desc: ModelStringInput
+  disease: ModelStringInput
+  diseaseDesc: ModelStringInput
+  liquor: ModelStringInput
+  liquorDesc: ModelStringInput
+  noticePeriod: ModelStringInput
+  perIS: ModelStringInput
+  perIDesc: ModelStringInput
+  referees: ModelStringInput
+  relatives: ModelStringInput
+  salaryExpectation: ModelStringInput
+  supportInfo: ModelStringInput
+  uploadResume: ModelStringInput
+  uploadCertificate: ModelStringInput
+  uploadPp: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelEducationDetailsFilterInput]
+  or: [ModelEducationDetailsFilterInput]
+  not: ModelEducationDetailsFilterInput
+}
+
+input ModelEducationDetailsConditionInput {
+  tempID: ModelStringInput
+  crime: ModelStringInput
+  crimeDesc: ModelStringInput
+  emgDetails: ModelStringInput
+  noExperience: ModelStringInput
+  empStatement: ModelStringInput
+  desc: ModelStringInput
+  disease: ModelStringInput
+  diseaseDesc: ModelStringInput
+  liquor: ModelStringInput
+  liquorDesc: ModelStringInput
+  noticePeriod: ModelStringInput
+  perIS: ModelStringInput
+  perIDesc: ModelStringInput
+  referees: ModelStringInput
+  relatives: ModelStringInput
+  salaryExpectation: ModelStringInput
+  supportInfo: ModelStringInput
+  uploadResume: ModelStringInput
+  uploadCertificate: ModelStringInput
+  uploadPp: ModelStringInput
+  and: [ModelEducationDetailsConditionInput]
+  or: [ModelEducationDetailsConditionInput]
+  not: ModelEducationDetailsConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateEducationDetailsInput {
+  id: ID
+  tempID: String!
+  crime: String
+  crimeDesc: String
+  emgDetails: [AWSJSON]
+  noExperience: String
+  empStatement: String
+  desc: String
+  disease: String
+  diseaseDesc: String
+  liquor: String
+  liquorDesc: String
+  noticePeriod: String
+  perIS: String
+  perIDesc: String
+  referees: [AWSJSON]
+  relatives: [AWSJSON]
+  salaryExpectation: String
+  supportInfo: String
+  uploadResume: String
+  uploadCertificate: String
+  uploadPp: String
+}
+
+input UpdateEducationDetailsInput {
+  id: ID!
+  tempID: String
+  crime: String
+  crimeDesc: String
+  emgDetails: [AWSJSON]
+  noExperience: String
+  empStatement: String
+  desc: String
+  disease: String
+  diseaseDesc: String
+  liquor: String
+  liquorDesc: String
+  noticePeriod: String
+  perIS: String
+  perIDesc: String
+  referees: [AWSJSON]
+  relatives: [AWSJSON]
+  salaryExpectation: String
+  supportInfo: String
+  uploadResume: String
+  uploadCertificate: String
+  uploadPp: String
+}
+
+input DeleteEducationDetailsInput {
+  id: ID!
+}
+
+input ModelSubscriptionEducationDetailsFilterInput {
+  id: ModelSubscriptionIDInput
+  tempID: ModelSubscriptionStringInput
+  crime: ModelSubscriptionStringInput
+  crimeDesc: ModelSubscriptionStringInput
+  emgDetails: ModelSubscriptionStringInput
+  noExperience: ModelSubscriptionStringInput
+  empStatement: ModelSubscriptionStringInput
+  desc: ModelSubscriptionStringInput
+  disease: ModelSubscriptionStringInput
+  diseaseDesc: ModelSubscriptionStringInput
+  liquor: ModelSubscriptionStringInput
+  liquorDesc: ModelSubscriptionStringInput
+  noticePeriod: ModelSubscriptionStringInput
+  perIS: ModelSubscriptionStringInput
+  perIDesc: ModelSubscriptionStringInput
+  referees: ModelSubscriptionStringInput
+  relatives: ModelSubscriptionStringInput
+  salaryExpectation: ModelSubscriptionStringInput
+  supportInfo: ModelSubscriptionStringInput
+  uploadResume: ModelSubscriptionStringInput
+  uploadCertificate: ModelSubscriptionStringInput
+  uploadPp: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionEducationDetailsFilterInput]
+  or: [ModelSubscriptionEducationDetailsFilterInput]
+}
+
+type ModelPersonalDetailsConnection {
+  items: [PersonalDetails]!
+  nextToken: String
+}
+
+input ModelPersonalDetailsFilterInput {
+  id: ModelIDInput
+  tempID: ModelStringInput
+  age: ModelIntInput
+  alternateNo: ModelStringInput
+  agent: ModelStringInput
+  bwnIcNo: ModelStringInput
+  bwnIcExpiry: ModelStringInput
+  bwnIcColour: ModelStringInput
+  contactNo: ModelStringInput
+  cob: ModelStringInput
+  contractType: ModelStringInput
+  chinese: ModelStringInput
+  dob: ModelStringInput
+  driveLic: ModelStringInput
+  email: ModelStringInput
+  empType: ModelStringInput
+  eduDetails: ModelStringInput
+  familyDetails: ModelStringInput
+  gender: ModelStringInput
+  lang: ModelStringInput
+  marital: ModelStringInput
+  name: ModelStringInput
+  nationality: ModelStringInput
+  otherNation: ModelStringInput
+  otherRace: ModelStringInput
+  otherReligion: ModelStringInput
+  ppNo: ModelStringInput
+  ppIssued: ModelStringInput
+  ppExpiry: ModelStringInput
+  ppDestinate: ModelStringInput
+  presentAddress: ModelStringInput
+  permanentAddress: ModelStringInput
+  profilePhoto: ModelStringInput
+  position: ModelStringInput
+  race: ModelStringInput
+  religion: ModelStringInput
+  status: ModelStringInput
+  workExperience: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelPersonalDetailsFilterInput]
+  or: [ModelPersonalDetailsFilterInput]
+  not: ModelPersonalDetailsFilterInput
+}
+
+input ModelPersonalDetailsConditionInput {
+  tempID: ModelStringInput
+  age: ModelIntInput
+  alternateNo: ModelStringInput
+  agent: ModelStringInput
+  bwnIcNo: ModelStringInput
+  bwnIcExpiry: ModelStringInput
+  bwnIcColour: ModelStringInput
+  contactNo: ModelStringInput
+  cob: ModelStringInput
+  contractType: ModelStringInput
+  chinese: ModelStringInput
+  dob: ModelStringInput
+  driveLic: ModelStringInput
+  email: ModelStringInput
+  empType: ModelStringInput
+  eduDetails: ModelStringInput
+  familyDetails: ModelStringInput
+  gender: ModelStringInput
+  lang: ModelStringInput
+  marital: ModelStringInput
+  name: ModelStringInput
+  nationality: ModelStringInput
+  otherNation: ModelStringInput
+  otherRace: ModelStringInput
+  otherReligion: ModelStringInput
+  ppNo: ModelStringInput
+  ppIssued: ModelStringInput
+  ppExpiry: ModelStringInput
+  ppDestinate: ModelStringInput
+  presentAddress: ModelStringInput
+  permanentAddress: ModelStringInput
+  profilePhoto: ModelStringInput
+  position: ModelStringInput
+  race: ModelStringInput
+  religion: ModelStringInput
+  status: ModelStringInput
+  workExperience: ModelStringInput
+  and: [ModelPersonalDetailsConditionInput]
+  or: [ModelPersonalDetailsConditionInput]
+  not: ModelPersonalDetailsConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreatePersonalDetailsInput {
+  id: ID
+  tempID: String!
+  age: Int
+  alternateNo: String
+  agent: String
+  bwnIcNo: String
+  bwnIcExpiry: String
+  bwnIcColour: String
+  contactNo: String
+  cob: String
+  contractType: String
+  chinese: String
+  dob: String
+  driveLic: String
+  email: String
+  empType: String
+  eduDetails: [AWSJSON]
+  familyDetails: [AWSJSON]
+  gender: String
+  lang: String
+  marital: String
+  name: String
+  nationality: String
+  otherNation: String
+  otherRace: String
+  otherReligion: String
+  ppNo: String
+  ppIssued: String
+  ppExpiry: String
+  ppDestinate: String
+  presentAddress: String
+  permanentAddress: String
+  profilePhoto: String
+  position: String
+  race: String
+  religion: String
+  status: String
+  workExperience: [AWSJSON]
+}
+
+input UpdatePersonalDetailsInput {
+  id: ID!
+  tempID: String
+  age: Int
+  alternateNo: String
+  agent: String
+  bwnIcNo: String
+  bwnIcExpiry: String
+  bwnIcColour: String
+  contactNo: String
+  cob: String
+  contractType: String
+  chinese: String
+  dob: String
+  driveLic: String
+  email: String
+  empType: String
+  eduDetails: [AWSJSON]
+  familyDetails: [AWSJSON]
+  gender: String
+  lang: String
+  marital: String
+  name: String
+  nationality: String
+  otherNation: String
+  otherRace: String
+  otherReligion: String
+  ppNo: String
+  ppIssued: String
+  ppExpiry: String
+  ppDestinate: String
+  presentAddress: String
+  permanentAddress: String
+  profilePhoto: String
+  position: String
+  race: String
+  religion: String
+  status: String
+  workExperience: [AWSJSON]
+}
+
+input DeletePersonalDetailsInput {
+  id: ID!
+}
+
+input ModelSubscriptionPersonalDetailsFilterInput {
+  id: ModelSubscriptionIDInput
+  tempID: ModelSubscriptionStringInput
+  age: ModelSubscriptionIntInput
+  alternateNo: ModelSubscriptionStringInput
+  agent: ModelSubscriptionStringInput
+  bwnIcNo: ModelSubscriptionStringInput
+  bwnIcExpiry: ModelSubscriptionStringInput
+  bwnIcColour: ModelSubscriptionStringInput
+  contactNo: ModelSubscriptionStringInput
+  cob: ModelSubscriptionStringInput
+  contractType: ModelSubscriptionStringInput
+  chinese: ModelSubscriptionStringInput
+  dob: ModelSubscriptionStringInput
+  driveLic: ModelSubscriptionStringInput
+  email: ModelSubscriptionStringInput
+  empType: ModelSubscriptionStringInput
+  eduDetails: ModelSubscriptionStringInput
+  familyDetails: ModelSubscriptionStringInput
+  gender: ModelSubscriptionStringInput
+  lang: ModelSubscriptionStringInput
+  marital: ModelSubscriptionStringInput
+  name: ModelSubscriptionStringInput
+  nationality: ModelSubscriptionStringInput
+  otherNation: ModelSubscriptionStringInput
+  otherRace: ModelSubscriptionStringInput
+  otherReligion: ModelSubscriptionStringInput
+  ppNo: ModelSubscriptionStringInput
+  ppIssued: ModelSubscriptionStringInput
+  ppExpiry: ModelSubscriptionStringInput
+  ppDestinate: ModelSubscriptionStringInput
+  presentAddress: ModelSubscriptionStringInput
+  permanentAddress: ModelSubscriptionStringInput
+  profilePhoto: ModelSubscriptionStringInput
+  position: ModelSubscriptionStringInput
+  race: ModelSubscriptionStringInput
+  religion: ModelSubscriptionStringInput
+  status: ModelSubscriptionStringInput
+  workExperience: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionPersonalDetailsFilterInput]
+  or: [ModelSubscriptionPersonalDetailsFilterInput]
+}
+
+type ModelUserConnection {
+  items: [User]!
+  nextToken: String
+}
+
+input ModelUserFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  selectType: ModelStringInput
+  setPermissions: ModelStringInput
+  password: ModelStringInput
+  status: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelUserFilterInput]
+  or: [ModelUserFilterInput]
+  not: ModelUserFilterInput
+}
+
+input ModelUserConditionInput {
+  empID: ModelStringInput
+  selectType: ModelStringInput
+  setPermissions: ModelStringInput
+  password: ModelStringInput
+  status: ModelStringInput
+  and: [ModelUserConditionInput]
+  or: [ModelUserConditionInput]
+  not: ModelUserConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateUserInput {
+  id: ID
+  empID: String
+  selectType: String
+  setPermissions: [String]
+  password: String
+  status: String
+}
+
+input UpdateUserInput {
+  id: ID!
+  empID: String
+  selectType: String
+  setPermissions: [String]
+  password: String
+  status: String
+}
+
+input DeleteUserInput {
+  id: ID!
+}
+
+input ModelSubscriptionUserFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  selectType: ModelSubscriptionStringInput
+  setPermissions: ModelSubscriptionStringInput
+  password: ModelSubscriptionStringInput
+  status: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionUserFilterInput]
+  or: [ModelSubscriptionUserFilterInput]
+}
+
+type ModelTicketRequestConnection {
+  items: [TicketRequest]!
+  nextToken: String
+}
+
+input ModelTicketRequestFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  empStatus: ModelStringInput
+  empDate: ModelStringInput
+  empRemarks: ModelStringInput
+  departureDate: ModelStringInput
+  arrivalDate: ModelStringInput
+  destination: ModelStringInput
+  remarks: ModelStringInput
+  hrStatus: ModelStringInput
+  hrDate: ModelStringInput
+  hrRemarks: ModelStringInput
+  hrName: ModelStringInput
+  hrEmpID: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelTicketRequestFilterInput]
+  or: [ModelTicketRequestFilterInput]
+  not: ModelTicketRequestFilterInput
+}
+
+input ModelTicketRequestConditionInput {
+  empID: ModelStringInput
+  empStatus: ModelStringInput
+  empDate: ModelStringInput
+  empRemarks: ModelStringInput
+  departureDate: ModelStringInput
+  arrivalDate: ModelStringInput
+  destination: ModelStringInput
+  remarks: ModelStringInput
+  hrStatus: ModelStringInput
+  hrDate: ModelStringInput
+  hrRemarks: ModelStringInput
+  hrName: ModelStringInput
+  hrEmpID: ModelStringInput
+  and: [ModelTicketRequestConditionInput]
+  or: [ModelTicketRequestConditionInput]
+  not: ModelTicketRequestConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateTicketRequestInput {
+  id: ID
+  empID: String!
+  empStatus: String
+  empDate: AWSDateTime
+  empRemarks: String
+  departureDate: AWSDateTime
+  arrivalDate: AWSDateTime
+  destination: String
+  remarks: String
+  hrStatus: String
+  hrDate: AWSDateTime
+  hrRemarks: String
+  hrName: String
+  hrEmpID: String
+}
+
+input UpdateTicketRequestInput {
+  id: ID!
+  empID: String
+  empStatus: String
+  empDate: AWSDateTime
+  empRemarks: String
+  departureDate: AWSDateTime
+  arrivalDate: AWSDateTime
+  destination: String
+  remarks: String
+  hrStatus: String
+  hrDate: AWSDateTime
+  hrRemarks: String
+  hrName: String
+  hrEmpID: String
+}
+
+input DeleteTicketRequestInput {
+  id: ID!
+}
+
+input ModelSubscriptionTicketRequestFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  empStatus: ModelSubscriptionStringInput
+  empDate: ModelSubscriptionStringInput
+  empRemarks: ModelSubscriptionStringInput
+  departureDate: ModelSubscriptionStringInput
+  arrivalDate: ModelSubscriptionStringInput
+  destination: ModelSubscriptionStringInput
+  remarks: ModelSubscriptionStringInput
+  hrStatus: ModelSubscriptionStringInput
+  hrDate: ModelSubscriptionStringInput
+  hrRemarks: ModelSubscriptionStringInput
+  hrName: ModelSubscriptionStringInput
+  hrEmpID: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionTicketRequestFilterInput]
+  or: [ModelSubscriptionTicketRequestFilterInput]
+}
+
+type ModelLeaveStatusConnection {
+  items: [LeaveStatus]!
+  nextToken: String
+}
+
+input ModelLeaveStatusFilterInput {
+  id: ModelIDInput
+  empID: ModelIDInput
+  leaveType: ModelStringInput
+  fromDate: ModelStringInput
+  toDate: ModelStringInput
+  days: ModelFloatInput
+  applyTo: ModelStringInput
+  reason: ModelStringInput
+  medicalCertificate: ModelStringInput
+  supervisorName: ModelStringInput
+  supervisorEmpID: ModelStringInput
+  supervisorStatus: ModelStringInput
+  supervisorDate: ModelStringInput
+  supervisorRemarks: ModelStringInput
+  managerName: ModelStringInput
+  managerEmpID: ModelStringInput
+  managerStatus: ModelStringInput
+  managerDate: ModelStringInput
+  managerRemarks: ModelStringInput
+  empStatus: ModelStringInput
+  empDate: ModelStringInput
+  empRemarks: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelLeaveStatusFilterInput]
+  or: [ModelLeaveStatusFilterInput]
+  not: ModelLeaveStatusFilterInput
+}
+
+input ModelLeaveStatusConditionInput {
+  empID: ModelIDInput
+  leaveType: ModelStringInput
+  fromDate: ModelStringInput
+  toDate: ModelStringInput
+  days: ModelFloatInput
+  applyTo: ModelStringInput
+  reason: ModelStringInput
+  medicalCertificate: ModelStringInput
+  supervisorName: ModelStringInput
+  supervisorEmpID: ModelStringInput
+  supervisorStatus: ModelStringInput
+  supervisorDate: ModelStringInput
+  supervisorRemarks: ModelStringInput
+  managerName: ModelStringInput
+  managerEmpID: ModelStringInput
+  managerStatus: ModelStringInput
+  managerDate: ModelStringInput
+  managerRemarks: ModelStringInput
+  empStatus: ModelStringInput
+  empDate: ModelStringInput
+  empRemarks: ModelStringInput
+  and: [ModelLeaveStatusConditionInput]
+  or: [ModelLeaveStatusConditionInput]
+  not: ModelLeaveStatusConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateLeaveStatusInput {
+  id: ID
+  empID: ID!
+  leaveType: String
+  fromDate: AWSDateTime
+  toDate: AWSDateTime
+  days: Float
+  applyTo: [String]
+  reason: String
+  medicalCertificate: String
+  supervisorName: String
+  supervisorEmpID: String
+  supervisorStatus: String
+  supervisorDate: AWSDateTime
+  supervisorRemarks: String
+  managerName: String
+  managerEmpID: String
+  managerStatus: String
+  managerDate: AWSDateTime
+  managerRemarks: String
+  empStatus: String
+  empDate: AWSDateTime
+  empRemarks: String
+}
+
+input UpdateLeaveStatusInput {
+  id: ID!
+  empID: ID
+  leaveType: String
+  fromDate: AWSDateTime
+  toDate: AWSDateTime
+  days: Float
+  applyTo: [String]
+  reason: String
+  medicalCertificate: String
+  supervisorName: String
+  supervisorEmpID: String
+  supervisorStatus: String
+  supervisorDate: AWSDateTime
+  supervisorRemarks: String
+  managerName: String
+  managerEmpID: String
+  managerStatus: String
+  managerDate: AWSDateTime
+  managerRemarks: String
+  empStatus: String
+  empDate: AWSDateTime
+  empRemarks: String
+}
+
+input DeleteLeaveStatusInput {
+  id: ID!
+}
+
+input ModelSubscriptionLeaveStatusFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionIDInput
+  leaveType: ModelSubscriptionStringInput
+  fromDate: ModelSubscriptionStringInput
+  toDate: ModelSubscriptionStringInput
+  days: ModelSubscriptionFloatInput
+  applyTo: ModelSubscriptionStringInput
+  reason: ModelSubscriptionStringInput
+  medicalCertificate: ModelSubscriptionStringInput
+  supervisorName: ModelSubscriptionStringInput
+  supervisorEmpID: ModelSubscriptionStringInput
+  supervisorStatus: ModelSubscriptionStringInput
+  supervisorDate: ModelSubscriptionStringInput
+  supervisorRemarks: ModelSubscriptionStringInput
+  managerName: ModelSubscriptionStringInput
+  managerEmpID: ModelSubscriptionStringInput
+  managerStatus: ModelSubscriptionStringInput
+  managerDate: ModelSubscriptionStringInput
+  managerRemarks: ModelSubscriptionStringInput
+  empStatus: ModelSubscriptionStringInput
+  empDate: ModelSubscriptionStringInput
+  empRemarks: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionLeaveStatusFilterInput]
+  or: [ModelSubscriptionLeaveStatusFilterInput]
+}

@@ -31,10 +31,12 @@ export declare type LeaveStatusUpdateFormInputValues = {
     reason?: string;
     medicalCertificate?: string;
     supervisorName?: string;
+    supervisorEmpID?: string;
     supervisorStatus?: string;
     supervisorDate?: string;
     supervisorRemarks?: string;
     managerName?: string;
+    managerEmpID?: string;
     managerStatus?: string;
     managerDate?: string;
     managerRemarks?: string;
@@ -52,10 +54,12 @@ export declare type LeaveStatusUpdateFormValidationValues = {
     reason?: ValidationFunction<string>;
     medicalCertificate?: ValidationFunction<string>;
     supervisorName?: ValidationFunction<string>;
+    supervisorEmpID?: ValidationFunction<string>;
     supervisorStatus?: ValidationFunction<string>;
     supervisorDate?: ValidationFunction<string>;
     supervisorRemarks?: ValidationFunction<string>;
     managerName?: ValidationFunction<string>;
+    managerEmpID?: ValidationFunction<string>;
     managerStatus?: ValidationFunction<string>;
     managerDate?: ValidationFunction<string>;
     managerRemarks?: ValidationFunction<string>;
@@ -75,10 +79,12 @@ export declare type LeaveStatusUpdateFormOverridesProps = {
     reason?: PrimitiveOverrideProps<TextFieldProps>;
     medicalCertificate?: PrimitiveOverrideProps<TextFieldProps>;
     supervisorName?: PrimitiveOverrideProps<TextFieldProps>;
+    supervisorEmpID?: PrimitiveOverrideProps<TextFieldProps>;
     supervisorStatus?: PrimitiveOverrideProps<TextFieldProps>;
     supervisorDate?: PrimitiveOverrideProps<TextFieldProps>;
     supervisorRemarks?: PrimitiveOverrideProps<TextFieldProps>;
     managerName?: PrimitiveOverrideProps<TextFieldProps>;
+    managerEmpID?: PrimitiveOverrideProps<TextFieldProps>;
     managerStatus?: PrimitiveOverrideProps<TextFieldProps>;
     managerDate?: PrimitiveOverrideProps<TextFieldProps>;
     managerRemarks?: PrimitiveOverrideProps<TextFieldProps>;

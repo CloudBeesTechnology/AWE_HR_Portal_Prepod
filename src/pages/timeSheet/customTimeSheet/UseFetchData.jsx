@@ -286,9 +286,111 @@ import {
   listORMCSheets,
   listOffshoreSheets,
 } from "../../../graphql/queries";
+// import { useScrollableView } from "./UseScrollableView";
 
+// export const useFetchData = (titleName) => {
+//   const [loading, setLoading] = useState(null);
+//   const client = generateClient(); // GraphQL client
+//   const [convertedStringToArrayObj, setConvertedStringToArrayObj] = useState(
+//     []
+//   );
+//   const [getPosition, setGetPosition] = useState(null);
+
+//   useEffect(() => {
+//     // setLoading(boolean);
+//     const Position = localStorage.getItem("userType");
+//     setGetPosition(Position);
+
+//     const fetchData = async () => {
+//       try {
+//         let query;
+//         let dataKey;
+
+//         // Map titleName to appropriate query and data keys
+
+//         switch (titleName) {
+//           case "BLNG":
+//             query = listBlngs;
+//             dataKey = "listBlngs";
+//             break;
+//           case "HO":
+//             query = listHeadOffices;
+//             dataKey = "listHeadOffices";
+//             break;
+//           case "SBW":
+//             query = listSBWSheets;
+//             dataKey = "listSBWSheets";
+//             break;
+//           case "ORMC":
+//             query = listORMCSheets;
+//             dataKey = "listORMCSheets";
+//             break;
+//           case "Offshore":
+//             query = listOffshoreSheets;
+//             dataKey = "listOffshoreSheets";
+//             break;
+//           default:
+//             console.log("Invalid titleName");
+//             return;
+//         }
+//         let nextToken = null;
+//         // Fetch data from GraphQL
+//         const response = await client.graphql({
+//           query: query,
+//           variables: { limit: 100, nextToken },
+//         });
+//         const fetchedData = response?.data?.[dataKey]?.items || [];
+//         console.log(fetchedData);
+//         // Transform data if needed
+//         const processedData = fetchedData.map((item) => {
+//           const rawSheet = item.weeklySheet || item.dailySheet;
+//           if (Array.isArray(rawSheet) && rawSheet.length > 0) {
+//             const rawData = rawSheet[0];
+//             const id = item.id;
+//             const Status = item.status;
+
+//             try {
+//               const cleanedData = rawData
+//                 .replace(/^"|\s*'|\s*"$|\\'/g, "")
+//                 .replace(/\\"/g, '"')
+//                 .replace(/\\n/g, "")
+//                 .replace(/\\\//g, "/");
+//               const arrayOfObjects = JSON.parse(cleanedData);
+//               const dataWithStatus = arrayOfObjects.map((obj) => ({
+//                 ...obj,
+//                 status: Status,
+//               }));
+//               return [{ id: id }, dataWithStatus];
+//             } catch (error) {
+//               console.error("Error parsing JSON:", error);
+//               return null;
+//             }
+//           }
+//           return null;
+//         });
+//         const filteredDatas = processedData.map((item) => item);
+//         console.log(processedData);
+//         // Filter out invalid entries
+//         const filteredData = processedData.filter((item) => item !== null);
+//         console.log(filteredData);
+//         setConvertedStringToArrayObj(filteredData);
+//       } catch (error) {
+//         console.error(`Error fetching data for ${titleName}:`, error);
+//       }
+//     };
+
+//     // Fetch only if titleName and Position are valid
+//     if ((Position === "Manager" && titleName) || Position !== "Manager") {
+//       fetchData();
+//     }
+//     console.log(convertedStringToArrayObj);
+//   }, [titleName]);
+
+//   return { convertedStringToArrayObj, getPosition };
+// };
+// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 export const useFetchData = (titleName) => {
-  const [loading, setLoading] = useState(null);
+  const [loading, setLoading] = useState(false);
   const client = generateClient(); // GraphQL client
   const [convertedStringToArrayObj, setConvertedStringToArrayObj] = useState(
     []
@@ -296,17 +398,16 @@ export const useFetchData = (titleName) => {
   const [getPosition, setGetPosition] = useState(null);
 
   useEffect(() => {
-    // setLoading(boolean);
     const Position = localStorage.getItem("userType");
     setGetPosition(Position);
 
     const fetchData = async () => {
       try {
+        setLoading(true); // Start loading indicator
         let query;
         let dataKey;
 
         // Map titleName to appropriate query and data keys
-
         switch (titleName) {
           case "BLNG":
             query = listBlngs;
@@ -329,52 +430,62 @@ export const useFetchData = (titleName) => {
             dataKey = "listOffshoreSheets";
             break;
           default:
-            console.log("Invalid titleName");
+            setLoading(false); // Stop loading on invalid titleName
             return;
         }
-        let nextToken = null;
-        // Fetch data from GraphQL
-        const response = await client.graphql({
-          query: query,
-          variables: { limit: 100, nextToken },
-        });
-        const fetchedData = response?.data?.[dataKey]?.items || [];
-        console.log(fetchedData);
-        // Transform data if needed
-        const processedData = fetchedData.map((item) => {
-          const rawSheet = item.weeklySheet || item.dailySheet;
-          if (Array.isArray(rawSheet) && rawSheet.length > 0) {
-            const rawData = rawSheet[0];
-            const id = item.id;
-            const Status = item.status;
 
-            try {
-              const cleanedData = rawData
-                .replace(/^"|\s*'|\s*"$|\\'/g, "")
-                .replace(/\\"/g, '"')
-                .replace(/\\n/g, "")
-                .replace(/\\\//g, "/");
-              const arrayOfObjects = JSON.parse(cleanedData);
-              const dataWithStatus = arrayOfObjects.map((obj) => ({
-                ...obj,
-                status: Status,
-              }));
-              return [{ id: id }, dataWithStatus];
-            } catch (error) {
-              console.error("Error parsing JSON:", error);
-              return null;
+        let nextToken = null;
+        let allData = [];
+
+        // Fetch data in a paginated manner
+        do {
+          const response = await client.graphql({
+            query: query,
+            variables: { limit: 10, nextToken },
+          });
+
+          const fetchedData = response?.data?.[dataKey]?.items || [];
+
+          nextToken = response?.data?.[dataKey]?.nextToken; // Update nextToken for next page
+
+          // Process fetched data
+          const processedData = fetchedData.map((item) => {
+            const rawSheet = item.weeklySheet || item.dailySheet;
+            if (Array.isArray(rawSheet) && rawSheet.length > 0) {
+              const rawData = rawSheet[0];
+              const id = item.id;
+              const Status = item.status;
+
+              try {
+                const cleanedData = rawData
+                  .replace(/^"|\s*'|\s*"$|\\'/g, "")
+                  .replace(/\\"/g, '"')
+                  .replace(/\\n/g, "")
+                  .replace(/\\\//g, "/");
+                const arrayOfObjects = JSON.parse(cleanedData);
+                const dataWithStatus = arrayOfObjects.map((obj) => ({
+                  ...obj,
+                  status: Status,
+                }));
+                return [{ id: id }, dataWithStatus];
+              } catch (error) {
+                console.error("Error parsing JSON:", error);
+                return null;
+              }
             }
-          }
-          return null;
-        });
-        const filteredDatas = processedData.map((item) => item);
-        console.log(processedData);
-        // Filter out invalid entries
-        const filteredData = processedData.filter((item) => item !== null);
-        console.log(filteredData);
-        setConvertedStringToArrayObj(filteredData);
+            return null;
+          });
+
+          // Append valid data to allData
+          const validData = processedData.filter((item) => item !== null);
+          allData = [...allData, ...validData];
+        } while (nextToken);
+        console.log("useFetchData : ", allData);
+        setConvertedStringToArrayObj(allData); // Update state with all data
       } catch (error) {
         console.error(`Error fetching data for ${titleName}:`, error);
+      } finally {
+        setLoading(false); // Stop loading indicator
       }
     };
 
@@ -382,12 +493,17 @@ export const useFetchData = (titleName) => {
     if ((Position === "Manager" && titleName) || Position !== "Manager") {
       fetchData();
     }
-    console.log(convertedStringToArrayObj);
   }, [titleName]);
+  // const { handleScroll, visibleData, setVisibleData } = useScrollableView(
+  //   convertedStringToArrayObj,
+  //   "Manager"
+  // );
 
-  return { convertedStringToArrayObj, getPosition };
+  return { convertedStringToArrayObj, getPosition, loading };
 };
 
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // import { useState, useEffect } from "react";
 // import { generateClient } from "@aws-amplify/api";
 // import {
@@ -420,7 +536,7 @@ export const useFetchData = (titleName) => {
 //         // Fetch data for the current page
 //         const response = await client.graphql({
 //           query,
-//           variables: { limit: 100, nextToken },
+//           variables: { limit: 1, nextToken },
 //         });
 
 //         const currentItems = response?.data?.[dataKey]?.items || [];
@@ -526,87 +642,4 @@ export const useFetchData = (titleName) => {
 //   }, [titleName]);
 
 //   return { convertedStringToArrayObj, getPosition, loading };
-// };
-
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// import { useState, useEffect } from "react";
-// import { generateClient } from "@aws-amplify/api";
-// import { listBlngs, listHeadOffices } from "../../../graphql/queries";
-
-// export const useFetchData = (titleName) => {
-//   const client = generateClient();
-//   const [convertedStringToArrayObj, setConvertedStringToArrayObj] = useState(
-//     []
-//   );
-//   const [getPosition, setGetPosition] = useState(null);
-
-//   useEffect(() => {
-//     const Position = localStorage.getItem("userType");
-//     setGetPosition(Position);
-
-//     // Helper function to fetch and process data
-//     const fetchData = async (query, sheetKey) => {
-//       try {
-//         const { data } = await client.graphql({ query });
-//         console.log(data);
-//         const items = data?.[Object.keys(data)[1]]?.items;
-//         console.log(items);
-//         // listHeadOffices, "dailySheet"
-//         // const BLNGdata = data?.data?.dailySheet?.items;
-//         // console.log(BLNGdata);
-//         if (items && items.length > 0) {
-//           const processedData = items.map((item) => {
-//             if (Array.isArray(item[sheetKey]) && item[sheetKey].length > 0) {
-//               const rawSheetData = item[sheetKey][0];
-//               const id = item.id;
-//               const status = item.status;
-
-//               const cleanedData = rawSheetData
-//                 .replace(/^"|\s*'|\s*"$|\\'/g, "")
-//                 .replace(/\\"/g, '"')
-//                 .replace(/\\n/g, "")
-//                 .replace(/\\\//g, "/");
-
-//               try {
-//                 const arrayOfObjects = JSON.parse(cleanedData);
-//                 return [
-//                   { id },
-//                   arrayOfObjects.map((obj) => ({ ...obj, status })),
-//                 ];
-//               } catch (error) {
-//                 console.error("Error parsing JSON:", error);
-//                 return null;
-//               }
-//             }
-//             return null;
-//           });
-
-//           return processedData.filter((item) => item !== null);
-//         } else {
-//           console.log("No data available");
-//           return [];
-//         }
-//       } catch (error) {
-//         console.error("Error fetching data:", error);
-//         return [];
-//       }
-//     };
-
-//     const fetchBLNGData = async () => {
-//       if (Position === "Manager") {
-//         if (titleName === "BLNG") {
-//           const result = await fetchData(listBlngs, "weeklySheet");
-//           setConvertedStringToArrayObj(result);
-//         } else if (titleName === "HO") {
-//           const result = await fetchData(listHeadOffices, "dailySheet");
-//           setConvertedStringToArrayObj(result);
-//         }
-//       }
-//     };
-
-//     fetchBLNGData();
-//   }, [titleName]);
-
-//   return { convertedStringToArrayObj, getPosition };
 // };

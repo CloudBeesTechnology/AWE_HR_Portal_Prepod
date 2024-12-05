@@ -20,8 +20,10 @@ export const DependentInsurance = () => {
   const { depInsuranceData } = useContext(DataSupply);
   const { SubmitMPData } = DependInsDataFun();
   const { UpdateDIData } = UpdateDepInsDataFun();
+
   const [notification, setNotification] = useState(false);
   const { searchResultData } = useOutletContext();
+
   const [selectedNationality, setSelectedNationality] = useState("");
   const {
     register,
@@ -38,6 +40,7 @@ export const DependentInsurance = () => {
 
   const [inputFields, setInputFields] = useState([{ id: Date.now() }]);
   const [uploadedFileDep, setUploadedFileDep] = useState({});
+  
   const [uploadedDocs, setUploadedDocs] = useState({
     depInsurance: [],
   });
@@ -69,9 +72,7 @@ export const DependentInsurance = () => {
       alert("Upload must be a PDF file");
       return;
     }
-
     setValue(`depInsurance[${index}].depenInfUpload`, selectedFile);
-
     try {
       await uploadDocs(
         selectedFile,
@@ -95,56 +96,56 @@ export const DependentInsurance = () => {
   const handleNationalityChange = (e) => {
     setSelectedNationality(e.target.value);
   };
-  useEffect(() => {
-    setValue("empID", searchResultData?.empID);
+  // useEffect(() => {
+  //   setValue("empID", searchResultData?.empID);
 
-    // Check if depInsurance is defined and not null before parsing
-    const depInsuranceData = searchResultData?.depInsurance;
-    if (depInsuranceData) {
-      try {
-        const parsedData = JSON.parse(depInsuranceData);
-        if (isInitialMount.current) {
-          if (parsedData && parsedData.length > 0) {
-            setDepInsurance(parsedData);
-            setValue("depInsurance", parsedData);
+  //   // Check if depInsurance is defined and not null before parsing
+  //   const depInsuranceData = searchResultData?.depInsurance;
+  //   if (depInsuranceData) {
+  //     try {
+  //       const parsedData = JSON.parse(depInsuranceData);
+  //       if (isInitialMount.current) {
+  //         if (parsedData && parsedData.length > 0) {
+  //           setDepInsurance(parsedData);
+  //           setValue("depInsurance", parsedData);
 
-            parsedData.forEach((item, idx) => {
-              if (item?.depenInfUpload) {
-                const url = item.depenInfUpload;
-                const parsedArray = JSON.parse(url);
-                const parsedFiles = parsedArray.map((item) =>
-                  typeof item === "string" ? JSON.parse(item) : item
-                );
-                setUploadedDocs((prev) => {
-                  const updatedDepInsurance = [...prev.depInsurance];
-                  updatedDepInsurance[idx] = parsedFiles;
+  //           parsedData.forEach((item, idx) => {
+  //             if (item?.depenInfUpload) {
+  //               const url = item.depenInfUpload;
+  //               const parsedArray = JSON.parse(url);
+  //               const parsedFiles = parsedArray.map((item) =>
+  //                 typeof item === "string" ? JSON.parse(item) : item
+  //               );
+  //               setUploadedDocs((prev) => {
+  //                 const updatedDepInsurance = [...prev.depInsurance];
+  //                 updatedDepInsurance[idx] = parsedFiles;
 
-                  return {
-                    ...prev,
-                    depInsurance: updatedDepInsurance,
-                  };
-                });
+  //                 return {
+  //                   ...prev,
+  //                   depInsurance: updatedDepInsurance,
+  //                 };
+  //               });
 
-                setUploadedFileDep((prev) => ({
-                  ...prev,
-                  [idx]:
-                    parsedFiles.length > 0
-                      ? getFileName(parsedFiles[parsedFiles.length - 1].upload)
-                      : "", // Assign file name dynamically based on index
-                }));
-              }
-            });
-          }
-          isInitialMount.current = false;
-        } else if (parsedData && parsedData.length > 0) {
-          setDepInsurance(parsedData);
-          setValue("depInsurance", parsedData);
-        }
-      } catch (error) {
-        console.error("Error parsing depInsurance data:", error);
-      }
-    }
-  }, [searchResultData]);
+  //               setUploadedFileDep((prev) => ({
+  //                 ...prev,
+  //                 [idx]:
+  //                   parsedFiles.length > 0
+  //                     ? getFileName(parsedFiles[parsedFiles.length - 1].upload)
+  //                     : "", // Assign file name dynamically based on index
+  //               }));
+  //             }
+  //           });
+  //         }
+  //         isInitialMount.current = false;
+  //       } else if (parsedData && parsedData.length > 0) {
+  //         setDepInsurance(parsedData);
+  //         setValue("depInsurance", parsedData);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error parsing depInsurance data:", error);
+  //     }
+  //   }
+  // }, [searchResultData]);
 
 
   const getFileName = (filePath) => {
@@ -177,8 +178,8 @@ export const DependentInsurance = () => {
 
         // console.log(depValue, "updatex");
         await UpdateDIData({ depValue });
-        setShowTitle("Dependent Insurance Info Updated successfully");
-        setNotification(true);
+        // setShowTitle("Dependent Insurance Info Updated successfully");
+        // setNotification(true);
       } else {
         const depValue = {
           ...data,
@@ -194,8 +195,8 @@ export const DependentInsurance = () => {
         // console.log(depValue, "create");
 
         await SubmitMPData({ depValue });
-        setShowTitle("Dependent Insurance Info saved successfully");
-        setNotification(true);
+        // setShowTitle("Dependent Insurance Info saved successfully");
+        // setNotification(true);
       }
     } catch (error) {
       console.error("Error submitting data:", error);
@@ -203,7 +204,7 @@ export const DependentInsurance = () => {
   };
 
   return (
-    <div className="bg-[#F5F6F1CC] mx-auto p-2 py-10">
+    <div className="bg-[#F5F6F1CC] mx-auto p-2 py-10" >
       <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
         <div className="flex justify-end items-center">
           <div className="max-w-sm">

@@ -280,14 +280,14 @@ export default function CandIToEMPCreateForm(props) {
     crime: [],
     crimeDesc: [],
     emgDetails: [{ type: "Required" }, { type: "JSON" }],
-    noExperience: [{ type: "Required" }],
-    empStatement: [{ type: "Required" }],
+    noExperience: [],
+    empStatement: [],
     desc: [],
     disease: [],
     diseaseDesc: [],
     liquor: [],
     liquorDesc: [],
-    perIS: [{ type: "Required" }],
+    perIS: [],
     perID: [],
     referees: [{ type: "JSON" }],
     relatives: [{ type: "JSON" }],
@@ -581,7 +581,7 @@ export default function CandIToEMPCreateForm(props) {
       </ArrayField>
       <TextField
         label="No experience"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={noExperience}
         onChange={(e) => {
@@ -622,7 +622,7 @@ export default function CandIToEMPCreateForm(props) {
       ></TextField>
       <TextField
         label="Emp statement"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={empStatement}
         onChange={(e) => {
@@ -868,7 +868,7 @@ export default function CandIToEMPCreateForm(props) {
       ></TextField>
       <TextField
         label="Per is"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={perIS}
         onChange={(e) => {

@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import { GoUpload } from 'react-icons/go';
+import React, { useContext, useEffect, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { JitpaEmpSchema } from '../../../services/EmployeeValidation'; 
@@ -49,9 +48,7 @@ export const Jitpa = () => {
     return ""; 
   };
 
-  const jpPurDate = () => setJpPurchaseDta([...tbaPurchase, ""]);
-  const jpValids = () => setJpValidation([...jpValid, ""]);
-  const jpEndorsements = () => setJpEndorsement([...jpEndorse, ""]);
+
 
   const getFileName = (input) => {
     // Check if input is an object and has the 'upload' property
@@ -119,7 +116,6 @@ export const Jitpa = () => {
         const parsedFiles = parsedArray.map((item) =>
           typeof item === "string" ? JSON.parse(item) : item
         );
-        console.log(parsedFiles);
         setValue("jpEmpUpload", parsedFiles);
 
         setUploadjitpa((prev) => ({
@@ -148,9 +144,6 @@ export const Jitpa = () => {
 
     const allowedTypes = [
       "application/pdf",
-      "image/jpeg",
-      "image/png",
-      "image/jpg",
     ];
 
     if (!empID) {
@@ -160,7 +153,7 @@ export const Jitpa = () => {
     }
 
     if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      alert("Upload must be a PDF file");
       return;
     }
 
@@ -182,7 +175,6 @@ export const Jitpa = () => {
 
   const onSubmit = async (data) => {
 
-
     const formatDate = (date) => date ? new Date(date).toLocaleDateString('en-CA') : null;
     const tbaPurchase = formatDate(data.tbaPurchase);
     const jpValid = formatDate(data.jpValid);
@@ -193,7 +185,6 @@ export const Jitpa = () => {
       if (empID) {
 
         matchedEmployee = BJLData.find((val) => val.empID === empID);
-  
 
         const updatedSubmissionDate = [
           ...new Set([
@@ -215,8 +206,7 @@ export const Jitpa = () => {
              jpValid
           ]),
         ];
-   
-
+  
 
       const JitpaValue = {
         ...data,
@@ -227,20 +217,24 @@ export const Jitpa = () => {
         id: matchedEmployee ? matchedEmployee.id : null,
       };
 
-      
-     
-
       await UpdateJitpaData({ JitpaValue });
-      setShowTitle("Work Pass JITPA Info Data Stored Successfully")
+      setShowTitle("JITPA Info Saved Successfully")
         setNotification(true);
+        
     } else {
       console.log("error")
     }
     } catch (error) {
-      console.error("Error submitting data:", error);
-   
+      console.log(error);
 
-     
+      if (error?.errors) {
+        error.errors.forEach((err, index) => {
+          console.error(`GraphQL Error ${index + 1}:`, err.message);
+          if (err.extensions) {
+            console.error("Error Extensions:", err.extensions);
+          }
+        });
+      }
     }
   };
 
@@ -285,7 +279,7 @@ export const Jitpa = () => {
           errors={errors}
         />
       <FormField
-          label="Date Endorsement Of Jitpa"
+          label="Date Endorsement Of JITPA"
           register={register}
           name="jpEndorse"
           type="date"
@@ -316,9 +310,11 @@ export const Jitpa = () => {
           <SpinLogo
             text={showTitle}
             notification={notification}
-            path="/employee"
+            path="/sawp/jitpa"
           />
         )}
     </form>
   );
 };
+
+

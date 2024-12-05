@@ -9,6 +9,7 @@ export const EmpReqDataFun = () => {
       throw new Error("Missing required parameters");
     }
     const totalData = {
+        reqName:EmpReqValue.reqName,
         department:EmpReqValue.department,  
         project: EmpReqValue.project,
         position: EmpReqValue.position,
@@ -18,8 +19,10 @@ export const EmpReqDataFun = () => {
         replacementFor: EmpReqValue.replacementFor,
         qualification: EmpReqValue.qualification,
         tentativeDate: EmpReqValue.tentativeDate,
+        status: EmpReqValue.status,
+        remarkReq: EmpReqValue.remarkReq,
     };
-    // console.log(totalData);
+    console.log(totalData);
 
     try {
       const storedData=   await Promise.all([
@@ -30,7 +33,7 @@ export const EmpReqDataFun = () => {
              },
            })
          ])
-        //  console.log(storedData,"successfully stored data");
+         console.log(storedData,"successfully stored data");
 
        } catch (error) {
          console.error("Error executing GraphQL requests:", error);

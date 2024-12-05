@@ -1,5 +1,9 @@
 import { GoUpload } from "react-icons/go";
-
+import {
+  GenderDD,
+  MaritalDD,
+  NationalityDD,
+} from "../../utils/DropDownMenus";
 export const WorkDataPass = {
 
     positions : [
@@ -116,72 +120,29 @@ export const WorkDataPass = {
           name: "supervisor",
           type: "text",
         },
-        {
-          label: "Employee Status",
-          name: "relationship",
-          type: "select",
-          options: [
-            "",
-            "Single",
-            "Employee & Spouse",
-            "Employee, Spouse & Children (max 2 pax below age 18)",
-          ],
-        },
-        { label: "Upgrade Position", name: "upgradePosition", type: "text" },
-        {
-          label: "Position  Upgrade Effective date",
-          name: "upgradeDate",
-          type: "date",
-        },
-        {
-          label: "Contract Period Status",
-          name: "contractPeriod",
-          type: "text",
-        },
-        { label: "Contract Start Date", name: "contractStart", type: "date" },
-        { label: "Contract End Date", name: "contractEnd", type: "date" },
-        {
-          label: "Probationary Start Date",
-          name: "probationStart",
-          type: "date",
-        },
-        {
-          label: "Probationary End Date",
-          name: "probationEnd",
-          type: "date",
-        },
-        {
-          label: "Probation Duration",
-          name: "probDuration",
-          type: "text",
-        },
-        {
-          label: "Normal Working Hours Per Day",
-          name: "workHrs",
-          type: "text",
-        },
-        {
-          label: "Normal Working Day per Week",
-          name: "workWeek",
-          type: "text",
-        },
-        {
-          label: "Normal Working Day per Month",
-          name: "workMonth",
-          type: "text",
-        },
-        {
-          label: "Employment Work Status",
-          name: "workStatus",
-          type: "select",
-          options: ["", "Probationary", "Active", "Resignation", "Termination"],
-        },
-        {
-          label: "Type of Salary Pay",
-          name: "salaryType",
-          type: "select",
-          options: ["", "Monthly", "Daily"],
-        },
+ 
+        // {
+        //   label: "Normal Working Day per Week",
+        //   name: "workWeek",
+        //   type: "text",
+        // },
+        // {
+        //   label: "Normal Working Day per Month",
+        //   name: "workMonth",
+        //   type: "text",
+        // },
+        // {
+        //   label: "Employment Work Status",
+        //   name: "workStatus",
+        //   type: "select",
+        //   options: ["", "Probationary", "Active", "Resignation", "Termination"],
+        // },
+        // {
+        //   label: "Type of Salary Pay",
+        //   name: "salaryType",
+        //   type: "select",
+        //   options: ["", "Monthly", "Daily"],
+        // },
         
       ],
     
@@ -218,17 +179,6 @@ export const WorkDataPass = {
 
       leaveBasic : [
         {
-          label: "Leave Passage Entitlement for Non-Local",
-          name: "leavePass",
-          type: "select",
-          options: [
-            "",
-            "Employee alone",
-            "Employee & Spouse",
-            "Employee, Spouse & Children (max 2 pax below age 18)",
-          ],
-        },
-        {
           label: "Date of Leave Passage Entitlement After Contract",
           name: "dateLeavePass",
           type: "date",
@@ -244,24 +194,18 @@ export const WorkDataPass = {
           type: "text",
         },
       ],
-
-      leaveFields : [
-        
+    
+      leaveFieldsAnother:[
         { label: "Annual Leave Entitlement", name: "annualLeave", type: "text" },
-        { label: "Effective Date", name: "annualLeaveDate", type: "date" },
+        { label: "Effective Date", name: "annualLeaveDate", type: "date" },  
         { label: "Sick Leave Entitlement", name: "sickLeave", type: "text" },
         { label: "Effective Date", name: "sickLeaveDate", type: "date" },
         { label: "Maternity Leave Entitlement", name: "materLeave", type: "text" },
-        { label: "Effective Date", name: "materLeaveDate", type: "date" },
         { label: "Paternity Leave Entitlement", name: "paterLeave", type: "text" },
-        { label: "Effective Date", name: "paterLeaveDate", type: "date" },
         { label: "Marriage Leave Entitlement", name: "mrageLeave", type: "text" },
-        { label: "Effective Date", name: "mrageLeaveDate", type: "date" },
         { label: "Compassionate Entitlement", name: "compasLeave", type: "text" },
-        { label: "Effective Date", name: "compasLeaveDate", type: "date" },
+        { label: "Hospitalisation Leave Entitlement", name: "hospLeave", type: "text" },
       ],
-    
-
      serviceRecords : [
         { label: "Position Revision", name: "positionRev", type: "text" },
         { label: "Effective Date", name: "positionRevDate", type: "date" },
@@ -279,6 +223,82 @@ export const WorkDataPass = {
         { label: "Effective Date", name: "depEmpDate", type: "date" },
         { label: "Upload File", name: "uploadDep", type: "file" },
       ],
+      hiringJob:[
+        { label: "Job Title", name: "jobTitle", type: "text" },
+        { label: "Experience", name: "experience", type: "text" },
+        { label: "Location", name: "location", type: "text" },
+        { label: "Quantity", name: "quantity", type: "text" },
+        { label: "Start Date", name: "startDate", type: "date" },
+        { label: "Expiry Date", name: "expiryDate", type: "date" },
+      ],
 
+//      formField1 : [
+//         { label: "Employee Badge Number", key: "empBadgeNo", type: "text" },
+//         { label: "Employee Name", key: "name", type: "text" },
+//         { label: "Department", key: "department", type: "text" },
+//         { label: "Position", key: "position", type: "text" },
+//         { label: "Date of Joining", key: "doj", type: "date" },
+//         { label: "Gender", key: "gender", type: "select", options: GenderDD },
+//         { label: "Brunei I/C Number", key: "bwnIcNo", type: "text" },
+//         { label: "Passport Number for Non-Local", key: "ppNo", type: "text" },
+//         { label: "Date of Birth", key: "dob", type: "date" },
+//         {
+//           label: "Marital Status",
+//           key: "marital",
+//           type: "select",
+//           options: MaritalDD,
+//         },
+//         {
+//           label: "Nationality",
+//           key: "nationality",
+//           type: "select",
+//           options: NationalityDD,
+//         },
+//         // { label: "Other Nationality", key: "otherNation", type: "text" }
+//       ],
+// formField2:[
+//   {
+//     label: "Group H&S Insurance",
+//     key: "groupIns",
+//     type: "select",
+//     options: [
+//       "Single",
+//       "Employee & spouse",
+//       "Employee & Child",
+//       "Employee & Family",
+//       "Decline",
+//       "Others",
+//     ],
+//   },
+//   {
+//     label: "Group H&S Insurance Enrollment Effective Date",
+//     key: "groupInsEffectDate",
+//     type: "date",
+//   },
+//   {
+//     label: "Group H&S Insurance Enrollment End Date",
+//     key: "groupInsEndDate",
+//     type: "date",
+//   },
+//   {
+//     label: "Workmen Compensation Insurance",
+//     key: "workmenComp",
+//     type: "select",
+//     options: ["Offshore", "Onshore", "General"],
+//   },
+//   { label: "Policy Number", key: "workmePolicyNo", type: "text" },
+//   {
+//     label: "Travelling Insurance",
+//     key: "travelIns",
+//     type: "select",
+//     options: ["Yes", "No"],
+//   },
+//   {
+//     label: "Personal Accident Insurance",
+//     key: "accidentIns",
+//     type: "select",
+//     options: ["Yes", "No"],
+//   },
+// ]
 }
 

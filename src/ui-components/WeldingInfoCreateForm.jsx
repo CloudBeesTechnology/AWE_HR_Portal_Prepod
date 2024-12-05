@@ -273,23 +273,23 @@ export default function WeldingInfoCreateForm(props) {
   const weldingUploadRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
-    department: [{ type: "Required" }],
-    diameterRange: [{ type: "Required" }],
-    empBadgeNo: [{ type: "Required" }],
-    empName: [{ type: "Required" }],
-    fillerMetal: [{ type: "Required" }],
-    position: [{ type: "Required" }],
-    thicknessRange: [{ type: "Required" }],
-    weldingStampNor: [{ type: "Required" }],
-    wpsNumber: [{ type: "Required" }],
-    weldingProcess: [{ type: "Required" }],
-    weldingPosition: [{ type: "Required" }],
-    WQExpiry: [{ type: "Required" }],
+    department: [],
+    diameterRange: [],
+    empBadgeNo: [],
+    empName: [],
+    fillerMetal: [],
+    position: [],
+    thicknessRange: [],
+    weldingStampNor: [],
+    wpsNumber: [],
+    weldingProcess: [],
+    weldingPosition: [],
+    WQExpiry: [],
     WQRemarks: [],
     weldingUpload: [{ type: "JSON" }],
-    WQRNo: [{ type: "Required" }],
-    weldingCode: [{ type: "Required" }],
-    weldingMaterial: [{ type: "Required" }],
+    WQRNo: [],
+    weldingCode: [],
+    weldingMaterial: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -431,7 +431,7 @@ export default function WeldingInfoCreateForm(props) {
       ></TextField>
       <TextField
         label="Department"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={department}
         onChange={(e) => {
@@ -472,7 +472,7 @@ export default function WeldingInfoCreateForm(props) {
       ></TextField>
       <TextField
         label="Diameter range"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={diameterRange}
         onChange={(e) => {
@@ -513,7 +513,7 @@ export default function WeldingInfoCreateForm(props) {
       ></TextField>
       <TextField
         label="Emp badge no"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={empBadgeNo}
         onChange={(e) => {
@@ -554,7 +554,7 @@ export default function WeldingInfoCreateForm(props) {
       ></TextField>
       <TextField
         label="Emp name"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={empName}
         onChange={(e) => {
@@ -595,7 +595,7 @@ export default function WeldingInfoCreateForm(props) {
       ></TextField>
       <TextField
         label="Filler metal"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={fillerMetal}
         onChange={(e) => {
@@ -636,7 +636,7 @@ export default function WeldingInfoCreateForm(props) {
       ></TextField>
       <TextField
         label="Position"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={position}
         onChange={(e) => {
@@ -677,7 +677,7 @@ export default function WeldingInfoCreateForm(props) {
       ></TextField>
       <TextField
         label="Thickness range"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={thicknessRange}
         onChange={(e) => {
@@ -718,7 +718,7 @@ export default function WeldingInfoCreateForm(props) {
       ></TextField>
       <TextField
         label="Welding stamp nor"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={weldingStampNor}
         onChange={(e) => {
@@ -759,7 +759,7 @@ export default function WeldingInfoCreateForm(props) {
       ></TextField>
       <TextField
         label="Wps number"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={wpsNumber}
         onChange={(e) => {
@@ -800,7 +800,7 @@ export default function WeldingInfoCreateForm(props) {
       ></TextField>
       <TextField
         label="Welding process"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={weldingProcess}
         onChange={(e) => {
@@ -841,7 +841,7 @@ export default function WeldingInfoCreateForm(props) {
       ></TextField>
       <TextField
         label="Welding position"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={weldingPosition}
         onChange={(e) => {
@@ -882,7 +882,7 @@ export default function WeldingInfoCreateForm(props) {
       ></TextField>
       <TextField
         label="Wq expiry"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={WQExpiry}
         onChange={(e) => {
@@ -1028,7 +1028,7 @@ export default function WeldingInfoCreateForm(props) {
       </ArrayField>
       <TextField
         label="Wqr no"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={WQRNo}
         onChange={(e) => {
@@ -1069,7 +1069,7 @@ export default function WeldingInfoCreateForm(props) {
       ></TextField>
       <TextField
         label="Welding code"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={weldingCode}
         onChange={(e) => {
@@ -1110,7 +1110,7 @@ export default function WeldingInfoCreateForm(props) {
       ></TextField>
       <TextField
         label="Welding material"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={weldingMaterial}
         onChange={(e) => {

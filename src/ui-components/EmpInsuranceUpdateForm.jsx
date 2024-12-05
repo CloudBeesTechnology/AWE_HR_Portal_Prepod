@@ -196,8 +196,8 @@ export default function EmpInsuranceUpdateForm(props) {
     groupIns: [],
     groupInsEffectDate: [],
     groupInsEndDate: [],
-    workmenComp: [],
-    workmePolicyNo: [],
+    empStatusType: "",
+    workmenCompNo: "",
     travelIns: [],
     accidentIns: [],
     empInsUpload: [],
@@ -210,11 +210,11 @@ export default function EmpInsuranceUpdateForm(props) {
   const [groupInsEndDate, setGroupInsEndDate] = React.useState(
     initialValues.groupInsEndDate
   );
-  const [workmenComp, setWorkmenComp] = React.useState(
-    initialValues.workmenComp
+  const [empStatusType, setEmpStatusType] = React.useState(
+    initialValues.empStatusType
   );
-  const [workmePolicyNo, setWorkmePolicyNo] = React.useState(
-    initialValues.workmePolicyNo
+  const [workmenCompNo, setWorkmenCompNo] = React.useState(
+    initialValues.workmenCompNo
   );
   const [travelIns, setTravelIns] = React.useState(initialValues.travelIns);
   const [accidentIns, setAccidentIns] = React.useState(
@@ -235,10 +235,8 @@ export default function EmpInsuranceUpdateForm(props) {
     setCurrentGroupInsEffectDateValue("");
     setGroupInsEndDate(cleanValues.groupInsEndDate ?? []);
     setCurrentGroupInsEndDateValue("");
-    setWorkmenComp(cleanValues.workmenComp ?? []);
-    setCurrentWorkmenCompValue("");
-    setWorkmePolicyNo(cleanValues.workmePolicyNo ?? []);
-    setCurrentWorkmePolicyNoValue("");
+    setEmpStatusType(cleanValues.empStatusType);
+    setWorkmenCompNo(cleanValues.workmenCompNo);
     setTravelIns(cleanValues.travelIns ?? []);
     setCurrentTravelInsValue("");
     setAccidentIns(cleanValues.accidentIns ?? []);
@@ -273,12 +271,6 @@ export default function EmpInsuranceUpdateForm(props) {
   const [currentGroupInsEndDateValue, setCurrentGroupInsEndDateValue] =
     React.useState("");
   const groupInsEndDateRef = React.createRef();
-  const [currentWorkmenCompValue, setCurrentWorkmenCompValue] =
-    React.useState("");
-  const workmenCompRef = React.createRef();
-  const [currentWorkmePolicyNoValue, setCurrentWorkmePolicyNoValue] =
-    React.useState("");
-  const workmePolicyNoRef = React.createRef();
   const [currentTravelInsValue, setCurrentTravelInsValue] = React.useState("");
   const travelInsRef = React.createRef();
   const [currentAccidentInsValue, setCurrentAccidentInsValue] =
@@ -289,11 +281,11 @@ export default function EmpInsuranceUpdateForm(props) {
   const empInsUploadRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
-    groupIns: [{ type: "Required" }],
-    groupInsEffectDate: [{ type: "Required" }],
-    groupInsEndDate: [{ type: "Required" }],
-    workmenComp: [{ type: "Required" }],
-    workmePolicyNo: [],
+    groupIns: [],
+    groupInsEffectDate: [],
+    groupInsEndDate: [],
+    empStatusType: [],
+    workmenCompNo: [],
     travelIns: [],
     accidentIns: [],
     empInsUpload: [{ type: "JSON" }],
@@ -325,11 +317,11 @@ export default function EmpInsuranceUpdateForm(props) {
         event.preventDefault();
         let modelFields = {
           empID,
-          groupIns,
-          groupInsEffectDate,
-          groupInsEndDate,
-          workmenComp,
-          workmePolicyNo: workmePolicyNo ?? null,
+          groupIns: groupIns ?? null,
+          groupInsEffectDate: groupInsEffectDate ?? null,
+          groupInsEndDate: groupInsEndDate ?? null,
+          empStatusType: empStatusType ?? null,
+          workmenCompNo: workmenCompNo ?? null,
           travelIns: travelIns ?? null,
           accidentIns: accidentIns ?? null,
           empInsUpload: empInsUpload ?? null,
@@ -397,8 +389,8 @@ export default function EmpInsuranceUpdateForm(props) {
               groupIns,
               groupInsEffectDate,
               groupInsEndDate,
-              workmenComp,
-              workmePolicyNo,
+              empStatusType,
+              workmenCompNo,
               travelIns,
               accidentIns,
               empInsUpload,
@@ -425,8 +417,8 @@ export default function EmpInsuranceUpdateForm(props) {
               groupIns: values,
               groupInsEffectDate,
               groupInsEndDate,
-              workmenComp,
-              workmePolicyNo,
+              empStatusType,
+              workmenCompNo,
               travelIns,
               accidentIns,
               empInsUpload,
@@ -451,7 +443,7 @@ export default function EmpInsuranceUpdateForm(props) {
       >
         <TextField
           label="Group ins"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentGroupInsValue}
           onChange={(e) => {
@@ -478,8 +470,8 @@ export default function EmpInsuranceUpdateForm(props) {
               groupIns,
               groupInsEffectDate: values,
               groupInsEndDate,
-              workmenComp,
-              workmePolicyNo,
+              empStatusType,
+              workmenCompNo,
               travelIns,
               accidentIns,
               empInsUpload,
@@ -507,7 +499,7 @@ export default function EmpInsuranceUpdateForm(props) {
       >
         <TextField
           label="Group ins effect date"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentGroupInsEffectDateValue}
           onChange={(e) => {
@@ -539,8 +531,8 @@ export default function EmpInsuranceUpdateForm(props) {
               groupIns,
               groupInsEffectDate,
               groupInsEndDate: values,
-              workmenComp,
-              workmePolicyNo,
+              empStatusType,
+              workmenCompNo,
               travelIns,
               accidentIns,
               empInsUpload,
@@ -568,7 +560,7 @@ export default function EmpInsuranceUpdateForm(props) {
       >
         <TextField
           label="Group ins end date"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentGroupInsEndDateValue}
           onChange={(e) => {
@@ -588,116 +580,70 @@ export default function EmpInsuranceUpdateForm(props) {
           {...getOverrideProps(overrides, "groupInsEndDate")}
         ></TextField>
       </ArrayField>
-      <ArrayField
-        onChange={async (items) => {
-          let values = items;
+      <TextField
+        label="Emp status type"
+        isRequired={false}
+        isReadOnly={false}
+        value={empStatusType}
+        onChange={(e) => {
+          let { value } = e.target;
           if (onChange) {
             const modelFields = {
               empID,
               groupIns,
               groupInsEffectDate,
               groupInsEndDate,
-              workmenComp: values,
-              workmePolicyNo,
+              empStatusType: value,
+              workmenCompNo,
               travelIns,
               accidentIns,
               empInsUpload,
             };
             const result = onChange(modelFields);
-            values = result?.workmenComp ?? values;
+            value = result?.empStatusType ?? value;
           }
-          setWorkmenComp(values);
-          setCurrentWorkmenCompValue("");
+          if (errors.empStatusType?.hasError) {
+            runValidationTasks("empStatusType", value);
+          }
+          setEmpStatusType(value);
         }}
-        currentFieldValue={currentWorkmenCompValue}
-        label={"Workmen comp"}
-        items={workmenComp}
-        hasError={errors?.workmenComp?.hasError}
-        runValidationTasks={async () =>
-          await runValidationTasks("workmenComp", currentWorkmenCompValue)
-        }
-        errorMessage={errors?.workmenComp?.errorMessage}
-        setFieldValue={setCurrentWorkmenCompValue}
-        inputFieldRef={workmenCompRef}
-        defaultFieldValue={""}
-      >
-        <TextField
-          label="Workmen comp"
-          isRequired={true}
-          isReadOnly={false}
-          value={currentWorkmenCompValue}
-          onChange={(e) => {
-            let { value } = e.target;
-            if (errors.workmenComp?.hasError) {
-              runValidationTasks("workmenComp", value);
-            }
-            setCurrentWorkmenCompValue(value);
-          }}
-          onBlur={() =>
-            runValidationTasks("workmenComp", currentWorkmenCompValue)
-          }
-          errorMessage={errors.workmenComp?.errorMessage}
-          hasError={errors.workmenComp?.hasError}
-          ref={workmenCompRef}
-          labelHidden={true}
-          {...getOverrideProps(overrides, "workmenComp")}
-        ></TextField>
-      </ArrayField>
-      <ArrayField
-        onChange={async (items) => {
-          let values = items;
+        onBlur={() => runValidationTasks("empStatusType", empStatusType)}
+        errorMessage={errors.empStatusType?.errorMessage}
+        hasError={errors.empStatusType?.hasError}
+        {...getOverrideProps(overrides, "empStatusType")}
+      ></TextField>
+      <TextField
+        label="Workmen comp no"
+        isRequired={false}
+        isReadOnly={false}
+        value={workmenCompNo}
+        onChange={(e) => {
+          let { value } = e.target;
           if (onChange) {
             const modelFields = {
               empID,
               groupIns,
               groupInsEffectDate,
               groupInsEndDate,
-              workmenComp,
-              workmePolicyNo: values,
+              empStatusType,
+              workmenCompNo: value,
               travelIns,
               accidentIns,
               empInsUpload,
             };
             const result = onChange(modelFields);
-            values = result?.workmePolicyNo ?? values;
+            value = result?.workmenCompNo ?? value;
           }
-          setWorkmePolicyNo(values);
-          setCurrentWorkmePolicyNoValue("");
+          if (errors.workmenCompNo?.hasError) {
+            runValidationTasks("workmenCompNo", value);
+          }
+          setWorkmenCompNo(value);
         }}
-        currentFieldValue={currentWorkmePolicyNoValue}
-        label={"Workme policy no"}
-        items={workmePolicyNo}
-        hasError={errors?.workmePolicyNo?.hasError}
-        runValidationTasks={async () =>
-          await runValidationTasks("workmePolicyNo", currentWorkmePolicyNoValue)
-        }
-        errorMessage={errors?.workmePolicyNo?.errorMessage}
-        setFieldValue={setCurrentWorkmePolicyNoValue}
-        inputFieldRef={workmePolicyNoRef}
-        defaultFieldValue={""}
-      >
-        <TextField
-          label="Workme policy no"
-          isRequired={false}
-          isReadOnly={false}
-          value={currentWorkmePolicyNoValue}
-          onChange={(e) => {
-            let { value } = e.target;
-            if (errors.workmePolicyNo?.hasError) {
-              runValidationTasks("workmePolicyNo", value);
-            }
-            setCurrentWorkmePolicyNoValue(value);
-          }}
-          onBlur={() =>
-            runValidationTasks("workmePolicyNo", currentWorkmePolicyNoValue)
-          }
-          errorMessage={errors.workmePolicyNo?.errorMessage}
-          hasError={errors.workmePolicyNo?.hasError}
-          ref={workmePolicyNoRef}
-          labelHidden={true}
-          {...getOverrideProps(overrides, "workmePolicyNo")}
-        ></TextField>
-      </ArrayField>
+        onBlur={() => runValidationTasks("workmenCompNo", workmenCompNo)}
+        errorMessage={errors.workmenCompNo?.errorMessage}
+        hasError={errors.workmenCompNo?.hasError}
+        {...getOverrideProps(overrides, "workmenCompNo")}
+      ></TextField>
       <ArrayField
         onChange={async (items) => {
           let values = items;
@@ -707,8 +653,8 @@ export default function EmpInsuranceUpdateForm(props) {
               groupIns,
               groupInsEffectDate,
               groupInsEndDate,
-              workmenComp,
-              workmePolicyNo,
+              empStatusType,
+              workmenCompNo,
               travelIns: values,
               accidentIns,
               empInsUpload,
@@ -760,8 +706,8 @@ export default function EmpInsuranceUpdateForm(props) {
               groupIns,
               groupInsEffectDate,
               groupInsEndDate,
-              workmenComp,
-              workmePolicyNo,
+              empStatusType,
+              workmenCompNo,
               travelIns,
               accidentIns: values,
               empInsUpload,
@@ -815,8 +761,8 @@ export default function EmpInsuranceUpdateForm(props) {
               groupIns,
               groupInsEffectDate,
               groupInsEndDate,
-              workmenComp,
-              workmePolicyNo,
+              empStatusType,
+              workmenCompNo,
               travelIns,
               accidentIns,
               empInsUpload: values,

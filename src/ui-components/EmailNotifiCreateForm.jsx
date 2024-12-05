@@ -6,177 +6,11 @@
 
 /* eslint-disable */
 import * as React from "react";
-import {
-  Badge,
-  Button,
-  Divider,
-  Flex,
-  Grid,
-  Icon,
-  ScrollView,
-  Text,
-  TextField,
-  useTheme,
-} from "@aws-amplify/ui-react";
+import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { generateClient } from "aws-amplify/api";
 import { createEmailNotifi } from "../graphql/mutations";
 const client = generateClient();
-function ArrayField({
-  items = [],
-  onChange,
-  label,
-  inputFieldRef,
-  children,
-  hasError,
-  setFieldValue,
-  currentFieldValue,
-  defaultFieldValue,
-  lengthLimit,
-  getBadgeText,
-  runValidationTasks,
-  errorMessage,
-}) {
-  const labelElement = <Text>{label}</Text>;
-  const {
-    tokens: {
-      components: {
-        fieldmessages: { error: errorStyles },
-      },
-    },
-  } = useTheme();
-  const [selectedBadgeIndex, setSelectedBadgeIndex] = React.useState();
-  const [isEditing, setIsEditing] = React.useState();
-  React.useEffect(() => {
-    if (isEditing) {
-      inputFieldRef?.current?.focus();
-    }
-  }, [isEditing]);
-  const removeItem = async (removeIndex) => {
-    const newItems = items.filter((value, index) => index !== removeIndex);
-    await onChange(newItems);
-    setSelectedBadgeIndex(undefined);
-  };
-  const addItem = async () => {
-    const { hasError } = runValidationTasks();
-    if (
-      currentFieldValue !== undefined &&
-      currentFieldValue !== null &&
-      currentFieldValue !== "" &&
-      !hasError
-    ) {
-      const newItems = [...items];
-      if (selectedBadgeIndex !== undefined) {
-        newItems[selectedBadgeIndex] = currentFieldValue;
-        setSelectedBadgeIndex(undefined);
-      } else {
-        newItems.push(currentFieldValue);
-      }
-      await onChange(newItems);
-      setIsEditing(false);
-    }
-  };
-  const arraySection = (
-    <React.Fragment>
-      {!!items?.length && (
-        <ScrollView height="inherit" width="inherit" maxHeight={"7rem"}>
-          {items.map((value, index) => {
-            return (
-              <Badge
-                key={index}
-                style={{
-                  cursor: "pointer",
-                  alignItems: "center",
-                  marginRight: 3,
-                  marginTop: 3,
-                  backgroundColor:
-                    index === selectedBadgeIndex ? "#B8CEF9" : "",
-                }}
-                onClick={() => {
-                  setSelectedBadgeIndex(index);
-                  setFieldValue(items[index]);
-                  setIsEditing(true);
-                }}
-              >
-                {getBadgeText ? getBadgeText(value) : value.toString()}
-                <Icon
-                  style={{
-                    cursor: "pointer",
-                    paddingLeft: 3,
-                    width: 20,
-                    height: 20,
-                  }}
-                  viewBox={{ width: 20, height: 20 }}
-                  paths={[
-                    {
-                      d: "M10 10l5.09-5.09L10 10l5.09 5.09L10 10zm0 0L4.91 4.91 10 10l-5.09 5.09L10 10z",
-                      stroke: "black",
-                    },
-                  ]}
-                  ariaLabel="button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    removeItem(index);
-                  }}
-                />
-              </Badge>
-            );
-          })}
-        </ScrollView>
-      )}
-      <Divider orientation="horizontal" marginTop={5} />
-    </React.Fragment>
-  );
-  if (lengthLimit !== undefined && items.length >= lengthLimit && !isEditing) {
-    return (
-      <React.Fragment>
-        {labelElement}
-        {arraySection}
-      </React.Fragment>
-    );
-  }
-  return (
-    <React.Fragment>
-      {labelElement}
-      {isEditing && children}
-      {!isEditing ? (
-        <>
-          <Button
-            onClick={() => {
-              setIsEditing(true);
-            }}
-          >
-            Add item
-          </Button>
-          {errorMessage && hasError && (
-            <Text color={errorStyles.color} fontSize={errorStyles.fontSize}>
-              {errorMessage}
-            </Text>
-          )}
-        </>
-      ) : (
-        <Flex justifyContent="flex-end">
-          {(currentFieldValue || isEditing) && (
-            <Button
-              children="Cancel"
-              type="button"
-              size="small"
-              onClick={() => {
-                setFieldValue(defaultFieldValue);
-                setIsEditing(false);
-                setSelectedBadgeIndex(undefined);
-              }}
-            ></Button>
-          )}
-          <Button size="small" variation="link" onClick={addItem}>
-            {selectedBadgeIndex !== undefined ? "Save" : "Add"}
-          </Button>
-        </Flex>
-      )}
-      {arraySection}
-    </React.Fragment>
-  );
-}
 export default function EmailNotifiCreateForm(props) {
   const {
     clearOnSuccess = true,
@@ -192,7 +26,8 @@ export default function EmailNotifiCreateForm(props) {
     empID: "",
     leaveType: "",
     senderEmail: "",
-    receipentEmail: [],
+    receipentEmail: "",
+    receipentEmpID: "",
     status: "",
     message: "",
   };
@@ -204,6 +39,9 @@ export default function EmailNotifiCreateForm(props) {
   const [receipentEmail, setReceipentEmail] = React.useState(
     initialValues.receipentEmail
   );
+  const [receipentEmpID, setReceipentEmpID] = React.useState(
+    initialValues.receipentEmpID
+  );
   const [status, setStatus] = React.useState(initialValues.status);
   const [message, setMessage] = React.useState(initialValues.message);
   const [errors, setErrors] = React.useState({});
@@ -212,19 +50,17 @@ export default function EmailNotifiCreateForm(props) {
     setLeaveType(initialValues.leaveType);
     setSenderEmail(initialValues.senderEmail);
     setReceipentEmail(initialValues.receipentEmail);
-    setCurrentReceipentEmailValue("");
+    setReceipentEmpID(initialValues.receipentEmpID);
     setStatus(initialValues.status);
     setMessage(initialValues.message);
     setErrors({});
   };
-  const [currentReceipentEmailValue, setCurrentReceipentEmailValue] =
-    React.useState("");
-  const receipentEmailRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
     leaveType: [],
-    senderEmail: [{ type: "Required" }],
-    receipentEmail: [{ type: "Required" }],
+    senderEmail: [],
+    receipentEmail: [],
+    receipentEmpID: [],
     status: [],
     message: [],
   };
@@ -258,6 +94,7 @@ export default function EmailNotifiCreateForm(props) {
           leaveType,
           senderEmail,
           receipentEmail,
+          receipentEmpID,
           status,
           message,
         };
@@ -326,6 +163,7 @@ export default function EmailNotifiCreateForm(props) {
               leaveType,
               senderEmail,
               receipentEmail,
+              receipentEmpID,
               status,
               message,
             };
@@ -355,6 +193,7 @@ export default function EmailNotifiCreateForm(props) {
               leaveType: value,
               senderEmail,
               receipentEmail,
+              receipentEmpID,
               status,
               message,
             };
@@ -373,7 +212,7 @@ export default function EmailNotifiCreateForm(props) {
       ></TextField>
       <TextField
         label="Sender email"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={senderEmail}
         onChange={(e) => {
@@ -384,6 +223,7 @@ export default function EmailNotifiCreateForm(props) {
               leaveType,
               senderEmail: value,
               receipentEmail,
+              receipentEmpID,
               status,
               message,
             };
@@ -400,58 +240,66 @@ export default function EmailNotifiCreateForm(props) {
         hasError={errors.senderEmail?.hasError}
         {...getOverrideProps(overrides, "senderEmail")}
       ></TextField>
-      <ArrayField
-        onChange={async (items) => {
-          let values = items;
+      <TextField
+        label="Receipent email"
+        isRequired={false}
+        isReadOnly={false}
+        value={receipentEmail}
+        onChange={(e) => {
+          let { value } = e.target;
           if (onChange) {
             const modelFields = {
               empID,
               leaveType,
               senderEmail,
-              receipentEmail: values,
+              receipentEmail: value,
+              receipentEmpID,
               status,
               message,
             };
             const result = onChange(modelFields);
-            values = result?.receipentEmail ?? values;
+            value = result?.receipentEmail ?? value;
           }
-          setReceipentEmail(values);
-          setCurrentReceipentEmailValue("");
+          if (errors.receipentEmail?.hasError) {
+            runValidationTasks("receipentEmail", value);
+          }
+          setReceipentEmail(value);
         }}
-        currentFieldValue={currentReceipentEmailValue}
-        label={"Receipent email"}
-        items={receipentEmail}
-        hasError={errors?.receipentEmail?.hasError}
-        runValidationTasks={async () =>
-          await runValidationTasks("receipentEmail", currentReceipentEmailValue)
-        }
-        errorMessage={errors?.receipentEmail?.errorMessage}
-        setFieldValue={setCurrentReceipentEmailValue}
-        inputFieldRef={receipentEmailRef}
-        defaultFieldValue={""}
-      >
-        <TextField
-          label="Receipent email"
-          isRequired={true}
-          isReadOnly={false}
-          value={currentReceipentEmailValue}
-          onChange={(e) => {
-            let { value } = e.target;
-            if (errors.receipentEmail?.hasError) {
-              runValidationTasks("receipentEmail", value);
-            }
-            setCurrentReceipentEmailValue(value);
-          }}
-          onBlur={() =>
-            runValidationTasks("receipentEmail", currentReceipentEmailValue)
+        onBlur={() => runValidationTasks("receipentEmail", receipentEmail)}
+        errorMessage={errors.receipentEmail?.errorMessage}
+        hasError={errors.receipentEmail?.hasError}
+        {...getOverrideProps(overrides, "receipentEmail")}
+      ></TextField>
+      <TextField
+        label="Receipent emp id"
+        isRequired={false}
+        isReadOnly={false}
+        value={receipentEmpID}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              leaveType,
+              senderEmail,
+              receipentEmail,
+              receipentEmpID: value,
+              status,
+              message,
+            };
+            const result = onChange(modelFields);
+            value = result?.receipentEmpID ?? value;
           }
-          errorMessage={errors.receipentEmail?.errorMessage}
-          hasError={errors.receipentEmail?.hasError}
-          ref={receipentEmailRef}
-          labelHidden={true}
-          {...getOverrideProps(overrides, "receipentEmail")}
-        ></TextField>
-      </ArrayField>
+          if (errors.receipentEmpID?.hasError) {
+            runValidationTasks("receipentEmpID", value);
+          }
+          setReceipentEmpID(value);
+        }}
+        onBlur={() => runValidationTasks("receipentEmpID", receipentEmpID)}
+        errorMessage={errors.receipentEmpID?.errorMessage}
+        hasError={errors.receipentEmpID?.hasError}
+        {...getOverrideProps(overrides, "receipentEmpID")}
+      ></TextField>
       <TextField
         label="Status"
         isRequired={false}
@@ -465,6 +313,7 @@ export default function EmailNotifiCreateForm(props) {
               leaveType,
               senderEmail,
               receipentEmail,
+              receipentEmpID,
               status: value,
               message,
             };
@@ -494,6 +343,7 @@ export default function EmailNotifiCreateForm(props) {
               leaveType,
               senderEmail,
               receipentEmail,
+              receipentEmpID,
               status,
               message: value,
             };

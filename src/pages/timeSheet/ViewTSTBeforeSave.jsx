@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
 import {
   createOffshoreSheet,
+  deleteOffshoreSheet,
   updateOffshoreSheet,
 } from "../../graphql/mutations";
 import { generateClient } from "@aws-amplify/api";
@@ -11,8 +12,11 @@ import { EditTimeSheet } from "./EditTimeSheet";
 import { SuccessMessage } from "./ModelForSuccessMess/SuccessMessage";
 import "../../../src/index.css";
 import { useScrollableView } from "./customTimeSheet/UseScrollableView";
-import { listEmpWorkInfos } from "../../graphql/queries";
+import { listEmpWorkInfos, listOffshoreSheets } from "../../graphql/queries";
+import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
+import { PopupForAssignManager } from "./ModelForSuccessMess/PopupForAssignManager";
 const client = generateClient();
+
 export const ViewTSTBeforeSave = ({
   excelData,
   returnedTHeader,
@@ -29,6 +33,7 @@ export const ViewTSTBeforeSave = ({
   const [loading, setLoading] = useState(true);
   const [userIdentification, setUserIdentification] = useState("");
   const [successMess, setSuccessMess] = useState(null);
+  const [toggleAssignManager, setToggleAssignManager] = useState(false);
 
   const [showStatusCol, setShowStatusCol] = useState(null);
   const { handleScroll, visibleData, setVisibleData } = useScrollableView(
@@ -100,14 +105,14 @@ export const ViewTSTBeforeSave = ({
                   : null,
               };
             });
-            console.log("MergedData : ", mergedData);
+            console.log(mergedData);
+
             setData(mergedData); // Set merged data
             setSecondaryData(mergedData);
           };
 
           fetchWorkInfo();
         } catch (err) {
-          console.log("ERROR : ", err);
         } finally {
           // setLoading is removed ;
         }
@@ -122,8 +127,6 @@ export const ViewTSTBeforeSave = ({
     } else if (getPosition === "TimeKeeper") {
       setUserIdentification("TimeKeeper");
     }
-
-    // console.log(getPosition);
   }, []);
 
   const pendingData = (data) => {
@@ -157,6 +160,7 @@ export const ViewTSTBeforeSave = ({
                 jobLocaWhrs: val.jobLocaWhrs || [],
                 REMARKS: val.remarks || "",
                 status: val.status || "",
+                managerData: val?.managerData,
                 // ALLDAYMINHRS: val.allDayMin || "",
                 // NETMINUTES: val.netMin || "",
                 // TOTALHOURS: val.totalHrs || 0,
@@ -174,7 +178,6 @@ export const ViewTSTBeforeSave = ({
     }
   };
   const searchResult = async (searchedData) => {
-    console.log(searchedData);
     try {
       const result = await searchedData;
       setData(result);
@@ -182,7 +185,7 @@ export const ViewTSTBeforeSave = ({
       console.error("Error fetching user data:", error);
     }
   };
-  console.log(excelData);
+
   const cleanValue = (value) => {
     if (typeof value !== "string") {
       return value; // Return value if not a string (e.g., number, object)
@@ -201,7 +204,7 @@ export const ViewTSTBeforeSave = ({
           }
           return cleanedItem;
         });
-      console.log(cleanData);
+
       const requiredKeys = ["NAME", "No", "Company", "TOTALHOURS"];
 
       const result = await new Promise((resolve) => {
@@ -221,7 +224,6 @@ export const ViewTSTBeforeSave = ({
         resolve(keyCheckResult);
       });
 
-      console.log("Result: ", result);
       setShowStatusCol(result);
       setCurrentStatus(result); // Assuming setCurrentStatus is defined
       setLoading(false);
@@ -264,9 +266,10 @@ export const ViewTSTBeforeSave = ({
           //   const filterPending =
           // console.log(filterPending);
           //   console.log(fetchedData);
-          console.log(filterPending);
+
           if (userIdentification === "Manager") {
-            pendingData(filterPending);
+            const finalData = await SendDataToManager(filterPending);
+            pendingData(finalData);
           }
         } catch (err) {
         } finally {
@@ -293,12 +296,14 @@ export const ViewTSTBeforeSave = ({
   const toggleSFAMessage = (value) => {
     setSuccessMess(value);
   };
-
+  const toggleFunctionForAssiMana = () => {
+    setToggleAssignManager(!toggleAssignManager);
+  };
   const editNestedData = (data, getObject) => {
     return data.map((m) => ({
       id: m.id,
       data: m.data.map((val) => {
-        if (val.NO === getObject.NO) {
+        if (val.DATE === getObject.DATE) {
           return getObject;
         } else {
           return val;
@@ -321,13 +326,13 @@ export const ViewTSTBeforeSave = ({
     const result = Array.isArray(data[0]?.data)
       ? editNestedData(data, getObject)
       : editFlatData(data, getObject);
-    // console.log(result);
+
     setData(result);
   };
 
   const AllFieldData = useTableFieldData(titleName);
 
-  const renameKeysFunctionAndSubmit = async () => {
+  const renameKeysFunctionAndSubmit = async (managerData) => {
     if (userIdentification !== "Manager") {
       const result =
         data &&
@@ -360,11 +365,15 @@ export const ViewTSTBeforeSave = ({
             // remarks: val.REMARKS || "",
           };
         });
-      console.log(result);
+
+      const finalResult = result.map((val) => {
+        return { ...val, managerData };
+      });
+      console.log(finalResult);
       //   CREATE
       const currentDate = new Date().toLocaleDateString();
       const DailySheet = {
-        dailySheet: JSON.stringify(result),
+        dailySheet: JSON.stringify(finalResult),
         status: "Pending",
         date: currentDate,
       };
@@ -378,13 +387,15 @@ export const ViewTSTBeforeSave = ({
             },
           })
           .then((res) => {
-            console.log(res);
             if (res.data.createOffshoreSheet) {
+              console.log(
+                "res.data.createOffshoreSheet : ",
+                res.data.createOffshoreSheet
+              );
               toggleSFAMessage(true);
             }
           })
           .catch((err) => {
-            console.log(err);
             toggleSFAMessage(false);
           });
       }
@@ -408,6 +419,7 @@ export const ViewTSTBeforeSave = ({
                 OT: val.OT || "",
                 remarks: val.REMARKS || "",
                 jobLocaWhrs: val?.jobLocaWhrs || [],
+                managerData: val?.managerData,
               };
             }),
           };
@@ -427,7 +439,6 @@ export const ViewTSTBeforeSave = ({
         };
 
         if (finalData.dailySheet) {
-          // console.log("Work");
           await client
             .graphql({
               query: updateOffshoreSheet,
@@ -436,15 +447,17 @@ export const ViewTSTBeforeSave = ({
               },
             })
             .then((res) => {
-              console.log(res);
               if (res.data.updateOffshoreSheet) {
+                console.log(
+                  "res.data.updateOffshoreSheet : ",
+                  res.data.updateOffshoreSheet
+                );
                 toggleSFAMessage(true);
                 setVisibleData([]);
                 // setData(null);
               }
             })
             .catch((err) => {
-              console.log(err);
               toggleSFAMessage(false);
             });
         }
@@ -455,7 +468,7 @@ export const ViewTSTBeforeSave = ({
     <div className="border border-white">
       {currentStatus ? (
         <div>
-          <div className="flex justify-end mr-7">
+          <div className="flex justify-end w-full mr-7">
             <SearchBoxForTimeSheet
               allEmpDetails={data}
               searchResult={searchResult}
@@ -566,7 +579,7 @@ export const ViewTSTBeforeSave = ({
                       <tr>
                         <td
                           colSpan="15"
-                          className="px-6 py-6 text-center text-dark_ash text_size_5"
+                          className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white"
                         >
                           <p className="px-6 py-6">
                             No Table Data Available Here
@@ -577,7 +590,7 @@ export const ViewTSTBeforeSave = ({
                       <tr>
                         <td
                           colSpan="15"
-                          className="px-6 py-6 text-center text-dark_ash text_size_5"
+                          className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white"
                         >
                           <p className="px-6 py-6">
                             No Table Data Available Here
@@ -598,12 +611,47 @@ export const ViewTSTBeforeSave = ({
                 userIdentification === "Manager" ? "w-40" : "w-52"
               } bg-[#FEF116] text_size_5 text-dark_grey mb-10`}
               onClick={() => {
-                renameKeysFunctionAndSubmit();
+                if (userIdentification !== "Manager") {
+                  toggleFunctionForAssiMana();
+                  // const fetchData = async () => {
+                  //   console.log("I am calling You");
+                  //   // Fetch the BLNG data using GraphQL
+                  //   const [fetchBLNGdata] = await Promise.all([
+                  //     client.graphql({
+                  //       query: listOffshoreSheets,
+                  //     }),
+                  //   ]);
+                  //   const BLNGdata =
+                  //     fetchBLNGdata?.data?.listOffshoreSheets?.items;
+                  //   console.log("BLNGdata : ", BLNGdata);
+                  //   const deleteFunction =
+                  //     BLNGdata &&
+                  //     BLNGdata.map(async (m) => {
+                  //       const dailySheet = {
+                  //         id: m.id,
+                  //       };
+                  //       await client
+                  //         .graphql({
+                  //           query: deleteOffshoreSheet,
+                  //           variables: {
+                  //             input: dailySheet,
+                  //           },
+                  //         })
+                  //         .then((res) => {
+                  //           console.log(res);
+                  //         })
+                  //         .catch((err) => {
+                  //           console.log(err);
+                  //         });
+                  //     });
+                  // };
+                  // fetchData();
+                } else if (userIdentification === "Manager") {
+                  renameKeysFunctionAndSubmit();
+                }
               }}
             >
-              {userIdentification === "Manager"
-                ? "Approve"
-                : "Send For Approval"}
+              {userIdentification === "Manager" ? "Approve" : "Assign Manager"}
             </button>
           </div>
         </div>
@@ -630,6 +678,13 @@ export const ViewTSTBeforeSave = ({
         setExcelData={setExcelData}
         userIdentification={userIdentification}
       />
+
+      {toggleAssignManager === true && (
+        <PopupForAssignManager
+          toggleFunctionForAssiMana={toggleFunctionForAssiMana}
+          renameKeysFunctionAndSubmit={renameKeysFunctionAndSubmit}
+        />
+      )}
     </div>
   );
 };

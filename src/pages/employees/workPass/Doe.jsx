@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from "react";
-import { GoUpload } from "react-icons/go";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { DoeEmpSchema } from "../../../services/EmployeeValidation";
@@ -58,12 +57,7 @@ export const Doe = () => {
     return ""; 
   };
 
-
-  const approvalDate = () => setDateOfApproval([...doeEmpApproval, ""]);
-  const submissionDate = () => setDateOfSubmission([...doeEmpSubmit, ""]);
-  const validDate = () => setValidUntil([...doeEmpValid, ""]);
   
-
 
   const getFileName = (input) => {
     // Check if input is an object and has the 'upload' property
@@ -128,7 +122,7 @@ export const Doe = () => {
         const parsedFiles = parsedArray.map((item) =>
           typeof item === "string" ? JSON.parse(item) : item
         );
-   
+        console.log(parsedFiles);
         setValue("doeEmpUpload", parsedFiles);
 
         setUploadDoe((prev) => ({
@@ -157,9 +151,6 @@ export const Doe = () => {
 
     const allowedTypes = [
       "application/pdf",
-      "image/jpeg",
-      "image/png",
-      "image/jpg",
     ];
 
         // Check for empID before proceeding with the upload
@@ -170,7 +161,7 @@ export const Doe = () => {
   }
 
     if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      alert("Upload must be a PDF file");
       return;
     }
 
@@ -189,11 +180,8 @@ export const Doe = () => {
   };
 
 
-
 const onSubmit = async (data) => {    
   try {
-
-
     const checkingEIDTable = DNData.find((match) => match.empID === data.empID);
     
     // Helper function to format dates
@@ -238,7 +226,7 @@ const onSubmit = async (data) => {
 
 
       await UpdateMPData({ DoeUpValue });
-      setShowTitle("Work Pass DOE Info Updated Successfully");
+      setShowTitle("DOE Info Updated Successfully");
       setNotification(true);
     } else {
       // If no entry exists, create new data
@@ -250,14 +238,13 @@ const onSubmit = async (data) => {
         doeEmpUpload: JSON.stringify(uploadDoe.doeEmpUpload),
       };
 
-
       await CrerDoeFunData({ DoeValue });
-      setShowTitle("Work Pass DOE Info Saved Successfully");
+      setShowTitle("DOE Info Created Successfully");
       setNotification(true);
     }
   } catch (error) {
     console.error("Error submitting data:", error);
-
+   
   }
 };
 
@@ -331,7 +318,7 @@ const onSubmit = async (data) => {
           <SpinLogo
             text={showTitle}
             notification={notification}
-            path="/employee"
+            path="/sawp/doe"
           />
         )}
     </form>

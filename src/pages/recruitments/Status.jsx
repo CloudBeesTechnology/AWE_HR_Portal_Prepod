@@ -5,7 +5,7 @@ import { Table } from "../../utils/Table"; // Reusable table component
 import { StatusForm } from "../recruitments/StatusForm";
 import {
   // listCandidateApplicationForms,
-  listInterviewScheduleSchemas,
+  listInterviewSchedules,
 } from "../../graphql/queries";
 
 import { generateClient } from "@aws-amplify/api";
@@ -15,35 +15,34 @@ const client = generateClient();
 // Column mappings for different statuses
 const columnMapping = {
   "Interview Scheduled": [
-    "tempID",
+    "TempID",
     "Name",
     "Nationality",
-    // "Application Form",
     "Interview Date",
     "Time",
     "Venue",
     "Interviewer",
   ],
   "Selected Candidate": [
-    "tempID",
+    "TempID",
     "Name",
     "Nationality",
     "Position",
-    "Department",
-    "Status Update",
+    "Selected Department",
   ],
   "LOI": [
-    "tempID",
+    "TempID",
     "Name",
     "Nationality",
     "Issue Date",
     "Accept Date",
     "LOI PDF",
     "Decline Date",
+    "Decline Reason",
     "Status Update",
   ],
   "CVEV_OffShore": [
-    "tempID",
+    "TempID",
     "Name",
     "Nationality",
     "Position",
@@ -52,7 +51,7 @@ const columnMapping = {
     "Status Update",
   ],
   "PAAF_OnShore": [
-    "tempID",
+    "TempID",
     "Name",
     "Nationality",
     "Position",
@@ -61,7 +60,7 @@ const columnMapping = {
     "Status Update",
   ],
   "Mobilization": [
-    "tempID",
+    "TempID",
     "Name",
     "Nationality",
     "Position",
@@ -119,11 +118,11 @@ export const Status = () => {
       try {
         const [interviewDatas] = await Promise.all([
           client.graphql({
-            query: listInterviewScheduleSchemas,
+            query: listInterviewSchedules,
           }),
         ]);
 
-        const interviews = interviewDatas?.data?.listInterviewScheduleSchemas?.items || [];
+        const interviews = interviewDatas?.data?.listInterviewSchedules?.items || [];
 
         if (empPDData && educDetailsData ) {
           const merged = mergeContextData(empPDData, educDetailsData);
@@ -265,25 +264,25 @@ export const Status = () => {
         break;
       case "LOI":
         const loiAccept = mergeData.filter(
-          (val) => val.candidateStatus === "Selected"
+          (val) => val.loiStatus === "Accepted"
         );
         setFilteredData(loiAccept);
         break;
       case "CVEV_OffShore":
         const cvevOff = mergeData.filter(
-          (val) => val.candidateStatus === "Selected"
+          (val) => val.cvevStatus === "Approved"
         );
         setFilteredData(cvevOff);
         break;
       case "PAAF_OnShore":
         const paafOn = mergeData.filter(
-          (val) => val.candidateStatus === "Selected"
+          (val) => val.paafStatus === "Approved"
         );
         setFilteredData(paafOn);
         break;
       case "Mobilization":
         const  mobiliLocal= mergeData.filter(
-          (val) => val.candidateStatus === "Selected"
+          (val) => val.mobiliLocal === "Done"
         );
         setFilteredData(mobiliLocal);
         break;

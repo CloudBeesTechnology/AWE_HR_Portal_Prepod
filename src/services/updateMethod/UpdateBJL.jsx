@@ -20,7 +20,7 @@ export const UpdateBJL = () => {
       bankEmpUpload: [BJLUpValue.bankEmpUpload],
 
     };
-  
+    console.log(totalData);
 
     try {
       const storedData=   await Promise.all([
@@ -31,12 +31,13 @@ export const UpdateBJL = () => {
              },
            })
          ])
-        
+         console.log(storedData,"successfully Updated data");
 
        } catch (error) {
         console.log(error);
         
-       
+         console.error("Error executing GraphQL requests:", error);
+         throw error; // Rethrow error if needed
        }
   }, []);
   return { UpdateBJLFun };

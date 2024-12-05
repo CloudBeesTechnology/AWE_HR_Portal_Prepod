@@ -10,6 +10,7 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
     Recruitment: [],
     User: [],
     Employee: [],
+    Insurance: [],
     Training: [],
     TimeSheet: [],
     LeaveManagement: [],
@@ -103,6 +104,7 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
         "Non Local CV",
         "Status",
         "WorkPass Tracking",
+        "Hiring Job"
       ],
     },
     {
@@ -114,6 +116,13 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
         "Medical & Dependent Info",
         "Insurance",
         "Non-Local Accommodation in Brunei",
+      ],
+    },
+    {
+      Insurance: [
+        "Insurance",
+        "Insurance Info",
+        "Insurance Claim",
       ],
     },
     {

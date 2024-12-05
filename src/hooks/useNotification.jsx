@@ -17,6 +17,7 @@ export const useNotification = () => {
           query: listEmailNotifis, // Query to fetch email notifications
         });
 
+
         const fetchedEmailNotifications =
           emailNotifData?.data?.listEmailNotifis?.items || [];
 

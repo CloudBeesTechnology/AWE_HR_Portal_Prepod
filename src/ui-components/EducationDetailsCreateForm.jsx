@@ -288,24 +288,24 @@ export default function EducationDetailsCreateForm(props) {
     tempID: [{ type: "Required" }],
     crime: [],
     crimeDesc: [],
-    emgDetails: [{ type: "Required" }, { type: "JSON" }],
-    noExperience: [{ type: "Required" }],
-    empStatement: [{ type: "Required" }],
+    emgDetails: [{ type: "JSON" }],
+    noExperience: [],
+    empStatement: [],
     desc: [],
     disease: [],
     diseaseDesc: [],
     liquor: [],
     liquorDesc: [],
-    noticePeriod: [{ type: "Required" }],
-    perIS: [{ type: "Required" }],
+    noticePeriod: [],
+    perIS: [],
     perIDesc: [],
     referees: [{ type: "JSON" }],
     relatives: [{ type: "JSON" }],
     salaryExpectation: [],
     supportInfo: [],
-    uploadResume: [{ type: "Required" }],
-    uploadCertificate: [{ type: "Required" }],
-    uploadPp: [{ type: "Required" }],
+    uploadResume: [],
+    uploadCertificate: [],
+    uploadPp: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -586,7 +586,7 @@ export default function EducationDetailsCreateForm(props) {
       >
         <TextAreaField
           label="Emg details"
-          isRequired={true}
+          isRequired={false}
           isReadOnly={false}
           value={currentEmgDetailsValue}
           onChange={(e) => {
@@ -608,7 +608,7 @@ export default function EducationDetailsCreateForm(props) {
       </ArrayField>
       <TextField
         label="No experience"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={noExperience}
         onChange={(e) => {
@@ -652,7 +652,7 @@ export default function EducationDetailsCreateForm(props) {
       ></TextField>
       <TextField
         label="Emp statement"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={empStatement}
         onChange={(e) => {
@@ -916,7 +916,7 @@ export default function EducationDetailsCreateForm(props) {
       ></TextField>
       <TextField
         label="Notice period"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={noticePeriod}
         onChange={(e) => {
@@ -960,7 +960,7 @@ export default function EducationDetailsCreateForm(props) {
       ></TextField>
       <TextField
         label="Per is"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={perIS}
         onChange={(e) => {
@@ -1268,7 +1268,7 @@ export default function EducationDetailsCreateForm(props) {
       ></TextField>
       <TextField
         label="Upload resume"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={uploadResume}
         onChange={(e) => {
@@ -1312,7 +1312,7 @@ export default function EducationDetailsCreateForm(props) {
       ></TextField>
       <TextField
         label="Upload certificate"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={uploadCertificate}
         onChange={(e) => {
@@ -1358,7 +1358,7 @@ export default function EducationDetailsCreateForm(props) {
       ></TextField>
       <TextField
         label="Upload pp"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={uploadPp}
         onChange={(e) => {

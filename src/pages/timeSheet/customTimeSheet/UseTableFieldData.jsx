@@ -162,7 +162,7 @@ export const useTableFieldData = (titleName) => {
           "REMARKS",
         ],
         tableHeader: [
-          "Name",
+          "NAME",
           "DEPT/DIV",
           "BADGE#",
           "DATE",

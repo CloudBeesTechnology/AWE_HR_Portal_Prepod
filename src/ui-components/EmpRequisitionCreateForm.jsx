@@ -32,6 +32,9 @@ export default function EmpRequisitionCreateForm(props) {
     reasonForReq: "",
     replacementFor: "",
     tentativeDate: "",
+    status: "",
+    remarkReq: "",
+    reqName: "",
   };
   const [department, setDepartment] = React.useState(initialValues.department);
   const [justification, setJustification] = React.useState(
@@ -52,6 +55,9 @@ export default function EmpRequisitionCreateForm(props) {
   const [tentativeDate, setTentativeDate] = React.useState(
     initialValues.tentativeDate
   );
+  const [status, setStatus] = React.useState(initialValues.status);
+  const [remarkReq, setRemarkReq] = React.useState(initialValues.remarkReq);
+  const [reqName, setReqName] = React.useState(initialValues.reqName);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setDepartment(initialValues.department);
@@ -63,18 +69,24 @@ export default function EmpRequisitionCreateForm(props) {
     setReasonForReq(initialValues.reasonForReq);
     setReplacementFor(initialValues.replacementFor);
     setTentativeDate(initialValues.tentativeDate);
+    setStatus(initialValues.status);
+    setRemarkReq(initialValues.remarkReq);
+    setReqName(initialValues.reqName);
     setErrors({});
   };
   const validations = {
-    department: [{ type: "Required" }],
-    justification: [{ type: "Required" }],
-    project: [{ type: "Required" }],
-    position: [{ type: "Required" }],
-    quantity: [{ type: "Required" }],
-    qualification: [{ type: "Required" }],
-    reasonForReq: [{ type: "Required" }],
+    department: [],
+    justification: [],
+    project: [],
+    position: [],
+    quantity: [],
+    qualification: [],
+    reasonForReq: [],
     replacementFor: [],
-    tentativeDate: [{ type: "Required" }],
+    tentativeDate: [],
+    status: [],
+    remarkReq: [],
+    reqName: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -111,6 +123,9 @@ export default function EmpRequisitionCreateForm(props) {
           reasonForReq,
           replacementFor,
           tentativeDate,
+          status,
+          remarkReq,
+          reqName,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -166,7 +181,7 @@ export default function EmpRequisitionCreateForm(props) {
     >
       <TextField
         label="Department"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={department}
         onChange={(e) => {
@@ -182,6 +197,9 @@ export default function EmpRequisitionCreateForm(props) {
               reasonForReq,
               replacementFor,
               tentativeDate,
+              status,
+              remarkReq,
+              reqName,
             };
             const result = onChange(modelFields);
             value = result?.department ?? value;
@@ -198,7 +216,7 @@ export default function EmpRequisitionCreateForm(props) {
       ></TextField>
       <TextField
         label="Justification"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={justification}
         onChange={(e) => {
@@ -214,6 +232,9 @@ export default function EmpRequisitionCreateForm(props) {
               reasonForReq,
               replacementFor,
               tentativeDate,
+              status,
+              remarkReq,
+              reqName,
             };
             const result = onChange(modelFields);
             value = result?.justification ?? value;
@@ -230,7 +251,7 @@ export default function EmpRequisitionCreateForm(props) {
       ></TextField>
       <TextField
         label="Project"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={project}
         onChange={(e) => {
@@ -246,6 +267,9 @@ export default function EmpRequisitionCreateForm(props) {
               reasonForReq,
               replacementFor,
               tentativeDate,
+              status,
+              remarkReq,
+              reqName,
             };
             const result = onChange(modelFields);
             value = result?.project ?? value;
@@ -262,7 +286,7 @@ export default function EmpRequisitionCreateForm(props) {
       ></TextField>
       <TextField
         label="Position"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={position}
         onChange={(e) => {
@@ -278,6 +302,9 @@ export default function EmpRequisitionCreateForm(props) {
               reasonForReq,
               replacementFor,
               tentativeDate,
+              status,
+              remarkReq,
+              reqName,
             };
             const result = onChange(modelFields);
             value = result?.position ?? value;
@@ -294,7 +321,7 @@ export default function EmpRequisitionCreateForm(props) {
       ></TextField>
       <TextField
         label="Quantity"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         type="number"
         step="any"
@@ -314,6 +341,9 @@ export default function EmpRequisitionCreateForm(props) {
               reasonForReq,
               replacementFor,
               tentativeDate,
+              status,
+              remarkReq,
+              reqName,
             };
             const result = onChange(modelFields);
             value = result?.quantity ?? value;
@@ -330,7 +360,7 @@ export default function EmpRequisitionCreateForm(props) {
       ></TextField>
       <TextField
         label="Qualification"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={qualification}
         onChange={(e) => {
@@ -346,6 +376,9 @@ export default function EmpRequisitionCreateForm(props) {
               reasonForReq,
               replacementFor,
               tentativeDate,
+              status,
+              remarkReq,
+              reqName,
             };
             const result = onChange(modelFields);
             value = result?.qualification ?? value;
@@ -362,7 +395,7 @@ export default function EmpRequisitionCreateForm(props) {
       ></TextField>
       <TextField
         label="Reason for req"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={reasonForReq}
         onChange={(e) => {
@@ -378,6 +411,9 @@ export default function EmpRequisitionCreateForm(props) {
               reasonForReq: value,
               replacementFor,
               tentativeDate,
+              status,
+              remarkReq,
+              reqName,
             };
             const result = onChange(modelFields);
             value = result?.reasonForReq ?? value;
@@ -410,6 +446,9 @@ export default function EmpRequisitionCreateForm(props) {
               reasonForReq,
               replacementFor: value,
               tentativeDate,
+              status,
+              remarkReq,
+              reqName,
             };
             const result = onChange(modelFields);
             value = result?.replacementFor ?? value;
@@ -426,7 +465,7 @@ export default function EmpRequisitionCreateForm(props) {
       ></TextField>
       <TextField
         label="Tentative date"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={tentativeDate}
         onChange={(e) => {
@@ -442,6 +481,9 @@ export default function EmpRequisitionCreateForm(props) {
               reasonForReq,
               replacementFor,
               tentativeDate: value,
+              status,
+              remarkReq,
+              reqName,
             };
             const result = onChange(modelFields);
             value = result?.tentativeDate ?? value;
@@ -455,6 +497,111 @@ export default function EmpRequisitionCreateForm(props) {
         errorMessage={errors.tentativeDate?.errorMessage}
         hasError={errors.tentativeDate?.hasError}
         {...getOverrideProps(overrides, "tentativeDate")}
+      ></TextField>
+      <TextField
+        label="Status"
+        isRequired={false}
+        isReadOnly={false}
+        value={status}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              department,
+              justification,
+              project,
+              position,
+              quantity,
+              qualification,
+              reasonForReq,
+              replacementFor,
+              tentativeDate,
+              status: value,
+              remarkReq,
+              reqName,
+            };
+            const result = onChange(modelFields);
+            value = result?.status ?? value;
+          }
+          if (errors.status?.hasError) {
+            runValidationTasks("status", value);
+          }
+          setStatus(value);
+        }}
+        onBlur={() => runValidationTasks("status", status)}
+        errorMessage={errors.status?.errorMessage}
+        hasError={errors.status?.hasError}
+        {...getOverrideProps(overrides, "status")}
+      ></TextField>
+      <TextField
+        label="Remark req"
+        isRequired={false}
+        isReadOnly={false}
+        value={remarkReq}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              department,
+              justification,
+              project,
+              position,
+              quantity,
+              qualification,
+              reasonForReq,
+              replacementFor,
+              tentativeDate,
+              status,
+              remarkReq: value,
+              reqName,
+            };
+            const result = onChange(modelFields);
+            value = result?.remarkReq ?? value;
+          }
+          if (errors.remarkReq?.hasError) {
+            runValidationTasks("remarkReq", value);
+          }
+          setRemarkReq(value);
+        }}
+        onBlur={() => runValidationTasks("remarkReq", remarkReq)}
+        errorMessage={errors.remarkReq?.errorMessage}
+        hasError={errors.remarkReq?.hasError}
+        {...getOverrideProps(overrides, "remarkReq")}
+      ></TextField>
+      <TextField
+        label="Req name"
+        isRequired={false}
+        isReadOnly={false}
+        value={reqName}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              department,
+              justification,
+              project,
+              position,
+              quantity,
+              qualification,
+              reasonForReq,
+              replacementFor,
+              tentativeDate,
+              status,
+              remarkReq,
+              reqName: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.reqName ?? value;
+          }
+          if (errors.reqName?.hasError) {
+            runValidationTasks("reqName", value);
+          }
+          setReqName(value);
+        }}
+        onBlur={() => runValidationTasks("reqName", reqName)}
+        errorMessage={errors.reqName?.errorMessage}
+        hasError={errors.reqName?.hasError}
+        {...getOverrideProps(overrides, "reqName")}
       ></TextField>
       <Flex
         justifyContent="space-between"

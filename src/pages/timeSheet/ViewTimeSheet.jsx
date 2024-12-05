@@ -145,7 +145,7 @@
 //   };
 // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { FaAngleDown } from "react-icons/fa";
 import { VTimeSheetTable } from "./VTimeSheetTable";
 import { Link } from "react-router-dom";
@@ -166,7 +166,14 @@ export const ViewTimeSheet = () => {
   const [loading, setLoading] = useState(true);
   const [secondaryData, setSecondaryData] = useState(null);
 
-  const { convertedStringToArrayObj } = useFetchData(categoryFilter);
+  const { convertedStringToArrayObj, getPosition } =
+    useFetchData(categoryFilter);
+
+  const { handleScroll, visibleData, setVisibleData } = useScrollableView(
+    data,
+    "Manager"
+  );
+
   const AllFieldData = useTableFieldData(categoryFilter);
   // const { handleScroll, visibleData } = useScrollableView(data, "Manager");
   // Fetch and set the initial data
@@ -293,11 +300,11 @@ export const ViewTimeSheet = () => {
 
       // Remove empty data sets
       filteredData = filteredData.filter((item) => item.data.length > 0);
-      console.log(filteredData);
+
       setData(filteredData);
     }
     setLoading(false);
-    console.log("Working");
+
     // } catch (err) {
     //   console.log("ERROR : ", err);
     // }
@@ -317,7 +324,6 @@ export const ViewTimeSheet = () => {
 
   const searchResult = (result) => {
     setSearchQuery(result);
-    console.log(result);
   };
 
   const handleCategorySelect = (category) => {
@@ -529,7 +535,8 @@ export const ViewTimeSheet = () => {
           <VTimeSheetTable
             AllFieldData={AllFieldData}
             categoryFilter={categoryFilter}
-            data={data}
+            data={visibleData}
+            handleScroll={handleScroll}
           />
         )}
       </div>

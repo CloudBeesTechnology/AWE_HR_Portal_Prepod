@@ -33,7 +33,7 @@ export declare type ServiceRecordCreateFormInputValues = {
     revLeaveDate?: string[];
     revAnnualLeave?: string[];
     revALD?: string[];
-    remarkWI?: string[];
+    remarkWI?: string;
     uploadPR?: string[];
     uploadSP?: string[];
     uploadLP?: string[];
