@@ -75,7 +75,7 @@ export const useLeaveManage = () => {
         // console.log("Fetched Personal Details:", fetchedPersonalDetails);
         // console.log("Fetched User Data:", fetchedUserData);
         // console.log("new", ticketRequestsData)
-        console.log("leave",fetchedLeaveDetails)
+        // console.log("leave",fetchedLeaveDetails)
       
         setTicketRequests(fetchedTicketRequests);
         setPersonalDetails(fetchedPersonalDetails);
@@ -110,7 +110,7 @@ export const useLeaveManage = () => {
           leaveDetails: leaveDetails[leaveStatus.empID] || {},
         }));
 
-        console.log("Merged Data:", merged);
+        // console.log("Merged Data:", merged);
         setMergedData(merged);
       } catch (err) {
         setError(err);
@@ -165,7 +165,7 @@ export const useLeaveManage = () => {
         }));
   
         // console.log("Merged Data 4.0:", merged);
-        setTicketMerged(merged, "BRI");
+        setTicketMerged(merged);
        
       } catch (err) {
         setError(err);
@@ -179,7 +179,7 @@ export const useLeaveManage = () => {
   }, []);
 
   useEffect(() => {
-    console.log("2826", ticketMerged);
+    // console.log("2826", ticketMerged);
   }, [ticketMerged]);
   
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import AweLogo from "../../assets/logo/logo-with-name.svg";
 import { VscClose } from "react-icons/vsc";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useLeaveManage } from "../../hooks/useLeaveManage";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { SpinLogo } from "../../utils/SpinLogo";
@@ -24,7 +24,7 @@ export const ViewForm = ({
   const [notification, setNotification] = useState(false);
   const [notificationText, setNotificationText] = useState("");
 
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const { handleUpdateLeaveStatus, handleUpdateTicketRequest } =
     useLeaveManage();
@@ -122,7 +122,7 @@ export const ViewForm = ({
       setTimeout(() => {
         setNotification(false);
         handleClickForToggle(false);
-        // navigate("/leaveManage")
+        navigate("/leaveManage")
         // Redirect to the dashboard or another page
       }, 3000);
     } else if (source === "Tickets") {

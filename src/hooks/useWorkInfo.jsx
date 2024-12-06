@@ -20,7 +20,7 @@ export const useWorkInfo = () => {
         const fetchedEmpWorkInfo =
         workInfoData?.data?.listEmpWorkInfos?.items || [];
 
-        console.log("Fetched Email Notifications:", fetchedEmpWorkInfo);
+        // console.log("Fetched Email Notifications:", fetchedEmpWorkInfo);
         setEmpWorkInfo(fetchedEmpWorkInfo);
       } catch (err) {
         setError(err);
@@ -33,7 +33,7 @@ export const useWorkInfo = () => {
     fetchData();
   }, []);
 
-  console.log("workInfo data",empWorkInfo)
+  // console.log("workInfo data",empWorkInfo)
 
   return { empWorkInfo, loading, error };
 };

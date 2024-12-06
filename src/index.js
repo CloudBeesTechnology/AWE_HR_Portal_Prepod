@@ -9,6 +9,15 @@ import awsExports from "./aws-exports.js";
 
 Amplify.configure(awsExports);
 
+if (!window.console) {
+  window.console = {
+    log: function () {},
+    warn: function () {},
+    error: function () {},
+    time: function () {},
+    timeEnd: function () {}
+  };
+}
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>

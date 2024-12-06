@@ -96,7 +96,7 @@ export const InsuranceNav = () => {
   }, [location]);
 
   const searchResult = (result) => {
-    console.log(result);
+    // console.log(result);
 
     setSearchResultData(result);
   };

@@ -58,7 +58,7 @@ export const LeaveManage = () => {
 
   // console.log("Notification", emailNotifications);
   // console.log("WorkInfo Data 6.0", mergedData);
-  console.log("Mergeddata", mergedData);
+  // console.log("Mergeddata", mergedData);
 
   // useEffect(() => {
   //   // Set initial data when mergedData changes
@@ -410,6 +410,7 @@ export const LeaveManage = () => {
                   rowsPerPage={rowsPerPage}
                   formatDate={formatDate}
                   userType={userType}
+                  personalInfo={personalInfo}
                 />
               ) : (
                 <p className="mt-12 text-center text-gray-500">

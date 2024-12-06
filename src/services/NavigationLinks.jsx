@@ -24,7 +24,7 @@ import { Status } from "../pages/recruitments/Status";
 import { WorkpassTracking } from "../pages/recruitments/WorkpassTracking";
 import { AllEmployee } from "../pages/employees/AllEmployee";
 import { EmployeeInfo } from "../pages/employees/employeeInfos/EmployeeInfo";
-import { WorkInfo } from "../pages/employees/WorkInfo";
+import { WorkInfo } from "../pages/employees/workInfoFile/WorkInfo";
 import LabourImmigration from "../pages/employees/medicalDep/LabourImmigration";
 import { EmpRequisitionForm } from "../pages/recruitments/EmpRequisitionForm";
 import { InsuranceNav } from "../pages/employees/insurance/InsuranceNav";
@@ -157,7 +157,7 @@ const NavigationLinks = () => {
     <Routes>
       {/* Login and Change Password Routes */}
       <Route path="/changePassword" element={<ChangePassword />} />
-
+  
       {loginAuth && (
         <>
           {/* <Route path="/" element={<Navigate to={defaultRoute} />} /> */}
@@ -260,7 +260,7 @@ const NavigationLinks = () => {
                 {show === "Insurance" && (
                   <>
                     <Route path="/insuranceHr" Component={HrInsuranceNav}>
-                      <Route index element={<Insurance />} />
+                      <Route index element={<Insurance/>} />
                       <Route path="groupHS" element={<GroupHS />} />
                       <Route path="workmenComp" element={<WorkmenComp />} />
                       <Route path="travelling" element={<Travelling />} />

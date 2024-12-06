@@ -21,7 +21,7 @@ export const useNotification = () => {
         const fetchedEmailNotifications =
           emailNotifData?.data?.listEmailNotifis?.items || [];
 
-        console.log("Fetched Email Notifications:", fetchedEmailNotifications);
+        // console.log("Fetched Email Notifications:", fetchedEmailNotifications);
         setEmailNotifications(fetchedEmailNotifications);
       } catch (err) {
         setError(err);
@@ -34,7 +34,7 @@ export const useNotification = () => {
     fetchData();
   }, []);
 
-  console.log("notification",emailNotifications)
+  // console.log("notification",emailNotifications)
 
   return { emailNotifications, loading, error };
 };

@@ -20,7 +20,7 @@ export const useEmpLeaveDetails = () => {
         const fetchedEmpLeaveDetails =
           empLeaveData?.data?.listEmpLeaveDetails?.items || [];
 
-        console.log("Fetched Employee Leave Details:", fetchedEmpLeaveDetails);
+        // console.log("Fetched Employee Leave Details:", fetchedEmpLeaveDetails);
         setEmpLeaveDetails(fetchedEmpLeaveDetails);
       } catch (err) {
         setError(err);
@@ -33,7 +33,7 @@ export const useEmpLeaveDetails = () => {
     fetchData();
   }, []);
 
-  console.log("Employee Leave Details:", empLeaveDetails);
+  // console.log("Employee Leave Details:", empLeaveDetails);
 
   return { empLeaveDetails, loading, error };
 };

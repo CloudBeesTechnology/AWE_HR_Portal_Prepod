@@ -15,22 +15,22 @@ const useEmployeePersonalInfo = (userID) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log(`useEmployeePersonalInfo: Fetching data for userID: ${userID}`);
+    // console.log(`useEmployeePersonalInfo: Fetching data for userID: ${userID}`);
     
     const fetchData = async () => {
       try {
         setLoading(true);
-        console.log("Fetching employee data...");
+        // console.log("Fetching employee data...");
         const empPersonalInfosData = await client.graphql({
           query: listEmpPersonalInfos,
         });
 
         const empPersonalInfos = empPersonalInfosData?.data?.listEmpPersonalInfos?.items || [];
-        console.log("Fetched employee data:", empPersonalInfos);
+        // console.log("Fetched employee data:", empPersonalInfos);
 
         if (empPersonalInfos.length === 0) {
           setError("No employee data found.");
-          console.log("No employee data found.");
+          // console.log("No employee data found.");
           setLoading(false);
           return;
         }
@@ -38,7 +38,7 @@ const useEmployeePersonalInfo = (userID) => {
         const userPersonalInfo = empPersonalInfos.find(
           (emp) => emp.empID.toLowerCase() === userID.toLowerCase()
         );
-        console.log("Matching user data: 20000", userPersonalInfo);
+        // console.log("Matching user data: 20000", userPersonalInfo);
 
         if (userPersonalInfo) {
           setPersonalInfo({
@@ -56,7 +56,7 @@ const useEmployeePersonalInfo = (userID) => {
         console.error("Error fetching data:", err);
       } finally {
         setLoading(false);
-        console.log("Data fetching completed.");
+        // console.log("Data fetching completed.");
       }
     };
 

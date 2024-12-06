@@ -60,13 +60,13 @@ export const NonLocalAcco = () => {
   });
 
   const searchResult = (result) => {
-    console.log("Search Result:", result);  // Log the result to confirm the empID is included
+    // console.log("Search Result:", result);  // Log the result to confirm the empID is included
     const keysToSet = ["empID", "empBadgeNo", "name", "accommodation", "accommodationAddress"];
     keysToSet.forEach((key) => setValue(key, result[key]));
   };
 
   const onSubmit = async (data) => {
-    console.log("Submitted Data:", data);  // Check if empID is part of the data
+    // console.log("Submitted Data:", data);  // Check if empID is part of the data
 
     if (!data.empID) {
       console.error("empID is missing");
@@ -87,7 +87,7 @@ export const NonLocalAcco = () => {
           PITableID: checkingPITable.id,
           IDTable: checkingIDTable.id,
         };
-        console.log("Updating data with empID:", data.empID);  // Log before calling the update function
+        // console.log("Updating data with empID:", data.empID);  // Log before calling the update function
         await NLAUpdateFun({ NLAValue });
         setShowTitle("Details updated successfully");
         setNotification(true);
@@ -95,7 +95,7 @@ export const NonLocalAcco = () => {
         const NLACreValue = {
           ...data,
         };
-        console.log("Creating new data for empID:", data.empID);  // Log before calling the create function
+        // console.log("Creating new data for empID:", data.empID);  // Log before calling the create function
         await NLADatas({ NLACreValue });
         setShowTitle("Details saved successfully");
         setNotification(true);

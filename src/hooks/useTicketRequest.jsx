@@ -58,7 +58,7 @@ export const useLeaveManageTwo = () => {
           workInfo: empWorkInfoMap[ticket.empID] || {}, // Add employee work info
         }));
   
-        console.log("Merged Data with Work Info 6.0:", merged);
+        // console.log("Merged Data with Work Info 6.0:", merged);
   
         // Set the merged data to state
         setTicketMerged(merged);

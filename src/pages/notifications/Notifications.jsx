@@ -31,7 +31,7 @@ export const Notifications = () => {
   useEffect(() => {
     const userID = localStorage.getItem("userID");
     setUserID(userID);
-    console.log(userID, "userid");
+    // console.log(userID, "userid");
   }, []);
   useEffect(() => {
     const fetchData = async () => {
@@ -40,10 +40,10 @@ export const Notifications = () => {
         const leaveNotification = emailNotifis?.data?.listEmailNotifis?.items;
 
         // Log the receipentEmpID for debugging
-        console.log(
-          "Leave Notifications (receipentEmpID):",
-          leaveNotification.map((notification) => notification.receipentEmpID)
-        );
+        // console.log(
+        //   "Leave Notifications (receipentEmpID):",
+        //   leaveNotification.map((notification) => notification.receipentEmpID)
+        // );
 
         // Filter leave notifications for the logged-in user, ensuring recipientEmpID is not null or empty
         const filteredLeaveNotifications = leaveNotification.filter(
@@ -55,7 +55,7 @@ export const Notifications = () => {
             const loggedInUserID = userID ? userID.trim().toLowerCase() : "";
 
             // Log for debugging
-            console.log(`Comparing: ${recipientEmpID} === ${loggedInUserID}`);
+            // console.log(`Comparing: ${recipientEmpID} === ${loggedInUserID}`);
 
             // Return the notification if recipientEmpID matches loggedInUserID and is not null or empty
             return recipientEmpID === loggedInUserID && recipientEmpID !== ""; // Ensures valid recipientEmpID
@@ -63,10 +63,10 @@ export const Notifications = () => {
         );
 
         // Log the filtered leave notifications
-        console.log(
-          "Filtered Leave Notifications:",
-          filteredLeaveNotifications
-        );
+        // console.log(
+        //   "Filtered Leave Notifications:",
+        //   filteredLeaveNotifications
+        // );
 
         // Set leave notifications in the table
         const additionalNotifications = filteredLeaveNotifications.map(
@@ -275,7 +275,7 @@ export const Notifications = () => {
     setListOfNotifications(flattenedNotifications);
 
     // Log results for now
-    console.log(flattenedNotifications);
+    // console.log(flattenedNotifications);
   };
 
   useEffect(() => {

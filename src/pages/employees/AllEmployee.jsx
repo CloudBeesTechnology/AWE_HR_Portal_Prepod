@@ -30,7 +30,8 @@ export const AllEmployee = () => {
     depInsuranceData,
     NLAData,
     SawpDetails
-  } = useContext(DataSupply);
+  } = useContext(DataSupply); 
+  // console.log(depInsuranceData, "DATA dep")
   const [searchTerm, setSearchTerm] = useState("");
   const [mergeData, setMergeData] = useState([]); // To store merged data
   const [filteredData, setFilteredData] = useState([]); // To store filtered data for search
@@ -258,7 +259,7 @@ export const AllEmployee = () => {
                   key={index}
                   className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)]"
                   onClick={() => {
-                    console.log("Clicked candidate data:", candidate);
+                    // console.log("Clicked candidate data:", candidate);
                     {handleFormShow(candidate)}
                   } 
                 }

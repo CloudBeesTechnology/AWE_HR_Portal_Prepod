@@ -122,7 +122,7 @@ export const Doe = () => {
         const parsedFiles = parsedArray.map((item) =>
           typeof item === "string" ? JSON.parse(item) : item
         );
-        console.log(parsedFiles);
+        // console.log(parsedFiles);
         setValue("doeEmpUpload", parsedFiles);
 
         setUploadDoe((prev) => ({

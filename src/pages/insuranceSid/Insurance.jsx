@@ -66,8 +66,7 @@ export const Insurance = () => {
         query: createInsuranceType,
         variables: { input: InsTypeData },
       });
-
-      console.log("Successfully submitted data:", response);
+      // console.log("Successfully submitted data:", response);
       setNotification(true);
     } catch (error) {
       console.error("Error submitting data:", error);
@@ -80,7 +79,6 @@ export const Insurance = () => {
         const response = await client.graphql({
           query: listInsuranceTypes,
         });
-
         const rawData = response.data.listInsuranceTypes.items;
         const groupedData = groupByTypeIns(rawData);
         setInsuranceData(groupedData);

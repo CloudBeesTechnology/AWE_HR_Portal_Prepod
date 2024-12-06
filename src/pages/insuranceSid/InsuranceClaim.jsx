@@ -178,7 +178,7 @@ export const InsuranceClaim = () => {
   };
 
   const onSubmit = async (data) => {
-    console.log(data);
+    // console.log(data);
     try {
       const checkingDITable = insuranceClaimsData.find(
         (match) => match.empID === data.empID
@@ -194,11 +194,9 @@ export const InsuranceClaim = () => {
                 JSON.stringify(uploadedDocs.insuranceClaims[index]) || [], // Dynamically assign uploaded files for each index
             };
           }),
-
           id: checkingDITable.id,
         };
-
-        console.log(ICValuse, "update");
+        // console.log(ICValuse, "update");
         await InsClaimUpData({ ICValuse });
         setShowTitle("Dependent Insurance Info Updated successfully");
         setNotification(true);
@@ -213,9 +211,7 @@ export const InsuranceClaim = () => {
             };
           }),
         };
-
-        console.log(ICValuse, "create");
-
+        // console.log(ICValuse, "create");
         await SubmitICData({ ICValuse });
         setShowTitle("Dependent Insurance Info saved successfully");
         setNotification(true);

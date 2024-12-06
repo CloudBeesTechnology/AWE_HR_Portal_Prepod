@@ -26,7 +26,7 @@ export const useUpdateLeaveDetails = () => {
       });
 
       const updatedLeave = result?.data?.updateEmpLeaveDetails;
-      console.log("Updated Leave Details:", updatedLeave);
+      // console.log("Updated Leave Details:", updatedLeave);
       setUpdatedLeaveDetails(updatedLeave);
     } catch (err) {
       setError(err);

@@ -127,6 +127,9 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
   
   
   const {
+    empStatusType,
+    workmenCompNo,
+
     age,
     email,
     aTQualify,
@@ -404,13 +407,13 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
 
   const insuranceInfo = {
     "Group H&S Insurance" : groupIns,
-    "Group H&S Insurance Enrollment Effective Date" : groupInsEffectDate,
-    "Group H&S Insurance Enrollment End Date" : groupInsEndDate, 
-    "Workmen Compensation Insurance" : workmenComp,
+    "Group H&S Insurance Enrollment Effective Date" :formatDate(groupInsEffectDate),
+    "Group H&S Insurance Enrollment End Date" : formatDate(groupInsEndDate), 
+    "Workmen Compensation Insurance" : empStatusType,
     "Personal Accident Insurance": accidentIns,
     "Travelling Insurance" : travelIns,
-    "Employee Insurance Upload" : empInsUpload,
-    "Policy Number" : workmePolicyNo,
+    // "Employee Insurance Upload" : empInsUpload,
+    "Policy Number" : workmenCompNo,
     // DependentInsurance : {
     //   "Dependent Insurance" : depInsurance,      
     // }
@@ -574,6 +577,9 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
   // const documents = parseDocumentData(passingValue.empUpDocs);
   const documentsTwo = parseDocumentData(passingValue.uploadBwn);
   const documentThree = parseDocumentData(passingValue.workInfoUploads);
+
+
+  // console.log(depInsurance, "2.o")
 
   return (
     <>

@@ -24,14 +24,13 @@ export const EmployeeInsurance = () => {
   const { searchResultData } = useOutletContext();
   // console.log(searchResultData, "emplkh");
   const { EmpInsuranceData , workMenDetails } = useContext(DataSupply);
-  console.log(workMenDetails);
+  // console.log(workMenDetails);
   
   const { SubmitMPData } = EmpInsDataFun();
   const { UpdateEIDataSubmit } = UpdateEmpInsDataFun();
   const [notification, setNotification] = useState(false);
   const [uploadedDocs, setUploadedDocs] = useState({ empInsUpload: [] });
   const [inputFields, setInputFields] = useState([{}]); // Tracks each file input field
-
   const [empInsUpload, setEmpInsUpload] = useState([]);
   const [showTitle, setShowTitle] = useState("");
 
@@ -156,7 +155,7 @@ export const EmployeeInsurance = () => {
           updatedUrls[index] = [fileUrl]; // Update with the URL instead of the file object
           return updatedUrls; // Return the updated state
         });
-        console.log("File uploaded successfully. URL:", fileUrl);
+        // console.log("File uploaded successfully. URL:", fileUrl);
       }
     } catch (err) {
       console.error("Error uploading file:", err);
@@ -203,7 +202,7 @@ export const EmployeeInsurance = () => {
 
 
 
-    console.log(searchResultData.empInsUpload);
+    // console.log(searchResultData.empInsUpload);
     const url = searchResultData?.empInsUpload;
 
     if (url) {
@@ -212,7 +211,7 @@ export const EmployeeInsurance = () => {
         const parsedFiles = parsedArray.map((item) =>
           typeof item === "string" ? JSON.parse(item) : item
         );
-        console.log(parsedFiles);
+        // console.log(parsedFiles);
         setUploadedDocs((prev) => ({
           ...prev,
           empInsUpload: parsedFiles,
@@ -226,7 +225,7 @@ export const EmployeeInsurance = () => {
       );
     }
   }, [searchResultData]);
-  console.log(uploadedDocs);
+  // console.log(uploadedDocs);
 
 
   useEffect(() => {
@@ -244,7 +243,7 @@ export const EmployeeInsurance = () => {
   }, [empStatusTypeValue, setValue, workMenDetails]);
 
   const onSubmit = async (data) => {
-    console.log(data, "data");
+    // console.log(data, "data");
 
     const existingEmpInsurance = EmpInsuranceData.find(
       (match) => match.empID === data.empID
@@ -256,7 +255,7 @@ export const EmployeeInsurance = () => {
         id: existingEmpInsurance.id,
         empInsUpload: JSON.stringify(uploadedDocs.empInsUpload.flat()), // Flatten if necessary, otherwise keep as it is
       };
-      console.log("update", empInsValue);
+      // console.log("update", empInsValue);
       await UpdateEIDataSubmit({empInsValue});
       setShowTitle("Employee Insurance Info updated successfully");
       setNotification(true);
@@ -265,7 +264,7 @@ export const EmployeeInsurance = () => {
         ...data,
         empInsUpload: JSON.stringify(uploadedDocs.empInsUpload.flat()), // Flatten if necessary, otherwise keep as it is
       };
-      console.log("create", empInsValue);
+      // console.log("create", empInsValue);
       await SubmitMPData({empInsValue});
       setShowTitle("Employee Insurance Info Saved successfully");
         setNotification(true);

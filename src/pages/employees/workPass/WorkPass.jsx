@@ -27,7 +27,7 @@ export const WorkPass = () => {
   useEffect(() => {
     const userID = localStorage.getItem("userID");
     setEmpID(userID);
-    console.log("Navbar: User ID from localStorage:", userID);
+    // console.log("Navbar: User ID from localStorage:", userID);
   }, []);
 
   useEffect(() => {
@@ -131,7 +131,7 @@ export const WorkPass = () => {
   }, [location]);
 
   const searchResult = (result) => {
-    console.log(result);
+    // console.log(result);
     setSearchResultData(result);
   };
 
