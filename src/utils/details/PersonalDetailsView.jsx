@@ -1,15 +1,10 @@
 import React, { useState, useEffect} from "react";
-// import { Document, Page } from "react-pdf";
-// import "react-pdf/dist/esm/Page/TextLayer.css";
-// import "react-pdf/dist/esm/Page/AnnotationLayer.css";
-// import { Viewer, Worker } from "@react-pdf-viewer/core";
-// import "@react-pdf-viewer/core/lib/styles/index.css";
-// import { pdfjs } from "react-pdf";
 import { FaTimes, FaPrint, FaDownload } from "react-icons/fa";
 import { getUrl } from "@aws-amplify/storage";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { pdfjs } from "react-pdf";
+
 
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -18,7 +13,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 
 
-const PersonalDetails = ({
+const PersonalDetailsView = ({
   personalDetails,
   educationalDetails,
   profilePhoto,
@@ -391,4 +386,4 @@ const PersonalDetails = ({
   );
 };
 
-export default PersonalDetails;
+export default PersonalDetailsView;

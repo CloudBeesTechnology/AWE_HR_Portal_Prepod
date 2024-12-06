@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import TabNavigation from "./TabNavigation";
-import PersonalDetails from "./PersonalDetailsView";
+import PersonalDetailsView from "./PersonalDetailsView";
 import FamilyDetails from "./FamilyDetails";
 import MedicalDetails from "./MedicalDetails";
 import AccommodationDetails from "./AccommodationDetails";
@@ -25,8 +25,11 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
   const invoiceRef = useRef();
   const mainRef = useRef();
 
-  const handlePrint = useReactToPrint({
-    content: () => invoiceRef.current,
+  const handlePrpint = useReactToPrint({
+    content: () => {
+      console.log(invoiceRef.current); // Log the reference to ensure it's correct
+      return invoiceRef.current;
+    }, 
     onBeforePrint: () => console.log("Preparing print..."),
     onAfterPrint: () => console.log("Print complete"),
     pageStyle: "print", // This ensures the print view uses a different CSS style
@@ -604,7 +607,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
               />
               <div className="mt-5">
                 {activeTab === 0 && (
-                  <PersonalDetails
+                  <PersonalDetailsView
                     personalDetails={personalDetails}
                     profilePhoto={profilePhoto}
                     // documents={documents}
@@ -625,7 +628,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                     paafCvevUpload={paafCvevUpload}
                     ppUpload={ppUpload}
                     supportDocUpload={supportDocUpload}
-                    handlePrint={handlePrint}
+                    handlePrint={handlePrpint}
                     invoiceRef={invoiceRef}
                     educationalDetails={educationalDetails}
                     formatDate={formatDate}
@@ -636,7 +639,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                 {activeTab === 1 && (
                   <FamilyDetails
                     familyDetails={familyDetails}
-                    handlePrint={handlePrint}
+                    handlePrint={handlePrpint}
                     invoiceRef={invoiceRef}
                     formatDate={formatDate}
                     mainRef={mainRef}
@@ -650,7 +653,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                     uploadBwn={uploadBwn}
                     documentsTwo={documentsTwo}
                     uploadRegis={uploadRegis}
-                    handlePrint={handlePrint}
+                    handlePrint={handlePrpint}
                     invoiceRef={invoiceRef}
                     dependPass={dependPass}
                     formatDate={formatDate}
@@ -660,7 +663,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                 {activeTab === 3 && (
                   <AccommodationDetails
                     accommodationInfo={accommodationInfo}
-                    handlePrint={handlePrint}
+                    handlePrint={handlePrpint}
                     invoiceRef={invoiceRef}
                     mainRef={mainRef}
                   />
@@ -669,7 +672,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                   <InsuranceDetails
                     insuranceInfo={insuranceInfo}
                     DependentInsurance={DependentInsurance}
-                    handlePrint={handlePrint}
+                    handlePrint={handlePrpint}
                     invoiceRef={invoiceRef}
                     depInsurance={depInsurance}
                     empInsUpload={empInsUpload}
@@ -697,7 +700,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                     uploadLP={uploadLP}
                     uploadPR={uploadPR}
                     uploadSP={uploadSP}
-                    handlePrint={handlePrint}
+                    handlePrint={handlePrpint}
                     invoiceRef={invoiceRef}
                     WIContract={WIContract}
                     WILeaveEntitle={WILeaveEntitle}
@@ -726,7 +729,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                     onDocumentLoadSuccess={onDocumentLoadSuccess}
                     setPageNumber={setPageNumber}
                     inducBriefUp={inducBriefUp}
-                    handlePrint={handlePrint}
+                    handlePrint={handlePrpint}
                     invoiceRef={invoiceRef}
                     formatDate={formatDate}
                     arrivStampUpload={arrivStampUpload}
