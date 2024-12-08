@@ -20,14 +20,14 @@ export const UploadHOfile = (
         allSheets.push({ sheetName, data: sheet });
       });
 
-      console.log(allSheets);
+      // console.log(allSheets);
       const AddData = [];
 
       const getResult =
         allSheets &&
         allSheets.map((sheet) => {
           const data = sheet.data;
-          console.log(data);
+          // console.log(data);
 
           var headerSlicedData = data.slice(1, 2);
 
@@ -213,7 +213,7 @@ export const UploadHOfile = (
 
       const filteredData = filterDataByDateFormat(updatedDataArray);
 
-      console.log(filteredData);
+      // console.log(filteredData);
       setExcelData(filteredData);
       setLoading(false);
       return getResult.flat();

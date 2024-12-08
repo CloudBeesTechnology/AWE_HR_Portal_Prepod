@@ -1,10 +1,9 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useRef} from "react";
 import { FaTimes, FaPrint, FaDownload } from "react-icons/fa";
 import { getUrl } from "@aws-amplify/storage";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { pdfjs } from "react-pdf";
-
 
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -109,6 +108,17 @@ const PersonalDetailsView = ({
     }
   };
 
+ 
+  const onPageChange = (newPageNumber) => {
+    if (newPageNumber >= 1 && newPageNumber <= numPages) {
+      setPageNumber(newPageNumber);
+    }
+  };
+
+  const onDocumentLoadSuccess = ({ numPages }) => {
+    setPageNumber(1); // Start from page 1
+  };
+
   // Function to render documents under a single category
 
   const renderDocumentsUnderCategory = (documents) => {
@@ -136,46 +146,20 @@ const PersonalDetailsView = ({
               document.upload.endsWith(".pdf") && (
                 <div className="mt-4">
                   <div className="relative bg-white max-w-3xl mx-auto p-6 rounded-lg shadow-lg">
-                    <div ref={invoiceRef} className="flex justify-center">
+                    <div  className="flex justify-center">
                       <Worker
                        workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
                       >
                         <Viewer
                           fileUrl={lastUploadUrl || ""}
+                          
                          
                         />
                          {/* <Page pageNumber={pageNumber} className="mx-auto" /> */}
                       </Worker>
-                      {/* <Document
-                        file={lastUploadUrl} // Use the URL fetched for the document
-                        onLoadSuccess={onDocumentLoadSuccess}
-                        className="w-full"
-                      >
-                        <Page pageNumber={pageNumber} className=" mx-auto" />
-                      </Document> */}
+                  
                     </div>
-
-                    {/* Pagination Controls */}
-                    <div className="mt-4 flex justify-between items-center">
-                      <button
-                        onClick={() => setPageNumber(pageNumber - 1)}
-                        disabled={pageNumber <= 1}
-                        className="bg-blue-600 text-black px-3 py-1 rounded-full text-sm hover:bg-blue-800"
-                      >
-                        Previous
-                      </button>
-                      <span className="text-gray-700">
-                        Page {pageNumber} of {numPages}
-                      </span>
-                      <button
-                        onClick={() => setPageNumber(pageNumber + 1)}
-                        disabled={pageNumber >= numPages}
-                        className="bg-blue-600 text-black px-3 py-1 rounded-full text-sm hover:bg-blue-800"
-                      >
-                        Next
-                      </button>
-                    </div>
-
+                 
                     {/* Close Button */}
                     <div className="absolute top-2 right-2">
                       <button
@@ -198,7 +182,7 @@ const PersonalDetailsView = ({
                     </div>
                     <div className="mt-2 flex">
                       <button
-                        onClick={handlePrint}
+                        onClick={() => window.print()} 
                         className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
                       >
                         Print
@@ -334,9 +318,9 @@ const PersonalDetailsView = ({
   };
 
   return (
-    <section ref={mainRef} className="py-8 bg-gray-50 rounded-lg">
+    <section className="py-8 bg-gray-50 rounded-lg">
       <h6 className="uppercase text_size_5 my-3">Personal Details:</h6>
-      <div className="flex flex-col md:flex-row items-start justify-between gap-8">
+      <div ref={mainRef}  className="flex flex-col md:flex-row items-start justify-between gap-8">
         {/* Personal details */}
         <div className="flex-1">{renderDetails(personalDetails)}</div>
         <div className="w-[250px] h-[350px] rounded-lg overflow-hidden border border-gray-200 shadow-md">

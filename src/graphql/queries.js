@@ -1,6 +1,48 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getHiringJob = /* GraphQL */ `
+  query GetHiringJob($id: ID!) {
+    getHiringJob(id: $id) {
+      id
+      jobTitle
+      exper
+      location
+      quantityPerson
+      startDate
+      expiryDate
+      jobContent
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listHiringJobs = /* GraphQL */ `
+  query ListHiringJobs(
+    $filter: ModelHiringJobFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listHiringJobs(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        jobTitle
+        exper
+        location
+        quantityPerson
+        startDate
+        expiryDate
+        jobContent
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getInsuranceType = /* GraphQL */ `
   query GetInsuranceType($id: ID!) {
     getInsuranceType(id: $id) {
@@ -1349,6 +1391,14 @@ export const getEmpLeaveDetails = /* GraphQL */ `
       sickLeave
       sickLeaveDate
       hospLeave
+      remainingAnualLeave
+      remainingSickLeave
+      remainingMateLeave
+      remainingMrageLeave
+      remainingPaternityLeave
+      remainingHosLeave
+      remainingCompasLeave
+      unPaidAuthorize
       createdAt
       updatedAt
       __typename
@@ -1378,6 +1428,14 @@ export const listEmpLeaveDetails = /* GraphQL */ `
         sickLeave
         sickLeaveDate
         hospLeave
+        remainingAnualLeave
+        remainingSickLeave
+        remainingMateLeave
+        remainingMrageLeave
+        remainingPaternityLeave
+        remainingHosLeave
+        remainingCompasLeave
+        unPaidAuthorize
         createdAt
         updatedAt
         __typename

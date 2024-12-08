@@ -330,7 +330,7 @@ export const ViewSBWsheet = ({
             })
             .filter((item) => item.data && item.data.length > 0);
 
-          console.log(filterPending);
+          // console.log(filterPending);
           if (userIdentification === "Manager") {
             const finalData = await SendDataToManager(filterPending);
             pendingData(finalData);
@@ -489,10 +489,10 @@ export const ViewSBWsheet = ({
           })
           .then((res) => {
             if (res.data.createSBWSheet) {
-              console.log(
-                "res.data.createSBWSheet : ",
-                res.data.createSBWSheet
-              );
+              // console.log(
+              //   "res.data.createSBWSheet : ",
+              //   res.data.createSBWSheet
+              // );
               toggleSFAMessage(true);
             }
           })
@@ -553,10 +553,10 @@ export const ViewSBWsheet = ({
             })
             .then((res) => {
               if (res.data.updateSBWSheet) {
-                console.log(
-                  "res.data.updateSBWSheet : ",
-                  res.data.updateSBWSheet
-                );
+                // console.log(
+                //   "res.data.updateSBWSheet : ",
+                //   res.data.updateSBWSheet
+                // );
                 toggleSFAMessage(true);
                 setVisibleData([]);
                 // setData(null);
@@ -587,7 +587,7 @@ export const ViewSBWsheet = ({
               <table className="styled-table">
                 <thead className="sticky-header">
                   <tr className="text_size_5">
-                    <td className="px-4 text-center">S No.</td>
+                    <td className="px-4 text-center text_size_7">S No.</td>
                     {/* <td className="px-4 flex-1 text-start">Name</td>
                     <td className="px-4 flex-1">DEPT/DIV</td>
                     <td className="px-4 flex-1 text-start">BADGE#</td>
@@ -602,12 +602,12 @@ export const ViewSBWsheet = ({
                     <td className="px-4 flex-1">OT</td>
                     <td className="px-4 flex-1">REMARKS</td> */}
                     {AllFieldData?.tableHeader.map((header, index) => (
-                      <td key={index} className="px-4 flex-1">
+                      <td key={index} className="px-4 flex-1 text_size_7">
                         {header}
                       </td>
                     )) ?? (
                       <tr>
-                        <td colSpan="100%" className="text-center">
+                        <td colSpan="100%" className="text-center text_size_7">
                           No headers available
                         </td>
                       </tr>
@@ -615,7 +615,7 @@ export const ViewSBWsheet = ({
                     {showStatusCol === true ? (
                       ""
                     ) : (
-                      <td className="px-4 flex-">STATUS</td>
+                      <td className="px-4 flex-1 text_size_7">STATUS</td>
                     )}
                   </tr>
                 </thead>

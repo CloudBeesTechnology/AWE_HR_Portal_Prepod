@@ -17,15 +17,14 @@ import { FilterForTimeSheet } from "./FilterForTimeSheet";
 import { Link } from "react-router-dom";
 import { SearchDisplayForTimeSheet } from "./timeSheetSearch/SearchDisplayForTS";
 import { LocationData } from "./customTimeSheet/JobcodeAndLocation";
+import { dummyLeaveStatus } from "./customTimeSheet/JobcodeAndLocation";
 const client = generateClient();
 export const ViewSummary = () => {
   const [data, setData] = useState(null);
   const [secondaryData, setSecondaryData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [categoryFilter, setCategoryFilter] = useState("BLNG");
-  const [toggleClick, setToggleClick] = useState(false);
+
   const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+
   const [selectedLocation, setSelectedLocation] = useState(null);
   const { convertedStringToArrayObj, getPosition } = useFetchData("Offshore");
 
@@ -52,15 +51,14 @@ export const ViewSummary = () => {
 
       const offshoreData = processedData.flat();
       const leaveStatusData = leaveStatus?.data?.listLeaveStatuses?.items;
-      console.log("leaveStatusData : ", leaveStatusData);
 
       const approvedLeaveStatus = leaveStatusData.filter(
         (fil) =>
           fil.managerStatus === "Approved" &&
           fil.supervisorStatus === "Approved"
       );
-      console.log("Approved : ", approvedLeaveStatus);
-
+      // console.log(leaveStatusData);
+      // console.log(approvedLeaveStatus);
       // const existingDate = "7/21/2025";
       // const parsedExistingDate = new Date(existingDate);
 
@@ -94,13 +92,12 @@ export const ViewSummary = () => {
           };
         })
         .filter((item) => item !== null && item !== undefined);
-      console.log(mergedData);
 
       const groupBySapNo = (data) => {
         const grouped = data.reduce((acc, item) => {
           const key = String(item.no);
           let existingGroup = acc.find((group) => group.sapNo === key);
-          console.log(existingGroup);
+
           if (!existingGroup) {
             existingGroup = { sapNo: key, data: [] };
             acc.push(existingGroup);
@@ -113,15 +110,66 @@ export const ViewSummary = () => {
         return grouped;
       };
       const grouped = groupBySapNo(offshoreData);
-      console.log("offshoreData : ", offshoreData);
-      console.log("Grouped Data : ", grouped);
+      // console.log("offshoreData : ", offshoreData);
+      // console.log("Grouped Data : ", grouped);
 
-      // LeaveStatus
-      // const filterApprovedData = mergedData.filter(
-      //   (fil) =>
-      //     fil.managerStatus === "Approved" &&
-      //     fil.supervisorStatus === "Approved"
-      // );
+      const seperateDateMethod = (inputData) => {
+        return inputData
+          .map((entry) => {
+            // Group by Month/Year
+            const groupedByMonthYear = entry.data.reduce((acc, record) => {
+              const date = new Date(record.date);
+              const monthYear = `${date.getMonth() + 1}/${date.getFullYear()}`;
+
+              if (!acc[monthYear]) {
+                acc[monthYear] = [];
+              }
+              acc[monthYear].push(record);
+
+              return acc;
+            }, {});
+
+            // Construct final output for each Month/Year group
+            return Object.entries(groupedByMonthYear).map(
+              ([monthYear, records]) => ({
+                sapNo: entry.sapNo,
+
+                data: records,
+              })
+            );
+          })
+          .flat(); // Flatten the nested arrays into a single-level array
+      };
+      const seperatedEmpByDate = seperateDateMethod(grouped);
+
+      // Filter employee based on Location
+      const processData = (inputData) => {
+        return inputData
+          .map((entry) => {
+            // Extract unique locations from `jobLocaWhrs`
+            const groupedByLocation = entry.data.reduce((acc, record) => {
+              const location = record.jobLocaWhrs[0]?.LOCATION || "Unknown";
+
+              if (!acc[location]) {
+                acc[location] = [];
+              }
+              acc[location].push(record);
+              return acc;
+            }, {});
+
+            // Construct final output for each location group
+            return Object.entries(groupedByLocation).map(
+              ([location, records]) => ({
+                sapNo: entry.sapNo,
+                data: records,
+              })
+            );
+          })
+          .flat();
+      };
+      const seperatedGroupedData = processData(seperatedEmpByDate);
+      // console.log("Seperated Data : ", seperatedGroupedData);
+
       const merged = mergedData.flatMap((val) => {
         // Filter all matching entries from approvedLeaveStatus
         const matches = approvedLeaveStatus.filter(
@@ -146,17 +194,23 @@ export const ViewSummary = () => {
           fil.supervisorStatus === "Approved"
       );
 
-      console.log("merge : ", approvedLeaveStatuses);
+      // console.log("approvedLeaveStatuses : ", approvedLeaveStatuses);
 
       const filteredData = approvedLeaveStatuses.filter((leave) => {
-        return grouped.some((emp) => {
+        return seperatedGroupedData.some((emp) => {
           if (leave.sapNo === emp.sapNo) {
             console.log(leave.sapNo, " | ", emp.sapNo);
 
             return emp.data.some((entry) => {
               const leaveDate = new Date(leave.toDate);
               const empDate = new Date(entry.date);
-
+              console.log(
+                "empDate : ",
+                empDate.toLocaleDateString(),
+                " | ",
+                "leaveDate : ",
+                leaveDate.toLocaleDateString()
+              );
               return (
                 leaveDate.getFullYear() === empDate.getFullYear() &&
                 leaveDate.getMonth() === empDate.getMonth()
@@ -166,7 +220,7 @@ export const ViewSummary = () => {
           return false;
         });
       });
-      console.log(filteredData);
+      // console.log(filteredData);
       const leaveCounts = filteredData.reduce((acc, entry) => {
         const { sapNo, leaveType } = entry;
 
@@ -181,6 +235,7 @@ export const ViewSummary = () => {
         return acc;
       }, {});
 
+      // console.log(leaveCounts);
       // Convert to an array format if desired
       const leaveCount = Object.entries(leaveCounts).map(
         ([sapNo, leaveTypes]) => ({
@@ -188,9 +243,11 @@ export const ViewSummary = () => {
           leaveCounts: leaveTypes,
         })
       );
-      console.log(leaveCount);
       console.log("leaveCount : ", leaveCount);
-      const addLeaveTypeCount = grouped.map((val) => {
+      // &&&
+
+      // %%%
+      const addLeaveTypeCount = seperatedGroupedData.map((val) => {
         const empLeaveCount = leaveCount.find((fi) => val.sapNo === fi.sapNo);
         const k = val.data.find((f) => f);
 
@@ -205,14 +262,18 @@ export const ViewSummary = () => {
             }
           : { ...val, leaveCounts: {}, newDate: k.date, location: res[0] };
       });
-      console.log(addLeaveTypeCount);
+      // console.log("addLeaveTypeCount : ", addLeaveTypeCount);
+      // &&&&
 
+      // const result = processData(res.data);
+
+      // $$$$
       const transformedData = addLeaveTypeCount
         .map((item) => {
           const initialMatch = mergedData.find(
             (datasetItem) => datasetItem.sapNo === item.sapNo
           );
-          console.log(initialMatch);
+
           const selectedFields = initialMatch
             ? (({
                 empID,
@@ -245,7 +306,7 @@ export const ViewSummary = () => {
             {}
           );
           const getEmpDateRange = item.data.find((first) => first.date);
-          console.log(getEmpDateRange);
+
           const empName = item.data.map((m) => m.name);
           const empLeaveCount = item.leaveCounts;
           const dateForSelectMY = item.newDate;
@@ -280,7 +341,7 @@ export const ViewSummary = () => {
         })
         .filter(Boolean);
 
-      console.log(transformedData);
+      // console.log(transformedData);
       // return transformedData;
       setData(transformedData);
       setSecondaryData(transformedData);
@@ -359,7 +420,7 @@ export const ViewSummary = () => {
   const selectLocation = async (loca) => {
     try {
       const result = await loca;
-      console.log(loca.location);
+      // console.log(loca.location);
       setSelectedLocation(result.location);
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -469,7 +530,7 @@ export const ViewSummary = () => {
   return (
     <div className="bg-[#fafaf6] h-screen">
       <div className="screen-size p-4">
-        <div className="m-5 flex justify-between">
+        <header className="m-5 flex justify-between">
           <div className=" flex items-center">
             <Link to="/timeSheet" className="text-xl flex-1 text-grey">
               <FaArrowLeft />
@@ -479,7 +540,7 @@ export const ViewSummary = () => {
             <p>View Time Sheet Summary</p>
           </header>
           <div></div>
-        </div>
+        </header>
         <div className="flex  justify-between items-center w-full mb-5">
           <div className="flex justify-start gap-4 ">
             <div className="relative grid grid-cols-1 ">
@@ -513,8 +574,8 @@ export const ViewSummary = () => {
           </div>
         </div>
         <div className="overflow-auto max-h-[60vh] ">
-          <table className="min-w-full  text-sm bg-white ">
-            <thead className="bg-grey">
+          <table className="min-w-full text-sm bg-white ">
+            <thead className="bg-[#949393] ">
               <tr className=" text-white">
                 <th className="border px-2 py-1 border-dark_grey" rowSpan="2">
                   Employee Name

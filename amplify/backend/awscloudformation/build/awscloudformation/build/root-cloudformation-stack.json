@@ -207,8 +207,14 @@
           "AppSyncApiName": "aweadininprod",
           "DynamoDBBillingMode": "PAY_PER_REQUEST",
           "DynamoDBEnableServerSideEncryption": false,
+          "authRoleName": {
+            "Ref": "AuthRoleName"
+          },
+          "unauthRoleName": {
+            "Ref": "UnauthRoleName"
+          },
           "S3DeploymentBucket": "amplify-aweadininprod-prod-954b8-deployment",
-          "S3DeploymentRootKey": "amplify-appsync-files/d1a6c2621d6f04dc504ca6d8494ff4ed10da75a7",
+          "S3DeploymentRootKey": "amplify-appsync-files/c739d435312115e2d21d2bd6b2c26854ecb24f73",
           "env": "prod"
         }
       }

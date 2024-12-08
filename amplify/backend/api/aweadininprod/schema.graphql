@@ -1,17 +1,28 @@
-type InsuranceType @model @auth(rules: [{ allow: public }]) {
+type HiringJob @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  jobTitle: String
+  exper: String
+  location: String
+  quantityPerson: String
+  startDate: String
+  expiryDate: String
+  jobContent: String
+}
+
+type InsuranceType @model @auth(rules: [{allow: public}]) {
   id: ID!
   typeIns: String
   insDetails: [String]
 }
 
-type GroupHandS @model @auth(rules: [{ allow: public }]) {
+type GroupHandS @model @auth(rules: [{allow: public}]) {
   id: ID!
   groupHSExp: String
   groupHSNo: String
   groupHSUpload: [AWSJSON]
 }
 
-type WorkMen @model @auth(rules: [{ allow: public }]) {
+type WorkMen @model @auth(rules: [{allow: public}]) {
   id: ID!
   empStatusType: String
   workmenCompExp: String
@@ -19,27 +30,27 @@ type WorkMen @model @auth(rules: [{ allow: public }]) {
   workmenComUp: [AWSJSON]
 }
 
-type TravelIns @model @auth(rules: [{ allow: public }]) {
+type TravelIns @model @auth(rules: [{allow: public}]) {
   id: ID!
   travelExp: String
   travelNo: String
   travelUp: [AWSJSON]
 }
 
-type PersonalAccident @model @auth(rules: [{ allow: public }]) {
+type PersonalAccident @model @auth(rules: [{allow: public}]) {
   id: ID!
   perAccExp: String
   perAccNo: String
   perAccUp: [AWSJSON]
 }
 
-type InsClaim @model @auth(rules: [{ allow: public }]) {
+type InsClaim @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String
   insuranceClaims: [AWSJSON]
 }
 
-type ProbForm @model @auth(rules: [{ allow: public }]) {
+type ProbForm @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
   adaptability: String
@@ -76,7 +87,7 @@ type ProbForm @model @auth(rules: [{ allow: public }]) {
   teamwork: String
 }
 
-type EmailNotifi @model @auth(rules: [{ allow: public }]) {
+type EmailNotifi @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
   leaveType: String
@@ -87,7 +98,7 @@ type EmailNotifi @model @auth(rules: [{ allow: public }]) {
   message: String
 }
 
-type OffshoreSheet @model @auth(rules: [{ allow: public }]) {
+type OffshoreSheet @model @auth(rules: [{allow: public}]) {
   id: ID!
   date: String
   dailySheet: [AWSJSON]
@@ -95,7 +106,7 @@ type OffshoreSheet @model @auth(rules: [{ allow: public }]) {
   manager: [AWSJSON]
 }
 
-type ORMCSheet @model @auth(rules: [{ allow: public }]) {
+type ORMCSheet @model @auth(rules: [{allow: public}]) {
   id: ID!
   date: String
   dailySheet: [AWSJSON]
@@ -103,7 +114,7 @@ type ORMCSheet @model @auth(rules: [{ allow: public }]) {
   manager: [AWSJSON]
 }
 
-type SBWSheet @model @auth(rules: [{ allow: public }]) {
+type SBWSheet @model @auth(rules: [{allow: public}]) {
   id: ID!
   date: String
   dailySheet: [AWSJSON]
@@ -111,7 +122,7 @@ type SBWSheet @model @auth(rules: [{ allow: public }]) {
   manager: [AWSJSON]
 }
 
-type Blng @model @auth(rules: [{ allow: public }]) {
+type Blng @model @auth(rules: [{allow: public}]) {
   id: ID!
   weeklySheet: [AWSJSON]
   date: String
@@ -119,7 +130,7 @@ type Blng @model @auth(rules: [{ allow: public }]) {
   manager: [AWSJSON]
 }
 
-type HeadOffice @model @auth(rules: [{ allow: public }]) {
+type HeadOffice @model @auth(rules: [{allow: public}]) {
   id: ID!
   dailySheet: [AWSJSON]
   date: String
@@ -127,7 +138,7 @@ type HeadOffice @model @auth(rules: [{ allow: public }]) {
   manager: [AWSJSON]
 }
 
-type EmpRequisition @model @auth(rules: [{ allow: public }]) {
+type EmpRequisition @model @auth(rules: [{allow: public}]) {
   id: ID!
   department: String
   justification: String
@@ -143,7 +154,7 @@ type EmpRequisition @model @auth(rules: [{ allow: public }]) {
   reqName: String
 }
 
-type WeldingInfo @model @auth(rules: [{ allow: public }]) {
+type WeldingInfo @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
   department: String
@@ -165,7 +176,7 @@ type WeldingInfo @model @auth(rules: [{ allow: public }]) {
   weldingMaterial: String
 }
 
-type TrainingReq @model @auth(rules: [{ allow: public }]) {
+type TrainingReq @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
   MRNo: String
@@ -183,7 +194,7 @@ type TrainingReq @model @auth(rules: [{ allow: public }]) {
   traineeCourseFee: String
 }
 
-type TrainingCertificates @model @auth(rules: [{ allow: public }]) {
+type TrainingCertificates @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
   courseCode: [String]
@@ -195,20 +206,20 @@ type TrainingCertificates @model @auth(rules: [{ allow: public }]) {
   orgiCertifiDate: [String]
 }
 
-type AddCourse @model @auth(rules: [{ allow: public }]) {
+type AddCourse @model @auth(rules: [{allow: public}]) {
   id: ID!
   courseSelect: String
   courseName: [String]
   company: [String]
 }
 
-type EmpDepInsurance @model @auth(rules: [{ allow: public }]) {
+type EmpDepInsurance @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String
   depInsurance: [AWSJSON]
 }
 
-type EmpInsurance @model @auth(rules: [{ allow: public }]) {
+type EmpInsurance @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
   groupIns: [String]
@@ -221,7 +232,7 @@ type EmpInsurance @model @auth(rules: [{ allow: public }]) {
   empInsUpload: [AWSJSON]
 }
 
-type SawpDetails @model @auth(rules: [{ allow: public }]) {
+type SawpDetails @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
   sawpEmpLtrReq: [String]
@@ -229,7 +240,7 @@ type SawpDetails @model @auth(rules: [{ allow: public }]) {
   sawpEmpUpload: [AWSJSON]
 }
 
-type DNDetails @model @auth(rules: [{ allow: public }]) {
+type DNDetails @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
   doeEmpSubmit: [String]
@@ -246,7 +257,7 @@ type DNDetails @model @auth(rules: [{ allow: public }]) {
   nlmsEmpUpload: [AWSJSON]
 }
 
-type BJLDetails @model @auth(rules: [{ allow: public }]) {
+type BJLDetails @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
   bankSubmit: [String]
@@ -267,7 +278,7 @@ type BJLDetails @model @auth(rules: [{ allow: public }]) {
   lbrDepoUpload: [AWSJSON]
 }
 
-type PassportValid @model @auth(rules: [{ allow: public }]) {
+type PassportValid @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
   ppLocation: [String]
@@ -286,7 +297,7 @@ type PassportValid @model @auth(rules: [{ allow: public }]) {
   remarkImmig: [String]
 }
 
-type WPTracking @model @auth(rules: [{ allow: public }]) {
+type WPTracking @model @auth(rules: [{allow: public}]) {
   id: ID!
   tempID: String!
   supportletterReqDate: String
@@ -330,14 +341,14 @@ type WPTracking @model @auth(rules: [{ allow: public }]) {
   mobFile: String
 }
 
-type EmployeeNonLocalAcco @model @auth(rules: [{ allow: public }]) {
+type EmployeeNonLocalAcco @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
   accommodation: [String]
   accommodationAddress: [String]
 }
 
-type LabourMedicalInfo @model @auth(rules: [{ allow: public }]) {
+type LabourMedicalInfo @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
   overMD: String
@@ -352,7 +363,7 @@ type LabourMedicalInfo @model @auth(rules: [{ allow: public }]) {
   dependPass: [AWSJSON]
 }
 
-type ServiceRecord @model @auth(rules: [{ allow: public }]) {
+type ServiceRecord @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
   depEmpDate: [String]
@@ -373,7 +384,7 @@ type ServiceRecord @model @auth(rules: [{ allow: public }]) {
   uploadDep: [AWSJSON]
 }
 
-type EmpLeaveDetails @model @auth(rules: [{ allow: public }]) {
+type EmpLeaveDetails @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
   annualLeave: [String]
@@ -389,9 +400,17 @@ type EmpLeaveDetails @model @auth(rules: [{ allow: public }]) {
   sickLeave: String
   sickLeaveDate: String
   hospLeave: String
+  remainingAnualLeave: String
+  remainingSickLeave: String
+  remainingMateLeave: String
+  remainingMrageLeave: String
+  remainingPaternityLeave: String
+  remainingHosLeave: String
+  remainingCompasLeave: String
+  unPaidAuthorize: String
 }
 
-type TerminationInfo @model @auth(rules: [{ allow: public }]) {
+type TerminationInfo @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
   resignDate: String
@@ -413,7 +432,7 @@ type TerminationInfo @model @auth(rules: [{ allow: public }]) {
   WILeaveEntitle: [AWSJSON]
 }
 
-type EmpWorkInfo @model @auth(rules: [{ allow: public }]) {
+type EmpWorkInfo @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
   contractStart: [String]
@@ -445,7 +464,7 @@ type EmpWorkInfo @model @auth(rules: [{ allow: public }]) {
   workMonth: [String]
 }
 
-type EmpPersonalInfo @model @auth(rules: [{ allow: public }]) {
+type EmpPersonalInfo @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
   age: Int
@@ -478,7 +497,7 @@ type EmpPersonalInfo @model @auth(rules: [{ allow: public }]) {
   sapNo: String
 }
 
-type IDDetails @model @auth(rules: [{ allow: public }]) {
+type IDDetails @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
   applicationUpload: [AWSJSON]
@@ -511,7 +530,7 @@ type IDDetails @model @auth(rules: [{ allow: public }]) {
   supportDocUpload: [AWSJSON]
 }
 
-type CandIToEMP @model @auth(rules: [{ allow: public }]) {
+type CandIToEMP @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
   crime: String
@@ -533,7 +552,7 @@ type CandIToEMP @model @auth(rules: [{ allow: public }]) {
   workExperience: [AWSJSON]
 }
 
-type LocalMobilization @model @auth(rules: [{ allow: public }]) {
+type LocalMobilization @model @auth(rules: [{allow: public}]) {
   id: ID!
   tempID: String
   mobSignDate: String
@@ -549,7 +568,7 @@ type LocalMobilization @model @auth(rules: [{ allow: public }]) {
   cvecFile: String
 }
 
-type InterviewSchedule @model @auth(rules: [{ allow: public }]) {
+type InterviewSchedule @model @auth(rules: [{allow: public}]) {
   id: ID!
   interDate: String
   interTime: String
@@ -563,10 +582,9 @@ type InterviewSchedule @model @auth(rules: [{ allow: public }]) {
   department: String
   otherDepartment: String
   status: String
-
 }
 
-type EducationDetails @model @auth(rules: [{ allow: public }]) {
+type EducationDetails @model @auth(rules: [{allow: public}]) {
   id: ID!
   tempID: String!
   crime: String
@@ -591,7 +609,7 @@ type EducationDetails @model @auth(rules: [{ allow: public }]) {
   uploadPp: String
 }
 
-type PersonalDetails @model @auth(rules: [{ allow: public }]) {
+type PersonalDetails @model @auth(rules: [{allow: public}]) {
   id: ID!
   tempID: String!
   age: Int
@@ -632,7 +650,7 @@ type PersonalDetails @model @auth(rules: [{ allow: public }]) {
   workExperience: [AWSJSON]
 }
 
-type User @model @auth(rules: [{ allow: public }]) {
+type User @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String
   selectType: String
@@ -641,7 +659,7 @@ type User @model @auth(rules: [{ allow: public }]) {
   status: String
 }
 
-type TicketRequest @model @auth(rules: [{ allow: public }]) {
+type TicketRequest @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
   empStatus: String
@@ -658,7 +676,7 @@ type TicketRequest @model @auth(rules: [{ allow: public }]) {
   hrEmpID: String
 }
 
-type LeaveStatus @model @auth(rules: [{ allow: public }]) {
+type LeaveStatus @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: ID!
   leaveType: String
@@ -682,3 +700,4 @@ type LeaveStatus @model @auth(rules: [{ allow: public }]) {
   empDate: AWSDateTime
   empRemarks: String
 }
+ 

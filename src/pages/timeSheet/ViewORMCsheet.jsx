@@ -370,10 +370,10 @@ export const ViewORMCsheet = ({
           })
           .then((res) => {
             if (res.data.createORMCSheet) {
-              console.log(
-                "res.data.createORMCSheet : ",
-                res.data.createORMCSheet
-              );
+              // console.log(
+              //   "res.data.createORMCSheet : ",
+              //   res.data.createORMCSheet
+              // );
               toggleSFAMessage(true);
             }
           })
@@ -434,10 +434,10 @@ export const ViewORMCsheet = ({
             })
             .then((res) => {
               if (res.data.updateORMCSheet) {
-                console.log(
-                  "res.data.updateORMCSheet : ",
-                  res.data.updateORMCSheet
-                );
+                // console.log(
+                //   "res.data.updateORMCSheet : ",
+                //   res.data.updateORMCSheet
+                // );
                 toggleSFAMessage(true);
                 setVisibleData([]);
                 // setData(null);
@@ -469,7 +469,7 @@ export const ViewORMCsheet = ({
               <table className="styled-table">
                 <thead className="sticky-header">
                   <tr className="text_size_5">
-                    <td className="px-5 text-center">S No.</td>
+                    <td className="px-5 text-center text_size_7">S No.</td>
                     {/* <td className="px-4 flex-1 text-start">Name</td>
                     <td className="px-4 flex-1">DEPT/DIV</td>
                     <td className="px-4 flex-1 text-start">BADGE#</td>
@@ -483,12 +483,12 @@ export const ViewORMCsheet = ({
 
                     <td className="px-4 flex-1">REMARKS</td> */}
                     {AllFieldData?.tableHeader.map((header, index) => (
-                      <td key={index} className="px-5 flex-1">
+                      <td key={index} className="px-5 flex-1 text_size_7">
                         {header}
                       </td>
                     )) ?? (
                       <tr>
-                        <td colSpan="100%" className="text-center">
+                        <td colSpan="100%" className="text-center text_size_7">
                           No headers available
                         </td>
                       </tr>
@@ -496,7 +496,7 @@ export const ViewORMCsheet = ({
                     {showStatusCol === true ? (
                       ""
                     ) : (
-                      <td className="px-5 flex-">STATUS</td>
+                      <td className="px-5 flex-1 text_size_7">STATUS</td>
                     )}
                   </tr>
                 </thead>

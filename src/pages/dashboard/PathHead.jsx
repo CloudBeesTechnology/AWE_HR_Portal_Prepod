@@ -15,9 +15,6 @@ export const PathHead = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [LPACount, setLPACount] = useState(0);
   const [SAWPCount, setSAWPCount] = useState(0);
-
-  console.log(empPIData.contractType);
-  console.log(IDData.contractType);
   
   
   // Function to merge and calculate counts
@@ -25,7 +22,6 @@ export const PathHead = () => {
     try {
       const candidates = [...empPIData, ...IDData];
 
-      console.log("Employee Personal Infos:", candidates);
       setMergeData(candidates);
       
       // const bruneian = candidates.filter(
@@ -52,7 +48,7 @@ export const PathHead = () => {
       // Total count
       setTotalCount(bruneian + LPA + SAWP);
     } catch (err) {
-      console.error("Error calculating counts:", err.message);
+      // console.error("Error calculating counts:", err.message);
     }
   };
 

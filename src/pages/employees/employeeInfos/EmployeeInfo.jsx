@@ -235,8 +235,6 @@ export const EmployeeInfo = () => {
   };
 
   const searchResult = (result) => {
-    console.log(result);
-
     const keysToSet = [
       "empID",
       "driveLic",
@@ -381,8 +379,6 @@ export const EmployeeInfo = () => {
     const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
     return fileName;
   };
-  console.log(uploadedDocs.profilePhoto);
-  console.log(uploadedDocs.inducBriefUp,"induc");
 
   const onSubmit = async (data) => {
     data.contractType = contractTypes;
@@ -440,7 +436,7 @@ export const EmployeeInfo = () => {
           PITableID: checkingPITable.id,
           IDTable: checkingIDTable.id,
         };
-        console.log("AZQ Update", collectValue);
+        // console.log("AZQ Update", collectValue);
 
         await UpdateEIValue({ collectValue });
         setShowTitle("Employee Personal Info updated successfully");
@@ -469,7 +465,7 @@ export const EmployeeInfo = () => {
           supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
           familyDetails: JSON.stringify(data.familyDetails),
         };
-        console.log("AZ", empValue);
+        // console.log("AZ", empValue);
         await SubmitEIData({ empValue });
         setShowTitle("Employee Personal Info saved successfully");
         setNotification(true);
@@ -478,10 +474,8 @@ export const EmployeeInfo = () => {
       console.log(error);
     }
   };
-  console.log(uploadedDocs.profilePhoto);
 
   const watchedProfilePhoto = watch("profilePhoto" || "");
-  const watchInducBriefUpload = watch("inducBriefUp" || "");
 
   return (
     <section

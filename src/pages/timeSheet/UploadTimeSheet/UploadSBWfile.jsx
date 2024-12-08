@@ -21,13 +21,13 @@ export const UploadSBWfile = (
         allSheets.push({ sheetName, data: sheet });
       });
 
-      console.log(allSheets);
+      // console.log(allSheets);
 
       const getResult =
         allSheets &&
         allSheets.map((sheet) => {
           const data = sheet.data;
-          console.log(data);
+          // console.log(data);
 
           var headerSlicedData = data.slice(0, 1);
           const hasNameAndDate = headerSlicedData.some((obj) =>
@@ -45,7 +45,7 @@ export const UploadSBWfile = (
           // const result = changedHeader.flat().flat();
 
           var bodySlicedData = data.slice(0);
-          console.log(bodySlicedData);
+          // console.log(bodySlicedData);
           tableBodyData.push(bodySlicedData);
           // bodySlicedData.forEach((bodyData) => {
           //   const row = {};
@@ -108,7 +108,7 @@ export const UploadSBWfile = (
           // console.log(cleanedItem);
           return cleanedItem;
         });
-        console.log("formattedData : ", formattedData);
+        // console.log("formattedData : ", formattedData);
 
         const updatedDataArray =
           formattedData &&
@@ -127,7 +127,7 @@ export const UploadSBWfile = (
 
             return item;
           });
-        console.log(updatedDataArray);
+        // console.log(updatedDataArray);
         // console.log(updatedDataArray);
         // const removeTotalEmployees = updatedDataArray.filter(
         //   (val) => !val.NAME?.includes("TOTAL EMPLOYEES")

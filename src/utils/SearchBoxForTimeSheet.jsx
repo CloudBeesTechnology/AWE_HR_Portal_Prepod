@@ -75,7 +75,7 @@ export const SearchBoxForTimeSheet = ({
   Position,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  console.log("Search EmpId : ", secondaryData);
+  // console.log("Search EmpId : ", secondaryData);
   const handleSearch = (e) => {
     const query = e.target.value.trim().toUpperCase();
     setSearchQuery(query);

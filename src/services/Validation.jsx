@@ -376,10 +376,10 @@ export const MobilizationSchema = Yup.object().shape({
 });
 
 export const hiringJobSchema = Yup.object().shape({
-  jobTitle: Yup.string().notRequired(),
+  jobTitle: Yup.string().required("Job Title is required"),
   location: Yup.string().notRequired(),
   jobDesc: Yup.string().notRequired(),
-  experience: Yup.string().notRequired(),
+  experience: Yup.string().required("Experience is required"),
   quantity: Yup.string().notRequired(),
   startDate: Yup.date()
     .nullable()

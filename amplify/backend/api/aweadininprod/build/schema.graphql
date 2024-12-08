@@ -1,4 +1,17 @@
-type InsuranceType {
+type HiringJob @aws_iam @aws_api_key {
+  id: ID!
+  jobTitle: String
+  exper: String
+  location: String
+  quantityPerson: String
+  startDate: String
+  expiryDate: String
+  jobContent: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type InsuranceType @aws_iam @aws_api_key {
   id: ID!
   typeIns: String
   insDetails: [String]
@@ -6,7 +19,7 @@ type InsuranceType {
   updatedAt: AWSDateTime!
 }
 
-type GroupHandS {
+type GroupHandS @aws_iam @aws_api_key {
   id: ID!
   groupHSExp: String
   groupHSNo: String
@@ -15,7 +28,7 @@ type GroupHandS {
   updatedAt: AWSDateTime!
 }
 
-type WorkMen {
+type WorkMen @aws_iam @aws_api_key {
   id: ID!
   empStatusType: String
   workmenCompExp: String
@@ -25,7 +38,7 @@ type WorkMen {
   updatedAt: AWSDateTime!
 }
 
-type TravelIns {
+type TravelIns @aws_iam @aws_api_key {
   id: ID!
   travelExp: String
   travelNo: String
@@ -34,7 +47,7 @@ type TravelIns {
   updatedAt: AWSDateTime!
 }
 
-type PersonalAccident {
+type PersonalAccident @aws_iam @aws_api_key {
   id: ID!
   perAccExp: String
   perAccNo: String
@@ -43,7 +56,7 @@ type PersonalAccident {
   updatedAt: AWSDateTime!
 }
 
-type InsClaim {
+type InsClaim @aws_iam @aws_api_key {
   id: ID!
   empID: String
   insuranceClaims: [AWSJSON]
@@ -51,7 +64,7 @@ type InsClaim {
   updatedAt: AWSDateTime!
 }
 
-type ProbForm {
+type ProbForm @aws_iam @aws_api_key {
   id: ID!
   empID: String!
   adaptability: String
@@ -90,7 +103,7 @@ type ProbForm {
   updatedAt: AWSDateTime!
 }
 
-type EmailNotifi {
+type EmailNotifi @aws_iam @aws_api_key {
   id: ID!
   empID: String!
   leaveType: String
@@ -103,7 +116,7 @@ type EmailNotifi {
   updatedAt: AWSDateTime!
 }
 
-type OffshoreSheet {
+type OffshoreSheet @aws_iam @aws_api_key {
   id: ID!
   date: String
   dailySheet: [AWSJSON]
@@ -113,7 +126,7 @@ type OffshoreSheet {
   updatedAt: AWSDateTime!
 }
 
-type ORMCSheet {
+type ORMCSheet @aws_iam @aws_api_key {
   id: ID!
   date: String
   dailySheet: [AWSJSON]
@@ -123,7 +136,7 @@ type ORMCSheet {
   updatedAt: AWSDateTime!
 }
 
-type SBWSheet {
+type SBWSheet @aws_iam @aws_api_key {
   id: ID!
   date: String
   dailySheet: [AWSJSON]
@@ -133,7 +146,7 @@ type SBWSheet {
   updatedAt: AWSDateTime!
 }
 
-type Blng {
+type Blng @aws_iam @aws_api_key {
   id: ID!
   weeklySheet: [AWSJSON]
   date: String
@@ -143,7 +156,7 @@ type Blng {
   updatedAt: AWSDateTime!
 }
 
-type HeadOffice {
+type HeadOffice @aws_iam @aws_api_key {
   id: ID!
   dailySheet: [AWSJSON]
   date: String
@@ -153,7 +166,7 @@ type HeadOffice {
   updatedAt: AWSDateTime!
 }
 
-type EmpRequisition {
+type EmpRequisition @aws_iam @aws_api_key {
   id: ID!
   department: String
   justification: String
@@ -171,7 +184,7 @@ type EmpRequisition {
   updatedAt: AWSDateTime!
 }
 
-type WeldingInfo {
+type WeldingInfo @aws_iam @aws_api_key {
   id: ID!
   empID: String!
   department: String
@@ -195,7 +208,7 @@ type WeldingInfo {
   updatedAt: AWSDateTime!
 }
 
-type TrainingReq {
+type TrainingReq @aws_iam @aws_api_key {
   id: ID!
   empID: String!
   MRNo: String
@@ -215,7 +228,7 @@ type TrainingReq {
   updatedAt: AWSDateTime!
 }
 
-type TrainingCertificates {
+type TrainingCertificates @aws_iam @aws_api_key {
   id: ID!
   empID: String!
   courseCode: [String]
@@ -229,7 +242,7 @@ type TrainingCertificates {
   updatedAt: AWSDateTime!
 }
 
-type AddCourse {
+type AddCourse @aws_iam @aws_api_key {
   id: ID!
   courseSelect: String
   courseName: [String]
@@ -238,7 +251,7 @@ type AddCourse {
   updatedAt: AWSDateTime!
 }
 
-type EmpDepInsurance {
+type EmpDepInsurance @aws_iam @aws_api_key {
   id: ID!
   empID: String
   depInsurance: [AWSJSON]
@@ -246,7 +259,7 @@ type EmpDepInsurance {
   updatedAt: AWSDateTime!
 }
 
-type EmpInsurance {
+type EmpInsurance @aws_iam @aws_api_key {
   id: ID!
   empID: String!
   groupIns: [String]
@@ -261,7 +274,7 @@ type EmpInsurance {
   updatedAt: AWSDateTime!
 }
 
-type SawpDetails {
+type SawpDetails @aws_iam @aws_api_key {
   id: ID!
   empID: String!
   sawpEmpLtrReq: [String]
@@ -271,7 +284,7 @@ type SawpDetails {
   updatedAt: AWSDateTime!
 }
 
-type DNDetails {
+type DNDetails @aws_iam @aws_api_key {
   id: ID!
   empID: String!
   doeEmpSubmit: [String]
@@ -290,7 +303,7 @@ type DNDetails {
   updatedAt: AWSDateTime!
 }
 
-type BJLDetails {
+type BJLDetails @aws_iam @aws_api_key {
   id: ID!
   empID: String!
   bankSubmit: [String]
@@ -313,7 +326,7 @@ type BJLDetails {
   updatedAt: AWSDateTime!
 }
 
-type PassportValid {
+type PassportValid @aws_iam @aws_api_key {
   id: ID!
   empID: String!
   ppLocation: [String]
@@ -334,7 +347,7 @@ type PassportValid {
   updatedAt: AWSDateTime!
 }
 
-type WPTracking {
+type WPTracking @aws_iam @aws_api_key {
   id: ID!
   tempID: String!
   supportletterReqDate: String
@@ -380,7 +393,7 @@ type WPTracking {
   updatedAt: AWSDateTime!
 }
 
-type EmployeeNonLocalAcco {
+type EmployeeNonLocalAcco @aws_iam @aws_api_key {
   id: ID!
   empID: String!
   accommodation: [String]
@@ -389,7 +402,7 @@ type EmployeeNonLocalAcco {
   updatedAt: AWSDateTime!
 }
 
-type LabourMedicalInfo {
+type LabourMedicalInfo @aws_iam @aws_api_key {
   id: ID!
   empID: String!
   overMD: String
@@ -406,7 +419,7 @@ type LabourMedicalInfo {
   updatedAt: AWSDateTime!
 }
 
-type ServiceRecord {
+type ServiceRecord @aws_iam @aws_api_key {
   id: ID!
   empID: String!
   depEmpDate: [String]
@@ -429,7 +442,7 @@ type ServiceRecord {
   updatedAt: AWSDateTime!
 }
 
-type EmpLeaveDetails {
+type EmpLeaveDetails @aws_iam @aws_api_key {
   id: ID!
   empID: String!
   annualLeave: [String]
@@ -445,11 +458,19 @@ type EmpLeaveDetails {
   sickLeave: String
   sickLeaveDate: String
   hospLeave: String
+  remainingAnualLeave: String
+  remainingSickLeave: String
+  remainingMateLeave: String
+  remainingMrageLeave: String
+  remainingPaternityLeave: String
+  remainingHosLeave: String
+  remainingCompasLeave: String
+  unPaidAuthorize: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
 
-type TerminationInfo {
+type TerminationInfo @aws_iam @aws_api_key {
   id: ID!
   empID: String!
   resignDate: String
@@ -473,7 +494,7 @@ type TerminationInfo {
   updatedAt: AWSDateTime!
 }
 
-type EmpWorkInfo {
+type EmpWorkInfo @aws_iam @aws_api_key {
   id: ID!
   empID: String!
   contractStart: [String]
@@ -507,7 +528,7 @@ type EmpWorkInfo {
   updatedAt: AWSDateTime!
 }
 
-type EmpPersonalInfo {
+type EmpPersonalInfo @aws_iam @aws_api_key {
   id: ID!
   empID: String!
   age: Int
@@ -542,7 +563,7 @@ type EmpPersonalInfo {
   updatedAt: AWSDateTime!
 }
 
-type IDDetails {
+type IDDetails @aws_iam @aws_api_key {
   id: ID!
   empID: String!
   applicationUpload: [AWSJSON]
@@ -577,7 +598,7 @@ type IDDetails {
   updatedAt: AWSDateTime!
 }
 
-type CandIToEMP {
+type CandIToEMP @aws_iam @aws_api_key {
   id: ID!
   empID: String!
   crime: String
@@ -601,7 +622,7 @@ type CandIToEMP {
   updatedAt: AWSDateTime!
 }
 
-type LocalMobilization {
+type LocalMobilization @aws_iam @aws_api_key {
   id: ID!
   tempID: String
   mobSignDate: String
@@ -619,7 +640,7 @@ type LocalMobilization {
   updatedAt: AWSDateTime!
 }
 
-type InterviewSchedule {
+type InterviewSchedule @aws_iam @aws_api_key {
   id: ID!
   interDate: String
   interTime: String
@@ -637,7 +658,7 @@ type InterviewSchedule {
   updatedAt: AWSDateTime!
 }
 
-type EducationDetails {
+type EducationDetails @aws_iam @aws_api_key {
   id: ID!
   tempID: String!
   crime: String
@@ -664,7 +685,7 @@ type EducationDetails {
   updatedAt: AWSDateTime!
 }
 
-type PersonalDetails {
+type PersonalDetails @aws_iam @aws_api_key {
   id: ID!
   tempID: String!
   age: Int
@@ -707,7 +728,7 @@ type PersonalDetails {
   updatedAt: AWSDateTime!
 }
 
-type User {
+type User @aws_iam @aws_api_key {
   id: ID!
   empID: String
   selectType: String
@@ -718,7 +739,7 @@ type User {
   updatedAt: AWSDateTime!
 }
 
-type TicketRequest {
+type TicketRequest @aws_iam @aws_api_key {
   id: ID!
   empID: String!
   empStatus: String
@@ -737,7 +758,7 @@ type TicketRequest {
   updatedAt: AWSDateTime!
 }
 
-type LeaveStatus {
+type LeaveStatus @aws_iam @aws_api_key {
   id: ID!
   empID: ID!
   leaveType: String
@@ -914,7 +935,429 @@ enum ModelSortDirection {
   DESC
 }
 
-type ModelInsuranceTypeConnection {
+type ModelHiringJobConnection @aws_api_key @aws_iam {
+  items: [HiringJob]!
+  nextToken: String
+}
+
+input ModelHiringJobFilterInput {
+  id: ModelIDInput
+  jobTitle: ModelStringInput
+  exper: ModelStringInput
+  location: ModelStringInput
+  quantityPerson: ModelStringInput
+  startDate: ModelStringInput
+  expiryDate: ModelStringInput
+  jobContent: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelHiringJobFilterInput]
+  or: [ModelHiringJobFilterInput]
+  not: ModelHiringJobFilterInput
+}
+
+type Query {
+  getHiringJob(id: ID!): HiringJob @aws_api_key @aws_iam
+  listHiringJobs(filter: ModelHiringJobFilterInput, limit: Int, nextToken: String): ModelHiringJobConnection @aws_api_key @aws_iam
+  getInsuranceType(id: ID!): InsuranceType @aws_api_key @aws_iam
+  listInsuranceTypes(filter: ModelInsuranceTypeFilterInput, limit: Int, nextToken: String): ModelInsuranceTypeConnection @aws_api_key @aws_iam
+  getGroupHandS(id: ID!): GroupHandS @aws_api_key @aws_iam
+  listGroupHandS(filter: ModelGroupHandSFilterInput, limit: Int, nextToken: String): ModelGroupHandSConnection @aws_api_key @aws_iam
+  getWorkMen(id: ID!): WorkMen @aws_api_key @aws_iam
+  listWorkMen(filter: ModelWorkMenFilterInput, limit: Int, nextToken: String): ModelWorkMenConnection @aws_api_key @aws_iam
+  getTravelIns(id: ID!): TravelIns @aws_api_key @aws_iam
+  listTravelIns(filter: ModelTravelInsFilterInput, limit: Int, nextToken: String): ModelTravelInsConnection @aws_api_key @aws_iam
+  getPersonalAccident(id: ID!): PersonalAccident @aws_api_key @aws_iam
+  listPersonalAccidents(filter: ModelPersonalAccidentFilterInput, limit: Int, nextToken: String): ModelPersonalAccidentConnection @aws_api_key @aws_iam
+  getInsClaim(id: ID!): InsClaim @aws_api_key @aws_iam
+  listInsClaims(filter: ModelInsClaimFilterInput, limit: Int, nextToken: String): ModelInsClaimConnection @aws_api_key @aws_iam
+  getProbForm(id: ID!): ProbForm @aws_api_key @aws_iam
+  listProbForms(filter: ModelProbFormFilterInput, limit: Int, nextToken: String): ModelProbFormConnection @aws_api_key @aws_iam
+  getEmailNotifi(id: ID!): EmailNotifi @aws_api_key @aws_iam
+  listEmailNotifis(filter: ModelEmailNotifiFilterInput, limit: Int, nextToken: String): ModelEmailNotifiConnection @aws_api_key @aws_iam
+  getOffshoreSheet(id: ID!): OffshoreSheet @aws_api_key @aws_iam
+  listOffshoreSheets(filter: ModelOffshoreSheetFilterInput, limit: Int, nextToken: String): ModelOffshoreSheetConnection @aws_api_key @aws_iam
+  getORMCSheet(id: ID!): ORMCSheet @aws_api_key @aws_iam
+  listORMCSheets(filter: ModelORMCSheetFilterInput, limit: Int, nextToken: String): ModelORMCSheetConnection @aws_api_key @aws_iam
+  getSBWSheet(id: ID!): SBWSheet @aws_api_key @aws_iam
+  listSBWSheets(filter: ModelSBWSheetFilterInput, limit: Int, nextToken: String): ModelSBWSheetConnection @aws_api_key @aws_iam
+  getBlng(id: ID!): Blng @aws_api_key @aws_iam
+  listBlngs(filter: ModelBlngFilterInput, limit: Int, nextToken: String): ModelBlngConnection @aws_api_key @aws_iam
+  getHeadOffice(id: ID!): HeadOffice @aws_api_key @aws_iam
+  listHeadOffices(filter: ModelHeadOfficeFilterInput, limit: Int, nextToken: String): ModelHeadOfficeConnection @aws_api_key @aws_iam
+  getEmpRequisition(id: ID!): EmpRequisition @aws_api_key @aws_iam
+  listEmpRequisitions(filter: ModelEmpRequisitionFilterInput, limit: Int, nextToken: String): ModelEmpRequisitionConnection @aws_api_key @aws_iam
+  getWeldingInfo(id: ID!): WeldingInfo @aws_api_key @aws_iam
+  listWeldingInfos(filter: ModelWeldingInfoFilterInput, limit: Int, nextToken: String): ModelWeldingInfoConnection @aws_api_key @aws_iam
+  getTrainingReq(id: ID!): TrainingReq @aws_api_key @aws_iam
+  listTrainingReqs(filter: ModelTrainingReqFilterInput, limit: Int, nextToken: String): ModelTrainingReqConnection @aws_api_key @aws_iam
+  getTrainingCertificates(id: ID!): TrainingCertificates @aws_api_key @aws_iam
+  listTrainingCertificates(filter: ModelTrainingCertificatesFilterInput, limit: Int, nextToken: String): ModelTrainingCertificatesConnection @aws_api_key @aws_iam
+  getAddCourse(id: ID!): AddCourse @aws_api_key @aws_iam
+  listAddCourses(filter: ModelAddCourseFilterInput, limit: Int, nextToken: String): ModelAddCourseConnection @aws_api_key @aws_iam
+  getEmpDepInsurance(id: ID!): EmpDepInsurance @aws_api_key @aws_iam
+  listEmpDepInsurances(filter: ModelEmpDepInsuranceFilterInput, limit: Int, nextToken: String): ModelEmpDepInsuranceConnection @aws_api_key @aws_iam
+  getEmpInsurance(id: ID!): EmpInsurance @aws_api_key @aws_iam
+  listEmpInsurances(filter: ModelEmpInsuranceFilterInput, limit: Int, nextToken: String): ModelEmpInsuranceConnection @aws_api_key @aws_iam
+  getSawpDetails(id: ID!): SawpDetails @aws_api_key @aws_iam
+  listSawpDetails(filter: ModelSawpDetailsFilterInput, limit: Int, nextToken: String): ModelSawpDetailsConnection @aws_api_key @aws_iam
+  getDNDetails(id: ID!): DNDetails @aws_api_key @aws_iam
+  listDNDetails(filter: ModelDNDetailsFilterInput, limit: Int, nextToken: String): ModelDNDetailsConnection @aws_api_key @aws_iam
+  getBJLDetails(id: ID!): BJLDetails @aws_api_key @aws_iam
+  listBJLDetails(filter: ModelBJLDetailsFilterInput, limit: Int, nextToken: String): ModelBJLDetailsConnection @aws_api_key @aws_iam
+  getPassportValid(id: ID!): PassportValid @aws_api_key @aws_iam
+  listPassportValids(filter: ModelPassportValidFilterInput, limit: Int, nextToken: String): ModelPassportValidConnection @aws_api_key @aws_iam
+  getWPTracking(id: ID!): WPTracking @aws_api_key @aws_iam
+  listWPTrackings(filter: ModelWPTrackingFilterInput, limit: Int, nextToken: String): ModelWPTrackingConnection @aws_api_key @aws_iam
+  getEmployeeNonLocalAcco(id: ID!): EmployeeNonLocalAcco @aws_api_key @aws_iam
+  listEmployeeNonLocalAccos(filter: ModelEmployeeNonLocalAccoFilterInput, limit: Int, nextToken: String): ModelEmployeeNonLocalAccoConnection @aws_api_key @aws_iam
+  getLabourMedicalInfo(id: ID!): LabourMedicalInfo @aws_api_key @aws_iam
+  listLabourMedicalInfos(filter: ModelLabourMedicalInfoFilterInput, limit: Int, nextToken: String): ModelLabourMedicalInfoConnection @aws_api_key @aws_iam
+  getServiceRecord(id: ID!): ServiceRecord @aws_api_key @aws_iam
+  listServiceRecords(filter: ModelServiceRecordFilterInput, limit: Int, nextToken: String): ModelServiceRecordConnection @aws_api_key @aws_iam
+  getEmpLeaveDetails(id: ID!): EmpLeaveDetails @aws_api_key @aws_iam
+  listEmpLeaveDetails(filter: ModelEmpLeaveDetailsFilterInput, limit: Int, nextToken: String): ModelEmpLeaveDetailsConnection @aws_api_key @aws_iam
+  getTerminationInfo(id: ID!): TerminationInfo @aws_api_key @aws_iam
+  listTerminationInfos(filter: ModelTerminationInfoFilterInput, limit: Int, nextToken: String): ModelTerminationInfoConnection @aws_api_key @aws_iam
+  getEmpWorkInfo(id: ID!): EmpWorkInfo @aws_api_key @aws_iam
+  listEmpWorkInfos(filter: ModelEmpWorkInfoFilterInput, limit: Int, nextToken: String): ModelEmpWorkInfoConnection @aws_api_key @aws_iam
+  getEmpPersonalInfo(id: ID!): EmpPersonalInfo @aws_api_key @aws_iam
+  listEmpPersonalInfos(filter: ModelEmpPersonalInfoFilterInput, limit: Int, nextToken: String): ModelEmpPersonalInfoConnection @aws_api_key @aws_iam
+  getIDDetails(id: ID!): IDDetails @aws_api_key @aws_iam
+  listIDDetails(filter: ModelIDDetailsFilterInput, limit: Int, nextToken: String): ModelIDDetailsConnection @aws_api_key @aws_iam
+  getCandIToEMP(id: ID!): CandIToEMP @aws_api_key @aws_iam
+  listCandIToEMPS(filter: ModelCandIToEMPFilterInput, limit: Int, nextToken: String): ModelCandIToEMPConnection @aws_api_key @aws_iam
+  getLocalMobilization(id: ID!): LocalMobilization @aws_api_key @aws_iam
+  listLocalMobilizations(filter: ModelLocalMobilizationFilterInput, limit: Int, nextToken: String): ModelLocalMobilizationConnection @aws_api_key @aws_iam
+  getInterviewSchedule(id: ID!): InterviewSchedule @aws_api_key @aws_iam
+  listInterviewSchedules(filter: ModelInterviewScheduleFilterInput, limit: Int, nextToken: String): ModelInterviewScheduleConnection @aws_api_key @aws_iam
+  getEducationDetails(id: ID!): EducationDetails @aws_api_key @aws_iam
+  listEducationDetails(filter: ModelEducationDetailsFilterInput, limit: Int, nextToken: String): ModelEducationDetailsConnection @aws_api_key @aws_iam
+  getPersonalDetails(id: ID!): PersonalDetails @aws_api_key @aws_iam
+  listPersonalDetails(filter: ModelPersonalDetailsFilterInput, limit: Int, nextToken: String): ModelPersonalDetailsConnection @aws_api_key @aws_iam
+  getUser(id: ID!): User @aws_api_key @aws_iam
+  listUsers(filter: ModelUserFilterInput, limit: Int, nextToken: String): ModelUserConnection @aws_api_key @aws_iam
+  getTicketRequest(id: ID!): TicketRequest @aws_api_key @aws_iam
+  listTicketRequests(filter: ModelTicketRequestFilterInput, limit: Int, nextToken: String): ModelTicketRequestConnection @aws_api_key @aws_iam
+  getLeaveStatus(id: ID!): LeaveStatus @aws_api_key @aws_iam
+  listLeaveStatuses(filter: ModelLeaveStatusFilterInput, limit: Int, nextToken: String): ModelLeaveStatusConnection @aws_api_key @aws_iam
+}
+
+input ModelHiringJobConditionInput {
+  jobTitle: ModelStringInput
+  exper: ModelStringInput
+  location: ModelStringInput
+  quantityPerson: ModelStringInput
+  startDate: ModelStringInput
+  expiryDate: ModelStringInput
+  jobContent: ModelStringInput
+  and: [ModelHiringJobConditionInput]
+  or: [ModelHiringJobConditionInput]
+  not: ModelHiringJobConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateHiringJobInput {
+  id: ID
+  jobTitle: String
+  exper: String
+  location: String
+  quantityPerson: String
+  startDate: String
+  expiryDate: String
+  jobContent: String
+}
+
+input UpdateHiringJobInput {
+  id: ID!
+  jobTitle: String
+  exper: String
+  location: String
+  quantityPerson: String
+  startDate: String
+  expiryDate: String
+  jobContent: String
+}
+
+input DeleteHiringJobInput {
+  id: ID!
+}
+
+type Mutation {
+  createHiringJob(input: CreateHiringJobInput!, condition: ModelHiringJobConditionInput): HiringJob @aws_api_key @aws_iam
+  updateHiringJob(input: UpdateHiringJobInput!, condition: ModelHiringJobConditionInput): HiringJob @aws_api_key @aws_iam
+  deleteHiringJob(input: DeleteHiringJobInput!, condition: ModelHiringJobConditionInput): HiringJob @aws_api_key @aws_iam
+  createInsuranceType(input: CreateInsuranceTypeInput!, condition: ModelInsuranceTypeConditionInput): InsuranceType @aws_api_key @aws_iam
+  updateInsuranceType(input: UpdateInsuranceTypeInput!, condition: ModelInsuranceTypeConditionInput): InsuranceType @aws_api_key @aws_iam
+  deleteInsuranceType(input: DeleteInsuranceTypeInput!, condition: ModelInsuranceTypeConditionInput): InsuranceType @aws_api_key @aws_iam
+  createGroupHandS(input: CreateGroupHandSInput!, condition: ModelGroupHandSConditionInput): GroupHandS @aws_api_key @aws_iam
+  updateGroupHandS(input: UpdateGroupHandSInput!, condition: ModelGroupHandSConditionInput): GroupHandS @aws_api_key @aws_iam
+  deleteGroupHandS(input: DeleteGroupHandSInput!, condition: ModelGroupHandSConditionInput): GroupHandS @aws_api_key @aws_iam
+  createWorkMen(input: CreateWorkMenInput!, condition: ModelWorkMenConditionInput): WorkMen @aws_api_key @aws_iam
+  updateWorkMen(input: UpdateWorkMenInput!, condition: ModelWorkMenConditionInput): WorkMen @aws_api_key @aws_iam
+  deleteWorkMen(input: DeleteWorkMenInput!, condition: ModelWorkMenConditionInput): WorkMen @aws_api_key @aws_iam
+  createTravelIns(input: CreateTravelInsInput!, condition: ModelTravelInsConditionInput): TravelIns @aws_api_key @aws_iam
+  updateTravelIns(input: UpdateTravelInsInput!, condition: ModelTravelInsConditionInput): TravelIns @aws_api_key @aws_iam
+  deleteTravelIns(input: DeleteTravelInsInput!, condition: ModelTravelInsConditionInput): TravelIns @aws_api_key @aws_iam
+  createPersonalAccident(input: CreatePersonalAccidentInput!, condition: ModelPersonalAccidentConditionInput): PersonalAccident @aws_api_key @aws_iam
+  updatePersonalAccident(input: UpdatePersonalAccidentInput!, condition: ModelPersonalAccidentConditionInput): PersonalAccident @aws_api_key @aws_iam
+  deletePersonalAccident(input: DeletePersonalAccidentInput!, condition: ModelPersonalAccidentConditionInput): PersonalAccident @aws_api_key @aws_iam
+  createInsClaim(input: CreateInsClaimInput!, condition: ModelInsClaimConditionInput): InsClaim @aws_api_key @aws_iam
+  updateInsClaim(input: UpdateInsClaimInput!, condition: ModelInsClaimConditionInput): InsClaim @aws_api_key @aws_iam
+  deleteInsClaim(input: DeleteInsClaimInput!, condition: ModelInsClaimConditionInput): InsClaim @aws_api_key @aws_iam
+  createProbForm(input: CreateProbFormInput!, condition: ModelProbFormConditionInput): ProbForm @aws_api_key @aws_iam
+  updateProbForm(input: UpdateProbFormInput!, condition: ModelProbFormConditionInput): ProbForm @aws_api_key @aws_iam
+  deleteProbForm(input: DeleteProbFormInput!, condition: ModelProbFormConditionInput): ProbForm @aws_api_key @aws_iam
+  createEmailNotifi(input: CreateEmailNotifiInput!, condition: ModelEmailNotifiConditionInput): EmailNotifi @aws_api_key @aws_iam
+  updateEmailNotifi(input: UpdateEmailNotifiInput!, condition: ModelEmailNotifiConditionInput): EmailNotifi @aws_api_key @aws_iam
+  deleteEmailNotifi(input: DeleteEmailNotifiInput!, condition: ModelEmailNotifiConditionInput): EmailNotifi @aws_api_key @aws_iam
+  createOffshoreSheet(input: CreateOffshoreSheetInput!, condition: ModelOffshoreSheetConditionInput): OffshoreSheet @aws_api_key @aws_iam
+  updateOffshoreSheet(input: UpdateOffshoreSheetInput!, condition: ModelOffshoreSheetConditionInput): OffshoreSheet @aws_api_key @aws_iam
+  deleteOffshoreSheet(input: DeleteOffshoreSheetInput!, condition: ModelOffshoreSheetConditionInput): OffshoreSheet @aws_api_key @aws_iam
+  createORMCSheet(input: CreateORMCSheetInput!, condition: ModelORMCSheetConditionInput): ORMCSheet @aws_api_key @aws_iam
+  updateORMCSheet(input: UpdateORMCSheetInput!, condition: ModelORMCSheetConditionInput): ORMCSheet @aws_api_key @aws_iam
+  deleteORMCSheet(input: DeleteORMCSheetInput!, condition: ModelORMCSheetConditionInput): ORMCSheet @aws_api_key @aws_iam
+  createSBWSheet(input: CreateSBWSheetInput!, condition: ModelSBWSheetConditionInput): SBWSheet @aws_api_key @aws_iam
+  updateSBWSheet(input: UpdateSBWSheetInput!, condition: ModelSBWSheetConditionInput): SBWSheet @aws_api_key @aws_iam
+  deleteSBWSheet(input: DeleteSBWSheetInput!, condition: ModelSBWSheetConditionInput): SBWSheet @aws_api_key @aws_iam
+  createBlng(input: CreateBlngInput!, condition: ModelBlngConditionInput): Blng @aws_api_key @aws_iam
+  updateBlng(input: UpdateBlngInput!, condition: ModelBlngConditionInput): Blng @aws_api_key @aws_iam
+  deleteBlng(input: DeleteBlngInput!, condition: ModelBlngConditionInput): Blng @aws_api_key @aws_iam
+  createHeadOffice(input: CreateHeadOfficeInput!, condition: ModelHeadOfficeConditionInput): HeadOffice @aws_api_key @aws_iam
+  updateHeadOffice(input: UpdateHeadOfficeInput!, condition: ModelHeadOfficeConditionInput): HeadOffice @aws_api_key @aws_iam
+  deleteHeadOffice(input: DeleteHeadOfficeInput!, condition: ModelHeadOfficeConditionInput): HeadOffice @aws_api_key @aws_iam
+  createEmpRequisition(input: CreateEmpRequisitionInput!, condition: ModelEmpRequisitionConditionInput): EmpRequisition @aws_api_key @aws_iam
+  updateEmpRequisition(input: UpdateEmpRequisitionInput!, condition: ModelEmpRequisitionConditionInput): EmpRequisition @aws_api_key @aws_iam
+  deleteEmpRequisition(input: DeleteEmpRequisitionInput!, condition: ModelEmpRequisitionConditionInput): EmpRequisition @aws_api_key @aws_iam
+  createWeldingInfo(input: CreateWeldingInfoInput!, condition: ModelWeldingInfoConditionInput): WeldingInfo @aws_api_key @aws_iam
+  updateWeldingInfo(input: UpdateWeldingInfoInput!, condition: ModelWeldingInfoConditionInput): WeldingInfo @aws_api_key @aws_iam
+  deleteWeldingInfo(input: DeleteWeldingInfoInput!, condition: ModelWeldingInfoConditionInput): WeldingInfo @aws_api_key @aws_iam
+  createTrainingReq(input: CreateTrainingReqInput!, condition: ModelTrainingReqConditionInput): TrainingReq @aws_api_key @aws_iam
+  updateTrainingReq(input: UpdateTrainingReqInput!, condition: ModelTrainingReqConditionInput): TrainingReq @aws_api_key @aws_iam
+  deleteTrainingReq(input: DeleteTrainingReqInput!, condition: ModelTrainingReqConditionInput): TrainingReq @aws_api_key @aws_iam
+  createTrainingCertificates(input: CreateTrainingCertificatesInput!, condition: ModelTrainingCertificatesConditionInput): TrainingCertificates @aws_api_key @aws_iam
+  updateTrainingCertificates(input: UpdateTrainingCertificatesInput!, condition: ModelTrainingCertificatesConditionInput): TrainingCertificates @aws_api_key @aws_iam
+  deleteTrainingCertificates(input: DeleteTrainingCertificatesInput!, condition: ModelTrainingCertificatesConditionInput): TrainingCertificates @aws_api_key @aws_iam
+  createAddCourse(input: CreateAddCourseInput!, condition: ModelAddCourseConditionInput): AddCourse @aws_api_key @aws_iam
+  updateAddCourse(input: UpdateAddCourseInput!, condition: ModelAddCourseConditionInput): AddCourse @aws_api_key @aws_iam
+  deleteAddCourse(input: DeleteAddCourseInput!, condition: ModelAddCourseConditionInput): AddCourse @aws_api_key @aws_iam
+  createEmpDepInsurance(input: CreateEmpDepInsuranceInput!, condition: ModelEmpDepInsuranceConditionInput): EmpDepInsurance @aws_api_key @aws_iam
+  updateEmpDepInsurance(input: UpdateEmpDepInsuranceInput!, condition: ModelEmpDepInsuranceConditionInput): EmpDepInsurance @aws_api_key @aws_iam
+  deleteEmpDepInsurance(input: DeleteEmpDepInsuranceInput!, condition: ModelEmpDepInsuranceConditionInput): EmpDepInsurance @aws_api_key @aws_iam
+  createEmpInsurance(input: CreateEmpInsuranceInput!, condition: ModelEmpInsuranceConditionInput): EmpInsurance @aws_api_key @aws_iam
+  updateEmpInsurance(input: UpdateEmpInsuranceInput!, condition: ModelEmpInsuranceConditionInput): EmpInsurance @aws_api_key @aws_iam
+  deleteEmpInsurance(input: DeleteEmpInsuranceInput!, condition: ModelEmpInsuranceConditionInput): EmpInsurance @aws_api_key @aws_iam
+  createSawpDetails(input: CreateSawpDetailsInput!, condition: ModelSawpDetailsConditionInput): SawpDetails @aws_api_key @aws_iam
+  updateSawpDetails(input: UpdateSawpDetailsInput!, condition: ModelSawpDetailsConditionInput): SawpDetails @aws_api_key @aws_iam
+  deleteSawpDetails(input: DeleteSawpDetailsInput!, condition: ModelSawpDetailsConditionInput): SawpDetails @aws_api_key @aws_iam
+  createDNDetails(input: CreateDNDetailsInput!, condition: ModelDNDetailsConditionInput): DNDetails @aws_api_key @aws_iam
+  updateDNDetails(input: UpdateDNDetailsInput!, condition: ModelDNDetailsConditionInput): DNDetails @aws_api_key @aws_iam
+  deleteDNDetails(input: DeleteDNDetailsInput!, condition: ModelDNDetailsConditionInput): DNDetails @aws_api_key @aws_iam
+  createBJLDetails(input: CreateBJLDetailsInput!, condition: ModelBJLDetailsConditionInput): BJLDetails @aws_api_key @aws_iam
+  updateBJLDetails(input: UpdateBJLDetailsInput!, condition: ModelBJLDetailsConditionInput): BJLDetails @aws_api_key @aws_iam
+  deleteBJLDetails(input: DeleteBJLDetailsInput!, condition: ModelBJLDetailsConditionInput): BJLDetails @aws_api_key @aws_iam
+  createPassportValid(input: CreatePassportValidInput!, condition: ModelPassportValidConditionInput): PassportValid @aws_api_key @aws_iam
+  updatePassportValid(input: UpdatePassportValidInput!, condition: ModelPassportValidConditionInput): PassportValid @aws_api_key @aws_iam
+  deletePassportValid(input: DeletePassportValidInput!, condition: ModelPassportValidConditionInput): PassportValid @aws_api_key @aws_iam
+  createWPTracking(input: CreateWPTrackingInput!, condition: ModelWPTrackingConditionInput): WPTracking @aws_api_key @aws_iam
+  updateWPTracking(input: UpdateWPTrackingInput!, condition: ModelWPTrackingConditionInput): WPTracking @aws_api_key @aws_iam
+  deleteWPTracking(input: DeleteWPTrackingInput!, condition: ModelWPTrackingConditionInput): WPTracking @aws_api_key @aws_iam
+  createEmployeeNonLocalAcco(input: CreateEmployeeNonLocalAccoInput!, condition: ModelEmployeeNonLocalAccoConditionInput): EmployeeNonLocalAcco @aws_api_key @aws_iam
+  updateEmployeeNonLocalAcco(input: UpdateEmployeeNonLocalAccoInput!, condition: ModelEmployeeNonLocalAccoConditionInput): EmployeeNonLocalAcco @aws_api_key @aws_iam
+  deleteEmployeeNonLocalAcco(input: DeleteEmployeeNonLocalAccoInput!, condition: ModelEmployeeNonLocalAccoConditionInput): EmployeeNonLocalAcco @aws_api_key @aws_iam
+  createLabourMedicalInfo(input: CreateLabourMedicalInfoInput!, condition: ModelLabourMedicalInfoConditionInput): LabourMedicalInfo @aws_api_key @aws_iam
+  updateLabourMedicalInfo(input: UpdateLabourMedicalInfoInput!, condition: ModelLabourMedicalInfoConditionInput): LabourMedicalInfo @aws_api_key @aws_iam
+  deleteLabourMedicalInfo(input: DeleteLabourMedicalInfoInput!, condition: ModelLabourMedicalInfoConditionInput): LabourMedicalInfo @aws_api_key @aws_iam
+  createServiceRecord(input: CreateServiceRecordInput!, condition: ModelServiceRecordConditionInput): ServiceRecord @aws_api_key @aws_iam
+  updateServiceRecord(input: UpdateServiceRecordInput!, condition: ModelServiceRecordConditionInput): ServiceRecord @aws_api_key @aws_iam
+  deleteServiceRecord(input: DeleteServiceRecordInput!, condition: ModelServiceRecordConditionInput): ServiceRecord @aws_api_key @aws_iam
+  createEmpLeaveDetails(input: CreateEmpLeaveDetailsInput!, condition: ModelEmpLeaveDetailsConditionInput): EmpLeaveDetails @aws_api_key @aws_iam
+  updateEmpLeaveDetails(input: UpdateEmpLeaveDetailsInput!, condition: ModelEmpLeaveDetailsConditionInput): EmpLeaveDetails @aws_api_key @aws_iam
+  deleteEmpLeaveDetails(input: DeleteEmpLeaveDetailsInput!, condition: ModelEmpLeaveDetailsConditionInput): EmpLeaveDetails @aws_api_key @aws_iam
+  createTerminationInfo(input: CreateTerminationInfoInput!, condition: ModelTerminationInfoConditionInput): TerminationInfo @aws_api_key @aws_iam
+  updateTerminationInfo(input: UpdateTerminationInfoInput!, condition: ModelTerminationInfoConditionInput): TerminationInfo @aws_api_key @aws_iam
+  deleteTerminationInfo(input: DeleteTerminationInfoInput!, condition: ModelTerminationInfoConditionInput): TerminationInfo @aws_api_key @aws_iam
+  createEmpWorkInfo(input: CreateEmpWorkInfoInput!, condition: ModelEmpWorkInfoConditionInput): EmpWorkInfo @aws_api_key @aws_iam
+  updateEmpWorkInfo(input: UpdateEmpWorkInfoInput!, condition: ModelEmpWorkInfoConditionInput): EmpWorkInfo @aws_api_key @aws_iam
+  deleteEmpWorkInfo(input: DeleteEmpWorkInfoInput!, condition: ModelEmpWorkInfoConditionInput): EmpWorkInfo @aws_api_key @aws_iam
+  createEmpPersonalInfo(input: CreateEmpPersonalInfoInput!, condition: ModelEmpPersonalInfoConditionInput): EmpPersonalInfo @aws_api_key @aws_iam
+  updateEmpPersonalInfo(input: UpdateEmpPersonalInfoInput!, condition: ModelEmpPersonalInfoConditionInput): EmpPersonalInfo @aws_api_key @aws_iam
+  deleteEmpPersonalInfo(input: DeleteEmpPersonalInfoInput!, condition: ModelEmpPersonalInfoConditionInput): EmpPersonalInfo @aws_api_key @aws_iam
+  createIDDetails(input: CreateIDDetailsInput!, condition: ModelIDDetailsConditionInput): IDDetails @aws_api_key @aws_iam
+  updateIDDetails(input: UpdateIDDetailsInput!, condition: ModelIDDetailsConditionInput): IDDetails @aws_api_key @aws_iam
+  deleteIDDetails(input: DeleteIDDetailsInput!, condition: ModelIDDetailsConditionInput): IDDetails @aws_api_key @aws_iam
+  createCandIToEMP(input: CreateCandIToEMPInput!, condition: ModelCandIToEMPConditionInput): CandIToEMP @aws_api_key @aws_iam
+  updateCandIToEMP(input: UpdateCandIToEMPInput!, condition: ModelCandIToEMPConditionInput): CandIToEMP @aws_api_key @aws_iam
+  deleteCandIToEMP(input: DeleteCandIToEMPInput!, condition: ModelCandIToEMPConditionInput): CandIToEMP @aws_api_key @aws_iam
+  createLocalMobilization(input: CreateLocalMobilizationInput!, condition: ModelLocalMobilizationConditionInput): LocalMobilization @aws_api_key @aws_iam
+  updateLocalMobilization(input: UpdateLocalMobilizationInput!, condition: ModelLocalMobilizationConditionInput): LocalMobilization @aws_api_key @aws_iam
+  deleteLocalMobilization(input: DeleteLocalMobilizationInput!, condition: ModelLocalMobilizationConditionInput): LocalMobilization @aws_api_key @aws_iam
+  createInterviewSchedule(input: CreateInterviewScheduleInput!, condition: ModelInterviewScheduleConditionInput): InterviewSchedule @aws_api_key @aws_iam
+  updateInterviewSchedule(input: UpdateInterviewScheduleInput!, condition: ModelInterviewScheduleConditionInput): InterviewSchedule @aws_api_key @aws_iam
+  deleteInterviewSchedule(input: DeleteInterviewScheduleInput!, condition: ModelInterviewScheduleConditionInput): InterviewSchedule @aws_api_key @aws_iam
+  createEducationDetails(input: CreateEducationDetailsInput!, condition: ModelEducationDetailsConditionInput): EducationDetails @aws_api_key @aws_iam
+  updateEducationDetails(input: UpdateEducationDetailsInput!, condition: ModelEducationDetailsConditionInput): EducationDetails @aws_api_key @aws_iam
+  deleteEducationDetails(input: DeleteEducationDetailsInput!, condition: ModelEducationDetailsConditionInput): EducationDetails @aws_api_key @aws_iam
+  createPersonalDetails(input: CreatePersonalDetailsInput!, condition: ModelPersonalDetailsConditionInput): PersonalDetails @aws_api_key @aws_iam
+  updatePersonalDetails(input: UpdatePersonalDetailsInput!, condition: ModelPersonalDetailsConditionInput): PersonalDetails @aws_api_key @aws_iam
+  deletePersonalDetails(input: DeletePersonalDetailsInput!, condition: ModelPersonalDetailsConditionInput): PersonalDetails @aws_api_key @aws_iam
+  createUser(input: CreateUserInput!, condition: ModelUserConditionInput): User @aws_api_key @aws_iam
+  updateUser(input: UpdateUserInput!, condition: ModelUserConditionInput): User @aws_api_key @aws_iam
+  deleteUser(input: DeleteUserInput!, condition: ModelUserConditionInput): User @aws_api_key @aws_iam
+  createTicketRequest(input: CreateTicketRequestInput!, condition: ModelTicketRequestConditionInput): TicketRequest @aws_api_key @aws_iam
+  updateTicketRequest(input: UpdateTicketRequestInput!, condition: ModelTicketRequestConditionInput): TicketRequest @aws_api_key @aws_iam
+  deleteTicketRequest(input: DeleteTicketRequestInput!, condition: ModelTicketRequestConditionInput): TicketRequest @aws_api_key @aws_iam
+  createLeaveStatus(input: CreateLeaveStatusInput!, condition: ModelLeaveStatusConditionInput): LeaveStatus @aws_api_key @aws_iam
+  updateLeaveStatus(input: UpdateLeaveStatusInput!, condition: ModelLeaveStatusConditionInput): LeaveStatus @aws_api_key @aws_iam
+  deleteLeaveStatus(input: DeleteLeaveStatusInput!, condition: ModelLeaveStatusConditionInput): LeaveStatus @aws_api_key @aws_iam
+}
+
+input ModelSubscriptionHiringJobFilterInput {
+  id: ModelSubscriptionIDInput
+  jobTitle: ModelSubscriptionStringInput
+  exper: ModelSubscriptionStringInput
+  location: ModelSubscriptionStringInput
+  quantityPerson: ModelSubscriptionStringInput
+  startDate: ModelSubscriptionStringInput
+  expiryDate: ModelSubscriptionStringInput
+  jobContent: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionHiringJobFilterInput]
+  or: [ModelSubscriptionHiringJobFilterInput]
+}
+
+type Subscription {
+  onCreateHiringJob(filter: ModelSubscriptionHiringJobFilterInput): HiringJob @aws_subscribe(mutations: ["createHiringJob"]) @aws_api_key @aws_iam
+  onUpdateHiringJob(filter: ModelSubscriptionHiringJobFilterInput): HiringJob @aws_subscribe(mutations: ["updateHiringJob"]) @aws_api_key @aws_iam
+  onDeleteHiringJob(filter: ModelSubscriptionHiringJobFilterInput): HiringJob @aws_subscribe(mutations: ["deleteHiringJob"]) @aws_api_key @aws_iam
+  onCreateInsuranceType(filter: ModelSubscriptionInsuranceTypeFilterInput): InsuranceType @aws_subscribe(mutations: ["createInsuranceType"]) @aws_api_key @aws_iam
+  onUpdateInsuranceType(filter: ModelSubscriptionInsuranceTypeFilterInput): InsuranceType @aws_subscribe(mutations: ["updateInsuranceType"]) @aws_api_key @aws_iam
+  onDeleteInsuranceType(filter: ModelSubscriptionInsuranceTypeFilterInput): InsuranceType @aws_subscribe(mutations: ["deleteInsuranceType"]) @aws_api_key @aws_iam
+  onCreateGroupHandS(filter: ModelSubscriptionGroupHandSFilterInput): GroupHandS @aws_subscribe(mutations: ["createGroupHandS"]) @aws_api_key @aws_iam
+  onUpdateGroupHandS(filter: ModelSubscriptionGroupHandSFilterInput): GroupHandS @aws_subscribe(mutations: ["updateGroupHandS"]) @aws_api_key @aws_iam
+  onDeleteGroupHandS(filter: ModelSubscriptionGroupHandSFilterInput): GroupHandS @aws_subscribe(mutations: ["deleteGroupHandS"]) @aws_api_key @aws_iam
+  onCreateWorkMen(filter: ModelSubscriptionWorkMenFilterInput): WorkMen @aws_subscribe(mutations: ["createWorkMen"]) @aws_api_key @aws_iam
+  onUpdateWorkMen(filter: ModelSubscriptionWorkMenFilterInput): WorkMen @aws_subscribe(mutations: ["updateWorkMen"]) @aws_api_key @aws_iam
+  onDeleteWorkMen(filter: ModelSubscriptionWorkMenFilterInput): WorkMen @aws_subscribe(mutations: ["deleteWorkMen"]) @aws_api_key @aws_iam
+  onCreateTravelIns(filter: ModelSubscriptionTravelInsFilterInput): TravelIns @aws_subscribe(mutations: ["createTravelIns"]) @aws_api_key @aws_iam
+  onUpdateTravelIns(filter: ModelSubscriptionTravelInsFilterInput): TravelIns @aws_subscribe(mutations: ["updateTravelIns"]) @aws_api_key @aws_iam
+  onDeleteTravelIns(filter: ModelSubscriptionTravelInsFilterInput): TravelIns @aws_subscribe(mutations: ["deleteTravelIns"]) @aws_api_key @aws_iam
+  onCreatePersonalAccident(filter: ModelSubscriptionPersonalAccidentFilterInput): PersonalAccident @aws_subscribe(mutations: ["createPersonalAccident"]) @aws_api_key @aws_iam
+  onUpdatePersonalAccident(filter: ModelSubscriptionPersonalAccidentFilterInput): PersonalAccident @aws_subscribe(mutations: ["updatePersonalAccident"]) @aws_api_key @aws_iam
+  onDeletePersonalAccident(filter: ModelSubscriptionPersonalAccidentFilterInput): PersonalAccident @aws_subscribe(mutations: ["deletePersonalAccident"]) @aws_api_key @aws_iam
+  onCreateInsClaim(filter: ModelSubscriptionInsClaimFilterInput): InsClaim @aws_subscribe(mutations: ["createInsClaim"]) @aws_api_key @aws_iam
+  onUpdateInsClaim(filter: ModelSubscriptionInsClaimFilterInput): InsClaim @aws_subscribe(mutations: ["updateInsClaim"]) @aws_api_key @aws_iam
+  onDeleteInsClaim(filter: ModelSubscriptionInsClaimFilterInput): InsClaim @aws_subscribe(mutations: ["deleteInsClaim"]) @aws_api_key @aws_iam
+  onCreateProbForm(filter: ModelSubscriptionProbFormFilterInput): ProbForm @aws_subscribe(mutations: ["createProbForm"]) @aws_api_key @aws_iam
+  onUpdateProbForm(filter: ModelSubscriptionProbFormFilterInput): ProbForm @aws_subscribe(mutations: ["updateProbForm"]) @aws_api_key @aws_iam
+  onDeleteProbForm(filter: ModelSubscriptionProbFormFilterInput): ProbForm @aws_subscribe(mutations: ["deleteProbForm"]) @aws_api_key @aws_iam
+  onCreateEmailNotifi(filter: ModelSubscriptionEmailNotifiFilterInput): EmailNotifi @aws_subscribe(mutations: ["createEmailNotifi"]) @aws_api_key @aws_iam
+  onUpdateEmailNotifi(filter: ModelSubscriptionEmailNotifiFilterInput): EmailNotifi @aws_subscribe(mutations: ["updateEmailNotifi"]) @aws_api_key @aws_iam
+  onDeleteEmailNotifi(filter: ModelSubscriptionEmailNotifiFilterInput): EmailNotifi @aws_subscribe(mutations: ["deleteEmailNotifi"]) @aws_api_key @aws_iam
+  onCreateOffshoreSheet(filter: ModelSubscriptionOffshoreSheetFilterInput): OffshoreSheet @aws_subscribe(mutations: ["createOffshoreSheet"]) @aws_api_key @aws_iam
+  onUpdateOffshoreSheet(filter: ModelSubscriptionOffshoreSheetFilterInput): OffshoreSheet @aws_subscribe(mutations: ["updateOffshoreSheet"]) @aws_api_key @aws_iam
+  onDeleteOffshoreSheet(filter: ModelSubscriptionOffshoreSheetFilterInput): OffshoreSheet @aws_subscribe(mutations: ["deleteOffshoreSheet"]) @aws_api_key @aws_iam
+  onCreateORMCSheet(filter: ModelSubscriptionORMCSheetFilterInput): ORMCSheet @aws_subscribe(mutations: ["createORMCSheet"]) @aws_api_key @aws_iam
+  onUpdateORMCSheet(filter: ModelSubscriptionORMCSheetFilterInput): ORMCSheet @aws_subscribe(mutations: ["updateORMCSheet"]) @aws_api_key @aws_iam
+  onDeleteORMCSheet(filter: ModelSubscriptionORMCSheetFilterInput): ORMCSheet @aws_subscribe(mutations: ["deleteORMCSheet"]) @aws_api_key @aws_iam
+  onCreateSBWSheet(filter: ModelSubscriptionSBWSheetFilterInput): SBWSheet @aws_subscribe(mutations: ["createSBWSheet"]) @aws_api_key @aws_iam
+  onUpdateSBWSheet(filter: ModelSubscriptionSBWSheetFilterInput): SBWSheet @aws_subscribe(mutations: ["updateSBWSheet"]) @aws_api_key @aws_iam
+  onDeleteSBWSheet(filter: ModelSubscriptionSBWSheetFilterInput): SBWSheet @aws_subscribe(mutations: ["deleteSBWSheet"]) @aws_api_key @aws_iam
+  onCreateBlng(filter: ModelSubscriptionBlngFilterInput): Blng @aws_subscribe(mutations: ["createBlng"]) @aws_api_key @aws_iam
+  onUpdateBlng(filter: ModelSubscriptionBlngFilterInput): Blng @aws_subscribe(mutations: ["updateBlng"]) @aws_api_key @aws_iam
+  onDeleteBlng(filter: ModelSubscriptionBlngFilterInput): Blng @aws_subscribe(mutations: ["deleteBlng"]) @aws_api_key @aws_iam
+  onCreateHeadOffice(filter: ModelSubscriptionHeadOfficeFilterInput): HeadOffice @aws_subscribe(mutations: ["createHeadOffice"]) @aws_api_key @aws_iam
+  onUpdateHeadOffice(filter: ModelSubscriptionHeadOfficeFilterInput): HeadOffice @aws_subscribe(mutations: ["updateHeadOffice"]) @aws_api_key @aws_iam
+  onDeleteHeadOffice(filter: ModelSubscriptionHeadOfficeFilterInput): HeadOffice @aws_subscribe(mutations: ["deleteHeadOffice"]) @aws_api_key @aws_iam
+  onCreateEmpRequisition(filter: ModelSubscriptionEmpRequisitionFilterInput): EmpRequisition @aws_subscribe(mutations: ["createEmpRequisition"]) @aws_api_key @aws_iam
+  onUpdateEmpRequisition(filter: ModelSubscriptionEmpRequisitionFilterInput): EmpRequisition @aws_subscribe(mutations: ["updateEmpRequisition"]) @aws_api_key @aws_iam
+  onDeleteEmpRequisition(filter: ModelSubscriptionEmpRequisitionFilterInput): EmpRequisition @aws_subscribe(mutations: ["deleteEmpRequisition"]) @aws_api_key @aws_iam
+  onCreateWeldingInfo(filter: ModelSubscriptionWeldingInfoFilterInput): WeldingInfo @aws_subscribe(mutations: ["createWeldingInfo"]) @aws_api_key @aws_iam
+  onUpdateWeldingInfo(filter: ModelSubscriptionWeldingInfoFilterInput): WeldingInfo @aws_subscribe(mutations: ["updateWeldingInfo"]) @aws_api_key @aws_iam
+  onDeleteWeldingInfo(filter: ModelSubscriptionWeldingInfoFilterInput): WeldingInfo @aws_subscribe(mutations: ["deleteWeldingInfo"]) @aws_api_key @aws_iam
+  onCreateTrainingReq(filter: ModelSubscriptionTrainingReqFilterInput): TrainingReq @aws_subscribe(mutations: ["createTrainingReq"]) @aws_api_key @aws_iam
+  onUpdateTrainingReq(filter: ModelSubscriptionTrainingReqFilterInput): TrainingReq @aws_subscribe(mutations: ["updateTrainingReq"]) @aws_api_key @aws_iam
+  onDeleteTrainingReq(filter: ModelSubscriptionTrainingReqFilterInput): TrainingReq @aws_subscribe(mutations: ["deleteTrainingReq"]) @aws_api_key @aws_iam
+  onCreateTrainingCertificates(filter: ModelSubscriptionTrainingCertificatesFilterInput): TrainingCertificates @aws_subscribe(mutations: ["createTrainingCertificates"]) @aws_api_key @aws_iam
+  onUpdateTrainingCertificates(filter: ModelSubscriptionTrainingCertificatesFilterInput): TrainingCertificates @aws_subscribe(mutations: ["updateTrainingCertificates"]) @aws_api_key @aws_iam
+  onDeleteTrainingCertificates(filter: ModelSubscriptionTrainingCertificatesFilterInput): TrainingCertificates @aws_subscribe(mutations: ["deleteTrainingCertificates"]) @aws_api_key @aws_iam
+  onCreateAddCourse(filter: ModelSubscriptionAddCourseFilterInput): AddCourse @aws_subscribe(mutations: ["createAddCourse"]) @aws_api_key @aws_iam
+  onUpdateAddCourse(filter: ModelSubscriptionAddCourseFilterInput): AddCourse @aws_subscribe(mutations: ["updateAddCourse"]) @aws_api_key @aws_iam
+  onDeleteAddCourse(filter: ModelSubscriptionAddCourseFilterInput): AddCourse @aws_subscribe(mutations: ["deleteAddCourse"]) @aws_api_key @aws_iam
+  onCreateEmpDepInsurance(filter: ModelSubscriptionEmpDepInsuranceFilterInput): EmpDepInsurance @aws_subscribe(mutations: ["createEmpDepInsurance"]) @aws_api_key @aws_iam
+  onUpdateEmpDepInsurance(filter: ModelSubscriptionEmpDepInsuranceFilterInput): EmpDepInsurance @aws_subscribe(mutations: ["updateEmpDepInsurance"]) @aws_api_key @aws_iam
+  onDeleteEmpDepInsurance(filter: ModelSubscriptionEmpDepInsuranceFilterInput): EmpDepInsurance @aws_subscribe(mutations: ["deleteEmpDepInsurance"]) @aws_api_key @aws_iam
+  onCreateEmpInsurance(filter: ModelSubscriptionEmpInsuranceFilterInput): EmpInsurance @aws_subscribe(mutations: ["createEmpInsurance"]) @aws_api_key @aws_iam
+  onUpdateEmpInsurance(filter: ModelSubscriptionEmpInsuranceFilterInput): EmpInsurance @aws_subscribe(mutations: ["updateEmpInsurance"]) @aws_api_key @aws_iam
+  onDeleteEmpInsurance(filter: ModelSubscriptionEmpInsuranceFilterInput): EmpInsurance @aws_subscribe(mutations: ["deleteEmpInsurance"]) @aws_api_key @aws_iam
+  onCreateSawpDetails(filter: ModelSubscriptionSawpDetailsFilterInput): SawpDetails @aws_subscribe(mutations: ["createSawpDetails"]) @aws_api_key @aws_iam
+  onUpdateSawpDetails(filter: ModelSubscriptionSawpDetailsFilterInput): SawpDetails @aws_subscribe(mutations: ["updateSawpDetails"]) @aws_api_key @aws_iam
+  onDeleteSawpDetails(filter: ModelSubscriptionSawpDetailsFilterInput): SawpDetails @aws_subscribe(mutations: ["deleteSawpDetails"]) @aws_api_key @aws_iam
+  onCreateDNDetails(filter: ModelSubscriptionDNDetailsFilterInput): DNDetails @aws_subscribe(mutations: ["createDNDetails"]) @aws_api_key @aws_iam
+  onUpdateDNDetails(filter: ModelSubscriptionDNDetailsFilterInput): DNDetails @aws_subscribe(mutations: ["updateDNDetails"]) @aws_api_key @aws_iam
+  onDeleteDNDetails(filter: ModelSubscriptionDNDetailsFilterInput): DNDetails @aws_subscribe(mutations: ["deleteDNDetails"]) @aws_api_key @aws_iam
+  onCreateBJLDetails(filter: ModelSubscriptionBJLDetailsFilterInput): BJLDetails @aws_subscribe(mutations: ["createBJLDetails"]) @aws_api_key @aws_iam
+  onUpdateBJLDetails(filter: ModelSubscriptionBJLDetailsFilterInput): BJLDetails @aws_subscribe(mutations: ["updateBJLDetails"]) @aws_api_key @aws_iam
+  onDeleteBJLDetails(filter: ModelSubscriptionBJLDetailsFilterInput): BJLDetails @aws_subscribe(mutations: ["deleteBJLDetails"]) @aws_api_key @aws_iam
+  onCreatePassportValid(filter: ModelSubscriptionPassportValidFilterInput): PassportValid @aws_subscribe(mutations: ["createPassportValid"]) @aws_api_key @aws_iam
+  onUpdatePassportValid(filter: ModelSubscriptionPassportValidFilterInput): PassportValid @aws_subscribe(mutations: ["updatePassportValid"]) @aws_api_key @aws_iam
+  onDeletePassportValid(filter: ModelSubscriptionPassportValidFilterInput): PassportValid @aws_subscribe(mutations: ["deletePassportValid"]) @aws_api_key @aws_iam
+  onCreateWPTracking(filter: ModelSubscriptionWPTrackingFilterInput): WPTracking @aws_subscribe(mutations: ["createWPTracking"]) @aws_api_key @aws_iam
+  onUpdateWPTracking(filter: ModelSubscriptionWPTrackingFilterInput): WPTracking @aws_subscribe(mutations: ["updateWPTracking"]) @aws_api_key @aws_iam
+  onDeleteWPTracking(filter: ModelSubscriptionWPTrackingFilterInput): WPTracking @aws_subscribe(mutations: ["deleteWPTracking"]) @aws_api_key @aws_iam
+  onCreateEmployeeNonLocalAcco(filter: ModelSubscriptionEmployeeNonLocalAccoFilterInput): EmployeeNonLocalAcco @aws_subscribe(mutations: ["createEmployeeNonLocalAcco"]) @aws_api_key @aws_iam
+  onUpdateEmployeeNonLocalAcco(filter: ModelSubscriptionEmployeeNonLocalAccoFilterInput): EmployeeNonLocalAcco @aws_subscribe(mutations: ["updateEmployeeNonLocalAcco"]) @aws_api_key @aws_iam
+  onDeleteEmployeeNonLocalAcco(filter: ModelSubscriptionEmployeeNonLocalAccoFilterInput): EmployeeNonLocalAcco @aws_subscribe(mutations: ["deleteEmployeeNonLocalAcco"]) @aws_api_key @aws_iam
+  onCreateLabourMedicalInfo(filter: ModelSubscriptionLabourMedicalInfoFilterInput): LabourMedicalInfo @aws_subscribe(mutations: ["createLabourMedicalInfo"]) @aws_api_key @aws_iam
+  onUpdateLabourMedicalInfo(filter: ModelSubscriptionLabourMedicalInfoFilterInput): LabourMedicalInfo @aws_subscribe(mutations: ["updateLabourMedicalInfo"]) @aws_api_key @aws_iam
+  onDeleteLabourMedicalInfo(filter: ModelSubscriptionLabourMedicalInfoFilterInput): LabourMedicalInfo @aws_subscribe(mutations: ["deleteLabourMedicalInfo"]) @aws_api_key @aws_iam
+  onCreateServiceRecord(filter: ModelSubscriptionServiceRecordFilterInput): ServiceRecord @aws_subscribe(mutations: ["createServiceRecord"]) @aws_api_key @aws_iam
+  onUpdateServiceRecord(filter: ModelSubscriptionServiceRecordFilterInput): ServiceRecord @aws_subscribe(mutations: ["updateServiceRecord"]) @aws_api_key @aws_iam
+  onDeleteServiceRecord(filter: ModelSubscriptionServiceRecordFilterInput): ServiceRecord @aws_subscribe(mutations: ["deleteServiceRecord"]) @aws_api_key @aws_iam
+  onCreateEmpLeaveDetails(filter: ModelSubscriptionEmpLeaveDetailsFilterInput): EmpLeaveDetails @aws_subscribe(mutations: ["createEmpLeaveDetails"]) @aws_api_key @aws_iam
+  onUpdateEmpLeaveDetails(filter: ModelSubscriptionEmpLeaveDetailsFilterInput): EmpLeaveDetails @aws_subscribe(mutations: ["updateEmpLeaveDetails"]) @aws_api_key @aws_iam
+  onDeleteEmpLeaveDetails(filter: ModelSubscriptionEmpLeaveDetailsFilterInput): EmpLeaveDetails @aws_subscribe(mutations: ["deleteEmpLeaveDetails"]) @aws_api_key @aws_iam
+  onCreateTerminationInfo(filter: ModelSubscriptionTerminationInfoFilterInput): TerminationInfo @aws_subscribe(mutations: ["createTerminationInfo"]) @aws_api_key @aws_iam
+  onUpdateTerminationInfo(filter: ModelSubscriptionTerminationInfoFilterInput): TerminationInfo @aws_subscribe(mutations: ["updateTerminationInfo"]) @aws_api_key @aws_iam
+  onDeleteTerminationInfo(filter: ModelSubscriptionTerminationInfoFilterInput): TerminationInfo @aws_subscribe(mutations: ["deleteTerminationInfo"]) @aws_api_key @aws_iam
+  onCreateEmpWorkInfo(filter: ModelSubscriptionEmpWorkInfoFilterInput): EmpWorkInfo @aws_subscribe(mutations: ["createEmpWorkInfo"]) @aws_api_key @aws_iam
+  onUpdateEmpWorkInfo(filter: ModelSubscriptionEmpWorkInfoFilterInput): EmpWorkInfo @aws_subscribe(mutations: ["updateEmpWorkInfo"]) @aws_api_key @aws_iam
+  onDeleteEmpWorkInfo(filter: ModelSubscriptionEmpWorkInfoFilterInput): EmpWorkInfo @aws_subscribe(mutations: ["deleteEmpWorkInfo"]) @aws_api_key @aws_iam
+  onCreateEmpPersonalInfo(filter: ModelSubscriptionEmpPersonalInfoFilterInput): EmpPersonalInfo @aws_subscribe(mutations: ["createEmpPersonalInfo"]) @aws_api_key @aws_iam
+  onUpdateEmpPersonalInfo(filter: ModelSubscriptionEmpPersonalInfoFilterInput): EmpPersonalInfo @aws_subscribe(mutations: ["updateEmpPersonalInfo"]) @aws_api_key @aws_iam
+  onDeleteEmpPersonalInfo(filter: ModelSubscriptionEmpPersonalInfoFilterInput): EmpPersonalInfo @aws_subscribe(mutations: ["deleteEmpPersonalInfo"]) @aws_api_key @aws_iam
+  onCreateIDDetails(filter: ModelSubscriptionIDDetailsFilterInput): IDDetails @aws_subscribe(mutations: ["createIDDetails"]) @aws_api_key @aws_iam
+  onUpdateIDDetails(filter: ModelSubscriptionIDDetailsFilterInput): IDDetails @aws_subscribe(mutations: ["updateIDDetails"]) @aws_api_key @aws_iam
+  onDeleteIDDetails(filter: ModelSubscriptionIDDetailsFilterInput): IDDetails @aws_subscribe(mutations: ["deleteIDDetails"]) @aws_api_key @aws_iam
+  onCreateCandIToEMP(filter: ModelSubscriptionCandIToEMPFilterInput): CandIToEMP @aws_subscribe(mutations: ["createCandIToEMP"]) @aws_api_key @aws_iam
+  onUpdateCandIToEMP(filter: ModelSubscriptionCandIToEMPFilterInput): CandIToEMP @aws_subscribe(mutations: ["updateCandIToEMP"]) @aws_api_key @aws_iam
+  onDeleteCandIToEMP(filter: ModelSubscriptionCandIToEMPFilterInput): CandIToEMP @aws_subscribe(mutations: ["deleteCandIToEMP"]) @aws_api_key @aws_iam
+  onCreateLocalMobilization(filter: ModelSubscriptionLocalMobilizationFilterInput): LocalMobilization @aws_subscribe(mutations: ["createLocalMobilization"]) @aws_api_key @aws_iam
+  onUpdateLocalMobilization(filter: ModelSubscriptionLocalMobilizationFilterInput): LocalMobilization @aws_subscribe(mutations: ["updateLocalMobilization"]) @aws_api_key @aws_iam
+  onDeleteLocalMobilization(filter: ModelSubscriptionLocalMobilizationFilterInput): LocalMobilization @aws_subscribe(mutations: ["deleteLocalMobilization"]) @aws_api_key @aws_iam
+  onCreateInterviewSchedule(filter: ModelSubscriptionInterviewScheduleFilterInput): InterviewSchedule @aws_subscribe(mutations: ["createInterviewSchedule"]) @aws_api_key @aws_iam
+  onUpdateInterviewSchedule(filter: ModelSubscriptionInterviewScheduleFilterInput): InterviewSchedule @aws_subscribe(mutations: ["updateInterviewSchedule"]) @aws_api_key @aws_iam
+  onDeleteInterviewSchedule(filter: ModelSubscriptionInterviewScheduleFilterInput): InterviewSchedule @aws_subscribe(mutations: ["deleteInterviewSchedule"]) @aws_api_key @aws_iam
+  onCreateEducationDetails(filter: ModelSubscriptionEducationDetailsFilterInput): EducationDetails @aws_subscribe(mutations: ["createEducationDetails"]) @aws_api_key @aws_iam
+  onUpdateEducationDetails(filter: ModelSubscriptionEducationDetailsFilterInput): EducationDetails @aws_subscribe(mutations: ["updateEducationDetails"]) @aws_api_key @aws_iam
+  onDeleteEducationDetails(filter: ModelSubscriptionEducationDetailsFilterInput): EducationDetails @aws_subscribe(mutations: ["deleteEducationDetails"]) @aws_api_key @aws_iam
+  onCreatePersonalDetails(filter: ModelSubscriptionPersonalDetailsFilterInput): PersonalDetails @aws_subscribe(mutations: ["createPersonalDetails"]) @aws_api_key @aws_iam
+  onUpdatePersonalDetails(filter: ModelSubscriptionPersonalDetailsFilterInput): PersonalDetails @aws_subscribe(mutations: ["updatePersonalDetails"]) @aws_api_key @aws_iam
+  onDeletePersonalDetails(filter: ModelSubscriptionPersonalDetailsFilterInput): PersonalDetails @aws_subscribe(mutations: ["deletePersonalDetails"]) @aws_api_key @aws_iam
+  onCreateUser(filter: ModelSubscriptionUserFilterInput): User @aws_subscribe(mutations: ["createUser"]) @aws_api_key @aws_iam
+  onUpdateUser(filter: ModelSubscriptionUserFilterInput): User @aws_subscribe(mutations: ["updateUser"]) @aws_api_key @aws_iam
+  onDeleteUser(filter: ModelSubscriptionUserFilterInput): User @aws_subscribe(mutations: ["deleteUser"]) @aws_api_key @aws_iam
+  onCreateTicketRequest(filter: ModelSubscriptionTicketRequestFilterInput): TicketRequest @aws_subscribe(mutations: ["createTicketRequest"]) @aws_api_key @aws_iam
+  onUpdateTicketRequest(filter: ModelSubscriptionTicketRequestFilterInput): TicketRequest @aws_subscribe(mutations: ["updateTicketRequest"]) @aws_api_key @aws_iam
+  onDeleteTicketRequest(filter: ModelSubscriptionTicketRequestFilterInput): TicketRequest @aws_subscribe(mutations: ["deleteTicketRequest"]) @aws_api_key @aws_iam
+  onCreateLeaveStatus(filter: ModelSubscriptionLeaveStatusFilterInput): LeaveStatus @aws_subscribe(mutations: ["createLeaveStatus"]) @aws_api_key @aws_iam
+  onUpdateLeaveStatus(filter: ModelSubscriptionLeaveStatusFilterInput): LeaveStatus @aws_subscribe(mutations: ["updateLeaveStatus"]) @aws_api_key @aws_iam
+  onDeleteLeaveStatus(filter: ModelSubscriptionLeaveStatusFilterInput): LeaveStatus @aws_subscribe(mutations: ["deleteLeaveStatus"]) @aws_api_key @aws_iam
+}
+
+type ModelInsuranceTypeConnection @aws_api_key @aws_iam {
   items: [InsuranceType]!
   nextToken: String
 }
@@ -928,91 +1371,6 @@ input ModelInsuranceTypeFilterInput {
   and: [ModelInsuranceTypeFilterInput]
   or: [ModelInsuranceTypeFilterInput]
   not: ModelInsuranceTypeFilterInput
-}
-
-type Query {
-  getInsuranceType(id: ID!): InsuranceType
-  listInsuranceTypes(filter: ModelInsuranceTypeFilterInput, limit: Int, nextToken: String): ModelInsuranceTypeConnection
-  getGroupHandS(id: ID!): GroupHandS
-  listGroupHandS(filter: ModelGroupHandSFilterInput, limit: Int, nextToken: String): ModelGroupHandSConnection
-  getWorkMen(id: ID!): WorkMen
-  listWorkMen(filter: ModelWorkMenFilterInput, limit: Int, nextToken: String): ModelWorkMenConnection
-  getTravelIns(id: ID!): TravelIns
-  listTravelIns(filter: ModelTravelInsFilterInput, limit: Int, nextToken: String): ModelTravelInsConnection
-  getPersonalAccident(id: ID!): PersonalAccident
-  listPersonalAccidents(filter: ModelPersonalAccidentFilterInput, limit: Int, nextToken: String): ModelPersonalAccidentConnection
-  getInsClaim(id: ID!): InsClaim
-  listInsClaims(filter: ModelInsClaimFilterInput, limit: Int, nextToken: String): ModelInsClaimConnection
-  getProbForm(id: ID!): ProbForm
-  listProbForms(filter: ModelProbFormFilterInput, limit: Int, nextToken: String): ModelProbFormConnection
-  getEmailNotifi(id: ID!): EmailNotifi
-  listEmailNotifis(filter: ModelEmailNotifiFilterInput, limit: Int, nextToken: String): ModelEmailNotifiConnection
-  getOffshoreSheet(id: ID!): OffshoreSheet
-  listOffshoreSheets(filter: ModelOffshoreSheetFilterInput, limit: Int, nextToken: String): ModelOffshoreSheetConnection
-  getORMCSheet(id: ID!): ORMCSheet
-  listORMCSheets(filter: ModelORMCSheetFilterInput, limit: Int, nextToken: String): ModelORMCSheetConnection
-  getSBWSheet(id: ID!): SBWSheet
-  listSBWSheets(filter: ModelSBWSheetFilterInput, limit: Int, nextToken: String): ModelSBWSheetConnection
-  getBlng(id: ID!): Blng
-  listBlngs(filter: ModelBlngFilterInput, limit: Int, nextToken: String): ModelBlngConnection
-  getHeadOffice(id: ID!): HeadOffice
-  listHeadOffices(filter: ModelHeadOfficeFilterInput, limit: Int, nextToken: String): ModelHeadOfficeConnection
-  getEmpRequisition(id: ID!): EmpRequisition
-  listEmpRequisitions(filter: ModelEmpRequisitionFilterInput, limit: Int, nextToken: String): ModelEmpRequisitionConnection
-  getWeldingInfo(id: ID!): WeldingInfo
-  listWeldingInfos(filter: ModelWeldingInfoFilterInput, limit: Int, nextToken: String): ModelWeldingInfoConnection
-  getTrainingReq(id: ID!): TrainingReq
-  listTrainingReqs(filter: ModelTrainingReqFilterInput, limit: Int, nextToken: String): ModelTrainingReqConnection
-  getTrainingCertificates(id: ID!): TrainingCertificates
-  listTrainingCertificates(filter: ModelTrainingCertificatesFilterInput, limit: Int, nextToken: String): ModelTrainingCertificatesConnection
-  getAddCourse(id: ID!): AddCourse
-  listAddCourses(filter: ModelAddCourseFilterInput, limit: Int, nextToken: String): ModelAddCourseConnection
-  getEmpDepInsurance(id: ID!): EmpDepInsurance
-  listEmpDepInsurances(filter: ModelEmpDepInsuranceFilterInput, limit: Int, nextToken: String): ModelEmpDepInsuranceConnection
-  getEmpInsurance(id: ID!): EmpInsurance
-  listEmpInsurances(filter: ModelEmpInsuranceFilterInput, limit: Int, nextToken: String): ModelEmpInsuranceConnection
-  getSawpDetails(id: ID!): SawpDetails
-  listSawpDetails(filter: ModelSawpDetailsFilterInput, limit: Int, nextToken: String): ModelSawpDetailsConnection
-  getDNDetails(id: ID!): DNDetails
-  listDNDetails(filter: ModelDNDetailsFilterInput, limit: Int, nextToken: String): ModelDNDetailsConnection
-  getBJLDetails(id: ID!): BJLDetails
-  listBJLDetails(filter: ModelBJLDetailsFilterInput, limit: Int, nextToken: String): ModelBJLDetailsConnection
-  getPassportValid(id: ID!): PassportValid
-  listPassportValids(filter: ModelPassportValidFilterInput, limit: Int, nextToken: String): ModelPassportValidConnection
-  getWPTracking(id: ID!): WPTracking
-  listWPTrackings(filter: ModelWPTrackingFilterInput, limit: Int, nextToken: String): ModelWPTrackingConnection
-  getEmployeeNonLocalAcco(id: ID!): EmployeeNonLocalAcco
-  listEmployeeNonLocalAccos(filter: ModelEmployeeNonLocalAccoFilterInput, limit: Int, nextToken: String): ModelEmployeeNonLocalAccoConnection
-  getLabourMedicalInfo(id: ID!): LabourMedicalInfo
-  listLabourMedicalInfos(filter: ModelLabourMedicalInfoFilterInput, limit: Int, nextToken: String): ModelLabourMedicalInfoConnection
-  getServiceRecord(id: ID!): ServiceRecord
-  listServiceRecords(filter: ModelServiceRecordFilterInput, limit: Int, nextToken: String): ModelServiceRecordConnection
-  getEmpLeaveDetails(id: ID!): EmpLeaveDetails
-  listEmpLeaveDetails(filter: ModelEmpLeaveDetailsFilterInput, limit: Int, nextToken: String): ModelEmpLeaveDetailsConnection
-  getTerminationInfo(id: ID!): TerminationInfo
-  listTerminationInfos(filter: ModelTerminationInfoFilterInput, limit: Int, nextToken: String): ModelTerminationInfoConnection
-  getEmpWorkInfo(id: ID!): EmpWorkInfo
-  listEmpWorkInfos(filter: ModelEmpWorkInfoFilterInput, limit: Int, nextToken: String): ModelEmpWorkInfoConnection
-  getEmpPersonalInfo(id: ID!): EmpPersonalInfo
-  listEmpPersonalInfos(filter: ModelEmpPersonalInfoFilterInput, limit: Int, nextToken: String): ModelEmpPersonalInfoConnection
-  getIDDetails(id: ID!): IDDetails
-  listIDDetails(filter: ModelIDDetailsFilterInput, limit: Int, nextToken: String): ModelIDDetailsConnection
-  getCandIToEMP(id: ID!): CandIToEMP
-  listCandIToEMPS(filter: ModelCandIToEMPFilterInput, limit: Int, nextToken: String): ModelCandIToEMPConnection
-  getLocalMobilization(id: ID!): LocalMobilization
-  listLocalMobilizations(filter: ModelLocalMobilizationFilterInput, limit: Int, nextToken: String): ModelLocalMobilizationConnection
-  getInterviewSchedule(id: ID!): InterviewSchedule
-  listInterviewSchedules(filter: ModelInterviewScheduleFilterInput, limit: Int, nextToken: String): ModelInterviewScheduleConnection
-  getEducationDetails(id: ID!): EducationDetails
-  listEducationDetails(filter: ModelEducationDetailsFilterInput, limit: Int, nextToken: String): ModelEducationDetailsConnection
-  getPersonalDetails(id: ID!): PersonalDetails
-  listPersonalDetails(filter: ModelPersonalDetailsFilterInput, limit: Int, nextToken: String): ModelPersonalDetailsConnection
-  getUser(id: ID!): User
-  listUsers(filter: ModelUserFilterInput, limit: Int, nextToken: String): ModelUserConnection
-  getTicketRequest(id: ID!): TicketRequest
-  listTicketRequests(filter: ModelTicketRequestFilterInput, limit: Int, nextToken: String): ModelTicketRequestConnection
-  getLeaveStatus(id: ID!): LeaveStatus
-  listLeaveStatuses(filter: ModelLeaveStatusFilterInput, limit: Int, nextToken: String): ModelLeaveStatusConnection
 }
 
 input ModelInsuranceTypeConditionInput {
@@ -1041,132 +1399,6 @@ input DeleteInsuranceTypeInput {
   id: ID!
 }
 
-type Mutation {
-  createInsuranceType(input: CreateInsuranceTypeInput!, condition: ModelInsuranceTypeConditionInput): InsuranceType
-  updateInsuranceType(input: UpdateInsuranceTypeInput!, condition: ModelInsuranceTypeConditionInput): InsuranceType
-  deleteInsuranceType(input: DeleteInsuranceTypeInput!, condition: ModelInsuranceTypeConditionInput): InsuranceType
-  createGroupHandS(input: CreateGroupHandSInput!, condition: ModelGroupHandSConditionInput): GroupHandS
-  updateGroupHandS(input: UpdateGroupHandSInput!, condition: ModelGroupHandSConditionInput): GroupHandS
-  deleteGroupHandS(input: DeleteGroupHandSInput!, condition: ModelGroupHandSConditionInput): GroupHandS
-  createWorkMen(input: CreateWorkMenInput!, condition: ModelWorkMenConditionInput): WorkMen
-  updateWorkMen(input: UpdateWorkMenInput!, condition: ModelWorkMenConditionInput): WorkMen
-  deleteWorkMen(input: DeleteWorkMenInput!, condition: ModelWorkMenConditionInput): WorkMen
-  createTravelIns(input: CreateTravelInsInput!, condition: ModelTravelInsConditionInput): TravelIns
-  updateTravelIns(input: UpdateTravelInsInput!, condition: ModelTravelInsConditionInput): TravelIns
-  deleteTravelIns(input: DeleteTravelInsInput!, condition: ModelTravelInsConditionInput): TravelIns
-  createPersonalAccident(input: CreatePersonalAccidentInput!, condition: ModelPersonalAccidentConditionInput): PersonalAccident
-  updatePersonalAccident(input: UpdatePersonalAccidentInput!, condition: ModelPersonalAccidentConditionInput): PersonalAccident
-  deletePersonalAccident(input: DeletePersonalAccidentInput!, condition: ModelPersonalAccidentConditionInput): PersonalAccident
-  createInsClaim(input: CreateInsClaimInput!, condition: ModelInsClaimConditionInput): InsClaim
-  updateInsClaim(input: UpdateInsClaimInput!, condition: ModelInsClaimConditionInput): InsClaim
-  deleteInsClaim(input: DeleteInsClaimInput!, condition: ModelInsClaimConditionInput): InsClaim
-  createProbForm(input: CreateProbFormInput!, condition: ModelProbFormConditionInput): ProbForm
-  updateProbForm(input: UpdateProbFormInput!, condition: ModelProbFormConditionInput): ProbForm
-  deleteProbForm(input: DeleteProbFormInput!, condition: ModelProbFormConditionInput): ProbForm
-  createEmailNotifi(input: CreateEmailNotifiInput!, condition: ModelEmailNotifiConditionInput): EmailNotifi
-  updateEmailNotifi(input: UpdateEmailNotifiInput!, condition: ModelEmailNotifiConditionInput): EmailNotifi
-  deleteEmailNotifi(input: DeleteEmailNotifiInput!, condition: ModelEmailNotifiConditionInput): EmailNotifi
-  createOffshoreSheet(input: CreateOffshoreSheetInput!, condition: ModelOffshoreSheetConditionInput): OffshoreSheet
-  updateOffshoreSheet(input: UpdateOffshoreSheetInput!, condition: ModelOffshoreSheetConditionInput): OffshoreSheet
-  deleteOffshoreSheet(input: DeleteOffshoreSheetInput!, condition: ModelOffshoreSheetConditionInput): OffshoreSheet
-  createORMCSheet(input: CreateORMCSheetInput!, condition: ModelORMCSheetConditionInput): ORMCSheet
-  updateORMCSheet(input: UpdateORMCSheetInput!, condition: ModelORMCSheetConditionInput): ORMCSheet
-  deleteORMCSheet(input: DeleteORMCSheetInput!, condition: ModelORMCSheetConditionInput): ORMCSheet
-  createSBWSheet(input: CreateSBWSheetInput!, condition: ModelSBWSheetConditionInput): SBWSheet
-  updateSBWSheet(input: UpdateSBWSheetInput!, condition: ModelSBWSheetConditionInput): SBWSheet
-  deleteSBWSheet(input: DeleteSBWSheetInput!, condition: ModelSBWSheetConditionInput): SBWSheet
-  createBlng(input: CreateBlngInput!, condition: ModelBlngConditionInput): Blng
-  updateBlng(input: UpdateBlngInput!, condition: ModelBlngConditionInput): Blng
-  deleteBlng(input: DeleteBlngInput!, condition: ModelBlngConditionInput): Blng
-  createHeadOffice(input: CreateHeadOfficeInput!, condition: ModelHeadOfficeConditionInput): HeadOffice
-  updateHeadOffice(input: UpdateHeadOfficeInput!, condition: ModelHeadOfficeConditionInput): HeadOffice
-  deleteHeadOffice(input: DeleteHeadOfficeInput!, condition: ModelHeadOfficeConditionInput): HeadOffice
-  createEmpRequisition(input: CreateEmpRequisitionInput!, condition: ModelEmpRequisitionConditionInput): EmpRequisition
-  updateEmpRequisition(input: UpdateEmpRequisitionInput!, condition: ModelEmpRequisitionConditionInput): EmpRequisition
-  deleteEmpRequisition(input: DeleteEmpRequisitionInput!, condition: ModelEmpRequisitionConditionInput): EmpRequisition
-  createWeldingInfo(input: CreateWeldingInfoInput!, condition: ModelWeldingInfoConditionInput): WeldingInfo
-  updateWeldingInfo(input: UpdateWeldingInfoInput!, condition: ModelWeldingInfoConditionInput): WeldingInfo
-  deleteWeldingInfo(input: DeleteWeldingInfoInput!, condition: ModelWeldingInfoConditionInput): WeldingInfo
-  createTrainingReq(input: CreateTrainingReqInput!, condition: ModelTrainingReqConditionInput): TrainingReq
-  updateTrainingReq(input: UpdateTrainingReqInput!, condition: ModelTrainingReqConditionInput): TrainingReq
-  deleteTrainingReq(input: DeleteTrainingReqInput!, condition: ModelTrainingReqConditionInput): TrainingReq
-  createTrainingCertificates(input: CreateTrainingCertificatesInput!, condition: ModelTrainingCertificatesConditionInput): TrainingCertificates
-  updateTrainingCertificates(input: UpdateTrainingCertificatesInput!, condition: ModelTrainingCertificatesConditionInput): TrainingCertificates
-  deleteTrainingCertificates(input: DeleteTrainingCertificatesInput!, condition: ModelTrainingCertificatesConditionInput): TrainingCertificates
-  createAddCourse(input: CreateAddCourseInput!, condition: ModelAddCourseConditionInput): AddCourse
-  updateAddCourse(input: UpdateAddCourseInput!, condition: ModelAddCourseConditionInput): AddCourse
-  deleteAddCourse(input: DeleteAddCourseInput!, condition: ModelAddCourseConditionInput): AddCourse
-  createEmpDepInsurance(input: CreateEmpDepInsuranceInput!, condition: ModelEmpDepInsuranceConditionInput): EmpDepInsurance
-  updateEmpDepInsurance(input: UpdateEmpDepInsuranceInput!, condition: ModelEmpDepInsuranceConditionInput): EmpDepInsurance
-  deleteEmpDepInsurance(input: DeleteEmpDepInsuranceInput!, condition: ModelEmpDepInsuranceConditionInput): EmpDepInsurance
-  createEmpInsurance(input: CreateEmpInsuranceInput!, condition: ModelEmpInsuranceConditionInput): EmpInsurance
-  updateEmpInsurance(input: UpdateEmpInsuranceInput!, condition: ModelEmpInsuranceConditionInput): EmpInsurance
-  deleteEmpInsurance(input: DeleteEmpInsuranceInput!, condition: ModelEmpInsuranceConditionInput): EmpInsurance
-  createSawpDetails(input: CreateSawpDetailsInput!, condition: ModelSawpDetailsConditionInput): SawpDetails
-  updateSawpDetails(input: UpdateSawpDetailsInput!, condition: ModelSawpDetailsConditionInput): SawpDetails
-  deleteSawpDetails(input: DeleteSawpDetailsInput!, condition: ModelSawpDetailsConditionInput): SawpDetails
-  createDNDetails(input: CreateDNDetailsInput!, condition: ModelDNDetailsConditionInput): DNDetails
-  updateDNDetails(input: UpdateDNDetailsInput!, condition: ModelDNDetailsConditionInput): DNDetails
-  deleteDNDetails(input: DeleteDNDetailsInput!, condition: ModelDNDetailsConditionInput): DNDetails
-  createBJLDetails(input: CreateBJLDetailsInput!, condition: ModelBJLDetailsConditionInput): BJLDetails
-  updateBJLDetails(input: UpdateBJLDetailsInput!, condition: ModelBJLDetailsConditionInput): BJLDetails
-  deleteBJLDetails(input: DeleteBJLDetailsInput!, condition: ModelBJLDetailsConditionInput): BJLDetails
-  createPassportValid(input: CreatePassportValidInput!, condition: ModelPassportValidConditionInput): PassportValid
-  updatePassportValid(input: UpdatePassportValidInput!, condition: ModelPassportValidConditionInput): PassportValid
-  deletePassportValid(input: DeletePassportValidInput!, condition: ModelPassportValidConditionInput): PassportValid
-  createWPTracking(input: CreateWPTrackingInput!, condition: ModelWPTrackingConditionInput): WPTracking
-  updateWPTracking(input: UpdateWPTrackingInput!, condition: ModelWPTrackingConditionInput): WPTracking
-  deleteWPTracking(input: DeleteWPTrackingInput!, condition: ModelWPTrackingConditionInput): WPTracking
-  createEmployeeNonLocalAcco(input: CreateEmployeeNonLocalAccoInput!, condition: ModelEmployeeNonLocalAccoConditionInput): EmployeeNonLocalAcco
-  updateEmployeeNonLocalAcco(input: UpdateEmployeeNonLocalAccoInput!, condition: ModelEmployeeNonLocalAccoConditionInput): EmployeeNonLocalAcco
-  deleteEmployeeNonLocalAcco(input: DeleteEmployeeNonLocalAccoInput!, condition: ModelEmployeeNonLocalAccoConditionInput): EmployeeNonLocalAcco
-  createLabourMedicalInfo(input: CreateLabourMedicalInfoInput!, condition: ModelLabourMedicalInfoConditionInput): LabourMedicalInfo
-  updateLabourMedicalInfo(input: UpdateLabourMedicalInfoInput!, condition: ModelLabourMedicalInfoConditionInput): LabourMedicalInfo
-  deleteLabourMedicalInfo(input: DeleteLabourMedicalInfoInput!, condition: ModelLabourMedicalInfoConditionInput): LabourMedicalInfo
-  createServiceRecord(input: CreateServiceRecordInput!, condition: ModelServiceRecordConditionInput): ServiceRecord
-  updateServiceRecord(input: UpdateServiceRecordInput!, condition: ModelServiceRecordConditionInput): ServiceRecord
-  deleteServiceRecord(input: DeleteServiceRecordInput!, condition: ModelServiceRecordConditionInput): ServiceRecord
-  createEmpLeaveDetails(input: CreateEmpLeaveDetailsInput!, condition: ModelEmpLeaveDetailsConditionInput): EmpLeaveDetails
-  updateEmpLeaveDetails(input: UpdateEmpLeaveDetailsInput!, condition: ModelEmpLeaveDetailsConditionInput): EmpLeaveDetails
-  deleteEmpLeaveDetails(input: DeleteEmpLeaveDetailsInput!, condition: ModelEmpLeaveDetailsConditionInput): EmpLeaveDetails
-  createTerminationInfo(input: CreateTerminationInfoInput!, condition: ModelTerminationInfoConditionInput): TerminationInfo
-  updateTerminationInfo(input: UpdateTerminationInfoInput!, condition: ModelTerminationInfoConditionInput): TerminationInfo
-  deleteTerminationInfo(input: DeleteTerminationInfoInput!, condition: ModelTerminationInfoConditionInput): TerminationInfo
-  createEmpWorkInfo(input: CreateEmpWorkInfoInput!, condition: ModelEmpWorkInfoConditionInput): EmpWorkInfo
-  updateEmpWorkInfo(input: UpdateEmpWorkInfoInput!, condition: ModelEmpWorkInfoConditionInput): EmpWorkInfo
-  deleteEmpWorkInfo(input: DeleteEmpWorkInfoInput!, condition: ModelEmpWorkInfoConditionInput): EmpWorkInfo
-  createEmpPersonalInfo(input: CreateEmpPersonalInfoInput!, condition: ModelEmpPersonalInfoConditionInput): EmpPersonalInfo
-  updateEmpPersonalInfo(input: UpdateEmpPersonalInfoInput!, condition: ModelEmpPersonalInfoConditionInput): EmpPersonalInfo
-  deleteEmpPersonalInfo(input: DeleteEmpPersonalInfoInput!, condition: ModelEmpPersonalInfoConditionInput): EmpPersonalInfo
-  createIDDetails(input: CreateIDDetailsInput!, condition: ModelIDDetailsConditionInput): IDDetails
-  updateIDDetails(input: UpdateIDDetailsInput!, condition: ModelIDDetailsConditionInput): IDDetails
-  deleteIDDetails(input: DeleteIDDetailsInput!, condition: ModelIDDetailsConditionInput): IDDetails
-  createCandIToEMP(input: CreateCandIToEMPInput!, condition: ModelCandIToEMPConditionInput): CandIToEMP
-  updateCandIToEMP(input: UpdateCandIToEMPInput!, condition: ModelCandIToEMPConditionInput): CandIToEMP
-  deleteCandIToEMP(input: DeleteCandIToEMPInput!, condition: ModelCandIToEMPConditionInput): CandIToEMP
-  createLocalMobilization(input: CreateLocalMobilizationInput!, condition: ModelLocalMobilizationConditionInput): LocalMobilization
-  updateLocalMobilization(input: UpdateLocalMobilizationInput!, condition: ModelLocalMobilizationConditionInput): LocalMobilization
-  deleteLocalMobilization(input: DeleteLocalMobilizationInput!, condition: ModelLocalMobilizationConditionInput): LocalMobilization
-  createInterviewSchedule(input: CreateInterviewScheduleInput!, condition: ModelInterviewScheduleConditionInput): InterviewSchedule
-  updateInterviewSchedule(input: UpdateInterviewScheduleInput!, condition: ModelInterviewScheduleConditionInput): InterviewSchedule
-  deleteInterviewSchedule(input: DeleteInterviewScheduleInput!, condition: ModelInterviewScheduleConditionInput): InterviewSchedule
-  createEducationDetails(input: CreateEducationDetailsInput!, condition: ModelEducationDetailsConditionInput): EducationDetails
-  updateEducationDetails(input: UpdateEducationDetailsInput!, condition: ModelEducationDetailsConditionInput): EducationDetails
-  deleteEducationDetails(input: DeleteEducationDetailsInput!, condition: ModelEducationDetailsConditionInput): EducationDetails
-  createPersonalDetails(input: CreatePersonalDetailsInput!, condition: ModelPersonalDetailsConditionInput): PersonalDetails
-  updatePersonalDetails(input: UpdatePersonalDetailsInput!, condition: ModelPersonalDetailsConditionInput): PersonalDetails
-  deletePersonalDetails(input: DeletePersonalDetailsInput!, condition: ModelPersonalDetailsConditionInput): PersonalDetails
-  createUser(input: CreateUserInput!, condition: ModelUserConditionInput): User
-  updateUser(input: UpdateUserInput!, condition: ModelUserConditionInput): User
-  deleteUser(input: DeleteUserInput!, condition: ModelUserConditionInput): User
-  createTicketRequest(input: CreateTicketRequestInput!, condition: ModelTicketRequestConditionInput): TicketRequest
-  updateTicketRequest(input: UpdateTicketRequestInput!, condition: ModelTicketRequestConditionInput): TicketRequest
-  deleteTicketRequest(input: DeleteTicketRequestInput!, condition: ModelTicketRequestConditionInput): TicketRequest
-  createLeaveStatus(input: CreateLeaveStatusInput!, condition: ModelLeaveStatusConditionInput): LeaveStatus
-  updateLeaveStatus(input: UpdateLeaveStatusInput!, condition: ModelLeaveStatusConditionInput): LeaveStatus
-  deleteLeaveStatus(input: DeleteLeaveStatusInput!, condition: ModelLeaveStatusConditionInput): LeaveStatus
-}
-
 input ModelSubscriptionInsuranceTypeFilterInput {
   id: ModelSubscriptionIDInput
   typeIns: ModelSubscriptionStringInput
@@ -1177,133 +1409,7 @@ input ModelSubscriptionInsuranceTypeFilterInput {
   or: [ModelSubscriptionInsuranceTypeFilterInput]
 }
 
-type Subscription {
-  onCreateInsuranceType(filter: ModelSubscriptionInsuranceTypeFilterInput): InsuranceType @aws_subscribe(mutations: ["createInsuranceType"])
-  onUpdateInsuranceType(filter: ModelSubscriptionInsuranceTypeFilterInput): InsuranceType @aws_subscribe(mutations: ["updateInsuranceType"])
-  onDeleteInsuranceType(filter: ModelSubscriptionInsuranceTypeFilterInput): InsuranceType @aws_subscribe(mutations: ["deleteInsuranceType"])
-  onCreateGroupHandS(filter: ModelSubscriptionGroupHandSFilterInput): GroupHandS @aws_subscribe(mutations: ["createGroupHandS"])
-  onUpdateGroupHandS(filter: ModelSubscriptionGroupHandSFilterInput): GroupHandS @aws_subscribe(mutations: ["updateGroupHandS"])
-  onDeleteGroupHandS(filter: ModelSubscriptionGroupHandSFilterInput): GroupHandS @aws_subscribe(mutations: ["deleteGroupHandS"])
-  onCreateWorkMen(filter: ModelSubscriptionWorkMenFilterInput): WorkMen @aws_subscribe(mutations: ["createWorkMen"])
-  onUpdateWorkMen(filter: ModelSubscriptionWorkMenFilterInput): WorkMen @aws_subscribe(mutations: ["updateWorkMen"])
-  onDeleteWorkMen(filter: ModelSubscriptionWorkMenFilterInput): WorkMen @aws_subscribe(mutations: ["deleteWorkMen"])
-  onCreateTravelIns(filter: ModelSubscriptionTravelInsFilterInput): TravelIns @aws_subscribe(mutations: ["createTravelIns"])
-  onUpdateTravelIns(filter: ModelSubscriptionTravelInsFilterInput): TravelIns @aws_subscribe(mutations: ["updateTravelIns"])
-  onDeleteTravelIns(filter: ModelSubscriptionTravelInsFilterInput): TravelIns @aws_subscribe(mutations: ["deleteTravelIns"])
-  onCreatePersonalAccident(filter: ModelSubscriptionPersonalAccidentFilterInput): PersonalAccident @aws_subscribe(mutations: ["createPersonalAccident"])
-  onUpdatePersonalAccident(filter: ModelSubscriptionPersonalAccidentFilterInput): PersonalAccident @aws_subscribe(mutations: ["updatePersonalAccident"])
-  onDeletePersonalAccident(filter: ModelSubscriptionPersonalAccidentFilterInput): PersonalAccident @aws_subscribe(mutations: ["deletePersonalAccident"])
-  onCreateInsClaim(filter: ModelSubscriptionInsClaimFilterInput): InsClaim @aws_subscribe(mutations: ["createInsClaim"])
-  onUpdateInsClaim(filter: ModelSubscriptionInsClaimFilterInput): InsClaim @aws_subscribe(mutations: ["updateInsClaim"])
-  onDeleteInsClaim(filter: ModelSubscriptionInsClaimFilterInput): InsClaim @aws_subscribe(mutations: ["deleteInsClaim"])
-  onCreateProbForm(filter: ModelSubscriptionProbFormFilterInput): ProbForm @aws_subscribe(mutations: ["createProbForm"])
-  onUpdateProbForm(filter: ModelSubscriptionProbFormFilterInput): ProbForm @aws_subscribe(mutations: ["updateProbForm"])
-  onDeleteProbForm(filter: ModelSubscriptionProbFormFilterInput): ProbForm @aws_subscribe(mutations: ["deleteProbForm"])
-  onCreateEmailNotifi(filter: ModelSubscriptionEmailNotifiFilterInput): EmailNotifi @aws_subscribe(mutations: ["createEmailNotifi"])
-  onUpdateEmailNotifi(filter: ModelSubscriptionEmailNotifiFilterInput): EmailNotifi @aws_subscribe(mutations: ["updateEmailNotifi"])
-  onDeleteEmailNotifi(filter: ModelSubscriptionEmailNotifiFilterInput): EmailNotifi @aws_subscribe(mutations: ["deleteEmailNotifi"])
-  onCreateOffshoreSheet(filter: ModelSubscriptionOffshoreSheetFilterInput): OffshoreSheet @aws_subscribe(mutations: ["createOffshoreSheet"])
-  onUpdateOffshoreSheet(filter: ModelSubscriptionOffshoreSheetFilterInput): OffshoreSheet @aws_subscribe(mutations: ["updateOffshoreSheet"])
-  onDeleteOffshoreSheet(filter: ModelSubscriptionOffshoreSheetFilterInput): OffshoreSheet @aws_subscribe(mutations: ["deleteOffshoreSheet"])
-  onCreateORMCSheet(filter: ModelSubscriptionORMCSheetFilterInput): ORMCSheet @aws_subscribe(mutations: ["createORMCSheet"])
-  onUpdateORMCSheet(filter: ModelSubscriptionORMCSheetFilterInput): ORMCSheet @aws_subscribe(mutations: ["updateORMCSheet"])
-  onDeleteORMCSheet(filter: ModelSubscriptionORMCSheetFilterInput): ORMCSheet @aws_subscribe(mutations: ["deleteORMCSheet"])
-  onCreateSBWSheet(filter: ModelSubscriptionSBWSheetFilterInput): SBWSheet @aws_subscribe(mutations: ["createSBWSheet"])
-  onUpdateSBWSheet(filter: ModelSubscriptionSBWSheetFilterInput): SBWSheet @aws_subscribe(mutations: ["updateSBWSheet"])
-  onDeleteSBWSheet(filter: ModelSubscriptionSBWSheetFilterInput): SBWSheet @aws_subscribe(mutations: ["deleteSBWSheet"])
-  onCreateBlng(filter: ModelSubscriptionBlngFilterInput): Blng @aws_subscribe(mutations: ["createBlng"])
-  onUpdateBlng(filter: ModelSubscriptionBlngFilterInput): Blng @aws_subscribe(mutations: ["updateBlng"])
-  onDeleteBlng(filter: ModelSubscriptionBlngFilterInput): Blng @aws_subscribe(mutations: ["deleteBlng"])
-  onCreateHeadOffice(filter: ModelSubscriptionHeadOfficeFilterInput): HeadOffice @aws_subscribe(mutations: ["createHeadOffice"])
-  onUpdateHeadOffice(filter: ModelSubscriptionHeadOfficeFilterInput): HeadOffice @aws_subscribe(mutations: ["updateHeadOffice"])
-  onDeleteHeadOffice(filter: ModelSubscriptionHeadOfficeFilterInput): HeadOffice @aws_subscribe(mutations: ["deleteHeadOffice"])
-  onCreateEmpRequisition(filter: ModelSubscriptionEmpRequisitionFilterInput): EmpRequisition @aws_subscribe(mutations: ["createEmpRequisition"])
-  onUpdateEmpRequisition(filter: ModelSubscriptionEmpRequisitionFilterInput): EmpRequisition @aws_subscribe(mutations: ["updateEmpRequisition"])
-  onDeleteEmpRequisition(filter: ModelSubscriptionEmpRequisitionFilterInput): EmpRequisition @aws_subscribe(mutations: ["deleteEmpRequisition"])
-  onCreateWeldingInfo(filter: ModelSubscriptionWeldingInfoFilterInput): WeldingInfo @aws_subscribe(mutations: ["createWeldingInfo"])
-  onUpdateWeldingInfo(filter: ModelSubscriptionWeldingInfoFilterInput): WeldingInfo @aws_subscribe(mutations: ["updateWeldingInfo"])
-  onDeleteWeldingInfo(filter: ModelSubscriptionWeldingInfoFilterInput): WeldingInfo @aws_subscribe(mutations: ["deleteWeldingInfo"])
-  onCreateTrainingReq(filter: ModelSubscriptionTrainingReqFilterInput): TrainingReq @aws_subscribe(mutations: ["createTrainingReq"])
-  onUpdateTrainingReq(filter: ModelSubscriptionTrainingReqFilterInput): TrainingReq @aws_subscribe(mutations: ["updateTrainingReq"])
-  onDeleteTrainingReq(filter: ModelSubscriptionTrainingReqFilterInput): TrainingReq @aws_subscribe(mutations: ["deleteTrainingReq"])
-  onCreateTrainingCertificates(filter: ModelSubscriptionTrainingCertificatesFilterInput): TrainingCertificates @aws_subscribe(mutations: ["createTrainingCertificates"])
-  onUpdateTrainingCertificates(filter: ModelSubscriptionTrainingCertificatesFilterInput): TrainingCertificates @aws_subscribe(mutations: ["updateTrainingCertificates"])
-  onDeleteTrainingCertificates(filter: ModelSubscriptionTrainingCertificatesFilterInput): TrainingCertificates @aws_subscribe(mutations: ["deleteTrainingCertificates"])
-  onCreateAddCourse(filter: ModelSubscriptionAddCourseFilterInput): AddCourse @aws_subscribe(mutations: ["createAddCourse"])
-  onUpdateAddCourse(filter: ModelSubscriptionAddCourseFilterInput): AddCourse @aws_subscribe(mutations: ["updateAddCourse"])
-  onDeleteAddCourse(filter: ModelSubscriptionAddCourseFilterInput): AddCourse @aws_subscribe(mutations: ["deleteAddCourse"])
-  onCreateEmpDepInsurance(filter: ModelSubscriptionEmpDepInsuranceFilterInput): EmpDepInsurance @aws_subscribe(mutations: ["createEmpDepInsurance"])
-  onUpdateEmpDepInsurance(filter: ModelSubscriptionEmpDepInsuranceFilterInput): EmpDepInsurance @aws_subscribe(mutations: ["updateEmpDepInsurance"])
-  onDeleteEmpDepInsurance(filter: ModelSubscriptionEmpDepInsuranceFilterInput): EmpDepInsurance @aws_subscribe(mutations: ["deleteEmpDepInsurance"])
-  onCreateEmpInsurance(filter: ModelSubscriptionEmpInsuranceFilterInput): EmpInsurance @aws_subscribe(mutations: ["createEmpInsurance"])
-  onUpdateEmpInsurance(filter: ModelSubscriptionEmpInsuranceFilterInput): EmpInsurance @aws_subscribe(mutations: ["updateEmpInsurance"])
-  onDeleteEmpInsurance(filter: ModelSubscriptionEmpInsuranceFilterInput): EmpInsurance @aws_subscribe(mutations: ["deleteEmpInsurance"])
-  onCreateSawpDetails(filter: ModelSubscriptionSawpDetailsFilterInput): SawpDetails @aws_subscribe(mutations: ["createSawpDetails"])
-  onUpdateSawpDetails(filter: ModelSubscriptionSawpDetailsFilterInput): SawpDetails @aws_subscribe(mutations: ["updateSawpDetails"])
-  onDeleteSawpDetails(filter: ModelSubscriptionSawpDetailsFilterInput): SawpDetails @aws_subscribe(mutations: ["deleteSawpDetails"])
-  onCreateDNDetails(filter: ModelSubscriptionDNDetailsFilterInput): DNDetails @aws_subscribe(mutations: ["createDNDetails"])
-  onUpdateDNDetails(filter: ModelSubscriptionDNDetailsFilterInput): DNDetails @aws_subscribe(mutations: ["updateDNDetails"])
-  onDeleteDNDetails(filter: ModelSubscriptionDNDetailsFilterInput): DNDetails @aws_subscribe(mutations: ["deleteDNDetails"])
-  onCreateBJLDetails(filter: ModelSubscriptionBJLDetailsFilterInput): BJLDetails @aws_subscribe(mutations: ["createBJLDetails"])
-  onUpdateBJLDetails(filter: ModelSubscriptionBJLDetailsFilterInput): BJLDetails @aws_subscribe(mutations: ["updateBJLDetails"])
-  onDeleteBJLDetails(filter: ModelSubscriptionBJLDetailsFilterInput): BJLDetails @aws_subscribe(mutations: ["deleteBJLDetails"])
-  onCreatePassportValid(filter: ModelSubscriptionPassportValidFilterInput): PassportValid @aws_subscribe(mutations: ["createPassportValid"])
-  onUpdatePassportValid(filter: ModelSubscriptionPassportValidFilterInput): PassportValid @aws_subscribe(mutations: ["updatePassportValid"])
-  onDeletePassportValid(filter: ModelSubscriptionPassportValidFilterInput): PassportValid @aws_subscribe(mutations: ["deletePassportValid"])
-  onCreateWPTracking(filter: ModelSubscriptionWPTrackingFilterInput): WPTracking @aws_subscribe(mutations: ["createWPTracking"])
-  onUpdateWPTracking(filter: ModelSubscriptionWPTrackingFilterInput): WPTracking @aws_subscribe(mutations: ["updateWPTracking"])
-  onDeleteWPTracking(filter: ModelSubscriptionWPTrackingFilterInput): WPTracking @aws_subscribe(mutations: ["deleteWPTracking"])
-  onCreateEmployeeNonLocalAcco(filter: ModelSubscriptionEmployeeNonLocalAccoFilterInput): EmployeeNonLocalAcco @aws_subscribe(mutations: ["createEmployeeNonLocalAcco"])
-  onUpdateEmployeeNonLocalAcco(filter: ModelSubscriptionEmployeeNonLocalAccoFilterInput): EmployeeNonLocalAcco @aws_subscribe(mutations: ["updateEmployeeNonLocalAcco"])
-  onDeleteEmployeeNonLocalAcco(filter: ModelSubscriptionEmployeeNonLocalAccoFilterInput): EmployeeNonLocalAcco @aws_subscribe(mutations: ["deleteEmployeeNonLocalAcco"])
-  onCreateLabourMedicalInfo(filter: ModelSubscriptionLabourMedicalInfoFilterInput): LabourMedicalInfo @aws_subscribe(mutations: ["createLabourMedicalInfo"])
-  onUpdateLabourMedicalInfo(filter: ModelSubscriptionLabourMedicalInfoFilterInput): LabourMedicalInfo @aws_subscribe(mutations: ["updateLabourMedicalInfo"])
-  onDeleteLabourMedicalInfo(filter: ModelSubscriptionLabourMedicalInfoFilterInput): LabourMedicalInfo @aws_subscribe(mutations: ["deleteLabourMedicalInfo"])
-  onCreateServiceRecord(filter: ModelSubscriptionServiceRecordFilterInput): ServiceRecord @aws_subscribe(mutations: ["createServiceRecord"])
-  onUpdateServiceRecord(filter: ModelSubscriptionServiceRecordFilterInput): ServiceRecord @aws_subscribe(mutations: ["updateServiceRecord"])
-  onDeleteServiceRecord(filter: ModelSubscriptionServiceRecordFilterInput): ServiceRecord @aws_subscribe(mutations: ["deleteServiceRecord"])
-  onCreateEmpLeaveDetails(filter: ModelSubscriptionEmpLeaveDetailsFilterInput): EmpLeaveDetails @aws_subscribe(mutations: ["createEmpLeaveDetails"])
-  onUpdateEmpLeaveDetails(filter: ModelSubscriptionEmpLeaveDetailsFilterInput): EmpLeaveDetails @aws_subscribe(mutations: ["updateEmpLeaveDetails"])
-  onDeleteEmpLeaveDetails(filter: ModelSubscriptionEmpLeaveDetailsFilterInput): EmpLeaveDetails @aws_subscribe(mutations: ["deleteEmpLeaveDetails"])
-  onCreateTerminationInfo(filter: ModelSubscriptionTerminationInfoFilterInput): TerminationInfo @aws_subscribe(mutations: ["createTerminationInfo"])
-  onUpdateTerminationInfo(filter: ModelSubscriptionTerminationInfoFilterInput): TerminationInfo @aws_subscribe(mutations: ["updateTerminationInfo"])
-  onDeleteTerminationInfo(filter: ModelSubscriptionTerminationInfoFilterInput): TerminationInfo @aws_subscribe(mutations: ["deleteTerminationInfo"])
-  onCreateEmpWorkInfo(filter: ModelSubscriptionEmpWorkInfoFilterInput): EmpWorkInfo @aws_subscribe(mutations: ["createEmpWorkInfo"])
-  onUpdateEmpWorkInfo(filter: ModelSubscriptionEmpWorkInfoFilterInput): EmpWorkInfo @aws_subscribe(mutations: ["updateEmpWorkInfo"])
-  onDeleteEmpWorkInfo(filter: ModelSubscriptionEmpWorkInfoFilterInput): EmpWorkInfo @aws_subscribe(mutations: ["deleteEmpWorkInfo"])
-  onCreateEmpPersonalInfo(filter: ModelSubscriptionEmpPersonalInfoFilterInput): EmpPersonalInfo @aws_subscribe(mutations: ["createEmpPersonalInfo"])
-  onUpdateEmpPersonalInfo(filter: ModelSubscriptionEmpPersonalInfoFilterInput): EmpPersonalInfo @aws_subscribe(mutations: ["updateEmpPersonalInfo"])
-  onDeleteEmpPersonalInfo(filter: ModelSubscriptionEmpPersonalInfoFilterInput): EmpPersonalInfo @aws_subscribe(mutations: ["deleteEmpPersonalInfo"])
-  onCreateIDDetails(filter: ModelSubscriptionIDDetailsFilterInput): IDDetails @aws_subscribe(mutations: ["createIDDetails"])
-  onUpdateIDDetails(filter: ModelSubscriptionIDDetailsFilterInput): IDDetails @aws_subscribe(mutations: ["updateIDDetails"])
-  onDeleteIDDetails(filter: ModelSubscriptionIDDetailsFilterInput): IDDetails @aws_subscribe(mutations: ["deleteIDDetails"])
-  onCreateCandIToEMP(filter: ModelSubscriptionCandIToEMPFilterInput): CandIToEMP @aws_subscribe(mutations: ["createCandIToEMP"])
-  onUpdateCandIToEMP(filter: ModelSubscriptionCandIToEMPFilterInput): CandIToEMP @aws_subscribe(mutations: ["updateCandIToEMP"])
-  onDeleteCandIToEMP(filter: ModelSubscriptionCandIToEMPFilterInput): CandIToEMP @aws_subscribe(mutations: ["deleteCandIToEMP"])
-  onCreateLocalMobilization(filter: ModelSubscriptionLocalMobilizationFilterInput): LocalMobilization @aws_subscribe(mutations: ["createLocalMobilization"])
-  onUpdateLocalMobilization(filter: ModelSubscriptionLocalMobilizationFilterInput): LocalMobilization @aws_subscribe(mutations: ["updateLocalMobilization"])
-  onDeleteLocalMobilization(filter: ModelSubscriptionLocalMobilizationFilterInput): LocalMobilization @aws_subscribe(mutations: ["deleteLocalMobilization"])
-  onCreateInterviewSchedule(filter: ModelSubscriptionInterviewScheduleFilterInput): InterviewSchedule @aws_subscribe(mutations: ["createInterviewSchedule"])
-  onUpdateInterviewSchedule(filter: ModelSubscriptionInterviewScheduleFilterInput): InterviewSchedule @aws_subscribe(mutations: ["updateInterviewSchedule"])
-  onDeleteInterviewSchedule(filter: ModelSubscriptionInterviewScheduleFilterInput): InterviewSchedule @aws_subscribe(mutations: ["deleteInterviewSchedule"])
-  onCreateEducationDetails(filter: ModelSubscriptionEducationDetailsFilterInput): EducationDetails @aws_subscribe(mutations: ["createEducationDetails"])
-  onUpdateEducationDetails(filter: ModelSubscriptionEducationDetailsFilterInput): EducationDetails @aws_subscribe(mutations: ["updateEducationDetails"])
-  onDeleteEducationDetails(filter: ModelSubscriptionEducationDetailsFilterInput): EducationDetails @aws_subscribe(mutations: ["deleteEducationDetails"])
-  onCreatePersonalDetails(filter: ModelSubscriptionPersonalDetailsFilterInput): PersonalDetails @aws_subscribe(mutations: ["createPersonalDetails"])
-  onUpdatePersonalDetails(filter: ModelSubscriptionPersonalDetailsFilterInput): PersonalDetails @aws_subscribe(mutations: ["updatePersonalDetails"])
-  onDeletePersonalDetails(filter: ModelSubscriptionPersonalDetailsFilterInput): PersonalDetails @aws_subscribe(mutations: ["deletePersonalDetails"])
-  onCreateUser(filter: ModelSubscriptionUserFilterInput): User @aws_subscribe(mutations: ["createUser"])
-  onUpdateUser(filter: ModelSubscriptionUserFilterInput): User @aws_subscribe(mutations: ["updateUser"])
-  onDeleteUser(filter: ModelSubscriptionUserFilterInput): User @aws_subscribe(mutations: ["deleteUser"])
-  onCreateTicketRequest(filter: ModelSubscriptionTicketRequestFilterInput): TicketRequest @aws_subscribe(mutations: ["createTicketRequest"])
-  onUpdateTicketRequest(filter: ModelSubscriptionTicketRequestFilterInput): TicketRequest @aws_subscribe(mutations: ["updateTicketRequest"])
-  onDeleteTicketRequest(filter: ModelSubscriptionTicketRequestFilterInput): TicketRequest @aws_subscribe(mutations: ["deleteTicketRequest"])
-  onCreateLeaveStatus(filter: ModelSubscriptionLeaveStatusFilterInput): LeaveStatus @aws_subscribe(mutations: ["createLeaveStatus"])
-  onUpdateLeaveStatus(filter: ModelSubscriptionLeaveStatusFilterInput): LeaveStatus @aws_subscribe(mutations: ["updateLeaveStatus"])
-  onDeleteLeaveStatus(filter: ModelSubscriptionLeaveStatusFilterInput): LeaveStatus @aws_subscribe(mutations: ["deleteLeaveStatus"])
-}
-
-type ModelGroupHandSConnection {
+type ModelGroupHandSConnection @aws_api_key @aws_iam {
   items: [GroupHandS]!
   nextToken: String
 }
@@ -1360,7 +1466,7 @@ input ModelSubscriptionGroupHandSFilterInput {
   or: [ModelSubscriptionGroupHandSFilterInput]
 }
 
-type ModelWorkMenConnection {
+type ModelWorkMenConnection @aws_api_key @aws_iam {
   items: [WorkMen]!
   nextToken: String
 }
@@ -1422,7 +1528,7 @@ input ModelSubscriptionWorkMenFilterInput {
   or: [ModelSubscriptionWorkMenFilterInput]
 }
 
-type ModelTravelInsConnection {
+type ModelTravelInsConnection @aws_api_key @aws_iam {
   items: [TravelIns]!
   nextToken: String
 }
@@ -1479,7 +1585,7 @@ input ModelSubscriptionTravelInsFilterInput {
   or: [ModelSubscriptionTravelInsFilterInput]
 }
 
-type ModelPersonalAccidentConnection {
+type ModelPersonalAccidentConnection @aws_api_key @aws_iam {
   items: [PersonalAccident]!
   nextToken: String
 }
@@ -1536,7 +1642,7 @@ input ModelSubscriptionPersonalAccidentFilterInput {
   or: [ModelSubscriptionPersonalAccidentFilterInput]
 }
 
-type ModelInsClaimConnection {
+type ModelInsClaimConnection @aws_api_key @aws_iam {
   items: [InsClaim]!
   nextToken: String
 }
@@ -1588,7 +1694,7 @@ input ModelSubscriptionInsClaimFilterInput {
   or: [ModelSubscriptionInsClaimFilterInput]
 }
 
-type ModelProbFormConnection {
+type ModelProbFormConnection @aws_api_key @aws_iam {
   items: [ProbForm]!
   nextToken: String
 }
@@ -1795,7 +1901,7 @@ input ModelSubscriptionProbFormFilterInput {
   or: [ModelSubscriptionProbFormFilterInput]
 }
 
-type ModelEmailNotifiConnection {
+type ModelEmailNotifiConnection @aws_api_key @aws_iam {
   items: [EmailNotifi]!
   nextToken: String
 }
@@ -1872,7 +1978,7 @@ input ModelSubscriptionEmailNotifiFilterInput {
   or: [ModelSubscriptionEmailNotifiFilterInput]
 }
 
-type ModelOffshoreSheetConnection {
+type ModelOffshoreSheetConnection @aws_api_key @aws_iam {
   items: [OffshoreSheet]!
   nextToken: String
 }
@@ -1934,7 +2040,7 @@ input ModelSubscriptionOffshoreSheetFilterInput {
   or: [ModelSubscriptionOffshoreSheetFilterInput]
 }
 
-type ModelORMCSheetConnection {
+type ModelORMCSheetConnection @aws_api_key @aws_iam {
   items: [ORMCSheet]!
   nextToken: String
 }
@@ -1996,7 +2102,7 @@ input ModelSubscriptionORMCSheetFilterInput {
   or: [ModelSubscriptionORMCSheetFilterInput]
 }
 
-type ModelSBWSheetConnection {
+type ModelSBWSheetConnection @aws_api_key @aws_iam {
   items: [SBWSheet]!
   nextToken: String
 }
@@ -2058,7 +2164,7 @@ input ModelSubscriptionSBWSheetFilterInput {
   or: [ModelSubscriptionSBWSheetFilterInput]
 }
 
-type ModelBlngConnection {
+type ModelBlngConnection @aws_api_key @aws_iam {
   items: [Blng]!
   nextToken: String
 }
@@ -2120,7 +2226,7 @@ input ModelSubscriptionBlngFilterInput {
   or: [ModelSubscriptionBlngFilterInput]
 }
 
-type ModelHeadOfficeConnection {
+type ModelHeadOfficeConnection @aws_api_key @aws_iam {
   items: [HeadOffice]!
   nextToken: String
 }
@@ -2182,7 +2288,7 @@ input ModelSubscriptionHeadOfficeFilterInput {
   or: [ModelSubscriptionHeadOfficeFilterInput]
 }
 
-type ModelEmpRequisitionConnection {
+type ModelEmpRequisitionConnection @aws_api_key @aws_iam {
   items: [EmpRequisition]!
   nextToken: String
 }
@@ -2284,7 +2390,7 @@ input ModelSubscriptionEmpRequisitionFilterInput {
   or: [ModelSubscriptionEmpRequisitionFilterInput]
 }
 
-type ModelWeldingInfoConnection {
+type ModelWeldingInfoConnection @aws_api_key @aws_iam {
   items: [WeldingInfo]!
   nextToken: String
 }
@@ -2416,7 +2522,7 @@ input ModelSubscriptionWeldingInfoFilterInput {
   or: [ModelSubscriptionWeldingInfoFilterInput]
 }
 
-type ModelTrainingReqConnection {
+type ModelTrainingReqConnection @aws_api_key @aws_iam {
   items: [TrainingReq]!
   nextToken: String
 }
@@ -2528,7 +2634,7 @@ input ModelSubscriptionTrainingReqFilterInput {
   or: [ModelSubscriptionTrainingReqFilterInput]
 }
 
-type ModelTrainingCertificatesConnection {
+type ModelTrainingCertificatesConnection @aws_api_key @aws_iam {
   items: [TrainingCertificates]!
   nextToken: String
 }
@@ -2610,7 +2716,7 @@ input ModelSubscriptionTrainingCertificatesFilterInput {
   or: [ModelSubscriptionTrainingCertificatesFilterInput]
 }
 
-type ModelAddCourseConnection {
+type ModelAddCourseConnection @aws_api_key @aws_iam {
   items: [AddCourse]!
   nextToken: String
 }
@@ -2667,7 +2773,7 @@ input ModelSubscriptionAddCourseFilterInput {
   or: [ModelSubscriptionAddCourseFilterInput]
 }
 
-type ModelEmpDepInsuranceConnection {
+type ModelEmpDepInsuranceConnection @aws_api_key @aws_iam {
   items: [EmpDepInsurance]!
   nextToken: String
 }
@@ -2719,7 +2825,7 @@ input ModelSubscriptionEmpDepInsuranceFilterInput {
   or: [ModelSubscriptionEmpDepInsuranceFilterInput]
 }
 
-type ModelEmpInsuranceConnection {
+type ModelEmpInsuranceConnection @aws_api_key @aws_iam {
   items: [EmpInsurance]!
   nextToken: String
 }
@@ -2806,7 +2912,7 @@ input ModelSubscriptionEmpInsuranceFilterInput {
   or: [ModelSubscriptionEmpInsuranceFilterInput]
 }
 
-type ModelSawpDetailsConnection {
+type ModelSawpDetailsConnection @aws_api_key @aws_iam {
   items: [SawpDetails]!
   nextToken: String
 }
@@ -2868,7 +2974,7 @@ input ModelSubscriptionSawpDetailsFilterInput {
   or: [ModelSubscriptionSawpDetailsFilterInput]
 }
 
-type ModelDNDetailsConnection {
+type ModelDNDetailsConnection @aws_api_key @aws_iam {
   items: [DNDetails]!
   nextToken: String
 }
@@ -2975,7 +3081,7 @@ input ModelSubscriptionDNDetailsFilterInput {
   or: [ModelSubscriptionDNDetailsFilterInput]
 }
 
-type ModelBJLDetailsConnection {
+type ModelBJLDetailsConnection @aws_api_key @aws_iam {
   items: [BJLDetails]!
   nextToken: String
 }
@@ -3102,7 +3208,7 @@ input ModelSubscriptionBJLDetailsFilterInput {
   or: [ModelSubscriptionBJLDetailsFilterInput]
 }
 
-type ModelPassportValidConnection {
+type ModelPassportValidConnection @aws_api_key @aws_iam {
   items: [PassportValid]!
   nextToken: String
 }
@@ -3219,7 +3325,7 @@ input ModelSubscriptionPassportValidFilterInput {
   or: [ModelSubscriptionPassportValidFilterInput]
 }
 
-type ModelWPTrackingConnection {
+type ModelWPTrackingConnection @aws_api_key @aws_iam {
   items: [WPTracking]!
   nextToken: String
 }
@@ -3461,7 +3567,7 @@ input ModelSubscriptionWPTrackingFilterInput {
   or: [ModelSubscriptionWPTrackingFilterInput]
 }
 
-type ModelEmployeeNonLocalAccoConnection {
+type ModelEmployeeNonLocalAccoConnection @aws_api_key @aws_iam {
   items: [EmployeeNonLocalAcco]!
   nextToken: String
 }
@@ -3518,7 +3624,7 @@ input ModelSubscriptionEmployeeNonLocalAccoFilterInput {
   or: [ModelSubscriptionEmployeeNonLocalAccoFilterInput]
 }
 
-type ModelLabourMedicalInfoConnection {
+type ModelLabourMedicalInfoConnection @aws_api_key @aws_iam {
   items: [LabourMedicalInfo]!
   nextToken: String
 }
@@ -3615,7 +3721,7 @@ input ModelSubscriptionLabourMedicalInfoFilterInput {
   or: [ModelSubscriptionLabourMedicalInfoFilterInput]
 }
 
-type ModelServiceRecordConnection {
+type ModelServiceRecordConnection @aws_api_key @aws_iam {
   items: [ServiceRecord]!
   nextToken: String
 }
@@ -3742,7 +3848,7 @@ input ModelSubscriptionServiceRecordFilterInput {
   or: [ModelSubscriptionServiceRecordFilterInput]
 }
 
-type ModelEmpLeaveDetailsConnection {
+type ModelEmpLeaveDetailsConnection @aws_api_key @aws_iam {
   items: [EmpLeaveDetails]!
   nextToken: String
 }
@@ -3763,6 +3869,14 @@ input ModelEmpLeaveDetailsFilterInput {
   sickLeave: ModelStringInput
   sickLeaveDate: ModelStringInput
   hospLeave: ModelStringInput
+  remainingAnualLeave: ModelStringInput
+  remainingSickLeave: ModelStringInput
+  remainingMateLeave: ModelStringInput
+  remainingMrageLeave: ModelStringInput
+  remainingPaternityLeave: ModelStringInput
+  remainingHosLeave: ModelStringInput
+  remainingCompasLeave: ModelStringInput
+  unPaidAuthorize: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelEmpLeaveDetailsFilterInput]
@@ -3785,6 +3899,14 @@ input ModelEmpLeaveDetailsConditionInput {
   sickLeave: ModelStringInput
   sickLeaveDate: ModelStringInput
   hospLeave: ModelStringInput
+  remainingAnualLeave: ModelStringInput
+  remainingSickLeave: ModelStringInput
+  remainingMateLeave: ModelStringInput
+  remainingMrageLeave: ModelStringInput
+  remainingPaternityLeave: ModelStringInput
+  remainingHosLeave: ModelStringInput
+  remainingCompasLeave: ModelStringInput
+  unPaidAuthorize: ModelStringInput
   and: [ModelEmpLeaveDetailsConditionInput]
   or: [ModelEmpLeaveDetailsConditionInput]
   not: ModelEmpLeaveDetailsConditionInput
@@ -3808,6 +3930,14 @@ input CreateEmpLeaveDetailsInput {
   sickLeave: String
   sickLeaveDate: String
   hospLeave: String
+  remainingAnualLeave: String
+  remainingSickLeave: String
+  remainingMateLeave: String
+  remainingMrageLeave: String
+  remainingPaternityLeave: String
+  remainingHosLeave: String
+  remainingCompasLeave: String
+  unPaidAuthorize: String
 }
 
 input UpdateEmpLeaveDetailsInput {
@@ -3826,6 +3956,14 @@ input UpdateEmpLeaveDetailsInput {
   sickLeave: String
   sickLeaveDate: String
   hospLeave: String
+  remainingAnualLeave: String
+  remainingSickLeave: String
+  remainingMateLeave: String
+  remainingMrageLeave: String
+  remainingPaternityLeave: String
+  remainingHosLeave: String
+  remainingCompasLeave: String
+  unPaidAuthorize: String
 }
 
 input DeleteEmpLeaveDetailsInput {
@@ -3848,13 +3986,21 @@ input ModelSubscriptionEmpLeaveDetailsFilterInput {
   sickLeave: ModelSubscriptionStringInput
   sickLeaveDate: ModelSubscriptionStringInput
   hospLeave: ModelSubscriptionStringInput
+  remainingAnualLeave: ModelSubscriptionStringInput
+  remainingSickLeave: ModelSubscriptionStringInput
+  remainingMateLeave: ModelSubscriptionStringInput
+  remainingMrageLeave: ModelSubscriptionStringInput
+  remainingPaternityLeave: ModelSubscriptionStringInput
+  remainingHosLeave: ModelSubscriptionStringInput
+  remainingCompasLeave: ModelSubscriptionStringInput
+  unPaidAuthorize: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionEmpLeaveDetailsFilterInput]
   or: [ModelSubscriptionEmpLeaveDetailsFilterInput]
 }
 
-type ModelTerminationInfoConnection {
+type ModelTerminationInfoConnection @aws_api_key @aws_iam {
   items: [TerminationInfo]!
   nextToken: String
 }
@@ -3986,7 +4132,7 @@ input ModelSubscriptionTerminationInfoFilterInput {
   or: [ModelSubscriptionTerminationInfoFilterInput]
 }
 
-type ModelEmpWorkInfoConnection {
+type ModelEmpWorkInfoConnection @aws_api_key @aws_iam {
   items: [EmpWorkInfo]!
   nextToken: String
 }
@@ -4168,7 +4314,7 @@ input ModelSubscriptionEmpWorkInfoFilterInput {
   or: [ModelSubscriptionEmpWorkInfoFilterInput]
 }
 
-type ModelEmpPersonalInfoConnection {
+type ModelEmpPersonalInfoConnection @aws_api_key @aws_iam {
   items: [EmpPersonalInfo]!
   nextToken: String
 }
@@ -4355,7 +4501,7 @@ input ModelSubscriptionEmpPersonalInfoFilterInput {
   or: [ModelSubscriptionEmpPersonalInfoFilterInput]
 }
 
-type ModelIDDetailsConnection {
+type ModelIDDetailsConnection @aws_api_key @aws_iam {
   items: [IDDetails]!
   nextToken: String
 }
@@ -4542,7 +4688,7 @@ input ModelSubscriptionIDDetailsFilterInput {
   or: [ModelSubscriptionIDDetailsFilterInput]
 }
 
-type ModelCandIToEMPConnection {
+type ModelCandIToEMPConnection @aws_api_key @aws_iam {
   items: [CandIToEMP]!
   nextToken: String
 }
@@ -4674,7 +4820,7 @@ input ModelSubscriptionCandIToEMPFilterInput {
   or: [ModelSubscriptionCandIToEMPFilterInput]
 }
 
-type ModelLocalMobilizationConnection {
+type ModelLocalMobilizationConnection @aws_api_key @aws_iam {
   items: [LocalMobilization]!
   nextToken: String
 }
@@ -4776,7 +4922,7 @@ input ModelSubscriptionLocalMobilizationFilterInput {
   or: [ModelSubscriptionLocalMobilizationFilterInput]
 }
 
-type ModelInterviewScheduleConnection {
+type ModelInterviewScheduleConnection @aws_api_key @aws_iam {
   items: [InterviewSchedule]!
   nextToken: String
 }
@@ -4878,7 +5024,7 @@ input ModelSubscriptionInterviewScheduleFilterInput {
   or: [ModelSubscriptionInterviewScheduleFilterInput]
 }
 
-type ModelEducationDetailsConnection {
+type ModelEducationDetailsConnection @aws_api_key @aws_iam {
   items: [EducationDetails]!
   nextToken: String
 }
@@ -5025,7 +5171,7 @@ input ModelSubscriptionEducationDetailsFilterInput {
   or: [ModelSubscriptionEducationDetailsFilterInput]
 }
 
-type ModelPersonalDetailsConnection {
+type ModelPersonalDetailsConnection @aws_api_key @aws_iam {
   items: [PersonalDetails]!
   nextToken: String
 }
@@ -5252,7 +5398,7 @@ input ModelSubscriptionPersonalDetailsFilterInput {
   or: [ModelSubscriptionPersonalDetailsFilterInput]
 }
 
-type ModelUserConnection {
+type ModelUserConnection @aws_api_key @aws_iam {
   items: [User]!
   nextToken: String
 }
@@ -5319,7 +5465,7 @@ input ModelSubscriptionUserFilterInput {
   or: [ModelSubscriptionUserFilterInput]
 }
 
-type ModelTicketRequestConnection {
+type ModelTicketRequestConnection @aws_api_key @aws_iam {
   items: [TicketRequest]!
   nextToken: String
 }
@@ -5426,7 +5572,7 @@ input ModelSubscriptionTicketRequestFilterInput {
   or: [ModelSubscriptionTicketRequestFilterInput]
 }
 
-type ModelLeaveStatusConnection {
+type ModelLeaveStatusConnection @aws_api_key @aws_iam {
   items: [LeaveStatus]!
   nextToken: String
 }

@@ -25,11 +25,9 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
   const invoiceRef = useRef();
   const mainRef = useRef();
 
-  const handlePrpint = useReactToPrint({
-    content: () => {
-      console.log(invoiceRef.current); // Log the reference to ensure it's correct
-      return invoiceRef.current;
-    }, 
+  const handlePrint = useReactToPrint({
+    
+    content: () => invoiceRef.current,
     onBeforePrint: () => console.log("Preparing print..."),
     onAfterPrint: () => console.log("Print complete"),
     pageStyle: "print", // This ensures the print view uses a different CSS style
@@ -573,14 +571,12 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       "Re-Entry Visa Expiry": formatDate(reEntryVisaExp),
       "Remarks for Immigration": remarkImmig,
       //   airTktStatus,reEntryVisa,immigApproval,reEntryVisaExp,remarkImmig,
-
       
     },
   };
   // const documents = parseDocumentData(passingValue.empUpDocs);
   const documentsTwo = parseDocumentData(passingValue.uploadBwn);
   const documentThree = parseDocumentData(passingValue.workInfoUploads);
-
 
   // console.log(depInsurance, "2.o")
 
@@ -628,7 +624,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                     paafCvevUpload={paafCvevUpload}
                     ppUpload={ppUpload}
                     supportDocUpload={supportDocUpload}
-                    handlePrint={handlePrpint}
+                    handlePrint={handlePrint}
                     invoiceRef={invoiceRef}
                     educationalDetails={educationalDetails}
                     formatDate={formatDate}
@@ -639,7 +635,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                 {activeTab === 1 && (
                   <FamilyDetails
                     familyDetails={familyDetails}
-                    handlePrint={handlePrpint}
+                    handlePrint={handlePrint}
                     invoiceRef={invoiceRef}
                     formatDate={formatDate}
                     mainRef={mainRef}
@@ -653,7 +649,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                     uploadBwn={uploadBwn}
                     documentsTwo={documentsTwo}
                     uploadRegis={uploadRegis}
-                    handlePrint={handlePrpint}
+                    handlePrint={handlePrint}
                     invoiceRef={invoiceRef}
                     dependPass={dependPass}
                     formatDate={formatDate}
@@ -663,7 +659,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                 {activeTab === 3 && (
                   <AccommodationDetails
                     accommodationInfo={accommodationInfo}
-                    handlePrint={handlePrpint}
+                    handlePrint={handlePrint}
                     invoiceRef={invoiceRef}
                     mainRef={mainRef}
                   />
@@ -672,7 +668,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                   <InsuranceDetails
                     insuranceInfo={insuranceInfo}
                     DependentInsurance={DependentInsurance}
-                    handlePrint={handlePrpint}
+                    handlePrint={handlePrint}
                     invoiceRef={invoiceRef}
                     depInsurance={depInsurance}
                     empInsUpload={empInsUpload}
@@ -700,7 +696,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                     uploadLP={uploadLP}
                     uploadPR={uploadPR}
                     uploadSP={uploadSP}
-                    handlePrint={handlePrpint}
+                    handlePrint={handlePrint}
                     invoiceRef={invoiceRef}
                     WIContract={WIContract}
                     WILeaveEntitle={WILeaveEntitle}
@@ -729,7 +725,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                     onDocumentLoadSuccess={onDocumentLoadSuccess}
                     setPageNumber={setPageNumber}
                     inducBriefUp={inducBriefUp}
-                    handlePrint={handlePrpint}
+                    handlePrint={handlePrint}
                     invoiceRef={invoiceRef}
                     formatDate={formatDate}
                     arrivStampUpload={arrivStampUpload}

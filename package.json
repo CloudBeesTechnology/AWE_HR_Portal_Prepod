@@ -39,7 +39,7 @@
     "react-router-dom": "^7.0.2",
     "react-scripts": "5.0.1",
     "react-scroll": "^1.9.0",
-    "react-to-print": "^3.0.2",
+    "react-to-print": "^2.15.1",
     "sheetjs-style": "^0.15.8",
     "tailwind-scrollbar-hide": "^1.1.7",
     "web-vitals": "^2.1.4",

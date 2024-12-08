@@ -23,6 +23,7 @@ import {
   listInterviewSchedules,
   listInsClaims,
   listWorkMen,
+  listHiringJobs,
 } from "../graphql/queries";
 
 export const DataSupply = createContext();
@@ -36,7 +37,7 @@ const DataStoredContext = ({ children }) => {
     empLeaveStatusData: [],
     empPDData: [],
     IDData: [],
-    workInfoData: [],   
+    workInfoData: [],
     terminateData: [],
     leaveDetailsData: [],
     SRData: [],
@@ -51,8 +52,9 @@ const DataStoredContext = ({ children }) => {
     SawpDetails: [],
     IVSSDetails: [],
     AddCourseDetails: [],
-    insuranceClaimsData:[],
-    workMenDetails:[],
+    insuranceClaimsData: [],
+    workMenDetails: [],
+    hiringData: [],
   });
 
   useEffect(() => {
@@ -81,6 +83,7 @@ const DataStoredContext = ({ children }) => {
           { query: listAddCourses, key: "AddCourseDetails" },
           { query: listInsClaims, key: "insuranceClaimsData" },
           { query: listWorkMen, key: "workMenDetails" },
+          { query: listHiringJobs, key: "hiringData" },
         ];
         const limit = 10000;
         const responses = await Promise.all(
@@ -98,6 +101,7 @@ const DataStoredContext = ({ children }) => {
               ?.items || [];
           return { ...acc, [key]: items };
         }, {});
+        console.log(newData);
 
         setDataState((prevState) => ({ ...prevState, ...newData }));
       } catch (error) {

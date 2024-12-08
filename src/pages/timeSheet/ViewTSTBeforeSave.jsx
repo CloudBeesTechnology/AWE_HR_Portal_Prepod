@@ -105,7 +105,7 @@ export const ViewTSTBeforeSave = ({
                   : null,
               };
             });
-            console.log(mergedData);
+            // console.log(mergedData);
 
             setData(mergedData); // Set merged data
             setSecondaryData(mergedData);
@@ -369,7 +369,7 @@ export const ViewTSTBeforeSave = ({
       const finalResult = result.map((val) => {
         return { ...val, managerData };
       });
-      console.log(finalResult);
+      // console.log(finalResult);
       //   CREATE
       const currentDate = new Date().toLocaleDateString();
       const DailySheet = {
@@ -388,10 +388,10 @@ export const ViewTSTBeforeSave = ({
           })
           .then((res) => {
             if (res.data.createOffshoreSheet) {
-              console.log(
-                "res.data.createOffshoreSheet : ",
-                res.data.createOffshoreSheet
-              );
+              // console.log(
+              //   "res.data.createOffshoreSheet : ",
+              //   res.data.createOffshoreSheet
+              // );
               toggleSFAMessage(true);
             }
           })
@@ -448,10 +448,10 @@ export const ViewTSTBeforeSave = ({
             })
             .then((res) => {
               if (res.data.updateOffshoreSheet) {
-                console.log(
-                  "res.data.updateOffshoreSheet : ",
-                  res.data.updateOffshoreSheet
-                );
+                // console.log(
+                //   "res.data.updateOffshoreSheet : ",
+                //   res.data.updateOffshoreSheet
+                // );
                 toggleSFAMessage(true);
                 setVisibleData([]);
                 // setData(null);
@@ -482,9 +482,9 @@ export const ViewTSTBeforeSave = ({
             <table className="styled-table">
               <thead className="sticky-header">
                 <tr className="text_size_5">
-                  <td className="px-4 flex-1">S No.</td>
+                  <td className="px-4 flex-1 text_size_7">S No.</td>
                   {AllFieldData?.tableHeader.map((header, index) => (
-                    <td key={index} className="px-5 flex-1">
+                    <td key={index} className="px-5 flex-1 text_size_7">
                       {header}
                     </td>
                   )) ?? (
@@ -504,7 +504,7 @@ export const ViewTSTBeforeSave = ({
                   {showStatusCol === true ? (
                     ""
                   ) : (
-                    <td className="px-5 flex-">STATUS</td>
+                    <td className="px-5 flex-1 text_size_7">STATUS</td>
                   )}
                 </tr>
               </thead>

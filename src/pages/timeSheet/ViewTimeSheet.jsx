@@ -154,7 +154,7 @@ import { FilterForTimeSheet } from "./FilterForTimeSheet";
 import { useFetchData } from "./customTimeSheet/UseFetchData";
 import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
 import { useScrollableView } from "./customTimeSheet/UseScrollableView";
-
+import { FaArrowLeft } from "react-icons/fa";
 export const ViewTimeSheet = () => {
   const [categoryFilter, setCategoryFilter] = useState("BLNG");
   const [toggleClick, setToggleClick] = useState(false);
@@ -450,10 +450,21 @@ export const ViewTimeSheet = () => {
     // <section class="min-h-screen p-10 bg-[#F5F6F1]"><div class=" screen-size flex justify-between items-center flex-wrap gap-10 text-black"><div class=" shadow-[0_1px_6px_1px_rgba(0,0,0,0.2)] rounded-3xl w-72 h-50 p-4 bg-white border-4 border-white cursor-pointer transition-all duration-50 hover:border-[#faf362] hover:border-4"><div class="bg-[#F58DC3] rounded-full my-8 w-24 h-24 center m-auto"><img class="w-13 h-16 object-cover" src="/src/assets/recruitment/recruitdash/local-cv.svg" alt="0 Icon not found"></div><h5 class="text-[18px] font-semibold text-center">Local CV</h5></div><div class=" shadow-[0_1px_6px_1px_rgba(0,0,0,0.2)] rounded-3xl w-72 h-50 p-4 bg-white border-4 border-white cursor-pointer transition-all duration-50 hover:border-[#faf362] hover:border-4"><div class="bg-[#B1F094] rounded-full my-8 w-24 h-24 center m-auto"><img class="w-13 h-16 object-cover" src="/src/assets/recruitment/recruitdash/non-local-cv.svg" alt="1 Icon not found"></div><h5 class="text-[18px] font-semibold text-center">Non Local CV</h5></div><div class=" shadow-[0_1px_6px_1px_rgba(0,0,0,0.2)] rounded-3xl w-72 h-50 p-4 bg-white border-4 border-white cursor-pointer transition-all duration-50 hover:border-[#faf362] hover:border-4"><div class="bg-[#BF91FF] rounded-full my-8 w-24 h-24 center m-auto"><img class="w-13 h-16 object-cover" src="/src/assets/recruitment/recruitdash/status.svg" alt="2 Icon not found"></div><h5 class="text-[18px] font-semibold text-center">Status</h5></div></div></section>
     <div className="bg-[#fafaf6] h-screen border border-[#fafaf6]">
       <div className="screen-size m-9 ">
-        <Link to="/timeSheet" className="text-[#0033ffe2]">
+        {/* <Link to="/timeSheet" className="text-[#0033ffe2]">
           Back
         </Link>
-        <p className="text-xl font-medium py-6">View Time Sheet</p>
+        <p className="text-xl font-medium py-6">View Time Sheet</p> */}
+        <div className="m-5 flex justify-between">
+          <div className=" flex items-center">
+            <Link to="/timeSheet" className="text-xl flex-1 text-grey">
+              <FaArrowLeft />
+            </Link>
+          </div>
+          <header className="flex justify-center text_size_2 py-5 text-dark_grey ">
+            <p>View Time Sheet</p>
+          </header>
+          <div></div>
+        </div>
         {/* Original */}
         <div className="flex  justify-between items-center w-full">
           <div className="flex justify-start gap-4 ">

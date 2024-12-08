@@ -11,14 +11,14 @@ export const UploadOffshoreFile = (
     const workbook = XLSX.read(excelFile, { type: "buffer" });
 
     const worksheetNameLength = workbook.SheetNames;
-    console.log("WorkSheet Names :", worksheetNameLength);
+    // console.log("WorkSheet Names :", worksheetNameLength);
     const allSheets = [];
 
     worksheetNameLength.forEach((sheetName) => {
       const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
       allSheets.push({ sheetName, data: sheet });
     });
-    console.log(allSheets);
+    // console.log(allSheets);
 
     var dataWithDateAndLocation = [];
 
@@ -105,7 +105,7 @@ export const UploadOffshoreFile = (
         };
 
         tbodyHeader.push(combinedTbodyHeader);
-        console.log(combinedTbodyHeader);
+        // console.log(combinedTbodyHeader);
 
         const tbodyRows = sheet.data
           .slice(8)
@@ -119,7 +119,7 @@ export const UploadOffshoreFile = (
         };
       });
 
-    console.log(processedSheets);
+    // console.log(processedSheets);
     const finalFilterdData = [];
 
     processedSheets &&
@@ -139,13 +139,13 @@ export const UploadOffshoreFile = (
         let totalIndex = MergeDateLocation.findIndex(
           (item) => item.NAME === "TOTAL"
         );
-        console.log(tbodyData);
+        // console.log(tbodyData);
         console.log(totalIndex);
         if (totalIndex > -1) {
           let slicedData = MergeDateLocation.slice(0, totalIndex);
-          console.log(slicedData);
+          // console.log(slicedData);
           let filteredData = slicedData.filter((item) => item.NAME !== null);
-          console.log(filteredData);
+          // console.log(filteredData);
           const filterdData = filteredData.flat();
 
           finalFilterdData.push(...filterdData);
@@ -168,7 +168,7 @@ export const UploadOffshoreFile = (
           date: formattedDate,
         };
       });
-    console.log(result);
+    // console.log(result);
     function cleanKey(key) {
       if (typeof key !== "string") {
         return key; // Return value if not a string (e.g., number, object)
@@ -186,7 +186,7 @@ export const UploadOffshoreFile = (
 
       return cleanedItem;
     });
-    console.log("formattedData : ", formattedData);
+    // console.log("formattedData : ", formattedData);
     setExcelData(formattedData);
     setLoading(false);
     return tbodyHeader;

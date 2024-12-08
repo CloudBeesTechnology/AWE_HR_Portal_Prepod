@@ -29,12 +29,12 @@ export const UploadBLNGfile = (
         allSheets.push({ sheetName, data: sheet });
       });
 
-      console.log(allSheets);
+      // console.log(allSheets);
       const getResult =
         allSheets &&
         allSheets.map((sheet) => {
           const data = sheet.data;
-          console.log(data);
+          // console.log(data);
           var headerSlicedData = data.slice(0, 1);
           const changedHeader = headerSlicedData.map((columns) => {
             const foundKey = Object.entries(columns).map(([key, value]) => {
@@ -44,7 +44,7 @@ export const UploadBLNGfile = (
           });
           const result = changedHeader.flat().flat();
           var bodySlicedData = data.slice(1);
-          console.log(bodySlicedData);
+          // console.log(bodySlicedData);
           bodySlicedData.forEach((bodyData) => {
             const row = {};
 
@@ -87,7 +87,7 @@ export const UploadBLNGfile = (
 
         return NewKeyValueAdded;
       });
-      console.log("formattedData : ", formattedData);
+      // console.log("formattedData : ", formattedData);
       // Transforming the data
 
       // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -257,7 +257,7 @@ export const UploadBLNGfile = (
 
         return acc;
       }, []);
-      console.log("transformedData : ", transformedData);
+      // console.log("transformedData : ", transformedData);
 
       transformedData.forEach((entry) => {
         if (entry.FID && entry.ENTRANCEDATEUSED) {

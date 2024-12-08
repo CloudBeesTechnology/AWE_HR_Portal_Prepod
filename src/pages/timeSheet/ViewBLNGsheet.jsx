@@ -477,7 +477,7 @@ export const ViewBLNGsheet = ({
           });
 
           if (res.data.createBlng) {
-            console.log("res.data.createBlng : ", res.data.createBlng);
+            // console.log("res.data.createBlng : ", res.data.createBlng);
             toggleSFAMessage(true);
           }
         } catch (err) {
@@ -600,10 +600,10 @@ export const ViewBLNGsheet = ({
                     // className="bg-lite_grey  text-dark_grey text_size_5"
                     className="text_size_5"
                   >
-                    <td className="px-4 text-center">S No.</td>
+                    <td className="px-4 text-center text_size_7">S No.</td>
 
                     {AllFieldData?.tableHeader.map((header, index) => (
-                      <td key={index} className="px-4 flex-1">
+                      <td key={index} className="px-4 flex-1 text_size_7">
                         {header}
                       </td>
                     )) ?? (
@@ -616,7 +616,7 @@ export const ViewBLNGsheet = ({
                     {showStatusCol === true ? (
                       ""
                     ) : (
-                      <td className="px-4 text-center">STATUS</td>
+                      <td className="px-4 text-center text_size_7">STATUS</td>
                     )}
                   </tr>
                 </thead>

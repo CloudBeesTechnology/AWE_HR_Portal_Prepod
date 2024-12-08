@@ -226,8 +226,6 @@ export const AllEmployee = () => {
             placeholder="Search by Name or Emp ID"
             allEmpDetails={mergeData}
             searchUserList={setFilteredData}
-            // value={searchTerm}
-            // onChange={handleSearch}
             className="py-2 px-4 rounded-lg shadow-[0_1px_6px_1px_rgba(0,0,0,0.2)]"
           />
           <img
@@ -237,19 +235,19 @@ export const AllEmployee = () => {
           />
         </div>
       </div>
-      <div className=" overflow-x-auto  mt-8 w-[100%] ml-4 rounded-md">
+      <div className=" overflow-x-auto  mt-8 w-[100%] ml-4 rounded-xl">
         <div className="w-full px-4 max-h-[calc(70vh-7rem)] overflow-y-auto">
           <table className="w-full rounded-xl table-auto">
             <thead className="bg-[#939393] text-center text-white sticky top-0">
               <tr>
-                <th className=" py-4 px-2 ">Employee ID</th>
+                <th className=" py-4 px-2 rounded-tl-xl">Employee ID</th>
                 <th className="py-4 px-2 ">Badge No</th>
                 <th className="py-4 px-2">Name</th>
                 <th className="py-4 px-2 ">DOB</th>
                 <th className="py-4 px-2">Nationality</th>
                 <th className="py-4 px-2 ">Email</th>
                 <th className="py-4 px-2 ">Contact No</th>
-                <th className="py-4 px-2 ">Status</th>
+                <th className="py-4 px-2 rounded-tl-xl">Status</th>
               </tr>
             </thead>
             <tbody className="bg-white text-center text-sm font-semibold text-dark_grey">
@@ -259,7 +257,6 @@ export const AllEmployee = () => {
                   key={index}
                   className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)]"
                   onClick={() => {
-                    // console.log("Clicked candidate data:", candidate);
                     {handleFormShow(candidate)}
                   } 
                 }
@@ -268,7 +265,6 @@ export const AllEmployee = () => {
                   <td className=" py-4 px-4 ">{candidate?.empBadgeNo || "N/A"}</td>
                   <td className="py-4 px-4 ">{candidate?.name || "N/A"}</td>
                   <td className="py-4 px-4">{formatDate(candidate?.dob || "N/A")}</td>
-
                   <td className="py-4 px-4">{candidate?.nationality || "N/A"}</td>
                   <td className="py-4 px-4 ">{candidate?.email || "N/A"}</td>
                   <td className="py-4 px-4 ">{candidate?.contactNo || "N/A"}</td>
@@ -276,6 +272,7 @@ export const AllEmployee = () => {
                   {/* <td className="py-4 px-4 text-dark_skyBlue underline">
                     <button  onClick={() => handleFormShow(candidate)} className="underline">View</button>
                   </td> */}
+                  
                 </tr>
               ))}
             </tbody>

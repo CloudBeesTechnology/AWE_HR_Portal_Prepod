@@ -1,6 +1,66 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const createHiringJob = /* GraphQL */ `
+  mutation CreateHiringJob(
+    $input: CreateHiringJobInput!
+    $condition: ModelHiringJobConditionInput
+  ) {
+    createHiringJob(input: $input, condition: $condition) {
+      id
+      jobTitle
+      exper
+      location
+      quantityPerson
+      startDate
+      expiryDate
+      jobContent
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateHiringJob = /* GraphQL */ `
+  mutation UpdateHiringJob(
+    $input: UpdateHiringJobInput!
+    $condition: ModelHiringJobConditionInput
+  ) {
+    updateHiringJob(input: $input, condition: $condition) {
+      id
+      jobTitle
+      exper
+      location
+      quantityPerson
+      startDate
+      expiryDate
+      jobContent
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteHiringJob = /* GraphQL */ `
+  mutation DeleteHiringJob(
+    $input: DeleteHiringJobInput!
+    $condition: ModelHiringJobConditionInput
+  ) {
+    deleteHiringJob(input: $input, condition: $condition) {
+      id
+      jobTitle
+      exper
+      location
+      quantityPerson
+      startDate
+      expiryDate
+      jobContent
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const createInsuranceType = /* GraphQL */ `
   mutation CreateInsuranceType(
     $input: CreateInsuranceTypeInput!
@@ -1903,6 +1963,14 @@ export const createEmpLeaveDetails = /* GraphQL */ `
       sickLeave
       sickLeaveDate
       hospLeave
+      remainingAnualLeave
+      remainingSickLeave
+      remainingMateLeave
+      remainingMrageLeave
+      remainingPaternityLeave
+      remainingHosLeave
+      remainingCompasLeave
+      unPaidAuthorize
       createdAt
       updatedAt
       __typename
@@ -1930,6 +1998,14 @@ export const updateEmpLeaveDetails = /* GraphQL */ `
       sickLeave
       sickLeaveDate
       hospLeave
+      remainingAnualLeave
+      remainingSickLeave
+      remainingMateLeave
+      remainingMrageLeave
+      remainingPaternityLeave
+      remainingHosLeave
+      remainingCompasLeave
+      unPaidAuthorize
       createdAt
       updatedAt
       __typename
@@ -1957,6 +2033,14 @@ export const deleteEmpLeaveDetails = /* GraphQL */ `
       sickLeave
       sickLeaveDate
       hospLeave
+      remainingAnualLeave
+      remainingSickLeave
+      remainingMateLeave
+      remainingMrageLeave
+      remainingPaternityLeave
+      remainingHosLeave
+      remainingCompasLeave
+      unPaidAuthorize
       createdAt
       updatedAt
       __typename

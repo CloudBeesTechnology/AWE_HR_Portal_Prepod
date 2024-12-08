@@ -4,7 +4,7 @@ import {
   createEmpPersonalInfo,
   createIDDetails,
 } from "../../graphql/mutations";
-import { getEmpPersonalInfo } from "../../graphql/queries";
+
 
 export const EmpInfoFunc = () => {
   const client = generateClient();
@@ -77,7 +77,7 @@ export const EmpInfoFunc = () => {
       ppUpload,
       supportDocUpload,
     };
-    console.log(totalData1,"totalData1 Create");
+    // console.log(totalData1,"totalData1 Create");
 
     const {
       age,
@@ -186,6 +186,6 @@ export const EmpInfoFunc = () => {
       console.error("Error executing GraphQL requests:", error);
       throw error; // Rethrow error if needed
     }
-  }, []);
+  }, [client]);
   return { SubmitEIData, errorEmpID };
 };

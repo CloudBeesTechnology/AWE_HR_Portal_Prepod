@@ -227,7 +227,7 @@ export const WorkDataPass = {
         { label: "Job Title", name: "jobTitle", type: "text" },
         { label: "Experience", name: "experience", type: "text" },
         { label: "Location", name: "location", type: "text" },
-        { label: "Quantity", name: "quantity", type: "text" },
+        { label: "Quantity", name: "quantity", type: "number" },
         { label: "Start Date", name: "startDate", type: "date" },
         { label: "Expiry Date", name: "expiryDate", type: "date" },
       ],

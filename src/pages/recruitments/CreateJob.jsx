@@ -3,11 +3,17 @@ import { hiringJobSchema } from "../../services/Validation";
 import { FormField } from "../../utils/FormField";
 import { WorkDataPass } from "../employees/WorkDataPass";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
+import { CreateJobFunc } from "../../services/createMethod/CreateJobFunc";
+import { SpinLogo } from "../../utils/SpinLogo";
 
 export const CreateJob = () => {
+  const { SubmitJobData } = CreateJobFunc();
+
+  const [notification, setNotification] = useState(false);
+  const [showTitle, setShowTitle] = useState("");
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -24,13 +30,19 @@ export const CreateJob = () => {
   });
 
   const onSubmit = handleSubmit((data) => {
-    console.log(data);
+    try {
+      SubmitJobData({ jobValue: data });
+      setShowTitle("Posted Job successfully");
+      setNotification(true);
+    } catch (error) {
+      console.log(error);
+    }
   });
 
   return (
     <section className="bg-[#F5F6F1CC] mx-auto p-10">
       <div className="w-full flex items-center gap-5 mb-10">
-        <Link to="/recruitment" className="text-xl text-grey">
+        <Link to="/hiringJob" className="text-xl text-grey">
           <FaArrowLeft />
         </Link>
         <h6 className="text-center flex-1 mt-2 text_size_2 uppercase">
@@ -60,7 +72,7 @@ export const CreateJob = () => {
           <textarea
             {...register("jobDesc")}
             className="resize-none w-full p-2 mt-1 border bg-lite_skyBlue border-lite_grey rounded-md outline-none"
-            rows="4"
+            rows="1"
           ></textarea>
           {errors.jobDesc && (
             <p className="text-[red] text-[13px] mt-1">
@@ -75,6 +87,13 @@ export const CreateJob = () => {
           </button>
         </div>
       </div>
+      {notification && (
+        <SpinLogo
+          text={showTitle}
+          notification={notification}
+          path="/hiringJob"
+        />
+      )}
     </section>
   );
 };

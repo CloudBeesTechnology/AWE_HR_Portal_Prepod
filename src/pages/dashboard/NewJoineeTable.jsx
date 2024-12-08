@@ -35,7 +35,6 @@ export const NewJoineeTable = () => {
     setLatestJoinees(latest5Joinees);
   }, [empPIData, IDData, workInfoData]);
 
-  console.log("Latest 5 Joinees:", latestJoinees);
 
   return (
     <div className="bg-white shadow-md rounded-2xl overflow-hidden m-2">

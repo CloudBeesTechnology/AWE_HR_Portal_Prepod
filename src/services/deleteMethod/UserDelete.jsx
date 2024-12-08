@@ -28,7 +28,7 @@ export const UserDelete = () => {
           },
         })
         .then((res) => {
-          console.log(res, "deleted successfully");
+          // console.log(res, "deleted successfully");
           window.location.href = "/user";
         });
     } catch (err) {

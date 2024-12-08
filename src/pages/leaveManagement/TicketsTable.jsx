@@ -41,15 +41,15 @@ export const TicketsTable = ({
   //   .filter((item) => item.hrName === personalInfo.name);
 
   const finalData = data
-  .filter((item) => item.empStatus !== "Cancelled") // Keep items that aren't cancelled
-  .filter((item) => {
-    // If the user is HR, filter by HR name
-    if (userType === "HR") {
-      return item.hrName === personalInfo.name;
-    }
-    // If not HR, don't filter by hrName
-    return true;
-  });
+    .filter((item) => item.empStatus !== "Cancelled") // Keep items that aren't cancelled
+    .filter((item) => {
+      // If the user is HR, filter by HR name
+      if (userType === "HR") {
+        return item.hrName === personalInfo.name;
+      }
+      // If not HR, don't filter by hrName
+      return true;
+    });
 
   useEffect(() => {
     const filteredData = finalData;
@@ -65,14 +65,14 @@ export const TicketsTable = ({
 
   return (
     <section className="">
-      <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] max-w-[100%] overflow-x-auto flex-grow">
-        <table className="w-[1150px]">
-          <thead className="bg-black">
-            <tr className="  bg-[#C5C5C5]  rounded-sm">
+      <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] max-w-[100%] overflow-x-auto flex-grow rounded-xl">
+        <table className="w-[1150px] font-semibold text-sm">
+          <thead className="bg-[#939393] sticky top-0 rounded-t-lg">
+            <tr className="">
               {heading.map((header, index) => (
                 <th
                   key={index}
-                  className=" px-4 py-5 text-[15px] text-secondary"
+                  className="px-1 py-5 text-[15px] text-white"
                 >
                   {header}
                 </th>
@@ -85,36 +85,45 @@ export const TicketsTable = ({
                 return (
                   <tr
                     key={index}
-                    className="text-center text-sm border-b-2 border-[#CECECE]"
+                    className="text-center text-sm shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
                   >
-                    <td className="border-b-2 border-[#CECECE] py-3">
+                    <td className="border-b-2 px-2 border-[#CECECE] py-3">
                       {index + 1}
                     </td>
-                    <td className="border-b-2 border-[#CECECE] py-3">
+                    <td className="border-b-2 px-2 border-[#CECECE] py-3">
                       {item.employeeInfo.name}
                     </td>
-                    <td className="border-b-2 border-[#CECECE] pl-4">
+                    <td className="border-b-2 px-2 border-[#CECECE] pl-4">
                       {item.employeeInfo.empBadgeNo}
                     </td>
-                    <td className="border-b-2 border-[#CECECE]">
-                      {item.workInfo.department || "N/A"}
+                    <td className="border-b-2 px-2 border-[#CECECE]">
+                      {Array.isArray(item.workInfo.department)
+                        ? item.workInfo.department[
+                            item.workInfo.department.length - 1
+                          ]
+                        : item.workInfo.department || "N/A"}
                     </td>
-                    <td className="border-b-2 border-[#CECECE]">
-                      {item.workInfo.position || "N/A"}
+                    <td className="border-b-2 px-2 border-[#CECECE]">
+                      {Array.isArray(item.workInfo.position)
+                        ? item.workInfo.position[
+                            item.workInfo.position.length - 1
+                          ]
+                        : item.workInfo.position || "N/A"}
                     </td>
-                    <td className="border-b-2 border-[#CECECE]">
+
+                    <td className="border-b-2 px-2 border-[#CECECE]">
                       {formatDate(item.createdAt)}
                     </td>
-                    <td className="border-b-2 border-[#CECECE]">
+                    <td className="border-b-2 px-2 border-[#CECECE]">
                       {formatDate(item.departureDate)}
                     </td>
-                    <td className="border-b-2 border-[#CECECE]">
+                    <td className="border-b-2 px-2 border-[#CECECE]">
                       {formatDate(item.arrivalDate)}
                     </td>
 
-                    <td className="border-b-2 border-[#CECECE] cursor-pointer">
+                    <td className="border-b-2 px-2 border-[#CECECE] cursor-pointer">
                       <span
-                        className="border-b-2 border-dark_grey "
+                        className="border-b-2 text-[blue] "
                         onClick={() => {
                           handleClickForToggle();
                           onViewClick(item);
@@ -147,16 +156,15 @@ export const TicketsTable = ({
       <div className="ml-20 flex justify-center">
         <div className="w-[60%] flex justify-start mt-4  px-10">
           {userType !== "SuperAdmin" && (
-               <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={(newPage) => {
-              if (newPage >= 1 && newPage <= totalPages) {
-                setCurrentPage(newPage);
-              }
-            }}
-          />
-
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(newPage) => {
+                if (newPage >= 1 && newPage <= totalPages) {
+                  setCurrentPage(newPage);
+                }
+              }}
+            />
           )}
         </div>
       </div>

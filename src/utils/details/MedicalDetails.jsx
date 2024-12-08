@@ -1,11 +1,8 @@
 // export default MedicalDetails;
 import React, { useState } from "react";
-// import { Document, Page } from "react-pdf"; // For PDF viewing
 import { FaTimes, FaPrint, FaDownload } from "react-icons/fa"; // Icons for close, print, and download
-// import "react-pdf/dist/esm/Page/TextLayer.css";
-// import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import { getUrl } from "@aws-amplify/storage";
-import { Viewer, Worker, Page } from "@react-pdf-viewer/core";
+import { Viewer, Worker} from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { pdfjs } from "react-pdf";
 
@@ -99,15 +96,22 @@ const MedicalDetails = ({
     return <p>There was an error processing the dependent data.</p>;
   }
 
-  // Handle document loading success
-  const onDocumentLoadSuccess = ({ numPages }) => {
-    setNumPages(numPages);
-  };
 
   // Parse the document data for uploads
   const parsedFitness = parseDocuments(uploadFitness);
   const parsedBwn = parseDocuments(uploadBwn);
   const parsedRegis = parseDocuments(uploadRegis);
+
+
+  const onPageChange = (newPageNumber) => {
+    if (newPageNumber >= 1 && newPageNumber <= numPages) {
+      setPageNumber(newPageNumber);
+    }
+  };
+
+  const onDocumentLoadSuccess = ({ numPages }) => {
+    setPageNumber(1); // Start from page 1
+  };
 
   // Function to render documents
   const renderDocumentsUnderCategory = (documents, category) => {
@@ -141,27 +145,6 @@ const MedicalDetails = ({
                         {/* <Page pageNumber={pageNumber} className="mx-auto" /> */}
                       </Worker>
                     
-                    </div>
-
-                    {/* Pagination Controls */}
-                    <div className="mt-4 flex justify-between items-center">
-                      <button
-                        onClick={() => setPageNumber(pageNumber - 1)}
-                        disabled={pageNumber <= 1}
-                        className="bg-blue-600 text-black px-3 py-1 rounded-full text-sm hover:bg-blue-800"
-                      >
-                        Prev
-                      </button>
-                      <span className="text-gray-700">
-                        Page {pageNumber} of {numPages}
-                      </span>
-                      <button
-                        onClick={() => setPageNumber(pageNumber + 1)}
-                        disabled={pageNumber >= numPages}
-                        className="bg-blue-600 text-black px-3 py-1 rounded-full text-sm hover:bg-blue-800"
-                      >
-                        Next
-                      </button>
                     </div>
 
                     {/* Close Button */}

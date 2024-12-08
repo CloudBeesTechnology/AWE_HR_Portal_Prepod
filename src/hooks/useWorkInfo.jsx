@@ -33,7 +33,7 @@ export const useWorkInfo = () => {
     fetchData();
   }, []);
 
-  // console.log("workInfo data",empWorkInfo)
+  console.log("workInfo data",empWorkInfo)
 
   return { empWorkInfo, loading, error };
 };

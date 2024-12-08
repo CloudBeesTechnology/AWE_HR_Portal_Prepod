@@ -473,10 +473,10 @@ export const ViewHOsheet = ({
           })
           .then((res) => {
             if (res.data.createHeadOffice) {
-              console.log(
-                "res.data.createHeadOffice : ",
-                res.data.createHeadOffice
-              );
+              // console.log(
+              //   "res.data.createHeadOffice : ",
+              //   res.data.createHeadOffice
+              // );
               toggleSFAMessage(true);
             }
           })
@@ -610,10 +610,10 @@ export const ViewHOsheet = ({
             })
             .then((res) => {
               if (res.data.updateHeadOffice) {
-                console.log(
-                  "res.data.updateHeadOffice : ",
-                  res.data.updateHeadOffice
-                );
+                // console.log(
+                //   "res.data.updateHeadOffice : ",
+                //   res.data.updateHeadOffice
+                // );
                 toggleSFAMessage(true);
                 setVisibleData([]);
                 // setData(null);
@@ -644,9 +644,9 @@ export const ViewHOsheet = ({
               <table className="styled-table">
                 <thead className="sticky-header">
                   <tr className="text_size_5">
-                    <td className="px-4 flex-1">S No.</td>
+                    <td className="px-4 flex-1 text_size_7">S No.</td>
                     {AllfieldData?.tableHeader.map((header, index) => (
-                      <td key={index} className="px-4 flex-1">
+                      <td key={index} className="px-4 flex-1 text_size_7">
                         {header}
                       </td>
                     )) ?? (
@@ -659,7 +659,7 @@ export const ViewHOsheet = ({
                     {showStatusCol === true ? (
                       ""
                     ) : (
-                      <td className="px-5 flex-1">STATUS</td>
+                      <td className="px-5 flex-1 text_size_7">STATUS</td>
                     )}
                   </tr>
                 </thead>

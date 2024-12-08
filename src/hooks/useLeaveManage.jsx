@@ -11,10 +11,9 @@ import {
   listEmpLeaveDetails,
   
 } from "../graphql/queries";
-import { deleteLeaveStatus, updateLeaveStatus, updateTicketRequest } from "../graphql/mutations";
+import { deleteLeaveStatus, updateLeaveStatus, updateTicketRequest, updateEmpLeaveDetails } from "../graphql/mutations";
 
 const client = generateClient();
-
 export const useLeaveManage = () => {
   // const [leaveStatuses, setLeaveStatuses] = useState([]);
   // const [empPersonalInfos, setEmpPersonalInfos] = useState([]);
@@ -235,6 +234,33 @@ export const useLeaveManage = () => {
     }
   };
 
+
+  const handleUpdateEmpLeaveDetails = async (empID, updatedData) => {
+    setLoading(true);
+    try {
+      const result = await client.graphql({
+        query: updateEmpLeaveDetails,
+        variables: {
+          input: { empID, ...updatedData },
+        },
+      });
+
+      const updatedEmpLeaveDetails = result.data.updateEmpLeaveDetails;
+
+      setMergedData((prevData) =>
+        prevData.map((leaveDetails) =>
+          leaveDetails.empID === empID ? updatedEmpLeaveDetails : leaveDetails
+        )
+      );
+    } catch (err) {
+      setError(err);
+      console.error("Error updating employee leave details:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   const handleUpdateTicketRequest  = async (id, updatedData) => {
     setLoading(true);
     try {
@@ -261,5 +287,5 @@ export const useLeaveManage = () => {
     }
   };
 
-  return { ticketMerged, mergedData,  ticketRequests, loading, error, handleDeleteLeaveStatus, handleUpdateLeaveStatus, handleUpdateTicketRequest, personalDetails};
+  return { handleUpdateEmpLeaveDetails ,ticketMerged, mergedData,  ticketRequests, loading, error, handleDeleteLeaveStatus, handleUpdateLeaveStatus, handleUpdateTicketRequest, personalDetails};
 };

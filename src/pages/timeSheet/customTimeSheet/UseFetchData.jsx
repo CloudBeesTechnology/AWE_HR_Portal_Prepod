@@ -480,7 +480,7 @@ export const useFetchData = (titleName) => {
           const validData = processedData.filter((item) => item !== null);
           allData = [...allData, ...validData];
         } while (nextToken);
-        console.log("useFetchData : ", allData);
+        // console.log("useFetchData : ", allData);
         setConvertedStringToArrayObj(allData); // Update state with all data
       } catch (error) {
         console.error(`Error fetching data for ${titleName}:`, error);

@@ -13,18 +13,15 @@ export const BirthdayReminder = () => {
     return data.filter((person) => {
       // Check if dob is valid
       if (!person.dob) {
-        // console.error('Missing dob for person:', person.name);
+  
         return false; // Skip persons with missing dob
       }
       
       const dob = new Date(person.dob);
-      
-      // Log the dob to see what value it holds
-      // console.log('Checking dob for person:', person.name, person.dob);
-      
+
       if (isNaN(dob)) {
         // Log the invalid dob value and person details
-        console.error('Invalid date:', person.dob, 'for', person.name);
+        // console.error('Invalid date:', person.dob, 'for', person.name);
         return false; // Skip invalid dates
       }
       

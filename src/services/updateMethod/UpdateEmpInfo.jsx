@@ -139,9 +139,6 @@ export const UpdateEmpInfo = () => {
       supportDocUpload,
     };
 
-    console.log(totalData1, "totalData1Update");
-
-    // console.log(totalData,"totalData");
 
     try {
       const [empInfoResponse, idResponse] = await Promise.all([

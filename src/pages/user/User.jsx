@@ -176,13 +176,14 @@ export const User = () => {
             <table className="w-full mx-auto bg-white pt-10">
               <thead>
                 <tr className="text_size_5 text-dark_grey ">
-                  <th className="px-6 text-start py-3">EMP ID</th>
-                  {/* <th className="px-6 text-start  py-3">User ID</th> */}
-                  <th className="px-6 text-start  py-3">Name</th>
-                  <th className="px-6 text-start py-3">Type</th>
-                  <th className="px-6 text-start py-3">Official Email Id</th>
-                  <th className="px-6 text-start py-3">Password</th>
-                  <th className="px-6 text-start py-3">Actions</th>
+                  <th className="px-2 text-start py-3">EMP ID</th>
+                  {/* <th className="px-2 text-start  py-3">User ID</th> */}
+                  <th className="px-2 text-start  py-3">Name</th>
+                  <th className="px-2 text-start py-3">Type</th>
+                  <th className="px-2 text-start py-3">Official Email Id</th>
+                  <th className="px-2 text-start py-3">Password</th>
+                  <th className="px-2 text-start py-3">ViewForm</th>
+                  <th className="px-2 text-start py-3">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -191,13 +192,7 @@ export const User = () => {
                     // console.log(val);
 
                     return (
-                      <tr
-                        key={i}
-                        onClick={() => {
-                          ViewFormShow();
-                          setSendData(val);
-                        }}
-                      >
+                      <tr key={i}>
                         <td className="px-6 py-2">{val.empID}</td>
                         {/* <td className="px-6 py-2">{val.empID}</td> */}
                         <td className="px-6 py-2">{val.name}</td>
@@ -210,6 +205,18 @@ export const User = () => {
                             value={val.password}
                             readOnly
                           />
+                        </td>
+                        <td className="center">
+                          <span
+                            className=" text-[blue]  text-center border-b-2"
+                            onClick={() => {
+                              ViewFormShow();
+                              setSendData(val);
+                            }}
+                          >
+                            {" "}
+                            View
+                          </span>
                         </td>
                         <td className="px-6 py-2">
                           <div className="flex gap-5">

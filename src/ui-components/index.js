@@ -36,6 +36,8 @@ export { default as GroupHandSCreateForm } from "./GroupHandSCreateForm";
 export { default as GroupHandSUpdateForm } from "./GroupHandSUpdateForm";
 export { default as HeadOfficeCreateForm } from "./HeadOfficeCreateForm";
 export { default as HeadOfficeUpdateForm } from "./HeadOfficeUpdateForm";
+export { default as HiringJobCreateForm } from "./HiringJobCreateForm";
+export { default as HiringJobUpdateForm } from "./HiringJobUpdateForm";
 export { default as IDDetailsCreateForm } from "./IDDetailsCreateForm";
 export { default as IDDetailsUpdateForm } from "./IDDetailsUpdateForm";
 export { default as InsClaimCreateForm } from "./InsClaimCreateForm";

@@ -21,21 +21,21 @@ export const UploadORMCfile = (
         allSheets.push({ sheetName, data: sheet });
       });
 
-      console.log(allSheets);
+      // console.log(allSheets);
 
       const getResult =
         allSheets &&
         allSheets.map((sheet) => {
           const data = sheet.data;
-          console.log(data);
+          // console.log(data);
 
           var headerSlicedData = data.slice(0, 1);
           //   console.log(headerSlicedData);
-          console.log(headerSlicedData);
+          // console.log(headerSlicedData);
           const hasNameAndDate = headerSlicedData.some((obj) =>
             ["NAME", "DATE"].every((key) => key in obj)
           );
-          console.log(hasNameAndDate);
+          // console.log(hasNameAndDate);
           checkTrueOrFalse = hasNameAndDate;
           // const changedHeader = headerSlicedData.map((columns) => {
           //   const foundKey = Object.entries(columns).map(([key, value]) => {
@@ -64,7 +64,7 @@ export const UploadORMCfile = (
           // });
           return headerSlicedData;
         });
-      console.log(checkTrueOrFalse);
+      // console.log(checkTrueOrFalse);
       if (checkTrueOrFalse === true) {
         const convertDecimalToTime = (decimal, value) => {
           if (value === "time") {
@@ -138,7 +138,7 @@ export const UploadORMCfile = (
 
             return item;
           });
-        console.log(updatedDataArray);
+        // console.log(updatedDataArray);
         // console.log(updatedDataArray);
         // const removeTotalEmployees = updatedDataArray.filter(
         //   (val) => !val.NAME?.includes("TOTAL EMPLOYEES")

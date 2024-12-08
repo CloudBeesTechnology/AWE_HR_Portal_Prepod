@@ -156,7 +156,8 @@ export const DummyViewSummary = () => {
         {
           date: "7/19/2024",
           normalWhrsPerDay: 8,
-          jobLocaWhrs   : [{ OVERTIMEHRS: "1", JOBCODE: "J9002" }],     },
+          jobLocaWhrs: [{ OVERTIMEHRS: "1", JOBCODE: "J9002" }],
+        },
         {
           date: "7/20/2024",
           normalWhrsPerDay: 7,
@@ -185,17 +186,14 @@ export const DummyViewSummary = () => {
         {}
       );
 
-      const overtimeHours = item.data.reduce(
-        (acc, { date, jobLocaWhrs }) => {
-          const day = new Date(date).getDate();
-          const overtime = jobLocaWhrs[0]?.OVERTIMEHRS;
-          if (overtime) {
-            acc[day] = parseInt(overtime, 10);
-          }
-          return acc;
-        },
-        {}
-      );
+      const overtimeHours = item.data.reduce((acc, { date, jobLocaWhrs }) => {
+        const day = new Date(date).getDate();
+        const overtime = jobLocaWhrs[0]?.OVERTIMEHRS;
+        if (overtime) {
+          acc[day] = parseInt(overtime, 10);
+        }
+        return acc;
+      }, {});
 
       const jobcode = item.data
         .map(({ jobLocaWhrs }) => jobLocaWhrs[0]?.JOBCODE)
@@ -210,7 +208,7 @@ export const DummyViewSummary = () => {
     })
     .filter(Boolean);
 
-  console.log(transformedData);
+  // console.log(transformedData);
 
   return (
     <div>

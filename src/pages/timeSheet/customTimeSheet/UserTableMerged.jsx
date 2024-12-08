@@ -64,12 +64,12 @@ export const useTableMerged = (excelData) => {
                   : null,
               };
             });
-            console.log("useTableMergedData : ", finalData);
+            // console.log("useTableMergedData : ", finalData);
             setData(finalData);
           };
           fetchWorkInfo();
         } catch (err) {
-          console.error("Error fetching data:", err.message);
+          // console.error("Error fetching data:", err.message);
         }
       };
       fetchData();

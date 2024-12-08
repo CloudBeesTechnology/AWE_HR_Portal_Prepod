@@ -3,16 +3,11 @@ import { DataSupply } from "../../utils/DataStoredContext";
 
 export const UserProgress = () => {
   const { userData } = useContext(DataSupply);
-
-  // const setPremissionValue=JSON.parse(userData?.setPermission)
-  // console.log(setPremissionValue);
-console.log(userData);
-
   const userCounts = userData.reduce(
     (acc, val) => {
       if (val.selectType !== "Employee" && val.status === "Active") {
         acc.active += 1;
-      } else if (val.status === "InActive") {
+      } else if (val.selectType !== "Employee" && val.status === "InActive") {
         acc.inactive += 1;
       }
       return acc;

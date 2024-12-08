@@ -116,26 +116,6 @@ const WorkInfoView = ({
                       </div>
                     </div>
 
-                    {/* Pagination Controls */}
-                    <div className="mt-4 flex justify-between items-center">
-                      <button
-                        onClick={() => setPageNumber(pageNumber - 1)}
-                        disabled={pageNumber <= 1}
-                        className="bg-blue-600 text-black px-3 py-1 rounded-full text-sm hover:bg-blue-800"
-                      >
-                        Previous
-                      </button>
-                      <span className="text-gray-700">
-                        Page {pageNumber} of {numPages}
-                      </span>
-                      <button
-                        onClick={() => setPageNumber(pageNumber + 1)}
-                        disabled={pageNumber >= numPages}
-                        className="bg-blue-600 text-black px-3 py-1 rounded-full text-sm hover:bg-blue-800"
-                      >
-                        Next
-                      </button>
-                    </div>
 
                     {/* Close Button */}
                     <div className="absolute top-2 right-2">

@@ -154,7 +154,7 @@ export const VTimeSheetTable = ({
         {/* <table className="styled-table text-center w-full rounded-md overflow-hidden shadow-md overflow-y-auto"> */}
         <table className="styled-table">
           <thead className="sticky-header">
-            <tr className="text_size_5">
+            <tr className="text_size_7">
               <td className="px-5 text-center">S No.</td>
 
               {AllFieldData?.tableHeader?.map((header, index) => (

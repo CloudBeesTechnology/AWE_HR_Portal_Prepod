@@ -49,25 +49,31 @@
     "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref": {
       "Type": "String"
     },
-    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypeauth0FunctionQuerygetInsuranceTypeauth0FunctionAppSyncFunction84613F74FunctionId": {
+    "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobauth0FunctionQuerygetHiringJobauth0FunctionAppSyncFunction8941716EFunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId": {
+    "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobpostAuth0FunctionQuerygetHiringJobpostAuth0FunctionAppSyncFunction20353E51FunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeMutationcreateInsuranceTypeinit0FunctionMutationcreateInsuranceTypeinit0FunctionAppSyncFunction84DE8DC3FunctionId": {
+    "referencetotransformerrootstackauthRoleNameFB872D50Ref": {
       "Type": "String"
     },
-    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeMutationcreateInsuranceTypeauth0FunctionMutationcreateInsuranceTypeauth0FunctionAppSyncFunction3271F8FDFunctionId": {
+    "referencetotransformerrootstackunauthRoleName49F3C1FERef": {
       "Type": "String"
     },
-    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeMutationupdateInsuranceTypeinit0FunctionMutationupdateInsuranceTypeinit0FunctionAppSyncFunctionA0D393B0FunctionId": {
+    "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobMutationcreateHiringJobinit0FunctionMutationcreateHiringJobinit0FunctionAppSyncFunction09FDB38CFunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptiononCreateInsuranceTypeauth0FunctionSubscriptiononCreateInsuranceTypeauth0FunctionAppSyncFuncti1417D75E": {
+    "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobMutationcreateHiringJobauth0FunctionMutationcreateHiringJobauth0FunctionAppSyncFunctionB65AEBFEFunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptionOnCreateInsuranceTypeDataResolverFnSubscriptionOnCreateInsuranceTypeDataResolverFnAppSyncFunc15969348": {
+    "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobMutationupdateHiringJobinit0FunctionMutationupdateHiringJobinit0FunctionAppSyncFunctionD57ABAAFFunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobSubscriptiononCreateHiringJobauth0FunctionSubscriptiononCreateHiringJobauth0FunctionAppSyncFunctionB277D55EFunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobSubscriptionOnCreateHiringJobDataResolverFnSubscriptionOnCreateHiringJobDataResolverFnAppSyncFunction23A58A85FunctionId": {
       "Type": "String"
     }
   },
@@ -386,10 +392,10 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypeauth0FunctionQuerygetInsuranceTypeauth0FunctionAppSyncFunction84613F74FunctionId"
+              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobauth0FunctionQuerygetHiringJobauth0FunctionAppSyncFunction8941716EFunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobpostAuth0FunctionQuerygetHiringJobpostAuth0FunctionAppSyncFunction20353E51FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -411,7 +417,23 @@
               {
                 "Ref": "LabourMedicalInfoTable"
               },
-              "\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+              "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackauthRoleNameFB872D50Ref"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackunauthRoleName49F3C1FERef"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
             ]
           ]
         },
@@ -481,10 +503,10 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypeauth0FunctionQuerygetInsuranceTypeauth0FunctionAppSyncFunction84613F74FunctionId"
+              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobauth0FunctionQuerygetHiringJobauth0FunctionAppSyncFunction8941716EFunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobpostAuth0FunctionQuerygetHiringJobpostAuth0FunctionAppSyncFunction20353E51FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -506,7 +528,23 @@
               {
                 "Ref": "LabourMedicalInfoTable"
               },
-              "\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+              "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackauthRoleNameFB872D50Ref"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackunauthRoleName49F3C1FERef"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
             ]
           ]
         },
@@ -576,13 +614,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeMutationcreateInsuranceTypeinit0FunctionMutationcreateInsuranceTypeinit0FunctionAppSyncFunction84DE8DC3FunctionId"
+              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobMutationcreateHiringJobinit0FunctionMutationcreateHiringJobinit0FunctionAppSyncFunction09FDB38CFunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeMutationcreateInsuranceTypeauth0FunctionMutationcreateInsuranceTypeauth0FunctionAppSyncFunction3271F8FDFunctionId"
+              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobMutationcreateHiringJobauth0FunctionMutationcreateHiringJobauth0FunctionAppSyncFunctionB65AEBFEFunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobpostAuth0FunctionQuerygetHiringJobpostAuth0FunctionAppSyncFunction20353E51FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -604,7 +642,23 @@
               {
                 "Ref": "LabourMedicalInfoTable"
               },
-              "\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+              "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackauthRoleNameFB872D50Ref"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackunauthRoleName49F3C1FERef"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
             ]
           ]
         },
@@ -725,7 +779,7 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeMutationupdateInsuranceTypeinit0FunctionMutationupdateInsuranceTypeinit0FunctionAppSyncFunctionA0D393B0FunctionId"
+              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobMutationupdateHiringJobinit0FunctionMutationupdateHiringJobinit0FunctionAppSyncFunctionD57ABAAFFunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -734,7 +788,7 @@
               ]
             },
             {
-              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobpostAuth0FunctionQuerygetHiringJobpostAuth0FunctionAppSyncFunction20353E51FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -756,7 +810,23 @@
               {
                 "Ref": "LabourMedicalInfoTable"
               },
-              "\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+              "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackauthRoleNameFB872D50Ref"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackunauthRoleName49F3C1FERef"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
             ]
           ]
         },
@@ -883,7 +953,7 @@
               ]
             },
             {
-              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobpostAuth0FunctionQuerygetHiringJobpostAuth0FunctionAppSyncFunction20353E51FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -905,7 +975,23 @@
               {
                 "Ref": "LabourMedicalInfoTable"
               },
-              "\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+              "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackauthRoleNameFB872D50Ref"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackunauthRoleName49F3C1FERef"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
             ]
           ]
         },
@@ -924,13 +1010,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptiononCreateInsuranceTypeauth0FunctionSubscriptiononCreateInsuranceTypeauth0FunctionAppSyncFuncti1417D75E"
+              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobSubscriptiononCreateHiringJobauth0FunctionSubscriptiononCreateHiringJobauth0FunctionAppSyncFunctionB277D55EFunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobpostAuth0FunctionQuerygetHiringJobpostAuth0FunctionAppSyncFunction20353E51FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptionOnCreateInsuranceTypeDataResolverFnSubscriptionOnCreateInsuranceTypeDataResolverFnAppSyncFunc15969348"
+              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobSubscriptionOnCreateHiringJobDataResolverFnSubscriptionOnCreateHiringJobDataResolverFnAppSyncFunction23A58A85FunctionId"
             }
           ]
         },
@@ -942,7 +1028,23 @@
               {
                 "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
               },
-              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"authRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackauthRoleNameFB872D50Ref"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackunauthRoleName49F3C1FERef"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
             ]
           ]
         },
@@ -961,13 +1063,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptiononCreateInsuranceTypeauth0FunctionSubscriptiononCreateInsuranceTypeauth0FunctionAppSyncFuncti1417D75E"
+              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobSubscriptiononCreateHiringJobauth0FunctionSubscriptiononCreateHiringJobauth0FunctionAppSyncFunctionB277D55EFunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobpostAuth0FunctionQuerygetHiringJobpostAuth0FunctionAppSyncFunction20353E51FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptionOnCreateInsuranceTypeDataResolverFnSubscriptionOnCreateInsuranceTypeDataResolverFnAppSyncFunc15969348"
+              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobSubscriptionOnCreateHiringJobDataResolverFnSubscriptionOnCreateHiringJobDataResolverFnAppSyncFunction23A58A85FunctionId"
             }
           ]
         },
@@ -979,7 +1081,23 @@
               {
                 "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
               },
-              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"authRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackauthRoleNameFB872D50Ref"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackunauthRoleName49F3C1FERef"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
             ]
           ]
         },
@@ -998,13 +1116,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptiononCreateInsuranceTypeauth0FunctionSubscriptiononCreateInsuranceTypeauth0FunctionAppSyncFuncti1417D75E"
+              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobSubscriptiononCreateHiringJobauth0FunctionSubscriptiononCreateHiringJobauth0FunctionAppSyncFunctionB277D55EFunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeQuerygetInsuranceTypepostAuth0FunctionQuerygetInsuranceTypepostAuth0FunctionAppSyncFunction61E3634FFunctionId"
+              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobpostAuth0FunctionQuerygetHiringJobpostAuth0FunctionAppSyncFunction20353E51FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackInsuranceTypeNestedStackInsuranceTypeNestedStackResource90AF70C7OutputstransformerrootstackInsuranceTypeSubscriptionOnCreateInsuranceTypeDataResolverFnSubscriptionOnCreateInsuranceTypeDataResolverFnAppSyncFunc15969348"
+              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobSubscriptionOnCreateHiringJobDataResolverFnSubscriptionOnCreateHiringJobDataResolverFnAppSyncFunction23A58A85FunctionId"
             }
           ]
         },
@@ -1016,7 +1134,23 @@
               {
                 "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
               },
-              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"authRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackauthRoleNameFB872D50Ref"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackunauthRoleName49F3C1FERef"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-southeast-1:a7922744-4c59-4979-b386-13e05591c7cd\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ap-southeast-1_VN0FtgRLX_Full-access/CognitoIdentityCredentials\",\"ap-southeast-1_VN0FtgRLX_Manage-only/CognitoIdentityCredentials\"]))\n$util.toJson({})"
             ]
           ]
         },

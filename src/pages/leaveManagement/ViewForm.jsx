@@ -3,11 +3,9 @@ import AweLogo from "../../assets/logo/logo-with-name.svg";
 import { VscClose } from "react-icons/vsc";
 import { useNavigate } from "react-router-dom";
 import { useLeaveManage } from "../../hooks/useLeaveManage";
-import { DataSupply } from "../../utils/DataStoredContext";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { useCreateNotification } from "../../hooks/useCreateNotification"; // Importing the custom hook
-import {useWorkInfo} from "../../hooks/useWorkInfo"
-import { UpdateWIData } from "../../services/updateMethod/UpdateWIData";
+import {UpdateLeaveData} from "../../services/updateMethod/UpdateLeaveData"
 
 
 export const ViewForm = ({
@@ -18,41 +16,18 @@ export const ViewForm = ({
   userType,
   personalInfo,
   formatDate,
+  
 }) => {
   const [remark, setRemark] = useState("");
   const [userName, setUserName] = useState("");
   const [notification, setNotification] = useState(false);
   const [notificationText, setNotificationText] = useState("");
-
   const navigate = useNavigate();
+  const { handleUpdateLeaveStatus, handleUpdateTicketRequest } = useLeaveManage();
+  const { createNotification } = useCreateNotification(); // Hook for creating notification
+  const { leaveDetails } = UpdateLeaveData();
 
-  const { handleUpdateLeaveStatus, handleUpdateTicketRequest } =
-    useLeaveManage();
-  const { userData } = useContext(DataSupply);
-  const { createNotification } = useCreateNotification(); // Hook for creating notifications
-  const [workInfoUpValue, setWorkInfoUpValue] = useState({
-    // Initially, set this state with the required fields
-    // empID, 
-    // leaveDetailsDataRecord, 
-    // ... other fields from the `workInfoUpValue` object
-  });
-
-  const {workInfo} = useWorkInfo();
-
-  const { WIUpdateData } = UpdateWIData();
-
-  const handleUpdateData = async () => {
-    try {
-      // Pass the updated work info data to WIUpdateData
-      await WIUpdateData({ workInfoUpValue });
-      console.log("Data updated successfully!", userData, userName);
-    } catch (error) {
-      console.error("Error updating data:", error);
-    }
-  };
-
-
-  console.log("workInfow",workInfo)
+  // console.log("workInfow",workInfo)
 
   const handleUpdateStatus = async (status) => {
     const updateData = {};
@@ -104,19 +79,41 @@ export const ViewForm = ({
         });
       }
 
-      const updatedData = {
-        ...workInfoUpValue,
-        leaveDetailsDataRecord: {
-          ...workInfoUpValue.leaveDetailsDataRecord,
-          annualLeave: 25, // Example update
-          leavePass: ["sick leave"], // Example update
-          // Update other fields as necessary
-        },
-      };
 
+      if (source === "LM") {
+        if (userType === "Manager") {
+          // Calculate remaining leave based on leave type
+          let remainingLeaveUpdate = {};
+    
+          if (leaveData.leaveType === "Hospitalisation Leave") {
+            remainingLeaveUpdate.remainingHosLeave = leaveData.leaveDetails.hospLeave - leaveData.days;
+          } else if (leaveData.leaveType === "Annual Leave") {
+            remainingLeaveUpdate.remainingAnualLeave = leaveData.leaveDetails.annualLeave - leaveData.days;
+          } else if (leaveData.leaveType === "Sick Leave") {
+            remainingLeaveUpdate.remainingSickLeave = leaveData.leaveDetails.sickLeave - leaveData.days;
+          } else if (leaveData.leaveType === "Marriage Leave") {
+            remainingLeaveUpdate.remainingMrageLeave = leaveData.leaveDetails.mrageLeave - leaveData.days;
+          } else if (leaveData.leaveType === "Compassionate Leave") {
+            remainingLeaveUpdate.remainingCompasLeave = leaveData.leaveDetails.compasLeave - leaveData.days;
+          } else if (leaveData.leaveType === "Paternity Leave") {
+            remainingLeaveUpdate.remainingPaternityLeave = leaveData.leaveDetails.paterLeave - leaveData.days;
+          } else if (leaveData.leaveType === "Maternity Leave") {
+            remainingLeaveUpdate.remainingMateLeave = leaveData.leaveDetails.materLeave - leaveData.days;
+          } else if (leaveData.leaveType === "Compensate Leave") {
+            remainingLeaveUpdate.remainingCompasLeave = 0; // Setting it to 0 based on the given condition
+          }
+    
+          // Update remaining leave details
+          console.log('Remaining Leave Update:', remainingLeaveUpdate);
+          const LeaveValue = {
+            id:leaveData.leaveDetails.id,
+             ...remainingLeaveUpdate,
 
-      
-      setWorkInfoUpValue(updatedData);
+          }
+          await leaveDetails({LeaveValue});
+          console.log(LeaveValue, "LeaveRecords")
+      }
+    }
       
       setNotification(true);
       setTimeout(() => {
@@ -125,6 +122,7 @@ export const ViewForm = ({
         navigate("/leaveManage")
         // Redirect to the dashboard or another page
       }, 3000);
+      
     } else if (source === "Tickets") {
       updateData.hrStatus = status; // Set the status for the ticket request
       updateData.hrRemarks = remark;
@@ -165,6 +163,7 @@ export const ViewForm = ({
       setTimeout(() => {
         setNotification(false);
         handleClickForToggle(false)
+        navigate("/leaveManage")
         // Redirect to the dashboard or another page
       }, 3000);
     }
@@ -240,7 +239,7 @@ export const ViewForm = ({
         <div className=" justify-items-center gap-4">
           <img src={AweLogo} alt="Logo" className="max-w-[180px] w-full" />
           <h2 className="text-xl mt-2 font-bold underline">
-            Leave Application Form
+            {source === "LM" && "Leave Application Form" || source === "Tickets" && "Ticket Request Form"}
           </h2>
         </div>
         {notification && (
@@ -257,8 +256,14 @@ export const ViewForm = ({
               {[
                 { label: "Name", value: leaveData.employeeInfo.name },
                 { label: "Badge No", value: leaveData.employeeInfo.empBadgeNo },
-                { label: "Job Title", value: leaveData.workInfo.position || "N/A"},
-                { label: "Department", value: leaveData.workInfo.department || "N/A"},
+                {
+                  label: "Job Title", 
+                  value: Array.isArray(leaveData.workInfo.position) ? leaveData.workInfo.position[leaveData.workInfo.position.length - 1] : leaveData.workInfo.position || "N/A"
+                },
+                {
+                  label: "Department", 
+                  value: Array.isArray(leaveData.workInfo.department) ? leaveData.workInfo.department[leaveData.workInfo.department.length - 1] : leaveData.workInfo.department || "N/A"
+                },
                 { label: "Leave Type", value: leaveData.leaveType },
                 {
                   label: "Applied Dates",
@@ -267,7 +272,7 @@ export const ViewForm = ({
                   )} `,
                 },
                 { label: "Total No of Days", value: leaveData.days },
-                { label: "Leave Balance", value: leaveData.balance },
+                // { label: "Leave Balance", value: leaveData.balance },
                 { label: "Reason", value: leaveData.reason },
               ].map((item, index) => (
                 <div key={index} className="grid grid-cols-3 gap-4 mb-4">
@@ -309,8 +314,8 @@ export const ViewForm = ({
                 )}
             </div>
             {/* Action Buttons */}
-            <div className="flex justify-between px-5 pb-10">
-              {(leaveData.managerStatus === "Pending" ||
+            <div className="flex justify-between px-5 mt-6">
+              {(leaveData.managerStatus === "Pending"||
                 leaveData.supervisorStatus === "Pending") &&
                 userType !== "SuperAdmin" &&
                 userType !== "HR" && (
@@ -336,12 +341,12 @@ export const ViewForm = ({
         {source === "Tickets" && (
           <section className="shadow-md w-[500px] px-5 bg-white">
             <div className="text_size_6">
-              <div className="mb-5 text-[green]">
-                <p className="text-center text-[24px] font-semibold">
+              <div className="mb-5 ">
+                {/* <p className="text-center text-[24px] font-semibold">
                   {ticketData.hrStatus === "Pending"
                     ? "Request Tickets"
                     : ticketData.hrStatus}
-                </p>
+                </p> */}
               </div>
 
               {[
@@ -352,11 +357,15 @@ export const ViewForm = ({
                 },
                 {
                   label: "Department",
-                  value: ticketData.workInfo.department || "N/A",
+                  value: Array.isArray(ticketData.workInfo.department) 
+                    ? ticketData.workInfo.department[ticketData.workInfo.department.length - 1] 
+                    : ticketData.workInfo.department || "N/A",
                 },
                 {
                   label: "Position",
-                  value: ticketData.workInfo.position || "N/A",
+                  value: Array.isArray(ticketData.workInfo.position) 
+                    ? ticketData.workInfo.position[ticketData.workInfo.position.length - 1] 
+                    : ticketData.workInfo.position || "N/A",
                 },
                 {
                   label: "Date of Join",
@@ -400,7 +409,7 @@ export const ViewForm = ({
                 )}
             </div>
 
-            <div className="flex justify-between px-5 py-6 pb-10">
+            <div className="flex justify-between px-5 mt-12">
               {ticketData.hrStatus === "Pending" && userType === "HR" && (
                 <>
                   <button

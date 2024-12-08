@@ -34,7 +34,7 @@ export const RecruDash = () => {
   // console.log(filteredCards, "kjhg");
   return (
     <section className="min-h-screen p-10 bg-[#F5F6F1]">
-      <div className=" screen-size flex justify-between items-center flex-wrap gap-10 text-black">
+      <div className=" screen-size flex justify-evenly items-center flex-wrap gap-10 text-black">
         {filteredCards.map((value, index) => (
           <div
             key={index}

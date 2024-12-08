@@ -58,22 +58,8 @@ export const LeaveManage = () => {
 
   // console.log("Notification", emailNotifications);
   // console.log("WorkInfo Data 6.0", mergedData);
-  // console.log("Mergeddata", mergedData);
-
-  // useEffect(() => {
-  //   // Set initial data when mergedData changes
-  //   setData(applyFilters());
-  // }, [mergedData]);  @Yf1#9cUhd>M
 
 
-  // const getData = () => {
-  //   if (count === 0) return mergedData;
-  //   if (count === 1) return mergedData;
-  //   if (count === 2) return mergedData;
-  //   if (count === 3) return ticketMerged;
-  // };
-
-  
   useEffect(() => {
     // Set initial data when mergedData changes
     setData(applyFilters());
@@ -441,20 +427,7 @@ export const LeaveManage = () => {
             </>
           )}
         </section>
-        {/*       
-        <div className="ml-20 flex justify-center">
-          <div className="w-[60%] flex justify-start mt-4  px-10">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={(newPage) => {
-                if (newPage >= 1 && newPage <= totalPages) {
-                  setCurrentPage(newPage);
-                }
-              }}
-            />
-          </div>
-        </div> */}
+
 
         {/* Pagination section */}
         <div className="ml-20 flex justify-center">

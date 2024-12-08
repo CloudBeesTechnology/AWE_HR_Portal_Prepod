@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useRef } from "react";
+
 
 const AccommodationDetails = ({
   accommodationInfo,
