@@ -15,15 +15,24 @@ export const EmpLeaveBalance = ({ initialData, userType, personalInfo }) => {
     "No of Leave Taken",
     "Leave Type",
     "No of Leave Remaining",
-    "Summary"
+    "Summary",
   ];
 
   useEffect(() => {
     const filteredData = data;
     const startIndex = (currentPage - 1) * rowsPerPage;
-    const paginatedData = filteredData.slice(startIndex, startIndex + rowsPerPage);
+    const paginatedData = filteredData.slice(
+      startIndex,
+      startIndex + rowsPerPage
+    );
     setData(paginatedData);
   }, [currentPage, rowsPerPage]);
+  useEffect(() => {
+    const filteringLeaveDays = data.filter(
+      (val) => val.managerStatus === "Approved"
+    );
+    console.log(filteringLeaveDays);
+  }, []);
 
   const filteredResults = data;
   const totalPages = Math.ceil(filteredResults.length / rowsPerPage);
@@ -49,7 +58,9 @@ export const EmpLeaveBalance = ({ initialData, userType, personalInfo }) => {
               item.supervisorName === personalInfo.name)
         )
       : userType === "Supervisor"
-      ? filteredResults.filter((item) => item.supervisorName === personalInfo.name)
+      ? filteredResults.filter(
+          (item) => item.supervisorName === personalInfo.name
+        )
       : filteredResults;
 
   // Function to get remaining leave for a specific leave type
@@ -91,17 +102,28 @@ export const EmpLeaveBalance = ({ initialData, userType, personalInfo }) => {
           <tbody>
             {finalData &&
               finalData.map((item, index) => {
-                const remainingLeave = getRemainingLeave(item.leaveType, item.leaveDetails);
+                const remainingLeave = getRemainingLeave(
+                  item.leaveType,
+                  item.leaveDetails
+                );
                 return (
                   <tr
                     key={index}
                     className="text-center text-sm shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
                   >
-                    <td className="border-b-2 border-[#CECECE] py-3">{index + 1}</td>
-                    <td className="border-b-2 border-[#CECECE] py-3">{item.empID}</td>
-                    <td className="border-b-2 border-[#CECECE] py-3">{item.employeeInfo.name}</td>
+                    <td className="border-b-2 border-[#CECECE] py-3">
+                      {index + 1}
+                    </td>
+                    <td className="border-b-2 border-[#CECECE] py-3">
+                      {item.empID}
+                    </td>
+                    <td className="border-b-2 border-[#CECECE] py-3">
+                      {item.employeeInfo.name}
+                    </td>
                     <td className="border-b-2 border-[#CECECE]">{item.days}</td>
-                    <td className="border-b-2 border-[#CECECE]">{item.leaveType}</td>
+                    <td className="border-b-2 border-[#CECECE]">
+                      {item.leaveType}
+                    </td>
                     <td className="border-b-2 border-[#CECECE]">
                       {remainingLeave || "N/A"}
                     </td>
@@ -142,7 +164,9 @@ export const EmpLeaveBalance = ({ initialData, userType, personalInfo }) => {
         <div className="fixed top-0 left-0 w-full h-full bg-gray-500 bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg shadow-lg w-[80%] max-w-[1000px] overflow-y-auto max-h-[70%]">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="uppercase text-xl font-bold">Leave Summary for {selectedEmployee.employeeInfo.name}</h2>
+              <h2 className="uppercase text-xl font-bold">
+                Leave Summary for {selectedEmployee.employeeInfo.name}
+              </h2>
               <button
                 onClick={handleClosePopup}
                 className="text-white uppercase px-4 py-2 text-xs font-bold rounded-full bg-grey"
@@ -152,27 +176,50 @@ export const EmpLeaveBalance = ({ initialData, userType, personalInfo }) => {
             </div>
             <div className="space-y-4 font-semibold">
               {/* Employee Details */}
-              <h2 className="uppercase"> Employee ID: {selectedEmployee.empID}</h2>
+              <h2 className="uppercase">
+                {" "}
+                Employee ID: {selectedEmployee.empID}
+              </h2>
               <h2 className="uppercase"> Total Leave Balances: </h2>
               <table className="min-w-full bg-white text-sm font-semibold">
                 <thead className="bg-gray-100">
                   <tr>
                     <th className="border px-4 py-2 text-sm">Leave Type</th>
                     <th className="border px-4 py-2 text-sm">Days Taken</th>
-                    <th className="border px-4 py-2 text-sm">Remaining Leave</th>
+                    <th className="border px-4 py-2 text-sm">
+                      Remaining Leave
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {["Annual Leave", "Hospitalisation Leave", "Compassionate Leave", "Marriage Leave", "Paternity Leave", "Sick Leave", "Maternity Leave"].map((leaveType) => {
-                    const remainingLeave = getRemainingLeave(leaveType, selectedEmployee.leaveDetails);
+                  {[
+                    "Annual Leave",
+                    "Hospitalisation Leave",
+                    "Compassionate Leave",
+                    "Marriage Leave",
+                    "Paternity Leave",
+                    "Sick Leave",
+                    "Maternity Leave",
+                    "Unpaid Authorization",
+                  ].map((leaveType) => {
+                    const remainingLeave = getRemainingLeave(
+                      leaveType,
+                      selectedEmployee.leaveDetails
+                    );
                     const leaveTaken = initialData
-                      .filter(item => item.empID === selectedEmployee.empID && item.leaveType === leaveType)
+                      .filter(
+                        (item) =>
+                          item.empID === selectedEmployee.empID &&
+                          item.leaveType === leaveType
+                      )
                       .reduce((total, item) => total + item.days, 0);
                     return (
                       <tr key={leaveType} className="text-center">
                         <td className="border px-4 py-2">{leaveType}</td>
                         <td className="border px-4 py-2">{leaveTaken} days</td>
-                        <td className="border px-4 py-2">{remainingLeave} days</td>
+                        <td className="border px-4 py-2">
+                          {remainingLeave} days
+                        </td>
                       </tr>
                     );
                   })}
@@ -180,7 +227,7 @@ export const EmpLeaveBalance = ({ initialData, userType, personalInfo }) => {
               </table>
               <h2 className="uppercase">Leave Taken:</h2>
               {initialData
-                .filter(item => item.empID === selectedEmployee.empID)
+                .filter((item) => item.empID === selectedEmployee.empID)
                 .map((leaveRecord, index) => (
                   <p key={index} className="text-sm">
                     {leaveRecord.leaveType} - {leaveRecord.days} days taken

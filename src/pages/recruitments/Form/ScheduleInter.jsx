@@ -24,12 +24,13 @@ export const ScheduleInter = ({ candidate, onClose, onSave }) => {
   const onSubmit = handleSubmit(async (data) => {
     const formattedData = {
       ...data,
-      interDate: new Date(data.interDate), // Ensure the date is in the correct format
-      tempID: candidate.tempID,  // Ensure the candidate's temporary ID is included
-      candidateStatus: "pending",  // Default status is 'pending'
+      interDate: new Date(data.interDate), 
+      tempID: candidate.tempID, 
+      candidateStatus: "pending", 
     };
 
-    console.log("Formatted Data:", formattedData);
+    // console.log("Formatted Data:", formattedData);
+
     // setNotification(true);
     await createSchedule(formattedData);
   });

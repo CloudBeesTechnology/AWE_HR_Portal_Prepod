@@ -46,7 +46,7 @@ export const CVEVForm = () => {
       ...data,
       cvecFile: uploadedCVEV, // Include the uploaded file URL
     };
-    console.log("Form submitted with data:", formData);
+    // console.log("Form submitted with data:", formData);
   };
 
   return (

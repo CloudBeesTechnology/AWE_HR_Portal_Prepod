@@ -112,13 +112,13 @@ export const EducationDetails = () => {
   //   navigate("/addCandidates/otherDetails");
   // });
   const onSubmit = (data) => {
-    console.log(data);
+    // console.log(data);
     const navigatingEduData = {
       ...data,
       ...navigatingPersonalData,
     };
     // setNavigateEduData(navigatingEduData)
-    console.log(navigatingEduData);
+    // console.log(navigatingEduData);
     // handleNext();
     navigate("/addCandidates/otherDetails", {
       state: { FormData: navigatingEduData },

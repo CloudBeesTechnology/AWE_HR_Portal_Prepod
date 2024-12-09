@@ -24,10 +24,11 @@ export const EmpRequisitionForm = ({ isVisible, onClose }) => {
   });
 
   const [notification, setNotification] = useState(false);
+  
   useEffect(() => {
     const userID = localStorage.getItem("userID");
     setUserID(userID);
-    console.log("Navbar: User ID from localStorage:", userID);
+    // console.log("Navbar: User ID from localStorage:", userID);
   }, []);
 
   // Use the custom hook
@@ -35,12 +36,13 @@ export const EmpRequisitionForm = ({ isVisible, onClose }) => {
 
 
   const onSubmit = async (data) => {
-    console.log("Form data:", data);
-    console.log("Personal Info:", personalInfo);
+    // console.log("Form data:", data);
+    // console.log("Personal Info:", personalInfo);
     try {
       const EmpReqValue = {
         ...data,
         reqName:personalInfo.name,
+        userID,
         department: data.department,
         project: data.project,
         position: data.position,
@@ -159,7 +161,7 @@ export const EmpRequisitionForm = ({ isVisible, onClose }) => {
             <SpinLogo
               text="Your Requisition Submitted Successfully"
               notification={notification}
-              path="/recrutiles/applymployreq"
+              path="/recrutiles/applyemployreq"
             />
           )}
         </form>

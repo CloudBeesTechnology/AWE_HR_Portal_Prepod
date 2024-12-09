@@ -10,7 +10,7 @@ export const HiringJob = () => {
     });
   }, []);
   const { hiringData } = useContext(DataSupply);
-  console.log(hiringData);
+  // console.log(hiringData);
 
   const heading = [
     "Job Title",
@@ -39,6 +39,7 @@ export const HiringJob = () => {
   const getStatusClass = (status) => {
     return status === "Completed" ? "text-[green]" : "text-[#E8A317]";
   };
+  
   
   return (
     <section className="bg-[#F5F6F1CC] mx-auto p-10 min-h-screen ">

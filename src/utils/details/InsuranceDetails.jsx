@@ -206,9 +206,9 @@ const InsuranceDetails = ({
     );
   };
 
-  if (!Array.isArray(dependInsurance) || dependInsurance.length === 0) {
-    return <p>There was an error processing the dependent insurance data.</p>;
-  }
+  // if (!Array.isArray(dependInsurance) || dependInsurance.length === 0) {
+  //   return <p>There was an error processing the dependent insurance data.</p>;
+  // }
 
   const renderDocumentCategory = (uploadArray, categoryName) => {
     const documents =
@@ -276,7 +276,12 @@ const InsuranceDetails = ({
     );
   };
 
+  // if (!Array.isArray(dependInsurance) || dependInsurance.length === 0) {
+  //   return <p>There was an error processing the dependent insurance data.</p>;
+  // }
+
   return (
+    
     <section ref={mainRef} className="py-3">
       <h6 className="uppercase text_size_5 my-3">Insurance Details:</h6>
       <div className="flex flex-col md:flex-row items-start justify-between gap-8">
@@ -423,7 +428,9 @@ const InsuranceDetails = ({
             {/* Status */}
           </div>
         ))}
+        
       </div>
+      
     </section>
   );
 };

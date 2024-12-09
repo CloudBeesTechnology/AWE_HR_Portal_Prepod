@@ -96,7 +96,7 @@ export const PersonalDetails = () => {
 
     // setNavigateData(navigatingData);
     // handleNext();
-    console.log(navigatingData);
+    // console.log(navigatingData);
     navigate("/addCandidates/educationDetails", {
       state: { FormData: navigatingData },
     });

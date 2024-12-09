@@ -46,6 +46,16 @@ export const ApplyEmployReq = () => {
     setIsReviewFormVisible(false);
   };
 
+  const getStatusClass = (status) => {
+    return status === "Rejected"
+      ? "text-[red]"
+      : status === "Approved"
+      ? "text-[green]"
+      : status === "Pending"
+      ? "text-dark_grey"
+      : "text-[#E8A317]";
+  };
+
   return (
     <section className="min-h-screen bg-[#F5F6F1]">
       <div className="screen-size">
@@ -68,51 +78,43 @@ export const ApplyEmployReq = () => {
         {/* Requisition Table */}
         {requisitionData.length > 0 ? (
           <div className="overflow-x-auto rounded-lg">
-            <table className="w-full text-left">
+            <table className="w-full">
               <thead className="bg-[#939393] text-white rounded-lg">
                 <tr>
                   <th className="pl-4 py-3">Requestor</th>
                   <th className="pl-4">Department</th>
-                  <th className="py-4">Applied Position</th>
+                  <th className="py-4">Position</th>
                   <th className="py-4">Project</th>
                   <th className="py-4">Quantity</th>
-                  <th className="py-4">Submit Date</th>
-                  <th className="py-4">Submitted Form</th>
-                  <th className="py-4">Form Status</th>
+                  <th className="py-4">Submitted Date</th>
+                  <th className="py-4">Form</th>
+                  <th className="py-4">Status</th>
                   <th className="py-4">Remarks</th>
                 </tr>
               </thead>
-              <tbody className="bg-white">
+              <tbody className="bg-white text-center">
                 {requisitionData.map((item) => (
-                  <tr key={item.id} className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)]">
-                    <td className="pl-4 py-4">{item.reqName}</td>
+                  <tr key={item.id} className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue">
+                    <td className="py-4 max-w-[200px] text-ellipsis overflow-hidden">{item.reqName}</td>
                     <td className="py-4">{item.department}</td>
-                    <td className="py-4">{item.position}</td>
-                    <td className="py-4">{item.project}</td>
-                    <td className="py-4">{item.quantity}</td>
-                    <td className="py-4">{format(new Date(item.createdAt), "dd-MM-yyyy")}</td>             
+                    <td className="py-4 max-w-[200px] text-ellipsis overflow-hidden">{item.position}</td>
+                    <td className="py-4 max-w-[200px] text-ellipsis overflow-hidden">{item.project}</td>
+                    <td className="py-4 ">{item.quantity}</td>
+                    <td className="py-4 ">{format(new Date(item.createdAt), "dd-MM-yyyy")}</td>             
 
                     <td className="py-4">
                       <a
                         href="#"
-                        className="text-[#2779f5f7] font-semibold underline cursor-pointer"
+                        className="text-[blue] font-semibold border-b-2 cursor-pointer"
                         onClick={() => handleViewClick(item)}
                       >
                         View
                       </a>
                     </td>
-                    {/* <td
-                      className={`py-4 font-semibold ${
-                        item.status === "Approved"
-                          ? "text-[#25a041]"
-                          : item.status === "Rejected"
-                          ? "text-[red]"
-                          : "text-grey"
-                      }`}
-                    > */}
-                       <td className="py-4">{item.status ? item.status : "Pending"}</td>   
-                    {/* </td> */}
-                    <td className="py-4">{item.remarks}</td>
+                    <td className={`py-4 font-semibold ${getStatusClass(item.status)}`}>
+                     {item.status ? item.status : "Pending"}
+                      </td>                    
+                    <td className="py-4 max-w-[200px] text-ellipsis overflow-hidden">{item.remarkReq}</td>
                   </tr>
                 ))}
               </tbody>

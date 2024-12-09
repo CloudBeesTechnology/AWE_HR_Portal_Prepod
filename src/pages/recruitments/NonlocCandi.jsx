@@ -47,7 +47,7 @@ export const NonlocCandi = () => {
   const handleRowSelect = (updatedSelectedRows) => {
     setSelectedRows(updatedSelectedRows);
   };
-  console.log(empPDData);
+  // console.log(empPDData);
   
   const otherCandidates = empPDData.filter((candidate) => {
     const isOtherNationality =

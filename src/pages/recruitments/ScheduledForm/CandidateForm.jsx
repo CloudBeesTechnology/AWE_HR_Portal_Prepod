@@ -46,7 +46,7 @@ export const CandidateForm = () => {
           },
         },
       });
-      console.log("Update Successful:", updatedData);
+      // console.log("Update Successful:", updatedData);
       alert("Department updated successfully!");
     } catch (error) {
       console.error("Error updating department:", error);

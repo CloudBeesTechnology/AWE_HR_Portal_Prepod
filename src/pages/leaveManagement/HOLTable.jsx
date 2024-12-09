@@ -24,12 +24,12 @@ export const HOLTable = ({
 
   const getStatusClass = (status) => {
     return status === "Rejected"
-      ? "text-[#C50000]"
+      ? "text-[red]"
       : status === "Approved"
-      ? "text-[#0CB100]"
+      ? "text-[green]"
       : status === "Pending"
       ? "text-dark_grey"
-      : "text-gray-500";
+      : "text-[#E8A317]";
   };
 
   // // Filter for approved and rejected statuses

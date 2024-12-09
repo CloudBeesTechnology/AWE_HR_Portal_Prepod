@@ -383,7 +383,7 @@ export const PersonalAcci = () => {
         <SpinLogo
           text="Personal Accident Saved Successfully"
           notification={notification}
-          path="/insuranceHr/personalAccii"
+          path="/insuranceHr/personalAcci"
         />
       )}
 

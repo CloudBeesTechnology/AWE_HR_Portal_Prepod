@@ -148,6 +148,7 @@ export const LabourImmigrationSchema = Yup.object().shape({
     })
   ),
 });
+
 export const WorkInfoSchema = Yup.object().shape({
   empID: Yup.string().required("Employee ID is mandatory"),
   department: Yup.string()
@@ -230,17 +231,14 @@ export const WorkInfoSchema = Yup.object().shape({
     .notRequired()
     .test(
       "is-on-or-after-doj-or-contract-start",
-      "Probation Start date must be the same as or after Date of Joining and Contract Start date",
+      "Probation Start date must be the same as or after Date of Joining ",
       function (value) {
-        const { doj, contractStart } = this.parent;
+        const { doj } = this.parent;
         if (!doj || !value) return true;
   
         const dojDate = new Date(doj);
-        const contractStartDate = contractStart ? new Date(contractStart) : dojDate; // Use contractStart if available; otherwise, fall back to doj
         const probationStartDate = new Date(value);
-  
-        // Check if probationStartDate is the same as or after the earliest of dojDate and contractStartDate
-        return probationStartDate >= dojDate && probationStartDate >= contractStartDate;
+        return probationStartDate >= dojDate;
       }
     ),
   probationEnd: Yup.string()
@@ -582,7 +580,7 @@ export const employeeInfoSchema = Yup.object().shape({
   name: Yup.string()
     .min(3, "Name must be at least 3 characters") // Minimum length check
     .matches(
-      /^[A-Za-z\s]+$/,
+      /[A-Za-z\s]/,
       "Name cannot contain numbers or special characters"
     ) // Regex to allow only letters and spaces
     .required("Name is mandatory"),
@@ -666,10 +664,8 @@ export const employeeInfoSchema = Yup.object().shape({
       return true;
     }
   ),
-
   inducBrief: Yup.string().required("Induction Briefing Date is mandatory"),
   inducBriefUp: Yup.string().notRequired(),
-
   preEmp: Yup.string().notRequired(),
   preEmpPeriod: Yup.string().notRequired(),
   bwnUpload: Yup.array()

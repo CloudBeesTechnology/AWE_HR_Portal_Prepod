@@ -10,7 +10,7 @@ import { DataSupply } from "../../utils/DataStoredContext";
 
 export const WorkInfoFunc = () => {
   const client = generateClient();
-  const {empPIData}=useContext(DataSupply)
+  const { empPIData } = useContext(DataSupply);
 
   const SubmitWIData = useCallback(async ({ workInfoValue }) => {
     if (!workInfoValue) {
@@ -69,6 +69,14 @@ export const WorkInfoFunc = () => {
       paterLeave,
       mrageLeave,
       compasLeave,
+      remainingAnualLeave,
+      remainingCompasLeave,
+      remainingHosLeave,
+      remainingMateLeave,
+      remainingMrageLeave,
+      remainingPaternityLeave,
+      remainingSickLeave,
+      unPaidAuthorize,
       probDuration,
       WIContract,
       WIProbation,
@@ -93,9 +101,6 @@ export const WorkInfoFunc = () => {
       uploadDep,
       sapNo,
     } = workInfoValue;
- 
-
-
 
     const formatDate = (date) =>
       date ? new Date(date).toLocaleDateString("en-CA") : null;
@@ -113,12 +118,11 @@ export const WorkInfoFunc = () => {
     const upgradeRevSalaryDate = formatDate(revSalaryDate);
     const upgradeRevLeaveDate = formatDate(revLeaveDate);
     const upgradeRevALD = formatDate(revALD);
-  
 
     const uniqueValues = [
       contractEndValue,
       contractStartValue,
- 
+
       probationEndValue,
       probationStartValue,
       upgradeDateValue,
@@ -169,43 +173,41 @@ export const WorkInfoFunc = () => {
       updatedWorkMonth,
       updatedContractPeriod,
     ] = uniqueValues;
-   
 
     const uniqueValues1 = [
-  annualLeave, 
-  annualLeaveDateValue, 
-  // compasLeave, 
-  destinateLeavePass, 
-  durLeavePass, 
-  dateLeavePassValue, 
-  leavePass, 
-  // materLeave, 
-  // mrageLeave, 
-  // paterLeave, 
-  // sickLeave, 
-  // sickLeaveDate, 
-  // hospLeave, 
+      annualLeave,
+      annualLeaveDateValue,
+      // compasLeave,
+      destinateLeavePass,
+      durLeavePass,
+      dateLeavePassValue,
+      leavePass,
+      // materLeave,
+      // mrageLeave,
+      // paterLeave,
+      // sickLeave,
+      // sickLeaveDate,
+      // hospLeave,
     ].map((value) => [...new Set([value])]);
 
     const [
-      updatedAnnualLeave, 
-      updatedAnnualLeaveDateValue, 
-      // updatedCompasLeave, 
-      updatedDestinateLeavePass, 
-      updatedDurLeavePass, 
-      updatedDateLeavePassValue, 
-      updatedLeavePass, 
-      // updatedMaterLeave, 
-      // updatedMrageLeave, 
-      // updatedPaterLeave, 
-      // updatedSickLeave, 
-      // updatedSickLeaveDate, 
-      // updatedHospLeave, 
+      updatedAnnualLeave,
+      updatedAnnualLeaveDateValue,
+      // updatedCompasLeave,
+      updatedDestinateLeavePass,
+      updatedDurLeavePass,
+      updatedDateLeavePassValue,
+      updatedLeavePass,
+      // updatedMaterLeave,
+      // updatedMrageLeave,
+      // updatedPaterLeave,
+      // updatedSickLeave,
+      // updatedSickLeaveDate,
+      // updatedHospLeave,
     ] = uniqueValues1;
 
-
     const uniqueValues3 = [
-      upgradeDepEmpDate, 
+      upgradeDepEmpDate,
       depEmp,
       upgradePositionRevDate,
       positionRev,
@@ -216,12 +218,11 @@ export const WorkInfoFunc = () => {
       upgradeRevALD,
       revAnnualLeave,
       // remarkWI,
+    ].map((value) => [...new Set([value])]);
 
-        ].map((value) => [...new Set([value])]);
-    
-        const [
-          upgradeDepEmpDateValue,
-          upgradeDepEmp, 
+    const [
+      upgradeDepEmpDateValue,
+      upgradeDepEmp,
       upgradePositionRevDateValue,
       pupgradePositionRev,
       upgradeRevSalaryDateValue,
@@ -229,11 +230,9 @@ export const WorkInfoFunc = () => {
       upgradeRevLeaveDateValue,
       upgradeRevLeavePass,
       upgradeRevALDValue,
-      upgradeDRevAnnualLeave,  
+      upgradeDRevAnnualLeave,
       // upgradeRemarkWI
-        ] = uniqueValues3;
-       
-
+    ] = uniqueValues3;
 
     const totalData = {
       empID,
@@ -266,23 +265,31 @@ export const WorkInfoFunc = () => {
       sapNo,
     };
 
-     const totalData1 = {
+    const totalData1 = {
       empID,
-  annualLeave: updatedAnnualLeave, 
-  annualLeaveDate: updatedAnnualLeaveDateValue, 
-  compasLeave,
-  destinateLeavePass: updatedDestinateLeavePass,
-  durLeavePass: updatedDurLeavePass, 
-  dateLeavePass: updatedDateLeavePassValue, 
-  leavePass: updatedLeavePass,
-  materLeave,
-  mrageLeave,
-  paterLeave,
-  sickLeave,
-  sickLeaveDate,
-  hospLeave,
+      annualLeave: updatedAnnualLeave,
+      annualLeaveDate: updatedAnnualLeaveDateValue,
+      compasLeave,
+      destinateLeavePass: updatedDestinateLeavePass,
+      durLeavePass: updatedDurLeavePass,
+      dateLeavePass: updatedDateLeavePassValue,
+      leavePass: updatedLeavePass,
+      materLeave,
+      mrageLeave,
+      paterLeave,
+      sickLeave,
+      sickLeaveDate,
+      hospLeave,
+      remainingAnualLeave,
+      remainingCompasLeave,
+      remainingHosLeave,
+      remainingMateLeave,
+      remainingMrageLeave,
+      remainingPaternityLeave,
+      remainingSickLeave,
+      unPaidAuthorize,
     };
-     const totalData2 = {
+    const totalData2 = {
       empID,
       resignDate,
       resignNotProb,
@@ -300,34 +307,33 @@ export const WorkInfoFunc = () => {
       WIProbation: JSON.stringify(WIProbation),
       WIResignation: JSON.stringify(WIResignation),
       WITermination: JSON.stringify(WITermination),
-      WILeaveEntitle: JSON.stringify(WILeaveEntitle), 
+      WILeaveEntitle: JSON.stringify(WILeaveEntitle),
     };
-     const totalData3 = {
+    const totalData3 = {
       empID,
-  depEmpDate:upgradeDepEmpDateValue, 
-  depEmp:upgradeDepEmp, 
-  positionRev:pupgradePositionRev, 
-  positionRevDate:upgradePositionRevDateValue, 
-  revSalary:upgradeRevSalary, 
-  revSalaryDate:upgradeRevSalaryDateValue, 
-  revLeavePass:upgradeRevLeavePass, 
-  revLeaveDate:upgradeRevLeaveDateValue, 
-  revAnnualLeave:upgradeDRevAnnualLeave, 
-  revALD:upgradeRevALDValue, 
-  remarkWI, 
-  uploadPR: JSON.stringify(uploadPR),
-  uploadSP: JSON.stringify(uploadSP),
-  uploadLP: JSON.stringify(uploadLP),
-  uploadAL: JSON.stringify(uploadAL),
-  uploadDep: JSON.stringify(uploadDep),
-
+      depEmpDate: upgradeDepEmpDateValue,
+      depEmp: upgradeDepEmp,
+      positionRev: pupgradePositionRev,
+      positionRevDate: upgradePositionRevDateValue,
+      revSalary: upgradeRevSalary,
+      revSalaryDate: upgradeRevSalaryDateValue,
+      revLeavePass: upgradeRevLeavePass,
+      revLeaveDate: upgradeRevLeaveDateValue,
+      revAnnualLeave: upgradeDRevAnnualLeave,
+      revALD: upgradeRevALDValue,
+      remarkWI,
+      uploadPR: JSON.stringify(uploadPR),
+      uploadSP: JSON.stringify(uploadSP),
+      uploadLP: JSON.stringify(uploadLP),
+      uploadAL: JSON.stringify(uploadAL),
+      uploadDep: JSON.stringify(uploadDep),
     };
     console.log(totalData);
     console.log(totalData1);
     console.log(totalData2);
     console.log(totalData3);
     try {
-      const [Emp,Leave,Ter,Ser] = await Promise.all([
+      const [Emp, Leave, Ter, Ser] = await Promise.all([
         client.graphql({
           query: createEmpWorkInfo,
           variables: {
@@ -356,9 +362,8 @@ export const WorkInfoFunc = () => {
 
       console.log(Emp);
       console.log(Leave);
-      console.log(Ter)
-      console.log(Ser)
-      
+      console.log(Ter);
+      console.log(Ser);
     } catch (error) {
       console.log(error);
     }

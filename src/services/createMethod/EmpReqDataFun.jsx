@@ -8,8 +8,15 @@ export const EmpReqDataFun = () => {
     if (!EmpReqValue ) {
       throw new Error("Missing required parameters");
     }
+
+    const userID = localStorage.getItem("userID");
+    if (!userID) {
+      throw new Error("User ID is not available in localStorage");
+    }
+
     const totalData = {
         reqName:EmpReqValue.reqName,
+        userID,
         department:EmpReqValue.department,  
         project: EmpReqValue.project,
         position: EmpReqValue.position,

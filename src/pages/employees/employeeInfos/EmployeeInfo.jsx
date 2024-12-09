@@ -29,6 +29,7 @@ import { DataSupply } from "../../../utils/DataStoredContext";
 import { Badge } from "@aws-amplify/ui-react";
 import { UpdateEmpInfo } from "../../../services/updateMethod/UpdateEmpInfo";
 import { getUrl } from "@aws-amplify/storage";
+import { RowThirteen } from "./RowThirteen";
 
 export const EmployeeInfo = () => {
   useEffect(() => {
@@ -381,6 +382,8 @@ export const EmployeeInfo = () => {
   };
 
   const onSubmit = async (data) => {
+    console.log(data);
+    
     data.contractType = contractTypes;
     data.empType = empTypes;
 
@@ -655,6 +658,7 @@ export const EmployeeInfo = () => {
               {uploadedFileNames?.inducBriefUp}
             </p>
           </div>
+          <RowThirteen register={register} errors={errors} /> 
         </div>
 
         <div className="grid grid-cols-4 gap-5 form-group mt-5">

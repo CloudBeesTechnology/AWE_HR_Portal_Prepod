@@ -59,7 +59,6 @@ export const LeaveManage = () => {
   // console.log("Notification", emailNotifications);
   // console.log("WorkInfo Data 6.0", mergedData);
 
-
   useEffect(() => {
     // Set initial data when mergedData changes
     setData(applyFilters());
@@ -88,8 +87,22 @@ export const LeaveManage = () => {
     if (selectedDate) {
       const selectedDateObject = new Date(selectedDate);
       filteredData = filteredData.filter((item) => {
-        const itemDate =
-          count === 0 ? new Date(item.createdAt) : new Date(item["start Date"]);
+        // const itemDate =
+        //   count === 0 ? new Date(item.createdAt) : new Date(item["start Date"]);
+        let itemDate;
+        if (count === 0) {
+          itemDate = new Date(item.createdAt); // Use 'createdAt' for count 0
+        } else if (count === 1) {
+          itemDate = new Date(item.fromDate); // Use 'start Date' for count 1
+          
+        } else if (count === 2) {
+          itemDate = new Date(item["end Date"]); // Use 'end Date' for count 2
+        } else if (count === 3) {
+          itemDate = new Date(item.
+            arrivalDate); // Use 'ticketDate' for count 3 (or whatever field is relevant)
+          itemDate = new Date(item.departureDate);
+        }
+
         return (
           itemDate.getFullYear() === selectedDateObject.getFullYear() &&
           itemDate.getMonth() === selectedDateObject.getMonth() &&
@@ -103,10 +116,11 @@ export const LeaveManage = () => {
         item.empID.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
+    // console.log(filteredData, "Filter")
 
     return filteredData;
+   
   };
-
   // Handle pagination and filters
 
   useEffect(() => {
@@ -264,7 +278,7 @@ export const LeaveManage = () => {
         <section className="flex justify-between items-center py-3">
           <p className="text_size_5">
             <span
-              className={`relative after:absolute after:-bottom-1 after:left-0 after:w-[90%] after:h-1 cursor-pointer ${
+              className={`pr-2 relative after:absolute after:-bottom-1 after:left-0 after:w-[90%] after:h-1 cursor-pointer ${
                 count === 0 && "after:bg-primary"
               }`}
               onClick={() => {
@@ -275,9 +289,9 @@ export const LeaveManage = () => {
             >
               Request Leave
             </span>{" "}
-            /{" "}
+            {" "}
             <span
-              className={`relative after:absolute after:-bottom-2 after:left-0 after:w-[90%] after:h-1 cursor-pointer ${
+              className={`px-2 relative after:absolute after:-bottom-2 after:left-0 after:w-[90%] after:h-1 cursor-pointer ${
                 count === 1 && "after:bg-primary"
               }`}
               onClick={() => {
@@ -287,9 +301,9 @@ export const LeaveManage = () => {
             >
               History of leave
             </span>{" "}
-            /{" "}
+            {" "}
             <span
-              className={`relative after:absolute after:-bottom-2 after:left-0 after:w-[90%] after:h-1 cursor-pointer ${
+              className={`px-2 relative after:absolute after:-bottom-2 after:left-0 after:w-[90%] after:h-1 cursor-pointer ${
                 count === 2 && "after:bg-primary"
               }`}
               onClick={() => {
@@ -301,9 +315,9 @@ export const LeaveManage = () => {
             </span>{" "}
             {(userType === "HR" || userType === "SuperAdmin") && (
               <>
-                /{" "}
+                {" "}
                 <span
-                  className={`relative after:absolute after:-bottom-2 after:left-0 after:w-[90%] after:h-1 cursor-pointer ${
+                  className={`px-2 relative after:absolute after:-bottom-2 after:left-0 after:w-[90%] after:h-1 cursor-pointer ${
                     count === 3 && "after:bg-primary"
                   }`}
                   onClick={() => {
@@ -342,9 +356,8 @@ export const LeaveManage = () => {
                   }}
                 />
                 {count !== 0 && (
-                      <Filter AfterFilter={handleFilterChange} />
-                )}
-            
+                  <Filter AfterFilter={handleFilterChange} />
+                )}           
               </>
             )}
           </div>
@@ -427,7 +440,6 @@ export const LeaveManage = () => {
             </>
           )}
         </section>
-
 
         {/* Pagination section */}
         <div className="ml-20 flex justify-center">

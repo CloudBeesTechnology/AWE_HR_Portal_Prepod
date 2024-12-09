@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { generateClient } from "@aws-amplify/api";
 import { listEmpLeaveDetails } from "../graphql/queries"; // Assuming you have the query for listEmpLeaveDetails
 
-const client = generateClient();
+const client = generateClient(); 
 
 export const useEmpLeaveDetails = () => {
   const [empLeaveDetails, setEmpLeaveDetails] = useState([]);

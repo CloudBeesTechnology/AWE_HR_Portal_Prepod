@@ -460,9 +460,9 @@ Best regards,
                 {data?.storedValue?.data?.selectType || "Select access"}
               </option>
               <option value="SuperAdmin">SuperAdmin</option>
-              <option value="Admin">Admin</option>
-              <option value="Manager">Manager</option>
+              <option value="GM">GM</option>
               <option value="HR">HR</option>
+              <option value="Manager">Manager</option>
               <option value="Supervisor">Supervisor</option>
               <option value="Training Requestor">Training Requestor</option>
               <option value="TimeKeeper">TimeKeeper</option>

@@ -6,7 +6,7 @@ import { useLeaveManage } from "../../hooks/useLeaveManage";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { useCreateNotification } from "../../hooks/useCreateNotification"; // Importing the custom hook
 import {UpdateLeaveData} from "../../services/updateMethod/UpdateLeaveData"
-
+import { useEmpLeaveDetails } from "../../hooks/useEmpLeaveDetails";
 
 export const ViewForm = ({
   handleClickForToggle,
@@ -26,8 +26,10 @@ export const ViewForm = ({
   const { handleUpdateLeaveStatus, handleUpdateTicketRequest } = useLeaveManage();
   const { createNotification } = useCreateNotification(); // Hook for creating notification
   const { leaveDetails } = UpdateLeaveData();
+  const {empLeaveDetails} = useEmpLeaveDetails()
 
-  // console.log("workInfow",workInfo)
+
+  // console.log("Leave Leave",empLeaveDetails)
 
   const handleUpdateStatus = async (status) => {
     const updateData = {};
@@ -79,41 +81,80 @@ export const ViewForm = ({
         });
       }
 
-
       if (source === "LM") {
         if (userType === "Manager") {
           // Calculate remaining leave based on leave type
           let remainingLeaveUpdate = {};
-    
+      
+          // Subtract leave days from the corresponding leave type total
           if (leaveData.leaveType === "Hospitalisation Leave") {
-            remainingLeaveUpdate.remainingHosLeave = leaveData.leaveDetails.hospLeave - leaveData.days;
+            remainingLeaveUpdate.remainingHosLeave = leaveData.leaveDetails.remainingHosLeave - leaveData.days;
           } else if (leaveData.leaveType === "Annual Leave") {
-            remainingLeaveUpdate.remainingAnualLeave = leaveData.leaveDetails.annualLeave - leaveData.days;
+            remainingLeaveUpdate.remainingAnualLeave = leaveData.leaveDetails.remainingAnualLeave - leaveData.days;
           } else if (leaveData.leaveType === "Sick Leave") {
-            remainingLeaveUpdate.remainingSickLeave = leaveData.leaveDetails.sickLeave - leaveData.days;
+            remainingLeaveUpdate.remainingSickLeave = leaveData.leaveDetails.remainingSickLeave - leaveData.days;
           } else if (leaveData.leaveType === "Marriage Leave") {
-            remainingLeaveUpdate.remainingMrageLeave = leaveData.leaveDetails.mrageLeave - leaveData.days;
+            remainingLeaveUpdate.remainingMrageLeave = leaveData.leaveDetails.remainingMrageLeave - leaveData.days;
           } else if (leaveData.leaveType === "Compassionate Leave") {
-            remainingLeaveUpdate.remainingCompasLeave = leaveData.leaveDetails.compasLeave - leaveData.days;
+            remainingLeaveUpdate.remainingCompasLeave = leaveData.leaveDetails.remainingCompasLeave - leaveData.days;
           } else if (leaveData.leaveType === "Paternity Leave") {
-            remainingLeaveUpdate.remainingPaternityLeave = leaveData.leaveDetails.paterLeave - leaveData.days;
+            remainingLeaveUpdate.remainingPaternityLeave = leaveData.leaveDetails.remainingPaternityLeave - leaveData.days;
           } else if (leaveData.leaveType === "Maternity Leave") {
-            remainingLeaveUpdate.remainingMateLeave = leaveData.leaveDetails.materLeave - leaveData.days;
+            remainingLeaveUpdate.remainingMateLeave = leaveData.leaveDetails.remainingMateLeave - leaveData.days;
           } else if (leaveData.leaveType === "Compensate Leave") {
-            remainingLeaveUpdate.remainingCompasLeave = 0; // Setting it to 0 based on the given condition
+            // Setting compensate leave to 0 based on given condition
+            remainingLeaveUpdate.remainingCompasLeave = 0;
           }
-    
+      
           // Update remaining leave details
           console.log('Remaining Leave Update:', remainingLeaveUpdate);
+          
           const LeaveValue = {
-            id:leaveData.leaveDetails.id,
-             ...remainingLeaveUpdate,
-
+            id: leaveData.leaveDetails.id,
+            ...remainingLeaveUpdate
           }
-          await leaveDetails({LeaveValue});
-          console.log(LeaveValue, "LeaveRecords")
+      
+          // Call the function to update the leave data
+          await leaveDetails({ LeaveValue });
+          console.log(LeaveValue, "LeaveRecords");
+        }
       }
-    }
+    
+
+    //   if (source === "LM") {
+    //     if (userType === "Manager") {
+    //       // Calculate remaining leave based on leave type
+    //       let remainingLeaveUpdate = {};
+    
+    //       if (leaveData.leaveType === "Hospitalisation Leave") {
+    //         remainingLeaveUpdate.remainingHosLeave = leaveData.leaveDetails.hospLeave - leaveData.days;
+    //       } else if (leaveData.leaveType === "Annual Leave") {
+    //         remainingLeaveUpdate.remainingAnualLeave = leaveData.leaveDetails.annualLeave - leaveData.days;
+    //       } else if (leaveData.leaveType === "Sick Leave") {
+    //         remainingLeaveUpdate.remainingSickLeave = leaveData.leaveDetails.sickLeave - leaveData.days;
+    //       } else if (leaveData.leaveType === "Marriage Leave") {
+    //         remainingLeaveUpdate.remainingMrageLeave = leaveData.leaveDetails.mrageLeave - leaveData.days;
+    //       } else if (leaveData.leaveType === "Compassionate Leave") {
+    //         remainingLeaveUpdate.remainingCompasLeave = leaveData.leaveDetails.compasLeave - leaveData.days;
+    //       } else if (leaveData.leaveType === "Paternity Leave") {
+    //         remainingLeaveUpdate.remainingPaternityLeave = leaveData.leaveDetails.paterLeave - leaveData.days;
+    //       } else if (leaveData.leaveType === "Maternity Leave") {
+    //         remainingLeaveUpdate.remainingMateLeave = leaveData.leaveDetails.materLeave - leaveData.days;
+    //       } else if (leaveData.leaveType === "Compensate Leave") {
+    //         remainingLeaveUpdate.remainingCompasLeave = 0; // Setting it to 0 based on the given condition
+    //       }
+    
+    //       // Update remaining leave details
+    //       console.log('Remaining Leave Update:', remainingLeaveUpdate);
+    //       const LeaveValue = {
+    //         id:leaveData.leaveDetails.id,
+    //          ...remainingLeaveUpdate,
+
+    //       }
+    //       await leaveDetails({LeaveValue});
+    //       console.log(LeaveValue, "LeaveRecords")
+    //   }
+    // }
       
       setNotification(true);
       setTimeout(() => {

@@ -46,7 +46,7 @@ export const PAAFForm = () => {
       ...data,
       paafFile: uploadedPAAF, // Include the uploaded file URL
     };
-    console.log("Form submitted with data:", formData);
+    // console.log("Form submitted with data:", formData);
   };
 
   return (

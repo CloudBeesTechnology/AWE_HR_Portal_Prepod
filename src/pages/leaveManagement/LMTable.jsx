@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Pagination } from "./Pagination";
 import { getUrl } from "@aws-amplify/storage";
 
-
 export const LMTable = ({
   initialData,
   statusUpdate,
@@ -21,14 +20,13 @@ export const LMTable = ({
     try {
       // Fetch the file URL from AWS Amplify storage
       const result = await getUrl({ path: pathUrl });
-         console.log("File URL:", result.url.href);
+      console.log("File URL:", result.url.href);
       // Set the generated URL in state to be used for the download link
-      setPPLastUP(result.url.href); 
+      setPPLastUP(result.url.href);
     } catch (error) {
       console.error("Error fetching the file URL:", error);
     }
   };
-
 
   useEffect(() => {
     setData(initialData);
@@ -52,9 +50,8 @@ export const LMTable = ({
   const editStatus = (itemId, status) => {
     // Call the statusUpdate function and update the local state
     statusUpdate(itemId, status).then((updatedItem) => {
-      console.log("Helo",editStatus)
+      console.log("Helo", editStatus);
       setData((prevData) =>
-        
         prevData.map((item) =>
           item.id === updatedItem.id ? updatedItem : item
         )
@@ -64,12 +61,12 @@ export const LMTable = ({
 
   const getStatusClass = (status) => {
     return status === "Rejected"
-      ? "text-[#C50000]"
+      ? "text-[red]"
       : status === "Approved"
-      ? "text-[#0CB100]"
+      ? "text-[green]"
       : status === "Pending"
       ? "text-dark_grey"
-      : "text-gray-500";
+      : "text-[#E8A317]";
   };
 
   const filteredData = data.filter((item) => item.empStatus !== "Cancelled");
@@ -211,21 +208,18 @@ export const LMTable = ({
     //       )}
     //     </div>
     //     <div>
-        
+
     //     </div>
     //   </div>
     // </section>
 
-     <section className="flex flex-col">
+    <section className="flex flex-col">
       <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] max-w-[100%] overflow-x-auto rounded-xl">
         <table className="w-[1150px] font-semibold text-sm text-center">
           <thead className="bg-[#939393] sticky top-0 rounded-t-lg">
             <tr>
               {heading.map((header, index) => (
-                <th
-                  key={index}
-                  className="px-4 py-5 text-[15px] text-white"
-                >
+                <th key={index} className="px-4 py-5 text-[15px] text-white">
                   {header}
                 </th>
               ))}
@@ -238,22 +232,14 @@ export const LMTable = ({
                   key={item.id}
                   className="text-center text-sm shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
                 >
+                  <td className="py-3">{index + 1}</td>
+                  <td className="py-3">{item.empID}</td>
                   <td className="py-3">
-                    {index + 1}
-                  </td>
-                  <td className="py-3">
-                    {item.empID}
-                  </td>
-                  <td className="py-3 text-start pl-4">
                     {item.employeeInfo.name || "Tony Stark"}
                   </td>
-                  <td className="py-3">
-                    {formatDate(item.createdAt)}
-                  </td>
+                  <td className="py-3">{formatDate(item.createdAt)}</td>
                   {userType !== "Supervisor" && userType !== "Manager" && (
-                    <td className="py-3">
-                      {item.supervisorName || "N/A"}
-                    </td>
+                    <td className="py-3">{item.supervisorName || "N/A"}</td>
                   )}
                   {userType !== "Manager" && (
                     <td className="py-3">
@@ -261,9 +247,7 @@ export const LMTable = ({
                     </td>
                   )}
                   {userType !== "Manager" && userType !== "Supervisor" && (
-                    <td className="py-3">
-                      {item.managerName || "N/A"}
-                    </td>
+                    <td className="py-3">{item.managerName || "N/A"}</td>
                   )}
                   {userType !== "Supervisor" && (
                     <td className="py-3">
@@ -272,16 +256,27 @@ export const LMTable = ({
                   )}
 
                   <td className="py-3">
-                    <span className="border-b-2 border-[orange] text-[orange]">
-                      <a
-                        href={lastUploadUrl}
-                        onClick={() =>
-                          linkToStorageFile(item.medicalCertificate)
-                        }
-                        download
-                      >
-                        {item.medicalCertificate ? "Download" : "N/A"}
-                      </a>
+                    <span className="">
+                      <td className="py-3">
+                        <span className="">
+                          <a
+                            href={lastUploadUrl}
+                            onClick={(e) => {
+                              if (!item.medicalCertificate) {
+                                e.preventDefault(); // Prevent the default link behavior when there's no certificate
+                              } else {
+                                linkToStorageFile(item.medicalCertificate); // Trigger the download if the certificate exists
+                              }
+                            }}
+                            download
+                            className={
+                              item.medicalCertificate ? "border-b-2 border-[orange] text-[orange]" : ""
+                            } // Apply underline only when medicalCertificate exists
+                          >
+                            {item.medicalCertificate ? "Download" : "N/A"}
+                          </a>
+                        </span>
+                      </td>
                     </span>
                   </td>
 
@@ -291,12 +286,17 @@ export const LMTable = ({
                       onClick={() => {
                         handleClickForToggle();
                         onViewClick(item);
+                        // console.log(item.leaveDetails);
                       }}
                     >
                       {item["submitted Form"] || "View"}
                     </span>
                   </td>
-                  <td className={`font-semibold ${getStatusClass(item.managerStatus)}`}>
+                  <td
+                    className={`font-semibold ${getStatusClass(
+                      item.managerStatus
+                    )}`}
+                  >
                     {(userType === "Supervisor" && item.supervisorStatus) ||
                       (userType === "Manager" && item.managerStatus)}
                   </td>
@@ -328,12 +328,10 @@ export const LMTable = ({
         </div>
       </div>
     </section>
-)
+  );
 };
 //{userType === "Supervisior" && item.supervisorStatus || userType === "Manager" && item.managerStatus}
 
-
-
-// remainingAnualLeave, remainingSickLeave, remainingMateLeave, 
+// remainingAnualLeave, remainingSickLeave, remainingMateLeave,
 // remainingmrageLeave, remainingPaternityLeave, remainingHosLeave
 // remainingCompasLeave

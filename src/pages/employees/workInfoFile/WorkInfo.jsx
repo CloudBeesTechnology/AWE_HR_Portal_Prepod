@@ -203,6 +203,9 @@ export const WorkInfo = () => {
       "compasLeave",
       "remarkWI",
       "sapNo",
+      "remainingAnualLeave", "remainingCompasLeave", "remainingHosLeave", "remainingMateLeave", "remainingMrageLeave", "remainingPaternityLeave", "remainingSickLeave"
+
+      
 
     ];
 
@@ -352,8 +355,27 @@ export const WorkInfo = () => {
       ) {
         const workInfoUpValue = {
           ...data,
+          remainingAnualLeave: data?.annualLeave?.[0] || "0",  // Fixing the syntax
+          remainingCompasLeave: data?.compasLeave || "0",
+          remainingHosLeave: data?.hospLeave || "0",
+          remainingMateLeave: data?.materLeave || "0",
+          remainingMrageLeave: data?.mrageLeave || "0",
+          remainingPaternityLeave: data?.paterLeave || "0",
+          remainingSickLeave: data?.sickLeave || "0",
+          unPaidAuthorize: "0",
           SRDataRecord: SRDataRecord,
-          leaveDetailsDataRecord: leaveDetailsDataRecord,
+          leaveDetailsDataRecord: {
+            ...leaveDetailsDataRecord,
+            remainingAnualLeave: data?.annualLeave?.[0] || "0",  // Fixing the syntax
+            remainingCompasLeave: data?.compasLeave || "0",
+            remainingHosLeave: data?.hospLeave || "0",
+            remainingMateLeave: data?.materLeave || "0",
+            remainingMrageLeave: data?.mrageLeave || "0",
+            remainingPaternityLeave: data?.paterLeave || "0",
+            remainingSickLeave: data?.sickLeave || "0",
+            unPaidAuthorize: "0",
+          },
+          
           workInfoDataRecord: workInfoDataRecord,
           terminateDataRecord: terminateDataRecord,
           WIContract: JSON.stringify(nameServiceUp.WIContract),
@@ -367,14 +389,23 @@ export const WorkInfo = () => {
           uploadAL: JSON.stringify(nameServiceUp.uploadAL),
           uploadDep: JSON.stringify(nameServiceUp.uploadDep),
         };
-        // console.log(workInfoUpValue);
-
+        console.log("Update Value",workInfoUpValue);
         await WIUpdateData({ workInfoUpValue });
         setShowTitle("Employee Work Info Updated successfully");
         setNotification(true);
+
       } else {
         const workInfoValue = {
-          ...data,
+          ...data,        
+            remainingAnualLeave: data?.annualLeave || "0", // Default to "0" if no value is provided
+            remainingCompasLeave: data?.compasLeave || "0",
+            remainingHosLeave: data?.hospLeave || "0",
+            remainingMateLeave: data?.materLeave || "0",
+            remainingMrageLeave: data?.mrageLeave || "0",
+            remainingPaternityLeave: data?.paterLeave || "0",
+            remainingSickLeave: data?.sickLeave || "0",
+            unPaidAuthorize: "0",
+        
           sapNo: checkingPITable.sapNo,
           WIContract: JSON.stringify(nameServiceUp.WIContract),
           WIProbation: JSON.stringify(nameServiceUp.WIProbation),
@@ -387,6 +418,7 @@ export const WorkInfo = () => {
           uploadAL: JSON.stringify(nameServiceUp.uploadAL),
           uploadDep: JSON.stringify(nameServiceUp.uploadDep),
         };
+        // console.log("Create Value", workInfoValue)
         await SubmitWIData({ workInfoValue });
         setShowTitle("Employee Work Info saved successfully");
         setNotification(true);

@@ -12,7 +12,7 @@ const client = generateClient();
 export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
   // Pass showDecisionButtons as a prop
   const { IVSSDetails } = useContext(DataSupply);
-  console.log(IVSSDetails);
+  // console.log(IVSSDetails);
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [notification, setNotification] = useState(false);
   const { personalDetails } = useLeaveManage();
@@ -41,13 +41,13 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
 
       if (validMatches.length === 0) {
         console.error("No matching candidates found.");
-        console.log("dataCandi:", dataCandi);
-        console.log("IVSSDetails:", IVSSDetails);
+        // console.log("dataCandi:", dataCandi);
+        // console.log("IVSSDetails:", IVSSDetails);
         return;
       }
 
       for (const match of validMatches) {
-        console.log("Updating candidate with ID:", match.id);
+        // console.log("Updating candidate with ID:", match.id);
 
         const data = {
           id: match.id,
@@ -60,12 +60,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             variables: { input: data },
           });
 
-          console.log(
-            "Update successful for candidate ID",
-            match.id,
-            ":",
-            response
-          );
+          // console.log("Update successful for candidate ID",match.id, ":", response);
           setNotification(true); // Show notification on success
         } catch (err) {
           console.error("Error updating candidate ID", match.id, ":", err);
@@ -92,13 +87,13 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
 
       if (validMatches.length === 0) {
         // console.log(error);
-        console.log("dataCandi:", dataCandi);
-        console.log("IVSSDetails:", IVSSDetails);
+        // console.log("dataCandi:", dataCandi);
+        // console.log("IVSSDetails:", IVSSDetails);
         return;
       }
 
       for (const match of validMatches) {
-        console.log("Updating candidate with ID:", match.id);
+        // console.log("Updating candidate with ID:", match.id);
 
         const data = {
           id: match.id,
@@ -111,12 +106,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             variables: { input: data },
           });
 
-          console.log(
-            "Update successful for candidate ID",
-            match.id,
-            ":",
-            response
-          );
+          // console.log("Update successful for candidate ID", match.id, ":",response );
         } catch (err) {
           console.log(err);
 
