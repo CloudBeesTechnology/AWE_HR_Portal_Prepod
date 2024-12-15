@@ -10,7 +10,6 @@ import { UserDelete } from "../../services/deleteMethod/UserDelete";
 
 export const User = () => {
   const { empPIData, userData, workInfoData } = useContext(DataSupply);
-
   const { SubmitDeletedUser } = UserDelete();
 
   const [userDetails, setUserDetails] = useState([]);
@@ -177,28 +176,25 @@ export const User = () => {
               <thead>
                 <tr className="text_size_5 text-dark_grey ">
                   <th className="px-2 text-start py-3">EMP ID</th>
-                  {/* <th className="px-2 text-start  py-3">User ID</th> */}
                   <th className="px-2 text-start  py-3">Name</th>
                   <th className="px-2 text-start py-3">Type</th>
                   <th className="px-2 text-start py-3">Official Email Id</th>
                   <th className="px-2 text-start py-3">Password</th>
-                  <th className="px-2 text-start py-3">ViewForm</th>
+                  <th className="px-2 text-center py-3">ViewForm</th>
                   <th className="px-2 text-start py-3">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredData && filteredData.length > 0 ? (
                   filteredData.map((val, i) => {
-                    // console.log(val);
-
                     return (
                       <tr key={i}>
-                        <td className="px-6 py-2">{val.empID}</td>
-                        {/* <td className="px-6 py-2">{val.empID}</td> */}
-                        <td className="px-6 py-2">{val.name}</td>
-                        <td className="px-6 py-2">{val.selectType}</td>
-                        <td className="px-6 py-2">{val.officialEmail}</td>
-                        <td className="px-6 w-[200px] py-2 text-center">
+                        <td className="px-2 py-2">{val.empID}</td>
+                        {/* <td className="px-2 py-2">{val.empID}</td> */}
+                        <td className="px-2 py-2">{val.name}</td>
+                        <td className="px-2 py-2">{val.selectType}</td>
+                        <td className="px-2 py-2">{val.officialEmail}</td>
+                        <td className="px-2 w-[200px] py-2 text-center">
                           <input
                             type="password"
                             className="outline-none w-full"
@@ -208,7 +204,7 @@ export const User = () => {
                         </td>
                         <td className="center">
                           <span
-                            className=" text-[blue]  text-center border-b-2"
+                            className=" text-[blue] border-b-2"
                             onClick={() => {
                               ViewFormShow();
                               setSendData(val);
@@ -218,7 +214,7 @@ export const User = () => {
                             View
                           </span>
                         </td>
-                        <td className="px-6 py-2">
+                        <td className="px-2 py-2">
                           <div className="flex gap-5">
                             <span
                               onClick={() => {

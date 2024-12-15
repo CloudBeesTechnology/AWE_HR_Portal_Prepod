@@ -1,122 +1,253 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import * as Yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { GoUpload } from 'react-icons/go';
+import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { LocalMobilization } from "../../../services/createMethod/CreateLOI"; // Import the hook
 import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
-
-const LOIFormSchema = Yup.object().shape({
-  loiIssueDate: Yup.date().required('Issue date is required'),
-  loiAcceptDate: Yup.date().nullable(),
-  loiDeclineDate: Yup.date().nullable(),
-  declineReason: Yup.string().when('loiDeclineDate', {
-    is: (val) => val != null,
-    then: Yup.string().required('Decline reason is required if declined'),
-  }),
-  loiFile: Yup.mixed().nullable().test('fileType', 'Only PDF files are allowed', (value) =>
-    value ? value[0].type === 'application/pdf' : true
-  ),
-});
+import { FileUploadField } from "../../employees/medicalDep/FileUploadField";
+import { useFetchInterview } from "../../../hooks/useFetchInterview";
+import { UpdateLoiData } from "../../../services/updateMethod/UpdateLoi";
 
 export const LOIForm = () => {
-  const [uploadedFileName, setUploadedFileName] = useState(null);
-  const [uploadedLoi, setUploadedLoi] = useState(null);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-  } = useForm({
-    resolver: yupResolver(LOIFormSchema),
+  const { localMobilization, isLoading, notification, error } = LocalMobilization(); // Use the custom hook
+    const {loiDetails} = UpdateLoiData();
+  const { mergedInterviewData } = useFetchInterview();
+  const [uploadedFileNames, setUploadedFileNames] = useState({
+    loiFile: null,
+  });
+  const [uploadedLOI, setUploadedLOI] = useState({
+    loiFile: null,
   });
 
-  const handleFileChange = async (e, type) => {
-    const file = e.target.files[0];
-    setValue(type, file); // Set file value for validation
-    if (file) {
-      if (type === "loiFile") {
-        // Assuming uploadLoi is a custom function to upload the file
-        await uploadDocs(file, "loiFile", setUploadedLoi); // Ensure uploadLoi function works correctly
-        setUploadedFileName(file.name); // Store file name for display
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm();
+    const [formData, setFormData] = useState({
+      interview: {
+        loiIssueDate: "",
+        loiAcceptDate: "",
+        loiDeclineDate: "",
+        declineReason: "",
+        tempID: "",
+        
+      },
+    });
+
+  const LOIFile = watch("loiFile", "");
+
+  const extractFileName = (url) => {
+    if (typeof url === "string" && url) {
+      return url.split("/").pop(); // Extract the file name from URL
+    }
+    return "";
+  };
+
+    const handleFileChange = async (e, type) => {
+  
+      const file = e.target.files[0];
+      setValue(type, file); // Set file value for validation
+      if (file) {
+        if (type === "loiFile") {
+          await uploadDocs(file, "loiFile", setUploadedLOI, "personName");
+  
+          setUploadedFileNames((prev) => ({
+            ...prev,
+            loiFile: file.name, // Store the file name for display
+          }));
+        }
       }
+    };
+  
+  // Handle form submission
+  const onSubmit = async (data) => {
+   
+
+    const formattedData = {
+      loiIssueDate: data.loiIssueDate,
+      loiAcceptDate: data.loiAcceptDate,
+      loiDeclineDate: data.loiDeclineDate,
+      declineReason: data.declineReason,
+      loiFile: uploadedLOI.loiFile, // Add the uploaded file's URL or reference
+      tempID: formData.interview.tempID,
+    };
+
+    // Call the createLOI function from the custom hook
+    try {
+      await localMobilization(formattedData);
+    } catch (err) {
+      console.error("LOI creation failed:", err);
     }
   };
 
-  const onSubmit = (data) => {
-    console.log({
-      ...data,
-      loiFile: uploadedLoi, // Ensure correct data structure when submitting
-    });
+  const handleSubmitTwo = async (e) => {
+    e.preventDefault();
+
+    const localMobilizationId = mergedInterviewData[0]?.localMobilization.id;
+
+    try {
+      await loiDetails({
+        LoiValue: {
+          id: localMobilizationId,
+          loiIssueDate: formData.interview.loiIssueDate,
+          loiAcceptDate: formData.interview.loiAcceptDate,
+          loiDeclineDate: formData.interview.loiDeclineDate,
+          declineReason: formData.interview.declineReason,
+          loiFile: uploadedLOI.loiFile,
+        },
+      });
+      console.log("Data stored successfully...");
+      // setNotification(true);
+    } catch (error) {
+      console.error("Error submitting interview details:", error);
+      alert("Failed to update interview details. Please try again.");
+    }
   };
 
+
+  useEffect(() => {
+    if (mergedInterviewData.length > 0) {
+      const interviewData = mergedInterviewData[0]; // Assuming we want to take the first item
+      setFormData({
+        interview: {
+          loiIssueDate: interviewData.localMobilization.loiIssueDate,
+          loiAcceptDate: interviewData.localMobilization.loiAcceptDate,
+          loiDeclineDate: interviewData.localMobilization.loiDeclineDate,
+          declineReason: interviewData.localMobilization.declineReason,
+          loiFile: interviewData.localMobilization.loiFile,
+          tempID: interviewData.tempID
+        },
+      });
+      if (interviewData.localMobilization.loiFile) {
+        setUploadedFileNames((prev) => ({
+          ...prev,
+          loiFile: extractFileName(interviewData.localMobilization.loiFile),
+        }));
+      }
+    }
+  }, [mergedInterviewData]);
+
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      interview: {
+        ...prev.interview,
+        [field]: value,
+      },
+    }));
+  };
+
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form>
       <div className="grid grid-cols-2 gap-5 mt-5">
         <div>
           <label htmlFor="loiIssueDate">Date of Issue</label>
-          <input className="w-full border p-2 rounded mt-1" type="date" id="loiIssueDate" {...register('loiIssueDate')} />
-          {errors.loiIssueDate && <p className="text-[red] text-xs">{errors.loiIssueDate.message}</p>}
+          <input
+            className="w-full border p-2 rounded mt-1"
+            type="date"
+            id="loiIssueDate"
+            {...register("loiIssueDate", { required: "Date of Issue is required" })}
+            value={formData.interview.loiIssueDate}
+            onChange={(e) => handleInputChange("loiIssueDate", e.target.value)}
+          />
+          {errors.loiIssueDate && (
+            <p className="text-[red] text-xs">{errors.loiIssueDate.message}</p>
+          )}
         </div>
         <div>
           <label htmlFor="loiAcceptDate">Date of Acceptance</label>
-          <input className="w-full border p-2 rounded mt-1" type="date" id="loiAcceptDate" {...register('loiAcceptDate')} />
-          {errors.loiAcceptDate && <p className="text-[red] text-xs">{errors.loiAcceptDate.message}</p>}
+          <input
+            className="w-full border p-2 rounded mt-1"
+            type="date"
+            id="loiAcceptDate"
+            {...register("loiAcceptDate")}
+            value={formData.interview.loiAcceptDate}
+            onChange={(e) => handleInputChange("loiAcceptDate", e.target.value)}
+            
+          />
+          {errors.loiAcceptDate && (
+            <p className="text-[red] text-xs">{errors.loiAcceptDate.message}</p>
+          )}
         </div>
         <div>
           <label htmlFor="loiDeclineDate">Date of Decline</label>
-          <input className="w-full border p-2 rounded mt-1" type="date" id="loiDeclineDate" {...register('loiDeclineDate')} />
-          {errors.loiDeclineDate && <p className="text-[red] text-xs">{errors.loiDeclineDate.message}</p>}
+          <input
+            className="w-full border p-2 rounded mt-1"
+            type="date"
+            id="loiDeclineDate"
+            {...register("loiDeclineDate")}
+            value={formData.interview.loiDeclineDate}
+            onChange={(e) => handleInputChange("loiDeclineDate", e.target.value)}
+          />
+          {errors.loiDeclineDate && (
+            <p className="text-[red] text-xs">{errors.loiDeclineDate.message}</p>
+          )}
         </div>
         <div>
-  <label htmlFor="declineReason">Decline Reason</label>
-  <textarea
-    className="w-full border p-2 rounded mt-1"
-    id="declineReason"
-    rows="2" // Optional: Defines the height of the textarea
-    {...register('declineReason')}
-  ></textarea>
-  {errors.declineReason && <p className="text-[red] text-xs">{errors.declineReason.message}</p>}
-</div>
-
-
+          <label htmlFor="declineReason">Decline Reason</label>
+          <textarea
+            className="w-full border p-2 rounded mt-1"
+            id="declineReason"
+            rows="2"
+            {...register("declineReason")}
+            value={formData.interview.declineReason}
+            onChange={(e) => handleInputChange("declineReason", e.target.value)}
+          ></textarea>
+          {errors.declineReason && (
+            <p className="text-[red] text-xs">{errors.declineReason.message}</p>
+          )}
+        </div>
         <div className="">
           <label className="text_size_6">Choose file</label>
           <div className="flex items-center justify-between mt-3 mb-5 gap-5">
             {/* LOI File Upload */}
             <div>
-              <label className="flex items-center px-3 py-2 p-2.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer">
-                Upload LOI
-                <input
-                  type="file"
+              {/* <label className="flex items-center px-3 py-2 p-2.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer">
+                Upload LOI */}
+                <FileUploadField
+                
+                   label="Upload File"
+                   onChangeFunc={(e) => handleFileChange(e, "loiFile")}
                   {...register("loiFile")}
-                  onChange={(e) => handleFileChange(e, "loiFile")}
-                  className="hidden"
                   accept="application/pdf"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  fileName={uploadedFileNames.loiFile || extractFileName(LOIFile)}
+                  value={formData.interview.loiFile}
+                  
+                  // accept="application/pdf"
                 />
-                <span className="ml-2">
+                {/* <span className="ml-2">
                   <GoUpload />
                 </span>
-              </label>
+              </label> */}
               {/* Display uploaded file name */}
-              {uploadedFileName ? (
-                <p className="text-xs mt-1 text-grey">
-                  {uploadedFileName}
-                </p>
-              ) : (
-                <p className="text-[red] text-xs mt-1">
-                  {errors?.loiFile?.message}
-                </p>
-              )}
+              
             </div>
           </div>
         </div>
       </div>
+
       <div className="center mt-5">
-        <button type="submit" 
-        className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow">
-          Submit
+        <button
+          type="submit"
+          className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
+          disabled={isLoading}
+          onClick={onSubmit}
+        >
+          {isLoading ? "Submitting..." : "Submit"}
         </button>
+
+        <button
+          type="submit"
+          className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
+          disabled={isLoading}
+          onSubmit={handleSubmitTwo}
+        >
+          {isLoading ? "Updating..." : "Update"}
+        </button>
+        
+        {/* Success notification */}
+        {notification && <p className="text-green-500">LOI created successfully!</p>}
+        
+        {/* Error notification */}
+        {error && <p className="text-red-500">{error.message}</p>}
       </div>
     </form>
   );

@@ -69,6 +69,18 @@ import { PersonalAcci } from "../pages/insuranceSid/PersonalAcci";
 import { CreateJob } from "../pages/recruitments/CreateJob";
 import { HiringJob } from "../pages/recruitments/HiringJob";
 import { Insurance } from "../pages/insuranceSid/Insurance";
+import { AllTrainingData } from "../pages/training/trainingForm/AllTrainingData";
+import { TableAddEmp } from "../pages/training/TableTraining/TableAddEmp";
+import { TableWelding } from "../pages/training/TableTraining/TableWelding";
+import { TableBlasting } from "../pages/training/TableTraining/TableBlasting";
+import { TableTC } from "../pages/training/TableTraining/TableTC";
+import { LMTable } from "../pages/leaveManagement/LMTable";
+import { HOLTable } from "../pages/leaveManagement/HOLTable";
+import { EmpLeaveBalance } from "../pages/leaveManagement/EmpLeaveBalance";
+import { TicketsTable } from "../pages/leaveManagement/TicketsTable";
+import { ListTimeSheet } from "../pages/timeSheet/ListTimeSheet";
+import { VTimeSheetTable } from "../pages/timeSheet/VTimeSheetTable";
+
 const client = generateClient();
 
 const NavigationLinks = () => {
@@ -76,7 +88,6 @@ const NavigationLinks = () => {
   const [mainCategories, setMainCategories] = useState([]);
   const [defaultRoute, setDefaultRoute] = useState("");
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     async function fetchUserData() {
       try {
@@ -157,7 +168,7 @@ const NavigationLinks = () => {
     <Routes>
       {/* Login and Change Password Routes */}
       <Route path="/changePassword" element={<ChangePassword />} />
-  
+     
       {loginAuth && (
         <>
           {/* <Route path="/" element={<Navigate to={defaultRoute} />} /> */}
@@ -260,7 +271,7 @@ const NavigationLinks = () => {
                 {show === "Insurance" && (
                   <>
                     <Route path="/insuranceHr" Component={HrInsuranceNav}>
-                      <Route index element={<Insurance/>} />
+                      <Route index element={<Insurance />} />
                       <Route path="groupHS" element={<GroupHS />} />
                       <Route path="workmenComp" element={<WorkmenComp />} />
                       <Route path="travelling" element={<Travelling />} />
@@ -273,7 +284,17 @@ const NavigationLinks = () => {
                   </>
                 )}
                 {show === "LeaveManagement" && (
-                  <Route path="/leaveManage" Component={LeaveManage} />
+                  <>
+                    <Route path="/leaveManage" Component={LeaveManage}>
+                      <Route index element={<LMTable />} />
+                      <Route path="historyLeave" element={<HOLTable />} />
+                      <Route
+                        path="leaveBalance"
+                        element={<EmpLeaveBalance />}
+                      />
+                      <Route path="requestTickets" element={<TicketsTable />} />
+                    </Route>
+                  </>
                 )}
                 {show === "Notification" && (
                   <Route path="/notifications" Component={Notifications} />
@@ -294,14 +315,18 @@ const NavigationLinks = () => {
                 {show === "TimeSheet" && (
                   <>
                     <Route path="/timeSheet" element={<TimeSheet />} />
-
                     <Route path="/timesheetHO" element={<HO />} />
                     <Route path="/timesheetSBW" element={<SBW />} />
                     <Route path="/timesheetORMC" element={<ORMC />} />
                     <Route path="/timesheetOffshore" element={<Offshore />} />
-
                     <Route path="/timesheetBlng" element={<Blng />} />
-                    <Route path="/viewTimesheet" element={<ViewTimeSheet />} />
+                    <Route
+                      path="/viewTimesheet"
+                      element={<ViewTimeSheet />}
+                    >
+                      <Route index element={<ListTimeSheet/>}/>
+                      <Route path="viewSheet" element={<VTimeSheetTable/>} />
+                      </Route>{" "}
                     <Route path="/viewSummary" element={<ViewSummary />} />
                   </>
                 )}
@@ -315,6 +340,15 @@ const NavigationLinks = () => {
                       path="/trainingQA"
                       Component={WeldingQualificationForm}
                     />
+                    <Route path="/allTraining" Component={AllTrainingData}>
+                      <Route index element={<TableAddEmp />} />
+                      <Route path="weldingqualifi" element={<TableWelding />} />
+                      <Route
+                        path="blastingpainting"
+                        element={<TableBlasting />}
+                      />
+                      <Route path="trainCertifi" element={<TableTC />} />
+                    </Route>
                   </>
                 )}
                 <Route path="/logout" Component={Logout} />

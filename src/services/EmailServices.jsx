@@ -1,3 +1,5 @@
+import { apiKey } from "../StoredKeys";
+
 export const sendEmail = async (subject, message,fromaddress, toaddress) => {
     try {
       const response = await fetch(
@@ -6,6 +8,8 @@ export const sendEmail = async (subject, message,fromaddress, toaddress) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "x-api-key": apiKey,  // Add your API key here
+
             // "Access-Control-Allow-Origin": "http://127.0.0.1:5173",
 
           },

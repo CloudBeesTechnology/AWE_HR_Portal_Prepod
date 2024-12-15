@@ -61,6 +61,7 @@ export const WorkInfo = () => {
     jobCat: "",
     // Add other fields here if needed
   });
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setSelection((prevSelection) => ({
@@ -72,6 +73,7 @@ export const WorkInfo = () => {
   const watchFields = watch(
     WorkDataPass.terminationFields.map((field) => field.name)
   );
+
   useEffect(() => {
     empPIData.map((items) => {
       if (watchedEmpID === items.empID) {

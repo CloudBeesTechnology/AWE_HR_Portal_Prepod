@@ -22,7 +22,7 @@ export const Table = ({
   const [selectCandidate, setSelectCandidate] = useState(null); // To store selected candidate
   const tableRef = useRef(null); // Step 1: Create ref for table element
 
-
+console.log(data, "RC DATA")
 
   // Filter out rows where status is "Inactive"
   const filteredData = data.filter((row) => row.status !== "Inactive");

@@ -16,9 +16,12 @@ import { EmploymentMedical } from "./EmploymentMedical";
 import { ContractPDF } from "./ContractPDF";
 import { ProbationPDF } from "./ProbationPDF";
 import { DataSupply } from "../../utils/DataStoredContext";
+import { GroupHSData } from "./GroupHSData";
+import { WeldingData } from "./WeldingData";
+import { LbdKpi } from "./LbdKpi";
 
 export const Reports = () => {
-  const { empPIData,LMIData,PPValidsData, empPDData, IDData,workInfoData,terminateData,DNData } = useContext(DataSupply);
+  const { empPIData,LMIData,PPValidsData, empPDData, IDData,workInfoData,terminateData,DNData,EmpInsuranceData,WeldeInfo } = useContext(DataSupply);
   const [tableHead, setTableHead] = useState([]);
   const [tableBody, setTableBody] = useState([]);
   const [emptySearch, setEmptySearch] = useState(false);
@@ -36,39 +39,47 @@ export const Reports = () => {
 // console.log(terminateData);
 // console.log(DNData);
 // console.log(PPValidsData);
-// console.log(LMIData);
+// console.log(EmpInsuranceData);
 
-  const mergeData = (empPIData, empPDData, IDData,workInfoData,terminateData,PPValidsData,LMIData,DNData) => {
-    return empPIData.map((piData) => {
-      const pdData = empPDData.find((item) => item.empID === piData.empID) || {};
-      const idData = IDData.find((item) => item.empID === piData.empID) || {};
-      const wiData= workInfoData.find((item) => item.empID === piData.empID) || {};
-      const tData= terminateData.find((item) => item.empID === piData.empID) || {};
-      const dnData= DNData.find((item) => item.empID === piData.empID) || {};
-      const PPVData= PPValidsData.find((item) => item.empID === piData.empID) || {};
-      const LMData= LMIData.find((item) => item.empID === piData.empID) || {};
-
-      return {
-        ...piData,
-        ...pdData,
-        ...idData,
-        ...wiData,
-        ...tData,
-        ...dnData,
-        ...PPVData,
-        ...LMData,
-      };
-    });
-  };
+  
 
   useEffect(() => {
-    if (empPIData && empPDData && IDData && workInfoData && terminateData && DNData && PPValidsData && LMIData) {
-      const merged = mergeData(empPIData, empPDData, IDData,workInfoData, terminateData, DNData, PPValidsData, LMIData);
-      setMergeData(merged);
-      console.log(merged);
+    // if (empPIData) {
+    //   const merged = mergeData(empPIData, empPDData, IDData,workInfoData, terminateData, DNData, PPValidsData, LMIData);
+    //   setMergeData(merged);
+    //   console.log(merged);
+    //   setLoading(false); // Set loading to false once data is merged
+    // }
+    const mergeData =  empPIData.map((piData) => {
+
+        // const pdData = empPDData.find((item) => item.empID === piData.empID) || {};
+        const idData = IDData.find((item) => item.empID === piData.empID) || {};
+        const wiData= workInfoData.find((item) => item.empID === piData.empID) || {};
+        const tData= terminateData.find((item) => item.empID === piData.empID) || {};
+        const dnData= DNData.find((item) => item.empID === piData.empID) || {};
+        const PPVData= PPValidsData.find((item) => item.empID === piData.empID) || {};
+        const LMData= LMIData.find((item) => item.empID === piData.empID) || {};
+        const EmpInsData= EmpInsuranceData.find((item) => item.empID === piData.empID) || {};
+        const WeldeInfoData= WeldeInfo.find((item) => item.empID === piData.empID) || {};
+  
+        return {
+          ...piData,
+          // ...pdData,
+          ...idData,
+          ...wiData,
+          ...tData,
+          ...dnData,
+          ...PPVData,
+          ...LMData,
+          ...EmpInsData,
+          ...WeldeInfoData
+        };
+      });
+         setMergeData(mergeData);
+         console.log(mergeData);
       setLoading(false); // Set loading to false once data is merged
-    }
-  }, [empPIData, empPDData, IDData,workInfoData,terminateData, DNData,PPValidsData, LMIData]);
+      
+  }, [empPIData, empPDData, IDData,workInfoData,terminateData, DNData,PPValidsData, LMIData,EmpInsuranceData,WeldeInfo]);
 
   useEffect(() => {
     setReportTitle(typeOfReport);
@@ -104,21 +115,29 @@ export const Reports = () => {
     { title: "Termination" },
     { title: "Probation Review" },
     { title: "Contract Expiry Review" },
-    // { title: "Probation Form" },
     { title: "Contract Expiry PDF" },
     { title: "Employment Pass expiry" },
     { title: "LD expiry" },
     { title: "Passport Expiry" },
     { title: "Employment Medical" },
+    // new added
+    { title: "Qualified Welder Registered" },
+    { title: "Blaster Painter Qualification" },
+    { title: "LBD KPI" },
+    { title: "Group H&S" },
+    { title: "Leave Passage" },
+    { title: "New Recruitment" },
+    { title: "Training Record" },
+
   ];
 
   return (
-    <div className="border border-white p-10 w-full">
+    <div className=" p-10 w-full bg-[#F5F6F1CC]">
       <p className="text-2xl font-semibold text-dark_grey text-center uppercase mb-10">
         Report
       </p>
 
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center ">
         <Filter
           typeOfReport={typeOfReport}
           setTypeOfReport={setTypeOfReport}
@@ -127,7 +146,7 @@ export const Reports = () => {
         />
 
         <div className="flex justify-end gap-4">
-          <div className="flex items-center w-[20%] p-2 gap-1 border border-[#D9D9D9] rounded text-dark_grey">
+          <div className="flex items-center w-[20%] p-2 gap-1 border border-[#D9D9D9] bg-white rounded text-dark_grey">
             <input
               type="text"
               value={startDate}
@@ -140,7 +159,7 @@ export const Reports = () => {
             </span>
           </div>
 
-          <div className="border border-[#D9D9D9] rounded w-[20%] text-dark_grey flex items-center p-2 gap-1">
+          <div className="border border-[#D9D9D9] bg-white rounded w-[20%] text-dark_grey flex items-center p-2 gap-1">
             <input
               type="text"
               value={endDate}
@@ -234,6 +253,27 @@ export const Reports = () => {
       )}
       {reportTitle === "Employment Medical" && (
         <EmploymentMedical
+          allData={mergedData}
+          typeOfReport={typeOfReport}
+          reportTitle={reportTitle}
+        />
+      )}
+      {reportTitle === "Group H&S" && (
+        <GroupHSData
+          allData={mergedData}
+          typeOfReport={typeOfReport}
+          reportTitle={reportTitle}
+        />
+      )}
+      {reportTitle === "Qualified Welder Registered" && (
+        <WeldingData
+          allData={mergedData}
+          typeOfReport={typeOfReport}
+          reportTitle={reportTitle}
+        />
+      )}
+      {reportTitle === "LBD KPI" && (
+        <LbdKpi
           allData={mergedData}
           typeOfReport={typeOfReport}
           reportTitle={reportTitle}

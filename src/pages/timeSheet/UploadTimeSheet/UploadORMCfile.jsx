@@ -154,25 +154,52 @@ export const UploadORMCfile = (
         //   }
         // });
 
-        const getLastOccurrencePerFIDDate = (dataArray) => {
-          const map = new Map();
+        // const getLastOccurrencePerFIDDate = (dataArray) => {
+        //   const map = new Map();
 
-          // Iterate over each object and store the last occurrence of each unique FID-date combination
-          dataArray.forEach((obj) => {
-            // Check if "ENTRANCEDATEUSED" exists in the object
-            if (obj.hasOwnProperty("NAME")) {
-              const key = `${obj.NAME}`; // Create a unique key based on FID and ENTRANCEDATEUSED
-              map.set(key, obj); // Overwrite previous entries with the same FID and ENTRANCEDATEUSED
-            }
-          });
+        //   // Iterate over each object and store the last occurrence of each unique FID-date combination
+        //   dataArray.forEach((obj) => {
+        //     // Check if "ENTRANCEDATEUSED" exists in the object
+        //     if (obj.hasOwnProperty("NAME")) {
+        //       const key = `${obj.NAME}`; // Create a unique key based on FID and ENTRANCEDATEUSED
+        //       map.set(key, obj); // Overwrite previous entries with the same FID and ENTRANCEDATEUSED
+        //     }
+        //   });
 
-          // Convert the map values to an array of the last occurrences for each FID-date pair
-          return Array.from(map.values());
-        };
-        const lastOccurrenceObjects =
-          getLastOccurrencePerFIDDate(updatedDataArray);
+        //   // Convert the map values to an array of the last occurrences for each FID-date pair
+        //   return Array.from(map.values());
+        // };
 
-        setExcelData(lastOccurrenceObjects);
+        const filteHighlightedData = updatedDataArray.filter(
+          (item) => item.IN && item.OUT
+        );
+        console.log("filteHighlightedData : ",filteHighlightedData)
+
+        const getCleanedDate = (obj) => {
+          const date = obj?.DATE?.trim() || '';
+          // Remove "(Tue)" or similar day abbreviations
+          return date.replace(/\(\w+\)/, '').trim();
+      };
+      
+      // Check the first object's DATE, fallback to the second object if needed
+      let dateValue = getCleanedDate(updatedDataArray[0]);
+      if (!dateValue) {
+          dateValue = getCleanedDate(updatedDataArray[1]);
+      }
+      
+     
+      console.log(dateValue);
+
+        // const lastOccurrenceObjects =
+        //   getLastOccurrencePerFIDDate(updatedDataArray);
+
+          // console.log(lastOccurrenceObjects)
+          filteHighlightedData.forEach(obj => {
+            obj.DATE = dateValue;
+        });
+
+        // console.log(updatedDataArray);
+        setExcelData(filteHighlightedData);
         setLoading(false);
 
         const theaderResult = getResult.flat();

@@ -18,17 +18,31 @@ export const Resignation = ({ allData, typeOfReport, reportTitle }) => {
   const resignationMergedData = (data) => {
     return data
       .filter((item) => item.resignDate) // Only include items with resignDate
-      .map((item) => [
-        item.name || "-",
-        item.empID || "-",
-        item.empBadgeNo || "-",
-        item.nationality || "-",
-        item.department || "-",
-        item.position || "-",
-        item.resignDate || "-",
-        item.resignNotProb || "-",
-      ]);
+      .map((item) => ({
+        name: item.name || "-",
+        empID: item.empID || "-",
+        empBadgeNo: item.empBadgeNo || "-",
+        nationality: item.nationality || "-",
+        department: item.department || "-",
+        position: item.position || "-",
+        resignDate: item.resignDate || "-",
+        resignNotProb: item.resignNotProb || "-",
+      }));
   };
+  
+    // return data
+    //   .filter((item) => item.resignDate) // Only include items with resignDate
+    //   .map((item) => [
+    //     item.name || "-",
+    //     item.empID || "-",
+    //     item.empBadgeNo || "-",
+    //     item.nationality || "-",
+    //     item.department || "-",
+    //     item.position || "-",
+    //     item.resignDate || "-",
+    //     item.resignNotProb || "-",
+    //   ]);
+  // };
 
   useEffect(() => {
     setTableBody(resignationMergedData(allData));

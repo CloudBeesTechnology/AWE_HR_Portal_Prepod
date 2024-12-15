@@ -79,7 +79,12 @@ export const ProbationPDF = ({ allData, typeOfReport, reportTitle }) => {
                 <img className="w-full" src={logo} alt="Logo" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold border-b-2">Person Details</h2>
+              <button
+                className="mt-4 bg-blue text-white px-4 py-2 rounded"
+                onClick={closeModal}
+              >
+                Close
+              </button>
               </div>
             </section>
             <p className="flex justify-between mb-2">
@@ -107,14 +112,7 @@ export const ProbationPDF = ({ allData, typeOfReport, reportTitle }) => {
               <strong>Contract End Date:</strong> {selectedPerson.contractEnd || '-' }
             </p>
 
-            <div className="flex justify-evenly items-center p-3">
-              <button
-                className="mt-4 bg-blue text-white px-4 py-2 rounded"
-                onClick={closeModal}
-              >
-                Close
-              </button>
-
+            <div className="center p-3">
               {/* Download Button */}
               <button
                 className="mt-4 bg-green text-white px-4 py-2 rounded"

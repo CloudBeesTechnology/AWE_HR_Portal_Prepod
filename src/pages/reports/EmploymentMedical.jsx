@@ -28,16 +28,17 @@ const employeeMedicalMergedData = (data) => {
   const filteredData = data.filter((item) =>
     isWithinThreeMonths(item.bruneiME)
   );
-
-  return filteredData.map((item) => [
-    item.name || "-",
-    item.empBadgeNo || "-",
-    item.nationality || "-",
-    item.position || "-",
-    item.department || "-",
-    item.bruneiME || "-",
-  ]);
-};
+  return filteredData.map((item) => {
+    return {
+      name: item.name || "-",
+      empBadgeNo: item.empBadgeNo || "-",
+      nationality: item.nationality || "-",
+      position: item.position || "-",
+      department: item.department || "-",
+      bruneiME: item.bruneiME || "-",
+    };
+  });
+}  
 
   useEffect(()=>{
     

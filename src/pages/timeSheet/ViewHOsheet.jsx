@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
-import {
-  createHeadOffice,
-  deleteBlng,
-  deleteHeadOffice,
-  updateHeadOffice,
-} from "../../graphql/mutations";
+// import {
+//   createHeadOffice,
+//   deleteBlng,
+//   deleteHeadOffice,
+//   updateHeadOffice,
+// } from "../../graphql/mutations";
 import { generateClient } from "@aws-amplify/api";
 import { EditTimeSheet } from "./EditTimeSheet";
 import { PopupForSFApproves } from "./ModelForSuccessMess/PopupForSFApproves";
@@ -14,16 +14,18 @@ import { MdCancel } from "react-icons/md";
 import { SuccessMessage } from "./ModelForSuccessMess/SuccessMessage";
 import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
 import { PopupForMissMatchExcelSheet } from "./ModelForSuccessMess/PopupForMissMatchExcelSheet";
-import {
-  listEmpPersonalInfos,
-  listEmpWorkInfos,
-  listHeadOffices,
-} from "../../graphql/queries";
+// import {
+//   listEmpPersonalInfos,
+//   listEmpWorkInfos,
+//   listHeadOffices,
+// } from "../../graphql/queries";
 import { useTableMerged } from "./customTimeSheet/UserTableMerged";
 import "../../../src/index.css";
-import { useScrollableView } from "./customTimeSheet/UseScrollableView";
+
 import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
 import { PopupForAssignManager } from "./ModelForSuccessMess/PopupForAssignManager";
+import { createTimeSheet, updateTimeSheet } from "../../graphql/mutations";
+import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
 const client = generateClient();
 
 export const ViewHOsheet = ({
@@ -33,148 +35,21 @@ export const ViewHOsheet = ({
   Position,
   convertedStringToArrayObj,
   titleName,
+  fileName,
 }) => {
+  const uploaderID = localStorage.getItem("userID")?.toUpperCase();
   const [data, setData] = useState(null);
   const [secondaryData, setSecondaryData] = useState(null);
   const [editObject, setEditObject] = useState();
   const [toggleHandler, setToggleHandler] = useState(false);
   const [currentStatus, setCurrentStatus] = useState(null);
   const [toggleAssignManager, setToggleAssignManager] = useState(false);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const [userIdentification, setUserIdentification] = useState("");
   const [showStatusCol, setShowStatusCol] = useState(null);
   const [successMess, setSuccessMess] = useState(null);
-  // const fetchAllData = async () => {
-  //   let allItems = [];
-  //   let nextToken = null;
 
-  //   do {
-  //     const response = await client.graphql({
-  //       query: listHeadOffices,
-  //       variables: { limit: 40000, nextToken }, // Increase limit as needed
-  //     });
-
-  //     const fetchedItems = response?.data?.listHeadOffices?.items || [];
-  //     allItems = [...allItems, ...fetchedItems];
-  //     nextToken = response?.data?.listHeadOffices?.nextToken;
-  //   } while (nextToken); // Fetch until there are no more pages
-
-  //   return allItems;
-  // };
-
-  // useEffect(async () => {
-  //   const result = await fetchAllData();
-  //   console.log(result);
-  // }, []);
-  // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-  // const ITEMS_PER_PAGE = 50; // Initial number of items to display
-  // const [visibleData, setVisibleData] = useState([]);
-  // const [currentPage, setCurrentPage] = useState(1);
-  // %%%%%%%%%%%%%%%
-  // useEffect(() => {
-  //   // Load initial data
-  //   if (data && data.length > 0) {
-  //     console.log("WORKING");
-  //     setVisibleData(data.slice(0, ITEMS_PER_PAGE));
-  //   }
-  // }, [data]);
-  // console.log(titleName);
-  // const loadMoreData = useCallback(() => {
-  //   // Calculate new visible data when user scrolls down
-  //   const nextPage = currentPage + 1;
-  //   const start = currentPage * ITEMS_PER_PAGE;
-  //   const end = start + ITEMS_PER_PAGE;
-  //   const newItems = data.slice(start, end);
-
-  //   setVisibleData((prevData) => [...prevData, ...newItems]);
-  //   setCurrentPage(nextPage);
-  // }, [currentPage, data]);
-
-  // const handleScroll = (e) => {
-  //   const threshold = 5;
-  //   const bottomReached =
-  //     e.target.scrollHeight - e.target.scrollTop <=
-  //     e.target.clientHeight + threshold;
-
-  //   if (bottomReached) {
-  //     if (data && data.length > 0) {
-  //       loadMoreData();
-  //     }
-  //   }
-  // };
-  // &&&&&&&&&&&&&&&&
-
-  // useEffect(() => {
-  //   if (excelData) {
-  //     const fetchData = async () => {
-  //       // setLoading(true);
-
-  //       const dataPromise = new Promise((resolve, reject) => {
-  //         if (excelData) {
-  //           resolve(excelData);
-  //         } else {
-  //           setTimeout(() => {
-  //             reject("No data found after waiting.");
-  //           }, 5000);
-  //         }
-  //       });
-
-  //       const fetchedData = await dataPromise;
-
-  //       try {
-  //         const [empPersonalInfos, empPersonalDocs] = await Promise.all([
-  //           client.graphql({ query: listEmpPersonalInfos }),
-  //           client.graphql({ query: listEmpWorkInfos }),
-  //         ]);
-
-  //         const candidates =
-  //           empPersonalInfos?.data?.listEmpPersonalInfos?.items;
-  //         const interviews = empPersonalDocs?.data?.listEmpWorkInfos?.items;
-
-  //         const mergedData = candidates
-  //           .map((candidate) => {
-  //             const interviewDetails = interviews.find(
-  //               (item) => item.empID === candidate.empID
-  //             );
-
-  //             // Return null if all details are undefined
-  //             if (!interviewDetails) {
-  //               return null;
-  //             }
-
-  //             return {
-  //               ...candidate,
-  //               ...interviewDetails,
-  //             };
-  //           })
-  //           .filter((item) => item !== null);
-  //         console.log(mergedData);
-
-  //         const fetchWorkInfo = async () => {
-  //           const finalData = fetchedData?.map((item) => {
-  //             const workInfoItem = mergedData?.find(
-  //               (info) => info.empBadgeNo === item.BADGE
-  //             );
-  //             return {
-  //               ...item,
-  //               NORMALWORKINGHRSPERDAY: workInfoItem
-  //                 ? workInfoItem.workHrs[0]
-  //                 : null,
-  //             };
-  //           });
-  //           console.log("finalData : ", finalData);
-  //           setData(finalData);
-  //         };
-  //         fetchWorkInfo();
-  //       } catch (err) {
-  //         console.error("Error fetching data:", err.message);
-  //       }
-  //     };
-  //     fetchData();
-  //   }
-  // }, [excelData]);
-  const { handleScroll, visibleData, setVisibleData } = useScrollableView(
+  const { handleScroll, visibleData, setVisibleData } = UseScrollableView(
     data,
     Position
   );
@@ -308,7 +183,7 @@ export const ViewHOsheet = ({
 
       setShowStatusCol(result);
       setCurrentStatus(result); // Assuming setCurrentStatus is defined
-      setLoading(false);
+      // setLoading(false);
     };
 
     if (returnedTHeader && returnedTHeader.length > 0) {
@@ -342,6 +217,7 @@ export const ViewHOsheet = ({
                     return val;
                   }
                 }),
+                managerData: value[2],
               };
             })
             .filter((item) => item.data && item.data.length > 0);
@@ -360,7 +236,7 @@ export const ViewHOsheet = ({
       fetchData();
     } else {
       setCurrentStatus(false);
-      setLoading(false);
+      // setLoading(false);
     }
   }, [returnedTHeader, convertedStringToArrayObj]);
 
@@ -382,10 +258,7 @@ export const ViewHOsheet = ({
     return data.map((m) => ({
       id: m.id,
       data: m.data.map((val) => {
-        if (
-          val.EMPLOYEEID === getObject.EMPLOYEEID &&
-          val.DATE === getObject.DATE
-        ) {
+        if (val.BADGE === getObject.BADGE && val.DATE === getObject.DATE) {
           return getObject;
         } else {
           return val;
@@ -461,18 +334,22 @@ export const ViewHOsheet = ({
         dailySheet: JSON.stringify(finalResult),
         status: "Pending",
         date: currentDate,
+        managerDetails: JSON.stringify(managerData),
+        type: "HO",
+        fileName: fileName,
+        uploaderID: uploaderID,
       };
 
       if (DailySheet.dailySheet) {
         await client
           .graphql({
-            query: createHeadOffice,
+            query: createTimeSheet,
             variables: {
               input: DailySheet,
             },
           })
           .then((res) => {
-            if (res.data.createHeadOffice) {
+            if (res.data.createTimeSheet) {
               // console.log(
               //   "res.data.createHeadOffice : ",
               //   res.data.createHeadOffice
@@ -484,72 +361,7 @@ export const ViewHOsheet = ({
             toggleSFAMessage(false);
           });
       }
-    }
-    // if (userIdentification === "TimeKeeper") {
-    //   const result =
-    //     data &&
-    //     data.map((val) => {
-    //       return {
-    //         fid: val?.FID || 0,
-    //         name: val?.NAMEFLAST || "",
-    //         entDate: val?.ENTRANCEDATEUSED || "",
-    //         entDT: val?.ENTRANCEDATETIME || "",
-    //         exitDT: val?.EXITDATETIME || "",
-    //         day: val?.DAYDIFFERENCE || 0,
-    //         avgTotalDay: val?.AVGDAILYTOTALBYDAY || "",
-    //         totalhrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
-    //         workDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
-    //         normalWhrsPerDay: val?.NORMALWORKINGHRSPERDAY || 0,
-    //         workhrs: val?.WORKINGHOURS || 0,
-    //         OT: val?.OT || 0,
-    //         jobLocaWhrs: val?.jobLocaWhrs || "",
-    //         remarks: val?.REMARKS || "",
-    //       };
-    //     });
-
-    //   const currentDate = new Date().toLocaleDateString();
-
-    //   // Function to submit a batch
-    //   const submitBatch = async (batch, batchNumber) => {
-    //     const weeklySheet = {
-    //       weeklySheet: JSON.stringify(batch),
-    //       status: "Pending",
-    //       date: currentDate,
-    //     };
-
-    //     try {
-    //       console.log(`Submitting batch ${batchNumber}`);
-    //       console.log(weeklySheet);
-    //       const res = await client.graphql({
-    //         query: createBlng,
-    //         variables: { input: weeklySheet },
-    //       });
-
-    //       if (res.data.createBlng) {
-    //         console.log(`Batch ${batchNumber} submitted successfully`);
-    //         toggleSFAMessage(true);
-    //         console.log(res);
-    //       }
-    //     } catch (err) {
-    //       console.log(`Error in batch ${batchNumber}:`, err);
-    //       toggleSFAMessage(false);
-    //     }
-    //   };
-
-    //   // Batch size
-    //   const batchSize = 1000;
-
-    //   // Loop to send data in batches
-    //   // for (let i = 0; i < result.length; i += batchSize) {
-    //   //   const batch = result.slice(i, i + batchSize);
-    //   //   await submitBatch(batch, i / batchSize + 1); // Track batch number
-    //   // }
-    //   for (let i = 0; i < result.length; i += batchSize) {
-    //     const batch = result.slice(i, i + batchSize);
-    //     await submitBatch(batch);
-    //   }
-    // }
-    else if (userIdentification === "Manager") {
+    } else if (userIdentification === "Manager") {
       const MultipleBLNGfile =
         data &&
         data.map((value) => {
@@ -585,12 +397,6 @@ export const ViewHOsheet = ({
             }),
           };
         });
-      // UPDATE
-      //   const weaklysheet = {
-      //     id: "6b22df70-9ab7-4873-9d24-9ab719347b62",
-      //     weeklySheet: JSON.stringify(result),
-      //     status: "Pending",
-      //   };
 
       const result = MultipleBLNGfile.map(async (obj) => {
         const finalData = {
@@ -603,20 +409,20 @@ export const ViewHOsheet = ({
           // console.log("Work");
           await client
             .graphql({
-              query: updateHeadOffice,
+              query: updateTimeSheet,
               variables: {
                 input: finalData,
               },
             })
             .then((res) => {
-              if (res.data.updateHeadOffice) {
+              if (res.data.updateTimeSheet) {
                 // console.log(
                 //   "res.data.updateHeadOffice : ",
                 //   res.data.updateHeadOffice
                 // );
                 toggleSFAMessage(true);
                 setVisibleData([]);
-                // setData(null);
+                setData(null);
               }
             })
             .catch((err) => {
@@ -768,22 +574,22 @@ export const ViewHOsheet = ({
                     : (
                         <tr>
                           <td
-                            colSpan="15"
-                            className="px-6 py-6 text-center text-dark_ash text_size_5"
+                            colSpan="100%"
+                            className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white  "
                           >
                             <p className="px-6 py-6">
-                              No Table Data Available Here
+                              No Table Data Available Here.
                             </p>
                           </td>
                         </tr>
                       ) ?? (
                         <tr>
                           <td
-                            colSpan="15"
-                            className="px-6 py-6 text-center text-dark_ash text_size_5"
+                            colSpan="100%"
+                            className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white"
                           >
                             <p className="px-6 py-6">
-                              No Table Data Available Here
+                              No Table Data Available Here.
                             </p>
                           </td>
                         </tr>
@@ -804,38 +610,37 @@ export const ViewHOsheet = ({
                   if (userIdentification !== "Manager") {
                     toggleFunctionForAssiMana();
                     // const fetchData = async () => {
-                    //   console.log("I am calling You");
-                    //   // Fetch the BLNG data using GraphQL
-                    //   const [fetchBLNGdata] = await Promise.all([
-                    //     client.graphql({
-                    //       query: listHeadOffices,
-                    //     }),
-                    //   ]);
-                    //   const BLNGdata =
-                    //     fetchBLNGdata?.data?.listHeadOffices?.items;
-                    //   console.log("BLNGdata : ", BLNGdata);
-
-                    //   const deleteFunction =
-                    //     BLNGdata &&
-                    //     BLNGdata.map(async (m) => {
-                    //       const dailySheet = {
-                    //         id: m.id,
-                    //       };
-
-                    //       await client
-                    //         .graphql({
-                    //           query: deleteHeadOffice,
-                    //           variables: {
-                    //             input: dailySheet,
-                    //           },
-                    //         })
-                    //         .then((res) => {
-                    //           console.log(res);
-                    //         })
-                    //         .catch((err) => {
-                    //           console.log(err);
-                    //         });
-                    //     });
+                    //   //   console.log("I am calling You");
+                    //   //   // Fetch the BLNG data using GraphQL
+                    //   // const [fetchBLNGdata] = await Promise.all([
+                    //   //   client.graphql({
+                    //   //     query: createHeadOffice,
+                    //   //   }),
+                    //   // ]);
+                    //   // const BLNGdata =
+                    //   //   fetchBLNGdata?.data?.createHeadOffice?.items;
+                    //   //   console.log(BLNGdata)
+                    //   //   console.log("BLNGdata : ", BLNGdata);
+                    //   //   const deleteFunction =
+                    //   //     BLNGdata &&
+                    //   //     BLNGdata.map(async (m) => {
+                    //   //       const dailySheet = {
+                    //   //         id: m.id,
+                    //   //       };
+                    //   //       await client
+                    //   //         .graphql({
+                    //   //           query: deleteHeadOffice,
+                    //   //           variables: {
+                    //   //             input: dailySheet,
+                    //   //           },
+                    //   //         })
+                    //   //         .then((res) => {
+                    //   //           console.log(res);
+                    //   //         })
+                    //   //         .catch((err) => {
+                    //   //           console.log(err);
+                    //   //         });
+                    //   //     });
                     // };
                     // fetchData();
                     // FOR DELETE

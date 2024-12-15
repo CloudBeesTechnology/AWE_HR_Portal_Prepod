@@ -10,6 +10,7 @@ import { UpdateLDFun } from '../../../services/updateMethod/UpdateLDFun';
 import { FormField } from '../../../utils/FormField';
 import { FileUploadField } from '../medicalDep/FileUploadField';
 import { useOutletContext } from 'react-router-dom';
+import { LabCreFun } from '../../../services/createMethod/LabCreFun';
 
 export const LabourDeposit = () => {
   const { searchResultData } = useOutletContext();
@@ -20,10 +21,9 @@ export const LabourDeposit = () => {
 
   const { BJLData } = useContext(DataSupply);
   const { UpdateLDData } = UpdateLDFun();
+  const { LabourCreData } = LabCreFun();
   const { register, handleSubmit,watch, formState: { errors }, setValue } = useForm({
     resolver: yupResolver(LabourDepositSchema),
-    lbrDepoSubmit: [],
-
   });
   
   const [notification, setNotification] = useState(false);
@@ -171,53 +171,55 @@ export const LabourDeposit = () => {
   };
   
 
-
   const onSubmit = async (data) => {
-
-    try {
-      let matchedEmployee = null;
-      if (empID) {
-        matchedEmployee = BJLData.find((val) => val.empID === empID);
-      
+    // console.log(data);
     
-    const formatDate = (date) => date ? new Date(date).toLocaleDateString('en-CA') : null;
-    const lbrDepoSubmit = formatDate(data.lbrDepoSubmit);
+    try {
+      const matchedEmployee = BJLData.find(
+        (match) => match.empID === data.empID
+      );
 
-    const updatedlbrDate = [
-      ...new Set([
-        ...(matchedEmployee.lbrDepoSubmit || []), // ensure it's an array before spreading
-        lbrDepoSubmit
-      ]),
-    ];
+      const formatDate = (date) =>
+        date ? new Date(date).toLocaleDateString("en-CA") : null; // 'en-CA' gives yyyy-mm-dd format
+      const lbrDepoSubmit = formatDate(data.lbrDepoSubmit);
 
-      const LDValue = {
-        ...data,
+
+      if (matchedEmployee) {
+        
+        const updatedlbrDate = [
+          ...new Set([
+            ...(matchedEmployee.lbrDepoSubmit || []), // ensure it's an array before spreading
+            lbrDepoSubmit
+          ]),
+        ];
+
+        const LDValue = {
+          ...data,
         lbrDepoSubmit: updatedlbrDate.map(formatDate),
         lbrDepoUpload: JSON.stringify(uploadLD.lbrDepoUpload),
-        id: matchedEmployee ? matchedEmployee.id : null,
-      };
+          id: matchedEmployee.id ,
+        };
+  
+        await UpdateLDData({ LDValue });
+        setShowTitle("Labour Info Updated Successfully")
+          setNotification(true);
 
-      await UpdateLDData({ LDValue });
-      setShowTitle("Labour Deposit Info Saved Successfully")
-      setNotification(true);
-    } else {
-      console.log("Employee id not found")
-    }
-
+      } else {
+        const creLabpaValue = {
+          ...data,
+          lbrDepoSubmit,
+          lbrDepoUpload: JSON.stringify(uploadLD.lbrDepoUpload),
+        };
+        // console.log(creLabpaValue);
+  
+        await LabourCreData({ creLabpaValue });
+        setShowTitle("Labour Info Saved Successfully");
+        setNotification(true);
+      }
     } catch (error) {
       console.error("Error submitting data:", error);
-
-      if (error?.errors) {
-        error.errors.forEach((err, index) => {
-          console.error(`GraphQL Error ${index + 1}:`, err.message);
-          if (err.extensions) {
-            console.error("Error Extensions:", err.extensions);
-          }
-        });
-      }
     }
   };
-
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="mx-auto min-h-screen p-2 my-10 bg-[#F5F6F1CC]">

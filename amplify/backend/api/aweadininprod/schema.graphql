@@ -1,3 +1,55 @@
+type BastingPaint @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  empID: String!
+  blastingRemarks: String
+  blastingEndDate: String
+  blastingStartDate: String
+  blastingBadgeNo: String
+  blastingQulifiExp: String
+  blastingUpload: [AWSJSON]
+}
+
+type TimeSheet @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  date: String
+  status: String
+  fileName: String
+  fileType: String
+  assignTo: String
+  assignBy: String
+  empName: String
+  empBadgeNo: String
+  empID: String
+  empDept: String
+  inTime: String
+  outTime: String
+  totalInOut: String
+  allDayHrs: String
+  totalHrs: String
+  remarks: String
+  otTime: String
+  netMins: String
+  actualWorkHrs: String
+  normalWorkHrs: String
+  fidNo: String
+  companyName: String
+  trade: String
+  tradeCode: String
+  onAM: String
+  offAM: String
+  onPM: String
+  offPM: String
+  ctr: String
+  rec: String
+  avgDailyTD: String
+  highlightDayTG: String
+  aweSDN: String
+  totalNT: String
+  totalOT: String
+  totalNTOT: String
+  empWorkInfo: [AWSJSON]
+}
+
 type HiringJob @model @auth(rules: [{allow: public}]) {
   id: ID!
   jobTitle: String
@@ -7,6 +59,7 @@ type HiringJob @model @auth(rules: [{allow: public}]) {
   startDate: String
   expiryDate: String
   jobContent: String
+  uploadJobDetails: String
 }
 
 type InsuranceType @model @auth(rules: [{allow: public}]) {
@@ -98,46 +151,6 @@ type EmailNotifi @model @auth(rules: [{allow: public}]) {
   message: String
 }
 
-type OffshoreSheet @model @auth(rules: [{allow: public}]) {
-  id: ID!
-  date: String
-  dailySheet: [AWSJSON]
-  status: String
-  manager: [AWSJSON]
-}
-
-type ORMCSheet @model @auth(rules: [{allow: public}]) {
-  id: ID!
-  date: String
-  dailySheet: [AWSJSON]
-  status: String
-  manager: [AWSJSON]
-}
-
-type SBWSheet @model @auth(rules: [{allow: public}]) {
-  id: ID!
-  date: String
-  dailySheet: [AWSJSON]
-  status: String
-  manager: [AWSJSON]
-}
-
-type Blng @model @auth(rules: [{allow: public}]) {
-  id: ID!
-  weeklySheet: [AWSJSON]
-  date: String
-  status: String
-  manager: [AWSJSON]
-}
-
-type HeadOffice @model @auth(rules: [{allow: public}]) {
-  id: ID!
-  dailySheet: [AWSJSON]
-  date: String
-  status: String
-  manager: [AWSJSON]
-}
-
 type EmpRequisition @model @auth(rules: [{allow: public}]) {
   id: ID!
   department: String
@@ -152,6 +165,8 @@ type EmpRequisition @model @auth(rules: [{allow: public}]) {
   status: String
   remarkReq: String
   reqName: String
+  requestorID: String
+  approverID: String
 }
 
 type WeldingInfo @model @auth(rules: [{allow: public}]) {

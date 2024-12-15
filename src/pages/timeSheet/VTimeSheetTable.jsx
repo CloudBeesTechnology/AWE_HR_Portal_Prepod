@@ -1,118 +1,3 @@
-// import { useEffect, useState } from "react";
-// import { BlngTBody } from "./tableBody/BlngTBody";
-// import { HoTBody } from "./tableBody/HoTBody";
-// import { OffshoreTBody } from "./tableBody/OffshoreTBody";
-// import { OrmcTBody } from "./tableBody/OrmcTBody";
-// import { SbwTBody } from "./tableBody/SbwTBody";
-// import { ExportTableToExcel } from "./customTimeSheet/DownloadTableToExcel";
-// import "../../../src/index.css";
-
-// export const VTimeSheetTable = ({
-//   AllFieldData,
-//   categoryFilter,
-//   data,
-// }) => {
-//   const [loading, setLoading] = useState(true);
-//   const [tableData, setTableData] = useState(null);
-
-//   useEffect(() => {
-//     if (data) {
-//       setTimeout(() => {
-//         setLoading(false);
-//       }, 5000);
-//     }
-//   }, [data]);
-
-//   const useDownloadFunc = (res) => {
-//     console.log(res);
-//     setTableData(res);
-//   };
-
-//   return (
-//     <section>
-//       <article
-//         className={`flex justify-center text_size_5 text-dark_grey ${
-//           loading && "pt-6"
-//         }`}
-//       >
-//         {loading && <p>Please wait a few seconds...</p>}
-//       </article>
-
-//       <div className="table-container">
-//         <table className="styled-table">
-//           <thead className="sticky-header">
-//             <tr className="text_size_5">
-//               <td className="px-5 text-center">S No.</td>
-
-//               {AllFieldData?.tableHeader?.map((header, index) => (
-//                 <td key={index} className="px-4 flex-1 text-center">
-//                   {header}
-//                 </td>
-//               )) ?? (
-//                 <tr>
-//                   <td colSpan="100%" className="text-center">
-//                     No headers available
-//                   </td>
-//                 </tr>
-//               )}
-//               <td className="px-5 text-center">STATUS</td>
-//             </tr>
-//           </thead>
-
-//           {categoryFilter === "BLNG" && (
-//             <BlngTBody
-//               data={data}
-//               loading={loading}
-//               useDownloadFunc={useDownloadFunc}
-//             />
-//           )}
-//           {categoryFilter === "HO" && (
-//             <HoTBody
-//               data={data}
-//               loading={loading}
-//               useDownloadFunc={useDownloadFunc}
-//             />
-//           )}
-//           {categoryFilter === "SBW" && (
-//             <SbwTBody
-//               data={data}
-//               loading={loading}
-//               useDownloadFunc={useDownloadFunc}
-//             />
-//           )}
-//           {categoryFilter === "ORMC" && (
-//             <OrmcTBody
-//               data={data}
-//               loading={loading}
-//               useDownloadFunc={useDownloadFunc}
-//             />
-//           )}
-//           {categoryFilter === "Offshore" && (
-//             <OffshoreTBody
-//               data={data}
-//               loading={loading}
-//               useDownloadFunc={useDownloadFunc}
-//             />
-//           )}
-//         </table>
-//       </div>
-
-//       <div className="flex justify-center p-7">
-//         <button
-//           className="rounded px-3 py-2 bg-[#FEF116] text_size_5 text-dark_grey"
-//           onClick={() => {
-//             ExportTableToExcel(categoryFilter || "TimeSheet", tableData);
-//           }}
-//         >
-//           Download
-//         </button>
-//       </div>
-//     </section>
-//   );
-// };
-
-// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 import { useEffect, useState } from "react";
 
 import { BlngTBody } from "./tableBody/BlngTBody";
@@ -122,14 +7,117 @@ import { OrmcTBody } from "./tableBody/OrmcTBody";
 import { SbwTBody } from "./tableBody/SbwTBody";
 import { ExportTableToExcel } from "./customTimeSheet/DownloadTableToExcel";
 import "../../../src/index.css";
-export const VTimeSheetTable = ({
-  AllFieldData,
-  categoryFilter,
-  data,
-  handleScroll,
-}) => {
+import { useLocation, useOutletContext } from "react-router-dom";
+
+import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
+import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
+
+
+
+
+export const VTimeSheetTable = (
+  {
+    // AllFieldData,
+    // categoryFilter,
+    // data,
+    // handleScroll,
+  }
+) => {
   const [loading, setLoading] = useState(true);
   const [tableData, setTableData] = useState(null);
+  const [data, setData] = useState(null);
+  const [secondaryData, setSecondaryData] = useState(null);
+  const location = useLocation();
+  const { fileData } = location.state || {};
+  const [categoryFilter, setCategoryFilter] = useState(fileData.type);
+  // const [startDate, setStartDate] = useState("");
+  // const [endDate, setEndDate] = useState("");
+
+  const AllFieldData = useTableFieldData(categoryFilter);
+
+  const { startDate, endDate, searchQuery } = useOutletContext();
+
+  const convertStringToObject = (fetchedData) => {
+    const processedData = fetchedData.map((item) => {
+      const rawSheet = item.dailySheet;
+      if (Array.isArray(rawSheet) && rawSheet.length > 0) {
+        const rawData = rawSheet[0];
+        const id = item.id;
+        const Status = item.status;
+
+        try {
+          const cleanedData = rawData
+            .replace(/^"|\s*'|\s*"$|\\'/g, "")
+            .replace(/\\"/g, '"')
+            .replace(/\\n/g, "")
+            .replace(/\\\//g, "/");
+          const arrayOfObjects = JSON.parse(cleanedData);
+          const dataWithStatus = arrayOfObjects.map((obj) => ({
+            ...obj,
+            status: Status,
+          }));
+          return [{ id: id }, dataWithStatus];
+        } catch (error) {
+          console.error("Error parsing JSON:", error);
+          return null;
+        }
+      }
+      return null;
+    });
+
+    const addProKey = processedData
+      .map((value) => ({
+        id: value[0]?.id,
+        data: value[1]?.filter(Boolean),
+      }))
+      .filter((item) => item.data?.length > 0);
+    setData(addProKey);
+    setSecondaryData(addProKey);
+
+  };
+
+
+  const { handleScroll, visibleData, setVisibleData } = UseScrollableView(
+    data,
+    "Manager"
+  );
+
+  useEffect(() => {
+    if (!secondaryData) return;
+    if (secondaryData && secondaryData.length > 0) {
+      let filteredData = [...secondaryData];
+
+      if (searchQuery) {
+        filteredData = searchQuery.filter((fil) => fil);
+      }
+
+      if (startDate && endDate) {
+        const start = new Date(startDate).toLocaleDateString().toString();
+        const end = new Date(endDate).toLocaleDateString().toString();
+        filteredData = filteredData.map((item) => ({
+          id: item.id,
+          data: item.data.filter((val) => {
+            const itemDate = new Date(val.date || val.entDate)
+              .toLocaleDateString()
+              .toString();
+            return itemDate >= start && itemDate <= end;
+          }),
+        }));
+      }
+
+      filteredData = filteredData.filter((item) => item.data !== null || item.data !== undefined );
+      
+      setData(filteredData);
+    }
+    setLoading(false);
+  }, [secondaryData, startDate, endDate,searchQuery]);
+
+  useEffect(() => {
+    if (fileData) {
+      convertStringToObject([fileData]);
+      console.log(fileData);
+    }
+  }, [fileData]);
   useEffect(() => {
     if (data) {
       setTimeout(() => {
@@ -155,7 +143,9 @@ export const VTimeSheetTable = ({
         <table className="styled-table">
           <thead className="sticky-header">
             <tr className="text_size_7">
-              <td className="px-5 text-center">S No.</td>
+              {categoryFilter !== "HO" && (
+                <td className="px-5 text-center">S No.</td>
+              )}
 
               {AllFieldData?.tableHeader?.map((header, index) => (
                 <td key={index} className="px-4 flex-1 text-center">
@@ -168,40 +158,39 @@ export const VTimeSheetTable = ({
                   </td>
                 </tr>
               )}
-              <td className="px-5 text-center">STATUS</td>
             </tr>
           </thead>
           {categoryFilter === "BLNG" && (
             <BlngTBody
-              data={data}
+              data={visibleData}
               loading={loading}
               setTableData={setTableData}
             />
           )}
           {categoryFilter === "HO" && (
             <HoTBody
-              data={data}
+              data={visibleData}
               loading={loading}
               setTableData={setTableData}
             />
           )}
           {categoryFilter === "SBW" && (
             <SbwTBody
-              data={data}
+              data={visibleData}
               loading={loading}
               setTableData={setTableData}
             />
           )}
           {categoryFilter === "ORMC" && (
             <OrmcTBody
-              data={data}
+              data={visibleData}
               loading={loading}
               setTableData={setTableData}
             />
           )}
           {categoryFilter === "Offshore" && (
             <OffshoreTBody
-              data={data}
+              data={visibleData}
               loading={loading}
               setTableData={setTableData}
             />
@@ -222,117 +211,4 @@ export const VTimeSheetTable = ({
     </section>
   );
 };
-// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-// import { useEffect, useState } from "react";
-// import { BlngTBody } from "./tableBody/BlngTBody";
-// import { HoTBody } from "./tableBody/HoTBody";
-// import { OffshoreTBody } from "./tableBody/OffshoreTBody";
-// import { OrmcTBody } from "./tableBody/OrmcTBody";
-// import { SbwTBody } from "./tableBody/SbwTBody";
-// import { ExportTableToExcel } from "./customTimeSheet/DownloadTableToExcel";
-// import "../../../src/index.css";
-// export const VTimeSheetTable = ({
-//   AllFieldData,
-//   categoryFilter,
-//   data,
-//   // loading,
-// }) => {
-//   const [loading, setLoading] = useState(true);
-//   const [tableData, setTableData] = useState(null);
-//   useEffect(() => {
-//     if (data) {
-//       setTimeout(() => {
-//         setLoading(false);
-//       }, 5000);
-//     }
-//   }, [data]);
-//   const useDownloadFunc = (res) => {
-//     console.log(res);
-//     setTableData(res);
-//   };
 
-//   return (
-//     <section>
-//       <article
-//         className={`flex justify-center text_size_5  text-dark_grey ${
-//           loading && "pt-6"
-//         }`}
-//       >
-//         {loading && <p>Please wait few seconds...</p>}
-//       </article>
-
-//       <div className=" mt-9  max-h-[500px] table-wrp block overflow-x-scroll border-2 border-lite_grey">
-//         {/* <div className="mt-9  max-h-[500px] table-wrp block overflow-x-scroll border-2 border-lite_grey"> */}
-//         {/* w-[1190px] */}
-//         {/* <table className="styled-table text-center w-full rounded-md overflow-hidden shadow-md overflow-y-auto"> */}
-//         <table className="text-center w-full rounded-md overflow-hidden shadow-md overflow-y-auto ">
-//           <thead className="sticky top-0 ">
-//             <tr className="bg-lite_grey h-10 text-dark_grey text_size_5 text-start ">
-//               <td className="px-5 text-center">S No.</td>
-
-//               {AllFieldData?.tableHeader?.map((header, index) => (
-//                 <td key={index} className="px-4 flex-1 text-center">
-//                   {header}
-//                 </td>
-//               )) ?? (
-//                 <tr>
-//                   <td colSpan="100%" className="text-center">
-//                     No headers available
-//                   </td>
-//                 </tr>
-//               )}
-//               <td className="px-5 text-center">STATUS</td>
-//             </tr>
-//           </thead>
-//           {categoryFilter === "BLNG" && (
-//             <BlngTBody
-//               data={data}
-//               loading={loading}
-//               useDownloadFunc={useDownloadFunc}
-//             />
-//           )}
-//           {categoryFilter === "HO" && (
-//             <HoTBody
-//               data={data}
-//               loading={loading}
-//               useDownloadFunc={useDownloadFunc}
-//             />
-//           )}
-//           {categoryFilter === "SBW" && (
-//             <SbwTBody
-//               data={data}
-//               loading={loading}
-//               useDownloadFunc={useDownloadFunc}
-//             />
-//           )}
-//           {categoryFilter === "ORMC" && (
-//             <OrmcTBody
-//               data={data}
-//               loading={loading}
-//               useDownloadFunc={useDownloadFunc}
-//             />
-//           )}
-//           {categoryFilter === "Offshore" && (
-//             <OffshoreTBody
-//               data={data}
-//               loading={loading}
-//               useDownloadFunc={useDownloadFunc}
-//             />
-//           )}
-//         </table>
-//       </div>
-//       {/* </div> */}
-//       <div className="flex justify-center p-7">
-//         <button
-//           className="rounded px-3 py-2 bg-[#FEF116] text_size_5 text-dark_grey"
-//           onClick={() => {
-//             ExportTableToExcel(categoryFilter || "TimeSheet", tableData);
-//           }}
-//         >
-//           Download
-//         </button>
-//       </div>
-//     </section>
-//   );
-// };

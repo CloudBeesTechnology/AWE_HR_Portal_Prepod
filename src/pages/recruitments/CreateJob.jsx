@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { CreateJobFunc } from "../../services/createMethod/CreateJobFunc";
 import { SpinLogo } from "../../utils/SpinLogo";
+import { GoUpload } from "react-icons/go";
+import { uploadDocs } from "../../services/uploadDocsS3/UploadDocs";
 
 export const CreateJob = () => {
   const { SubmitJobData } = CreateJobFunc();
@@ -24,14 +26,70 @@ export const CreateJob = () => {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(hiringJobSchema),
   });
+  const [uploadedDocs,setUploadedDocs]=useState(null)
+  const [uploadedFileNames,setUploadedFileNames]=useState({})
+  const watchedJobTitle=watch("jobTitle")
+  const handleFileUpload = async (e, type) => {
+    if (!watchedJobTitle) {
+      alert("Please enter the Job Title before uploading files.");
+      window.location.href = "/hiringJob";
+      return;
+    }
 
+    let selectedFile = e.target.files[0];
+
+    // Allowed file types
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
+
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
+    }
+
+    setValue(type, selectedFile);
+
+    if (selectedFile) {
+      // const result = await uploadData({
+      //   path: `${watchedJobTitle}/${selectedFile.name}`,
+      //   data: selectedFile,
+      // }).result;
+
+      // const fileUrl = `https://commonfiles.s3.ap-southeast-1.amazonaws.com/applyJob/dev${encodeURIComponent(
+      //   result.path
+      // )}`;
+      // console.log(fileUrl);
+
+      // https://commonfiles.s3.ap-southeast-1.amazonaws.com/dev/download
+      await uploadDocs(selectedFile, type, setUploadedDocs, watchedJobTitle);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [type]: selectedFile.name, // Dynamically store file name
+      }));
+    }
+  };
+  // console.log(uploadedDocs);
+  
   const onSubmit = handleSubmit((data) => {
+    console.log(data);
+    
     try {
-      SubmitJobData({ jobValue: data });
+      const storedvalue={
+        ...data,
+        uploadJobDetails: uploadedDocs.uploadJobDetails
+      }
+      // console.log(storedvalue);
+      
+      SubmitJobData({ jobValue: storedvalue });
       setShowTitle("Posted Job successfully");
       setNotification(true);
     } catch (error) {
@@ -80,6 +138,25 @@ export const CreateJob = () => {
             </p>
           )}
         </div>
+        <div>
+            <h2 className="text_size_5 mb-2">Upload Job Document</h2>
+            <label className="flex items-center px-3 py-2 p-2.5 bg-lite_skyBlue w-72 border border-[#dedddd] rounded-md cursor-pointer">
+              <input
+                type="file"
+                {...register("uploadJobDetails")}
+                onChange={(e) => handleFileUpload(e, "uploadJobDetails")}
+                className="hidden"
+                accept=".pdf, .jpg, .jpeg, .png"
+              />
+              <span className="ml-2 flex p-1 text-grey gap-10">
+                <GoUpload /> PDF
+              </span>
+            </label>
+
+            <p className="text-xs mt-1 text-grey">
+              {uploadedFileNames?.uploadJobDetails}
+            </p>
+          </div>
 
         <div className="w-full center">
           <button className="primary_btn" onClick={onSubmit}>

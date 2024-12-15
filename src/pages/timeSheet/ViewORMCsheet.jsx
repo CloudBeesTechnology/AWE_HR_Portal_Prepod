@@ -1,27 +1,29 @@
 import { useCallback, useEffect, useState } from "react";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
 import { PopupForMissMatchExcelSheet } from "./ModelForSuccessMess/PopupForMissMatchExcelSheet";
-import {
-  createORMCSheet,
-  deleteORMCSheet,
-  updateORMCSheet,
-} from "../../graphql/mutations";
+// import {
+//   createORMCSheet,
+//   deleteORMCSheet,
+//   updateORMCSheet,
+// } from "../../graphql/mutations";
 import { generateClient } from "@aws-amplify/api";
 import { EditTimeSheet } from "./EditTimeSheet";
 import { SuccessMessage } from "./ModelForSuccessMess/SuccessMessage";
 import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
 import "../../../src/index.css";
-import { useScrollableView } from "./customTimeSheet/UseScrollableView";
+
 import { useTableMerged } from "./customTimeSheet/UserTableMerged";
 import { PopupForAssignManager } from "./ModelForSuccessMess/PopupForAssignManager";
-import {
-  getEmpWorkInfo,
-  listEmpPersonalInfos,
-  listEmpWorkInfos,
-  listORMCSheets,
-  listUsers,
-} from "../../graphql/queries";
+// import {
+//   getEmpWorkInfo,
+//   listEmpPersonalInfos,
+//   listEmpWorkInfos,
+//   listORMCSheets,
+//   listUsers,
+// } from "../../graphql/queries";
 import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
+import { createTimeSheet, updateTimeSheet } from "../../graphql/mutations";
+import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
 const client = generateClient();
 export const ViewORMCsheet = ({
   excelData,
@@ -30,11 +32,14 @@ export const ViewORMCsheet = ({
   setExcelData,
   convertedStringToArrayObj,
   Position,
+  fileName,
+  defaultValue,
 }) => {
+  const uploaderID = localStorage.getItem("userID")?.toUpperCase();
   const [data, setData] = useState(null);
-
   const [secondaryData, setSecondaryData] = useState(null);
-  const [currentStatus, setCurrentStatus] = useState(null);
+  const [currentStatus, setCurrentStatus] = useState(defaultValue);
+
   const [editObject, setEditObject] = useState();
   const [toggleHandler, setToggleHandler] = useState(false);
   const [toggleAssignManager, setToggleAssignManager] = useState(false);
@@ -43,12 +48,13 @@ export const ViewORMCsheet = ({
   const [showStatusCol, setShowStatusCol] = useState(null);
   const [successMess, setSuccessMess] = useState(null);
 
-  const { handleScroll, visibleData, setVisibleData } = useScrollableView(
+  const { handleScroll, visibleData, setVisibleData } = UseScrollableView(
     data,
     Position
   );
-  const processedData = useTableMerged(excelData);
 
+  const processedData = useTableMerged(excelData);
+  console.log(currentStatus);
   useEffect(() => {
     if (processedData && processedData.length > 0) {
       setData(processedData);
@@ -64,37 +70,6 @@ export const ViewORMCsheet = ({
       console.error("Error fetching user data:", error);
     }
   };
-  // useEffect(() => {
-  //   if (excelData) {
-  //     const fetchData = async () => {
-  //       // setLoading(true);
-  //       try {
-  //         const dataPromise = new Promise((resolve, reject) => {
-  //           if (excelData) {
-  //             resolve(excelData);
-  //           } else {
-  //             setTimeout(() => {
-  //               reject("No data found after waiting.");
-  //             }, 5000);
-  //           }
-  //         });
-
-  //         const fetchedData = await dataPromise;
-
-  //         // setForUpdateBlng(fetchedData);
-  //         setData(fetchedData);
-  //         setSecondaryData(fetchedData);
-  //       } catch (err) {}
-  //     };
-  //     fetchData();
-  //   }
-  // }, [excelData]);
-  // const cleanValue = (value) => {
-  //   if (typeof value !== "string") {
-  //     return value; // Return value if not a string (e.g., number, object)
-  //   }
-  //   return value.replace(/[^a-zA-Z0-9]/g, ""); // Removes all non-alphanumeric characters
-  // };
   useEffect(() => {
     const getPosition = localStorage.getItem("userType");
     if (getPosition === "Manager") {
@@ -143,14 +118,6 @@ export const ViewORMCsheet = ({
 
   useEffect(() => {
     const checkKeys = async () => {
-      // const cleanData = returnedTHeader.map((item) => {
-      //   const cleanedItem = {};
-      //   for (const key in item) {
-      //     cleanedItem[key] = cleanValue(item[key]); // Clean the value, not the key
-      //   }
-      //   return cleanedItem;
-      // });
-
       const convertKeys = (obj) => {
         return Object.keys(obj).reduce((acc, key) => {
           // Remove spaces and special characters, and convert to lowercase
@@ -201,22 +168,7 @@ export const ViewORMCsheet = ({
           resolve(keyCheckResult);
         });
       };
-      // const result = await new Promise((resolve) => {
-      //   // Check if all required keys are in the object
-      //   const keyCheckResult =
-      //     cleanData &&
-      //     cleanData.every((m) => {
-      //       return requiredKeys.every(
-      //         (key) =>
-      //           Object.values(m)
-      //             .map((value) =>
-      //               typeof value === "string" ? value.toUpperCase() : value
-      //             ) // Convert string values to uppercase
-      //             .includes(key.toUpperCase()) // Compare with key in uppercase
-      //       );
-      //     });
-      //   resolve(keyCheckResult);
-      // });
+
       const result = await checkedKeys();
 
       setCurrentStatus(result); // Assuming setCurrentStatus is defined
@@ -358,23 +310,28 @@ export const ViewORMCsheet = ({
         dailySheet: JSON.stringify(finalResult),
         status: "Pending",
         date: currentDate,
+        managerDetails: JSON.stringify(managerData),
+        type: "ORMC",
+        fileName: fileName,
+        uploaderID: uploaderID,
       };
 
       if (DailySheet.dailySheet) {
         await client
           .graphql({
-            query: createORMCSheet,
+            query: createTimeSheet,
             variables: {
               input: DailySheet,
             },
           })
           .then((res) => {
-            if (res.data.createORMCSheet) {
+            if (res.data.createTimeSheet) {
               // console.log(
               //   "res.data.createORMCSheet : ",
               //   res.data.createORMCSheet
               // );
               toggleSFAMessage(true);
+              setData(null);
             }
           })
           .catch((err) => {
@@ -427,20 +384,20 @@ export const ViewORMCsheet = ({
         if (finalData.dailySheet) {
           await client
             .graphql({
-              query: updateORMCSheet,
+              query: updateTimeSheet,
               variables: {
                 input: finalData,
               },
             })
             .then((res) => {
-              if (res.data.updateORMCSheet) {
+              if (res.data.updateTimeSheet) {
                 // console.log(
                 //   "res.data.updateORMCSheet : ",
                 //   res.data.updateORMCSheet
                 // );
                 toggleSFAMessage(true);
                 setVisibleData([]);
-                // setData(null);
+                setData(null);
               }
             })
             .catch((err) => {
@@ -584,22 +541,22 @@ export const ViewORMCsheet = ({
                     : (
                         <tr>
                           <td
-                            colSpan="15"
-                            className="px-6 py-6 text-center text-dark_ash text_size_5"
+                            colSpan="100%"
+                            className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white "
                           >
                             <p className="px-6 py-6">
-                              No Table Data Available Here
+                            No Table Data Available Here.
                             </p>
                           </td>
                         </tr>
                       ) ?? (
                         <tr>
                           <td
-                            colSpan="15"
+                            colSpan="100%"
                             className="px-6 py-6 text-center text-dark_ash text_size_5"
                           >
                             <p className="px-6 py-6">
-                              No Table Data Available Here
+                            No Table Data Available Here.
                             </p>
                           </td>
                         </tr>
@@ -612,15 +569,6 @@ export const ViewORMCsheet = ({
                 visibleData && visibleData.length > 0 ? "" : "hidden"
               }`}
             >
-              {/* <button
-                className="rounded px-7 py-2 bg-[#FEF116] text_size_5 text-dark_grey mb-10"
-                onClick={() => {
-                  toggleFunctionForAssiMana();
-                }}
-              >
-                Assign Manager
-              </button> */}
-
               <button
                 className={`rounded px-3 py-2 ${
                   userIdentification === "Manager" ? "w-40" : "w-52"
@@ -628,39 +576,6 @@ export const ViewORMCsheet = ({
                 onClick={() => {
                   if (userIdentification !== "Manager") {
                     toggleFunctionForAssiMana();
-                    // const fetchData = async () => {
-                    //   console.log("I am calling You");
-                    //   // Fetch the BLNG data using GraphQL
-                    //   const [fetchBLNGdata] = await Promise.all([
-                    //     client.graphql({
-                    //       query: listORMCSheets,
-                    //     }),
-                    //   ]);
-                    //   const BLNGdata =
-                    //     fetchBLNGdata?.data?.listORMCSheets?.items;
-                    //   console.log("BLNGdata : ", BLNGdata);
-                    //   const deleteFunction =
-                    //     BLNGdata &&
-                    //     BLNGdata.map(async (m) => {
-                    //       const dailySheet = {
-                    //         id: m.id,
-                    //       };
-                    //       await client
-                    //         .graphql({
-                    //           query: deleteORMCSheet,
-                    //           variables: {
-                    //             input: dailySheet,
-                    //           },
-                    //         })
-                    //         .then((res) => {
-                    //           console.log(res);
-                    //         })
-                    //         .catch((err) => {
-                    //           console.log(err);
-                    //         });
-                    //     });
-                    // };
-                    // fetchData();
                   } else if (userIdentification === "Manager") {
                     renameKeysFunctionAndSubmit();
                   }
@@ -676,9 +591,11 @@ export const ViewORMCsheet = ({
           // {data ? ("True case") : data == false ? ("False case") : ("Default case")}
           <PopupForMissMatchExcelSheet />
         ) : (
+          // setShowPopup
           ""
         )}
       </div>
+   
       {toggleHandler === true && (
         <EditTimeSheet
           toggleFunction={toggleFunction}

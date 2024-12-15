@@ -3,9 +3,9 @@ import React, { useState } from "react";
 import { FaAngleDown } from "react-icons/fa";
 import { SlCalender } from "react-icons/sl";
 import { FiSearch } from "react-icons/fi";
-import { VTimeSheetTable } from "./VTimeSheetTable";
 import { Link } from "react-router-dom";
-import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
+import { SearchBoxForTimeSheet } from "../../../../utils/SearchBoxForTimeSheet";
+import { VTimeSheetTable } from "../../VTimeSheetTable";
 export const ViewTimeSheet = (
   {
     // searchAllEmployee,

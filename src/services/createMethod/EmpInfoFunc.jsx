@@ -105,6 +105,8 @@ export const EmpInfoFunc = () => {
       permanentAddress,
       position,
       sapNo,
+      bankName,
+      bankAccNo
     } = empValue;
 
     const totalData = {
@@ -135,6 +137,8 @@ export const EmpInfoFunc = () => {
       permanentAddress,
       position,
       sapNo,
+      bankName,
+      bankAccNo
     };
     // console.log(totalData,"totalData");
 

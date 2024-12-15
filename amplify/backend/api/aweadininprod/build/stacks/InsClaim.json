@@ -49,10 +49,10 @@
     "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref": {
       "Type": "String"
     },
-    "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobauth0FunctionQuerygetHiringJobauth0FunctionAppSyncFunction8941716EFunctionId": {
+    "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintauth0FunctionQuerygetBastingPaintauth0FunctionAppSyncFunction189A1CA9FunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobpostAuth0FunctionQuerygetHiringJobpostAuth0FunctionAppSyncFunction20353E51FunctionId": {
+    "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction520CA580FunctionId": {
       "Type": "String"
     },
     "referencetotransformerrootstackauthRoleNameFB872D50Ref": {
@@ -61,19 +61,19 @@
     "referencetotransformerrootstackunauthRoleName49F3C1FERef": {
       "Type": "String"
     },
-    "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobMutationcreateHiringJobinit0FunctionMutationcreateHiringJobinit0FunctionAppSyncFunction09FDB38CFunctionId": {
+    "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintMutationcreateBastingPaintinit0FunctionMutationcreateBastingPaintinit0FunctionAppSyncFunction5E76F8D6FunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobMutationcreateHiringJobauth0FunctionMutationcreateHiringJobauth0FunctionAppSyncFunctionB65AEBFEFunctionId": {
+    "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintMutationcreateBastingPaintauth0FunctionMutationcreateBastingPaintauth0FunctionAppSyncFunctionFDDFD342FunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobMutationupdateHiringJobinit0FunctionMutationupdateHiringJobinit0FunctionAppSyncFunctionD57ABAAFFunctionId": {
+    "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintMutationupdateBastingPaintinit0FunctionMutationupdateBastingPaintinit0FunctionAppSyncFunction5A468F17FunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobSubscriptiononCreateHiringJobauth0FunctionSubscriptiononCreateHiringJobauth0FunctionAppSyncFunctionB277D55EFunctionId": {
+    "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintSubscriptiononCreateBastingPaintauth0FunctionSubscriptiononCreateBastingPaintauth0FunctionAppSyncFunction70B34728FunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobSubscriptionOnCreateHiringJobDataResolverFnSubscriptionOnCreateHiringJobDataResolverFnAppSyncFunction23A58A85FunctionId": {
+    "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintSubscriptionOnCreateBastingPaintDataResolverFnSubscriptionOnCreateBastingPaintDataResolverFnAppSyncFunctionCA89E9AF6": {
       "Type": "String"
     }
   },
@@ -392,10 +392,10 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobauth0FunctionQuerygetHiringJobauth0FunctionAppSyncFunction8941716EFunctionId"
+              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintauth0FunctionQuerygetBastingPaintauth0FunctionAppSyncFunction189A1CA9FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobpostAuth0FunctionQuerygetHiringJobpostAuth0FunctionAppSyncFunction20353E51FunctionId"
+              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction520CA580FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -503,10 +503,10 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobauth0FunctionQuerygetHiringJobauth0FunctionAppSyncFunction8941716EFunctionId"
+              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintauth0FunctionQuerygetBastingPaintauth0FunctionAppSyncFunction189A1CA9FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobpostAuth0FunctionQuerygetHiringJobpostAuth0FunctionAppSyncFunction20353E51FunctionId"
+              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction520CA580FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -614,13 +614,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobMutationcreateHiringJobinit0FunctionMutationcreateHiringJobinit0FunctionAppSyncFunction09FDB38CFunctionId"
+              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintMutationcreateBastingPaintinit0FunctionMutationcreateBastingPaintinit0FunctionAppSyncFunction5E76F8D6FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobMutationcreateHiringJobauth0FunctionMutationcreateHiringJobauth0FunctionAppSyncFunctionB65AEBFEFunctionId"
+              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintMutationcreateBastingPaintauth0FunctionMutationcreateBastingPaintauth0FunctionAppSyncFunctionFDDFD342FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobpostAuth0FunctionQuerygetHiringJobpostAuth0FunctionAppSyncFunction20353E51FunctionId"
+              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction520CA580FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -779,7 +779,7 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobMutationupdateHiringJobinit0FunctionMutationupdateHiringJobinit0FunctionAppSyncFunctionD57ABAAFFunctionId"
+              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintMutationupdateBastingPaintinit0FunctionMutationupdateBastingPaintinit0FunctionAppSyncFunction5A468F17FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -788,7 +788,7 @@
               ]
             },
             {
-              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobpostAuth0FunctionQuerygetHiringJobpostAuth0FunctionAppSyncFunction20353E51FunctionId"
+              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction520CA580FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -953,7 +953,7 @@
               ]
             },
             {
-              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobpostAuth0FunctionQuerygetHiringJobpostAuth0FunctionAppSyncFunction20353E51FunctionId"
+              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction520CA580FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -1010,13 +1010,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobSubscriptiononCreateHiringJobauth0FunctionSubscriptiononCreateHiringJobauth0FunctionAppSyncFunctionB277D55EFunctionId"
+              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintSubscriptiononCreateBastingPaintauth0FunctionSubscriptiononCreateBastingPaintauth0FunctionAppSyncFunction70B34728FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobpostAuth0FunctionQuerygetHiringJobpostAuth0FunctionAppSyncFunction20353E51FunctionId"
+              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction520CA580FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobSubscriptionOnCreateHiringJobDataResolverFnSubscriptionOnCreateHiringJobDataResolverFnAppSyncFunction23A58A85FunctionId"
+              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintSubscriptionOnCreateBastingPaintDataResolverFnSubscriptionOnCreateBastingPaintDataResolverFnAppSyncFunctionCA89E9AF6"
             }
           ]
         },
@@ -1063,13 +1063,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobSubscriptiononCreateHiringJobauth0FunctionSubscriptiononCreateHiringJobauth0FunctionAppSyncFunctionB277D55EFunctionId"
+              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintSubscriptiononCreateBastingPaintauth0FunctionSubscriptiononCreateBastingPaintauth0FunctionAppSyncFunction70B34728FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobpostAuth0FunctionQuerygetHiringJobpostAuth0FunctionAppSyncFunction20353E51FunctionId"
+              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction520CA580FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobSubscriptionOnCreateHiringJobDataResolverFnSubscriptionOnCreateHiringJobDataResolverFnAppSyncFunction23A58A85FunctionId"
+              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintSubscriptionOnCreateBastingPaintDataResolverFnSubscriptionOnCreateBastingPaintDataResolverFnAppSyncFunctionCA89E9AF6"
             }
           ]
         },
@@ -1116,13 +1116,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobSubscriptiononCreateHiringJobauth0FunctionSubscriptiononCreateHiringJobauth0FunctionAppSyncFunctionB277D55EFunctionId"
+              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintSubscriptiononCreateBastingPaintauth0FunctionSubscriptiononCreateBastingPaintauth0FunctionAppSyncFunction70B34728FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobQuerygetHiringJobpostAuth0FunctionQuerygetHiringJobpostAuth0FunctionAppSyncFunction20353E51FunctionId"
+              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction520CA580FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackHiringJobNestedStackHiringJobNestedStackResourceCFC75870OutputstransformerrootstackHiringJobSubscriptionOnCreateHiringJobDataResolverFnSubscriptionOnCreateHiringJobDataResolverFnAppSyncFunction23A58A85FunctionId"
+              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintSubscriptionOnCreateBastingPaintDataResolverFnSubscriptionOnCreateBastingPaintDataResolverFnAppSyncFunctionCA89E9AF6"
             }
           ]
         },

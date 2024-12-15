@@ -140,7 +140,8 @@ export const OtherDetails = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="pt-5">
+    <div>
+      <form onSubmit={handleSubmit(onSubmit)} className="pt-5">
       {/* Salary Expected */}
       <div className=" grid grid-cols-2 gap-5">
         <div className="mb-4">
@@ -372,13 +373,16 @@ export const OtherDetails = () => {
           Submit
         </button>
       </div>
-      {notification && (
+      
+    </form> 
+    {notification && (
         <SpinLogo
           text="Your Application Submitted Successfully"
           notification={notification}
           path="/recrutiles/candidate"
         />
       )}
-    </form> 
+    </div>
+    
   );
 };

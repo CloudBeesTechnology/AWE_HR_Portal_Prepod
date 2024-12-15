@@ -10,13 +10,13 @@ export const ViewOnshoreTSheet = ({ excelData }) => {
 
   useEffect(() => {
     if (excelData) {
-      const result = excelData.find((m) => {
+      const result = excelData.find((m) => { 
         const hasAllKeys = [
           "NAME",
           "BADGE#",
           "DEPT",
           "DATE",
-          "IN",
+          "IN", 
           "OUT",
         ].every((key) => key in m);
 

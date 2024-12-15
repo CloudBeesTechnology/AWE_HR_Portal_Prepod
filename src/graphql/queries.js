@@ -1,6 +1,150 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getBastingPaint = /* GraphQL */ `
+  query GetBastingPaint($id: ID!) {
+    getBastingPaint(id: $id) {
+      id
+      empID
+      blastingRemarks
+      blastingEndDate
+      blastingStartDate
+      blastingBadgeNo
+      blastingQulifiExp
+      blastingUpload
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listBastingPaints = /* GraphQL */ `
+  query ListBastingPaints(
+    $filter: ModelBastingPaintFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listBastingPaints(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        empID
+        blastingRemarks
+        blastingEndDate
+        blastingStartDate
+        blastingBadgeNo
+        blastingQulifiExp
+        blastingUpload
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getTimeSheet = /* GraphQL */ `
+  query GetTimeSheet($id: ID!) {
+    getTimeSheet(id: $id) {
+      id
+      date
+      status
+      fileName
+      fileType
+      assignTo
+      assignBy
+      empName
+      empBadgeNo
+      empID
+      empDept
+      inTime
+      outTime
+      totalInOut
+      allDayHrs
+      totalHrs
+      remarks
+      otTime
+      netMins
+      actualWorkHrs
+      normalWorkHrs
+      fidNo
+      companyName
+      trade
+      tradeCode
+      onAM
+      offAM
+      onPM
+      offPM
+      ctr
+      rec
+      avgDailyTD
+      highlightDayTG
+      aweSDN
+      totalNT
+      totalOT
+      totalNTOT
+      empWorkInfo
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listTimeSheets = /* GraphQL */ `
+  query ListTimeSheets(
+    $filter: ModelTimeSheetFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listTimeSheets(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        date
+        status
+        fileName
+        fileType
+        assignTo
+        assignBy
+        empName
+        empBadgeNo
+        empID
+        empDept
+        inTime
+        outTime
+        totalInOut
+        allDayHrs
+        totalHrs
+        remarks
+        otTime
+        netMins
+        actualWorkHrs
+        normalWorkHrs
+        fidNo
+        companyName
+        trade
+        tradeCode
+        onAM
+        offAM
+        onPM
+        offPM
+        ctr
+        rec
+        avgDailyTD
+        highlightDayTG
+        aweSDN
+        totalNT
+        totalOT
+        totalNTOT
+        empWorkInfo
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getHiringJob = /* GraphQL */ `
   query GetHiringJob($id: ID!) {
     getHiringJob(id: $id) {
@@ -12,6 +156,7 @@ export const getHiringJob = /* GraphQL */ `
       startDate
       expiryDate
       jobContent
+      uploadJobDetails
       createdAt
       updatedAt
       __typename
@@ -34,6 +179,7 @@ export const listHiringJobs = /* GraphQL */ `
         startDate
         expiryDate
         jobContent
+        uploadJobDetails
         createdAt
         updatedAt
         __typename
@@ -385,186 +531,6 @@ export const listEmailNotifis = /* GraphQL */ `
     }
   }
 `;
-export const getOffshoreSheet = /* GraphQL */ `
-  query GetOffshoreSheet($id: ID!) {
-    getOffshoreSheet(id: $id) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const listOffshoreSheets = /* GraphQL */ `
-  query ListOffshoreSheets(
-    $filter: ModelOffshoreSheetFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listOffshoreSheets(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        date
-        dailySheet
-        status
-        manager
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const getORMCSheet = /* GraphQL */ `
-  query GetORMCSheet($id: ID!) {
-    getORMCSheet(id: $id) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const listORMCSheets = /* GraphQL */ `
-  query ListORMCSheets(
-    $filter: ModelORMCSheetFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listORMCSheets(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        date
-        dailySheet
-        status
-        manager
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const getSBWSheet = /* GraphQL */ `
-  query GetSBWSheet($id: ID!) {
-    getSBWSheet(id: $id) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const listSBWSheets = /* GraphQL */ `
-  query ListSBWSheets(
-    $filter: ModelSBWSheetFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listSBWSheets(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        date
-        dailySheet
-        status
-        manager
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const getBlng = /* GraphQL */ `
-  query GetBlng($id: ID!) {
-    getBlng(id: $id) {
-      id
-      weeklySheet
-      date
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const listBlngs = /* GraphQL */ `
-  query ListBlngs(
-    $filter: ModelBlngFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listBlngs(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        weeklySheet
-        date
-        status
-        manager
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const getHeadOffice = /* GraphQL */ `
-  query GetHeadOffice($id: ID!) {
-    getHeadOffice(id: $id) {
-      id
-      dailySheet
-      date
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const listHeadOffices = /* GraphQL */ `
-  query ListHeadOffices(
-    $filter: ModelHeadOfficeFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listHeadOffices(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        dailySheet
-        date
-        status
-        manager
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
 export const getEmpRequisition = /* GraphQL */ `
   query GetEmpRequisition($id: ID!) {
     getEmpRequisition(id: $id) {
@@ -581,6 +547,8 @@ export const getEmpRequisition = /* GraphQL */ `
       status
       remarkReq
       reqName
+      requestorID
+      approverID
       createdAt
       updatedAt
       __typename
@@ -608,6 +576,8 @@ export const listEmpRequisitions = /* GraphQL */ `
         status
         remarkReq
         reqName
+        requestorID
+        approverID
         createdAt
         updatedAt
         __typename

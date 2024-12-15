@@ -11,7 +11,7 @@ export const HiringJob = () => {
   }, []);
   const { hiringData } = useContext(DataSupply);
   // console.log(hiringData);
-
+  const latestData = hiringData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const heading = [
     "Job Title",
     "Experience",
@@ -63,8 +63,8 @@ export const HiringJob = () => {
 
         {/* Table Body */}
         <tbody className="bg-white cursor-pointer">
-          {hiringData && hiringData.length > 0 ? (
-            hiringData.map((val, idx) => {
+          {latestData && latestData.length > 0 ? (
+            latestData.map((val, idx) => {
               const status = getStatus(val?.expiryDate);
               return (
                 <tr

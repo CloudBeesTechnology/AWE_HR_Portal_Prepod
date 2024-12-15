@@ -1,3 +1,59 @@
+type BastingPaint @aws_iam @aws_api_key {
+  id: ID!
+  empID: String!
+  blastingRemarks: String
+  blastingEndDate: String
+  blastingStartDate: String
+  blastingBadgeNo: String
+  blastingQulifiExp: String
+  blastingUpload: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type TimeSheet @aws_iam @aws_api_key {
+  id: ID!
+  date: String
+  status: String
+  fileName: String
+  fileType: String
+  assignTo: String
+  assignBy: String
+  empName: String
+  empBadgeNo: String
+  empID: String
+  empDept: String
+  inTime: String
+  outTime: String
+  totalInOut: String
+  allDayHrs: String
+  totalHrs: String
+  remarks: String
+  otTime: String
+  netMins: String
+  actualWorkHrs: String
+  normalWorkHrs: String
+  fidNo: String
+  companyName: String
+  trade: String
+  tradeCode: String
+  onAM: String
+  offAM: String
+  onPM: String
+  offPM: String
+  ctr: String
+  rec: String
+  avgDailyTD: String
+  highlightDayTG: String
+  aweSDN: String
+  totalNT: String
+  totalOT: String
+  totalNTOT: String
+  empWorkInfo: [AWSJSON]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
 type HiringJob @aws_iam @aws_api_key {
   id: ID!
   jobTitle: String
@@ -7,6 +63,7 @@ type HiringJob @aws_iam @aws_api_key {
   startDate: String
   expiryDate: String
   jobContent: String
+  uploadJobDetails: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -116,56 +173,6 @@ type EmailNotifi @aws_iam @aws_api_key {
   updatedAt: AWSDateTime!
 }
 
-type OffshoreSheet @aws_iam @aws_api_key {
-  id: ID!
-  date: String
-  dailySheet: [AWSJSON]
-  status: String
-  manager: [AWSJSON]
-  createdAt: AWSDateTime!
-  updatedAt: AWSDateTime!
-}
-
-type ORMCSheet @aws_iam @aws_api_key {
-  id: ID!
-  date: String
-  dailySheet: [AWSJSON]
-  status: String
-  manager: [AWSJSON]
-  createdAt: AWSDateTime!
-  updatedAt: AWSDateTime!
-}
-
-type SBWSheet @aws_iam @aws_api_key {
-  id: ID!
-  date: String
-  dailySheet: [AWSJSON]
-  status: String
-  manager: [AWSJSON]
-  createdAt: AWSDateTime!
-  updatedAt: AWSDateTime!
-}
-
-type Blng @aws_iam @aws_api_key {
-  id: ID!
-  weeklySheet: [AWSJSON]
-  date: String
-  status: String
-  manager: [AWSJSON]
-  createdAt: AWSDateTime!
-  updatedAt: AWSDateTime!
-}
-
-type HeadOffice @aws_iam @aws_api_key {
-  id: ID!
-  dailySheet: [AWSJSON]
-  date: String
-  status: String
-  manager: [AWSJSON]
-  createdAt: AWSDateTime!
-  updatedAt: AWSDateTime!
-}
-
 type EmpRequisition @aws_iam @aws_api_key {
   id: ID!
   department: String
@@ -180,6 +187,8 @@ type EmpRequisition @aws_iam @aws_api_key {
   status: String
   remarkReq: String
   reqName: String
+  requestorID: String
+  approverID: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -935,28 +944,32 @@ enum ModelSortDirection {
   DESC
 }
 
-type ModelHiringJobConnection @aws_api_key @aws_iam {
-  items: [HiringJob]!
+type ModelBastingPaintConnection @aws_api_key @aws_iam {
+  items: [BastingPaint]!
   nextToken: String
 }
 
-input ModelHiringJobFilterInput {
+input ModelBastingPaintFilterInput {
   id: ModelIDInput
-  jobTitle: ModelStringInput
-  exper: ModelStringInput
-  location: ModelStringInput
-  quantityPerson: ModelStringInput
-  startDate: ModelStringInput
-  expiryDate: ModelStringInput
-  jobContent: ModelStringInput
+  empID: ModelStringInput
+  blastingRemarks: ModelStringInput
+  blastingEndDate: ModelStringInput
+  blastingStartDate: ModelStringInput
+  blastingBadgeNo: ModelStringInput
+  blastingQulifiExp: ModelStringInput
+  blastingUpload: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
-  and: [ModelHiringJobFilterInput]
-  or: [ModelHiringJobFilterInput]
-  not: ModelHiringJobFilterInput
+  and: [ModelBastingPaintFilterInput]
+  or: [ModelBastingPaintFilterInput]
+  not: ModelBastingPaintFilterInput
 }
 
 type Query {
+  getBastingPaint(id: ID!): BastingPaint @aws_api_key @aws_iam
+  listBastingPaints(filter: ModelBastingPaintFilterInput, limit: Int, nextToken: String): ModelBastingPaintConnection @aws_api_key @aws_iam
+  getTimeSheet(id: ID!): TimeSheet @aws_api_key @aws_iam
+  listTimeSheets(filter: ModelTimeSheetFilterInput, limit: Int, nextToken: String): ModelTimeSheetConnection @aws_api_key @aws_iam
   getHiringJob(id: ID!): HiringJob @aws_api_key @aws_iam
   listHiringJobs(filter: ModelHiringJobFilterInput, limit: Int, nextToken: String): ModelHiringJobConnection @aws_api_key @aws_iam
   getInsuranceType(id: ID!): InsuranceType @aws_api_key @aws_iam
@@ -975,16 +988,6 @@ type Query {
   listProbForms(filter: ModelProbFormFilterInput, limit: Int, nextToken: String): ModelProbFormConnection @aws_api_key @aws_iam
   getEmailNotifi(id: ID!): EmailNotifi @aws_api_key @aws_iam
   listEmailNotifis(filter: ModelEmailNotifiFilterInput, limit: Int, nextToken: String): ModelEmailNotifiConnection @aws_api_key @aws_iam
-  getOffshoreSheet(id: ID!): OffshoreSheet @aws_api_key @aws_iam
-  listOffshoreSheets(filter: ModelOffshoreSheetFilterInput, limit: Int, nextToken: String): ModelOffshoreSheetConnection @aws_api_key @aws_iam
-  getORMCSheet(id: ID!): ORMCSheet @aws_api_key @aws_iam
-  listORMCSheets(filter: ModelORMCSheetFilterInput, limit: Int, nextToken: String): ModelORMCSheetConnection @aws_api_key @aws_iam
-  getSBWSheet(id: ID!): SBWSheet @aws_api_key @aws_iam
-  listSBWSheets(filter: ModelSBWSheetFilterInput, limit: Int, nextToken: String): ModelSBWSheetConnection @aws_api_key @aws_iam
-  getBlng(id: ID!): Blng @aws_api_key @aws_iam
-  listBlngs(filter: ModelBlngFilterInput, limit: Int, nextToken: String): ModelBlngConnection @aws_api_key @aws_iam
-  getHeadOffice(id: ID!): HeadOffice @aws_api_key @aws_iam
-  listHeadOffices(filter: ModelHeadOfficeFilterInput, limit: Int, nextToken: String): ModelHeadOfficeConnection @aws_api_key @aws_iam
   getEmpRequisition(id: ID!): EmpRequisition @aws_api_key @aws_iam
   listEmpRequisitions(filter: ModelEmpRequisitionFilterInput, limit: Int, nextToken: String): ModelEmpRequisitionConnection @aws_api_key @aws_iam
   getWeldingInfo(id: ID!): WeldingInfo @aws_api_key @aws_iam
@@ -1043,48 +1046,54 @@ type Query {
   listLeaveStatuses(filter: ModelLeaveStatusFilterInput, limit: Int, nextToken: String): ModelLeaveStatusConnection @aws_api_key @aws_iam
 }
 
-input ModelHiringJobConditionInput {
-  jobTitle: ModelStringInput
-  exper: ModelStringInput
-  location: ModelStringInput
-  quantityPerson: ModelStringInput
-  startDate: ModelStringInput
-  expiryDate: ModelStringInput
-  jobContent: ModelStringInput
-  and: [ModelHiringJobConditionInput]
-  or: [ModelHiringJobConditionInput]
-  not: ModelHiringJobConditionInput
+input ModelBastingPaintConditionInput {
+  empID: ModelStringInput
+  blastingRemarks: ModelStringInput
+  blastingEndDate: ModelStringInput
+  blastingStartDate: ModelStringInput
+  blastingBadgeNo: ModelStringInput
+  blastingQulifiExp: ModelStringInput
+  blastingUpload: ModelStringInput
+  and: [ModelBastingPaintConditionInput]
+  or: [ModelBastingPaintConditionInput]
+  not: ModelBastingPaintConditionInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
 }
 
-input CreateHiringJobInput {
+input CreateBastingPaintInput {
   id: ID
-  jobTitle: String
-  exper: String
-  location: String
-  quantityPerson: String
-  startDate: String
-  expiryDate: String
-  jobContent: String
+  empID: String!
+  blastingRemarks: String
+  blastingEndDate: String
+  blastingStartDate: String
+  blastingBadgeNo: String
+  blastingQulifiExp: String
+  blastingUpload: [AWSJSON]
 }
 
-input UpdateHiringJobInput {
+input UpdateBastingPaintInput {
   id: ID!
-  jobTitle: String
-  exper: String
-  location: String
-  quantityPerson: String
-  startDate: String
-  expiryDate: String
-  jobContent: String
+  empID: String
+  blastingRemarks: String
+  blastingEndDate: String
+  blastingStartDate: String
+  blastingBadgeNo: String
+  blastingQulifiExp: String
+  blastingUpload: [AWSJSON]
 }
 
-input DeleteHiringJobInput {
+input DeleteBastingPaintInput {
   id: ID!
 }
 
 type Mutation {
+  createBastingPaint(input: CreateBastingPaintInput!, condition: ModelBastingPaintConditionInput): BastingPaint @aws_api_key @aws_iam
+  updateBastingPaint(input: UpdateBastingPaintInput!, condition: ModelBastingPaintConditionInput): BastingPaint @aws_api_key @aws_iam
+  deleteBastingPaint(input: DeleteBastingPaintInput!, condition: ModelBastingPaintConditionInput): BastingPaint @aws_api_key @aws_iam
+  createTimeSheet(input: CreateTimeSheetInput!, condition: ModelTimeSheetConditionInput): TimeSheet @aws_api_key @aws_iam
+  updateTimeSheet(input: UpdateTimeSheetInput!, condition: ModelTimeSheetConditionInput): TimeSheet @aws_api_key @aws_iam
+  deleteTimeSheet(input: DeleteTimeSheetInput!, condition: ModelTimeSheetConditionInput): TimeSheet @aws_api_key @aws_iam
   createHiringJob(input: CreateHiringJobInput!, condition: ModelHiringJobConditionInput): HiringJob @aws_api_key @aws_iam
   updateHiringJob(input: UpdateHiringJobInput!, condition: ModelHiringJobConditionInput): HiringJob @aws_api_key @aws_iam
   deleteHiringJob(input: DeleteHiringJobInput!, condition: ModelHiringJobConditionInput): HiringJob @aws_api_key @aws_iam
@@ -1112,21 +1121,6 @@ type Mutation {
   createEmailNotifi(input: CreateEmailNotifiInput!, condition: ModelEmailNotifiConditionInput): EmailNotifi @aws_api_key @aws_iam
   updateEmailNotifi(input: UpdateEmailNotifiInput!, condition: ModelEmailNotifiConditionInput): EmailNotifi @aws_api_key @aws_iam
   deleteEmailNotifi(input: DeleteEmailNotifiInput!, condition: ModelEmailNotifiConditionInput): EmailNotifi @aws_api_key @aws_iam
-  createOffshoreSheet(input: CreateOffshoreSheetInput!, condition: ModelOffshoreSheetConditionInput): OffshoreSheet @aws_api_key @aws_iam
-  updateOffshoreSheet(input: UpdateOffshoreSheetInput!, condition: ModelOffshoreSheetConditionInput): OffshoreSheet @aws_api_key @aws_iam
-  deleteOffshoreSheet(input: DeleteOffshoreSheetInput!, condition: ModelOffshoreSheetConditionInput): OffshoreSheet @aws_api_key @aws_iam
-  createORMCSheet(input: CreateORMCSheetInput!, condition: ModelORMCSheetConditionInput): ORMCSheet @aws_api_key @aws_iam
-  updateORMCSheet(input: UpdateORMCSheetInput!, condition: ModelORMCSheetConditionInput): ORMCSheet @aws_api_key @aws_iam
-  deleteORMCSheet(input: DeleteORMCSheetInput!, condition: ModelORMCSheetConditionInput): ORMCSheet @aws_api_key @aws_iam
-  createSBWSheet(input: CreateSBWSheetInput!, condition: ModelSBWSheetConditionInput): SBWSheet @aws_api_key @aws_iam
-  updateSBWSheet(input: UpdateSBWSheetInput!, condition: ModelSBWSheetConditionInput): SBWSheet @aws_api_key @aws_iam
-  deleteSBWSheet(input: DeleteSBWSheetInput!, condition: ModelSBWSheetConditionInput): SBWSheet @aws_api_key @aws_iam
-  createBlng(input: CreateBlngInput!, condition: ModelBlngConditionInput): Blng @aws_api_key @aws_iam
-  updateBlng(input: UpdateBlngInput!, condition: ModelBlngConditionInput): Blng @aws_api_key @aws_iam
-  deleteBlng(input: DeleteBlngInput!, condition: ModelBlngConditionInput): Blng @aws_api_key @aws_iam
-  createHeadOffice(input: CreateHeadOfficeInput!, condition: ModelHeadOfficeConditionInput): HeadOffice @aws_api_key @aws_iam
-  updateHeadOffice(input: UpdateHeadOfficeInput!, condition: ModelHeadOfficeConditionInput): HeadOffice @aws_api_key @aws_iam
-  deleteHeadOffice(input: DeleteHeadOfficeInput!, condition: ModelHeadOfficeConditionInput): HeadOffice @aws_api_key @aws_iam
   createEmpRequisition(input: CreateEmpRequisitionInput!, condition: ModelEmpRequisitionConditionInput): EmpRequisition @aws_api_key @aws_iam
   updateEmpRequisition(input: UpdateEmpRequisitionInput!, condition: ModelEmpRequisitionConditionInput): EmpRequisition @aws_api_key @aws_iam
   deleteEmpRequisition(input: DeleteEmpRequisitionInput!, condition: ModelEmpRequisitionConditionInput): EmpRequisition @aws_api_key @aws_iam
@@ -1213,22 +1207,28 @@ type Mutation {
   deleteLeaveStatus(input: DeleteLeaveStatusInput!, condition: ModelLeaveStatusConditionInput): LeaveStatus @aws_api_key @aws_iam
 }
 
-input ModelSubscriptionHiringJobFilterInput {
+input ModelSubscriptionBastingPaintFilterInput {
   id: ModelSubscriptionIDInput
-  jobTitle: ModelSubscriptionStringInput
-  exper: ModelSubscriptionStringInput
-  location: ModelSubscriptionStringInput
-  quantityPerson: ModelSubscriptionStringInput
-  startDate: ModelSubscriptionStringInput
-  expiryDate: ModelSubscriptionStringInput
-  jobContent: ModelSubscriptionStringInput
+  empID: ModelSubscriptionStringInput
+  blastingRemarks: ModelSubscriptionStringInput
+  blastingEndDate: ModelSubscriptionStringInput
+  blastingStartDate: ModelSubscriptionStringInput
+  blastingBadgeNo: ModelSubscriptionStringInput
+  blastingQulifiExp: ModelSubscriptionStringInput
+  blastingUpload: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
-  and: [ModelSubscriptionHiringJobFilterInput]
-  or: [ModelSubscriptionHiringJobFilterInput]
+  and: [ModelSubscriptionBastingPaintFilterInput]
+  or: [ModelSubscriptionBastingPaintFilterInput]
 }
 
 type Subscription {
+  onCreateBastingPaint(filter: ModelSubscriptionBastingPaintFilterInput): BastingPaint @aws_subscribe(mutations: ["createBastingPaint"]) @aws_api_key @aws_iam
+  onUpdateBastingPaint(filter: ModelSubscriptionBastingPaintFilterInput): BastingPaint @aws_subscribe(mutations: ["updateBastingPaint"]) @aws_api_key @aws_iam
+  onDeleteBastingPaint(filter: ModelSubscriptionBastingPaintFilterInput): BastingPaint @aws_subscribe(mutations: ["deleteBastingPaint"]) @aws_api_key @aws_iam
+  onCreateTimeSheet(filter: ModelSubscriptionTimeSheetFilterInput): TimeSheet @aws_subscribe(mutations: ["createTimeSheet"]) @aws_api_key @aws_iam
+  onUpdateTimeSheet(filter: ModelSubscriptionTimeSheetFilterInput): TimeSheet @aws_subscribe(mutations: ["updateTimeSheet"]) @aws_api_key @aws_iam
+  onDeleteTimeSheet(filter: ModelSubscriptionTimeSheetFilterInput): TimeSheet @aws_subscribe(mutations: ["deleteTimeSheet"]) @aws_api_key @aws_iam
   onCreateHiringJob(filter: ModelSubscriptionHiringJobFilterInput): HiringJob @aws_subscribe(mutations: ["createHiringJob"]) @aws_api_key @aws_iam
   onUpdateHiringJob(filter: ModelSubscriptionHiringJobFilterInput): HiringJob @aws_subscribe(mutations: ["updateHiringJob"]) @aws_api_key @aws_iam
   onDeleteHiringJob(filter: ModelSubscriptionHiringJobFilterInput): HiringJob @aws_subscribe(mutations: ["deleteHiringJob"]) @aws_api_key @aws_iam
@@ -1256,21 +1256,6 @@ type Subscription {
   onCreateEmailNotifi(filter: ModelSubscriptionEmailNotifiFilterInput): EmailNotifi @aws_subscribe(mutations: ["createEmailNotifi"]) @aws_api_key @aws_iam
   onUpdateEmailNotifi(filter: ModelSubscriptionEmailNotifiFilterInput): EmailNotifi @aws_subscribe(mutations: ["updateEmailNotifi"]) @aws_api_key @aws_iam
   onDeleteEmailNotifi(filter: ModelSubscriptionEmailNotifiFilterInput): EmailNotifi @aws_subscribe(mutations: ["deleteEmailNotifi"]) @aws_api_key @aws_iam
-  onCreateOffshoreSheet(filter: ModelSubscriptionOffshoreSheetFilterInput): OffshoreSheet @aws_subscribe(mutations: ["createOffshoreSheet"]) @aws_api_key @aws_iam
-  onUpdateOffshoreSheet(filter: ModelSubscriptionOffshoreSheetFilterInput): OffshoreSheet @aws_subscribe(mutations: ["updateOffshoreSheet"]) @aws_api_key @aws_iam
-  onDeleteOffshoreSheet(filter: ModelSubscriptionOffshoreSheetFilterInput): OffshoreSheet @aws_subscribe(mutations: ["deleteOffshoreSheet"]) @aws_api_key @aws_iam
-  onCreateORMCSheet(filter: ModelSubscriptionORMCSheetFilterInput): ORMCSheet @aws_subscribe(mutations: ["createORMCSheet"]) @aws_api_key @aws_iam
-  onUpdateORMCSheet(filter: ModelSubscriptionORMCSheetFilterInput): ORMCSheet @aws_subscribe(mutations: ["updateORMCSheet"]) @aws_api_key @aws_iam
-  onDeleteORMCSheet(filter: ModelSubscriptionORMCSheetFilterInput): ORMCSheet @aws_subscribe(mutations: ["deleteORMCSheet"]) @aws_api_key @aws_iam
-  onCreateSBWSheet(filter: ModelSubscriptionSBWSheetFilterInput): SBWSheet @aws_subscribe(mutations: ["createSBWSheet"]) @aws_api_key @aws_iam
-  onUpdateSBWSheet(filter: ModelSubscriptionSBWSheetFilterInput): SBWSheet @aws_subscribe(mutations: ["updateSBWSheet"]) @aws_api_key @aws_iam
-  onDeleteSBWSheet(filter: ModelSubscriptionSBWSheetFilterInput): SBWSheet @aws_subscribe(mutations: ["deleteSBWSheet"]) @aws_api_key @aws_iam
-  onCreateBlng(filter: ModelSubscriptionBlngFilterInput): Blng @aws_subscribe(mutations: ["createBlng"]) @aws_api_key @aws_iam
-  onUpdateBlng(filter: ModelSubscriptionBlngFilterInput): Blng @aws_subscribe(mutations: ["updateBlng"]) @aws_api_key @aws_iam
-  onDeleteBlng(filter: ModelSubscriptionBlngFilterInput): Blng @aws_subscribe(mutations: ["deleteBlng"]) @aws_api_key @aws_iam
-  onCreateHeadOffice(filter: ModelSubscriptionHeadOfficeFilterInput): HeadOffice @aws_subscribe(mutations: ["createHeadOffice"]) @aws_api_key @aws_iam
-  onUpdateHeadOffice(filter: ModelSubscriptionHeadOfficeFilterInput): HeadOffice @aws_subscribe(mutations: ["updateHeadOffice"]) @aws_api_key @aws_iam
-  onDeleteHeadOffice(filter: ModelSubscriptionHeadOfficeFilterInput): HeadOffice @aws_subscribe(mutations: ["deleteHeadOffice"]) @aws_api_key @aws_iam
   onCreateEmpRequisition(filter: ModelSubscriptionEmpRequisitionFilterInput): EmpRequisition @aws_subscribe(mutations: ["createEmpRequisition"]) @aws_api_key @aws_iam
   onUpdateEmpRequisition(filter: ModelSubscriptionEmpRequisitionFilterInput): EmpRequisition @aws_subscribe(mutations: ["updateEmpRequisition"]) @aws_api_key @aws_iam
   onDeleteEmpRequisition(filter: ModelSubscriptionEmpRequisitionFilterInput): EmpRequisition @aws_subscribe(mutations: ["deleteEmpRequisition"]) @aws_api_key @aws_iam
@@ -1355,6 +1340,315 @@ type Subscription {
   onCreateLeaveStatus(filter: ModelSubscriptionLeaveStatusFilterInput): LeaveStatus @aws_subscribe(mutations: ["createLeaveStatus"]) @aws_api_key @aws_iam
   onUpdateLeaveStatus(filter: ModelSubscriptionLeaveStatusFilterInput): LeaveStatus @aws_subscribe(mutations: ["updateLeaveStatus"]) @aws_api_key @aws_iam
   onDeleteLeaveStatus(filter: ModelSubscriptionLeaveStatusFilterInput): LeaveStatus @aws_subscribe(mutations: ["deleteLeaveStatus"]) @aws_api_key @aws_iam
+}
+
+type ModelTimeSheetConnection @aws_api_key @aws_iam {
+  items: [TimeSheet]!
+  nextToken: String
+}
+
+input ModelTimeSheetFilterInput {
+  id: ModelIDInput
+  date: ModelStringInput
+  status: ModelStringInput
+  fileName: ModelStringInput
+  fileType: ModelStringInput
+  assignTo: ModelStringInput
+  assignBy: ModelStringInput
+  empName: ModelStringInput
+  empBadgeNo: ModelStringInput
+  empID: ModelStringInput
+  empDept: ModelStringInput
+  inTime: ModelStringInput
+  outTime: ModelStringInput
+  totalInOut: ModelStringInput
+  allDayHrs: ModelStringInput
+  totalHrs: ModelStringInput
+  remarks: ModelStringInput
+  otTime: ModelStringInput
+  netMins: ModelStringInput
+  actualWorkHrs: ModelStringInput
+  normalWorkHrs: ModelStringInput
+  fidNo: ModelStringInput
+  companyName: ModelStringInput
+  trade: ModelStringInput
+  tradeCode: ModelStringInput
+  onAM: ModelStringInput
+  offAM: ModelStringInput
+  onPM: ModelStringInput
+  offPM: ModelStringInput
+  ctr: ModelStringInput
+  rec: ModelStringInput
+  avgDailyTD: ModelStringInput
+  highlightDayTG: ModelStringInput
+  aweSDN: ModelStringInput
+  totalNT: ModelStringInput
+  totalOT: ModelStringInput
+  totalNTOT: ModelStringInput
+  empWorkInfo: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelTimeSheetFilterInput]
+  or: [ModelTimeSheetFilterInput]
+  not: ModelTimeSheetFilterInput
+}
+
+input ModelTimeSheetConditionInput {
+  date: ModelStringInput
+  status: ModelStringInput
+  fileName: ModelStringInput
+  fileType: ModelStringInput
+  assignTo: ModelStringInput
+  assignBy: ModelStringInput
+  empName: ModelStringInput
+  empBadgeNo: ModelStringInput
+  empID: ModelStringInput
+  empDept: ModelStringInput
+  inTime: ModelStringInput
+  outTime: ModelStringInput
+  totalInOut: ModelStringInput
+  allDayHrs: ModelStringInput
+  totalHrs: ModelStringInput
+  remarks: ModelStringInput
+  otTime: ModelStringInput
+  netMins: ModelStringInput
+  actualWorkHrs: ModelStringInput
+  normalWorkHrs: ModelStringInput
+  fidNo: ModelStringInput
+  companyName: ModelStringInput
+  trade: ModelStringInput
+  tradeCode: ModelStringInput
+  onAM: ModelStringInput
+  offAM: ModelStringInput
+  onPM: ModelStringInput
+  offPM: ModelStringInput
+  ctr: ModelStringInput
+  rec: ModelStringInput
+  avgDailyTD: ModelStringInput
+  highlightDayTG: ModelStringInput
+  aweSDN: ModelStringInput
+  totalNT: ModelStringInput
+  totalOT: ModelStringInput
+  totalNTOT: ModelStringInput
+  empWorkInfo: ModelStringInput
+  and: [ModelTimeSheetConditionInput]
+  or: [ModelTimeSheetConditionInput]
+  not: ModelTimeSheetConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateTimeSheetInput {
+  id: ID
+  date: String
+  status: String
+  fileName: String
+  fileType: String
+  assignTo: String
+  assignBy: String
+  empName: String
+  empBadgeNo: String
+  empID: String
+  empDept: String
+  inTime: String
+  outTime: String
+  totalInOut: String
+  allDayHrs: String
+  totalHrs: String
+  remarks: String
+  otTime: String
+  netMins: String
+  actualWorkHrs: String
+  normalWorkHrs: String
+  fidNo: String
+  companyName: String
+  trade: String
+  tradeCode: String
+  onAM: String
+  offAM: String
+  onPM: String
+  offPM: String
+  ctr: String
+  rec: String
+  avgDailyTD: String
+  highlightDayTG: String
+  aweSDN: String
+  totalNT: String
+  totalOT: String
+  totalNTOT: String
+  empWorkInfo: [AWSJSON]
+}
+
+input UpdateTimeSheetInput {
+  id: ID!
+  date: String
+  status: String
+  fileName: String
+  fileType: String
+  assignTo: String
+  assignBy: String
+  empName: String
+  empBadgeNo: String
+  empID: String
+  empDept: String
+  inTime: String
+  outTime: String
+  totalInOut: String
+  allDayHrs: String
+  totalHrs: String
+  remarks: String
+  otTime: String
+  netMins: String
+  actualWorkHrs: String
+  normalWorkHrs: String
+  fidNo: String
+  companyName: String
+  trade: String
+  tradeCode: String
+  onAM: String
+  offAM: String
+  onPM: String
+  offPM: String
+  ctr: String
+  rec: String
+  avgDailyTD: String
+  highlightDayTG: String
+  aweSDN: String
+  totalNT: String
+  totalOT: String
+  totalNTOT: String
+  empWorkInfo: [AWSJSON]
+}
+
+input DeleteTimeSheetInput {
+  id: ID!
+}
+
+input ModelSubscriptionTimeSheetFilterInput {
+  id: ModelSubscriptionIDInput
+  date: ModelSubscriptionStringInput
+  status: ModelSubscriptionStringInput
+  fileName: ModelSubscriptionStringInput
+  fileType: ModelSubscriptionStringInput
+  assignTo: ModelSubscriptionStringInput
+  assignBy: ModelSubscriptionStringInput
+  empName: ModelSubscriptionStringInput
+  empBadgeNo: ModelSubscriptionStringInput
+  empID: ModelSubscriptionStringInput
+  empDept: ModelSubscriptionStringInput
+  inTime: ModelSubscriptionStringInput
+  outTime: ModelSubscriptionStringInput
+  totalInOut: ModelSubscriptionStringInput
+  allDayHrs: ModelSubscriptionStringInput
+  totalHrs: ModelSubscriptionStringInput
+  remarks: ModelSubscriptionStringInput
+  otTime: ModelSubscriptionStringInput
+  netMins: ModelSubscriptionStringInput
+  actualWorkHrs: ModelSubscriptionStringInput
+  normalWorkHrs: ModelSubscriptionStringInput
+  fidNo: ModelSubscriptionStringInput
+  companyName: ModelSubscriptionStringInput
+  trade: ModelSubscriptionStringInput
+  tradeCode: ModelSubscriptionStringInput
+  onAM: ModelSubscriptionStringInput
+  offAM: ModelSubscriptionStringInput
+  onPM: ModelSubscriptionStringInput
+  offPM: ModelSubscriptionStringInput
+  ctr: ModelSubscriptionStringInput
+  rec: ModelSubscriptionStringInput
+  avgDailyTD: ModelSubscriptionStringInput
+  highlightDayTG: ModelSubscriptionStringInput
+  aweSDN: ModelSubscriptionStringInput
+  totalNT: ModelSubscriptionStringInput
+  totalOT: ModelSubscriptionStringInput
+  totalNTOT: ModelSubscriptionStringInput
+  empWorkInfo: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionTimeSheetFilterInput]
+  or: [ModelSubscriptionTimeSheetFilterInput]
+}
+
+type ModelHiringJobConnection @aws_api_key @aws_iam {
+  items: [HiringJob]!
+  nextToken: String
+}
+
+input ModelHiringJobFilterInput {
+  id: ModelIDInput
+  jobTitle: ModelStringInput
+  exper: ModelStringInput
+  location: ModelStringInput
+  quantityPerson: ModelStringInput
+  startDate: ModelStringInput
+  expiryDate: ModelStringInput
+  jobContent: ModelStringInput
+  uploadJobDetails: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelHiringJobFilterInput]
+  or: [ModelHiringJobFilterInput]
+  not: ModelHiringJobFilterInput
+}
+
+input ModelHiringJobConditionInput {
+  jobTitle: ModelStringInput
+  exper: ModelStringInput
+  location: ModelStringInput
+  quantityPerson: ModelStringInput
+  startDate: ModelStringInput
+  expiryDate: ModelStringInput
+  jobContent: ModelStringInput
+  uploadJobDetails: ModelStringInput
+  and: [ModelHiringJobConditionInput]
+  or: [ModelHiringJobConditionInput]
+  not: ModelHiringJobConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateHiringJobInput {
+  id: ID
+  jobTitle: String
+  exper: String
+  location: String
+  quantityPerson: String
+  startDate: String
+  expiryDate: String
+  jobContent: String
+  uploadJobDetails: String
+}
+
+input UpdateHiringJobInput {
+  id: ID!
+  jobTitle: String
+  exper: String
+  location: String
+  quantityPerson: String
+  startDate: String
+  expiryDate: String
+  jobContent: String
+  uploadJobDetails: String
+}
+
+input DeleteHiringJobInput {
+  id: ID!
+}
+
+input ModelSubscriptionHiringJobFilterInput {
+  id: ModelSubscriptionIDInput
+  jobTitle: ModelSubscriptionStringInput
+  exper: ModelSubscriptionStringInput
+  location: ModelSubscriptionStringInput
+  quantityPerson: ModelSubscriptionStringInput
+  startDate: ModelSubscriptionStringInput
+  expiryDate: ModelSubscriptionStringInput
+  jobContent: ModelSubscriptionStringInput
+  uploadJobDetails: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionHiringJobFilterInput]
+  or: [ModelSubscriptionHiringJobFilterInput]
 }
 
 type ModelInsuranceTypeConnection @aws_api_key @aws_iam {
@@ -1978,316 +2272,6 @@ input ModelSubscriptionEmailNotifiFilterInput {
   or: [ModelSubscriptionEmailNotifiFilterInput]
 }
 
-type ModelOffshoreSheetConnection @aws_api_key @aws_iam {
-  items: [OffshoreSheet]!
-  nextToken: String
-}
-
-input ModelOffshoreSheetFilterInput {
-  id: ModelIDInput
-  date: ModelStringInput
-  dailySheet: ModelStringInput
-  status: ModelStringInput
-  manager: ModelStringInput
-  createdAt: ModelStringInput
-  updatedAt: ModelStringInput
-  and: [ModelOffshoreSheetFilterInput]
-  or: [ModelOffshoreSheetFilterInput]
-  not: ModelOffshoreSheetFilterInput
-}
-
-input ModelOffshoreSheetConditionInput {
-  date: ModelStringInput
-  dailySheet: ModelStringInput
-  status: ModelStringInput
-  manager: ModelStringInput
-  and: [ModelOffshoreSheetConditionInput]
-  or: [ModelOffshoreSheetConditionInput]
-  not: ModelOffshoreSheetConditionInput
-  createdAt: ModelStringInput
-  updatedAt: ModelStringInput
-}
-
-input CreateOffshoreSheetInput {
-  id: ID
-  date: String
-  dailySheet: [AWSJSON]
-  status: String
-  manager: [AWSJSON]
-}
-
-input UpdateOffshoreSheetInput {
-  id: ID!
-  date: String
-  dailySheet: [AWSJSON]
-  status: String
-  manager: [AWSJSON]
-}
-
-input DeleteOffshoreSheetInput {
-  id: ID!
-}
-
-input ModelSubscriptionOffshoreSheetFilterInput {
-  id: ModelSubscriptionIDInput
-  date: ModelSubscriptionStringInput
-  dailySheet: ModelSubscriptionStringInput
-  status: ModelSubscriptionStringInput
-  manager: ModelSubscriptionStringInput
-  createdAt: ModelSubscriptionStringInput
-  updatedAt: ModelSubscriptionStringInput
-  and: [ModelSubscriptionOffshoreSheetFilterInput]
-  or: [ModelSubscriptionOffshoreSheetFilterInput]
-}
-
-type ModelORMCSheetConnection @aws_api_key @aws_iam {
-  items: [ORMCSheet]!
-  nextToken: String
-}
-
-input ModelORMCSheetFilterInput {
-  id: ModelIDInput
-  date: ModelStringInput
-  dailySheet: ModelStringInput
-  status: ModelStringInput
-  manager: ModelStringInput
-  createdAt: ModelStringInput
-  updatedAt: ModelStringInput
-  and: [ModelORMCSheetFilterInput]
-  or: [ModelORMCSheetFilterInput]
-  not: ModelORMCSheetFilterInput
-}
-
-input ModelORMCSheetConditionInput {
-  date: ModelStringInput
-  dailySheet: ModelStringInput
-  status: ModelStringInput
-  manager: ModelStringInput
-  and: [ModelORMCSheetConditionInput]
-  or: [ModelORMCSheetConditionInput]
-  not: ModelORMCSheetConditionInput
-  createdAt: ModelStringInput
-  updatedAt: ModelStringInput
-}
-
-input CreateORMCSheetInput {
-  id: ID
-  date: String
-  dailySheet: [AWSJSON]
-  status: String
-  manager: [AWSJSON]
-}
-
-input UpdateORMCSheetInput {
-  id: ID!
-  date: String
-  dailySheet: [AWSJSON]
-  status: String
-  manager: [AWSJSON]
-}
-
-input DeleteORMCSheetInput {
-  id: ID!
-}
-
-input ModelSubscriptionORMCSheetFilterInput {
-  id: ModelSubscriptionIDInput
-  date: ModelSubscriptionStringInput
-  dailySheet: ModelSubscriptionStringInput
-  status: ModelSubscriptionStringInput
-  manager: ModelSubscriptionStringInput
-  createdAt: ModelSubscriptionStringInput
-  updatedAt: ModelSubscriptionStringInput
-  and: [ModelSubscriptionORMCSheetFilterInput]
-  or: [ModelSubscriptionORMCSheetFilterInput]
-}
-
-type ModelSBWSheetConnection @aws_api_key @aws_iam {
-  items: [SBWSheet]!
-  nextToken: String
-}
-
-input ModelSBWSheetFilterInput {
-  id: ModelIDInput
-  date: ModelStringInput
-  dailySheet: ModelStringInput
-  status: ModelStringInput
-  manager: ModelStringInput
-  createdAt: ModelStringInput
-  updatedAt: ModelStringInput
-  and: [ModelSBWSheetFilterInput]
-  or: [ModelSBWSheetFilterInput]
-  not: ModelSBWSheetFilterInput
-}
-
-input ModelSBWSheetConditionInput {
-  date: ModelStringInput
-  dailySheet: ModelStringInput
-  status: ModelStringInput
-  manager: ModelStringInput
-  and: [ModelSBWSheetConditionInput]
-  or: [ModelSBWSheetConditionInput]
-  not: ModelSBWSheetConditionInput
-  createdAt: ModelStringInput
-  updatedAt: ModelStringInput
-}
-
-input CreateSBWSheetInput {
-  id: ID
-  date: String
-  dailySheet: [AWSJSON]
-  status: String
-  manager: [AWSJSON]
-}
-
-input UpdateSBWSheetInput {
-  id: ID!
-  date: String
-  dailySheet: [AWSJSON]
-  status: String
-  manager: [AWSJSON]
-}
-
-input DeleteSBWSheetInput {
-  id: ID!
-}
-
-input ModelSubscriptionSBWSheetFilterInput {
-  id: ModelSubscriptionIDInput
-  date: ModelSubscriptionStringInput
-  dailySheet: ModelSubscriptionStringInput
-  status: ModelSubscriptionStringInput
-  manager: ModelSubscriptionStringInput
-  createdAt: ModelSubscriptionStringInput
-  updatedAt: ModelSubscriptionStringInput
-  and: [ModelSubscriptionSBWSheetFilterInput]
-  or: [ModelSubscriptionSBWSheetFilterInput]
-}
-
-type ModelBlngConnection @aws_api_key @aws_iam {
-  items: [Blng]!
-  nextToken: String
-}
-
-input ModelBlngFilterInput {
-  id: ModelIDInput
-  weeklySheet: ModelStringInput
-  date: ModelStringInput
-  status: ModelStringInput
-  manager: ModelStringInput
-  createdAt: ModelStringInput
-  updatedAt: ModelStringInput
-  and: [ModelBlngFilterInput]
-  or: [ModelBlngFilterInput]
-  not: ModelBlngFilterInput
-}
-
-input ModelBlngConditionInput {
-  weeklySheet: ModelStringInput
-  date: ModelStringInput
-  status: ModelStringInput
-  manager: ModelStringInput
-  and: [ModelBlngConditionInput]
-  or: [ModelBlngConditionInput]
-  not: ModelBlngConditionInput
-  createdAt: ModelStringInput
-  updatedAt: ModelStringInput
-}
-
-input CreateBlngInput {
-  id: ID
-  weeklySheet: [AWSJSON]
-  date: String
-  status: String
-  manager: [AWSJSON]
-}
-
-input UpdateBlngInput {
-  id: ID!
-  weeklySheet: [AWSJSON]
-  date: String
-  status: String
-  manager: [AWSJSON]
-}
-
-input DeleteBlngInput {
-  id: ID!
-}
-
-input ModelSubscriptionBlngFilterInput {
-  id: ModelSubscriptionIDInput
-  weeklySheet: ModelSubscriptionStringInput
-  date: ModelSubscriptionStringInput
-  status: ModelSubscriptionStringInput
-  manager: ModelSubscriptionStringInput
-  createdAt: ModelSubscriptionStringInput
-  updatedAt: ModelSubscriptionStringInput
-  and: [ModelSubscriptionBlngFilterInput]
-  or: [ModelSubscriptionBlngFilterInput]
-}
-
-type ModelHeadOfficeConnection @aws_api_key @aws_iam {
-  items: [HeadOffice]!
-  nextToken: String
-}
-
-input ModelHeadOfficeFilterInput {
-  id: ModelIDInput
-  dailySheet: ModelStringInput
-  date: ModelStringInput
-  status: ModelStringInput
-  manager: ModelStringInput
-  createdAt: ModelStringInput
-  updatedAt: ModelStringInput
-  and: [ModelHeadOfficeFilterInput]
-  or: [ModelHeadOfficeFilterInput]
-  not: ModelHeadOfficeFilterInput
-}
-
-input ModelHeadOfficeConditionInput {
-  dailySheet: ModelStringInput
-  date: ModelStringInput
-  status: ModelStringInput
-  manager: ModelStringInput
-  and: [ModelHeadOfficeConditionInput]
-  or: [ModelHeadOfficeConditionInput]
-  not: ModelHeadOfficeConditionInput
-  createdAt: ModelStringInput
-  updatedAt: ModelStringInput
-}
-
-input CreateHeadOfficeInput {
-  id: ID
-  dailySheet: [AWSJSON]
-  date: String
-  status: String
-  manager: [AWSJSON]
-}
-
-input UpdateHeadOfficeInput {
-  id: ID!
-  dailySheet: [AWSJSON]
-  date: String
-  status: String
-  manager: [AWSJSON]
-}
-
-input DeleteHeadOfficeInput {
-  id: ID!
-}
-
-input ModelSubscriptionHeadOfficeFilterInput {
-  id: ModelSubscriptionIDInput
-  dailySheet: ModelSubscriptionStringInput
-  date: ModelSubscriptionStringInput
-  status: ModelSubscriptionStringInput
-  manager: ModelSubscriptionStringInput
-  createdAt: ModelSubscriptionStringInput
-  updatedAt: ModelSubscriptionStringInput
-  and: [ModelSubscriptionHeadOfficeFilterInput]
-  or: [ModelSubscriptionHeadOfficeFilterInput]
-}
-
 type ModelEmpRequisitionConnection @aws_api_key @aws_iam {
   items: [EmpRequisition]!
   nextToken: String
@@ -2307,6 +2291,8 @@ input ModelEmpRequisitionFilterInput {
   status: ModelStringInput
   remarkReq: ModelStringInput
   reqName: ModelStringInput
+  requestorID: ModelStringInput
+  approverID: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelEmpRequisitionFilterInput]
@@ -2327,6 +2313,8 @@ input ModelEmpRequisitionConditionInput {
   status: ModelStringInput
   remarkReq: ModelStringInput
   reqName: ModelStringInput
+  requestorID: ModelStringInput
+  approverID: ModelStringInput
   and: [ModelEmpRequisitionConditionInput]
   or: [ModelEmpRequisitionConditionInput]
   not: ModelEmpRequisitionConditionInput
@@ -2348,6 +2336,8 @@ input CreateEmpRequisitionInput {
   status: String
   remarkReq: String
   reqName: String
+  requestorID: String
+  approverID: String
 }
 
 input UpdateEmpRequisitionInput {
@@ -2364,6 +2354,8 @@ input UpdateEmpRequisitionInput {
   status: String
   remarkReq: String
   reqName: String
+  requestorID: String
+  approverID: String
 }
 
 input DeleteEmpRequisitionInput {
@@ -2384,6 +2376,8 @@ input ModelSubscriptionEmpRequisitionFilterInput {
   status: ModelSubscriptionStringInput
   remarkReq: ModelSubscriptionStringInput
   reqName: ModelSubscriptionStringInput
+  requestorID: ModelSubscriptionStringInput
+  approverID: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionEmpRequisitionFilterInput]

@@ -276,8 +276,8 @@ export const DependentPass = ({
 
             <FormField
               label="Labour Deposit Amount"
-              type="number"
-              inputmode="numeric"
+              type="text"
+              // inputmode="numeric"
               name={`dependPass[${index}].labourDAmount`}
               placeholder="Enter Deposit Amount"
               errors={errors}

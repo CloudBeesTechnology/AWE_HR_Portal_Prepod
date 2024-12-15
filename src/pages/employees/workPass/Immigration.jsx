@@ -305,7 +305,11 @@ export const Immigration = () => {
         </div>
       </div>
 
-      <div className="w-full max-w-[300px] ">
+   
+
+      <div className="grid grid-cols-3 mt-10 gap-5">
+
+      <div className="  ">
         <label className="mb-1 text_size_6">Original Passport Location</label>
         <select
           {...register("ppLocation")}
@@ -319,8 +323,6 @@ export const Immigration = () => {
         </select>
         {errors.ppLocation && <p className="text-[red] text-[13px] mt-1">{errors.ppLocation.message}</p>}
       </div>
-
-      <div className="grid grid-cols-2 mt-10 gap-5">
 
       <FormField
           label="Date Of Arrival Stamping Expiry"
@@ -342,7 +344,8 @@ export const Immigration = () => {
           />
       </div> 
 
-      <hr className='text-lite_grey'/>
+      <hr className='text-lite_grey mt-7'/>
+
       <div className="grid grid-cols-2 mt-10 gap-5">
 
 
@@ -387,7 +390,7 @@ export const Immigration = () => {
           }        
           />
       </div> 
-<hr className='text-lite_grey'/>
+<hr className='text-lite_grey mt-5'/>
  <div className="grid grid-cols-2 mt-10 gap-5 ">
  <div className="form-group">
           <label className='mb-1 text_size_6 '>Air Ticket Status</label>
@@ -442,7 +445,7 @@ export const Immigration = () => {
       
         </div>
 
-        <div className="">
+        <div className="mt-5">
           <label className='mb-1 text_size_6'>Remarks for Immigration</label>
           <textarea 
           {...register("remarkImmig")} 

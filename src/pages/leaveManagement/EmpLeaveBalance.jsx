@@ -1,44 +1,161 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Pagination } from "./Pagination";
+import { data, useOutletContext } from "react-router-dom";
+import { IoSearch } from "react-icons/io5";
+import { Searchbox } from "../../utils/Searchbox";
+import { LeaveSummaryPopUp } from "./LeaveSummaryPopUp";
 
-export const EmpLeaveBalance = ({ initialData, userType, personalInfo }) => {
-  const [data, setData] = useState(initialData);
+export const EmpLeaveBalance = () => {
+  const { mergedData, formatDate, userType } = useOutletContext();
+
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [leaveSummary, setLeaveSummary] = useState({});
+  const [searchResults, setSearchResults] = useState([]);
+  const [secondartyData, setSecondartyData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(15);
-  const [selectedEmployee, setSelectedEmployee] = useState(null); // For the selected employee
-  const [showPopup, setShowPopup] = useState(false); // For the popup visibility
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [data, setData] = useState([]);
 
+  const [searchQuery, setSearchQuery] = useState("");
   const heading = [
     "S.No",
     "Employee ID",
     "Employee Name",
-    "No of Leave Taken",
     "Leave Type",
-    "No of Leave Remaining",
+    "Leave Taken",
+    "Leave Remaining",
+    "Waiting for Approval",
     "Summary",
   ];
 
   useEffect(() => {
-    const filteredData = data;
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const paginatedData = filteredData.slice(
-      startIndex,
-      startIndex + rowsPerPage
-    );
-    setData(paginatedData);
-  }, [currentPage, rowsPerPage]);
+    const fetchedData = async () => {
+      const result = mergedData.reduce((acc, val) => {
+        if (
+          val.managerStatus === "Approved" ||
+          val.supervisorStatus === "Approved" ||
+          val.managerStatus === "Pending" ||
+          val.supervisorStatus === "Pending" ||
+          val.managerStatus === "Rejected" ||
+          val.supervisorStatus === "Rejected"
+        ) {
+          if (!acc[val.empID]) {
+            acc[val.empID] = {
+              compassionateLeave: {
+                taken: 0,
+                total: val.leaveDetails?.compasLeave || 0,
+                waitingLeave: 0,
+                remaining: 0,
+              },
+              annualLeave: {
+                taken: 0,
+                total: Array.isArray(val.leaveDetails?.annualLeave)
+                  ? val.leaveDetails.annualLeave[
+                      val.leaveDetails.annualLeave.length - 1
+                    ]
+                  : 0,
+                waitingLeave: 0,
+                remaining: 0,
+              },
+              marriageLeave: {
+                taken: 0,
+                total: val.leaveDetails?.mrageLeave || 0,
+                waitingLeave: 0,
+                remaining: 0,
+              },
+              hospitalisationLeave: {
+                taken: 0,
+                total: val.leaveDetails?.hospLeave || 0,
+                waitingLeave: 0,
+                remaining: 0,
+              },
+              maternityLeave: {
+                taken: 0,
+                total: val.leaveDetails?.materLeave || 0,
+                waitingLeave: 0,
+                remaining: 0,
+              },
+              sickLeave: {
+                taken: 0,
+                total: val.leaveDetails?.sickLeave || 0,
+                waitingLeave: 0,
+                remaining: 0,
+              },
+              unpaidLeave: {
+                taken: 0,
+                total: val.leaveDetails?.unPaidAuthorize || 0,
+                waitingLeave: 0,
+                remaining: 0,
+              },
+              paternityLeave: {
+                taken: 0,
+                total: val.leaveDetails?.paterLeave || 0,
+                waitingLeave: 0,
+                remaining: 0,
+              },
+              empId: val.empID,
+              employeeName: val.employeeInfo.name,
+            };
+          }
+
+          const leaveTypeKeyMap = {
+            "Compassionate Leave": "compassionateLeave",
+            "Annual Leave": "annualLeave",
+            "Marriage Leave": "marriageLeave",
+            "Hospitalisation Leave": "hospitalisationLeave",
+            "Maternity Leave": "maternityLeave",
+            "Sick Leave": "sickLeave",
+            "Paternity Leave": "paternityLeave",
+            "Unpaid Leave": "unpaidLeave",
+          };
+
+          const leaveKey = leaveTypeKeyMap[val.leaveType];
+          if (leaveKey && val.days > 0) {
+            if (
+              val.managerStatus === "Approved" &&
+              val.empStatus !== "Cancelled"
+            ) {
+              acc[val.empID][leaveKey].taken += val.days;
+            } else if (
+              val.managerStatus === "Pending" &&
+              val.supervisorStatus !== "Rejected" &&
+              val.empStatus !== "Cancelled"
+            ) {
+              acc[val.empID][leaveKey].waitingLeave += val.days;
+            }
+            acc[val.empID][leaveKey].remaining =
+              acc[val.empID][leaveKey].total -
+              (acc[val.empID][leaveKey].taken +
+                acc[val.empID][leaveKey].waitingLeave);
+          }
+        }
+
+        return acc;
+      }, {});
+
+      setLeaveSummary(result);
+      setFilteredData(Object.entries(result));
+    };
+
+    fetchedData();
+  }, [mergedData]);
+
   useEffect(() => {
-    const filteringLeaveDays = data.filter(
-      (val) => val.managerStatus === "Approved"
+    const filtered = Object.entries(leaveSummary).filter(
+      ([empID, leaveData]) => {
+        const employeeName = leaveData.employeeName.toLowerCase();
+        const employeeId = leaveData.empId.toLowerCase();
+        const query = searchQuery.toLowerCase();
+        return employeeId.includes(query) || employeeName.includes(query);
+      }
     );
-    console.log(filteringLeaveDays);
-  }, []);
-
-  const filteredResults = data;
-  const totalPages = Math.ceil(filteredResults.length / rowsPerPage);
-
+    setFilteredData(filtered);
+  }, [searchQuery, leaveSummary]);
   // Handle "view summary" click
   const handleViewSummary = (employee) => {
+    // console.log(employee);
     setSelectedEmployee(employee);
     setShowPopup(true);
   };
@@ -48,195 +165,163 @@ export const EmpLeaveBalance = ({ initialData, userType, personalInfo }) => {
     setShowPopup(false);
     setSelectedEmployee(null);
   };
+  let serialNo = 1;
+  // console.log(leaveSummary);
 
-  const finalData =
-    (userType !== "SuperAdmin" || userType !== "HR") && userType === "Manager"
-      ? filteredResults.filter(
-          (item) =>
-            item.supervisorStatus === "Approved" &&
-            (item.managerName === personalInfo.name ||
-              item.supervisorName === personalInfo.name)
-        )
-      : userType === "Supervisor"
-      ? filteredResults.filter(
-          (item) => item.supervisorName === personalInfo.name
-        )
-      : filteredResults;
-
-  // Function to get remaining leave for a specific leave type
-  const getRemainingLeave = (leaveType, employeeLeaveDetails) => {
-    switch (leaveType) {
-      case "Annual Leave":
-        return employeeLeaveDetails.remainingAnualLeave || "N/A";
-      case "Hospitalisation Leave":
-        return employeeLeaveDetails.remainingHosLeave || "N/A";
-      case "Compassionate Leave":
-        return employeeLeaveDetails.remainingCompasLeave || "N/A";
-      case "Marriage Leave":
-        return employeeLeaveDetails.remainingMrageLeave || "N/A";
-      case "Paternity Leave":
-        return employeeLeaveDetails.remainingPaternityLeave || "N/A";
-      case "Sick Leave":
-        return employeeLeaveDetails.remainingSickLeave || "N/A";
-      case "Maternity Leave":
-        return employeeLeaveDetails.remainingMateLeave || "N/A";
-      default:
-        return "N/A";
-    }
+  const handleSearch = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
   };
 
-  return (
-    <section>
-      <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] max-w-[100%] overflow-y-auto rounded-xl">
-        <table className="w-[1150px] font-semibold text-sm">
-          <thead className="bg-[#939393] sticky top-0 rounded-t-lg">
-            <tr>
-              {heading.map((header, index) => (
-                <th key={index} className="px-4 py-5 text-[15px] text-white">
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * rowsPerPage;
 
-          <tbody>
-            {finalData &&
-              finalData.map((item, index) => {
-                const remainingLeave = getRemainingLeave(
-                  item.leaveType,
-                  item.leaveDetails
+    const dataToPaginate =
+      searchResults.length > 0 ? searchResults : Object.entries(leaveSummary);
+
+    // const sortedData = dataToPaginate.sort((a, b) => {
+    //   const regex = /\d+$/;
+
+    //   const numPartA = a.empID.match(regex)
+    //     ? a.empID.match(regex)[0].padStart(5, "0")
+    //     : "";
+    //   const numPartB = b.empID.match(regex)
+    //     ? b.empID.match(regex)[0].padStart(5, "0")
+    //     : "";
+
+    //   const prefixA = a.empID.replace(regex, "").toLowerCase();
+    //   const prefixB = b.empID.replace(regex, "").toLowerCase();
+
+    //   if (prefixA !== prefixB) {
+    //     return prefixA.localeCompare(prefixB);
+    //   }
+
+    //   return numPartA.localeCompare(numPartB);
+    // });
+
+    const paginatedData = dataToPaginate.slice(
+      startIndex,
+      startIndex + rowsPerPage
+    );
+
+    // console.log(paginatedData);
+
+    setFilteredData(paginatedData);
+  }, [currentPage, rowsPerPage, leaveSummary, searchResults]);
+
+  const totalPages = Math.ceil(
+    (searchResults.length > 0
+      ? searchResults.length
+      : Object.entries(leaveSummary).length) / rowsPerPage
+  );
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  return (
+    <section className="relative py-5 w-full">
+      <div className="absolute right-0 -top-12 ">
+        <div className="py-2 w-full text_size_5 bg-white border rounded-md text-grey border-lite_grey flex items-center px-3 gap-2">
+          <input
+            type="text"
+            placeholder="Employee ID"
+            className="outline-none w-full text-sm"
+            value={searchQuery}
+            onChange={handleSearch}
+          />
+          <span className="text-dark_grey text-2xl mr-1">
+            <IoSearch />
+          </span>
+        </div>
+      </div>
+      <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] max-w-[100%] overflow-y-auto rounded-xl">
+        {filteredData.length > 0 ? (
+          <table className="w-[1150px] font-semibold text-sm">
+            <thead className="bg-[#939393] sticky top-0 rounded-t-lg">
+              <tr>
+                {heading.map((header, index) => (
+                  <th key={index} className="px-4 py-5 text-[15px] text-white">
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filteredData.map(([empID, leaveData], parentIndex) => {
+                let leaveRows = [];
+                const displayParentIndex = startIndex + parentIndex + 1; // Adjust index based on pagination
+
+                Object.entries(leaveData).forEach(
+                  ([leaveType, data], subIndex) => {
+                    if (leaveType !== "empId" && leaveType !== "employeeName") {
+                      const leaveName = leaveType
+                        .replace(/([A-Z])/g, " $1")
+                        .trim();
+                      const serialNumber = `${displayParentIndex}.${
+                        subIndex + 1
+                      }`;
+                      leaveRows.push(
+                        <tr
+                          key={`${empID}-${leaveType}`}
+                          className="text-center text-sm shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
+                        >
+                          <td className="py-5">{serialNumber}</td>
+                          <td className="py-5">{leaveData.empId}</td>
+                          <td className="py-5">{leaveData.employeeName}</td>
+                          <td className="py-5">{leaveName}</td>
+                          <td className="py-5">{data.taken || 0}</td>
+                          <td className="py-5">
+                            {data.remaining < 0 ? 0 : data.remaining || 0}
+                          </td>
+                          <td className="py-5">{data.waitingLeave || 0}</td>
+                        </tr>
+                      );
+                    }
+                  }
                 );
+
                 return (
-                  <tr
-                    key={index}
-                    className="text-center text-sm shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
-                  >
-                    <td className="border-b-2 border-[#CECECE] py-3">
-                      {index + 1}
-                    </td>
-                    <td className="border-b-2 border-[#CECECE] py-3">
-                      {item.empID}
-                    </td>
-                    <td className="border-b-2 border-[#CECECE] py-3">
-                      {item.employeeInfo.name}
-                    </td>
-                    <td className="border-b-2 border-[#CECECE]">{item.days}</td>
-                    <td className="border-b-2 border-[#CECECE]">
-                      {item.leaveType}
-                    </td>
-                    <td className="border-b-2 border-[#CECECE]">
-                      {remainingLeave || "N/A"}
-                    </td>
-                    <td>
-                      <button
-                        onClick={() => handleViewSummary(item)}
-                        className="border-b-2 text-[blue]"
-                      >
-                        View
-                      </button>
-                    </td>
-                  </tr>
+                  <React.Fragment key={empID}>
+                    {leaveRows}
+                    <tr className="text-end w-full text-lg shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] ">
+                      <td colSpan="8" className="p-5 w-full">
+                        <button
+                          onClick={() => handleViewSummary(leaveData)}
+                          className="border-b-2 text-[blue]"
+                        >
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  </React.Fragment>
                 );
               })}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      <div className="ml-20 flex justify-center">
-        <div className="w-[60%] flex justify-start mt-4 px-10">
-          {userType !== "SuperAdmin" && userType !== "HR" && (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={(newPage) => {
-                if (newPage >= 1 && newPage <= totalPages) {
-                  setCurrentPage(newPage);
-                }
-              }}
-            />
-          )}
-        </div>
+            </tbody>
+          </table>
+        ) : (
+          <div className="text-center mt-6 py-20">
+            <p>No leave data available for employees.</p>
+          </div>
+        )}
       </div>
 
       {/* Popup for Leave Summary (Updated with employee details) */}
       {showPopup && selectedEmployee && (
-        <div className="fixed top-0 left-0 w-full h-full bg-gray-500 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-[80%] max-w-[1000px] overflow-y-auto max-h-[70%]">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="uppercase text-xl font-bold">
-                Leave Summary for {selectedEmployee.employeeInfo.name}
-              </h2>
-              <button
-                onClick={handleClosePopup}
-                className="text-white uppercase px-4 py-2 text-xs font-bold rounded-full bg-grey"
-              >
-                Close
-              </button>
-            </div>
-            <div className="space-y-4 font-semibold">
-              {/* Employee Details */}
-              <h2 className="uppercase">
-                {" "}
-                Employee ID: {selectedEmployee.empID}
-              </h2>
-              <h2 className="uppercase"> Total Leave Balances: </h2>
-              <table className="min-w-full bg-white text-sm font-semibold">
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="border px-4 py-2 text-sm">Leave Type</th>
-                    <th className="border px-4 py-2 text-sm">Days Taken</th>
-                    <th className="border px-4 py-2 text-sm">
-                      Remaining Leave
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    "Annual Leave",
-                    "Hospitalisation Leave",
-                    "Compassionate Leave",
-                    "Marriage Leave",
-                    "Paternity Leave",
-                    "Sick Leave",
-                    "Maternity Leave",
-                    "Unpaid Authorization",
-                  ].map((leaveType) => {
-                    const remainingLeave = getRemainingLeave(
-                      leaveType,
-                      selectedEmployee.leaveDetails
-                    );
-                    const leaveTaken = initialData
-                      .filter(
-                        (item) =>
-                          item.empID === selectedEmployee.empID &&
-                          item.leaveType === leaveType
-                      )
-                      .reduce((total, item) => total + item.days, 0);
-                    return (
-                      <tr key={leaveType} className="text-center">
-                        <td className="border px-4 py-2">{leaveType}</td>
-                        <td className="border px-4 py-2">{leaveTaken} days</td>
-                        <td className="border px-4 py-2">
-                          {remainingLeave} days
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              <h2 className="uppercase">Leave Taken:</h2>
-              {initialData
-                .filter((item) => item.empID === selectedEmployee.empID)
-                .map((leaveRecord, index) => (
-                  <p key={index} className="text-sm">
-                    {leaveRecord.leaveType} - {leaveRecord.days} days taken
-                  </p>
-                ))}
-            </div>
-          </div>
-        </div>
+        <LeaveSummaryPopUp
+          selectedEmployee={selectedEmployee}
+          handleClosePopup={handleClosePopup}
+        />
       )}
+      <div className="center my-10">
+        <div>
+         {filteredData.length >0 &&  <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(newPage) => {
+              if (newPage >= 1 && newPage <= totalPages) {
+                setCurrentPage(newPage);
+              }
+            }}
+          />}
+        </div>
+      </div>
     </section>
   );
 };

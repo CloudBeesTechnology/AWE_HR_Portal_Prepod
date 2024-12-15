@@ -160,22 +160,21 @@ export const AddNewForm = () => {
   }
 
   const onSubmit = handleSubmit(async (data) => {
-    // console.log(data);
+    // console.log(data, "Data checking");
 
     try {
       const desideCreateOrUpdate = userDataDetails.some((m) => {
-        return m.empID.includes(data.empID);
+        return m.empID === data.empID;
       });
+      // console.log(desideCreateOrUpdate);
 
       const userIDs = await userDataDetails
         .filter((m) => m.empID === data.empID)
         .map((m) => m);
-      // console.log(userIDs);
 
       if (desideCreateOrUpdate) {
         const updateUserObject = {
           id: userIDs[0].id,
-          // password: "AWE001",
           password: data.password,
           selectType: data.selectType,
           setPermissions: dropDownVal,
@@ -197,8 +196,12 @@ export const AddNewForm = () => {
             console.log(err);
           });
       } else {
+        console.log("8451296");
+
         const nameperson =
           data.name.charAt(0).toUpperCase() + data.name.slice(1).toLowerCase();
+        console.log(data.empID, "Employee ID");
+
         const username = data.empID;
         const password = data.password;
         const email = data.officialEmail;
@@ -469,6 +472,7 @@ Best regards,
               <option value="QA \ QC">QA \ QC</option>
               <option value="User">User</option>
               <option value="Employee">Employee</option>
+              <option value="Payroll">Payroll</option>
             </select>
 
             <p className="text-[red] text-[12px] mt-1">

@@ -31,13 +31,16 @@ export const CreateJobFunc = () => {
           startDate: startDateValue,
           expiryDate: expiryDateValue,
           jobContent: jobValue.jobDesc,
+          uploadJobDetails:jobValue.uploadJobDetails
         };
+console.log(createHireData);
 
         const response = await client.graphql({
           query: createHiringJob,
           variables: { input: createHireData },
         });
-      } catch (error) {
+      }
+       catch (error) {
         console.error("Error updating data:", error);
         throw error; // Re-throw the error after logging
       }

@@ -1,6 +1,216 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const createBastingPaint = /* GraphQL */ `
+  mutation CreateBastingPaint(
+    $input: CreateBastingPaintInput!
+    $condition: ModelBastingPaintConditionInput
+  ) {
+    createBastingPaint(input: $input, condition: $condition) {
+      id
+      empID
+      blastingRemarks
+      blastingEndDate
+      blastingStartDate
+      blastingBadgeNo
+      blastingQulifiExp
+      blastingUpload
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateBastingPaint = /* GraphQL */ `
+  mutation UpdateBastingPaint(
+    $input: UpdateBastingPaintInput!
+    $condition: ModelBastingPaintConditionInput
+  ) {
+    updateBastingPaint(input: $input, condition: $condition) {
+      id
+      empID
+      blastingRemarks
+      blastingEndDate
+      blastingStartDate
+      blastingBadgeNo
+      blastingQulifiExp
+      blastingUpload
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteBastingPaint = /* GraphQL */ `
+  mutation DeleteBastingPaint(
+    $input: DeleteBastingPaintInput!
+    $condition: ModelBastingPaintConditionInput
+  ) {
+    deleteBastingPaint(input: $input, condition: $condition) {
+      id
+      empID
+      blastingRemarks
+      blastingEndDate
+      blastingStartDate
+      blastingBadgeNo
+      blastingQulifiExp
+      blastingUpload
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const createTimeSheet = /* GraphQL */ `
+  mutation CreateTimeSheet(
+    $input: CreateTimeSheetInput!
+    $condition: ModelTimeSheetConditionInput
+  ) {
+    createTimeSheet(input: $input, condition: $condition) {
+      id
+      date
+      status
+      fileName
+      fileType
+      assignTo
+      assignBy
+      empName
+      empBadgeNo
+      empID
+      empDept
+      inTime
+      outTime
+      totalInOut
+      allDayHrs
+      totalHrs
+      remarks
+      otTime
+      netMins
+      actualWorkHrs
+      normalWorkHrs
+      fidNo
+      companyName
+      trade
+      tradeCode
+      onAM
+      offAM
+      onPM
+      offPM
+      ctr
+      rec
+      avgDailyTD
+      highlightDayTG
+      aweSDN
+      totalNT
+      totalOT
+      totalNTOT
+      empWorkInfo
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateTimeSheet = /* GraphQL */ `
+  mutation UpdateTimeSheet(
+    $input: UpdateTimeSheetInput!
+    $condition: ModelTimeSheetConditionInput
+  ) {
+    updateTimeSheet(input: $input, condition: $condition) {
+      id
+      date
+      status
+      fileName
+      fileType
+      assignTo
+      assignBy
+      empName
+      empBadgeNo
+      empID
+      empDept
+      inTime
+      outTime
+      totalInOut
+      allDayHrs
+      totalHrs
+      remarks
+      otTime
+      netMins
+      actualWorkHrs
+      normalWorkHrs
+      fidNo
+      companyName
+      trade
+      tradeCode
+      onAM
+      offAM
+      onPM
+      offPM
+      ctr
+      rec
+      avgDailyTD
+      highlightDayTG
+      aweSDN
+      totalNT
+      totalOT
+      totalNTOT
+      empWorkInfo
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteTimeSheet = /* GraphQL */ `
+  mutation DeleteTimeSheet(
+    $input: DeleteTimeSheetInput!
+    $condition: ModelTimeSheetConditionInput
+  ) {
+    deleteTimeSheet(input: $input, condition: $condition) {
+      id
+      date
+      status
+      fileName
+      fileType
+      assignTo
+      assignBy
+      empName
+      empBadgeNo
+      empID
+      empDept
+      inTime
+      outTime
+      totalInOut
+      allDayHrs
+      totalHrs
+      remarks
+      otTime
+      netMins
+      actualWorkHrs
+      normalWorkHrs
+      fidNo
+      companyName
+      trade
+      tradeCode
+      onAM
+      offAM
+      onPM
+      offPM
+      ctr
+      rec
+      avgDailyTD
+      highlightDayTG
+      aweSDN
+      totalNT
+      totalOT
+      totalNTOT
+      empWorkInfo
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const createHiringJob = /* GraphQL */ `
   mutation CreateHiringJob(
     $input: CreateHiringJobInput!
@@ -15,6 +225,7 @@ export const createHiringJob = /* GraphQL */ `
       startDate
       expiryDate
       jobContent
+      uploadJobDetails
       createdAt
       updatedAt
       __typename
@@ -35,6 +246,7 @@ export const updateHiringJob = /* GraphQL */ `
       startDate
       expiryDate
       jobContent
+      uploadJobDetails
       createdAt
       updatedAt
       __typename
@@ -55,6 +267,7 @@ export const deleteHiringJob = /* GraphQL */ `
       startDate
       expiryDate
       jobContent
+      uploadJobDetails
       createdAt
       updatedAt
       __typename
@@ -544,261 +757,6 @@ export const deleteEmailNotifi = /* GraphQL */ `
     }
   }
 `;
-export const createOffshoreSheet = /* GraphQL */ `
-  mutation CreateOffshoreSheet(
-    $input: CreateOffshoreSheetInput!
-    $condition: ModelOffshoreSheetConditionInput
-  ) {
-    createOffshoreSheet(input: $input, condition: $condition) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const updateOffshoreSheet = /* GraphQL */ `
-  mutation UpdateOffshoreSheet(
-    $input: UpdateOffshoreSheetInput!
-    $condition: ModelOffshoreSheetConditionInput
-  ) {
-    updateOffshoreSheet(input: $input, condition: $condition) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const deleteOffshoreSheet = /* GraphQL */ `
-  mutation DeleteOffshoreSheet(
-    $input: DeleteOffshoreSheetInput!
-    $condition: ModelOffshoreSheetConditionInput
-  ) {
-    deleteOffshoreSheet(input: $input, condition: $condition) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const createORMCSheet = /* GraphQL */ `
-  mutation CreateORMCSheet(
-    $input: CreateORMCSheetInput!
-    $condition: ModelORMCSheetConditionInput
-  ) {
-    createORMCSheet(input: $input, condition: $condition) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const updateORMCSheet = /* GraphQL */ `
-  mutation UpdateORMCSheet(
-    $input: UpdateORMCSheetInput!
-    $condition: ModelORMCSheetConditionInput
-  ) {
-    updateORMCSheet(input: $input, condition: $condition) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const deleteORMCSheet = /* GraphQL */ `
-  mutation DeleteORMCSheet(
-    $input: DeleteORMCSheetInput!
-    $condition: ModelORMCSheetConditionInput
-  ) {
-    deleteORMCSheet(input: $input, condition: $condition) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const createSBWSheet = /* GraphQL */ `
-  mutation CreateSBWSheet(
-    $input: CreateSBWSheetInput!
-    $condition: ModelSBWSheetConditionInput
-  ) {
-    createSBWSheet(input: $input, condition: $condition) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const updateSBWSheet = /* GraphQL */ `
-  mutation UpdateSBWSheet(
-    $input: UpdateSBWSheetInput!
-    $condition: ModelSBWSheetConditionInput
-  ) {
-    updateSBWSheet(input: $input, condition: $condition) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const deleteSBWSheet = /* GraphQL */ `
-  mutation DeleteSBWSheet(
-    $input: DeleteSBWSheetInput!
-    $condition: ModelSBWSheetConditionInput
-  ) {
-    deleteSBWSheet(input: $input, condition: $condition) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const createBlng = /* GraphQL */ `
-  mutation CreateBlng(
-    $input: CreateBlngInput!
-    $condition: ModelBlngConditionInput
-  ) {
-    createBlng(input: $input, condition: $condition) {
-      id
-      weeklySheet
-      date
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const updateBlng = /* GraphQL */ `
-  mutation UpdateBlng(
-    $input: UpdateBlngInput!
-    $condition: ModelBlngConditionInput
-  ) {
-    updateBlng(input: $input, condition: $condition) {
-      id
-      weeklySheet
-      date
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const deleteBlng = /* GraphQL */ `
-  mutation DeleteBlng(
-    $input: DeleteBlngInput!
-    $condition: ModelBlngConditionInput
-  ) {
-    deleteBlng(input: $input, condition: $condition) {
-      id
-      weeklySheet
-      date
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const createHeadOffice = /* GraphQL */ `
-  mutation CreateHeadOffice(
-    $input: CreateHeadOfficeInput!
-    $condition: ModelHeadOfficeConditionInput
-  ) {
-    createHeadOffice(input: $input, condition: $condition) {
-      id
-      dailySheet
-      date
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const updateHeadOffice = /* GraphQL */ `
-  mutation UpdateHeadOffice(
-    $input: UpdateHeadOfficeInput!
-    $condition: ModelHeadOfficeConditionInput
-  ) {
-    updateHeadOffice(input: $input, condition: $condition) {
-      id
-      dailySheet
-      date
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const deleteHeadOffice = /* GraphQL */ `
-  mutation DeleteHeadOffice(
-    $input: DeleteHeadOfficeInput!
-    $condition: ModelHeadOfficeConditionInput
-  ) {
-    deleteHeadOffice(input: $input, condition: $condition) {
-      id
-      dailySheet
-      date
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
 export const createEmpRequisition = /* GraphQL */ `
   mutation CreateEmpRequisition(
     $input: CreateEmpRequisitionInput!
@@ -818,6 +776,8 @@ export const createEmpRequisition = /* GraphQL */ `
       status
       remarkReq
       reqName
+      requestorID
+      approverID
       createdAt
       updatedAt
       __typename
@@ -843,6 +803,8 @@ export const updateEmpRequisition = /* GraphQL */ `
       status
       remarkReq
       reqName
+      requestorID
+      approverID
       createdAt
       updatedAt
       __typename
@@ -868,6 +830,8 @@ export const deleteEmpRequisition = /* GraphQL */ `
       status
       remarkReq
       reqName
+      requestorID
+      approverID
       createdAt
       updatedAt
       __typename

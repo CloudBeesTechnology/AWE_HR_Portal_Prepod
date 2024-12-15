@@ -392,4 +392,5 @@ export const hiringJobSchema = Yup.object().shape({
     .test("is-future-date", "Only Future Dates Allowed", function (value) {
       return !value || new Date(value) > new Date();
     }),
+    uploadJobDetails:Yup.string().notRequired()
 });

@@ -47,7 +47,7 @@ export const UploadingFiles = ({
           className="input-field"
         />
       ) : field.type === "file" ? (
-        <label className="w-full mt-2 max-w-[300px] flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer">
+        <label className="w-full mt-2  flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer">
           <input
             type="file"
             className="hidden"

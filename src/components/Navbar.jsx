@@ -113,7 +113,7 @@ setCurrentDateValue(currentDate)
         );
 
         if (userPersonalInfo) {
-          const profilePhotoString = userPersonalInfo?.profilePhoto;
+          const profilePhotoString = userPersonalInfo?.profilePhoto  || "public/profilePhoto/User-avatar.svg.png";
           // console.log(profilePhotoString);
           
           // const trimmedProfilePhotoString = profilePhotoString?.replace(/^public\//, '');
@@ -123,6 +123,8 @@ setCurrentDateValue(currentDate)
             const result = await getUrl({
               path: pathUrl,
             });
+            // console.log(result?.url?.toString());
+            
             return setPersonalInfo({
               name: userPersonalInfo?.name, // Use the name
               profilePhoto: result?.url?.toString(), // Set the profile photo
@@ -197,12 +199,12 @@ setCurrentDateValue(currentDate)
             <div className="relative">
               <div className="relative">
                 <div
-                  className="max-w-10 h-10 w-full rounded-full relative overflow-hidden shadow-md shadow-[#00000033]"
+                  className="w-12 h-12 rounded-full relative center overflow-hidden shadow-md shadow-[#00000033]"
                   onClick={() => toggleDropdown()}
                 >
                   <img
-                    className="w-full h-full object-cover"
-                    src={personalInfo.profilePhoto || avatar}
+                    className="w-full object-center"
+                    src={personalInfo?.profilePhoto || avatar}
                     alt="avatar not found"
                   />
                 </div>
@@ -220,10 +222,10 @@ setCurrentDateValue(currentDate)
                 >
                   <Profile
                     setIsOpen={setIsOpen}
-                    name={personalInfo.name}
-                    email={personalInfo.email}
-                    profilePhoto={personalInfo.profilePhoto}
-                    contactNo={personalInfo.contactNo}
+                    name={personalInfo?.name}
+                    email={personalInfo?.email}
+                    profilePhoto={personalInfo?.profilePhoto}
+                    contactNo={personalInfo?.contactNo}
                   />
                 </div>
               )}

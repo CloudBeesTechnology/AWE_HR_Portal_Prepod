@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormField } from "../../utils/FormField";
@@ -13,8 +13,10 @@ import { FaTimes, FaDownload, FaPrint } from "react-icons/fa";
 import { Document, Page } from "react-pdf";
 import { pdfjs } from "react-pdf";
 import { getUrl } from "@aws-amplify/storage";
+import { useReactToPrint } from "react-to-print";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
+
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
   import.meta.url
@@ -38,6 +40,7 @@ export const GroupHS = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [numPages, setNumPages] = useState(null);
   const [lastUploadUrl, setPPLastUP] = useState("");
+  
   const {
     register,
     handleSubmit,
@@ -56,6 +59,8 @@ export const GroupHS = () => {
     
     return `${day}/${month}/${year}`;
   };
+
+  const groupPrint =useRef();
 
   const linkToStorageFile = async (pathUrl) => {
     try {
@@ -111,53 +116,14 @@ export const GroupHS = () => {
     }
   };
 
-  const onSubmit = async (data) => {
-    try {
-      const GHSreValue = {
-        ...data,
-        groupHSUpload: JSON.stringify(uploadGHsU.groupHSUpload),
-      };
-      // console.log(GHSreValue);
 
-      const response = await client.graphql({
-        query: createGroupHandS,
-        variables: { input: GHSreValue },
-      });
-
-      // console.log("Successfully submitted data:", response);
-      setNotification(true);
-    } catch (error) {
-      console.error("Error submitting data:", error);
-    }
-  };
-
-  useEffect(() => {
-    const fetchInsuranceData = async () => {
-      try {
-        const response = await client.graphql({
-          query: listGroupHandS,
-        });
-        setInsuranceData(response.data.listGroupHandS.items);
-        setLoading(false); // Set loading to false when data is fetched
-      } catch (error) {
-        console.error('Error fetching insurance data:', error);
-        setError('insuranceData', { message: 'Error fetching data' }); // Set error using setError
-        setLoading(false);
-      }
-    };
-
-    fetchInsuranceData();
-  }, []);
-
-
-  const openPopup = (fileUrl) => {
-    setPopupImage(fileUrl); // Set the URL for the image or file
-    setPopupVisible(true); // Show the popup
-  };
-
-  const handlePrint = () => {
-    window.print();
-  };
+  const handlePrint = useReactToPrint({
+    content: () => groupPrint.current,
+    onBeforePrint: () => console.log("Preparing print..."),
+    onAfterPrint: () => console.log("Print complete"),
+    pageStyle: "print", // This ensures the print view uses a different CSS style
+  });
+  
 
   const onDocumentLoadSuccess = ({ numPages }) => {
     setNumPages(numPages);
@@ -189,7 +155,7 @@ export const GroupHS = () => {
               document.upload.endsWith(".pdf") && (
                 <div className="mt-4  ">
                   <div className="relative bg-white max-w-3xl mx-auto p-6 rounded-lg shadow-lg">
-                    <div  className="flex justify-center  h-[400px] overflow-y-auto">
+                    <div ref={groupPrint} className="flex justify-center  h-[400px] overflow-y-auto">
                       <Worker
                        workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
                       >
@@ -198,27 +164,6 @@ export const GroupHS = () => {
                          
                         />
                       </Worker>
-                    </div>
-
-                    {/* Pagination Controls */}
-                    <div className="mt-4 flex justify-between items-center">
-                      <button
-                        onClick={() => setPageNumber(pageNumber - 1)}
-                        disabled={pageNumber <= 1}
-                        className="bg-blue-600 text-black px-3 py-1 rounded-full text-sm hover:bg-blue-800"
-                      >
-                        Previous
-                      </button>
-                      <span className="text-gray-700">
-                        Page {pageNumber} of {numPages}
-                      </span>
-                      <button
-                        onClick={() => setPageNumber(pageNumber + 1)}
-                        disabled={pageNumber >= numPages}
-                        className="bg-blue-600 text-black px-3 py-1 rounded-full text-sm hover:bg-blue-800"
-                      >
-                        Next
-                      </button>
                     </div>
 
                     {/* Close Button */}
@@ -310,7 +255,7 @@ export const GroupHS = () => {
       Array.isArray(documents) && documents.length > 0;
 
     return (
-      <div className="py-4">
+      <div className="py-4 ">
         <h6 className="uppercase text_size_5 my-3">{categoryName}</h6>
         {isValidDocumentsArray ? (
           renderDocumentsUnderCategory(documents, categoryName)
@@ -322,8 +267,57 @@ export const GroupHS = () => {
       </div>
     );
   };
+  
+  const onSubmit = async (data) => {
+    try {
+      const GHSreValue = {
+        ...data,
+        groupHSUpload: JSON.stringify(uploadGHsU.groupHSUpload),
+      };
+      // console.log(GHSreValue);
+
+      const response = await client.graphql({
+        query: createGroupHandS,
+        variables: { input: GHSreValue },
+      });
+
+      // console.log("Successfully submitted data:", response);
+      setNotification(true);
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchInsuranceData = async () => {
+      try {
+        const response = await client.graphql({
+          query: listGroupHandS,
+        });
+        const items = response.data.listGroupHandS.items;
+  
+        // Filter out expired policies
+        const filteredData = items.filter((data) => {
+          const expiryDate = new Date(data.groupHSExp);
+          return expiryDate >= new Date(); // Include only non-expired policies
+        });
+  
+        setInsuranceData(filteredData);
+        setLoading(false); // Set loading to false when data is fetched
+      } catch (error) {
+        console.error("Error fetching insurance data:", error);
+        setError("insuranceData", { message: "Error fetching data" }); // Set error using setError
+        setLoading(false);
+      }
+    };
+  
+    fetchInsuranceData();
+  }, []);
+
+  
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="mx-auto min-h-screen py-5 px-10 my-10 bg-[#F5F6F1CC]">
+    <section>
+      <form onSubmit={handleSubmit(onSubmit)} className="mx-auto py-5 px-10 my-10 bg-[#F5F6F1CC]">
       {/* Group H&S Insurance Fields */}
       <h3 className="mb-5 text-lg font-bold">Group H&S Insurance</h3>
       <div className="relative mb-5">
@@ -365,41 +359,48 @@ export const GroupHS = () => {
           Save
         </button>
       </div>
+      </form>
+
       {notification && (
         <SpinLogo text="Group H&S Saved Successfully" notification={notification} path="/insuranceHr/groupHS" />
       )}
       {/* View Insurance Info Section */}
-      <div className="mt-20">
-        <p className="text-xl font-bold mb-10 p-3 rounded-lg border-2 border-[#FEF116] bg-[#FFFEF4] w-[250px]">
-          View Insurance Info
-        </p>
-        {loading ? (
-          <p>Loading...</p>
-        ) : insuranceData.length > 0 ? (
-          <table className="w-full text-center">
-            <thead className="bg-[#939393] text-white">
-              <tr>
-                <th className="pl-4 py-4 rounded-tl-lg">Policy Number</th>
-                <th className="pl-4 py-4">Expiry Date</th>
-                <th className="pl-4 py-4 rounded-tr-lg">Uploaded File</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white cursor-pointer ">
-              {insuranceData.map((data, index) => (
-                <tr key={index} className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue">
-                  <td className="pl-4 py-4">{data.groupHSNo}</td>
-                  <td className="py-4 px-4">{formatDate(data?.groupHSExp || "N/A")}</td>
-                  <td className="pl-4 py-4">
-                    {renderDocumentCategory(data.groupHSUpload,"perAccUp Pdf")}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="text-center mt-10">No insurance information available.</p>
-        )}
+      <div className="mt-10">
+    <p className="text-xl font-bold mb-10 p-3 rounded-lg border-2 border-[#FEF116] bg-[#FFFEF4] w-[250px]">
+      View Insurance Info
+    </p>
+    {loading ? (
+      <p>Loading...</p>
+    ) : insuranceData.length > 0 ? (
+      <div className=' h-[400px] overflow-y-auto scrollBar'>
+        <table className="w-full text-center ">
+        <thead className="bg-[#939393] text-white ">
+          <tr>
+            <th className="pl-4 py-4 rounded-tl-lg">Policy Number</th>
+            <th className="pl-4 py-4">Expiry Date</th>
+            <th className="pl-4 py-4 rounded-tr-lg">Uploaded File</th>
+          </tr>
+        </thead>
+        <tbody className="bg-white cursor-pointer  ">
+          {insuranceData.map((data, index) => (
+            <tr
+              key={index}
+              className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue "
+            >
+              <td className="pl-4 py-4">{data.groupHSNo}</td>
+              <td className="py-4 px-4">{formatDate(data?.groupHSExp || "N/A")}</td>
+              <td className="pl-4 py-4">
+                {renderDocumentCategory(data.groupHSUpload, "PDF File")}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       </div>
+    ) : (
+      <p className="text-center mt-10">No insurance information available.</p>
+    )}
+  </div>
       {/* Popup */}
       {popupVisible && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
@@ -441,6 +442,7 @@ export const GroupHS = () => {
           </div>
         </div>
       )}
-    </form>
+    </section>
+    
   );
 };

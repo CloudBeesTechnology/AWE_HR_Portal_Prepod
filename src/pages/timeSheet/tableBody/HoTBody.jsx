@@ -28,7 +28,7 @@ export const HoTBody = ({ data, loading, setTableData }) => {
                   key={index}
                   className="text-dark_grey h-[53px] bg-white text-sm rounded-sm shadow-md text-start border-b-2 border-[#CECECE]"
                 >
-                  <td className="text-start px-4 flex-1">{index + 1}</td>
+                  {/* <td className="text-start px-4 flex-1">{index + 1}</td> */}
                   <td className="text-start px-4 flex-1">{m.rec}</td>
                   <td className="text-center px-4 flex-1">{m.ctr}</td>
                   <td className="text-center px-4 flex-1">{m.dept}</td>
@@ -58,13 +58,13 @@ export const HoTBody = ({ data, loading, setTableData }) => {
                   </td>
                   <td className="text-center px-4 flex-1">{m.OT || 0}</td>
                   <td className="text-center px-4 flex-1">{m.remarks}</td>
-                  <td
+                  {/* <td
                     className={`text-center px-4 flex-1 ${
                       m.status === "Approved" ? "text-[#0CB100]" : "text_size_8"
                     }`}
                   >
                     {m.status}
-                  </td>
+                  </td> */}
                 </tr>
               );
             };
@@ -73,19 +73,20 @@ export const HoTBody = ({ data, loading, setTableData }) => {
         : (
             <tr>
               <td
-                colSpan="15"
+                colSpan="100%"
                 className="text-center text-dark_ash text_size_5 bg-white"
               >
-                <p className="p-5">No Table Data Available Here.</p>
-              </td>
-            </tr>
+                <p className="p-5">Please wait few seconds...</p>
+              </td>  
+            </tr>  
+            
           ) ?? (
-            <tr>
+               <tr>
               <td
-                colSpan="15"
-                className="text-center text-dark_ash text_size_5"
+                  colSpan="15"
+                className="text-center text-dark_ash text_size_5 bg-white"
               >
-                <p className="p-5">No Table Data Available Here</p>
+                {/* <p className="p-5">No Table Data Available Here</p> */}
               </td>
             </tr>
           )}

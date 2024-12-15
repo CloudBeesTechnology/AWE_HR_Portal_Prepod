@@ -1,225 +1,235 @@
 import { useEffect, useState } from "react";
-import { LMTable } from "./LMTable";
-import { HOLTable } from "./HOLTable";
+import { useLocation, Link, Outlet } from "react-router-dom";
 import { Filter } from "./Filter";
 import { Pagination } from "./Pagination";
 import { IoSearch } from "react-icons/io5";
-import { FilterMonthAndYear } from "./FilterMonthAndYear";
 import { ViewForm } from "./ViewForm";
-import { EmpLeaveBalance } from "./EmpLeaveBalance";
 import { Searchbox } from "../../utils/Searchbox";
-import { TicketsTable } from "./TicketsTable";
 import { useLeaveManage } from "../../hooks/useLeaveManage";
-import { useNotification } from "../../hooks/useNotification";
-import {useWorkInfo} from "../../hooks/useWorkInfo";
 import useEmployeePersonalInfo from "../../hooks/useEmployeePersonalInfo";
 
 export const LeaveManage = () => {
   const [data, setData] = useState([]);
   const [source, setSource] = useState(null);
-  const [count, setCount] = useState(0);
   const [filterStatus, setFilterStatus] = useState("All");
-  const [selectedMonth, setSelectedMonth] = useState("");
-  const [selectedYear, setSelectedYear] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(35);
-  const [totalPages, setTotalPages] = useState("");
+  const [rowsPerPage, setRowsPerPage] = useState(30);
   const [searchTerm, setSearchTerm] = useState("");
   const [toggleClick, setToggleClick] = useState(false);
   const [selectedLeaveData, setSelectedLeaveData] = useState(null);
+  const [secondartyData, setSecondartyData] = useState([]);
   const [selectedTicketData, setSelectedTicketData] = useState(null);
-  const [userName, setUserName] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [userType, setUserType] = useState("");
   const [userID, setUserID] = useState("");
-  const [fakeUserType, setFakeUsertype] = useState("Hr");
+  const [searchResults, setSearchResults] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+
+  const location = useLocation();
+
   const {
     mergedData,
-    loading,
-    error,
     handleDeleteLeaveStatus,
     handleUpdateLeaveStatus,
-    fetchedTicketRequests,
     ticketMerged,
+    statusUpdate,
   } = useLeaveManage();
 
-  // const {emailNotifications} = useNotification();
-
-  // const {empWorkInfo} = useWorkInfo()
-
+  //   const check=filteredData.map((val)=>{
+  // return val.empID
+  //   })
+  //   console.log(check);
   useEffect(() => {
     const userID = localStorage.getItem("userID");
     setUserID(userID);
-    // console.log("Navbar: User ID from localStorage:", userID);
+    const userType = localStorage.getItem("userType");
+    setUserType(userType);
   }, []);
 
-  // Use the custom hook
   const { personalInfo } = useEmployeePersonalInfo(userID);
 
-  // console.log("Notification", emailNotifications);
-  // console.log("WorkInfo Data 6.0", mergedData);
-
   useEffect(() => {
-    // Set initial data when mergedData changes
-    setData(applyFilters());
-  }, [mergedData]);
+    // const filtered = applyFilters();
+    // console.log(filtered);
+
+    const filteredDataValue = mergedData.filter((item) => {
+      if (location.pathname === "/leaveManage/requestTickets") {
+        const isValid =
+          item?.empStatus !== "Cancelled" &&
+          Object.keys(item?.ticketRequest || {}).length > 0;
+
+        return isValid;
+      } else if (location.pathname === "/leaveManage/historyLeave") {
+        const isValid =
+          item?.empStatus !== "Cancelled" && item.managerStatus === "Approved";
+
+        return isValid;
+      } else {
+        const isValid = item?.empStatus !== "Cancelled";
+
+        return isValid;
+      }
+    });
+    // console.log(filteredDataValue);
+
+    setSecondartyData(filteredDataValue);
+    setData(filteredDataValue);
+  }, [
+    ticketMerged,
+    filterStatus,
+    selectedDate,
+    searchTerm,
+    mergedData,
+    location.pathname,
+  ]);
 
   const getData = () => {
     let dataToReturn = [];
-  
-    if (count === 0 || count === 1 || count === 2) {
-      dataToReturn = mergedData;
-    } else if (count === 3) {
+    if (
+      location.pathname === "/leaveManage" ||
+      location.pathname === "/leaveManage/historyLeave" ||
+      location.pathname === "/leaveManage/leaveBalance"
+    ) {
+      dataToReturn = data;
+    } else if (location.pathname === "/leaveManage/requestTickets") {
       dataToReturn = ticketMerged;
     }
 
     // Apply the empStatus filter to exclude "Cancelled" status
-    return dataToReturn.filter(item => item.empStatus !== "Cancelled");
+    return dataToReturn.filter((item) => item.empStatus !== "Cancelled");
   };
-
-  const applyFilters = () => {
-    let filteredData = getData();
-
-    if (filterStatus !== "All") {
-      filteredData = filteredData.filter((item) => userType === "Supervisor" && item.supervisorStatus === filterStatus || userType === "Manager" && item.managerStatus === filterStatus);
-    }
-
-    if (selectedDate) {
-      const selectedDateObject = new Date(selectedDate);
-      filteredData = filteredData.filter((item) => {
-        // const itemDate =
-        //   count === 0 ? new Date(item.createdAt) : new Date(item["start Date"]);
-        let itemDate;
-        if (count === 0) {
-          itemDate = new Date(item.createdAt); // Use 'createdAt' for count 0
-        } else if (count === 1) {
-          itemDate = new Date(item.fromDate); // Use 'start Date' for count 1
-          
-        } else if (count === 2) {
-          itemDate = new Date(item["end Date"]); // Use 'end Date' for count 2
-        } else if (count === 3) {
-          itemDate = new Date(item.
-            arrivalDate); // Use 'ticketDate' for count 3 (or whatever field is relevant)
-          itemDate = new Date(item.departureDate);
-        }
-
-        return (
-          itemDate.getFullYear() === selectedDateObject.getFullYear() &&
-          itemDate.getMonth() === selectedDateObject.getMonth() &&
-          itemDate.getDate() === selectedDateObject.getDate()
-        );
-      });
-    }
-
-    if (searchTerm) {
-      filteredData = filteredData.filter((item) =>
-        item.empID.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    // console.log(filteredData, "Filter")
-
-    return filteredData;
-   
-  };
-  // Handle pagination and filters
-
-  useEffect(() => {
-    const filteredData = applyFilters(); // Apply all filters here
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const paginatedData = filteredData.slice(startIndex, startIndex + rowsPerPage);
-    setData(paginatedData); // Update the data after pagination
-  }, [mergedData, filterStatus, selectedDate, searchTerm, currentPage, rowsPerPage, count]); // Add dependencies
-  
-  useEffect(() => {
-    // Recalculate totalPages after applying filters and pagination
-    const filteredResults = applyFilters();
-    const totalPages = Math.ceil(filteredResults.length / rowsPerPage);
-    setTotalPages(totalPages); // Update total pages
-  }, [mergedData, filterStatus, selectedDate, searchTerm, rowsPerPage, count]); // Add dependencies for recalculating totalPages
-  
-
-  // useEffect(() => {
-  //   const filteredData = applyFilters();
-  //   const startIndex = (currentPage - 1) * rowsPerPage;
-  //   const paginatedData = filteredData.slice(startIndex, startIndex + rowsPerPage);
-  //   setData(paginatedData);
-  // }, [filterStatus, selectedDate, searchTerm, currentPage, rowsPerPage, count]);
-
-  
 
   // const applyFilters = () => {
   //   let filteredData = getData();
 
+  //   // Apply status filter
   //   if (filterStatus !== "All") {
-  //     filteredData = filteredData.filter(
-  //       (item) => item.status === filterStatus
-  //     );
-  //   }
-  //   if (selectedDate) {
-  //     const selectedDateObject = new Date(selectedDate);
   //     filteredData = filteredData.filter((item) => {
-  //       const itemDate =
-  //         count === 0 ? new Date(item.createdAt) : new Date(item["start Date"]);
-  //       return (
-  //         itemDate.getFullYear() === selectedDateObject.getFullYear() &&
-  //         itemDate.getMonth() === selectedDateObject.getMonth() &&
-  //         itemDate.getDate() === selectedDateObject.getDate()
-  //       );
+  //       const supervisorCondition =
+  //         userType === "Supervisor" && item.supervisorStatus === filterStatus;
+  //       const managerCondition =
+  //         userType === "Manager" && item.managerStatus === filterStatus;
+
+  //       const condition = supervisorCondition || managerCondition;
+  //       console.log(`Employee ${item.empID} passes condition: ${condition}`);
+  //       return condition;
   //     });
   //   }
+
+  //   // Apply search term filter
   //   if (searchTerm) {
-  //     filteredData = filteredData.filter((item) =>
-  //       item.empID.toLowerCase().includes(searchTerm.toLowerCase())
+  //     filteredData = filteredData.filter(
+  //       (item) =>
+  //         item.empID
+  //           .toString()
+  //           .toLowerCase()
+  //           .includes(searchTerm.toLowerCase()) ||
+  //         item.employeeInfo.empBadgeNo
+  //           .toString()
+  //           .toLowerCase()
+  //           .includes(searchTerm.toLowerCase()) ||
+  //         item.employeeInfo.name
+  //           .toLowerCase()
+  //           .includes(searchTerm.toLowerCase())
   //     );
   //   }
 
+  //   // console.log("Filtered Data after applying filters:", filteredData);
   //   return filteredData;
   // };
+  const dateFD = (selectedDate) => {
+    try {
+      const selectedDateObj = new Date(selectedDate);
+      const selectedDateLocal = selectedDateObj.toLocaleDateString("en-GB"); // 'DD/MM/YYYY' format
 
-  // useEffect(() => {
-  //   const filteredData = applyFilters();
-  //   const startIndex = (currentPage - 1) * rowsPerPage;
-  //   const paginatedData = filteredData.slice(
-  //     startIndex,
-  //     startIndex + rowsPerPage
-  //   );
-  //   setData(paginatedData);
-  // }, [currentPage, filterStatus, selectedDate, rowsPerPage, searchTerm, count]);
+      const filtered = mergedData.filter((item) => {
+        if (!item.createdAt && !item.fromDate && !item.toDate) {
+          return false;
+        }
 
-  const handleFilterChange = (status) => {
-    setFilterStatus(status);
-    setCurrentPage(1);
+        let isCreatedAtMatch = false;
+        let isFromDateMatch = false;
+        let isToDateMatch = false;
+        let isDepartureDateMatch = false;
+        let isArrivalDateMatch = false;
+
+        if (location.pathname === "/leaveManage") {
+          const createdDate = item.createdAt
+            ? new Date(item.createdAt).toLocaleDateString("en-GB") // Convert createdAt to local date
+            : null;
+          isCreatedAtMatch = createdDate === selectedDateLocal;
+        }
+
+        if (location.pathname === "/leaveManage/historyLeave") {
+          const fromDate = item.fromDate
+            ? new Date(item.fromDate).toLocaleDateString("en-GB") // Convert fromDate to local date
+            : null;
+          isFromDateMatch = fromDate === selectedDateLocal;
+
+          const toDate = item.toDate
+            ? new Date(item.toDate).toLocaleDateString("en-GB") // Convert toDate to local date
+            : null;
+          isToDateMatch = toDate === selectedDateLocal;
+        }
+
+        if (location.pathname === "/leaveManage/requestTickets") {
+          const departureDate = item.ticketRequest?.departureDate
+            ? new Date(item.ticketRequest.departureDate).toLocaleDateString(
+                "en-GB"
+              )
+            : null;
+          isDepartureDateMatch = departureDate === selectedDateLocal;
+
+          const arrivalDate = item.ticketRequest?.arrivalDate
+            ? new Date(item.ticketRequest.arrivalDate).toLocaleDateString(
+                "en-GB"
+              )
+            : null;
+          isArrivalDateMatch = arrivalDate === selectedDateLocal;
+
+          const ticketCreatedAt = item.ticketRequest?.createdAt
+            ? new Date(item.ticketRequest.createdAt).toLocaleDateString("en-GB")
+            : null;
+          isCreatedAtMatch = ticketCreatedAt === selectedDateLocal;
+        }
+
+        // Filter if any of the dates match
+        const isMatch =
+          isCreatedAtMatch ||
+          isFromDateMatch ||
+          isToDateMatch ||
+          isDepartureDateMatch ||
+          isArrivalDateMatch;
+
+        return isMatch;
+      });
+
+      setSearchResults(filtered);
+      setFilteredData(filtered);
+    } catch (error) {
+      console.error("Error in applyFilters:", error);
+    }
   };
 
-  const handleDateChange = (month, year) => {
-    setSelectedMonth(month);
-    setSelectedYear(year);
-    setCurrentPage(1);
+  const handleDateChange = (event) => {
+    const date = event.target.value;
+    setSelectedDate(date);
+    dateFD(date);
   };
 
-  const handleSearchChange = (term) => {
-    setSearchTerm(term);
+  useEffect(() => {
+    setSelectedDate(null);
+    setSearchTerm("");
     setCurrentPage(1);
-  };
+  }, [location.pathname]);
 
   const handleClickForToggle = () => {
     setToggleClick(!toggleClick);
   };
 
-  const handleLimitChange = (e) => {
-    setRowsPerPage(parseInt(e.target.value));
-    setCurrentPage(1);
-  };
-
-  const emptySearch = () => {
-    setSearchTerm("");
-    setData(applyFilters());
-  };
-
-  // const filteredResults = applyFilters();
-  // const totalPages = Math.ceil(filteredResults.length / rowsPerPage);
-
   const handleViewClick = (data, source) => {
+    // console.log(data);
+
     setSource(source);
     if (source === "LM") {
       setSelectedLeaveData(data); // Leave Data
@@ -230,6 +240,7 @@ export const LeaveManage = () => {
     }
     setToggleClick(true);
   };
+  // console.log(toggleClick);
 
   const handleUpdate = async (empID, newStatus, remark) => {
     try {
@@ -242,220 +253,210 @@ export const LeaveManage = () => {
     }
   };
 
-
   const searchUserList = async (data) => {
     try {
       const result = await data;
+      setSearchResults(result);
+      setCurrentPage(1);
       setData(result);
     } catch (error) {
       console.error("Error search data", error);
     }
   };
 
-  useEffect(() => {
-    const userType = localStorage.getItem("userType"); 
-    setUserType(userType);
-    // console.log("UserID from localStorage:", userType);
-  }, []);
+  const formatDate = (dateToString) => {
+    if (!dateToString || isNaN(new Date(dateToString).getTime())) {
+      return "";
+    }
 
- 
-  const formatDate = (dateString) => {
-    // Check if the dateString is empty or invalid before processing
-    if (!dateString || isNaN(new Date(dateString).getTime())) {
-      return ''; // Return an empty string or a custom message if invalid
-    } 
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, "0"); // Adds leading zero if day is single digit
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // getMonth() returns 0-11, so we add 1
-    const year = date.getFullYear();
-  
-    return `${day}/${month}/${year}`;
+    const date = new Date(dateToString);
+
+    const day = date.getDate().toString().padStart(2, "0"); // Local day
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Local month
+    const year = date.getFullYear(); // Local year
+
+    return `${day}/${month}/${year}`; // Format as DD/MM/YYYY
   };
-  
+
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * rowsPerPage;
+
+    const dataToPaginate = searchResults.length > 0 ? searchResults : data;
+
+    const sortedData = dataToPaginate.sort((a, b) => {
+      const regex = /\d+$/;
+
+      const numPartA = a.empID.match(regex)
+        ? a.empID.match(regex)[0].padStart(5, "0")
+        : "";
+      const numPartB = b.empID.match(regex)
+        ? b.empID.match(regex)[0].padStart(5, "0")
+        : "";
+
+      const prefixA = a.empID.replace(regex, "").toLowerCase();
+      const prefixB = b.empID.replace(regex, "").toLowerCase();
+
+      if (prefixA !== prefixB) {
+        return prefixA.localeCompare(prefixB);
+      }
+
+      return numPartA.localeCompare(numPartB);
+    });
+
+    const paginatedData = sortedData.slice(
+      startIndex,
+      startIndex + rowsPerPage
+    );
+
+    setFilteredData(paginatedData);
+  }, [
+    currentPage,
+    rowsPerPage,
+    data,
+    searchResults,
+    selectedDate,
+    filterStatus,
+  ]);
+
+  const handleFilterChange = (status) => {
+    setFilterStatus(status);
+    setCurrentPage(1);
+  };
+
+  const totalPages = Math.ceil(
+    (searchResults.length > 0 ? searchResults.length : data.length) /
+      rowsPerPage
+  );
+
+  // console.log(selectedLeaveData); // Ensure at least one has data
+  // console.log(selectedTicketData);
+  // console.log(filteredData);
+
+  // const check=filteredData.map((val)=>{
+  //   return val.empID
+  //     })
+  //     console.log(check);
+
   return (
     <section className={`py-20 px-10`}>
       <div className="screen-size">
         <section className="flex justify-between items-center py-3">
           <p className="text_size_5">
-            <span
+            <Link
+              to="/leaveManage"
               className={`pr-2 relative after:absolute after:-bottom-1 after:left-0 after:w-[90%] after:h-1 cursor-pointer ${
-                count === 0 && "after:bg-primary"
+                location.pathname === "/leaveManage" ? "after:bg-primary" : ""
               }`}
-              onClick={() => {
-                setCount(0);
-                setCurrentPage(1);
-                // console.log(count);
-              }}
             >
               Request Leave
-            </span>{" "}
-            {" "}
-            <span
+            </Link>{" "}
+            <Link
+              to="/leaveManage/historyLeave"
               className={`px-2 relative after:absolute after:-bottom-2 after:left-0 after:w-[90%] after:h-1 cursor-pointer ${
-                count === 1 && "after:bg-primary"
+                location.pathname === "/leaveManage/historyLeave"
+                  ? "after:bg-primary"
+                  : ""
               }`}
-              onClick={() => {
-                setCount(1);
-                setCurrentPage(1);
-              }}
             >
               History of leave
-            </span>{" "}
-            {" "}
-            <span
+            </Link>{" "}
+            <Link
+              to="/leaveManage/leaveBalance"
               className={`px-2 relative after:absolute after:-bottom-2 after:left-0 after:w-[90%] after:h-1 cursor-pointer ${
-                count === 2 && "after:bg-primary"
+                location.pathname === "/leaveManage/leaveBalance"
+                  ? "after:bg-primary"
+                  : ""
               }`}
-              onClick={() => {
-                setCount(2);
-                setCurrentPage(1);
-              }}
             >
               Employee Leave Balance
-            </span>{" "}
+            </Link>{" "}
             {(userType === "HR" || userType === "SuperAdmin") && (
               <>
                 {" "}
-                <span
+                <Link
+                  to="/leaveManage/requestTickets"
                   className={`px-2 relative after:absolute after:-bottom-2 after:left-0 after:w-[90%] after:h-1 cursor-pointer ${
-                    count === 3 && "after:bg-primary"
+                    location.pathname === "/leaveManage/requestTickets"
+                      ? "after:bg-primary"
+                      : ""
                   }`}
-                  onClick={() => {
-                    setCount(3);
-                    setCurrentPage(1);
-                    // console.log(count);
-                  }}
                 >
                   Request Tickets
-                </span>
+                </Link>
               </>
             )}
           </p>
           <div
             className={`flex gap-5 w-[500px] ${
-              count === 2 ? "justify-end" : ""
+              location.pathname === "/leaveManage/leaveBalance"
+                ? "justify-end"
+                : ""
             }`}
           >
-          
-            <Searchbox
-              allEmpDetails={mergedData}
-              searchIcon2={<IoSearch />}
-              placeholder="Employee ID"
-              // emptySearch={emptySearch}
-              searchUserList={searchUserList}
-              // onSearchChange={handleSearchChange}
-              border="rounded-md"
-            />
-          
-            {count !== 2 && (
-              <>
-                <FilterMonthAndYear
-                  onDateChange={(day, month, year) => {
-                    setSelectedDate(`${year}-${month}-${day}`);
-                    setCurrentPage(1);
-                  }}
+            {location.pathname !== "/leaveManage/leaveBalance" && (
+              <Searchbox
+                allEmpDetails={secondartyData}
+                searchIcon2={<IoSearch />}
+                placeholder="Employee ID"
+                searchUserList={searchUserList}
+                border="rounded-md"
+              />
+            )}
+            {location.pathname !== "/leaveManage/leaveBalance" && (
+              <div className="py-2  text_size_5 bg-white border rounded-md text-grey border-lite_grey flex items-center px-3 gap-2">
+                <input
+                  type="date"
+                  name="selectedDate"
+                  className="text-grey"
+                  value={selectedDate || ""}
+                  onChange={handleDateChange}
                 />
-                {count !== 0 && (
-                  <Filter AfterFilter={handleFilterChange} />
-                )}           
-              </>
+
+                {/* {location.pathname === "/leaveManage/requestTickets" &&
+                  userType !== "HR" &&
+                  userType !== "SuperAdmin" && (
+                    <Filter AfterFilter={handleFilterChange} />
+                  )} */}
+              </div>
             )}
           </div>
         </section>
         <section className="center w-full">
-          {count === 0 && (
-            <>
-              {data.length > 0 ? (
-                <LMTable
-                  handleClickForToggle={handleClickForToggle}
-                  initialData={data}
-                  userType={userType}
-                  onViewClick={(leaveData) => handleViewClick(leaveData, "LM")}
-                  handleDelete={handleDeleteLeaveStatus}
-                  personalInfo={personalInfo}
-                  formatDate={formatDate}
-                />
-              ) : (
-                <p className="mt-12 text-center text-gray-500">
-                  No results found in the history of leave.
-                </p>
-              )}
-            </>
-          )}
-          {count === 1 && (
-            <>
-              {data.length > 0 ? (
-                <HOLTable
-                  initialData={data}
-                  userType={userType}
-                  currentPage={currentPage}
-                  rowsPerPage={rowsPerPage}
-                  formatDate={formatDate}
-                  personalInfo={personalInfo}
-                />
-              ) : (
-                <p className="mt-12 text-center text-gray-500">
-                  No results found in the history of leave.
-                </p>
-              )}
-            </>
-          )}
-          {count === 2 && (
-            <>
-              {data.length > 0 ? (
-                <EmpLeaveBalance
-                  initialData={data}
-                  currentPage={currentPage}
-                  rowsPerPage={rowsPerPage}
-                  formatDate={formatDate}
-                  userType={userType}
-                  personalInfo={personalInfo}
-                />
-              ) : (
-                <p className="mt-12 text-center text-gray-500">
-                  No results found in employee leave balance.
-                </p>
-              )}
-            </>
-          )}
-
-          {count === 3 && (
-            <>
-              {data.length > 0 ? (
-                <TicketsTable
-                  handleClickForToggle={handleClickForToggle}
-                  initialData={ticketMerged}
-                  userType={userType}
-                  formatDate={formatDate}
-                  personalInfo={personalInfo}
-                  onViewClick={(ticketData) =>
-                    handleViewClick(ticketData, "Tickets")
-                  }
-                />
-              ) : (
-                <p className="mt-12 text-center text-gray-500">
-                  No results found in ticket request.
-                </p>
-              )}
-            </>
-          )}
+          <Outlet
+            context={{
+              handleClickForToggle,
+              filteredData,
+              ticketMerged,
+              currentPage,
+              rowsPerPage,
+              handleViewClick,
+              handleDeleteLeaveStatus,
+              personalInfo,
+              formatDate,
+              userType,
+              statusUpdate,
+              mergedData,
+            }}
+          />
         </section>
 
         {/* Pagination section */}
         <div className="ml-20 flex justify-center">
           <div className="w-[60%] flex justify-start mt-4 px-10">
             {/* Conditionally render pagination only for tables other than LMTable and TicketsTable */}
-            {(userType === "SuperAdmin" || userType !== "Supervisor" && userType !== "Manager" && count !== 3) && data.length > 0  && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={(newPage) => {
-                  if (newPage >= 1 && newPage <= totalPages) {
-                    setCurrentPage(newPage);
-                  }
-                }}
-              />
-            )}
+
+            {location.pathname !== "/leaveManage/leaveBalance" &&
+              filteredData.length > 0 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(newPage) => {
+                    if (newPage >= 1 && newPage <= totalPages) {
+                      setCurrentPage(newPage);
+                    }
+                  }}
+                />
+              )}
           </div>
         </div>
       </div>

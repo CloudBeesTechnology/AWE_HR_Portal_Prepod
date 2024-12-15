@@ -162,26 +162,11 @@ export const WorkInfoSchema = Yup.object().shape({
     .required("Job Category is mandatory"),
   otherJobCat: Yup.string().notRequired(),
 
-  // remarkWI
-  // : Yup.array()
-  //   .of(Yup.string().notRequired(),)
-  //
-  //   .notRequired(),
-  // other: Yup.string().when("egory is required", {
-  //   is: (value) => value && value.trim().toLowerCase() === "other",
-  //   then: () => Yup.string().required("Other  is required"),
-  //   otherwise: () => Yup.string().notRequired(),
-  // }),
   doj: Yup.date()
     .nullable()
     .transform((value, originalValue) => (originalValue === "" ? null : value))
     .required("Date of Join is mandatory"),
-    // .test("is-past-date", "Date of joining must be in the past", (value) => {
-    //   if (!value) return true;
-    //   const dojDate = new Date(value);
-    //   const currentDate = new Date();
-    //   return dojDate < currentDate;
-    // }),
+   
   jobDesc: Yup.string().required("Job Description is mandatory"),
   skillPool: Yup.string().required("Skill Pool is mandatory"),
   hr: Yup.string().notRequired(),
@@ -267,18 +252,18 @@ export const WorkInfoSchema = Yup.object().shape({
     .required("Type of Salary Pay is mandatory")
     .notOneOf([""], "Type of Salary Pay is mandatory"),
 
-  // resignDate: Yup.string().notRequired(),
-  // termiDate: Yup.string().notRequired(),
-  // resignNotProb: Yup.string().notRequired(),
-  // otherResignNotProb: Yup.string().notRequired(),
-  // termiNotProb: Yup.string().notRequired(),
-  // otherTermiNotProb: Yup.string().notRequired(),
-  // resignNotConf: Yup.string().notRequired(),
-  // otherResignNotConf: Yup.string().notRequired(),
-  // termiNotConf: Yup.string().notRequired(),
-  // otherTermiNotConf: Yup.string().notRequired(),
-  // reasonResign: Yup.string().notRequired(),
-  // reasonTerminate: Yup.string().notRequired(),
+  resignDate: Yup.string().notRequired(),
+  termiDate: Yup.string().notRequired(),
+  resignNotProb: Yup.string().notRequired(),
+  otherResignNotProb: Yup.string().notRequired(),
+  termiNotProb: Yup.string().notRequired(),
+  otherTermiNotProb: Yup.string().notRequired(),
+  resignNotConf: Yup.string().notRequired(),
+  otherResignNotConf: Yup.string().notRequired(),
+  termiNotConf: Yup.string().notRequired(),
+  otherTermiNotConf: Yup.string().notRequired(),
+  reasonResign: Yup.string().notRequired(),
+  reasonTerminate: Yup.string().notRequired(),
   leavePass: Yup.string()
   .notRequired(),
   dateLeavePass: Yup.string()
@@ -668,6 +653,9 @@ export const employeeInfoSchema = Yup.object().shape({
   inducBriefUp: Yup.string().notRequired(),
   preEmp: Yup.string().notRequired(),
   preEmpPeriod: Yup.string().notRequired(),
+bankName:Yup.string().notRequired(),
+bankAccNo:Yup.string().notRequired(),
+
   bwnUpload: Yup.array()
     .of(
       Yup.mixed()

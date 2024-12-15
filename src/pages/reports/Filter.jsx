@@ -17,7 +17,7 @@ export const Filter = ({
     <div>
       <div className="relative">
         <div
-          className="flex items-center gap-3 border rounded p-0.5 px-3 text-sm text-secondary border-[#D9D9D9]"
+          className="flex items-center gap-3 border rounded p-0.5 px-3 text-sm text-secondary  border-[#D9D9D9] bg-white"
           onClick={handleToggle}
         >
           <IoFilterOutline />
@@ -38,7 +38,7 @@ export const Filter = ({
               Reports.map((report, index) => (
                 <p
                   key={index}
-                  className="hover:bg-secondary hover:text-white p-1 cursor-pointer text-dark_grey"
+                  className="hover:bg-secondary hover:text-white p-1 cursor-pointer text-dark_grey border-b "
                   onClick={() => {
                     setTypeOfReport(report.title);
                     setToggleClick(false);

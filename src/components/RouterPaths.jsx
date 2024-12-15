@@ -66,6 +66,7 @@ export const TrainingPaths = [
   "/training/hr",
   "/trainingReq",
   "/trainingQA",
+  "/allTraining",
 ];
 
 export const UserPaths = ["/user", "/addNewForm"];

@@ -106,17 +106,17 @@ export const WorkDataPass = {
           ],
         },
         {
-          label: "HR",
+          label: "HR ID",
           name: "hr",
           type: "text",
         },
         {
-          label: "Manager",
+          label: "Manager ID",
           name: "manager",
           type: "text",
         },
         {
-          label: "Supervisor",
+          label: "Supervisor ID",
           name: "supervisor",
           type: "text",
         },

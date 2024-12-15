@@ -33,7 +33,7 @@ export const useTableMerged = (excelData) => {
           const candidates =
             empPersonalInfos?.data?.listEmpPersonalInfos?.items;
           const interviews = empPersonalDocs?.data?.listEmpWorkInfos?.items;
-
+console.log(empPersonalInfos)
           const mergedData = candidates
             .map((candidate) => {
               const interviewDetails = interviews.find(

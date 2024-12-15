@@ -61,7 +61,7 @@ export const ConfirmationForm = ({register}) => {
               The appointment to be extended for a further probationary period of
               <input
                 type="text"
-                {...register("extensionPeriod")}
+                {...register("extendedProbationEndDate")}
                 className="w-12 border-b outline-none text-center ml-2"
                 placeholder="0"
               />{" "}

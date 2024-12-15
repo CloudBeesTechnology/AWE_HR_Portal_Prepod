@@ -8,6 +8,7 @@ export const ContractPDF = ({ allData, typeOfReport, reportTitle }) => {
   const [tableBody, setTableBody] = useState([]);
   const [tableHead, setTableHead] = useState([
     "Name",
+    "Emp ID",
     "Employee Badge No",
     "Nationality",
     "Date of Join",
@@ -45,72 +46,76 @@ export const ContractPDF = ({ allData, typeOfReport, reportTitle }) => {
     return `${day}-${month}-${year}`;
   };
   
-  const calculateTotalDays = (startDate, endDate) => {
+  const calculateTotalMonths = (startDate, endDate) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
   
     if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-      return "-"; // Return "-" if any date is invalid
+      return "-";
     }
   
-    // Difference in milliseconds
-    const diffInMs = end - start;
-  
-    // Convert milliseconds to days
-    const totalDays = Math.ceil(diffInMs / (1000 * 60 * 60 * 24));
-  
-    return totalDays >= 0 ? totalDays : "-"; // Return "-" for negative days
+    return (
+      (end.getFullYear() - start.getFullYear()) * 12 +
+      (end.getMonth() - start.getMonth())
+    );
   };
   
-  // Helper function to calculate remaining balance Days
-  const calculateBalanceDays = (startDate, endDate) => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const today = new Date(); // Current date
+  const calculateBalanceMonths = (startDate, endDate) => {
+    const today = new Date();
+    const totalMonths = calculateTotalMonths(startDate, endDate);
+    const completedMonths = calculateTotalMonths(startDate, today);
   
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-      return "-"; // Return "-" if any date is invalid
+    if (typeof totalMonths === "string" || typeof completedMonths === "string") {
+      return "-";
     }
   
-    const totalDays = calculateTotalDays(startDate, endDate);
-    const completedDays = calculateTotalDays(startDate, today);
-  
-    const balanceDays = totalDays - completedDays;
-    return balanceDays >= 0 ? `${balanceDays} Days` : "-"; // Return "-" if balance is negative
+    const balanceMonths = totalMonths - completedMonths;
+    return (balanceMonths >= 0 && balanceMonths !== 0) ? `${balanceMonths} months` : "Few days more";
   };
-
+  
   const contractExpiryMergedData = (data) => {
-    const today = new Date(); // Current date
-    const oneMonthFromNow = new Date();
-    oneMonthFromNow.setDate(today.getDate() + 30); // Add 30 days to the current date
+    const today = new Date();
+  
+    // Start date should be the first day of the next month (excluding current month)
+    const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    
+    // End date should be the last day of the second month after today
+    const endOfTwoMonthsAfter = new Date(today.getFullYear(), today.getMonth() + 3, 0);
   
     return data
       .filter((item) => {
-        const contractEndDates = item.contractEnd || []; // Ensure it's an array
-        const lastDate = contractEndDates[contractEndDates.length - 1]; // Get the last date
-        // Filter for contracts expiring within the next 30 days
-        return lastDate && new Date(lastDate) >= today && new Date(lastDate) <= oneMonthFromNow;
+        const contractEndDates = item.contractEnd || [];
+        const lastDate = contractEndDates[contractEndDates.length - 1];
+        if (!lastDate) return false;
+  
+        const contractEnd = new Date(lastDate);
+  
+        // Check if the contractEndDate is between the start of next month and the last day of two months after today
+        return contractEnd >= startOfNextMonth && contractEnd <= endOfTwoMonthsAfter;
       })
       .map((item) => {
         const contractEndDates = item.contractEnd || [];
-        const lastDate = contractEndDates[contractEndDates.length - 1]; // Get the last element safely
+        const lastDate = contractEndDates[contractEndDates.length - 1];
         const contractStartDates = item.contractStart || [];
-        const startDate = contractStartDates[contractStartDates.length - 1]; // Get the last element safely
+        const startDate = contractStartDates[contractStartDates.length - 1];
   
-        const balanceDays = calculateBalanceDays(startDate, lastDate);
+        const balanceMonths = calculateBalanceMonths(startDate, lastDate);
   
-        return [
-          item.name || "-",
-          item.empBadgeNo || "-",
-          item.nationality || "-",
-          formatDate(item.doj) || "-", // Format Date of Joined
-          item.department || "-",
-          item.position || "-",
-          formatDate(startDate) || "-", // Format Contract Start Date
-          formatDate(lastDate) || "-", // Format Contract End Date
-          formatDate(item.nlmsEmpValid) || "-",
-          balanceDays, // Store the calculated balance Days
-        ];
+        return {
+          name: item.name || "-",
+          empID: item.empID || "-",
+          empBadgeNo: item.empBadgeNo || "-",
+          nationality: item.nationality || "-",
+          doj: formatDate(item.doj) || "-",
+          department: item.department || "-",
+          position: item.position || "-",
+          contractStartDate: formatDate(startDate) || "-",
+          contractEndDate: formatDate(lastDate) || "-",
+          nlmsEmpValid: Array.isArray(item.nlmsEmpValid)
+            ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
+            : "-",
+          balanceMonths: balanceMonths,
+        };
       });
   };
   

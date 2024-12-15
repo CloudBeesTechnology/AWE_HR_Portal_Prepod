@@ -9,6 +9,7 @@ import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
 import { UpdateJitpaFun } from '../../../services/updateMethod/UpdateJitpaFun';
 import { DataSupply } from '../../../utils/DataStoredContext';
 import { useOutletContext } from 'react-router-dom';
+import { JitpaCreFun } from '../../../services/createMethod/JitpaCreFun';
 
 export const Jitpa = () => {
   const { searchResultData } = useOutletContext();
@@ -18,18 +19,19 @@ export const Jitpa = () => {
   }, []);
   const { BJLData } = useContext(DataSupply);
   const { UpdateJitpaData } = UpdateJitpaFun();
+  const { JitpaCreData } = JitpaCreFun();
   const { register, handleSubmit, watch,formState: { errors }, setValue } = useForm({
     resolver: yupResolver(JitpaEmpSchema),
-    tbaPurchase: [],
-    jpValid: [],
-    jpEndorse: [],
+    // tbaPurchase: [],
+    // jpValid: [],
+    // jpEndorse: [],
   });
   
   const [notification, setNotification] = useState(false);
   const [showTitle,setShowTitle]=useState("")
-  const [jpPurchaseDta,setJpPurchaseDta]=useState("")
-  const [jpValidation,setJpValidation]=useState("")
-  const [jpEndorsement,setJpEndorsement]=useState("")
+  // const [jpPurchaseDta,setJpPurchaseDta]=useState("")
+  // const [jpValidation,setJpValidation]=useState("")
+  // const [jpEndorsement,setJpEndorsement]=useState("")
 
   const [uploadedFileNames, setUploadedFileNames] = useState({
     jpEmpUpload: null,
@@ -174,18 +176,22 @@ export const Jitpa = () => {
 
 
   const onSubmit = async (data) => {
-
-    const formatDate = (date) => date ? new Date(date).toLocaleDateString('en-CA') : null;
-    const tbaPurchase = formatDate(data.tbaPurchase);
-    const jpValid = formatDate(data.jpValid);
-    const jpEndorse = formatDate(data.jpEndorse);
-
+    // console.log(data);
+    
     try {
-      let matchedEmployee = null;
-      if (empID) {
+      const matchedEmployee = BJLData.find(
+        (match) => match.empID === data.empID
+      );
 
-        matchedEmployee = BJLData.find((val) => val.empID === empID);
+      const formatDate = (date) =>
+        date ? new Date(date).toLocaleDateString("en-CA") : null; // 'en-CA' gives yyyy-mm-dd format
+      const tbaPurchase = formatDate(data.tbaPurchase);
+      const jpValid = formatDate(data.jpValid);
+      const jpEndorse = formatDate(data.jpEndorse); 
 
+
+      if (matchedEmployee) {
+        
         const updatedSubmissionDate = [
           ...new Set([
             ...(matchedEmployee.tbaPurchase || []), // ensure it's an array before spreading
@@ -206,37 +212,39 @@ export const Jitpa = () => {
              jpValid
           ]),
         ];
+
+        const JitpaValue = {
+          ...data,
+          jpValid:updatedValidDate.map(formatDate),
+        tbaPurchase:updatedSubmissionDate.map(formatDate),
+        jpEndorse:updatedEndorseDate.map(formatDate),
+        jpEmpUpload: JSON.stringify(uploadjitpa.jpEmpUpload),
+          id: matchedEmployee.id ,
+        };
   
+        await UpdateJitpaData({ JitpaValue });
+        setShowTitle("JITPA Info Updated Successfully")
+          setNotification(true);
 
-      const JitpaValue = {
-        ...data,
-        jpValid:updatedValidDate.map(formatDate),
-      tbaPurchase:updatedSubmissionDate.map(formatDate),
-      jpEndorse:updatedEndorseDate.map(formatDate),
-      jpEmpUpload: JSON.stringify(uploadjitpa.jpEmpUpload),
-        id: matchedEmployee ? matchedEmployee.id : null,
-      };
-
-      await UpdateJitpaData({ JitpaValue });
-      setShowTitle("JITPA Info Saved Successfully")
+      } else {
+        const creJitpaValue = {
+          ...data,
+          jpValid,
+        tbaPurchase,
+        jpEndorse,
+        jpEmpUpload: JSON.stringify(uploadjitpa.jpEmpUpload),
+        };
+        // console.log(creJitpaValue);
+  
+        await JitpaCreData({ creJitpaValue });
+        setShowTitle("JITPA Info Saved Successfully");
         setNotification(true);
-        
-    } else {
-      console.log("error")
-    }
-    } catch (error) {
-      console.log(error);
-
-      if (error?.errors) {
-        error.errors.forEach((err, index) => {
-          console.error(`GraphQL Error ${index + 1}:`, err.message);
-          if (err.extensions) {
-            console.error("Error Extensions:", err.extensions);
-          }
-        });
       }
+    } catch (error) {
+      console.error("Error submitting data:", error);
     }
   };
+
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="mx-auto min-h-screen p-2 my-10 bg-[#F5F6F1CC]">

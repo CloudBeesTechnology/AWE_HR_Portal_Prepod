@@ -1,4 +1,5 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useEffect } from "react";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form"; // Import useForm from react-hook-form
 import logo from "../../assets/logo/logo-with-name.svg";
 import { ConfirmationForm } from './ConfirmationForm';
@@ -6,19 +7,106 @@ import { ContractChoose } from "./ContractChoose";
 import { useLocation } from "react-router-dom";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { useState } from "react";
+import { ProbFormFun } from "../../services/createMethod/ProbFormFun";
+import { UpdateProbForm } from "../../services/updateMethod/UpdateProbForm";
+import {probationFormSchema} from "../../services/ReportValidation"
+import { DataSupply } from "../../utils/DataStoredContext";
+import { useContext } from "react";
 
 export const ProbationForm = forwardRef(() => {
+
+   const { empPIData,workInfoData,  ProbFData} =
+     useContext(DataSupply);
+   useEffect(() => {
+     window.scrollTo({ top: 0, behavior: "smooth" });
+   }, []);
+
+  const { ProbFormsData } = ProbFormFun();
+    const { UpdateProb } = UpdateProbForm();
+
+    const {
+      register,
+      handleSubmit,
+      formState: { errors },
+    } = useForm({
+      resolver: yupResolver(probationFormSchema),
+     
+    });
+
   const location = useLocation();
   const [notification, setNotification] = useState(false);
   const [showTitle,setShowTitle]=useState("")
   const { employeeData } = location.state || {};
-  const { register, handleSubmit } = useForm(); // Initialize useForm
+  const [userDetails, setUserDetails] = useState([]);
+  const [allEmpDetails, setAllEmpDetails] = useState([]);
+  // const [filteredEmployees, setFilteredEmployees] = useState([]);
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
-    setShowTitle("Report  Probation Form Info  Save successfully")
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const mergedData = empPIData
+          .map((emp) => {
+            const WIDetails = workInfoData
+              ? workInfoData.find((user) => user.empID === emp.empID)
+              : {};
+            const provDetails = ProbFData
+              ? ProbFData.find((user) => user.empID === emp.empID)
+              : {};
+        
+
+            return {
+              ...emp,
+              ...WIDetails,
+            ...provDetails
+            };
+          })
+          .filter(Boolean);
+
+        setUserDetails(mergedData);
+        setAllEmpDetails(mergedData);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchData();
+  }, [empPIData, workInfoData, ProbFData]); 
+
+
+  const onSubmit = async (data) => {
+    console.log("Form data:", data);
+
+    try {
+      const PFDataRecord = ProbFData
+        ? ProbFData.find((match) => match.empID === data.empID)
+        : {};
+
+      if (PFDataRecord) {
+        const TMRDataUp = {
+          ...data,
+          id: PFDataRecord.id,
+        };
+        console.log(TMRDataUp);
+
+        await UpdateProb({ TMRDataUp });
+        setShowTitle("Probation Form Updated successfully");
         setNotification(true);
+      } else {
+        const ProbValue = {
+          ...data,
+        };
+        console.log(ProbValue);
+        
+        await ProbFormsData({ ProbValue });
+        setShowTitle("Probation Form  Saved successfully");
+        setNotification(true);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
+
+
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="p-10 bg-white shadow-md w-full px-20 mx-auto">
@@ -120,12 +208,12 @@ export const ProbationForm = forwardRef(() => {
               <td className="p-2 border-b">
               <input
                 {...register("probationEnd")}
-                defaultValue={employeeData?.probationEnd || "-"}
+                defaultValue={employeeData?.probationEndDate || "-"}
                 className="w-full outline-none"
               />
             </td>
             </tr>
-            <tr className="border">
+            {/* <tr className="border">
               <td className="p-2 border-r font-semibold">Extended Probation End Date</td>
               <td className="p-2 border-b">
               <input
@@ -134,7 +222,7 @@ export const ProbationForm = forwardRef(() => {
                 className="w-full outline-none"
               />
             </td>
-            </tr>
+            </tr> */}
           </tbody>
         </table>
       </div>
@@ -151,13 +239,13 @@ export const ProbationForm = forwardRef(() => {
           Save
         </button>
       </div>
-      {notification && (
+      {/* {notification && (
           <SpinLogo
             text={showTitle}
             notification={notification}
             path="/reports"
           />
-        )}
+        )} */}
     </form>
   );
 });

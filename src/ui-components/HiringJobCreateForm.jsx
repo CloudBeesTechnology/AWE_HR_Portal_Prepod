@@ -30,6 +30,7 @@ export default function HiringJobCreateForm(props) {
     startDate: "",
     expiryDate: "",
     jobContent: "",
+    uploadJobDetails: "",
   };
   const [jobTitle, setJobTitle] = React.useState(initialValues.jobTitle);
   const [exper, setExper] = React.useState(initialValues.exper);
@@ -40,6 +41,9 @@ export default function HiringJobCreateForm(props) {
   const [startDate, setStartDate] = React.useState(initialValues.startDate);
   const [expiryDate, setExpiryDate] = React.useState(initialValues.expiryDate);
   const [jobContent, setJobContent] = React.useState(initialValues.jobContent);
+  const [uploadJobDetails, setUploadJobDetails] = React.useState(
+    initialValues.uploadJobDetails
+  );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setJobTitle(initialValues.jobTitle);
@@ -49,6 +53,7 @@ export default function HiringJobCreateForm(props) {
     setStartDate(initialValues.startDate);
     setExpiryDate(initialValues.expiryDate);
     setJobContent(initialValues.jobContent);
+    setUploadJobDetails(initialValues.uploadJobDetails);
     setErrors({});
   };
   const validations = {
@@ -59,6 +64,7 @@ export default function HiringJobCreateForm(props) {
     startDate: [],
     expiryDate: [],
     jobContent: [],
+    uploadJobDetails: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -93,6 +99,7 @@ export default function HiringJobCreateForm(props) {
           startDate,
           expiryDate,
           jobContent,
+          uploadJobDetails,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -162,6 +169,7 @@ export default function HiringJobCreateForm(props) {
               startDate,
               expiryDate,
               jobContent,
+              uploadJobDetails,
             };
             const result = onChange(modelFields);
             value = result?.jobTitle ?? value;
@@ -192,6 +200,7 @@ export default function HiringJobCreateForm(props) {
               startDate,
               expiryDate,
               jobContent,
+              uploadJobDetails,
             };
             const result = onChange(modelFields);
             value = result?.exper ?? value;
@@ -222,6 +231,7 @@ export default function HiringJobCreateForm(props) {
               startDate,
               expiryDate,
               jobContent,
+              uploadJobDetails,
             };
             const result = onChange(modelFields);
             value = result?.location ?? value;
@@ -252,6 +262,7 @@ export default function HiringJobCreateForm(props) {
               startDate,
               expiryDate,
               jobContent,
+              uploadJobDetails,
             };
             const result = onChange(modelFields);
             value = result?.quantityPerson ?? value;
@@ -282,6 +293,7 @@ export default function HiringJobCreateForm(props) {
               startDate: value,
               expiryDate,
               jobContent,
+              uploadJobDetails,
             };
             const result = onChange(modelFields);
             value = result?.startDate ?? value;
@@ -312,6 +324,7 @@ export default function HiringJobCreateForm(props) {
               startDate,
               expiryDate: value,
               jobContent,
+              uploadJobDetails,
             };
             const result = onChange(modelFields);
             value = result?.expiryDate ?? value;
@@ -342,6 +355,7 @@ export default function HiringJobCreateForm(props) {
               startDate,
               expiryDate,
               jobContent: value,
+              uploadJobDetails,
             };
             const result = onChange(modelFields);
             value = result?.jobContent ?? value;
@@ -355,6 +369,37 @@ export default function HiringJobCreateForm(props) {
         errorMessage={errors.jobContent?.errorMessage}
         hasError={errors.jobContent?.hasError}
         {...getOverrideProps(overrides, "jobContent")}
+      ></TextField>
+      <TextField
+        label="Upload job details"
+        isRequired={false}
+        isReadOnly={false}
+        value={uploadJobDetails}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              jobTitle,
+              exper,
+              location,
+              quantityPerson,
+              startDate,
+              expiryDate,
+              jobContent,
+              uploadJobDetails: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.uploadJobDetails ?? value;
+          }
+          if (errors.uploadJobDetails?.hasError) {
+            runValidationTasks("uploadJobDetails", value);
+          }
+          setUploadJobDetails(value);
+        }}
+        onBlur={() => runValidationTasks("uploadJobDetails", uploadJobDetails)}
+        errorMessage={errors.uploadJobDetails?.errorMessage}
+        hasError={errors.uploadJobDetails?.hasError}
+        {...getOverrideProps(overrides, "uploadJobDetails")}
       ></TextField>
       <Flex
         justifyContent="space-between"

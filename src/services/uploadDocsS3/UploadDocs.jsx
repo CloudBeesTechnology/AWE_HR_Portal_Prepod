@@ -71,7 +71,7 @@ export const uploadDocs = async (
         //     [fileType]: updatedArray,
         //   };
         // });
-      } else if (fileType === "profilePhoto" || fileType === "inducBriefUp") {
+      } else if (fileType === "profilePhoto" || fileType === "inducBriefUp" || fileType === "uploadJobDetails") {
         setUploadedDocs((prevState) => ({
           ...prevState,
           [fileType]: fileUrl,

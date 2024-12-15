@@ -3,7 +3,6 @@ import { FormField } from "../../../utils/FormField";
 export const RowThirteen = ({ register, errors }) => {
   return (
     <>
-      {" "}
       <FormField
         label="Bank Name"
         type="text"

@@ -7,15 +7,18 @@ import icons11 from "../../assets/timeSheet/icons11.svg";
 
 export const TimeSheet = () => {
   return (
-    <section className="p-16 bg-[#f5f6f1cc] ">
-      <h4 className="text_size_6 border w-fit py-2 px-4 bg-slate_grey text-white rounded">
-        Please Upload the Time Sheet
-      </h4>
+    <section className="p-16 bg-[#f5f6f1cc] h-screen">
+     
       {/* grid grid-flow-col */}
-      <div className="grid grid-cols-4  gap-10 my-5">
+      {/* <div className="grid grid-cols-4  gap-10 my-5 "></div> */}
+      <div className=" screen-size">
+      <h4 className="text_size_4  w-fit py-2    text-dark_grey ">
+        Upload Time Sheet
+      </h4>
+      <div className="flex justify-start gap-20">
         {/* ONSHORE */}
         <SelectTiles
-          img={icons5}
+          img={icons5} 
           text1="HO"
           borderColor="border-[#B70B36]"
           bgColor="bg-white"
@@ -44,7 +47,8 @@ export const TimeSheet = () => {
           link="/timesheetOffshore"
         />
       </div>
-      <div className="grid grid-cols-3 gap-10 my-5">
+      {/* <div className="flex justify-center gap-20"> */}
+      <div className="flex justify-start gap-20">
         {/* BLNG */}
         <SelectTiles
           img={icons10}
@@ -71,6 +75,8 @@ export const TimeSheet = () => {
           bgColor="bg-white"
           link="/viewSummary"
         />
+        <div></div>
+      </div>
       </div>
     </section>
   );

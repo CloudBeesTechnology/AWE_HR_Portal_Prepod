@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { GoDotFill } from "react-icons/go";
 import { Link } from "react-router-dom";
 import * as XLSX from "xlsx";
@@ -27,10 +27,11 @@ import { UploadEditedSBW } from "../pages/timeSheet/uploadManuallyEditedExcel/Up
 const client = generateClient();
 export const TimeSheetBrowser = ({ title }) => {
   const fileInputRef = useRef(null);
+  const [error, setError] = useState("");
   const [fileName, setFileName] = useState("");
   const [closeSavedModel, setCloseSavedModel] = useState(false);
   const [fileNameForSuccessful, setFileNameForSuccessful] = useState("");
-  const [ensureExcelFile, setEnsureExcelFile] = useState(false);
+  const [ensureExcelFile, setEnsureExcelFile] = useState(true);
   const [excelFile, setExcelFile] = useState(null);
   const [typeError, setTypeError] = useState(null);
   const [returnedTHeader, setReturnedTHeader] = useState();
@@ -43,7 +44,6 @@ export const TimeSheetBrowser = ({ title }) => {
   //   []
   // );
 
-  const [blngData, setBlngData] = useState();
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
     setExcelData(null);
@@ -55,6 +55,7 @@ export const TimeSheetBrowser = ({ title }) => {
       setTitleName(title);
     }
   }, [isChecked]);
+
   const { convertedStringToArrayObj, getPosition } = useFetchData(titleName);
 
   // Convert string to array of object
@@ -252,8 +253,26 @@ export const TimeSheetBrowser = ({ title }) => {
   //   };
   // }, [callBLNGgetMethod]);
 
+  const handleForErrorMsg = (e) => {
+    const file = e.target.files[0];
+    const allowedExtensions = ["xlsx", "xls"];
+
+    if (file) {
+      const fileExtension = file.name.split(".").pop().toLowerCase();
+      if (!allowedExtensions.includes(fileExtension)) {
+        setError("Please upload a valid Excel file.");
+        e.target.value = ""; // Clear the input field
+      } else {
+        setError("");
+        // Handle the valid Excel file upload logic here
+        // console.log("Uploaded file:", file);
+      }
+    }
+  };
+
   const handleFile = (e) => {
     setFileNameForSuccessful(e.target.files[0].name);
+
     let fileType = [
       "application/vnd.ms-excel",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -262,7 +281,7 @@ export const TimeSheetBrowser = ({ title }) => {
     let selectedFile = e.target.files[0];
 
     if (selectedFile) {
-      setFileName(selectedFile.name);
+      setFileName(e.target.files[0].name);
       if (selectedFile && fileType.includes(selectedFile.type)) {
         var result = selectedFile && fileType.includes(selectedFile.type);
 
@@ -292,7 +311,7 @@ export const TimeSheetBrowser = ({ title }) => {
   // }, [loading]);
   // Onshore
   const UploadFile = async () => {
-    // try {
+    try {
     if (titleName === "Offshore") {
       const result = UploadOffshoreFile(
         excelFile,
@@ -360,8 +379,7 @@ export const TimeSheetBrowser = ({ title }) => {
           fileInputRef,
           setLoading
         );
-        console.log("Yes it works");
-        console.log();
+        
         setReturnedTHeader(editedResult);
       }
 
@@ -414,9 +432,9 @@ export const TimeSheetBrowser = ({ title }) => {
       fileInputRef.current.value = "";
       setExcelFile(null);
     }
-    // } catch {
-    //   console.log("ERROR");
-    // }
+    } catch(err) {
+      console.log("ERROR", err);
+    }
   };
 
   const clearUseRefObject = () => {
@@ -429,7 +447,7 @@ export const TimeSheetBrowser = ({ title }) => {
   };
 
   return (
-    <div className="p-10 bg-[#fafaf6] min-h-screen">
+    <div className="p-10 bg-[#fafaf6] min-h-screen  flex-col items-center">
       <div>
         <Link to="/timeSheet" className="text-xl flex-1 text-grey ">
           <FaArrowLeft />
@@ -473,7 +491,9 @@ export const TimeSheetBrowser = ({ title }) => {
                     <div>
                       <button
                         className="text_size_4 border-[#30303080] border-2 py-1 px-10 text-dark_grey rounded-md bg-[#FEF116]"
-                        onClick={handleImageClick}
+                        onClick={() => {
+                          handleImageClick();
+                        }}
                       >
                         Upload
                       </button>
@@ -529,7 +549,11 @@ export const TimeSheetBrowser = ({ title }) => {
                   ref={fileInputRef}
                   type="file"
                   className="hidden"
-                  onChange={handleFile}
+                  onChange={(e) => {
+                    handleFile(e);
+                    handleForErrorMsg(e);
+                  }}
+                  accept=".xls,.xlsx"
                 />
               </div>
             </div>
@@ -537,8 +561,8 @@ export const TimeSheetBrowser = ({ title }) => {
         </div>
       </div>
 
-      {!ensureExcelFile && (
-        <div className="flex flex-col items-center">
+      {error && (
+        <div className="flex items-center justify-center ">
           <Popup
             fileName={fileName}
             ensureExcelFile={ensureExcelFile}
@@ -550,9 +574,17 @@ export const TimeSheetBrowser = ({ title }) => {
           />
         </div>
       )}
+
+   <div>
+   {loading === true && (
+            <div className="flex justify-center items-center text_size_5 text-dark_grey m-2">
+              <p>Please wait a few seconds.....</p>
+            </div>
+          )}
+   </div>
       {excelData && (
         <div>
-          {" "}
+         {" "}
           {/* <TSRawTable excelData={excelData} /> */}
           {/* <ViewTSTBeforeSave
             excelData={excelData}
@@ -564,20 +596,24 @@ export const TimeSheetBrowser = ({ title }) => {
           /> */}
           {titleName === "Offshore" && (
             <ViewTSTBeforeSave
+             
               setExcelData={setExcelData}
               excelData={excelData}
               returnedTHeader={returnedTHeader}
               Position={getPosition}
               titleName={titleName}
+              fileName={fileNameForSuccessful}
             />
           )}
           {titleName === "HO" && (
             <ViewHOsheet
+              
               setExcelData={setExcelData}
               excelData={excelData}
               returnedTHeader={returnedTHeader}
               Position={getPosition}
               titleName={titleName}
+              fileName={fileNameForSuccessful}
             />
           )}
           {titleName === "SBW" && (
@@ -587,6 +623,7 @@ export const TimeSheetBrowser = ({ title }) => {
               returnedTHeader={returnedTHeader}
               Position={getPosition}
               titleName={titleName}
+              fileName={fileNameForSuccessful}
             />
           )}
           {titleName === "ORMC" && (
@@ -596,6 +633,7 @@ export const TimeSheetBrowser = ({ title }) => {
               returnedTHeader={returnedTHeader}
               Position={getPosition}
               titleName={titleName}
+              fileName={fileNameForSuccessful}
             />
           )}
           {titleName === "BLNG" && (
@@ -605,6 +643,7 @@ export const TimeSheetBrowser = ({ title }) => {
               returnedTHeader={returnedTHeader}
               Position={getPosition}
               titleName={titleName}
+              fileName={fileNameForSuccessful}
             />
           )}
         </div>
@@ -615,6 +654,7 @@ export const TimeSheetBrowser = ({ title }) => {
           returnedTHeader={null}
           convertedStringToArrayObj={convertedStringToArrayObj}
           Position={getPosition}
+          fileName={fileNameForSuccessful}
         />
       )}
       {!excelData && getPosition === "Manager" && titleName === "HO" && (
@@ -623,6 +663,7 @@ export const TimeSheetBrowser = ({ title }) => {
           returnedTHeader={null}
           convertedStringToArrayObj={convertedStringToArrayObj}
           Position={getPosition}
+          fileName={fileNameForSuccessful}
         />
       )}
       {!excelData && getPosition === "Manager" && titleName === "SBW" && (
@@ -631,6 +672,7 @@ export const TimeSheetBrowser = ({ title }) => {
           returnedTHeader={null}
           convertedStringToArrayObj={convertedStringToArrayObj}
           Position={getPosition}
+          fileName={fileNameForSuccessful}
         />
       )}
       {!excelData && getPosition === "Manager" && titleName === "ORMC" && (
@@ -639,6 +681,7 @@ export const TimeSheetBrowser = ({ title }) => {
           returnedTHeader={null}
           convertedStringToArrayObj={convertedStringToArrayObj}
           Position={getPosition}
+          fileName={fileNameForSuccessful}
         />
       )}
       {!excelData && getPosition === "Manager" && titleName === "Offshore" && (
@@ -647,6 +690,7 @@ export const TimeSheetBrowser = ({ title }) => {
           returnedTHeader={null}
           convertedStringToArrayObj={convertedStringToArrayObj}
           Position={getPosition}
+          fileName={fileNameForSuccessful}
         />
       )}
       {closeSavedModel && (
@@ -656,11 +700,6 @@ export const TimeSheetBrowser = ({ title }) => {
             setCloseSavedModel={setCloseSavedModel}
             // backToHome={backToHome}
           />
-        </div>
-      )}
-      {loading === true && (
-        <div className="flex justify-center items-center text_size_5 text-dark_grey m-2">
-          <p>Please wait a few seconds.....</p>
         </div>
       )}
     </div>

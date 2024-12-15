@@ -7,9 +7,9 @@ import { SpinLogo } from "../../../utils/SpinLogo";
 import { SubmitInterviewSchedule } from "../../../services/createMethod/SubmitInterviewSchedule";
 import { FormField } from "../../../utils/FormField";
 
-const client = generateClient();
+// const client = generateClient();
 
-export const ScheduleInter = ({ candidate, onClose, onSave }) => {
+export const ScheduleInter = ({ candidate, onClose }) => {
   const [notification, setNotification] = useState(false);
   const {
     register,
@@ -24,12 +24,12 @@ export const ScheduleInter = ({ candidate, onClose, onSave }) => {
   const onSubmit = handleSubmit(async (data) => {
     const formattedData = {
       ...data,
-      interDate: new Date(data.interDate), 
-      tempID: candidate.tempID, 
-      candidateStatus: "pending", 
-    };
+      interDate: new Date(data.interDate),
+      tempID: candidate.tempID,
+      candidateStatus: "pending",
+    }; 
 
-    // console.log("Formatted Data:", formattedData);
+    console.log("Formatted Data:", formattedData);
 
     // setNotification(true);
     await createSchedule(formattedData);
@@ -105,29 +105,29 @@ export const ScheduleInter = ({ candidate, onClose, onSave }) => {
             register={register}
             errors={errors}
           />
-<div className="mt-4">
-  <label className="text-dark_grey text-[16px] underline font-semibold block mb-2">
-    Assign Interviewer :
-  </label>
-  <div className="grid grid-cols-2 gap-4">
-    <FormField
-      name="empBadgeNo"
-      type="text"
-      label="Badge No"
-      placeholder="Enter Badge Number"
-      register={register}
-      errors={errors}
-    />
-    <FormField
-      name="manager"
-      type="text"
-      label="Manager Name"
-      placeholder="Enter Manager Name"
-      register={register}
-      errors={errors}
-    />
-  </div>
-</div>
+          <div className="mt-4">
+            <label className="text-dark_grey text-[16px] underline font-semibold block mb-2">
+              Assign Interviewer :
+            </label>
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                name="bagdeNo"
+                type="text"
+                label="Badge No"
+                placeholder="Enter Badge Number"
+                register={register}
+                errors={errors}
+              />
+              <FormField
+                name="manager"
+                type="text"
+                label="Manager Name"
+                placeholder="Enter Manager Name"
+                register={register}
+                errors={errors}
+              />
+            </div>
+          </div>
           <FormField
             name="message"
             type="textarea"

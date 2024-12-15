@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
+import logo from "../../../assets/logo/logo-with-name.svg"
 export const PopupForAssignManager = ({
   toggleFunctionForAssiMana,
   renameKeysFunctionAndSubmit,
@@ -61,15 +62,15 @@ export const PopupForAssignManager = ({
     // </section>
     <section className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white w-[90%] max-w-[500px] rounded-lg shadow-lg p-7 ">
-        <div className="flex justify-center pb-5 ">
+        <div className=" flex items-center justify-between pb-5 ">
           <img
-            className="size-32 h-12 w-full "
-            src="/src/assets/logo/logo-with-name.svg"
+            className="max-w-[220px] w-full  "
+            src={logo}
              
             alt="not found"
           />
           <RxCross2
-            className="text-2xl text-dark_grey cursor-pointer "
+            className="text-2xl  text-dark_grey cursor-pointer "
             onClick={() => {
               toggleFunctionForAssiMana();
             }}

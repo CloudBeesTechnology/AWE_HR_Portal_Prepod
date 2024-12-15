@@ -130,7 +130,8 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
   const {
     empStatusType,
     workmenCompNo,
-
+    bankAccNo,
+    bankName,
     age,
     email,
     aTQualify,
@@ -369,6 +370,8 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Previous Employment Details": preEmp,
     "Previous Employment Period": preEmpPeriod,
     "Date of Induction Briefing": formatDate(inducBrief),
+    "Bank name": bankName,
+    "Bank account number":bankAccNo,
   };
 
   const employeeDocument = {
@@ -495,8 +498,8 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       "Position Revision Effective Date": formatDate(positionRevDate),
       "Salary Package Revision": revSalary,
       "Salary Package Revision Effective Date": formatDate(revSalaryDate),  
-      "Leave Passage Revision": formatDate(revLeaveDate),
-      "Leave Passage Revision Effective Date": revLeavePass,
+      "Leave Passage Revision": revLeavePass,
+      "Leave Passage Revision Effective Date":formatDate(revLeaveDate),
       "Annual Leave Revison": revAnnualLeave,
       "Annual Leave Revison Effective Date": formatDate(revALD),
       "Change of Department": depEmp,

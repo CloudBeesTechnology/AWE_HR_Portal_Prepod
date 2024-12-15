@@ -146,7 +146,7 @@ const PersonalDetailsView = ({
               document.upload.endsWith(".pdf") && (
                 <div className="mt-4">
                   <div className="relative bg-white max-w-3xl mx-auto p-6 rounded-lg shadow-lg">
-                    <div  className="flex justify-center">
+                    <div  ref={invoiceRef} className="flex justify-center">
                       <Worker
                        workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
                       >
@@ -182,7 +182,7 @@ const PersonalDetailsView = ({
                     </div>
                     <div className="mt-2 flex">
                       <button
-                        onClick={() => window.print()} 
+                        onClick={handlePrint} 
                         className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
                       >
                         Print

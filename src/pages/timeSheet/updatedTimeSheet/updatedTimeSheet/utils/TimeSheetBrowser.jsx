@@ -1,14 +1,14 @@
 import { useRef, useState } from "react";
 import { GoDotFill } from "react-icons/go";
 
-import { Popup } from "../pages/timeSheet/Popup";
-import { PopupForSave } from "../pages/timeSheet/PopupForSave";
-import { ViewTSTBeforeSave } from "../pages/timeSheet/ViewTSTBeforeSave";
+import { PopupForSave } from "../../../PopupForSave";
+import { ViewTSTBeforeSave } from "../../../ViewTSTBeforeSave";
 import { UploadOffshoreFile } from "./UploadOffshoreFile";
 
 import { UploadOnshoreFile } from "./UploadOnshoreFile";
-import { ViewOnshoreTSheet } from "../pages/timeSheet/ViewOnshoreTSheet";
+import { ViewOnshoreTSheet } from "../../../ViewOnshoreTSheet";
 import { Link } from "react-router-dom";
+import { Popup } from "../../../Popup";
 export const TimeSheetBrowser = ({ title }) => {
   const fileInputRef = useRef(null);
 

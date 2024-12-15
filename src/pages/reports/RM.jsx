@@ -23,26 +23,28 @@ export const RM = ({allData,typeOfReport,reportTitle}) => {
   // Generate table body dynamically from mergedData
   const generateTableBodyFromMergedData = (data) => {
     console.log(data);
-    
-    return data.map((item) => [
-      item.name || "-",
-      item.empBadgeNo || "-",
-      item.gender || "-",
-      item.dob || "-",
-      item.doj || "-",
-      item.nationality || "-",
-      item.position || "-",
-      item.contactNo || "-",
-      item.bwnIcNo || "-",
-      item.ppNo || "-",
-      item.ppExpiry || "-",
-      item.department || "-",
-      item.contractStart || "-",
-      item.contractEnd || "-",
-      item.preEmp || "-",
-    ]);
+  
+    return data.map((item) => {
+      return {
+        name: item.name || "-",
+        empBadgeNo: item.empBadgeNo || "-",
+        gender: item.gender || "-",
+        dob: item.dob || "-",
+        doj: item.doj || "-",
+        nationality: item.nationality || "-",
+        position: item.position || "-",
+        contactNo: item.contactNo || "-",
+        bwnIcNo: item.bwnIcNo || "-",
+        ppNo: item.ppNo || "-",
+        ppExpiry: item.ppExpiry || "-",
+        department: item.department || "-",
+        contractStart: item.contractStart || "-",
+        contractEnd: item.contractEnd || "-",
+        preEmp: item.preEmp || "-",
+      };
+    });
   };
-
+  
   useEffect(()=>{
     
       setTableBody(generateTableBodyFromMergedData(allData))

@@ -4,19 +4,18 @@ import { createTrainingCertificates } from "../../graphql/mutations";
 
 export const TCDataFun = () => {
   const client = generateClient();
-  const SubmitMPData = useCallback(async ({ TCValue  }) => {
+  const TCData = useCallback(async ({ TCValue  }) => {
     if (!TCValue ) {
       throw new Error("Missing required parameters");
     }
     const totalData = {
       empID:TCValue.empID,
-      courseCode:[TCValue.courseCode],
-      courseName:[TCValue.courseName],
-      company:[TCValue.company],
       certifiExpiry:[TCValue.certifiExpiry],
       eCertifiDate:[TCValue.eCertifiDate],
       trainingUpCertifi: [JSON.stringify(TCValue.trainingUpCertifi)],
       orgiCertifiDate:[TCValue.orgiCertifiDate],
+      poNo: [TCValue.poNo],
+      addDescretion: [TCValue.addDescretion]
     };
     console.log(totalData);
 
@@ -36,5 +35,5 @@ export const TCDataFun = () => {
          throw error; // Rethrow error if needed
        }
   }, []);
-  return { SubmitMPData };
+  return { TCData };
 };

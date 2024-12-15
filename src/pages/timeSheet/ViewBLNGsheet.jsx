@@ -2,21 +2,23 @@ import React, { useCallback, useEffect, useState } from "react";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
 import { EditTimeSheet } from "./EditTimeSheet";
 import { generateClient } from "@aws-amplify/api";
-import {
-  createBlng,
-  deleteBlng,
-  deleteHeadOffice,
-  updateBlng,
-} from "../../graphql/mutations";
+// import {
+//   createBlng,
+//   deleteBlng,
+//   deleteHeadOffice,
+//   updateBlng,
+// } from "../../graphql/mutations";
 
 import { listBlngs, listEmpWorkInfos } from "../../graphql/queries";
 import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
 import { SuccessMessage } from "./ModelForSuccessMess/SuccessMessage";
 import { PopupForMissMatchExcelSheet } from "./ModelForSuccessMess/PopupForMissMatchExcelSheet";
-import { useScrollableView } from "./customTimeSheet/UseScrollableView";
+
 import "../../../src/index.css";
 import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
 import { PopupForAssignManager } from "./ModelForSuccessMess/PopupForAssignManager";
+import { createTimeSheet, updateTimeSheet } from "../../graphql/mutations";
+import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
 const client = generateClient();
 
 export const ViewBLNGsheet = ({
@@ -26,7 +28,9 @@ export const ViewBLNGsheet = ({
   titleName,
   setExcelData,
   Position,
+  fileName,
 }) => {
+  const uploaderID = localStorage.getItem("userID")?.toUpperCase();
   const [data, setData] = useState(null);
   const [secondaryData, setSecondaryData] = useState(null);
   const [currentStatus, setCurrentStatus] = useState(null);
@@ -39,7 +43,7 @@ export const ViewBLNGsheet = ({
 
   const [showStatusCol, setShowStatusCol] = useState(null);
 
-  const { handleScroll, visibleData, setVisibleData } = useScrollableView(
+  const { handleScroll, visibleData, setVisibleData } = UseScrollableView(
     data,
     Position
   );
@@ -140,15 +144,7 @@ export const ViewBLNGsheet = ({
           };
         });
 
-      // if (Position === "Manager") {
-      //   const getData = result.map((val) => {
-      //     return val.data.map((m) => m);
-      //   });
-      //   // console.log("poiuytrelkjh : ", getData.flat().flat());
-      //   // setData(k);
-      //   const finalResult = getData.flat().flat();
-      //   console.log(finalResult);
-      // }
+   
 
       setData(result);
       setSecondaryData(result);
@@ -260,7 +256,7 @@ export const ViewBLNGsheet = ({
 
           if (userIdentification === "Manager") {
             const finalData = await SendDataToManager(filterPending);
-
+            console.log(finalData)
             pendingData(finalData);
           }
         } catch (err) {
@@ -326,113 +322,10 @@ export const ViewBLNGsheet = ({
     setData(result);
   };
 
-  // const fieldObj = {
-  //   FID: null,
-  //   NAMEFLAST: null,
-  //   ENTRANCEDATEUSED: null,
-  //   ENTRANCEDATETIME: null,
-  //   EXITDATETIME: null,
-  //   DAYDIFFERENCE: null,
-  //   AVGDAILYTOTALBYDAY: null,
-  //   AHIGHLIGHTDAILYTOTALBYGROUP: null,
-  //   ADININWORKSENGINEERINGSDNBHD: null,
-  //   NORMALWORKINGHRSPERDAY: null,
-  //   WORKINGHOURS: null,
-  //   OT: null,
-  //   REMARKS: null,
-  // };
-
-  // const fields = [
-  //   "FID",
-  //   "NAMEFLAST",
-  //   "ENTRANCEDATEUSED",
-  //   "ENTRANCEDATETIME",
-  //   "EXITDATETIME",
-  //   "DAYDIFFERENCE",
-  //   "AVGDAILYTOTALBYDAY",
-  //   "AHIGHLIGHTDAILYTOTALBYGROUP",
-  //   "ADININWORKSENGINEERINGSDNBHD",
-  //   "NORMALWORKINGHRSPERDAY",
-  //   "WORKINGHOURS",
-  //   "OT",
-  //   "REMARKS",
-  // ];
-
-  // const tableHeader = [
-  //   "FID",
-  //   "NAME (FLAST)",
-  //   "ENTRANCE DATE USED",
-  //   "ENTRANCE DATETIME",
-  //   "EXIT DATETIME",
-  //   "DAY DIFFERENCE",
-  //   "AVG. DAILY TOTAL BY DAY",
-  //   "A HIGHLIGHT DAILY TOTAL BY GROUP",
-  //   "ADININ WORK & ENGINEERING SDN BHD",
-  //   "NORMAL WORKING HRS PERDAY",
-  //   "ACTUAL WORKING HOURS",
-  //   "OT",
-  //   // "JOB CODE",
-  //   // "LOCATION",
-  //   "REMARKS",
-  // ];
-  // useTableFieldData
   const AllFieldData = useTableFieldData(titleName);
 
   const renameKeysFunctionAndSubmit = async (managerData) => {
-    // if (userIdentification !== "Manager") {
-    //   const result =
-    //     data &&
-    //     data.map((val) => {
-    //       return {
-    //         fid: val?.FID || 0,
-    //         name: val?.NAMEFLAST || "",
-    //         entDate: val?.ENTRANCEDATEUSED || "",
-    //         entDT: val?.ENTRANCEDATETIME || "",
-    //         exitDT: val?.EXITDATETIME || "",
-    //         day: val?.DAYDIFFERENCE || 0,
-    //         avgTotalDay: val?.AVGDAILYTOTALBYDAY || "",
-    //         totalhrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
-    //         workDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
-    //         normalWhrsPerDay: val?.NORMALWORKINGHRSPERDAY || 0,
-    //         workhrs: val?.WORKINGHOURS || 0,
-    //         OT: val?.OT || 0,
-    //         // jobCode: val?.JOBCODE || [],
-    //         // location: val?.LOCATION || [],
-    //         jobLocaWhrs: val?.jobLocaWhrs || "",
-    //         remarks: val?.REMARKS || "",
-    //       };
-    //     });
-    //   console.log(result);
-    //   //   CREATE
-    //   const currentDate = new Date().toLocaleDateString();
-    //   const weaklysheet = {
-    //     weeklySheet: JSON.stringify(result),
-    //     status: "Pending",
-    //     date: currentDate,
-    //   };
-    //   console.log(weaklysheet);
-    //   if (weaklysheet.weeklySheet) {
-    //     console.log(weaklysheet);
-    //     await client
-    //       .graphql({
-    //         query: createBlng,
-    //         variables: {
-    //           input: weaklysheet,
-    //         },
-    //       })
-    //       .then((res) => {
-    //         console.log(res);
-    //         if (res.data.createBlng) {
-    //           toggleSFAMessage(true);
-    //         }
-    //       })
-    //       .catch((err) => {
-    //         console.log(err);
-    //         toggleSFAMessage(false);
-    //       });
-    //   }
-    // }
-
+  
     if (userIdentification !== "Manager") {
       const result =
         data &&
@@ -464,21 +357,26 @@ export const ViewBLNGsheet = ({
       });
       // Function to submit a batch
       const submitBatch = async (batch, batchNumber) => {
-        const weeklySheet = {
-          weeklySheet: JSON.stringify(batch),
+        const DailySheet = {
+          dailySheet: JSON.stringify(batch),
           status: "Pending",
           date: currentDate,
+          managerDetails:JSON.stringify(managerData),
+          type:"BLNG",
+          fileName:fileName,
+          uploaderID:uploaderID,
         };
 
         try {
           const res = await client.graphql({
-            query: createBlng,
-            variables: { input: weeklySheet },
+            query: createTimeSheet,
+            variables: { input: DailySheet },
           });
 
-          if (res.data.createBlng) {
+          if (res.data.createTimeSheet) {
             // console.log("res.data.createBlng : ", res.data.createBlng);
             toggleSFAMessage(true);
+            setData(null);
           }
         } catch (err) {
           toggleSFAMessage(false);
@@ -526,38 +424,34 @@ export const ViewBLNGsheet = ({
             }),
           };
         });
-      // UPDATE
-      //   const weaklysheet = {
-      //     id: "6b22df70-9ab7-4873-9d24-9ab719347b62",
-      //     weeklySheet: JSON.stringify(result),
-      //     status: "Pending",
-      //   };
+     
 
       const result = MultipleBLNGfile.map(async (obj) => {
         const finalData = {
           id: obj.id,
-          weeklySheet: JSON.stringify(obj.weaklySheet),
+          dailySheet: JSON.stringify(obj.weaklySheet),
           status: "Approved",
         };
 
-        if (finalData.weeklySheet) {
+        if (finalData.dailySheet) {
           // console.log("Work");
           await client
             .graphql({
-              query: updateBlng,
+              query: updateTimeSheet,
               variables: {
                 input: finalData,
               },
             })
             .then((res) => {
-              if (res.data.updateBlng) {
+              if (res.data.updateTimeSheet) {
                 toggleSFAMessage(true);
                 setVisibleData([]);
-                setData("res.data.updateBlng : ", res.data.updateBlng);
-                // setData(null);
+                // setData("res.data.updateBlng : ", res.data.updateBlng);
+                setData(null);
               }
             })
             .catch((err) => {
+              console.log(err)
               toggleSFAMessage(false);
             });
         }
@@ -567,13 +461,7 @@ export const ViewBLNGsheet = ({
 
   return (
     <div>
-      {/* {loading === true && (
-        <div className="flex justify-center items-center">
-          <p className="text_sixe_1 text-dark_grey">
-            Please wait few seconds...
-          </p>
-        </div>
-      )} */}
+      
       <div>
         {currentStatus === true ? (
           <div>
@@ -707,11 +595,11 @@ export const ViewBLNGsheet = ({
                   ) : (
                     <tr>
                       <td
-                        colSpan="15"
-                        className="text-center text-dark_ash text_size_5"
+                        colSpan="100%"
+                        className="text-center text-dark_ash text_size_5 bg-white"
                       >
                         <p className="px-6 py-6">
-                          No Table Data Available Here
+                        No Table Data Available Here.
                         </p>
                       </td>
                     </tr>
@@ -732,58 +620,7 @@ export const ViewBLNGsheet = ({
                 onClick={() => {
                   if (userIdentification !== "Manager") {
                     toggleFunctionForAssiMana();
-                    // const fetchData = async () => {
-                    //   console.log("I am calling You");
-                    //   // Fetch the BLNG data using GraphQL
-                    //   const [fetchBLNGdata] = await Promise.all([
-                    //     client.graphql({
-                    //       query: listBlngs,
-                    //     }),
-                    //   ]);
-                    //   const BLNGdata = fetchBLNGdata?.data?.listBlngs?.items;
-                    //   console.log("BLNGdata : ", BLNGdata);
-                    //   const deleteFunction =
-                    //     BLNGdata &&
-                    //     BLNGdata.map(async (m) => {
-                    //       const dailySheet = {
-                    //         id: m.id,
-                    //       };
-                    //       await client
-                    //         .graphql({
-                    //           query: deleteBlng,
-                    //           variables: {
-                    //             input: dailySheet,
-                    //           },
-                    //         })
-                    //         .then((res) => {
-                    //           console.log(res);
-                    //         })
-                    //         .catch((err) => {
-                    //           console.log(err);
-                    //         });
-                    //     });
-                    // };
-                    // fetchData();
-                    // FOR DELETE
-                    // const deleteFunction = async () => {
-                    //   const weaklysheet = {
-                    //     id: "388e8f75-fadb-4398-9430-9c250331ac41",
-                    //   };
-                    //   await client
-                    //     .graphql({
-                    //       query: deleteBlng,
-                    //       variables: {
-                    //         input: weaklysheet,
-                    //       },
-                    //     })
-                    //     .then((res) => {
-                    //       console.log(res);
-                    //     })
-                    //     .catch((err) => {
-                    //       console.log(err);
-                    //     });
-                    // };
-                    // deleteFunction();
+                    
                   } else if (userIdentification === "Manager") {
                     renameKeysFunctionAndSubmit();
                   }

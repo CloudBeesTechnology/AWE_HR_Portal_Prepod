@@ -6,7 +6,7 @@ export const SearchDisplayForTimeSheet = ({
   searchIcon1,
   searchIcon2,
   placeholder,
-  rounded,
+  rounded,  
   setDrpValue,
   searchedValue,
   id,

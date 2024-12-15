@@ -1,85 +1,83 @@
-import React, { useContext, useEffect, useRef,useState } from "react";
+import { useContext, useEffect,useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { trainingCertificatesValidationSchema } from "../../../services/TrainingValidation";
+import { trainingCertificatesValidation } from "../../../services/TrainingValidation";
 import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
-import { GoUpload } from "react-icons/go";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { TCDataFun } from "../../../services/createMethod/TCDataFun";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { FileUploadField } from "../../employees/medicalDep/FileUploadField";
-import { useOutletContext } from "react-router-dom";
+import { SearchDisplay } from "../../../utils/SearchDisplay";
+import { IoSearch } from "react-icons/io5";
+import { FormField } from "../../../utils/FormField";
+import { TCDataUpdate } from "../../../services/updateMethod/TCDataUpdate";
 
 export const TrainingCertificatesForm = () => {
-  // const { searchResultData } = useOutletContext();
+  const { empPIData, workInfoData, trainingCertifi, AddEmpReq} =useContext(DataSupply);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
-  const { SubmitMPData } = TCDataFun();
+  const { TCData } = TCDataFun();
+  const { TCDataFunUp } = TCDataUpdate(); 
   const [notification, setNotification] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false); // State for the modal
-  const { AddCourseDetails } = useContext(DataSupply); // Access AddCourseDetails from context
-  const [selectedCourse, setSelectedCourse] = useState(null); // Track selected course
+  const [userDetails, setUserDetails] = useState([]);
+  const [allEmpDetails, setAllEmpDetails] = useState([]);
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [showTitle, setShowTitle] = useState("");
 
- 
   const [uploadedFileNames, setUploadedFileNames] = useState({
     trainingUpCertifi: null,
- 
   });
   const [uploadeTC, setUploadTC] = useState({
     trainingUpCertifi: null,
   });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const mergedData = empPIData
+          .map((emp) => {
+            const WIDetails = workInfoData
+              ? workInfoData.find((user) => user.empID === emp.empID)
+              : {};
+            const TrainCer = trainingCertifi
+              ? trainingCertifi.find((user) => user.empID === emp.empID)
+              : {};
+            const AEReq = AddEmpReq
+              ? AddEmpReq.find((user) => user.empID === emp.empID)
+              : {};
+
+            return {
+              ...emp,
+              ...WIDetails,
+              ...TrainCer,
+              ...AEReq,
+            };
+          })
+          .filter(Boolean);
+
+        setUserDetails(mergedData);
+        setAllEmpDetails(mergedData);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchData();
+  }, [empPIData, workInfoData, trainingCertifi,AddEmpReq]);
+
   const {
     register,
     handleSubmit,setValue,watch,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(trainingCertificatesValidationSchema),
+    resolver: yupResolver(trainingCertificatesValidation),
   });
-
   
+  const watchedEmpID = watch("empID");
 
-  // const handleFileChange = async (e, type) => {
-  //   const file = e.target.files[0];
-  //   setValue(type, file); // Set file value for validation
-  //   if (file) {
-  //     if (type === "trainingUpCertifi") {
-  //       await uploadDocs(file, "trainingUpCertifi", setUploadTC, "personName");
-
-  //       setUploadedFileNames((prev) => ({
-  //         ...prev,
-  //         trainingUpCertifi: file.name, // Store the file name for display
-  //       }));
-  //     } 
-  //   }
-  // };
-
-  
-
-  const watchInducSwapUpload = watch("trainingUpCertifi", ""); // Watch the trainingUpCertifi field
-
-  const handleCourseSelectChange = (event) => {
-    const selectedValue = event.target.value;
-  
-    // Find the selected course
-    const matchedCourse = AddCourseDetails.find(
-      (course) => String(course.courseSelect) === String(selectedValue)
-    );
-  
-    setSelectedCourse(matchedCourse || null);
-  
-    if (matchedCourse) {
-      // Set form values
-      setValue("courseName", matchedCourse.courseName || "");
-      setValue("company", matchedCourse.company || "");
-    } else {
-      // Clear values if no match
-      setValue("courseName", "");
-      setValue("company", "");
-    }
-  };
-
+  const watchTCUpload = watch("trainingUpCertifi", ""); // Watch the trainingUpCertifi field
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
@@ -88,69 +86,25 @@ export const TrainingCertificatesForm = () => {
     return ""; 
   };
 
-  const getFileName = (url) => {
-    const urlObj = new URL(url);
-    const filePath = urlObj.pathname;
-    const decodedUrl = decodeURIComponent(filePath);
-
-    const fileNameWithExtension = decodedUrl.substring(
-      decodedUrl.lastIndexOf("/") + 1
-    );
-
-    return fileNameWithExtension;
+  const getFileName = (filePath) => {
+    const fileNameWithExtension = filePath.split("/").pop(); // Get file name with extension
+    const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
+    return fileName;
   };
-
-  const getLastValue = (value) =>
-    Array.isArray(value) ? value[value.length - 1] : value;
-
-  // useEffect(() => {
-  //   setValue("empID", searchResultData.empID);
-  //   const fields = ["sawpEmpLtrReci", "sawpEmpLtrReq"];
-  //   fields.forEach((field) =>
-  //     setValue(field, getLastValue(searchResultData[field]))
-  //   );
-  //   if (searchResultData && searchResultData.trainingUpCertifi) {
-  //     try {
-  //       const parsedArray = JSON.parse(searchResultData.trainingUpCertifi);
-
-  //       const parsedFiles = parsedArray.map((item) =>
-  //         typeof item === "string" ? JSON.parse(item) : item
-  //       );
-  //       console.log(parsedFiles);
-  //       setValue("trainingUpCertifi", parsedFiles);
-
-  //       setUploadTC((prev) => ({
-  //         ...prev,
-  //         trainingUpCertifi: parsedFiles, 
-  //       }));
-
-  //       setUploadedFileNames((prev) => ({
-  //         ...prev,
-  //         trainingUpCertifi:
-  //           parsedFiles.length > 0
-  //             ? getFileName(parsedFiles[parsedFiles.length - 1].upload)
-  //             : "",
-  //       }));
-  //     } catch (error) {
-  //       console.error(`Failed to parse ${searchResultData.trainingUpCertifi}:`, error);
-  //     }
-    
-  //   }
-    
-  // }, [searchResultData, setValue]);
-
+  
   const handleFileChange = async (e, label) => {
+    if (!watchedEmpID) {
+      alert("Please enter the Employee ID before uploading files.");
+      return;
+    }
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
 
     const allowedTypes = [
       "application/pdf",
-      "image/jpeg",
-      "image/png",
-      "image/jpg",
     ];
     if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      alert("Upload must be a PDF file ");
       return;
     }
 
@@ -158,7 +112,7 @@ export const TrainingCertificatesForm = () => {
     setValue(label, [...currentFiles, selectedFile]);
 
     try {
-      await uploadDocs(selectedFile, label, setUploadTC);
+      await uploadDocs(selectedFile, label, setUploadTC, watchedEmpID);
       setUploadedFileNames((prev) => ({
         ...prev,
         [label]: selectedFile.name, // Store just the file name
@@ -168,56 +122,140 @@ export const TrainingCertificatesForm = () => {
     }
   };
 
+  const getLastValue = (value) =>
+    Array.isArray(value) ? value[value.length - 1] : value;
+  
+  const searchResult = (result) => {
+    console.log("Search result:", result); // Debugging
+  
+    const keysToSet = ["empID","empBadgeNo","name","position"];
+    const fields = [
+      "department",
+      "courseCode",
+      "courseName",
+      "company",
+      "certifiExpiry",
+      "eCertifiDate",
+      "orgiCertifiDate",
+      "poNo",
+      "addDescretion"
+    ];
+    const uploadFields = ["trainingUpCertifi"];
+  
+    // Set simple fields
+    keysToSet.forEach((key) => {
+      if (result[key]) {
+        setValue(key, result[key]);
+      }
+    });
+  
+   
+    // Set other fields
+    fields.forEach((field) => {
+      const value = getLastValue(result[field]);
+      if (value) {
+        setValue(field, value);
+      }
+    });
+  
+    // Handle upload fields
+    // uploadFields.forEach((field) => {
+    //   if (result[field]) {
+    //     try {
+    //       const parsedArray = JSON.parse(result[field][0]);
+    //       setValue(field, parsedArray);
+    //       setUploadTC((prev) => ({ ...prev, [field]: parsedArray }));
+    //       setUploadedFileNames((prev) => ({
+    //         ...prev,
+    //         [field]: getFileName(parsedArray[parsedArray.length - 1].upload),
+    //       }));
+    //     } catch (error) {
+    //       console.error(`Error parsing upload field ${field}:`, error);
+    //     }
+    //   }
+    // });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    uploadFields.forEach((field) => {
+      if (result[field]) {
+        try {
+          const parsedArray = JSON.parse(result?.[field][0]);
+          setValue(field, parsedArray);
+    
+          setUploadTC((prev) => ({ ...prev, [field]: parsedArray }));
+    
+          // Check if parsedArray is valid and non-empty
+          if (Array.isArray(parsedArray) && parsedArray.length > 0) {
+            const lastItem = parsedArray[parsedArray.length - 1];
+    
+            // Check if lastItem has the upload property
+            const fileName = lastItem?.upload
+              ? getFileName(lastItem.upload)
+              : "Unknown file";
+    
+            setUploadedFileNames((prev) => ({
+              ...prev,
+              [field]: fileName,
+            }));
+          } 
+        } catch (error) {
+          console.error(`Error parsing upload field ${field}:`, error);
+        }
+      }
+    });
+  };
+  
 
   const onSubmit = async (data) => {
     console.log("Form data:", data);
 
     try {
-      const TCValue = {
-        ...data,
-        trainingUpCertifi:uploadeTC.trainingUpCertifi
-      };
+      
+      const TCDataRecord = trainingCertifi
+        ? trainingCertifi.find((match) => match.empID === data.empID)
+        : {};
      
-      console.log("Data sucessfully stored",TCValue);
-      await SubmitMPData({ TCValue });
-      
-      // setNotification(true);
-    } catch (error) {
-      console.log(error);
-      
-      console.error("Error submitting data:", error);
+      if (
+        TCDataRecord 
+      ) {
+        const TCDataUp = {
+          ...data,
+          trainingUpCertifi:uploadeTC.trainingUpCertifi,
+          id: TCDataRecord.id,  
+        };
+        console.log(TCDataUp);
+
+        await TCDataFunUp({ TCDataUp });
+        setShowTitle("Training Certificates Updated successfully");
+        setNotification(true);
+      } else {
+        const TCValue = {
+          ...data,
+          trainingUpCertifi:uploadeTC.trainingUpCertifi,
+        };
+        await TCData({ TCValue });
+        setShowTitle("Training Certificates Saved successfully");
+        setNotification(true);
+      }
+    } catch (err) {
+      console.log(err);
     }
   };
 
   return (
-    <section className="center flex-col gap-16 bg-[#F8F8F8]">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 screen-size bg-white py-5 px-8 rounded-xl  text_size_6 text-dark_grey">
-
+    <section className="mt-10 space-y-5 screen-size bg-white py-5 px-8 rounded-xl  text_size_6 text-dark_grey">
+        <div className="w-[30%] mt-5" >
+          <SearchDisplay
+            searchResult={searchResult}
+            newFormData={allEmpDetails}
+            searchIcon2={<IoSearch />}
+            placeholder="Employee Id"
+            rounded="rounded-lg"
+            filteredEmployees={filteredEmployees}
+            setFilteredEmployees={setFilteredEmployees}
+          />
+        </div>
+      <form onSubmit={handleSubmit(onSubmit)} >
+     
       <div className="flex justify-end  items-center py-5 mt-2">
           <div className="max-w-sm">
             <label className="text_size_5">Employee ID</label> <br />
@@ -237,102 +275,92 @@ export const TrainingCertificatesForm = () => {
 
           <div className="mb-2">
             <label className="text_size_5">Employee Name</label>
-            <input type="text" {...register("employeeName")} className="input-field"/>
-          
-            {errors.employeeName && (
-              <p className="text-[red] text-[13px] mt-1">
-                {errors.employeeName.message}
-              </p>
-            )} </div>
+            <input type="text" {...register("name")} className="input-field"/>
+          </div>
 
-<div className="mb-2">
+          <div className="mb-2">
             <label className="text_size_5">Employee Badge Number</label>
-         
             <input
             type="text"
               {...register("empBadgeNo")}
-              className="input-field"
-            />
-            {errors.empBadgeNo && (
-              <p className="text-[red] text-[13px] mt-1">
-                {errors.empBadgeNo.message}
-              </p>
-            )}
-</div>
-<div className="mb-2">
-              <label className="text_size_5">Department</label>
-            <input
-              {...register("department")}
-              className="input-field"
-              type="text"
-            />
-            {errors.department && (
-              <p className="text-[red] text-[13px] mt-1">
-                {errors.department.message}
-              </p>
-            )}
-            </div>
+              className="input-field"/>    
+          </div>
 
-
+<FormField
+          label="Department"
+          register={register}
+          name="department"
+          type="text"
+          errors={errors}
+        />
+        
             <div className="mb-4">
       <label htmlFor="courseSelect" className="font-semibold">
         Select Course:
       </label>
-      <select
-        {...register("courseCode")}
-        onChange={handleCourseSelectChange}
-        className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full"
-      >
-        <option value="">Training Course Select</option>
-        {AddCourseDetails.map((course) => (
-          <option key={course.courseSelect} value={course.courseSelect}>
-            {course.courseSelect}
-          </option>
-        ))}
-      </select>
+      <input
+            type="text"
+              {...register("courseCode")}
+              className="input-field"/>    
     </div>
 
     {/* Course Name */}
     <div className="mb-4">
       <label className="text_size_5">Training Course Name</label>
-      <select
-        {...register("courseName")}
-        className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full"
-      >
-        {selectedCourse && Array.isArray(selectedCourse.courseName) ? (
-          selectedCourse.courseName.map((name, index) => (
-            <option key={index} value={name}>
-              {name}
-            </option>
-          ))
-        ) : (
-          <option value={selectedCourse?.courseName || ""}>
-            {selectedCourse?.courseName || "No Course Name Available"}
-          </option>
-        )}
-      </select>
+      <input
+            type="text"
+              {...register("courseName")}
+              className="input-field"/>
     </div>
 
     {/* Training Company */}
     <div className="mb-4">
       <label className="text_size_5">Training Company</label>
-      <select
-        {...register("company")}
-        className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full"
-      >
-        {selectedCourse && Array.isArray(selectedCourse.company) ? (
-          selectedCourse.company.map((company, index) => (
-            <option key={index} value={company}>
-              {company}
-            </option>
-          ))
-        ) : (
-          <option value={selectedCourse?.company || ""}>
-            {selectedCourse?.company || "No Company Available"}
-          </option>
-        )}
-      </select>
+      <input
+            type="text"
+              {...register("company")}
+              className="input-field"/>
     </div>
+
+    <div className="mb-2"> <label className="text_size_5">
+        Purchase Order (PO) Number
+            </label>
+            <input
+              {...register("poNo")}
+              className="input-field"
+              type="text"
+            />
+            {errors.poNo && (
+              <p className="text-[red] text-[13px] mt-1">
+                {errors.poNo.message}
+              </p>
+            )}</div>
+        <div className="mb-2"> <label className="text_size_5">
+        Expiry Condition
+            </label>
+            <input
+              {...register("addDescretion")}
+              className="input-field"
+              type="text"
+            />
+            {errors.addDescretion && (
+              <p className="text-[red] text-[13px] mt-1">
+                {errors.addDescretion.message}
+              </p>
+            )}</div>
+
+    <div className="mb-2"> <label className="text_size_5">Date received E-certificate</label>
+            <input
+              {...register("eCertifiDate")}
+              className="input-field"
+              type="date"
+            />
+            {errors.eCertifiDate && (
+              <p className="text-[red] text-[13px] mt-1">
+                {errors.eCertifiDate.message}
+              </p>
+            )}</div>
+
             <div className="mb-2"> <label className="text_size_5">
               Date received Original Certificate
             </label>
@@ -345,23 +373,11 @@ export const TrainingCertificatesForm = () => {
               <p className="text-[red] text-[13px] mt-1">
                 {errors.orgiCertifiDate.message}
               </p>
-            )}</div>
-        
-          <div className="mb-2"> <label className="text_size_5">Date received E-certificate</label>
-            <input
-              {...register("eCertifiDate")}
-              className="input-field"
-              type="date"
-            />
-            {errors.eCertifiDate && (
-              <p className="text-[red] text-[13px] mt-1">
-                {errors.eCertifiDate.message}
-              </p>
-            )}</div>
+            )}
+            </div>
 
-<div className="mb-2">
-              
-              <label className="text_size_5">Training Certificate Expiry</label>
+            <div className="mb-2">
+            <label className="text_size_5">Training Certificate Expiry</label>
             <input
               {...register("certifiExpiry")}
               className="input-field"
@@ -371,7 +387,8 @@ export const TrainingCertificatesForm = () => {
               <p className="text-[red] text-[13px] mt-1">
                 {errors.certifiExpiry.message}
               </p>
-            )}</div>
+            )}
+            </div>
 
 
 <FileUploadField
@@ -382,45 +399,24 @@ export const TrainingCertificatesForm = () => {
         error={errors}
         fileName={
           uploadedFileNames.trainingUpCertifi ||
-          extractFileName(watchInducSwapUpload)
+          extractFileName(watchTCUpload)
         }
       />
-{/* 
-<div>
-<p className="mb-2">Upload</p>
-            <label className="flex items-center px-3 py-3 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer">
-            Training Certificate
-              <input
-                type="file"
-                {...register("trainingUpCertifi")}
-                onChange={(e) => handleFileChange(e, "trainingUpCertifi")}
-                className="hidden"
-                accept="application/pdf, image/png, image/jpeg"
-              />
-              <span className="ml-2">
-                <GoUpload/>
-              </span>
-            </label>
-            {uploadedFileNames.trainingUpCertifi && (
-              <p className="text-xs mt-1 text-grey">
-                Uploaded: {uploadedFileNames.trainingUpCertifi}
-              </p>
-            )}
-          </div> */}
+
        </div>
         <div className="center py-5">
           <button type="submit" className="primary_btn">
             Submit
           </button>
-        </div>
-        {notification && (
+        </div>  
+      </form>
+      {notification && (
         <SpinLogo
-          text="Dependent Insurance Info details save successfully"
-          notification={notification}
+        text={showTitle}
+        notification={notification}
           path="/training"
         />
       )}
-      </form>
     </section>
   );
 }; 

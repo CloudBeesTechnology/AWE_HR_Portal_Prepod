@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { uploadDocs } from "../../services/uploadDocsS3/UploadDocs";
@@ -17,6 +17,7 @@ import { pdfjs } from "react-pdf";
 import { getUrl } from "@aws-amplify/storage";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
+import { useReactToPrint } from "react-to-print";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
   import.meta.url
@@ -37,6 +38,7 @@ export const PersonalAcci = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   // Popup State
+  const personAcciPrint= useRef();
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupImage, setPopupImage] = useState("");
   const [viewingDocument, setViewingDocument] = useState(null);
@@ -136,32 +138,62 @@ export const PersonalAcci = () => {
       console.error("Error submitting data:", error);
     }
   };
-
+  
   useEffect(() => {
     const fetchInsuranceData = async () => {
       try {
         const response = await client.graphql({
           query: listPersonalAccidents,
         });
-        setInsuranceData(response.data.listPersonalAccidents.items);
-        setLoading(false);
+        const items = response.data.listPersonalAccidents.items;
+  
+        // Filter out expired policies
+        const filteredData = items.filter((data) => {
+          const expiryDate = new Date(data.perAccExp);
+          return expiryDate >= new Date(); 
+        });
+  
+        setInsuranceData(filteredData);
+        setLoading(false); // Set loading to false when data is fetched
       } catch (error) {
         console.error("Error fetching insurance data:", error);
-        setError("insuranceData", { message: "Error fetching data" });
+        setError("insuranceData", { message: "Error fetching data" }); // Set error using setError
         setLoading(false);
       }
     };
+  
     fetchInsuranceData();
   }, []);
+
+  // useEffect(() => {
+  //   const fetchInsuranceData = async () => {
+  //     try {
+  //       const response = await client.graphql({
+  //         query: listPersonalAccidents,
+  //       });
+  //       setInsuranceData(response.data.listPersonalAccidents.items);
+  //       setLoading(false);
+  //     } catch (error) {
+  //       console.error("Error fetching insurance data:", error);
+  //       setError("insuranceData", { message: "Error fetching data" });
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchInsuranceData();
+  // }, []);
 
   const openPopup = (fileUrl) => {
     setPopupImage(fileUrl); // Set the URL for the image or file
     setPopupVisible(true); // Show the popup
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
+ const handlePrint = useReactToPrint({
+     content: () => personAcciPrint.current,
+     onBeforePrint: () => console.log("Preparing print..."),
+     onAfterPrint: () => console.log("Print complete"),
+     pageStyle: "print", // This ensures the print view uses a different CSS style
+   });
+ 
 
   const onDocumentLoadSuccess = ({ numPages }) => {
     setNumPages(numPages);
@@ -193,7 +225,7 @@ export const PersonalAcci = () => {
               document.upload.endsWith(".pdf") && (
                 <div className="mt-4  ">
                   <div className="relative bg-white max-w-3xl mx-auto p-6 rounded-lg shadow-lg">
-                    <div  className="flex justify-center  h-[400px] overflow-y-auto">
+                    <div ref={personAcciPrint} className="flex justify-center  h-[400px] overflow-y-auto">
                       <Worker
                        workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
                       >
@@ -204,26 +236,6 @@ export const PersonalAcci = () => {
                       </Worker>
                     </div>
 
-                    {/* Pagination Controls */}
-                    <div className="mt-4 flex justify-between items-center">
-                      <button
-                        onClick={() => setPageNumber(pageNumber - 1)}
-                        disabled={pageNumber <= 1}
-                        className="bg-blue-600 text-black px-3 py-1 rounded-full text-sm hover:bg-blue-800"
-                      >
-                        Previous
-                      </button>
-                      <span className="text-gray-700">
-                        Page {pageNumber} of {numPages}
-                      </span>
-                      <button
-                        onClick={() => setPageNumber(pageNumber + 1)}
-                        disabled={pageNumber >= numPages}
-                        className="bg-blue-600 text-black px-3 py-1 rounded-full text-sm hover:bg-blue-800"
-                      >
-                        Next
-                      </button>
-                    </div>
 
                     {/* Close Button */}
                     <div className="absolute top-2 right-2">
@@ -327,9 +339,10 @@ export const PersonalAcci = () => {
     );
   };
   return (
-    <form
+    <section>
+      <form
       onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto min-h-screen py-5 px-10 my-10 bg-[#F5F6F1CC]"
+      className="mx-auto py-5 px-10 my-10 bg-[#F5F6F1CC]"
     >
       {/* Personal Accident Insurance Fields */}
       <h3 className="mb-5 text-lg font-bold">Personal Accident Insurance</h3>
@@ -378,6 +391,7 @@ export const PersonalAcci = () => {
           Save
         </button>
       </div>
+      </form>
 
       {notification && (
         <SpinLogo
@@ -393,6 +407,7 @@ export const PersonalAcci = () => {
           View Insurance Info
         </p>
         {insuranceData.length > 0 ? (
+                <div className=' h-[400px] overflow-y-auto scrollBar'>
           <table className="w-full text-center">
             <thead className="bg-[#939393] text-white">
               <tr>
@@ -412,12 +427,13 @@ export const PersonalAcci = () => {
                     {formatDate(data?.perAccExp || "N/A")}
                   </td>
                   <td className="pl-4 py-4">
-                    {renderDocumentCategory(data.perAccUp,"perAccUp Pdf")}
+                    {renderDocumentCategory(data.perAccUp,"PDF File")}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         ) : (
           <p className="text-center mt-10">No insurance information available.</p>
         )}
@@ -464,6 +480,7 @@ export const PersonalAcci = () => {
           </div>
         </div>
       )}
-    </form>
+    </section>
+    
   );
 };

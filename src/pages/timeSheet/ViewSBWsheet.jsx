@@ -1,21 +1,24 @@
 import { useCallback, useEffect, useState } from "react";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
-import {
-  createSBWSheet,
-  deleteSBWSheet,
-  updateSBWSheet,
-} from "../../graphql/mutations";
+// import {
+//   createSBWSheet,
+//   deleteSBWSheet,
+//   updateSBWSheet,
+// } from "../../graphql/mutations";
 import { SuccessMessage } from "./ModelForSuccessMess/SuccessMessage";
 import { generateClient } from "@aws-amplify/api";
 import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
 import { PopupForMissMatchExcelSheet } from "./ModelForSuccessMess/PopupForMissMatchExcelSheet";
 import { EditTimeSheet } from "./EditTimeSheet";
 import "../../../src/index.css";
-import { useScrollableView } from "./customTimeSheet/UseScrollableView";
+
 import { useTableMerged } from "./customTimeSheet/UserTableMerged";
 import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
-import { listSBWSheets } from "../../graphql/queries";
+// import { listSBWSheets } from "../../graphql/queries";
 import { PopupForAssignManager } from "./ModelForSuccessMess/PopupForAssignManager";
+import { createTimeSheet, deleteTimeSheet, updateTimeSheet } from "../../graphql/mutations";
+import { listTimeSheets } from "../../graphql/queries";
+import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
 const client = generateClient();
 export const ViewSBWsheet = ({
   excelData,
@@ -24,7 +27,9 @@ export const ViewSBWsheet = ({
   setExcelData,
   convertedStringToArrayObj,
   Position,
+  fileName,
 }) => {
+  const uploaderID = localStorage.getItem("userID")?.toUpperCase();
   const [data, setData] = useState(null);
   const [secondaryData, setSecondaryData] = useState(null);
   const [currentStatus, setCurrentStatus] = useState(null);
@@ -38,7 +43,7 @@ export const ViewSBWsheet = ({
   const [showStatusCol, setShowStatusCol] = useState(null);
   const [successMess, setSuccessMess] = useState(null);
 
-  const { handleScroll, visibleData, setVisibleData } = useScrollableView(
+  const { handleScroll, visibleData, setVisibleData } = UseScrollableView(
     data,
     Position
   );
@@ -141,91 +146,6 @@ export const ViewSBWsheet = ({
 
   useEffect(() => {
     const checkKeys = async () => {
-      // const cleanData = returnedTHeader.map((item) => {
-      //   const cleanedItem = {};
-      //   for (const key in item) {
-      //     cleanedItem[key] = cleanValue(item[key]); // Clean the value, not the key
-      //   }
-      //   return cleanedItem;
-      // });
-
-      // const convertKeys = (obj) => {
-      //   return Object.keys(obj).reduce((acc, key) => {
-      //     // Remove spaces and special characters, and convert to lowercase
-      //     const newKey = key.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
-      //     acc[newKey] = obj[key];
-      //     return acc;
-      //   }, {});
-      // };
-
-      // Apply the conversion to each object in the array
-
-      // const convertedData = returnedTHeader.map(convertKeys);
-
-      // const k = [
-      //   {
-      //     alldayminhrs: "14:37:50",
-      //     badge: "3907A",
-      //     // date: "10/01/2024(Tue)",
-      //     deptdiv: "HRD",
-      //     in: "14:37:50",
-      //     // name: "ABDUL HAFIZ MUIZ BIN JEFERI",
-      //     // netminutes: " ",
-      //     // totalhours: " ",
-      //     // totalinout: " ",
-      //   },
-      // ];
-      // const convertedData = k.map(convertKeys);
-      // const d = [convertedData[0]];
-      // console.log(convertedData);
-
-      // const requiredKeys = [
-      //   "DEPTDIV",
-      //   "NAME",
-      //   "BADGE",
-      //   // "DATE",
-      //   "IN",
-      //   // "OUT",
-      //   // "TOTALINOUT",
-      //   // "ALLDAYMINHRS",
-      //   // "NETMINUTES",
-      //   // "TOTALHOURS",
-      //   // "WORKINGHOURS",
-      //   // "OT",
-      //   // "REMARKS",
-      // ];
-      // const result = await new Promise((resolve) => {
-      //   // Check if all required keys are in each object
-      //   const keyCheckResult = convertedData.every((item) =>
-      //     requiredKeys.every((key) =>
-      //       Object.keys(item)
-      //         .map((k) => k.toUpperCase())
-      //         .includes(key)
-      //     )
-      //   );
-      //   resolve(keyCheckResult);
-      // });
-
-      // console.log(result);
-      // result.then((keyCheckResult) =>
-      //   console.log("All required keys present:", keyCheckResult)
-      // );
-      // const result = await new Promise((resolve) => {
-      //   // Check if all required keys are in the object
-      //   const keyCheckResult =
-      //     convertedData &&
-      //     convertedData.every((m) => {
-      //       return requiredKeys.every(
-      //         (key) =>
-      //           Object.keys(m)
-      //             .map((value) =>
-      //               typeof value === "string" ? value.toUpperCase() : value
-      //             ) // Convert string values to uppercase
-      //             .includes(key.toUpperCase()) // Compare with key in uppercase
-      //       );
-      //     });
-      //   resolve(keyCheckResult);
-      // });
       const convertKeys = (obj) => {
         return Object.keys(obj).reduce((acc, key) => {
           // Remove spaces and special characters, and convert to lowercase
@@ -247,33 +167,8 @@ export const ViewSBWsheet = ({
       ];
       const convertedData = returnedTHeader.map(convertKeys);
 
-      const requiredKeys = [
-        "deptdiv",
-        "name",
-        "badge",
-        // "date",
-        // "in",
-        // "out",
-        // "totalinout",
-        // "alldayminhrs",
-        // "netminutes",
-        // "totalhours",
-        // "workinghours",
-        // "ot",
-        // "remarks",
-      ];
+      const requiredKeys = ["deptdiv", "name", "badge"];
 
-      // Check if all required keys (case-insensitive) are present in each converted object
-      // const checkKeys = () => {
-      //   const keyCheckResult = convertedData.every((item) =>
-      //     requiredKeys.every((key) =>
-      //       Object.keys(item)
-      //         .map((k) => k.toLowerCase())
-      //         .includes(key.toLowerCase())
-      //     )
-      //   );
-      //   return keyCheckResult;
-      // };
       const checkedKeys = () => {
         return new Promise((resolve) => {
           const keyCheckResult = convertedData.every((item) =>
@@ -394,52 +289,6 @@ export const ViewSBWsheet = ({
     setData(result);
   };
 
-  // const fieldObj = {
-  //   NAME: null,
-  //   DEPTDIV: null,
-  //   BADGE: null,
-  //   DATE: null,
-  //   IN: null,
-  //   OUT: null,
-  //   TOTALINOUT: null,
-  //   ALLDAYMINHRS: null,
-  //   NETMINUTES: null,
-  //   TOTALHOURS: null,
-  //   WORKINGHOURS: null,
-  //   OT: null,
-  //   REMARKS: null,
-  // };
-  // const fields = [
-  //   "NAME",
-  //   "DEPTDIV",
-  //   "BADGE",
-  //   "DATE",
-  //   "IN",
-  //   "OUT",
-  //   "TOTALINOUT",
-  //   "ALLDAYMINHRS",
-  //   "NETMINUTES",
-  //   "TOTALHOURS",
-  //   "WORKINGHOURS",
-  //   "OT",
-  //   "REMARKS",
-  // ];
-
-  // const tableHeader = [
-  //   "Name",
-  //   "DEPT/DIV",
-  //   "BADGE#",
-  //   "DATE",
-  //   "IN",
-  //   "OUT",
-  //   "TOTAL IN/OUT",
-  //   "ALL DAY MIN (HRS)",
-  //   "NET MINUTES",
-  //   "TOTAL HOURS",
-  //   "WORKING HOURS",
-  //   "OT",
-  //   "REMARKS",
-  // ];
   const AllFieldData = useTableFieldData(titleName);
   const renameKeysFunctionAndSubmit = async (managerData) => {
     if (userIdentification !== "Manager") {
@@ -477,23 +326,28 @@ export const ViewSBWsheet = ({
         dailySheet: JSON.stringify(finalResult),
         status: "Pending",
         date: currentDate,
+        managerDetails: JSON.stringify(managerData),
+        type: "SBW",
+        fileName: fileName,
+        uploaderID: uploaderID,
       };
 
       if (DailySheet.dailySheet) {
         await client
           .graphql({
-            query: createSBWSheet,
+            query: createTimeSheet,
             variables: {
               input: DailySheet,
             },
           })
           .then((res) => {
-            if (res.data.createSBWSheet) {
+            if (res.data.createTimeSheet) {
               // console.log(
               //   "res.data.createSBWSheet : ",
               //   res.data.createSBWSheet
               // );
               toggleSFAMessage(true);
+              setData(null);
             }
           })
           .catch((err) => {
@@ -528,13 +382,6 @@ export const ViewSBWsheet = ({
           };
         });
 
-      // UPDATE
-      //   const weaklysheet = {
-      //     id: "6b22df70-9ab7-4873-9d24-9ab719347b62",
-      //     weeklySheet: JSON.stringify(result),
-      //     status: "Pending",
-      //   };
-
       const result = MultipleBLNGfile.map(async (obj) => {
         const finalData = {
           id: obj.id,
@@ -546,20 +393,20 @@ export const ViewSBWsheet = ({
           // console.log("Work");
           await client
             .graphql({
-              query: updateSBWSheet,
+              query: updateTimeSheet,
               variables: {
                 input: finalData,
               },
             })
             .then((res) => {
-              if (res.data.updateSBWSheet) {
+              if (res.data.updateTimeSheet) {
                 // console.log(
                 //   "res.data.updateSBWSheet : ",
                 //   res.data.updateSBWSheet
                 // );
                 toggleSFAMessage(true);
                 setVisibleData([]);
-                // setData(null);
+                setData(null);
               }
             })
             .catch((err) => {
@@ -588,19 +435,7 @@ export const ViewSBWsheet = ({
                 <thead className="sticky-header">
                   <tr className="text_size_5">
                     <td className="px-4 text-center text_size_7">S No.</td>
-                    {/* <td className="px-4 flex-1 text-start">Name</td>
-                    <td className="px-4 flex-1">DEPT/DIV</td>
-                    <td className="px-4 flex-1 text-start">BADGE#</td>
-                    <td className="px-4 flex-1">DATE</td>
-                    <td className="px-4 flex-1">IN</td>
-                    <td className="px-4 flex-1">OUT</td>
-                    <td className="px-4 flex-1">TOTAL IN/OUT</td>
-                    <td className="px-4 flex-1">{"ALL DAY MIN (HRS)"}</td>
-                    <td className="px-4 flex-1">NET MINUTES</td>
-                    <td className="px-4 flex-1">TOTAL HOURS</td>
-                    <td className="px-4 flex-1">WORKING HOURS</td>
-                    <td className="px-4 flex-1">OT</td>
-                    <td className="px-4 flex-1">REMARKS</td> */}
+
                     {AllFieldData?.tableHeader.map((header, index) => (
                       <td key={index} className="px-4 flex-1 text_size_7">
                         {header}
@@ -690,7 +525,7 @@ export const ViewSBWsheet = ({
                                   {m.status}
                                 </td>
                               )}
-                            </tr>
+                            </tr> 
                           );
                         };
 
@@ -703,22 +538,22 @@ export const ViewSBWsheet = ({
                     : (
                         <tr>
                           <td
-                            colSpan="15"
-                            className="px-6 py-6 text-center text-dark_ash text_size_5"
+                            colSpan="100%"
+                            className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white"
                           >
                             <p className="px-6 py-6">
-                              No Table Data Available Here
+                            No Table Data Available Here.
                             </p>
                           </td>
                         </tr>
                       ) ?? (
                         <tr>
                           <td
-                            colSpan="15"
-                            className="px-6 py-6 text-center text-dark_ash text_size_5"
+                            colSpan="100%"
+                            className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white"
                           >
                             <p className="px-6 py-6">
-                              No Table Data Available Here
+                            No Table Data Available Here.
                             </p>
                           </td>
                         </tr>
@@ -736,41 +571,56 @@ export const ViewSBWsheet = ({
                   userIdentification === "Manager" ? "w-40" : "w-52"
                 } bg-[#FEF116] text_size_5 text-dark_grey mb-10`}
                 onClick={() => {
-                  // const fetchData = async () => {
-                  //   // Fetch the BLNG data using GraphQL
-                  //   const [fetchBLNGdata] = await Promise.all([
-                  //     client.graphql({
-                  //       query: listSBWSheets,
-                  //     }),
-                  //   ]);
-                  //   const BLNGdata = fetchBLNGdata?.data?.listSBWSheets?.items;
-                  //   console.log("BLNGdata : ", BLNGdata);
-                  //   const deleteFunction =
-                  //     BLNGdata &&
-                  //     BLNGdata.map(async (m) => {
-                  //       const dailySheet = {
-                  //         id: m.id,
-                  //       };
-                  //       await client
-                  //         .graphql({
-                  //           query: deleteSBWSheet,
-                  //           variables: {
-                  //             input: dailySheet,
-                  //           },
-                  //         })
-                  //         .then((res) => {
-                  //           console.log(res);
-                  //         })
-                  //         .catch((err) => {
-                  //           console.log(err);
-                  //         });
-                  //     });
-                  // };
-                  // fetchData();
                   if (userIdentification !== "Manager") {
                     toggleFunctionForAssiMana();
+
+                   
+                    
                   } else if (userIdentification === "Manager") {
                     renameKeysFunctionAndSubmit();
+                  
+                    // const fetchData = async () => {
+                    //   try {
+                    //     console.log("I am calling You");
+                    
+                    //     // Fetch the BLNG data using GraphQL
+                    //     const response = await client.graphql({ query: listTimeSheets });
+                    //     const SBWdata = response?.data?.listTimeSheets?.items || [];
+                    
+                    //     console.log("Fetched SBW Data:", SBWdata);
+                    
+                    //     // Filter data for type === "SBW"
+                    //     const result = SBWdata.filter((item) => item.type==="SBW");
+                    //     console.log("Filtered BLNG Data:", result);
+                    
+                    //     // Delete each item in the filtered result
+                    //     if (result.length > 0) {
+                    //       await Promise.all(
+                    //         result.map(async (item) => {
+                    //           const dailySheet = { id: item.id };
+                    
+                    //           try {
+                    //             const deleteResponse = await client.graphql({
+                    //               query: deleteTimeSheet,
+                    //               variables: { input: dailySheet },
+                    //             });
+                    //             console.log("Deleted Item Response:", deleteResponse);
+                    //           } catch (err) {
+                    //             console.error("Error deleting item:", err);
+                    //           }
+                    //         })
+                    //       );
+                    //     } else {
+                    //       console.log("No SBW items to delete.");
+                    //     }
+                    //   } catch (err) {
+                    //     console.error("Error in fetchData:", err);
+                    //   }
+                    // };
+                    
+                    // // Call the function
+                    // fetchData();
+                    
                   }
                 }}
               >

@@ -390,7 +390,7 @@ const LabourImmigration = () => {
       </div>
 
       {/* Form Fields */}
-      <div className="flex justify-end items-center pt-7 pb-2">
+      <div className="flex justify-end items-center pt-10 pb-2">
         <div>
           <FormField
             label="Employee ID"
@@ -407,7 +407,7 @@ const LabourImmigration = () => {
         <p className="text_size_3 form-group text-medium_grey mb-5">
           Employee Medical Info
         </p>
-        <div className="grid grid-cols-3 gap-x-4 gap-y-2 mt-2 mb-5">
+        <div className=" grid grid-cols-3 gap-x-5 gap-y-5 mt-5 mb-5 ">
           {EmpDataPass.medicalFields.map((field, index) => (
             <UploadingFiles
               key={index}

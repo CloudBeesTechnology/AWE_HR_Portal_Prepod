@@ -1,4 +1,3 @@
-
 import { generateClient } from "@aws-amplify/api";
 import { useCallback, useEffect, useState } from "react";
 import { updateBJLDetails } from "../../graphql/mutations";

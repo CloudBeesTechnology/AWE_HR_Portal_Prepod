@@ -5,6 +5,7 @@ import { FaPlus } from "react-icons/fa6";
 import { FaRegSquarePlus } from "react-icons/fa6";
 import { FaRegSquareMinus } from "react-icons/fa6";
 import "../../../src/index.css";
+import  img  from "../../assets/logo/logo-with-name.svg";
 import { SearchDisplayForTimeSheet } from "./timeSheetSearch/SearchDisplayForTS";
 export const EditTimeSheet = ({
   editObject,
@@ -72,17 +73,19 @@ export const EditTimeSheet = ({
   ];
 
   const LocationData = [
-    { id: 1, location: "Crest Centurion 2" },
-    { id: 2, location: "DAY TRIPPING" },
-    { id: 3, location: "Icon Aliza" },
-    { id: 4, location: "Icon Valiant" },
-    { id: 6, location: "Khalifa" },
-    { id: 7, location: "Masshor Princess" },
-    { id: 8, location: "MV Falgout" },
-    { id: 9, location: "Offshore" },
-    { id: 10, location: "Head Office" },
-    { id: 11, location: "ORMC" },
-    { id: 12, location: "SBW" },
+    { id: 1, location: "Offshore" },
+    { id: 2, location: "Head Office" },
+    { id: 3, location: "ORMC" },
+    { id: 4, location: "SBW" },
+    { id: 5, location: "BLNG" },
+    { id: 6, location: "Crest Centurion 2" },
+    { id: 7, location: "DAY TRIPPING" },
+    { id: 8, location: "Icon Aliza" },
+    { id: 9, location: "Icon Valiant" },
+    { id: 10, location: "Khalifa" },
+    { id: 11, location: "Masshor Princess" },
+    { id: 12, location: "MV Falgout" },
+   
   ];
 
   useEffect(() => {
@@ -360,11 +363,7 @@ export const EditTimeSheet = ({
           />
         </div>
         <div className="flex justify-center ">
-          <img
-            className="size-32 h-12 w-full"
-            src="/src/assets/logo/logo-with-name.svg"
-            alt="not found"
-          />
+          <img className="size-32 h-12 w-full" src={img} alt="not found" />
         </div>
         <div className="flex justify-center py-2 ">
           <p className="text-dark_grey text_size_2">Edit Access</p>
@@ -379,7 +378,7 @@ export const EditTimeSheet = ({
               <input
                 type="text"
                 name={field}
-                className="border border-dark_grey rounded text-dark_grey text-[16px] outline-none w-full py-1 px-3 cursor-auto"
+                className="border border-dark_grey rounded text-dark_grey text-[16px] outline-none w-full py-1 px-3 cursor-auto bg-white"
                 // value={editObject.FID}
                 value={formData[field] || ""}
                 onChange={handleChange}
@@ -401,7 +400,7 @@ export const EditTimeSheet = ({
             <p className="text-dark_grey text_size_6 pt-2">STATUS</p>
             <input
               type="text"
-              className="border border-dark_grey rounded text-dark_grey text-[16px] outline-none w-full py-1 px-3 cursor-auto"
+              className="border border-dark_grey rounded text-dark_grey text-[16px] outline-none w-full py-1 px-3 cursor-auto bg-white"
               value="Pending"
               readOnly
             />
@@ -459,7 +458,7 @@ export const EditTimeSheet = ({
                       </span>
                     )}
                   </div>
-                  <div className="w-fit">
+                  <div className="w-fit ">
                     <input
                       type="text"
                       id={`workingHours-${index}`}
@@ -472,7 +471,7 @@ export const EditTimeSheet = ({
                         );
                       }}
                       placeholder="Enter Hours"
-                      className="border border-lite_grey rounded text-dark_grey text_size_5 outline-none w-full py-2 px-3 cursor-auto"
+                      className="border border-lite_grey rounded text-dark_grey text_size_5 outline-none w-full py-2 px-3 cursor-auto bg-white"
                       readOnly={!section.LOCATION}
                     />
                   </div>
@@ -491,7 +490,7 @@ export const EditTimeSheet = ({
                         // combineAllData(section.id, e.target.value)
                       }}
                       placeholder="Enter Overtime "
-                      className="border border-lite_grey rounded text-dark_grey text_size_5 outline-none w-full py-2 px-3 cursor-auto"
+                      className="border border-lite_grey rounded text-dark_grey text_size_5 outline-none w-full py-2 px-3 cursor-auto bg-white"
                       readOnly={!section.LOCATION}
                     />
                   </div>

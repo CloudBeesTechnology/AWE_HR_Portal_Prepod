@@ -254,7 +254,7 @@ export const BankGuarantee = () => {
         // console.log(BJLValue);
 
         await BGData({ BJLValue });
-        setShowTitle("Bank Guarantee Info Created Successfully");
+        setShowTitle("Bank Guarantee Info Saved Successfully");
         setNotification(true);
       }
       // setNotification(true);

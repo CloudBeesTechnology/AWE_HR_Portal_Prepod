@@ -1,6 +1,210 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreateBastingPaint = /* GraphQL */ `
+  subscription OnCreateBastingPaint(
+    $filter: ModelSubscriptionBastingPaintFilterInput
+  ) {
+    onCreateBastingPaint(filter: $filter) {
+      id
+      empID
+      blastingRemarks
+      blastingEndDate
+      blastingStartDate
+      blastingBadgeNo
+      blastingQulifiExp
+      blastingUpload
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateBastingPaint = /* GraphQL */ `
+  subscription OnUpdateBastingPaint(
+    $filter: ModelSubscriptionBastingPaintFilterInput
+  ) {
+    onUpdateBastingPaint(filter: $filter) {
+      id
+      empID
+      blastingRemarks
+      blastingEndDate
+      blastingStartDate
+      blastingBadgeNo
+      blastingQulifiExp
+      blastingUpload
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteBastingPaint = /* GraphQL */ `
+  subscription OnDeleteBastingPaint(
+    $filter: ModelSubscriptionBastingPaintFilterInput
+  ) {
+    onDeleteBastingPaint(filter: $filter) {
+      id
+      empID
+      blastingRemarks
+      blastingEndDate
+      blastingStartDate
+      blastingBadgeNo
+      blastingQulifiExp
+      blastingUpload
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateTimeSheet = /* GraphQL */ `
+  subscription OnCreateTimeSheet(
+    $filter: ModelSubscriptionTimeSheetFilterInput
+  ) {
+    onCreateTimeSheet(filter: $filter) {
+      id
+      date
+      status
+      fileName
+      fileType
+      assignTo
+      assignBy
+      empName
+      empBadgeNo
+      empID
+      empDept
+      inTime
+      outTime
+      totalInOut
+      allDayHrs
+      totalHrs
+      remarks
+      otTime
+      netMins
+      actualWorkHrs
+      normalWorkHrs
+      fidNo
+      companyName
+      trade
+      tradeCode
+      onAM
+      offAM
+      onPM
+      offPM
+      ctr
+      rec
+      avgDailyTD
+      highlightDayTG
+      aweSDN
+      totalNT
+      totalOT
+      totalNTOT
+      empWorkInfo
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateTimeSheet = /* GraphQL */ `
+  subscription OnUpdateTimeSheet(
+    $filter: ModelSubscriptionTimeSheetFilterInput
+  ) {
+    onUpdateTimeSheet(filter: $filter) {
+      id
+      date
+      status
+      fileName
+      fileType
+      assignTo
+      assignBy
+      empName
+      empBadgeNo
+      empID
+      empDept
+      inTime
+      outTime
+      totalInOut
+      allDayHrs
+      totalHrs
+      remarks
+      otTime
+      netMins
+      actualWorkHrs
+      normalWorkHrs
+      fidNo
+      companyName
+      trade
+      tradeCode
+      onAM
+      offAM
+      onPM
+      offPM
+      ctr
+      rec
+      avgDailyTD
+      highlightDayTG
+      aweSDN
+      totalNT
+      totalOT
+      totalNTOT
+      empWorkInfo
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteTimeSheet = /* GraphQL */ `
+  subscription OnDeleteTimeSheet(
+    $filter: ModelSubscriptionTimeSheetFilterInput
+  ) {
+    onDeleteTimeSheet(filter: $filter) {
+      id
+      date
+      status
+      fileName
+      fileType
+      assignTo
+      assignBy
+      empName
+      empBadgeNo
+      empID
+      empDept
+      inTime
+      outTime
+      totalInOut
+      allDayHrs
+      totalHrs
+      remarks
+      otTime
+      netMins
+      actualWorkHrs
+      normalWorkHrs
+      fidNo
+      companyName
+      trade
+      tradeCode
+      onAM
+      offAM
+      onPM
+      offPM
+      ctr
+      rec
+      avgDailyTD
+      highlightDayTG
+      aweSDN
+      totalNT
+      totalOT
+      totalNTOT
+      empWorkInfo
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const onCreateHiringJob = /* GraphQL */ `
   subscription OnCreateHiringJob(
     $filter: ModelSubscriptionHiringJobFilterInput
@@ -14,6 +218,7 @@ export const onCreateHiringJob = /* GraphQL */ `
       startDate
       expiryDate
       jobContent
+      uploadJobDetails
       createdAt
       updatedAt
       __typename
@@ -33,6 +238,7 @@ export const onUpdateHiringJob = /* GraphQL */ `
       startDate
       expiryDate
       jobContent
+      uploadJobDetails
       createdAt
       updatedAt
       __typename
@@ -52,6 +258,7 @@ export const onDeleteHiringJob = /* GraphQL */ `
       startDate
       expiryDate
       jobContent
+      uploadJobDetails
       createdAt
       updatedAt
       __typename
@@ -499,234 +706,6 @@ export const onDeleteEmailNotifi = /* GraphQL */ `
     }
   }
 `;
-export const onCreateOffshoreSheet = /* GraphQL */ `
-  subscription OnCreateOffshoreSheet(
-    $filter: ModelSubscriptionOffshoreSheetFilterInput
-  ) {
-    onCreateOffshoreSheet(filter: $filter) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onUpdateOffshoreSheet = /* GraphQL */ `
-  subscription OnUpdateOffshoreSheet(
-    $filter: ModelSubscriptionOffshoreSheetFilterInput
-  ) {
-    onUpdateOffshoreSheet(filter: $filter) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onDeleteOffshoreSheet = /* GraphQL */ `
-  subscription OnDeleteOffshoreSheet(
-    $filter: ModelSubscriptionOffshoreSheetFilterInput
-  ) {
-    onDeleteOffshoreSheet(filter: $filter) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onCreateORMCSheet = /* GraphQL */ `
-  subscription OnCreateORMCSheet(
-    $filter: ModelSubscriptionORMCSheetFilterInput
-  ) {
-    onCreateORMCSheet(filter: $filter) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onUpdateORMCSheet = /* GraphQL */ `
-  subscription OnUpdateORMCSheet(
-    $filter: ModelSubscriptionORMCSheetFilterInput
-  ) {
-    onUpdateORMCSheet(filter: $filter) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onDeleteORMCSheet = /* GraphQL */ `
-  subscription OnDeleteORMCSheet(
-    $filter: ModelSubscriptionORMCSheetFilterInput
-  ) {
-    onDeleteORMCSheet(filter: $filter) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onCreateSBWSheet = /* GraphQL */ `
-  subscription OnCreateSBWSheet($filter: ModelSubscriptionSBWSheetFilterInput) {
-    onCreateSBWSheet(filter: $filter) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onUpdateSBWSheet = /* GraphQL */ `
-  subscription OnUpdateSBWSheet($filter: ModelSubscriptionSBWSheetFilterInput) {
-    onUpdateSBWSheet(filter: $filter) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onDeleteSBWSheet = /* GraphQL */ `
-  subscription OnDeleteSBWSheet($filter: ModelSubscriptionSBWSheetFilterInput) {
-    onDeleteSBWSheet(filter: $filter) {
-      id
-      date
-      dailySheet
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onCreateBlng = /* GraphQL */ `
-  subscription OnCreateBlng($filter: ModelSubscriptionBlngFilterInput) {
-    onCreateBlng(filter: $filter) {
-      id
-      weeklySheet
-      date
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onUpdateBlng = /* GraphQL */ `
-  subscription OnUpdateBlng($filter: ModelSubscriptionBlngFilterInput) {
-    onUpdateBlng(filter: $filter) {
-      id
-      weeklySheet
-      date
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onDeleteBlng = /* GraphQL */ `
-  subscription OnDeleteBlng($filter: ModelSubscriptionBlngFilterInput) {
-    onDeleteBlng(filter: $filter) {
-      id
-      weeklySheet
-      date
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onCreateHeadOffice = /* GraphQL */ `
-  subscription OnCreateHeadOffice(
-    $filter: ModelSubscriptionHeadOfficeFilterInput
-  ) {
-    onCreateHeadOffice(filter: $filter) {
-      id
-      dailySheet
-      date
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onUpdateHeadOffice = /* GraphQL */ `
-  subscription OnUpdateHeadOffice(
-    $filter: ModelSubscriptionHeadOfficeFilterInput
-  ) {
-    onUpdateHeadOffice(filter: $filter) {
-      id
-      dailySheet
-      date
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onDeleteHeadOffice = /* GraphQL */ `
-  subscription OnDeleteHeadOffice(
-    $filter: ModelSubscriptionHeadOfficeFilterInput
-  ) {
-    onDeleteHeadOffice(filter: $filter) {
-      id
-      dailySheet
-      date
-      status
-      manager
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
 export const onCreateEmpRequisition = /* GraphQL */ `
   subscription OnCreateEmpRequisition(
     $filter: ModelSubscriptionEmpRequisitionFilterInput
@@ -745,6 +724,8 @@ export const onCreateEmpRequisition = /* GraphQL */ `
       status
       remarkReq
       reqName
+      requestorID
+      approverID
       createdAt
       updatedAt
       __typename
@@ -769,6 +750,8 @@ export const onUpdateEmpRequisition = /* GraphQL */ `
       status
       remarkReq
       reqName
+      requestorID
+      approverID
       createdAt
       updatedAt
       __typename
@@ -793,6 +776,8 @@ export const onDeleteEmpRequisition = /* GraphQL */ `
       status
       remarkReq
       reqName
+      requestorID
+      approverID
       createdAt
       updatedAt
       __typename

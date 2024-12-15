@@ -49,7 +49,61 @@ export const dummyLeaveStatus = [
     empID: "AWE350",
     leaveType: "Annual Leave",
     fromDate: "2024-12-08T18:30:00.000000000Z",
-    toDate: "2024-8-12T18:30:00.000000000Z",
+    toDate: "2024-8-12",
+    days: 5,
+    applyTo: ["Manager", "Supervisor"],
+    reason: "for vacation",
+    medicalCertificate: null,
+    supervisorName: "Rose",
+    supervisorEmpID: "AWE026",
+    supervisorStatus: "Approved",
+    supervisorDate: "2024-12-04T16:28:26.887Z",
+    supervisorRemarks: "",
+    managerName: "Arjun",
+    managerEmpID: "AWE765",
+    managerStatus: "Approved",
+    managerDate: "2024-12-04T16:31:02.182Z",
+    managerRemarks: "",
+    empStatus: "Pending",
+    empDate: null,
+    empRemarks: null,
+    createdAt: "2024-12-04T16:27:44.356Z",
+    updatedAt: "2024-12-04T16:31:02.038Z",
+    __typename: "LeaveStatus",
+  },
+  {
+    id: "712a1c4b-88a8-49f3-aa13-880879a7b168",
+    empID: "AWE350",
+    leaveType: "Annual Leave",
+    fromDate: "2024-12-08T18:30:00.000000000Z",
+    toDate: "2024-8-12",
+    days: 5,
+    applyTo: ["Manager", "Supervisor"],
+    reason: "for vacation",
+    medicalCertificate: null,
+    supervisorName: "Rose",
+    supervisorEmpID: "AWE026",
+    supervisorStatus: "Approved",
+    supervisorDate: "2024-12-04T16:28:26.887Z",
+    supervisorRemarks: "",
+    managerName: "Arjun",
+    managerEmpID: "AWE765",
+    managerStatus: "Approved",
+    managerDate: "2024-12-04T16:31:02.182Z",
+    managerRemarks: "",
+    empStatus: "Pending",
+    empDate: null,
+    empRemarks: null,
+    createdAt: "2024-12-04T16:27:44.356Z",
+    updatedAt: "2024-12-04T16:31:02.038Z",
+    __typename: "LeaveStatus",
+  },
+  {
+    id: "712a1c4b-88a8-49f3-aa13-880879a7b168",
+    empID: "AWE600",
+    leaveType: "Annual Leave",
+    fromDate: "2024-12-08T18:30:00.000000000Z",
+    toDate: "2024-10-12",
     days: 5,
     applyTo: ["Manager", "Supervisor"],
     reason: "for vacation",
@@ -73,10 +127,10 @@ export const dummyLeaveStatus = [
   },
   {
     id: "39c6cb04-30df-4f67-81ef-dfdca46bc6ee",
-    empID: "AWE350",
-    leaveType: "Hospitalisation Leave",
+    empID: "AWE600",
+    leaveType: "Annual Leave",
     fromDate: "2024-12-22T18:30:00.000000000Z",
-    toDate: "2024-8-26T18:30:00.000000000Z",
+    toDate: "2024-10-26",
     days: 4,
     applyTo: ["Manager", "Supervisor"],
     reason: "dfhadfh",
@@ -102,8 +156,8 @@ export const dummyLeaveStatus = [
     id: "39c6cb04-30df-4f67-81ef-dfdca46bc6ee",
     empID: "AWE600",
     leaveType: "Hospitalisation Leave",
-    fromDate: "2024-12-22T18:30:00.000000000Z",
-    toDate: "2024-7-26T18:30:00.000000000Z",
+    fromDate: "2024-9-22T18:30:00.000000000Z",
+    toDate: "2024-10-26",
     days: 4,
     applyTo: ["Manager", "Supervisor"],
     reason: "dfhadfh",
@@ -126,3 +180,199 @@ export const dummyLeaveStatus = [
     __typename: "LeaveStatus",
   },
 ];
+
+
+export const seperateDataBasedOnLocation =[
+  {
+  "empId": "AWE600",
+  "data": [
+      {
+          "ctr": 6,
+          "date": "9/23/2024",
+          "offPm": "16:30:00",
+          "empId": "AWE600",
+          "in": "07:47:51 ",
+          "OT": 2,
+          "onPm": "13:00:00",
+          "jobLocaWhrs": [
+              {
+                  "LOCATION": "Head Office",
+                  "OVERTIMEHRS": "4",
+                  "JOBCODE": "J9005",
+                  "WORKINGHRS": "15"
+              },{
+                "LOCATION": "Head Office",
+                "OVERTIMEHRS": "4",
+                "JOBCODE": "J9008",
+                "WORKINGHRS": "15"
+            },{
+                  "LOCATION": "HR",
+                  "OVERTIMEHRS": "2",
+                  "JOBCODE": "J9005",
+                  "WORKINGHRS": "15"
+              }
+
+
+          ],
+          "dept": "OFF",
+          "out": "11:54:25 ",
+          "netMin": 219,
+          "workhrs": 0,
+          "rec": "1 ",
+          "badge": "099A",
+          "allDayMin": "247.00 ",
+          "totalHrs": 3.65,
+          "offAm": "12:00:00",
+          "name": "ADRIAN",
+          "managerData": {
+              "muntilDate": "2024-12-13",
+              "mdepartment": "BLNG",
+              "mName": "Zara",
+              "mbadgeNo": "0600",
+              "mfromDate": "2024-12-12"
+          },
+          "totalActHrs": 15,
+          "totalInOut": "28 ",
+          "normalWhrsPerDay": "12",
+          "remarks": "Acceptable",
+          "onAm": "07:30:00",
+          "status": "Approved"
+      },
+      {
+          "ctr": 7,
+          "date": "9/24/2024",
+          "offPm": "16:30:00",
+          "empId": "AWE600",
+          "in": "07:27:15 ",
+          "OT": 3,
+          "onPm": "13:00:00",
+          "jobLocaWhrs": [
+              {
+                  "LOCATION": "Head Office",
+                  "OVERTIMEHRS": "3",
+                  "JOBCODE": "J9005",
+                  "WORKINGHRS": "15"
+              },{
+                  "LOCATION": "SBW",
+                  "OVERTIMEHRS": "4",
+                  "JOBCODE": "J9008",
+                  "WORKINGHRS": "15"
+              }
+
+
+          ],
+          "dept": "OFF",
+          "out": "11:59:38 ",
+          "netMin": 248,
+          "workhrs": 0,
+          "rec": "2 ",
+          "badge": "099A",
+          "allDayMin": "272.00 ",
+          "totalHrs": 4.13,
+          "offAm": "12:00:00",
+          "name": "ADRIAN",
+          "managerData": {
+              "muntilDate": "2024-12-13",
+              "mdepartment": "BLNG",
+              "mName": "Zara",
+              "mbadgeNo": "0600",
+              "mfromDate": "2024-12-12"
+          },
+          "totalActHrs": 15,
+          "totalInOut": "24 ",
+          "normalWhrsPerDay": "12",
+          "remarks": "Permission Granted",
+          "onAm": "07:30:00",
+          "status": "Approved"
+      },
+        ]
+}, {
+  "empId": "AWE700",
+  "data": [
+      {
+          "ctr": 6,
+          "date": "9/23/2024",
+          "offPm": "16:30:00",
+          "empId": "AWE700",
+          "in": "07:47:51 ",
+          "OT": 2,
+          "onPm": "13:00:00",
+          "jobLocaWhrs": [
+              {
+                  "LOCATION": "BLNG",
+                  "OVERTIMEHRS": "4",
+                  "JOBCODE": "J9005",
+                  "WORKINGHRS": "15"
+              },{
+                  "LOCATION": "HR",
+                  "OVERTIMEHRS": "2",
+                  "JOBCODE": "J9001",
+                  "WORKINGHRS": "15"
+              }
+
+
+          ],
+          "dept": "OFF",
+          "out": "11:54:25 ",
+          "netMin": 219,
+          "workhrs": 0,
+          "rec": "1 ",
+          "badge": "099A",
+          "allDayMin": "247.00 ",
+          "totalHrs": 3.65,
+          "offAm": "12:00:00",
+          "name": "ADRIAN",
+          "managerData": {
+              "muntilDate": "2024-12-13",
+              "mdepartment": "BLNG",
+              "mName": "Zara",
+              "mbadgeNo": "0600",
+              "mfromDate": "2024-12-12"
+          },
+          "totalActHrs": 15,
+          "totalInOut": "28 ",
+          "normalWhrsPerDay": "12",
+          "remarks": "Acceptable",
+          "onAm": "07:30:00",
+          "status": "Approved"
+      },
+      {
+          "ctr": 7,
+          "date": "9/24/2024",
+          "offPm": "16:30:00",
+          "empId": "AWE700",
+          "in": "07:27:15 ",
+          "OT": 3,
+          "onPm": "13:00:00",
+          "jobLocaWhrs": [
+              
+
+
+          ],
+          "dept": "OFF",
+          "out": "11:59:38 ",
+          "netMin": 248,
+          "workhrs": 0,
+          "rec": "2 ",
+          "badge": "099A",
+          "allDayMin": "272.00 ",
+          "totalHrs": 4.13,
+          "offAm": "12:00:00",
+          "name": "ADRIAN",
+          "managerData": {
+              "muntilDate": "2024-12-13",
+              "mdepartment": "BLNG",
+              "mName": "Zara",
+              "mbadgeNo": "0600",
+              "mfromDate": "2024-12-12"
+          },
+          "totalActHrs": 15,
+          "totalInOut": "24 ",
+          "normalWhrsPerDay": "12",
+          "remarks": "Permission Granted",
+          "onAm": "07:30:00",
+          "status": "Approved"
+      },
+        ]
+}
+] 

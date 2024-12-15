@@ -108,7 +108,7 @@ export const NonLocalAcco = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center  p-10"  onClick={() => {
+    <div className="flex flex-col items-center justify-center  p-10 bg-[#F5F6F1]"  onClick={() => {
       setFilteredEmployees([]);
     }}>
       <div className="w-full flex items-center justify-between gap-5">
@@ -134,24 +134,20 @@ export const NonLocalAcco = () => {
         className="h-screen   w-full"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <div className="flex justify-end items-center py-7 mt-2">
-          <div className="max-w-sm">
-            <FormField
-              label="Employee ID"
-              register={register}
-              name="empID"
-              type="text"
-              value={watch("empID") || ""}
-              placeholder="Enter Employee ID"
-              errors={errors}
-            />
-            {errorEmpID && (
-              <p className="text-[red] text-[13px] text-center">{errorEmpID}</p>
-            )}
-          </div>
-        </div>
+        <div className="flex justify-end items-center mt-14">
+             <div className="max-w-sm">
+               <FormField
+                 label="Employee ID"
+                 register={register}
+                 name="empID"
+                 type="text"
+                 placeholder="Enter Employee ID"
+                 errors={errors}
+               />
+             </div>
+           </div>
 
-        <div className="grid grid-cols-2 gap-6 mt-20">
+        <div className="grid grid-cols-2 gap-6 mt-10">
           <FormField
             label="Badge Number"
             register={register}
@@ -183,7 +179,7 @@ export const NonLocalAcco = () => {
               </p>
             )}
           </div>
-          <div className="col-span-2">
+          <div className="col-span-1">
             <label className="block text_size_5">Accommodation Address</label>
             <input
               type="text"

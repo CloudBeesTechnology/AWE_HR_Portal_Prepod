@@ -51,13 +51,13 @@ export const SbwTBody = ({ data, loading, setTableData }) => {
                   <td className="text-center px-4 flex-1">{m.workHrs}</td>
                   <td className="text-center px-4 flex-1">{m.OT}</td>
                   <td className="text-center px-4 flex-1">{m.remarks}</td>
-                  <td
+                  {/* <td
                     className={`text-center px-4 flex-1 ${
                       m.status === "Approved" ? "text-[#0CB100]" : "text_size_8"
                     }`}
                   >
                     {m.status}
-                  </td>
+                  </td> */}
                 </tr>
               );
             };
@@ -66,19 +66,20 @@ export const SbwTBody = ({ data, loading, setTableData }) => {
         : (
             <tr>
               <td
-                colSpan="15"
-                className="text-center text-dark_ash text_size_5"
+                colSpan="100%"
+                className="text-center text-dark_ash text_size_5 bg-white"
               >
-                <p className="p-5">No Table Data Available Here</p>
+                <p className="p-5">Please wait few seconds...</p>
               </td>
             </tr>
+            
           ) ?? (
             <tr>
               <td
-                colSpan="15"
-                className="text-center text-dark_ash text_size_5"
+                colSpan="100%"
+                className="text-center text-dark_ash text_size_5 bg-white"
               >
-                <p className="p-5">No Table Data Available Here</p>
+                {/* <p className="p-5">Please wait few seconds...</p> */}
               </td>
             </tr>
           )}

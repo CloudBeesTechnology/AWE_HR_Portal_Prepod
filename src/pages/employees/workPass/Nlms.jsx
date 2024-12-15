@@ -17,9 +17,9 @@ export const Nlms = () => {
 
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState('');
-  const [nlmsEmpApprovals, setNlmsEmpApprovals] = useState([]);
-  const [nlmsEmpSubmits, setNlmsEmpSubmits] = useState([]);
-  const [nlmsEmpValids, setNlmsEmpValids] = useState([]);
+  // const [nlmsEmpApprovals, setNlmsEmpApprovals] = useState([]);
+  // const [nlmsEmpSubmits, setNlmsEmpSubmits] = useState([]);
+  // const [nlmsEmpValids, setNlmsEmpValids] = useState([]);
 
   const [uploadedFileNames, setUploadedFileNames] = useState({
     nlmsEmpUpload: null,
@@ -65,28 +65,6 @@ export const Nlms = () => {
     return "";
   };
   
-
-  // const extractFileName = (input) => {
-  //   // Handle the case when input is an object and contains the 'upload' property
-  //   if (typeof input === 'object' && input.upload) {
-  //     const filePath = input.upload;  // Extract the 'upload' path
-  //     return filePath.split("/").pop();  // Extract the file name from the path
-  //   }
-  
-  //   // Handle the case when input is a valid URL string
-  //   if (typeof input === 'string' && input) {
-  //     // If the input is a URL, we extract the file name using split
-  //     return input.split("/").pop();  // Extract the file name from URL
-  //   }
-  
-  //   // Return an empty string if input is neither a valid string nor object
-  //   return "";
-  // };
-  
-
-  
-  
-
   // const getLastValue = (value) => Array.isArray(value) ? value[value.length - 1] : value;
   const getLastValue = (value, field) => {
     if (field === "nlmsEmpValid" || field === "nlmsEmpApproval" || field === "nlmsEmpValid") {

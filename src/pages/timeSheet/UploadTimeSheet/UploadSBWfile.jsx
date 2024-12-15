@@ -127,6 +127,7 @@ export const UploadSBWfile = (
 
             return item;
           });
+          
         // console.log(updatedDataArray);
         // console.log(updatedDataArray);
         // const removeTotalEmployees = updatedDataArray.filter(
@@ -151,9 +152,30 @@ export const UploadSBWfile = (
         // const lastOccurrenceObjects =
         //   getLastOccurrencePerFIDDate(updatedDataArray);
         // console.log(lastOccurrenceObjects);
+
+        // Get Date from array of object
+        const getCleanedDate = (obj) => {
+          const date = obj?.DATE?.trim() || '';
+          // Remove "(Tue)" or similar day abbreviations
+          return date.replace(/\(\w+\)/, '').trim();
+      };
+      
+      // Check the first object's DATE, fallback to the second object if needed
+      let dateValue = getCleanedDate(updatedDataArray[0]);
+      if (!dateValue) {
+          dateValue = getCleanedDate(updatedDataArray[1]);
+      }
+      
+      console.log(dateValue);
+
         const filteHighlightedData = updatedDataArray.filter(
           (item) => item.IN && item.OUT
         );
+
+        filteHighlightedData.forEach(obj => {
+          obj.DATE = dateValue;
+      });
+        console.log(filteHighlightedData)
         setExcelData(filteHighlightedData);
         setLoading(false);
         const theaderResult = getResult.flat();

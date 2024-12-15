@@ -94,9 +94,10 @@ export const Insurance = () => {
   }, []);
 
   return (
+    <section>
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto min-h-screen pt-2 px-10 mt-10 bg-[#F5F6F1CC]"
+      className="mx-auto  pt-2 px-10 mt-10 bg-[#F5F6F1CC]"
     >
       <div className="mb-3">
         <div className="grid grid-cols-2 gap-x-14">
@@ -121,28 +122,28 @@ export const Insurance = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-x-14">
-          {insuranceFields.map((field, index) => (
-            <div key={field.id} className="mb-2 relative">
-              <FormField
-                name={`insDetails.${index}.company`}
-                type="text"
-                placeholder="Enter Insurance Company"
-                label="Insurance Company"
-                register={register}
-                errors={errors}
-              />
-              {insuranceFields.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => remove(index)}
-                  className="absolute top-10 -right-10 text-medium_grey text-[25px]"
-                >
-                  <FaRegMinusSquare />
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
+    {insuranceFields.map((field, index) => (
+      <div key={field.id} className="mb-2 relative">
+        <FormField
+          name={`insDetails.${index}.company`}
+          type="text"
+          placeholder="Enter Insurance Company"
+          label="Insurance Company"
+          register={register}
+          errors={errors}
+        />
+        {insuranceFields.length > 1 && index !== 0 && ( // Add condition to exclude first element
+          <button
+            type="button"
+            onClick={() => remove(index)}
+            className="absolute top-10 -right-10 text-medium_grey text-[25px]"
+          >
+            <FaRegMinusSquare />
+          </button>
+        )}
+      </div>
+    ))}
+      </div>
       </div>
 
       <div className="flex justify-center items-center mt-10">
@@ -150,6 +151,7 @@ export const Insurance = () => {
           Save
         </button>
       </div>
+      </form>
 
       {notification && (
         <SpinLogo
@@ -169,6 +171,7 @@ export const Insurance = () => {
         </p>
 
         {insuranceData.length > 0 ? (
+                <div className=' h-[400px] overflow-y-auto scrollBar'>
           <table className="w-full text-center">
             <thead className=" bg-[#939393] text-white">
               <tr>
@@ -189,10 +192,11 @@ export const Insurance = () => {
         ))}
       </tbody>
           </table>
+          </div>
         ) : (
           <p className="text-center mt-10">No insurance information available.</p>
         )}
       </div>
-    </form>
+      </section>
   );
 };

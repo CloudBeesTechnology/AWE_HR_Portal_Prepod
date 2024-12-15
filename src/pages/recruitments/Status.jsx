@@ -30,7 +30,7 @@ const columnMapping = {
     "Position",
     "Selected Department",
   ],
-  "LOI": [
+  LOI: [
     "TempID",
     "Name",
     "Nationality",
@@ -41,7 +41,7 @@ const columnMapping = {
     "Decline Reason",
     "Status Update",
   ],
-  "CVEV_OffShore": [
+  CVEV_OffShore: [
     "TempID",
     "Name",
     "Nationality",
@@ -50,7 +50,7 @@ const columnMapping = {
     "CVEV PDF",
     "Status Update",
   ],
-  "PAAF_OnShore": [
+  PAAF_OnShore: [
     "TempID",
     "Name",
     "Nationality",
@@ -59,7 +59,7 @@ const columnMapping = {
     "PAAF PDF",
     "Status Update",
   ],
-  "Mobilization": [
+  Mobilization: [
     "TempID",
     "Name",
     "Nationality",
@@ -96,14 +96,15 @@ export const Status = () => {
   const [selectedCandidates, setSelectedCandidates] = useState([]);
   const [mergeData, setMergeData] = useState([]);
 
-  const { empPDData, educDetailsData } = useContext(DataSupply);
-// console.log(empPDData);
-// console.log(educDetailsData);
+  const { empPDData, educDetailsData, IVSSDetails } = useContext(DataSupply);
+  // console.log(empPDData);
+  // console.log(educDetailsData);
 
   // Merge function for context data
   const mergeContextData = (empPDData, educDetailsData) => {
     return empPDData.map((piData) => {
-      const edData = educDetailsData.find((item) => item.tempID === piData.tempID) || {};
+      const edData =
+        educDetailsData.find((item) => item.tempID === piData.tempID) || {};
 
       return {
         ...piData,
@@ -122,10 +123,20 @@ export const Status = () => {
           }),
         ]);
 
-        const interviews = interviewDatas?.data?.listInterviewSchedules?.items || [];
+        const interviews =
+          interviewDatas?.data?.listInterviewSchedules?.items || [];
 
-        if (empPDData && educDetailsData ) {
-          const merged = mergeContextData(empPDData, educDetailsData);
+        // if (empPDData && educDetailsData ) {
+        //   const merged = mergeContextData(empPDData, educDetailsData);
+
+        if (empPDData && educDetailsData && IVSSDetails) {
+          // Filter empPDData to include only those whose tempID is also in IVSSDetails
+          const filteredEmpPDData = empPDData.filter((emp) =>
+            IVSSDetails.some((ivss) => ivss.tempID === emp.tempID)
+          );
+
+          // Merge the filtered empPDData with educDetailsData
+          const merged = mergeContextData(filteredEmpPDData, educDetailsData);
 
           // Add interview details
           const mergedWithInterviews = merged.map((candidate) => {
@@ -148,7 +159,7 @@ export const Status = () => {
     };
 
     fetchData();
-  }, [empPDData, educDetailsData]);
+  }, [empPDData, educDetailsData, IVSSDetails]);
 
   const handleOptionSelect = (option) => {
     setSelectedOptions((prevSelectedOptions) => {
@@ -250,7 +261,7 @@ export const Status = () => {
     switch (selectedValue) {
       case "Interview Scheduled":
         const pendingCandi = mergeData.filter(
-          (val) => val.candidateStatus === "Pending"
+          (val) => val.status === "Pending"
         );
 
         setFilteredData(pendingCandi);
@@ -258,10 +269,18 @@ export const Status = () => {
         break;
       case "Selected Candidate":
         const selectedCandi = mergeData.filter(
-          (val) => val.candidateStatus === "Selected"
+          (val) => val.status === "Selected"
         );
+
         setFilteredData(selectedCandi);
+        // Log each candidate's name and status
+        selectedCandi.forEach((candidate) => {
+          console.log(
+            `Candidate: ${candidate.name}, Status: ${candidate.status}`
+          );
+        });
         break;
+        
       case "LOI":
         const loiAccept = mergeData.filter(
           (val) => val.loiStatus === "Accepted"
@@ -275,20 +294,18 @@ export const Status = () => {
         setFilteredData(cvevOff);
         break;
       case "PAAF_OnShore":
-        const paafOn = mergeData.filter(
-          (val) => val.paafStatus === "Approved"
-        );
+        const paafOn = mergeData.filter((val) => val.paafStatus === "Approved");
         setFilteredData(paafOn);
         break;
       case "Mobilization":
-        const  mobiliLocal= mergeData.filter(
+        const mobiliLocal = mergeData.filter(
           (val) => val.mobiliLocal === "Done"
         );
         setFilteredData(mobiliLocal);
         break;
-        default:
-          setFilteredData(mergeData); // Show all data if no specific filter is applied
-          break;
+      default:
+        setFilteredData(mergeData); // Show all data if no specific filter is applied
+        break;
     }
 
     setIsFilterBoxOpen(false);

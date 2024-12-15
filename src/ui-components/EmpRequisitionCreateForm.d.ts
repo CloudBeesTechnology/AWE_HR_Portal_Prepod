@@ -34,6 +34,8 @@ export declare type EmpRequisitionCreateFormInputValues = {
     status?: string;
     remarkReq?: string;
     reqName?: string;
+    requestorID?: string;
+    approverID?: string;
 };
 export declare type EmpRequisitionCreateFormValidationValues = {
     department?: ValidationFunction<string>;
@@ -48,6 +50,8 @@ export declare type EmpRequisitionCreateFormValidationValues = {
     status?: ValidationFunction<string>;
     remarkReq?: ValidationFunction<string>;
     reqName?: ValidationFunction<string>;
+    requestorID?: ValidationFunction<string>;
+    approverID?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type EmpRequisitionCreateFormOverridesProps = {
@@ -64,6 +68,8 @@ export declare type EmpRequisitionCreateFormOverridesProps = {
     status?: PrimitiveOverrideProps<TextFieldProps>;
     remarkReq?: PrimitiveOverrideProps<TextFieldProps>;
     reqName?: PrimitiveOverrideProps<TextFieldProps>;
+    requestorID?: PrimitiveOverrideProps<TextFieldProps>;
+    approverID?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type EmpRequisitionCreateFormProps = React.PropsWithChildren<{
     overrides?: EmpRequisitionCreateFormOverridesProps | undefined | null;

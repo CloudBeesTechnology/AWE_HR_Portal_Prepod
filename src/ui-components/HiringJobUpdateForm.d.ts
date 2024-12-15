@@ -29,6 +29,7 @@ export declare type HiringJobUpdateFormInputValues = {
     startDate?: string;
     expiryDate?: string;
     jobContent?: string;
+    uploadJobDetails?: string;
 };
 export declare type HiringJobUpdateFormValidationValues = {
     jobTitle?: ValidationFunction<string>;
@@ -38,6 +39,7 @@ export declare type HiringJobUpdateFormValidationValues = {
     startDate?: ValidationFunction<string>;
     expiryDate?: ValidationFunction<string>;
     jobContent?: ValidationFunction<string>;
+    uploadJobDetails?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type HiringJobUpdateFormOverridesProps = {
@@ -49,6 +51,7 @@ export declare type HiringJobUpdateFormOverridesProps = {
     startDate?: PrimitiveOverrideProps<TextFieldProps>;
     expiryDate?: PrimitiveOverrideProps<TextFieldProps>;
     jobContent?: PrimitiveOverrideProps<TextFieldProps>;
+    uploadJobDetails?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type HiringJobUpdateFormProps = React.PropsWithChildren<{
     overrides?: HiringJobUpdateFormOverridesProps | undefined | null;

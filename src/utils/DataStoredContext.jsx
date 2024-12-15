@@ -23,7 +23,14 @@ import {
   listInterviewSchedules,
   listInsClaims,
   listWorkMen,
+  listTrainingCertificates,
+  listTrainingReqs,
+  listWeldingInfos,
+  listBastingPaints,
   listHiringJobs,
+  listTicketRequests,
+  listProbForms
+
 } from "../graphql/queries";
 
 export const DataSupply = createContext();
@@ -52,9 +59,15 @@ const DataStoredContext = ({ children }) => {
     SawpDetails: [],
     IVSSDetails: [],
     AddCourseDetails: [],
-    insuranceClaimsData: [],
-    workMenDetails: [],
-    hiringData: [],
+    insuranceClaimsData:[],
+    workMenDetails:[],
+    trainingCertifi:[],
+    AddEmpReq:[],
+    WeldeInfo:[],
+    BastingInfo:[],
+    hiringData:[],
+    ticketData:[],
+    ProbFData:[]
   });
 
   useEffect(() => {
@@ -83,7 +96,13 @@ const DataStoredContext = ({ children }) => {
           { query: listAddCourses, key: "AddCourseDetails" },
           { query: listInsClaims, key: "insuranceClaimsData" },
           { query: listWorkMen, key: "workMenDetails" },
+          { query: listTrainingCertificates, key: "trainingCertifi" },
+          { query: listTrainingReqs, key: "AddEmpReq" },
+          { query: listWeldingInfos, key: "WeldeInfo" },
+          { query: listBastingPaints, key: "BastingInfo" },
           { query: listHiringJobs, key: "hiringData" },
+          { query: listTicketRequests, key: "ticketData" },
+          { query: listProbForms, key: "ProbFData" },
         ];
         const limit = 10000;
         const responses = await Promise.all(
@@ -101,7 +120,7 @@ const DataStoredContext = ({ children }) => {
               ?.items || [];
           return { ...acc, [key]: items };
         }, {});
-        console.log(newData);
+        // console.log(newData);
 
         setDataState((prevState) => ({ ...prevState, ...newData }));
       } catch (error) {

@@ -1,64 +1,91 @@
-
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CourceValidationSchema } from "../../../services/TrainingValidation";
 import { useContext, useState } from "react";
 import { CiSquarePlus } from "react-icons/ci";
-
+import { IoIosCloseCircleOutline } from "react-icons/io";
 import { AddCFFun } from "../../../services/createMethod/AddCFFun";
 import { AddCFUpdate } from "../../../services/updateMethod/AddCFUpdate";
 import { DataSupply } from "../../../utils/DataStoredContext";
+import { SpinLogo } from "../../../utils/SpinLogo";
+import { FaRegMinusSquare } from "react-icons/fa";
 
 export const AddCourseForm = ({ closeModal }) => {
   const { AddCourseData } = AddCFFun();
   const { AddCourseDetails } = useContext(DataSupply);
   const { AddCUpdateFun } = AddCFUpdate();
-console.log(AddCourseDetails);
+  console.log(AddCourseDetails);
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(CourceValidationSchema),
   });
 
-  const [courseName, setCourseName] = useState([""]);
-  const [company, setCompany] = useState([""]);
+  // State to track dynamic inputs
+  const [courseName, setCourseName] = useState([""]);  // Initial state for course names
+  const [company, setCompany] = useState([""]);  // Initial state for company names
 
-  const addCourseNameField = () => setCourseName([...courseName, ""]);
-  const addCompanyField = () => setCompany([...company, ""]);
+  // Add a new input field for course name
+  const addCourseNameField = () => {
+    setCourseName((prevState) => [...prevState, ""]);
+  };
+
+  // Add a new input field for company
+  const addCompanyField = () => {
+    setCompany((prevState) => [...prevState, ""]);
+  };
+
+  // Remove a course name input field
+  const removeCourseNameField = (index) => {
+    const updatedCourseNames = [...courseName];
+    updatedCourseNames.splice(index, 1); // Remove the field at the given index
+    setCourseName(updatedCourseNames); // Update state
+    setValue("courseName", updatedCourseNames); // Update react-hook-form state
+  };
+
+  // Remove a company input field
+  const removeCompanyField = (index) => {
+    const updatedCompanies = [...company];
+    updatedCompanies.splice(index, 1); // Remove the field at the given index
+    setCompany(updatedCompanies); // Update state
+    setValue("company", updatedCompanies); // Update react-hook-form state
+  };
+
+  const [showTitle, setShowTitle] = useState("");
+  const [notification, setNotification] = useState(false);
 
   const onSubmit = async (data) => {
     try {
       console.log("Form Data Submitted:", data);
-  
+
       const submittedCourseSelect = typeof data.courseSelect === 'string' ? data.courseSelect : '';
 
       // Find an existing entry matching courseSelect
       const checkingEIDTable = AddCourseDetails?.find((match) => {
-        // Ensure match.courseSelect is a string
         const matchCourseSelect = typeof match.courseSelect === 'string' ? match.courseSelect : '';
         return submittedCourseSelect === matchCourseSelect;
       });
 
       if (checkingEIDTable) {
         // Combine existing data with new data and remove duplicates
-  
         const updatedCourseName = [
           ...new Set([
             ...checkingEIDTable.courseName,
             ...data.courseName,
           ]),
         ];
-  
+
         const updatedCompany = [
           ...new Set([
             ...checkingEIDTable.company,
             ...data.company,
           ]),
         ];
-  
+
         // Update logic
         const AddCFUpp = {
           ...data,
@@ -66,7 +93,7 @@ console.log(AddCourseDetails);
           company: updatedCompany,
           id: checkingEIDTable.id,
         };
-  
+
         console.log("Updating data:", AddCFUpp);
         await AddCUpdateFun({ AddCFUpp });
       } else {
@@ -74,35 +101,36 @@ console.log(AddCourseDetails);
         const AddCFCre = {
           ...data,
         };
-  
+
         console.log("Creating new data:", AddCFCre);
-        await AddCourseData({AddCFCre});
+        await AddCourseData({ AddCFCre });
+        setShowTitle("Training Add Course Form Saved successfully");
+        setNotification(true);
       }
     } catch (error) {
       console.error("Error submitting data:", error.message);
     }
   };
-  
 
   return (
-    <div className="flex justify-center items-center h-screen">
-      <section className="w-[500px] max-h-[500px] overflow-y-auto bg-white shadow-lg p-10 rounded-lg border">
-      <div className="flex justify-end items-end">
-      <button
-        onClick={closeModal} // Call the function passed as a prop to close the modal
-        className="bg-blue rounded-full p-2 w-[50px] h-[50px]"
-      >
-        X
-      </button>
-      </div>
-        <form onSubmit={handleSubmit(onSubmit)}>
+    <div className="flex justify-center items-center">
+      <section className="w-[550px] h-[440px] overflow-y-auto p-5 bg-white shadow-lg rounded-lg scrollBar">
+        <div className="flex justify-end items-end">
+          <button
+            onClick={closeModal} // Call the function passed as a prop to close the modal
+            className="p-2"
+          >
+            <IoIosCloseCircleOutline className="text-[32px] font-xs" />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="p-7">
           {/* courseSelect field */}
           <div className="mb-4 relative">
-            <label className="font-semibold">Select Course:</label>
+            <label className="font-semibold">Course Code:</label>
             <input
               type="text"
               {...register("courseSelect")}
-              className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full"
+              className="input-field"
             />
             {errors.courseSelect && (
               <p className="text-[red] text-[13px] mt-1">
@@ -115,23 +143,40 @@ console.log(AddCourseDetails);
           <div className="mb-4 relative">
             <label className="font-semibold">Course Name:</label>
             {courseName.map((_, index) => (
-              <div key={index}>
+              <div key={index} className="flex  items-center mb-2">
                 <input
                   type="text"
+                  value={courseName[index]}
                   {...register(`courseName[${index}]`)}
-                  className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full"
+                  onChange={(e) => {
+                    const updatedCourseNames = [...courseName];
+                    updatedCourseNames[index] = e.target.value;
+                    setCourseName(updatedCourseNames);
+                    setValue(`courseName[${index}]`, e.target.value);
+                  }}
+                  className="input-field"
                 />
-                {errors.courseName && errors.courseName[index] && (
+                {index > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => removeCourseNameField(index)}
+                    className="ml-2 text-medium_grey"
+                  >
+                    <FaRegMinusSquare/>
+                  </button>
+                )}
+                
+                {/* {errors.courseName && errors.courseName[index] && (
                   <p className="text-[red] text-[13px] mt-1">
                     {errors.courseName[index].message}
                   </p>
-                )}
+                )} */}
               </div>
             ))}
             <button
               type="button"
               onClick={addCourseNameField}
-              className="absolute top-10 -right-7 text-medium_grey text-[18px]"
+              className="absolute top-10 -right-7 text-medium_grey text-[24px]"
             >
               <CiSquarePlus />
             </button>
@@ -141,12 +186,28 @@ console.log(AddCourseDetails);
           <div className="mb-4 relative">
             <label className="font-semibold">Training Company:</label>
             {company.map((_, index) => (
-              <div key={index}>
+              <div key={index} className="flex items-center mb-2">
                 <input
                   type="text"
+                  value={company[index]}
                   {...register(`company[${index}]`)}
-                  className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full"
+                  onChange={(e) => {
+                    const updatedCompanies = [...company];
+                    updatedCompanies[index] = e.target.value;
+                    setCompany(updatedCompanies);
+                    setValue(`company[${index}]`, e.target.value);
+                  }}
+                  className="input-field"
                 />
+                {index > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => removeCompanyField(index)}
+                    className="ml-2 text-medium_grey"
+                  >
+                    <FaRegMinusSquare/>
+                  </button>
+                )}
                 {errors.company && errors.company[index] && (
                   <p className="text-[red] text-[13px] mt-1">
                     {errors.company[index].message}
@@ -157,7 +218,7 @@ console.log(AddCourseDetails);
             <button
               type="button"
               onClick={addCompanyField}
-              className="absolute top-10 -right-7 text-medium_grey text-[18px]"
+              className="absolute top-10 -right-7 text-medium_grey text-[24px]"
             >
               <CiSquarePlus />
             </button>
@@ -170,9 +231,15 @@ console.log(AddCourseDetails);
             </button>
           </div>
         </form>
+        {notification && (
+          <SpinLogo
+            text={showTitle}
+            notification={notification}
+            path="/training"
+          />
+        )}
       </section>
     </div>
   );
 };
-
 

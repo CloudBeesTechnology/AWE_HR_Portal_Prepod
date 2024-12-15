@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useForm} from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormField } from "../../utils/FormField";
@@ -15,6 +15,7 @@ import { pdfjs } from "react-pdf";
 import { getUrl } from "@aws-amplify/storage";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
+import { useReactToPrint } from 'react-to-print';
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
   import.meta.url
@@ -41,6 +42,8 @@ export const WorkmenComp = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [numPages, setNumPages] = useState(null);
   const [lastUploadUrl, setPPLastUP] = useState("");
+    const workmenPrint =useRef();
+  
   const {
     register,
     handleSubmit,
@@ -136,23 +139,33 @@ const onSubmit = async (data) => {
   }
 };
 
-useEffect(() => {
-  const fetchInsuranceData = async () => {
-    try {
-      const response = await client.graphql({
-        query: listWorkMen,
-      });
-      setInsuranceData(response.data.listWorkMen.items);
-      setLoading(false); 
-    } catch (error) {
-      console.error('Error fetching insurance data:', error);
-      setError('insuranceData', { message: 'Error fetching data' }); // Set error using setError
-      setLoading(false);
-    }
-  };
 
-  fetchInsuranceData();
-}, []);
+ useEffect(() => {
+    const fetchInsuranceData = async () => {
+      try {
+        const response = await client.graphql({
+          query: listWorkMen,
+        });
+        const items = response.data.listWorkMen.items;
+  
+        // Filter out expired policies
+        const filteredData = items.filter((data) => {
+          const expiryDate = new Date(data.workmenCompExp);
+          return expiryDate >= new Date(); // Include only non-expired policies
+        });
+  
+        setInsuranceData(filteredData);
+        setLoading(false); // Set loading to false when data is fetched
+      } catch (error) {
+        console.error("Error fetching insurance data:", error);
+        setError("insuranceData", { message: "Error fetching data" }); // Set error using setError
+        setLoading(false);
+      }
+    };
+  
+    fetchInsuranceData();
+  }, []);
+
 
 
 const openPopup = (fileUrl) => {
@@ -160,9 +173,13 @@ const openPopup = (fileUrl) => {
   setPopupVisible(true); // Show the popup
 };
 
-const handlePrint = () => {
-  window.print();
-};
+ const handlePrint = useReactToPrint({
+    content: () => workmenPrint.current,
+    onBeforePrint: () => console.log("Preparing print..."),
+    onAfterPrint: () => console.log("Print complete"),
+    pageStyle: "print", // This ensures the print view uses a different CSS style
+  });
+
 
 const onDocumentLoadSuccess = ({ numPages }) => {
   setNumPages(numPages);
@@ -194,7 +211,7 @@ const renderDocumentsUnderCategory = (documents) => {
             document.upload.endsWith(".pdf") && (
               <div className="mt-4  ">
                 <div className="relative bg-white max-w-3xl mx-auto p-6 rounded-lg shadow-lg">
-                  <div  className="flex justify-center  h-[400px] overflow-y-auto">
+                  <div ref={workmenPrint} className="flex justify-center  h-[400px] overflow-y-auto">
                     <Worker
                      workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
                     >
@@ -203,27 +220,6 @@ const renderDocumentsUnderCategory = (documents) => {
                        
                       />
                     </Worker>
-                  </div>
-
-                  {/* Pagination Controls */}
-                  <div className="mt-4 flex justify-between items-center">
-                    <button
-                      onClick={() => setPageNumber(pageNumber - 1)}
-                      disabled={pageNumber <= 1}
-                      className="bg-blue-600 text-black px-3 py-1 rounded-full text-sm hover:bg-blue-800"
-                    >
-                      Previous
-                    </button>
-                    <span className="text-gray-700">
-                      Page {pageNumber} of {numPages}
-                    </span>
-                    <button
-                      onClick={() => setPageNumber(pageNumber + 1)}
-                      disabled={pageNumber >= numPages}
-                      className="bg-blue-600 text-black px-3 py-1 rounded-full text-sm hover:bg-blue-800"
-                    >
-                      Next
-                    </button>
                   </div>
 
                   {/* Close Button */}
@@ -328,7 +324,8 @@ const renderDocumentCategory = (uploadArray, categoryName) => {
   );
 };
   return (
-<form onSubmit={handleSubmit(onSubmit)} className="mx-auto min-h-screen py-5 px-10 my-10 bg-[#F5F6F1CC]">
+<section>
+<form onSubmit={handleSubmit(onSubmit)} className="mx-auto py-5 px-10 my-10 bg-[#F5F6F1CC]">
 
 {/* Workmen Compensation Insurance Fields */}
 <h3 className="mb-5 text-lg font-bold">Workmen Compensation Insurance</h3>
@@ -397,6 +394,8 @@ const renderDocumentCategory = (uploadArray, categoryName) => {
           Save
         </button>
       </div>
+      </form>
+
       {notification && (
         <SpinLogo
           text="Workmen Compensation Saved Successfully"
@@ -405,11 +404,13 @@ const renderDocumentCategory = (uploadArray, categoryName) => {
         />
       )}
 {/* View Insurance Info Section */}
-<div className="mt-20">
+<div className="mt-10">
 <p className="text-xl font-bold mb-10 p-3 rounded-lg border-2 border-[#FEF116] bg-[#FFFEF4] w-[250px]">
           View Insurance Info
         </p>
         {insuranceData.length > 0 ? (
+      <div className=' h-[400px] overflow-y-auto scrollBar'>
+
           <table className="w-full text-center">
             <thead className="bg-[#939393] text-white">
               <tr>
@@ -429,13 +430,14 @@ const renderDocumentCategory = (uploadArray, categoryName) => {
                   <td className="pl-4 py-4">{data.workmenCompNo}</td>
                   <td className="py-4 px-4">{formatDate(data?.workmenCompExp || "N/A")}</td>
                   <td className="pl-4 py-4">
-                    {renderDocumentCategory(data.workmenComUp,"perAccUp Pdf")}
+                    {renderDocumentCategory(data.workmenComUp,"PDF File")}
                   </td>
                 
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         ) : (
           <p className="text-center mt-10">No insurance information available.</p>
         )}
@@ -480,7 +482,7 @@ const renderDocumentCategory = (uploadArray, categoryName) => {
           </div>
         </div>
       )}
-    </form>
+</section>
   );
 };
 

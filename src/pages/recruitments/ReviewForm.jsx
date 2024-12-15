@@ -6,6 +6,7 @@ import { generateClient } from "@aws-amplify/api";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { useLeaveManage } from "../../hooks/useLeaveManage";
 import { DataSupply } from "../../utils/DataStoredContext";
+import { getUrl } from "@aws-amplify/storage";
 
 const client = generateClient();
 
@@ -16,6 +17,8 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [notification, setNotification] = useState(false);
   const { personalDetails } = useLeaveManage();
+  const [imageUrl, setImageUrl] = useState("");
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const handleScheduleInterview = () => {
     setIsScheduleOpen(true);
@@ -25,7 +28,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     setIsScheduleOpen(false);
   };
 
-  console.log("hey buddy", personalDetails);
+  // console.log("hey buddy", personalDetails);
 
   const handleRejected = async (dataCandi) => {
     try {
@@ -97,7 +100,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
 
         const data = {
           id: match.id,
-          candidateStatus: "Selected",
+          status: "Selected",
         };
 
         try {
@@ -106,7 +109,8 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             variables: { input: data },
           });
 
-          // console.log("Update successful for candidate ID", match.id, ":",response );
+          console.log("Update successful for candidate ID", match.id, ":",response );
+          setNotification(true);
         } catch (err) {
           console.log(err);
 
@@ -129,6 +133,31 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
       document.body.style.overflow = "";
     };
   }, []);
+
+  const formatDate = (dateString) => {
+    // Check if the dateString is empty or invalid before processing
+    if (!dateString || isNaN(new Date(dateString).getTime())) {
+      return ""; // Return an empty string or a custom message if invalid
+    }
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, "0"); // Adds leading zero if day is single digit
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // getMonth() returns 0-11, so we add 1
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  };
+
+  useEffect(() => {
+    const linkToImageFile = async (pathUrl) => {
+      const result = await getUrl({ path: pathUrl });
+      setImageUrl(result.url.toString());
+    };
+
+    if (candidate?.profilePhoto) {
+      linkToImageFile(candidate.profilePhoto);
+    }
+  }, [candidate?.profilePhoto]);// Only run when candidate.profilePhoto changes
+  
 
   return (
     <section>
@@ -155,42 +184,75 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
           <div className="mt-6 relative">
             <div className="flex justify-end absolute right-0 top-0 mt-4 mr-4">
               <img
-                src={candidate.profilePhoto}
+                src={imageUrl}
                 alt={`${candidate.name}'s photo`}
                 className="w-32 h-36 border-2 border-lite_grey shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)]"
               />
             </div>
             {[
-              { label: "Applying For", value: candidate.position },
-              { label: "Experience", value: candidate.noExperience },
-              { label: "Previous Company", value: candidate.workExperience },
-              { label: "Contract", value: candidate.contractType },
-              { label: "Type", value: candidate.empType },
-              { label: "CV Received From", value: candidate.agent },
-              { label: "Qualification", value: candidate.eduDetails },
-              { label: "Name", value: candidate.name },
-              { label: "Nationality", value: candidate.nationality },
-              { label: "Race", value: candidate.race },
-              { label: "Gender", value: candidate.gender },
-              { label: "Date of Birth", value: candidate.dob },
-              { label: "Age", value: candidate.age },
-              { label: "Marital Status", value: candidate.marital },
-              { label: "Religion", value: candidate.religion },
-              { label: "Country of Birth", value: candidate.cob },
-              { label: "Language Profiency", value: candidate.lang },
-              { label: "Home Address", value: candidate.permanentAddress },
-              { label: "Email", value: candidate.email },
-              { label: "Contact", value: candidate.contactNo },
-              { label: "Brunei IC No.", value: candidate.bwnIcNo},
-              { label: "Brunei IC Colour.", value: candidate.bwnIcColour},
-              { label: "Brunei IC Expiry", value: candidate.bwnIcExpiry },
-              { label: "Malaysia IC No.", value: candidate.alternateNo },
-              { label: "Passport No.", value: candidate.ppNo },
-              { label: "Passport Issue Date", value: candidate.ppIssued },
-              { label: "Passport Expiry Date", value: candidate.ppExpiry },
-              { label: "Passport Issued Place", value: candidate.ppDestinate },
-              { label: "Next of Kin Info", value: candidate.familyDetails },
-              { label: "Emergency Contact", value: candidate.emgDetails },
+              { label: "Applying For", value: candidate.position || "N/A" },
+              { label: "Experience", value: candidate.noExperience || "N/A" },
+              {
+                label: "Previous Company",
+                value: candidate.workExperience || "N/A",
+              },
+              { label: "Contract", value: candidate.contractType || "N/A" },
+              { label: "Type", value: candidate.empType || "N/A" },
+              { label: "CV Received From", value: candidate.agent || "N/A" },
+              { label: "Qualification", value: candidate.eduDetails || "N/A" },
+              { label: "Name", value: candidate.name || "N/A" },
+              { label: "Nationality", value: candidate.nationality || "N/A" },
+              { label: "Race", value: candidate.race || "N/A" },
+              { label: "Gender", value: candidate.gender || "N/A" },
+              {
+                label: "Date of Birth",
+                value: formatDate(candidate.dob) || "N/A",
+              },
+              { label: "Age", value: candidate.age || "N/A" },
+              { label: "Marital Status", value: candidate.marital || "N/A" },
+              { label: "Religion", value: candidate.religion || "N/A" },
+              { label: "Country of Birth", value: candidate.cob || "N/A" },
+              { label: "Language Profiency", value: candidate.lang || "N/A" },
+              {
+                label: "Home Address",
+                value: candidate.permanentAddress || "N/A",
+              },
+              { label: "Email", value: candidate.email || "N/A" },
+              { label: "Contact", value: candidate.contactNo || "N/A" },
+              { label: "Brunei IC No.", value: candidate.bwnIcNo || "N/A" },
+              {
+                label: "Brunei IC Colour.",
+                value: candidate.bwnIcColour || "N/A",
+              },
+              {
+                label: "Brunei IC Expiry",
+                value: formatDate(candidate.bwnIcExpiry) || "N/A",
+              },
+              {
+                label: "Malaysia IC No.",
+                value: candidate.alternateNo || "N/A",
+              },
+              { label: "Passport No.", value: candidate.ppNo || "N/A" },
+              {
+                label: "Passport Issue Date",
+                value: candidate.ppIssued || "N/A",
+              },
+              {
+                label: "Passport Expiry Date",
+                value: candidate.ppExpiry || "N/A",
+              },
+              {
+                label: "Passport Issued Place",
+                value: candidate.ppDestinate || "N/A",
+              },
+              {
+                label: "Next of Kin Info",
+                value: candidate.familyDetails || "N/A",
+              },
+              {
+                label: "Emergency Contact",
+                value: candidate.emgDetails || "N/A",
+              },
             ].map((item, index) => (
               <div key={index} className="grid grid-cols-3 gap-4 mb-4">
                 <strong className="w-full">{item.label}</strong>
@@ -234,7 +296,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                   className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
                   onClick={() => {
                     handleSelected([candidate]);
-                    // console.log(candidate);
+                    console.log(candidate);
                   }}
                 >
                   Selected

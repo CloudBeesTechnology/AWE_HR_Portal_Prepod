@@ -1,20 +1,30 @@
 import { useCallback, useEffect, useState } from "react";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
-import {
-  createOffshoreSheet,
-  deleteOffshoreSheet,
-  updateOffshoreSheet,
-} from "../../graphql/mutations";
+// import {
+//   createOffshoreSheet,
+//   deleteOffshoreSheet,
+//   updateOffshoreSheet,
+// } from "../../graphql/mutations";
 import { generateClient } from "@aws-amplify/api";
 import { PopupForMissMatchExcelSheet } from "./ModelForSuccessMess/PopupForMissMatchExcelSheet";
 import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
 import { EditTimeSheet } from "./EditTimeSheet";
 import { SuccessMessage } from "./ModelForSuccessMess/SuccessMessage";
 import "../../../src/index.css";
-import { useScrollableView } from "./customTimeSheet/UseScrollableView";
-import { listEmpWorkInfos, listOffshoreSheets } from "../../graphql/queries";
+
+import {
+  listEmpWorkInfos,
+  listOffshoreSheets,
+  listTimeSheets,
+} from "../../graphql/queries";
 import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
 import { PopupForAssignManager } from "./ModelForSuccessMess/PopupForAssignManager";
+import {
+  createTimeSheet,
+  deleteTimeSheet,
+  updateTimeSheet,
+} from "../../graphql/mutations";
+import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
 const client = generateClient();
 
 export const ViewTSTBeforeSave = ({
@@ -24,7 +34,10 @@ export const ViewTSTBeforeSave = ({
   convertedStringToArrayObj,
   titleName,
   setExcelData,
+  fileName,
+  
 }) => {
+  const uploaderID = localStorage.getItem("userID")?.toUpperCase();
   const [data, setData] = useState(null);
   const [secondaryData, setSecondaryData] = useState(null);
   const [currentStatus, setCurrentStatus] = useState(null);
@@ -36,10 +49,11 @@ export const ViewTSTBeforeSave = ({
   const [toggleAssignManager, setToggleAssignManager] = useState(false);
 
   const [showStatusCol, setShowStatusCol] = useState(null);
-  const { handleScroll, visibleData, setVisibleData } = useScrollableView(
+  const { handleScroll, visibleData, setVisibleData } = UseScrollableView(
     data,
     Position
   );
+
   // useEffect(() => {
   //   if (excelData) {
   //     const fetchData = async () => {
@@ -250,7 +264,7 @@ export const ViewTSTBeforeSave = ({
           // const filterPending = fetchedData.filter(
           //   (val) => val.status !== "Approved"
           // );
-
+          
           const filterPending = fetchedData
             .map((value) => {
               return {
@@ -264,7 +278,7 @@ export const ViewTSTBeforeSave = ({
             })
             .filter((item) => item.data && item.data.length > 0);
           //   const filterPending =
-          // console.log(filterPending);
+         
           //   console.log(fetchedData);
 
           if (userIdentification === "Manager") {
@@ -303,7 +317,7 @@ export const ViewTSTBeforeSave = ({
     return data.map((m) => ({
       id: m.id,
       data: m.data.map((val) => {
-        if (val.DATE === getObject.DATE) {
+        if (val.NO === getObject.NO) {
           return getObject;
         } else {
           return val;
@@ -373,21 +387,25 @@ export const ViewTSTBeforeSave = ({
       //   CREATE
       const currentDate = new Date().toLocaleDateString();
       const DailySheet = {
+        date: currentDate,
         dailySheet: JSON.stringify(finalResult),
         status: "Pending",
-        date: currentDate,
+        managerDetails: JSON.stringify(managerData),
+        type: "Offshore",
+        fileName: fileName,
+        uploaderID: uploaderID,
       };
 
       if (DailySheet.dailySheet) {
         await client
           .graphql({
-            query: createOffshoreSheet,
+            query: createTimeSheet,
             variables: {
               input: DailySheet,
             },
           })
           .then((res) => {
-            if (res.data.createOffshoreSheet) {
+            if (res.data.createTimeSheet) {
               // console.log(
               //   "res.data.createOffshoreSheet : ",
               //   res.data.createOffshoreSheet
@@ -396,6 +414,7 @@ export const ViewTSTBeforeSave = ({
             }
           })
           .catch((err) => {
+        
             toggleSFAMessage(false);
           });
       }
@@ -441,20 +460,20 @@ export const ViewTSTBeforeSave = ({
         if (finalData.dailySheet) {
           await client
             .graphql({
-              query: updateOffshoreSheet,
+              query: updateTimeSheet,
               variables: {
                 input: finalData,
               },
             })
             .then((res) => {
-              if (res.data.updateOffshoreSheet) {
+              if (res.data.updateTimeSheet) {
                 // console.log(
                 //   "res.data.updateOffshoreSheet : ",
                 //   res.data.updateOffshoreSheet
                 // );
                 toggleSFAMessage(true);
                 setVisibleData([]);
-                // setData(null);
+                setData(null);
               }
             })
             .catch((err) => {
@@ -466,6 +485,7 @@ export const ViewTSTBeforeSave = ({
   };
   return (
     <div className="border border-white">
+       
       {currentStatus ? (
         <div>
           <div className="flex justify-end w-full mr-7">
@@ -578,22 +598,22 @@ export const ViewTSTBeforeSave = ({
                   : (
                       <tr>
                         <td
-                          colSpan="15"
+                          colSpan="100%"
                           className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white"
                         >
                           <p className="px-6 py-6">
-                            No Table Data Available Here
+                          No Table Data Available Here.
                           </p>
                         </td>
                       </tr>
                     ) ?? (
                       <tr>
                         <td
-                          colSpan="15"
+                          colSpan="100%"
                           className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white"
                         >
                           <p className="px-6 py-6">
-                            No Table Data Available Here
+                          No Table Data Available Here.
                           </p>
                         </td>
                       </tr>
@@ -618,11 +638,11 @@ export const ViewTSTBeforeSave = ({
                   //   // Fetch the BLNG data using GraphQL
                   //   const [fetchBLNGdata] = await Promise.all([
                   //     client.graphql({
-                  //       query: listOffshoreSheets,
+                  //       query: listTimeSheets,
                   //     }),
                   //   ]);
                   //   const BLNGdata =
-                  //     fetchBLNGdata?.data?.listOffshoreSheets?.items;
+                  //     fetchBLNGdata?.data?.listTimeSheets?.items;
                   //   console.log("BLNGdata : ", BLNGdata);
                   //   const deleteFunction =
                   //     BLNGdata &&
@@ -632,7 +652,7 @@ export const ViewTSTBeforeSave = ({
                   //       };
                   //       await client
                   //         .graphql({
-                  //           query: deleteOffshoreSheet,
+                  //           query: deleteTimeSheet,
                   //           variables: {
                   //             input: dailySheet,
                   //           },

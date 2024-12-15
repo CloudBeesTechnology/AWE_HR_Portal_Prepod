@@ -37,6 +37,8 @@ export default function EmpRequisitionUpdateForm(props) {
     status: "",
     remarkReq: "",
     reqName: "",
+    requestorID: "",
+    approverID: "",
   };
   const [department, setDepartment] = React.useState(initialValues.department);
   const [justification, setJustification] = React.useState(
@@ -60,6 +62,10 @@ export default function EmpRequisitionUpdateForm(props) {
   const [status, setStatus] = React.useState(initialValues.status);
   const [remarkReq, setRemarkReq] = React.useState(initialValues.remarkReq);
   const [reqName, setReqName] = React.useState(initialValues.reqName);
+  const [requestorID, setRequestorID] = React.useState(
+    initialValues.requestorID
+  );
+  const [approverID, setApproverID] = React.useState(initialValues.approverID);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = empRequisitionRecord
@@ -77,6 +83,8 @@ export default function EmpRequisitionUpdateForm(props) {
     setStatus(cleanValues.status);
     setRemarkReq(cleanValues.remarkReq);
     setReqName(cleanValues.reqName);
+    setRequestorID(cleanValues.requestorID);
+    setApproverID(cleanValues.approverID);
     setErrors({});
   };
   const [empRequisitionRecord, setEmpRequisitionRecord] = React.useState(
@@ -110,6 +118,8 @@ export default function EmpRequisitionUpdateForm(props) {
     status: [],
     remarkReq: [],
     reqName: [],
+    requestorID: [],
+    approverID: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -149,6 +159,8 @@ export default function EmpRequisitionUpdateForm(props) {
           status: status ?? null,
           remarkReq: remarkReq ?? null,
           reqName: reqName ?? null,
+          requestorID: requestorID ?? null,
+          approverID: approverID ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -221,6 +233,8 @@ export default function EmpRequisitionUpdateForm(props) {
               status,
               remarkReq,
               reqName,
+              requestorID,
+              approverID,
             };
             const result = onChange(modelFields);
             value = result?.department ?? value;
@@ -256,6 +270,8 @@ export default function EmpRequisitionUpdateForm(props) {
               status,
               remarkReq,
               reqName,
+              requestorID,
+              approverID,
             };
             const result = onChange(modelFields);
             value = result?.justification ?? value;
@@ -291,6 +307,8 @@ export default function EmpRequisitionUpdateForm(props) {
               status,
               remarkReq,
               reqName,
+              requestorID,
+              approverID,
             };
             const result = onChange(modelFields);
             value = result?.project ?? value;
@@ -326,6 +344,8 @@ export default function EmpRequisitionUpdateForm(props) {
               status,
               remarkReq,
               reqName,
+              requestorID,
+              approverID,
             };
             const result = onChange(modelFields);
             value = result?.position ?? value;
@@ -365,6 +385,8 @@ export default function EmpRequisitionUpdateForm(props) {
               status,
               remarkReq,
               reqName,
+              requestorID,
+              approverID,
             };
             const result = onChange(modelFields);
             value = result?.quantity ?? value;
@@ -400,6 +422,8 @@ export default function EmpRequisitionUpdateForm(props) {
               status,
               remarkReq,
               reqName,
+              requestorID,
+              approverID,
             };
             const result = onChange(modelFields);
             value = result?.qualification ?? value;
@@ -435,6 +459,8 @@ export default function EmpRequisitionUpdateForm(props) {
               status,
               remarkReq,
               reqName,
+              requestorID,
+              approverID,
             };
             const result = onChange(modelFields);
             value = result?.reasonForReq ?? value;
@@ -470,6 +496,8 @@ export default function EmpRequisitionUpdateForm(props) {
               status,
               remarkReq,
               reqName,
+              requestorID,
+              approverID,
             };
             const result = onChange(modelFields);
             value = result?.replacementFor ?? value;
@@ -505,6 +533,8 @@ export default function EmpRequisitionUpdateForm(props) {
               status,
               remarkReq,
               reqName,
+              requestorID,
+              approverID,
             };
             const result = onChange(modelFields);
             value = result?.tentativeDate ?? value;
@@ -540,6 +570,8 @@ export default function EmpRequisitionUpdateForm(props) {
               status: value,
               remarkReq,
               reqName,
+              requestorID,
+              approverID,
             };
             const result = onChange(modelFields);
             value = result?.status ?? value;
@@ -575,6 +607,8 @@ export default function EmpRequisitionUpdateForm(props) {
               status,
               remarkReq: value,
               reqName,
+              requestorID,
+              approverID,
             };
             const result = onChange(modelFields);
             value = result?.remarkReq ?? value;
@@ -610,6 +644,8 @@ export default function EmpRequisitionUpdateForm(props) {
               status,
               remarkReq,
               reqName: value,
+              requestorID,
+              approverID,
             };
             const result = onChange(modelFields);
             value = result?.reqName ?? value;
@@ -623,6 +659,80 @@ export default function EmpRequisitionUpdateForm(props) {
         errorMessage={errors.reqName?.errorMessage}
         hasError={errors.reqName?.hasError}
         {...getOverrideProps(overrides, "reqName")}
+      ></TextField>
+      <TextField
+        label="Requestor id"
+        isRequired={false}
+        isReadOnly={false}
+        value={requestorID}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              department,
+              justification,
+              project,
+              position,
+              quantity,
+              qualification,
+              reasonForReq,
+              replacementFor,
+              tentativeDate,
+              status,
+              remarkReq,
+              reqName,
+              requestorID: value,
+              approverID,
+            };
+            const result = onChange(modelFields);
+            value = result?.requestorID ?? value;
+          }
+          if (errors.requestorID?.hasError) {
+            runValidationTasks("requestorID", value);
+          }
+          setRequestorID(value);
+        }}
+        onBlur={() => runValidationTasks("requestorID", requestorID)}
+        errorMessage={errors.requestorID?.errorMessage}
+        hasError={errors.requestorID?.hasError}
+        {...getOverrideProps(overrides, "requestorID")}
+      ></TextField>
+      <TextField
+        label="Approver id"
+        isRequired={false}
+        isReadOnly={false}
+        value={approverID}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              department,
+              justification,
+              project,
+              position,
+              quantity,
+              qualification,
+              reasonForReq,
+              replacementFor,
+              tentativeDate,
+              status,
+              remarkReq,
+              reqName,
+              requestorID,
+              approverID: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.approverID ?? value;
+          }
+          if (errors.approverID?.hasError) {
+            runValidationTasks("approverID", value);
+          }
+          setApproverID(value);
+        }}
+        onBlur={() => runValidationTasks("approverID", approverID)}
+        errorMessage={errors.approverID?.errorMessage}
+        hasError={errors.approverID?.hasError}
+        {...getOverrideProps(overrides, "approverID")}
       ></TextField>
       <Flex
         justifyContent="space-between"

@@ -72,7 +72,8 @@ export const UpdateEmpInfo = () => {
       permanentAddress,
       position,
       sapNo,
-      PITableID,
+      PITableID, bankName,
+      bankAccNo
     } = collectValue;
 
     const totalData = {
@@ -104,6 +105,8 @@ export const UpdateEmpInfo = () => {
       permanentAddress,
       position,
       sapNo,
+      bankName,
+      bankAccNo
     };
 
     const totalData1 = {
