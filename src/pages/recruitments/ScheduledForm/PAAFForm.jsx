@@ -18,7 +18,7 @@ const PAAFFormSchema = Yup.object().shape({
     ),
 });
 
-export const PAAFForm = () => {
+export const PAAFForm = ({candidate}) => {
   const { loiDetails } = UpdateLoiData();
   const { mergedInterviewData } = useFetchInterview();
   const [formData, setFormData] = useState({
@@ -28,8 +28,7 @@ export const PAAFForm = () => {
       paafFile: "",
     },
   });
-  // const [uploadedFileName, setUploadedFileName] = useState(null);
-  // const [uploadedPAAF, setUploadedPAAF] = useState(null);
+
   const [uploadedFileNames, setUploadedFileNames] = useState({
     paafFile: null,
   });
@@ -38,7 +37,6 @@ export const PAAFForm = () => {
   });
   const {
     register,
-    handleSubmit,
     formState: { errors },
     setValue,
     watch,
@@ -48,11 +46,11 @@ export const PAAFForm = () => {
 
   const PAAFUpload = watch("paafFile", "");
 
-  console.log("DATA 3.0", mergedInterviewData);
 
   useEffect(() => {
     if (mergedInterviewData.length > 0) {
-      const interviewData = mergedInterviewData[0]; // Assuming we want to take the first item
+      const interviewData = mergedInterviewData.find((data) => data.tempID === candidate.tempID); // Assuming we want to take the first item
+      if (interviewData) {
       setFormData({
         interview: {
           paafApproveDate: interviewData.localMobilization.paafApproveDate,
@@ -66,7 +64,8 @@ export const PAAFForm = () => {
         }));
       }
     }
-  }, [mergedInterviewData]);
+  }
+  }, [mergedInterviewData, candidate.tempID]);
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
@@ -93,7 +92,18 @@ export const PAAFForm = () => {
   const handleSubmitTwo = async (e) => {
     e.preventDefault();
  
-    const localMobilizationId = mergedInterviewData[0]?.localMobilization.id;
+   // Check if mergedInterviewData is available for the candidate
+   const selectedInterviewData = mergedInterviewData.find(
+    (data) => data.tempID === candidate?.tempID
+  );
+
+    // Ensure the candidate and their localMobilization details exist
+    if (!selectedInterviewData || !selectedInterviewData.localMobilization) {
+      alert("Candidate or LOI data not found.");
+      return;
+    }
+
+    const localMobilizationId = selectedInterviewData.localMobilization.id;
 
     try {
       await loiDetails({

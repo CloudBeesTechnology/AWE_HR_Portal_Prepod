@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { GoUpload } from "react-icons/go";
 import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
 import { UpdateLoiData } from "../../../services/updateMethod/UpdateLoi";
 import { useFetchInterview } from "../../../hooks/useFetchInterview";
@@ -19,7 +18,7 @@ const MOBFormSchema = Yup.object().shape({
     ),
 });
 
-export const MobilizationForm = () => {
+export const MobilizationForm = ({candidate}) => {
   const { loiDetails } = UpdateLoiData();
   const { mergedInterviewData } = useFetchInterview();
   const [formData, setFormData] = useState({
@@ -51,21 +50,26 @@ export const MobilizationForm = () => {
 
   useEffect(() => {
     if (mergedInterviewData.length > 0) {
-      const interviewData = mergedInterviewData[0]; // Assuming we want to take the first item
-      setFormData({
-        interview: {
-          mobSignDate: interviewData.localMobilization.mobSignDate,
-          mobFile: interviewData.localMobilization.mobFile,
-        },
-      });
-      if (interviewData.localMobilization.mobFile) {
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          mobFile: extractFileName(interviewData.localMobilization.mobFile),
-        }));
+      const interviewData = mergedInterviewData.find(
+        (data) => data.tempID === candidate.tempID
+      ); // Assuming we want to take the first item
+      if (interviewData) {
+  
+        setFormData({
+          interview: {
+            mobSignDate: interviewData.localMobilization.mobSignDate,
+            mobFile: interviewData.localMobilization.mobFile,
+          },
+        });
+        if (interviewData.localMobilization.mobFile) {
+          setUploadedFileNames((prev) => ({
+            ...prev,
+            mobFile: extractFileName(interviewData.localMobilization.mobFile),
+          }));
+        }
       }
     }
-  }, [mergedInterviewData]);
+  }, [mergedInterviewData, candidate.tempID]);
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
@@ -92,7 +96,19 @@ export const MobilizationForm = () => {
   const handleSubmitTwo = async (e) => {
     e.preventDefault();
 
-    const localMobilizationId = mergedInterviewData[0]?.localMobilization.id;
+    
+    // Check if mergedInterviewData is available for the candidate
+    const selectedInterviewData = mergedInterviewData.find(
+      (data) => data.tempID === candidate?.tempID
+    );
+
+    // Ensure the candidate and their localMobilization details exist
+    if (!selectedInterviewData || !selectedInterviewData.localMobilization) {
+      alert("Candidate or LOI data not found.");
+      return;
+    }
+
+    const localMobilizationId = selectedInterviewData.localMobilization.id;
 
     try {
       await loiDetails({
@@ -140,7 +156,7 @@ export const MobilizationForm = () => {
           {/* <label>Choose File</label> */}
           <div className="flex items-center gap-5 mt-1">
             {/* <label className="flex items-center px-3 py-2 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer"> */}
-           
+
             <FileUploadField
               label="Upload File"
               onChangeFunc={(e) => handleFileChange(e, "mobFile")}
@@ -148,7 +164,9 @@ export const MobilizationForm = () => {
               accept="application/pdf"
               register={register}
               fileName={
-                uploadedFileNames.mobFile || extractFileName(MOBUpload) || formData.interview.mobFile
+                uploadedFileNames.mobFile ||
+                extractFileName(MOBUpload) ||
+                formData.interview.mobFile
               }
               value={formData.interview.mobFile}
             />

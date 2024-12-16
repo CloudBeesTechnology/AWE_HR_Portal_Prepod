@@ -19,7 +19,7 @@ export const ViewForm = ({
   formatDate,
 }) => {
   console.log(ticketData);
-  
+
   const { empPIData } = useContext(DataSupply);
   const [remark, setRemark] = useState("");
   const [userName, setUserName] = useState("");
@@ -59,6 +59,7 @@ export const ViewForm = ({
       const toDate = leaveData.toDate;
       const formattedDateFrom = formatDate(fromDate);
       const formattedDateTo = formatDate(toDate);
+
       handleUpdateLeaveStatus(leaveData.id, updateData);
 
       setNotificationText(
@@ -103,9 +104,8 @@ export const ViewForm = ({
         // manager got email
         sendEmail(
           `Leave Request ${status}`,
-          `Dear ${
-            leaveData.employeeInfo.name || "Not mention"
-          } , Your leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Supervisor ${
+          `Dear ${leaveData.employeeInfo.name || "Not mention"} , 
+           Your leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Supervisor ${
             leaveData.supervisorName || "Not mention"
           }.`,
 
@@ -189,43 +189,47 @@ export const ViewForm = ({
       updateData.hrStatus = status; // Set the status for the ticket request
       updateData.hrRemarks = remark;
       updateData.hrDate = currentDate;
+      const formattedDatedeparture = formatDate(ticketData.departureDate);
+      const formattedDatearrival = formatDate(ticketData.arrivalDate);
+      handleUpdateTicketRequest(ticketData.id, updateData);
 
-      handleUpdateTicketRequest(ticketData.ticketRequest.id, updateData);
-console.log(ticketData.ticketRequest.id);
+      setNotificationText(
+        `Ticket request ${status} by ${personalInfo.name} on ${formatDate(
+          currentDate
+        )}`
+      );
 
-      // setNotificationText(
-      //   `Ticket request ${status} by ${personalInfo.name} on ${formatDate(
-      //     currentDate
-      //   )}`
-      // );
-
-      // sendEmail(
-      //   `Ticket Request ${status}`,
-      //   `Dear  ${ticketData.employeeInfo.name} , Your ticket request has been ${status} by HR ${personalInfo.name}.`,
-      //   "hr_no-reply@adininworks.com",
-      //   ticketData.employeeInfo.officialEmail
-      // );
+      sendEmail(
+        `Ticket Request ${status}`,
+        `Dear  ${
+          ticketData.employeeInfo.name || "Not mention"
+        } , Your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${status} by HR ${
+          personalInfo.name || "Not mention"
+        }.`,
+        "hr_no-reply@adininworks.com",
+        ticketData.employeeInfo.officialEmail
+      );
 
       // Create notification for the ticket status update
-      // createNotification({
-      //   empID: ticketData.employeeInfo.empID,
-      //   leaveType: "Ticket Request", // Assuming a default value as this is a ticket request
-      //   message: `Ticket request for ${ticketData.employeeInfo.name} has been ${status} by ${personalInfo.name}`,
-      //   senderEmail: "ticket_no-reply@adininworks.com", // Sender email
-      //   receipentEmail: ticketData.employeeInfo.officialEmail, // Using the employee's official email
-      //   receipentEmpID: ticketData.employeeInfo.empID,
-      //   status: status,
-      //   createdAt: currentDate,
-      //   updatedAt: currentDate,
-      // });
+      createNotification({
+        empID: ticketData.employeeInfo.empID,
+        leaveType: "Ticket Request", // Assuming a default value as this is a ticket request
+        message: `Ticket request for ${ticketData.employeeInfo.name} has been ${status} by ${personalInfo.name}`,
+        senderEmail: "ticket_no-reply@adininworks.com", // Sender email
+        receipentEmail: ticketData.employeeInfo.officialEmail, // Using the employee's official email
+        receipentEmpID: ticketData.employeeInfo.empID,
+        status: status,
+        createdAt: currentDate,
+        updatedAt: currentDate,
+      });
 
-      // setNotification(true);
-      // setTimeout(() => {
-      //   setNotification(false);
-      //   handleClickForToggle(false);
-      //   navigate("/leaveManage");
-      //   // Redirect to the dashboard or another page
-      // }, 3000);
+      setNotification(true);
+      setTimeout(() => {
+        setNotification(false);
+        handleClickForToggle(false);
+        navigate("/leaveManage");
+        // Redirect to the dashboard or another page
+      }, 3000);
     }
   };
 
@@ -529,10 +533,10 @@ console.log(ticketData.ticketRequest.id);
               <div className="text_size_6">
                 <div className="mb-5 ">
                   <p className="text-center text-[24px] font-semibold">
-                  {ticketData.ticketRequest.hrStatus === "Pending"
-                    ? "Request Tickets"
-                    : ticketData.ticketRequest.hrStatus}
-                </p>
+                    {ticketData.hrStatus === "Pending"
+                      ? "Request Tickets"
+                      : ticketData.hrStatus}
+                  </p>
                 </div>
 
                 {[
@@ -564,19 +568,19 @@ console.log(ticketData.ticketRequest.id);
                   },
                   {
                     label: "Departure Date",
-                    value: formatDate(ticketData.ticketRequest.departureDate),
+                    value: formatDate(ticketData.departureDate),
                   },
                   {
                     label: "Arrival Date",
-                    value: formatDate(ticketData.ticketRequest.arrivalDate),
+                    value: formatDate(ticketData.arrivalDate),
                   },
                   {
                     label: "Reason",
-                    value: ticketData.ticketRequest.remarks || "N/A",
+                    value: ticketData.remarks || "N/A",
                   },
                   ticketData.hrRemark && {
                     label: "Remark",
-                    value: ticketData.ticketRequest.hrRemark || "No remarks added",
+                    value: ticketData.hrRemark || "No remarks added",
                   },
                 ]
                   .filter(Boolean)
@@ -589,7 +593,7 @@ console.log(ticketData.ticketRequest.id);
                     </div>
                   ))}
 
-                {ticketData.ticketRequest.hrStatus === "Pending" &&
+                {ticketData.hrStatus === "Pending" &&
                   userType !== "SuperAdmin" && (
                     <div className="grid grid-rows-2 pt-1">
                       <label htmlFor="remark">Remark :</label>
@@ -604,7 +608,7 @@ console.log(ticketData.ticketRequest.id);
               </div>
 
               <div className="flex justify-between p-5 ">
-                {ticketData.ticketRequest.hrStatus === "Pending" && userType === "HR" && (
+                {ticketData.hrStatus === "Pending" && userType === "HR" && (
                   <>
                     <button
                       className="bg-[#FEF116] p-2 px-3 rounded text-dark_grey text_size_6"

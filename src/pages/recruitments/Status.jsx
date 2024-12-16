@@ -6,6 +6,7 @@ import { StatusForm } from "../recruitments/StatusForm";
 import {
   // listCandidateApplicationForms,
   listInterviewSchedules,
+  listLocalMobilizations,
 } from "../../graphql/queries";
 
 import { generateClient } from "@aws-amplify/api";
@@ -114,20 +115,130 @@ export const Status = () => {
   };
 
   // Fetch interview data and merge with context
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const [interviewDatas] = await Promise.all([
+  //         client.graphql({
+  //           query: listInterviewSchedules,
+  //         }),
+  //       ]);
+
+  //       const interviews =
+  //         interviewDatas?.data?.listInterviewSchedules?.items || [];
+
+  //       // if (empPDData && educDetailsData ) {
+  //       //   const merged = mergeContextData(empPDData, educDetailsData);
+
+  //       if (empPDData && educDetailsData && IVSSDetails) {
+  //         // Filter empPDData to include only those whose tempID is also in IVSSDetails
+  //         const filteredEmpPDData = empPDData.filter((emp) =>
+  //           IVSSDetails.some((ivss) => ivss.tempID === emp.tempID)
+  //         );
+
+  //         // Merge the filtered empPDData with educDetailsData
+  //         const merged = mergeContextData(filteredEmpPDData, educDetailsData);
+
+  //         // Add interview details
+  //         const mergedWithInterviews = merged.map((candidate) => {
+  //           const interviewDetails = interviews.find(
+  //             (interview) => interview.tempID === candidate.tempID
+  //           );
+  //           return interviewDetails
+  //             ? { ...candidate, ...interviewDetails }
+  //             : candidate;
+  //         });
+
+  //         setMergeData(mergedWithInterviews);
+  //         setFilteredData(mergedWithInterviews);
+  //         setLoading(false);
+  //       }
+  //     } catch (err) {
+  //       setError(err.message);
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, [empPDData, educDetailsData, IVSSDetails, ]);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const [
+  //         interviewDatas, // Existing interview data fetch
+  //         localMobilizationData, // New fetch for local mobilization data
+  //       ] = await Promise.all([
+  //         client.graphql({
+  //           query: listInterviewSchedules, // Query for interviews
+  //         }),
+  //         client.graphql({
+  //           query: listLocalMobilizations, // Query for local mobilizations
+  //         }),
+  //       ]);
+
+  //       const interviews =
+  //         interviewDatas?.data?.listInterviewSchedules?.items || [];
+  //       const localMobilizations =
+  //         localMobilizationData?.data?.listLocalMobilizations?.items || [];
+
+  //       if (empPDData && educDetailsData && IVSSDetails) {
+  //         // Filter empPDData to include only those whose tempID is also in IVSSDetails
+  //         const filteredEmpPDData = empPDData.filter((emp) =>
+  //           IVSSDetails.some((ivss) => ivss.tempID === emp.tempID)
+  //         );
+
+  //         // Merge the filtered empPDData with educDetailsData
+  //         const merged = mergeContextData(filteredEmpPDData, educDetailsData);
+
+  //         // Add interview details and local mobilization details
+  //         const mergedWithDetails = merged.map((candidate) => {
+  //           const interviewDetails = interviews.find(
+  //             (interview) => interview.tempID === candidate.tempID
+  //           );
+
+  //           const mobilizationDetails = localMobilizations.find(
+  //             (mobilization) => mobilization.tempID === candidate.tempID ||  mobilization.tempID === null && candidate.tempID
+  //           );
+
+  //           return {
+  //             ...candidate,
+  //             ...(interviewDetails ? { interviewDetails } : {}),
+  //             ...(mobilizationDetails ? { mobilizationDetails } : {}),
+  //           };
+  //         });
+
+  //         setMergeData(mergedWithDetails);
+  //         setFilteredData(mergedWithDetails);
+  //         setLoading(false);
+  //       }
+  //     } catch (err) {
+  //       setError(err.message);
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, [empPDData, educDetailsData, IVSSDetails]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [interviewDatas] = await Promise.all([
+        const [
+          interviewDatas, // Existing interview data fetch
+          localMobilizationData, // New fetch for local mobilizations
+        ] = await Promise.all([
           client.graphql({
-            query: listInterviewSchedules,
+            query: listInterviewSchedules, // Query for interviews
+          }),
+          client.graphql({
+            query: listLocalMobilizations, // Query for local mobilizations
           }),
         ]);
 
         const interviews =
           interviewDatas?.data?.listInterviewSchedules?.items || [];
-
-        // if (empPDData && educDetailsData ) {
-        //   const merged = mergeContextData(empPDData, educDetailsData);
+        const localMobilizations =
+          localMobilizationData?.data?.listLocalMobilizations?.items || [];
 
         if (empPDData && educDetailsData && IVSSDetails) {
           // Filter empPDData to include only those whose tempID is also in IVSSDetails
@@ -138,18 +249,36 @@ export const Status = () => {
           // Merge the filtered empPDData with educDetailsData
           const merged = mergeContextData(filteredEmpPDData, educDetailsData);
 
-          // Add interview details
-          const mergedWithInterviews = merged.map((candidate) => {
-            const interviewDetails = interviews.find(
-              (interview) => interview.tempID === candidate.tempID
-            );
-            return interviewDetails
-              ? { ...candidate, ...interviewDetails }
-              : candidate;
+          // Create a global mapping for interviews and mobilizations using tempID
+          const interviewsMap = interviews.reduce((acc, interview) => {
+            acc[interview.tempID] = interview;
+            return acc;
+          }, {});
+
+          const mobilizationsMap = localMobilizations.reduce(
+            (acc, mobilization) => {
+              acc[mobilization.tempID] = mobilization;
+              return acc;
+            },
+            {}
+          );
+
+          // Flatten the candidate data by adding interview and mobilization details globally
+          const flattenedData = merged.map((candidate) => {
+            const interview = interviewsMap[candidate.tempID] || {};
+            const mobilization = mobilizationsMap[candidate.tempID] || {};
+
+            return {
+              ...candidate,
+              // Retain the original names and pull the properties out
+              interviewDetails: interview, // Keeping original name
+              mobilizationDetails: mobilization, // Keeping original name
+            };
           });
 
-          setMergeData(mergedWithInterviews);
-          setFilteredData(mergedWithInterviews);
+          // Update state with the flattened data
+          setMergeData(flattenedData);
+          setFilteredData(flattenedData);
           setLoading(false);
         }
       } catch (err) {
@@ -251,55 +380,66 @@ export const Status = () => {
     setIsFilterBoxOpen((prevState) => !prevState);
   };
 
+  // console.log(mergeData, "GFC");
+
   // Handle filter change
   const handleFilterChange = async (event) => {
     const selectedValue = event.target.value;
     setSelectedFilters(selectedValue);
     setFilterBoxTitle(selectedValue);
 
-    // // Filter only the "Interview Scheduled" data
+   
     switch (selectedValue) {
       case "Interview Scheduled":
         const pendingCandi = mergeData.filter(
-          (val) => val.status === "Pending"
+          (val) =>
+            val.interviewDetails.candidateStatus === "pending" || "" && 
+            val.interviewDetails.status !== "Selected" && 
+            val.interviewDetails.mobSignDate === null || ""
         );
 
         setFilteredData(pendingCandi);
-        // window.location.href="/recrutiles/status"
         break;
+
       case "Selected Candidate":
         const selectedCandi = mergeData.filter(
-          (val) => val.status === "Selected"
+          (val) =>
+              val.interviewDetails.status === "Selected" &&
+              val.loiAcceptDate === null || "" && 
+              val.cvecApproveDate === null || "" && 
+              val.paafApproveDate == null || "" &&
+              val.mobSignDate === null
         );
-
         setFilteredData(selectedCandi);
-        // Log each candidate's name and status
-        selectedCandi.forEach((candidate) => {
-          console.log(
-            `Candidate: ${candidate.name}, Status: ${candidate.status}`
-          );
-        });
         break;
-        
+
       case "LOI":
         const loiAccept = mergeData.filter(
-          (val) => val.loiStatus === "Accepted"
+          (val) =>
+              val.loiAcceptDate !== null && 
+              val.cvecApproveDate === null || "" && 
+              val.paafApproveDate !== null || "" 
         );
         setFilteredData(loiAccept);
         break;
       case "CVEV_OffShore":
         const cvevOff = mergeData.filter(
-          (val) => val.cvevStatus === "Approved"
+          (val) => 
+            val.cvecApproveDate !== null && val.empType === "Offshore"
         );
         setFilteredData(cvevOff);
         break;
       case "PAAF_OnShore":
-        const paafOn = mergeData.filter((val) => val.paafStatus === "Approved");
+        const paafOn = mergeData.filter(
+          (val) => val.paafApproveDate !== null && val.empType === "Onshore"
+        );
         setFilteredData(paafOn);
         break;
       case "Mobilization":
         const mobiliLocal = mergeData.filter(
-          (val) => val.mobiliLocal === "Done"
+          (val) => 
+            val.contractType === "Local" &&
+            val.mobSignDate !== null
         );
         setFilteredData(mobiliLocal);
         break;
@@ -310,7 +450,7 @@ export const Status = () => {
 
     setIsFilterBoxOpen(false);
   };
-
+  // console.log("Hello World", mergeData);
   // Handle edit click
   const handleEditClick = (candidate) => {
     setSelectedInterviewCandidate(candidate);

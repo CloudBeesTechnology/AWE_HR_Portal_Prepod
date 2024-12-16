@@ -13,13 +13,10 @@ const client = generateClient();
 export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
   // Pass showDecisionButtons as a prop
   const { IVSSDetails } = useContext(DataSupply);
-  // console.log(IVSSDetails);
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [notification, setNotification] = useState(false);
-  const { personalDetails } = useLeaveManage();
   const [imageUrl, setImageUrl] = useState("");
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-
+ 
   const handleScheduleInterview = () => {
     setIsScheduleOpen(true);
   };

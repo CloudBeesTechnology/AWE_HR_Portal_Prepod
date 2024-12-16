@@ -26,7 +26,7 @@ export const HOLTable = () => {
       : "text-[#E8A317]";
   };
   return (
-    <section className=" w-full">
+    <section className="py-5">
       <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] max-w-[100%] overflow-x-auto rounded-xl">
         {filteredData && filteredData.length > 0 ? (
           <table className="w-[1150px] font-semibold text-sm">

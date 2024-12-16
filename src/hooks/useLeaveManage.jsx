@@ -35,13 +35,12 @@ export const useLeaveManage = () => {
         const [
           leaveStatusesData,
           empPersonalInfosData,
-          ticketRequestsData,
+
           workInfoData,
           empLeaveData,
         ] = await Promise.all([
           client.graphql({ query: listLeaveStatuses }),
           client.graphql({ query: listEmpPersonalInfos }),
-          client.graphql({ query: listTicketRequests }),
           client.graphql({ query: listEmpWorkInfos }),
           client.graphql({ query: listEmpLeaveDetails }),
         ]);
@@ -50,8 +49,6 @@ export const useLeaveManage = () => {
           leaveStatusesData?.data?.listLeaveStatuses?.items || [];
         const fetchedEmpPersonalInfos =
           empPersonalInfosData?.data?.listEmpPersonalInfos?.items || [];
-        const fetchedTicketRequests =
-          ticketRequestsData?.data?.listTicketRequests?.items || [];
         const fetchedWorkInfo =
           workInfoData?.data?.listEmpWorkInfos?.items || [];
         const fetchedLeaveDetails =
@@ -77,11 +74,6 @@ export const useLeaveManage = () => {
           return acc;
         }, {});
 
-        const ticketReqMap = fetchedTicketRequests.reduce((acc, emp) => {
-          acc[emp.empID] = emp;
-          return acc;
-        }, {});
-
         const workInfoReqMap = fetchedWorkInfo.reduce((acc, emp) => {
           acc[emp.empID] = emp;
           return acc;
@@ -101,7 +93,6 @@ export const useLeaveManage = () => {
           
           ...leaveStatus,
           employeeInfo: empInfoMap[leaveStatus.empID] || {}, // Add employee info
-          ticketRequest: ticketReqMap[leaveStatus.empID] || {},
           workInfo: workInfoReqMap[leaveStatus.empID] || {},
           leaveDetails: leaveDetails[leaveStatus.empID] || {},
         }));
@@ -119,62 +110,62 @@ export const useLeaveManage = () => {
     fetchData();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     setLoading(true);
-  //     try {
-  //       const [empPersonalInfosData, ticketRequestsData, empWorkInfosData] =
-  //         await Promise.all([
-  //           client.graphql({ query: listEmpPersonalInfos }),
-  //           client.graphql({ query: listTicketRequests }),
-  //           client.graphql({ query: listEmpWorkInfos }),
-  //         ]);
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [empPersonalInfosData, ticketRequestsData, empWorkInfosData] =
+          await Promise.all([
+            client.graphql({ query: listEmpPersonalInfos }),
+            client.graphql({ query: listTicketRequests }),
+            client.graphql({ query: listEmpWorkInfos }),
+          ]);
           
 
-  //       const fetchedEmpPersonalInfos =
-  //         empPersonalInfosData?.data?.listEmpPersonalInfos?.items || [];
-  //       const fetchedTicketRequests =
-  //         ticketRequestsData?.data?.listTicketRequests?.items || [];
-  //       const fetchedEmpWorkInfos =
-  //         empWorkInfosData?.data?.listEmpWorkInfos?.items || [];
+        const fetchedEmpPersonalInfos =
+          empPersonalInfosData?.data?.listEmpPersonalInfos?.items || [];
+        const fetchedTicketRequests =
+          ticketRequestsData?.data?.listTicketRequests?.items || [];
+        const fetchedEmpWorkInfos =
+          empWorkInfosData?.data?.listEmpWorkInfos?.items || [];
 
-  //       // console.log("Fetched Employee Personal Infos:", fetchedEmpPersonalInfos);
-  //       // console.log("Fetched Ticket Request Details:", fetchedTicketRequests);
-  //       // console.log("Fetched Employee Work Infos:", fetchedEmpWorkInfos);
+        // console.log("Fetched Employee Personal Infos:", fetchedEmpPersonalInfos);
+        // console.log("Fetched Ticket Request Details:", fetchedTicketRequests);
+        // console.log("Fetched Employee Work Infos:", fetchedEmpWorkInfos);
 
-  //       setTicketRequests(fetchedTicketRequests);
+        // setTicketRequests(fetchedTicketRequests);
 
-  //       // Create a mapping of employee personal info by empID
-  //       const empInfoMap = fetchedEmpPersonalInfos.reduce((acc, emp) => {
-  //         acc[emp.empID] = emp;
-  //         return acc;
-  //       }, {});
+        // Create a mapping of employee personal info by empID
+        const empInfoMap = fetchedEmpPersonalInfos.reduce((acc, emp) => {
+          acc[emp.empID] = emp;
+          return acc;
+        }, {});
 
-  //       // Create a mapping of employee work info by empID
-  //       const empWorkInfoMap = fetchedEmpWorkInfos.reduce((acc, workInfo) => {
-  //         acc[workInfo.empID] = workInfo;
-  //         return acc;
-  //       }, {});
+        // Create a mapping of employee work info by empID
+        const empWorkInfoMap = fetchedEmpWorkInfos.reduce((acc, workInfo) => {
+          acc[workInfo.empID] = workInfo;
+          return acc;
+        }, {});
 
-  //       // Merge employee personal info into ticket requests
-  //       const merged = fetchedTicketRequests.map((ticket) => ({
-  //         ...ticket,
-  //         employeeInfo: empInfoMap[ticket.empID] || {}, // Add employee info
-  //         workInfo: empWorkInfoMap[ticket.empID] || {},
-  //       }));
+        // Merge employee personal info into ticket requests
+        const merged = fetchedTicketRequests.map((ticket) => ({
+          ...ticket,
+          employeeInfo: empInfoMap[ticket.empID] || {}, // Add employee info
+          workInfo: empWorkInfoMap[ticket.empID] || {},
+        }));
 
-  //       // console.log("Merged Data 4.0:", merged);
-  //       setTicketMerged(merged);
-  //     } catch (err) {
-  //       setError(err);
-  //       console.error("Error fetching data:", err);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
+        // console.log("Merged Data 4.0:", merged);
+        setTicketMerged(merged);
+      } catch (err) {
+        setError(err);
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  //   fetchData();
-  // }, []);
+    fetchData();
+  }, []);
 
 
   //merge ticket request and empPersonal,
@@ -287,7 +278,7 @@ export const useLeaveManage = () => {
 
   return {
     handleUpdateEmpLeaveDetails,
-    // ticketMerged,
+    ticketMerged,
     mergedData,
     // ticketRequests,
     loading,

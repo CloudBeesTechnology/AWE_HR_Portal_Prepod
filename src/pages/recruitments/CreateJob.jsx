@@ -59,17 +59,6 @@ export const CreateJob = () => {
     setValue(type, selectedFile);
 
     if (selectedFile) {
-      // const result = await uploadData({
-      //   path: `${watchedJobTitle}/${selectedFile.name}`,
-      //   data: selectedFile,
-      // }).result;
-
-      // const fileUrl = `https://commonfiles.s3.ap-southeast-1.amazonaws.com/applyJob/dev${encodeURIComponent(
-      //   result.path
-      // )}`;
-      // console.log(fileUrl);
-
-      // https://commonfiles.s3.ap-southeast-1.amazonaws.com/dev/download
       await uploadDocs(selectedFile, type, setUploadedDocs, watchedJobTitle);
       setUploadedFileNames((prev) => ({
         ...prev,
@@ -85,7 +74,7 @@ export const CreateJob = () => {
     try {
       const storedvalue={
         ...data,
-        uploadJobDetails: uploadedDocs.uploadJobDetails
+        uploadJobDetails: uploadedDocs?.uploadJobDetails || null
       }
       // console.log(storedvalue);
       

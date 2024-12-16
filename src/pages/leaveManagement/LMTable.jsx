@@ -2,60 +2,95 @@ import React, { useEffect, useState } from "react";
 import { Pagination } from "./Pagination";
 import { getUrl } from "@aws-amplify/storage";
 import { useOutletContext } from "react-router-dom";
+import { Filter } from "./Filter";
 
 export const LMTable = () => {
   const {
     handleClickForToggle,
     filteredData,
     handleViewClick,
+    handleDeleteLeaveStatus,
+    personalInfo,
     formatDate,
     userType,
     statusUpdate,
     currentPage,
+    setCurrentPage,
     rowsPerPage,
   } = useOutletContext();
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const [storedData, setStoredData] = useState(filteredData);
+
+  const [filterStatus, setFilterStatus] = useState("All"); // State for filter status
   const [lastUploadUrl, setPPLastUP] = useState(""); // State to store the last uploaded file's URL
+
+  // Logic to get the URL of the uploaded file
   const linkToStorageFile = async (pathUrl) => {
     try {
       const result = await getUrl({ path: pathUrl });
-
       setPPLastUP(result.url.href);
     } catch (error) {
       console.error("Error fetching the file URL:", error);
     }
   };
-  useEffect(() => {
-    setStoredData(filteredData);
-  }, [filteredData]);
+
+  const startIndex = (currentPage - 1) * rowsPerPage;
+
+  // Handle filter status change
+  const handleFilterChange = (status) => {
+    console.log("Filter changed to:", status); // Debug log
+    setFilterStatus(status);
+    setCurrentPage(1); // Reset to the first page on filter change
+  };
+
+  // Apply filtering based on filterStatus and userType
+  const filteredFinalData = filteredData.filter((item) => {
+    const status =
+      userType === "Manager"
+        ? item.managerStatus
+        : userType === "Supervisor"
+        ? item.supervisorStatus
+        : null;
+
+    if (filterStatus === "All") {
+      return true;
+    }
+
+    return status === filterStatus;
+  });
+
+  // Conditional table headers based on userType
   const heading = [
     "S. No",
     "Employee ID",
     "Name",
     "Received Date",
     userType !== "Supervisor" && userType !== "Manager" && "Supervisor Name",
-    userType !== "Manager" && " Supervisor Approved Date",
+    userType !== "Manager" && "Supervisor Approved Date",
     userType !== "Manager" && userType !== "Supervisor" && "Manager Name",
     userType !== "Supervisor" && "Manager Approved Date",
     "Documents",
     "Submitted Form",
-    // "Action",
     userType !== "SuperAdmin" && userType !== "HR" && "Status",
   ].filter(Boolean);
 
-  const editStatus = (itemId, status) => {
-    // Call the statusUpdate function and update the local state
-    statusUpdate(itemId, status).then((updatedItem) => {
-      // console.log("Helo", editStatus);
-      setStoredData((prevData) =>
-        prevData.map((item) =>
-          item.id === updatedItem.id ? updatedItem : item
-        )
-      );
-    });
-  };
+  // Determine final data based on user type
+  const userID = localStorage.getItem("userID");
+  let finalDataFiltered;
 
+  if (userType === "Manager") {
+    finalDataFiltered = filteredFinalData.filter((item) => {
+      const condition =
+        (item?.supervisorStatus === "Approved" &&
+          item?.managerEmpID.toString().toLowerCase() === userID) ||
+        item?.managerEmpID.toString().toLowerCase() === userID;
+      return condition;
+    });
+  } else if (userType === "Supervisor") {
+    finalDataFiltered = filteredFinalData.filter((item) => {
+      return item?.supervisorEmpID?.toString().toLowerCase() === userID;
+    });
+  } else {
+    finalDataFiltered = filteredFinalData;
+  }
   const getStatusClass = (status) => {
     return status === "Rejected"
       ? "text-[red]"
@@ -66,36 +101,17 @@ export const LMTable = () => {
       : "text-[#E8A317]";
   };
 
-  const userID = localStorage.getItem("userID");
-
-  let finalData;
-
-  if (userType === "Manager") {
-    finalData = storedData.filter((item) => {
-      const condition =
-        (item?.supervisorStatus === "Approved" &&
-          item?.managerEmpID.toString().toLowerCase() === userID) ||
-        item?.managerEmpID.toString().toLowerCase() === userID;
-      // (item?.managerEmpID.toString().toLowerCase() === userID ||
-      //   item?.supervisorEmpID.toString().toLowerCase() === userID);
-
-      return condition;
-    });
-  } else if (userType === "Supervisor") {
-    finalData = storedData.filter((item) => {
-      const condition =
-        item?.supervisorEmpID?.toString().toLowerCase() || "" === userID;
-
-      return condition;
-    });
-  } else {
-    finalData = storedData;
-  }
-
   return (
-    <section className="flex flex-col w-full">
+    <section className="flex flex-col py-5">
+      <div className="relative h-full">
+        <div className="absolute -top-14 -right-10">
+          {userType !== "HR" && userType !== "SuperAdmin" && (
+            <Filter AfterFilter={handleFilterChange} />
+          )}
+        </div>
+      </div>
       <div className="leaveManagementTable w-full max-w-[100%] overflow-x-auto rounded-xl">
-        {finalData && finalData.length > 0 ? (
+        {finalDataFiltered && finalDataFiltered.length > 0 ? (
           <table className="w-[1150px] font-semibold text-sm text-center">
             <thead className="bg-[#939393] sticky top-0 rounded-t-lg">
               <tr>
@@ -107,8 +123,8 @@ export const LMTable = () => {
               </tr>
             </thead>
             <tbody>
-              {finalData && finalData.length > 0 ? (
-                finalData.map((item, index) => {
+              {finalDataFiltered && finalDataFiltered.length > 0 ? (
+                finalDataFiltered.map((item, index) => {
                   const displayIndex = startIndex + index + 1; // Adjust index based on pagination
 
                   return (
@@ -139,14 +155,14 @@ export const LMTable = () => {
                         </td>
                       )}
 
-                      <td className="py-3 ">
+                      <td className="py-3">
                         <a
                           href={lastUploadUrl}
                           onClick={(e) => {
                             if (!item.medicalCertificate) {
-                              e.preventDefault(); // Prevent the default link behavior when there's no certificate
+                              e.preventDefault();
                             } else {
-                              linkToStorageFile(item.medicalCertificate); // Trigger the download if the certificate exists
+                              linkToStorageFile(item.medicalCertificate);
                             }
                           }}
                           download
@@ -154,7 +170,7 @@ export const LMTable = () => {
                             item.medicalCertificate
                               ? "border-b-2 border-[orange] text-[orange]"
                               : ""
-                          } // Apply underline only when medicalCertificate exists
+                          }
                         >
                           {item.medicalCertificate ? "Download" : "N/A"}
                         </a>
@@ -197,6 +213,6 @@ export const LMTable = () => {
           </div>
         )}
       </div>
-      </section>
+    </section>
   );
 };

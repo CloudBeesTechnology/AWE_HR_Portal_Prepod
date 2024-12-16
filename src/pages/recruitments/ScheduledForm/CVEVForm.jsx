@@ -18,7 +18,7 @@ const CVEVFormSchema = Yup.object().shape({
     ),
 });
 
-export const CVEVForm = () => {
+export const CVEVForm = ({candidate}) => {
   const { mergedInterviewData } = useFetchInterview();
   const { loiDetails } = UpdateLoiData();
   const [formData, setFormData] = useState({
@@ -47,17 +47,21 @@ export const CVEVForm = () => {
 
   const CVECUpload = watch("cvecFile", "");
 
-  console.log("DATA 3.0", mergedInterviewData);
+  // console.log("DATA 3.0", mergedInterviewData);
 
   useEffect(() => {
-    if (mergedInterviewData.length > 0) {
-      const interviewData = mergedInterviewData[0]; // Assuming we want to take the first item
+    if (mergedInterviewData.length > 0 && candidate?.tempID) {
+      const interviewData = mergedInterviewData.find(
+        (data) => data.tempID === candidate.tempID
+      ); // Use the candidate's tempID to filter the data
+      if (interviewData) {
       setFormData({
         interview: {
           cvecApproveDate: interviewData.localMobilization.cvecApproveDate,
           cvecFile: interviewData.localMobilization.cvecFile,
         },
       });
+    }
       if (interviewData.localMobilization.cvecFile) {
         setUploadedFileNames((prev) => ({
           ...prev,
@@ -65,7 +69,7 @@ export const CVEVForm = () => {
         }));
       }
     }
-  }, [mergedInterviewData]);
+  }, [mergedInterviewData, candidate?.tempID]);
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
@@ -92,7 +96,23 @@ export const CVEVForm = () => {
   const handleSubmitTwo = async (e) => {
     e.preventDefault();
 
-    const localMobilizationId = mergedInterviewData[0]?.localMobilization.id;
+    // Find the correct interview data using the tempID of the selected candidate
+    const selectedInterviewData = mergedInterviewData.find(
+      (data) => data.tempID === candidate?.tempID
+    );
+
+    if (!selectedInterviewData) {
+      console.error("No interview data found for the selected candidate.");
+      alert("No interview data found for the selected candidate.");
+      return;
+    }
+    const localMobilizationId = selectedInterviewData?.localMobilization?.id;
+
+    if (!localMobilizationId) {
+      console.error("Interview schedule ID not found.");
+      alert("Interview schedule ID not found.");
+      return;
+    }
 
     try {
       await loiDetails({

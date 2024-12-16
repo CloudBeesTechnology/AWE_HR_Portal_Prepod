@@ -84,12 +84,16 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
              Mobilization
           </h6>
         </article>
-{show === 0 && <InterviewForm/>}
-{show === 1 && <CandidateForm/>}
-{show === 2 && <LOIForm/>}
-{show === 3 && <CVEVForm/>}
-{show === 4 && <PAAFForm/>}
-{show === 5 && <MobilizationForm/>}
+{show === 0 && <InterviewForm candidate = {candidate}/>}
+{show === 1 && <CandidateForm candidate = {candidate}/>}
+{show === 2 && <LOIForm candidate = {candidate}/>}
+{show === 3 && <CVEVForm candidate = {candidate}/>}
+{show === 4 && <PAAFForm candidate = {candidate}/>}
+{candidate.contractType === "Local" && show === 5 && <MobilizationForm candidate={candidate} />}
+
+{/* {candidate.contractType === "Local" &&
+{show === 5 && <MobilizationForm candidate = {candidate}/>}
+} */}
 
 
         {/* <div className="flex justify-between mt-4">

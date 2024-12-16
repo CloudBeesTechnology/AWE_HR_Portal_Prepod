@@ -1,21 +1,102 @@
 import { useOutletContext } from "react-router-dom";
+import { useLeaveManage } from "../../hooks/useLeaveManage";
+import { Searchbox } from "../../utils/Searchbox";
+import { useEffect, useState } from "react";
+import { IoSearch } from "react-icons/io5";
+import { Pagination } from "./Pagination";
+import { Filter } from "./Filter";
 
 export const TicketsTable = () => {
+  const { handleViewClick, handleClickForToggle, userType } =
+    useOutletContext();
+
+  const [searchResults, setSearchResults] = useState([]);
+  const [secondartyData, setSecondartyData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(30);
+  const [data, setData] = useState([]);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [filterStatus, setFilterStatus] = useState("All");
   const {
-    filteredData,
-    handleViewClick,
-    handleClickForToggle,
-    formatDate,
-    userType,
-    currentPage,
-    rowsPerPage,
-  } = useOutletContext();
-  // console.log(filteredData);
+    handleDeleteLeaveStatus,
+    handleUpdateLeaveStatus,
+    ticketMerged,
+    statusUpdate,
+  } = useLeaveManage();
+
+ 
+   // Filter the data based on filterStatus (All, Pending, Approved, Rejected)
+   
   
-//   const check=filteredData.map((val)=>{
-// return val.empID
-//   })
-//   console.log(check);
+
+  const dateFD = (selectedDate) => {
+    try {
+      if (!selectedDate) {
+        setSearchResults([]);
+        setFilteredData([]);
+        return;
+      }
+      const selectedDateObj = new Date(selectedDate);
+      const selectedDateLocal = selectedDateObj.toLocaleDateString("en-GB"); // 'DD/MM/YYYY' format
+
+      const filtered = ticketMerged.filter((item) => {
+        if (!item.createdAt && !item.departureDate && !item.arrivalDate) {
+          return false;
+        }
+
+        let isCreatedAtMatch = false;
+        let isDepartureDateMatch = false;
+        let isArrivalDateMatch = false;
+
+        const departureDate = item?.departureDate
+          ? new Date(item?.departureDate).toLocaleDateString("en-GB")
+          : null;
+        isDepartureDateMatch = departureDate === selectedDateLocal;
+
+        const arrivalDate = item?.arrivalDate
+          ? new Date(item?.arrivalDate).toLocaleDateString("en-GB")
+          : null;
+        isArrivalDateMatch = arrivalDate === selectedDateLocal;
+
+        const ticketCreatedAt = item?.createdAt
+          ? new Date(item?.createdAt).toLocaleDateString("en-GB")
+          : null;
+        isCreatedAtMatch = ticketCreatedAt === selectedDateLocal;
+
+        // Filter if any of the dates match
+        const isMatch =
+          isCreatedAtMatch || isDepartureDateMatch || isArrivalDateMatch;
+
+        return isMatch;
+      });
+
+      setSearchResults(filtered);
+      setFilteredData(filtered);
+    } catch (error) {
+      console.error("Error in applyFilters:", error);
+    }
+  };
+
+  const handleDateChange = (event) => {
+    const date = event.target.value;
+    setSelectedDate(date);
+    dateFD(date);
+  };
+  const formatDate = (dateToString) => {
+    if (!dateToString || isNaN(new Date(dateToString).getTime())) {
+      return "";
+    }
+
+    const date = new Date(dateToString);
+
+    const day = date.getDate().toString().padStart(2, "0"); // Local day
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Local month
+    const year = date.getFullYear(); // Local year
+
+    return `${day}/${month}/${year}`; // Format as DD/MM/YYYY
+  };
+
   const startIndex = (currentPage - 1) * rowsPerPage;
 
   const heading = [
@@ -30,12 +111,109 @@ export const TicketsTable = () => {
     "Submitted form",
     userType !== "SuperAdmin" && "Status",
   ];
-  const isValidData = Array.isArray(filteredData) && filteredData.length > 0;
+
+  useEffect(() => {
+    setSecondartyData(ticketMerged);
+    setData(ticketMerged);
+  }, [ticketMerged]);
+  
+
+  useEffect(() => {
+    if (filterStatus !== "All") {
+      const updatedData = ticketMerged.filter((item) => item.hrStatus === filterStatus);
+      setFilteredData(updatedData);
+    } else {
+      setFilteredData(ticketMerged);
+    }
+  }, [filterStatus, ticketMerged]);
+  
+
+  const searchUserList = async (data) => {
+    try {
+      const result = await data;
+      setSearchResults(result);
+      setCurrentPage(1);
+      setData(result);  
+    } catch (error) {
+      console.error("Error search data", error);
+    }
+  };
+
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * rowsPerPage;
+
+    const dataToPaginate = searchResults.length > 0 ? searchResults : data;
+
+    const sortedData = dataToPaginate.sort((a, b) => {
+      const regex = /\d+$/;
+
+      const numPartA = a.empID.match(regex)
+        ? a.empID.match(regex)[0].padStart(5, "0")
+        : "";
+      const numPartB = b.empID.match(regex)
+        ? b.empID.match(regex)[0].padStart(5, "0")
+        : "";
+
+      const prefixA = a.empID.replace(regex, "").toLowerCase();
+      const prefixB = b.empID.replace(regex, "").toLowerCase();
+
+      if (prefixA !== prefixB) {
+        return prefixA.localeCompare(prefixB);
+      }
+
+      return numPartA.localeCompare(numPartB);
+    });
+
+    const paginatedData = sortedData.slice(
+      startIndex,
+      startIndex + rowsPerPage
+    );
+
+    setFilteredData(paginatedData);
+  }, [currentPage, rowsPerPage, data, searchResults, selectedDate]);
+
+  const totalPages = Math.ceil(
+    (searchResults.length > 0 ? searchResults.length : data.length) /
+      rowsPerPage
+  );
+  const handleFilterChange = (status) => {
+    console.log("Filter changed to:", status); // Debug log
+    setFilterStatus(status);
+    setCurrentPage(1); // Reset to the first page on filter change
+  };
 
   return (
-    <section>
-      <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] max-w-[100%] overflow-x-auto flex-grow rounded-xl">
-        {isValidData ? (
+    <section className="relative w-full">
+      <div >
+        <div className="flex absolute -top-11 right-0 justify-end gap-3">
+          <div className="w-[40%]">
+            <Searchbox
+              allEmpDetails={secondartyData}
+              searchIcon2={<IoSearch />}
+              placeholder="Employee ID"
+              searchUserList={searchUserList}
+              border="rounded-md"
+            />
+          </div>
+          <div className="text_size_5 bg-white border rounded-md text-grey border-lite_grey flex items-center px-3 gap-2">
+            <input
+              type="date"
+              name="selectedDate"
+              className="text-grey outline-none"
+              value={selectedDate || ""}
+              onChange={handleDateChange}
+            />
+
+          </div>
+            {userType === "HR" && (
+              <div>
+                <Filter AfterFilter={handleFilterChange} />
+              </div>
+            )}
+        </div>
+      </div>
+      <div className=" top-0 py-5 leaveManagementTable max-w-[100%] overflow-x-auto flex-grow rounded-xl">
+        {filteredData && filteredData.length > 0 ? (
           <table className="w-[1150px] font-semibold text-sm">
             <thead className="bg-[#939393] sticky top-0 rounded-t-lg">
               <tr className="px-6">
@@ -47,7 +225,7 @@ export const TicketsTable = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredData ? (
+              {filteredData && filteredData.length > 0 ? (
                 filteredData.map((item, index) => {
                   const displayIndex = startIndex + index + 1; // Adjust index based on pagination
                   // console.log(item.empID);
@@ -84,13 +262,13 @@ export const TicketsTable = () => {
                       </td>
 
                       <td className="border-b-2  border-[#CECECE] py-5">
-                        {formatDate(item.ticketRequest.createdAt)}
+                        {formatDate(item.createdAt)}
                       </td>
                       <td className="border-b-2  border-[#CECECE] py-5">
-                        {formatDate(item.ticketRequest.departureDate)}
+                        {formatDate(item.departureDate)}
                       </td>
                       <td className="border-b-2  border-[#CECECE] py-5">
-                        {formatDate(item.ticketRequest.arrivalDate)}
+                        {formatDate(item.arrivalDate)}
                       </td>
 
                       <td className="border-b-2  border-[#CECECE] cursor-pointer py-5">
@@ -107,7 +285,7 @@ export const TicketsTable = () => {
                       {userType !== "SuperAdmin" && (
                         <td
                           className={`border-b-2 border-[#CECECE] py-5 ${
-                            item.ticketRequest.hrStatus === "Rejected"
+                            item.hrStatus === "Rejected"
                               ? "text-[#C50000]"
                               : item.hrStatus === "Approved"
                               ? "text-[#0CB100]"
@@ -116,7 +294,7 @@ export const TicketsTable = () => {
                               : ""
                           }`}
                         >
-                          {item.ticketRequest.hrStatus}
+                          {item.hrStatus}
                         </td>
                       )}
                     </tr>
@@ -136,6 +314,19 @@ export const TicketsTable = () => {
             <p>Ticket Request not available.</p>
           </div>
         )}
+      </div>
+      <div className="center pt-10">
+        <div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(newPage) => {
+              if (newPage >= 1 && newPage <= totalPages) {
+                setCurrentPage(newPage);
+              }
+            }}
+          />
+        </div>
       </div>
     </section>
   );

@@ -53,13 +53,7 @@ export const LeaveManage = () => {
     // console.log(filtered);
 
     const filteredDataValue = mergedData.filter((item) => {
-      if (location.pathname === "/leaveManage/requestTickets") {
-        const isValid =
-          item?.empStatus !== "Cancelled" &&
-          Object.keys(item?.ticketRequest || {}).length > 0;
-
-        return isValid;
-      } else if (location.pathname === "/leaveManage/historyLeave") {
+       if (location.pathname === "/leaveManage/historyLeave") {
         const isValid =
           item?.empStatus !== "Cancelled" && item.managerStatus === "Approved";
 
@@ -393,7 +387,7 @@ export const LeaveManage = () => {
                 : ""
             }`}
           >
-            {location.pathname !== "/leaveManage/leaveBalance" && (
+            {location.pathname !== "/leaveManage/leaveBalance" && location.pathname !== "/leaveManage/requestTickets" && (
               <Searchbox
                 allEmpDetails={secondartyData}
                 searchIcon2={<IoSearch />}
@@ -402,12 +396,12 @@ export const LeaveManage = () => {
                 border="rounded-md"
               />
             )}
-            {location.pathname !== "/leaveManage/leaveBalance" && (
+            {location.pathname !== "/leaveManage/leaveBalance" && location.pathname !== "/leaveManage/requestTickets" && (
               <div className="py-2  text_size_5 bg-white border rounded-md text-grey border-lite_grey flex items-center px-3 gap-2">
                 <input
                   type="date"
                   name="selectedDate"
-                  className="text-grey"
+                  className="text-grey outline-none"
                   value={selectedDate || ""}
                   onChange={handleDateChange}
                 />
@@ -436,6 +430,7 @@ export const LeaveManage = () => {
               userType,
               statusUpdate,
               mergedData,
+              setCurrentPage
             }}
           />
         </section>
@@ -445,18 +440,17 @@ export const LeaveManage = () => {
           <div className="w-[60%] flex justify-start mt-4 px-10">
             {/* Conditionally render pagination only for tables other than LMTable and TicketsTable */}
 
-            {location.pathname !== "/leaveManage/leaveBalance" &&
-              filteredData.length > 0 && (
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={(newPage) => {
-                    if (newPage >= 1 && newPage <= totalPages) {
-                      setCurrentPage(newPage);
-                    }
-                  }}
-                />
-              )}
+            {location.pathname !== "/leaveManage/leaveBalance" && location.pathname !== "/leaveManage/requestTickets"&& (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(newPage) => {
+                  if (newPage >= 1 && newPage <= totalPages) {
+                    setCurrentPage(newPage);
+                  }
+                }}
+              />
+            )}
           </div>
         </div>
       </div>

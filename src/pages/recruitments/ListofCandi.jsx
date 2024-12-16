@@ -211,6 +211,8 @@ export const ListofCandi = () => {
     }
   }, [allCandidates]);
 
+  console.log(allCandidates, "TESTING")
+
   const columns = [
     "Name",
     "Gender",

@@ -216,7 +216,7 @@ export const EmpLeaveBalance = () => {
   );
   const startIndex = (currentPage - 1) * rowsPerPage;
   return (
-    <section className="relative py-5 w-full">
+    <section className="relative py-5">
       <div className="absolute right-0 -top-12 ">
         <div className="py-2 w-full text_size_5 bg-white border rounded-md text-grey border-lite_grey flex items-center px-3 gap-2">
           <input
@@ -311,7 +311,7 @@ export const EmpLeaveBalance = () => {
       )}
       <div className="center my-10">
         <div>
-         {filteredData.length >0 &&  <Pagination
+          <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={(newPage) => {
@@ -319,7 +319,7 @@ export const EmpLeaveBalance = () => {
                 setCurrentPage(newPage);
               }
             }}
-          />}
+          />
         </div>
       </div>
     </section>
