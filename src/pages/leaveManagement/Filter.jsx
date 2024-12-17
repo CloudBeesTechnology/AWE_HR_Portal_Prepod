@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { IoFilterOutline } from "react-icons/io5";
 
 
-export const Filter = ({ AfterFilter }) => {
+export const Filter = ({ AfterFilter ,name}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All");
 
@@ -26,7 +26,8 @@ export const Filter = ({ AfterFilter }) => {
           onClick={toggleDropdown}
         >
           <IoFilterOutline />
-          <p>Filter</p>
+          <p>{name}</p>
+          {/* <p>Filter</p> */}
         {isOpen && (
           <div className=" top-10 absolute left-0 w-32 shadow-lg bg-white z-50 ">
             <div className="py-1 shadow-md  flex flex-col bg-white">

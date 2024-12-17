@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, Link, Outlet } from "react-router-dom";
+import { useLocation, Link, Outlet, Navigate } from "react-router-dom";
 import { Filter } from "./Filter";
 import { Pagination } from "./Pagination";
 import { IoSearch } from "react-icons/io5";
@@ -7,6 +7,7 @@ import { ViewForm } from "./ViewForm";
 import { Searchbox } from "../../utils/Searchbox";
 import { useLeaveManage } from "../../hooks/useLeaveManage";
 import useEmployeePersonalInfo from "../../hooks/useEmployeePersonalInfo";
+import { NavigateLM } from "./NavigateLM";
 
 export const LeaveManage = () => {
   const [data, setData] = useState([]);
@@ -35,10 +36,8 @@ export const LeaveManage = () => {
     statusUpdate,
   } = useLeaveManage();
 
-  //   const check=filteredData.map((val)=>{
-  // return val.empID
-  //   })
-  //   console.log(check);
+  // console.log(mergedData);
+
   useEffect(() => {
     const userID = localStorage.getItem("userID");
     setUserID(userID);
@@ -49,11 +48,8 @@ export const LeaveManage = () => {
   const { personalInfo } = useEmployeePersonalInfo(userID);
 
   useEffect(() => {
-    // const filtered = applyFilters();
-    // console.log(filtered);
-
     const filteredDataValue = mergedData.filter((item) => {
-       if (location.pathname === "/leaveManage/historyLeave") {
+      if (location.pathname === "/leaveManage/historyLeave") {
         const isValid =
           item?.empStatus !== "Cancelled" && item.managerStatus === "Approved";
 
@@ -64,7 +60,7 @@ export const LeaveManage = () => {
         return isValid;
       }
     });
-    // console.log(filteredDataValue);
+    console.log(filteredDataValue);
 
     setSecondartyData(filteredDataValue);
     setData(filteredDataValue);
@@ -93,122 +89,72 @@ export const LeaveManage = () => {
     return dataToReturn.filter((item) => item.empStatus !== "Cancelled");
   };
 
-  // const applyFilters = () => {
-  //   let filteredData = getData();
-
-  //   // Apply status filter
-  //   if (filterStatus !== "All") {
-  //     filteredData = filteredData.filter((item) => {
-  //       const supervisorCondition =
-  //         userType === "Supervisor" && item.supervisorStatus === filterStatus;
-  //       const managerCondition =
-  //         userType === "Manager" && item.managerStatus === filterStatus;
-
-  //       const condition = supervisorCondition || managerCondition;
-  //       console.log(`Employee ${item.empID} passes condition: ${condition}`);
-  //       return condition;
-  //     });
-  //   }
-
-  //   // Apply search term filter
-  //   if (searchTerm) {
-  //     filteredData = filteredData.filter(
-  //       (item) =>
-  //         item.empID
-  //           .toString()
-  //           .toLowerCase()
-  //           .includes(searchTerm.toLowerCase()) ||
-  //         item.employeeInfo.empBadgeNo
-  //           .toString()
-  //           .toLowerCase()
-  //           .includes(searchTerm.toLowerCase()) ||
-  //         item.employeeInfo.name
-  //           .toLowerCase()
-  //           .includes(searchTerm.toLowerCase())
-  //     );
-  //   }
-
-  //   // console.log("Filtered Data after applying filters:", filteredData);
-  //   return filteredData;
-  // };
   const dateFD = (selectedDate) => {
     try {
-      const selectedDateObj = new Date(selectedDate);
-      const selectedDateLocal = selectedDateObj.toLocaleDateString("en-GB"); // 'DD/MM/YYYY' format
+      if (!selectedDate) {
+        setSearchResults([]);
+        setFilteredData(data);
+        return;
+      }
 
+      const selectedDateObj = new Date(selectedDate);
+      // Set time to midnight to compare dates only
+      selectedDateObj.setHours(0, 0, 0, 0);
+      
       const filtered = mergedData.filter((item) => {
-        if (!item.createdAt && !item.fromDate && !item.toDate) {
+        // Skip items without any dates
+        if (!item.leaveStatusCreatedAt && !item.empLeaveStartDate && !item.empLeaveEndDate) {
           return false;
         }
 
-        let isCreatedAtMatch = false;
-        let isFromDateMatch = false;
-        let isToDateMatch = false;
-        let isDepartureDateMatch = false;
-        let isArrivalDateMatch = false;
-
         if (location.pathname === "/leaveManage") {
-          const createdDate = item.createdAt
-            ? new Date(item.createdAt).toLocaleDateString("en-GB") // Convert createdAt to local date
-            : null;
-          isCreatedAtMatch = createdDate === selectedDateLocal;
+          const createdDate = new Date(item.leaveStatusCreatedAt);
+          createdDate.setHours(0, 0, 0, 0);
+          return createdDate.getTime() === selectedDateObj.getTime();
         }
 
         if (location.pathname === "/leaveManage/historyLeave") {
-          const fromDate = item.fromDate
-            ? new Date(item.fromDate).toLocaleDateString("en-GB") // Convert fromDate to local date
-            : null;
-          isFromDateMatch = fromDate === selectedDateLocal;
+          const startDate = item.empLeaveStartDate ? new Date(item.empLeaveStartDate) : null;
+          const endDate = item.empLeaveEndDate ? new Date(item.empLeaveEndDate) : null;
 
-          const toDate = item.toDate
-            ? new Date(item.toDate).toLocaleDateString("en-GB") // Convert toDate to local date
-            : null;
-          isToDateMatch = toDate === selectedDateLocal;
+          if (startDate) startDate.setHours(0, 0, 0, 0);
+          if (endDate) endDate.setHours(0, 0, 0, 0);
+
+          return (
+            (startDate && startDate.getTime() === selectedDateObj.getTime()) ||
+            (endDate && endDate.getTime() === selectedDateObj.getTime())
+          );
         }
 
-        if (location.pathname === "/leaveManage/requestTickets") {
-          const departureDate = item.ticketRequest?.departureDate
-            ? new Date(item.ticketRequest.departureDate).toLocaleDateString(
-                "en-GB"
-              )
-            : null;
-          isDepartureDateMatch = departureDate === selectedDateLocal;
-
-          const arrivalDate = item.ticketRequest?.arrivalDate
-            ? new Date(item.ticketRequest.arrivalDate).toLocaleDateString(
-                "en-GB"
-              )
-            : null;
-          isArrivalDateMatch = arrivalDate === selectedDateLocal;
-
-          const ticketCreatedAt = item.ticketRequest?.createdAt
-            ? new Date(item.ticketRequest.createdAt).toLocaleDateString("en-GB")
-            : null;
-          isCreatedAtMatch = ticketCreatedAt === selectedDateLocal;
-        }
-
-        // Filter if any of the dates match
-        const isMatch =
-          isCreatedAtMatch ||
-          isFromDateMatch ||
-          isToDateMatch ||
-          isDepartureDateMatch ||
-          isArrivalDateMatch;
-
-        return isMatch;
+        return false;
       });
 
-      setSearchResults(filtered);
-      setFilteredData(filtered);
+      // If no results found for the selected date, set empty arrays
+      if (filtered.length === 0) {
+        setSearchResults([]);
+        setFilteredData([]);
+      } else {
+        setSearchResults(filtered);
+        setFilteredData(filtered);
+      }
     } catch (error) {
-      console.error("Error in applyFilters:", error);
+      console.error("Error in date filtering:", error);
+      // In case of error, show no results
+      setSearchResults([]);
+      setFilteredData([]);
     }
   };
 
   const handleDateChange = (event) => {
     const date = event.target.value;
     setSelectedDate(date);
-    dateFD(date);
+    if (!date) {
+      // Reset to show all data when date is cleared
+      setSearchResults([]);
+      setFilteredData(data);
+    } else {
+      dateFD(date);
+    }
   };
 
   useEffect(() => {
@@ -222,19 +168,18 @@ export const LeaveManage = () => {
   };
 
   const handleViewClick = (data, source) => {
-    // console.log(data);
-
     setSource(source);
     if (source === "LM") {
       setSelectedLeaveData(data); // Leave Data
       setSelectedTicketData(null); // Clear ticket data
     } else if (source === "Tickets") {
+      console.log(data);
+
       setSelectedTicketData(data); // Ticket Data
       setSelectedLeaveData(null); // Clear leave data
     }
     setToggleClick(true);
   };
-  // console.log(toggleClick);
 
   const handleUpdate = async (empID, newStatus, remark) => {
     try {
@@ -334,85 +279,47 @@ export const LeaveManage = () => {
   return (
     <section className={`py-20 px-10`}>
       <div className="screen-size">
-        <section className="flex justify-between items-center py-3">
-          <p className="text_size_5">
-            <Link
-              to="/leaveManage"
-              className={`pr-2 relative after:absolute after:-bottom-1 after:left-0 after:w-[90%] after:h-1 cursor-pointer ${
-                location.pathname === "/leaveManage" ? "after:bg-primary" : ""
-              }`}
-            >
-              Request Leave
-            </Link>{" "}
-            <Link
-              to="/leaveManage/historyLeave"
-              className={`px-2 relative after:absolute after:-bottom-2 after:left-0 after:w-[90%] after:h-1 cursor-pointer ${
-                location.pathname === "/leaveManage/historyLeave"
-                  ? "after:bg-primary"
-                  : ""
-              }`}
-            >
-              History of leave
-            </Link>{" "}
-            <Link
-              to="/leaveManage/leaveBalance"
-              className={`px-2 relative after:absolute after:-bottom-2 after:left-0 after:w-[90%] after:h-1 cursor-pointer ${
-                location.pathname === "/leaveManage/leaveBalance"
-                  ? "after:bg-primary"
-                  : ""
-              }`}
-            >
-              Employee Leave Balance
-            </Link>{" "}
-            {(userType === "HR" || userType === "SuperAdmin") && (
-              <>
-                {" "}
-                <Link
-                  to="/leaveManage/requestTickets"
-                  className={`px-2 relative after:absolute after:-bottom-2 after:left-0 after:w-[90%] after:h-1 cursor-pointer ${
-                    location.pathname === "/leaveManage/requestTickets"
-                      ? "after:bg-primary"
-                      : ""
-                  }`}
-                >
-                  Request Tickets
-                </Link>
-              </>
-            )}
-          </p>
+        <section className="flex flex-wrap justify-between items-center py-3">
+          {(location.pathname === "/leaveManage" ||
+            location.pathname === "/leaveManage/historyLeave") && (
+            <div className="">
+              <NavigateLM userType={userType} />
+            </div>
+          )}
           <div
-            className={`flex gap-5 w-[500px] ${
+            className={`flex flex-wrap gap-5 ${
               location.pathname === "/leaveManage/leaveBalance"
                 ? "justify-end"
                 : ""
             }`}
           >
-            {location.pathname !== "/leaveManage/leaveBalance" && location.pathname !== "/leaveManage/requestTickets" && (
-              <Searchbox
-                allEmpDetails={secondartyData}
-                searchIcon2={<IoSearch />}
-                placeholder="Employee ID"
-                searchUserList={searchUserList}
-                border="rounded-md"
-              />
-            )}
-            {location.pathname !== "/leaveManage/leaveBalance" && location.pathname !== "/leaveManage/requestTickets" && (
-              <div className="py-2  text_size_5 bg-white border rounded-md text-grey border-lite_grey flex items-center px-3 gap-2">
-                <input
-                  type="date"
-                  name="selectedDate"
-                  className="text-grey outline-none"
-                  value={selectedDate || ""}
-                  onChange={handleDateChange}
+            {location.pathname !== "/leaveManage/leaveBalance" &&
+              location.pathname !== "/leaveManage/requestTickets" && (
+                <Searchbox
+                  allEmpDetails={secondartyData}
+                  searchIcon2={<IoSearch />}
+                  placeholder="Employee ID"
+                  searchUserList={searchUserList}
+                  border="rounded-md"
                 />
+              )}
+            {location.pathname !== "/leaveManage/leaveBalance" &&
+              location.pathname !== "/leaveManage/requestTickets" && (
+                <div className="py-2  text_size_5 bg-white border rounded-md text-grey border-lite_grey flex items-center px-3 gap-2">
+                  <input
+                    type="date"
+                    name="selectedDate"
+                    className="text-grey outline-none"
+                    value={selectedDate || ""}
+                    onChange={handleDateChange}
+                  />
+                </div>
+              )}
 
-                {/* {location.pathname === "/leaveManage/requestTickets" &&
-                  userType !== "HR" &&
-                  userType !== "SuperAdmin" && (
-                    <Filter AfterFilter={handleFilterChange} />
-                  )} */}
-              </div>
-            )}
+            {/* {location.pathname === "/leaveManage" &&
+              userType === "SuperAdmin" && (
+                <Filter AfterFilter={handleFilterChange} />
+              )} */}
           </div>
         </section>
         <section className="center w-full">
@@ -430,7 +337,8 @@ export const LeaveManage = () => {
               userType,
               statusUpdate,
               mergedData,
-              setCurrentPage
+              setCurrentPage,
+              selectedDate,
             }}
           />
         </section>
@@ -440,17 +348,18 @@ export const LeaveManage = () => {
           <div className="w-[60%] flex justify-start mt-4 px-10">
             {/* Conditionally render pagination only for tables other than LMTable and TicketsTable */}
 
-            {location.pathname !== "/leaveManage/leaveBalance" && location.pathname !== "/leaveManage/requestTickets"&& (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={(newPage) => {
-                  if (newPage >= 1 && newPage <= totalPages) {
-                    setCurrentPage(newPage);
-                  }
-                }}
-              />
-            )}
+            {location.pathname !== "/leaveManage/leaveBalance" &&
+              location.pathname !== "/leaveManage/requestTickets" && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(newPage) => {
+                    if (newPage >= 1 && newPage <= totalPages) {
+                      setCurrentPage(newPage);
+                    }
+                  }}
+                />
+              )}
           </div>
         </div>
       </div>

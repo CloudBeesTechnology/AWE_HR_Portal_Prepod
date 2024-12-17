@@ -135,9 +135,9 @@ export const LMTable = () => {
                       <td className="py-3">{displayIndex}</td>
                       <td className="py-3">{item.empID}</td>
                       <td className="py-3">
-                        {item.employeeInfo.name || "Tony Stark"}
+                        {item.empName || "Tony Stark"}
                       </td>
-                      <td className="py-3">{formatDate(item.createdAt)}</td>
+                      <td className="py-3">{formatDate(item.leaveStatusCreatedAt)}</td>
                       {userType !== "Supervisor" && userType !== "Manager" && (
                         <td className="py-3">{item.supervisorName || "N/A"}</td>
                       )}

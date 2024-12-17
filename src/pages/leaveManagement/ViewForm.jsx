@@ -18,7 +18,8 @@ export const ViewForm = ({
   personalInfo,
   formatDate,
 }) => {
-  console.log(ticketData);
+
+console.log(ticketData);
 
   const { empPIData } = useContext(DataSupply);
   const [remark, setRemark] = useState("");
@@ -30,6 +31,16 @@ export const ViewForm = ({
     useLeaveManage();
   const { createNotification } = useCreateNotification(); // Hook for creating notification
   const { leaveDetails } = UpdateLeaveData();
+
+  const managerName = empPIData.find((val) => {
+    const findingManagerName = leaveData?.managerEmpID === val.empID
+    return findingManagerName
+  });
+  const supervisorName = empPIData.find((val) => {
+    const findingSupervisorName = leaveData?.supervisorEmpID === val.empID
+    return findingSupervisorName
+  });
+
 
   const handleUpdateStatus = async (status) => {
     const updateData = {};
@@ -55,13 +66,14 @@ export const ViewForm = ({
 
     // Handle Leave status update
     if (source === "LM") {
-      const fromDate = leaveData.fromDate;
-      const toDate = leaveData.toDate;
+      const fromDate = leaveData.empLeaveStartDate;
+      const toDate = leaveData.empLeaveEndDate;
       const formattedDateFrom = formatDate(fromDate);
       const formattedDateTo = formatDate(toDate);
 
-      handleUpdateLeaveStatus(leaveData.id, updateData);
 
+      handleUpdateLeaveStatus(leaveData.id, updateData).then(()=>{
+        
       setNotificationText(
         `Leave ${status} by ${personalInfo.name} on ${formatDate(currentDate)}`
       );
@@ -69,62 +81,46 @@ export const ViewForm = ({
       if (
         userType === "Manager" &&
         leaveData.supervisorEmpID === null &&
-        leaveData.managerEmpID &&
         status === "Approved"
       ) {
-        // console.log("checking manager");
+        console.log("checking manager");
 
         sendEmail(
           `Leave Request ${status}`,
-          `Leave request for From Date : ${formattedDateFrom} To Date : ${formattedDateTo} has been Status: ${status} by Manager Name : ${
-            leaveData.managerName || "Not mention"
-          }`,
+          `Dear ${leaveData.empName || "Not mention"}, Leave request for From Date : ${formattedDateFrom} To Date : ${formattedDateTo} has been Status: ${status} by Manager Name : ${
+            managerName.name || "Not mention"
+          }. View at : https://hr.adininworks.co `,
           "hr_no-reply@adininworks.com",
-          leaveData.employeeInfo.officialEmail
+          leaveData.empOfficialEmail
         );
+
       } else if (
         userType === "Supervisor" &&
-        leaveData.supervisorEmpID &&
-        leaveData.managerStatus === "Pending" &&
+        leaveData?.supervisorEmpID &&
+        leaveData?.managerStatus === "Pending" &&
         status === "Approved"
       ) {
         const FindingEmail = empPIData.filter((manage) => {
           const IdFinding =
-            leaveData.managerEmpID.toLowerCase() === manage.empID.toLowerCase();
+            leaveData?.managerEmpID.toLowerCase() === manage.empID.toLowerCase();
 
           return IdFinding;
         });
         // console.log("manager");
-        // console.log(
-        //   FindingEmail[0].officialEmail,
-        //   leaveData?.supervisorName?.name,
-        //   leaveData?.employeeInfo?.name
-        // );
-
+ 
         // manager got email
         sendEmail(
           `Leave Request ${status}`,
-          `Dear ${leaveData.employeeInfo.name || "Not mention"} , 
-           Your leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Supervisor ${
-            leaveData.supervisorName || "Not mention"
-          }.`,
+          `Employee ${leaveData.empName || "Not mention"} , 
+           applied leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Supervisor ${
+            supervisorName.name || "Not mention"
+          }. View at : https://hr.adininworks.co `,
 
           "hr_no-reply@adininworks.com",
           FindingEmail[0].officialEmail
         );
 
-        // sendEmail(
-        //   `Leave Request Status: ${status}`,
-        //   `Dear ${leaveData.employeeInfo.name || "Valued Employee"},\n\n` +
-        //   `We would like to inform you that your leave request for the period from ${formattedDateFrom} to ${formattedDateTo} has been ${status} by your Supervisor, ${leaveData.supervisorName || "Not Mentioned"}.\n\n` +
-        //   `If you have any further questions or need clarification, please do not hesitate to reach out to us.\n\n` +
-        //   `Kind regards,\n` +
-        //   `Human Resources Team\n` +
-        //   `Adinin Works\n` +
-        //   `Email: hr_no-reply@adininworks.com`,
-        //   "hr_no-reply@adininworks.com",
-        //   FindingEmail[0].officialEmail
-        // );
+
       } else if (
         userType === "Manager" &&
         leaveData.managerEmpID &&
@@ -142,11 +138,11 @@ export const ViewForm = ({
         // //superviosr got email
         sendEmail(
           `Leave Request ${status}`,
-          `Dear  ${
-            leaveData.employeeInfo.name || "Not mention"
-          } , Your leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Manager ${
-            leaveData.managerName || "Not mention"
-          }.`,
+          `Employee  ${
+            leaveData.empName || "Not mention"
+          } , applied leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Manager ${
+            managerName.name || "Not mention"
+          }. View at : https://hr.adininworks.co `,
           "hr_no-reply@adininworks.com",
           FindingEmail[0].officialEmail
         );
@@ -154,24 +150,24 @@ export const ViewForm = ({
         sendEmail(
           `Leave Request ${status}`,
           `Dear ${
-            leaveData.employeeInfo.name || "Not mention"
+            leaveData.empName || "Not mention"
           } , Your leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Manager ${
-            leaveData.managerName || "Not mention"
-          }  and Supervisor ${leaveData.supervisorName || "Not mention"}.`,
+            managerName.name || "Not mention"
+          }  and Supervisor ${supervisorName.name || "Not mention"}. View at : https://hr.adininworks.co `,
           "hr_no-reply@adininworks.com",
-          leaveData.employeeInfo.officialEmail
+          leaveData.empOfficialEmail
         );
       }
 
       // Create notification for the leave status update
       if (userType === "Manager") {
         createNotification({
-          empID: leaveData.employeeInfo.empID,
+          empID: leaveData.empID,
           leaveType: leaveData.leaveType,
-          message: `Leave request for ${leaveData.employeeInfo.name} has been ${status} by ${personalInfo.name}`,
+          message: `Leave request for ${leaveData.empName} has been ${status} by ${personalInfo.name}`,
           senderEmail: "leave_no-reply@adininworks.com", // Sender email
-          receipentEmail: leaveData.employeeInfo.officialEmail, // Using the employee's official email
-          receipentEmpID: leaveData.employeeInfo.empID,
+          receipentEmail: leaveData.empOfficialEmail, // Using the employee's official email
+          receipentEmpID: leaveData.empID,
           status: status,
           createdAt: currentDate,
           updatedAt: currentDate,
@@ -185,51 +181,59 @@ export const ViewForm = ({
         navigate("/leaveManage");
         // Redirect to the dashboard or another page
       }, 3000);
+
+      }).catch((err)=>console.log(err)
+      )
+
     } else if (source === "Tickets") {
       updateData.hrStatus = status; // Set the status for the ticket request
       updateData.hrRemarks = remark;
       updateData.hrDate = currentDate;
       const formattedDatedeparture = formatDate(ticketData.departureDate);
       const formattedDatearrival = formatDate(ticketData.arrivalDate);
-      handleUpdateTicketRequest(ticketData.id, updateData);
+      handleUpdateTicketRequest(ticketData.id, updateData).then(()=>{
+        setNotificationText(
+          `Ticket request ${status} by ${personalInfo.name} on ${formatDate(
+            currentDate
+          )}`
+        );
+  
+        sendEmail(
+          `Ticket Request ${status}`,
+          `Dear  ${
+            ticketData.empName || "Not mention"
+          } , Your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${status} by HR ${
+            personalInfo.name || "Not mention"
+          }. View at : https://hr.adininworks.co `,
+          "hr_no-reply@adininworks.com",
+  
+          ticketData.empOfficialEmail
+        );
+  
+        // Create notification for the ticket status update
+        createNotification({
+          empID: ticketData.empID,
+          leaveType: "Ticket Request", // Assuming a default value as this is a ticket request
+          message: `Ticket request for ${ticketData.empName} has been ${status} by ${personalInfo.name}`,
+          senderEmail: "ticket_no-reply@adininworks.com", // Sender email
+          receipentEmail: ticketData.empOfficialEmail, // Using the employee's official email
+          receipentEmpID: ticketData.empID,
+          status: status,
+          createdAt: currentDate,
+          updatedAt: currentDate,
+        });
+  
+        setNotification(true);
+        setTimeout(() => {
+          setNotification(false);
+          handleClickForToggle(false);
+          navigate("/leaveManage/requestTickets");
+          // Redirect to the dashboard or another page
+        }, 3000);
+        })
+        .catch((err)=>console.log(err)
+      )
 
-      setNotificationText(
-        `Ticket request ${status} by ${personalInfo.name} on ${formatDate(
-          currentDate
-        )}`
-      );
-
-      sendEmail(
-        `Ticket Request ${status}`,
-        `Dear  ${
-          ticketData.employeeInfo.name || "Not mention"
-        } , Your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${status} by HR ${
-          personalInfo.name || "Not mention"
-        }.`,
-        "hr_no-reply@adininworks.com",
-        ticketData.employeeInfo.officialEmail
-      );
-
-      // Create notification for the ticket status update
-      createNotification({
-        empID: ticketData.employeeInfo.empID,
-        leaveType: "Ticket Request", // Assuming a default value as this is a ticket request
-        message: `Ticket request for ${ticketData.employeeInfo.name} has been ${status} by ${personalInfo.name}`,
-        senderEmail: "ticket_no-reply@adininworks.com", // Sender email
-        receipentEmail: ticketData.employeeInfo.officialEmail, // Using the employee's official email
-        receipentEmpID: ticketData.employeeInfo.empID,
-        status: status,
-        createdAt: currentDate,
-        updatedAt: currentDate,
-      });
-
-      setNotification(true);
-      setTimeout(() => {
-        setNotification(false);
-        handleClickForToggle(false);
-        navigate("/leaveManage");
-        // Redirect to the dashboard or another page
-      }, 3000);
     }
   };
 
@@ -361,7 +365,14 @@ export const ViewForm = ({
                 (source === "Tickets" && "Ticket Request Form")}
             </h2>
           </div>
-          {notification && (
+          {notification && userType === "HR" && (
+            <SpinLogo
+              text={notificationText}
+              notification={notification}
+              path="/leaveManage/requestTickets"
+            />
+          )}
+            {notification && userType === "Manager" || userType === "Supervisor" && (
             <SpinLogo
               text={notificationText}
               notification={notification}
@@ -373,35 +384,27 @@ export const ViewForm = ({
             <section className="shadow-md w-[500px] p-5 bg-white">
               <div className="text_size_6 ">
                 {[
-                  { label: "Name", value: leaveData.employeeInfo.name || "" },
+                  { label: "Name", value: leaveData.empName || "" },
                   {
                     label: "Badge No",
-                    value: leaveData.employeeInfo.empBadgeNo,
+                    value: leaveData.empBadgeNo,
                   },
                   {
                     label: "Job Title",
-                    value: Array.isArray(leaveData.workInfo.position)
-                      ? leaveData.workInfo.position[
-                          leaveData.workInfo.position.length - 1
-                        ]
-                      : leaveData.workInfo.position || "N/A",
+                    value: leaveData.position || "N/A",
                   },
                   {
                     label: "Department",
-                    value: Array.isArray(leaveData.workInfo.department)
-                      ? leaveData.workInfo.department[
-                          leaveData.workInfo.department.length - 1
-                        ]
-                      : leaveData.workInfo.department || "N/A",
+                    value:  leaveData.department || "N/A",
                   },
-                  { label: "Leave Type", value: leaveData.leaveType },
+                  { label: "Leave Type", value: leaveData.empLeaveType },
                   {
                     label: "Applied Dates",
-                    value: ` ${formatDate(leaveData.fromDate)} to ${formatDate(
-                      leaveData.toDate
+                    value: ` ${formatDate(leaveData.  empLeaveStartDate)} to ${formatDate(
+                      leaveData. empLeaveEndDate
                     )} `,
                   },
-                  { label: "Total No of Days", value: leaveData.days },
+                  { label: "Total No of Days", value: leaveData.leaveDays},
                   // { label: "Leave Balance", value: leaveData.balance },
                   { label: "Reason", value: leaveData.reason },
                 ].map((item, index) => (
@@ -540,31 +543,27 @@ export const ViewForm = ({
                 </div>
 
                 {[
-                  { label: "Name", value: ticketData.employeeInfo.name },
+                  { label: "Name", value: ticketData.empName },
                   {
                     label: "Badge Number",
-                    value: ticketData.employeeInfo.empBadgeNo || "N/A",
+                    value: ticketData.empBadgeNo || "N/A",
                   },
 
                   {
                     label: "Department",
-                    value: Array.isArray(ticketData.workInfo.department)
-                      ? ticketData.workInfo.department[
-                          ticketData.workInfo.department.length - 1
-                        ]
-                      : ticketData.workInfo.department || "N/A",
+                    value: ticketData.department || "N/A",
                   },
                   {
                     label: "Position",
-                    value: Array.isArray(ticketData.workInfo.position)
-                      ? ticketData.workInfo.position[
-                          ticketData.workInfo.position.length - 1
-                        ]
-                      : ticketData.workInfo.position || "N/A",
+                    value: ticketData.position || "N/A",
                   },
                   {
                     label: "Date of Join",
-                    value: formatDate(ticketData.workInfo.doj) || "N/A",
+                    value: formatDate(ticketData.doj) || "N/A",
+                  },
+                  {
+                    label: "Destination",
+                    value: ticketData.destination,
                   },
                   {
                     label: "Departure Date",

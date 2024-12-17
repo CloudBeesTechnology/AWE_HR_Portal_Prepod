@@ -4,6 +4,7 @@ import { data, useOutletContext } from "react-router-dom";
 import { IoSearch } from "react-icons/io5";
 import { Searchbox } from "../../utils/Searchbox";
 import { LeaveSummaryPopUp } from "./LeaveSummaryPopUp";
+import { NavigateLM } from "./NavigateLM";
 
 export const EmpLeaveBalance = () => {
   const { mergedData, formatDate, userType } = useOutletContext();
@@ -96,7 +97,7 @@ export const EmpLeaveBalance = () => {
                 remaining: 0,
               },
               empId: val.empID,
-              employeeName: val.employeeInfo.name,
+              employeeName: val.empName,
             };
           }
 
@@ -217,8 +218,11 @@ export const EmpLeaveBalance = () => {
   const startIndex = (currentPage - 1) * rowsPerPage;
   return (
     <section className="relative py-5">
-      <div className="absolute right-0 -top-12 ">
-        <div className="py-2 w-full text_size_5 bg-white border rounded-md text-grey border-lite_grey flex items-center px-3 gap-2">
+      <div className="flex flex-wrap justify-between items-center mb-6">
+        <div className="">
+          <NavigateLM userType={userType} />
+        </div>
+        <div className="py-2  text_size_5 bg-white border rounded-md text-grey border-lite_grey flex items-center px-3 gap-2">
           <input
             type="text"
             placeholder="Employee ID"
@@ -264,7 +268,7 @@ export const EmpLeaveBalance = () => {
                         >
                           <td className="py-5">{serialNumber}</td>
                           <td className="py-5">{leaveData.empId}</td>
-                          <td className="py-5">{leaveData.employeeName}</td>
+                          <td className="py-5">{leaveData.empName}</td>
                           <td className="py-5">{leaveName}</td>
                           <td className="py-5">{data.taken || 0}</td>
                           <td className="py-5">

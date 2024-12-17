@@ -2,7 +2,7 @@ import React from "react";
 import { useOutletContext } from "react-router-dom";
 
 export const HOLTable = () => {
-  const { filteredData, formatDate, userType, currentPage, rowsPerPage } =
+  const { filteredData, formatDate, userType, currentPage, rowsPerPage, selectedDate } =
     useOutletContext();
   const startIndex = (currentPage - 1) * rowsPerPage;
 
@@ -51,10 +51,10 @@ export const HOLTable = () => {
                     >
                       <td className="py-5">{displayIndex}</td>
                       <td className="py-5">{item.empID}</td>
-                      <td className="py-5">{item.employeeInfo.name}</td>
-                      <td className="py-5">{item.leaveType}</td>
-                      <td className="py-5">{formatDate(item.fromDate)}</td>
-                      <td className="py-5">{formatDate(item.toDate)}</td>
+                      <td className="py-5">{item.empName}</td>
+                      <td className="py-5">{item.empLeaveType}</td>
+                      <td className="py-5">{formatDate(item.empLeaveStartDate)}</td>
+                      <td className="py-5">{formatDate(item.empLeaveEndDate)}</td>
                       <td className="py-5 w-[20%] break-words overflow-hidden">
                         {item.reason}
                       </td>
@@ -80,7 +80,11 @@ export const HOLTable = () => {
           </table>
         ) : (
           <div className="text-center mt-6 py-20">
-            <p>History leave not available.</p>
+            <p>
+              {selectedDate 
+                ? `No leave history found for ${new Date(selectedDate).toLocaleDateString("en-GB")}`
+                : "History leave not available."}
+            </p>
           </div>
         )}
       </div>

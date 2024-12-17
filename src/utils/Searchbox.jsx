@@ -40,24 +40,24 @@ const location=useLocation()
       const results = allEmpDetails.filter((employee) => {
         return (
           // Check if empID exists and is a string, then check if it includes the query
-          (employee.empID && typeof employee.empID === 'string' && employee.empID.toLowerCase().includes(query)) ||
+          (employee.empID && typeof employee.empID === 'string' && employee.empID.toLowerCase().includes(query.toLowerCase())) ||
           
-          // Check if name exists directly or within employeeInfo, and is a string
-          (employee.name && typeof employee.name === 'string' && employee.name.toLowerCase().includes(query)) ||
-          (employee.employeeInfo?.name && typeof employee.employeeInfo.name === 'string' && employee.employeeInfo.name.toLowerCase().includes(query)) ||
+          // Check if name exists and is a string
+          (employee.name && typeof employee.name === 'string' && employee.name.toLowerCase().includes(query.toLowerCase())) ||
           
-          // Check if position exists directly or within workInfo, and is a string
-          (employee.position && typeof employee.position === 'string' && employee.position.toLowerCase().includes(query)) ||
-          (employee.workInfo?.position && typeof employee.workInfo.position === 'string' && employee.workInfo.position.toLowerCase().includes(query)) ||
+          // Check if empName exists and is a string
+          (employee.empName && typeof employee.empName === 'string' && employee.empName.toLowerCase().includes(query.toLowerCase())) ||
     
-          // Check if empBadgeNo exists and is a string, then check if it includes the query
-          (employee.empBadgeNo && typeof employee.empBadgeNo === 'string' && employee.empBadgeNo.toLowerCase().includes(query)) ||
-          (employee.employeeInfo?.empBadgeNo && typeof employee.employeeInfo.empBadgeNo === 'string' && employee.employeeInfo.empBadgeNo.toLowerCase().includes(query))
+          // Check if position exists and is a string
+          (employee.position && typeof employee.position === 'string' && employee.position.toLowerCase().includes(query.toLowerCase())) ||
+    
+          // Check if empBadgeNo exists and is a string
+          (employee.empBadgeNo && typeof employee.empBadgeNo === 'string' && employee.empBadgeNo.toLowerCase().includes(query.toLowerCase()))
         );
       });
+      searchUserList(results)
+    }
     
-      searchUserList(results); // If provided, otherwise will be a no-op
-    } 
     else {
       // emptySearch();
       searchUserList(allEmpDetails);

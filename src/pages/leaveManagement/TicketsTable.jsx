@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { IoSearch } from "react-icons/io5";
 import { Pagination } from "./Pagination";
 import { Filter } from "./Filter";
+import { NavigateLM } from "./NavigateLM";
 
 export const TicketsTable = () => {
   const { handleViewClick, handleClickForToggle, userType } =
@@ -18,71 +19,124 @@ export const TicketsTable = () => {
   const [data, setData] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
-  const {
-    handleDeleteLeaveStatus,
-    handleUpdateLeaveStatus,
-    ticketMerged,
-    statusUpdate,
-  } = useLeaveManage();
+  const { ticketMerged } = useLeaveManage();
 
- 
-   // Filter the data based on filterStatus (All, Pending, Approved, Rejected)
-   
-  
+  // Add new state to track all filters
+  const [filters, setFilters] = useState({
+    date: "",
+    search: [],
+    status: "All"
+  });
 
-  const dateFD = (selectedDate) => {
-    try {
-      if (!selectedDate) {
-        setSearchResults([]);
-        setFilteredData([]);
-        return;
-      }
-      const selectedDateObj = new Date(selectedDate);
-      const selectedDateLocal = selectedDateObj.toLocaleDateString("en-GB"); // 'DD/MM/YYYY' format
+  // Modify useEffect to handle all filters together
+  useEffect(() => {
+    let filteredResults = [...ticketMerged]; // Create a new array to avoid mutations
 
-      const filtered = ticketMerged.filter((item) => {
-        if (!item.createdAt && !item.departureDate && !item.arrivalDate) {
-          return false;
-        }
+    // Apply status filter
+    if (filters.status !== "All") {
+      filteredResults = filteredResults.filter(
+        (item) => item.hrStatus === filters.status
+      );
+    }
 
-        let isCreatedAtMatch = false;
-        let isDepartureDateMatch = false;
-        let isArrivalDateMatch = false;
+    // Apply date filter if selected
+    if (filters.date) {
+      const selectedDateLocal = new Date(filters.date);
+      // Remove time portion for accurate date comparison
+      selectedDateLocal.setHours(0, 0, 0, 0);
 
-        const departureDate = item?.departureDate
-          ? new Date(item?.departureDate).toLocaleDateString("en-GB")
-          : null;
-        isDepartureDateMatch = departureDate === selectedDateLocal;
+      const dateFilteredResults = filteredResults.filter((item) => {
+        const departureDate = item?.departureDate ? new Date(item.departureDate) : null;
+        const arrivalDate = item?.arrivalDate ? new Date(item.arrivalDate) : null;
+        const createdDate = item?.createdAt ? new Date(item.createdAt) : null;
 
-        const arrivalDate = item?.arrivalDate
-          ? new Date(item?.arrivalDate).toLocaleDateString("en-GB")
-          : null;
-        isArrivalDateMatch = arrivalDate === selectedDateLocal;
+        // Remove time portion from all dates
+        if (departureDate) departureDate.setHours(0, 0, 0, 0);
+        if (arrivalDate) arrivalDate.setHours(0, 0, 0, 0);
+        if (createdDate) createdDate.setHours(0, 0, 0, 0);
 
-        const ticketCreatedAt = item?.createdAt
-          ? new Date(item?.createdAt).toLocaleDateString("en-GB")
-          : null;
-        isCreatedAtMatch = ticketCreatedAt === selectedDateLocal;
-
-        // Filter if any of the dates match
-        const isMatch =
-          isCreatedAtMatch || isDepartureDateMatch || isArrivalDateMatch;
-
-        return isMatch;
+        // Compare dates using getTime() for accurate comparison
+        return [departureDate, arrivalDate, createdDate].some(date => 
+          date && date.getTime() === selectedDateLocal.getTime()
+        );
       });
 
-      setSearchResults(filtered);
-      setFilteredData(filtered);
-    } catch (error) {
-      console.error("Error in applyFilters:", error);
+      filteredResults = dateFilteredResults;
     }
-  };
 
+    // Apply search results if any
+    if (filters.search.length > 0) {
+      filteredResults = filteredResults.filter(item => 
+        filters.search.some(searchItem => searchItem.empID === item.empID)
+      );
+    }
+
+    // Update data and reset pagination in a single batch
+    setData(filteredResults);
+    setFilteredData([]); // Clear filtered data before pagination recalculation
+    setCurrentPage(1);
+  }, [filters, ticketMerged]);
+
+  // Separate useEffect for pagination to avoid race conditions
+  useEffect(() => {
+    if (!data.length) {
+      setFilteredData([]);
+      return;
+    }
+
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const sortedData = [...data].sort((a, b) => {
+      const regex = /\d+$/;
+      const numPartA = a.empID.match(regex)
+        ? a.empID.match(regex)[0].padStart(5, "0")
+        : "";
+      const numPartB = b.empID.match(regex)
+        ? b.empID.match(regex)[0].padStart(5, "0")
+        : "";
+
+      const prefixA = a.empID.replace(regex, "").toLowerCase();
+      const prefixB = b.empID.replace(regex, "").toLowerCase();
+
+      return prefixA !== prefixB
+        ? prefixA.localeCompare(prefixB)
+        : numPartA.localeCompare(numPartB);
+    });
+
+    const paginatedData = sortedData.slice(startIndex, startIndex + rowsPerPage);
+    setFilteredData(paginatedData);
+  }, [currentPage, rowsPerPage, data]);
+
+  // Console log for debugging
+  useEffect(() => {
+    console.log('Filtered Data Length:', filteredData.length);
+    console.log('Total Data Length:', data.length);
+  }, [filteredData, data]);
+
+  // Update handlers to use new filters state
   const handleDateChange = (event) => {
     const date = event.target.value;
     setSelectedDate(date);
-    dateFD(date);
+    setFilters(prev => ({ ...prev, date }));
   };
+
+  const handleFilterChange = (status) => {
+    setFilterStatus(status);
+    setFilters(prev => ({ ...prev, status }));
+  };
+
+  const searchUserList = async (searchData) => {
+    try {
+      const result = await searchData;
+      setSearchResults(result);
+      setFilters(prev => ({ ...prev, search: result }));
+    } catch (error) {
+      console.error("Error search data", error);
+    }
+  };
+
+  // Update total pages calculation
+  const totalPages = Math.ceil(data.length / rowsPerPage);
+
   const formatDate = (dateToString) => {
     if (!dateToString || isNaN(new Date(dateToString).getTime())) {
       return "";
@@ -111,82 +165,21 @@ export const TicketsTable = () => {
     "Submitted form",
     userType !== "SuperAdmin" && "Status",
   ];
+  console.log(filteredData.length);
 
   useEffect(() => {
     setSecondartyData(ticketMerged);
-    setData(ticketMerged);
+    // setData(ticketMerged);
   }, [ticketMerged]);
-  
-
-  useEffect(() => {
-    if (filterStatus !== "All") {
-      const updatedData = ticketMerged.filter((item) => item.hrStatus === filterStatus);
-      setFilteredData(updatedData);
-    } else {
-      setFilteredData(ticketMerged);
-    }
-  }, [filterStatus, ticketMerged]);
-  
-
-  const searchUserList = async (data) => {
-    try {
-      const result = await data;
-      setSearchResults(result);
-      setCurrentPage(1);
-      setData(result);  
-    } catch (error) {
-      console.error("Error search data", error);
-    }
-  };
-
-  useEffect(() => {
-    const startIndex = (currentPage - 1) * rowsPerPage;
-
-    const dataToPaginate = searchResults.length > 0 ? searchResults : data;
-
-    const sortedData = dataToPaginate.sort((a, b) => {
-      const regex = /\d+$/;
-
-      const numPartA = a.empID.match(regex)
-        ? a.empID.match(regex)[0].padStart(5, "0")
-        : "";
-      const numPartB = b.empID.match(regex)
-        ? b.empID.match(regex)[0].padStart(5, "0")
-        : "";
-
-      const prefixA = a.empID.replace(regex, "").toLowerCase();
-      const prefixB = b.empID.replace(regex, "").toLowerCase();
-
-      if (prefixA !== prefixB) {
-        return prefixA.localeCompare(prefixB);
-      }
-
-      return numPartA.localeCompare(numPartB);
-    });
-
-    const paginatedData = sortedData.slice(
-      startIndex,
-      startIndex + rowsPerPage
-    );
-
-    setFilteredData(paginatedData);
-  }, [currentPage, rowsPerPage, data, searchResults, selectedDate]);
-
-  const totalPages = Math.ceil(
-    (searchResults.length > 0 ? searchResults.length : data.length) /
-      rowsPerPage
-  );
-  const handleFilterChange = (status) => {
-    console.log("Filter changed to:", status); // Debug log
-    setFilterStatus(status);
-    setCurrentPage(1); // Reset to the first page on filter change
-  };
 
   return (
     <section className="relative w-full">
-      <div >
-        <div className="flex absolute -top-11 right-0 justify-end gap-3">
-          <div className="w-[40%]">
+      <div className="flex justify-around flex-wrap">
+        <div>
+          <NavigateLM userType={userType} />
+        </div>
+        <div className="flex  flex-wrap items-center gap-1">
+          <div>
             <Searchbox
               allEmpDetails={secondartyData}
               searchIcon2={<IoSearch />}
@@ -195,7 +188,7 @@ export const TicketsTable = () => {
               border="rounded-md"
             />
           </div>
-          <div className="text_size_5 bg-white border rounded-md text-grey border-lite_grey flex items-center px-3 gap-2">
+          <div className="text_size_5 bg-white border py-2 rounded-md text-grey border-lite_grey flex items-center px-3 gap-2">
             <input
               type="date"
               name="selectedDate"
@@ -203,16 +196,15 @@ export const TicketsTable = () => {
               value={selectedDate || ""}
               onChange={handleDateChange}
             />
-
           </div>
-            {userType === "HR" && (
-              <div>
-                <Filter AfterFilter={handleFilterChange} />
-              </div>
-            )}
+          {userType === "HR" && (
+            <div>
+              <Filter name={filterStatus} AfterFilter={handleFilterChange} />
+            </div>
+          )}
         </div>
       </div>
-      <div className=" top-0 py-5 leaveManagementTable max-w-[100%] overflow-x-auto flex-grow rounded-xl">
+      <div className="py-5 leaveManagementTable max-w-[100%] overflow-x-auto flex-grow rounded-xl">
         {filteredData && filteredData.length > 0 ? (
           <table className="w-[1150px] font-semibold text-sm">
             <thead className="bg-[#939393] sticky top-0 rounded-t-lg">
@@ -242,23 +234,15 @@ export const TicketsTable = () => {
                         {item?.empID}
                       </td>
                       <td className="border-b-2  border-[#CECECE] py-5">
-                        {item?.employeeInfo.name}
+                        {item?.empName}
                       </td>
                       <td className="border-b-2 border-[#CECECE] py-5">
-                        {Array.isArray(item.workInfo?.department) &&
-                        item.workInfo.department.length > 0
-                          ? item.workInfo.department[
-                              item.workInfo.department.length - 1
-                            ]
-                          : "N/A"}
+                        { item.department
+                          || "N/A"}
                       </td>
                       <td className="border-b-2 border-[#CECECE] py-5">
-                        {Array.isArray(item.workInfo?.position) &&
-                        item.workInfo.position.length > 0
-                          ? item.workInfo.position[
-                              item.workInfo.position.length - 1
-                            ]
-                          : "N/A"}
+                        {item.position
+                         || "N/A"}
                       </td>
 
                       <td className="border-b-2  border-[#CECECE] py-5">
@@ -311,7 +295,11 @@ export const TicketsTable = () => {
           </table>
         ) : (
           <div className="text-center mt-6 py-20">
-            <p>Ticket Request not available.</p>
+            <p>
+              {filters.date 
+                ? "No tickets found for the selected date."
+                : "Ticket Request not available."}
+            </p>
           </div>
         )}
       </div>

@@ -10,6 +10,7 @@ import { CreateJobFunc } from "../../services/createMethod/CreateJobFunc";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { GoUpload } from "react-icons/go";
 import { uploadDocs } from "../../services/uploadDocsS3/UploadDocs";
+import axios from "axios";
 
 export const CreateJob = () => {
   const { SubmitJobData } = CreateJobFunc();
@@ -31,9 +32,9 @@ export const CreateJob = () => {
   } = useForm({
     resolver: yupResolver(hiringJobSchema),
   });
-  const [uploadedDocs,setUploadedDocs]=useState(null)
-  const [uploadedFileNames,setUploadedFileNames]=useState({})
-  const watchedJobTitle=watch("jobTitle")
+  const [uploadedDocs, setUploadedDocs] = useState(null);
+  const [uploadedFileNames, setUploadedFileNames] = useState({});
+  const watchedJobTitle = watch("jobTitle");
   const handleFileUpload = async (e, type) => {
     if (!watchedJobTitle) {
       alert("Please enter the Job Title before uploading files.");
@@ -59,25 +60,45 @@ export const CreateJob = () => {
     setValue(type, selectedFile);
 
     if (selectedFile) {
-      await uploadDocs(selectedFile, type, setUploadedDocs, watchedJobTitle);
-      setUploadedFileNames((prev) => ({
-        ...prev,
-        [type]: selectedFile.name, // Dynamically store file name
-      }));
+      try {
+        setUploadedFileNames((prev) => ({
+          uploadJobDetails: selectedFile.name, // Dynamically store file name
+        }));
+       await fetch(
+          `https://p7b9zso8gl.execute-api.ap-southeast-1.amazonaws.com/adinin-uploadapi-stage/commonfiles/recruitment%2fapplyJob%2f${watchedJobTitle}%2f${selectedFile.name}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/octet-stream",
+            },
+            body: selectedFile,
+            //  mode: 'no-cors'
+          } // data: `recruitment%2fapplyJob%2f${watchedJobTitle}%2f${selectedFile.name}`,
+        ).then((res) => {
+          console.log(res, "su");
+        });
+      } catch (err) {
+        console.log(err);
+      }
+      // await uploadDocs(selectedFile, type, setUploadedDocs, watchedJobTitle);
+      // setUploadedFileNames((prev) => ({
+      //   ...prev,
+      //   [type]: selectedFile.name, // Dynamically store file name
+      // }));
     }
   };
   // console.log(uploadedDocs);
-  
+
   const onSubmit = handleSubmit((data) => {
     console.log(data);
-    
+
     try {
-      const storedvalue={
+      const storedvalue = {
         ...data,
-        uploadJobDetails: uploadedDocs?.uploadJobDetails || null
-      }
+        uploadJobDetails: uploadedDocs?.uploadJobDetails || null,
+      };
       // console.log(storedvalue);
-      
+
       SubmitJobData({ jobValue: storedvalue });
       setShowTitle("Posted Job successfully");
       setNotification(true);
@@ -128,24 +149,24 @@ export const CreateJob = () => {
           )}
         </div>
         <div>
-            <h2 className="text_size_5 mb-2">Upload Job Document</h2>
-            <label className="flex items-center px-3 py-2 p-2.5 bg-lite_skyBlue w-72 border border-[#dedddd] rounded-md cursor-pointer">
-              <input
-                type="file"
-                {...register("uploadJobDetails")}
-                onChange={(e) => handleFileUpload(e, "uploadJobDetails")}
-                className="hidden"
-                accept=".pdf, .jpg, .jpeg, .png"
-              />
-              <span className="ml-2 flex p-1 text-grey gap-10">
-                <GoUpload /> PDF
-              </span>
-            </label>
+          <h2 className="text_size_5 mb-2">Upload Job Document</h2>
+          <label className="flex items-center px-3 py-2 p-2.5 bg-lite_skyBlue w-72 border border-[#dedddd] rounded-md cursor-pointer">
+            <input
+              type="file"
+              {...register("uploadJobDetails")}
+              onChange={(e) => handleFileUpload(e, "uploadJobDetails")}
+              className="hidden"
+              accept=".pdf, .jpg, .jpeg, .png"
+            />
+            <span className="ml-2 flex p-1 text-grey gap-10">
+              <GoUpload /> PDF
+            </span>
+          </label>
 
-            <p className="text-xs mt-1 text-grey">
-              {uploadedFileNames?.uploadJobDetails}
-            </p>
-          </div>
+          <p className="text-xs mt-1 text-grey">
+            {uploadedFileNames?.uploadJobDetails}
+          </p>
+        </div>
 
         <div className="w-full center">
           <button className="primary_btn" onClick={onSubmit}>
