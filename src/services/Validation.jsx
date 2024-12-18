@@ -300,6 +300,8 @@ export const CandidatesSchema = Yup.object().shape({
 // Define the validation schema using Yup
 export const EmpRequisitionSchema = Yup.object().shape({
   nameReq: Yup.string().notRequired(),
+  requestorID: Yup.string().notRequired(),
+  approverID: Yup.string().notRequired(),
   department: Yup.string().required("Department is required"),
   project: Yup.string().required("Project is required"),
   position: Yup.string().required("Position is required"),
@@ -340,41 +342,6 @@ export const InterviewScheduleSchema = Yup.object().shape({
   message: Yup.string().optional(),
 });
 
-export const SelectedCandidateSchema = Yup.object().shape({
-  position: Yup.string().notRequired(),
-  department: Yup.string().required("Department is required"),
-  otherDepartment: Yup.string().notRequired(),
-});
-
-export const LoiSchema = Yup.object().shape({
-  loiIssueDate: Yup.date().required("LOI issue date is required"),
-  loiAcceptDate: Yup.date().optional(),
-  loiDeclineDate: Yup.date().optional(),
-  declineReason: Yup.string().optional(),
-  loiFile: Yup.mixed().notRequired(),
-});
-
-export const CvevSchema = Yup.object().shape({
-  cvecApproveDate: Yup.date().required("CVEC approval date is required"),
-  cvecFile: Yup.mixed().required("CVEC PDF is required"),
-});
-
-export const PaafSchema = Yup.object().shape({
-  paafApproveDate: Yup.date().required("PAAF approval date is required"),
-  paafFile: Yup.mixed().required("PAAF PDF is required"),
-});
-
-export const updateInterviewScheduleSchema = Yup.object().shape({
-  department: Yup.string().required("Department is required"),
-  otherDepartment: Yup.string().notRequired(),
-
-});
-
-export const MobilizationSchema = Yup.object().shape({
-  mobSignDate: Yup.date().required("Mobilization sign date is required"),
-  mobFile: Yup.mixed().required("Contract PDF is required"),
-});
-
 export const hiringJobSchema = Yup.object().shape({
   jobTitle: Yup.string().required("Job Title is required"),
   location: Yup.string().notRequired(),
@@ -393,4 +360,121 @@ export const hiringJobSchema = Yup.object().shape({
       return !value || new Date(value) > new Date();
     }),
     uploadJobDetails:Yup.string().notRequired()
+});
+
+//WorkPass Tracking Forms Schema - Recruitment 
+export const SawpFormSchema = Yup.object().shape({
+  tempID: Yup.string().required("Temporary ID is Required"),
+  sawpLtrReq: Yup.date().notRequired(),
+  sawpLtrRece: Yup.date().notRequired(),
+  sawpFile: Yup.mixed()
+    .nullable()
+    .notRequired()
+    .test("fileType", "Only PDF files are allowed", (value) =>
+      value ? value.type === "application/pdf" : false
+    ),
+});
+export const DoeFormSchema = Yup.object().shape({
+  tempID: Yup.string().required("Temporary ID is Required"),
+  doeSubmit: Yup.date().notRequired(),
+  doeApproval: Yup.date().notRequired(),
+  doeValid: Yup.date().notRequired(),
+  doeRefNo: Yup.string().notRequired(),
+  doeFile: Yup.mixed()
+    .nullable()
+    .notRequired()
+    .test("fileType", "Only PDF files are allowed", (value) =>
+      value ? value.type === "application/pdf" : false
+    ),
+});
+export const NlmsFormSchema = Yup.object().shape({
+  tempID: Yup.string().required("Temporary ID is Required"),
+  nlmsSubmit: Yup.date().notRequired(),
+  nlmsSubmitRefNo: Yup.string().notRequired(),
+  nlmsApproval: Yup.date().notRequired(),
+  nlmsValid: Yup.date().notRequired(),
+  ldRefNo: Yup.string().notRequired(),
+  nlmsFile: Yup.mixed()
+    .nullable()
+    .notRequired()
+    .test("fileType", "Only PDF files are allowed", (value) =>
+      value ? value.type === "application/pdf" : false
+    ),
+});
+export const BankFormSchema = Yup.object().shape({
+  tempID: Yup.string().required("Temporary ID is Required"),
+  bgSubmit: Yup.date().notRequired(),
+  bgRece: Yup.date().notRequired(),
+  bgValid: Yup.date().notRequired(),
+  bgRefNo: Yup.string().notRequired(),
+  bgAmount: Yup.string().notRequired(),
+  bgFile: Yup.mixed()
+    .nullable()
+    .notRequired()
+    .test("fileType", "Only PDF files are allowed", (value) =>
+      value ? value.type === "application/pdf" : false
+    ),
+});
+export const JitpaFormSchema = Yup.object().shape({
+  tempID: Yup.string().required("Temporary ID is Required"),
+  jpTbaPurchase: Yup.date().notRequired(),
+  jpEndorsement: Yup.date().notRequired(),
+  jitpaValid: Yup.date().notRequired(),
+  jpAmount: Yup.string().notRequired(),
+  jitpaFile: Yup.mixed()
+    .nullable()
+    .notRequired()
+    .test("fileType", "Only PDF files are allowed", (value) =>
+      value ? value.type === "application/pdf" : false
+    ),
+});
+export const LabourDepFormSchema = Yup.object().shape({
+  tempID: Yup.string().required("Temporary ID is Required"),
+  labDepReceiptNo: Yup.string().notRequired(),
+  labDepAmount: Yup.string().notRequired(),
+  labEndrose: Yup.date().notRequired(),
+  labDepFile: Yup.mixed()
+    .nullable()
+    .notRequired()
+    .test("fileType", "Only PDF files are allowed", (value) =>
+      value ? value.type === "application/pdf" : false
+    ),
+});
+export const ImmigrationFormSchema = Yup.object().shape({
+  tempID: Yup.string().required("Temporary ID is Required"),
+  immbdNo: Yup.string().notRequired(),
+  docSubmit: Yup.date().notRequired(),
+  visaApproval: Yup.date().notRequired(),
+  visaRefNo: Yup.string().notRequired(),
+  visaFile: Yup.mixed()
+    .nullable()
+    .notRequired()
+    .test("fileType", "Only PDF files are allowed", (value) =>
+      value ? value.type === "application/pdf" : false
+    ),
+});
+export const AirTktFormSchema = Yup.object().shape({
+  tempID: Yup.string().required("Temporary ID is Required"),
+  departure: Yup.date().notRequired(),
+  arrival: Yup.date().notRequired(),
+  cityName: Yup.string().notRequired(),
+  airFare: Yup.string().notRequired(),
+  airTktFile: Yup.mixed()
+    .nullable()
+    .notRequired()
+    .test("fileType", "Only PDF files are allowed", (value) =>
+      value ? value.type === "application/pdf" : false
+    ),
+});
+export const NonLocalMOBFormSchema = Yup.object().shape({
+  tempID: Yup.string().required("Temporary ID is Required"),
+  mobSignDate: Yup.date().notRequired(),
+  agent: Yup.string().notRequired(),
+  remarkNLMob: Yup.string().notRequired(),
+  mobFile: Yup.mixed()
+    .nullable()
+    .notRequired()
+    .test("fileType", "Only PDF files are allowed", (value) =>
+      value ? value.type === "application/pdf" : false
+    ),
 });

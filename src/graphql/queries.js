@@ -407,31 +407,25 @@ export const getProbForm = /* GraphQL */ `
       commitment
       communication
       deadline
-      department
       diligent
-      doj
-      empBadgeNo
-      extendedProbationEndDate
       extensionPeriod
-      gmApproved
       gmDate
       hrDate
       hrName
       initiative
-      managerApproved
       managerDate
       managerName
-      name
       pace
-      position
-      probationEnd
       quality
       recommendation
       responsibility
-      supervisorApproved
       supervisorDate
       supervisorName
       teamwork
+      extendProbED
+      gmApproved
+      managerApproved
+      supervisorApproved
       createdAt
       updatedAt
       __typename
@@ -455,31 +449,25 @@ export const listProbForms = /* GraphQL */ `
         commitment
         communication
         deadline
-        department
         diligent
-        doj
-        empBadgeNo
-        extendedProbationEndDate
         extensionPeriod
-        gmApproved
         gmDate
         hrDate
         hrName
         initiative
-        managerApproved
         managerDate
         managerName
-        name
         pace
-        position
-        probationEnd
         quality
         recommendation
         responsibility
-        supervisorApproved
         supervisorDate
         supervisorName
         teamwork
+        extendProbED
+        gmApproved
+        managerApproved
+        supervisorApproved
         createdAt
         updatedAt
         __typename
@@ -1361,14 +1349,6 @@ export const getEmpLeaveDetails = /* GraphQL */ `
       sickLeave
       sickLeaveDate
       hospLeave
-      remainingAnualLeave
-      remainingSickLeave
-      remainingMateLeave
-      remainingMrageLeave
-      remainingPaternityLeave
-      remainingHosLeave
-      remainingCompasLeave
-      unPaidAuthorize
       createdAt
       updatedAt
       __typename
@@ -1398,14 +1378,6 @@ export const listEmpLeaveDetails = /* GraphQL */ `
         sickLeave
         sickLeaveDate
         hospLeave
-        remainingAnualLeave
-        remainingSickLeave
-        remainingMateLeave
-        remainingMrageLeave
-        remainingPaternityLeave
-        remainingHosLeave
-        remainingCompasLeave
-        unPaidAuthorize
         createdAt
         updatedAt
         __typename

@@ -16,7 +16,7 @@ export const ContractPDF = ({ allData, typeOfReport, reportTitle }) => {
     "Work Position",
     "Contract Start Date ",
     "Contract End Date",
-    "LD Expiry",
+    // "LD Expiry",
     "Duration of Renewal Contract",
   ]);
   const contentRef = useRef();
@@ -111,9 +111,9 @@ export const ContractPDF = ({ allData, typeOfReport, reportTitle }) => {
           position: item.position || "-",
           contractStartDate: formatDate(startDate) || "-",
           contractEndDate: formatDate(lastDate) || "-",
-          nlmsEmpValid: Array.isArray(item.nlmsEmpValid)
-            ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
-            : "-",
+          // nlmsEmpValid: Array.isArray(item.nlmsEmpValid)
+          //   ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
+          //   : "-",
           balanceMonths: balanceMonths,
         };
       });

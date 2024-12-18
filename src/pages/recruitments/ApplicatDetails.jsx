@@ -232,7 +232,7 @@ export const ApplicantDetails = () => {
               type: "select",
               options: ContractTypeDD,
             },
-            { label: "Agent", name: "agent", type: "text" },
+            { label: "CV Received From", name: "agent", type: "text" },
 
             { label: "Name", name: "name", type: "text" },
             {

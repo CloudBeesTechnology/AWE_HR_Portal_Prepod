@@ -485,6 +485,7 @@ export const WorkInfo = () => {
                 <select
                   {...register(field.name)}
                   className="input-field select-custom"
+                  defaultValue={field.value || ""}
                   watch={watch(field.name)}
                 >
                   {(field.options || []).map((option, i) => (
@@ -498,6 +499,7 @@ export const WorkInfo = () => {
                   type={field.type}
                   {...register(field.name)}
                   className="input-field"
+                  defaultValue={field.value || ""}
                 />
               )}
               {errors[field.name] && (
@@ -545,6 +547,7 @@ export const WorkInfo = () => {
                 {field.type === "select" ? (
                   <select
                     {...register(field.name)}
+                    // defaultValue={field.value || ""}
                     className="input-field select-custom"
                   >
                     {(field.options || []).map((option, i) => (
@@ -557,6 +560,7 @@ export const WorkInfo = () => {
                   <input
                     type={field.type}
                     {...register(field.name)}
+                    // defaultValue={field.value || ""}
                     className="input-field"
                   />
                 )}

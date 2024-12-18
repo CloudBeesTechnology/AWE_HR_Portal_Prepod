@@ -205,14 +205,6 @@ export default function EmpLeaveDetailsUpdateForm(props) {
     sickLeave: "",
     sickLeaveDate: "",
     hospLeave: "",
-    remainingAnualLeave: "",
-    remainingSickLeave: "",
-    remainingMateLeave: "",
-    remainingMrageLeave: "",
-    remainingPaternityLeave: "",
-    remainingHosLeave: "",
-    remainingCompasLeave: "",
-    unPaidAuthorize: "",
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [annualLeave, setAnnualLeave] = React.useState(
@@ -242,30 +234,6 @@ export default function EmpLeaveDetailsUpdateForm(props) {
     initialValues.sickLeaveDate
   );
   const [hospLeave, setHospLeave] = React.useState(initialValues.hospLeave);
-  const [remainingAnualLeave, setRemainingAnualLeave] = React.useState(
-    initialValues.remainingAnualLeave
-  );
-  const [remainingSickLeave, setRemainingSickLeave] = React.useState(
-    initialValues.remainingSickLeave
-  );
-  const [remainingMateLeave, setRemainingMateLeave] = React.useState(
-    initialValues.remainingMateLeave
-  );
-  const [remainingMrageLeave, setRemainingMrageLeave] = React.useState(
-    initialValues.remainingMrageLeave
-  );
-  const [remainingPaternityLeave, setRemainingPaternityLeave] = React.useState(
-    initialValues.remainingPaternityLeave
-  );
-  const [remainingHosLeave, setRemainingHosLeave] = React.useState(
-    initialValues.remainingHosLeave
-  );
-  const [remainingCompasLeave, setRemainingCompasLeave] = React.useState(
-    initialValues.remainingCompasLeave
-  );
-  const [unPaidAuthorize, setUnPaidAuthorize] = React.useState(
-    initialValues.unPaidAuthorize
-  );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = empLeaveDetailsRecord
@@ -291,14 +259,6 @@ export default function EmpLeaveDetailsUpdateForm(props) {
     setSickLeave(cleanValues.sickLeave);
     setSickLeaveDate(cleanValues.sickLeaveDate);
     setHospLeave(cleanValues.hospLeave);
-    setRemainingAnualLeave(cleanValues.remainingAnualLeave);
-    setRemainingSickLeave(cleanValues.remainingSickLeave);
-    setRemainingMateLeave(cleanValues.remainingMateLeave);
-    setRemainingMrageLeave(cleanValues.remainingMrageLeave);
-    setRemainingPaternityLeave(cleanValues.remainingPaternityLeave);
-    setRemainingHosLeave(cleanValues.remainingHosLeave);
-    setRemainingCompasLeave(cleanValues.remainingCompasLeave);
-    setUnPaidAuthorize(cleanValues.unPaidAuthorize);
     setErrors({});
   };
   const [empLeaveDetailsRecord, setEmpLeaveDetailsRecord] = React.useState(
@@ -351,14 +311,6 @@ export default function EmpLeaveDetailsUpdateForm(props) {
     sickLeave: [],
     sickLeaveDate: [],
     hospLeave: [],
-    remainingAnualLeave: [],
-    remainingSickLeave: [],
-    remainingMateLeave: [],
-    remainingMrageLeave: [],
-    remainingPaternityLeave: [],
-    remainingHosLeave: [],
-    remainingCompasLeave: [],
-    unPaidAuthorize: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -400,14 +352,6 @@ export default function EmpLeaveDetailsUpdateForm(props) {
           sickLeave: sickLeave ?? null,
           sickLeaveDate: sickLeaveDate ?? null,
           hospLeave: hospLeave ?? null,
-          remainingAnualLeave: remainingAnualLeave ?? null,
-          remainingSickLeave: remainingSickLeave ?? null,
-          remainingMateLeave: remainingMateLeave ?? null,
-          remainingMrageLeave: remainingMrageLeave ?? null,
-          remainingPaternityLeave: remainingPaternityLeave ?? null,
-          remainingHosLeave: remainingHosLeave ?? null,
-          remainingCompasLeave: remainingCompasLeave ?? null,
-          unPaidAuthorize: unPaidAuthorize ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -482,14 +426,6 @@ export default function EmpLeaveDetailsUpdateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
-              remainingAnualLeave,
-              remainingSickLeave,
-              remainingMateLeave,
-              remainingMrageLeave,
-              remainingPaternityLeave,
-              remainingHosLeave,
-              remainingCompasLeave,
-              unPaidAuthorize,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -523,14 +459,6 @@ export default function EmpLeaveDetailsUpdateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
-              remainingAnualLeave,
-              remainingSickLeave,
-              remainingMateLeave,
-              remainingMrageLeave,
-              remainingPaternityLeave,
-              remainingHosLeave,
-              remainingCompasLeave,
-              unPaidAuthorize,
             };
             const result = onChange(modelFields);
             values = result?.annualLeave ?? values;
@@ -591,14 +519,6 @@ export default function EmpLeaveDetailsUpdateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
-              remainingAnualLeave,
-              remainingSickLeave,
-              remainingMateLeave,
-              remainingMrageLeave,
-              remainingPaternityLeave,
-              remainingHosLeave,
-              remainingCompasLeave,
-              unPaidAuthorize,
             };
             const result = onChange(modelFields);
             values = result?.annualLeaveDate ?? values;
@@ -666,14 +586,6 @@ export default function EmpLeaveDetailsUpdateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
-              remainingAnualLeave,
-              remainingSickLeave,
-              remainingMateLeave,
-              remainingMrageLeave,
-              remainingPaternityLeave,
-              remainingHosLeave,
-              remainingCompasLeave,
-              unPaidAuthorize,
             };
             const result = onChange(modelFields);
             value = result?.compasLeave ?? value;
@@ -707,14 +619,6 @@ export default function EmpLeaveDetailsUpdateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
-              remainingAnualLeave,
-              remainingSickLeave,
-              remainingMateLeave,
-              remainingMrageLeave,
-              remainingPaternityLeave,
-              remainingHosLeave,
-              remainingCompasLeave,
-              unPaidAuthorize,
             };
             const result = onChange(modelFields);
             values = result?.destinateLeavePass ?? values;
@@ -781,14 +685,6 @@ export default function EmpLeaveDetailsUpdateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
-              remainingAnualLeave,
-              remainingSickLeave,
-              remainingMateLeave,
-              remainingMrageLeave,
-              remainingPaternityLeave,
-              remainingHosLeave,
-              remainingCompasLeave,
-              unPaidAuthorize,
             };
             const result = onChange(modelFields);
             values = result?.durLeavePass ?? values;
@@ -849,14 +745,6 @@ export default function EmpLeaveDetailsUpdateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
-              remainingAnualLeave,
-              remainingSickLeave,
-              remainingMateLeave,
-              remainingMrageLeave,
-              remainingPaternityLeave,
-              remainingHosLeave,
-              remainingCompasLeave,
-              unPaidAuthorize,
             };
             const result = onChange(modelFields);
             values = result?.dateLeavePass ?? values;
@@ -917,14 +805,6 @@ export default function EmpLeaveDetailsUpdateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
-              remainingAnualLeave,
-              remainingSickLeave,
-              remainingMateLeave,
-              remainingMrageLeave,
-              remainingPaternityLeave,
-              remainingHosLeave,
-              remainingCompasLeave,
-              unPaidAuthorize,
             };
             const result = onChange(modelFields);
             values = result?.leavePass ?? values;
@@ -987,14 +867,6 @@ export default function EmpLeaveDetailsUpdateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
-              remainingAnualLeave,
-              remainingSickLeave,
-              remainingMateLeave,
-              remainingMrageLeave,
-              remainingPaternityLeave,
-              remainingHosLeave,
-              remainingCompasLeave,
-              unPaidAuthorize,
             };
             const result = onChange(modelFields);
             value = result?.materLeave ?? value;
@@ -1032,14 +904,6 @@ export default function EmpLeaveDetailsUpdateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
-              remainingAnualLeave,
-              remainingSickLeave,
-              remainingMateLeave,
-              remainingMrageLeave,
-              remainingPaternityLeave,
-              remainingHosLeave,
-              remainingCompasLeave,
-              unPaidAuthorize,
             };
             const result = onChange(modelFields);
             value = result?.mrageLeave ?? value;
@@ -1077,14 +941,6 @@ export default function EmpLeaveDetailsUpdateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
-              remainingAnualLeave,
-              remainingSickLeave,
-              remainingMateLeave,
-              remainingMrageLeave,
-              remainingPaternityLeave,
-              remainingHosLeave,
-              remainingCompasLeave,
-              unPaidAuthorize,
             };
             const result = onChange(modelFields);
             value = result?.paterLeave ?? value;
@@ -1122,14 +978,6 @@ export default function EmpLeaveDetailsUpdateForm(props) {
               sickLeave: value,
               sickLeaveDate,
               hospLeave,
-              remainingAnualLeave,
-              remainingSickLeave,
-              remainingMateLeave,
-              remainingMrageLeave,
-              remainingPaternityLeave,
-              remainingHosLeave,
-              remainingCompasLeave,
-              unPaidAuthorize,
             };
             const result = onChange(modelFields);
             value = result?.sickLeave ?? value;
@@ -1167,14 +1015,6 @@ export default function EmpLeaveDetailsUpdateForm(props) {
               sickLeave,
               sickLeaveDate: value,
               hospLeave,
-              remainingAnualLeave,
-              remainingSickLeave,
-              remainingMateLeave,
-              remainingMrageLeave,
-              remainingPaternityLeave,
-              remainingHosLeave,
-              remainingCompasLeave,
-              unPaidAuthorize,
             };
             const result = onChange(modelFields);
             value = result?.sickLeaveDate ?? value;
@@ -1212,14 +1052,6 @@ export default function EmpLeaveDetailsUpdateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave: value,
-              remainingAnualLeave,
-              remainingSickLeave,
-              remainingMateLeave,
-              remainingMrageLeave,
-              remainingPaternityLeave,
-              remainingHosLeave,
-              remainingCompasLeave,
-              unPaidAuthorize,
             };
             const result = onChange(modelFields);
             value = result?.hospLeave ?? value;
@@ -1233,380 +1065,6 @@ export default function EmpLeaveDetailsUpdateForm(props) {
         errorMessage={errors.hospLeave?.errorMessage}
         hasError={errors.hospLeave?.hasError}
         {...getOverrideProps(overrides, "hospLeave")}
-      ></TextField>
-      <TextField
-        label="Remaining anual leave"
-        isRequired={false}
-        isReadOnly={false}
-        value={remainingAnualLeave}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              empID,
-              annualLeave,
-              annualLeaveDate,
-              compasLeave,
-              destinateLeavePass,
-              durLeavePass,
-              dateLeavePass,
-              leavePass,
-              materLeave,
-              mrageLeave,
-              paterLeave,
-              sickLeave,
-              sickLeaveDate,
-              hospLeave,
-              remainingAnualLeave: value,
-              remainingSickLeave,
-              remainingMateLeave,
-              remainingMrageLeave,
-              remainingPaternityLeave,
-              remainingHosLeave,
-              remainingCompasLeave,
-              unPaidAuthorize,
-            };
-            const result = onChange(modelFields);
-            value = result?.remainingAnualLeave ?? value;
-          }
-          if (errors.remainingAnualLeave?.hasError) {
-            runValidationTasks("remainingAnualLeave", value);
-          }
-          setRemainingAnualLeave(value);
-        }}
-        onBlur={() =>
-          runValidationTasks("remainingAnualLeave", remainingAnualLeave)
-        }
-        errorMessage={errors.remainingAnualLeave?.errorMessage}
-        hasError={errors.remainingAnualLeave?.hasError}
-        {...getOverrideProps(overrides, "remainingAnualLeave")}
-      ></TextField>
-      <TextField
-        label="Remaining sick leave"
-        isRequired={false}
-        isReadOnly={false}
-        value={remainingSickLeave}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              empID,
-              annualLeave,
-              annualLeaveDate,
-              compasLeave,
-              destinateLeavePass,
-              durLeavePass,
-              dateLeavePass,
-              leavePass,
-              materLeave,
-              mrageLeave,
-              paterLeave,
-              sickLeave,
-              sickLeaveDate,
-              hospLeave,
-              remainingAnualLeave,
-              remainingSickLeave: value,
-              remainingMateLeave,
-              remainingMrageLeave,
-              remainingPaternityLeave,
-              remainingHosLeave,
-              remainingCompasLeave,
-              unPaidAuthorize,
-            };
-            const result = onChange(modelFields);
-            value = result?.remainingSickLeave ?? value;
-          }
-          if (errors.remainingSickLeave?.hasError) {
-            runValidationTasks("remainingSickLeave", value);
-          }
-          setRemainingSickLeave(value);
-        }}
-        onBlur={() =>
-          runValidationTasks("remainingSickLeave", remainingSickLeave)
-        }
-        errorMessage={errors.remainingSickLeave?.errorMessage}
-        hasError={errors.remainingSickLeave?.hasError}
-        {...getOverrideProps(overrides, "remainingSickLeave")}
-      ></TextField>
-      <TextField
-        label="Remaining mate leave"
-        isRequired={false}
-        isReadOnly={false}
-        value={remainingMateLeave}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              empID,
-              annualLeave,
-              annualLeaveDate,
-              compasLeave,
-              destinateLeavePass,
-              durLeavePass,
-              dateLeavePass,
-              leavePass,
-              materLeave,
-              mrageLeave,
-              paterLeave,
-              sickLeave,
-              sickLeaveDate,
-              hospLeave,
-              remainingAnualLeave,
-              remainingSickLeave,
-              remainingMateLeave: value,
-              remainingMrageLeave,
-              remainingPaternityLeave,
-              remainingHosLeave,
-              remainingCompasLeave,
-              unPaidAuthorize,
-            };
-            const result = onChange(modelFields);
-            value = result?.remainingMateLeave ?? value;
-          }
-          if (errors.remainingMateLeave?.hasError) {
-            runValidationTasks("remainingMateLeave", value);
-          }
-          setRemainingMateLeave(value);
-        }}
-        onBlur={() =>
-          runValidationTasks("remainingMateLeave", remainingMateLeave)
-        }
-        errorMessage={errors.remainingMateLeave?.errorMessage}
-        hasError={errors.remainingMateLeave?.hasError}
-        {...getOverrideProps(overrides, "remainingMateLeave")}
-      ></TextField>
-      <TextField
-        label="Remaining mrage leave"
-        isRequired={false}
-        isReadOnly={false}
-        value={remainingMrageLeave}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              empID,
-              annualLeave,
-              annualLeaveDate,
-              compasLeave,
-              destinateLeavePass,
-              durLeavePass,
-              dateLeavePass,
-              leavePass,
-              materLeave,
-              mrageLeave,
-              paterLeave,
-              sickLeave,
-              sickLeaveDate,
-              hospLeave,
-              remainingAnualLeave,
-              remainingSickLeave,
-              remainingMateLeave,
-              remainingMrageLeave: value,
-              remainingPaternityLeave,
-              remainingHosLeave,
-              remainingCompasLeave,
-              unPaidAuthorize,
-            };
-            const result = onChange(modelFields);
-            value = result?.remainingMrageLeave ?? value;
-          }
-          if (errors.remainingMrageLeave?.hasError) {
-            runValidationTasks("remainingMrageLeave", value);
-          }
-          setRemainingMrageLeave(value);
-        }}
-        onBlur={() =>
-          runValidationTasks("remainingMrageLeave", remainingMrageLeave)
-        }
-        errorMessage={errors.remainingMrageLeave?.errorMessage}
-        hasError={errors.remainingMrageLeave?.hasError}
-        {...getOverrideProps(overrides, "remainingMrageLeave")}
-      ></TextField>
-      <TextField
-        label="Remaining paternity leave"
-        isRequired={false}
-        isReadOnly={false}
-        value={remainingPaternityLeave}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              empID,
-              annualLeave,
-              annualLeaveDate,
-              compasLeave,
-              destinateLeavePass,
-              durLeavePass,
-              dateLeavePass,
-              leavePass,
-              materLeave,
-              mrageLeave,
-              paterLeave,
-              sickLeave,
-              sickLeaveDate,
-              hospLeave,
-              remainingAnualLeave,
-              remainingSickLeave,
-              remainingMateLeave,
-              remainingMrageLeave,
-              remainingPaternityLeave: value,
-              remainingHosLeave,
-              remainingCompasLeave,
-              unPaidAuthorize,
-            };
-            const result = onChange(modelFields);
-            value = result?.remainingPaternityLeave ?? value;
-          }
-          if (errors.remainingPaternityLeave?.hasError) {
-            runValidationTasks("remainingPaternityLeave", value);
-          }
-          setRemainingPaternityLeave(value);
-        }}
-        onBlur={() =>
-          runValidationTasks("remainingPaternityLeave", remainingPaternityLeave)
-        }
-        errorMessage={errors.remainingPaternityLeave?.errorMessage}
-        hasError={errors.remainingPaternityLeave?.hasError}
-        {...getOverrideProps(overrides, "remainingPaternityLeave")}
-      ></TextField>
-      <TextField
-        label="Remaining hos leave"
-        isRequired={false}
-        isReadOnly={false}
-        value={remainingHosLeave}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              empID,
-              annualLeave,
-              annualLeaveDate,
-              compasLeave,
-              destinateLeavePass,
-              durLeavePass,
-              dateLeavePass,
-              leavePass,
-              materLeave,
-              mrageLeave,
-              paterLeave,
-              sickLeave,
-              sickLeaveDate,
-              hospLeave,
-              remainingAnualLeave,
-              remainingSickLeave,
-              remainingMateLeave,
-              remainingMrageLeave,
-              remainingPaternityLeave,
-              remainingHosLeave: value,
-              remainingCompasLeave,
-              unPaidAuthorize,
-            };
-            const result = onChange(modelFields);
-            value = result?.remainingHosLeave ?? value;
-          }
-          if (errors.remainingHosLeave?.hasError) {
-            runValidationTasks("remainingHosLeave", value);
-          }
-          setRemainingHosLeave(value);
-        }}
-        onBlur={() =>
-          runValidationTasks("remainingHosLeave", remainingHosLeave)
-        }
-        errorMessage={errors.remainingHosLeave?.errorMessage}
-        hasError={errors.remainingHosLeave?.hasError}
-        {...getOverrideProps(overrides, "remainingHosLeave")}
-      ></TextField>
-      <TextField
-        label="Remaining compas leave"
-        isRequired={false}
-        isReadOnly={false}
-        value={remainingCompasLeave}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              empID,
-              annualLeave,
-              annualLeaveDate,
-              compasLeave,
-              destinateLeavePass,
-              durLeavePass,
-              dateLeavePass,
-              leavePass,
-              materLeave,
-              mrageLeave,
-              paterLeave,
-              sickLeave,
-              sickLeaveDate,
-              hospLeave,
-              remainingAnualLeave,
-              remainingSickLeave,
-              remainingMateLeave,
-              remainingMrageLeave,
-              remainingPaternityLeave,
-              remainingHosLeave,
-              remainingCompasLeave: value,
-              unPaidAuthorize,
-            };
-            const result = onChange(modelFields);
-            value = result?.remainingCompasLeave ?? value;
-          }
-          if (errors.remainingCompasLeave?.hasError) {
-            runValidationTasks("remainingCompasLeave", value);
-          }
-          setRemainingCompasLeave(value);
-        }}
-        onBlur={() =>
-          runValidationTasks("remainingCompasLeave", remainingCompasLeave)
-        }
-        errorMessage={errors.remainingCompasLeave?.errorMessage}
-        hasError={errors.remainingCompasLeave?.hasError}
-        {...getOverrideProps(overrides, "remainingCompasLeave")}
-      ></TextField>
-      <TextField
-        label="Un paid authorize"
-        isRequired={false}
-        isReadOnly={false}
-        value={unPaidAuthorize}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              empID,
-              annualLeave,
-              annualLeaveDate,
-              compasLeave,
-              destinateLeavePass,
-              durLeavePass,
-              dateLeavePass,
-              leavePass,
-              materLeave,
-              mrageLeave,
-              paterLeave,
-              sickLeave,
-              sickLeaveDate,
-              hospLeave,
-              remainingAnualLeave,
-              remainingSickLeave,
-              remainingMateLeave,
-              remainingMrageLeave,
-              remainingPaternityLeave,
-              remainingHosLeave,
-              remainingCompasLeave,
-              unPaidAuthorize: value,
-            };
-            const result = onChange(modelFields);
-            value = result?.unPaidAuthorize ?? value;
-          }
-          if (errors.unPaidAuthorize?.hasError) {
-            runValidationTasks("unPaidAuthorize", value);
-          }
-          setUnPaidAuthorize(value);
-        }}
-        onBlur={() => runValidationTasks("unPaidAuthorize", unPaidAuthorize)}
-        errorMessage={errors.unPaidAuthorize?.errorMessage}
-        hasError={errors.unPaidAuthorize?.hasError}
-        {...getOverrideProps(overrides, "unPaidAuthorize")}
       ></TextField>
       <Flex
         justifyContent="space-between"

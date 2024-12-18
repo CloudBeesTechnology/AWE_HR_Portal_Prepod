@@ -34,7 +34,7 @@ export const WeldingQualificationForm = () => {
  
   });
   const [uploadeWQU, setUploadWQU] = useState({
-    weldingUpload: null,
+    weldingUpload: [],
   });
   const {
     register,

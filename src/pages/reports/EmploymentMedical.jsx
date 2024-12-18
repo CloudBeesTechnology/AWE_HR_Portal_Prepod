@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
-import { FilterTable } from './FilterTable'
+import React, { useEffect, useState } from 'react';
+import { FilterTable } from './FilterTable';
 
-export const EmploymentMedical = ({allData,typeOfReport,reportTitle}) => {
+export const EmploymentMedical = ({ allData, typeOfReport, reportTitle }) => {
   const [tableBody, setTableBody] = useState([]);
   const [tableHead, setTableHead] = useState([
     "Name",
@@ -9,47 +9,45 @@ export const EmploymentMedical = ({allData,typeOfReport,reportTitle}) => {
     "Nationality",
     "Work Position",
     "Department",
-    "Medical Expiry",]);
+    "Medical Expiry",
+  ]);
 
- // Helper function to check if the medical expiry is within three months or less from today
- const isWithinThreeMonths = (expiryDate) => {
-  if (!expiryDate) return false;
+  const employeeMedicalMergedData = (data) => {
 
-  const today = new Date();
-  const expiry = new Date(expiryDate);
 
-  const timeDiff = expiry.getTime() - today.getTime();
-  const daysDiff = timeDiff / (1000 * 3600 * 24); // Convert milliseconds to days
+    const filteredData = data?.filter(item => item.bruneiME) || []; // Keep only items with a valid bruneiME
 
-  return daysDiff <= 90 && daysDiff >= 0;
-};
+    return filteredData.map((item) => {
+      const expiryDate = new Date(item.bruneiME);
+      // Check if the expiry date is within the last three months
+      if (expiryDate ) {
+        return {
+          name: item.name || "-",
+          empBadgeNo: item.empBadgeNo || "-",
+          nationality: item.nationality || "-",
+          position: item.position || "-",
+          department: item.department || "-",
+          bruneiME: item.bruneiME || "-",
+        };
+      }
+      return null; // Exclude items outside the last three months
+    }).filter(item => item !== null); // Remove null values
+  };
 
-const employeeMedicalMergedData = (data) => {
-  const filteredData = data.filter((item) =>
-    isWithinThreeMonths(item.bruneiME)
-  );
-  return filteredData.map((item) => {
-    return {
-      name: item.name || "-",
-      empBadgeNo: item.empBadgeNo || "-",
-      nationality: item.nationality || "-",
-      position: item.position || "-",
-      department: item.department || "-",
-      bruneiME: item.bruneiME || "-",
-    };
-  });
-}  
+  useEffect(() => {
+    setTableBody(employeeMedicalMergedData(allData));
+  }, [allData]);
 
-  useEffect(()=>{
-    
-      setTableBody(employeeMedicalMergedData(allData))
-    },[allData])
-console.log(tableBody);
+  console.log(tableBody);
 
   return (
     <div>
-
-      <FilterTable tableBody={tableBody} tableHead={tableHead} typeOfReport={typeOfReport} reportTitle={reportTitle}/>
+      <FilterTable
+        tableBody={tableBody}
+        tableHead={tableHead}
+        typeOfReport={typeOfReport}
+        reportTitle={reportTitle}
+      />
     </div>
-  )
-}
+  );
+};

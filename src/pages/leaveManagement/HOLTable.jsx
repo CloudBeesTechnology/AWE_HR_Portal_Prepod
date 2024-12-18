@@ -2,7 +2,7 @@ import React from "react";
 import { useOutletContext } from "react-router-dom";
 
 export const HOLTable = () => {
-  const { filteredData, formatDate, userType, currentPage, rowsPerPage, selectedDate } =
+  const { data, formatDate, userType, currentPage, rowsPerPage, selectedDate } =
     useOutletContext();
   const startIndex = (currentPage - 1) * rowsPerPage;
 
@@ -26,10 +26,10 @@ export const HOLTable = () => {
       : "text-[#E8A317]";
   };
   return (
-    <section className="py-5">
+    <section className="py-5 w-full">
       <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] max-w-[100%] overflow-x-auto rounded-xl">
-        {filteredData && filteredData.length > 0 ? (
-          <table className="w-[1150px] font-semibold text-sm">
+        {data && data.length > 0 ? (
+          <table className="w-full font-semibold text-sm">
             <thead className="bg-[#939393] sticky top-0 rounded-t-lg ">
               <tr className="">
                 {heading.map((header, index) => (
@@ -40,8 +40,8 @@ export const HOLTable = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredData &&
-                filteredData.map((item, index) => {
+              {data &&
+                data.map((item, index) => {
                   const displayIndex = startIndex + index + 1; // Adjust index based on pagination
 
                   return (

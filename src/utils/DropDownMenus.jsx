@@ -85,8 +85,8 @@ export const SalaryPayDD = [
   { value: "Daily", label: "Daily" },
 ];
 export const EmpTypeDD = [
-  { value: "Onshore", label: "OnShore" },
-  { value: "Offshore", label: "OffShore" },
+  { value: "OnShore", label: "OnShore" },
+  { value: "OffShore", label: "OffShore" },
 ];
 
 export const CountryORDD = [
@@ -151,46 +151,48 @@ export const leavePassDD = [
 ];
 
 export const DepartmentDD = [
-  { value: "Corporate", label: "Corporate" },
-  { value: "Human Resources", label: "Human Resources" },
   { value: "Accounts", label: "Accounts" },
-  { value: "LBD", label: "LBD" },
-  { value: "Purchasing", label: "Purchasing" },
-  { value: "Offshore", label: "Offshore" },
   { value: "BLNG", label: "BLNG" },
+  { value: "Corporate", label: "Corporate" },
   { value: "CPD", label: "CPD" },
   { value: "E&I", label: "E&I" },
+  { value: "Human Resources", label: "Human Resources" },
+  { value: "LBD", label: "LBD" },
+  { value: "Offshore", label: "Offshore" },
+  { value: "Purchasing", label: "Purchasing" },
   { value: "Other", label: "Other" },
 ];
 
+
 export const JobCatDD = [
   { value: "", label: "Select Category" },
-  { value: "Director", label: "Director" },
-  { value: "Mechanic", label: "Mechanic" },
-  { value: "Manager", label: "Manager" },
   { value: "Blaster/Painter", label: "Blaster/Painter" },
-  { value: "Coordinator", label: "Coordinator" },
-  { value: "Fitter", label: "Fitter" },
-  { value: "Superintendent", label: "Superintendent" },
-  { value: "Welder", label: "Welder" },
-  { value: "Inspector", label: "Inspector" },
-  { value: "Machinist", label: "Machinist" },
-  { value: "Engineer", label: "Engineer" },
-  { value: "Scaffolder", label: "Scaffolder" },
-  { value: "Supervisor", label: "Supervisor" },
-  { value: "Storekeeper", label: "Storekeeper" },
-  { value: "Safety", label: "Safety" },
-  { value: "Insulation", label: "Insulation" },
-  { value: "Technician", label: "Technician" },
-  { value: "Leadman", label: "Leadman" },
-  { value: "Rigger/Field Support", label: "Rigger/Field Support" },
   { value: "Clerical", label: "Clerical" },
-  { value: "Helper/Store Assistant", label: "Helper/Store Assistant" },
-  { value: "Electrician", label: "Electrician" },
+  { value: "Coordinator", label: "Coordinator" },
+  { value: "Director", label: "Director" },
   { value: "Driver", label: "Driver" },
   { value: "Driver/Operator", label: "Driver/Operator" },
+  { value: "Electrician", label: "Electrician" },
+  { value: "Engineer", label: "Engineer" },
+  { value: "Fitter", label: "Fitter" },
+  { value: "Helper/Store Assistant", label: "Helper/Store Assistant" },
+  { value: "Inspector", label: "Inspector" },
+  { value: "Insulation", label: "Insulation" },
+  { value: "Leadman", label: "Leadman" },
+  { value: "Machinist", label: "Machinist" },
+  { value: "Manager", label: "Manager" },
+  { value: "Mechanic", label: "Mechanic" },
+  { value: "Rigger/Field Support", label: "Rigger/Field Support" },
+  { value: "Safety", label: "Safety" },
+  { value: "Scaffolder", label: "Scaffolder" },
+  { value: "Storekeeper", label: "Storekeeper" },
+  { value: "Superintendent", label: "Superintendent" },
+  { value: "Supervisor", label: "Supervisor" },
+  { value: "Technician", label: "Technician" },
+  { value: "Welder", label: "Welder" },
   { value: "Other", label: "Other" },
 ];
+
 
 export const workInfoUploads = [
   { label: "Contract", icon: <GoUpload />, title: "WIContract" },

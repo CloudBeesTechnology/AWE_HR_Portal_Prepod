@@ -71,18 +71,17 @@ export const useLeaveManage = () => {
 
       // Merge leave status data
       const mergedLeaveData = fetchedLeaveStatuses.map((leaveStatus) => {
-        // console.log(leaveStatus);
-        
         const empInfo = empInfoMap[leaveStatus.empID] || {};
         const workInfo = workInfoMap[leaveStatus.empID] || {};
         const leaveDetails = leaveDetailsMap[leaveStatus.empID] || {};
 
         return {
-          id:leaveStatus.id,
+          id: leaveStatus.id,
           empID: leaveStatus.empID,
           empName: empInfo.name,
           empBadgeNo: empInfo.empBadgeNo,
           empOfficialEmail: empInfo.officialEmail,
+          doj: workInfo.doj,
           leaveStatusCreatedAt: leaveStatus.createdAt,
           leaveDays: leaveStatus.days,
           supervisorName: leaveStatus.supervisorName,
@@ -98,15 +97,19 @@ export const useLeaveManage = () => {
           empStatus: leaveStatus.empStatus,
           reason: leaveStatus.reason,
           medicalCertificate: leaveStatus.medicalCertificate,
-          empLeaveBalance: leaveDetails.annualLeave?.[0] || 0,
-          empLeaveTaken: leaveDetails.annualLeave?.[1] || 0,
-          empLeaveRemaining: leaveDetails.remainingAnualLeave || 0,
           empLeaveType: leaveStatus.leaveType,
           position: workInfo.position?.slice(-1)[0] || "",
           department: workInfo.department?.slice(-1)[0] || "",
           empLeaveStartDate: leaveStatus.fromDate,
           empLeaveEndDate: leaveStatus.toDate,
           empLeaveUpdatedAt: leaveStatus.updatedAt,
+          compassionateLeave: leaveDetails.compasLeave || 0,
+          annualLeave: leaveDetails.annualLeave.slice(-1)[0] || 0,
+          sickLeave: leaveDetails.sickLeave || 0,
+          maternityLeave: leaveDetails.materLeave || 0,
+          paternityLeave: leaveDetails.paterLeave || 0,
+          hospitalLeave: leaveDetails.hospLeave || 0,
+          marriageLeave: leaveDetails.mrageLeave || 0,
         };
       });
 
@@ -116,12 +119,12 @@ export const useLeaveManage = () => {
         const workInfo = workInfoMap[ticket.empID] || {};
 
         return {
-          id:ticket.id,
+          id: ticket.id,
           empID: ticket.empID,
           empName: empInfo.name,
           position: workInfo.position?.slice(-1)[0] || "",
           department: workInfo.department?.slice(-1)[0] || "",
-          doj:workInfo.doj,
+          doj: workInfo.doj,
           empBadgeNo: empInfo.empBadgeNo,
           empOfficialEmail: empInfo.officialEmail,
           departureDate: ticket.departureDate,
@@ -138,9 +141,6 @@ export const useLeaveManage = () => {
           createdAt: ticket.createdAt,
         };
       });
-
-      // Combine both datasets
-      const combinedData = [...mergedLeaveData];
 
       setData({
         mergedData: mergedLeaveData,

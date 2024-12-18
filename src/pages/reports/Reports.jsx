@@ -19,9 +19,13 @@ import { DataSupply } from "../../utils/DataStoredContext";
 import { GroupHSData } from "./GroupHSData";
 import { WeldingData } from "./WeldingData";
 import { LbdKpi } from "./LbdKpi";
+import { BlastingData } from "./BlastingData";
+import { LeavePassData } from "./LeavePassData";
+import { NewRecruit } from "./NewRecruit";
+import { TrainingRCData } from "./TrainingRCData";
 
 export const Reports = () => {
-  const { empPIData,LMIData,PPValidsData, empPDData, IDData,workInfoData,terminateData,DNData,EmpInsuranceData,WeldeInfo } = useContext(DataSupply);
+  const { empPIData,LMIData,PPValidsData, empPDData, IDData,workInfoData,terminateData,DNData,EmpInsuranceData,WeldeInfo,BastingInfo,leaveDetailsData,trainingCertifi,AddEmpReq } = useContext(DataSupply);
   const [tableHead, setTableHead] = useState([]);
   const [tableBody, setTableBody] = useState([]);
   const [emptySearch, setEmptySearch] = useState(false);
@@ -61,6 +65,10 @@ export const Reports = () => {
         const LMData= LMIData.find((item) => item.empID === piData.empID) || {};
         const EmpInsData= EmpInsuranceData.find((item) => item.empID === piData.empID) || {};
         const WeldeInfoData= WeldeInfo.find((item) => item.empID === piData.empID) || {};
+        const bastingData= BastingInfo.find((item) => item.empID === piData.empID) || {};
+        const LSData= leaveDetailsData.find((item) => item.empID === piData.empID) || {};
+        const TCData= trainingCertifi.find((item) => item.empID === piData.empID) || {};
+        const AddERData= AddEmpReq.find((item) => item.empID === piData.empID) || {};
   
         return {
           ...piData,
@@ -72,14 +80,18 @@ export const Reports = () => {
           ...PPVData,
           ...LMData,
           ...EmpInsData,
-          ...WeldeInfoData
+          ...WeldeInfoData,
+          ...bastingData,
+          ...LSData,
+          ...TCData,
+          ...AddERData
         };
       });
          setMergeData(mergeData);
          console.log(mergeData);
       setLoading(false); // Set loading to false once data is merged
       
-  }, [empPIData, empPDData, IDData,workInfoData,terminateData, DNData,PPValidsData, LMIData,EmpInsuranceData,WeldeInfo]);
+  }, [empPIData, empPDData, IDData,workInfoData,terminateData, DNData,PPValidsData, LMIData,EmpInsuranceData,WeldeInfo,BastingInfo,leaveDetailsData,trainingCertifi,AddEmpReq]);
 
   useEffect(() => {
     setReportTitle(typeOfReport);
@@ -145,40 +157,6 @@ export const Reports = () => {
           justFilterName={justFilterName}
         />
 
-        <div className="flex justify-end gap-4">
-          <div className="flex items-center w-[20%] p-2 gap-1 border border-[#D9D9D9] bg-white rounded text-dark_grey">
-            <input
-              type="text"
-              value={startDate}
-              placeholder="Start Date"
-              className="outline-none w-full"
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-            <span>
-              <SlCalender className="text-xl text-dark_grey" />
-            </span>
-          </div>
-
-          <div className="border border-[#D9D9D9] bg-white rounded w-[20%] text-dark_grey flex items-center p-2 gap-1">
-            <input
-              type="text"
-              value={endDate}
-              placeholder="End Date"
-              className="outline-none w-full"
-              onChange={(e) => setEndDate(e.target.value)}
-            />
-            <span>
-              <SlCalender className="text-xl text-dark_grey" />
-            </span>
-          </div>
-
-          <Searchbox
-            placeholder="Search Name"
-            onResult={searchResult}
-            icon={<IoSearch />}
-            data={mergedData}
-          />
-        </div>
       </div>
 
       {reportTitle === "Recruitment & Mobilization" && (
@@ -279,6 +257,34 @@ export const Reports = () => {
           reportTitle={reportTitle}
         />
       )}
+      {reportTitle === "Blaster Painter Qualification" && (
+        <BlastingData
+          allData={mergedData}
+          typeOfReport={typeOfReport}
+          reportTitle={reportTitle}
+        />
+      )}
+      {reportTitle === "Leave Passage" && (
+        <LeavePassData
+          allData={mergedData}
+          typeOfReport={typeOfReport}
+          reportTitle={reportTitle}
+        />
+      )}
+      {reportTitle === "New Recruitment" && (
+        <NewRecruit
+          allData={mergedData}
+          typeOfReport={typeOfReport}
+          reportTitle={reportTitle}
+        />
+      )}
+      {reportTitle === "Training Record" && (
+        <TrainingRCData
+          allData={mergedData}
+          typeOfReport={typeOfReport}
+          reportTitle={reportTitle}
+        />
+      )}
 
       <div>
         {(reportTitle !== "Contract Expiry PDF" &&
@@ -330,7 +336,7 @@ export const Reports = () => {
 // const client = generateClient();
 
 // export const Reports = () => {
-//   const { userData, empPIData, empLeaveStatusData, empPDData, educDetailsData, idData } = useContext(DataSupply);
+//   const { userData, empPIData, leaveDetailsData, empPDData, educDetailsData, idData } = useContext(DataSupply);
 //   const [tableHead, setTableHead] = useState([]);
 //   const [tableBody, setTableBody] = useState([]);
 //   const [emptySearch, setEmptySearch] = useState(false);

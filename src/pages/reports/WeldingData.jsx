@@ -22,6 +22,23 @@ export const WeldingData = ({ allData, typeOfReport, reportTitle }) => {
     "Remarks for Welding Qualification"
   ]);
 
+  const formatDate = (date, type) => {
+    if (Array.isArray(date)) {
+      if (date.length === 0) return "-";
+      const lastDate = date[date.length - 1];
+      return formatDate(lastDate, type);
+    }
+
+    if (!date) return "-";
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) return "-";
+
+    const day = String(parsedDate.getDate()).padStart(2, "0");
+    const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+    const year = parsedDate.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  };
 
   const resignationMergedData = (data) => {
     return data
@@ -41,7 +58,7 @@ export const WeldingData = ({ allData, typeOfReport, reportTitle }) => {
         fillerMetal: item.fillerMetal || "-",
         thicknessRange: item.thicknessRange || "-",
         diameterRange: item.diameterRange || "-",
-        WQExpiry: item.WQExpiry || "-",
+        WQExpiry: formatDate(item.WQExpiry) || "-",
         WQRemarks: item.WQRemarks || "-",
       }));
   };

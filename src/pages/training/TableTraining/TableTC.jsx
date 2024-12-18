@@ -7,12 +7,16 @@ export const TableTC = () => {
   const { tableColumns } = useOutletContext();
   const {
     empPIData,
-    trainingCertifi,
+    trainingCertifi,AddEmpReq
   } = useContext(DataSupply);
   
   const addTCForm = [
     { header: "Employee ID", key: "empID" },
+    { header: "Employee Badge No", key: "empBadgeNo" },
     { header: "Name", key: "name" },
+    { header: "Course", key: "courseCode" },
+    { header: "Course Name", key: "courseName" },
+    { header: "Company", key: "company" },
     { header: "Purchase Order No", key: "poNo" },
     { header: "Expiry Condition", key: "addDescretion" },
     { header: "Date E-certificate", key: "eCertifiDate" },
@@ -35,12 +39,13 @@ export const TableTC = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (empPIData && trainingCertifi) {
+    if (empPIData && trainingCertifi && AddEmpReq) {
       try {
         const mergedData = empPIData
           .map((emp) => {
             const TCertifi = trainingCertifi.find((item) => item.empID === emp.empID);
-            return TCertifi ? { ...emp, ...TCertifi } : null;
+            const addEmp = AddEmpReq.find((item) => item.empID === emp.empID);
+            return TCertifi ? { ...emp, ...TCertifi, ...addEmp } : null;
           })
           .filter(Boolean) // Remove nulls
           .sort((a, b) => a.empID.localeCompare(b.empID));
@@ -56,7 +61,7 @@ export const TableTC = () => {
       setError('Required data is missing.');
       setLoading(false);
     }
-  }, [empPIData, trainingCertifi]);
+  }, [empPIData, trainingCertifi,AddEmpReq]);
 
   if (loading) {
     return <div>Loading...</div>;

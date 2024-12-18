@@ -108,6 +108,7 @@ export const WorkDataPass = {
         {
           label: "HR ID",
           name: "hr",
+          value: "Hr-notification@adininworks.com",
           type: "text",
         },
         {
@@ -120,6 +121,7 @@ export const WorkDataPass = {
           name: "supervisor",
           type: "text",
         },
+      ],
  
         // {
         //   label: "Normal Working Day per Week",
@@ -144,31 +146,30 @@ export const WorkDataPass = {
         //   options: ["", "Monthly", "Daily"],
         // },
         
-      ],
     
      terminationFields : [
         { label: "Date of Resignation", name: "resignDate", type: "date" },
         { label: "Date of Termination", name: "termiDate", type: "date" },
         {
-          label: "Resignation Notice during Probation",
+          label: "Resignation Notice During Probation",
           name: "resignNotProb",
           type: "select",
           options: ["", "1 Week", "28 Working Days", "N/A", "Other"],
         },
         {
-          label: "Termination Notice during Probation",
+          label: "Termination Notice During Probation",
           name: "termiNotProb",
           type: "select",
           options: ["", "1 Week", "28 Working Days", "N/A", "Other"],
         },
         {
-          label: "Resignation Notice after Confirmation",
+          label: "Resignation Notice After Confirmation",
           name: "resignNotConf",
           type: "select",
           options: ["", "1 Month", "3 Months", "N/A", "Other"],
         },
         {
-          label: "Termination Notice after Confirmation",
+          label: "Termination Notice After Confirmation",
           name: "termiNotConf",
           type: "select",
           options: ["", "1 Month", "3 Months", "N/A", "Other"],
@@ -200,10 +201,10 @@ export const WorkDataPass = {
         { label: "Effective Date", name: "annualLeaveDate", type: "date" },  
         { label: "Sick Leave Entitlement", name: "sickLeave", type: "text" },
         { label: "Effective Date", name: "sickLeaveDate", type: "date" },
-        { label: "Maternity Leave Entitlement", name: "materLeave", type: "text" },
-        { label: "Paternity Leave Entitlement", name: "paterLeave", type: "text" },
-        { label: "Marriage Leave Entitlement", name: "mrageLeave", type: "text" },
-        { label: "Compassionate Entitlement", name: "compasLeave", type: "text" },
+        { label: "Maternity Leave Entitlement", name: "materLeave",  type: "text" },
+        { label: "Paternity Leave Entitlement", name: "paterLeave",  type: "text" },
+        { label: "Marriage Leave Entitlement", name: "mrageLeave",  type: "text" },
+        // { label: "Compassionate Entitlement", name: "compasLeave",  type: "text" },
         { label: "Hospitalisation Leave Entitlement", name: "hospLeave", type: "text" },
       ],
      serviceRecords : [

@@ -60,19 +60,21 @@ export const LbdKpi = ({allData,typeOfReport,reportTitle}) => {
         nationality: item.nationality || "-",
         position: item.position || "-",
         upgradePosition:  Array.isArray(item.upgradePosition)
-        ? item.upgradePosition[item.upgradePosition.length - 1] || "-"
+        ? formatDate(item.upgradePosition[item.upgradePosition.length - 1])
         : "-",
         contactNo: item.contactNo || "-",
         bwnIcNo:item.bwnIcNo || "-",
         bwnIcExpiry: Array.isArray(item.bwnIcExpiry)
-        ? item.bwnIcExpiry[item.bwnIcExpiry.length - 1] || "-"
+        ? formatDate(item.bwnIcExpiry[item.bwnIcExpiry.length - 1])
         : "-",
         myIcNo:item.myIcNo || "-",
         ppNo: Array.isArray(item.ppNo)
-        ? item.ppNo[item.ppNo.length - 1] || "-"
+        ? formatDate(item.ppNo[item.ppNo.length - 1])
         : "-",
         immigRefNo: item.immigRefNo || "-",
-        empPassExp: item.empPassExp || "-",
+        empPassExp: Array.isArray(item.empPassExp)
+        ? formatDate(item.empPassExp[item.empPassExp.length - 1])
+        : "-",
         educLevel: item.educLevel || "-",
         agent: item.agent || "-",
  

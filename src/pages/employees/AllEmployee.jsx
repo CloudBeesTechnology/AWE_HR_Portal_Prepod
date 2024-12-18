@@ -72,6 +72,9 @@ export const AllEmployee = () => {
     }
   }; 
 
+  const getLatestValue = (field) =>
+    Array.isArray(field) ? field[field.length - 1] : field;
+
   useEffect(() => {
     // Check if both data sets are available
     if (
@@ -182,7 +185,46 @@ export const AllEmployee = () => {
     NLAData,
     SawpDetails,
   ]);
-  // console.log(IDData);
+
+  const handleFilterChange = (e) => {
+    const selectedStatus = e.target.value;
+
+    if (selectedStatus === "All") {
+      setFilteredData(mergeData);
+    } else {
+      const filtered = mergeData.filter((candidate) => {
+        const contractType = getLatestValue(candidate.contractType);
+        const empType = getLatestValue(candidate.empType);
+        const workStatus = getLatestValue(candidate.workStatus);
+        const nationality = getLatestValue(candidate.nationality);
+
+        switch (selectedStatus) {
+          case "Local":
+            return ["Bruneian", "Brunei PR"].includes(nationality);
+          case "Foreigner":
+            return (
+              nationality && !["Bruneian", "Brunei PR"].includes(nationality)
+            );
+          case "LPA":
+            return contractType === "LPA";
+          case "SAWP":
+            return contractType === "SAWP";
+          case "OnShore":
+            return empType === "OnShore";
+          case "OffShore":
+            return empType === "OffShore";
+          case "Active":
+          case "Probationary":
+          case "Resignation":
+          case "Termination":
+            return workStatus === selectedStatus;
+          default:
+            return false;
+        }
+      });
+      setFilteredData(filtered);
+    }
+  };
 
   // Handle pagination
   useEffect(() => {
@@ -205,36 +247,62 @@ export const AllEmployee = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, '0');  // Adds leading zero if day is single digit
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');  // getMonth() returns 0-11, so we add 1
+    const day = date.getDate().toString().padStart(2, '0');  
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); 
     const year = date.getFullYear();
     
     return `${day}/${month}/${year}`;
   };
-
-  // console.log(mergeData, "hey ")
+ 
+  const getStatusClass = (workStatus) => {
+    return {
+      Active: "text-[green]",
+      Probationary: "text-[#E8A317]",
+      Resignation: "text-red",
+      Termination: "text-[red]",
+    }[workStatus] || "text-medium_grey";
+  };
+  console.log(mergeData);
 
   return (
     <section className="bg-[#F5F6F1CC] w-full flex items-center flex-col h-screen pt-14">
-      <div className="w-full px-10 flex justify-between items-center mb-10">
-        <div className="bg-[#faf362] py-2 px-3 rounded-lg text-[18px] font-semibold">
-          All Employee Details
-        </div>
-        <div className="relative">
-          <Searchbox
-            type="text"
-            placeholder="Search by Name or Emp ID"
-            allEmpDetails={mergeData}
-            searchUserList={setFilteredData}
-            className="py-2 px-4 rounded-lg shadow-[0_1px_6px_1px_rgba(0,0,0,0.2)]"
-          />
-          <img
-            src={searchIcon}
-            alt="Search Icon"
-            className="absolute top-1/2 right-2 transform -translate-y-1/2 w-4 h-4"
-          />
-        </div>
-      </div>
+<div className="w-full px-10 flex justify-between items-center mb-10">
+  <div className="bg-[#faf362] py-2 px-3 rounded-lg text-[18px] font-semibold">
+    All Employee Details
+  </div>
+  <div className="flex items-center space-x-4">
+    <div className="relative">
+      <Searchbox
+        type="text"
+        placeholder="Search by Name or Emp ID"
+        allEmpDetails={mergeData}
+        searchUserList={setFilteredData}
+        className="py-2 px-4 "
+      />
+      <img
+        src={searchIcon}
+        alt="Search Icon"
+        className="absolute top-1/2 right-2 transform -translate-y-1/2 w-4 h-4"
+      />
+    </div>
+    <select
+  className="py-[7px] px-2 border border-lite_grey focus:outline-none focus:ring-0"
+  onChange={handleFilterChange}
+  >
+    <option value="All">All</option>
+    <option value="Local">Local</option>
+    <option value="Foreigner">Foreigner</option>
+    <option value="LPA">LPA</option>
+    <option value="SAWP">SAWP</option>
+    <option value="OnShore">OnShore</option>
+    <option value="OffShore">OffShore</option>
+    <option value="Active">Active</option>
+    <option value="Probationary">Probationary</option>
+    <option value="Resignation">Resignation</option>
+    <option value="Termination">Termination</option>
+  </select>
+ </div>
+</div>
       <div className=" overflow-x-auto  mt-8 w-[100%] ml-4 rounded-xl">
         <div className="w-full px-4 max-h-[calc(70vh-7rem)] overflow-y-auto">
           <table className="w-full rounded-xl table-auto">
@@ -245,12 +313,14 @@ export const AllEmployee = () => {
                 <th className="py-4 px-2">Name</th>
                 <th className="py-4 px-2 ">DOB</th>
                 <th className="py-4 px-2">Nationality</th>
+                <th className="py-4 px-2">Contract</th>
+                <th className="py-4 px-2">Type</th>
                 <th className="py-4 px-2 ">Email</th>
                 <th className="py-4 px-2 ">Contact No</th>
-                <th className="py-4 px-2 rounded-tl-xl">Status</th>
+                <th className="py-4 px-2 rounded-tr-xl">Status</th>
               </tr>
             </thead>
-            <tbody className="bg-white text-center text-sm font-semibold text-dark_grey">
+            <tbody className="bg-white text-center text-sm font-semibold text-dark_grey cursor-pointer">
               {paginatedData.map((candidate, index) => (
                 
                 <tr
@@ -266,13 +336,12 @@ export const AllEmployee = () => {
                   <td className="py-4 px-4 ">{candidate?.name || "N/A"}</td>
                   <td className="py-4 px-4">{formatDate(candidate?.dob || "N/A")}</td>
                   <td className="py-4 px-4">{candidate?.nationality || "N/A"}</td>
+                  <td className="py-4 px-4">{candidate?.contractType || "N/A"}</td>  
+                  <td className="py-4 px-4">{candidate?.empType || "N/A"}</td>
                   <td className="py-4 px-4 ">{candidate?.email || "N/A"}</td>
                   <td className="py-4 px-4 ">{candidate?.contactNo || "N/A"}</td>
-                  <td className="py-4 px-4 ">{candidate?.workStatus || "N/A"}</td>
-                  {/* <td className="py-4 px-4 text-dark_skyBlue underline">
-                    <button  onClick={() => handleFormShow(candidate)} className="underline">View</button>
-                  </td> */}
-                  
+                 <td className={`py-4 px-4 font-bold ${getStatusClass(candidate?.workStatus || "N/A")}`}>
+                     {candidate?.workStatus || "N/A"}  </td>                
                 </tr>
               ))}
             </tbody>

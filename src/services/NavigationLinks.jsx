@@ -19,14 +19,14 @@ import { Localcandi } from "../pages/recruitments/LocalCandi";
 import { NonlocCandi } from "../pages/recruitments/NonlocCandi";
 import { AddCandidates } from "../pages/recruitments/AddCandidates";
 import { User } from "../pages/user/User";
-import { EmployReq } from "../pages/recruitments/EmployReq";
+import { EmployReq } from "../pages/recruitments/empRequisition/EmployReq";
 import { Status } from "../pages/recruitments/Status";
-import { WorkpassTracking } from "../pages/recruitments/WorkpassTracking";
+import { WorkpassTracking } from "../pages/recruitments/workPassTrack/WorkpassTracking";
 import { AllEmployee } from "../pages/employees/AllEmployee";
 import { EmployeeInfo } from "../pages/employees/employeeInfos/EmployeeInfo";
 import { WorkInfo } from "../pages/employees/workInfoFile/WorkInfo";
 import LabourImmigration from "../pages/employees/medicalDep/LabourImmigration";
-import { EmpRequisitionForm } from "../pages/recruitments/EmpRequisitionForm";
+import { EmpRequisitionForm } from "../pages/recruitments/empRequisition/EmpRequisitionForm";
 import { InsuranceNav } from "../pages/employees/insurance/InsuranceNav";
 import { EmployeeInsurance } from "../pages/employees/insurance/EmployeeInsurance";
 import { DependentInsurance } from "../pages/employees/insurance/DependentInsurance";
@@ -57,7 +57,7 @@ import { HO } from "../pages/timeSheet/HO";
 import { SBW } from "../pages/timeSheet/SBW";
 import { ORMC } from "../pages/timeSheet/ORMC";
 import { ListofCandi } from "../pages/recruitments/ListofCandi";
-import { ApplyEmployReq } from "../pages/recruitments/ApplyEmployReq";
+import { ApplyEmployReq } from "../pages/recruitments/empRequisition/ApplyEmployReq";
 import { ProbationForm } from "../pages/reports/ProbationForm";
 import { ViewSummary } from "../pages/timeSheet/ViewSummary";
 import { HrInsuranceNav } from "../pages/insuranceSid/HrInsuranceNav";
@@ -170,7 +170,7 @@ const NavigationLinks = () => {
       {/* Login and Change Password Routes */}
       <Route path="/changePassword" element={<ChangePassword />} />
       <Route path="/checkingData" element={<MyComponent />} />
-     
+
       {loginAuth && (
         <>
           {/* <Route path="/" element={<Navigate to={defaultRoute} />} /> */}
@@ -286,7 +286,7 @@ const NavigationLinks = () => {
                   </>
                 )}
                 {show === "LeaveManagement" && (
-                  <>
+                  
                     <Route path="/leaveManage" Component={LeaveManage}>
                       <Route index element={<LMTable />} />
                       <Route path="historyLeave" element={<HOLTable />} />
@@ -296,7 +296,7 @@ const NavigationLinks = () => {
                       />
                       <Route path="requestTickets" element={<TicketsTable />} />
                     </Route>
-                  </>
+                  
                 )}
                 {show === "Notification" && (
                   <Route path="/notifications" Component={Notifications} />
@@ -322,13 +322,10 @@ const NavigationLinks = () => {
                     <Route path="/timesheetORMC" element={<ORMC />} />
                     <Route path="/timesheetOffshore" element={<Offshore />} />
                     <Route path="/timesheetBlng" element={<Blng />} />
-                    <Route
-                      path="/viewTimesheet"
-                      element={<ViewTimeSheet />}
-                    >
-                      <Route index element={<ListTimeSheet/>}/>
-                      <Route path="viewSheet" element={<VTimeSheetTable/>} />
-                      </Route>{" "}
+                    <Route path="/viewTimesheet" element={<ViewTimeSheet />}>
+                      <Route index element={<ListTimeSheet />} />
+                      <Route path="viewSheet" element={<VTimeSheetTable />} />
+                    </Route>{" "}
                     <Route path="/viewSummary" element={<ViewSummary />} />
                   </>
                 )}

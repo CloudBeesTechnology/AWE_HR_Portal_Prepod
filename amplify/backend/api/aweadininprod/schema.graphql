@@ -113,31 +113,25 @@ type ProbForm @model @auth(rules: [{allow: public}]) {
   commitment: String
   communication: String
   deadline: String
-  department: String
   diligent: String
-  doj: String
-  empBadgeNo: String
-  extendedProbationEndDate: String
   extensionPeriod: String
-  gmApproved: Boolean
   gmDate: String
   hrDate: String
   hrName: String
   initiative: String
-  managerApproved: Boolean
   managerDate: String
   managerName: String
-  name: String
   pace: String
-  position: String
-  probationEnd: String
   quality: String
   recommendation: String
   responsibility: String
-  supervisorApproved: Boolean
   supervisorDate: String
   supervisorName: String
   teamwork: String
+  extendProbED: String
+  gmApproved: String
+  managerApproved: String
+  supervisorApproved: String
 }
 
 type EmailNotifi @model @auth(rules: [{allow: public}]) {
@@ -415,14 +409,6 @@ type EmpLeaveDetails @model @auth(rules: [{allow: public}]) {
   sickLeave: String
   sickLeaveDate: String
   hospLeave: String
-  remainingAnualLeave: String
-  remainingSickLeave: String
-  remainingMateLeave: String
-  remainingMrageLeave: String
-  remainingPaternityLeave: String
-  remainingHosLeave: String
-  remainingCompasLeave: String
-  unPaidAuthorize: String
 }
 
 type TerminationInfo @model @auth(rules: [{allow: public}]) {

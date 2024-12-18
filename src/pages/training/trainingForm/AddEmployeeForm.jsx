@@ -483,20 +483,6 @@ export const AddEmployeeForm = () => {
       
           </div>
 
-          {/* <div>
-            <label className="text_size_5">Purchase Order (PO) Number</label>
-            <input
-              type="text"
-              className={`input-field `}
-              {...register("purchaseONo")}
-            />
-            {errors.purchaseONo && (
-              <p className="text-[red] text-[13px] mt-1">
-                {errors.purchaseONo.message}
-              </p>
-            )}
-          </div> */}
-
           <div>
             <label className="text_size_5">Training Status</label>
             <select className={`input-field `} {...register("traineeStatus")}>

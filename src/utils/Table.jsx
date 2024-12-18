@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ReviewForm } from "../pages/recruitments/ReviewForm";
 import { RiFileEditLine } from "react-icons/ri";
+import { date } from "yup";
 
 export const Table = ({
   columns,
@@ -92,7 +93,7 @@ export const Table = ({
     Contract: "contractType",
     Type: "empType",
     Interviewer: "interviewer",
-    "Interview Date": "date",
+    date: "date",
     Time: "time",
     Venue: "venue",
     Status: "status"

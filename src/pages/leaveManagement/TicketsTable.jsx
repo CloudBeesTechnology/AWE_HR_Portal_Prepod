@@ -25,12 +25,23 @@ export const TicketsTable = () => {
   const [filters, setFilters] = useState({
     date: "",
     search: [],
-    status: "All"
+    status: "All",
+  });
+
+  // Add this state at the top with other states
+  const [errorState, setErrorState] = useState({
+    noResults: false,
+    searchError: false,
+    dateError: false,
   });
 
   // Modify useEffect to handle all filters together
   useEffect(() => {
-    let filteredResults = [...ticketMerged]; // Create a new array to avoid mutations
+    let filteredResults = [...ticketMerged];
+    let hasDateFilter = false;
+    let hasSearchFilter = false;
+    let dateMatches = false;
+    let searchMatches = false;
 
     // Apply status filter
     if (filters.status !== "All") {
@@ -41,40 +52,59 @@ export const TicketsTable = () => {
 
     // Apply date filter if selected
     if (filters.date) {
+      hasDateFilter = true;
       const selectedDateLocal = new Date(filters.date);
-      // Remove time portion for accurate date comparison
       selectedDateLocal.setHours(0, 0, 0, 0);
 
-      const dateFilteredResults = filteredResults.filter((item) => {
-        const departureDate = item?.departureDate ? new Date(item.departureDate) : null;
-        const arrivalDate = item?.arrivalDate ? new Date(item.arrivalDate) : null;
+      filteredResults = filteredResults.filter((item) => {
+        const departureDate = item?.departureDate
+          ? new Date(item.departureDate)
+          : null;
+        const arrivalDate = item?.arrivalDate
+          ? new Date(item.arrivalDate)
+          : null;
         const createdDate = item?.createdAt ? new Date(item.createdAt) : null;
 
-        // Remove time portion from all dates
         if (departureDate) departureDate.setHours(0, 0, 0, 0);
         if (arrivalDate) arrivalDate.setHours(0, 0, 0, 0);
         if (createdDate) createdDate.setHours(0, 0, 0, 0);
 
-        // Compare dates using getTime() for accurate comparison
-        return [departureDate, arrivalDate, createdDate].some(date => 
-          date && date.getTime() === selectedDateLocal.getTime()
+        const matches = [departureDate, arrivalDate, createdDate].some(
+          (date) => date && date.getTime() === selectedDateLocal.getTime()
         );
+        if (matches) dateMatches = true;
+        return matches;
       });
-
-      filteredResults = dateFilteredResults;
     }
 
-    // Apply search results if any
+    // Apply search filter if there are search results
     if (filters.search.length > 0) {
-      filteredResults = filteredResults.filter(item => 
-        filters.search.some(searchItem => searchItem.empID === item.empID)
-      );
+      hasSearchFilter = true;
+      filteredResults = filteredResults.filter((item) => {
+        const matches = filters.search.some(
+          (searchItem) => searchItem.empID === item.empID
+        );
+        if (matches) searchMatches = true;
+        return matches;
+      });
     }
 
-    // Update data and reset pagination in a single batch
     setData(filteredResults);
-    setFilteredData([]); // Clear filtered data before pagination recalculation
+    setFilteredData([]);
     setCurrentPage(1);
+
+    // Update the error message state or flag if needed
+    const noResults = filteredResults.length === 0;
+    const searchError = !searchMatches;
+    const dateError = hasDateFilter && !dateMatches;
+
+    // You can use these flags to customize your error message in the render section
+    const errorState = {
+      noResults,
+      searchError,
+      dateError,
+    };
+    setErrorState(errorState); // Add this state if not already present
   }, [filters, ticketMerged]);
 
   // Separate useEffect for pagination to avoid race conditions
@@ -102,35 +132,53 @@ export const TicketsTable = () => {
         : numPartA.localeCompare(numPartB);
     });
 
-    const paginatedData = sortedData.slice(startIndex, startIndex + rowsPerPage);
+    const paginatedData = sortedData.slice(
+      startIndex,
+      startIndex + rowsPerPage
+    );
     setFilteredData(paginatedData);
   }, [currentPage, rowsPerPage, data]);
 
   // Console log for debugging
-  useEffect(() => {
-    console.log('Filtered Data Length:', filteredData.length);
-    console.log('Total Data Length:', data.length);
-  }, [filteredData, data]);
+  useEffect(() => {}, [filteredData, data]);
 
   // Update handlers to use new filters state
   const handleDateChange = (event) => {
     const date = event.target.value;
     setSelectedDate(date);
-    setFilters(prev => ({ ...prev, date }));
+    setFilters((prev) => ({ ...prev, date }));
   };
 
   const handleFilterChange = (status) => {
     setFilterStatus(status);
-    setFilters(prev => ({ ...prev, status }));
+    setFilters((prev) => ({ ...prev, status }));
   };
 
   const searchUserList = async (searchData) => {
     try {
       const result = await searchData;
       setSearchResults(result);
-      setFilters(prev => ({ ...prev, search: result }));
+      setFilters((prev) => ({ ...prev, search: result }));
+
+      // Clear error state when starting a new search
+      setErrorState(prev => ({
+        ...prev,
+        searchError: false
+      }));
+
+      // If search was performed with no results, set search error
+      if (result && result.length === 0) {
+        setErrorState(prev => ({
+          ...prev,
+          searchError: true
+        }));
+      }
     } catch (error) {
       console.error("Error search data", error);
+      setErrorState(prev => ({
+        ...prev,
+        searchError: true
+      }));
     }
   };
 
@@ -165,7 +213,6 @@ export const TicketsTable = () => {
     "Submitted form",
     userType !== "SuperAdmin" && "Status",
   ];
-  console.log(filteredData.length);
 
   useEffect(() => {
     setSecondartyData(ticketMerged);
@@ -173,12 +220,12 @@ export const TicketsTable = () => {
   }, [ticketMerged]);
 
   return (
-    <section className="relative w-full">
-      <div className="flex justify-around flex-wrap">
+    <section className="w-full">
+      <div className="flex justify-between flex-wrap mb-5">
         <div>
           <NavigateLM userType={userType} />
         </div>
-        <div className="flex  flex-wrap items-center gap-1">
+        <div className="flex  flex-wrap items-center gap-2">
           <div>
             <Searchbox
               allEmpDetails={secondartyData}
@@ -188,6 +235,7 @@ export const TicketsTable = () => {
               border="rounded-md"
             />
           </div>
+          
           <div className="text_size_5 bg-white border py-2 rounded-md text-grey border-lite_grey flex items-center px-3 gap-2">
             <input
               type="date"
@@ -204,9 +252,13 @@ export const TicketsTable = () => {
           )}
         </div>
       </div>
-      <div className="py-5 leaveManagementTable max-w-[100%] overflow-x-auto flex-grow rounded-xl">
-        {filteredData && filteredData.length > 0 ? (
-          <table className="w-[1150px] font-semibold text-sm">
+      <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl ">
+        {errorState.searchError ? (
+          <div className="text-center mt-6 py-20">
+            <p>No matching results found for your search.</p>
+          </div>
+        ) : filteredData && filteredData.length > 0 ? (
+          <table className="w-full font-semibold text-sm">
             <thead className="bg-[#939393] sticky top-0 rounded-t-lg">
               <tr className="px-6">
                 {heading.map((header, index) => (
@@ -217,88 +269,80 @@ export const TicketsTable = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredData && filteredData.length > 0 ? (
-                filteredData.map((item, index) => {
-                  const displayIndex = startIndex + index + 1; // Adjust index based on pagination
-                  // console.log(item.empID);
+              {filteredData.map((item, index) => {
+                const displayIndex = startIndex + index + 1; // Adjust index based on pagination
+                // console.log(item.empID);
 
-                  return (
-                    <tr
-                      key={index}
-                      className="text-center text-sm shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
-                    >
-                      <td className="border-b-2  border-[#CECECE] py-5">
-                        {displayIndex}
-                      </td>
-                      <td className="border-b-2  border-[#CECECE] py-5">
-                        {item?.empID}
-                      </td>
-                      <td className="border-b-2  border-[#CECECE] py-5">
-                        {item?.empName}
-                      </td>
-                      <td className="border-b-2 border-[#CECECE] py-5">
-                        { item.department
-                          || "N/A"}
-                      </td>
-                      <td className="border-b-2 border-[#CECECE] py-5">
-                        {item.position
-                         || "N/A"}
-                      </td>
+                return (
+                  <tr
+                    key={index}
+                    className="text-center text-sm shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
+                  >
+                    <td className="border-b-2  border-[#CECECE] py-5">
+                      {displayIndex}
+                    </td>
+                    <td className="border-b-2  border-[#CECECE] py-5">
+                      {item?.empID}
+                    </td>
+                    <td className="border-b-2  border-[#CECECE] py-5">
+                      {item?.empName}
+                    </td>
+                    <td className="border-b-2 border-[#CECECE] py-5">
+                      {item.department || "N/A"}
+                    </td>
+                    <td className="border-b-2 border-[#CECECE] py-5">
+                      {item.position || "N/A"}
+                    </td>
 
-                      <td className="border-b-2  border-[#CECECE] py-5">
-                        {formatDate(item.createdAt)}
-                      </td>
-                      <td className="border-b-2  border-[#CECECE] py-5">
-                        {formatDate(item.departureDate)}
-                      </td>
-                      <td className="border-b-2  border-[#CECECE] py-5">
-                        {formatDate(item.arrivalDate)}
-                      </td>
+                    <td className="border-b-2  border-[#CECECE] py-5">
+                      {formatDate(item.createdAt)}
+                    </td>
+                    <td className="border-b-2  border-[#CECECE] py-5">
+                      {formatDate(item.departureDate)}
+                    </td>
+                    <td className="border-b-2  border-[#CECECE] py-5">
+                      {formatDate(item.arrivalDate)}
+                    </td>
 
-                      <td className="border-b-2  border-[#CECECE] cursor-pointer py-5">
-                        <span
-                          className="border-b-2 text-[blue] "
-                          onClick={() => {
-                            handleClickForToggle();
-                            handleViewClick(item, "Tickets");
-                          }}
-                        >
-                          {"View"}
-                        </span>
+                    <td className="border-b-2  border-[#CECECE] cursor-pointer py-5">
+                      <span
+                        className="border-b-2 text-[blue] "
+                        onClick={() => {
+                          handleClickForToggle();
+                          handleViewClick(item, "Tickets");
+                        }}
+                      >
+                        {"View"}
+                      </span>
+                    </td>
+                    {userType !== "SuperAdmin" && (
+                      <td
+                        className={`border-b-2 border-[#CECECE] py-5 ${
+                          item.hrStatus === "Rejected"
+                            ? "text-[#C50000]"
+                            : item.hrStatus === "Approved"
+                            ? "text-[#0CB100]"
+                            : item.hrStatus === "Pending"
+                            ? "text-dark_grey"
+                            : ""
+                        }`}
+                      >
+                        {item.hrStatus}
                       </td>
-                      {userType !== "SuperAdmin" && (
-                        <td
-                          className={`border-b-2 border-[#CECECE] py-5 ${
-                            item.hrStatus === "Rejected"
-                              ? "text-[#C50000]"
-                              : item.hrStatus === "Approved"
-                              ? "text-[#0CB100]"
-                              : item.hrStatus === "Pending"
-                              ? "text-dark_grey"
-                              : ""
-                          }`}
-                        >
-                          {item.hrStatus}
-                        </td>
-                      )}
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan={heading.length} className="text-center py-4">
-                    No data available
-                  </td>
-                </tr>
-              )}
+                    )}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         ) : (
           <div className="text-center mt-6 py-20">
             <p>
-              {filters.date 
+              {filters.status !== "All"
+                ? `No tickets found with status "${filters.status}".`
+                : errorState.dateError
                 ? "No tickets found for the selected date."
-                : "Ticket Request not available."}
+                : "No tickets available."}
             </p>
           </div>
         )}

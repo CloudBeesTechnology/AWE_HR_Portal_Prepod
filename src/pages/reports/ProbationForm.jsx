@@ -82,15 +82,15 @@ export const ProbationForm = forwardRef(() => {
         : {};
 
       if (PFDataRecord) {
-        const TMRDataUp = {
+        const PbFDataUp = {
           ...data,
           id: PFDataRecord.id,
         };
-        console.log(TMRDataUp);
+        console.log(PbFDataUp);
 
-        await UpdateProb({ TMRDataUp });
-        setShowTitle("Probation Form Updated successfully");
-        setNotification(true);
+        await UpdateProb({ PbFDataUp });
+        // setShowTitle("Probation Form Updated successfully");
+        // setNotification(true);
       } else {
         const ProbValue = {
           ...data,
@@ -98,8 +98,8 @@ export const ProbationForm = forwardRef(() => {
         console.log(ProbValue);
         
         await ProbFormsData({ ProbValue });
-        setShowTitle("Probation Form  Saved successfully");
-        setNotification(true);
+        // setShowTitle("Probation Form  Saved successfully");
+        // setNotification(true);
       }
     } catch (err) {
       console.log(err);

@@ -26,6 +26,13 @@ export const LeaveManage = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
 
+  // Add this state at the top with other states
+  const [errorState, setErrorState] = useState({
+    noResults: false,
+    searchError: false,
+    dateError: false,
+  });
+
   const location = useLocation();
 
   const {
@@ -49,7 +56,7 @@ export const LeaveManage = () => {
 
   useEffect(() => {
     const filteredDataValue = mergedData.filter((item) => {
-      if (location.pathname === "/leaveManage/historyLeave") {
+      if (location.pathname.replace(/\/$/, '') === "/leaveManage/historyLeave") {
         const isValid =
           item?.empStatus !== "Cancelled" && item.managerStatus === "Approved";
 
@@ -60,101 +67,126 @@ export const LeaveManage = () => {
         return isValid;
       }
     });
-    console.log(filteredDataValue);
 
     setSecondartyData(filteredDataValue);
     setData(filteredDataValue);
-  }, [
-    ticketMerged,
-    filterStatus,
-    selectedDate,
-    searchTerm,
-    mergedData,
-    location.pathname,
-  ]);
+  }, [filterStatus, searchTerm, mergedData, location.pathname]);
 
-  const getData = () => {
-    let dataToReturn = [];
-    if (
-      location.pathname === "/leaveManage" ||
-      location.pathname === "/leaveManage/historyLeave" ||
-      location.pathname === "/leaveManage/leaveBalance"
-    ) {
-      dataToReturn = data;
-    } else if (location.pathname === "/leaveManage/requestTickets") {
-      dataToReturn = ticketMerged;
+  useEffect(() => {
+    let filteredResults = [...mergedData];
+
+    // 1. First apply the status filter
+    if (filterStatus !== "All") {
+      filteredResults = filteredResults.filter((item) => {
+        const status =
+          userType === "Manager"
+            ? item.managerStatus
+            : userType === "Supervisor"
+            ? item.supervisorStatus
+            : null;
+
+        return status === filterStatus;
+      });
+
+      // Apply user-specific filtering
+      if (userType === "Manager") {
+        filteredResults = filteredResults.filter((item) => {
+          return (
+            (item?.supervisorStatus === "Approved" &&
+              item?.managerEmpID.toString().toLowerCase() === userID) ||
+            item?.managerEmpID.toString().toLowerCase() === userID
+          );
+        });
+      } else if (userType === "Supervisor") {
+        filteredResults = filteredResults.filter((item) => {
+          return item?.supervisorEmpID?.toString().toLowerCase() === userID;
+        });
+      }
     }
 
-    // Apply the empStatus filter to exclude "Cancelled" status
-    return dataToReturn.filter((item) => item.empStatus !== "Cancelled");
-  };
-
-  const dateFD = (selectedDate) => {
-    try {
-      if (!selectedDate) {
-        setSearchResults([]);
-        setFilteredData(data);
-        return;
-      }
-
+    // 2. Apply the date filter
+    if (selectedDate) {
       const selectedDateObj = new Date(selectedDate);
-      // Set time to midnight to compare dates only
-      selectedDateObj.setHours(0, 0, 0, 0);
-      
-      const filtered = mergedData.filter((item) => {
-        // Skip items without any dates
-        if (!item.leaveStatusCreatedAt && !item.empLeaveStartDate && !item.empLeaveEndDate) {
-          return false;
+      selectedDateObj.setHours(0, 0, 0, 0); // Set to start of the day
+
+      filteredResults = filteredResults.filter((item) => {
+        // For leaveManage route
+        if (location.pathname.replace(/\/$/, '') === "/leaveManage") {
+          const createdDate = item.leaveStatusCreatedAt
+            ? new Date(item.leaveStatusCreatedAt)
+            : null;
+          const supervisorDate = item.supervisorDate
+            ? new Date(item.supervisorDate)
+            : null;
+          const managerDate = item.managerDate
+            ? new Date(item.managerDate)
+            : null;
+
+          // Normalize the dates to remove time components
+          [createdDate, supervisorDate, managerDate].forEach((date) => {
+            if (date) date.setHours(0, 0, 0, 0);
+          });
+
+          return [createdDate, supervisorDate, managerDate].some(
+            (date) => date && date.getTime() === selectedDateObj.getTime()
+          );
         }
 
-        if (location.pathname === "/leaveManage") {
-          const createdDate = new Date(item.leaveStatusCreatedAt);
-          createdDate.setHours(0, 0, 0, 0);
-          return createdDate.getTime() === selectedDateObj.getTime();
-        }
-
-        if (location.pathname === "/leaveManage/historyLeave") {
-          const startDate = item.empLeaveStartDate ? new Date(item.empLeaveStartDate) : null;
-          const endDate = item.empLeaveEndDate ? new Date(item.empLeaveEndDate) : null;
+        // For leaveManage/historyLeave route
+        if (location.pathname.replace(/\/$/, '') === "/leaveManage/historyLeave") {
+          const startDate = item.empLeaveStartDate
+            ? new Date(item.empLeaveStartDate)
+            : null;
+          const endDate = item.empLeaveEndDate
+            ? new Date(item.empLeaveEndDate)
+            : null;
 
           if (startDate) startDate.setHours(0, 0, 0, 0);
           if (endDate) endDate.setHours(0, 0, 0, 0);
 
           return (
-            (startDate && startDate.getTime() === selectedDateObj.getTime()) ||
-            (endDate && endDate.getTime() === selectedDateObj.getTime())
+            startDate &&
+            endDate &&
+            selectedDateObj >= startDate &&
+            selectedDateObj <= endDate
           );
         }
 
         return false;
       });
-
-      // If no results found for the selected date, set empty arrays
-      if (filtered.length === 0) {
-        setSearchResults([]);
-        setFilteredData([]);
-      } else {
-        setSearchResults(filtered);
-        setFilteredData(filtered);
-      }
-    } catch (error) {
-      console.error("Error in date filtering:", error);
-      // In case of error, show no results
-      setSearchResults([]);
-      setFilteredData([]);
     }
-  };
+
+    // 3. Finally apply the search filter
+    if (searchResults.length > 0) {
+      const searchEmpIDs = searchResults.map((item) => item.empID);
+      filteredResults = filteredResults.filter((item) =>
+        searchEmpIDs.includes(item.empID)
+      );
+    }
+
+    setData(filteredResults);
+    setFilteredData([]); // Reset filtered data
+    setCurrentPage(1); // Reset to first page when filters change
+
+    // Update error states
+    setErrorState({
+      noResults: filteredResults.length === 0,
+      searchError: searchResults.length > 0 && filteredResults.length === 0,
+      dateError: selectedDate && filteredResults.length === 0,
+    });
+  }, [
+    filterStatus,
+    selectedDate,
+    searchResults,
+    mergedData,
+    userType,
+    userID,
+    location.pathname,
+  ]);
 
   const handleDateChange = (event) => {
     const date = event.target.value;
     setSelectedDate(date);
-    if (!date) {
-      // Reset to show all data when date is cleared
-      setSearchResults([]);
-      setFilteredData(data);
-    } else {
-      dateFD(date);
-    }
   };
 
   useEffect(() => {
@@ -196,10 +228,9 @@ export const LeaveManage = () => {
     try {
       const result = await data;
       setSearchResults(result);
-      setCurrentPage(1);
-      setData(result);
     } catch (error) {
       console.error("Error search data", error);
+      setSearchResults([]);
     }
   };
 
@@ -220,7 +251,8 @@ export const LeaveManage = () => {
   useEffect(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
 
-    const dataToPaginate = searchResults.length > 0 ? searchResults : data;
+    const dataToPaginate =
+      searchResults.length > 0 ? searchResults : secondartyData;
 
     const sortedData = dataToPaginate.sort((a, b) => {
       const regex = /\d+$/;
@@ -247,15 +279,8 @@ export const LeaveManage = () => {
       startIndex + rowsPerPage
     );
 
-    setFilteredData(paginatedData);
-  }, [
-    currentPage,
-    rowsPerPage,
-    data,
-    searchResults,
-    selectedDate,
-    filterStatus,
-  ]);
+    setData(paginatedData);
+  }, [currentPage, rowsPerPage, secondartyData, searchResults]);
 
   const handleFilterChange = (status) => {
     setFilterStatus(status);
@@ -267,34 +292,54 @@ export const LeaveManage = () => {
       rowsPerPage
   );
 
-  // console.log(selectedLeaveData); // Ensure at least one has data
-  // console.log(selectedTicketData);
-  // console.log(filteredData);
+  // Apply filtering based on filterStatus and userType
+  const filteredFinalData = filteredData.filter((item) => {
+    const status =
+      userType === "Manager"
+        ? item.managerStatus
+        : userType === "Supervisor"
+        ? item.supervisorStatus
+        : null;
 
-  // const check=filteredData.map((val)=>{
-  //   return val.empID
-  //     })
-  //     console.log(check);
+    if (filterStatus === "All") {
+      return true;
+    }
+
+    return status === filterStatus;
+  });
+  let finalDataFiltered;
+
+  if (userType === "Manager") {
+    finalDataFiltered = filteredFinalData.filter((item) => {
+      const condition =
+        (item?.supervisorStatus === "Approved" &&
+          item?.managerEmpID.toString().toLowerCase() === userID) ||
+        item?.managerEmpID.toString().toLowerCase() === userID;
+      return condition;
+    });
+  } else if (userType === "Supervisor") {
+    finalDataFiltered = filteredFinalData.filter((item) => {
+      return item?.supervisorEmpID?.toString().toLowerCase() === userID;
+    });
+  } else {
+    finalDataFiltered = filteredFinalData;
+  }
 
   return (
-    <section className={`py-20 px-10`}>
+    <section className="py-20 px-10">
       <div className="screen-size">
-        <section className="flex flex-wrap justify-between items-center py-3">
-          {(location.pathname === "/leaveManage" ||
-            location.pathname === "/leaveManage/historyLeave") && (
-            <div className="">
-              <NavigateLM userType={userType} />
-            </div>
-          )}
-          <div
-            className={`flex flex-wrap gap-5 ${
-              location.pathname === "/leaveManage/leaveBalance"
-                ? "justify-end"
-                : ""
-            }`}
-          >
-            {location.pathname !== "/leaveManage/leaveBalance" &&
-              location.pathname !== "/leaveManage/requestTickets" && (
+        {(location.pathname.replace(/\/$/, '') === "/leaveManage" ||
+          location.pathname.replace(/\/$/, '') === "/leaveManage/historyLeave") &&
+         !(location.pathname.replace(/\/$/, '') === "/leaveManage/leaveBalance" ||
+            location.pathname.replace(/\/$/, '') === "/leaveManage/requestTickets") && (
+            <section className="flex flex-wrap justify-between items-center mb-5">
+              <div className="">
+                <NavigateLM userType={userType} />
+              </div>
+
+              <div
+                className={"flex flex-wrap gap-2"}
+              >
                 <Searchbox
                   allEmpDetails={secondartyData}
                   searchIcon2={<IoSearch />}
@@ -302,9 +347,7 @@ export const LeaveManage = () => {
                   searchUserList={searchUserList}
                   border="rounded-md"
                 />
-              )}
-            {location.pathname !== "/leaveManage/leaveBalance" &&
-              location.pathname !== "/leaveManage/requestTickets" && (
+                
                 <div className="py-2  text_size_5 bg-white border rounded-md text-grey border-lite_grey flex items-center px-3 gap-2">
                   <input
                     type="date"
@@ -314,15 +357,19 @@ export const LeaveManage = () => {
                     onChange={handleDateChange}
                   />
                 </div>
-              )}
 
-            {/* {location.pathname === "/leaveManage" &&
-              userType === "SuperAdmin" && (
-                <Filter AfterFilter={handleFilterChange} />
-              )} */}
-          </div>
-        </section>
-        <section className="center w-full">
+                {location.pathname.replace(/\/$/, '') === "/leaveManage" &&
+                  (userType === "Supervisor" || userType === "Manager") && (
+                    <Filter
+                      name={filterStatus}
+                      AfterFilter={handleFilterChange}
+                    />
+                  )}
+              </div>
+            </section>
+          )}
+       
+        <section className="center w-full ">
           <Outlet
             context={{
               handleClickForToggle,
@@ -334,6 +381,7 @@ export const LeaveManage = () => {
               handleDeleteLeaveStatus,
               personalInfo,
               formatDate,
+              data,
               userType,
               statusUpdate,
               mergedData,
@@ -345,11 +393,9 @@ export const LeaveManage = () => {
 
         {/* Pagination section */}
         <div className="ml-20 flex justify-center">
-          <div className="w-[60%] flex justify-start mt-4 px-10">
-            {/* Conditionally render pagination only for tables other than LMTable and TicketsTable */}
-
-            {location.pathname !== "/leaveManage/leaveBalance" &&
-              location.pathname !== "/leaveManage/requestTickets" && (
+          <div className="w-[60%] flex justify-start mt-10 px-10">
+            {location.pathname.replace(/\/$/, '') !== "/leaveManage/leaveBalance" &&
+              location.pathname.replace(/\/$/, '') !== "/leaveManage/requestTickets" && (
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}

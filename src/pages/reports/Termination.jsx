@@ -14,6 +14,25 @@ export const Termination = ({ allData, typeOfReport, reportTitle }) => {
     "Reason of Termination",
   ]);
 
+  const formatDate = (date, type) => {
+    if (Array.isArray(date)) {
+      if (date.length === 0) return "-";
+      const lastDate = date[date.length - 1];
+      return formatDate(lastDate, type);
+    }
+
+    if (!date) return "-";
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) return "-";
+
+    const day = String(parsedDate.getDate()).padStart(2, "0");
+    const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+    const year = parsedDate.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  };
+
+
   // Generate table body dynamically from mergedData
   const resignationMergedData = (data) => {
     return data
@@ -25,8 +44,8 @@ export const Termination = ({ allData, typeOfReport, reportTitle }) => {
         nationality: item.nationality || "-",
         position: item.position || "-",
         department: item.department || "-",
-        termiDate: item.termiDate || "-", // Corrected to display termination date
-        termiNotProb: item.termiNotProb || "-", // Corrected to display termination note (if any)
+        termiDate: formatDate(item.termiDate) || "-", // Corrected to display termination date
+        reasonTerminate: item.reasonTerminate || "-", // Corrected to display termination note (if any)
       }));
   };
   
@@ -41,72 +60,3 @@ export const Termination = ({ allData, typeOfReport, reportTitle }) => {
     </div>
   );
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import React, { useEffect, useState } from 'react'
-// import { FilterTable } from './FilterTable'
-
-// export const Termination = ({allData,typeOfReport,reportTitle}) => {
-//   const [tableBody, setTableBody] = useState([]);
-//   const [tableHead, setTableHead] = useState([
-//     "Name",
-//     "Emp ID",
-//     "Badge No",
-//     "Nationality",
-//     "Department",
-//     "workPosition",
-//     "Date of Termination",
-//     "Reason of Termination",]);
-
-//   // Generate table body dynamically from mergedData
-//   const terminationMergedData = (data) => {
-//     return data
-    
-//     .filter((item) => item.termiDate) // Only include items with resignDate
-    
-//     .map((item) => [        
-//         item.name || "-",
-//         item.empID || "-",
-//         item.empBadgeNo || "-",
-//         item.nationality || "-",
-//         item.position || "-",
-//         item.department || "-",
-//         item.termiDate || "-",
-//         item.termiNotProb || "-",,
-//     ]);
-//   };
-
-//   useEffect(()=>{
-    
-//       setTableBody(terminationMergedData(allData))
-//     },[allData])
-// console.log(tableBody);
-
-//   return (
-//     <div>
-
-//       <FilterTable tableBody={tableBody} tableHead={tableHead} typeOfReport={typeOfReport} reportTitle={reportTitle}/>
-//     </div>
-//   )
-// }

@@ -131,31 +131,25 @@ type ProbForm @aws_iam @aws_api_key {
   commitment: String
   communication: String
   deadline: String
-  department: String
   diligent: String
-  doj: String
-  empBadgeNo: String
-  extendedProbationEndDate: String
   extensionPeriod: String
-  gmApproved: Boolean
   gmDate: String
   hrDate: String
   hrName: String
   initiative: String
-  managerApproved: Boolean
   managerDate: String
   managerName: String
-  name: String
   pace: String
-  position: String
-  probationEnd: String
   quality: String
   recommendation: String
   responsibility: String
-  supervisorApproved: Boolean
   supervisorDate: String
   supervisorName: String
   teamwork: String
+  extendProbED: String
+  gmApproved: String
+  managerApproved: String
+  supervisorApproved: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -467,14 +461,6 @@ type EmpLeaveDetails @aws_iam @aws_api_key {
   sickLeave: String
   sickLeaveDate: String
   hospLeave: String
-  remainingAnualLeave: String
-  remainingSickLeave: String
-  remainingMateLeave: String
-  remainingMrageLeave: String
-  remainingPaternityLeave: String
-  remainingHosLeave: String
-  remainingCompasLeave: String
-  unPaidAuthorize: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -2003,31 +1989,25 @@ input ModelProbFormFilterInput {
   commitment: ModelStringInput
   communication: ModelStringInput
   deadline: ModelStringInput
-  department: ModelStringInput
   diligent: ModelStringInput
-  doj: ModelStringInput
-  empBadgeNo: ModelStringInput
-  extendedProbationEndDate: ModelStringInput
   extensionPeriod: ModelStringInput
-  gmApproved: ModelBooleanInput
   gmDate: ModelStringInput
   hrDate: ModelStringInput
   hrName: ModelStringInput
   initiative: ModelStringInput
-  managerApproved: ModelBooleanInput
   managerDate: ModelStringInput
   managerName: ModelStringInput
-  name: ModelStringInput
   pace: ModelStringInput
-  position: ModelStringInput
-  probationEnd: ModelStringInput
   quality: ModelStringInput
   recommendation: ModelStringInput
   responsibility: ModelStringInput
-  supervisorApproved: ModelBooleanInput
   supervisorDate: ModelStringInput
   supervisorName: ModelStringInput
   teamwork: ModelStringInput
+  extendProbED: ModelStringInput
+  gmApproved: ModelStringInput
+  managerApproved: ModelStringInput
+  supervisorApproved: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelProbFormFilterInput]
@@ -2044,31 +2024,25 @@ input ModelProbFormConditionInput {
   commitment: ModelStringInput
   communication: ModelStringInput
   deadline: ModelStringInput
-  department: ModelStringInput
   diligent: ModelStringInput
-  doj: ModelStringInput
-  empBadgeNo: ModelStringInput
-  extendedProbationEndDate: ModelStringInput
   extensionPeriod: ModelStringInput
-  gmApproved: ModelBooleanInput
   gmDate: ModelStringInput
   hrDate: ModelStringInput
   hrName: ModelStringInput
   initiative: ModelStringInput
-  managerApproved: ModelBooleanInput
   managerDate: ModelStringInput
   managerName: ModelStringInput
-  name: ModelStringInput
   pace: ModelStringInput
-  position: ModelStringInput
-  probationEnd: ModelStringInput
   quality: ModelStringInput
   recommendation: ModelStringInput
   responsibility: ModelStringInput
-  supervisorApproved: ModelBooleanInput
   supervisorDate: ModelStringInput
   supervisorName: ModelStringInput
   teamwork: ModelStringInput
+  extendProbED: ModelStringInput
+  gmApproved: ModelStringInput
+  managerApproved: ModelStringInput
+  supervisorApproved: ModelStringInput
   and: [ModelProbFormConditionInput]
   or: [ModelProbFormConditionInput]
   not: ModelProbFormConditionInput
@@ -2086,31 +2060,25 @@ input CreateProbFormInput {
   commitment: String
   communication: String
   deadline: String
-  department: String
   diligent: String
-  doj: String
-  empBadgeNo: String
-  extendedProbationEndDate: String
   extensionPeriod: String
-  gmApproved: Boolean
   gmDate: String
   hrDate: String
   hrName: String
   initiative: String
-  managerApproved: Boolean
   managerDate: String
   managerName: String
-  name: String
   pace: String
-  position: String
-  probationEnd: String
   quality: String
   recommendation: String
   responsibility: String
-  supervisorApproved: Boolean
   supervisorDate: String
   supervisorName: String
   teamwork: String
+  extendProbED: String
+  gmApproved: String
+  managerApproved: String
+  supervisorApproved: String
 }
 
 input UpdateProbFormInput {
@@ -2123,31 +2091,25 @@ input UpdateProbFormInput {
   commitment: String
   communication: String
   deadline: String
-  department: String
   diligent: String
-  doj: String
-  empBadgeNo: String
-  extendedProbationEndDate: String
   extensionPeriod: String
-  gmApproved: Boolean
   gmDate: String
   hrDate: String
   hrName: String
   initiative: String
-  managerApproved: Boolean
   managerDate: String
   managerName: String
-  name: String
   pace: String
-  position: String
-  probationEnd: String
   quality: String
   recommendation: String
   responsibility: String
-  supervisorApproved: Boolean
   supervisorDate: String
   supervisorName: String
   teamwork: String
+  extendProbED: String
+  gmApproved: String
+  managerApproved: String
+  supervisorApproved: String
 }
 
 input DeleteProbFormInput {
@@ -2164,31 +2126,25 @@ input ModelSubscriptionProbFormFilterInput {
   commitment: ModelSubscriptionStringInput
   communication: ModelSubscriptionStringInput
   deadline: ModelSubscriptionStringInput
-  department: ModelSubscriptionStringInput
   diligent: ModelSubscriptionStringInput
-  doj: ModelSubscriptionStringInput
-  empBadgeNo: ModelSubscriptionStringInput
-  extendedProbationEndDate: ModelSubscriptionStringInput
   extensionPeriod: ModelSubscriptionStringInput
-  gmApproved: ModelSubscriptionBooleanInput
   gmDate: ModelSubscriptionStringInput
   hrDate: ModelSubscriptionStringInput
   hrName: ModelSubscriptionStringInput
   initiative: ModelSubscriptionStringInput
-  managerApproved: ModelSubscriptionBooleanInput
   managerDate: ModelSubscriptionStringInput
   managerName: ModelSubscriptionStringInput
-  name: ModelSubscriptionStringInput
   pace: ModelSubscriptionStringInput
-  position: ModelSubscriptionStringInput
-  probationEnd: ModelSubscriptionStringInput
   quality: ModelSubscriptionStringInput
   recommendation: ModelSubscriptionStringInput
   responsibility: ModelSubscriptionStringInput
-  supervisorApproved: ModelSubscriptionBooleanInput
   supervisorDate: ModelSubscriptionStringInput
   supervisorName: ModelSubscriptionStringInput
   teamwork: ModelSubscriptionStringInput
+  extendProbED: ModelSubscriptionStringInput
+  gmApproved: ModelSubscriptionStringInput
+  managerApproved: ModelSubscriptionStringInput
+  supervisorApproved: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionProbFormFilterInput]
@@ -3863,14 +3819,6 @@ input ModelEmpLeaveDetailsFilterInput {
   sickLeave: ModelStringInput
   sickLeaveDate: ModelStringInput
   hospLeave: ModelStringInput
-  remainingAnualLeave: ModelStringInput
-  remainingSickLeave: ModelStringInput
-  remainingMateLeave: ModelStringInput
-  remainingMrageLeave: ModelStringInput
-  remainingPaternityLeave: ModelStringInput
-  remainingHosLeave: ModelStringInput
-  remainingCompasLeave: ModelStringInput
-  unPaidAuthorize: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelEmpLeaveDetailsFilterInput]
@@ -3893,14 +3841,6 @@ input ModelEmpLeaveDetailsConditionInput {
   sickLeave: ModelStringInput
   sickLeaveDate: ModelStringInput
   hospLeave: ModelStringInput
-  remainingAnualLeave: ModelStringInput
-  remainingSickLeave: ModelStringInput
-  remainingMateLeave: ModelStringInput
-  remainingMrageLeave: ModelStringInput
-  remainingPaternityLeave: ModelStringInput
-  remainingHosLeave: ModelStringInput
-  remainingCompasLeave: ModelStringInput
-  unPaidAuthorize: ModelStringInput
   and: [ModelEmpLeaveDetailsConditionInput]
   or: [ModelEmpLeaveDetailsConditionInput]
   not: ModelEmpLeaveDetailsConditionInput
@@ -3924,14 +3864,6 @@ input CreateEmpLeaveDetailsInput {
   sickLeave: String
   sickLeaveDate: String
   hospLeave: String
-  remainingAnualLeave: String
-  remainingSickLeave: String
-  remainingMateLeave: String
-  remainingMrageLeave: String
-  remainingPaternityLeave: String
-  remainingHosLeave: String
-  remainingCompasLeave: String
-  unPaidAuthorize: String
 }
 
 input UpdateEmpLeaveDetailsInput {
@@ -3950,14 +3882,6 @@ input UpdateEmpLeaveDetailsInput {
   sickLeave: String
   sickLeaveDate: String
   hospLeave: String
-  remainingAnualLeave: String
-  remainingSickLeave: String
-  remainingMateLeave: String
-  remainingMrageLeave: String
-  remainingPaternityLeave: String
-  remainingHosLeave: String
-  remainingCompasLeave: String
-  unPaidAuthorize: String
 }
 
 input DeleteEmpLeaveDetailsInput {
@@ -3980,14 +3904,6 @@ input ModelSubscriptionEmpLeaveDetailsFilterInput {
   sickLeave: ModelSubscriptionStringInput
   sickLeaveDate: ModelSubscriptionStringInput
   hospLeave: ModelSubscriptionStringInput
-  remainingAnualLeave: ModelSubscriptionStringInput
-  remainingSickLeave: ModelSubscriptionStringInput
-  remainingMateLeave: ModelSubscriptionStringInput
-  remainingMrageLeave: ModelSubscriptionStringInput
-  remainingPaternityLeave: ModelSubscriptionStringInput
-  remainingHosLeave: ModelSubscriptionStringInput
-  remainingCompasLeave: ModelSubscriptionStringInput
-  unPaidAuthorize: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionEmpLeaveDetailsFilterInput]

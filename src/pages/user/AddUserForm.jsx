@@ -472,7 +472,6 @@ Best regards,
               <option value="QA \ QC">QA \ QC</option>
               <option value="User">User</option>
               <option value="Employee">Employee</option>
-              <option value="Payroll">Payroll</option>
             </select>
 
             <p className="text-[red] text-[12px] mt-1">

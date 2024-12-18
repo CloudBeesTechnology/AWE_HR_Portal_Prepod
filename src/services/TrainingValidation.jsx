@@ -114,7 +114,7 @@ export const trainingCertificatesValidation = Yup.object().shape({
         (value) => {
           // If value is a file, check for valid file types
           if (value instanceof File) {
-            return ["application/pdf", "image/jpeg", "image/png"].includes(
+            return ["application/pdf"].includes(
               value.type
             );
           }

@@ -65,18 +65,22 @@ export const CreateJob = () => {
           uploadJobDetails: selectedFile.name, // Dynamically store file name
         }));
        await fetch(
-          `https://p7b9zso8gl.execute-api.ap-southeast-1.amazonaws.com/adinin-uploadapi-stage/commonfiles/recruitment%2fapplyJob%2f${watchedJobTitle}%2f${selectedFile.name}`,
+          `https://p7b9zso8gl.execute-api.ap-southeast-1.amazonaws.com/adinin-uploadapi-stage/commonfiles/recruitment%2fapplyJob%2f${encodeURIComponent(watchedJobTitle)}%2f${encodeURIComponent(selectedFile.name)}`,
           {
             method: "PUT",
             headers: {
               "Content-Type": "application/octet-stream",
+              "Access-Control-Allow-Origin": "http://localhost:3000",
             },
             body: selectedFile,
             //  mode: 'no-cors'
           } // data: `recruitment%2fapplyJob%2f${watchedJobTitle}%2f${selectedFile.name}`,
         ).then((res) => {
           console.log(res, "su");
-        });
+        }).catch((err)=>{
+          console.log(err);
+          
+        })
       } catch (err) {
         console.log(err);
       }

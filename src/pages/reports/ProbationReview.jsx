@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useRef } from "react"; 
+import React, { useEffect, useState } from "react";
 import { FilterTable } from "./FilterTable";
 import logo from "../../assets/logo/logo-with-name.svg";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for routing
-import { ProbationForm } from "./ProbationForm"; // Import the ProbationForm
+import { useNavigate } from "react-router-dom";
+import { ProbationForm } from "./ProbationForm";
 import { VscClose } from "react-icons/vsc";
 
 export const ProbationReview = ({ allData, typeOfReport, reportTitle }) => {
@@ -16,64 +16,73 @@ export const ProbationReview = ({ allData, typeOfReport, reportTitle }) => {
     "Work Position",
     "Probation Expiry Date",
     "Deadline to Return to HRD",
-    "Probation Form"
+    "Probation Form",
   ]);
 
-  const [selectedPerson, setSelectedPerson] = useState(null); // State for the selected person
-  const navigate = useNavigate(); // Hook for navigation
+  const [selectedPerson, setSelectedPerson] = useState(null);
+  const navigate = useNavigate();
+
+  const formatDate = (date) => {
+    if (Array.isArray(date)) {
+      if (date.length === 0) return "-";
+      const lastDate = date[date.length - 1];
+      return formatDate(lastDate);
+    }
+
+    if (!date) return "-";
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) return "-";
+
+    const day = String(parsedDate.getDate()).padStart(2, "0");
+    const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+    const year = parsedDate.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  };
 
   const calculateDeadline = (probationEndDate) => {
     const date = new Date(probationEndDate);
-    date.setDate(date.getDate() - 7); // Subtract 7 days from probationEnd date
-    return date.toISOString().split("T")[0]; // Format as YYYY-MM-DD
+    date.setDate(date.getDate() - 7);
+    return date.toISOString().split("T")[0];
   };
-  
+
   const probationReviewMergedData = (data) => {
-    const today = new Date(); // Get the current date
-    const currentMonth = today.getMonth(); // Current month (0-indexed)
-    const nextMonth = currentMonth + 1; // Next month
-    
-    // Set the first and last day of the next month for comparison
-    const firstDayOfNextMonth = new Date(today.getFullYear(), nextMonth, 1);
-    const lastDayOfNextMonth = new Date(today.getFullYear(), nextMonth + 1, 0);
-  
+    const today = new Date();
+    const firstDayOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1);
+    const lastDayOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+
     return data
       .filter((item) => {
-        // Ensure probationEnd is a valid array with non-empty and valid date entries
-        return (
-          Array.isArray(item.probationEnd) &&
-          item.probationEnd.length > 0 &&
-          item.probationEnd.every(
-            (date) => date !== "" && date !== null && !isNaN(new Date(date).getTime())
-          )
-        );
-      })
-      .filter((item) => {
-        const lastDate = item.probationEnd[item.probationEnd.length - 1];
+        const probationEndDates = item.probationEnd || [];
+        const lastDate = probationEndDates[probationEndDates.length - 1];
+        if (!lastDate) return false;
+
         const probationEnd = new Date(lastDate);
-        // Check if the probationEndDate is within the next month
         return probationEnd >= firstDayOfNextMonth && probationEnd <= lastDayOfNextMonth;
       })
       .map((item) => {
-        const lastDate = item.probationEnd[item.probationEnd.length - 1];
+        const probationEndDates = item.probationEnd || [];
+        const lastDate = probationEndDates[probationEndDates.length - 1];
+        const contractStartDates = item.contractStart || [];
+        const startDate = contractStartDates[contractStartDates.length - 1];
+
         return {
           name: item.name || "-",
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
-          doj: item.doj || "-",
+          doj: formatDate(item.doj) || "-",
           department: item.department || "-",
           position: item.position || "-",
-          probationEndDate: lastDate || "-", // Use the last value
-          deadline: lastDate ? calculateDeadline(lastDate) : "-", // Calculate deadline for the last value
+          probationEndDate: formatDate(lastDate) || "-",
+          deadline: lastDate ? calculateDeadline(lastDate) : "-",
         };
       });
   };
-  
 
   useEffect(() => {
     if (allData && Array.isArray(allData)) {
       const mergedData = probationReviewMergedData(allData);
-      console.log('Merged Data:', mergedData); // Debugging merged data
+      console.log("Merged Data:", mergedData);
       setTableBody(mergedData);
     } else {
       console.warn("Invalid or missing allData:", allData);
@@ -147,7 +156,7 @@ export const ProbationReview = ({ allData, typeOfReport, reportTitle }) => {
               <strong>Probation End Date:</strong> {selectedPerson.probationEndDate}
             </p>
             {/* <p className="flex justify-between mb-2">
-              <strong>Contract End Date:</strong> {selectedPerson.contractEnd || '-' }
+              <strong>Contract End Date:</strong> {selectedPerson.probationEnd || '-' }
             </p> */}
 
             <div className="flex justify-evenly items-center p-3">

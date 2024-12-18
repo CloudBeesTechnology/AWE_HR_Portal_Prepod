@@ -532,31 +532,25 @@ export const onCreateProbForm = /* GraphQL */ `
       commitment
       communication
       deadline
-      department
       diligent
-      doj
-      empBadgeNo
-      extendedProbationEndDate
       extensionPeriod
-      gmApproved
       gmDate
       hrDate
       hrName
       initiative
-      managerApproved
       managerDate
       managerName
-      name
       pace
-      position
-      probationEnd
       quality
       recommendation
       responsibility
-      supervisorApproved
       supervisorDate
       supervisorName
       teamwork
+      extendProbED
+      gmApproved
+      managerApproved
+      supervisorApproved
       createdAt
       updatedAt
       __typename
@@ -575,31 +569,25 @@ export const onUpdateProbForm = /* GraphQL */ `
       commitment
       communication
       deadline
-      department
       diligent
-      doj
-      empBadgeNo
-      extendedProbationEndDate
       extensionPeriod
-      gmApproved
       gmDate
       hrDate
       hrName
       initiative
-      managerApproved
       managerDate
       managerName
-      name
       pace
-      position
-      probationEnd
       quality
       recommendation
       responsibility
-      supervisorApproved
       supervisorDate
       supervisorName
       teamwork
+      extendProbED
+      gmApproved
+      managerApproved
+      supervisorApproved
       createdAt
       updatedAt
       __typename
@@ -618,31 +606,25 @@ export const onDeleteProbForm = /* GraphQL */ `
       commitment
       communication
       deadline
-      department
       diligent
-      doj
-      empBadgeNo
-      extendedProbationEndDate
       extensionPeriod
-      gmApproved
       gmDate
       hrDate
       hrName
       initiative
-      managerApproved
       managerDate
       managerName
-      name
       pace
-      position
-      probationEnd
       quality
       recommendation
       responsibility
-      supervisorApproved
       supervisorDate
       supervisorName
       teamwork
+      extendProbED
+      gmApproved
+      managerApproved
+      supervisorApproved
       createdAt
       updatedAt
       __typename
@@ -1830,14 +1812,6 @@ export const onCreateEmpLeaveDetails = /* GraphQL */ `
       sickLeave
       sickLeaveDate
       hospLeave
-      remainingAnualLeave
-      remainingSickLeave
-      remainingMateLeave
-      remainingMrageLeave
-      remainingPaternityLeave
-      remainingHosLeave
-      remainingCompasLeave
-      unPaidAuthorize
       createdAt
       updatedAt
       __typename
@@ -1864,14 +1838,6 @@ export const onUpdateEmpLeaveDetails = /* GraphQL */ `
       sickLeave
       sickLeaveDate
       hospLeave
-      remainingAnualLeave
-      remainingSickLeave
-      remainingMateLeave
-      remainingMrageLeave
-      remainingPaternityLeave
-      remainingHosLeave
-      remainingCompasLeave
-      unPaidAuthorize
       createdAt
       updatedAt
       __typename
@@ -1898,14 +1864,6 @@ export const onDeleteEmpLeaveDetails = /* GraphQL */ `
       sickLeave
       sickLeaveDate
       hospLeave
-      remainingAnualLeave
-      remainingSickLeave
-      remainingMateLeave
-      remainingMrageLeave
-      remainingPaternityLeave
-      remainingHosLeave
-      remainingCompasLeave
-      unPaidAuthorize
       createdAt
       updatedAt
       __typename

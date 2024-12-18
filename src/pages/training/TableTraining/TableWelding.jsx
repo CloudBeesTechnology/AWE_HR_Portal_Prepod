@@ -96,6 +96,7 @@ export const TableWelding = () => {
 
   const addWelForm = [
     { header: "Employee ID", key: "empID" },
+    { header: "Employee Badge No", key: "empBadgeNo" },
     { header: "Name", key: "name" },
     { header: "Welding Stamp Number", key: "weldingStampNor" },
     { header: "WQR Number", key: "WQRNo" },

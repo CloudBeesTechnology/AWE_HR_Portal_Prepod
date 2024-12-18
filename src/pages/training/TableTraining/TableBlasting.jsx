@@ -9,6 +9,7 @@ export const TableBlasting = () => {
 
   const addBastingForm = [
     { header: "Employee ID", key: "empID" },
+    { header: "Employee Badge No", key: "empBadgeNo" },
     { header: "Name", key: "name" },
     { header: "Remarks for Blasting", key: "blastingRemarks" },
     { header: "Start Date", key: "blastingStartDate" },

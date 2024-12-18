@@ -61,7 +61,7 @@ export const ConfirmationForm = ({register}) => {
               The appointment to be extended for a further probationary period of
               <input
                 type="text"
-                {...register("extendedProbationEndDate")}
+                {...register("extendProbED")}
                 className="w-12 border-b outline-none text-center ml-2"
                 placeholder="0"
               />{" "}
@@ -113,11 +113,32 @@ export const ConfirmationForm = ({register}) => {
               className="border-b outline-none px-1"
             />
           </div>
-
-          <div className="flex items-center space-x-2 border-b">
+          <div className="flex items-center space-x-10 border-b">
+  <div className="flex items-center space-x-2">
+    <input
+      type="radio"
+      value="Approved"
+      {...register("supervisorApproved")}
+      id="approved"
+      className=" h-4 w-4 form-checkbox"
+    />
+    <label htmlFor="approved" className="text-sm">Approved</label>
+  </div>
+  <div className="flex items-center space-x-2">
+    <input
+      type="radio"
+      value="Reject"
+      {...register("supervisorApproved")}
+      id="reject"
+      className=" h-4 w-4 form-checkbox"
+    />
+    <label htmlFor="reject" className="text-sm">Rejected</label>
+  </div>
+</div>
+          {/* <div className="flex items-center space-x-2 border-b">
             <label className="text-sm font-medium">Approved</label>
             <input type="checkbox" {...register("supervisorApproved")} className="form-checkbox h-4 w-4" />
-          </div>
+          </div> */}
 
           <div className="flex items-center space-x-2 border-b">
             <input type="date" {...register("supervisorDate")} className="outline-none" />
@@ -134,11 +155,32 @@ export const ConfirmationForm = ({register}) => {
               className="border-b outline-none px-1"
             />
           </div>
-
-          <div className="flex items-center space-x-2 border-b">
+          <div className="flex items-center space-x-10 border-b">
+  <div className="flex items-center space-x-2">
+    <input
+      type="radio"
+      value="Approved"
+      {...register("managerApproved")}
+      id="approved"
+      className=" h-4 w-4 form-checkbox"
+    />
+    <label htmlFor="approved" className="text-sm">Approved</label>
+  </div>
+  <div className="flex items-center space-x-2">
+    <input
+      type="radio"
+      value="Reject"
+      {...register("managerApproved")}
+      id="reject"
+      className=" h-4 w-4 form-checkbox"
+    />
+    <label htmlFor="reject" className="text-sm">Rejected</label>
+  </div>
+</div>
+          {/* <div className="flex items-center space-x-2 border-b">
             <label className="text-sm font-medium">Approved</label>
             <input type="checkbox" {...register("managerApproved")} className="form-checkbox h-4 w-4" />
-          </div>
+          </div> */}
 
           <div className="flex items-center space-x-2 border-b">
             <input type="date" {...register("managerDate")} className="outline-none" />
@@ -151,10 +193,29 @@ export const ConfirmationForm = ({register}) => {
             <p className="font-semibold">Concurred By GM :</p>
             <p>(For Staff Category Only)</p>
           </div>
-          <div className="flex items-center space-x-2 border-b">
-            <label className="text-sm font-medium">Approved</label>
-            <input type="checkbox" {...register("gmApproved")} className="form-checkbox h-4 w-4" />
-          </div>
+          <div className="flex items-center space-x-10 border-b">
+  <div className="flex items-center space-x-2">
+    <input
+      type="radio"
+      value="Approved"
+      {...register("gmApproved")}
+      id="approved"
+      className=" h-4 w-4 form-checkbox"
+    />
+    <label htmlFor="approved" className="text-sm">Approved</label>
+  </div>
+  <div className="flex items-center space-x-2">
+    <input
+      type="radio"
+      value="Reject"
+      {...register("gmApproved")}
+      id="reject"
+      className=" h-4 w-4 form-checkbox"
+    />
+    <label htmlFor="reject" className="text-sm">Rejected</label>
+  </div>
+</div>
+
           <div className="flex items-center space-x-2 border-b">
             <input type="date" {...register("gmDate")} className="outline-none" />
           </div>

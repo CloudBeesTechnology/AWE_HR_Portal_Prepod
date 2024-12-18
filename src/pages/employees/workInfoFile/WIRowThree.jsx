@@ -14,14 +14,14 @@ export const WIRowThree = ({ register, errors, watch, setValue, control }) => {
 
       />
       <FormField
-        label="Normal Working Day per Week"
+        label="Normal Working Day Per Week"
         register={register}
         type="text"
         name="workWeek"
         errors={errors}
       />
       <FormField
-        label="Normal Working Day per Month"
+        label="Normal Working Day Per Month"
         register={register}
         type="text"
         name="workMonth"
@@ -43,6 +43,13 @@ export const WIRowThree = ({ register, errors, watch, setValue, control }) => {
         name="salaryType"
         errors={errors}
       />
+      {/* <FormField
+        label="Annual Leave Balance for 2024"
+        register={register}
+        type="text"
+        name="leaveBal"
+        errors={errors}
+      /> */}
 
     </div>
   )

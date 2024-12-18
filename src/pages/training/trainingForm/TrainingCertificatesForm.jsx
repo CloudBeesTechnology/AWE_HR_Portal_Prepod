@@ -30,7 +30,7 @@ export const TrainingCertificatesForm = () => {
     trainingUpCertifi: null,
   });
   const [uploadeTC, setUploadTC] = useState({
-    trainingUpCertifi: null,
+    trainingUpCertifi: [],
   });
 
   useEffect(() => {

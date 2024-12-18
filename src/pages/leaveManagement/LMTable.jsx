@@ -7,19 +7,14 @@ import { Filter } from "./Filter";
 export const LMTable = () => {
   const {
     handleClickForToggle,
-    filteredData,
-    handleViewClick,
-    handleDeleteLeaveStatus,
-    personalInfo,
+    handleViewClick,  
     formatDate,
-    userType,
-    statusUpdate,
+    userType,  
     currentPage,
-    setCurrentPage,
+    data,
     rowsPerPage,
   } = useOutletContext();
 
-  const [filterStatus, setFilterStatus] = useState("All"); // State for filter status
   const [lastUploadUrl, setPPLastUP] = useState(""); // State to store the last uploaded file's URL
 
   // Logic to get the URL of the uploaded file
@@ -33,29 +28,6 @@ export const LMTable = () => {
   };
 
   const startIndex = (currentPage - 1) * rowsPerPage;
-
-  // Handle filter status change
-  const handleFilterChange = (status) => {
-    console.log("Filter changed to:", status); // Debug log
-    setFilterStatus(status);
-    setCurrentPage(1); // Reset to the first page on filter change
-  };
-
-  // Apply filtering based on filterStatus and userType
-  const filteredFinalData = filteredData.filter((item) => {
-    const status =
-      userType === "Manager"
-        ? item.managerStatus
-        : userType === "Supervisor"
-        ? item.supervisorStatus
-        : null;
-
-    if (filterStatus === "All") {
-      return true;
-    }
-
-    return status === filterStatus;
-  });
 
   // Conditional table headers based on userType
   const heading = [
@@ -72,25 +44,6 @@ export const LMTable = () => {
     userType !== "SuperAdmin" && userType !== "HR" && "Status",
   ].filter(Boolean);
 
-  // Determine final data based on user type
-  const userID = localStorage.getItem("userID");
-  let finalDataFiltered;
-
-  if (userType === "Manager") {
-    finalDataFiltered = filteredFinalData.filter((item) => {
-      const condition =
-        (item?.supervisorStatus === "Approved" &&
-          item?.managerEmpID.toString().toLowerCase() === userID) ||
-        item?.managerEmpID.toString().toLowerCase() === userID;
-      return condition;
-    });
-  } else if (userType === "Supervisor") {
-    finalDataFiltered = filteredFinalData.filter((item) => {
-      return item?.supervisorEmpID?.toString().toLowerCase() === userID;
-    });
-  } else {
-    finalDataFiltered = filteredFinalData;
-  }
   const getStatusClass = (status) => {
     return status === "Rejected"
       ? "text-[red]"
@@ -100,19 +53,13 @@ export const LMTable = () => {
       ? "text-dark_grey"
       : "text-[#E8A317]";
   };
+console.log(data.length);
 
   return (
-    <section className="flex flex-col py-5">
-      <div className="relative h-full">
-        <div className="absolute -top-14 -right-10">
-          {userType !== "HR" && userType !== "SuperAdmin" && (
-            <Filter AfterFilter={handleFilterChange} />
-          )}
-        </div>
-      </div>
-      <div className="leaveManagementTable w-full max-w-[100%] overflow-x-auto rounded-xl">
-        {finalDataFiltered && finalDataFiltered.length > 0 ? (
-          <table className="w-[1150px] font-semibold text-sm text-center">
+    <section className="flex flex-col w-full mt-4">
+      <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl ">
+        {data && data.length > 0 ? (
+          <table className="w-full font-semibold text-sm text-center">
             <thead className="bg-[#939393] sticky top-0 rounded-t-lg">
               <tr>
                 {heading.map((header, index) => (
@@ -123,8 +70,8 @@ export const LMTable = () => {
               </tr>
             </thead>
             <tbody>
-              {finalDataFiltered && finalDataFiltered.length > 0 ? (
-                finalDataFiltered.map((item, index) => {
+              {data && data.length > 0 ? (
+                data.map((item, index) => {
                   const displayIndex = startIndex + index + 1; // Adjust index based on pagination
 
                   return (
@@ -134,10 +81,10 @@ export const LMTable = () => {
                     >
                       <td className="py-3">{displayIndex}</td>
                       <td className="py-3">{item.empID}</td>
+                      <td className="py-3">{item.empName || "Tony Stark"}</td>
                       <td className="py-3">
-                        {item.empName || "Tony Stark"}
+                        {formatDate(item.leaveStatusCreatedAt)}
                       </td>
-                      <td className="py-3">{formatDate(item.leaveStatusCreatedAt)}</td>
                       {userType !== "Supervisor" && userType !== "Manager" && (
                         <td className="py-3">{item.supervisorName || "N/A"}</td>
                       )}

@@ -163,9 +163,11 @@ export const WorkInfoSchema = Yup.object().shape({
   otherJobCat: Yup.string().notRequired(),
 
   doj: Yup.date()
-    .nullable()
-    .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .required("Date of Join is mandatory"),
+  .nullable()
+  .transform((value, originalValue) => (originalValue === "" ? null : value))
+  .required("Date of Join is mandatory")
+  .max(new Date(), "Date of Join cannot be in the future"),
+
    
   jobDesc: Yup.string().required("Job Description is mandatory"),
   skillPool: Yup.string().required("Skill Pool is mandatory"),
@@ -252,6 +254,9 @@ export const WorkInfoSchema = Yup.object().shape({
     .required("Type of Salary Pay is mandatory")
     .notOneOf([""], "Type of Salary Pay is mandatory"),
 
+  // leaveBal: Yup.string()
+  // .required("Leave Balance is mandatory"),
+
   resignDate: Yup.string().notRequired(),
   termiDate: Yup.string().notRequired(),
   resignNotProb: Yup.string().notRequired(),
@@ -289,7 +294,7 @@ export const WorkInfoSchema = Yup.object().shape({
   materLeave: Yup.string().notRequired(),
   paterLeave: Yup.string().notRequired(),
   mrageLeave: Yup.string().notRequired(),
-  compasLeave: Yup.string().notRequired(),
+  // compasLeave: Yup.string().notRequired(),
   // WIProbation: Yup.array()
   //   .of(
   //     Yup.mixed()

@@ -60,7 +60,7 @@ export const UpdateWIData = () => {
       salaryType,
       annualLeave,
       annualLeaveDate,
-      compasLeave,
+      // compasLeave,
       destinateLeavePass,
       durLeavePass,
       dateLeavePass,
@@ -71,14 +71,7 @@ export const UpdateWIData = () => {
       sickLeave,
       sickLeaveDate,
       hospLeave,
-      remainingAnualLeave,
-      remainingCompasLeave,
-      remainingHosLeave,
-      remainingMateLeave,
-      remainingMrageLeave,
-      remainingPaternityLeave,
-      remainingSickLeave,
-      unPaidAuthorize,
+  
       resignDate,
       resignNotProb,
       otherResignNotProb,
@@ -306,16 +299,9 @@ export const UpdateWIData = () => {
       materLeave,
       paterLeave,
       mrageLeave,
-      compasLeave,
+      // compasLeave,
       hospLeave, 
-      remainingAnualLeave,
-      remainingCompasLeave,
-      remainingHosLeave,
-      remainingMateLeave,
-      remainingMrageLeave,
-      remainingPaternityLeave,
-      remainingSickLeave,
-      unPaidAuthorize,
+     
     };
     
       // console.log(totalData1, "ertdfghjkhbtxrfgh");

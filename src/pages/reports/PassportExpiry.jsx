@@ -13,6 +13,25 @@ export const PassportExpiry = ({ allData, typeOfReport, reportTitle }) => {
     "Passport Expiry",
   ]);
 
+  const formatDate = (date, type) => {
+    if (Array.isArray(date)) {
+      if (date.length === 0) return "-";
+      const lastDate = date[date.length - 1];
+      return formatDate(lastDate, type);
+    }
+
+    if (!date) return "-";
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) return "-";
+
+    const day = String(parsedDate.getDate()).padStart(2, "0");
+    const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+    const year = parsedDate.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  };
+
+
   // Function to filter data for the current month (1 year after today)
   const filterPassportExpiry = (data) => {
     const today = new Date();
@@ -48,9 +67,9 @@ export const PassportExpiry = ({ allData, typeOfReport, reportTitle }) => {
       nationality: item.nationality || "-",
       department: item.department || "-",
       position: item.position || "-",
-      ppExpiry: Array.isArray(item.ppExpiry)
-        ? item.ppExpiry[item.ppExpiry.length - 1] || "-"
-        : "-", // Show the last value of ppExpiry
+      ppExpiry:  Array.isArray(item.ppExpiry)
+      ? formatDate(item.ppExpiry[item.ppExpiry.length - 1])
+      : "-",
     }));
 
     setTableBody(filteredData);

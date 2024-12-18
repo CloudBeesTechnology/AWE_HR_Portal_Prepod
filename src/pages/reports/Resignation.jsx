@@ -14,6 +14,25 @@ export const Resignation = ({ allData, typeOfReport, reportTitle }) => {
     "Reason of Resignation",
   ]);
 
+  const formatDate = (date, type) => {
+    if (Array.isArray(date)) {
+      if (date.length === 0) return "-";
+      const lastDate = date[date.length - 1];
+      return formatDate(lastDate, type);
+    }
+
+    if (!date) return "-";
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) return "-";
+
+    const day = String(parsedDate.getDate()).padStart(2, "0");
+    const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+    const year = parsedDate.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  };
+
+
   // Generate table body dynamically from mergedData
   const resignationMergedData = (data) => {
     return data
@@ -25,8 +44,8 @@ export const Resignation = ({ allData, typeOfReport, reportTitle }) => {
         nationality: item.nationality || "-",
         department: item.department || "-",
         position: item.position || "-",
-        resignDate: item.resignDate || "-",
-        resignNotProb: item.resignNotProb || "-",
+        resignDate: formatDate(item.resignDate) || "-",
+        reasonResign: item.reasonResign || "-",
       }));
   };
   

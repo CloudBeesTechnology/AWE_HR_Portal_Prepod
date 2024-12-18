@@ -4,20 +4,39 @@ import { updateProbForm } from "../../graphql/mutations";
 
 export const UpdateProbForm = () => {
   const client = generateClient();
-  const UpdateProb = useCallback(async ({ BJLUpValue }) => {
-    if (!BJLUpValue ) {
+  const UpdateProb = useCallback(async ({ PbFDataUp }) => {
+    if (!PbFDataUp ) {
       throw new Error("Missing required parameters");
     }
     const totalData = {
-        id:BJLUpValue.id,
-        empID: BJLUpValue.empID,
-      bankSubmit: BJLUpValue.bankSubmit,
-      bankRece: BJLUpValue.bankRece,
-      bankRefNo: [BJLUpValue.bankRefNo],
-      bankAmt: [BJLUpValue.bankAmt],
-      bankValid: BJLUpValue.bankValid,
-      bankEndorse: BJLUpValue.bankEndorse,
-      bankEmpUpload: [BJLUpValue.bankEmpUpload],
+        id:PbFDataUp.id,
+        empID: PbFDataUp.empID,
+        adaptability: PbFDataUp.adaptability,
+        additionalInfo: PbFDataUp.additionalInfo,
+        attention: PbFDataUp.attention,
+        attitude: PbFDataUp.attitude,
+        commitment: PbFDataUp.commitment,
+        communication: PbFDataUp.communication,
+        deadline: PbFDataUp.deadline,
+        diligent: PbFDataUp.diligent,
+        extendProbED: PbFDataUp.extendProbED,
+        extensionPeriod: PbFDataUp.extensionPeriod,
+        gmApproved: PbFDataUp.gmApproved,
+        gmDate: PbFDataUp.gmDate,
+        hrDate: PbFDataUp.hrDate,
+        hrName: PbFDataUp.hrName,
+        initiative: PbFDataUp.initiative,
+        managerApproved: PbFDataUp.managerApproved,
+        managerDate: PbFDataUp.managerDate,
+        managerName: PbFDataUp.managerName,
+        pace: PbFDataUp.pace,
+        quality: PbFDataUp.quality,
+        recommendation: PbFDataUp.recommendation,
+        responsibility: PbFDataUp.responsibility,
+        supervisorApproved: PbFDataUp.supervisorApproved,
+        supervisorDate: PbFDataUp.supervisorDate,
+        supervisorName: PbFDataUp.supervisorName,
+        teamwork: PbFDataUp.teamwork, 
 
     };
     console.log(totalData);

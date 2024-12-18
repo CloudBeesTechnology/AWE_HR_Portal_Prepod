@@ -24,7 +24,7 @@ export const User = () => {
 
   // pagination process
   const [currentPage, setCurrentPage] = useState(1); // updated by hari
-  const [rowsPerPage, setRowsPerPage] = useState(5); // updated by hari
+  const [rowsPerPage, setRowsPerPage] = useState(30); // updated by hari
   const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
@@ -141,7 +141,7 @@ export const User = () => {
 
   return (
     <section
-      className=" flex justify-center px-10 py-20 bg-[#F8F8F8] h-screen relative"
+      className=" flex justify-center px-10 py-20 bg-[#F8F8F8] min-h-screen relative"
       onClick={() => {
         setFilteredEmployees([]);
       }}
@@ -172,16 +172,16 @@ export const User = () => {
         </section>
         <div className="flex flex-col flex-grow">
           <div className="px-1 ">
-            <table className="w-full mx-auto bg-white pt-10">
-              <thead>
-                <tr className="text_size_5 text-dark_grey ">
-                  <th className="px-2 text-start py-3">EMP ID</th>
-                  <th className="px-2 text-start  py-3">Name</th>
-                  <th className="px-2 text-start py-3">Type</th>
-                  <th className="px-2 text-start py-3">Official Email Id</th>
-                  <th className="px-2 text-start py-3">Password</th>
-                  <th className="px-2 text-center py-3">ViewForm</th>
-                  <th className="px-2 text-start py-3">Actions</th>
+            <table className="w-full mx-auto bg-white pt-10 ">
+              <thead className="px-5">
+                <tr className="text_size_5 text-dark_grey px-5">
+                  <th className="px-5 text-start py-3">EMP ID</th>
+                  <th className="px-5 text-start  py-3">Name</th>
+                  <th className="px-5 text-start py-3">Type</th>
+                  <th className="px-5 text-start py-3">Official Email Id</th>
+                  <th className="px-5 text-start py-3">Password</th>
+                  <th className="px-5 text-center py-3">ViewForm</th>
+                  <th className="px-5 text-start py-3">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -189,12 +189,12 @@ export const User = () => {
                   filteredData.map((val, i) => {
                     return (
                       <tr key={i}>
-                        <td className="px-2 py-2">{val.empID}</td>
-                        {/* <td className="px-2 py-2">{val.empID}</td> */}
-                        <td className="px-2 py-2">{val.name}</td>
-                        <td className="px-2 py-2">{val.selectType}</td>
-                        <td className="px-2 py-2">{val.officialEmail}</td>
-                        <td className="px-2 w-[200px] py-2 text-center">
+                        <td className="px-5 py-2 ">{val.empID}</td>
+                        {/* <td className="px-5 py-2">{val.empID}</td> */}
+                        <td className="px-5 py-2">{val.name}</td>
+                        <td className="px-5 py-2">{val.selectType}</td>
+                        <td className="px-5 py-2">{val.officialEmail}</td>
+                        <td className="px-5 w-[200px] py-2 text-center">
                           <input
                             type="password"
                             className="outline-none w-full"
@@ -214,7 +214,7 @@ export const User = () => {
                             View
                           </span>
                         </td>
-                        <td className="px-2 py-2">
+                        <td className="px-5 py-2">
                           <div className="flex gap-5">
                             <span
                               onClick={() => {

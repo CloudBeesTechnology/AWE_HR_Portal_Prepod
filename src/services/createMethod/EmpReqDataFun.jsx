@@ -15,9 +15,11 @@ export const EmpReqDataFun = () => {
     }
 
     const totalData = {
-        reqName:EmpReqValue.reqName,
         userID,
-        department:EmpReqValue.department,  
+        requestorID: EmpReqValue.requestorID,
+        approverID: EmpReqValue.approverID,
+        reqName: EmpReqValue.reqName,
+        department: EmpReqValue.department,  
         project: EmpReqValue.project,
         position: EmpReqValue.position,
         quantity: EmpReqValue.quantity,

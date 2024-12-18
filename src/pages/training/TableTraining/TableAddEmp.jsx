@@ -8,6 +8,7 @@ export const TableAddEmp = () => {
 
   const addTrainingForm = [
     { header: "Employee ID", key: "empID" },
+    { header: "Employee Badge No", key: "empBadgeNo" },
     { header: "Name", key: "name" },
     { header: "Material Requisition ", key: "MRNo" },
     { header: "Medical Name", key: "medicalName" },

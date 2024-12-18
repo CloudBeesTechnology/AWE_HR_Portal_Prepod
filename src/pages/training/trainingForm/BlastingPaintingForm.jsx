@@ -31,7 +31,7 @@ export const BlastingPaintingForm = () => {
     blastingUpload: null,
   });
   const [uploadeBlast, setUploadBlast] = useState({
-    blastingUpload: null,
+    blastingUpload: [],
   });
   const {
     register,
