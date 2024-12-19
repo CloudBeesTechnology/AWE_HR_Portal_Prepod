@@ -1909,6 +1909,7 @@ export const createEmpLeaveDetails = /* GraphQL */ `
       sickLeave
       sickLeaveDate
       hospLeave
+      pervAnnualLeaveBal
       createdAt
       updatedAt
       __typename
@@ -1936,6 +1937,7 @@ export const updateEmpLeaveDetails = /* GraphQL */ `
       sickLeave
       sickLeaveDate
       hospLeave
+      pervAnnualLeaveBal
       createdAt
       updatedAt
       __typename
@@ -1963,6 +1965,7 @@ export const deleteEmpLeaveDetails = /* GraphQL */ `
       sickLeave
       sickLeaveDate
       hospLeave
+      pervAnnualLeaveBal
       createdAt
       updatedAt
       __typename

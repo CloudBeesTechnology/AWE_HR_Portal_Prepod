@@ -348,44 +348,93 @@ export const Notifications = () => {
                 </tr>
               ))}
           </tbody>
-          <tbody>
-            {listOfNotifications &&
-              listOfNotifications.map((notification1, index) => (
-                <tr key={index} className="border-b last:border-b-0 ">
-                  <td className="p-7">{notification1.date}</td>
-                  <td className="p-7 text_size_6 text-dark_grey gap-5">
-                    {notification1.subject} <br />
-                    <span className="text-sm text-dark_ash">
-                      Please take immediate action to renew your{" "}
-                      {notification1.subject}...
-                    </span>
-                  </td>
-                  <td className="pr-14 ">
-                    <span
-                      className="border-b-2 py-1 cursor-pointer"
-                      onClick={() => {
-                        toggleFunction();
-                        sendToPopup(notification1);
-                      }}
-                    >
-                      Read More
-                    </span>
-                  </td>
-                  <td className="px-4">
-                    <div className=" mt-3.5 w-[60px] border label-new ">
-                      <span className="flex justify-center items-center">
-                        New
-                      </span>
-                    </div>
-                  </td>
-                  {/* {notification.isNew && (   
-              <td className=" mt-3.5 w-[60px] border label-new ">
-                   <span className="flex justify-center items-center"> New</span>
-              </td>
-              )} */}
-                </tr>
-              ))}
-          </tbody>
+          {/* <tbody>
+  {listOfNotifications &&
+    listOfNotifications.map((notification1, index) => (
+      <tr key={index} className="border-b last:border-b-0 ">
+        <td className="p-7">{notification1.date}</td>
+        <td className="p-7 text_size_6 text-dark_grey gap-5">
+          {notification1.subject} <br />
+          <span className="text-sm text-dark_ash">
+            Please take immediate action to renew your{" "}
+            {notification1.subject}...
+          </span>
+        </td>
+        <td className="pr-14 ">
+          <span
+            className="border-b-2 py-1 cursor-pointer"
+            onClick={() => {
+              toggleFunction();
+              sendToPopup(notification1);
+              // Mark notification as read
+              const updatedNotifications = [...listOfNotifications];
+              updatedNotifications[index].read = true;
+              setListOfNotifications(updatedNotifications); // Update state
+            }}
+          >
+            Read More
+          </span>
+        </td>
+        <td className="px-4">
+          {!notification1.read && ( // Show "New" only if the notification is unread
+            <div className="mt-3.5 w-[60px] border label-new ">
+              <span className="flex justify-center items-center">
+                New
+              </span>
+            </div>
+          )}
+        </td>
+      </tr>
+    ))}
+</tbody> */}
+<tbody>
+  {listOfNotifications &&
+    listOfNotifications.map((notification1, index) => (
+      <tr key={index} className="border-b last:border-b-0">
+        <td className="p-7">{notification1.date}</td>
+        <td className="p-7 text_size_6 text-dark_grey gap-5">
+          {notification1.subject} <br />
+          <span className="text-sm text-dark_ash">
+            Please take immediate action to renew your{" "}
+            {notification1.subject}...
+          </span>
+        </td>
+        <td className="pr-14">
+          <span
+            className="border-b-2 py-1 cursor-pointer"
+            onClick={() => {
+              toggleFunction();
+              sendToPopup(notification1);
+              // Mark notification as read
+              const updatedNotifications = [...listOfNotifications];
+              updatedNotifications[index].read = true;
+              setListOfNotifications(updatedNotifications);
+            }}
+          >
+            Read More
+          </span>
+        </td>
+        <td className="px-4">
+          {notification1.read ? (
+            // Show "Read" label for read notifications
+            <div className="mt-3.5 w-[60px]  label-read">
+              <span className="flex justify-center items-center text-grey">
+                Readed
+              </span>
+            </div>
+          ) : (
+            // Show "New" label for unread notifications
+            <div className="mt-3.5 w-[60px] border label-new bg-blue-500">
+              <span className="flex justify-center items-center text-white">
+                New
+              </span>
+            </div>
+          )}
+        </td>
+      </tr>
+    ))}
+</tbody>
+
         </table>
       </div>
       {toggleForPopup && (

@@ -461,6 +461,7 @@ type EmpLeaveDetails @aws_iam @aws_api_key {
   sickLeave: String
   sickLeaveDate: String
   hospLeave: String
+  pervAnnualLeaveBal: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -3819,6 +3820,7 @@ input ModelEmpLeaveDetailsFilterInput {
   sickLeave: ModelStringInput
   sickLeaveDate: ModelStringInput
   hospLeave: ModelStringInput
+  pervAnnualLeaveBal: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelEmpLeaveDetailsFilterInput]
@@ -3841,6 +3843,7 @@ input ModelEmpLeaveDetailsConditionInput {
   sickLeave: ModelStringInput
   sickLeaveDate: ModelStringInput
   hospLeave: ModelStringInput
+  pervAnnualLeaveBal: ModelStringInput
   and: [ModelEmpLeaveDetailsConditionInput]
   or: [ModelEmpLeaveDetailsConditionInput]
   not: ModelEmpLeaveDetailsConditionInput
@@ -3864,6 +3867,7 @@ input CreateEmpLeaveDetailsInput {
   sickLeave: String
   sickLeaveDate: String
   hospLeave: String
+  pervAnnualLeaveBal: String
 }
 
 input UpdateEmpLeaveDetailsInput {
@@ -3882,6 +3886,7 @@ input UpdateEmpLeaveDetailsInput {
   sickLeave: String
   sickLeaveDate: String
   hospLeave: String
+  pervAnnualLeaveBal: String
 }
 
 input DeleteEmpLeaveDetailsInput {
@@ -3904,6 +3909,7 @@ input ModelSubscriptionEmpLeaveDetailsFilterInput {
   sickLeave: ModelSubscriptionStringInput
   sickLeaveDate: ModelSubscriptionStringInput
   hospLeave: ModelSubscriptionStringInput
+  pervAnnualLeaveBal: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionEmpLeaveDetailsFilterInput]

@@ -36,6 +36,7 @@ export declare type EmpLeaveDetailsUpdateFormInputValues = {
     sickLeave?: string;
     sickLeaveDate?: string;
     hospLeave?: string;
+    pervAnnualLeaveBal?: string;
 };
 export declare type EmpLeaveDetailsUpdateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -52,6 +53,7 @@ export declare type EmpLeaveDetailsUpdateFormValidationValues = {
     sickLeave?: ValidationFunction<string>;
     sickLeaveDate?: ValidationFunction<string>;
     hospLeave?: ValidationFunction<string>;
+    pervAnnualLeaveBal?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type EmpLeaveDetailsUpdateFormOverridesProps = {
@@ -70,6 +72,7 @@ export declare type EmpLeaveDetailsUpdateFormOverridesProps = {
     sickLeave?: PrimitiveOverrideProps<TextFieldProps>;
     sickLeaveDate?: PrimitiveOverrideProps<TextFieldProps>;
     hospLeave?: PrimitiveOverrideProps<TextFieldProps>;
+    pervAnnualLeaveBal?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type EmpLeaveDetailsUpdateFormProps = React.PropsWithChildren<{
     overrides?: EmpLeaveDetailsUpdateFormOverridesProps | undefined | null;

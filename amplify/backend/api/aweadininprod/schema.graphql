@@ -409,6 +409,7 @@ type EmpLeaveDetails @model @auth(rules: [{allow: public}]) {
   sickLeave: String
   sickLeaveDate: String
   hospLeave: String
+  pervAnnualLeaveBal: String
 }
 
 type TerminationInfo @model @auth(rules: [{allow: public}]) {

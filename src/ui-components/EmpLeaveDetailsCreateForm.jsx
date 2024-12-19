@@ -203,6 +203,7 @@ export default function EmpLeaveDetailsCreateForm(props) {
     sickLeave: "",
     sickLeaveDate: "",
     hospLeave: "",
+    pervAnnualLeaveBal: "",
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [annualLeave, setAnnualLeave] = React.useState(
@@ -232,6 +233,9 @@ export default function EmpLeaveDetailsCreateForm(props) {
     initialValues.sickLeaveDate
   );
   const [hospLeave, setHospLeave] = React.useState(initialValues.hospLeave);
+  const [pervAnnualLeaveBal, setPervAnnualLeaveBal] = React.useState(
+    initialValues.pervAnnualLeaveBal
+  );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setEmpID(initialValues.empID);
@@ -254,6 +258,7 @@ export default function EmpLeaveDetailsCreateForm(props) {
     setSickLeave(initialValues.sickLeave);
     setSickLeaveDate(initialValues.sickLeaveDate);
     setHospLeave(initialValues.hospLeave);
+    setPervAnnualLeaveBal(initialValues.pervAnnualLeaveBal);
     setErrors({});
   };
   const [currentAnnualLeaveValue, setCurrentAnnualLeaveValue] =
@@ -288,6 +293,7 @@ export default function EmpLeaveDetailsCreateForm(props) {
     sickLeave: [],
     sickLeaveDate: [],
     hospLeave: [],
+    pervAnnualLeaveBal: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -329,6 +335,7 @@ export default function EmpLeaveDetailsCreateForm(props) {
           sickLeave,
           sickLeaveDate,
           hospLeave,
+          pervAnnualLeaveBal,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -405,6 +412,7 @@ export default function EmpLeaveDetailsCreateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
+              pervAnnualLeaveBal,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -438,6 +446,7 @@ export default function EmpLeaveDetailsCreateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
+              pervAnnualLeaveBal,
             };
             const result = onChange(modelFields);
             values = result?.annualLeave ?? values;
@@ -498,6 +507,7 @@ export default function EmpLeaveDetailsCreateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
+              pervAnnualLeaveBal,
             };
             const result = onChange(modelFields);
             values = result?.annualLeaveDate ?? values;
@@ -565,6 +575,7 @@ export default function EmpLeaveDetailsCreateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
+              pervAnnualLeaveBal,
             };
             const result = onChange(modelFields);
             value = result?.compasLeave ?? value;
@@ -598,6 +609,7 @@ export default function EmpLeaveDetailsCreateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
+              pervAnnualLeaveBal,
             };
             const result = onChange(modelFields);
             values = result?.destinateLeavePass ?? values;
@@ -664,6 +676,7 @@ export default function EmpLeaveDetailsCreateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
+              pervAnnualLeaveBal,
             };
             const result = onChange(modelFields);
             values = result?.durLeavePass ?? values;
@@ -724,6 +737,7 @@ export default function EmpLeaveDetailsCreateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
+              pervAnnualLeaveBal,
             };
             const result = onChange(modelFields);
             values = result?.dateLeavePass ?? values;
@@ -784,6 +798,7 @@ export default function EmpLeaveDetailsCreateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
+              pervAnnualLeaveBal,
             };
             const result = onChange(modelFields);
             values = result?.leavePass ?? values;
@@ -846,6 +861,7 @@ export default function EmpLeaveDetailsCreateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
+              pervAnnualLeaveBal,
             };
             const result = onChange(modelFields);
             value = result?.materLeave ?? value;
@@ -883,6 +899,7 @@ export default function EmpLeaveDetailsCreateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
+              pervAnnualLeaveBal,
             };
             const result = onChange(modelFields);
             value = result?.mrageLeave ?? value;
@@ -920,6 +937,7 @@ export default function EmpLeaveDetailsCreateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave,
+              pervAnnualLeaveBal,
             };
             const result = onChange(modelFields);
             value = result?.paterLeave ?? value;
@@ -957,6 +975,7 @@ export default function EmpLeaveDetailsCreateForm(props) {
               sickLeave: value,
               sickLeaveDate,
               hospLeave,
+              pervAnnualLeaveBal,
             };
             const result = onChange(modelFields);
             value = result?.sickLeave ?? value;
@@ -994,6 +1013,7 @@ export default function EmpLeaveDetailsCreateForm(props) {
               sickLeave,
               sickLeaveDate: value,
               hospLeave,
+              pervAnnualLeaveBal,
             };
             const result = onChange(modelFields);
             value = result?.sickLeaveDate ?? value;
@@ -1031,6 +1051,7 @@ export default function EmpLeaveDetailsCreateForm(props) {
               sickLeave,
               sickLeaveDate,
               hospLeave: value,
+              pervAnnualLeaveBal,
             };
             const result = onChange(modelFields);
             value = result?.hospLeave ?? value;
@@ -1044,6 +1065,46 @@ export default function EmpLeaveDetailsCreateForm(props) {
         errorMessage={errors.hospLeave?.errorMessage}
         hasError={errors.hospLeave?.hasError}
         {...getOverrideProps(overrides, "hospLeave")}
+      ></TextField>
+      <TextField
+        label="Perv annual leave bal"
+        isRequired={false}
+        isReadOnly={false}
+        value={pervAnnualLeaveBal}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              annualLeave,
+              annualLeaveDate,
+              compasLeave,
+              destinateLeavePass,
+              durLeavePass,
+              dateLeavePass,
+              leavePass,
+              materLeave,
+              mrageLeave,
+              paterLeave,
+              sickLeave,
+              sickLeaveDate,
+              hospLeave,
+              pervAnnualLeaveBal: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.pervAnnualLeaveBal ?? value;
+          }
+          if (errors.pervAnnualLeaveBal?.hasError) {
+            runValidationTasks("pervAnnualLeaveBal", value);
+          }
+          setPervAnnualLeaveBal(value);
+        }}
+        onBlur={() =>
+          runValidationTasks("pervAnnualLeaveBal", pervAnnualLeaveBal)
+        }
+        errorMessage={errors.pervAnnualLeaveBal?.errorMessage}
+        hasError={errors.pervAnnualLeaveBal?.hasError}
+        {...getOverrideProps(overrides, "pervAnnualLeaveBal")}
       ></TextField>
       <Flex
         justifyContent="space-between"

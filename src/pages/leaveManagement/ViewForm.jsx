@@ -168,7 +168,7 @@ console.log(ticketData);
           senderEmail: "leave_no-reply@adininworks.com", // Sender email
           receipentEmail: leaveData.empOfficialEmail, // Using the employee's official email
           receipentEmpID: leaveData.empID,
-          status: status,
+          status: "Unread",
           createdAt: currentDate,
           updatedAt: currentDate,
         });
@@ -218,7 +218,7 @@ console.log(ticketData);
           senderEmail: "ticket_no-reply@adininworks.com", // Sender email
           receipentEmail: ticketData.empOfficialEmail, // Using the employee's official email
           receipentEmpID: ticketData.empID,
-          status: status,
+          status: "Unread",
           createdAt: currentDate,
           updatedAt: currentDate,
         });
