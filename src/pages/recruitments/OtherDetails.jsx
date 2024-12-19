@@ -42,6 +42,7 @@ export const OtherDetails = () => {
       perIDesc: "",
     },
   });
+console.log(navigatingEducationData);
 
   // File upload handler
   const handleFileChange = async (e, type) => {
@@ -112,12 +113,12 @@ export const OtherDetails = () => {
       const reqValue = {
         ...data,
         ...navigatingEducationData,
-        eduDetails: JSON.stringify(data.eduDetails),
-        familyDetails: JSON.stringify(data.familyDetails),
-        workExperience: JSON.stringify(data.workExperience),
-        emgDetails: JSON.stringify(data.emgDetails),
-        referees: JSON.stringify(data.referees),
-        relatives: JSON.stringify(data.relatives),
+        eduDetails: JSON.stringify(navigatingEducationData.eduDetails),
+        familyDetails: JSON.stringify(navigatingEducationData.familyDetails),
+        workExperience: JSON.stringify(navigatingEducationData.workExperience),
+        emgDetails: JSON.stringify(navigatingEducationData.emgDetails),
+        referees: JSON.stringify(navigatingEducationData.referees),
+        relatives: JSON.stringify(navigatingEducationData.relatives),
         uploadResume: uploadedDocs.uploadResume,
         uploadCertificate: uploadedDocs.uploadCertificate,
         uploadPp: uploadedDocs.uploadPassport,
@@ -128,7 +129,8 @@ export const OtherDetails = () => {
         reqValue,
         latestTempIDData,
       });
-      setNotification(true);
+      console.log("Value",reqValue)
+      // setNotification(true);
     } catch (error) {
       console.log(error);
       
@@ -375,13 +377,13 @@ export const OtherDetails = () => {
       </div>
       
     </form> 
-    {notification && (
+    {/* {notification && (
         <SpinLogo
           text="Your Application Submitted Successfully"
           notification={notification}
           path="/recrutiles/candidate"
         />
-      )}
+      )} */}
     </div>
     
   );

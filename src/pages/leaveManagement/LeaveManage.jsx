@@ -9,6 +9,8 @@ import { useLeaveManage } from "../../hooks/useLeaveManage";
 import useEmployeePersonalInfo from "../../hooks/useEmployeePersonalInfo";
 import { NavigateLM } from "./NavigateLM";
 
+
+
 export const LeaveManage = () => {
   const [data, setData] = useState([]);
   const [source, setSource] = useState(null);
@@ -25,6 +27,7 @@ export const LeaveManage = () => {
   const [userID, setUserID] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
+  const [noDataMessage, setNoDataMessage] = useState("");
 
   // Add this state at the top with other states
   const [errorState, setErrorState] = useState({
@@ -55,27 +58,30 @@ export const LeaveManage = () => {
   const { personalInfo } = useEmployeePersonalInfo(userID);
 
   useEffect(() => {
-    const filteredDataValue = mergedData.filter((item) => {
+    // Start with the base filtered data from mergedData
+    let filteredResults = mergedData.filter((item) => {
       if (location.pathname.replace(/\/$/, '') === "/leaveManage/historyLeave") {
-        const isValid =
-          item?.empStatus !== "Cancelled" && item.managerStatus === "Approved";
-
-        return isValid;
-      } else {
-        const isValid = item?.empStatus !== "Cancelled";
-
-        return isValid;
+        return item?.empStatus !== "Cancelled" && item.managerStatus === "Approved";
       }
+      return item?.empStatus !== "Cancelled";
     });
 
-    setSecondartyData(filteredDataValue);
-    setData(filteredDataValue);
-  }, [filterStatus, searchTerm, mergedData, location.pathname]);
+    // Apply user type filtering
+    filteredResults = filteredResults.filter((item) => {
+      if (userType === "Manager") {
+        return (
+          (item?.supervisorStatus === "Approved" && item?.managerEmpID === userID) ||
+          item?.managerEmpID === userID
+        );
+      } else if (userType === "Supervisor") {
+        return item?.supervisorEmpID === userID;
+      } else if (userType === "SuperAdmin" || userType === "HR") {
+        return true;
+      }
+      return false;
+    });
 
-  useEffect(() => {
-    let filteredResults = [...mergedData];
-
-    // 1. First apply the status filter
+    // Apply status filter if not "All"
     if (filterStatus !== "All") {
       filteredResults = filteredResults.filter((item) => {
         const status =
@@ -84,89 +90,58 @@ export const LeaveManage = () => {
             : userType === "Supervisor"
             ? item.supervisorStatus
             : null;
-
         return status === filterStatus;
       });
-
-      // Apply user-specific filtering
-      if (userType === "Manager") {
-        filteredResults = filteredResults.filter((item) => {
-          return (
-            (item?.supervisorStatus === "Approved" &&
-              item?.managerEmpID.toString().toLowerCase() === userID) ||
-            item?.managerEmpID.toString().toLowerCase() === userID
-          );
-        });
-      } else if (userType === "Supervisor") {
-        filteredResults = filteredResults.filter((item) => {
-          return item?.supervisorEmpID?.toString().toLowerCase() === userID;
-        });
-      }
     }
 
-    // 2. Apply the date filter
+    // Apply date filter
     if (selectedDate) {
       const selectedDateObj = new Date(selectedDate);
-      selectedDateObj.setHours(0, 0, 0, 0); // Set to start of the day
+      selectedDateObj.setHours(0, 0, 0, 0);
 
       filteredResults = filteredResults.filter((item) => {
-        // For leaveManage route
         if (location.pathname.replace(/\/$/, '') === "/leaveManage") {
-          const createdDate = item.leaveStatusCreatedAt
-            ? new Date(item.leaveStatusCreatedAt)
-            : null;
-          const supervisorDate = item.supervisorDate
-            ? new Date(item.supervisorDate)
-            : null;
-          const managerDate = item.managerDate
-            ? new Date(item.managerDate)
-            : null;
+          const dates = [
+            item.leaveStatusCreatedAt && new Date(item.leaveStatusCreatedAt),
+            item.supervisorDate && new Date(item.supervisorDate),
+            item.managerDate && new Date(item.managerDate)
+          ].filter(Boolean);
 
-          // Normalize the dates to remove time components
-          [createdDate, supervisorDate, managerDate].forEach((date) => {
-            if (date) date.setHours(0, 0, 0, 0);
-          });
-
-          return [createdDate, supervisorDate, managerDate].some(
-            (date) => date && date.getTime() === selectedDateObj.getTime()
-          );
+          // Normalize all dates to midnight
+          dates.forEach(date => date.setHours(0, 0, 0, 0));
+          
+          return dates.some(date => date.getTime() === selectedDateObj.getTime());
         }
 
-        // For leaveManage/historyLeave route
         if (location.pathname.replace(/\/$/, '') === "/leaveManage/historyLeave") {
-          const startDate = item.empLeaveStartDate
-            ? new Date(item.empLeaveStartDate)
-            : null;
-          const endDate = item.empLeaveEndDate
-            ? new Date(item.empLeaveEndDate)
-            : null;
+          const startDate = item.empLeaveStartDate && new Date(item.empLeaveStartDate);
+          const endDate = item.empLeaveEndDate && new Date(item.empLeaveEndDate);
 
-          if (startDate) startDate.setHours(0, 0, 0, 0);
-          if (endDate) endDate.setHours(0, 0, 0, 0);
-
-          return (
-            startDate &&
-            endDate &&
-            selectedDateObj >= startDate &&
-            selectedDateObj <= endDate
-          );
+          if (startDate && endDate) {
+            startDate.setHours(0, 0, 0, 0);
+            endDate.setHours(0, 0, 0, 0);
+            return selectedDateObj >= startDate && selectedDateObj <= endDate;
+          }
         }
-
         return false;
       });
     }
 
-    // 3. Finally apply the search filter
+    // Store the filtered results before applying search
+    setSecondartyData(filteredResults);
+
+    // Only apply search filter if there are search results
     if (searchResults.length > 0) {
-      const searchEmpIDs = searchResults.map((item) => item.empID);
-      filteredResults = filteredResults.filter((item) =>
-        searchEmpIDs.includes(item.empID)
+      const searchEmpIDs = new Set(searchResults.map(item => item.empID));
+      filteredResults = filteredResults.filter(item => 
+        searchEmpIDs.has(item.empID)
       );
     }
 
+    // Update states
     setData(filteredResults);
-    setFilteredData([]); // Reset filtered data
-    setCurrentPage(1); // Reset to first page when filters change
+    setFilteredData([]);
+    setCurrentPage(1);
 
     // Update error states
     setErrorState({
@@ -175,14 +150,33 @@ export const LeaveManage = () => {
       dateError: selectedDate && filteredResults.length === 0,
     });
   }, [
+    mergedData,
     filterStatus,
     selectedDate,
-    searchResults,
-    mergedData,
     userType,
     userID,
-    location.pathname,
+    location.pathname
   ]);
+
+  // Add a separate useEffect for handling search results
+  useEffect(() => {
+    if (searchResults.length > 0) {
+      const searchEmpIDs = new Set(searchResults.map(item => item.empID));
+      const filteredResults = secondartyData.filter(item => 
+        searchEmpIDs.has(item.empID)
+      );
+      
+      setData(filteredResults);
+      setCurrentPage(1);
+      
+      setErrorState(prev => ({
+        ...prev,
+        searchError: filteredResults.length === 0,
+      }));
+    } else {
+      setData(secondartyData);
+    }
+  }, [searchResults, secondartyData]);
 
   const handleDateChange = (event) => {
     const date = event.target.value;
@@ -192,6 +186,7 @@ export const LeaveManage = () => {
   useEffect(() => {
     setSelectedDate(null);
     setSearchTerm("");
+    setFilterStatus("All")
     setCurrentPage(1);
   }, [location.pathname]);
 
@@ -292,38 +287,6 @@ export const LeaveManage = () => {
       rowsPerPage
   );
 
-  // Apply filtering based on filterStatus and userType
-  const filteredFinalData = filteredData.filter((item) => {
-    const status =
-      userType === "Manager"
-        ? item.managerStatus
-        : userType === "Supervisor"
-        ? item.supervisorStatus
-        : null;
-
-    if (filterStatus === "All") {
-      return true;
-    }
-
-    return status === filterStatus;
-  });
-  let finalDataFiltered;
-
-  if (userType === "Manager") {
-    finalDataFiltered = filteredFinalData.filter((item) => {
-      const condition =
-        (item?.supervisorStatus === "Approved" &&
-          item?.managerEmpID.toString().toLowerCase() === userID) ||
-        item?.managerEmpID.toString().toLowerCase() === userID;
-      return condition;
-    });
-  } else if (userType === "Supervisor") {
-    finalDataFiltered = filteredFinalData.filter((item) => {
-      return item?.supervisorEmpID?.toString().toLowerCase() === userID;
-    });
-  } else {
-    finalDataFiltered = filteredFinalData;
-  }
 
   return (
     <section className="py-20 px-10">

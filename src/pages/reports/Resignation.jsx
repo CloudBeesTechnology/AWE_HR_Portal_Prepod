@@ -4,12 +4,13 @@ import { FilterTable } from './FilterTable';
 export const Resignation = ({ allData, typeOfReport, reportTitle }) => {
   const [tableBody, setTableBody] = useState([]);
   const [tableHead, setTableHead] = useState([
-    "Name",
     "Emp ID",
     "Badge No",
+    "Name",
+    "Date of join",
     "Nationality",
     "Department",
-    "Work Position",
+    "Position",
     "Date of Resignation",
     "Reason of Resignation",
   ]);
@@ -38,9 +39,10 @@ export const Resignation = ({ allData, typeOfReport, reportTitle }) => {
     return data
       .filter((item) => item.resignDate) // Only include items with resignDate
       .map((item) => ({
-        name: item.name || "-",
         empID: item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
+        name: item.name || "-",
+        doj:item.doj || "-",
         nationality: item.nationality || "-",
         department: item.department || "-",
         position: item.position || "-",

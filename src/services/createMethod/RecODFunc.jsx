@@ -43,7 +43,7 @@ export const RecODFunc = () => {
     console.log(totalData);
   
     try {
-      await Promise.all([
+      const res = await Promise.all([
         client.graphql({
           query: createPersonalDetails,
           variables: { input: totalData1 },
@@ -53,9 +53,9 @@ export const RecODFunc = () => {
           variables: { input: totalData },
         }),
       ]);
-  
-      localStorage.removeItem("applicantFormData");
-      localStorage.removeItem("personalFormData");
+      console.log("Response", res)
+      // localStorage.removeItem("applicantFormData");
+      // localStorage.removeItem("personalFormData");
     } catch (error) {
       console.error("Error executing GraphQL requests:", error);
       throw error; // Rethrow error if needed

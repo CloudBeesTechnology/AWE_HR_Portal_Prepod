@@ -14,7 +14,7 @@ export const Searchbox = ({
 
   useEffect(() => {
     setSearchQuery('');
-    searchUserList(allEmpDetails); // Reset to all results when component mounts or route changes
+    // searchUserList(allEmpDetails); // Reset to all results when component mounts or route changes
   }, [allEmpDetails, location]);
 
   const handleSearch = (e) => {

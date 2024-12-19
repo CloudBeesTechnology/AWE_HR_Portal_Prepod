@@ -4,10 +4,11 @@ import { FilterTable } from "./FilterTable";
 export const LDexpiry = ({ allData, typeOfReport, reportTitle }) => {
   const [tableBody, setTableBody] = useState([]);
   const [tableHead] = useState([
+    "Employee Badge No",
+    "Emp ID",
     "Name",
-    "Employee Badge",
     "Nationality",
-    "Work Position",
+    "Position",
     "Department",
     "LD Approved",
     "LD Expiry",
@@ -47,9 +48,11 @@ export const LDexpiry = ({ allData, typeOfReport, reportTitle }) => {
     };
   
     // Filter and map the employee pass data
-    const probationReviewMergedData = (data) => {
+    const LDReviewMergedData = (data) => {
       return data
         .filter((item) => {
+          console.log(item.nlmsEmpValid);
+          
           // Ensure nlmsEmpValid is a valid array with non-empty and valid date entries
           return (
             Array.isArray(item.nlmsEmpValid) &&
@@ -64,8 +67,10 @@ export const LDexpiry = ({ allData, typeOfReport, reportTitle }) => {
         .map((item) => {
           const lastPassExp = item.nlmsEmpValid[item.nlmsEmpValid.length - 1];
           return {
-            name: item.name || "-",
+            
             empBadgeNo: item.empBadgeNo || "-",
+            empID: item.empID || "-",
+            name: item.name || "-",
             nationality: item.nationality || "-",
             position: item.position || "-",
             department: item.department || "-",
@@ -80,7 +85,7 @@ export const LDexpiry = ({ allData, typeOfReport, reportTitle }) => {
   
     useEffect(() => {
       if (allData && allData.length > 0) {
-        setTableBody(probationReviewMergedData(allData));
+        setTableBody(LDReviewMergedData(allData));
       }
     }, [allData]);
 

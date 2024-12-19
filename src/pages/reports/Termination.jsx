@@ -4,12 +4,13 @@ import { FilterTable } from './FilterTable';
 export const Termination = ({ allData, typeOfReport, reportTitle }) => {
   const [tableBody, setTableBody] = useState([]);
   const [tableHead, setTableHead] = useState([
-    "Name",
     "Emp ID",
-    "Badge No",
+    "Employee Badge No",
+    "Name",
+    "Date of join",
     "Nationality",
     "Department",
-    "Work Position",
+    "Position",
     "Date of Termination",
     "Reason of Termination",
   ]);
@@ -38,9 +39,10 @@ export const Termination = ({ allData, typeOfReport, reportTitle }) => {
     return data
       .filter((item) => item.termiDate) // Only include items with termiDate
       .map((item) => ({
-        name: item.name || "-",
         empID: item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
+        name: item.name || "-",
+        doj:item.doj || "-",
         nationality: item.nationality || "-",
         position: item.position || "-",
         department: item.department || "-",

@@ -44,10 +44,24 @@ export const EducationDetails = () => {
       diseaseDesc: "",
       liquorDesc: "",
       crimeDesc: "",
+      ...JSON.parse(localStorage.getItem("educationFormData")) || {},
     },
   });
   const navigate = useNavigate();
   // const { handleNext } = useOutletContext();
+
+  useEffect(() => {
+    const eduData = () => {
+      localStorage.removeItem("educationFormData"); // Clear data on refresh or tab close
+    };
+    // Add event listener for unload
+    window.addEventListener("beforeunload", eduData);
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener("beforeunload", eduData);
+    };
+  }, []);
+
   const {
     fields: emgDetails,
     append: appendEmergency,
@@ -120,10 +134,14 @@ export const EducationDetails = () => {
     // setNavigateEduData(navigatingEduData)
     // console.log(navigatingEduData);
     // handleNext();
+    localStorage.setItem("educationFormData", JSON.stringify(navigatingEduData));
+    
     navigate("/addCandidates/otherDetails", {
       state: { FormData: navigatingEduData },
     });
   };
+
+
   // const onSubmit = async (data) => {
   // try {
 

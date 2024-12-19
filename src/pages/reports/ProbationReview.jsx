@@ -8,9 +8,9 @@ import { VscClose } from "react-icons/vsc";
 export const ProbationReview = ({ allData, typeOfReport, reportTitle }) => {
   const [tableBody, setTableBody] = useState([]);
   const [tableHead] = useState([
-    "Name",
     "Emp ID",
     "Employee Badge",
+    "Name",
     "Date of Join",
     "Department",
     "Work Position",
@@ -67,9 +67,9 @@ export const ProbationReview = ({ allData, typeOfReport, reportTitle }) => {
         const startDate = contractStartDates[contractStartDates.length - 1];
 
         return {
-          name: item.name || "-",
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
+          name: item.name || "-",
           doj: formatDate(item.doj) || "-",
           department: item.department || "-",
           position: item.position || "-",

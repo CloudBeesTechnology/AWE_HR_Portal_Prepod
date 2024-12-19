@@ -110,6 +110,7 @@ export const useLeaveManage = () => {
           paternityLeave: leaveDetails.paterLeave || 0,
           hospitalLeave: leaveDetails.hospLeave || 0,
           marriageLeave: leaveDetails.mrageLeave || 0,
+          empPervAnnualLeaveBal:leaveDetails.pervAnnualLeaveBal || 0
         };
       });
 

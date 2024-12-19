@@ -10,15 +10,15 @@ export const Popup = ({ toggleFunction, specificNotificationDetails }) => {
             onClick={toggleFunction}
           />
         </div>
-        <div className="flex justify-center ">
+        {/* <div className="flex justify-center ">
           <img
             className="size-32 h-12 w-full"
             src="/src/assets/logo/logo-with-name.svg"
             alt="not found"
           />
-        </div>
+        </div> */}
         <div className="flex justify-center py-2 ">
-          <p className="text-dark_grey text_size_3">Passport Expiry</p>
+          <p className="text-dark_grey text_size_3">{specificNotificationDetails.type}</p>
         </div>
         <div className="grid grid-cols-2  pl-5">
           <p className="text-dark_grey text_size_6">Employee ID</p>
@@ -29,7 +29,7 @@ export const Popup = ({ toggleFunction, specificNotificationDetails }) => {
         <div className="grid grid-cols-2 pl-5">
           <p className="text-dark_grey text_size_6">Employee Badge number</p>
           <p className="text-dark_grey text-[16px] pl-5">
-            {specificNotificationDetails.empBatchNo}
+            {specificNotificationDetails.empBadgeNo}
           </p>
         </div>
 
@@ -54,7 +54,7 @@ export const Popup = ({ toggleFunction, specificNotificationDetails }) => {
         <div className="grid grid-cols-2 pl-5">
           <p className="text-dark_grey text_size_6">Position</p>
           <p className="text-dark_grey text-[16px] pl-5">
-            {specificNotificationDetails.possition}
+            {specificNotificationDetails.position}
           </p>
         </div>
         <div className="grid grid-cols-2 pl-5 pb-3">

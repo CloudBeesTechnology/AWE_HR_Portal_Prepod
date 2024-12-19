@@ -36,7 +36,7 @@ const PersonalDetailsView = ({
   const [viewingDocument, setViewingDocument] = useState(null); // State to store the currently viewed document URL
   const [lastUploadUrl, setPPLastUP] = useState(""); // State to store the last uploaded file's URL
   const [imageUrl, setImageUrl] = useState("");
-  const [error, setError] = useState(null);
+ 
 
   // Helper function to fetch the cloud URL
   const linkToStorageFile = async (pathUrl) => {
@@ -53,8 +53,6 @@ const PersonalDetailsView = ({
   const linkToImageFile = async (pathUrl) => {
     const result = await getUrl({
       path: pathUrl,
-      // path: profilePhoto/Pic6.jpg,
-      // Alternatively, path: ({identityId}) => album/{identityId}/1.jpg
     });
     return setImageUrl(result.url.toString());
   };

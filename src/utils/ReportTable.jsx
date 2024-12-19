@@ -72,7 +72,7 @@ export const ReportTable = ({
  };
 
   return (
-    <section className="my-10 space-y-3">
+    <section className="my-10 space-y-3 ">
       <footer>
         <div className="vertical-center p-5 pt-9 ">
           <button

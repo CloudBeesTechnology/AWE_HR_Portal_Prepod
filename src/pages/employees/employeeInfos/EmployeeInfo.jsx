@@ -263,6 +263,8 @@ export const EmployeeInfo = () => {
       "empBadgeNo",
       "empType",
       // "familyDetails",
+      "bankName",
+      "bankAccNo",
       "gender",
       "lang",
       "marital",

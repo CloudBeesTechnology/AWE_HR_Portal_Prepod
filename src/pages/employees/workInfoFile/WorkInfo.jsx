@@ -205,9 +205,8 @@ export const WorkInfo = () => {
       "compasLeave",
       "remarkWI",
       "sapNo",
+      "pervAnnualLeaveBal",
       "remainingAnualLeave", "remainingCompasLeave", "remainingHosLeave", "remainingMateLeave", "remainingMrageLeave", "remainingPaternityLeave", "remainingSickLeave"
-
-      
 
     ];
 
@@ -335,7 +334,7 @@ export const WorkInfo = () => {
   };
 
   const onSubmit = async (data) => {
-    console.log("Date upgrade", data);
+    // console.log("Date upgrade", data);
 
     try {
       const checkingPITable =
@@ -391,7 +390,7 @@ export const WorkInfo = () => {
           uploadAL: JSON.stringify(nameServiceUp.uploadAL),
           uploadDep: JSON.stringify(nameServiceUp.uploadDep),
         };
-        console.log("Update Value",workInfoUpValue);
+        // console.log("Update Value",workInfoUpValue);
         await WIUpdateData({ workInfoUpValue });
         setShowTitle("Employee Work Info Updated successfully");
         setNotification(true);

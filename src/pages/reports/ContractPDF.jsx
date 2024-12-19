@@ -7,9 +7,9 @@ import { ContractFormPDF } from "./ContractFormPDF";
 export const ContractPDF = ({ allData, typeOfReport, reportTitle }) => {
   const [tableBody, setTableBody] = useState([]);
   const [tableHead, setTableHead] = useState([
-    "Name",
     "Emp ID",
     "Employee Badge No",
+    "Name",
     "Nationality",
     "Date of Join",
     "Department",
@@ -17,7 +17,7 @@ export const ContractPDF = ({ allData, typeOfReport, reportTitle }) => {
     "Contract Start Date ",
     "Contract End Date",
     // "LD Expiry",
-    "Duration of Renewal Contract",
+    // "Duration of Renewal Contract",
   ]);
   const contentRef = useRef();
   const [showContractPDF, setShowContractPDF] = useState(true); // Create a ref for the PDF content
@@ -99,12 +99,12 @@ export const ContractPDF = ({ allData, typeOfReport, reportTitle }) => {
         const contractStartDates = item.contractStart || [];
         const startDate = contractStartDates[contractStartDates.length - 1];
   
-        const balanceMonths = calculateBalanceMonths(startDate, lastDate);
+        // const balanceMonths = calculateBalanceMonths(startDate, lastDate);
   
         return {
-          name: item.name || "-",
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
+          name: item.name || "-",
           nationality: item.nationality || "-",
           doj: formatDate(item.doj) || "-",
           department: item.department || "-",
@@ -114,7 +114,7 @@ export const ContractPDF = ({ allData, typeOfReport, reportTitle }) => {
           // nlmsEmpValid: Array.isArray(item.nlmsEmpValid)
           //   ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
           //   : "-",
-          balanceMonths: balanceMonths,
+          // balanceMonths: balanceMonths,
         };
       });
   };

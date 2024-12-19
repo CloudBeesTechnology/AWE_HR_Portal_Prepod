@@ -68,7 +68,9 @@ export const AddCourse = () => {
       setValue("company", "");
     }
   };
-
+  console.log("Selected Course:", selectedCourse);
+  console.log("Course Name:", selectedCourse?.courseName);
+  
 
   return (
     <section className="p-10 center flex-col gap-16 bg-[#F8F8F8] mt-10">
@@ -147,9 +149,9 @@ export const AddCourse = () => {
                   className="input-field select-custom"
                 >
                   {selectedCourse && Array.isArray(selectedCourse.courseName) ? (
-                    selectedCourse.courseName.map((name, index) => (
-                      <option key={index} value={name}>
-                        {name}
+                    selectedCourse.courseName.map((courseName, index) => (
+                      <option key={index} value={courseName}>
+                        {courseName}
                       </option>
                     ))
                   ) : (

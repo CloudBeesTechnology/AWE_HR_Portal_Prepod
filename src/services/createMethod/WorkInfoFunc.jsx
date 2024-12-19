@@ -69,7 +69,7 @@ export const WorkInfoFunc = () => {
       paterLeave,
       mrageLeave,
       // compasLeave,
-     
+      pervAnnualLeaveBal,
       probDuration,
       WIContract,
       WIProbation,
@@ -270,6 +270,7 @@ export const WorkInfoFunc = () => {
       materLeave,
       mrageLeave,
       paterLeave,
+      pervAnnualLeaveBal,
       sickLeave,
       sickLeaveDate,
       hospLeave,

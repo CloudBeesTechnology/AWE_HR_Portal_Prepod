@@ -47,7 +47,7 @@ export const CVEVForm = ({candidate}) => {
 
   const CVECUpload = watch("cvecFile", "");
 
-  // console.log("DATA 3.0", mergedInterviewData);
+  console.log("DATA 3.0", mergedInterviewData);
 
   useEffect(() => {
     if (mergedInterviewData.length > 0 && candidate?.tempID) {

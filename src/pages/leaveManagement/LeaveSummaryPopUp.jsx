@@ -11,6 +11,7 @@ export const LeaveSummaryPopUp = ({
   empDetails,
   formatDate,
 }) => {
+  
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [leaveSummary, setLeaveSummary] = useState({});
@@ -33,9 +34,30 @@ export const LeaveSummaryPopUp = ({
 
     return `${day}/${month}/${year}`;
   };
+  const initializeLeaveType = (total = 0, isSpecialLeave = false) => ({
+    
+    total: isSpecialLeave ? null : total,
+    taken: 0,
+    waitingLeave: 0,
+    remaining: isSpecialLeave ? null : total,
+  });
+
+  const isCurrentYear = (dateStr) => {
+    const currentYear = new Date().getFullYear();
+    const dateYear = new Date(dateStr).getFullYear();
+    return currentYear === dateYear;
+  };
+
+  const parseDate = (dateStr) => {
+    const [day, month, year] = dateStr.split('/');
+    return new Date(year, month - 1, day);
+  };
+
   useEffect(() => {
     const fetchedData = async () => {
       const result = mergedData.reduce((acc, val) => {
+        // console.log(acc[val.empID],val.empPervAnnualLeaveBal);
+                
         if (!acc[val.empID]) {
           acc[val.empID] = {
             empId: val.empID,
@@ -44,13 +66,14 @@ export const LeaveSummaryPopUp = ({
             position: val.position,
             department: val.department,
             doj: val.doj,
-            compassionateLeave: initializeLeaveType(val.compassionateLeave),
-            annualLeave: initializeLeaveType(val.annualLeave),
-            marriageLeave: initializeLeaveType(val.marriageLeave),
-            hospitalisationLeave: initializeLeaveType(val.hospitalLeave),
-            maternityLeave: initializeLeaveType(val.maternityLeave),
-            sickLeave: initializeLeaveType(val.sickLeave),
-            paternityLeave: initializeLeaveType(val.paternityLeave),
+            compassionateLeave: initializeLeaveType(Number(val.compassionateLeave), true),
+            unPaidAuthozriationLeave: initializeLeaveType(Number(val.unPaidAuthozriationLeave), true),
+            annualLeave: initializeLeaveType(Number(val.annualLeave) + Number(val.empPervAnnualLeaveBal || 0)),
+            marriageLeave: initializeLeaveType(Number(val.marriageLeave)),
+            hospitalisationLeave: initializeLeaveType(Number(val.hospitalLeave)),
+            maternityLeave: initializeLeaveType(Number(val.maternityLeave)),
+            sickLeave: initializeLeaveType(Number(val.sickLeave)),
+            paternityLeave: initializeLeaveType(Number(val.paternityLeave)),
           };
         }
   
@@ -62,66 +85,50 @@ export const LeaveSummaryPopUp = ({
           "Maternity Leave": "maternityLeave",
           "Sick Leave": "sickLeave",
           "Paternity Leave": "paternityLeave",
+          "Unpaid Authorize Leave": "unPaidAuthozriationLeave",
         };
   
         const leaveKey = leaveTypeKeyMap[val.empLeaveType];
-        const applicationformDate = formatDate(val.empLeaveStartDate);
-        const applicationtoDate = formatDate(val.empLeaveEndDate);
         
-        // Check if startDate and endDate are provided
-        const startDateObject = startDate ? formattingDate(startDate) : null;
-        const endDateObject = endDate ? formattingDate(endDate) : null;
-  
-        // Condition to show based on start and end date availability
-        if (startDateObject && endDateObject) {
-          // Filter based on the date range
-          if (
-            applicationformDate >= startDateObject &&
-            applicationformDate <= endDateObject &&
-            applicationtoDate >= startDateObject &&
-            applicationtoDate <= endDateObject
-          ) {
-            if (leaveKey) {
-              if (
-                val.managerStatus === "Approved" &&
-                val.empStatus !== "Cancelled"
-              ) {
-                acc[val.empID][leaveKey].taken += val.leaveDays;
-              } else if (
-                val.managerStatus === "Pending" &&
-                val.supervisorStatus !== "Rejected" &&
-                val.empStatus !== "Cancelled"
-              ) {
-                acc[val.empID][leaveKey].waitingLeave += val.leaveDays;
-              }
-  
-              acc[val.empID][leaveKey].remaining =
-                acc[val.empID][leaveKey].total -
-                (acc[val.empID][leaveKey].taken + acc[val.empID][leaveKey].waitingLeave);
-            }
-          }
+        const applicationStartDate = formatDate(val.empLeaveStartDate);
+        const applicationEndDate = formatDate(val.empLeaveEndDate);
+
+        let shouldProcessLeave = false;
+
+        if (startDate && endDate) {
+          // If date filter is applied, check if leave falls within the filter range
+          const filterStartDate = formattingDate(startDate);
+          const filterEndDate = formattingDate(endDate);
+          
+          const appStartDate = parseDate(applicationStartDate);
+          const appEndDate = parseDate(applicationEndDate);
+          const filtStart = parseDate(filterStartDate);
+          const filtEnd = parseDate(filterEndDate);
+
+          shouldProcessLeave = appStartDate >= filtStart && appEndDate <= filtEnd;
         } else {
-          // Show all data if no date range is provided
-          if (leaveKey) {
-            if (
-              val.managerStatus === "Approved" &&
-              val.empStatus !== "Cancelled"
-            ) {
-              acc[val.empID][leaveKey].taken += val.leaveDays;
-            } else if (
-              val.managerStatus === "Pending" &&
-              val.supervisorStatus !== "Rejected" &&
-              val.empStatus !== "Cancelled"
-            ) {
-              acc[val.empID][leaveKey].waitingLeave += val.leaveDays;
-            }
-  
+          // If no date filter, only show current year's leaves
+          shouldProcessLeave = isCurrentYear(val.empLeaveStartDate);
+        }
+
+        if (shouldProcessLeave && leaveKey) {
+          if (val.managerStatus === "Approved" && val.empStatus !== "Cancelled") {
+            acc[val.empID][leaveKey].taken += val.leaveDays;
+          } else if (
+            val.managerStatus === "Pending" &&
+            val.supervisorStatus !== "Rejected" &&
+            val.empStatus !== "Cancelled"
+          ) {
+            acc[val.empID][leaveKey].waitingLeave += val.leaveDays;
+          }
+
+          if (leaveKey !== 'compassionateLeave' && leaveKey !== 'unPaidAuthozriationLeave') {
             acc[val.empID][leaveKey].remaining =
               acc[val.empID][leaveKey].total -
               (acc[val.empID][leaveKey].taken + acc[val.empID][leaveKey].waitingLeave);
           }
         }
-  
+
         return acc;
       }, {});
   
@@ -142,6 +149,7 @@ export const LeaveSummaryPopUp = ({
     "maternityLeave",
     "sickLeave",
     "paternityLeave",
+    "unPaidAuthozriationLeave"
   ];
 
   // Format leave type name
@@ -289,15 +297,21 @@ export const LeaveSummaryPopUp = ({
           .map(([leaveType, details]) => (
             <tr key={leaveType}>
               <td className="border px-4 py-2">{formatLeaveType(leaveType)}</td>
-              <td className="border px-4 text-center py-2">{details.total || 0}</td>
+              <td className="border px-4 text-center py-2">
+                {leaveType === 'compassionateLeave' || leaveType === 'unPaidAuthozriationLeave' 
+                  ? '-' 
+                  : (details.total || 0)}
+              </td>
               <td className="border px-4 text-center py-2">{details.taken || 0}</td>
               <td className="border px-4 text-center py-2">
                 {details.waitingLeave || 0}
               </td>
               <td className="border px-4 text-center py-2">
-                {details.remaining !== undefined && details.remaining >= 0
-                  ? details.remaining
-                  : 0}
+                {leaveType === 'compassionateLeave' || leaveType === 'unPaidAuthozriationLeave'
+                  ? '-'
+                  : (details.remaining !== undefined && details.remaining >= 0
+                      ? details.remaining
+                      : 0)}
               </td>
             </tr>
           ))}
@@ -316,10 +330,3 @@ export const LeaveSummaryPopUp = ({
     </section>
   );
 };
-
-const initializeLeaveType = (total = 0) => ({
-  total: total,
-  taken: 0,
-  waitingLeave: 0,
-  remaining: total,
-});

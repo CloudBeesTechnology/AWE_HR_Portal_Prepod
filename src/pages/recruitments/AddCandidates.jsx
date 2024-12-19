@@ -1,17 +1,19 @@
-
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 
 export const AddCandidates = () => {
-  useEffect(()=>{
+
+
+  useEffect(() => {
     window.scrollTo({
-      top:0,
-      behavior:"smooth"
-    })
-      },[])
+      top: 0,
+      behavior: "smooth",
+    });
+  }, []);
   const [activeTab, setActiveTab] = useState("applicantDetails");
   const navigate = useNavigate();
   const location = useLocation();
+  const { tempID } = location.state || {};
   
 
   const handleNext = () => {
@@ -39,7 +41,7 @@ export const AddCandidates = () => {
   };
 
   // Update activeTab based on current route
-useEffect(() => {
+  useEffect(() => {
     const path = location.pathname;
     if (path.includes("/personalDetails")) {
       setActiveTab("personalDetails");
@@ -56,7 +58,9 @@ useEffect(() => {
     <section className="w-full bg-[#F5F6F1] ">
       {/* min-h-screen overflow-y-auto */}
       <div className="w-11/12 relative mx-auto p-6">
-        <h2 className="text-[20px] font-bold mb-4 text-center">Application Form</h2>
+        <h2 className="text-[20px] font-bold mb-4 text-center">
+          Application Form
+        </h2>
 
         {/* Tab Navigation */}
         <div className="flex justify-between border-b mb-4 text-[14px] font-semibold">
@@ -72,23 +76,37 @@ useEffect(() => {
             className={`py-2 px-4 focus:outline-none ${
               activeTab === "personalDetails" ? "border-b-8 border-yellow" : ""
             }`}
-            onClick={() => handleTabClick("personalDetails", "/addCandidates/personalDetails")}
+            onClick={() =>
+              handleTabClick(
+                "personalDetails",
+                "/addCandidates/personalDetails"
+              )
+            }
           >
             Personal Details
           </button>
           <button
             className={`py-2 px-4 focus:outline-none ${
-              activeTab === "educationExperience" ? "border-b-8 border-yellow" : ""
+              activeTab === "educationExperience"
+                ? "border-b-8 border-yellow"
+                : ""
             }`}
-            onClick={() => handleTabClick("educationExperience", "/addCandidates/educationDetails")}
+            onClick={() =>
+              handleTabClick(
+                "educationExperience",
+                "/addCandidates/educationDetails"
+              )
+            }
           >
-          Reference Details
+            Reference Details
           </button>
           <button
             className={`py-2 px-4 focus:outline-none ${
               activeTab === "otherDetails" ? "border-b-8 border-yellow" : ""
             }`}
-            onClick={() => handleTabClick("otherDetails", "/addCandidates/otherDetails")}
+            onClick={() =>
+              handleTabClick("otherDetails", "/addCandidates/otherDetails")
+            }
           >
             Other Details
           </button>
@@ -96,10 +114,9 @@ useEffect(() => {
 
         {/* Render Child Components */}
         <div>
-          <Outlet context={{ activeTab, handleNext }} />
+          <Outlet context={{ activeTab, handleNext, tempID }} />
         </div>
       </div>
     </section>
   );
 };
-

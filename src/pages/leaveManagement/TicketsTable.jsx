@@ -37,6 +37,17 @@ export const TicketsTable = () => {
 
   // Modify useEffect to handle all filters together
   useEffect(() => {
+    // If no filters are active, show all data
+    if (!filters.date && filters.search.length === 0 && filters.status === "All") {
+      setData(ticketMerged);
+      setErrorState({
+        noResults: false,
+        searchError: false,
+        dateError: false,
+      });
+      return;
+    }
+
     let filteredResults = [...ticketMerged];
     let hasDateFilter = false;
     let hasSearchFilter = false;
@@ -216,7 +227,7 @@ export const TicketsTable = () => {
 
   useEffect(() => {
     setSecondartyData(ticketMerged);
-    // setData(ticketMerged);
+    setData(ticketMerged);
   }, [ticketMerged]);
 
   return (

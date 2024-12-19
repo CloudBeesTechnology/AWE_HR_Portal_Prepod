@@ -19,11 +19,13 @@ const InsuranceDetails = ({
   formatDate,
   empInsUpload,
   mainRef,
+  InsuranceClaim
 }) => {
   const [viewingDocument, setViewingDocument] = useState(null); // Document URL or file being viewed
   const [pageNumber, setPageNumber] = useState(1); // For paginated PDF documents
   const [numPages, setNumPages] = useState(null); // Total pages in the document
   const [dependInsurance, setDependInsurance] = useState([]);
+  const [insClaim, setInsClaim] = useState([]);
   const [lastUploadUrl, setPPLastUP] = useState(""); // State to store the last uploaded file's URL
 
   const linkToStorageFile = async (pathUrl) => {
@@ -36,6 +38,8 @@ const InsuranceDetails = ({
       console.error("Error fetching the file URL:", error);
     }
   };
+
+  
 
   // Function to handle document loading success (for pagination)
   const onDocumentLoadSuccess = ({ numPages }) => {
@@ -67,6 +71,25 @@ const InsuranceDetails = ({
       }
     }
   }, [depInsurance]);
+
+  useEffect(() => {
+    // Check if depInsurance is an array and not empty
+    if (Array.isArray(InsuranceClaim) && InsuranceClaim.length > 0) {
+      // Check if the data at depInsurance[0] is a stringified JSON array
+      if (typeof InsuranceClaim[0] === "string") {
+        try {
+          // Parse the string to remove escape characters if needed
+          const parsedString = JSON.parse(InsuranceClaim[0]);
+          setInsClaim(parsedString);
+        } catch (error) {
+          console.error("Error parsing depInsurance:", error);
+        }
+      } else {
+        setInsClaim(InsuranceClaim);
+      }
+    }
+  }, [InsuranceClaim]);
+
 
   const parseDocuments = (docData) => {
     try {
@@ -420,6 +443,77 @@ const InsuranceDetails = ({
               </h4>
               {depend.depenInfUpload && depend.depenInfUpload.length > 0 ? (
                 renderDocumentsUnderCategory(JSON.parse(depend.depenInfUpload))
+              ) : (
+                <p>No documents uploaded.</p>
+              )}
+            </div>
+
+            {/* Status */}
+          </div>
+        ))}
+        
+      </div>
+
+      <div className="flex flex-col gap-8 mt-6">
+        {insClaim.map((depend, index) => (
+          <div
+            key={index}
+            className="depend-detail mb-6 p-4 border rounded-lg shadow-md bg-white mt-4"
+          >
+            {/* Dependent's Name */}
+            <h3 className="uppercase text_size_5  my-3">
+              Insurance claim {index + 1}
+            </h3>
+
+            {/* Passport Details */}
+            <div className="grid grid-cols-3 gap-y-4 items-center font-semibold text-sm">
+              <span className="text-dark_grey">Type of Insurance Claim</span>
+              <span className="text-center text-gray-700">:</span>
+              <span className="text-dark_grey">
+                {depend.claimType || "N/A"}
+              </span>
+
+              <span className="text-dark_grey">Insurance Claim For</span>
+              <span className="text-center text-gray-700">:</span>
+              <span className="text-dark_grey">
+                {depend.claimInfo || "N/A"}
+              </span>
+
+              <span className="text-dark_grey">Clainmant Name</span>
+              <span className="text-center text-gray-700">:</span>
+              <span className="text-dark_grey">
+                {depend.claimantName || "N/A"}
+              </span>
+              <span className="text-dark_grey">Date Reported to Insurance Company</span>
+              <span className="text-center text-gray-700">:</span>
+              <span className="text-dark_grey">
+                {formatDate(depend.dateReported) || "N/A"}
+              </span>
+
+
+              <span className="text-dark_grey">Date of Payment Received</span>
+              <span className="text-center text-gray-700">:</span>
+              <span className="text-dark_grey">
+                {formatDate(depend.datePaid) || "N/A"}
+              </span>
+
+
+              <span className="text-dark_grey">Date Paid to Employee</span>
+              <span className="text-center text-gray-700">:</span>
+              <span className="text-dark_grey">
+                {formatDate(depend.paymentReceived) || "N/A"}
+              </span>
+
+            
+            </div>
+
+            {/* Uploaded Documents */}
+            <div className="uploads mt-6">
+              <h4 className="uppercase text_size_5  my-3">
+                Uploaded Documents:
+              </h4>
+              {depend.claimUpload && depend.claimUpload.length > 0 ? (
+                renderDocumentsUnderCategory(JSON.parse(depend.claimUpload))
               ) : (
                 <p>No documents uploaded.</p>
               )}

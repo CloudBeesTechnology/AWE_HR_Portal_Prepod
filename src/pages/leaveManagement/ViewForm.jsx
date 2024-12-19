@@ -237,6 +237,8 @@ console.log(ticketData);
     }
   };
 
+  console.log(leaveData, "LD")
+
   const handleApprove = () => handleUpdateStatus("Approved");
   const handleReject = () => handleUpdateStatus("Rejected");
 

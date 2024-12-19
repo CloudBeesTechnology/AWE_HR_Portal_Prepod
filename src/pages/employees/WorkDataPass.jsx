@@ -206,6 +206,14 @@ export const WorkDataPass = {
         { label: "Marriage Leave Entitlement", name: "mrageLeave",  type: "text" },
         // { label: "Compassionate Entitlement", name: "compasLeave",  type: "text" },
         { label: "Hospitalisation Leave Entitlement", name: "hospLeave", type: "text" },
+        { label: "Previous Annual Leave Balance", name: "pervAnnualLeaveBal", type: "text" },
+      //   <FormField
+      //   label="Previous Annual Leave Balance"
+      //   register={register}
+      //   type="text"
+      //   name="pervAnnualLeaveBal"
+      //   errors={errors}
+      // />
       ],
      serviceRecords : [
         { label: "Position Revision", name: "positionRev", type: "text" },

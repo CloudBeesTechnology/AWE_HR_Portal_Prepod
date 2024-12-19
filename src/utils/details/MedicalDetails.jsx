@@ -18,7 +18,7 @@ const MedicalDetails = ({
   uploadBwn,
   uploadRegis,
   handlePrint,
-  invoiceRef,
+  invoiceRef, 
   dependPass,
   formatDate,
   mainRef,

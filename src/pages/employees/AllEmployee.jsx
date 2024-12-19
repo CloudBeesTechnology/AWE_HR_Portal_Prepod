@@ -7,7 +7,7 @@ import { DataSupply } from "../../utils/DataStoredContext";
 import { DetailsShowingForm } from "../../utils/details/DetailsShowingForm";
 import { Pagination } from "../../pages/leaveManagement/Pagination";
 
-import {Searchbox} from "../../utils/Searchbox"
+import { Searchbox } from "../../utils/Searchbox";
 const client = generateClient();
 
 export const AllEmployee = () => {
@@ -29,8 +29,9 @@ export const AllEmployee = () => {
     EmpInsuranceData,
     depInsuranceData,
     NLAData,
-    SawpDetails
-  } = useContext(DataSupply); 
+    SawpDetails,
+    insuranceClaimsData,
+  } = useContext(DataSupply);
   // console.log(depInsuranceData, "DATA dep")
   const [searchTerm, setSearchTerm] = useState("");
   const [mergeData, setMergeData] = useState([]); // To store merged data
@@ -45,7 +46,7 @@ export const AllEmployee = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(30);
   const [paginatedData, setPaginatedData] = useState([]);
-  const [data, setData] = useState([])
+  const [data, setData] = useState([]);
 
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
@@ -70,7 +71,7 @@ export const AllEmployee = () => {
     } catch (error) {
       console.error("Error search data", error);
     }
-  }; 
+  };
 
   const getLatestValue = (field) =>
     Array.isArray(field) ? field[field.length - 1] : field;
@@ -95,58 +96,85 @@ export const AllEmployee = () => {
       EmpInsuranceData &&
       depInsuranceData &&
       NLAData &&
-      SawpDetails
+      SawpDetails &&
+      insuranceClaimsData
     ) {
       // Merging all data based on empID
-      const allDataValues = empPIData.map((empPIItem) => {
-        const idMatch = IDData.find((item) => item.empID === empPIItem.empID) || {};
-        const empPDMatch = empPDData.find((item) => item.empID === empPIItem.empID) || {};
-        const sdnMatch = DNData.find((item) => item.empID === empPIItem.empID) || {};
-        const bjlMatch = BJLData.find((item) => item.empID === empPIItem.empID) || {};
-        const ppValidMatch = PPValidsData.find((item) => item.empID === empPIItem.empID) || {};
-        const lmiMatch = LMIData.find((item) => item.empID === empPIItem.empID) || {};
-        const empInsuranceMatch = EmpInsuranceData.find((item) => item.empID === empPIItem.empID) || {};
-        const depInsuranceMatch = depInsuranceData.find((item) => item.empID === empPIItem.empID) || {};
-        const nlaMatch = NLAData.find((item) => item.empID === empPIItem.empID) || {};
-        const terminateMatch = terminateData.find((item) => item.empID === empPIItem.empID) || {};
-        const leaveDetailsMatch = leaveDetailsData.find((item) => item.empID === empPIItem.empID) || {};
-        const srMatch = SRData.find((item) => item.empID === empPIItem.empID) || {};
-        const empLeaveStatusMatch = empLeaveStatusData.find((item) => item.empID === empPIItem.empID) || {};
-        const educDetailsMatch = educDetailsData.find((item) => item.empID === empPIItem.empID) || {};
-        const workInfoMatch = workInfoData.find((item) => item.empID === empPIItem.empID) || {};
-        const userMatch = userData.find((item) => item.empID === empPIItem.empID) || {};
-        const swapMatch = SawpDetails.find((item) => item.empID === empPIItem.empID) || {};
-
-        return {
-          ...empPIItem,
-          ...idMatch,
-          ...empPDMatch,
-          ...sdnMatch,
-          ...bjlMatch,
-          ...ppValidMatch,
-          ...lmiMatch,
-          ...empInsuranceMatch,
-          ...depInsuranceMatch,
-          ...nlaMatch,
-          ...terminateMatch,
-          ...leaveDetailsMatch,
-          ...srMatch,
-          ...empLeaveStatusMatch,
-          ...educDetailsMatch,
-          ...workInfoMatch,
-          ...userMatch,
-          ...swapMatch,
-        };
-      }).filter(item => item?.empID)  // Only include items with a valid empID
-      .reduce((unique, item) => {
-        // Use a Map to keep unique empIDs and avoid duplicates
-        if (!unique.some(emp => emp.empID === item.empID)) {
-          unique.push(item);
-        }
-        return unique;
-      }, []);  // Initialize with an empty array to store unique items
-  ;
-
+      const allDataValues = empPIData
+        .map((empPIItem) => {
+          const idMatch =
+            IDData.find((item) => item.empID === empPIItem.empID) || {};
+          const empPDMatch =
+            empPDData.find((item) => item.empID === empPIItem.empID) || {};
+          const sdnMatch =
+            DNData.find((item) => item.empID === empPIItem.empID) || {};
+          const bjlMatch =
+            BJLData.find((item) => item.empID === empPIItem.empID) || {};
+          const ppValidMatch =
+            PPValidsData.find((item) => item.empID === empPIItem.empID) || {};
+          const lmiMatch =
+            LMIData.find((item) => item.empID === empPIItem.empID) || {};
+          const empInsuranceMatch =
+            EmpInsuranceData.find((item) => item.empID === empPIItem.empID) ||
+            {};
+          const depInsuranceMatch =
+            depInsuranceData.find((item) => item.empID === empPIItem.empID) ||
+            {};
+          const nlaMatch =
+            NLAData.find((item) => item.empID === empPIItem.empID) || {};
+          const terminateMatch =
+            terminateData.find((item) => item.empID === empPIItem.empID) || {};
+          const leaveDetailsMatch =
+            leaveDetailsData.find((item) => item.empID === empPIItem.empID) ||
+            {};
+          const srMatch =
+            SRData.find((item) => item.empID === empPIItem.empID) || {};
+          const empLeaveStatusMatch =
+            empLeaveStatusData.find((item) => item.empID === empPIItem.empID) ||
+            {};
+          const educDetailsMatch =
+            educDetailsData.find((item) => item.empID === empPIItem.empID) ||
+            {};
+          const workInfoMatch =
+            workInfoData.find((item) => item.empID === empPIItem.empID) || {};
+          const userMatch =
+            userData.find((item) => item.empID === empPIItem.empID) || {};
+          const swapMatch =
+            SawpDetails.find((item) => item.empID === empPIItem.empID) || {};
+          const insClaimMatch =
+            insuranceClaimsData.find(
+              (item) => item.empID === empPIItem.empID
+            ) || {};
+          return {
+            ...empPIItem,
+            ...idMatch,
+            ...empPDMatch,
+            ...sdnMatch,
+            ...bjlMatch,
+            ...ppValidMatch,
+            ...lmiMatch,
+            ...empInsuranceMatch,
+            ...depInsuranceMatch,
+            ...nlaMatch,
+            ...terminateMatch,
+            ...leaveDetailsMatch,
+            ...srMatch,
+            ...empLeaveStatusMatch,
+            ...educDetailsMatch,
+            ...workInfoMatch,
+            ...userMatch,
+            ...swapMatch,
+            ...insClaimMatch,
+          };
+        })
+        .filter((item) => item?.empID) // Only include items with a valid empID
+        .reduce((unique, item) => {
+          // Use a Map to keep unique empIDs and avoid duplicates
+          if (!unique.some((emp) => emp.empID === item.empID)) {
+            unique.push(item);
+          }
+          return unique;
+        }, []); // Initialize with an empty array to store unique items
       const sorted = allDataValues.sort((a, b) =>
         a.empID.localeCompare(b.empID)
       );
@@ -184,6 +212,7 @@ export const AllEmployee = () => {
     depInsuranceData,
     NLAData,
     SawpDetails,
+    insuranceClaimsData,
   ]);
 
   const handleFilterChange = (e) => {
@@ -247,62 +276,64 @@ export const AllEmployee = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, '0');  
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); 
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
-    
+
     return `${day}/${month}/${year}`;
   };
- 
+
   const getStatusClass = (workStatus) => {
-    return {
-      Active: "text-[green]",
-      Probationary: "text-[#E8A317]",
-      Resignation: "text-red",
-      Termination: "text-[red]",
-    }[workStatus] || "text-medium_grey";
+    return (
+      {
+        Active: "text-[green]",
+        Probationary: "text-[#E8A317]",
+        Resignation: "text-red",
+        Termination: "text-[red]",
+      }[workStatus] || "text-medium_grey"
+    );
   };
   console.log(mergeData);
 
   return (
     <section className="bg-[#F5F6F1CC] w-full flex items-center flex-col h-screen pt-14">
-<div className="w-full px-10 flex justify-between items-center mb-10">
-  <div className="bg-[#faf362] py-2 px-3 rounded-lg text-[18px] font-semibold">
-    All Employee Details
-  </div>
-  <div className="flex items-center space-x-4">
-    <div className="relative">
-      <Searchbox
-        type="text"
-        placeholder="Search by Name or Emp ID"
-        allEmpDetails={mergeData}
-        searchUserList={setFilteredData}
-        className="py-2 px-4 "
-      />
-      <img
-        src={searchIcon}
-        alt="Search Icon"
-        className="absolute top-1/2 right-2 transform -translate-y-1/2 w-4 h-4"
-      />
-    </div>
-    <select
-  className="py-[7px] px-2 border border-lite_grey focus:outline-none focus:ring-0"
-  onChange={handleFilterChange}
-  >
-    <option value="All">All</option>
-    <option value="Local">Local</option>
-    <option value="Foreigner">Foreigner</option>
-    <option value="LPA">LPA</option>
-    <option value="SAWP">SAWP</option>
-    <option value="OnShore">OnShore</option>
-    <option value="OffShore">OffShore</option>
-    <option value="Active">Active</option>
-    <option value="Probationary">Probationary</option>
-    <option value="Resignation">Resignation</option>
-    <option value="Termination">Termination</option>
-  </select>
- </div>
-</div>
+      <div className="w-full px-10 flex justify-between items-center mb-10">
+        <div className="bg-[#faf362] py-2 px-3 rounded-lg text-[18px] font-semibold">
+          All Employee Details
+        </div>
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <Searchbox
+              type="text"
+              placeholder="Search by Name or Emp ID"
+              allEmpDetails={mergeData}
+              searchUserList={setFilteredData}
+              className="py-2 px-4 "
+            />
+            <img
+              src={searchIcon}
+              alt="Search Icon"
+              className="absolute top-1/2 right-2 transform -translate-y-1/2 w-4 h-4"
+            />
+          </div>
+          <select
+            className="py-[7px] px-2 border border-lite_grey focus:outline-none focus:ring-0"
+            onChange={handleFilterChange}
+          >
+            <option value="All">All</option>
+            <option value="Local">Local</option>
+            <option value="Foreigner">Foreigner</option>
+            <option value="LPA">LPA</option>
+            <option value="SAWP">SAWP</option>
+            <option value="OnShore">OnShore</option>
+            <option value="OffShore">OffShore</option>
+            <option value="Active">Active</option>
+            <option value="Probationary">Probationary</option>
+            <option value="Resignation">Resignation</option>
+            <option value="Termination">Termination</option>
+          </select>
+        </div>
+      </div>
       <div className=" overflow-x-auto  mt-8 w-[100%] ml-4 rounded-xl">
         <div className="w-full px-4 max-h-[calc(70vh-7rem)] overflow-y-auto">
           <table className="w-full rounded-xl table-auto">
@@ -322,26 +353,47 @@ export const AllEmployee = () => {
             </thead>
             <tbody className="bg-white text-center text-sm font-semibold text-dark_grey cursor-pointer">
               {paginatedData.map((candidate, index) => (
-                
                 <tr
                   key={index}
                   className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
                   onClick={() => {
-                    {handleFormShow(candidate)}
-                  } 
-                }
+                    {
+                      handleFormShow(candidate);
+                    }
+                  }}
                 >
                   <td className=" py-4 px-4 ">{candidate?.empID || "N/A"}</td>
-                  <td className=" py-4 px-4 ">{candidate?.empBadgeNo || "N/A"}</td>
+                  <td className=" py-4 px-4 ">
+                    {candidate?.empBadgeNo || "N/A"}
+                  </td>
                   <td className="py-4 px-4 ">{candidate?.name || "N/A"}</td>
-                  <td className="py-4 px-4">{formatDate(candidate?.dob || "N/A")}</td>
-                  <td className="py-4 px-4">{candidate?.nationality || "N/A"}</td>
-                  <td className="py-4 px-4">{candidate?.contractType || "N/A"}</td>  
-                  <td className="py-4 px-4">{candidate?.empType || "N/A"}</td>
+                  <td className="py-4 px-4">
+                    {formatDate(candidate?.dob || "N/A")}
+                  </td>
+                  <td className="py-4 px-4">
+                    {candidate?.nationality || "N/A"}
+                  </td>
+                  <td className="py-4 px-4">
+                    {candidate?.contractType?.[
+                      candidate.contractType.length - 1
+                    ] || "N/A"}
+                  </td>
+                  <td className="py-4 px-4">
+                    {candidate?.empType?.[candidate.empType.length - 1] ||
+                      "N/A"}
+                  </td>
+
                   <td className="py-4 px-4 ">{candidate?.email || "N/A"}</td>
-                  <td className="py-4 px-4 ">{candidate?.contactNo || "N/A"}</td>
-                 <td className={`py-4 px-4 font-bold ${getStatusClass(candidate?.workStatus || "N/A")}`}>
-                     {candidate?.workStatus || "N/A"}  </td>                
+                  <td className="py-4 px-4 ">
+                    {candidate?.contactNo || "N/A"}
+                  </td>
+                  <td
+                    className={`py-4 px-4 font-bold ${getStatusClass(
+                      candidate?.workStatus || "N/A"
+                    )}`}
+                  >
+                    {candidate?.workStatus || "N/A"}{" "}
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -6,11 +6,14 @@ import { generateClient } from "@aws-amplify/api";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { SubmitInterviewSchedule } from "../../../services/createMethod/SubmitInterviewSchedule";
 import { FormField } from "../../../utils/FormField";
+import { LocalMobilization } from "../../../services/createMethod/CreateLOI";
 
 // const client = generateClient();
 
 export const ScheduleInter = ({ candidate, onClose }) => {
   const [notification, setNotification] = useState(false);
+    const { localMobilization } =
+      LocalMobilization(); // Use the custom hook
   const {
     register,
     handleSubmit,
@@ -29,10 +32,18 @@ export const ScheduleInter = ({ candidate, onClose }) => {
       candidateStatus: "pending",
     }; 
 
+    const mobilizationData = {
+      tempID: candidate.tempID,
+      // Include other required fields for localMobilization
+    };
+  
+
     console.log("Formatted Data:", formattedData);
+    console.log("Mobilization Data:", mobilizationData);
 
     // setNotification(true);
     await createSchedule(formattedData);
+    await localMobilization(mobilizationData)
   });
 
   return (
@@ -148,7 +159,7 @@ export const ScheduleInter = ({ candidate, onClose }) => {
           </div>
           {notification && (
             <SpinLogo
-              text="Scheduled Notification Sent to HRD & Manager"
+              text="Interview scheduled notification sent to HRD & Manager successfully"
               notification={notification}
               path="/recrutiles/listofcandi"
             />

@@ -302,7 +302,7 @@ const filteredTableBody = tableBody.filter((row) => {
       {/* Table */}
       {filteredTableBody.length > 0 ? (
         <div>
-          <h1 className="text-xl font-bold center my-10">{typeOfReport}</h1>
+          <h1 className="text-xl font-bold center my-10 uppercase">{typeOfReport}</h1>
 
           <div className="w-full overflow-x-auto overflow-y-auto h-[500px] scrollbar-hide shadow-lg">
             <table className="mt-5 border-collapse w-full">

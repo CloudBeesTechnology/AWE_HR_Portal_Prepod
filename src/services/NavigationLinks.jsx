@@ -81,6 +81,8 @@ import { TicketsTable } from "../pages/leaveManagement/TicketsTable";
 import { ListTimeSheet } from "../pages/timeSheet/ListTimeSheet";
 import { VTimeSheetTable } from "../pages/timeSheet/VTimeSheetTable";
 import MyComponent from "../pages/leaveManagement/CheckingData";
+import { RM } from "../pages/reports/RM";
+import { Resignation } from "../pages/reports/Resignation";
 
 const client = generateClient();
 
@@ -144,7 +146,7 @@ const NavigationLinks = () => {
     }
     fetchUserData();
   }, []);
-
+  
   const extractMainCategories = (permissionsString) => {
     const regex = /(\w+)=\[/g;
     const matches = [];
@@ -305,6 +307,9 @@ const NavigationLinks = () => {
                   <>
                     <Route path="/reports" Component={Reports} />
                     <Route path="/probForm" Component={ProbationForm} />
+      
+    <Route path="rm" Component={RM} />
+    <Route path="/resignation" Component={Resignation} />
                   </>
                 )}
                 {show === "BenefitsAndRewards" && (

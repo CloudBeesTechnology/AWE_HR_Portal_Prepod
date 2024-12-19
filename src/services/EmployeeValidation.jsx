@@ -253,10 +253,7 @@ export const WorkInfoSchema = Yup.object().shape({
   salaryType: Yup.string()
     .required("Type of Salary Pay is mandatory")
     .notOneOf([""], "Type of Salary Pay is mandatory"),
-
-  // leaveBal: Yup.string()
-  // .required("Leave Balance is mandatory"),
-
+    pervAnnualLeaveBal: Yup.string().notRequired(),
   resignDate: Yup.string().notRequired(),
   termiDate: Yup.string().notRequired(),
   resignNotProb: Yup.string().notRequired(),

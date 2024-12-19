@@ -43,13 +43,6 @@ export const WIRowThree = ({ register, errors, watch, setValue, control }) => {
         name="salaryType"
         errors={errors}
       />
-      {/* <FormField
-        label="Annual Leave Balance for 2024"
-        register={register}
-        type="text"
-        name="leaveBal"
-        errors={errors}
-      /> */}
 
     </div>
   )

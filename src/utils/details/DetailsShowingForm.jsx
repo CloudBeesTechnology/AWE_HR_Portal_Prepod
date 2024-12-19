@@ -132,9 +132,11 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     workmenCompNo,
     bankAccNo,
     bankName,
+    insuranceClaims,
     age,
     email,
     aTQualify,
+    address,
     agent,
     alternateNo,
     accidentIns,
@@ -323,8 +325,12 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     reEntryUpload,
     probDuration,
     hospLeave,
+    pervAnnualLeaveBal
 
   } = passingValue;
+  console.log(address)
+
+  console.log(insuranceClaims)
 
   const personalDetails = {
     "Name": name,
@@ -342,6 +348,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Age": age,
     "Gender": gender,
     "Marital Status": marital,
+
     "Country of birth": cob,
     "Country of Origin": ctryOfOrigin,
     "Other country of origin": oCOfOrigin,
@@ -362,6 +369,8 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Passport issued destination": ppDestinate,
     "Email": email,
     "Official Email": officialEmail,
+    "Address" : 
+    permanentAddress,
     "Contact No": contactNo,
     "Alternate Number": alternateNo,
     "Language": lang,
@@ -416,16 +425,19 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Workmen Compensation Insurance" : empStatusType,
     "Personal Accident Insurance": accidentIns,
     "Travelling Insurance" : travelIns,
-    // "Employee Insurance Upload" : empInsUpload,
     "Policy Number" : workmenCompNo,
-    // DependentInsurance : {
-    //   "Dependent Insurance" : depInsurance,      
-    // }
+  
   };
 
   const DependentInsurance = {
     "Dependent Insurance" : depInsurance,
   }
+
+  const InsuranceClaim = {
+    "Insurance Claim" : insuranceClaims,
+  }
+
+
 
   const workInfo = {
     employeeDetails: {
@@ -474,8 +486,8 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       "Maternity Leave Entitlement": materLeave,
       "Paternity Leave Entitlement": paterLeave, 
       "Marriage Leave Entitlement": mrageLeave,    
-      "Compassionate Entitlement": compasLeave,
       "Hospitalisation Leave Entitlement": hospLeave,
+      "Previous Annual Leave Balance": pervAnnualLeaveBal,
     },
 
     TerminateDetails: {
@@ -671,6 +683,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                   <InsuranceDetails
                     insuranceInfo={insuranceInfo}
                     DependentInsurance={DependentInsurance}
+                    InsuranceClaim={insuranceClaims}
                     handlePrint={handlePrint}
                     invoiceRef={invoiceRef}
                     depInsurance={depInsurance}

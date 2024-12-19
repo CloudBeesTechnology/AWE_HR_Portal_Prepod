@@ -102,7 +102,7 @@ export const AddCourseForm = ({ closeModal }) => {
           ...data,
         };
 
-        console.log("Creating new data:", AddCFCre);
+        // console.log("Creating new data:", AddCFCre);
         await AddCourseData({ AddCFCre });
         setShowTitle("Training Add Course Form Saved successfully");
         setNotification(true);
@@ -143,7 +143,7 @@ export const AddCourseForm = ({ closeModal }) => {
           <div className="mb-4 relative">
             <label className="font-semibold">Course Name:</label>
             {courseName.map((_, index) => (
-              <div key={index} className="flex  items-center mb-2">
+              <div key={index} className="flex items-center mb-2">
                 <input
                   type="text"
                   value={courseName[index]}
@@ -165,12 +165,11 @@ export const AddCourseForm = ({ closeModal }) => {
                     <FaRegMinusSquare/>
                   </button>
                 )}
-                
-                {/* {errors.courseName && errors.courseName[index] && (
+                {errors.courseName && errors.courseName[index] && (
                   <p className="text-[red] text-[13px] mt-1">
                     {errors.courseName[index].message}
                   </p>
-                )} */}
+                )}
               </div>
             ))}
             <button

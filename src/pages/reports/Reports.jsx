@@ -133,6 +133,8 @@ export const Reports = () => {
     { title: "Passport Expiry" },
     { title: "Employment Medical" },
     // new added
+
+    { title: "PROMOTION REPORT" },
     { title: "Qualified Welder Registered" },
     { title: "Blaster Painter Qualification" },
     { title: "LBD KPI" },

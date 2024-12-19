@@ -32,7 +32,7 @@ export const EmpLeaveBalance = () => {
   useEffect(() => {
     const uniqueData = [];
     const seen = new Set();
-
+const userID=localStorage.getItem("userID")
     mergedData.forEach((val) => {
       const uniqueKey = val.empID;
 
@@ -41,8 +41,21 @@ export const EmpLeaveBalance = () => {
         uniqueData.push(val);
       }
     });
-    setSecondartyData(uniqueData);
-    setData(uniqueData);
+
+    const result = uniqueData.filter((item) => {
+      if (userType === "Manager") {
+        return item.managerEmpID === userID;
+      } else if (userType === "Supervisor") {
+        return item.supervisorEmpID === userID;
+      } else if (userType === "SuperAdmin" || userType === "HR") {
+        return true; // Include all items for these user types
+      }
+      return false; // Default to exclude items if no condition is met
+    });
+  // console.log(result);
+  
+    setSecondartyData(result);
+    setData(result);
   }, [mergedData]);
 
   // Handle "view summary" click
@@ -55,12 +68,18 @@ export const EmpLeaveBalance = () => {
   const handleClosePopup = () => {
     setShowPopup(false);
   };
+  // console.log(secondartyData);
+  
 
   useEffect(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
 
-    const dataToPaginate =
-      searchResults.length > 0 ? searchResults : secondartyData;
+    const dataToPaginate = searchResults.length > 0 ? searchResults : secondartyData;
+
+    if (dataToPaginate.length === 0) {
+      setFilteredData([]);
+      return;
+    }
 
     const sortedData = dataToPaginate.sort((a, b) => {
       const regex = /\d+$/;
@@ -99,11 +118,13 @@ export const EmpLeaveBalance = () => {
     try {
       const result = await data;
       setSearchResults(result);
+      setCurrentPage(1); // Reset to first page when new search is performed
     } catch (error) {
       console.error("Error search data", error);
       setSearchResults([]);
     }
   };
+  
   return (
     <section className="relative w-full">
       <div className="flex flex-wrap justify-between items-center mb-5">
@@ -119,10 +140,10 @@ export const EmpLeaveBalance = () => {
         />
       </div>
       
-      <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl py-3">
-        {(searchResults.length === 0 && secondartyData.length > 0) ? (
+      <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl">
+        {(searchResults.length > 0  && filteredData.length === 0) ? (
           <div className="text-center mt-6 py-20">
-            <p>No matching results found.</p>
+            <p className="text-red-500 font-medium">No matching results found for your search.</p>
           </div>
         ) : filteredData && filteredData.length > 0 ? (
           <table className="w-full font-semibold text-sm">
@@ -173,7 +194,7 @@ export const EmpLeaveBalance = () => {
           </table>
         ) : (
           <div className="text-center mt-6 py-20">
-            <p>No leave data available for employees.</p>
+            <p className="text-gray-600">No leave data available for employees.</p>
           </div>
         )}
       </div>

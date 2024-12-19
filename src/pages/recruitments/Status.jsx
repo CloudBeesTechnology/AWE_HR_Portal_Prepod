@@ -114,111 +114,6 @@ export const Status = () => {
     });
   };
 
-  // Fetch interview data and merge with context
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const [interviewDatas] = await Promise.all([
-  //         client.graphql({
-  //           query: listInterviewSchedules,
-  //         }),
-  //       ]);
-
-  //       const interviews =
-  //         interviewDatas?.data?.listInterviewSchedules?.items || [];
-
-  //       // if (empPDData && educDetailsData ) {
-  //       //   const merged = mergeContextData(empPDData, educDetailsData);
-
-  //       if (empPDData && educDetailsData && IVSSDetails) {
-  //         // Filter empPDData to include only those whose tempID is also in IVSSDetails
-  //         const filteredEmpPDData = empPDData.filter((emp) =>
-  //           IVSSDetails.some((ivss) => ivss.tempID === emp.tempID)
-  //         );
-
-  //         // Merge the filtered empPDData with educDetailsData
-  //         const merged = mergeContextData(filteredEmpPDData, educDetailsData);
-
-  //         // Add interview details
-  //         const mergedWithInterviews = merged.map((candidate) => {
-  //           const interviewDetails = interviews.find(
-  //             (interview) => interview.tempID === candidate.tempID
-  //           );
-  //           return interviewDetails
-  //             ? { ...candidate, ...interviewDetails }
-  //             : candidate;
-  //         });
-
-  //         setMergeData(mergedWithInterviews);
-  //         setFilteredData(mergedWithInterviews);
-  //         setLoading(false);
-  //       }
-  //     } catch (err) {
-  //       setError(err.message);
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, [empPDData, educDetailsData, IVSSDetails, ]);
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const [
-  //         interviewDatas, // Existing interview data fetch
-  //         localMobilizationData, // New fetch for local mobilization data
-  //       ] = await Promise.all([
-  //         client.graphql({
-  //           query: listInterviewSchedules, // Query for interviews
-  //         }),
-  //         client.graphql({
-  //           query: listLocalMobilizations, // Query for local mobilizations
-  //         }),
-  //       ]);
-
-  //       const interviews =
-  //         interviewDatas?.data?.listInterviewSchedules?.items || [];
-  //       const localMobilizations =
-  //         localMobilizationData?.data?.listLocalMobilizations?.items || [];
-
-  //       if (empPDData && educDetailsData && IVSSDetails) {
-  //         // Filter empPDData to include only those whose tempID is also in IVSSDetails
-  //         const filteredEmpPDData = empPDData.filter((emp) =>
-  //           IVSSDetails.some((ivss) => ivss.tempID === emp.tempID)
-  //         );
-
-  //         // Merge the filtered empPDData with educDetailsData
-  //         const merged = mergeContextData(filteredEmpPDData, educDetailsData);
-
-  //         // Add interview details and local mobilization details
-  //         const mergedWithDetails = merged.map((candidate) => {
-  //           const interviewDetails = interviews.find(
-  //             (interview) => interview.tempID === candidate.tempID
-  //           );
-
-  //           const mobilizationDetails = localMobilizations.find(
-  //             (mobilization) => mobilization.tempID === candidate.tempID ||  mobilization.tempID === null && candidate.tempID
-  //           );
-
-  //           return {
-  //             ...candidate,
-  //             ...(interviewDetails ? { interviewDetails } : {}),
-  //             ...(mobilizationDetails ? { mobilizationDetails } : {}),
-  //           };
-  //         });
-
-  //         setMergeData(mergedWithDetails);
-  //         setFilteredData(mergedWithDetails);
-  //         setLoading(false);
-  //       }
-  //     } catch (err) {
-  //       setError(err.message);
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, [empPDData, educDetailsData, IVSSDetails]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -331,12 +226,49 @@ export const Status = () => {
             ),
           ];
         }
-
+  
         // If none of the special rules apply, just add the option
         return [...prevSelectedOptions, option];
       }
     });
+    
+    // Now filter mergeData based on the selected options
+    filterMergeDataBasedOnOptions();
   };
+
+  const filterMergeDataBasedOnOptions = () => {
+    let filteredData = mergeData;
+  
+    // Filtering logic based on selected options
+    if (selectedOptions.includes("LOCAL")) {
+      filteredData = filteredData.filter((item) => item.contractType === "Local");
+    }
+  
+    if (selectedOptions.includes("NON LOCAL")) {
+      filteredData = filteredData.filter((item) => item.contractType === "Non Local");
+    }
+  
+    if (selectedOptions.includes("ONSHORE")) {
+      filteredData = filteredData.filter((item) => item.empType === "Onshore");
+    }
+  
+    if (selectedOptions.includes("OFFSHORE")) {
+      filteredData = filteredData.filter((item) => item.empType === "Offshore");
+    }
+  
+    if (selectedOptions.includes("LPA")) {
+      filteredData = filteredData.filter((item) => item.contractType  === "LPA");
+    }
+  
+    if (selectedOptions.includes("SAWP")) {
+      filteredData = filteredData.filter((item) => item.contractType  === "SAWP");
+    }
+  
+    // After applying all the filters, set the filtered data
+    setFilteredData(filteredData);
+  };
+  
+
 
   const isOptionDisabled = (option) => {
     if (selectedOptions.includes("LOCAL")) {
@@ -393,12 +325,13 @@ export const Status = () => {
       case "Interview Scheduled":
         const pendingCandi = mergeData.filter(
           (val) =>
-            val.interviewDetails.candidateStatus === "pending" || "" && 
+            val.interviewDetails.status === "pending" || "" && 
             val.interviewDetails.status !== "Selected" && 
             val.interviewDetails.mobSignDate === null || ""
         );
 
         setFilteredData(pendingCandi);
+        console.log(pendingCandi, "pending")
         break;
 
       case "Selected Candidate":
@@ -425,13 +358,18 @@ export const Status = () => {
       case "CVEV_OffShore":
         const cvevOff = mergeData.filter(
           (val) => 
-            val.cvecApproveDate !== null && val.empType === "Offshore"
+            val.cvecApproveDate !== null && val.empType === "Offshore" &&
+            val.paafApproveDate === null || "" &&
+            val.mobSignDate === null || ""
         );
         setFilteredData(cvevOff);
         break;
       case "PAAF_OnShore":
         const paafOn = mergeData.filter(
-          (val) => val.paafApproveDate !== null && val.empType === "Onshore"
+          (val) => 
+            val.paafApproveDate !== null && val.empType === "Onshore" &&
+            val.mobSignDate === null || ""
+
         );
         setFilteredData(paafOn);
         break;
@@ -439,7 +377,10 @@ export const Status = () => {
         const mobiliLocal = mergeData.filter(
           (val) => 
             val.contractType === "Local" &&
-            val.mobSignDate !== null
+            val.mobSignDate !== null &&
+            val.loiAcceptDate !== null && 
+            val.cvecApproveDate !== null && 
+            val.paafApproveDate !== null 
         );
         setFilteredData(mobiliLocal);
         break;

@@ -71,7 +71,7 @@ export const UpdateWIData = () => {
       sickLeave,
       sickLeaveDate,
       hospLeave,
-  
+      pervAnnualLeaveBal,
       resignDate,
       resignNotProb,
       otherResignNotProb,
@@ -299,6 +299,7 @@ export const UpdateWIData = () => {
       materLeave,
       paterLeave,
       mrageLeave,
+      pervAnnualLeaveBal,
       // compasLeave,
       hospLeave, 
      

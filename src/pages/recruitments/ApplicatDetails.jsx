@@ -1,15 +1,30 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import avatar from "../../assets/navabar/avatar.jpeg";
 import { ApplicantSchema } from "../../services/Validation";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { IoCameraOutline } from "react-icons/io5";
 import { uploadDocs } from "../../services/uploadDocsS3/UploadDocs";
 import { FormField } from "../../utils/FormField";
-import { ContractTypeDD, GenderDD, MaritalDD, NationalityDD, RaceDD, ReligionDD } from "../../utils/DropDownMenus";
+import { useOutletContext } from "react-router-dom";
+import { getUrl } from "@aws-amplify/storage";
+import avatar from "../../assets/navabar/avatar.jpeg";
+
+import {
+  ContractTypeDD,
+  GenderDD,
+  MaritalDD,
+  NationalityDD,
+  RaceDD,
+  ReligionDD,
+} from "../../utils/DropDownMenus";
+import { DataSupply } from "../../utils/DataStoredContext";
 
 export const ApplicantDetails = () => {
+  const { empPDData } = useContext(DataSupply);
+  const { tempID } = useOutletContext();
+  const navigate = useNavigate();
+
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -17,10 +32,50 @@ export const ApplicantDetails = () => {
     });
   }, []);
 
-  const navigate = useNavigate();
-  const [file, setFile] = useState(null);
-  const location = useLocation();
-  const data = location.state?.editingData;
+  const [formData, setFormData] = useState({
+    personalDetails: {
+      age: "",
+      agent: "",
+      alternateNo: "",
+      bwnIcColour: "",
+      bwnIcExpiry: "",
+      bwnIcNo: "",
+      chinese: "",
+      cob: "",
+      contactNo: "",
+      contractType: "",
+      createdAt: "",
+      dob: "",
+      driveLic: "",
+      eduDetails: "",
+      email: "",
+      empType: "",
+      familyDetails: "",
+      gender: "",
+      id: "",
+      lang: "",
+      marital: "",
+      name: "",
+      nationality: "",
+      otherNation: "",
+      otherRace: "",
+      otherReligion: "",
+      permanentAddress: "",
+      position: "",
+      ppDestinate: "",
+      ppExpiry: "",
+      ppIssued: "",
+      ppNo: "",
+      presentAddress: "",
+      profilePhoto: "",
+      race: "",
+      religion: "",
+      status: "",
+      tempID: "",
+      updatedAt: "",
+      workExperience: "",
+    },
+  });
 
   const {
     register,
@@ -30,27 +85,67 @@ export const ApplicantDetails = () => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(ApplicantSchema), // Use the Yup schema for validation
-    defaultValues: JSON.parse(localStorage.getItem("applicantFormData")) || {}, // Load saved data from localStorage
+    defaultValues: {}, // Load saved data from localStorage
   });
   const [uploadedDocs, setUploadedDocs] = useState({ profilePhoto: null });
   const [profilePhoto, setProfilePhoto] = useState(null);
+  const [imageUrl, setImageUrl] = useState("");
+
+  const linkToImageFile = async (pathUrl) => {
+    const result = await getUrl({
+      path: pathUrl,
+    });
+    setImageUrl(result.url.toString());
+  };
 
   // Load form data from localStorage when the component mounts
   useEffect(() => {
-    const savedData = JSON.parse(localStorage.getItem("applicantFormData"));
-    if (savedData) {
-      Object.keys(savedData).forEach((key) => setValue(key, savedData[key]));
+    if (tempID) {
+      const savedData = JSON.parse(localStorage.getItem("applicantFormData"));
+      if (savedData) {
+        Object.keys(savedData).forEach((key) => setValue(key, savedData[key]));
+      }
+
+      if (empPDData.length > 0) {
+        const interviewData = empPDData.find((data) => data.tempID === tempID);
+        if (interviewData) {
+          // Set form fields with empPDData if available
+          Object.keys(interviewData).forEach((key) => {
+            if (interviewData[key]) {
+              setValue(key, interviewData[key]);
+            }
+          });
+          // Load profile photo from empPDData (if available)
+          if (interviewData.profilePhoto) {
+            setUploadedDocs((prev) => ({
+              ...prev,
+              profilePhoto: interviewData.profilePhoto,
+            }));
+          }
+        }
+      }
+
+      // Fetch profile photo URL if available
+      if (uploadedDocs.profilePhoto) {
+        linkToImageFile(uploadedDocs.profilePhoto);
+      }
     }
-  }, [setValue]);
+  }, [empPDData, tempID, setValue, uploadedDocs.profilePhoto]);
 
   // Handle file upload and set the profile photo URL
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      setProfilePhoto(selectedFile);
-      setValue("profilePhoto", selectedFile);
 
-      await uploadDocs(selectedFile, "profilePhoto", setUploadedDocs, "Employee");
+    if (selectedFile) {
+      // Handle the file object
+      setProfilePhoto(selectedFile); // Store the file object in state
+      setValue("profilePhoto", selectedFile); // Set form value for profilePhoto
+      await uploadDocs(
+        selectedFile,
+        "profilePhoto",
+        setUploadedDocs,
+        "Employee"
+      );
     }
   };
 
@@ -76,6 +171,58 @@ export const ApplicantDetails = () => {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    if (empPDData.length > 0) {
+      const interviewData = empPDData.find((data) => data.tempID === tempID); // Assuming we want to take the first item
+      if (interviewData) {
+        setFormData({
+          personalDetails: {
+            age: interviewData.age || "",
+            agent: interviewData.agent || "",
+            alternateNo: interviewData.alternateNo || "",
+            bwnIcColour: interviewData.bwnIcColour || "",
+            bwnIcExpiry: interviewData.bwnIcExpiry || "",
+            bwnIcNo: interviewData.bwnIcNo || "",
+            chinese: interviewData.chinese || "",
+            cob: interviewData.cob || "",
+            contactNo: interviewData.contactNo || "",
+            contractType: interviewData.contractType || "",
+            createdAt: interviewData.createdAt || "",
+            dob: interviewData.dob || "",
+            driveLic: interviewData.driveLic || "",
+            eduDetails: interviewData.eduDetails || "",
+            email: interviewData.email || "",
+            empType: interviewData.empType || "",
+            familyDetails: interviewData.familyDetails || "",
+            gender: interviewData.gender || "",
+            id: interviewData.id || "",
+            lang: interviewData.lang || "",
+            marital: interviewData.marital || "",
+            name: interviewData.name || "",
+            nationality: interviewData.nationality || "",
+            otherNation: interviewData.otherNation || "",
+            otherRace: interviewData.otherRace || "",
+            otherReligion: interviewData.otherReligion || "",
+            permanentAddress: interviewData.permanentAddress || "",
+            position: interviewData.position || "",
+            ppDestinate: interviewData.ppDestinate || "",
+            ppExpiry: interviewData.ppExpiry || "",
+            ppIssued: interviewData.ppIssued || "",
+            ppNo: interviewData.ppNo || "",
+            presentAddress: interviewData.presentAddress || "",
+            profilePhoto: interviewData.profilePhoto || "",
+            race: interviewData.race || "",
+            religion: interviewData.religion || "",
+            status: interviewData.status || "",
+            tempID: interviewData.tempID || "",
+            updatedAt: interviewData.updatedAt || "",
+            workExperience: interviewData.workExperience || "",
+          },
+        });
+      }
+    }
+  }, [empPDData, tempID]);
 
   return (
     <section className="w-full">
@@ -117,7 +264,6 @@ export const ApplicantDetails = () => {
             )}
           </div>
 
-          {/* Upload Photo */}
           <div className="py-2 center flex-col max-w-[160px]">
             <input
               type="file"
@@ -127,23 +273,23 @@ export const ApplicantDetails = () => {
               onChange={handleFileChange}
               className="hidden"
             />
-           <div className="h-[120px] max-w-[120px] relative rounded-md bg-lite_skyBlue">
+            <div className="h-[120px] max-w-[120px] relative rounded-md bg-lite_skyBlue">
               <img
                 src={
-                  profilePhoto
+                  imageUrl
+                    ? imageUrl
+                    : profilePhoto
                     ? URL.createObjectURL(profilePhoto)
-                    : uploadedDocs.profilePhoto
-                    ? uploadedDocs.profilePhoto
-                    : avatar
+                    : uploadedDocs.profilePhoto || avatar
                 }
                 id="previewImg"
                 alt="profile"
                 className="object-cover w-full h-full"
-                onError={(e) => (e.target.src = avatar)}
+                onError={(e) => (e.target.src = avatar)} // Handle image load errors
               />
-              {(profilePhoto || uploadedDocs.profilePhoto) && (
+              {(profilePhoto || uploadedDocs.profilePhoto || imageUrl) && (
                 <div
-                  className="absolute top-24 -right-3  bg-lite_grey p-[2px] rounded-full cursor-pointer"
+                  className="absolute top-24 -right-3 bg-lite_grey p-[2px] rounded-full cursor-pointer"
                   onClick={() => document.getElementById("fileInput").click()}
                 >
                   <IoCameraOutline className="w-6 h-6 p-1" />
@@ -151,7 +297,7 @@ export const ApplicantDetails = () => {
               )}
             </div>
 
-            {!profilePhoto && !uploadedDocs.profilePhoto && (
+            {!profilePhoto && !uploadedDocs.profilePhoto && !imageUrl && (
               <div className="mt-1 rounded-lg text-center">
                 <button
                   type="button"
@@ -169,29 +315,26 @@ export const ApplicantDetails = () => {
               </p>
             )}
           </div>
-           {/* <div className="py-2 center flex-col max-w-[160px]">
+
+          {/* Upload Photo */}
+          {/* <div className="py-2 center flex-col max-w-[160px]">
             <input
               type="file"
               id="fileInput"
               name="profilePhoto"
               accept=".jpg,.jpeg,.png"
-              onChange={(e) => handleFileUpload(e, "profilePhoto")}
+              onChange={handleFileChange}
               className="hidden"
             />
             <div className="h-[120px] max-w-[120px] relative rounded-md bg-lite_skyBlue">
               <img
-                src={
-                  profilePhoto
-                    ? URL.createObjectURL(profilePhoto)
-                    : uploadedDocs.profilePhoto
-                    ? uploadedDocs.profilePhoto
-                    : avatar
-                }
+                src={imageUrl}
                 id="previewImg"
                 alt="profile"
                 className="object-cover w-full h-full"
-                onError={(e) => (e.target.src = avatar)}
+                onError={(e) => (e.target.src = avatar)} // Fallback image if there's an error
               />
+
               {(profilePhoto || uploadedDocs.profilePhoto) && (
                 <div
                   className="absolute top-24 -right-3  bg-lite_grey p-[2px] rounded-full cursor-pointer"
@@ -210,10 +353,9 @@ export const ApplicantDetails = () => {
                   onClick={() => document.getElementById("fileInput").click()}
                 >
                   Choose Image
-                </button>
+                </button> 
               </div>
             )}
-            
 
             {errors.profilePhoto && (
               <p className="text-[red] text-[13px] text-center">
@@ -260,7 +402,7 @@ export const ApplicantDetails = () => {
               label: "Nationality",
               name: "nationality",
               type: "select",
-              options:  NationalityDD,
+              options: NationalityDD,
             },
             {
               label: "Other Nationality",
@@ -284,7 +426,7 @@ export const ApplicantDetails = () => {
               label: "Religion",
               name: "religion",
               type: "select",
-              options:ReligionDD,
+              options: ReligionDD,
             },
             {
               label: "Other Religion",
@@ -300,7 +442,7 @@ export const ApplicantDetails = () => {
                   {...register(field.name)}
                   className="mt-2 p-2.5 text_size_7 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full"
                 >
-                    <option value=""></option>
+                  <option value=""></option>
                   {(field.options || []).map((option, i) => (
                     <option key={i} value={option.value}>
                       {option.label}

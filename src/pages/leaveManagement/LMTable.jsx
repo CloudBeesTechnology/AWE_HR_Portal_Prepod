@@ -53,7 +53,7 @@ export const LMTable = () => {
       ? "text-dark_grey"
       : "text-[#E8A317]";
   };
-console.log(data.length);
+// console.log(data.length);
 
   return (
     <section className="flex flex-col w-full mt-4">
