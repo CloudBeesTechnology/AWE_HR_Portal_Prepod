@@ -12,9 +12,6 @@ import { useLocation, useOutletContext } from "react-router-dom";
 import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
 import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
 
-
-
-
 export const VTimeSheetTable = (
   {
     // AllFieldData,
@@ -29,7 +26,7 @@ export const VTimeSheetTable = (
   const [secondaryData, setSecondaryData] = useState(null);
   const location = useLocation();
   const { fileData } = location.state || {};
-  const [categoryFilter, setCategoryFilter] = useState(fileData.type);
+  const [categoryFilter, setCategoryFilter] = useState(fileData.fileType);
   // const [startDate, setStartDate] = useState("");
   // const [endDate, setEndDate] = useState("");
 
@@ -37,87 +34,91 @@ export const VTimeSheetTable = (
 
   const { startDate, endDate, searchQuery } = useOutletContext();
 
-  const convertStringToObject = (fetchedData) => {
-    const processedData = fetchedData.map((item) => {
-      const rawSheet = item.dailySheet;
-      if (Array.isArray(rawSheet) && rawSheet.length > 0) {
-        const rawData = rawSheet[0];
-        const id = item.id;
-        const Status = item.status;
+  // const convertStringToObject = (fetchedData) => {
+  //   const processedData = fetchedData.map((item) => {
+  //     const rawSheet = item.dailySheet;
+  //     if (Array.isArray(rawSheet) && rawSheet.length > 0) {
+  //       const rawData = rawSheet[0];
+  //       const id = item.id;
+  //       const Status = item.status;
 
-        try {
-          const cleanedData = rawData
-            .replace(/^"|\s*'|\s*"$|\\'/g, "")
-            .replace(/\\"/g, '"')
-            .replace(/\\n/g, "")
-            .replace(/\\\//g, "/");
-          const arrayOfObjects = JSON.parse(cleanedData);
-          const dataWithStatus = arrayOfObjects.map((obj) => ({
-            ...obj,
-            status: Status,
-          }));
-          return [{ id: id }, dataWithStatus];
-        } catch (error) {
-          console.error("Error parsing JSON:", error);
-          return null;
-        }
-      }
-      return null;
-    });
+  //       try {
+  //         const cleanedData = rawData
+  //           .replace(/^"|\s*'|\s*"$|\\'/g, "")
+  //           .replace(/\\"/g, '"')
+  //           .replace(/\\n/g, "")
+  //           .replace(/\\\//g, "/");
+  //         const arrayOfObjects = JSON.parse(cleanedData);
+  //         const dataWithStatus = arrayOfObjects.map((obj) => ({
+  //           ...obj,
+  //           status: Status,
+  //         }));
+  //         return [{ id: id }, dataWithStatus];
+  //       } catch (error) {
+  //         console.error("Error parsing JSON:", error);
+  //         return null;
+  //       }
+  //     }
+  //     return null;
+  //   });
 
-    const addProKey = processedData
-      .map((value) => ({
-        id: value[0]?.id,
-        data: value[1]?.filter(Boolean),
-      }))
-      .filter((item) => item.data?.length > 0);
-    setData(addProKey);
-    setSecondaryData(addProKey);
+  //   const addProKey = processedData
+  //     .map((value) => ({
+  //       id: value[0]?.id,
+  //       data: value[1]?.filter(Boolean),
+  //     }))
+  //     .filter((item) => item.data?.length > 0);
+  //   setData(addProKey);
+  //   setSecondaryData(addProKey);
 
-  };
-
+  // };
 
   const { handleScroll, visibleData, setVisibleData } = UseScrollableView(
     data,
-    "Manager"
+    "TimeKeeper"
   );
-
+ 
   useEffect(() => {
-    if (!secondaryData) return;
-    if (secondaryData && secondaryData.length > 0) {
-      let filteredData = [...secondaryData];
+    if (!secondaryData || secondaryData.length === 0) return;
+    // if (secondaryData && secondaryData.length > 0) {
+    let filteredData = [...secondaryData];
 
-      if (searchQuery) {
-        filteredData = searchQuery.filter((fil) => fil);
-      }
-
-      if (startDate && endDate) {
-        const start = new Date(startDate).toLocaleDateString().toString();
-        const end = new Date(endDate).toLocaleDateString().toString();
-        filteredData = filteredData.map((item) => ({
-          id: item.id,
-          data: item.data.filter((val) => {
-            const itemDate = new Date(val.date || val.entDate)
-              .toLocaleDateString()
-              .toString();
-            return itemDate >= start && itemDate <= end;
-          }),
-        }));
-      }
-
-      filteredData = filteredData.filter((item) => item.data !== null || item.data !== undefined );
-      
-      setData(filteredData);
+    if (searchQuery) {
+      filteredData = searchQuery.filter((fil) => fil);
     }
+
+    if (!startDate && !endDate) {
+      setData(filteredData);
+    } else if (startDate && endDate) {
+      const start = new Date(startDate).toLocaleDateString().toString();
+      const end = new Date(endDate).toLocaleDateString().toString();
+
+      filteredData = filteredData.filter((val) => {
+        const itemDate = new Date(val.date).toLocaleDateString().toString();
+        return itemDate >= start && itemDate <= end;
+      });
+      console.log(filteredData);
+      if (!filteredData[0]) {
+        setVisibleData([]);
+      } else {
+        setData(filteredData);
+      }
+    }
+
+    // }
     setLoading(false);
-  }, [secondaryData, startDate, endDate,searchQuery]);
+  }, [secondaryData, startDate, endDate, searchQuery]);
+
+  // console.log(fileData)
 
   useEffect(() => {
     if (fileData) {
-      convertStringToObject([fileData]);
-      console.log(fileData);
+     
+      setData(fileData.updatedAt);
+      setSecondaryData(fileData.updatedAt);
     }
   }, [fileData]);
+
   useEffect(() => {
     if (data) {
       setTimeout(() => {
@@ -211,4 +212,3 @@ export const VTimeSheetTable = (
     </section>
   );
 };
-

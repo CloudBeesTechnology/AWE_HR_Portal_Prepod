@@ -18,8 +18,7 @@ export const ViewForm = ({
   personalInfo,
   formatDate,
 }) => {
-
-console.log(ticketData);
+  // console.log(leaveData.empOfficialEmail);
 
   const { empPIData } = useContext(DataSupply);
   const [remark, setRemark] = useState("");
@@ -33,14 +32,13 @@ console.log(ticketData);
   const { leaveDetails } = UpdateLeaveData();
 
   const managerName = empPIData.find((val) => {
-    const findingManagerName = leaveData?.managerEmpID === val.empID
-    return findingManagerName
+    const findingManagerName = leaveData?.managerEmpID === val.empID;
+    return findingManagerName;
   });
   const supervisorName = empPIData.find((val) => {
-    const findingSupervisorName = leaveData?.supervisorEmpID === val.empID
-    return findingSupervisorName
+    const findingSupervisorName = leaveData?.supervisorEmpID === val.empID;
+    return findingSupervisorName;
   });
-
 
   const handleUpdateStatus = async (status) => {
     const updateData = {};
@@ -71,173 +69,336 @@ console.log(ticketData);
       const formattedDateFrom = formatDate(fromDate);
       const formattedDateTo = formatDate(toDate);
 
+      handleUpdateLeaveStatus(leaveData.id, updateData)
+        .then(() => {
+          setNotificationText(
+            `Leave ${status} by ${personalInfo.name} on ${formatDate(
+              currentDate
+            )}`
+          );
 
-      handleUpdateLeaveStatus(leaveData.id, updateData).then(()=>{
-        
-      setNotificationText(
-        `Leave ${status} by ${personalInfo.name} on ${formatDate(currentDate)}`
-      );
+          if (
+            userType === "Manager" &&
+            (leaveData.supervisorEmpID == null ||
+              leaveData.supervisorEmpID === "") &&
+            (status === "Approved" || status === "Rejected")
+          ) {
+            console.log("checking manager");
+            //employee got email
+            sendEmail(
+              `Leave Request ${status}`,
+              `Dear ${
+                leaveData.empName || "Not mention"
+              }, Leave request for From Date : ${formattedDateFrom} To Date : ${formattedDateTo} has been Status: ${status} by Manager Name : ${
+                managerName.name || "Not mention"
+              }. View at : https://hr.adininworks.co `,
+              "leave_no-reply@adininworks.com",
+              leaveData.empOfficialEmail
+            );
 
-      if (
-        userType === "Manager" &&
-        leaveData.supervisorEmpID === null &&
-        status === "Approved"
-      ) {
-        console.log("checking manager");
+            //hr got email
+            sendEmail(
+              `Leave Request ${status}`,
+              `Employee ${
+                leaveData.empName || "Not mention"
+              }, Leave request for From Date : ${formattedDateFrom} To Date : ${formattedDateTo} has been Status: ${status} by Manager Name : ${
+                managerName.name || "Not mention"
+              }. View at : https://hr.adininworks.co `,
+              "leave_no-reply@adininworks.com",
+              "hr_no-reply@adininworks.com"
+            );
 
-        sendEmail(
-          `Leave Request ${status}`,
-          `Dear ${leaveData.empName || "Not mention"}, Leave request for From Date : ${formattedDateFrom} To Date : ${formattedDateTo} has been Status: ${status} by Manager Name : ${
-            managerName.name || "Not mention"
-          }. View at : https://hr.adininworks.co `,
-          "hr_no-reply@adininworks.com",
-          leaveData.empOfficialEmail
-        );
+            //employee notify
+            createNotification({
+              empID: leaveData.empID,
+              leaveType: leaveData.leaveType,
+              message: `Leave request for ${leaveData.empName} has been ${status} by Manager ${managerName.name}`,
+              senderEmail: "leave_no-reply@adininworks.com", // Sender email
+              receipentEmail: leaveData.empOfficialEmail, // Using the employee's official email
+              receipentEmpID: leaveData.empID,
+              status: "Unread",
+            });
 
-      } else if (
-        userType === "Supervisor" &&
-        leaveData?.supervisorEmpID &&
-        leaveData?.managerStatus === "Pending" &&
-        status === "Approved"
-      ) {
-        const FindingEmail = empPIData.filter((manage) => {
-          const IdFinding =
-            leaveData?.managerEmpID.toLowerCase() === manage.empID.toLowerCase();
+            //hr notify
+            createNotification({
+              empID: leaveData.empID,
+              leaveType: leaveData.leaveType,
+              message: `Leave request for ${leaveData.empName} has been ${status} by Manager ${managerName.name}`,
+              senderEmail: "leave_no-reply@adininworks.com", // Sender email
+              receipentEmail: "hr_no-reply@adininworks.com", // Using the employee's official email
+              status: "Unread",
+            });
+          } else if (
+            userType === "Supervisor" &&
+            leaveData.supervisorEmpID &&
+            leaveData?.managerStatus === "Pending" &&
+            (status === "Approved" || status === "Rejected")
+          ) {
+            const FindingEmail = empPIData.filter((manage) => {
+              const IdFinding =
+                leaveData?.managerEmpID.toLowerCase() ===
+                manage.empID.toLowerCase();
 
-          return IdFinding;
-        });
-        // console.log("manager");
- 
-        // manager got email
-        sendEmail(
-          `Leave Request ${status}`,
-          `Employee ${leaveData.empName || "Not mention"} , 
+              return IdFinding;
+            });
+            // console.log("manager");
+
+            // manager got email
+            sendEmail(
+              `Leave Request ${status}`,
+              `Employee ${leaveData.empName || "Not mention"} , 
            applied leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Supervisor ${
-            supervisorName.name || "Not mention"
-          }. View at : https://hr.adininworks.co `,
+                supervisorName.name || "Not mention"
+              }. View at : https://hr.adininworks.co `,
 
-          "hr_no-reply@adininworks.com",
-          FindingEmail[0].officialEmail
-        );
+              "leave_no-reply@adininworks.com",
+              FindingEmail[0].officialEmail
+            );
 
+            //hr got email
+            sendEmail(
+              `Leave Request ${status}`,
+              `Employee ${leaveData.empName || "Not mention"} , 
+           applied leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Supervisor ${
+                supervisorName.name || "Not mention"
+              }. View at : https://hr.adininworks.co `,
 
-      } else if (
-        userType === "Manager" &&
-        leaveData.managerEmpID &&
-        leaveData.supervisorStatus === "Approved" &&
-        status === "Approved"
-      ) {
-        const FindingEmail = empPIData.filter((sup) => {
-          const IdFinding =
-            leaveData.supervisorEmpID.toLowerCase() === sup.empID.toLowerCase();
+              "leave_no-reply@adininworks.com",
 
-          return IdFinding;
-        });
-        // console.log("2");
+              "hr_no-reply@adininworks.com"
+            );
 
-        // //superviosr got email
-        sendEmail(
-          `Leave Request ${status}`,
-          `Employee  ${
-            leaveData.empName || "Not mention"
-          } , applied leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Manager ${
-            managerName.name || "Not mention"
-          }. View at : https://hr.adininworks.co `,
-          "hr_no-reply@adininworks.com",
-          FindingEmail[0].officialEmail
-        );
-        //Employee got email
-        sendEmail(
-          `Leave Request ${status}`,
-          `Dear ${
-            leaveData.empName || "Not mention"
-          } , Your leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Manager ${
-            managerName.name || "Not mention"
-          }  and Supervisor ${supervisorName.name || "Not mention"}. View at : https://hr.adininworks.co `,
-          "hr_no-reply@adininworks.com",
-          leaveData.empOfficialEmail
-        );
-      }
+            //manager notify
+            createNotification({
+              empID: leaveData.empID,
+              leaveType: leaveData.leaveType,
+              message: `Leave request for ${leaveData.empName} has been ${status} by Supervisor ${supervisorName.name}`,
+              senderEmail: "leave_no-reply@adininworks.com", // Sender email
+              receipentEmail: FindingEmail[0].officialEmail, // Using the employee's official email
+              receipentEmpID: leaveData.managerEmpID,
+              status: "Unread",
+            });
 
-      // Create notification for the leave status update
-      if (userType === "Manager") {
-        createNotification({
-          empID: leaveData.empID,
-          leaveType: leaveData.leaveType,
-          message: `Leave request for ${leaveData.empName} has been ${status} by ${personalInfo.name}`,
-          senderEmail: "leave_no-reply@adininworks.com", // Sender email
-          receipentEmail: leaveData.empOfficialEmail, // Using the employee's official email
-          receipentEmpID: leaveData.empID,
-          status: "Unread",
-          createdAt: currentDate,
-          updatedAt: currentDate,
-        });
-      }
+            //hr notify
+            createNotification({
+              empID: leaveData.empID,
+              leaveType: leaveData.leaveType,
+              message: `Leave request for ${leaveData.empName} has been ${status} by Supervisor ${supervisorName.name}`,
+              senderEmail: "leave_no-reply@adininworks.com", // Sender email
+              receipentEmail: "hr_no-reply@adininworks.com", // Using the employee's official email
+              status: "Unread",
+            });
 
-      setNotification(true);
-      setTimeout(() => {
-        setNotification(false);
-        handleClickForToggle(false);
-        navigate("/leaveManage");
-        // Redirect to the dashboard or another page
-      }, 3000);
+            if (status === "Rejected") {
+              sendEmail(
+                `Leave Request ${status}`,
+                `Dear ${leaveData.empName || "Not mention"} , 
+             leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Supervisor ${
+                  supervisorName.name || "Not mention"
+                }. View at : https://hr.adininworks.co `,
 
-      }).catch((err)=>console.log(err)
-      )
+                "leave_no-reply@adininworks.com",
+                leaveData.empOfficialEmail
+              );
+              createNotification({
+                empID: leaveData.empID,
+                leaveType: leaveData.leaveType,
+                message: `Leave request for ${leaveData.empName} has been ${status} by Supervisor ${supervisorName.name}`,
+                senderEmail: "leave_no-reply@adininworks.com", // Sender email
+                receipentEmail: leaveData.empOfficialEmail, // Using the employee's official email
+                receipentEmpID: leaveData.empID,
+                status: "Unread",
+              });
+            }
+          } else if (
+            userType === "Manager" &&
+            leaveData.managerEmpID &&
+            leaveData.supervisorStatus === "Approved" &&
+            (status === "Approved" || status === "Rejected")
+          ) {
+            const FindingEmail = empPIData.filter((sup) => {
+              const IdFinding =
+                leaveData.supervisorEmpID.toLowerCase() ===
+                sup.empID.toLowerCase();
 
+              return IdFinding;
+            });
+            // console.log("2");
+
+            //superviosr got email
+            sendEmail(
+              `Leave Request ${status}`,
+              `Employee  ${
+                leaveData.empName || "Not mention"
+              } , applied leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Manager ${
+                managerName.name || "Not mention"
+              }. View at : https://hr.adininworks.co `,
+              "leave_no-reply@adininworks.com",
+              FindingEmail[0].officialEmail
+            );
+
+            //Employee got email
+            sendEmail(
+              `Leave Request ${status}`,
+              `Dear ${
+                leaveData.empName || "Not mention"
+              } , Your leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Manager ${
+                managerName.name || "Not mention"
+              }  and Supervisor ${
+                supervisorName.name || "Not mention"
+              }. View at : https://hr.adininworks.co `,
+              "leave_no-reply@adininworks.com",
+              leaveData.empOfficialEmail
+            );
+
+            //hr send email
+            sendEmail(
+              `Leave Request ${status}`,
+              `Employee ${
+                leaveData.empName || "Not mention"
+              } , Leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Manager ${
+                managerName.name || "Not mention"
+              }  and Supervisor ${
+                supervisorName.name || "Not mention"
+              }. View at : https://hr.adininworks.co `,
+              "leave_no-reply@adininworks.com",
+
+              "hr_no-reply@adininworks.com"
+            );
+
+            // Create notification for Employeee
+            createNotification({
+              empID: leaveData.empID,
+              leaveType: leaveData.leaveType,
+              message: `Leave request for ${
+                leaveData.empName
+              } has been ${status} by Manager ${
+                personalInfo.name || "Not mentioned"
+              } and Supervisor ${supervisorName.name || "Not mention"}.`,
+              senderEmail: "leave_no-reply@adininworks.com", // Sender email
+              receipentEmail: leaveData.empOfficialEmail, // Using the employee's official email
+              receipentEmpID: leaveData.empID,
+              status: "Unread",
+            });
+            // Create notification for Supervisor
+            createNotification({
+              empID: leaveData.empID,
+              leaveType: leaveData.leaveType,
+              message: `Leave request for ${
+                leaveData.empName
+              } has been ${status} by Manager ${
+                managerName.name || "Not mentioned"
+              }.`,
+              senderEmail: "leave_no-reply@adininworks.com", // Sender email
+              receipentEmail: FindingEmail[0].officialEmail, // Using the employee's official email
+              receipentEmpID: leaveData.supervisorEmpID,
+              status: "Unread",
+            });
+            // Create notification for HR
+            createNotification({
+              empID: leaveData.empID,
+              leaveType: leaveData.leaveType,
+              message: `Leave request for ${
+                leaveData.empName
+              } has been ${status} by Manager ${
+                managerName.name || "Not mentioned"
+              }.`,
+              senderEmail: "leave_no-reply@adininworks.com", // Sender email
+              receipentEmail: "hr_no-reply@adininworks.com", // Using the employee's official email
+              status: "Unread",
+            });
+          }
+
+          setNotification(true);
+          setTimeout(() => {
+            setNotification(false);
+            handleClickForToggle(false);
+            navigate("/leaveManage");
+            // Redirect to the dashboard or another page
+          }, 3000);
+        })
+        .catch((err) => console.log(err));
     } else if (source === "Tickets") {
       updateData.hrStatus = status; // Set the status for the ticket request
       updateData.hrRemarks = remark;
       updateData.hrDate = currentDate;
       const formattedDatedeparture = formatDate(ticketData.departureDate);
       const formattedDatearrival = formatDate(ticketData.arrivalDate);
-      handleUpdateTicketRequest(ticketData.id, updateData).then(()=>{
-        setNotificationText(
-          `Ticket request ${status} by ${personalInfo.name} on ${formatDate(
-            currentDate
-          )}`
-        );
-  
-        sendEmail(
-          `Ticket Request ${status}`,
-          `Dear  ${
-            ticketData.empName || "Not mention"
-          } , Your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${status} by HR ${
-            personalInfo.name || "Not mention"
-          }. View at : https://hr.adininworks.co `,
-          "hr_no-reply@adininworks.com",
-  
-          ticketData.empOfficialEmail
-        );
-  
-        // Create notification for the ticket status update
-        createNotification({
-          empID: ticketData.empID,
-          leaveType: "Ticket Request", // Assuming a default value as this is a ticket request
-          message: `Ticket request for ${ticketData.empName} has been ${status} by ${personalInfo.name}`,
-          senderEmail: "ticket_no-reply@adininworks.com", // Sender email
-          receipentEmail: ticketData.empOfficialEmail, // Using the employee's official email
-          receipentEmpID: ticketData.empID,
-          status: "Unread",
-          createdAt: currentDate,
-          updatedAt: currentDate,
-        });
-  
-        setNotification(true);
-        setTimeout(() => {
-          setNotification(false);
-          handleClickForToggle(false);
-          navigate("/leaveManage/requestTickets");
-          // Redirect to the dashboard or another page
-        }, 3000);
-        })
-        .catch((err)=>console.log(err)
-      )
 
+      handleUpdateTicketRequest(ticketData.id, updateData)
+        .then(() => {
+          setNotificationText(
+            `Ticket request ${status} by ${personalInfo.name} on ${formatDate(
+              currentDate
+            )}`
+          );
+          const managerEmpID =
+            ticketData.managerEmpID[ticketData.managerEmpID.length - 1];
+
+          const findingManagerEmail = empPIData.find(
+            (val) => val.empID === managerEmpID
+          );
+          // console.log(findingManagerEmail.officialEmail);
+
+          // //employee send email
+          sendEmail(
+            `Ticket Request ${status}`,
+            `Dear  ${
+              ticketData.empName || "Not mention"
+            } , Your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${status} by HR ${
+              personalInfo.name || "Not mention"
+            }. View at : https://hr.adininworks.co `,
+            "hr_no-reply@adininworks.com",
+            ticketData.empOfficialEmail
+          );
+
+          //manager send email
+          sendEmail(
+            `Ticket Request ${status}`,
+            `Employee  ${
+              ticketData.empName || "Not mention"
+            } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${status} by HR ${
+              personalInfo.name || "Not mention"
+            }. View at : https://hr.adininworks.co `,
+            "hr_no-reply@adininworks.com",
+            findingManagerEmail.officialEmail
+          );
+
+          // Create notification for the ticket status update employee
+          createNotification({
+            empID: ticketData.empID,
+            leaveType: "Ticket Request", // Assuming a default value as this is a ticket request
+            message: `Ticket request for ${ticketData.empName} has been ${status} by HR ${personalInfo.name}`,
+            senderEmail: "ticket_no-reply@adininworks.com", // Sender email
+            receipentEmail: ticketData.empOfficialEmail, // Using the employee's official email
+            receipentEmpID: ticketData.empID,
+            status: "Unread",
+          });
+
+          // Create notification for the ticket status update manager
+          createNotification({
+            empID: ticketData.empID,
+            leaveType: "Ticket Request", // Assuming a default value as this is a ticket request
+            message: `Ticket request for ${ticketData.empName} has been ${status} by HR ${personalInfo.name}`,
+            senderEmail: "ticket_no-reply@adininworks.com", // Sender email
+            receipentEmail: findingManagerEmail.officialEmail, // Using the employee's official email
+            receipentEmpID: ticketData.empID,
+            status: "Unread",
+          });
+
+          setNotification(true);
+          setTimeout(() => {
+            setNotification(false);
+            handleClickForToggle(false);
+            navigate("/leaveManage/requestTickets");
+            // Redirect to the dashboard or another page
+          }, 3000);
+        })
+        .catch((err) => console.log(err));
     }
   };
 
-  console.log(leaveData, "LD")
+  // console.log(leaveData, "LD");
 
   const handleApprove = () => handleUpdateStatus("Approved");
   const handleReject = () => handleUpdateStatus("Rejected");
@@ -247,12 +408,19 @@ console.log(ticketData);
     setUserName(userType);
   }, []);
   const renderButtons = () => {
+    const { supervisorStatus, managerStatus, supervisorEmpID } = leaveData;
+    const isPending = managerStatus === "Pending";
+    const isApproved = supervisorStatus === "Approved";
+    const isSupervisor = userType === "Supervisor";
+    const isNotSuperAdminOrHR = userType !== "SuperAdmin" && userType !== "HR";
+
+    // Case 1: Supervisor approved, Manager pending, Supervisor not SuperAdmin/HR
     if (
-      leaveData.supervisorStatus === "Approved" &&
-      leaveData.managerStatus === "Pending" &&
-      userType === "Supervisor" &&
-      userType !== "SuperAdmin" &&
-      userType !== "HR"
+      isApproved &&
+      supervisorStatus !== "Rejected" &&
+      isPending &&
+      isSupervisor &&
+      isNotSuperAdminOrHR
     ) {
       return (
         <div className="center w-full">
@@ -266,10 +434,11 @@ console.log(ticketData);
       );
     }
 
+    // Case 2: Supervisor pending, Supervisor EmpID available, and User not SuperAdmin/HR
     if (
-      leaveData.supervisorStatus === "Pending" &&
-      userType !== "SuperAdmin" &&
-      userType !== "HR"
+      supervisorStatus === "Pending" &&
+      supervisorEmpID &&
+      isNotSuperAdminOrHR
     ) {
       return (
         <>
@@ -289,12 +458,31 @@ console.log(ticketData);
       );
     }
 
+    // Case 3: Supervisor approved, Manager pending, User not SuperAdmin/HR
+    if (isApproved && isPending && isNotSuperAdminOrHR) {
+      return (
+        <>
+          <button
+            className="bg-[#FEF116] p-2 px-3 rounded text-dark_grey text_size_6"
+            onClick={handleApprove}
+          >
+            Approve
+          </button>
+          <button
+            className="border border-grey p-2 px-5 rounded text-dark_grey text_size_6"
+            onClick={handleReject}
+          >
+            Reject
+          </button>
+        </>
+      );
+    }
+
+    // Case 4: Supervisor EmpID missing, Manager pending, User not SuperAdmin/HR
     if (
-      leaveData.supervisorStatus === "Approved" &&
-      leaveData.supervisorStatus !== "Rejected" &&
-      leaveData.managerStatus === "Pending" &&
-      userType !== "SuperAdmin" &&
-      userType !== "HR"
+      isPending &&
+      (supervisorEmpID === " " || supervisorEmpID === null) &&
+      isNotSuperAdminOrHR
     ) {
       return (
         <>
@@ -314,41 +502,14 @@ console.log(ticketData);
       );
     }
 
-    if (
-      leaveData.managerStatus === "Pending" &&
-      leaveData.supervisorStatus !== "Rejected" &&
-      userType !== "SuperAdmin" &&
-      userType !== "HR"
-    ) {
-      return (
-        <>
-          <button
-            className="bg-[#FEF116] p-2 px-3 rounded text-dark_grey text_size_6"
-            onClick={handleApprove}
-          >
-            Approve
-          </button>
-          <button
-            className="border border-grey p-2 px-5 rounded text-dark_grey text_size_6"
-            onClick={handleReject}
-          >
-            Reject
-          </button>
-        </>
-      );
-    }
-
-    if (
-      leaveData.managerStatus === "Approved" &&
-      leaveData.supervisorStatus === "Approved" &&
-      userType !== "SuperAdmin" &&
-      userType !== "HR"
-    ) {
+    // Case 5: Supervisor and Manager both approved, User not SuperAdmin/HR
+    if (managerStatus === "Approved" && isApproved && isNotSuperAdminOrHR) {
       return null; // No buttons rendered in this case
     }
 
     return null; // Default case if none of the conditions match
   };
+
   return (
     <main className="flex flex-col items-center justify-center bg-grey bg-opacity-75 inset-0 z-50 fixed">
       <div className="center min-h-screen overflow-y-auto">
@@ -374,13 +535,14 @@ console.log(ticketData);
               path="/leaveManage/requestTickets"
             />
           )}
-            {notification && userType === "Manager" || userType === "Supervisor" && (
-            <SpinLogo
-              text={notificationText}
-              notification={notification}
-              path="/leaveManage"
-            />
-          )}
+          {notification &&
+            (userType === "Manager" || userType === "Supervisor") && (
+              <SpinLogo
+                text={notificationText}
+                notification={notification}
+                path="/leaveManage"
+              />
+            )}
 
           {source === "LM" && (
             <section className="shadow-md w-[500px] p-5 bg-white">
@@ -393,20 +555,28 @@ console.log(ticketData);
                   },
                   {
                     label: "Job Title",
-                    value: leaveData.position || "N/A",
+                    value:
+                      Array.isArray(leaveData.position) &&
+                      leaveData.position.length > 0
+                        ? leaveData.position[leaveData.position.length - 1]
+                        : "N/A",
                   },
                   {
                     label: "Department",
-                    value:  leaveData.department || "N/A",
+                    value:
+                      Array.isArray(leaveData.department) &&
+                      leaveData.department.length > 0
+                        ? leaveData.department[leaveData.department.length - 1]
+                        : "N/A",
                   },
                   { label: "Leave Type", value: leaveData.empLeaveType },
                   {
                     label: "Applied Dates",
-                    value: ` ${formatDate(leaveData.  empLeaveStartDate)} to ${formatDate(
-                      leaveData. empLeaveEndDate
-                    )} `,
+                    value: ` ${formatDate(
+                      leaveData.empLeaveStartDate
+                    )} to ${formatDate(leaveData.empLeaveEndDate)} `,
                   },
-                  { label: "Total No of Days", value: leaveData.leaveDays},
+                  { label: "Total No of Days", value: leaveData.leaveDays },
                   // { label: "Leave Balance", value: leaveData.balance },
                   { label: "Reason", value: leaveData.reason },
                 ].map((item, index) => (
@@ -458,17 +628,22 @@ console.log(ticketData);
                   </div>
                 ) : userType === "Manager" ? (
                   <div className="mt-5 text-lg space-y-2 font-semibold">
-                    <p className="">
-                      {`Supervisor: ${leaveData.supervisorStatus}`}
-                      <p className=" w-full break-words overflow-hidden">{`Supervisor Remark:   ${
-                        leaveData.supervisorRemarks || "no remarks"
-                      }`}</p>
-                      {leaveData.managerStatus === "Approved" && (
-                        <p className=" w-full break-words overflow-hidden">{`Remark:   ${
-                          leaveData.managerRemarks || "no remarks"
+                    {leaveData.supervisorEmpID && (
+                      <article>
+                        {" "}
+                        <p className="">
+                          {`Supervisor: ${leaveData.supervisorStatus}`}{" "}
+                        </p>
+                        <p className=" w-full break-words overflow-hidden">{`Supervisor Remark:   ${
+                          leaveData.supervisorRemarks || "no remarks"
                         }`}</p>
-                      )}
-                    </p>
+                      </article>
+                    )}
+                    {leaveData.managerStatus === "Approved" && (
+                      <p className=" w-full break-words overflow-hidden">{`Remark:   ${
+                        leaveData.managerRemarks || "no remarks"
+                      }`}</p>
+                    )}
                   </div>
                 ) : (
                   ""
@@ -553,11 +728,21 @@ console.log(ticketData);
 
                   {
                     label: "Department",
-                    value: ticketData.department || "N/A",
+                    value:
+                      Array.isArray(ticketData.department) &&
+                      ticketData.department.length > 0
+                        ? ticketData.department[
+                            ticketData.department.length - 1
+                          ]
+                        : "N/A",
                   },
                   {
                     label: "Position",
-                    value: ticketData.position || "N/A",
+                    value:
+                      Array.isArray(ticketData.position) &&
+                      ticketData.position.length > 0
+                        ? ticketData.position[ticketData.position.length - 1]
+                        : "N/A",
                   },
                   {
                     label: "Date of Join",
@@ -576,13 +761,13 @@ console.log(ticketData);
                     value: formatDate(ticketData.arrivalDate),
                   },
                   {
-                    label: "Reason",
-                    value: ticketData.remarks || "N/A",
+                    label: "Employee Remarks",
+                    value: ticketData.empRemarks || "N/A",
                   },
-                  ticketData.hrRemark && {
-                    label: "Remark",
-                    value: ticketData.hrRemark || "No remarks added",
-                  },
+                  // ticketData.hrRemark && {
+                  //   label: "Remark",
+                  //   value: ticketData.hrRemark || "No remarks added",
+                  // },
                 ]
                   .filter(Boolean)
                   .map((item, index) => (
@@ -593,6 +778,27 @@ console.log(ticketData);
                       </span>
                     </div>
                   ))}
+
+                {userType === "SuperAdmin" ? (
+                  <div className="mt-5 text-lg flex flex-col justify-between gap-2 font-semibold">
+                    <div className="flex flex-col justify-between gap-2">
+                      <p className="">{`HR: ${ticketData.hrStatus}`}</p>
+                      <p className=" w-full break-words overflow-hidden">{`HR Remark:   ${
+                        ticketData.hrRemarks || "no remarks"
+                      }`}</p>
+                    </div>
+                  </div>
+                ) : userType === "HR" ? (
+                  <div className="mt-5 text-lg space-y-2 font-semibold ">
+                    {ticketData.hrStatus === "Approved" && (
+                      <p className=" w-full break-words overflow-hidden">{` Remark:   ${
+                        ticketData.hrDateRemarks || "no remarks"
+                      }`}</p>
+                    )}
+                  </div>
+                ) : (
+                  ""
+                )}
 
                 {ticketData.hrStatus === "Pending" &&
                   userType !== "SuperAdmin" && (

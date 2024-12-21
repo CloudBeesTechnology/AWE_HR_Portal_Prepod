@@ -354,6 +354,8 @@ export const WorkInfo = () => {
         terminateDataRecord &&
         checkingPITable
       ) {
+
+        
         const workInfoUpValue = {
           ...data,
           remainingAnualLeave: data?.annualLeave?.[0] || "0",  // Fixing the syntax

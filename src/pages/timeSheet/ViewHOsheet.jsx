@@ -24,8 +24,15 @@ import "../../../src/index.css";
 
 import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
 import { PopupForAssignManager } from "./ModelForSuccessMess/PopupForAssignManager";
-import { createTimeSheet, updateTimeSheet } from "../../graphql/mutations";
+import {
+  createTimeSheet,
+  deleteTimeSheet,
+  updateTimeSheet,
+} from "../../graphql/mutations";
 import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
+import { listTimeSheets } from "../../graphql/queries";
+import { Notification } from "./customTimeSheet/Notification";
+import { useMergeTableForNotification } from "./customTimeSheet/useMergeTableForNotification";
 const client = generateClient();
 
 export const ViewHOsheet = ({
@@ -38,6 +45,7 @@ export const ViewHOsheet = ({
   fileName,
 }) => {
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
+
   const [data, setData] = useState(null);
   const [secondaryData, setSecondaryData] = useState(null);
   const [editObject, setEditObject] = useState();
@@ -48,11 +56,13 @@ export const ViewHOsheet = ({
   const [userIdentification, setUserIdentification] = useState("");
   const [showStatusCol, setShowStatusCol] = useState(null);
   const [successMess, setSuccessMess] = useState(null);
-
+  const [response, setResponse] = useState(null);
   const { handleScroll, visibleData, setVisibleData } = UseScrollableView(
     data,
-    Position
+    "TimeKeeper"
   );
+  const getEmail = useMergeTableForNotification(response);
+
   const processedData = useTableMerged(excelData);
 
   useEffect(() => {
@@ -61,6 +71,19 @@ export const ViewHOsheet = ({
       setSecondaryData(processedData);
     }
   }, [processedData]);
+  // useEffect(()=>{
+  //   const fetchWorkInfo = async () => {
+  //     // Fetch the BLNG data using GraphQL
+  //     const [empWorkInfos] = await Promise.all([
+  //       client.graphql({
+  //         query: listTimeSheets,
+  //       }),
+  //     ]);
+  //     const workInfo = empWorkInfos?.data?.listTimeSheets?.items;
+  //     console.log(workInfo)
+  //   }
+  //     fetchWorkInfo();
+  // },[])
   useEffect(() => {
     const getPosition = localStorage.getItem("userType");
     if (getPosition === "Manager") {
@@ -75,46 +98,55 @@ export const ViewHOsheet = ({
 
       const result =
         data &&
-        data.map((vals) => {
+        data?.map((val) => {
+          let parsedEmpWorkInfo = [];
+          try {
+            if (Array.isArray(val.empWorkInfo)) {
+              parsedEmpWorkInfo = val.empWorkInfo.map((info) =>
+                typeof info === "string" ? JSON.parse(info) : info
+              );
+            }
+          } catch (error) {
+            console.error("Error parsing empWorkInfo for ID:", val.id, error);
+          }
           return {
-            id: vals?.id || null,
-            data: vals?.data?.map((val, index) => {
-              return {
-                REC: val.rec || 0,
-                CTR: val.ctr || "",
-                DEPT: val.dept || "",
-                EMPLOYEEID: val.empId || "",
-                BADGE: val.badge || "",
-                NAME: val.name || 0,
-                DATE: val.date || "",
-                ONAM: val.onAm || "",
-                OFFAM: val.offAm || "",
-                ONPM: val.onPm || 0,
-                OFFPM: val.offPm || 0,
-                IN: val?.in || 0,
-                OUT: val.out || 0,
-                TOTALINOUT: val.totalInOut || "",
-                ALLDAYMINUTES: val.allDayMin || "",
-                NETMINUTES: val.netMin || "",
-                TOTALHOURS: val.totalHrs || "",
-                NORMALWORKINGHRSPERDAY: val?.normalWhrsPerDay || 0,
-                WORKINGHOURS: val?.workhrs || 0,
-                OT: val?.OT || 0,
-                TOTALACTUALHOURS: val.totalActHrs || "",
-                jobLocaWhrs: val?.jobLocaWhrs || [],
-                REMARKS: val.remarks || "",
-                status: val.status || "",
-                managerData: val?.managerData,
-              };
-            }),
+            id: val.id,
+            fileName: val.fileName,
+            REC: val.rec || 0,
+            CTR: val.ctr || "",
+            DEPT: val.empDept || "",
+            EMPLOYEEID: val.empID || "",
+            BADGE: val.empBadgeNo || "",
+            NAME: val.empName || 0,
+            DATE: val.date || "",
+            ONAM: val.onAM || "",
+            OFFAM: val.offAM || "",
+            ONPM: val.onPM || 0,
+            OFFPM: val.offPM || 0,
+            IN: val?.inTime || 0,
+            OUT: val.outTime || 0,
+            TOTALINOUT: val.totalInOut || "",
+            ALLDAYMINUTES: val.allDayHrs || "",
+            NETMINUTES: val.netMins || "",
+            TOTALHOURS: val.totalHrs || "",
+            NORMALWORKINGHRSPERDAY: val?.normalWorkHrs || 0,
+            WORKINGHOURS: val?.actualWorkHrs || 0,
+            OT: val?.otTime || 0,
+            TOTALACTUALHOURS: val.actualWorkHrs || "",
+            jobLocaWhrs: parsedEmpWorkInfo.flat() || [],
+            fileType: val.fileType,
+            timeKeeper: val.assignBy,
+            manager: val.assignTo,
+            REMARKS: val.remarks || "",
+            status: val.status || "",
           };
         });
 
+      console.log(result);
       setData(result);
       setSecondaryData(result);
     }
   };
-
   // const searchResult = (result) => {
   //   setData(result);
   // };
@@ -208,22 +240,27 @@ export const ViewHOsheet = ({
           //   (val) => val.status !== "Approved"
           // );
 
-          const filterPending = fetchedData
-            .map((value) => {
-              return {
-                id: value[0]?.id,
-                data: value[1]?.filter((val) => {
-                  if (val.status !== "Approved") {
-                    return val;
-                  }
-                }),
-                managerData: value[2],
-              };
-            })
-            .filter((item) => item.data && item.data.length > 0);
+          // const filterPending = fetchedData
+          //   .map((value) => {
+          //     return {
+          //       id: value[0]?.id,
+          //       data: value[1]?.filter((val) => {
+          //         if (val.status !== "Approved") {
+          //           return val;
+          //         }
+          //       }),
+          //       managerData: value[2],
+          //     };
+          //   })
+          //   .filter((item) => item.data && item.data.length > 0);
+
+          // const filteredData = fetchedData.filter(
+          //   (fil) => fil.status !== "Approved"
+          // );
 
           if (userIdentification === "Manager") {
-            const finalData = await SendDataToManager(filterPending);
+            const finalData = await SendDataToManager(fetchedData);
+            console.log(finalData);
             pendingData(finalData);
           }
         } catch (err) {
@@ -248,8 +285,12 @@ export const ViewHOsheet = ({
     setToggleHandler(!toggleHandler);
   };
 
-  const toggleSFAMessage = (value) => {
+  const toggleSFAMessage = async (value, responseData) => {
     setSuccessMess(value);
+    if (value === true && responseData) {
+      console.log("Success Message : ", responseData);
+      setResponse(responseData);
+    }
   };
   const toggleFunctionForAssiMana = () => {
     setToggleAssignManager(!toggleAssignManager);
@@ -296,140 +337,144 @@ export const ViewHOsheet = ({
         data &&
         data.map((val) => {
           return {
+            fileName: fileName,
             rec: val.REC || "",
             ctr: val.CTR || "",
-            dept: val.DEPT || "",
-            empId: val.EMPLOYEEID || "",
-            badge: val.BADGE || "",
-            name: val.NAME || "",
+            empDept: val.DEPT || "",
+            empID: val.EMPLOYEEID || "",
+            empBadgeNo: val.BADGE || "",
+            empName: val.NAME || "",
             date: val.DATE || "",
-            onAm: val.ONAM || "",
-            offAm: val.OFFAM || "",
-            onPm: val.ONPM || "",
-            offPm: val.OFFPM || "",
-            in: val.IN || "",
-            out: val.OUT || "",
+            onAM: val.ONAM || "",
+            offAM: val.OFFAM || "",
+            onPM: val.ONPM || "",
+            offPM: val.OFFPM || "",
+            inTime: val.IN || "",
+            outTime: val.OUT || "",
             totalInOut: val.TOTALINOUT || "",
-            allDayMin: val.ALLDAYMINUTES || "",
-            netMin: val.NETMINUTES || "",
+            allDayHrs: val.ALLDAYMINUTES || "",
+            netMins: val.NETMINUTES || "",
             totalHrs: val.TOTALHOURS || "",
-            normalWhrsPerDay: val?.NORMALWORKINGHRSPERDAY || 0,
-            workhrs: val?.WORKINGHOURS || 0,
-            OT: val?.OT || 0,
-            totalActHrs: val.TOTALACTUALHOURS || "",
-            jobLocaWhrs: val?.jobLocaWhrs || [],
+            normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+            actualWorkHrs: val?.WORKINGHOURS || 0,
+            otTime: val?.OT || 0,
+            actualWorkHrs: val.TOTALACTUALHOURS || "",
+            empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+            fileType: "HO",
+            status: "Pending",
+            remarks: val.REMARKS || "",
+          };
+        });
+      const finalResult = result.map((val) => {
+        return {
+          ...val,
+          assignTo: managerData.mbadgeNo,
+          assignBy: uploaderID,
+          trade: managerData.mfromDate,
+          tradeCode: managerData.muntilDate,
+        };
+      });
+      //   CREATE
+      const sendTimeSheets = async (timeSheetData) => {
+        let successFlag = false;
+        for (const timeSheet of timeSheetData) {
+          try {
+            const response = await client.graphql({
+              query: createTimeSheet,
+              variables: {
+                input: timeSheet,
+              },
+            });
+
+            if (response?.data?.createTimeSheet) {
+              console.log(
+                "TimeSheet created successfully:",
+                response.data.createTimeSheet
+              );
+              const responseData = response.data.createTimeSheet;
+              if (!successFlag) {
+                toggleSFAMessage(true, responseData); // Only toggle success message once
+                successFlag = true; // Set the flag to true
+              }
+            }
+          } catch (error) {
+            console.error("Error creating TimeSheet:", error);
+            toggleSFAMessage(false);
+          }
+        }
+      };
+
+      console.log(finalResult);
+
+      sendTimeSheets(finalResult);
+    } else if (userIdentification === "Manager") {
+      const MultipleBLNGfile =
+        data &&
+        data.map((val) => {
+          return {
+            id: val.id,
+            // fileName: val.fileName,
+            rec: val.REC || "",
+            ctr: val.CTR || "",
+            empDept: val.DEPT || "",
+            empID: val.EMPLOYEEID || "",
+            empBadgeNo: val.BADGE || "",
+            empName: val.NAME || "",
+            date: val.DATE || "",
+            onAM: val.ONAM || "",
+            offAM: val.OFFAM || "",
+            onPM: val.ONPM || "",
+            offPM: val.OFFPM || "",
+            inTime: val.IN || "",
+            outTime: val.OUT || "",
+            totalInOut: val.TOTALINOUT || "",
+            allDayHrs: val.ALLDAYMINUTES || "",
+            netMins: val.NETMINUTES || "",
+            totalHrs: val.TOTALHOURS || "",
+            normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+            actualWorkHrs: val?.WORKINGHOURS || 0,
+            otTime: val?.OT || 0,
+            actualWorkHrs: val.TOTALACTUALHOURS || "",
+            empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+            fileType: "HO",
+            status: "Approved",
             remarks: val.REMARKS || "",
           };
         });
 
-      const mergeData = [...result]; // Clone result to avoid mutation (optional)
-      mergeData.unshift(managerData);
-
-      const finalResult = result.map((val) => {
-        return { ...val, managerData };
-      });
-      //   CREATE
-      const currentDate = new Date().toLocaleDateString();
-      const DailySheet = {
-        dailySheet: JSON.stringify(finalResult),
-        status: "Pending",
-        date: currentDate,
-        managerDetails: JSON.stringify(managerData),
-        type: "HO",
-        fileName: fileName,
-        uploaderID: uploaderID,
-      };
-
-      if (DailySheet.dailySheet) {
-        await client
-          .graphql({
-            query: createTimeSheet,
-            variables: {
-              input: DailySheet,
-            },
-          })
-          .then((res) => {
-            if (res.data.createTimeSheet) {
-              // console.log(
-              //   "res.data.createHeadOffice : ",
-              //   res.data.createHeadOffice
-              // );
-              toggleSFAMessage(true);
-            }
-          })
-          .catch((err) => {
-            toggleSFAMessage(false);
-          });
-      }
-    } else if (userIdentification === "Manager") {
-      const MultipleBLNGfile =
-        data &&
-        data.map((value) => {
-          return {
-            id: value?.id || null,
-            dailySheet: value?.data?.map((val) => {
-              return {
-                rec: val.REC || "",
-                ctr: val.CTR || "",
-                dept: val.DEPT || "",
-                empId: val.EMPLOYEEID || "",
-                badge: val.BADGE || "",
-                name: val.NAME || "",
-                date: val.DATE || "",
-                onAm: val.ONAM || "",
-                offAm: val.OFFAM || "",
-                onPm: val.ONPM || "",
-                offPm: val.OFFPM || "",
-                in: val.IN || "",
-                out: val.OUT || "",
-                totalInOut: val.TOTALINOUT || 0,
-                allDayMin: val.ALLDAYMINUTES || 0,
-                netMin: val.NETMINUTES || 0,
-                totalHrs: val.TOTALHOURS || 0,
-                normalWhrsPerDay: val?.NORMALWORKINGHRSPERDAY || 0,
-                workhrs: val?.WORKINGHOURS || 0,
-                OT: val?.OT || 0,
-                totalActHrs: val.TOTALACTUALHOURS || 0,
-                jobLocaWhrs: val?.jobLocaWhrs || [],
-                remarks: val.REMARKS || "",
-                managerData: val?.managerData,
-              };
-            }),
-          };
-        });
-
-      const result = MultipleBLNGfile.map(async (obj) => {
-        const finalData = {
-          id: obj.id,
-          dailySheet: JSON.stringify(obj.dailySheet),
-          status: "Approved",
-        };
-
-        if (finalData.dailySheet) {
-          // console.log("Work");
-          await client
-            .graphql({
+      const updateTimeSheetFunction = async (timeSheetData) => {
+        let successFlag = false;
+        for (const timeSheet of timeSheetData) {
+          try {
+            const response = await client.graphql({
               query: updateTimeSheet,
               variables: {
-                input: finalData,
+                input: timeSheet, // Send each object individually
               },
-            })
-            .then((res) => {
-              if (res.data.updateTimeSheet) {
-                // console.log(
-                //   "res.data.updateHeadOffice : ",
-                //   res.data.updateHeadOffice
-                // );
-                toggleSFAMessage(true);
-                setVisibleData([]);
-                setData(null);
-              }
-            })
-            .catch((err) => {
-              toggleSFAMessage(false);
             });
+
+            if (response?.data?.updateTimeSheet) {
+              console.log(
+                "TimeSheet Updated successfully:",
+                response.data.updateTimeSheet
+              );
+             
+              const responseData = response.data.updateTimeSheet;
+              if (!successFlag) {
+                toggleSFAMessage(true, responseData); // Only toggle success message once
+                successFlag = true; // Set the flag to true
+              }
+              setVisibleData([]);
+              setData(null);
+            }
+          } catch (error) {
+            console.error("Error creating TimeSheet:", error);
+            toggleSFAMessage(false);
+          }
         }
-      });
+      };
+
+      updateTimeSheetFunction(MultipleBLNGfile);
     }
   };
   return (
@@ -443,7 +488,7 @@ export const ViewHOsheet = ({
                 searchResult={searchResult}
                 secondaryData={secondaryData}
                 Position={Position}
-                placeholder="Badge or Employee Id"
+                placeholder="Badge No."
               />
             </div>
             <div className="table-container" onScroll={handleScroll}>
@@ -610,37 +655,37 @@ export const ViewHOsheet = ({
                   if (userIdentification !== "Manager") {
                     toggleFunctionForAssiMana();
                     // const fetchData = async () => {
-                    //   //   console.log("I am calling You");
-                    //   //   // Fetch the BLNG data using GraphQL
-                    //   // const [fetchBLNGdata] = await Promise.all([
-                    //   //   client.graphql({
-                    //   //     query: createHeadOffice,
-                    //   //   }),
-                    //   // ]);
-                    //   // const BLNGdata =
-                    //   //   fetchBLNGdata?.data?.createHeadOffice?.items;
-                    //   //   console.log(BLNGdata)
-                    //   //   console.log("BLNGdata : ", BLNGdata);
-                    //   //   const deleteFunction =
-                    //   //     BLNGdata &&
-                    //   //     BLNGdata.map(async (m) => {
-                    //   //       const dailySheet = {
-                    //   //         id: m.id,
-                    //   //       };
-                    //   //       await client
-                    //   //         .graphql({
-                    //   //           query: deleteHeadOffice,
-                    //   //           variables: {
-                    //   //             input: dailySheet,
-                    //   //           },
-                    //   //         })
-                    //   //         .then((res) => {
-                    //   //           console.log(res);
-                    //   //         })
-                    //   //         .catch((err) => {
-                    //   //           console.log(err);
-                    //   //         });
-                    //   //     });
+                    // console.log("I am calling You");
+                    // // Fetch the BLNG data using GraphQL
+                    //   const [fetchBLNGdata] = await Promise.all([
+                    //     client.graphql({
+                    //       query: listTimeSheets,
+                    //     }),
+                    //   ]);
+                    //   const BLNGdata =
+                    //     fetchBLNGdata?.data?.listTimeSheets?.items;
+                    //     // console.log(BLNGdata)
+                    //     // console.log("BLNGdata : ", BLNGdata);
+                    //     const deleteFunction =
+                    //       BLNGdata &&
+                    //       BLNGdata.map(async (m) => {
+                    //         const dailySheet = {
+                    //           id: m.id,
+                    //         };
+                    //         await client
+                    //           .graphql({
+                    //             query: deleteTimeSheet,
+                    //             variables: {
+                    //               input: dailySheet,
+                    //             },
+                    //           })
+                    //           .then((res) => {
+                    //             console.log(res);
+                    //           })
+                    //           .catch((err) => {
+                    //             console.log(err);
+                    //           });
+                    //       });
                     // };
                     // fetchData();
                     // FOR DELETE
@@ -704,233 +749,14 @@ export const ViewHOsheet = ({
         <PopupForAssignManager
           toggleFunctionForAssiMana={toggleFunctionForAssiMana}
           renameKeysFunctionAndSubmit={renameKeysFunctionAndSubmit}
+       
         />
       )}
-      {/* {successMess === true && (
-        <PopupForSFApproves
-          toggleSFAMessage={toggleSFAMessage}
-          setExcelData={setExcelData}
-          icons={<IoCheckmarkCircleSharp />}
-          iconColor="text-[#2BEE48]"
-          textColor="text-[#05b01f]"
-          title={"Success!"}
-          message={`Data has been successfully ${
-            userIdentification === "Manager" ? "Approved" : "Saved"
-          }`}
-          btnText={"OK"}
-        />
+
+      {response && getEmail  && successMess && Position && (
+        <Notification getEmail={getEmail} Position={Position} />
       )}
-      {successMess === false && (
-        <PopupForSFApproves
-          toggleSFAMessage={toggleSFAMessage}
-          icons={<MdCancel />}
-          iconColor="text-[#dc2626]"
-          textColor="text-[#dc2626]"
-          title={"Sorry :("}
-          message={"Something went wrong please try again!!"}
-          btnText={"TRY AGAIN"}
-        />
-      )} */}
+      
     </div>
   );
 };
-
-// import { useEffect, useState } from "react";
-// import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
-
-// export const ViewHOsheet = ({ excelData, returnedTHeader }) => {
-//   const [data, setData] = useState(excelData);
-//   const [currentStatus, setCurrentStatus] = useState(null);
-//   const [highlight, sethighlight] = useState(false);
-//   const [loading, setLoading] = useState(true);
-//   const searchResult = (result) => {
-//     setData(result);
-//   };
-
-//   const cleanValue = (value) => {
-//     if (typeof value !== "string") {
-//       return value; // Return value if not a string (e.g., number, object)
-//     }
-//     return value.replace(/[^a-zA-Z0-9]/g, ""); // Removes all non-alphanumeric characters
-//   };
-
-//   useEffect(() => {
-//     const checkKeys = async () => {
-//       const cleanData = returnedTHeader.map((item) => {
-//         const cleanedItem = {};
-//         for (const key in item) {
-//           cleanedItem[key] = cleanValue(item[key]); // Clean the value, not the key
-//         }
-//         return cleanedItem;
-//       });
-
-//       const requiredKeys = [
-//         "REC",
-//         "CTR",
-//         "DEPT",
-//         "EMPLOYEEID",
-//         "BADGE",
-//         "NAME",
-//         "DATE",
-//         "ONAM",
-//         "OFFAM",
-//         "ONPM",
-//         "OFFPM",
-//         "IN",
-//         "OUT",
-//         "TOTALINOUT",
-//         "ALLDAYMINUTES",
-//         "NETMINUTES",
-//         "TOTALHOURS",
-//         "TOTALACTUALHOURS",
-//         "REMARKS",
-//       ];
-
-//       const result = await new Promise((resolve) => {
-//         // Check if all required keys are in the object
-//         const keyCheckResult =
-//           cleanData &&
-//           cleanData.every((m) => {
-//             return requiredKeys.every(
-//               (key) =>
-//                 Object.values(m)
-//                   .map((value) =>
-//                     typeof value === "string" ? value.toUpperCase() : value
-//                   ) // Convert string values to uppercase
-//                   .includes(key.toUpperCase()) // Compare with key in uppercase
-//             );
-//           });
-//         resolve(keyCheckResult);
-//       });
-
-//
-//       setCurrentStatus(result); // Assuming setCurrentStatus is defined
-//       setLoading(false);
-//     };
-
-//     if (returnedTHeader && returnedTHeader.length > 0) {
-//       checkKeys();
-//     } else {
-//       setCurrentStatus(false);
-//       setLoading(false);
-//     }
-//   }, [returnedTHeader]);
-
-//   return (
-//     <div>
-//       <div>
-//         {currentStatus === true ? (
-//           <div>
-//             <div className="flex justify-end mr-7">
-//               <SearchBoxForTimeSheet
-//                 excelData={excelData}
-//                 searchResult={searchResult}
-//               />
-//             </div>
-//             <div className="mt-9 overflow-x-auto overflow-y-scroll max-h-[500px]">
-//               <table className="table-auto text-center w-full">
-//                 <thead>
-//                   <tr className="bg-lite_grey text-dark_grey text_size_5">
-//                     <td className="px-4 flex-1">S No.</td>
-//                     <td className="px-4 flex-1 text-start">REC#</td>
-//                     <td className="px-4 flex-1">CTR</td>
-//                     <td className="px-4 flex-1 text-start">DEPT</td>
-//                     <td className="px-4 flex-1">EMPLOYEE ID</td>
-//                     <td className="px-4 flex-1">BADGE#</td>
-//                     <td className="px-4 flex-1">NAME</td>
-//                     <td className="px-4 flex-1">DATE</td>
-//                     <td className="px-4 flex-1">ON AM</td>
-//                     <td className="px-4 flex-1">OFF AM</td>
-//                     <td className="px-4 flex-1">ON PM</td>
-//                     <td className="px-4 flex-1">OFF PM</td>
-//                     <td className="px-4 flex-1">IN</td>
-//                     <td className="px-4 flex-1">OUT</td>
-//                     <td className="px-4 flex-1">TOTAL IN/OUT</td>
-//                     <td className="px-4 flex-1">ALL DAY MINUTES</td>
-//                     <td className="px-4 flex-1">NET MINUTES</td>
-//                     <td className="px-4 flex-1">TOTAL HOURS</td>
-//                     <td className="px-4 flex-1">TOTAL ACTUAL HOURS</td>
-//                     <td className="px-4 flex-1">REMARKS</td>
-//                   </tr>
-//                 </thead>
-//                 <tbody>
-//                   {excelData &&
-//                     excelData.map((m, index) => {
-//                       return (
-//                         <tr
-//                           key={index}
-//                           className={`text-dark_grey h-[40px] text-sm rounded-sm shadow-md border-b-2 border-[#CECECE] ${
-//                             m.data ? "bg-grey text-white" : "bg-white"
-//                           }`}
-//                         >
-//                           <td className="text-center px-4 flex-1">
-//                             {index + 1}
-//                           </td>
-//                           <td className="text-start px-4 flex-1">{m.REC}</td>
-//                           <td className="text-center px-4 flex-1">{m.CTR}</td>
-//                           <td className="text-center px-4 flex-1">{m.DEPT}</td>
-//                           <td className="text-center px-4 flex-1">
-//                             {m.EMPLOYEEID}
-//                           </td>
-//                           <td className="text-center px-4 flex-1">{m.BADGE}</td>
-//                           <td className="text-center px-4 flex-1">{m.NAME}</td>
-//                           <td className="text-center px-4 flex-1">{m.DATE}</td>
-//                           <td className="text-center px-4 flex-1">{m.ONAM}</td>
-//                           <td className="text-center px-4 flex-1">{m.OFFAM}</td>
-//                           <td className="text-center px-4 flex-1">{m.ONPM}</td>
-//                           <td className="text-center px-4 flex-1">{m.OFFPM}</td>
-//                           <td className="text-center px-4 flex-1">{m.IN}</td>
-//                           <td className="text-center px-4 flex-1">{m.OUT}</td>
-//                           <td className="text-center px-4 flex-1">
-//                             {m.TOTALINOUT || 0}
-//                           </td>
-//                           <td className="text-center px-4 flex-1">
-//                             {m.ALLDAYMINUTES || 0}
-//                           </td>
-//                           <td className="text-center px-4 flex-1">
-//                             {m.NETMINUTES || 0}
-//                           </td>
-//                           <td className="text-center px-4 flex-1">
-//                             {m.TOTALHOURS || 0}
-//                           </td>
-//                           <td className="text-center px-4 flex-1">
-//                             {m.TOTALACTUALHOURS || 0}
-//                           </td>
-//                           <td className="text-center px-4 flex-1">
-//                             {m.REMARKS}
-//                           </td>
-//                         </tr>
-//                       );
-//                     })}
-//                 </tbody>
-//               </table>
-//             </div>
-//             <div className="flex justify-center my-5">
-//               <button
-//                 className="rounded px-3 py-2 bg-[#FEF116] text_size_5 text-dark_grey"
-//                 onClick={() => {
-//                   //   renameKeysFunctionAndSubmit();
-//                 }}
-//               >
-//                 Send for Approval
-//               </button>
-//             </div>
-//           </div>
-//         ) : currentStatus === false ? (
-//           // {data ? ("True case") : data == false ? ("False case") : ("Default case")}
-//           <div className="flex justify-center">
-//             <div className=" flex flex-col items-center gap-5 p-5 px-16  rounded shadow-lg">
-//               <p className="text-dark_grey text_size_5">Message :</p>
-//               <p className={`text-dark_grey text_size_5 `}>
-//                 Your excel sheet is not expected format
-//               </p>
-//               <p className={`text-[#00DF0F] text_size_5`}>ERROR</p>
-//             </div>
-//           </div>
-//         ) : (
-//           ""
-//         )}
-//       </div>
-//     </div>
-//   );
-// };

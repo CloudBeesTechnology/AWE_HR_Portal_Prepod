@@ -7,6 +7,7 @@ import { IoCameraOutline } from "react-icons/io5";
 import { uploadDocs } from "../../services/uploadDocsS3/UploadDocs";
 import { FormField } from "../../utils/FormField";
 import { useOutletContext } from "react-router-dom";
+import { DataSupply } from "../../utils/DataStoredContext";
 import { getUrl } from "@aws-amplify/storage";
 import avatar from "../../assets/navabar/avatar.jpeg";
 
@@ -18,7 +19,7 @@ import {
   RaceDD,
   ReligionDD,
 } from "../../utils/DropDownMenus";
-import { DataSupply } from "../../utils/DataStoredContext";
+
 
 export const ApplicantDetails = () => {
   const { empPDData } = useContext(DataSupply);
@@ -32,50 +33,50 @@ export const ApplicantDetails = () => {
     });
   }, []);
 
-  const [formData, setFormData] = useState({
-    personalDetails: {
-      age: "",
-      agent: "",
-      alternateNo: "",
-      bwnIcColour: "",
-      bwnIcExpiry: "",
-      bwnIcNo: "",
-      chinese: "",
-      cob: "",
-      contactNo: "",
-      contractType: "",
-      createdAt: "",
-      dob: "",
-      driveLic: "",
-      eduDetails: "",
-      email: "",
-      empType: "",
-      familyDetails: "",
-      gender: "",
-      id: "",
-      lang: "",
-      marital: "",
-      name: "",
-      nationality: "",
-      otherNation: "",
-      otherRace: "",
-      otherReligion: "",
-      permanentAddress: "",
-      position: "",
-      ppDestinate: "",
-      ppExpiry: "",
-      ppIssued: "",
-      ppNo: "",
-      presentAddress: "",
-      profilePhoto: "",
-      race: "",
-      religion: "",
-      status: "",
-      tempID: "",
-      updatedAt: "",
-      workExperience: "",
-    },
-  });
+  // const [formData, setFormData] = useState({
+  //   personalDetails: {
+  //     age: "",
+  //     agent: "",
+  //     alternateNo: "",
+  //     bwnIcColour: "",
+  //     bwnIcExpiry: "",
+  //     bwnIcNo: "",
+  //     chinese: "",
+  //     cob: "",
+  //     contactNo: "",
+  //     contractType: "",
+  //     createdAt: "",
+  //     dob: "",
+  //     driveLic: "",
+  //     eduDetails: "",
+  //     email: "",
+  //     empType: "",
+  //     familyDetails: "",
+  //     gender: "",
+  //     id: "",
+  //     lang: "",
+  //     marital: "",
+  //     name: "",
+  //     nationality: "",
+  //     otherNation: "",
+  //     otherRace: "",
+  //     otherReligion: "",
+  //     permanentAddress: "",
+  //     position: "",
+  //     ppDestinate: "",
+  //     ppExpiry: "",
+  //     ppIssued: "",
+  //     ppNo: "",
+  //     presentAddress: "",
+  //     profilePhoto: "",
+  //     race: "",
+  //     religion: "",
+  //     status: "",
+  //     tempID: "",
+  //     updatedAt: "",
+  //     workExperience: "",
+  //   },
+  // });
 
   const {
     register,
@@ -172,57 +173,57 @@ export const ApplicantDetails = () => {
     }
   };
 
-  useEffect(() => {
-    if (empPDData.length > 0) {
-      const interviewData = empPDData.find((data) => data.tempID === tempID); // Assuming we want to take the first item
-      if (interviewData) {
-        setFormData({
-          personalDetails: {
-            age: interviewData.age || "",
-            agent: interviewData.agent || "",
-            alternateNo: interviewData.alternateNo || "",
-            bwnIcColour: interviewData.bwnIcColour || "",
-            bwnIcExpiry: interviewData.bwnIcExpiry || "",
-            bwnIcNo: interviewData.bwnIcNo || "",
-            chinese: interviewData.chinese || "",
-            cob: interviewData.cob || "",
-            contactNo: interviewData.contactNo || "",
-            contractType: interviewData.contractType || "",
-            createdAt: interviewData.createdAt || "",
-            dob: interviewData.dob || "",
-            driveLic: interviewData.driveLic || "",
-            eduDetails: interviewData.eduDetails || "",
-            email: interviewData.email || "",
-            empType: interviewData.empType || "",
-            familyDetails: interviewData.familyDetails || "",
-            gender: interviewData.gender || "",
-            id: interviewData.id || "",
-            lang: interviewData.lang || "",
-            marital: interviewData.marital || "",
-            name: interviewData.name || "",
-            nationality: interviewData.nationality || "",
-            otherNation: interviewData.otherNation || "",
-            otherRace: interviewData.otherRace || "",
-            otherReligion: interviewData.otherReligion || "",
-            permanentAddress: interviewData.permanentAddress || "",
-            position: interviewData.position || "",
-            ppDestinate: interviewData.ppDestinate || "",
-            ppExpiry: interviewData.ppExpiry || "",
-            ppIssued: interviewData.ppIssued || "",
-            ppNo: interviewData.ppNo || "",
-            presentAddress: interviewData.presentAddress || "",
-            profilePhoto: interviewData.profilePhoto || "",
-            race: interviewData.race || "",
-            religion: interviewData.religion || "",
-            status: interviewData.status || "",
-            tempID: interviewData.tempID || "",
-            updatedAt: interviewData.updatedAt || "",
-            workExperience: interviewData.workExperience || "",
-          },
-        });
-      }
-    }
-  }, [empPDData, tempID]);
+  // useEffect(() => {
+  //   if (empPDData.length > 0) {
+  //     const interviewData = empPDData.find((data) => data.tempID === tempID); // Assuming we want to take the first item
+  //     if (interviewData) {
+  //       setFormData({
+  //         personalDetails: {
+  //           age: interviewData.age || "",
+  //           agent: interviewData.agent || "",
+  //           alternateNo: interviewData.alternateNo || "",
+  //           bwnIcColour: interviewData.bwnIcColour || "",
+  //           bwnIcExpiry: interviewData.bwnIcExpiry || "",
+  //           bwnIcNo: interviewData.bwnIcNo || "",
+  //           chinese: interviewData.chinese || "",
+  //           cob: interviewData.cob || "",
+  //           contactNo: interviewData.contactNo || "",
+  //           contractType: interviewData.contractType || "",
+  //           createdAt: interviewData.createdAt || "",
+  //           dob: interviewData.dob || "",
+  //           driveLic: interviewData.driveLic || "",
+  //           eduDetails: interviewData.eduDetails || "",
+  //           email: interviewData.email || "",
+  //           empType: interviewData.empType || "",
+  //           familyDetails: interviewData.familyDetails || "",
+  //           gender: interviewData.gender || "",
+  //           id: interviewData.id || "",
+  //           lang: interviewData.lang || "",
+  //           marital: interviewData.marital || "",
+  //           name: interviewData.name || "",
+  //           nationality: interviewData.nationality || "",
+  //           otherNation: interviewData.otherNation || "",
+  //           otherRace: interviewData.otherRace || "",
+  //           otherReligion: interviewData.otherReligion || "",
+  //           permanentAddress: interviewData.permanentAddress || "",
+  //           position: interviewData.position || "",
+  //           ppDestinate: interviewData.ppDestinate || "",
+  //           ppExpiry: interviewData.ppExpiry || "",
+  //           ppIssued: interviewData.ppIssued || "",
+  //           ppNo: interviewData.ppNo || "",
+  //           presentAddress: interviewData.presentAddress || "",
+  //           profilePhoto: interviewData.profilePhoto || "",
+  //           race: interviewData.race || "",
+  //           religion: interviewData.religion || "",
+  //           status: interviewData.status || "",
+  //           tempID: interviewData.tempID || "",
+  //           updatedAt: interviewData.updatedAt || "",
+  //           workExperience: interviewData.workExperience || "",
+  //         },
+  //       });
+  //     }
+  //   }
+  // }, [empPDData, tempID]);
 
   return (
     <section className="w-full">
@@ -360,7 +361,7 @@ export const ApplicantDetails = () => {
             {errors.profilePhoto && (
               <p className="text-[red] text-[13px] text-center">
                 {errors.profilePhoto.message}
-              </p>
+              </p> ApplicatDetails,
             )}
           </div> */}
         </div>

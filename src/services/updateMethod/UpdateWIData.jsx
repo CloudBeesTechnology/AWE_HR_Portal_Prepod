@@ -24,7 +24,12 @@ export const UpdateWIData = () => {
     const updateFieldArray = (existingArray, newValue) => [
       ...new Set([...(existingArray || []), newValue]),
     ];
-    // Function to handle updating the data for employee work info
+
+    const updateFieldArray1 = (existingArray, newValue) => {
+      // Simply add the newValue to the existingArray without checking duplicates
+      existingArray.push(newValue);
+      return existingArray;  // Return the updated array
+    };
 
     const {
       empID,
@@ -174,12 +179,12 @@ export const UpdateWIData = () => {
         workInfoDataRecord.salaryType,
         salaryType
       );
-      const updatedmanager = updateFieldArray(
+      const updatedmanager = updateFieldArray1(
         workInfoDataRecord.manager,
         manager
       );
-      const updatedhr = updateFieldArray(workInfoDataRecord.hr, hr);
-      const updatedsupervisor = updateFieldArray(
+      const updatedhr = updateFieldArray1(workInfoDataRecord.hr, hr);
+      const updatedsupervisor = updateFieldArray1(
         workInfoDataRecord.supervisor,
         supervisor
       );

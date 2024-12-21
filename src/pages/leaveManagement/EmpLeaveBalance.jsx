@@ -17,6 +17,7 @@ export const EmpLeaveBalance = () => {
   const [rowsPerPage, setRowsPerPage] = useState(30);
   const [data, setData] = useState([]);
   const [empDetails, setEmpDetails] = useState([]);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const heading = [
     "S.No",
@@ -32,7 +33,7 @@ export const EmpLeaveBalance = () => {
   useEffect(() => {
     const uniqueData = [];
     const seen = new Set();
-const userID=localStorage.getItem("userID")
+    const userID = localStorage.getItem("userID");
     mergedData.forEach((val) => {
       const uniqueKey = val.empID;
 
@@ -52,8 +53,8 @@ const userID=localStorage.getItem("userID")
       }
       return false; // Default to exclude items if no condition is met
     });
-  // console.log(result);
-  
+    // console.log(result);
+
     setSecondartyData(result);
     setData(result);
   }, [mergedData]);
@@ -69,12 +70,12 @@ const userID=localStorage.getItem("userID")
     setShowPopup(false);
   };
   // console.log(secondartyData);
-  
 
   useEffect(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
 
-    const dataToPaginate = searchResults.length > 0 ? searchResults : secondartyData;
+    const dataToPaginate =
+      searchResults.length > 0 ? searchResults : secondartyData;
 
     if (dataToPaginate.length === 0) {
       setFilteredData([]);
@@ -117,14 +118,16 @@ const userID=localStorage.getItem("userID")
   const searchUserList = async (data) => {
     try {
       const result = await data;
-      setSearchResults(result);
-      setCurrentPage(1); // Reset to first page when new search is performed
+      setSearchResults(result || []);
+      setHasSearched(true);
+      setCurrentPage(1);
     } catch (error) {
       console.error("Error search data", error);
       setSearchResults([]);
+      setHasSearched(true);
     }
   };
-  
+
   return (
     <section className="relative w-full">
       <div className="flex flex-wrap justify-between items-center mb-5">
@@ -139,13 +142,15 @@ const userID=localStorage.getItem("userID")
           border="rounded-md"
         />
       </div>
-      
+
       <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl">
-        {(searchResults.length > 0  && filteredData.length === 0) ? (
+        {hasSearched && searchResults.length === 0 ? (
           <div className="text-center mt-6 py-20">
-            <p className="text-red-500 font-medium">No matching results found for your search.</p>
+            <p className="text-red-500 font-medium">
+              No matching results found for your search.
+            </p>
           </div>
-        ) : filteredData && filteredData.length > 0 ? (
+        ) : filteredData.length > 0 ? (
           <table className="w-full font-semibold text-sm">
             <thead className="bg-[#939393] sticky top-0 rounded-t-lg">
               <tr>
@@ -169,9 +174,19 @@ const userID=localStorage.getItem("userID")
                       <td className="py-3">{item.empID}</td>
                       <td className="py-3">{item.empName || "N/A"}</td>
                       <td className="py-3">{item.empBadgeNo || "N/A"}</td>
-                      <td className="py-3">{item.doj || "N/A"}</td>
-                      <td className="py-3">{item.position || "N/A"}</td>
-                      <td className="py-3">{item.department || "N/A"}</td>
+                      <td className="py-3">{formatDate(item.doj) || "N/A"}</td>
+                      <td className="py-3">
+                        {" "}
+                        {Array.isArray(item.position)
+                          ? item.position[item.position.length - 1] || "N/A"
+                          : "N/A"}
+                      </td>
+                      <td className="py-3">
+                        {" "}
+                        {Array.isArray(item.department)
+                          ? item.department[item.department.length - 1] || "N/A"
+                          : "N/A"}
+                      </td>
                       <td className="py-3">
                         <button
                           onClick={() => handleViewSummary(item)}
@@ -194,7 +209,9 @@ const userID=localStorage.getItem("userID")
           </table>
         ) : (
           <div className="text-center mt-6 py-20">
-            <p className="text-gray-600">No leave data available for employees.</p>
+            <p className="text-gray-600">
+              No leave data available for employees.
+            </p>
           </div>
         )}
       </div>

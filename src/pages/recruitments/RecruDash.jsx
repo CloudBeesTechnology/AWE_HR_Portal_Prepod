@@ -24,22 +24,25 @@ export const RecruDash = () => {
     } else if (title === "Hiring Job") {
       navigate("/hiringJob");
     }
- 
   };
   // console.log(recruitmentPermissions);
-  
+
   const filteredCards = RecDashdetails.filter((card) =>
     recruitmentPermissions.includes(card.title)
   );
   // console.log(filteredCards, "kjhg");
   return (
     <section className="min-h-screen p-10 bg-[#F5F6F1]">
-      <div className=" screen-size flex justify-evenly items-center flex-wrap gap-10 text-black">
+      <div
+        className={`screen-size flex ${
+          filteredCards.length <= 2 ? "justify-start" : "justify-evenly"
+        } items-center flex-wrap gap-10 text-black`}
+      >
         {filteredCards.map((value, index) => (
           <div
             key={index}
             onClick={() => handleTileClick(value.title)}
-            className={`${value.bg} rounded-3xl w-72 h-50 p-4 bg-white border-4 border-white cursor-pointer transition-all duration-50 hover:border-[#faf362] hover:border-4`}
+            className={`${value.bg} rounded-3xl w-[320px] h-50 p-4 bg-white border-4 border-white cursor-pointer transition-all duration-50 hover:border-[#faf362] hover:border-4`}
           >
             <div
               className={`${value.bg1} rounded-full my-8 w-24 h-24 center m-auto`}

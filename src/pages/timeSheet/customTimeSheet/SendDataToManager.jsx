@@ -53,30 +53,44 @@ export const SendDataToManager = async (filterPending) => {
     };
     const getOneObject = await fetchData();
 
-    const finalOutput = filterPending?.map((pendingItem) => {
-      return {
-        id: pendingItem.id,
-        data: pendingItem.data.filter((dataItem) => {
-          // Iterate over getOneObject to check for a match
+    const finalOutput = filterPending?.filter((pendingItem) => {
+      return getOneObject.some((manager) => {
+        const lastDepartment =
+          manager.department[manager.department.length - 1];
 
-          return getOneObject.some((manager) => {
-            // Get the last department of the manager
-
-            const lastDepartment =
-              manager.department[manager.department.length - 1];
-            // Check if the mdepartment matches the manager's empBadgeNo
-
-            return (
-              dataItem.managerData.mbadgeNo === manager.empBadgeNo &&
-              dataItem.managerData.mdepartment === lastDepartment
-            );
-          });
-        }),
-      };
+        return (
+          pendingItem.assignTo === manager.empBadgeNo 
+          // pendingItem.mdepartment === lastDepartment
+        );
+      });
     });
 
-    const filteredOutput = finalOutput.filter((item) => item.data.length > 0);
+    console.log(finalOutput);
 
+    // const finalOutput = filterPending?.map((pendingItem) => {
+    //   return {
+    //     id: pendingItem.id,
+    //     data: pendingItem.data.filter((dataItem) => {
+    //       // Iterate over getOneObject to check for a match
+
+    //       return getOneObject.some((manager) => {
+    //         // Get the last department of the manager
+
+    //         const lastDepartment =
+    //           manager.department[manager.department.length - 1];
+    //         // Check if the mdepartment matches the manager's empBadgeNo
+
+    // return (
+    //   dataItem.managerData.mbadgeNo === manager.empBadgeNo &&
+    //   dataItem.managerData.mdepartment === lastDepartment
+    // );
+    //       });
+    //     }),
+    //   };
+    // });
+
+    const filteredOutput = finalOutput.filter((item) => item !== null && item !== undefined);
+    console.log(filteredOutput)
     return filteredOutput;
   } catch (err) {
     console.log("ERROR : ", err);
@@ -145,7 +159,7 @@ export const SendDataToManager = async (filterPending) => {
 //         id: pendingItem.id,
 //         data: pendingItem.data,
 //         managerData: pendingItem.managerData,
-        
+
 //       };
 //     });
 

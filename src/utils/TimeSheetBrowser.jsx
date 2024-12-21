@@ -55,8 +55,8 @@ export const TimeSheetBrowser = ({ title }) => {
       setTitleName(title);
     }
   }, [isChecked]);
-
-  const { convertedStringToArrayObj, getPosition } = useFetchData(titleName);
+  const Position = localStorage.getItem("userType");
+  const { convertedStringToArrayObj, getPosition } = useFetchData(titleName,Position);
 
   // Convert string to array of object
   // useEffect(() => {

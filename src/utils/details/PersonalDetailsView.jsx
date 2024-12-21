@@ -144,13 +144,12 @@ const PersonalDetailsView = ({
               document.upload.endsWith(".pdf") && (
                 <div className="mt-4">
                   <div className="relative bg-white max-w-3xl mx-auto p-6 rounded-lg shadow-lg">
-                    <div  ref={invoiceRef} className="flex justify-center">
+                    <div  ref={invoiceRef} className="invoice-content flex justify-center">
                       <Worker
                        workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
                       >
                         <Viewer
-                          fileUrl={lastUploadUrl || ""}
-                          
+                          fileUrl={lastUploadUrl || ""}   
                          
                         />
                          {/* <Page pageNumber={pageNumber} className="mx-auto" /> */}
@@ -317,6 +316,7 @@ const PersonalDetailsView = ({
 
   return (
     <section className="py-8 bg-gray-50 rounded-lg">
+      <div ref={mainRef} >
       <h6 className="uppercase text_size_5 my-3">Personal Details:</h6>
       <div ref={mainRef}  className="flex flex-col md:flex-row items-start justify-between gap-8">
         {/* Personal details */}
@@ -338,6 +338,7 @@ const PersonalDetailsView = ({
           <div className="w-[250px] rounded-lg overflow-hidden "> </div>
         </div>
       </section>
+      </div>
 
       {/* Document categories */}
 

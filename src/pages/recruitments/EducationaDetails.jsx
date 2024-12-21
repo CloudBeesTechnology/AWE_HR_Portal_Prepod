@@ -1,27 +1,30 @@
-import { useEffect, useState } from "react";
+import { useEffect, useContext } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FaRegMinusSquare } from "react-icons/fa";
 import { CiSquarePlus } from "react-icons/ci";
-
 import { EducationSchema } from "../../services/Validation"; // Adjust import as necessary
 import { useLocation, useNavigate } from "react-router-dom";
-import { generateClient } from "aws-amplify/api";
-const client = generateClient();
+import { useOutletContext } from "react-router-dom";
+import { DataSupply } from "../../utils/DataStoredContext";
 
 export const EducationDetails = () => {
+  const { tempID } = useOutletContext();
+
   const location = useLocation();
   const navigatingPersonalData = location.state?.FormData;
-  // console.log("Received form data:", navigatingPersonalData );
+
   useEffect(() => {
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
   }, []);
+
   const {
     handleSubmit,
     control,
+    setValue,
     formState: { errors },
     watch,
   } = useForm({
@@ -44,24 +47,10 @@ export const EducationDetails = () => {
       diseaseDesc: "",
       liquorDesc: "",
       crimeDesc: "",
-      ...JSON.parse(localStorage.getItem("educationFormData")) || {},
     },
   });
   const navigate = useNavigate();
   // const { handleNext } = useOutletContext();
-
-  useEffect(() => {
-    const eduData = () => {
-      localStorage.removeItem("educationFormData"); // Clear data on refresh or tab close
-    };
-    // Add event listener for unload
-    window.addEventListener("beforeunload", eduData);
-    // Clean up the event listener when the component unmounts
-    return () => {
-      window.removeEventListener("beforeunload", eduData);
-    };
-  }, []);
-
   const {
     fields: emgDetails,
     append: appendEmergency,
@@ -119,55 +108,39 @@ export const EducationDetails = () => {
     });
   };
 
-  // const onSubmit = handleSubmit((data) => {
-  //   console.log(data);
-  //   localStorage.setItem('educationDetails', JSON.stringify(data));
-  //   // handleNext();
-  //   navigate("/addCandidates/otherDetails");
-  // });
   const onSubmit = (data) => {
     // console.log(data);
+
+    localStorage.setItem("educationFormData", JSON.stringify(data));
     const navigatingEduData = {
       ...data,
       ...navigatingPersonalData,
     };
-    // setNavigateEduData(navigatingEduData)
-    // console.log(navigatingEduData);
-    // handleNext();
-    localStorage.setItem("educationFormData", JSON.stringify(navigatingEduData));
-    
     navigate("/addCandidates/otherDetails", {
       state: { FormData: navigatingEduData },
     });
   };
 
+  useEffect(() => {
+    if (tempID) {
+      const savedData = JSON.parse(localStorage.getItem("educationFormData"));
 
-  // const onSubmit = async (data) => {
-  // try {
+      if (savedData) {
+        console.log("Loaded Saved Data:", savedData);
 
-  //   console.log(data);
+        // Loop through saved data and set each value
+        Object.keys(savedData).forEach((key) => {
+          // If the field is an array, set it using `setValue` directly for the array field
+          if (Array.isArray(savedData[key])) {
+            setValue(key, savedData[key]);
+          } else if (savedData[key]) {
+            setValue(key, savedData[key]);
+          }
+        });
+      }
+    }
+  }, [tempID, setValue]);
 
-  //   // Combine all form data
-  //   const result = await client.graphql({
-  //     query: createEducation,
-  //     variables: {
-  //       input: data ,
-  //     },
-  //   });
-  //   console.log("Successfully submitted:hiiiiiiiii", result);
-
-  // } catch (error) {
-  //   console.log(error);
-
-  //   console.error(
-  //     "Error submitting data to AWS:",
-  //     JSON.stringify(error, null, 2)
-  //   );
-  // }
-  // navigate("/addCandidates/personalDetails", {
-  //   state: { FormData: data },
-  // });
-  // };
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="">
       {/* h-screen overflow-y-auto scrollbar-hide */}

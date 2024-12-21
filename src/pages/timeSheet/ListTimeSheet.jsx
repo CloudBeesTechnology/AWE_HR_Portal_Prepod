@@ -3,12 +3,12 @@ import { Link, useNavigate, useOutletContext } from "react-router-dom";
 
 export const ListTimeSheet = () => {
   const {
-    allExcelSheetData,
-    newSearchFunction
+    // allExcelSheetData,
+    newSearchFunction,
     // setCategoryFilter,
     // AllFieldData,
     // categoryFilter,
-    // visibleData,
+    visibleData,
     // handleScroll, 
   } = useOutletContext();
   
@@ -37,14 +37,14 @@ export const ListTimeSheet = () => {
         </thead>
         {/* context={{ allExcelSheetData, AllFieldData, categoryFilter, visibleData, handleScroll }} */}
         <tbody>
-          {allExcelSheetData && allExcelSheetData.length > 0 ? (
-            allExcelSheetData.map((val, index) => {
+          {visibleData && visibleData.length > 0 ? (
+            visibleData.map((val, index) => {
               return (
                 // <React.Fragment key={index}>
                   <tr key={index} className="text-dark_grey h-[53px] text-sm bg-white  rounded-sm shadow-md text-start border-b-2 border-[#CECECE]">
                     <td>{index + 1}</td>
                     <td>{val.fileName}</td>
-                    <td>{val.type}</td>
+                    <td>{val.fileType}</td>
                     <td>{val.date}</td>
                     <td
                       onClick={() => {
@@ -55,7 +55,7 @@ export const ListTimeSheet = () => {
                     >
                       View
                     </td>  
-                    <td>{val.status}</td>
+                    <td className={val.status==="Approved" ? "text-[#16a34a]" : ""}>{val.status}</td>
                   </tr>
                 // </React.Fragment>
               );
@@ -66,7 +66,7 @@ export const ListTimeSheet = () => {
                 colSpan="15"
                 className="text-center text-dark_ash text_size_5 bg-white"
               >
-                <p className="p-5">Please wait few seconds...</p>
+                <p className="p-5">No Table Data Available Here...</p>
               </td>
             </tr>
           )}

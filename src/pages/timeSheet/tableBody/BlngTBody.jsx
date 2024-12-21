@@ -24,35 +24,36 @@ export const BlngTBody = ({ data, loading, setTableData }) => {
       {loading === false && data && data?.length > 0
         ? data.map((value, index) => {
             const renderRows = (rowData, ind) => {
+              console.log(rowData.fidNo)
               return (
                 <tr
                   key={index}
                   className="text-dark_grey h-[53px] bg-white text-sm rounded-sm shadow-md text-start border-b-2 border-[#CECECE]"
                 >
                   <td className="text-start px-4 flex-1">{index + 1}</td>
-                  <td className="text-start px-4 flex-1">{rowData.fid}</td>
-                  <td className="text-center px-4 flex-1">{rowData.name}</td>
-                  <td className="text-center px-4 flex-1">{rowData.entDate}</td>
-                  <td className="text-center px-4 flex-1">{rowData.entDT}</td>
-                  <td className="text-center px-4 flex-1">{rowData.exitDT}</td>
+                  <td className="text-start px-4 flex-1">{rowData.fidNo}</td>
+                  <td className="text-center px-4 flex-1">{rowData.empName}</td>
+                  <td className="text-center px-4 flex-1">{rowData.date}</td>
+                  <td className="text-center px-4 flex-1">{rowData.inTime?.replace(/[\[\]]/g, "") || ""}</td>
+                  <td className="text-center px-4 flex-1">{rowData.outTime?.replace(/[\[\]]/g, "") || ""}</td>
                   <td className="text-center px-4 flex-1">
                     {rowData.day || 0}
                   </td>
                   <td className="text-center px-4 flex-1">
-                    {rowData.avgTotalDay || 0}
+                    {rowData.avgDailyTD || 0}
                   </td>
                   <td className="text-center px-4 flex-1">
-                    {rowData.totalhrs || ""}
+                    {rowData.totalHrs || ""}
                   </td>
-                  <td className="text-center px-4 flex-1">{rowData.workDN}</td>
+                  <td className="text-center px-4 flex-1">{rowData.aweSDN}</td>
 
                   <td className="text-center px-4 flex-1">
-                    {rowData.normalWhrsPerDay || 0}
+                    {rowData.normalWorkHrs || 0}
                   </td>
                   <td className="text-center px-4 flex-1">
-                    {rowData.workhrs || 0}
+                    {rowData.actualWorkHrs || 0}
                   </td>
-                  <td className="text-center px-4 flex-1">{rowData.OT || 0}</td>
+                  <td className="text-center px-4 flex-1">{rowData.totalOT || 0}</td>
                   <td className="text-center px-4 flex-1">{rowData.remarks}</td>
                   {/* <td
                     className={`text-center px-4 flex-1 ${

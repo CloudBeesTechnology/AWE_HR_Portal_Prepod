@@ -6,6 +6,7 @@ const client = generateClient();
 
 const useEmployeePersonalInfo = (userID) => {
   const [personalInfo, setPersonalInfo] = useState({
+    empID:"",
     profilePhoto: "",
     name: "",
     email: "",
@@ -42,6 +43,7 @@ const useEmployeePersonalInfo = (userID) => {
 
         if (userPersonalInfo) {
           setPersonalInfo({
+            empID: userPersonalInfo.empID,
             profilePhoto: userPersonalInfo.profilePhoto,
             name: userPersonalInfo.name,
             email: userPersonalInfo.email,

@@ -1,7 +1,7 @@
 import { generateClient } from "@aws-amplify/api";
 import { useEffect, useState } from "react";
 import {
-  listEmpPersonalInfos,
+  listEmpPersonalInfos, 
   listEmpWorkInfos,
 } from "../../../graphql/queries";
 const client = generateClient();

@@ -17,6 +17,7 @@ export const EmployReq = ({}) => {
   const [selectedRemarksRequest, setSelectedRemarksRequest] = useState(null);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
+  const [remarksSubmitted, setRemarksSubmitted] = useState({});
 
   const fetchRequisitionData = async () => {
     try {
@@ -75,6 +76,13 @@ export const EmployReq = ({}) => {
         item.id === requestId ? { ...item, remarkReq: remarks } : item
       )
     );
+
+    // Update remarksSubmitted and persist to localStorage
+    setRemarksSubmitted((prevState) => {
+      const updatedState = { ...prevState, [requestId]: true };
+      localStorage.setItem("remarksSubmitted", JSON.stringify(updatedState));
+      return updatedState;
+    });
   };
 
   useEffect(() => {
@@ -96,9 +104,9 @@ export const EmployReq = ({}) => {
           Employee Requisition Review
         </button>
         <Searchbox
-          allEmpDetails={requisitionData} 
-          searchUserList={setFilteredData} 
-          searchIcon1={<IoSearch />} 
+          allEmpDetails={requisitionData}
+          searchUserList={setFilteredData}
+          searchIcon1={<IoSearch />}
           placeholder="Search by Name or Position"
         />
       </div>
@@ -163,11 +171,11 @@ export const EmployReq = ({}) => {
                       <span className="max-w-[200px] text-ellipsis overflow-hidden">
                         {item.remarkReq}
                       </span>
-                      <div className="w-6 h-6 flex justify-center items-center">
-                        {localStorage.getItem("userType") !== "HR" &&
+                      <div className="w-6 h-6 center">
+                        {localStorage.getItem("userType") === "GM" &&
                           !item.remarkReq && (
                             <FaPencilAlt
-                              className="text-[brown]"
+                              className="text-[brown] cursor-pointer"
                               onClick={() => setSelectedRemarksRequest(item)}
                             />
                           )}

@@ -19,6 +19,8 @@ import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
 import { PopupForAssignManager } from "./ModelForSuccessMess/PopupForAssignManager";
 import { createTimeSheet, updateTimeSheet } from "../../graphql/mutations";
 import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
+import { useMergeTableForNotification } from "./customTimeSheet/useMergeTableForNotification";
+import { Notification } from "./customTimeSheet/Notification";
 const client = generateClient();
 
 export const ViewBLNGsheet = ({
@@ -40,14 +42,15 @@ export const ViewBLNGsheet = ({
   const [toggleAssignManager, setToggleAssignManager] = useState(false);
   const [userIdentification, setUserIdentification] = useState("");
   const [successMess, setSuccessMess] = useState(null);
-
+  const [response, setResponse] = useState(null);
   const [showStatusCol, setShowStatusCol] = useState(null);
+
 
   const { handleScroll, visibleData, setVisibleData } = UseScrollableView(
     data,
-    Position
+    "TimeKeeper"
   );
-
+  const getEmail = useMergeTableForNotification(response);
   useEffect(() => {
     if (excelData) {
       const fetchData = async () => {
@@ -118,33 +121,50 @@ export const ViewBLNGsheet = ({
 
       const result =
         data &&
-        data.map((vals) => {
-          return {
-            id: vals?.id || null,
-            data: vals?.data?.map((val, index) => {
+        data.map((val) => {
+        
+          let parsedEmpWorkInfo = [];
+          try {
+              
+              if (Array.isArray(val.empWorkInfo)) {
+                  parsedEmpWorkInfo = val.empWorkInfo.map(info => 
+                      typeof info === "string" ? JSON.parse(info) : info
+                  );
+              }
+          } catch (error) {
+              console.error("Error parsing empWorkInfo for ID:", val.id, error);
+          }
+
               return {
-                FID: val.fid || 0,
-                NAMEFLAST: val.name || "",
-                ENTRANCEDATEUSED: val.entDate || "",
-                ENTRANCEDATETIME: val.entDT || "",
-                EXITDATETIME: val.exitDT || "",
-                DAYDIFFERENCE: val.day || 0,
-                AVGDAILYTOTALBYDAY: val.avgTotalDay || "",
-                AHIGHLIGHTDAILYTOTALBYGROUP: val.totalhrs || "",
-                ADININWORKSENGINEERINGSDNBHD: val.workDN || "",
-                WORKINGHOURS: val.workhrs || 0,
-                OT: val.OT || 0,
-                NORMALWORKINGHRSPERDAY: val?.normalWhrsPerDay || 0,
-                jobLocaWhrs: val.jobLocaWhrs || [],
+                id: val.id,
+                fileName: fileName,
+                FID: val.fidNo || 0,
+                NAMEFLAST: val.empName || "",
+                ENTRANCEDATEUSED: val.date || "",
+                ENTRANCEDATETIME: val.inTime?.replace(/[\[\]]/g, "")|| "",
+                EXITDATETIME: val.outTime?.replace(/[\[\]]/g, "") || "",
+                // DAYDIFFERENCE: val.day || 0,
+                AVGDAILYTOTALBYDAY: val.avgDailyTD || "",
+                AHIGHLIGHTDAILYTOTALBYGROUP: val.totalHrs || "",
+                ADININWORKSENGINEERINGSDNBHD: val.aweSDN || "",
+                WORKINGHOURS: val.actualWorkHrs || 0,
+                OT: val.otTime || 0,
+                NORMALWORKINGHRSPERDAY: val?.normalWorkHrs || 0,
+                jobLocaWhrs: parsedEmpWorkInfo.flat() || [],
+                fileType: val.fileType,
+                timeKeeper: val.assignBy,
+                manager: val.assignTo,
                 REMARKS: val.remarks || "",
                 status: val.status || "",
-                managerData: val?.managerData,
+                
               };
-            }),
-          };
+            
+        
         });
 
    
+
+
 
       setData(result);
       setSecondaryData(result);
@@ -238,25 +258,29 @@ export const ViewBLNGsheet = ({
           //   (val) => val.status !== "Approved"
           // );
 
-          const filterPending = fetchedData
-            .map((value) => {
-              return {
-                id: value[0]?.id,
-                data: value[1]?.filter((val) => {
-                  if (val.status !== "Approved") {
-                    return val;
-                  }
-                }),
-              };
-            })
-            .filter((item) => item.data && item.data.length > 0);
+          // const filterPending = fetchedData
+          //   .map((value) => {
+          //     return {
+          //       id: value[0]?.id,
+          //       data: value[1]?.filter((val) => {
+          //         if (val.status !== "Approved") {
+          //           return val;
+          //         }
+          //       }),
+          //     };
+          //   })
+          //   .filter((item) => item.data && item.data.length > 0);
           //   const filterPending =
           // console.log(filterPending);
           //   console.log(fetchedData);
 
+          // const filteredData = fetchedData.filter(
+          //   (fil) => fil.status !== "Approved"
+          // );
+
           if (userIdentification === "Manager") {
-            const finalData = await SendDataToManager(filterPending);
-            console.log(finalData)
+            const finalData = await SendDataToManager(fetchedData);
+           console.log(finalData)
             pendingData(finalData);
           }
         } catch (err) {
@@ -279,8 +303,12 @@ export const ViewBLNGsheet = ({
   const toggleFunction = () => {
     setToggleHandler(!toggleHandler);
   };
-  const toggleSFAMessage = (value) => {
+  const toggleSFAMessage = async (value, responseData) => {
     setSuccessMess(value);
+    if (value === true && responseData) {
+      console.log("Success Message : ", responseData);
+      setResponse(responseData);
+    }
   };
   const toggleFunctionForAssiMana = () => {
     setToggleAssignManager(!toggleAssignManager);
@@ -329,59 +357,98 @@ export const ViewBLNGsheet = ({
     if (userIdentification !== "Manager") {
       const result =
         data &&
-        data.map((val) => {
+        data.map((val,i) => {
+          
           return {
-            fid: val?.FID || 0,
-            name: val?.NAMEFLAST || "",
-            entDate: val?.ENTRANCEDATEUSED || "",
-            entDT: val?.ENTRANCEDATETIME || "",
-            exitDT: val?.EXITDATETIME || "",
-            day: val?.DAYDIFFERENCE || 0,
-            avgTotalDay: val?.AVGDAILYTOTALBYDAY || "",
-            totalhrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
-            workDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
-            normalWhrsPerDay: val?.NORMALWORKINGHRSPERDAY || 0,
-            workhrs: val?.WORKINGHOURS || 0,
-            OT: val?.OT || 0,
-            jobLocaWhrs: val?.jobLocaWhrs || "",
+            fileName: fileName,
+            fidNo: val?.FID || 0,
+            empName: val?.NAMEFLAST || "",
+            date: val?.ENTRANCEDATEUSED || "",
+            inTime: val?.ENTRANCEDATETIME || "",
+            outTime: val?.EXITDATETIME || "",
+            // day: val?.DAYDIFFERENCE || 0,
+            avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
+            totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
+            aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
+            normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+            actualWorkHrs: val?.WORKINGHOURS || 0,
+            otTime: val?.OT || 0,
+            empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+            fileType: "BLNG",
+            status: "Pending",
             remarks: val?.REMARKS || "",
           };
         });
 
-      const currentDate = new Date().toLocaleDateString();
-      const mergeData = [...result]; // Clone result to avoid mutation (optional)
-      mergeData.unshift(managerData);
+        const finalResult = result.map((val) => {
+          return {
+            ...val,
+            assignTo: managerData.mbadgeNo,
+            assignBy: uploaderID,
+            // trade: managerData.mfromDate,
+            // tradeCode: managerData.muntilDate,
+          };
+        });
 
-      const finalResult = result.map((val) => {
-        return { ...val, managerData };
-      });
-      // Function to submit a batch
-      const submitBatch = async (batch, batchNumber) => {
-        const DailySheet = {
-          dailySheet: JSON.stringify(batch),
-          status: "Pending",
-          date: currentDate,
-          managerDetails:JSON.stringify(managerData),
-          type:"BLNG",
-          fileName:fileName,
-          uploaderID:uploaderID,
-        };
 
-        try {
-          const res = await client.graphql({
-            query: createTimeSheet,
-            variables: { input: DailySheet },
-          });
-
-          if (res.data.createTimeSheet) {
-            // console.log("res.data.createBlng : ", res.data.createBlng);
-            toggleSFAMessage(true);
-            setData(null);
+        const sendTimeSheets = async (timeSheetData) => {
+          let successFlag = false;
+          for (const timeSheet of timeSheetData) {
+            try {
+              const response = await client.graphql({
+                query: createTimeSheet,
+                variables: {
+                  input: timeSheet, // Send each object individually
+                },
+              });
+  
+              if (response?.data?.createTimeSheet) {
+                console.log(
+                  "TimeSheet created successfully:",
+                  response.data.createTimeSheet
+                );
+                const responseData = response.data.createTimeSheet;
+              if (!successFlag) {
+                toggleSFAMessage(true, responseData); // Only toggle success message once
+                successFlag = true; // Set the flag to true
+              }
+              }
+            } catch (error) {
+              console.error("Error creating TimeSheet:", error);
+              toggleSFAMessage(false);
+            }
           }
-        } catch (err) {
-          toggleSFAMessage(false);
-        }
-      };
+        };
+  
+        sendTimeSheets(finalResult);
+   
+      // Function to submit a batch
+      // const submitBatch = async (batch, batchNumber) => {
+      //   const DailySheet = {
+      //     dailySheet: JSON.stringify(batch),
+      //     status: "Pending",
+      //     date: currentDate,
+      //     managerDetails:JSON.stringify(managerData),
+      //     type:"BLNG",
+      //     fileName:fileName,
+      //     uploaderID:uploaderID,
+      //   };
+
+      //   try {
+      //     const res = await client.graphql({
+      //       query: createTimeSheet,
+      //       variables: { input: DailySheet },
+      //     });
+
+      //     if (res.data.createTimeSheet) {
+      //       // console.log("res.data.createBlng : ", res.data.createBlng);
+      //       toggleSFAMessage(true);
+      //       setData(null);
+      //     }
+      //   } catch (err) {
+      //     toggleSFAMessage(false);
+      //   }
+      // };
 
       // Batch size
       const batchSize = 1000;
@@ -391,71 +458,70 @@ export const ViewBLNGsheet = ({
       //   const batch = result.slice(i, i + batchSize);
       //   await submitBatch(batch, i / batchSize + 1); // Track batch number
       // }
-      for (let i = 0; i < finalResult.length; i += batchSize) {
-        const batch = finalResult.slice(i, i + batchSize);
-        await submitBatch(batch, "6785A");
-      }
+      // for (let i = 0; i < finalResult.length; i += batchSize) {
+      //   const batch = finalResult.slice(i, i + batchSize);
+      //   await submitBatch(batch, "6785A");
+      // }
     } else if (userIdentification === "Manager") {
       const MultipleBLNGfile =
-        data &&
-        data.map((value) => {
-          return {
-            id: value?.id || null,
-            weaklySheet: value?.data?.map((val) => {
-              return {
-                fid: val?.FID || 0,
-                name: val?.NAMEFLAST || "",
-                entDate: val?.ENTRANCEDATEUSED || "",
-                entDT: val?.ENTRANCEDATETIME || "",
-                exitDT: val?.EXITDATETIME || "",
-                day: val?.DAYDIFFERENCE || 0,
-                avgTotalDay: val?.AVGDAILYTOTALBYDAY || "",
-                totalhrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
-                workDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
-                workhrs: val?.WORKINGHOURS || 0,
-                OT: val?.OT || 0,
-                normalWhrsPerDay: val?.NORMALWORKINGHRSPERDAY || 0,
-                // jobCode: val?.JOBCODE || [],
-                // location: val?.LOCATION || [],
-                jobLocaWhrs: val.jobLocaWhrs || [],
-                remarks: val?.REMARKS || "",
-                managerData: val?.managerData,
-              };
-            }),
-          };
-        });
+      data &&
+      data.map((val) => {
+        return {
+          id: val.id,
+          // fileName: val.fileName,
+          fidNo: val?.FID || 0,
+          empName: val?.NAMEFLAST || "",
+          date: val?.ENTRANCEDATEUSED || "",
+          inTime: val?.ENTRANCEDATETIME || "",
+          outTime: val?.EXITDATETIME || "",
+          // day: val?.DAYDIFFERENCE || 0,
+          avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
+          totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
+          aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
+          normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+          actualWorkHrs: val?.WORKINGHOURS || 0,
+          otTime: val?.OT || 0,
+          empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+
+          fileType: "BLNG",
+          status: "Approved",
+          remarks: val?.REMARKS || "",
+        };
+      });
      
 
-      const result = MultipleBLNGfile.map(async (obj) => {
-        const finalData = {
-          id: obj.id,
-          dailySheet: JSON.stringify(obj.weaklySheet),
-          status: "Approved",
-        };
-
-        if (finalData.dailySheet) {
-          // console.log("Work");
-          await client
-            .graphql({
+      const updateTimeSheetFuction = async (timeSheetData) => {
+        let successFlag = false;
+        for (const timeSheet of timeSheetData) {
+          try {
+            const response = await client.graphql({
               query: updateTimeSheet,
               variables: {
-                input: finalData,
+                input: timeSheet, // Send each object individually
               },
-            })
-            .then((res) => {
-              if (res.data.updateTimeSheet) {
-                toggleSFAMessage(true);
-                setVisibleData([]);
-                // setData("res.data.updateBlng : ", res.data.updateBlng);
-                setData(null);
-              }
-            })
-            .catch((err) => {
-              console.log(err)
-              toggleSFAMessage(false);
             });
+
+            if (response?.data?.updateTimeSheet) {
+              console.log(
+                "TimeSheet Updated successfully:",
+                response.data.updateTimeSheet
+              );
+              const responseData = response.data.updateTimeSheet;
+              if (!successFlag) {
+                toggleSFAMessage(true, responseData); // Only toggle success message once
+                successFlag = true; // Set the flag to true
+              }
+              setVisibleData([]);
+              setData(null);
+            }
+          } catch (error) {
+            console.error("Error creating TimeSheet:", error);
+            toggleSFAMessage(false);
+          }
         }
-      });
+      };
+
+      updateTimeSheetFuction(MultipleBLNGfile);
     }
   };
 
@@ -661,6 +727,9 @@ export const ViewBLNGsheet = ({
           toggleFunctionForAssiMana={toggleFunctionForAssiMana}
           renameKeysFunctionAndSubmit={renameKeysFunctionAndSubmit}
         />
+      )}
+        {response && getEmail && successMess && (
+        <Notification getEmail={getEmail} Position={Position} />
       )}
     </div>
   );

@@ -69,10 +69,14 @@ export const LeaveManage = () => {
     // Apply user type filtering
     filteredResults = filteredResults.filter((item) => {
       if (userType === "Manager") {
+        
         return (
-          (item?.supervisorStatus === "Approved" && item?.managerEmpID === userID) ||
-          item?.managerEmpID === userID
+          item?.empStatus !== "Cancelled" &&
+          item?.managerEmpID === userID &&
+          ((item?.supervisorStatus === "Approved" && item?.supervisorEmpID) || 
+           (item?.supervisorStatus === "Pending" && !item?.supervisorEmpID))
         );
+        
       } else if (userType === "Supervisor") {
         return item?.supervisorEmpID === userID;
       } else if (userType === "SuperAdmin" || userType === "HR") {
@@ -93,8 +97,12 @@ export const LeaveManage = () => {
         return status === filterStatus;
       });
     }
+// console.log(filteredResults);
 
-    // Apply date filter
+    // Store the base filtered results before applying date and search filters
+    setSecondartyData(filteredResults);
+
+    // Apply date filter if selected
     if (selectedDate) {
       const selectedDateObj = new Date(selectedDate);
       selectedDateObj.setHours(0, 0, 0, 0);
@@ -102,22 +110,20 @@ export const LeaveManage = () => {
       filteredResults = filteredResults.filter((item) => {
         if (location.pathname.replace(/\/$/, '') === "/leaveManage") {
           const dates = [
-            item.leaveStatusCreatedAt && new Date(item.leaveStatusCreatedAt),
-            item.supervisorDate && new Date(item.supervisorDate),
-            item.managerDate && new Date(item.managerDate)
-          ].filter(Boolean);
+            new Date(item.leaveStatusCreatedAt),
+            new Date(item.supervisorDate),
+            new Date(item.managerDate)
+          ].filter(date => !isNaN(date.getTime()));
 
-          // Normalize all dates to midnight
           dates.forEach(date => date.setHours(0, 0, 0, 0));
-          
           return dates.some(date => date.getTime() === selectedDateObj.getTime());
         }
 
         if (location.pathname.replace(/\/$/, '') === "/leaveManage/historyLeave") {
-          const startDate = item.empLeaveStartDate && new Date(item.empLeaveStartDate);
-          const endDate = item.empLeaveEndDate && new Date(item.empLeaveEndDate);
+          const startDate = new Date(item.empLeaveStartDate);
+          const endDate = new Date(item.empLeaveEndDate);
 
-          if (startDate && endDate) {
+          if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
             startDate.setHours(0, 0, 0, 0);
             endDate.setHours(0, 0, 0, 0);
             return selectedDateObj >= startDate && selectedDateObj <= endDate;
@@ -127,20 +133,13 @@ export const LeaveManage = () => {
       });
     }
 
-    // Store the filtered results before applying search
-    setSecondartyData(filteredResults);
-
-    // Only apply search filter if there are search results
+    // Apply search filter if there are search results
     if (searchResults.length > 0) {
       const searchEmpIDs = new Set(searchResults.map(item => item.empID));
-      filteredResults = filteredResults.filter(item => 
-        searchEmpIDs.has(item.empID)
-      );
+      filteredResults = filteredResults.filter(item => searchEmpIDs.has(item.empID));
     }
 
-    // Update states
     setData(filteredResults);
-    setFilteredData([]);
     setCurrentPage(1);
 
     // Update error states
@@ -149,38 +148,12 @@ export const LeaveManage = () => {
       searchError: searchResults.length > 0 && filteredResults.length === 0,
       dateError: selectedDate && filteredResults.length === 0,
     });
-  }, [
-    mergedData,
-    filterStatus,
-    selectedDate,
-    userType,
-    userID,
-    location.pathname
-  ]);
-
-  // Add a separate useEffect for handling search results
-  useEffect(() => {
-    if (searchResults.length > 0) {
-      const searchEmpIDs = new Set(searchResults.map(item => item.empID));
-      const filteredResults = secondartyData.filter(item => 
-        searchEmpIDs.has(item.empID)
-      );
-      
-      setData(filteredResults);
-      setCurrentPage(1);
-      
-      setErrorState(prev => ({
-        ...prev,
-        searchError: filteredResults.length === 0,
-      }));
-    } else {
-      setData(secondartyData);
-    }
-  }, [searchResults, secondartyData]);
+  }, [mergedData, filterStatus, selectedDate, userType, userID, location.pathname]);
 
   const handleDateChange = (event) => {
     const date = event.target.value;
     setSelectedDate(date);
+    setSearchResults([]); // Reset search when date changes
   };
 
   useEffect(() => {
@@ -223,6 +196,7 @@ export const LeaveManage = () => {
     try {
       const result = await data;
       setSearchResults(result);
+      setSelectedDate(""); // Reset date when searching
     } catch (error) {
       console.error("Error search data", error);
       setSearchResults([]);
@@ -350,6 +324,7 @@ export const LeaveManage = () => {
               mergedData,
               setCurrentPage,
               selectedDate,
+              errorState,
             }}
           />
         </section>

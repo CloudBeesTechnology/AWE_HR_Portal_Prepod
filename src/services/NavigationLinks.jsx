@@ -80,7 +80,6 @@ import { EmpLeaveBalance } from "../pages/leaveManagement/EmpLeaveBalance";
 import { TicketsTable } from "../pages/leaveManagement/TicketsTable";
 import { ListTimeSheet } from "../pages/timeSheet/ListTimeSheet";
 import { VTimeSheetTable } from "../pages/timeSheet/VTimeSheetTable";
-import MyComponent from "../pages/leaveManagement/CheckingData";
 import { RM } from "../pages/reports/RM";
 import { Resignation } from "../pages/reports/Resignation";
 
@@ -171,7 +170,7 @@ const NavigationLinks = () => {
     <Routes>
       {/* Login and Change Password Routes */}
       <Route path="/changePassword" element={<ChangePassword />} />
-      <Route path="/checkingData" element={<MyComponent />} />
+    
 
       {loginAuth && (
         <>

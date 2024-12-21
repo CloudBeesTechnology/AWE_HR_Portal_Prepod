@@ -9,6 +9,7 @@ export const PopupForSFApproves = ({
   title,
   message,
   btnText,
+ 
 }) => {
   return (
     <div>
@@ -28,8 +29,9 @@ export const PopupForSFApproves = ({
                 <button
                   className=" p-2 rounded border-[#FEF116] bg-[#FEF116] text-dark_grey text_size_5 w-52"
                   onClick={() => {
-                    toggleSFAMessage(null);
+                    toggleSFAMessage(null,null);
                     setExcelData?.(null);
+                  
                   }}
                 >
                   {btnText}

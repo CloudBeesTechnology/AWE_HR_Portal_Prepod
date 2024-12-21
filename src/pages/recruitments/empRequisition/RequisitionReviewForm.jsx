@@ -161,7 +161,7 @@ export const RequisitionReviewForm = ({
           ))}
         </div>
 
-        {userType === "GM" && isMdView && (
+        {/* {userType === "GM" && isMdView && (
           <>
             {request.status !== "Approved" && request.status !== "Rejected" ? (
               <div className="flex justify-center gap-10 mt-4">
@@ -191,9 +191,9 @@ export const RequisitionReviewForm = ({
           </div>
             )}
           </>
-        )}
+        )} */}
 
-        {/* {userType === "GM" && isMdView && (
+        {userType === "GM" && isMdView && (
               <div className="flex justify-center gap-10 mt-4">
                 <button
                   className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
@@ -209,7 +209,7 @@ export const RequisitionReviewForm = ({
                 </button>
               </div>
  
-        )} */}
+        )}
 
         {userType === "HR" && isHrView && (
           <div className="mt-6 center gap-3">

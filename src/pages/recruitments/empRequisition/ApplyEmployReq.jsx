@@ -14,19 +14,36 @@ export const ApplyEmployReq = () => {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [error, setError] = useState(null);
 
-  // Fetch requisition data
-  const fetchRequisitionData = async () => {
-    try {
-      const response = await client.graphql({ query: listEmpRequisitions });
-      const fetchedData = response?.data?.listEmpRequisitions?.items || [];
-      setRequisitionData(fetchedData);
-      setError(null);
-    } catch (err) {
-      console.error("Error fetching requisition data:", err);
-      setError("Failed to fetch requisition data");
-      setRequisitionData([]);
+// Fetch requisition data
+const fetchRequisitionData = async () => {
+  try {
+    // Retrieve the userID from localStorage
+    const userID = localStorage.getItem("userID");
+    if (!userID) {
+      throw new Error("User ID is not available in localStorage");
     }
-  };
+
+    // GraphQL query with filter
+    const response = await client.graphql({
+      query: listEmpRequisitions,
+      variables: {
+        filter: {
+          requestorID: { eq: userID }, // Filter by the logged-in user's ID
+        },
+      },
+    });
+
+    // Extract and set the filtered requisition data
+    const fetchedData = response?.data?.listEmpRequisitions?.items || [];
+    setRequisitionData(fetchedData);
+    setError(null);
+  } catch (err) {
+    console.error("Error fetching requisition data:", err);
+    setError("Failed to fetch requisition data");
+    setRequisitionData([]);
+  }
+};
+
 
   useEffect(() => {
     fetchRequisitionData();

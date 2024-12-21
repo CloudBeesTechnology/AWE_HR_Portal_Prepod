@@ -24,6 +24,8 @@ import { PopupForAssignManager } from "./ModelForSuccessMess/PopupForAssignManag
 import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
 import { createTimeSheet, updateTimeSheet } from "../../graphql/mutations";
 import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
+import { Notification } from "./customTimeSheet/Notification";
+import { useMergeTableForNotification } from "./customTimeSheet/useMergeTableForNotification";
 const client = generateClient();
 export const ViewORMCsheet = ({
   excelData,
@@ -47,12 +49,12 @@ export const ViewORMCsheet = ({
   const [userIdentification, setUserIdentification] = useState("");
   const [showStatusCol, setShowStatusCol] = useState(null);
   const [successMess, setSuccessMess] = useState(null);
-
+  const [response, setResponse] = useState(null);
   const { handleScroll, visibleData, setVisibleData } = UseScrollableView(
     data,
-    Position
+    "TimeKeeper"
   );
-
+  const getEmail = useMergeTableForNotification(response);
   const processedData = useTableMerged(excelData);
   console.log(currentStatus);
   useEffect(() => {
@@ -85,30 +87,39 @@ export const ViewORMCsheet = ({
 
       const result =
         data &&
-        data.map((vals) => {
+        data?.map((val) => {
+          let parsedEmpWorkInfo = [];
+          try {
+            if (Array.isArray(val.empWorkInfo)) {
+              parsedEmpWorkInfo = val.empWorkInfo.map((info) =>
+                typeof info === "string" ? JSON.parse(info) : info
+              );
+            }
+          } catch (error) {
+            console.error("Error parsing empWorkInfo for ID:", val.id, error);
+          }
           return {
-            id: vals?.id || null,
-            data: vals?.data?.map((val, index) => {
-              return {
-                NAME: val.name || 0,
-                DEPTDIV: val.deptDiv || "",
-                BADGE: val.badge || "",
-                DATE: val.date || "",
-                IN: val.in || "",
-                OUT: val.out || 0,
-                TOTALINOUT: val.totalInOut || "",
-                ALLDAYMINHRS: val.allDayMin || "",
-                NETMINUTES: val.netMin || "",
-                TOTALHOURS: val.totalHrs || 0,
-                NORMALWORKINGHRSPERDAY: val?.normalWhrsPerDay || 0,
-                WORKINGHOURS: val.workHrs || 0,
-                OT: val?.OT || 0,
-                jobLocaWhrs: val.jobLocaWhrs || [],
-                REMARKS: val.remarks || "",
-                status: val.status || "",
-                managerData: val?.managerData,
-              };
-            }),
+            id: val.id,
+            fileName: val.fileName,
+            NAME: val.empName || 0,
+            DEPTDIV: val.empDept || "",
+            BADGE: val.empBadgeNo || "",
+            DATE: val.date || "",
+            IN: val.inTime || "",
+            OUT: val.outTime || 0,
+            TOTALINOUT: val.totalInOut || "",
+            ALLDAYMINHRS: val.allDayHrs || "",
+            NETMINUTES: val.netMins || "",
+            TOTALHOURS: val.totalHrs || 0,
+            NORMALWORKINGHRSPERDAY: val?.normalWorkHrs || 0,
+            WORKINGHOURS: val.actualWorkHrs || 0,
+            OT: val?.otTime || 0,
+            jobLocaWhrs: parsedEmpWorkInfo.flat() || [],
+            fileType: val.fileType || "",
+            timeKeeper: val.assignBy || "",
+            manager: val.assignTo || "",
+            REMARKS: val.remarks || "",
+            status: val.status || "",
           };
         });
       setData(result);
@@ -198,23 +209,26 @@ export const ViewORMCsheet = ({
           //   (val) => val.status !== "Approved"
           // );
 
-          const filterPending = fetchedData
-            .map((value) => {
-              return {
-                id: value[0]?.id,
-                data: value[1]?.filter((val) => {
-                  if (val.status !== "Approved") {
-                    return val;
-                  }
-                }),
-              };
-            })
-            .filter((item) => item.data && item.data.length > 0);
+          // const filterPending = fetchedData
+          //   .map((value) => {
+          //     return {
+          //       id: value[0]?.id,
+          //       data: value[1]?.filter((val) => {
+          //         if (val.status !== "Approved") {
+          //           return val;
+          //         }
+          //       }),
+          //     };
+          //   })
+          //   .filter((item) => item.data && item.data.length > 0);
           //   const filterPending =
           // console.log(filterPending);
 
+          // const filteredData = fetchedData.filter(
+          //   (fil) => fil.status !== "Approved"
+          // );
           if (Position === "Manager") {
-            const finalData = await SendDataToManager(filterPending);
+            const finalData = await SendDataToManager(fetchedData);
             pendingData(finalData);
           }
         } catch (err) {
@@ -236,8 +250,12 @@ export const ViewORMCsheet = ({
   const toggleFunction = () => {
     setToggleHandler(!toggleHandler);
   };
-  const toggleSFAMessage = (value) => {
+  const toggleSFAMessage = async (value, responseData) => {
     setSuccessMess(value);
+    if (value === true && responseData) {
+      console.log("Success Message : ", responseData);
+      setResponse(responseData);
+    }
   };
   const toggleFunctionForAssiMana = () => {
     setToggleAssignManager(!toggleAssignManager);
@@ -278,133 +296,127 @@ export const ViewORMCsheet = ({
         data &&
         data.map((val) => {
           return {
-            name: val.NAME || "",
-            deptDiv: val.DEPTDIV || "",
-            badge: val.BADGE || "",
+            fileName: fileName,
+            empName: val.NAME || "",
+            empDept: val.DEPTDIV || "",
+            empBadgeNo: val.BADGE || "",
             date: val.DATE || "",
-            in: val.IN || "",
-            out: val.OUT || "",
+            inTime: val.IN || "",
+            outTime: val.OUT || "",
             totalInOut: val.TOTALINOUT || "",
-            allDayMin: val.ALLDAYMINHRS || "",
-            netMin: val.NETMINUTES || "",
+            allDayHrs: val.ALLDAYMINHRS || "",
+            netMins: val.NETMINUTES || "",
             totalHrs: val.TOTALHOURS || "",
-            normalWhrsPerDay: val?.NORMALWORKINGHRSPERDAY || 0,
-            workHrs: val.WORKINGHOURS || "",
-            OT: val.OT || "",
+            normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+            actualWorkHrs: val.WORKINGHOURS || "",
+            otTime: val.OT || "",
             remarks: val.REMARKS || "",
-            jobLocaWhrs: val?.jobLocaWhrs || [],
+            empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+            fileType: "ORMC",
+            status: "Pending",
           };
         });
 
       // const mergeData = [...result, managerData];
-      const mergeData = [...result]; // Clone result to avoid mutation (optional)
-      mergeData.unshift(managerData);
-
       const finalResult = result.map((val) => {
-        return { ...val, managerData };
+        return {
+          ...val,
+          assignTo: managerData.mbadgeNo,
+          assignBy: uploaderID,
+          // trade: managerData.mfromDate,
+          // tradeCode: managerData.muntilDate,
+        };
       });
 
-      //   CREATE
-      const currentDate = new Date().toLocaleDateString();
-      const DailySheet = {
-        dailySheet: JSON.stringify(finalResult),
-        status: "Pending",
-        date: currentDate,
-        managerDetails: JSON.stringify(managerData),
-        type: "ORMC",
-        fileName: fileName,
-        uploaderID: uploaderID,
+      const sendTimeSheets = async (timeSheetData) => {
+        let successFlag = false;
+        for (const timeSheet of timeSheetData) {
+          try {
+            const response = await client.graphql({
+              query: createTimeSheet,
+              variables: {
+                input: timeSheet,
+              },
+            });
+
+            if (response?.data?.createTimeSheet) {
+              console.log(
+                "TimeSheet created successfully:",
+                response.data.createTimeSheet
+              );
+              const responseData = response.data.createTimeSheet;
+              if (!successFlag) {
+                toggleSFAMessage(true, responseData); // Only toggle success message once
+                successFlag = true; // Set the flag to true
+              }
+            }
+          } catch (error) {
+            console.error("Error creating TimeSheet:", error);
+            toggleSFAMessage(false);
+          }
+        }
       };
 
-      if (DailySheet.dailySheet) {
-        await client
-          .graphql({
-            query: createTimeSheet,
-            variables: {
-              input: DailySheet,
-            },
-          })
-          .then((res) => {
-            if (res.data.createTimeSheet) {
-              // console.log(
-              //   "res.data.createORMCSheet : ",
-              //   res.data.createORMCSheet
-              // );
-              toggleSFAMessage(true);
-              setData(null);
-            }
-          })
-          .catch((err) => {
-            toggleSFAMessage(false);
-          });
-      }
+      sendTimeSheets(finalResult);
     } else if (userIdentification === "Manager") {
       const MultipleBLNGfile =
         data &&
-        data.map((value) => {
+        data.map((val) => {
           return {
-            id: value?.id || null,
-            dailySheet: value?.data?.map((val) => {
-              return {
-                name: val.NAME || "",
-                deptDiv: val.DEPTDIV || "",
-                badge: val.BADGE || "",
-                date: val.DATE || "",
-                in: val.IN || "",
-                out: val.OUT || "",
-                totalInOut: val.TOTALINOUT || "",
-                allDayMin: val.ALLDAYMINHRS || "",
-                netMin: val.NETMINUTES || "",
-                totalHrs: val.TOTALHOURS || "",
-                normalWhrsPerDay: val?.NORMALWORKINGHRSPERDAY || 0,
-                workHrs: val.WORKINGHOURS || "",
-                OT: val.OT || "",
-                remarks: val.REMARKS || "",
-                jobLocaWhrs: val?.jobLocaWhrs || [],
-                managerData: val?.managerData,
-              };
-            }),
+            id: val.id,
+            // fileName: val.fileName,
+            empName: val.NAME || "",
+            empDept: val.DEPTDIV || "",
+            empBadgeNo: val.BADGE || "",
+            date: val.DATE || "",
+            inTime: val.IN || "",
+            outTime: val.OUT || "",
+            totalInOut: val.TOTALINOUT || "",
+            allDayHrs: val.ALLDAYMINHRS || "",
+            netMins: val.NETMINUTES || "",
+            totalHrs: val.TOTALHOURS || "",
+            normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+            actualWorkHrs: val.WORKINGHOURS || "",
+            otTime: val.OT || "",
+            remarks: val.REMARKS || "",
+            empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+            fileType: "ORMC",
+            status: "Approved",
           };
         });
 
-      // UPDATE
-      //   const weaklysheet = {
-      //     id: "6b22df70-9ab7-4873-9d24-9ab719347b62",
-      //     weeklySheet: JSON.stringify(result),
-      //     status: "Pending",
-      //   };
-
-      const result = MultipleBLNGfile.map(async (obj) => {
-        const finalData = {
-          id: obj.id,
-          dailySheet: JSON.stringify(obj.dailySheet),
-          status: "Approved",
-        };
-
-        if (finalData.dailySheet) {
-          await client
-            .graphql({
+      const updateTimeSheetFunction = async (timeSheetData) => {
+        let successFlag = false;
+        for (const timeSheet of timeSheetData) {
+          try {
+            const response = await client.graphql({
               query: updateTimeSheet,
               variables: {
-                input: finalData,
+                input: timeSheet, // Send each object individually
               },
-            })
-            .then((res) => {
-              if (res.data.updateTimeSheet) {
-                // console.log(
-                //   "res.data.updateORMCSheet : ",
-                //   res.data.updateORMCSheet
-                // );
-                toggleSFAMessage(true);
-                setVisibleData([]);
-                setData(null);
-              }
-            })
-            .catch((err) => {
-              toggleSFAMessage(false);
             });
+
+            if (response?.data?.updateTimeSheet) {
+              console.log(
+                "TimeSheet Updated successfully:",
+                response.data.updateTimeSheet
+              );
+              const responseData = response.data.updateTimeSheet;
+              if (!successFlag) {
+                toggleSFAMessage(true, responseData); // Only toggle success message once
+                successFlag = true; // Set the flag to true
+              }
+              setVisibleData([]);
+              setData(null);
+            }
+          } catch (error) {
+            console.error("Error creating TimeSheet:", error);
+            toggleSFAMessage(false);
+          }
         }
-      });
+      };
+
+      updateTimeSheetFunction(MultipleBLNGfile);
     }
   };
 
@@ -545,7 +557,7 @@ export const ViewORMCsheet = ({
                             className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white "
                           >
                             <p className="px-6 py-6">
-                            No Table Data Available Here.
+                              No Table Data Available Here.
                             </p>
                           </td>
                         </tr>
@@ -556,7 +568,7 @@ export const ViewORMCsheet = ({
                             className="px-6 py-6 text-center text-dark_ash text_size_5"
                           >
                             <p className="px-6 py-6">
-                            No Table Data Available Here.
+                              No Table Data Available Here.
                             </p>
                           </td>
                         </tr>
@@ -595,7 +607,7 @@ export const ViewORMCsheet = ({
           ""
         )}
       </div>
-   
+
       {toggleHandler === true && (
         <EditTimeSheet
           toggleFunction={toggleFunction}
@@ -619,6 +631,10 @@ export const ViewORMCsheet = ({
           toggleFunctionForAssiMana={toggleFunctionForAssiMana}
           renameKeysFunctionAndSubmit={renameKeysFunctionAndSubmit}
         />
+      )}
+
+      {response && getEmail && successMess && (
+        <Notification getEmail={getEmail} Position={Position} />
       )}
     </div>
   );

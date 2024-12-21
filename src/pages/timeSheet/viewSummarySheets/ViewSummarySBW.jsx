@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { FaAngleDown } from "react-icons/fa";
 import {
+  listEmpLeaveDetails,
   listEmpPersonalInfos,
   listEmpWorkInfos,
   listLeaveStatuses,
@@ -23,11 +24,11 @@ export const ViewSummarySBW = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selectedLocation, setSelectedLocation] = useState(null);
-  const { convertedStringToArrayObj, getPosition } = useFetchData("SBW");
+  const { convertedStringToArrayObj, getPosition } = useFetchData("Offshore");
 
   useEffect(() => {
     const fetchData = async () => {
-      const [empPersonalInfos, empPersonalDocs, leaveStatus] =
+      const [empPersonalInfos, empPersonalDocs, leaveStatus, leaveDetails] =
         await Promise.all([
           client.graphql({ query: listEmpPersonalInfos }),
           client.graphql({ query: listEmpWorkInfos }),
@@ -41,18 +42,40 @@ export const ViewSummarySBW = () => {
         const { sapNo, ...rest } = item; // Destructure to exclude `sapNo`
         return rest; // Return the modified object without `sapNo`
       });
-      const processedData = convertedStringToArrayObj
-        .map((value) => value[1])
-        .filter((item) => item !== null && item !== undefined);
 
-      const SBWsheet = processedData.flat();
-      // console.log(SBWsheet);
+      convertedStringToArrayObj.forEach((sheet) => {
+        try {
+          if (
+            Array.isArray(sheet.empWorkInfo) &&
+            sheet.empWorkInfo.length > 0
+          ) {
+            sheet.empWorkInfo = sheet.empWorkInfo
+              .map((info) => {
+                try {
+                  return JSON.parse(info);
+                } catch {
+                  return null;
+                }
+              })
+              .map((info) => info[0]);
+              // .filter((fil) => fil !== null && fil !== undefined);
+          } else {
+            sheet.empWorkInfo = [null];
+          }
+        } catch (err) {
+          console.error(
+            `Error processing empWorkInfo for id ${sheet.id}:`,
+            err
+          );
+          sheet.empWorkInfo = [null];
+        }
+      });
+      console.log(convertedStringToArrayObj);
+
       const leaveStatusData = leaveStatus?.data?.listLeaveStatuses?.items;
 
       const approvedLeaveStatus = dummyLeaveStatus.filter(
-        (fil) =>
-          fil.managerStatus === "Approved" &&
-          fil.supervisorStatus === "Approved"
+        (fil) => fil.managerStatus === "Approved"
       );
 
       const mergedData = candidates
@@ -77,16 +100,16 @@ export const ViewSummarySBW = () => {
           };
         })
         .filter((item) => item !== null && item !== undefined);
-        const res=mergedData.filter((fil,i)=>fil.empBadgeNo==="3907A");
-        // console.log(res)
+
+      // Grouping data based on empID
       const groupBySapNo = (data) => {
         const grouped = data.reduce((acc, item) => {
-          const key = String(item.badge);
-        
-          let existingGroup = acc.find((group) => group.badge === key);
+          const key = String(item.empBadgeNo);
+
+          let existingGroup = acc.find((group) => group.empBadgeNo === key);
 
           if (!existingGroup) {
-            existingGroup = { badge: key, data: [] };
+            existingGroup = { empBadgeNo: key, data: [] };
             acc.push(existingGroup);
           }
 
@@ -96,14 +119,14 @@ export const ViewSummarySBW = () => {
 
         return grouped;
       };
-      const grouped = groupBySapNo(SBWsheet);
+      const grouped = groupBySapNo(convertedStringToArrayObj);
+      // console.log(grouped);
 
-      console.log(grouped);
       const seperateDateMethod = (inputData) => {
         return inputData
           .map((entry) => {
             // Group by Month/Year
-           
+
             const groupedByMonthYear = entry.data.reduce((acc, record) => {
               const date = new Date(record.date);
               const monthYear = `${date.getMonth() + 1}/${date.getFullYear()}`;
@@ -119,7 +142,7 @@ export const ViewSummarySBW = () => {
             // Construct final output for each Month/Year group
             return Object.entries(groupedByMonthYear).map(
               ([monthYear, records]) => ({
-                badge: entry.badge,
+                empBadgeNo: entry.empBadgeNo,
 
                 data: records,
               })
@@ -128,44 +151,49 @@ export const ViewSummarySBW = () => {
           .flat();
       };
       const seperatedEmpByDate = seperateDateMethod(grouped);
-    
+      console.log("seperatedEmpByDate : ", seperatedEmpByDate);
 
-      //   groupByEmpIdAndLocation
       function groupByEmpIdAndLocation(dataArray) {
         const groupedData = new Map();
         const ungroupedData = [];
 
         dataArray.forEach((emp) => {
+          console.log(emp);
           emp.data.forEach((dataEntry) => {
             // Handle entries with no `jobLocaWhrs` or a single unique LOCATION
-            if (!dataEntry.jobLocaWhrs || dataEntry.jobLocaWhrs.length === 0) {
+            if (
+              !dataEntry.empWorkInfo[0] ||
+              dataEntry.empWorkInfo[0].length === 0 ||
+              dataEntry.empWorkInfo[0] !== null ||
+              dataEntry.empWorkInfo[0] !== undefined
+            ) {
               ungroupedData.push({
-                badge: emp.badge,
-                data: [{ ...dataEntry, jobLocaWhrs: [] }],
+                badgeempBadgeNo: emp.empBadgeNo,
+                data: [{ ...dataEntry, empWorkInfo: [] }],
               });
             } else {
               // Group entries with multiple LOCATIONS
-              dataEntry.jobLocaWhrs.forEach((job) => {
-                const location = job.LOCATION;
-                const jobcode = job.JOBCODE;
+              dataEntry.empWorkInfo[0]?.forEach((job) => {
+                const location = job.LOCATION || "";
+                const jobcode = job.JOBCODE || "";
                 const dateObj = new Date(dataEntry.date);
                 const monthYearKey = `${dateObj.getFullYear()}-${
                   dateObj.getMonth() + 1
                 }`;
-                const key = `${emp.badge}-${location}-${jobcode}-${monthYearKey}`;
+                const key = `${emp.empBadgeNo}-${location}-${jobcode}-${monthYearKey}`;
 
                 if (!groupedData.has(key)) {
                   groupedData.set(key, {
-                    badge: emp.badge,
+                    empBadgeNo: emp.empBadgeNo,
                     data: [],
                   });
                 }
 
-                // Add the current dataEntry to the group, ensuring `jobLocaWhrs` is specific to this LOCATION
+                // Add the current dataEntry to the group, ensuring `empWorkInfo` is specific to this LOCATION
                 const group = groupedData.get(key);
                 group.data.push({
                   ...dataEntry,
-                  jobLocaWhrs: [job], // Only include the current job entry for this LOCATION
+                  empWorkInfo: [job], // Only include the current job entry for this LOCATION
                 });
               });
             }
@@ -177,203 +205,6 @@ export const ViewSummarySBW = () => {
       }
       const seperatedGroupedData = groupByEmpIdAndLocation(seperatedEmpByDate);
       console.log(seperatedGroupedData);
-
-      const merged = mergedData.flatMap((val) => {
-        // Filter all matching entries from approvedLeaveStatus
-        const matches = approvedLeaveStatus.filter(
-          (so) => val.empID === so.empID
-        );
-
-        if (matches.length > 0) {
-          // Map over matches and merge each one with the current `val`
-          return matches.map((match) => ({
-            ...val,
-            ...match,
-          }));
-        }
-
-        // If no match is found, just return the original `val`
-        return [val];
-      });
-    
-    //   const approvedLeaveStatuses = merged.filter(
-    //     (fil) =>
-    //       fil.managerStatus === "Approved" &&
-    //       fil.supervisorStatus === "Approved"
-    //   );
-console.log(seperatedGroupedData)
-
-console.log(res)
-      const filteredData = merged.filter((leave) => {
-        return seperatedGroupedData.some((emp) => {
-            // console.log(leave.empBadgeNo === emp.badge)
-          if (leave.empBadgeNo === emp.badge) {
-            // console.log(leave.empBadgeNo, " | ", emp.badge);
-            console.log(leave)
-            return emp.data.some((entry) => {
-              const leaveDate = new Date(leave.toDate);
-              const empDate = new Date(entry.date);
-              console.log(
-                "empDate : ",
-                empDate.getFullYear(),
-                " | ",
-                "leaveDate : ",
-                leaveDate.getFullYear()
-              );
-              return (
-                leaveDate.getFullYear() === empDate.getFullYear() &&
-                leaveDate.getMonth() === empDate.getMonth()
-              );
-            });
-          }
-          return false;
-        });
-      });
-      console.log(filteredData);
-
-      const leaveCounts = filteredData.reduce((acc, entry) => {
-        const { empBadgeNo, leaveType } = entry;
-
-        // Ensure an entry exists for the sapNo
-        if (!acc[empBadgeNo]) {
-          acc[empBadgeNo] = {};
-        }
-
-        // Increment the count for the specific leaveType
-        acc[empBadgeNo][leaveType] = (acc[empBadgeNo][leaveType] || 0) + 1;
-
-        return acc;
-      }, {});
-
-      const leaveCount = Object.entries(leaveCounts).map(
-        ([empBadgeNo, leaveTypes]) => ({
-          empBadgeNo,
-          leaveCounts: leaveTypes,
-        })
-      );
-
-      const addLeaveTypeCount = seperatedGroupedData.map((val) => {
-        const empLeaveCount = leaveCount.find((fi) => val.badge === fi.empBadgeNo);
-        const k = val.data.find((f) => f);
-
-        const res = k.jobLocaWhrs.map((val) => val.LOCATION);
-
-        return empLeaveCount
-          ? {
-              ...val,
-              leaveCounts: empLeaveCount.leaveCounts,
-              newDate: k.date,
-              location: res[0],
-            }
-          : { ...val, leaveCounts: {}, newDate: k.date, location: res[0] };
-      });
-      console.log(addLeaveTypeCount);
-   
-
-      const transformedData = addLeaveTypeCount
-      .map((item) => {
-        const initialMatch = mergedData.find(
-          (datasetItem) => datasetItem.empBadgeNo === item.badge
-        );
-
-        const selectedFields = initialMatch
-          ? (({
-              empID,
-              name,
-              sapNo,             
-              empBadgeNo,
-              workHrs,
-              workMonth,
-              salaryType,
-              days,
-            }) => ({
-              empID,
-              name,
-              sapNo,
-              empBadgeNo,
-              workHrs,
-              workMonth,
-              salaryType,
-              days,
-            }))(initialMatch)
-          : {};
-
-        
-        const normalWorkHours = item.data.reduce(
-          (acc, { date, normalWhrsPerDay }) => {
-            const day = new Date(date).getDate().toString();
-
-            acc[day] = normalWhrsPerDay;
-            return acc;
-          },
-          {}
-        );
-
-      //   const initialResult = {
-       
-      //     NORMALWORKHRSPERDAY: {},
-      //     OVERTIMEHRS:{},
-      //   };
-      
-      //   const result = item.data.reduce((acc, item) => {
-      //     const day = new Date(item.date).getDate();
-          
-      //     acc.NORMALWORKHRSPERDAY[day] = item.normalWhrsPerDay;
-      //     acc.OVERTIMEHRS[day] = item.OT;
-      
-      //     return acc;
-      //   }, initialResult);
-      
-      //   // Fill missing days with 'A' for Absent
-      //   for (let day = 1; day <= 31; day++) {
-      //     if (!result.NORMALWORKHRSPERDAY[day]) {
-      //       result.NORMALWORKHRSPERDAY[day] = "A";
-      //     }
-      //     if (!result.OVERTIMEHRS[day]) {
-      //       result.OVERTIMEHRS[day] = "0";
-      //     }
-      //   }
-      
-      // console.log(result)
-
-        const getEmpDateRange = item.data.find((first) => first.date);
-
-        const empName = item.data.map((m) => m.name);
-        const empLeaveCount = item.leaveCounts;
-        const dateForSelectMY = item.newDate;
-        const location = item.location;
-        const overtimeHours = item.data.reduce(
-          (acc, { date, jobLocaWhrs }) => {
-            const day = new Date(date).getDate().toString();
-
-            const overtime = jobLocaWhrs[0]?.OVERTIMEHRS;
-            if (overtime) {
-              acc[day] = parseInt(overtime);
-            }
-            return acc;
-          },
-          {}
-        );
-
-        const jobcode = item.data.map(
-          ({ jobLocaWhrs }) => jobLocaWhrs[0]?.JOBCODE
-        );
-
-        return {
-          empName: empName,
-          jobcode: jobcode[0] || "",
-          dateForSelectMY: dateForSelectMY,
-          ...selectedFields,
-          NORMALWORKHRSPERDAY: normalWorkHours,
-          OVERTIMEHRS: overtimeHours,
-          empLeaveCount: empLeaveCount,
-          location: location,
-        };
-      })
-      .filter(Boolean);
-   console.log(transformedData)
-    setData(transformedData);
-    setSecondaryData(transformedData);
     };
     fetchData();
   }, [convertedStringToArrayObj]);
@@ -382,7 +213,7 @@ console.log(res)
     if (!secondaryData || secondaryData.length === 0) return;
 
     let filteredData = [...secondaryData];
-    
+
     // Filter by selectedLocation if it's not "All"
     if (selectedLocation && selectedLocation !== "All Location") {
       filteredData = filteredData.filter(
@@ -671,7 +502,7 @@ console.log(res)
                         {/* {employee.NORMALWORKHRSPERDAY[10]} */}
                         {Array.from({ length: 31 }, (_, i) => (
                           <td className="border px-2 py-1" key={i}>
-                            {employee.NORMALWORKHRSPERDAY?.[i + 1] || ""}
+                            {employee.workingHrs?.[i + 1] || ""}
                           </td>
                         ))}
 
@@ -728,7 +559,7 @@ console.log(res)
                         {Array.from({ length: 31 }, (_, i) => (
                           <td className="border px-2 py-1" key={i}>
                             {/* Check if NORMALWORKHRSPERDAY has a key matching the index (i+1) */}
-                            {employee.OVERTIMEHRS?.[i + 1] || ""}
+                            {employee.OVERTIMEHRS?.[i + 1] || 0}
                           </td>
                         ))}
                         {/* ))} */}

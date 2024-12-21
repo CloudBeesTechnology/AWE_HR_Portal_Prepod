@@ -42,10 +42,10 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
 
   const parseDocumentData = (data) => {
     if (!data || !Array.isArray(data) || typeof data[0] !== "string") {
-      return {}; // Return an empty object if data is invalid
+      return {}; // Return an empty object if data is invalid create a component that have to print my pdf link it need to be a react component  
     }
 
-    // Extract the first item from the array (which is the string with key-value pairs)
+    // Extract the first item from the array (which is the string with key-value pairs)  
     let docString = data[0];
 
     // Remove the surrounding curly braces if they exist
@@ -227,11 +227,9 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     contractEnd,
     contractPeriod,
     contractStart,
-    createdAt,
     department,
     doj,
     hr,
-    id,
     jobCat,
     jobDesc,
     manager,
@@ -246,7 +244,6 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     sapNo,
     skillPool,
     supervisor,
-    updatedAt,
     upgradeDate,
     upgradePosition,
     workHrs,
@@ -262,11 +259,8 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     durLeavePass,
     leavePass,
     materLeave,
-    materLeaveDate,
-    mrageLeave,
-    mrageLeaveDate,
+    mrageLeave, 
     paterLeave,
-    paterLeaveDate,
     sickLeave,
     sickLeaveDate,
     otherResignNotConf,
@@ -386,9 +380,10 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
   const employeeDocument = {
     "EmpUpDocs": empUpDocs,
   };
+
   const educationalDetails = {
+    "Education Level": educLevel,
     "Education Details": eduDetails,
-    "Highlight Education": educLevel,
     "Academic / Technical qualification": aTQualify,
   };
 
@@ -423,9 +418,9 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Group H&S Insurance Enrollment Effective Date" :formatDate(groupInsEffectDate),
     "Group H&S Insurance Enrollment End Date" : formatDate(groupInsEndDate), 
     "Workmen Compensation Insurance" : empStatusType,
+    "Workmen Policy Number" : workmenCompNo,
     "Personal Accident Insurance": accidentIns,
     "Travelling Insurance" : travelIns,
-    "Policy Number" : workmenCompNo,
   
   };
 
@@ -558,7 +553,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       "Date Received": formatDate(bankRece),
       "BG Reference Number": bankRefNo,
       "Bank Guarantee Amount": bankAmt,
-      "Bank Valid Until": formatDate(bankValid),
+      "Bank Guarantee Valid Until": formatDate(bankValid),
       // "Employee Upload": bankEmpUpload,
       "Date Endorsement Of BG": formatDate(bankEndorse),
     },

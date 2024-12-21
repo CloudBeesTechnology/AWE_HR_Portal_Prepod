@@ -5,7 +5,7 @@ import { FaPlus } from "react-icons/fa6";
 import { FaRegSquarePlus } from "react-icons/fa6";
 import { FaRegSquareMinus } from "react-icons/fa6";
 import "../../../src/index.css";
-import  img  from "../../assets/logo/logo-with-name.svg";
+import img from "../../assets/logo/logo-with-name.svg";
 import { SearchDisplayForTimeSheet } from "./timeSheetSearch/SearchDisplayForTS";
 export const EditTimeSheet = ({
   editObject,
@@ -19,13 +19,14 @@ export const EditTimeSheet = ({
 }) => {
   const [jobCode, setJobCode] = useState(null);
   const [allLocation, setAllLocation] = useState(null);
-  const [typeLocation, setTypeLocation] = useState(null);
-  const [typeJobcode, setTypeJobcode] = useState([]);
-  const [workingHrs, setWorkingHrs] = useState();
-  const [allData, setAllData] = useState([]);
+  // const [typeLocation, setTypeLocation] = useState(null);
+  // const [typeJobcode, setTypeJobcode] = useState([]);
+  // const [workingHrs, setWorkingHrs] = useState();
+  // const [allData, setAllData] = useState([]);
   const [warningMess, setWarningMess] = useState(null);
-  const [validationMessages, setValidationMessages] = useState(null);
+  // const [validationMessages, setValidationMessages] = useState(null);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
+  // const [toggleHandle, setToggleHandle] = useState(false);
   const [formData, setFormData] = useState({
     fieldObj,
     // FID: null,
@@ -85,21 +86,26 @@ export const EditTimeSheet = ({
     { id: 10, location: "Khalifa" },
     { id: 11, location: "Masshor Princess" },
     { id: 12, location: "MV Falgout" },
-   
   ];
 
   useEffect(() => {
     if (editObject) {
       setFormData(editObject);
-
-      if (editObject.jobLocaWhrs?.length > 0) {
-        const resultData = editObject.jobLocaWhrs?.map((m, index) => {
+      console.log(editObject);
+      const validJobLocaWhrs = editObject?.jobLocaWhrs?.filter(
+        (item) => item !== null && item !== undefined
+      ) || [];
+  
+      console.log("Valid Job Location & Working Hours:", validJobLocaWhrs);
+  
+      if (validJobLocaWhrs.length > 0) {
+        const resultData = validJobLocaWhrs.map((m, index) => {
           // const newId = sections.length + 1;
           return {
             id: index + 1,
             JOBCODE: m.JOBCODE,
             LOCATION: m.LOCATION,
-            WORKINGHRS: m.WORKINGHRS,
+            WORKINGHRS: m.WORKINGHRS, 
             OVERTIMEHRS: m.OVERTIMEHRS,
 
             // jobCodeData: {
@@ -354,6 +360,9 @@ export const EditTimeSheet = ({
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 "
       // className="table-container z-50 fixed inset-0"
+      onClick={() => {
+        setFilteredEmployees([]);
+      }}
     >
       <section className="bg-[#FBFBFB] p-5 gap-2 flex flex-col item-center rounded-lg shadow-md border-4 border-[#EBEBEB] h-[600px] w-[900px] overflow-y-auto">
         <div className="flex justify-end">
@@ -409,9 +418,9 @@ export const EditTimeSheet = ({
         {/*  */}
         <section
           className="grid grid-cols-1 pl-4 "
-          onClick={() => {
-            setFilteredEmployees([]);
-          }}
+          // onClick={() => {
+          //   setFilteredEmployees([]);
+          // }}
         >
           <div className="grid grid-cols-[10fr,10fr,10fr,10fr,0.6fr] gap-0 pt-5">
             <label className="text_size_6 text-dark_grey ">JOBCODE</label>

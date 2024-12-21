@@ -98,8 +98,8 @@ export const useLeaveManage = () => {
           reason: leaveStatus.reason,
           medicalCertificate: leaveStatus.medicalCertificate,
           empLeaveType: leaveStatus.leaveType,
-          position: workInfo.position?.slice(-1)[0] || "",
-          department: workInfo.department?.slice(-1)[0] || "",
+          position: workInfo.position || "",
+          department: workInfo.department || "",
           empLeaveStartDate: leaveStatus.fromDate,
           empLeaveEndDate: leaveStatus.toDate,
           empLeaveUpdatedAt: leaveStatus.updatedAt,
@@ -110,7 +110,7 @@ export const useLeaveManage = () => {
           paternityLeave: leaveDetails.paterLeave || 0,
           hospitalLeave: leaveDetails.hospLeave || 0,
           marriageLeave: leaveDetails.mrageLeave || 0,
-          empPervAnnualLeaveBal:leaveDetails.pervAnnualLeaveBal || 0
+          empPervAnnualLeaveBal: leaveDetails.pervAnnualLeaveBal || 0,
         };
       });
 
@@ -123,8 +123,8 @@ export const useLeaveManage = () => {
           id: ticket.id,
           empID: ticket.empID,
           empName: empInfo.name,
-          position: workInfo.position?.slice(-1)[0] || "",
-          department: workInfo.department?.slice(-1)[0] || "",
+          position: workInfo.position|| "",
+          department: workInfo.department || "",
           doj: workInfo.doj,
           empBadgeNo: empInfo.empBadgeNo,
           empOfficialEmail: empInfo.officialEmail,
@@ -139,6 +139,7 @@ export const useLeaveManage = () => {
           hrRemarks: ticket.hrRemarks,
           hrName: ticket.hrName,
           hrEmpID: ticket.hrEmpID,
+          managerEmpID: workInfo.manager   || "",
           createdAt: ticket.createdAt,
         };
       });

@@ -30,18 +30,18 @@ export const OffshoreTBody = ({ data, loading, setTableData }) => {
                   className="text-dark_grey h-[53px] bg-white text-sm rounded-sm shadow-md text-start border-b-2 border-[#CECECE]"
                 >
                   <td className="text-start px-4 flex-1">{index + 1}</td>
-                  <td className="text-start px-4 flex-1">{m.name}</td>
-                  <td className="text-center px-4 flex-1">{m.no}</td>
-                  <td className="text-center px-4 flex-1">{m.location}</td>
+                  <td className="text-start px-4 flex-1">{m.empName}</td>
+                  <td className="text-center px-4 flex-1">{m.fidNo}</td>
+                  <td className="text-center px-4 flex-1">{m.companyName}</td>
                   <td className="text-center px-4 flex-1">{m.date}</td>
-                  <td className="text-center px-4 flex-1">{m.ntTotalHrs}</td>
-                  <td className="text-center px-4 flex-1">{m.otTotalHrs}</td>
-                  <td className="text-center px-4 flex-1">{m.totalHrs || 0}</td>
+                  <td className="text-center px-4 flex-1">{m.totalNT}</td>
+                  <td className="text-center px-4 flex-1">{m.totalOT}</td>
+                  <td className="text-center px-4 flex-1">{m.totalNTOT || 0}</td>
                   <td className="text-center px-4 flex-1">
-                    {m.normalWhrsPerDay || 0}
+                    {m.normalWorkHrs || 0}
                   </td>
-                  <td className="text-center px-4 flex-1">{m.workHrs || 0}</td>
-                  <td className="text-center px-4 flex-1">{m.OT || 0}</td>
+                  <td className="text-center px-4 flex-1">{m.actualWorkHrs || 0}</td>
+                  <td className="text-center px-4 flex-1">{m.otTime || 0}</td>
                   <td className="text-center px-4 flex-1">{m.remarks}</td>
                   {/* <td
                     className={`text-center px-4 flex-1 ${

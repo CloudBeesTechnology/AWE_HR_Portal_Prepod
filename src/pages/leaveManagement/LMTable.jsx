@@ -13,7 +13,10 @@ export const LMTable = () => {
     currentPage,
     data,
     rowsPerPage,
+    errorState,
+    selectedDate,
   } = useOutletContext();
+// console.log(data);
 
   const [lastUploadUrl, setPPLastUP] = useState(""); // State to store the last uploaded file's URL
 
@@ -58,7 +61,20 @@ export const LMTable = () => {
   return (
     <section className="flex flex-col w-full mt-4">
       <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl ">
-        {data && data.length > 0 ? (
+        {errorState?.noResults ? (
+          <div className="text-center mt-6 py-20">
+            {errorState?.dateError ? (
+              <>
+                <p className="text-red-500">No records found for the selected date: {selectedDate}</p>
+                <p className="text-sm mt-2">Please select a different date or clear the date filter</p>
+              </>
+            ) : errorState?.searchError ? (
+              <p>No matching results found for your search.</p>
+            ) : (
+              <p>No data available.</p>
+            )}
+          </div>
+        ) : data && data.length > 0 ? (
           <table className="w-full font-semibold text-sm text-center">
             <thead className="bg-[#939393] sticky top-0 rounded-t-lg">
               <tr>
@@ -148,7 +164,11 @@ export const LMTable = () => {
               ) : (
                 <tr>
                   <td colSpan={heading.length} className="text-center py-4">
-                    No data available
+                    {errorState?.searchError 
+                      ? "No matching results found for your search"
+                      : errorState?.dateError 
+                      ? "No records found for the selected date"
+                      : "No data available"}
                   </td>
                 </tr>
               )}
@@ -156,7 +176,16 @@ export const LMTable = () => {
           </table>
         ) : (
           <div className="text-center mt-6 py-20">
-            <p> Currently, no employees have requested leave.</p>
+            {errorState?.dateError ? (
+              <>
+                <p className="text-red-500">No records found for the selected date: {selectedDate}</p>
+                <p className="text-sm mt-2">Please select a different date or clear the date filter</p>
+              </>
+            ) : errorState?.searchError ? (
+              <p>No matching results found for your search</p>
+            ) : (
+              <p>Currently, no employees have requested leave.</p>
+            )}
           </div>
         )}
       </div>

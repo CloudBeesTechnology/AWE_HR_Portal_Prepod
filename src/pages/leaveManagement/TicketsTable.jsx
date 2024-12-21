@@ -38,7 +38,11 @@ export const TicketsTable = () => {
   // Modify useEffect to handle all filters together
   useEffect(() => {
     // If no filters are active, show all data
-    if (!filters.date && filters.search.length === 0 && filters.status === "All") {
+    if (
+      !filters.date &&
+      filters.search.length === 0 &&
+      filters.status === "All"
+    ) {
       setData(ticketMerged);
       setErrorState({
         noResults: false,
@@ -151,7 +155,7 @@ export const TicketsTable = () => {
   }, [currentPage, rowsPerPage, data]);
 
   // Console log for debugging
-  useEffect(() => {}, [filteredData, data]);
+  // useEffect(() => {}, [filteredData, data]);
 
   // Update handlers to use new filters state
   const handleDateChange = (event) => {
@@ -169,26 +173,32 @@ export const TicketsTable = () => {
     try {
       const result = await searchData;
       setSearchResults(result);
-      setFilters((prev) => ({ ...prev, search: result }));
 
-      // Clear error state when starting a new search
-      setErrorState(prev => ({
-        ...prev,
-        searchError: false
-      }));
-
-      // If search was performed with no results, set search error
-      if (result && result.length === 0) {
-        setErrorState(prev => ({
+      // If search result is empty, show no results message immediately
+      if (result.length === 0) {
+        setData([]); // Clear the data to show no results
+        setFilteredData([]); // Clear filtered data
+        setErrorState((prev) => ({
           ...prev,
-          searchError: true
+          searchError: true,
+          noResults: true,
+        }));
+      } else {
+        setFilters((prev) => ({ ...prev, search: result }));
+        setErrorState((prev) => ({
+          ...prev,
+          searchError: false,
+          noResults: false,
         }));
       }
     } catch (error) {
       console.error("Error search data", error);
-      setErrorState(prev => ({
+      setData([]);
+      setFilteredData([]);
+      setErrorState((prev) => ({
         ...prev,
-        searchError: true
+        searchError: true,
+        noResults: true,
       }));
     }
   };
@@ -246,7 +256,7 @@ export const TicketsTable = () => {
               border="rounded-md"
             />
           </div>
-          
+
           <div className="text_size_5 bg-white border py-2 rounded-md text-grey border-lite_grey flex items-center px-3 gap-2">
             <input
               type="date"
@@ -264,7 +274,7 @@ export const TicketsTable = () => {
         </div>
       </div>
       <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl ">
-        {errorState.searchError ? (
+        {errorState.noResults ? (
           <div className="text-center mt-6 py-20">
             <p>No matching results found for your search.</p>
           </div>
@@ -299,10 +309,14 @@ export const TicketsTable = () => {
                       {item?.empName}
                     </td>
                     <td className="border-b-2 border-[#CECECE] py-5">
-                      {item.department || "N/A"}
+                      {Array.isArray(item.department)
+                        ? item.department[item.department.length - 1] || "N/A"
+                        : "N/A"}
                     </td>
                     <td className="border-b-2 border-[#CECECE] py-5">
-                      {item.position || "N/A"}
+                      {Array.isArray(item.position)
+                        ? item.position[item.position.length - 1] || "N/A"
+                        : "N/A"}
                     </td>
 
                     <td className="border-b-2  border-[#CECECE] py-5">

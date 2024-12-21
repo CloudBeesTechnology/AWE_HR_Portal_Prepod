@@ -35,21 +35,21 @@ export const SbwTBody = ({ data, loading, setTableData }) => {
                   className="text-dark_grey h-[53px] bg-white text-sm rounded-sm shadow-md text-start border-b-2 border-[#CECECE]"
                 >
                   <td className="text-start px-4 flex-1">{index + 1}</td>
-                  <td className="text-start px-4 flex-1">{m.name}</td>
-                  <td className="text-center px-4 flex-1">{m.deptDiv}</td>
-                  <td className="text-center px-4 flex-1">{m.badge}</td>
+                  <td className="text-start px-4 flex-1">{m.empName}</td>
+                  <td className="text-center px-4 flex-1">{m.empDept}</td>
+                  <td className="text-center px-4 flex-1">{m.empBadgeNo}</td>
                   <td className="text-center px-4 flex-1">{m.date}</td>
-                  <td className="text-center px-4 flex-1">{m.in}</td>
-                  <td className="text-center px-4 flex-1">{m.out}</td>
+                  <td className="text-center px-4 flex-1">{m.inTime}</td>
+                  <td className="text-center px-4 flex-1">{m.outTime}</td>
                   <td className="text-center px-4 flex-1">{m.totalInOut}</td>
-                  <td className="text-center px-4 flex-1">{m.allDayMin}</td>
-                  <td className="text-center px-4 flex-1">{m.netMin}</td>
+                  <td className="text-center px-4 flex-1">{m.allDayHrs}</td>
+                  <td className="text-center px-4 flex-1">{m.netMins}</td>
                   <td className="text-center px-4 flex-1">{m.totalHrs}</td>
                   <td className="text-center px-4 flex-1">
-                    {m.normalWhrsPerDay || 0}
+                    {m.normalWorkHrs || 0}
                   </td>
-                  <td className="text-center px-4 flex-1">{m.workHrs}</td>
-                  <td className="text-center px-4 flex-1">{m.OT}</td>
+                  <td className="text-center px-4 flex-1">{m.actualWorkHrs}</td>
+                  <td className="text-center px-4 flex-1">{m.otTime}</td>
                   <td className="text-center px-4 flex-1">{m.remarks}</td>
                   {/* <td
                     className={`text-center px-4 flex-1 ${

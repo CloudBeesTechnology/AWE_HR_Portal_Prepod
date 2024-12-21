@@ -11,6 +11,7 @@ import {
 
 import { generateClient } from "@aws-amplify/api";
 import { DataSupply } from "../../utils/DataStoredContext";
+import { InterviewTable } from "./status/InterviewTable";
 const client = generateClient();
 
 // Column mappings for different statuses
@@ -419,6 +420,30 @@ export const Status = () => {
     setIsFormVisible(false); // Close the form after saving
   };
 
+
+  const flattenObject = (data) => {
+    const result = { ...data };
+  
+    // Flatten `interviewDetails`
+    if (result.interviewDetails) {
+      Object.entries(result.interviewDetails).forEach(([key, value]) => {
+        result[`interviewDetails_${key}`] = value;
+      });
+      delete result.interviewDetails; // Remove original nested object
+    }
+  
+    // Flatten `mobilizationDetails`
+    if (result.mobilizationDetails) {
+      Object.entries(result.mobilizationDetails).forEach(([key, value]) => {
+        result[`mobilizationDetails_${key}`] = value;
+      });
+      delete result.mobilizationDetails;
+    }
+  
+    return result;
+  };
+  const flattenedData = filteredData.map(flattenObject);
+
   return (
     <section className="screen-size min-h-screen mb-4">
       <div className="relative">
@@ -505,7 +530,9 @@ export const Status = () => {
         <p>{error}</p>
       ) : (
         <>
-          {/* Table Component */}
+        {selectedFilters === "Interview Scheduled" && <InterviewTable  data={flattenedData } />}
+        
+          {/* Table Component
           <Table
             columns={
               columnMapping[selectedFilters]
@@ -518,7 +545,7 @@ export const Status = () => {
             selectedTable="status"
             edited={handleEditClick}
             showEditIcon={true}
-          />
+          /> */}
 
           {/* Status Form for Editing */}
           {isFormVisible && (

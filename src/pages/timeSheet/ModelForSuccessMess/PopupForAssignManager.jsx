@@ -4,6 +4,7 @@ import logo from "../../../assets/logo/logo-with-name.svg"
 export const PopupForAssignManager = ({
   toggleFunctionForAssiMana,
   renameKeysFunctionAndSubmit,
+
 }) => {
   const [formData, setFormData] = useState({
     mbadgeNo: "",
@@ -23,6 +24,7 @@ export const PopupForAssignManager = ({
   const handleSubmit = () => {
     renameKeysFunctionAndSubmit(formData);
     toggleFunctionForAssiMana();
+    
   };
   return (
     // <section className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 border ">

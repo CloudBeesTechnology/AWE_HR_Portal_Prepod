@@ -7,6 +7,7 @@ export const SuccessMessage = ({
   toggleSFAMessage,
   setExcelData,
   userIdentification,
+
 }) => {
   return (
     <div>
@@ -22,6 +23,7 @@ export const SuccessMessage = ({
             userIdentification === "Manager" ? "Approved" : "Saved"
           }`}
           btnText={"OK"}
+        
         />
       )}
       {successMess === false && (

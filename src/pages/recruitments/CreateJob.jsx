@@ -70,7 +70,7 @@ export const CreateJob = () => {
             method: "PUT",
             headers: {
               "Content-Type": "application/octet-stream",
-              "Access-Control-Allow-Origin": "http://localhost:3000",
+              // "Access-Control-Allow-Origin": "http://localhost:3000",
             },
             body: selectedFile,
             //  mode: 'no-cors'

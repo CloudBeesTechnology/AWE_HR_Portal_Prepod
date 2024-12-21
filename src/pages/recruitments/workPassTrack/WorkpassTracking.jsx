@@ -3,6 +3,7 @@ import { FaChevronDown, FaChevronUp } from "react-icons/fa"; // Import icons for
 import { LuFilter } from "react-icons/lu";
 import { Table } from '../../../utils/Table'; // Import your existing Table component
 import { WorkpassForm } from './WorkpassForm';
+import { useFetchInterview } from '../../../hooks/useFetchInterview';
 
 export const WorkpassTracking = () => {
   const [data, setData] = useState([]); // Data fetched from API
@@ -19,21 +20,23 @@ export const WorkpassTracking = () => {
   const [selectedFilters, setSelectedFilters] = useState('');
   const [selectedCandidateType, setSelectedCandidateType] = useState([]);
   const [candidateTypeDropdownOpen, setCandidateTypeDropdownOpen] = useState(false);
-
+  const {mergedInterviewData} = useFetchInterview();
   const tableData = data || []; // Example: reuse the same data, but you can filter or change it as needed
+ 
 
   useEffect(() => {
-    if (data && data.length > 0) {
+    if (mergedInterviewData && mergedInterviewData.length > 0) {
       // Filter candidates based on approvalStatus
-      const approvedCandidates = data.filter((candidate) => 
-        candidate.approvalStatus === "CVEV" || candidate.approvalStatus === "PAAF"
+      const approvedCandidates = mergedInterviewData .filter((candidate) => 
+        candidate.localMobilization.cvecApproveDate !== null || candidate.localMobilization.cvecApproveDate !== null
       );
       setFilteredData(approvedCandidates);
     } else {
       setFilteredData([]); // Set to empty array if no candidates are approved
     }
-  }, [data]);
+  }, [mergedInterviewData]);
 
+  // console.log("Interview Data", mergedInterviewData)
   
   const toggleFilterBox = (event) => {
     event?.stopPropagation();
@@ -200,10 +203,10 @@ export const WorkpassTracking = () => {
         )}
 
         {!loading && !error ? (
-          filteredData.length > 0 ? (
+          mergedInterviewData.length > 0 ? (
             <Table
               columns={columns}
-              data={filteredData}
+              data={mergedInterviewData}
               rowClickHandler={handleRowClick}
               showCheckboxes={false}
               selectedRows={selectedRows}

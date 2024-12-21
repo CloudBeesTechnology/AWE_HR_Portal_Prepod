@@ -389,10 +389,14 @@ export const AllEmployee = () => {
                   </td>
                   <td
                     className={`py-4 px-4 font-bold ${getStatusClass(
-                      candidate?.workStatus || "N/A"
+                      candidate?.workStatus?.[
+                        candidate?.workStatus.length - 1
+                      ] || "N/A"
                     )}`}
                   >
-                    {candidate?.workStatus || "N/A"}{" "}
+                    {candidate?.workStatus?.[
+                      candidate?.workStatus.length - 1
+                    ] || "N/A"}
                   </td>
                 </tr>
               ))}

@@ -284,7 +284,7 @@
 //         />
 //       )}
 //     </section>
-//   );
+//   );   ApplicatDetails,PersonalDetails,EducationaDetails,OtherDetails
 // };
 import React, { useState, useContext, useEffect } from "react";
 import { Table } from "../../utils/Table";
@@ -410,7 +410,7 @@ export const ListofCandi = () => {
           onClick={() => {
             if (selectedRows.length === 1) {
               const selectedTempID = allCandidates[selectedRows[0]]?.tempID; // Get the tempID
-              navigate("/addCandidates", {
+              navigate("/addCandidates/otherDetails", {
                 state: { tempID: selectedTempID }, // Pass the tempID for editing
               });
             } else if (selectedRows.length > 1) {
