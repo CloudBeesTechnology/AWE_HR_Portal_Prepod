@@ -102,7 +102,7 @@ export const useFetchInterview = () => {
         // Set interview schedules to state
         setInterviewSchedules(fetchedInterviewSchedules);
 
-        // Create a mapping of personal details by empID
+        // Create a mapping of personal details by empID;
         const interviewDetailsMap = fetchedInterviewSchedules.reduce((acc, detail) => {
           acc[detail.tempID] = detail;
           return acc;

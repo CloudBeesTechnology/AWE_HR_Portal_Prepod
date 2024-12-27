@@ -88,22 +88,22 @@ export const SearchBoxForTimeSheet = ({
             return (
               item?.no?.toString().toUpperCase().includes(query) ||
               item?.NO?.toString().toUpperCase().includes(query) ||
-              item?.fid?.toString().toUpperCase().includes(query) ||
+              item?.fidNo?.toString().toUpperCase().includes(query) ||
               item?.FID?.toString().toUpperCase().includes(query) ||
-              item?.badge?.toString().toUpperCase().includes(query) ||
+              item?.empBadgeNo?.toString().toUpperCase().includes(query) ||
               item?.BADGE?.toString().toUpperCase().includes(query) ||
               item?.sapNo?.toString().toUpperCase().includes(query) ||
-              item?.empBadgeNo?.toString().toUpperCase().includes(query)
+              item?.empID?.toString().toUpperCase().includes(query) 
             );
           };
 
-          if (Position === "Manager") {
+          if (Position === "Manager_") {
             const matchingData = employee.data.filter(checkSearchMatch);
 
             if (matchingData.length > 0) {
               return { id: employee.id, data: matchingData }; // Return matched data
             }
-          } else if (Position === "ViewTimeSheet") {
+          } else if (Position === "ViewTimeSheet_") {
             const matchingData = employee.data.filter(checkSearchMatch);
             if (matchingData.length > 0) {
               return { id: employee.id, data: matchingData }; // Return matched data
@@ -118,7 +118,7 @@ export const SearchBoxForTimeSheet = ({
           }
         });
 
-      const validResults = filteredResults.filter(
+      const validResults = filteredResults?.filter(
         (result) => result !== null && result !== undefined
       );
 

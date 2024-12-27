@@ -6,6 +6,7 @@ import { FileUploadField } from "../../employees/medicalDep/FileUploadField";
 import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
 import { UpdateLoiData } from "../../../services/updateMethod/UpdateLoi";
 import { useFetchInterview } from "../../../hooks/useFetchInterview";
+import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
 
 // Define validation schema using Yup
 const PAAFFormSchema = Yup.object().shape({
@@ -21,11 +22,13 @@ const PAAFFormSchema = Yup.object().shape({
 export const PAAFForm = ({candidate}) => {
   const { loiDetails } = UpdateLoiData();
   const { mergedInterviewData } = useFetchInterview();
+    const { interviewDetails } = UpdateInterviewData();
   const [formData, setFormData] = useState({
     interview: {
       id: "",
       paafApproveDate: "",
       paafFile: "",
+      status: ""
     },
   });
 
@@ -55,6 +58,7 @@ export const PAAFForm = ({candidate}) => {
         interview: {
           paafApproveDate: interviewData.localMobilization.paafApproveDate,
           paafFile: interviewData.localMobilization.paafFile,
+          status: interviewData.interviewSchedules.status
         },
       });
       if (interviewData.localMobilization.paafFile) {
@@ -104,6 +108,7 @@ export const PAAFForm = ({candidate}) => {
     }
 
     const localMobilizationId = selectedInterviewData.localMobilization.id;
+    const interviewScheduleId = selectedInterviewData.interviewSchedules.id;
 
     try {
       await loiDetails({
@@ -113,6 +118,16 @@ export const PAAFForm = ({candidate}) => {
           paafFile: uploadedPAAF.paafFile || formData.paafFile,
         },
       });
+
+      await interviewDetails({
+        InterviewValue: {
+          id: interviewScheduleId, // Dynamically use the correct id
+          status: formData.interview.status
+          // status: selectedInterviewData.empType === "Offshore" ? "CVEV" : "PAAF",
+          // status: selectedInterviewData.contractType === "Local" ? "mobilization" : "workpass",
+        },
+      });
+
       console.log("Data stored successfully...");
       // setNotification(true);
     } catch (error) {
@@ -165,20 +180,19 @@ export const PAAFForm = ({candidate}) => {
                 }
                 value={formData.interview.paafFile}               
               />
-              {/* <span className="ml-2">
-                <GoUpload />
-              </span> */}
-            {/* </label> */}
-            {/* {uploadedFileName ? (
-              <p className="text-xs mt-1 text-grey">{uploadedFileName}</p>
-            ) : (
-              errors.paafFile && (
-                <p className="text-[red] text-xs mt-1">
-                  {errors.paafFile.message}
-                </p>
-              )
-            )} */}
+             
           </div>
+        </div>
+        <div>
+          <label htmlFor="status">Status</label>
+          <input
+            className="w-full border p-2 rounded mt-1"
+            type="text"
+            id="status"
+            {...register("status")}
+            value={formData.interview.status}
+            onChange={(e) => handleInputChange("status", e.target.value)}
+          />
         </div>
       </div>
 

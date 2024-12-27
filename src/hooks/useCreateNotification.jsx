@@ -1,39 +1,4 @@
-// import { useState } from "react";
-// import { generateClient } from "@aws-amplify/api";
 
-// // Import the GraphQL mutation
-// import { createEmailNotifi } from "../graphql/mutations"; // Assuming mutation path
-
-// const client = generateClient();
-
-// export const useCreateNotification = () => {
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState(null);
-//   const [notification, setNotification] = useState(null);
-
-//   const createNotification = async (input) => {
-//     setLoading(true);
-//     try {
-//       const result = await client.graphql({
-//         query: createEmailNotifi, // The mutation query to create an email notification
-//         variables: {
-//           input, // The input for creating the notification
-//         },
-//       });
-
-//       const createdNotification = result?.data?.createEmailNotifi;
-//       console.log("Created Email Notification:", createdNotification);
-//       setNotification(createdNotification);
-//     } catch (err) {
-//       setError(err);
-//       console.error("Error creating email notification:", err);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return { createNotification, loading, error, notification };
-// };
 import { useState } from "react";
 import { generateClient } from "@aws-amplify/api";
 
@@ -64,6 +29,8 @@ export const useCreateNotification = () => {
             message: input.message, // Notification message to send
             // Avoid adding createdAt and updatedAt unless the schema expects them
           },
+          variables: { limit: 20000 },
+
         },
       });
 

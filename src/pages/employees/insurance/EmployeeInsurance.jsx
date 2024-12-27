@@ -360,7 +360,7 @@ export const EmployeeInsurance = () => {
               className="input-field select-custom"
               {...register("accidentIns")}
             >
-              <option value=""></option>
+              <option value="">Select</option>
               <option value="Yes">Yes</option>
               <option value="No">No</option>
             </select>

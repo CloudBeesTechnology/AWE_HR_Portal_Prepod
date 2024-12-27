@@ -7,12 +7,10 @@ export const TrainVT = ({ mergering, columns, popupAll }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedDetails, setSelectedDetails] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(30);
   const [paginatedData, setPaginatedData] = useState([]);
-
   // Memoize filteredData to avoid unnecessary recalculations on each render
   const filteredData = useMemo(() => {
     return mergering.filter((candidate) => {
@@ -44,7 +42,7 @@ export const TrainVT = ({ mergering, columns, popupAll }) => {
   };
 
   return (
-    <section>
+    <section >
       <div className="relative flex justify-end items-end mb-10">
         <input
           type="text"
@@ -59,12 +57,12 @@ export const TrainVT = ({ mergering, columns, popupAll }) => {
       </div>
 
       <div className="overflow-x-auto mt-8 w-full rounded-md">
-        <div className="w-full px-4 max-h-[calc(70vh-7rem)] overflow-y-auto scrollBar">
+        <div className="w-full px-4 max-h-[calc(90vh-7rem)] overflow-y-auto scrollBar">
           <table className="w-full rounded-xl table-auto">
             <thead className="bg-[#939393] text-center sticky top-0">
               <tr>
                 {columns.map((column, index) => (
-                  <th key={index} className="py-4 px-2">
+                  <th key={index} className="py-4 px-2 text-white">
                     {column.header}
                   </th>
                 ))}

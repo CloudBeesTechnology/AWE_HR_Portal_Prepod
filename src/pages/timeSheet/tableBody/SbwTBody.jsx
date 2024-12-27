@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-export const SbwTBody = ({ data, loading, setTableData }) => {
+export const SbwTBody = ({ data, loading, setTableData, message }) => {
   useEffect(() => {
     if (loading === false) {
       const rows = document.querySelectorAll("tbody tr");
@@ -69,7 +69,7 @@ export const SbwTBody = ({ data, loading, setTableData }) => {
                 colSpan="100%"
                 className="text-center text-dark_ash text_size_5 bg-white"
               >
-                <p className="p-5">Please wait few seconds...</p>
+                <p className="p-5">{message || "Please wait few seconds."}</p>
               </td>
             </tr>
             

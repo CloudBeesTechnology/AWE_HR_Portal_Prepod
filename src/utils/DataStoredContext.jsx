@@ -29,8 +29,8 @@ import {
   listBastingPaints,
   listHiringJobs,
   listTicketRequests,
-  listProbForms
-
+  listProbForms,
+  listEmailNotifis,
 } from "../graphql/queries";
 
 export const DataSupply = createContext();
@@ -67,7 +67,8 @@ const DataStoredContext = ({ children }) => {
     BastingInfo:[],
     hiringData:[],
     ticketData:[],
-    ProbFData:[]
+    ProbFData:[],
+    EmailNotifi:[]
   });
 
   useEffect(() => {
@@ -96,13 +97,14 @@ const DataStoredContext = ({ children }) => {
           { query: listAddCourses, key: "AddCourseDetails" },
           { query: listInsClaims, key: "insuranceClaimsData" },
           { query: listWorkMen, key: "workMenDetails" },
-          { query: listTrainingCertificates, key: "trainingCertifi" },
-          { query: listTrainingReqs, key: "AddEmpReq" },
-          { query: listWeldingInfos, key: "WeldeInfo" },
-          { query: listBastingPaints, key: "BastingInfo" },
+          { query: listTrainingCertificates, key: "trainingCertifi"},
+          { query: listTrainingReqs, key: "AddEmpReq"},
+          { query: listWeldingInfos, key: "WeldeInfo"},
+          { query: listBastingPaints, key: "BastingInfo"},
           { query: listHiringJobs, key: "hiringData" },
-          { query: listTicketRequests, key: "ticketData" },
+          { query: listTicketRequests, key: "ticketData"},
           { query: listProbForms, key: "ProbFData" },
+          { query: listEmailNotifis, key: "EmailNotifi" },
         ];
         const limit = 10000;
         const responses = await Promise.all(

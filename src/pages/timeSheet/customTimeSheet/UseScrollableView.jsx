@@ -1,42 +1,35 @@
-
 import { useCallback, useEffect, useState } from "react";
 
 export const UseScrollableView = (data, Position) => {
- 
   const ITEMS_PER_PAGE = 25; // Number of items to display per page
   const [visibleData, setVisibleData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
-
-
   const loadMoreDataForNonManager = useCallback(() => {
- 
+    try {
+      // if (!data || data.length === 0) {
+      //   return ; // Return early if no data available
+      // }
+      // if (!visibleData || visibleData.length === 0) {
+      //   return ; // Return early if no data available
+      // }
+      if (data && data) {
+        // Logic for Position !== "Manager"
+        const nextPage = currentPage + 1;
+        const start = currentPage * ITEMS_PER_PAGE;
+        const end = start + ITEMS_PER_PAGE;
 
-    if (!data || data.length === 0) {
-      return ; // Return early if no data available
+        const newItems = data.slice(start, end);
+
+        setVisibleData((prevData) => [...prevData, ...newItems]);
+        setCurrentPage(nextPage);
+      }
+    } catch (err) {
+      console.log(err, " : Error occur");
     }
-    if (!visibleData || visibleData.length === 0) {
-      return ; // Return early if no data available
-    }
- try{
-
-
-    // Logic for Position !== "Manager"
-    const nextPage = currentPage + 1;
-    const start = currentPage * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE;
-
-    const newItems = data.slice(start, end);
- 
-    setVisibleData((prevData) => [...prevData, ...newItems]);
-    setCurrentPage(nextPage);
-  }catch(err){
-  console.log(err," : Error occur")
-  }
   }, [currentPage, data]);
 
   const loadMoreDataForManager = useCallback(() => {
-   
     // Logic for Position === "Manager"
     if (!data || data.length === 0) return;
 
@@ -93,15 +86,13 @@ export const UseScrollableView = (data, Position) => {
       if (bottomReached) {
         if (Position !== "Manager") {
           loadMoreDataForNonManager();
-        } else  {
+        } else {
           loadMoreDataForManager();
         }
       }
     },
     [loadMoreDataForNonManager, loadMoreDataForManager, Position]
   );
-
-      
 
   return { handleScroll, visibleData, setVisibleData };
 };

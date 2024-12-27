@@ -43,7 +43,7 @@ export const RecODFunc = () => {
     console.log(totalData);
   
     try {
-      const res = await Promise.all([
+       await Promise.all([
         client.graphql({
           query: createPersonalDetails,
           variables: { input: totalData1 },
@@ -53,7 +53,7 @@ export const RecODFunc = () => {
           variables: { input: totalData },
         }),
       ]);
-      console.log("Response", res)
+      // console.log("Response", res)
       // localStorage.removeItem("applicantFormData");
       // localStorage.removeItem("personalFormData");
     } catch (error) {

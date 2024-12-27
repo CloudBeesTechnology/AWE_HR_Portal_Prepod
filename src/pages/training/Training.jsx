@@ -38,17 +38,8 @@ export const Training = () => {
           link="/trainingReq"
         />
       )}
-      {recruitmentPermissions.includes("QA / QC") && (
-        <SelectTiles
-          img={icon3}
-          text1="QA / QC"
-          fontSize="text_size_5 "
-          borderColor="border-[#BDF27D]"
-          bgColor="bg-white"
-          link="/trainingQA"
-        />
-      )}
-      {recruitmentPermissions.includes("Training List") && (
+         
+      {/* {recruitmentPermissions.includes("Training List") && (
         <SelectTiles
           img={icon4}
           text1="Training List"
@@ -57,7 +48,25 @@ export const Training = () => {
           bgColor="bg-white"
           link="/allTraining"
         />
-      )}
+      )} */}
+       <SelectTiles
+          img={icon3}
+          text1="BLNG"
+          fontSize="text_size_5 "
+          borderColor="border-[#F589C1]"
+          bgColor="bg-white"
+          link="/blngCertify"
+        />
+        {/* {recruitmentPermissions.includes("OME") && ( */}
+        <SelectTiles
+          img={icon3}
+          text1="OME"
+          fontSize="text_size_5 "
+          borderColor="border-[#F589C1]"
+          bgColor="bg-white"
+          link="/omgCertify"
+        />
+      {/* )} */}
     </section>
   );
 };

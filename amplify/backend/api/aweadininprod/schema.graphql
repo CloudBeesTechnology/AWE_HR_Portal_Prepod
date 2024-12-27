@@ -48,6 +48,9 @@ type TimeSheet @model @auth(rules: [{allow: public}]) {
   totalOT: String
   totalNTOT: String
   empWorkInfo: [AWSJSON]
+  fromDate: String
+  untilDate: String
+  location: String
 }
 
 type HiringJob @model @auth(rules: [{allow: public}]) {
@@ -348,6 +351,14 @@ type WPTracking @model @auth(rules: [{allow: public}]) {
   agentname: String
   mobSignDate: String
   mobFile: String
+  doerefno: String
+  sawpDate: String
+  sawpRecivedDate: String
+  sawpFile: String
+  lbrDepoNum: String
+  lbrEndroseDate: String
+  lbrDepoAmount: String
+  lbrFile: String
 }
 
 type EmployeeNonLocalAcco @model @auth(rules: [{allow: public}]) {
@@ -552,6 +563,25 @@ type CandIToEMP @model @auth(rules: [{allow: public}]) {
   salaryExpectation: String
   supportInfo: String
   workExperience: [AWSJSON]
+  mobSignDate: String
+  mobFile: String
+  paafApproveDate: String
+  paafFile: String
+  loiIssueDate: String
+  loiAcceptDate: String
+  loiDeclineDate: String
+  declineReason: String
+  loiFile: String
+  cvecApproveDate: String
+  cvecFile: String
+  uploadCertificate: [AWSJSON]
+  pcNoticePeriod: String
+  venue: String
+  managerBadgeNo: String
+  message: String
+  interType: String
+  interTime: String
+  interDate: String
 }
 
 type LocalMobilization @model @auth(rules: [{allow: public}]) {

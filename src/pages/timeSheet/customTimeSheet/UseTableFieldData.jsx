@@ -261,7 +261,7 @@ export const useTableFieldData = (titleName) => {
         ],
         tableHeader: [
           "EMPLOYEE NAME",
-          "SUB ID",
+          "SAP ID",
           "LOCATION",
           "DATE",
           "TOTAL NT",

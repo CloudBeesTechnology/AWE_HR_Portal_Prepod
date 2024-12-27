@@ -35,11 +35,26 @@ export const useLeaveManage = () => {
         empLeaveData,
         ticketRequestsData,
       ] = await Promise.all([
-        client.graphql({ query: listLeaveStatuses }),
-        client.graphql({ query: listEmpPersonalInfos }),
-        client.graphql({ query: listEmpWorkInfos }),
-        client.graphql({ query: listEmpLeaveDetails }),
-        client.graphql({ query: listTicketRequests }),
+        client.graphql({
+          query: listLeaveStatuses,
+          variables: { limit: 20000 },
+        }),
+        client.graphql({
+          query: listEmpPersonalInfos,
+          variables: { limit: 20000 },
+        }),
+        client.graphql({
+          query: listEmpWorkInfos,
+          variables: { limit: 20000 },
+        }),
+        client.graphql({
+          query: listEmpLeaveDetails,
+          variables: { limit: 20000 },
+        }),
+        client.graphql({
+          query: listTicketRequests,
+          variables: { limit: 20000 },
+        }),
       ]);
 
       // Extract items from responses
@@ -74,6 +89,7 @@ export const useLeaveManage = () => {
         const empInfo = empInfoMap[leaveStatus.empID] || {};
         const workInfo = workInfoMap[leaveStatus.empID] || {};
         const leaveDetails = leaveDetailsMap[leaveStatus.empID] || {};
+        // console.log(empInfoMap);
 
         return {
           id: leaveStatus.id,
@@ -123,7 +139,7 @@ export const useLeaveManage = () => {
           id: ticket.id,
           empID: ticket.empID,
           empName: empInfo.name,
-          position: workInfo.position|| "",
+          position: workInfo.position || "",
           department: workInfo.department || "",
           doj: workInfo.doj,
           empBadgeNo: empInfo.empBadgeNo,
@@ -139,7 +155,7 @@ export const useLeaveManage = () => {
           hrRemarks: ticket.hrRemarks,
           hrName: ticket.hrName,
           hrEmpID: ticket.hrEmpID,
-          managerEmpID: workInfo.manager   || "",
+          managerEmpID: workInfo.manager || "",
           createdAt: ticket.createdAt,
         };
       });

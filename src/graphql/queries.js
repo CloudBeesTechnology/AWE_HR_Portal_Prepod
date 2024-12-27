@@ -84,6 +84,9 @@ export const getTimeSheet = /* GraphQL */ `
       totalOT
       totalNTOT
       empWorkInfo
+      fromDate
+      untilDate
+      location
       createdAt
       updatedAt
       __typename
@@ -136,6 +139,9 @@ export const listTimeSheets = /* GraphQL */ `
         totalOT
         totalNTOT
         empWorkInfo
+        fromDate
+        untilDate
+        location
         createdAt
         updatedAt
         __typename
@@ -1113,6 +1119,14 @@ export const getWPTracking = /* GraphQL */ `
       agentname
       mobSignDate
       mobFile
+      doerefno
+      sawpDate
+      sawpRecivedDate
+      sawpFile
+      lbrDepoNum
+      lbrEndroseDate
+      lbrDepoAmount
+      lbrFile
       createdAt
       updatedAt
       __typename
@@ -1168,6 +1182,14 @@ export const listWPTrackings = /* GraphQL */ `
         agentname
         mobSignDate
         mobFile
+        doerefno
+        sawpDate
+        sawpRecivedDate
+        sawpFile
+        lbrDepoNum
+        lbrEndroseDate
+        lbrDepoAmount
+        lbrFile
         createdAt
         updatedAt
         __typename
@@ -1739,6 +1761,25 @@ export const getCandIToEMP = /* GraphQL */ `
       salaryExpectation
       supportInfo
       workExperience
+      mobSignDate
+      mobFile
+      paafApproveDate
+      paafFile
+      loiIssueDate
+      loiAcceptDate
+      loiDeclineDate
+      declineReason
+      loiFile
+      cvecApproveDate
+      cvecFile
+      uploadCertificate
+      pcNoticePeriod
+      venue
+      managerBadgeNo
+      message
+      interType
+      interTime
+      interDate
       createdAt
       updatedAt
       __typename
@@ -1772,6 +1813,25 @@ export const listCandIToEMPS = /* GraphQL */ `
         salaryExpectation
         supportInfo
         workExperience
+        mobSignDate
+        mobFile
+        paafApproveDate
+        paafFile
+        loiIssueDate
+        loiAcceptDate
+        loiDeclineDate
+        declineReason
+        loiFile
+        cvecApproveDate
+        cvecFile
+        uploadCertificate
+        pcNoticePeriod
+        venue
+        managerBadgeNo
+        message
+        interType
+        interTime
+        interDate
         createdAt
         updatedAt
         __typename

@@ -12,12 +12,12 @@ import logo from "../../assets/logo/logo-with-name.svg";
 import { useReactToPrint } from "react-to-print";
 import { FaPrint } from "react-icons/fa";
 
-
 export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
   const [activeTab, setActiveTab] = useState(0); // Track active tab
   const [currentPage, setCurrentPage] = useState(1);
 
   // State for PDF viewing
+  const [showInBetweenData, setShowInBetweenData] = useState(true);
   const [viewingDocument, setViewingDocument] = useState(null);
   const [isPdfOpen, setIsPdfOpen] = useState(false);
   const [numPages, setNumPages] = useState(null);
@@ -26,36 +26,58 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
   const mainRef = useRef();
 
   const handlePrint = useReactToPrint({
-    
     content: () => invoiceRef.current,
-    onBeforePrint: () => console.log("Preparing print..."),
+    onBeforePrint: () => console.log("Preparing to print PDF..."),
     onAfterPrint: () => console.log("Print complete"),
-    pageStyle: "print", // This ensures the print view uses a different CSS style
+    pageStyle: `
+      @page {
+        margin: 98px 0px 100px 0px;
+        size: auto;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+      }
+      .pdf-page {
+        page-break-before: always;
+      }
+      .page {
+        page-break-after: always;
+      }
+    `,
+    // Ensures each page in the content starts on a new page
   });
-  
+
   const handlePrintMain = useReactToPrint({
     content: () => mainRef.current,
     onBeforePrint: () => console.log("Preparing print for Item 2..."),
     onAfterPrint: () => console.log("Print complete for Item 2"),
-    pageStyle: "print",
+    pageStyle: `
+      @page {
+        margin: 0;
+      }
+      body {
+        font-family: 'Times New Roman', serif;
+      }
+      .page {
+        page-break-after: always;
+      }
+    `,
   });
 
   const parseDocumentData = (data) => {
     if (!data || !Array.isArray(data) || typeof data[0] !== "string") {
-      return {}; // Return an empty object if data is invalid create a component that have to print my pdf link it need to be a react component  
+      return {}; // Return an empty object if data is invalid
     }
-
-    // Extract the first item from the array (which is the string with key-value pairs)  
+    // Extract the first item from the array (which is the string with key-value pairs)
     let docString = data[0];
-
     // Remove the surrounding curly braces if they exist
     if (docString.startsWith("{") && docString.endsWith("}")) {
       docString = docString.slice(1, -1); // Remove the first and last characters (curly braces)
     }
-
     // Split the string by commas to get individual key-value pairs
     const docEntries = docString.split(",").map((item) => item.trim());
-
 
     // Process the key-value pairs into an object
     const docObject = docEntries.reduce((acc, entry) => {
@@ -116,7 +138,6 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       });
     }
   
-    // If dateInput is a single date, format it
     const date = new Date(dateInput);
     if (isNaN(date.getTime())) return "N/A"; // Return "N/A" if the date is invalid
     const day = date.getDate().toString().padStart(2, "0");
@@ -370,7 +391,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Language": lang,
     "Driving License": driveLic,
     "Agent Name": agent,
-    "Previous Employment Details": preEmp,
+    "Company Name of Previous Employment": preEmp,
     "Previous Employment Period": preEmpPeriod,
     "Date of Induction Briefing": formatDate(inducBrief),
     "Bank name": bankName,
@@ -418,7 +439,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Group H&S Insurance Enrollment Effective Date" :formatDate(groupInsEffectDate),
     "Group H&S Insurance Enrollment End Date" : formatDate(groupInsEndDate), 
     "Workmen Compensation Insurance" : empStatusType,
-    "Workmen Policy Number" : workmenCompNo,
+    "Workmen compensation insurance policy number" : workmenCompNo,
     "Personal Accident Insurance": accidentIns,
     "Travelling Insurance" : travelIns,
   
@@ -436,7 +457,6 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
 
   const workInfo = {
     employeeDetails: {
-
       "Department": department,
       "Other Department": otherDepartment,
       "Position": position,
@@ -482,7 +502,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       "Paternity Leave Entitlement": paterLeave, 
       "Marriage Leave Entitlement": mrageLeave,    
       "Hospitalisation Leave Entitlement": hospLeave,
-      "Previous Annual Leave Balance": pervAnnualLeaveBal,
+      "Previous Year Annual Leave Balance": pervAnnualLeaveBal,
     },
 
     TerminateDetails: {
@@ -581,13 +601,11 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       "Re-Entry Visa Expiry": formatDate(reEntryVisaExp),
       "Remarks for Immigration": remarkImmig,
       //   airTktStatus,reEntryVisa,immigApproval,reEntryVisaExp,remarkImmig,
-      
     },
   };
   // const documents = parseDocumentData(passingValue.empUpDocs);
   const documentsTwo = parseDocumentData(passingValue.uploadBwn);
   const documentThree = parseDocumentData(passingValue.workInfoUploads);
-
   // console.log(depInsurance, "2.o")
 
   return (
@@ -685,8 +703,6 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                     empInsUpload={empInsUpload}
                     formatDate={formatDate}
                     mainRef={mainRef}
-                    
-
                   />
                 )}
                 {activeTab === 5 && (
@@ -750,7 +766,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
               <div className="flex justify-center py-6">
                 <button
                   onClick={handlePrintMain}
-                  className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
+                  className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2 "
                 >
                   Print
                   <FaPrint className="ml-2 mt-1" />

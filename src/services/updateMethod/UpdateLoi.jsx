@@ -17,7 +17,7 @@ export const UpdateLoiData = () => {
         paafApproveDate,
         paafFile,
         loiIssueDate,
-        loiAcceptDate,
+        loiAcceptDate, 
         loiDeclineDate,
         declineReason,
         loiFile,

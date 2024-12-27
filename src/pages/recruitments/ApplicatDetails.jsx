@@ -9,6 +9,7 @@ import { FormField } from "../../utils/FormField";
 import { useOutletContext } from "react-router-dom";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { getUrl } from "@aws-amplify/storage";
+import { useTempID } from "../../utils/TempIDContext";
 import avatar from "../../assets/navabar/avatar.jpeg";
 
 import {
@@ -23,7 +24,8 @@ import {
 
 export const ApplicantDetails = () => {
   const { empPDData } = useContext(DataSupply);
-  const { tempID } = useOutletContext();
+  // const { tempID } = useOutletContext();
+   const { tempID } = useTempID();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,52 +34,6 @@ export const ApplicantDetails = () => {
       behavior: "smooth",
     });
   }, []);
-
-  // const [formData, setFormData] = useState({
-  //   personalDetails: {
-  //     age: "",
-  //     agent: "",
-  //     alternateNo: "",
-  //     bwnIcColour: "",
-  //     bwnIcExpiry: "",
-  //     bwnIcNo: "",
-  //     chinese: "",
-  //     cob: "",
-  //     contactNo: "",
-  //     contractType: "",
-  //     createdAt: "",
-  //     dob: "",
-  //     driveLic: "",
-  //     eduDetails: "",
-  //     email: "",
-  //     empType: "",
-  //     familyDetails: "",
-  //     gender: "",
-  //     id: "",
-  //     lang: "",
-  //     marital: "",
-  //     name: "",
-  //     nationality: "",
-  //     otherNation: "",
-  //     otherRace: "",
-  //     otherReligion: "",
-  //     permanentAddress: "",
-  //     position: "",
-  //     ppDestinate: "",
-  //     ppExpiry: "",
-  //     ppIssued: "",
-  //     ppNo: "",
-  //     presentAddress: "",
-  //     profilePhoto: "",
-  //     race: "",
-  //     religion: "",
-  //     status: "",
-  //     tempID: "",
-  //     updatedAt: "",
-  //     workExperience: "",
-  //   },
-  // });
-
   const {
     register,
     handleSubmit,
@@ -99,17 +55,20 @@ export const ApplicantDetails = () => {
     setImageUrl(result.url.toString());
   };
 
-  // Load form data from localStorage when the component mounts
+  const profile = watch("profilePhoto")
+
   useEffect(() => {
     if (tempID) {
       const savedData = JSON.parse(localStorage.getItem("applicantFormData"));
+      console.log('Saved data:', savedData); 
       if (savedData) {
         Object.keys(savedData).forEach((key) => setValue(key, savedData[key]));
       }
-
+  
       if (empPDData.length > 0) {
         const interviewData = empPDData.find((data) => data.tempID === tempID);
         if (interviewData) {
+          console.log('Interview data found:', interviewData);
           // Set form fields with empPDData if available
           Object.keys(interviewData).forEach((key) => {
             if (interviewData[key]) {
@@ -125,13 +84,50 @@ export const ApplicantDetails = () => {
           }
         }
       }
-
+  
       // Fetch profile photo URL if available
       if (uploadedDocs.profilePhoto) {
         linkToImageFile(uploadedDocs.profilePhoto);
       }
     }
   }, [empPDData, tempID, setValue, uploadedDocs.profilePhoto]);
+  
+  
+  // Load form data from localStorage when the component mounts
+  // useEffect(() => {
+  //   if (tempID) {
+  //     const savedData = JSON.parse(localStorage.getItem("applicantFormData"));
+  //     console.log('Saved data:', savedData); 
+  //     if (savedData) {
+  //       Object.keys(savedData).forEach((key) => setValue(key, savedData[key]));
+  //     }
+
+  //     if (empPDData.length > 0) {
+  //       const interviewData = empPDData.find((data) => data.tempID === tempID);
+  //       if (interviewData) {
+  //         console.log('Interview data found:', interviewData);
+  //         // Set form fields with empPDData if available
+  //         Object.keys(interviewData).forEach((key) => {
+  //           if (interviewData[key]) {
+  //             setValue(key, interviewData[key]);
+  //           }
+  //         });
+  //         // Load profile photo from empPDData (if available)
+  //         if (interviewData.profilePhoto) {
+  //           setUploadedDocs((prev) => ({
+  //             ...prev,
+  //             profilePhoto: interviewData.profilePhoto,
+  //           }));
+  //         }
+  //       }
+  //     }
+
+  //     // Fetch profile photo URL if available
+  //     if (uploadedDocs.profilePhoto) {
+  //       linkToImageFile(uploadedDocs.profilePhoto);
+  //     }
+  //   }
+  // }, [empPDData, tempID, setValue, uploadedDocs.profilePhoto]);
 
   // Handle file upload and set the profile photo URL
   const handleFileChange = async (e) => {
@@ -156,7 +152,7 @@ export const ApplicantDetails = () => {
       console.log(data);
       const applicationUpdate = {
         ...data,
-        profilePhoto: uploadedDocs.profilePhoto,
+        profilePhoto: uploadedDocs.profilePhoto || profile,
       };
       // Save form data to localStorage before navigating
       localStorage.setItem(
@@ -167,63 +163,13 @@ export const ApplicantDetails = () => {
       navigate("/addCandidates/personalDetails", {
         state: { FormData: applicationUpdate },
       });
+
+      console.log("APP DATA", applicationUpdate)
       setUploadedDocs({ profilePhoto: null });
     } catch (error) {
       console.log(error);
     }
   };
-
-  // useEffect(() => {
-  //   if (empPDData.length > 0) {
-  //     const interviewData = empPDData.find((data) => data.tempID === tempID); // Assuming we want to take the first item
-  //     if (interviewData) {
-  //       setFormData({
-  //         personalDetails: {
-  //           age: interviewData.age || "",
-  //           agent: interviewData.agent || "",
-  //           alternateNo: interviewData.alternateNo || "",
-  //           bwnIcColour: interviewData.bwnIcColour || "",
-  //           bwnIcExpiry: interviewData.bwnIcExpiry || "",
-  //           bwnIcNo: interviewData.bwnIcNo || "",
-  //           chinese: interviewData.chinese || "",
-  //           cob: interviewData.cob || "",
-  //           contactNo: interviewData.contactNo || "",
-  //           contractType: interviewData.contractType || "",
-  //           createdAt: interviewData.createdAt || "",
-  //           dob: interviewData.dob || "",
-  //           driveLic: interviewData.driveLic || "",
-  //           eduDetails: interviewData.eduDetails || "",
-  //           email: interviewData.email || "",
-  //           empType: interviewData.empType || "",
-  //           familyDetails: interviewData.familyDetails || "",
-  //           gender: interviewData.gender || "",
-  //           id: interviewData.id || "",
-  //           lang: interviewData.lang || "",
-  //           marital: interviewData.marital || "",
-  //           name: interviewData.name || "",
-  //           nationality: interviewData.nationality || "",
-  //           otherNation: interviewData.otherNation || "",
-  //           otherRace: interviewData.otherRace || "",
-  //           otherReligion: interviewData.otherReligion || "",
-  //           permanentAddress: interviewData.permanentAddress || "",
-  //           position: interviewData.position || "",
-  //           ppDestinate: interviewData.ppDestinate || "",
-  //           ppExpiry: interviewData.ppExpiry || "",
-  //           ppIssued: interviewData.ppIssued || "",
-  //           ppNo: interviewData.ppNo || "",
-  //           presentAddress: interviewData.presentAddress || "",
-  //           profilePhoto: interviewData.profilePhoto || "",
-  //           race: interviewData.race || "",
-  //           religion: interviewData.religion || "",
-  //           status: interviewData.status || "",
-  //           tempID: interviewData.tempID || "",
-  //           updatedAt: interviewData.updatedAt || "",
-  //           workExperience: interviewData.workExperience || "",
-  //         },
-  //       });
-  //     }
-  //   }
-  // }, [empPDData, tempID]);
 
   return (
     <section className="w-full">
@@ -317,53 +263,7 @@ export const ApplicantDetails = () => {
             )}
           </div>
 
-          {/* Upload Photo */}
-          {/* <div className="py-2 center flex-col max-w-[160px]">
-            <input
-              type="file"
-              id="fileInput"
-              name="profilePhoto"
-              accept=".jpg,.jpeg,.png"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-            <div className="h-[120px] max-w-[120px] relative rounded-md bg-lite_skyBlue">
-              <img
-                src={imageUrl}
-                id="previewImg"
-                alt="profile"
-                className="object-cover w-full h-full"
-                onError={(e) => (e.target.src = avatar)} // Fallback image if there's an error
-              />
-
-              {(profilePhoto || uploadedDocs.profilePhoto) && (
-                <div
-                  className="absolute top-24 -right-3  bg-lite_grey p-[2px] rounded-full cursor-pointer"
-                  onClick={() => document.getElementById("fileInput").click()}
-                >
-                  <IoCameraOutline className="w-6 h-6 p-1" />
-                </div>
-              )}
-            </div>
-
-            {!profilePhoto && !uploadedDocs.profilePhoto && (
-              <div className="mt-1 rounded-lg text-center">
-                <button
-                  type="button"
-                  className="text_size_6"
-                  onClick={() => document.getElementById("fileInput").click()}
-                >
-                  Choose Image
-                </button> 
-              </div>
-            )}
-
-            {errors.profilePhoto && (
-              <p className="text-[red] text-[13px] text-center">
-                {errors.profilePhoto.message}
-              </p> ApplicatDetails,
-            )}
-          </div> */}
+  
         </div>
 
         {/* Form Fields */}

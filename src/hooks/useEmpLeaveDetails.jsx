@@ -14,7 +14,8 @@ export const useEmpLeaveDetails = () => {
       setLoading(true);
       try {
         const empLeaveData = await client.graphql({
-          query: listEmpLeaveDetails, // Query to fetch employee leave details
+          query: listEmpLeaveDetails,           variables: { limit: 20000 },
+          // Query to fetch employee leave details
         });
 
         const fetchedEmpLeaveDetails =

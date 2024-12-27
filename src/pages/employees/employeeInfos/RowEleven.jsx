@@ -24,32 +24,35 @@ export const RowEleven = ({
 
   useEffect(() => {
     if (isInitialMount.current) {
-      if (value && value.length > 0) {
-        // Replace current fields with fetched data only if available
-        // replace(value);
-        // setValue("familyDetails", JSON.stringify(value));
-       const parsedValue = typeof value === "string" ? JSON.parse(value) : value;
-      replace(parsedValue); // Replace fields with parsed data
-      setValue("familyDetails", parsedValue); 
-      } else {
-        append({
-          name: "",
-          relationship: "",
-          contact: "",
-          address: "",
-          isNew: false,
-        });
-      }
-      isInitialMount.current = false;
+        console.log("Initial value:", value);
+        if (value && value.length > 0) {
+            try {
+                const parsedValue = typeof value === "string" ? JSON.parse(value) : value;
+                replace(parsedValue); // Replace fields with parsed data
+                setValue("familyDetails", parsedValue);
+            } catch (error) {
+                console.error("JSON parse error:", error, "Value:", value);
+            }
+        } else {
+            append({
+                name: "",
+                relationship: "",
+                contact: "",
+                address: "",
+                isNew: false,
+            });
+        }
+        isInitialMount.current = false;
     } else if (value && value.length > 0) {
-      // Ensure the fields are replaced when value updates later
-      const parsedValue = typeof value === "string" ? JSON.parse(value) : value;
-      replace(parsedValue); // Replace fields with parsed data
-      setValue("familyDetails", parsedValue); 
-      // replace(value);
-      // setValue("familyDetails", JSON.stringify(value));
+        try {
+            const parsedValue = typeof value === "string" ? JSON.parse(value) : value;
+            replace(parsedValue); // Replace fields with parsed data
+            setValue("familyDetails", parsedValue);
+        } catch (error) {
+            console.error("JSON parse error during update:", error, "Value:", value);
+        }
     }
-  }, [value, append, replace, setValue]);
+}, [value, append, replace, setValue]);
 
   const handleAddFamily = () => {
     append({

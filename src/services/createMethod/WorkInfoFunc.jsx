@@ -10,7 +10,6 @@ import { DataSupply } from "../../utils/DataStoredContext";
 
 export const WorkInfoFunc = () => {
   const client = generateClient();
-  const { empPIData } = useContext(DataSupply);
 
   const SubmitWIData = useCallback(async ({ workInfoValue }) => {
     if (!workInfoValue) {
@@ -115,7 +114,6 @@ export const WorkInfoFunc = () => {
     const uniqueValues = [
       contractEndValue,
       contractStartValue,
-
       probationEndValue,
       probationStartValue,
       upgradeDateValue,
@@ -320,37 +318,42 @@ export const WorkInfoFunc = () => {
     console.log(totalData2);
     console.log(totalData3);
     try {
-      const [Emp, Leave, Ter, Ser] = await Promise.all([
+      const [
+        Emp,
+        //  Leave, 
+        //  Ter,
+        //   Ser
+        ] = await Promise.all([
         client.graphql({
           query: createEmpWorkInfo,
           variables: {
             input: totalData,
           },
         }),
-        client.graphql({
-          query: createEmpLeaveDetails,
-          variables: {
-            input: totalData1,
-          },
-        }),
-        client.graphql({
-          query: createTerminationInfo,
-          variables: {
-            input: totalData2,
-          },
-        }),
-        client.graphql({
-          query: createServiceRecord,
-          variables: {
-            input: totalData3,
-          },
-        }),
+        // client.graphql({
+        //   query: createEmpLeaveDetails,
+        //   variables: {
+        //     input: totalData1,
+        //   },
+        // }),
+        // client.graphql({
+        //   query: createTerminationInfo,
+        //   variables: {
+        //     input: totalData2,
+        //   },
+        // }),
+        // client.graphql({
+        //   query: createServiceRecord,
+        //   variables: {
+        //     input: totalData3,
+        //   },
+        // }),
       ]);
 
       console.log(Emp);
-      console.log(Leave);
-      console.log(Ter);
-      console.log(Ser);
+      // console.log(Leave);
+      // console.log(Ter);
+      // console.log(Ser);
     } catch (error) {
       console.log(error);
     }

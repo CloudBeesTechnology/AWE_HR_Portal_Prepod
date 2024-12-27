@@ -29,7 +29,7 @@ export const PopupForSFApproves = ({
                 <button
                   className=" p-2 rounded border-[#FEF116] bg-[#FEF116] text-dark_grey text_size_5 w-52"
                   onClick={() => {
-                    toggleSFAMessage(null,null);
+                    toggleSFAMessage(null);
                     setExcelData?.(null);
                   
                   }}

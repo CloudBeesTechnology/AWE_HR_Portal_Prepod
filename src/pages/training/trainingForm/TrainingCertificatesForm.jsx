@@ -11,6 +11,8 @@ import { SearchDisplay } from "../../../utils/SearchDisplay";
 import { IoSearch } from "react-icons/io5";
 import { FormField } from "../../../utils/FormField";
 import { TCDataUpdate } from "../../../services/updateMethod/TCDataUpdate";
+import { Link } from "react-router-dom";
+import { FaArrowLeft } from "react-icons/fa6";
 
 export const TrainingCertificatesForm = () => {
   const { empPIData, workInfoData, trainingCertifi, AddEmpReq} =useContext(DataSupply);
@@ -157,23 +159,7 @@ export const TrainingCertificatesForm = () => {
         setValue(field, value);
       }
     });
-  
-    // Handle upload fields
-    // uploadFields.forEach((field) => {
-    //   if (result[field]) {
-    //     try {
-    //       const parsedArray = JSON.parse(result[field][0]);
-    //       setValue(field, parsedArray);
-    //       setUploadTC((prev) => ({ ...prev, [field]: parsedArray }));
-    //       setUploadedFileNames((prev) => ({
-    //         ...prev,
-    //         [field]: getFileName(parsedArray[parsedArray.length - 1].upload),
-    //       }));
-    //     } catch (error) {
-    //       console.error(`Error parsing upload field ${field}:`, error);
-    //     }
-    //   }
-    // });
+
 
     uploadFields.forEach((field) => {
       if (result[field]) {
@@ -242,8 +228,22 @@ export const TrainingCertificatesForm = () => {
   };
 
   return (
-    <section className="mt-10 space-y-5 screen-size bg-white py-5 px-8 rounded-xl  text_size_6 text-dark_grey">
-        <div className="w-[30%] mt-5" >
+    <section className="space-y-5 bg-[#F8F8F8]  mt-10 py-5 px-8 rounded-xl  text_size_6 text-dark_grey">
+          <div className=" w-full flex items-center justify-center gap-5 my-10">
+        <Link to="/training/hr" className="text-xl flex-1 text-grey">
+          <FaArrowLeft />
+        </Link>
+
+        <article className="w-full  center gap-5 text-dark_grey ">
+          <p
+          className="text-center mt-2 text_size_2 relative after:absolute after:w-full after:h-1 after:bg-primary after:-bottom-2 after:left-0">
+          
+            Training Certificate
+          </p>    
+        </article>       
+      </div>
+       <div className="mt-16 mb-16 w-full rounded-md bg-white px-20 py-10">
+       <div className="w-[30%] mt-5" >
           <SearchDisplay
             searchResult={searchResult}
             newFormData={allEmpDetails}
@@ -410,6 +410,7 @@ export const TrainingCertificatesForm = () => {
           </button>
         </div>  
       </form>
+       </div>
       {notification && (
         <SpinLogo
         text={showTitle}

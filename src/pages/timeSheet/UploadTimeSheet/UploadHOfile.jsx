@@ -141,79 +141,22 @@ export const UploadHOfile = (
             const dateObject = new Date(jsDate);
             item.DATE = dateObject.toLocaleDateString();
           }
-          // if (
-          //   typeof item["ALL DAY MINUTES"] === "number" &&
-          //   item.data === false
-          // ) {
-          //   item["ALL DAY MINUTES"] = convertDecimalToTime(
-          //     item["ALL DAY MINUTES"],
-          //     "time"
-          //   );
-          // }
+
           return item;
         });
 
-      // console.log(updatedDataArray);
-      // const removeTotalEmployees = updatedDataArray.filter(
-      //   (val) => !val.NAME?.includes("TOTAL EMPLOYEES")
-      // );
-      // const filteHighlightedData = updatedDataArray.filter((item) => {
-      //   if (
-      //     item.DEPT &&
-      //     item.EMPLOYEEID &&
-      //     item.BADGE &&
-      //     item.NAME &&
-      //     item.DATE &&
-      //     item.ONAM &&
-      //     item.OFFAM &&
-      //     item.ONPM &&
-      //     item.OFFPM &&
-      //     item.IN &&
-      //     item.OUT &&
-      //     item.REC >= 0 &&
-      //     item.CTR >= 0 &&
-      //     item.TOTALINOUT >= 0 &&
-      //     item.ALLDAYMINUTES >= 0 &&
-      //     item.NETMINUTES >= 0 &&
-      //     item.TOTALHOURS >= 0 &&
-      //     item.TOTALACTUALHOURS >= 0
-      //   ) {
-      //     return item;
-      //   }
-      // });
-
-      // const getLastOccurrencePerFIDDate = (dataArray) => {
-      //   const map = new Map();
-
-      //   // Iterate over each object and store the last occurrence of each unique FID-date combination
-      //   dataArray.forEach((obj) => {
-      //     // Check if "ENTRANCEDATEUSED" exists in the object
-      //     if (obj.hasOwnProperty("REC")) {
-      //       const key = `${obj.REC}-${obj.DATE}`; // Create a unique key based on FID and ENTRANCEDATEUSED
-      //       map.set(key, obj); // Overwrite previous entries with the same FID and ENTRANCEDATEUSED
-      //     }
-      //   });
-
-      //   // Convert the map values to an array of the last occurrences for each FID-date pair
-      //   return Array.from(map.values());
-      // };
-
-      // const lastOccurrenceObjects = getLastOccurrencePerFIDDate(updatedDataArray);
-      // console.log("lastOccurrenceObjects : ", lastOccurrenceObjects);
       try {
       } catch {}
       function filterDataByDateFormat(data) {
-        const dateFormatRegex = /^\d{1,2}\/\d{1,2}\/\d{4}$/; // Matches MM/DD/YYYY format
+        const dateFormatRegex = /^\d{1,2}\/\d{1,2}\/\d{4}$/; 
 
-        return data.filter((obj) => obj.IN && obj.OUT); // Ensure both IN and OUT exist
-        // .filter((obj) => dateFormatRegex.test(obj.DATE)) // Check if DATE is in MM/DD/YYYY format
+        return data.filter((obj) => obj.IN && obj.OUT); 
+        
       }
-
-      // Example usage:
 
       const filteredData = filterDataByDateFormat(updatedDataArray);
 
-      // console.log(filteredData);
+   
       setExcelData(filteredData);
       setLoading(false);
       return getResult.flat();

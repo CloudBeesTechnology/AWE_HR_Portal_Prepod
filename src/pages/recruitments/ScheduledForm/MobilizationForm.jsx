@@ -6,7 +6,7 @@ import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
 import { UpdateLoiData } from "../../../services/updateMethod/UpdateLoi";
 import { useFetchInterview } from "../../../hooks/useFetchInterview";
 import { FileUploadField } from "../../employees/medicalDep/FileUploadField";
-
+import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
 // Define validation schema using Yup
 const MOBFormSchema = Yup.object().shape({
   mobSignDate: Yup.date().notRequired(),
@@ -21,11 +21,13 @@ const MOBFormSchema = Yup.object().shape({
 export const MobilizationForm = ({candidate}) => {
   const { loiDetails } = UpdateLoiData();
   const { mergedInterviewData } = useFetchInterview();
+  const { interviewDetails } = UpdateInterviewData();
   const [formData, setFormData] = useState({
     interview: {
       id: "",
       mobSignDate: "",
       mobFile: "",
+      status: ""
     },
   });
   // const [uploadedFileName, setUploadedFileName] = useState(null);
@@ -59,6 +61,7 @@ export const MobilizationForm = ({candidate}) => {
           interview: {
             mobSignDate: interviewData.localMobilization.mobSignDate,
             mobFile: interviewData.localMobilization.mobFile,
+            status: interviewData.interviewSchedules.status
           },
         });
         if (interviewData.localMobilization.mobFile) {
@@ -109,6 +112,7 @@ export const MobilizationForm = ({candidate}) => {
     }
 
     const localMobilizationId = selectedInterviewData.localMobilization.id;
+    const interviewScheduleId = selectedInterviewData.interviewSchedules.id;
 
     try {
       await loiDetails({
@@ -117,7 +121,15 @@ export const MobilizationForm = ({candidate}) => {
           mobSignDate: formData.interview.mobSignDate,
           mobFile: uploadedMOB.mobFile || formData.mobfFile,
         },
+      })
+      await interviewDetails({
+        InterviewValue: {
+          id: interviewScheduleId, // Dynamically use the correct id
+          status: formData.interview.status
+          // status: selectedInterviewData.contractType === "Local" ? "mobilization" : "workpass",
+        },
       });
+
       console.log("Data stored successfully...");
       // setNotification(true);
     } catch (error) {
@@ -170,20 +182,19 @@ export const MobilizationForm = ({candidate}) => {
               }
               value={formData.interview.mobFile}
             />
-            {/* <span className="ml-2">
-                <GoUpload />
-              </span> */}
-            {/* </label> */}
-            {/* {uploadedFileName ? (
-              <p className="text-xs mt-1 text-grey">{uploadedFileName}</p>
-            ) : (
-              errors.mobFile && (
-                <p className="text-[red] text-xs mt-1">
-                  {errors.mobFile.message}
-                </p>
-              )
-            )} */}
+      
           </div>
+        </div>
+        <div>
+          <label htmlFor="status">Status</label>
+          <input
+            className="w-full border p-2 rounded mt-1"
+            type="text"
+            id="status"
+            {...register("status")}
+            value={formData.interview.status}
+            onChange={(e) => handleInputChange("status", e.target.value)}
+          />
         </div>
       </div>
 

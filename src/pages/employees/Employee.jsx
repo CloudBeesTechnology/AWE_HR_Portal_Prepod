@@ -80,7 +80,7 @@ export const Employee = () => {
     // You can add more cards if needed
   ];
   const filteredCards = cards.filter((card) => employeePermissions.includes(card.title));
-console.log(filteredCards);
+// console.log(filteredCards);
 
   return (
     <section className=" bg-[#F5F6F1CC] w-full p-10 min-h-screen">

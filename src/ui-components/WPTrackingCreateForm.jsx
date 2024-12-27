@@ -63,6 +63,14 @@ export default function WPTrackingCreateForm(props) {
     agentname: "",
     mobSignDate: "",
     mobFile: "",
+    doerefno: "",
+    sawpDate: "",
+    sawpRecivedDate: "",
+    sawpFile: "",
+    lbrDepoNum: "",
+    lbrEndroseDate: "",
+    lbrDepoAmount: "",
+    lbrFile: "",
   };
   const [tempID, setTempID] = React.useState(initialValues.tempID);
   const [supportletterReqDate, setSupportletterReqDate] = React.useState(
@@ -155,6 +163,20 @@ export default function WPTrackingCreateForm(props) {
     initialValues.mobSignDate
   );
   const [mobFile, setMobFile] = React.useState(initialValues.mobFile);
+  const [doerefno, setDoerefno] = React.useState(initialValues.doerefno);
+  const [sawpDate, setSawpDate] = React.useState(initialValues.sawpDate);
+  const [sawpRecivedDate, setSawpRecivedDate] = React.useState(
+    initialValues.sawpRecivedDate
+  );
+  const [sawpFile, setSawpFile] = React.useState(initialValues.sawpFile);
+  const [lbrDepoNum, setLbrDepoNum] = React.useState(initialValues.lbrDepoNum);
+  const [lbrEndroseDate, setLbrEndroseDate] = React.useState(
+    initialValues.lbrEndroseDate
+  );
+  const [lbrDepoAmount, setLbrDepoAmount] = React.useState(
+    initialValues.lbrDepoAmount
+  );
+  const [lbrFile, setLbrFile] = React.useState(initialValues.lbrFile);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setTempID(initialValues.tempID);
@@ -197,6 +219,14 @@ export default function WPTrackingCreateForm(props) {
     setAgentname(initialValues.agentname);
     setMobSignDate(initialValues.mobSignDate);
     setMobFile(initialValues.mobFile);
+    setDoerefno(initialValues.doerefno);
+    setSawpDate(initialValues.sawpDate);
+    setSawpRecivedDate(initialValues.sawpRecivedDate);
+    setSawpFile(initialValues.sawpFile);
+    setLbrDepoNum(initialValues.lbrDepoNum);
+    setLbrEndroseDate(initialValues.lbrEndroseDate);
+    setLbrDepoAmount(initialValues.lbrDepoAmount);
+    setLbrFile(initialValues.lbrFile);
     setErrors({});
   };
   const validations = {
@@ -240,6 +270,14 @@ export default function WPTrackingCreateForm(props) {
     agentname: [],
     mobSignDate: [],
     mobFile: [],
+    doerefno: [],
+    sawpDate: [],
+    sawpRecivedDate: [],
+    sawpFile: [],
+    lbrDepoNum: [],
+    lbrEndroseDate: [],
+    lbrDepoAmount: [],
+    lbrFile: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -307,6 +345,14 @@ export default function WPTrackingCreateForm(props) {
           agentname,
           mobSignDate,
           mobFile,
+          doerefno,
+          sawpDate,
+          sawpRecivedDate,
+          sawpFile,
+          lbrDepoNum,
+          lbrEndroseDate,
+          lbrDepoAmount,
+          lbrFile,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -409,6 +455,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.tempID ?? value;
@@ -472,6 +526,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.supportletterReqDate ?? value;
@@ -537,6 +599,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.supportletterReceiveDate ?? value;
@@ -605,6 +675,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.letterfile ?? value;
@@ -668,6 +746,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.doesubmitdate ?? value;
@@ -731,6 +817,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.doeapprovedate ?? value;
@@ -794,6 +888,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.doeexpirydate ?? value;
@@ -857,6 +959,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.doefile ?? value;
@@ -920,6 +1030,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.nlmssubmitdate ?? value;
@@ -983,6 +1101,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.submissionrefrenceno ?? value;
@@ -1048,6 +1174,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.nlmsapprovedate ?? value;
@@ -1111,6 +1245,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.ldreferenceno ?? value;
@@ -1174,6 +1316,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.nlmsexpirydate ?? value;
@@ -1237,6 +1387,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.nlmsfile ?? value;
@@ -1300,6 +1458,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.bgsubmitdate ?? value;
@@ -1363,6 +1529,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.bgreceivedate ?? value;
@@ -1426,6 +1600,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.referenceno ?? value;
@@ -1489,6 +1671,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.bgamount ?? value;
@@ -1552,6 +1742,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.bgexpirydate ?? value;
@@ -1615,6 +1813,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.bgfile ?? value;
@@ -1678,6 +1884,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.tbapurchasedate ?? value;
@@ -1741,6 +1955,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.jitpaamount ?? value;
@@ -1804,6 +2026,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.jitpaexpirydate ?? value;
@@ -1867,6 +2097,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.receiptno ?? value;
@@ -1930,6 +2168,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.depositamount ?? value;
@@ -1993,6 +2239,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.submitdateendorsement ?? value;
@@ -2058,6 +2312,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.jitpafile ?? value;
@@ -2121,6 +2383,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.immbdno ?? value;
@@ -2184,6 +2454,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.docsubmitdate ?? value;
@@ -2247,6 +2525,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.visaapprovedate ?? value;
@@ -2310,6 +2596,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.visareferenceno ?? value;
@@ -2373,6 +2667,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.visaFile ?? value;
@@ -2436,6 +2738,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.departuredate ?? value;
@@ -2499,6 +2809,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.arrivaldate ?? value;
@@ -2562,6 +2880,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.cityname ?? value;
@@ -2625,6 +2951,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.airfare ?? value;
@@ -2688,6 +3022,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.airticketfile ?? value;
@@ -2751,6 +3093,14 @@ export default function WPTrackingCreateForm(props) {
               agentname: value,
               mobSignDate,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.agentname ?? value;
@@ -2814,6 +3164,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate: value,
               mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.mobSignDate ?? value;
@@ -2877,6 +3235,14 @@ export default function WPTrackingCreateForm(props) {
               agentname,
               mobSignDate,
               mobFile: value,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
             };
             const result = onChange(modelFields);
             value = result?.mobFile ?? value;
@@ -2890,6 +3256,574 @@ export default function WPTrackingCreateForm(props) {
         errorMessage={errors.mobFile?.errorMessage}
         hasError={errors.mobFile?.hasError}
         {...getOverrideProps(overrides, "mobFile")}
+      ></TextField>
+      <TextField
+        label="Doerefno"
+        isRequired={false}
+        isReadOnly={false}
+        value={doerefno}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              tempID,
+              supportletterReqDate,
+              supportletterReceiveDate,
+              letterfile,
+              doesubmitdate,
+              doeapprovedate,
+              doeexpirydate,
+              doefile,
+              nlmssubmitdate,
+              submissionrefrenceno,
+              nlmsapprovedate,
+              ldreferenceno,
+              nlmsexpirydate,
+              nlmsfile,
+              bgsubmitdate,
+              bgreceivedate,
+              referenceno,
+              bgamount,
+              bgexpirydate,
+              bgfile,
+              tbapurchasedate,
+              jitpaamount,
+              jitpaexpirydate,
+              receiptno,
+              depositamount,
+              submitdateendorsement,
+              jitpafile,
+              immbdno,
+              docsubmitdate,
+              visaapprovedate,
+              visareferenceno,
+              visaFile,
+              departuredate,
+              arrivaldate,
+              cityname,
+              airfare,
+              airticketfile,
+              agentname,
+              mobSignDate,
+              mobFile,
+              doerefno: value,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
+            };
+            const result = onChange(modelFields);
+            value = result?.doerefno ?? value;
+          }
+          if (errors.doerefno?.hasError) {
+            runValidationTasks("doerefno", value);
+          }
+          setDoerefno(value);
+        }}
+        onBlur={() => runValidationTasks("doerefno", doerefno)}
+        errorMessage={errors.doerefno?.errorMessage}
+        hasError={errors.doerefno?.hasError}
+        {...getOverrideProps(overrides, "doerefno")}
+      ></TextField>
+      <TextField
+        label="Sawp date"
+        isRequired={false}
+        isReadOnly={false}
+        value={sawpDate}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              tempID,
+              supportletterReqDate,
+              supportletterReceiveDate,
+              letterfile,
+              doesubmitdate,
+              doeapprovedate,
+              doeexpirydate,
+              doefile,
+              nlmssubmitdate,
+              submissionrefrenceno,
+              nlmsapprovedate,
+              ldreferenceno,
+              nlmsexpirydate,
+              nlmsfile,
+              bgsubmitdate,
+              bgreceivedate,
+              referenceno,
+              bgamount,
+              bgexpirydate,
+              bgfile,
+              tbapurchasedate,
+              jitpaamount,
+              jitpaexpirydate,
+              receiptno,
+              depositamount,
+              submitdateendorsement,
+              jitpafile,
+              immbdno,
+              docsubmitdate,
+              visaapprovedate,
+              visareferenceno,
+              visaFile,
+              departuredate,
+              arrivaldate,
+              cityname,
+              airfare,
+              airticketfile,
+              agentname,
+              mobSignDate,
+              mobFile,
+              doerefno,
+              sawpDate: value,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
+            };
+            const result = onChange(modelFields);
+            value = result?.sawpDate ?? value;
+          }
+          if (errors.sawpDate?.hasError) {
+            runValidationTasks("sawpDate", value);
+          }
+          setSawpDate(value);
+        }}
+        onBlur={() => runValidationTasks("sawpDate", sawpDate)}
+        errorMessage={errors.sawpDate?.errorMessage}
+        hasError={errors.sawpDate?.hasError}
+        {...getOverrideProps(overrides, "sawpDate")}
+      ></TextField>
+      <TextField
+        label="Sawp recived date"
+        isRequired={false}
+        isReadOnly={false}
+        value={sawpRecivedDate}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              tempID,
+              supportletterReqDate,
+              supportletterReceiveDate,
+              letterfile,
+              doesubmitdate,
+              doeapprovedate,
+              doeexpirydate,
+              doefile,
+              nlmssubmitdate,
+              submissionrefrenceno,
+              nlmsapprovedate,
+              ldreferenceno,
+              nlmsexpirydate,
+              nlmsfile,
+              bgsubmitdate,
+              bgreceivedate,
+              referenceno,
+              bgamount,
+              bgexpirydate,
+              bgfile,
+              tbapurchasedate,
+              jitpaamount,
+              jitpaexpirydate,
+              receiptno,
+              depositamount,
+              submitdateendorsement,
+              jitpafile,
+              immbdno,
+              docsubmitdate,
+              visaapprovedate,
+              visareferenceno,
+              visaFile,
+              departuredate,
+              arrivaldate,
+              cityname,
+              airfare,
+              airticketfile,
+              agentname,
+              mobSignDate,
+              mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate: value,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
+            };
+            const result = onChange(modelFields);
+            value = result?.sawpRecivedDate ?? value;
+          }
+          if (errors.sawpRecivedDate?.hasError) {
+            runValidationTasks("sawpRecivedDate", value);
+          }
+          setSawpRecivedDate(value);
+        }}
+        onBlur={() => runValidationTasks("sawpRecivedDate", sawpRecivedDate)}
+        errorMessage={errors.sawpRecivedDate?.errorMessage}
+        hasError={errors.sawpRecivedDate?.hasError}
+        {...getOverrideProps(overrides, "sawpRecivedDate")}
+      ></TextField>
+      <TextField
+        label="Sawp file"
+        isRequired={false}
+        isReadOnly={false}
+        value={sawpFile}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              tempID,
+              supportletterReqDate,
+              supportletterReceiveDate,
+              letterfile,
+              doesubmitdate,
+              doeapprovedate,
+              doeexpirydate,
+              doefile,
+              nlmssubmitdate,
+              submissionrefrenceno,
+              nlmsapprovedate,
+              ldreferenceno,
+              nlmsexpirydate,
+              nlmsfile,
+              bgsubmitdate,
+              bgreceivedate,
+              referenceno,
+              bgamount,
+              bgexpirydate,
+              bgfile,
+              tbapurchasedate,
+              jitpaamount,
+              jitpaexpirydate,
+              receiptno,
+              depositamount,
+              submitdateendorsement,
+              jitpafile,
+              immbdno,
+              docsubmitdate,
+              visaapprovedate,
+              visareferenceno,
+              visaFile,
+              departuredate,
+              arrivaldate,
+              cityname,
+              airfare,
+              airticketfile,
+              agentname,
+              mobSignDate,
+              mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile: value,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
+            };
+            const result = onChange(modelFields);
+            value = result?.sawpFile ?? value;
+          }
+          if (errors.sawpFile?.hasError) {
+            runValidationTasks("sawpFile", value);
+          }
+          setSawpFile(value);
+        }}
+        onBlur={() => runValidationTasks("sawpFile", sawpFile)}
+        errorMessage={errors.sawpFile?.errorMessage}
+        hasError={errors.sawpFile?.hasError}
+        {...getOverrideProps(overrides, "sawpFile")}
+      ></TextField>
+      <TextField
+        label="Lbr depo num"
+        isRequired={false}
+        isReadOnly={false}
+        value={lbrDepoNum}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              tempID,
+              supportletterReqDate,
+              supportletterReceiveDate,
+              letterfile,
+              doesubmitdate,
+              doeapprovedate,
+              doeexpirydate,
+              doefile,
+              nlmssubmitdate,
+              submissionrefrenceno,
+              nlmsapprovedate,
+              ldreferenceno,
+              nlmsexpirydate,
+              nlmsfile,
+              bgsubmitdate,
+              bgreceivedate,
+              referenceno,
+              bgamount,
+              bgexpirydate,
+              bgfile,
+              tbapurchasedate,
+              jitpaamount,
+              jitpaexpirydate,
+              receiptno,
+              depositamount,
+              submitdateendorsement,
+              jitpafile,
+              immbdno,
+              docsubmitdate,
+              visaapprovedate,
+              visareferenceno,
+              visaFile,
+              departuredate,
+              arrivaldate,
+              cityname,
+              airfare,
+              airticketfile,
+              agentname,
+              mobSignDate,
+              mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum: value,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
+            };
+            const result = onChange(modelFields);
+            value = result?.lbrDepoNum ?? value;
+          }
+          if (errors.lbrDepoNum?.hasError) {
+            runValidationTasks("lbrDepoNum", value);
+          }
+          setLbrDepoNum(value);
+        }}
+        onBlur={() => runValidationTasks("lbrDepoNum", lbrDepoNum)}
+        errorMessage={errors.lbrDepoNum?.errorMessage}
+        hasError={errors.lbrDepoNum?.hasError}
+        {...getOverrideProps(overrides, "lbrDepoNum")}
+      ></TextField>
+      <TextField
+        label="Lbr endrose date"
+        isRequired={false}
+        isReadOnly={false}
+        value={lbrEndroseDate}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              tempID,
+              supportletterReqDate,
+              supportletterReceiveDate,
+              letterfile,
+              doesubmitdate,
+              doeapprovedate,
+              doeexpirydate,
+              doefile,
+              nlmssubmitdate,
+              submissionrefrenceno,
+              nlmsapprovedate,
+              ldreferenceno,
+              nlmsexpirydate,
+              nlmsfile,
+              bgsubmitdate,
+              bgreceivedate,
+              referenceno,
+              bgamount,
+              bgexpirydate,
+              bgfile,
+              tbapurchasedate,
+              jitpaamount,
+              jitpaexpirydate,
+              receiptno,
+              depositamount,
+              submitdateendorsement,
+              jitpafile,
+              immbdno,
+              docsubmitdate,
+              visaapprovedate,
+              visareferenceno,
+              visaFile,
+              departuredate,
+              arrivaldate,
+              cityname,
+              airfare,
+              airticketfile,
+              agentname,
+              mobSignDate,
+              mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate: value,
+              lbrDepoAmount,
+              lbrFile,
+            };
+            const result = onChange(modelFields);
+            value = result?.lbrEndroseDate ?? value;
+          }
+          if (errors.lbrEndroseDate?.hasError) {
+            runValidationTasks("lbrEndroseDate", value);
+          }
+          setLbrEndroseDate(value);
+        }}
+        onBlur={() => runValidationTasks("lbrEndroseDate", lbrEndroseDate)}
+        errorMessage={errors.lbrEndroseDate?.errorMessage}
+        hasError={errors.lbrEndroseDate?.hasError}
+        {...getOverrideProps(overrides, "lbrEndroseDate")}
+      ></TextField>
+      <TextField
+        label="Lbr depo amount"
+        isRequired={false}
+        isReadOnly={false}
+        value={lbrDepoAmount}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              tempID,
+              supportletterReqDate,
+              supportletterReceiveDate,
+              letterfile,
+              doesubmitdate,
+              doeapprovedate,
+              doeexpirydate,
+              doefile,
+              nlmssubmitdate,
+              submissionrefrenceno,
+              nlmsapprovedate,
+              ldreferenceno,
+              nlmsexpirydate,
+              nlmsfile,
+              bgsubmitdate,
+              bgreceivedate,
+              referenceno,
+              bgamount,
+              bgexpirydate,
+              bgfile,
+              tbapurchasedate,
+              jitpaamount,
+              jitpaexpirydate,
+              receiptno,
+              depositamount,
+              submitdateendorsement,
+              jitpafile,
+              immbdno,
+              docsubmitdate,
+              visaapprovedate,
+              visareferenceno,
+              visaFile,
+              departuredate,
+              arrivaldate,
+              cityname,
+              airfare,
+              airticketfile,
+              agentname,
+              mobSignDate,
+              mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount: value,
+              lbrFile,
+            };
+            const result = onChange(modelFields);
+            value = result?.lbrDepoAmount ?? value;
+          }
+          if (errors.lbrDepoAmount?.hasError) {
+            runValidationTasks("lbrDepoAmount", value);
+          }
+          setLbrDepoAmount(value);
+        }}
+        onBlur={() => runValidationTasks("lbrDepoAmount", lbrDepoAmount)}
+        errorMessage={errors.lbrDepoAmount?.errorMessage}
+        hasError={errors.lbrDepoAmount?.hasError}
+        {...getOverrideProps(overrides, "lbrDepoAmount")}
+      ></TextField>
+      <TextField
+        label="Lbr file"
+        isRequired={false}
+        isReadOnly={false}
+        value={lbrFile}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              tempID,
+              supportletterReqDate,
+              supportletterReceiveDate,
+              letterfile,
+              doesubmitdate,
+              doeapprovedate,
+              doeexpirydate,
+              doefile,
+              nlmssubmitdate,
+              submissionrefrenceno,
+              nlmsapprovedate,
+              ldreferenceno,
+              nlmsexpirydate,
+              nlmsfile,
+              bgsubmitdate,
+              bgreceivedate,
+              referenceno,
+              bgamount,
+              bgexpirydate,
+              bgfile,
+              tbapurchasedate,
+              jitpaamount,
+              jitpaexpirydate,
+              receiptno,
+              depositamount,
+              submitdateendorsement,
+              jitpafile,
+              immbdno,
+              docsubmitdate,
+              visaapprovedate,
+              visareferenceno,
+              visaFile,
+              departuredate,
+              arrivaldate,
+              cityname,
+              airfare,
+              airticketfile,
+              agentname,
+              mobSignDate,
+              mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.lbrFile ?? value;
+          }
+          if (errors.lbrFile?.hasError) {
+            runValidationTasks("lbrFile", value);
+          }
+          setLbrFile(value);
+        }}
+        onBlur={() => runValidationTasks("lbrFile", lbrFile)}
+        errorMessage={errors.lbrFile?.errorMessage}
+        hasError={errors.lbrFile?.hasError}
+        {...getOverrideProps(overrides, "lbrFile")}
       ></TextField>
       <Flex
         justifyContent="space-between"

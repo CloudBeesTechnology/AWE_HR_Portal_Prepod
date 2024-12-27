@@ -51,9 +51,9 @@ export const LMTable = () => {
     return status === "Rejected"
       ? "text-[red]"
       : status === "Approved"
-      ? "text-[green]"
+      ? "text-[#339933]"
       : status === "Pending"
-      ? "text-dark_grey"
+      ? "text-[#E8A317]"
       : "text-[#E8A317]";
   };
 // console.log(data.length);
@@ -65,7 +65,7 @@ export const LMTable = () => {
           <div className="text-center mt-6 py-20">
             {errorState?.dateError ? (
               <>
-                <p className="text-red-500">No records found for the selected date: {selectedDate}</p>
+                <p className="text-[red]">No records found for the selected date: {selectedDate}</p>
                 <p className="text-sm mt-2">Please select a different date or clear the date filter</p>
               </>
             ) : errorState?.searchError ? (
@@ -89,6 +89,7 @@ export const LMTable = () => {
               {data && data.length > 0 ? (
                 data.map((item, index) => {
                   const displayIndex = startIndex + index + 1; // Adjust index based on pagination
+// console.log(item);
 
                   return (
                     <tr
@@ -97,7 +98,7 @@ export const LMTable = () => {
                     >
                       <td className="py-3">{displayIndex}</td>
                       <td className="py-3">{item.empID}</td>
-                      <td className="py-3">{item.empName || "Tony Stark"}</td>
+                      <td className="py-3">{item.empName || "N/A"}</td>
                       <td className="py-3">
                         {formatDate(item.leaveStatusCreatedAt)}
                       </td>
@@ -178,7 +179,7 @@ export const LMTable = () => {
           <div className="text-center mt-6 py-20">
             {errorState?.dateError ? (
               <>
-                <p className="text-red-500">No records found for the selected date: {selectedDate}</p>
+                <p className="text-[red]">No records found for the selected date: {selectedDate}</p>
                 <p className="text-sm mt-2">Please select a different date or clear the date filter</p>
               </>
             ) : errorState?.searchError ? (

@@ -18,37 +18,11 @@ export const UploadOffshoreFile = (
       const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
       allSheets.push({ sheetName, data: sheet });
     });
-    // console.log(allSheets);
+
 
     var dataWithDateAndLocation = [];
 
-    // const procedure = (data) => {
-    //   const dataWithDateLocation = data.map((sheet, index) => {
-    //     let date = null;
-    //     let location = null;
-
-    //     sheet.forEach((item) => {
-    //       if (item.date) {
-    //         date = item.date;
-    //       }
-    //       if (item.location) {
-    //         location = item.location;
-    //       }
-    //     });
-
-    //     const processedData = sheet
-    //       .filter((item) => !item.date && !item.location) // Exclude date and location objects to avoid duplicates
-    //       .map((item) => {
-    //         return {
-    //           ...item,
-    //           date: date || "",
-    //           location: location || "",
-    //         };
-    //       });
-
-    //     dataWithDateAndLocation.push(processedData);
-    //   });
-    // };
+ 
 
     const mapKeys = (row, header) => {
       const mappedObj = {};

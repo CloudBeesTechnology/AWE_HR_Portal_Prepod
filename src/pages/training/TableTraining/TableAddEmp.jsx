@@ -48,8 +48,6 @@ export const TableAddEmp = () => {
         columns={tableColumns.addTraining} popupAll={addTrainingForm}
       />
     </div>
-            {/* <TrainVT mergering={mergeData} /> */}
-
     </div>
   )
 }

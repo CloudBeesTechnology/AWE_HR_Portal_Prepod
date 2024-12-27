@@ -44,10 +44,7 @@ export const UpdateEmpInfo = () => {
       ppUpload,
       supportDocUpload,
       IDTable,
-    } = collectValue;
-
-    const {
-      age,
+       age,
       aTQualify,
       alternateNo,
       agent,
@@ -75,6 +72,7 @@ export const UpdateEmpInfo = () => {
       PITableID, bankName,
       bankAccNo
     } = collectValue;
+
 
     const totalData = {
       id: PITableID,

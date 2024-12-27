@@ -20,6 +20,7 @@ export const InterviewForm = ({ candidate }) => {
       message: "",
     },
   });
+  console.log(candidate)
 
   // Effect hook to auto-fetch and populate form data when IVSSDetails changes or candidate's tempID changes
   useEffect(() => {

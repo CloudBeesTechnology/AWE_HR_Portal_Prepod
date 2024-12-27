@@ -50,6 +50,9 @@ type TimeSheet @aws_iam @aws_api_key {
   totalOT: String
   totalNTOT: String
   empWorkInfo: [AWSJSON]
+  fromDate: String
+  untilDate: String
+  location: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -392,6 +395,14 @@ type WPTracking @aws_iam @aws_api_key {
   agentname: String
   mobSignDate: String
   mobFile: String
+  doerefno: String
+  sawpDate: String
+  sawpRecivedDate: String
+  sawpFile: String
+  lbrDepoNum: String
+  lbrEndroseDate: String
+  lbrDepoAmount: String
+  lbrFile: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -614,6 +625,25 @@ type CandIToEMP @aws_iam @aws_api_key {
   salaryExpectation: String
   supportInfo: String
   workExperience: [AWSJSON]
+  mobSignDate: String
+  mobFile: String
+  paafApproveDate: String
+  paafFile: String
+  loiIssueDate: String
+  loiAcceptDate: String
+  loiDeclineDate: String
+  declineReason: String
+  loiFile: String
+  cvecApproveDate: String
+  cvecFile: String
+  uploadCertificate: [AWSJSON]
+  pcNoticePeriod: String
+  venue: String
+  managerBadgeNo: String
+  message: String
+  interType: String
+  interTime: String
+  interDate: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -1373,6 +1403,9 @@ input ModelTimeSheetFilterInput {
   totalOT: ModelStringInput
   totalNTOT: ModelStringInput
   empWorkInfo: ModelStringInput
+  fromDate: ModelStringInput
+  untilDate: ModelStringInput
+  location: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelTimeSheetFilterInput]
@@ -1418,6 +1451,9 @@ input ModelTimeSheetConditionInput {
   totalOT: ModelStringInput
   totalNTOT: ModelStringInput
   empWorkInfo: ModelStringInput
+  fromDate: ModelStringInput
+  untilDate: ModelStringInput
+  location: ModelStringInput
   and: [ModelTimeSheetConditionInput]
   or: [ModelTimeSheetConditionInput]
   not: ModelTimeSheetConditionInput
@@ -1464,6 +1500,9 @@ input CreateTimeSheetInput {
   totalOT: String
   totalNTOT: String
   empWorkInfo: [AWSJSON]
+  fromDate: String
+  untilDate: String
+  location: String
 }
 
 input UpdateTimeSheetInput {
@@ -1505,6 +1544,9 @@ input UpdateTimeSheetInput {
   totalOT: String
   totalNTOT: String
   empWorkInfo: [AWSJSON]
+  fromDate: String
+  untilDate: String
+  location: String
 }
 
 input DeleteTimeSheetInput {
@@ -1550,6 +1592,9 @@ input ModelSubscriptionTimeSheetFilterInput {
   totalOT: ModelSubscriptionStringInput
   totalNTOT: ModelSubscriptionStringInput
   empWorkInfo: ModelSubscriptionStringInput
+  fromDate: ModelSubscriptionStringInput
+  untilDate: ModelSubscriptionStringInput
+  location: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionTimeSheetFilterInput]
@@ -3323,6 +3368,14 @@ input ModelWPTrackingFilterInput {
   agentname: ModelStringInput
   mobSignDate: ModelStringInput
   mobFile: ModelStringInput
+  doerefno: ModelStringInput
+  sawpDate: ModelStringInput
+  sawpRecivedDate: ModelStringInput
+  sawpFile: ModelStringInput
+  lbrDepoNum: ModelStringInput
+  lbrEndroseDate: ModelStringInput
+  lbrDepoAmount: ModelStringInput
+  lbrFile: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelWPTrackingFilterInput]
@@ -3371,6 +3424,14 @@ input ModelWPTrackingConditionInput {
   agentname: ModelStringInput
   mobSignDate: ModelStringInput
   mobFile: ModelStringInput
+  doerefno: ModelStringInput
+  sawpDate: ModelStringInput
+  sawpRecivedDate: ModelStringInput
+  sawpFile: ModelStringInput
+  lbrDepoNum: ModelStringInput
+  lbrEndroseDate: ModelStringInput
+  lbrDepoAmount: ModelStringInput
+  lbrFile: ModelStringInput
   and: [ModelWPTrackingConditionInput]
   or: [ModelWPTrackingConditionInput]
   not: ModelWPTrackingConditionInput
@@ -3420,6 +3481,14 @@ input CreateWPTrackingInput {
   agentname: String
   mobSignDate: String
   mobFile: String
+  doerefno: String
+  sawpDate: String
+  sawpRecivedDate: String
+  sawpFile: String
+  lbrDepoNum: String
+  lbrEndroseDate: String
+  lbrDepoAmount: String
+  lbrFile: String
 }
 
 input UpdateWPTrackingInput {
@@ -3464,6 +3533,14 @@ input UpdateWPTrackingInput {
   agentname: String
   mobSignDate: String
   mobFile: String
+  doerefno: String
+  sawpDate: String
+  sawpRecivedDate: String
+  sawpFile: String
+  lbrDepoNum: String
+  lbrEndroseDate: String
+  lbrDepoAmount: String
+  lbrFile: String
 }
 
 input DeleteWPTrackingInput {
@@ -3512,6 +3589,14 @@ input ModelSubscriptionWPTrackingFilterInput {
   agentname: ModelSubscriptionStringInput
   mobSignDate: ModelSubscriptionStringInput
   mobFile: ModelSubscriptionStringInput
+  doerefno: ModelSubscriptionStringInput
+  sawpDate: ModelSubscriptionStringInput
+  sawpRecivedDate: ModelSubscriptionStringInput
+  sawpFile: ModelSubscriptionStringInput
+  lbrDepoNum: ModelSubscriptionStringInput
+  lbrEndroseDate: ModelSubscriptionStringInput
+  lbrDepoAmount: ModelSubscriptionStringInput
+  lbrFile: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionWPTrackingFilterInput]
@@ -4629,6 +4714,25 @@ input ModelCandIToEMPFilterInput {
   salaryExpectation: ModelStringInput
   supportInfo: ModelStringInput
   workExperience: ModelStringInput
+  mobSignDate: ModelStringInput
+  mobFile: ModelStringInput
+  paafApproveDate: ModelStringInput
+  paafFile: ModelStringInput
+  loiIssueDate: ModelStringInput
+  loiAcceptDate: ModelStringInput
+  loiDeclineDate: ModelStringInput
+  declineReason: ModelStringInput
+  loiFile: ModelStringInput
+  cvecApproveDate: ModelStringInput
+  cvecFile: ModelStringInput
+  uploadCertificate: ModelStringInput
+  pcNoticePeriod: ModelStringInput
+  venue: ModelStringInput
+  managerBadgeNo: ModelStringInput
+  message: ModelStringInput
+  interType: ModelStringInput
+  interTime: ModelStringInput
+  interDate: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelCandIToEMPFilterInput]
@@ -4655,6 +4759,25 @@ input ModelCandIToEMPConditionInput {
   salaryExpectation: ModelStringInput
   supportInfo: ModelStringInput
   workExperience: ModelStringInput
+  mobSignDate: ModelStringInput
+  mobFile: ModelStringInput
+  paafApproveDate: ModelStringInput
+  paafFile: ModelStringInput
+  loiIssueDate: ModelStringInput
+  loiAcceptDate: ModelStringInput
+  loiDeclineDate: ModelStringInput
+  declineReason: ModelStringInput
+  loiFile: ModelStringInput
+  cvecApproveDate: ModelStringInput
+  cvecFile: ModelStringInput
+  uploadCertificate: ModelStringInput
+  pcNoticePeriod: ModelStringInput
+  venue: ModelStringInput
+  managerBadgeNo: ModelStringInput
+  message: ModelStringInput
+  interType: ModelStringInput
+  interTime: ModelStringInput
+  interDate: ModelStringInput
   and: [ModelCandIToEMPConditionInput]
   or: [ModelCandIToEMPConditionInput]
   not: ModelCandIToEMPConditionInput
@@ -4682,6 +4805,25 @@ input CreateCandIToEMPInput {
   salaryExpectation: String
   supportInfo: String
   workExperience: [AWSJSON]
+  mobSignDate: String
+  mobFile: String
+  paafApproveDate: String
+  paafFile: String
+  loiIssueDate: String
+  loiAcceptDate: String
+  loiDeclineDate: String
+  declineReason: String
+  loiFile: String
+  cvecApproveDate: String
+  cvecFile: String
+  uploadCertificate: [AWSJSON]
+  pcNoticePeriod: String
+  venue: String
+  managerBadgeNo: String
+  message: String
+  interType: String
+  interTime: String
+  interDate: String
 }
 
 input UpdateCandIToEMPInput {
@@ -4704,6 +4846,25 @@ input UpdateCandIToEMPInput {
   salaryExpectation: String
   supportInfo: String
   workExperience: [AWSJSON]
+  mobSignDate: String
+  mobFile: String
+  paafApproveDate: String
+  paafFile: String
+  loiIssueDate: String
+  loiAcceptDate: String
+  loiDeclineDate: String
+  declineReason: String
+  loiFile: String
+  cvecApproveDate: String
+  cvecFile: String
+  uploadCertificate: [AWSJSON]
+  pcNoticePeriod: String
+  venue: String
+  managerBadgeNo: String
+  message: String
+  interType: String
+  interTime: String
+  interDate: String
 }
 
 input DeleteCandIToEMPInput {
@@ -4730,6 +4891,25 @@ input ModelSubscriptionCandIToEMPFilterInput {
   salaryExpectation: ModelSubscriptionStringInput
   supportInfo: ModelSubscriptionStringInput
   workExperience: ModelSubscriptionStringInput
+  mobSignDate: ModelSubscriptionStringInput
+  mobFile: ModelSubscriptionStringInput
+  paafApproveDate: ModelSubscriptionStringInput
+  paafFile: ModelSubscriptionStringInput
+  loiIssueDate: ModelSubscriptionStringInput
+  loiAcceptDate: ModelSubscriptionStringInput
+  loiDeclineDate: ModelSubscriptionStringInput
+  declineReason: ModelSubscriptionStringInput
+  loiFile: ModelSubscriptionStringInput
+  cvecApproveDate: ModelSubscriptionStringInput
+  cvecFile: ModelSubscriptionStringInput
+  uploadCertificate: ModelSubscriptionStringInput
+  pcNoticePeriod: ModelSubscriptionStringInput
+  venue: ModelSubscriptionStringInput
+  managerBadgeNo: ModelSubscriptionStringInput
+  message: ModelSubscriptionStringInput
+  interType: ModelSubscriptionStringInput
+  interTime: ModelSubscriptionStringInput
+  interDate: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionCandIToEMPFilterInput]

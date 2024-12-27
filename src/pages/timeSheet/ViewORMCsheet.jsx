@@ -1,11 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
 import { PopupForMissMatchExcelSheet } from "./ModelForSuccessMess/PopupForMissMatchExcelSheet";
-// import {
-//   createORMCSheet,
-//   deleteORMCSheet,
-//   updateORMCSheet,
-// } from "../../graphql/mutations";
+
 import { generateClient } from "@aws-amplify/api";
 import { EditTimeSheet } from "./EditTimeSheet";
 import { SuccessMessage } from "./ModelForSuccessMess/SuccessMessage";
@@ -14,18 +10,14 @@ import "../../../src/index.css";
 
 import { useTableMerged } from "./customTimeSheet/UserTableMerged";
 import { PopupForAssignManager } from "./ModelForSuccessMess/PopupForAssignManager";
-// import {
-//   getEmpWorkInfo,
-//   listEmpPersonalInfos,
-//   listEmpWorkInfos,
-//   listORMCSheets,
-//   listUsers,
-// } from "../../graphql/queries";
+
 import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
 import { createTimeSheet, updateTimeSheet } from "../../graphql/mutations";
 import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
 import { Notification } from "./customTimeSheet/Notification";
-import { useMergeTableForNotification } from "./customTimeSheet/useMergeTableForNotification";
+import { MergeTableForNotification } from "./customTimeSheet/MergeTableForNotification";
+import { sendEmail } from "../../services/EmailServices";
+
 const client = generateClient();
 export const ViewORMCsheet = ({
   excelData,
@@ -38,6 +30,7 @@ export const ViewORMCsheet = ({
   defaultValue,
 }) => {
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
+    const [closePopup, setClosePopup] = useState(false);
   const [data, setData] = useState(null);
   const [secondaryData, setSecondaryData] = useState(null);
   const [currentStatus, setCurrentStatus] = useState(defaultValue);
@@ -54,9 +47,9 @@ export const ViewORMCsheet = ({
     data,
     "TimeKeeper"
   );
-  const getEmail = useMergeTableForNotification(response);
+
   const processedData = useTableMerged(excelData);
-  console.log(currentStatus);
+  
   useEffect(() => {
     if (processedData && processedData.length > 0) {
       setData(processedData);
@@ -182,6 +175,7 @@ export const ViewORMCsheet = ({
 
       const result = await checkedKeys();
 
+      setClosePopup(true);
       setCurrentStatus(result); // Assuming setCurrentStatus is defined
       setShowStatusCol(result);
       // setLoading(false);
@@ -253,7 +247,7 @@ export const ViewORMCsheet = ({
   const toggleSFAMessage = async (value, responseData) => {
     setSuccessMess(value);
     if (value === true && responseData) {
-      console.log("Success Message : ", responseData);
+    
       setResponse(responseData);
     }
   };
@@ -323,8 +317,8 @@ export const ViewORMCsheet = ({
           ...val,
           assignTo: managerData.mbadgeNo,
           assignBy: uploaderID,
-          // trade: managerData.mfromDate,
-          // tradeCode: managerData.muntilDate,
+          trade: managerData.mfromDate,
+          tradeCode: managerData.muntilDate,
         };
       });
 
@@ -334,9 +328,7 @@ export const ViewORMCsheet = ({
           try {
             const response = await client.graphql({
               query: createTimeSheet,
-              variables: {
-                input: timeSheet,
-              },
+              variables: { input: timeSheet },
             });
 
             if (response?.data?.createTimeSheet) {
@@ -345,8 +337,40 @@ export const ViewORMCsheet = ({
                 response.data.createTimeSheet
               );
               const responseData = response.data.createTimeSheet;
+
               if (!successFlag) {
                 toggleSFAMessage(true, responseData); // Only toggle success message once
+
+                const result = await MergeTableForNotification(responseData);
+             
+
+                if (result) {
+                  // Call the Notification function
+                  const emailDetails = await Notification({
+                    getEmail: result, // Fix: Pass 'getEmail' instead of 'result'
+                    Position,
+                  });
+
+                  if (emailDetails) {
+                    // Log email details
+                    const { subject, message, fromAddress, toAddress } =
+                      emailDetails;
+                  
+                    await sendEmail(
+                      subject,
+                      message,
+                      fromAddress,
+                      toAddress
+                    );
+                  } else {
+                    console.error("Notification returned undefined!");
+                  }
+                } else {
+                  console.error(
+                    "MergeTableForNotification returned undefined!"
+                  );
+                }
+
                 successFlag = true; // Set the flag to true
               }
             }
@@ -404,6 +428,37 @@ export const ViewORMCsheet = ({
               const responseData = response.data.updateTimeSheet;
               if (!successFlag) {
                 toggleSFAMessage(true, responseData); // Only toggle success message once
+
+                const result = await MergeTableForNotification(responseData);
+                
+
+                if (result) {
+                  // Call the Notification function
+                  const emailDetails = await Notification({
+                    getEmail: result, // Fix: Pass 'getEmail' instead of 'result'
+                    Position,
+                  });
+
+                  if (emailDetails) {
+                    // Log email details
+                    const { subject, message, fromAddress, toAddress } =
+                      emailDetails;
+                   
+                    await sendEmail(
+                      subject,
+                      message,
+                      fromAddress,
+                      toAddress
+                    );
+                  } else {
+                    console.error("Notification returned undefined!");
+                  }
+                } else {
+                  console.error(
+                    "MergeTableForNotification returned undefined!"
+                  );
+                }
+
                 successFlag = true; // Set the flag to true
               }
               setVisibleData([]);
@@ -439,18 +494,7 @@ export const ViewORMCsheet = ({
                 <thead className="sticky-header">
                   <tr className="text_size_5">
                     <td className="px-5 text-center text_size_7">S No.</td>
-                    {/* <td className="px-4 flex-1 text-start">Name</td>
-                    <td className="px-4 flex-1">DEPT/DIV</td>
-                    <td className="px-4 flex-1 text-start">BADGE#</td>
-                    <td className="px-4 flex-1">DATE</td>
-                    <td className="px-4 flex-1">IN</td>
-                    <td className="px-4 flex-1">OUT</td>
-                    <td className="px-4 flex-1">TOTAL IN/OUT</td>
-                    <td className="px-4 flex-1">{"ALL DAY MIN (HRS)"}</td>
-                    <td className="px-4 flex-1">NET MINUTES</td>
-                    <td className="px-4 flex-1">TOTAL HOURS</td>
 
-                    <td className="px-4 flex-1">REMARKS</td> */}
                     {AllFieldData?.tableHeader.map((header, index) => (
                       <td key={index} className="px-5 flex-1 text_size_7">
                         {header}
@@ -599,9 +643,9 @@ export const ViewORMCsheet = ({
               </button>
             </div>
           </div>
-        ) : currentStatus === false ? (
+        ) : currentStatus === false && closePopup === true  ? (
           // {data ? ("True case") : data == false ? ("False case") : ("Default case")}
-          <PopupForMissMatchExcelSheet />
+          <PopupForMissMatchExcelSheet setClosePopup={setClosePopup}/>
         ) : (
           // setShowPopup
           ""
@@ -631,10 +675,6 @@ export const ViewORMCsheet = ({
           toggleFunctionForAssiMana={toggleFunctionForAssiMana}
           renameKeysFunctionAndSubmit={renameKeysFunctionAndSubmit}
         />
-      )}
-
-      {response && getEmail && successMess && (
-        <Notification getEmail={getEmail} Position={Position} />
       )}
     </div>
   );

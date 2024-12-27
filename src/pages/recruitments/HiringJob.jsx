@@ -43,11 +43,17 @@ export const HiringJob = () => {
   
   return (
     <section className="bg-[#F5F6F1CC] mx-auto p-10 min-h-screen ">
-      <div className="mb-5">
+      <div className="mb-5 flex justify-between">
         {" "}
         <span className="bg-[#faf362] py-2 px-3 rounded-lg text-[18px] font-semibold">
           Hiring Job
         </span>
+        <Link
+          to="/postJob"
+          className="bg-primary py-2 px-5 text-zinc font-semibold text-lg flex items-center gap-5"
+        >
+          <span className="text-xl">+</span> Create Job
+        </Link>
       </div>{" "}
       <table className="w-full text-left">
         {/* Table Header */}
@@ -73,7 +79,7 @@ export const HiringJob = () => {
                 >
                   <td className=" pl-4 py-4">{val?.jobTitle || "N/A"}</td>
                   <td className=" pl-4 py-4">{val?.exper || "N/A"}</td>
-                  <td className=" pl-4 py-4  max-w-[200px]">
+                  <td className=" pl-4 py-4  break-words overflow-x-auto">
                     {val?.jobContent || "N/A"}
                   </td>
                   <td className=" pl-4 py-4">{val?.location || "N/A"}</td>
@@ -95,14 +101,7 @@ export const HiringJob = () => {
           )}
         </tbody>
       </table>
-      <div className="w-full center my-10">
-        <Link
-          to="/postJob"
-          className="bg-primary py-2 px-5 text-zinc font-semibold text-lg flex items-center gap-5"
-        >
-          <span className="text-xl">+</span> Create Job
-        </Link>
-      </div>
+      
     </section>
   );
 };

@@ -695,3 +695,41 @@ export const Notifications = () => {
 //     </section>
 //   );
 // };
+
+
+
+{/* <tbody>
+{leaveOfNotifications.map((notification, index) => (
+  <tr key={index} className="border-b last:border-b-0">
+    <td className="p-7">{notification.date}</td>
+    <td className="p-7 text_size_6 text-dark_grey gap-5">
+      {notification.subject} <br />
+      <span className="text-sm text-dark_ash">{notification.message}...</span>
+    </td>
+    <td className="pr-14">
+      <span
+        className="border-b-2 py-1 cursor-pointer"
+        onClick={() => {
+          toggleFunction();
+          sendToPopup(notification);
+          handleReadMore(notification, index)
+        }}
+        // onClick={() => handleReadMore(notification, index)}
+      >
+        Read More
+      </span>
+    </td>
+    <td className="px-4">
+      {notification.read ? (
+        <div className="mt-3.5 w-[60px] label-read">
+          <span className="flex justify-center items-center text-grey">Readed</span>
+        </div>
+      ) : (
+        <div className="mt-3.5 w-[60px] border label-new bg-blue-500">
+          <span className="flex justify-center items-center text-white">New</span>
+        </div>
+      )}
+    </td>
+  </tr>
+))}
+</tbody> */}

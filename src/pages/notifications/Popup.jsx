@@ -1,39 +1,57 @@
 import { RxCross2 } from "react-icons/rx";
-export const Popup = ({ toggleFunction, specificNotificationDetails }) => {
+import { TbArrowBackUp } from "react-icons/tb";
+export const Popup = ({ toggleFunction, specificNotificationDetails ,popupData}) => {
   console.log(specificNotificationDetails);
+  console.log(popupData);
+  
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 ">
-      <section className="bg-[#FBFBFB] p-5 gap-2 flex flex-col item-center rounded-lg shadow-md border border-[#EBEBEB] ">
-        <div className="flex justify-end">
-          <RxCross2
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <section className="bg-[#FBFBFB] p-5 gap-2 flex flex-col item-center rounded-lg shadow-md  w-[600px]">
+        <div className="flex justify-between items-center border-b pb-2">
+          <TbArrowBackUp
             className="text-2xl cursor-pointer"
             onClick={toggleFunction}
           />
+          <p className="text-dark_grey text-[14px] pl-5">
+            {specificNotificationDetails.date}
+          </p>
         </div>
-        {/* <div className="flex justify-center ">
-          <img
-            className="size-32 h-12 w-full"
-            src="/src/assets/logo/logo-with-name.svg"
-            alt="not found"
-          />
-        </div> */}
-        <div className="flex justify-center py-2 ">
-          <p className="text-dark_grey text_size_3">{specificNotificationDetails.type}</p>
-        </div>
-        <div className="grid grid-cols-2  pl-5">
-          <p className="text-dark_grey text_size_6">Employee ID</p>
+        <div className="grid grid-cols-2 mt-3">
+          <p className="text-dark_grey text_size_6">Emp ID</p>
           <p className="text-dark_grey text-[16px] pl-5">
             {specificNotificationDetails.empID}
           </p>
         </div>
-        <div className="grid grid-cols-2 pl-5">
-          <p className="text-dark_grey text_size_6">Employee Badge number</p>
+        <div className="grid grid-cols-2 mt-1">
+          <p className="text-dark_grey text_size_6">Subject</p>
           <p className="text-dark_grey text-[16px] pl-5">
-            {specificNotificationDetails.empBadgeNo}
+            {specificNotificationDetails.subject}
+          </p>
+        </div>
+        <div className="grid mt-3">
+          <p className="text-dark_grey text_size_6">Description</p>
+          <p className="text-dark_grey text-[16px] mt-2">
+            {specificNotificationDetails.message}
           </p>
         </div>
 
-        <div className="grid grid-cols-2 pl-5">
+
+        {/* empID: notification.empID,
+          subject: notification.leaveType || "Notification",
+          receipentEmail: notification.receipentEmail,
+          senderEmail:notification.senderEmail,
+          message: notification.message,
+          date: new Date(notification.createdAt).toLocaleDateString(), */}
+
+
+        {/* <div className="grid grid-cols-2 pl-5">
+          <p className="text-dark_grey text_size_6">Emp Badge number</p>
+          <p className="text-dark_grey text-[16px] pl-5">
+            {specificNotificationDetails.empBadgeNo}
+          </p>
+        </div> */}
+
+        {/* <div className="grid grid-cols-2 pl-5">
           <p className="text-dark_grey text_size_6">Employee Name</p>
           <p className="text-dark_grey text-[16px] pl-5">
             {specificNotificationDetails.name}
@@ -56,15 +74,8 @@ export const Popup = ({ toggleFunction, specificNotificationDetails }) => {
           <p className="text-dark_grey text-[16px] pl-5">
             {specificNotificationDetails.position}
           </p>
-        </div>
-        <div className="grid grid-cols-2 pl-5 pb-3">
-          <p className="text-dark_grey text_size_6">
-            {specificNotificationDetails.subject}
-          </p>
-          <p className="text-dark_grey text-[16px] pl-5">
-            {specificNotificationDetails.expiryDate}
-          </p>
-        </div>
+        </div> */}
+      
       </section>
     </div>
   );

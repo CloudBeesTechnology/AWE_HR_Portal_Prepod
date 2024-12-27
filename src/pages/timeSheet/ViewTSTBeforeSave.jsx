@@ -26,8 +26,9 @@ import {
   updateTimeSheet,
 } from "../../graphql/mutations";
 import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
-import { useMergeTableForNotification } from "./customTimeSheet/useMergeTableForNotification";
+
 import { Notification } from "./customTimeSheet/Notification";
+import { sendEmail } from "../../services/EmailServices";
 
 const client = generateClient();
 
@@ -43,7 +44,7 @@ export const ViewTSTBeforeSave = ({
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
 
   // State to trigger re-render for Notification component
-
+  const [closePopup, setClosePopup] = useState(false);
   const [data, setData] = useState(null);
   const [secondaryData, setSecondaryData] = useState(null);
   const [currentStatus, setCurrentStatus] = useState(null);
@@ -60,17 +61,8 @@ export const ViewTSTBeforeSave = ({
     data,
     "TimeKeeper"
   );
-  const [email, setEmail] = useState(null);
-  // const getEmail = useMergeTableForNotification(response);
-  const client = generateClient();
-
-  //   const getEmail = useMergeTableForNotification(response);
-  //   console.log(getEmail);
-  // }catch(err){}
-  // };
+  
   const MergeTableForNotification = async (responseData) => {
-    console.log("Response Data:", responseData);
-
     try {
       const empPersonalInfosResponse = await client.graphql({
         query: listEmpPersonalInfos,
@@ -87,17 +79,20 @@ export const ViewTSTBeforeSave = ({
         const getTimeKeeper = candidates.find(
           (candidate) => candidate.empID === responseData.assignBy
         );
-        // if (getManager || getTimeKeeper) {
-        setEmailInfo({
+
+        const emailInfo = {
           ManagerDetails: getManager || null,
           TimeKeeperDetails: getTimeKeeper || null,
-          TimeSheetData: responseData && responseData,
-        });
-        // }
+          TimeSheetData: responseData,
+        };
+
+        setEmailInfo(emailInfo);
+        return emailInfo;
       }
     } catch (err) {
       console.error("Error fetching data from GraphQL:", err.message);
     }
+    return null;
   };
 
   // useEffect(() => {
@@ -126,59 +121,83 @@ export const ViewTSTBeforeSave = ({
   // }, [excelData]);
 
   useEffect(() => {
-    if (excelData) {
-      const fetchData = async () => {
-        // setLoading is removed
-        try {
-          const dataPromise = new Promise((resolve, reject) => {
-            if (excelData) {
-              resolve(excelData);
-            } else {
-              setTimeout(() => {
-                reject("No data found after waiting.");
-              }, 5000);
-            }
-          });
-
-          const fetchedData = await dataPromise;
-
-          // setForUpdateBlng(fetchedData);
-          // setData(fetchedData);
-          const fetchWorkInfo = async () => {
-            // Fetch the BLNG data using GraphQL
-            const [empWorkInfos] = await Promise.all([
-              client.graphql({
-                query: listEmpPersonalInfos,
-              }),
-            ]);
-            const workInfo = empWorkInfos?.data?.listEmpPersonalInfos?.items;
-
-            // Merge fetchedData with workInfo based on FID
-            const mergedData = fetchedData.map((item) => {
-              const workInfoItem = workInfo.find(
-                (info) => info.sapNo == item.NO
-              );
-
-              return {
-                ...item,
-                NORMALWORKINGHRSPERDAY: workInfoItem
-                  ? workInfoItem.workHrs[0]
-                  : null,
-              };
+    try {
+      if (excelData) {
+        const fetchData = async () => {
+          // setLoading is removed
+          try {
+            const dataPromise = new Promise((resolve, reject) => {
+              if (excelData) {
+                resolve(excelData);
+              } else {
+                setTimeout(() => {
+                  reject("No data found after waiting.");
+                }, 5000);
+              }
             });
-            // console.log(mergedData);
 
-            setData(mergedData); // Set merged data
-            setSecondaryData(mergedData);
-          };
+            const fetchedData = await dataPromise;
 
-          fetchWorkInfo();
-        } catch (err) {
-        } finally {
-          // setLoading is removed ;
-        }
-      };
-      fetchData();
+            const fetchWorkInfo = async () => {
+              // Fetch the BLNG data using GraphQL
+              const [employeeInfo, empWorkInfos] = await Promise.all([
+                client.graphql({ query: listEmpPersonalInfos }),
+                client.graphql({ query: listEmpWorkInfos }),
+              ]);
+              const empInfo = employeeInfo?.data?.listEmpPersonalInfos?.items;
+              const workInfo = empWorkInfos?.data?.listEmpWorkInfos?.items;
+              const sapNoRemoved = workInfo.map((item) => {
+                const { sapNo, ...rest } = item;
+                return rest;
+              });
+
+              const mergedDatas = empInfo
+                .map((empInf) => {
+                  const interviewDetails = sapNoRemoved.find(
+                    (item) => item?.empID === empInf?.empID
+                  );
+
+                  // Return null if all details are undefined
+                  if (!interviewDetails) {
+                    return null;
+                  }
+
+                  return {
+                    ...empInf,
+                    ...interviewDetails,
+                  };
+                })
+                .filter((item) => item !== null);
+
+              console.log(mergedDatas);
+              // Merge fetchedData with workInfo based on FID
+              const mergedData = fetchedData.map((item) => {
+                const workInfoItem = mergedDatas.find(
+                  (info) => info?.sapNo == item?.NO
+                );
+                console.log(workInfoItem);
+                return {
+                  ...item,
+                  NORMALWORKINGHRSPERDAY: workInfoItem
+                    ? workInfoItem.workHrs[workInfoItem.workHrs.length - 1]
+                    : null,
+                };
+              });
+
+              setData(mergedData); // Set merged data
+              setSecondaryData(mergedData);
+            };
+
+            fetchWorkInfo();
+          } catch (err) {
+          } finally {
+            // setLoading is removed ;
+          }
+        };
+        fetchData();
+      }
+    } catch (err) {
+      console.log("Error : ", err);
     }
   }, [excelData]);
   useEffect(() => {
@@ -193,7 +212,7 @@ export const ViewTSTBeforeSave = ({
   const pendingData = (data) => {
     if (data && data.length > 0) {
       setCurrentStatus(true);
-
+     
       const result = data?.map((val) => {
         let parsedEmpWorkInfo = [];
         try {
@@ -278,7 +297,7 @@ export const ViewTSTBeforeSave = ({
           });
         resolve(keyCheckResult);
       });
-
+      setClosePopup(true);
       setShowStatusCol(result);
       setCurrentStatus(result); // Assuming setCurrentStatus is defined
       setLoading(false);
@@ -306,8 +325,6 @@ export const ViewTSTBeforeSave = ({
           //   (val) => val.status !== "Approved"
           // );
 
-          console.log(fetchedData);
-
           // const filterPending = fetchedData
           //   .map((value) => {
           //     return {
@@ -330,7 +347,7 @@ export const ViewTSTBeforeSave = ({
 
           if (userIdentification === "Manager") {
             const finalData = await SendDataToManager(fetchedData);
-            console.log(finalData);
+
             pendingData(finalData);
           }
         } catch (err) {
@@ -384,7 +401,6 @@ export const ViewTSTBeforeSave = ({
   };
 
   const editFlatData = (data, getObject) => {
-    console.log(getObject);
     return data.map((val) => {
       if (val.NO === getObject.NO) {
         return getObject;
@@ -429,8 +445,6 @@ export const ViewTSTBeforeSave = ({
           };
         });
 
-      console.log("managerData : ", managerData);
-
       const finalResult = result.map((val) => {
         return {
           ...val,
@@ -443,13 +457,12 @@ export const ViewTSTBeforeSave = ({
 
       const sendTimeSheets = async (timeSheetData) => {
         let successFlag = false;
+
         for (const timeSheet of timeSheetData) {
           try {
             const response = await client.graphql({
               query: createTimeSheet,
-              variables: {
-                input: timeSheet,
-              },
+              variables: { input: timeSheet },
             });
 
             if (response?.data?.createTimeSheet) {
@@ -458,9 +471,35 @@ export const ViewTSTBeforeSave = ({
                 response.data.createTimeSheet
               );
               const responseData = response.data.createTimeSheet;
+
               if (!successFlag) {
                 toggleSFAMessage(true, responseData); // Only toggle success message once
-                MergeTableForNotification(responseData);
+
+                const result = await MergeTableForNotification(responseData);
+                console.log(result);
+
+                if (result) {
+                  // Call the Notification function
+                  const emailDetails = await Notification({
+                    getEmail: result, // Fix: Pass 'getEmail' instead of 'result'
+                    Position,
+                  });
+
+                  if (emailDetails) {
+                    // Log email details
+                    const { subject, message, fromAddress, toAddress } =
+                      emailDetails;
+
+                    await sendEmail(subject, message, fromAddress, toAddress);
+                  } else {
+                    console.error("Notification returned undefined!");
+                  }
+                } else {
+                  console.error(
+                    "MergeTableForNotification returned undefined!"
+                  );
+                }
+
                 successFlag = true; // Set the flag to true
               }
             }
@@ -533,15 +572,34 @@ export const ViewTSTBeforeSave = ({
             });
 
             if (response?.data?.updateTimeSheet) {
-              console.log(
-                "TimeSheet Updated successfully:",
-                response.data.updateTimeSheet
-              );
-
               const responseData = response.data.updateTimeSheet;
               if (!successFlag) {
                 toggleSFAMessage(true, responseData); // Only toggle success message once
-                MergeTableForNotification(responseData);
+
+                const result = await MergeTableForNotification(responseData);
+
+                if (result) {
+                  // Call the Notification function
+                  const emailDetails = await Notification({
+                    getEmail: result, // Fix: Pass 'getEmail' instead of 'result'
+                    Position,
+                  });
+
+                  if (emailDetails) {
+                    // Log email details
+                    const { subject, message, fromAddress, toAddress } =
+                      emailDetails;
+                    console.log(subject, message, fromAddress, toAddress);
+                    await sendEmail(subject, message, fromAddress, toAddress);
+                  } else {
+                    console.error("Notification returned undefined!");
+                  }
+                } else {
+                  console.error(
+                    "MergeTableForNotification returned undefined!"
+                  );
+                }
+
                 successFlag = true; // Set the flag to true
               }
               setVisibleData([]);
@@ -591,7 +649,7 @@ export const ViewTSTBeforeSave = ({
   };
 
   return (
-    <div className="border border-white">
+    <div>
       {currentStatus ? (
         <div>
           <div className="flex justify-end w-full mr-7">
@@ -604,13 +662,13 @@ export const ViewTSTBeforeSave = ({
             />
           </div>
 
-          <div className="table-container" onScroll={handleScroll}>
+          <div className="table-container " onScroll={handleScroll}>
             {/* w-[1190px] */}
             <table className="styled-table w-full">
               {/*  */}
-              <thead className="sticky-header  h-12">
-                <tr className="text_size_5">
-                  <td className="px-4 flex-1 text_size_7">S No.</td>
+              <thead className="sticky-header border">
+                <tr className="text_size_5 ">
+                  <td className="px-5 flex-1 text_size_7">S No.</td>
                   {AllFieldData?.tableHeader.map((header, index) => (
                     <td key={index} className="px-5 flex-1 text_size_7">
                       {header}
@@ -622,13 +680,7 @@ export const ViewTSTBeforeSave = ({
                       </td>
                     </tr>
                   )}
-                  {/* <td className="px-4 flex-1 text-start">EMPLOYEE NAME</td>
-                  <td className="px-4 flex-1">SUB ID</td>
-                  <td className="px-4 flex-1 text-start">LOCATION</td>
-                  <td className="px-4 flex-1">DATE</td>
-                  <td className="px-4 flex-1">TOTAL NT</td>
-                  <td className="px-4 flex-1">TOTAL OT</td>
-                  <td className="px-4 flex-1">TOTAL NT/OT</td> */}
+
                   {showStatusCol === true ? (
                     ""
                   ) : (
@@ -784,10 +836,15 @@ export const ViewTSTBeforeSave = ({
             </button>
           </div>
         </div>
-      ) : currentStatus === false ? (
-        <PopupForMissMatchExcelSheet />
-      ) : (
+      ) 
+      // : currentStatus === false ? (
+      //   <PopupForMissMatchExcelSheet setClosePopup={setClosePopup} />
+      // ) 
+      : (
         ""
+      )}
+      {currentStatus === false && closePopup === true &&(
+        <PopupForMissMatchExcelSheet setClosePopup={setClosePopup} />
       )}
       {toggleHandler === true && (
         <EditTimeSheet
@@ -815,7 +872,6 @@ export const ViewTSTBeforeSave = ({
           renameKeysFunctionAndSubmit={renameKeysFunctionAndSubmit}
         />
       )}
-      {/* {emailInfo && successMess && Position && <Notification getEmail={emailInfo} Position={Position}/>} */}
     </div>
   );
 };

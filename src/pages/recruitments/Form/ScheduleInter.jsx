@@ -18,7 +18,7 @@ export const ScheduleInter = ({ candidate, onClose }) => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm({ 
     resolver: yupResolver(InterviewScheduleSchema),
   });
 
@@ -30,18 +30,19 @@ export const ScheduleInter = ({ candidate, onClose }) => {
       interDate: new Date(data.interDate),
       tempID: candidate.tempID,
       candidateStatus: "pending",
+      status: "interviewscheduled",
     }; 
 
     const mobilizationData = {
       tempID: candidate.tempID,
-      // Include other required fields for localMobilization
+    
     };
   
 
-    console.log("Formatted Data:", formattedData);
-    console.log("Mobilization Data:", mobilizationData);
+    // console.log("Formatted Data:", formattedData);
+    // console.log("Mobilization Data:", mobilizationData);
 
-    // setNotification(true);
+    setNotification(true);
     await createSchedule(formattedData);
     await localMobilization(mobilizationData)
   });

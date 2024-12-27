@@ -23,7 +23,7 @@ const Popup = ({ details, popupAll, onClose }) => {
           if (value) {
             const fileKey = JSON.parse(value);
             if (Array.isArray(fileKey) && fileKey.length > 0) {
-              const lastUpload = fileKey[fileKey.length - 1].upload;
+              const lastUpload = fileKey[fileKey.length -1].upload;
               try {
                 // const trimmedPath = lastUpload?.replace(/^public\//, ""); // Remove 'public/' if it exists
                 const result = await getUrl({ path: lastUpload });
@@ -44,15 +44,15 @@ const Popup = ({ details, popupAll, onClose }) => {
   }, [details, popupAll]);
 
   return (
-    <div className="fixed top-0 w-full left-0 bg-black bg-opacity-50 z-[9999] py-10 min-h-screen flex items-center justify-center ">
+    <div className="fixed top-0 w-full left-0 bg-black bg-opacity-50 z-[9999] py-7 min-h-screen flex items-center justify-center ">
       <div className="bg-white rounded-lg shadow-lg p-6 w-[40%] overflow-y-auto scrollBar">
        <div className="flex justify-between items-center pb-3 ">
-<div className="w-full  center ">
+<div className="w-full center">
 <img src={AweLogo} alt="Logo" className="max-w-[200px] " />
 </div>       
 <button
           onClick={onClose}
-          className="rounded-md  "
+          className="rounded-md"
         >
           <IoIosCloseCircleOutline className="text-[32px] font-xs" />
         </button>

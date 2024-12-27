@@ -1,7 +1,7 @@
 import { generateClient } from "@aws-amplify/api";
 import { useEffect, useState } from "react";
 import {
-  listEmpPersonalInfos, 
+  listEmpPersonalInfos,
   listEmpWorkInfos,
 } from "../../../graphql/queries";
 const client = generateClient();
@@ -33,7 +33,7 @@ export const useTableMerged = (excelData) => {
           const candidates =
             empPersonalInfos?.data?.listEmpPersonalInfos?.items;
           const interviews = empPersonalDocs?.data?.listEmpWorkInfos?.items;
-console.log(empPersonalInfos)
+
           const mergedData = candidates
             .map((candidate) => {
               const interviewDetails = interviews.find(
@@ -55,16 +55,17 @@ console.log(empPersonalInfos)
           const fetchWorkInfo = async () => {
             const finalData = fetchedData?.map((item) => {
               const workInfoItem = mergedData?.find(
-                (info) => info.empBadgeNo == item.BADGE
+                (info) => info.empBadgeNo === item.BADGE
               );
+              console.log("workInfoItem : ", workInfoItem);
               return {
                 ...item,
                 NORMALWORKINGHRSPERDAY: workInfoItem
-                  ? workInfoItem.workHrs[0]
+                  ? workInfoItem.workHrs[workInfoItem.workHrs.length - 1]
                   : null,
               };
             });
-            // console.log("useTableMergedData : ", finalData);
+            console.log("useTableMergedData : ", finalData);
             setData(finalData);
           };
           fetchWorkInfo();

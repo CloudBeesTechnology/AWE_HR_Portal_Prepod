@@ -46,7 +46,6 @@ export const EmployeeInfo = () => {
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedRace, setSelectedRace] = useState("");
   const [filteredEmployees, setFilteredEmployees] = useState([]);
-
   const [notification, setNotification] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState({
     bwnUpload: [],
@@ -234,6 +233,24 @@ export const EmployeeInfo = () => {
     return Array.isArray(value) ? value[value.length - 1] : value;
   };
 
+  const preprocessJSONString = (str) => {
+    try {
+      // Replace `=` with `:`
+      let processedStr = str.replace(/=/g, ":");
+
+      // Add quotes around keys
+      processedStr = processedStr.replace(/([{,])\s*(\w+)\s*:/g, '$1"$2":');
+
+      // Add quotes around string values
+      processedStr = processedStr.replace(/:\s*([^"{[\]},]+)/g, ': "$1"');
+
+      return processedStr;
+    } catch (error) {
+      console.error("Error processing string:", error);
+      return str; // Return original string if there's an error
+    }
+  };
+
   const searchResult = (result) => {
     const keysToSet = [
       "empID",
@@ -348,35 +365,55 @@ export const EmployeeInfo = () => {
     uploadFields.map((field) => {
       if (result && result[field]) {
         try {
-          // Parse the field data if it exists
-          const parsedArray = JSON.parse(result[field]);
+          // First, parse the outermost level
+          const outerParsed = JSON.parse(result[field]);
+          const parsedArray = Array.isArray(outerParsed)
+            ? outerParsed
+            : [outerParsed];
 
-          // Then, parse each element inside the array (if it's stringified as well)
-          const parsedFiles = parsedArray.map((item) =>
-            typeof item === "string" ? JSON.parse(item) : item
-          );
+          // Now process each item inside the array
+          const parsedFiles = parsedArray.map((item) => {
+            if (typeof item === "string") {
+              try {
+                const validJSON = preprocessJSONString(item); // Preprocess the string
+                return JSON.parse(validJSON); // Parse the corrected JSON string
+              } catch (e) {
+                // console.error(`Failed to parse item for "${field}":`, item, e);
+                return item; // Return as-is if it can't be parsed
+              }
+            }
+            return item; // Return the item if it's already an object
+          });
+
+          // Get the last file path
+
+          const lastFile = parsedFiles[parsedFiles.length - 1];
+          // console.log(lastFile[0]?.upload);
+          const lastFileName = lastFile?.upload
+            ? getFileName(lastFile.upload)
+            : lastFile[0]?.upload
+            ? getFileName(lastFile[0].upload)
+            : null;
+
+          // Set values
           setValue(field, parsedFiles);
-
-          setUploadedFiles((prev) => ({
-            ...prev,
-            [field]: parsedFiles, // Dynamically set based on field name
-          }));
-
+          setUploadedFiles((prev) => ({ ...prev, [field]: parsedFiles }));
           setUploadedFileNames((prev) => ({
             ...prev,
-            [field]:
-              parsedFiles.length > 0
-                ? getFileName(parsedFiles[parsedFiles.length - 1].upload)
-                : "",
+            [field]: lastFileName || "",
           }));
         } catch (error) {
-          console.error(`Failed to parse ${field}:`, error);
+          // console.error(`Failed to parse ${field}:`, error);
         }
       }
     });
   };
 
   const getFileName = (filePath) => {
+    if (!filePath || typeof filePath !== "string") {
+      console.error("Invalid file path:", filePath); // Log error for debugging
+      return ""; // Return an empty string if the file path is invalid
+    }
     const fileNameWithExtension = filePath.split("/").pop(); // Get file name with extension
     const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
     return fileName;
@@ -707,7 +744,7 @@ export const EmployeeInfo = () => {
           <SpinLogo
             text={showTitle}
             notification={notification}
-            path="/employee"
+            path="/employeeInfo"
           />
         )}
       </form>

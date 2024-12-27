@@ -208,6 +208,25 @@ export default function CandIToEMPCreateForm(props) {
     salaryExpectation: "",
     supportInfo: "",
     workExperience: [],
+    mobSignDate: "",
+    mobFile: "",
+    paafApproveDate: "",
+    paafFile: "",
+    loiIssueDate: "",
+    loiAcceptDate: "",
+    loiDeclineDate: "",
+    declineReason: "",
+    loiFile: "",
+    cvecApproveDate: "",
+    cvecFile: "",
+    uploadCertificate: [],
+    pcNoticePeriod: "",
+    venue: "",
+    managerBadgeNo: "",
+    message: "",
+    interType: "",
+    interTime: "",
+    interDate: "",
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [crime, setCrime] = React.useState(initialValues.crime);
@@ -239,6 +258,45 @@ export default function CandIToEMPCreateForm(props) {
   const [workExperience, setWorkExperience] = React.useState(
     initialValues.workExperience
   );
+  const [mobSignDate, setMobSignDate] = React.useState(
+    initialValues.mobSignDate
+  );
+  const [mobFile, setMobFile] = React.useState(initialValues.mobFile);
+  const [paafApproveDate, setPaafApproveDate] = React.useState(
+    initialValues.paafApproveDate
+  );
+  const [paafFile, setPaafFile] = React.useState(initialValues.paafFile);
+  const [loiIssueDate, setLoiIssueDate] = React.useState(
+    initialValues.loiIssueDate
+  );
+  const [loiAcceptDate, setLoiAcceptDate] = React.useState(
+    initialValues.loiAcceptDate
+  );
+  const [loiDeclineDate, setLoiDeclineDate] = React.useState(
+    initialValues.loiDeclineDate
+  );
+  const [declineReason, setDeclineReason] = React.useState(
+    initialValues.declineReason
+  );
+  const [loiFile, setLoiFile] = React.useState(initialValues.loiFile);
+  const [cvecApproveDate, setCvecApproveDate] = React.useState(
+    initialValues.cvecApproveDate
+  );
+  const [cvecFile, setCvecFile] = React.useState(initialValues.cvecFile);
+  const [uploadCertificate, setUploadCertificate] = React.useState(
+    initialValues.uploadCertificate
+  );
+  const [pcNoticePeriod, setPcNoticePeriod] = React.useState(
+    initialValues.pcNoticePeriod
+  );
+  const [venue, setVenue] = React.useState(initialValues.venue);
+  const [managerBadgeNo, setManagerBadgeNo] = React.useState(
+    initialValues.managerBadgeNo
+  );
+  const [message, setMessage] = React.useState(initialValues.message);
+  const [interType, setInterType] = React.useState(initialValues.interType);
+  const [interTime, setInterTime] = React.useState(initialValues.interTime);
+  const [interDate, setInterDate] = React.useState(initialValues.interDate);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setEmpID(initialValues.empID);
@@ -263,6 +321,26 @@ export default function CandIToEMPCreateForm(props) {
     setSupportInfo(initialValues.supportInfo);
     setWorkExperience(initialValues.workExperience);
     setCurrentWorkExperienceValue("");
+    setMobSignDate(initialValues.mobSignDate);
+    setMobFile(initialValues.mobFile);
+    setPaafApproveDate(initialValues.paafApproveDate);
+    setPaafFile(initialValues.paafFile);
+    setLoiIssueDate(initialValues.loiIssueDate);
+    setLoiAcceptDate(initialValues.loiAcceptDate);
+    setLoiDeclineDate(initialValues.loiDeclineDate);
+    setDeclineReason(initialValues.declineReason);
+    setLoiFile(initialValues.loiFile);
+    setCvecApproveDate(initialValues.cvecApproveDate);
+    setCvecFile(initialValues.cvecFile);
+    setUploadCertificate(initialValues.uploadCertificate);
+    setCurrentUploadCertificateValue("");
+    setPcNoticePeriod(initialValues.pcNoticePeriod);
+    setVenue(initialValues.venue);
+    setManagerBadgeNo(initialValues.managerBadgeNo);
+    setMessage(initialValues.message);
+    setInterType(initialValues.interType);
+    setInterTime(initialValues.interTime);
+    setInterDate(initialValues.interDate);
     setErrors({});
   };
   const [currentEmgDetailsValue, setCurrentEmgDetailsValue] =
@@ -275,6 +353,9 @@ export default function CandIToEMPCreateForm(props) {
   const [currentWorkExperienceValue, setCurrentWorkExperienceValue] =
     React.useState("");
   const workExperienceRef = React.createRef();
+  const [currentUploadCertificateValue, setCurrentUploadCertificateValue] =
+    React.useState("");
+  const uploadCertificateRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
     crime: [],
@@ -294,6 +375,25 @@ export default function CandIToEMPCreateForm(props) {
     salaryExpectation: [],
     supportInfo: [],
     workExperience: [{ type: "JSON" }],
+    mobSignDate: [],
+    mobFile: [],
+    paafApproveDate: [],
+    paafFile: [],
+    loiIssueDate: [],
+    loiAcceptDate: [],
+    loiDeclineDate: [],
+    declineReason: [],
+    loiFile: [],
+    cvecApproveDate: [],
+    cvecFile: [],
+    uploadCertificate: [{ type: "JSON" }],
+    pcNoticePeriod: [],
+    venue: [],
+    managerBadgeNo: [],
+    message: [],
+    interType: [],
+    interTime: [],
+    interDate: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -339,6 +439,25 @@ export default function CandIToEMPCreateForm(props) {
           salaryExpectation,
           supportInfo,
           workExperience,
+          mobSignDate,
+          mobFile,
+          paafApproveDate,
+          paafFile,
+          loiIssueDate,
+          loiAcceptDate,
+          loiDeclineDate,
+          declineReason,
+          loiFile,
+          cvecApproveDate,
+          cvecFile,
+          uploadCertificate,
+          pcNoticePeriod,
+          venue,
+          managerBadgeNo,
+          message,
+          interType,
+          interTime,
+          interDate,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -419,6 +538,25 @@ export default function CandIToEMPCreateForm(props) {
               salaryExpectation,
               supportInfo,
               workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -460,6 +598,25 @@ export default function CandIToEMPCreateForm(props) {
               salaryExpectation,
               supportInfo,
               workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
             };
             const result = onChange(modelFields);
             value = result?.crime ?? value;
@@ -501,6 +658,25 @@ export default function CandIToEMPCreateForm(props) {
               salaryExpectation,
               supportInfo,
               workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
             };
             const result = onChange(modelFields);
             value = result?.crimeDesc ?? value;
@@ -538,6 +714,25 @@ export default function CandIToEMPCreateForm(props) {
               salaryExpectation,
               supportInfo,
               workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
             };
             const result = onChange(modelFields);
             values = result?.emgDetails ?? values;
@@ -606,6 +801,25 @@ export default function CandIToEMPCreateForm(props) {
               salaryExpectation,
               supportInfo,
               workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
             };
             const result = onChange(modelFields);
             value = result?.noExperience ?? value;
@@ -647,6 +861,25 @@ export default function CandIToEMPCreateForm(props) {
               salaryExpectation,
               supportInfo,
               workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
             };
             const result = onChange(modelFields);
             value = result?.empStatement ?? value;
@@ -688,6 +921,25 @@ export default function CandIToEMPCreateForm(props) {
               salaryExpectation,
               supportInfo,
               workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
             };
             const result = onChange(modelFields);
             value = result?.desc ?? value;
@@ -729,6 +981,25 @@ export default function CandIToEMPCreateForm(props) {
               salaryExpectation,
               supportInfo,
               workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
             };
             const result = onChange(modelFields);
             value = result?.disease ?? value;
@@ -770,6 +1041,25 @@ export default function CandIToEMPCreateForm(props) {
               salaryExpectation,
               supportInfo,
               workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
             };
             const result = onChange(modelFields);
             value = result?.diseaseDesc ?? value;
@@ -811,6 +1101,25 @@ export default function CandIToEMPCreateForm(props) {
               salaryExpectation,
               supportInfo,
               workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
             };
             const result = onChange(modelFields);
             value = result?.liquor ?? value;
@@ -852,6 +1161,25 @@ export default function CandIToEMPCreateForm(props) {
               salaryExpectation,
               supportInfo,
               workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
             };
             const result = onChange(modelFields);
             value = result?.liquorDesc ?? value;
@@ -893,6 +1221,25 @@ export default function CandIToEMPCreateForm(props) {
               salaryExpectation,
               supportInfo,
               workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
             };
             const result = onChange(modelFields);
             value = result?.perIS ?? value;
@@ -934,6 +1281,25 @@ export default function CandIToEMPCreateForm(props) {
               salaryExpectation,
               supportInfo,
               workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
             };
             const result = onChange(modelFields);
             value = result?.perID ?? value;
@@ -971,6 +1337,25 @@ export default function CandIToEMPCreateForm(props) {
               salaryExpectation,
               supportInfo,
               workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
             };
             const result = onChange(modelFields);
             values = result?.referees ?? values;
@@ -1033,6 +1418,25 @@ export default function CandIToEMPCreateForm(props) {
               salaryExpectation,
               supportInfo,
               workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
             };
             const result = onChange(modelFields);
             values = result?.relatives ?? values;
@@ -1099,6 +1503,25 @@ export default function CandIToEMPCreateForm(props) {
               salaryExpectation: value,
               supportInfo,
               workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
             };
             const result = onChange(modelFields);
             value = result?.salaryExpectation ?? value;
@@ -1142,6 +1565,25 @@ export default function CandIToEMPCreateForm(props) {
               salaryExpectation,
               supportInfo: value,
               workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
             };
             const result = onChange(modelFields);
             value = result?.supportInfo ?? value;
@@ -1179,6 +1621,25 @@ export default function CandIToEMPCreateForm(props) {
               salaryExpectation,
               supportInfo,
               workExperience: values,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
             };
             const result = onChange(modelFields);
             values = result?.workExperience ?? values;
@@ -1220,6 +1681,1175 @@ export default function CandIToEMPCreateForm(props) {
           {...getOverrideProps(overrides, "workExperience")}
         ></TextAreaField>
       </ArrayField>
+      <TextField
+        label="Mob sign date"
+        isRequired={false}
+        isReadOnly={false}
+        value={mobSignDate}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              perIS,
+              perID,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              workExperience,
+              mobSignDate: value,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.mobSignDate ?? value;
+          }
+          if (errors.mobSignDate?.hasError) {
+            runValidationTasks("mobSignDate", value);
+          }
+          setMobSignDate(value);
+        }}
+        onBlur={() => runValidationTasks("mobSignDate", mobSignDate)}
+        errorMessage={errors.mobSignDate?.errorMessage}
+        hasError={errors.mobSignDate?.hasError}
+        {...getOverrideProps(overrides, "mobSignDate")}
+      ></TextField>
+      <TextField
+        label="Mob file"
+        isRequired={false}
+        isReadOnly={false}
+        value={mobFile}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              perIS,
+              perID,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              workExperience,
+              mobSignDate,
+              mobFile: value,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.mobFile ?? value;
+          }
+          if (errors.mobFile?.hasError) {
+            runValidationTasks("mobFile", value);
+          }
+          setMobFile(value);
+        }}
+        onBlur={() => runValidationTasks("mobFile", mobFile)}
+        errorMessage={errors.mobFile?.errorMessage}
+        hasError={errors.mobFile?.hasError}
+        {...getOverrideProps(overrides, "mobFile")}
+      ></TextField>
+      <TextField
+        label="Paaf approve date"
+        isRequired={false}
+        isReadOnly={false}
+        value={paafApproveDate}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              perIS,
+              perID,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate: value,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.paafApproveDate ?? value;
+          }
+          if (errors.paafApproveDate?.hasError) {
+            runValidationTasks("paafApproveDate", value);
+          }
+          setPaafApproveDate(value);
+        }}
+        onBlur={() => runValidationTasks("paafApproveDate", paafApproveDate)}
+        errorMessage={errors.paafApproveDate?.errorMessage}
+        hasError={errors.paafApproveDate?.hasError}
+        {...getOverrideProps(overrides, "paafApproveDate")}
+      ></TextField>
+      <TextField
+        label="Paaf file"
+        isRequired={false}
+        isReadOnly={false}
+        value={paafFile}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              perIS,
+              perID,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile: value,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.paafFile ?? value;
+          }
+          if (errors.paafFile?.hasError) {
+            runValidationTasks("paafFile", value);
+          }
+          setPaafFile(value);
+        }}
+        onBlur={() => runValidationTasks("paafFile", paafFile)}
+        errorMessage={errors.paafFile?.errorMessage}
+        hasError={errors.paafFile?.hasError}
+        {...getOverrideProps(overrides, "paafFile")}
+      ></TextField>
+      <TextField
+        label="Loi issue date"
+        isRequired={false}
+        isReadOnly={false}
+        value={loiIssueDate}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              perIS,
+              perID,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate: value,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.loiIssueDate ?? value;
+          }
+          if (errors.loiIssueDate?.hasError) {
+            runValidationTasks("loiIssueDate", value);
+          }
+          setLoiIssueDate(value);
+        }}
+        onBlur={() => runValidationTasks("loiIssueDate", loiIssueDate)}
+        errorMessage={errors.loiIssueDate?.errorMessage}
+        hasError={errors.loiIssueDate?.hasError}
+        {...getOverrideProps(overrides, "loiIssueDate")}
+      ></TextField>
+      <TextField
+        label="Loi accept date"
+        isRequired={false}
+        isReadOnly={false}
+        value={loiAcceptDate}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              perIS,
+              perID,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate: value,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.loiAcceptDate ?? value;
+          }
+          if (errors.loiAcceptDate?.hasError) {
+            runValidationTasks("loiAcceptDate", value);
+          }
+          setLoiAcceptDate(value);
+        }}
+        onBlur={() => runValidationTasks("loiAcceptDate", loiAcceptDate)}
+        errorMessage={errors.loiAcceptDate?.errorMessage}
+        hasError={errors.loiAcceptDate?.hasError}
+        {...getOverrideProps(overrides, "loiAcceptDate")}
+      ></TextField>
+      <TextField
+        label="Loi decline date"
+        isRequired={false}
+        isReadOnly={false}
+        value={loiDeclineDate}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              perIS,
+              perID,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate: value,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.loiDeclineDate ?? value;
+          }
+          if (errors.loiDeclineDate?.hasError) {
+            runValidationTasks("loiDeclineDate", value);
+          }
+          setLoiDeclineDate(value);
+        }}
+        onBlur={() => runValidationTasks("loiDeclineDate", loiDeclineDate)}
+        errorMessage={errors.loiDeclineDate?.errorMessage}
+        hasError={errors.loiDeclineDate?.hasError}
+        {...getOverrideProps(overrides, "loiDeclineDate")}
+      ></TextField>
+      <TextField
+        label="Decline reason"
+        isRequired={false}
+        isReadOnly={false}
+        value={declineReason}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              perIS,
+              perID,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason: value,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.declineReason ?? value;
+          }
+          if (errors.declineReason?.hasError) {
+            runValidationTasks("declineReason", value);
+          }
+          setDeclineReason(value);
+        }}
+        onBlur={() => runValidationTasks("declineReason", declineReason)}
+        errorMessage={errors.declineReason?.errorMessage}
+        hasError={errors.declineReason?.hasError}
+        {...getOverrideProps(overrides, "declineReason")}
+      ></TextField>
+      <TextField
+        label="Loi file"
+        isRequired={false}
+        isReadOnly={false}
+        value={loiFile}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              perIS,
+              perID,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile: value,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.loiFile ?? value;
+          }
+          if (errors.loiFile?.hasError) {
+            runValidationTasks("loiFile", value);
+          }
+          setLoiFile(value);
+        }}
+        onBlur={() => runValidationTasks("loiFile", loiFile)}
+        errorMessage={errors.loiFile?.errorMessage}
+        hasError={errors.loiFile?.hasError}
+        {...getOverrideProps(overrides, "loiFile")}
+      ></TextField>
+      <TextField
+        label="Cvec approve date"
+        isRequired={false}
+        isReadOnly={false}
+        value={cvecApproveDate}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              perIS,
+              perID,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate: value,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.cvecApproveDate ?? value;
+          }
+          if (errors.cvecApproveDate?.hasError) {
+            runValidationTasks("cvecApproveDate", value);
+          }
+          setCvecApproveDate(value);
+        }}
+        onBlur={() => runValidationTasks("cvecApproveDate", cvecApproveDate)}
+        errorMessage={errors.cvecApproveDate?.errorMessage}
+        hasError={errors.cvecApproveDate?.hasError}
+        {...getOverrideProps(overrides, "cvecApproveDate")}
+      ></TextField>
+      <TextField
+        label="Cvec file"
+        isRequired={false}
+        isReadOnly={false}
+        value={cvecFile}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              perIS,
+              perID,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile: value,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.cvecFile ?? value;
+          }
+          if (errors.cvecFile?.hasError) {
+            runValidationTasks("cvecFile", value);
+          }
+          setCvecFile(value);
+        }}
+        onBlur={() => runValidationTasks("cvecFile", cvecFile)}
+        errorMessage={errors.cvecFile?.errorMessage}
+        hasError={errors.cvecFile?.hasError}
+        {...getOverrideProps(overrides, "cvecFile")}
+      ></TextField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              perIS,
+              perID,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate: values,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
+            };
+            const result = onChange(modelFields);
+            values = result?.uploadCertificate ?? values;
+          }
+          setUploadCertificate(values);
+          setCurrentUploadCertificateValue("");
+        }}
+        currentFieldValue={currentUploadCertificateValue}
+        label={"Upload certificate"}
+        items={uploadCertificate}
+        hasError={errors?.uploadCertificate?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks(
+            "uploadCertificate",
+            currentUploadCertificateValue
+          )
+        }
+        errorMessage={errors?.uploadCertificate?.errorMessage}
+        setFieldValue={setCurrentUploadCertificateValue}
+        inputFieldRef={uploadCertificateRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Upload certificate"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentUploadCertificateValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.uploadCertificate?.hasError) {
+              runValidationTasks("uploadCertificate", value);
+            }
+            setCurrentUploadCertificateValue(value);
+          }}
+          onBlur={() =>
+            runValidationTasks(
+              "uploadCertificate",
+              currentUploadCertificateValue
+            )
+          }
+          errorMessage={errors.uploadCertificate?.errorMessage}
+          hasError={errors.uploadCertificate?.hasError}
+          ref={uploadCertificateRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "uploadCertificate")}
+        ></TextAreaField>
+      </ArrayField>
+      <TextField
+        label="Pc notice period"
+        isRequired={false}
+        isReadOnly={false}
+        value={pcNoticePeriod}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              perIS,
+              perID,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod: value,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.pcNoticePeriod ?? value;
+          }
+          if (errors.pcNoticePeriod?.hasError) {
+            runValidationTasks("pcNoticePeriod", value);
+          }
+          setPcNoticePeriod(value);
+        }}
+        onBlur={() => runValidationTasks("pcNoticePeriod", pcNoticePeriod)}
+        errorMessage={errors.pcNoticePeriod?.errorMessage}
+        hasError={errors.pcNoticePeriod?.hasError}
+        {...getOverrideProps(overrides, "pcNoticePeriod")}
+      ></TextField>
+      <TextField
+        label="Venue"
+        isRequired={false}
+        isReadOnly={false}
+        value={venue}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              perIS,
+              perID,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue: value,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.venue ?? value;
+          }
+          if (errors.venue?.hasError) {
+            runValidationTasks("venue", value);
+          }
+          setVenue(value);
+        }}
+        onBlur={() => runValidationTasks("venue", venue)}
+        errorMessage={errors.venue?.errorMessage}
+        hasError={errors.venue?.hasError}
+        {...getOverrideProps(overrides, "venue")}
+      ></TextField>
+      <TextField
+        label="Manager badge no"
+        isRequired={false}
+        isReadOnly={false}
+        value={managerBadgeNo}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              perIS,
+              perID,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo: value,
+              message,
+              interType,
+              interTime,
+              interDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.managerBadgeNo ?? value;
+          }
+          if (errors.managerBadgeNo?.hasError) {
+            runValidationTasks("managerBadgeNo", value);
+          }
+          setManagerBadgeNo(value);
+        }}
+        onBlur={() => runValidationTasks("managerBadgeNo", managerBadgeNo)}
+        errorMessage={errors.managerBadgeNo?.errorMessage}
+        hasError={errors.managerBadgeNo?.hasError}
+        {...getOverrideProps(overrides, "managerBadgeNo")}
+      ></TextField>
+      <TextField
+        label="Message"
+        isRequired={false}
+        isReadOnly={false}
+        value={message}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              perIS,
+              perID,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message: value,
+              interType,
+              interTime,
+              interDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.message ?? value;
+          }
+          if (errors.message?.hasError) {
+            runValidationTasks("message", value);
+          }
+          setMessage(value);
+        }}
+        onBlur={() => runValidationTasks("message", message)}
+        errorMessage={errors.message?.errorMessage}
+        hasError={errors.message?.hasError}
+        {...getOverrideProps(overrides, "message")}
+      ></TextField>
+      <TextField
+        label="Inter type"
+        isRequired={false}
+        isReadOnly={false}
+        value={interType}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              perIS,
+              perID,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType: value,
+              interTime,
+              interDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.interType ?? value;
+          }
+          if (errors.interType?.hasError) {
+            runValidationTasks("interType", value);
+          }
+          setInterType(value);
+        }}
+        onBlur={() => runValidationTasks("interType", interType)}
+        errorMessage={errors.interType?.errorMessage}
+        hasError={errors.interType?.hasError}
+        {...getOverrideProps(overrides, "interType")}
+      ></TextField>
+      <TextField
+        label="Inter time"
+        isRequired={false}
+        isReadOnly={false}
+        value={interTime}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              perIS,
+              perID,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime: value,
+              interDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.interTime ?? value;
+          }
+          if (errors.interTime?.hasError) {
+            runValidationTasks("interTime", value);
+          }
+          setInterTime(value);
+        }}
+        onBlur={() => runValidationTasks("interTime", interTime)}
+        errorMessage={errors.interTime?.errorMessage}
+        hasError={errors.interTime?.hasError}
+        {...getOverrideProps(overrides, "interTime")}
+      ></TextField>
+      <TextField
+        label="Inter date"
+        isRequired={false}
+        isReadOnly={false}
+        value={interDate}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              perIS,
+              perID,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              workExperience,
+              mobSignDate,
+              mobFile,
+              paafApproveDate,
+              paafFile,
+              loiIssueDate,
+              loiAcceptDate,
+              loiDeclineDate,
+              declineReason,
+              loiFile,
+              cvecApproveDate,
+              cvecFile,
+              uploadCertificate,
+              pcNoticePeriod,
+              venue,
+              managerBadgeNo,
+              message,
+              interType,
+              interTime,
+              interDate: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.interDate ?? value;
+          }
+          if (errors.interDate?.hasError) {
+            runValidationTasks("interDate", value);
+          }
+          setInterDate(value);
+        }}
+        onBlur={() => runValidationTasks("interDate", interDate)}
+        errorMessage={errors.interDate?.errorMessage}
+        hasError={errors.interDate?.hasError}
+        {...getOverrideProps(overrides, "interDate")}
+      ></TextField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

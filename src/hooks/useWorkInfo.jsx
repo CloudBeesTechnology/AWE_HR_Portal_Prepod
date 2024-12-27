@@ -14,7 +14,8 @@ export const useWorkInfo = () => {
       setLoading(true);
       try {
         const workInfoData = await client.graphql({
-          query: listEmpWorkInfos, // Query to fetch email notifications
+          query: listEmpWorkInfos,           variables: { limit: 20000 },
+          // Query to fetch email notifications
         });
 
         const fetchedEmpWorkInfo =
@@ -33,7 +34,7 @@ export const useWorkInfo = () => {
     fetchData();
   }, []);
 
-  console.log("workInfo data",empWorkInfo)
+  // console.log("workInfo data",empWorkInfo)
 
   return { empWorkInfo, loading, error };
 };

@@ -48,14 +48,7 @@ export const Reports = () => {
   
 
   useEffect(() => {
-    // if (empPIData) {
-    //   const merged = mergeData(empPIData, empPDData, IDData,workInfoData, terminateData, DNData, PPValidsData, LMIData);
-    //   setMergeData(merged);
-    //   console.log(merged);
-    //   setLoading(false); // Set loading to false once data is merged
-    // }
     const mergeData =  empPIData.map((piData) => {
-
         // const pdData = empPDData.find((item) => item.empID === piData.empID) || {};
         const idData = IDData.find((item) => item.empID === piData.empID) || {};
         const wiData= workInfoData.find((item) => item.empID === piData.empID) || {};
@@ -189,13 +182,7 @@ export const Reports = () => {
           reportTitle={reportTitle}
         />
       )}
-      {/* {reportTitle === "Probation Form" && (
-        <ProbationPDF
-          allData={mergedData}
-          typeOfReport={typeOfReport}
-          reportTitle={reportTitle}
-        />
-      )} */}
+     
       {reportTitle === "Contract Expiry Review" && (
         <ContractReview
           allData={mergedData}
@@ -301,6 +288,8 @@ export const Reports = () => {
     </div>
   );
 };
+
+
 
 // import { SlCalender } from "react-icons/sl";
 // import { useContext, useEffect, useState } from "react";

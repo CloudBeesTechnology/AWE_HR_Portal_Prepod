@@ -306,7 +306,7 @@ export const TicketsTable = () => {
                       {item?.empID}
                     </td>
                     <td className="border-b-2  border-[#CECECE] py-5">
-                      {item?.empName}
+                      {item?.empName || "N/A"}
                     </td>
                     <td className="border-b-2 border-[#CECECE] py-5">
                       {Array.isArray(item.department)
@@ -344,11 +344,11 @@ export const TicketsTable = () => {
                       <td
                         className={`border-b-2 border-[#CECECE] py-5 ${
                           item.hrStatus === "Rejected"
-                            ? "text-[#C50000]"
+                            ? "text-[red]"
                             : item.hrStatus === "Approved"
-                            ? "text-[#0CB100]"
+                            ? "text-[#339933]"
                             : item.hrStatus === "Pending"
-                            ? "text-dark_grey"
+                            ? "text-[#E8A317]"
                             : ""
                         }`}
                       >

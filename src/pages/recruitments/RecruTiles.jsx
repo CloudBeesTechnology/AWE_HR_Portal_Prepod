@@ -4,6 +4,12 @@ import { RecDashdetails } from "./RecDashdetails";
 import usePermission from "../../hooks/usePermissionDashInside";
 
 export const RecruTiles = () => {
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, []);
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedTile, setSelectedTile] = useState("");

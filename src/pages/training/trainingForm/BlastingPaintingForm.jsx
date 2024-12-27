@@ -194,7 +194,7 @@ export const BlastingPaintingForm = () => {
   };
 
   const onSubmit = async (data) => {
-    console.log("Form data:", data);
+    // console.log("Form data:", data);
 
     try {
       
@@ -233,7 +233,7 @@ export const BlastingPaintingForm = () => {
   };
 
   return (
-   <section className=' bg-white p-10 rounded-lg mt-10'>
+   <section className='bg-[#F8F8F8] p-10 rounded-lg mt-10'>
      <div className="w-[30%]">
         <SearchDisplay
             searchResult={searchResult}

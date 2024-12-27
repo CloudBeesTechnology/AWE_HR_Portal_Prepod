@@ -14,7 +14,7 @@ export const AddCourseForm = ({ closeModal }) => {
   const { AddCourseData } = AddCFFun();
   const { AddCourseDetails } = useContext(DataSupply);
   const { AddCUpdateFun } = AddCFUpdate();
-  console.log(AddCourseDetails);
+  // console.log(AddCourseDetails);
 
   const {
     register,
@@ -60,7 +60,7 @@ export const AddCourseForm = ({ closeModal }) => {
 
   const onSubmit = async (data) => {
     try {
-      console.log("Form Data Submitted:", data);
+      // console.log("Form Data Submitted:", data);
 
       const submittedCourseSelect = typeof data.courseSelect === 'string' ? data.courseSelect : '';
 
@@ -94,7 +94,7 @@ export const AddCourseForm = ({ closeModal }) => {
           id: checkingEIDTable.id,
         };
 
-        console.log("Updating data:", AddCFUpp);
+        // console.log("Updating data:", AddCFUpp);
         await AddCUpdateFun({ AddCFUpp });
       } else {
         // Create logic

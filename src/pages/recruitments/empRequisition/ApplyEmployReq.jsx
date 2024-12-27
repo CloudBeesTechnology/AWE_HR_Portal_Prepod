@@ -65,7 +65,7 @@ const fetchRequisitionData = async () => {
     return status === "Rejected"
       ? "text-[red]"
       : status === "Approved"
-      ? "text-[green]"
+      ? "text-[#339933]"
       : status === "Pending"
       ? "text-dark_grey"
       : "text-[#E8A317]";

@@ -126,7 +126,7 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
       ],
     },
     {
-      Training: ["HR", "Training Requestor","QA / QC", "Training List"],
+      Training: ["HR", "Training Requestor","BLNG", "OME"],
     },
     {
       TimeSheet: ["HO","SBW","ORMC", "Offshore", "BLNG", "View Time Sheet","View Summary"],

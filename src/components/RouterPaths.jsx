@@ -64,9 +64,14 @@ export const TimePaths = [
 export const TrainingPaths = [
   "/training",
   "/training/hr",
+  "/training/AcTc",
+  "/training/trainingCertify",
   "/trainingReq",
-  "/trainingQA",
-  "/allTraining",
+  "/trainingReq/add",
+  "/trainingReq/view",
+  "/blngCertify",
+  "/omgCertify",
+  "/training/tcView"
 ];
 
 export const UserPaths = ["/user", "/addNewForm"];

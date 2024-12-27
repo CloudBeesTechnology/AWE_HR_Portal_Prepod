@@ -23,9 +23,9 @@
 //     }
 //   }, [setDrpValue]);
 
-//   const toggleFunction=()=>{
-//     setToggleHandle(!toggleHandle);
-//   }
+//   // const toggleFunction=()=>{
+//   //   setToggleHandle(!toggleHandle);
+//   // }
 
 //   // useEffect(()=>{
 
@@ -39,14 +39,14 @@
 //   // },[toggleHandle]);
 
 
-//   // const toggleFunction = useCallback(() => {
-//   //   setToggleHandle(!toggleHandle);
-//   //   if (toggleHandle === true) {
-//   //     setFilteredEmployees?.([]);
-//   //   } else if (toggleHandle === false) {
-//   //     setFilteredEmployees?.(newFormData);
-//   //   }
-//   // }, [toggleHandle, newFormData]);
+//   const toggleFunction = useCallback(() => {
+//     setToggleHandle(!toggleHandle);
+//     if (toggleHandle === true) {
+//       setFilteredEmployees?.([]);
+//     } else if (toggleHandle === false) {
+//       setFilteredEmployees?.(newFormData);
+//     }
+//   }, [toggleHandle, newFormData]);
 
 //   const handleSearch = (e) => {
 //     const query = e.target.value.toLowerCase();
@@ -108,6 +108,7 @@
 //                   searchResult(employee);
 
 //                   setSearchQuery("");
+//                   setFilteredEmployees([])
 //                 }
 
 //                 if (employee.JOBCODE) {
@@ -149,8 +150,9 @@
 //     </div>
 //   );
 // };
-
-import React, { useEffect, useRef, useState } from "react";
+// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+import React, { useEffect, useState, useCallback, useRef } from "react";
 
 export const SearchDisplayForTimeSheet = ({
   searchResult,
@@ -163,97 +165,110 @@ export const SearchDisplayForTimeSheet = ({
   searchedValue,
   id,
 }) => {
+  
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredEmployees, setFilteredEmployees] = useState([]);
-  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
-  const dropdownRef = useRef(null);
-
+  // Sync external dropdown value with search query
   useEffect(() => {
     if (setDrpValue) {
       setSearchQuery(setDrpValue);
     }
   }, [setDrpValue]);
 
-  useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownVisible(false);
-      }
-    };
+ // Close dropdown when clicking outside
+ useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (!event.target.closest(".dropdown-container")) {
+      setIsDropdownVisible(false);
+    }
+  };
 
-    document.addEventListener("mousedown", handleOutsideClick);
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
 
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
+  // Toggle dropdown visibility
+  const toggleDropdown = useCallback(() => {
+    setIsDropdownVisible((prev) => !prev);
   }, []);
 
+  // Handle search query and filter results
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
     searchedValue?.(id, query);
-    if (query) {
-      const results =
-        newFormData &&
-        newFormData.filter(
-          (employee) =>
-            employee.name?.toLowerCase().includes(query) ||
-            employee.empID?.toLowerCase().includes(query) ||
-            employee.JOBCODE?.toLowerCase().includes(query) ||
-            employee.location?.toLowerCase().includes(query) ||
-            employee.empBadgeNo?.toLowerCase().includes(query)
-        );
-      setFilteredEmployees?.(results);
-    } else {
-      setFilteredEmployees?.(newFormData);
-    }
-  };
 
-  const handleInputClick = () => {
-    setDropdownVisible((prev) => !prev); // Toggle dropdown visibility
-    if (!dropdownVisible && !searchQuery) {
-      // Set the list if dropdown is about to show
+    if (query) {
+      const results = newFormData?.filter(
+        (employee) =>
+          employee.name?.toLowerCase().includes(query) ||
+          employee.empID?.toLowerCase().includes(query) ||
+          employee.JOBCODE?.toLowerCase().includes(query) ||
+          employee.location?.toLowerCase().includes(query) ||
+          employee.empBadgeNo?.toLowerCase().includes(query)
+      );
+      setFilteredEmployees(results);
+    } else {
       setFilteredEmployees(newFormData);
     }
   };
 
+  
+
+  useEffect(()=>{
+    setFilteredEmployees(newFormData)
+  },[isDropdownVisible])
+  // Handle item selection
+  const handleSelect = (employee) => {
+    if (employee.empID || employee.name) {
+      setSearchQuery(`${employee.empID} - ${employee.name || ""}`);
+      searchResult(employee);
+    } else if (employee.JOBCODE) {
+      setSearchQuery(employee.JOBCODE);
+      searchResult(employee, id);
+    } else if (employee.location) {
+      setSearchQuery(employee.location);
+      searchResult(employee, id);
+    }
+
+    setIsDropdownVisible(false);
+    setFilteredEmployees([]);
+  };
+
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative dropdown-container">
       <div
         className={`py-2 w-full text_size_5 border text-grey bg-white border-lite_grey ${rounded} flex items-center px-2 gap-2`}
       >
-        <div className=" text-dark_grey text-2xl ">{searchIcon1}</div>
+        <div className="text-dark_grey text-2xl">{searchIcon1}</div>
         <input
           type="text"
           placeholder={placeholder}
           className="outline-none w-full cursor-pointer"
           value={searchQuery}
           onChange={handleSearch}
-          onClick={handleInputClick}
+          onClick={toggleDropdown}
         />
-        <div className=" text-dark_grey text-1xl ">{searchIcon2}</div>
+        <div className="text-dark_grey text-1xl">{searchIcon2}</div>
       </div>
 
-      {dropdownVisible && filteredEmployees?.length > 0 && (
-        <ul className="absolute right-0 overflow-x-hidden mt-2 w-full ml-auto max-h-36 overflow-y-auto rounded-lg shadow-lg bg-white z-10">
+      {isDropdownVisible && filteredEmployees?.length > 0 && (
+        <ul className="absolute right-0 overflow-x-hidden mt-2 w-full max-h-36 overflow-y-auto rounded-lg shadow-lg bg-white z-10">
           {filteredEmployees.map((employee, index) => (
             <li
               key={index}
               className="m-2 p-1 hover:bg-grey hover:text-white cursor-pointer flex justify-between items-center transition-all duration-200"
-              onClick={() => {
-                setSearchQuery(
-                  `${employee.empID || ""} - ${employee.name || ""}`
-                );
-                searchResult(employee, id);
-                setDropdownVisible(false);
-              }}
+              onClick={() => handleSelect(employee)}
             >
               <div>
-                <span className=" text-sm">{employee.empID}</span>
-                <span className=" text-sm"> {employee.name}</span>
-                <span className=" text-sm">{employee.JOBCODE}</span>
-                <span className=" text-sm">{employee.location}</span>
+                <span className="text-sm">{employee.empID}</span>
+                <span className="text-sm"> {employee.name}</span>
+                <span className="text-sm">{employee.JOBCODE}</span>
+                <span className="text-sm">{employee.location}</span>
               </div>
             </li>
           ))}
@@ -263,6 +278,119 @@ export const SearchDisplayForTimeSheet = ({
   );
 };
 
+//  &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// import React, { useEffect, useRef, useState } from "react";
 
+// export const SearchDisplayForTimeSheet = ({
+//   searchResult,
+//   newFormData,
+//   searchIcon1,
+//   searchIcon2,
+//   placeholder,
+//   rounded,
+//   setDrpValue,
+//   searchedValue,
+//   id,
+// }) => {
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const [filteredEmployees, setFilteredEmployees] = useState([]);
+//   const [dropdownVisible, setDropdownVisible] = useState(false);
+
+//   const dropdownRef = useRef(null);
+
+//   useEffect(() => {
+//     if (setDrpValue) {
+//       setSearchQuery(setDrpValue);
+//     }
+//   }, [setDrpValue]);
+
+//   useEffect(() => {
+//     const handleOutsideClick = (event) => {
+//       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+//         setDropdownVisible(false);
+//       }
+//     };
+
+//     document.addEventListener("mousedown", handleOutsideClick);
+
+//     return () => {
+//       document.removeEventListener("mousedown", handleOutsideClick);
+//     };
+//   }, []);
+
+//   const handleSearch = (e) => {
+//     const query = e.target.value.toLowerCase();
+//     setSearchQuery(query);
+//     searchedValue?.(id, query);
+//     if (query) {
+//       const results =
+//         newFormData &&
+//         newFormData.filter(
+//           (employee) =>
+//             employee.name?.toLowerCase().includes(query) ||
+//             employee.empID?.toLowerCase().includes(query) ||
+//             employee.JOBCODE?.toLowerCase().includes(query) ||
+//             employee.location?.toLowerCase().includes(query) ||
+//             employee.empBadgeNo?.toLowerCase().includes(query)
+//         );
+//       setFilteredEmployees?.(results);
+//     } else {
+//       setFilteredEmployees?.(newFormData);
+//     }
+//   };
+
+//   const handleInputClick = () => {
+//     setDropdownVisible((prev) => !prev); // Toggle dropdown visibility
+//     if (!dropdownVisible && !searchQuery) {
+//       // Set the list if dropdown is about to show
+//       setFilteredEmployees(newFormData);
+//     }
+//   };
+
+//   return (
+//     <div className="relative" ref={dropdownRef}>
+//       <div
+//         className={`py-2 w-full text_size_5 border text-grey bg-white border-lite_grey ${rounded} flex items-center px-2 gap-2`}
+//       >
+//         <div className=" text-dark_grey text-2xl ">{searchIcon1}</div>
+//         <input
+//           type="text"
+//           placeholder={placeholder}
+//           className="outline-none w-full cursor-pointer"
+//           value={searchQuery}
+//           onChange={handleSearch}
+//           onClick={handleInputClick}
+//         />
+//         <div className=" text-dark_grey text-1xl ">{searchIcon2}</div>
+//       </div>
+
+//       {dropdownVisible && filteredEmployees?.length > 0 && (
+//         <ul className="absolute right-0 overflow-x-hidden mt-2 w-full ml-auto max-h-36 overflow-y-auto rounded-lg shadow-lg bg-white z-10">
+//           {filteredEmployees.map((employee, index) => (
+//             <li
+//               key={index}
+//               className="m-2 p-1 hover:bg-grey hover:text-white cursor-pointer flex justify-between items-center transition-all duration-200"
+//               onClick={() => {
+//                 setSearchQuery(
+//                   `${employee.empID || ""}${employee.name || ""}${employee.location || ""}`
+//                 );
+//                 searchResult(employee, id);
+//                 setDropdownVisible(false);
+//               }}
+//             >
+//               <div>
+//                 <span className=" text-sm">{employee.empID}</span>
+//                 <span className=" text-sm"> {employee.name}</span>
+//                 <span className=" text-sm">{employee.JOBCODE}</span>
+//                 <span className=" text-sm">{employee.location}</span>
+//               </div>
+//             </li>
+//           ))}
+//         </ul>
+//       )}
+//     </div>
+//   );
+// };
 
 

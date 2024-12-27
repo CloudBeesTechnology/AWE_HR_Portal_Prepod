@@ -13,7 +13,7 @@ export const Localcandi = () => {
   const [error, setError] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]); // To track selected rows for edit/delete
   const [selectedRow, setSelectedRow] = useState(null); // For handling the review form
-  const { empPDData} = useContext(DataSupply); // Fetching data from context
+  const { empPDData, IVSSDetails } = useContext(DataSupply); // Fetching data from context
   const navigate=useNavigate()
   const [editingData,setEditingData]=useState([])
   // Filter candidates with nationality 'Brunei'
@@ -28,7 +28,13 @@ export const Localcandi = () => {
         candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         candidate.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
         candidate.nationality.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+
+    .filter(
+      (candidate) =>
+        !IVSSDetails.some((detail) => detail.tempID === candidate.tempID)
     );
+
   useEffect(() => {
     if (bruneiCandidates.length > 0) {
       setLoading(false);

@@ -36,7 +36,6 @@ const PersonalDetailsView = ({
   const [viewingDocument, setViewingDocument] = useState(null); // State to store the currently viewed document URL
   const [lastUploadUrl, setPPLastUP] = useState(""); // State to store the last uploaded file's URL
   const [imageUrl, setImageUrl] = useState("");
- 
 
   // Helper function to fetch the cloud URL
   const linkToStorageFile = async (pathUrl) => {
@@ -143,16 +142,16 @@ const PersonalDetailsView = ({
             {viewingDocument === document.upload &&
               document.upload.endsWith(".pdf") && (
                 <div className="mt-4">
-                  <div className="relative bg-white max-w-3xl mx-auto p-6 rounded-lg shadow-lg">
-                    <div  ref={invoiceRef} className="invoice-content flex justify-center">
+                  <div className="relative invoice-content bg-white max-w-3xl mx-auto p-6 rounded-lg shadow-lg">
+                    <div  ref={invoiceRef} className=" pdfViewerflex justify-center">
                       <Worker
                        workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
                       >
                         <Viewer
-                          fileUrl={lastUploadUrl || ""}   
-                         
+                          ref={invoiceRef}
+                          fileUrl={lastUploadUrl || ""}  
                         />
-                         {/* <Page pageNumber={pageNumber} className="mx-auto" /> */}
+
                       </Worker>
                   
                     </div>

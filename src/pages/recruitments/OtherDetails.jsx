@@ -12,26 +12,95 @@ import { uploadDocs } from "../../services/uploadDocsS3/UploadDocs";
 import { FormField } from "../../utils/FormField";
 import { useOutletContext } from "react-router-dom";
 import { DataSupply } from "../../utils/DataStoredContext";
-const client = generateClient();  
+import { useTempID } from "../../utils/TempIDContext";
+import { CandyDetails  } from "../../services/updateMethod/UpdatePersonalDetails";
+
+const client = generateClient();
 
 export const OtherDetails = () => {
   const { submitODFunc } = RecODFunc();
   const [notification, setNotification] = useState(false);
+  const { candyDetails } = CandyDetails()
   const location = useLocation();
   const navigatingEducationData = location.state?.FormData;
   const [latestTempIDData, setLatesTempIDData] = useState("");
+  const [mergedData, setMergedData] = useState([]);
   const [uploadedFileNames, setUploadedFileNames] = useState({
     uploadResume: null,
     uploadCertificate: null,
     uploadPp: null,
   });
-  const { tempID } = useOutletContext();
-  const { empPDData } = useContext(DataSupply);
+  // const { tempID } = useOutletContext();
+  const { tempID } = useTempID();
+  const { empPDData, educDetailsData } = useContext(DataSupply);
   const [uploadedDocs, setUploadedDocs] = useState({
     uploadResume: null,
     uploadCertificate: null,
     uploadPassport: null,
   });
+  const [formData, setFormData] = useState({
+    interview: {
+      id: "",
+      crime: "",
+      crimeDesc: "",
+      emgDetails: [], // Assuming this is an array
+      noExperience: "",
+      empStatement: "",
+      desc: "",
+      disease: "",
+      diseaseDesc: "",
+      liquor: "",
+      liquorDesc: "",
+      noticePeriod: "",
+      perIS: "no", // Default value
+      perIDesc: "",
+      referees: [], // Assuming this is an array
+      relatives: [], // Assuming this is an array
+      salaryExpectation: "",
+      supportInfo: "",
+      uploadResume: [], // Assuming this is an array
+      uploadCertificate: [], // Assuming this is an array
+      uploadPp: [], // Assuming this is an array
+      age: "",
+      alternateNo: "",
+      agent: "",
+      bwnIcNo: "",
+      bwnIcExpiry: "",
+      bwnIcColour: "",
+      contactNo: "",
+      cob: "", // Assuming cob stands for country of birth
+      contractType: "",
+      chinese: "", // Assuming this field is for ethnicity
+      dob: "",
+      driveLic: "",
+      email: "",
+      empType: "",
+      eduDetails: [], // Assuming this is an array of educational details
+      familyDetails: [], // Assuming this is an array
+      gender: "",
+      lang: "", // Assuming this is for languages spoken
+      marital: "",
+      name: "",
+      nationality: "",
+      otherNation: "",
+      otherRace: "",
+      otherReligion: "",
+      ppNo: "",
+      ppIssued: "",
+      ppExpiry: "",
+      ppDestinate: "",
+      presentAddress: "",
+      permanentAddress: "",
+      profilePhoto: "", // Assuming this is a URL or path to the photo
+      position: "",
+      race: "",
+      religion: "",
+      workExperience: [], // Assuming this is an array
+      status: "", // Assuming this field refers to candidate status (e.g., active, rejected, etc.)
+    },
+  });
+  
+
   const {
     register,
     control,
@@ -46,29 +115,63 @@ export const OtherDetails = () => {
       perIDesc: "",
     },
   });
- 
-  // Load form data from localStorage when the component mounts
 
   useEffect(() => {
-    if (tempID) {
-      const savedData = JSON.parse(localStorage.getItem("otherFormData"));
-      if (savedData) {
-        Object.keys(savedData).forEach((key) => setValue(key, savedData[key]));
-      }
+    if (empPDData.length > 0 && educDetailsData.length > 0) {
+      const merged = empPDData.map((empData) => {
+        // Find the matching record from educDetailsData based on tempID
+        const educData = educDetailsData.find(
+          (educ) => educ.tempID === empData.tempID
+        );
+        return {
+          ...empData,
+          ...(educData ? educData : {}), // Merge the data from both arrays
+        };
+      });
+      setMergedData(merged); // Store the merged data
+    }
+  }, [empPDData, educDetailsData]);
+  console.log(mergedData)
 
-      if (empPDData.length > 0) {
-        const interviewData = empPDData.find((data) => data.tempID === tempID);
-        if (interviewData) {
-          // Set form fields with empPDData if available
-          Object.keys(interviewData).forEach((key) => {
-            if (interviewData[key]) {
-              setValue(key, interviewData[key]);
-            }
-          });
-        }
+
+  const extractFileName = (url) => {
+    if (typeof url === "string" && url) {
+      return url.split("/").pop(); // Extract the file name from URL
+    }
+    return "";
+  };
+  console.log(tempID);
+
+  useEffect(() => {
+    if (educDetailsData.length > 0 && tempID) {
+      const interviewData = educDetailsData.find(
+        (data) => data.tempID === tempID
+      ); // Use the candidate's tempID to filter the data
+      if (interviewData) {
+        setFormData({
+          interview: {
+            noExperience: interviewData.noExperience,
+            salaryExpectation: interviewData.salaryExpectation,
+            supportInfo: interviewData.supportInfo,
+            noticePeriod: interviewData.noticePeriod,
+            perIDesc: interviewData.perIDesc,
+            perIS: interviewData.perIS,
+            uploadCertificate: interviewData.uploadCertificate,
+            uploadPp: interviewData.uploadPp,
+            uploadResume: interviewData.uploadResume,
+          },
+        });
+      }
+      if (interviewData) {
+        setUploadedFileNames((prev) => ({
+          ...prev,
+          uploadCertificate: extractFileName(interviewData.uploadCertificate),
+          uploadPp: extractFileName(interviewData.uploadPp),
+          uploadResume: extractFileName(interviewData.uploadResume),
+        }));
       }
     }
-  }, [empPDData, tempID, setValue]);
+  }, [educDetailsData, tempID]);
 
   // File upload handler
   const handleFileChange = async (e, type) => {
@@ -121,8 +224,7 @@ export const OtherDetails = () => {
 
   const generateNextTempID = (totalCount) => {
     const nextNumber = totalCount + 1;
-    const nextTempID = `TEMP${String(nextNumber).padStart(3, "0")}`;
-    return nextTempID;
+    return  String(nextNumber);
   };
 
   useEffect(() => {
@@ -134,8 +236,9 @@ export const OtherDetails = () => {
     fetchNextTempID();
   }, []);
 
-  
   const onSubmit = async (data) => {
+       data.preventDefault();
+    
     try {
       const reqValue = {
         ...data,
@@ -157,10 +260,7 @@ export const OtherDetails = () => {
         latestTempIDData,
       });
       console.log("Value", reqValue);
-      localStorage.setItem(
-        "otherFormData",
-        JSON.stringify(reqValue)
-      );
+      localStorage.setItem("otherFormData", JSON.stringify(reqValue));
       // setNotification(true);
     } catch (error) {
       console.log(error);
@@ -172,39 +272,179 @@ export const OtherDetails = () => {
     }
   };
 
+  const handleSubmitTwo = async (event) => {
+    // Prevent the default form submission behavior
+    event.preventDefault();
+  
+    // Find the correct interview data using the tempID of the selected candidate
+    const selectedInterviewData = mergedData.find((data) => data.tempID === tempID);
+  
+    if (!selectedInterviewData) {
+      console.error("Candidate not found");
+      return;
+    }
+  
+    // Log the selectedInterviewData to compare
+    console.log("Selected Interview Data before merge:", selectedInterviewData);
+  
+    const candyID = selectedInterviewData.id;
+    console.log("Candy ID:", candyID);
+  
+    // Merge selectedInterviewData and formData to update the interview details
+    const updatedInterviewData = {
+      ...selectedInterviewData, // Start with the existing interview data
+      ...formData.interview,    // Override with the values from formData
+    };
+  
+    // Log the updatedInterviewData to compare with the original data
+    console.log("Updated Interview Data after merge:", updatedInterviewData);
+  
+    // Prepare the required data for candyDetails (reqValue)
+    const reqValue = {
+      id: candyID,
+      crime: updatedInterviewData.crime,
+      crimeDesc: updatedInterviewData.crimeDesc,
+      emgDetails: updatedInterviewData.emgDetails,
+      noExperience: updatedInterviewData.noExperience,
+      empStatement: updatedInterviewData.empStatement,
+      desc: updatedInterviewData.desc,
+      disease: updatedInterviewData.disease,
+      diseaseDesc: updatedInterviewData.diseaseDesc,
+      liquor: updatedInterviewData.liquor,
+      liquorDesc: updatedInterviewData.liquorDesc,
+      noticePeriod: updatedInterviewData.noticePeriod,
+      perIS: updatedInterviewData.perIS,
+      perIDesc: updatedInterviewData.perIDesc,
+      referees: updatedInterviewData.referees,
+      relatives: updatedInterviewData.relatives,
+      salaryExpectation: updatedInterviewData.salaryExpectation,
+      supportInfo: updatedInterviewData.supportInfo,
+      uploadResume: updatedInterviewData.uploadResume,
+      uploadCertificate: updatedInterviewData.uploadCertificate,
+      uploadPp: updatedInterviewData.uploadPp,
+      // For PersonalDetails
+      age: updatedInterviewData.age,
+      alternateNo: updatedInterviewData.alternateNo,
+      agent: updatedInterviewData.agent,
+      bwnIcNo: updatedInterviewData.bwnIcNo,
+      bwnIcExpiry: updatedInterviewData.bwnIcExpiry,
+      bwnIcColour: updatedInterviewData.bwnIcColour,
+      contactNo: updatedInterviewData.contactNo,
+      cob: updatedInterviewData.cob,
+      contractType: updatedInterviewData.contractType,
+      chinese: updatedInterviewData.chinese,
+      dob: updatedInterviewData.dob,
+      driveLic: updatedInterviewData.driveLic,
+      email: updatedInterviewData.email,
+      empType: updatedInterviewData.empType,
+      eduDetails: updatedInterviewData.eduDetails,
+      familyDetails: updatedInterviewData.familyDetails,
+      gender: updatedInterviewData.gender,
+      lang: updatedInterviewData.lang,
+      marital: updatedInterviewData.marital,
+      name: updatedInterviewData.name,
+      nationality: updatedInterviewData.nationality,
+      otherNation: updatedInterviewData.otherNation,
+      otherRace: updatedInterviewData.otherRace,
+      otherReligion: updatedInterviewData.otherReligion,
+      ppNo: updatedInterviewData.ppNo,
+      ppIssued: updatedInterviewData.ppIssued,
+      ppExpiry: updatedInterviewData.ppExpiry,
+      ppDestinate: updatedInterviewData.ppDestinate,
+      presentAddress: updatedInterviewData.presentAddress,
+      permanentAddress: updatedInterviewData.permanentAddress,
+      profilePhoto: updatedInterviewData.profilePhoto,
+      position: updatedInterviewData.position,
+      race: updatedInterviewData.race,
+      religion: updatedInterviewData.religion,
+      workExperience: updatedInterviewData.workExperience,
+      status: updatedInterviewData.status,
+      tempID: updatedInterviewData.tempID,
+    };
+  
+    console.log("Prepared reqValue:", reqValue);
+  
+    
+    // Log latestTempIDData before calling the mutation
+    // console.log("Latest Temp ID Data:", latestTempIDData);  // Check latestTempIDData
+  
+    try {
+      // Submit the data using the mutation
+      // await candyDetails({ reqValue });
+  
+      console.log("Data stored successfully...");
+      // setNotification(true);
+    } catch (error) {
+      console.error("Error submitting interview details:", error);
+    }
+  };
+  
+
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      interview: {
+        ...prev.interview,
+        [field]: value,
+      },
+    }));
+  };
+
   return (
     <div>
-      <form onSubmit={handleSubmit(onSubmit)} className="pt-5">
+      <form className="pt-5">
         {/* Salary Expected */}
         <div className=" grid grid-cols-2 gap-5">
           <div className="mb-4">
-            <FormField
+            <label className="block text_size_6">
+              Number of Years Experience in Applied Position
+            </label>
+            <input
               label="Number of Years Experience in Applied Position"
-              register={register}
+              {...register("noExperience")}
+              className="input-field border"
               name="noExperience"
               type="text"
               errors={errors}
+              value={formData.interview.noExperience}
+              onChange={(e) =>
+                handleInputChange("noExperience", e.target.value)
+              }
             />
           </div>
+
           <div className="mb-4">
-            <FormField
+            <label className="block text_size_6">Salary Expected</label>
+            <input
               label="Salary Expected"
-              register={register}
+              {...register("salaryExpectation")}
+              className="input-field border"
               name="salaryExpectation"
               type="text"
               errors={errors}
+              value={formData.interview.salaryExpectation}
+              onChange={(e) =>
+                handleInputChange("salaryExpectation", e.target.value)
+              }
             />
           </div>
         </div>
 
         {/* Termination Notice */}
+
         <div className="mb-4">
-          <FormField
-            label="  Termination Notice for Present job (month/Date)"
-            register={register}
+          <label className="block text_size_6">
+            Termination Notice for Present job (month/Date)
+          </label>
+          <input
+            label="Termination Notice for Present job (month/Date)"
+            {...register("noticePeriod")}
+            className="input-field border"
             name="noticePeriod"
             type="text"
             errors={errors}
+            value={formData.interview.noticePeriod}
+            onChange={(e) => handleInputChange("noticePeriod", e.target.value)}
           />
         </div>
 
@@ -288,6 +528,8 @@ export const OtherDetails = () => {
             {...register("supportInfo")}
             className="resize-none mt-2 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full"
             rows="4"
+            value={formData.interview.supportInfo}
+            onChange={(e) => handleInputChange("supportInfo", e.target.value)}
           ></textarea>
         </div>
 
@@ -399,8 +641,13 @@ export const OtherDetails = () => {
         )}
 
         <div className="text-center my-10">
-          <button type="submit" className="primary_btn">
+          <button onclick={onSubmit} type="submit" className="primary_btn">
             Submit
+          </button>
+        </div>
+          <div className="text-center my-10">
+          <button onClick={handleSubmitTwo} type="submit" className="primary_btn">
+            Update
           </button>
         </div>
       </form>

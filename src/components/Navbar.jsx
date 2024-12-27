@@ -58,7 +58,7 @@ const Navbar = () => {
       const month = today.getMonth() + 1;
       const year = today.getFullYear();
       const currentDate = `${date}/${month}/${year}`;
-setCurrentDateValue(currentDate)
+      setCurrentDateValue(currentDate);
       let hours = today.getHours();
       const minutes = today.getMinutes();
       const seconds = today.getSeconds();
@@ -96,6 +96,7 @@ setCurrentDateValue(currentDate)
       try {
         const empPersonalInfosData = await client.graphql({
           query: listEmpPersonalInfos,
+          variables: { limit: 10000 },
         });
 
         const empPersonalInfos =
@@ -109,22 +110,24 @@ setCurrentDateValue(currentDate)
 
         // Find the employee matching the userID, ignoring case
         const userPersonalInfo = empPersonalInfos.find(
-          (emp) => emp.empID.toLowerCase() === userID.toLowerCase()
+          (emp) => emp.empID.toString().toLowerCase() === "awe350"
         );
 
         if (userPersonalInfo) {
-          const profilePhotoString = userPersonalInfo?.profilePhoto  || "public/profilePhoto/User-avatar.svg.png";
+          const profilePhotoString =
+            userPersonalInfo?.profilePhoto ||
+            "public/profilePhoto/User-avatar.svg.png";
           // console.log(profilePhotoString);
-          
+
           // const trimmedProfilePhotoString = profilePhotoString?.replace(/^public\//, '');
           // console.log(trimmedProfilePhotoString);
-          
+
           const linkToStorageFile = async (pathUrl) => {
             const result = await getUrl({
               path: pathUrl,
             });
             // console.log(result?.url?.toString());
-            
+
             return setPersonalInfo({
               name: userPersonalInfo?.name, // Use the name
               profilePhoto: result?.url?.toString(), // Set the profile photo

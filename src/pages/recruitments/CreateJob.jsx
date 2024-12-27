@@ -38,7 +38,7 @@ export const CreateJob = () => {
   const handleFileUpload = async (e, type) => {
     if (!watchedJobTitle) {
       alert("Please enter the Job Title before uploading files.");
-      window.location.href = "/hiringJob";
+      window.location.href = "/postJob";
       return;
     }
 
@@ -64,23 +64,26 @@ export const CreateJob = () => {
         setUploadedFileNames((prev) => ({
           uploadJobDetails: selectedFile.name, // Dynamically store file name
         }));
-       await fetch(
-          `https://p7b9zso8gl.execute-api.ap-southeast-1.amazonaws.com/adinin-uploadapi-stage/commonfiles/recruitment%2fapplyJob%2f${encodeURIComponent(watchedJobTitle)}%2f${encodeURIComponent(selectedFile.name)}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/octet-stream",
-              // "Access-Control-Allow-Origin": "http://localhost:3000",
-            },
-            body: selectedFile,
-            //  mode: 'no-cors'
-          } // data: `recruitment%2fapplyJob%2f${watchedJobTitle}%2f${selectedFile.name}`,
-        ).then((res) => {
-          console.log(res, "su");
-        }).catch((err)=>{
-          console.log(err);
-          
-        })
+        const url = `https://71n903ao01.execute-api.ap-southeast-1.amazonaws.com/adininfile/commonfiles/recruitment%2fapplyJob%2f${encodeURIComponent(
+          watchedJobTitle
+        )}%2f${encodeURIComponent(selectedFile.name)}`;
+        const response = await fetch(url, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json", // Correct header for file uploads
+          },
+          body: selectedFile,
+        });
+    
+        // Check if the response indicates success
+        if (!response.ok) {
+          throw new Error(
+            `Failed to upload. Status: ${response.status}, Message: ${response.statusText}`
+          );
+        }
+    
+        const result = await response.json(); // Parse JSON response if applicable
+        console.log("File uploaded successfully:", result);
       } catch (err) {
         console.log(err);
       }

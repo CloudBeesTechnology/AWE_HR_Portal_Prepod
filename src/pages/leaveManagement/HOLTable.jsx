@@ -51,7 +51,7 @@ export const HOLTable = () => {
                     >
                       <td className="py-5">{displayIndex}</td>
                       <td className="py-5">{item.empID}</td>
-                      <td className="py-5">{item.empName}</td>
+                      <td className="py-5">{item.empName || "N/A"}</td>
                       <td className="py-5">{item.empLeaveType}</td>
                       <td className="py-5">{formatDate(item.empLeaveStartDate)}</td>
                       <td className="py-5">{formatDate(item.empLeaveEndDate)}</td>

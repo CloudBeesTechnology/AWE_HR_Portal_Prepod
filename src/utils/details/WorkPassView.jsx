@@ -263,7 +263,8 @@ export const WorkPassView = ({
   };
 
   return (
-    <section ref={mainRef} className="py-8 bg-gray-50 rounded-lg">
+    <section>
+    <div ref={mainRef} className="py-8 bg-gray-50 rounded-lg">
       <h6 className="uppercase text_size_5 mb-6">WorkPass Details:</h6>
       <div className="space-y-6">
         {sections.map(({ name, data, upload }, index) => (
@@ -274,6 +275,7 @@ export const WorkPassView = ({
           </div>
         ))}
       </div>
+    </div>
       {/* Grouped Documents under Categories */}
       <div className="mt-8">
         <h6 className="uppercase text_size_5  my-3">Uploaded Documents:</h6>

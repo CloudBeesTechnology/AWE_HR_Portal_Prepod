@@ -1,24 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
-// import {
-//   createHeadOffice,
-//   deleteBlng,
-//   deleteHeadOffice,
-//   updateHeadOffice,
-// } from "../../graphql/mutations";
+
 import { generateClient } from "@aws-amplify/api";
 import { EditTimeSheet } from "./EditTimeSheet";
-import { PopupForSFApproves } from "./ModelForSuccessMess/PopupForSFApproves";
-import { IoCheckmarkCircleSharp } from "react-icons/io5";
-import { MdCancel } from "react-icons/md";
+
+
 import { SuccessMessage } from "./ModelForSuccessMess/SuccessMessage";
 import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
 import { PopupForMissMatchExcelSheet } from "./ModelForSuccessMess/PopupForMissMatchExcelSheet";
-// import {
-//   listEmpPersonalInfos,
-//   listEmpWorkInfos,
-//   listHeadOffices,
-// } from "../../graphql/queries";
+
 import { useTableMerged } from "./customTimeSheet/UserTableMerged";
 import "../../../src/index.css";
 
@@ -32,7 +22,8 @@ import {
 import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
 import { listTimeSheets } from "../../graphql/queries";
 import { Notification } from "./customTimeSheet/Notification";
-import { useMergeTableForNotification } from "./customTimeSheet/useMergeTableForNotification";
+import { MergeTableForNotification } from "./customTimeSheet/MergeTableForNotification";
+import { sendEmail } from "../../services/EmailServices";
 const client = generateClient();
 
 export const ViewHOsheet = ({
@@ -46,6 +37,7 @@ export const ViewHOsheet = ({
 }) => {
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
 
+  const [closePopup, setClosePopup] = useState(false);
   const [data, setData] = useState(null);
   const [secondaryData, setSecondaryData] = useState(null);
   const [editObject, setEditObject] = useState();
@@ -61,7 +53,7 @@ export const ViewHOsheet = ({
     data,
     "TimeKeeper"
   );
-  const getEmail = useMergeTableForNotification(response);
+
 
   const processedData = useTableMerged(excelData);
 
@@ -142,7 +134,7 @@ export const ViewHOsheet = ({
           };
         });
 
-      console.log(result);
+      
       setData(result);
       setSecondaryData(result);
     }
@@ -212,7 +204,7 @@ export const ViewHOsheet = ({
           });
         resolve(keyCheckResult);
       });
-
+      setClosePopup(true);
       setShowStatusCol(result);
       setCurrentStatus(result); // Assuming setCurrentStatus is defined
       // setLoading(false);
@@ -260,7 +252,7 @@ export const ViewHOsheet = ({
 
           if (userIdentification === "Manager") {
             const finalData = await SendDataToManager(fetchedData);
-            console.log(finalData);
+            
             pendingData(finalData);
           }
         } catch (err) {
@@ -288,7 +280,7 @@ export const ViewHOsheet = ({
   const toggleSFAMessage = async (value, responseData) => {
     setSuccessMess(value);
     if (value === true && responseData) {
-      console.log("Success Message : ", responseData);
+    
       setResponse(responseData);
     }
   };
@@ -376,35 +368,64 @@ export const ViewHOsheet = ({
       });
       //   CREATE
       const sendTimeSheets = async (timeSheetData) => {
-        let successFlag = false;
-        for (const timeSheet of timeSheetData) {
-          try {
-            const response = await client.graphql({
-              query: createTimeSheet,
-              variables: {
-                input: timeSheet,
-              },
-            });
-
-            if (response?.data?.createTimeSheet) {
-              console.log(
-                "TimeSheet created successfully:",
-                response.data.createTimeSheet
-              );
-              const responseData = response.data.createTimeSheet;
-              if (!successFlag) {
-                toggleSFAMessage(true, responseData); // Only toggle success message once
-                successFlag = true; // Set the flag to true
+              let successFlag = false;
+      
+              for (const timeSheet of timeSheetData) {
+                try {
+                  const response = await client.graphql({
+                    query: createTimeSheet,
+                    variables: { input: timeSheet },
+                  });
+      
+                  if (response?.data?.createTimeSheet) {
+                    console.log(
+                      "TimeSheet created successfully:",
+                      response.data.createTimeSheet
+                    );
+                    const responseData = response.data.createTimeSheet;
+      
+                    if (!successFlag) {
+                      toggleSFAMessage(true, responseData); // Only toggle success message once
+      
+                      const result = await MergeTableForNotification(responseData);
+                     
+      
+                      if (result) {
+                        // Call the Notification function
+                        const emailDetails = await Notification({
+                          getEmail: result, // Fix: Pass 'getEmail' instead of 'result'
+                          Position,
+                        });
+      
+                        if (emailDetails) {
+                          // Log email details
+                          const { subject, message, fromAddress, toAddress } =
+                            emailDetails;
+                          
+                          await sendEmail(
+                            subject,
+                            message,
+                            fromAddress,
+                            toAddress,
+                          );
+                        } else {
+                          console.error("Notification returned undefined!");
+                        }
+                      } else {
+                        console.error(
+                          "MergeTableForNotification returned undefined!"
+                        );
+                      }
+      
+                      successFlag = true; // Set the flag to true
+                    }
+                  }
+                } catch (error) {
+                  console.error("Error creating TimeSheet:", error);
+                  toggleSFAMessage(false);
+                }
               }
-            }
-          } catch (error) {
-            console.error("Error creating TimeSheet:", error);
-            toggleSFAMessage(false);
-          }
-        }
-      };
-
-      console.log(finalResult);
+            };
 
       sendTimeSheets(finalResult);
     } else if (userIdentification === "Manager") {
@@ -462,6 +483,37 @@ export const ViewHOsheet = ({
               const responseData = response.data.updateTimeSheet;
               if (!successFlag) {
                 toggleSFAMessage(true, responseData); // Only toggle success message once
+
+                const result = await MergeTableForNotification(responseData);
+            
+
+                if (result) {
+                  // Call the Notification function
+                  const emailDetails = await Notification({
+                    getEmail: result, // Fix: Pass 'getEmail' instead of 'result'
+                    Position,
+                  });
+
+                  if (emailDetails) {
+                    // Log email details
+                    const { subject, message, fromAddress, toAddress } =
+                      emailDetails;
+                    
+                    await sendEmail(
+                      subject,
+                      message,
+                      fromAddress,
+                      toAddress
+                    );
+                  } else {
+                    console.error("Notification returned undefined!");
+                  }
+                } else {
+                  console.error(
+                    "MergeTableForNotification returned undefined!"
+                  );
+                }
+
                 successFlag = true; // Set the flag to true
               }
               setVisibleData([]);
@@ -721,8 +773,8 @@ export const ViewHOsheet = ({
               </button>
             </div>
           </div>
-        ) : currentStatus === false ? (
-          <PopupForMissMatchExcelSheet />
+        ) :  currentStatus === false && closePopup === true ? (
+          <PopupForMissMatchExcelSheet setClosePopup={setClosePopup}/>
         ) : (
           ""
         )}
@@ -753,9 +805,7 @@ export const ViewHOsheet = ({
         />
       )}
 
-      {response && getEmail  && successMess && Position && (
-        <Notification getEmail={getEmail} Position={Position} />
-      )}
+     
       
     </div>
   );

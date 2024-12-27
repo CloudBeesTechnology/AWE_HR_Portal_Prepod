@@ -6,7 +6,7 @@ import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
 import { FileUploadField } from "../../employees/medicalDep/FileUploadField";
 import { UpdateLoiData } from "../../../services/updateMethod/UpdateLoi";
 import { useFetchInterview } from "../../../hooks/useFetchInterview";
-
+import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
 // Define validation schema using Yup
 const CVEVFormSchema = Yup.object().shape({
   cvecApproveDate: Yup.date().notRequired(),
@@ -18,14 +18,16 @@ const CVEVFormSchema = Yup.object().shape({
     ),
 });
 
-export const CVEVForm = ({candidate}) => {
+export const CVEVForm = ({ candidate }) => {
   const { mergedInterviewData } = useFetchInterview();
   const { loiDetails } = UpdateLoiData();
+  const { interviewDetails } = UpdateInterviewData();
   const [formData, setFormData] = useState({
     interview: {
       id: "",
       cvecApproveDate: "",
       cvecFile: [],
+      status: "",
     },
   });
 
@@ -37,7 +39,6 @@ export const CVEVForm = ({candidate}) => {
   });
   const {
     register,
-    handleSubmit,
     watch,
     formState: { errors },
     setValue,
@@ -47,7 +48,7 @@ export const CVEVForm = ({candidate}) => {
 
   const CVECUpload = watch("cvecFile", "");
 
-  console.log("DATA 3.0", mergedInterviewData);
+  // console.log("DATA 3.0", mergedInterviewData);
 
   useEffect(() => {
     if (mergedInterviewData.length > 0 && candidate?.tempID) {
@@ -55,13 +56,14 @@ export const CVEVForm = ({candidate}) => {
         (data) => data.tempID === candidate.tempID
       ); // Use the candidate's tempID to filter the data
       if (interviewData) {
-      setFormData({
-        interview: {
-          cvecApproveDate: interviewData.localMobilization.cvecApproveDate,
-          cvecFile: interviewData.localMobilization.cvecFile,
-        },
-      });
-    }
+        setFormData({
+          interview: {
+            cvecApproveDate: interviewData.localMobilization.cvecApproveDate,
+            cvecFile: interviewData.localMobilization.cvecFile,
+            status: interviewData.interviewSchedules.status,
+          },
+        });
+      }
       if (interviewData.localMobilization.cvecFile) {
         setUploadedFileNames((prev) => ({
           ...prev,
@@ -107,6 +109,7 @@ export const CVEVForm = ({candidate}) => {
       return;
     }
     const localMobilizationId = selectedInterviewData?.localMobilization?.id;
+    const interviewScheduleId = selectedInterviewData.interviewSchedules.id;
 
     if (!localMobilizationId) {
       console.error("Interview schedule ID not found.");
@@ -122,6 +125,14 @@ export const CVEVForm = ({candidate}) => {
           cvecFile: uploadedCVEC.cvecFile || formData.cvecFile,
         },
       });
+
+      await interviewDetails({
+        InterviewValue: {
+          id: interviewScheduleId, // Dynamically use the correct id
+          status: formData.interview.status,
+
+        },
+      });
       console.log("Data stored successfully...");
       // setNotification(true);
     } catch (error) {
@@ -129,21 +140,6 @@ export const CVEVForm = ({candidate}) => {
       alert("Failed to update interview details. Please try again.");
     }
   };
-
-  // useEffect(() => {
-  //   if (mergedInterviewData.length > 0) {
-  //     const interviewData = mergedInterviewData[0]; // Assuming we want to take the first item
-  //     setFormData({
-  //       interview: {
-  //         loiIssueDate: interviewData.localMobilization.loiIssueDate,
-  //         loiAcceptDate: interviewData.localMobilization.loiAcceptDate,
-  //         loiDeclineDate: interviewData.localMobilization.loiDeclineDate,
-  //         declineReason: interviewData.localMobilization.declineReason,
-  //         loiFile: interviewData.localMobilization.loiFile,
-  //       },
-  //     });
-  //   }
-  // }, [mergedInterviewData]);
 
   // Function to handle changes for non-file fields
   const handleInputChange = (field, value) => {
@@ -189,19 +185,18 @@ export const CVEVForm = ({candidate}) => {
               }
               value={formData.interview.cvecFile}
             />
-            {/* </label> */}
-            {/* {uploadedFileNames.cvecFile ? (
-              <p className="text-xs mt-1 text-grey">
-                {uploadedFileNames.cvecFile}
-              </p>
-            ) : (
-              errors.cvecFile && (
-                <p className="text-[red] text-xs mt-1">
-                  {errors.cvecFile.message}
-                </p>
-              )
-            )} */}
           </div>
+        </div>
+        <div>
+          <label htmlFor="status">Status</label>
+          <input
+            className="w-full border p-2 rounded mt-1"
+            type="text"
+            id="status"
+            {...register("status")}
+            value={formData.interview.status}
+            onChange={(e) => handleInputChange("status", e.target.value)}
+          />
         </div>
       </div>
 

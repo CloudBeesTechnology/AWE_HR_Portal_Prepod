@@ -21,7 +21,8 @@ export const usePersonalInformation = (userID) => {
   const fetchData = async () => {
     try {
       const empPersonalInfosData = await client.graphql({
-        query: listEmpPersonalInfos,
+        query: listEmpPersonalInfos,          variables: { limit: 20000 },
+
       });
 
       const empPersonalInfos = empPersonalInfosData?.data?.listEmpPersonalInfos?.items || [];
@@ -56,7 +57,8 @@ export const usePersonalInformation = (userID) => {
     try {
       const response = await client.graphql({
         query: updateEmpPersonalInfo,
-        variables: { input },
+        variables: { input ,          variables: { limit: 20000 },
+      },
       });
 
       if (response.data.updateEmpPersonalInfo) {

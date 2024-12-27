@@ -117,15 +117,15 @@ export const WorkpassForm = ({ candidate, onClose, onSave }) => {
              Non Local Mobilization
           </h6>
         </article>
-{show === 0 && <SawpForm/>}
-{show === 1 && <DoeForm/>}
-{show === 2 && <NlmsForm/>}
-{show === 3 && <BankForm/>}
-{show === 4 && <JitpaForm/>}
-{show === 5 && <LabourDepForm/>}
-{show === 6 && <ImmigrationForm/>}
-{show === 7 && <AirTktForm/>}
-{show === 8 && <NonLocalMobilizForm/>}
+{show === 0 && <SawpForm candidate={candidate}/>}
+{show === 1 && <DoeForm candidate={candidate}/>}
+{show === 2 && <NlmsForm candidate={candidate}/>}
+{show === 3 && <BankForm candidate={candidate}/>}
+{show === 4 && <JitpaForm candidate={candidate}/>}
+{show === 5 && <LabourDepForm candidate={candidate}/>}
+{show === 6 && <ImmigrationForm candidate={candidate}/>}
+{show === 7 && <AirTktForm candidate={candidate}/>}
+{show === 8 && <NonLocalMobilizForm candidate={candidate}/>}
 
 </div>
     </div>

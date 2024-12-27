@@ -4,7 +4,6 @@ import { CourceValidationSchema } from "../../../services/TrainingValidation";
 import { Link } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { useContext, useEffect, useState } from "react";
-import { TrainingCertificatesForm } from "./TrainingCertificatesForm";
 import { AddCourseForm } from "./AddCourseForm"; // Import the AddCourseForm component
 import { DataSupply } from "../../../utils/DataStoredContext";
 
@@ -68,47 +67,27 @@ export const AddCourse = () => {
       setValue("company", "");
     }
   };
-  console.log("Selected Course:", selectedCourse);
-  console.log("Course Name:", selectedCourse?.courseName);
+  // console.log("Selected Course:", selectedCourse);
+  // console.log("Course Name:", selectedCourse?.courseName);
   
 
   return (
     <section className="p-10 center flex-col gap-16 bg-[#F8F8F8] mt-10">
       {/* Header Section */}
       <div className=" w-full flex items-center justify-center gap-5 ">
-        <Link to="/training" className="text-xl flex-1 text-grey">
+        <Link to="/training/hr" className="text-xl flex-1 text-grey">
           <FaArrowLeft />
         </Link>
 
         <article className="w-full  center gap-5 text-dark_grey ">
           <p
-            className={`text-center mt-2 text_size_2 relative ${
-              show
-                ? "after:absolute after:w-full after:h-1 after:bg-primary after:-bottom-2 after:left-0"
-                : ""
-            }`}
-            onClick={() => setShow(true)}
-          >
+          className="text-center mt-2 text_size_2 relative after:absolute after:w-full after:h-1 after:bg-primary after:-bottom-2 after:left-0">
+          
             Add Course
-          </p>
-          <p
-            className={`text-center mt-2 text_size_2 relative ${
-              !show
-                ? "after:absolute after:w-full after:h-1 after:bg-primary after:-bottom-2 after:left-0"
-                : ""
-            }`}
-            onClick={() => setShow(false)}
-          >
-            Training Certificates
-          </p>
-        </article>
-
-        {/* Search Section */}
-       
+          </p>    
+        </article>       
       </div>
 
-      {/* Add Course Form Section */}
-      {show && (
         <div className="screen-size center  w-full h-full">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-2xl w-full  max-h-[400px] h-full">
             <div className="flex justify-end items-center py-2">
@@ -187,12 +166,6 @@ export const AddCourse = () => {
             </form>
           </div>
         </div>
-      )}
-
-      {/* Training Certificates Section */}
-      {!show && <TrainingCertificatesForm />}
-
-      {/* Modal for AddCourseForm */}
       {isModalOpen && (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center border mt-20">
     

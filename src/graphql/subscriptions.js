@@ -101,6 +101,9 @@ export const onCreateTimeSheet = /* GraphQL */ `
       totalOT
       totalNTOT
       empWorkInfo
+      fromDate
+      untilDate
+      location
       createdAt
       updatedAt
       __typename
@@ -150,6 +153,9 @@ export const onUpdateTimeSheet = /* GraphQL */ `
       totalOT
       totalNTOT
       empWorkInfo
+      fromDate
+      untilDate
+      location
       createdAt
       updatedAt
       __typename
@@ -199,6 +205,9 @@ export const onDeleteTimeSheet = /* GraphQL */ `
       totalOT
       totalNTOT
       empWorkInfo
+      fromDate
+      untilDate
+      location
       createdAt
       updatedAt
       __typename
@@ -1481,6 +1490,14 @@ export const onCreateWPTracking = /* GraphQL */ `
       agentname
       mobSignDate
       mobFile
+      doerefno
+      sawpDate
+      sawpRecivedDate
+      sawpFile
+      lbrDepoNum
+      lbrEndroseDate
+      lbrDepoAmount
+      lbrFile
       createdAt
       updatedAt
       __typename
@@ -1533,6 +1550,14 @@ export const onUpdateWPTracking = /* GraphQL */ `
       agentname
       mobSignDate
       mobFile
+      doerefno
+      sawpDate
+      sawpRecivedDate
+      sawpFile
+      lbrDepoNum
+      lbrEndroseDate
+      lbrDepoAmount
+      lbrFile
       createdAt
       updatedAt
       __typename
@@ -1585,6 +1610,14 @@ export const onDeleteWPTracking = /* GraphQL */ `
       agentname
       mobSignDate
       mobFile
+      doerefno
+      sawpDate
+      sawpRecivedDate
+      sawpFile
+      lbrDepoNum
+      lbrEndroseDate
+      lbrDepoAmount
+      lbrFile
       createdAt
       updatedAt
       __typename
@@ -2353,6 +2386,25 @@ export const onCreateCandIToEMP = /* GraphQL */ `
       salaryExpectation
       supportInfo
       workExperience
+      mobSignDate
+      mobFile
+      paafApproveDate
+      paafFile
+      loiIssueDate
+      loiAcceptDate
+      loiDeclineDate
+      declineReason
+      loiFile
+      cvecApproveDate
+      cvecFile
+      uploadCertificate
+      pcNoticePeriod
+      venue
+      managerBadgeNo
+      message
+      interType
+      interTime
+      interDate
       createdAt
       updatedAt
       __typename
@@ -2383,6 +2435,25 @@ export const onUpdateCandIToEMP = /* GraphQL */ `
       salaryExpectation
       supportInfo
       workExperience
+      mobSignDate
+      mobFile
+      paafApproveDate
+      paafFile
+      loiIssueDate
+      loiAcceptDate
+      loiDeclineDate
+      declineReason
+      loiFile
+      cvecApproveDate
+      cvecFile
+      uploadCertificate
+      pcNoticePeriod
+      venue
+      managerBadgeNo
+      message
+      interType
+      interTime
+      interDate
       createdAt
       updatedAt
       __typename
@@ -2413,6 +2484,25 @@ export const onDeleteCandIToEMP = /* GraphQL */ `
       salaryExpectation
       supportInfo
       workExperience
+      mobSignDate
+      mobFile
+      paafApproveDate
+      paafFile
+      loiIssueDate
+      loiAcceptDate
+      loiDeclineDate
+      declineReason
+      loiFile
+      cvecApproveDate
+      cvecFile
+      uploadCertificate
+      pcNoticePeriod
+      venue
+      managerBadgeNo
+      message
+      interType
+      interTime
+      interDate
       createdAt
       updatedAt
       __typename

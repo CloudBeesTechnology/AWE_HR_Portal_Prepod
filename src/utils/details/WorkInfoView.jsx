@@ -265,7 +265,8 @@ const WorkInfoView = ({
   };
 
   return (
-    <section ref={mainRef} className="py-8 bg-gray-50 rounded-lg">
+    <section>
+    <div ref={mainRef} className="py-8 bg-gray-50 rounded-lg">
       <h6 className="uppercase text_size_5 mb-6">Work Info Details:</h6>
 
       {/* Employee Details */}
@@ -300,16 +301,6 @@ const WorkInfoView = ({
           </div>
         </div>
       </div>
-      <div className="mt-8">
-        <h6 className="uppercase text_size_5  my-3">
-          Employee Exit Info Documents
-        </h6>
-        {renderDocumentCategory(WIContract, "Contract")}
-        {renderDocumentCategory(WILeaveEntitle, "Probation")}
-        {renderDocumentCategory(WIResignation, "Resignation")}
-        {renderDocumentCategory(WITermination, "Termination")}
-        {renderDocumentCategory(WIProbation, "Leave Entitlement")}
-      </div>
 
       <div className="mt-8">
         <h6 className="uppercase text_size_5  my-3">Employee Service Record</h6>
@@ -320,8 +311,20 @@ const WorkInfoView = ({
         </div>
       </div>
 
-      {/* Service Road Section */}
-      <div className="mt-8">
+     
+    </div>
+    <div className="mt-8">
+        <h6 className="uppercase text_size_5  my-3">
+          Employee Exit Info Documents
+        </h6>
+        {renderDocumentCategory(WIContract, "Contract")}
+        {renderDocumentCategory(WILeaveEntitle, "Probation")}
+        {renderDocumentCategory(WIResignation, "Resignation")}
+        {renderDocumentCategory(WITermination, "Termination")}
+        {renderDocumentCategory(WIProbation, "Leave Entitlement")}
+      </div>
+     {/* Service Road Section */}
+     <div className="mt-8">
         <h6 className="uppercase text_size_5 my-3">Service Record Documents</h6>
         {renderDocumentCategory(uploadPR, "Position Revision")}
         {renderDocumentCategory(uploadSP, "Salary Package Revision")}

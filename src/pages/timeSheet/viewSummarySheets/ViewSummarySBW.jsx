@@ -1,5 +1,5 @@
 import { generateClient } from "@aws-amplify/api";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { FaAngleDown } from "react-icons/fa";
 import {
@@ -13,8 +13,8 @@ import "jspdf-autotable";
 import { SearchBoxForTimeSheet } from "../../../utils/SearchBoxForTimeSheet";
 import { SearchDisplayForTimeSheet } from "../timeSheetSearch/SearchDisplayForTS";
 import { useFetchData } from "../customTimeSheet/UseFetchData";
-import { LocationData } from "../../timeSheet/customTimeSheet/JobcodeAndLocation";
-import { dummyLeaveStatus } from "../../timeSheet/customTimeSheet/JobcodeAndLocation";
+import { LocationData } from "../customTimeSheet/JobcodeAndLocation";
+import { dummyLeaveStatus } from "../customTimeSheet/JobcodeAndLocation";
 
 import { Link } from "react-router-dom";
 const client = generateClient();
@@ -24,7 +24,10 @@ export const ViewSummarySBW = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selectedLocation, setSelectedLocation] = useState(null);
-  const { convertedStringToArrayObj, getPosition } = useFetchData("Offshore");
+  const { convertedStringToArrayObj, getPosition } = useFetchData(
+    "SBW",
+    "viewTimeSheet"
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,20 +60,26 @@ export const ViewSummarySBW = () => {
                   return null;
                 }
               })
-              .map((info) => info[0]);
-              // .filter((fil) => fil !== null && fil !== undefined);
+              .map((info) => info)[0];
+
+            // .filter((fil) => fil !== null && fil !== undefined);
           } else {
-            sheet.empWorkInfo = [null];
+            return (sheet.empWorkInfo = sheet.empWorkInfo);
           }
         } catch (err) {
-          console.error(
-            `Error processing empWorkInfo for id ${sheet.id}:`,
-            err
-          );
-          sheet.empWorkInfo = [null];
+          // console.error(
+          //   `Error processing empWorkInfo for id ${sheet.id}:`,
+          //   err
+          // );
+          // console.log("ERROR : ", err);
+          return (sheet.empWorkInfo = sheet.empWorkInfo);
         }
       });
-      console.log(convertedStringToArrayObj);
+
+      const k = convertedStringToArrayObj.filter(
+        (fil) => fil.empBadgeNo === "3907A"
+      );
+      console.log(k);
 
       const leaveStatusData = leaveStatus?.data?.listLeaveStatuses?.items;
 
@@ -120,7 +129,7 @@ export const ViewSummarySBW = () => {
         return grouped;
       };
       const grouped = groupBySapNo(convertedStringToArrayObj);
-      // console.log(grouped);
+      console.log("grouped : ", grouped);
 
       const seperateDateMethod = (inputData) => {
         return inputData
@@ -153,29 +162,22 @@ export const ViewSummarySBW = () => {
       const seperatedEmpByDate = seperateDateMethod(grouped);
       console.log("seperatedEmpByDate : ", seperatedEmpByDate);
 
+      const res = seperatedEmpByDate.filter(
+        (fil) => fil.empBadgeNo === "3907A"
+      );
+
       function groupByEmpIdAndLocation(dataArray) {
         const groupedData = new Map();
         const ungroupedData = [];
 
         dataArray.forEach((emp) => {
-          console.log(emp);
           emp.data.forEach((dataEntry) => {
-            // Handle entries with no `jobLocaWhrs` or a single unique LOCATION
-            if (
-              !dataEntry.empWorkInfo[0] ||
-              dataEntry.empWorkInfo[0].length === 0 ||
-              dataEntry.empWorkInfo[0] !== null ||
-              dataEntry.empWorkInfo[0] !== undefined
-            ) {
-              ungroupedData.push({
-                badgeempBadgeNo: emp.empBadgeNo,
-                data: [{ ...dataEntry, empWorkInfo: [] }],
-              });
-            } else {
-              // Group entries with multiple LOCATIONS
-              dataEntry.empWorkInfo[0]?.forEach((job) => {
-                const location = job.LOCATION || "";
-                const jobcode = job.JOBCODE || "";
+            // Check if empWorkInfo exists and is an array
+            if (Array.isArray(dataEntry.empWorkInfo) && dataEntry.empWorkInfo) {
+              // Process entries with valid empWorkInfo
+              dataEntry.empWorkInfo.forEach((job) => {
+                const location = job?.LOCATION || "";
+                const jobcode = job?.JOBCODE || "";
                 const dateObj = new Date(dataEntry.date);
                 const monthYearKey = `${dateObj.getFullYear()}-${
                   dateObj.getMonth() + 1
@@ -189,12 +191,18 @@ export const ViewSummarySBW = () => {
                   });
                 }
 
-                // Add the current dataEntry to the group, ensuring `empWorkInfo` is specific to this LOCATION
+                // Add the current dataEntry to the group
                 const group = groupedData.get(key);
                 group.data.push({
                   ...dataEntry,
-                  empWorkInfo: [job], // Only include the current job entry for this LOCATION
+                  empWorkInfo: [job], // Include only the current job entry
                 });
+              });
+            } else {
+              // Handle entries with no or invalid empWorkInfo
+              ungroupedData.push({
+                empBadgeNo: emp.empBadgeNo,
+                data: [{ ...dataEntry, empWorkInfo: [] }],
               });
             }
           });
@@ -205,7 +213,396 @@ export const ViewSummarySBW = () => {
       }
       const seperatedGroupedData = groupByEmpIdAndLocation(seperatedEmpByDate);
       console.log(seperatedGroupedData);
+
+      // const seperatedData = seperatedGroupedData.flatMap(item =>
+      //     item.data.map(dataItem => ({
+      //         empBadgeNo: item.empBadgeNo,
+      //         data: [dataItem]
+      //     }))
+      // );
+
+      const merged = mergedData.flatMap((val) => {
+        // Filter all matching entries from approvedLeaveStatus
+        const matches = approvedLeaveStatus.filter(
+          (so) => val.empID === so.empID
+        );
+
+        if (matches.length > 0) {
+          // Map over matches and merge each one with the current `val`
+          return matches.map((match) => ({
+            ...val,
+            ...match,
+          }));
+        }
+
+        // If no match is found, just return the original `val`
+        return [val];
+      });
+
+      // seperatedGroupedData
+      const filteredData = merged.filter((leave) => {
+        return seperatedGroupedData.some((emp) => {
+          // console.log(leave.empBadgeNo === emp.badge)
+          if (leave.empBadgeNo === emp.empBadgeNo) {
+            // console.log(leave.empBadgeNo, " | ", emp.badge);
+
+            return emp.data.some((entry) => {
+              const leaveDate = new Date(leave.toDate);
+              const empDate = new Date(entry.date);
+              // console.log(
+              //   "empDate : ",
+              //   empDate.getFullYear(),
+              //   " | ",
+              //   "leaveDate : ",
+              //   leaveDate.getMonth()
+              // );
+
+              return (
+                leaveDate.getFullYear() === empDate.getFullYear() &&
+                leaveDate.getMonth() === empDate.getMonth()
+              );
+            });
+          }
+          return false;
+        });
+      });
+
+      console.log("filteredData : ", filteredData);
+
+      const leaveCounts = filteredData.reduce((acc, entry) => {
+        const { empBadgeNo, leaveType } = entry;
+
+        // Ensure an entry exists for the sapNo
+        if (!acc[empBadgeNo]) {
+          acc[empBadgeNo] = {};
+        }
+
+        // Increment the count for the specific leaveType
+        acc[empBadgeNo][leaveType] = (acc[empBadgeNo][leaveType] || 0) + 1;
+
+        return acc;
+      }, {});
+
+      const leaveCount = Object.entries(leaveCounts).map(
+        ([empBadgeNo, leaveTypes]) => ({
+          empBadgeNo,
+          leaveCounts: leaveTypes,
+        })
+      );
+
+      console.log(leaveCount);
+
+      const leaveTypeAbbreviation = {
+        "Annual Leave": "AL",
+        "Compassionate Leave": "CL",
+        "Sick Leave": "SL",
+        "Unpaid Authorise Leave": "UAL",
+      };
+
+      // Helper function to generate a list of dates
+      const generateDateList = (
+        fromDate,
+        toDate,
+        abbreviation,
+        isHalfDay = false
+      ) => {
+        const start = new Date(fromDate);
+        const end = new Date(toDate);
+        const list = {};
+
+        while (start <= end) {
+          const day = start.getDate();
+          list[day] = isHalfDay ? `H${abbreviation}4` : abbreviation; // Handle half-day abbreviation
+          start.setDate(start.getDate() + 1);
+        }
+        return list;
+      };
+
+      // Transform function
+      const transformData = (inputData) => {
+        const result = {};
+
+        inputData.forEach((entry) => {
+          const { empID, empBadgeNo, leaveType, fromDate, toDate, days } =
+            entry;
+
+          if (!result[empID]) {
+            result[empID] = {
+              empBadgeNo: empBadgeNo,
+              leaveCounts: {},
+              dateDifferences: [],
+            };
+          }
+          if (!(leaveType === "Compassionate Leave" && days === 0.5)) {
+            result[empID].leaveCounts[leaveType] =
+              (result[empID].leaveCounts[leaveType] || 0) + 1;
+          }
+
+          // Add date difference details
+          result[empID].dateDifferences.push({
+            leaveType,
+            fromDate,
+            toDate,
+            listDate: generateDateList(
+              fromDate,
+              toDate,
+              leaveTypeAbbreviation[leaveType],
+              days === 0.5 // Pass half-day indicator
+            ),
+            daysDifference: days,
+          });
+        });
+
+        return Object.values(result);
+      };
+
+      // Transform the data
+      const leaveCount_ = transformData(filteredData);
+      console.log("leaveCount_ : ", leaveCount_);
+      console.log("seperatedGroupedData : ", seperatedGroupedData);
+   
+  
+
+      const addLeaveTypeCount = seperatedGroupedData.map((val) => {
+        const empLeaveCount = leaveCount_.find(
+          (fi) => val.empBadgeNo === fi.empBadgeNo
+        );
+
+        const getDate = val.data.find((f) => f);
+
+        const res = getDate.empWorkInfo.map((val) => val?.LOCATION);
+        const jobcode = getDate.empWorkInfo.map((val) => val?.JOBCODE);
+
+        const workingHrs = Array.from(
+          { length: `${31}` },
+          (_, i) => i + 1
+        ).reduce((acc, day) => {
+          const dayStr = day.toString();
+          const entry = val.data.find(
+            ({ date }) => new Date(date).getDate() === day
+          );
+
+          // Construct date based on current year, month, and day
+          const date = new Date(
+            entry?.date ||
+              `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${day}`
+          );
+          const dayOfWeek = date.toLocaleDateString("en-US", {
+            weekday: "long",
+          }); // Get day name
+          const checkEntry = entry?.empWorkInfo[0]?.WORKINGHRS;
+
+          // Handle day-specific conditions
+          if (dayOfWeek === "Saturday") {
+            // Saturday
+            acc[dayStr] = !checkEntry ? "OFF" : checkEntry; // Set 'OFF' if workingHrs is empty
+          } else if (dayOfWeek === "Sunday") {
+            // Sunday
+            acc[dayStr] = ""; // Leave blank for Sunday
+          } else {
+            // Other weekdays
+            if (!checkEntry) {
+              acc[dayStr] = "A"; // Mark 'A' for absence if no entry
+            } else {
+              const workingHrs = parseFloat(entry.empWorkInfo[0]?.WORKINGHRS);
+              // if (workingHrs < entry?.normalWorkHrs === undefined ? 0 : entry?.normalWorkHrs)  {
+              //   const absence = (entry?.normalWorkHrs === undefined ? 0 : entry?.normalWorkHrs - workingHrs).toFixed(1);
+              if (workingHrs < entry?.normalWorkHrs) {
+                const absence = (entry?.normalWorkHrs - workingHrs).toFixed(1);
+                acc[dayStr] = `x(${absence})${workingHrs}`; // Format as "absence(workingHrs)"
+              } else {
+                acc[dayStr] = workingHrs.toString();
+                console.log(workingHrs);
+              }
+            }
+          }
+
+          return acc;
+        }, {});
+
+        return empLeaveCount
+          ? {
+              ...val,
+              workingHrs: workingHrs,
+              leaveCounts: empLeaveCount.leaveCounts,
+              newDate: getDate.date,
+              location: res?.[0],
+              jobcode: jobcode?.[0],
+              // dateDifferences:empLeaveCount.dateDifferences,
+            }
+          : {
+              ...val,
+              workingHrs: workingHrs,
+              leaveCounts: {},
+              newDate: getDate.date,
+              location: res?.[0],
+              jobcode: jobcode?.[0],
+            };
+      });
+
+      console.log(addLeaveTypeCount);
+
+      // Iterate through each employee in leaveCount_
+      // leaveCount_.forEach((leaveEmp) => {
+      //   // Find the corresponding employee in addLeaveTypeCount
+      //   const matchingEmp = addLeaveTypeCount.find(
+      //     (emp) => emp.empBadgeNo === leaveEmp.empBadgeNo
+      //   );
+      //   console.log(matchingEmp)
+      //   if (matchingEmp) {
+      //     // Loop through each leave entry in dateDifferences
+      //     leaveEmp.dateDifferences.forEach((leaveEntry) => {
+      //       // Extract listDate and leaveType
+      //       const listDate = leaveEntry.listDate;
+
+      //       // Iterate through the listDate keys
+      //       Object.keys(listDate).forEach((dateKey) => {
+      //         // Check if the dateKey exists in workingHrs
+      //         if (matchingEmp.workingHrs[dateKey] !== undefined) {
+      //           // Update workingHrs with listDate value
+      //           matchingEmp.workingHrs[dateKey] = listDate[dateKey];
+      //         }
+      //       });
+      //     });
+      //   }
+      // });
+
+      // console.log(leaveCount_);
+
+      // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+      function assignLeaveToWorkingHrs(leaveStatus_, addLeaveTypeCount) {
+        // Iterate through each employee in addLeaveTypeCount
+        addLeaveTypeCount.forEach((empData) => {
+          // Find the matching employee in leaveStatus_
+          const matchingLeaveData = leaveStatus_.find(
+            (leave) => leave.empBadgeNo === empData.empBadgeNo
+          );
+
+          if (matchingLeaveData) {
+            // Iterate through dateDifferences for the matching employee
+            matchingLeaveData.dateDifferences.forEach((leave) => {
+              // For each leaveType, get the corresponding listDate
+              const listDate = leave.listDate;
+
+              // Iterate through listDate keys and assign the values to workingHrs in addLeaveTypeCount
+              Object.keys(listDate).forEach((day) => {
+                if (empData.workingHrs[day] !== undefined) {
+                  // Assign the leave type (e.g., "AL", "CL") to the corresponding workingHrs key
+                  empData.workingHrs[day] = listDate[day];
+                }
+              });
+            });
+          }
+        });
+        return addLeaveTypeCount;
+      }
+
+      // Example usage
+      const updatedSeperatedData = await assignLeaveToWorkingHrs(
+        leaveCount_,
+        addLeaveTypeCount
+      );
+      console.log(updatedSeperatedData);
+
+      // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+      const processWorkingHrs = async (addLeaveTypeCount) => {
+        return await addLeaveTypeCount.map((entry) => {
+          // Process only if empBadgeNo matches
+          data.forEach((item) => {
+            if (entry.empBadgeNo === item.empBadgeNo) {
+              Object.keys(entry.workingHrs).forEach((key) => {
+                // Check if any other value for the same key across the data is not "A"
+                const hasValidValue = data.some(
+                  (item) =>
+                    item.empBadgeNo === entry.empBadgeNo &&
+                    item.workingHrs[key] &&
+                    item.workingHrs[key] !== "A"
+                );
+
+                if (entry.workingHrs[key] === "A" && hasValidValue) {
+                  entry.workingHrs[key] = "0";
+                }
+              });
+            }
+          });
+          return entry;
+        });
+      };
+
+      const FinalData = await processWorkingHrs(addLeaveTypeCount);
+      console.log("addLeaveTypeCount : ", addLeaveTypeCount);
+      // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+      const transformedData = addLeaveTypeCount
+        .map((item) => {
+          const initialMatch = mergedData.find(
+            (datasetItem) => datasetItem.empBadgeNo === item.empBadgeNo
+          );
+
+          const selectedFields = initialMatch
+            ? (({
+                empID,
+                name,
+                sapNo,
+                empBadgeNo,
+                workHrs,
+                workMonth,
+                salaryType,
+                days,
+              }) => ({
+                empID,
+                name,
+                sapNo,
+                empBadgeNo,
+                workHrs,
+                workMonth,
+                salaryType,
+                days,
+              }))(initialMatch)
+            : {};
+
+          const getEmpDateRange = item.data.find((first) => first.date);
+
+          const empName = item?.data?.map((m) => m.name);
+          const empLeaveCount = item?.leaveCounts;
+          const workingHrs = item?.workingHrs;
+          const dateForSelectMY = item?.newDate;
+          const location = item?.location;
+          const overtimeHours = item?.data?.reduce(
+            (acc, { date, empWorkInfo }) => {
+              const day = new Date(date).getDate().toString();
+
+              const overtime = empWorkInfo[0]?.OVERTIMEHRS;
+              if (overtime) {
+                acc[day] = parseInt(overtime);
+              }
+              return acc;
+            },
+            {}
+          );
+
+          const jobcode = item.data.map(
+            ({ empWorkInfo }) => empWorkInfo[0]?.JOBCODE
+          );
+
+          return {
+            empName: empName,
+            jobcode: jobcode[0] || "",
+            dateForSelectMY: dateForSelectMY,
+            ...selectedFields,
+            // NORMALWORKHRSPERDAY: normalWorkHours,
+            OVERTIMEHRS: overtimeHours,
+            empLeaveCount: empLeaveCount,
+            workingHrs: workingHrs,
+            location: location,
+          };
+        })
+        .filter(Boolean);
+      console.log(transformedData);
+      setData(transformedData);
+      setSecondaryData(transformedData);
     };
+
     fetchData();
   }, [convertedStringToArrayObj]);
 
@@ -624,7 +1021,13 @@ export const ViewSummarySBW = () => {
             </tbody>
           </table>
         </div>
-        <footer className="flex justify-center py-5">
+        <footer className="flex justify-center py-10 space-x-10">
+          <button
+            className=" rounded text_size_5 text-dark_grey bg-primary px-3 py-2 w-[180px]"
+            // onClick={exportToPDF}
+          >
+            Verify
+          </button>
           <button
             className=" rounded text_size_5 text-dark_grey bg-primary px-3 py-2 w-[180px]"
             // onClick={exportToPDF}

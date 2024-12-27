@@ -6,10 +6,14 @@ import { CiSquarePlus } from "react-icons/ci";
 import { EducationSchema } from "../../services/Validation"; // Adjust import as necessary
 import { useLocation, useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
+
 import { DataSupply } from "../../utils/DataStoredContext";
+import { useTempID } from "../../utils/TempIDContext";
 
 export const EducationDetails = () => {
-  const { tempID } = useOutletContext();
+  // const { tempID } = useOutletContext();
+  const { tempID } = useTempID();
+  const { educDetailsData } = useContext(DataSupply);
 
   const location = useLocation();
   const navigatingPersonalData = location.state?.FormData;
@@ -87,6 +91,8 @@ export const EducationDetails = () => {
     });
   };
 
+  console.log(tempID)
+  
   const handleAddReferee = () => {
     // Append a new referee object with isNew flag set to true
     appendCharacterReferee({
@@ -123,24 +129,64 @@ export const EducationDetails = () => {
 
   useEffect(() => {
     if (tempID) {
+      // Retrieve saved data from localStorage
       const savedData = JSON.parse(localStorage.getItem("educationFormData"));
-
-      if (savedData) {
-        console.log("Loaded Saved Data:", savedData);
-
-        // Loop through saved data and set each value
+    console.log('Saved data:', savedData);    // Debugging log
+  
+      // Ensure savedData is not null or undefined and is an object
+      if (savedData && typeof savedData === 'object') {
+        // Log the keys to check if they match your form field names
         Object.keys(savedData).forEach((key) => {
-          // If the field is an array, set it using `setValue` directly for the array field
-          if (Array.isArray(savedData[key])) {
-            setValue(key, savedData[key]);
-          } else if (savedData[key]) {
-            setValue(key, savedData[key]);
-          }
+          console.log('Setting value for field:', key, 'Value:', savedData[key]);
+          setValue(key, savedData[key]);
         });
+      }
+  
+      // Ensure educDetailsData is an array and has length
+      if (Array.isArray(educDetailsData) && educDetailsData.length > 0) {
+        const interviewData = educDetailsData.find((data) => data.tempID === tempID);
+        if (interviewData) {
+          console.log('Interview data found:', interviewData); // Debugging log
+  
+          // If interviewData found, iterate over savedData keys
+          Object.keys(savedData || {}).forEach((key) => {
+            console.log('Setting value from interview data:', key, 'Value:', savedData[key]);
+            if (Array.isArray(savedData[key])) {
+              setValue(key, savedData[key]);
+            } else if (savedData[key]) {
+              setValue(key, savedData[key]);
+            }
+          });
+        }
       }
     }
   }, [tempID, setValue]);
+  
 
+  // useEffect(() => {
+  //   if (tempID) {
+  //     const savedData = JSON.parse(localStorage.getItem("educationFormData"));
+  //     if (savedData) {
+  //       Object.keys(savedData).forEach((key) => setValue(key, savedData[key]));
+  //     }
+
+  //     if (educDetailsData.length > 0) {
+  //       const interviewData = educDetailsData.find((data) => data.tempID === tempID);
+  //       if (interviewData) {
+  //       Object.keys(savedData).forEach((key) => {
+         
+  //         if (Array.isArray(savedData[key])) {
+  //           setValue(key, savedData[key]);
+  //         } else if (savedData[key]) {
+  //           setValue(key, savedData[key]);
+  //         }
+  //       });
+  //     }
+  //     }
+  //   }
+  // }, [tempID, setValue]);
+
+  console.log(educDetailsData)
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="">
       {/* h-screen overflow-y-auto scrollbar-hide */}

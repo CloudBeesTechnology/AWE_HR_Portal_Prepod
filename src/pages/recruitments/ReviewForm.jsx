@@ -16,7 +16,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [notification, setNotification] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
- 
+
   const handleScheduleInterview = () => {
     setIsScheduleOpen(true);
   };
@@ -86,9 +86,6 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
       const validMatches = matchTempIDs.filter((item) => item?.id);
 
       if (validMatches.length === 0) {
-        // console.log(error);
-        // console.log("dataCandi:", dataCandi);
-        // console.log("IVSSDetails:", IVSSDetails);
         return;
       }
 
@@ -106,7 +103,12 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             variables: { input: data },
           });
 
-          console.log("Update successful for candidate ID", match.id, ":",response );
+          console.log(
+            "Update successful for candidate ID",
+            match.id,
+            ":",
+            response
+          );
           setNotification(true);
         } catch (err) {
           console.log(err);
@@ -153,8 +155,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     if (candidate?.profilePhoto) {
       linkToImageFile(candidate.profilePhoto);
     }
-  }, [candidate?.profilePhoto]);// Only run when candidate.profilePhoto changes
-  
+  }, [candidate?.profilePhoto]); // Only run when candidate.profilePhoto changes
 
   return (
     <section>
@@ -260,44 +261,48 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
 
           {/* Bottom Buttons: Reject and Schedule Interview */}
           <div className="flex justify-center mt-6 gap-5">
-            {!showDecisionButtons && (
+            {showDecisionButtons !== undefined && (
               <>
-                <button
-                  className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
-                  onClick={handleRejected}
-                >
-                  Reject
-                </button>
-                <button
-                  className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
-                  onClick={handleScheduleInterview} // Opens the schedule interview form
-                >
-                  Schedule Interview
-                </button>
-              </>
-            )}
+                {!showDecisionButtons && (
+                  <>
+                    <button
+                      className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
+                      onClick={handleRejected}
+                    >
+                      Reject
+                    </button>
+                    <button
+                      className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
+                      onClick={handleScheduleInterview} // Opens the schedule interview form
+                    >
+                      Schedule Interview
+                    </button>
+                  </>
+                )}
 
-            {/* Conditionally render the Rejected and Selected buttons */}
-            {showDecisionButtons && (
-              <>
-                <button
-                  className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
-                  onClick={() => {
-                    handleRejected([candidate]); // Pass candidate as an array
-                  }}
-                >
-                  Rejected
-                </button>
+                {/* Conditionally render the Rejected and Selected buttons */}
+                {showDecisionButtons && (
+                  <>
+                    <button
+                      className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
+                      onClick={() => {
+                        handleRejected([candidate]); // Pass candidate as an array
+                      }}
+                    >
+                      Rejected
+                    </button>
 
-                <button
-                  className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
-                  onClick={() => {
-                    handleSelected([candidate]);
-                    console.log(candidate);
-                  }}
-                >
-                  Selected
-                </button>
+                    <button
+                      className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
+                      onClick={() => {
+                        handleSelected([candidate]);
+                        console.log(candidate);
+                      }}
+                    >
+                      Selected
+                    </button>
+                  </>
+                )}
               </>
             )}
             {notification && (

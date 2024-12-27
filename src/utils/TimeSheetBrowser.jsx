@@ -6,8 +6,6 @@ import { Popup } from "../pages/timeSheet/Popup";
 import { PopupForSave } from "../pages/timeSheet/PopupForSave";
 import { ViewTSTBeforeSave } from "../pages/timeSheet/ViewTSTBeforeSave";
 import { FaArrowLeft } from "react-icons/fa";
-// import { UploadOffshoreFile } from "./UploadOffshoreFile";
-// import { UploadBLNGfile } from "./UploadBLNGfile";
 
 import { ViewBLNGsheet } from "../pages/timeSheet/ViewBLNGsheet";
 import { ViewSBWsheet } from "../pages/timeSheet/ViewSBWsheet";
@@ -37,12 +35,9 @@ export const TimeSheetBrowser = ({ title }) => {
   const [returnedTHeader, setReturnedTHeader] = useState();
   const [excelData, setExcelData] = useState(null);
   const [titleName, setTitleName] = useState("");
-  // const [getPosition, setGetPosition] = useState(null);
+
   const [loading, setLoading] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
-  // const [convertedStringToArrayObj, setConvertedStringToArrayObj] = useState(
-  //   []
-  // );
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
@@ -56,202 +51,10 @@ export const TimeSheetBrowser = ({ title }) => {
     }
   }, [isChecked]);
   const Position = localStorage.getItem("userType");
-  const { convertedStringToArrayObj, getPosition } = useFetchData(titleName,Position);
-
-  // Convert string to array of object
-  // useEffect(() => {
-  //   const Position = localStorage.getItem("userType");
-
-  //   // setGetPosition(Position);
-
-  //   const fetchData = async () => {
-  //     console.log("I am calling You");
-  //     // Fetch the BLNG data using GraphQL
-  //     const [fetchBLNGdata] = await Promise.all([
-  //       client.graphql({
-  //         query: listBlngs,
-  //       }),
-  //     ]);
-  //     // const [fetchBLNGdata] = await Promise.all([
-  //     //   client.graphql({
-  //     //     query: listHeadOffices,
-  //     //   }),
-  //     // ]);
-
-  //     // const k = JSON.parse(fetchBLNGdata?.data?.listBlngs?.items);
-  //     // console.log(k);
-  //     const BLNGdata = fetchBLNGdata?.data?.listBlngs?.items;
-  //     // console.log("BLNGdata : ", BLNGdata);
-
-  //     if (BLNGdata && BLNGdata.length > 0) {
-  //       const result = BLNGdata.map((m, index) => {
-  //         // Check if m.weeklySheet is an array and contains a string
-  //         if (Array.isArray(m.weeklySheet) && m.weeklySheet.length > 0) {
-  //           const rawWeeklySheet = m.weeklySheet[0]; // Safely access the first element of the array
-  //           const id = m.id;
-  //           console.log("ID : ", id);
-  //           console.log("Status:", m.status);
-  //           const Status = m.status; // Store the status dynamically
-
-  //           // Step 1: Clean the data string
-  //           const cleanedData = rawWeeklySheet.replace(
-  //             /^"|\s*'|\s*"$|\\'/g,
-  //             ""
-  //           ); // Remove leading and trailing quotes and escape characters
-
-  //           // Step 2: Unescape the string by replacing escaped quotes
-  //           const unescapedData = cleanedData
-  //             .replace(/\\"/g, '"') // Replace escaped quotes
-  //             .replace(/\\n/g, "") // Replace escaped new lines
-  //             .replace(/\\\//g, "/"); // Replace escaped slashes
-
-  //           try {
-  //             // Step 3: Parse the valid JSON string into an array of objects
-  //             const arrayOfObjects = JSON.parse(unescapedData);
-
-  //             // Log the result for debugging
-  //             console.log("Parsed JSON:", arrayOfObjects);
-
-  //             // const result = arrayOfObjects.map((obj) => ({
-  //             //   id: id,
-  //             //   weaklySheet: { ...obj, status: Status },
-  //             // }));
-
-  //             // console.log(...result, { id: id });
-
-  //             const dataWithStatus = arrayOfObjects.map((obj) => ({
-  //               ...obj,
-  //               status: Status, // Dynamically assign the status to each object
-  //             }));
-  //             const dataWithIdStatus = [{ id: id }, dataWithStatus];
-
-  //             // console.log("Raw Data", { id: id }, dataWithStatus);
-  //             return dataWithIdStatus; // Return the modified objects
-  //           } catch (error) {
-  //             // console.error("Error parsing JSON:", error);
-  //             return null; // Return null in case of error
-  //           }
-  //         } else {
-  //           // console.warn(
-  //           //   "weeklySheet is not an array or is empty:",
-  //           //   m.weeklySheet
-  //           // );
-  //           return null; // Handle the case where weeklySheet is not valid
-  //         }
-  //       });
-  //       console.log("Raw Data : ", result);
-  //       // Flatten the resulting array and remove nulls
-  //       const removedArray = result.filter((item) => item !== null);
-
-  //       console.log("Final parsed data:", removedArray);
-
-  //       setConvertedStringToArrayObj(removedArray);
-  //     } else {
-  //       console.log("BLNGdata is not available");
-  //     }
-  //   };
-
-  //   return () => {
-  //     fetchData();
-  //   };
-  // }, [callBLNGgetMethod]);
-
-  // useEffect(() => {
-  //   const Position = localStorage.getItem("userType");
-
-  //   setGetPosition(Position);
-
-  //   const fetchData = async () => {
-  //     console.log("I am calling You");
-  //     // Fetch the BLNG data using GraphQL
-  //     const [fetchBLNGdata] = await Promise.all([
-  //       client.graphql({
-  //         query: listHeadOffices,
-  //       }),
-  //     ]);
-  //     // const [fetchBLNGdata] = await Promise.all([
-  //     //   client.graphql({
-  //     //     query: listHeadOffices,
-  //     //   }),
-  //     // ]);
-
-  //     // const k = JSON.parse(fetchBLNGdata?.data?.listBlngs?.items);
-  //     // console.log(k);
-  //     const headOffice = fetchBLNGdata?.data?.listHeadOffices?.items;
-  //     // console.log("headOffice : ", headOffice);
-
-  //     if (headOffice && headOffice.length > 0) {
-  //       const result = headOffice.map((m, index) => {
-  //         // Check if m.weeklySheet is an array and contains a string
-  //         if (Array.isArray(m.dailySheet) && m.dailySheet.length > 0) {
-  //           const rawWeeklySheet = m.dailySheet[0]; // Safely access the first element of the array
-  //           const id = m.id;
-  //           console.log("ID : ", id);
-  //           console.log("Status:", m.status);
-  //           const Status = m.status; // Store the status dynamically
-
-  //           // Step 1: Clean the data string
-  //           const cleanedData = rawWeeklySheet.replace(
-  //             /^"|\s*'|\s*"$|\\'/g,
-  //             ""
-  //           ); // Remove leading and trailing quotes and escape characters
-
-  //           // Step 2: Unescape the string by replacing escaped quotes
-  //           const unescapedData = cleanedData
-  //             .replace(/\\"/g, '"') // Replace escaped quotes
-  //             .replace(/\\n/g, "") // Replace escaped new lines
-  //             .replace(/\\\//g, "/"); // Replace escaped slashes
-
-  //           try {
-  //             // Step 3: Parse the valid JSON string into an array of objects
-  //             const arrayOfObjects = JSON.parse(unescapedData);
-
-  //             // Log the result for debugging
-  //             console.log("Parsed JSON:", arrayOfObjects);
-
-  //             // const result = arrayOfObjects.map((obj) => ({
-  //             //   id: id,
-  //             //   weaklySheet: { ...obj, status: Status },
-  //             // }));
-
-  //             // console.log(...result, { id: id });
-
-  //             const dataWithStatus = arrayOfObjects.map((obj) => ({
-  //               ...obj,
-  //               status: Status, // Dynamically assign the status to each object
-  //             }));
-  //             const dataWithIdStatus = [{ id: id }, dataWithStatus];
-
-  //             // console.log("Raw Data", { id: id }, dataWithStatus);
-  //             return dataWithIdStatus; // Return the modified objects
-  //           } catch (error) {
-  //             // console.error("Error parsing JSON:", error);
-  //             return null; // Return null in case of error
-  //           }
-  //         } else {
-  //           // console.warn(
-  //           //   "weeklySheet is not an array or is empty:",
-  //           //   m.weeklySheet
-  //           // );
-  //           return null; // Handle the case where weeklySheet is not valid
-  //         }
-  //       });
-  //       console.log("Raw Data : ", result);
-  //       // Flatten the resulting array and remove nulls
-  //       const removedArray = result.filter((item) => item !== null);
-
-  //       console.log("Final parsed data:", removedArray);
-
-  //       setConvertedStringToArrayObj(removedArray);
-  //     } else {
-  //       console.log("headOffice is not available");
-  //     }
-  //   };
-
-  //   return () => {
-  //     fetchData();
-  //   };
-  // }, [callBLNGgetMethod]);
+  const { convertedStringToArrayObj, getPosition } = useFetchData(
+    titleName,
+    Position
+  );
 
   const handleForErrorMsg = (e) => {
     const file = e.target.files[0];
@@ -264,8 +67,6 @@ export const TimeSheetBrowser = ({ title }) => {
         e.target.value = ""; // Clear the input field
       } else {
         setError("");
-        // Handle the valid Excel file upload logic here
-        // console.log("Uploaded file:", file);
       }
     }
   };
@@ -302,101 +103,26 @@ export const TimeSheetBrowser = ({ title }) => {
   const handleImageClick = async () => {
     fileInputRef.current.click();
   };
-  // useEffect(() => {
-  //   if (loading === true) {
-  //     setLoading(true);
-  //   } else {
-  //     setLoading(false);
-  //   }
-  // }, [loading]);
-  // Onshore
+
   const UploadFile = async () => {
     try {
-    if (titleName === "Offshore") {
-      const result = UploadOffshoreFile(
-        excelFile,
-        setExcelData,
-        setExcelFile,
-        fileInputRef,
-        setLoading
-      );
+      if (titleName === "Offshore") {
+        const result = UploadOffshoreFile(
+          excelFile,
+          setExcelData,
+          setExcelFile,
+          fileInputRef,
+          setLoading
+        );
 
-      setReturnedTHeader(result);
-      fileInputRef.current.value = "";
-      setExcelFile(null);
-    }
-    // else if (titleName === "ORMC") {
-    //   const { result, checkTrueOrFalse } = UploadORMCfile(
-    //     excelFile,
-    //     setExcelData,
-    //     setExcelFile,
-    //     fileInputRef,
-    //     setLoading
-    //   );
-    //   if (checkTrueOrFalse === true) {
-    //     setReturnedTHeader(result);
-    //   }
+        setReturnedTHeader(result);
+        fileInputRef.current.value = "";
+        setExcelFile(null);
+      }
 
-    //   if (checkTrueOrFalse === false) {
-    //     const result = await UploadEditedORMC(
-    //       excelFile,
-    //       setExcelData,
-    //       setExcelFile,
-    //       fileInputRef,
-    //       setLoading
-    //     );
-    //     console.log("Yes it works");
-    //     setReturnedTHeader(result);
-    //   }
-
-    //   fileInputRef.current.value = "";
-    //   setExcelFile(null);
-    // }
-    else if (titleName === "ORMC") {
-      // if (!data) {
-      //   console.error("UploadORMCfile returned undefined or null");
-      //   return;
       // }
-
-      // try {
-      const result = UploadORMCfile(
-        excelFile,
-        setExcelData,
-        setExcelFile,
-        fileInputRef,
-        setLoading
-      );
-      // const { result, checkTrueOrFalse } = data;
-
-      setReturnedTHeader(result);
-
-      // } catch {
-      if (result === false) {
-        const editedResult = await UploadEditedORMC(
-          excelFile,
-          setExcelData,
-          setExcelFile,
-          fileInputRef,
-          setLoading
-        );
-        
-        setReturnedTHeader(editedResult);
-      }
-
-      fileInputRef.current.value = "";
-      setExcelFile(null);
-    } else if (titleName === "SBW") {
-      const result = UploadSBWfile(
-        excelFile,
-        setExcelData,
-        setExcelFile,
-        fileInputRef,
-        setLoading
-      );
-      setReturnedTHeader(result);
-
-      if (result === false) {
-        const editedResult = await UploadEditedSBW(
+      else if (titleName === "ORMC") {
+        const result = UploadORMCfile(
           excelFile,
           setExcelData,
           setExcelFile,
@@ -404,35 +130,70 @@ export const TimeSheetBrowser = ({ title }) => {
           setLoading
         );
 
-        setReturnedTHeader(editedResult);
-      }
-      fileInputRef.current.value = "";
-      setExcelFile(null);
-    } else if (titleName === "HO") {
-      const result = UploadHOfile(
-        excelFile,
-        setExcelData,
-        setExcelFile,
-        fileInputRef,
-        setLoading
-      );
-      setReturnedTHeader(result);
-      fileInputRef.current.value = "";
-      setExcelFile(null);
-    } else if (titleName === "BLNG") {
-      const result = UploadBLNGfile(
-        excelFile,
-        setExcelData,
-        setExcelFile,
-        fileInputRef,
-        setLoading
-      );
-      setReturnedTHeader(result);
+        setReturnedTHeader(result);
 
-      fileInputRef.current.value = "";
-      setExcelFile(null);
-    }
-    } catch(err) {
+        if (result === false) {
+          const editedResult = await UploadEditedORMC(
+            excelFile,
+            setExcelData,
+            setExcelFile,
+            fileInputRef,
+            setLoading
+          );
+
+          setReturnedTHeader(editedResult);
+        }
+
+        fileInputRef.current.value = "";
+        setExcelFile(null);
+      } else if (titleName === "SBW") {
+        const result = UploadSBWfile(
+          excelFile,
+          setExcelData,
+          setExcelFile,
+          fileInputRef,
+          setLoading
+        );
+        setReturnedTHeader(result);
+
+        if (result === false) {
+          const editedResult = await UploadEditedSBW(
+            excelFile,
+            setExcelData,
+            setExcelFile,
+            fileInputRef,
+            setLoading
+          );
+
+          setReturnedTHeader(editedResult);
+        }
+        fileInputRef.current.value = "";
+        setExcelFile(null);
+      } else if (titleName === "HO") {
+        const result = UploadHOfile(
+          excelFile,
+          setExcelData,
+          setExcelFile,
+          fileInputRef,
+          setLoading
+        );
+        setReturnedTHeader(result);
+        fileInputRef.current.value = "";
+        setExcelFile(null);
+      } else if (titleName === "BLNG") {
+        const result = UploadBLNGfile(
+          excelFile,
+          setExcelData,
+          setExcelFile,
+          fileInputRef,
+          setLoading
+        );
+        setReturnedTHeader(result);
+
+        fileInputRef.current.value = "";
+        setExcelFile(null);
+      }
+    } catch (err) {
       console.log("ERROR", err);
     }
   };
@@ -442,8 +203,8 @@ export const TimeSheetBrowser = ({ title }) => {
     setExcelFile(null);
   };
   const clearFileInput = () => {
-    setFileName(""); // Clear the state
-    fileInputRef.current.value = ""; // Clear the input reference
+    setFileName("");
+    fileInputRef.current.value = "";
   };
 
   return (
@@ -453,10 +214,7 @@ export const TimeSheetBrowser = ({ title }) => {
           <FaArrowLeft />
         </Link>
       </div>
-      <div
-      // className={`${(fileName || excelData || closeSavedModel) && "hidden"}`}
-      // className="h-full"
-      >
+      <div>
         <div
           className={" m-9 screen-size my-5  flex flex-col items-center gap-3"}
         >
@@ -575,28 +333,17 @@ export const TimeSheetBrowser = ({ title }) => {
         </div>
       )}
 
-   <div>
-   {loading === true && (
-            <div className="flex justify-center items-center text_size_5 text-dark_grey m-2">
-              <p>Please wait a few seconds.....</p>
-            </div>
-          )}
-   </div>
+      <div>
+        {loading === true && (
+          <div className="flex justify-center items-center text_size_5 text-dark_grey m-2">
+            <p>Please wait a few seconds.....</p>
+          </div>
+        )}
+      </div>
       {excelData && (
         <div>
-         {" "}
-          {/* <TSRawTable excelData={excelData} /> */}
-          {/* <ViewTSTBeforeSave
-            excelData={excelData}
-            setExcelData={setExcelData}
-            setCloseSavedModel={setCloseSavedModel}
-            // fileName={fileName}
-            // tsheetDate={tsheetDate}
-            // tSlocation={tSlocation}
-          /> */}
           {titleName === "Offshore" && (
             <ViewTSTBeforeSave
-             
               setExcelData={setExcelData}
               excelData={excelData}
               returnedTHeader={returnedTHeader}
@@ -607,7 +354,6 @@ export const TimeSheetBrowser = ({ title }) => {
           )}
           {titleName === "HO" && (
             <ViewHOsheet
-              
               setExcelData={setExcelData}
               excelData={excelData}
               returnedTHeader={returnedTHeader}
@@ -698,7 +444,6 @@ export const TimeSheetBrowser = ({ title }) => {
           <PopupForSave
             fileNameForSuccessful={fileNameForSuccessful}
             setCloseSavedModel={setCloseSavedModel}
-            // backToHome={backToHome}
           />
         </div>
       )}

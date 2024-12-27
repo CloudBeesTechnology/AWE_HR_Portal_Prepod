@@ -14,7 +14,7 @@ export const NonlocCandi = () => {
   const [selectedOption, setSelectedOption] = useState("");
   const [selectedRows, setSelectedRows] = useState([]); // Track selected rows for edit/delete
   const [selectedRow, setSelectedRow] = useState(null); // Handle the review form
-  const { empPDData } = useContext(DataSupply); // Fetching data from context
+  const { empPDData, IVSSDetails } = useContext(DataSupply); // Fetching data from context
   const navigate = useNavigate();
   const [editingData, setEditingData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,23 +53,27 @@ export const NonlocCandi = () => {
     const isOtherNationality =
       candidate.nationality !== "Bruneian" &&
       candidate.nationality !== "Brunei PR";
-
+  
     const matchesContract =
       !selectedOption ||
       (selectedOption === "LPA" &&
         candidate.contractType.toLowerCase() === "lpa") ||
       (selectedOption === "SAWP" &&
         candidate.contractType.toLowerCase() === "sawp");
-
+  
     const matchesSearch =
       candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       candidate.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
       candidate.nationality.toLowerCase().includes(searchTerm.toLowerCase());
-
+  
+    const notInIVSSDetails = !IVSSDetails.some(
+      (detail) => detail.tempID === candidate.tempID
+    );
+  
     // Return true if all conditions are met
-    return isOtherNationality && matchesContract && matchesSearch;
+    return isOtherNationality && matchesContract && matchesSearch && notInIVSSDetails;
   });
-
+  
   useEffect(() => {
     if (otherCandidates.length > 0) {
       setLoading(false);

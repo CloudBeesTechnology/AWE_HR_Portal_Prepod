@@ -48,16 +48,7 @@ export const ViewTSTBeforeSave = ({ excelData }) => {
             {/* w-[1190px] */}
             <table className="table-auto text-center w-full">
               <thead>
-                {/* <tr className="bg-lite_grey h-10 text-dark_grey text_size_5 text-start">
-                  <td className="px-5  text-center ">S No.</td>
-                  <td className="px-7 ">Employee Name</td>
-                  <td className="pr-14  text-center ">Sub ID</td>
-                  <td className="px-7  ">Location</td>
-                  <td className="px-7  text-center ">Date</td>
-                  <td className="px-7 text-center ">Total NT</td>
-                  <td className="pr-7 text-center ">Total OT</td>
-                  
-                </tr> */}
+              
                 <tr className="bg-lite_grey h-10 text-dark_grey text_size_5">
                   <td className="px-4 flex-1">S No.</td>
                   <td className="px-4 flex-1 text-start">Employee Name</td>
@@ -72,18 +63,7 @@ export const ViewTSTBeforeSave = ({ excelData }) => {
                 {excelData &&
                   excelData.map((m, index) => {
                     return (
-                      // <tr
-                      //   key={index}
-                      //   className="text-dark_grey h-[53px] bg-white text-sm rounded-sm shadow-md text-start"
-                      // >
-                      //   <td className="px-5 text-center ">{index + 1}</td>
-                      //   <td className="px-7">{m["CONTRACT No:"]}</td>
-                      //   <td className="text-center pr-14 ">{m.__EMPTY_2}</td>
-                      //   <td className="px-7">{m.location}</td>
-                      //   <td className="text-center px-5 ">{m.date}</td>
-                      //   <td className="text-center px-7 ">{m.__EMPTY_40}</td>
-                      //   <td className="text-center pr-7 ">{m.__EMPTY_41}</td>
-                      // </tr>
+                      
                       <tr
                         key={index}
                         className="text-dark_grey h-[53px] bg-white text-sm rounded-sm shadow-md text-start"

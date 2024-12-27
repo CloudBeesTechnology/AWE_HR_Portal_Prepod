@@ -16,11 +16,17 @@ import { useTableMerged } from "./customTimeSheet/UserTableMerged";
 import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
 // import { listSBWSheets } from "../../graphql/queries";
 import { PopupForAssignManager } from "./ModelForSuccessMess/PopupForAssignManager";
-import { createTimeSheet, deleteTimeSheet, updateTimeSheet } from "../../graphql/mutations";
-import { listTimeSheets } from "../../graphql/queries";
+import {
+  createTimeSheet,
+  deleteTimeSheet,
+  updateTimeSheet,
+} from "../../graphql/mutations";
+
 import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
-import { useMergeTableForNotification } from "./customTimeSheet/useMergeTableForNotification";
+import { MergeTableForNotification } from "./customTimeSheet/MergeTableForNotification";
 import { Notification } from "./customTimeSheet/Notification";
+import { sendEmail } from "../../services/EmailServices";
+import { listTimeSheets } from "../../graphql/queries";
 const client = generateClient();
 export const ViewSBWsheet = ({
   excelData,
@@ -32,6 +38,7 @@ export const ViewSBWsheet = ({
   fileName,
 }) => {
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
+  const [closePopup, setClosePopup] = useState(false);
   const [data, setData] = useState(null);
   const [secondaryData, setSecondaryData] = useState(null);
   const [currentStatus, setCurrentStatus] = useState(null);
@@ -47,11 +54,9 @@ export const ViewSBWsheet = ({
 
   const { handleScroll, visibleData, setVisibleData } = UseScrollableView(
     data,
-    "TimeKeeper"
+    "TimeSheet"
   );
-
-  const getEmail = useMergeTableForNotification(response);
-
+  console.log(visibleData);
   const processedData = useTableMerged(excelData);
 
   useEffect(() => {
@@ -70,7 +75,6 @@ export const ViewSBWsheet = ({
     }
   };
 
-  console.log(convertedStringToArrayObj);
   // useEffect(() => {
   //   if (excelData) {
   //     const fetchData = async () => {
@@ -110,8 +114,6 @@ export const ViewSBWsheet = ({
     } else if (getPosition === "TimeKeeper") {
       setUserIdentification("TimeKeeper");
     }
-
-    // console.log(getPosition);
   }, [convertedStringToArrayObj]);
   const pendingData = (data) => {
     if (data && data.length > 0) {
@@ -154,6 +156,7 @@ export const ViewSBWsheet = ({
             status: val.status || "",
           };
         });
+      console.log(result);
       setData(result);
       setSecondaryData(result);
     }
@@ -200,6 +203,7 @@ export const ViewSBWsheet = ({
       // Usage
       const result = await checkedKeys();
 
+      setClosePopup(true);
       setCurrentStatus(result); // Assuming setCurrentStatus is defined
       setShowStatusCol(result);
       // setLoading(false);
@@ -246,6 +250,7 @@ export const ViewSBWsheet = ({
           // );
           if (userIdentification === "Manager") {
             const finalData = await SendDataToManager(fetchedData);
+            console.log(finalData);
             pendingData(finalData);
           }
         } catch (err) {
@@ -270,7 +275,6 @@ export const ViewSBWsheet = ({
   const toggleSFAMessage = async (value, responseData) => {
     setSuccessMess(value);
     if (value === true && responseData) {
-      console.log("Success Message : ", responseData);
       setResponse(responseData);
     }
   };
@@ -314,9 +318,9 @@ export const ViewSBWsheet = ({
   const AllFieldData = useTableFieldData(titleName);
   const renameKeysFunctionAndSubmit = async (managerData) => {
     if (userIdentification !== "Manager") {
-      const result =
-        data &&
-        data.map((val) => {
+      const processedData =
+      await Promise.all(
+        data.map(async (val) => {
           return {
             fileName: fileName,
             empName: val.NAME || "",
@@ -336,52 +340,82 @@ export const ViewSBWsheet = ({
             empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
             fileType: "SBW",
             status: "Pending",
-          };
-        });
-
-        const finalResult = result.map((val) => {
-          return {
-            ...val,
-            assignTo: managerData.mbadgeNo,
-            assignBy: uploaderID,
-            // trade: managerData.mfromDate,
-            // tradeCode: managerData.muntilDate,
-          };
-        });
-        
-        const sendTimeSheets = async (timeSheetData) => {
-          let successFlag = false;
-          for (const timeSheet of timeSheetData) {
-            try {
-              const response = await client.graphql({
-                query: createTimeSheet,
-                variables: {
-                  input: timeSheet,
-                },
-              });
-  
-              if (response?.data?.createTimeSheet) {
-                console.log(
-                  "TimeSheet created successfully:",
-                  response.data.createTimeSheet
-                );
-                const responseData = response.data.createTimeSheet;
-                if (!successFlag) {
-                  toggleSFAMessage(true, responseData); // Only toggle success message once
-                  successFlag = true; // Set the flag to true
-                }
-              }
-            } catch (error) {
-              console.error("Error creating TimeSheet:", error);
-              toggleSFAMessage(false);
-            }
           }
-        };
-  
-        sendTimeSheets(finalResult);
+        })
+      );
+   
+     
+    const result =  await processedData;
+    
 
+      const finalResult = result.map((val) => {
+        return {
+          ...val,
+          assignTo: managerData.mbadgeNo,
+          assignBy: uploaderID,
+          trade: managerData.mfromDate,
+          tradeCode: managerData.muntilDate,
+        };
+      });
+      console.log(finalResult);
+      const sendTimeSheets = async (timeSheetData) => {
+        let successFlag = false;
+
+        for (const timeSheet of timeSheetData) {
+          try {
+            const response = await client.graphql({
+              query: createTimeSheet,
+              variables: { input: timeSheet },
+            });
+
+            if (response?.data?.createTimeSheet) {
+              console.log(
+                "TimeSheet created successfully:",
+                response.data.createTimeSheet
+              );
+              const responseData = response.data.createTimeSheet;
+
+              if (!successFlag) {
+                toggleSFAMessage(true, responseData); // Only toggle success message once
+
+                const result = await MergeTableForNotification(responseData);
+                console.log(result);
+
+                if (result) {
+                  // Call the Notification function
+                  const emailDetails = await Notification({
+                    getEmail: result, // Fix: Pass 'getEmail' instead of 'result'
+                    Position,
+                  });
+
+                  if (emailDetails) {
+                    // Log email details
+                    const { subject, message, fromAddress, toAddress } =
+                      emailDetails;
+
+                    await sendEmail(subject, message, fromAddress, toAddress);
+                  } else {
+                    console.error("Notification returned undefined!");
+                  }
+                } else {
+                  console.error(
+                    "MergeTableForNotification returned undefined!"
+                  );
+                }
+
+                successFlag = true; // Set the flag to true
+              }
+            }
+          } catch (error) {
+            console.error("Error creating TimeSheet:", error);
+            toggleSFAMessage(false);
+          }
+        }
+      };
+
+      sendTimeSheets(finalResult);
     } else if (userIdentification === "Manager") {
-       const MultipleBLNGfile =
+      const MultipleBLNGfile =
         data &&
         data.map((val) => {
           return {
@@ -407,39 +441,63 @@ export const ViewSBWsheet = ({
           };
         });
 
-        const updateTimeSheetFunction = async (timeSheetData) => {
-          let successFlag = false;
-          for (const timeSheet of timeSheetData) {
-            try {
-              const response = await client.graphql({
-                query: updateTimeSheet,
-                variables: {
-                  input: timeSheet, // Send each object individually
-                },
-              });
-  
-              if (response?.data?.updateTimeSheet) {
-                console.log(
-                  "TimeSheet Updated successfully:",
-                  response.data.updateTimeSheet
-                );
-                const responseData = response.data.updateTimeSheet;
+      const updateTimeSheetFunction = async (timeSheetData) => {
+        let successFlag = false;
+        for (const timeSheet of timeSheetData) {
+          try {
+            const response = await client.graphql({
+              query: updateTimeSheet,
+              variables: {
+                input: timeSheet, // Send each object individually
+              },
+            });
+
+            if (response?.data?.updateTimeSheet) {
+              console.log(
+                "TimeSheet Updated successfully:",
+                response.data.updateTimeSheet
+              );
+              const responseData = response.data.updateTimeSheet;
               if (!successFlag) {
                 toggleSFAMessage(true, responseData); // Only toggle success message once
+
+                const result = await MergeTableForNotification(responseData);
+
+                if (result) {
+                  // Call the Notification function
+                  const emailDetails = await Notification({
+                    getEmail: result, // Fix: Pass 'getEmail' instead of 'result'
+                    Position,
+                  });
+
+                  if (emailDetails) {
+                    // Log email details
+                    const { subject, message, fromAddress, toAddress } =
+                      emailDetails;
+
+                    await sendEmail(subject, message, fromAddress, toAddress);
+                  } else {
+                    console.error("Notification returned undefined!");
+                  }
+                } else {
+                  console.error(
+                    "MergeTableForNotification returned undefined!"
+                  );
+                }
+
                 successFlag = true; // Set the flag to true
               }
-                setVisibleData([]);
-                setData(null);
-              }
-            } catch (error) {
-              console.error("Error creating TimeSheet:", error);
-              toggleSFAMessage(false);
+              setVisibleData([]);
+              setData(null);
             }
+          } catch (error) {
+            console.error("Error creating TimeSheet:", error);
+            toggleSFAMessage(false);
           }
-        };
-  
-        updateTimeSheetFunction(MultipleBLNGfile);
-      
+        }
+      };
+
+      updateTimeSheetFunction(MultipleBLNGfile);
     }
   };
   return (
@@ -551,7 +609,7 @@ export const ViewSBWsheet = ({
                                   {m.status}
                                 </td>
                               )}
-                            </tr> 
+                            </tr>
                           );
                         };
 
@@ -568,7 +626,7 @@ export const ViewSBWsheet = ({
                             className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white"
                           >
                             <p className="px-6 py-6">
-                            No Table Data Available Here.
+                              No Table Data Available Here.
                             </p>
                           </td>
                         </tr>
@@ -579,7 +637,7 @@ export const ViewSBWsheet = ({
                             className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white"
                           >
                             <p className="px-6 py-6">
-                            No Table Data Available Here.
+                              No Table Data Available Here.
                             </p>
                           </td>
                         </tr>
@@ -600,53 +658,70 @@ export const ViewSBWsheet = ({
                   if (userIdentification !== "Manager") {
                     toggleFunctionForAssiMana();
 
-                   
-                    
-                  } else if (userIdentification === "Manager") {
-                    renameKeysFunctionAndSubmit();
-                  
-                    // const fetchData = async () => {
+                    // const fetchDataAndDelete = async () => {
                     //   try {
-                    //     console.log("I am calling You");
-                    
-                    //     // Fetch the BLNG data using GraphQL
-                    //     const response = await client.graphql({ query: listTimeSheets });
-                    //     const SBWdata = response?.data?.listTimeSheets?.items || [];
-                    
-                    //     console.log("Fetched SBW Data:", SBWdata);
-                    
-                    //     // Filter data for type === "SBW"
-                    //     const result = SBWdata.filter((item) => item.type==="SBW");
-                    //     console.log("Filtered BLNG Data:", result);
-                    
-                    //     // Delete each item in the filtered result
-                    //     if (result.length > 0) {
+                    //     console.log("Fetching and Deleting SBW Data...");
+                    //     // setIsDeleting(true); // Set loading state
+                    //     let nextToken = null; // Initialize nextToken for pagination
+
+                    //     do {
+                    //       // Define the filter for fetching SBW data
+                    //       const filter = {
+                    //         and: [{ fileType: { eq: "SBW" } }],
+                    //       };
+
+                    //       // Fetch the BLNG data using GraphQL with pagination
+                    //       const response = await client.graphql({
+                    //         query: listTimeSheets,
+                    //         variables: { filter: filter, nextToken: nextToken }, // Pass nextToken for pagination
+                    //       });
+
+                    //       // Extract data and nextToken
+                    //       const SBWdata =
+                    //         response?.data?.listTimeSheets?.items || [];
+                    //       nextToken = response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
+
+                    //       console.log("Fetched SBW Data:", SBWdata);
+
+                    //       // Delete each item in the current batch
                     //       await Promise.all(
-                    //         result.map(async (item) => {
-                    //           const dailySheet = { id: item.id };
-                    
+                    //         SBWdata.map(async (item) => {
                     //           try {
                     //             const deleteResponse = await client.graphql({
                     //               query: deleteTimeSheet,
-                    //               variables: { input: dailySheet },
+                    //               variables: { input: { id: item.id } },
                     //             });
-                    //             console.log("Deleted Item Response:", deleteResponse);
-                    //           } catch (err) {
-                    //             console.error("Error deleting item:", err);
+                    //             console.log(
+                    //               "Deleted Item Response:",
+                    //               deleteResponse
+                    //             );
+                    //           } catch (deleteError) {
+                    //             console.error(
+                    //               `Error deleting item with ID ${item.id}:`,
+                    //               deleteError
+                    //             );
                     //           }
                     //         })
                     //       );
-                    //     } else {
-                    //       console.log("No SBW items to delete.");
-                    //     }
-                    //   } catch (err) {
-                    //     console.error("Error in fetchData:", err);
+
+                    //       console.log("Batch deletion completed.");
+                    //     } while (nextToken); // Continue fetching until no more data
+
+                    //     console.log(
+                    //       "All SBW items deletion process completed."
+                    //     );
+                    //   } catch (fetchError) {
+                    //     console.error(
+                    //       "Error in fetchDataAndDelete:",
+                    //       fetchError
+                    //     );
+                    //   } finally {
+                    //     // setIsDeleting(false); // Reset loading state
                     //   }
                     // };
-                    
-                    // // Call the function
-                    // fetchData();
-                    
+                    // fetchDataAndDelete();
+                  } else if (userIdentification === "Manager") {
+                    renameKeysFunctionAndSubmit();
                   }
                 }}
               >
@@ -656,8 +731,8 @@ export const ViewSBWsheet = ({
               </button>
             </div>
           </div>
-        ) : currentStatus === false ? (
-          <PopupForMissMatchExcelSheet />
+        ) : currentStatus === false && closePopup === true ? (
+          <PopupForMissMatchExcelSheet setClosePopup={setClosePopup} />
         ) : (
           ""
         )}
@@ -685,10 +760,6 @@ export const ViewSBWsheet = ({
           toggleFunctionForAssiMana={toggleFunctionForAssiMana}
           renameKeysFunctionAndSubmit={renameKeysFunctionAndSubmit}
         />
-      )}
-
-      {response && getEmail && successMess && (
-        <Notification getEmail={getEmail} Position={Position} />
       )}
     </div>
   );

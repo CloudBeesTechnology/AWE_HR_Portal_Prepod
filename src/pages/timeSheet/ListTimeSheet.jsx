@@ -1,26 +1,21 @@
 import React from "react";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
+import { useTempID } from "../../utils/TempIDContext";
 
-export const ListTimeSheet = () => {
-  const {
-    // allExcelSheetData,
-    newSearchFunction,
-    // setCategoryFilter,
-    // AllFieldData,
-    // categoryFilter,
-    visibleData,
-    // handleScroll, 
-  } = useOutletContext();
-  
+export const ListTimeSheet = ({
+  newSearchFunction,
+  visibleData,
+  message,
+ 
+}) => {
+
+  const { setTimeSheetFileData ,setShowListTimeSheet} = useTempID();
   const nav = useNavigate();
 
   const handleNavigate = (val) => {
-
-    nav("viewSheet", {
-      state: {
-        fileData: val,
-      },
-    });
+    setTimeSheetFileData(val);
+    setShowListTimeSheet(false);
+    nav("/viewTsheetDetails");
   };
   return (
     <div className="table-container flex justify-center ">
@@ -41,22 +36,32 @@ export const ListTimeSheet = () => {
             visibleData.map((val, index) => {
               return (
                 // <React.Fragment key={index}>
-                  <tr key={index} className="text-dark_grey h-[53px] text-sm bg-white  rounded-sm shadow-md text-start border-b-2 border-[#CECECE]">
-                    <td>{index + 1}</td>
-                    <td>{val.fileName}</td>
-                    <td>{val.fileType}</td>
-                    <td>{val.date}</td>
-                    <td
-                      onClick={() => {
-                        handleNavigate(val);
-                        newSearchFunction(val);
-                      }}
-                      className="underline text-dark_skyBlue cursor-pointer"
-                    >
-                      View
-                    </td>  
-                    <td className={val.status==="Approved" ? "text-[#16a34a]" : ""}>{val.status}</td>
-                  </tr>
+                <tr
+                  key={index}
+                  className="text-dark_grey h-[53px] text-sm bg-white  rounded-sm shadow-md text-start border-b-2 border-[#CECECE]"
+                >
+                  <td>{index + 1}</td>
+                  <td>{val.fileName}</td>
+                  <td>{val.fileType}</td>
+                  <td>{val.date}</td>
+                  <td
+                    onClick={() => {
+                      handleNavigate(val);
+                      newSearchFunction(val);
+                    
+                    }}
+                    className="underline text-dark_skyBlue cursor-pointer"
+                  >
+                    View
+                  </td>
+                  <td
+                    className={
+                      val.status === "Approved" ? "text-[#16a34a]" : ""
+                    }
+                  >
+                    {val.status}
+                  </td>
+                </tr>
                 // </React.Fragment>
               );
             })
@@ -66,11 +71,10 @@ export const ListTimeSheet = () => {
                 colSpan="15"
                 className="text-center text-dark_ash text_size_5 bg-white"
               >
-                <p className="p-5">No Table Data Available Here...</p>
+                <p className="p-5">{message || "Please wait few seconds."}</p>
               </td>
             </tr>
           )}
-
         </tbody>
       </table>
     </div>

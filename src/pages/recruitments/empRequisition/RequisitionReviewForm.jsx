@@ -6,6 +6,9 @@ import { generateClient } from "@aws-amplify/api";
 import { listEmpRequisitions } from "../../../graphql/queries";
 import { UpdateEmpReqData } from "../../../services/updateMethod/UpdateEmpReqData";
 import { SpinLogo } from "../../../utils/SpinLogo";
+// import { useCreateNotification } from "../../hooks/useCreateNotification"; 
+// import { sendEmail } from "../../services/EmailServices";
+
 
 const client = generateClient();
 
@@ -23,6 +26,8 @@ export const RequisitionReviewForm = ({
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
   const userType = localStorage.getItem("userType");
+  // const { createNotification } = useCreateNotification();
+  
 
   const defaultRequest = {
     reqName: "",
@@ -105,9 +110,9 @@ export const RequisitionReviewForm = ({
     return status === "Rejected"
       ? "text-[red]"
       : status === "Approved"
-      ? "text-[green]"
+      ? "text-[#339933]"
       : status === "Pending"
-      ? "text-dark_grey"
+      ? "text-[#E8A317]"
       : "text-[#E8A317]";
   };
 
@@ -161,7 +166,7 @@ export const RequisitionReviewForm = ({
           ))}
         </div>
 
-        {/* {userType === "GM" && isMdView && (
+        {userType === "GM" && isMdView && (
           <>
             {request.status !== "Approved" && request.status !== "Rejected" ? (
               <div className="flex justify-center gap-10 mt-4">
@@ -179,8 +184,8 @@ export const RequisitionReviewForm = ({
                 </button>
               </div>
             ) : (
-              <div className="mt-6 center gap-3">
-            <h3 className="text-lg font-bold">Requisition Status :</h3>
+              <div className="mt-6 center gap-3 rounded-lg bg-gradient-to-r from-[#f5ee6ad7] via-[#faf362] to-[#f5ee6ad7] shadow-[0_4px_6px_rgba(255,250,150,0.5)]">
+            <h3 className="text-lg text-[#615d5d] p-1.5 font-bold">Requisition Status :</h3>
             <p
               className={`text-xl font-semibold ${getStatusClass(
                 request.status
@@ -191,9 +196,9 @@ export const RequisitionReviewForm = ({
           </div>
             )}
           </>
-        )} */}
+        )}
 
-        {userType === "GM" && isMdView && (
+        {/* {userType === "GM" && isMdView && (
               <div className="flex justify-center gap-10 mt-4">
                 <button
                   className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
@@ -209,11 +214,11 @@ export const RequisitionReviewForm = ({
                 </button>
               </div>
  
-        )}
+        )} */}
 
         {userType === "HR" && isHrView && (
-          <div className="mt-6 center gap-3">
-            <h3 className="text-lg font-bold">Requisition Status :</h3>
+          <div className="mt-6 center gap-3 rounded-lg  [background:linear-gradient(to_right,_#f5ee6ad7,_#faf362,_#ffe89d,_#f5ee6ad7)] shadow-[0_4px_6px_rgba(255,250,150,0.5)]">
+            <h3 className="text-lg text-[#615d5d] p-1.5 font-bold">Requisition Status :</h3>
             <p
               className={`text-xl font-semibold ${getStatusClass(
                 request.status
@@ -228,7 +233,7 @@ export const RequisitionReviewForm = ({
           <SpinLogo
             text= "Requisition Form Status Saved Successfully"
             notification={notification}
-            // path="/recrutiles/employreq"
+            path="/recrutiles/employreq"
           />
         )}
       </div>

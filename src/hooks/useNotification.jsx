@@ -14,7 +14,8 @@ export const useNotification = () => {
       setLoading(true);
       try {
         const emailNotifData = await client.graphql({
-          query: listEmailNotifis, // Query to fetch email notifications
+          query: listEmailNotifis,           variables: { limit: 20000 },
+          // Query to fetch email notifications
         });
 
 

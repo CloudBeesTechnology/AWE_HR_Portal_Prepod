@@ -40,7 +40,7 @@ export const FilterMonthAndYear = ({ onDateChange }) => {
           onCalendarClose={() => setIsOpen(false)}
         />
         <FaCalendarAlt 
-          className="absolute right-2 text-gray-400 cursor-pointer" 
+          className="absolute right-2 text-grey cursor-pointer" 
           onClick={handleIconClick} 
         />
       </div>

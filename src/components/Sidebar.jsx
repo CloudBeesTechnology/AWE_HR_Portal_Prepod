@@ -37,7 +37,6 @@ const Sidebar = () => {
     async function fetchUserData() {
       try {
         const res = await client.graphql({ query: listUsers });
-
         const result = res?.data?.listUsers?.items;
         const userID = localStorage.getItem("userID");
         const userType = localStorage.getItem("userType");
@@ -48,9 +47,7 @@ const Sidebar = () => {
             val.selectType === userType
           ) {
             const empID = val.empID.toLowerCase();
-
             const isIncluded = empID.includes(userID.toLowerCase());
-
             return isIncluded;
           }
         });

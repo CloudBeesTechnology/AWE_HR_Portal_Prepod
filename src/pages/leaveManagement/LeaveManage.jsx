@@ -261,6 +261,7 @@ export const LeaveManage = () => {
       rowsPerPage
   );
 
+// console.log(data);
 
   return (
     <section className="py-20 px-10">

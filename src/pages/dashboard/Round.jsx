@@ -1,175 +1,97 @@
-import React from "react";
-import {
-  CircularProgressbarWithChildren,
-  buildStyles,
-} from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
+import { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { DataSupply } from "../../utils/DataStoredContext";
+
 
 export const Round = () => {
-  const total = 2200;
-  const onTime = 1715;
-  const lateAttendance = 397;
-  const permission = 74;
-  const takeDayOff = 14;
+  const { empPIData, IDData } = useContext(DataSupply);
 
-  // Calculate percentages
-  // const onTimePercentage = (onTime / total) * 100;
-  // const lateAttendancePercentage = (lateAttendance / total) * 100;
-  // const permissionPercentage = (permission / total) * 100;
-  // const takeDayOffPercentage = (takeDayOff / total) * 100;
+  const [mergeData, setMergeData] = useState([]);
+  const [bruneianCount, setBruneianCount] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const [LPACount, setLPACount] = useState(0);
+  const [SAWPCount, setSAWPCount] = useState(0);
+  
+  
+  const calculateCounts = () => {
+    try {
+      const candidates = [...empPIData, ...IDData];
+
+      setMergeData(candidates);
+    
+      const bruneian = candidates.filter(
+        (item) => Array.isArray(item.contractType) && item.contractType.includes("Local")
+      ).length;
+      setBruneianCount(bruneian);
+
+      // Calculate LPA count
+      const LPA = candidates.filter(
+        (item) => Array.isArray(item.contractType) && item.contractType.includes("LPA")
+      ).length;
+      setLPACount(LPA);
+
+      // Calculate SAWP count
+      const SAWP = candidates.filter(
+        (item) => Array.isArray(item.contractType) && item.contractType.includes("SAWP")
+      ).length;
+      setSAWPCount(SAWP);
+
+      // Total count
+      // setTotalCount(bruneian + LPA + SAWP);
+    } catch (err) {
+      // console.error("Error calculating counts:", err.message);
+    }
+  };
+
+  useEffect(() => {
+    calculateCounts();
+  }, []);
 
   return (
-    <div className="flex flex-col  items-center h-full p-3 w-full bg-white rounded-2xl shadow-md ">
-      <div className="flex justify-between w-full items-center">
-        <h2 className="text-lg font-semibold text-grey">Attendance</h2>
-        {/* <button className="text-sm text-grey ">View Stats</button> */}
+    <div className="flex justify-center h-full max-w-[500px] p-2 w-full ">
+    <div className="rounded-lg shadow-md w-full h-full">
+      <div className=" font-semibold p-3">
+        <h2 className=" mx-2">Application Received</h2>
       </div>
+       
+      <div className="flex justify-evenly items-center flex-wrap h-full">
+       <div
+          className="rounded-lg shadow-lg flex items-center h-[120px] w-[150px] "
+        >
+            <div className="w-1 h-16 mr-4 rounded-md bg-[#B17A7A] border-[#B17A7A]"></div>
+            <div className="text-center flex justify-center items-center flex-col">
+              <h1 className="text-3xl font-bold">{totalCount}</h1>
+              <p className="text-sm font-medium">Marker Fitter</p>
+            </div>     
+        </div>
 
-      <div className="relative w-48 h-48 mt-7 ">
-        <div className="absolute inset-0">
-          <CircularProgressbarWithChildren
-            value={100}
-            strokeWidth={10}
-            styles={buildStyles({
-              pathColor: "#6E349E",
-              trailColor: "transparent",
-              strokeLinecap: "round",
-            })}
-          />
-        </div>
-        <div className="absolute inset-0">
-          <CircularProgressbarWithChildren
-            value={50}
-            strokeWidth={10}
-            styles={buildStyles({
-              pathColor: "#E61A1A",
-              trailColor: "transparent",
-              strokeLinecap: "round",
-            })}
-          />
-        </div>
-        <div className="absolute ">
-          <CircularProgressbarWithChildren
-            value={20}
-            strokeWidth={10}
-            styles={buildStyles({
-              pathColor: "#F1A924",
-              trailColor: "transparent",
-              strokeLinecap: "round",
-            })}
-          />
-        </div>
-        <div className="absolute ">
-          <CircularProgressbarWithChildren
-            value={5}
-            strokeWidth={10}
-            styles={buildStyles({
-              pathColor: "#17C900",
-              trailColor: "transparent",
-              strokeLinecap: "round",
-            })}
-          >
-            <div className="text-center">
-              <div className="text-3xl font-semibold">
-                {onTime + lateAttendance }
-              </div>
-              <div className="text-sm text-grey">/ {total}</div>
+        <div className="rounded-lg shadow-lg flex items-center justify-between  h-[120px] w-[150px] ">
+            <div className="w-1 h-16 rounded-md bg-[#91A672] border-[#91A672]"></div>
+            <div  className="text-start  w-full  pl-16">
+              <h1 className="text-3xl font-bold">{LPACount}</h1>
+              <p className="text-sm font-medium">Welder</p>
             </div>
-          </CircularProgressbarWithChildren>
-        </div>
-      </div>
+          </div>
 
-      <div className="mt-14 justify-evenly items-center flex gap-5 w-full">
-        <div>
-          <div className="flex items-center">
-            <span className="w-3 h-3 bg-purple rounded-full mr-2"></span>
-            <span className="text-sm text-grey">
-              {onTime} <span className="text-gray-500">OnTime</span>
-            </span>
-          </div>
-          <div className="flex items-center mt-5">
-            <span className="w-3 h-3 bg-red rounded-full mr-2"></span>
-            <span className="text-sm text-grey">
-              {lateAttendance}{" "}
-              <span className="text-gray-500">Late Attendance</span>
-            </span>
-          </div>
+          <div
+          className="rounded-lg shadow-lg flex items-center   h-[120px] w-[150px] "
+        >
+            <div className="w-1 h-16 mr-4 border rounded-md bg-[#B17A7A] border-[#B17A7A]"></div>
+            <div className="text-center flex justify-center items-center flex-col">
+              <h1 className="text-3xl font-bold">{totalCount}</h1>
+              <p className="text-sm font-medium">Marker Fitter</p>
+            </div>     
         </div>
-        <div className="">
-          <div className="flex items-center">
-            <span className="w-3 h-3 bg-yellow rounded-full mr-2"></span>
-            <span className="text-sm text-grey">
-              {permission} <span className="text-gray-500">Permission</span>
-            </span>
+
+        <div className="rounded-lg shadow-lg flex items-center  h-[120px] w-[150px] ">
+            <div className="w-1 h-16 mr-4 border rounded-md bg-[#91A672] border-[#91A672]"></div>
+            <div  className="text-center flex justify-center items-center flex-col">
+              <h1 className="text-3xl font-bold">{LPACount}</h1>
+              <p className="text-sm font-medium">Welder</p>
+            </div>
           </div>
-          <div className="flex items-center mt-5">
-            <span className="w-3 h-3 bg-green rounded-full mr-2"></span>
-            <span className="text-sm text-grey">
-              {takeDayOff} <span className="text-gray-500">TakeDayOff</span>
-            </span>
-          </div>
-        </div>
+       </div>
       </div>
     </div>
   );
 };
-
-// import React from 'react';
-// import { CircularProgressbarWithChildren, buildStyles } from 'react-circular-progressbar';
-// import 'react-circular-progressbar/dist/styles.css';
-
-// export const Dashboard = () => {
-//   const total = 2200;
-//   const onTime = 1167;
-//   const lateAttendance = 397;
-//   const permission = 74;
-//   const takeDayOff = 14;
-//   const totalAttendance = onTime + lateAttendance + permission + takeDayOff;
-
-//   const percentage = (totalAttendance / total) * 100;
-
-//   return (
-//     <div className="flex flex-col items-center p-4 bg-white rounded-lg shadow-md">
-//       <div className="flex justify-between w-full items-center">
-//         <h2 className="text-lg font-semibold text-grey">Attendance</h2>
-//         <button className="text-sm text-grey hover:text-grey">View Stats</button>
-//       </div>
-
-//       <div className="w-40 h-40 mt-4">
-//         <CircularProgressbarWithChildren
-//           value={percentage}
-//           strokeWidth={10}
-//           styles={buildStyles({
-//             pathColor: `#6B21A8`,
-//             trailColor: '#e0e0e0',
-//             strokeLinecap: 'round',
-//           })}
-//         >
-//           <div className="text-center">
-//             <div className="text-3xl font-semibold">{totalAttendance}</div>
-//             <div className="text-sm text-grey">/ {total}</div>
-//           </div>
-//         </CircularProgressbarWithChildren>
-//       </div>
-
-//       <div className="mt-4 grid grid-cols-2 gap-2 w-full">
-//         <div className="flex items-center">
-//           <span className="w-3 h-3 bg-purple rounded-full mr-2"></span>
-//           <span className="text-sm text-grey">{onTime} <span className="text-gray-500">on time</span></span>
-//         </div>
-//         <div className="flex items-center">
-//           <span className="w-3 h-3 bg-red rounded-full mr-2"></span>
-//           <span className="text-sm text-grey">{lateAttendance} <span className="text-gray-500">late attendance</span></span>
-//         </div>
-//         <div className="flex items-center">
-//           <span className="w-3 h-3 bg-yellow rounded-full mr-2"></span>
-//           <span className="text-sm text-grey">{permission} <span className="text-gray-500">not present</span></span>
-//         </div>
-//         <div className="flex items-center">
-//           <span className="w-3 h-3 bg-green rounded-full mr-2"></span>
-//           <span className="text-sm text-grey">{takeDayOff} <span className="text-gray-500">take day off</span></span>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
