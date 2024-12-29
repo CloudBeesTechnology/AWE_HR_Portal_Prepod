@@ -251,7 +251,97 @@ export const EmployeeInfo = () => {
     }
   };
 
+  
+  // const cleanFamilyDetailsString = (familyDetailsString) => {
+  //   try {
+  //     // Ensure it's a string before applying .trim() and other string methods
+  //     if (typeof familyDetailsString !== 'string') {
+  //       console.error("Expected a string, but got:", typeof familyDetailsString);
+  //       return []; // Return empty array if the value is not a string
+  //     }
+  
+  //     // Log the raw value to inspect the format
+  //     console.log("Raw familyDetails:", familyDetailsString);
+  
+  //     // Remove the surrounding quotes if they exist
+  //     let cleanedString = familyDetailsString.trim();
+  
+  //     if (cleanedString.startsWith('"') && cleanedString.endsWith('"')) {
+  //       cleanedString = cleanedString.slice(1, -1); // Remove surrounding quotes
+  //     }
+  
+  //     // Replace escaped quotes (e.g., \") with regular quotes (")
+  //     cleanedString = cleanedString.replace(/\\"/g, '"');
+  
+  //     // Add double quotes around property names (e.g., name to "name")
+  //     cleanedString = cleanedString.replace(/([a-zA-Z0-9_]+)(:)/g, '"$1"$2');
+  
+  //     // After cleaning, the string should be a valid JSON array
+  //     if (cleanedString.startsWith("[") && cleanedString.endsWith("]")) {
+  //       // If it's an array-like string, parse it directly
+  //       return JSON.parse(cleanedString);
+  //     } else {
+  //       // If it's not in array format, wrap it in an array and parse it
+  //       return [JSON.parse(cleanedString)];
+  //     }
+  //   } catch (error) {
+  //     console.error("Error cleaning and parsing familyDetails:", error);
+  //     return []; // Return empty array if parsing fails
+  //   }
+  // };
+  const cleanFamilyDetailsString = (familyDetailsInput) => {
+    try {
+      // Check if it's already a string
+      let familyDetailsString = familyDetailsInput;
+  
+      // If it's an object, convert it to a string
+      if (typeof familyDetailsString === 'object') {
+        // If it's an array, we join the array elements into a string
+        if (Array.isArray(familyDetailsString)) {
+          familyDetailsString = JSON.stringify(familyDetailsString);
+        } else {
+          // If it's an object, use JSON.stringify to convert it to a string
+          familyDetailsString = JSON.stringify([familyDetailsString]);
+        }
+      }
+  
+      // Now we can safely apply string manipulations
+      console.log("Raw familyDetails:", familyDetailsString);
+  
+      // Remove the surrounding quotes if they exist
+      let cleanedString = familyDetailsString.trim();
+  
+      // Remove surrounding quotes (if any) after trimming
+      if (cleanedString.startsWith('"') && cleanedString.endsWith('"')) {
+        cleanedString = cleanedString.slice(1, -1); // Remove surrounding quotes
+      }
+  
+      // Fix malformed JSON by ensuring property names are wrapped in double quotes
+      cleanedString = cleanedString.replace(/([a-zA-Z0-9_]+)(:)/g, '"$1"$2');
+  
+      // Handle potential single quotes around values or unescaped characters
+      cleanedString = cleanedString.replace(/"(?!\\)/g, '\\"'); // Escape any unescaped quotes
+  
+      // Handle special characters that might be causing issues (like '/')
+      cleanedString = cleanedString.replace(/\\/g, "");
+  
+      // After cleaning, the string should be a valid JSON array
+      if (cleanedString.startsWith("[") && cleanedString.endsWith("]")) {
+        // If it's an array-like string, parse it directly
+        return JSON.parse(cleanedString);
+      } else {
+        // If it's not in array format, wrap it in an array and parse it
+        return [JSON.parse(cleanedString)];
+      }
+    } catch (error) {
+      console.error("Error cleaning and parsing familyDetails:", error);
+      return []; // Return empty array if parsing fails
+    }
+  };
+  
   const searchResult = (result) => {
+  //   const cleanedFamilyDetails = cleanFamilyDetailsString(result.familyDetails);
+  // setFamilyData(cleanedFamilyDetails);
     const keysToSet = [
       "empID",
       "driveLic",
@@ -279,7 +369,6 @@ export const EmployeeInfo = () => {
       "eduDetails",
       "empBadgeNo",
       "empType",
-      // "familyDetails",
       "bankName",
       "bankAccNo",
       "gender",
@@ -293,6 +382,7 @@ export const EmployeeInfo = () => {
       "bwnIcColour",
     ];
 
+    // Set form values
     keysToSet.forEach((key) => {
       setValue(key, result[key]);
     });
@@ -304,6 +394,7 @@ export const EmployeeInfo = () => {
     fieldsArray.forEach((field) =>
       setValue(field, getLastArrayValue(result[field]))
     );
+
     const changeString = [
       "permanentAddress",
       "contactNo",
@@ -321,9 +412,16 @@ export const EmployeeInfo = () => {
       }
     });
 
-    const parsedData = JSON.parse(result.familyDetails);
-    setFamilyData(parsedData);
+    // Handle familyDetails parsing with the cleaning function
+    if (Array.isArray(result.familyDetails) && result.familyDetails.length > 0) {
+      const cleanedFamilyDetails = cleanFamilyDetailsString(result.familyDetails[0]);
+      setFamilyData(cleanedFamilyDetails);
+    } else {
+      console.error("Invalid familyDetails format:", result.familyDetails);
+      setFamilyData([]); // Default to empty array if format is not correct
+    }
 
+    // Handle uploaded files and their names
     result.inducBriefUp &&
       setUploadedFileNames((prev) => ({
         ...prev,
@@ -340,17 +438,23 @@ export const EmployeeInfo = () => {
 
     const linkToStorageFile = async (pathUrl) => {
       try {
-        const result = await getUrl({
-          path: pathUrl,
-        });
+        // Ensure you only pass the correct parameter to getUrl (either path or key, not both)
+        if (pathUrl) {
+          const result = await getUrl({
+            path: pathUrl, // Pass only path
+          });
 
-        return setPPLastUP(result.url.toString());
+          setPPLastUP(result.url.toString());
+        } else {
+          console.log("No valid path provided for getUrl.");
+        }
       } catch (err) {
-        console.log(err, "errors");
+        console.log("Error fetching file from storage:", err);
       }
     };
     linkToStorageFile(profilePhotoString);
 
+    // Handle multiple file uploads
     const uploadFields = [
       "bwnUpload",
       "applicationUpload",
@@ -378,7 +482,6 @@ export const EmployeeInfo = () => {
                 const validJSON = preprocessJSONString(item); // Preprocess the string
                 return JSON.parse(validJSON); // Parse the corrected JSON string
               } catch (e) {
-                // console.error(`Failed to parse item for "${field}":`, item, e);
                 return item; // Return as-is if it can't be parsed
               }
             }
@@ -386,9 +489,7 @@ export const EmployeeInfo = () => {
           });
 
           // Get the last file path
-
           const lastFile = parsedFiles[parsedFiles.length - 1];
-          // console.log(lastFile[0]?.upload);
           const lastFileName = lastFile?.upload
             ? getFileName(lastFile.upload)
             : lastFile[0]?.upload

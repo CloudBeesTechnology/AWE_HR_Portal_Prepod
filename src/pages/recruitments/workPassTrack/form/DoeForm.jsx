@@ -8,10 +8,11 @@ import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
 import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPTracking";
 import { useFetchInterview } from "../../../../hooks/useFetchInterview";
 import { UpdateInterviewData } from "../../../../services/updateMethod/UpdateInterview";
+import { statusOptions } from "../../../../utils/StatusDropdown";
 
 export const DoeForm = ({ candidate }) => {
   const { interviewSchedules } = useFetchCandy();
-   const { interviewDetails } = UpdateInterviewData();
+  const { interviewDetails } = UpdateInterviewData();
   const { wpTrackingDetails } = useUpdateWPTracking();
   const { mergedInterviewData } = useFetchInterview();
   const [formData, setFormData] = useState({
@@ -58,6 +59,8 @@ export const DoeForm = ({ candidate }) => {
         (data) => data.tempID === candidate.tempID
       );
 
+      // Log the found interviewData
+      // console.log("Found interviewData:", interviewData);
 
       if (interviewData) {
         // Set the form data
@@ -68,15 +71,13 @@ export const DoeForm = ({ candidate }) => {
             doeapprovedate: interviewData.doeapprovedate,
             doeexpirydate: interviewData.doeexpirydate,
             doefile: interviewData.doefile,
+            status: interviewData.status,
           },
         });
-        // console.log("Form data set:", {
-        //   doesubmitdate: interviewData.doesubmitdate,
-        //   doerefno: interviewData.doerefno,
-        //   doeapprovedate: interviewData.doeapprovedate,
-        //   doeexpirydate: interviewData.doeexpirydate,
-        //   doefile: interviewData.doefile,
-        // });
+        console.log("Form data set:", {
+        
+          // status: interviewData.status
+        });
 
         // Check if sawpFile exists and update the file names
         if (interviewData.doefile) {
@@ -119,32 +120,33 @@ export const DoeForm = ({ candidate }) => {
 
   const handleSubmitTwo = async (data) => {
     data.preventDefault();
-  
+
     const selectedInterviewData = interviewSchedules.find(
       (data) => data.tempID === candidate?.tempID
     );
-  
+
     const selectedInterviewDataStatus = mergedInterviewData.find(
       (data) => data.tempID === candidate?.tempID
     );
-  
+
     const interviewScheduleId = selectedInterviewData?.id;
     const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
-  
+
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
       return;
     }
-  
-    const interStatus = {
-      id: interviewScheduleStatusId, // Dynamically use the correct id
-      status: formData.interview.status,
-    };
-  
-    console.log("Submitting interview details with status:", interStatus); // Log the status object
-  
     try {
-      console.log("Calling wpTrackingDetails API..."); // Before the API call
+      const interStatus = {
+        id: interviewScheduleStatusId, // Dynamically use the correct id
+        status: formData.interview.status,
+      };
+
+      console.log("Submitting interview details with status:", interStatus);
+
+      await interviewDetails({ InterviewValue: interStatus });
+
+      console.log("Calling wpTrackingDetails API..."); 
       const response = await wpTrackingDetails({
         WPTrackingValue: {
           id: interviewScheduleId,
@@ -159,14 +161,12 @@ export const DoeForm = ({ candidate }) => {
       });
       console.log("WPTracking response:", response); // Log the response from wpTrackingDetails
       console.log("Calling interviewDetails API..."); // Before the second API call
-      await interviewDetails({ InterviewValue: interStatus });
+
       console.log("Interview status updated:", interStatus); // Log the updated status
-  
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }
   };
-  
 
   // const handleSubmitTwo = async (data) => {
   //   data.preventDefault();
@@ -296,14 +296,20 @@ export const DoeForm = ({ candidate }) => {
         </div>
         <div>
           <label htmlFor="status">Status</label>
-          <input
+          <select
             className="w-full border p-2 rounded mt-1"
-            type="text"
             id="status"
             {...register("status")}
             value={formData.interview.status}
             onChange={(e) => handleInputChange("status", e.target.value)}
-          />
+          >
+            {/* <option value="">Select Status</option> */}
+            {statusOptions.map((status, index) => (
+              <option key={index} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

@@ -1,10 +1,10 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormField } from "../../utils/FormField";
 import { FileUploadField } from "../employees/medicalDep/FileUploadField";
 import { SpinLogo } from "../../utils/SpinLogo";
-import { GroupHSSchema } from '../../services/EmployeeValidation';
+import { GroupHSSchema } from "../../services/EmployeeValidation";
 import { uploadDocs } from "../../services/uploadDocsS3/UploadDocs";
 import { generateClient } from "@aws-amplify/api";
 import { createGroupHandS } from "../../graphql/mutations";
@@ -40,7 +40,7 @@ export const GroupHS = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [numPages, setNumPages] = useState(null);
   const [lastUploadUrl, setPPLastUP] = useState("");
-  
+
   const {
     register,
     handleSubmit,
@@ -53,14 +53,14 @@ export const GroupHS = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, '0');  // Adds leading zero if day is single digit
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');  // getMonth() returns 0-11, so we add 1
+    const day = date.getDate().toString().padStart(2, "0"); // Adds leading zero if day is single digit
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // getMonth() returns 0-11, so we add 1
     const year = date.getFullYear();
-    
+
     return `${day}/${month}/${year}`;
   };
 
-  const groupPrint =useRef();
+  const groupPrint = useRef();
 
   const linkToStorageFile = async (pathUrl) => {
     try {
@@ -90,7 +90,7 @@ export const GroupHS = () => {
       return [];
     }
   };
-  
+
   const handleFileChange = async (e, label) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
@@ -119,16 +119,29 @@ export const GroupHS = () => {
 
   const handlePrint = useReactToPrint({
     content: () => groupPrint.current,
-    onBeforePrint: () => console.log("Preparing print..."),
+    onBeforePrint: () => console.log("Preparing to print PDF..."),
     onAfterPrint: () => console.log("Print complete"),
-    pageStyle: "print", // This ensures the print view uses a different CSS style
+    pageStyle: `
+        @page {
+            /* Adjust the margin as necessary */
+          height:  714px;
+          padding: 22px, 0px, 22px, 0px;     
+        }
+      `,
   });
-  
+
+  const openModal = (uploadUrl) => {
+    setPPLastUP(uploadUrl);
+    setViewingDocument(uploadUrl);
+  };
+
+  const closeModal = () => {
+    setViewingDocument(null);
+  };
 
   const onDocumentLoadSuccess = ({ numPages }) => {
     setNumPages(numPages);
   };
-
 
   const renderDocumentsUnderCategory = (documents) => {
     return (
@@ -150,50 +163,44 @@ export const GroupHS = () => {
               </button>
             </div>
 
-            {/* Conditional rendering of PDF or image */}
             {viewingDocument === document.upload &&
               document.upload.endsWith(".pdf") && (
-                <div className="mt-4  ">
-                  <div className="relative bg-white max-w-3xl mx-auto p-6 rounded-lg shadow-lg">
-                    <div ref={groupPrint} className="flex justify-center  h-[400px] overflow-y-auto">
-                      <Worker
-                       workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
-                      >
-                        <Viewer
-                          fileUrl={lastUploadUrl || ""}
-                         
-                        />
+                <div className="py-6 fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="relative bg-white rounded-lg shadow-lg w-[40vw] max-h-full flex flex-col">
+                    {/* PDF Viewer */}
+                    <div ref={groupPrint} className="flex-grow overflow-y-auto">
+                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                        <Viewer fileUrl={lastUploadUrl || ""} />
                       </Worker>
                     </div>
 
-                    {/* Close Button */}
                     <div className="absolute top-2 right-2">
                       <button
-                        onClick={() => setViewingDocument(null)} // Close the viewer
+                        onClick={closeModal} // Close the modal
                         className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
                       >
                         <FaTimes />
                       </button>
                     </div>
-                  </div>
 
-                  <div className="flex items-center justify-center gap-6 py-4">
-                    <div className="mt-2 flex">
-                      <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
-                        <a href={lastUploadUrl} download>
-                          Download
-                        </a>
-                        <FaDownload className="ml-2 mt-1" />
-                      </button>
-                    </div>
-                    <div className="mt-2 flex">
-                      <button
-                        onClick={handlePrint}
-                        className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
-                      >
-                        Print
-                        <FaPrint className="ml-2 mt-1" />
-                      </button>
+                    <div className="flex items-center justify-center gap-6 py-4">
+                      <div className="mt-2 flex">
+                        <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
+                          <a href={lastUploadUrl} download>
+                            Download
+                          </a>
+                          <FaDownload className="ml-2 mt-1" />
+                        </button>
+                      </div>
+                      <div className="mt-2 flex">
+                        <button
+                          onClick={handlePrint}
+                          className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
+                        >
+                          Print
+                          <FaPrint className="ml-2 mt-1" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -203,7 +210,7 @@ export const GroupHS = () => {
             {viewingDocument === document.upload &&
               !document.upload.endsWith(".pdf") && (
                 <div className="relative mt-4">
-                  <div >
+                  <div>
                     <img
                       src={lastUploadUrl} // Use the URL for the image
                       alt="Document Preview"
@@ -267,7 +274,7 @@ export const GroupHS = () => {
       </div>
     );
   };
-  
+
   const onSubmit = async (data) => {
     try {
       const GHSreValue = {
@@ -295,13 +302,13 @@ export const GroupHS = () => {
           query: listGroupHandS,
         });
         const items = response.data.listGroupHandS.items;
-  
+
         // Filter out expired policies
         const filteredData = items.filter((data) => {
           const expiryDate = new Date(data.groupHSExp);
           return expiryDate >= new Date(); // Include only non-expired policies
         });
-  
+
         setInsuranceData(filteredData);
         setLoading(false); // Set loading to false when data is fetched
       } catch (error) {
@@ -310,97 +317,109 @@ export const GroupHS = () => {
         setLoading(false);
       }
     };
-  
+
     fetchInsuranceData();
   }, []);
 
-  
   return (
     <section>
-      <form onSubmit={handleSubmit(onSubmit)} className="mx-auto py-5 px-10 my-10 bg-[#F5F6F1CC]">
-      {/* Group H&S Insurance Fields */}
-      <h3 className="mb-5 text-lg font-bold">Group H&S Insurance</h3>
-      <div className="relative mb-5">
-        <div className="grid grid-cols-3 gap-4 items-center">
-          <FormField
-            name="groupHSNo"
-            type="text"
-            placeholder="Enter H&S Policy Number"
-            label="Policy Number"
-            register={register}
-            errors={errors}
-          />
-          <FormField
-            name="groupHSExp"
-            type="date"
-            label="Expiry Date"
-            register={register}
-            errors={errors}
-          />
-          <div className="mb-2 relative">
-            <FileUploadField
-              label="Upload File"
-              onChangeFunc={(e) => handleFileChange(e, "groupHSUpload")}
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="mx-auto py-5 px-10 my-10 bg-[#F5F6F1CC]"
+      >
+        {/* Group H&S Insurance Fields */}
+        <h3 className="mb-5 text-lg font-bold">Group H&S Insurance</h3>
+        <div className="relative mb-5">
+          <div className="grid grid-cols-3 gap-4 items-center">
+            <FormField
+              name="groupHSNo"
+              type="text"
+              placeholder="Enter H&S Policy Number"
+              label="Policy Number"
               register={register}
-              name="groupHSUpload"
-              error={errors}
+              errors={errors}
             />
-            <div className="absolute">
-              {uploadedFileNames.groupHSUpload && (
-                <span className="text-sm text-grey ">{uploadedFileNames.groupHSUpload}</span>
-              )}
+            <FormField
+              name="groupHSExp"
+              type="date"
+              label="Expiry Date"
+              register={register}
+              errors={errors}
+            />
+            <div className="mb-2 relative">
+              <FileUploadField
+                label="Upload File"
+                onChangeFunc={(e) => handleFileChange(e, "groupHSUpload")}
+                register={register}
+                name="groupHSUpload"
+                error={errors}
+              />
+              <div className="absolute">
+                {uploadedFileNames.groupHSUpload && (
+                  <span className="text-sm text-grey ">
+                    {uploadedFileNames.groupHSUpload}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      {/* Submit Button */}
-      <div className="center my-10">
-        <button type="submit" className="primary_btn">
-          Save
-        </button>
-      </div>
+        {/* Submit Button */}
+        <div className="center my-10">
+          <button type="submit" className="primary_btn">
+            Save
+          </button>
+        </div>
       </form>
 
       {notification && (
-        <SpinLogo text="Group H&S Saved Successfully" notification={notification} path="/insuranceHr/groupHS" />
+        <SpinLogo
+          text="Group H&S Saved Successfully"
+          notification={notification}
+          path="/insuranceHr/groupHS"
+        />
       )}
       {/* View Insurance Info Section */}
       <div className="mt-10">
-    <p className="text-xl font-bold mb-10 p-3 rounded-lg border-2 border-[#FEF116] bg-[#FFFEF4] w-[250px]">
-      View Insurance Info
-    </p>
-    {loading ? (
-      <p>Loading...</p>
-    ) : insuranceData.length > 0 ? (
-      <div className=' h-[400px] overflow-y-auto scrollBar'>
-        <table className="w-full text-center ">
-        <thead className="bg-[#939393] text-white ">
-          <tr>
-            <th className="pl-4 py-4 rounded-tl-lg">Policy Number</th>
-            <th className="pl-4 py-4">Expiry Date</th>
-            <th className="pl-4 py-4 rounded-tr-lg">Uploaded File</th>
-          </tr>
-        </thead>
-        <tbody className="bg-white cursor-pointer  ">
-          {insuranceData.map((data, index) => (
-            <tr
-              key={index}
-              className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue "
-            >
-              <td className="pl-4 py-4">{data.groupHSNo}</td>
-              <td className="py-4 px-4">{formatDate(data?.groupHSExp || "N/A")}</td>
-              <td className="pl-4 py-4">
-                {renderDocumentCategory(data.groupHSUpload, "PDF File")}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        <p className="text-xl font-bold mb-10 p-3 rounded-lg border-2 border-[#FEF116] bg-[#FFFEF4] w-[250px]">
+          View Insurance Info
+        </p>
+        {loading ? (
+          <p>Loading...</p>
+        ) : insuranceData.length > 0 ? (
+          <div className=" h-[400px] overflow-y-auto scrollBar">
+            <table className="w-full text-center ">
+              <thead className="bg-[#939393] text-white ">
+                <tr>
+                  <th className="pl-4 py-4 rounded-tl-lg">Policy Number</th>
+                  <th className="pl-4 py-4">Expiry Date</th>
+                  <th className="pl-4 py-4 rounded-tr-lg">Uploaded File</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white cursor-pointer  ">
+                {insuranceData.map((data, index) => (
+                  <tr
+                    key={index}
+                    className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue "
+                  >
+                    <td className="pl-4 py-4">{data.groupHSNo}</td>
+                    <td className="py-4 px-4">
+                      {formatDate(data?.groupHSExp || "N/A")}
+                    </td>
+                    <td className="pl-4 py-4">
+                      {renderDocumentCategory(data.groupHSUpload, "PDF File")}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-center mt-10">
+            No insurance information available.
+          </p>
+        )}
       </div>
-    ) : (
-      <p className="text-center mt-10">No insurance information available.</p>
-    )}
-  </div>
       {/* Popup */}
       {popupVisible && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
@@ -413,14 +432,16 @@ export const GroupHS = () => {
             </button>
             {popupImage.endsWith(".pdf") ? (
               <Worker
-              workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
+                workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
                 file={popupImage}
                 onLoadSuccess={onDocumentLoadSuccess}
               >
                 <Page pageNumber={pageNumber} />
                 <div className="text-center mt-2">
                   <button
-                    onClick={() => setPageNumber((prev) => Math.max(prev - 1, 1))}
+                    onClick={() =>
+                      setPageNumber((prev) => Math.max(prev - 1, 1))
+                    }
                     disabled={pageNumber <= 1}
                   >
                     Previous
@@ -429,7 +450,9 @@ export const GroupHS = () => {
                     {pageNumber} / {numPages}
                   </span>
                   <button
-                    onClick={() => setPageNumber((prev) => Math.min(prev + 1, numPages))}
+                    onClick={() =>
+                      setPageNumber((prev) => Math.min(prev + 1, numPages))
+                    }
                     disabled={pageNumber >= numPages}
                   >
                     Next
@@ -437,12 +460,15 @@ export const GroupHS = () => {
                 </div>
               </Worker>
             ) : (
-              <img src={popupImage} alt="popup view" className="w-full h-auto" />
+              <img
+                src={popupImage}
+                alt="popup view"
+                className="w-full h-auto"
+              />
             )}
           </div>
         </div>
       )}
     </section>
-    
   );
 };

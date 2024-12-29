@@ -26,13 +26,13 @@ export const UpdateMedical = () => {
       uploadRegis: LabUpValue.uploadRegis,
     };
 
-    console.log("Updating data in LabourMedicalInfo table:", updateData);
+    // console.log("Updating data in LabourMedicalInfo table:", updateData);
 
     try {
       const updatedData = await client.graphql({
         query: updateLabourMedicalInfo,
         variables: {
-          input: updateData,
+          input: updateData, limit:20000,
         },
       });
 

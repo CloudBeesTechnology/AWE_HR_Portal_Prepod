@@ -28,11 +28,11 @@ export const UpdateLDFun = () => {
 
       const response = await client.graphql({
         query: updateBJLDetails,
-        variables: { input: updatedData },
+        variables: { input: updatedData , limit:20000,},
       });
 
       // // Log the response to confirm the update
-      console.log("Data successfully updated:", response);
+      // console.log("Data successfully updated:", response);
     } catch (error) {
       console.error("Error updating data:", error);
       throw error; // Re-throw the error after logging

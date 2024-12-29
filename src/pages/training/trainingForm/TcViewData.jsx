@@ -123,7 +123,7 @@ export const TcViewData = () => {
   return (
     <section className="bg-[#F8F8F8] mx-auto p-5 h-full w-full">
       <div className="w-full flex items-center justify-between gap-5 my-5 ">
-                <Link to="/training" className="text-xl  text-grey">
+                <Link to="/training/hr" className="text-xl  text-grey">
                   <FaArrowLeft />
                 </Link>
           <article className="flex-1 flex gap-5 text-dark_grey justify-center">

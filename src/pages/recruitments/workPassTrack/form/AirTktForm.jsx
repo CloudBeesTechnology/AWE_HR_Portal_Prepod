@@ -6,6 +6,7 @@ import { FileUploadField } from "../../../employees/medicalDep/FileUploadField";
 import { AirTktFormSchema } from "../../../../services/Validation";
 import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
 import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPTracking";
+import { statusOptions } from "../../../../utils/StatusDropdown";
 
 export const AirTktForm = ({ candidate }) => {
   const { interviewSchedules } = useFetchCandy();
@@ -218,14 +219,20 @@ export const AirTktForm = ({ candidate }) => {
         </div>
         <div>
           <label htmlFor="status">Status</label>
-          <input
+          <select
             className="w-full border p-2 rounded mt-1"
-            type="text"
             id="status"
             {...register("status")}
             value={formData.interview.status}
             onChange={(e) => handleInputChange("status", e.target.value)}
-          />
+          >
+            {/* <option value="">Select Status</option> */}
+            {statusOptions.map((status, index) => (
+              <option key={index} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

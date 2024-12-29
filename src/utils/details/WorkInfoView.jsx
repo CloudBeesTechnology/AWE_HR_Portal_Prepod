@@ -1,7 +1,8 @@
 import React, { useState, useRef } from "react";
-import { Viewer, Worker, Page } from "@react-pdf-viewer/core";
+import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { pdfjs } from "react-pdf";
+import { useReactToPrint } from "react-to-print";
 // import "react-pdf/dist/esm/Page/TextLayer.css";
 // import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import { FaTimes, FaPrint, FaDownload } from "react-icons/fa"; // Import "X" icon from react-icons
@@ -33,10 +34,13 @@ const WorkInfoView = ({
   invoiceRef,
   formatDate,
   mainRef,
-  handlePrint,
+
 }) => {
   const [viewingDocument, setViewingDocument] = useState(null); // State to store the currently viewed document URL
   const [lastUploadUrl, setPPLastUP] = useState("");
+  const [loading, setLoading] = useState(false);
+  const workInfoRef = useRef();
+
   // Helper function to fetch the cloud URL
   const linkToStorageFile = async (pathUrl) => {
     try {
@@ -44,8 +48,10 @@ const WorkInfoView = ({
       //  console.log("File URL:", result.url.href); // Use .href to extract the URL as a string
       setPPLastUP(result.url.href); // Store the URL as a string
       setViewingDocument(pathUrl); // Update the state to show the selected document
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching the file URL:", error);
+      setLoading(false);
     }
   };
 
@@ -68,10 +74,26 @@ const WorkInfoView = ({
     }
   };
 
-  // Function to handle closing the viewer
-  const handleCloseViewerFunction = () => {
-    setViewingDocument(null); // Close the viewer by setting the state to null
+  const handleClose = (e) => {
+    e.preventDefault(); // Prevent default action
+    setViewingDocument(null); // Close the viewer
   };
+
+  const closeModal = () => {
+    setViewingDocument(null);
+  };
+
+  const handlePrint = useReactToPrint({
+    content: () => workInfoRef.current,
+    onBeforePrint: () => console.log("Preparing to print PDF..."),
+    onAfterPrint: () => console.log("Print complete"),
+    pageStyle: `
+        @page {    
+          height:  714px;
+          padding: 22px, 0px, 22px, 0px;    
+        }
+      `,
+  });
 
   // Function to render documents under a single category
   const renderDocumentsUnderCategory = (documents, documentName) => {
@@ -97,60 +119,46 @@ const WorkInfoView = ({
             {/* Conditional rendering of PDF or image */}
             {viewingDocument === document.upload &&
               document.upload.endsWith(".pdf") && (
-                <div className="mt-4">
-                  <div className="relative bg-white max-w-3xl mx-auto p-6 rounded-lg shadow-lg">
-                    {/* PDF Viewer using react-pdf */}
-                    <div className="flex justify-center">
-                      <div ref={invoiceRef}>
-                        <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-                          <Viewer fileUrl={lastUploadUrl || ""} />
-                          {/* <Page pageNumber={pageNumber} className="mx-auto" /> */}
-                        </Worker>
-                        {/* <Document
-                          file={lastUploadUrl}
-                          onLoadSuccess={onDocumentLoadSuccess}
-                          className="w-full"
-                        >
-                          <Page pageNumber={pageNumber} className=" mx-auto" />
-                        </Document> */}
-                      </div>
+                <div className="py-6 fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="relative bg-white rounded-lg shadow-lg w-[40vw] max-h-full flex flex-col">
+                    {/* PDF Viewer */}
+                    <div ref={workInfoRef} className="flex-grow overflow-y-auto">
+                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                        <Viewer fileUrl={lastUploadUrl || ""} />
+                      </Worker>
                     </div>
 
-
-                    {/* Close Button */}
                     <div className="absolute top-2 right-2">
                       <button
-                        onClick={handleCloseViewerFunction}
+                        onClick={closeModal} // Close the modal
                         className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
                       >
-                        <FaTimes /> {/* Close icon */}
+                        <FaTimes />
                       </button>
                     </div>
-                  </div>
 
-                  <div className="flex items-center justify-center gap-6 py-4">
-                    <div className="mt-2 flex">
-                      <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
-                        <a href={lastUploadUrl} download>
-                          Download
-                        </a>
-                        <FaDownload className="ml-2 mt-1" />
-                      </button>
-                    </div>
-                    {/* Print Button */}
-                    <div className="mt-2 flex">
-                      <button
-                        onClick={handlePrint}
-                        className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
-                      >
-                        Print
-                        <FaPrint className="ml-2 mt-1" />
-                      </button>
+                    <div className="flex items-center justify-center gap-6 py-4">
+                      <div className="mt-2 flex">
+                        <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
+                          <a href={lastUploadUrl} download>
+                            Download
+                          </a>
+                          <FaDownload className="ml-2 mt-1" />
+                        </button>
+                      </div>
+                      <div className="mt-2 flex">
+                        <button
+                          onClick={handlePrint}
+                          className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
+                        >
+                          Print
+                          <FaPrint className="ml-2 mt-1" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
-
             {/* Image Viewer */}
             {viewingDocument === document.upload &&
               !document.upload.endsWith(".pdf") && (
@@ -165,7 +173,7 @@ const WorkInfoView = ({
 
                   <div className="absolute top-2 right-2">
                     <button
-                      onClick={handleCloseViewerFunction}
+                      onClick={handleClose}
                       className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
                     >
                       <FaTimes /> {/* Close icon */}

@@ -21,7 +21,7 @@ export const AddCFUpdate = () => {
            client.graphql({
              query: updateAddCourse,
              variables: {
-               input: totalData,
+               input: totalData, limit:20000,
              },
            })
          ])

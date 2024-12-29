@@ -19,7 +19,7 @@ export const WorkInfoMD = () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmployeeDetails/EmpWorkInfo.csv ",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmployeeDetails/Employee+Info+%26+Work+Info+as+at+20DEC2024/EmpWorkInfo.csv  ",
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }

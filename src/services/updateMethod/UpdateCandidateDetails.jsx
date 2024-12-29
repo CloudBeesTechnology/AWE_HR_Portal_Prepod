@@ -101,11 +101,11 @@ export const UpdateCandidateDetails = () => {
       // Send the updated data to the backend
       const response = await client.graphql({
         query: updateIDDetails, // The mutation for updating candidate details
-        variables: { input: updatedData },
+        variables: { input: updatedData, limit:20000, },
       });
 
       // Log the response to confirm the update
-      console.log("Candidate details successfully updated:", response);
+      // console.log("Candidate details successfully updated:", response);
     } catch (error) {
       console.error("Error updating candidate details:", error);
       throw error; // Re-throw the error after logging

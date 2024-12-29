@@ -29,35 +29,66 @@ export const EmpLeaveBalance = () => {
     "Department",
     "Summary",
   ];
+// console.log(mergedData);
 
-  useEffect(() => {
-    const uniqueData = [];
-    const seen = new Set();
-    const userID = localStorage.getItem("userID");
-    mergedData.forEach((val) => {
-      const uniqueKey = val.empID;
+useEffect(() => {
+  const userID = localStorage.getItem("userID");
 
-      if (!seen.has(uniqueKey)) {
-        seen.add(uniqueKey);
-        uniqueData.push(val);
-      }
-    });
+  // Step 1: Create a map to track the most recent data by empID
+  const recentDataMap = new Map();
 
-    const result = uniqueData.filter((item) => {
-      if (userType === "Manager") {
-        return item.managerEmpID === userID;
-      } else if (userType === "Supervisor") {
-        return item.supervisorEmpID === userID;
-      } else if (userType === "SuperAdmin" || userType === "HR") {
-        return true; // Include all items for these user types
-      }
-      return false; // Default to exclude items if no condition is met
-    });
-    // console.log(result);
+  mergedData.forEach((val) => {
+    const uniqueKey = val.empID;
 
-    setSecondartyData(result);
-    setData(result);
-  }, [mergedData]);
+    // Determine the most recent timestamp (created or updated)
+    const mostRecentTimestamp = new Date(
+      Math.max(
+        new Date(val.leaveDetailsCreatedAt).getTime(),
+        new Date(val.leaveDetailsUpdatedAt).getTime()
+      )
+    );
+
+    // Compare the most recent timestamp, keeping the most recent entry
+    if (
+      !recentDataMap.has(uniqueKey) ||
+      mostRecentTimestamp >
+        new Date(
+          Math.max(
+            new Date(
+              recentDataMap.get(uniqueKey).leaveDetailsCreatedAt
+            ).getTime(),
+            new Date(
+              recentDataMap.get(uniqueKey).leaveDetailsUpdatedAt
+            ).getTime()
+          )
+        )
+    ) {
+      recentDataMap.set(uniqueKey, val);
+    }
+  });
+
+  // Step 2: Convert the map values to an array
+  const uniqueData = Array.from(recentDataMap.values());
+
+  // Step 3: Filter data based on userType and userID
+  const result = uniqueData.filter((item) => {
+    if (userType === "Manager") {
+      return item.managerEmpID === userID;
+    } else if (userType === "Supervisor") {
+      return item.supervisorEmpID === userID;
+    } else if (userType === "SuperAdmin" || userType === "HR") {
+      return true; // Include all items for these user types
+    }
+    return false; // Default to exclude items if no condition is met
+  });
+
+  console.log("Filtered Result:", result);
+
+  // Step 4: Update state with filtered results
+  setSecondartyData(result);
+  setData(result);
+}, [mergedData, userType]);
+
 
   // Handle "view summary" click
   const handleViewSummary = (employee) => {

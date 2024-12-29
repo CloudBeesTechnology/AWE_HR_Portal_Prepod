@@ -26,7 +26,7 @@ export const BlastDataUp = () => {
            client.graphql({
              query: updateBastingPaint,
              variables: {
-               input: totalData,
+               input: totalData, limit:20000,
              },
            })
          ])

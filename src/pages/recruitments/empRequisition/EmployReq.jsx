@@ -98,7 +98,7 @@ export const EmployReq = ({}) => {
   }, [isReviewFormVisible]);
 
   return (
-    <section className="screen-size h-screen w-full my-5">
+    <section className="screen-size w-full mt-5 mb-1">
       <div className="mb-8 flex justify-between items-center">
         <button className="bg-[#faf362] py-2 px-3 rounded-lg text-[18px] font-semibold">
           Employee Requisition Review
@@ -114,9 +114,9 @@ export const EmployReq = ({}) => {
       {error && <div className="text-[red] text-center mb-4">{error}</div>}
 
       {requisitionData.length > 0 ? (
-        <div className="overflow-x-auto rounded-lg">
+        <div className="h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-lg">
           <table className="w-full">
-            <thead className="bg-[#939393] text-white rounded-lg">
+            <thead className="bg-[#939393] text-white sticky top-0 rounded-lg">
               <tr>
                 <th className="pl-4 py-4">Manager</th>
                 {/* <th className="py-4">Department</th> */}
@@ -171,7 +171,7 @@ export const EmployReq = ({}) => {
                       <span className="max-w-[200px] text-ellipsis overflow-hidden">
                         {item.remarkReq}
                       </span>
-                      <div className="w-6 h-6 center">
+                      <div className="w-6 h-6 flex justify-center items-center">
                         {localStorage.getItem("userType") === "GM" &&
                           !item.remarkReq && (
                             <FaPencilAlt
@@ -193,8 +193,7 @@ export const EmployReq = ({}) => {
       <RequisitionReviewForm
         isVisible={isReviewFormVisible}
         onClose={handleReviewFormClose}
-        isMdView={localStorage.getItem("userType") === "GM"}
-        isHrView={localStorage.getItem("userType") === "HR"}
+        isGmView={localStorage.getItem("userType") === "GM"}
         selectedRequest={selectedRequest}
         onStatusChange={handleStatusChange}
       />

@@ -30,7 +30,7 @@ export const  HandleDeleteCandy= () => {
             input: { 
               id: candidateId, 
               status: "Inactive"  // Update the status to "Inactive"
-            } 
+            } , limit:20000,
           },
         });
       }

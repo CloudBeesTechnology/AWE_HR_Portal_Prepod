@@ -192,7 +192,7 @@ export const TrainingCertificatesForm = () => {
   
 
   const onSubmit = async (data) => {
-    console.log("Form data:", data);
+    // console.log("Form data:", data);
 
     try {
       
@@ -208,10 +208,10 @@ export const TrainingCertificatesForm = () => {
           trainingUpCertifi:uploadeTC.trainingUpCertifi,
           id: TCDataRecord.id,  
         };
-        console.log(TCDataUp);
+        // console.log(TCDataUp);
 
         await TCDataFunUp({ TCDataUp });
-        setShowTitle("Training Certificates Updated successfully");
+        setShowTitle("Training Certificate Details Updated successfully");
         setNotification(true);
       } else {
         const TCValue = {
@@ -219,7 +219,7 @@ export const TrainingCertificatesForm = () => {
           trainingUpCertifi:uploadeTC.trainingUpCertifi,
         };
         await TCData({ TCValue });
-        setShowTitle("Training Certificates Saved successfully");
+        setShowTitle("Training Certificate Details Saved successfully");
         setNotification(true);
       }
     } catch (err) {
@@ -242,8 +242,9 @@ export const TrainingCertificatesForm = () => {
           </p>    
         </article>       
       </div>
+   
        <div className="mt-16 mb-16 w-full rounded-md bg-white px-20 py-10">
-       <div className="w-[30%] mt-5" >
+       <div className="flex-1 w-[30%] mt-5" >
           <SearchDisplay
             searchResult={searchResult}
             newFormData={allEmpDetails}
@@ -415,7 +416,7 @@ export const TrainingCertificatesForm = () => {
         <SpinLogo
         text={showTitle}
         notification={notification}
-          path="/training"
+          path="/training/hr"
         />
       )}
     </section>

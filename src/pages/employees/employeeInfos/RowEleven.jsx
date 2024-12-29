@@ -24,36 +24,62 @@ export const RowEleven = ({
 
   useEffect(() => {
     if (isInitialMount.current) {
-        console.log("Initial value:", value);
-        if (value && value.length > 0) {
-            try {
-                const parsedValue = typeof value === "string" ? JSON.parse(value) : value;
-                replace(parsedValue); // Replace fields with parsed data
-                setValue("familyDetails", parsedValue);
-            } catch (error) {
-                console.error("JSON parse error:", error, "Value:", value);
-            }
-        } else {
-            append({
-                name: "",
-                relationship: "",
-                contact: "",
-                address: "",
-                isNew: false,
-            });
-        }
-        isInitialMount.current = false;
-    } else if (value && value.length > 0) {
+      if (value && value.length > 0) {
+        // Log the value to see its format
+        console.log("Received value:", value);
+  
+        let parsedValue;
+  
         try {
-            const parsedValue = typeof value === "string" ? JSON.parse(value) : value;
-            replace(parsedValue); // Replace fields with parsed data
-            setValue("familyDetails", parsedValue);
+          if (typeof value === "string") {
+            // Attempt to clean up the string by removing unnecessary escape characters
+            const cleanedValue = value.replace(/\\"/g, '"'); // Remove escaped quotes
+            console.log("Cleaned value:", cleanedValue);
+  
+            // Try to parse the cleaned string
+            parsedValue = JSON.parse(cleanedValue);
+          } else {
+            parsedValue = value; // If value is already an array, use it directly
+          }
+  
+          replace(parsedValue); // Replace fields with parsed data
+          setValue("familyDetails", parsedValue); // Set the form value
         } catch (error) {
-            console.error("JSON parse error during update:", error, "Value:", value);
+          console.error("Error parsing value:", error);
         }
+      } else {
+        append({
+          name: "",
+          relationship: "",
+          contact: "",
+          address: "",
+          isNew: false,
+        });
+      }
+      isInitialMount.current = false;
+    } else if (value && value.length > 0) {
+      // Ensure the fields are replaced when value updates later
+      let parsedValue;
+  
+      try {
+        if (typeof value === "string") {
+          const cleanedValue = value.replace(/\\"/g, '"'); // Handle escaped quotes
+          console.log("Cleaned value (on update):", cleanedValue);
+  
+          parsedValue = JSON.parse(cleanedValue);
+        } else {
+          parsedValue = value;
+        }
+  
+        replace(parsedValue); // Replace fields with parsed data
+        setValue("familyDetails", parsedValue); // Set the form value
+      } catch (error) {
+        console.error("Error parsing value (on update):", error);
+      }
     }
-}, [value, append, replace, setValue]);
-
+  }, [value, append, replace, setValue]);
+  
+  
   const handleAddFamily = () => {
     append({
       name: "",
@@ -106,7 +132,7 @@ export const RowEleven = ({
             name={`familyDetails.${index}.address`}
             register={register}
             errors={errors}
-            // value={familyDetails?.[index]?.address || ""}
+            value={familyDetails?.[index]?.address || ""}
           />
 
           {/* Conditionally render the remove button only if the field is marked as new */}

@@ -86,15 +86,15 @@ const fetchRequisitionData = async () => {
   }, [isFormVisible, isReviewFormVisible]);
 
   return (
-    <section className="min-h-screen bg-[#F5F6F1]">
+    <section className=" bg-[#F5F6F1]">
       <div className="screen-size">
         {/* Header Buttons */}
         <div className="flex justify-between my-8">
-          <button className="bg-[#faf362] py-2 px-3 rounded-lg text-[18px] font-semibold">
+          <p className="bg-[#faf362] py-2 px-3 rounded-lg text-[18px] font-semibold">
             My Requisition List
-          </button>
+          </p>
           <button
-            className="bg-[#faf362] py-2 px-3 rounded-lg text-[18px] font-semibold"
+            className="hover:bg-[#f4bf71] border-2 border-[#f4bf71] py-2 px-3 rounded-lg text-[18px] font-semibold"
             onClick={() => setIsFormVisible(true)}
           >
             Apply New Requisition
@@ -106,9 +106,9 @@ const fetchRequisitionData = async () => {
 
         {/* Requisition Table */}
         {requisitionData.length > 0 ? (
-          <div className="overflow-x-auto rounded-lg">
+        <div className="h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-lg">
             <table className="w-full">
-              <thead className="bg-[#939393] text-white rounded-lg">
+            <thead className="bg-[#939393] text-white sticky top-0 rounded-lg">
                 <tr>
                   {/* <th className="pl-4 py-3">Requestor</th> */}
                   {/* <th className="pl-4">Department</th> */}

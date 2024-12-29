@@ -12,8 +12,11 @@ export const UpdateEmpInfo = () => {
     if (!collectValue) {
       throw new Error("Missing required parameters");
     }
+
     const {
       empID,
+      PITableID,
+      IDTable,
       bwnIcNo,
       bwnIcColour,
       bwnIcExpiry,
@@ -43,8 +46,8 @@ export const UpdateEmpInfo = () => {
       paafCvevUpload,
       ppUpload,
       supportDocUpload,
-      IDTable,
-       age,
+
+      age,
       aTQualify,
       alternateNo,
       agent,
@@ -69,10 +72,10 @@ export const UpdateEmpInfo = () => {
       permanentAddress,
       position,
       sapNo,
-      PITableID, bankName,
-      bankAccNo
-    } = collectValue;
 
+      bankName,
+      bankAccNo,
+    } = collectValue;
 
     const totalData = {
       id: PITableID,
@@ -104,7 +107,7 @@ export const UpdateEmpInfo = () => {
       position,
       sapNo,
       bankName,
-      bankAccNo
+      bankAccNo,
     };
 
     const totalData1 = {
@@ -140,35 +143,36 @@ export const UpdateEmpInfo = () => {
       supportDocUpload,
     };
 
-
     try {
       const [empInfoResponse, idResponse] = await Promise.all([
         client.graphql({
           query: updateEmpPersonalInfo,
           variables: {
             input: totalData,
+            limit: 20000,
           },
         }),
         client.graphql({
           query: updateIDDetails,
           variables: {
             input: totalData1,
+            limit: 20000,
           },
         }),
       ]);
-      console.log(idResponse);
-      console.log(empInfoResponse);
-      if (idResponse.errors) {
-        console.error("Error in idResponse:", idResponse.errors);
-      } else {
-        console.log("idResponse:", idResponse);
-      }
+      // console.log(idResponse);
+      // console.log(empInfoResponse);
+      // if (idResponse.errors) {
+      //   console.error("Error in idResponse:", idResponse.errors);
+      // } else {
+      //   console.log("idResponse:", idResponse);
+      // }
 
-      if (empInfoResponse.errors) {
-        console.error("Error in empInfoResponse:", empInfoResponse.errors);
-      } else {
-        console.log("empInfoResponse:", empInfoResponse);
-      }
+      // if (empInfoResponse.errors) {
+      //   console.error("Error in empInfoResponse:", empInfoResponse.errors);
+      // } else {
+      //   console.log("empInfoResponse:", empInfoResponse);
+      // }
     } catch (error) {
       console.error("Error executing GraphQL requests:", error);
       throw error; // Rethrow error if needed

@@ -82,7 +82,7 @@
     @apply bg-secondary py-2 px-3 rounded-md text-white;
   }
   .input-field {
-    @apply w-full h-[45px] bg-lite_skyBlue px-3 mt-2 border outline-none border-[#dedddd] rounded;
+    @apply w-full h-[45px] bg-lite_skyBlue pl-3 mt-2 border outline-none border-[#dedddd] rounded pr-12;
   }
 
   .form-group {
@@ -123,7 +123,7 @@
 }
 .select-custom {
   background: url("./assets/drop.png") no-repeat;
-  background-position: right 5% center;
+  background-position: right 4% center;
   background-color: #f5f7fb;
   background-size: 18px 18px; /* Adjust size if needed */
   appearance: none; /* Remove default arrow */
@@ -207,9 +207,10 @@ input[type="number"] {
 .table-container {
   margin-top: 2.25rem; /* mt-9 */
   max-height: 500px;
+  min-width: 100px;
   overflow-y: scroll; /* Enable vertical scrolling */
   display: block;
-  width: 100%; /* Ensures full width for the table */
+  width:100%; /*Ensures full width for the table */
   scrollbar-width: thin; /* For Firefox (stylish scroll) */
   /* scrollbar-color: #bfc1c2 #f2f0f0; Scrollbar color (thumb and track) */
   box-shadow: #9c0f0f;
@@ -221,9 +222,10 @@ input[type="number"] {
   top: 0;
   background-color: #939393;
   z-index: 1;
-  text-align: left;
+  text-align:left;
   box-shadow: 0px 2px 4px rgba(26, 25, 25, 0.1);
   color: #f0f0f0;
+  height: 45px;
 }
 
 /* Add padding for table cells */
@@ -231,5 +233,36 @@ input[type="number"] {
 .styled-table th {
   padding: 1px 10px;
   text-align: center;
+  /* width: 100px; */
   /* background-color: #f7f1f1;  */
+}
+@media print {
+  /* Remove margins to ensure content fills the entire page */
+  body {
+    margin: 0;
+  }
+
+  /* Force page breaks for the PDF content */
+  .invoice-content {
+    page-break-before: always;  /* Ensures each new page starts with a fresh break */
+    page-break-after: always;   /* Forces a break after each PDF page */
+    break-inside: avoid;        /* Prevents breaking content between pages */
+  }
+
+  /* Ensure the PDF content doesn't overflow the page */
+  .pdfViewer {
+    max-width: 100%;
+    max-height: 100%;
+    overflow: hidden;
+  }
+
+  /* Optional: Make sure the viewer scales to fit properly */
+  .pdfViewer {
+    width: 100%;
+    height: auto;
+  }
+}
+
+.custom-shadow {
+  box-shadow: 0px 0px 1px 0px ;
 }

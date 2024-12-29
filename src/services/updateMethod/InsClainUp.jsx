@@ -20,7 +20,7 @@ export const InsClaimUp = () => {
         client.graphql({
           query: updateInsClaim,
           variables: {
-            input: totalData,
+            input: totalData, limit:20000,
           },
         }),
       ]);

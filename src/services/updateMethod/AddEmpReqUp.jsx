@@ -32,7 +32,7 @@ export const AddEmpReqUp = () => {
            client.graphql({
              query: updateTrainingReq,
              variables: {
-               input: totalData,
+               input: totalData, limit:20000,
              },
            })
          ])

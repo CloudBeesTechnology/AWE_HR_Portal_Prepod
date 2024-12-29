@@ -86,6 +86,10 @@ import { TrainingCertificatesForm } from "../pages/training/trainingForm/Trainin
 import { IDDetailsMD } from "../components/migratingData/IDDetailsMD";
 import { EmpPersonalMD } from "../components/migratingData/EmpPersonalMD";
 import { WorkInfoMD } from "../components/migratingData/WorkInfoMD";
+import { EmpInsuranceMD } from "../components/migratingData/EmpInsuranceMD";
+import { LeaveDetailsMD } from "../components/migratingData/LeaveDetailsMD";
+import { NonLocalAccMD } from "../components/migratingData/NonLocalAccMD";
+import { DNDetailsMD } from "../components/migratingData/DNDetailsMD";
 
 const client = generateClient();
 
@@ -176,8 +180,12 @@ const NavigationLinks = () => {
         {/* Login and Change Password Routes */}
         <Route path="/changePassword" element={<ChangePassword />} />
         <Route path="/migrationDataID" element={<IDDetailsMD />} />
-      <Route path="/migrationDataEPI" element={<EmpPersonalMD />} />
-      <Route path="/migrationDataWorkI" element={<WorkInfoMD />} />
+        <Route path="/migrationDataEPI" element={<EmpPersonalMD />} />
+        <Route path="/migrationDataWorkI" element={<WorkInfoMD />} />
+        <Route path="/migrationDataEmpInsu" element={<EmpInsuranceMD />} />
+        <Route path="/migrationDataLeaveDetails" element={<LeaveDetailsMD />} />
+        <Route path="/migrationDataNLA" element={<NonLocalAccMD />} />
+        <Route path="/migrationDataDN" element={<DNDetailsMD />} />
 
         {loginAuth && (
           <>
@@ -337,7 +345,6 @@ const NavigationLinks = () => {
                       <Route path="/timesheetORMC" element={<ORMC />} />
                       <Route path="/timesheetOffshore" element={<Offshore />} />
                       <Route path="/timesheetBlng" element={<Blng />} />
-                     
 
                       <Route
                         path="/viewTimesheet"

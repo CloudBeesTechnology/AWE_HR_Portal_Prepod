@@ -28,7 +28,7 @@ export const HandleRejectCandidates = () => {
     try {
       const response = await client.graphql({
         query: updatePersonalDetails,  // Mutation for updating candidate details
-        variables: { input: data },
+        variables: { input: data, limit:20000, },
       });
 
       // Handle success

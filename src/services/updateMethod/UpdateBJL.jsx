@@ -20,18 +20,18 @@ export const UpdateBJL = () => {
       bankEmpUpload: [BJLUpValue.bankEmpUpload],
 
     };
-    console.log(totalData);
+    // console.log(totalData);
 
     try {
       const storedData=   await Promise.all([
            client.graphql({
              query: updateBJLDetails,
              variables: {
-               input: totalData,
+               input: totalData, limit:20000,
              },
            })
          ])
-         console.log(storedData,"successfully Updated data");
+        //  console.log(storedData,"successfully Updated data");
 
        } catch (error) {
         console.log(error);

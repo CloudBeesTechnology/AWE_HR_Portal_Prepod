@@ -56,6 +56,7 @@ export const LeaveManage = () => {
   }, []);
 
   const { personalInfo } = useEmployeePersonalInfo(userID);
+// console.log(mergedData);
 
   useEffect(() => {
     // Start with the base filtered data from mergedData

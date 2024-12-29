@@ -350,10 +350,10 @@ export const WorkInfoFunc = () => {
         }),
       ]);
 
-      console.log(Emp);
-      console.log(Leave);
-      console.log(Ter);
-      console.log(Ser);
+      // console.log(Emp);
+      // console.log(Leave);
+      // console.log(Ter);
+      // console.log(Ser);
     } catch (error) {
       console.log(error);
     }

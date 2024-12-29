@@ -255,7 +255,7 @@ export const UpdateWIData = () => {
       // console.log(totalData, "ertdfghjkhbtxrfgh");
      try{ const Work = await client.graphql({
       query: updateEmpWorkInfo, 
-      variables: { input: totalData },
+      variables: { input: totalData, limit:20000, },
     })
     // console.log(Work);
   }
@@ -313,7 +313,7 @@ export const UpdateWIData = () => {
       // console.log(totalData1, "ertdfghjkhbtxrfgh");
       try{const Leave = await client.graphql({
         query: updateEmpLeaveDetails, 
-        variables: { input: totalData1 },
+        variables: { input: totalData1, limit:20000, },
       });
       // console.log(Leave);
     }catch(err){
@@ -349,7 +349,7 @@ export const UpdateWIData = () => {
       try{
         const Terminate = await client.graphql({
           query: updateTerminationInfo, 
-          variables: { input: totalData2 },
+          variables: { input: totalData2 , limit:20000,},
         });
         // console.log(Terminate);
       }catch(err){console.log(err);
@@ -424,7 +424,7 @@ export const UpdateWIData = () => {
       try{
         const Service = await client.graphql({
           query: updateServiceRecord, 
-          variables: { input: totalData3 },
+          variables: { input: totalData3, limit:20000, },
         });
         // console.log(Service);
       }catch(err){console.log(err);

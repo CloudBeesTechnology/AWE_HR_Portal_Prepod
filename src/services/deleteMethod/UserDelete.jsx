@@ -25,6 +25,7 @@ export const UserDelete = () => {
           query: updateUser,
           variables: {
             input: deletingUser, // Pass the 'input' in the expected format
+            limit:20000,
           },
         })
         .then((res) => {

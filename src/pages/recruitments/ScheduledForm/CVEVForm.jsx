@@ -7,6 +7,8 @@ import { FileUploadField } from "../../employees/medicalDep/FileUploadField";
 import { UpdateLoiData } from "../../../services/updateMethod/UpdateLoi";
 import { useFetchInterview } from "../../../hooks/useFetchInterview";
 import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
+import { statusOptions } from "../../../utils/StatusDropdown";
+
 // Define validation schema using Yup
 const CVEVFormSchema = Yup.object().shape({
   cvecApproveDate: Yup.date().notRequired(),
@@ -130,7 +132,6 @@ export const CVEVForm = ({ candidate }) => {
         InterviewValue: {
           id: interviewScheduleId, // Dynamically use the correct id
           status: formData.interview.status,
-
         },
       });
       console.log("Data stored successfully...");
@@ -189,14 +190,20 @@ export const CVEVForm = ({ candidate }) => {
         </div>
         <div>
           <label htmlFor="status">Status</label>
-          <input
+          <select
             className="w-full border p-2 rounded mt-1"
-            type="text"
             id="status"
             {...register("status")}
             value={formData.interview.status}
             onChange={(e) => handleInputChange("status", e.target.value)}
-          />
+          >
+            {/* <option value="">Select Status</option> */}
+            {statusOptions.map((status, index) => (
+              <option key={index} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

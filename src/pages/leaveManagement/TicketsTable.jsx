@@ -43,7 +43,10 @@ export const TicketsTable = () => {
       filters.search.length === 0 &&
       filters.status === "All"
     ) {
-      setData(ticketMerged);
+      const sortedData = [...ticketMerged].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setData(sortedData);
       setErrorState({
         noResults: false,
         searchError: false,
@@ -234,10 +237,14 @@ export const TicketsTable = () => {
     "Submitted form",
     userType !== "SuperAdmin" && "Status",
   ];
+console.log(ticketMerged);
 
   useEffect(() => {
-    setSecondartyData(ticketMerged);
-    setData(ticketMerged);
+    const sortedData = ticketMerged.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+    setSecondartyData(sortedData);
+    setData(sortedData);
   }, [ticketMerged]);
 
   return (

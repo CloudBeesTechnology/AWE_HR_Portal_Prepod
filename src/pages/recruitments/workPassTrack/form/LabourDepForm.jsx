@@ -4,9 +4,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { uploadDocs } from "../../../../services/uploadDocsS3/UploadDocs";
 import { FileUploadField } from "../../../employees/medicalDep/FileUploadField";
 import { LabourDepFormSchema } from "../../../../services/Validation";
-import { UpdateLoiData } from "../../../../services/updateMethod/UpdateLoi";
 import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
 import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPTracking";
+import { statusOptions } from "../../../../utils/StatusDropdown";
 
 export const LabourDepForm = ({ candidate }) => {
   const { interviewSchedules } = useFetchCandy();
@@ -213,14 +213,20 @@ export const LabourDepForm = ({ candidate }) => {
         </div>
         <div>
           <label htmlFor="status">Status</label>
-          <input
+          <select
             className="w-full border p-2 rounded mt-1"
-            type="text"
             id="status"
             {...register("status")}
             value={formData.interview.status}
             onChange={(e) => handleInputChange("status", e.target.value)}
-          />
+          >
+            {/* <option value="">Select Status</option> */}
+            {statusOptions.map((status, index) => (
+              <option key={index} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

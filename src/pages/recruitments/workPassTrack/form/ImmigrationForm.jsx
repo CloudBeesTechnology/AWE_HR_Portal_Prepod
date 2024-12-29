@@ -6,8 +6,9 @@ import { FileUploadField } from "../../../employees/medicalDep/FileUploadField";
 import { ImmigrationFormSchema } from "../../../../services/Validation";
 import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
 import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPTracking";
+import { statusOptions } from "../../../../utils/StatusDropdown";
 
-export const ImmigrationForm = ({candidate}) => {
+export const ImmigrationForm = ({ candidate }) => {
   const { interviewSchedules } = useFetchCandy();
   const { wpTrackingDetails } = useUpdateWPTracking();
 
@@ -19,7 +20,7 @@ export const ImmigrationForm = ({candidate}) => {
       visaapprovedate: "",
       visareferenceno: "",
       visaFile: "",
-      status: ""
+      status: "",
     },
   });
   const [uploadedFileNames, setUploadedFileNames] = useState({
@@ -41,45 +42,42 @@ export const ImmigrationForm = ({candidate}) => {
 
   const VisaUpload = watch("visaFile");
 
-   useEffect(() => {
+  useEffect(() => {
+    if (interviewSchedules.length > 0) {
+      // Find the interviewData for the candidate
+      const interviewData = interviewSchedules.find(
+        (data) => data.tempID === candidate.tempID
+      );
 
-    
-        if (interviewSchedules.length > 0) {
-          // Find the interviewData for the candidate
-          const interviewData = interviewSchedules.find(
-            (data) => data.tempID === candidate.tempID
-          );
-    
-    
-          if (interviewData) {
-            // Set the form data
-            setFormData({
-              interview: {
-                immbdno: interviewData.immbdno,
-                docsubmitdate: interviewData.docsubmitdate,
-                visaapprovedate: interviewData.visaapprovedate,
-                visareferenceno: interviewData.visareferenceno,
-                visaFile: interviewData.visaFile,
-                status: interviewData.status
-              },
-            });
-    
-            // Check if sawpFile exists and update the file names
-            if (interviewData.visaFile) {
-              const fileName = extractFileName(interviewData.visaFile);
-              setUploadedFileNames((prev) => ({
-                ...prev,
-                visaFile: fileName,
-              }));
-              console.log("Uploaded file name set:", fileName);
-            }
-          } else {
-            console.log("No interviewData found for candidate:", candidate.tempID);
-          }
-        } else {
-          console.log("No interview schedules available.");
+      if (interviewData) {
+        // Set the form data
+        setFormData({
+          interview: {
+            immbdno: interviewData.immbdno,
+            docsubmitdate: interviewData.docsubmitdate,
+            visaapprovedate: interviewData.visaapprovedate,
+            visareferenceno: interviewData.visareferenceno,
+            visaFile: interviewData.visaFile,
+            status: interviewData.status,
+          },
+        });
+
+        // Check if sawpFile exists and update the file names
+        if (interviewData.visaFile) {
+          const fileName = extractFileName(interviewData.visaFile);
+          setUploadedFileNames((prev) => ({
+            ...prev,
+            visaFile: fileName,
+          }));
+          console.log("Uploaded file name set:", fileName);
         }
-      }, [interviewSchedules, candidate.tempID]);
+      } else {
+        console.log("No interviewData found for candidate:", candidate.tempID);
+      }
+    } else {
+      console.log("No interview schedules available.");
+    }
+  }, [interviewSchedules, candidate.tempID]);
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
@@ -105,22 +103,22 @@ export const ImmigrationForm = ({candidate}) => {
 
   const handleSubmitTwo = async (data) => {
     data.preventDefault();
-  
+
     const selectedInterviewData = interviewSchedules.find(
       (data) => data.tempID === candidate?.tempID
     );
     const interviewScheduleId = selectedInterviewData?.id;
-  
+
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
       return;
     }
-  
+
     if (!interviewScheduleId) {
       console.error("Error: No interview schedule found for this candidate.");
       return;
     }
-  
+
     try {
       const response = await wpTrackingDetails({
         WPTrackingValue: {
@@ -129,17 +127,17 @@ export const ImmigrationForm = ({candidate}) => {
           docsubmitdate: formData.interview.docsubmitdate,
           visaapprovedate: formData.interview.visaapprovedate,
           visareferenceno: formData.interview.visareferenceno,
-          visaFile: uploadedVisa.visaFile ? uploadedVisa.visaFile : formData.interview.visaFile,  
+          visaFile: uploadedVisa.visaFile
+            ? uploadedVisa.visaFile
+            : formData.interview.visaFile,
         },
-
       });
-  
+
       // console.log("Response from WPTrackingDetails:", response);
-  
+
       if (response.errors && response.errors.length > 0) {
         console.error("Response errors:", response.errors);
       }
-  
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }
@@ -188,7 +186,9 @@ export const ImmigrationForm = ({candidate}) => {
             id=" visaapprovedate"
             {...register(" visaapprovedate")}
             value={formData.interview.visaapprovedate}
-            onChange={(e) => handleInputChange("visaapprovedate", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("visaapprovedate", e.target.value)
+            }
           />
         </div>
         <div>
@@ -199,7 +199,9 @@ export const ImmigrationForm = ({candidate}) => {
             id="visareferenceno"
             {...register("visareferenceno")}
             value={formData.interview.visareferenceno}
-            onChange={(e) => handleInputChange("visareferenceno", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("visareferenceno", e.target.value)
+            }
           />
         </div>
 
@@ -220,14 +222,20 @@ export const ImmigrationForm = ({candidate}) => {
         </div>
         <div>
           <label htmlFor="status">Status</label>
-          <input
+          <select
             className="w-full border p-2 rounded mt-1"
-            type="text"
             id="status"
             {...register("status")}
             value={formData.interview.status}
             onChange={(e) => handleInputChange("status", e.target.value)}
-          />
+          >
+            {/* <option value="">Select Status</option> */}
+            {statusOptions.map((status, index) => (
+              <option key={index} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

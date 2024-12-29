@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { getUrl } from "@aws-amplify/storage";
 import { FaTimes, FaPrint, FaDownload } from "react-icons/fa";
 import { Viewer, Worker, Page } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { pdfjs } from "react-pdf";
-
+import { useReactToPrint } from "react-to-print";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
@@ -15,11 +15,10 @@ const InsuranceDetails = ({
   insuranceInfo,
   depInsurance,
   invoiceRef,
-  handlePrint,
   formatDate,
   empInsUpload,
   mainRef,
-  InsuranceClaim
+  InsuranceClaim,
 }) => {
   const [viewingDocument, setViewingDocument] = useState(null); // Document URL or file being viewed
   const [pageNumber, setPageNumber] = useState(1); // For paginated PDF documents
@@ -27,6 +26,8 @@ const InsuranceDetails = ({
   const [dependInsurance, setDependInsurance] = useState([]);
   const [insClaim, setInsClaim] = useState([]);
   const [lastUploadUrl, setPPLastUP] = useState(""); // State to store the last uploaded file's URL
+  const [loading, setLoading] = useState(false);
+  const insurance = useRef();
 
   const linkToStorageFile = async (pathUrl) => {
     try {
@@ -34,12 +35,12 @@ const InsuranceDetails = ({
       // console.log("File URL:", result.url.href); // Use .href to extract the URL as a string
       setPPLastUP(result.url.href); // Store the URL as a string
       setViewingDocument(pathUrl); // Update the state to show the selected document
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching the file URL:", error);
+      setLoading(false);
     }
   };
-
-  
 
   // Function to handle document loading success (for pagination)
   const onDocumentLoadSuccess = ({ numPages }) => {
@@ -90,7 +91,6 @@ const InsuranceDetails = ({
     }
   }, [InsuranceClaim]);
 
-
   const parseDocuments = (docData) => {
     try {
       const parsedData = JSON.parse(docData);
@@ -108,6 +108,27 @@ const InsuranceDetails = ({
       return [];
     }
   };
+
+  const handleClose = (e) => {
+    e.preventDefault(); // Prevent default action
+    setViewingDocument(null); // Close the viewer
+  };
+
+  const closeModal = () => {
+    setViewingDocument(null);
+  };
+
+  const handlePrint = useReactToPrint({
+    content: () => insurance.current,
+    onBeforePrint: () => console.log("Preparing to print PDF..."),
+    onAfterPrint: () => console.log("Print complete"),
+    pageStyle: `
+          @page {    
+            height:  714px;
+            padding: 22px, 0px, 22px, 0px;    
+          }
+        `,
+  });
 
   const renderDocumentsUnderCategory = (documents) => {
     if (!Array.isArray(documents)) {
@@ -139,43 +160,42 @@ const InsuranceDetails = ({
             {/* Conditional rendering of PDF or image */}
             {viewingDocument === document.upload &&
               document.upload.endsWith(".pdf") && (
-                <div className="mt-4">
-                  <div className="relative bg-white max-w-3xl mx-auto p-6 rounded-lg shadow-lg">
-                    <div ref={invoiceRef} className="flex justify-center">
+                <div className="py-6 fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="relative bg-white rounded-lg shadow-lg w-[40vw] max-h-full flex flex-col">
+                    {/* PDF Viewer */}
+                    <div ref={insurance} className="flex-grow overflow-y-auto">
                       <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
                         <Viewer fileUrl={lastUploadUrl || ""} />
-                        {/* <Page pageNumber={pageNumber} className="mx-auto" /> */}
                       </Worker>
                     </div>
 
-                    {/* Close Button */}
                     <div className="absolute top-2 right-2">
                       <button
-                        onClick={() => setViewingDocument(null)} // Close the viewer
+                        onClick={closeModal} // Close the modal
                         className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
                       >
                         <FaTimes />
                       </button>
                     </div>
-                  </div>
 
-                  <div className="flex items-center justify-center gap-6 py-4">
-                    <div className="mt-2 flex">
-                      <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
-                        <a href={lastUploadUrl} download>
-                          Download
-                        </a>
-                        <FaDownload className="ml-2 mt-1" />
-                      </button>
-                    </div>
-                    <div className="mt-2 flex">
-                      <button
-                        onClick={handlePrint}
-                        className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
-                      >
-                        Print
-                        <FaPrint className="ml-2 mt-1" />
-                      </button>
+                    <div className="flex items-center justify-center gap-6 py-4">
+                      <div className="mt-2 flex">
+                        <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
+                          <a href={lastUploadUrl} download>
+                            Download
+                          </a>
+                          <FaDownload className="ml-2 mt-1" />
+                        </button>
+                      </div>
+                      <div className="mt-2 flex">
+                        <button
+                          onClick={handlePrint}
+                          className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
+                        >
+                          Print
+                          <FaPrint className="ml-2 mt-1" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -195,7 +215,7 @@ const InsuranceDetails = ({
 
                   <div className="absolute top-2 right-2">
                     <button
-                      onClick={() => setViewingDocument(null)} // Close the viewer
+                      onClick={handleClose} // Close the viewer
                       className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
                     >
                       <FaTimes />
@@ -260,7 +280,6 @@ const InsuranceDetails = ({
     return (
       <div className="grid grid-cols-3 gap-y-4 items-center font-semibold text-sm">
         {Object.entries(insuranceInfo).map(([key, value], index) => (
-
           <React.Fragment key={index}>
             <span className="text-dark_grey">{key}</span>
             <span className="text-center text-gray-700">:</span>
@@ -304,7 +323,6 @@ const InsuranceDetails = ({
   // }
 
   return (
-    
     <section ref={mainRef} className="py-3">
       <h6 className="uppercase text_size_5 my-3">Insurance Details:</h6>
       <div className="flex flex-col md:flex-row items-start justify-between gap-8">
@@ -451,7 +469,6 @@ const InsuranceDetails = ({
             {/* Status */}
           </div>
         ))}
-        
       </div>
 
       <div className="flex flex-col gap-8 mt-6">
@@ -484,12 +501,13 @@ const InsuranceDetails = ({
               <span className="text-dark_grey">
                 {depend.claimantName || "N/A"}
               </span>
-              <span className="text-dark_grey">Date Reported to Insurance Company</span>
+              <span className="text-dark_grey">
+                Date Reported to Insurance Company
+              </span>
               <span className="text-center text-gray-700">:</span>
               <span className="text-dark_grey">
                 {formatDate(depend.dateReported) || "N/A"}
               </span>
-
 
               <span className="text-dark_grey">Date of Payment Received</span>
               <span className="text-center text-gray-700">:</span>
@@ -497,14 +515,11 @@ const InsuranceDetails = ({
                 {formatDate(depend.datePaid) || "N/A"}
               </span>
 
-
               <span className="text-dark_grey">Date Paid to Employee</span>
               <span className="text-center text-gray-700">:</span>
               <span className="text-dark_grey">
                 {formatDate(depend.paymentReceived) || "N/A"}
               </span>
-
-            
             </div>
 
             {/* Uploaded Documents */}
@@ -522,9 +537,7 @@ const InsuranceDetails = ({
             {/* Status */}
           </div>
         ))}
-        
       </div>
-      
     </section>
   );
 };

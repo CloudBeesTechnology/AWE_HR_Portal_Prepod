@@ -25,10 +25,12 @@ export const HOLTable = () => {
       ? "text-dark_grey"
       : "text-[#E8A317]";
   };
+  // console.log(data);
+  const sortedData = data?.sort((a, b) => new Date(b.leaveStatusCreatedAt) - new Date(a.leaveStatusCreatedAt));
   return (
     <section className="py-5 w-full">
       <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] max-w-[100%] overflow-x-auto rounded-xl">
-        {data && data.length > 0 ? (
+        {sortedData && sortedData.length > 0 ? (
           <table className="w-full font-semibold text-sm">
             <thead className="bg-[#939393] sticky top-0 rounded-t-lg ">
               <tr className="">
@@ -40,8 +42,8 @@ export const HOLTable = () => {
               </tr>
             </thead>
             <tbody>
-              {data &&
-                data.map((item, index) => {
+              {sortedData &&
+                sortedData.map((item, index) => {
                   const displayIndex = startIndex + index + 1; // Adjust index based on pagination
 
                   return (

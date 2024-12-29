@@ -57,7 +57,8 @@ export const LMTable = () => {
       : "text-[#E8A317]";
   };
 // console.log(data.length);
-
+// console.log(data);
+const sortedData = data?.sort((a, b) => new Date(b.leaveStatusCreatedAt) - new Date(a.leaveStatusCreatedAt));
   return (
     <section className="flex flex-col w-full mt-4">
       <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl ">
@@ -74,7 +75,7 @@ export const LMTable = () => {
               <p>No data available.</p>
             )}
           </div>
-        ) : data && data.length > 0 ? (
+        ) : sortedData && sortedData.length > 0 ? (
           <table className="w-full font-semibold text-sm text-center">
             <thead className="bg-[#939393] sticky top-0 rounded-t-lg">
               <tr>
@@ -86,8 +87,8 @@ export const LMTable = () => {
               </tr>
             </thead>
             <tbody>
-              {data && data.length > 0 ? (
-                data.map((item, index) => {
+              {sortedData && sortedData.length > 0 ? (
+                sortedData.map((item, index) => {
                   const displayIndex = startIndex + index + 1; // Adjust index based on pagination
 // console.log(item);
 

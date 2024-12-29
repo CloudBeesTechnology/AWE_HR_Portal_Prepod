@@ -127,6 +127,8 @@ export const useLeaveManage = () => {
           hospitalLeave: leaveDetails.hospLeave || 0,
           marriageLeave: leaveDetails.mrageLeave || 0,
           empPervAnnualLeaveBal: leaveDetails.pervAnnualLeaveBal || 0,
+          leaveDetailsCreatedAt:leaveDetails.createdAt,
+          leaveDetailsUpdatedAt:leaveDetails.updatedAt
         };
       });
 

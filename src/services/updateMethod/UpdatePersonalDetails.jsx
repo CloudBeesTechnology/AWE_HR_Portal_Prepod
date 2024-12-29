@@ -144,8 +144,8 @@ export const CandyDetails = () => {
   
     
 
-    console.log("Total Data",totalData);
-    console.log("Total DataT",totalDataTwo);
+    // console.log("Total Data",totalData);
+    // console.log("Total DataT",totalDataTwo);
 
     try {
       const [personaldetails] = await Promise.all([
@@ -155,10 +155,10 @@ export const CandyDetails = () => {
         // }),
         client.graphql({
           query: updateEducationDetails,
-          variables: { input: totalDataTwo },
+          variables: { input: totalDataTwo, limit:20000, },
         }),
       ]);
-      console.log("Response", personaldetails);
+      // console.log("Response", personaldetails);
       // localStorage.removeItem("applicantFormData");
       // localStorage.removeItem("personalFormData");
     } catch (error) {

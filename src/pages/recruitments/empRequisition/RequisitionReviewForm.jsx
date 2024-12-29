@@ -6,28 +6,22 @@ import { generateClient } from "@aws-amplify/api";
 import { listEmpRequisitions } from "../../../graphql/queries";
 import { UpdateEmpReqData } from "../../../services/updateMethod/UpdateEmpReqData";
 import { SpinLogo } from "../../../utils/SpinLogo";
-// import { useCreateNotification } from "../../hooks/useCreateNotification"; 
-// import { sendEmail } from "../../services/EmailServices";
-
+import { sendEmail } from "../../../services/EmailServices";
 
 const client = generateClient();
 
 export const RequisitionReviewForm = ({
   isVisible,
   onClose,
-  isMdView = false,
-  isHrView = false,
+  isGmView = false,
   selectedRequest,
   onStatusChange,
-  // userType
 }) => {
   const [requestData, setRequestData] = useState([]);
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
   const userType = localStorage.getItem("userType");
-  // const { createNotification } = useCreateNotification();
-  
 
   const defaultRequest = {
     reqName: "",
@@ -40,7 +34,6 @@ export const RequisitionReviewForm = ({
     replacementFor: "",
     qualification: "",
     tentativeDate: new Date(),
-    // status: "Pending",
   };
 
   const request = selectedRequest || defaultRequest;
@@ -91,29 +84,70 @@ export const RequisitionReviewForm = ({
         requestId: selectedRequest.id,
         newStatus: statusUpdate,
       });
-
-      setShowTitle("Form Status Updated Successfully");
+  
       setNotification(true);
-
-      // console.log("Status updated successfully:", response);
-
+      setShowTitle("Form Status Updated Successfully");
+  
+      console.log("Status updated successfully:", response);
+  
       if (onStatusChange) {
         onStatusChange({ id: selectedRequest.id, status: statusUpdate });
       }
-
-      onClose();
+  
+      const { reqName, position, project, requestorEmail, humanResourceManagerEmail } = request;
+  
+      // Email to requestor
+      if (requestorEmail) {
+        await sendEmail(
+          `Your Requisition Request Has Been ${request.status}`,
+          `Dear ${reqName}, 
+  
+          Your requisition request for the position of ${position} under the project ${project} has been ${request.status} by the General Manager.
+  
+          View the details at: https://hr.adininworks.co`,
+          "hr_no-reply@adininworks.com",
+          requestorEmail
+        );
+      } else {
+        console.error("Requestor email not found.");
+      }
+  
+      // Email to HR
+      if (humanResourceManagerEmail) {
+        await sendEmail(
+          `Requisition ${request.status}`,
+          `Dear HR Team,
+  
+          The requisition request for the position of ${position} under the project ${project}, submitted by ${reqName}, has been ${request.status} by the General Manager.
+  
+          Please proceed with the necessary actions.
+  
+          View the details at: https://hr.adininworks.co
+  
+          Regards, 
+          GM`,
+          "hr_no-reply@adininworks.com",
+          humanResourceManagerEmail
+        );
+      } else {
+        console.error("HR email not found.");
+      }
+  
+      setTimeout(() => onClose(), 4000);
     } catch (err) {
-      console.error("Error updating status:", err);
+      console.error("Error updating status", err);
     }
   };
+  
+
   const getStatusClass = (status) => {
     return status === "Rejected"
       ? "text-[red]"
       : status === "Approved"
       ? "text-[#339933]"
       : status === "Pending"
-      ? "text-[#E8A317]"
-      : "text-[#E8A317]";
+      ? "text-[#ff8b3d]"
+      : "text-[#ff8b3d]";
   };
 
   return (
@@ -122,22 +156,25 @@ export const RequisitionReviewForm = ({
         isVisible ? "flex" : "hidden"
       } bg-grey bg-opacity-75 flex items-center justify-center z-50`}
     >
-      <div className="bg-white w-full max-w-[700px] rounded-lg relative p-10 overflow-y-auto">
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-6 border rounded-full p-1"
-        >
-          <VscClose size={20} />
-        </button>
-
-        <div className="flex items-center gap-8 py-2 pb-5">
-          <img src={AweLogo} alt="Logo" className="max-w-[180px] w-full" />
-          <h2 className="text-xl font-bold underline">
+      <div className="bg-white w-full max-w-[600px] rounded-lg relative ">
+        <div className="text-center p-2">
+          <img
+            src={AweLogo}
+            alt="Logo"
+            className="max-w-[250px] w-full mx-40 mb-3"
+          />
+          <h2 className="text-xl font-bold underline my-6">
             Employee Requisition Form
           </h2>
+          <button
+            onClick={onClose}
+            className="absolute top-5 right-6 border rounded-full p-1"
+          >
+            <VscClose size={20} />
+          </button>
         </div>
 
-        <div className="gap-4">
+        <form className="max-h-[500px] overflow-y-auto px-10">
           {[
             {
               label: "Requested Manager",
@@ -164,42 +201,44 @@ export const RequisitionReviewForm = ({
               <span className="w-full col-span-2">: &nbsp;{item.value}</span>
             </div>
           ))}
-        </div>
 
-        {userType === "GM" && isMdView && (
-          <>
-            {request.status !== "Approved" && request.status !== "Rejected" ? (
-              <div className="flex justify-center gap-10 mt-4">
-                <button
-                  className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
-                  onClick={() => handleStatusUpdate("Rejected")}
-                >
-                  Reject
-                </button>
-                <button
-                  className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
-                  onClick={() => handleStatusUpdate("Approved")}
-                >
-                  Approve
-                </button>
-              </div>
-            ) : (
-              <div className="mt-6 center gap-3 rounded-lg bg-gradient-to-r from-[#f5ee6ad7] via-[#faf362] to-[#f5ee6ad7] shadow-[0_4px_6px_rgba(255,250,150,0.5)]">
-            <h3 className="text-lg text-[#615d5d] p-1.5 font-bold">Requisition Status :</h3>
-            <p
-              className={`text-xl font-semibold ${getStatusClass(
-                request.status
-              )}`}
-            >
-              {request.status || "Pending"}
-            </p>
-          </div>
-            )}
-          </>
-        )}
+          {userType === "GM" && isGmView && (
+            <>
+              {request.status !== "Approved" &&
+              request.status !== "Rejected" ? (
+                <div className="flex justify-center gap-10 mb-10">
+                  <button
+                    className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
+                    onClick={() => handleStatusUpdate("Rejected")}
+                  >
+                    Reject
+                  </button>
+                  <button
+                    className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
+                    onClick={() => handleStatusUpdate("Approved")}
+                  >
+                    Approve
+                  </button>
+                </div>
+              ) : (
+                <div className="mx-10 mb-5 center gap-3 rounded-lg bg-gradient-to-r from-[#f5ee6ad7] via-[#faf362] to-[#f5ee6ad7] shadow-[0_4px_6px_rgba(255,250,150,0.5)]">
+                  <h3 className="text-lg text-[#615d5d] p-1.5 font-bold">
+                    Requisition Status :
+                  </h3>
+                  <p
+                    className={`text-xl font-semibold ${getStatusClass(
+                      request.status
+                    )}`}
+                  >
+                    {request.status || "Pending"}
+                  </p>
+                </div>
+              )}
+            </>
+          )}
 
-        {/* {userType === "GM" && isMdView && (
-              <div className="flex justify-center gap-10 mt-4">
+          {/* {userType === "GM" && isGmView && (
+              <div className="flex justify-center gap-10 mb-10">
                 <button
                   className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
                   onClick={() => handleStatusUpdate("Rejected")}
@@ -216,28 +255,29 @@ export const RequisitionReviewForm = ({
  
         )} */}
 
-        {userType === "HR" && isHrView && (
-          <div className="mt-6 center gap-3 rounded-lg  [background:linear-gradient(to_right,_#f5ee6ad7,_#faf362,_#ffe89d,_#f5ee6ad7)] shadow-[0_4px_6px_rgba(255,250,150,0.5)]">
-            <h3 className="text-lg text-[#615d5d] p-1.5 font-bold">Requisition Status :</h3>
-            <p
-              className={`text-xl font-semibold ${getStatusClass(
-                request.status
-              )}`}
-            >
-              {request.status || "Pending"}
-            </p>
-          </div>
-        )}
-
-        {notification && (
-          <SpinLogo
-            text= "Requisition Form Status Saved Successfully"
-            notification={notification}
-            path="/recrutiles/employreq"
-          />
-        )}
+          {!(userType === "GM" && isGmView) && (
+            <div className="mx-10 mb-5 center gap-3 rounded-lg [background:linear-gradient(to_right,_#f5ee6ad7,_#faf362,_#ffe89d,_#f5ee6ad7)] shadow-[0_4px_6px_rgba(255,250,150,0.5)]">
+              <h3 className="text-lg text-[#615d5d] p-1.5 font-bold">
+                Requisition Status :
+              </h3>
+              <p
+                className={`text-xl font-semibold ${getStatusClass(
+                  request.status
+                )}`}
+              >
+                {request.status || "Pending"}
+              </p>
+            </div>
+          )}
+          {notification && (
+            <SpinLogo
+              text={showTitle}
+              notification={notification}
+              path="/recrutiles/employreq"
+            />
+          )}
+        </form>
       </div>
     </div>
   );
 };
-

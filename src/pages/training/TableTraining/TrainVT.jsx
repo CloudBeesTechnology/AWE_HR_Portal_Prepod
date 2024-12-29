@@ -4,6 +4,7 @@ import Popup from "./Popup";
 import { Pagination } from "../../../pages/leaveManagement/Pagination";
 
 export const TrainVT = ({ mergering, columns, popupAll }) => {
+  
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedDetails, setSelectedDetails] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");

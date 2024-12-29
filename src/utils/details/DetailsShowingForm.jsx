@@ -31,23 +31,39 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     onAfterPrint: () => console.log("Print complete"),
     pageStyle: `
       @page {
-        margin: 98px 0px 100px 0px;
-        size: auto;
-      }
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
-      }
-      .pdf-page {
-        page-break-before: always;
-      }
-      .page {
-        page-break-after: always;
+          
+        height:  714px;
+        padding: 22px, 0px, 22px, 0px;
+        
       }
     `,
-    // Ensures each page in the content starts on a new page
   });
+  
+  /* Adjust the margin as necessary height:  872px; */
+//874 px h perfect
+  // const handlePrint = useReactToPrint({
+  //   content: () => invoiceRef.current,
+  //   onBeforePrint: () => console.log("Preparing to print PDF..."),
+  //   onAfterPrint: () => console.log("Print complete"),
+  //   pageStyle: `
+  //     @page {
+  //       margin: 98px 0px 100px 0px;
+  //       size: auto;
+  //     }
+  //     body {
+  //       margin: 0;
+  //       padding: 0;
+  //       font-family: Arial, sans-serif;
+  //     }
+  //     .pdf-page {
+  //       page-break-before: always;
+  //     }
+  //     .page {
+  //       page-break-after: always;
+  //     }
+  //   `,
+  //   // Ensures each page in the content starts on a new page
+  // });
 
   const handlePrintMain = useReactToPrint({
     content: () => mainRef.current,

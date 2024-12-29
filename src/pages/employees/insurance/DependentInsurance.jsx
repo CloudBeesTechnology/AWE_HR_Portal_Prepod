@@ -96,56 +96,56 @@ export const DependentInsurance = () => {
   const handleNationalityChange = (e) => {
     setSelectedNationality(e.target.value);
   };
-  // useEffect(() => {
-  //   setValue("empID", searchResultData?.empID);
+  useEffect(() => {
+    setValue("empID", searchResultData?.empID);
 
-  //   // Check if depInsurance is defined and not null before parsing
-  //   const depInsuranceData = searchResultData?.depInsurance;
-  //   if (depInsuranceData) {
-  //     try {
-  //       const parsedData = JSON.parse(depInsuranceData);
-  //       if (isInitialMount.current) {
-  //         if (parsedData && parsedData.length > 0) {
-  //           setDepInsurance(parsedData);
-  //           setValue("depInsurance", parsedData);
+    // Check if depInsurance is defined and not null before parsing
+    const depInsuranceData = searchResultData?.depInsurance;
+    if (depInsuranceData) {
+      try {
+        const parsedData = JSON.parse(depInsuranceData);
+        if (isInitialMount.current) {
+          if (parsedData && parsedData.length > 0) {
+            setDepInsurance(parsedData);
+            setValue("depInsurance", parsedData);
 
-  //           parsedData.forEach((item, idx) => {
-  //             if (item?.depenInfUpload) {
-  //               const url = item.depenInfUpload;
-  //               const parsedArray = JSON.parse(url);
-  //               const parsedFiles = parsedArray.map((item) =>
-  //                 typeof item === "string" ? JSON.parse(item) : item
-  //               );
-  //               setUploadedDocs((prev) => {
-  //                 const updatedDepInsurance = [...prev.depInsurance];
-  //                 updatedDepInsurance[idx] = parsedFiles;
+            parsedData.forEach((item, idx) => {
+              if (item?.depenInfUpload) {
+                const url = item.depenInfUpload;
+                const parsedArray = JSON.parse(url);
+                const parsedFiles = parsedArray.map((item) =>
+                  typeof item === "string" ? JSON.parse(item) : item
+                );
+                setUploadedDocs((prev) => {
+                  const updatedDepInsurance = [...prev.depInsurance];
+                  updatedDepInsurance[idx] = parsedFiles;
 
-  //                 return {
-  //                   ...prev,
-  //                   depInsurance: updatedDepInsurance,
-  //                 };
-  //               });
+                  return {
+                    ...prev,
+                    depInsurance: updatedDepInsurance,
+                  };
+                });
 
-  //               setUploadedFileDep((prev) => ({
-  //                 ...prev,
-  //                 [idx]:
-  //                   parsedFiles.length > 0
-  //                     ? getFileName(parsedFiles[parsedFiles.length - 1].upload)
-  //                     : "", // Assign file name dynamically based on index
-  //               }));
-  //             }
-  //           });
-  //         }
-  //         isInitialMount.current = false;
-  //       } else if (parsedData && parsedData.length > 0) {
-  //         setDepInsurance(parsedData);
-  //         setValue("depInsurance", parsedData);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error parsing depInsurance data:", error);
-  //     }
-  //   }
-  // }, [searchResultData]);
+                setUploadedFileDep((prev) => ({
+                  ...prev,
+                  [idx]:
+                    parsedFiles.length > 0
+                      ? getFileName(parsedFiles[parsedFiles.length - 1].upload)
+                      : "", // Assign file name dynamically based on index
+                }));
+              }
+            });
+          }
+          isInitialMount.current = false;
+        } else if (parsedData && parsedData.length > 0) {
+          setDepInsurance(parsedData);
+          setValue("depInsurance", parsedData);
+        }
+      } catch (error) {
+        console.error("Error parsing depInsurance data:", error);
+      }
+    }
+  }, [searchResultData]);
 
 
   const getFileName = (filePath) => {

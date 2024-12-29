@@ -256,8 +256,7 @@ export const AddEmployeeForm = () => {
   };
 
   const onSubmit = async (data) => {
-    console.log("Form data:", data);
-
+    // console.log("Form data:", data);
     try {
       const EmpReqDataRecord = AddEmpReq
         ? AddEmpReq.find((match) => match.empID === data.empID)
@@ -269,10 +268,10 @@ export const AddEmployeeForm = () => {
           medicalReport: uploadMedicalReports.medicalReport,
           id: EmpReqDataRecord.id,
         };
-        console.log(TMRDataUp);
+        // console.log(TMRDataUp);
 
         await TrReqUp({ TMRDataUp });
-        setShowTitle("Training Requestor Updated successfully");
+        setShowTitle("Training details Updated successfully");
         setNotification(true);
       } else {
         const AddEmpValue = {
@@ -280,7 +279,7 @@ export const AddEmployeeForm = () => {
           medicalReport: uploadMedicalReports.medicalReport,
         };
         await AddEmpData({ AddEmpValue });
-        setShowTitle("Training Requestor Saved successfully");
+        setShowTitle("Training details Saved successfully");
         setNotification(true);
       }
     } catch (err) {
@@ -600,7 +599,7 @@ export const AddEmployeeForm = () => {
         <SpinLogo
           text={showTitle}
           notification={notification}
-          path="/training"
+          path="/trainingReq"
         />
       )}
     </section>

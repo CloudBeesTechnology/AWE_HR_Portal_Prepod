@@ -8,6 +8,7 @@ export const EmpInsDataFun = () => {
     if (!empInsValue ) {
       throw new Error("Missing required parameters");
     }
+    
     const totalData = {
         empID:empInsValue.empID,
         // empBadgeNo:empInsValue.empBadgeNo,

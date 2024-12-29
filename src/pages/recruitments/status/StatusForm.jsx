@@ -20,11 +20,23 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
         >
           <VscClose size={20} />
         </button>
-        <h2 className="text-xl font-bold mb-4 p-2 rounded-md bg-[#f7f183ea]">
-          TempID: {candidate?.tempID}{" "}
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Name:{" "}
-          {candidate?.name}
-        </h2>
+        <div className="p-4 rounded-md bg-[#f7f183ea]">
+
+          <div className="grid grid-cols-1 sm:grid-cols-4 text-xs font-semibold">
+            <div>
+              <span className="font-semibold">TempID:</span> {candidate?.tempID}
+            </div>
+            <div>
+              <span className="font-semibold">Name:</span> {candidate?.name}
+            </div>
+            <div>
+              <span className="font-semibold">Contract Type:</span> {candidate?.contractType}
+            </div>
+            <div>
+              <span className="font-semibold">Employee Type:</span> {candidate?.empType}
+            </div>
+          </div>
+        </div>
 
         <article className="flex-1 flex gap-5 text-black mt-5">
           <h1
@@ -78,16 +90,20 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
           >
             PAAF
           </h5>
-          <h6
-            className={`  px-3 py-1 rounded-lg whitespace-nowrap  ${
-              show === 5
-                ? "border-2 border-[#FEF116] bg-[#FFFEF4]"
-                : "bg-[#DDDDDD]"
-            }`}
-            onClick={() => setShow(5)}
-          >
-            Mobilization
-          </h6>
+          
+          {candidate?.contractType === "Local" && (
+               <h6
+               className={`  px-3 py-1 rounded-lg whitespace-nowrap  ${
+                 show === 5
+                   ? "border-2 border-[#FEF116] bg-[#FFFEF4]"
+                   : "bg-[#DDDDDD]"
+               }`}
+               onClick={() => setShow(5)}
+             >
+               Mobilization
+             </h6>
+          )}
+       
         </article>
         {show === 0 && <InterviewForm candidate={candidate} />}
         {show === 1 && <CandidateForm candidate={candidate} />}

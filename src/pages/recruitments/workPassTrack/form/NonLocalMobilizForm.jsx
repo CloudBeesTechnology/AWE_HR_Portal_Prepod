@@ -6,8 +6,9 @@ import { FileUploadField } from "../../../employees/medicalDep/FileUploadField";
 import { NonLocalMOBFormSchema } from "../../../../services/Validation";
 import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
 import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPTracking";
+import { statusOptions } from "../../../../utils/StatusDropdown";
 
-export const NonLocalMobilizForm = ({candidate}) => {
+export const NonLocalMobilizForm = ({ candidate }) => {
   const { interviewSchedules } = useFetchCandy();
   const { wpTrackingDetails } = useUpdateWPTracking();
 
@@ -18,7 +19,7 @@ export const NonLocalMobilizForm = ({candidate}) => {
       agentname: "",
       remarkNLMob: "",
       mobFile: "",
-      status: ""
+      status: "",
     },
   });
   const [uploadedFileNames, setUploadedFileNames] = useState({
@@ -40,8 +41,7 @@ export const NonLocalMobilizForm = ({candidate}) => {
 
   const MobilizUpload = watch("mobFile", "");
 
- useEffect(() => {
-
+  useEffect(() => {
     if (interviewSchedules.length > 0) {
       // Find the interviewData for the candidate
       const interviewData = interviewSchedules.find(
@@ -56,7 +56,7 @@ export const NonLocalMobilizForm = ({candidate}) => {
             agentname: interviewData.agentname,
             remarkNLMob: interviewData.remarkNLMob,
             mobFile: interviewData.mobFile,
-            status: interviewData.status
+            status: interviewData.status,
           },
         });
 
@@ -111,22 +111,22 @@ export const NonLocalMobilizForm = ({candidate}) => {
 
   const handleSubmitTwo = async (data) => {
     data.preventDefault();
-  
+
     const selectedInterviewData = interviewSchedules.find(
       (data) => data.tempID === candidate?.tempID
     );
     const interviewScheduleId = selectedInterviewData?.id;
-  
+
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
       return;
     }
-  
+
     if (!interviewScheduleId) {
       console.error("Error: No interview schedule found for this candidate.");
       return;
     }
-  
+
     try {
       const response = await wpTrackingDetails({
         WPTrackingValue: {
@@ -134,17 +134,17 @@ export const NonLocalMobilizForm = ({candidate}) => {
           mobSignDate: formData.interview.mobSignDate,
           agentname: formData.interview.agentname,
           remarkNLMob: formData.interview.remarkNLMob,
-          mobFile: uploadedMobiliz.mobFile ? uploadedMobiliz.mobFile : formData.interview.mobFile, 
+          mobFile: uploadedMobiliz.mobFile
+            ? uploadedMobiliz.mobFile
+            : formData.interview.mobFile,
         },
-
       });
-  
+
       // console.log("Response from WPTrackingDetails:", response);
-  
+
       if (response.errors && response.errors.length > 0) {
         console.error("Response errors:", response.errors);
       }
-  
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }
@@ -204,14 +204,20 @@ export const NonLocalMobilizForm = ({candidate}) => {
         </div>
         <div>
           <label htmlFor="status">Status</label>
-          <input
+          <select
             className="w-full border p-2 rounded mt-1"
-            type="text"
             id="status"
             {...register("status")}
             value={formData.interview.status}
             onChange={(e) => handleInputChange("status", e.target.value)}
-          />
+          >
+            {/* <option value="">Select Status</option> */}
+            {statusOptions.map((status, index) => (
+              <option key={index} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

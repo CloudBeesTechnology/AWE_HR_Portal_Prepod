@@ -187,13 +187,34 @@ export const PersonalAcci = () => {
     setPopupVisible(true); // Show the popup
   };
 
- const handlePrint = useReactToPrint({
-     content: () => personAcciPrint.current,
-     onBeforePrint: () => console.log("Preparing print..."),
-     onAfterPrint: () => console.log("Print complete"),
-     pageStyle: "print", // This ensures the print view uses a different CSS style
-   });
+//  const handlePrint = useReactToPrint({
+//      content: () => personAcciPrint.current,
+//      onBeforePrint: () => console.log("Preparing print..."),
+//      onAfterPrint: () => console.log("Print complete"),
+//      pageStyle: "print", // This ensures the print view uses a different CSS style
+//    });
+
+const handlePrint = useReactToPrint({
+  content: () => personAcciPrint.current,
+  onBeforePrint: () => console.log("Preparing to print PDF..."),
+  onAfterPrint: () => console.log("Print complete"),
+  pageStyle: `
+      @page {
+          /* Adjust the margin as necessary */
+        height:  714px;
+        padding: 22px, 0px, 22px, 0px;     
+      }
+    `,
+});
  
+const openModal = (uploadUrl) => {
+  setPPLastUP(uploadUrl);
+  setViewingDocument(uploadUrl);
+};
+
+const closeModal = () => {
+  setViewingDocument(null);
+};
 
   const onDocumentLoadSuccess = ({ numPages }) => {
     setNumPages(numPages);
@@ -223,52 +244,47 @@ export const PersonalAcci = () => {
             {/* Conditional rendering of PDF or image */}
             {viewingDocument === document.upload &&
               document.upload.endsWith(".pdf") && (
-                <div className="mt-4  ">
-                  <div className="relative bg-white max-w-3xl mx-auto p-6 rounded-lg shadow-lg">
-                    <div ref={personAcciPrint} className="flex justify-center  h-[400px] overflow-y-auto">
-                      <Worker
-                       workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
-                      >
-                        <Viewer
-                          fileUrl={lastUploadUrl || ""}
-                         
-                        />
+                <div className="py-6 fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="relative bg-white rounded-lg shadow-lg w-[40vw] max-h-full flex flex-col">
+                    {/* PDF Viewer */}
+                    <div ref={personAcciPrint} className="flex-grow overflow-y-auto">
+                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                        <Viewer fileUrl={lastUploadUrl || ""} />
                       </Worker>
                     </div>
 
-
-                    {/* Close Button */}
                     <div className="absolute top-2 right-2">
                       <button
-                        onClick={() => setViewingDocument(null)} // Close the viewer
+                        onClick={closeModal} // Close the modal
                         className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
                       >
                         <FaTimes />
                       </button>
                     </div>
-                  </div>
 
-                  <div className="flex items-center justify-center gap-6 py-4">
-                    <div className="mt-2 flex">
-                      <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
-                        <a href={lastUploadUrl} download>
-                          Download
-                        </a>
-                        <FaDownload className="ml-2 mt-1" />
-                      </button>
-                    </div>
-                    <div className="mt-2 flex">
-                      <button
-                        onClick={handlePrint}
-                        className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
-                      >
-                        Print
-                        <FaPrint className="ml-2 mt-1" />
-                      </button>
+                    <div className="flex items-center justify-center gap-6 py-4">
+                      <div className="mt-2 flex">
+                        <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
+                          <a href={lastUploadUrl} download>
+                            Download
+                          </a>
+                          <FaDownload className="ml-2 mt-1" />
+                        </button>
+                      </div>
+                      <div className="mt-2 flex">
+                        <button
+                          onClick={handlePrint}
+                          className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
+                        >
+                          Print
+                          <FaPrint className="ml-2 mt-1" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
+
 
             {/* Image Viewer */}
             {viewingDocument === document.upload &&

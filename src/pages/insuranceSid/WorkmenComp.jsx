@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useForm} from "react-hook-form";
+import React, { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormField } from "../../utils/FormField";
 import { uploadDocs } from "../../services/uploadDocsS3/UploadDocs";
 import { FileUploadField } from "../employees/medicalDep/FileUploadField";
 import { SpinLogo } from "../../utils/SpinLogo";
-import { WorkmenCompSchema } from '../../services/EmployeeValidation';
+import { WorkmenCompSchema } from "../../services/EmployeeValidation";
 import { generateClient } from "@aws-amplify/api";
 import { createWorkMen } from "../../graphql/mutations";
 import { listWorkMen } from "../../graphql/queries";
@@ -13,9 +13,10 @@ import { FaTimes, FaDownload, FaPrint } from "react-icons/fa";
 import { Document, Page } from "react-pdf";
 import { pdfjs } from "react-pdf";
 import { getUrl } from "@aws-amplify/storage";
+import * as pdfjsLib from 'pdfjs-dist';
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
-import { useReactToPrint } from 'react-to-print';
+import { useReactToPrint } from "react-to-print";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
   import.meta.url
@@ -23,27 +24,28 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 
 export const WorkmenComp = () => {
   const client = generateClient();
-    const [notification, setNotification] = useState(false);
-    const [insuranceData, setInsuranceData] = useState([]); 
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null); 
-    const [uploadedFileNames, setUploadedFileNames] = useState({
-      workmenComUp: null,
-    });
-    const [uploadWCU, setUploadWCU] = useState({
-      workmenComUp: [], 
-    });
+  const [notification, setNotification] = useState(false);
+  const [insuranceData, setInsuranceData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [uploadedFileNames, setUploadedFileNames] = useState({
+    workmenComUp: null,
+  });
+  const [uploadWCU, setUploadWCU] = useState({
+    workmenComUp: [],
+  });
 
-
-      // Popup State
+  // Popup State
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupImage, setPopupImage] = useState("");
   const [viewingDocument, setViewingDocument] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [numPages, setNumPages] = useState(null);
   const [lastUploadUrl, setPPLastUP] = useState("");
-    const workmenPrint =useRef();
-  
+  const [pdfHeight, setPdfHeight] = useState("");
+  const [pdfWidth, setPdfWidth] = useState("");
+  const workmenPrint = useRef();
+
   const {
     register,
     handleSubmit,
@@ -52,108 +54,103 @@ export const WorkmenComp = () => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(WorkmenCompSchema),
- 
-});
+  });
 
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  const day = date.getDate().toString().padStart(2, '0');  // Adds leading zero if day is single digit
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');  // getMonth() returns 0-11, so we add 1
-  const year = date.getFullYear();
-  
-  return `${day}/${month}/${year}`;
-};
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, "0"); // Adds leading zero if day is single digit
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // getMonth() returns 0-11, so we add 1
+    const year = date.getFullYear();
 
-const linkToStorageFile = async (pathUrl) => {
-  try {
-    const result = await getUrl({ path: pathUrl });
-    //   console.log("File URL:", result.url.href); // Use .href to extract the URL as a string
-    setPPLastUP(result.url.href); // Store the URL as a string
-    setViewingDocument(pathUrl); // Update the state to show the selected document
-  } catch (error) {
-    console.error("Error fetching the file URL:", error);
-  }
-};
+    return `${day}/${month}/${year}`;
+  };
 
-const parseDocuments = (docData) => {
-  try {
-    const parsedData = JSON.parse(docData);
-    if (Array.isArray(parsedData)) {
-      return parsedData.map((doc) => {
-        if (doc.upload) {
-          doc.fileName = doc.upload.split("/").pop(); // Extract file name from path
-        }
-        return doc;
-      });
+  const linkToStorageFile = async (pathUrl) => {
+    try {
+      const result = await getUrl({ path: pathUrl });
+      //   console.log("File URL:", result.url.href); // Use .href to extract the URL as a string
+      setPPLastUP(result.url.href); // Store the URL as a string
+      setViewingDocument(pathUrl); // Update the state to show the selected document
+    } catch (error) {
+      console.error("Error fetching the file URL:", error);
     }
-    return [];
-  } catch (error) {
-    console.error("Error parsing document data:", error);
-    return [];
-  }
-};
+  };
 
-const handleFileChange = async (e, label) => {
-  const selectedFile = e.target.files[0];
-  if (!selectedFile) return;
-  const allowedTypes = [
-    "application/pdf",
-  ];
+  const parseDocuments = (docData) => {
+    try {
+      const parsedData = JSON.parse(docData);
+      if (Array.isArray(parsedData)) {
+        return parsedData.map((doc) => {
+          if (doc.upload) {
+            doc.fileName = doc.upload.split("/").pop(); // Extract file name from path
+          }
+          return doc;
+        });
+      }
+      return [];
+    } catch (error) {
+      console.error("Error parsing document data:", error);
+      return [];
+    }
+  };
 
-  if (!allowedTypes.includes(selectedFile.type)) {
-    alert("Upload must be a PDF file ");
-    return;
-  }
+  const handleFileChange = async (e, label) => {
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+    const allowedTypes = ["application/pdf"];
 
-  const currentFiles = watch(label) || [];
-  setValue(label, [...currentFiles, selectedFile]);
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file ");
+      return;
+    }
 
-  try {
-    await uploadDocs(selectedFile, label, setUploadWCU);
-    setUploadedFileNames((prev) => ({
-      ...prev,
-      [label]: selectedFile.name, // Store just the file name
-    }));
-  } catch (err) {
-    console.log(err);
-  }
-};
+    const currentFiles = watch(label) || [];
+    setValue(label, [...currentFiles, selectedFile]);
 
-const onSubmit = async (data) => {
-  try {
+    try {
+      await uploadDocs(selectedFile, label, setUploadWCU);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [label]: selectedFile.name, // Store just the file name
+      }));
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-    const WCCreValue = {
-      ...data,
-      workmenComUp: JSON.stringify(uploadWCU.workmenComUp) 
-    } 
-    // console.log(WCCreValue);
+  const onSubmit = async (data) => {
+    try {
+      const WCCreValue = {
+        ...data,
+        workmenComUp: JSON.stringify(uploadWCU.workmenComUp),
+      };
+      // console.log(WCCreValue);
 
-    const response = await client.graphql({
-      query: createWorkMen,
-      variables: { input: WCCreValue },
-    });
-    // console.log("Successfully submitted data:", response);
-    setNotification(true);
-  } catch (error) {
-    console.error("Error submitting data:", error);
-  }
-};
+      const response = await client.graphql({
+        query: createWorkMen,
+        variables: { input: WCCreValue },
+      });
+      // console.log("Successfully submitted data:", response);
+      setNotification(true);
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    }
+  };
 
-
- useEffect(() => {
+  useEffect(() => {
     const fetchInsuranceData = async () => {
       try {
         const response = await client.graphql({
           query: listWorkMen,
         });
         const items = response.data.listWorkMen.items;
-  
+
         // Filter out expired policies
         const filteredData = items.filter((data) => {
           const expiryDate = new Date(data.workmenCompExp);
           return expiryDate >= new Date(); // Include only non-expired policies
         });
-  
+
         setInsuranceData(filteredData);
         setLoading(false); // Set loading to false when data is fetched
       } catch (error) {
@@ -162,238 +159,248 @@ const onSubmit = async (data) => {
         setLoading(false);
       }
     };
-  
+
     fetchInsuranceData();
   }, []);
 
+  const openPopup = (fileUrl) => {
+    setPopupImage(fileUrl); // Set the URL for the image or file
+    setPopupVisible(true); // Show the popup
+  };
 
-
-const openPopup = (fileUrl) => {
-  setPopupImage(fileUrl); // Set the URL for the image or file
-  setPopupVisible(true); // Show the popup
-};
-
- const handlePrint = useReactToPrint({
+  const handlePrint = useReactToPrint({
     content: () => workmenPrint.current,
-    onBeforePrint: () => console.log("Preparing print..."),
+    onBeforePrint: () => console.log("Preparing to print PDF..."),
     onAfterPrint: () => console.log("Print complete"),
-    pageStyle: "print", // This ensures the print view uses a different CSS style
+    pageStyle: `
+        @page {
+            /* Adjust the margin as necessary */
+          height:  714px;
+          padding: 22px, 0px, 22px, 0px;     
+        }
+      `,
   });
 
+  // const handlePrint = async () => {
+  //   const pdfUrl = lastUploadUrl; // Path to your 10-page PDF
+  
+  //   const printWindow = window.open('', '', 'height=600,width=800');
+  //   printWindow.document.write('<html><head><title>Print PDF</title></head><body>');
+  
+  //   // Create a container to render each PDF page
+  //   const container = document.createElement('div');
+  //   container.style.textAlign = 'center';
+  //   printWindow.document.body.appendChild(container);
+  
+  //   try {
+  //     // Load the PDF using pdf.js
+  //     const pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
+  
+  //     // Render each page of the PDF
+  //     for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+  //       const page = await pdfDoc.getPage(pageNum);
+  //       const viewport = page.getViewport({ scale: 1.5 }); // Adjust scale if needed
+  
+  //       // Create a canvas to render each page
+  //       const canvas = document.createElement('canvas');
+  //       canvas.width = viewport.width;
+  //       canvas.height = viewport.height;
+  //       container.appendChild(canvas);
+  
+  //       const context = canvas.getContext('2d');
+  //       const renderContext = {
+  //         canvasContext: context,
+  //         viewport: viewport,
+  //       };
+  
+  //       // Render the page
+  //       await page.render(renderContext).promise;
+  //     }
+  
+  //     printWindow.document.write('</body></html>');
+  //     printWindow.document.close(); // Close the document
+  
+  //     // Trigger the print dialog
+  //     printWindow.print();
+  //   } catch (error) {
+  //     console.error('Error printing PDF:', error);
+  //   }
+  // };
 
-const onDocumentLoadSuccess = ({ numPages }) => {
-  setNumPages(numPages);
-};
+  const openModal = (uploadUrl) => {
+    setPPLastUP(uploadUrl);
+    setViewingDocument(uploadUrl);
+  };
 
+  const closeModal = () => {
+    setViewingDocument(null);
+  };
 
-const renderDocumentsUnderCategory = (documents) => {
-  return (
-    <>
-      {documents.map((document, index) => (
-        <div
-          key={index}
-          className="bg-white rounded-lg shadow-md p-4 mb-4 border border-gray-200"
-        >
-          <div className="flex justify-between items-center">
-            <span className="uppercase font-semibold text-sm">
-              Uploaded on: {formatDate(document.date)}
-            </span>
-            <button
-              onClick={() => linkToStorageFile(document.upload)} // Fetch the URL for the document
-              className="text-dark_grey font-semibold text-sm"
-            >
-              View Document
-            </button>
+  const onDocumentLoadSuccess = ({ numPages }) => {
+    setNumPages(numPages);
+  };
+
+  console.log(pdfHeight);
+
+  const renderDocumentsUnderCategory = (documents) => {
+    return (
+      <>
+        {documents.map((document, index) => (
+          <div
+            key={index}
+            className="bg-white rounded-lg shadow-md p-4 mb-4 border border-gray-200"
+          >
+            <div className="flex justify-between items-center">
+              <span className="uppercase font-semibold text-sm">
+                Uploaded on: {formatDate(document.date)}
+              </span>
+              <button
+                onClick={() => linkToStorageFile(document.upload)} // Fetch the URL for the document
+                className="text-dark_grey font-semibold text-sm"
+              >
+                View Document
+              </button>
+            </div>
+            {viewingDocument === document.upload &&
+              document.upload.endsWith(".pdf") && (
+                <div className="py-6 fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="relative bg-white rounded-lg shadow-lg w-[40vw] max-h-full flex flex-col">
+                    {/* PDF Viewer */}
+                    <div ref={workmenPrint} className="flex-grow overflow-y-auto">
+                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                        <Viewer fileUrl={lastUploadUrl || ""} />
+                      </Worker>
+                    </div>
+
+                    <div className="absolute top-2 right-2">
+                      <button
+                        onClick={closeModal} // Close the modal
+                        className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
+                      >
+                        <FaTimes />
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-center gap-6 py-4">
+                      <div className="mt-2 flex">
+                        <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
+                          <a href={lastUploadUrl} download>
+                            Download
+                          </a>
+                          <FaDownload className="ml-2 mt-1" />
+                        </button>
+                      </div>
+                      <div className="mt-2 flex">
+                        <button
+                          onClick={handlePrint}
+                          className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
+                        >
+                          Print
+                          <FaPrint className="ml-2 mt-1" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
           </div>
+        ))}
+      </>
+    );
+  };
+  const renderDocumentCategory = (uploadArray, categoryName) => {
+    const documents =
+      uploadArray.length > 0 ? parseDocuments(uploadArray[0]) : [];
 
-          {/* Conditional rendering of PDF or image */}
-          {viewingDocument === document.upload &&
-            document.upload.endsWith(".pdf") && (
-              <div className="mt-4  ">
-                <div className="relative bg-white max-w-3xl mx-auto p-6 rounded-lg shadow-lg">
-                  <div ref={workmenPrint} className="flex justify-center  h-[400px] overflow-y-auto">
-                    <Worker
-                     workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
-                    >
-                      <Viewer
-                        fileUrl={lastUploadUrl || ""}
-                       
-                      />
-                    </Worker>
-                  </div>
+    // Check if documents is an array and has items
+    const isValidDocumentsArray =
+      Array.isArray(documents) && documents.length > 0;
 
-                  {/* Close Button */}
-                  <div className="absolute top-2 right-2">
-                    <button
-                      onClick={() => setViewingDocument(null)} // Close the viewer
-                      className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
-                    >
-                      <FaTimes />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-center gap-6 py-4">
-                  <div className="mt-2 flex">
-                    <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
-                      <a href={lastUploadUrl} download>
-                        Download
-                      </a>
-                      <FaDownload className="ml-2 mt-1" />
-                    </button>
-                  </div>
-                  <div className="mt-2 flex">
-                    <button
-                      onClick={handlePrint}
-                      className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
-                    >
-                      Print
-                      <FaPrint className="ml-2 mt-1" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-          {/* Image Viewer */}
-          {viewingDocument === document.upload &&
-            !document.upload.endsWith(".pdf") && (
-              <div className="relative mt-4">
-                <div >
-                  <img
-                    src={lastUploadUrl} // Use the URL for the image
-                    alt="Document Preview"
-                    className="w-full h-auto"
-                  />
-                </div>
-
-                <div className="absolute top-2 right-2">
-                  <button
-                    onClick={() => setViewingDocument(null)} // Close the viewer
-                    className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
-                  >
-                    <FaTimes />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-center gap-6 py-4">
-                  <div className="mt-2 flex">
-                    <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
-                      <a href={lastUploadUrl} download>
-                        Download
-                      </a>
-                      <FaDownload className="ml-2 mt-1" />
-                    </button>
-                  </div>
-                  <div className="mt-2 flex">
-                    <button
-                      onClick={handlePrint}
-                      className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
-                    >
-                      Print
-                      <FaPrint className="ml-2 mt-1" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-        </div>
-      ))}
-    </>
-  );
-};
-const renderDocumentCategory = (uploadArray, categoryName) => {
-  const documents =
-    uploadArray.length > 0 ? parseDocuments(uploadArray[0]) : [];
-
-  // Check if documents is an array and has items
-  const isValidDocumentsArray =
-    Array.isArray(documents) && documents.length > 0;
-
-  return (
-    <div className="py-4">
-      <h6 className="uppercase text_size_5 my-3">{categoryName}</h6>
-      {isValidDocumentsArray ? (
-        renderDocumentsUnderCategory(documents, categoryName)
-      ) : (
-        <p className="text-dark_grey font-semibold text-sm">
-          No documents and images available
-        </p>
-      )}
-    </div>
-  );
-};
-  return (
-<section>
-<form onSubmit={handleSubmit(onSubmit)} className="mx-auto py-5 px-10 my-10 bg-[#F5F6F1CC]">
-
-{/* Workmen Compensation Insurance Fields */}
-<h3 className="mb-5 text-lg font-bold">Workmen Compensation Insurance</h3>
-<div className="relative mb-5">
-
-
-    <div className="grid grid-cols-4 gap-4 items-center">
-      {/* Employee Type - Dropdown */}
-      <FormField
-        name="empStatusType"
-        label="Employee Type"
-        register={register}
-        type="select"
-        options={[
-          { value: 'OffShore', label: 'OffShore' },
-          { value: 'OnShore', label: 'OnShore' },
-          { value: 'General', label: 'General' },
-        ]}
-        errors={errors}
-      />
-
-      {/* Workmen Comp Policy Number */}
-      <FormField
-        name="workmenCompNo"
-        label="Policy Number"
-        type="text"
-        placeholder="Enter Workmen Comp Policy No"
-        register={register}
-        errors={errors}
-      />
-
-      {/* Workmen Comp Expiry Date */}
-      <FormField
-        name="workmenCompExp"
-        label="Expiry Date"
-        type="date"
-        register={register}
-        errors={errors}
-        // className="mt-2 p-2.5 bg-lite_skyBlue border border-[#dedddd] outline-none rounded"
-      />
-
-      {/* File Upload Field */}
-      <div className="mb-2 relative">
-    <FileUploadField
-      label="Upload File"
-      onChangeFunc={(e) => handleFileChange(e, "workmenComUp")}
-      register={register}
-      name="workmenComUp"
-      error={errors}
-    />
-
-<div className='absolute'>
-    {uploadedFileNames.workmenComUp && (
-      <span className="text-sm text-grey ">
-        {uploadedFileNames.workmenComUp}
-      </span>
-    )}
-    </div>
-    </div>
-    </div>
-
-</div>
-{/* Submit Button */}
-<div className="center my-10">
-        <button type="submit" className="primary_btn">
-          Save
-        </button>
+    return (
+      <div className="py-4">
+        <h6 className="uppercase text_size_5 my-3">{categoryName}</h6>
+        {isValidDocumentsArray ? (
+          renderDocumentsUnderCategory(documents, categoryName)
+        ) : (
+          <p className="text-dark_grey font-semibold text-sm">
+            No documents and images available
+          </p>
+        )}
       </div>
+    );
+  };
+  return (
+    <section>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="mx-auto py-5 px-10 my-10 bg-[#F5F6F1CC]"
+      >
+        {/* Workmen Compensation Insurance Fields */}
+        <h3 className="mb-5 text-lg font-bold">
+          Workmen Compensation Insurance
+        </h3>
+        <div className="relative mb-5">
+          <div className="grid grid-cols-4 gap-4 items-center">
+            {/* Employee Type - Dropdown */}
+            <FormField
+              name="empStatusType"
+              label="Employee Type"
+              register={register}
+              type="select"
+              options={[
+                { value: "OffShore", label: "OffShore" },
+                { value: "OnShore", label: "OnShore" },
+                { value: "General", label: "General" },
+              ]}
+              errors={errors}
+            />
+
+            {/* Workmen Comp Policy Number */}
+            <FormField
+              name="workmenCompNo"
+              label="Policy Number"
+              type="text"
+              placeholder="Enter Workmen Comp Policy No"
+              register={register}
+              errors={errors}
+            />
+
+            {/* Workmen Comp Expiry Date */}
+            <FormField
+              name="workmenCompExp"
+              label="Expiry Date"
+              type="date"
+              register={register}
+              errors={errors}
+              // className="mt-2 p-2.5 bg-lite_skyBlue border border-[#dedddd] outline-none rounded"
+            />
+
+            {/* File Upload Field */}
+            <div className="mb-2 relative">
+              <FileUploadField
+                label="Upload File"
+                onChangeFunc={(e) => handleFileChange(e, "workmenComUp")}
+                register={register}
+                name="workmenComUp"
+                error={errors}
+              />
+
+              <div className="absolute">
+                {uploadedFileNames.workmenComUp && (
+                  <span className="text-sm text-grey ">
+                    {uploadedFileNames.workmenComUp}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Submit Button */}
+        <div className="center my-10">
+          <button type="submit" className="primary_btn">
+            Save
+          </button>
+        </div>
       </form>
 
       {notification && (
@@ -403,43 +410,45 @@ const renderDocumentCategory = (uploadArray, categoryName) => {
           path="/insuranceHr/workmenComp"
         />
       )}
-{/* View Insurance Info Section */}
-<div className="mt-10">
-<p className="text-xl font-bold mb-10 p-3 rounded-lg border-2 border-[#FEF116] bg-[#FFFEF4] w-[250px]">
+      {/* View Insurance Info Section */}
+      <div className="mt-10">
+        <p className="text-xl font-bold mb-10 p-3 rounded-lg border-2 border-[#FEF116] bg-[#FFFEF4] w-[250px]">
           View Insurance Info
         </p>
         {insuranceData.length > 0 ? (
-      <div className=' h-[400px] overflow-y-auto scrollBar'>
-
-          <table className="w-full text-center">
-            <thead className="bg-[#939393] text-white">
-              <tr>
-              <th className="pl-4 py-4 rounded-tl-lg">Employee Type</th>
-              <th className="pl-4 py-4">Policy Number</th>
-                <th className="pl-4 py-4">Expiry Date</th>
-                <th className="pl-4 py-4 rounded-tr-lg">Uploaded File</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white cursor-pointer">
-              {insuranceData.map((data, index) => (
-                <tr
-                  key={index}
-                  className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
-                >
-                  <td className="pl-4 py-4">{data.empStatusType}</td>
-                  <td className="pl-4 py-4">{data.workmenCompNo}</td>
-                  <td className="py-4 px-4">{formatDate(data?.workmenCompExp || "N/A")}</td>
-                  <td className="pl-4 py-4">
-                    {renderDocumentCategory(data.workmenComUp,"PDF File")}
-                  </td>
-                
+          <div className=" h-[400px] overflow-y-auto scrollBar">
+            <table className="w-full text-center">
+              <thead className="bg-[#939393] text-white">
+                <tr>
+                  <th className="pl-4 py-4 rounded-tl-lg">Employee Type</th>
+                  <th className="pl-4 py-4">Policy Number</th>
+                  <th className="pl-4 py-4">Expiry Date</th>
+                  <th className="pl-4 py-4 rounded-tr-lg">Uploaded File</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-white cursor-pointer">
+                {insuranceData.map((data, index) => (
+                  <tr
+                    key={index}
+                    className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
+                  >
+                    <td className="pl-4 py-4">{data.empStatusType}</td>
+                    <td className="pl-4 py-4">{data.workmenCompNo}</td>
+                    <td className="py-4 px-4">
+                      {formatDate(data?.workmenCompExp || "N/A")}
+                    </td>
+                    <td className="pl-4 py-4">
+                      {renderDocumentCategory(data.workmenComUp, "PDF File")}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         ) : (
-          <p className="text-center mt-10">No insurance information available.</p>
+          <p className="text-center mt-10">
+            No insurance information available.
+          </p>
         )}
       </div>
       {popupVisible && (
@@ -453,14 +462,16 @@ const renderDocumentCategory = (uploadArray, categoryName) => {
             </button>
             {popupImage.endsWith(".pdf") ? (
               <Worker
-              workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
+                workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
                 file={popupImage}
                 onLoadSuccess={onDocumentLoadSuccess}
               >
                 <Page pageNumber={pageNumber} />
                 <div className="text-center mt-2">
                   <button
-                    onClick={() => setPageNumber((prev) => Math.max(prev - 1, 1))}
+                    onClick={() =>
+                      setPageNumber((prev) => Math.max(prev - 1, 1))
+                    }
                     disabled={pageNumber <= 1}
                   >
                     Previous
@@ -469,7 +480,9 @@ const renderDocumentCategory = (uploadArray, categoryName) => {
                     {pageNumber} / {numPages}
                   </span>
                   <button
-                    onClick={() => setPageNumber((prev) => Math.min(prev + 1, numPages))}
+                    onClick={() =>
+                      setPageNumber((prev) => Math.min(prev + 1, numPages))
+                    }
                     disabled={pageNumber >= numPages}
                   >
                     Next
@@ -477,12 +490,15 @@ const renderDocumentCategory = (uploadArray, categoryName) => {
                 </div>
               </Worker>
             ) : (
-              <img src={popupImage} alt="popup view" className="w-full h-auto" />
+              <img
+                src={popupImage}
+                alt="popup view"
+                className="w-full h-auto"
+              />
             )}
           </div>
         </div>
       )}
-</section>
+    </section>
   );
 };
-

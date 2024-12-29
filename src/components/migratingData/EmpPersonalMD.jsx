@@ -20,7 +20,7 @@ export const EmpPersonalMD = () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmployeeDetails/EmpPersonalInfo.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmployeeDetails/Employee+Info+%26+Work+Info+as+at+20DEC2024/EmpPersonalInfo.csv",
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
@@ -60,17 +60,21 @@ export const EmpPersonalMD = () => {
         console.log(empValue);
 
         const checkingPITable = empPIData.find(
-          (match) => match.empID === empValue.empID
+          (match) =>
+            match.empID.toString().toLowerCase() ===
+            empValue.empID.toString().toLowerCase()
         );
+
         if (checkingPITable) {
-            console.log(empValue, "update");
+          console.log(empValue, "update");
+
           const collectValue = {
             ...empValue,
             PITableID: checkingPITable.id,
           };
           await UpdateEIValue({ collectValue });
         } else {
-            console.log(empValue, "create");
+          console.log(empValue, "create");
           await SubmitEIData({ empValue });
         }
         // const cleanData = Object.fromEntries(

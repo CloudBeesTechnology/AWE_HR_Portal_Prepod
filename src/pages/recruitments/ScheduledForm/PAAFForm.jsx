@@ -7,7 +7,7 @@ import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
 import { UpdateLoiData } from "../../../services/updateMethod/UpdateLoi";
 import { useFetchInterview } from "../../../hooks/useFetchInterview";
 import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
-
+import { statusOptions } from "../../../utils/StatusDropdown";
 // Define validation schema using Yup
 const PAAFFormSchema = Yup.object().shape({
   paafApproveDate: Yup.date().notRequired(),
@@ -19,16 +19,16 @@ const PAAFFormSchema = Yup.object().shape({
     ),
 });
 
-export const PAAFForm = ({candidate}) => {
+export const PAAFForm = ({ candidate }) => {
   const { loiDetails } = UpdateLoiData();
   const { mergedInterviewData } = useFetchInterview();
-    const { interviewDetails } = UpdateInterviewData();
+  const { interviewDetails } = UpdateInterviewData();
   const [formData, setFormData] = useState({
     interview: {
       id: "",
       paafApproveDate: "",
       paafFile: "",
-      status: ""
+      status: "",
     },
   });
 
@@ -49,26 +49,27 @@ export const PAAFForm = ({candidate}) => {
 
   const PAAFUpload = watch("paafFile", "");
 
-
   useEffect(() => {
     if (mergedInterviewData.length > 0) {
-      const interviewData = mergedInterviewData.find((data) => data.tempID === candidate.tempID); // Assuming we want to take the first item
+      const interviewData = mergedInterviewData.find(
+        (data) => data.tempID === candidate.tempID
+      ); // Assuming we want to take the first item
       if (interviewData) {
-      setFormData({
-        interview: {
-          paafApproveDate: interviewData.localMobilization.paafApproveDate,
-          paafFile: interviewData.localMobilization.paafFile,
-          status: interviewData.interviewSchedules.status
-        },
-      });
-      if (interviewData.localMobilization.paafFile) {
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          paafFile: extractFileName(interviewData.localMobilization.paafFile),
-        }));
+        setFormData({
+          interview: {
+            paafApproveDate: interviewData.localMobilization.paafApproveDate,
+            paafFile: interviewData.localMobilization.paafFile,
+            status: interviewData.interviewSchedules.status,
+          },
+        });
+        if (interviewData.localMobilization.paafFile) {
+          setUploadedFileNames((prev) => ({
+            ...prev,
+            paafFile: extractFileName(interviewData.localMobilization.paafFile),
+          }));
+        }
       }
     }
-  }
   }, [mergedInterviewData, candidate.tempID]);
 
   const extractFileName = (url) => {
@@ -95,11 +96,11 @@ export const PAAFForm = ({candidate}) => {
 
   const handleSubmitTwo = async (e) => {
     e.preventDefault();
- 
-   // Check if mergedInterviewData is available for the candidate
-   const selectedInterviewData = mergedInterviewData.find(
-    (data) => data.tempID === candidate?.tempID
-  );
+
+    // Check if mergedInterviewData is available for the candidate
+    const selectedInterviewData = mergedInterviewData.find(
+      (data) => data.tempID === candidate?.tempID
+    );
 
     // Ensure the candidate and their localMobilization details exist
     if (!selectedInterviewData || !selectedInterviewData.localMobilization) {
@@ -122,7 +123,7 @@ export const PAAFForm = ({candidate}) => {
       await interviewDetails({
         InterviewValue: {
           id: interviewScheduleId, // Dynamically use the correct id
-          status: formData.interview.status
+          status: formData.interview.status,
           // status: selectedInterviewData.empType === "Offshore" ? "CVEV" : "PAAF",
           // status: selectedInterviewData.contractType === "Local" ? "mobilization" : "workpass",
         },
@@ -136,8 +137,8 @@ export const PAAFForm = ({candidate}) => {
     }
   };
 
-   // Function to handle changes for non-file fields
-   const handleInputChange = (field, value) => {
+  // Function to handle changes for non-file fields
+  const handleInputChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
       interview: {
@@ -168,31 +169,38 @@ export const PAAFForm = ({candidate}) => {
           {/* <label>Choose File</label> */}
           <div className="flex items-center gap-5 mt-1">
             {/* <label className="flex items-center px-3 py-2 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer"> */}
-             
-              <FileUploadField
-                label="Upload File"
-                className="p-4"
-                onChangeFunc={(e) => handleFileChange(e, "paafFile")}
-                accept="application/pdf"
-                register={register}
-                fileName={
-                  uploadedFileNames.paafFile || extractFileName(PAAFUpload) || formData.interview.paafFile
-                }
-                value={formData.interview.paafFile}               
-              />
-             
+
+            <FileUploadField
+              label="Upload File"
+              className="p-4"
+              onChangeFunc={(e) => handleFileChange(e, "paafFile")}
+              accept="application/pdf"
+              register={register}
+              fileName={
+                uploadedFileNames.paafFile ||
+                extractFileName(PAAFUpload) ||
+                formData.interview.paafFile
+              }
+              value={formData.interview.paafFile}
+            />
           </div>
         </div>
         <div>
           <label htmlFor="status">Status</label>
-          <input
+          <select
             className="w-full border p-2 rounded mt-1"
-            type="text"
             id="status"
             {...register("status")}
             value={formData.interview.status}
             onChange={(e) => handleInputChange("status", e.target.value)}
-          />
+          >
+            {/* <option value="">Select Status</option> */}
+            {statusOptions.map((status, index) => (
+              <option key={index} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

@@ -7,6 +7,8 @@ import { UpdateLoiData } from "../../../services/updateMethod/UpdateLoi";
 import { useFetchInterview } from "../../../hooks/useFetchInterview";
 import { FileUploadField } from "../../employees/medicalDep/FileUploadField";
 import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
+import { statusOptions } from "../../../utils/StatusDropdown";
+
 // Define validation schema using Yup
 const MOBFormSchema = Yup.object().shape({
   mobSignDate: Yup.date().notRequired(),
@@ -18,7 +20,7 @@ const MOBFormSchema = Yup.object().shape({
     ),
 });
 
-export const MobilizationForm = ({candidate}) => {
+export const MobilizationForm = ({ candidate }) => {
   const { loiDetails } = UpdateLoiData();
   const { mergedInterviewData } = useFetchInterview();
   const { interviewDetails } = UpdateInterviewData();
@@ -27,7 +29,7 @@ export const MobilizationForm = ({candidate}) => {
       id: "",
       mobSignDate: "",
       mobFile: "",
-      status: ""
+      status: "",
     },
   });
   // const [uploadedFileName, setUploadedFileName] = useState(null);
@@ -56,12 +58,11 @@ export const MobilizationForm = ({candidate}) => {
         (data) => data.tempID === candidate.tempID
       ); // Assuming we want to take the first item
       if (interviewData) {
-  
         setFormData({
           interview: {
             mobSignDate: interviewData.localMobilization.mobSignDate,
             mobFile: interviewData.localMobilization.mobFile,
-            status: interviewData.interviewSchedules.status
+            status: interviewData.interviewSchedules.status,
           },
         });
         if (interviewData.localMobilization.mobFile) {
@@ -99,7 +100,6 @@ export const MobilizationForm = ({candidate}) => {
   const handleSubmitTwo = async (e) => {
     e.preventDefault();
 
-    
     // Check if mergedInterviewData is available for the candidate
     const selectedInterviewData = mergedInterviewData.find(
       (data) => data.tempID === candidate?.tempID
@@ -121,11 +121,11 @@ export const MobilizationForm = ({candidate}) => {
           mobSignDate: formData.interview.mobSignDate,
           mobFile: uploadedMOB.mobFile || formData.mobfFile,
         },
-      })
+      });
       await interviewDetails({
         InterviewValue: {
           id: interviewScheduleId, // Dynamically use the correct id
-          status: formData.interview.status
+          status: formData.interview.status,
           // status: selectedInterviewData.contractType === "Local" ? "mobilization" : "workpass",
         },
       });
@@ -182,19 +182,24 @@ export const MobilizationForm = ({candidate}) => {
               }
               value={formData.interview.mobFile}
             />
-      
           </div>
         </div>
         <div>
           <label htmlFor="status">Status</label>
-          <input
+          <select
             className="w-full border p-2 rounded mt-1"
-            type="text"
             id="status"
             {...register("status")}
             value={formData.interview.status}
             onChange={(e) => handleInputChange("status", e.target.value)}
-          />
+          >
+            {/* <option value="">Select Status</option> */}
+            {statusOptions.map((status, index) => (
+              <option key={index} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

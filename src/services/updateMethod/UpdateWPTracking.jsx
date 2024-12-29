@@ -14,7 +14,6 @@ export const useUpdateWPTracking = () => {
       const {
         id,
         tempID,
-        
         supportletterReqDate,
         supportletterReceiveDate,
         letterfile,
@@ -112,7 +111,7 @@ export const useUpdateWPTracking = () => {
 
       const response = await client.graphql({
         query: updateWPTracking,
-        variables: { input: updatedData },
+        variables: { input: updatedData, limit:20000, },
       });
 
       // Log the response to confirm the update

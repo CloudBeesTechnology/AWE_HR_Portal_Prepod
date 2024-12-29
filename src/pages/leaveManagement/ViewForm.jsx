@@ -597,52 +597,178 @@ export const ViewForm = ({
                     </p>
                   </div>
                 )}
-                {userType === "SuperAdmin" ? (
-                  <div className="mt-5 text-lg flex flex-col justify-between gap-2 font-semibold">
-                    <div className="flex flex-col justify-between gap-2">
-                      <p className="">
-                        {`Supervisor: ${leaveData.supervisorStatus}`}
-                      </p>
-                      <p className=" w-full break-words overflow-hidden">{`Supervisor Remark:   ${
-                        leaveData.supervisorRemarks || "no remarks"
-                      }`}</p>
-                      <p className="">{`Manager:   ${leaveData.managerStatus}`}</p>
-                    </div>
-                    <p className=" w-full break-words overflow-hidden">{` Manager Remark:   ${
-                      leaveData.managerRemarks || "no remarks"
-                    }`}</p>
+                {userType === "SuperAdmin" || userType === "HR" ? (
+                  <div className=" w-full text-center text_size_6 shadow-md pt-3">
+                    <table className="w-full ">
+                      <thead className=" bg-[#D8D8D8]">
+                        <tr>
+                          <th className="py-1">Role</th>
+                          <th className="py-1">Status</th>
+                          <th className="py-1">Remark</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      {leaveData.supervisorStatus !== "Rejected" &&   <tr>
+                          <td className="py-2">Manager</td>
+                          <td className="py-2">
+                            {" "}
+                            <p
+                              className={`w-full break-words overflow-hidden ${
+                                leaveData.managerStatus === "Approved"
+                                  ? "text-[green]"
+                                  : leaveData.managerStatus === "Rejected"
+                                  ? "text-[red]"
+                                  : "text-dark_grey"
+                              }`}
+                            >{`${leaveData.managerStatus}`}</p>
+                          </td>
+                          <td className="py-2">
+                            {(leaveData.managerStatus === "Approved" ||
+                              leaveData.managerStatus === "Rejected" ||
+                              leaveData.managerStatus === "Pending") && (
+                              <p className="w-full break-words overflow-hidden ">
+                                {`${leaveData.managerRemarks || "no remark"}`}
+                              </p>
+                            )}
+                          </td>
+                        </tr>}
+                        <tr>
+                          <td className="py-2">Supervisor</td>
+                          <td className="py-2">
+                            {" "}
+                            <p
+                              className={`w-full break-words overflow-hidden ${
+                                leaveData.supervisorStatus === "Approved"
+                                  ? "text-[green]"
+                                  : leaveData.supervisorStatus === "Rejected"
+                                  ? "text-[red]"
+                                  : "text-dark_grey"
+                              }`}
+                            >{`${leaveData.supervisorStatus}`}</p>
+                          </td>
+                          <td className="py-2">
+                            {(leaveData.supervisorStatus === "Approved" ||
+                              leaveData.supervisorStatus === "Rejected" ||
+                              leaveData.supervisorStatus === "Pending") && (
+                              <p className="w-full break-words overflow-hidden ">
+                                {`${
+                                  leaveData.supervisorRemarks || "no remark"
+                                }`}
+                              </p>
+                            )}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 ) : userType === "Supervisor" ? (
-                  <div className="mt-5 text-lg space-y-2 font-semibold ">
-                    {leaveData.supervisorStatus === "Approved" && (
-                      <p className=" w-full break-words overflow-hidden">{` Remark:   ${
-                        leaveData.supervisorRemarks || "no remarks"
-                      }`}</p>
+                  <div className=" text_size_6 ">
+                    {(leaveData.supervisorStatus === "Approved" ||
+                      leaveData.supervisorStatus === "Rejected") && (
+                      <div className=" grid grid-cols-3 gap-4 mb-4">
+                        {" "}
+                        <p className=" w-full break-words overflow-hidden font-semibold">
+                          Remark
+                        </p>
+                        <span className="col-span-2 w-full">{`: ${
+                          leaveData.supervisorRemarks || "no remarks"
+                        }`}</span>
+                      </div>
                     )}
-                    <p className="">{`Manager:   ${leaveData.managerStatus}`}</p>
-                    {leaveData.managerStatus === "Approved" && (
-                      <p className=" w-full break-words overflow-hidden">{`Mangaer Remarks:   ${
-                        leaveData.managerRemarks || "no remark"
-                      }`}</p>
-                    )}
+
+                   {leaveData.supervisorStatus !== "Rejected" &&  <div className=" w-full text-center text_size_6 shadow-md pt-3">
+                      <table className="w-full ">
+                        <thead className=" bg-[#D8D8D8]">
+                          <tr>
+                            <th className="py-1">Role</th>
+                            <th className="py-1">Status</th>
+                            <th className="py-1">Remark</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td className="py-2">Manager</td>
+                            <td className="py-2">
+                              <p
+                                className={`w-full break-words overflow-hidden ${
+                                  leaveData.managerStatus === "Approved"
+                                    ? "text-[green]"
+                                    : leaveData.managerStatus === "Rejected"
+                                    ? "text-[red]"
+                                    : "text-dark_grey"
+                                }`}
+                              >{`${leaveData.managerStatus}`}</p>
+                            </td>
+                            <td className="py-2">
+                              {(leaveData.managerStatus === "Approved" ||
+                                leaveData.managerStatus === "Rejected" ||
+                                leaveData.managerStatus === "Pending") && (
+                                <p className="w-full break-words overflow-hidden ">
+                                  {`${leaveData.managerRemarks || "no remark"}`}
+                                </p>
+                              )}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>}
                   </div>
                 ) : userType === "Manager" ? (
-                  <div className="mt-5 text-lg space-y-2 font-semibold">
-                    {leaveData.supervisorEmpID && (
-                      <article>
+                  <div className=" text_size_6 ">
+                    {(leaveData.managerStatus === "Approved" ||
+                      leaveData.managerStatus === "Rejected") && (
+                      <div className=" grid grid-cols-3 gap-4 mb-4">
                         {" "}
-                        <p className="">
-                          {`Supervisor: ${leaveData.supervisorStatus}`}{" "}
+                        <p className=" w-full break-words overflow-hidden font-semibold">
+                          Remark
                         </p>
-                        <p className=" w-full break-words overflow-hidden">{`Supervisor Remark:   ${
-                          leaveData.supervisorRemarks || "no remarks"
-                        }`}</p>
-                      </article>
+                        <span className="col-span-2 w-full">{`: ${
+                          leaveData.managerRemarks || " no remarks"
+                        }`}</span>
+                      </div>
                     )}
-                    {leaveData.managerStatus === "Approved" && (
-                      <p className=" w-full break-words overflow-hidden">{`Remark:   ${
-                        leaveData.managerRemarks || "no remarks"
-                      }`}</p>
+
+                    {leaveData.supervisorEmpID && (
+                      <div className=" w-full text-center text_size_6 shadow-md pt-3">
+                        <table className="w-full ">
+                          <thead className=" bg-[#D8D8D8]">
+                            <tr>
+                              <th className="py-1">Role</th>
+                              <th className="py-1">Status</th>
+                              <th className="py-1">Remark</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td className="py-2">Supervisor</td>
+                              <td className="py-2">
+                                {" "}
+                                <p
+                                  className={`w-full break-words overflow-hidden ${
+                                    leaveData.supervisorStatus === "Approved"
+                                      ? "text-[green]"
+                                      : leaveData.supervisorStatus ===
+                                        "Rejected"
+                                      ? "text-[red]"
+                                      : "text-dark_grey"
+                                  }`}
+                                >{`${leaveData.supervisorStatus}`}</p>
+                              </td>
+                              <td className="py-2">
+                                {(leaveData.supervisorStatus === "Approved" ||
+                                  leaveData.supervisorStatus === "Rejected" ||
+                                  leaveData.supervisorStatus === "Pending") && (
+                                  <p className="w-full break-words overflow-hidden ">
+                                    {`${
+                                      leaveData.supervisorRemarks || "no remark"
+                                    }`}
+                                  </p>
+                                )}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
                     )}
                   </div>
                 ) : (

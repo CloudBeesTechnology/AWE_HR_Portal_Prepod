@@ -1,10 +1,10 @@
-import React, { useState, useRef} from "react";
+import React, { useState, useRef } from "react";
 import { FaTimes, FaPrint, FaDownload } from "react-icons/fa";
 import { getUrl } from "@aws-amplify/storage";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { pdfjs } from "react-pdf";
-
+import { useReactToPrint } from "react-to-print";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
@@ -28,7 +28,6 @@ const PersonalDetailsView = ({
   ppUpload,
   supportDocUpload,
   inducBriefUp,
-  handlePrint,
   invoiceRef,
   formatDate,
   mainRef,
@@ -36,6 +35,8 @@ const PersonalDetailsView = ({
   const [viewingDocument, setViewingDocument] = useState(null); // State to store the currently viewed document URL
   const [lastUploadUrl, setPPLastUP] = useState(""); // State to store the last uploaded file's URL
   const [imageUrl, setImageUrl] = useState("");
+  const [loading, setLoading] = useState(false);
+  const personal = useRef();
 
   // Helper function to fetch the cloud URL
   const linkToStorageFile = async (pathUrl) => {
@@ -44,8 +45,10 @@ const PersonalDetailsView = ({
       //   console.log("File URL:", result.url.href); // Use .href to extract the URL as a string
       setPPLastUP(result.url.href); // Store the URL as a string
       setViewingDocument(pathUrl); // Update the state to show the selected document
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching the file URL:", error);
+      setLoading(false);
     }
   };
 
@@ -102,7 +105,7 @@ const PersonalDetailsView = ({
     } catch (error) {
       console.error("Error parsing inducBriefUp data:", error);
       return [];
-    }
+    } 
   };
 
  
@@ -115,6 +118,30 @@ const PersonalDetailsView = ({
   const onDocumentLoadSuccess = ({ numPages }) => {
     setPageNumber(1); // Start from page 1
   };
+ 
+  const handleClose = (e) => {
+    e.preventDefault(); // Prevent default action
+    setViewingDocument(null); // Close the viewer
+  };
+
+  
+  const closeModal = () => {
+    setViewingDocument(null);
+  };
+
+
+    const handlePrint = useReactToPrint({
+      content: () => personal.current,
+      onBeforePrint: () => console.log("Preparing to print PDF..."),
+      onAfterPrint: () => console.log("Print complete"),
+      pageStyle: `
+        @page {    
+          height:  714px;
+          padding: 22px, 0px, 22px, 0px;    
+        }
+      `,
+    });
+  
 
   // Function to render documents under a single category
 
@@ -141,66 +168,60 @@ const PersonalDetailsView = ({
             {/* Conditional rendering of PDF or image */}
             {viewingDocument === document.upload &&
               document.upload.endsWith(".pdf") && (
-                <div className="mt-4">
-                  <div className="relative invoice-content bg-white max-w-3xl mx-auto p-6 rounded-lg shadow-lg">
-                    <div  ref={invoiceRef} className=" pdfViewerflex justify-center">
-                      <Worker
-                       workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
-                      >
-                        <Viewer
-                          ref={invoiceRef}
-                          fileUrl={lastUploadUrl || ""}  
-                        />
-
+                <div className="py-6 fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="relative bg-white rounded-lg shadow-lg w-[40vw] max-h-full flex flex-col">
+                    {/* PDF Viewer */}
+                    <div ref={personal} className="flex-grow overflow-y-auto">
+                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                        <Viewer fileUrl={lastUploadUrl || ""} />
                       </Worker>
-                  
                     </div>
-                 
-                    {/* Close Button */}
+
                     <div className="absolute top-2 right-2">
                       <button
-                        onClick={() => setViewingDocument(null)} // Close the viewer
+                        onClick={closeModal} // Close the modal
                         className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
                       >
                         <FaTimes />
                       </button>
                     </div>
-                  </div>
 
-                  <div className="flex items-center justify-center gap-6 py-4">
-                    <div className="mt-2 flex">
-                      <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
-                        <a href={lastUploadUrl} download>
-                          Download
-                        </a>
-                        <FaDownload className="ml-2 mt-1" />
-                      </button>
-                    </div>
-                    <div className="mt-2 flex">
-                      <button
-                        onClick={handlePrint} 
-                        className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
-                      >
-                        Print
-                        <FaPrint className="ml-2 mt-1" />
-                      </button>
+                    <div className="flex items-center justify-center gap-6 py-4">
+                      <div className="mt-2 flex">
+                        <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
+                          <a href={lastUploadUrl} download>
+                            Download
+                          </a>
+                          <FaDownload className="ml-2 mt-1" />
+                        </button>
+                      </div>
+                      <div className="mt-2 flex">
+                        <button
+                          onClick={handlePrint}
+                          className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
+                        >
+                          Print
+                          <FaPrint className="ml-2 mt-1" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
-
             {/* Image Viewer */}
             {viewingDocument === document.upload &&
               !document.upload.endsWith(".pdf") && (
-                <div className="relative mt-4">
-                  <div ref={invoiceRef}>
-                    <img
-                      src={lastUploadUrl} // Use the URL for the image
-                      alt="Document Preview"
-                      className="w-full h-auto"
-                    />
+                <div className="mt-4">
+                <div className="relative invoice-content bg-white max-w-3xl mx-auto p-6 rounded-lg shadow-lg">
+                  <div ref={invoiceRef} className="pdfViewerflex justify-center border h-auto">
+                    <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                      <Viewer
+                        fileUrl={lastUploadUrl || ""}
+                      />
+                    </Worker>
                   </div>
-
+          
+                  {/* Close Button */}
                   <div className="absolute top-2 right-2">
                     <button
                       onClick={() => setViewingDocument(null)} // Close the viewer
@@ -209,27 +230,66 @@ const PersonalDetailsView = ({
                       <FaTimes />
                     </button>
                   </div>
-
-                  <div className="flex items-center justify-center gap-6 py-4">
-                    <div className="mt-2 flex">
-                      <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
-                        <a href={lastUploadUrl} download>
-                          Download
-                        </a>
-                        <FaDownload className="ml-2 mt-1" />
-                      </button>
-                    </div>
-                    <div className="mt-2 flex">
-                      <button
-                        onClick={handlePrint}
-                        className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
-                      >
-                        Print
-                        <FaPrint className="ml-2 mt-1" />
-                      </button>
-                    </div>
+                </div>
+          
+                <div className="flex items-center justify-center gap-6 py-4">
+                  <div className="mt-2 flex">
+                    <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
+                      <a href={lastUploadUrl} download>
+                        Download
+                      </a>
+                      <FaDownload className="ml-2 mt-1" />
+                    </button>
+                  </div>
+                  <div className="mt-2 flex">
+                    <button
+                      onClick={handlePrint} // Triggers the print
+                      className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
+                    >
+                      Print
+                      <FaPrint className="ml-2 mt-1" />
+                    </button>
                   </div>
                 </div>
+              </div>
+                // <div className="relative mt-4">
+                //   <div ref={invoiceRef}>
+                //     <img
+                //       src={lastUploadUrl} // Use the URL for the image
+                //       alt="Document Preview"
+                //       className="w-full h-auto"
+                //     />
+                //   </div>
+
+                //   <div className="absolute top-2 right-2">
+                //     <button
+                //       onClick={() => setViewingDocument(null)} // Close the viewer
+                //       className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
+                //     >
+                //       <FaTimes />
+                //     </button>
+                //   </div>
+
+                //   <div className="flex items-center justify-center gap-6 py-4">
+                //     <div className="mt-2 flex">
+                //       <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
+                //         <a href={lastUploadUrl} download>
+                //           Download
+                //         </a>
+                //         <FaDownload className="ml-2 mt-1" />
+                //       </button>
+                //     </div>
+                //     <div className="mt-2 flex">
+                //       <button
+                //         onClick={handlePrint}
+                //         className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
+                //       >
+                //         Print
+                //         <FaPrint className="ml-2 mt-1" />
+                //       </button>
+                //     </div>
+                //   </div>
+                // </div>
               )}
           </div>
         ))}
