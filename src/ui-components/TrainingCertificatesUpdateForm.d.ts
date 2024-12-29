@@ -23,35 +23,32 @@ export declare type ValidationResponse = {
 export declare type ValidationFunction<T> = (value: T, validationResponse: ValidationResponse) => ValidationResponse | Promise<ValidationResponse>;
 export declare type TrainingCertificatesUpdateFormInputValues = {
     empID?: string;
-    courseCode?: string[];
-    courseName?: string[];
-    company?: string[];
     certifiExpiry?: string[];
     eCertifiDate?: string[];
     trainingUpCertifi?: string[];
     orgiCertifiDate?: string[];
+    poNo?: string[];
+    addDescretion?: string[];
 };
 export declare type TrainingCertificatesUpdateFormValidationValues = {
     empID?: ValidationFunction<string>;
-    courseCode?: ValidationFunction<string>;
-    courseName?: ValidationFunction<string>;
-    company?: ValidationFunction<string>;
     certifiExpiry?: ValidationFunction<string>;
     eCertifiDate?: ValidationFunction<string>;
     trainingUpCertifi?: ValidationFunction<string>;
     orgiCertifiDate?: ValidationFunction<string>;
+    poNo?: ValidationFunction<string>;
+    addDescretion?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type TrainingCertificatesUpdateFormOverridesProps = {
     TrainingCertificatesUpdateFormGrid?: PrimitiveOverrideProps<GridProps>;
     empID?: PrimitiveOverrideProps<TextFieldProps>;
-    courseCode?: PrimitiveOverrideProps<TextFieldProps>;
-    courseName?: PrimitiveOverrideProps<TextFieldProps>;
-    company?: PrimitiveOverrideProps<TextFieldProps>;
     certifiExpiry?: PrimitiveOverrideProps<TextFieldProps>;
     eCertifiDate?: PrimitiveOverrideProps<TextFieldProps>;
     trainingUpCertifi?: PrimitiveOverrideProps<TextAreaFieldProps>;
     orgiCertifiDate?: PrimitiveOverrideProps<TextFieldProps>;
+    poNo?: PrimitiveOverrideProps<TextFieldProps>;
+    addDescretion?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type TrainingCertificatesUpdateFormProps = React.PropsWithChildren<{
     overrides?: TrainingCertificatesUpdateFormOverridesProps | undefined | null;

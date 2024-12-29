@@ -16,11 +16,11 @@ export const UserProgress = () => {
   );
 
   return (
-    <div className="flex justify-center items-center w-full space-x-10 bg-white p-7 rounded-2xl shadow-lg">
+    <div className="flex justify-evenly items-center w-full gap-3 bg-white py-7 px-2 rounded-2xl shadow-lg">
       {/* Active Users */}
-      <div className="text-center">
+      <div className="text-center w-full ">
         <h3 className="text-lg font-semibold">Active users</h3>
-        <div className="relative w-40 h-2 bg-grey rounded-full overflow-hidden my-2">
+        <div className="relative w-full h-2 bg-grey rounded-full overflow-hidden my-2">
           <div
             className="absolute h-full bg-[#32d432]"
             style={{ width: `${userCounts.active}%` }}
@@ -30,9 +30,9 @@ export const UserProgress = () => {
       </div>
 
       {/* Inactive Users */}
-      <div className="text-center">
+      <div className="text-center  w-full">
         <h3 className="text-lg font-semibold">Inactive users</h3>
-        <div className="relative w-40 h-2 bg-grey rounded-full overflow-hidden my-2">
+        <div className="relative w-full h-2 bg-grey rounded-full overflow-hidden my-2">
           <div
             className="absolute h-full bg-yellow"
             style={{ width: `${userCounts.inactive}%` }}

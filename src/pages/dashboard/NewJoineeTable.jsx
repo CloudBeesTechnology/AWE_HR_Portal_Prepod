@@ -1,64 +1,93 @@
+
 import { useContext, useEffect, useState } from "react";
 import { DataSupply } from "../../utils/DataStoredContext";
+import { getUrl } from "@aws-amplify/storage";
+import avatar from "../../assets/navabar/avatar.jpeg";
+import { Link } from "react-router-dom";
 
 export const NewJoineeTable = () => {
-  const { empPIData, IDData, workInfoData } = useContext(DataSupply);
+  const { empPIData, workInfoData, IDData } = useContext(DataSupply);
+
+  // State variables
+  const [userDetails, setUserDetails] = useState([]);
+  const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [latestJoinees, setLatestJoinees] = useState([]);
 
   useEffect(() => {
-    // Filter empPIData to include only the last 5 entries by createdAt
-    const filteredEmpPIData = empPIData
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sort by createdAt descending
-      .slice(0, 5); // Get the last 5 entries
+    const fetchData = async () => {
+      try {
+        // Merge employee data with work info and ID data
+        const mergedData = empPIData
+          .map((emp) => {
+            const WIDetails = workInfoData
+              ? workInfoData.find((user) => user.empID === emp.empID)
+              : {};
+            const IDDetails = IDData
+              ? IDData.find((user) => user.empID === emp.empID)
+              : {};
 
-    // Filter workInfoData to include only active entries
-    const filteredWorkInfoData = workInfoData.filter((entry) => entry.workStatus === 'active');
+            return {
+              ...emp,
+              ...WIDetails,
+              ...IDDetails,
+            };
+          })
+          .filter(Boolean);
 
-    // Merge filtered data with IDData
-    const joineesMap = {};
+        // Sort data by createdAt timestamp (descending) and take the last 4 entries
+        const sortedData = mergedData
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .slice(0, 4);
 
-    [...filteredEmpPIData, ...IDData, ...filteredWorkInfoData].forEach((entry) => {
-      const { empID } = entry;
-      if (!joineesMap[empID]) {
-        joineesMap[empID] = { ...entry, startDates: [entry.doj] };
-      } else {
-        // Merge fields and add unique dates
-        const existingEntry = joineesMap[empID];
-        joineesMap[empID] = {
-          ...existingEntry,
-          ...entry, // overwrite with latest non-null values from the current entry
-          startDates: [...new Set([...existingEntry.startDates, entry.doj])],
-        };
+        setUserDetails(sortedData);
+        setAllEmpDetails(mergedData);
+        setLatestJoinees(sortedData);
+      } catch (err) {
+        console.error("Error fetching data:", err);
       }
-    });
+    };
 
-    // Get all merged entries
-    const allJoinees = Object.values(joineesMap);
+    fetchData();
+  }, [empPIData, workInfoData, IDData]);
 
-    // Sort by the latest date (using doj or startDates) and limit to 5
-    const latest5Joinees = allJoinees
-      .sort((a, b) => new Date(b.doj) - new Date(a.doj)) // Sort by doj in descending order
-      .slice(0, 5); // Get only the top 5
+  useEffect(() => {
+    const fetchProfilePhotos = async () => {
+      try {
+        const updatedJoinees = await Promise.all(
+          latestJoinees.map(async (joinee) => {
+            if (joinee.profilePhoto) {
+              const result = await getUrl({ path: joinee.profilePhoto });
+              return { ...joinee, profilePhotoUrl: result.url };
+            }
+            return { ...joinee, profilePhotoUrl: null };
+          })
+        );
+        setLatestJoinees(updatedJoinees);
+      } catch (err) {
+        console.error("Error fetching profile photos:", err);
+      }
+    };
 
-    setLatestJoinees(latest5Joinees);
-  }, [empPIData, IDData, workInfoData]);
-
-
+    if (latestJoinees.length > 0) {
+      fetchProfilePhotos();
+    }
+  }, [latestJoinees]);
 
   return (
     <div className="bg-white shadow-md rounded-2xl overflow-hidden m-2">
-      <div className="bg-lite_grey p-4">
+      <div className="bg-lite_grey p-4 flex justify-between">
         <h2 className="text-lg font-semibold">New Joinee</h2>
+        <Link to="/allempDetails" className="px-10 underline text-[blue]"> View All
+        </Link>
       </div>
       <table className="min-w-full bg-white">
         <thead>
           <tr className="border-b">
             <th className="py-3 px-6 text-left text-sm font-medium">Employee</th>
-            <th className="py-3 px-6 text-left text-sm font-medium">Country</th>
+            <th className="py-3 px-6 text-left text-sm font-medium">Date of Join</th>
+            <th className="py-3 px-6 text-left text-sm font-medium">Nationality</th>
             <th className="py-3 px-6 text-left text-sm font-medium">Position</th>
-            <th className="py-3 px-6 text-left text-sm font-medium">Start Dates</th>
             <th className="py-3 px-6 text-left text-sm font-medium">Type</th>
-            <th className="py-3 px-6 text-left text-sm font-medium">Status</th>
           </tr>
         </thead>
         <tbody>
@@ -67,28 +96,15 @@ export const NewJoineeTable = () => {
               <td className="py-4 px-6 flex items-center">
                 <img
                   className="w-10 h-10 rounded-full mr-4"
-                  src={joinee.profilePhoto || '/path/to/default-image.jpg'}
-                  alt={joinee.name || 'Unnamed'}
+                  src={joinee.profilePhotoUrl || avatar}
+                  alt={joinee.name}
                 />
-                <span className="text-grey">{joinee.name || 'N/A'}</span>
+                <span className="text-grey">{joinee.name}</span>
               </td>
-              <td className="py-4 px-6 text-grey">{joinee.nationality || 'N/A'}</td>
-              <td className="py-4 px-6 text-grey">{joinee.position || 'N/A'}</td>
-              <td className="py-4 px-6 text-grey">
-                {joinee.doj || 'N/A'}
-              </td>
-              <td className="py-4 px-6 text-grey">{joinee.contractType || 'N/A'}</td>
-              <td className="py-4 px-6">
-                <span
-                  className={`rounded-full px-3 py-1 text-sm ${
-                    joinee.workStatus === 'Active'
-                      ? 'text-[#14AD35] bg-[#41d441]'
-                      : 'text-[#ff0000] bg-[#ffcccc]'
-                  }`}
-                >
-                  {joinee.workStatus || 'Inactive'}
-                </span>
-              </td>
+              <td className="py-4 text-grey text-center">{joinee.doj || "N/A"}</td>
+              <td className="py-4 px-6 text-grey">{joinee.nationality || "N/A"}</td>
+              <td className="py-4 px-6 text-grey">{joinee.position || "N/A"}</td>
+              <td className="py-4 px-6 text-grey">{joinee.empType || "N/A"}</td>
             </tr>
           ))}
         </tbody>

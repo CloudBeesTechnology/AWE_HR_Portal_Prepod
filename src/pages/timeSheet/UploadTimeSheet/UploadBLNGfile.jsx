@@ -191,6 +191,8 @@ export const UploadBLNGfile = (
           ENTRANCEDATEUSED,
           ENTRANCEDATETIME,
           EXITDATETIME,
+          AVGDAILYTOTALBYDAY,
+          ADININWORKSENGINEERINGSDNBHD,
           ...rest
         } = curr;
 
@@ -212,6 +214,9 @@ export const UploadBLNGfile = (
           // If found, push new times into the respective arrays
           existingEntry.ENTRANCEDATETIME.push(ENTRANCEDATETIME);
           existingEntry.EXITDATETIME.push(EXITDATETIME);
+          // existingEntry.ADININWORKSENGINEERINGSDNBHD.push(
+          //   ADININWORKSENGINEERINGSDNBHD
+          // );
         } else {
           // Create a new entry if it doesn't exist
           acc.push({
@@ -220,6 +225,8 @@ export const UploadBLNGfile = (
             ENTRANCEDATEUSED: ENTRANCEDATEUSED, // Keep date as is
             ENTRANCEDATETIME: [ENTRANCEDATETIME], // Initialize as array
             EXITDATETIME: [EXITDATETIME], // Initialize as array
+            AVGDAILYTOTALBYDAY:AVGDAILYTOTALBYDAY,
+            ADININWORKSENGINEERINGSDNBHD: AVGDAILYTOTALBYDAY,
             ...rest, // Include other properties
           });
           console.log("Working...");
@@ -227,7 +234,7 @@ export const UploadBLNGfile = (
 
         return acc;
       }, []);
-      // console.log("transformedData : ", transformedData);
+      console.log("transformedData : ", transformedData);
 
       transformedData.forEach((entry) => {
         if (entry.FID && entry.ENTRANCEDATEUSED) {

@@ -574,7 +574,7 @@ export const EditTimeSheet = ({
   const [allLocation, setAllLocation] = useState(null);
 
   const [warningMess, setWarningMess] = useState(null);
-
+  const [warningMessForAdinin, setWarningMessForAdinin] = useState(null);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
 
   const [formData, setFormData] = useState({
@@ -790,7 +790,7 @@ export const EditTimeSheet = ({
       return [...prevSections, newSection]; // No reassignment here
     });
   };
-  console.log(sections);
+
   // jobCode
   // Original
 
@@ -813,37 +813,131 @@ export const EditTimeSheet = ({
     );
   }, []);
 
+  // Example Inputs
+
+  // Call the function dynamically
+
+  // useEffect(() => {
+  //   const updateFormData = (workingHoursKey, actualHoursKey) => {
+  //     const totalWorkingHrs = sections.reduce((total, sec) => {
+  //       return total + (parseInt(sec.WORKINGHRS) || 0); // Default to 0 if WORKINGHRS is empty
+  //     }, 0);
+
+  //     const totalOvertimeHrs = sections.reduce((total, sec) => {
+  //       return total + (parseInt(sec.OVERTIMEHRS) || 0); // Default to 0 if OVERTIMEHRS is empty
+  //     }, 0);
+
+  //     setFormData((prevFormData) => {
+  //       // const updatedWorkingHours =
+  //       //   totalWorkingHrs || editObject[workingHoursKey];
+  //       const updatedWorkingHours = totalWorkingHrs || 0;
+  //       const calculatedOT =
+  //         updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY <= 0
+  //           ? 0
+  //           : updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY;
+
+  //       setWarningMess(
+  //         updatedWorkingHours > parseInt(prevFormData.NORMALWORKINGHRSPERDAY)
+  //       );
+
+  //       // setWarningMessForAdinin(
+  //       //   updatedWorkingHours + totalWorkingHrs >
+  //       //     parseInt(prevFormData.ADININWORKSENGINEERINGSDNBHD)
+  //       // );
+  //       // if (
+  //       //   updatedWorkingHours + totalOvertimeHrs >
+  //       //   parseInt(prevFormData.ADININWORKSENGINEERINGSDNBHD)
+  //       // ) {
+  //       //   setWarningMessForAdinin(
+  //       //     "AW & ESB"
+  //       //   );
+  //       //   console.log(updatedWorkingHours + totalOvertimeHrs)
+  //       //   console.log("Yes it is true")
+  //       // }
+
+  //       return {
+  //         ...prevFormData,
+  //         [actualHoursKey]: updatedWorkingHours || 0, // Ensure a default value of 0
+  //         OT: updatedWorkingHours === 0 ? 0 : calculatedOT,
+  //       };
+  //     });
+  //   };
+
+  //   if (titleName === "HO") {
+  //     updateFormData("TOTALACTUALHOURS", "TOTALACTUALHOURS");
+  //   } else if (titleName === "BLNG") {
+  //     updateFormData("WORKINGHOURS", "WORKINGHOURS");
+  //   } else {
+  //     updateFormData("WORKINGHOURS", "WORKINGHOURS");
+  //   }
+  // }, [sections]);
+
   useEffect(() => {
+    const formatTime = (decimalHours) => {
+      const hours = Math.floor(decimalHours); // Extract hours
+      const minutes = Math.round((decimalHours - hours) * 60); // Calculate minutes
+      return `${hours}:${minutes.toString().padStart(2, "0")}`; // Format as HH:MM
+    };
+
     const updateFormData = (workingHoursKey, actualHoursKey) => {
-      const totalWorkingHrs = sections.reduce((total, sec) => {
-        return total + (parseInt(sec.WORKINGHRS) || 0); // Default to 0 if WORKINGHRS is empty
-      }, 0);
+      // Calculate total working hours
+      const sumHoursAndMinutes = (sections, key) => {
+        let totalMinutes = sections.reduce((total, sec) => {
+          console.log(sec);
+          if (sec[key]) {
+            const [hours, minutes] = sec[key].split(":").map(Number); // Split into hours and minutes
+            total += hours * 60 + (minutes || 0); // Convert to total minutes
+          }
+          return total;
+        }, 0);
 
-      const totalOvertimeHrs = sections.reduce((total, sec) => {
-        return total + (parseInt(sec.OVERTIMEHRS) || 0); // Default to 0 if OVERTIMEHRS is empty
-      }, 0);
+        // Convert total minutes back to HH:MM format
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        return `${hours}:${minutes.toString().padStart(2, "0")}`;
+      };
 
+      // Calculate total working hours and overtime hours
+      const totalWorkingHrs = sumHoursAndMinutes(sections, "WORKINGHRS");
+      const totalOvertimeHrs = sumHoursAndMinutes(sections, "OVERTIMEHRS");
+      console.log(totalWorkingHrs, " : ", totalOvertimeHrs);
       setFormData((prevFormData) => {
-        // const updatedWorkingHours =
-        //   totalWorkingHrs || editObject[workingHoursKey];
-        const updatedWorkingHours = totalWorkingHrs || 0;
+        const updatedWorkingHours =
+          parseFloat(totalWorkingHrs.split(":")[0]) +
+          parseFloat(totalWorkingHrs.split(":")[1]) / 60;
+
+        // Calculate overtime
         const calculatedOT =
           updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY <= 0
             ? 0
             : updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY;
 
+        // Update warning messages
         setWarningMess(
-          updatedWorkingHours > parseInt(prevFormData.NORMALWORKINGHRSPERDAY)
+          updatedWorkingHours > parseFloat(prevFormData.NORMALWORKINGHRSPERDAY)
         );
 
+        // Example for additional warnings
+        if (
+          updatedWorkingHours +
+            parseFloat(totalOvertimeHrs.split(":")[0]) +
+            parseFloat(totalOvertimeHrs.split(":")[1]) / 60 >
+          parseFloat(prevFormData.ADININWORKSENGINEERINGSDNBHD)
+        ) {
+          setWarningMessForAdinin("AW & ESB");
+          console.log(updatedWorkingHours + totalOvertimeHrs);
+          console.log("Yes it is true");
+        }
+        console.log(formatTime(calculatedOT));
         return {
           ...prevFormData,
-          [actualHoursKey]: updatedWorkingHours || 0, // Ensure a default value of 0
-          OT: updatedWorkingHours === 0 ? 0 : calculatedOT,
+          [actualHoursKey]: totalWorkingHrs, // Already formatted as HH:MM
+          OT: formatTime(calculatedOT), // Format OT as HH:MM
         };
       });
     };
 
+    // Handle different cases based on titleName
     if (titleName === "HO") {
       updateFormData("TOTALACTUALHOURS", "TOTALACTUALHOURS");
     } else if (titleName === "BLNG") {
@@ -854,19 +948,57 @@ export const EditTimeSheet = ({
   }, [sections]);
 
   // Original
+  // useEffect(() => {
+  //   const totalOvertimeHrs = sections.reduce((total, sec) => {
+  //     return parseInt(total) + parseInt(sec.OVERTIMEHRS || 0);
+  //   }, 0);
+
+  //   console.log(totalOvertimeHrs)
+  //   // Update formData with totalOvertimeHrs if it exists
+  //   if (totalOvertimeHrs) {
+  //     setFormData((prevFormData) => ({
+  //       ...prevFormData,
+  //       OT: totalOvertimeHrs || 0,
+  //     }));
+  //   }
+  // }, [sections]);
+
   useEffect(() => {
     const totalOvertimeHrs = sections.reduce((total, sec) => {
-      return parseInt(total) + parseInt(sec.OVERTIMEHRS || 0);
+      let overtime = sec.OVERTIMEHRS || "0:00"; // Default value if empty
+  
+      if (overtime.includes(".")) {
+        // Handle decimal format like "8.20"
+        // const [whole, fraction] = overtime.split(".");
+        // const mins = Math.round((parseFloat(`0.${fraction}`) || 0) * 60); // Convert decimal to minutes
+        // overtime = `${whole}:${mins.toString().padStart(2, "0")}`; // Format as hh:mm
+        overtime = overtime.replace(".", ":");
+      } else if (!overtime.includes(":")) {
+        // Handle whole number format like "8"
+        overtime = `${overtime}:00`; // Convert to hh:mm
+      }
+  
+      // Split and calculate total minutes
+      const [hrs, mins] = overtime.split(":").map(Number);
+      return total + hrs * 60 + mins; // Convert to total minutes
     }, 0);
-
-    // Update formData with totalOvertimeHrs if it exists
-    if (totalOvertimeHrs) {
+  
+    // Convert total minutes back to hh:mm format
+    const hours = Math.floor(totalOvertimeHrs / 60);
+    const minutes = totalOvertimeHrs % 60;
+    const formattedTime = `${hours}:${minutes.toString().padStart(2, "0")}`;
+  
+    console.log(formattedTime);
+  
+    // Update formData with formattedTime if totalOvertimeHrs exists
+    if (totalOvertimeHrs > 0) {
       setFormData((prevFormData) => ({
         ...prevFormData,
-        OT: totalOvertimeHrs || 0,
+        OT: formattedTime,
       }));
     }
   }, [sections]);
+  
 
   const addJCandLocaWhrs = useCallback(() => {
     const getData =
@@ -977,9 +1109,15 @@ export const EditTimeSheet = ({
               {warningMess &&
                 (field === "WORKINGHOURS" || field === "TOTALACTUALHOURS") && (
                   <span className="text_size_9 mt-2 text-red">
-                    Working hours exceed the normal working hours per day.
+                    {`Working hours exceed the NWHPD ${warningMessForAdinin}`}
                   </span>
                 )}
+              {/* {warningMessForAdinin &&
+                (field === "WORKINGHOURS" || field === "TOTALACTUALHOURS") && (
+                  <span className="text_size_9 mt-2 text-red">
+                 {" "} and AW & ESB
+                  </span>
+                )} */}
             </div>
           </div>
         ))}

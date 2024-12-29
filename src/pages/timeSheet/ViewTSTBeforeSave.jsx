@@ -138,57 +138,85 @@ export const ViewTSTBeforeSave = ({
 
             const fetchedData = await dataPromise;
 
+            async function fetchAllData(queryName) {
+              let allData = [];
+              let nextToken = null;
+            
+              do {
+                const response = await client.graphql({
+                  query: queryName,
+                  variables: { nextToken },
+                });
+            
+                const items = response.data[Object.keys(response.data)[0]].items; // Extract items
+                allData = [...allData, ...items]; // Append fetched items
+                nextToken = response.data[Object.keys(response.data)[0]].nextToken; // Get nextToken
+              } while (nextToken); // Continue if there's more data
+            
+              return allData;
+            }
+            
             const fetchWorkInfo = async () => {
-              // Fetch the BLNG data using GraphQL
-              const [employeeInfo, empWorkInfos] = await Promise.all([
-                client.graphql({ query: listEmpPersonalInfos }),
-                client.graphql({ query: listEmpWorkInfos }),
-              ]);
-              const empInfo = employeeInfo?.data?.listEmpPersonalInfos?.items;
-              const workInfo = empWorkInfos?.data?.listEmpWorkInfos?.items;
-              const sapNoRemoved = workInfo.map((item) => {
-                const { sapNo, ...rest } = item;
-                return rest;
-              });
-
-              const mergedDatas = empInfo
-                .map((empInf) => {
-                  const interviewDetails = sapNoRemoved.find(
-                    (item) => item?.empID === empInf?.empID
+              try {
+                // Fetch all data with pagination
+                const [employeeInfo, empWorkInfos] = await Promise.all([
+                  fetchAllData(listEmpPersonalInfos),
+                  fetchAllData(listEmpWorkInfos),
+                ]);
+            
+                const empInfo = employeeInfo; // All employee personal info
+                const workInfo = empWorkInfos; // All employee work info
+            
+                // Remove sapNo from work info
+                const sapNoRemoved = workInfo.map(({ sapNo, ...rest }) => rest);
+            
+                const mergedDatas = empInfo
+                  .map((empInf) => {
+                    const interviewDetails = sapNoRemoved.find(
+                      (item) => item?.empID === empInf?.empID
+                    );
+            
+                    // Return null if all details are undefined
+                    if (!interviewDetails) {
+                      return null;
+                    }
+            
+                    return {
+                      ...empInf,
+                      ...interviewDetails,
+                    };
+                  })
+                  .filter((item) => item !== null);
+            
+                console.log(mergedDatas);
+            
+                // Merge fetchedData with workInfo based on FID
+                const mergedData = fetchedData.map((item) => {
+                  const workInfoItem = mergedDatas.find(
+                    (info) => info?.sapNo == item?.NO
                   );
-
-                  // Return null if all details are undefined
-                  if (!interviewDetails) {
-                    return null;
-                  }
-
+            
+                  console.log(workInfoItem);
                   return {
-                    ...empInf,
-                    ...interviewDetails,
+                    ...item,
+                    NORMALWORKINGHRSPERDAY: workInfoItem
+                      ? workInfoItem.workHrs[workInfoItem.workHrs.length - 1]
+                      : null,
                   };
-                })
-                .filter((item) => item !== null);
-
-              console.log(mergedDatas);
-              // Merge fetchedData with workInfo based on FID
-              const mergedData = fetchedData.map((item) => {
-                const workInfoItem = mergedDatas.find(
-                  (info) => info?.sapNo == item?.NO
-                );
-                console.log(workInfoItem);
-                return {
-                  ...item,
-                  NORMALWORKINGHRSPERDAY: workInfoItem
-                    ? workInfoItem.workHrs[workInfoItem.workHrs.length - 1]
-                    : null,
-                };
-              });
-
-              setData(mergedData); // Set merged data
-              setSecondaryData(mergedData);
+                });
+            
+                console.log(mergedData);
+            
+                // Set merged data in state
+                setData(mergedData);
+                setSecondaryData(mergedData);
+              } catch (error) {
+                console.error("Error fetching work info:", error.message);
+              }
             };
-
+            
             fetchWorkInfo();
+            
           } catch (err) {
           } finally {
             // setLoading is removed ;

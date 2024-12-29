@@ -43,7 +43,7 @@ export const TrainVT = ({ mergering, columns, popupAll }) => {
 
   return (
     <section >
-      <div className="relative flex justify-end items-end mb-10">
+      <div className="relative flex justify-end items-end mt-14">
         <input
           type="text"
           placeholder="Search by empID or name"
@@ -56,7 +56,7 @@ export const TrainVT = ({ mergering, columns, popupAll }) => {
         </div>
       </div>
 
-      <div className="overflow-x-auto mt-8 w-full rounded-md">
+      <div className="overflow-x-auto mt-16 w-full rounded-md">
         <div className="w-full px-4 max-h-[calc(90vh-7rem)] overflow-y-auto scrollBar">
           <table className="w-full rounded-xl table-auto">
             <thead className="bg-[#939393] text-center sticky top-0">
@@ -66,7 +66,7 @@ export const TrainVT = ({ mergering, columns, popupAll }) => {
                     {column.header}
                   </th>
                 ))}
-                <th className="py-4 px-4">View</th>
+                <th className="py-4 px-4 text-white">View</th>
               </tr>
             </thead>
             <tbody className="bg-white text-center text-sm font-semibold text-dark_grey ">

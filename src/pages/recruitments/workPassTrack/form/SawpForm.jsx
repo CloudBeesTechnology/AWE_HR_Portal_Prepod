@@ -6,9 +6,13 @@ import { FileUploadField } from "../../../employees/medicalDep/FileUploadField";
 import { SawpFormSchema } from "../../../../services/Validation";
 import { useCreateWPTracking } from "../../../../services/createMethod/CreateWPTracking";
 import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
+import { UpdateInterviewData } from "../../../../services/updateMethod/UpdateInterview";
+import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPTracking";
 
 export const SawpForm = ({ candidate }) => {
-  const { interviewSchedules } = useFetchCandy();
+  // const { interviewSchedules } = useFetchCandy();
+  const { wpTrackingDetails } = useUpdateWPTracking();
+  const { interviewDetails } = UpdateInterviewData();
   const { createWPTrackingHandler } = useCreateWPTracking();
   const [formData, setFormData] = useState({
     interview: {
@@ -62,6 +66,7 @@ export const SawpForm = ({ candidate }) => {
       lbrEndroseDate: "",
       lbrDepoAmount: "",
       lbrFile: "",
+      status: "",
     },
   });
   const [uploadedFileNames, setUploadedFileNames] = useState({
@@ -83,52 +88,36 @@ export const SawpForm = ({ candidate }) => {
 
   const SawpUpload = watch("sawpFile");
 
-
   useEffect(() => {
-    // Log to see if interviewSchedules has data
-    // console.log("interviewSchedules:", interviewSchedules);
-  
-    if (interviewSchedules.length > 0) {
-      // Find the interviewData for the candidate
-      const interviewData = interviewSchedules.find(
-        (data) => data.tempID === candidate.tempID
-      );
-  
-      // // Log the found interviewData
-      // console.log("Found interviewData:", interviewData);
-  
-      if (interviewData) {
-        // Set the form data
-        setFormData({
-          interview: {
-            sawpDate: interviewData.sawpDate,
-            sawpRecivedDate: interviewData.sawpRecivedDate,
-            sawpFile: interviewData.sawpFile,
-          },
-        });
-        // console.log("Form data set:", {
-        //   sawpLtrReq: interviewData.sawpDate,
-        //   sawpLtrRece: interviewData.sawpRecivedDate,
-        //   sawpFile: interviewData.sawpFile,
-        // });
-  
-        // Check if sawpFile exists and update the file names
-        if (interviewData.sawpFile) {
-          const fileName = extractFileName(interviewData.sawpFile);
-          setUploadedFileNames((prev) => ({
-            ...prev,
-            sawpFile: fileName,
-          }));
-          // console.log("Uploaded file name set:", fileName);
-        }
-      } else {
-        console.log("No interviewData found for candidate:", candidate.tempID);
+    if (candidate) {
+      // Set the form data
+      setFormData({
+        interview: {
+          sawpDate: candidate.WPTrackDetails_sawpDate,
+          sawpRecivedDate: candidate.WPTrackDetails_sawpRecivedDate,
+          sawpFile: candidate.WPTrackDetails_sawpFile,
+        },
+      });
+
+      console.log({
+        sawpDate: candidate.WPTrackDetails_sawpDate,
+        sawpRecivedDate: candidate.WPTrackDetails_sawpRecivedDate,
+        sawpFile: candidate.WPTrackDetails_sawpFile,
+      });
+
+      // Check if sawpFile exists and update the file names
+      if (candidate.WPTrackDetails_sawpFile) {
+        const fileName = extractFileName(candidate.WPTrackDetails_sawpFile);
+        setUploadedFileNames((prev) => ({
+          ...prev,
+          sawpFile: fileName,
+        }));
+        // console.log("Uploaded file name set:", fileName);
       }
     } else {
-      console.log("No interview schedules available.");
+      console.log("No interviewData found for candidate:", candidate.tempID);
     }
-  }, [interviewSchedules, candidate.tempID]);
-  
+  }, [candidate]);
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
@@ -152,6 +141,7 @@ export const SawpForm = ({ candidate }) => {
     }
   };
 
+  //create call
   const onSubmit = async (data) => {
     data.preventDefault();
     // Ensure form fields are populated
@@ -159,14 +149,11 @@ export const SawpForm = ({ candidate }) => {
       reqValue: {
         ...formData.interview,
         sawpFile: uploadedSawp.sawpFile ? uploadedSawp.sawpFile : "",
-        sawpDate: formData.interview.sawpDate,
-        sawpRecivedDate: formData.interview.sawpRecivedDate,
+        sawpDate: formData.interview.WPTrackDetails_sawpDate,
+        sawpRecivedDate: formData.interview.WPTrackDetails_sawpRecivedDate,
         tempID: candidate.tempID,
       },
     };
-
-    // Debugging: Log the requestData to ensure everything is correct
-    // console.log("Sending data to createWPTrackingHandler:", requestData);
 
     try {
       await createWPTrackingHandler(requestData); // Call the createWPTrackingHandler with form data
@@ -190,15 +177,14 @@ export const SawpForm = ({ candidate }) => {
   return (
     <form onSubmit={onSubmit} className="p-5">
       <div className="grid grid-cols-2 gap-5 mt-5">
-
-      <div>
+        <div>
           <label htmlFor="sawpDate">Sawp Request Date</label>
           <input
             className="w-full border p-2 rounded mt-1"
             type="date"
             id="sawpDate"
             {...register("sawpDate")}
-            value={formData.interview.sawpDate}
+            value={formData.interview.WPTrackDetails_sawpDate}
             onChange={(e) => handleInputChange("sawpDate", e.target.value)}
           />
         </div>
@@ -210,11 +196,12 @@ export const SawpForm = ({ candidate }) => {
             type="date"
             id="sawpRecivedDate"
             {...register("sawpRecivedDate")}
-            value={formData.interview.sawpRecivedDate}
-            onChange={(e) => handleInputChange("sawpRecivedDate", e.target.value)}
+            value={formData.interview.WPTrackDetails_sawpRecivedDate}
+            onChange={(e) =>
+              handleInputChange("sawpRecivedDate", e.target.value)
+            }
           />
         </div>
-     
 
         <div className="">
           <div className="flex items-center gap-5 mt-1">
@@ -223,13 +210,23 @@ export const SawpForm = ({ candidate }) => {
               className="p-4"
               onChangeFunc={(e) => handleFileChange(e, "sawpFile")}
               accept="application/pdf"
-              
               fileName={
                 uploadedFileNames.sawpFile || extractFileName(SawpUpload)
               }
-              value={formData.interview.sawpFile}
+              value={formData.interview.WPTrackDetails_sawpFile}
             />
           </div>
+        </div>
+        <div>
+          <label htmlFor="status">Status</label>
+          <input
+            className="w-full border p-2 rounded mt-1"
+            type="text"
+            id="status"
+            {...register("status")}
+            value={formData.interview.interviewDetails_status}
+            onChange={(e) => handleInputChange("status", e.target.value)}
+          />
         </div>
       </div>
 
@@ -237,8 +234,8 @@ export const SawpForm = ({ candidate }) => {
         <button
           type="submit"
           className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
-          >
-            Submit
+        >
+          Submit
         </button>
       </div>
     </form>

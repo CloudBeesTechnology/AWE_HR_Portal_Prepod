@@ -193,12 +193,8 @@ type EmpRequisition @aws_iam @aws_api_key {
 type WeldingInfo @aws_iam @aws_api_key {
   id: ID!
   empID: String!
-  department: String
   diameterRange: String
-  empBadgeNo: String
-  empName: String
   fillerMetal: String
-  position: String
   thicknessRange: String
   weldingStampNor: String
   wpsNumber: String
@@ -222,14 +218,14 @@ type TrainingReq @aws_iam @aws_api_key {
   medicalExpiry: String
   medicalAppointDate: String
   medicalReport: [AWSJSON]
-  purchaseONo: String
-  traineeCourseCode: String
-  traineeCourseName: String
-  traineeCompany: String
   traineeSD: String
   traineeED: String
   traineeStatus: String
   traineeCourseFee: String
+  courseCode: [String]
+  courseName: [String]
+  company: [String]
+  mediRequired: Boolean
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -237,13 +233,12 @@ type TrainingReq @aws_iam @aws_api_key {
 type TrainingCertificates @aws_iam @aws_api_key {
   id: ID!
   empID: String!
-  courseCode: [String]
-  courseName: [String]
-  company: [String]
   certifiExpiry: [String]
   eCertifiDate: [String]
   trainingUpCertifi: [AWSJSON]
   orgiCertifiDate: [String]
+  poNo: [String]
+  addDescretion: [String]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -403,6 +398,7 @@ type WPTracking @aws_iam @aws_api_key {
   lbrEndroseDate: String
   lbrDepoAmount: String
   lbrFile: String
+  remarkNLMob: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -2394,12 +2390,8 @@ type ModelWeldingInfoConnection @aws_api_key @aws_iam {
 input ModelWeldingInfoFilterInput {
   id: ModelIDInput
   empID: ModelStringInput
-  department: ModelStringInput
   diameterRange: ModelStringInput
-  empBadgeNo: ModelStringInput
-  empName: ModelStringInput
   fillerMetal: ModelStringInput
-  position: ModelStringInput
   thicknessRange: ModelStringInput
   weldingStampNor: ModelStringInput
   wpsNumber: ModelStringInput
@@ -2420,12 +2412,8 @@ input ModelWeldingInfoFilterInput {
 
 input ModelWeldingInfoConditionInput {
   empID: ModelStringInput
-  department: ModelStringInput
   diameterRange: ModelStringInput
-  empBadgeNo: ModelStringInput
-  empName: ModelStringInput
   fillerMetal: ModelStringInput
-  position: ModelStringInput
   thicknessRange: ModelStringInput
   weldingStampNor: ModelStringInput
   wpsNumber: ModelStringInput
@@ -2447,12 +2435,8 @@ input ModelWeldingInfoConditionInput {
 input CreateWeldingInfoInput {
   id: ID
   empID: String!
-  department: String
   diameterRange: String
-  empBadgeNo: String
-  empName: String
   fillerMetal: String
-  position: String
   thicknessRange: String
   weldingStampNor: String
   wpsNumber: String
@@ -2469,12 +2453,8 @@ input CreateWeldingInfoInput {
 input UpdateWeldingInfoInput {
   id: ID!
   empID: String
-  department: String
   diameterRange: String
-  empBadgeNo: String
-  empName: String
   fillerMetal: String
-  position: String
   thicknessRange: String
   weldingStampNor: String
   wpsNumber: String
@@ -2495,12 +2475,8 @@ input DeleteWeldingInfoInput {
 input ModelSubscriptionWeldingInfoFilterInput {
   id: ModelSubscriptionIDInput
   empID: ModelSubscriptionStringInput
-  department: ModelSubscriptionStringInput
   diameterRange: ModelSubscriptionStringInput
-  empBadgeNo: ModelSubscriptionStringInput
-  empName: ModelSubscriptionStringInput
   fillerMetal: ModelSubscriptionStringInput
-  position: ModelSubscriptionStringInput
   thicknessRange: ModelSubscriptionStringInput
   weldingStampNor: ModelSubscriptionStringInput
   wpsNumber: ModelSubscriptionStringInput
@@ -2531,14 +2507,14 @@ input ModelTrainingReqFilterInput {
   medicalExpiry: ModelStringInput
   medicalAppointDate: ModelStringInput
   medicalReport: ModelStringInput
-  purchaseONo: ModelStringInput
-  traineeCourseCode: ModelStringInput
-  traineeCourseName: ModelStringInput
-  traineeCompany: ModelStringInput
   traineeSD: ModelStringInput
   traineeED: ModelStringInput
   traineeStatus: ModelStringInput
   traineeCourseFee: ModelStringInput
+  courseCode: ModelStringInput
+  courseName: ModelStringInput
+  company: ModelStringInput
+  mediRequired: ModelBooleanInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelTrainingReqFilterInput]
@@ -2553,14 +2529,14 @@ input ModelTrainingReqConditionInput {
   medicalExpiry: ModelStringInput
   medicalAppointDate: ModelStringInput
   medicalReport: ModelStringInput
-  purchaseONo: ModelStringInput
-  traineeCourseCode: ModelStringInput
-  traineeCourseName: ModelStringInput
-  traineeCompany: ModelStringInput
   traineeSD: ModelStringInput
   traineeED: ModelStringInput
   traineeStatus: ModelStringInput
   traineeCourseFee: ModelStringInput
+  courseCode: ModelStringInput
+  courseName: ModelStringInput
+  company: ModelStringInput
+  mediRequired: ModelBooleanInput
   and: [ModelTrainingReqConditionInput]
   or: [ModelTrainingReqConditionInput]
   not: ModelTrainingReqConditionInput
@@ -2576,14 +2552,14 @@ input CreateTrainingReqInput {
   medicalExpiry: String
   medicalAppointDate: String
   medicalReport: [AWSJSON]
-  purchaseONo: String
-  traineeCourseCode: String
-  traineeCourseName: String
-  traineeCompany: String
   traineeSD: String
   traineeED: String
   traineeStatus: String
   traineeCourseFee: String
+  courseCode: [String]
+  courseName: [String]
+  company: [String]
+  mediRequired: Boolean
 }
 
 input UpdateTrainingReqInput {
@@ -2594,14 +2570,14 @@ input UpdateTrainingReqInput {
   medicalExpiry: String
   medicalAppointDate: String
   medicalReport: [AWSJSON]
-  purchaseONo: String
-  traineeCourseCode: String
-  traineeCourseName: String
-  traineeCompany: String
   traineeSD: String
   traineeED: String
   traineeStatus: String
   traineeCourseFee: String
+  courseCode: [String]
+  courseName: [String]
+  company: [String]
+  mediRequired: Boolean
 }
 
 input DeleteTrainingReqInput {
@@ -2616,14 +2592,14 @@ input ModelSubscriptionTrainingReqFilterInput {
   medicalExpiry: ModelSubscriptionStringInput
   medicalAppointDate: ModelSubscriptionStringInput
   medicalReport: ModelSubscriptionStringInput
-  purchaseONo: ModelSubscriptionStringInput
-  traineeCourseCode: ModelSubscriptionStringInput
-  traineeCourseName: ModelSubscriptionStringInput
-  traineeCompany: ModelSubscriptionStringInput
   traineeSD: ModelSubscriptionStringInput
   traineeED: ModelSubscriptionStringInput
   traineeStatus: ModelSubscriptionStringInput
   traineeCourseFee: ModelSubscriptionStringInput
+  courseCode: ModelSubscriptionStringInput
+  courseName: ModelSubscriptionStringInput
+  company: ModelSubscriptionStringInput
+  mediRequired: ModelSubscriptionBooleanInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionTrainingReqFilterInput]
@@ -2638,13 +2614,12 @@ type ModelTrainingCertificatesConnection @aws_api_key @aws_iam {
 input ModelTrainingCertificatesFilterInput {
   id: ModelIDInput
   empID: ModelStringInput
-  courseCode: ModelStringInput
-  courseName: ModelStringInput
-  company: ModelStringInput
   certifiExpiry: ModelStringInput
   eCertifiDate: ModelStringInput
   trainingUpCertifi: ModelStringInput
   orgiCertifiDate: ModelStringInput
+  poNo: ModelStringInput
+  addDescretion: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelTrainingCertificatesFilterInput]
@@ -2654,13 +2629,12 @@ input ModelTrainingCertificatesFilterInput {
 
 input ModelTrainingCertificatesConditionInput {
   empID: ModelStringInput
-  courseCode: ModelStringInput
-  courseName: ModelStringInput
-  company: ModelStringInput
   certifiExpiry: ModelStringInput
   eCertifiDate: ModelStringInput
   trainingUpCertifi: ModelStringInput
   orgiCertifiDate: ModelStringInput
+  poNo: ModelStringInput
+  addDescretion: ModelStringInput
   and: [ModelTrainingCertificatesConditionInput]
   or: [ModelTrainingCertificatesConditionInput]
   not: ModelTrainingCertificatesConditionInput
@@ -2671,25 +2645,23 @@ input ModelTrainingCertificatesConditionInput {
 input CreateTrainingCertificatesInput {
   id: ID
   empID: String!
-  courseCode: [String]
-  courseName: [String]
-  company: [String]
   certifiExpiry: [String]
   eCertifiDate: [String]
   trainingUpCertifi: [AWSJSON]
   orgiCertifiDate: [String]
+  poNo: [String]
+  addDescretion: [String]
 }
 
 input UpdateTrainingCertificatesInput {
   id: ID!
   empID: String
-  courseCode: [String]
-  courseName: [String]
-  company: [String]
   certifiExpiry: [String]
   eCertifiDate: [String]
   trainingUpCertifi: [AWSJSON]
   orgiCertifiDate: [String]
+  poNo: [String]
+  addDescretion: [String]
 }
 
 input DeleteTrainingCertificatesInput {
@@ -2699,13 +2671,12 @@ input DeleteTrainingCertificatesInput {
 input ModelSubscriptionTrainingCertificatesFilterInput {
   id: ModelSubscriptionIDInput
   empID: ModelSubscriptionStringInput
-  courseCode: ModelSubscriptionStringInput
-  courseName: ModelSubscriptionStringInput
-  company: ModelSubscriptionStringInput
   certifiExpiry: ModelSubscriptionStringInput
   eCertifiDate: ModelSubscriptionStringInput
   trainingUpCertifi: ModelSubscriptionStringInput
   orgiCertifiDate: ModelSubscriptionStringInput
+  poNo: ModelSubscriptionStringInput
+  addDescretion: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionTrainingCertificatesFilterInput]
@@ -3376,6 +3347,7 @@ input ModelWPTrackingFilterInput {
   lbrEndroseDate: ModelStringInput
   lbrDepoAmount: ModelStringInput
   lbrFile: ModelStringInput
+  remarkNLMob: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelWPTrackingFilterInput]
@@ -3432,6 +3404,7 @@ input ModelWPTrackingConditionInput {
   lbrEndroseDate: ModelStringInput
   lbrDepoAmount: ModelStringInput
   lbrFile: ModelStringInput
+  remarkNLMob: ModelStringInput
   and: [ModelWPTrackingConditionInput]
   or: [ModelWPTrackingConditionInput]
   not: ModelWPTrackingConditionInput
@@ -3489,6 +3462,7 @@ input CreateWPTrackingInput {
   lbrEndroseDate: String
   lbrDepoAmount: String
   lbrFile: String
+  remarkNLMob: String
 }
 
 input UpdateWPTrackingInput {
@@ -3541,6 +3515,7 @@ input UpdateWPTrackingInput {
   lbrEndroseDate: String
   lbrDepoAmount: String
   lbrFile: String
+  remarkNLMob: String
 }
 
 input DeleteWPTrackingInput {
@@ -3597,6 +3572,7 @@ input ModelSubscriptionWPTrackingFilterInput {
   lbrEndroseDate: ModelSubscriptionStringInput
   lbrDepoAmount: ModelSubscriptionStringInput
   lbrFile: ModelSubscriptionStringInput
+  remarkNLMob: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionWPTrackingFilterInput]

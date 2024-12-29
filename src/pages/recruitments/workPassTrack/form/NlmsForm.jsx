@@ -4,12 +4,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { uploadDocs } from "../../../../services/uploadDocsS3/UploadDocs";
 import { FileUploadField } from "../../../employees/medicalDep/FileUploadField";
 import { NlmsFormSchema } from "../../../../services/Validation";
-import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPTracking"; 
+import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPTracking";
 import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
 
 export const NlmsForm = ({ candidate }) => {
   const { interviewSchedules } = useFetchCandy();
-  const { wpTrackingDetails, isLoading, notification, error } = useUpdateWPTracking(); // Use the wpTrackingDetails function
+  const { wpTrackingDetails, isLoading, notification, error } =
+    useUpdateWPTracking(); // Use the wpTrackingDetails function
   const [formData, setFormData] = useState({
     interview: {
       id: "",
@@ -19,6 +20,7 @@ export const NlmsForm = ({ candidate }) => {
       nlmsexpirydate: "",
       ldreferenceno: "",
       nlmsfile: "",
+      status: "",
     },
   });
 
@@ -41,58 +43,56 @@ export const NlmsForm = ({ candidate }) => {
 
   const NlmsUpload = watch("nlmsfile");
 
+  useEffect(() => {
+    // Log to see if interviewSchedules has data
+    // console.log("interviewSchedules:", interviewSchedules);
 
-    useEffect(() => {
-      // Log to see if interviewSchedules has data
-      // console.log("interviewSchedules:", interviewSchedules);
-    
-      if (interviewSchedules.length > 0) {
-        // Find the interviewData for the candidate
-        const interviewData = interviewSchedules.find(
-          (data) => data.tempID === candidate.tempID
-        );
-    
-        // Log the found interviewData
-        // console.log("Found interviewData:", interviewData);
-    
-        if (interviewData) {
-          // Set the form data
-          setFormData({
-            interview: {
-              nlmssubmitdate: interviewData.nlmssubmitdate,
-              submissionrefrenceno: interviewData.submissionrefrenceno,
-              nlmsapprovedate: interviewData.nlmsapprovedate,
-              nlmsexpirydate: interviewData.nlmsexpirydate,
-              ldreferenceno: interviewData.ldreferenceno,
-              nlmsfile: interviewData.nlmsfile,
-            },
-          });
-          // console.log("Form data set:", {
-          //   nlmssubmitdate: interviewData.nlmssubmitdate,
-          //   submissionrefrenceno: interviewData.submissionrefrenceno,
-          //   nlmsapprovedate: interviewData.nlmsapprovedate,
-          //   nlmsexpirydate: interviewData.nlmsexpirydate,
-          //   ldreferenceno: interviewData.ldreferenceno,
-          //   nlmsfile: interviewData.nlmsfile,
-          // });
-    
-          // Check if sawpFile exists and update the file names
-          if (interviewData.nlmsfile) {
-            const fileName = extractFileName(interviewData.nlmsfile);
-            setUploadedFileNames((prev) => ({
-              ...prev,
-              nlmsFile: fileName,
-            }));
-            console.log("Uploaded file name set:", fileName);
-          }
-        } else {
-          console.log("No interviewData found for candidate:", candidate.tempID);
+    if (interviewSchedules.length > 0) {
+      // Find the interviewData for the candidate
+      const interviewData = interviewSchedules.find(
+        (data) => data.tempID === candidate.tempID
+      );
+
+      // Log the found interviewData
+      // console.log("Found interviewData:", interviewData);
+
+      if (interviewData) {
+        // Set the form data
+        setFormData({
+          interview: {
+            nlmssubmitdate: interviewData.nlmssubmitdate,
+            submissionrefrenceno: interviewData.submissionrefrenceno,
+            nlmsapprovedate: interviewData.nlmsapprovedate,
+            nlmsexpirydate: interviewData.nlmsexpirydate,
+            ldreferenceno: interviewData.ldreferenceno,
+            nlmsfile: interviewData.nlmsfile,
+          },
+        });
+        // console.log("Form data set:", {
+        //   nlmssubmitdate: interviewData.nlmssubmitdate,
+        //   submissionrefrenceno: interviewData.submissionrefrenceno,
+        //   nlmsapprovedate: interviewData.nlmsapprovedate,
+        //   nlmsexpirydate: interviewData.nlmsexpirydate,
+        //   ldreferenceno: interviewData.ldreferenceno,
+        //   nlmsfile: interviewData.nlmsfile,
+        // });
+
+        // Check if sawpFile exists and update the file names
+        if (interviewData.nlmsfile) {
+          const fileName = extractFileName(interviewData.nlmsfile);
+          setUploadedFileNames((prev) => ({
+            ...prev,
+            nlmsFile: fileName,
+          }));
+          console.log("Uploaded file name set:", fileName);
         }
       } else {
-        console.log("No interview schedules available.");
+        console.log("No interviewData found for candidate:", candidate.tempID);
       }
-    }, [interviewSchedules, candidate.tempID]);
-
+    } else {
+      console.log("No interview schedules available.");
+    }
+  }, [interviewSchedules, candidate.tempID]);
 
   useEffect(() => {
     // Debugging log to track formData state
@@ -137,22 +137,22 @@ export const NlmsForm = ({ candidate }) => {
   // Handle form submission and use wpTrackingDetails for update
   const handleSubmitTwo = async (data) => {
     data.preventDefault();
-  
+
     const selectedInterviewData = interviewSchedules.find(
       (data) => data.tempID === candidate?.tempID
     );
     const interviewScheduleId = selectedInterviewData?.id;
-  
+
     // console.log("Selected Interview Data:", selectedInterviewData);
     // console.log("Interview Schedule ID:", interviewScheduleId);
     // console.log("Form Data before submission:", formData);
     // console.log("Uploaded Nlms File:", uploadedNlms.nlmsFile);
-  
+
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
       return;
     }
-  
+
     try {
       const response = await wpTrackingDetails({
         WPTrackingValue: {
@@ -162,16 +162,15 @@ export const NlmsForm = ({ candidate }) => {
           nlmsapprovedate: formData.interview.nlmsapprovedate,
           nlmsexpirydate: formData.interview.nlmsexpirydate,
           ldreferenceno: formData.interview.ldreferenceno,
-          nlmsfile: uploadedNlms.nlmsFile ? uploadedNlms.nlmsFile : "", 
+          nlmsfile: uploadedNlms.nlmsFile ? uploadedNlms.nlmsFile : "",
         },
       });
-      
+
       // console.log("WPTracking response:", response);
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }
   };
-  
 
   return (
     <form onSubmit={handleSubmitTwo} className="p-5">
@@ -190,7 +189,9 @@ export const NlmsForm = ({ candidate }) => {
           />
         </div>
         <div>
-          <label htmlFor="submissionrefrenceno">Submission Reference Number</label>
+          <label htmlFor="submissionrefrenceno">
+            Submission Reference Number
+          </label>
           <input
             className="w-full border p-2 rounded mt-1"
             type="text"
@@ -236,9 +237,7 @@ export const NlmsForm = ({ candidate }) => {
             id="ldreferenceno"
             {...register("ldreferenceno")}
             value={formData.interview.ldreferenceno}
-            onChange={(e) =>
-              handleInputChange("ldreferenceno", e.target.value)
-            }
+            onChange={(e) => handleInputChange("ldreferenceno", e.target.value)}
           />
         </div>
 
@@ -250,10 +249,23 @@ export const NlmsForm = ({ candidate }) => {
               onChangeFunc={(e) => handleFileChange(e, "nlmsfile")}
               accept="application/pdf"
               register={register}
-              fileName={uploadedFileNames.nlmsFile || extractFileName(NlmsUpload)}
+              fileName={
+                uploadedFileNames.nlmsFile || extractFileName(NlmsUpload)
+              }
               value={formData.interview.nlmsfile}
             />
           </div>
+        </div>
+        <div>
+          <label htmlFor="status">Status</label>
+          <input
+            className="w-full border p-2 rounded mt-1"
+            type="text"
+            id="status"
+            {...register("status")}
+            value={formData.interview.status}
+            onChange={(e) => handleInputChange("status", e.target.value)}
+          />
         </div>
       </div>
 

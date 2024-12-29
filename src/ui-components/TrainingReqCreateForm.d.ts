@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, SwitchFieldProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -28,14 +28,14 @@ export declare type TrainingReqCreateFormInputValues = {
     medicalExpiry?: string;
     medicalAppointDate?: string;
     medicalReport?: string[];
-    purchaseONo?: string;
-    traineeCourseCode?: string;
-    traineeCourseName?: string;
-    traineeCompany?: string;
     traineeSD?: string;
     traineeED?: string;
     traineeStatus?: string;
     traineeCourseFee?: string;
+    courseCode?: string[];
+    courseName?: string[];
+    company?: string[];
+    mediRequired?: boolean;
 };
 export declare type TrainingReqCreateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -44,14 +44,14 @@ export declare type TrainingReqCreateFormValidationValues = {
     medicalExpiry?: ValidationFunction<string>;
     medicalAppointDate?: ValidationFunction<string>;
     medicalReport?: ValidationFunction<string>;
-    purchaseONo?: ValidationFunction<string>;
-    traineeCourseCode?: ValidationFunction<string>;
-    traineeCourseName?: ValidationFunction<string>;
-    traineeCompany?: ValidationFunction<string>;
     traineeSD?: ValidationFunction<string>;
     traineeED?: ValidationFunction<string>;
     traineeStatus?: ValidationFunction<string>;
     traineeCourseFee?: ValidationFunction<string>;
+    courseCode?: ValidationFunction<string>;
+    courseName?: ValidationFunction<string>;
+    company?: ValidationFunction<string>;
+    mediRequired?: ValidationFunction<boolean>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type TrainingReqCreateFormOverridesProps = {
@@ -62,14 +62,14 @@ export declare type TrainingReqCreateFormOverridesProps = {
     medicalExpiry?: PrimitiveOverrideProps<TextFieldProps>;
     medicalAppointDate?: PrimitiveOverrideProps<TextFieldProps>;
     medicalReport?: PrimitiveOverrideProps<TextAreaFieldProps>;
-    purchaseONo?: PrimitiveOverrideProps<TextFieldProps>;
-    traineeCourseCode?: PrimitiveOverrideProps<TextFieldProps>;
-    traineeCourseName?: PrimitiveOverrideProps<TextFieldProps>;
-    traineeCompany?: PrimitiveOverrideProps<TextFieldProps>;
     traineeSD?: PrimitiveOverrideProps<TextFieldProps>;
     traineeED?: PrimitiveOverrideProps<TextFieldProps>;
     traineeStatus?: PrimitiveOverrideProps<TextFieldProps>;
     traineeCourseFee?: PrimitiveOverrideProps<TextFieldProps>;
+    courseCode?: PrimitiveOverrideProps<TextFieldProps>;
+    courseName?: PrimitiveOverrideProps<TextFieldProps>;
+    company?: PrimitiveOverrideProps<TextFieldProps>;
+    mediRequired?: PrimitiveOverrideProps<SwitchFieldProps>;
 } & EscapeHatchProps;
 export declare type TrainingReqCreateFormProps = React.PropsWithChildren<{
     overrides?: TrainingReqCreateFormOverridesProps | undefined | null;

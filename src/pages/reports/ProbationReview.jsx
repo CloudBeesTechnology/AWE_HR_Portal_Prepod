@@ -127,7 +127,7 @@ export const ProbationReview = ({ allData, typeOfReport, reportTitle }) => {
                 <img className="max-w-[200px] " src={logo} alt="Logo" />
               </div>
               <button
-                className=" text-[24px] rounded"
+                className="text-[24px] rounded"
                 onClick={closeModal}
               >
                 <VscClose/>

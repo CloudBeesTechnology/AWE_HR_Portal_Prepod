@@ -71,6 +71,7 @@ export default function WPTrackingCreateForm(props) {
     lbrEndroseDate: "",
     lbrDepoAmount: "",
     lbrFile: "",
+    remarkNLMob: "",
   };
   const [tempID, setTempID] = React.useState(initialValues.tempID);
   const [supportletterReqDate, setSupportletterReqDate] = React.useState(
@@ -177,6 +178,9 @@ export default function WPTrackingCreateForm(props) {
     initialValues.lbrDepoAmount
   );
   const [lbrFile, setLbrFile] = React.useState(initialValues.lbrFile);
+  const [remarkNLMob, setRemarkNLMob] = React.useState(
+    initialValues.remarkNLMob
+  );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setTempID(initialValues.tempID);
@@ -227,6 +231,7 @@ export default function WPTrackingCreateForm(props) {
     setLbrEndroseDate(initialValues.lbrEndroseDate);
     setLbrDepoAmount(initialValues.lbrDepoAmount);
     setLbrFile(initialValues.lbrFile);
+    setRemarkNLMob(initialValues.remarkNLMob);
     setErrors({});
   };
   const validations = {
@@ -278,6 +283,7 @@ export default function WPTrackingCreateForm(props) {
     lbrEndroseDate: [],
     lbrDepoAmount: [],
     lbrFile: [],
+    remarkNLMob: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -353,6 +359,7 @@ export default function WPTrackingCreateForm(props) {
           lbrEndroseDate,
           lbrDepoAmount,
           lbrFile,
+          remarkNLMob,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -463,6 +470,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.tempID ?? value;
@@ -534,6 +542,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.supportletterReqDate ?? value;
@@ -607,6 +616,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.supportletterReceiveDate ?? value;
@@ -683,6 +693,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.letterfile ?? value;
@@ -754,6 +765,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.doesubmitdate ?? value;
@@ -825,6 +837,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.doeapprovedate ?? value;
@@ -896,6 +909,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.doeexpirydate ?? value;
@@ -967,6 +981,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.doefile ?? value;
@@ -1038,6 +1053,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.nlmssubmitdate ?? value;
@@ -1109,6 +1125,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.submissionrefrenceno ?? value;
@@ -1182,6 +1199,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.nlmsapprovedate ?? value;
@@ -1253,6 +1271,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.ldreferenceno ?? value;
@@ -1324,6 +1343,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.nlmsexpirydate ?? value;
@@ -1395,6 +1415,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.nlmsfile ?? value;
@@ -1466,6 +1487,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.bgsubmitdate ?? value;
@@ -1537,6 +1559,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.bgreceivedate ?? value;
@@ -1608,6 +1631,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.referenceno ?? value;
@@ -1679,6 +1703,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.bgamount ?? value;
@@ -1750,6 +1775,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.bgexpirydate ?? value;
@@ -1821,6 +1847,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.bgfile ?? value;
@@ -1892,6 +1919,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.tbapurchasedate ?? value;
@@ -1963,6 +1991,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.jitpaamount ?? value;
@@ -2034,6 +2063,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.jitpaexpirydate ?? value;
@@ -2105,6 +2135,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.receiptno ?? value;
@@ -2176,6 +2207,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.depositamount ?? value;
@@ -2247,6 +2279,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.submitdateendorsement ?? value;
@@ -2320,6 +2353,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.jitpafile ?? value;
@@ -2391,6 +2425,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.immbdno ?? value;
@@ -2462,6 +2497,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.docsubmitdate ?? value;
@@ -2533,6 +2569,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.visaapprovedate ?? value;
@@ -2604,6 +2641,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.visareferenceno ?? value;
@@ -2675,6 +2713,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.visaFile ?? value;
@@ -2746,6 +2785,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.departuredate ?? value;
@@ -2817,6 +2857,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.arrivaldate ?? value;
@@ -2888,6 +2929,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.cityname ?? value;
@@ -2959,6 +3001,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.airfare ?? value;
@@ -3030,6 +3073,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.airticketfile ?? value;
@@ -3101,6 +3145,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.agentname ?? value;
@@ -3172,6 +3217,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.mobSignDate ?? value;
@@ -3243,6 +3289,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.mobFile ?? value;
@@ -3314,6 +3361,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.doerefno ?? value;
@@ -3385,6 +3433,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.sawpDate ?? value;
@@ -3456,6 +3505,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.sawpRecivedDate ?? value;
@@ -3527,6 +3577,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.sawpFile ?? value;
@@ -3598,6 +3649,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.lbrDepoNum ?? value;
@@ -3669,6 +3721,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate: value,
               lbrDepoAmount,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.lbrEndroseDate ?? value;
@@ -3740,6 +3793,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount: value,
               lbrFile,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.lbrDepoAmount ?? value;
@@ -3811,6 +3865,7 @@ export default function WPTrackingCreateForm(props) {
               lbrEndroseDate,
               lbrDepoAmount,
               lbrFile: value,
+              remarkNLMob,
             };
             const result = onChange(modelFields);
             value = result?.lbrFile ?? value;
@@ -3824,6 +3879,78 @@ export default function WPTrackingCreateForm(props) {
         errorMessage={errors.lbrFile?.errorMessage}
         hasError={errors.lbrFile?.hasError}
         {...getOverrideProps(overrides, "lbrFile")}
+      ></TextField>
+      <TextField
+        label="Remark nl mob"
+        isRequired={false}
+        isReadOnly={false}
+        value={remarkNLMob}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              tempID,
+              supportletterReqDate,
+              supportletterReceiveDate,
+              letterfile,
+              doesubmitdate,
+              doeapprovedate,
+              doeexpirydate,
+              doefile,
+              nlmssubmitdate,
+              submissionrefrenceno,
+              nlmsapprovedate,
+              ldreferenceno,
+              nlmsexpirydate,
+              nlmsfile,
+              bgsubmitdate,
+              bgreceivedate,
+              referenceno,
+              bgamount,
+              bgexpirydate,
+              bgfile,
+              tbapurchasedate,
+              jitpaamount,
+              jitpaexpirydate,
+              receiptno,
+              depositamount,
+              submitdateendorsement,
+              jitpafile,
+              immbdno,
+              docsubmitdate,
+              visaapprovedate,
+              visareferenceno,
+              visaFile,
+              departuredate,
+              arrivaldate,
+              cityname,
+              airfare,
+              airticketfile,
+              agentname,
+              mobSignDate,
+              mobFile,
+              doerefno,
+              sawpDate,
+              sawpRecivedDate,
+              sawpFile,
+              lbrDepoNum,
+              lbrEndroseDate,
+              lbrDepoAmount,
+              lbrFile,
+              remarkNLMob: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.remarkNLMob ?? value;
+          }
+          if (errors.remarkNLMob?.hasError) {
+            runValidationTasks("remarkNLMob", value);
+          }
+          setRemarkNLMob(value);
+        }}
+        onBlur={() => runValidationTasks("remarkNLMob", remarkNLMob)}
+        errorMessage={errors.remarkNLMob?.errorMessage}
+        hasError={errors.remarkNLMob?.hasError}
+        {...getOverrideProps(overrides, "remarkNLMob")}
       ></TextField>
       <Flex
         justifyContent="space-between"

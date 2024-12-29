@@ -193,12 +193,8 @@ export default function WeldingInfoUpdateForm(props) {
   } = props;
   const initialValues = {
     empID: "",
-    department: "",
     diameterRange: "",
-    empBadgeNo: "",
-    empName: "",
     fillerMetal: "",
-    position: "",
     thicknessRange: "",
     weldingStampNor: "",
     wpsNumber: "",
@@ -212,16 +208,12 @@ export default function WeldingInfoUpdateForm(props) {
     weldingMaterial: "",
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
-  const [department, setDepartment] = React.useState(initialValues.department);
   const [diameterRange, setDiameterRange] = React.useState(
     initialValues.diameterRange
   );
-  const [empBadgeNo, setEmpBadgeNo] = React.useState(initialValues.empBadgeNo);
-  const [empName, setEmpName] = React.useState(initialValues.empName);
   const [fillerMetal, setFillerMetal] = React.useState(
     initialValues.fillerMetal
   );
-  const [position, setPosition] = React.useState(initialValues.position);
   const [thicknessRange, setThicknessRange] = React.useState(
     initialValues.thicknessRange
   );
@@ -253,12 +245,8 @@ export default function WeldingInfoUpdateForm(props) {
       ? { ...initialValues, ...weldingInfoRecord }
       : initialValues;
     setEmpID(cleanValues.empID);
-    setDepartment(cleanValues.department);
     setDiameterRange(cleanValues.diameterRange);
-    setEmpBadgeNo(cleanValues.empBadgeNo);
-    setEmpName(cleanValues.empName);
     setFillerMetal(cleanValues.fillerMetal);
-    setPosition(cleanValues.position);
     setThicknessRange(cleanValues.thicknessRange);
     setWeldingStampNor(cleanValues.weldingStampNor);
     setWpsNumber(cleanValues.wpsNumber);
@@ -295,12 +283,8 @@ export default function WeldingInfoUpdateForm(props) {
   const weldingUploadRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
-    department: [],
     diameterRange: [],
-    empBadgeNo: [],
-    empName: [],
     fillerMetal: [],
-    position: [],
     thicknessRange: [],
     weldingStampNor: [],
     wpsNumber: [],
@@ -340,12 +324,8 @@ export default function WeldingInfoUpdateForm(props) {
         event.preventDefault();
         let modelFields = {
           empID,
-          department: department ?? null,
           diameterRange: diameterRange ?? null,
-          empBadgeNo: empBadgeNo ?? null,
-          empName: empName ?? null,
           fillerMetal: fillerMetal ?? null,
-          position: position ?? null,
           thicknessRange: thicknessRange ?? null,
           weldingStampNor: weldingStampNor ?? null,
           wpsNumber: wpsNumber ?? null,
@@ -418,12 +398,8 @@ export default function WeldingInfoUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               empID: value,
-              department,
               diameterRange,
-              empBadgeNo,
-              empName,
               fillerMetal,
-              position,
               thicknessRange,
               weldingStampNor,
               wpsNumber,
@@ -450,47 +426,6 @@ export default function WeldingInfoUpdateForm(props) {
         {...getOverrideProps(overrides, "empID")}
       ></TextField>
       <TextField
-        label="Department"
-        isRequired={false}
-        isReadOnly={false}
-        value={department}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              empID,
-              department: value,
-              diameterRange,
-              empBadgeNo,
-              empName,
-              fillerMetal,
-              position,
-              thicknessRange,
-              weldingStampNor,
-              wpsNumber,
-              weldingProcess,
-              weldingPosition,
-              WQExpiry,
-              WQRemarks,
-              weldingUpload,
-              WQRNo,
-              weldingCode,
-              weldingMaterial,
-            };
-            const result = onChange(modelFields);
-            value = result?.department ?? value;
-          }
-          if (errors.department?.hasError) {
-            runValidationTasks("department", value);
-          }
-          setDepartment(value);
-        }}
-        onBlur={() => runValidationTasks("department", department)}
-        errorMessage={errors.department?.errorMessage}
-        hasError={errors.department?.hasError}
-        {...getOverrideProps(overrides, "department")}
-      ></TextField>
-      <TextField
         label="Diameter range"
         isRequired={false}
         isReadOnly={false}
@@ -500,12 +435,8 @@ export default function WeldingInfoUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               empID,
-              department,
               diameterRange: value,
-              empBadgeNo,
-              empName,
               fillerMetal,
-              position,
               thicknessRange,
               weldingStampNor,
               wpsNumber,
@@ -532,88 +463,6 @@ export default function WeldingInfoUpdateForm(props) {
         {...getOverrideProps(overrides, "diameterRange")}
       ></TextField>
       <TextField
-        label="Emp badge no"
-        isRequired={false}
-        isReadOnly={false}
-        value={empBadgeNo}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              empID,
-              department,
-              diameterRange,
-              empBadgeNo: value,
-              empName,
-              fillerMetal,
-              position,
-              thicknessRange,
-              weldingStampNor,
-              wpsNumber,
-              weldingProcess,
-              weldingPosition,
-              WQExpiry,
-              WQRemarks,
-              weldingUpload,
-              WQRNo,
-              weldingCode,
-              weldingMaterial,
-            };
-            const result = onChange(modelFields);
-            value = result?.empBadgeNo ?? value;
-          }
-          if (errors.empBadgeNo?.hasError) {
-            runValidationTasks("empBadgeNo", value);
-          }
-          setEmpBadgeNo(value);
-        }}
-        onBlur={() => runValidationTasks("empBadgeNo", empBadgeNo)}
-        errorMessage={errors.empBadgeNo?.errorMessage}
-        hasError={errors.empBadgeNo?.hasError}
-        {...getOverrideProps(overrides, "empBadgeNo")}
-      ></TextField>
-      <TextField
-        label="Emp name"
-        isRequired={false}
-        isReadOnly={false}
-        value={empName}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              empID,
-              department,
-              diameterRange,
-              empBadgeNo,
-              empName: value,
-              fillerMetal,
-              position,
-              thicknessRange,
-              weldingStampNor,
-              wpsNumber,
-              weldingProcess,
-              weldingPosition,
-              WQExpiry,
-              WQRemarks,
-              weldingUpload,
-              WQRNo,
-              weldingCode,
-              weldingMaterial,
-            };
-            const result = onChange(modelFields);
-            value = result?.empName ?? value;
-          }
-          if (errors.empName?.hasError) {
-            runValidationTasks("empName", value);
-          }
-          setEmpName(value);
-        }}
-        onBlur={() => runValidationTasks("empName", empName)}
-        errorMessage={errors.empName?.errorMessage}
-        hasError={errors.empName?.hasError}
-        {...getOverrideProps(overrides, "empName")}
-      ></TextField>
-      <TextField
         label="Filler metal"
         isRequired={false}
         isReadOnly={false}
@@ -623,12 +472,8 @@ export default function WeldingInfoUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               empID,
-              department,
               diameterRange,
-              empBadgeNo,
-              empName,
               fillerMetal: value,
-              position,
               thicknessRange,
               weldingStampNor,
               wpsNumber,
@@ -655,47 +500,6 @@ export default function WeldingInfoUpdateForm(props) {
         {...getOverrideProps(overrides, "fillerMetal")}
       ></TextField>
       <TextField
-        label="Position"
-        isRequired={false}
-        isReadOnly={false}
-        value={position}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              empID,
-              department,
-              diameterRange,
-              empBadgeNo,
-              empName,
-              fillerMetal,
-              position: value,
-              thicknessRange,
-              weldingStampNor,
-              wpsNumber,
-              weldingProcess,
-              weldingPosition,
-              WQExpiry,
-              WQRemarks,
-              weldingUpload,
-              WQRNo,
-              weldingCode,
-              weldingMaterial,
-            };
-            const result = onChange(modelFields);
-            value = result?.position ?? value;
-          }
-          if (errors.position?.hasError) {
-            runValidationTasks("position", value);
-          }
-          setPosition(value);
-        }}
-        onBlur={() => runValidationTasks("position", position)}
-        errorMessage={errors.position?.errorMessage}
-        hasError={errors.position?.hasError}
-        {...getOverrideProps(overrides, "position")}
-      ></TextField>
-      <TextField
         label="Thickness range"
         isRequired={false}
         isReadOnly={false}
@@ -705,12 +509,8 @@ export default function WeldingInfoUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               empID,
-              department,
               diameterRange,
-              empBadgeNo,
-              empName,
               fillerMetal,
-              position,
               thicknessRange: value,
               weldingStampNor,
               wpsNumber,
@@ -746,12 +546,8 @@ export default function WeldingInfoUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               empID,
-              department,
               diameterRange,
-              empBadgeNo,
-              empName,
               fillerMetal,
-              position,
               thicknessRange,
               weldingStampNor: value,
               wpsNumber,
@@ -787,12 +583,8 @@ export default function WeldingInfoUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               empID,
-              department,
               diameterRange,
-              empBadgeNo,
-              empName,
               fillerMetal,
-              position,
               thicknessRange,
               weldingStampNor,
               wpsNumber: value,
@@ -828,12 +620,8 @@ export default function WeldingInfoUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               empID,
-              department,
               diameterRange,
-              empBadgeNo,
-              empName,
               fillerMetal,
-              position,
               thicknessRange,
               weldingStampNor,
               wpsNumber,
@@ -869,12 +657,8 @@ export default function WeldingInfoUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               empID,
-              department,
               diameterRange,
-              empBadgeNo,
-              empName,
               fillerMetal,
-              position,
               thicknessRange,
               weldingStampNor,
               wpsNumber,
@@ -910,12 +694,8 @@ export default function WeldingInfoUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               empID,
-              department,
               diameterRange,
-              empBadgeNo,
-              empName,
               fillerMetal,
-              position,
               thicknessRange,
               weldingStampNor,
               wpsNumber,
@@ -951,12 +731,8 @@ export default function WeldingInfoUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               empID,
-              department,
               diameterRange,
-              empBadgeNo,
-              empName,
               fillerMetal,
-              position,
               thicknessRange,
               weldingStampNor,
               wpsNumber,
@@ -988,12 +764,8 @@ export default function WeldingInfoUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               empID,
-              department,
               diameterRange,
-              empBadgeNo,
-              empName,
               fillerMetal,
-              position,
               thicknessRange,
               weldingStampNor,
               wpsNumber,
@@ -1056,12 +828,8 @@ export default function WeldingInfoUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               empID,
-              department,
               diameterRange,
-              empBadgeNo,
-              empName,
               fillerMetal,
-              position,
               thicknessRange,
               weldingStampNor,
               wpsNumber,
@@ -1097,12 +865,8 @@ export default function WeldingInfoUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               empID,
-              department,
               diameterRange,
-              empBadgeNo,
-              empName,
               fillerMetal,
-              position,
               thicknessRange,
               weldingStampNor,
               wpsNumber,
@@ -1138,12 +902,8 @@ export default function WeldingInfoUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               empID,
-              department,
               diameterRange,
-              empBadgeNo,
-              empName,
               fillerMetal,
-              position,
               thicknessRange,
               weldingStampNor,
               wpsNumber,

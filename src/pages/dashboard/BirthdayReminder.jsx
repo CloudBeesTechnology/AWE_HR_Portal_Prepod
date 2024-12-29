@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { format } from "date-fns";
 import { IoPersonCircleOutline } from "react-icons/io5";
 import { DataSupply } from '../../utils/DataStoredContext';
+import { VscClose } from 'react-icons/vsc';
 
 export const BirthdayReminder = () => {
   const { empPIData } = useContext(DataSupply);
@@ -37,7 +38,7 @@ export const BirthdayReminder = () => {
   }, [empPIData]);
 
   return (
-    <div className="max-w-md w-full shadow-md rounded-2xl h-full bg-white">
+    <div className="max-w-md w-full shadow-md rounded-2xl h-full bg-white ">
       <div className="bg-lite_grey p-4 rounded-t-2xl">
         <h2 className="text-lg font-semibold">Birthday Reminder</h2>
       </div>
@@ -66,27 +67,30 @@ export const BirthdayReminder = () => {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h2 className="text-lg font-semibold mb-4">All Birthdays Today</h2>
+        <div className="fixed inset-0 center z-50 bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg p-6 max-w-4xl w-full h-[550px] overflow-y-auto scrollBar ">
+           <div className='flex justify-between items-center mb-5'>
+           <h2 className="text-lg font-semibold ">All Birthdays Today</h2>
+            <button
+              onClick={() => setShowModal(false)}
+              className="text-[24px] rounded "
+            >
+              <VscClose/>
+            </button>
+           </div>
+            <div className='grid grid-cols-2 gap-5'>
             {birthdays.map((person, index) => (
-              <div key={index} className="flex items-center space-x-3 bg-[#F5F7FB] p-2 rounded-md shadow-sm mb-2">
+              <div key={index} className="flex justify-between flex-wrap items-center space-x-3 bg-[#F5F7FB] p-2 rounded-md shadow-sm mb-2 gap-5">
                 <p className="w-10 h-10 text-[50px] rounded-full center"><IoPersonCircleOutline /></p>
                 <div>
                   <p className="text-[14px] font-semibold">{person.name}</p>
                   <p className="text-[10px] text-grey">{person.message || "Happy Birthday!"}</p>
                   <p className="text-[10px] text-grey">{format(new Date(person.dob), 'MMMM dd')}</p>
                 </div>
-              </div>
+                </div>
             ))}
-           <div className='center'>
-           <button
-              onClick={() => setShowModal(false)}
-              className="primary_btn mt-4"
-            >
-              Close
-            </button>
-           </div>
+            </div>
+         
           </div>
         </div>
       )}

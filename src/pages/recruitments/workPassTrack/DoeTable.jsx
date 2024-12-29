@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { RiFileEditLine } from "react-icons/ri";
 import { StatusForm } from "./StatusForm";
 import { ReviewForm } from "../ReviewForm";
+import { WorkpassForm } from "./WorkpassForm";
 
 export const DoeTable = ({ data, formatDate }) => {
   const [isFormVisible, setIsFormVisible] = useState(false);
@@ -97,11 +98,11 @@ export const DoeTable = ({ data, formatDate }) => {
         <ReviewForm
           candidate={selectedCandi}
           onClose={handleShowReviewForm}
-          showDecisionButtons={true}
+      
         />
       )}
       {isFormVisible && (
-        <StatusForm
+        <WorkpassForm
           candidate={selectedCandi}
           //   onSave={handleFormSave}
           onClose={handleShowForm}

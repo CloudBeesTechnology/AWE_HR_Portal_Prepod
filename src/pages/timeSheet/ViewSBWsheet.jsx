@@ -26,7 +26,7 @@ import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
 import { MergeTableForNotification } from "./customTimeSheet/MergeTableForNotification";
 import { Notification } from "./customTimeSheet/Notification";
 import { sendEmail } from "../../services/EmailServices";
-import { listTimeSheets } from "../../graphql/queries";
+import { listEmpWorkInfos, listTimeSheets } from "../../graphql/queries";
 const client = generateClient();
 export const ViewSBWsheet = ({
   excelData,
@@ -74,7 +74,20 @@ export const ViewSBWsheet = ({
       console.error("Error fetching user data:", error);
     }
   };
-
+  useEffect(()=>{
+    const fetchWorkInfo = async () => {
+      // Fetch the BLNG data using GraphQL
+      const [empWorkInfos] = await Promise.all([
+        client.graphql({
+          query: listEmpWorkInfos,
+        }),
+      ]);
+      const workInfo = empWorkInfos?.data?.listEmpWorkInfos?.items;
+      console.log(workInfo)
+    }
+      fetchWorkInfo();
+  },[])
+  // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
   // useEffect(() => {
   //   if (excelData) {
   //     const fetchData = async () => {

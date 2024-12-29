@@ -70,6 +70,7 @@ export declare type WPTrackingUpdateFormInputValues = {
     lbrEndroseDate?: string;
     lbrDepoAmount?: string;
     lbrFile?: string;
+    remarkNLMob?: string;
 };
 export declare type WPTrackingUpdateFormValidationValues = {
     tempID?: ValidationFunction<string>;
@@ -120,6 +121,7 @@ export declare type WPTrackingUpdateFormValidationValues = {
     lbrEndroseDate?: ValidationFunction<string>;
     lbrDepoAmount?: ValidationFunction<string>;
     lbrFile?: ValidationFunction<string>;
+    remarkNLMob?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type WPTrackingUpdateFormOverridesProps = {
@@ -172,6 +174,7 @@ export declare type WPTrackingUpdateFormOverridesProps = {
     lbrEndroseDate?: PrimitiveOverrideProps<TextFieldProps>;
     lbrDepoAmount?: PrimitiveOverrideProps<TextFieldProps>;
     lbrFile?: PrimitiveOverrideProps<TextFieldProps>;
+    remarkNLMob?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type WPTrackingUpdateFormProps = React.PropsWithChildren<{
     overrides?: WPTrackingUpdateFormOverridesProps | undefined | null;

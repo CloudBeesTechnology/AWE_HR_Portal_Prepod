@@ -1,17 +1,17 @@
+
 import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { DataSupply } from "../../utils/DataStoredContext";
 
-
 export const Round = () => {
-  const { empPIData, IDData } = useContext(DataSupply);
+  const { empPIData, IDData ,hiringData} = useContext(DataSupply);
+console.log(hiringData);
 
   const [mergeData, setMergeData] = useState([]);
   const [bruneianCount, setBruneianCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [LPACount, setLPACount] = useState(0);
   const [SAWPCount, setSAWPCount] = useState(0);
-  
   
   const calculateCounts = () => {
     try {
@@ -48,49 +48,50 @@ export const Round = () => {
   }, []);
 
   return (
-    <div className="flex justify-center h-full max-w-[500px] p-2 w-full ">
-    <div className="rounded-lg shadow-md w-full h-full">
+    <div className="flex justify-center h-full p-2 w-full">
+    <div className="rounded-lg shadow-md w-full ">
       <div className=" font-semibold p-3">
         <h2 className=" mx-2">Application Received</h2>
       </div>
        
-      <div className="flex justify-evenly items-center flex-wrap h-full">
-       <div
-          className="rounded-lg shadow-lg flex items-center h-[120px] w-[150px] "
-        >
-            <div className="w-1 h-16 mr-4 rounded-md bg-[#B17A7A] border-[#B17A7A]"></div>
-            <div className="text-center flex justify-center items-center flex-col">
-              <h1 className="text-3xl font-bold">{totalCount}</h1>
+       <div className=" h-full flex flex-col  items-center gap-16 mt-5 p-1">
+       <div className="w-full flex justify-evenly items-center gap-2">
+       <div className="rounded-lg shadow-lg flex items-center h-[140px] w-[180px] border border-lite_grey">
+            <div className="w-2 h-32  rounded-md bg-[#6E349E]"></div>
+            <div className="w-full flex justify-center items-center flex-col m-1">
               <p className="text-sm font-medium">Marker Fitter</p>
-            </div>     
-        </div>
-
-        <div className="rounded-lg shadow-lg flex items-center justify-between  h-[120px] w-[150px] ">
-            <div className="w-1 h-16 rounded-md bg-[#91A672] border-[#91A672]"></div>
-            <div  className="text-start  w-full  pl-16">
-              <h1 className="text-3xl font-bold">{LPACount}</h1>
-              <p className="text-sm font-medium">Welder</p>
-            </div>
-          </div>
-
-          <div
-          className="rounded-lg shadow-lg flex items-center   h-[120px] w-[150px] "
-        >
-            <div className="w-1 h-16 mr-4 border rounded-md bg-[#B17A7A] border-[#B17A7A]"></div>
-            <div className="text-center flex justify-center items-center flex-col">
               <h1 className="text-3xl font-bold">{totalCount}</h1>
-              <p className="text-sm font-medium">Marker Fitter</p>
-            </div>     
-        </div>
+            </div>   
+            </div>  
 
-        <div className="rounded-lg shadow-lg flex items-center  h-[120px] w-[150px] ">
-            <div className="w-1 h-16 mr-4 border rounded-md bg-[#91A672] border-[#91A672]"></div>
-            <div  className="text-center flex justify-center items-center flex-col">
-              <h1 className="text-3xl font-bold">{LPACount}</h1>
+        <div className="rounded-lg shadow-lg flex items-center justify-between h-[140px] w-[180px] border border-lite_grey">
+            <div className="w-2 h-32  rounded-md bg-[#F1A924]"></div>
+            <div  className="w-full flex justify-center items-center flex-col m-1">
               <p className="text-sm font-medium">Welder</p>
+              <h1 className="text-3xl font-bold">{LPACount}</h1>
             </div>
           </div>
        </div>
+
+         <div className="w-full flex justify-evenly items-center gap-2 ">
+         <div className="rounded-lg shadow-lg flex items-center h-[140px] w-[180px] border border-lite_grey">
+         <div className="w-2 h-32 rounded-md bg-[#E61A1A]"></div>
+            <div className="w-full  flex justify-center items-center flex-col m-1">
+              <p className="text-sm font-medium">Blasting/Painter</p>
+              <h1 className="text-3xl font-bold">{totalCount}</h1>
+            </div>     
+        </div>
+
+        <div className="rounded-lg shadow-lg flex items-center justify-between h-[140px] w-[180px] border border-lite_grey ">
+        <div className="w-2 h-32 rounded-md bg-[#17C900] "></div>
+            <div  className="w-full flex justify-center items-center flex-col m-1">
+              <p className="text-sm font-medium">Trainer</p>
+              <h1 className="text-3xl font-bold">{LPACount}</h1>
+            </div>
+          </div>
+         </div>
+       </div>
+       
       </div>
     </div>
   );

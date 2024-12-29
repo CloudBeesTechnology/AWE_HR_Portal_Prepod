@@ -49,7 +49,7 @@ export const ViewORMCsheet = ({
   );
 
   const processedData = useTableMerged(excelData);
-  
+  console.log(processedData)
   useEffect(() => {
     if (processedData && processedData.length > 0) {
       setData(processedData);

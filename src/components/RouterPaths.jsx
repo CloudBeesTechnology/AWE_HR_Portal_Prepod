@@ -49,7 +49,7 @@ export const InsurancePaths = [
   "/insuranceHr/personalAcci",
   "/insuranceHr/insuranceClaim",
 ];
-export const LeaveManagement = ["/leaveManage"];
+export const LeaveManagement = ["/leaveManage","/leaveManage/historyLeave","/leaveManage/leaveBalance","/leaveManage/requestTickets"];
 
 export const TimePaths = [
   "/timeSheet",

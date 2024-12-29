@@ -6,10 +6,14 @@ import { FileUploadField } from "../../../employees/medicalDep/FileUploadField";
 import { DoeFormSchema } from "../../../../services/Validation";
 import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
 import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPTracking";
+import { useFetchInterview } from "../../../../hooks/useFetchInterview";
+import { UpdateInterviewData } from "../../../../services/updateMethod/UpdateInterview";
 
 export const DoeForm = ({ candidate }) => {
   const { interviewSchedules } = useFetchCandy();
+   const { interviewDetails } = UpdateInterviewData();
   const { wpTrackingDetails } = useUpdateWPTracking();
+  const { mergedInterviewData } = useFetchInterview();
   const [formData, setFormData] = useState({
     interview: {
       id: "",
@@ -18,6 +22,7 @@ export const DoeForm = ({ candidate }) => {
       doeapprovedate: "",
       doeexpirydate: "",
       doefile: "",
+      status: "",
     },
   });
 
@@ -53,8 +58,6 @@ export const DoeForm = ({ candidate }) => {
         (data) => data.tempID === candidate.tempID
       );
 
-      // Log the found interviewData
-      // console.log("Found interviewData:", interviewData);
 
       if (interviewData) {
         // Set the form data
@@ -116,18 +119,32 @@ export const DoeForm = ({ candidate }) => {
 
   const handleSubmitTwo = async (data) => {
     data.preventDefault();
-
+  
     const selectedInterviewData = interviewSchedules.find(
       (data) => data.tempID === candidate?.tempID
     );
+  
+    const selectedInterviewDataStatus = mergedInterviewData.find(
+      (data) => data.tempID === candidate?.tempID
+    );
+  
     const interviewScheduleId = selectedInterviewData?.id;
-
+    const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
+  
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
       return;
     }
-
+  
+    const interStatus = {
+      id: interviewScheduleStatusId, // Dynamically use the correct id
+      status: formData.interview.status,
+    };
+  
+    console.log("Submitting interview details with status:", interStatus); // Log the status object
+  
     try {
+      console.log("Calling wpTrackingDetails API..."); // Before the API call
       const response = await wpTrackingDetails({
         WPTrackingValue: {
           id: interviewScheduleId,
@@ -140,12 +157,62 @@ export const DoeForm = ({ candidate }) => {
             : formData.interview.doefile,
         },
       });
-
-      // console.log("WPTracking response:", response);
+      console.log("WPTracking response:", response); // Log the response from wpTrackingDetails
+      console.log("Calling interviewDetails API..."); // Before the second API call
+      await interviewDetails({ InterviewValue: interStatus });
+      console.log("Interview status updated:", interStatus); // Log the updated status
+  
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }
   };
+  
+
+  // const handleSubmitTwo = async (data) => {
+  //   data.preventDefault();
+
+  //   const selectedInterviewData = interviewSchedules.find(
+  //     (data) => data.tempID === candidate?.tempID
+  //   );
+
+  //   const selectedInterviewDataStatus = mergedInterviewData.find(
+  //     (data) => data.tempID === candidate?.tempID
+  //   );
+
+  //   const interviewScheduleId = selectedInterviewData?.id;
+  //   const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
+
+  //   if (!formData?.interview) {
+  //     console.error("Error: formData.interview is undefined.");
+  //     return;
+  //   }
+
+  //   const interStatus = {
+  //     id: interviewScheduleStatusId, // Dynamically use the correct id
+  //     status: formData.interview.status,
+  //   };
+
+  //   try {
+  //     const response = await wpTrackingDetails({
+  //       WPTrackingValue: {
+  //         id: interviewScheduleId,
+  //         doesubmitdate: formData.interview.doesubmitdate,
+  //         doerefno: formData.interview.doerefno,
+  //         doeapprovedate: formData.interview.doeapprovedate,
+  //         doeexpirydate: formData.interview.doeexpirydate,
+  //         doefile: uploadedDoe.doeFile
+  //           ? uploadedDoe.doeFile
+  //           : formData.interview.doefile,
+  //       },
+  //     });
+  //     await interviewDetails({ InterviewValue: interStatus });
+  //     console.log("Status", interStatus)
+
+  //     // console.log("WPTracking response:", response);
+  //   } catch (err) {
+  //     console.error("Error submitting interview details:", err);
+  //   }
+  // };
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -226,6 +293,17 @@ export const DoeForm = ({ candidate }) => {
             />
             {errors.doeFile && <span>{errors.doeFile.message}</span>}
           </div>
+        </div>
+        <div>
+          <label htmlFor="status">Status</label>
+          <input
+            className="w-full border p-2 rounded mt-1"
+            type="text"
+            id="status"
+            {...register("status")}
+            value={formData.interview.status}
+            onChange={(e) => handleInputChange("status", e.target.value)}
+          />
         </div>
       </div>
 

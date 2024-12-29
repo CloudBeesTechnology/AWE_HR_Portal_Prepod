@@ -46,7 +46,7 @@ export const Status = () => {
   const [selectedCandidates, setSelectedCandidates] = useState([]);
   const [mergeData, setMergeData] = useState([]);
   const [urlValue, setURLValue] = useState("");
-  const [ dropOption, setDropOption] = useState();
+  const [dropOption, setDropOption] = useState();
   const { empPDData, educDetailsData, IVSSDetails } = useContext(DataSupply);
   // console.log(empPDData);
   // console.log(educDetailsData);
@@ -66,6 +66,7 @@ export const Status = () => {
 
   const flattenObject = (data) => {
     const result = { ...data };
+    console.log(data);
 
     // Flatten `interviewDetails`
     if (result.interviewDetails) {
@@ -89,20 +90,21 @@ export const Status = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [
-          interviewDatas,
-          localMobilizationData,
-        ] = await Promise.all([
+        const [interviewDatas, localMobilizationData] = await Promise.all([
           client.graphql({
             query: listInterviewSchedules,
+            variables: { limit: 20000 },
           }),
           client.graphql({
             query: listLocalMobilizations,
+            variables: { limit: 20000 },
           }),
         ]);
 
-        const interviews = interviewDatas?.data?.listInterviewSchedules?.items || [];
-        const localMobilizations = localMobilizationData?.data?.listLocalMobilizations?.items || [];
+        const interviews =
+          interviewDatas?.data?.listInterviewSchedules?.items || [];
+        const localMobilizations =
+          localMobilizationData?.data?.listLocalMobilizations?.items || [];
 
         if (empPDData && educDetailsData && IVSSDetails) {
           const filteredEmpPDData = empPDData.filter((emp) =>
@@ -116,10 +118,13 @@ export const Status = () => {
             return acc;
           }, {});
 
-          const mobilizationsMap = localMobilizations.reduce((acc, mobilization) => {
-            acc[mobilization.tempID] = mobilization;
-            return acc;
-          }, {});
+          const mobilizationsMap = localMobilizations.reduce(
+            (acc, mobilization) => {
+              acc[mobilization.tempID] = mobilization;
+              return acc;
+            },
+            {}
+          );
 
           const flattenedData = merged.map((candidate) => {
             const interview = interviewsMap[candidate.tempID] || {};
@@ -133,13 +138,15 @@ export const Status = () => {
           });
           const flattingData = flattenedData.map(flattenObject);
           setMergeData(flattingData);
-          
-          const initialFiltered = flattingData.filter((val) => 
-            val?.interviewDetails_status?.toLowerCase() === "interviewscheduled"
+
+          const initialFiltered = flattingData.filter(
+            (val) =>
+              val?.interviewDetails_status?.toLowerCase() ===
+              "interviewscheduled"
           );
-          
+
           setFilteredData(initialFiltered);
-          setDropOption(initialFiltered)
+          setDropOption(initialFiltered);
           setLoading(false);
         }
       } catch (err) {
@@ -293,47 +300,51 @@ export const Status = () => {
     let filtered = [];
     switch (selectedValue) {
       case "Interview Scheduled":
-        filtered = mergeData.filter((val) => 
-          val?.interviewDetails_status?.toLowerCase() === "interviewscheduled"
+        filtered = mergeData.filter(
+          (val) =>
+            val?.interviewDetails_status?.toLowerCase() === "interviewscheduled"
         );
         break;
 
       case "Selected Candidate":
-        filtered = mergeData.filter((val) => 
-          val?.interviewDetails_status === "Selected"
+        filtered = mergeData.filter(
+          (val) => val?.interviewDetails_status === "Selected"
         );
         break;
 
       case "LOI":
-        filtered = mergeData.filter((val) => 
-          val?.interviewDetails_status?.toUpperCase() === "LOI"
+        filtered = mergeData.filter(
+          (val) => val?.interviewDetails_status?.toUpperCase() === "LOI"
         );
         break;
 
       case "CVEV_OffShore":
-        filtered = mergeData.filter((val) => 
-          val?.interviewDetails_status?.toUpperCase() === "CVEV" &&
-          val?.empType === "Offshore" 
+        filtered = mergeData.filter(
+          (val) =>
+            val?.interviewDetails_status?.toUpperCase() === "CVEV" &&
+            val?.empType === "Offshore"
         );
         break;
 
       case "PAAF_OnShore":
-        filtered = mergeData.filter((val) => 
-          val?.interviewDetails_status?.toUpperCase() === "PAAF" &&
-          val?.empType === "Onshore"
+        filtered = mergeData.filter(
+          (val) =>
+            val?.interviewDetails_status?.toUpperCase() === "PAAF" &&
+            val?.empType === "Onshore"
         );
         break;
 
       case "Mobilization":
-        filtered = mergeData.filter((val) => 
-          val?.contractType === "Local" &&
-          val?.interviewDetails_status?.toLowerCase() === "mobilization" 
+        filtered = mergeData.filter(
+          (val) =>
+            val?.contractType === "Local" &&
+            val?.interviewDetails_status?.toLowerCase() === "mobilization"
         );
         break;
 
       default:
-        filtered = mergeData.filter((val) => 
-          val?.interviewDetails_status?.toLowerCase() === "pending"
+        filtered = mergeData.filter(
+          (val) => val?.interviewDetails_status?.toLowerCase() === "pending"
         );
         break;
     }
@@ -341,7 +352,7 @@ export const Status = () => {
     setFilteredData(filtered);
     setIsFilterBoxOpen(false);
   };
-  
+
   // console.log("Hello World", mergeData);
   // Handle edit click
   const handleEditClick = (candidate) => {
@@ -572,7 +583,6 @@ export const Status = () => {
         <>
           {renderComponent()}
 
-
           {isFormVisible && (
             <StatusForm
               candidate={selectedInterviewCandidate}
@@ -585,4 +595,3 @@ export const Status = () => {
     </section>
   );
 };
-

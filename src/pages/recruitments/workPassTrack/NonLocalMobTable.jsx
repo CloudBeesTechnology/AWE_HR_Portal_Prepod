@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { RiFileEditLine } from "react-icons/ri";
 import { StatusForm } from "./StatusForm";
 import { ReviewForm } from "../ReviewForm";
+import { WorkpassForm } from "./WorkpassForm";
 
 
 export const NonLocalMobTable = ({ data,formatDate }) => {
@@ -85,9 +86,9 @@ const handleShowReviewForm = (candi) => {
           <p className="text-lg text-dark_grey mt-2">No Data Available</p>
         </div>
       )}
-      {isReviewFormVisible && <ReviewForm candidate={selectedCandi} onClose={handleShowReviewForm} showDecisionButtons={true} />}
+      {isReviewFormVisible && <ReviewForm candidate={selectedCandi} onClose={handleShowReviewForm} />}
       {isFormVisible && (
-        <StatusForm
+        <WorkpassForm
         candidate={selectedCandi}
         //   onSave={handleFormSave}
           onClose={handleShowForm}

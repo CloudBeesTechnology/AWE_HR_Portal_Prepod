@@ -8,7 +8,7 @@ import { UpdateLoiData } from "../../../../services/updateMethod/UpdateLoi";
 import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
 import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPTracking";
 
-export const LabourDepForm = ({candidate}) => {
+export const LabourDepForm = ({ candidate }) => {
   const { interviewSchedules } = useFetchCandy();
   const { wpTrackingDetails } = useUpdateWPTracking();
   const [formData, setFormData] = useState({
@@ -17,7 +17,8 @@ export const LabourDepForm = ({candidate}) => {
       lbrDepoNum: "",
       lbrEndroseDate: "",
       lbrDepoAmount: "",
-      lbrFile: "",   
+      lbrFile: "",
+      status: "",
     },
   });
   const [uploadedFileNames, setUploadedFileNames] = useState({
@@ -39,48 +40,47 @@ export const LabourDepForm = ({candidate}) => {
 
   const DepositUpload = watch("lbrFile");
 
+  useEffect(() => {
+    // Log to see if interviewSchedules has data
+    // console.log("interviewSchedules:", interviewSchedules);
 
-   useEffect(() => {
-        // Log to see if interviewSchedules has data
-        // console.log("interviewSchedules:", interviewSchedules);
-    
-        if (interviewSchedules.length > 0) {
-          // Find the interviewData for the candidate
-          const interviewData = interviewSchedules.find(
-            (data) => data.tempID === candidate.tempID
-          );
-    
-          // Log the found interviewData
-          // console.log("Found interviewData:", interviewData);
-    
-          if (interviewData) {
-            // Set the form data
-            setFormData({
-              interview: {
-                lbrDepoNum: interviewData.lbrDepoNum,
-                lbrEndroseDate: interviewData.lbrEndroseDate,
-                lbrDepoAmount: interviewData.lbrDepoAmount,
-                lbrFile: interviewData.lbrFile,  
-              },
-            });
-    
-            // Check if sawpFile exists and update the file names
-            if (interviewData.lbrFile) {
-              const fileName = extractFileName(interviewData.lbrFile);
-              setUploadedFileNames((prev) => ({
-                ...prev,
-                lbrFile: fileName,
-              }));
-              console.log("Uploaded file name set:", fileName);
-            }
-          } else {
-            console.log("No interviewData found for candidate:", candidate.tempID);
-          }
-        } else {
-          console.log("No interview schedules available.");
+    if (interviewSchedules.length > 0) {
+      // Find the interviewData for the candidate
+      const interviewData = interviewSchedules.find(
+        (data) => data.tempID === candidate.tempID
+      );
+
+      // Log the found interviewData
+      // console.log("Found interviewData:", interviewData);
+
+      if (interviewData) {
+        // Set the form data
+        setFormData({
+          interview: {
+            lbrDepoNum: interviewData.lbrDepoNum,
+            lbrEndroseDate: interviewData.lbrEndroseDate,
+            lbrDepoAmount: interviewData.lbrDepoAmount,
+            lbrFile: interviewData.lbrFile,
+            status: interviewData.status,
+          },
+        });
+
+        // Check if sawpFile exists and update the file names
+        if (interviewData.lbrFile) {
+          const fileName = extractFileName(interviewData.lbrFile);
+          setUploadedFileNames((prev) => ({
+            ...prev,
+            lbrFile: fileName,
+          }));
+          console.log("Uploaded file name set:", fileName);
         }
-      }, [interviewSchedules, candidate.tempID]);
- 
+      } else {
+        console.log("No interviewData found for candidate:", candidate.tempID);
+      }
+    } else {
+      console.log("No interview schedules available.");
+    }
+  }, [interviewSchedules, candidate.tempID]);
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
@@ -106,22 +106,22 @@ export const LabourDepForm = ({candidate}) => {
 
   const handleSubmitTwo = async (data) => {
     data.preventDefault();
-  
+
     const selectedInterviewData = interviewSchedules.find(
       (data) => data.tempID === candidate?.tempID
     );
     const interviewScheduleId = selectedInterviewData?.id;
-  
+
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
       return;
     }
-  
+
     if (!interviewScheduleId) {
       console.error("Error: No interview schedule found for this candidate.");
       return;
     }
-  
+
     try {
       const response = await wpTrackingDetails({
         WPTrackingValue: {
@@ -129,22 +129,21 @@ export const LabourDepForm = ({candidate}) => {
           lbrDepoNum: formData.interview.lbrDepoNum,
           lbrEndroseDate: formData.interview.lbrEndroseDate,
           lbrDepoAmount: formData.interview.lbrDepoAmount,
-          lbrFile: uploadedLabDep.lbrFile ? uploadedLabDep.lbrFile : formData.interview.lbrFile,   
+          lbrFile: uploadedLabDep.lbrFile
+            ? uploadedLabDep.lbrFile
+            : formData.interview.lbrFile,
         },
-
       });
-  
+
       // console.log("Response from WPTrackingDetails:", response);
-  
+
       if (response.errors && response.errors.length > 0) {
         console.error("Response errors:", response.errors);
       }
-  
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }
   };
-
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -167,21 +166,23 @@ export const LabourDepForm = ({candidate}) => {
             id="lbrDepoNum"
             {...register("lbrDepoNum")}
             value={formData.interview.lbrDepoNum}
-            onChange={(e) =>
-              handleInputChange("lbrDepoNum", e.target.value)
-            }
+            onChange={(e) => handleInputChange("lbrDepoNum", e.target.value)}
           />
         </div>
 
         <div>
-          <label htmlFor="lbrEndroseDate">Date Endrosement Of Labour Deposit</label>
+          <label htmlFor="lbrEndroseDate">
+            Date Endrosement Of Labour Deposit
+          </label>
           <input
             className="w-full border p-2 rounded mt-1"
             type="date"
             id="lbrEndroseDate"
             {...register("lbrEndroseDate")}
             value={formData.interview.lbrEndroseDate}
-            onChange={(e) => handleInputChange("lbrEndroseDate", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("lbrEndroseDate", e.target.value)
+            }
           />
         </div>
         <div>
@@ -209,6 +210,17 @@ export const LabourDepForm = ({candidate}) => {
               value={formData.interview.lbrFile}
             />
           </div>
+        </div>
+        <div>
+          <label htmlFor="status">Status</label>
+          <input
+            className="w-full border p-2 rounded mt-1"
+            type="text"
+            id="status"
+            {...register("status")}
+            value={formData.interview.status}
+            onChange={(e) => handleInputChange("status", e.target.value)}
+          />
         </div>
       </div>
 

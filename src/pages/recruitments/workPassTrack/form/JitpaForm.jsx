@@ -19,6 +19,7 @@ export const JitpaForm = ({candidate}) => {
       jitpaexpirydate: "",
       jitpaamount: "",
       jitpafile: "",
+      status: ""
     },
   });
   const [uploadedFileNames, setUploadedFileNames] = useState({
@@ -217,6 +218,17 @@ export const JitpaForm = ({candidate}) => {
               value={formData.interview.jitpafile}
             />
           </div>
+        </div>
+        <div>
+          <label htmlFor="status">Status</label>
+          <input
+            className="w-full border p-2 rounded mt-1"
+            type="text"
+            id="status"
+            {...register("status")}
+            value={formData.interview.status}
+            onChange={(e) => handleInputChange("status", e.target.value)}
+          />
         </div>
       </div>
 

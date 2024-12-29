@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { RiFileEditLine } from "react-icons/ri";
-import { StatusForm } from "./StatusForm";
-import { ReviewForm } from "../ReviewForm";
 
-export const SawpTable = ({ data, formatDate }) => {
+import { ReviewForm } from "../ReviewForm";
+import { StatusForm } from "../status/StatusForm";
+import { WorkpassForm } from "./WorkpassForm";
+import { DateFormat } from "../../../utils/DateFormat";
+
+export const SawpTable = ({ data, fileUpload, urlValue }) => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const [selectedCandi, setSelectedCandi] = useState([]);
@@ -54,17 +57,36 @@ export const SawpTable = ({ data, formatDate }) => {
                     <td className="py-3">{item.tempID}</td>
                     <td className="py-3">{item.name || "N/A"}</td>
                     <td className="py-3">{item.nationality || "N/A"}</td>
+                    <td className="py-3">{item.position || "N/A"}</td>
                     <td className="py-3">
-                      {formatDate(item.interviewDetails_interDate) || "N/A"}
+                      {DateFormat(item.WPTrackDetails_sawpDate) || "N/A"}
                     </td>
                     <td className="py-3">
-                      {item.interviewDetails_interTime || "N/A"}
+                      {DateFormat(item.WPTrackDetails_sawpRecivedDate) || "N/A"}
                     </td>
                     <td className="py-3">
-                      {item.interviewDetails_venue || "N/A"}
-                    </td>
-                    <td className="py-3">
-                      {item.interviewDetails_manager || "N/A"}
+                      {item.WPTrackDetails_sawpFile ? (
+                        <a
+                          href={urlValue}
+                          onClick={(e) => {
+                            if (!item.WPTrackDetails_sawpFile) {
+                              e.preventDefault();
+                            } else {
+                              fileUpload(item.WPTrackDetails_sawpFile); // Fetch URL when clicked
+                            }
+                          }}
+                          download
+                          className={
+                            item.WPTrackDetails_sawpFile
+                              ? "border-b-2 border-[orange] text-[orange]"
+                              : ""
+                          }
+                        >
+                          {item.WPTrackDetails_sawpFile ? "Download" : "N/A"}
+                        </a>
+                      ) : (
+                        <p>N/A</p>
+                      )}
                     </td>
                     <td
                       className="py-3 text-center"
@@ -88,18 +110,14 @@ export const SawpTable = ({ data, formatDate }) => {
         </table>
       ) : (
         <div className="text-center mt-6 py-20">
-          <p className="text-lg text-dark_grey mt-2">No Data Available</p>
+          <p className="text-lg text-dark_grey mt-2">No candidate Available</p>
         </div>
       )}
       {isReviewFormVisible && (
-        <ReviewForm
-          candidate={selectedCandi}
-          onClose={handleShowReviewForm}
-          showDecisionButtons={true}
-        />
+        <ReviewForm candidate={selectedCandi} onClose={handleShowReviewForm} />
       )}
       {isFormVisible && (
-        <StatusForm
+        <WorkpassForm
           candidate={selectedCandi}
           //   onSave={handleFormSave}
           onClose={handleShowForm}

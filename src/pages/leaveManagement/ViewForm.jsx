@@ -40,16 +40,6 @@ export const ViewForm = ({
     return findingSupervisorName;
   });
 
-  const getStatusClass = (status) => {
-    return status === "Rejected"
-      ? "text-[red]"
-      : status === "Approved"
-      ? "text-[#339933]"
-      : status === "Pending"
-      ? "text-[#E8A317]"
-      : "text-[#E8A317]";
-  };
-
   const handleUpdateStatus = async (status) => {
     const updateData = {};
     const userType = localStorage.getItem("userType");
@@ -433,9 +423,9 @@ export const ViewForm = ({
       isNotSuperAdminOrHR
     ) {
       return (
-        <div className="flex justify-evenly items-center w-full">
+        <div className="center w-full">
           <button
-            className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
+            className="border border-grey p-2 px-5 rounded text-dark_grey text_size_6"
             onClick={handleReject}
           >
             Reject
@@ -453,16 +443,16 @@ export const ViewForm = ({
       return (
         <>
           <button
-            className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
-            onClick={handleReject}
-          >
-            Reject
-          </button>
-          <button
-            className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
+            className="bg-[#FEF116] p-2 px-3 rounded text-dark_grey text_size_6"
             onClick={handleApprove}
           >
             Approve
+          </button>
+          <button
+            className="border border-grey p-2 px-5 rounded text-dark_grey text_size_6"
+            onClick={handleReject}
+          >
+            Reject
           </button>
         </>
       );
@@ -473,16 +463,16 @@ export const ViewForm = ({
       return (
         <>
           <button
-            className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
-            onClick={handleReject}
-          >
-            Reject
-          </button>
-          <button
-            className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
+            className="bg-[#FEF116] p-2 px-3 rounded text-dark_grey text_size_6"
             onClick={handleApprove}
           >
             Approve
+          </button>
+          <button
+            className="border border-grey p-2 px-5 rounded text-dark_grey text_size_6"
+            onClick={handleReject}
+          >
+            Reject
           </button>
         </>
       );
@@ -497,16 +487,16 @@ export const ViewForm = ({
       return (
         <>
           <button
-            className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
-            onClick={handleReject}
-          >
-            Reject
-          </button>
-          <button
-            className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
+            className="bg-[#FEF116] p-2 px-3 rounded text-dark_grey text_size_6"
             onClick={handleApprove}
           >
             Approve
+          </button>
+          <button
+            className="border border-grey p-2 px-5 rounded text-dark_grey text_size_6"
+            onClick={handleReject}
+          >
+            Reject
           </button>
         </>
       );
@@ -556,7 +546,7 @@ export const ViewForm = ({
 
           {source === "LM" && (
             <section className="shadow-md w-[500px] p-5 bg-white">
-              <div className="">
+              <div className="text_size_6 ">
                 {[
                   { label: "Name", value: leaveData.empName || "" },
                   {
@@ -598,22 +588,79 @@ export const ViewForm = ({
                   </div>
                 ))}
 
+                {/* Remarks Section */}
+                {leaveData.remark && (
+                  <div className="grid grid-cols-2 py-6">
+                    <p>Comments:</p>
+                    <p className="text-start text-[16px] font-medium border border-gray-400 w-full break-words overflow-hidden h-[51px]">
+                      {leaveData.empRemarks || "No remarks added"}
+                    </p>
+                  </div>
+                )}
+                {userType === "SuperAdmin" ? (
+                  <div className="mt-5 text-lg flex flex-col justify-between gap-2 font-semibold">
+                    <div className="flex flex-col justify-between gap-2">
+                      <p className="">
+                        {`Supervisor: ${leaveData.supervisorStatus}`}
+                      </p>
+                      <p className=" w-full break-words overflow-hidden">{`Supervisor Remark:   ${
+                        leaveData.supervisorRemarks || "no remarks"
+                      }`}</p>
+                      <p className="">{`Manager:   ${leaveData.managerStatus}`}</p>
+                    </div>
+                    <p className=" w-full break-words overflow-hidden">{` Manager Remark:   ${
+                      leaveData.managerRemarks || "no remarks"
+                    }`}</p>
+                  </div>
+                ) : userType === "Supervisor" ? (
+                  <div className="mt-5 text-lg space-y-2 font-semibold ">
+                    {leaveData.supervisorStatus === "Approved" && (
+                      <p className=" w-full break-words overflow-hidden">{` Remark:   ${
+                        leaveData.supervisorRemarks || "no remarks"
+                      }`}</p>
+                    )}
+                    <p className="">{`Manager:   ${leaveData.managerStatus}`}</p>
+                    {leaveData.managerStatus === "Approved" && (
+                      <p className=" w-full break-words overflow-hidden">{`Mangaer Remarks:   ${
+                        leaveData.managerRemarks || "no remark"
+                      }`}</p>
+                    )}
+                  </div>
+                ) : userType === "Manager" ? (
+                  <div className="mt-5 text-lg space-y-2 font-semibold">
+                    {leaveData.supervisorEmpID && (
+                      <article>
+                        {" "}
+                        <p className="">
+                          {`Supervisor: ${leaveData.supervisorStatus}`}{" "}
+                        </p>
+                        <p className=" w-full break-words overflow-hidden">{`Supervisor Remark:   ${
+                          leaveData.supervisorRemarks || "no remarks"
+                        }`}</p>
+                      </article>
+                    )}
+                    {leaveData.managerStatus === "Approved" && (
+                      <p className=" w-full break-words overflow-hidden">{`Remark:   ${
+                        leaveData.managerRemarks || "no remarks"
+                      }`}</p>
+                    )}
+                  </div>
+                ) : (
+                  ""
+                )}
+
                 {/* Add Remark Input */}
                 {leaveData.managerStatus === "Pending" &&
                   leaveData.supervisorStatus === "Pending" &&
                   userType !== "SuperAdmin" &&
                   userType !== "HR" && (
-                    <div className="grid grid-cols-[150px_auto_1fr] gap-2 items-center pt-1">
-                      <label className="font-semibold" htmlFor="remark">
-                        Remark
-                      </label>
-                      <span className="text-center">:</span>
+                    <div className="grid grid-rows-2 pt-1">
+                      <label htmlFor="remark">Remark :</label>
                       <input
-                        id="remark"
                         type="text"
                         value={remark}
                         onChange={(e) => setRemark(e.target.value)}
-                        className="border border-lite_grey h-9 outline-none pl-2"
+                        className="border border-grey w-full h-9 outline-none pl-2"
                       />
                     </div>
                   )}
@@ -622,197 +669,17 @@ export const ViewForm = ({
                   userType === "Manager" &&
                   userType !== "SuperAdmin" &&
                   userType !== "HR" && (
-                    <div className="grid grid-cols-[150px_auto_1fr] gap-2 items-center pt-1">
-                      <label className="font-semibold" htmlFor="remark">
-                        Remark
-                      </label>
-                      <span className="text-center">:</span>
+                    <div className="grid grid-rows-2 pt-1">
+                      <label htmlFor="remark">Remark :</label>
                       <input
-                        id="remark"
                         type="text"
                         value={remark}
                         onChange={(e) => setRemark(e.target.value)}
-                        className="border border-lite_grey h-9 outline-none pl-2"
+                        className="border border-grey w-full h-9 outline-none pl-2"
                       />
                     </div>
                   )}
-
-                {/* Remarks Section */}
-                {leaveData.remark && (
-                  <div className="grid grid-cols-2 py-6">
-                    <p>Comments:</p>
-                    <p className="text-start text-[16px] font-medium border border-grey w-full break-words overflow-hidden h-[51px]">
-                      {leaveData.empRemarks || "No remarks"}
-                    </p>
-                  </div>
-                )}
-                {userType === "SuperAdmin" || userType === "HR" ? (
-                  <div className="font-medium p-4">
-                    <table className="w-full border-collapse">
-                      <thead className="bg-gradient-to-r from-[#f5ee6ad7] via-[#faf362] to-[#f5ee6ad7] shadow-[0_4px_6px_rgba(255,250,150,0.5)]">
-                        <tr className="">
-                          <th className="text-center p-1.5 text-[#615d5d] font-bold rounded-tl-lg shadow-lg">
-                            Role
-                          </th>
-                          <th className="text-center p-1.5 text-[#615d5d] font-bold shadow-md">
-                            Status
-                          </th>
-                          <th className="text-center p-1.5 text-[#615d5d] font-bold rounded-tr-lg shadow-lg">
-                            Remarks
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                      {leaveData.supervisorEmpID && (
-                        <tr className="border-b border-lite_grey">
-                          <td className="p-2 text-center font-semibold">
-                            Supervisor
-                          </td>
-                          <td
-                            className={`text-center font-bold p-2 ${getStatusClass(
-                              leaveData.supervisorStatus
-                            )}`}
-                          >
-                            {leaveData.supervisorStatus}
-                          </td>
-                          <td className="p-2 break-words text-center text-grey">
-                            {leaveData.supervisorRemarks || "No remarks"}
-                          </td>
-                        </tr>
-                        )}
-                        <tr className="border-b border-lite_grey">
-                          <td className="p-2 text-center font-semibold">
-                            Manager
-                          </td>
-                          <td
-                            className={`text-center font-bold p-2 ${getStatusClass(
-                              leaveData.managerStatus
-                            )}`}
-                          >
-                            {leaveData.managerStatus}
-                          </td>
-                          <td className="p-2 break-words text-center text-grey">
-                            {leaveData.managerRemarks || "No remarks"}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                ) : userType === "Supervisor" && leaveData.supervisorStatus !== "Pending" ? (
-                  <table className="w-full mt-5 border-collapse">
-                    <thead className="bg-gradient-to-r from-[#f5ee6ad7] via-[#faf362] to-[#f5ee6ad7] shadow-[0_4px_6px_rgba(255,250,150,0.5)]">
-                      <tr>
-                        <th className="text-center p-1.5 text-[#615d5d] font-bold rounded-tl-lg shadow-md">
-                          Role
-                        </th>
-                        <th className="text-center p-1.5 text-[#615d5d] font-bold shadow-md">
-                          Status
-                        </th>
-                        <th className="text-center p-1.5 text-[#615d5d] font-bold rounded-tr-lg shadow-md">
-                          Remarks
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {/* Supervisor Row */}
-                      <tr className="border-b border-lite_grey">
-                        <td className="p-2 text-center font-semibold">
-                          Supervisor
-                        </td>
-                        <td
-                          className={`text-center font-bold p-2 ${getStatusClass(
-                            leaveData.supervisorStatus
-                          )}`}
-                        >
-                          {leaveData.supervisorStatus}
-                        </td>
-                        <td className="p-2 break-words text-center text-grey">
-                          {leaveData.supervisorStatus === "Approved"
-                            ? leaveData.supervisorRemarks || "No remarks"
-                            : ""}
-                        </td>
-                      </tr>
-
-                      {/* Manager Row */}
-                      <tr className="border-b border-lite_grey">
-                        <td className="p-2 text-center font-semibold">
-                          Manager
-                        </td>
-                        <td
-                          className={`text-center font-bold p-2 ${getStatusClass(
-                            leaveData.managerStatus
-                          )}`}
-                        >
-                          {leaveData.managerStatus}
-                        </td>
-                        <td className="p-2 break-words text-center text-grey">
-                          {leaveData.managerStatus === "Approved"
-                            ? leaveData.managerRemarks || "No remarks"
-                            : ""}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                ) : userType === "Manager" ? (
-                  <table className="w-full mt-5 border-collapse">
-                    <thead className="bg-gradient-to-r from-[#f5ee6ad7] via-[#faf362] to-[#f5ee6ad7] shadow-[0_4px_6px_rgba(255,250,150,0.5)]">
-                      <tr>
-                        <th className="text-center p-1.5 text-[#615d5d] font-bold rounded-tl-lg shadow-md">
-                          Role
-                        </th>
-                        <th className="text-center p-1.5 text-[#615d5d] font-bold shadow-md">
-                          Status
-                        </th>
-                        <th className="text-center p-1.5 text-[#615d5d] font-bold rounded-tr-lg shadow-md">
-                          Remarks
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {/* Supervisor Row */}
-                      {leaveData.supervisorEmpID && (
-                        <tr className="border-b border-lite_grey">
-                          <td className="p-2 text-center font-semibold">
-                            Supervisor
-                          </td>
-                          <td
-                            className={`text-center font-bold p-2 ${getStatusClass(
-                              leaveData.supervisorStatus
-                            )}`}
-                          >
-                            {leaveData.supervisorStatus}
-                          </td>
-                          <td className="p-2 break-words text-center text-grey">
-                            {leaveData.supervisorRemarks || "No remarks"}
-                          </td>
-                        </tr>
-                      )}
-
-                      {/* Manager Row */}
-                      {leaveData.managerStatus === "Approved" && (
-                        <tr className="border-b border-lite_grey">
-                          <td className="p-2 text-center font-semibold">
-                            Manager
-                          </td>
-                          <td
-                            className={`text-center font-bold p-2 ${getStatusClass(
-                              leaveData.managerStatus
-                            )}`}
-                          >
-                            {leaveData.managerStatus}
-                          </td>
-                          <td className="p-2 break-words text-center text-grey">
-                            {leaveData.managerRemarks || "No remarks"}
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                ) : (
-                  ""
-                )}
               </div>
-
               {/* Action Buttons */}
               <div className="flex justify-between px-5 mt-6">
                 {renderButtons()}
@@ -842,8 +709,16 @@ export const ViewForm = ({
           )}
 
           {source === "Tickets" && (
-            <section className="shadow-md w-[500px] p-5 bg-white">
+            <section className="shadow-md w-[500px] px-5 bg-white">
               <div className="text_size_6">
+                <div className="mb-5 ">
+                  <p className="text-center text-[24px] font-semibold">
+                    {ticketData.hrStatus === "Pending"
+                      ? "Request Tickets"
+                      : ticketData.hrStatus}
+                  </p>
+                </div>
+
                 {[
                   { label: "Name", value: ticketData.empName },
                   {
@@ -904,81 +779,55 @@ export const ViewForm = ({
                     </div>
                   ))}
 
-                {(userType === "SuperAdmin" ||
-                  (userType === "HR" && ticketData.hrStatus !== "Pending")) && (
-                  <table className="w-full mt-5 border-collapse">
-                    <thead className="bg-gradient-to-r from-[#f5ee6ad7] via-[#faf362] to-[#f5ee6ad7] shadow-[0_4px_6px_rgba(255,250,150,0.5)]">
-                      <tr>
-                        <th className="text-center p-1.5 text-[#615d5d] font-bold rounded-tl-lg shadow-md">
-                          Role
-                        </th>
-                        <th className="text-center p-1.5 text-[#615d5d] font-bold shadow-md">
-                          Status
-                        </th>
-                        <th className="text-center p-1.5 text-[#615d5d] font-bold rounded-tr-lg shadow-md">
-                          Remark
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {/* HR Row */}
-                      <tr className="border-b border-lite_grey">
-                        <td className="p-2 text-center font-semibold">HR</td>
-                        <td
-                          className={`text-center font-bold p-2 ${getStatusClass(
-                            ticketData.hrStatus
-                          )}`}
-                        >
-                          {ticketData.hrStatus}
-                        </td>
-                        <td className="p-2 break-words text-center text-grey">
-                          {ticketData.hrRemarks || "No remarks"}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                {userType === "SuperAdmin" ? (
+                  <div className="mt-5 text-lg flex flex-col justify-between gap-2 font-semibold">
+                    <div className="flex flex-col justify-between gap-2">
+                      <p className="">{`HR: ${ticketData.hrStatus}`}</p>
+                      <p className=" w-full break-words overflow-hidden">{`HR Remark:   ${
+                        ticketData.hrRemarks || "no remarks"
+                      }`}</p>
+                    </div>
+                  </div>
+                ) : userType === "HR" ? (
+                  <div className="mt-5 text-lg space-y-2 font-semibold ">
+                    {ticketData.hrStatus === "Approved" && (
+                      <p className=" w-full break-words overflow-hidden">{` Remark:   ${
+                        ticketData.hrRemarks || "no remarks"
+                      }`}</p>
+                    )}
+                  </div>
+                ) : (
+                  ""
                 )}
 
                 {ticketData.hrStatus === "Pending" &&
                   userType !== "SuperAdmin" && (
-                    <div className="grid grid-cols-[150px_auto_1fr] gap-2 items-center pt-1">
-                      <label className="font-semibold" htmlFor="remark">
-                        Remark
-                      </label>
-                      <span className="text-center">:</span>
+                    <div className="grid grid-rows-2 pt-1">
+                      <label htmlFor="remark">Remark :</label>
                       <input
-                        id="remark"
                         type="text"
                         value={remark}
                         onChange={(e) => setRemark(e.target.value)}
-                        className="border border-lite_grey h-9 outline-none pl-2"
+                        className="border border-grey w-full h-9 outline-none pl-2"
                       />
                     </div>
                   )}
-                {/* <div className="mb-5 center gap-2">
-                  <p className="font-semibold">Ticket Request Status :</p>
-                  <p className="font-bold">
-                    {ticketData.hrStatus === "Pending"
-                      ? "Pending"
-                      : ticketData.hrStatus}
-                  </p>
-                </div> */}
               </div>
 
               <div className="flex justify-between p-5 ">
                 {ticketData.hrStatus === "Pending" && userType === "HR" && (
                   <>
                     <button
-                      className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
-                      onClick={handleReject}
-                    >
-                      Reject
-                    </button>
-                    <button
-                      className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
+                      className="bg-[#FEF116] p-2 px-3 rounded text-dark_grey text_size_6"
                       onClick={handleApprove}
                     >
                       Approve
+                    </button>
+                    <button
+                      className="border border-grey p-2 px-5 rounded text-dark_grey text_size_6"
+                      onClick={handleReject}
+                    >
+                      Reject
                     </button>
                   </>
                 )}

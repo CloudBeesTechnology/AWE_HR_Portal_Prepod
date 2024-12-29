@@ -10,9 +10,9 @@ import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterv
 export const LOIForm = ({ candidate }) => {
   // Ensure candidate is passed as prop
   const { localMobilization, isLoading, notification, error } =
-    LocalMobilization(); // Use the custom hook
+    LocalMobilization();
   const { loiDetails } = UpdateLoiData();
-   const { interviewDetails } = UpdateInterviewData();
+  const { interviewDetails } = UpdateInterviewData();
   const { mergedInterviewData } = useFetchInterview();
   const [uploadedFileNames, setUploadedFileNames] = useState({
     loiFile: null,
@@ -40,7 +40,7 @@ export const LOIForm = ({ candidate }) => {
     },
   });
 
-  console.log(mergedInterviewData, "TV")
+  console.log(mergedInterviewData, "TV");
   const LOIFile = watch("loiFile", "");
 
   const extractFileName = (url) => {
@@ -84,8 +84,6 @@ export const LOIForm = ({ candidate }) => {
     // Call the createLOI function from the custom hook
     try {
       await localMobilization(formattedData);
-    
-     
     } catch (err) {
       console.error("LOI creation failed:", err);
     }
@@ -115,7 +113,7 @@ export const LOIForm = ({ candidate }) => {
 
     // const interStatus = {
     //   id: interviewScheduleId,
-      // status: selectedInterviewData.empType === "Offshore" ? "CVEV" : "PAAF",
+    // status: selectedInterviewData.empType === "Offshore" ? "CVEV" : "PAAF",
     // };
 
     const interStatus = {
@@ -123,13 +121,13 @@ export const LOIForm = ({ candidate }) => {
       department: formData.interview.department,
       otherDepartment: formData.interview.otherDepartment,
       status: formData.interview.status,
-    }
+    };
 
     try {
       // Call the update LOI API function
       await loiDetails({ LoiValue: formattedData });
-      await interviewDetails({InterviewValue: interStatus});
-      console.log("status", interStatus)
+      await interviewDetails({ InterviewValue: interStatus });
+      console.log("status", interStatus);
       console.log("Data updated successfully...");
     } catch (error) {
       console.error("Error updating LOI:", error);

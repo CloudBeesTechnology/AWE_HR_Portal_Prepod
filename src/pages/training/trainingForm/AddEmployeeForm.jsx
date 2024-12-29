@@ -291,7 +291,7 @@ export const AddEmployeeForm = () => {
   return (
     <section className="bg-[#F8F8F8] p-10 center flex-col w-full ">
       <div className="w-full flex items-center justify-between gap-5">
-        <Link to="/training/hr" className="text-xl flex-1 text-grey">
+        <Link to="/trainingReq" className="text-xl flex-1 text-grey">
           <FaArrowLeft />
         </Link>
         <article className="flex-1 flex gap-5 text-dark_grey">
@@ -302,7 +302,6 @@ export const AddEmployeeForm = () => {
 
       </div>
       <section
-     
         className=" mt-16 mb-14 w-full bg-white px-20 py-10"
       >
         
@@ -389,7 +388,7 @@ export const AddEmployeeForm = () => {
             <select
               {...register("courseCode")}
               onChange={handleCourseSelectChange}
-              className="input-field"
+              className="input-field select-custom"
             >
               <option value="">Training Course Select</option>
               {AddCourseDetails.map((course) => (
@@ -408,7 +407,7 @@ export const AddEmployeeForm = () => {
           {/* Course Name */}
           <div className="mb-4">
             <label className="text_size_5">Course Name</label>
-            <select {...register("courseName")} className="input-field">
+            <select {...register("courseName")} className="input-field select-custom">
               <option >Select</option>
               {selectedCourse && Array.isArray(selectedCourse.courseName) ? (
                 selectedCourse.courseName.map((name, index) => (
@@ -432,7 +431,7 @@ export const AddEmployeeForm = () => {
           {/* Training Company */}
           <div className="mb-4">
             <label className="text_size_5">Training Company</label>
-            <select {...register("company")} className="input-field">
+            <select {...register("company")} className="input-field select-custom">
             <option >Select</option>
               {selectedCourse && Array.isArray(selectedCourse.company) ? (
                 selectedCourse.company.map((name, index) => (
@@ -485,7 +484,7 @@ export const AddEmployeeForm = () => {
 
           <div>
             <label className="text_size_5">Training Status</label>
-            <select className={`input-field `} {...register("traineeStatus")}>
+            <select className={`input-field select-custom`} {...register("traineeStatus")}>
               <option value="">Select Status</option>
               <option value="Mandatory">Mandatory</option>
               <option value="Supplementary">Supplementary</option>
@@ -539,23 +538,6 @@ export const AddEmployeeForm = () => {
               )}
             </div>
 
-            {/* Medical Expiry */}
-            <div>
-              <label className="text_size_5">Medical Expiry</label>
-              <input
-                type="date"
-                className="input-field"
-                {...register("medicalExpiry", {
-                  required: "Medical Expiry is required",
-                })}
-              />
-              {errors.medicalExpiry && (
-                <p className="text-[red] text-[13px] mt-1">
-                  {errors.medicalExpiry.message}
-                </p>
-              )}
-            </div>
-
             {/* Medical Appointment Date */}
             <div>
               <label className="text_size_5">Medical Appointment Date</label>
@@ -572,6 +554,25 @@ export const AddEmployeeForm = () => {
                 </p>
               )}
             </div>
+
+
+              {/* Medical Expiry */}
+              <div>
+              <label className="text_size_5">Medical Expiry</label>
+              <input
+                type="date"
+                className="input-field"
+                {...register("medicalExpiry", {
+                  required: "Medical Expiry is required",
+                })}
+              />
+              {errors.medicalExpiry && (
+                <p className="text-[red] text-[13px] mt-1">
+                  {errors.medicalExpiry.message}
+                </p>
+              )}
+            </div>
+
 
             <FileUploadField
               label="Upload Medical Report"

@@ -31,6 +31,7 @@ import {
   listTicketRequests,
   listProbForms,
   listEmailNotifis,
+  listWPTrackings,
 } from "../graphql/queries";
 
 export const DataSupply = createContext();
@@ -68,7 +69,8 @@ const DataStoredContext = ({ children }) => {
     hiringData:[],
     ticketData:[],
     ProbFData:[],
-    EmailNotifi:[]
+    EmailNotifi:[],
+    WPTrackings:[],
   });
 
   useEffect(() => {
@@ -105,8 +107,9 @@ const DataStoredContext = ({ children }) => {
           { query: listTicketRequests, key: "ticketData"},
           { query: listProbForms, key: "ProbFData" },
           { query: listEmailNotifis, key: "EmailNotifi" },
+          { query: listWPTrackings, key: "WPTrackings" },
         ];
-        const limit = 10000;
+        const limit = 20000;
         const responses = await Promise.all(
           queries.map(({ query }) =>
             client.graphql({ query, variables: { limit } }).catch((error) => {

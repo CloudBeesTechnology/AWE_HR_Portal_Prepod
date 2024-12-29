@@ -169,12 +169,8 @@ type EmpRequisition @model @auth(rules: [{allow: public}]) {
 type WeldingInfo @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
-  department: String
   diameterRange: String
-  empBadgeNo: String
-  empName: String
   fillerMetal: String
-  position: String
   thicknessRange: String
   weldingStampNor: String
   wpsNumber: String
@@ -196,26 +192,25 @@ type TrainingReq @model @auth(rules: [{allow: public}]) {
   medicalExpiry: String
   medicalAppointDate: String
   medicalReport: [AWSJSON]
-  purchaseONo: String
-  traineeCourseCode: String
-  traineeCourseName: String
-  traineeCompany: String
   traineeSD: String
   traineeED: String
   traineeStatus: String
   traineeCourseFee: String
+  courseCode: [String]
+  courseName: [String]
+  company: [String]
+  mediRequired: Boolean
 }
 
 type TrainingCertificates @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
-  courseCode: [String]
-  courseName: [String]
-  company: [String]
   certifiExpiry: [String]
   eCertifiDate: [String]
   trainingUpCertifi: [AWSJSON]
   orgiCertifiDate: [String]
+  poNo: [String]
+  addDescretion: [String]
 }
 
 type AddCourse @model @auth(rules: [{allow: public}]) {
@@ -359,6 +354,7 @@ type WPTracking @model @auth(rules: [{allow: public}]) {
   lbrEndroseDate: String
   lbrDepoAmount: String
   lbrFile: String
+  remarkNLMob: String
 }
 
 type EmployeeNonLocalAcco @model @auth(rules: [{allow: public}]) {

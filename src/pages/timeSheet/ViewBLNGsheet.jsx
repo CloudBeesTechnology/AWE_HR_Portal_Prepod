@@ -3,7 +3,6 @@ import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
 import { EditTimeSheet } from "./EditTimeSheet";
 import { generateClient } from "@aws-amplify/api";
 
-
 import { listBlngs, listEmpWorkInfos } from "../../graphql/queries";
 import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
 import { SuccessMessage } from "./ModelForSuccessMess/SuccessMessage";
@@ -49,10 +48,84 @@ export const ViewBLNGsheet = ({
     "TimeKeeper"
   );
 
+  
+  // useEffect(() => {
+  //   if (excelData) {
+  //     const fetchData = async () => {
+  //       // setLoading is removed
+  //       try {
+  //         const dataPromise = new Promise((resolve, reject) => {
+  //           if (excelData) {
+  //             resolve(excelData);
+  //           } else {
+  //             setTimeout(() => {
+  //               reject("No data found after waiting.");
+  //             }, 5000);
+  //           }
+  //         });
+
+  //         const fetchedData = await dataPromise;
+
+  //         // setForUpdateBlng(fetchedData);
+  //         // setData(fetchedData);
+  //         const fetchWorkInfo = async () => {
+  //           // Fetch the BLNG data using GraphQL
+  //           const [empWorkInfos] = await Promise.all([
+  //             client.graphql({
+  //               query: listEmpWorkInfos,
+  //             }),
+  //           ]);
+  //           const workInfo = empWorkInfos?.data?.listEmpWorkInfos?.items;
+
+  //           // Merge fetchedData with workInfo based on FID
+  //           const mergedData = fetchedData.map((item) => {
+  //             const workInfoItem = workInfo.find(
+  //               (info) => info.sapNo == item.FID
+  //             );
+
+  //             return {
+  //               ...item,
+  //               NORMALWORKINGHRSPERDAY: workInfoItem
+  //                 ? workInfoItem.workHrs[workInfoItem.workHrs.length - 1]
+  //                 : null,
+  //             };
+  //           });
+  //           console.log(mergedData);
+  //           setData(mergedData); // Set merged data
+  //           setSecondaryData(mergedData);
+  //         };
+
+  //         fetchWorkInfo();
+  //       } catch (err) {
+  //       } finally {
+  //         // setLoading is removed ;
+  //       }
+  //     };
+  //     fetchData();
+  //   }
+  // }, [excelData]);
+  
+  async function fetchAllData(queryName) {
+    let allData = [];
+    let nextToken = null;
+  
+    do {
+      const response = await client.graphql({
+        query: queryName,
+        variables: { nextToken },
+      });
+  
+      const items = response.data[Object.keys(response.data)[0]].items; // Extract items
+      allData = [...allData, ...items]; // Append fetched items
+      nextToken = response.data[Object.keys(response.data)[0]].nextToken; // Get nextToken
+    } while (nextToken); // Continue if there's more data
+  
+    return allData;
+  }
+  
   useEffect(() => {
     if (excelData) {
       const fetchData = async () => {
-        // setLoading is removed
         try {
           const dataPromise = new Promise((resolve, reject) => {
             if (excelData) {
@@ -63,47 +136,49 @@ export const ViewBLNGsheet = ({
               }, 5000);
             }
           });
-
+  
           const fetchedData = await dataPromise;
-
-          // setForUpdateBlng(fetchedData);
-          // setData(fetchedData);
+  
           const fetchWorkInfo = async () => {
-            // Fetch the BLNG data using GraphQL
-            const [empWorkInfos] = await Promise.all([
-              client.graphql({
-                query: listEmpWorkInfos,
-              }),
-            ]);
-            const workInfo = empWorkInfos?.data?.listEmpWorkInfos?.items;
-
-            // Merge fetchedData with workInfo based on FID
-            const mergedData = fetchedData.map((item) => {
-              const workInfoItem = workInfo.find(
-                (info) => info.sapNo == item.FID
-              );
-
-              return {
-                ...item,
-                NORMALWORKINGHRSPERDAY: workInfoItem
-                  ? workInfoItem.workHrs[workInfoItem.workHrs.length - 1]
-                  : null,
-              };
-            });
-
-            setData(mergedData); // Set merged data
-            setSecondaryData(mergedData);
+            try {
+              // Fetch all data with pagination for work info
+              const empWorkInfos = await fetchAllData(listEmpWorkInfos);
+              const workInfo = empWorkInfos; // All work info data
+  
+              // Merge fetchedData with workInfo based on FID
+              const mergedData = fetchedData.map((item) => {
+                const workInfoItem = workInfo.find(
+                  (info) => info.sapNo == item.FID
+                );
+  
+                return {
+                  ...item,
+                  NORMALWORKINGHRSPERDAY: workInfoItem
+                    ? workInfoItem.workHrs[workInfoItem.workHrs.length - 1]
+                    : null,
+                };
+              });
+  
+              console.log(mergedData);
+              setData(mergedData); // Set merged data
+              setSecondaryData(mergedData);
+            } catch (err) {
+              console.error("Error fetching work info:", err.message);
+            }
           };
-
+  
           fetchWorkInfo();
         } catch (err) {
-        } finally {
-          // setLoading is removed ;
+          console.error("Error in fetchData:", err.message);
         }
       };
+  
       fetchData();
     }
   }, [excelData]);
+  
+  
+  
   useEffect(() => {
     const getPosition = localStorage.getItem("userType");
     if (getPosition === "Manager") {
@@ -243,7 +318,6 @@ export const ViewBLNGsheet = ({
           });
 
           const fetchedData = await dataPromise;
-         
 
           if (userIdentification === "Manager") {
             const finalData = await SendDataToManager(fetchedData);
@@ -410,7 +484,6 @@ export const ViewBLNGsheet = ({
 
       sendTimeSheets(finalResult);
 
-     
       const batchSize = 1000;
 
       // }
@@ -549,7 +622,7 @@ export const ViewBLNGsheet = ({
                     )}
                   </tr>
                 </thead>
-
+                {console.log(visibleData)}
                 <tbody>
                   {visibleData && visibleData?.length > 0 ? (
                     visibleData.map((value, index) => {
@@ -672,8 +745,8 @@ export const ViewBLNGsheet = ({
               </button>
             </div>
           </div>
-        ) : currentStatus === false && closePopup === true  ? (
-          <PopupForMissMatchExcelSheet setClosePopup={setClosePopup}/>
+        ) : currentStatus === false && closePopup === true ? (
+          <PopupForMissMatchExcelSheet setClosePopup={setClosePopup} />
         ) : (
           ""
         )}

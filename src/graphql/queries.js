@@ -586,12 +586,8 @@ export const getWeldingInfo = /* GraphQL */ `
     getWeldingInfo(id: $id) {
       id
       empID
-      department
       diameterRange
-      empBadgeNo
-      empName
       fillerMetal
-      position
       thicknessRange
       weldingStampNor
       wpsNumber
@@ -619,12 +615,8 @@ export const listWeldingInfos = /* GraphQL */ `
       items {
         id
         empID
-        department
         diameterRange
-        empBadgeNo
-        empName
         fillerMetal
-        position
         thicknessRange
         weldingStampNor
         wpsNumber
@@ -655,14 +647,14 @@ export const getTrainingReq = /* GraphQL */ `
       medicalExpiry
       medicalAppointDate
       medicalReport
-      purchaseONo
-      traineeCourseCode
-      traineeCourseName
-      traineeCompany
       traineeSD
       traineeED
       traineeStatus
       traineeCourseFee
+      courseCode
+      courseName
+      company
+      mediRequired
       createdAt
       updatedAt
       __typename
@@ -684,14 +676,14 @@ export const listTrainingReqs = /* GraphQL */ `
         medicalExpiry
         medicalAppointDate
         medicalReport
-        purchaseONo
-        traineeCourseCode
-        traineeCourseName
-        traineeCompany
         traineeSD
         traineeED
         traineeStatus
         traineeCourseFee
+        courseCode
+        courseName
+        company
+        mediRequired
         createdAt
         updatedAt
         __typename
@@ -706,13 +698,12 @@ export const getTrainingCertificates = /* GraphQL */ `
     getTrainingCertificates(id: $id) {
       id
       empID
-      courseCode
-      courseName
-      company
       certifiExpiry
       eCertifiDate
       trainingUpCertifi
       orgiCertifiDate
+      poNo
+      addDescretion
       createdAt
       updatedAt
       __typename
@@ -733,13 +724,12 @@ export const listTrainingCertificates = /* GraphQL */ `
       items {
         id
         empID
-        courseCode
-        courseName
-        company
         certifiExpiry
         eCertifiDate
         trainingUpCertifi
         orgiCertifiDate
+        poNo
+        addDescretion
         createdAt
         updatedAt
         __typename
@@ -1127,6 +1117,7 @@ export const getWPTracking = /* GraphQL */ `
       lbrEndroseDate
       lbrDepoAmount
       lbrFile
+      remarkNLMob
       createdAt
       updatedAt
       __typename
@@ -1190,6 +1181,7 @@ export const listWPTrackings = /* GraphQL */ `
         lbrEndroseDate
         lbrDepoAmount
         lbrFile
+        remarkNLMob
         createdAt
         updatedAt
         __typename

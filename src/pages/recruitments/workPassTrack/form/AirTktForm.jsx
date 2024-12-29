@@ -4,21 +4,22 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { uploadDocs } from "../../../../services/uploadDocsS3/UploadDocs";
 import { FileUploadField } from "../../../employees/medicalDep/FileUploadField";
 import { AirTktFormSchema } from "../../../../services/Validation";
-import { UpdateLoiData } from "../../../../services/updateMethod/UpdateLoi";
-import { useFetchInterview } from "../../../../hooks/useFetchInterview";
+import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
+import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPTracking";
 
-export const AirTktForm = () => {
-  const { mergedInterviewData } = useFetchInterview();
-  const { loiDetails } = UpdateLoiData();
+export const AirTktForm = ({ candidate }) => {
+  const { interviewSchedules } = useFetchCandy();
+  const { wpTrackingDetails } = useUpdateWPTracking();
 
   const [formData, setFormData] = useState({
     interview: {
       id: "",
-      departure: "",
-      arrival: "",
-      cityName: "",
-      airFare: "",
-      airTktFile: [],
+      departuredate: "",
+      arrivaldate: "",
+      cityname: "",
+      airfare: "",
+      airticketfile: "",
+      status: "",
     },
   });
   const [uploadedFileNames, setUploadedFileNames] = useState({
@@ -39,26 +40,43 @@ export const AirTktForm = () => {
   });
 
   const AirTktUpload = watch("airTktFile", "");
+
   useEffect(() => {
-    if (mergedInterviewData.length > 0) {
-      const interviewData = mergedInterviewData[0]; // Assuming we want to take the first item
-      setFormData({
-        interview: {
-          departure: interviewData.localMobilization.departure,
-          arrival: interviewData.localMobilization.arrival,
-          cityName: interviewData.localMobilization.cityName,
-          airFare: interviewData.localMobilization.airFare,
-          airTktFile: interviewData.localMobilization.airTktFile,
-        },
-      });
-      if (interviewData.localMobilization.airTktFile) {
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          airTktFile: extractFileName(interviewData.localMobilization.airTktFile),
-        }));
+    if (interviewSchedules.length > 0) {
+      // Find the interviewData for the candidate
+      const interviewData = interviewSchedules.find(
+        (data) => data.tempID === candidate.tempID
+      );
+
+      if (interviewData) {
+        // Set the form data
+        setFormData({
+          interview: {
+            departuredate: interviewData.departure,
+            arrivaldate: interviewData.arrivaldate,
+            cityname: interviewData.cityname,
+            airfare: interviewData.airfare,
+            airticketfile: interviewData.airticketfile,
+            status: interviewData.status,
+          },
+        });
+
+        // Check if sawpFile exists and update the file names
+        if (interviewData.airticketfile) {
+          const fileName = extractFileName(interviewData.airticketfile);
+          setUploadedFileNames((prev) => ({
+            ...prev,
+            airTktFile: fileName,
+          }));
+          console.log("Uploaded file name set:", fileName);
+        }
+      } else {
+        console.log("No interviewData found for candidate:", candidate.tempID);
       }
+    } else {
+      console.log("No interview schedules available.");
     }
-  }, [mergedInterviewData]);
+  }, [interviewSchedules, candidate.tempID]);
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
@@ -82,27 +100,45 @@ export const AirTktForm = () => {
     }
   };
 
-  const handleSubmitTwo = async (e) => {
-    e.preventDefault();
+  const handleSubmitTwo = async (data) => {
+    data.preventDefault();
 
-    const localMobilizationId = mergedInterviewData[0]?.localMobilization.id;
+    const selectedInterviewData = interviewSchedules.find(
+      (data) => data.tempID === candidate?.tempID
+    );
+    const interviewScheduleId = selectedInterviewData?.id;
+
+    if (!formData?.interview) {
+      console.error("Error: formData.interview is undefined.");
+      return;
+    }
+
+    if (!interviewScheduleId) {
+      console.error("Error: No interview schedule found for this candidate.");
+      return;
+    }
 
     try {
-      await loiDetails({
-        LoiValue: {
-          id: localMobilizationId,
-          departure: formData.interview.departure,
-          arrival: formData.interview.arrival,
-          cityName: formData.interview.cityName,
-          airFare: formData.interview.airFare,
-          airTktFile: uploadedAirTkt.airTktFile || formData.airTktFile,
+      const response = await wpTrackingDetails({
+        WPTrackingValue: {
+          id: interviewScheduleId,
+          departuredate: formData.interview.departuredate,
+          arrivaldate: formData.interview.arrivaldate,
+          cityname: formData.interview.cityname,
+          airfare: formData.interview.airfare,
+          airticketfile: uploadedAirTkt.airTktFile
+            ? uploadedAirTkt.airTktFile
+            : formData.interview.airticketfile,
         },
       });
-      console.log("Data stored successfully...");
-      // setNotification(true);
-    } catch (error) {
-      console.error("Error submitting interview details:", error);
-      alert("Failed to update interview details. Please try again.");
+
+      // console.log("Response from WPTrackingDetails:", response);
+
+      if (response.errors && response.errors.length > 0) {
+        console.error("Response errors:", response.errors);
+      }
+    } catch (err) {
+      console.error("Error submitting interview details:", err);
     }
   };
 
@@ -120,48 +156,48 @@ export const AirTktForm = () => {
     <form onSubmit={handleSubmitTwo} className="p-5">
       <div className="grid grid-cols-2 gap-5 mt-5">
         <div>
-          <label htmlFor="departure">Date of Departure</label>
+          <label htmlFor="departuredate">Date of Departure</label>
           <input
             className="w-full border p-2 rounded mt-1"
             type="date"
-            id="departure"
-            {...register("departure")}
-            value={formData.interview.departure}
-            onChange={(e) => handleInputChange("departure", e.target.value)}
+            id="departuredate"
+            {...register("departuredate")}
+            value={formData.interview.departuredate}
+            onChange={(e) => handleInputChange("departuredate", e.target.value)}
           />
         </div>
 
         <div>
-          <label htmlFor="arrival">Date of Arrival</label>
+          <label htmlFor="arrivaldate">Date of Arrival</label>
           <input
             className="w-full border p-2 rounded mt-1"
             type="date"
-            id="arrival"
-            {...register("arrival")}
-            value={formData.interview.arrival}
-            onChange={(e) => handleInputChange("arrival", e.target.value)}
+            id="arrivaldate"
+            {...register("arrivaldate")}
+            value={formData.interview.arrivaldate}
+            onChange={(e) => handleInputChange("arrivaldate", e.target.value)}
           />
         </div>
         <div>
-          <label htmlFor="cityName">City of Departure</label>
+          <label htmlFor="cityname">City of Departure</label>
           <input
             className="w-full border p-2 rounded mt-1"
             type="text"
-            id="cityName"
-            {...register("cityName")}
-            value={formData.interview.cityName}
-            onChange={(e) => handleInputChange("cityName", e.target.value)}
+            id="cityname"
+            {...register("cityname")}
+            value={formData.interview.cityname}
+            onChange={(e) => handleInputChange("cityname", e.target.value)}
           />
         </div>
         <div>
-          <label htmlFor="airFare">AirFare</label>
+          <label htmlFor="airfare">AirFare</label>
           <input
             className="w-full border p-2 rounded mt-1"
             type="text"
-            id="airFare"
-            {...register("airFare")}
-            value={formData.interview.airFare}
-            onChange={(e) => handleInputChange("airFare", e.target.value)}
+            id="airfare"
+            {...register("airfare")}
+            value={formData.interview.airfare}
+            onChange={(e) => handleInputChange("airfare", e.target.value)}
           />
         </div>
 
@@ -176,9 +212,20 @@ export const AirTktForm = () => {
               fileName={
                 uploadedFileNames.airTktFile || extractFileName(AirTktUpload)
               }
-              value={formData.interview.airTktFile}
+              value={formData.interview.airfare}
             />
           </div>
+        </div>
+        <div>
+          <label htmlFor="status">Status</label>
+          <input
+            className="w-full border p-2 rounded mt-1"
+            type="text"
+            id="status"
+            {...register("status")}
+            value={formData.interview.status}
+            onChange={(e) => handleInputChange("status", e.target.value)}
+          />
         </div>
       </div>
 

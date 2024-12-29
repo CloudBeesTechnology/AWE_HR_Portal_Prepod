@@ -4,21 +4,22 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { uploadDocs } from "../../../../services/uploadDocsS3/UploadDocs";
 import { FileUploadField } from "../../../employees/medicalDep/FileUploadField";
 import { ImmigrationFormSchema } from "../../../../services/Validation";
-import { UpdateLoiData } from "../../../../services/updateMethod/UpdateLoi";
-import { useFetchInterview } from "../../../../hooks/useFetchInterview";
+import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
+import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPTracking";
 
-export const ImmigrationForm = () => {
-  const { mergedInterviewData } = useFetchInterview();
-  const { loiDetails } = UpdateLoiData();
+export const ImmigrationForm = ({candidate}) => {
+  const { interviewSchedules } = useFetchCandy();
+  const { wpTrackingDetails } = useUpdateWPTracking();
 
   const [formData, setFormData] = useState({
     interview: {
       id: "",
-      immbdNo: "IMMBD/1382",
-      docSubmit: "",
-      visaApproval: "",
-      visaRefNo: "",
-      visaFile: [],
+      immbdno: "",
+      docsubmitdate: "",
+      visaapprovedate: "",
+      visareferenceno: "",
+      visaFile: "",
+      status: ""
     },
   });
   const [uploadedFileNames, setUploadedFileNames] = useState({
@@ -38,28 +39,47 @@ export const ImmigrationForm = () => {
     resolver: yupResolver(ImmigrationFormSchema),
   });
 
-  const VisaUpload = watch("visaFile", "");
+  const VisaUpload = watch("visaFile");
 
-  useEffect(() => {
-    if (mergedInterviewData.length > 0) {
-      const interviewData = mergedInterviewData[0]; // Assuming we want to take the first item
-      setFormData({
-        interview: {
-          immbdNo: interviewData.localMobilization.immbdNo,
-          docSubmit: interviewData.localMobilization.docSubmit,
-          visaApproval: interviewData.localMobilization.visaApproval,
-          visaRefNo: interviewData.localMobilization.visaRefNo,
-          visaFile: interviewData.localMobilization.visaFile,
-        },
-      });
-      if (interviewData.localMobilization.visaFile) {
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          visaFile: extractFileName(interviewData.localMobilization.visaFile),
-        }));
-      }
-    }
-  }, [mergedInterviewData]);
+   useEffect(() => {
+
+    
+        if (interviewSchedules.length > 0) {
+          // Find the interviewData for the candidate
+          const interviewData = interviewSchedules.find(
+            (data) => data.tempID === candidate.tempID
+          );
+    
+    
+          if (interviewData) {
+            // Set the form data
+            setFormData({
+              interview: {
+                immbdno: interviewData.immbdno,
+                docsubmitdate: interviewData.docsubmitdate,
+                visaapprovedate: interviewData.visaapprovedate,
+                visareferenceno: interviewData.visareferenceno,
+                visaFile: interviewData.visaFile,
+                status: interviewData.status
+              },
+            });
+    
+            // Check if sawpFile exists and update the file names
+            if (interviewData.visaFile) {
+              const fileName = extractFileName(interviewData.visaFile);
+              setUploadedFileNames((prev) => ({
+                ...prev,
+                visaFile: fileName,
+              }));
+              console.log("Uploaded file name set:", fileName);
+            }
+          } else {
+            console.log("No interviewData found for candidate:", candidate.tempID);
+          }
+        } else {
+          console.log("No interview schedules available.");
+        }
+      }, [interviewSchedules, candidate.tempID]);
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
@@ -83,27 +103,45 @@ export const ImmigrationForm = () => {
     }
   };
 
-  const handleSubmitTwo = async (e) => {
-    e.preventDefault();
-
-    const localMobilizationId = mergedInterviewData[0]?.localMobilization.id;
-
+  const handleSubmitTwo = async (data) => {
+    data.preventDefault();
+  
+    const selectedInterviewData = interviewSchedules.find(
+      (data) => data.tempID === candidate?.tempID
+    );
+    const interviewScheduleId = selectedInterviewData?.id;
+  
+    if (!formData?.interview) {
+      console.error("Error: formData.interview is undefined.");
+      return;
+    }
+  
+    if (!interviewScheduleId) {
+      console.error("Error: No interview schedule found for this candidate.");
+      return;
+    }
+  
     try {
-      await loiDetails({
-        LoiValue: {
-          id: localMobilizationId,
-          immbdNo: formData.interview.immbdNo,
-          docSubmit: formData.interview.docSubmit,
-          visaApproval: formData.interview.visaApproval,
-          visaRefNo: formData.interview.visaRefNo,
-          visaFile: uploadedVisa.visaFile || formData.visaFile,
+      const response = await wpTrackingDetails({
+        WPTrackingValue: {
+          id: interviewScheduleId,
+          immbdno: formData.interview.immbdno,
+          docsubmitdate: formData.interview.docsubmitdate,
+          visaapprovedate: formData.interview.visaapprovedate,
+          visareferenceno: formData.interview.visareferenceno,
+          visaFile: uploadedVisa.visaFile ? uploadedVisa.visaFile : formData.interview.visaFile,  
         },
+
       });
-      console.log("Data stored successfully...");
-      // setNotification(true);
-    } catch (error) {
-      console.error("Error submitting interview details:", error);
-      alert("Failed to update interview details. Please try again.");
+  
+      // console.log("Response from WPTrackingDetails:", response);
+  
+      if (response.errors && response.errors.length > 0) {
+        console.error("Response errors:", response.errors);
+      }
+  
+    } catch (err) {
+      console.error("Error submitting interview details:", err);
     }
   };
 
@@ -121,47 +159,47 @@ export const ImmigrationForm = () => {
     <form onSubmit={handleSubmitTwo} className="p-5">
       <div className="grid grid-cols-2 gap-5 mt-5">
         <div>
-          <label htmlFor="docSubmit">Date of Submission</label>
+          <label htmlFor="docsubmitdate">Date of Submission</label>
           <input
             className="w-full border p-2 rounded mt-1"
             type="date"
-            id="docSubmit"
-            {...register("docSubmit")}
-            value={formData.interview.docSubmit}
-            onChange={(e) => handleInputChange("docSubmit", e.target.value)}
+            id="docsubmitdate"
+            {...register("docsubmitdate")}
+            value={formData.interview.docsubmitdate}
+            onChange={(e) => handleInputChange("docsubmitdate", e.target.value)}
           />
         </div>
         <div>
-          <label htmlFor="immbdNo">Immigration Reference Number</label>
+          <label htmlFor="immbdno">Immigration Reference Number</label>
           <input
             className="w-full border p-2 rounded mt-1"
-            type="date"
-            id="immbdNo"
-            {...register("immbdNo")}
-            value={formData.interview.immbdNo}
-            onChange={(e) => handleInputChange("immbdNo", e.target.value)}
+            type="text"
+            id="immbdno"
+            {...register("immbdno")}
+            value={formData.interview.immbdno}
+            onChange={(e) => handleInputChange("immbdno", e.target.value)}
           />
         </div>
         <div>
-          <label htmlFor="visaApproval">Date of Approval</label>
+          <label htmlFor="visaapprovedate">Date of Approval</label>
           <input
             className="w-full border p-2 rounded mt-1"
             type="date"
-            id="visaApproval"
-            {...register("visaApproval")}
-            value={formData.interview.visaApproval}
-            onChange={(e) => handleInputChange("visaApproval", e.target.value)}
+            id=" visaapprovedate"
+            {...register(" visaapprovedate")}
+            value={formData.interview.visaapprovedate}
+            onChange={(e) => handleInputChange("visaapprovedate", e.target.value)}
           />
         </div>
         <div>
-          <label htmlFor="visaRefNo">Visa Reference Number</label>
+          <label htmlFor="visareferenceno">Visa Reference Number</label>
           <input
             className="w-full border p-2 rounded mt-1"
-            type="date"
-            id="visaRefNo"
-            {...register("visaRefNo")}
-            value={formData.interview.visaRefNo}
-            onChange={(e) => handleInputChange("visaRefNo", e.target.value)}
+            type="text"
+            id="visareferenceno"
+            {...register("visareferenceno")}
+            value={formData.interview.visareferenceno}
+            onChange={(e) => handleInputChange("visareferenceno", e.target.value)}
           />
         </div>
 
@@ -179,6 +217,17 @@ export const ImmigrationForm = () => {
               value={formData.interview.visaFile}
             />
           </div>
+        </div>
+        <div>
+          <label htmlFor="status">Status</label>
+          <input
+            className="w-full border p-2 rounded mt-1"
+            type="text"
+            id="status"
+            {...register("status")}
+            value={formData.interview.status}
+            onChange={(e) => handleInputChange("status", e.target.value)}
+          />
         </div>
       </div>
 

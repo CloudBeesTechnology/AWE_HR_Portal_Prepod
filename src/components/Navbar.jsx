@@ -96,7 +96,7 @@ const Navbar = () => {
       try {
         const empPersonalInfosData = await client.graphql({
           query: listEmpPersonalInfos,
-          variables: { limit: 10000 },
+          variables: { limit: 20000 },
         });
 
         const empPersonalInfos =
@@ -110,7 +110,7 @@ const Navbar = () => {
 
         // Find the employee matching the userID, ignoring case
         const userPersonalInfo = empPersonalInfos.find(
-          (emp) => emp.empID.toString().toLowerCase() === "awe350"
+          (emp) => emp.empID.toString().toLowerCase() === userID.toString().toLowerCase() 
         );
 
         if (userPersonalInfo) {

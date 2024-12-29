@@ -17,6 +17,7 @@ export const Training = () => {
 
   return (
     <section className="min-h-screen p-10 bg-[#F5F6F1CC] flex gap-16">
+
       {recruitmentPermissions.includes("HR") && (
         <SelectTiles
           img={icon1}
@@ -39,16 +40,6 @@ export const Training = () => {
         />
       )}
          
-      {/* {recruitmentPermissions.includes("Training List") && (
-        <SelectTiles
-          img={icon4}
-          text1="Training List"
-          fontSize="text_size_5"
-          borderColor="border-[#FF8BC7]"
-          bgColor="bg-white"
-          link="/allTraining"
-        />
-      )} */}
        <SelectTiles
           img={icon3}
           text1="BLNG"

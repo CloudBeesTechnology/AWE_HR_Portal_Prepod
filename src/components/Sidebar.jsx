@@ -36,7 +36,7 @@ const Sidebar = () => {
   useEffect(() => {
     async function fetchUserData() {
       try {
-        const res = await client.graphql({ query: listUsers });
+        const res = await client.graphql({ query: listUsers,variables:{limit:20000} });
         const result = res?.data?.listUsers?.items;
         const userID = localStorage.getItem("userID");
         const userType = localStorage.getItem("userType");

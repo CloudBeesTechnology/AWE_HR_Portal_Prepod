@@ -122,19 +122,16 @@ export const TcViewData = () => {
 
   return (
     <section className="bg-[#F8F8F8] mx-auto p-5 h-full w-full">
-      <div className=" flex items-center my-5">
-        <div className=" ">
-          <Link to="/training/hr" className="text-xl  text-grey ">
-            <FaArrowLeft />
-          </Link>
+      <div className="w-full flex items-center justify-between gap-5 my-5 ">
+                <Link to="/training" className="text-xl  text-grey">
+                  <FaArrowLeft />
+                </Link>
+          <article className="flex-1 flex gap-5 text-dark_grey justify-center">
+          <h1 className="text-center mt-2 text_size_2 relative after:absolute after:w-full after:h-1 after:bg-primary after:-bottom-2 after:left-0">
+          View Training Certificates
+          </h1>
+        </article>
         </div>
-      </div>
-
-      <div className="flex items-center justify-center gap-10 m-4 text-[16px] font-semibold mt-10">
-        <button className={`py-2 px-4 focus:outline-none border-b-4 border-yellow`}>
-        View Training Certificates
-        </button>
-      </div>
 
       <TrainVT
         mergering={finalData}

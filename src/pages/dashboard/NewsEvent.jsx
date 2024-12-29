@@ -15,7 +15,7 @@ export const NewsEvent = () => {
   const bgColors = ["bg-[#DEFFFF]", "bg-[#ECF9E2]", "bg-[#FFF3DC]"];
 
   return (
-    <div className="flex justify-center h-full max-w-[350px] p-2 w-full">
+    <div className="flex justify-center h-full p-2 w-full">
       <div className="rounded-lg shadow-md w-full h-full">
         <div className="bg-lite_grey rounded-t-2xl font-semibold p-3">
           <h2 className=" mx-2">Recent Notifications</h2>
@@ -45,7 +45,7 @@ export const NewsEvent = () => {
             </div>
           );
         })}
-          <div className=" underline text-[#8bb4f1] text-center px-16 mb-3  ">
+          <div className=" underline text-[#8bb4f1] text-center px-16 mb-3">
           <Link to="/notifications">View More
           </Link>
           </div>

@@ -26,6 +26,7 @@ export const LeaveSummaryPopUp = ({
       setEndDate(selectedDate);
     }
   };
+  
   const formattingDate = (date) => {
     const [year, month, day] = date?.split("-");
     const dats = `${day}/${month}/${year}`;

@@ -14,6 +14,7 @@ import {
   Grid,
   Icon,
   ScrollView,
+  SwitchField,
   Text,
   TextAreaField,
   TextField,
@@ -196,14 +197,14 @@ export default function TrainingReqCreateForm(props) {
     medicalExpiry: "",
     medicalAppointDate: "",
     medicalReport: [],
-    purchaseONo: "",
-    traineeCourseCode: "",
-    traineeCourseName: "",
-    traineeCompany: "",
     traineeSD: "",
     traineeED: "",
     traineeStatus: "",
     traineeCourseFee: "",
+    courseCode: [],
+    courseName: [],
+    company: [],
+    mediRequired: false,
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [MRNo, setMRNo] = React.useState(initialValues.MRNo);
@@ -219,18 +220,6 @@ export default function TrainingReqCreateForm(props) {
   const [medicalReport, setMedicalReport] = React.useState(
     initialValues.medicalReport
   );
-  const [purchaseONo, setPurchaseONo] = React.useState(
-    initialValues.purchaseONo
-  );
-  const [traineeCourseCode, setTraineeCourseCode] = React.useState(
-    initialValues.traineeCourseCode
-  );
-  const [traineeCourseName, setTraineeCourseName] = React.useState(
-    initialValues.traineeCourseName
-  );
-  const [traineeCompany, setTraineeCompany] = React.useState(
-    initialValues.traineeCompany
-  );
   const [traineeSD, setTraineeSD] = React.useState(initialValues.traineeSD);
   const [traineeED, setTraineeED] = React.useState(initialValues.traineeED);
   const [traineeStatus, setTraineeStatus] = React.useState(
@@ -238,6 +227,12 @@ export default function TrainingReqCreateForm(props) {
   );
   const [traineeCourseFee, setTraineeCourseFee] = React.useState(
     initialValues.traineeCourseFee
+  );
+  const [courseCode, setCourseCode] = React.useState(initialValues.courseCode);
+  const [courseName, setCourseName] = React.useState(initialValues.courseName);
+  const [company, setCompany] = React.useState(initialValues.company);
+  const [mediRequired, setMediRequired] = React.useState(
+    initialValues.mediRequired
   );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
@@ -248,19 +243,30 @@ export default function TrainingReqCreateForm(props) {
     setMedicalAppointDate(initialValues.medicalAppointDate);
     setMedicalReport(initialValues.medicalReport);
     setCurrentMedicalReportValue("");
-    setPurchaseONo(initialValues.purchaseONo);
-    setTraineeCourseCode(initialValues.traineeCourseCode);
-    setTraineeCourseName(initialValues.traineeCourseName);
-    setTraineeCompany(initialValues.traineeCompany);
     setTraineeSD(initialValues.traineeSD);
     setTraineeED(initialValues.traineeED);
     setTraineeStatus(initialValues.traineeStatus);
     setTraineeCourseFee(initialValues.traineeCourseFee);
+    setCourseCode(initialValues.courseCode);
+    setCurrentCourseCodeValue("");
+    setCourseName(initialValues.courseName);
+    setCurrentCourseNameValue("");
+    setCompany(initialValues.company);
+    setCurrentCompanyValue("");
+    setMediRequired(initialValues.mediRequired);
     setErrors({});
   };
   const [currentMedicalReportValue, setCurrentMedicalReportValue] =
     React.useState("");
   const medicalReportRef = React.createRef();
+  const [currentCourseCodeValue, setCurrentCourseCodeValue] =
+    React.useState("");
+  const courseCodeRef = React.createRef();
+  const [currentCourseNameValue, setCurrentCourseNameValue] =
+    React.useState("");
+  const courseNameRef = React.createRef();
+  const [currentCompanyValue, setCurrentCompanyValue] = React.useState("");
+  const companyRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
     MRNo: [],
@@ -268,14 +274,14 @@ export default function TrainingReqCreateForm(props) {
     medicalExpiry: [],
     medicalAppointDate: [],
     medicalReport: [{ type: "JSON" }],
-    purchaseONo: [],
-    traineeCourseCode: [],
-    traineeCourseName: [],
-    traineeCompany: [],
     traineeSD: [],
     traineeED: [],
     traineeStatus: [],
     traineeCourseFee: [],
+    courseCode: [],
+    courseName: [],
+    company: [],
+    mediRequired: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -309,14 +315,14 @@ export default function TrainingReqCreateForm(props) {
           medicalExpiry,
           medicalAppointDate,
           medicalReport,
-          purchaseONo,
-          traineeCourseCode,
-          traineeCourseName,
-          traineeCompany,
           traineeSD,
           traineeED,
           traineeStatus,
           traineeCourseFee,
+          courseCode,
+          courseName,
+          company,
+          mediRequired,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -385,14 +391,14 @@ export default function TrainingReqCreateForm(props) {
               medicalExpiry,
               medicalAppointDate,
               medicalReport,
-              purchaseONo,
-              traineeCourseCode,
-              traineeCourseName,
-              traineeCompany,
               traineeSD,
               traineeED,
               traineeStatus,
               traineeCourseFee,
+              courseCode,
+              courseName,
+              company,
+              mediRequired,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -422,14 +428,14 @@ export default function TrainingReqCreateForm(props) {
               medicalExpiry,
               medicalAppointDate,
               medicalReport,
-              purchaseONo,
-              traineeCourseCode,
-              traineeCourseName,
-              traineeCompany,
               traineeSD,
               traineeED,
               traineeStatus,
               traineeCourseFee,
+              courseCode,
+              courseName,
+              company,
+              mediRequired,
             };
             const result = onChange(modelFields);
             value = result?.MRNo ?? value;
@@ -459,14 +465,14 @@ export default function TrainingReqCreateForm(props) {
               medicalExpiry,
               medicalAppointDate,
               medicalReport,
-              purchaseONo,
-              traineeCourseCode,
-              traineeCourseName,
-              traineeCompany,
               traineeSD,
               traineeED,
               traineeStatus,
               traineeCourseFee,
+              courseCode,
+              courseName,
+              company,
+              mediRequired,
             };
             const result = onChange(modelFields);
             value = result?.medicalName ?? value;
@@ -496,14 +502,14 @@ export default function TrainingReqCreateForm(props) {
               medicalExpiry: value,
               medicalAppointDate,
               medicalReport,
-              purchaseONo,
-              traineeCourseCode,
-              traineeCourseName,
-              traineeCompany,
               traineeSD,
               traineeED,
               traineeStatus,
               traineeCourseFee,
+              courseCode,
+              courseName,
+              company,
+              mediRequired,
             };
             const result = onChange(modelFields);
             value = result?.medicalExpiry ?? value;
@@ -533,14 +539,14 @@ export default function TrainingReqCreateForm(props) {
               medicalExpiry,
               medicalAppointDate: value,
               medicalReport,
-              purchaseONo,
-              traineeCourseCode,
-              traineeCourseName,
-              traineeCompany,
               traineeSD,
               traineeED,
               traineeStatus,
               traineeCourseFee,
+              courseCode,
+              courseName,
+              company,
+              mediRequired,
             };
             const result = onChange(modelFields);
             value = result?.medicalAppointDate ?? value;
@@ -568,14 +574,14 @@ export default function TrainingReqCreateForm(props) {
               medicalExpiry,
               medicalAppointDate,
               medicalReport: values,
-              purchaseONo,
-              traineeCourseCode,
-              traineeCourseName,
-              traineeCompany,
               traineeSD,
               traineeED,
               traineeStatus,
               traineeCourseFee,
+              courseCode,
+              courseName,
+              company,
+              mediRequired,
             };
             const result = onChange(modelFields);
             values = result?.medicalReport ?? values;
@@ -618,158 +624,6 @@ export default function TrainingReqCreateForm(props) {
         ></TextAreaField>
       </ArrayField>
       <TextField
-        label="Purchase o no"
-        isRequired={false}
-        isReadOnly={false}
-        value={purchaseONo}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              empID,
-              MRNo,
-              medicalName,
-              medicalExpiry,
-              medicalAppointDate,
-              medicalReport,
-              purchaseONo: value,
-              traineeCourseCode,
-              traineeCourseName,
-              traineeCompany,
-              traineeSD,
-              traineeED,
-              traineeStatus,
-              traineeCourseFee,
-            };
-            const result = onChange(modelFields);
-            value = result?.purchaseONo ?? value;
-          }
-          if (errors.purchaseONo?.hasError) {
-            runValidationTasks("purchaseONo", value);
-          }
-          setPurchaseONo(value);
-        }}
-        onBlur={() => runValidationTasks("purchaseONo", purchaseONo)}
-        errorMessage={errors.purchaseONo?.errorMessage}
-        hasError={errors.purchaseONo?.hasError}
-        {...getOverrideProps(overrides, "purchaseONo")}
-      ></TextField>
-      <TextField
-        label="Trainee course code"
-        isRequired={false}
-        isReadOnly={false}
-        value={traineeCourseCode}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              empID,
-              MRNo,
-              medicalName,
-              medicalExpiry,
-              medicalAppointDate,
-              medicalReport,
-              purchaseONo,
-              traineeCourseCode: value,
-              traineeCourseName,
-              traineeCompany,
-              traineeSD,
-              traineeED,
-              traineeStatus,
-              traineeCourseFee,
-            };
-            const result = onChange(modelFields);
-            value = result?.traineeCourseCode ?? value;
-          }
-          if (errors.traineeCourseCode?.hasError) {
-            runValidationTasks("traineeCourseCode", value);
-          }
-          setTraineeCourseCode(value);
-        }}
-        onBlur={() =>
-          runValidationTasks("traineeCourseCode", traineeCourseCode)
-        }
-        errorMessage={errors.traineeCourseCode?.errorMessage}
-        hasError={errors.traineeCourseCode?.hasError}
-        {...getOverrideProps(overrides, "traineeCourseCode")}
-      ></TextField>
-      <TextField
-        label="Trainee course name"
-        isRequired={false}
-        isReadOnly={false}
-        value={traineeCourseName}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              empID,
-              MRNo,
-              medicalName,
-              medicalExpiry,
-              medicalAppointDate,
-              medicalReport,
-              purchaseONo,
-              traineeCourseCode,
-              traineeCourseName: value,
-              traineeCompany,
-              traineeSD,
-              traineeED,
-              traineeStatus,
-              traineeCourseFee,
-            };
-            const result = onChange(modelFields);
-            value = result?.traineeCourseName ?? value;
-          }
-          if (errors.traineeCourseName?.hasError) {
-            runValidationTasks("traineeCourseName", value);
-          }
-          setTraineeCourseName(value);
-        }}
-        onBlur={() =>
-          runValidationTasks("traineeCourseName", traineeCourseName)
-        }
-        errorMessage={errors.traineeCourseName?.errorMessage}
-        hasError={errors.traineeCourseName?.hasError}
-        {...getOverrideProps(overrides, "traineeCourseName")}
-      ></TextField>
-      <TextField
-        label="Trainee company"
-        isRequired={false}
-        isReadOnly={false}
-        value={traineeCompany}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              empID,
-              MRNo,
-              medicalName,
-              medicalExpiry,
-              medicalAppointDate,
-              medicalReport,
-              purchaseONo,
-              traineeCourseCode,
-              traineeCourseName,
-              traineeCompany: value,
-              traineeSD,
-              traineeED,
-              traineeStatus,
-              traineeCourseFee,
-            };
-            const result = onChange(modelFields);
-            value = result?.traineeCompany ?? value;
-          }
-          if (errors.traineeCompany?.hasError) {
-            runValidationTasks("traineeCompany", value);
-          }
-          setTraineeCompany(value);
-        }}
-        onBlur={() => runValidationTasks("traineeCompany", traineeCompany)}
-        errorMessage={errors.traineeCompany?.errorMessage}
-        hasError={errors.traineeCompany?.hasError}
-        {...getOverrideProps(overrides, "traineeCompany")}
-      ></TextField>
-      <TextField
         label="Trainee sd"
         isRequired={false}
         isReadOnly={false}
@@ -784,14 +638,14 @@ export default function TrainingReqCreateForm(props) {
               medicalExpiry,
               medicalAppointDate,
               medicalReport,
-              purchaseONo,
-              traineeCourseCode,
-              traineeCourseName,
-              traineeCompany,
               traineeSD: value,
               traineeED,
               traineeStatus,
               traineeCourseFee,
+              courseCode,
+              courseName,
+              company,
+              mediRequired,
             };
             const result = onChange(modelFields);
             value = result?.traineeSD ?? value;
@@ -821,14 +675,14 @@ export default function TrainingReqCreateForm(props) {
               medicalExpiry,
               medicalAppointDate,
               medicalReport,
-              purchaseONo,
-              traineeCourseCode,
-              traineeCourseName,
-              traineeCompany,
               traineeSD,
               traineeED: value,
               traineeStatus,
               traineeCourseFee,
+              courseCode,
+              courseName,
+              company,
+              mediRequired,
             };
             const result = onChange(modelFields);
             value = result?.traineeED ?? value;
@@ -858,14 +712,14 @@ export default function TrainingReqCreateForm(props) {
               medicalExpiry,
               medicalAppointDate,
               medicalReport,
-              purchaseONo,
-              traineeCourseCode,
-              traineeCourseName,
-              traineeCompany,
               traineeSD,
               traineeED,
               traineeStatus: value,
               traineeCourseFee,
+              courseCode,
+              courseName,
+              company,
+              mediRequired,
             };
             const result = onChange(modelFields);
             value = result?.traineeStatus ?? value;
@@ -895,14 +749,14 @@ export default function TrainingReqCreateForm(props) {
               medicalExpiry,
               medicalAppointDate,
               medicalReport,
-              purchaseONo,
-              traineeCourseCode,
-              traineeCourseName,
-              traineeCompany,
               traineeSD,
               traineeED,
               traineeStatus,
               traineeCourseFee: value,
+              courseCode,
+              courseName,
+              company,
+              mediRequired,
             };
             const result = onChange(modelFields);
             value = result?.traineeCourseFee ?? value;
@@ -917,6 +771,221 @@ export default function TrainingReqCreateForm(props) {
         hasError={errors.traineeCourseFee?.hasError}
         {...getOverrideProps(overrides, "traineeCourseFee")}
       ></TextField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              MRNo,
+              medicalName,
+              medicalExpiry,
+              medicalAppointDate,
+              medicalReport,
+              traineeSD,
+              traineeED,
+              traineeStatus,
+              traineeCourseFee,
+              courseCode: values,
+              courseName,
+              company,
+              mediRequired,
+            };
+            const result = onChange(modelFields);
+            values = result?.courseCode ?? values;
+          }
+          setCourseCode(values);
+          setCurrentCourseCodeValue("");
+        }}
+        currentFieldValue={currentCourseCodeValue}
+        label={"Course code"}
+        items={courseCode}
+        hasError={errors?.courseCode?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("courseCode", currentCourseCodeValue)
+        }
+        errorMessage={errors?.courseCode?.errorMessage}
+        setFieldValue={setCurrentCourseCodeValue}
+        inputFieldRef={courseCodeRef}
+        defaultFieldValue={""}
+      >
+        <TextField
+          label="Course code"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCourseCodeValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.courseCode?.hasError) {
+              runValidationTasks("courseCode", value);
+            }
+            setCurrentCourseCodeValue(value);
+          }}
+          onBlur={() =>
+            runValidationTasks("courseCode", currentCourseCodeValue)
+          }
+          errorMessage={errors.courseCode?.errorMessage}
+          hasError={errors.courseCode?.hasError}
+          ref={courseCodeRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "courseCode")}
+        ></TextField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              MRNo,
+              medicalName,
+              medicalExpiry,
+              medicalAppointDate,
+              medicalReport,
+              traineeSD,
+              traineeED,
+              traineeStatus,
+              traineeCourseFee,
+              courseCode,
+              courseName: values,
+              company,
+              mediRequired,
+            };
+            const result = onChange(modelFields);
+            values = result?.courseName ?? values;
+          }
+          setCourseName(values);
+          setCurrentCourseNameValue("");
+        }}
+        currentFieldValue={currentCourseNameValue}
+        label={"Course name"}
+        items={courseName}
+        hasError={errors?.courseName?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("courseName", currentCourseNameValue)
+        }
+        errorMessage={errors?.courseName?.errorMessage}
+        setFieldValue={setCurrentCourseNameValue}
+        inputFieldRef={courseNameRef}
+        defaultFieldValue={""}
+      >
+        <TextField
+          label="Course name"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCourseNameValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.courseName?.hasError) {
+              runValidationTasks("courseName", value);
+            }
+            setCurrentCourseNameValue(value);
+          }}
+          onBlur={() =>
+            runValidationTasks("courseName", currentCourseNameValue)
+          }
+          errorMessage={errors.courseName?.errorMessage}
+          hasError={errors.courseName?.hasError}
+          ref={courseNameRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "courseName")}
+        ></TextField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              MRNo,
+              medicalName,
+              medicalExpiry,
+              medicalAppointDate,
+              medicalReport,
+              traineeSD,
+              traineeED,
+              traineeStatus,
+              traineeCourseFee,
+              courseCode,
+              courseName,
+              company: values,
+              mediRequired,
+            };
+            const result = onChange(modelFields);
+            values = result?.company ?? values;
+          }
+          setCompany(values);
+          setCurrentCompanyValue("");
+        }}
+        currentFieldValue={currentCompanyValue}
+        label={"Company"}
+        items={company}
+        hasError={errors?.company?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("company", currentCompanyValue)
+        }
+        errorMessage={errors?.company?.errorMessage}
+        setFieldValue={setCurrentCompanyValue}
+        inputFieldRef={companyRef}
+        defaultFieldValue={""}
+      >
+        <TextField
+          label="Company"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentCompanyValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.company?.hasError) {
+              runValidationTasks("company", value);
+            }
+            setCurrentCompanyValue(value);
+          }}
+          onBlur={() => runValidationTasks("company", currentCompanyValue)}
+          errorMessage={errors.company?.errorMessage}
+          hasError={errors.company?.hasError}
+          ref={companyRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "company")}
+        ></TextField>
+      </ArrayField>
+      <SwitchField
+        label="Medi required"
+        defaultChecked={false}
+        isDisabled={false}
+        isChecked={mediRequired}
+        onChange={(e) => {
+          let value = e.target.checked;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              MRNo,
+              medicalName,
+              medicalExpiry,
+              medicalAppointDate,
+              medicalReport,
+              traineeSD,
+              traineeED,
+              traineeStatus,
+              traineeCourseFee,
+              courseCode,
+              courseName,
+              company,
+              mediRequired: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.mediRequired ?? value;
+          }
+          if (errors.mediRequired?.hasError) {
+            runValidationTasks("mediRequired", value);
+          }
+          setMediRequired(value);
+        }}
+        onBlur={() => runValidationTasks("mediRequired", mediRequired)}
+        errorMessage={errors.mediRequired?.errorMessage}
+        hasError={errors.mediRequired?.hasError}
+        {...getOverrideProps(overrides, "mediRequired")}
+      ></SwitchField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

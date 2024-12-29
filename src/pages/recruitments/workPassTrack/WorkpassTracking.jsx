@@ -4,6 +4,10 @@ import { LuFilter } from "react-icons/lu";
 import { Table } from "../../../utils/Table"; // Import your existing Table component
 import { WorkpassForm } from "./WorkpassForm";
 import { useFetchInterview } from "../../../hooks/useFetchInterview";
+import { SawpTable } from "./SawpTable";
+import { DateFormat } from "../../../utils/DateFormat";
+import { DataSupply } from "../../../utils/DataStoredContext";
+import { getUrl } from "@aws-amplify/storage";
 
 export const WorkpassTracking = () => {
   const [data, setData] = useState([]); // Data fetched from API
@@ -16,30 +20,80 @@ export const WorkpassTracking = () => {
   const [isFilterBoxOpen, setIsFilterBoxOpen] = useState(false);
   const [filteredData, setFilteredData] = useState([]); // To store filtered table data
   const filterBoxRef = useRef(null); // Ref to track clicks outside the filter box
-  const [filterBoxTitle, setFilterBoxTitle] = useState("Check status");
-  const [selectedFilters, setSelectedFilters] = useState("");
+  const [filterBoxTitle, setFilterBoxTitle] = useState("SAWP");
+  const [selectedFilters, setSelectedFilters] = useState("SAWP");
   const [selectedCandidateType, setSelectedCandidateType] = useState([]);
   const [candidateTypeDropdownOpen, setCandidateTypeDropdownOpen] =
     useState(false);
-  const { mergedInterviewData } = useFetchInterview();
+  const [urlValue, setURLValue] = useState("");
+
+  const { WPTrackings, empPDData, IVSSDetails } = useContext(DataSupply);
   const tableData = data || []; // Example: reuse the same data, but you can filter or change it as needed
 
-  useEffect(() => {
-    if (mergedInterviewData && mergedInterviewData.length > 0) {
-      // Filter candidates based on approvalStatus
-      const approvedCandidates = mergedInterviewData.filter(
-        (candidate) =>
-          (candidate.localMobilization.cvecApproveDate !== null ||
-            candidate.localMobilization.paafApproveDate !== null) &&
-          candidate.contractType !== "Local"
-      );
-      setFilteredData(approvedCandidates);
-    } else {
-      setFilteredData([]); // Set to empty array if no candidates are approved
-    }
-  }, [mergedInterviewData]);
+  // console.log(mergedInterviewData);
 
-  // console.log("Interview Data", mergedInterviewData)
+  useEffect(() => {
+    const empPDMap = empPDData.reduce((acc, item) => {
+      acc[item.tempID] = item;
+      return acc;
+    }, {});
+
+    const IVSSMap = IVSSDetails.reduce((acc, item) => {
+      acc[item.tempID] = item;
+      return acc;
+    }, {});
+
+    const WPTackingMap = WPTrackings.reduce((acc, item) => {
+      acc[item.tempID] = item;
+      return acc;
+    }, {});
+    const mergedInterviewData = Object.values(empPDMap).map((candi) => {
+      const WPTrack = WPTackingMap[candi.tempID] || {};
+      const IVSS = IVSSMap[candi.tempID] || {};
+
+      return {
+        ...candi,
+        interviewDetails: IVSS,
+        WPTrackDetails: WPTrack,
+      };
+    });
+
+    const flattenObject = mergedInterviewData.map((data) => {
+      const result = { ...data };
+
+      // Flatten `interviewDetails`
+      if (result.interviewDetails) {
+        Object.entries(result.interviewDetails).forEach(([key, value]) => {
+          result[`interviewDetails_${key}`] = value;
+        });
+        delete result.interviewDetails; // Remove original nested object
+      }
+
+      // Flatten `localMobilization`
+      if (result.WPTrackDetails) {
+        Object.entries(result.WPTrackDetails).forEach(([key, value]) => {
+          result[`WPTrackDetails_${key}`] = value;
+        });
+        delete result.WPTrackDetails;
+      }
+
+      return result;
+    });
+    if (flattenObject && flattenObject.length > 0) {
+      // Filter candidates based on approvalStatus
+      // console.log(flattenObject);
+      const initialFiltered = flattenObject.filter(
+        (val) => val?.interviewDetails_status?.toUpperCase() === "SAWP"
+      );
+
+      setFilteredData(initialFiltered);
+      setData(initialFiltered);
+    } else {
+      setData([]); // Set to empty array if no candidates are approved
+    }
+  }, [WPTrackings, empPDData, IVSSDetails]);
+
+  // console.log("Interview Data", flattenObject)
 
   const toggleFilterBox = (event) => {
     event?.stopPropagation();
@@ -53,32 +107,76 @@ export const WorkpassTracking = () => {
 
   const handleFilterChange = (event) => {
     const selectedValue = event.target.value; // Get the correct selected value
+
     setSelectedFilters(selectedValue); // Update the selected filter state
     setFilterBoxTitle(selectedValue); // Update the filter box title with the selected value
 
-    // Filter data based on the selected value
-    const newFilteredData = data.filter(
-      (item) => item.workpasstracking === selectedValue
-    );
-    setFilteredData(newFilteredData); // Update the filtered data
+    if (!data) return; // Guard clause for null data
+
+    let filtered = [];
+    switch (selectedValue) {
+      case "SAWP":
+        filtered = data.filter(
+          (val) => val?.interviewDetails_status?.toUpperCase() === "SAWP"
+        );
+        break;
+
+      case "DOE":
+        filtered = data.filter(
+          (val) => val?.interviewDetails_status?.toUpperCase() === "DOE"
+        );
+        break;
+
+      case "NLMS":
+        filtered = data.filter(
+          (val) => val?.interviewDetails_status?.toUpperCase() === "NLMS"
+        );
+        break;
+
+      case "Bank Guarantee":
+        filtered = data.filter(
+          (val) =>
+            val?.interviewDetails_status?.toUpperCase() === "BANKGUARANTEE"
+        );
+        break;
+
+      case "JITPA":
+        filtered = data.filter(
+          (val) => val?.interviewDetails_status?.toUpperCase() === "JIPTA"
+        );
+        break;
+
+      case "Labour Deposit":
+        filtered = data.filter(
+          (val) =>
+            val?.interviewDetails_status?.toLowerCase() === "LABOURDEPOSIT"
+        );
+        break;
+      case "Immigration":
+        filtered = data.filter(
+          (val) => val?.interviewDetails_status?.toLowerCase() === "IMMIGRATION"
+        );
+        break;
+      case "Air Ticket":
+        filtered = data.filter(
+          (val) => val?.interviewDetails_status?.toLowerCase() === "AIRTICKET"
+        );
+        break;
+      case "NonLocal Mobilization":
+        filtered = data.filter(
+          (val) => val?.interviewDetails_status?.toLowerCase() === "NONLOCALMOB"
+        );
+        break;
+    }
+    console.log(filtered);
+
+    setFilteredData(filtered);
 
     // Close the filter box after selection
     setIsFilterBoxOpen(false);
   };
 
   const closeForm = () => setIsFormVisible(false);
-
-  const columns = [
-    "TempId",
-    "Name",
-    "Nationality",
-    "Position",
-    "Contract",
-    "Type",
-    "Email",
-    "Contact",
-  ];
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -138,7 +236,34 @@ export const WorkpassTracking = () => {
       setFilteredData(filtered); // Update the filtered data
     }
   };
+  const fileUpload = async (files) => {
+    try {
+      // Check if input is a string
+      if (typeof files === "string") {
+        let validJsonString = files
+          .replace(/=/g, ":") // Replace `=` with `:`
+          .replace(/([{,])(\s*[a-zA-Z0-9_]+)(?=\s*:)/g, '$1"$2"') // Wrap keys in quotes
+          .replace(/:\s*([^",}\]]+)/g, ': "$1"') // Wrap unquoted values in quotes
+          .replace(/"\s*[^"]+"\s*$/g, (match) => match.trim()) // Trim unnecessary spaces
+          .replace(/(\w)(,|})/g, "$1$2"); // Ensure commas and closing brackets are in place
 
+        const parsedArray = JSON.parse(validJsonString);
+
+        const parsedFiles = parsedArray[parsedArray.length - 1].upload;
+        const gettingUrl = await getUrl({
+          path: parsedFiles,
+        });
+
+        return setURLValue(gettingUrl.url.toString());
+      } else {
+        console.error("Input must be a string.");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error parsing files:", error.message);
+      return null;
+    }
+  };
   return (
     <section className="screen-size min-h-screen mb-4 ">
       <div className="relative">
@@ -241,18 +366,24 @@ export const WorkpassTracking = () => {
 
         {loading && !error ? (
           filteredData.length > 0 ? (
-            <Table
-              columns={columns}
+            <SawpTable
               data={filteredData}
-              rowClickHandler={handleRowClick}
-              showCheckboxes={false}
-              selectedRows={selectedRows}
-              currentPage="workpasstracking"
-              selectedTable="workpasstracking"
-              edited={handleRowClick}
-              showEditIcon={true}
+              formatDate={DateFormat}
+              fileUpload={fileUpload}
+              urlValue={urlValue}
             />
           ) : (
+            // <Table
+            //   columns={columns}
+            //   data={filteredData}
+            //   rowClickHandler={handleRowClick}
+            //   showCheckboxes={false}
+            //   selectedRows={selectedRows}
+            //   currentPage="workpasstracking"
+            //   selectedTable="workpasstracking"
+            //   edited={handleRowClick}
+            //   showEditIcon={true}
+            // />
             <div className="text-center text-grey py-10">No data found</div>
           )
         ) : (

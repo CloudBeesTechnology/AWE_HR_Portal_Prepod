@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { RiFileEditLine } from "react-icons/ri";
 import { StatusForm } from "./StatusForm";
 import { ReviewForm } from "../ReviewForm";
+import { WorkpassForm } from "./WorkpassForm";
 
-export const AirTKtTable = ({ data,formatDate }) => {
+export const AirTKtTable = ({ data, formatDate }) => {
   const [isFormVisible, setIsFormVisible] = useState(false);
-    const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
+  const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const [selectedCandi, setSelectedCandi] = useState([]);
   const heading = [
     "TempID",
@@ -19,14 +20,14 @@ export const AirTKtTable = ({ data,formatDate }) => {
     "Edit Form",
   ];
   console.log(data);
-const handleShowForm=(candi)=>{
-  setSelectedCandi(candi);
-    setIsFormVisible(!isFormVisible)
-}
-const handleShowReviewForm = (candi) => {
-  setSelectedCandi(candi);
-  setIsReviewFormVisible(!isReviewFormVisible);
-};
+  const handleShowForm = (candi) => {
+    setSelectedCandi(candi);
+    setIsFormVisible(!isFormVisible);
+  };
+  const handleShowReviewForm = (candi) => {
+    setSelectedCandi(candi);
+    setIsReviewFormVisible(!isReviewFormVisible);
+  };
   return (
     <div>
       {data && data.length > 0 ? (
@@ -66,8 +67,16 @@ const handleShowReviewForm = (candi) => {
                     <td className="py-3">
                       {item.interviewDetails_manager || "N/A"}
                     </td>
-                    <td className="py-3 text-center" onClick={() => handleShowReviewForm(item)} >View</td>
-                    <td className="text-2xl cursor-pointer py-3 center" onClick={()=>handleShowForm(item)}>
+                    <td
+                      className="py-3 text-center"
+                      onClick={() => handleShowReviewForm(item)}
+                    >
+                      View
+                    </td>
+                    <td
+                      className="text-2xl cursor-pointer py-3 center"
+                      onClick={() => handleShowForm(item)}
+                    >
                       <RiFileEditLine />
                     </td>
                   </tr>
@@ -80,15 +89,20 @@ const handleShowReviewForm = (candi) => {
         </table>
       ) : (
         <div className="text-center mt-6 py-20">
-
           <p className="text-lg text-dark_grey mt-2">No Data Available</p>
         </div>
       )}
-      {isReviewFormVisible && <ReviewForm candidate={selectedCandi} onClose={handleShowReviewForm} showDecisionButtons={true} />}
+      {isReviewFormVisible && (
+        <ReviewForm
+          candidate={selectedCandi}
+          onClose={handleShowReviewForm}
+         
+        />
+      )}
       {isFormVisible && (
-        <StatusForm
-        candidate={selectedCandi}
-        //   onSave={handleFormSave}
+        <WorkpassForm
+          candidate={selectedCandi}
+          //   onSave={handleFormSave}
           onClose={handleShowForm}
         />
       )}

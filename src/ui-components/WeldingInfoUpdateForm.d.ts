@@ -23,12 +23,8 @@ export declare type ValidationResponse = {
 export declare type ValidationFunction<T> = (value: T, validationResponse: ValidationResponse) => ValidationResponse | Promise<ValidationResponse>;
 export declare type WeldingInfoUpdateFormInputValues = {
     empID?: string;
-    department?: string;
     diameterRange?: string;
-    empBadgeNo?: string;
-    empName?: string;
     fillerMetal?: string;
-    position?: string;
     thicknessRange?: string;
     weldingStampNor?: string;
     wpsNumber?: string;
@@ -43,12 +39,8 @@ export declare type WeldingInfoUpdateFormInputValues = {
 };
 export declare type WeldingInfoUpdateFormValidationValues = {
     empID?: ValidationFunction<string>;
-    department?: ValidationFunction<string>;
     diameterRange?: ValidationFunction<string>;
-    empBadgeNo?: ValidationFunction<string>;
-    empName?: ValidationFunction<string>;
     fillerMetal?: ValidationFunction<string>;
-    position?: ValidationFunction<string>;
     thicknessRange?: ValidationFunction<string>;
     weldingStampNor?: ValidationFunction<string>;
     wpsNumber?: ValidationFunction<string>;
@@ -65,12 +57,8 @@ export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes
 export declare type WeldingInfoUpdateFormOverridesProps = {
     WeldingInfoUpdateFormGrid?: PrimitiveOverrideProps<GridProps>;
     empID?: PrimitiveOverrideProps<TextFieldProps>;
-    department?: PrimitiveOverrideProps<TextFieldProps>;
     diameterRange?: PrimitiveOverrideProps<TextFieldProps>;
-    empBadgeNo?: PrimitiveOverrideProps<TextFieldProps>;
-    empName?: PrimitiveOverrideProps<TextFieldProps>;
     fillerMetal?: PrimitiveOverrideProps<TextFieldProps>;
-    position?: PrimitiveOverrideProps<TextFieldProps>;
     thicknessRange?: PrimitiveOverrideProps<TextFieldProps>;
     weldingStampNor?: PrimitiveOverrideProps<TextFieldProps>;
     wpsNumber?: PrimitiveOverrideProps<TextFieldProps>;

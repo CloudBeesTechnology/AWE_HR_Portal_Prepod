@@ -837,12 +837,8 @@ export const createWeldingInfo = /* GraphQL */ `
     createWeldingInfo(input: $input, condition: $condition) {
       id
       empID
-      department
       diameterRange
-      empBadgeNo
-      empName
       fillerMetal
-      position
       thicknessRange
       weldingStampNor
       wpsNumber
@@ -868,12 +864,8 @@ export const updateWeldingInfo = /* GraphQL */ `
     updateWeldingInfo(input: $input, condition: $condition) {
       id
       empID
-      department
       diameterRange
-      empBadgeNo
-      empName
       fillerMetal
-      position
       thicknessRange
       weldingStampNor
       wpsNumber
@@ -899,12 +891,8 @@ export const deleteWeldingInfo = /* GraphQL */ `
     deleteWeldingInfo(input: $input, condition: $condition) {
       id
       empID
-      department
       diameterRange
-      empBadgeNo
-      empName
       fillerMetal
-      position
       thicknessRange
       weldingStampNor
       wpsNumber
@@ -935,14 +923,14 @@ export const createTrainingReq = /* GraphQL */ `
       medicalExpiry
       medicalAppointDate
       medicalReport
-      purchaseONo
-      traineeCourseCode
-      traineeCourseName
-      traineeCompany
       traineeSD
       traineeED
       traineeStatus
       traineeCourseFee
+      courseCode
+      courseName
+      company
+      mediRequired
       createdAt
       updatedAt
       __typename
@@ -962,14 +950,14 @@ export const updateTrainingReq = /* GraphQL */ `
       medicalExpiry
       medicalAppointDate
       medicalReport
-      purchaseONo
-      traineeCourseCode
-      traineeCourseName
-      traineeCompany
       traineeSD
       traineeED
       traineeStatus
       traineeCourseFee
+      courseCode
+      courseName
+      company
+      mediRequired
       createdAt
       updatedAt
       __typename
@@ -989,14 +977,14 @@ export const deleteTrainingReq = /* GraphQL */ `
       medicalExpiry
       medicalAppointDate
       medicalReport
-      purchaseONo
-      traineeCourseCode
-      traineeCourseName
-      traineeCompany
       traineeSD
       traineeED
       traineeStatus
       traineeCourseFee
+      courseCode
+      courseName
+      company
+      mediRequired
       createdAt
       updatedAt
       __typename
@@ -1011,13 +999,12 @@ export const createTrainingCertificates = /* GraphQL */ `
     createTrainingCertificates(input: $input, condition: $condition) {
       id
       empID
-      courseCode
-      courseName
-      company
       certifiExpiry
       eCertifiDate
       trainingUpCertifi
       orgiCertifiDate
+      poNo
+      addDescretion
       createdAt
       updatedAt
       __typename
@@ -1032,13 +1019,12 @@ export const updateTrainingCertificates = /* GraphQL */ `
     updateTrainingCertificates(input: $input, condition: $condition) {
       id
       empID
-      courseCode
-      courseName
-      company
       certifiExpiry
       eCertifiDate
       trainingUpCertifi
       orgiCertifiDate
+      poNo
+      addDescretion
       createdAt
       updatedAt
       __typename
@@ -1053,13 +1039,12 @@ export const deleteTrainingCertificates = /* GraphQL */ `
     deleteTrainingCertificates(input: $input, condition: $condition) {
       id
       empID
-      courseCode
-      courseName
-      company
       certifiExpiry
       eCertifiDate
       trainingUpCertifi
       orgiCertifiDate
+      poNo
+      addDescretion
       createdAt
       updatedAt
       __typename
@@ -1583,6 +1568,7 @@ export const createWPTracking = /* GraphQL */ `
       lbrEndroseDate
       lbrDepoAmount
       lbrFile
+      remarkNLMob
       createdAt
       updatedAt
       __typename
@@ -1644,6 +1630,7 @@ export const updateWPTracking = /* GraphQL */ `
       lbrEndroseDate
       lbrDepoAmount
       lbrFile
+      remarkNLMob
       createdAt
       updatedAt
       __typename
@@ -1705,6 +1692,7 @@ export const deleteWPTracking = /* GraphQL */ `
       lbrEndroseDate
       lbrDepoAmount
       lbrFile
+      remarkNLMob
       createdAt
       updatedAt
       __typename

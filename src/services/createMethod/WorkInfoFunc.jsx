@@ -320,9 +320,9 @@ export const WorkInfoFunc = () => {
     try {
       const [
         Emp,
-        //  Leave, 
-        //  Ter,
-        //   Ser
+         Leave, 
+         Ter,
+          Ser
         ] = await Promise.all([
         client.graphql({
           query: createEmpWorkInfo,
@@ -330,30 +330,30 @@ export const WorkInfoFunc = () => {
             input: totalData,
           },
         }),
-        // client.graphql({
-        //   query: createEmpLeaveDetails,
-        //   variables: {
-        //     input: totalData1,
-        //   },
-        // }),
-        // client.graphql({
-        //   query: createTerminationInfo,
-        //   variables: {
-        //     input: totalData2,
-        //   },
-        // }),
-        // client.graphql({
-        //   query: createServiceRecord,
-        //   variables: {
-        //     input: totalData3,
-        //   },
-        // }),
+        client.graphql({
+          query: createEmpLeaveDetails,
+          variables: {
+            input: totalData1,
+          },
+        }),
+        client.graphql({
+          query: createTerminationInfo,
+          variables: {
+            input: totalData2,
+          },
+        }),
+        client.graphql({
+          query: createServiceRecord,
+          variables: {
+            input: totalData3,
+          },
+        }),
       ]);
 
       console.log(Emp);
-      // console.log(Leave);
-      // console.log(Ter);
-      // console.log(Ser);
+      console.log(Leave);
+      console.log(Ter);
+      console.log(Ser);
     } catch (error) {
       console.log(error);
     }

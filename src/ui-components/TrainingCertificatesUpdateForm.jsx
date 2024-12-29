@@ -193,18 +193,14 @@ export default function TrainingCertificatesUpdateForm(props) {
   } = props;
   const initialValues = {
     empID: "",
-    courseCode: [],
-    courseName: [],
-    company: [],
     certifiExpiry: [],
     eCertifiDate: [],
     trainingUpCertifi: [],
     orgiCertifiDate: [],
+    poNo: [],
+    addDescretion: [],
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
-  const [courseCode, setCourseCode] = React.useState(initialValues.courseCode);
-  const [courseName, setCourseName] = React.useState(initialValues.courseName);
-  const [company, setCompany] = React.useState(initialValues.company);
   const [certifiExpiry, setCertifiExpiry] = React.useState(
     initialValues.certifiExpiry
   );
@@ -217,18 +213,16 @@ export default function TrainingCertificatesUpdateForm(props) {
   const [orgiCertifiDate, setOrgiCertifiDate] = React.useState(
     initialValues.orgiCertifiDate
   );
+  const [poNo, setPoNo] = React.useState(initialValues.poNo);
+  const [addDescretion, setAddDescretion] = React.useState(
+    initialValues.addDescretion
+  );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = trainingCertificatesRecord
       ? { ...initialValues, ...trainingCertificatesRecord }
       : initialValues;
     setEmpID(cleanValues.empID);
-    setCourseCode(cleanValues.courseCode ?? []);
-    setCurrentCourseCodeValue("");
-    setCourseName(cleanValues.courseName ?? []);
-    setCurrentCourseNameValue("");
-    setCompany(cleanValues.company ?? []);
-    setCurrentCompanyValue("");
     setCertifiExpiry(cleanValues.certifiExpiry ?? []);
     setCurrentCertifiExpiryValue("");
     setECertifiDate(cleanValues.eCertifiDate ?? []);
@@ -237,6 +231,10 @@ export default function TrainingCertificatesUpdateForm(props) {
     setCurrentTrainingUpCertifiValue("");
     setOrgiCertifiDate(cleanValues.orgiCertifiDate ?? []);
     setCurrentOrgiCertifiDateValue("");
+    setPoNo(cleanValues.poNo ?? []);
+    setCurrentPoNoValue("");
+    setAddDescretion(cleanValues.addDescretion ?? []);
+    setCurrentAddDescretionValue("");
     setErrors({});
   };
   const [trainingCertificatesRecord, setTrainingCertificatesRecord] =
@@ -256,14 +254,6 @@ export default function TrainingCertificatesUpdateForm(props) {
     queryData();
   }, [idProp, trainingCertificatesModelProp]);
   React.useEffect(resetStateValues, [trainingCertificatesRecord]);
-  const [currentCourseCodeValue, setCurrentCourseCodeValue] =
-    React.useState("");
-  const courseCodeRef = React.createRef();
-  const [currentCourseNameValue, setCurrentCourseNameValue] =
-    React.useState("");
-  const courseNameRef = React.createRef();
-  const [currentCompanyValue, setCurrentCompanyValue] = React.useState("");
-  const companyRef = React.createRef();
   const [currentCertifiExpiryValue, setCurrentCertifiExpiryValue] =
     React.useState("");
   const certifiExpiryRef = React.createRef();
@@ -276,15 +266,19 @@ export default function TrainingCertificatesUpdateForm(props) {
   const [currentOrgiCertifiDateValue, setCurrentOrgiCertifiDateValue] =
     React.useState("");
   const orgiCertifiDateRef = React.createRef();
+  const [currentPoNoValue, setCurrentPoNoValue] = React.useState("");
+  const poNoRef = React.createRef();
+  const [currentAddDescretionValue, setCurrentAddDescretionValue] =
+    React.useState("");
+  const addDescretionRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
-    courseCode: [],
-    courseName: [],
-    company: [],
     certifiExpiry: [],
     eCertifiDate: [],
     trainingUpCertifi: [{ type: "JSON" }],
     orgiCertifiDate: [],
+    poNo: [],
+    addDescretion: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -313,13 +307,12 @@ export default function TrainingCertificatesUpdateForm(props) {
         event.preventDefault();
         let modelFields = {
           empID,
-          courseCode: courseCode ?? null,
-          courseName: courseName ?? null,
-          company: company ?? null,
           certifiExpiry: certifiExpiry ?? null,
           eCertifiDate: eCertifiDate ?? null,
           trainingUpCertifi: trainingUpCertifi ?? null,
           orgiCertifiDate: orgiCertifiDate ?? null,
+          poNo: poNo ?? null,
+          addDescretion: addDescretion ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -381,13 +374,12 @@ export default function TrainingCertificatesUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               empID: value,
-              courseCode,
-              courseName,
-              company,
               certifiExpiry,
               eCertifiDate,
               trainingUpCertifi,
               orgiCertifiDate,
+              poNo,
+              addDescretion,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -408,173 +400,12 @@ export default function TrainingCertificatesUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               empID,
-              courseCode: values,
-              courseName,
-              company,
-              certifiExpiry,
-              eCertifiDate,
-              trainingUpCertifi,
-              orgiCertifiDate,
-            };
-            const result = onChange(modelFields);
-            values = result?.courseCode ?? values;
-          }
-          setCourseCode(values);
-          setCurrentCourseCodeValue("");
-        }}
-        currentFieldValue={currentCourseCodeValue}
-        label={"Course code"}
-        items={courseCode}
-        hasError={errors?.courseCode?.hasError}
-        runValidationTasks={async () =>
-          await runValidationTasks("courseCode", currentCourseCodeValue)
-        }
-        errorMessage={errors?.courseCode?.errorMessage}
-        setFieldValue={setCurrentCourseCodeValue}
-        inputFieldRef={courseCodeRef}
-        defaultFieldValue={""}
-      >
-        <TextField
-          label="Course code"
-          isRequired={false}
-          isReadOnly={false}
-          value={currentCourseCodeValue}
-          onChange={(e) => {
-            let { value } = e.target;
-            if (errors.courseCode?.hasError) {
-              runValidationTasks("courseCode", value);
-            }
-            setCurrentCourseCodeValue(value);
-          }}
-          onBlur={() =>
-            runValidationTasks("courseCode", currentCourseCodeValue)
-          }
-          errorMessage={errors.courseCode?.errorMessage}
-          hasError={errors.courseCode?.hasError}
-          ref={courseCodeRef}
-          labelHidden={true}
-          {...getOverrideProps(overrides, "courseCode")}
-        ></TextField>
-      </ArrayField>
-      <ArrayField
-        onChange={async (items) => {
-          let values = items;
-          if (onChange) {
-            const modelFields = {
-              empID,
-              courseCode,
-              courseName: values,
-              company,
-              certifiExpiry,
-              eCertifiDate,
-              trainingUpCertifi,
-              orgiCertifiDate,
-            };
-            const result = onChange(modelFields);
-            values = result?.courseName ?? values;
-          }
-          setCourseName(values);
-          setCurrentCourseNameValue("");
-        }}
-        currentFieldValue={currentCourseNameValue}
-        label={"Course name"}
-        items={courseName}
-        hasError={errors?.courseName?.hasError}
-        runValidationTasks={async () =>
-          await runValidationTasks("courseName", currentCourseNameValue)
-        }
-        errorMessage={errors?.courseName?.errorMessage}
-        setFieldValue={setCurrentCourseNameValue}
-        inputFieldRef={courseNameRef}
-        defaultFieldValue={""}
-      >
-        <TextField
-          label="Course name"
-          isRequired={false}
-          isReadOnly={false}
-          value={currentCourseNameValue}
-          onChange={(e) => {
-            let { value } = e.target;
-            if (errors.courseName?.hasError) {
-              runValidationTasks("courseName", value);
-            }
-            setCurrentCourseNameValue(value);
-          }}
-          onBlur={() =>
-            runValidationTasks("courseName", currentCourseNameValue)
-          }
-          errorMessage={errors.courseName?.errorMessage}
-          hasError={errors.courseName?.hasError}
-          ref={courseNameRef}
-          labelHidden={true}
-          {...getOverrideProps(overrides, "courseName")}
-        ></TextField>
-      </ArrayField>
-      <ArrayField
-        onChange={async (items) => {
-          let values = items;
-          if (onChange) {
-            const modelFields = {
-              empID,
-              courseCode,
-              courseName,
-              company: values,
-              certifiExpiry,
-              eCertifiDate,
-              trainingUpCertifi,
-              orgiCertifiDate,
-            };
-            const result = onChange(modelFields);
-            values = result?.company ?? values;
-          }
-          setCompany(values);
-          setCurrentCompanyValue("");
-        }}
-        currentFieldValue={currentCompanyValue}
-        label={"Company"}
-        items={company}
-        hasError={errors?.company?.hasError}
-        runValidationTasks={async () =>
-          await runValidationTasks("company", currentCompanyValue)
-        }
-        errorMessage={errors?.company?.errorMessage}
-        setFieldValue={setCurrentCompanyValue}
-        inputFieldRef={companyRef}
-        defaultFieldValue={""}
-      >
-        <TextField
-          label="Company"
-          isRequired={false}
-          isReadOnly={false}
-          value={currentCompanyValue}
-          onChange={(e) => {
-            let { value } = e.target;
-            if (errors.company?.hasError) {
-              runValidationTasks("company", value);
-            }
-            setCurrentCompanyValue(value);
-          }}
-          onBlur={() => runValidationTasks("company", currentCompanyValue)}
-          errorMessage={errors.company?.errorMessage}
-          hasError={errors.company?.hasError}
-          ref={companyRef}
-          labelHidden={true}
-          {...getOverrideProps(overrides, "company")}
-        ></TextField>
-      </ArrayField>
-      <ArrayField
-        onChange={async (items) => {
-          let values = items;
-          if (onChange) {
-            const modelFields = {
-              empID,
-              courseCode,
-              courseName,
-              company,
               certifiExpiry: values,
               eCertifiDate,
               trainingUpCertifi,
               orgiCertifiDate,
+              poNo,
+              addDescretion,
             };
             const result = onChange(modelFields);
             values = result?.certifiExpiry ?? values;
@@ -622,13 +453,12 @@ export default function TrainingCertificatesUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               empID,
-              courseCode,
-              courseName,
-              company,
               certifiExpiry,
               eCertifiDate: values,
               trainingUpCertifi,
               orgiCertifiDate,
+              poNo,
+              addDescretion,
             };
             const result = onChange(modelFields);
             values = result?.eCertifiDate ?? values;
@@ -676,13 +506,12 @@ export default function TrainingCertificatesUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               empID,
-              courseCode,
-              courseName,
-              company,
               certifiExpiry,
               eCertifiDate,
               trainingUpCertifi: values,
               orgiCertifiDate,
+              poNo,
+              addDescretion,
             };
             const result = onChange(modelFields);
             values = result?.trainingUpCertifi ?? values;
@@ -736,13 +565,12 @@ export default function TrainingCertificatesUpdateForm(props) {
           if (onChange) {
             const modelFields = {
               empID,
-              courseCode,
-              courseName,
-              company,
               certifiExpiry,
               eCertifiDate,
               trainingUpCertifi,
               orgiCertifiDate: values,
+              poNo,
+              addDescretion,
             };
             const result = onChange(modelFields);
             values = result?.orgiCertifiDate ?? values;
@@ -785,6 +613,110 @@ export default function TrainingCertificatesUpdateForm(props) {
           ref={orgiCertifiDateRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "orgiCertifiDate")}
+        ></TextField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              certifiExpiry,
+              eCertifiDate,
+              trainingUpCertifi,
+              orgiCertifiDate,
+              poNo: values,
+              addDescretion,
+            };
+            const result = onChange(modelFields);
+            values = result?.poNo ?? values;
+          }
+          setPoNo(values);
+          setCurrentPoNoValue("");
+        }}
+        currentFieldValue={currentPoNoValue}
+        label={"Po no"}
+        items={poNo}
+        hasError={errors?.poNo?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("poNo", currentPoNoValue)
+        }
+        errorMessage={errors?.poNo?.errorMessage}
+        setFieldValue={setCurrentPoNoValue}
+        inputFieldRef={poNoRef}
+        defaultFieldValue={""}
+      >
+        <TextField
+          label="Po no"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentPoNoValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.poNo?.hasError) {
+              runValidationTasks("poNo", value);
+            }
+            setCurrentPoNoValue(value);
+          }}
+          onBlur={() => runValidationTasks("poNo", currentPoNoValue)}
+          errorMessage={errors.poNo?.errorMessage}
+          hasError={errors.poNo?.hasError}
+          ref={poNoRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "poNo")}
+        ></TextField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              certifiExpiry,
+              eCertifiDate,
+              trainingUpCertifi,
+              orgiCertifiDate,
+              poNo,
+              addDescretion: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.addDescretion ?? values;
+          }
+          setAddDescretion(values);
+          setCurrentAddDescretionValue("");
+        }}
+        currentFieldValue={currentAddDescretionValue}
+        label={"Add descretion"}
+        items={addDescretion}
+        hasError={errors?.addDescretion?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("addDescretion", currentAddDescretionValue)
+        }
+        errorMessage={errors?.addDescretion?.errorMessage}
+        setFieldValue={setCurrentAddDescretionValue}
+        inputFieldRef={addDescretionRef}
+        defaultFieldValue={""}
+      >
+        <TextField
+          label="Add descretion"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentAddDescretionValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.addDescretion?.hasError) {
+              runValidationTasks("addDescretion", value);
+            }
+            setCurrentAddDescretionValue(value);
+          }}
+          onBlur={() =>
+            runValidationTasks("addDescretion", currentAddDescretionValue)
+          }
+          errorMessage={errors.addDescretion?.errorMessage}
+          hasError={errors.addDescretion?.hasError}
+          ref={addDescretionRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "addDescretion")}
         ></TextField>
       </ArrayField>
       <Flex
