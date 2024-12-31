@@ -1,3 +1,83 @@
+// import { generateClient } from "@aws-amplify/api";
+// import {
+//   listEmpPersonalInfos,
+//   listEmpWorkInfos,
+//   listUsers,
+// } from "../../../graphql/queries";
+
+// const client = generateClient();
+// export const SendDataToManager = async (filterPending) => {
+//   try {
+//     const loginAuth = localStorage.getItem("userID")?.toUpperCase();
+//     //   useEffect(() => {
+//     const fetchData = async () => {
+//       const [empPersonalInfos, empPersonalDocs, userDetails] =
+//         await Promise.all([
+//           client.graphql({ query: listEmpPersonalInfos }),
+//           client.graphql({ query: listEmpWorkInfos }),
+//           client.graphql({ query: listUsers }),
+//         ]);
+
+//       const candidates = empPersonalInfos?.data?.listEmpPersonalInfos?.items;
+
+//       const interviews = empPersonalDocs?.data?.listEmpWorkInfos?.items;
+//       const usersData = userDetails?.data?.listUsers?.items;
+
+//       const mergedData = candidates
+//         .map((candidate) => {
+//           const interviewDetails = interviews.find(
+//             (item) => item.empID === candidate.empID
+//           );
+
+//           const allUser = usersData.find(
+//             (item) => item.empID === candidate.empID
+//           );
+
+//           // Return null if all details are undefined
+//           if (!interviewDetails && !allUser) {
+//             return null;
+//           }
+
+//           return {
+//             ...candidate,
+//             ...interviewDetails,
+//             ...allUser,
+//           };
+//         })
+//         .filter((item) => item !== null);
+
+//       const filterdData = mergedData.filter(
+//         (value) => value.empID === loginAuth && value.selectType === "Manager"
+//       );
+//       return filterdData;
+//     };
+//     const getOneObject = await fetchData();
+
+//     const finalOutput = filterPending?.filter((pendingItem) => {
+//       return getOneObject.some((manager) => {
+//         const lastDepartment =
+//           manager.department[manager.department.length - 1];
+
+//         return (
+//           pendingItem.assignTo === manager.empBadgeNo 
+//           // pendingItem.mdepartment === lastDepartment
+//         );
+//       });
+//     });
+
+//     console.log(finalOutput);
+
+ 
+
+//     const filteredOutput = finalOutput.filter((item) => item !== null && item !== undefined);
+//     console.log(filteredOutput)
+//     return filteredOutput;
+//   } catch (err) {
+//     console.log("ERROR : ", err);
+//   }
+// };
+
+
 import { generateClient } from "@aws-amplify/api";
 import {
   listEmpPersonalInfos,
@@ -6,26 +86,42 @@ import {
 } from "../../../graphql/queries";
 
 const client = generateClient();
+
+// Function to handle pagination and fetch all data
+const fetchAllData = async (queryName) => {
+  let allData = [];
+  let nextToken = null;
+
+  do {
+    const response = await client.graphql({
+      query: queryName,
+      variables: { nextToken },
+    });
+
+    const items = response.data[Object.keys(response.data)[0]].items; // Extract items
+    allData = [...allData, ...items]; // Append fetched items
+    nextToken = response.data[Object.keys(response.data)[0]].nextToken; // Update nextToken
+  } while (nextToken); // Continue fetching if more pages exist
+
+  return allData;
+};
+
 export const SendDataToManager = async (filterPending) => {
   try {
     const loginAuth = localStorage.getItem("userID")?.toUpperCase();
-    //   useEffect(() => {
+
     const fetchData = async () => {
-      const [empPersonalInfos, empPersonalDocs, userDetails] =
-        await Promise.all([
-          client.graphql({ query: listEmpPersonalInfos }),
-          client.graphql({ query: listEmpWorkInfos }),
-          client.graphql({ query: listUsers }),
-        ]);
+      // Fetch all paginated data from GraphQL queries
+      const [empPersonalInfos, empWorkInfos, usersData] = await Promise.all([
+        fetchAllData(listEmpPersonalInfos),
+        fetchAllData(listEmpWorkInfos),
+        fetchAllData(listUsers),
+      ]);
 
-      const candidates = empPersonalInfos?.data?.listEmpPersonalInfos?.items;
-
-      const interviews = empPersonalDocs?.data?.listEmpWorkInfos?.items;
-      const usersData = userDetails?.data?.listUsers?.items;
-
-      const mergedData = candidates
+      // Merge data based on empID
+      const mergedData = empPersonalInfos
         .map((candidate) => {
-          const interviewDetails = interviews.find(
+          const interviewDetails = empWorkInfos.find(
             (item) => item.empID === candidate.empID
           );
 
@@ -44,22 +140,27 @@ export const SendDataToManager = async (filterPending) => {
             ...allUser,
           };
         })
-        .filter((item) => item !== null);
+        .filter((item) => item !== null); // Remove null values
 
-      const filterdData = mergedData.filter(
+      // Filter data for the logged-in Manager
+      const filteredData = mergedData.filter(
         (value) => value.empID === loginAuth && value.selectType === "Manager"
       );
-      return filterdData;
+
+      return filteredData;
     };
+
+    // Fetch merged data
     const getOneObject = await fetchData();
 
+    // Filter pending items based on manager assignments
     const finalOutput = filterPending?.filter((pendingItem) => {
       return getOneObject.some((manager) => {
         const lastDepartment =
-          manager.department[manager.department.length - 1];
+          manager.department[manager.department.length - 1]; // Get the latest department
 
         return (
-          pendingItem.assignTo === manager.empBadgeNo 
+          pendingItem.assignTo === manager.empBadgeNo
           // pendingItem.mdepartment === lastDepartment
         );
       });
@@ -67,13 +168,14 @@ export const SendDataToManager = async (filterPending) => {
 
     console.log(finalOutput);
 
- 
+    // Remove null and undefined values from the filtered output
+    const filteredOutput = finalOutput.filter(
+      (item) => item !== null && item !== undefined
+    );
 
-    const filteredOutput = finalOutput.filter((item) => item !== null && item !== undefined);
-    console.log(filteredOutput)
+    console.log(filteredOutput);
     return filteredOutput;
   } catch (err) {
     console.log("ERROR : ", err);
   }
 };
-

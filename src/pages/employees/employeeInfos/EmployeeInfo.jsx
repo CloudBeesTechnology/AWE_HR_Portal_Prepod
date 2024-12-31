@@ -98,6 +98,8 @@ export const EmployeeInfo = () => {
     },
   });
 
+
+  
   const contractTypes = watch("contractType");
   const empTypes = watch("empType");
   const watchedEmpID = watch("empID");
@@ -339,176 +341,153 @@ export const EmployeeInfo = () => {
     }
   };
   
-  const searchResult = (result) => {
-  //   const cleanedFamilyDetails = cleanFamilyDetailsString(result.familyDetails);
-  // setFamilyData(cleanedFamilyDetails);
-    const keysToSet = [
-      "empID",
-      "driveLic",
-      "inducBrief",
-      "myIcNo",
-      "nationality",
-      "nationalCat",
-      "otherNation",
-      "otherRace",
-      "otherReligion",
-      "preEmp",
-      "preEmpPeriod",
-      "race",
-      "religion",
-      "age",
-      "aTQualify",
-      "alternateNo",
-      "agent",
-      "dob",
-      "cob",
-      "ctryOfOrigin",
-      "chinese",
-      "educLevel",
-      "email",
-      "eduDetails",
-      "empBadgeNo",
-      "empType",
-      "bankName",
-      "bankAccNo",
-      "gender",
-      "lang",
-      "marital",
-      "name",
-      "oCOfOrigin",
-      "position",
-      "sapNo",
-      "officialEmail",
-      "bwnIcColour",
-    ];
+  
+const searchResult = async (result) => {
+  console.log(result); // Log the result to check the fetched data
 
-    // Set form values
-    keysToSet.forEach((key) => {
-      setValue(key, result[key]);
-    });
+  // Map the gender to the correct value (Male, Female, or whatever the input value is)
+  const genderValue = result.gender === "M" || result.gender === "Male" ? "MALE"
+    : result.gender === "F" || result.gender === "Female" ? "FEMALE"
+    : result.gender;
 
-    const fields = ["contractType", "empType"];
-    fields.forEach((field) => setValue(field, getLastValue(result[field])));
+  console.log("Gender value being passed: ", genderValue); // Debugging log
 
-    const fieldsArray = ["bwnIcExpiry", "ppExpiry", "ppIssued"];
-    fieldsArray.forEach((field) =>
-      setValue(field, getLastArrayValue(result[field]))
-    );
+  // Set the gender value in the form
+  setValue("gender", genderValue);
 
-    const changeString = [
-      "permanentAddress",
-      "contactNo",
-      "ppNo",
-      "ppDestinate",
-      "bwnIcNo",
-    ];
-    changeString.forEach((field) => {
-      const value = result[field]; // Get the backend value
-      if (Array.isArray(value)) {
-        const stringValue = value.join(", "); // Convert array to string for display
-        setValue(field, stringValue); // Show as a string in the frontend
-      } else {
-        setValue(field, value); // Handle non-array values if any
-      }
-    });
+  // Map the bwnIcColour to its respective value (Yellow, Red, Green, Purple)
+  const bwnIcColourValue = result.bwnIcColour === "Y" || result.bwnIcColour ==="Yellow" ? "YELLOW"
+    : result.bwnIcColour === "R" || result.bwnIcColour ==="Red" ? "RED"
+    : result.bwnIcColour === "G" || result.bwnIcColour ==="Green"? "GREEN"
+    : result.bwnIcColour === "P" || result.bwnIcColour ==="Purple"? "PURPLE"
+    : result.bwnIcColour;
+  setValue("bwnIcColour", bwnIcColourValue);
 
-    // Handle familyDetails parsing with the cleaning function
-    if (Array.isArray(result.familyDetails) && result.familyDetails.length > 0) {
-      const cleanedFamilyDetails = cleanFamilyDetailsString(result.familyDetails[0]);
-      setFamilyData(cleanedFamilyDetails);
+  const maritalValue = result.marital === "S" || result.marital ==="Single" ? "SINGLE"
+    : result.marital === "M" || result.marital ==="Married" ? "MARRIED"
+    : result.marital === "W" || result.marital ==="Widow"? "WIDOW"
+    : result.marital === "D" || result.marital ==="Divorce"? "DIVORCE"
+    : result.marital;
+  setValue("marital", maritalValue);
+
+  const keysToSet = [
+    "empID", "driveLic", "inducBrief", "myIcNo", "nationality", "nationalCat", 
+    "otherNation", "otherRace", "otherReligion", "preEmp", "preEmpPeriod", "race", 
+    "religion", "age", "aTQualify", "alternateNo", "agent", "dob", "cob",
+    "ctryOfOrigin", "chinese", "educLevel", "email", "eduDetails", "empBadgeNo", 
+    "empType", "bankName", "bankAccNo", "lang", "marital", "name", "oCOfOrigin", 
+    "position", "sapNo", "officialEmail", "bwnIcColour",
+  ];
+
+  // Set values for other fields
+  keysToSet.forEach((key) => {
+    // If the key is "gender" or "bwnIcColour", use the mapped value
+    const valueToSet = key === "gender" ? genderValue
+      : key === "bwnIcColour" ? bwnIcColourValue :  key === "marital" ? maritalValue
+      : result[key];
+    console.log(`Setting value for ${key}:`, valueToSet);
+    setValue(key, valueToSet);
+  });
+
+  const fields = ["contractType", "empType"];
+  fields.forEach((field) => setValue(field, getLastValue(result[field])));
+
+  const fieldsArray = ["bwnIcExpiry", "ppExpiry", "ppIssued"];
+  fieldsArray.forEach((field) => setValue(field, getLastArrayValue(result[field])));
+
+  const changeString = ["permanentAddress", "contactNo", "ppNo", "ppDestinate", "bwnIcNo"];
+  changeString.forEach((field) => {
+    const value = result[field];
+    if (Array.isArray(value)) {
+      const stringValue = value.join(", ");
+      console.log(`Setting ${field} as a string:`, stringValue);
+      setValue(field, stringValue);
     } else {
-      console.error("Invalid familyDetails format:", result.familyDetails);
-      setFamilyData([]); // Default to empty array if format is not correct
+      setValue(field, value);
     }
+  });
 
-    // Handle uploaded files and their names
-    result.inducBriefUp &&
-      setUploadedFileNames((prev) => ({
-        ...prev,
-        inducBriefUp: getFileName(result.inducBriefUp) || "",
-      }));
+  // Handle familyDetails
+  if (Array.isArray(result.familyDetails) && result.familyDetails.length > 0) {
+    const cleanedFamilyDetails = cleanFamilyDetailsString(result.familyDetails[0]);
+    console.log('Family Details:', cleanedFamilyDetails);
+    setFamilyData(cleanedFamilyDetails);
+  } else {
+    console.error("Invalid familyDetails format:", result.familyDetails);
+    setFamilyData([]);
+  }
 
-    setValue("profilePhoto", result?.profilePhoto?.toString());
-    setValue("inducBriefUp", result?.inducBriefUp?.toString());
-    setUploadedDocs((prev) => ({
-      profilePhoto: result.profilePhoto,
-      inducBriefUp: result.inducBriefUp,
+  // Handle file uploads and names
+  if (result.inducBriefUp) {
+    setUploadedFileNames((prev) => ({
+      ...prev,
+      inducBriefUp: getFileName(result.inducBriefUp) || "",
     }));
-    const profilePhotoString = result?.profilePhoto;
+  }
 
-    const linkToStorageFile = async (pathUrl) => {
-      try {
-        // Ensure you only pass the correct parameter to getUrl (either path or key, not both)
-        if (pathUrl) {
-          const result = await getUrl({
-            path: pathUrl, // Pass only path
-          });
+  setValue("profilePhoto", result?.profilePhoto?.toString());
+  setValue("inducBriefUp", result?.inducBriefUp?.toString());
+  setUploadedDocs((prev) => ({
+    profilePhoto: result.profilePhoto,
+    inducBriefUp: result.inducBriefUp,
+  }));
 
-          setPPLastUP(result.url.toString());
-        } else {
-          console.log("No valid path provided for getUrl.");
-        }
-      } catch (err) {
-        console.log("Error fetching file from storage:", err);
+  const profilePhotoString = result?.profilePhoto;
+  const linkToStorageFile = async (pathUrl) => {
+    try {
+      if (pathUrl) {
+        const result = await getUrl({ path: pathUrl });
+        setPPLastUP(result.url.toString());
+      } else {
+        console.log("No valid path provided for getUrl.");
       }
-    };
-    linkToStorageFile(profilePhotoString);
-
-    // Handle multiple file uploads
-    const uploadFields = [
-      "bwnUpload",
-      "applicationUpload",
-      "cvCertifyUpload",
-      "loiUpload",
-      "myIcUpload",
-      "paafCvevUpload",
-      "ppUpload",
-      "supportDocUpload",
-    ];
-
-    uploadFields.map((field) => {
-      if (result && result[field]) {
-        try {
-          // First, parse the outermost level
-          const outerParsed = JSON.parse(result[field]);
-          const parsedArray = Array.isArray(outerParsed)
-            ? outerParsed
-            : [outerParsed];
-
-          // Now process each item inside the array
-          const parsedFiles = parsedArray.map((item) => {
-            if (typeof item === "string") {
-              try {
-                const validJSON = preprocessJSONString(item); // Preprocess the string
-                return JSON.parse(validJSON); // Parse the corrected JSON string
-              } catch (e) {
-                return item; // Return as-is if it can't be parsed
-              }
-            }
-            return item; // Return the item if it's already an object
-          });
-
-          // Get the last file path
-          const lastFile = parsedFiles[parsedFiles.length - 1];
-          const lastFileName = lastFile?.upload
-            ? getFileName(lastFile.upload)
-            : lastFile[0]?.upload
-            ? getFileName(lastFile[0].upload)
-            : null;
-
-          // Set values
-          setValue(field, parsedFiles);
-          setUploadedFiles((prev) => ({ ...prev, [field]: parsedFiles }));
-          setUploadedFileNames((prev) => ({
-            ...prev,
-            [field]: lastFileName || "",
-          }));
-        } catch (error) {
-          // console.error(`Failed to parse ${field}:`, error);
-        }
-      }
-    });
+    } catch (err) {
+      console.log("Error fetching file from storage:", err);
+    }
   };
+  linkToStorageFile(profilePhotoString);
+
+  // Handle multiple file uploads
+  const uploadFields = [
+    "bwnUpload", "applicationUpload", "cvCertifyUpload", "loiUpload", "myIcUpload",
+    "paafCvevUpload", "ppUpload", "supportDocUpload"
+  ];
+
+  uploadFields.map((field) => {
+    if (result && result[field]) {
+      try {
+        const outerParsed = JSON.parse(result[field]);
+        const parsedArray = Array.isArray(outerParsed) ? outerParsed : [outerParsed];
+
+        const parsedFiles = parsedArray.map((item) => {
+          if (typeof item === "string") {
+            try {
+              const validJSON = preprocessJSONString(item);
+              return JSON.parse(validJSON);
+            } catch (e) {
+              return item;
+            }
+          }
+          return item;
+        });
+
+        const lastFile = parsedFiles[parsedFiles.length - 1];
+        const lastFileName = lastFile?.upload
+          ? getFileName(lastFile.upload)
+          : lastFile[0]?.upload
+          ? getFileName(lastFile[0].upload)
+          : null;
+
+        setValue(field, parsedFiles);
+        setUploadedFiles((prev) => ({ ...prev, [field]: parsedFiles }));
+        setUploadedFileNames((prev) => ({ ...prev, [field]: lastFileName || "" }));
+      } catch (error) {
+        console.error(`Failed to parse ${field}:`, error);
+      }
+    }
+  });
+};
+
 
   const getFileName = (filePath) => {
     if (!filePath || typeof filePath !== "string") {
@@ -520,18 +499,118 @@ export const EmployeeInfo = () => {
     return fileName;
   };
 
+  // const onSubmit = async (data) => {
+  //   // console.log(data);
+  //   data.contractType = contractTypes;
+  //   data.empType = empTypes;
+
+  //   const formatDate = (date) =>
+  //     date ? new Date(date).toLocaleDateString("en-CA") : null;
+
+  //   const bwnIcExpiry = formatDate(data.bwnIcExpiry);
+  //   const ppIssued = formatDate(data.ppIssued);
+  //   const ppExpiry = formatDate(data.ppExpiry);
+
+  //   try {
+  //     const checkingPITable = empPIData.find(
+  //       (match) => match.empID === data.empID
+  //     );
+  //     const checkingIDTable = IDData.find(
+  //       (match) => match.empID === data.empID
+  //     );
+
+  //     if (checkingIDTable && checkingPITable) {
+  //       const updateFieldArray = (existingArray, newValue) => [
+  //         ...new Set([...(existingArray || []), newValue]),
+  //       ];
+
+  //       const updatedbwnIcExpiry = updateFieldArray(
+  //         checkingIDTable.bwnIcExpiry,
+  //         bwnIcExpiry
+  //       );
+  //       const updatedppExpiry = updateFieldArray(
+  //         checkingIDTable.ppExpiry,
+  //         ppExpiry
+  //       );
+  //       const updatedppIssued = updateFieldArray(
+  //         checkingIDTable.ppIssued,
+  //         ppIssued
+  //       );
+
+  //       const collectValue = {
+  //         ...data,
+  //         profilePhoto: uploadedDocs.profilePhoto,
+  //         inducBriefUp: uploadedDocs.inducBriefUp,
+  //         bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
+  //         bwnIcExpiry: updatedbwnIcExpiry,
+  //         ppIssued: updatedppIssued,
+  //         ppExpiry: updatedppExpiry,
+  //         applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
+  //         cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
+  //         loiUpload: JSON.stringify(uploadedFiles.loiUpload),
+  //         myIcUpload: JSON.stringify(uploadedFiles.myIcUpload),
+  //         paafCvevUpload: JSON.stringify(uploadedFiles.paafCvevUpload),
+  //         ppUpload: JSON.stringify(uploadedFiles.ppUpload),
+  //         supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
+  //         familyDetails: JSON.stringify(data.familyDetails),
+  //         PITableID: checkingPITable.id,
+  //         IDTable: checkingIDTable.id,
+  //       };
+  //       // console.log("AZQ Update", collectValue);
+
+  //       await UpdateEIValue({ collectValue });
+  //       setShowTitle("Employee Personal Info updated successfully");
+  //       setNotification(true);
+  //     } else {
+  //       const [updatedbwnIcExpiry, updatedppExpiry, updatedppIssued] = [
+  //         [bwnIcExpiry],
+  //         [ppExpiry],
+  //         [ppIssued],
+  //       ].map((arr) => [...new Set(arr)]);
+
+  //       const empValue = {
+  //         ...data,
+  //         profilePhoto: uploadedDocs.profilePhoto,
+  //         inducBriefUp: uploadedDocs.inducBriefUp,
+  //         bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
+  //         bwnIcExpiry: updatedbwnIcExpiry,
+  //         ppIssued: updatedppIssued,
+  //         ppExpiry: updatedppExpiry,
+  //         applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
+  //         cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
+  //         loiUpload: JSON.stringify(uploadedFiles.loiUpload),
+  //         myIcUpload: JSON.stringify(uploadedFiles.myIcUpload),
+  //         paafCvevUpload: JSON.stringify(uploadedFiles.paafCvevUpload),
+  //         ppUpload: JSON.stringify(uploadedFiles.ppUpload),
+  //         supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
+  //         familyDetails: JSON.stringify(data.familyDetails),
+  //       };
+  //       // console.log("AZ", empValue);
+  //       await SubmitEIData({ empValue });
+  //       setShowTitle("Employee Personal Info saved successfully");
+  //       setNotification(true);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
   const onSubmit = async (data) => {
-    // console.log(data);
     data.contractType = contractTypes;
     data.empType = empTypes;
-
+  
     const formatDate = (date) =>
       date ? new Date(date).toLocaleDateString("en-CA") : null;
-
+  
     const bwnIcExpiry = formatDate(data.bwnIcExpiry);
     const ppIssued = formatDate(data.ppIssued);
     const ppExpiry = formatDate(data.ppExpiry);
-
+  
+    const removeLeadingNulls = (array, newValue) => {
+      const newArray = [...(array || []), newValue]; // Combine old array and new value
+      let firstValidIndex = newArray.findIndex((item) => item !== null);
+      return firstValidIndex !== -1 ? newArray.slice(firstValidIndex) : []; // Remove leading nulls
+    };
+  
     try {
       const checkingPITable = empPIData.find(
         (match) => match.empID === data.empID
@@ -539,25 +618,21 @@ export const EmployeeInfo = () => {
       const checkingIDTable = IDData.find(
         (match) => match.empID === data.empID
       );
-
+  
       if (checkingIDTable && checkingPITable) {
-        const updateFieldArray = (existingArray, newValue) => [
-          ...new Set([...(existingArray || []), newValue]),
-        ];
-
-        const updatedbwnIcExpiry = updateFieldArray(
+        const updatedbwnIcExpiry = removeLeadingNulls(
           checkingIDTable.bwnIcExpiry,
           bwnIcExpiry
         );
-        const updatedppExpiry = updateFieldArray(
+        const updatedppExpiry = removeLeadingNulls(
           checkingIDTable.ppExpiry,
           ppExpiry
         );
-        const updatedppIssued = updateFieldArray(
+        const updatedppIssued = removeLeadingNulls(
           checkingIDTable.ppIssued,
           ppIssued
         );
-
+  
         const collectValue = {
           ...data,
           profilePhoto: uploadedDocs.profilePhoto,
@@ -577,18 +652,15 @@ export const EmployeeInfo = () => {
           PITableID: checkingPITable.id,
           IDTable: checkingIDTable.id,
         };
-        // console.log("AZQ Update", collectValue);
-
+  
         await UpdateEIValue({ collectValue });
         setShowTitle("Employee Personal Info updated successfully");
         setNotification(true);
       } else {
-        const [updatedbwnIcExpiry, updatedppExpiry, updatedppIssued] = [
-          [bwnIcExpiry],
-          [ppExpiry],
-          [ppIssued],
-        ].map((arr) => [...new Set(arr)]);
-
+        const updatedbwnIcExpiry = removeLeadingNulls([], bwnIcExpiry);
+        const updatedppExpiry = removeLeadingNulls([], ppExpiry);
+        const updatedppIssued = removeLeadingNulls([], ppIssued);
+  
         const empValue = {
           ...data,
           profilePhoto: uploadedDocs.profilePhoto,
@@ -606,7 +678,7 @@ export const EmployeeInfo = () => {
           supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
           familyDetails: JSON.stringify(data.familyDetails),
         };
-        // console.log("AZ", empValue);
+  
         await SubmitEIData({ empValue });
         setShowTitle("Employee Personal Info saved successfully");
         setNotification(true);
@@ -615,7 +687,7 @@ export const EmployeeInfo = () => {
       console.log(error);
     }
   };
-
+  
   const watchedProfilePhoto = watch("profilePhoto" || "");
 
   return (

@@ -213,7 +213,7 @@ export const InsuranceClaim = () => {
         };
         // console.log(ICValuse, "create");
         await SubmitICData({ ICValuse });
-        setShowTitle("Dependent Insurance Info saved successfully");
+        setShowTitle("Insurance claim saved successfully");
         setNotification(true);
       }
     } catch (error) {

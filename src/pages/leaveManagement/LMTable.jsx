@@ -30,7 +30,7 @@ export const LMTable = () => {
     dateError: false,
     noResults: false
   });
-  console.log(mergedData);
+  // console.log(mergedData);
 
   useEffect(() => {
     // Step 1: Initial filtering based on user type
@@ -92,7 +92,7 @@ export const LMTable = () => {
     setMatchData(filteredData);
   }, [mergedData, userType, userID, filterStatus, selectedDate]);
 
-  console.log(matchData);
+  // console.log(matchData);
 
   // Logic to get the URL of the uploaded file
   const linkToStorageFile = async (pathUrl) => {

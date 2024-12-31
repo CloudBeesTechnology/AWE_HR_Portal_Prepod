@@ -73,8 +73,6 @@ export const WorkInfoMD = () => {
 
         if (workInfoValue.empID) {
           workInfoValue.empID = String(workInfoValue.empID);
-          //   workInfoValue.ppExpiry = [workInfoValue.ppExpiry];
-          //   workInfoValue.bwnIcExpiry = [workInfoValue.bwnIcExpiry];
         }
         console.log(workInfoValue);
 

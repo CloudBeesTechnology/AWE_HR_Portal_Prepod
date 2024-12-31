@@ -58,11 +58,18 @@ export const NonLocalAcco = () => {
   } = useForm({
     resolver: yupResolver(NonLocalAccovalidationSchema),
   });
-
+  const getArrayDateValue = (value) => {
+    return Array.isArray(value) ? value[value.length - 1] : value;
+  };
   const searchResult = (result) => {
     // console.log("Search Result:", result);  // Log the result to confirm the empID is included
     const keysToSet = ["empID", "empBadgeNo", "name", "accommodation", "accommodationAddress"];
     keysToSet.forEach((key) => setValue(key, result[key]));
+    const arrayDateField = ["accommodation", "accommodationAddress"];
+
+    arrayDateField.forEach((field) => {
+      setValue(field, getArrayDateValue(result[field]));
+    });
   };
 
   const onSubmit = async (data) => {
@@ -200,13 +207,13 @@ export const NonLocalAcco = () => {
           </button>
         </div>
         
-        {notification && (
+        {/* {notification && (
           <SpinLogo
             text={showTitle}
             notification={notification}
             path="/employee"
           />
-        )}
+        )} */}
       </form>
     </div>
   );

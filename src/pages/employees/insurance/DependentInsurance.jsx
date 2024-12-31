@@ -72,7 +72,7 @@ export const DependentInsurance = () => {
       alert("Upload must be a PDF file");
       return;
     }
-    setValue(`depInsurance[${index}].depenInfUpload`, selectedFile);
+    setValue(`depInsurance[${index}].depenInfUpload, selectedFile`);
     try {
       await uploadDocs(
         selectedFile,

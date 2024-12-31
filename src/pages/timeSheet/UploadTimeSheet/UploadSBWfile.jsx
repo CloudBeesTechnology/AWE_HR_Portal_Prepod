@@ -166,14 +166,28 @@ export const UploadSBWfile = (
           dateValue = getCleanedDate(updatedDataArray[1]);
       }
       
-      console.log(dateValue);
+      function convertDateFormat(dateStr) {
+        // Split the input string by '/'
+        const parts = dateStr.split("/");
+
+        // Validate the input format
+        if (parts.length !== 3) {
+          throw new Error("Invalid date format. Expected DD/MM/YYYY");
+        }
+
+        // Rearrange the parts to MM/DD/YYYY
+        const [day, month, year] = parts;
+        return `${month}/${day}/${year}`;
+      }
 
         const filteHighlightedData = updatedDataArray.filter(
           (item) => item.IN && item.OUT
         );
 
+        const dateObject = new Date(dateValue).toLocaleDateString();
+        const formattedDate = convertDateFormat(dateObject);
         filteHighlightedData.forEach(obj => {
-          obj.DATE = dateValue;
+          obj.DATE = formattedDate;
       });
         console.log(filteHighlightedData)
         setExcelData(filteHighlightedData);

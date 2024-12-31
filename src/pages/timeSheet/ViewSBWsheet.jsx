@@ -74,19 +74,19 @@ export const ViewSBWsheet = ({
       console.error("Error fetching user data:", error);
     }
   };
-  useEffect(()=>{
-    const fetchWorkInfo = async () => {
-      // Fetch the BLNG data using GraphQL
-      const [empWorkInfos] = await Promise.all([
-        client.graphql({
-          query: listEmpWorkInfos,
-        }),
-      ]);
-      const workInfo = empWorkInfos?.data?.listEmpWorkInfos?.items;
-      console.log(workInfo)
-    }
-      fetchWorkInfo();
-  },[])
+  // useEffect(() => {
+  //   const fetchWorkInfo = async () => {
+  //     // Fetch the BLNG data using GraphQL
+  //     const [empWorkInfos] = await Promise.all([
+  //       client.graphql({
+  //         query: listEmpWorkInfos,
+  //       }),
+  //     ]);
+  //     const workInfo = empWorkInfos?.data?.listEmpWorkInfos?.items;
+      
+  //   };
+  //   fetchWorkInfo();
+  // }, []);
   // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
   // useEffect(() => {
   //   if (excelData) {
@@ -331,8 +331,7 @@ export const ViewSBWsheet = ({
   const AllFieldData = useTableFieldData(titleName);
   const renameKeysFunctionAndSubmit = async (managerData) => {
     if (userIdentification !== "Manager") {
-      const processedData =
-      await Promise.all(
+      const processedData = await Promise.all(
         data.map(async (val) => {
           return {
             fileName: fileName,
@@ -353,13 +352,11 @@ export const ViewSBWsheet = ({
             empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
             fileType: "SBW",
             status: "Pending",
-          }
+          };
         })
       );
-   
-     
-    const result =  await processedData;
-    
+
+      const result = await processedData;
 
       const finalResult = result.map((val) => {
         return {
@@ -555,7 +552,7 @@ export const ViewSBWsheet = ({
                   {visibleData && visibleData?.length > 0
                     ? visibleData.map((value, index) => {
                         const renderRows = (m, ind) => {
-                          const isStatusPending = m.status === "Pending";
+                          const isStatusPending = m?.status === "Pending";
                           return (
                             <tr
                               key={index + 1}
@@ -568,58 +565,58 @@ export const ViewSBWsheet = ({
                               <td className="text-center px-4 flex-1">
                                 {index + 1}
                               </td>
-                              <td className="text-start px-4 flex-1">
-                                {m.NAME}
+                              <td className="text-start px-4 flex-1"> 
+                                {m?.NAME}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.DEPTDIV}
+                                {m?.DEPTDIV}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.BADGE}
+                                {m?.BADGE}
                               </td>
-                              {/* <td className="text-center px-4 flex-1">{m.DEPT}</td> */}
+                              {/* <td className="text-center px-4 flex-1">{m?.DEPT}</td> */}
                               <td className="text-center px-4 flex-1">
-                                {m.DATE}
-                              </td>
-                              <td className="text-center px-4 flex-1">
-                                {m.IN}
+                                {m?.DATE}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.OUT}
+                                {m?.IN  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.TOTALINOUT}
+                                {m?.OUT  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.ALLDAYMINHRS}
+                                {m?.TOTALINOUT  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.NETMINUTES}
+                                {m?.ALLDAYMINHRS  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.TOTALHOURS}
+                                {m?.NETMINUTES  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.NORMALWORKINGHRSPERDAY}
+                                {m?.TOTALHOURS  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.WORKINGHOURS}
+                                {m?.NORMALWORKINGHRSPERDAY  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.OT}
+                                {m?.WORKINGHOURS  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.REMARKS}
+                                {m?.OT  || 0}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m?.REMARKS}
                               </td>
                               {isStatusPending && (
                                 <td
                                   className={`text-center px-4 flex-1 ${
-                                    m.status === "Approved"
+                                    m?.status === "Approved"
                                       ? "text-[#0CB100]"
                                       : "text_size_8"
                                   }`}
                                 >
-                                  {m.status}
+                                  {m?.status}
                                 </td>
                               )}
                             </tr>
@@ -639,7 +636,7 @@ export const ViewSBWsheet = ({
                             className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white"
                           >
                             <p className="px-6 py-6">
-                              No Table Data Available Here.
+                              Please wait few seconds.
                             </p>
                           </td>
                         </tr>
@@ -650,7 +647,7 @@ export const ViewSBWsheet = ({
                             className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white"
                           >
                             <p className="px-6 py-6">
-                              No Table Data Available Here.
+                              Please wait few seconds.
                             </p>
                           </td>
                         </tr>

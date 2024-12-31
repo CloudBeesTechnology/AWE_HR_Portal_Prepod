@@ -62,8 +62,6 @@ export const LeaveDetailsMD = () => {
       for (const workInfoValue of transformedData) {
         if (workInfoValue.empID) {
           workInfoValue.empID = String(workInfoValue.empID);
-          //   workInfoValue.ppExpiry = [workInfoValue.ppExpiry];
-          //   workInfoValue.bwnIcExpiry = [workInfoValue.bwnIcExpiry];
         }
         console.log(workInfoValue);
 

@@ -52,7 +52,7 @@ const nav=useNavigate();
       const currentPath = window.location.pathname;
       if (currentPath === "/viewTsheetDetails" || currentPath === "/viewTsheetDetails/") {
         // window.history.replaceState(null, "", "/viewTimesheet"); // Replace URL in history
-      nav("/viewTimesheet")
+      nav("/viewTimesheet");
         // window.location.href = "/viewTimesheet";
         // window.location.reload(); // Reload to apply changes
    
@@ -172,6 +172,7 @@ const nav=useNavigate();
 
     // Filter by date range
     if (startDate && endDate) {
+      console.log(startDate && endDate)
       const start = new Date(startDate);
       const end = new Date(endDate);
 

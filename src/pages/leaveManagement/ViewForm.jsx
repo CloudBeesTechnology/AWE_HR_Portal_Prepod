@@ -22,14 +22,12 @@ export const ViewForm = ({
 
   const { empPIData } = useContext(DataSupply);
   const [remark, setRemark] = useState("");
-  const [userName, setUserName] = useState("");
   const [notification, setNotification] = useState(false);
   const [notificationText, setNotificationText] = useState("");
-  const navigate = useNavigate();
+  const [path, setPath] = useState("");
   const { handleUpdateLeaveStatus, handleUpdateTicketRequest } =
     useLeaveManage();
   const { createNotification } = useCreateNotification(); // Hook for creating notification
-  const { leaveDetails } = UpdateLeaveData();
 
   const managerName = empPIData.find((val) => {
     const findingManagerName = leaveData?.managerEmpID === val.empID;
@@ -310,11 +308,9 @@ export const ViewForm = ({
           }
 
           setNotification(true);
+          setPath("/leaveManagement");
           setTimeout(() => {
-            setNotification(false);
-            handleClickForToggle(false);
-            navigate("/leaveManage");
-            // Redirect to the dashboard or another page
+            handleClickForToggle(false); // Redirect to the dashboard or another page
           }, 3000);
         })
         .catch((err) => console.log(err));
@@ -387,11 +383,9 @@ export const ViewForm = ({
           });
 
           setNotification(true);
+          setPath("/leaveManagement/requestTickets");
           setTimeout(() => {
-            setNotification(false);
             handleClickForToggle(false);
-            navigate("/leaveManage/requestTickets");
-            // Redirect to the dashboard or another page
           }, 3000);
         })
         .catch((err) => console.log(err));
@@ -403,10 +397,6 @@ export const ViewForm = ({
   const handleApprove = () => handleUpdateStatus("Approved");
   const handleReject = () => handleUpdateStatus("Rejected");
 
-  useEffect(() => {
-    const userType = localStorage.getItem("userType");
-    setUserName(userType);
-  }, []);
   const renderButtons = () => {
     const { supervisorStatus, managerStatus, supervisorEmpID } = leaveData;
     const isPending = managerStatus === "Pending";
@@ -528,21 +518,13 @@ export const ViewForm = ({
                 (source === "Tickets" && "Ticket Request Form")}
             </h2>
           </div>
-          {notification && userType === "HR" && (
+          {notification && (
             <SpinLogo
               text={notificationText}
               notification={notification}
-              path="/leaveManage/requestTickets"
+              path={path}
             />
           )}
-          {notification &&
-            (userType === "Manager" || userType === "Supervisor") && (
-              <SpinLogo
-                text={notificationText}
-                notification={notification}
-                path="/leaveManage"
-              />
-            )}
 
           {source === "LM" && (
             <section className="shadow-md w-[500px] p-5 bg-white">
@@ -608,30 +590,32 @@ export const ViewForm = ({
                         </tr>
                       </thead>
                       <tbody>
-                      {leaveData.supervisorStatus !== "Rejected" &&   <tr>
-                          <td className="py-2">Manager</td>
-                          <td className="py-2">
-                            {" "}
-                            <p
-                              className={`w-full break-words overflow-hidden ${
-                                leaveData.managerStatus === "Approved"
-                                  ? "text-[green]"
-                                  : leaveData.managerStatus === "Rejected"
-                                  ? "text-[red]"
-                                  : "text-dark_grey"
-                              }`}
-                            >{`${leaveData.managerStatus}`}</p>
-                          </td>
-                          <td className="py-2">
-                            {(leaveData.managerStatus === "Approved" ||
-                              leaveData.managerStatus === "Rejected" ||
-                              leaveData.managerStatus === "Pending") && (
-                              <p className="w-full break-words overflow-hidden ">
-                                {`${leaveData.managerRemarks || "no remark"}`}
-                              </p>
-                            )}
-                          </td>
-                        </tr>}
+                        {leaveData.supervisorStatus !== "Rejected" && (
+                          <tr>
+                            <td className="py-2">Manager</td>
+                            <td className="py-2">
+                              {" "}
+                              <p
+                                className={`w-full break-words overflow-hidden ${
+                                  leaveData.managerStatus === "Approved"
+                                    ? "text-[green]"
+                                    : leaveData.managerStatus === "Rejected"
+                                    ? "text-[red]"
+                                    : "text-dark_grey"
+                                }`}
+                              >{`${leaveData.managerStatus}`}</p>
+                            </td>
+                            <td className="py-2">
+                              {(leaveData.managerStatus === "Approved" ||
+                                leaveData.managerStatus === "Rejected" ||
+                                leaveData.managerStatus === "Pending") && (
+                                <p className="w-full break-words overflow-hidden ">
+                                  {`${leaveData.managerRemarks || "no remark"}`}
+                                </p>
+                              )}
+                            </td>
+                          </tr>
+                        )}
                         <tr>
                           <td className="py-2">Supervisor</td>
                           <td className="py-2">
@@ -676,42 +660,46 @@ export const ViewForm = ({
                       </div>
                     )}
 
-                   {leaveData.supervisorStatus !== "Rejected" &&  <div className=" w-full text-center text_size_6 shadow-md pt-3">
-                      <table className="w-full ">
-                        <thead className=" bg-[#D8D8D8]">
-                          <tr>
-                            <th className="py-1">Role</th>
-                            <th className="py-1">Status</th>
-                            <th className="py-1">Remark</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td className="py-2">Manager</td>
-                            <td className="py-2">
-                              <p
-                                className={`w-full break-words overflow-hidden ${
-                                  leaveData.managerStatus === "Approved"
-                                    ? "text-[green]"
-                                    : leaveData.managerStatus === "Rejected"
-                                    ? "text-[red]"
-                                    : "text-dark_grey"
-                                }`}
-                              >{`${leaveData.managerStatus}`}</p>
-                            </td>
-                            <td className="py-2">
-                              {(leaveData.managerStatus === "Approved" ||
-                                leaveData.managerStatus === "Rejected" ||
-                                leaveData.managerStatus === "Pending") && (
-                                <p className="w-full break-words overflow-hidden ">
-                                  {`${leaveData.managerRemarks || "no remark"}`}
-                                </p>
-                              )}
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>}
+                    {leaveData.supervisorStatus !== "Rejected" && (
+                      <div className=" w-full text-center text_size_6 shadow-md pt-3">
+                        <table className="w-full ">
+                          <thead className=" bg-[#D8D8D8]">
+                            <tr>
+                              <th className="py-1">Role</th>
+                              <th className="py-1">Status</th>
+                              <th className="py-1">Remark</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td className="py-2">Manager</td>
+                              <td className="py-2">
+                                <p
+                                  className={`w-full break-words overflow-hidden ${
+                                    leaveData.managerStatus === "Approved"
+                                      ? "text-[green]"
+                                      : leaveData.managerStatus === "Rejected"
+                                      ? "text-[red]"
+                                      : "text-dark_grey"
+                                  }`}
+                                >{`${leaveData.managerStatus}`}</p>
+                              </td>
+                              <td className="py-2">
+                                {(leaveData.managerStatus === "Approved" ||
+                                  leaveData.managerStatus === "Rejected" ||
+                                  leaveData.managerStatus === "Pending") && (
+                                  <p className="w-full break-words overflow-hidden ">
+                                    {`${
+                                      leaveData.managerRemarks || "no remark"
+                                    }`}
+                                  </p>
+                                )}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
                   </div>
                 ) : userType === "Manager" ? (
                   <div className=" text_size_6 ">

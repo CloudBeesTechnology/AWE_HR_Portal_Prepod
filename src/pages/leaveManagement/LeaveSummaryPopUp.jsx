@@ -2,14 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import logo from "../../assets/logo/logo-with-name.svg";
 import { useReactToPrint } from "react-to-print";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+
 
 export const LeaveSummaryPopUp = ({
   handleClosePopup,
   mergedData,
   empDetails,
-  formatDate,
 }) => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -51,125 +49,115 @@ export const LeaveSummaryPopUp = ({
     const [day, month, year] = dateStr.split("/");
     return new Date(year, month - 1, day);
   };
-console.log(mergedData);
+// console.log(mergedData);
+const formatToTwoDecimals = (num) => parseFloat(num.toFixed(1));
 
-  useEffect(() => {
-    const fetchedData = async () => {
-      const result = mergedData.reduce((acc, val) => {
-       
-        if (!acc[val.empID]) {
-          acc[val.empID] = {
-            empId: val.empID,
-            employeeName: val.empName,
-            empBadgeNo: val.empBadgeNo,
-            position: val.position,
-            department: val.department,
-            doj: val.doj,
-            annualLeaveBal: val.empPervAnnualLeaveBal,
-            compassionateLeave: initializeLeaveType(0, true),
-            unPaidAuthorisedLeave: initializeLeaveType(0, true),
-            annualLeave: initializeLeaveType(
+useEffect(() => {
+  const fetchedData = async () => {
+    const result = mergedData.reduce((acc, val) => {
+      if (!acc[val.empID]) {
+        acc[val.empID] = {
+          empId: val.empID,
+          employeeName: val.empName,
+          empBadgeNo: val.empBadgeNo,
+          position: val.position,
+          department: val.department,
+          doj: val.doj,
+          annualLeaveBal: val.empPervAnnualLeaveBal,
+          compassionateLeave: initializeLeaveType(0, true),
+          unPaidAuthorisedLeave: initializeLeaveType(0, true),
+          annualLeave: initializeLeaveType(
+            formatToTwoDecimals(
               Number(
-                (Array.isArray(val.annualLeave) && val.annualLeave.length > 0 
-                  ? val.annualLeave[val.annualLeave.length - 1] 
+                Array.isArray(val.annualLeave) && val.annualLeave.length > 0
+                  ? val.annualLeave[val.annualLeave.length - 1]
                   : 0
-                )
               ) + Number(val.empPervAnnualLeaveBal || 0)
-            ),
-            
-            marriageLeave: initializeLeaveType(Number(val.marriageLeave) || 0),
-            hospitalisationLeave: initializeLeaveType(
-              Number(val.hospitalLeave)
-            ),
-            maternityLeave: initializeLeaveType(Number(val.maternityLeave)),
-            sickLeave: initializeLeaveType(Number(val.sickLeave)),
-            paternityLeave: initializeLeaveType(
-              Number(val.paternityLeave) || 0
-            ),
-            compensateLeave: initializeLeaveType(0, true),
-          };
-        }
-
-        const leaveTypeKeyMap = {
-          "Compassionate Leave": "compassionateLeave",
-          "Annual Leave": "annualLeave",
-          "Marriage Leave": "marriageLeave",
-          "Hospitalisation Leave": "hospitalisationLeave",
-          "Maternity Leave": "maternityLeave",
-          "Sick Leave": "sickLeave",
-          "Paternity Leave": "paternityLeave",
-          "Unpaid Authorize Leave": "unPaidAuthorisedLeave",
-          "Compensate Leave": "compensateLeave",
+            )
+          ),
+          marriageLeave: initializeLeaveType(Number(val.marriageLeave) || 0),
+          hospitalisationLeave: initializeLeaveType(Number(val.hospitalLeave)),
+          maternityLeave: initializeLeaveType(Number(val.maternityLeave)),
+          sickLeave: initializeLeaveType(Number(val.sickLeave)),
+          paternityLeave: initializeLeaveType(Number(val.paternityLeave) || 0),
+          compensateLeave: initializeLeaveType(0, true),
         };
+      }
 
-        const leaveKey = leaveTypeKeyMap[val.empLeaveType];
+      const leaveTypeKeyMap = {
+        "Compassionate Leave": "compassionateLeave",
+        "Annual Leave": "annualLeave",
+        "Marriage Leave": "marriageLeave",
+        "Hospitalisation Leave": "hospitalisationLeave",
+        "Maternity Leave": "maternityLeave",
+        "Sick Leave": "sickLeave",
+        "Paternity Leave": "paternityLeave",
+        "Unpaid Authorize Leave": "unPaidAuthorisedLeave",
+        "Compensate Leave": "compensateLeave",
+      };
 
-        const applicationStartDate = formatDate(val.empLeaveStartDate);
-        const applicationEndDate = formatDate(val.empLeaveEndDate);
+      const leaveKey = leaveTypeKeyMap[val.empLeaveType];
 
-        let shouldProcessLeave = false;
+      const applicationStartDate = formattingDate(val.empLeaveStartDate);
+      const applicationEndDate = formattingDate(val.empLeaveEndDate);
 
-        if (startDate && endDate) {
-          // If date filter is applied, check if leave falls within the filter range
-          const filterStartDate = formattingDate(startDate);
-          const filterEndDate = formattingDate(endDate);
+      let shouldProcessLeave = false;
 
-          const appStartDate = parseDate(applicationStartDate);
-          const appEndDate = parseDate(applicationEndDate);
-          const filtStart = parseDate(filterStartDate);
-          const filtEnd = parseDate(filterEndDate);
+      if (startDate && endDate) {
+        // Date filter applied
+        const filterStartDate = parseDate(formattingDate(startDate));
+        const filterEndDate = parseDate(formattingDate(endDate));
 
-          shouldProcessLeave =
-            appStartDate >= filtStart && appEndDate <= filtEnd;
-        } else {
-          // If no date filter, only show current year's leaves
-          shouldProcessLeave = isCurrentYear(val.empLeaveStartDate);
+        const appStartDate = parseDate(applicationStartDate);
+        const appEndDate = parseDate(applicationEndDate);
+
+        shouldProcessLeave =
+          appStartDate >= filterStartDate && appEndDate <= filterEndDate;
+      } else {
+        // Default to current year
+        shouldProcessLeave = isCurrentYear(val.empLeaveStartDate);
+      }
+
+      if (shouldProcessLeave && leaveKey) {
+        if (
+          val.managerStatus === "Approved" &&
+          val.empStatus !== "Cancelled"
+        ) {
+          acc[val.empID][leaveKey].taken += Number(val.leaveDays) || 0;
+        } else if (
+          val.managerStatus === "Pending" &&
+          val.supervisorStatus !== "Rejected" &&
+          val.empStatus !== "Cancelled"
+        ) {
+          acc[val.empID][leaveKey].waitingLeave += Number(val.leaveDays) || 0;
         }
 
-        if (shouldProcessLeave && leaveKey) {
-          if (
-            val.managerStatus === "Approved" &&
-            val.empStatus !== "Cancelled"
-          ) {
-            acc[val.empID][leaveKey].taken +=  Number(val.leaveDays) || 0;
-          } else if (
-            val.managerStatus === "Pending" &&
-            val.supervisorStatus !== "Rejected" &&
-            val.empStatus !== "Cancelled"
-          ) {
-            acc[val.empID][leaveKey].waitingLeave += Number(val.leaveDays) || 0;
-          }
+        if (
+          ![
+            "compassionateLeave",
+            "unPaidAuthorisedLeave",
+            "compensateLeave",
+          ].includes(leaveKey)
+        ) {
+          const total = acc[val.empID][leaveKey].total || 0;
+          const taken = acc[val.empID][leaveKey].taken || 0;
+          const waiting = acc[val.empID][leaveKey].waitingLeave || 0;
 
-          if (
-            ![
-              "compassionateLeave",
-              "unPaidAuthorisedLeave",
-              "compensateLeave",
-            ].includes(leaveKey)
-          ) {
-            const total = acc[val.empID][leaveKey].total || 0;
-            const taken = acc[val.empID][leaveKey].taken || 0;
-            const waiting = acc[val.empID][leaveKey].waitingLeave || 0;
-
-            acc[val.empID][leaveKey].remaining = Math.floor(
-             
-              total - (taken + waiting)
-            );
-            console.log("taken leave calculation", acc[val.empID][leaveKey].taken);
-          }
+          acc[val.empID][leaveKey].remaining = Math.floor(
+            total - (taken + waiting)
+          );
         }
+      }
 
-        return acc;
-      }, {});
+      return acc;
+    }, {});
 
-      const summary = result[empDetails.empID]; // Find the leave summary for the employee
-      console.log(summary);
-      
-      setLeaveSummary(summary); // Set the leave summary for the employee
-    };
+    const summary = result[empDetails.empID]; // Find the leave summary for the employee
+    setLeaveSummary(summary); // Set the leave summary for the employee
+  };
 
-    fetchedData();
-  }, [mergedData, startDate, endDate, empDetails]);
+  fetchedData();
+}, [mergedData, startDate, endDate, empDetails]);
 
   // Define leave types to display in the specified order
   const leaveTypes = [

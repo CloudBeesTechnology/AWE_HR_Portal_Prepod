@@ -188,14 +188,29 @@ export const UploadORMCfile = (
       }
       
      
-      console.log(dateValue);
+    
+      function convertDateFormat(dateStr) {
+        // Split the input string by '/'
+        const parts = dateStr.split("/");
 
+        // Validate the input format
+        if (parts.length !== 3) {
+          throw new Error("Invalid date format. Expected DD/MM/YYYY");
+        }
+
+        // Rearrange the parts to MM/DD/YYYY
+        const [day, month, year] = parts;
+        return `${month}/${day}/${year}`;
+      }
         // const lastOccurrenceObjects =
         //   getLastOccurrencePerFIDDate(updatedDataArray);
-
+        const dateObject = new Date(dateValue).toLocaleDateString();
+        const formattedDate = convertDateFormat(dateObject);
+        console.log(formattedDate)
           // console.log(lastOccurrenceObjects)
           filteHighlightedData.forEach(obj => {
-            obj.DATE = dateValue;
+        
+            obj.DATE = formattedDate;
         });
 
         // console.log(updatedDataArray);

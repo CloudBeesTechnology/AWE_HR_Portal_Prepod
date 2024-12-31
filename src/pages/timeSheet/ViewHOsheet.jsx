@@ -570,7 +570,7 @@ export const ViewHOsheet = ({
                   {visibleData && visibleData?.length > 0
                     ? visibleData.map((value, index) => {
                         const renderRows = (m, ind) => {
-                          const isStatusPending = m.status === "Pending";
+                          const isStatusPending = m?.status === "Pending";
                           return (
                             <tr
                               key={index + 1}
@@ -584,78 +584,78 @@ export const ViewHOsheet = ({
                                 {index + 1}
                               </td>
                               <td className="text-start px-4 flex-1">
-                                {m.REC}
+                                {m?.REC}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.CTR}
+                                {m?.CTR}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.DEPT}
+                                {m?.DEPT}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.EMPLOYEEID}
+                                {m?.EMPLOYEEID}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.BADGE}
+                                {m?.BADGE}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.NAME}
+                                {m?.NAME}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.DATE}
+                                {m?.DATE}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.ONAM}
+                                {m?.ONAM}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.OFFAM}
+                                {m?.OFFAM}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.ONPM}
+                                {m?.ONPM}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.OFFPM}
+                                {m?.OFFPM}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.IN}
+                                {m?.IN  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.OUT}
+                                {m?.OUT  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.TOTALINOUT || 0}
+                                {m?.TOTALINOUT  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.ALLDAYMINUTES || 0}
+                                {m?.ALLDAYMINUTES  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.NETMINUTES || 0}
+                                {m?.NETMINUTES  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.TOTALHOURS || 0}
+                                {m?.TOTALHOURS  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.NORMALWORKINGHRSPERDAY || 0}
+                                {m?.NORMALWORKINGHRSPERDAY  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.TOTALACTUALHOURS || 0}
+                                {m?.TOTALACTUALHOURS  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.OT || 0}
+                                {m?.OT  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.REMARKS}
+                                {m?.REMARKS}
                               </td>
 
                               {isStatusPending && (
                                 <td
                                   className={`text-center px-4 flex-1 ${
-                                    m.status === "Approved"
+                                    m?.status === "Approved"
                                       ? "text-[#0CB100]"
                                       : "text_size_8"
                                   }`}
                                 >
-                                  {m.status}
+                                  {m?.status}
                                 </td>
                               )}
                             </tr>
@@ -675,7 +675,7 @@ export const ViewHOsheet = ({
                             className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white  "
                           >
                             <p className="px-6 py-6">
-                              No Table Data Available Here.
+                              Please wait few seconds.
                             </p>
                           </td>
                         </tr>
@@ -686,7 +686,7 @@ export const ViewHOsheet = ({
                             className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white"
                           >
                             <p className="px-6 py-6">
-                              No Table Data Available Here.
+                              Please wait few seconds.
                             </p>
                           </td>
                         </tr>
@@ -706,39 +706,69 @@ export const ViewHOsheet = ({
                 onClick={() => {
                   if (userIdentification !== "Manager") {
                     toggleFunctionForAssiMana();
-                    // const fetchData = async () => {
-                    // console.log("I am calling You");
-                    // // Fetch the BLNG data using GraphQL
-                    //   const [fetchBLNGdata] = await Promise.all([
-                    //     client.graphql({
-                    //       query: listTimeSheets,
-                    //     }),
-                    //   ]);
-                    //   const BLNGdata =
-                    //     fetchBLNGdata?.data?.listTimeSheets?.items;
-                    //     // console.log(BLNGdata)
-                    //     // console.log("BLNGdata : ", BLNGdata);
-                    //     const deleteFunction =
-                    //       BLNGdata &&
-                    //       BLNGdata.map(async (m) => {
-                    //         const dailySheet = {
-                    //           id: m.id,
-                    //         };
-                    //         await client
-                    //           .graphql({
-                    //             query: deleteTimeSheet,
-                    //             variables: {
-                    //               input: dailySheet,
-                    //             },
-                    //           })
-                    //           .then((res) => {
-                    //             console.log(res);
-                    //           })
-                    //           .catch((err) => {
-                    //             console.log(err);
-                    //           });
+                    //   const fetchDataAndDelete = async () => {
+                    //   try {
+                    //     console.log("Fetching and Deleting SBW Data...");
+                    //     // setIsDeleting(true); // Set loading state
+                    //     let nextToken = null; // Initialize nextToken for pagination
+
+                    //     do {
+                    //       // Define the filter for fetching SBW data
+                    //       const filter = {
+                    //         and: [{ fileType: { eq: "HO" } }],
+                    //       };
+
+                    //       // Fetch the BLNG data using GraphQL with pagination
+                    //       const response = await client.graphql({
+                    //         query: listTimeSheets,
+                    //         variables: { filter: filter, nextToken: nextToken }, // Pass nextToken for pagination
                     //       });
+
+                    //       // Extract data and nextToken
+                    //       const SBWdata =
+                    //         response?.data?.listTimeSheets?.items || [];
+                    //       nextToken = response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
+
+                    //       console.log("Fetched SBW Data:", SBWdata);
+
+                    //       // Delete each item in the current batch
+                    //       await Promise.all(
+                    //         SBWdata.map(async (item) => {
+                    //           try {
+                    //             const deleteResponse = await client.graphql({
+                    //               query: deleteTimeSheet,
+                    //               variables: { input: { id: item.id } },
+                    //             });
+                    //             console.log(
+                    //               "Deleted Item Response:",
+                    //               deleteResponse
+                    //             );
+                    //           } catch (deleteError) {
+                    //             console.error(
+                    //               `Error deleting item with ID ${item.id}:`,
+                    //               deleteError
+                    //             );
+                    //           }
+                    //         })
+                    //       );
+
+                    //       console.log("Batch deletion completed.");
+                    //     } while (nextToken); // Continue fetching until no more data
+
+                    //     console.log(
+                    //       "All SBW items deletion process completed."
+                    //     );
+                    //   } catch (fetchError) {
+                    //     console.error(
+                    //       "Error in fetchDataAndDelete:",
+                    //       fetchError
+                    //     );
+                    //   } finally {
+                    //     // setIsDeleting(false); // Reset loading state
+                    //   }
                     // };
+                    // fetchDataAndDelete();
+                   
                     // fetchData();
                     // FOR DELETE
                     // const deleteFunction = async () => {

@@ -627,7 +627,7 @@ export const ViewBLNGsheet = ({
                   {visibleData && visibleData?.length > 0 ? (
                     visibleData.map((value, index) => {
                       const renderRows = (rowData, ind) => {
-                        const isStatusPending = rowData.status === "Pending";
+                        const isStatusPending = rowData?.status === "Pending";
 
                         return (
                           <tr
@@ -648,53 +648,53 @@ export const ViewBLNGsheet = ({
                                 : index + 1}
                             </td>
                             <td className="text-start px-4 flex-1">
-                              {rowData.FID}
+                              {rowData?.FID}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {rowData.NAMEFLAST}
+                              {rowData?.NAMEFLAST}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {rowData.ENTRANCEDATEUSED}
+                              {rowData?.ENTRANCEDATEUSED}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {rowData.ENTRANCEDATETIME}
+                              {rowData?.ENTRANCEDATETIME}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {rowData.EXITDATETIME}
+                              {rowData?.EXITDATETIME}
                             </td>
                             {/* <td className="text-center px-4 flex-1">
-                              {rowData.DAYDIFFERENCE || 0}
+                              {rowData?.DAYDIFFERENCE || 0}
                             </td> */}
                             <td className="text-center px-4 flex-1">
-                              {rowData.AVGDAILYTOTALBYDAY || 0}
+                              {rowData?.AVGDAILYTOTALBYDAY}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {rowData.AHIGHLIGHTDAILYTOTALBYGROUP || ""}
+                              {rowData?.AHIGHLIGHTDAILYTOTALBYGROUP || ""}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {rowData.ADININWORKSENGINEERINGSDNBHD}
+                              {rowData?.ADININWORKSENGINEERINGSDNBHD || 0}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {rowData.NORMALWORKINGHRSPERDAY || 0}
+                              {rowData?.NORMALWORKINGHRSPERDAY || 0}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {rowData.WORKINGHOURS || 0}
+                              {rowData?.WORKINGHOURS || 0}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {rowData.OT || 0}
+                              {rowData?.OT || 0}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {rowData.REMARKS}
+                              {rowData?.REMARKS}
                             </td>
                             {isStatusPending && (
                               <td
                                 className={`text-center px-4 flex-1 ${
-                                  rowData.status === "Approved"
+                                  rowData?.status === "Approved"
                                     ? "text-[#0CB100]"
                                     : "text_size_8"
                                 }`}
                               >
-                                {rowData.status || 0}
+                                {rowData?.status}
                               </td>
                             )}
                           </tr>
@@ -713,7 +713,7 @@ export const ViewBLNGsheet = ({
                         className="text-center text-dark_ash text_size_5 bg-white"
                       >
                         <p className="px-6 py-6">
-                          No Table Data Available Here.
+                          Please wait few seconds.
                         </p>
                       </td>
                     </tr>

@@ -26,7 +26,7 @@ export const CreateDoe = () => {
       });
 
       // // Log the response to confirm the update
-      // console.log("Data successfully created:", response);
+      console.log("Data successfully updated:", response);
     } catch (error) {
       console.error("Error updating data:", error);
       throw error; // Re-throw the error after logging

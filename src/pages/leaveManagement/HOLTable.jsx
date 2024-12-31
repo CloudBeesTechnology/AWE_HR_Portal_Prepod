@@ -46,7 +46,7 @@ export const HOLTable = () => {
         (a, b) =>
           new Date(b.leaveStatusCreatedAt) - new Date(a.leaveStatusCreatedAt)
       );
-    console.log(filteredData);
+    // console.log(filteredData);
 
     // Step 3: Apply date filter with proper date comparison
     if (selectedDate) {
@@ -73,7 +73,7 @@ export const HOLTable = () => {
         );
       });
     }
-    console.log(filteredData);
+    // console.log(filteredData);
 
     setSecondartyData(filteredData);
     setMatchData(filteredData);

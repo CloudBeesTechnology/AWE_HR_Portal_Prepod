@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { generateClient } from "@aws-amplify/api";
 import { listTimeSheets } from "../../../graphql/queries";
 
-export const useFetchData = (titleName,cardName) => {
+export const useFetchData = (titleName, cardName) => {
   const [loading, setLoading] = useState(false);
   const client = generateClient(); // GraphQL client
   const [convertedStringToArrayObj, setConvertedStringToArrayObj] = useState(
@@ -27,13 +27,18 @@ export const useFetchData = (titleName,cardName) => {
 
           const filter = {
             and:
-            cardName === "Manager"
+              cardName === "Manager"
                 ? [
                     { status: { eq: "Pending" } },
                     { fileType: { eq: titleName } },
                   ]
                 : cardName === "viewTimeSheet"
                 ? [{ fileType: { eq: titleName } }]
+                : cardName === "viewSummary"
+                ? [
+                    { status: { eq: "Approved" } },
+                    { fileType: { eq: titleName } },
+                  ]
                 : [{ fileType: { eq: titleName } }],
           };
           // Fetch data in a paginated manner
@@ -48,7 +53,7 @@ export const useFetchData = (titleName,cardName) => {
             });
 
             const result = response?.data?.listTimeSheets?.items || [];
-            
+
             fetchedData = response?.data?.listTimeSheets?.items || [];
 
             nextToken = response?.data?.listTimeSheets?.nextToken; // Update nextToken for next page
@@ -56,11 +61,9 @@ export const useFetchData = (titleName,cardName) => {
             const validData = fetchedData.filter(
               (item) => item !== null && item !== undefined
             );
-            
+
             allData = [...allData, ...fetchedData];
           } while (nextToken);
-
-         
 
           setConvertedStringToArrayObj(allData); // Update state with all data
         } catch (error) {
@@ -79,10 +82,9 @@ export const useFetchData = (titleName,cardName) => {
     //   convertedStringToArrayObj,
     //   "Manager"
     // );
-  
+
     return { convertedStringToArrayObj, getPosition, loading };
   } catch (err) {
     console.log("ERROR : ", err);
   }
 };
-

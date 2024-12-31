@@ -721,7 +721,7 @@ export const ViewTSTBeforeSave = ({
                 {visibleData && visibleData.length > 0
                   ? visibleData.map((value, index) => {
                       const renderRows = (m, ind) => {
-                        const isStatusPending = m.status === "Pending";
+                        const isStatusPending = m?.status === "Pending";
                         return (
                           <tr
                             key={index + 1}
@@ -734,45 +734,45 @@ export const ViewTSTBeforeSave = ({
                             <td className="text-center px-4 flex-1">
                               {index + 1}
                             </td>
-                            <td className="text-start px-4 flex-1">{m.NAME}</td>
-                            <td className="text-center px-4 flex-1">{m.NO}</td>
+                            <td className="text-start px-4 flex-1">{m?.NAME}</td>
+                            <td className="text-center px-4 flex-1">{m?.NO}</td>
                             <td className="text-start px-4 flex-1">
-                              {m.LOCATION}
+                              {m?.LOCATION}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {m.DATE}
+                              {m?.DATE}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {m.TOTALHOURS || 0}
+                              {m?.TOTALHOURS || 0}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {m.TOTALHOURS2 || 0}
+                              {m?.TOTALHOURS2 || 0}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {m.TOTALHOURS3 || 0}
+                              {m?.TOTALHOURS3 || 0}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {m.NORMALWORKINGHRSPERDAY || 0}
+                              {m?.NORMALWORKINGHRSPERDAY || 0}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {m.WORKINGHOURS || 0}
+                              {m?.WORKINGHOURS || 0}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {m.OT || 0}
+                              {m?.OT || 0}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {m.REMARKS}
+                              {m?.REMARKS}
                             </td>
 
                             {isStatusPending && (
                               <td
                                 className={`text-center px-4 flex-1 ${
-                                  m.status === "Approved"
+                                  m?.status === "Approved"
                                     ? "text-[#0CB100]"
                                     : "text_size_8"
                                 }`}
                               >
-                                {m.status}
+                                {m?.status}
                               </td>
                             )}
                           </tr>
@@ -791,7 +791,7 @@ export const ViewTSTBeforeSave = ({
                           className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white"
                         >
                           <p className="px-6 py-6">
-                            No Table Data Available Here.
+                            Please wait few seconds.
                           </p>
                         </td>
                       </tr>
@@ -802,7 +802,7 @@ export const ViewTSTBeforeSave = ({
                           className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white"
                         >
                           <p className="px-6 py-6">
-                            No Table Data Available Here.
+                           Please wait few seconds.
                           </p>
                         </td>
                       </tr>

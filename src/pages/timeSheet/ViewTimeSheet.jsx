@@ -1,4 +1,3 @@
-
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FaAngleDown } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -42,6 +41,8 @@ export const ViewTimeSheet = () => {
     setSearchQuery,
     showListTimeSheet,
     setShowListTimeSheet,
+    timeSheetFileData,
+    setTimeSheetFileData,
   } = useTempID();
   const { handleScroll, visibleData, setVisibleData } = UseScrollableView(
     allExcelSheetData,
@@ -125,6 +126,7 @@ export const ViewTimeSheet = () => {
 
   const searchResult = (result) => {
     setSearchQuery(result);
+    console.log(result);
   };
 
   const handleForSelectTSheet = (category) => {
@@ -132,13 +134,16 @@ export const ViewTimeSheet = () => {
   };
 
   const newSearchFunction = useCallback((allData) => {
-    setData(allData.updatedAt);
+    setData(allData?.updatedAt);
+    console.log(allData)
   }, []);
 
   console.log(showListTimeSheet);
   return (
     <div
-      className={`bg-[#fafaf6] ${showListTimeSheet && "h-screen"} border border-[#fafaf6] flex justify-center `}
+      className={`bg-[#fafaf6] ${
+        showListTimeSheet && "h-screen"
+      } border border-[#fafaf6] flex justify-center `}
       onClick={() => {
         if (toggleClick === true) {
           setToggleClick(false);
@@ -153,12 +158,13 @@ export const ViewTimeSheet = () => {
       >
         <div className="flex items-center w-full">
           <Link
-            to={`${showListTimeSheet ? "/timeSheet" :"/viewTimesheet"}`}
+            to={`${showListTimeSheet ? "/timeSheet" : "/viewTimesheet"}`}
             className="text-xl text-grey cursor-pointer w-1/15 flex items-center"
             onClick={() => {
               setStartDate("");
               setEndDate("");
-              setShowListTimeSheet(true)
+              setShowListTimeSheet(true);
+              setTimeSheetFileData(null)
             }}
           >
             <FaArrowLeft />
@@ -172,7 +178,9 @@ export const ViewTimeSheet = () => {
         <div className="flex justify-between items-center w-full">
           <div className="flex justify-start gap-4">
             <div className="relative grid grid-cols-1">
-              <label className="text_size_6">Start Date</label>
+              <label className="text_size_6">
+                {showListTimeSheet ? "Choose Date" : "Start Date"}
+              </label>
               <input
                 type="date"
                 value={startDate}
@@ -248,21 +256,33 @@ export const ViewTimeSheet = () => {
 
             {!showListTimeSheet && (
               <SearchBoxForTimeSheet
-                placeholder="Search"
+                placeholder={`${
+                  timeSheetFileData?.fileType === "Offshore"
+                    ? "SAP ID"
+                    : timeSheetFileData?.fileType === "HO"
+                    ? "EMPLOYEE ID / BADGE NO"
+                    : timeSheetFileData?.fileType === "SBW"
+                    ? "BADGE NO"
+                    : timeSheetFileData?.fileType === "ORMC"
+                    ? "BADGE NO"
+                    : timeSheetFileData?.fileType === "BLNG"
+                    ? "FID"
+                    : "Search..."
+                }`}
                 searchResult={searchResult}
                 allEmpDetails={data}
-                secondaryData={data}
+                secondaryData={timeSheetFileData?.updatedAt}
                 Position="ViewTimeSheet"
               />
             )}
-             {showListTimeSheet && (
-            <FilterForTimeSheet
-              handleFilterChange={handleFilterChange}
-              toggleDropdown={toggleDropdown}
-              isOpen={isOpen}
-              setIsOpen={setIsOpen}
-            />
-             )}
+            {showListTimeSheet && (
+              <FilterForTimeSheet
+                handleFilterChange={handleFilterChange}
+                toggleDropdown={toggleDropdown}
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+              />
+            )}
           </div>
         </div>
 
@@ -274,6 +294,7 @@ export const ViewTimeSheet = () => {
         {showListTimeSheet && (
           <ListTimeSheet
             visibleData={visibleData}
+            setVisibleData={ setVisibleData}
             newSearchFunction={newSearchFunction}
             message={message}
           />

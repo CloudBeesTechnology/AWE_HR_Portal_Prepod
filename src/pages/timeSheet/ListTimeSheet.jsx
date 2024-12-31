@@ -6,13 +6,16 @@ export const ListTimeSheet = ({
   newSearchFunction,
   visibleData,
   message,
- 
+  setVisibleData,
 }) => {
-
-  const { setTimeSheetFileData ,setShowListTimeSheet} = useTempID();
+  const { setTimeSheetFileData, setShowListTimeSheet, setSearchQuery } =
+    useTempID();
   const nav = useNavigate();
 
   const handleNavigate = (val) => {
+    setTimeSheetFileData(null);
+    setVisibleData([]);
+    setSearchQuery(null);
     setTimeSheetFileData(val);
     setShowListTimeSheet(false);
     nav("/viewTsheetDetails");
@@ -48,7 +51,6 @@ export const ListTimeSheet = ({
                     onClick={() => {
                       handleNavigate(val);
                       newSearchFunction(val);
-                    
                     }}
                     className="underline text-dark_skyBlue cursor-pointer"
                   >

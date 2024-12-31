@@ -131,12 +131,28 @@ export const UploadOffshoreFile = (
       const daysToAdd = serial;
       return new Date(baseDate.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
     }
+
+    function convertDateFormat(dateStr) {
+      // Split the input string by '/'
+      const parts = dateStr.split("/");
+
+      // Validate the input format
+      if (parts.length !== 3) {
+        throw new Error("Invalid date format. Expected DD/MM/YYYY");
+      }
+
+      // Rearrange the parts to MM/DD/YYYY
+      const [day, month, year] = parts;
+      return `${month}/${day}/${year}`;
+    }
     const result =
       finalFilterdData &&
       finalFilterdData.map((getDate) => {
         const dates = getDate.date.flat();
         let jsDate = excelDateToJSDate(dates);
-        const formattedDate = jsDate.toLocaleDateString();
+        const dateObject = jsDate.toLocaleDateString();
+       const formattedDate= convertDateFormat(dateObject)
+        
         return {
           ...getDate,
           date: formattedDate,

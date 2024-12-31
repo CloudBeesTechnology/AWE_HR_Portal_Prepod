@@ -13,12 +13,39 @@ export const LanguageDD = [
 ];
 
 export const RaceDD = [
-  { value: "Malay", label: "Malay" },
+  { value: "Australian", label: "Australian" },
+  { value: "Bangladesi", label: "Bangladesi" },
+  { value: "Bidayuh", label: "Bidayuh" },
+  { value: "British", label: "British" },
   { value: "Chinese", label: "Chinese" },
+  { value: "Dayak", label: "Dayak" },
+  { value: "Dusun", label: "Dusun" },
+  { value: "Dusun Muslim", label: "Dusun Muslim" },
+  { value: "Eurasian", label: "Eurasian" },
+  { value: "Filipino", label: "Filipino" },
+  { value: "Iban", label: "Iban" },
+  { value: "Iban Chinese", label: "Iban Chinese" },
+  { value: "Iban Dayak", label: "Iban Dayak" },
+  { value: "Iban Muslim", label: "Iban Muslim" },
   { value: "Indian", label: "Indian" },
+  { value: "Indonesia", label: "Indonesia" },
+  { value: "Java", label: "Java" },
+  { value: "Kadazan", label: "Kadazan" },
+  { value: "Kayan", label: "Kayan" },
+  { value: "Kedayan", label: "Kedayan" },
+  { value: "Kelabit", label: "Kelabit" },
+  { value: "Kenyah", label: "Kenyah" },
+  { value: "Lun Bawang", label: "Lun Bawang" },
+  { value: "Malay", label: "Malay" },
+  { value: "Melanau", label: "Melanau" },
+  { value: "Murut", label: "Murut" },
+  { value: "Muslim", label: "Muslim" },
+  { value: "Srilankan", label: "Srilankan" },
+  { value: "Thai", label: "Thai" },
+  { value: "Ukit", label: "Ukit" },
   { value: "Other", label: "Other" },
-];
 
+];
 export const ReligionDD = [
   { value: "Islam", label: "Islam" },
   { value: "Christian", label: "Christian" },
@@ -85,26 +112,30 @@ export const SalaryPayDD = [
   { value: "Daily", label: "Daily" },
 ];
 export const EmpTypeDD = [
-  { value: "OnShore", label: "OnShore" },
-  { value: "OffShore", label: "OffShore" },
+  { value: "ONSHORE", label: "ONSHORE" },
+  { value: "OFFSHORE", label: "OFFSHORE" },
 ];
 
 export const CountryORDD = [
-  { value: "Brunei", label: "Brunei" },
-  { value: "Malaysia", label: "Malaysia" },
-  { value: "Indonesia", label: "Indonesia" },
-  { value: "India", label: "India" },
+  { value: "Afghanistan", label: "Afghanistan" },
   { value: "Bangladesh", label: "Bangladesh" },
-  { value: "Thailand", label: "Thailand" },
-  { value: "Sri Lanka", label: "Sri Lanka" },
+  { value: "Brunei", label: "Brunei" },
+  { value: "Brunei Darussa", label: "Brunei Darussa" },
+  { value: "Brunei Darussalam", label: "Brunei Darussalam" },
+  { value: "India", label: "India" },
+  { value: "Indonesia", label: "Indonesia" },
+  { value: "Malaysia", label: "Malaysia" },
   { value: "Philippines", label: "Philippines" },
+  { value: "Sri Lanka", label: "Sri Lanka" },
+  { value: "Thailand", label: "Thailand" },
+  { value: "United Kingdom", label: "United Kingdom" },
   { value: "Other", label: "Other" },
 ];
-
 export const BwnIcColourDD = [
   { value: "Yellow", label: "Yellow" },
   { value: "Red", label: "Red" },
   { value: "Green", label: "Green" },
+  { value: "Purple", label: "Purple" },
 ];
 
 export const EducLevelDD = [

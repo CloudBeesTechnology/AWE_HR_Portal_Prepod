@@ -155,7 +155,7 @@ export const Insurance = () => {
 
       {notification && (
         <SpinLogo
-          text="Insurance Info Saved Successfully"
+          text="Insurance Type Saved Successfully"
           notification={notification}
           path="/insuranceHr"
         />

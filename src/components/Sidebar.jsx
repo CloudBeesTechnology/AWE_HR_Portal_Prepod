@@ -254,7 +254,7 @@ const Sidebar = () => {
               )}
               {category === "LeaveManagement" && (
                 <NavLink
-                  to="/leaveManage"
+                  to="/leaveManagement"
                   className={({ isActive }) =>
                     `flex items-center gap-3 py-2 pl-1  rounded-lg ${
                       isActive ? "bg-primary text-secondary" : ""
@@ -262,7 +262,7 @@ const Sidebar = () => {
                   }
                 >
                   <span>
-                    {location.pathname === "/leaveManage" ? (
+                    {location.pathname === "/leaveManagement" ? (
                       <LeaveIcons color="#303030" />
                     ) : (
                       <LeaveIcons color="white" />

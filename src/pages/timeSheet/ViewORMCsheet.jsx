@@ -30,7 +30,7 @@ export const ViewORMCsheet = ({
   defaultValue,
 }) => {
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
-    const [closePopup, setClosePopup] = useState(false);
+  const [closePopup, setClosePopup] = useState(false);
   const [data, setData] = useState(null);
   const [secondaryData, setSecondaryData] = useState(null);
   const [currentStatus, setCurrentStatus] = useState(defaultValue);
@@ -49,7 +49,7 @@ export const ViewORMCsheet = ({
   );
 
   const processedData = useTableMerged(excelData);
-  console.log(processedData)
+  console.log(processedData);
   useEffect(() => {
     if (processedData && processedData.length > 0) {
       setData(processedData);
@@ -247,7 +247,6 @@ export const ViewORMCsheet = ({
   const toggleSFAMessage = async (value, responseData) => {
     setSuccessMess(value);
     if (value === true && responseData) {
-    
       setResponse(responseData);
     }
   };
@@ -342,7 +341,6 @@ export const ViewORMCsheet = ({
                 toggleSFAMessage(true, responseData); // Only toggle success message once
 
                 const result = await MergeTableForNotification(responseData);
-             
 
                 if (result) {
                   // Call the Notification function
@@ -355,13 +353,8 @@ export const ViewORMCsheet = ({
                     // Log email details
                     const { subject, message, fromAddress, toAddress } =
                       emailDetails;
-                  
-                    await sendEmail(
-                      subject,
-                      message,
-                      fromAddress,
-                      toAddress
-                    );
+
+                    await sendEmail(subject, message, fromAddress, toAddress);
                   } else {
                     console.error("Notification returned undefined!");
                   }
@@ -430,7 +423,6 @@ export const ViewORMCsheet = ({
                 toggleSFAMessage(true, responseData); // Only toggle success message once
 
                 const result = await MergeTableForNotification(responseData);
-                
 
                 if (result) {
                   // Call the Notification function
@@ -443,13 +435,8 @@ export const ViewORMCsheet = ({
                     // Log email details
                     const { subject, message, fromAddress, toAddress } =
                       emailDetails;
-                   
-                    await sendEmail(
-                      subject,
-                      message,
-                      fromAddress,
-                      toAddress
-                    );
+
+                    await sendEmail(subject, message, fromAddress, toAddress);
                   } else {
                     console.error("Notification returned undefined!");
                   }
@@ -517,7 +504,7 @@ export const ViewORMCsheet = ({
                   {visibleData && visibleData.length > 0
                     ? visibleData.map((value, index) => {
                         const renderRows = (m, ind) => {
-                          const isStatusPending = m.status === "Pending";
+                          const isStatusPending = m?.status === "Pending";
                           return (
                             <tr
                               key={index + 1}
@@ -531,57 +518,57 @@ export const ViewORMCsheet = ({
                                 {index + 1}
                               </td>
                               <td className="text-start px-4 flex-1">
-                                {m.NAME}
+                                {m?.NAME}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.DEPTDIV}
+                                {m?.DEPTDIV}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.BADGE}
+                                {m?.BADGE}
                               </td>
-                              {/* <td className="text-center px-4 flex-1">{m.DEPT}</td> */}
+                              {/* <td className="text-center px-4 flex-1">{m?.DEPT}</td> */}
                               <td className="text-center px-4 flex-1">
-                                {m.DATE}
-                              </td>
-                              <td className="text-center px-4 flex-1">
-                                {m.IN}
+                                {m?.DATE}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.OUT}
+                                {m?.IN  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.TOTALINOUT}
+                                {m?.OUT  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.ALLDAYMINHRS}
+                                {m?.TOTALINOUT  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.NETMINUTES}
+                                {m?.ALLDAYMINHRS  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.TOTALHOURS}
+                                {m?.NETMINUTES  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.NORMALWORKINGHRSPERDAY || 0}
+                                {m?.TOTALHOURS  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.WORKINGHOURS}
+                                {m?.NORMALWORKINGHRSPERDAY  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.OT}
+                                {m?.WORKINGHOURS  || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m.REMARKS}
+                                {m?.OT  || 0}
+                              </td>
+                              <td className="text-center px-4 flex-1">
+                                {m?.REMARKS}
                               </td>
                               {isStatusPending && (
                                 <td
                                   className={`text-center px-4 flex-1 ${
-                                    m.status === "Approved"
+                                    m?.status === "Approved"
                                       ? "text-[#0CB100]"
                                       : "text_size_8"
                                   }`}
                                 >
-                                  {m.status}
+                                  {m?.status}
                                 </td>
                               )}
                             </tr>
@@ -601,7 +588,7 @@ export const ViewORMCsheet = ({
                             className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white "
                           >
                             <p className="px-6 py-6">
-                              No Table Data Available Here.
+                              Please wait few seconds.
                             </p>
                           </td>
                         </tr>
@@ -612,7 +599,7 @@ export const ViewORMCsheet = ({
                             className="px-6 py-6 text-center text-dark_ash text_size_5"
                           >
                             <p className="px-6 py-6">
-                              No Table Data Available Here.
+                              Please wait few seconds.
                             </p>
                           </td>
                         </tr>
@@ -643,9 +630,9 @@ export const ViewORMCsheet = ({
               </button>
             </div>
           </div>
-        ) : currentStatus === false && closePopup === true  ? (
+        ) : currentStatus === false && closePopup === true ? (
           // {data ? ("True case") : data == false ? ("False case") : ("Default case")}
-          <PopupForMissMatchExcelSheet setClosePopup={setClosePopup}/>
+          <PopupForMissMatchExcelSheet setClosePopup={setClosePopup} />
         ) : (
           // setShowPopup
           ""

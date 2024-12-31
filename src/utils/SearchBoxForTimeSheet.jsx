@@ -75,7 +75,7 @@ export const SearchBoxForTimeSheet = ({
   Position,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  // console.log("Search EmpId : ", secondaryData);
+  
   const handleSearch = (e) => {
     const query = e.target.value.trim().toUpperCase();
     setSearchQuery(query);
@@ -134,7 +134,7 @@ export const SearchBoxForTimeSheet = ({
         value={searchQuery}
         type="text"
         placeholder={placeholder}
-        className="outline-none flex-grow text-sm w-full"
+        className="outline-none flex-grow text-sm text_size_7 text-dark_grey w-full "
         onChange={handleSearch}
       />
       <span className="ml-2">

@@ -881,11 +881,69 @@ export const EditTimeSheet = ({
 
     const updateFormData = (workingHoursKey, actualHoursKey) => {
       // Calculate total working hours
+      // const sumHoursAndMinutes = (sections, key) => {
+      //   let totalMinutes = sections.reduce((total, sec) => {
+      //     console.log(sec);
+      //     if (sec[key]) {
+      //       const [hours, minutes] = sec[key].split(":").map(Number); // Split into hours and minutes
+      //       total += hours * 60 + (minutes || 0); // Convert to total minutes
+      //     }
+      //     return total;
+      //   }, 0);
+
+      //   // Convert total minutes back to HH:MM format
+      //   const hours = Math.floor(totalMinutes / 60);
+      //   const minutes = totalMinutes % 60;
+      //   return `${hours}:${minutes.toString().padStart(2, "0")}`;
+      // };
+      const ConvertHours = (sections) => {
+        let totalMinutes = 0; // Initialize totalMinutes to avoid undefined error
+
+        if (sections) {
+          // Replace "." with ":" to handle decimal formats like "8.20" → "8:20"
+          let time = sections.includes(".")
+            ? sections.replace(".", ":")
+            : sections;
+
+          // Handle whole numbers like "8" → "8:00"
+          if (!time.includes(":")) {
+            time = `${time}:00`;
+          }
+
+          // Split into hours and minutes
+          const [hours, minutes] = time.split(":").map(Number);
+
+          // Validate hours and minutes
+          if (isNaN(hours) || isNaN(minutes)) {
+            throw new Error("Invalid time format");
+          }
+
+          totalMinutes = hours * 60 + minutes; // Convert to total minutes
+        }
+
+        // Convert total minutes back to HH:MM format
+        const outputHours = Math.floor(totalMinutes / 60);
+        const outputMinutes = totalMinutes % 60;
+        return `${outputHours}:${outputMinutes.toString().padStart(2, "0")}`;
+      };
+      // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
       const sumHoursAndMinutes = (sections, key) => {
         let totalMinutes = sections.reduce((total, sec) => {
           console.log(sec);
+
           if (sec[key]) {
-            const [hours, minutes] = sec[key].split(":").map(Number); // Split into hours and minutes
+            // Replace "." with ":" to handle decimal formats like "8.20" → "8:20"
+            let time = sec[key].includes(".")
+              ? sec[key].replace(".", ":")
+              : sec[key];
+
+            // Handle whole numbers like "8" → "8:00"
+            if (!time.includes(":")) {
+              time = `${time}:00`;
+            }
+
+            // Split into hours and minutes
+            const [hours, minutes] = time.split(":").map(Number);
             total += hours * 60 + (minutes || 0); // Convert to total minutes
           }
           return total;
@@ -896,39 +954,48 @@ export const EditTimeSheet = ({
         const minutes = totalMinutes % 60;
         return `${hours}:${minutes.toString().padStart(2, "0")}`;
       };
-
       // Calculate total working hours and overtime hours
       const totalWorkingHrs = sumHoursAndMinutes(sections, "WORKINGHRS");
       const totalOvertimeHrs = sumHoursAndMinutes(sections, "OVERTIMEHRS");
+
       console.log(totalWorkingHrs, " : ", totalOvertimeHrs);
       setFormData((prevFormData) => {
         const updatedWorkingHours =
-          parseFloat(totalWorkingHrs.split(":")[0]) +
-          parseFloat(totalWorkingHrs.split(":")[1]) / 60;
-
+          parseFloat(totalWorkingHrs?.split(":")[0]) +
+          parseFloat(totalWorkingHrs?.split(":")[1]) / 60;
+        const normalWH = ConvertHours(prevFormData?.NORMALWORKINGHRSPERDAY);
+        const convertNWPD =
+          parseFloat(normalWH?.split(":")[0]) +
+          parseFloat(normalWH?.split(":")[1]) / 60;
         // Calculate overtime
         const calculatedOT =
-          updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY <= 0
+          updatedWorkingHours - convertNWPD <= 0
             ? 0
-            : updatedWorkingHours - prevFormData.NORMALWORKINGHRSPERDAY;
+            : updatedWorkingHours - convertNWPD;
 
         // Update warning messages
-        setWarningMess(
-          updatedWorkingHours > parseFloat(prevFormData.NORMALWORKINGHRSPERDAY)
+        setWarningMess(updatedWorkingHours > convertNWPD);
+        const adininWorks = ConvertHours(
+          prevFormData?.ADININWORKSENGINEERINGSDNBHD
         );
 
+        const adinin =
+          parseFloat(adininWorks?.split(":")[0]) +
+          parseFloat(adininWorks?.split(":")[1]) / 60;
+
         // Example for additional warnings
-        if (
-          updatedWorkingHours +
-            parseFloat(totalOvertimeHrs.split(":")[0]) +
-            parseFloat(totalOvertimeHrs.split(":")[1]) / 60 >
-          parseFloat(prevFormData.ADININWORKSENGINEERINGSDNBHD)
-        ) {
-          setWarningMessForAdinin("AW & ESB");
-          console.log(updatedWorkingHours + totalOvertimeHrs);
-          console.log("Yes it is true");
+        const updatedTotalOvertimeHrs =
+          parseFloat(totalOvertimeHrs?.split(":")[0]) +
+          parseFloat(totalOvertimeHrs?.split(":")[1]) / 60;
+
+        if (updatedWorkingHours + updatedTotalOvertimeHrs > adinin) {
+          setWarningMessForAdinin(
+            updatedWorkingHours + updatedTotalOvertimeHrs > adinin
+          );
+        } else {
+          setWarningMessForAdinin(false);
         }
-        console.log(formatTime(calculatedOT));
+
         return {
           ...prevFormData,
           [actualHoursKey]: totalWorkingHrs, // Already formatted as HH:MM
@@ -966,7 +1033,7 @@ export const EditTimeSheet = ({
   useEffect(() => {
     const totalOvertimeHrs = sections.reduce((total, sec) => {
       let overtime = sec.OVERTIMEHRS || "0:00"; // Default value if empty
-  
+
       if (overtime.includes(".")) {
         // Handle decimal format like "8.20"
         // const [whole, fraction] = overtime.split(".");
@@ -977,19 +1044,19 @@ export const EditTimeSheet = ({
         // Handle whole number format like "8"
         overtime = `${overtime}:00`; // Convert to hh:mm
       }
-  
+
       // Split and calculate total minutes
       const [hrs, mins] = overtime.split(":").map(Number);
       return total + hrs * 60 + mins; // Convert to total minutes
     }, 0);
-  
+
     // Convert total minutes back to hh:mm format
     const hours = Math.floor(totalOvertimeHrs / 60);
     const minutes = totalOvertimeHrs % 60;
     const formattedTime = `${hours}:${minutes.toString().padStart(2, "0")}`;
-  
+
     console.log(formattedTime);
-  
+
     // Update formData with formattedTime if totalOvertimeHrs exists
     if (totalOvertimeHrs > 0) {
       setFormData((prevFormData) => ({
@@ -998,7 +1065,6 @@ export const EditTimeSheet = ({
       }));
     }
   }, [sections]);
-  
 
   const addJCandLocaWhrs = useCallback(() => {
     const getData =
@@ -1102,16 +1168,45 @@ export const EditTimeSheet = ({
                 // value={editObject.FID}
                 value={formData[field] || ""}
                 onChange={handleChange}
-                readOnly={index < 0}
+                readOnly={index < 7}
               />
 
               {/* TOTALACTUALHOURS */}
-              {warningMess &&
-                (field === "WORKINGHOURS" || field === "TOTALACTUALHOURS") && (
-                  <span className="text_size_9 mt-2 text-red">
-                    {`Working hours exceed the NWHPD ${warningMessForAdinin}`}
-                  </span>
-                )}
+              {warningMess === true &&
+              warningMessForAdinin === false &&
+              titleName === "BLNG"
+                ? (field === "WORKINGHOURS" ||
+                    field === "TOTALACTUALHOURS") && (
+                    <span className="text_size_9 mt-2 text-red">
+                      {`Working hours exceed the NWHPD`}
+                    </span>
+                  )
+                : warningMess === false &&
+                  warningMessForAdinin === true &&
+                  titleName === "BLNG"
+                ? (field === "WORKINGHOURS" ||
+                    field === "TOTALACTUALHOURS") && (
+                    <span className="text_size_9 mt-2 text-red">
+                      {`Working hours + OT exceed the AW & ESB`}
+                    </span>
+                  )
+                : warningMess === true &&
+                  warningMessForAdinin === true &&
+                  titleName === "BLNG"
+                ? (field === "WORKINGHOURS" ||
+                    field === "TOTALACTUALHOURS") && (
+                    <span className="text_size_9 mt-2 text-red">
+                      {`Working hours + OT exceed the NWHPD, AW & ESB`}
+                    </span>
+                  )
+                : warningMess &&
+                  titleName !== "BLNG" ?
+                  (field === "WORKINGHOURS" ||
+                    field === "TOTALACTUALHOURS") && (
+                    <span className="text_size_9 mt-2 text-red">
+                      {`Working hours exceed the NWHPD`}
+                    </span>
+                  ):""}
               {/* {warningMessForAdinin &&
                 (field === "WORKINGHOURS" || field === "TOTALACTUALHOURS") && (
                   <span className="text_size_9 mt-2 text-red">

@@ -30,24 +30,30 @@ export const JOBCODES = [
 
 export const LocationData = [
   { id: 0, location: "All Location" },
-  { id: 1, location: "Crest Centurion 2" },
-  { id: 2, location: "DAY TRIPPING" },
-  { id: 3, location: "Icon Aliza" },
-  { id: 4, location: "Icon Valiant" },
-  { id: 6, location: "Khalifa" },
-  { id: 7, location: "Masshor Princess" },
-  { id: 8, location: "MV Falgout" },
-  { id: 9, location: "Offshore" },
-  { id: 10, location: "Head Office" },
-  { id: 11, location: "ORMC" },
-  { id: 12, location: "SBW" },
+  { id: 1, location: "Offshore" },
+  { id: 2, location: "Head Office" },
+  { id: 3, location: "ORMC" },
+  { id: 4, location: "SBW" },
+  { id: 5, location: "BLNG" },
+  { id: 6, location: "Crest Centurion 2" },
+  { id: 7, location: "DAY TRIPPING" },
+  { id: 8, location: "Icon Aliza" },
+  { id: 9, location: "Icon Valiant" },
+  { id: 10, location: "Khalifa" },
+  { id: 11, location: "Masshor Princess" },
+  { id: 12, location: "MV Falgout" },
+  { id: 13, location: "Accounts" },
+  { id: 14, location: "HR" },
+  { id: 15, location: "Purchasing" },
+  { id: 16, location: "Corporate" },
+  { id: 17, location: "CPT" },
 ];
 
 export const dummyLeaveStatus = [
   {
     id: "712a1c4b-88a8-49f3-aa13-880879a7b168",
     empID: "AWE360",
-    leaveType: "Annual Leave",
+    leaveType: "Sick Leave",
     fromDate: "2024-10-07",
     toDate: "2024-10-08",
     days: 5,
@@ -74,8 +80,8 @@ export const dummyLeaveStatus = [
   {
     id: "712a1c4b-88a8-49f3-aa13-880879a7b168",
     empID: "AWE360",
-    leaveType: "Compassionate Leave",
-    fromDate: "2024-10-04",
+    leaveType: "Unpaid Authorise Leave",
+    fromDate: "2024-10-05",
     toDate: "2024-10-06",
     days: 1,
     applyTo: ["Manager", "Supervisor"],
@@ -128,7 +134,7 @@ export const dummyLeaveStatus = [
   {
     id: "39c6cb04-30df-4f67-81ef-dfdca46bc6ee",
     empID: "352",
-    leaveType: "Annual Leave",
+    leaveType: "Unpaid Authorised Leave",
     fromDate: "2024-10-17",
     toDate: "2024-10-20",
     days: 4,
@@ -181,198 +187,254 @@ export const dummyLeaveStatus = [
   },
 ];
 
-
-export const seperateDataBasedOnLocation =[
+export const seperateDataBasedOnLocation = [
   {
-  "empId": "AWE600",
-  "data": [
+    empId: "AWE600",
+    data: [
       {
-          "ctr": 6,
-          "date": "9/23/2024",
-          "offPm": "16:30:00",
-          "empId": "AWE600",
-          "in": "07:47:51 ",
-          "OT": 2,
-          "onPm": "13:00:00",
-          "jobLocaWhrs": [
-              {
-                  "LOCATION": "Head Office",
-                  "OVERTIMEHRS": "4",
-                  "JOBCODE": "J9005",
-                  "WORKINGHRS": "15"
-              },{
-                "LOCATION": "Head Office",
-                "OVERTIMEHRS": "4",
-                "JOBCODE": "J9008",
-                "WORKINGHRS": "15"
-            },{
-                  "LOCATION": "HR",
-                  "OVERTIMEHRS": "2",
-                  "JOBCODE": "J9005",
-                  "WORKINGHRS": "15"
-              }
-
-
-          ],
-          "dept": "OFF",
-          "out": "11:54:25 ",
-          "netMin": 219,
-          "workhrs": 0,
-          "rec": "1 ",
-          "badge": "099A",
-          "allDayMin": "247.00 ",
-          "totalHrs": 3.65,
-          "offAm": "12:00:00",
-          "name": "ADRIAN",
-          "managerData": {
-              "muntilDate": "2024-12-13",
-              "mdepartment": "BLNG",
-              "mName": "Zara",
-              "mbadgeNo": "0600",
-              "mfromDate": "2024-12-12"
+        ctr: 6,
+        date: "9/23/2024",
+        offPm: "16:30:00",
+        empId: "AWE600",
+        in: "07:47:51 ",
+        OT: 2,
+        onPm: "13:00:00",
+        jobLocaWhrs: [
+          {
+            LOCATION: "Head Office",
+            OVERTIMEHRS: "4",
+            JOBCODE: "J9005",
+            WORKINGHRS: "15",
           },
-          "totalActHrs": 15,
-          "totalInOut": "28 ",
-          "normalWhrsPerDay": "12",
-          "remarks": "Acceptable",
-          "onAm": "07:30:00",
-          "status": "Approved"
+          {
+            LOCATION: "Head Office",
+            OVERTIMEHRS: "4",
+            JOBCODE: "J9008",
+            WORKINGHRS: "15",
+          },
+          {
+            LOCATION: "HR",
+            OVERTIMEHRS: "2",
+            JOBCODE: "J9005",
+            WORKINGHRS: "15",
+          },
+        ],
+        dept: "OFF",
+        out: "11:54:25 ",
+        netMin: 219,
+        workhrs: 0,
+        rec: "1 ",
+        badge: "099A",
+        allDayMin: "247.00 ",
+        totalHrs: 3.65,
+        offAm: "12:00:00",
+        name: "ADRIAN",
+        managerData: {
+          muntilDate: "2024-12-13",
+          mdepartment: "BLNG",
+          mName: "Zara",
+          mbadgeNo: "0600",
+          mfromDate: "2024-12-12",
+        },
+        totalActHrs: 15,
+        totalInOut: "28 ",
+        normalWhrsPerDay: "12",
+        remarks: "Acceptable",
+        onAm: "07:30:00",
+        status: "Approved",
       },
       {
-          "ctr": 7,
-          "date": "9/24/2024",
-          "offPm": "16:30:00",
-          "empId": "AWE600",
-          "in": "07:27:15 ",
-          "OT": 3,
-          "onPm": "13:00:00",
-          "jobLocaWhrs": [
-              {
-                  "LOCATION": "Head Office",
-                  "OVERTIMEHRS": "3",
-                  "JOBCODE": "J9005",
-                  "WORKINGHRS": "15"
-              },{
-                  "LOCATION": "SBW",
-                  "OVERTIMEHRS": "4",
-                  "JOBCODE": "J9008",
-                  "WORKINGHRS": "15"
-              }
-
-
-          ],
-          "dept": "OFF",
-          "out": "11:59:38 ",
-          "netMin": 248,
-          "workhrs": 0,
-          "rec": "2 ",
-          "badge": "099A",
-          "allDayMin": "272.00 ",
-          "totalHrs": 4.13,
-          "offAm": "12:00:00",
-          "name": "ADRIAN",
-          "managerData": {
-              "muntilDate": "2024-12-13",
-              "mdepartment": "BLNG",
-              "mName": "Zara",
-              "mbadgeNo": "0600",
-              "mfromDate": "2024-12-12"
+        ctr: 7,
+        date: "9/24/2024",
+        offPm: "16:30:00",
+        empId: "AWE600",
+        in: "07:27:15 ",
+        OT: 3,
+        onPm: "13:00:00",
+        jobLocaWhrs: [
+          {
+            LOCATION: "Head Office",
+            OVERTIMEHRS: "3",
+            JOBCODE: "J9005",
+            WORKINGHRS: "15",
           },
-          "totalActHrs": 15,
-          "totalInOut": "24 ",
-          "normalWhrsPerDay": "12",
-          "remarks": "Permission Granted",
-          "onAm": "07:30:00",
-          "status": "Approved"
+          {
+            LOCATION: "SBW",
+            OVERTIMEHRS: "4",
+            JOBCODE: "J9008",
+            WORKINGHRS: "15",
+          },
+        ],
+        dept: "OFF",
+        out: "11:59:38 ",
+        netMin: 248,
+        workhrs: 0,
+        rec: "2 ",
+        badge: "099A",
+        allDayMin: "272.00 ",
+        totalHrs: 4.13,
+        offAm: "12:00:00",
+        name: "ADRIAN",
+        managerData: {
+          muntilDate: "2024-12-13",
+          mdepartment: "BLNG",
+          mName: "Zara",
+          mbadgeNo: "0600",
+          mfromDate: "2024-12-12",
+        },
+        totalActHrs: 15,
+        totalInOut: "24 ",
+        normalWhrsPerDay: "12",
+        remarks: "Permission Granted",
+        onAm: "07:30:00",
+        status: "Approved",
       },
-        ]
-}, {
-  "empId": "AWE700",
-  "data": [
+    ],
+  },
+  {
+    empId: "AWE700",
+    data: [
       {
-          "ctr": 6,
-          "date": "9/23/2024",
-          "offPm": "16:30:00",
-          "empId": "AWE700",
-          "in": "07:47:51 ",
-          "OT": 2,
-          "onPm": "13:00:00",
-          "jobLocaWhrs": [
-              {
-                  "LOCATION": "BLNG",
-                  "OVERTIMEHRS": "4",
-                  "JOBCODE": "J9005",
-                  "WORKINGHRS": "15"
-              },{
-                  "LOCATION": "HR",
-                  "OVERTIMEHRS": "2",
-                  "JOBCODE": "J9001",
-                  "WORKINGHRS": "15"
-              }
-
-
-          ],
-          "dept": "OFF",
-          "out": "11:54:25 ",
-          "netMin": 219,
-          "workhrs": 0,
-          "rec": "1 ",
-          "badge": "099A",
-          "allDayMin": "247.00 ",
-          "totalHrs": 3.65,
-          "offAm": "12:00:00",
-          "name": "ADRIAN",
-          "managerData": {
-              "muntilDate": "2024-12-13",
-              "mdepartment": "BLNG",
-              "mName": "Zara",
-              "mbadgeNo": "0600",
-              "mfromDate": "2024-12-12"
+        ctr: 6,
+        date: "9/23/2024",
+        offPm: "16:30:00",
+        empId: "AWE700",
+        in: "07:47:51 ",
+        OT: 2,
+        onPm: "13:00:00",
+        jobLocaWhrs: [
+          {
+            LOCATION: "BLNG",
+            OVERTIMEHRS: "4",
+            JOBCODE: "J9005",
+            WORKINGHRS: "15",
           },
-          "totalActHrs": 15,
-          "totalInOut": "28 ",
-          "normalWhrsPerDay": "12",
-          "remarks": "Acceptable",
-          "onAm": "07:30:00",
-          "status": "Approved"
+          {
+            LOCATION: "HR",
+            OVERTIMEHRS: "2",
+            JOBCODE: "J9001",
+            WORKINGHRS: "15",
+          },
+        ],
+        dept: "OFF",
+        out: "11:54:25 ",
+        netMin: 219,
+        workhrs: 0,
+        rec: "1 ",
+        badge: "099A",
+        allDayMin: "247.00 ",
+        totalHrs: 3.65,
+        offAm: "12:00:00",
+        name: "ADRIAN",
+        managerData: {
+          muntilDate: "2024-12-13",
+          mdepartment: "BLNG",
+          mName: "Zara",
+          mbadgeNo: "0600",
+          mfromDate: "2024-12-12",
+        },
+        totalActHrs: 15,
+        totalInOut: "28 ",
+        normalWhrsPerDay: "12",
+        remarks: "Acceptable",
+        onAm: "07:30:00",
+        status: "Approved",
       },
       {
-          "ctr": 7,
-          "date": "9/24/2024",
-          "offPm": "16:30:00",
-          "empId": "AWE700",
-          "in": "07:27:15 ",
-          "OT": 3,
-          "onPm": "13:00:00",
-          "jobLocaWhrs": [
-              
-
-
-          ],
-          "dept": "OFF",
-          "out": "11:59:38 ",
-          "netMin": 248,
-          "workhrs": 0,
-          "rec": "2 ",
-          "badge": "099A",
-          "allDayMin": "272.00 ",
-          "totalHrs": 4.13,
-          "offAm": "12:00:00",
-          "name": "ADRIAN",
-          "managerData": {
-              "muntilDate": "2024-12-13",
-              "mdepartment": "BLNG",
-              "mName": "Zara",
-              "mbadgeNo": "0600",
-              "mfromDate": "2024-12-12"
-          },
-          "totalActHrs": 15,
-          "totalInOut": "24 ",
-          "normalWhrsPerDay": "12",
-          "remarks": "Permission Granted",
-          "onAm": "07:30:00",
-          "status": "Approved"
+        ctr: 7,
+        date: "9/24/2024",
+        offPm: "16:30:00",
+        empId: "AWE700",
+        in: "07:27:15 ",
+        OT: 3,
+        onPm: "13:00:00",
+        jobLocaWhrs: [],
+        dept: "OFF",
+        out: "11:59:38 ",
+        netMin: 248,
+        workhrs: 0,
+        rec: "2 ",
+        badge: "099A",
+        allDayMin: "272.00 ",
+        totalHrs: 4.13,
+        offAm: "12:00:00",
+        name: "ADRIAN",
+        managerData: {
+          muntilDate: "2024-12-13",
+          mdepartment: "BLNG",
+          mName: "Zara",
+          mbadgeNo: "0600",
+          mfromDate: "2024-12-12",
+        },
+        totalActHrs: 15,
+        totalInOut: "24 ",
+        normalWhrsPerDay: "12",
+        remarks: "Permission Granted",
+        onAm: "07:30:00",
+        status: "Approved",
       },
-        ]
+    ],
+  },
+];
+
+
+
+export const dummyHolidayList={
+  "CompanyHolidays2025": [
+      {
+          "name": "New Year's Day",
+          "date": "Monday, 1st October 2024"
+      },
+      {
+          "name": "Isra’ Mi’raj",
+          "date": "Tuesday, 5th October 2024"
+      },
+      {
+          "name": "Chinese New Year",
+          "date": "Wednesday, 20th November 2024"
+      },
+      {
+          "name": "41st National Day Negara Brunei Darussalam",
+          "date": "Thursday, 7th October 2024",
+          "note": "In lieu of Sunday, 23rd February 2025"
+      },
+      {
+          "name": "1st Day of Ramadhan",
+          "date": "Friday, 5th October 2024",
+          "note": "In lieu of Sunday, 2nd March 2025"
+      },
+      {
+          "name": "Anniversary of the Revelation of the Quran",
+          "date": "Tuesday, 18th March 2025"
+      },
+      {
+          "name": "Hari Raya Aidil Fitri",
+          "dates": [
+              "Monday, 31st March 2025",
+              "Tuesday, 1st April 2025",
+              "Wednesday, 2nd April 2025"
+          ]
+      },
+      {
+          "name": "Hari Raya Aidil Adha",
+          "date": "Saturday, 7th June 2025"
+      },
+      {
+          "name": "First Day of Hijrah 1447",
+          "date": "Friday, 27th June 2025"
+      },
+      {
+          "name": "His Majesty the Sultan’s 79th Birthday",
+          "date": "Tuesday, 15th July 2025"
+      },
+      {
+          "name": "Maulud-Prophet Muhammad’s Birthday",
+          "date": "Friday, 5th September 2025"
+      },
+      {
+          "name": "Christmas Day",
+          "date": "Thursday, 25th December 2025"
+      }
+  ],
+  "notes": "*Dates subject to alteration"
 }
-] 

@@ -83,7 +83,7 @@ useEffect(() => {
     return false; // Default to exclude items if no condition is met
   });
 
-  console.log("Filtered Result:", result);
+  // console.log("Filtered Result:", result);
 
   // Step 4: Update state with filtered results
   setSecondartyData(result);

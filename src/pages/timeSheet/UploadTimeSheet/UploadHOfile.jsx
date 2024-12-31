@@ -115,6 +115,23 @@ export const UploadHOfile = (
       //       return { ...m, data: false };
       //     }
       //   });
+
+      function convertDateFormat(dateStr) {
+        // Split the input string by '/'
+        const parts = dateStr.split("/");
+
+        // Validate the input format
+        if (parts.length !== 3) {
+          throw new Error("Invalid date format. Expected DD/MM/YYYY");
+        }
+
+        // Rearrange the parts to MM/DD/YYYY
+        const [day, month, year] = parts;
+        return `${month}/${day}/${year}`;
+      }
+
+      
+
       const updatedDataArray =
         formattedData &&
         formattedData.map((item) => {
@@ -138,8 +155,11 @@ export const UploadHOfile = (
           }
           if (typeof item.DATE === "number") {
             const jsDate = convertDecimalToTime(item.DATE, "date");
-            const dateObject = new Date(jsDate);
-            item.DATE = dateObject.toLocaleDateString();
+            const dateObject = new Date(jsDate).toLocaleDateString();
+
+            const formattedDate = convertDateFormat(dateObject);
+            item.DATE = formattedDate;
+            
           }
 
           return item;
@@ -148,15 +168,11 @@ export const UploadHOfile = (
       try {
       } catch {}
       function filterDataByDateFormat(data) {
-        const dateFormatRegex = /^\d{1,2}\/\d{1,2}\/\d{4}$/; 
-
-        return data.filter((obj) => obj.IN && obj.OUT); 
-        
+        return data.filter((obj) => obj.IN && obj.OUT);
       }
 
       const filteredData = filterDataByDateFormat(updatedDataArray);
 
-   
       setExcelData(filteredData);
       setLoading(false);
       return getResult.flat();
@@ -164,5 +180,7 @@ export const UploadHOfile = (
 
     fileInputRef.current.value = "";
     setExcelFile(null);
-  } catch (err) {}
+  } catch (err) {
+    console.log(err);
+  }
 };

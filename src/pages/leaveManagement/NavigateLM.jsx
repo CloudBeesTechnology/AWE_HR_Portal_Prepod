@@ -6,17 +6,17 @@ export const NavigateLM = ({ userType }) => {
   return (
     <section className="flex text-center items-center py-3 text_size_5">
       <Link
-        to="/leaveManage"
+        to="/leaveManagement"
         className={`pr-2 relative after:absolute after:-bottom-1 after:left-0 after:w-[90%] after:h-1 cursor-pointer ${
-          location.pathname === "/leaveManage" ? "after:bg-primary" : ""
+          location.pathname === "/leaveManagement" ? "after:bg-primary" : ""
         }`}
       >
         Request Leave
       </Link>{" "}
       <Link
-        to="/leaveManage/historyLeave"
+        to="/leaveManagement/historyLeave"
         className={`px-1 relative after:absolute after:-bottom-2 after:left-0 after:w-[90%] after:h-1 cursor-pointer ${
-          location.pathname === "/leaveManage/historyLeave"
+          location.pathname === "/leaveManagement/historyLeave"
             ? "after:bg-primary"
             : ""
         }`}
@@ -24,9 +24,9 @@ export const NavigateLM = ({ userType }) => {
         History of leave
       </Link>{" "}
       <Link
-        to="/leaveManage/leaveBalance"
+        to="/leaveManagement/leaveBalance"
         className={`px-1 relative after:absolute after:-bottom-2 after:left-0 after:w-[90%] after:h-1 cursor-pointer ${
-          location.pathname === "/leaveManage/leaveBalance"
+          location.pathname === "/leaveManagement/leaveBalance"
             ? "after:bg-primary"
             : ""
         }`}
@@ -37,9 +37,9 @@ export const NavigateLM = ({ userType }) => {
         <>
           {" "}
           <Link
-            to="/leaveManage/requestTickets"
+            to="/leaveManagement/requestTickets"
             className={`px-1 relative after:absolute after:-bottom-2 after:left-0 after:w-[90%] after:h-1 cursor-pointer ${
-              location.pathname === "/leaveManage/requestTickets"
+              location.pathname === "/leaveManagement/requestTickets"
                 ? "after:bg-primary"
                 : ""
             }`}

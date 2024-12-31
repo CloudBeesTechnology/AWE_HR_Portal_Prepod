@@ -1,4 +1,3 @@
-
 export const Notification = async ({ getEmail, Position }) => {
   // Replace useRef with a regular variable
   let hasSentEmail = false; // Track email sending
@@ -73,6 +72,7 @@ export const Notification = async ({ getEmail, Position }) => {
           `;
     }
     hasSentEmail = true;
+    console.log(subject, message, fromAddress, toAddress);
     return {
       subject,
       message,

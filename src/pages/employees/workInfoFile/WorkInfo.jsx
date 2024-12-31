@@ -179,131 +179,239 @@ export const WorkInfo = () => {
     return Array.isArray(value) ? value[value.length - 1] : value;
   };
 
+  // const searchResult = (result) => {
+  //   // Ensure correct handling for both array and non-array salaryType
+  //   const salaryTypeValue = Array.isArray(result.salaryType) 
+  //     ? (result.salaryType[0] === "M" || result.salaryType[0] === "Monthly" 
+  //       ? "MONTHLY" 
+  //       : (result.salaryType[0] === "D" || result.salaryType[0] === "Daily" 
+  //         ? "DAILY" 
+  //         : result.salaryType[0]))
+  //     : (result.salaryType === "M" || result.salaryType === "Monthly" 
+  //       ? "MONTHLY"
+  //       : (result.salaryType === "D" || result.salaryType === "Daily"
+  //         ? "DAILY"
+  //         : result.salaryType));
+  
+  //   setValue("salaryType", salaryTypeValue);
+  
+  //   console.log("salaryType value being passed: ", salaryTypeValue);
+  
+  //   const keysToSet = [
+  //     "empID",
+  //     "doj",
+  //     "hospLeave",
+  //     "skillPool",
+  //     "resignDate",
+  //     "termiDate",
+  //     "resignNotProb",
+  //     "otherResignNotProb",
+  //     "termiNotProb",
+  //     "otherTermiNotProb",
+  //     "resignNotConf",
+  //     "otherResignNotConf",
+  //     "termiNotConf",
+  //     "otherTermiNotConf",
+  //     "reasonResign",
+  //     "reasonTerminate",
+  //     "materLeave",
+  //     "paterLeave",
+  //     "sickLeave",
+  //     "sickLeaveDate",
+  //     "mrageLeave",
+  //     "compasLeave",
+  //     "remarkWI",
+  //     "sapNo",
+  //     "pervAnnualLeaveBal",
+  //     "remainingAnualLeave", 
+  //     "remainingCompasLeave", 
+  //     "remainingHosLeave", 
+  //     "remainingMateLeave", 
+  //     "remainingMrageLeave", 
+  //     "remainingPaternityLeave", 
+  //     "remainingSickLeave"
+  //   ];
+  
+  //   keysToSet.forEach((key) => {
+  //     setValue(key, result[key]);
+  //   });
+  
+  //   const arrayDateField = [
+  //     "dateLeavePass",
+  //     "depEmp",
+  //     "positionRev",
+  //     "revSalary",
+  //     "revLeavePass",
+  //     "revAnnualLeave",
+  //     "durLeavePass",
+  //     "destinateLeavePass",
+  //     "annualLeave",
+  //     "leavePass",
+  //     "salaryType",
+  //     "manager",
+  //     "supervisor",
+  //     "workStatus",
+  //     "workHrs",
+  //     "workWeek",
+  //     "workMonth",
+  //     "hr",
+  //     "upgradePosition",
+  //     "contractPeriod",
+  //     "probDuration",
+  //     "department",
+  //     "otherDepartment",
+  //     "position",
+  //     "otherPosition",
+  //     "jobCat",
+  //     "otherJobCat",
+  //     "jobDesc",
+  //     "relationship",
+  //     "upgradeDate",
+  //     "revALD",
+  //     "contractStart",
+  //     "contractEnd",
+  //     "probationStart",
+  //     "probationEnd",
+  //     "revLeaveDate",
+  //     "revSalaryDate",
+  //     "depEmpDate",
+  //     "annualLeaveDate",
+  //     "positionRevDate",
+  //   ];
+  
+  //   arrayDateField.forEach((field) => {
+  //     const valueToSet = field === "salaryType" ? salaryTypeValue : result[field];
+  //     console.log(`Setting value for ${field}:`, valueToSet);
+      
+  //     setValue(field, getArrayDateValue(result[field]));
+  //   });
+  
+  //   const uploadFields = [
+  //     "WIProbation",
+  //     "WIResignation",
+  //     "WITermination",
+  //     "WILeaveEntitle",
+  //     "WIContract",
+  //     "uploadPR",
+  //     "uploadSP",
+  //     "uploadLP",
+  //     "uploadAL",
+  //     "uploadDep",
+  //   ];
+  
+  //   uploadFields.forEach((field) => {
+  //     if (result[field]) {
+  //       try {
+  //         const rawArrayString = result[field][0]; // Access the first element of the array
+          
+  //         const trimmedString = rawArrayString.startsWith('"') && rawArrayString.endsWith('"')
+  //           ? rawArrayString.slice(1, -1)
+  //           : rawArrayString;
+  
+  //         const properJsonString = trimmedString.replace(/\\"/g, '"');
+  
+  //         const parsedArray = JSON.parse(properJsonString);
+  
+  //         if (!Array.isArray(parsedArray)) {
+  //           throw new Error(`Parsed result is not an array for ${field}`);
+  //         }
+  
+  //         // Parse each item in the array
+  //         const parsedFiles = parsedArray.map((item) =>
+  //           typeof item === "string" ? JSON.parse(item) : item
+  //         );
+  
+  //         setValue(field, parsedFiles);
+  //         setNameServiceUp((prev) => ({ ...prev, [field]: parsedFiles }));
+  //         setUploadedFileNames((prev) => ({
+  //           ...prev,
+  //           [field]:
+  //             parsedFiles.length > 0
+  //               ? getFileName(parsedFiles[parsedFiles.length - 1].upload)
+  //               : "",
+  //         }));
+  //       } catch (error) {
+  //         console.error(`Failed to parse ${field}:`, error);
+  //       }
+  //     }
+  //   });
+  // };
+  
   const searchResult = (result) => {
+    // Ensure correct handling for both array and non-array salaryType
+    const salaryTypeValue = Array.isArray(result.salaryType)
+      ? result.salaryType[0] === "M" || result.salaryType[0] === "Monthly"
+        ? "MONTHLY"
+        : result.salaryType[0] === "D" || result.salaryType[0] === "Daily"
+        ? "DAILY"
+        : result.salaryType[0]
+      : result.salaryType === "M" || result.salaryType === "Monthly"
+      ? "MONTHLY"
+      : result.salaryType === "D" || result.salaryType === "Daily"
+      ? "DAILY"
+      : result.salaryType;
+  
+    setValue("salaryType", salaryTypeValue);
+    console.log("salaryType value being passed: ", salaryTypeValue);
+  
     const keysToSet = [
-      "empID",
-      "doj",
-      "hospLeave",
-      "skillPool",
-      "resignDate",
-      "termiDate",
-      "resignNotProb",
-      "otherResignNotProb",
-      "termiNotProb",
-      "otherTermiNotProb",
-      "resignNotConf",
-      "otherResignNotConf",
-      "termiNotConf",
-      "otherTermiNotConf",
-      "reasonResign",
-      "reasonTerminate",
-      "materLeave",
-      "paterLeave",
-      "sickLeave",
-      "sickLeaveDate",
-      "mrageLeave",
-      "compasLeave",
-      "remarkWI",
-      "sapNo",
-      "pervAnnualLeaveBal",
-      "remainingAnualLeave", "remainingCompasLeave", "remainingHosLeave", "remainingMateLeave", "remainingMrageLeave", "remainingPaternityLeave", "remainingSickLeave"
-
+      "empID", "doj", "hospLeave", "skillPool", "resignDate", "termiDate",
+      "resignNotProb", "otherResignNotProb", "termiNotProb", "otherTermiNotProb",
+      "resignNotConf", "otherResignNotConf", "termiNotConf", "otherTermiNotConf",
+      "reasonResign", "reasonTerminate", "materLeave", "paterLeave", "sickLeave",
+      "sickLeaveDate", "mrageLeave", "compasLeave", "remarkWI", "sapNo",
+      "pervAnnualLeaveBal", "remainingAnualLeave", "remainingCompasLeave", "remainingHosLeave",
+      "remainingMateLeave", "remainingMrageLeave", "remainingPaternityLeave", "remainingSickLeave"
     ];
-
+  
+    // Set values for basic fields
     keysToSet.forEach((key) => {
       setValue(key, result[key]);
     });
-    const fields = [
-    ];
-    
+  
     const arrayDateField = [
-      "dateLeavePass",
-      "depEmp",
-      "positionRev",
-      "revSalary",
-      "revLeavePass",
-      "revAnnualLeave",
-      "durLeavePass",
-      "destinateLeavePass",
-      "annualLeave",
-      "leavePass",
-      "salaryType",
-      "manager",
-      "supervisor",
-      "workStatus",
-      "workHrs",
-      "workWeek",
-      "workMonth",
-      "hr",
-      "upgradePosition",
-      "contractPeriod",
-      "probDuration",
-      "department",
-      "otherDepartment",
-      "position",
-      "otherPosition",
-      "jobCat",
-      "otherJobCat",
-      "jobDesc",
-      "relationship",
-      "upgradeDate",
-      "revALD",
-      "contractStart",
-      "contractEnd",
-      "probationStart",
-      "probationEnd",
-      "revLeaveDate",
-      "revSalaryDate",
-      "depEmpDate",
-      "annualLeaveDate",
-      "positionRevDate",
+      "dateLeavePass", "depEmp", "positionRev", "revSalary", "revLeavePass", "revAnnualLeave",
+      "durLeavePass", "destinateLeavePass", "annualLeave", "leavePass", "salaryType", "manager",
+      "supervisor", "workStatus", "workHrs", "workWeek", "workMonth", "hr", "upgradePosition",
+      "contractPeriod", "probDuration", "department", "otherDepartment", "position", "otherPosition",
+      "jobCat", "otherJobCat", "jobDesc", "relationship", "upgradeDate", "revALD", "contractStart",
+      "contractEnd", "probationStart", "probationEnd", "revLeaveDate", "revSalaryDate", "depEmpDate",
+      "annualLeaveDate", "positionRevDate"
     ];
-
+  
+    // Set values for date fields and handle salaryType condition
     arrayDateField.forEach((field) => {
-      setValue(field, getArrayDateValue(result[field]));
+      const valueToSet = field === "salaryType" ? salaryTypeValue : result[field];
+      console.log(`Setting value for ${field}:`, valueToSet);
+      setValue(field, getArrayDateValue(valueToSet)); // Use getArrayDateValue for all fields
     });
-
+  
     const uploadFields = [
-      "WIProbation",
-      "WIResignation",
-      "WITermination",
-      "WILeaveEntitle",
-      "WIContract",
-      "uploadPR",
-      "uploadSP",
-      "uploadLP",
-      "uploadAL",
-      "uploadDep",
+      "WIProbation", "WIResignation", "WITermination", "WILeaveEntitle", "WIContract",
+      "uploadPR", "uploadSP", "uploadLP", "uploadAL", "uploadDep"
     ];
-
-    fields.forEach((field) => {
-      const value = getLastValue(result[field]); // Pass the field name to the function
-      setValue(field, [value]);
-    });
-
+  
+    // Handle file uploads
     uploadFields.forEach((field) => {
       if (result[field]) {
         try {
           const rawArrayString = result[field][0]; // Access the first element of the array
-      
           const trimmedString = rawArrayString.startsWith('"') && rawArrayString.endsWith('"')
             ? rawArrayString.slice(1, -1)
             : rawArrayString;
-            
-        
+  
           const properJsonString = trimmedString.replace(/\\"/g, '"');
-
           const parsedArray = JSON.parse(properJsonString);
-
+  
           if (!Array.isArray(parsedArray)) {
             throw new Error(`Parsed result is not an array for ${field}`);
           }
-
+  
           // Parse each item in the array
           const parsedFiles = parsedArray.map((item) =>
             typeof item === "string" ? JSON.parse(item) : item
           );
-
+  
           setValue(field, parsedFiles);
           setNameServiceUp((prev) => ({ ...prev, [field]: parsedFiles }));
           setUploadedFileNames((prev) => ({
@@ -318,15 +426,8 @@ export const WorkInfo = () => {
         }
       }
     });
-
-    // // Update state for other fields visibility
-    // setShowOtherFields({
-    //   department: result.department === "Other",
-    //   position: result.position === "Other",
-    //   jobCat: result.jobCat === "Other",
-    // });
   };
-
+  
   const getFileName = (filePath) => {
     const fileNameWithExtension = filePath.split("/").pop(); // Get file name with extension
     const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
