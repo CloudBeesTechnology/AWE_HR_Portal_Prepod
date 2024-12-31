@@ -310,7 +310,7 @@ export const UpdateWIData = () => {
      
     };
     
-      // console.log(totalData1, "ertdfghjkhbtxrfgh");
+    //   // console.log(totalData1, "ertdfghjkhbtxrfgh");
       try{const Leave = await client.graphql({
         query: updateEmpLeaveDetails, 
         variables: { input: totalData1, limit:20000, },

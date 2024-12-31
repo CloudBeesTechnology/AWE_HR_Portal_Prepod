@@ -90,6 +90,8 @@ import { EmpInsuranceMD } from "../components/migratingData/EmpInsuranceMD";
 import { LeaveDetailsMD } from "../components/migratingData/LeaveDetailsMD";
 import { NonLocalAccMD } from "../components/migratingData/NonLocalAccMD";
 import { DNDetailsMD } from "../components/migratingData/DNDetailsMD";
+import { TerminatedMD } from "../components/migratingData/TerminatedMD";
+import { BJLDetailsMD } from "../components/migratingData/BJLDetailsMD";
 
 const client = generateClient();
 
@@ -186,6 +188,8 @@ const NavigationLinks = () => {
         <Route path="/migrationDataLeaveDetails" element={<LeaveDetailsMD />} />
         <Route path="/migrationDataNLA" element={<NonLocalAccMD />} />
         <Route path="/migrationDataDN" element={<DNDetailsMD />} />
+        <Route path="/migrationDataTerminated" element={<TerminatedMD />} />
+        <Route path="/migrationDataBJL" element={<BJLDetailsMD />} />
 
         {loginAuth && (
           <>

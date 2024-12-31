@@ -4,16 +4,14 @@ import * as XLSX from "xlsx";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { WorkInfoFunc } from "../../services/createMethod/WorkInfoFunc";
 import { UpdateWIData } from "../../services/updateMethod/UpdateWIData";
-import { NLACreate } from "../../services/createMethod/NLACreate";
-import { NLAUpdate } from "../../services/updateMethod/NLAUpdate";
 
-export const NonLocalAccMD = () => {
-  const { NLAData } = useContext(DataSupply);
-  const { NLADatas } = NLACreate();
-  const { NLAUpdateFun } = NLAUpdate();
+export const TerminatedMD = () => {
+  const { terminateData } = useContext(DataSupply);
+  const { SubmitWIData } = WorkInfoFunc();
+  const { WIUpdateData } = UpdateWIData();
 
-console.log(NLAData);
-
+  console.log(terminateData);
+  
 
   const excelDateToJSDate = (serial) => {
     const excelEpoch = new Date(Date.UTC(1900, 0, 1)); // Start from Jan 1, 1900
@@ -21,14 +19,13 @@ console.log(NLAData);
     return new Date(excelEpoch.getTime() + daysOffset * 24 * 60 * 60 * 1000);
   };
 
-  // Link 1 :"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Non-Local+Accommodation/EmployeeNonLocalAcco.csv "
-  // Link 2 :"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Non-Local+Accommodation/EmployeeNonLocalAccom.csv"
+  // Link 1:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/TerminationInfo+Prod/TerminationInfo.csv"
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Non-Local+Accommodation/EmployeeNonLocalAcco.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/TerminationInfo+Prod/TerminationInfo.csv",
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
@@ -44,46 +41,56 @@ console.log(NLAData);
 
       // Convert sheet data to JSON format
       const sheetData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-
+      const dateKeys = ["termiDate", "resignDate"];
       const transformedData = sheetData.slice(1).map((row) => {
         let result = {};
         sheetData[0].forEach((key, index) => {
           let value = row[index];
+          if (dateKeys.includes(key)) {
+            value = undefined; // Set the value to null for date keys
+          }
+          result[key] = value;
 
-          result[key] = value !== undefined ? String(value) : value; // Convert to string
+          //   if (dateKeys.includes(key) && !isNaN(value)) {
+          //     value = excelDateToJSDate(value).toISOString().split("T")[0];
+          //   }
+
+          //   result[key] = value !== undefined ? String(value) : value; // Convert to string
         });
         return result;
       });
       // console.log("All Data:", transformedData);
-      for (const NLACreValue of transformedData) {
-        if (!NLACreValue.empID) {
+      for (const workInfoValue of transformedData) {
+        if (!workInfoValue.empID) {
           continue;
         }
 
-        if (NLACreValue.empID) {
-          NLACreValue.empID = String(NLACreValue.empID);
-          //   NLACreValue.ppExpiry = [NLACreValue.ppExpiry];
-          //   NLACreValue.bwnIcExpiry = [NLACreValue.bwnIcExpiry];
+        if (workInfoValue.empID) {
+          workInfoValue.empID = String(workInfoValue.empID);
+          //   workInfoValue.ppExpiry = [workInfoValue.ppExpiry];
+          //   workInfoValue.bwnIcExpiry = [workInfoValue.bwnIcExpiry];
         }
-        // console.log(NLACreValue);
+        console.log(workInfoValue.empID);
 
-        const checkingNLADataTable = NLAData.find(
-          (match) => match.empID === NLACreValue.empID
+        const checkingWorkInfoTable = terminateData.find(
+          (match) =>
+            match.empID === workInfoValue.empID
+        //    ===
+        //     workInfoValue.empID.trim().toLowerCase()
         );
 
-        if (checkingNLADataTable) {
-          console.log(NLACreValue, "update");
-          const NLAValue = {
-            ...NLACreValue,
-            IDTable: checkingNLADataTable.id,
-          };
-          await NLAUpdateFun({ NLAValue });
-        } else {
-          console.log(NLACreValue, "create");
-          await NLADatas({ NLACreValue });
-        }
 
-        
+        if (checkingWorkInfoTable) {
+            console.log(workInfoValue, "update");
+          const workInfoUpValue = {
+            ...workInfoValue,
+            workInfoDataRecord: checkingWorkInfoTable,
+          };
+            await WIUpdateData({ workInfoUpValue });
+        } else {
+            console.log(workInfoValue, "create");
+            await SubmitWIData({ workInfoValue });
+        }
       }
     } catch (error) {
       console.error("Error fetching Excel file:", error);
@@ -92,7 +99,7 @@ console.log(NLAData);
 
   return (
     <div className="flex flex-col gap-40">
-      NonLocalAccMD
+      TerminatedMD
       <button onClick={fetchExcelFile}>Click Here</button>
     </div>
   );

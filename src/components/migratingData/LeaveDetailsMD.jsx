@@ -10,16 +10,23 @@ export const LeaveDetailsMD = () => {
   const { SubmitWIData } = WorkInfoFunc();
   const { WIUpdateData } = UpdateWIData();
 
+  console.log(leaveDetailsData);
+  
+
   const excelDateToJSDate = (serial) => {
     const excelEpoch = new Date(Date.UTC(1900, 0, 1)); // Start from Jan 1, 1900
     const daysOffset = serial - 1; // Excel considers 1 as Jan 1, 1900
     return new Date(excelEpoch.getTime() + daysOffset * 24 * 60 * 60 * 1000);
   };
+
+  // Link 1 : "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmpLeaveDetails+Prod/EmpLeaveDetails.csv"
+  // Link 2 : "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmpLeaveDetails+Prod/EmpLeavedetails.csv"
+
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmployeeDetails/Employee+Info+%26+Work+Info+as+at+20DEC2024/EmpLeaveDetails.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmpLeaveDetails+Prod/EmpLeavedetails.csv",
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
@@ -76,14 +83,7 @@ export const LeaveDetailsMD = () => {
           await SubmitWIData({ workInfoValue });
         }
 
-        // const cleanData = Object.fromEntries(
-        //   Object.entries(IDValue).filter(([key, value]) =>
-        //     allowedFields.includes(key) && value !== undefined
-        //   )
-        // );
-
-        // console.log(allowedFields);
-      }
+        }
     } catch (error) {
       console.error("Error fetching Excel file:", error);
     }

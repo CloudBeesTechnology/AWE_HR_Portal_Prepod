@@ -51,6 +51,7 @@ export const LeaveSummaryPopUp = ({
     const [day, month, year] = dateStr.split("/");
     return new Date(year, month - 1, day);
   };
+console.log(mergedData);
 
   useEffect(() => {
     const fetchedData = async () => {
@@ -68,8 +69,14 @@ export const LeaveSummaryPopUp = ({
             compassionateLeave: initializeLeaveType(0, true),
             unPaidAuthorisedLeave: initializeLeaveType(0, true),
             annualLeave: initializeLeaveType(
-              Number(val.annualLeave) + Number(val.empPervAnnualLeaveBal || 0)
+              Number(
+                (Array.isArray(val.annualLeave) && val.annualLeave.length > 0 
+                  ? val.annualLeave[val.annualLeave.length - 1] 
+                  : 0
+                )
+              ) + Number(val.empPervAnnualLeaveBal || 0)
             ),
+            
             marriageLeave: initializeLeaveType(Number(val.marriageLeave) || 0),
             hospitalisationLeave: initializeLeaveType(
               Number(val.hospitalLeave)
@@ -124,12 +131,11 @@ export const LeaveSummaryPopUp = ({
             val.managerStatus === "Approved" &&
             val.empStatus !== "Cancelled"
           ) {
-            acc[val.empID][leaveKey].taken += Number(val.leaveDays) || 0;
+            acc[val.empID][leaveKey].taken +=  Number(val.leaveDays) || 0;
           } else if (
-             val.supervisorStatus === "Pending"
-            // val.managerStatus === "Pending" &&
-            // val.supervisorStatus !== "Rejected" &&
-            // val.empStatus !== "Cancelled"
+            val.managerStatus === "Pending" &&
+            val.supervisorStatus !== "Rejected" &&
+            val.empStatus !== "Cancelled"
           ) {
             acc[val.empID][leaveKey].waitingLeave += Number(val.leaveDays) || 0;
           }
@@ -145,10 +151,11 @@ export const LeaveSummaryPopUp = ({
             const taken = acc[val.empID][leaveKey].taken || 0;
             const waiting = acc[val.empID][leaveKey].waitingLeave || 0;
 
-            acc[val.empID][leaveKey].remaining = Math.max(
-              0,
+            acc[val.empID][leaveKey].remaining = Math.floor(
+             
               total - (taken + waiting)
             );
+            console.log("taken leave calculation", acc[val.empID][leaveKey].taken);
           }
         }
 
@@ -156,7 +163,7 @@ export const LeaveSummaryPopUp = ({
       }, {});
 
       const summary = result[empDetails.empID]; // Find the leave summary for the employee
-      // console.log(summary);
+      console.log(summary);
       
       setLeaveSummary(summary); // Set the leave summary for the employee
     };

@@ -120,7 +120,7 @@ export const useLeaveManage = () => {
           empLeaveEndDate: leaveStatus.toDate,
           empLeaveUpdatedAt: leaveStatus.updatedAt,
           compassionateLeave: leaveDetails.compasLeave || 0,
-          annualLeave: leaveDetails.annualLeave.slice(-1)[0] || 0,
+          annualLeave: leaveDetails.annualLeave || 0,
           sickLeave: leaveDetails.sickLeave || 0,
           maternityLeave: leaveDetails.materLeave || 0,
           paternityLeave: leaveDetails.paterLeave || 0,

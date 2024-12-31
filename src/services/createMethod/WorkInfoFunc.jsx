@@ -313,10 +313,10 @@ export const WorkInfoFunc = () => {
       uploadAL: JSON.stringify(uploadAL),
       uploadDep: JSON.stringify(uploadDep),
     };
-    console.log(totalData);
-    console.log(totalData1);
-    console.log(totalData2);
-    console.log(totalData3);
+    // console.log(totalData);
+    // console.log(totalData1);
+    // console.log(totalData2);
+    // console.log(totalData3);
     try {
       const [
         Emp,

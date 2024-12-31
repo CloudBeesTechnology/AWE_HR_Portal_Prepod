@@ -6,6 +6,7 @@ import { IoSearch } from "react-icons/io5";
 import { Pagination } from "./Pagination";
 import { Filter } from "./Filter";
 import { NavigateLM } from "./NavigateLM";
+import { DateFormat } from "../../utils/DateFormat";
 
 export const TicketsTable = () => {
   const { handleViewClick, handleClickForToggle, userType } =
@@ -209,20 +210,6 @@ export const TicketsTable = () => {
   // Update total pages calculation
   const totalPages = Math.ceil(data.length / rowsPerPage);
 
-  const formatDate = (dateToString) => {
-    if (!dateToString || isNaN(new Date(dateToString).getTime())) {
-      return "";
-    }
-
-    const date = new Date(dateToString);
-
-    const day = date.getDate().toString().padStart(2, "0"); // Local day
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Local month
-    const year = date.getFullYear(); // Local year
-
-    return `${day}/${month}/${year}`; // Format as DD/MM/YYYY
-  };
-
   const startIndex = (currentPage - 1) * rowsPerPage;
 
   const heading = [
@@ -237,7 +224,7 @@ export const TicketsTable = () => {
     "Submitted form",
     userType !== "SuperAdmin" && "Status",
   ];
-console.log(ticketMerged);
+  console.log(ticketMerged);
 
   useEffect(() => {
     const sortedData = ticketMerged.sort(
@@ -327,13 +314,13 @@ console.log(ticketMerged);
                     </td>
 
                     <td className="border-b-2  border-[#CECECE] py-5">
-                      {formatDate(item.createdAt)}
+                      {DateFormat(item.createdAt)}
                     </td>
                     <td className="border-b-2  border-[#CECECE] py-5">
-                      {formatDate(item.departureDate)}
+                      {DateFormat(item.departureDate)}
                     </td>
                     <td className="border-b-2  border-[#CECECE] py-5">
-                      {formatDate(item.arrivalDate)}
+                      {DateFormat(item.arrivalDate)}
                     </td>
 
                     <td className="border-b-2  border-[#CECECE] cursor-pointer py-5">

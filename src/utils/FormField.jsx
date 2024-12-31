@@ -76,7 +76,7 @@ export const FormField = ({
         >
           <option value="">{select || " "}</option>
           {options?.map((option, index) => (
-            <option key={index} value={option.value}>
+            <option key={index} value={option?.value.trim().toUpperCase()}>
               {option.label}
             </option>
           ))}
@@ -87,9 +87,9 @@ export const FormField = ({
           {...register(name)}
           onChange={handleSelectChange}
         >
-          <option value={`${valueData || ""}`}>{select}</option>
+          <option value={`${valueData?.trim().toUpperCase() || ""}`}>{select}</option>
           {options?.map((option, index) => (
-            <option key={index} value={option.value}>
+            <option key={index} value={option?.value.trim().toUpperCase()}>
               {option.label}
             </option>
           ))}

@@ -144,7 +144,11 @@ export const UpdateEmpInfo = () => {
     };
 
     try {
-      const [empInfoResponse, idResponse] = await Promise.all([
+      const [
+        empInfoResponse, 
+        idResponse
+
+      ] = await Promise.all([
         client.graphql({
           query: updateEmpPersonalInfo,
           variables: {

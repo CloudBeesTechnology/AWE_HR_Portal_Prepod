@@ -5,9 +5,10 @@ import { IoSearch } from "react-icons/io5";
 import { Searchbox } from "../../utils/Searchbox";
 import { LeaveSummaryPopUp } from "./LeaveSummaryPopUp";
 import { NavigateLM } from "./NavigateLM";
+import { DateFormat } from "../../utils/DateFormat";
 
 export const EmpLeaveBalance = () => {
-  const { mergedData, formatDate, userType } = useOutletContext();
+  const { mergedData, userType } = useOutletContext();
 
   const [showPopup, setShowPopup] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
@@ -205,7 +206,7 @@ useEffect(() => {
                       <td className="py-3">{item.empID}</td>
                       <td className="py-3">{item.empName || "N/A"}</td>
                       <td className="py-3">{item.empBadgeNo || "N/A"}</td>
-                      <td className="py-3">{formatDate(item.doj) || "N/A"}</td>
+                      <td className="py-3">{DateFormat(item.doj) || "N/A"}</td>
                       <td className="py-3">
                         {" "}
                         {Array.isArray(item.position)
@@ -250,7 +251,7 @@ useEffect(() => {
         <LeaveSummaryPopUp
           handleClosePopup={handleClosePopup}
           mergedData={mergedData}
-          formatDate={formatDate}
+          formatDate={DateFormat}
           empDetails={empDetails}
         />
       )}

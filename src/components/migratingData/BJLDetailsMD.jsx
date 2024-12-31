@@ -1,17 +1,17 @@
+
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import * as XLSX from "xlsx";
-import { EmpInfoFunc } from "../../services/createMethod/EmpInfoFunc";
 import { DataSupply } from "../../utils/DataStoredContext";
-import { UpdateEmpInfo } from "../../services/updateMethod/UpdateEmpInfo";
+import { UpdateDataFun } from "../../services/updateMethod/UpdateSDNData";
+import { BJLDataFun } from "../../services/createMethod/BJLDataFun";
+import { UpdateBJL } from "../../services/updateMethod/UpdateBJL";
 
-export const IDDetailsMD = () => {
-  const { IDData } = useContext(DataSupply);
-  const { SubmitEIData } = EmpInfoFunc();
-  const { UpdateEIValue } = UpdateEmpInfo();
-
-  console.log(IDData);
-  
+export const BJLDetailsMD = () => {
+  const { BJLData } = useContext(DataSupply);
+  const { BGData } = BJLDataFun();
+  const { UpdateBJLFun } = UpdateBJL();
+console.log(BJLData);
 
   const excelDateToJSDate = (serial) => {
     const excelEpoch = new Date(Date.UTC(1900, 0, 1)); // Start from Jan 1, 1900
@@ -19,15 +19,13 @@ export const IDDetailsMD = () => {
     return new Date(excelEpoch.getTime() + daysOffset * 24 * 60 * 60 * 1000);
   };
 
-  // Link 1: "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/IDDetails+Prod/IDDetails.csv "
-  // Link 2: "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/IDDetails+Prod/IdDetails.csv"
-  // Link 3: "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/IDDetails+Prod/IDdetails.csv"
+// Link 1:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/BJLDetails+Prod/BJLDetails.csv"
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/IDDetails+Prod/IDdetails.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/BJLDetails+Prod/BJLDetails.csv",
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
@@ -43,7 +41,10 @@ export const IDDetailsMD = () => {
 
       // Convert sheet data to JSON format
       const sheetData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-      const dateKeys = ["ppExpiry", "bwnIcExpiry", "ppIssued"];
+      const dateKeys = [
+        "jpValid","bankValid","bankSubmit","bankRece","bankEndorse","jpEndorse","tbaPurchase","lbrDepoSubmit"
+        
+      ];
       const transformedData = sheetData.slice(1).map((row) => {
         let result = {};
         sheetData[0].forEach((key, index) => {
@@ -57,33 +58,27 @@ export const IDDetailsMD = () => {
         return result;
       });
       // console.log("All Data:", transformedData);
-      for (const empValue of transformedData) {
-        if (!empValue.empID) {
-          continue;
+      for (const BJLValue of transformedData) {
+        if (BJLValue.empID) {
+          BJLValue.empID = String(BJLValue.empID);
         }
+        console.log(BJLValue);
 
-        if (empValue.empID) {
-          empValue.empID = String(empValue.empID);
-          empValue.ppExpiry = [empValue.ppExpiry];
-          empValue.bwnIcExpiry = [empValue.bwnIcExpiry];
-        }
-        console.log(empValue);
-
-        const checkingIDTable = IDData.find(
-          (match) => match?.empID === empValue?.empID
+        const checkingBJLTable = BJLData.find(
+          (match) => match.empID === BJLValue.empID
         );
 
-          if (checkingIDTable) {
-            console.log(empValue, "update");
-            const collectValue = {
-              ...empValue,
-              IDTable: checkingIDTable.id,
-            };
-            await UpdateEIValue({ collectValue });
-          } else {
-            console.log(empValue, "create");
-            await SubmitEIData({ empValue });
-          }
+        if (checkingBJLTable) {
+          console.log(BJLValue, "update");
+          const BJLUpValue = {
+            ...BJLValue,
+            id: checkingBJLTable.id,
+          };
+          await UpdateBJLFun({ BJLUpValue });
+        } else {
+          console.log(BJLValue, "create");
+          await BGData({ BJLValue });
+        }
       }
     } catch (error) {
       console.error("Error fetching Excel file:", error);
@@ -92,7 +87,7 @@ export const IDDetailsMD = () => {
 
   return (
     <div className="flex flex-col gap-40">
-      IDDetailsMD
+      BJLDetailsMD
       <button onClick={fetchExcelFile}>Click Here</button>
     </div>
   );

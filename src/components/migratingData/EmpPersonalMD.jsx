@@ -11,16 +11,26 @@ export const EmpPersonalMD = () => {
   const { SubmitEIData } = EmpInfoFunc();
   const { UpdateEIValue } = UpdateEmpInfo();
 
+console.log(empPIData);
+
   const excelDateToJSDate = (serial) => {
     const excelEpoch = new Date(Date.UTC(1900, 0, 1)); // Start from Jan 1, 1900
     const daysOffset = serial - 1; // Excel considers 1 as Jan 1, 1900
     return new Date(excelEpoch.getTime() + daysOffset * 24 * 60 * 60 * 1000);
   };
+
+  // Link 1: "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PersonalInfo+Prod/EmpPersonaInfo.csv",
+  // Link 2: "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PersonalInfo+Prod/EmpPersonnelInfo.csv"
+  // Link 3: "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PersonalInfo+Prod/EmPPersonalInfo.csv"
+  // Link 4: "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PersonalInfo+Prod/EmppersonalInfo.csv"
+  // Link 5: "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PersonalInfo+Prod/EmpPersonalInfO.csv"
+  // Link 6: "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PersonalInfo+Prod/EMPpersonalInfo.csv"
+
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmployeeDetails/Employee+Info+%26+Work+Info+as+at+20DEC2024/EmpPersonalInfo.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PersonalInfo+Prod/EmpPersonnelInfo.csv",
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
@@ -54,6 +64,9 @@ export const EmpPersonalMD = () => {
       });
       // console.log("All Data:", transformedData);
       for (const empValue of transformedData) {
+        if (!empValue.empID) {
+          continue;
+        }
         if (empValue.empID) {
           empValue.empID = String(empValue.empID);
         }
@@ -61,8 +74,8 @@ export const EmpPersonalMD = () => {
 
         const checkingPITable = empPIData.find(
           (match) =>
-            match.empID.toString().toLowerCase() ===
-            empValue.empID.toString().toLowerCase()
+            match?.empID?.toString().toLowerCase() ===
+            empValue?.empID?.toString().toLowerCase()
         );
 
         if (checkingPITable) {
@@ -77,6 +90,7 @@ export const EmpPersonalMD = () => {
           console.log(empValue, "create");
           await SubmitEIData({ empValue });
         }
+
         // const cleanData = Object.fromEntries(
         //   Object.entries(IDValue).filter(([key, value]) =>
         //     allowedFields.includes(key) && value !== undefined

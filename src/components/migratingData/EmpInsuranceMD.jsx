@@ -1,4 +1,3 @@
-
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import * as XLSX from "xlsx";
@@ -12,17 +11,22 @@ export const EmpInsuranceMD = () => {
   const { EmpInsuranceData } = useContext(DataSupply);
   const { SubmitMPData } = EmpInsDataFun();
   const { UpdateEIDataSubmit } = UpdateEmpInsDataFun();
+console.log(EmpInsuranceData);
+
 
   const excelDateToJSDate = (serial) => {
     const excelEpoch = new Date(Date.UTC(1900, 0, 1)); // Start from Jan 1, 1900
     const daysOffset = serial - 1; // Excel considers 1 as Jan 1, 1900
     return new Date(excelEpoch.getTime() + daysOffset * 24 * 60 * 60 * 1000);
   };
+
+  // Link 1: "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmpInsurance+Prod/EmpInsurance.csv"
+
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmployeeDetails/Employee+Info+%26+Work+Info+as+at+20DEC2024/EmpInsurance.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmpInsurance+Prod/EmpInsurance.csv",
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
@@ -60,6 +64,9 @@ export const EmpInsuranceMD = () => {
       });
       // console.log("All Data:", transformedData);
       for (const empInsValue of transformedData) {
+        if (!empInsValue.empID) {
+          continue;
+        }
         if (empInsValue.empID) {
           empInsValue.empID = String(empInsValue.empID);
           //   empInsValue.ppExpiry = [empInsValue.ppExpiry];
@@ -77,19 +84,11 @@ export const EmpInsuranceMD = () => {
             ...empInsValue,
             id: checkingEmpInsuranceTable.id,
           };
-          await UpdateEIDataSubmit({ empInsValue:InsuranceUpValue  });
+          await UpdateEIDataSubmit({ empInsValue: InsuranceUpValue });
         } else {
           console.log(empInsValue, "create");
           await SubmitMPData({ empInsValue });
         }
-
-        // const cleanData = Object.fromEntries(
-        //   Object.entries(IDValue).filter(([key, value]) =>
-        //     allowedFields.includes(key) && value !== undefined
-        //   )
-        // );
-
-        // console.log(allowedFields);
       }
     } catch (error) {
       console.error("Error fetching Excel file:", error);
