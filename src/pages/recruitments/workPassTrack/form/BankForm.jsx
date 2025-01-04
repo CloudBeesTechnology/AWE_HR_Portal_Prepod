@@ -6,11 +6,15 @@ import { FileUploadField } from "../../../employees/medicalDep/FileUploadField";
 import { BankFormSchema } from "../../../../services/Validation";
 import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
 import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPTracking";
+import { UpdateInterviewData } from "../../../../services/updateMethod/UpdateInterview";
 import { statusOptions } from "../../../../utils/StatusDropdown";
+import { SpinLogo } from "../../../../utils/SpinLogo";
 
 export const BankForm = ({ candidate }) => {
   const { interviewSchedules } = useFetchCandy();
   const { wpTrackingDetails } = useUpdateWPTracking();
+  const { interviewDetails } = UpdateInterviewData();
+  const [notification, setNotification] = useState(false);
   const [formData, setFormData] = useState({
     interview: {
       id: "",
@@ -20,6 +24,7 @@ export const BankForm = ({ candidate }) => {
       referenceno: "",
       bgamount: "",
       bgfile: "",
+      status: "",
     },
   });
   const [uploadedFileNames, setUploadedFileNames] = useState({
@@ -64,6 +69,7 @@ export const BankForm = ({ candidate }) => {
             referenceno: interviewData.referenceno,
             bgamount: interviewData.bgamount,
             bgfile: interviewData.bgfile,
+            status: interviewData.IDDetails.status,
           },
         });
 
@@ -112,16 +118,18 @@ export const BankForm = ({ candidate }) => {
     const selectedInterviewData = interviewSchedules.find(
       (data) => data.tempID === candidate?.tempID
     );
+
+    const selectedInterviewDataStatus = interviewSchedules.find(
+      (data) => data.IDDetails.tempID === candidate?.tempID
+    );
+
     const interviewScheduleId = selectedInterviewData?.id;
+    const interviewScheduleStatusId = selectedInterviewDataStatus.IDDetails?.id;
 
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
       return;
     }
-
-    // console.log("Selected Interview Data:", selectedInterviewData);
-    // console.log("Interview Schedule ID:", interviewScheduleId);
-    // console.log("Form Data:", formData);
 
     if (!interviewScheduleId) {
       console.error("Error: No interview schedule found for this candidate.");
@@ -143,7 +151,17 @@ export const BankForm = ({ candidate }) => {
         },
       });
 
-      // console.log("Response from WPTrackingDetails:", response);
+      const interStatus = {
+        id: interviewScheduleStatusId,
+        status: formData.interview.status,
+      };
+      setNotification(true);
+
+      console.log("Submitting interview details with status:", interStatus);
+
+      await interviewDetails({ InterviewValue: interStatus });
+
+      console.log("Interview status updated:", interStatus);
 
       if (response.errors && response.errors.length > 0) {
         console.error("Response errors:", response.errors);
@@ -164,105 +182,125 @@ export const BankForm = ({ candidate }) => {
   };
 
   return (
-    <form onSubmit={handleSubmitTwo} className="p-5">
-      <div className="grid grid-cols-2 gap-5 mt-5">
-        <div>
-          <label htmlFor="bgsubmitdate">Date of Submission</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="date"
-            id="bgsubmitdate"
-            {...register("bgsubmitdate")}
-            value={formData.interview.bgsubmitdate}
-            onChange={(e) => handleInputChange("bgsubmitdate", e.target.value)}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="bgreceivedate">Date Received</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="date"
-            id="bgreceivedate"
-            {...register("bgreceivedate")}
-            value={formData.interview.bgreceivedate}
-            onChange={(e) => handleInputChange("bgreceivedate", e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="bgexpirydate">Valid Until</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="date"
-            id="bgexpirydate"
-            {...register("bgexpirydate")}
-            value={formData.interview.bgexpirydate}
-            onChange={(e) => handleInputChange("bgexpirydate", e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="bgamount">Bank Guarantee Amount</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="text"
-            id="bgamount"
-            {...register("bgamount")}
-            value={formData.interview.bgamount}
-            onChange={(e) => handleInputChange("bgamount", e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="referenceno"> Bank Guarantee Reference Number</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="text"
-            id="referenceno"
-            {...register("referenceno")}
-            value={formData.interview.referenceno}
-            onChange={(e) => handleInputChange("referenceno", e.target.value)}
-          />
-        </div>
-
-        <div className="">
-          <div className="flex items-center gap-5 mt-1">
-            <FileUploadField
-              label="Upload File"
-              className="p-4"
-              onChangeFunc={(e) => handleFileChange(e, "bgFile")}
-              accept="application/pdf"
-              register={register}
-              fileName={uploadedFileNames.bgFile || extractFileName(BankUpload)}
-              value={formData.interview.bgfile}
+    <>
+      <form onSubmit={handleSubmitTwo} className="p-5">
+        <div className="grid grid-cols-2 gap-5 mt-5">
+          <div>
+            <label htmlFor="bgsubmitdate">Date of Submission</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="date"
+              id="bgsubmitdate"
+              {...register("bgsubmitdate")}
+              value={formData.interview.bgsubmitdate}
+              onChange={(e) =>
+                handleInputChange("bgsubmitdate", e.target.value)
+              }
             />
           </div>
-        </div>
-        <div>
-          <label htmlFor="status">Status</label>
-          <select
-            className="w-full border p-2 rounded mt-1"
-            id="status"
-            {...register("status")}
-            value={formData.interview.status}
-            onChange={(e) => handleInputChange("status", e.target.value)}
-          >
-            {/* <option value="">Select Status</option> */}
-            {statusOptions.map((status, index) => (
-              <option key={index} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
 
-      <div className="mt-5 flex justify-center">
-        <button
-          type="submit"
-          className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
-        >
-          Submit
-        </button>
-      </div>
-    </form>
+          <div>
+            <label htmlFor="bgreceivedate">Date Received</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="date"
+              id="bgreceivedate"
+              {...register("bgreceivedate")}
+              value={formData.interview.bgreceivedate}
+              onChange={(e) =>
+                handleInputChange("bgreceivedate", e.target.value)
+              }
+            />
+          </div>
+          <div>
+            <label htmlFor="bgexpirydate">Valid Until</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="date"
+              id="bgexpirydate"
+              {...register("bgexpirydate")}
+              value={formData.interview.bgexpirydate}
+              onChange={(e) =>
+                handleInputChange("bgexpirydate", e.target.value)
+              }
+            />
+          </div>
+          <div>
+            <label htmlFor="bgamount">Bank Guarantee Amount</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="text"
+              id="bgamount"
+              {...register("bgamount")}
+              value={formData.interview.bgamount}
+              onChange={(e) => handleInputChange("bgamount", e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="referenceno">
+              {" "}
+              Bank Guarantee Reference Number
+            </label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="text"
+              id="referenceno"
+              {...register("referenceno")}
+              value={formData.interview.referenceno}
+              onChange={(e) => handleInputChange("referenceno", e.target.value)}
+            />
+          </div>
+
+          <div className="">
+            <div className="flex items-center gap-5 mt-1">
+              <FileUploadField
+                label="Upload File"
+                className="p-4"
+                onChangeFunc={(e) => handleFileChange(e, "bgFile")}
+                accept="application/pdf"
+                register={register}
+                fileName={
+                  uploadedFileNames.bgFile || extractFileName(BankUpload)
+                }
+                value={formData.interview.bgfile}
+              />
+            </div>
+          </div>
+          <div>
+            <label htmlFor="status">Status</label>
+            <select
+              className="w-full border p-2 rounded mt-1"
+              id="status"
+              {...register("status")}
+              value={formData.interview.status}
+              onChange={(e) => handleInputChange("status", e.target.value)}
+            >
+              {/* <option value="">Select Status</option> */}
+              {statusOptions.map((status, index) => (
+                <option key={index} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="mt-5 flex justify-center">
+          <button
+            type="submit"
+            className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
+          >
+            Submit
+          </button>
+        </div>
+      </form>
+      {notification && (
+        <SpinLogo
+          text="Candidate details updated successfully"
+          notification={notification}
+          path="/recrutiles/workpasstracking"
+        />
+      )}
+    </>
   );
 };

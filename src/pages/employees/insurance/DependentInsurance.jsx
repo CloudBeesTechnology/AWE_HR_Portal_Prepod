@@ -12,12 +12,13 @@ import { SpinLogo } from "../../../utils/SpinLogo";
 import { useOutletContext } from "react-router-dom";
 import { UpdateDepInsDataFun } from "../../../services/updateMethod/UpdateDepInsurance";
 import { DataSupply } from "../../../utils/DataStoredContext";
+import { FormField } from "../../../utils/FormField";
 
 export const DependentInsurance = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
-  const { depInsuranceData } = useContext(DataSupply);
+  const { depInsuranceData,dropDownVal} = useContext(DataSupply);
   const { SubmitMPData } = DependInsDataFun();
   const { UpdateDIData } = UpdateDepInsDataFun();
 
@@ -57,7 +58,10 @@ export const DependentInsurance = () => {
     setDepInsurance(newFields);
     setValue("depInsurance", newFields); //
   };
-
+  const insuClaimDD = dropDownVal[0]?.insuClaimDD.map((item) => ({
+    value: item,
+    label: item,
+  }));
   const handleFileChange = async (e, type, index) => {
     if (!watchedEmpID) {
       alert("Please enter the Employee ID before uploading files.");
@@ -234,32 +238,14 @@ export const DependentInsurance = () => {
           depInsurance.map((field, index) => (
             <div key={index} className="flex flex-col gap-5 border-b pb-10">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
-                  <label className="mb-1 text_size_5">
-                    Type of Dependent Insurance
-                  </label>
-                  <select
-                    {...register(`depInsurance[${index}].depenInsType`)}
-                    defaultValue={field.depenInsType || ""}
-                    className="input-field select-custom"
-                  >
-                    <option value=""></option>
-                    <option value="Group H&S Insurance">
-                      Group H&S Insurance
-                    </option>
-                    <option value="Travelling Insurance">
-                      Travelling Insurance
-                    </option>
-                    <option value="Personal Accident Insurance">
-                      Personal Accident Insurance
-                    </option>
-                  </select>
-                  {errors.depInsurance?.[index]?.depenInsType && (
-                    <p className="text-[red] text-xs mt-1">
-                      {errors.depInsurance[index].depenInsType.message}
-                    </p>
-                  )}
-                </div>
+                       <FormField
+                  label="Type of Insurance Claim"
+                  register={register}
+                  name={`insuranceClaims[${index}].claimType`}
+                  type="select"
+                  options={insuClaimDD}
+                  errors={errors.insuranceClaims?.[index]}
+                />
                 <div>
                   <label className="mb-1 text_size_5">
                     Dependent Information
@@ -293,6 +279,7 @@ export const DependentInsurance = () => {
                 watch={watch}
                 selectedNationality={selectedNationality}
                 handleNationalityChange={handleNationalityChange}
+                dropDownVal={dropDownVal}
               />
 
               <div className="grid grid-cols-3 gap-10">

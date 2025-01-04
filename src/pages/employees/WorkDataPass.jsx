@@ -1,6 +1,72 @@
-import { GoUpload } from "react-icons/go";
-import { GenderDD, MaritalDD, NationalityDD } from "../../utils/DropDownMenus";
-export const WorkDataPass = {
+// import { useContext } from "react";
+// import { DataSupply } from "../../utils/DataStoredContext";
+
+// export const WorkDataPass = () => {
+//    const {dropDownVal} =
+//       useContext(DataSupply);
+//       console.log(dropDownVal);
+//       const relationshipDD = dropDownVal[0]?.relationshipDD.map((item) => ({
+//         value: item,
+//         label: item,
+//       }));
+//   return {
+//     terminationFields: [
+//       { label: "Date of Resignation", name: "resignDate", type: "date" },
+//       { label: "Date of Termination", name: "termiDate", type: "date" },
+//       {
+//         label: "Resignation Notice During Probation",
+//         name: "resignNotProb",
+//         type: "select",
+//         options:relationshipDD,
+//       },
+//       {
+//         label: "Termination Notice During Probation",
+//         name: "termiNotProb",
+//         type: "select",
+//         options: ["", "1 Week", "28 Days", "N/A", "Other"],
+//       },
+//       {
+//         label: "Resignation Notice After Confirmation",
+//         name: "resignNotConf",
+//         type: "select",
+//         options: ["", "1 Month", "3 Months", "N/A", "Other"],
+//       },
+//       {
+//         label: "Termination Notice After Confirmation",
+//         name: "termiNotConf",
+//         type: "select",
+//         options: ["", "28 Days", "1 Month", "3 Months", "N/A", "Other"],
+//       },
+//       { label: "Reason of Resignation", name: "reasonResign", type: "text" },
+//       { label: "Reason of Termination", name: "reasonTerminate", type: "text" },
+//     ],
+//   };
+// };
+import { useContext } from "react";
+import { DataSupply } from "../../utils/DataStoredContext";
+
+export const WorkDataPass = () => {
+   const {dropDownVal} =
+      useContext(DataSupply);
+      console.log(dropDownVal);
+      const resignNotifConfDD = dropDownVal[0]?.resignNotifConfDD.map((item) => ({
+        value: item,
+        label: item,
+      }));
+      const resignNotifProbDD = dropDownVal[0]?.resignNotifProbDD.map((item) => ({
+        value: item,
+        label: item,
+      }));
+      const termiNotifConfDD = dropDownVal[0]?.termiNotifConfDD.map((item) => ({
+        value: item,
+        label: item,
+      }));
+      const termiNotifProbDD = dropDownVal[0]?.termiNotifProbDD.map((item) => ({
+        value: item,
+        label: item,
+      }));
+      
+  return {
   positions: [
     "Accountant",
     "Accounts Assistant",
@@ -240,6 +306,7 @@ export const WorkDataPass = {
       name: "hr",
       value: "Hr-notification@adininworks.com",
       type: "text",
+      readOnly: true,
     },
     {
       label: "Manager ID",
@@ -253,29 +320,6 @@ export const WorkDataPass = {
     },
   ],
 
-  // {
-  //   label: "Normal Working Day per Week",
-  //   name: "workWeek",
-  //   type: "text",
-  // },
-  // {
-  //   label: "Normal Working Day per Month",
-  //   name: "workMonth",
-  //   type: "text",
-  // },
-  // {
-  //   label: "Employment Work Status",
-  //   name: "workStatus",
-  //   type: "select",
-  //   options: ["", "Probationary", "Active", "Resignation", "Termination"],
-  // },
-  // {
-  //   label: "Type of Salary Pay",
-  //   name: "salaryType",
-  //   type: "select",
-  //   options: ["", "Monthly", "Daily"],
-  // },
-
   terminationFields: [
     { label: "Date of Resignation", name: "resignDate", type: "date" },
     { label: "Date of Termination", name: "termiDate", type: "date" },
@@ -283,25 +327,25 @@ export const WorkDataPass = {
       label: "Resignation Notice During Probation",
       name: "resignNotProb",
       type: "select",
-      options: ["", "1 Week", "28 Working Days", "N/A", "Other"],
+      options:resignNotifProbDD,
     },
     {
       label: "Termination Notice During Probation",
       name: "termiNotProb",
       type: "select",
-      options: ["", "1 Week", "28 Working Days", "N/A", "Other"],
+      options:termiNotifProbDD,
     },
     {
       label: "Resignation Notice After Confirmation",
       name: "resignNotConf",
       type: "select",
-      options: ["", "1 Month", "3 Months", "N/A", "Other"],
+      options:resignNotifConfDD,
     },
     {
       label: "Termination Notice After Confirmation",
       name: "termiNotConf",
       type: "select",
-      options: ["", "1 Month", "3 Months", "N/A", "Other"],
+      options:termiNotifConfDD,
     },
     { label: "Reason of Resignation", name: "reasonResign", type: "text" },
     { label: "Reason of Termination", name: "reasonTerminate", type: "text" },
@@ -377,73 +421,75 @@ export const WorkDataPass = {
     { label: "Start Date", name: "startDate", type: "date" },
     { label: "Expiry Date", name: "expiryDate", type: "date" },
   ],
-
-  //      formField1 : [
-  //         { label: "Employee Badge Number", key: "empBadgeNo", type: "text" },
-  //         { label: "Employee Name", key: "name", type: "text" },
-  //         { label: "Department", key: "department", type: "text" },
-  //         { label: "Position", key: "position", type: "text" },
-  //         { label: "Date of Joining", key: "doj", type: "date" },
-  //         { label: "Gender", key: "gender", type: "select", options: GenderDD },
-  //         { label: "Brunei I/C Number", key: "bwnIcNo", type: "text" },
-  //         { label: "Passport Number for Non-Local", key: "ppNo", type: "text" },
-  //         { label: "Date of Birth", key: "dob", type: "date" },
-  //         {
-  //           label: "Marital Status",
-  //           key: "marital",
-  //           type: "select",
-  //           options: MaritalDD,
-  //         },
-  //         {
-  //           label: "Nationality",
-  //           key: "nationality",
-  //           type: "select",
-  //           options: NationalityDD,
-  //         },
-  //         // { label: "Other Nationality", key: "otherNation", type: "text" }
-  //       ],
-  // formField2:[
-  //   {
-  //     label: "Group H&S Insurance",
-  //     key: "groupIns",
-  //     type: "select",
-  //     options: [
-  //       "Single",
-  //       "Employee & spouse",
-  //       "Employee & Child",
-  //       "Employee & Family",
-  //       "Decline",
-  //       "Others",
-  //     ],
-  //   },
-  //   {
-  //     label: "Group H&S Insurance Enrollment Effective Date",
-  //     key: "groupInsEffectDate",
-  //     type: "date",
-  //   },
-  //   {
-  //     label: "Group H&S Insurance Enrollment End Date",
-  //     key: "groupInsEndDate",
-  //     type: "date",
-  //   },
-  //   {
-  //     label: "Workmen Compensation Insurance",
-  //     key: "workmenComp",
-  //     type: "select",
-  //     options: ["Offshore", "Onshore", "General"],
-  //   },
-  //   { label: "Policy Number", key: "workmePolicyNo", type: "text" },
-  //   {
-  //     label: "Travelling Insurance",
-  //     key: "travelIns",
-  //     type: "select",
-  //     options: ["Yes", "No"],
-  //   },
-  //   {
-  //     label: "Personal Accident Insurance",
-  //     key: "accidentIns",
-  //     type: "select",
-  //     options: ["Yes", "No"],
-  //   },
-  // ]
 };
+};
+
+
+//  //      formField1 : [
+//   //         { label: "Employee Badge Number", key: "empBadgeNo", type: "text" },
+//   //         { label: "Employee Name", key: "name", type: "text" },
+//   //         { label: "Department", key: "department", type: "text" },
+//   //         { label: "Position", key: "position", type: "text" },
+//   //         { label: "Date of Joining", key: "doj", type: "date" },
+//   //         { label: "Gender", key: "gender", type: "select", options: GenderDD },
+//   //         { label: "Brunei I/C Number", key: "bwnIcNo", type: "text" },
+//   //         { label: "Passport Number for Non-Local", key: "ppNo", type: "text" },
+//   //         { label: "Date of Birth", key: "dob", type: "date" },
+//   //         {
+//   //           label: "Marital Status",
+//   //           key: "marital",
+//   //           type: "select",
+//   //           options: MaritalDD,
+//   //         },
+//   //         {
+//   //           label: "Nationality",
+//   //           key: "nationality",
+//   //           type: "select",
+//   //           options: NationalityDD,
+//   //         },
+//   //         // { label: "Other Nationality", key: "otherNation", type: "text" }
+//   //       ],
+//   // formField2:[
+//   //   {
+//   //     label: "Group H&S Insurance",
+//   //     key: "groupIns",
+//   //     type: "select",
+//   //     options: [
+//   //       "Single",
+//   //       "Employee & spouse",
+//   //       "Employee & Child",
+//   //       "Employee & Family",
+//   //       "Decline",
+//   //       "Others",
+//   //     ],
+//   //   },
+//   //   {
+//   //     label: "Group H&S Insurance Enrollment Effective Date",
+//   //     key: "groupInsEffectDate",
+//   //     type: "date",
+//   //   },
+//   //   {
+//   //     label: "Group H&S Insurance Enrollment End Date",
+//   //     key: "groupInsEndDate",
+//   //     type: "date",
+//   //   },
+//   //   {
+//   //     label: "Workmen Compensation Insurance",
+//   //     key: "workmenComp",
+//   //     type: "select",
+//   //     options: ["Offshore", "Onshore", "General"],
+//   //   },
+//   //   { label: "Policy Number", key: "workmePolicyNo", type: "text" },
+//   //   {
+//   //     label: "Travelling Insurance",
+//   //     key: "travelIns",
+//   //     type: "select",
+//   //     options: ["Yes", "No"],
+//   //   },
+//   //   {
+//   //     label: "Personal Accident Insurance",
+//   //     key: "accidentIns",
+//   //     type: "select",
+//   //     options: ["Yes", "No"],
+//   //   },
+//   // ]

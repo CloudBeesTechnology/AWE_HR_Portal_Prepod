@@ -1,6 +1,93 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreateKeyValueStore = /* GraphQL */ `
+  subscription OnCreateKeyValueStore(
+    $filter: ModelSubscriptionKeyValueStoreFilterInput
+  ) {
+    onCreateKeyValueStore(filter: $filter) {
+      id
+      departmentDD
+      positionDD
+      jobCatDD
+      raceDD
+      religionDD
+      nationalityDD
+      countryORDD
+      educLevelDD
+      workStatusDD
+      relationshipDD
+      resignNotifProbDD
+      termiNotifProbDD
+      resignNotifConfDD
+      termiNotifConfDD
+      workPermitDD
+      insuHSDD
+      insuClaimDD
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateKeyValueStore = /* GraphQL */ `
+  subscription OnUpdateKeyValueStore(
+    $filter: ModelSubscriptionKeyValueStoreFilterInput
+  ) {
+    onUpdateKeyValueStore(filter: $filter) {
+      id
+      departmentDD
+      positionDD
+      jobCatDD
+      raceDD
+      religionDD
+      nationalityDD
+      countryORDD
+      educLevelDD
+      workStatusDD
+      relationshipDD
+      resignNotifProbDD
+      termiNotifProbDD
+      resignNotifConfDD
+      termiNotifConfDD
+      workPermitDD
+      insuHSDD
+      insuClaimDD
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteKeyValueStore = /* GraphQL */ `
+  subscription OnDeleteKeyValueStore(
+    $filter: ModelSubscriptionKeyValueStoreFilterInput
+  ) {
+    onDeleteKeyValueStore(filter: $filter) {
+      id
+      departmentDD
+      positionDD
+      jobCatDD
+      raceDD
+      religionDD
+      nationalityDD
+      countryORDD
+      educLevelDD
+      workStatusDD
+      relationshipDD
+      resignNotifProbDD
+      termiNotifProbDD
+      resignNotifConfDD
+      termiNotifConfDD
+      workPermitDD
+      insuHSDD
+      insuClaimDD
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const onCreateBastingPaint = /* GraphQL */ `
   subscription OnCreateBastingPaint(
     $filter: ModelSubscriptionBastingPaintFilterInput
@@ -104,6 +191,8 @@ export const onCreateTimeSheet = /* GraphQL */ `
       fromDate
       untilDate
       location
+      mealAllow
+      verify
       createdAt
       updatedAt
       __typename
@@ -156,6 +245,8 @@ export const onUpdateTimeSheet = /* GraphQL */ `
       fromDate
       untilDate
       location
+      mealAllow
+      verify
       createdAt
       updatedAt
       __typename
@@ -208,6 +299,8 @@ export const onDeleteTimeSheet = /* GraphQL */ `
       fromDate
       untilDate
       location
+      mealAllow
+      verify
       createdAt
       updatedAt
       __typename

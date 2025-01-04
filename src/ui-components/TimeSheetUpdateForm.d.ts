@@ -62,6 +62,8 @@ export declare type TimeSheetUpdateFormInputValues = {
     fromDate?: string;
     untilDate?: string;
     location?: string;
+    mealAllow?: string;
+    verify?: string;
 };
 export declare type TimeSheetUpdateFormValidationValues = {
     date?: ValidationFunction<string>;
@@ -104,6 +106,8 @@ export declare type TimeSheetUpdateFormValidationValues = {
     fromDate?: ValidationFunction<string>;
     untilDate?: ValidationFunction<string>;
     location?: ValidationFunction<string>;
+    mealAllow?: ValidationFunction<string>;
+    verify?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type TimeSheetUpdateFormOverridesProps = {
@@ -148,6 +152,8 @@ export declare type TimeSheetUpdateFormOverridesProps = {
     fromDate?: PrimitiveOverrideProps<TextFieldProps>;
     untilDate?: PrimitiveOverrideProps<TextFieldProps>;
     location?: PrimitiveOverrideProps<TextFieldProps>;
+    mealAllow?: PrimitiveOverrideProps<TextFieldProps>;
+    verify?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type TimeSheetUpdateFormProps = React.PropsWithChildren<{
     overrides?: TimeSheetUpdateFormOverridesProps | undefined | null;

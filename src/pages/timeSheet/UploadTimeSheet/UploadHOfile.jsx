@@ -127,7 +127,7 @@ export const UploadHOfile = (
 
         // Rearrange the parts to MM/DD/YYYY
         const [day, month, year] = parts;
-        return `${month}/${day}/${year}`;
+        return `${day}/${month}/${year}`;
       }
 
       

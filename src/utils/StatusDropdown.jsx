@@ -1,11 +1,16 @@
-
 export const statusOptions = [
-    "CVEC",
-    "PAAF",
-    "MOBILIZATION",
-    "SAWP",
-    "VALUES",
-    "LOI",
-    "SAWP",
-    "DOE"
-  ];
+  "LOI",
+  "CVEC",
+  "PAAF",
+  "MOBILIZATION",
+  "SAWP",
+  "SAWP",
+  "DOE",
+  "NLMS",
+  "Bank Guarantee",
+  "JITPA",
+  "Labour Deposit",
+  "Immigration",
+  "Air Ticket",
+  "NonLocal Mobilization",
+];

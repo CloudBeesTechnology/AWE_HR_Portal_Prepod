@@ -280,7 +280,16 @@ export const ViewORMCsheet = ({
       ? editNestedData(data, getObject)
       : editFlatData(data, getObject);
 
-    setData(result);
+      const updatedData = result?.map((item) => {
+        // Check if jobLocaWhrs is a non-null, non-empty array and assign LOCATION if valid
+        if (Array.isArray(item.jobLocaWhrs) && item.jobLocaWhrs.length > 0) {
+          item.LOCATION = item.jobLocaWhrs[0].LOCATION;
+        } else {
+          item.LOCATION = null; // Default to null or any other fallback value
+        }
+        return item;
+      });
+    setData(updatedData);
   };
   const AllFieldData = useTableFieldData(titleName);
   const renameKeysFunctionAndSubmit = async (managerData) => {
@@ -307,6 +316,7 @@ export const ViewORMCsheet = ({
             empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
             fileType: "ORMC",
             status: "Pending",
+            companyName: val?.LOCATION,
           };
         });
 

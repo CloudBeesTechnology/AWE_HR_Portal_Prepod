@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
 // import {
 //   createSBWSheet,
@@ -38,6 +38,7 @@ export const ViewSBWsheet = ({
   fileName,
 }) => {
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
+
   const [closePopup, setClosePopup] = useState(false);
   const [data, setData] = useState(null);
   const [secondaryData, setSecondaryData] = useState(null);
@@ -74,19 +75,20 @@ export const ViewSBWsheet = ({
       console.error("Error fetching user data:", error);
     }
   };
-  // useEffect(() => {
-  //   const fetchWorkInfo = async () => {
-  //     // Fetch the BLNG data using GraphQL
-  //     const [empWorkInfos] = await Promise.all([
-  //       client.graphql({
-  //         query: listEmpWorkInfos,
-  //       }),
-  //     ]);
-  //     const workInfo = empWorkInfos?.data?.listEmpWorkInfos?.items;
-      
-  //   };
-  //   fetchWorkInfo();
-  // }, []);
+  useEffect(() => {
+    const fetchWorkInfo = async () => {
+      // Fetch the BLNG data using GraphQL
+      const [empWorkInfos] = await Promise.all([
+        client.graphql({
+          query: listTimeSheets,
+        }),
+      ]);
+      const workInfo = empWorkInfos?.data?.listTimeSheets?.items;
+      const k = workInfo.filter((fil) => fil.fileType === "SBW");
+      console.log(k);
+    };
+    fetchWorkInfo();
+  }, []);
   // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
   // useEffect(() => {
   //   if (excelData) {
@@ -325,7 +327,17 @@ export const ViewSBWsheet = ({
       ? editNestedData(data, getObject)
       : editFlatData(data, getObject);
 
-    setData(result);
+    const updatedData = result?.map((item) => {
+      // Check if jobLocaWhrs is a non-null, non-empty array and assign LOCATION if valid
+      if (Array.isArray(item.jobLocaWhrs) && item.jobLocaWhrs.length > 0) {
+        item.LOCATION = item.jobLocaWhrs[0].LOCATION;
+      } else {
+        item.LOCATION = null; // Default to null or any other fallback value
+      }
+      return item;
+    });
+
+    setData(updatedData);
   };
 
   const AllFieldData = useTableFieldData(titleName);
@@ -348,6 +360,7 @@ export const ViewSBWsheet = ({
             normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
             actualWorkHrs: val.WORKINGHOURS || "",
             otTime: val.OT || "",
+            companyName: val?.LOCATION,
             remarks: val.REMARKS || "",
             empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
             fileType: "SBW",
@@ -565,7 +578,7 @@ export const ViewSBWsheet = ({
                               <td className="text-center px-4 flex-1">
                                 {index + 1}
                               </td>
-                              <td className="text-start px-4 flex-1"> 
+                              <td className="text-start px-4 flex-1">
                                 {m?.NAME}
                               </td>
                               <td className="text-center px-4 flex-1">
@@ -579,31 +592,31 @@ export const ViewSBWsheet = ({
                                 {m?.DATE}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m?.IN  || 0}
+                                {m?.IN || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m?.OUT  || 0}
+                                {m?.OUT || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m?.TOTALINOUT  || 0}
+                                {m?.TOTALINOUT || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m?.ALLDAYMINHRS  || 0}
+                                {m?.ALLDAYMINHRS || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m?.NETMINUTES  || 0}
+                                {m?.NETMINUTES || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m?.TOTALHOURS  || 0}
+                                {m?.TOTALHOURS || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m?.NORMALWORKINGHRSPERDAY  || 0}
+                                {m?.NORMALWORKINGHRSPERDAY || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m?.WORKINGHOURS  || 0}
+                                {m?.WORKINGHOURS || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m?.OT  || 0}
+                                {m?.OT || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
                                 {m?.REMARKS}

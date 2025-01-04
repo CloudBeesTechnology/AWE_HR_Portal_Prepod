@@ -1,6 +1,96 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const createKeyValueStore = /* GraphQL */ `
+  mutation CreateKeyValueStore(
+    $input: CreateKeyValueStoreInput!
+    $condition: ModelKeyValueStoreConditionInput
+  ) {
+    createKeyValueStore(input: $input, condition: $condition) {
+      id
+      departmentDD
+      positionDD
+      jobCatDD
+      raceDD
+      religionDD
+      nationalityDD
+      countryORDD
+      educLevelDD
+      workStatusDD
+      relationshipDD
+      resignNotifProbDD
+      termiNotifProbDD
+      resignNotifConfDD
+      termiNotifConfDD
+      workPermitDD
+      insuHSDD
+      insuClaimDD
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateKeyValueStore = /* GraphQL */ `
+  mutation UpdateKeyValueStore(
+    $input: UpdateKeyValueStoreInput!
+    $condition: ModelKeyValueStoreConditionInput
+  ) {
+    updateKeyValueStore(input: $input, condition: $condition) {
+      id
+      departmentDD
+      positionDD
+      jobCatDD
+      raceDD
+      religionDD
+      nationalityDD
+      countryORDD
+      educLevelDD
+      workStatusDD
+      relationshipDD
+      resignNotifProbDD
+      termiNotifProbDD
+      resignNotifConfDD
+      termiNotifConfDD
+      workPermitDD
+      insuHSDD
+      insuClaimDD
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteKeyValueStore = /* GraphQL */ `
+  mutation DeleteKeyValueStore(
+    $input: DeleteKeyValueStoreInput!
+    $condition: ModelKeyValueStoreConditionInput
+  ) {
+    deleteKeyValueStore(input: $input, condition: $condition) {
+      id
+      departmentDD
+      positionDD
+      jobCatDD
+      raceDD
+      religionDD
+      nationalityDD
+      countryORDD
+      educLevelDD
+      workStatusDD
+      relationshipDD
+      resignNotifProbDD
+      termiNotifProbDD
+      resignNotifConfDD
+      termiNotifConfDD
+      workPermitDD
+      insuHSDD
+      insuClaimDD
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const createBastingPaint = /* GraphQL */ `
   mutation CreateBastingPaint(
     $input: CreateBastingPaintInput!
@@ -108,6 +198,8 @@ export const createTimeSheet = /* GraphQL */ `
       fromDate
       untilDate
       location
+      mealAllow
+      verify
       createdAt
       updatedAt
       __typename
@@ -161,6 +253,8 @@ export const updateTimeSheet = /* GraphQL */ `
       fromDate
       untilDate
       location
+      mealAllow
+      verify
       createdAt
       updatedAt
       __typename
@@ -214,6 +308,8 @@ export const deleteTimeSheet = /* GraphQL */ `
       fromDate
       untilDate
       location
+      mealAllow
+      verify
       createdAt
       updatedAt
       __typename

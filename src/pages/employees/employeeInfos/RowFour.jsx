@@ -5,24 +5,49 @@ import { FormField } from "../../../utils/FormField";
 export const RowFour = ({
   register,
   errors,
-  handleRaceChange,
-  selectedRace,
- watch
+  handleRaceChange,handleRelegianChange,
+  selectedRace,selectedReligion,
+ watch,dropDownVal
 }) => {
+    
+  const religionDD = dropDownVal[0]?.religionDD.map((item) => ({
+    value: item,
+    label: item,
+  }));
+  const raceDD = dropDownVal[0]?.raceDD.map((item) => ({
+    value: item,
+    label: item,
+  }));
   const race = watch("race" || "");
+  const religion = watch("Religion" || "");
   const otherRace = watch("otherRace" || "");
+  const otherReligion = watch("otherReligion" || "");
   return (
     <div className="grid grid-cols-2 gap-5 form-group">
       {/* Religion dropdown */}
+      <div className="flex items-center gap-5">
+
       <FormField
         label="Religion"
         register={register}
         name="religion"
         type="select"
-        options={ReligionDD}
+        options={religionDD}
+        onChange={handleRelegianChange}
         errors={errors}
       />
-
+   {(selectedReligion === "OTHER" || (otherReligion && religion === "OTHER")) && (
+          <FormField
+            label="Other Religion"
+            register={register}
+            name="otherReligion"
+            type="text"
+            watch={otherReligion} // Bind the value of the "Other Race" input
+            errors={errors}
+            placeholder="Enter Other Religion"
+          />
+        )}
+        </div>
       {/* Race dropdown and Other Race input */}
       <div className="flex items-center gap-5">
         <FormField
@@ -31,13 +56,13 @@ export const RowFour = ({
           name="race"
           type="select"
           watch={race}
-          options={RaceDD}
+          options={raceDD}
           errors={errors}
           onChange={handleRaceChange} // Make sure this function is defined in your component
         />
 
         {/* Conditionally render the 'Other Race' input beside Race dropdown */}
-        {(selectedRace === "Other" || (otherRace && race === "other")) && (
+        {(selectedRace === "OTHER" || (otherRace && race === "OTHER")) && (
           <FormField
             label="Other Race"
             register={register}

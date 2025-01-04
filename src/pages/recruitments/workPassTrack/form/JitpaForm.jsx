@@ -6,12 +6,15 @@ import { FileUploadField } from "../../../employees/medicalDep/FileUploadField";
 import { JitpaFormSchema } from "../../../../services/Validation";
 import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
 import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPTracking";
+import { UpdateInterviewData } from "../../../../services/updateMethod/UpdateInterview";
 import { statusOptions } from "../../../../utils/StatusDropdown";
+import { SpinLogo } from "../../../../utils/SpinLogo";
 
 export const JitpaForm = ({ candidate }) => {
   const { interviewSchedules } = useFetchCandy();
+  const { interviewDetails } = UpdateInterviewData();
   const { wpTrackingDetails } = useUpdateWPTracking();
-
+  const [notification, setNotification] = useState(false);
   const [formData, setFormData] = useState({
     interview: {
       id: "",
@@ -43,9 +46,6 @@ export const JitpaForm = ({ candidate }) => {
   const JitpaUpload = watch("jitpaFile", "");
 
   useEffect(() => {
-    // Log to see if interviewSchedules has data
-    //  console.log("interviewSchedules:", interviewSchedules);
-
     if (interviewSchedules.length > 0) {
       // Find the interviewData for the candidate
       const interviewData = interviewSchedules.find(
@@ -63,6 +63,7 @@ export const JitpaForm = ({ candidate }) => {
             jitpaexpirydate: interviewData.jitpaexpirydate,
             jitpaamount: interviewData.jitpaamount,
             jitpafile: interviewData.jitpafile,
+            status: interviewData.IDDetails.status,
           },
         });
 
@@ -111,7 +112,13 @@ export const JitpaForm = ({ candidate }) => {
     const selectedInterviewData = interviewSchedules.find(
       (data) => data.tempID === candidate?.tempID
     );
+
+    const selectedInterviewDataStatus = interviewSchedules.find(
+      (data) => data.IDDetails.tempID === candidate?.tempID
+    );
+
     const interviewScheduleId = selectedInterviewData?.id;
+    const interviewScheduleStatusId = selectedInterviewDataStatus.IDDetails?.id;
 
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
@@ -137,6 +144,18 @@ export const JitpaForm = ({ candidate }) => {
         },
       });
 
+      const interStatus = {
+        id: interviewScheduleStatusId,
+        status: formData.interview.status,
+      };
+      setNotification(true);
+
+      console.log("Submitting interview details with status:", interStatus);
+
+      await interviewDetails({ InterviewValue: interStatus });
+
+      console.log("Interview status updated:", interStatus);
+
       // console.log("Response from WPTrackingDetails:", response);
 
       if (response.errors && response.errors.length > 0) {
@@ -158,100 +177,109 @@ export const JitpaForm = ({ candidate }) => {
   };
 
   return (
-    <form onSubmit={handleSubmitTwo} className="p-5">
-      <div className="grid grid-cols-2 gap-5 mt-5">
-        <div>
-          <label htmlFor="tbapurchasedate">Date of Purchase</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="date"
-            id="tbapurchasedate"
-            {...register("tbapurchasedate")}
-            value={formData.interview.tbapurchasedate}
-            onChange={(e) =>
-              handleInputChange("tbapurchasedate", e.target.value)
-            }
-          />
-        </div>
-        <div>
-          <label htmlFor="submitdateendorsement">Date of Endrosement</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="date"
-            id="submitdateendorsement"
-            {...register("submitdateendorsement")}
-            value={formData.interview.submitdateendorsement}
-            onChange={(e) =>
-              handleInputChange("submitdateendorsement", e.target.value)
-            }
-          />
-        </div>
-        <div>
-          <label htmlFor="jitpaexpirydate">Valid Until</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="date"
-            id="jitpaexpirydate"
-            {...register("jitpaexpirydate")}
-            value={formData.interview.jitpaexpirydate}
-            onChange={(e) =>
-              handleInputChange("jitpaexpirydate", e.target.value)
-            }
-          />
-        </div>
-        <div>
-          <label htmlFor="jitpaamount">JITPA Amount</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="text"
-            id="jitpaamount"
-            {...register("jitpaamount")}
-            value={formData.interview.jitpaamount}
-            onChange={(e) => handleInputChange("jitpaamount", e.target.value)}
-          />
-        </div>
-        <div className="">
-          <div className="flex items-center gap-5 mt-1">
-            <FileUploadField
-              label="Upload File"
-              className="p-4"
-              onChangeFunc={(e) => handleFileChange(e, "jitpaFile")}
-              accept="application/pdf"
-              register={register}
-              fileName={
-                uploadedFileNames.jitpaFile || extractFileName(JitpaUpload)
+    <>
+      <form onSubmit={handleSubmitTwo} className="p-5">
+        <div className="grid grid-cols-2 gap-5 mt-5">
+          <div>
+            <label htmlFor="tbapurchasedate">Date of Purchase</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="date"
+              id="tbapurchasedate"
+              {...register("tbapurchasedate")}
+              value={formData.interview.tbapurchasedate}
+              onChange={(e) =>
+                handleInputChange("tbapurchasedate", e.target.value)
               }
-              value={formData.interview.jitpafile}
             />
           </div>
+          <div>
+            <label htmlFor="submitdateendorsement">Date of Endrosement</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="date"
+              id="submitdateendorsement"
+              {...register("submitdateendorsement")}
+              value={formData.interview.submitdateendorsement}
+              onChange={(e) =>
+                handleInputChange("submitdateendorsement", e.target.value)
+              }
+            />
+          </div>
+          <div>
+            <label htmlFor="jitpaexpirydate">Valid Until</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="date"
+              id="jitpaexpirydate"
+              {...register("jitpaexpirydate")}
+              value={formData.interview.jitpaexpirydate}
+              onChange={(e) =>
+                handleInputChange("jitpaexpirydate", e.target.value)
+              }
+            />
+          </div>
+          <div>
+            <label htmlFor="jitpaamount">JITPA Amount</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="text"
+              id="jitpaamount"
+              {...register("jitpaamount")}
+              value={formData.interview.jitpaamount}
+              onChange={(e) => handleInputChange("jitpaamount", e.target.value)}
+            />
+          </div>
+          <div className="">
+            <div className="flex items-center gap-5 mt-1">
+              <FileUploadField
+                label="Upload File"
+                className="p-4"
+                onChangeFunc={(e) => handleFileChange(e, "jitpaFile")}
+                accept="application/pdf"
+                register={register}
+                fileName={
+                  uploadedFileNames.jitpaFile || extractFileName(JitpaUpload)
+                }
+                value={formData.interview.jitpafile}
+              />
+            </div>
+          </div>
+          <div>
+            <label htmlFor="status">Status</label>
+            <select
+              className="w-full border p-2 rounded mt-1"
+              id="status"
+              {...register("status")}
+              value={formData.interview.status}
+              onChange={(e) => handleInputChange("status", e.target.value)}
+            >
+              {/* <option value="">Select Status</option> */}
+              {statusOptions.map((status, index) => (
+                <option key={index} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-        <div>
-          <label htmlFor="status">Status</label>
-          <select
-            className="w-full border p-2 rounded mt-1"
-            id="status"
-            {...register("status")}
-            value={formData.interview.status}
-            onChange={(e) => handleInputChange("status", e.target.value)}
-          >
-            {/* <option value="">Select Status</option> */}
-            {statusOptions.map((status, index) => (
-              <option key={index} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
 
-      <div className="mt-5 flex justify-center">
-        <button
-          type="submit"
-          className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
-        >
-          Submit
-        </button>
-      </div>
-    </form>
+        <div className="mt-5 flex justify-center">
+          <button
+            type="submit"
+            className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
+          >
+            Submit
+          </button>
+        </div>
+      </form>
+      {notification && (
+        <SpinLogo
+          text="Candidate details updated successfully"
+          notification={notification}
+          path="/recrutiles/workpasstracking"
+        />
+      )}
+    </>
   );
 };

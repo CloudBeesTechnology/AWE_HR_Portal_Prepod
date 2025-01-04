@@ -182,20 +182,7 @@ export const WorkInfoSchema = Yup.object().shape({
   contractPeriod: Yup.string().notRequired(),
   contractStart: Yup.string()
   .notRequired()
-  .test(
-    "is-on-or-after-doj",
-    "Contract Start date must be the same as or after Date of Joining",
-    function (value) {
-      const { doj } = this.parent;
-      if (!doj || !value) return true;
-
-      const dojDate = new Date(doj);
-      const contractStartDate = new Date(value);
-
-      // Check if contractStartDate is the same as or after dojDate
-      return contractStartDate >= dojDate;
-    }
-  ),
+  ,
   contractEnd: Yup.string()
     .notRequired()
     .test(
@@ -588,10 +575,7 @@ export const employeeInfoSchema = Yup.object().shape({
   bwnIcExpiry: Yup.date()
     .nullable()
     .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .notRequired()
-    .test("is-future-date", "Only Future Dates Allowed", function (value) {
-      return !value || new Date(value) > new Date();
-    }),
+    .notRequired(),
   myIcNo: Yup.string().notRequired(),
   ppNo: Yup.string().notRequired(),
   ppIssued: Yup.date()

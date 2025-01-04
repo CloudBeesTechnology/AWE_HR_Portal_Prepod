@@ -20,6 +20,7 @@ export const LeaveManage = () => {
     handleUpdateLeaveStatus,
     ticketMerged,
     statusUpdate,
+    loading
   } = useLeaveManage();
 
   // console.log(mergedData);
@@ -34,7 +35,6 @@ export const LeaveManage = () => {
   const { personalInfo } = useEmployeePersonalInfo(userID);
 // console.log(mergedData);
  
-
   const handleClickForToggle = () => {
     setToggleClick(!toggleClick);
   };
@@ -64,11 +64,6 @@ export const LeaveManage = () => {
     }
   };
 
-
-  
-
-
-
 // console.log(data);
 
   return (
@@ -87,6 +82,7 @@ export const LeaveManage = () => {
               userID,
               statusUpdate,
               mergedData,
+              loading
             }}
           />
         </section>

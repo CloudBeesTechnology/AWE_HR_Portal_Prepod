@@ -32,7 +32,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     pageStyle: `
       @page {
           
-        height:  714px;
+        height:  874px;
         padding: 22px, 0px, 22px, 0px;
         
       }
@@ -440,6 +440,9 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     // "Brunei Medical Details": uploadRegis,
     // dependPass: dependPass,
   };
+
+  console.log(bruneiME)
+  console.log(overME)
 
   const dependenPass = {
     DependPass: dependPass,

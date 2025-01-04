@@ -1,3 +1,24 @@
+type KeyValueStore @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  departmentDD: [String]
+  positionDD: [String]
+  jobCatDD: [String]
+  raceDD: [String]
+  religionDD: [String]
+  nationalityDD: [String]
+  countryORDD: [String]
+  educLevelDD: [String]
+  workStatusDD: [String]
+  relationshipDD: [String]
+  resignNotifProbDD: [String]
+  termiNotifProbDD: [String]
+  resignNotifConfDD: [String]
+  termiNotifConfDD: [String]
+  workPermitDD: String
+  insuHSDD: [String]
+  insuClaimDD: [String]
+}
+
 type BastingPaint @model @auth(rules: [{allow: public}]) {
   id: ID!
   empID: String!
@@ -51,6 +72,8 @@ type TimeSheet @model @auth(rules: [{allow: public}]) {
   fromDate: String
   untilDate: String
   location: String
+  mealAllow: String
+  verify: String
 }
 
 type HiringJob @model @auth(rules: [{allow: public}]) {

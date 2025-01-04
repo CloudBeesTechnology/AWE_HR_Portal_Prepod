@@ -5,7 +5,7 @@ import { FilterTable } from "./FilterTable";
 import { VscClose } from "react-icons/vsc";
 import logo from "../../assets/logo/logo-with-name.svg";
 
-export const RM = ({ allData, typeOfReport, reportTitle }) => {
+export const RM = ({ allData}) => {
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [tableBody, setTableBody] = useState([]);
   const [tableHead, setTableHead] = useState([
@@ -111,8 +111,6 @@ export const RM = ({ allData, typeOfReport, reportTitle }) => {
       <FilterTable
         tableBody={tableBody}
         tableHead={tableHead}
-        typeOfReport={typeOfReport}
-        reportTitle={reportTitle}
         handleViewDetails={handleViewDetails}
       />
 

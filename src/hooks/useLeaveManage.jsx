@@ -28,6 +28,9 @@ export const useLeaveManage = () => {
   const fetchAllData = useCallback(async () => {
     setLoading(true);
     try {
+
+      const limit = 3000;
+
       const [
         leaveStatusesData,
         empPersonalInfosData,
@@ -35,26 +38,12 @@ export const useLeaveManage = () => {
         empLeaveData,
         ticketRequestsData,
       ] = await Promise.all([
-        client.graphql({
-          query: listLeaveStatuses,
-          variables: { limit: 20000 },
-        }),
-        client.graphql({
-          query: listEmpPersonalInfos,
-          variables: { limit: 20000 },
-        }),
-        client.graphql({
-          query: listEmpWorkInfos,
-          variables: { limit: 20000 },
-        }),
-        client.graphql({
-          query: listEmpLeaveDetails,
-          variables: { limit: 20000 },
-        }),
-        client.graphql({
-          query: listTicketRequests,
-          variables: { limit: 20000 },
-        }),
+        client.graphql({ query: listLeaveStatuses, variables: { limit } }),
+        client.graphql({ query: listEmpPersonalInfos, variables: { limit } }),
+        client.graphql({ query: listEmpWorkInfos, variables: { limit } }),
+        client.graphql({ query: listEmpLeaveDetails, variables: { limit } }),
+        client.graphql({ query: listTicketRequests, variables: { limit } }),
+      
       ]);
 
       // Extract items from responses
@@ -68,6 +57,8 @@ export const useLeaveManage = () => {
       const fetchedTicketRequests =
         ticketRequestsData?.data?.listTicketRequests?.items || [];
 
+
+        
       // Create lookup maps
       const empInfoMap = fetchedEmpPersonalInfos.reduce((acc, item) => {
         acc[item.empID] = item;
@@ -87,6 +78,8 @@ export const useLeaveManage = () => {
       // Merge leave status data
       const mergedLeaveData = fetchedLeaveStatuses.map((leaveStatus) => {
         const empInfo = empInfoMap[leaveStatus.empID] || {};
+        // console.log(empInfo, "EMP INFO");
+        
         const workInfo = workInfoMap[leaveStatus.empID] || {};
         const leaveDetails = leaveDetailsMap[leaveStatus.empID] || {};
         // console.log(empInfoMap);

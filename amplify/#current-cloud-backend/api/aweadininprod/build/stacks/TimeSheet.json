@@ -49,10 +49,10 @@
     "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref": {
       "Type": "String"
     },
-    "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintauth0FunctionQuerygetBastingPaintauth0FunctionAppSyncFunction189A1CA9FunctionId": {
+    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStoreauth0FunctionQuerygetKeyValueStoreauth0FunctionAppSyncFunction0470BA2FFunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction520CA580FunctionId": {
+    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId": {
       "Type": "String"
     },
     "referencetotransformerrootstackauthRoleNameFB872D50Ref": {
@@ -61,19 +61,19 @@
     "referencetotransformerrootstackunauthRoleName49F3C1FERef": {
       "Type": "String"
     },
-    "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintMutationcreateBastingPaintinit0FunctionMutationcreateBastingPaintinit0FunctionAppSyncFunction5E76F8D6FunctionId": {
+    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreMutationcreateKeyValueStoreinit0FunctionMutationcreateKeyValueStoreinit0FunctionAppSyncFunctionD1C1F6DBFunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintMutationcreateBastingPaintauth0FunctionMutationcreateBastingPaintauth0FunctionAppSyncFunctionFDDFD342FunctionId": {
+    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreMutationcreateKeyValueStoreauth0FunctionMutationcreateKeyValueStoreauth0FunctionAppSyncFunction988E554AFunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintMutationupdateBastingPaintinit0FunctionMutationupdateBastingPaintinit0FunctionAppSyncFunction5A468F17FunctionId": {
+    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreMutationupdateKeyValueStoreinit0FunctionMutationupdateKeyValueStoreinit0FunctionAppSyncFunction6FD54BEFFunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintSubscriptiononCreateBastingPaintauth0FunctionSubscriptiononCreateBastingPaintauth0FunctionAppSyncFunction70B34728FunctionId": {
+    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptiononCreateKeyValueStoreauth0FunctionSubscriptiononCreateKeyValueStoreauth0FunctionAppSyncFuncti641AE5F6": {
       "Type": "String"
     },
-    "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintSubscriptionOnCreateBastingPaintDataResolverFnSubscriptionOnCreateBastingPaintDataResolverFnAppSyncFunctionCA89E9AF6": {
+    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptionOnCreateKeyValueStoreDataResolverFnSubscriptionOnCreateKeyValueStoreDataResolverFnAppSyncFuncC74BAD12": {
       "Type": "String"
     }
   },
@@ -392,10 +392,10 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintauth0FunctionQuerygetBastingPaintauth0FunctionAppSyncFunction189A1CA9FunctionId"
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStoreauth0FunctionQuerygetKeyValueStoreauth0FunctionAppSyncFunction0470BA2FFunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction520CA580FunctionId"
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -503,10 +503,10 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintauth0FunctionQuerygetBastingPaintauth0FunctionAppSyncFunction189A1CA9FunctionId"
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStoreauth0FunctionQuerygetKeyValueStoreauth0FunctionAppSyncFunction0470BA2FFunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction520CA580FunctionId"
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -614,13 +614,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintMutationcreateBastingPaintinit0FunctionMutationcreateBastingPaintinit0FunctionAppSyncFunction5E76F8D6FunctionId"
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreMutationcreateKeyValueStoreinit0FunctionMutationcreateKeyValueStoreinit0FunctionAppSyncFunctionD1C1F6DBFunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintMutationcreateBastingPaintauth0FunctionMutationcreateBastingPaintauth0FunctionAppSyncFunctionFDDFD342FunctionId"
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreMutationcreateKeyValueStoreauth0FunctionMutationcreateKeyValueStoreauth0FunctionAppSyncFunction988E554AFunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction520CA580FunctionId"
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -779,7 +779,7 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintMutationupdateBastingPaintinit0FunctionMutationupdateBastingPaintinit0FunctionAppSyncFunction5A468F17FunctionId"
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreMutationupdateKeyValueStoreinit0FunctionMutationupdateKeyValueStoreinit0FunctionAppSyncFunction6FD54BEFFunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -788,7 +788,7 @@
               ]
             },
             {
-              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction520CA580FunctionId"
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -953,7 +953,7 @@
               ]
             },
             {
-              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction520CA580FunctionId"
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -1010,13 +1010,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintSubscriptiononCreateBastingPaintauth0FunctionSubscriptiononCreateBastingPaintauth0FunctionAppSyncFunction70B34728FunctionId"
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptiononCreateKeyValueStoreauth0FunctionSubscriptiononCreateKeyValueStoreauth0FunctionAppSyncFuncti641AE5F6"
             },
             {
-              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction520CA580FunctionId"
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintSubscriptionOnCreateBastingPaintDataResolverFnSubscriptionOnCreateBastingPaintDataResolverFnAppSyncFunctionCA89E9AF6"
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptionOnCreateKeyValueStoreDataResolverFnSubscriptionOnCreateKeyValueStoreDataResolverFnAppSyncFuncC74BAD12"
             }
           ]
         },
@@ -1063,13 +1063,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintSubscriptiononCreateBastingPaintauth0FunctionSubscriptiononCreateBastingPaintauth0FunctionAppSyncFunction70B34728FunctionId"
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptiononCreateKeyValueStoreauth0FunctionSubscriptiononCreateKeyValueStoreauth0FunctionAppSyncFuncti641AE5F6"
             },
             {
-              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction520CA580FunctionId"
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintSubscriptionOnCreateBastingPaintDataResolverFnSubscriptionOnCreateBastingPaintDataResolverFnAppSyncFunctionCA89E9AF6"
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptionOnCreateKeyValueStoreDataResolverFnSubscriptionOnCreateKeyValueStoreDataResolverFnAppSyncFuncC74BAD12"
             }
           ]
         },
@@ -1116,13 +1116,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintSubscriptiononCreateBastingPaintauth0FunctionSubscriptiononCreateBastingPaintauth0FunctionAppSyncFunction70B34728FunctionId"
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptiononCreateKeyValueStoreauth0FunctionSubscriptiononCreateKeyValueStoreauth0FunctionAppSyncFuncti641AE5F6"
             },
             {
-              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintQuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction520CA580FunctionId"
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackBastingPaintNestedStackBastingPaintNestedStackResource2879DBFFOutputstransformerrootstackBastingPaintSubscriptionOnCreateBastingPaintDataResolverFnSubscriptionOnCreateBastingPaintDataResolverFnAppSyncFunctionCA89E9AF6"
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptionOnCreateKeyValueStoreDataResolverFnSubscriptionOnCreateKeyValueStoreDataResolverFnAppSyncFuncC74BAD12"
             }
           ]
         },

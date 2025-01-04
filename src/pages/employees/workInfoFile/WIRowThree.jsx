@@ -2,7 +2,11 @@ import React from 'react'
 import { SalaryPayDD, WorkStatusDD } from '../../../utils/DropDownMenus'
 import { FormField } from '../../../utils/FormField'
 
-export const WIRowThree = ({ register, errors, watch, setValue, control }) => {
+export const WIRowThree = ({ register, errors, dropDownVal,watch, setValue, control }) => {
+  const workStatusDD = dropDownVal[0]?.workStatusDD.map((item) => ({
+    value: item,
+    label: item,
+  }));
   return (
     <div className="grid grid-cols-3 gap-5 form-group mt-5">
         <FormField
@@ -31,7 +35,7 @@ export const WIRowThree = ({ register, errors, watch, setValue, control }) => {
         label="Employment Work Status"
         register={register}
         type="select"
-        options={WorkStatusDD}
+        options={workStatusDD}
         name="workStatus"
         errors={errors}
       />
@@ -43,7 +47,6 @@ export const WIRowThree = ({ register, errors, watch, setValue, control }) => {
         name="salaryType"
         errors={errors}
       />
-
     </div>
   )
 }

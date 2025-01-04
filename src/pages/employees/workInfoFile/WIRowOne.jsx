@@ -1,10 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { DepartmentDD, JobCatDD } from "../../../utils/DropDownMenus";
 import { FormField } from "../../../utils/FormField";
-import { WorkDataPass } from "../WorkDataPass";
-import { Controller } from "react-hook-form";
 
-export const WIRowOne = ({ register, errors, watch, setValue, control,onChange,selection }) => {
+export const WIRowOne = ({
+  register,
+  errors,
+  watch,
+  onChange,
+  selection,
+  dropDownVal,
+}) => {
+  console.log(dropDownVal);
+  
+  const DepartmentDD = dropDownVal[0]?.departmentDD.map((item) => ({
+    value: item,
+    label: item,
+  }));
+  const positionDD = dropDownVal[0]?.positionDD.map((item) => ({
+    value: item,
+    label: item,
+  }));
+  const jobCatDD = dropDownVal[0]?.jobCatDD.map((item) => ({
+    value: item,
+    label: item,
+  }));
+
+
 
   // Watch specific fields
   const department = watch("department");
@@ -16,119 +36,53 @@ export const WIRowOne = ({ register, errors, watch, setValue, control,onChange,s
   const jobCat = watch("jobCat");
   const otherJobCat = watch("otherJobCat");
 
-  // console.log(jobCat);
-
-  // // Update display states based on field values
-  // useEffect(() => {
-  //   setForDisplaydep(department === "Other");
-  //   setForDisplaypos(position === "Other");
-  //   setForDisplayjob(jobCat === "Other");
-  // }, [department, position, jobCat]);
-
   return (
     <div>
       {/* Department Field */}
       <div className="grid grid-cols-2 gap-5 form-group mt-2">
         <div>
-        <FormField
-          label="Department"
-          register={register}
-          name="department"
-          type="select"
-          options={DepartmentDD}
-          errors={errors}
-          onChange={onChange}
-        />
-          {/* <Controller
+          <FormField
+            label="Department"
+            register={register}
             name="department"
-            control={control}
-            render={({ field }) => (
-              <FormField
-                label="Department"
-                name={field.name}
-                type="selectOption"
-                value={field.value}
-                setValue={setValue}
-                options={DepartmentDD}
-                // onChange={(e) => setValue("department", e.target.value)} // Use setValue to update field
-                watch={watch}
-                register={() => field}
-                errors={errors}
-                append={true}
-              />
-            )} */}
-          {/* /> */}
+            type="select"
+            options={DepartmentDD}
+            errors={errors}
+            onChange={onChange}
+          />
         </div>
         <div>
-        {(selection.department === "Other" ||
-          (otherDepartment && department === "Other")) && (
-          <FormField
-            label="Other Department"
-            register={register}
-            name="otherDepartment"
-            type="text"
-            errors={errors}
-          />
-        )}
-        </div>
-        {/* {Array.isArray(department) && department.includes("Other") && (
-          <div>
+          {(selection.department === "OTHER" ||
+            otherDepartment ||
+            department === "OTHER") && (
             <FormField
               label="Other Department"
               register={register}
               name="otherDepartment"
               type="text"
-              setValue={setValue}
               errors={errors}
             />
-          </div>
-        )} */}
+          )}
+        </div>
       </div>
 
       {/* Position Field */}
       <div className="grid grid-cols-2 gap-5 form-group mt-2">
         <div>
-        <FormField
-          label="Position"
-          register={register}
-          name="position"
-          type="select"
-          options={WorkDataPass.positions.map((position) => ({
-            value: position,
-            label: position,
-          }))}
-          errors={errors}
-          onChange={onChange}
-        />
-
-        
-          {/* <Controller
+          <FormField
+            label="Position"
+            register={register}
             name="position"
-            control={control}
-            render={({ field }) => (
-              <FormField
-                label="Position"
-                name={field.name}
-                type="selectOption"
-                value={field.value}
-                setValue={setValue}
-                options={WorkDataPass.positions.map((position) => ({
-                  value: position,
-                  label: position,
-                }))}
-                watch={watch}
-                // onChange={(e) => setValue("position", e.target.value)} // Use setValue to update field
-                register={() => field}
-                errors={errors}
-                append={true}
-              />
-            )}
-          /> */}
+            type="select"
+            options={positionDD}
+            errors={errors}
+            onChange={onChange}
+          />
         </div>
         {/* Conditionally render the 'Other Country of Origin' input field */}
         <div>
-        {(selection.position === "Other" ||
-          (otherPosition && position === "Other")) && (
+        {(selection.position === "OTHER" ||
+          (otherPosition || position === "OTHER")) && (
           <FormField
             label="Other Position"
             register={register}
@@ -138,18 +92,6 @@ export const WIRowOne = ({ register, errors, watch, setValue, control,onChange,s
           />
         )}
         </div>
-        {/* {Array.isArray(position) && position.includes("Other") && (
-          <div>
-            <FormField
-              label="Other Position"
-              register={register}
-              setValue={setValue}
-              name="otherPosition"
-              type="text"
-              errors={errors}
-            />
-          </div>
-        )} */}
       </div>
 
       {/* Job Category Field */}
@@ -160,33 +102,15 @@ export const WIRowOne = ({ register, errors, watch, setValue, control,onChange,s
           register={register}
           name="jobCat"
           type="select"
-          options={JobCatDD}
+          options={jobCatDD}
           errors={errors}
           onChange={onChange}
         />
-          {/* <Controller
-            name="jobCat"
-            control={control}
-            render={({ field }) => (
-              <FormField
-                label="Job Category"
-                name={field.name}
-                type="selectOption"
-                value={field.value}
-                setValue={setValue}
-                options={JobCatDD}
-                watch={watch}
-                // onChange={(e) => setValue("jobCat", e.target.value)} // Use setValue to update field
-                register={() => field}
-                errors={errors}
-                append={true}
-              />
-            )}
-          /> */}
+          
         </div>
         <div>
-        {(selection.jobCat === "Other" ||
-          (otherJobCat && jobCat === "Other")) && (
+        {(selection.jobCat === "OTHER" ||
+          (otherJobCat || jobCat === "OTHER")) && (
           <FormField
             label="Other Job"
             register={register}
@@ -196,19 +120,6 @@ export const WIRowOne = ({ register, errors, watch, setValue, control,onChange,s
           />
         )}
         </div>
-        {/* {Array.isArray(jobCat) && jobCat.includes("Other") && (
-          <div>
-            <FormField
-              label="Other Job"
-              register={register}
-              setValue={setValue}
-              name="otherJobCat"
-              watch={otherJobCat}
-              type="text"
-              errors={errors}
-            />
-          </div>
-        )} */}
       </div>
     </div>
   );

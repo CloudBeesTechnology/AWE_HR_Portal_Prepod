@@ -169,7 +169,6 @@ export const AllEmployee = () => {
         })
         .filter((item) => item?.empID) // Only include items with a valid empID
         .reduce((unique, item) => {
-          // Use a Map to keep unique empIDs and avoid duplicates
           if (!unique.some((emp) => emp.empID === item.empID)) {
             unique.push(item);
           }
@@ -178,7 +177,7 @@ export const AllEmployee = () => {
       const sorted = allDataValues.sort((a, b) =>
         a.empID.localeCompare(b.empID)
       );
-      // console.log(allDataValues, "kjhgfd");
+
 
       setMergeData(sorted);
       setFilteredData(sorted);
@@ -294,6 +293,7 @@ export const AllEmployee = () => {
     );
   };
   console.log(mergeData);
+
 
   return (
     <section className="bg-[#F5F6F1CC] w-full flex items-center flex-col h-screen pt-14">

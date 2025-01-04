@@ -89,7 +89,7 @@ export const ViewForm = ({
                 leaveData.empName || "Not mention"
               }, Leave request for From Date : ${formattedDateFrom} To Date : ${formattedDateTo} has been Status: ${status} by Manager Name : ${
                 managerName.name || "Not mention"
-              }. View at : https://hr.adininworks.co `,
+              }. View at : https://employee.adininworks.co `,
               "leave_no-reply@adininworks.com",
               leaveData.empOfficialEmail
             );
@@ -103,7 +103,7 @@ export const ViewForm = ({
                 managerName.name || "Not mention"
               }. View at : https://hr.adininworks.co `,
               "leave_no-reply@adininworks.com",
-              "hr_no-reply@adininworks.com"
+              "Hr-notification@adininworks.com"
             );
 
             //employee notify
@@ -123,7 +123,7 @@ export const ViewForm = ({
               leaveType: leaveData.empLeaveType,
               message: `Leave request for ${leaveData.empName} has been ${status} by Manager ${managerName.name}`,
               senderEmail: "leave_no-reply@adininworks.com", // Sender email
-              receipentEmail: "hr_no-reply@adininworks.com", // Using the employee's official email
+              receipentEmail: "Hr-notification@adininworks.com", // Using the employee's official email
               status: "Unread",
             });
           } else if (
@@ -163,7 +163,7 @@ export const ViewForm = ({
 
               "leave_no-reply@adininworks.com",
 
-              "hr_no-reply@adininworks.com"
+              "Hr-notification@adininworks.com"
             );
 
             //manager notify
@@ -183,21 +183,46 @@ export const ViewForm = ({
               leaveType: leaveData.empLeaveType,
               message: `Leave request for ${leaveData.empName} has been ${status} by Supervisor ${supervisorName.name}`,
               senderEmail: "leave_no-reply@adininworks.com", // Sender email
-              receipentEmail: "hr_no-reply@adininworks.com", // Using the employee's official email
+              receipentEmail: "Hr-notification@adininworks.com", // Using the employee's official email
               status: "Unread",
             });
 
             if (status === "Rejected") {
+              //manager email
+              sendEmail(
+                `Leave Request ${status}`,
+                `Employee ${leaveData.empName || "Not mention"} , 
+             applied leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Supervisor ${
+                  supervisorName.name || "Not mention"
+                }. View at : https://hr.adininworks.co `,
+
+                "leave_no-reply@adininworks.com",
+                FindingEmail[0].officialEmail
+              );
+
+              //employee email
               sendEmail(
                 `Leave Request ${status}`,
                 `Dear ${leaveData.empName || "Not mention"} , 
              leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Supervisor ${
                   supervisorName.name || "Not mention"
-                }. View at : https://hr.adininworks.co `,
+                }. View at : https://employee.adininworks.co `,
 
                 "leave_no-reply@adininworks.com",
                 leaveData.empOfficialEmail
               );
+              //manager
+              createNotification({
+                empID: leaveData.empID,
+                leaveType: leaveData.empLeaveType,
+                message: `Leave request for ${leaveData.empName} has been ${status} by Supervisor ${supervisorName.name}`,
+                senderEmail: "leave_no-reply@adininworks.com", // Sender email
+                receipentEmail: FindingEmail[0].officialEmail, // Using the employee's official email
+                receipentEmpID: leaveData.managerEmpID,
+                status: "Unread",
+              });
+
+              //employee
               createNotification({
                 empID: leaveData.empID,
                 leaveType: leaveData.empLeaveType,
@@ -244,7 +269,7 @@ export const ViewForm = ({
                 managerName.name || "Not mention"
               }  and Supervisor ${
                 supervisorName.name || "Not mention"
-              }. View at : https://hr.adininworks.co `,
+              }. View at : https://employee.adininworks.co `,
               "leave_no-reply@adininworks.com",
               leaveData.empOfficialEmail
             );
@@ -261,7 +286,7 @@ export const ViewForm = ({
               }. View at : https://hr.adininworks.co `,
               "leave_no-reply@adininworks.com",
 
-              "hr_no-reply@adininworks.com"
+              "Hr-notification@adininworks.com"
             );
 
             // Create notification for Employeee
@@ -302,16 +327,13 @@ export const ViewForm = ({
                 managerName.name || "Not mentioned"
               }.`,
               senderEmail: "leave_no-reply@adininworks.com", // Sender email
-              receipentEmail: "hr_no-reply@adininworks.com", // Using the employee's official email
+              receipentEmail: "Hr-notification@adininworks.com", // Using the employee's official email
               status: "Unread",
             });
           }
 
           setNotification(true);
           setPath("/leaveManagement");
-          setTimeout(() => {
-            handleClickForToggle(false); // Redirect to the dashboard or another page
-          }, 3000);
         })
         .catch((err) => console.log(err));
     } else if (source === "Tickets") {
@@ -336,14 +358,14 @@ export const ViewForm = ({
           );
           // console.log(findingManagerEmail.officialEmail);
 
-          // //employee send email
+          //employee send email
           sendEmail(
             `Ticket Request ${status}`,
             `Dear  ${
               ticketData.empName || "Not mention"
             } , Your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${status} by HR ${
               personalInfo.name || "Not mention"
-            }. View at : https://hr.adininworks.co `,
+            }. View at : https://employee.adininworks.co `,
             "hr_no-reply@adininworks.com",
             ticketData.empOfficialEmail
           );
@@ -384,9 +406,6 @@ export const ViewForm = ({
 
           setNotification(true);
           setPath("/leaveManagement/requestTickets");
-          setTimeout(() => {
-            handleClickForToggle(false);
-          }, 3000);
         })
         .catch((err) => console.log(err));
     }
@@ -797,27 +816,6 @@ export const ViewForm = ({
               {/* Action Buttons */}
               <div className="flex justify-between px-5 mt-6">
                 {renderButtons()}
-                {/* {leaveData.managerStatus === "Pending" &&
-                (leaveData.supervisorStatus === "Pending" ||
-                  leaveData.supervisorStatus === "Approved") &&
-                userType !== "SuperAdmin" &&
-                userType !== "HR" &&
-                leaveData.managerStatus !== "Approved" && (
-                  <>
-                    <button
-                      className="bg-[#FEF116] p-2 px-3 rounded text-dark_grey text_size_6"
-                      onClick={handleApprove}
-                    >
-                      Approve
-                    </button>
-                    <button
-                      className="border border-grey p-2 px-5 rounded text-dark_grey text_size_6"
-                      onClick={handleReject}
-                    >
-                      Reject
-                    </button>
-                  </>
-                )} */}
               </div>
             </section>
           )}

@@ -43,19 +43,37 @@
     "referencetotransformerrootstackGraphQLAPI20497F53ApiId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackGraphQLAPINONEDS2BA9D1C8Name": {
-      "Type": "String"
-    },
     "referencetotransformerrootstackS3DeploymentBucket7592718ARef": {
       "Type": "String"
     },
     "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref": {
       "Type": "String"
     },
+    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStoreauth0FunctionQuerygetKeyValueStoreauth0FunctionAppSyncFunction0470BA2FFunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId": {
+      "Type": "String"
+    },
     "referencetotransformerrootstackauthRoleNameFB872D50Ref": {
       "Type": "String"
     },
     "referencetotransformerrootstackunauthRoleName49F3C1FERef": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreMutationcreateKeyValueStoreinit0FunctionMutationcreateKeyValueStoreinit0FunctionAppSyncFunctionD1C1F6DBFunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreMutationcreateKeyValueStoreauth0FunctionMutationcreateKeyValueStoreauth0FunctionAppSyncFunction988E554AFunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreMutationupdateKeyValueStoreinit0FunctionMutationupdateKeyValueStoreinit0FunctionAppSyncFunction6FD54BEFFunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptiononCreateKeyValueStoreauth0FunctionSubscriptiononCreateKeyValueStoreauth0FunctionAppSyncFuncti641AE5F6": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptionOnCreateKeyValueStoreDataResolverFnSubscriptionOnCreateKeyValueStoreDataResolverFnAppSyncFuncC74BAD12": {
       "Type": "String"
     }
   },
@@ -312,66 +330,6 @@
         "BastingPaintIAMRole725C393A"
       ]
     },
-    "QuerygetBastingPaintauth0FunctionQuerygetBastingPaintauth0FunctionAppSyncFunction81D041B5": {
-      "Type": "AWS::AppSync::FunctionConfiguration",
-      "Properties": {
-        "ApiId": {
-          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
-        },
-        "DataSourceName": {
-          "Ref": "referencetotransformerrootstackGraphQLAPINONEDS2BA9D1C8Name"
-        },
-        "FunctionVersion": "2018-05-29",
-        "Name": "QuerygetBastingPaintauth0Function",
-        "RequestMappingTemplateS3Location": {
-          "Fn::Join": [
-            "",
-            [
-              "s3://",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
-              },
-              "/",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
-              },
-              "/resolvers/Query.getBastingPaint.auth.1.req.vtl"
-            ]
-          ]
-        },
-        "ResponseMappingTemplate": "$util.toJson({})"
-      }
-    },
-    "QuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction9DB7B839": {
-      "Type": "AWS::AppSync::FunctionConfiguration",
-      "Properties": {
-        "ApiId": {
-          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
-        },
-        "DataSourceName": {
-          "Ref": "referencetotransformerrootstackGraphQLAPINONEDS2BA9D1C8Name"
-        },
-        "FunctionVersion": "2018-05-29",
-        "Name": "QuerygetBastingPaintpostAuth0Function",
-        "RequestMappingTemplateS3Location": {
-          "Fn::Join": [
-            "",
-            [
-              "s3://",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
-              },
-              "/",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
-              },
-              "/resolvers/Query.getBastingPaint.postAuth.1.req.vtl"
-            ]
-          ]
-        },
-        "ResponseMappingTemplate": "$util.toJson({})"
-      }
-    },
     "QueryGetBastingPaintDataResolverFnQueryGetBastingPaintDataResolverFnAppSyncFunctionC3E8D929": {
       "Type": "AWS::AppSync::FunctionConfiguration",
       "Properties": {
@@ -434,16 +392,10 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Fn::GetAtt": [
-                "QuerygetBastingPaintauth0FunctionQuerygetBastingPaintauth0FunctionAppSyncFunction81D041B5",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStoreauth0FunctionQuerygetKeyValueStoreauth0FunctionAppSyncFunction0470BA2FFunctionId"
             },
             {
-              "Fn::GetAtt": [
-                "QuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction9DB7B839",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -551,16 +503,10 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Fn::GetAtt": [
-                "QuerygetBastingPaintauth0FunctionQuerygetBastingPaintauth0FunctionAppSyncFunction81D041B5",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStoreauth0FunctionQuerygetKeyValueStoreauth0FunctionAppSyncFunction0470BA2FFunctionId"
             },
             {
-              "Fn::GetAtt": [
-                "QuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction9DB7B839",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -604,66 +550,6 @@
         },
         "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
         "TypeName": "Query"
-      }
-    },
-    "MutationcreateBastingPaintinit0FunctionMutationcreateBastingPaintinit0FunctionAppSyncFunction8FB8DA71": {
-      "Type": "AWS::AppSync::FunctionConfiguration",
-      "Properties": {
-        "ApiId": {
-          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
-        },
-        "DataSourceName": {
-          "Ref": "referencetotransformerrootstackGraphQLAPINONEDS2BA9D1C8Name"
-        },
-        "FunctionVersion": "2018-05-29",
-        "Name": "MutationcreateBastingPaintinit0Function",
-        "RequestMappingTemplateS3Location": {
-          "Fn::Join": [
-            "",
-            [
-              "s3://",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
-              },
-              "/",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
-              },
-              "/resolvers/Mutation.createBastingPaint.init.1.req.vtl"
-            ]
-          ]
-        },
-        "ResponseMappingTemplate": "$util.toJson({})"
-      }
-    },
-    "MutationcreateBastingPaintauth0FunctionMutationcreateBastingPaintauth0FunctionAppSyncFunction1BB76C22": {
-      "Type": "AWS::AppSync::FunctionConfiguration",
-      "Properties": {
-        "ApiId": {
-          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
-        },
-        "DataSourceName": {
-          "Ref": "referencetotransformerrootstackGraphQLAPINONEDS2BA9D1C8Name"
-        },
-        "FunctionVersion": "2018-05-29",
-        "Name": "MutationcreateBastingPaintauth0Function",
-        "RequestMappingTemplateS3Location": {
-          "Fn::Join": [
-            "",
-            [
-              "s3://",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
-              },
-              "/",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
-              },
-              "/resolvers/Mutation.createBastingPaint.auth.1.req.vtl"
-            ]
-          ]
-        },
-        "ResponseMappingTemplate": "$util.toJson({})"
       }
     },
     "MutationCreateBastingPaintDataResolverFnMutationCreateBastingPaintDataResolverFnAppSyncFunctionBF058C99": {
@@ -728,22 +614,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Fn::GetAtt": [
-                "MutationcreateBastingPaintinit0FunctionMutationcreateBastingPaintinit0FunctionAppSyncFunction8FB8DA71",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreMutationcreateKeyValueStoreinit0FunctionMutationcreateKeyValueStoreinit0FunctionAppSyncFunctionD1C1F6DBFunctionId"
             },
             {
-              "Fn::GetAtt": [
-                "MutationcreateBastingPaintauth0FunctionMutationcreateBastingPaintauth0FunctionAppSyncFunction1BB76C22",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreMutationcreateKeyValueStoreauth0FunctionMutationcreateKeyValueStoreauth0FunctionAppSyncFunction988E554AFunctionId"
             },
             {
-              "Fn::GetAtt": [
-                "QuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction9DB7B839",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -787,36 +664,6 @@
         },
         "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
         "TypeName": "Mutation"
-      }
-    },
-    "MutationupdateBastingPaintinit0FunctionMutationupdateBastingPaintinit0FunctionAppSyncFunction8F2A1BDA": {
-      "Type": "AWS::AppSync::FunctionConfiguration",
-      "Properties": {
-        "ApiId": {
-          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
-        },
-        "DataSourceName": {
-          "Ref": "referencetotransformerrootstackGraphQLAPINONEDS2BA9D1C8Name"
-        },
-        "FunctionVersion": "2018-05-29",
-        "Name": "MutationupdateBastingPaintinit0Function",
-        "RequestMappingTemplateS3Location": {
-          "Fn::Join": [
-            "",
-            [
-              "s3://",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
-              },
-              "/",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
-              },
-              "/resolvers/Mutation.updateBastingPaint.init.1.req.vtl"
-            ]
-          ]
-        },
-        "ResponseMappingTemplate": "$util.toJson({})"
       }
     },
     "MutationupdateBastingPaintauth0FunctionMutationupdateBastingPaintauth0FunctionAppSyncFunctionC3716CF9": {
@@ -932,10 +779,7 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Fn::GetAtt": [
-                "MutationupdateBastingPaintinit0FunctionMutationupdateBastingPaintinit0FunctionAppSyncFunction8F2A1BDA",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreMutationupdateKeyValueStoreinit0FunctionMutationupdateKeyValueStoreinit0FunctionAppSyncFunction6FD54BEFFunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -944,10 +788,7 @@
               ]
             },
             {
-              "Fn::GetAtt": [
-                "QuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction9DB7B839",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -1112,10 +953,7 @@
               ]
             },
             {
-              "Fn::GetAtt": [
-                "QuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction9DB7B839",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -1161,81 +999,6 @@
         "TypeName": "Mutation"
       }
     },
-    "SubscriptiononCreateBastingPaintauth0FunctionSubscriptiononCreateBastingPaintauth0FunctionAppSyncFunction9A5615C9": {
-      "Type": "AWS::AppSync::FunctionConfiguration",
-      "Properties": {
-        "ApiId": {
-          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
-        },
-        "DataSourceName": {
-          "Ref": "referencetotransformerrootstackGraphQLAPINONEDS2BA9D1C8Name"
-        },
-        "FunctionVersion": "2018-05-29",
-        "Name": "SubscriptiononCreateBastingPaintauth0Function",
-        "RequestMappingTemplateS3Location": {
-          "Fn::Join": [
-            "",
-            [
-              "s3://",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
-              },
-              "/",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
-              },
-              "/resolvers/Subscription.onCreateBastingPaint.auth.1.req.vtl"
-            ]
-          ]
-        },
-        "ResponseMappingTemplate": "$util.toJson({})"
-      }
-    },
-    "SubscriptionOnCreateBastingPaintDataResolverFnSubscriptionOnCreateBastingPaintDataResolverFnAppSyncFunctionA6586CBF": {
-      "Type": "AWS::AppSync::FunctionConfiguration",
-      "Properties": {
-        "ApiId": {
-          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
-        },
-        "DataSourceName": {
-          "Ref": "referencetotransformerrootstackGraphQLAPINONEDS2BA9D1C8Name"
-        },
-        "FunctionVersion": "2018-05-29",
-        "Name": "SubscriptionOnCreateBastingPaintDataResolverFn",
-        "RequestMappingTemplateS3Location": {
-          "Fn::Join": [
-            "",
-            [
-              "s3://",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
-              },
-              "/",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
-              },
-              "/resolvers/Subscription.onCreateBastingPaint.req.vtl"
-            ]
-          ]
-        },
-        "ResponseMappingTemplateS3Location": {
-          "Fn::Join": [
-            "",
-            [
-              "s3://",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
-              },
-              "/",
-              {
-                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
-              },
-              "/resolvers/Subscription.onCreateBastingPaint.res.vtl"
-            ]
-          ]
-        }
-      }
-    },
     "SubscriptiononCreateBastingPaintResolver": {
       "Type": "AWS::AppSync::Resolver",
       "Properties": {
@@ -1247,22 +1010,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Fn::GetAtt": [
-                "SubscriptiononCreateBastingPaintauth0FunctionSubscriptiononCreateBastingPaintauth0FunctionAppSyncFunction9A5615C9",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptiononCreateKeyValueStoreauth0FunctionSubscriptiononCreateKeyValueStoreauth0FunctionAppSyncFuncti641AE5F6"
             },
             {
-              "Fn::GetAtt": [
-                "QuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction9DB7B839",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
             },
             {
-              "Fn::GetAtt": [
-                "SubscriptionOnCreateBastingPaintDataResolverFnSubscriptionOnCreateBastingPaintDataResolverFnAppSyncFunctionA6586CBF",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptionOnCreateKeyValueStoreDataResolverFnSubscriptionOnCreateKeyValueStoreDataResolverFnAppSyncFuncC74BAD12"
             }
           ]
         },
@@ -1309,22 +1063,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Fn::GetAtt": [
-                "SubscriptiononCreateBastingPaintauth0FunctionSubscriptiononCreateBastingPaintauth0FunctionAppSyncFunction9A5615C9",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptiononCreateKeyValueStoreauth0FunctionSubscriptiononCreateKeyValueStoreauth0FunctionAppSyncFuncti641AE5F6"
             },
             {
-              "Fn::GetAtt": [
-                "QuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction9DB7B839",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
             },
             {
-              "Fn::GetAtt": [
-                "SubscriptionOnCreateBastingPaintDataResolverFnSubscriptionOnCreateBastingPaintDataResolverFnAppSyncFunctionA6586CBF",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptionOnCreateKeyValueStoreDataResolverFnSubscriptionOnCreateKeyValueStoreDataResolverFnAppSyncFuncC74BAD12"
             }
           ]
         },
@@ -1371,22 +1116,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Fn::GetAtt": [
-                "SubscriptiononCreateBastingPaintauth0FunctionSubscriptiononCreateBastingPaintauth0FunctionAppSyncFunction9A5615C9",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptiononCreateKeyValueStoreauth0FunctionSubscriptiononCreateKeyValueStoreauth0FunctionAppSyncFuncti641AE5F6"
             },
             {
-              "Fn::GetAtt": [
-                "QuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction9DB7B839",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
             },
             {
-              "Fn::GetAtt": [
-                "SubscriptionOnCreateBastingPaintDataResolverFnSubscriptionOnCreateBastingPaintDataResolverFnAppSyncFunctionA6586CBF",
-                "FunctionId"
-              ]
+              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptionOnCreateKeyValueStoreDataResolverFnSubscriptionOnCreateKeyValueStoreDataResolverFnAppSyncFuncC74BAD12"
             }
           ]
         },
@@ -1485,62 +1221,6 @@
             ]
           ]
         }
-      }
-    },
-    "transformerrootstackBastingPaintQuerygetBastingPaintauth0FunctionQuerygetBastingPaintauth0FunctionAppSyncFunction189A1CA9FunctionId": {
-      "Value": {
-        "Fn::GetAtt": [
-          "QuerygetBastingPaintauth0FunctionQuerygetBastingPaintauth0FunctionAppSyncFunction81D041B5",
-          "FunctionId"
-        ]
-      }
-    },
-    "transformerrootstackBastingPaintQuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction520CA580FunctionId": {
-      "Value": {
-        "Fn::GetAtt": [
-          "QuerygetBastingPaintpostAuth0FunctionQuerygetBastingPaintpostAuth0FunctionAppSyncFunction9DB7B839",
-          "FunctionId"
-        ]
-      }
-    },
-    "transformerrootstackBastingPaintMutationcreateBastingPaintinit0FunctionMutationcreateBastingPaintinit0FunctionAppSyncFunction5E76F8D6FunctionId": {
-      "Value": {
-        "Fn::GetAtt": [
-          "MutationcreateBastingPaintinit0FunctionMutationcreateBastingPaintinit0FunctionAppSyncFunction8FB8DA71",
-          "FunctionId"
-        ]
-      }
-    },
-    "transformerrootstackBastingPaintMutationcreateBastingPaintauth0FunctionMutationcreateBastingPaintauth0FunctionAppSyncFunctionFDDFD342FunctionId": {
-      "Value": {
-        "Fn::GetAtt": [
-          "MutationcreateBastingPaintauth0FunctionMutationcreateBastingPaintauth0FunctionAppSyncFunction1BB76C22",
-          "FunctionId"
-        ]
-      }
-    },
-    "transformerrootstackBastingPaintMutationupdateBastingPaintinit0FunctionMutationupdateBastingPaintinit0FunctionAppSyncFunction5A468F17FunctionId": {
-      "Value": {
-        "Fn::GetAtt": [
-          "MutationupdateBastingPaintinit0FunctionMutationupdateBastingPaintinit0FunctionAppSyncFunction8F2A1BDA",
-          "FunctionId"
-        ]
-      }
-    },
-    "transformerrootstackBastingPaintSubscriptiononCreateBastingPaintauth0FunctionSubscriptiononCreateBastingPaintauth0FunctionAppSyncFunction70B34728FunctionId": {
-      "Value": {
-        "Fn::GetAtt": [
-          "SubscriptiononCreateBastingPaintauth0FunctionSubscriptiononCreateBastingPaintauth0FunctionAppSyncFunction9A5615C9",
-          "FunctionId"
-        ]
-      }
-    },
-    "transformerrootstackBastingPaintSubscriptionOnCreateBastingPaintDataResolverFnSubscriptionOnCreateBastingPaintDataResolverFnAppSyncFunctionC91AA6D0FunctionId": {
-      "Value": {
-        "Fn::GetAtt": [
-          "SubscriptionOnCreateBastingPaintDataResolverFnSubscriptionOnCreateBastingPaintDataResolverFnAppSyncFunctionA6586CBF",
-          "FunctionId"
-        ]
       }
     }
   }

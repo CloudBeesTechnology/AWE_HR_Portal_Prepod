@@ -318,7 +318,16 @@ export const ViewHOsheet = ({
       ? editNestedData(data, getObject)
       : editFlatData(data, getObject);
 
-    setData(result);
+      const updatedData = result?.map((item) => {
+        // Check if jobLocaWhrs is a non-null, non-empty array and assign LOCATION if valid
+        if (Array.isArray(item.jobLocaWhrs) && item.jobLocaWhrs.length > 0) {
+          item.LOCATION = item.jobLocaWhrs[0].LOCATION;
+        } else {
+          item.LOCATION = null; // Default to null or any other fallback value
+        }
+        return item;
+      });
+    setData(updatedData);
   };
 
   const AllfieldData = useTableFieldData(titleName);
@@ -355,6 +364,7 @@ export const ViewHOsheet = ({
             fileType: "HO",
             status: "Pending",
             remarks: val.REMARKS || "",
+            companyName: val?.LOCATION,
           };
         });
       const finalResult = result.map((val) => {

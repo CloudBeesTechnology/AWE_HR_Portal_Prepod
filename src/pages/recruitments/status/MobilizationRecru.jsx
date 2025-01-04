@@ -43,6 +43,9 @@ export const MobilizationRecru = ({
     setIsReviewFormVisible(!isReviewFormVisible);
   };
 
+  console.log("hello world");
+  
+
   const getTotalCount = async () => {
     try {
       const result = await client.graphql({

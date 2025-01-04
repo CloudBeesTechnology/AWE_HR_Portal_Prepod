@@ -3,7 +3,7 @@ import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
 import { EditTimeSheet } from "./EditTimeSheet";
 import { generateClient } from "@aws-amplify/api";
 
-import { listBlngs, listEmpWorkInfos } from "../../graphql/queries";
+import { listBlngs, listEmpPersonalInfos, listEmpWorkInfos } from "../../graphql/queries";
 import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
 import { SuccessMessage } from "./ModelForSuccessMess/SuccessMessage";
 import { PopupForMissMatchExcelSheet } from "./ModelForSuccessMess/PopupForMissMatchExcelSheet";
@@ -105,75 +105,112 @@ export const ViewBLNGsheet = ({
   //   }
   // }, [excelData]);
   
-  async function fetchAllData(queryName) {
-    let allData = [];
-    let nextToken = null;
-  
-    do {
-      const response = await client.graphql({
-        query: queryName,
-        variables: { nextToken },
-      });
-  
-      const items = response.data[Object.keys(response.data)[0]].items; // Extract items
-      allData = [...allData, ...items]; // Append fetched items
-      nextToken = response.data[Object.keys(response.data)[0]].nextToken; // Get nextToken
-    } while (nextToken); // Continue if there's more data
-  
-    return allData;
-  }
-  
   useEffect(() => {
-    if (excelData) {
-      const fetchData = async () => {
-        try {
-          const dataPromise = new Promise((resolve, reject) => {
-            if (excelData) {
-              resolve(excelData);
-            } else {
-              setTimeout(() => {
-                reject("No data found after waiting.");
-              }, 5000);
+    try {
+      if (excelData) {
+        const fetchData = async () => {
+          // setLoading is removed
+          try {
+            const dataPromise = new Promise((resolve, reject) => {
+              if (excelData) {
+                resolve(excelData);
+              } else {
+                setTimeout(() => {
+                  reject("No data found after waiting.");
+                }, 5000);
+              }
+            });
+
+            const fetchedData = await dataPromise;
+
+            async function fetchAllData(queryName) {
+              let allData = [];
+              let nextToken = null;
+            
+              do {
+                const response = await client.graphql({
+                  query: queryName,
+                  variables: { nextToken },
+                });
+            
+                const items = response.data[Object.keys(response.data)[0]].items; // Extract items
+                allData = [...allData, ...items]; // Append fetched items
+                nextToken = response.data[Object.keys(response.data)[0]].nextToken; // Get nextToken
+              } while (nextToken); // Continue if there's more data
+            
+              return allData;
             }
-          });
-  
-          const fetchedData = await dataPromise;
-  
-          const fetchWorkInfo = async () => {
-            try {
-              // Fetch all data with pagination for work info
-              const empWorkInfos = await fetchAllData(listEmpWorkInfos);
-              const workInfo = empWorkInfos; // All work info data
-  
-              // Merge fetchedData with workInfo based on FID
-              const mergedData = fetchedData.map((item) => {
-                const workInfoItem = workInfo.find(
-                  (info) => info.sapNo == item.FID
-                );
-  
-                return {
-                  ...item,
-                  NORMALWORKINGHRSPERDAY: workInfoItem
-                    ? workInfoItem.workHrs[workInfoItem.workHrs.length - 1]
-                    : null,
-                };
-              });
-  
-              console.log(mergedData);
-              setData(mergedData); // Set merged data
-              setSecondaryData(mergedData);
-            } catch (err) {
-              console.error("Error fetching work info:", err.message);
-            }
-          };
-  
-          fetchWorkInfo();
-        } catch (err) {
-          console.error("Error in fetchData:", err.message);
-        }
-      };
-  
-      fetchData();
+            
+            const fetchWorkInfo = async () => {
+              try {
+                // Fetch all data with pagination
+                const [employeeInfo, empWorkInfos] = await Promise.all([
+                  fetchAllData(listEmpPersonalInfos),
+                  fetchAllData(listEmpWorkInfos),
+                ]);
+            
+                const empInfo = employeeInfo; // All employee personal info
+                const workInfo = empWorkInfos; // All employee work info
+            
+                // Remove sapNo from work info
+                const sapNoRemoved = workInfo.map(({ sapNo, ...rest }) => rest);
+            
+                const mergedDatas = empInfo
+                  .map((empInf) => {
+                    const interviewDetails = sapNoRemoved.find(
+                      (item) => item?.empID === empInf?.empID
+                    );
+            
+                    // Return null if all details are undefined
+                    if (!interviewDetails) {
+                      return null;
+                    }
+            
+                    return {
+                      ...empInf,
+                      ...interviewDetails,
+                    };
+                  })
+                  .filter((item) => item !== null);
+            
+                console.log(fetchedData);
+            
+                // Merge fetchedData with workInfo based on FID
+                const mergedData = fetchedData.map((item) => {
+                  const workInfoItem = mergedDatas.find(
+                    (info) => info?.sapNo == item?.FID
+                  );
+              
+               
+                  return {
+                    ...item,
+                    NORMALWORKINGHRSPERDAY: workInfoItem
+                      ? workInfoItem?.workHrs[workInfoItem.workHrs.length - 1]
+                      : null,
+                  };
+                });
+            
+                console.log(mergedData);
+            
+                // Set merged data in state
+                setData(mergedData);
+                setSecondaryData(mergedData);
+              } catch (error) {
+                console.error("Error fetching work info:", error.message);
+              }
+            };
+            
+            fetchWorkInfo();
+            
+          } catch (err) {
+          } finally {
+            // setLoading is removed ;
+          }
+        };
+        fetchData();
+      }
+    } catch (err) {
+      console.log("Error : ", err);
     }
   }, [excelData]);
   
@@ -387,7 +424,16 @@ export const ViewBLNGsheet = ({
       ? editNestedData(data, getObject)
       : editFlatData(data, getObject);
 
-    setData(result);
+      const updatedData = result?.map((item) => {
+        // Check if jobLocaWhrs is a non-null, non-empty array and assign LOCATION if valid
+        if (Array.isArray(item.jobLocaWhrs) && item.jobLocaWhrs.length > 0) {
+          item.LOCATION = item.jobLocaWhrs[0].LOCATION;
+        } else {
+          item.LOCATION = null; // Default to null or any other fallback value
+        }
+        return item;
+      });
+    setData(updatedData);
   };
 
   const AllFieldData = useTableFieldData(titleName);
@@ -415,6 +461,7 @@ export const ViewBLNGsheet = ({
             fileType: "BLNG",
             status: "Pending",
             remarks: val?.REMARKS || "",
+            companyName: val?.LOCATION,
           };
         });
 

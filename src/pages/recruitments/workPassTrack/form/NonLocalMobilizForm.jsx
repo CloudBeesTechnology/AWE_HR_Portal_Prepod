@@ -6,11 +6,15 @@ import { FileUploadField } from "../../../employees/medicalDep/FileUploadField";
 import { NonLocalMOBFormSchema } from "../../../../services/Validation";
 import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
 import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPTracking";
+import { UpdateInterviewData } from "../../../../services/updateMethod/UpdateInterview";
 import { statusOptions } from "../../../../utils/StatusDropdown";
+import { SpinLogo } from "../../../../utils/SpinLogo";
 
 export const NonLocalMobilizForm = ({ candidate }) => {
   const { interviewSchedules } = useFetchCandy();
   const { wpTrackingDetails } = useUpdateWPTracking();
+  const { interviewDetails } = UpdateInterviewData();
+  const [notification, setNotification] = useState(false);
 
   const [formData, setFormData] = useState({
     interview: {
@@ -56,7 +60,7 @@ export const NonLocalMobilizForm = ({ candidate }) => {
             agentname: interviewData.agentname,
             remarkNLMob: interviewData.remarkNLMob,
             mobFile: interviewData.mobFile,
-            status: interviewData.status,
+            status: interviewData.IDDetails.status,
           },
         });
 
@@ -115,7 +119,13 @@ export const NonLocalMobilizForm = ({ candidate }) => {
     const selectedInterviewData = interviewSchedules.find(
       (data) => data.tempID === candidate?.tempID
     );
+
+    const selectedInterviewDataStatus = interviewSchedules.find(
+      (data) => data.IDDetails.tempID === candidate?.tempID
+    );
+
     const interviewScheduleId = selectedInterviewData?.id;
+    const interviewScheduleStatusId = selectedInterviewDataStatus.IDDetails?.id;
 
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
@@ -140,6 +150,18 @@ export const NonLocalMobilizForm = ({ candidate }) => {
         },
       });
 
+      const interStatus = {
+        id: interviewScheduleStatusId, // Dynamically use the correct id
+        status: formData.interview.status,
+      };
+      setNotification(true);
+
+      console.log("Submitting interview details with status:", interStatus);
+
+      await interviewDetails({ InterviewValue: interStatus });
+
+      console.log("Interview status updated:", interStatus);
+
       // console.log("Response from WPTrackingDetails:", response);
 
       if (response.errors && response.errors.length > 0) {
@@ -151,84 +173,93 @@ export const NonLocalMobilizForm = ({ candidate }) => {
   };
 
   return (
-    <form onSubmit={handleSubmitTwo} className="p-5">
-      <div className="grid grid-cols-2 gap-5 mt-5">
-        <div>
-          <label htmlFor="mobSignDate">Date of Mobilization</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="date"
-            id="mobSignDate"
-            {...register("mobSignDate")}
-            value={formData.interview.mobSignDate}
-            onChange={(e) => handleInputChange("mobSignDate", e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="agentname">Agent Name</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="text"
-            id="agentname"
-            {...register("agentname")}
-            value={formData.interview.agentname}
-            onChange={(e) => handleInputChange("agentname", e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="remarkNLMob">Recruitment Remarks</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="text"
-            id="remarkNLMob"
-            {...register("remarkNLMob")}
-            value={formData.interview.remarkNLMob}
-            onChange={(e) => handleInputChange("remarkNLMob", e.target.value)}
-          />
-        </div>
-
-        <div className="">
-          <div className="flex items-center gap-5 mt-1">
-            <FileUploadField
-              label="Upload File"
-              className="p-4"
-              onChangeFunc={(e) => handleFileChange(e, "mobFile")}
-              accept="application/pdf"
-              register={register}
-              fileName={
-                uploadedFileNames.mobFile || extractFileName(MobilizUpload)
-              }
-              value={formData.interview.mobFile}
+    <>
+      <form onSubmit={handleSubmitTwo} className="p-5">
+        <div className="grid grid-cols-2 gap-5 mt-5">
+          <div>
+            <label htmlFor="mobSignDate">Date of Mobilization</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="date"
+              id="mobSignDate"
+              {...register("mobSignDate")}
+              value={formData.interview.mobSignDate}
+              onChange={(e) => handleInputChange("mobSignDate", e.target.value)}
             />
           </div>
-        </div>
-        <div>
-          <label htmlFor="status">Status</label>
-          <select
-            className="w-full border p-2 rounded mt-1"
-            id="status"
-            {...register("status")}
-            value={formData.interview.status}
-            onChange={(e) => handleInputChange("status", e.target.value)}
-          >
-            {/* <option value="">Select Status</option> */}
-            {statusOptions.map((status, index) => (
-              <option key={index} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+          <div>
+            <label htmlFor="agentname">Agent Name</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="text"
+              id="agentname"
+              {...register("agentname")}
+              value={formData.interview.agentname}
+              onChange={(e) => handleInputChange("agentname", e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="remarkNLMob">Recruitment Remarks</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="text"
+              id="remarkNLMob"
+              {...register("remarkNLMob")}
+              value={formData.interview.remarkNLMob}
+              onChange={(e) => handleInputChange("remarkNLMob", e.target.value)}
+            />
+          </div>
 
-      <div className="mt-5 flex justify-center">
-        <button
-          type="submit"
-          className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
-        >
-          Submit
-        </button>
-      </div>
-    </form>
+          <div className="">
+            <div className="flex items-center gap-5 mt-1">
+              <FileUploadField
+                label="Upload File"
+                className="p-4"
+                onChangeFunc={(e) => handleFileChange(e, "mobFile")}
+                accept="application/pdf"
+                register={register}
+                fileName={
+                  uploadedFileNames.mobFile || extractFileName(MobilizUpload)
+                }
+                value={formData.interview.mobFile}
+              />
+            </div>
+          </div>
+          <div>
+            <label htmlFor="status">Status</label>
+            <select
+              className="w-full border p-2 rounded mt-1"
+              id="status"
+              {...register("status")}
+              value={formData.interview.status}
+              onChange={(e) => handleInputChange("status", e.target.value)}
+            >
+              {/* <option value="">Select Status</option> */}
+              {statusOptions.map((status, index) => (
+                <option key={index} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="mt-5 flex justify-center">
+          <button
+            type="submit"
+            className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
+          >
+            Submit
+          </button>
+        </div>
+      </form>
+      {notification && (
+        <SpinLogo
+          text="Candidate details updated successfully"
+          notification={notification}
+          path="/recrutiles/workpasstracking"
+        />
+      )}
+    </>
   );
 };

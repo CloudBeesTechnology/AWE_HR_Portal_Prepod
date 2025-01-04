@@ -12,7 +12,8 @@ import { useOutletContext } from 'react-router-dom';
 
 export const Nlms = () => {
   const { searchResultData } = useOutletContext();
-  const { DNData } = useContext(DataSupply);
+  
+  const { DNData,dropDownVal } = useContext(DataSupply);
   const { uploadNlmsFun } = UpdateNlmsData();
 
   const [notification, setNotification] = useState(false);
@@ -133,6 +134,10 @@ export const Nlms = () => {
     return date ? new Date(date).toLocaleDateString('en-CA') : null;
   };
 
+  const workPermitDD = dropDownVal[0]?.workPermitDD.map((item) => ({
+    value: item,
+    label: item,
+  }));
   const onSubmit = async (data) => {
     try {
 
@@ -205,20 +210,7 @@ export const Nlms = () => {
           register={register}
           name="permitType"
           type="select"
-          options={[
-            { value: 'Foreign Worker License (LPA)', label: 'Foreign Worker License (LPA)' },
-            { value: 'Foreign Worker License (SAWP)', label: 'Foreign Worker License (SAWP)' },
-            { value: 'Foreign Worker License Additional (LPA)', label: 'Foreign Worker License Additional (LPA)' },
-            { value: 'Foreign Worker License Additional (SAWP)', label: 'Foreign Worker License Additional (SAWP)' },
-            { value: 'Foreign Worker License Renewal (LPA)', label: 'Foreign Worker License Renewal (LPA)' },
-            { value: 'Foreign Worker License Renewal (SAWP)', label: 'Foreign Worker License Renewal (SAWP)' },
-            { value: 'Foreign Worker License Change Salary/Job Title (LPA)', label: 'Foreign Worker License Change Salary/Job Title (LPA)' },
-            { value: 'Foreign Worker License Cancellation (LPA)', label: 'Foreign Worker License Cancellation (LPA)' },
-            { value: 'Foreign Worker License Cancellation (SAWP)', label: 'Foreign Worker License Cancellation (SAWP)' },
-            { value: 'Foreign Worker License Cancellation SAWP to LPA', label: 'Foreign Worker License Cancellation SAWP to LPA' },
-            { value: 'Foreign Worker License Transfer of Contract (LPA)', label: 'Foreign Worker License Transfer of Contract (LPA)' },
-            // Add remaining options here
-          ]}
+          options={workPermitDD}
           errors={errors}
         />
 

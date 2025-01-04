@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from "react";
+import AweLogo from "../../../../assets/logo/logo-with-name.svg";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { uploadDocs } from "../../../../services/uploadDocsS3/UploadDocs";
 import { FileUploadField } from "../../../employees/medicalDep/FileUploadField";
 import { NlmsFormSchema } from "../../../../services/Validation";
 import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPTracking";
+import { UpdateInterviewData } from "../../../../services/updateMethod/UpdateInterview";
 import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
 import { statusOptions } from "../../../../utils/StatusDropdown";
+import { SpinLogo } from "../../../../utils/SpinLogo";
 
 export const NlmsForm = ({ candidate }) => {
   const { interviewSchedules } = useFetchCandy();
-  const { wpTrackingDetails, isLoading, notification, error } =
-    useUpdateWPTracking(); // Use the wpTrackingDetails function
+  const { interviewDetails } = UpdateInterviewData();
+  const { wpTrackingDetails, isLoading, error } = useUpdateWPTracking();
+  const [notification, setNotification] = useState(false); 
   const [formData, setFormData] = useState({
     interview: {
       id: "",
@@ -42,12 +46,11 @@ export const NlmsForm = ({ candidate }) => {
     resolver: yupResolver(NlmsFormSchema),
   });
 
-  const NlmsUpload = watch("nlmsfile");
+  const NlmsUpload = watch("nlmsFile");
 
   useEffect(() => {
-    // Log to see if interviewSchedules has data
+ 
     // console.log("interviewSchedules:", interviewSchedules);
-
     if (interviewSchedules.length > 0) {
       // Find the interviewData for the candidate
       const interviewData = interviewSchedules.find(
@@ -67,15 +70,11 @@ export const NlmsForm = ({ candidate }) => {
             nlmsexpirydate: interviewData.nlmsexpirydate,
             ldreferenceno: interviewData.ldreferenceno,
             nlmsfile: interviewData.nlmsfile,
+            status: interviewData.IDDetails.status,
           },
         });
         // console.log("Form data set:", {
         //   nlmssubmitdate: interviewData.nlmssubmitdate,
-        //   submissionrefrenceno: interviewData.submissionrefrenceno,
-        //   nlmsapprovedate: interviewData.nlmsapprovedate,
-        //   nlmsexpirydate: interviewData.nlmsexpirydate,
-        //   ldreferenceno: interviewData.ldreferenceno,
-        //   nlmsfile: interviewData.nlmsfile,
         // });
 
         // Check if sawpFile exists and update the file names
@@ -95,11 +94,6 @@ export const NlmsForm = ({ candidate }) => {
     }
   }, [interviewSchedules, candidate.tempID]);
 
-  useEffect(() => {
-    // Debugging log to track formData state
-    // console.log("Initial formData:", formData);
-  }, [formData]);
-
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
       return url.split("/").pop(); // Extract the file name from URL
@@ -112,8 +106,8 @@ export const NlmsForm = ({ candidate }) => {
     setValue(type, file); // Set file value for validation
     if (file) {
       console.log("File selected:", file.name);
-      if (type === "nlmsfile") {
-        await uploadDocs(file, "nlmsfile", setUploadedNlms, "personName");
+      if (type === "nlmsFile") {
+        await uploadDocs(file, "nlmsFile", setUploadedNlms, "personName");
 
         setUploadedFileNames((prev) => ({
           ...prev,
@@ -142,12 +136,18 @@ export const NlmsForm = ({ candidate }) => {
     const selectedInterviewData = interviewSchedules.find(
       (data) => data.tempID === candidate?.tempID
     );
-    const interviewScheduleId = selectedInterviewData?.id;
 
-    // console.log("Selected Interview Data:", selectedInterviewData);
-    // console.log("Interview Schedule ID:", interviewScheduleId);
-    // console.log("Form Data before submission:", formData);
-    // console.log("Uploaded Nlms File:", uploadedNlms.nlmsFile);
+    const selectedInterviewDataStatus = interviewSchedules.find(
+      (data) => data.IDDetails.tempID === candidate?.tempID
+    );
+
+    const interviewScheduleId = selectedInterviewData?.id;
+    const interviewScheduleStatusId = selectedInterviewDataStatus.IDDetails?.id;
+
+    console.log("Selected Interview Data:", selectedInterviewData);
+    console.log("Interview Schedule ID:", interviewScheduleId);
+    console.log("Form Data before submission:", formData);
+    console.log("Uploaded Nlms File:", uploadedNlms.nlmsFile);
 
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
@@ -163,9 +163,23 @@ export const NlmsForm = ({ candidate }) => {
           nlmsapprovedate: formData.interview.nlmsapprovedate,
           nlmsexpirydate: formData.interview.nlmsexpirydate,
           ldreferenceno: formData.interview.ldreferenceno,
-          nlmsfile: uploadedNlms.nlmsFile ? uploadedNlms.nlmsFile : "",
+          nlmsfile: uploadedNlms.nlmsFile
+            ? uploadedNlms.nlmsFile
+            : formData.interview.nlmsfile,
         },
       });
+
+      const interStatus = {
+        id: interviewScheduleStatusId, 
+        status: formData.interview.status,
+      };
+      setNotification(true);
+
+      console.log("Submitting interview details with status:", interStatus);
+
+      await interviewDetails({ InterviewValue: interStatus });
+
+      console.log("Interview status updated:", interStatus);
 
       // console.log("WPTracking response:", response);
     } catch (err) {
@@ -174,120 +188,131 @@ export const NlmsForm = ({ candidate }) => {
   };
 
   return (
-    <form onSubmit={handleSubmitTwo} className="p-5">
-      <div className="grid grid-cols-2 gap-5 mt-5">
-        <div>
-          <label htmlFor="nlmssubmitdate">Date of Submission</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="date"
-            id="nlmssubmitdate"
-            {...register("nlmssubmitdate")}
-            value={formData.interview.nlmssubmitdate}
-            onChange={(e) =>
-              handleInputChange("nlmssubmitdate", e.target.value)
-            }
-          />
-        </div>
-        <div>
-          <label htmlFor="submissionrefrenceno">
-            Submission Reference Number
-          </label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="text"
-            id="submissionrefrenceno"
-            {...register("submissionrefrenceno")}
-            value={formData.interview.submissionrefrenceno}
-            onChange={(e) =>
-              handleInputChange("submissionrefrenceno", e.target.value)
-            }
-          />
-        </div>
-        <div>
-          <label htmlFor="nlmsapprovedate">Date of Approval</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="date"
-            id="nlmsapprovedate"
-            {...register("nlmsapprovedate")}
-            value={formData.interview.nlmsapprovedate}
-            onChange={(e) =>
-              handleInputChange("nlmsapprovedate", e.target.value)
-            }
-          />
-        </div>
-        <div>
-          <label htmlFor="nlmsexpirydate">Valid Until</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="date"
-            id="nlmsexpirydate"
-            {...register("nlmsexpirydate")}
-            value={formData.interview.nlmsexpirydate}
-            onChange={(e) =>
-              handleInputChange("nlmsexpirydate", e.target.value)
-            }
-          />
-        </div>
-        <div>
-          <label htmlFor="ldreferenceno">LD Reference Number</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="text"
-            id="ldreferenceno"
-            {...register("ldreferenceno")}
-            value={formData.interview.ldreferenceno}
-            onChange={(e) => handleInputChange("ldreferenceno", e.target.value)}
-          />
-        </div>
-
-        <div>
-          <div className="flex items-center gap-5 mt-1">
-            <FileUploadField
-              label="Upload File"
-              className="p-4"
-              onChangeFunc={(e) => handleFileChange(e, "nlmsfile")}
-              accept="application/pdf"
-              register={register}
-              fileName={
-                uploadedFileNames.nlmsFile || extractFileName(NlmsUpload)
+    <>
+      <form onSubmit={handleSubmitTwo} className="p-5">
+        <div className="grid grid-cols-2 gap-5 mt-5">
+          <div>
+            <label htmlFor="nlmssubmitdate">Date of Submission</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="date"
+              id="nlmssubmitdate"
+              {...register("nlmssubmitdate")}
+              value={formData.interview.nlmssubmitdate}
+              onChange={(e) =>
+                handleInputChange("nlmssubmitdate", e.target.value)
               }
-              value={formData.interview.nlmsfile}
             />
           </div>
+          <div>
+            <label htmlFor="submissionrefrenceno">
+              Submission Reference Number
+            </label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="text"
+              id="submissionrefrenceno"
+              {...register("submissionrefrenceno")}
+              value={formData.interview.submissionrefrenceno}
+              onChange={(e) =>
+                handleInputChange("submissionrefrenceno", e.target.value)
+              }
+            />
+          </div>
+          <div>
+            <label htmlFor="nlmsapprovedate">Date of Approval</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="date"
+              id="nlmsapprovedate"
+              {...register("nlmsapprovedate")}
+              value={formData.interview.nlmsapprovedate}
+              onChange={(e) =>
+                handleInputChange("nlmsapprovedate", e.target.value)
+              }
+            />
+          </div>
+          <div>
+            <label htmlFor="nlmsexpirydate">Valid Until</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="date"
+              id="nlmsexpirydate"
+              {...register("nlmsexpirydate")}
+              value={formData.interview.nlmsexpirydate}
+              onChange={(e) =>
+                handleInputChange("nlmsexpirydate", e.target.value)
+              }
+            />
+          </div>
+          <div>
+            <label htmlFor="ldreferenceno">LD Reference Number</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="text"
+              id="ldreferenceno"
+              {...register("ldreferenceno")}
+              value={formData.interview.ldreferenceno}
+              onChange={(e) =>
+                handleInputChange("ldreferenceno", e.target.value)
+              }
+            />
+          </div>
+
+          <div>
+            <div className="flex items-center gap-5 mt-1">
+              <FileUploadField
+                label="Upload File"
+                className="p-4"
+                onChangeFunc={(e) => handleFileChange(e, "nlmsFile")}
+                accept="application/pdf"
+                register={register}
+                fileName={
+                  uploadedFileNames.nlmsFile || extractFileName(NlmsUpload)
+                }
+                value={formData.interview.nlmsfile}
+              />
+            </div>
+          </div>
+          <div>
+            <label htmlFor="status">Status</label>
+            <select
+              className="w-full border p-2 rounded mt-1"
+              id="status"
+              {...register("status")}
+              value={formData.interview.status}
+              onChange={(e) => handleInputChange("status", e.target.value)}
+            >
+              {/* <option value="">Select Status</option> */}
+              {statusOptions.map((status, index) => (
+                <option key={index} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-        <div>
-          <label htmlFor="status">Status</label>
-          <select
-            className="w-full border p-2 rounded mt-1"
-            id="status"
-            {...register("status")}
-            value={formData.interview.status}
-            onChange={(e) => handleInputChange("status", e.target.value)}
+
+        {isLoading && <div>Loading...</div>}
+        {notification && <div>Data updated successfully!</div>}
+        {error && <div>Error: {error.message}</div>}
+
+        <div className="mt-5 flex justify-center">
+          <button
+            type="submit"
+            className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
           >
-            {/* <option value="">Select Status</option> */}
-            {statusOptions.map((status, index) => (
-              <option key={index} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
+            Submit
+          </button>
         </div>
-      </div>
-
-      {isLoading && <div>Loading...</div>}
-      {notification && <div>Data updated successfully!</div>}
-      {error && <div>Error: {error.message}</div>}
-
-      <div className="mt-5 flex justify-center">
-        <button
-          type="submit"
-          className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
-        >
-          Submit
-        </button>
-      </div>
-    </form>
+      </form>
+      {notification && (
+        <SpinLogo
+          text="Candidate details updated successfully"
+          notification={notification}
+          path="/recrutiles/workpasstracking"
+        />
+      )}
+    </>
   );
 };

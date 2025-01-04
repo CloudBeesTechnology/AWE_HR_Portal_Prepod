@@ -16,7 +16,7 @@ const client = generateClient();
 export const ViewTimeSheet = () => {
   const prevCategoryRef = useRef(null);
 
-  const [categoryFilter, setCategoryFilter] = useState("BLNG");
+  const [categoryFilter, setCategoryFilter] = useState("Offshore");
   const [toggleClick, setToggleClick] = useState(false);
 
   const [selectedCategory, setSelectedCategory] = useState("All");

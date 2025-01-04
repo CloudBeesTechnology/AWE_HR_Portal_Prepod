@@ -109,7 +109,7 @@ const fetchAllData = async (queryName) => {
 export const SendDataToManager = async (filterPending) => {
   try {
     const loginAuth = localStorage.getItem("userID")?.toUpperCase();
-
+console.log(loginAuth)
     const fetchData = async () => {
       // Fetch all paginated data from GraphQL queries
       const [empPersonalInfos, empWorkInfos, usersData] = await Promise.all([
@@ -158,7 +158,7 @@ export const SendDataToManager = async (filterPending) => {
       return getOneObject.some((manager) => {
         const lastDepartment =
           manager.department[manager.department.length - 1]; // Get the latest department
-
+  
         return (
           pendingItem.assignTo === manager.empBadgeNo
           // pendingItem.mdepartment === lastDepartment

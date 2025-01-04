@@ -8,7 +8,7 @@ import { NavigateLM } from "./NavigateLM";
 import { DateFormat } from "../../utils/DateFormat";
 
 export const EmpLeaveBalance = () => {
-  const { mergedData, userType } = useOutletContext();
+  const { mergedData, userType, loading } = useOutletContext();
 
   const [showPopup, setShowPopup] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
@@ -159,6 +159,16 @@ useEffect(() => {
       setHasSearched(true);
     }
   };
+
+  if (loading) {
+    return (
+      <div>
+        <div className="flex items-center justify-center h-[60vh]">
+          <p className="text-sm font-semibold">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <section className="relative w-full">

@@ -172,10 +172,10 @@ export const User = () => {
           </div>
         </section>
         <div className="flex flex-col flex-grow">
-          <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl ">
-            <table className="w-full mx-auto bg-white pt-10 ">
-              <thead className="px-5">
-                <tr className="text_size_5 text-dark_grey px-5">
+          <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto  px-5">
+            <table className="w-full mx-auto bg-white pt-10">
+              <thead className="px-5 bg-[#939393] text-white sticky top-0 left-0">
+                <tr className="text_size_5  px-5">
 
                   <th className="px-5 text-start py-3">S.No</th>
                   <th className="px-5 text-start py-3">EMP ID</th>
@@ -192,29 +192,29 @@ export const User = () => {
                   filteredData.map((val, i) => {
                     const displayIndex=startIndex+i+1
                     return (
-                      <tr key={i}>
-                        <td className="px-5 py-2 ">{displayIndex}</td>
-                        <td className="px-5 py-2">{val.empID}</td>
-                        <td className="px-5 py-2">{val.name}</td>
-                        <td className="px-5 py-2">{val.selectType}</td>
-                        <td className="px-5 py-2">{val.officialEmail}</td>
-                        <td className="px-5 w-[200px] py-2 text-center">
+                      <tr key={i} className="shadow-lg ">
+                        <td className="px-5 py-3 ">{displayIndex}</td>
+                        <td className="px-5 py-3">{val.empID}</td>
+                        <td className="px-5 py-3 break-words overflow-hidden">{val.name}</td>
+                        <td className="px-5 py-3">{val.selectType}</td>
+                        <td className="px-5 py-3 break-words overflow-hidden">{val.officialEmail}</td>
+                        <td className="px-5 w-[200px] py-3 text-center">
                           <input
                             type="password"
-                            className="outline-none w-full"
+                            className="outline-none w-full break-words overflow-hidden"
                             value={val.password}
                             readOnly
                           />
                         </td>
-                        <td className="center">
+                        <td className=" py-3">
                           <span
-                            className=" text-[blue] border-b-2"
+                            className=" text-[blue] underline flex justify-center"
                             onClick={() => {
                               ViewFormShow();
                               setSendData(val);
                             }}
                           >
-                            {" "}
+                        
                             View
                           </span>
                         </td>

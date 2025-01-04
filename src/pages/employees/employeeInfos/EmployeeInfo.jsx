@@ -39,12 +39,15 @@ export const EmployeeInfo = () => {
   }, []);
   const { SubmitEIData, errorEmpID } = EmpInfoFunc();
   const { UpdateEIValue } = UpdateEmpInfo();
-  const { empPIData, IDData } = useContext(DataSupply);
+  const { empPIData, IDData,dropDownVal} = useContext(DataSupply);
+  console.log(dropDownVal);
+  
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [selectedNationality, setSelectedNationality] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedRace, setSelectedRace] = useState("");
+  const [selectedReligion, setSelectedReligion] = useState("");
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [notification, setNotification] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState({
@@ -79,6 +82,9 @@ export const EmployeeInfo = () => {
   };
   const handleRaceChange = (e) => {
     setSelectedRace(e.target.value);
+  };
+  const handleRelegianChange = (e) => {
+    setSelectedReligion(e.target.value);
   };
 
   const {
@@ -253,44 +259,6 @@ export const EmployeeInfo = () => {
     }
   };
 
-  
-  // const cleanFamilyDetailsString = (familyDetailsString) => {
-  //   try {
-  //     // Ensure it's a string before applying .trim() and other string methods
-  //     if (typeof familyDetailsString !== 'string') {
-  //       console.error("Expected a string, but got:", typeof familyDetailsString);
-  //       return []; // Return empty array if the value is not a string
-  //     }
-  
-  //     // Log the raw value to inspect the format
-  //     console.log("Raw familyDetails:", familyDetailsString);
-  
-  //     // Remove the surrounding quotes if they exist
-  //     let cleanedString = familyDetailsString.trim();
-  
-  //     if (cleanedString.startsWith('"') && cleanedString.endsWith('"')) {
-  //       cleanedString = cleanedString.slice(1, -1); // Remove surrounding quotes
-  //     }
-  
-  //     // Replace escaped quotes (e.g., \") with regular quotes (")
-  //     cleanedString = cleanedString.replace(/\\"/g, '"');
-  
-  //     // Add double quotes around property names (e.g., name to "name")
-  //     cleanedString = cleanedString.replace(/([a-zA-Z0-9_]+)(:)/g, '"$1"$2');
-  
-  //     // After cleaning, the string should be a valid JSON array
-  //     if (cleanedString.startsWith("[") && cleanedString.endsWith("]")) {
-  //       // If it's an array-like string, parse it directly
-  //       return JSON.parse(cleanedString);
-  //     } else {
-  //       // If it's not in array format, wrap it in an array and parse it
-  //       return [JSON.parse(cleanedString)];
-  //     }
-  //   } catch (error) {
-  //     console.error("Error cleaning and parsing familyDetails:", error);
-  //     return []; // Return empty array if parsing fails
-  //   }
-  // };
   const cleanFamilyDetailsString = (familyDetailsInput) => {
     try {
       // Check if it's already a string
@@ -341,34 +309,8 @@ export const EmployeeInfo = () => {
     }
   };
   
-  
 const searchResult = async (result) => {
   console.log(result); // Log the result to check the fetched data
-
-  // Map the gender to the correct value (Male, Female, or whatever the input value is)
-  const genderValue = result.gender === "M" || result.gender === "Male" ? "MALE"
-    : result.gender === "F" || result.gender === "Female" ? "FEMALE"
-    : result.gender;
-
-  console.log("Gender value being passed: ", genderValue); // Debugging log
-
-  // Set the gender value in the form
-  setValue("gender", genderValue);
-
-  // Map the bwnIcColour to its respective value (Yellow, Red, Green, Purple)
-  const bwnIcColourValue = result.bwnIcColour === "Y" || result.bwnIcColour ==="Yellow" ? "YELLOW"
-    : result.bwnIcColour === "R" || result.bwnIcColour ==="Red" ? "RED"
-    : result.bwnIcColour === "G" || result.bwnIcColour ==="Green"? "GREEN"
-    : result.bwnIcColour === "P" || result.bwnIcColour ==="Purple"? "PURPLE"
-    : result.bwnIcColour;
-  setValue("bwnIcColour", bwnIcColourValue);
-
-  const maritalValue = result.marital === "S" || result.marital ==="Single" ? "SINGLE"
-    : result.marital === "M" || result.marital ==="Married" ? "MARRIED"
-    : result.marital === "W" || result.marital ==="Widow"? "WIDOW"
-    : result.marital === "D" || result.marital ==="Divorce"? "DIVORCE"
-    : result.marital;
-  setValue("marital", maritalValue);
 
   const keysToSet = [
     "empID", "driveLic", "inducBrief", "myIcNo", "nationality", "nationalCat", 
@@ -382,9 +324,7 @@ const searchResult = async (result) => {
   // Set values for other fields
   keysToSet.forEach((key) => {
     // If the key is "gender" or "bwnIcColour", use the mapped value
-    const valueToSet = key === "gender" ? genderValue
-      : key === "bwnIcColour" ? bwnIcColourValue :  key === "marital" ? maritalValue
-      : result[key];
+    const valueToSet = result[key];
     console.log(`Setting value for ${key}:`, valueToSet);
     setValue(key, valueToSet);
   });
@@ -482,7 +422,7 @@ const searchResult = async (result) => {
         setUploadedFiles((prev) => ({ ...prev, [field]: parsedFiles }));
         setUploadedFileNames((prev) => ({ ...prev, [field]: lastFileName || "" }));
       } catch (error) {
-        console.error(`Failed to parse ${field}:`, error);
+        // console.error(`Failed to parse ${field}:`, error);
       }
     }
   });
@@ -499,101 +439,7 @@ const searchResult = async (result) => {
     return fileName;
   };
 
-  // const onSubmit = async (data) => {
-  //   // console.log(data);
-  //   data.contractType = contractTypes;
-  //   data.empType = empTypes;
-
-  //   const formatDate = (date) =>
-  //     date ? new Date(date).toLocaleDateString("en-CA") : null;
-
-  //   const bwnIcExpiry = formatDate(data.bwnIcExpiry);
-  //   const ppIssued = formatDate(data.ppIssued);
-  //   const ppExpiry = formatDate(data.ppExpiry);
-
-  //   try {
-  //     const checkingPITable = empPIData.find(
-  //       (match) => match.empID === data.empID
-  //     );
-  //     const checkingIDTable = IDData.find(
-  //       (match) => match.empID === data.empID
-  //     );
-
-  //     if (checkingIDTable && checkingPITable) {
-  //       const updateFieldArray = (existingArray, newValue) => [
-  //         ...new Set([...(existingArray || []), newValue]),
-  //       ];
-
-  //       const updatedbwnIcExpiry = updateFieldArray(
-  //         checkingIDTable.bwnIcExpiry,
-  //         bwnIcExpiry
-  //       );
-  //       const updatedppExpiry = updateFieldArray(
-  //         checkingIDTable.ppExpiry,
-  //         ppExpiry
-  //       );
-  //       const updatedppIssued = updateFieldArray(
-  //         checkingIDTable.ppIssued,
-  //         ppIssued
-  //       );
-
-  //       const collectValue = {
-  //         ...data,
-  //         profilePhoto: uploadedDocs.profilePhoto,
-  //         inducBriefUp: uploadedDocs.inducBriefUp,
-  //         bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
-  //         bwnIcExpiry: updatedbwnIcExpiry,
-  //         ppIssued: updatedppIssued,
-  //         ppExpiry: updatedppExpiry,
-  //         applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
-  //         cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
-  //         loiUpload: JSON.stringify(uploadedFiles.loiUpload),
-  //         myIcUpload: JSON.stringify(uploadedFiles.myIcUpload),
-  //         paafCvevUpload: JSON.stringify(uploadedFiles.paafCvevUpload),
-  //         ppUpload: JSON.stringify(uploadedFiles.ppUpload),
-  //         supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
-  //         familyDetails: JSON.stringify(data.familyDetails),
-  //         PITableID: checkingPITable.id,
-  //         IDTable: checkingIDTable.id,
-  //       };
-  //       // console.log("AZQ Update", collectValue);
-
-  //       await UpdateEIValue({ collectValue });
-  //       setShowTitle("Employee Personal Info updated successfully");
-  //       setNotification(true);
-  //     } else {
-  //       const [updatedbwnIcExpiry, updatedppExpiry, updatedppIssued] = [
-  //         [bwnIcExpiry],
-  //         [ppExpiry],
-  //         [ppIssued],
-  //       ].map((arr) => [...new Set(arr)]);
-
-  //       const empValue = {
-  //         ...data,
-  //         profilePhoto: uploadedDocs.profilePhoto,
-  //         inducBriefUp: uploadedDocs.inducBriefUp,
-  //         bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
-  //         bwnIcExpiry: updatedbwnIcExpiry,
-  //         ppIssued: updatedppIssued,
-  //         ppExpiry: updatedppExpiry,
-  //         applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
-  //         cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
-  //         loiUpload: JSON.stringify(uploadedFiles.loiUpload),
-  //         myIcUpload: JSON.stringify(uploadedFiles.myIcUpload),
-  //         paafCvevUpload: JSON.stringify(uploadedFiles.paafCvevUpload),
-  //         ppUpload: JSON.stringify(uploadedFiles.ppUpload),
-  //         supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
-  //         familyDetails: JSON.stringify(data.familyDetails),
-  //       };
-  //       // console.log("AZ", empValue);
-  //       await SubmitEIData({ empValue });
-  //       setShowTitle("Employee Personal Info saved successfully");
-  //       setNotification(true);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+  
   const onSubmit = async (data) => {
     data.contractType = contractTypes;
     data.empType = empTypes;
@@ -608,7 +454,12 @@ const searchResult = async (result) => {
     const removeLeadingNulls = (array, newValue) => {
       const newArray = [...(array || []), newValue]; // Combine old array and new value
       let firstValidIndex = newArray.findIndex((item) => item !== null);
-      return firstValidIndex !== -1 ? newArray.slice(firstValidIndex) : []; // Remove leading nulls
+      if (firstValidIndex !==-1){
+        return newArray.map((item)=>(item === null ? "N/A" : item))
+      }
+      else{
+        return []
+      }
     };
   
     try {
@@ -718,7 +569,7 @@ const searchResult = async (result) => {
       </div>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className=" flex flex-col justify-center "
+        className=" flex flex-col justify-center"
       >
         {/* Row1 */}
         <div className="flex justify-between items-center py-7 mt-2">
@@ -813,11 +664,16 @@ const searchResult = async (result) => {
           register={register}
           errors={errors}
           handleRaceChange={handleRaceChange}
+          handleRelegianChange={handleRelegianChange}
           selectedRace={selectedRace}
+          selectedReligion={selectedReligion}
           watch={watch}
+          dropDownVal={dropDownVal}
+
         />
         {/* Row5 */}
-        <RowFive register={register} errors={errors} />
+        <RowFive register={register} errors={errors} dropDownVal={dropDownVal}
+        />
         {/* Row6 */}
         <RowSix
           register={register}
@@ -833,7 +689,7 @@ const searchResult = async (result) => {
         {/* Row8 */}
         <RowEight register={register} errors={errors} />
         {/* Row9 */}
-        <RowNine register={register} errors={errors} />
+        <RowNine register={register} errors={errors} dropDownVal={dropDownVal}/>
         {/* Row10 */}
         <RowTen register={register} errors={errors} />
         {/* Row11 */}

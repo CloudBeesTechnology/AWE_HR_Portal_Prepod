@@ -15,6 +15,7 @@ export const LMTable = () => {
     userType,
     mergedData,
     userID,
+    loading
   } = useOutletContext();
 
   const [lastUploadUrl, setPPLastUP] = useState(""); // State to store the last uploaded file's URL
@@ -28,7 +29,7 @@ export const LMTable = () => {
   const [errorState, setErrorState] = useState({
     searchError: false,
     dateError: false,
-    noResults: false
+    noResults: false,
   });
   // console.log(mergedData);
 
@@ -49,7 +50,10 @@ export const LMTable = () => {
         }
         return false;
       })
-      .sort((a, b) => new Date(b.leaveStatusCreatedAt) - new Date(a.leaveStatusCreatedAt));
+      .sort(
+        (a, b) =>
+          new Date(b.leaveStatusCreatedAt) - new Date(a.leaveStatusCreatedAt)
+      );
 
     // Step 2: Apply status filter
     if (filterStatus !== "All") {
@@ -69,12 +73,14 @@ export const LMTable = () => {
       filteredData = filteredData.filter((item) => {
         // Convert selectedDate to Date object
         const selectedDateObj = new Date(selectedDate);
-        
+
         // Convert supervisor and manager dates to Date objects
-        const supervisorDate = item.supervisorDate ? new Date(item.supervisorDate) : null;
-        const managerDate = item.managerDate ? new Date(item.managerDate) : null;
-        
-       
+        const supervisorDate = item.supervisorDate
+          ? new Date(item.supervisorDate)
+          : null;
+        const managerDate = item.managerDate
+          ? new Date(item.managerDate)
+          : null;
 
         const selectedDateFormatted = DateFormat(selectedDateObj);
         const supervisorDateFormatted = DateFormat(supervisorDate);
@@ -131,25 +137,6 @@ export const LMTable = () => {
       : "text-[#E8A317]";
   };
 
-  const searchUserList = async (data) => {
-    try {
-      const result = await data;
-      setSearchResults(result);
-      setErrorState({
-        searchError: result.length === 0,
-        dateError: false,
-        noResults: result.length === 0
-      });
-    } catch (error) {
-      console.error("Error search data", error);
-      setSearchResults([]);
-      setErrorState({
-        searchError: true,
-        dateError: false,
-        noResults: true
-      });
-    }
-  };
   const handleDateChange = (event) => {
     const date = event.target.value;
     setSelectedDate(date);
@@ -158,7 +145,7 @@ export const LMTable = () => {
     setErrorState({
       searchError: false,
       dateError: false,
-      noResults: false
+      noResults: false,
     });
   };
 
@@ -168,31 +155,47 @@ export const LMTable = () => {
     setErrorState({
       searchError: false,
       dateError: false,
-      noResults: false
+      noResults: false,
     });
   };
   useEffect(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
-    
+
     // Use the filtered data from secondaryData
     let finalData = secondartyData;
 
     // Apply search filter if exists
     if (searchResults.length > 0) {
-      const searchIds = new Set(searchResults.map(item => item.empID));
-      finalData = finalData.filter(item => searchIds.has(item.empID));
+      const searchIds = new Set(searchResults.map((item) => item.empID));
+      finalData = finalData.filter((item) => searchIds.has(item.empID));
     }
-
- 
 
     // Apply pagination
     const paginatedData = finalData.slice(startIndex, startIndex + rowsPerPage);
     setMatchData(paginatedData);
+
+    if (searchResults === 0) {
+      setErrorState({
+        searchError: true,
+      });
+    }
   }, [currentPage, rowsPerPage, secondartyData, searchResults]);
+
   const totalPages = Math.ceil(
     (searchResults.length > 0 ? searchResults.length : secondartyData.length) /
       rowsPerPage
   );
+
+
+   if (loading) {
+    return (
+      <div>
+        <div className="flex items-center justify-center h-[60vh]">
+          <p className="text-sm font-semibold">Loading...</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <section className="flex flex-col w-full mt-4">
       <section className="flex flex-wrap justify-between items-center mb-5">
@@ -205,7 +208,7 @@ export const LMTable = () => {
             allEmpDetails={secondartyData}
             searchIcon2={<IoSearch />}
             placeholder="Employee ID"
-            searchUserList={searchUserList}
+            searchUserList={setMatchData}
             border="rounded-md"
           />
 
@@ -225,131 +228,126 @@ export const LMTable = () => {
         </div>
       </section>
       <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl ">
-      
-      {
-        matchData && matchData.length > 0 ? 
-        (
-           <table className="w-full font-semibold text-sm text-center">
-             <thead className="bg-[#939393] sticky top-0 rounded-t-lg">
-               <tr>
-                 {heading.map((header, index) => (
-                   <th key={index} className="px-4 py-5 text-[15px] text-white">
-                     {header}
-                   </th>
-                 ))}
-               </tr>
-             </thead>
-             <tbody>
-               {matchData && matchData.length > 0 ? (
-                 matchData.map((item, index) => {
-                   const displayIndex = startIndex + index + 1;
-                   return (
-                     <tr
-                       key={index}
-                       className="text-center text-sm shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
-                     >
-                       <td className="py-3">{displayIndex}</td>
-                       <td className="py-3">{item.empID}</td>
-                       <td className="py-3">{item.empName || "N/A"}</td>
-                       <td className="py-3">
-                         {DateFormat(item.leaveStatusCreatedAt)}
-                       </td>
-                       {userType !== "Supervisor" && userType !== "Manager" && (
-                         <td className="py-3">{item.supervisorName || "N/A"}</td>
-                       )}
-                       {userType !== "Manager" && (
-                         <td className="py-3">
-                           {DateFormat(item.supervisorDate) || "N/A"}
-                         </td>
-                       )}
-                       {userType !== "Manager" && userType !== "Supervisor" && (
-                         <td className="py-3">{item.managerName || "N/A"}</td>
-                       )}
-                       {userType !== "Supervisor" && (
-                         <td className="py-3">
-                           {DateFormat(item.managerDate) || "N/A"}
-                         </td>
-                       )}
- 
-                       <td className="py-3">
-                         <a
-                           href={lastUploadUrl}
-                           onClick={(e) => {
-                             if (!item.medicalCertificate) {
-                               e.preventDefault();
-                             } else {
-                               linkToStorageFile(item.medicalCertificate);
-                             }
-                           }}
-                           download
-                           className={
-                             item.medicalCertificate
-                               ? "border-b-2 border-[orange] text-[orange]"
-                               : ""
-                           }
-                         >
-                           {item.medicalCertificate ? "Download" : "N/A"}
-                         </a>
-                       </td>
- 
-                       <td className="py-3 cursor-pointer">
-                         <button
-                           className="border-b-2 border-[blue] text-[blue]"
-                           onClick={() => {
-                             handleClickForToggle();
-                             handleViewClick(item, "LM");
-                           }}
-                         >
-                           {item["submitted Form"] || "View"}
-                         </button>
-                       </td>
-                       <td
-                         className={`font-semibold ${getStatusClass(
-                           item.managerStatus
-                         )}`}
-                       >
-                         {(userType === "Supervisor" && item.supervisorStatus) ||
-                           (userType === "Manager" && item.managerStatus)}
-                       </td>
-                     </tr>
-                   );
-                 })
-               ) : (
-                 <tr>
-                   <td colSpan={heading.length} className="text-center py-4">
-                     {errorState.searchError ? (
-                       <p>No matching results found for your search</p>
-                     ) : errorState.dateError ? (
-                       <p>No records found for the selected date</p>
-                     ) : (
-                       <p>No data available</p>
-                     )}
-                   </td>
-                 </tr>
-               )}
-             </tbody>
-           </table>
-         ):(
+        {matchData && matchData.length > 0 ? (
+          <table className="w-full font-semibold text-sm text-center">
+            <thead className="bg-[#939393] sticky top-0 rounded-t-lg">
+              <tr>
+                {heading.map((header, index) => (
+                  <th key={index} className="px-4 py-5 text-[15px] text-white">
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {matchData && matchData.length > 0 ? (
+                matchData.map((item, index) => {
+                  const displayIndex = startIndex + index + 1;
+                  return (
+                    <tr
+                      key={index}
+                      className="text-center text-sm shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
+                    >
+                      <td className="py-3">{displayIndex}</td>
+                      <td className="py-3">{item.empID}</td>
+                      <td className="py-3">{item.empName || "N/A"}</td>
+                      <td className="py-3">
+                        {DateFormat(item.leaveStatusCreatedAt)}
+                      </td>
+                      {userType !== "Supervisor" && userType !== "Manager" && (
+                        <td className="py-3">{item.supervisorName || "N/A"}</td>
+                      )}
+                      {userType !== "Manager" && (
+                        <td className="py-3">
+                          {DateFormat(item.supervisorDate) || "N/A"}
+                        </td>
+                      )}
+                      {userType !== "Manager" && userType !== "Supervisor" && (
+                        <td className="py-3">{item.managerName || "N/A"}</td>
+                      )}
+                      {userType !== "Supervisor" && (
+                        <td className="py-3">
+                          {DateFormat(item.managerDate) || "N/A"}
+                        </td>
+                      )}
+
+                      <td className="py-3">
+                        <a
+                          href={lastUploadUrl}
+                          onClick={(e) => {
+                            if (!item.medicalCertificate) {
+                              e.preventDefault();
+                            } else {
+                              linkToStorageFile(item.medicalCertificate);
+                            }
+                          }}
+                          download
+                          className={
+                            item.medicalCertificate
+                              ? "border-b-2 border-[orange] text-[orange]"
+                              : ""
+                          }
+                        >
+                          {item.medicalCertificate ? "Download" : "N/A"}
+                        </a>
+                      </td>
+
+                      <td className="py-3 cursor-pointer">
+                        <button
+                          className="border-b-2 border-[blue] text-[blue]"
+                          onClick={() => {
+                            handleClickForToggle();
+                            handleViewClick(item, "LM");
+                          }}
+                        >
+                          {item["submitted Form"] || "View"}
+                        </button>
+                      </td>
+                      <td
+                        className={`font-semibold ${getStatusClass(
+                          item.managerStatus
+                        )}`}
+                      >
+                        {(userType === "Supervisor" && item.supervisorStatus) ||
+                          (userType === "Manager" && item.managerStatus)}
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={heading.length} className="text-center py-4">
+                    {errorState.searchError ? (
+                      <p>No matching results found for your search</p>
+                    ) : errorState.dateError ? (
+                      <p>No records found for the selected date</p>
+                    ) : (
+                      <p>No data available </p>
+                    )}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        ) : (
           <div className="text-center mt-6 py-20">
-            <p>No data available</p>
+            <p>No matching results found for your search</p>
           </div>
-         )
-      }
+        )}
       </div>
       <div className="ml-20 flex justify-center">
         <div className="w-[60%] flex justify-start mt-10 px-10">
-        {
-                  matchData && matchData.length > 0 &&
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={(newPage) => {
-              if (newPage >= 1 && newPage <= totalPages) {
-                setCurrentPage(newPage);
-              }
-            }}
-          />
-        }
+          {matchData && matchData.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(newPage) => {
+                if (newPage >= 1 && newPage <= totalPages) {
+                  setCurrentPage(newPage);
+                }
+              }}
+            />
+          )}
         </div>
       </div>
     </section>

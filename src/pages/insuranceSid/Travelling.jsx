@@ -135,7 +135,7 @@ export const Travelling = () => {
       @page {
           /* Adjust the margin as necessary */
         height:  714px;
-        padding: 22px, 0px, 22px, 0px;     
+        padding-top: 87px  
       }
     `,
   });

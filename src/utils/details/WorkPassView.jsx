@@ -99,6 +99,7 @@ export const WorkPassView = ({
           }
         `,
   });
+  
 
   // Function to render documents under a single category
   const renderDocumentsUnderCategory = (documents) => {

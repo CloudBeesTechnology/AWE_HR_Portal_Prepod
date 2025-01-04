@@ -152,8 +152,9 @@ export const UploadBLNGfile = (
               item.ENTRANCEDATETIME,
               "dateTime"
             );
-
+          
             item.ENTRANCEDATETIME = formatDateTime(entranceDate);
+           
           }
           if (typeof item.ENTRANCEDATEUSED === "number") {
             const entranceDate = excelSerialToDate(
@@ -161,7 +162,10 @@ export const UploadBLNGfile = (
               "date"
             );
             const dateObject = new Date(entranceDate);
+           
+        
             item.ENTRANCEDATEUSED = dateObject.toLocaleDateString();
+            console.log(dateObject.toLocaleDateString());
           }
           if (typeof item.AVGDAILYTOTALBYDAY === "number") {
             const entranceDate = excelSerialToDate(

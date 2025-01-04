@@ -207,10 +207,15 @@ export const WorkInfo = () => {
     ];
 
     keysToSet.forEach((key) => {
-      setValue(key, result[key]);
+      if (result[key]) {
+        // Normalize the value to lowercase
+        const normalizedValue = result[key].toString().toLowerCase();
+    
+        // Set the normalized value
+        setValue(key, normalizedValue);
+      }
     });
-    const fields = [
-    ];
+  
     
     const arrayDateField = [
       "dateLeavePass",

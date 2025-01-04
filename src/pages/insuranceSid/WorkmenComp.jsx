@@ -13,8 +13,9 @@ import { FaTimes, FaDownload, FaPrint } from "react-icons/fa";
 import { Document, Page } from "react-pdf";
 import { pdfjs } from "react-pdf";
 import { getUrl } from "@aws-amplify/storage";
-import * as pdfjsLib from 'pdfjs-dist';
 import { Viewer, Worker } from "@react-pdf-viewer/core";
+import * as pdfjsLib from 'pdfjs-dist';
+
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { useReactToPrint } from "react-to-print";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -163,24 +164,121 @@ export const WorkmenComp = () => {
     fetchInsuranceData();
   }, []);
 
+
+
   const openPopup = (fileUrl) => {
     setPopupImage(fileUrl); // Set the URL for the image or file
     setPopupVisible(true); // Show the popup
   };
 
-  const handlePrint = useReactToPrint({
-    content: () => workmenPrint.current,
-    onBeforePrint: () => console.log("Preparing to print PDF..."),
-    onAfterPrint: () => console.log("Print complete"),
-    pageStyle: `
-        @page {
-            /* Adjust the margin as necessary */
-          height:  714px;
-          padding: 22px, 0px, 22px, 0px;     
-        }
-      `,
-  });
+   // Function to handle document load success
+  //  const onDocumentLoadSuccess = ({ numPages, document }) => {
+  //   setNumPages(numPages);
 
+  //   const firstPage = document.getPage(1); 
+  //   firstPage.then((page) => {
+  //     const { width, height } = page.getViewport({ scale: 1 });
+  //     setPdfWidth(width); 
+  //     setPdfHeight(height); 
+
+  //     console.log("PDF Width:", width);
+  //     console.log("PDF Height:", height);
+  //   });
+  // };
+
+  const onDocumentLoadSuccess = async ({ numPages, document }) => {
+    let totalWidth = 0;
+    let totalHeight = 0;
+  
+    for (let i = 1; i <= numPages; i++) {
+      const page = await document.getPage(i);
+      const viewport = page.getViewport({ scale: 1 });
+      totalWidth += viewport.width;
+      totalHeight += viewport.height;
+    }
+  
+    const averageWidth = totalWidth / numPages;
+    const averageHeight = totalHeight / numPages;
+  
+    setPdfWidth(averageWidth);
+    setPdfHeight(averageHeight);
+
+  };
+  console.log("h")
+  console.log("hello");
+
+  const handlePrint = async () => {
+    const pdfUrl = lastUploadUrl; // Path to your 10-page PDF
+  
+    // Open a new window for the print view
+    const printWindow = window.open('', '', 'height=600,width=800');
+    printWindow.document.write('<html><head><title>Print PDF</title>');
+  
+    // Add styles for proper rendering and color handling
+    printWindow.document.write(`
+      <style>
+        body {
+         
+          color: black; /* Ensure black text is printed */
+        }
+        canvas {
+          margin: 10px 0;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          image-rendering: -webkit-optimize-contrast; /* Improve rendering of colors */
+           font-family: 'Arial', sans-serif; /* Font style */
+        }
+      </style>
+    `);
+  
+    printWindow.document.write('</head><body>');
+  
+    // Create a container to render each PDF page
+    const container = document.createElement('div');
+    container.id = 'container';
+    printWindow.document.body.appendChild(container);
+  
+    try {
+      // Load the PDF using pdf.js
+      const pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
+  
+      // Render each page of the PDF
+      for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+        const page = await pdfDoc.getPage(pageNum);
+        const viewport = page.getViewport({ scale: 1.5 }); // Adjust scale for better clarity
+  
+        // Create a canvas to render each page
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+  
+        // Set the canvas width and height based on the page's viewport
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+  
+        // Append the canvas to the container
+        container.appendChild(canvas);
+  
+        const renderContext = {
+          canvasContext: context,
+          viewport: viewport,
+        };
+  
+        // Render the page (this can handle colors)
+        await page.render(renderContext).promise;
+      }
+  
+      // Close the HTML document after rendering the pages
+      printWindow.document.write('</body></html>');
+      printWindow.document.close();
+  
+      // Trigger the print dialog
+      printWindow.print();
+    } catch (error) {
+      console.error('Error printing PDF:', error);
+    }
+  };
+  
+
+  
   // const handlePrint = async () => {
   //   const pdfUrl = lastUploadUrl; // Path to your 10-page PDF
   
@@ -199,7 +297,106 @@ export const WorkmenComp = () => {
   //     // Render each page of the PDF
   //     for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
   //       const page = await pdfDoc.getPage(pageNum);
-  //       const viewport = page.getViewport({ scale: 1.5 }); // Adjust scale if needed
+  //       const viewport = page.getViewport({ scale: 2.0 }); // Adjust scale if needed
+  
+  //       // Create a canvas to render each page
+  //       const canvas = document.createElement('canvas');
+  //       canvas.width = viewport.width;
+  //       canvas.height = viewport.height;
+  //       container.appendChild(canvas);
+  
+  //       const context = canvas.getContext('2d');
+  //       const renderContext = {
+  //         canvasContext: context,
+  //         viewport: viewport,
+  //       };
+  
+  //       // Render the page
+  //       await page.render(renderContext).promise;
+  //     }
+  
+  //     printWindow.document.write('</body></html>');
+  //     printWindow.document.close(); // Close the document
+  
+  //     // Trigger the print dialog
+  //     printWindow.print();
+  //   } catch (error) {
+  //     console.error('Error printing PDF:', error);
+  //   }
+  // };
+  // const handlePrint = async () => {
+  //   const pdfUrl = lastUploadUrl; // Path to your 10-page PDF
+  //   if (pdfjsLib.GlobalFontFallback) {
+  //     pdfjsLib.GlobalFontFallback.enabled = true;
+  //   } else {
+  //     console.warn('Font fallback is not available in this pdf.js version.');
+  //   }
+  
+  
+  //   const printWindow = window.open('', '', 'height=600,width=4356');
+  //   printWindow.document.write('<html><head><title>Print PDF</title></head><body>');
+  
+  //   // Create a container to render each PDF page
+  //   const container = document.createElement('div');
+  //   container.style.textAlign = 'center';
+  //   printWindow.document.body.appendChild(container);
+  
+  //   try {
+  //     // Load the PDF using pdf.js
+  //     const pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
+  
+  //     // Render each page of the PDF
+  //     for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+  //       const page = await pdfDoc.getPage(pageNum);
+  //       const viewport = page.getViewport({ scale: 0.95 }); // Adjust scale if needed
+  
+  //       // Create a canvas to render each page
+  //       const canvas = document.createElement('canvas');
+  //       canvas.width = viewport.width;
+  //       canvas.height = viewport.height;
+  //       container.appendChild(canvas);
+  
+  //       const context = canvas.getContext('2d');
+  //       const renderContext = {
+  //         canvasContext: context,
+  //         viewport: viewport,
+  //       };
+  
+  //       // Render the page
+  //       await page.render(renderContext).promise;
+  //     }
+  
+  //     printWindow.document.write('</body></html>');
+  //     printWindow.document.close(); // Close the document
+  
+  //     // Trigger the print dialog
+  //     printWindow.print();
+  //   } catch (error) {
+  //     console.error('Error printing PDF:', error);
+  //   }
+  // };
+  
+  
+
+  // const handlePrint = async () => {
+  //   const pdfUrl = lastUploadUrl; // Path to your 10-page PDF
+  
+  //   const printWindow = window.open('', '', 'height=600,width=4356');
+  //   printWindow.document.write('<html><head><title>Print PDF</title></head><body>');
+  
+  //   // Create a container to render each PDF page
+  //   const container = document.createElement('div');
+  //   container.style.textAlign = 'center';
+  //   printWindow.document.body.appendChild(container);
+  
+  //   try {
+  //     // Load the PDF using pdf.js
+  //     const pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
+  
+  //     // Render each page of the PDF
+  //     for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+  //       const page = await pdfDoc.getPage(pageNum);
+  //       const viewport = page.getViewport({ scale: 0.95 }); // Adjust scale if needed
   
   //       // Create a canvas to render each page
   //       const canvas = document.createElement('canvas');
@@ -227,6 +424,88 @@ export const WorkmenComp = () => {
   //   }
   // };
 
+  // // Function to update PDF height based on content
+  // const updatePdfHeight = () => {
+  //   if (workmenPrint.current) {
+  //     const contentHeight = workmenPrint.current.scrollHeight;
+  //     setPdfHeight(contentHeight);
+  //   }
+  // };
+
+  // // This effect runs when lastUploadUrl or PDF dimensions change
+  // useEffect(() => {
+  //   updatePdfHeight();
+  //   console.log("PDF Dimensions H:", pdfHeight);
+  // }, [lastUploadUrl, pdfHeight, pdfWidth]); // Dependencies include dimensions and URL
+
+  // // Print handler setup
+  // const handlePrint = useReactToPrint({
+  //   content: () => workmenPrint.current,
+  //   onBeforePrint: () => console.log("Preparing to print PDF..."),
+  //   onAfterPrint: () => console.log("Print complete"),
+  //   pageStyle: `
+  //     @page {
+  //       size: auto;
+  //       height: ${pdfHeight}px; 
+  //     }
+  //   `, 
+  // });
+  // console.log("hello")
+
+  // isReadyToPrint will now depend on both pdfHeight and pdfWidth
+  const isReadyToPrint = pdfHeight ;
+
+  useEffect(() => {
+    if (isReadyToPrint) {
+      // Trigger actions or set states when the document is ready to print
+      console.log("Ready to print, PDF dimensions are set.");
+      // You can call handlePrint here or other actions related to print readiness
+    }
+  }, [isReadyToPrint]); // Trigger the effect when dimensions are ready
+
+//  // PDF Height and Width Calculation
+//  const onDocumentLoadSuccess = ({ numPages, document }) => {
+//   setNumPages(numPages);
+
+//   const firstPage = document.getPage(1); 
+//   firstPage.then((page) => {
+//     const { width, height } = page.getViewport({ scale: 1 });
+//     setPdfWidth(width); 
+//     setPdfHeight(height); 
+
+//     console.log("PDF Width:", width);
+//     console.log("PDF Height:", height);
+//   });
+// };
+
+// const updatePdfHeight = () => {
+//   if (workmenPrint.current) {
+//     const contentHeight = workmenPrint.current.scrollHeight;
+//     setPdfHeight(contentHeight);
+//   }
+// };
+
+// useEffect(() => {
+//   updatePdfHeight();
+//   console.log("PDF Dimensions H:", pdfHeight);
+// }, [lastUploadUrl]);
+
+// // Print handler
+// const handlePrint = useReactToPrint({
+//   content: () => workmenPrint.current,
+//   onBeforePrint: () => console.log("Preparing to print PDF..."),
+//   onAfterPrint: () => console.log("Print complete"),
+//   pageStyle: `
+//     @page {
+//       size: auto;
+//       height: 475px; 
+//     }
+//   `,
+// });
+
+// const isReadyToPrint = pdfHeight && pdfWidth;
+
+
   const openModal = (uploadUrl) => {
     setPPLastUP(uploadUrl);
     setViewingDocument(uploadUrl);
@@ -236,12 +515,8 @@ export const WorkmenComp = () => {
     setViewingDocument(null);
   };
 
-  const onDocumentLoadSuccess = ({ numPages }) => {
-    setNumPages(numPages);
-  };
-
   console.log(pdfHeight);
-
+  
   const renderDocumentsUnderCategory = (documents) => {
     return (
       <>
@@ -261,44 +536,92 @@ export const WorkmenComp = () => {
                 View Document
               </button>
             </div>
+
+            {/* Conditional rendering of PDF or image */}
             {viewingDocument === document.upload &&
               document.upload.endsWith(".pdf") && (
-                <div className="py-6 fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
-                  <div className="relative bg-white rounded-lg shadow-lg w-[40vw] max-h-full flex flex-col">
-                    {/* PDF Viewer */}
-                    <div ref={workmenPrint} className="flex-grow overflow-y-auto">
-                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-                        <Viewer fileUrl={lastUploadUrl || ""} />
+                 <div className="py-6 fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
+                <div className="relative bg-white rounded-lg shadow-lg w-[40vw] max-h-full flex flex-col">
+                  {/* PDF Viewer */}
+                  <div className="flex-grow overflow-y-auto">
+                    <div ref={workmenPrint} >
+                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js" >
+                        <Viewer fileUrl={lastUploadUrl || ""} onLoadSuccess={onDocumentLoadSuccess} />
                       </Worker>
                     </div>
+                  </div>
 
-                    <div className="absolute top-2 right-2">
-                      <button
-                        onClick={closeModal} // Close the modal
-                        className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
-                      >
-                        <FaTimes />
+                  <div className="absolute top-2 right-2">
+                    <button
+                      onClick={closeModal} // Close the modal
+                      className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-center gap-6 py-4">
+                    <div className="mt-2 flex">
+                      <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
+                        <a href={lastUploadUrl} download>
+                          Download
+                        </a>
+                        <FaDownload className="ml-2 mt-1" />
                       </button>
                     </div>
+                    <div className="mt-2 flex">
+                      <button
+                        onClick={handlePrint}
+                       
+                        className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
+                      >
+                        Print
+                        <FaPrint className="ml-2 mt-1" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              )}
 
-                    <div className="flex items-center justify-center gap-6 py-4">
-                      <div className="mt-2 flex">
-                        <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
-                          <a href={lastUploadUrl} download>
-                            Download
-                          </a>
-                          <FaDownload className="ml-2 mt-1" />
-                        </button>
-                      </div>
-                      <div className="mt-2 flex">
-                        <button
-                          onClick={handlePrint}
-                          className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
-                        >
-                          Print
-                          <FaPrint className="ml-2 mt-1" />
-                        </button>
-                      </div>
+            {/* Image Viewer */}
+            {viewingDocument === document.upload &&
+              !document.upload.endsWith(".pdf") && (
+                <div className="relative mt-4">
+                  <div>
+                    <img
+                      src={lastUploadUrl} // Use the URL for the image
+                      alt="Document Preview"
+                      className="w-full h-auto"
+                    />
+                  </div>
+
+                  <div className="absolute top-2 right-2">
+                    <button
+                      onClick={() => setViewingDocument(null)} // Close the viewer
+                      className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-center gap-6 py-4">
+                    <div className="mt-2 flex">
+                      <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
+                        <a href={lastUploadUrl} download>
+                          Download
+                        </a>
+                        <FaDownload className="ml-2 mt-1" />
+                      </button>
+                    </div>
+                    <div className="mt-2 flex">
+                      <button
+                        onClick={handlePrint}
+                        className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
+                      >
+                        Print
+                        <FaPrint className="ml-2 mt-1" />
+                      </button>
                     </div>
                   </div>
                 </div>

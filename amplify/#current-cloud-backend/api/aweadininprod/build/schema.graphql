@@ -1,3 +1,26 @@
+type KeyValueStore @aws_iam @aws_api_key {
+  id: ID!
+  departmentDD: [String]
+  positionDD: [String]
+  jobCatDD: [String]
+  raceDD: [String]
+  religionDD: [String]
+  nationalityDD: [String]
+  countryORDD: [String]
+  educLevelDD: [String]
+  workStatusDD: [String]
+  relationshipDD: [String]
+  resignNotifProbDD: [String]
+  termiNotifProbDD: [String]
+  resignNotifConfDD: [String]
+  termiNotifConfDD: [String]
+  workPermitDD: String
+  insuHSDD: [String]
+  insuClaimDD: [String]
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
 type BastingPaint @aws_iam @aws_api_key {
   id: ID!
   empID: String!
@@ -53,6 +76,8 @@ type TimeSheet @aws_iam @aws_api_key {
   fromDate: String
   untilDate: String
   location: String
+  mealAllow: String
+  verify: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -957,28 +982,40 @@ enum ModelSortDirection {
   DESC
 }
 
-type ModelBastingPaintConnection @aws_api_key @aws_iam {
-  items: [BastingPaint]!
+type ModelKeyValueStoreConnection @aws_api_key @aws_iam {
+  items: [KeyValueStore]!
   nextToken: String
 }
 
-input ModelBastingPaintFilterInput {
+input ModelKeyValueStoreFilterInput {
   id: ModelIDInput
-  empID: ModelStringInput
-  blastingRemarks: ModelStringInput
-  blastingEndDate: ModelStringInput
-  blastingStartDate: ModelStringInput
-  blastingBadgeNo: ModelStringInput
-  blastingQulifiExp: ModelStringInput
-  blastingUpload: ModelStringInput
+  departmentDD: ModelStringInput
+  positionDD: ModelStringInput
+  jobCatDD: ModelStringInput
+  raceDD: ModelStringInput
+  religionDD: ModelStringInput
+  nationalityDD: ModelStringInput
+  countryORDD: ModelStringInput
+  educLevelDD: ModelStringInput
+  workStatusDD: ModelStringInput
+  relationshipDD: ModelStringInput
+  resignNotifProbDD: ModelStringInput
+  termiNotifProbDD: ModelStringInput
+  resignNotifConfDD: ModelStringInput
+  termiNotifConfDD: ModelStringInput
+  workPermitDD: ModelStringInput
+  insuHSDD: ModelStringInput
+  insuClaimDD: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
-  and: [ModelBastingPaintFilterInput]
-  or: [ModelBastingPaintFilterInput]
-  not: ModelBastingPaintFilterInput
+  and: [ModelKeyValueStoreFilterInput]
+  or: [ModelKeyValueStoreFilterInput]
+  not: ModelKeyValueStoreFilterInput
 }
 
 type Query {
+  getKeyValueStore(id: ID!): KeyValueStore @aws_api_key @aws_iam
+  listKeyValueStores(filter: ModelKeyValueStoreFilterInput, limit: Int, nextToken: String): ModelKeyValueStoreConnection @aws_api_key @aws_iam
   getBastingPaint(id: ID!): BastingPaint @aws_api_key @aws_iam
   listBastingPaints(filter: ModelBastingPaintFilterInput, limit: Int, nextToken: String): ModelBastingPaintConnection @aws_api_key @aws_iam
   getTimeSheet(id: ID!): TimeSheet @aws_api_key @aws_iam
@@ -1059,48 +1096,81 @@ type Query {
   listLeaveStatuses(filter: ModelLeaveStatusFilterInput, limit: Int, nextToken: String): ModelLeaveStatusConnection @aws_api_key @aws_iam
 }
 
-input ModelBastingPaintConditionInput {
-  empID: ModelStringInput
-  blastingRemarks: ModelStringInput
-  blastingEndDate: ModelStringInput
-  blastingStartDate: ModelStringInput
-  blastingBadgeNo: ModelStringInput
-  blastingQulifiExp: ModelStringInput
-  blastingUpload: ModelStringInput
-  and: [ModelBastingPaintConditionInput]
-  or: [ModelBastingPaintConditionInput]
-  not: ModelBastingPaintConditionInput
+input ModelKeyValueStoreConditionInput {
+  departmentDD: ModelStringInput
+  positionDD: ModelStringInput
+  jobCatDD: ModelStringInput
+  raceDD: ModelStringInput
+  religionDD: ModelStringInput
+  nationalityDD: ModelStringInput
+  countryORDD: ModelStringInput
+  educLevelDD: ModelStringInput
+  workStatusDD: ModelStringInput
+  relationshipDD: ModelStringInput
+  resignNotifProbDD: ModelStringInput
+  termiNotifProbDD: ModelStringInput
+  resignNotifConfDD: ModelStringInput
+  termiNotifConfDD: ModelStringInput
+  workPermitDD: ModelStringInput
+  insuHSDD: ModelStringInput
+  insuClaimDD: ModelStringInput
+  and: [ModelKeyValueStoreConditionInput]
+  or: [ModelKeyValueStoreConditionInput]
+  not: ModelKeyValueStoreConditionInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
 }
 
-input CreateBastingPaintInput {
+input CreateKeyValueStoreInput {
   id: ID
-  empID: String!
-  blastingRemarks: String
-  blastingEndDate: String
-  blastingStartDate: String
-  blastingBadgeNo: String
-  blastingQulifiExp: String
-  blastingUpload: [AWSJSON]
+  departmentDD: [String]
+  positionDD: [String]
+  jobCatDD: [String]
+  raceDD: [String]
+  religionDD: [String]
+  nationalityDD: [String]
+  countryORDD: [String]
+  educLevelDD: [String]
+  workStatusDD: [String]
+  relationshipDD: [String]
+  resignNotifProbDD: [String]
+  termiNotifProbDD: [String]
+  resignNotifConfDD: [String]
+  termiNotifConfDD: [String]
+  workPermitDD: String
+  insuHSDD: [String]
+  insuClaimDD: [String]
 }
 
-input UpdateBastingPaintInput {
+input UpdateKeyValueStoreInput {
   id: ID!
-  empID: String
-  blastingRemarks: String
-  blastingEndDate: String
-  blastingStartDate: String
-  blastingBadgeNo: String
-  blastingQulifiExp: String
-  blastingUpload: [AWSJSON]
+  departmentDD: [String]
+  positionDD: [String]
+  jobCatDD: [String]
+  raceDD: [String]
+  religionDD: [String]
+  nationalityDD: [String]
+  countryORDD: [String]
+  educLevelDD: [String]
+  workStatusDD: [String]
+  relationshipDD: [String]
+  resignNotifProbDD: [String]
+  termiNotifProbDD: [String]
+  resignNotifConfDD: [String]
+  termiNotifConfDD: [String]
+  workPermitDD: String
+  insuHSDD: [String]
+  insuClaimDD: [String]
 }
 
-input DeleteBastingPaintInput {
+input DeleteKeyValueStoreInput {
   id: ID!
 }
 
 type Mutation {
+  createKeyValueStore(input: CreateKeyValueStoreInput!, condition: ModelKeyValueStoreConditionInput): KeyValueStore @aws_api_key @aws_iam
+  updateKeyValueStore(input: UpdateKeyValueStoreInput!, condition: ModelKeyValueStoreConditionInput): KeyValueStore @aws_api_key @aws_iam
+  deleteKeyValueStore(input: DeleteKeyValueStoreInput!, condition: ModelKeyValueStoreConditionInput): KeyValueStore @aws_api_key @aws_iam
   createBastingPaint(input: CreateBastingPaintInput!, condition: ModelBastingPaintConditionInput): BastingPaint @aws_api_key @aws_iam
   updateBastingPaint(input: UpdateBastingPaintInput!, condition: ModelBastingPaintConditionInput): BastingPaint @aws_api_key @aws_iam
   deleteBastingPaint(input: DeleteBastingPaintInput!, condition: ModelBastingPaintConditionInput): BastingPaint @aws_api_key @aws_iam
@@ -1220,22 +1290,35 @@ type Mutation {
   deleteLeaveStatus(input: DeleteLeaveStatusInput!, condition: ModelLeaveStatusConditionInput): LeaveStatus @aws_api_key @aws_iam
 }
 
-input ModelSubscriptionBastingPaintFilterInput {
+input ModelSubscriptionKeyValueStoreFilterInput {
   id: ModelSubscriptionIDInput
-  empID: ModelSubscriptionStringInput
-  blastingRemarks: ModelSubscriptionStringInput
-  blastingEndDate: ModelSubscriptionStringInput
-  blastingStartDate: ModelSubscriptionStringInput
-  blastingBadgeNo: ModelSubscriptionStringInput
-  blastingQulifiExp: ModelSubscriptionStringInput
-  blastingUpload: ModelSubscriptionStringInput
+  departmentDD: ModelSubscriptionStringInput
+  positionDD: ModelSubscriptionStringInput
+  jobCatDD: ModelSubscriptionStringInput
+  raceDD: ModelSubscriptionStringInput
+  religionDD: ModelSubscriptionStringInput
+  nationalityDD: ModelSubscriptionStringInput
+  countryORDD: ModelSubscriptionStringInput
+  educLevelDD: ModelSubscriptionStringInput
+  workStatusDD: ModelSubscriptionStringInput
+  relationshipDD: ModelSubscriptionStringInput
+  resignNotifProbDD: ModelSubscriptionStringInput
+  termiNotifProbDD: ModelSubscriptionStringInput
+  resignNotifConfDD: ModelSubscriptionStringInput
+  termiNotifConfDD: ModelSubscriptionStringInput
+  workPermitDD: ModelSubscriptionStringInput
+  insuHSDD: ModelSubscriptionStringInput
+  insuClaimDD: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
-  and: [ModelSubscriptionBastingPaintFilterInput]
-  or: [ModelSubscriptionBastingPaintFilterInput]
+  and: [ModelSubscriptionKeyValueStoreFilterInput]
+  or: [ModelSubscriptionKeyValueStoreFilterInput]
 }
 
 type Subscription {
+  onCreateKeyValueStore(filter: ModelSubscriptionKeyValueStoreFilterInput): KeyValueStore @aws_subscribe(mutations: ["createKeyValueStore"]) @aws_api_key @aws_iam
+  onUpdateKeyValueStore(filter: ModelSubscriptionKeyValueStoreFilterInput): KeyValueStore @aws_subscribe(mutations: ["updateKeyValueStore"]) @aws_api_key @aws_iam
+  onDeleteKeyValueStore(filter: ModelSubscriptionKeyValueStoreFilterInput): KeyValueStore @aws_subscribe(mutations: ["deleteKeyValueStore"]) @aws_api_key @aws_iam
   onCreateBastingPaint(filter: ModelSubscriptionBastingPaintFilterInput): BastingPaint @aws_subscribe(mutations: ["createBastingPaint"]) @aws_api_key @aws_iam
   onUpdateBastingPaint(filter: ModelSubscriptionBastingPaintFilterInput): BastingPaint @aws_subscribe(mutations: ["updateBastingPaint"]) @aws_api_key @aws_iam
   onDeleteBastingPaint(filter: ModelSubscriptionBastingPaintFilterInput): BastingPaint @aws_subscribe(mutations: ["deleteBastingPaint"]) @aws_api_key @aws_iam
@@ -1355,6 +1438,83 @@ type Subscription {
   onDeleteLeaveStatus(filter: ModelSubscriptionLeaveStatusFilterInput): LeaveStatus @aws_subscribe(mutations: ["deleteLeaveStatus"]) @aws_api_key @aws_iam
 }
 
+type ModelBastingPaintConnection @aws_api_key @aws_iam {
+  items: [BastingPaint]!
+  nextToken: String
+}
+
+input ModelBastingPaintFilterInput {
+  id: ModelIDInput
+  empID: ModelStringInput
+  blastingRemarks: ModelStringInput
+  blastingEndDate: ModelStringInput
+  blastingStartDate: ModelStringInput
+  blastingBadgeNo: ModelStringInput
+  blastingQulifiExp: ModelStringInput
+  blastingUpload: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelBastingPaintFilterInput]
+  or: [ModelBastingPaintFilterInput]
+  not: ModelBastingPaintFilterInput
+}
+
+input ModelBastingPaintConditionInput {
+  empID: ModelStringInput
+  blastingRemarks: ModelStringInput
+  blastingEndDate: ModelStringInput
+  blastingStartDate: ModelStringInput
+  blastingBadgeNo: ModelStringInput
+  blastingQulifiExp: ModelStringInput
+  blastingUpload: ModelStringInput
+  and: [ModelBastingPaintConditionInput]
+  or: [ModelBastingPaintConditionInput]
+  not: ModelBastingPaintConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateBastingPaintInput {
+  id: ID
+  empID: String!
+  blastingRemarks: String
+  blastingEndDate: String
+  blastingStartDate: String
+  blastingBadgeNo: String
+  blastingQulifiExp: String
+  blastingUpload: [AWSJSON]
+}
+
+input UpdateBastingPaintInput {
+  id: ID!
+  empID: String
+  blastingRemarks: String
+  blastingEndDate: String
+  blastingStartDate: String
+  blastingBadgeNo: String
+  blastingQulifiExp: String
+  blastingUpload: [AWSJSON]
+}
+
+input DeleteBastingPaintInput {
+  id: ID!
+}
+
+input ModelSubscriptionBastingPaintFilterInput {
+  id: ModelSubscriptionIDInput
+  empID: ModelSubscriptionStringInput
+  blastingRemarks: ModelSubscriptionStringInput
+  blastingEndDate: ModelSubscriptionStringInput
+  blastingStartDate: ModelSubscriptionStringInput
+  blastingBadgeNo: ModelSubscriptionStringInput
+  blastingQulifiExp: ModelSubscriptionStringInput
+  blastingUpload: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionBastingPaintFilterInput]
+  or: [ModelSubscriptionBastingPaintFilterInput]
+}
+
 type ModelTimeSheetConnection @aws_api_key @aws_iam {
   items: [TimeSheet]!
   nextToken: String
@@ -1402,6 +1562,8 @@ input ModelTimeSheetFilterInput {
   fromDate: ModelStringInput
   untilDate: ModelStringInput
   location: ModelStringInput
+  mealAllow: ModelStringInput
+  verify: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelTimeSheetFilterInput]
@@ -1450,6 +1612,8 @@ input ModelTimeSheetConditionInput {
   fromDate: ModelStringInput
   untilDate: ModelStringInput
   location: ModelStringInput
+  mealAllow: ModelStringInput
+  verify: ModelStringInput
   and: [ModelTimeSheetConditionInput]
   or: [ModelTimeSheetConditionInput]
   not: ModelTimeSheetConditionInput
@@ -1499,6 +1663,8 @@ input CreateTimeSheetInput {
   fromDate: String
   untilDate: String
   location: String
+  mealAllow: String
+  verify: String
 }
 
 input UpdateTimeSheetInput {
@@ -1543,6 +1709,8 @@ input UpdateTimeSheetInput {
   fromDate: String
   untilDate: String
   location: String
+  mealAllow: String
+  verify: String
 }
 
 input DeleteTimeSheetInput {
@@ -1591,6 +1759,8 @@ input ModelSubscriptionTimeSheetFilterInput {
   fromDate: ModelSubscriptionStringInput
   untilDate: ModelSubscriptionStringInput
   location: ModelSubscriptionStringInput
+  mealAllow: ModelSubscriptionStringInput
+  verify: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionTimeSheetFilterInput]

@@ -11,7 +11,12 @@ import { WorkDataPass } from "../../employees/WorkDataPass";
 import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
 import { FormField } from "../../../utils/FormField";
 import { DataSupply } from "../../../utils/DataStoredContext";
-import { leavePassDD, workInfoUploads } from "../../../utils/DropDownMenus";
+import {
+  DepartmentDD,
+  JobCatDD,
+  leavePassDD,
+  workInfoUploads,
+} from "../../../utils/DropDownMenus";
 import { UploadingFiles } from "../../employees/medicalDep/FileUploadField";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { UpdateWIData } from "../../../services/updateMethod/UpdateWIData";
@@ -25,7 +30,7 @@ export const WorkInfo = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
-  const { empPIData, terminateData, workInfoData, leaveDetailsData, SRData } =
+  const { empPIData, terminateData, workInfoData, leaveDetailsData, SRData ,dropDownVal} =
     useContext(DataSupply);
 
   const {
@@ -33,6 +38,7 @@ export const WorkInfo = () => {
     handleSubmit,
     control,
     setValue,
+    getValues,
     watch,
     formState: { errors },
   } = useForm({
@@ -52,13 +58,16 @@ export const WorkInfo = () => {
   const [showTitle, setShowTitle] = useState("");
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const watchedEmpID = watch("empID");
-
+  const [updateFlag, setUpdateFlag] = useState(false);
+  const { terminationFields,leaveFieldsAnother,workFields,leaveBasic,serviceRecords
+  } = WorkDataPass();
   const [empName, setEmpName] = useState("");
 
   const [selection, setSelection] = useState({
     department: "",
     position: "",
     jobCat: "",
+    otherDeparment: "",
     // Add other fields here if needed
   });
 
@@ -70,10 +79,12 @@ export const WorkInfo = () => {
     }));
   };
 
+  // const watchFields = watch(
+  //   WorkDataPass.terminationFields.map((field) => field.name)
+  // );
   const watchFields = watch(
-    WorkDataPass.terminationFields.map((field) => field.name)
+    terminationFields.map((field) => field.name)
   );
-
   useEffect(() => {
     empPIData.map((items) => {
       if (watchedEmpID === items.empID) {
@@ -172,246 +183,148 @@ export const WorkInfo = () => {
     }
   };
 
-  const getLastValue = (value) =>
-    Array.isArray(value) ? value[value.length - 1] : value;
-
   const getArrayDateValue = (value) => {
-    return Array.isArray(value) ? value[value.length - 1] : value;
+    if (Array.isArray(value) && value.length > 0) {
+      return value[value.length - 1]?.toUpperCase();
+    }
+    return typeof value === "string" ? value.toUpperCase() : null;
   };
 
-  // const searchResult = (result) => {
-  //   // Ensure correct handling for both array and non-array salaryType
-  //   const salaryTypeValue = Array.isArray(result.salaryType) 
-  //     ? (result.salaryType[0] === "M" || result.salaryType[0] === "Monthly" 
-  //       ? "MONTHLY" 
-  //       : (result.salaryType[0] === "D" || result.salaryType[0] === "Daily" 
-  //         ? "DAILY" 
-  //         : result.salaryType[0]))
-  //     : (result.salaryType === "M" || result.salaryType === "Monthly" 
-  //       ? "MONTHLY"
-  //       : (result.salaryType === "D" || result.salaryType === "Daily"
-  //         ? "DAILY"
-  //         : result.salaryType));
-  
-  //   setValue("salaryType", salaryTypeValue);
-  
-  //   console.log("salaryType value being passed: ", salaryTypeValue);
-  
-  //   const keysToSet = [
-  //     "empID",
-  //     "doj",
-  //     "hospLeave",
-  //     "skillPool",
-  //     "resignDate",
-  //     "termiDate",
-  //     "resignNotProb",
-  //     "otherResignNotProb",
-  //     "termiNotProb",
-  //     "otherTermiNotProb",
-  //     "resignNotConf",
-  //     "otherResignNotConf",
-  //     "termiNotConf",
-  //     "otherTermiNotConf",
-  //     "reasonResign",
-  //     "reasonTerminate",
-  //     "materLeave",
-  //     "paterLeave",
-  //     "sickLeave",
-  //     "sickLeaveDate",
-  //     "mrageLeave",
-  //     "compasLeave",
-  //     "remarkWI",
-  //     "sapNo",
-  //     "pervAnnualLeaveBal",
-  //     "remainingAnualLeave", 
-  //     "remainingCompasLeave", 
-  //     "remainingHosLeave", 
-  //     "remainingMateLeave", 
-  //     "remainingMrageLeave", 
-  //     "remainingPaternityLeave", 
-  //     "remainingSickLeave"
-  //   ];
-  
-  //   keysToSet.forEach((key) => {
-  //     setValue(key, result[key]);
-  //   });
-  
-  //   const arrayDateField = [
-  //     "dateLeavePass",
-  //     "depEmp",
-  //     "positionRev",
-  //     "revSalary",
-  //     "revLeavePass",
-  //     "revAnnualLeave",
-  //     "durLeavePass",
-  //     "destinateLeavePass",
-  //     "annualLeave",
-  //     "leavePass",
-  //     "salaryType",
-  //     "manager",
-  //     "supervisor",
-  //     "workStatus",
-  //     "workHrs",
-  //     "workWeek",
-  //     "workMonth",
-  //     "hr",
-  //     "upgradePosition",
-  //     "contractPeriod",
-  //     "probDuration",
-  //     "department",
-  //     "otherDepartment",
-  //     "position",
-  //     "otherPosition",
-  //     "jobCat",
-  //     "otherJobCat",
-  //     "jobDesc",
-  //     "relationship",
-  //     "upgradeDate",
-  //     "revALD",
-  //     "contractStart",
-  //     "contractEnd",
-  //     "probationStart",
-  //     "probationEnd",
-  //     "revLeaveDate",
-  //     "revSalaryDate",
-  //     "depEmpDate",
-  //     "annualLeaveDate",
-  //     "positionRevDate",
-  //   ];
-  
-  //   arrayDateField.forEach((field) => {
-  //     const valueToSet = field === "salaryType" ? salaryTypeValue : result[field];
-  //     console.log(`Setting value for ${field}:`, valueToSet);
-      
-  //     setValue(field, getArrayDateValue(result[field]));
-  //   });
-  
-  //   const uploadFields = [
-  //     "WIProbation",
-  //     "WIResignation",
-  //     "WITermination",
-  //     "WILeaveEntitle",
-  //     "WIContract",
-  //     "uploadPR",
-  //     "uploadSP",
-  //     "uploadLP",
-  //     "uploadAL",
-  //     "uploadDep",
-  //   ];
-  
-  //   uploadFields.forEach((field) => {
-  //     if (result[field]) {
-  //       try {
-  //         const rawArrayString = result[field][0]; // Access the first element of the array
-          
-  //         const trimmedString = rawArrayString.startsWith('"') && rawArrayString.endsWith('"')
-  //           ? rawArrayString.slice(1, -1)
-  //           : rawArrayString;
-  
-  //         const properJsonString = trimmedString.replace(/\\"/g, '"');
-  
-  //         const parsedArray = JSON.parse(properJsonString);
-  
-  //         if (!Array.isArray(parsedArray)) {
-  //           throw new Error(`Parsed result is not an array for ${field}`);
-  //         }
-  
-  //         // Parse each item in the array
-  //         const parsedFiles = parsedArray.map((item) =>
-  //           typeof item === "string" ? JSON.parse(item) : item
-  //         );
-  
-  //         setValue(field, parsedFiles);
-  //         setNameServiceUp((prev) => ({ ...prev, [field]: parsedFiles }));
-  //         setUploadedFileNames((prev) => ({
-  //           ...prev,
-  //           [field]:
-  //             parsedFiles.length > 0
-  //               ? getFileName(parsedFiles[parsedFiles.length - 1].upload)
-  //               : "",
-  //         }));
-  //       } catch (error) {
-  //         console.error(`Failed to parse ${field}:`, error);
-  //       }
-  //     }
-  //   });
-  // };
-  
   const searchResult = (result) => {
-    // Ensure correct handling for both array and non-array salaryType
-    const salaryTypeValue = Array.isArray(result.salaryType)
-      ? result.salaryType[0] === "M" || result.salaryType[0] === "Monthly"
-        ? "MONTHLY"
-        : result.salaryType[0] === "D" || result.salaryType[0] === "Daily"
-        ? "DAILY"
-        : result.salaryType[0]
-      : result.salaryType === "M" || result.salaryType === "Monthly"
-      ? "MONTHLY"
-      : result.salaryType === "D" || result.salaryType === "Daily"
-      ? "DAILY"
-      : result.salaryType;
-  
-    setValue("salaryType", salaryTypeValue);
-    console.log("salaryType value being passed: ", salaryTypeValue);
-  
+console.log(result);
+
     const keysToSet = [
-      "empID", "doj", "hospLeave", "skillPool", "resignDate", "termiDate",
-      "resignNotProb", "otherResignNotProb", "termiNotProb", "otherTermiNotProb",
-      "resignNotConf", "otherResignNotConf", "termiNotConf", "otherTermiNotConf",
-      "reasonResign", "reasonTerminate", "materLeave", "paterLeave", "sickLeave",
-      "sickLeaveDate", "mrageLeave", "compasLeave", "remarkWI", "sapNo",
-      "pervAnnualLeaveBal", "remainingAnualLeave", "remainingCompasLeave", "remainingHosLeave",
-      "remainingMateLeave", "remainingMrageLeave", "remainingPaternityLeave", "remainingSickLeave"
+      "empID",
+      "doj",
+      "hospLeave",
+      "skillPool",
+      "resignDate",
+      "termiDate",
+      "resignNotProb",
+      "otherResignNotProb",
+      "termiNotProb",
+      "otherTermiNotProb",
+      "resignNotConf",
+      "otherResignNotConf",
+      "termiNotConf",
+      "otherTermiNotConf",
+      "reasonResign",
+      "reasonTerminate",
+      "materLeave",
+      "paterLeave",
+      "sickLeave",
+      "sickLeaveDate",
+      "mrageLeave",
+      "compasLeave",
+      "remarkWI",
+      "sapNo",
+      "pervAnnualLeaveBal",
+      "remainingAnualLeave",
+      "remainingCompasLeave",
+      "remainingHosLeave",
+      "remainingMateLeave",
+      "remainingMrageLeave",
+      "remainingPaternityLeave",
+      "remainingSickLeave",
     ];
-  
+
     // Set values for basic fields
+    // keysToSet.forEach((key) => {
+    //   setValue(key, result[key]);
+    // });
     keysToSet.forEach((key) => {
-      setValue(key, result[key]);
+      if (result[key]) {
+        // Normalize the value to lowercase
+        const normalizedValue = result[key].toString().toUpperCase();
+    
+        // Set the normalized value
+        setValue(key, normalizedValue);
+      }
     });
-  
     const arrayDateField = [
-      "dateLeavePass", "depEmp", "positionRev", "revSalary", "revLeavePass", "revAnnualLeave",
-      "durLeavePass", "destinateLeavePass", "annualLeave", "leavePass", "salaryType", "manager",
-      "supervisor", "workStatus", "workHrs", "workWeek", "workMonth", "hr", "upgradePosition",
-      "contractPeriod", "probDuration", "department", "otherDepartment", "position", "otherPosition",
-      "jobCat", "otherJobCat", "jobDesc", "relationship", "upgradeDate", "revALD", "contractStart",
-      "contractEnd", "probationStart", "probationEnd", "revLeaveDate", "revSalaryDate", "depEmpDate",
-      "annualLeaveDate", "positionRevDate"
+      "dateLeavePass",
+      "depEmp",
+      "positionRev",
+      "revSalary",
+      "revLeavePass",
+      "revAnnualLeave",
+      "durLeavePass",
+      "destinateLeavePass",
+      "annualLeave",
+      "leavePass",
+      "salaryType",
+      "manager",
+      "supervisor",
+      "workStatus",
+      "workHrs",
+      "workWeek",
+      "workMonth",
+      "upgradePosition",
+      "contractPeriod",
+      "probDuration",
+      "department",
+      // "otherDepartment",
+      "position",
+      // "otherPosition",
+      "jobCat",
+      // "otherJobCat",
+      "jobDesc",
+      "relationship",
+      "upgradeDate",
+      "revALD",
+      "contractStart",
+      "contractEnd",
+      "probationStart",
+      "probationEnd",
+      "revLeaveDate",
+      "revSalaryDate",
+      "depEmpDate",
+      "annualLeaveDate",
+      "positionRevDate",
     ];
-  
+
     // Set values for date fields and handle salaryType condition
     arrayDateField.forEach((field) => {
-      const valueToSet = field === "salaryType" ? salaryTypeValue : result[field];
+      const valueToSet = result[field];
       console.log(`Setting value for ${field}:`, valueToSet);
       setValue(field, getArrayDateValue(valueToSet)); // Use getArrayDateValue for all fields
     });
-  
+    
+    setValue("hr","Hr-notification@adininworks.com")
+
     const uploadFields = [
-      "WIProbation", "WIResignation", "WITermination", "WILeaveEntitle", "WIContract",
-      "uploadPR", "uploadSP", "uploadLP", "uploadAL", "uploadDep"
+      "WIProbation",
+      "WIResignation",
+      "WITermination",
+      "WILeaveEntitle",
+      "WIContract",
+      "uploadPR",
+      "uploadSP",
+      "uploadLP",
+      "uploadAL",
+      "uploadDep",
     ];
-  
+
     // Handle file uploads
     uploadFields.forEach((field) => {
       if (result[field]) {
         try {
           const rawArrayString = result[field][0]; // Access the first element of the array
-          const trimmedString = rawArrayString.startsWith('"') && rawArrayString.endsWith('"')
-            ? rawArrayString.slice(1, -1)
-            : rawArrayString;
-  
+          const trimmedString =
+            rawArrayString.startsWith('"') && rawArrayString.endsWith('"')
+              ? rawArrayString.slice(1, -1)
+              : rawArrayString;
+
           const properJsonString = trimmedString.replace(/\\"/g, '"');
           const parsedArray = JSON.parse(properJsonString);
-  
+
           if (!Array.isArray(parsedArray)) {
             throw new Error(`Parsed result is not an array for ${field}`);
           }
-  
-          // Parse each item in the array
           const parsedFiles = parsedArray.map((item) =>
             typeof item === "string" ? JSON.parse(item) : item
           );
-  
+
           setValue(field, parsedFiles);
           setNameServiceUp((prev) => ({ ...prev, [field]: parsedFiles }));
           setUploadedFileNames((prev) => ({
@@ -427,7 +340,7 @@ export const WorkInfo = () => {
       }
     });
   };
-  
+
   const getFileName = (filePath) => {
     const fileNameWithExtension = filePath.split("/").pop(); // Get file name with extension
     const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
@@ -436,7 +349,6 @@ export const WorkInfo = () => {
 
   const onSubmit = async (data) => {
     // console.log("Date upgrade", data);
-
     try {
       const checkingPITable =
         empPIData?.find((match) => match.empID === data.empID) || null;
@@ -449,17 +361,15 @@ export const WorkInfo = () => {
       const SRDataRecord =
         SRData?.find((match) => match.empID === data.empID) || null;
       if (
-        SRDataRecord &&
-        leaveDetailsDataRecord &&
-        workInfoDataRecord &&
-        terminateDataRecord &&
+        SRDataRecord ||
+        leaveDetailsDataRecord ||
+        workInfoDataRecord ||
+        terminateDataRecord ||
         checkingPITable
       ) {
-
-        
         const workInfoUpValue = {
           ...data,
-          remainingAnualLeave: data?.annualLeave?.[0] || "0",  // Fixing the syntax
+          remainingAnualLeave: data?.annualLeave?.[0] || "0", // Fixing the syntax
           remainingCompasLeave: data?.compasLeave || "0",
           remainingHosLeave: data?.hospLeave || "0",
           remainingMateLeave: data?.materLeave || "0",
@@ -470,7 +380,7 @@ export const WorkInfo = () => {
           SRDataRecord: SRDataRecord,
           leaveDetailsDataRecord: {
             ...leaveDetailsDataRecord,
-            remainingAnualLeave: data?.annualLeave?.[0] || "0",  // Fixing the syntax
+            remainingAnualLeave: data?.annualLeave?.[0] || "0", // Fixing the syntax
             remainingCompasLeave: data?.compasLeave || "0",
             remainingHosLeave: data?.hospLeave || "0",
             remainingMateLeave: data?.materLeave || "0",
@@ -479,7 +389,7 @@ export const WorkInfo = () => {
             remainingSickLeave: data?.sickLeave || "0",
             unPaidAuthorize: "0",
           },
-          
+
           workInfoDataRecord: workInfoDataRecord,
           terminateDataRecord: terminateDataRecord,
           WIContract: JSON.stringify(nameServiceUp.WIContract),
@@ -497,20 +407,19 @@ export const WorkInfo = () => {
         await WIUpdateData({ workInfoUpValue });
         setShowTitle("Employee Work Info Updated successfully");
         setNotification(true);
-
       } else {
         const workInfoValue = {
-          ...data,        
-            remainingAnualLeave: data?.annualLeave || "0", // Default to "0" if no value is provided
-            remainingCompasLeave: data?.compasLeave || "0",
-            remainingHosLeave: data?.hospLeave || "0",
-            remainingMateLeave: data?.materLeave || "0",
-            remainingMrageLeave: data?.mrageLeave || "0",
-            remainingPaternityLeave: data?.paterLeave || "0",
-            remainingSickLeave: data?.sickLeave || "0",
-            unPaidAuthorize: "0",
-        
-          sapNo: checkingPITable.sapNo,
+          ...data,
+          remainingAnualLeave: data?.annualLeave || "0", // Default to "0" if no value is provided
+          remainingCompasLeave: data?.compasLeave || "0",
+          remainingHosLeave: data?.hospLeave || "0",
+          remainingMateLeave: data?.materLeave || "0",
+          remainingMrageLeave: data?.mrageLeave || "0",
+          remainingPaternityLeave: data?.paterLeave || "0",
+          remainingSickLeave: data?.sickLeave || "0",
+          unPaidAuthorize: "0",
+
+          sapNo: checkingPITable?.sapNo,
           WIContract: JSON.stringify(nameServiceUp.WIContract),
           WIProbation: JSON.stringify(nameServiceUp.WIProbation),
           WIResignation: JSON.stringify(nameServiceUp.WIResignation),
@@ -577,10 +486,13 @@ export const WorkInfo = () => {
           watch={watch}
           onChange={handleChange}
           selection={selection}
+          getValues={getValues}
+          setValue={setValue}
+          dropDownVal={dropDownVal}
         />
 
         <div className="grid grid-cols-3 gap-5 form-group mt-5">
-          {WorkDataPass.workFields.map((field, index) => (
+          {workFields.map((field, index) => (
             <div key={index} className="form-group">
               <label className="mb-1 text_size_5">{field.label}</label>
               {field.type === "select" ? (
@@ -589,9 +501,13 @@ export const WorkInfo = () => {
                   className="input-field select-custom"
                   defaultValue={field.value || ""}
                   watch={watch(field.name)}
+                  readOnly={field.readOnly || false}
                 >
                   {(field.options || []).map((option, i) => (
-                    <option key={i} value={option}>
+                    <option
+                      key={i}
+                      value={option === "Select" ? "" : option.toUpperCase()}
+                    >
                       {option}
                     </option>
                   ))}
@@ -602,6 +518,7 @@ export const WorkInfo = () => {
                   {...register(field.name)}
                   className="input-field"
                   defaultValue={field.value || ""}
+                  readOnly={field.readOnly || false}
                 />
               )}
               {errors[field.name] && (
@@ -612,8 +529,10 @@ export const WorkInfo = () => {
             </div>
           ))}
         </div>
-        <WIRowTwo register={register} errors={errors} watch={watch} />
-        <WIRowThree register={register} errors={errors} watch={watch} />
+
+        <WIRowTwo register={register} errors={errors} watch={watch} dropDownVal={dropDownVal}
+ />
+        <WIRowThree register={register} errors={errors} watch={watch} dropDownVal={dropDownVal} />
         <hr className="text-lite_grey mb-5" />
 
         <div className="form-group">
@@ -629,8 +548,7 @@ export const WorkInfo = () => {
               options={leavePassDD}
               errors={errors}
             />
-
-            {WorkDataPass.leaveBasic.map((field, index) => (
+            {leaveBasic.map((field, index) => (
               <FormField
                 key={index}
                 label={field.label}
@@ -643,7 +561,7 @@ export const WorkInfo = () => {
           </div>
 
           <div className="grid grid-cols-4 gap-5 form-group mt-5">
-            {WorkDataPass.leaveFieldsAnother.map((field, index) => (
+            {leaveFieldsAnother.map((field, index) => (
               <div key={index} className="form-group">
                 <label className="mb-1 text_size_5">{field.label}</label>
                 {field.type === "select" ? (
@@ -653,7 +571,10 @@ export const WorkInfo = () => {
                     className="input-field select-custom"
                   >
                     {(field.options || []).map((option, i) => (
-                      <option key={i} value={option}>
+                      <option
+                        key={i}
+                        value={option === "Select" ? "" : option.toUpperCase()}
+                      >
                         {option}
                       </option>
                     ))}
@@ -682,60 +603,54 @@ export const WorkInfo = () => {
             Employee Exit Info
           </p>
           <div className="grid grid-cols-2 form-group gap-5">
-            {WorkDataPass.terminationFields.map((field, index) => {
-              const selectedValue = watchFields[index]; // Get the watched value for the current field
-              const isOtherSelected = selectedValue === "other";
+          {terminationFields.map((field, index) => {              
+            const selectedValue = watchFields[index]; // Get the watched value for the current field
+              const isOtherSelected = selectedValue === "OTHER";
 
               return (
                 <div key={index} className="form-group">
                   <label className="block text_size_5">{field.label}</label>
                   {field.type === "select" ? (
-                    <>
-                      <select
-                        {...register(field.name)}
-                        className="input-field select-custom"
-                      >
-                        {field.options.map((option, i) => (
-                          <option
-                            key={i}
-                            value={
-                              option === "Select" ? "" : option.toLowerCase()
-                            }
-                          >
-                            {option}
-                          </option>
-                        ))}
-                      </select>
-                      {isOtherSelected && (
-                        <>
-                          <input
-                            type="text"
-                            placeholder="Please specify"
-                            {...register(
-                              `other${
-                                field.name.charAt(0).toUpperCase() +
-                                field.name.slice(1)
-                              }`,
-                              {
-                                required:
-                                  "This field is required when 'Other' is selected",
-                              }
-                            )}
-                            className="input-field"
-                          />
-                          <p className="text-[red] text-[13px] mt-1">
-                            {
-                              errors[
-                                `other${
-                                  field.name.charAt(0).toUpperCase() +
-                                  field.name.slice(1)
-                                }`
-                              ]?.message
-                            }
-                          </p>
-                        </>
-                      )}
-                    </>
+  <>
+    <select {...register(field?.name)} className="input-field select-custom">
+      <option value="">Select</option>
+      {field?.options?.map((option, i) => {
+        const optionValue =
+          typeof option === "object" ? option.value : option;
+        const optionLabel =
+          typeof option === "object" ? option.label : option;
+
+        return (
+          <option
+            key={i}
+            value={
+              optionValue === "Select"
+                ? ""
+                : String(optionValue).toUpperCase()
+            }
+          >
+            {optionLabel}
+          </option>
+        );
+      })}
+    </select>
+
+    {isOtherSelected && (
+      <>
+        <input
+          type="text"
+          placeholder="Please specify"
+          {...register(`other${field.name.charAt(0).toUpperCase() + field.name.slice(1)}`, {
+            required: "This field is required when 'Other' is selected",
+          })}
+          className="input-field"
+        />
+        <p className="text-[red] text-[13px] mt-1">
+          {errors[`other${field.name.charAt(0).toUpperCase() + field.name.slice(1)}`]?.message}
+        </p>
+      </>
+    )}
+  </>
                   ) : (
                     <input
                       type={field.type}
@@ -794,8 +709,9 @@ export const WorkInfo = () => {
           <p className="text_size_5 form-group text-medium_grey my-5">
             Employee Service Record
           </p>
+
           <div className="grid grid-cols-3 gap-5 ">
-            {WorkDataPass.serviceRecords.map((field, index) => {
+            {serviceRecords.map((field, index) => {
               return field.type === "file" ? (
                 <UploadingFiles
                   key={index}
@@ -839,13 +755,13 @@ export const WorkInfo = () => {
           </button>
         </div>
       </form>
-      {notification && (
+      {/* {notification && (
         <SpinLogo
           text={showTitle}
           notification={notification}
           path="/employee"
         />
-      )}
+      )} */}
     </section>
   );
 };

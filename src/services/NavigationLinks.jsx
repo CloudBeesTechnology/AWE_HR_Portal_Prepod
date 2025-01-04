@@ -154,6 +154,7 @@ const NavigationLinks = () => {
       "Employee",
       "Training",
       "TimeSheet",
+      "Insurance",
       "LeaveManagement",
       "Notification",
       "Report",
@@ -167,8 +168,8 @@ const NavigationLinks = () => {
   if (loading) {
     return (
       <div>
-        <div className="flex items-center justify-center h-screen">
-          <p className="text-18 font-serif font-bold">Loading...</p>
+        <div className="flex items-center justify-center h-[82vh]">
+          <p className="text-sm font-semibold">Loading...</p>
         </div>
       </div>
     );
@@ -183,6 +184,7 @@ const NavigationLinks = () => {
       "Training",
       "TimeSheet",
       "LeaveManagement",
+      "Insurance",
       "Notification",
       "Report",
       "BenefitsAndRewards",

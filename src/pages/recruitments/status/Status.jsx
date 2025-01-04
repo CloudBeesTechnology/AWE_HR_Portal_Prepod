@@ -66,7 +66,7 @@ export const Status = () => {
 
   const flattenObject = (data) => {
     const result = { ...data };
-    console.log(data);
+    console.log(data, "D");
 
     // Flatten `interviewDetails`
     if (result.interviewDetails) {

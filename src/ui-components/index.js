@@ -44,6 +44,8 @@ export { default as InsuranceTypeCreateForm } from "./InsuranceTypeCreateForm";
 export { default as InsuranceTypeUpdateForm } from "./InsuranceTypeUpdateForm";
 export { default as InterviewScheduleCreateForm } from "./InterviewScheduleCreateForm";
 export { default as InterviewScheduleUpdateForm } from "./InterviewScheduleUpdateForm";
+export { default as KeyValueStoreCreateForm } from "./KeyValueStoreCreateForm";
+export { default as KeyValueStoreUpdateForm } from "./KeyValueStoreUpdateForm";
 export { default as LabourMedicalInfoCreateForm } from "./LabourMedicalInfoCreateForm";
 export { default as LabourMedicalInfoUpdateForm } from "./LabourMedicalInfoUpdateForm";
 export { default as LeaveStatusCreateForm } from "./LeaveStatusCreateForm";

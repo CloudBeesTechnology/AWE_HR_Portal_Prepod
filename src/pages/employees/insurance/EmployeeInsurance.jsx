@@ -22,7 +22,7 @@ export const EmployeeInsurance = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
   const { searchResultData } = useOutletContext();
-  const { EmpInsuranceData , workMenDetails } = useContext(DataSupply);
+  const { EmpInsuranceData , workMenDetails,dropDownVal } = useContext(DataSupply);
   
   const { SubmitMPData } = EmpInsDataFun();
   const { UpdateEIDataSubmit } = UpdateEmpInsDataFun();
@@ -48,6 +48,10 @@ export const EmployeeInsurance = () => {
     },
     resolver: yupResolver(EmpInsuranceschema),
   });
+  const insuHSDD = dropDownVal[0]?.insuHSDD.map((item) => ({
+    value: item,
+    label: item,
+  }));
   const otherNationValue = watch("otherNation");
   const [empStatusTypeValue, setEmpStatusTypeValue] = useState("");
   const [filteredWorkmenCompNo, setFilteredWorkmenCompNo] = useState([]);
@@ -79,14 +83,7 @@ export const EmployeeInsurance = () => {
       label: "Group H&S Insurance",
       key: "groupIns",
       type: "select",
-      options: [
-        "Employee",
-        "Employee & spouse",
-        "Employee & Child",
-        "Employee & Family",
-        "Decline",
-        "Others",
-      ],
+      options:insuHSDD,
     },
     {
       label: "Group H&S Insurance Enrollment Effective Date",

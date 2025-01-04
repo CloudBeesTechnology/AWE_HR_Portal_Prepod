@@ -13,12 +13,13 @@ import { InsClainOne } from "../employees/insurance/InsClainOne";
 import { InsClaimUp } from "../../services/updateMethod/InsClainUp";
 import { SearchDisplay } from "../../utils/SearchDisplay";
 import { IoSearch } from "react-icons/io5";
+import { FormField } from "../../utils/FormField";
 
 export const InsuranceClaim = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
-  const { insuranceClaimsData, empPIData } = useContext(DataSupply);
+  const { insuranceClaimsData, empPIData,dropDownVal } = useContext(DataSupply);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const { SubmitICData } = InsClaimFun();
   const { InsClaimUpData } = InsClaimUp();
@@ -47,6 +48,10 @@ export const InsuranceClaim = () => {
   const [showTitle, setShowTitle] = useState("");
   const isInitialMount = useRef(true);
 
+  const insuClaimDD = dropDownVal[0]?.insuClaimDD.map((item) => ({
+    value: item,
+    label: item,
+  }));
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -268,32 +273,15 @@ export const InsuranceClaim = () => {
           insuranceClaims.map((field, index) => (
             <div key={index} className="flex flex-col gap-5 border-b py-10">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
-                  <label className="mb-1 text_size_6">
-                    Type of Insurance Claim
-                  </label>
-                  <select
-                    {...register(`insuranceClaims[${index}].claimType`)}
-                    defaultValue={field.claimType || ""}
-                    className="input-field select-custom"
-                  >
-                    <option value=""></option>
-                    <option value="Group H&S Insurance">
-                      Group H&S Insurance
-                    </option>
-                    <option value="Travelling Insurance">
-                      Travelling Insurance
-                    </option>
-                    <option value="Personal Accident Insurance">
-                      Personal Accident Insurance
-                    </option>
-                  </select>
-                  {errors.insuranceClaims?.[index]?.claimType && (
-                    <p className="text-[red] text-xs mt-1">
-                      {errors.insuranceClaims[index].claimType.message}
-                    </p>
-                  )}
-                </div>
+              <FormField
+  label="Type of Insurance Claim"
+  register={register}
+  name={`insuranceClaims[${index}].claimType`}
+  type="select"
+  options={insuClaimDD}
+  errors={errors.insuranceClaims?.[index]}
+/>
+
                 <div>
                   <label className="mb-1 text_size_6">
                     Insurance Claim For

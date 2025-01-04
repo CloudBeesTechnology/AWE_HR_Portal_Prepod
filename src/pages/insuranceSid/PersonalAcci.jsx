@@ -24,7 +24,6 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 
 export const PersonalAcci = () => {
-  
   const client = generateClient();
 
   const [uploadedFileNames, setUploadedFileNames] = useState({
@@ -34,17 +33,21 @@ export const PersonalAcci = () => {
     perAccUp: [],
   });
   const [notification, setNotification] = useState(false);
+  const [pageHeight, setPageHeight] = useState("auto");
   const [insuranceData, setInsuranceData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   // Popup State
-  const personAcciPrint= useRef();
+  const personAcciPrint = useRef();
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupImage, setPopupImage] = useState("");
   const [viewingDocument, setViewingDocument] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [numPages, setNumPages] = useState(null);
   const [lastUploadUrl, setPPLastUP] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [pdfHeight, setPdfHeight] = useState("");
+  const [pdfWidth, setPdfWidth] = useState("");
   const {
     register,
     handleSubmit,
@@ -56,6 +59,8 @@ export const PersonalAcci = () => {
     resolver: yupResolver(PersonalAcciSchema),
   });
 
+  console.log("J");
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = date.getDate().toString().padStart(2, "0");
@@ -64,8 +69,6 @@ export const PersonalAcci = () => {
 
     return `${day}/${month}/${year}`;
   };
-
-
 
   const linkToStorageFile = async (pathUrl) => {
     try {
@@ -77,7 +80,6 @@ export const PersonalAcci = () => {
       console.error("Error fetching the file URL:", error);
     }
   };
-
 
   const parseDocuments = (docData) => {
     try {
@@ -138,7 +140,7 @@ export const PersonalAcci = () => {
       console.error("Error submitting data:", error);
     }
   };
-  
+
   useEffect(() => {
     const fetchInsuranceData = async () => {
       try {
@@ -146,13 +148,13 @@ export const PersonalAcci = () => {
           query: listPersonalAccidents,
         });
         const items = response.data.listPersonalAccidents.items;
-  
+
         // Filter out expired policies
         const filteredData = items.filter((data) => {
           const expiryDate = new Date(data.perAccExp);
-          return expiryDate >= new Date(); 
+          return expiryDate >= new Date();
         });
-  
+
         setInsuranceData(filteredData);
         setLoading(false); // Set loading to false when data is fetched
       } catch (error) {
@@ -161,7 +163,7 @@ export const PersonalAcci = () => {
         setLoading(false);
       }
     };
-  
+
     fetchInsuranceData();
   }, []);
 
@@ -187,40 +189,55 @@ export const PersonalAcci = () => {
     setPopupVisible(true); // Show the popup
   };
 
-//  const handlePrint = useReactToPrint({
-//      content: () => personAcciPrint.current,
-//      onBeforePrint: () => console.log("Preparing print..."),
-//      onAfterPrint: () => console.log("Print complete"),
-//      pageStyle: "print", // This ensures the print view uses a different CSS style
-//    });
+  useEffect(() => {
+    const measureHeight = () => {
+      if (personAcciPrint.current) {
+        const measuredHeight = personAcciPrint.current.offsetHeight;
+        console.log("Measured PDF height:", measuredHeight);
+        if (measuredHeight > 0) {
+          setPdfHeight(`${measuredHeight}px`);
+          setIsLoading(false);
+        }
+      }
+    };
 
-const handlePrint = useReactToPrint({
-  content: () => personAcciPrint.current,
-  onBeforePrint: () => console.log("Preparing to print PDF..."),
-  onAfterPrint: () => console.log("Print complete"),
-  pageStyle: `
+    // Set a timeout to allow the DOM to fully render
+    const timeoutId = setTimeout(measureHeight, 500); // Delay for rendering
+    return () => clearTimeout(timeoutId); // Cleanup timeout on component unmount
+  }, [personAcciPrint, isLoading, pdfHeight, pdfWidth]);
+
+  const handlePrint = () => {
+    if (isLoading) {
+      alert("PDF is still loading, please wait...");
+      return;
+    }
+    printDocument();
+  };
+
+  const printDocument = useReactToPrint({
+    content: () => personAcciPrint.current,
+    onBeforePrint: () => console.log("Preparing to print PDF..."),
+    onAfterPrint: () => console.log("Print complete"),
+    pageStyle: `
       @page {
-          /* Adjust the margin as necessary */
-        height:  714px;
-        padding: 22px, 0px, 22px, 0px;     
+        height: ${pdfHeight}; /* Dynamically set height */
+        margin: 0; /* Adjust margins as needed */
       }
     `,
-});
- 
-const openModal = (uploadUrl) => {
-  setPPLastUP(uploadUrl);
-  setViewingDocument(uploadUrl);
-};
+  });
 
-const closeModal = () => {
-  setViewingDocument(null);
-};
+  const openModal = (uploadUrl) => {
+    setPPLastUP(uploadUrl);
+    setViewingDocument(uploadUrl);
+  };
+
+  const closeModal = () => {
+    setViewingDocument(null);
+  };
 
   const onDocumentLoadSuccess = ({ numPages }) => {
     setNumPages(numPages);
   };
-
-
   const renderDocumentsUnderCategory = (documents) => {
     return (
       <>
@@ -244,53 +261,62 @@ const closeModal = () => {
             {/* Conditional rendering of PDF or image */}
             {viewingDocument === document.upload &&
               document.upload.endsWith(".pdf") && (
-                <div className="py-6 fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
-                  <div className="relative bg-white rounded-lg shadow-lg w-[40vw] max-h-full flex flex-col">
-                    {/* PDF Viewer */}
-                    <div ref={personAcciPrint} className="flex-grow overflow-y-auto">
+                <div className="mt-4  ">
+                  <div className="relative bg-white max-w-3xl mx-auto p-6 rounded-lg shadow-lg">
+                    {isLoading && (
+                      <div className="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center z-10">
+                        <p className="text-lg font-semibold">Loading PDF...</p>
+                      </div>
+                    )}
+                    <div ref={personAcciPrint} className="flex justify-center">
                       <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-                        <Viewer fileUrl={lastUploadUrl || ""} />
+                        <Viewer
+                          fileUrl={lastUploadUrl || ""}
+                          onDocumentLoadSuccess={() =>
+                            console.log("PDF loaded successfully")
+                          }
+                        />
                       </Worker>
                     </div>
 
+                    {/* Close Button */}
                     <div className="absolute top-2 right-2">
                       <button
-                        onClick={closeModal} // Close the modal
+                        onClick={() => setViewingDocument(null)} // Close the viewer
                         className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
                       >
                         <FaTimes />
                       </button>
                     </div>
+                  </div>
 
-                    <div className="flex items-center justify-center gap-6 py-4">
-                      <div className="mt-2 flex">
-                        <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
-                          <a href={lastUploadUrl} download>
-                            Download
-                          </a>
-                          <FaDownload className="ml-2 mt-1" />
-                        </button>
-                      </div>
-                      <div className="mt-2 flex">
-                        <button
-                          onClick={handlePrint}
-                          className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
-                        >
-                          Print
-                          <FaPrint className="ml-2 mt-1" />
-                        </button>
-                      </div>
+                  <div className="flex items-center justify-center gap-6 py-4">
+                    <div className="mt-2 flex">
+                      <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
+                        <a href={lastUploadUrl} download>
+                          Download
+                        </a>
+                        <FaDownload className="ml-2 mt-1" />
+                      </button>
+                    </div>
+                    <div className="mt-2 flex">
+                      <button
+                        onClick={handlePrint}
+                        className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
+                      >
+                        Print
+                        <FaPrint className="ml-2 mt-1" />
+                      </button>
                     </div>
                   </div>
                 </div>
               )}
 
-
             {/* Image Viewer */}
             {viewingDocument === document.upload &&
               !document.upload.endsWith(".pdf") && (
                 <div className="relative mt-4">
-                  <div >
+                  <div>
                     <img
                       src={lastUploadUrl} // Use the URL for the image
                       alt="Document Preview"
@@ -321,7 +347,7 @@ const closeModal = () => {
                         onClick={handlePrint}
                         className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
                       >
-                        Print
+                        {isLoading ? "Loading..." : "Print PDF"}
                         <FaPrint className="ml-2 mt-1" />
                       </button>
                     </div>
@@ -357,56 +383,58 @@ const closeModal = () => {
   return (
     <section>
       <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto py-5 px-10 my-10 bg-[#F5F6F1CC]"
-    >
-      {/* Personal Accident Insurance Fields */}
-      <h3 className="mb-5 text-lg font-bold">Personal Accident Insurance</h3>
-      <div className="relative mb-5">
-        <div className="grid grid-cols-3 gap-4 items-center">
-          {/* Personal Accident Policy Number */}
-          <FormField
-            name="perAccNo"
-            type="text"
-            placeholder="Enter Personal Accident Policy Number"
-            label="Policy Number"
-            register={register}
-            errors={errors}
-          />
-
-          {/* Personal Accident Expiry Date */}
-          <FormField
-            name="perAccExp"
-            type="date"
-            label="Expiry Date"
-            register={register}
-            errors={errors}
-          />
-
-          {/* File Upload */}
-          <div className="mb-2 relative">
-            <FileUploadField
-              label="Upload File"
-              onChangeFunc={(e) => handleFileChange(e, "perAccUp")}
+        onSubmit={handleSubmit(onSubmit)}
+        className="mx-auto py-5 px-10 my-10 bg-[#F5F6F1CC]"
+      >
+        {/* Personal Accident Insurance Fields */}
+        <h3 className="mb-5 text-lg font-bold">Personal Accident Insurance</h3>
+        <div className="relative mb-5">
+          <div className="grid grid-cols-3 gap-4 items-center">
+            {/* Personal Accident Policy Number */}
+            <FormField
+              name="perAccNo"
+              type="text"
+              placeholder="Enter Personal Accident Policy Number"
+              label="Policy Number"
               register={register}
-              name="perAccUp"
-              error={errors}
+              errors={errors}
             />
-            <div className="absolute">
-              {uploadedFileNames.perAccUp && (
-                <span className="text-sm text-grey">{uploadedFileNames.perAccUp}</span>
-              )}
+
+            {/* Personal Accident Expiry Date */}
+            <FormField
+              name="perAccExp"
+              type="date"
+              label="Expiry Date"
+              register={register}
+              errors={errors}
+            />
+
+            {/* File Upload */}
+            <div className="mb-2 relative">
+              <FileUploadField
+                label="Upload File"
+                onChangeFunc={(e) => handleFileChange(e, "perAccUp")}
+                register={register}
+                name="perAccUp"
+                error={errors}
+              />
+              <div className="absolute">
+                {uploadedFileNames.perAccUp && (
+                  <span className="text-sm text-grey">
+                    {uploadedFileNames.perAccUp}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Submit Button */}
-      <div className="center my-10">
-        <button type="submit" className="primary_btn">
-          Save
-        </button>
-      </div>
+        {/* Submit Button */}
+        <div className="center my-10">
+          <button type="submit" className="primary_btn">
+            Save
+          </button>
+        </div>
       </form>
 
       {notification && (
@@ -423,35 +451,37 @@ const closeModal = () => {
           View Insurance Info
         </p>
         {insuranceData.length > 0 ? (
-                <div className=' h-[400px] overflow-y-auto scrollBar'>
-          <table className="w-full text-center">
-            <thead className="bg-[#939393] text-white">
-              <tr>
-                <th className="pl-4 py-4 rounded-tl-lg">Policy Number</th>
-                <th className="pl-4 py-4">Expiry Date</th>
-                <th className="pl-4 py-4 rounded-tr-lg">Uploaded File</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white cursor-pointer">
-              {insuranceData.map((data, index) => (
-                <tr
-                  key={index}
-                  className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
-                >
-                  <td className="pl-4 py-4">{data.perAccNo}</td>
-                  <td className="py-4 px-4">
-                    {formatDate(data?.perAccExp || "N/A")}
-                  </td>
-                  <td className="pl-4 py-4">
-                    {renderDocumentCategory(data.perAccUp,"PDF File")}
-                  </td>
+          <div className=" h-[400px] overflow-y-auto scrollBar">
+            <table className="w-full text-center">
+              <thead className="bg-[#939393] text-white">
+                <tr>
+                  <th className="pl-4 py-4 rounded-tl-lg">Policy Number</th>
+                  <th className="pl-4 py-4">Expiry Date</th>
+                  <th className="pl-4 py-4 rounded-tr-lg">Uploaded File</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-white cursor-pointer">
+                {insuranceData.map((data, index) => (
+                  <tr
+                    key={index}
+                    className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
+                  >
+                    <td className="pl-4 py-4">{data.perAccNo}</td>
+                    <td className="py-4 px-4">
+                      {formatDate(data?.perAccExp || "N/A")}
+                    </td>
+                    <td className="pl-4 py-4">
+                      {renderDocumentCategory(data.perAccUp, "PDF File")}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         ) : (
-          <p className="text-center mt-10">No insurance information available.</p>
+          <p className="text-center mt-10">
+            No insurance information available.
+          </p>
         )}
       </div>
 
@@ -467,14 +497,16 @@ const closeModal = () => {
             </button>
             {popupImage.endsWith(".pdf") ? (
               <Worker
-              workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
+                workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
                 file={popupImage}
                 onLoadSuccess={onDocumentLoadSuccess}
               >
                 <Page pageNumber={pageNumber} />
                 <div className="text-center mt-2">
                   <button
-                    onClick={() => setPageNumber((prev) => Math.max(prev - 1, 1))}
+                    onClick={() =>
+                      setPageNumber((prev) => Math.max(prev - 1, 1))
+                    }
                     disabled={pageNumber <= 1}
                   >
                     Previous
@@ -483,7 +515,9 @@ const closeModal = () => {
                     {pageNumber} / {numPages}
                   </span>
                   <button
-                    onClick={() => setPageNumber((prev) => Math.min(prev + 1, numPages))}
+                    onClick={() =>
+                      setPageNumber((prev) => Math.min(prev + 1, numPages))
+                    }
                     disabled={pageNumber >= numPages}
                   >
                     Next
@@ -491,12 +525,15 @@ const closeModal = () => {
                 </div>
               </Worker>
             ) : (
-              <img src={popupImage} alt="popup view" className="w-full h-auto" />
+              <img
+                src={popupImage}
+                alt="popup view"
+                className="w-full h-auto"
+              />
             )}
           </div>
         </div>
       )}
     </section>
-    
   );
 };

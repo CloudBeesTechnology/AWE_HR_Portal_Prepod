@@ -200,7 +200,7 @@ export const UploadORMCfile = (
 
         // Rearrange the parts to MM/DD/YYYY
         const [day, month, year] = parts;
-        return `${month}/${day}/${year}`;
+        return `${day}/${month}/${year}`;
       }
         // const lastOccurrenceObjects =
         //   getLastOccurrencePerFIDDate(updatedDataArray);

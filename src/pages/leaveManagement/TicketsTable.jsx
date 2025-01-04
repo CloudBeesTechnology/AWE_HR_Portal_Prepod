@@ -20,7 +20,7 @@ export const TicketsTable = () => {
   const [data, setData] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
-  const { ticketMerged } = useLeaveManage();
+  const { ticketMerged, loading } = useLeaveManage();
 
   // Add new state to track all filters
   const [filters, setFilters] = useState({
@@ -224,7 +224,7 @@ export const TicketsTable = () => {
     "Submitted form",
     userType !== "SuperAdmin" && "Status",
   ];
-  console.log(ticketMerged);
+
 
   useEffect(() => {
     const sortedData = ticketMerged.sort(
@@ -234,6 +234,15 @@ export const TicketsTable = () => {
     setData(sortedData);
   }, [ticketMerged]);
 
+  if (loading) {
+    return (
+      <div>
+        <div className="flex items-center justify-center h-[60vh]">
+          <p className="text-sm font-semibold">Loading...</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <section className="w-full">
       <div className="flex justify-between flex-wrap mb-5">
@@ -302,12 +311,12 @@ export const TicketsTable = () => {
                     <td className="border-b-2  border-[#CECECE] py-5">
                       {item?.empName || "N/A"}
                     </td>
-                    <td className="border-b-2 border-[#CECECE] py-5">
+                    <td className="border-b-2 border-[#CECECE] py-5 break-words overflow-hidden">
                       {Array.isArray(item.department)
                         ? item.department[item.department.length - 1] || "N/A"
                         : "N/A"}
                     </td>
-                    <td className="border-b-2 border-[#CECECE] py-5">
+                    <td className="border-b-2 border-[#CECECE] py-5 break-words overflow-hidden">
                       {Array.isArray(item.position)
                         ? item.position[item.position.length - 1] || "N/A"
                         : "N/A"}

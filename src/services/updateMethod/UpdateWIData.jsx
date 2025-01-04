@@ -19,18 +19,22 @@ export const UpdateWIData = () => {
       throw new Error("Missing required parameters");
     }
     const formatDate = (date) =>
+      date && new Date(date).toLocaleDateString("en-CA") ;
+    const formattingDate = (date) =>
       date ? new Date(date).toLocaleDateString("en-CA") : null;
 
-    const updateFieldArray = (existingArray, newValue) => [
-      ...new Set([...(existingArray || []), newValue]),
-    ];
-
-    const updateFieldArray1 = (existingArray, newValue) => {
-      // Simply add the newValue to the existingArray without checking duplicates
-      existingArray.push(newValue);
-      return existingArray;  // Return the updated array
+    const updateFieldArray = (existingArray, newValue) => {
+      if (!existingArray) return newValue ? [newValue] : []; // return empty array if no newValue
+      if (newValue == null) return existingArray; // avoid adding null/undefined
+      return [...new Set([...(existingArray || []), newValue])].filter(Boolean); // remove null/undefined values
     };
-
+    
+    const updateFieldArray1 = (existingArray, newValue) => {
+      if (!existingArray) return newValue ? [newValue] : []; // return empty array if no newValue
+      if (newValue == null) return existingArray; // avoid adding null/undefined
+      return [...existingArray, newValue].filter(Boolean); // remove null/undefined values
+    };
+    
     const {
       empID,
       SRDataRecord,
@@ -114,7 +118,7 @@ export const UpdateWIData = () => {
 
     const contractEndValue = formatDate(contractEnd);
     const contractStartValue = formatDate(contractStart);
-    const dojValue = formatDate(doj);
+    const dojValue = formattingDate(doj);
     const probationEndValue = formatDate(probationEnd);
     const probationStartValue = formatDate(probationStart);
     const upgradeDateValue = formatDate(upgradeDate);
@@ -183,7 +187,7 @@ export const UpdateWIData = () => {
         workInfoDataRecord.manager,
         manager
       );
-      const updatedhr = updateFieldArray1(workInfoDataRecord.hr, hr);
+      const updatedhr = updateFieldArray(workInfoDataRecord.hr, hr);
       const updatedsupervisor = updateFieldArray1(
         workInfoDataRecord.supervisor,
         supervisor
@@ -252,12 +256,12 @@ export const UpdateWIData = () => {
         salaryType: updatedsalaryType,
       };
 
-      // console.log(totalData, "ertdfghjkhbtxrfgh");
+  //     console.log(totalData, "ertdfghjkhbtxrfgh");
      try{ const Work = await client.graphql({
       query: updateEmpWorkInfo, 
       variables: { input: totalData, limit:20000, },
     })
-    // console.log(Work);
+    console.log(Work);
   }
     catch(err){
       console.log(err);     
@@ -310,7 +314,7 @@ export const UpdateWIData = () => {
      
     };
     
-      // console.log(totalData1, "ertdfghjkhbtxrfgh");
+    //   // console.log(totalData1, "ertdfghjkhbtxrfgh");
       try{const Leave = await client.graphql({
         query: updateEmpLeaveDetails, 
         variables: { input: totalData1, limit:20000, },
@@ -351,7 +355,7 @@ export const UpdateWIData = () => {
           query: updateTerminationInfo, 
           variables: { input: totalData2 , limit:20000,},
         });
-        // console.log(Terminate);
+        console.log(Terminate);
       }catch(err){console.log(err);
       }
     }

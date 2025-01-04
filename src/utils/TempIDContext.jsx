@@ -11,8 +11,14 @@ export const TempIDProvider = ({ children }) => {
   const [timeSheetFileData, setTimeSheetFileData] = useState(null);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
   const [searchQuery, setSearchQuery] = useState(null);
   const [showListTimeSheet, setShowListTimeSheet] = useState(true);
+
+  // For View Summary
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [getStartDate, setGetStartDate] = useState(new Date()); // Initialize with current date
+  const [getEndDate, setGetEndDate] = useState(new Date()); // Initialize with current date
   return (
     <TempIDContext.Provider
       value={{
@@ -28,6 +34,12 @@ export const TempIDProvider = ({ children }) => {
         setSearchQuery,
         showListTimeSheet,
         setShowListTimeSheet,
+        selectedLocation,
+        setSelectedLocation,
+        getStartDate,
+        setGetStartDate,
+        getEndDate,
+        setGetEndDate,
       }}
     >
       {children}

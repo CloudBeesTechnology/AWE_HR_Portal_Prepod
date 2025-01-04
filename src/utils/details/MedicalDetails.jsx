@@ -131,6 +131,8 @@ const MedicalDetails = ({
   //     `,
   // });
 
+  console.log(medicalInfo);
+
   // Function to render documents
   const renderDocumentsUnderCategory = (documents, category) => {
     return (

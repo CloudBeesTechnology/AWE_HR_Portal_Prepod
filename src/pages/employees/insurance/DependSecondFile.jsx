@@ -1,9 +1,13 @@
 import { FormField } from "../../../utils/FormField";
 import { GenderDD, NationalityDD } from "../../../utils/DropDownMenus";
 
-export const DependSecondFile = ({ register, errors, index, selectedNationality,handleNationalityChange,watch }) => {
+export const DependSecondFile = ({dropDownVal, register, errors, index, selectedNationality,handleNationalityChange,watch }) => {
   const depenotherNation = watch(`depInsurance[${index}].depenotherNation` || "");
   const nation = watch(`depInsurance[${index}].depenNation` || "");
+  const nationalityDD = dropDownVal[0]?.nationalityDD.map((item) => ({
+    value: item,
+    label: item,
+  }));
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -27,7 +31,7 @@ export const DependSecondFile = ({ register, errors, index, selectedNationality,
           register={register}
           name={`depInsurance[${index}].depenNation`}
           type="select"
-          options={NationalityDD}
+          options={nationalityDD}
           errors={errors}
           onChange={handleNationalityChange}
         />
@@ -40,8 +44,8 @@ export const DependSecondFile = ({ register, errors, index, selectedNationality,
           errors={errors}
           // onChange={handleNationalityChange}
         /> */}
-        {(selectedNationality === "Other" ||
-          (depenotherNation && nation === "Other")) && (
+        {(selectedNationality === "OTHER" ||
+          (depenotherNation && nation === "OTHER")) && (
           <FormField
             label="Other Nationality"
             register={register}

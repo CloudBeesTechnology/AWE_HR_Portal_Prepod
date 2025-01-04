@@ -14,6 +14,10 @@ export const useUpdateWPTracking = () => {
       const {
         id,
         tempID,
+        sawpDate,
+        sawpRecivedDate,
+        sawpFile, 
+        remarkNLMob,
         supportletterReqDate,
         supportletterReceiveDate,
         letterfile,
@@ -63,6 +67,10 @@ export const useUpdateWPTracking = () => {
       const updatedData = {
         id,
         tempID,
+        sawpDate,
+        sawpRecivedDate,
+        sawpFile, 
+        remarkNLMob,
         supportletterReqDate,
         supportletterReceiveDate,
         letterfile,

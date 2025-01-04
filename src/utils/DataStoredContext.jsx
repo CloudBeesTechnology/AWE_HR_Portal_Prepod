@@ -32,6 +32,7 @@ import {
   listProbForms,
   listEmailNotifis,
   listWPTrackings,
+  listKeyValueStores,
 } from "../graphql/queries";
 
 export const DataSupply = createContext();
@@ -71,6 +72,7 @@ const DataStoredContext = ({ children }) => {
     ProbFData:[],
     EmailNotifi:[],
     WPTrackings:[],
+    dropDownVal:[],
   });
 
   useEffect(() => {
@@ -108,6 +110,7 @@ const DataStoredContext = ({ children }) => {
           { query: listProbForms, key: "ProbFData" },
           { query: listEmailNotifis, key: "EmailNotifi" },
           { query: listWPTrackings, key: "WPTrackings" },
+          { query: listKeyValueStores, key: "dropDownVal" },
         ];
         const limit = 20000;
         const responses = await Promise.all(

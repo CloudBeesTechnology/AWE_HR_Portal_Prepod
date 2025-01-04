@@ -17,6 +17,7 @@ export const RaceDD = [
   { value: "Bangladesi", label: "Bangladesi" },
   { value: "Bidayuh", label: "Bidayuh" },
   { value: "British", label: "British" },
+  { value: "Bisaya", label: "Bisaya" },
   { value: "Chinese", label: "Chinese" },
   { value: "Dayak", label: "Dayak" },
   { value: "Dusun", label: "Dusun" },
@@ -49,10 +50,11 @@ export const RaceDD = [
 export const ReligionDD = [
   { value: "Islam", label: "Islam" },
   { value: "Christian", label: "Christian" },
-  { value: "Hindu", label: "Hindu" },
+  { value: "Hinduism", label: "Hinduism" },
   { value: "Buddhist", label: "Buddhist" },
   { value: "Free Thinker", label: "Free Thinker" },
   { value: "Not Mentioned", label: "Not Mentioned" },
+  { value: "Other", label: "Other" },
 ];
 
 export const NationalCatDD = [
@@ -187,7 +189,8 @@ export const DepartmentDD = [
   { value: "Corporate", label: "Corporate" },
   { value: "CPD", label: "CPD" },
   { value: "E&I", label: "E&I" },
-  { value: "Human Resources", label: "Human Resources" },
+  { value: "SBW", label: "SBW" },
+  { value: "Human Resource", label: "Human Resource" },
   { value: "LBD", label: "LBD" },
   { value: "Offshore", label: "Offshore" },
   { value: "Purchasing", label: "Purchasing" },
@@ -195,34 +198,34 @@ export const DepartmentDD = [
 ];
 
 
-export const JobCatDD = [
-  { value: "", label: "Select Category" },
-  { value: "Blaster/Painter", label: "Blaster/Painter" },
-  { value: "Clerical", label: "Clerical" },
-  { value: "Coordinator", label: "Coordinator" },
-  { value: "Director", label: "Director" },
-  { value: "Driver", label: "Driver" },
-  { value: "Driver/Operator", label: "Driver/Operator" },
-  { value: "Electrician", label: "Electrician" },
-  { value: "Engineer", label: "Engineer" },
-  { value: "Fitter", label: "Fitter" },
-  { value: "Helper/Store Assistant", label: "Helper/Store Assistant" },
-  { value: "Inspector", label: "Inspector" },
-  { value: "Insulation", label: "Insulation" },
-  { value: "Leadman", label: "Leadman" },
-  { value: "Machinist", label: "Machinist" },
-  { value: "Manager", label: "Manager" },
-  { value: "Mechanic", label: "Mechanic" },
-  { value: "Rigger/Field Support", label: "Rigger/Field Support" },
-  { value: "Safety", label: "Safety" },
-  { value: "Scaffolder", label: "Scaffolder" },
-  { value: "Storekeeper", label: "Storekeeper" },
-  { value: "Superintendent", label: "Superintendent" },
-  { value: "Supervisor", label: "Supervisor" },
-  { value: "Technician", label: "Technician" },
-  { value: "Welder", label: "Welder" },
-  { value: "Other", label: "Other" },
-];
+// export const JobCatDD = [
+//   { value: "", label: "Select Category" },
+//   { value: "Blaster/Painter", label: "Blaster/Painter" },
+//   { value: "Clerical", label: "Clerical" },
+//   { value: "Coordinator", label: "Coordinator" },
+//   { value: "Director", label: "Director" },
+//   { value: "Driver", label: "Driver" },
+//   { value: "Driver/Operator", label: "Driver/Operator" },
+//   { value: "Electrician", label: "Electrician" },
+//   { value: "Engineer", label: "Engineer" },
+//   { value: "Fitter", label: "Fitter" },
+//   { value: "Helper/Store Assistant", label: "Helper/Store Assistant" },
+//   { value: "Inspector", label: "Inspector" },
+//   { value: "Insulator", label: "Insulator" },
+//   { value: "Leadman", label: "Leadman" },
+//   { value: "Machinist", label: "Machinist" },
+//   { value: "Manager", label: "Manager" },
+//   { value: "Mechanic", label: "Mechanic" },
+//   { value: "Rigger/Field Support", label: "Rigger/Field Support" },
+//   { value: "Safety", label: "Safety" },
+//   { value: "Scaffolder", label: "Scaffolder" },
+//   { value: "Storekeeper", label: "Storekeeper" },
+//   { value: "Superintendent", label: "Superintendent" },
+//   { value: "Supervisor", label: "Supervisor" },
+//   { value: "Technician", label: "Technician" },
+//   { value: "Welder", label: "Welder" },
+//   { value: "Other", label: "Other" },
+// ];
 
 
 export const workInfoUploads = [

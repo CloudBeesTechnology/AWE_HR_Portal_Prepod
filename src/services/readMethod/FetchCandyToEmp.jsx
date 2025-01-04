@@ -1,8 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { generateClient } from "@aws-amplify/api";
-import { listWPTrackings } from "../../graphql/queries";
-import { listInterviewSchedules } from "../../graphql/queries"; // Assuming this query exists
+import { listWPTrackings, listInterviewSchedules } from "../../graphql/queries";
 
 const client = generateClient();
 
@@ -16,28 +15,35 @@ export const useFetchCandy = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Fetch the data from both queries concurrently
-        const [interviewSchedulesData, interviewScheduleData] = await Promise.all([
-          client.graphql({ query: listWPTrackings ,variables:{limit:20000}}),
-          client.graphql({ query: listInterviewSchedules ,variables:{limit:20000}}) // Fetch the second query
+        // Fetch the data from multiple sources concurrently
+        const [interviewSchedulesData, interStatus] = await Promise.all([
+          client.graphql({ query: listWPTrackings,variables:{limit:20000} }),
+          client.graphql({ query: listInterviewSchedules,variables:{limit:20000} }),
         ]);
 
         // Extract data or use empty array as fallback
         const fetchedInterviewSchedules = interviewSchedulesData?.data?.listWPTrackings?.items || [];
-        const fetchedInterviewSchedule = interviewScheduleData?.data?.listInterviewSchedules?.items || [];
+        const fetchedInterStatus = interStatus?.data?.listInterviewSchedules?.items || [];
+      
+        // Set interview schedules to state
+        setInterviewSchedules(fetchedInterviewSchedules);
 
-        // Merge the results
-        // Assuming both are arrays, just concatenate them
-        const mergedSchedules = [
-          ...fetchedInterviewSchedules, 
-          ...fetchedInterviewSchedule
-        ];
+        const interviewDetailsMap = fetchedInterviewSchedules.reduce((acc, detail) => {
+          acc[detail.tempID] = detail;
+          return acc;
+        }, {});
 
-        // Optionally, you can sort the merged result, if needed:
-        // mergedSchedules.sort((a, b) => new Date(a.date) - new Date(b.date)); // Example of sorting by date
+        const statusDetailsMap = fetchedInterStatus.reduce((acc, detail) => {
+          acc[detail.tempID] = detail;
+          return acc;
+        }, {});
 
-        // Set merged schedules to state
-        setInterviewSchedules(mergedSchedules);
+         // Merge interview schedules with personal details and local mobilizations
+         const merged = fetchedInterviewSchedules.map((schedule) => ({
+          ...schedule,
+          IDDetails: statusDetailsMap[schedule.tempID] || {}, // Add local mobilization info
+        }));
+    setInterviewSchedules(merged)
         
       } catch (err) {
         setError(err);

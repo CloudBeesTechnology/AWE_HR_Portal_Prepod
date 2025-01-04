@@ -1,6 +1,68 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getKeyValueStore = /* GraphQL */ `
+  query GetKeyValueStore($id: ID!) {
+    getKeyValueStore(id: $id) {
+      id
+      departmentDD
+      positionDD
+      jobCatDD
+      raceDD
+      religionDD
+      nationalityDD
+      countryORDD
+      educLevelDD
+      workStatusDD
+      relationshipDD
+      resignNotifProbDD
+      termiNotifProbDD
+      resignNotifConfDD
+      termiNotifConfDD
+      workPermitDD
+      insuHSDD
+      insuClaimDD
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listKeyValueStores = /* GraphQL */ `
+  query ListKeyValueStores(
+    $filter: ModelKeyValueStoreFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listKeyValueStores(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        departmentDD
+        positionDD
+        jobCatDD
+        raceDD
+        religionDD
+        nationalityDD
+        countryORDD
+        educLevelDD
+        workStatusDD
+        relationshipDD
+        resignNotifProbDD
+        termiNotifProbDD
+        resignNotifConfDD
+        termiNotifConfDD
+        workPermitDD
+        insuHSDD
+        insuClaimDD
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getBastingPaint = /* GraphQL */ `
   query GetBastingPaint($id: ID!) {
     getBastingPaint(id: $id) {
@@ -87,6 +149,8 @@ export const getTimeSheet = /* GraphQL */ `
       fromDate
       untilDate
       location
+      mealAllow
+      verify
       createdAt
       updatedAt
       __typename
@@ -142,6 +206,8 @@ export const listTimeSheets = /* GraphQL */ `
         fromDate
         untilDate
         location
+        mealAllow
+        verify
         createdAt
         updatedAt
         __typename

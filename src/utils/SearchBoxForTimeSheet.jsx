@@ -111,9 +111,9 @@ export const SearchBoxForTimeSheet = ({
           } else {
             const isMatch = checkSearchMatch(employee);
 
-            if (isMatch) {
-              // console.log(`TimeKeeper Match Found:`, employee);
-            }
+            // if (isMatch) {
+            //   // console.log(`TimeKeeper Match Found:`, employee);
+            // }
             return isMatch ? employee : null;
           }
         });

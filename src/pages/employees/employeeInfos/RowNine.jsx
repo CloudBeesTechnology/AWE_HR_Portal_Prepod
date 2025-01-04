@@ -2,7 +2,11 @@
 import { EducLevelDD } from '../../../utils/DropDownMenus'
 import { FormField } from '../../../utils/FormField'
 
-export const RowNine = ({register,errors}) => {
+export const RowNine = ({register,errors,dropDownVal}) => {
+  const educLevelDD = dropDownVal[0]?.educLevelDD.map((item) => ({
+    value: item,
+    label: item,
+  }));
   return (
     <div className="grid grid-cols-3 gap-5 form-group">
     <FormField
@@ -18,7 +22,7 @@ export const RowNine = ({register,errors}) => {
       register={register}
       name="educLevel"
       type="select"
-      options={EducLevelDD}
+      options={educLevelDD}
       errors={errors}
     />
 

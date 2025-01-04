@@ -6,12 +6,16 @@ import { FileUploadField } from "../../../employees/medicalDep/FileUploadField";
 import { AirTktFormSchema } from "../../../../services/Validation";
 import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
 import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPTracking";
+import { UpdateInterviewData } from "../../../../services/updateMethod/UpdateInterview";
 import { statusOptions } from "../../../../utils/StatusDropdown";
+import { SpinLogo } from "../../../../utils/SpinLogo";
 
 export const AirTktForm = ({ candidate }) => {
   const { interviewSchedules } = useFetchCandy();
   const { wpTrackingDetails } = useUpdateWPTracking();
+  const { interviewDetails } = UpdateInterviewData();
 
+  const [notification, setNotification] = useState(false);
   const [formData, setFormData] = useState({
     interview: {
       id: "",
@@ -41,6 +45,7 @@ export const AirTktForm = ({ candidate }) => {
   });
 
   const AirTktUpload = watch("airTktFile", "");
+  console.log(interviewSchedules);
 
   useEffect(() => {
     if (interviewSchedules.length > 0) {
@@ -53,12 +58,12 @@ export const AirTktForm = ({ candidate }) => {
         // Set the form data
         setFormData({
           interview: {
-            departuredate: interviewData.departure,
+            departuredate: interviewData.departuredate,
             arrivaldate: interviewData.arrivaldate,
             cityname: interviewData.cityname,
             airfare: interviewData.airfare,
             airticketfile: interviewData.airticketfile,
-            status: interviewData.status,
+            status: interviewData.IDDetails.status,
           },
         });
 
@@ -107,7 +112,13 @@ export const AirTktForm = ({ candidate }) => {
     const selectedInterviewData = interviewSchedules.find(
       (data) => data.tempID === candidate?.tempID
     );
+
+    const selectedInterviewDataStatus = interviewSchedules.find(
+      (data) => data.IDDetails.tempID === candidate?.tempID
+    );
+
     const interviewScheduleId = selectedInterviewData?.id;
+    const interviewScheduleStatusId = selectedInterviewDataStatus.IDDetails?.id;
 
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
@@ -133,6 +144,18 @@ export const AirTktForm = ({ candidate }) => {
         },
       });
 
+      const interStatus = {
+        id: interviewScheduleStatusId, // Dynamically use the correct id
+        status: formData.interview.status,
+      };
+      setNotification(true);
+
+      console.log("Submitting interview details with status:", interStatus);
+
+      await interviewDetails({ InterviewValue: interStatus });
+
+      console.log("Interview status updated:", interStatus);
+
       // console.log("Response from WPTrackingDetails:", response);
 
       if (response.errors && response.errors.length > 0) {
@@ -154,96 +177,107 @@ export const AirTktForm = ({ candidate }) => {
   };
 
   return (
-    <form onSubmit={handleSubmitTwo} className="p-5">
-      <div className="grid grid-cols-2 gap-5 mt-5">
-        <div>
-          <label htmlFor="departuredate">Date of Departure</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="date"
-            id="departuredate"
-            {...register("departuredate")}
-            value={formData.interview.departuredate}
-            onChange={(e) => handleInputChange("departuredate", e.target.value)}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="arrivaldate">Date of Arrival</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="date"
-            id="arrivaldate"
-            {...register("arrivaldate")}
-            value={formData.interview.arrivaldate}
-            onChange={(e) => handleInputChange("arrivaldate", e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="cityname">City of Departure</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="text"
-            id="cityname"
-            {...register("cityname")}
-            value={formData.interview.cityname}
-            onChange={(e) => handleInputChange("cityname", e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="airfare">AirFare</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="text"
-            id="airfare"
-            {...register("airfare")}
-            value={formData.interview.airfare}
-            onChange={(e) => handleInputChange("airfare", e.target.value)}
-          />
-        </div>
-
-        <div className="">
-          <div className="flex items-center gap-5 mt-1">
-            <FileUploadField
-              label="Upload File"
-              className="p-4"
-              onChangeFunc={(e) => handleFileChange(e, "airTktFile")}
-              accept="application/pdf"
-              register={register}
-              fileName={
-                uploadedFileNames.airTktFile || extractFileName(AirTktUpload)
+    <>
+      <form onSubmit={handleSubmitTwo} className="p-5">
+        <div className="grid grid-cols-2 gap-5 mt-5">
+          <div>
+            <label htmlFor="departuredate">Date of Departure</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="date"
+              id="departuredate"
+              {...register("departuredate")}
+              value={formData.interview.departuredate}
+              onChange={(e) =>
+                handleInputChange("departuredate", e.target.value)
               }
-              value={formData.interview.airfare}
             />
           </div>
-        </div>
-        <div>
-          <label htmlFor="status">Status</label>
-          <select
-            className="w-full border p-2 rounded mt-1"
-            id="status"
-            {...register("status")}
-            value={formData.interview.status}
-            onChange={(e) => handleInputChange("status", e.target.value)}
-          >
-            {/* <option value="">Select Status</option> */}
-            {statusOptions.map((status, index) => (
-              <option key={index} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
 
-      <div className="mt-5 flex justify-center">
-        <button
-          type="submit"
-          className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
-        >
-          Submit
-        </button>
-      </div>
-    </form>
+          <div>
+            <label htmlFor="arrivaldate">Date of Arrival</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="date"
+              id="arrivaldate"
+              {...register("arrivaldate")}
+              value={formData.interview.arrivaldate}
+              onChange={(e) => handleInputChange("arrivaldate", e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="cityname">City of Departure</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="text"
+              id="cityname"
+              {...register("cityname")}
+              value={formData.interview.cityname}
+              onChange={(e) => handleInputChange("cityname", e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="airfare">AirFare</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="text"
+              id="airfare"
+              {...register("airfare")}
+              value={formData.interview.airfare}
+              onChange={(e) => handleInputChange("airfare", e.target.value)}
+            />
+          </div>
+
+          <div className="">
+            <div className="flex items-center gap-5 mt-1">
+              <FileUploadField
+                label="Upload File"
+                className="p-4"
+                onChangeFunc={(e) => handleFileChange(e, "airTktFile")}
+                accept="application/pdf"
+                register={register}
+                fileName={
+                  uploadedFileNames.airTktFile || extractFileName(AirTktUpload)
+                }
+                value={formData.interview.airfare}
+              />
+            </div>
+          </div>
+          <div>
+            <label htmlFor="status">Status</label>
+            <select
+              className="w-full border p-2 rounded mt-1"
+              id="status"
+              {...register("status")}
+              value={formData.interview.status}
+              onChange={(e) => handleInputChange("status", e.target.value)}
+            >
+              {/* <option value="">Select Status</option> */}
+              {statusOptions.map((status, index) => (
+                <option key={index} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="mt-5 flex justify-center">
+          <button
+            type="submit"
+            className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
+          >
+            Submit
+          </button>
+        </div>
+      </form>
+      {notification && (
+        <SpinLogo
+          text="Candidate details updated successfully"
+          notification={notification}
+          path="/recrutiles/workpasstracking"
+        />
+      )}
+    </>
   );
 };

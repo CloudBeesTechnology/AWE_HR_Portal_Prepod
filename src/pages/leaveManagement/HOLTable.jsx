@@ -8,7 +8,7 @@ import { Pagination } from "./Pagination";
 import { DateFormat } from "../../utils/DateFormat";
 
 export const HOLTable = () => {
-  const { userType, mergedData, userID } = useOutletContext();
+  const { userType, mergedData, userID, loading } = useOutletContext();
 
   const [matchData, setMatchData] = useState([]);
   const [secondartyData, setSecondartyData] = useState([]);
@@ -29,12 +29,17 @@ export const HOLTable = () => {
     // Step 1: Initial filtering based on user type
     let filteredData = mergedData
       .filter((items) => {
-        if (userType === "Supervisor" && items?.empStatus !== "Cancelled" && items.managerStatus==="Approved") {
+        if (
+          userType === "Supervisor" &&
+          items?.empStatus !== "Cancelled" &&
+          items.managerStatus === "Approved"
+        ) {
           return items.supervisorEmpID === userID;
         } else if (
           userType === "Manager" &&
           (items.supervisorStatus === "Approved" || !items.supervisorEmpID) &&
-          items?.empStatus !== "Cancelled" && items.managerStatus==="Approved"
+          items?.empStatus !== "Cancelled" &&
+          items.managerStatus === "Approved"
         ) {
           return items.managerEmpID === userID;
         } else if (userType === "SuperAdmin" || userType === "HR") {
@@ -99,26 +104,7 @@ export const HOLTable = () => {
       ? "text-dark_grey"
       : "text-[#E8A317]";
   };
-  // console.log(data);
-  const searchUserList = async (data) => {
-    try {
-      const result = await data;
-      setSearchResults(result);
-      setErrorState({
-        searchError: result.length === 0,
-        dateError: false,
-        noResults: result.length === 0,
-      });
-    } catch (error) {
-      console.error("Error search data", error);
-      setSearchResults([]);
-      setErrorState({
-        searchError: true,
-        dateError: false,
-        noResults: true,
-      });
-    }
-  };
+
   const handleDateChange = (event) => {
     const date = event.target.value;
     setSelectedDate(date);
@@ -144,16 +130,24 @@ export const HOLTable = () => {
     }
 
     // Apply pagination
-    const paginatedData = finalData.slice(
-      startIndex,
-      startIndex + rowsPerPage
-    );
+    const paginatedData = finalData.slice(startIndex, startIndex + rowsPerPage);
     setMatchData(paginatedData);
   }, [currentPage, rowsPerPage, secondartyData, searchResults]);
   const totalPages = Math.ceil(
     (searchResults.length > 0 ? searchResults.length : secondartyData.length) /
       rowsPerPage
   );
+
+  if (loading) {
+    return (
+      <div>
+        <div className="flex items-center justify-center h-[60vh]">
+          <p className="text-sm font-semibold">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <section className="py-5 w-full">
       <section className="flex flex-wrap justify-between items-center mb-5">
@@ -166,7 +160,7 @@ export const HOLTable = () => {
             allEmpDetails={secondartyData}
             searchIcon2={<IoSearch />}
             placeholder="Employee ID"
-            searchUserList={searchUserList}
+            searchUserList={setMatchData}
             border="rounded-md"
           />
 
@@ -204,17 +198,17 @@ export const HOLTable = () => {
                       key={index}
                       className="text-center text-sm shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
                     >
-                      <td className="py-5">{displayIndex}</td>
-                      <td className="py-5">{item.empID}</td>
-                      <td className="py-5">{item.empName || "N/A"}</td>
-                      <td className="py-5">{item.empLeaveType}</td>
-                      <td className="py-5">
+                      <td className="py-3">{displayIndex}</td>
+                      <td className="py-3">{item.empID}</td>
+                      <td className="py-3">{item.empName || "N/A"}</td>
+                      <td className="py-3">{item.empLeaveType}</td>
+                      <td className="py-3">
                         {DateFormat(item.empLeaveStartDate)}
                       </td>
-                      <td className="py-5">
+                      <td className="py-3">
                         {DateFormat(item.empLeaveEndDate)}
                       </td>
-                      <td className="py-5 w-[20%] break-words overflow-hidden">
+                      <td className="py-3 w-[20%] break-words overflow-hidden">
                         {item.reason}
                       </td>
                       <td
@@ -244,25 +238,24 @@ export const HOLTable = () => {
                 ? `No leave history found for ${new Date(
                     selectedDate
                   ).toLocaleDateString("en-GB")}`
-                : "History leave not available."}
+                : "No matching results found for your search."}
             </p>
           </div>
         )}
       </div>
       <div className="ml-20 flex justify-center">
         <div className="w-[60%] flex justify-start mt-10 px-10">
-          {        matchData && matchData.length > 0 && 
-          
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={(newPage) => {
-              if (newPage >= 1 && newPage <= totalPages) {
-                setCurrentPage(newPage);
-              }
-            }}
-          />
-          }
+          {matchData && matchData.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(newPage) => {
+                if (newPage >= 1 && newPage <= totalPages) {
+                  setCurrentPage(newPage);
+                }
+              }}
+            />
+          )}
         </div>
       </div>
     </section>

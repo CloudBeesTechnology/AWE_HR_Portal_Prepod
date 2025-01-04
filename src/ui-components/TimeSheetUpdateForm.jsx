@@ -232,6 +232,8 @@ export default function TimeSheetUpdateForm(props) {
     fromDate: "",
     untilDate: "",
     location: "",
+    mealAllow: "",
+    verify: "",
   };
   const [date, setDate] = React.useState(initialValues.date);
   const [status, setStatus] = React.useState(initialValues.status);
@@ -283,6 +285,8 @@ export default function TimeSheetUpdateForm(props) {
   const [fromDate, setFromDate] = React.useState(initialValues.fromDate);
   const [untilDate, setUntilDate] = React.useState(initialValues.untilDate);
   const [location, setLocation] = React.useState(initialValues.location);
+  const [mealAllow, setMealAllow] = React.useState(initialValues.mealAllow);
+  const [verify, setVerify] = React.useState(initialValues.verify);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = timeSheetRecord
@@ -329,6 +333,8 @@ export default function TimeSheetUpdateForm(props) {
     setFromDate(cleanValues.fromDate);
     setUntilDate(cleanValues.untilDate);
     setLocation(cleanValues.location);
+    setMealAllow(cleanValues.mealAllow);
+    setVerify(cleanValues.verify);
     setErrors({});
   };
   const [timeSheetRecord, setTimeSheetRecord] =
@@ -392,6 +398,8 @@ export default function TimeSheetUpdateForm(props) {
     fromDate: [],
     untilDate: [],
     location: [],
+    mealAllow: [],
+    verify: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -459,6 +467,8 @@ export default function TimeSheetUpdateForm(props) {
           fromDate: fromDate ?? null,
           untilDate: untilDate ?? null,
           location: location ?? null,
+          mealAllow: mealAllow ?? null,
+          verify: verify ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -559,6 +569,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.date ?? value;
@@ -622,6 +634,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.status ?? value;
@@ -685,6 +699,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.fileName ?? value;
@@ -748,6 +764,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.fileType ?? value;
@@ -811,6 +829,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.assignTo ?? value;
@@ -874,6 +894,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.assignBy ?? value;
@@ -937,6 +959,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.empName ?? value;
@@ -1000,6 +1024,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.empBadgeNo ?? value;
@@ -1063,6 +1089,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -1126,6 +1154,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.empDept ?? value;
@@ -1189,6 +1219,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.inTime ?? value;
@@ -1252,6 +1284,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.outTime ?? value;
@@ -1315,6 +1349,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.totalInOut ?? value;
@@ -1378,6 +1414,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.allDayHrs ?? value;
@@ -1441,6 +1479,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.totalHrs ?? value;
@@ -1504,6 +1544,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.remarks ?? value;
@@ -1567,6 +1609,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.otTime ?? value;
@@ -1630,6 +1674,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.netMins ?? value;
@@ -1693,6 +1739,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.actualWorkHrs ?? value;
@@ -1756,6 +1804,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.normalWorkHrs ?? value;
@@ -1819,6 +1869,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.fidNo ?? value;
@@ -1882,6 +1934,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.companyName ?? value;
@@ -1945,6 +1999,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.trade ?? value;
@@ -2008,6 +2064,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.tradeCode ?? value;
@@ -2071,6 +2129,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.onAM ?? value;
@@ -2134,6 +2194,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.offAM ?? value;
@@ -2197,6 +2259,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.onPM ?? value;
@@ -2260,6 +2324,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.offPM ?? value;
@@ -2323,6 +2389,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.ctr ?? value;
@@ -2386,6 +2454,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.rec ?? value;
@@ -2449,6 +2519,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.avgDailyTD ?? value;
@@ -2512,6 +2584,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.highlightDayTG ?? value;
@@ -2575,6 +2649,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.aweSDN ?? value;
@@ -2638,6 +2714,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.totalNT ?? value;
@@ -2701,6 +2779,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.totalOT ?? value;
@@ -2764,6 +2844,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.totalNTOT ?? value;
@@ -2823,6 +2905,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             values = result?.empWorkInfo ?? values;
@@ -2913,6 +2997,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate: value,
               untilDate,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.fromDate ?? value;
@@ -2976,6 +3062,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate: value,
               location,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.untilDate ?? value;
@@ -3039,6 +3127,8 @@ export default function TimeSheetUpdateForm(props) {
               fromDate,
               untilDate,
               location: value,
+              mealAllow,
+              verify,
             };
             const result = onChange(modelFields);
             value = result?.location ?? value;
@@ -3052,6 +3142,136 @@ export default function TimeSheetUpdateForm(props) {
         errorMessage={errors.location?.errorMessage}
         hasError={errors.location?.hasError}
         {...getOverrideProps(overrides, "location")}
+      ></TextField>
+      <TextField
+        label="Meal allow"
+        isRequired={false}
+        isReadOnly={false}
+        value={mealAllow}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              date,
+              status,
+              fileName,
+              fileType,
+              assignTo,
+              assignBy,
+              empName,
+              empBadgeNo,
+              empID,
+              empDept,
+              inTime,
+              outTime,
+              totalInOut,
+              allDayHrs,
+              totalHrs,
+              remarks,
+              otTime,
+              netMins,
+              actualWorkHrs,
+              normalWorkHrs,
+              fidNo,
+              companyName,
+              trade,
+              tradeCode,
+              onAM,
+              offAM,
+              onPM,
+              offPM,
+              ctr,
+              rec,
+              avgDailyTD,
+              highlightDayTG,
+              aweSDN,
+              totalNT,
+              totalOT,
+              totalNTOT,
+              empWorkInfo,
+              fromDate,
+              untilDate,
+              location,
+              mealAllow: value,
+              verify,
+            };
+            const result = onChange(modelFields);
+            value = result?.mealAllow ?? value;
+          }
+          if (errors.mealAllow?.hasError) {
+            runValidationTasks("mealAllow", value);
+          }
+          setMealAllow(value);
+        }}
+        onBlur={() => runValidationTasks("mealAllow", mealAllow)}
+        errorMessage={errors.mealAllow?.errorMessage}
+        hasError={errors.mealAllow?.hasError}
+        {...getOverrideProps(overrides, "mealAllow")}
+      ></TextField>
+      <TextField
+        label="Verify"
+        isRequired={false}
+        isReadOnly={false}
+        value={verify}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              date,
+              status,
+              fileName,
+              fileType,
+              assignTo,
+              assignBy,
+              empName,
+              empBadgeNo,
+              empID,
+              empDept,
+              inTime,
+              outTime,
+              totalInOut,
+              allDayHrs,
+              totalHrs,
+              remarks,
+              otTime,
+              netMins,
+              actualWorkHrs,
+              normalWorkHrs,
+              fidNo,
+              companyName,
+              trade,
+              tradeCode,
+              onAM,
+              offAM,
+              onPM,
+              offPM,
+              ctr,
+              rec,
+              avgDailyTD,
+              highlightDayTG,
+              aweSDN,
+              totalNT,
+              totalOT,
+              totalNTOT,
+              empWorkInfo,
+              fromDate,
+              untilDate,
+              location,
+              mealAllow,
+              verify: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.verify ?? value;
+          }
+          if (errors.verify?.hasError) {
+            runValidationTasks("verify", value);
+          }
+          setVerify(value);
+        }}
+        onBlur={() => runValidationTasks("verify", verify)}
+        errorMessage={errors.verify?.errorMessage}
+        hasError={errors.verify?.hasError}
+        {...getOverrideProps(overrides, "verify")}
       ></TextField>
       <Flex
         justifyContent="space-between"

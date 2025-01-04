@@ -6,11 +6,16 @@ import { FileUploadField } from "../../../employees/medicalDep/FileUploadField";
 import { LabourDepFormSchema } from "../../../../services/Validation";
 import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
 import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPTracking";
+import { UpdateInterviewData } from "../../../../services/updateMethod/UpdateInterview";
 import { statusOptions } from "../../../../utils/StatusDropdown";
+import { SpinLogo } from "../../../../utils/SpinLogo";
 
 export const LabourDepForm = ({ candidate }) => {
   const { interviewSchedules } = useFetchCandy();
+  const { interviewDetails } = UpdateInterviewData();
   const { wpTrackingDetails } = useUpdateWPTracking();
+  const [notification, setNotification] = useState(false);
+  
   const [formData, setFormData] = useState({
     interview: {
       id: "",
@@ -62,6 +67,7 @@ export const LabourDepForm = ({ candidate }) => {
             lbrDepoAmount: interviewData.lbrDepoAmount,
             lbrFile: interviewData.lbrFile,
             status: interviewData.status,
+            status: interviewData.IDDetails.status,
           },
         });
 
@@ -110,7 +116,13 @@ export const LabourDepForm = ({ candidate }) => {
     const selectedInterviewData = interviewSchedules.find(
       (data) => data.tempID === candidate?.tempID
     );
+
+    const selectedInterviewDataStatus = interviewSchedules.find(
+      (data) => data.IDDetails.tempID === candidate?.tempID
+    );
+
     const interviewScheduleId = selectedInterviewData?.id;
+    const interviewScheduleStatusId = selectedInterviewDataStatus.IDDetails?.id;
 
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
@@ -135,6 +147,18 @@ export const LabourDepForm = ({ candidate }) => {
         },
       });
 
+      const interStatus = {
+        id: interviewScheduleStatusId, // Dynamically use the correct id
+        status: formData.interview.status,
+      };
+      setNotification(true);
+
+      console.log("Submitting interview details with status:", interStatus);
+
+      await interviewDetails({ InterviewValue: interStatus });
+
+      console.log("Interview status updated:", interStatus);
+
       // console.log("Response from WPTrackingDetails:", response);
 
       if (response.errors && response.errors.length > 0) {
@@ -156,88 +180,99 @@ export const LabourDepForm = ({ candidate }) => {
   };
 
   return (
-    <form onSubmit={handleSubmitTwo} className="p-5">
-      <div className="grid grid-cols-2 gap-5 mt-5">
-        <div>
-          <label htmlFor="lbrDepoNum">Labour Deposit Receipt Number</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="text"
-            id="lbrDepoNum"
-            {...register("lbrDepoNum")}
-            value={formData.interview.lbrDepoNum}
-            onChange={(e) => handleInputChange("lbrDepoNum", e.target.value)}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="lbrEndroseDate">
-            Date Endrosement Of Labour Deposit
-          </label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="date"
-            id="lbrEndroseDate"
-            {...register("lbrEndroseDate")}
-            value={formData.interview.lbrEndroseDate}
-            onChange={(e) =>
-              handleInputChange("lbrEndroseDate", e.target.value)
-            }
-          />
-        </div>
-        <div>
-          <label htmlFor="lbrDepoAmount">Deposit Amount</label>
-          <input
-            className="w-full border p-2 rounded mt-1"
-            type="text"
-            id="lbrDepoAmount"
-            {...register("lbrDepoAmount")}
-            value={formData.interview.lbrDepoAmount}
-            onChange={(e) => handleInputChange("lbrDepoAmount", e.target.value)}
-          />
-        </div>
-        <div className="">
-          <div className="flex items-center gap-5 mt-1">
-            <FileUploadField
-              label="Upload File"
-              className="p-4"
-              onChangeFunc={(e) => handleFileChange(e, "lbrFile")}
-              accept="application/pdf"
-              register={register}
-              fileName={
-                uploadedFileNames.lbrFile || extractFileName(DepositUpload)
-              }
-              value={formData.interview.lbrFile}
+    <>
+      <form onSubmit={handleSubmitTwo} className="p-5">
+        <div className="grid grid-cols-2 gap-5 mt-5">
+          <div>
+            <label htmlFor="lbrDepoNum">Labour Deposit Receipt Number</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="text"
+              id="lbrDepoNum"
+              {...register("lbrDepoNum")}
+              value={formData.interview.lbrDepoNum}
+              onChange={(e) => handleInputChange("lbrDepoNum", e.target.value)}
             />
           </div>
-        </div>
-        <div>
-          <label htmlFor="status">Status</label>
-          <select
-            className="w-full border p-2 rounded mt-1"
-            id="status"
-            {...register("status")}
-            value={formData.interview.status}
-            onChange={(e) => handleInputChange("status", e.target.value)}
-          >
-            {/* <option value="">Select Status</option> */}
-            {statusOptions.map((status, index) => (
-              <option key={index} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
 
-      <div className="mt-5 flex justify-center">
-        <button
-          type="submit"
-          className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
-        >
-          Submit
-        </button>
-      </div>
-    </form>
+          <div>
+            <label htmlFor="lbrEndroseDate">
+              Date Endrosement Of Labour Deposit
+            </label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="date"
+              id="lbrEndroseDate"
+              {...register("lbrEndroseDate")}
+              value={formData.interview.lbrEndroseDate}
+              onChange={(e) =>
+                handleInputChange("lbrEndroseDate", e.target.value)
+              }
+            />
+          </div>
+          <div>
+            <label htmlFor="lbrDepoAmount">Deposit Amount</label>
+            <input
+              className="w-full border p-2 rounded mt-1"
+              type="text"
+              id="lbrDepoAmount"
+              {...register("lbrDepoAmount")}
+              value={formData.interview.lbrDepoAmount}
+              onChange={(e) =>
+                handleInputChange("lbrDepoAmount", e.target.value)
+              }
+            />
+          </div>
+          <div className="">
+            <div className="flex items-center gap-5 mt-1">
+              <FileUploadField
+                label="Upload File"
+                className="p-4"
+                onChangeFunc={(e) => handleFileChange(e, "lbrFile")}
+                accept="application/pdf"
+                register={register}
+                fileName={
+                  uploadedFileNames.lbrFile || extractFileName(DepositUpload)
+                }
+                value={formData.interview.lbrFile}
+              />
+            </div>
+          </div>
+          <div>
+            <label htmlFor="status">Status</label>
+            <select
+              className="w-full border p-2 rounded mt-1"
+              id="status"
+              {...register("status")}
+              value={formData.interview.status}
+              onChange={(e) => handleInputChange("status", e.target.value)}
+            >
+              {/* <option value="">Select Status</option> */}
+              {statusOptions.map((status, index) => (
+                <option key={index} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="mt-5 flex justify-center">
+          <button
+            type="submit"
+            className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
+          >
+            Submit
+          </button>
+        </div>
+      </form>
+      {notification && (
+        <SpinLogo
+          text="Candidate details updated successfully"
+          notification={notification}
+          path="/recrutiles/workpasstracking"
+        />
+      )}
+    </>
   );
 };

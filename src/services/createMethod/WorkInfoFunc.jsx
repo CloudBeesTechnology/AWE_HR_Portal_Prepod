@@ -95,11 +95,14 @@ export const WorkInfoFunc = () => {
     } = workInfoValue;
 
     const formatDate = (date) =>
+      date ? new Date(date).toLocaleDateString("en-CA") : [];
+
+    const formattingDate = (date) =>
       date ? new Date(date).toLocaleDateString("en-CA") : null;
 
     const contractEndValue = formatDate(contractEnd);
     const contractStartValue = formatDate(contractStart);
-    const dojValue = formatDate(doj);
+    const dojValue = formattingDate(doj);
     const probationEndValue = formatDate(probationEnd);
     const probationStartValue = formatDate(probationStart);
     const upgradeDateValue = formatDate(upgradeDate);
@@ -136,7 +139,18 @@ export const WorkInfoFunc = () => {
       workWeek,
       workMonth,
       contractPeriod,
-    ].map((value) => [...new Set([value])]);
+    ].map((value) => {
+      // If value is null, undefined, or an empty array, return an empty array
+      if (value == null || (Array.isArray(value) && value.length === 0)) {
+        return [];
+      }
+      // If value is an array, return the value wrapped in an array
+      if (Array.isArray(value)) {
+        return [...new Set(value)];
+      }
+      // For any other value (non-array), return it wrapped in an array
+      return [value];
+    });
 
     const [
       updatedContractEndValue,
@@ -179,7 +193,18 @@ export const WorkInfoFunc = () => {
       // sickLeave,
       // sickLeaveDate,
       // hospLeave,
-    ].map((value) => [...new Set([value])]);
+    ].map((value) => {
+      // If value is null, undefined, or an empty array, return an empty array
+      if (value == null || (Array.isArray(value) && value.length === 0)) {
+        return [];
+      }
+      // If value is an array, return the value wrapped in an array
+      if (Array.isArray(value)) {
+        return [...new Set(value)];
+      }
+      // For any other value (non-array), return it wrapped in an array
+      return [value];
+    });
 
     const [
       updatedAnnualLeave,
@@ -209,7 +234,18 @@ export const WorkInfoFunc = () => {
       upgradeRevALD,
       revAnnualLeave,
       // remarkWI,
-    ].map((value) => [...new Set([value])]);
+    ].map((value) => {
+      // If value is null, undefined, or an empty array, return an empty array
+      if (value == null || (Array.isArray(value) && value.length === 0)) {
+        return [];
+      }
+      // If value is an array, return the value wrapped in an array
+      if (Array.isArray(value)) {
+        return [...new Set(value)];
+      }
+      // For any other value (non-array), return it wrapped in an array
+      return [value];
+    });
 
     const [
       upgradeDepEmpDateValue,
@@ -272,7 +308,6 @@ export const WorkInfoFunc = () => {
       sickLeave,
       sickLeaveDate,
       hospLeave,
-     
     };
     const totalData2 = {
       empID,
@@ -313,10 +348,10 @@ export const WorkInfoFunc = () => {
       uploadAL: JSON.stringify(uploadAL),
       uploadDep: JSON.stringify(uploadDep),
     };
-    console.log(totalData);
-    console.log(totalData1);
-    console.log(totalData2);
-    console.log(totalData3);
+    // console.log(totalData);
+    // console.log(totalData1);
+    // console.log(totalData2);
+    // console.log(totalData3);
     try {
       const [
         Emp,

@@ -6,6 +6,7 @@ export const WIRowTwo = ({
   register,
   errors,
   watch,
+  dropDownVal,
   setValue,
   control,
   upgradePosition,
@@ -18,34 +19,18 @@ export const WIRowTwo = ({
   probationEnd,
 }) => {
   const relationship = watch("relationship");
-
+  const relationshipDD = dropDownVal[0]?.relationshipDD.map((item) => ({
+    value: item,
+    label: item,
+  }));
   return (
     <div className="grid grid-cols-3 gap-5 form-group mt-5">
-      {/* Relationship */}
-      {/* <Controller
-        name="relationship"
-        control={control}
-        render={({ field }) => (
-          <FormField
-            label="Employee Status"
-            name={field.name}
-            type="selectOption"
-            value={field.value}
-            setValue={setValue}
-            options={RelationshipDD}
-            watch={watch}
-            register={() => field}
-            errors={errors}
-            append={true}
-          />
-        )}
-      /> */}
       <FormField
         label="Employee Status"
         register={register}
         name="relationship"
         type="select"
-        options={RelationshipDD}
+        options={relationshipDD}
         errors={errors}
       />
 
@@ -54,11 +39,6 @@ export const WIRowTwo = ({
         register={register}
         name="upgradePosition"
         type="text"
-        // control={control}
-        // watch={upgradePosition}
-        // setValue={setValue}
-        // isArray
-        // append={true}
         errors={errors}
         // arrayString={true}
       />
@@ -68,12 +48,6 @@ export const WIRowTwo = ({
         register={register}
         name="upgradeDate"
         type="date"
-        // control={control}
-        // watch={upgradeDate}
-        // setValue={setValue}
-        // isArray
-        // append={true}
-        // arrayDate={true}
         errors={errors}
       />
 
@@ -83,13 +57,6 @@ export const WIRowTwo = ({
         name="contractPeriod"
         type="text"
         errors={errors}
-
-        // control={control}
-        // watch={contractPeriod}
-        // setValue={setValue}
-        // isArray
-        // append={true}
-        // arrayString={true}
       />
 
       <FormField
@@ -97,12 +64,6 @@ export const WIRowTwo = ({
         register={register}
         name="contractStart"
         type="date"
-        // control={control}
-        // watch={contractStart}
-        // setValue={setValue}
-        // isArray
-        // append={true}
-        // arrayDate={true}
         errors={errors}
         // errorValue={errorValue}
       />
@@ -112,12 +73,6 @@ export const WIRowTwo = ({
         register={register}
         name="contractEnd"
         type="date"
-        // control={control}
-        // watch={contractEnd}
-        // setValue={setValue}
-        // isArray
-        // append={true}
-        // arrayDate={true}
         errors={errors}
 
         // errorValue={errorValue}
@@ -129,12 +84,6 @@ export const WIRowTwo = ({
         name="probDuration"
         type="text"
         errors={errors}
-        // control={control}
-        // watch={probDuration}
-        // setValue={setValue}
-        // isArray
-        // append={true}
-        // arrayString={true}
       />
       <FormField
         label="Probationary Start Date"
@@ -142,13 +91,6 @@ export const WIRowTwo = ({
         name="probationStart"
         type="date"
         errors={errors}
-        // control={control}
-        // watch={probationStart}
-        // setValue={setValue}
-        // isArray
-        // append={true}
-        // arrayDate={true}
-        // errorValue={errorValue}
       />
       <FormField
         label="Probationary End Date"
@@ -156,13 +98,6 @@ export const WIRowTwo = ({
         name="probationEnd"
         type="date"
         errors={errors}
-        // control={control}
-        // watch={probationEnd}
-        // setValue={setValue}
-        // isArray
-        // append={true}
-        // arrayDate={true}
-        // errorValue={errorValue}
       />
     </div>
   );
