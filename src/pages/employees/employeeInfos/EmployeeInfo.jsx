@@ -40,8 +40,7 @@ export const EmployeeInfo = () => {
   const { SubmitEIData, errorEmpID } = EmpInfoFunc();
   const { UpdateEIValue } = UpdateEmpInfo();
   const { empPIData, IDData,dropDownVal} = useContext(DataSupply);
-  console.log(dropDownVal);
-  
+ 
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [selectedNationality, setSelectedNationality] = useState("");
@@ -275,9 +274,7 @@ export const EmployeeInfo = () => {
         }
       }
   
-      // Now we can safely apply string manipulations
-      console.log("Raw familyDetails:", familyDetailsString);
-  
+
       // Remove the surrounding quotes if they exist
       let cleanedString = familyDetailsString.trim();
   
@@ -310,7 +307,7 @@ export const EmployeeInfo = () => {
   };
   
 const searchResult = async (result) => {
-  console.log(result); // Log the result to check the fetched data
+
 
   const keysToSet = [
     "empID", "driveLic", "inducBrief", "myIcNo", "nationality", "nationalCat", 
@@ -318,16 +315,23 @@ const searchResult = async (result) => {
     "religion", "age", "aTQualify", "alternateNo", "agent", "dob", "cob",
     "ctryOfOrigin", "chinese", "educLevel", "email", "eduDetails", "empBadgeNo", 
     "empType", "bankName", "bankAccNo", "lang", "marital", "name", "oCOfOrigin", 
-    "position", "sapNo", "officialEmail", "bwnIcColour",
+    "position", "sapNo", "officialEmail", "bwnIcColour","gender"
   ];
 
   // Set values for other fields
   keysToSet.forEach((key) => {
-    // If the key is "gender" or "bwnIcColour", use the mapped value
-    const valueToSet = result[key];
-    console.log(`Setting value for ${key}:`, valueToSet);
+    // Get the value associated with the key
+    let valueToSet = result[key];
+  
+    // Convert the value to uppercase if it's a string
+    if (typeof valueToSet === "string") {
+      valueToSet = valueToSet?.toUpperCase();
+    }
+  
+    // Set the value
     setValue(key, valueToSet);
   });
+  
 
   const fields = ["contractType", "empType"];
   fields.forEach((field) => setValue(field, getLastValue(result[field])));
@@ -340,7 +344,6 @@ const searchResult = async (result) => {
     const value = result[field];
     if (Array.isArray(value)) {
       const stringValue = value.join(", ");
-      console.log(`Setting ${field} as a string:`, stringValue);
       setValue(field, stringValue);
     } else {
       setValue(field, value);
@@ -350,7 +353,6 @@ const searchResult = async (result) => {
   // Handle familyDetails
   if (Array.isArray(result.familyDetails) && result.familyDetails.length > 0) {
     const cleanedFamilyDetails = cleanFamilyDetailsString(result.familyDetails[0]);
-    console.log('Family Details:', cleanedFamilyDetails);
     setFamilyData(cleanedFamilyDetails);
   } else {
     console.error("Invalid familyDetails format:", result.familyDetails);
@@ -378,9 +380,7 @@ const searchResult = async (result) => {
       if (pathUrl) {
         const result = await getUrl({ path: pathUrl });
         setPPLastUP(result.url.toString());
-      } else {
-        console.log("No valid path provided for getUrl.");
-      }
+      } 
     } catch (err) {
       console.log("Error fetching file from storage:", err);
     }
@@ -431,7 +431,7 @@ const searchResult = async (result) => {
 
   const getFileName = (filePath) => {
     if (!filePath || typeof filePath !== "string") {
-      console.error("Invalid file path:", filePath); // Log error for debugging
+     
       return ""; // Return an empty string if the file path is invalid
     }
     const fileNameWithExtension = filePath.split("/").pop(); // Get file name with extension

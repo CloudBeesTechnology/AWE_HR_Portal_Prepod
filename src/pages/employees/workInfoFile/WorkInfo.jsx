@@ -191,7 +191,7 @@ export const WorkInfo = () => {
   };
 
   const searchResult = (result) => {
-console.log(result);
+// console.log(result);
 
     const keysToSet = [
       "empID",
@@ -286,7 +286,7 @@ console.log(result);
     // Set values for date fields and handle salaryType condition
     arrayDateField.forEach((field) => {
       const valueToSet = result[field];
-      console.log(`Setting value for ${field}:`, valueToSet);
+    
       setValue(field, getArrayDateValue(valueToSet)); // Use getArrayDateValue for all fields
     });
     
@@ -389,7 +389,7 @@ console.log(result);
             remainingSickLeave: data?.sickLeave || "0",
             unPaidAuthorize: "0",
           },
-
+          sapNo: checkingPITable?.sapNo,
           workInfoDataRecord: workInfoDataRecord,
           terminateDataRecord: terminateDataRecord,
           WIContract: JSON.stringify(nameServiceUp.WIContract),
@@ -755,13 +755,13 @@ console.log(result);
           </button>
         </div>
       </form>
-      {/* {notification && (
+      {notification && (
         <SpinLogo
           text={showTitle}
           notification={notification}
-          path="/employee"
+          path="/workInfo"
         />
-      )} */}
+      )}
     </section>
   );
 };

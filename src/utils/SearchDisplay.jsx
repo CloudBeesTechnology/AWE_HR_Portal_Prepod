@@ -29,14 +29,14 @@ export const SearchDisplay = ({
     } else if (toggleHandle === false) {
       setFilteredEmployees?.(newFormData);
     }
-    console.log(filteredEmployees);
+    // console.log(filteredEmployees);
   }, [toggleHandle, newFormData]);
 
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
     searchedValue?.(id, query);
-    
+
     if (query) {
       const results =
         newFormData &&
@@ -84,11 +84,11 @@ export const SearchDisplay = ({
               key={index}
               className="m-2 p-1 hover:bg-grey hover:text-white cursor-pointer flex justify-between items-center transition-all duration-200"
               onClick={() => {
-                console.log(employee);
-                
+                // console.log(employee);
+
                 if (employee.empID || employee.name) {
-                  console.log(`${employee.empID} - ${employee.name || "sdfvgh"}`);
-                  
+                  // console.log(`${employee.empID} - ${employee.name || "sdfvgh"}`);
+
                   setSearchQuery(`${employee.empID} - ${employee.name || ""}`);
                   searchResult(employee);
                   setSearchQuery("");
@@ -98,13 +98,12 @@ export const SearchDisplay = ({
                   setSearchQuery(employee.JOBCODE);
                   searchResult(employee, id);
                   // setToggleHandle(!toggleHandle);
-         
                 }
 
                 if (employee.location) {
                   setSearchQuery(employee.location);
                   searchResult(employee, id);
-                
+
                   // setToggleHandle(!toggleHandle);
                 }
                 setToggleHandle(false);
