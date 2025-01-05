@@ -66,6 +66,7 @@ export const LeaveSummaryPopUp = ({
             empId: val.empID,
             employeeName: val.empName,
             empBadgeNo: val.empBadgeNo,
+            gender: val.gender,
             position: val.position,
             department: val.department,
             doj: val.doj,
@@ -366,6 +367,13 @@ export const LeaveSummaryPopUp = ({
                     "unPaidAuthorisedLeave",
                     "compensateLeave",
                   ].includes(leaveType);
+                  if (
+                    (leaveType === "maternityLeave" && leaveSummary?.gender !== "Female") || // Hide maternity for males
+                    (leaveType === "paternityLeave" && leaveSummary?.gender !== "Male") // Hide paternity for females
+                  ) {
+                    // console.log(Skipping ${leaveType} for ${leaveSummary?.gender});
+                    return null; // Skip rendering this row if gender doesn't match
+                  }
                   return (
                     <tr key={leaveType}>
                       <td className="border px-4 py-2">

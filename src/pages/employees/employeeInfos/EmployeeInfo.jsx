@@ -308,6 +308,7 @@ export const EmployeeInfo = () => {
   
 const searchResult = async (result) => {
 
+// console.log(result);
 
   const keysToSet = [
     "empID", "driveLic", "inducBrief", "myIcNo", "nationality", "nationalCat", 
@@ -683,6 +684,7 @@ const searchResult = async (result) => {
           selectedCountry={selectedCountry}
           handleCountryChange={handleCountryChange}
           watch={watch}
+          dropDownVal={dropDownVal}
         />
         {/* Row7 */}
         <RowSeven register={register} errors={errors} />

@@ -1,54 +1,11 @@
-// import { useContext } from "react";
-// import { DataSupply } from "../../utils/DataStoredContext";
 
-// export const WorkDataPass = () => {
-//    const {dropDownVal} =
-//       useContext(DataSupply);
-//       console.log(dropDownVal);
-//       const relationshipDD = dropDownVal[0]?.relationshipDD.map((item) => ({
-//         value: item,
-//         label: item,
-//       }));
-//   return {
-//     terminationFields: [
-//       { label: "Date of Resignation", name: "resignDate", type: "date" },
-//       { label: "Date of Termination", name: "termiDate", type: "date" },
-//       {
-//         label: "Resignation Notice During Probation",
-//         name: "resignNotProb",
-//         type: "select",
-//         options:relationshipDD,
-//       },
-//       {
-//         label: "Termination Notice During Probation",
-//         name: "termiNotProb",
-//         type: "select",
-//         options: ["", "1 Week", "28 Days", "N/A", "Other"],
-//       },
-//       {
-//         label: "Resignation Notice After Confirmation",
-//         name: "resignNotConf",
-//         type: "select",
-//         options: ["", "1 Month", "3 Months", "N/A", "Other"],
-//       },
-//       {
-//         label: "Termination Notice After Confirmation",
-//         name: "termiNotConf",
-//         type: "select",
-//         options: ["", "28 Days", "1 Month", "3 Months", "N/A", "Other"],
-//       },
-//       { label: "Reason of Resignation", name: "reasonResign", type: "text" },
-//       { label: "Reason of Termination", name: "reasonTerminate", type: "text" },
-//     ],
-//   };
-// };
 import { useContext } from "react";
 import { DataSupply } from "../../utils/DataStoredContext";
 
 export const WorkDataPass = () => {
    const {dropDownVal} =
       useContext(DataSupply);
-      console.log(dropDownVal);
+      // console.log(dropDownVal);
       const resignNotifConfDD = dropDownVal[0]?.resignNotifConfDD.map((item) => ({
         value: item,
         label: item,

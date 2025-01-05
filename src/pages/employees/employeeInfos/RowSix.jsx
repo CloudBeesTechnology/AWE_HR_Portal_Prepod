@@ -8,12 +8,24 @@ export const RowSix = ({
   handleCountryChange,
   selectedNationality,
   selectedCountry,
-  watch,
+  watch,dropDownVal
 }) => {
   const oCOfOrigin = watch("oCOfOrigin" || "");
   const otherNation = watch("otherNation" || "");
   const nation = watch("nationality" || "");
   const countryofOrigin = watch("ctryOfOrigin" || "");
+  const nationalityDD = dropDownVal[0]?.nationalityDD.map((item) => ({
+    value: item,
+    label: item.split(" ") // Split the string into words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+    .join(" "),
+  }));
+  const countryORDD = dropDownVal[0]?.countryORDD.map((item) => ({
+    value: item,
+    label: item.split(" ") // Split the string into words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+    .join(" "),
+  }));
   return (
     <div className="flex gap-5 form-group">
       <div className="flex flex-1 gap-7">
@@ -23,7 +35,7 @@ export const RowSix = ({
           register={register}
           name="nationality"
           type="select"
-          options={NationalityDD}
+          options={nationalityDD}
           errors={errors}
           onChange={handleNationalityChange}
         />
@@ -48,7 +60,7 @@ export const RowSix = ({
           register={register}
           name="ctryOfOrigin"
           type="select"
-          options={CountryORDD}
+          options={countryORDD}
           errors={errors}
           onChange={handleCountryChange}
         />

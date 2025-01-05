@@ -92,6 +92,9 @@ import { NonLocalAccMD } from "../components/migratingData/NonLocalAccMD";
 import { DNDetailsMD } from "../components/migratingData/DNDetailsMD";
 import { TerminatedMD } from "../components/migratingData/TerminatedMD";
 import { BJLDetailsMD } from "../components/migratingData/BJLDetailsMD";
+import { PassportValidMD } from "../components/migratingData/PassportValidMD";
+import { LabourMedicalInfoMD } from "../components/migratingData/LabourMedicalInfoMD";
+import { NlmsMD } from "../components/migratingData/NlmsMD";
 
 const client = generateClient();
 
@@ -204,6 +207,10 @@ const NavigationLinks = () => {
         <Route path="/migrationDataDN" element={<DNDetailsMD />} />
         <Route path="/migrationDataTerminated" element={<TerminatedMD />} />
         <Route path="/migrationDataBJL" element={<BJLDetailsMD />} />        {/* Redirect to the first matching allowed category */}
+        <Route path="/migrationPPValid" element={<PassportValidMD />} />
+        <Route path="/migrationLMInfo" element={<LabourMedicalInfoMD />} />
+        <Route path="/migrationNlms" element={<NlmsMD />} />
+
         <Route
           path="/"
           element={<Navigate to={`/${firstCategory?.toLowerCase()}`} />}

@@ -89,6 +89,7 @@ export const useLeaveManage = () => {
           empID: leaveStatus.empID,
           empName: empInfo.name,
           empBadgeNo: empInfo.empBadgeNo,
+          gender: empInfo.gender,
           empOfficialEmail: empInfo.officialEmail,
           doj: workInfo.doj,
           leaveStatusCreatedAt: leaveStatus.createdAt,
