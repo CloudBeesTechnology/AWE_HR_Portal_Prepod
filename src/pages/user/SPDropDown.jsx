@@ -86,7 +86,7 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
       Dashboard: [
         "Employee count",
         "Recent Notifications",
-        "Attendance",
+        "Application Received",
         "User Action",
         "Birthday Reminder",
         "New Joinee",
@@ -104,7 +104,7 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
         "Non Local CV",
         "Status",
         "WorkPass Tracking",
-        "Hiring Job"
+        "Hiring Job",
       ],
     },
     {
@@ -119,17 +119,21 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
       ],
     },
     {
-      Insurance: [
-        "Insurance",
-        "Insurance Info",
-        "Insurance Claim",
+      Insurance: ["Insurance", "Insurance Info", "Insurance Claim"],
+    },
+    {
+      Training: ["HR", "Training Requestor", "BLNG", "OME"],
+    },
+    {
+      TimeSheet: [
+        "HO",
+        "SBW",
+        "ORMC",
+        "Offshore",
+        "BLNG",
+        "View Time Sheet",
+        "View Summary",
       ],
-    },
-    {
-      Training: ["HR", "Training Requestor","BLNG", "OME"],
-    },
-    {
-      TimeSheet: ["HO","SBW","ORMC", "Offshore", "BLNG", "View Time Sheet","View Summary"],
     },
     {
       LeaveManagement: [
@@ -143,13 +147,31 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
       Notification: ["Notification"],
     },
     {
-      Report: ["Report"],
+      Report: [
+        "Recruitment & Mobilization",
+        "Resignation",
+        "Termination",
+        "Probation Review",
+        "Contract Expiry Review",
+        "Employment Pass Expiry",
+        "LD Expiry",
+        "Passport Expiry",
+        "Employment Medical",
+        "New Recruitment",
+        "Training Records",
+        "LBD KPI",
+        "Group H&S",
+        "Leave Passage",
+      ],
     },
     {
       BenefitsAndRewards: [
-        "Leave Benefits",
-        "Paternity Benefits",
-        "Employee Benefits",
+        "Employment Policy",
+        "Training & Development",
+        "Attendance & Work Schedule",
+        "Compensation & Benefits",
+        "Termination from the Company",
+        "Consequence Management",
       ],
     },
   ];
