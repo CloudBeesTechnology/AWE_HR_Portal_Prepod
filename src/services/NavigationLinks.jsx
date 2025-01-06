@@ -92,6 +92,7 @@ import { NonLocalAccMD } from "../components/migratingData/NonLocalAccMD";
 import { DNDetailsMD } from "../components/migratingData/DNDetailsMD";
 import { TerminatedMD } from "../components/migratingData/TerminatedMD";
 import { BJLDetailsMD } from "../components/migratingData/BJLDetailsMD";
+import { ServiceRecordedMD } from "../components/migratingData/ServiceRecordedMD";
 
 const client = generateClient();
 
@@ -198,6 +199,7 @@ const NavigationLinks = () => {
         <Route path="/migrationDataID" element={<IDDetailsMD />} />
         <Route path="/migrationDataEPI" element={<EmpPersonalMD />} />
         <Route path="/migrationDataWorkI" element={<WorkInfoMD />} />
+        <Route path="/migrationDataService" element={<ServiceRecordedMD />} />
         <Route path="/migrationDataEmpInsu" element={<EmpInsuranceMD />} />
         <Route path="/migrationDataLeaveDetails" element={<LeaveDetailsMD />} />
         <Route path="/migrationDataNLA" element={<NonLocalAccMD />} />

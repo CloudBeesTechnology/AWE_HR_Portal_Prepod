@@ -16,7 +16,7 @@ console.log(EmpInsuranceData);
 
   const excelDateToJSDate = (serial) => {
     const excelEpoch = new Date(Date.UTC(1900, 0, 1)); // Start from Jan 1, 1900
-    const daysOffset = serial - 1; // Excel considers 1 as Jan 1, 1900
+    const daysOffset = serial - 2; // Excel considers 1 as Jan 1, 1900
     return new Date(excelEpoch.getTime() + daysOffset * 24 * 60 * 60 * 1000);
   };
 

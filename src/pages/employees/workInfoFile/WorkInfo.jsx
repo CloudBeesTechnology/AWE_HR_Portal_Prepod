@@ -32,6 +32,7 @@ export const WorkInfo = () => {
   }, []);
   const { empPIData, terminateData, workInfoData, leaveDetailsData, SRData ,dropDownVal} =
     useContext(DataSupply);
+// console.log(dropDownVal);
 
   const {
     register,
@@ -183,11 +184,18 @@ export const WorkInfo = () => {
     }
   };
 
+  // const getArrayDateValue = (value) => {
+  //   if (Array.isArray(value) && value.length > 0) {
+  //     return value[value.length - 1]?.toUpperCase();
+  //   }
+  //   return typeof value === "string" ? value.toUpperCase() : null;
+  // };
+
   const getArrayDateValue = (value) => {
     if (Array.isArray(value) && value.length > 0) {
-      return value[value.length - 1]?.toUpperCase();
+      return value[value.length - 1]?.trim().toUpperCase();
     }
-    return typeof value === "string" ? value.toUpperCase() : null;
+    return typeof value === "string" ? value.trim().toUpperCase() : null;
   };
 
   const searchResult = (result) => {
@@ -234,8 +242,8 @@ export const WorkInfo = () => {
     // });
     keysToSet.forEach((key) => {
       if (result[key]) {
-        // Normalize the value to lowercase
-        const normalizedValue = result[key].toString().toUpperCase();
+        // Normalize the value: trim whitespace and convert to uppercase
+        const normalizedValue = result[key].toString().trim().toUpperCase();
     
         // Set the normalized value
         setValue(key, normalizedValue);

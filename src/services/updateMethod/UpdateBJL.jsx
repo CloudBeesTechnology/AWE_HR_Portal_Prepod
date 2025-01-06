@@ -31,7 +31,7 @@ export const UpdateBJL = () => {
              },
            })
          ])
-        //  console.log(storedData,"successfully Updated data");
+         console.log(storedData,"successfully Updated data");
 
        } catch (error) {
         console.log(error);

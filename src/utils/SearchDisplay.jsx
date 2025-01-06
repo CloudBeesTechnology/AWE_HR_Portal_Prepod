@@ -53,7 +53,7 @@ export const SearchDisplay = ({
           // employee.name?.toLowerCase().includes(query)
         );
       setFilteredEmployees?.(results);
-      // console.log("if FilteredEmployees : ", results);
+      console.log("if FilteredEmployees : ", results);
     } else {
       // console.log("Else FilteredEmployees : ", filteredEmployees);
       setFilteredEmployees?.(newFormData);
@@ -84,7 +84,7 @@ export const SearchDisplay = ({
               key={index}
               className="m-2 p-1 hover:bg-grey hover:text-white cursor-pointer flex justify-between items-center transition-all duration-200"
               onClick={() => {
-                // console.log(employee);
+                console.log(employee);
 
                 if (employee.empID || employee.name) {
                   // console.log(`${employee.empID} - ${employee.name || "sdfvgh"}`);

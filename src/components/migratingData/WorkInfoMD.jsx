@@ -13,21 +13,22 @@ export const WorkInfoMD = () => {
 
   const excelDateToJSDate = (serial) => {
     const excelEpoch = new Date(Date.UTC(1900, 0, 1)); // Start from Jan 1, 1900
-    const daysOffset = serial - 1; // Excel considers 1 as Jan 1, 1900
+    const daysOffset = serial - 2; // Excel considers 1 as Jan 1, 1900
     return new Date(excelEpoch.getTime() + daysOffset * 24 * 60 * 60 * 1000);
   };
 
-  // Link 1:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmpWorkInfo/EmpworkInfo.csv"
+  // Link 1:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmpWorkInfo/EmpWorkInfo.csv"
   // Link 2:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmpWorkInfo/EmpWorkInfo.csv"
   // Link 3:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmpWorkInfo/EmpWorkInfO.csv"
   // Link 4:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmpWorkInfo/EmPWorkInfo.csv"
   // Link 5:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmpWorkInfo/EMPWorkInfo.csv"
+  // Link 6:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmpWorkInfo/EmpWorkInfo+Update.csv"
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmpWorkInfo/EMPWorkInfo.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/EmpWorkInfo/EmpWorkInfo.csv",
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
@@ -73,6 +74,7 @@ export const WorkInfoMD = () => {
         if (workInfoValue.empID) {
           workInfoValue.empID = String(workInfoValue.empID);
         }
+
         console.log(workInfoValue);
 
         const checkingWorkInfoTable = workInfoData.find(
