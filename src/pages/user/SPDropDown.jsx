@@ -165,14 +165,7 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
       ],
     },
     {
-      BenefitsAndRewards: [
-        "Employment Policy",
-        "Training & Development",
-        "Attendance & Work Schedule",
-        "Compensation & Benefits",
-        "Termination from the Company",
-        "Consequence Management",
-      ],
+      BenefitsAndRewards: ["BenefitsAndRewards"],
     },
   ];
 

@@ -5,7 +5,7 @@ import { DataSupply } from "../../utils/DataStoredContext";
 
 export const Round = () => {
   const { empPIData, IDData ,hiringData} = useContext(DataSupply);
-console.log(hiringData);
+// console.log(hiringData);
 
   const [mergeData, setMergeData] = useState([]);
   const [bruneianCount, setBruneianCount] = useState(0);

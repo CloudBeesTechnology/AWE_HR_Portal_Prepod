@@ -33,7 +33,7 @@ export const Dashboard = () => {
           )}
 
           {/* Column 2: Attendance */}
-          {dashboardPermissions.includes("Attendance") && (
+          {dashboardPermissions.includes("Application Received") && (
             <div className="flex-1 w-full">
               <div className="w-full h-full">
                 <Round />

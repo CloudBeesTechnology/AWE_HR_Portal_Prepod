@@ -19,6 +19,7 @@ export const User = () => {
   const [workValue, setWorkValue] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
+
   const navigate = useNavigate();
   // console.log(userData);
 
@@ -173,105 +174,115 @@ export const User = () => {
         </section>
         <div className="flex flex-col flex-grow">
           <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto  px-5">
-            <table className="w-full mx-auto bg-white pt-10">
-              <thead className="px-5 bg-[#939393] text-white sticky top-0 left-0">
-                <tr className="text_size_5  px-5">
-
-                  <th className="px-5 text-start py-3">S.No</th>
-                  <th className="px-5 text-start py-3">EMP ID</th>
-                  <th className="px-5 text-start  py-3">Name</th>
-                  <th className="px-5 text-start py-3">Type</th>
-                  <th className="px-5 text-start py-3">Official Email Id</th>
-                  <th className="px-5 text-start py-3">Password</th>
-                  <th className="px-5 text-center py-3">ViewForm</th>
-                  <th className="px-5 text-start py-3">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredData && filteredData.length > 0 ? (
-                  filteredData.map((val, i) => {
-                    const displayIndex=startIndex+i+1
-                    return (
-                      <tr key={i} className="shadow-lg ">
-                        <td className="px-5 py-3 ">{displayIndex}</td>
-                        <td className="px-5 py-3">{val.empID}</td>
-                        <td className="px-5 py-3 break-words overflow-hidden">{val.name}</td>
-                        <td className="px-5 py-3">{val.selectType}</td>
-                        <td className="px-5 py-3 break-words overflow-hidden">{val.officialEmail}</td>
-                        <td className="px-5 w-[200px] py-3 text-center">
-                          <input
-                            type="password"
-                            className="outline-none w-full break-words overflow-hidden"
-                            value={val.password}
-                            readOnly
-                          />
-                        </td>
-                        <td className=" py-3">
-                          <span
-                            className=" text-[blue] underline flex justify-center"
-                            onClick={() => {
-                              ViewFormShow();
-                              setSendData(val);
-                            }}
-                          >
-                        
-                            View
-                          </span>
-                        </td>
-                        <td className="px-5 py-2">
-                          <div className="flex gap-5">
+            {filteredData && filteredData.length > 0 ? (
+              <table className="w-full mx-auto bg-white pt-10">
+                <thead className="px-5 bg-[#939393] text-white sticky top-0 left-0">
+                  <tr className="text_size_5  px-5">
+                    <th className="px-5 text-start py-3">S.No</th>
+                    <th className="px-5 text-start py-3">EMP ID</th>
+                    <th className="px-5 text-start  py-3">Name</th>
+                    <th className="px-5 text-start py-3">Type</th>
+                    <th className="px-5 text-start py-3">Official Email Id</th>
+                    <th className="px-5 text-start py-3">Password</th>
+                    <th className="px-5 text-center py-3">ViewForm</th>
+                    <th className="px-5 text-start py-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredData && filteredData.length > 0 ? (
+                    filteredData.map((val, i) => {
+                      const displayIndex = startIndex + i + 1;
+                      return (
+                        <tr key={i} className="shadow-lg ">
+                          <td className="px-5 py-3 ">{displayIndex}</td>
+                          <td className="px-5 py-3 ">{val.empID}</td>
+                          <td className="px-5 py-3 break-words overflow-hidden ">
+                            {val.name}
+                          </td>
+                          <td className="px-5 py-3 ">{val.selectType}</td>
+                          <td className="px-5 py-3 break-words overflow-hidden ">
+                            {val.officialEmail}
+                          </td>
+                          <td className=" py-3 text-center break-words overflow-hidden   ">
+                            <input
+                              type="password"
+                              className="outline-none w-full text-center  "
+                              value={val.password}
+                              readOnly
+                            />
+                          </td>
+                          <td className=" py-3">
                             <span
+                              className=" text-[blue] underline flex justify-center"
                               onClick={() => {
-                                handleTransferData(val);
+                                ViewFormShow();
+                                setSendData(val);
                               }}
                             >
-                              <RiEditLine />
+                              View
                             </span>
-                            <span
-                              onClick={() => {
-                                handleDelete(val);
-                              }}
-                            >
-                              <RiDeleteBin6Line />
-                            </span>
-                            {/* <div
+                          </td>
+                          <td className="px-5 py-2">
+                            <div className="flex gap-5">
+                              <span
+                                onClick={() => {
+                                  handleTransferData(val);
+                                }}
+                              >
+                                <RiEditLine />
+                              </span>
+                              <span
+                                onClick={() => {
+                                  handleDelete(val);
+                                }}
+                              >
+                                <RiDeleteBin6Line />
+                              </span>
+                              {/* <div
                       className="h-3 w-3 bg-[#08A757] rounded-full "
                       onClick={() => {
                         popUping();
                         ListUserData();
                       }}
                     ></div> */}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td
-                      colSpan="6"
-                      className="px-6 py-6 text-center text-dark_ash text_size_5"
-                    >
-                      No User List Available Here
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="6"
+                        className="px-6 py-6 text-center text-dark_ash text_size_5"
+                      >
+                        No User List Available Here
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            ) : (
+              <p className="px-6 py-6 text-center text-dark_ash text_size_5">
+                Loading Data...
+              </p>
+            )}
           </div>
 
           <div className="flex justify-center mt-auto">
-            <div className="ml-[650px] flex justify-between px-10 py-8">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={(newPage) => {
-                  if (newPage >= 1 && newPage <= totalPages) {
-                    setCurrentPage(newPage);
-                  }
-                }}
-              />
-            </div>
+            {filteredData && filteredData.length > 0 && (
+              <div className="ml-[650px] flex justify-between px-10 py-8">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(newPage) => {
+                    if (newPage >= 1 && newPage <= totalPages) {
+                      setCurrentPage(newPage);
+                    }
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>

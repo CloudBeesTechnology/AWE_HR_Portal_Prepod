@@ -223,7 +223,7 @@ export const WorkInfo = () => {
   };
 
   const searchResult = (result) => {
-    // console.log(result);
+    console.log(result);
 
     const keysToSet = [
       "empID",

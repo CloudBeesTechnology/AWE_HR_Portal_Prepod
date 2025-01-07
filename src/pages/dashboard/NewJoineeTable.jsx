@@ -91,8 +91,8 @@ export const NewJoineeTable = () => {
           </tr>
         </thead>
         <tbody>
-          {latestJoinees.map((joinee) => (
-            <tr key={joinee.empID} className="border-b last:border-none text-sm">
+          {latestJoinees.map((joinee,index) => (
+            <tr key={index} className="border-b last:border-none text-sm">
               <td className="py-4 px-6 flex items-center">
                 <img
                   className="w-10 h-10 rounded-full mr-4"
