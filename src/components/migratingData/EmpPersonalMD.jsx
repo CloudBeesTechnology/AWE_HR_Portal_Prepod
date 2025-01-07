@@ -27,12 +27,14 @@ console.log(empPIData);
   // Link 6: "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PersonalInfo+Prod/EmpPersonnelInfo+6.csv"
   // Link 7: "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PersonalInfo+Prod/EMPPERSONALINFO+7.csv"
   // Link 8: "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PersonalInfo+Prod/EmpPersonalInfo+8.csv"
+  // Link 9: "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PersonalInfo+Prod/EmpPersonaInfo+1.csv"
+  // Link 10: "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PersonalInfo+Prod/EmpPersonnelInfo+9.csv"
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PersonalInfo+Prod/EmpPersonaInfo.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PersonalInfo+Prod/EmpPersonnelInfo+9.csv",
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }

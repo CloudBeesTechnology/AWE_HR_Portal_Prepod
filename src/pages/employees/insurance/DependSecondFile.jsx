@@ -6,7 +6,9 @@ export const DependSecondFile = ({dropDownVal, register, errors, index, selected
   const nation = watch(`depInsurance[${index}].depenNation` || "");
   const nationalityDD = dropDownVal[0]?.nationalityDD.map((item) => ({
     value: item,
-    label: item,
+    label: item.split(" ") // Split the string into words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+    .join(" "),
   }));
   return (
     <div>

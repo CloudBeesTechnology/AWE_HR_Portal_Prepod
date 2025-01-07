@@ -9,19 +9,29 @@ export const WIRowOne = ({
   selection,
   dropDownVal,
 }) => {
-  console.log(dropDownVal);
+  // console.log(dropDownVal);
   
   const DepartmentDD = dropDownVal[0]?.departmentDD.map((item) => ({
-    value: item,
-    label: item,
+    value: item.split(" ") // Split the string into words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+    .join(" "),
+    label: item
+      .split(" ") // Split the string into words
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+      .join(" "), // Join the words back together
   }));
+  
   const positionDD = dropDownVal[0]?.positionDD.map((item) => ({
     value: item,
-    label: item,
+    label: item.split(" ") // Split the string into words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+    .join(" "),
   }));
   const jobCatDD = dropDownVal[0]?.jobCatDD.map((item) => ({
     value: item,
-    label: item,
+    label: item.split(" ") // Split the string into words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+    .join(" "),
   }));
 
 

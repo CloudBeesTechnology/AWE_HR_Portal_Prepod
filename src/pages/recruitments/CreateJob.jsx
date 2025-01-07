@@ -14,7 +14,7 @@ import axios from "axios";
 
 export const CreateJob = () => {
   const { SubmitJobData } = CreateJobFunc();
-
+  const { hiringJob } = WorkDataPass();
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
   useEffect(() => {
@@ -74,14 +74,14 @@ export const CreateJob = () => {
           },
           body: selectedFile,
         });
-    
+
         // Check if the response indicates success
         if (!response.ok) {
           throw new Error(
             `Failed to upload. Status: ${response.status}, Message: ${response.statusText}`
           );
         }
-    
+
         const result = await response.json(); // Parse JSON response if applicable
         console.log("File uploaded successfully:", result);
       } catch (err) {
@@ -127,7 +127,7 @@ export const CreateJob = () => {
 
       <div className="form-group flex flex-col gap-6">
         <div className="grid grid-cols-2 gap-5 ">
-          {WorkDataPass.hiringJob.map((field, index) => {
+          {hiringJob?.map((field, index) => {
             return (
               <div key={index}>
                 <FormField

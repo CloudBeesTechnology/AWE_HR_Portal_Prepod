@@ -50,7 +50,15 @@ export const EmployeeInsurance = () => {
   });
   const insuHSDD = dropDownVal[0]?.insuHSDD.map((item) => ({
     value: item,
-    label: item,
+    label: item.split(" ") // Split the string into words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+    .join(" "),
+  }));
+  const nationalityDD = dropDownVal[0]?.nationalityDD.map((item) => ({
+    value: item,
+    label: item.split(" ") // Split the string into words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+    .join(" "),
   }));
   const otherNationValue = watch("otherNation");
   const [empStatusTypeValue, setEmpStatusTypeValue] = useState("");
@@ -75,7 +83,7 @@ export const EmployeeInsurance = () => {
       label: "Nationality",
       key: "nationality",
       type: "select",
-      options: NationalityDD,
+      options: nationalityDD,
     },
     { label: "Other Nationality", key: "otherNation", type: "text" },
 
@@ -193,9 +201,9 @@ export const EmployeeInsurance = () => {
 
     if (url) {
       try {
-        const parsedArray = JSON.parse(url);
-        const parsedFiles = parsedArray.map((item) =>
-          typeof item === "string" ? JSON.parse(item) : item
+        const parsedArray = JSON?.parse(url);
+        const parsedFiles = parsedArray?.map((item) =>
+          typeof item === "string" ? JSON?.parse(item) : item
         );
         setUploadedDocs((prev) => ({ ...prev, empInsUpload: parsedFiles }));
       } catch (error) {

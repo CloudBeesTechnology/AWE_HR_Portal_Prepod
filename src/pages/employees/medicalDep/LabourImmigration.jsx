@@ -167,7 +167,7 @@ const LabourImmigration = () => {
   };
 
   const searchResult = (result) => {
-    console.log(result);
+    // console.log(result);
 
     const keysToSet = ["empID", "bruhimsRNo", "overMD", "overME", "bruhimsRD"];
 
@@ -238,7 +238,7 @@ const LabourImmigration = () => {
   };
 
   const onSubmit = async (data) => {
-    console.log(data);
+    // console.log(data);
 
     try {
       const checkingPITable = empPIData.find(
@@ -311,7 +311,7 @@ const LabourImmigration = () => {
           ),
           LabTable: checkingLMIDTable.id,
         };
-        console.log("Update Method :", LabUpValue);
+        // console.log("Update Method :", LabUpValue);
 
         await updateMedicalSubmit({ LabUpValue });
         setShowTitle("Medical and Dependent Info details updated successfully");
@@ -346,7 +346,7 @@ const LabourImmigration = () => {
             })
           ),
         };
-        console.log("Create Method :", labValue);
+        // console.log("Create Method :", labValue);
         await SubmitMPData({ labValue });
         setShowTitle("Medical and Dependent Info details saved successfully");
         setNotification(true);

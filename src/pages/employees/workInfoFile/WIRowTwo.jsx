@@ -8,20 +8,13 @@ export const WIRowTwo = ({
   watch,
   dropDownVal,
   setValue,
-  control,
-  upgradePosition,
-  upgradeDate,
-  contractPeriod,
-  contractStart,
-  contractEnd,
-  probDuration,
-  probationStart,
-  probationEnd,
+ 
 }) => {
-  const relationship = watch("relationship");
   const relationshipDD = dropDownVal[0]?.relationshipDD.map((item) => ({
     value: item,
-    label: item,
+    label: item.split(" ") // Split the string into words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+    .join(" "),
   }));
   return (
     <div className="grid grid-cols-3 gap-5 form-group mt-5">

@@ -87,7 +87,7 @@ export const ViewForm = ({
               `Leave Request ${status}`,
               `Dear ${
                 leaveData.empName || "Not mention"
-              }, Leave request for From Date : ${formattedDateFrom} To Date : ${formattedDateTo} has been Status: ${status} by Manager Name : ${
+              },  applied leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Manager Name : ${
                 managerName.name || "Not mention"
               }. View at : https://employee.adininworks.co `,
               "leave_no-reply@adininworks.com",
@@ -99,7 +99,7 @@ export const ViewForm = ({
               `Leave Request ${status}`,
               `Employee ${
                 leaveData.empName || "Not mention"
-              }, Leave request for From Date : ${formattedDateFrom} To Date : ${formattedDateTo} has been Status: ${status} by Manager Name : ${
+              }, applied leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Manager Name : ${
                 managerName.name || "Not mention"
               }. View at : https://hr.adininworks.co `,
               "leave_no-reply@adininworks.com",
@@ -136,7 +136,6 @@ export const ViewForm = ({
               const IdFinding =
                 leaveData?.managerEmpID.toLowerCase() ===
                 manage.empID.toLowerCase();
-
               return IdFinding;
             });
             // console.log("manager");
@@ -148,7 +147,6 @@ export const ViewForm = ({
            applied leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Supervisor ${
                 supervisorName.name || "Not mention"
               }. View at : https://hr.adininworks.co `,
-
               "leave_no-reply@adininworks.com",
               FindingEmail[0].officialEmail
             );
@@ -160,9 +158,7 @@ export const ViewForm = ({
            applied leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Supervisor ${
                 supervisorName.name || "Not mention"
               }. View at : https://hr.adininworks.co `,
-
               "leave_no-reply@adininworks.com",
-
               "Hr-notification@adininworks.com"
             );
 
@@ -195,7 +191,6 @@ export const ViewForm = ({
              applied leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Supervisor ${
                   supervisorName.name || "Not mention"
                 }. View at : https://hr.adininworks.co `,
-
                 "leave_no-reply@adininworks.com",
                 FindingEmail[0].officialEmail
               );
@@ -207,7 +202,6 @@ export const ViewForm = ({
              leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Supervisor ${
                   supervisorName.name || "Not mention"
                 }. View at : https://employee.adininworks.co `,
-
                 "leave_no-reply@adininworks.com",
                 leaveData.empOfficialEmail
               );
@@ -285,7 +279,6 @@ export const ViewForm = ({
                 supervisorName.name || "Not mention"
               }. View at : https://hr.adininworks.co `,
               "leave_no-reply@adininworks.com",
-
               "Hr-notification@adininworks.com"
             );
 

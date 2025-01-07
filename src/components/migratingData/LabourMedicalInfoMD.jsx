@@ -2,18 +2,14 @@ import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { DataSupply } from "../../utils/DataStoredContext";
-import { WorkInfoFunc } from "../../services/createMethod/WorkInfoFunc";
-import { UpdateWIData } from "../../services/updateMethod/UpdateWIData";
-import { NLACreate } from "../../services/createMethod/NLACreate";
-import { NLAUpdate } from "../../services/updateMethod/NLAUpdate";
-import { CreateDoe } from "../../services/createMethod/CreateDoe";
-import { UpdateDataFun } from "../../services/updateMethod/UpdateSDNData";
+import { MedicalPassFunc } from "../../services/createMethod/MedicalPassFunc";
+import { UpdateMedical } from "../../services/updateMethod/UpdateMedicalInfo";
 
-export const DNDetailsMD = () => {
-  const { DNData } = useContext(DataSupply);
-  const { CrerDoeFunData } = CreateDoe();
-  const { UpdateMPData } = UpdateDataFun();
-console.log(DNData);
+export const LabourMedicalInfoMD = () => {
+  const { LMIData } = useContext(DataSupply);
+  const { SubmitMPData } = MedicalPassFunc();
+  const { updateMedicalSubmit } = UpdateMedical();
+console.log(LMIData);
 
   const excelDateToJSDate = (serial) => {
     const excelEpoch = new Date(Date.UTC(1900, 0, 1)); // Start from Jan 1, 1900
@@ -21,16 +17,13 @@ console.log(DNData);
     return new Date(excelEpoch.getTime() + daysOffset * 24 * 60 * 60 * 1000);
   };
 
-// Link 1:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNDetails.csv"
-// Link 2:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNdetails+1.csv"
+// Link 1:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LabourMedicalInfo+Prod/LabourMedicalInfo.csv"
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNDetails.csv",
-        // "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNdetails+1.csv",
-        {
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LabourMedicalInfo+Prod/LabourMedicalInfo.csv",        {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
       );
@@ -46,8 +39,7 @@ console.log(DNData);
       // Convert sheet data to JSON format
       const sheetData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
       const dateKeys = [
-        "doeEmpValid","nlmsEmpValid","doeEmpSubmit","doeEmpApproval","nlmsEmpApproval","nlmsEmpSubmit"
-        
+        "bruneiME",      
       ];
       const transformedData = sheetData.slice(1).map((row) => {
         let result = {};
@@ -62,28 +54,26 @@ console.log(DNData);
         return result;
       });
       // console.log("All Data:", transformedData);
-      for (const DoeValue of transformedData) {
-        if (DoeValue.empID) {
-          DoeValue.empID = String(DoeValue.empID);
-          //   DoeValue.ppExpiry = [DoeValue.ppExpiry];
-          //   DoeValue.bwnIcExpiry = [DoeValue.bwnIcExpiry];
+      for (const labValue of transformedData) {
+        if (labValue.empID) {
+          labValue.empID = String(labValue.empID);
         }
-        console.log(DoeValue);
+        console.log(labValue);
 
-        const checkingDoeUpValueTable = DNData.find(
-          (match) => match.empID === DoeValue.empID
+        const checkingLMITable = LMIData.find(
+          (match) => match.empID === labValue.empID
         );
 
-        if (checkingDoeUpValueTable) {
-          console.log(DoeValue, "update");
-          const DoeUpValue = {
-            ...DoeValue,
-            id: checkingDoeUpValueTable.id,
+        if (checkingLMITable) {
+          console.log(labValue, "update");
+          const LabUpValue = {
+            ...labValue,
+            id: checkingLMITable.id,
           };
-          await UpdateMPData({ DoeUpValue });
+          await updateMedicalSubmit({ LabUpValue });
         } else {
-          console.log(DoeValue, "create");
-          await CrerDoeFunData({ DoeValue });
+          console.log(labValue, "create");
+          await SubmitMPData({ labValue });
         }
       }
     } catch (error) {
@@ -93,7 +83,7 @@ console.log(DNData);
 
   return (
     <div className="flex flex-col gap-40">
-      DNDetailsMD
+      LabourMedicalInfoMD
       <button onClick={fetchExcelFile}>Click Here</button>
     </div>
   );

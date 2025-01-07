@@ -2,17 +2,13 @@ import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { DataSupply } from "../../utils/DataStoredContext";
-import { WorkInfoFunc } from "../../services/createMethod/WorkInfoFunc";
-import { UpdateWIData } from "../../services/updateMethod/UpdateWIData";
-import { NLACreate } from "../../services/createMethod/NLACreate";
-import { NLAUpdate } from "../../services/updateMethod/NLAUpdate";
-import { CreateDoe } from "../../services/createMethod/CreateDoe";
-import { UpdateDataFun } from "../../services/updateMethod/UpdateSDNData";
+import { UpdateNlmsData } from "../../services/updateMethod/UpdateNlmsData";
 
-export const DNDetailsMD = () => {
+export const NlmsMD = () => {
   const { DNData } = useContext(DataSupply);
-  const { CrerDoeFunData } = CreateDoe();
-  const { UpdateMPData } = UpdateDataFun();
+//   const { CrerDoeFunData } = CreateDoe();
+    const { uploadNlmsFun } = UpdateNlmsData();
+  
 console.log(DNData);
 
   const excelDateToJSDate = (serial) => {
@@ -21,15 +17,13 @@ console.log(DNData);
     return new Date(excelEpoch.getTime() + daysOffset * 24 * 60 * 60 * 1000);
   };
 
-// Link 1:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNDetails.csv"
 // Link 2:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNdetails+1.csv"
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNDetails.csv",
-        // "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNdetails+1.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNdetails+1.csv",
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
@@ -46,7 +40,7 @@ console.log(DNData);
       // Convert sheet data to JSON format
       const sheetData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
       const dateKeys = [
-        "doeEmpValid","nlmsEmpValid","doeEmpSubmit","doeEmpApproval","nlmsEmpApproval","nlmsEmpSubmit"
+       "nlmsEmpValid",
         
       ];
       const transformedData = sheetData.slice(1).map((row) => {
@@ -62,29 +56,26 @@ console.log(DNData);
         return result;
       });
       // console.log("All Data:", transformedData);
-      for (const DoeValue of transformedData) {
-        if (DoeValue.empID) {
-          DoeValue.empID = String(DoeValue.empID);
+      for (const DoeValues of transformedData) {
+        if (DoeValues.empID) {
+          DoeValues.empID = String(DoeValues.empID);
           //   DoeValue.ppExpiry = [DoeValue.ppExpiry];
           //   DoeValue.bwnIcExpiry = [DoeValue.bwnIcExpiry];
         }
-        console.log(DoeValue);
+        console.log(DoeValues);
 
         const checkingDoeUpValueTable = DNData.find(
-          (match) => match.empID === DoeValue.empID
+          (match) => match.empID === DoeValues.empID
         );
 
         if (checkingDoeUpValueTable) {
-          console.log(DoeValue, "update");
-          const DoeUpValue = {
-            ...DoeValue,
+          console.log("update");
+          const DoeValue = {
+            ...DoeValues,
             id: checkingDoeUpValueTable.id,
           };
-          await UpdateMPData({ DoeUpValue });
-        } else {
-          console.log(DoeValue, "create");
-          await CrerDoeFunData({ DoeValue });
-        }
+          await uploadNlmsFun({ DoeValue });
+        } 
       }
     } catch (error) {
       console.error("Error fetching Excel file:", error);
@@ -93,7 +84,7 @@ console.log(DNData);
 
   return (
     <div className="flex flex-col gap-40">
-      DNDetailsMD
+      NlmsMD
       <button onClick={fetchExcelFile}>Click Here</button>
     </div>
   );

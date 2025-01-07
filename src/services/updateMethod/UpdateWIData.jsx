@@ -19,22 +19,45 @@ export const UpdateWIData = () => {
       throw new Error("Missing required parameters");
     }
     const formatDate = (date) =>
-      date && new Date(date).toLocaleDateString("en-CA") ;
+      date && new Date(date).toLocaleDateString("en-CA");
     const formattingDate = (date) =>
       date ? new Date(date).toLocaleDateString("en-CA") : null;
 
     const updateFieldArray = (existingArray, newValue) => {
-      if (!existingArray) return newValue ? [newValue] : []; // return empty array if no newValue
-      if (newValue == null) return existingArray; // avoid adding null/undefined
-      return [...new Set([...(existingArray || []), newValue])].filter(Boolean); // remove null/undefined values
+      if (!existingArray)
+        return newValue
+          ? [
+              newValue === null || newValue === undefined || newValue === ""
+                ? "N/A"
+                : newValue,
+            ]
+          : [];
+      if (newValue == null) return existingArray;
+      return [
+        ...new Set([
+          ...(existingArray || []),
+          newValue === null || newValue === undefined ? "N/A" : newValue,
+        ]),
+      ].map((item) =>
+        item === null || item === undefined || item === "" ? "N/A" : item
+      ); // Replace null/undefined with "N/A"
     };
-    
+
     const updateFieldArray1 = (existingArray, newValue) => {
-      if (!existingArray) return newValue ? [newValue] : []; // return empty array if no newValue
-      if (newValue == null) return existingArray; // avoid adding null/undefined
-      return [...existingArray, newValue].filter(Boolean); // remove null/undefined values
+      if (!existingArray)
+        return newValue
+          ? [
+              newValue === null || newValue === undefined || newValue === ""
+                ? "N/A"
+                : newValue,
+            ]
+          : [];
+      if (newValue == null) return existingArray;
+      return [...existingArray, newValue].map((item) =>
+        item === null || item === undefined || item === "" ? "N/A" : item
+      ); // Replace null/undefined with "N/A"
     };
-    
+
     const {
       empID,
       SRDataRecord,
@@ -122,13 +145,13 @@ export const UpdateWIData = () => {
     const probationEndValue = formatDate(probationEnd);
     const probationStartValue = formatDate(probationStart);
     const upgradeDateValue = formatDate(upgradeDate);
-     const annualLeaveDateValue = formatDate(annualLeaveDate);
-     const dateLeavePassValue = formatDate(dateLeavePass);
-     const upgradeDepEmpDate = formatDate(depEmpDate);
-     const upgradePositionRevDate = formatDate(positionRevDate);
-     const upgradeRevSalaryDate = formatDate(revSalaryDate);
-     const upgradeRevLeaveDate = formatDate(revLeaveDate);
-     const upgradeRevALD = formatDate(revALD);
+    const annualLeaveDateValue = formatDate(annualLeaveDate);
+    const dateLeavePassValue = formatDate(dateLeavePass);
+    const upgradeDepEmpDate = formatDate(depEmpDate);
+    const upgradePositionRevDate = formatDate(positionRevDate);
+    const upgradeRevSalaryDate = formatDate(revSalaryDate);
+    const upgradeRevLeaveDate = formatDate(revLeaveDate);
+    const upgradeRevALD = formatDate(revALD);
     // console.log(contractEndValue);
 
     if (workInfoDataRecord) {
@@ -256,16 +279,16 @@ export const UpdateWIData = () => {
         salaryType: updatedsalaryType,
       };
 
-  //     console.log(totalData, "ertdfghjkhbtxrfgh");
-     try{ const Work = await client.graphql({
-      query: updateEmpWorkInfo, 
-      variables: { input: totalData, limit:20000, },
-    })
-    console.log(Work);
-  }
-    catch(err){
-      console.log(err);     
-     }
+      //     console.log(totalData, "ertdfghjkhbtxrfgh");
+      try {
+        const Work = await client.graphql({
+          query: updateEmpWorkInfo,
+          variables: { input: totalData, limit: 20000 },
+        });
+        console.log(Work);
+      } catch (err) {
+        console.log(err);
+      }
     }
 
     if (leaveDetailsDataRecord) {
@@ -295,72 +318,72 @@ export const UpdateWIData = () => {
       );
 
       const totalData1 = {
-      id: leaveDetailsDataRecord.id,
-      empID,
-      leavePass:updatedleavePass,
-      dateLeavePass:updateddateLeavePass,
-      destinateLeavePass:updateddestinateLeavePass,
-      durLeavePass:updateddurLeavePass,
-      annualLeave:updatedannualLeave,
-      annualLeaveDate:updatedannualLeaveDate,
-      sickLeave,
-      sickLeaveDate,
-      materLeave,
-      paterLeave,
-      mrageLeave,
-      pervAnnualLeaveBal,
-      // compasLeave,
-      hospLeave, 
-     
-    };
-    
-    //   // console.log(totalData1, "ertdfghjkhbtxrfgh");
-      try{const Leave = await client.graphql({
-        query: updateEmpLeaveDetails, 
-        variables: { input: totalData1, limit:20000, },
-      });
-      // console.log(Leave);
-    }catch(err){
-    console.log(err);
+        id: leaveDetailsDataRecord.id,
+        empID,
+        leavePass: updatedleavePass,
+        dateLeavePass: updateddateLeavePass,
+        destinateLeavePass: updateddestinateLeavePass,
+        durLeavePass: updateddurLeavePass,
+        annualLeave: updatedannualLeave,
+        annualLeaveDate: updatedannualLeaveDate,
+        sickLeave,
+        sickLeaveDate,
+        materLeave,
+        paterLeave,
+        mrageLeave,
+        pervAnnualLeaveBal,
+        // compasLeave,
+        hospLeave,
+      };
+
+      //   // console.log(totalData1, "ertdfghjkhbtxrfgh");
+      try {
+        const Leave = await client.graphql({
+          query: updateEmpLeaveDetails,
+          variables: { input: totalData1, limit: 20000 },
+        });
+        // console.log(Leave);
+      } catch (err) {
+        console.log(err);
       }
     }
 
     if (terminateDataRecord) {
       const totalData2 = {
-      id: terminateDataRecord.id,
-      empID,
-      resignDate,
-      termiDate,
-      resignNotProb,
-      otherResignNotProb,
-      termiNotProb,
-      otherTermiNotProb,
-      resignNotConf,
-      otherResignNotConf,
-      termiNotConf,
-      otherTermiNotConf,
-      reasonResign,
-      reasonTerminate,
-      WIContract,
-      WIProbation,
-      WIResignation,
-      WITermination,
-      WILeaveEntitle,
-    };
-    
+        id: terminateDataRecord.id,
+        empID,
+        resignDate,
+        termiDate,
+        resignNotProb,
+        otherResignNotProb,
+        termiNotProb,
+        otherTermiNotProb,
+        resignNotConf,
+        otherResignNotConf,
+        termiNotConf,
+        otherTermiNotConf,
+        reasonResign,
+        reasonTerminate,
+        WIContract,
+        WIProbation,
+        WIResignation,
+        WITermination,
+        WILeaveEntitle,
+      };
+
       // console.log(totalData2, "ertdfghjkhbtxrfgh");
-      
-      try{
+
+      try {
         const Terminate = await client.graphql({
-          query: updateTerminationInfo, 
-          variables: { input: totalData2 , limit:20000,},
+          query: updateTerminationInfo,
+          variables: { input: totalData2, limit: 20000 },
         });
         console.log(Terminate);
-      }catch(err){console.log(err);
+      } catch (err) {
+        console.log(err);
       }
     }
 
-  
     if (SRDataRecord) {
       const updateddepEmpDate = updateFieldArray(
         SRDataRecord.depEmpDate,
@@ -399,39 +422,38 @@ export const UpdateWIData = () => {
         SRDataRecord.revALD,
         upgradeRevALD
       );
-      
-      
-    const totalData3 = {
-      id: SRDataRecord.id,
-      empID,
-      positionRev:updatedpositionRev,
-      positionRevDate:updatedpositionRevDate,
-      revSalary:updatedrevSalary,
-      revSalaryDate:updatedrevSalaryDate,
-      revLeavePass:updatedrevLeavePass,
-      revLeaveDate:updatedrevLeaveDate,
-      revAnnualLeave:updatedrevAnnualLeave,
-      revALD:updatedrevALD,
-      depEmp:updateddepEmp,
-      depEmpDate:updateddepEmpDate,
-      remarkWI,
-      uploadPR,
-      uploadSP,
-      uploadLP,
-      uploadAL,
-      uploadDep,
-    };
-    
-      // console.log(totalData3, "ertdfghjkhbtxrfgh");   
 
+      const totalData3 = {
+        id: SRDataRecord.id,
+        empID,
+        positionRev: updatedpositionRev,
+        positionRevDate: updatedpositionRevDate,
+        revSalary: updatedrevSalary,
+        revSalaryDate: updatedrevSalaryDate,
+        revLeavePass: updatedrevLeavePass,
+        revLeaveDate: updatedrevLeaveDate,
+        revAnnualLeave: updatedrevAnnualLeave,
+        revALD: updatedrevALD,
+        depEmp: updateddepEmp,
+        depEmpDate: updateddepEmpDate,
+        remarkWI,
+        uploadPR,
+        uploadSP,
+        uploadLP,
+        uploadAL,
+        uploadDep,
+      };
 
-      try{
+      // console.log(totalData3, "ertdfghjkhbtxrfgh");
+
+      try {
         const Service = await client.graphql({
-          query: updateServiceRecord, 
-          variables: { input: totalData3, limit:20000, },
+          query: updateServiceRecord,
+          variables: { input: totalData3, limit: 20000 },
         });
         // console.log(Service);
-      }catch(err){console.log(err);
+      } catch (err) {
+        console.log(err);
       }
     }
 

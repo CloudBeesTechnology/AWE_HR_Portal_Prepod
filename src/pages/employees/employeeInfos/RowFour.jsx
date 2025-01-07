@@ -12,11 +12,15 @@ export const RowFour = ({
     
   const religionDD = dropDownVal[0]?.religionDD.map((item) => ({
     value: item,
-    label: item,
+    label: item.split(" ") // Split the string into words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+    .join(" "),
   }));
   const raceDD = dropDownVal[0]?.raceDD.map((item) => ({
     value: item,
-    label: item,
+    label: item.split(" ") // Split the string into words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+    .join(" "),
   }));
   const race = watch("race" || "");
   const religion = watch("Religion" || "");

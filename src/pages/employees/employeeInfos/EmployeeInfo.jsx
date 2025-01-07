@@ -39,8 +39,8 @@ export const EmployeeInfo = () => {
   }, []);
   const { SubmitEIData, errorEmpID } = EmpInfoFunc();
   const { UpdateEIValue } = UpdateEmpInfo();
-  const { empPIData, IDData,dropDownVal} = useContext(DataSupply);
- 
+  const { empPIData, IDData, dropDownVal } = useContext(DataSupply);
+
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [selectedNationality, setSelectedNationality] = useState("");
@@ -103,8 +103,6 @@ export const EmployeeInfo = () => {
     },
   });
 
-
-  
   const contractTypes = watch("contractType");
   const empTypes = watch("empType");
   const watchedEmpID = watch("empID");
@@ -227,18 +225,54 @@ export const EmployeeInfo = () => {
     }
   }, [uploadedDocs]);
 
+  const capitalizeFirstLetter = (str) => {
+    if (typeof str === "string") {
+      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    }
+    return str;
+  };
+
   const getLastValue = (value, field) => {
     if (field === "contractType" || field === "empType") {
-      return value;
+      return capitalizeFirstLetter(value);
     }
 
-    return Array.isArray(value) ? value : value ? [value] : [];
+    const processedValue = Array.isArray(value) ? value : value ? [value] : [];
+    return processedValue.map(capitalizeFirstLetter);
   };
 
   const getLastArrayValue = (value, field) => {
-    // Check if the value is an array
-    return Array.isArray(value) ? value[value.length - 1] : value;
+    // If the value is an array, get the last value
+    const lastValue = Array.isArray(value) ? value[value.length - 1] : value;
+
+    // Check if the value is a valid date string, and if so, format it
+    if (isValidDate(lastValue)) {
+      return formatDate(lastValue);
+    }
+
+    // If it's not a date, return the last value as it is (no capitalization)
+    return lastValue;
   };
+
+  // Utility function to check if a date is valid
+  const isValidDate = (value) => {
+    const date = new Date(value);
+    return !isNaN(date.getTime()); // Return true if the date is valid
+  };
+  const formatDate = (date) => {
+    const d = new Date(date);
+  
+    // Ensure the date is formatted as yyyy-MM-dd
+    const year = d.getFullYear();
+    const month = (d.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed, so add 1
+    const day = d.getDate().toString().padStart(2, '0');
+  
+    // Return the formatted date in yyyy-MM-dd format
+    return `${year}-${month}-${day}`;
+  };
+  
+  
+  
 
   const preprocessJSONString = (str) => {
     try {
@@ -262,9 +296,9 @@ export const EmployeeInfo = () => {
     try {
       // Check if it's already a string
       let familyDetailsString = familyDetailsInput;
-  
+
       // If it's an object, convert it to a string
-      if (typeof familyDetailsString === 'object') {
+      if (typeof familyDetailsString === "object") {
         // If it's an array, we join the array elements into a string
         if (Array.isArray(familyDetailsString)) {
           familyDetailsString = JSON.stringify(familyDetailsString);
@@ -273,165 +307,274 @@ export const EmployeeInfo = () => {
           familyDetailsString = JSON.stringify([familyDetailsString]);
         }
       }
-  
 
       // Remove the surrounding quotes if they exist
       let cleanedString = familyDetailsString.trim();
-  
+
       // Remove surrounding quotes (if any) after trimming
       if (cleanedString.startsWith('"') && cleanedString.endsWith('"')) {
         cleanedString = cleanedString.slice(1, -1); // Remove surrounding quotes
       }
-  
+
       // Fix malformed JSON by ensuring property names are wrapped in double quotes
       cleanedString = cleanedString.replace(/([a-zA-Z0-9_]+)(:)/g, '"$1"$2');
-  
+
       // Handle potential single quotes around values or unescaped characters
       cleanedString = cleanedString.replace(/"(?!\\)/g, '\\"'); // Escape any unescaped quotes
-  
+
       // Handle special characters that might be causing issues (like '/')
       cleanedString = cleanedString.replace(/\\/g, "");
-  
+
+      // Capitalize words utility function
+      const capitalizeWords = (str) =>
+        str
+          .split(" ")
+          .map(
+            (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+          )
+          .join(" ");
+
       // After cleaning, the string should be a valid JSON array
       if (cleanedString.startsWith("[") && cleanedString.endsWith("]")) {
         // If it's an array-like string, parse it directly
-        return JSON.parse(cleanedString);
+        return JSON.parse(cleanedString).map((item) => {
+          if (typeof item === "string") {
+            return capitalizeWords(item);
+          }
+          if (typeof item === "object") {
+            return Object.fromEntries(
+              Object.entries(item).map(([key, value]) => [
+                key,
+                typeof value === "string" ? capitalizeWords(value) : value,
+              ])
+            );
+          }
+          return item;
+        });
       } else {
         // If it's not in array format, wrap it in an array and parse it
-        return [JSON.parse(cleanedString)];
+        const parsedItem = JSON.parse(cleanedString);
+        if (typeof parsedItem === "string") {
+          return [capitalizeWords(parsedItem)];
+        }
+        if (typeof parsedItem === "object") {
+          return [
+            Object.fromEntries(
+              Object.entries(parsedItem).map(([key, value]) => [
+                key,
+                typeof value === "string" ? capitalizeWords(value) : value,
+              ])
+            ),
+          ];
+        }
+        return [parsedItem];
       }
     } catch (error) {
       console.error("Error cleaning and parsing familyDetails:", error);
       return []; // Return empty array if parsing fails
     }
   };
-  
-const searchResult = async (result) => {
 
+  const searchResult = async (result) => {
+    // console.log(result);
 
-  const keysToSet = [
-    "empID", "driveLic", "inducBrief", "myIcNo", "nationality", "nationalCat", 
-    "otherNation", "otherRace", "otherReligion", "preEmp", "preEmpPeriod", "race", 
-    "religion", "age", "aTQualify", "alternateNo", "agent", "dob", "cob",
-    "ctryOfOrigin", "chinese", "educLevel", "email", "eduDetails", "empBadgeNo", 
-    "empType", "bankName", "bankAccNo", "lang", "marital", "name", "oCOfOrigin", 
-    "position", "sapNo", "officialEmail", "bwnIcColour","gender"
-  ];
+    const keysToSet = [
+      "empID",
+      "driveLic",
+      "inducBrief",
+      "myIcNo",
+      "nationality",
+      "nationalCat",
+      "otherNation",
+      "otherRace",
+      "otherReligion",
+      "preEmp",
+      "preEmpPeriod",
+      "race",
+      "religion",
+      "age",
+      "aTQualify",
+      "alternateNo",
+      "agent",
+      "dob",
+      "cob",
+      "ctryOfOrigin",
+      "chinese",
+      "educLevel",
+      "email",
+      "eduDetails",
+      "empBadgeNo",
+      "empType",
+      "bankName",
+      "bankAccNo",
+      "lang",
+      "marital",
+      "name",
+      "oCOfOrigin",
+      "position",
+      "sapNo",
+      "officialEmail",
+      "bwnIcColour",
+      "gender",
+    ];
 
-  // Set values for other fields
-  keysToSet.forEach((key) => {
-    // Get the value associated with the key
-    let valueToSet = result[key];
-  
-    // Convert the value to uppercase if it's a string
-    if (typeof valueToSet === "string") {
-      valueToSet = valueToSet?.toUpperCase();
-    }
-  
-    // Set the value
-    setValue(key, valueToSet);
-  });
-  
+    // Set values for other fields
+    keysToSet.forEach((key) => {
+      let valueToSet = result[key];
 
-  const fields = ["contractType", "empType"];
-  fields.forEach((field) => setValue(field, getLastValue(result[field])));
-
-  const fieldsArray = ["bwnIcExpiry", "ppExpiry", "ppIssued"];
-  fieldsArray.forEach((field) => setValue(field, getLastArrayValue(result[field])));
-
-  const changeString = ["permanentAddress", "contactNo", "ppNo", "ppDestinate", "bwnIcNo"];
-  changeString.forEach((field) => {
-    const value = result[field];
-    if (Array.isArray(value)) {
-      const stringValue = value.join(", ");
-      setValue(field, stringValue);
-    } else {
-      setValue(field, value);
-    }
-  });
-
-  // Handle familyDetails
-  if (Array.isArray(result.familyDetails) && result.familyDetails.length > 0) {
-    const cleanedFamilyDetails = cleanFamilyDetailsString(result.familyDetails[0]);
-    setFamilyData(cleanedFamilyDetails);
-  } else {
-    console.error("Invalid familyDetails format:", result.familyDetails);
-    setFamilyData([]);
-  }
-
-  // Handle file uploads and names
-  if (result.inducBriefUp) {
-    setUploadedFileNames((prev) => ({
-      ...prev,
-      inducBriefUp: getFileName(result.inducBriefUp) || "",
-    }));
-  }
-
-  setValue("profilePhoto", result?.profilePhoto?.toString());
-  setValue("inducBriefUp", result?.inducBriefUp?.toString());
-  setUploadedDocs((prev) => ({
-    profilePhoto: result.profilePhoto,
-    inducBriefUp: result.inducBriefUp,
-  }));
-
-  const profilePhotoString = result?.profilePhoto;
-  const linkToStorageFile = async (pathUrl) => {
-    try {
-      if (pathUrl) {
-        const result = await getUrl({ path: pathUrl });
-        setPPLastUP(result.url.toString());
-      } 
-    } catch (err) {
-      console.log("Error fetching file from storage:", err);
-    }
-  };
-  linkToStorageFile(profilePhotoString);
-
-  // Handle multiple file uploads
-  const uploadFields = [
-    "bwnUpload", "applicationUpload", "cvCertifyUpload", "loiUpload", "myIcUpload",
-    "paafCvevUpload", "ppUpload", "supportDocUpload"
-  ];
-
-  uploadFields.map((field) => {
-    if (result && result[field]) {
-      try {
-        const outerParsed = JSON.parse(result[field]);
-        const parsedArray = Array.isArray(outerParsed) ? outerParsed : [outerParsed];
-
-        const parsedFiles = parsedArray.map((item) => {
-          if (typeof item === "string") {
-            try {
-              const validJSON = preprocessJSONString(item);
-              return JSON.parse(validJSON);
-            } catch (e) {
-              return item;
-            }
-          }
-          return item;
-        });
-
-        const lastFile = parsedFiles[parsedFiles.length - 1];
-        const lastFileName = lastFile?.upload
-          ? getFileName(lastFile.upload)
-          : lastFile[0]?.upload
-          ? getFileName(lastFile[0].upload)
-          : null;
-
-        setValue(field, parsedFiles);
-        setUploadedFiles((prev) => ({ ...prev, [field]: parsedFiles }));
-        setUploadedFileNames((prev) => ({ ...prev, [field]: lastFileName || "" }));
-      } catch (error) {
-        // console.error(`Failed to parse ${field}:`, error);
+      if (typeof valueToSet === "string" && valueToSet.trim() !== "") {
+        valueToSet = valueToSet
+          .toLowerCase()
+          .split(" ")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
       }
-    }
-  });
-};
+      if (key === "empBadgeNo") {
+        valueToSet = valueToSet?.toUpperCase();
+      }
+      if (valueToSet !== undefined && valueToSet !== null) {
+        // console.log(`Key: ${key}, Original: ${result[key]}, Transformed: ${valueToSet}`);
+        setValue(key, valueToSet);
+      }
+    });
 
+    const fields = ["contractType", "empType"];
+    fields.forEach((field) => setValue(field, getLastValue(result[field])));
+
+    const fieldsArray = ["bwnIcExpiry", "ppExpiry", "ppIssued"];
+    fieldsArray.forEach((field) =>
+      setValue(field, getLastArrayValue(result[field]))
+    );
+
+    const changeString = [
+      "permanentAddress",
+      "contactNo",
+      "ppNo",
+      "ppDestinate",
+      "bwnIcNo",
+    ];
+    changeString.forEach((field) => {
+      const value = result[field];
+      if (Array.isArray(value)) {
+        // Join the array into a string and capitalize the first letter of each word
+        const stringValue = value
+          .join(", ")
+          .split(" ") // Split by spaces
+          .map(
+            (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+          ) // Capitalize each word
+          .join(" "); // Rejoin with spaces
+        setValue(field, stringValue);
+      } else if (typeof value === "string") {
+        // Capitalize the first letter of each word for a string
+        const stringValue = value
+          .split(" ")
+          .map(
+            (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+          )
+          .join(" ");
+        setValue(field, stringValue);
+      } else {
+        // Set the value directly if not an array or string
+        setValue(field, value);
+      }
+    });
+
+    // Handle familyDetails
+    if (
+      Array.isArray(result.familyDetails) &&
+      result.familyDetails.length > 0
+    ) {
+      const cleanedFamilyDetails = cleanFamilyDetailsString(
+        result?.familyDetails[0]
+      );
+      setFamilyData(cleanedFamilyDetails);
+    } else {
+      setFamilyData([]);
+    }
+
+    // Handle file uploads and names
+    if (result.inducBriefUp) {
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        inducBriefUp: getFileName(result.inducBriefUp) || "",
+      }));
+    }
+
+    setValue("profilePhoto", result?.profilePhoto?.toString());
+    setValue("inducBriefUp", result?.inducBriefUp?.toString());
+    setUploadedDocs((prev) => ({
+      profilePhoto: result.profilePhoto,
+      inducBriefUp: result.inducBriefUp,
+    }));
+
+    const profilePhotoString = result?.profilePhoto;
+    const linkToStorageFile = async (pathUrl) => {
+      try {
+        if (pathUrl) {
+          const result = await getUrl({ path: pathUrl });
+          setPPLastUP(result.url.toString());
+        }
+      } catch (err) {
+        console.log("Error fetching file from storage:", err);
+      }
+    };
+    linkToStorageFile(profilePhotoString);
+
+    // Handle multiple file uploads
+    const uploadFields = [
+      "bwnUpload",
+      "applicationUpload",
+      "cvCertifyUpload",
+      "loiUpload",
+      "myIcUpload",
+      "paafCvevUpload",
+      "ppUpload",
+      "supportDocUpload",
+    ];
+
+    uploadFields.map((field) => {
+      if (result && result[field]) {
+        try {
+          const outerParsed = JSON.parse(result[field]);
+          const parsedArray = Array.isArray(outerParsed)
+            ? outerParsed
+            : [outerParsed];
+
+          const parsedFiles = parsedArray.map((item) => {
+            if (typeof item === "string") {
+              try {
+                const validJSON = preprocessJSONString(item);
+                return JSON.parse(validJSON);
+              } catch (e) {
+                return item;
+              }
+            }
+            return item;
+          });
+
+          const lastFile = parsedFiles[parsedFiles.length - 1];
+          const lastFileName = lastFile?.upload
+            ? getFileName(lastFile.upload)
+            : lastFile[0]?.upload
+            ? getFileName(lastFile[0].upload)
+            : null;
+
+          setValue(field, parsedFiles);
+          setUploadedFiles((prev) => ({ ...prev, [field]: parsedFiles }));
+          setUploadedFileNames((prev) => ({
+            ...prev,
+            [field]: lastFileName || "",
+          }));
+        } catch (error) {
+          // console.error(`Failed to parse ${field}:`, error);
+        }
+      }
+    });
+  };
 
   const getFileName = (filePath) => {
     if (!filePath || typeof filePath !== "string") {
-     
       return ""; // Return an empty string if the file path is invalid
     }
     const fileNameWithExtension = filePath.split("/").pop(); // Get file name with extension
@@ -439,29 +582,27 @@ const searchResult = async (result) => {
     return fileName;
   };
 
-  
   const onSubmit = async (data) => {
     data.contractType = contractTypes;
     data.empType = empTypes;
-  
+
     const formatDate = (date) =>
       date ? new Date(date).toLocaleDateString("en-CA") : null;
-  
+
     const bwnIcExpiry = formatDate(data.bwnIcExpiry);
     const ppIssued = formatDate(data.ppIssued);
     const ppExpiry = formatDate(data.ppExpiry);
-  
+
     const removeLeadingNulls = (array, newValue) => {
       const newArray = [...(array || []), newValue]; // Combine old array and new value
       let firstValidIndex = newArray.findIndex((item) => item !== null);
-      if (firstValidIndex !==-1){
-        return newArray.map((item)=>(item === null ? "N/A" : item))
-      }
-      else{
-        return []
+      if (firstValidIndex !== -1) {
+        return newArray.map((item) => (item === null ? "N/A" : item));
+      } else {
+        return [];
       }
     };
-  
+
     try {
       const checkingPITable = empPIData.find(
         (match) => match.empID === data.empID
@@ -469,7 +610,7 @@ const searchResult = async (result) => {
       const checkingIDTable = IDData.find(
         (match) => match.empID === data.empID
       );
-  
+
       if (checkingIDTable && checkingPITable) {
         const updatedbwnIcExpiry = removeLeadingNulls(
           checkingIDTable.bwnIcExpiry,
@@ -483,7 +624,7 @@ const searchResult = async (result) => {
           checkingIDTable.ppIssued,
           ppIssued
         );
-  
+
         const collectValue = {
           ...data,
           profilePhoto: uploadedDocs.profilePhoto,
@@ -503,7 +644,7 @@ const searchResult = async (result) => {
           PITableID: checkingPITable.id,
           IDTable: checkingIDTable.id,
         };
-  
+
         await UpdateEIValue({ collectValue });
         setShowTitle("Employee Personal Info updated successfully");
         setNotification(true);
@@ -511,7 +652,7 @@ const searchResult = async (result) => {
         const updatedbwnIcExpiry = removeLeadingNulls([], bwnIcExpiry);
         const updatedppExpiry = removeLeadingNulls([], ppExpiry);
         const updatedppIssued = removeLeadingNulls([], ppIssued);
-  
+
         const empValue = {
           ...data,
           profilePhoto: uploadedDocs.profilePhoto,
@@ -529,7 +670,7 @@ const searchResult = async (result) => {
           supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
           familyDetails: JSON.stringify(data.familyDetails),
         };
-  
+
         await SubmitEIData({ empValue });
         setShowTitle("Employee Personal Info saved successfully");
         setNotification(true);
@@ -538,7 +679,7 @@ const searchResult = async (result) => {
       console.log(error);
     }
   };
-  
+
   const watchedProfilePhoto = watch("profilePhoto" || "");
 
   return (
@@ -669,10 +810,12 @@ const searchResult = async (result) => {
           selectedReligion={selectedReligion}
           watch={watch}
           dropDownVal={dropDownVal}
-
         />
         {/* Row5 */}
-        <RowFive register={register} errors={errors} dropDownVal={dropDownVal}
+        <RowFive
+          register={register}
+          errors={errors}
+          dropDownVal={dropDownVal}
         />
         {/* Row6 */}
         <RowSix
@@ -683,13 +826,18 @@ const searchResult = async (result) => {
           selectedCountry={selectedCountry}
           handleCountryChange={handleCountryChange}
           watch={watch}
+          dropDownVal={dropDownVal}
         />
         {/* Row7 */}
         <RowSeven register={register} errors={errors} />
         {/* Row8 */}
         <RowEight register={register} errors={errors} />
         {/* Row9 */}
-        <RowNine register={register} errors={errors} dropDownVal={dropDownVal}/>
+        <RowNine
+          register={register}
+          errors={errors}
+          dropDownVal={dropDownVal}
+        />
         {/* Row10 */}
         <RowTen register={register} errors={errors} />
         {/* Row11 */}

@@ -32,6 +32,21 @@ export const SearchDisplay = ({
     // console.log(filteredEmployees);
   }, [toggleHandle, newFormData]);
 
+  const filterDatabyClickSearchIcon = useCallback(() => {
+   
+    if (filteredEmployees && filteredEmployees.length > 0) {
+      const result = filteredEmployees.find((fi) => {
+        if (fi.empID === searchQuery) {
+          return fi;
+        }
+      });
+      if (result) {
+        searchResult(result);
+      }else{
+        searchResult({});
+      }
+    }
+  }, [searchQuery, filteredEmployees]);
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
@@ -53,7 +68,7 @@ export const SearchDisplay = ({
           // employee.name?.toLowerCase().includes(query)
         );
       setFilteredEmployees?.(results);
-      console.log("if FilteredEmployees : ", results);
+      // console.log("if FilteredEmployees : ", results);
     } else {
       // console.log("Else FilteredEmployees : ", filteredEmployees);
       setFilteredEmployees?.(newFormData);
@@ -74,7 +89,14 @@ export const SearchDisplay = ({
           onChange={handleSearch}
           onClick={toggleFunction}
         />
-        <div className=" text-dark_grey  text-2xl ">{searchIcon2}</div>
+        <div
+          className=" text-dark_grey  text-2xl cursor-pointer"
+          onClick={() => {
+            filterDatabyClickSearchIcon();
+          }}
+        >
+          {searchIcon2}
+        </div>
       </div>
 
       {filteredEmployees?.length > 0 && (
@@ -84,10 +106,10 @@ export const SearchDisplay = ({
               key={index}
               className="m-2 p-1 hover:bg-grey hover:text-white cursor-pointer flex justify-between items-center transition-all duration-200"
               onClick={() => {
-                console.log(employee);
+                // console.log(employee);
 
                 if (employee.empID || employee.name) {
-                  // console.log(`${employee.empID} - ${employee.name || "sdfvgh"}`);
+                  // console.log(`${employee.empID} - ${employee.name || ""}`);
 
                   setSearchQuery(`${employee.empID} - ${employee.name || ""}`);
                   searchResult(employee);

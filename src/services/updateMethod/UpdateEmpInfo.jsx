@@ -142,16 +142,20 @@ export const UpdateEmpInfo = () => {
       ppUpload,
       supportDocUpload,
     };
+// console.log(totalData1);
 
     try {
-      const [empInfoResponse, idResponse] = await Promise.all([
-        client.graphql({
-          query: updateEmpPersonalInfo,
-          variables: {
-            input: totalData,
-            limit: 20000,
-          },
-        }),
+      const [
+        // empInfoResponse,
+         idResponse
+        ] = await Promise.all([
+        // client.graphql({
+        //   query: updateEmpPersonalInfo,
+        //   variables: {
+        //     input: totalData,
+        //     limit: 20000,
+        //   },
+        // }),
         client.graphql({
           query: updateIDDetails,
           variables: {
@@ -160,7 +164,7 @@ export const UpdateEmpInfo = () => {
           },
         }),
       ]);
-      // console.log(idResponse);
+      console.log(idResponse);
       // console.log(empInfoResponse);
       // if (idResponse.errors) {
       //   console.error("Error in idResponse:", idResponse.errors);

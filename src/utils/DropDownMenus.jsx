@@ -196,6 +196,19 @@ export const DepartmentDD = [
   { value: "Other", label: "Other" },
 ];
 
+export const WorkPermitDD = [
+  { value: "Foreign Worker License (LPA)", label: "Foreign Worker License (LPA)" },
+  { value: "Foreign Worker License (SAWP)", label: "Foreign Worker License (SAWP)" },
+  { value: "Foreign Worker License Additional (LPA)", label: "Foreign Worker License Additional (LPA)" },
+  { value: "Foreign Worker License Additional (SAWP)", label: "Foreign Worker License Additional (SAWP)" },
+  { value: "Foreign Worker License Renewal (LPA)", label: "Foreign Worker License Renewal (LPA)" },
+  { value: "Foreign Worker License Renewal (SAWP)", label: "Foreign Worker License Renewal (SAWP)" },
+  { value: "Foreign Worker License Change Salary/Job Title (LPA)", label: "Foreign Worker License Change Salary/Job Title (LPA)" },
+  { value: "Foreign Worker License Cancellation (LPA)", label: "Foreign Worker License Cancellation (LPA)" },
+  { value: "Foreign Worker License Cancellation (SAWP)", label: "Foreign Worker License Cancellation (SAWP)" },
+  { value: "Foreign Worker License Cancellation SAWP To LPA", label: "Foreign Worker License Cancellation SAWP To LPA" },
+  { value: "Foreign Worker License Transfer Of Contract (LPA)", label: "Foreign Worker License Transfer Of Contract (LPA)" }
+];
 
 // export const JobCatDD = [
 //   { value: "", label: "Select Category" },

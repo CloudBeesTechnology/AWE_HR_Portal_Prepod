@@ -2,18 +2,14 @@ import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { DataSupply } from "../../utils/DataStoredContext";
-import { WorkInfoFunc } from "../../services/createMethod/WorkInfoFunc";
-import { UpdateWIData } from "../../services/updateMethod/UpdateWIData";
-import { NLACreate } from "../../services/createMethod/NLACreate";
-import { NLAUpdate } from "../../services/updateMethod/NLAUpdate";
-import { CreateDoe } from "../../services/createMethod/CreateDoe";
-import { UpdateDataFun } from "../../services/updateMethod/UpdateSDNData";
+import { ImmigrationFun } from "../../services/createMethod/ImmigrationFun";
+import { UpdateImmigra } from "../../services/updateMethod/UpdateImmigra";
 
-export const DNDetailsMD = () => {
-  const { DNData } = useContext(DataSupply);
-  const { CrerDoeFunData } = CreateDoe();
-  const { UpdateMPData } = UpdateDataFun();
-console.log(DNData);
+export const PassportValidMD = () => {
+  const { PPValidsData } = useContext(DataSupply);
+  const { ImmigrationData } = ImmigrationFun();
+    const { UpdateImmigraData } = UpdateImmigra();
+console.log(PPValidsData);
 
   const excelDateToJSDate = (serial) => {
     const excelEpoch = new Date(Date.UTC(1900, 0, 1)); // Start from Jan 1, 1900
@@ -21,16 +17,13 @@ console.log(DNData);
     return new Date(excelEpoch.getTime() + daysOffset * 24 * 60 * 60 * 1000);
   };
 
-// Link 1:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNDetails.csv"
-// Link 2:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNdetails+1.csv"
+// Link 1:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PassportValid+Prod/PassportValid.csv"
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNDetails.csv",
-        // "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNdetails+1.csv",
-        {
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PassportValid+Prod/PassportValid.csv",        {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
       );
@@ -46,7 +39,7 @@ console.log(DNData);
       // Convert sheet data to JSON format
       const sheetData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
       const dateKeys = [
-        "doeEmpValid","nlmsEmpValid","doeEmpSubmit","doeEmpApproval","nlmsEmpApproval","nlmsEmpSubmit"
+        "empPassExp","immigApproval","ppSubmit"
         
       ];
       const transformedData = sheetData.slice(1).map((row) => {
@@ -62,28 +55,26 @@ console.log(DNData);
         return result;
       });
       // console.log("All Data:", transformedData);
-      for (const DoeValue of transformedData) {
-        if (DoeValue.empID) {
-          DoeValue.empID = String(DoeValue.empID);
-          //   DoeValue.ppExpiry = [DoeValue.ppExpiry];
-          //   DoeValue.bwnIcExpiry = [DoeValue.bwnIcExpiry];
+      for (const ImmiValue of transformedData) {
+        if (ImmiValue.empID) {
+          ImmiValue.empID = String(ImmiValue.empID);
         }
-        console.log(DoeValue);
+        console.log(ImmiValue);
 
-        const checkingDoeUpValueTable = DNData.find(
-          (match) => match.empID === DoeValue.empID
+        const checkingPPTable = PPValidsData.find(
+          (match) => match.empID === ImmiValue.empID
         );
 
-        if (checkingDoeUpValueTable) {
-          console.log(DoeValue, "update");
-          const DoeUpValue = {
-            ...DoeValue,
-            id: checkingDoeUpValueTable.id,
+        if (checkingPPTable) {
+          console.log(ImmiValue, "update");
+          const UpImmiValue = {
+            ...ImmiValue,
+            id: checkingPPTable.id,
           };
-          await UpdateMPData({ DoeUpValue });
+          await UpdateImmigraData({ UpImmiValue });
         } else {
-          console.log(DoeValue, "create");
-          await CrerDoeFunData({ DoeValue });
+          console.log(ImmiValue, "create");
+          await ImmigrationData({ ImmiValue });
         }
       }
     } catch (error) {
@@ -93,7 +84,7 @@ console.log(DNData);
 
   return (
     <div className="flex flex-col gap-40">
-      DNDetailsMD
+      PassportValidMD
       <button onClick={fetchExcelFile}>Click Here</button>
     </div>
   );
