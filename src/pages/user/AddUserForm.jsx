@@ -211,7 +211,7 @@ export const AddNewForm = () => {
           options: {
             userAttributes: {
               email,
-              email_verified: "false",
+
             },
            
           },
