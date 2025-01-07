@@ -196,23 +196,24 @@ export const AddNewForm = () => {
             console.log(err);
           });
       } else {
-        console.log("8451296");
+        // console.log("8451296");
 
         const nameperson =
-          data.name.charAt(0).toUpperCase() + data.name.slice(1).toLowerCase();
-        console.log(data.empID, "Employee ID");
+          data?.name?.charAt(0).toUpperCase() + data?.name?.slice(1).toLowerCase();
+        // console.log(data.empID, "Employee ID");
 
         const username = data.empID;
         const password = data.password;
-        const email = data.officialEmail;
+        const email = data.officialEmail.trim().toLowerCase();
         await signUp({
           username,
           password,
           options: {
             userAttributes: {
               email,
+              email_verified: "false",
             },
-            autoSignIn: true, // Attempt to auto-sign in the user after sign-up
+           
           },
         })
           .then(async (res) => {

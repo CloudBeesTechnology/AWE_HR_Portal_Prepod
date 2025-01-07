@@ -72,7 +72,8 @@ export const EmpInfoFunc = () => {
         ppUpload,
         supportDocUpload,
       } = empValue;
-
+      const trimmedEmail = email.trim();
+      const trimmedOfficialEmail = officialEmail.trim();
       const totalData1 = {
         empID,
         bwnIcNo,
@@ -119,8 +120,8 @@ export const EmpInfoFunc = () => {
         chinese,
         dob,
         educLevel,
-        email,
-        officialEmail,
+        trimmedEmail,
+        trimmedOfficialEmail,
         eduDetails,
         empBadgeNo,
         empType,

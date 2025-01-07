@@ -11,9 +11,10 @@ export const NonLocalAccovalidationSchema = Yup.object().shape({
   empBadgeNo: Yup.string().notRequired(),
   name: Yup.string().notRequired(),
   accommodation: Yup.string().notRequired(),
-  accommodationAddress: Yup.string().notRequired(
+  accommodationAddress: Yup.string()
+    .notRequired
     // "Accommodation Address is required"
-  ),
+    (),
 });
 
 export const LabourImmigrationSchema = Yup.object().shape({
@@ -151,38 +152,31 @@ export const LabourImmigrationSchema = Yup.object().shape({
 
 export const WorkInfoSchema = Yup.object().shape({
   empID: Yup.string().required("Employee ID is mandatory"),
-  department: Yup.string()
-    .required("Department is mandatory"),
+  department: Yup.string().required("Department is mandatory"),
 
   otherDepartment: Yup.string().notRequired(),
-  position: Yup.string()
-    .required("Position is mandatory"),
+  position: Yup.string().required("Position is mandatory"),
   otherPosition: Yup.string().notRequired(),
-  jobCat: Yup.string()
-    .required("Job Category is mandatory"),
+  jobCat: Yup.string().required("Job Category is mandatory"),
   otherJobCat: Yup.string().notRequired(),
 
   doj: Yup.date()
-  .nullable()
-  .transform((value, originalValue) => (originalValue === "" ? null : value))
-  .required("Date of Join is mandatory")
-  .max(new Date(), "Date of Join cannot be in the future"),
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .required("Date of Join is mandatory")
+    .max(new Date(), "Date of Join cannot be in the future"),
 
-   
   jobDesc: Yup.string().required("Job Description is mandatory"),
   skillPool: Yup.string().required("Skill Pool is mandatory"),
   hr: Yup.string().notRequired(),
   manager: Yup.string().required("Manager is mandatory"),
   supervisor: Yup.string().notRequired(),
-  relationship: Yup.string()
-    .required("Employee Status is mandatory"),
+  relationship: Yup.string().required("Employee Status is mandatory"),
 
   upgradePosition: Yup.string().notRequired(),
   upgradeDate: Yup.string().notRequired(),
   contractPeriod: Yup.string().notRequired(),
-  contractStart: Yup.string()
-  .notRequired()
-  ,
+  contractStart: Yup.string().notRequired(),
   contractEnd: Yup.string()
     .notRequired()
     .test(
@@ -201,7 +195,7 @@ export const WorkInfoSchema = Yup.object().shape({
   workStatus: Yup.string()
     .required("Employment Work Status is required")
     .notOneOf([""], "Employment Work Status is mandatory"),
-    probationStart: Yup.string()
+  probationStart: Yup.string()
     .notRequired()
     .test(
       "is-on-or-after-doj-or-contract-start",
@@ -209,7 +203,7 @@ export const WorkInfoSchema = Yup.object().shape({
       function (value) {
         const { doj } = this.parent;
         if (!doj || !value) return true;
-  
+
         const dojDate = new Date(doj);
         const probationStartDate = new Date(value);
         return probationStartDate >= dojDate;
@@ -229,18 +223,15 @@ export const WorkInfoSchema = Yup.object().shape({
 
         return probationEndDate > probationStartDate; // Contract End must be after Contract Start
       }
-   ),
+    ),
   probDuration: Yup.string().notRequired(),
-  workHrs: Yup.string()
-    .required("Normal Working Hours mandatory"),
-  workWeek: Yup.string()
-    .required("Normal Working Week mandatory"),
-  workMonth: Yup.string()
-    .required("Normal Working Month mandatory"),
+  workHrs: Yup.string().required("Normal Working Hours mandatory"),
+  workWeek: Yup.string().required("Normal Working Week mandatory"),
+  workMonth: Yup.string().required("Normal Working Month mandatory"),
   salaryType: Yup.string()
     .required("Type of Salary Pay is mandatory")
     .notOneOf([""], "Type of Salary Pay is mandatory"),
-    pervAnnualLeaveBal: Yup.string().notRequired(),
+  pervAnnualLeaveBal: Yup.string().notRequired(),
   resignDate: Yup.string().notRequired(),
   termiDate: Yup.string().notRequired(),
   resignNotProb: Yup.string().notRequired(),
@@ -253,26 +244,21 @@ export const WorkInfoSchema = Yup.object().shape({
   otherTermiNotConf: Yup.string().notRequired(),
   reasonResign: Yup.string().notRequired(),
   reasonTerminate: Yup.string().notRequired(),
-  leavePass: Yup.string()
-  .notRequired(),
+  leavePass: Yup.string().notRequired(),
   dateLeavePass: Yup.string()
-  .nullable()
-  .transform((value, originalValue) => (originalValue === "" ? null : value))
-  .notRequired(),
-  destinateLeavePass:Yup.string()
-  .notRequired(),
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .notRequired(),
+  destinateLeavePass: Yup.string().notRequired(),
 
-  durLeavePass:Yup.string()
-  .notRequired(),
+  durLeavePass: Yup.string().notRequired(),
 
-  annualLeave: Yup.string()
-  .notRequired(),
+  annualLeave: Yup.string().notRequired(),
 
-
-  annualLeaveDate:Yup.date()
-  .nullable()
-  .transform((value, originalValue) => (originalValue === "" ? null : value))
-  .notRequired(),
+  annualLeaveDate: Yup.date()
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .notRequired(),
   sickLeave: Yup.string().notRequired(),
   sickLeaveDate: Yup.string().notRequired(),
   materLeave: Yup.string().notRequired(),
@@ -386,34 +372,34 @@ export const WorkInfoSchema = Yup.object().shape({
     .notRequired(),
   positionRev: Yup.string().notRequired(),
   positionRevDate: Yup.date()
-  .nullable()
-  .transform((value, originalValue) => (originalValue === "" ? null : value))
-  .notRequired(),
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .notRequired(),
 
   revSalary: Yup.string().notRequired(),
-  revSalaryDate:Yup.date()
-  .nullable()
-  .transform((value, originalValue) => (originalValue === "" ? null : value))
-  .notRequired(),
+  revSalaryDate: Yup.date()
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .notRequired(),
 
   revLeavePass: Yup.string().notRequired(),
-  revLeaveDate:Yup.date()
-  .nullable()
-  .transform((value, originalValue) => (originalValue === "" ? null : value))
-  .notRequired(),
+  revLeaveDate: Yup.date()
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .notRequired(),
 
-  revAnnualLeave:Yup.string().notRequired(),
+  revAnnualLeave: Yup.string().notRequired(),
 
-  revALD:Yup.date()
-  .nullable()
-  .transform((value, originalValue) => (originalValue === "" ? null : value))
-  .notRequired(),
+  revALD: Yup.date()
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .notRequired(),
 
   depEmp: Yup.string().notRequired(),
   depEmpDate: Yup.date()
-  .nullable()
-  .transform((value, originalValue) => (originalValue === "" ? null : value))
-  .notRequired(),
+    .nullable()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .notRequired(),
 
   remarkWI: Yup.string().notRequired(),
   uploadPR: Yup.array()
@@ -538,10 +524,7 @@ export const employeeInfoSchema = Yup.object().shape({
 
   name: Yup.string()
     .min(3, "Name must be at least 3 characters") // Minimum length check
-    .matches(
-      /[A-Za-z\s]/,
-      "Name cannot contain numbers or special characters"
-    ) // Regex to allow only letters and spaces
+    .matches(/[A-Za-z\s]/, "Name cannot contain numbers or special characters") // Regex to allow only letters and spaces
     .required("Name is mandatory"),
   gender: Yup.string().required("Gender is mandatory"),
   dob: Yup.string()
@@ -562,8 +545,50 @@ export const employeeInfoSchema = Yup.object().shape({
     }),
   email: Yup.string()
     .email("Please enter a valid email")
+    .matches(
+      /^[^\s]+@[^\s]+\.[^\s]{2,}$/,
+      "Email must not contain whitespace or invalid characters"
+    )
+    .matches(
+      /^[^.@]+(\.[^.@]+)*@[^.]+(\.[^.]+)*\.[a-z]{2,}$/,
+      "Email must not contain consecutive dots"
+    )
+    .matches(
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+      "Email must conform to standard email format"
+    )
+    .matches(
+      /^[^\\/]+$/, // Reject forward `/` and backward `\` slashes
+      "Email must not contain forward or backward slashes"
+    )
+    .matches(
+      /^[^\s]+$/, // New rule: Reject whitespace at any position
+      "Email must not contain whitespace"
+    )
     .required("Email is required"),
-  officialEmail: Yup.string().email("Please enter a valid email").notRequired(),
+  officialEmail: Yup.string()
+    .email("Please enter a valid email")
+    .notRequired()
+    .matches(
+      /^[^\s]+@[^\s]+\.[^\s]{2,}$/,
+      "Email must not contain whitespace or invalid characters"
+    )
+    .matches(
+      /^[^.@]+(\.[^.@]+)*@[^.]+(\.[^.]+)*\.[a-z]{2,}$/,
+      "Email must not contain consecutive dots"
+    )
+    .matches(
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+      "Email must conform to standard email format"
+    )
+    .matches(
+      /^[^\\/]+$/, // Reject forward `/` and backward `\` slashes
+      "Email must not contain forward or backward slashes"
+    )
+    .matches(
+      /^[^\s]+$/, // New rule: Reject whitespace at any position
+      "Email must not contain whitespace"
+    ),
   nationality: Yup.string().required("Nationality is mandatory"),
   otherNation: Yup.string().notRequired(),
   religion: Yup.string().required("Religion is mandatory"),
@@ -624,8 +649,8 @@ export const employeeInfoSchema = Yup.object().shape({
   inducBriefUp: Yup.string().notRequired(),
   preEmp: Yup.string().notRequired(),
   preEmpPeriod: Yup.string().notRequired(),
-bankName:Yup.string().notRequired(),
-bankAccNo:Yup.string().notRequired(),
+  bankName: Yup.string().notRequired(),
+  bankAccNo: Yup.string().notRequired(),
 
   bwnUpload: Yup.array()
     .of(
@@ -830,198 +855,188 @@ bankAccNo:Yup.string().notRequired(),
     .notRequired(),
 });
 
-
-
 // Validation EmployeeInsuranceschema Schema using Yup
 export const EmpInsuranceschema = Yup.object().shape({
   empID: Yup.string().required("Employee ID Number is mandatory"),
   empBadgeNo: Yup.string().required("Employee Badge is required"),
   name: Yup.string().required("Employee Name is required"),
   department: Yup.string().required("Department is required"),
-    empInsUpload: Yup.array()
+  empInsUpload: Yup.array()
     .of(
       Yup.mixed()
-      .test(
-        "fileOrUrl", // Custom test name
-        "Only PDF, image files, or valid URLs are allowed", // Custom error message
-        (value) => {
-          // If value is a file, check for valid file types
-          if (value instanceof File) {
-            return ["application/pdf", "image/jpeg", "image/png"].includes(
-              value.type
-            );
-          }
-          
-          // If value is a string, check if it's a valid URL
-          if (typeof value === "string") {
-            return isValidUrl(value); // Check if the string is a valid URL
-          }
-          
+        .test(
+          "fileOrUrl", // Custom test name
+          "Only PDF, image files, or valid URLs are allowed", // Custom error message
+          (value) => {
+            // If value is a file, check for valid file types
+            if (value instanceof File) {
+              return ["application/pdf", "image/jpeg", "image/png"].includes(
+                value.type
+              );
+            }
+
+            // If value is a string, check if it's a valid URL
+            if (typeof value === "string") {
+              return isValidUrl(value); // Check if the string is a valid URL
+            }
+
             return true; // Return true if neither a file nor a string (invalid type)
           }
         )
         .notRequired()
-      )
-      .notRequired(), // Top-level array is not required
-    });
-    
-    export const DependentInsuranceSchema = Yup.object().shape({
-      empID: Yup.string().required("Employee ID is required"),
-      depInsurance: Yup.mixed().test(
-        "is-valid-family-details",
-        "Invalid family details",
-        function (value) {
-          const { path, createError } = this;
-          const isValid = getDepInsuranceValidationSchema(value);
-          if (!isValid) {
-            return createError({
-              path,
-              message: "Invalid family details format or content",
-            });
-          }
-          return true;
-        }
-      ),
-    });
+    )
+    .notRequired(), // Top-level array is not required
+});
 
-    export const AddInsuranceSchema = Yup.object().shape({
-      typeIns: Yup.string().required("Type Insurance is required"),
-      insDetails: Yup.array().of(
-        Yup.object().shape({
-          company: Yup.string().required("Insurance company is required"),
-        })
-      ),
-    });
-    
-    // Yup InsuranceInfoSchema validation schema
-  export const GroupHSSchema = Yup.object().shape({
-      groupHSNo: Yup.string().required("Group HS Number is required"), // Adjusted to .notRequired() as per your initial code
-      groupHSExp: Yup.string().notRequired(), // Adjusted to .notRequired() as per your initial code
-      groupHSUpload: Yup.array()
-      .of(
-        Yup.mixed()
-          .test(
-            "fileOrUrl", // Custom test name
-            "Only PDF or valid URLs are allowed", // Custom error message
-            (value) => {
-              // If value is a file, check for valid file types
-              if (value instanceof File) {
-                return ["application/pdf"].includes(
-                  value.type
-                );
-              }
-              if (typeof value === "string") {
-                return isValidUrl(value); // Check if the string is a valid URL
-              }
-  
-              return true; // Return true if neither a file nor a string (invalid type)
+export const DependentInsuranceSchema = Yup.object().shape({
+  empID: Yup.string().required("Employee ID is required"),
+  depInsurance: Yup.mixed().test(
+    "is-valid-family-details",
+    "Invalid family details",
+    function (value) {
+      const { path, createError } = this;
+      const isValid = getDepInsuranceValidationSchema(value);
+      if (!isValid) {
+        return createError({
+          path,
+          message: "Invalid family details format or content",
+        });
+      }
+      return true;
+    }
+  ),
+});
+
+export const AddInsuranceSchema = Yup.object().shape({
+  typeIns: Yup.string().required("Type Insurance is required"),
+  insDetails: Yup.array().of(
+    Yup.object().shape({
+      company: Yup.string().required("Insurance company is required"),
+    })
+  ),
+});
+
+// Yup InsuranceInfoSchema validation schema
+export const GroupHSSchema = Yup.object().shape({
+  groupHSNo: Yup.string().required("Group HS Number is required"), // Adjusted to .notRequired() as per your initial code
+  groupHSExp: Yup.string().notRequired(), // Adjusted to .notRequired() as per your initial code
+  groupHSUpload: Yup.array()
+    .of(
+      Yup.mixed()
+        .test(
+          "fileOrUrl", // Custom test name
+          "Only PDF or valid URLs are allowed", // Custom error message
+          (value) => {
+            // If value is a file, check for valid file types
+            if (value instanceof File) {
+              return ["application/pdf"].includes(value.type);
             }
-          )
-          .notRequired()
-      )
-      .notRequired(),
-    });
-  export const WorkmenCompSchema = Yup.object().shape({
-      empStatusType: Yup.string().required("Employee Status Type is required"),
-      workmenCompNo: Yup.string().notRequired(),
-      workmenCompExp: Yup.string().notRequired(),
-      workmenComUp: Yup.array()
-      .of(
-        Yup.mixed()
-          .test(
-            "fileOrUrl", // Custom test name
-            "Only PDF or valid URLs are allowed", // Custom error message
-            (value) => {
-              // If value is a file, check for valid file types
-              if (value instanceof File) {
-                return ["application/pdf"].includes(
-                  value.type
-                );
-              }
-              if (typeof value === "string") {
-                return isValidUrl(value); // Check if the string is a valid URL
-              }
-  
-              return true; // Return true if neither a file nor a string (invalid type)
+            if (typeof value === "string") {
+              return isValidUrl(value); // Check if the string is a valid URL
             }
-          )
-          .notRequired()
-      )
-      .notRequired(),
-    });
-  export const TravellingSchema = Yup.object().shape({
-    travelNo: Yup.string().required("Travelling Number is required"),
-    travelExp: Yup.string().notRequired(),
-    travelUp: Yup.array()
-      .of(
-        Yup.mixed()
-          .test(
-            "fileOrUrl", // Custom test name
-            "Only PDF or valid URLs are allowed", // Custom error message
-            (value) => {
-              // If value is a file, check for valid file types
-              if (value instanceof File) {
-                return ["application/pdf"].includes(
-                  value.type
-                );
-              }
-              if (typeof value === "string") {
-                return isValidUrl(value); // Check if the string is a valid URL
-              }
-  
-              return true; // Return true if neither a file nor a string (invalid type)
+
+            return true; // Return true if neither a file nor a string (invalid type)
+          }
+        )
+        .notRequired()
+    )
+    .notRequired(),
+});
+export const WorkmenCompSchema = Yup.object().shape({
+  empStatusType: Yup.string().required("Employee Status Type is required"),
+  workmenCompNo: Yup.string().notRequired(),
+  workmenCompExp: Yup.string().notRequired(),
+  workmenComUp: Yup.array()
+    .of(
+      Yup.mixed()
+        .test(
+          "fileOrUrl", // Custom test name
+          "Only PDF or valid URLs are allowed", // Custom error message
+          (value) => {
+            // If value is a file, check for valid file types
+            if (value instanceof File) {
+              return ["application/pdf"].includes(value.type);
             }
-          )
-          .notRequired()
-      )
-      .notRequired(),
-    });
- export const PersonalAcciSchema = Yup.object().shape({
+            if (typeof value === "string") {
+              return isValidUrl(value); // Check if the string is a valid URL
+            }
+
+            return true; // Return true if neither a file nor a string (invalid type)
+          }
+        )
+        .notRequired()
+    )
+    .notRequired(),
+});
+export const TravellingSchema = Yup.object().shape({
+  travelNo: Yup.string().required("Travelling Number is required"),
+  travelExp: Yup.string().notRequired(),
+  travelUp: Yup.array()
+    .of(
+      Yup.mixed()
+        .test(
+          "fileOrUrl", // Custom test name
+          "Only PDF or valid URLs are allowed", // Custom error message
+          (value) => {
+            // If value is a file, check for valid file types
+            if (value instanceof File) {
+              return ["application/pdf"].includes(value.type);
+            }
+            if (typeof value === "string") {
+              return isValidUrl(value); // Check if the string is a valid URL
+            }
+
+            return true; // Return true if neither a file nor a string (invalid type)
+          }
+        )
+        .notRequired()
+    )
+    .notRequired(),
+});
+export const PersonalAcciSchema = Yup.object().shape({
   perAccNo: Yup.string().required("Personal Number is required"),
   perAccExp: Yup.string().notRequired(),
   perAccUp: Yup.array()
-      .of(
-        Yup.mixed()
-          .test(
-            "fileOrUrl", // Custom test name
-            "Only PDF or valid URLs are allowed", // Custom error message
-            (value) => {
-              // If value is a file, check for valid file types
-              if (value instanceof File) {
-                return ["application/pdf"].includes(
-                  value.type
-                );
-              }
-              if (typeof value === "string") {
-                return isValidUrl(value); // Check if the string is a valid URL
-              }
-  
-              return true; // Return true if neither a file nor a string (invalid type)
+    .of(
+      Yup.mixed()
+        .test(
+          "fileOrUrl", // Custom test name
+          "Only PDF or valid URLs are allowed", // Custom error message
+          (value) => {
+            // If value is a file, check for valid file types
+            if (value instanceof File) {
+              return ["application/pdf"].includes(value.type);
             }
-          )
-          .notRequired()
-      )
-      .notRequired(),
-    });
+            if (typeof value === "string") {
+              return isValidUrl(value); // Check if the string is a valid URL
+            }
 
-    export const ClaimInsuranceSchema = Yup.object().shape({
-      empID: Yup.string().required("Employee ID is required"),
-      insuranceClaims: Yup.mixed().test(
-        "is-valid-family-details",
-        "Invalid family details",
-        function (value) {
-          const { path, createError } = this;
-          const isValid = getDepInsuranceValidationSchema(value);
-          if (!isValid) {
-            return createError({
-              path,
-              message: "Invalid family details format or content",
-            });
+            return true; // Return true if neither a file nor a string (invalid type)
           }
-          return true;
-        }
-      ),
-    });
+        )
+        .notRequired()
+    )
+    .notRequired(),
+});
+
+export const ClaimInsuranceSchema = Yup.object().shape({
+  empID: Yup.string().required("Employee ID is required"),
+  insuranceClaims: Yup.mixed().test(
+    "is-valid-family-details",
+    "Invalid family details",
+    function (value) {
+      const { path, createError } = this;
+      const isValid = getDepInsuranceValidationSchema(value);
+      if (!isValid) {
+        return createError({
+          path,
+          message: "Invalid family details format or content",
+        });
+      }
+      return true;
+    }
+  ),
+});
 
 export const SawpEmpSchema = Yup.object().shape({
   empID: Yup.string().required("Employee ID is required"),

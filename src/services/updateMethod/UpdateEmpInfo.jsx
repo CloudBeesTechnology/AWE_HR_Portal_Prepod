@@ -76,7 +76,8 @@ export const UpdateEmpInfo = () => {
       bankName,
       bankAccNo,
     } = collectValue;
-
+    const trimmedEmail = email.trim();
+    const trimmedOfficialEmail = officialEmail.trim();
     const totalData = {
       id: PITableID,
       empID,
@@ -91,12 +92,12 @@ export const UpdateEmpInfo = () => {
       chinese,
       dob,
       educLevel,
-      email,
+      trimmedEmail,
       eduDetails,
       empBadgeNo,
       empType,
       familyDetails,
-      officialEmail,
+      trimmedOfficialEmail,
       gender,
       lang,
       marital,
@@ -144,10 +145,7 @@ export const UpdateEmpInfo = () => {
     };
 
     try {
-      const [
-        empInfoResponse,
-         idResponse
-        ] = await Promise.all([
+      const [empInfoResponse, idResponse] = await Promise.all([
         client.graphql({
           query: updateEmpPersonalInfo,
           variables: {
