@@ -196,6 +196,9 @@ export const LMTable = () => {
       </div>
     );
   }
+
+  console.log(matchData);
+  
   return (
     <section className="flex flex-col w-full mt-4">
       <section className="flex flex-wrap justify-between items-center mb-5">
