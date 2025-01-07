@@ -179,7 +179,7 @@ export const LeaveSummaryPopUp = ({
             const taken = acc[val.empID][leaveKey].taken || 0;
             const waiting = acc[val.empID][leaveKey].waitingLeave || 0;
 
-            const remaining = Math.floor(total - (taken + waiting));
+            const remaining = total - (taken + waiting);
 
             acc[val.empID][leaveKey].remaining = remaining;
           }
