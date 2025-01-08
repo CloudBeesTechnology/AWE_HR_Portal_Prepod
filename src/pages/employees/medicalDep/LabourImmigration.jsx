@@ -24,6 +24,7 @@ const LabourImmigration = () => {
   const { SubmitMPData } = MedicalPassFunc();
   const { updateMedicalSubmit } = UpdateMedical();
   const { empPIData, LMIData } = useContext(DataSupply);
+  // console.log(LMIData);
 
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [arrayUploadDocs, setArrayUploadDocs] = useState([]);
@@ -124,10 +125,16 @@ const LabourImmigration = () => {
 
   const formatDateValue = (dateString) => {
     if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
-      const [day, month, year] = dateString.split("/");
-      return `${year}-${month}-${day}`;
+      const [part1, part2, year] = dateString.split("/");
+
+      // Determine if the format is MM/dd/yyyy or dd/MM/yyyy
+      const isMMDDYYYY = parseInt(part1, 10) > 12; // If the first part is greater than 12, it's a day
+      const day = isMMDDYYYY ? part1 : part2;
+      const month = isMMDDYYYY ? part2 : part1;
+
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     }
-    return dateString;
+    return dateString; // Return original string if it doesn't match
   };
 
   const convertDateFormat = (dateStr) => {
@@ -172,20 +179,28 @@ const LabourImmigration = () => {
     const keysToSet = ["empID", "bruhimsRNo", "overMD", "overME", "bruhimsRD"];
 
     keysToSet.forEach((key) => {
-      if (result[key]) {
-        let value = result[key];
-        if (key === "overMD" || key === "overME" || key === "bruhimsRD") {
-          value = convertDateFormat(value);
-        }
-        setValue(key, value);
+      let value = result[key];
+
+      if (value === null || value === undefined) {
+        value = ""; // Set empty string for null or undefined values
       }
+
+      if (key === "overMD" || key === "overME" || key === "bruhimsRD") {
+        value = value ? convertDateFormat(value) : ""; // Format only if value exists
+      }
+
+      setValue(key, value); // Set the value (formatted or empty)
     });
 
     const fields = ["bruneiMAD", "bruneiME"];
     // fields.forEach((field) => setValue(field, getLastValue(result[field])));
     fields.forEach((field) => {
       const cleanedValue = getLastValue(result[field]);
+      // console.log(cleanedValue);
+
       const formattedValue = formatDateValue(cleanedValue);
+      // console.log(formattedValue);
+
       setValue(field, formattedValue);
     });
 
@@ -194,7 +209,7 @@ const LabourImmigration = () => {
         const parsedData = JSON.parse(result.dependPass);
         setDependPassData(parsedData);
       } catch (error) {
-        console.error("Failed to parse dependPass:", error);
+        // console.error("Failed to parse dependPass:", error);
       }
     }
 
@@ -226,7 +241,7 @@ const LabourImmigration = () => {
                 : "",
           }));
         } catch (error) {
-          console.error(`Failed to parse ${field}:`, error);
+          // console.error(`Failed to parse ${field}:`, error);
         }
       }
     });

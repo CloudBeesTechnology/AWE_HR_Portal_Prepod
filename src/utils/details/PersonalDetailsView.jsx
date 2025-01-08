@@ -5,6 +5,7 @@ import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { pdfjs } from "react-pdf";
 import { useReactToPrint } from "react-to-print";
+import defaultAvatar from "../../assets/navabar/defaultAvatar.jpg"
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
@@ -40,6 +41,10 @@ const PersonalDetailsView = ({
 
   // Helper function to fetch the cloud URL
   const linkToStorageFile = async (pathUrl) => {
+    if (!pathUrl) {
+      console.error("No URL provided for the file.");
+      return; // Exit early if no path is provided
+    }
     try {
       const result = await getUrl({ path: pathUrl });
       //   console.log("File URL:", result.url.href); // Use .href to extract the URL as a string
@@ -53,6 +58,11 @@ const PersonalDetailsView = ({
   };
 
   const linkToImageFile = async (pathUrl) => {
+    if (!pathUrl) {
+      console.error("No URL provided for the file.");
+      return; // Exit early if no path is provided
+    }
+    
     const result = await getUrl({
       path: pathUrl,
     });
@@ -252,44 +262,7 @@ const PersonalDetailsView = ({
                   </div>
                 </div>
               </div>
-                // <div className="relative mt-4">
-                //   <div ref={invoiceRef}>
-                //     <img
-                //       src={lastUploadUrl} // Use the URL for the image
-                //       alt="Document Preview"
-                //       className="w-full h-auto"
-                //     />
-                //   </div>
-
-                //   <div className="absolute top-2 right-2">
-                //     <button
-                //       onClick={() => setViewingDocument(null)} // Close the viewer
-                //       className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
-                //     >
-                //       <FaTimes />
-                //     </button>
-                //   </div>
-
-                //   <div className="flex items-center justify-center gap-6 py-4">
-                //     <div className="mt-2 flex">
-                //       <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
-                //         <a href={lastUploadUrl} download>
-                //           Download
-                //         </a>
-                //         <FaDownload className="ml-2 mt-1" />
-                //       </button>
-                //     </div>
-                //     <div className="mt-2 flex">
-                //       <button
-                //         onClick={handlePrint}
-                //         className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
-                //       >
-                //         Print
-                //         <FaPrint className="ml-2 mt-1" />
-                //       </button>
-                //     </div>
-                //   </div>
-                // </div>
+             
               )}
           </div>
         ))}
@@ -382,7 +355,7 @@ const PersonalDetailsView = ({
         <div className="flex-1">{renderDetails(personalDetails)}</div>
         <div className="w-[250px] h-[350px] rounded-lg overflow-hidden border border-gray-200 shadow-md">
           <img
-            src={imageUrl || "/path/to/default-photo.jpg"}
+            src={imageUrl || defaultAvatar}
             alt="Profile"
             className="object-cover w-full h-full"
           />

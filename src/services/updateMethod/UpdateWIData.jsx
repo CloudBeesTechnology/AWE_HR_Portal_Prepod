@@ -137,6 +137,7 @@ export const UpdateWIData = () => {
       uploadLP,
       uploadAL,
       uploadDep,
+      sapNo,
     } = workInfoUpValue;
 
     const contractEndValue = formatDate(contractEnd);
@@ -277,6 +278,7 @@ export const UpdateWIData = () => {
         workWeek: updatedworkWeek,
         workMonth: updatedworkMonth,
         salaryType: updatedsalaryType,
+        sapNo,
       };
 
       //     console.log(totalData, "ertdfghjkhbtxrfgh");
@@ -342,7 +344,7 @@ export const UpdateWIData = () => {
           query: updateEmpLeaveDetails,
           variables: { input: totalData1, limit: 20000 },
         });
-        // console.log(Leave);
+        console.log(Leave);
       } catch (err) {
         console.log(err);
       }

@@ -106,6 +106,7 @@ export const EmployeeInfo = () => {
   const contractTypes = watch("contractType");
   const empTypes = watch("empType");
   const watchedEmpID = watch("empID");
+  const watchedProfilePhoto = watch("profilePhoto" || "");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -223,7 +224,7 @@ export const EmployeeInfo = () => {
         setIBLastUP(lastUploadInduc);
       }
     }
-  }, [uploadedDocs]);
+  }, [uploadedDocs, watchedProfilePhoto]);
 
   const capitalizeFirstLetter = (str) => {
     if (typeof str === "string") {
@@ -261,18 +262,15 @@ export const EmployeeInfo = () => {
   };
   const formatDate = (date) => {
     const d = new Date(date);
-  
+
     // Ensure the date is formatted as yyyy-MM-dd
     const year = d.getFullYear();
-    const month = (d.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed, so add 1
-    const day = d.getDate().toString().padStart(2, '0');
-  
+    const month = (d.getMonth() + 1).toString().padStart(2, "0"); // Months are 0-indexed, so add 1
+    const day = d.getDate().toString().padStart(2, "0");
+
     // Return the formatted date in yyyy-MM-dd format
     return `${year}-${month}-${day}`;
   };
-  
-  
-  
 
   const preprocessJSONString = (str) => {
     try {
@@ -421,7 +419,9 @@ export const EmployeeInfo = () => {
     // Set values for other fields
     keysToSet.forEach((key) => {
       let valueToSet = result[key];
-
+      if (valueToSet === undefined || valueToSet === null) {
+        valueToSet = "";
+      }
       if (typeof valueToSet === "string" && valueToSet.trim() !== "") {
         valueToSet = valueToSet
           .toLowerCase()
@@ -464,7 +464,7 @@ export const EmployeeInfo = () => {
             (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
           ) // Capitalize each word
           .join(" "); // Rejoin with spaces
-        setValue(field, stringValue);
+        setValue(field, stringValue || "");
       } else if (typeof value === "string") {
         // Capitalize the first letter of each word for a string
         const stringValue = value
@@ -473,10 +473,10 @@ export const EmployeeInfo = () => {
             (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
           )
           .join(" ");
-        setValue(field, stringValue);
+        setValue(field, stringValue || "");
       } else {
         // Set the value directly if not an array or string
-        setValue(field, value);
+        setValue(field, value || "");
       }
     });
 
@@ -488,7 +488,7 @@ export const EmployeeInfo = () => {
       const cleanedFamilyDetails = cleanFamilyDetailsString(
         result?.familyDetails[0]
       );
-      setFamilyData(cleanedFamilyDetails);
+      setFamilyData(cleanedFamilyDetails || []);
     } else {
       setFamilyData([]);
     }
@@ -501,22 +501,27 @@ export const EmployeeInfo = () => {
       }));
     }
 
-    setValue("profilePhoto", result?.profilePhoto?.toString());
-    setValue("inducBriefUp", result?.inducBriefUp?.toString());
+    setValue("profilePhoto", result?.profilePhoto?.toString() || null);
+    setValue("inducBriefUp", result?.inducBriefUp?.toString() || "");
     setUploadedDocs((prev) => ({
-      profilePhoto: result.profilePhoto,
-      inducBriefUp: result.inducBriefUp,
+      profilePhoto: result.profilePhoto || null,
+      inducBriefUp: result.inducBriefUp || "",
     }));
 
-    const profilePhotoString = result?.profilePhoto;
+    const profilePhotoString = result?.profilePhoto || null;
     const linkToStorageFile = async (pathUrl) => {
       try {
+        if (!pathUrl) {
+          setPPLastUP(avatar);
+        }
+
         if (pathUrl) {
           const result = await getUrl({ path: pathUrl });
-          setPPLastUP(result.url.toString());
+
+          setPPLastUP(result.url?.toString());
         }
       } catch (err) {
-        console.log("Error fetching file from storage:", err);
+        // console.log("Error fetching file from storage:", err);
       }
     };
     linkToStorageFile(profilePhotoString);
@@ -643,6 +648,8 @@ export const EmployeeInfo = () => {
           familyDetails: JSON.stringify(data.familyDetails),
           PITableID: checkingPITable.id,
           IDTable: checkingIDTable.id,
+          email: data.email.trim().toLowerCase(),
+          officialEmail:data.officialEmail.trim().toLowerCase(),
         };
 
         await UpdateEIValue({ collectValue });
@@ -669,6 +676,8 @@ export const EmployeeInfo = () => {
           ppUpload: JSON.stringify(uploadedFiles.ppUpload),
           supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
           familyDetails: JSON.stringify(data.familyDetails),
+          email: data.email.trim().toLowerCase(),
+          officialEmail:data.officialEmail.trim().toLowerCase(),
         };
 
         await SubmitEIData({ empValue });
@@ -680,7 +689,6 @@ export const EmployeeInfo = () => {
     }
   };
 
-  const watchedProfilePhoto = watch("profilePhoto" || "");
 
   return (
     <section
@@ -736,8 +744,6 @@ export const EmployeeInfo = () => {
                     ? PPLastUP
                     : watchedProfilePhoto
                     ? watchedProfilePhoto
-                    : PPLastUP
-                    ? PPLastUP
                     : avatar
                 }
                 id="previewImg"

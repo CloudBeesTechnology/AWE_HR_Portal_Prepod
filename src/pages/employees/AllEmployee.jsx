@@ -292,7 +292,6 @@ export const AllEmployee = () => {
       }[workStatus] || "text-medium_grey"
     );
   };
-  console.log(mergeData);
 
 
   return (
@@ -358,6 +357,7 @@ export const AllEmployee = () => {
                   className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
                   onClick={() => {
                     {
+                      
                       handleFormShow(candidate);
                     }
                   }}

@@ -70,11 +70,25 @@ export const CreateJob = () => {
         const response = await fetch(url, {
           method: "PUT",
           headers: {
-            "Content-Type": "application/json", // Correct header for file uploads
+            "Content-Type": "application/octet-stream",
+            "referer" : "https://71n903ao01.execute-api.ap-southeast-1.amazonaws.com"
           },
           body: selectedFile,
         });
 
+        // const file = new File(['content'], 'icons.png', { type: 'image/png' });
+
+        // const response = await axios.put(
+        //   `https://71n903ao01.execute-api.ap-southeast-1.amazonaws.com/adininfile/commonfiles/${encodeURIComponent(
+        //     selectedFile.name
+        //   )}`,
+        //   selectedFile,
+        //   {
+        //     headers: {
+        //       "Content-Type": "application/octet-stream",
+        //     },
+        //   }
+        // );
         // Check if the response indicates success
         if (!response.ok) {
           throw new Error(

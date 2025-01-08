@@ -30,7 +30,7 @@ export const EmpLeaveBalance = () => {
     "Department",
     "Summary",
   ];
-// console.log(mergedData);
+console.log("DATA EMO LEAVE",mergedData);
 
 useEffect(() => {
   const userID = localStorage.getItem("userID");
@@ -231,7 +231,11 @@ useEffect(() => {
                       </td>
                       <td className="py-3">
                         <button
-                          onClick={() => handleViewSummary(item)}
+                          onClick={() => {
+                            handleViewSummary(item)
+                            console.log(item);
+                            
+                          }}
                           className="border-b-2 text-[blue]"
                         >
                           View

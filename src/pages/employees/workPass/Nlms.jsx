@@ -9,13 +9,11 @@ import { FormField } from '../../../utils/FormField';
 import { UpdateNlmsData } from '../../../services/updateMethod/UpdateNlmsData';
 import { DataSupply } from '../../../utils/DataStoredContext';
 import { useOutletContext } from 'react-router-dom';
-import { WorkPermitDD } from "../../../utils/DropDownMenus";
 
 export const Nlms = () => {
   const { searchResultData } = useOutletContext();
   
   const { DNData,dropDownVal } = useContext(DataSupply);
-  
   const { uploadNlmsFun } = UpdateNlmsData();
 
   const [notification, setNotification] = useState(false);
@@ -46,7 +44,7 @@ export const Nlms = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
- 
+
   const extractFileName = (input) => {
     // Return empty string if input is null or undefined
     if (input == null) {
@@ -136,7 +134,10 @@ export const Nlms = () => {
     return date ? new Date(date).toLocaleDateString('en-CA') : null;
   };
 
-
+  const workPermitDD = dropDownVal[0]?.workPermitDD.map((item) => ({
+    value: item,
+    label: item,
+  }));
   const onSubmit = async (data) => {
     try {
 
@@ -209,7 +210,7 @@ export const Nlms = () => {
           register={register}
           name="permitType"
           type="select"
-          options={WorkPermitDD}
+          options={workPermitDD}
           errors={errors}
         />
 
@@ -226,7 +227,7 @@ export const Nlms = () => {
           register={register}
           error={errors}
           fileName={uploadedFileNames.nlmsEmpUpload ||
-          extractFileName(watchInducNlmsUpload)
+                    extractFileName(watchInducNlmsUpload)
           }
         />
       </div>

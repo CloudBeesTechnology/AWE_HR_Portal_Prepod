@@ -203,7 +203,7 @@ export const User = () => {
                           <td className="px-5 py-3 break-words overflow-hidden ">
                             {val.officialEmail}
                           </td>
-                          <td className=" py-3 text-center break-words overflow-hidden   ">
+                          <td className="py-3 text-center break-words overflow-hidden">
                             <input
                               type="password"
                               className="outline-none w-full text-center  "

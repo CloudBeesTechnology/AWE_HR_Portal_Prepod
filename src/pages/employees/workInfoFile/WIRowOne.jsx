@@ -9,7 +9,6 @@ export const WIRowOne = ({
   selection,
   dropDownVal,
 }) => {
-  // console.log(dropDownVal);
   
   const DepartmentDD = dropDownVal[0]?.departmentDD.map((item) => ({
     value: item.split(" ") // Split the string into words

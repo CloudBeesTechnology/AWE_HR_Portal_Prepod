@@ -39,10 +39,6 @@ export const WorkInfo = () => {
     dropDownVal,
   } = useContext(DataSupply);
 
-  // SRData.forEach((item) => {
-  //   console.log(`empID: ${item.empID}, remarkWI: ${item.remarkWI}`);
-  // });
-
   const {
     register,
     handleSubmit,
@@ -212,14 +208,9 @@ export const WorkInfo = () => {
         .join(" ");
 
     if (Array.isArray(value) && value.length > 0) {
-      return formatToTitleCase(value[value.length - 1]?.trim());
+      return value[value.length - 1]?.trim().toUpperCase();
     }
-
-    if (typeof value === "string") {
-      return formatToTitleCase(value.trim());
-    }
-
-    return null;
+    return typeof value === "string" ? value.trim().toUpperCase() : null;
   };
 
   const searchResult = (result) => {
@@ -260,29 +251,13 @@ export const WorkInfo = () => {
       "remainingSickLeave",
     ];
     keysToSet.forEach((key) => {
-      let rawValue =
+      // Check if result[key] exists, otherwise use an empty string
+      const value =
         result[key] !== undefined && result[key] !== null
-          ? result[key].toString().trim()
+          ? result[key].toString().trim().toUpperCase()
           : "";
 
-      const toTitleCase = (input) =>
-        input
-          .toLowerCase()
-          .split(" ")
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(" ");
-
-      let value = toTitleCase(rawValue);
-
-      if (
-        key === "termiNotProb" ||
-        key === "termiNotConf" ||
-        key === "resignNotProb" ||
-        key === "resignNotConf"
-      ) {
-        value = value.toUpperCase();
-      }
-
+      // Set the normalized value
       setValue(key, value);
     });
 
@@ -308,11 +283,11 @@ export const WorkInfo = () => {
       "contractPeriod",
       "probDuration",
       "department",
-      // "otherDepartment",
+      "otherDepartment",
       "position",
-      // "otherPosition",
+      "otherPosition",
       "jobCat",
-      // "otherJobCat",
+      "otherJobCat",
       "jobDesc",
       "relationship",
       "upgradeDate",
@@ -328,7 +303,6 @@ export const WorkInfo = () => {
       "positionRevDate",
     ];
 
-    // Set values for date fields and handle salaryType condition
     arrayDateField.forEach((field) => {
       const valueToSet = result[field];
 
@@ -394,7 +368,7 @@ export const WorkInfo = () => {
   const onSubmit = async (data) => {
     try {
       // console.log("Received data:", data);  // Log the received data from the form
-
+  
       // Find existing records
       const checkingPITable =
         empPIData?.find((match) => match.empID === data.empID) || null;
@@ -407,6 +381,7 @@ export const WorkInfo = () => {
       const SRDataRecord =
         SRData?.find((match) => match.empID === data.empID) || null;
 
+  
       // Check each record and handle accordingly
       if (SRDataRecord) {
         // If SRDataRecord exists, update SR data
@@ -418,6 +393,7 @@ export const WorkInfo = () => {
           uploadLP: JSON.stringify(nameServiceUp.uploadLP),
           uploadAL: JSON.stringify(nameServiceUp.uploadAL),
           uploadDep: JSON.stringify(nameServiceUp.uploadDep),
+        
         };
         // console.log("SR Data Update Value:", workInfoUpValue);
         await WIUpdateData({ workInfoUpValue });
@@ -431,17 +407,19 @@ export const WorkInfo = () => {
           uploadLP: JSON.stringify(nameServiceUp.uploadLP),
           uploadAL: JSON.stringify(nameServiceUp.uploadAL),
           uploadDep: JSON.stringify(nameServiceUp.uploadDep),
+         
         };
         // console.log("Create SR Data Value:", workInfoValue);
         await SubmitWIData({ workInfoValue });
         // console.log("SR Create request sent");
       }
-
+  
       if (leaveDetailsDataRecord) {
         // If leaveDetailsDataRecord exists, update leave details data
         const workInfoUpValue = {
           ...data,
           leaveDetailsDataRecord: leaveDetailsDataRecord,
+         
         };
         // console.log("Leave Details Update Value:", workInfoUpValue);
         await WIUpdateData({ workInfoUpValue });
@@ -451,13 +429,15 @@ export const WorkInfo = () => {
         const workInfoValue = {
           ...data,
           empID: data.empID,
+         
         };
         // console.log("Create Leave Details Value:", workInfoValue);
         await SubmitWIData({ workInfoValue });
         // console.log("Leave Details Create request sent");
       }
-
+  
       if (workInfoDataRecord) {
+        
         const workInfoUpValue = {
           ...data,
           workInfoDataRecord: workInfoDataRecord,
@@ -472,6 +452,8 @@ export const WorkInfo = () => {
           uploadLP: JSON.stringify(nameServiceUp.uploadLP),
           uploadAL: JSON.stringify(nameServiceUp.uploadAL),
           uploadDep: JSON.stringify(nameServiceUp.uploadDep),
+          sapNo: checkingPITable?.sapNo,
+
         };
         // console.log("Work Info Update Value:", workInfoUpValue);
         await WIUpdateData({ workInfoUpValue });
@@ -496,7 +478,7 @@ export const WorkInfo = () => {
         await SubmitWIData({ workInfoValue });
         // console.log("Work Info Create request sent");
       }
-
+  
       if (terminateDataRecord) {
         // If terminateDataRecord exists, update terminate data
         const workInfoUpValue = {
@@ -528,107 +510,16 @@ export const WorkInfo = () => {
         await SubmitWIData({ workInfoValue });
         // console.log("Terminate Create request sent");
       }
-
+  
       // If you want to show a success notification or message
       setShowTitle("Employee Work Info Stored successfully");
       setNotification(true);
+  
     } catch (err) {
       console.log("Error during submission:", err);
     }
   };
-  // const onSubmit = async (data) => {
-  //   console.log("Date upgrade", data);
-  //   try {
-  //     const checkingPITable =
-  //       empPIData?.find((match) => match.empID === data.empID) || null;
-  //     const terminateDataRecord =
-  //       terminateData?.find((match) => match.empID === data.empID) || null;
-  //     const workInfoDataRecord =
-  //       workInfoData?.find((match) => match.empID === data.empID) || null;
-  //     const leaveDetailsDataRecord =
-  //       leaveDetailsData?.find((match) => match.empID === data.empID) || null;
-  //     const SRDataRecord =
-  //       SRData?.find((match) => match.empID === data.empID) || null;
-
-  //     if (
-  //       SRDataRecord ||
-  //       leaveDetailsDataRecord ||
-  //       workInfoDataRecord ||
-  //       terminateDataRecord
-  //     ) {
-  //       const workInfoUpValue = {
-  //         ...data,
-  //         remainingAnualLeave: data?.annualLeave?.[0] || "0", // Fixing the syntax
-  //         remainingCompasLeave: data?.compasLeave || "0",
-  //         remainingHosLeave: data?.hospLeave || "0",
-  //         remainingMateLeave: data?.materLeave || "0",
-  //         remainingMrageLeave: data?.mrageLeave || "0",
-  //         remainingPaternityLeave: data?.paterLeave || "0",
-  //         remainingSickLeave: data?.sickLeave || "0",
-  //         unPaidAuthorize: "0",
-  //         SRDataRecord: SRDataRecord,
-  //         leaveDetailsDataRecord: {
-  //           ...leaveDetailsDataRecord,
-  //           remainingAnualLeave: data?.annualLeave?.[0] || "0", // Fixing the syntax
-  //           remainingCompasLeave: data?.compasLeave || "0",
-  //           remainingHosLeave: data?.hospLeave || "0",
-  //           remainingMateLeave: data?.materLeave || "0",
-  //           remainingMrageLeave: data?.mrageLeave || "0",
-  //           remainingPaternityLeave: data?.paterLeave || "0",
-  //           remainingSickLeave: data?.sickLeave || "0",
-  //           unPaidAuthorize: "0",
-  //         },
-  //         sapNo: checkingPITable?.sapNo,
-  //         workInfoDataRecord: workInfoDataRecord,
-  //         terminateDataRecord: terminateDataRecord,
-  //         WIContract: JSON.stringify(nameServiceUp.WIContract),
-  //         WIProbation: JSON.stringify(nameServiceUp.WIProbation),
-  //         WIResignation: JSON.stringify(nameServiceUp.WIResignation),
-  //         WITermination: JSON.stringify(nameServiceUp.WITermination),
-  //         WILeaveEntitle: JSON.stringify(nameServiceUp.WILeaveEntitle),
-  //         uploadPR: JSON.stringify(nameServiceUp.uploadPR),
-  //         uploadSP: JSON.stringify(nameServiceUp.uploadSP),
-  //         uploadLP: JSON.stringify(nameServiceUp.uploadLP),
-  //         uploadAL: JSON.stringify(nameServiceUp.uploadAL),
-  //         uploadDep: JSON.stringify(nameServiceUp.uploadDep),
-  //       };
-  //       console.log("Update Value", workInfoUpValue);
-  //       await WIUpdateData({ workInfoUpValue });
-  //       setShowTitle("Employee Work Info Updated successfully");
-  //       setNotification(true);
-  //     } else {
-  //       const workInfoValue = {
-  //         ...data,
-  //         remainingAnualLeave: data?.annualLeave || "0", // Default to "0" if no value is provided
-  //         remainingCompasLeave: data?.compasLeave || "0",
-  //         remainingHosLeave: data?.hospLeave || "0",
-  //         remainingMateLeave: data?.materLeave || "0",
-  //         remainingMrageLeave: data?.mrageLeave || "0",
-  //         remainingPaternityLeave: data?.paterLeave || "0",
-  //         remainingSickLeave: data?.sickLeave || "0",
-  //         unPaidAuthorize: "0",
-
-  //         sapNo: checkingPITable?.sapNo,
-  //         WIContract: JSON.stringify(nameServiceUp.WIContract),
-  //         WIProbation: JSON.stringify(nameServiceUp.WIProbation),
-  //         WIResignation: JSON.stringify(nameServiceUp.WIResignation),
-  //         WITermination: JSON.stringify(nameServiceUp.WITermination),
-  //         WILeaveEntitle: JSON.stringify(nameServiceUp.WILeaveEntitle),
-  //         uploadPR: JSON.stringify(nameServiceUp.uploadPR),
-  //         uploadSP: JSON.stringify(nameServiceUp.uploadSP),
-  //         uploadLP: JSON.stringify(nameServiceUp.uploadLP),
-  //         uploadAL: JSON.stringify(nameServiceUp.uploadAL),
-  //         uploadDep: JSON.stringify(nameServiceUp.uploadDep),
-  //       };
-  //       console.log("Create Value", workInfoValue);
-  //       await SubmitWIData({ workInfoValue });
-  //       setShowTitle("Employee Work Info saved successfully");
-  //       setNotification(true);
-  //     }
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
+  
   return (
     <section
       className="bg-[#F5F6F1CC] mx-auto p-10"
@@ -692,20 +583,18 @@ export const WorkInfo = () => {
                   watch={watch(field.name)}
                   readOnly={field.readOnly || false}
                 >
-                  {(field.options || []).map((option, i) => {
-                    const formattedOption = option
-                      .trim()
-                      .toLowerCase()
-                      .replace(/^\w/, (c) => c.toUpperCase()); // Capitalize first letter
-                    return (
-                      <option
-                        key={i}
-                        value={option.trim() === "Select" ? "" : option.trim()}
-                      >
-                        {formattedOption}
-                      </option>
-                    );
-                  })}
+                  {(field.options || []).map((option, i) => (
+                    <option
+                      key={i}
+                      value={
+                        option.trim() === "Select"
+                          ? ""
+                          : option.trim().toUpperCase()
+                      }
+                    >
+                      {option.trim()}
+                    </option>
+                  ))}
                 </select>
               ) : (
                 <input

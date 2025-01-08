@@ -8,7 +8,7 @@ export const WIRowTwo = ({
   watch,
   dropDownVal,
   setValue,
- 
+  control,
 }) => {
   const relationshipDD = dropDownVal[0]?.relationshipDD.map((item) => ({
     value: item,

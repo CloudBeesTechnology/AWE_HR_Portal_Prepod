@@ -196,34 +196,43 @@ export const AddNewForm = () => {
             console.log(err);
           });
       } else {
-        // console.log("8451296");
-
         const nameperson =
-          data?.name?.charAt(0).toUpperCase() + data?.name?.slice(1).toLowerCase();
-        // console.log(data.empID, "Employee ID");
+          data.name.charAt(0).toUpperCase() + data.name.slice(1).toLowerCase();
 
         const username = data.empID;
         const password = data.password;
-        const email = data.officialEmail.trim().toLowerCase();
+        const email = data.officialEmail;
         await signUp({
           username,
           password,
           options: {
             userAttributes: {
               email,
-
             },
-           
+            autoSignIn: true, // Attempt to auto-sign in the user after sign-up
           },
         })
           .then(async (res) => {
             sendEmail(
-              `Verify Your Email Before Logging In`,
-              `Dear ${nameperson},  Please verify your email to activate your account before attempting to log in or change your password.
-You must complete the email verification process using the verification email sent to you earlier. Once verified, you can log in with the credentials provided below:
-Username: ${username} and the Temporary Password: ${password}. Ensure you verify your email first to avoid any issues during login or password changes.
-Best regards,
-[AWE Team]`,
+              `Verify Your Email to Activate Your Account`,
+              `
+              <html>
+                <body>
+                  <p>Dear ${nameperson},</p>
+                  <p>Please verify your email to activate your account before attempting to log in or change your password. <br/>
+                  You must complete the email verification process using the verification email sent to you earlier. <br/>
+                  Once verified, you can log in using the credentials provided below:
+                  </p>
+                  <p><strong>Username:</strong> ${username} <br /><strong>Temporary Password:</strong> ${password}</p>
+                
+                  <p>Visit <a href="http://employee.adininworks.co"> http://employee.adininworks.co </a> to log in. <br />Please note that changing your password is mandatory for account security. <br />Update your password immediately after logging in for the first time.</p>
+                  <p><strong>Important:</strong> Ensure you verify your email first to avoid any issues during login or password changes.</p>
+                
+                  <p>Best regards,</p>
+                  <p>AWE Team</p>
+                </body>
+              </html>
+            `,
               "hr_no-reply@adininworks.com",
               email
             );
@@ -499,6 +508,7 @@ Best regards,
           </button>
         </div>
       </form>
+
       {notification && (
         <SpinLogo text={showTitle} notification={notification} path="/user" />
       )}

@@ -353,7 +353,12 @@ export const WorkInfoFunc = () => {
     // console.log(totalData2);
     // console.log(totalData3);
     try {
-      const [Emp, Leave, Ter, Ser] = await Promise.all([
+      const [
+        Emp,
+         Leave, 
+         Ter,
+          Ser
+        ] = await Promise.all([
         client.graphql({
           query: createEmpWorkInfo,
           variables: {
@@ -380,10 +385,10 @@ export const WorkInfoFunc = () => {
         }),
       ]);
 
-      // console.log(Emp);
-      // console.log(Leave);
-      // console.log(Ter);
-      // console.log(Ser);
+      console.log(Emp);
+      console.log(Leave);
+      console.log(Ter);
+      console.log(Ser);
     } catch (error) {
       console.log(error);
     }

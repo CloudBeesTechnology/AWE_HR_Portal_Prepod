@@ -13,6 +13,7 @@ export const TicketsTable = () => {
     useOutletContext();
 
   const [searchResults, setSearchResults] = useState([]);
+  // const [loading, setLoading] = useState(false);
   const [secondartyData, setSecondartyData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -225,6 +226,7 @@ export const TicketsTable = () => {
     userType !== "SuperAdmin" && "Status",
   ];
 
+  // console.log(ticketMerged);
 
   useEffect(() => {
     const sortedData = ticketMerged.sort(
@@ -243,6 +245,9 @@ export const TicketsTable = () => {
       </div>
     );
   }
+
+  console.log(loading);
+  
   return (
     <section className="w-full">
       <div className="flex justify-between flex-wrap mb-5">
@@ -311,12 +316,12 @@ export const TicketsTable = () => {
                     <td className="border-b-2  border-[#CECECE] py-5">
                       {item?.empName || "N/A"}
                     </td>
-                    <td className="border-b-2 border-[#CECECE] py-5 break-words overflow-hidden">
+                    <td className="border-b-2 border-[#CECECE] py-5">
                       {Array.isArray(item.department)
                         ? item.department[item.department.length - 1] || "N/A"
                         : "N/A"}
                     </td>
-                    <td className="border-b-2 border-[#CECECE] py-5 break-words overflow-hidden">
+                    <td className="border-b-2 border-[#CECECE] py-5">
                       {Array.isArray(item.position)
                         ? item.position[item.position.length - 1] || "N/A"
                         : "N/A"}

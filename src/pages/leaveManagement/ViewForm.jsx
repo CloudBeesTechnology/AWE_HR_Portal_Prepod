@@ -87,7 +87,7 @@ export const ViewForm = ({
               `Leave Request ${status}`,
               `Dear ${
                 leaveData.empName || "Not mention"
-              },  applied leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Manager Name : ${
+              }, Leave request for From Date : ${formattedDateFrom} To Date : ${formattedDateTo} has been Status: ${status} by Manager Name : ${
                 managerName.name || "Not mention"
               }. View at : https://employee.adininworks.co `,
               "leave_no-reply@adininworks.com",
@@ -99,7 +99,7 @@ export const ViewForm = ({
               `Leave Request ${status}`,
               `Employee ${
                 leaveData.empName || "Not mention"
-              }, applied leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Manager Name : ${
+              }, Leave request for From Date : ${formattedDateFrom} To Date : ${formattedDateTo} has been Status: ${status} by Manager Name : ${
                 managerName.name || "Not mention"
               }. View at : https://hr.adininworks.co `,
               "leave_no-reply@adininworks.com",
@@ -136,54 +136,71 @@ export const ViewForm = ({
               const IdFinding =
                 leaveData?.managerEmpID.toLowerCase() ===
                 manage.empID.toLowerCase();
+
               return IdFinding;
             });
             // console.log("manager");
-
-            // manager got email
-            sendEmail(
-              `Leave Request ${status}`,
-              `Employee ${leaveData.empName || "Not mention"} , 
+            if (status === "Approved") {
+              // manager got email
+              sendEmail(
+                `Leave Request ${status}`,
+                `Employee ${leaveData.empName || "Not mention"} , 
            applied leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Supervisor ${
-                supervisorName.name || "Not mention"
-              }. View at : https://hr.adininworks.co `,
-              "leave_no-reply@adininworks.com",
-              FindingEmail[0].officialEmail
-            );
+                  supervisorName.name || "Not mention"
+                }. View at : https://hr.adininworks.co `,
 
-            //hr got email
-            sendEmail(
-              `Leave Request ${status}`,
-              `Employee ${leaveData.empName || "Not mention"} , 
+                "leave_no-reply@adininworks.com",
+                FindingEmail[0].officialEmail
+              );
+
+              //hr got email
+              sendEmail(
+                `Leave Request ${status}`,
+                `Employee ${leaveData.empName || "Not mention"} , 
            applied leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Supervisor ${
-                supervisorName.name || "Not mention"
-              }. View at : https://hr.adininworks.co `,
-              "leave_no-reply@adininworks.com",
-              "Hr-notification@adininworks.com"
-            );
+                  supervisorName.name || "Not mention"
+                }. View at : https://hr.adininworks.co `,
 
-            //manager notify
-            createNotification({
-              empID: leaveData.empID,
-              leaveType: leaveData.empLeaveType,
-              message: `Leave request for ${leaveData.empName} has been ${status} by Supervisor ${supervisorName.name}`,
-              senderEmail: "leave_no-reply@adininworks.com", // Sender email
-              receipentEmail: FindingEmail[0].officialEmail, // Using the employee's official email
-              receipentEmpID: leaveData.managerEmpID,
-              status: "Unread",
-            });
+                "leave_no-reply@adininworks.com",
 
-            //hr notify
-            createNotification({
-              empID: leaveData.empID,
-              leaveType: leaveData.empLeaveType,
-              message: `Leave request for ${leaveData.empName} has been ${status} by Supervisor ${supervisorName.name}`,
-              senderEmail: "leave_no-reply@adininworks.com", // Sender email
-              receipentEmail: "Hr-notification@adininworks.com", // Using the employee's official email
-              status: "Unread",
-            });
+                "Hr-notification@adininworks.com"
+              );
+
+              //manager notify
+              createNotification({
+                empID: leaveData.empID,
+                leaveType: leaveData.empLeaveType,
+                message: `Leave request for ${leaveData.empName} has been ${status} by Supervisor ${supervisorName.name}`,
+                senderEmail: "leave_no-reply@adininworks.com", // Sender email
+                receipentEmail: FindingEmail[0].officialEmail, // Using the employee's official email
+                receipentEmpID: leaveData.managerEmpID,
+                status: "Unread",
+              });
+
+              //hr notify
+              createNotification({
+                empID: leaveData.empID,
+                leaveType: leaveData.empLeaveType,
+                message: `Leave request for ${leaveData.empName} has been ${status} by Supervisor ${supervisorName.name}`,
+                senderEmail: "leave_no-reply@adininworks.com", // Sender email
+                receipentEmail: "Hr-notification@adininworks.com", // Using the employee's official email
+                status: "Unread",
+              });
+            }
 
             if (status === "Rejected") {
+              //hr got email
+              sendEmail(
+                `Leave Request ${status}`,
+                `Employee ${leaveData.empName || "Not mention"} , 
+           applied leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Supervisor ${
+                  supervisorName.name || "Not mention"
+                }. View at : https://hr.adininworks.co `,
+
+                "leave_no-reply@adininworks.com",
+
+                "Hr-notification@adininworks.com"
+              );
               //manager email
               sendEmail(
                 `Leave Request ${status}`,
@@ -191,10 +208,10 @@ export const ViewForm = ({
              applied leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Supervisor ${
                   supervisorName.name || "Not mention"
                 }. View at : https://hr.adininworks.co `,
+
                 "leave_no-reply@adininworks.com",
                 FindingEmail[0].officialEmail
               );
-
               //employee email
               sendEmail(
                 `Leave Request ${status}`,
@@ -202,6 +219,7 @@ export const ViewForm = ({
              leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Supervisor ${
                   supervisorName.name || "Not mention"
                 }. View at : https://employee.adininworks.co `,
+
                 "leave_no-reply@adininworks.com",
                 leaveData.empOfficialEmail
               );
@@ -215,7 +233,6 @@ export const ViewForm = ({
                 receipentEmpID: leaveData.managerEmpID,
                 status: "Unread",
               });
-
               //employee
               createNotification({
                 empID: leaveData.empID,
@@ -224,6 +241,15 @@ export const ViewForm = ({
                 senderEmail: "leave_no-reply@adininworks.com", // Sender email
                 receipentEmail: leaveData.empOfficialEmail, // Using the employee's official email
                 receipentEmpID: leaveData.empID,
+                status: "Unread",
+              });
+              //hr notify
+              createNotification({
+                empID: leaveData.empID,
+                leaveType: leaveData.empLeaveType,
+                message: `Leave request for ${leaveData.empName} has been ${status} by Supervisor ${supervisorName.name}`,
+                senderEmail: "leave_no-reply@adininworks.com", // Sender email
+                receipentEmail: "Hr-notification@adininworks.com", // Using the employee's official email
                 status: "Unread",
               });
             }
@@ -261,9 +287,7 @@ export const ViewForm = ({
                 leaveData.empName || "Not mention"
               } , Your leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Manager ${
                 managerName.name || "Not mention"
-              }  and Supervisor ${
-                supervisorName.name || "Not mention"
-              }. View at : https://employee.adininworks.co `,
+              } . View at : https://employee.adininworks.co `,
               "leave_no-reply@adininworks.com",
               leaveData.empOfficialEmail
             );
@@ -275,10 +299,9 @@ export const ViewForm = ({
                 leaveData.empName || "Not mention"
               } , Leave request for the period ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Manager ${
                 managerName.name || "Not mention"
-              }  and Supervisor ${
-                supervisorName.name || "Not mention"
-              }. View at : https://hr.adininworks.co `,
+              } . View at : https://hr.adininworks.co `,
               "leave_no-reply@adininworks.com",
+
               "Hr-notification@adininworks.com"
             );
 
@@ -289,8 +312,8 @@ export const ViewForm = ({
               message: `Leave request for ${
                 leaveData.empName
               } has been ${status} by Manager ${
-                personalInfo.name || "Not mentioned"
-              } and Supervisor ${supervisorName.name || "Not mention"}.`,
+                managerName.name || "Not mentioned"
+              } .`,
               senderEmail: "leave_no-reply@adininworks.com", // Sender email
               receipentEmail: leaveData.empOfficialEmail, // Using the employee's official email
               receipentEmpID: leaveData.empID,
@@ -370,7 +393,7 @@ export const ViewForm = ({
               ticketData.empName || "Not mention"
             } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${status} by HR ${
               personalInfo.name || "Not mention"
-            }. View at : https://hr.adininworks.co `,
+            }. `,
             "hr_no-reply@adininworks.com",
             findingManagerEmail.officialEmail
           );
@@ -483,7 +506,7 @@ export const ViewForm = ({
     // Case 4: Supervisor EmpID missing, Manager pending, User not SuperAdmin/HR
     if (
       isPending &&
-      (supervisorEmpID === "" || supervisorEmpID === null) &&
+      (supervisorEmpID === " " || supervisorEmpID === null) &&
       isNotSuperAdminOrHR
     ) {
       return (
