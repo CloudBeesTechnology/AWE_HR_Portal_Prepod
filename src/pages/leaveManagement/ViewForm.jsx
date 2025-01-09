@@ -506,7 +506,7 @@ export const ViewForm = ({
     // Case 4: Supervisor EmpID missing, Manager pending, User not SuperAdmin/HR
     if (
       isPending &&
-      (supervisorEmpID === " " || supervisorEmpID === null) &&
+      (supervisorEmpID === "" || supervisorEmpID === null) &&
       isNotSuperAdminOrHR
     ) {
       return (

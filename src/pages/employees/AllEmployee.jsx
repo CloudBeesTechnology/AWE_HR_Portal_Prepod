@@ -215,36 +215,34 @@ export const AllEmployee = () => {
   ]);
 
   const handleFilterChange = (e) => {
-    const selectedStatus = e.target.value;
-
-    if (selectedStatus === "All") {
+    const selectedStatus = e.target.value.toLowerCase(); // Normalize to lowercase
+  
+    if (selectedStatus === "all") {
       setFilteredData(mergeData);
     } else {
       const filtered = mergeData.filter((candidate) => {
-        const contractType = getLatestValue(candidate.contractType);
-        const empType = getLatestValue(candidate.empType);
-        const workStatus = getLatestValue(candidate.workStatus);
-        const nationality = getLatestValue(candidate.nationality);
-
+        const contractType = getLatestValue(candidate.contractType)?.toLowerCase();
+        const empType = getLatestValue(candidate.empType)?.toLowerCase();
+        const workStatus = getLatestValue(candidate.workStatus)?.toLowerCase();
+        const nationality = getLatestValue(candidate.nationality)?.toLowerCase();
+  
         switch (selectedStatus) {
-          case "Local":
-            return ["Bruneian", "Brunei PR"].includes(nationality);
-          case "Foreigner":
-            return (
-              nationality && !["Bruneian", "Brunei PR"].includes(nationality)
-            );
-          case "LPA":
-            return contractType === "LPA";
-          case "SAWP":
-            return contractType === "SAWP";
-          case "OnShore":
-            return empType === "OnShore";
-          case "OffShore":
-            return empType === "OffShore";
-          case "Active":
-          case "Probationary":
-          case "Resignation":
-          case "Termination":
+          case "local":
+            return ["bruneian", "brunei pr"].includes(nationality);
+          case "foreigner":
+            return nationality && !["bruneian", "brunei pr"].includes(nationality);
+          case "lpa":
+            return contractType === "lpa";
+          case "sawp":
+            return contractType === "sawp";
+          case "onshore":
+            return empType === "onshore";
+          case "offshore":
+            return empType === "offshore";
+          case "active":
+          case "probationary":
+          case "resignation":
+          case "termination":
             return workStatus === selectedStatus;
           default:
             return false;
@@ -253,7 +251,7 @@ export const AllEmployee = () => {
       setFilteredData(filtered);
     }
   };
-
+  
   // Handle pagination
   useEffect(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
@@ -283,15 +281,19 @@ export const AllEmployee = () => {
   };
 
   const getStatusClass = (workStatus) => {
-    return (
-      {
-        Active: "text-[green]",
-        Probationary: "text-[#E8A317]",
-        Resignation: "text-red",
-        Termination: "text-[red]",
-      }[workStatus] || "text-medium_grey"
-    );
-  };
+  const normalizedStatus = workStatus?.toLowerCase(); // Normalize to lowercase
+
+  return (
+    {
+      active: "text-[green]",
+      probationary: "text-[#E8A317]",
+      resignation: "text-red",
+      termination: "text-[red]",
+    }[normalizedStatus] || "text-medium_grey"
+  );
+};
+
+  console.log(mergeData);
 
 
   return (
@@ -357,8 +359,9 @@ export const AllEmployee = () => {
                   className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
                   onClick={() => {
                     {
-                      
                       handleFormShow(candidate);
+                      console.log("CANDY_DATA", candidate);
+                      
                     }
                   }}
                 >
