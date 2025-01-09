@@ -41,26 +41,24 @@ const Sidebar = () => {
         const userID = localStorage.getItem("userID");
         const userType = localStorage.getItem("userType");
         const filteredResults = result.filter((val) => {
-          if (
-            val.empID &&
-            typeof val.empID === "string" &&
-            val.selectType === userType
-          ) {
-            const empID = val.empID.toLowerCase();
-            const isIncluded = empID.includes(userID.toLowerCase());
-            return isIncluded;
+          // console.log(val);
+        
+          if (val.empID === userID && val.selectType === userType) {
+            const empID = val.empID.toString().toLowerCase();
+            const isEqual = empID === userID.toString().toLowerCase();
+            return isEqual;
           }
         });
-
+        
         if (filteredResults.length > 0) {
           const permissionsString = filteredResults[0].setPermissions[0];
+          // console.log(permissionsString);
+          
           const categories = extractMainCategories(permissionsString);
           // const desiredOrder = ["Dashboard", "User", "Recruitment","Employee","Training","Time Sheet" ,"Leave Management" ,"Notification center" ,"Report","Benefits & Rewards"];
           const orderedCategories = sortCategories(categories, desiredOrder);
           setMainCategories(orderedCategories);
-        } else {
-          console.log("No results found for the userType:", userID);
-        }
+        } 
       } catch (error) {
         console.error("Error fetching user data:", error);
       }

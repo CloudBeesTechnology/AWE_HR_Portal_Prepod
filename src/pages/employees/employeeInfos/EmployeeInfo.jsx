@@ -261,6 +261,10 @@ export const EmployeeInfo = () => {
     return !isNaN(date.getTime()); // Return true if the date is valid
   };
   const formatDate = (date) => {
+    if (!date) {
+      return "";
+    }
+
     const d = new Date(date);
 
     // Ensure the date is formatted as yyyy-MM-dd
@@ -649,7 +653,7 @@ export const EmployeeInfo = () => {
           PITableID: checkingPITable.id,
           IDTable: checkingIDTable.id,
           email: data.email.trim().toLowerCase(),
-          officialEmail:data.officialEmail.trim().toLowerCase(),
+          officialEmail: data.officialEmail.trim().toLowerCase(),
         };
 
         await UpdateEIValue({ collectValue });
@@ -677,7 +681,7 @@ export const EmployeeInfo = () => {
           supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
           familyDetails: JSON.stringify(data.familyDetails),
           email: data.email.trim().toLowerCase(),
-          officialEmail:data.officialEmail.trim().toLowerCase(),
+          officialEmail: data.officialEmail.trim().toLowerCase(),
         };
 
         await SubmitEIData({ empValue });
@@ -688,7 +692,6 @@ export const EmployeeInfo = () => {
       console.log(error);
     }
   };
-
 
   return (
     <section
