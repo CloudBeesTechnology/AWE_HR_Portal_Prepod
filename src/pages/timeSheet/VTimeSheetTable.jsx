@@ -7,12 +7,7 @@ import { OrmcTBody } from "./tableBody/OrmcTBody";
 import { SbwTBody } from "./tableBody/SbwTBody";
 import { ExportTableToExcel } from "./customTimeSheet/DownloadTableToExcel";
 import "../../../src/index.css";
-import {
-  Navigate,
-  useLocation,
-  useNavigate,
-  useOutletContext,
-} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
 import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
@@ -22,7 +17,7 @@ import { ViewTimeSheet } from "./ViewTimeSheet";
 export const VTimeSheetTable = (
   {
     // AllFieldData,
-    // categoryFilter,
+    // categoryFilters,
     // data,
     // handleScroll,
   }
@@ -33,7 +28,7 @@ export const VTimeSheetTable = (
   const [data, setData] = useState(null);
   const [secondaryData, setSecondaryData] = useState(null);
 
-  const [categoryFilter, setCategoryFilter] = useState(null);
+  const [categoryFilters, setCategoryFilters] = useState(null);
   const savedData = localStorage.getItem("timeSheetData");
   // console.log(savedData)
   const {
@@ -43,21 +38,22 @@ export const VTimeSheetTable = (
     endDate,
     searchQuery,
   } = useTempID();
-const nav=useNavigate();
+  const nav = useNavigate();
   // console.log(typeof savedData === "object", Array.isArray(savedData));
   // const [startDate, setStartDate] = useState("");
   // const [endDate, setEndDate] = useState("");
   useLayoutEffect(() => {
     if (showListTimeSheet === true) {
       const currentPath = window.location.pathname;
-      if (currentPath === "/viewTsheetDetails" || currentPath === "/viewTsheetDetails/") {
+      if (
+        currentPath === "/viewTsheetDetails" ||
+        currentPath === "/viewTsheetDetails/"
+      ) {
         // window.history.replaceState(null, "", "/viewTimesheet"); // Replace URL in history
-      nav("/viewTimesheet");
+        nav("/viewTimesheet");
         // window.location.href = "/viewTimesheet";
         // window.location.reload(); // Reload to apply changes
-   
       }
-      
     }
   }, []);
 
@@ -65,13 +61,12 @@ const nav=useNavigate();
     if (timeSheetFileData) {
       localStorage.setItem("timeSheetData", timeSheetFileData?.updatedAt);
       // console.log(savedData?.updatedAt)
-     
     }
   }, [timeSheetFileData]);
-  
-  const AllFieldData = useTableFieldData(categoryFilter);
-      console.log(AllFieldData);
- 
+
+  const AllFieldData = useTableFieldData(categoryFilters);
+  console.log(AllFieldData);
+
   // const { startDate, endDate, searchQuery } = useOutletContext();
 
   // const convertStringToObject = (fetchedData) => {
@@ -172,7 +167,7 @@ const nav=useNavigate();
 
     // Filter by date range
     if (startDate && endDate) {
-      console.log(startDate && endDate)
+      console.log(startDate && endDate);
       const start = new Date(startDate);
       const end = new Date(endDate);
 
@@ -198,9 +193,7 @@ const nav=useNavigate();
       setSecondaryData(timeSheetFileData?.updatedAt);
       // setData(fileData?.updatedAt);
       // setSecondaryData(fileData?.updatedAt);
-      setCategoryFilter(timeSheetFileData?.fileType);
-      
-      
+      setCategoryFilters(timeSheetFileData?.fileType);
     }
   }, [timeSheetFileData]);
 
@@ -234,10 +227,10 @@ const nav=useNavigate();
           {/* <div className="mt-9  max-h-[500px] table-wrp block overflow-x-scroll border-2 border-lite_grey"> */}
           {/* w-[1190px] */}
           {/* <table className="styled-table text-center w-full rounded-md overflow-hidden shadow-md overflow-y-auto"> */}
-          <table className="styled-table">
+          <table className="styled-table w-[100%]">
             <thead className="sticky-header">
               <tr className="text_size_7">
-                {categoryFilter !== "HO" && (
+                {categoryFilters !== "HO" && (
                   <td className="px-5 text-center">S No.</td>
                 )}
 
@@ -246,15 +239,13 @@ const nav=useNavigate();
                     {header}
                   </td>
                 )) ?? (
-                 
-                    <td colSpan="100%" className="text-center">
-                      No headers available
-                    </td>
-                
+                  <td colSpan="100%" className="text-center">
+                    No headers available
+                  </td>
                 )}
               </tr>
             </thead>
-            {categoryFilter === "BLNG" && (
+            {categoryFilters === "BLNG" && (
               <BlngTBody
                 data={visibleData}
                 loading={loading}
@@ -262,7 +253,7 @@ const nav=useNavigate();
                 message={message}
               />
             )}
-            {categoryFilter === "HO" && (
+            {categoryFilters === "HO" && (
               <HoTBody
                 data={visibleData}
                 loading={loading}
@@ -270,7 +261,7 @@ const nav=useNavigate();
                 message={message}
               />
             )}
-            {categoryFilter === "SBW" && (
+            {categoryFilters === "SBW" && (
               <SbwTBody
                 data={visibleData}
                 loading={loading}
@@ -278,7 +269,7 @@ const nav=useNavigate();
                 message={message}
               />
             )}
-            {categoryFilter === "ORMC" && (
+            {categoryFilters === "ORMC" && (
               <OrmcTBody
                 data={visibleData}
                 loading={loading}
@@ -286,7 +277,7 @@ const nav=useNavigate();
                 message={message}
               />
             )}
-            {categoryFilter === "Offshore" && (
+            {categoryFilters === "Offshore" && (
               <OffshoreTBody
                 data={visibleData}
                 loading={loading}
@@ -302,7 +293,7 @@ const nav=useNavigate();
         <button
           className="rounded px-3 py-2 bg-[#FEF116] text_size_5 text-dark_grey"
           onClick={() => {
-            ExportTableToExcel(categoryFilter || "TimeSheet", tableData);
+            ExportTableToExcel(categoryFilters || "TimeSheet", tableData);
           }}
         >
           Download

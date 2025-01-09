@@ -30,40 +30,12 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     onBeforePrint: () => console.log("Preparing to print PDF..."),
     onAfterPrint: () => console.log("Print complete"),
     pageStyle: `
-      @page {
-          
+      @page {       
         height:  874px;
-        padding: 22px, 0px, 22px, 0px;
-        
+        padding: 22px, 0px, 22px, 0px;     
       }
     `,
   });
-  
-  /* Adjust the margin as necessary height:  872px; */
-//874 px h perfect
-  // const handlePrint = useReactToPrint({
-  //   content: () => invoiceRef.current,
-  //   onBeforePrint: () => console.log("Preparing to print PDF..."),
-  //   onAfterPrint: () => console.log("Print complete"),
-  //   pageStyle: `
-  //     @page {
-  //       margin: 98px 0px 100px 0px;
-  //       size: auto;
-  //     }
-  //     body {
-  //       margin: 0;
-  //       padding: 0;
-  //       font-family: Arial, sans-serif;
-  //     }
-  //     .pdf-page {
-  //       page-break-before: always;
-  //     }
-  //     .page {
-  //       page-break-after: always;
-  //     }
-  //   `,
-  //   // Ensures each page in the content starts on a new page
-  // });
 
   const handlePrintMain = useReactToPrint({
     content: () => mainRef.current,
@@ -136,7 +108,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     if (dateInput === null || dateInput === undefined) {
       return "N/A";
     }
-  
+
     // If dateInput is an array, format each date in the array
     if (Array.isArray(dateInput)) {
       return dateInput.map((dateString) => {
@@ -144,7 +116,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
         if (dateString === null || dateString === undefined) {
           return "N/A";
         }
-  
+
         const date = new Date(dateString);
         if (isNaN(date.getTime())) return "N/A"; // Return "N/A" if the date is invalid
         const day = date.getDate().toString().padStart(2, "0"); // Add leading zero if day is single digit
@@ -153,17 +125,16 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
         return `${day}/${month}/${year}`;
       });
     }
-  
+
     const date = new Date(dateInput);
     if (isNaN(date.getTime())) return "N/A"; // Return "N/A" if the date is invalid
     const day = date.getDate().toString().padStart(2, "0");
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
-  
+
     return `${day}/${month}/${year}`;
   };
-  
-  
+
   const {
     empStatusType,
     workmenCompNo,
@@ -296,7 +267,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     durLeavePass,
     leavePass,
     materLeave,
-    mrageLeave, 
+    mrageLeave,
     paterLeave,
     sickLeave,
     sickLeaveDate,
@@ -344,51 +315,59 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     WITermination,
     groupIns,
     groupInsEffectDate,
-    groupInsEndDate,   
+    groupInsEndDate,
     travelIns,
     workmePolicyNo,
     workmenComp,
     empInsUpload,
     depInsurance,
-    airTktStatus,reEntryVisa,immigApproval,reEntryVisaExp,remarkImmig,ppLocation,arrivStampExp,immigRefNo,ppSubmit,empPassExp,empPassStatus,
+    airTktStatus,
+    reEntryVisa,
+    immigApproval,
+    reEntryVisaExp,
+    remarkImmig,
+    ppLocation,
+    arrivStampExp,
+    immigRefNo,
+    ppSubmit,
+    empPassExp,
+    empPassStatus,
     arrivStampUpload,
     immigEmpUpload,
     reEntryUpload,
     probDuration,
     hospLeave,
-    pervAnnualLeaveBal
-
+    pervAnnualLeaveBal,
   } = passingValue;
-  console.log(address)
+  console.log(address);
 
-  console.log(insuranceClaims)
+  console.log(insuranceClaims);
 
   const personalDetails = {
-    "Name": name,
+    Name: name,
     "Chinese character": chinese,
     "Employee ID": empID,
     "Employee Badge Number": empBadgeNo,
     "Sap Number": sapNo,
     "Contract Type": contractType,
     "Employee Type": empType,
-    "Position":
-    Array.isArray(position) && position.length > 0
-      ? position[0]
-      : "Position not available",
+    Position:
+      Array.isArray(position) && position.length > 0
+        ? position[0]
+        : "Position not available",
     "Date Of Birth": formatDate(dob),
-    "Age": age,
-    "Gender": gender,
+    Age: age,
+    Gender: gender,
     "Marital Status": marital,
-
     "Country of birth": cob,
     "Country of Origin": ctryOfOrigin,
     "Other country of origin": oCOfOrigin,
     "National Category": nationalCat,
-    "Nationality": nationality, 
+    Nationality: nationality,
     "Other Nationality": otherNation,
-    "Religion": religion,
+    Religion: religion,
     "Other Religion": otherReligion,
-    "Race": race,
+    Race: race,
     "Other Race": otherRace,
     "Brunei IC Number": bwnIcNo,
     "Brunei IC Colour": bwnIcColour,
@@ -398,24 +377,25 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Passport Issue Date": formatDate(ppIssued),
     "Passport Expiry": formatDate(ppExpiry),
     "Passport issued destination": ppDestinate,
-    "Email": email,
+    Email: email,
     "Official Email": officialEmail,
-    "Address" : 
-    permanentAddress,
+    Address: permanentAddress,
     "Contact No": contactNo,
     "Alternate Number": alternateNo,
-    "Language": lang,
+    Language: lang,
     "Driving License": driveLic,
     "Agent Name": agent,
     "Company Name of Previous Employment": preEmp,
     "Previous Employment Period": preEmpPeriod,
     "Date of Induction Briefing": formatDate(inducBrief),
     "Bank name": bankName,
-    "Bank account number":bankAccNo,
+    "Bank account number": bankAccNo,
   };
 
+  console.log("LOG SAP NO", sapNo);
+
   const employeeDocument = {
-    "EmpUpDocs": empUpDocs,
+    EmpUpDocs: empUpDocs,
   };
 
   const educationalDetails = {
@@ -441,75 +421,73 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     // dependPass: dependPass,
   };
 
-  console.log(bruneiME)
-  console.log(overME)
+  console.log(bruneiME);
+  console.log(overME);
 
   const dependenPass = {
     DependPass: dependPass,
   };
 
   const accommodationInfo = {
-    "Accommodation": accommodation,
+    Accommodation: accommodation,
     "Accommodation Address": accommodationAddress,
   };
 
   const insuranceInfo = {
-    "Group H&S Insurance" : groupIns,
-    "Group H&S Insurance Enrollment Effective Date" :formatDate(groupInsEffectDate),
-    "Group H&S Insurance Enrollment End Date" : formatDate(groupInsEndDate), 
-    "Workmen Compensation Insurance" : empStatusType,
-    "Workmen compensation insurance policy number" : workmenCompNo,
+    "Group H&S Insurance": groupIns,
+    "Group H&S Insurance Enrollment Effective Date":
+      formatDate(groupInsEffectDate),
+    "Group H&S Insurance Enrollment End Date": formatDate(groupInsEndDate),
+    "Workmen Compensation Insurance": empStatusType,
+    "Workmen compensation insurance policy number": workmenCompNo,
     "Personal Accident Insurance": accidentIns,
-    "Travelling Insurance" : travelIns,
-  
+    "Travelling Insurance": travelIns,
   };
 
   const DependentInsurance = {
-    "Dependent Insurance" : depInsurance,
-  }
+    "Dependent Insurance": depInsurance,
+  };
 
   const InsuranceClaim = {
-    "Insurance Claim" : insuranceClaims,
-  }
-
-
+    "Insurance Claim": insuranceClaims,
+  };
 
   const workInfo = {
     employeeDetails: {
-      "Department": department,
+      Department: department,
       "Other Department": otherDepartment,
-      "Position": position,
+      Position: position,
       "Other Position": otherPosition,
       "Job Category": jobCat,
       "Other Job Category": otherJobCat,
       "Date of Joining": formatDate(doj),
       "Job Description": jobDesc,
       "Skill Pool": skillPool,
-      "HR": hr,
-      "Manager": manager,
-      "Supervisor": supervisor,
+      HR: hr,
+      Manager: manager,
+      Supervisor: supervisor,
       "Employee Status": relationship,
       "Upgrade Position": upgradePosition,
       "Position Upgrade Effective date": formatDate(upgradeDate),
       "Contract Period Status": contractPeriod,
       "Contract Start Date": formatDate(contractStart),
-      "Contract End Date": formatDate(contractEnd),  
+      "Contract End Date": formatDate(contractEnd),
       "Probation Start Date": formatDate(probationStart),
       "Probation End Date": formatDate(probationEnd),
       "Probation Duration": probDuration,
       "Normal Working Hours Per Day": workHrs,
       "Normal Working Day per Week": workWeek,
       "Normal Working Day per Month": workMonth,
-      // "Employee ID": empID, 
+      // "Employee ID": empID,
       // "SAP Number": sapNo,
       "Employment Work Status": workStatus,
       "Type of Salary Pay": salaryType,
-    }, 
+    },
 
     LeaveDetails: {
-   
       "Leave Passage Entitlement for Non-Local": leavePass,
-      "Date of Leave Passage Entitlement After Contract": formatDate(dateLeavePass),
+      "Date of Leave Passage Entitlement After Contract":
+        formatDate(dateLeavePass),
       "Duration Period of Leave Passage Entitlement": durLeavePass,
       "Destination of Leave Passage Entitlement": destinateLeavePass,
       // "Employee ID": empID,     "Leave Passage Entitlement for Non-Local": leavePass,
@@ -518,8 +496,8 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       "Sick Leave Entitlement": sickLeave,
       "Sick Leave Effective Date": formatDate(sickLeaveDate),
       "Maternity Leave Entitlement": materLeave,
-      "Paternity Leave Entitlement": paterLeave, 
-      "Marriage Leave Entitlement": mrageLeave,    
+      "Paternity Leave Entitlement": paterLeave,
+      "Marriage Leave Entitlement": mrageLeave,
       "Hospitalisation Leave Entitlement": hospLeave,
       "Previous Year Annual Leave Balance": pervAnnualLeaveBal,
     },
@@ -527,13 +505,13 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     TerminateDetails: {
       "Date of Resignation": formatDate(resignDate),
       "Resignation Notice during Probation": resignNotProb,
-      "Other Resignation Notice Probation": otherResignNotProb, 
+      "Other Resignation Notice Probation": otherResignNotProb,
       "Resignation Notice after Confirmation": resignNotConf,
       "Other Resignation Notice Confirmation": otherResignNotConf,
       "Reason of Resignation": reasonResign,
-      "Date of Termination": formatDate(termiDate),   
+      "Date of Termination": formatDate(termiDate),
       "Termination Notice during Probation": termiNotProb,
-      "Other Termination Not Probation": otherTermiNotProb, 
+      "Other Termination Not Probation": otherTermiNotProb,
       "Termination Notice after Confirmation": termiNotConf,
       "Other Termination Not Confirmed": otherTermiNotConf,
       "Reason of Termination": reasonTerminate,
@@ -543,9 +521,9 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       "Position Revision": positionRev,
       "Position Revision Effective Date": formatDate(positionRevDate),
       "Salary Package Revision": revSalary,
-      "Salary Package Revision Effective Date": formatDate(revSalaryDate),  
+      "Salary Package Revision Effective Date": formatDate(revSalaryDate),
       "Leave Passage Revision": revLeavePass,
-      "Leave Passage Revision Effective Date":formatDate(revLeaveDate),
+      "Leave Passage Revision Effective Date": formatDate(revLeaveDate),
       "Annual Leave Revison": revAnnualLeave,
       "Annual Leave Revison Effective Date": formatDate(revALD),
       "Change of Department": depEmp,
@@ -553,7 +531,6 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       "Remarks for Work Info": remarkWI,
     },
   };
-
 
   const workPass = {
     doe: {
@@ -606,7 +583,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     },
 
     immigration: {
-      // "Passport no": ppNo,   
+      // "Passport no": ppNo,
       "Original Passport Location": ppLocation,
       "Date Of Arrival Stamping Expiry": formatDate(arrivStampExp),
       "Immigration Reference Number": immigRefNo,
@@ -678,7 +655,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                     mainRef={mainRef}
                   />
                 )}
-            
+
                 {activeTab === 1 && (
                   <FamilyDetails
                     familyDetails={familyDetails}
@@ -688,43 +665,8 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                     mainRef={mainRef}
                   />
                 )}
+
                 {activeTab === 2 && (
-                  <MedicalDetails
-                    medicalInfo={medicalInfo}
-                    dependenPass={dependenPass}
-                    uploadFitness={uploadFitness}
-                    uploadBwn={uploadBwn}
-                    documentsTwo={documentsTwo}
-                    uploadRegis={uploadRegis}
-                    handlePrint={handlePrint}
-                    invoiceRef={invoiceRef}
-                    dependPass={dependPass}
-                    formatDate={formatDate}
-                    mainRef={mainRef}
-                  />
-                )}
-                {activeTab === 3 && (
-                  <AccommodationDetails
-                    accommodationInfo={accommodationInfo}
-                    handlePrint={handlePrint}
-                    invoiceRef={invoiceRef}
-                    mainRef={mainRef}
-                  />
-                )}
-                {activeTab === 4 && (
-                  <InsuranceDetails
-                    insuranceInfo={insuranceInfo}
-                    DependentInsurance={DependentInsurance}
-                    InsuranceClaim={insuranceClaims}
-                    handlePrint={handlePrint}
-                    invoiceRef={invoiceRef}
-                    depInsurance={depInsurance}
-                    empInsUpload={empInsUpload}
-                    formatDate={formatDate}
-                    mainRef={mainRef}
-                  />
-                )}
-                {activeTab === 5 && (
                   <WorkInfoView
                     workInfo={workInfo}
                     documentThree={documentThree}
@@ -753,7 +695,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                     mainRef={mainRef}
                   />
                 )}
-                {activeTab === 6 && (
+                {activeTab === 3 && (
                   <WorkPassView
                     workPass={workPass}
                     doeEmpUpload={doeEmpUpload}
@@ -781,6 +723,44 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                   />
                 )}
 
+                {activeTab === 4 && (
+                  <MedicalDetails
+                    medicalInfo={medicalInfo}
+                    dependenPass={dependenPass}
+                    uploadFitness={uploadFitness}
+                    uploadBwn={uploadBwn}
+                    documentsTwo={documentsTwo}
+                    uploadRegis={uploadRegis}
+                    handlePrint={handlePrint}
+                    invoiceRef={invoiceRef}
+                    dependPass={dependPass}
+                    formatDate={formatDate}
+                    mainRef={mainRef}
+                  />
+                )}
+
+                {activeTab === 5 && (
+                  <InsuranceDetails
+                    insuranceInfo={insuranceInfo}
+                    DependentInsurance={DependentInsurance}
+                    InsuranceClaim={insuranceClaims}
+                    handlePrint={handlePrint}
+                    invoiceRef={invoiceRef}
+                    depInsurance={depInsurance}
+                    empInsUpload={empInsUpload}
+                    formatDate={formatDate}
+                    mainRef={mainRef}
+                  />
+                )}
+
+                {activeTab === 6 && (
+                  <AccommodationDetails
+                    accommodationInfo={accommodationInfo}
+                    handlePrint={handlePrint}
+                    invoiceRef={invoiceRef}
+                    mainRef={mainRef}
+                  />
+                )}
               </div>
               <div className="flex justify-center py-6">
                 <button

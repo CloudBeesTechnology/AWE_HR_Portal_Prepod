@@ -47,7 +47,7 @@ export const UseScrollableView = (data, Position) => {
 
   useEffect(() => {
     // Load initial data for Position !== "Manager"
-    if (Position !== "Manager") {
+    if (Position !== "Manager" || Position === "Manager") {
       if (data && data.length > 0) {
         setVisibleData(data.slice(0, ITEMS_PER_PAGE));
         setCurrentPage(1);
@@ -87,7 +87,8 @@ export const UseScrollableView = (data, Position) => {
         if (Position !== "Manager") {
           loadMoreDataForNonManager();
         } else {
-          loadMoreDataForManager();
+          // loadMoreDataForManager();
+          loadMoreDataForNonManager()
         }
       }
     },

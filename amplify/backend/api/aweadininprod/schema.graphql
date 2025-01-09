@@ -1,3 +1,13 @@
+type ContractForm @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  empID: String!
+  conAttn: String
+  depHead: String
+  hrManager: String
+  genManager: String
+  remarks: String
+}
+
 type KeyValueStore @model @auth(rules: [{allow: public}]) {
   id: ID!
   departmentDD: [String]
@@ -158,6 +168,16 @@ type ProbForm @model @auth(rules: [{allow: public}]) {
   gmApproved: String
   managerApproved: String
   supervisorApproved: String
+  communicationDetails: String
+  qualityDetails: String
+  paceDetails: String
+  initiativeDetails: String
+  attitudeDetails: String
+  adaptabilityDetails: String
+  teamworkDetails: String
+  responsibilityDetails: String
+  diligentDetails: String
+  commitmentDetails: String
 }
 
 type EmailNotifi @model @auth(rules: [{allow: public}]) {

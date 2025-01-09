@@ -1,3 +1,15 @@
+type ContractForm @aws_iam @aws_api_key {
+  id: ID!
+  empID: String!
+  conAttn: String
+  depHead: String
+  hrManager: String
+  genManager: String
+  remarks: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
 type KeyValueStore @aws_iam @aws_api_key {
   id: ID!
   departmentDD: [String]
@@ -178,6 +190,16 @@ type ProbForm @aws_iam @aws_api_key {
   gmApproved: String
   managerApproved: String
   supervisorApproved: String
+  communicationDetails: String
+  qualityDetails: String
+  paceDetails: String
+  initiativeDetails: String
+  attitudeDetails: String
+  adaptabilityDetails: String
+  teamworkDetails: String
+  responsibilityDetails: String
+  diligentDetails: String
+  commitmentDetails: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -982,38 +1004,29 @@ enum ModelSortDirection {
   DESC
 }
 
-type ModelKeyValueStoreConnection @aws_api_key @aws_iam {
-  items: [KeyValueStore]!
+type ModelContractFormConnection @aws_api_key @aws_iam {
+  items: [ContractForm]!
   nextToken: String
 }
 
-input ModelKeyValueStoreFilterInput {
+input ModelContractFormFilterInput {
   id: ModelIDInput
-  departmentDD: ModelStringInput
-  positionDD: ModelStringInput
-  jobCatDD: ModelStringInput
-  raceDD: ModelStringInput
-  religionDD: ModelStringInput
-  nationalityDD: ModelStringInput
-  countryORDD: ModelStringInput
-  educLevelDD: ModelStringInput
-  workStatusDD: ModelStringInput
-  relationshipDD: ModelStringInput
-  resignNotifProbDD: ModelStringInput
-  termiNotifProbDD: ModelStringInput
-  resignNotifConfDD: ModelStringInput
-  termiNotifConfDD: ModelStringInput
-  workPermitDD: ModelStringInput
-  insuHSDD: ModelStringInput
-  insuClaimDD: ModelStringInput
+  empID: ModelStringInput
+  conAttn: ModelStringInput
+  depHead: ModelStringInput
+  hrManager: ModelStringInput
+  genManager: ModelStringInput
+  remarks: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
-  and: [ModelKeyValueStoreFilterInput]
-  or: [ModelKeyValueStoreFilterInput]
-  not: ModelKeyValueStoreFilterInput
+  and: [ModelContractFormFilterInput]
+  or: [ModelContractFormFilterInput]
+  not: ModelContractFormFilterInput
 }
 
 type Query {
+  getContractForm(id: ID!): ContractForm @aws_api_key @aws_iam
+  listContractForms(filter: ModelContractFormFilterInput, limit: Int, nextToken: String): ModelContractFormConnection @aws_api_key @aws_iam
   getKeyValueStore(id: ID!): KeyValueStore @aws_api_key @aws_iam
   listKeyValueStores(filter: ModelKeyValueStoreFilterInput, limit: Int, nextToken: String): ModelKeyValueStoreConnection @aws_api_key @aws_iam
   getBastingPaint(id: ID!): BastingPaint @aws_api_key @aws_iam
@@ -1096,78 +1109,48 @@ type Query {
   listLeaveStatuses(filter: ModelLeaveStatusFilterInput, limit: Int, nextToken: String): ModelLeaveStatusConnection @aws_api_key @aws_iam
 }
 
-input ModelKeyValueStoreConditionInput {
-  departmentDD: ModelStringInput
-  positionDD: ModelStringInput
-  jobCatDD: ModelStringInput
-  raceDD: ModelStringInput
-  religionDD: ModelStringInput
-  nationalityDD: ModelStringInput
-  countryORDD: ModelStringInput
-  educLevelDD: ModelStringInput
-  workStatusDD: ModelStringInput
-  relationshipDD: ModelStringInput
-  resignNotifProbDD: ModelStringInput
-  termiNotifProbDD: ModelStringInput
-  resignNotifConfDD: ModelStringInput
-  termiNotifConfDD: ModelStringInput
-  workPermitDD: ModelStringInput
-  insuHSDD: ModelStringInput
-  insuClaimDD: ModelStringInput
-  and: [ModelKeyValueStoreConditionInput]
-  or: [ModelKeyValueStoreConditionInput]
-  not: ModelKeyValueStoreConditionInput
+input ModelContractFormConditionInput {
+  empID: ModelStringInput
+  conAttn: ModelStringInput
+  depHead: ModelStringInput
+  hrManager: ModelStringInput
+  genManager: ModelStringInput
+  remarks: ModelStringInput
+  and: [ModelContractFormConditionInput]
+  or: [ModelContractFormConditionInput]
+  not: ModelContractFormConditionInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
 }
 
-input CreateKeyValueStoreInput {
+input CreateContractFormInput {
   id: ID
-  departmentDD: [String]
-  positionDD: [String]
-  jobCatDD: [String]
-  raceDD: [String]
-  religionDD: [String]
-  nationalityDD: [String]
-  countryORDD: [String]
-  educLevelDD: [String]
-  workStatusDD: [String]
-  relationshipDD: [String]
-  resignNotifProbDD: [String]
-  termiNotifProbDD: [String]
-  resignNotifConfDD: [String]
-  termiNotifConfDD: [String]
-  workPermitDD: String
-  insuHSDD: [String]
-  insuClaimDD: [String]
+  empID: String!
+  conAttn: String
+  depHead: String
+  hrManager: String
+  genManager: String
+  remarks: String
 }
 
-input UpdateKeyValueStoreInput {
+input UpdateContractFormInput {
   id: ID!
-  departmentDD: [String]
-  positionDD: [String]
-  jobCatDD: [String]
-  raceDD: [String]
-  religionDD: [String]
-  nationalityDD: [String]
-  countryORDD: [String]
-  educLevelDD: [String]
-  workStatusDD: [String]
-  relationshipDD: [String]
-  resignNotifProbDD: [String]
-  termiNotifProbDD: [String]
-  resignNotifConfDD: [String]
-  termiNotifConfDD: [String]
-  workPermitDD: String
-  insuHSDD: [String]
-  insuClaimDD: [String]
+  empID: String
+  conAttn: String
+  depHead: String
+  hrManager: String
+  genManager: String
+  remarks: String
 }
 
-input DeleteKeyValueStoreInput {
+input DeleteContractFormInput {
   id: ID!
 }
 
 type Mutation {
+  createContractForm(input: CreateContractFormInput!, condition: ModelContractFormConditionInput): ContractForm @aws_api_key @aws_iam
+  updateContractForm(input: UpdateContractFormInput!, condition: ModelContractFormConditionInput): ContractForm @aws_api_key @aws_iam
+  deleteContractForm(input: DeleteContractFormInput!, condition: ModelContractFormConditionInput): ContractForm @aws_api_key @aws_iam
   createKeyValueStore(input: CreateKeyValueStoreInput!, condition: ModelKeyValueStoreConditionInput): KeyValueStore @aws_api_key @aws_iam
   updateKeyValueStore(input: UpdateKeyValueStoreInput!, condition: ModelKeyValueStoreConditionInput): KeyValueStore @aws_api_key @aws_iam
   deleteKeyValueStore(input: DeleteKeyValueStoreInput!, condition: ModelKeyValueStoreConditionInput): KeyValueStore @aws_api_key @aws_iam
@@ -1290,32 +1273,24 @@ type Mutation {
   deleteLeaveStatus(input: DeleteLeaveStatusInput!, condition: ModelLeaveStatusConditionInput): LeaveStatus @aws_api_key @aws_iam
 }
 
-input ModelSubscriptionKeyValueStoreFilterInput {
+input ModelSubscriptionContractFormFilterInput {
   id: ModelSubscriptionIDInput
-  departmentDD: ModelSubscriptionStringInput
-  positionDD: ModelSubscriptionStringInput
-  jobCatDD: ModelSubscriptionStringInput
-  raceDD: ModelSubscriptionStringInput
-  religionDD: ModelSubscriptionStringInput
-  nationalityDD: ModelSubscriptionStringInput
-  countryORDD: ModelSubscriptionStringInput
-  educLevelDD: ModelSubscriptionStringInput
-  workStatusDD: ModelSubscriptionStringInput
-  relationshipDD: ModelSubscriptionStringInput
-  resignNotifProbDD: ModelSubscriptionStringInput
-  termiNotifProbDD: ModelSubscriptionStringInput
-  resignNotifConfDD: ModelSubscriptionStringInput
-  termiNotifConfDD: ModelSubscriptionStringInput
-  workPermitDD: ModelSubscriptionStringInput
-  insuHSDD: ModelSubscriptionStringInput
-  insuClaimDD: ModelSubscriptionStringInput
+  empID: ModelSubscriptionStringInput
+  conAttn: ModelSubscriptionStringInput
+  depHead: ModelSubscriptionStringInput
+  hrManager: ModelSubscriptionStringInput
+  genManager: ModelSubscriptionStringInput
+  remarks: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
-  and: [ModelSubscriptionKeyValueStoreFilterInput]
-  or: [ModelSubscriptionKeyValueStoreFilterInput]
+  and: [ModelSubscriptionContractFormFilterInput]
+  or: [ModelSubscriptionContractFormFilterInput]
 }
 
 type Subscription {
+  onCreateContractForm(filter: ModelSubscriptionContractFormFilterInput): ContractForm @aws_subscribe(mutations: ["createContractForm"]) @aws_api_key @aws_iam
+  onUpdateContractForm(filter: ModelSubscriptionContractFormFilterInput): ContractForm @aws_subscribe(mutations: ["updateContractForm"]) @aws_api_key @aws_iam
+  onDeleteContractForm(filter: ModelSubscriptionContractFormFilterInput): ContractForm @aws_subscribe(mutations: ["deleteContractForm"]) @aws_api_key @aws_iam
   onCreateKeyValueStore(filter: ModelSubscriptionKeyValueStoreFilterInput): KeyValueStore @aws_subscribe(mutations: ["createKeyValueStore"]) @aws_api_key @aws_iam
   onUpdateKeyValueStore(filter: ModelSubscriptionKeyValueStoreFilterInput): KeyValueStore @aws_subscribe(mutations: ["updateKeyValueStore"]) @aws_api_key @aws_iam
   onDeleteKeyValueStore(filter: ModelSubscriptionKeyValueStoreFilterInput): KeyValueStore @aws_subscribe(mutations: ["deleteKeyValueStore"]) @aws_api_key @aws_iam
@@ -1436,6 +1411,133 @@ type Subscription {
   onCreateLeaveStatus(filter: ModelSubscriptionLeaveStatusFilterInput): LeaveStatus @aws_subscribe(mutations: ["createLeaveStatus"]) @aws_api_key @aws_iam
   onUpdateLeaveStatus(filter: ModelSubscriptionLeaveStatusFilterInput): LeaveStatus @aws_subscribe(mutations: ["updateLeaveStatus"]) @aws_api_key @aws_iam
   onDeleteLeaveStatus(filter: ModelSubscriptionLeaveStatusFilterInput): LeaveStatus @aws_subscribe(mutations: ["deleteLeaveStatus"]) @aws_api_key @aws_iam
+}
+
+type ModelKeyValueStoreConnection @aws_api_key @aws_iam {
+  items: [KeyValueStore]!
+  nextToken: String
+}
+
+input ModelKeyValueStoreFilterInput {
+  id: ModelIDInput
+  departmentDD: ModelStringInput
+  positionDD: ModelStringInput
+  jobCatDD: ModelStringInput
+  raceDD: ModelStringInput
+  religionDD: ModelStringInput
+  nationalityDD: ModelStringInput
+  countryORDD: ModelStringInput
+  educLevelDD: ModelStringInput
+  workStatusDD: ModelStringInput
+  relationshipDD: ModelStringInput
+  resignNotifProbDD: ModelStringInput
+  termiNotifProbDD: ModelStringInput
+  resignNotifConfDD: ModelStringInput
+  termiNotifConfDD: ModelStringInput
+  workPermitDD: ModelStringInput
+  insuHSDD: ModelStringInput
+  insuClaimDD: ModelStringInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelKeyValueStoreFilterInput]
+  or: [ModelKeyValueStoreFilterInput]
+  not: ModelKeyValueStoreFilterInput
+}
+
+input ModelKeyValueStoreConditionInput {
+  departmentDD: ModelStringInput
+  positionDD: ModelStringInput
+  jobCatDD: ModelStringInput
+  raceDD: ModelStringInput
+  religionDD: ModelStringInput
+  nationalityDD: ModelStringInput
+  countryORDD: ModelStringInput
+  educLevelDD: ModelStringInput
+  workStatusDD: ModelStringInput
+  relationshipDD: ModelStringInput
+  resignNotifProbDD: ModelStringInput
+  termiNotifProbDD: ModelStringInput
+  resignNotifConfDD: ModelStringInput
+  termiNotifConfDD: ModelStringInput
+  workPermitDD: ModelStringInput
+  insuHSDD: ModelStringInput
+  insuClaimDD: ModelStringInput
+  and: [ModelKeyValueStoreConditionInput]
+  or: [ModelKeyValueStoreConditionInput]
+  not: ModelKeyValueStoreConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateKeyValueStoreInput {
+  id: ID
+  departmentDD: [String]
+  positionDD: [String]
+  jobCatDD: [String]
+  raceDD: [String]
+  religionDD: [String]
+  nationalityDD: [String]
+  countryORDD: [String]
+  educLevelDD: [String]
+  workStatusDD: [String]
+  relationshipDD: [String]
+  resignNotifProbDD: [String]
+  termiNotifProbDD: [String]
+  resignNotifConfDD: [String]
+  termiNotifConfDD: [String]
+  workPermitDD: String
+  insuHSDD: [String]
+  insuClaimDD: [String]
+}
+
+input UpdateKeyValueStoreInput {
+  id: ID!
+  departmentDD: [String]
+  positionDD: [String]
+  jobCatDD: [String]
+  raceDD: [String]
+  religionDD: [String]
+  nationalityDD: [String]
+  countryORDD: [String]
+  educLevelDD: [String]
+  workStatusDD: [String]
+  relationshipDD: [String]
+  resignNotifProbDD: [String]
+  termiNotifProbDD: [String]
+  resignNotifConfDD: [String]
+  termiNotifConfDD: [String]
+  workPermitDD: String
+  insuHSDD: [String]
+  insuClaimDD: [String]
+}
+
+input DeleteKeyValueStoreInput {
+  id: ID!
+}
+
+input ModelSubscriptionKeyValueStoreFilterInput {
+  id: ModelSubscriptionIDInput
+  departmentDD: ModelSubscriptionStringInput
+  positionDD: ModelSubscriptionStringInput
+  jobCatDD: ModelSubscriptionStringInput
+  raceDD: ModelSubscriptionStringInput
+  religionDD: ModelSubscriptionStringInput
+  nationalityDD: ModelSubscriptionStringInput
+  countryORDD: ModelSubscriptionStringInput
+  educLevelDD: ModelSubscriptionStringInput
+  workStatusDD: ModelSubscriptionStringInput
+  relationshipDD: ModelSubscriptionStringInput
+  resignNotifProbDD: ModelSubscriptionStringInput
+  termiNotifProbDD: ModelSubscriptionStringInput
+  resignNotifConfDD: ModelSubscriptionStringInput
+  termiNotifConfDD: ModelSubscriptionStringInput
+  workPermitDD: ModelSubscriptionStringInput
+  insuHSDD: ModelSubscriptionStringInput
+  insuClaimDD: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionKeyValueStoreFilterInput]
+  or: [ModelSubscriptionKeyValueStoreFilterInput]
 }
 
 type ModelBastingPaintConnection @aws_api_key @aws_iam {
@@ -2220,6 +2322,16 @@ input ModelProbFormFilterInput {
   gmApproved: ModelStringInput
   managerApproved: ModelStringInput
   supervisorApproved: ModelStringInput
+  communicationDetails: ModelStringInput
+  qualityDetails: ModelStringInput
+  paceDetails: ModelStringInput
+  initiativeDetails: ModelStringInput
+  attitudeDetails: ModelStringInput
+  adaptabilityDetails: ModelStringInput
+  teamworkDetails: ModelStringInput
+  responsibilityDetails: ModelStringInput
+  diligentDetails: ModelStringInput
+  commitmentDetails: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelProbFormFilterInput]
@@ -2255,6 +2367,16 @@ input ModelProbFormConditionInput {
   gmApproved: ModelStringInput
   managerApproved: ModelStringInput
   supervisorApproved: ModelStringInput
+  communicationDetails: ModelStringInput
+  qualityDetails: ModelStringInput
+  paceDetails: ModelStringInput
+  initiativeDetails: ModelStringInput
+  attitudeDetails: ModelStringInput
+  adaptabilityDetails: ModelStringInput
+  teamworkDetails: ModelStringInput
+  responsibilityDetails: ModelStringInput
+  diligentDetails: ModelStringInput
+  commitmentDetails: ModelStringInput
   and: [ModelProbFormConditionInput]
   or: [ModelProbFormConditionInput]
   not: ModelProbFormConditionInput
@@ -2291,6 +2413,16 @@ input CreateProbFormInput {
   gmApproved: String
   managerApproved: String
   supervisorApproved: String
+  communicationDetails: String
+  qualityDetails: String
+  paceDetails: String
+  initiativeDetails: String
+  attitudeDetails: String
+  adaptabilityDetails: String
+  teamworkDetails: String
+  responsibilityDetails: String
+  diligentDetails: String
+  commitmentDetails: String
 }
 
 input UpdateProbFormInput {
@@ -2322,6 +2454,16 @@ input UpdateProbFormInput {
   gmApproved: String
   managerApproved: String
   supervisorApproved: String
+  communicationDetails: String
+  qualityDetails: String
+  paceDetails: String
+  initiativeDetails: String
+  attitudeDetails: String
+  adaptabilityDetails: String
+  teamworkDetails: String
+  responsibilityDetails: String
+  diligentDetails: String
+  commitmentDetails: String
 }
 
 input DeleteProbFormInput {
@@ -2357,6 +2499,16 @@ input ModelSubscriptionProbFormFilterInput {
   gmApproved: ModelSubscriptionStringInput
   managerApproved: ModelSubscriptionStringInput
   supervisorApproved: ModelSubscriptionStringInput
+  communicationDetails: ModelSubscriptionStringInput
+  qualityDetails: ModelSubscriptionStringInput
+  paceDetails: ModelSubscriptionStringInput
+  initiativeDetails: ModelSubscriptionStringInput
+  attitudeDetails: ModelSubscriptionStringInput
+  adaptabilityDetails: ModelSubscriptionStringInput
+  teamworkDetails: ModelSubscriptionStringInput
+  responsibilityDetails: ModelSubscriptionStringInput
+  diligentDetails: ModelSubscriptionStringInput
+  commitmentDetails: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionProbFormFilterInput]

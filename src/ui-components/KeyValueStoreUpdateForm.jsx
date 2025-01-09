@@ -1393,7 +1393,7 @@ export default function KeyValueStoreUpdateForm(props) {
             value = result?.workPermitDD ?? value;
           }
           if (errors.workPermitDD?.hasError) {
-            runValidationTasks("", value);
+            runValidationTasks("workPermitDD", value);
           }
           setWorkPermitDD(value);
         }}

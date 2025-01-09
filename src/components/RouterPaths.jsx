@@ -49,7 +49,12 @@ export const InsurancePaths = [
   "/insuranceHr/personalAcci",
   "/insuranceHr/insuranceClaim",
 ];
-export const LeaveManagement = ["/leaveManagement","/leaveManage/historyLeave","/leaveManage/leaveBalance","/leaveManage/requestTickets"];
+export const LeaveManagement = [
+  "/leaveManagement",
+  "/leaveManage/historyLeave",
+  "/leaveManage/leaveBalance",
+  "/leaveManage/requestTickets",
+];
 
 export const TimePaths = [
   "/timeSheet",
@@ -71,8 +76,29 @@ export const TrainingPaths = [
   "/trainingReq/view",
   "/blngCertify",
   "/omgCertify",
-  "/training/tcView"
+  "/training/tcView",
 ];
 
 export const UserPaths = ["/user", "/addNewForm"];
-export const ReportPaths = ["/reports", "/probForm"];
+export const ReportPaths = [
+  "/reports",
+  "/probForm",
+  "/contractForms",
+  "/rm",
+  "/filterTable",
+  "/resignation",
+  "/termination",
+  "/probationReview",
+  "/contractReview",
+  "/empPassExpiry",
+  "/ldExpiry",
+  "/passportExpiry",
+  "/empMedical",
+  "/newRecruit",
+  "/trainingRC",
+  "/lbdKpi",
+  "/groupHS",
+  "/leavePass",
+  "/contractForms",
+  "/promotion",
+];

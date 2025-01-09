@@ -35,9 +35,10 @@ export const TimeSheetBrowser = ({ title }) => {
   const [returnedTHeader, setReturnedTHeader] = useState();
   const [excelData, setExcelData] = useState(null);
   const [titleName, setTitleName] = useState("");
-
+  const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [assignPosition, setAssignPosition] = useState("");
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
@@ -51,9 +52,16 @@ export const TimeSheetBrowser = ({ title }) => {
     }
   }, [isChecked]);
   const Position = localStorage.getItem("userType");
+  useEffect(() => {
+    if (Position === "Manager") {
+      setAssignPosition("Manager");
+    } else {
+      setAssignPosition("timeKeeper");
+    }
+  }, [Position, count]);
   const { convertedStringToArrayObj, getPosition } = useFetchData(
     titleName,
-    Position
+    assignPosition
   );
 
   const handleForErrorMsg = (e) => {
@@ -209,25 +217,63 @@ export const TimeSheetBrowser = ({ title }) => {
 
   return (
     <div className="p-10 bg-[#fafaf6] min-h-screen  flex-col items-center">
-      <div>
-        <Link to="/timeSheet" className="text-xl flex-1 text-grey ">
-          <FaArrowLeft />
-        </Link>
+      <div
+        className={`flex ${
+          getPosition === "Manager" ? "justify-start" : "justify-center"
+        }  mt-5`}
+      >
+        <div>
+          <Link to="/timeSheet" className="text-xl flex-1 text-grey w-1/12">
+            <FaArrowLeft />
+          </Link>
+        </div>
+        {getPosition !== "Manager" && (
+          <div className="flex justify-center gap-11 w-11/12 pr-5 ">
+            <p
+              className={`${
+                count === 0 && "border-b-4 border-b-primary"
+              } pb-1 cursor-pointer text_size_5`}
+              onClick={() => {
+                setCount(0);
+              }}
+            >
+              {`Upload ${title} Excel Sheet`}
+            </p>
+            <p
+              className={`${
+                count === 1 && "border-b-4 border-b-primary"
+              } pb-1 cursor-pointer text_size_5`}
+              onClick={() => {
+                setCount(1);
+              }}
+            >
+              {`${title} Rejected Items`}
+            </p>
+          </div>
+        )}
       </div>
+
       <div>
         <div
           className={" m-9 screen-size my-5  flex flex-col items-center gap-3"}
         >
-          <p className="text-2xl font-semibold text-dark_grey uppercase">
+          <p
+            className={`${
+              count === 0
+                ? "text-2xl font-semibold text-dark_grey uppercase mt-4"
+                : "hidden"
+            }`}
+          >
             {title}
           </p>
-          {getPosition !== "Manager" && (
+
+          {getPosition !== "Manager" && count === 0 && (
             <div className="my-2 flex flex-col gap-5">
               <div className="flex gap-5">
                 <div className=" flex flex-col items-center  gap-5">
                   <div className="border-[#30303080] border-2">
                     <input
-                      className="outline-none py-2 px-3 text-sm"
+                      className="outline-none py-2 px-3 text-sm w-64"
                       type="text"
                       placeholder="Please Upload the Time Sheet"
                       value={fileName || ""}
@@ -439,11 +485,58 @@ export const TimeSheetBrowser = ({ title }) => {
           fileName={fileNameForSuccessful}
         />
       )}
+
+      {/* Show Rejected Items Only */}
+      {titleName === "Offshore" && getPosition !== "Manager" && count === 1 && (
+        <ViewTSTBeforeSave
+          titleName={titleName}
+          showRejectedItemTable="Rejected"
+          convertedStringToArrayObj={convertedStringToArrayObj}
+          Position={getPosition}
+        />
+      )}
+
+      {titleName === "BLNG" && getPosition !== "Manager" && count === 1 && (
+        <ViewBLNGsheet
+          titleName={titleName}
+          showRejectedItemTable="Rejected"
+          convertedStringToArrayObj={convertedStringToArrayObj}
+          Position={getPosition}
+        />
+      )}
+      {titleName === "HO" && getPosition !== "Manager" && count === 1 && (
+        <ViewHOsheet
+          titleName={titleName}
+          showRejectedItemTable="Rejected"
+          convertedStringToArrayObj={convertedStringToArrayObj}
+          Position={getPosition}
+        />
+      )}
+
+      {titleName === "ORMC" && getPosition !== "Manager" && count === 1 && (
+        <ViewORMCsheet
+          titleName={titleName}
+          showRejectedItemTable="Rejected"
+          convertedStringToArrayObj={convertedStringToArrayObj}
+          Position={getPosition}
+        />
+      )}
+
+      {titleName === "SBW" && getPosition !== "Manager" && count === 1 && (
+        <ViewSBWsheet
+          titleName={titleName}
+          showRejectedItemTable="Rejected"
+          convertedStringToArrayObj={convertedStringToArrayObj}
+          Position={getPosition}
+        />
+      )}
+
       {closeSavedModel && (
         <div className="flex flex-col items-center">
           <PopupForSave
             fileNameForSuccessful={fileNameForSuccessful}
             setCloseSavedModel={setCloseSavedModel}
+            returnedTHeader={[]}
           />
         </div>
       )}

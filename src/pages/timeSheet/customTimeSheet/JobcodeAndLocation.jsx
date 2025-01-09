@@ -29,7 +29,6 @@ export const JOBCODES = [
 ];
 
 export const LocationData = [
-  { id: 0, location: "All Location" },
   { id: 1, location: "Offshore" },
   { id: 2, location: "Head Office" },
   { id: 3, location: "ORMC" },
@@ -377,64 +376,62 @@ export const seperateDataBasedOnLocation = [
   },
 ];
 
-
-
-export const dummyHolidayList={
-  "CompanyHolidays2025": [
-      {
-          "name": "New Year's Day",
-          "date": "Monday, 1st October 2024"
-      },
-      {
-          "name": "Isra’ Mi’raj",
-          "date": "Tuesday, 5th October 2024"
-      },
-      {
-          "name": "Chinese New Year",
-          "date": "Wednesday, 11th September 2024"
-      },
-      {
-          "name": "41st National Day Negara Brunei Darussalam",
-          "date": "Thursday, 7th October 2024",
-          "note": "In lieu of Sunday, 23rd February 2025"
-      },
-      {
-          "name": "1st Day of Ramadhan",
-          "date": "Friday, 5th October 2024",
-          "note": "In lieu of Sunday, 2nd March 2025"
-      },
-      {
-          "name": "Anniversary of the Revelation of the Quran",
-          "date": "Tuesday, 18th March 2025"
-      },
-      {
-          "name": "Hari Raya Aidil Fitri",
-          "dates": [
-              "Monday, 31st March 2025",
-              "Tuesday, 1st April 2025",
-              "Wednesday, 2nd April 2025"
-          ]
-      },
-      {
-          "name": "Hari Raya Aidil Adha",
-          "date": "Saturday, 7th June 2025"
-      },
-      {
-          "name": "First Day of Hijrah 1447",
-          "date": "Friday, 27th June 2025"
-      },
-      {
-          "name": "His Majesty the Sultan’s 79th Birthday",
-          "date": "Tuesday, 15th July 2025"
-      },
-      {
-          "name": "Maulud-Prophet Muhammad’s Birthday",
-          "date": "Friday, 5th September 2025"
-      },
-      {
-          "name": "Christmas Day",
-          "date": "Thursday, 25th December 2025"
-      }
+export const dummyHolidayList = {
+  CompanyHolidays2025: [
+    {
+      name: "New Year's Day",
+      date: "Monday, 1st October 2024",
+    },
+    {
+      name: "Isra’ Mi’raj",
+      date: "Tuesday, 5th October 2024",
+    },
+    {
+      name: "Chinese New Year",
+      date: "Wednesday, 11th September 2024",
+    },
+    {
+      name: "41st National Day Negara Brunei Darussalam",
+      date: "Thursday, 7th October 2024",
+      note: "In lieu of Sunday, 23rd February 2025",
+    },
+    {
+      name: "1st Day of Ramadhan",
+      date: "Friday, 5th October 2024",
+      note: "In lieu of Sunday, 2nd March 2025",
+    },
+    {
+      name: "Anniversary of the Revelation of the Quran",
+      date: "Tuesday, 18th March 2025",
+    },
+    {
+      name: "Hari Raya Aidil Fitri",
+      dates: [
+        "Monday, 31st March 2025",
+        "Tuesday, 1st April 2025",
+        "Wednesday, 2nd April 2025",
+      ],
+    },
+    {
+      name: "Hari Raya Aidil Adha",
+      date: "Saturday, 7th June 2025",
+    },
+    {
+      name: "First Day of Hijrah 1447",
+      date: "Friday, 27th June 2025",
+    },
+    {
+      name: "His Majesty the Sultan’s 79th Birthday",
+      date: "Tuesday, 15th July 2025",
+    },
+    {
+      name: "Maulud-Prophet Muhammad’s Birthday",
+      date: "Friday, 5th September 2025",
+    },
+    {
+      name: "Christmas Day",
+      date: "Thursday, 25th December 2025",
+    },
   ],
-  "notes": "*Dates subject to alteration"
-}
+  notes: "*Dates subject to alteration",
+};

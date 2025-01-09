@@ -7,6 +7,7 @@ export const ListTimeSheet = ({
   visibleData,
   message,
   setVisibleData,
+  
 }) => {
   const { setTimeSheetFileData, setShowListTimeSheet, setSearchQuery } =
     useTempID();
@@ -58,7 +59,7 @@ export const ListTimeSheet = ({
                   </td>
                   <td
                     className={
-                      val.status === "Approved" ? "text-[#16a34a]" : ""
+                      val.status === "Approved" ? "text-[#16a34a] text_size_7" :  val.status === "Rejected" ? "text-[#a31f16] text_size_7" :"text-[#272727] text_size_7"
                     }
                   >
                     {val.status}
@@ -73,7 +74,7 @@ export const ListTimeSheet = ({
                 colSpan="15"
                 className="text-center text-dark_ash text_size_5 bg-white"
               >
-                <p className="p-5">{message || "Please wait few seconds."}</p>
+                <p className="p-5">{message || "Please select an Excel Sheet from the dropdown to display the data."}</p>
               </td>
             </tr>
           )}

@@ -69,21 +69,19 @@ export const EmployeeInsurance = () => {
     { label: "Department", key: "department", type: "text" },
     { label: "Position", key: "position", type: "text" },
     { label: "Date of Joining", key: "doj", type: "date" },
-    { label: "Gender", key: "gender", type: "select", options: GenderDD },
+    { label: "Gender", key: "gender", type: "text" },
     { label: "Brunei I/C Number", key: "bwnIcNo", type: "text" },
     { label: "Passport Number for Non-Local", key: "ppNo", type: "text" },
     { label: "Date of Birth", key: "dob", type: "date" },
     {
       label: "Marital Status",
       key: "marital",
-      type: "select",
-      options: MaritalDD,
+      type: "text",
     },
     {
       label: "Nationality",
       key: "nationality",
-      type: "select",
-      options: nationalityDD,
+      type: "text",
     },
     { label: "Other Nationality", key: "otherNation", type: "text" },
 
@@ -296,9 +294,9 @@ export const EmployeeInsurance = () => {
               <option value="">Select</option>
               {options.map((option) => (
                 typeof option === "string" ? (
-                  <option key={option} value={option}>{option}</option>
+                  <option key={option} value={option.toUpperCase()}>{option}</option>
                 ) : (
-                  <option key={option.value} value={option.value}>{option.label}</option>
+                  <option key={option.value} value={option.value.toUpperCase()}>{option.label}</option>
                 )
               ))}
             </select>

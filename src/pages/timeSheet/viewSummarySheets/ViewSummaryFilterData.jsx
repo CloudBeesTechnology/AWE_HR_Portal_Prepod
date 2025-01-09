@@ -10,9 +10,12 @@ export const ViewSummaryFilterData = ({
   secondaryData,
   data,
   searchResult,
+//   setEmptyTableMess
+resetTableFunc,
 }) => {
   const { setStartDate, setEndDate, setSelectedLocation } = useTempID();
   const selectLocationFunc = async (data) => {
+    resetTableFunc()
     if (data.location) {
       setSelectedLocation(data.location);
     }

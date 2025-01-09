@@ -1,6 +1,60 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onCreateContractForm = /* GraphQL */ `
+  subscription OnCreateContractForm(
+    $filter: ModelSubscriptionContractFormFilterInput
+  ) {
+    onCreateContractForm(filter: $filter) {
+      id
+      empID
+      conAttn
+      depHead
+      hrManager
+      genManager
+      remarks
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateContractForm = /* GraphQL */ `
+  subscription OnUpdateContractForm(
+    $filter: ModelSubscriptionContractFormFilterInput
+  ) {
+    onUpdateContractForm(filter: $filter) {
+      id
+      empID
+      conAttn
+      depHead
+      hrManager
+      genManager
+      remarks
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteContractForm = /* GraphQL */ `
+  subscription OnDeleteContractForm(
+    $filter: ModelSubscriptionContractFormFilterInput
+  ) {
+    onDeleteContractForm(filter: $filter) {
+      id
+      empID
+      conAttn
+      depHead
+      hrManager
+      genManager
+      remarks
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const onCreateKeyValueStore = /* GraphQL */ `
   subscription OnCreateKeyValueStore(
     $filter: ModelSubscriptionKeyValueStoreFilterInput
@@ -653,6 +707,16 @@ export const onCreateProbForm = /* GraphQL */ `
       gmApproved
       managerApproved
       supervisorApproved
+      communicationDetails
+      qualityDetails
+      paceDetails
+      initiativeDetails
+      attitudeDetails
+      adaptabilityDetails
+      teamworkDetails
+      responsibilityDetails
+      diligentDetails
+      commitmentDetails
       createdAt
       updatedAt
       __typename
@@ -690,6 +754,16 @@ export const onUpdateProbForm = /* GraphQL */ `
       gmApproved
       managerApproved
       supervisorApproved
+      communicationDetails
+      qualityDetails
+      paceDetails
+      initiativeDetails
+      attitudeDetails
+      adaptabilityDetails
+      teamworkDetails
+      responsibilityDetails
+      diligentDetails
+      commitmentDetails
       createdAt
       updatedAt
       __typename
@@ -727,6 +801,16 @@ export const onDeleteProbForm = /* GraphQL */ `
       gmApproved
       managerApproved
       supervisorApproved
+      communicationDetails
+      qualityDetails
+      paceDetails
+      initiativeDetails
+      attitudeDetails
+      adaptabilityDetails
+      teamworkDetails
+      responsibilityDetails
+      diligentDetails
+      commitmentDetails
       createdAt
       updatedAt
       __typename

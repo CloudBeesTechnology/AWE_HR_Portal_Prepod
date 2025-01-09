@@ -1,6 +1,46 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getContractForm = /* GraphQL */ `
+  query GetContractForm($id: ID!) {
+    getContractForm(id: $id) {
+      id
+      empID
+      conAttn
+      depHead
+      hrManager
+      genManager
+      remarks
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listContractForms = /* GraphQL */ `
+  query ListContractForms(
+    $filter: ModelContractFormFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listContractForms(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        empID
+        conAttn
+        depHead
+        hrManager
+        genManager
+        remarks
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getKeyValueStore = /* GraphQL */ `
   query GetKeyValueStore($id: ID!) {
     getKeyValueStore(id: $id) {
@@ -498,6 +538,16 @@ export const getProbForm = /* GraphQL */ `
       gmApproved
       managerApproved
       supervisorApproved
+      communicationDetails
+      qualityDetails
+      paceDetails
+      initiativeDetails
+      attitudeDetails
+      adaptabilityDetails
+      teamworkDetails
+      responsibilityDetails
+      diligentDetails
+      commitmentDetails
       createdAt
       updatedAt
       __typename
@@ -540,6 +590,16 @@ export const listProbForms = /* GraphQL */ `
         gmApproved
         managerApproved
         supervisorApproved
+        communicationDetails
+        qualityDetails
+        paceDetails
+        initiativeDetails
+        attitudeDetails
+        adaptabilityDetails
+        teamworkDetails
+        responsibilityDetails
+        diligentDetails
+        commitmentDetails
         createdAt
         updatedAt
         __typename

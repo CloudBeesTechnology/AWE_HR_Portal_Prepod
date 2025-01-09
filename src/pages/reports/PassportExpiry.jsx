@@ -1,9 +1,14 @@
-
 import React, { useEffect, useState } from "react";
 import { FilterTable } from "./FilterTable";
+import { useLocation } from "react-router-dom";
 
-export const PassportExpiry = ({ allData, typeOfReport, reportTitle }) => {
+export const PassportExpiry = () => {
+  const location = useLocation();
+  const { allData, title } = location.state || {};
   const [tableBody, setTableBody] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [tableHead, setTableHead] = useState([
     "Name",
     "Employee Badge",
@@ -13,13 +18,7 @@ export const PassportExpiry = ({ allData, typeOfReport, reportTitle }) => {
     "Passport Expiry",
   ]);
 
-  const formatDate = (date, type) => {
-    if (Array.isArray(date)) {
-      if (date.length === 0) return "-";
-      const lastDate = date[date.length - 1];
-      return formatDate(lastDate, type);
-    }
-
+  const formatDate = (date) => {
     if (!date) return "-";
     const parsedDate = new Date(date);
     if (isNaN(parsedDate.getTime())) return "-";
@@ -31,168 +30,79 @@ export const PassportExpiry = ({ allData, typeOfReport, reportTitle }) => {
     return `${day}-${month}-${year}`;
   };
 
-
-  // Function to filter data for the current month (1 year after today)
   const filterPassportExpiry = (data) => {
     const today = new Date();
-    const currentMonth = today.getMonth(); // 0-indexed (0 = January, 11 = December)
-    const nextYear = today.getFullYear() + 1; // Next year
+    const currentMonth = today.getMonth();
+    const nextYear = today.getFullYear() + 1;
 
     return data.filter((item) => {
-      if (!Array.isArray(item.ppExpiry) || item.ppExpiry.length === 0) {
-        return false; // Skip if ppExpiry is not an array or is empty
-      }
+      if (!Array.isArray(item.ppExpiry) || item.ppExpiry.length === 0) return false;
 
-      // Get the last value from the ppExpiry array
-      const lastExpiryDateStr = item.ppExpiry[item.ppExpiry.length - 1];
-      const lastExpiryDate = new Date(lastExpiryDateStr);
+      const lastExpiryDate = new Date(item.ppExpiry[item.ppExpiry.length - 1]);
+      if (isNaN(lastExpiryDate.getTime())) return false;
 
-      if (isNaN(lastExpiryDate)) {
-        console.warn(`Invalid date format in ppExpiry: ${lastExpiryDateStr}`);
-        return false; // Skip invalid dates
-      }
-
-      const expiryMonth = lastExpiryDate.getMonth(); // 0-indexed month
+      const expiryMonth = lastExpiryDate.getMonth();
       const expiryYear = lastExpiryDate.getFullYear();
 
-      // Match current month & next year
       return expiryMonth === currentMonth && expiryYear === nextYear;
     });
   };
 
   useEffect(() => {
-    const filteredData = filterPassportExpiry(allData).map((item) => ({
+    const data = filterPassportExpiry(allData).map((item) => ({
       name: item.name || "-",
       empBadgeNo: item.empBadgeNo || "-",
       nationality: item.nationality || "-",
       department: item.department || "-",
       position: item.position || "-",
-      ppExpiry:  Array.isArray(item.ppExpiry)
-      ? formatDate(item.ppExpiry[item.ppExpiry.length - 1])
-      : "-",
+      ppExpiry: formatDate(item.ppExpiry[item.ppExpiry.length - 1]),
     }));
 
-    setTableBody(filteredData);
+    setTableBody(data);
   }, [allData]);
+
+  const handleDate = (e, type) => {
+    const value = e.target.value;
+
+    if (type === "startDate") setStartDate(value);
+    if (type === "endDate") setEndDate(value);
+
+    const start = type === "startDate" ? new Date(value) : startDate ? new Date(startDate) : null;
+    const end = type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
+
+    const filtered = allData.filter((data) => {
+      const expiryArray = data.ppExpiry || [];
+      const expiryDate = expiryArray.length
+        ? new Date(expiryArray[expiryArray.length - 1])
+        : null;
+
+      if (!expiryDate || isNaN(expiryDate.getTime())) return false;
+
+      if (start && end) return expiryDate >= start && expiryDate <= end;
+      if (start) return expiryDate >= start;
+      if (end) return expiryDate <= end;
+
+      return true;
+    }).map((item) => ({
+      name: item.name || "-",
+      empBadgeNo: item.empBadgeNo || "-",
+      nationality: item.nationality || "-",
+      department: item.department || "-",
+      position: item.position || "-",
+      ppExpiry: formatDate(item.ppExpiry[item.ppExpiry.length - 1]),
+    }));
+
+    setFilteredData(filtered);
+  };
 
   return (
     <div>
       <FilterTable
-        tableBody={tableBody}
+        tableBody={filteredData.length ? filteredData : tableBody}
         tableHead={tableHead}
-        typeOfReport={typeOfReport}
-        reportTitle={reportTitle}
+        title={title}
+        handleDate={handleDate}
       />
     </div>
   );
 };
-
-// import React, { useEffect, useState } from 'react'
-// import { FilterTable } from './FilterTable'
-
-// export const PassportExpiry = ({allData,typeOfReport,reportTitle}) => {
-//   const [tableBody, setTableBody] = useState([]);
-//   const [tableHead, setTableHead] = useState([
-//        "Name",
-//     "Employee Badge",
-//     "Nationality",
-//     "Department",
-//     "Position",
-//     "Passport Expiry",
-//     // "Deadline to return HRD",
-//   ]);
-
-//   // Generate table body dynamically from mergedData
-//   const probationReviewMergedData = (data) => {
-//     return data.map((item) => {
-//       return {
-//         name: item.name || "-",
-//         empBadgeNo: item.empBadgeNo || "-",
-//         nationality: item.nationality || "-",
-//         department: item.department || "-",
-//         position: item.position || "-",
-//         ppExpiry: item.ppExpiry || "-",  
-//         // deadlineToReturnHRD: item.deadlineToReturnHRD || "-", // Ensure correct field
-//       };
-//     });
-//   };
-  
-
-//   useEffect(()=>{
-    
-//       setTableBody(probationReviewMergedData(allData))
-//     },[allData])
-// console.log(tableBody);
-
-//   return (
-//     <div>
-
-//       <FilterTable tableBody={tableBody} tableHead={tableHead} typeOfReport={typeOfReport} reportTitle={reportTitle}/>
-//     </div>
-//   )
-// }
-
-
-// import React, { useEffect, useState } from "react";
-// import { FilterTable } from "./FilterTable";
-
-// export const PassportExpiry = ({ allData, typeOfReport, reportTitle }) => {
-//   const [tableBody, setTableBody] = useState([]);
-//   const [tableHead, setTableHead] = useState([
-//     "Name",
-//     "Employee Badge",
-//     "Nationality",
-//     "Department",
-//     "Position",
-//     "Passport Expiry",
-//   ]);
-
-//   // Function to filter data for the current month (1 year after today)
-//   const filterPassportExpiry = (data) => {
-//     const today = new Date();
-//     const currentMonth = today.getMonth(); // 0-indexed (0 = January, 11 = December)
-//     const nextYear = today.getFullYear() + 1; // Next year
-
-//     return data.filter((item) => {
-//       if (!item.ppExpiry) return false; // Skip if no expiry date
-
-//       // Parse `ppExpiry` as a date
-//       const ppExpiryDate = new Date(item.ppExpiry);
-
-//       if (isNaN(ppExpiryDate)) {
-//         console.warn(`Invalid date format for ppExpiry: ${item.ppExpiry}`);
-//         return false; // Skip invalid dates
-//       }
-
-//       const expiryMonth = ppExpiryDate.getMonth(); // 0-indexed month
-//       const expiryYear = ppExpiryDate.getFullYear();
-
-//       // Match current month & next year
-//       return expiryMonth === currentMonth && expiryYear === nextYear;
-//     });
-//   };
-
-//   useEffect(() => {
-//     const filteredData = filterPassportExpiry(allData).map((item) => ({
-//       name: item.name || "-",
-//       empBadgeNo: item.empBadgeNo || "-",
-//       nationality: item.nationality || "-",
-//       department: item.department || "-",
-//       position: item.position || "-",
-//       ppExpiry: item.ppExpiry || "-",
-//     }));
-
-//     setTableBody(filteredData);
-//   }, [allData]);
-
-//   return (
-//     <div>
-//       <FilterTable
-//         tableBody={tableBody}
-//         tableHead={tableHead}
-//         typeOfReport={typeOfReport}
-//         reportTitle={reportTitle}
-//       />
-//     </div>
-//   );
-// };

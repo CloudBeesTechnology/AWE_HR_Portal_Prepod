@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { FilterTable } from './FilterTable';
+import { useLocation } from 'react-router-dom';
 
-export const EmpPE = ({ allData, typeOfReport, reportTitle }) => {
+export const EmpPE = () => {
+  const location = useLocation();
+  const { allData,title } = location.state || {}; 
   const [tableBody, setTableBody] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [tableHead, setTableHead] = useState([
-    "Name",
     "Emp ID",
     "Employee Badge",
+    "Name",
     "Nationality",
     "Date of Join",
     "Work Position",
@@ -14,7 +20,6 @@ export const EmpPE = ({ allData, typeOfReport, reportTitle }) => {
     "Pass Expiry",
   ]);
 
-  // Format date to DD-MM-YYYY
   const formatDate = (date) => {
     if (!date) return "-";
     const parsedDate = new Date(date);
@@ -58,9 +63,9 @@ export const EmpPE = ({ allData, typeOfReport, reportTitle }) => {
       .map((item) => {
         const lastPassExp = item.empPassExp[item.empPassExp.length - 1];
         return {
-          name: item.name || "-",
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
+          name: item.name || "-",
           nationality: item.nationality || "-",
           doj: formatDate(item.doj) || "-",
           position: item.position || "-",
@@ -71,191 +76,55 @@ export const EmpPE = ({ allData, typeOfReport, reportTitle }) => {
   };
 
   useEffect(() => {
-    if (allData && allData.length > 0) {
       setTableBody(empPassMergedData(allData));
-    }
   }, [allData]);
+
+  const handleDate = (e, type) => {
+    const value = e.target.value;
+
+    if (type === "startDate") setStartDate(value);
+    if (type === "endDate") setEndDate(value);
+
+    const start = type === "startDate" ? new Date(value) : startDate ? new Date(startDate) : null;
+    const end = type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
+
+    const filtered = allData.filter((data) => {
+      const expiryArray = data.empPassExp || [];
+      const expiryDate = expiryArray.length
+        ? new Date(expiryArray[expiryArray.length - 1])
+        : null;
+
+      if (!expiryDate || isNaN(expiryDate.getTime())) return false;
+
+      if (start && end) return expiryDate >= start && expiryDate <= end;
+      if (start) return expiryDate >= start;
+      if (end) return expiryDate <= end;
+
+      return true;
+    }).map((item) => {
+      const lastPassExp = item.empPassExp[item.empPassExp.length - 1];
+      return {
+      empID: item.empID || "-",
+      empBadgeNo: item.empBadgeNo || "-",
+      name: item.name || "-",
+      nationality: item.nationality || "-",
+      doj: formatDate(item.doj) || "-",
+      position: item.position || "-",
+      department: item.department || "-",
+      empPassExp: formatDate(lastPassExp) || "-",
+  }});
+
+    setFilteredData(filtered);
+  };
 
   return (
     <div>
       <FilterTable
-        tableBody={tableBody}
-        tableHead={tableHead}
-        typeOfReport={typeOfReport}
-        reportTitle={reportTitle}
+             tableBody={filteredData.length ? filteredData : tableBody}
+             tableHead={tableHead}
+             title={title}
+             handleDate={handleDate}
       />
     </div>
   );
 };
-
-// // import React, { useEffect, useState } from 'react';
-// // import { FilterTable } from './FilterTable';
-
-// // export const EmpPE = ({ allData, typeOfReport, reportTitle }) => {
-// //   const [tableBody, setTableBody] = useState([]);
-// //   const [tableHead, setTableHead] = useState([
-// //     "Name",
-// //     "Emp ID",
-// //     "Employee Badge",
-// //     "Nationality",
-// //     "Date of Join",
-// //     "Work Position",
-// //     "Department",
-// //     "Pass Expiry",
-// //   ]);
-
-// //   const formatDate = (date) => {
-// //     if (!date) return "-";
-// //     const parsedDate = new Date(date);
-// //     if (isNaN(parsedDate.getTime())) return "-";
-// //     const day = String(parsedDate.getDate()).padStart(2, "0");
-// //     const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
-// //     const year = parsedDate.getFullYear();
-// //     return `${day}-${month}-${year}`;
-// //   };
-
-// //   const isOneMonthBefore = (expiryDate) => {
-// //     if (!expiryDate) return false;
-
-// //     const today = new Date();
-// //     const oneMonthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-// //     const expiry = new Date(expiryDate);
-
-// //     // Check if expiry date is on or before one month ago
-// //     return expiry <= oneMonthAgo;
-// //   };
-
-// //   const empPassMergedData = (data) => {
-// //     return data
-// //       .filter((item) => {
-// //         // Ensure empPassExp is a valid array with non-empty and valid date entries
-// //         return (
-// //           Array.isArray(item.empPassExp) &&
-// //           item.empPassExp.length > 0 &&
-// //           item.empPassExp.every(
-// //             (date) => date && !isNaN(new Date(date).getTime())
-// //           )
-// //         );
-// //       })
-// //       .filter((item) => {
-// //         const lastPassExp = item.empPassExp[item.empPassExp.length - 1];
-// //         return isOneMonthBefore(lastPassExp);
-// //       })
-// //       .map((item) => {
-// //         const lastPassExp = item.empPassExp[item.empPassExp.length - 1];
-// //         return {
-// //           name: item.name || "-",
-// //           empID: item.empID || "-",
-// //           empBadgeNo: item.empBadgeNo || "-",
-// //           nationality: item.nationality || "-",
-// //           doj: formatDate(item.doj) || "-",
-// //           position: item.position || "-",
-// //           department: item.department || "-",
-// //           empPassExp: formatDate(lastPassExp) || "-",
-// //         };
-// //       });
-// //   };
-  
-// //   useEffect(() => {
-// //     if (allData && allData.length > 0) {
-// //       setTableBody(empPassMergedData(allData));
-// //     }
-// //   }, [allData]);
-
-// //   return (
-// //     <div>
-// //       <FilterTable
-// //         tableBody={tableBody}
-// //         tableHead={tableHead}
-// //         typeOfReport={typeOfReport}
-// //         reportTitle={reportTitle}
-// //       />
-// //     </div>
-// //   );
-// // };
-// import React, { useEffect, useState } from 'react';
-// import { FilterTable } from './FilterTable';
-
-// export const EmpPE = ({ allData, typeOfReport, reportTitle }) => {
-//   const [tableBody, setTableBody] = useState([]);
-//   const [tableHead, setTableHead] = useState([
-//     "Name",
-//     "Emp ID",
-//     "Employee Badge",
-//     "Nationality",
-//     "Date of Join",
-//     "Work Position",
-//     "Department",
-//     "Pass Expiry",
-//   ]);
-
-//   // Format date to DD-MM-YYYY
-//   const formatDate = (date) => {
-//     if (!date) return "-";
-//     const parsedDate = new Date(date);
-//     if (isNaN(parsedDate.getTime())) return "-";
-//     const day = String(parsedDate.getDate()).padStart(2, "0");
-//     const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
-//     const year = parsedDate.getFullYear();
-//     return `${day}-${month}-${year}`;
-//   };
-
-//   // Check if the date is within the current month or one month after
-//   const isInCurrentOrNextMonth = (expiryDate) => {
-//     if (!expiryDate) return false;
-
-//     const expiry = new Date(expiryDate);
-//     const today = new Date();
-//     const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1); // Start of the current month
-//     const nextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0); // End of the next month
-
-//     return expiry >= currentMonth && expiry <= nextMonth;
-//   };
-
-//   // Filter and map the employee pass data
-//   const empPassMergedData = (data) => {
-//     return data
-//       .filter((item) => {
-//         // Ensure empPassExp is a valid array with non-empty and valid date entries
-//         return (
-//           Array.isArray(item.empPassExp) &&
-//           item.empPassExp.length > 0 &&
-//           item.empPassExp.every((date) => date && !isNaN(new Date(date).getTime()))
-//         );
-//       })
-//       .filter((item) => {
-//         const lastPassExp = item.empPassExp[item.empPassExp.length - 1];
-//         return isInCurrentOrNextMonth(lastPassExp);
-//       })
-//       .map((item) => {
-//         const lastPassExp = item.empPassExp[item.empPassExp.length - 1];
-//         return {
-//           name: item.name || "-",
-//           empID: item.empID || "-",
-//           empBadgeNo: item.empBadgeNo || "-",
-//           nationality: item.nationality || "-",
-//           doj: formatDate(item.doj) || "-",
-//           position: item.position || "-",
-//           department: item.department || "-",
-//           empPassExp: formatDate(lastPassExp) || "-",
-//         };
-//       });
-//   };
-
-//   useEffect(() => {
-//     if (allData && allData.length > 0) {
-//       setTableBody(empPassMergedData(allData));
-//     }
-//   }, [allData]);
-
-//   return (
-//     <div>
-//       <FilterTable
-//         tableBody={tableBody}
-//         tableHead={tableHead}
-//         typeOfReport={typeOfReport}
-//         reportTitle={reportTitle}
-//       />
-//     </div>
-//   );
-// };

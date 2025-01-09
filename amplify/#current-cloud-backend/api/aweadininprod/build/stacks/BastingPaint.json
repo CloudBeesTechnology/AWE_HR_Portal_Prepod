@@ -49,10 +49,10 @@
     "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref": {
       "Type": "String"
     },
-    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStoreauth0FunctionQuerygetKeyValueStoreauth0FunctionAppSyncFunction0470BA2FFunctionId": {
+    "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormauth0FunctionQuerygetContractFormauth0FunctionAppSyncFunction3913C484FunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId": {
+    "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunctionB899EA1EFunctionId": {
       "Type": "String"
     },
     "referencetotransformerrootstackauthRoleNameFB872D50Ref": {
@@ -61,19 +61,19 @@
     "referencetotransformerrootstackunauthRoleName49F3C1FERef": {
       "Type": "String"
     },
-    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreMutationcreateKeyValueStoreinit0FunctionMutationcreateKeyValueStoreinit0FunctionAppSyncFunctionD1C1F6DBFunctionId": {
+    "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormMutationcreateContractForminit0FunctionMutationcreateContractForminit0FunctionAppSyncFunctionC8750CDCFunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreMutationcreateKeyValueStoreauth0FunctionMutationcreateKeyValueStoreauth0FunctionAppSyncFunction988E554AFunctionId": {
+    "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormMutationcreateContractFormauth0FunctionMutationcreateContractFormauth0FunctionAppSyncFunction5DEF2B7BFunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreMutationupdateKeyValueStoreinit0FunctionMutationupdateKeyValueStoreinit0FunctionAppSyncFunction6FD54BEFFunctionId": {
+    "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormMutationupdateContractForminit0FunctionMutationupdateContractForminit0FunctionAppSyncFunctionA6BC10BDFunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptiononCreateKeyValueStoreauth0FunctionSubscriptiononCreateKeyValueStoreauth0FunctionAppSyncFuncti641AE5F6": {
+    "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormSubscriptiononCreateContractFormauth0FunctionSubscriptiononCreateContractFormauth0FunctionAppSyncFunctionE9F67D22FunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptionOnCreateKeyValueStoreDataResolverFnSubscriptionOnCreateKeyValueStoreDataResolverFnAppSyncFuncC74BAD12": {
+    "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormSubscriptionOnCreateContractFormDataResolverFnSubscriptionOnCreateContractFormDataResolverFnAppSyncFunction404107DF3": {
       "Type": "String"
     }
   },
@@ -392,10 +392,10 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStoreauth0FunctionQuerygetKeyValueStoreauth0FunctionAppSyncFunction0470BA2FFunctionId"
+              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormauth0FunctionQuerygetContractFormauth0FunctionAppSyncFunction3913C484FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
+              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunctionB899EA1EFunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -503,10 +503,10 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStoreauth0FunctionQuerygetKeyValueStoreauth0FunctionAppSyncFunction0470BA2FFunctionId"
+              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormauth0FunctionQuerygetContractFormauth0FunctionAppSyncFunction3913C484FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
+              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunctionB899EA1EFunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -614,13 +614,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreMutationcreateKeyValueStoreinit0FunctionMutationcreateKeyValueStoreinit0FunctionAppSyncFunctionD1C1F6DBFunctionId"
+              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormMutationcreateContractForminit0FunctionMutationcreateContractForminit0FunctionAppSyncFunctionC8750CDCFunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreMutationcreateKeyValueStoreauth0FunctionMutationcreateKeyValueStoreauth0FunctionAppSyncFunction988E554AFunctionId"
+              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormMutationcreateContractFormauth0FunctionMutationcreateContractFormauth0FunctionAppSyncFunction5DEF2B7BFunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
+              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunctionB899EA1EFunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -779,7 +779,7 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreMutationupdateKeyValueStoreinit0FunctionMutationupdateKeyValueStoreinit0FunctionAppSyncFunction6FD54BEFFunctionId"
+              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormMutationupdateContractForminit0FunctionMutationupdateContractForminit0FunctionAppSyncFunctionA6BC10BDFunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -788,7 +788,7 @@
               ]
             },
             {
-              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
+              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunctionB899EA1EFunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -953,7 +953,7 @@
               ]
             },
             {
-              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
+              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunctionB899EA1EFunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -1010,13 +1010,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptiononCreateKeyValueStoreauth0FunctionSubscriptiononCreateKeyValueStoreauth0FunctionAppSyncFuncti641AE5F6"
+              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormSubscriptiononCreateContractFormauth0FunctionSubscriptiononCreateContractFormauth0FunctionAppSyncFunctionE9F67D22FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
+              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunctionB899EA1EFunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptionOnCreateKeyValueStoreDataResolverFnSubscriptionOnCreateKeyValueStoreDataResolverFnAppSyncFuncC74BAD12"
+              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormSubscriptionOnCreateContractFormDataResolverFnSubscriptionOnCreateContractFormDataResolverFnAppSyncFunction404107DF3"
             }
           ]
         },
@@ -1063,13 +1063,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptiononCreateKeyValueStoreauth0FunctionSubscriptiononCreateKeyValueStoreauth0FunctionAppSyncFuncti641AE5F6"
+              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormSubscriptiononCreateContractFormauth0FunctionSubscriptiononCreateContractFormauth0FunctionAppSyncFunctionE9F67D22FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
+              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunctionB899EA1EFunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptionOnCreateKeyValueStoreDataResolverFnSubscriptionOnCreateKeyValueStoreDataResolverFnAppSyncFuncC74BAD12"
+              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormSubscriptionOnCreateContractFormDataResolverFnSubscriptionOnCreateContractFormDataResolverFnAppSyncFunction404107DF3"
             }
           ]
         },
@@ -1116,13 +1116,13 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptiononCreateKeyValueStoreauth0FunctionSubscriptiononCreateKeyValueStoreauth0FunctionAppSyncFuncti641AE5F6"
+              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormSubscriptiononCreateContractFormauth0FunctionSubscriptiononCreateContractFormauth0FunctionAppSyncFunctionE9F67D22FunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreQuerygetKeyValueStorepostAuth0FunctionQuerygetKeyValueStorepostAuth0FunctionAppSyncFunctionB8A45866FunctionId"
+              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormQuerygetContractFormpostAuth0FunctionQuerygetContractFormpostAuth0FunctionAppSyncFunctionB899EA1EFunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackKeyValueStoreNestedStackKeyValueStoreNestedStackResource7DC3B037OutputstransformerrootstackKeyValueStoreSubscriptionOnCreateKeyValueStoreDataResolverFnSubscriptionOnCreateKeyValueStoreDataResolverFnAppSyncFuncC74BAD12"
+              "Ref": "referencetotransformerrootstackContractFormNestedStackContractFormNestedStackResource5CD4ED4BOutputstransformerrootstackContractFormSubscriptionOnCreateContractFormDataResolverFnSubscriptionOnCreateContractFormDataResolverFnAppSyncFunction404107DF3"
             }
           ]
         },

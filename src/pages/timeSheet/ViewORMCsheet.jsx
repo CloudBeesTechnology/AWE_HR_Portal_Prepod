@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
 import { PopupForMissMatchExcelSheet } from "./ModelForSuccessMess/PopupForMissMatchExcelSheet";
-
+import { IoCheckmarkCircleSharp } from "react-icons/io5";
 import { generateClient } from "@aws-amplify/api";
 import { EditTimeSheet } from "./EditTimeSheet";
 import { SuccessMessage } from "./ModelForSuccessMess/SuccessMessage";
@@ -17,6 +17,9 @@ import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
 import { Notification } from "./customTimeSheet/Notification";
 import { MergeTableForNotification } from "./customTimeSheet/MergeTableForNotification";
 import { sendEmail } from "../../services/EmailServices";
+import { PopupForAddRemark } from "./ModelForSuccessMess/PopupForAddRemark";
+import { FindSpecificTimeKeeper } from "./customTimeSheet/FindSpecificTimeKeeper";
+import { PopupForSFApproves } from "./ModelForSuccessMess/PopupForSFApproves";
 
 const client = generateClient();
 export const ViewORMCsheet = ({
@@ -28,12 +31,15 @@ export const ViewORMCsheet = ({
   Position,
   fileName,
   defaultValue,
+  showRejectedItemTable,
 }) => {
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
   const [closePopup, setClosePopup] = useState(false);
   const [data, setData] = useState(null);
   const [secondaryData, setSecondaryData] = useState(null);
   const [currentStatus, setCurrentStatus] = useState(defaultValue);
+  const [checkedItems, setCheckedItems] = useState({});
+  const [checkedItemsTwo, setCheckedItemsTwo] = useState({});
 
   const [editObject, setEditObject] = useState();
   const [toggleHandler, setToggleHandler] = useState(false);
@@ -43,18 +49,24 @@ export const ViewORMCsheet = ({
   const [showStatusCol, setShowStatusCol] = useState(null);
   const [successMess, setSuccessMess] = useState(null);
   const [response, setResponse] = useState(null);
+  const [toggleForRemark, setToggleForRemark] = useState(null);
+  const [allApprovedData, setAllApprovedData] = useState([]);
+  const [allRejectedData, setAllRejectedData] = useState([]);
+  const [passSelectedData, setPassSelectedData] = useState(null);
   const { handleScroll, visibleData, setVisibleData } = UseScrollableView(
     data,
     "TimeKeeper"
   );
-
+ const [storingMess, setStoringMess] = useState(null);
   const processedData = useTableMerged(excelData);
-  console.log(processedData);
+
   useEffect(() => {
-    if (processedData && processedData.length > 0) {
-      setData(processedData);
-      setSecondaryData(processedData);
-    }
+    try {
+      if (processedData && processedData.length > 0) {
+        setData(processedData);
+        setSecondaryData(processedData);
+      }
+    } catch (err) {}
   }, [processedData]);
 
   const searchResult = async (searchedData) => {
@@ -69,7 +81,7 @@ export const ViewORMCsheet = ({
     const getPosition = localStorage.getItem("userType");
     if (getPosition === "Manager") {
       setUserIdentification("Manager");
-    } else if (getPosition === "TimeKeeper") {
+    } else if (getPosition !== "Manager") {
       setUserIdentification("TimeKeeper");
     }
   }, [convertedStringToArrayObj]);
@@ -183,7 +195,7 @@ export const ViewORMCsheet = ({
 
     if (returnedTHeader && returnedTHeader.length > 0) {
       checkKeys();
-    } else if (!returnedTHeader) {
+    } else if (!returnedTHeader && showRejectedItemTable !== "Rejected") {
       const fetchData = async () => {
         setCurrentStatus(true);
         // setLoading(true);
@@ -199,30 +211,38 @@ export const ViewORMCsheet = ({
           });
 
           const fetchedData = await dataPromise;
-          // const filterPending = fetchedData.filter(
-          //   (val) => val.status !== "Approved"
-          // );
 
-          // const filterPending = fetchedData
-          //   .map((value) => {
-          //     return {
-          //       id: value[0]?.id,
-          //       data: value[1]?.filter((val) => {
-          //         if (val.status !== "Approved") {
-          //           return val;
-          //         }
-          //       }),
-          //     };
-          //   })
-          //   .filter((item) => item.data && item.data.length > 0);
-          //   const filterPending =
-          // console.log(filterPending);
-
-          // const filteredData = fetchedData.filter(
-          //   (fil) => fil.status !== "Approved"
-          // );
           if (Position === "Manager") {
             const finalData = await SendDataToManager(fetchedData);
+            pendingData(finalData);
+          }
+        } catch (err) {
+        } finally {
+          // setLoading(false);
+        }
+      };
+
+      // Call the fetchData function asynchronously
+      fetchData();
+    } else if (!returnedTHeader && showRejectedItemTable === "Rejected") {
+      const fetchData = async () => {
+        setCurrentStatus(true);
+        // setLoading(true);
+        try {
+          const dataPromise = new Promise((resolve, reject) => {
+            if (convertedStringToArrayObj) {
+              resolve(convertedStringToArrayObj);
+            } else {
+              setTimeout(() => {
+                reject("No data found after waiting.");
+              }, 5000);
+            }
+          });
+
+          const fetchedData = await dataPromise;
+
+          if (userIdentification !== "Manager") {
+            const finalData = await FindSpecificTimeKeeper(fetchedData);
             pendingData(finalData);
           }
         } catch (err) {
@@ -237,7 +257,12 @@ export const ViewORMCsheet = ({
       setCurrentStatus(false);
       setLoading(false);
     }
-  }, [returnedTHeader, convertedStringToArrayObj]);
+  }, [
+    returnedTHeader,
+    convertedStringToArrayObj,
+    userIdentification,
+    showRejectedItemTable,
+  ]);
   const editBLNG = (data) => {
     setEditObject(data);
   };
@@ -276,20 +301,24 @@ export const ViewORMCsheet = ({
   };
 
   const editSBWFunction = (getObject) => {
-    const result = Array.isArray(data[0]?.data)
-      ? editNestedData(data, getObject)
-      : editFlatData(data, getObject);
+    try {
+      const result = Array.isArray(data[0]?.data)
+        ? editNestedData(data, getObject)
+        : editFlatData(data, getObject);
 
       const updatedData = result?.map((item) => {
         // Check if jobLocaWhrs is a non-null, non-empty array and assign LOCATION if valid
-        if (Array.isArray(item.jobLocaWhrs) && item.jobLocaWhrs.length > 0) {
-          item.LOCATION = item.jobLocaWhrs[0].LOCATION;
+        if (Array.isArray(item?.jobLocaWhrs) && item?.jobLocaWhrs?.length > 0) {
+          item.LOCATION = item?.jobLocaWhrs[0]?.LOCATION;
         } else {
           item.LOCATION = null; // Default to null or any other fallback value
         }
         return item;
       });
-    setData(updatedData);
+      setData(updatedData);
+    } catch (err) {
+      console.log(err);
+    }
   };
   const AllFieldData = useTableFieldData(titleName);
   const renameKeysFunctionAndSubmit = async (managerData) => {
@@ -332,6 +361,7 @@ export const ViewORMCsheet = ({
       });
 
       const sendTimeSheets = async (timeSheetData) => {
+        let successCount = 0;
         let successFlag = false;
         for (const timeSheet of timeSheetData) {
           try {
@@ -346,9 +376,17 @@ export const ViewORMCsheet = ({
                 response.data.createTimeSheet
               );
               const responseData = response.data.createTimeSheet;
+              successCount++;
+
+              if (successCount === data.length) {
+                setStoringMess(false);
+                setVisibleData([]);
+                setData(null);
+              }
 
               if (!successFlag) {
                 toggleSFAMessage(true, responseData); // Only toggle success message once
+                setStoringMess(true);
 
                 const result = await MergeTableForNotification(responseData);
 
@@ -386,33 +424,41 @@ export const ViewORMCsheet = ({
 
       sendTimeSheets(finalResult);
     } else if (userIdentification === "Manager") {
-      const MultipleBLNGfile =
-        data &&
-        data.map((val) => {
-          return {
-            id: val.id,
-            // fileName: val.fileName,
-            empName: val.NAME || "",
-            empDept: val.DEPTDIV || "",
-            empBadgeNo: val.BADGE || "",
-            date: val.DATE || "",
-            inTime: val.IN || "",
-            outTime: val.OUT || "",
-            totalInOut: val.TOTALINOUT || "",
-            allDayHrs: val.ALLDAYMINHRS || "",
-            netMins: val.NETMINUTES || "",
-            totalHrs: val.TOTALHOURS || "",
-            normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
-            actualWorkHrs: val.WORKINGHOURS || "",
-            otTime: val.OT || "",
-            remarks: val.REMARKS || "",
-            empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
-            fileType: "ORMC",
-            status: "Approved",
-          };
-        });
+      const MergedData = [...allApprovedData, ...allRejectedData];
 
-      const updateTimeSheetFunction = async (timeSheetData) => {
+      const uniqueArray = MergedData?.filter(
+        (item, index, self) =>
+          index === self.findIndex((obj) => obj.id === item.id)
+      );
+
+      const InitialBLNGUpdate =
+        uniqueArray && uniqueArray.length > 0
+          ? uniqueArray.map((val) => {
+              return {
+                id: val.id,
+                // fileName: val.fileName,
+                empName: val.NAME || "",
+                empDept: val.DEPTDIV || "",
+                empBadgeNo: val.BADGE || "",
+                date: val.DATE || "",
+                inTime: val.IN || "",
+                outTime: val.OUT || "",
+                totalInOut: val.TOTALINOUT || "",
+                allDayHrs: val.ALLDAYMINHRS || "",
+                netMins: val.NETMINUTES || "",
+                totalHrs: val.TOTALHOURS || "",
+                normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+                actualWorkHrs: val.WORKINGHOURS || "",
+                otTime: val.OT || "",
+                remarks: val.REMARKS || "",
+                empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+                fileType: "ORMC",
+                status: val.status,
+              };
+            })
+          : [];
+
+      const updateTimeSheetFuction = async (timeSheetData) => {
         let successFlag = false;
         for (const timeSheet of timeSheetData) {
           try {
@@ -458,8 +504,6 @@ export const ViewORMCsheet = ({
 
                 successFlag = true; // Set the flag to true
               }
-              setVisibleData([]);
-              setData(null);
             }
           } catch (error) {
             console.error("Error creating TimeSheet:", error);
@@ -468,10 +512,162 @@ export const ViewORMCsheet = ({
         }
       };
 
-      updateTimeSheetFunction(MultipleBLNGfile);
+      updateTimeSheetFuction(InitialBLNGUpdate);
+    } else if (
+      userIdentification !== "Manager" &&
+      showRejectedItemTable === "Rejected"
+    ) {
+      const updatedRejectedItems =
+        data && data.length > 0
+          ? data.map((val) => {
+              return {
+                id: val.id,
+                // fileName: val.fileName,
+                empName: val.NAME || "",
+                empDept: val.DEPTDIV || "",
+                empBadgeNo: val.BADGE || "",
+                date: val.DATE || "",
+                inTime: val.IN || "",
+                outTime: val.OUT || "",
+                totalInOut: val.TOTALINOUT || "",
+                allDayHrs: val.ALLDAYMINHRS || "",
+                netMins: val.NETMINUTES || "",
+                totalHrs: val.TOTALHOURS || "",
+                normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+                actualWorkHrs: val.WORKINGHOURS || "",
+                otTime: val.OT || "",
+                remarks: val.REMARKS || "",
+                empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+                fileType: "ORMC",
+                status: "Pending",
+              };
+            })
+          : [];
+      const updateTimeSheetFunction = async (timeSheetData) => {
+        let successFlag = false;
+        for (const timeSheet of timeSheetData) {
+          try {
+            const response = await client.graphql({
+              query: updateTimeSheet,
+              variables: {
+                input: timeSheet, // Send each object individually
+              },
+            });
+
+            if (response?.data?.updateTimeSheet) {
+              console.log(
+                "TimeSheet created successfully:",
+                response.data.updateTimeSheet
+              );
+              const responseData = response.data.updateTimeSheet;
+
+              if (!successFlag) {
+                toggleSFAMessage(true, responseData); // Only toggle success message once
+
+                const result = await MergeTableForNotification(responseData);
+
+                if (result) {
+                  // Call the Notification function
+                  const emailDetails = await Notification({
+                    getEmail: result, // Fix: Pass 'getEmail' instead of 'result'
+                    Position,
+                  });
+
+                  if (emailDetails) {
+                    // Log email details
+                    const { subject, message, fromAddress, toAddress } =
+                      emailDetails;
+
+                    await sendEmail(subject, message, fromAddress, toAddress);
+                  } else {
+                    console.error("Notification returned undefined!");
+                  }
+                } else {
+                  console.error(
+                    "MergeTableForNotification returned undefined!"
+                  );
+                }
+                setVisibleData([]);
+                setData(null);
+                successFlag = true; // Set the flag to true
+              }
+            }
+          } catch (err) {}
+        }
+      };
+
+      updateTimeSheetFunction(updatedRejectedItems);
+    }
+  };
+  const toggleForRemarkFunc = () => {
+    setToggleForRemark(!toggleForRemark);
+  };
+
+  const storeOnlySelectedItem = (data, action) => {
+    if (action === "Approved") {
+      setAllApprovedData((prevApprovedData) => {
+        // Replace old data if ID matches, otherwise keep existing data
+        const updatedData = prevApprovedData.filter(
+          (item) => item.id !== data.id
+        );
+        const updateStatus = { ...data, status: "Approved" };
+
+        return [...updatedData, updateStatus]; // Add the new data
+      });
+    } else if (action === "Rejected") {
+      setAllRejectedData((prevRejectedData) => {
+        // Replace old data if ID matches, otherwise keep existing data
+        const updatedData = prevRejectedData.filter(
+          (item) => item.id !== data.id
+        );
+        return [...updatedData, data]; // Add the new data
+      });
+      setPassSelectedData(data); // Update the selected data
+    }
+  };
+  const addRemarks = (data) => {
+    const dataAlongWithRemark = allRejectedData.map((m) => {
+      if (m.id === data.id) {
+        return { ...data, REMARKS: data.REMARKS };
+      } else {
+        return m;
+      }
+    });
+
+    setAllRejectedData(dataAlongWithRemark);
+  };
+  // console.log(allApprovedData, " : ", allRejectedData);
+  const removeExistingData = (data, action) => {
+    if (action === "Approved") {
+      const afterRemoved = allApprovedData.filter((fil) => fil.id !== data.id);
+      setAllApprovedData(afterRemoved);
+    } else if (action === "Rejected") {
+      const afterRemoved = allRejectedData.filter((fil) => fil.id !== data.id);
+      setAllRejectedData(afterRemoved);
     }
   };
 
+  const removeCheckedItem = useCallback(() => {
+    // Combine approved and rejected data
+    const mergedData = [...allApprovedData, ...allRejectedData];
+
+    // Filter out items that have matching sapNo in mergedData
+    const afterRemoved = data?.filter(
+      (val) => !mergedData.some((fil) => val.id === fil.id)
+    );
+
+    // Update the state with the filtered data
+    setData(afterRemoved);
+    setAllApprovedData([]);
+    setAllRejectedData([]);
+  }, [allApprovedData, allRejectedData, data]);
+  const convertToISODate = (dateString) => {
+    try {
+      const [year, month, day] = dateString.split("/");
+
+      return `${month}/${year}/${day}`; // 'M/D/YYYY'
+    } catch {}
+  };
   return (
     <div>
       <div>
@@ -487,7 +683,7 @@ export const ViewORMCsheet = ({
               />
             </div>
             <div className="table-container" onScroll={handleScroll}>
-              <table className="styled-table">
+              <table className="styled-table w-[100%]">
                 <thead className="sticky-header">
                   <tr className="text_size_5">
                     <td className="px-5 text-center text_size_7">S No.</td>
@@ -503,10 +699,36 @@ export const ViewORMCsheet = ({
                         </td>
                       </tr>
                     )}
-                    {showStatusCol === true ? (
-                      ""
-                    ) : (
-                      <td className="px-5 flex-1 text_size_7">STATUS</td>
+                    {!showStatusCol && (
+                      <>
+                        <td
+                          className={`${
+                            showRejectedItemTable === "Rejected"
+                              ? "hidden"
+                              : "px-5 flex-1 text_size_7"
+                          }`}
+                        >
+                          STATUS
+                        </td>
+                        <td
+                          className={`${
+                            showRejectedItemTable === "Rejected"
+                              ? "hidden"
+                              : "px-5 flex-1 text_size_7"
+                          }`}
+                        >
+                          APPROVE
+                        </td>
+                        <td
+                          className={`${
+                            showRejectedItemTable === "Rejected"
+                              ? "hidden"
+                              : "px-5 flex-1 text_size_7"
+                          }`}
+                        >
+                          REJECT
+                        </td>
+                      </>
                     )}
                   </tr>
                 </thead>
@@ -538,48 +760,96 @@ export const ViewORMCsheet = ({
                               </td>
                               {/* <td className="text-center px-4 flex-1">{m?.DEPT}</td> */}
                               <td className="text-center px-4 flex-1">
-                                {m?.DATE}
+                                {convertToISODate(m?.DATE)}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m?.IN  || 0}
+                                {m?.IN || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m?.OUT  || 0}
+                                {m?.OUT || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m?.TOTALINOUT  || 0}
+                                {m?.TOTALINOUT || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m?.ALLDAYMINHRS  || 0}
+                                {m?.ALLDAYMINHRS || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m?.NETMINUTES  || 0}
+                                {m?.NETMINUTES || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m?.TOTALHOURS  || 0}
+                                {m?.TOTALHOURS || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m?.NORMALWORKINGHRSPERDAY  || 0}
+                                {m?.NORMALWORKINGHRSPERDAY || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m?.WORKINGHOURS  || 0}
+                                {m?.WORKINGHOURS || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {m?.OT  || 0}
+                                {m?.OT || 0}
                               </td>
                               <td className="text-center px-4 flex-1">
                                 {m?.REMARKS}
                               </td>
                               {isStatusPending && (
-                                <td
-                                  className={`text-center px-4 flex-1 ${
-                                    m?.status === "Approved"
-                                      ? "text-[#0CB100]"
-                                      : "text_size_8"
-                                  }`}
-                                >
-                                  {m?.status}
-                                </td>
+                                <React.Fragment>
+                                  <td
+                                    className={`text-center px-4 flex-1 ${
+                                      m?.status === "Approved"
+                                        ? "text-[#0CB100]"
+                                        : "text_size_8"
+                                    }`}
+                                  >
+                                    {m?.status}
+                                  </td>
+                                  <td>
+                                    <input
+                                      className="h-4 w-4"
+                                      type="checkbox"
+                                      checked={checkedItems[m.id] || false}
+                                      onClick={(e) => e.stopPropagation()}
+                                      onChange={(e) => {
+                                        if (e.target.checked) {
+                                          setCheckedItems((prev) => ({
+                                            ...prev,
+                                            [m.id]: e.target.checked, // Toggle the checked state for this specific ID
+                                          }));
+                                          storeOnlySelectedItem(m, "Approved");
+                                        } else {
+                                          removeExistingData(m, "Approved");
+                                          setCheckedItems((prev) => ({
+                                            ...prev,
+                                            [m.id]: false, // Toggle the checked state for this specific ID
+                                          }));
+                                        }
+                                      }}
+                                    />
+                                  </td>
+                                  <td>
+                                    <input
+                                      className="h-4 w-4"
+                                      type="checkbox"
+                                      onClick={(e) => e.stopPropagation()}
+                                      onChange={(e) => {
+                                        if (e.target.checked) {
+                                          setCheckedItemsTwo((prev) => ({
+                                            ...prev,
+                                            [m.id]: e.target.checked, // Toggle the checked state for this specific ID
+                                          }));
+                                          storeOnlySelectedItem(m, "Rejected");
+                                          toggleForRemarkFunc();
+                                        } else {
+                                          removeExistingData(m, "Rejected");
+                                          setCheckedItemsTwo((prev) => ({
+                                            ...prev,
+                                            [m.id]: false, // Toggle the checked state for this specific ID
+                                          }));
+                                        }
+                                      }}
+                                    />
+                                  </td>
+                                </React.Fragment>
                               )}
                             </tr>
                           );
@@ -631,6 +901,7 @@ export const ViewORMCsheet = ({
                     toggleFunctionForAssiMana();
                   } else if (userIdentification === "Manager") {
                     renameKeysFunctionAndSubmit();
+                    removeCheckedItem();
                   }
                 }}
               >
@@ -661,16 +932,38 @@ export const ViewORMCsheet = ({
           Position={Position}
         />
       )}
-      <SuccessMessage
-        successMess={successMess}
-        toggleSFAMessage={toggleSFAMessage}
-        setExcelData={setExcelData}
-        userIdentification={userIdentification}
-      />
+      {storingMess === true ? (
+        <PopupForSFApproves
+          toggleSFAMessage={toggleSFAMessage}
+          icons={<IoCheckmarkCircleSharp />}
+          iconColor="text-[#2BEE48]"
+          textColor="text-[#05b01f]"
+          title={"Processing..."}
+          message={`Data is being saved, `}
+          messageTwo={"this might take a few seconds..."}
+          // btnText={"OK"}
+        />
+      ) : storingMess === false ? (
+        <SuccessMessage
+          successMess={successMess}
+          toggleSFAMessage={toggleSFAMessage}
+          setExcelData={setExcelData}
+          userIdentification={userIdentification}
+        />
+      ) : (
+        ""
+      )}
       {toggleAssignManager === true && (
         <PopupForAssignManager
           toggleFunctionForAssiMana={toggleFunctionForAssiMana}
           renameKeysFunctionAndSubmit={renameKeysFunctionAndSubmit}
+        />
+      )}
+      {toggleForRemark === true && (
+        <PopupForAddRemark
+          toggleForRemarkFunc={toggleForRemarkFunc}
+          addRemarks={addRemarks}
+          passSelectedData={passSelectedData}
         />
       )}
     </div>

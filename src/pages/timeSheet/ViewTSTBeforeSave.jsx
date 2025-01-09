@@ -1,5 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
+
 // import {
 //   createOffshoreSheet,
 //   deleteOffshoreSheet,
@@ -8,6 +15,7 @@ import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
 import { generateClient } from "@aws-amplify/api";
 import { PopupForMissMatchExcelSheet } from "./ModelForSuccessMess/PopupForMissMatchExcelSheet";
 import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
+
 import { EditTimeSheet } from "./EditTimeSheet";
 import { SuccessMessage } from "./ModelForSuccessMess/SuccessMessage";
 import "../../../src/index.css";
@@ -29,6 +37,10 @@ import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
 
 import { Notification } from "./customTimeSheet/Notification";
 import { sendEmail } from "../../services/EmailServices";
+import { PopupForAddRemark } from "./ModelForSuccessMess/PopupForAddRemark";
+import { FindSpecificTimeKeeper } from "./customTimeSheet/FindSpecificTimeKeeper";
+import { PopupForSFApproves } from "./ModelForSuccessMess/PopupForSFApproves";
+import { IoCheckmarkCircleSharp } from "react-icons/io5";
 
 const client = generateClient();
 
@@ -40,9 +52,10 @@ export const ViewTSTBeforeSave = ({
   titleName,
   setExcelData,
   fileName,
+  showRejectedItemTable,
 }) => {
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
-
+  console.log(convertedStringToArrayObj);
   // State to trigger re-render for Notification component
   const [closePopup, setClosePopup] = useState(false);
   const [data, setData] = useState(null);
@@ -54,14 +67,22 @@ export const ViewTSTBeforeSave = ({
   const [userIdentification, setUserIdentification] = useState("");
   const [successMess, setSuccessMess] = useState(null);
   const [toggleAssignManager, setToggleAssignManager] = useState(false);
+  const [toggleForRemark, setToggleForRemark] = useState(null);
   const [response, setResponse] = useState(null);
   const [showStatusCol, setShowStatusCol] = useState(null);
+
+  const [allApprovedData, setAllApprovedData] = useState([]);
+  const [allRejectedData, setAllRejectedData] = useState([]);
+  const [passSelectedData, setPassSelectedData] = useState(null);
+
   const [emailInfo, setEmailInfo] = useState(null);
   const { handleScroll, visibleData, setVisibleData } = UseScrollableView(
     data,
     "TimeKeeper"
   );
-  
+  const [storingMess, setStoringMess] = useState(null);
+  const [checkedItems, setCheckedItems] = useState({});
+  const [checkedItemsTwo, setCheckedItemsTwo] = useState({});
   const MergeTableForNotification = async (responseData) => {
     try {
       const empPersonalInfosResponse = await client.graphql({
@@ -141,21 +162,23 @@ export const ViewTSTBeforeSave = ({
             async function fetchAllData(queryName) {
               let allData = [];
               let nextToken = null;
-            
+
               do {
                 const response = await client.graphql({
                   query: queryName,
                   variables: { nextToken },
                 });
-            
-                const items = response.data[Object.keys(response.data)[0]].items; // Extract items
+
+                const items =
+                  response.data[Object.keys(response.data)[0]].items; // Extract items
                 allData = [...allData, ...items]; // Append fetched items
-                nextToken = response.data[Object.keys(response.data)[0]].nextToken; // Get nextToken
+                nextToken =
+                  response.data[Object.keys(response.data)[0]].nextToken; // Get nextToken
               } while (nextToken); // Continue if there's more data
-            
+
               return allData;
             }
-            
+
             const fetchWorkInfo = async () => {
               try {
                 // Fetch all data with pagination
@@ -163,39 +186,39 @@ export const ViewTSTBeforeSave = ({
                   fetchAllData(listEmpPersonalInfos),
                   fetchAllData(listEmpWorkInfos),
                 ]);
-            
+
                 const empInfo = employeeInfo; // All employee personal info
                 const workInfo = empWorkInfos; // All employee work info
-            
+
                 // Remove sapNo from work info
                 const sapNoRemoved = workInfo.map(({ sapNo, ...rest }) => rest);
-            
+
                 const mergedDatas = empInfo
                   .map((empInf) => {
                     const interviewDetails = sapNoRemoved.find(
                       (item) => item?.empID === empInf?.empID
                     );
-            
+
                     // Return null if all details are undefined
                     if (!interviewDetails) {
                       return null;
                     }
-            
+
                     return {
                       ...empInf,
                       ...interviewDetails,
                     };
                   })
                   .filter((item) => item !== null);
-            
+
                 console.log(mergedDatas);
-            
+
                 // Merge fetchedData with workInfo based on FID
                 const mergedData = fetchedData.map((item) => {
                   const workInfoItem = mergedDatas.find(
                     (info) => info?.sapNo == item?.NO
                   );
-            
+
                   console.log(workInfoItem);
                   return {
                     ...item,
@@ -204,9 +227,9 @@ export const ViewTSTBeforeSave = ({
                       : null,
                   };
                 });
-            
+
                 console.log(mergedData);
-            
+
                 // Set merged data in state
                 setData(mergedData);
                 setSecondaryData(mergedData);
@@ -214,9 +237,8 @@ export const ViewTSTBeforeSave = ({
                 console.error("Error fetching work info:", error.message);
               }
             };
-            
+
             fetchWorkInfo();
-            
           } catch (err) {
           } finally {
             // setLoading is removed ;
@@ -232,7 +254,7 @@ export const ViewTSTBeforeSave = ({
     const getPosition = localStorage.getItem("userType");
     if (getPosition === "Manager") {
       setUserIdentification("Manager");
-    } else if (getPosition === "TimeKeeper") {
+    } else if (getPosition !== "Manager") {
       setUserIdentification("TimeKeeper");
     }
   }, []);
@@ -240,7 +262,7 @@ export const ViewTSTBeforeSave = ({
   const pendingData = (data) => {
     if (data && data.length > 0) {
       setCurrentStatus(true);
-     
+
       const result = data?.map((val) => {
         let parsedEmpWorkInfo = [];
         try {
@@ -326,14 +348,15 @@ export const ViewTSTBeforeSave = ({
         resolve(keyCheckResult);
       });
       setClosePopup(true);
+      console.log(result);
       setShowStatusCol(result);
       setCurrentStatus(result); // Assuming setCurrentStatus is defined
       setLoading(false);
     };
 
-    if (returnedTHeader && returnedTHeader.length > 0) {
+    if (returnedTHeader && returnedTHeader?.length > 0) {
       checkKeys();
-    } else if (!returnedTHeader) {
+    } else if (!returnedTHeader && showRejectedItemTable !== "Rejected") {
       const fetchData = async () => {
         setCurrentStatus(true);
         // setLoading(true);
@@ -349,29 +372,6 @@ export const ViewTSTBeforeSave = ({
           });
 
           const fetchedData = await dataPromise;
-          // const filterPending = fetchedData.filter(
-          //   (val) => val.status !== "Approved"
-          // );
-
-          // const filterPending = fetchedData
-          //   .map((value) => {
-          //     return {
-          //       id: value[0]?.id,
-          //       data: value[1]?.filter((val) => {
-          //         if (val.status !== "Approved") {
-          //           return val;
-          //         }
-          //       }),
-          //     };
-          //   })
-          //   .filter((item) => item.data && item.data.length > 0);
-          // //   const filterPending =
-
-          // //   console.log(fetchedData);
-
-          // const filteredData = fetchedData.filter(
-          //   (fil) => fil.status !== "Approved"
-          // );
 
           if (userIdentification === "Manager") {
             const finalData = await SendDataToManager(fetchedData);
@@ -386,11 +386,45 @@ export const ViewTSTBeforeSave = ({
 
       // Call the fetchData function asynchronously
       fetchData();
+    } else if (!returnedTHeader && showRejectedItemTable === "Rejected") {
+      const fetchData = async () => {
+        setCurrentStatus(true);
+        // setLoading(true);
+        try {
+          const dataPromise = new Promise((resolve, reject) => {
+            if (convertedStringToArrayObj) {
+              resolve(convertedStringToArrayObj);
+            } else {
+              setTimeout(() => {
+                reject("No data found after waiting.");
+              }, 5000);
+            }
+          });
+
+          const fetchedData = await dataPromise;
+
+          if (userIdentification !== "Manager") {
+            const finalData = await FindSpecificTimeKeeper(fetchedData);
+            pendingData(finalData);
+          }
+        } catch (err) {
+        } finally {
+          // setLoading(false);
+        }
+      };
+
+      // Call the fetchData function asynchronously
+      fetchData();
     } else {
       setCurrentStatus(false);
       setLoading(false);
     }
-  }, [returnedTHeader, convertedStringToArrayObj]);
+  }, [
+    returnedTHeader,
+    convertedStringToArrayObj,
+    userIdentification,
+    showRejectedItemTable,
+  ]);
 
   const editBLNG = (data) => {
     setEditObject(data);
@@ -439,27 +473,35 @@ export const ViewTSTBeforeSave = ({
   };
 
   const editOffShoreFunction = (getObject) => {
-    const result = Array.isArray(data[0]?.data)
-      ? editNestedData(data, getObject)
-      : editFlatData(data, getObject);
-
+    try {
+      const result = Array.isArray(data[0]?.data)
+        ? editNestedData(data, getObject)
+        : editFlatData(data, getObject);
+      console.log(result);
       const updatedData = result?.map((item) => {
+        console.log(item);
         // Check if jobLocaWhrs is a non-null, non-empty array and assign LOCATION if valid
-        if (Array.isArray(item.jobLocaWhrs) && item.jobLocaWhrs.length > 0) {
-          item.LOCATION = item.jobLocaWhrs[0].LOCATION;
+        if (Array.isArray(item?.jobLocaWhrs) && item?.jobLocaWhrs?.length > 0) {
+          item.LOCATION = item?.jobLocaWhrs[0]?.LOCATION;
         } else {
           item.LOCATION = null; // Default to null or any other fallback value
         }
         return item;
       });
 
-    setData(updatedData);
+      setData(updatedData);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const AllFieldData = useTableFieldData(titleName);
 
   const renameKeysFunctionAndSubmit = async (managerData) => {
-    if (userIdentification !== "Manager") {
+    if (
+      userIdentification !== "Manager" &&
+      showRejectedItemTable !== "Rejected"
+    ) {
       const result =
         data &&
         data.map((val) => {
@@ -494,6 +536,7 @@ export const ViewTSTBeforeSave = ({
       });
 
       const sendTimeSheets = async (timeSheetData) => {
+        let successCount = 0;
         let successFlag = false;
 
         for (const timeSheet of timeSheetData) {
@@ -509,10 +552,17 @@ export const ViewTSTBeforeSave = ({
                 response.data.createTimeSheet
               );
               const responseData = response.data.createTimeSheet;
+              successCount++;
+
+              if (successCount === data.length) {
+                setStoringMess(false);
+                setVisibleData([]);
+                setData(null);
+              }
 
               if (!successFlag) {
                 toggleSFAMessage(true, responseData); // Only toggle success message once
-
+                setStoringMess(true);
                 const result = await MergeTableForNotification(responseData);
                 console.log(result);
 
@@ -540,6 +590,8 @@ export const ViewTSTBeforeSave = ({
 
                 successFlag = true; // Set the flag to true
               }
+              setVisibleData([]);
+              setData(null);
             }
           } catch (error) {
             console.error("Error creating TimeSheet:", error);
@@ -551,7 +603,7 @@ export const ViewTSTBeforeSave = ({
       sendTimeSheets(finalResult);
       // }
     } else if (userIdentification === "Manager") {
-      // const MultipleBLNGfile =
+      // const UpdateRejectedItems =
       //   data &&
       //   data.map((value) => {
       //     return {
@@ -575,28 +627,37 @@ export const ViewTSTBeforeSave = ({
       //       }),
       //     };
       //   });
+
+      const MergedData = [...allApprovedData, ...allRejectedData];
+
+      const uniqueArray = MergedData?.filter(
+        (item, index, self) =>
+          index === self.findIndex((obj) => obj.id === item.id)
+      );
+
       const MultipleBLNGfile =
-        data &&
-        data.map((val) => {
-          return {
-            id: val.id,
-            // fileName: val.fileName,
-            empName: val.NAME || "",
-            fidNo: val.NO || "",
-            companyName: val.LOCATION || "",
-            date: val.DATE || "",
-            totalNT: val.TOTALHOURS || "",
-            totalOT: val.TOTALHOURS2 || "",
-            totalNTOT: val.TOTALHOURS3 || "",
-            normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
-            actualWorkHrs: val.WORKINGHOURS || "",
-            otTime: val.OT || "",
-            remarks: val.REMARKS || "",
-            empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
-            fileType: "Offshore",
-            status: "Approved",
-          };
-        });
+        uniqueArray && uniqueArray.length > 0
+          ? uniqueArray.map((val) => {
+              return {
+                id: val.id,
+                // fileName: val.fileName,
+                empName: val.NAME || "",
+                fidNo: val.NO || "",
+                companyName: val.LOCATION || "",
+                date: val.DATE || "",
+                totalNT: val.TOTALHOURS || "",
+                totalOT: val.TOTALHOURS2 || "",
+                totalNTOT: val.TOTALHOURS3 || "",
+                normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+                actualWorkHrs: val.WORKINGHOURS || "",
+                otTime: val.OT || "",
+                remarks: val.REMARKS || "",
+                empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+                fileType: "Offshore",
+                status: val.status,
+              };
+            })
+          : [];
 
       const updateTimeSheetFunction = async (timeSheetData) => {
         let successFlag = false;
@@ -609,8 +670,9 @@ export const ViewTSTBeforeSave = ({
               },
             });
 
-            if (response?.data?.updateTimeSheet) {
+            if (response.data.updateTimeSheet) {
               const responseData = response.data.updateTimeSheet;
+              console.log(response.data.updateTimeSheet);
               if (!successFlag) {
                 toggleSFAMessage(true, responseData); // Only toggle success message once
 
@@ -640,8 +702,6 @@ export const ViewTSTBeforeSave = ({
 
                 successFlag = true; // Set the flag to true
               }
-              setVisibleData([]);
-              setData(null);
             }
           } catch (error) {
             console.error("Error creating TimeSheet:", error);
@@ -683,9 +743,169 @@ export const ViewTSTBeforeSave = ({
       //       });
       //   }
       // });
+    } else if (
+      userIdentification !== "Manager" &&
+      showRejectedItemTable === "Rejected"
+    ) {
+      const updatedRejectedItems =
+        data && data.length > 0
+          ? data.map((val) => {
+              return {
+                id: val.id,
+                // fileName: val.fileName,
+                empName: val.NAME || "",
+                fidNo: val.NO || "",
+                companyName: val.LOCATION || "",
+                date: val.DATE || "",
+                totalNT: val.TOTALHOURS || "",
+                totalOT: val.TOTALHOURS2 || "",
+                totalNTOT: val.TOTALHOURS3 || "",
+                normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+                actualWorkHrs: val.WORKINGHOURS || "",
+                otTime: val.OT || "",
+                remarks: val.REMARKS || "",
+                empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+                fileType: "Offshore",
+                status: "Pending",
+              };
+            })
+          : [];
+      const updateTimeSheetFunction = async (timeSheetData) => {
+        let successFlag = false;
+        for (const timeSheet of timeSheetData) {
+          try {
+            const response = await client.graphql({
+              query: updateTimeSheet,
+              variables: {
+                input: timeSheet, // Send each object individually
+              },
+            });
+
+            if (response?.data?.updateTimeSheet) {
+              console.log(
+                "TimeSheet created successfully:",
+                response.data.updateTimeSheet
+              );
+              const responseData = response?.data?.updateTimeSheet;
+
+              if (!successFlag) {
+                toggleSFAMessage(true, responseData); // Only toggle success message once
+
+                const result = await MergeTableForNotification(responseData);
+
+                if (result) {
+                  // Call the Notification function
+                  const emailDetails = await Notification({
+                    getEmail: result, // Fix: Pass 'getEmail' instead of 'result'
+                    Position,
+                  });
+
+                  if (emailDetails) {
+                    // Log email details
+                    const { subject, message, fromAddress, toAddress } =
+                      emailDetails;
+
+                    await sendEmail(subject, message, fromAddress, toAddress);
+                  } else {
+                    console.error("Notification returned undefined!");
+                  }
+                } else {
+                  console.error(
+                    "MergeTableForNotification returned undefined!"
+                  );
+                }
+
+                successFlag = true; // Set the flag to true
+              }
+              setVisibleData([]);
+              setData(null);
+            }
+          } catch (err) {}
+        }
+      };
+
+      updateTimeSheetFunction(updatedRejectedItems);
     }
   };
 
+  const toggleForRemarkFunc = () => {
+    setToggleForRemark(!toggleForRemark);
+  };
+
+  const storeOnlySelectedItem = (data, action) => {
+    console.log(action);
+    if (action === "Approved") {
+      console.log(data);
+      setAllApprovedData((prevApprovedData) => {
+        // Replace old data if ID matches, otherwise keep existing data
+        const updatedData = prevApprovedData.filter(
+          (item) => item.id !== data.id
+        );
+        const updateStatus = { ...data, status: "Approved" };
+
+        return [...updatedData, updateStatus]; // Add the new data
+      });
+    } else if (action === "Rejected") {
+      setPassSelectedData(data);
+      console.log(data);
+      setAllRejectedData((prevRejectedData) => {
+        // Replace old data if ID matches, otherwise keep existing data
+        const updatedData = prevRejectedData.filter(
+          (item) => item.id !== data.id
+        );
+        return [...updatedData, data]; // Add the new data
+      });
+      // Update the selected data
+    }
+  };
+  const addRemarks = (data) => {
+    console.log(data);
+    const dataAlongWithRemark = allRejectedData.map((m) => {
+      if (m.id === data.id) {
+        console.log(data);
+        return { ...data, REMARKS: data.REMARKS };
+      } else {
+        return m;
+      }
+    });
+
+    setAllRejectedData(dataAlongWithRemark);
+  };
+  // console.log(allApprovedData, " : ", allRejectedData);
+  const removeExistingData = (data, action) => {
+    if (action === "Approved") {
+      const afterRemoved = allApprovedData.filter((fil) => fil.id !== data.id);
+      setAllApprovedData(afterRemoved);
+    } else if (action === "Rejected") {
+      const afterRemoved = allRejectedData.filter((fil) => fil.id !== data.id);
+      setAllRejectedData(afterRemoved);
+    }
+  };
+
+  const removeCheckedItem = useCallback(() => {
+    // Combine approved and rejected data
+    const mergedData = [...allApprovedData, ...allRejectedData];
+
+    // Filter out items that have matching sapNo in mergedData
+    const afterRemoved = data?.filter(
+      (val) => !mergedData.some((fil) => val.id === fil.id)
+    );
+
+    // Update the state with the filtered data
+    setData(afterRemoved);
+    setAllApprovedData([]);
+    setAllRejectedData([]);
+  }, [allApprovedData, allRejectedData, data]);
+
+  console.log(allApprovedData, " : ", allRejectedData);
+
+  const convertToISODate = (dateString) => {
+    try {
+      const [year, month, day] = dateString.split("/");
+
+      return `${month}/${year}/${day}`; // 'M/D/YYYY'
+    } catch {}
+  };
   return (
     <div>
       {currentStatus ? (
@@ -702,7 +922,7 @@ export const ViewTSTBeforeSave = ({
 
           <div className="table-container " onScroll={handleScroll}>
             {/* w-[1190px] */}
-            <table className="styled-table w-full">
+            <table className="styled-table w-[100%]">
               {/*  */}
               <thead className="sticky-header border">
                 <tr className="text_size_5 ">
@@ -719,10 +939,36 @@ export const ViewTSTBeforeSave = ({
                     </tr>
                   )}
 
-                  {showStatusCol === true ? (
-                    ""
-                  ) : (
-                    <td className="px-5 flex-1 text_size_7">STATUS</td>
+                  {!showStatusCol && (
+                    <>
+                      <td
+                        className={`${
+                          showRejectedItemTable === "Rejected"
+                            ? "hidden"
+                            : "px-5 flex-1 text_size_7"
+                        }`}
+                      >
+                        STATUS
+                      </td>
+                      <td
+                        className={`${
+                          showRejectedItemTable === "Rejected"
+                            ? "hidden"
+                            : "px-5 flex-1 text_size_7"
+                        }`}
+                      >
+                        APPROVE
+                      </td>
+                      <td
+                        className={`${
+                          showRejectedItemTable === "Rejected"
+                            ? "hidden"
+                            : "px-5 flex-1 text_size_7"
+                        }`}
+                      >
+                        REJECT
+                      </td>
+                    </>
                   )}
                 </tr>
               </thead>
@@ -744,13 +990,15 @@ export const ViewTSTBeforeSave = ({
                             <td className="text-center px-4 flex-1">
                               {index + 1}
                             </td>
-                            <td className="text-start px-4 flex-1">{m?.NAME}</td>
+                            <td className="text-start px-4 flex-1">
+                              {m?.NAME}
+                            </td>
                             <td className="text-center px-4 flex-1">{m?.NO}</td>
                             <td className="text-start px-4 flex-1">
                               {m?.LOCATION}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {m?.DATE}
+                              {convertToISODate(m?.DATE)}
                             </td>
                             <td className="text-center px-4 flex-1">
                               {m?.TOTALHOURS || 0}
@@ -775,15 +1023,67 @@ export const ViewTSTBeforeSave = ({
                             </td>
 
                             {isStatusPending && (
-                              <td
-                                className={`text-center px-4 flex-1 ${
-                                  m?.status === "Approved"
-                                    ? "text-[#0CB100]"
-                                    : "text_size_8"
-                                }`}
-                              >
-                                {m?.status}
-                              </td>
+                              <React.Fragment>
+                                <td
+                                  className={`text-center px-4 flex-1 ${
+                                    m?.status === "Approved"
+                                      ? "text-[#0CB100]"
+                                      : "text_size_8"
+                                  }`}
+                                >
+                                  {m?.status}
+                                </td>
+                                <td>
+                                  <input
+                                    className="h-4 w-4"
+                                    type="checkbox"
+                                    checked={checkedItems[m.id] || false}
+                                    onClick={(e) => e.stopPropagation()}
+                                    onChange={(e) => {
+                                      console.log(m);
+
+                                      if (e.target.checked) {
+                                        setCheckedItems((prev) => ({
+                                          ...prev,
+                                          [m.id]: e.target.checked, // Toggle the checked state for this specific ID
+                                        }));
+                                        storeOnlySelectedItem(m, "Approved");
+                                      } else {
+                                        removeExistingData(m, "Approved");
+                                        setCheckedItems((prev) => ({
+                                          ...prev,
+                                          [m.id]: false, // Toggle the checked state for this specific ID
+                                        }));
+                                      }
+                                    }}
+                                  />
+                                </td>
+                                <td>
+                                  <input
+                                    className="h-4 w-4"
+                                    type="checkbox"
+                                    checked={checkedItemsTwo[m.id] || false}
+                                    onClick={(e) => e.stopPropagation()}
+                                    onChange={(e) => {
+                                      if (e.target.checked) {
+                                        setCheckedItemsTwo((prev) => ({
+                                          ...prev,
+                                          [m.id]: e.target.checked, // Toggle the checked state for this specific ID
+                                        }));
+                                        storeOnlySelectedItem(m, "Rejected");
+                                        toggleForRemarkFunc();
+                                      } else {
+                                        removeExistingData(m, "Rejected");
+                                        // setCheckedItemsTwo({});
+                                        setCheckedItemsTwo((prev) => ({
+                                          ...prev,
+                                          [m.id]: false, // Toggle the checked state for this specific ID
+                                        }));
+                                      }
+                                    }}
+                                  />
+                                </td>
+                              </React.Fragment>
                             )}
                           </tr>
                         );
@@ -800,9 +1100,7 @@ export const ViewTSTBeforeSave = ({
                           colSpan="100%"
                           className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white"
                         >
-                          <p className="px-6 py-6">
-                            Please wait few seconds.
-                          </p>
+                          <p className="px-6 py-6">Please wait few seconds.</p>
                         </td>
                       </tr>
                     ) ?? (
@@ -811,9 +1109,7 @@ export const ViewTSTBeforeSave = ({
                           colSpan="100%"
                           className="px-6 py-6 text-center text-dark_ash text_size_5 bg-white"
                         >
-                          <p className="px-6 py-6">
-                           Please wait few seconds.
-                          </p>
+                          <p className="px-6 py-6">Please wait few seconds.</p>
                         </td>
                       </tr>
                     )}
@@ -821,67 +1117,114 @@ export const ViewTSTBeforeSave = ({
             </table>
           </div>
           <div
-            className={`flex justify-center my-5 ${
+            className={`flex justify-center my-5 gap-5 py-3${
               visibleData && visibleData.length > 0 ? "" : "hidden"
             }`}
           >
             <button
               className={`rounded px-3 py-2 ${
-                userIdentification === "Manager" ? "w-40" : "w-52"
+                userIdentification === "Manager" ? "w-52" : "w-52"
               } bg-[#FEF116] text_size_5 text-dark_grey mb-10`}
               onClick={() => {
                 if (userIdentification !== "Manager") {
                   toggleFunctionForAssiMana();
-                  // const fetchData = async () => {
-                  //   console.log("I am calling You");
-                  //   // Fetch the BLNG data using GraphQL
-                  //   const [fetchBLNGdata] = await Promise.all([
-                  //     client.graphql({
-                  //       query: listTimeSheets,
-                  //     }),
-                  //   ]);
-                  //   const BLNGdata =
-                  //     fetchBLNGdata?.data?.listTimeSheets?.items;
-                  //   console.log("BLNGdata : ", BLNGdata);
-                  //   const deleteFunction =
-                  //     BLNGdata &&
-                  //     BLNGdata.map(async (m) => {
-                  //       const dailySheet = {
-                  //         id: m.id,
-                  //       };
-                  //       await client
-                  //         .graphql({
-                  //           query: deleteTimeSheet,
-                  //           variables: {
-                  //             input: dailySheet,
-                  //           },
-                  //         })
-                  //         .then((res) => {
-                  //           console.log(res);
-                  //         })
-                  //         .catch((err) => {
-                  //           console.log(err);
+                  //  const fetchDataAndDelete = async () => {
+                  //     try {
+                  //       console.log("Fetching and Deleting SBW Data...");
+                  //       // setIsDeleting(true); // Set loading state
+                  //       let nextToken = null; // Initialize nextToken for pagination
+
+                  //       do {
+                  //         // Define the filter for fetching SBW data
+                  //         const filter = {
+                  //           and: [{ fileType: { eq: "Offshore" } }],
+                  //         };
+
+                  //         // Fetch the BLNG data using GraphQL with pagination
+                  //         const response = await client.graphql({
+                  //           query: listTimeSheets,
+                  //           variables: { filter: filter, nextToken: nextToken }, // Pass nextToken for pagination
                   //         });
-                  //     });
-                  // };
-                  // fetchData();
+
+                  //         // Extract data and nextToken
+                  //         const SBWdata =
+                  //           response?.data?.listTimeSheets?.items || [];
+                  //         nextToken = response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
+
+                  //         console.log("Fetched SBW Data:", SBWdata);
+
+                  //         // Delete each item in the current batch
+                  //         await Promise.all(
+                  //           SBWdata.map(async (item) => {
+                  //             try {
+                  //               const deleteResponse = await client.graphql({
+                  //                 query: deleteTimeSheet,
+                  //                 variables: { input: { id: item.id } },
+                  //               });
+                  //               console.log(
+                  //                 "Deleted Item Response:",
+                  //                 deleteResponse
+                  //               );
+                  //             } catch (deleteError) {
+                  //               console.error(
+                  //                 `Error deleting item with ID ${item.id}:`,
+                  //                 deleteError
+                  //               );
+                  //             }
+                  //           })
+                  //         );
+
+                  //         console.log("Batch deletion completed.");
+                  //       } while (nextToken); // Continue fetching until no more data
+
+                  //       console.log(
+                  //         "All SBW items deletion process completed."
+                  //       );
+                  //     } catch (fetchError) {
+                  //       console.error(
+                  //         "Error in fetchDataAndDelete:",
+                  //         fetchError
+                  //       );
+                  //     } finally {
+                  //       // setIsDeleting(false); // Reset loading state
+                  //     }
+                  //   };
+                  //   fetchDataAndDelete();
                 } else if (userIdentification === "Manager") {
                   renameKeysFunctionAndSubmit();
+                  removeCheckedItem();
+
+                  // setCheckedItems({});
                 }
               }}
             >
-              {userIdentification === "Manager" ? "Approve" : "Assign Manager"}
+              {userIdentification === "Manager"
+                ? "Finalize and Submit"
+                : "Assign Manager"}
             </button>
+            {/* <button
+              className={`rounded px-3 py-2 ${
+                userIdentification === "Manager" ? "w-60" : "w-52"
+              } bg-[#FEF116] text_size_5 text-dark_grey mb-10`}
+            >
+              Finalize and Submit
+            </button> */}
+            {/* <button
+              className={`rounded px-3 py-2 ${
+                userIdentification === "Manager" ? "w-60" : "w-52"
+              } bg-[#FEF116] text_size_5 text-dark_grey mb-10`}
+            >
+              Reject Selected row
+            </button> */}
           </div>
         </div>
-      ) 
-      // : currentStatus === false ? (
-      //   <PopupForMissMatchExcelSheet setClosePopup={setClosePopup} />
-      // ) 
-      : (
+      ) : (
+        // : currentStatus === false ? (
+        //   <PopupForMissMatchExcelSheet setClosePopup={setClosePopup} />
+        // )
         ""
       )}
-      {currentStatus === false && closePopup === true &&(
+      {currentStatus === false && closePopup === true && (
         <PopupForMissMatchExcelSheet setClosePopup={setClosePopup} />
       )}
       {toggleHandler === true && (
@@ -896,18 +1239,40 @@ export const ViewTSTBeforeSave = ({
           Position={Position}
         />
       )}
-      <SuccessMessage
-        successMess={successMess}
-        toggleSFAMessage={toggleSFAMessage}
-        setExcelData={setExcelData}
-        userIdentification={userIdentification}
-        // triggerNotification={triggerNotification}
-      />
+      {storingMess === true ? (
+        <PopupForSFApproves
+          toggleSFAMessage={toggleSFAMessage}
+          icons={<IoCheckmarkCircleSharp />}
+          iconColor="text-[#2BEE48]"
+          textColor="text-[#05b01f]"
+          title={"Processing..."}
+          message={`Data is being saved, `}
+          messageTwo={"this might take a few seconds..."}
+          // btnText={"OK"}
+        />
+      ) : storingMess === false ? (
+        <SuccessMessage
+          successMess={successMess}
+          toggleSFAMessage={toggleSFAMessage}
+          setExcelData={setExcelData}
+          userIdentification={userIdentification}
+        />
+      ) : (
+        ""
+      )}
 
       {toggleAssignManager === true && (
         <PopupForAssignManager
           toggleFunctionForAssiMana={toggleFunctionForAssiMana}
           renameKeysFunctionAndSubmit={renameKeysFunctionAndSubmit}
+        />
+      )}
+
+      {toggleForRemark === true && (
+        <PopupForAddRemark
+          toggleForRemarkFunc={toggleForRemarkFunc}
+          addRemarks={addRemarks}
+          passSelectedData={passSelectedData}
         />
       )}
     </div>

@@ -208,13 +208,18 @@ export const WorkInfo = () => {
         .join(" ");
 
     if (Array.isArray(value) && value.length > 0) {
-      return value[value.length - 1]?.trim().toUpperCase();
+      return formatToTitleCase(value[value.length - 1]?.trim());
     }
-    return typeof value === "string" ? value.trim().toUpperCase() : null;
+
+    if (typeof value === "string") {
+      return formatToTitleCase(value.trim());
+    }
+
+    return null;
   };
 
   const searchResult = (result) => {
-    console.log(result);
+    // console.log(result);
 
     const keysToSet = [
       "empID",
@@ -251,13 +256,29 @@ export const WorkInfo = () => {
       "remainingSickLeave",
     ];
     keysToSet.forEach((key) => {
-      // Check if result[key] exists, otherwise use an empty string
-      const value =
+      let rawValue =
         result[key] !== undefined && result[key] !== null
-          ? result[key].toString().trim().toUpperCase()
+          ? result[key].toString().trim()
           : "";
 
-      // Set the normalized value
+      const toTitleCase = (input) =>
+        input
+          .toLowerCase()
+          .split(" ")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
+
+      let value = toTitleCase(rawValue);
+
+      if (
+        key === "termiNotProb" ||
+        key === "termiNotConf" ||
+        key === "resignNotProb" ||
+        key === "resignNotConf"
+      ) {
+        value = value.toUpperCase();
+      }
+
       setValue(key, value);
     });
 
@@ -303,6 +324,7 @@ export const WorkInfo = () => {
       "positionRevDate",
     ];
 
+    // Set values for date fields and handle salaryType condition
     arrayDateField.forEach((field) => {
       const valueToSet = result[field];
 
@@ -368,7 +390,7 @@ export const WorkInfo = () => {
   const onSubmit = async (data) => {
     try {
       // console.log("Received data:", data);  // Log the received data from the form
-  
+
       // Find existing records
       const checkingPITable =
         empPIData?.find((match) => match.empID === data.empID) || null;
@@ -381,7 +403,6 @@ export const WorkInfo = () => {
       const SRDataRecord =
         SRData?.find((match) => match.empID === data.empID) || null;
 
-  
       // Check each record and handle accordingly
       if (SRDataRecord) {
         // If SRDataRecord exists, update SR data
@@ -393,7 +414,6 @@ export const WorkInfo = () => {
           uploadLP: JSON.stringify(nameServiceUp.uploadLP),
           uploadAL: JSON.stringify(nameServiceUp.uploadAL),
           uploadDep: JSON.stringify(nameServiceUp.uploadDep),
-        
         };
         // console.log("SR Data Update Value:", workInfoUpValue);
         await WIUpdateData({ workInfoUpValue });
@@ -407,19 +427,17 @@ export const WorkInfo = () => {
           uploadLP: JSON.stringify(nameServiceUp.uploadLP),
           uploadAL: JSON.stringify(nameServiceUp.uploadAL),
           uploadDep: JSON.stringify(nameServiceUp.uploadDep),
-         
         };
         // console.log("Create SR Data Value:", workInfoValue);
         await SubmitWIData({ workInfoValue });
         // console.log("SR Create request sent");
       }
-  
+
       if (leaveDetailsDataRecord) {
         // If leaveDetailsDataRecord exists, update leave details data
         const workInfoUpValue = {
           ...data,
           leaveDetailsDataRecord: leaveDetailsDataRecord,
-         
         };
         // console.log("Leave Details Update Value:", workInfoUpValue);
         await WIUpdateData({ workInfoUpValue });
@@ -429,17 +447,16 @@ export const WorkInfo = () => {
         const workInfoValue = {
           ...data,
           empID: data.empID,
-         
         };
         // console.log("Create Leave Details Value:", workInfoValue);
         await SubmitWIData({ workInfoValue });
         // console.log("Leave Details Create request sent");
       }
-  
+
       if (workInfoDataRecord) {
-        
         const workInfoUpValue = {
           ...data,
+          sapNo: checkingPITable?.sapNo,
           workInfoDataRecord: workInfoDataRecord,
           terminateDataRecord: terminateDataRecord,
           WIContract: JSON.stringify(nameServiceUp.WIContract),
@@ -452,8 +469,6 @@ export const WorkInfo = () => {
           uploadLP: JSON.stringify(nameServiceUp.uploadLP),
           uploadAL: JSON.stringify(nameServiceUp.uploadAL),
           uploadDep: JSON.stringify(nameServiceUp.uploadDep),
-          sapNo: checkingPITable?.sapNo,
-
         };
         // console.log("Work Info Update Value:", workInfoUpValue);
         await WIUpdateData({ workInfoUpValue });
@@ -478,7 +493,7 @@ export const WorkInfo = () => {
         await SubmitWIData({ workInfoValue });
         // console.log("Work Info Create request sent");
       }
-  
+
       if (terminateDataRecord) {
         // If terminateDataRecord exists, update terminate data
         const workInfoUpValue = {
@@ -510,17 +525,15 @@ export const WorkInfo = () => {
         await SubmitWIData({ workInfoValue });
         // console.log("Terminate Create request sent");
       }
-  
+
       // If you want to show a success notification or message
       setShowTitle("Employee Work Info Stored successfully");
       setNotification(true);
-  
     } catch (err) {
       console.log("Error during submission:", err);
     }
   };
-  
-  return (
+return (
     <section
       className="bg-[#F5F6F1CC] mx-auto p-10"
       onClick={() => {
@@ -583,18 +596,20 @@ export const WorkInfo = () => {
                   watch={watch(field.name)}
                   readOnly={field.readOnly || false}
                 >
-                  {(field.options || []).map((option, i) => (
-                    <option
-                      key={i}
-                      value={
-                        option.trim() === "Select"
-                          ? ""
-                          : option.trim().toUpperCase()
-                      }
-                    >
-                      {option.trim()}
-                    </option>
-                  ))}
+                  {(field.options || []).map((option, i) => {
+                    const formattedOption = option
+                      .trim()
+                      .toLowerCase()
+                      .replace(/^\w/, (c) => c.toUpperCase()); // Capitalize first letter
+                    return (
+                      <option
+                        key={i}
+                        value={option.trim() === "Select" ? "" : option.trim()}
+                      >
+                        {formattedOption}
+                      </option>
+                    );
+                  })}
                 </select>
               ) : (
                 <input

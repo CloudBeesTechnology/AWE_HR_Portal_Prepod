@@ -9,7 +9,7 @@ export const PopupForSFApproves = ({
   title,
   message,
   btnText,
- 
+  messageTwo,
 }) => {
   return (
     <div>
@@ -25,17 +25,22 @@ export const PopupForSFApproves = ({
               <div className=" flex flex-col items-center gap-5">
                 <p className={`text_size_2 ${textColor}`}>{title}</p>
                 <p className={` text-dark_grey  text_size_6 `}>{message}</p>
-
-                <button
-                  className=" p-2 rounded border-[#FEF116] bg-[#FEF116] text-dark_grey text_size_5 w-52"
-                  onClick={() => {
-                    toggleSFAMessage(null);
-                    setExcelData?.(null);
-                  
-                  }}
-                >
-                  {btnText}
-                </button>
+                {messageTwo && (
+                  <p className={` text-dark_grey  text_size_6 `}>
+                    {messageTwo}
+                  </p>
+                )}
+                {!messageTwo && (
+                  <button
+                    className=" p-2 rounded border-[#FEF116] bg-[#FEF116] text-dark_grey text_size_5 w-52"
+                    onClick={() => {
+                      toggleSFAMessage(null);
+                      setExcelData?.(null);
+                    }}
+                  >
+                    {btnText}
+                  </button>
+                )}
               </div>
             </div>
             {/*  */}

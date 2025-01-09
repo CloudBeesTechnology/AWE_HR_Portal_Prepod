@@ -4,19 +4,17 @@ import { Link } from "react-router-dom";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
 import { FilterForTimeSheet } from "./FilterForTimeSheet";
 import { useFetchData } from "./customTimeSheet/UseFetchData";
-import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
+
 import { FaArrowLeft } from "react-icons/fa";
 import { generateClient } from "@aws-amplify/api";
 import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
 import { ListTimeSheet } from "./ListTimeSheet";
 import { useTempID } from "../../utils/TempIDContext";
 
-const client = generateClient();
-
 export const ViewTimeSheet = () => {
   const prevCategoryRef = useRef(null);
 
-  const [categoryFilter, setCategoryFilter] = useState("Offshore");
+  // const [categoryFilter, setCategoryFilter] = useState("Select Excel Sheet");
   const [toggleClick, setToggleClick] = useState(false);
 
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -28,10 +26,6 @@ export const ViewTimeSheet = () => {
   const [message, setMessage] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
-  const { convertedStringToArrayObj } = useFetchData(
-    categoryFilter,
-    "viewTimeSheet"
-  );
   const {
     startDate,
     setStartDate,
@@ -43,37 +37,83 @@ export const ViewTimeSheet = () => {
     setShowListTimeSheet,
     timeSheetFileData,
     setTimeSheetFileData,
+    categoryFilter,
+    setCategoryFilter,
   } = useTempID();
+
+  const { convertedStringToArrayObj } = useFetchData(
+    categoryFilter,
+    "viewTimeSheet"
+  );
+
   const { handleScroll, visibleData, setVisibleData } = UseScrollableView(
     allExcelSheetData,
     "TimeKeeper"
   );
 
+  console.log(allExcelSheetData);
+  console.log(visibleData);
+  // useEffect(() => {
+  //   function groupByUpdatedAt(data) {
+  //     const groupedData = {};
+
+  //     data.forEach((item) => {
+  //       const updatedAtDate = item.updatedAt.split("T")[0];
+  //       const status = item.status.includes("Pending");
+
+  //       if (!groupedData[updatedAtDate]) {
+  //         groupedData[updatedAtDate] = {
+  //           fileName: item.fileName,
+  //           fileType: item.fileType,
+  //           date: updatedAtDate,
+  //           status: status === true ? "Pending" : "Approved",
+  //           updatedAt: [],
+  //         };
+  //       }
+
+  //       groupedData[updatedAtDate].updatedAt.push(item);
+  //     });
+
+  //     return Object.values(groupedData);
+  //   }
+
+  //   const groupedData = groupByUpdatedAt(convertedStringToArrayObj);
+  //   console.log(groupedData);
+  //   setAllExcelSheetData(groupedData);
+  //   setSecondaryData(groupedData);
+  // }, [convertedStringToArrayObj]);
+
   useEffect(() => {
-    function groupByUpdatedAt(data) {
+    function groupByUpdatedAtAndStatus(data) {
       const groupedData = {};
 
       data.forEach((item) => {
-        const updatedAtDate = item.updatedAt.split("T")[0];
-        const status = item.status.includes("Pending");
+        const updatedAtDate = item.updatedAt.split("T")[0]; // Extract date
+        const status = item.status; // Get status
 
-        if (!groupedData[updatedAtDate]) {
-          groupedData[updatedAtDate] = {
+        // Create a key combining date and status
+        const key = `${updatedAtDate}_${status}`;
+
+        // Initialize if the key doesn't exist
+        if (!groupedData[key]) {
+          groupedData[key] = {
             fileName: item.fileName,
             fileType: item.fileType,
             date: updatedAtDate,
-            status: status === true ? "Pending" : "Approved",
+            status: status, // Keep the actual status
             updatedAt: [],
           };
         }
 
-        groupedData[updatedAtDate].updatedAt.push(item);
+        // Push the item into the grouped array
+        groupedData[key].updatedAt.push(item);
       });
 
-      return Object.values(groupedData);
+      return Object.values(groupedData); // Return grouped data as an array
     }
 
-    const groupedData = groupByUpdatedAt(convertedStringToArrayObj);
+    const groupedData = groupByUpdatedAtAndStatus(convertedStringToArrayObj);
+    console.log(groupedData);
     setAllExcelSheetData(groupedData);
     setSecondaryData(groupedData);
   }, [convertedStringToArrayObj]);
@@ -135,10 +175,9 @@ export const ViewTimeSheet = () => {
 
   const newSearchFunction = useCallback((allData) => {
     setData(allData?.updatedAt);
-    console.log(allData)
+    console.log(allData);
   }, []);
 
-  console.log(showListTimeSheet);
   return (
     <div
       className={`bg-[#fafaf6] ${
@@ -154,7 +193,7 @@ export const ViewTimeSheet = () => {
       }}
     >
       <div
-        className={`${showListTimeSheet ? "w-[1300px]" : " screen-size"} m-9`}
+        className={`${showListTimeSheet ? "w-[1300px]" : "screen-size"} m-9`}
       >
         <div className="flex items-center w-full">
           <Link
@@ -164,7 +203,7 @@ export const ViewTimeSheet = () => {
               setStartDate("");
               setEndDate("");
               setShowListTimeSheet(true);
-              setTimeSheetFileData(null)
+              setTimeSheetFileData(null);
             }}
           >
             <FaArrowLeft />
@@ -210,7 +249,7 @@ export const ViewTimeSheet = () => {
               <input
                 value={categoryFilter}
                 placeholder="Select type"
-                className="border border-[#D9D9D9] cursor-pointer rounded outline-none p-2 text-[#000000] text-sm"
+                className="border border-[#D9D9D9] cursor-pointer rounded outline-none p-2 text-[#000000] text_size_8"
                 onClick={() => {
                   setToggleClick(!toggleClick);
                 }}
@@ -294,7 +333,7 @@ export const ViewTimeSheet = () => {
         {showListTimeSheet && (
           <ListTimeSheet
             visibleData={visibleData}
-            setVisibleData={ setVisibleData}
+            setVisibleData={setVisibleData}
             newSearchFunction={newSearchFunction}
             message={message}
           />

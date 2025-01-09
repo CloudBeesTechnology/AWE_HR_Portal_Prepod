@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
+import { IoCheckmarkCircleSharp } from "react-icons/io5";
 // import {
 //   createSBWSheet,
 //   deleteSBWSheet,
@@ -27,6 +28,9 @@ import { MergeTableForNotification } from "./customTimeSheet/MergeTableForNotifi
 import { Notification } from "./customTimeSheet/Notification";
 import { sendEmail } from "../../services/EmailServices";
 import { listEmpWorkInfos, listTimeSheets } from "../../graphql/queries";
+import { PopupForAddRemark } from "./ModelForSuccessMess/PopupForAddRemark";
+import { FindSpecificTimeKeeper } from "./customTimeSheet/FindSpecificTimeKeeper";
+import { PopupForSFApproves } from "./ModelForSuccessMess/PopupForSFApproves";
 const client = generateClient();
 export const ViewSBWsheet = ({
   excelData,
@@ -36,6 +40,7 @@ export const ViewSBWsheet = ({
   convertedStringToArrayObj,
   Position,
   fileName,
+  showRejectedItemTable,
 }) => {
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
 
@@ -46,6 +51,8 @@ export const ViewSBWsheet = ({
   const [editObject, setEditObject] = useState();
   const [toggleAssignManager, setToggleAssignManager] = useState(false);
   const [toggleHandler, setToggleHandler] = useState(false);
+  const [checkedItems, setCheckedItems] = useState({});
+  const [checkedItemsTwo, setCheckedItemsTwo] = useState({});
 
   const [loading, setLoading] = useState(true);
   const [userIdentification, setUserIdentification] = useState("");
@@ -53,11 +60,16 @@ export const ViewSBWsheet = ({
   const [showStatusCol, setShowStatusCol] = useState(null);
   const [successMess, setSuccessMess] = useState(null);
 
+  const [toggleForRemark, setToggleForRemark] = useState(null);
+  const [allApprovedData, setAllApprovedData] = useState([]);
+  const [allRejectedData, setAllRejectedData] = useState([]);
+  const [passSelectedData, setPassSelectedData] = useState(null);
+
   const { handleScroll, visibleData, setVisibleData } = UseScrollableView(
     data,
     "TimeSheet"
   );
-  console.log(visibleData);
+  const [storingMess, setStoringMess] = useState(null);
   const processedData = useTableMerged(excelData);
 
   useEffect(() => {
@@ -126,7 +138,7 @@ export const ViewSBWsheet = ({
     const getPosition = localStorage.getItem("userType");
     if (getPosition === "Manager") {
       setUserIdentification("Manager");
-    } else if (getPosition === "TimeKeeper") {
+    } else if (getPosition !== "Manager") {
       setUserIdentification("TimeKeeper");
     }
   }, [convertedStringToArrayObj]);
@@ -226,7 +238,7 @@ export const ViewSBWsheet = ({
 
     if (returnedTHeader && returnedTHeader.length > 0) {
       checkKeys();
-    } else if (!returnedTHeader) {
+    } else if (!returnedTHeader && showRejectedItemTable !== "Rejected") {
       const fetchData = async () => {
         setCurrentStatus(true);
         // setLoading(true);
@@ -276,11 +288,45 @@ export const ViewSBWsheet = ({
 
       // Call the fetchData function asynchronously
       fetchData();
+    } else if (!returnedTHeader && showRejectedItemTable === "Rejected") {
+      const fetchData = async () => {
+        setCurrentStatus(true);
+        // setLoading(true);
+        try {
+          const dataPromise = new Promise((resolve, reject) => {
+            if (convertedStringToArrayObj) {
+              resolve(convertedStringToArrayObj);
+            } else {
+              setTimeout(() => {
+                reject("No data found after waiting.");
+              }, 5000);
+            }
+          });
+
+          const fetchedData = await dataPromise;
+
+          if (userIdentification !== "Manager") {
+            const finalData = await FindSpecificTimeKeeper(fetchedData);
+            pendingData(finalData);
+          }
+        } catch (err) {
+        } finally {
+          // setLoading(false);
+        }
+      };
+
+      // Call the fetchData function asynchronously
+      fetchData();
     } else {
       setCurrentStatus(false);
       setLoading(false);
     }
-  }, [returnedTHeader, convertedStringToArrayObj]);
+  }, [
+    returnedTHeader,
+    convertedStringToArrayObj,
+    userIdentification,
+    showRejectedItemTable,
+  ]);
   const editBLNG = (data) => {
     setEditObject(data);
   };
@@ -323,26 +369,34 @@ export const ViewSBWsheet = ({
   };
 
   const editSBWFunction = (getObject) => {
-    const result = Array.isArray(data[0]?.data)
-      ? editNestedData(data, getObject)
-      : editFlatData(data, getObject);
+    try {
+      const result = Array.isArray(data[0]?.data)
+        ? editNestedData(data, getObject)
+        : editFlatData(data, getObject);
 
-    const updatedData = result?.map((item) => {
-      // Check if jobLocaWhrs is a non-null, non-empty array and assign LOCATION if valid
-      if (Array.isArray(item.jobLocaWhrs) && item.jobLocaWhrs.length > 0) {
-        item.LOCATION = item.jobLocaWhrs[0].LOCATION;
-      } else {
-        item.LOCATION = null; // Default to null or any other fallback value
-      }
-      return item;
-    });
+      const updatedData = result?.map((item) => {
+        // Check if jobLocaWhrs is a non-null, non-empty array and assign LOCATION if valid
+        if (Array.isArray(item?.jobLocaWhrs) && item?.jobLocaWhrs?.length > 0) {
+          item.LOCATION = item?.jobLocaWhrs[0]?.LOCATION;
+        } else {
+          item.LOCATION = null; // Default to null or any other fallback value
+        }
+        return item;
+      });
 
-    setData(updatedData);
+      setData(updatedData);
+      console.log(updatedData);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const AllFieldData = useTableFieldData(titleName);
   const renameKeysFunctionAndSubmit = async (managerData) => {
-    if (userIdentification !== "Manager") {
+    if (
+      userIdentification !== "Manager" &&
+      showRejectedItemTable !== "Rejected"
+    ) {
       const processedData = await Promise.all(
         data.map(async (val) => {
           return {
@@ -382,6 +436,7 @@ export const ViewSBWsheet = ({
       });
       console.log(finalResult);
       const sendTimeSheets = async (timeSheetData) => {
+        let successCount = 0;
         let successFlag = false;
 
         for (const timeSheet of timeSheetData) {
@@ -397,9 +452,17 @@ export const ViewSBWsheet = ({
                 response.data.createTimeSheet
               );
               const responseData = response.data.createTimeSheet;
+              successCount++;
+
+              if (successCount === data.length) {
+                setStoringMess(false);
+                setVisibleData([]);
+                setData(null);
+              }
 
               if (!successFlag) {
                 toggleSFAMessage(true, responseData); // Only toggle success message once
+                setStoringMess(true);
 
                 const result = await MergeTableForNotification(responseData);
                 console.log(result);
@@ -425,7 +488,8 @@ export const ViewSBWsheet = ({
                     "MergeTableForNotification returned undefined!"
                   );
                 }
-
+                setVisibleData([]);
+                setData(null);
                 successFlag = true; // Set the flag to true
               }
             }
@@ -438,31 +502,39 @@ export const ViewSBWsheet = ({
 
       sendTimeSheets(finalResult);
     } else if (userIdentification === "Manager") {
-      const MultipleBLNGfile =
-        data &&
-        data.map((val) => {
-          return {
-            id: val.id,
-            // fileName: val.fileName,
-            empName: val.NAME || "",
-            empDept: val.DEPTDIV || "",
-            empBadgeNo: val.BADGE || "",
-            date: val.DATE || "",
-            inTime: val.IN || "",
-            outTime: val.OUT || "",
-            totalInOut: val.TOTALINOUT || "",
-            allDayHrs: val.ALLDAYMINHRS || "",
-            netMins: val.NETMINUTES || "",
-            totalHrs: val.TOTALHOURS || "",
-            normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
-            actualWorkHrs: val.WORKINGHOURS || "",
-            otTime: val.OT || "",
-            remarks: val.REMARKS || "",
-            empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
-            fileType: "SBW",
-            status: "Approved",
-          };
-        });
+      const MergedData = [...allApprovedData, ...allRejectedData];
+
+      const uniqueArray = MergedData?.filter(
+        (item, index, self) =>
+          index === self.findIndex((obj) => obj.id === item.id)
+      );
+
+      const InitialBLNGUpdate =
+        uniqueArray && uniqueArray.length > 0
+          ? uniqueArray.map((val) => {
+              return {
+                id: val.id,
+                // fileName: val.fileName,
+                empName: val.NAME || "",
+                empDept: val.DEPTDIV || "",
+                empBadgeNo: val.BADGE || "",
+                date: val.DATE || "",
+                inTime: val.IN || "",
+                outTime: val.OUT || "",
+                totalInOut: val.TOTALINOUT || "",
+                allDayHrs: val.ALLDAYMINHRS || "",
+                netMins: val.NETMINUTES || "",
+                totalHrs: val.TOTALHOURS || "",
+                normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+                actualWorkHrs: val.WORKINGHOURS || "",
+                otTime: val.OT || "",
+                remarks: val.REMARKS || "",
+                empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+                fileType: "SBW",
+                status: val.status,
+              };
+            })
+          : [];
 
       const updateTimeSheetFunction = async (timeSheetData) => {
         let successFlag = false;
@@ -510,8 +582,6 @@ export const ViewSBWsheet = ({
 
                 successFlag = true; // Set the flag to true
               }
-              setVisibleData([]);
-              setData(null);
             }
           } catch (error) {
             console.error("Error creating TimeSheet:", error);
@@ -520,9 +590,164 @@ export const ViewSBWsheet = ({
         }
       };
 
-      updateTimeSheetFunction(MultipleBLNGfile);
+      updateTimeSheetFunction(InitialBLNGUpdate);
+    } else if (
+      userIdentification !== "Manager" &&
+      showRejectedItemTable === "Rejected"
+    ) {
+      const updatedRejectedItems =
+        data && data.length > 0
+          ? data.map((val) => {
+              return {
+                id: val.id,
+                // fileName: val.fileName,
+                empName: val.NAME || "",
+                empDept: val.DEPTDIV || "",
+                empBadgeNo: val.BADGE || "",
+                date: val.DATE || "",
+                inTime: val.IN || "",
+                outTime: val.OUT || "",
+                totalInOut: val.TOTALINOUT || "",
+                allDayHrs: val.ALLDAYMINHRS || "",
+                netMins: val.NETMINUTES || "",
+                totalHrs: val.TOTALHOURS || "",
+                normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+                actualWorkHrs: val.WORKINGHOURS || "",
+                otTime: val.OT || "",
+                remarks: val.REMARKS || "",
+                empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+                fileType: "SBW",
+                status: "Pending",
+              };
+            })
+          : [];
+
+      const updateTimeSheetFunction = async (timeSheetData) => {
+        let successFlag = false;
+        for (const timeSheet of timeSheetData) {
+          try {
+            const response = await client.graphql({
+              query: updateTimeSheet,
+              variables: {
+                input: timeSheet, // Send each object individually
+              },
+            });
+
+            if (response?.data?.updateTimeSheet) {
+              console.log(
+                "TimeSheet created successfully:",
+                response.data.updateTimeSheet
+              );
+              const responseData = response.data.updateTimeSheet;
+
+              if (!successFlag) {
+                toggleSFAMessage(true, responseData); // Only toggle success message once
+
+                const result = await MergeTableForNotification(responseData);
+
+                if (result) {
+                  // Call the Notification function
+                  const emailDetails = await Notification({
+                    getEmail: result, // Fix: Pass 'getEmail' instead of 'result'
+                    Position,
+                  });
+
+                  if (emailDetails) {
+                    // Log email details
+                    const { subject, message, fromAddress, toAddress } =
+                      emailDetails;
+
+                    await sendEmail(subject, message, fromAddress, toAddress);
+                  } else {
+                    console.error("Notification returned undefined!");
+                  }
+                } else {
+                  console.error(
+                    "MergeTableForNotification returned undefined!"
+                  );
+                }
+                setVisibleData([]);
+                setData(null);
+                successFlag = true; // Set the flag to true
+              }
+            }
+          } catch (err) {}
+        }
+      };
+
+      updateTimeSheetFunction(updatedRejectedItems);
     }
   };
+  const toggleForRemarkFunc = () => {
+    setToggleForRemark(!toggleForRemark);
+  };
+
+  const storeOnlySelectedItem = (data, action) => {
+    if (action === "Approved") {
+      setAllApprovedData((prevApprovedData) => {
+        // Replace old data if ID matches, otherwise keep existing data
+        const updatedData = prevApprovedData.filter(
+          (item) => item.id !== data.id
+        );
+        const updateStatus = { ...data, status: "Approved" };
+
+        return [...updatedData, updateStatus]; // Add the new data
+      });
+    } else if (action === "Rejected") {
+      setAllRejectedData((prevRejectedData) => {
+        // Replace old data if ID matches, otherwise keep existing data
+        const updatedData = prevRejectedData.filter(
+          (item) => item.id !== data.id
+        );
+        return [...updatedData, data]; // Add the new data
+      });
+      setPassSelectedData(data); // Update the selected data
+    }
+  };
+  const addRemarks = (data) => {
+    const dataAlongWithRemark = allRejectedData.map((m) => {
+      if (m.id === data.id) {
+        return { ...data, REMARKS: data.REMARKS };
+      } else {
+        return m;
+      }
+    });
+
+    setAllRejectedData(dataAlongWithRemark);
+  };
+  // console.log(allApprovedData, " : ", allRejectedData);
+  const removeExistingData = (data, action) => {
+    if (action === "Approved") {
+      const afterRemoved = allApprovedData.filter((fil) => fil.id !== data.id);
+      setAllApprovedData(afterRemoved);
+    } else if (action === "Rejected") {
+      const afterRemoved = allRejectedData.filter((fil) => fil.id !== data.id);
+      setAllRejectedData(afterRemoved);
+    }
+  };
+
+  const removeCheckedItem = useCallback(() => {
+    // Combine approved and rejected data
+    const mergedData = [...allApprovedData, ...allRejectedData];
+
+    // Filter out items that have matching sapNo in mergedData
+    const afterRemoved = data?.filter(
+      (val) => !mergedData.some((fil) => val.id === fil.id)
+    );
+
+    // Update the state with the filtered data
+    setData(afterRemoved);
+    setAllApprovedData([]);
+    setAllRejectedData([]);
+  }, [allApprovedData, allRejectedData, data]);
+  const convertToISODate = (dateString) => {
+    try {
+      const [year, month, day] = dateString.split("/");
+
+      return `${month}/${year}/${day}`; // 'M/D/YYYY'
+    } catch {}
+  };
+
   return (
     <div>
       <div>
@@ -538,9 +763,9 @@ export const ViewSBWsheet = ({
               />
             </div>
             <div className="table-container" onScroll={handleScroll}>
-              <table className="styled-table">
+              <table className="styled-table w-[100%]">
                 <thead className="sticky-header">
-                  <tr className="text_size_5">
+                  <tr className="text_size_5 h-16">
                     <td className="px-4 text-center text_size_7">S No.</td>
 
                     {AllFieldData?.tableHeader.map((header, index) => (
@@ -554,10 +779,36 @@ export const ViewSBWsheet = ({
                         </td>
                       </tr>
                     )}
-                    {showStatusCol === true ? (
-                      ""
-                    ) : (
-                      <td className="px-4 flex-1 text_size_7">STATUS</td>
+                    {!showStatusCol && (
+                      <>
+                        <td
+                          className={`${
+                            showRejectedItemTable === "Rejected"
+                              ? "hidden"
+                              : "px-5 flex-1 text_size_7"
+                          }`}
+                        >
+                          STATUS
+                        </td>
+                        <td
+                          className={`${
+                            showRejectedItemTable === "Rejected"
+                              ? "hidden"
+                              : "px-5 flex-1 text_size_7"
+                          }`}
+                        >
+                          APPROVE
+                        </td>
+                        <td
+                          className={`${
+                            showRejectedItemTable === "Rejected"
+                              ? "hidden"
+                              : "px-5 flex-1 text_size_7"
+                          }`}
+                        >
+                          REJECT
+                        </td>
+                      </>
                     )}
                   </tr>
                 </thead>
@@ -589,7 +840,7 @@ export const ViewSBWsheet = ({
                               </td>
                               {/* <td className="text-center px-4 flex-1">{m?.DEPT}</td> */}
                               <td className="text-center px-4 flex-1">
-                                {m?.DATE}
+                                {convertToISODate(m?.DATE)}
                               </td>
                               <td className="text-center px-4 flex-1">
                                 {m?.IN || 0}
@@ -622,15 +873,64 @@ export const ViewSBWsheet = ({
                                 {m?.REMARKS}
                               </td>
                               {isStatusPending && (
-                                <td
-                                  className={`text-center px-4 flex-1 ${
-                                    m?.status === "Approved"
-                                      ? "text-[#0CB100]"
-                                      : "text_size_8"
-                                  }`}
-                                >
-                                  {m?.status}
-                                </td>
+                                <React.Fragment>
+                                  <td
+                                    className={`text-center px-4 flex-1 ${
+                                      m?.status === "Approved"
+                                        ? "text-[#0CB100]"
+                                        : "text_size_8"
+                                    }`}
+                                  >
+                                    {m?.status}
+                                  </td>
+                                  <td>
+                                    <input
+                                      className="h-4 w-4"
+                                      type="checkbox"
+                                      checked={checkedItems[m.id] || false}
+                                      onClick={(e) => e.stopPropagation()}
+                                      onChange={(e) => {
+                                        if (e.target.checked) {
+                                          setCheckedItems((prev) => ({
+                                            ...prev,
+                                            [m.id]: e.target.checked, // Toggle the checked state for this specific ID
+                                          }));
+                                          storeOnlySelectedItem(m, "Approved");
+                                        } else {
+                                          removeExistingData(m, "Approved");
+                                          setCheckedItems((prev) => ({
+                                            ...prev,
+                                            [m.id]: false, // Toggle the checked state for this specific ID
+                                          }));
+                                        }
+                                      }}
+                                    />
+                                  </td>
+                                  <td>
+                                    <input
+                                      className="h-4 w-4"
+                                      type="checkbox"
+                                      checked={checkedItemsTwo[m.id] || false}
+                                      onClick={(e) => e.stopPropagation()}
+                                      onChange={(e) => {
+                                        if (e.target.checked) {
+                                          setCheckedItemsTwo((prev) => ({
+                                            ...prev,
+                                            [m.id]: e.target.checked, // Toggle the checked state for this specific ID
+                                          }));
+                                          storeOnlySelectedItem(m, "Rejected");
+                                          toggleForRemarkFunc();
+                                        } else {
+                                          removeExistingData(m, "Rejected");
+                                          setCheckedItemsTwo((prev) => ({
+                                            ...prev,
+                                            [m.id]: false, // Toggle the checked state for this specific ID
+                                          }));
+                                        }
+                                      }}
+                                    />
+                                  </td>
+                                </React.Fragment>
                               )}
                             </tr>
                           );
@@ -745,11 +1045,12 @@ export const ViewSBWsheet = ({
                     // fetchDataAndDelete();
                   } else if (userIdentification === "Manager") {
                     renameKeysFunctionAndSubmit();
+                    removeCheckedItem();
                   }
                 }}
               >
                 {userIdentification === "Manager"
-                  ? "Approve"
+                  ? "Finalize and Submit"
                   : "Assign Manager"}
               </button>
             </div>
@@ -772,16 +1073,39 @@ export const ViewSBWsheet = ({
           Position={Position}
         />
       )}
-      <SuccessMessage
-        successMess={successMess}
-        toggleSFAMessage={toggleSFAMessage}
-        setExcelData={setExcelData}
-        userIdentification={userIdentification}
-      />
+      {storingMess === true ? (
+        <PopupForSFApproves
+          toggleSFAMessage={toggleSFAMessage}
+          icons={<IoCheckmarkCircleSharp />}
+          iconColor="text-[#2BEE48]"
+          textColor="text-[#05b01f]"
+          title={"Processing..."}
+          message={`Data is being saved, `}
+          messageTwo={"this might take a few seconds..."}
+          // btnText={"OK"}
+        />
+      ) : storingMess === false ? (
+        <SuccessMessage
+          successMess={successMess}
+          toggleSFAMessage={toggleSFAMessage}
+          setExcelData={setExcelData}
+          userIdentification={userIdentification}
+        />
+      ) : (
+        ""
+      )}
       {toggleAssignManager === true && (
         <PopupForAssignManager
           toggleFunctionForAssiMana={toggleFunctionForAssiMana}
           renameKeysFunctionAndSubmit={renameKeysFunctionAndSubmit}
+        />
+      )}
+
+      {toggleForRemark === true && (
+        <PopupForAddRemark
+          toggleForRemarkFunc={toggleForRemarkFunc}
+          addRemarks={addRemarks}
+          passSelectedData={passSelectedData}
         />
       )}
     </div>

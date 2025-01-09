@@ -20,7 +20,7 @@ export const SuccessMessage = ({
           textColor="text-[#05b01f]"
           title={"Success!"}
           message={`Data has been successfully ${
-            userIdentification === "Manager" ? "Approved" : "Saved"
+            userIdentification === "Manager" ? "Approved" : "Stored"
           }`}
           btnText={"OK"}
         

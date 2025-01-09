@@ -49,6 +49,16 @@ export declare type ProbFormCreateFormInputValues = {
     gmApproved?: string;
     managerApproved?: string;
     supervisorApproved?: string;
+    communicationDetails?: string;
+    qualityDetails?: string;
+    paceDetails?: string;
+    initiativeDetails?: string;
+    attitudeDetails?: string;
+    adaptabilityDetails?: string;
+    teamworkDetails?: string;
+    responsibilityDetails?: string;
+    diligentDetails?: string;
+    commitmentDetails?: string;
 };
 export declare type ProbFormCreateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -78,6 +88,16 @@ export declare type ProbFormCreateFormValidationValues = {
     gmApproved?: ValidationFunction<string>;
     managerApproved?: ValidationFunction<string>;
     supervisorApproved?: ValidationFunction<string>;
+    communicationDetails?: ValidationFunction<string>;
+    qualityDetails?: ValidationFunction<string>;
+    paceDetails?: ValidationFunction<string>;
+    initiativeDetails?: ValidationFunction<string>;
+    attitudeDetails?: ValidationFunction<string>;
+    adaptabilityDetails?: ValidationFunction<string>;
+    teamworkDetails?: ValidationFunction<string>;
+    responsibilityDetails?: ValidationFunction<string>;
+    diligentDetails?: ValidationFunction<string>;
+    commitmentDetails?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type ProbFormCreateFormOverridesProps = {
@@ -109,6 +129,16 @@ export declare type ProbFormCreateFormOverridesProps = {
     gmApproved?: PrimitiveOverrideProps<TextFieldProps>;
     managerApproved?: PrimitiveOverrideProps<TextFieldProps>;
     supervisorApproved?: PrimitiveOverrideProps<TextFieldProps>;
+    communicationDetails?: PrimitiveOverrideProps<TextFieldProps>;
+    qualityDetails?: PrimitiveOverrideProps<TextFieldProps>;
+    paceDetails?: PrimitiveOverrideProps<TextFieldProps>;
+    initiativeDetails?: PrimitiveOverrideProps<TextFieldProps>;
+    attitudeDetails?: PrimitiveOverrideProps<TextFieldProps>;
+    adaptabilityDetails?: PrimitiveOverrideProps<TextFieldProps>;
+    teamworkDetails?: PrimitiveOverrideProps<TextFieldProps>;
+    responsibilityDetails?: PrimitiveOverrideProps<TextFieldProps>;
+    diligentDetails?: PrimitiveOverrideProps<TextFieldProps>;
+    commitmentDetails?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type ProbFormCreateFormProps = React.PropsWithChildren<{
     overrides?: ProbFormCreateFormOverridesProps | undefined | null;

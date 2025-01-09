@@ -43,7 +43,7 @@ const Sidebar = () => {
         const filteredResults = result.filter((val) => {
           // console.log(val);
         
-          if (val.empID === userID && val.selectType === userType) {
+          if (val.empID.toString().toLowerCase() === userID.toString() && val.selectType === userType) {
             const empID = val.empID.toString().toLowerCase();
             const isEqual = empID === userID.toString().toLowerCase();
             return isEqual;

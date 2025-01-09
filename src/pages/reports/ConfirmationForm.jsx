@@ -2,7 +2,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { TiTick } from "react-icons/ti";
 
-export const ConfirmationForm = ({register}) => {
+export const ConfirmationForm = ({register,formData,onChange}) => {
   const [selectedValue, setSelectedValue] = React.useState("");
 
   const handleChange = (event) => {
@@ -20,6 +20,7 @@ export const ConfirmationForm = ({register}) => {
         </p>
         <textarea
           {...register("additionalInfo")}
+          value={formData.additionalInfo}
           className="w-full h-32 border p-2 rounded resize-none outline-none"
         />
       </div>
@@ -110,6 +111,8 @@ export const ConfirmationForm = ({register}) => {
             <input
               type="text"
               {...register("supervisorName")}
+              value={formData.supervisorName}
+
               className="border-b outline-none px-1"
             />
           </div>
@@ -135,10 +138,7 @@ export const ConfirmationForm = ({register}) => {
     <label htmlFor="reject" className="text-sm">Rejected</label>
   </div>
 </div>
-          {/* <div className="flex items-center space-x-2 border-b">
-            <label className="text-sm font-medium">Approved</label>
-            <input type="checkbox" {...register("supervisorApproved")} className="form-checkbox h-4 w-4" />
-          </div> */}
+        
 
           <div className="flex items-center space-x-2 border-b">
             <input type="date" {...register("supervisorDate")} className="outline-none" />
@@ -177,10 +177,7 @@ export const ConfirmationForm = ({register}) => {
     <label htmlFor="reject" className="text-sm">Rejected</label>
   </div>
 </div>
-          {/* <div className="flex items-center space-x-2 border-b">
-            <label className="text-sm font-medium">Approved</label>
-            <input type="checkbox" {...register("managerApproved")} className="form-checkbox h-4 w-4" />
-          </div> */}
+          
 
           <div className="flex items-center space-x-2 border-b">
             <input type="date" {...register("managerDate")} className="outline-none" />

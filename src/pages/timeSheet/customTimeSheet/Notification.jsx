@@ -77,6 +77,7 @@ export const Notification = async ({ getEmail, Position }) => {
       subject,
       message,
       fromAddress,
+      // toAddress:""
       toAddress,
     };
     // await sendEmail(subject, message, fromAddress, toAddress);

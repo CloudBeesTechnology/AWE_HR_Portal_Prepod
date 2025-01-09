@@ -6,6 +6,7 @@ import {
 } from "../../../graphql/queries";
 const client = generateClient();
 export const useTableMerged = (excelData) => {
+  const getPosition = localStorage.getItem("userType");
   const [data, setData] = useState(null);
   // useEffect(() => {
   //   if (excelData) {
@@ -79,6 +80,9 @@ export const useTableMerged = (excelData) => {
   // }, [excelData]);
 
   useEffect(() => {
+    if(getPosition !== "Manager"){
+
+    
     async function fetchAllData(queryName) {
       let allData = [];
       let nextToken = null;
@@ -156,11 +160,12 @@ export const useTableMerged = (excelData) => {
         };
         fetchWorkInfo();
       } catch (err) {
-        console.error("Error fetching data:", err.message);
+        // console.error("Error fetching data:", err.message);
       }
     }
 
     fetchEmployeeData();
+  }
   }, []);
   return data;
 };

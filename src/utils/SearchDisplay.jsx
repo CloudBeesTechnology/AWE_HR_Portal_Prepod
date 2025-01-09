@@ -29,11 +29,10 @@ export const SearchDisplay = ({
     } else if (toggleHandle === false) {
       setFilteredEmployees?.(newFormData);
     }
-    // console.log(filteredEmployees);
+    console.log(filteredEmployees);
   }, [toggleHandle, newFormData]);
 
   const filterDatabyClickSearchIcon = useCallback(() => {
-   
     if (filteredEmployees && filteredEmployees.length > 0) {
       const result = filteredEmployees.find((fi) => {
         if (fi.empID === searchQuery) {
@@ -42,9 +41,13 @@ export const SearchDisplay = ({
       });
       if (result) {
         searchResult(result);
-      }else{
+      } else {
+        alert("Employee Id is not found.");
         searchResult({});
       }
+    } else {
+      alert("Employee Id is not found.");
+      searchResult({});
     }
   }, [searchQuery, filteredEmployees]);
   const handleSearch = (e) => {
@@ -106,10 +109,10 @@ export const SearchDisplay = ({
               key={index}
               className="m-2 p-1 hover:bg-grey hover:text-white cursor-pointer flex justify-between items-center transition-all duration-200"
               onClick={() => {
-                // console.log(employee);
+                console.log(employee);
 
                 if (employee.empID || employee.name) {
-                  // console.log(`${employee.empID} - ${employee.name || ""}`);
+                  console.log(`${employee.empID} - ${employee.name || ""}`);
 
                   setSearchQuery(`${employee.empID} - ${employee.name || ""}`);
                   searchResult(employee);

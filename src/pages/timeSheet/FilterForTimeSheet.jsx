@@ -22,7 +22,7 @@ export const FilterForTimeSheet = ({ handleFilterChange, toggleDropdown, isOpen 
         {isOpen && (
           <div className="top-10 absolute w-fit shadow-xl bg-white z-50">
             <div className="p-1 shadow-md flex flex-col bg-white ">
-              {["All", "Pending", "Approved"].map((filter) => (
+              {["All", "Pending", "Approved","Rejected"].map((filter) => (
                 <button
                   key={filter}
                   onClick={() => onFilterSelect(filter)}

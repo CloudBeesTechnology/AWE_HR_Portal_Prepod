@@ -1,14 +1,18 @@
-
-
 import React, { useEffect, useState } from "react";
 import { FilterTable } from "./FilterTable";
 import { VscClose } from "react-icons/vsc";
 import logo from "../../assets/logo/logo-with-name.svg";
+import { useLocation } from "react-router-dom";
 
-export const RM = ({ allData}) => {
+export const RM = () => {
+  const location = useLocation();
+  const { allData,title } = location.state || {};  
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [tableBody, setTableBody] = useState([]);
-  const [tableHead, setTableHead] = useState([
+  const [filteredData, setFilteredData] = useState([]);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [tableHead] = useState([ 
     "Emp ID",
     "Employee Badge",
     "Employee Name",
@@ -47,7 +51,7 @@ export const RM = ({ allData}) => {
 
   const generateFullDetails = (data) => {
     if (!Array.isArray(data)) {
-      console.error("Expected an array but got", data);
+      // console.error("Expected an array but got", data);
       return [];
     }
 
@@ -82,13 +86,16 @@ export const RM = ({ allData}) => {
       contractEnd: Array.isArray(item.contractEnd)
         ? formatDate(item.contractEnd[item.contractEnd.length - 1])
         : "-",
-        PreviousEmployment: item.preEmp || "-",
+      PreviousEmployment: item.preEmp || "-",
     }));
   };
 
+  // Ensure that useEffect is always called and will only update when `allData` changes
   useEffect(() => {
-    setTableBody(generateFullDetails(allData));
-  }, [allData]);
+    if (allData) {
+      setTableBody(generateFullDetails(allData));
+    }
+  }, [allData]);  // Dependency on allData
 
   const handleViewDetails = (person) => {
     const fullDetails = allData.find((item) => item.empID === person.empID);
@@ -106,15 +113,72 @@ export const RM = ({ allData}) => {
       .replace(/^\w/, (c) => c.toUpperCase()); // Capitalize the first letter
   };
 
+  const handleDate = (e, type) => {
+    const value = e.target.value;
+    if (type === "startDate") setStartDate(value);
+    if (type === "endDate") setEndDate(value);
+  
+    const start = type === "startDate" ? new Date(value) : startDate ? new Date(startDate) : null;
+    const end = type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
+  
+    const filtered = allData
+      .filter((data) => {
+        const doj = data.doj ? new Date(data.doj) : null;
+  
+        if (!doj || isNaN(doj.getTime())) return false;
+  
+        if (start && end) return doj >= start && doj <= end;
+        if (start) return doj >= start;
+        if (end) return doj <= end;
+  
+        return true;
+      })
+      .map((item) => ({
+        empID: item.empID || "-",
+      empBadgeNo: item.empBadgeNo || "-",
+      name: item.name || "-",
+      gender: item.gender || "-",
+      dateOfBirth: formatDate(item.dob) || "-",
+      dateOfJoin: formatDate(item.doj) || "-",
+      nationality: item.nationality || "-",
+      position: item.position || "-",
+      contactNo: item.contactNo || "-",
+      contractType: item.contractType || "-",
+      cvReceived: item.cvReceived || "-",
+      BruneiIcNo: item.bwnIcNo || "-",
+      BruneiIcExpiry: Array.isArray(item.bwnIcExpiry)
+        ? formatDate(item.bwnIcExpiry[item.bwnIcExpiry.length - 1])
+        : "-",
+      MalaysianIcNo: item.myIcNo || "-",
+      PassportNo: item.ppNo || "-",
+      PassportExpiry: Array.isArray(item.ppExpiry)
+        ? formatDate(item.ppExpiry[item.ppExpiry.length - 1])
+        : "-",
+      employeePassExpiry: Array.isArray(item.empPassExp)
+        ? formatDate(item.empPassExp[item.empPassExp.length - 1])
+        : "-",
+      department: item.department || "-",
+      contractStart: Array.isArray(item.contractStart)
+        ? formatDate(item.contractStart[item.contractStart.length - 1])
+        : "-",
+      contractEnd: Array.isArray(item.contractEnd)
+        ? formatDate(item.contractEnd[item.contractEnd.length - 1])
+        : "-",
+      PreviousEmployment: item.preEmp || "-",
+      }));
+  
+    setFilteredData(filtered);
+  };
+
   return (
     <div>
       <FilterTable
-        tableBody={tableBody}
-        tableHead={tableHead}
+        tableBody={filteredData.length ? filteredData : tableBody}
+         tableHead={tableHead} title={title}
+        handleDate={handleDate}
         handleViewDetails={handleViewDetails}
       />
 
-      {/* Modal for showing person's details */}
       {selectedPerson && (
         <div className="fixed inset-0 center z-50 bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-1/2 max-h-[80vh] overflow-y-auto scrollBar">

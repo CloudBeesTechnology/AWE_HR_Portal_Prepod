@@ -12,6 +12,8 @@ export { default as BastingPaintCreateForm } from "./BastingPaintCreateForm";
 export { default as BastingPaintUpdateForm } from "./BastingPaintUpdateForm";
 export { default as CandIToEMPCreateForm } from "./CandIToEMPCreateForm";
 export { default as CandIToEMPUpdateForm } from "./CandIToEMPUpdateForm";
+export { default as ContractFormCreateForm } from "./ContractFormCreateForm";
+export { default as ContractFormUpdateForm } from "./ContractFormUpdateForm";
 export { default as DNDetailsCreateForm } from "./DNDetailsCreateForm";
 export { default as DNDetailsUpdateForm } from "./DNDetailsUpdateForm";
 export { default as EducationDetailsCreateForm } from "./EducationDetailsCreateForm";

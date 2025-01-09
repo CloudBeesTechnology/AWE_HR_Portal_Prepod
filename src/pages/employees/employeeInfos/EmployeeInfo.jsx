@@ -435,6 +435,8 @@ export const EmployeeInfo = () => {
       }
       if (key === "empBadgeNo") {
         valueToSet = valueToSet?.toUpperCase();
+      } else if (key === "email" || key === "officialEmail") {
+        valueToSet = valueToSet;
       }
       if (valueToSet !== undefined && valueToSet !== null) {
         // console.log(`Key: ${key}, Original: ${result[key]}, Transformed: ${valueToSet}`);

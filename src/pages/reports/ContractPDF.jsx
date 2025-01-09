@@ -3,9 +3,15 @@ import { FilterTable } from "./FilterTable";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import { ContractFormPDF } from "./ContractFormPDF";
+import { useLocation } from "react-router-dom";
 
-export const ContractPDF = ({ allData, typeOfReport, reportTitle }) => {
+export const ContractPDF = () => {
+  const location = useLocation();
+  const { allData,title } = location.state || {}; 
   const [tableBody, setTableBody] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [tableHead, setTableHead] = useState([
     "Emp ID",
     "Employee Badge No",
@@ -111,10 +117,6 @@ export const ContractPDF = ({ allData, typeOfReport, reportTitle }) => {
           position: item.position || "-",
           contractStartDate: formatDate(startDate) || "-",
           contractEndDate: formatDate(lastDate) || "-",
-          // nlmsEmpValid: Array.isArray(item.nlmsEmpValid)
-          //   ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
-          //   : "-",
-          // balanceMonths: balanceMonths,
         };
       });
   };
@@ -221,14 +223,59 @@ doc.line(25, lineYPosition, 100, lineYPosition);
   const closeModal = () => {
     setSelectedPerson(null); // Reset the selected person to hide the modal
   };
+  const handleDate = (e, type) => {
+    const value = e.target.value;
+  
+    if (type === "startDate") setStartDate(value);
+    if (type === "endDate") setEndDate(value);
+  
+    const start = type === "startDate" ? new Date(value) : startDate ? new Date(startDate) : null;
+    const end = type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
+  
+    const filtered = allData.filter((data) => {
+      const expiryArray = data?.contractEnd || [];
+      const expiryDate = expiryArray.length
+        ? new Date(expiryArray[expiryArray.length - 1])
+        : null;
+  
+      if (!expiryDate || isNaN(expiryDate.getTime())) return false;
+  
+      if (start && end) return expiryDate >= start && expiryDate <= end;
+      if (start) return expiryDate >= start;
+      if (end) return expiryDate <= end;
+  
+      return true;
+    }).map((item) => {
+      const contractEndDates = item.contractEnd || [];
+      const lastDate = contractEndDates[contractEndDates.length - 1];
+      const contractStartDates = item.contractStart || [];
+      const startDate = contractStartDates[contractStartDates.length - 1];
+
+  
+      return {
+        empID: item.empID || "-",
+        empBadgeNo: item.empBadgeNo || "-",
+        name: item.name || "-",
+        nationality: item.nationality || "-",
+        doj: formatDate(item.doj) || "-",
+        department: item.department || "-",
+        position: item.position || "-",
+        contractStartDate: formatDate(startDate) || "-",
+        contractEndDate: formatDate(lastDate) || "-",      
+      };
+    });
+  
+    setFilteredData(filtered);
+  };
+
   return (
     <div>
       <FilterTable
-        tableBody={tableBody}
-        tableHead={tableHead}
-        typeOfReport={typeOfReport}
-        reportTitle={reportTitle}
-      />
+            tableBody={filteredData.length ? filteredData : tableBody}
+            tableHead={tableHead}
+            title={title}
+            handleDate={handleDate}
+            />
       <div className="vertical-center p-5 pt-9 ">
         <button
           className=" bg-[#FEF116] text-dark_grey text_size_5 w-[126px] p-2 rounded"

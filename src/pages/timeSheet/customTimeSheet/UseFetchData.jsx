@@ -39,6 +39,11 @@ export const useFetchData = (titleName, cardName) => {
                     { status: { eq: "Approved" } },
                     { fileType: { eq: titleName } },
                   ]
+                : cardName === "timeKeeper"
+                ? [
+                    { status: { eq: "Rejected" } },
+                    { fileType: { eq: titleName } },
+                  ]
                 : [{ fileType: { eq: titleName } }],
           };
           // Fetch data in a paginated manner

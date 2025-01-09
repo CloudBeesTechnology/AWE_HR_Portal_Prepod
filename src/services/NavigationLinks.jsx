@@ -92,10 +92,26 @@ import { NonLocalAccMD } from "../components/migratingData/NonLocalAccMD";
 import { DNDetailsMD } from "../components/migratingData/DNDetailsMD";
 import { TerminatedMD } from "../components/migratingData/TerminatedMD";
 import { BJLDetailsMD } from "../components/migratingData/BJLDetailsMD";
-import { PassportValidMD } from "../components/migratingData/PassportValidMD";
-import { LabourMedicalInfoMD } from "../components/migratingData/LabourMedicalInfoMD";
-import { NlmsMD } from "../components/migratingData/NlmsMD";
+import { FilterTable } from "../pages/reports/FilterTable";
+import { Termination } from "../pages/reports/Termination";
+import { ProbationReview } from "../pages/reports/ProbationReview";
+import { ContractReview } from "../pages/reports/ContractReview";
+import { EmpPE } from "../pages/reports/EmpPE";
+import { PassportExpiry } from "../pages/reports/PassportExpiry";
+import { LDexpiry } from "../pages/reports/LDexpiry";
+import { EmploymentMedical } from "../pages/reports/EmploymentMedical";
+import { NewRecruit } from "../pages/reports/NewRecruit";
+import { TrainingRCData } from "../pages/reports/TrainingRCData";
+import { LbdKpi } from "../pages/reports/LbdKpi";
+import { GroupHSData } from "../pages/reports/GroupHSData";
+import { LeavePassData } from "../pages/reports/LeavePassData";
+import { ContractPDF } from "../pages/reports/ContractPDF";
+import { PromotionRep } from "../pages/reports/PromotionRep";
 import { ServiceRecordedMD } from "../components/migratingData/ServiceRecordedMD";
+import { PassportValidMD } from "../components/migratingData/PassportValidMD";
+import { NlmsMD } from "../components/migratingData/NlmsMD";
+import { LabourMedicalInfoMD } from "../components/migratingData/LabourMedicalInfoMD";
+import { ContractFormPDF } from "../pages/reports/ContractFormPDF";
 
 const client = generateClient();
 
@@ -348,9 +364,26 @@ const NavigationLinks = () => {
           <>
             <Route path="/reports" Component={Reports} />
             <Route path="/probForm" Component={ProbationForm} />
+            <Route path="/contractForms" Component={ContractFormPDF} />
 
             <Route path="/rm" Component={RM} />
+            <Route path="/filterTable" Component={FilterTable} />
             <Route path="/resignation" Component={Resignation} />
+            <Route path="/termination" Component={Termination} />
+            <Route path="/probationReview" Component={ProbationReview} />
+            <Route path="/contractReview" Component={ContractReview} />
+            <Route path="/empPassExpiry" Component={EmpPE} />
+            <Route path="/ldExpiry" Component={LDexpiry} />
+            <Route path="/passportExpiry" Component={PassportExpiry} />
+            <Route path="/empMedical" Component={EmploymentMedical} />
+            <Route path="/newRecruit" Component={NewRecruit} />
+            <Route path="/trainingRC" Component={TrainingRCData} />
+            <Route path="/lbdKpi" Component={LbdKpi} />
+            <Route path="/groupHS" Component={GroupHSData} />
+            <Route path="/leavePass" Component={LeavePassData} />
+            <Route path="/contractForms" Component={ContractPDF} />
+            <Route path="/promotion" Component={PromotionRep} />
+
           </>
         )}
         {allowedCategories.includes("BenefitsAndRewards") && (

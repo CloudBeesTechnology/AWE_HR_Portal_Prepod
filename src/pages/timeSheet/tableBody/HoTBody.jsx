@@ -18,6 +18,15 @@ export const HoTBody = ({ data, loading, setTableData ,message}) => {
       handleDown();
     }
   }, [loading, data]);
+
+  const convertToISODate = (dateString) => {
+    try {
+      const [year, month, day] = dateString.split("/");
+
+      return `${month}/${year}/${day}`; // 'M/D/YYYY'
+    } catch {}
+  };
+  
   return (
     <tbody>
       {loading === false && data && data?.length > 0
@@ -35,7 +44,7 @@ export const HoTBody = ({ data, loading, setTableData ,message}) => {
                   <td className="text-center px-4 flex-1">{m.empID}</td>
                   <td className="text-center px-4 flex-1">{m.empBadgeNo}</td>
                   <td className="text-center px-4 flex-1">{m.empName}</td>
-                  <td className="text-center px-4 flex-1">{m.date}</td>
+                  <td className="text-center px-4 flex-1">{convertToISODate(m.date)}</td>
                   <td className="text-center px-4 flex-1">{m.onAM}</td>
                   <td className="text-center px-4 flex-1">{m.offAM}</td>
                   <td className="text-center px-4 flex-1">{m.onPM}</td>

@@ -14,7 +14,7 @@ export const TempIDProvider = ({ children }) => {
 
   const [searchQuery, setSearchQuery] = useState(null);
   const [showListTimeSheet, setShowListTimeSheet] = useState(true);
-
+ const [categoryFilter, setCategoryFilter] = useState("Select Excel Sheet");
   // For View Summary
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [getStartDate, setGetStartDate] = useState(new Date()); // Initialize with current date
@@ -40,6 +40,8 @@ export const TempIDProvider = ({ children }) => {
         setGetStartDate,
         getEndDate,
         setGetEndDate,
+        categoryFilter,
+        setCategoryFilter
       }}
     >
       {children}

@@ -1,20 +1,26 @@
 import React from "react";
 
-import { SearchBoxForTimeSheet } from "../../../utils/SearchBoxForTimeSheet";
-import { SearchDisplayForTimeSheet } from "../timeSheetSearch/SearchDisplayForTS";
 import { FaArrowLeft } from "react-icons/fa";
 
 import { Link } from "react-router-dom";
 import { useTempID } from "../../../utils/TempIDContext";
 import { ViewSummaryFilterData } from "./ViewSummaryFilterData";
+import { downloadPDF } from "../../../utils/DownloadPDF";
+
 export const ViewSummaryTable = ({
   dayCounts,
   data,
   LocationData,
   secondaryData,
   searchResult,
+  loading,
+  emptyTableMess,
+  resetTableFunc,
+  toggleEditViewSummaryFunc,
+  editViewSummaryObject,
+  // setEmptyTableMess
 }) => {
-  const { selectedLocation, getStartDate } = useTempID();
+  const { selectedLocation, getStartDate, startDate, endDate } = useTempID();
 
   function calculateTotalWorkingHours(data) {
     let totalHours = 0;
@@ -53,11 +59,48 @@ export const ViewSummaryTable = ({
     }
   }
 
+  const handlePrint = () => {
+    // Get the table by its ID
+    const table = document.getElementById("downloadTable");
+
+    if (!table) {
+      console.error("Table with the given ID not found");
+      return;
+    }
+
+    // Open a new window for printing
+    const printWindow = window.open("", "", "height=600,width=800");
+
+    // Write the HTML and CSS styles for the table and page
+    printWindow.document.write("<html><head><title>Print Table</title>");
+    printWindow.document.write("<style>");
+
+    // Add custom styles for table borders and other formatting
+    printWindow.document.write(`
+      body { font-family: Arial, sans-serif; margin: 20px; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { padding: 8px; text-align: left; border: 1px solid black; }
+      th { background-color: #f2f2f2; }
+    `);
+
+    printWindow.document.write("</style>");
+    printWindow.document.write("</head><body>");
+
+    // Append the table content into the new window's body
+    printWindow.document.body.appendChild(table.cloneNode(true)); // Clone the table to avoid affecting the original
+
+    printWindow.document.write("</body></html>");
+    printWindow.document.close(); // Close the document to finish writing content
+
+    // Trigger the print dialog
+    printWindow.print();
+  };
+
   return (
     <div className="bg-[#fafaf6] h-screen">
       <div className="screen-size p-4">
-        <header className="m-5 flex justify-between">
-          <div className=" flex items-center">
+        <header className="my-5 flex justify-between">
+          <div className="flex items-center ">
             <Link to="/timeSheet" className="text-xl flex-1 text-grey">
               <FaArrowLeft />
             </Link>
@@ -65,18 +108,32 @@ export const ViewSummaryTable = ({
           <header className="flex justify-center text_size_2 py-5 text-dark_grey ">
             <p>View Summary</p>
           </header>
-          <div></div>
+          <div className="flex items-center">
+            <button
+              className="rounded text_size_5 text-dark_grey bg-primary  py-2  px-7"
+              onClick={() => {
+                handlePrint();
+              }}
+            >
+              Print
+            </button>
+          </div>
         </header>
         <ViewSummaryFilterData
           LocationData={LocationData}
           secondaryData={secondaryData}
           searchResult={searchResult}
+          resetTableFunc={resetTableFunc}
+          // setEmptyTableMess={setEmptyTableMess}
         />
-        <div className="overflow-auto max-h-[60vh] ">
-          <table className="min-w-full text-sm bg-white ">
-            <thead className="bg-[#949393] ">
+        <div className="overflow-auto max-h-[60vh]">
+          <table className="min-w-full text-sm bg-white " id="downloadTable">
+            <thead className="bg-[#949393]">
               <tr className=" text-white">
-                <th className="border px-2 py-2 border-dark_grey" rowSpan="2">
+                <th
+                  className="border px-2 py-2 border-dark_grey min-w-[200px] max-w-[400px]"
+                  rowSpan="2"
+                >
                   Employee Name
                 </th>
                 <th className="border px-2 py-2 border-dark_grey" rowSpan="2">
@@ -111,7 +168,7 @@ export const ViewSummaryTable = ({
             </thead>
 
             <tbody>
-              {data && data?.length > 0 ? (
+              {loading && data && data?.length > 0 ? (
                 data.map((employee, index) => {
                   // const normalWorkHours = Object.values(
                   //   employee.NORMALWORKHRSPERDAY || {}
@@ -153,13 +210,26 @@ export const ViewSummaryTable = ({
                             }`}
                           </span>
                           <br />
-                          <span>{`Hours/Day : ${employee.workHrs || ""}`}</span>
+                          <span>{`Hours/Day : ${
+                            employee.workHrs && employee.workHrs.length > 0
+                              ? employee.workHrs
+                              : ""
+                          }  `}</span>
                           <span>{`Days/Month : ${
-                            employee.workMonth || ""
+                            employee.workMonth && employee.workMonth.length > 0
+                              ? employee.workMonth
+                              : ""
                           }`}</span>
                           <br />
                           <span>
-                            {`SalaryType : ${employee.salaryType || ""}`}
+                            {`SalaryType : ${
+                              employee?.salaryType &&
+                              employee?.salaryType.length > 0
+                                ? employee?.salaryType[
+                                    employee?.salaryType?.length - 1
+                                  ]
+                                : ""
+                            }`}
                           </span>
                         </td>
                         <td className="border px-2 py-1" rowSpan="2">
@@ -177,8 +247,35 @@ export const ViewSummaryTable = ({
 
                           return (
                             <td
-                              className="border px-2 py-1 border-dark_grey"
+                              className="border px-2 py-1 border-dark_grey cursor-pointer"
                               key={currentDayKey} // Unique key for each column
+                              onClick={() => {
+                                toggleEditViewSummaryFunc();
+                                const empDetails = {
+                                  empName: employee?.name,
+                                  sapNo: employee.sapNo,
+                                  empBadgeNo: employee?.empBadgeNo,
+                                  location: employee?.location,
+                                  jobcode: employee.jobcode,
+                                  workingHrs:
+                                    employee?.workingHrs?.[currentDayKey],
+                                  ot: employee?.OVERTIMEHRS?.[currentDayKey],
+                                  workHrs:
+                                    employee.workHrs &&
+                                    employee.workHrs.length > 0
+                                      ? employee.workHrs
+                                      : "",
+                                  workMonth:
+                                    employee.workMonth &&
+                                    employee.workMonth.length > 0
+                                      ? employee.workMonth
+                                      : "",
+
+                                  workingHrsKey: currentDayKey,
+                                };
+                                console.log(empDetails);
+                                editViewSummaryObject(empDetails);
+                              }}
                             >
                               {employee?.workingHrs?.[currentDayKey] || ""}{" "}
                             </td>
@@ -219,7 +316,7 @@ export const ViewSummaryTable = ({
                           yes
                         </td>
                         <td className="border px-2 py-1" rowSpan="2">
-                          updater
+                           {employee?.timeKeeper}
                         </td>
                       </tr>
                       <tr>
@@ -243,6 +340,44 @@ export const ViewSummaryTable = ({
                           );
                         })}
                         {/* ))} */}
+                      </tr>
+                      <tr>
+                        <td className="border px-2 py-1" colSpan={1}>
+                          {" "}
+                        </td>
+
+                        {Array.from({ length: dayCounts + 1 }, (_, i) => {
+                          const currentDayIndex = i + 1;
+
+                          return (
+                            <td
+                              className={`${
+                                i === 0 ? "border" : "border-b"
+                              } text-center py-1`}
+                              key={currentDayIndex} // Unique key for each column
+                            >
+                              <input
+                                className={`${i === 0 && "hidden"} py-10`}
+                                type="checkbox"
+                                onChange={() => {}}
+                              />
+                            </td>
+                          );
+                        })}
+                        {/* ))} */}
+                        <td className="border px-2 py-1">{""}</td>
+                        <td className="border px-2 py-1">{""}</td>
+
+                        <td className="border px-2 py-1">{""}</td>
+                        <td className="border px-2 py-1">{""}</td>
+                        <td className="border px-2 py-1">{""}</td>
+                        <td className="border px-2 py-1">{""}</td>
+                        <td className="border px-2 py-1">{""}</td>
+                        <td className="border px-2 py-1">{""}</td>
+                        <td className="border px-2 py-1">{""}</td>
+                        <td className="border px-2 py-1">{""}</td>
+                        <td className="border px-2 py-1"></td>
+                        <td className="border px-2 py-1"></td>
                       </tr>
                       <tr>
                         <td className="border px-2 py-1" colSpan={1}>
@@ -299,9 +434,21 @@ export const ViewSummaryTable = ({
                     className="px-6 py-3 text-center text-dark_ash text_size_5"
                   >
                     <p className="px-6 py-6">
-                      {!selectedLocation
-                        ? "Choose Location."
-                        : "Please wait few seconds."}
+                      {!startDate || (!endDate && loading === false)
+                        ? "Your table is currently empty. Set a date range to view employee records."
+                        : startDate &&
+                          endDate &&
+                          !selectedLocation &&
+                          loading === false
+                        ? "Please choose a location to filter records within the selected date range."
+                        : startDate &&
+                          endDate &&
+                          selectedLocation &&
+                          loading === true
+                        ? "Processing your request... This may take a moment."
+                        : emptyTableMess === true
+                        ? "No records available. Try selecting different dates or locations."
+                        : "Processing your request... This may take a moment."}
                     </p>
                   </td>
                 </tr>
@@ -312,13 +459,9 @@ export const ViewSummaryTable = ({
         <footer className="flex justify-center py-10 space-x-10">
           <button
             className=" rounded text_size_5 text-dark_grey bg-primary px-3 py-2 w-[180px]"
-            // onClick={exportToPDF}
-          >
-            Verify
-          </button>
-          <button
-            className=" rounded text_size_5 text-dark_grey bg-primary px-3 py-2 w-[180px]"
-            // onClick={exportToPDF}
+            onClick={() => {
+              downloadPDF("downloadTable", "Theader");
+            }}
           >
             Download
           </button>

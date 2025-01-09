@@ -19,6 +19,14 @@ export const OrmcTBody = ({ data, loading, setTableData, message }) => {
       handleDown();
     }
   }, [loading, data]);
+
+  const convertToISODate = (dateString) => {
+    try {
+      const [year, month, day] = dateString.split("/");
+
+      return `${month}/${year}/${day}`; // 'M/D/YYYY'
+    } catch {}
+  };
   return (
     <tbody>
       {loading === false && data && data?.length > 0
@@ -33,7 +41,9 @@ export const OrmcTBody = ({ data, loading, setTableData, message }) => {
                   <td className="text-start px-4 flex-1">{m.empName}</td>
                   <td className="text-center px-4 flex-1">{m.empDept}</td>
                   <td className="text-center px-4 flex-1">{m.empBadgeNo}</td>
-                  <td className="text-center px-4 flex-1">{m.date}</td>
+                  <td className="text-center px-4 flex-1">
+                    {convertToISODate(m.date)}
+                  </td>
                   <td className="text-center px-4 flex-1">{m.inTime}</td>
                   <td className="text-center px-4 flex-1">{m.outTime}</td>
                   <td className="text-center px-4 flex-1">{m.totalInOut}</td>
@@ -43,7 +53,9 @@ export const OrmcTBody = ({ data, loading, setTableData, message }) => {
                   <td className="text-center px-4 flex-1">
                     {m.normalWorkHrs || 0}
                   </td>
-                  <td className="text-center px-4 flex-1">{m.actualWorkHrs || 0}</td>
+                  <td className="text-center px-4 flex-1">
+                    {m.actualWorkHrs || 0}
+                  </td>
                   <td className="text-center px-4 flex-1">{m.otTime || 0}</td>
                   <td className="text-center px-4 flex-1">{m.remarks}</td>
                   {/* <td
@@ -67,7 +79,6 @@ export const OrmcTBody = ({ data, loading, setTableData, message }) => {
                 <p className="p-5">{message || "Please wait few seconds."}</p>
               </td>
             </tr>
-            
           ) ?? (
             <tr>
               <td

@@ -11,6 +11,7 @@ import {
 import "jspdf-autotable";
 
 import { useTempID } from "../../../utils/TempIDContext";
+import { GetViewSummaryUpdater } from "../customTimeSheet/GetViewSummaryUpdater";
 const client = generateClient();
 export const ApplyVSFunction = ({
   convertedStringToArrayObj,
@@ -106,7 +107,7 @@ export const ApplyVSFunction = ({
         // const leaveStatusData = leaveStatus?.data?.listLeaveStatuses?.items;
         const leaveStatusData = leaveStatuses;
 
-        const approvedLeaveStatus = dummyLeaveStatus.filter(
+        const approvedLeaveStatus = leaveStatusData.filter(
           (fil) => fil.managerStatus === "Approved"
         );
 
@@ -465,12 +466,37 @@ export const ApplyVSFunction = ({
         // }, [getStartDate, getEndDate]);
 
         const addLeaveTypeCount = seperatedGroupedData.map((val) => {
-          const empLeaveCount = leaveCount_.find(
-            (fi) => val.empBadgeNo === fi.empBadgeNo
-          );
-          const workInfoData = mergedData?.find(
-            (fi) => val.empBadgeNo === fi.empBadgeNo
-          );
+          //   const empLeaveCount = leaveCount_.find(
+          //     (fi) => val.empBadgeNo === fi.empBadgeNo
+          //   );
+
+          const empLeaveCount = leaveCount_.find((fi) => {
+            if (
+              val.empBadgeNo &&
+              fi.empBadgeNo &&
+              val.empBadgeNo === fi.empBadgeNo
+            ) {
+              return fi;
+            } else if (val.fidNo && fi.sapNo && val.fidNo === fi.sapNo) {
+              return fi;
+            }
+          });
+
+          //   const workInfoData = mergedData?.find(
+          //     (fi) => val.empBadgeNo === fi.empBadgeNo
+          //   );
+
+          const workInfoData = mergedData?.find((fi) => {
+            if (
+              val.empBadgeNo &&
+              fi.empBadgeNo &&
+              val.empBadgeNo === fi.empBadgeNo
+            ) {
+              return fi;
+            } else if (val.fidNo && fi.sapNo && val.fidNo === fi.sapNo) {
+              return fi;
+            }
+          });
           const getDate = val.data.find((f) => f);
 
           const res = getDate.empWorkInfo.map((val) => val?.LOCATION);
@@ -519,6 +545,15 @@ export const ApplyVSFunction = ({
               });
             }
 
+            const salaryType =
+              workInfoData?.salaryType[
+                workInfoData?.salaryType.length - 1
+              ]?.toLowerCase(); // Convert to lowercase for case-insensitive matching
+
+            // Define salary type categories
+            const monthlyTypes = ["monthly", "month", "m"];
+            const dailyTypes = ["daily", "day", "d"];
+
             // Prioritize conditions
             if (checkEntry) {
               // If there are working hours, prioritize them
@@ -537,57 +572,28 @@ export const ApplyVSFunction = ({
               acc[dayStr] = leaveType; // Use leave type if available
             } else if (dayOfWeek === "Saturday") {
               const result = parseFloat(entry?.normalWorkHrs) / 2;
-              // console.log(workInfoData?.salaryType);
-              acc[dayStr] =
-                (!checkEntry &&
-                  workInfoData?.salaryType[
-                    workInfoData?.salaryType.length - 1
-                  ] === "Monthly") ||
+              console.log(workInfoData?.salaryType);
+
+              // Extract salary type and normalize it to lowercase
+              const salaryType =
                 workInfoData?.salaryType[
                   workInfoData?.salaryType.length - 1
-                ] === "Month" ||
-                workInfoData?.salaryType[
-                  workInfoData?.salaryType.length - 1
-                ] === "M" ||
-                workInfoData?.salaryType[
-                  workInfoData?.salaryType.length - 1
-                ] === "MONTHLY" ||
-                workInfoData?.salaryType[
-                  workInfoData?.salaryType.length - 1
-                ] === "MONTH" ||
-                workInfoData?.salaryType[
-                  workInfoData?.salaryType.length - 1
-                ] === "month" ||
-                workInfoData?.salaryType[
-                  workInfoData?.salaryType.length - 1
-                ] === "monthly"
-                  ? "PHD"
-                  : (!checkEntry &&
-                      workInfoData?.salaryType[
-                        workInfoData?.salaryType.length - 1
-                      ] === "D") ||
-                    workInfoData?.salaryType[
-                      workInfoData?.salaryType.length - 1
-                    ] === "Day" ||
-                    workInfoData?.salaryType[
-                      workInfoData?.salaryType.length - 1
-                    ] === "DAY" ||
-                    workInfoData?.salaryType[
-                      workInfoData?.salaryType.length - 1
-                    ] === "Daily" ||
-                    workInfoData?.salaryType[
-                      workInfoData?.salaryType.length - 1
-                    ] === "DAILY" ||
-                    workInfoData?.salaryType[
-                      workInfoData?.salaryType.length - 1
-                    ] === "daily" ||
-                    workInfoData?.salaryType[
-                      workInfoData?.salaryType.length - 1
-                    ] === "day"
-                  ? "OFF"
-                  : result === parseInt(checkEntry)
-                  ? "HPHD"
-                  : checkEntry; // Set 'OFF' if workingHrs is empty
+                ]?.toLowerCase(); // Convert to lowercase for case-insensitive matching
+
+              // Define salary type categories
+              const monthlyTypes = ["monthly", "month", "m"];
+              const dailyTypes = ["daily", "day", "d"];
+
+              // Evaluate conditions
+              if (!checkEntry && monthlyTypes.includes(salaryType)) {
+                acc[dayStr] = "PHD";
+              } else if (!checkEntry && dailyTypes.includes(salaryType)) {
+                acc[dayStr] = "OFF";
+              } else if (result === parseInt(checkEntry)) {
+                acc[dayStr] = "HPHD";
+              } else {
+                acc[dayStr] = checkEntry; // Default to checkEntry
+              }
             } else if (dayOfWeek === "Sunday") {
               // Sunday condition: Leave blank
               acc[dayStr] = "";
@@ -598,59 +604,59 @@ export const ApplyVSFunction = ({
 
             return acc;
           }, {});
-          const keysToCount = ["OFF", "PH", "PHD", "A"];
+          //   const keysToCount = ["OFF", "PH", "PHD", "A"];
 
-          const countOccurrences = (data, keys) => {
-            const values = Object.values(data);
-            return keys?.reduce((counts, key) => {
-              counts[key] = values?.filter((value) => value === key).length;
-              return counts;
-            }, {});
-          };
+          //   const countOccurrences = (data, keys) => {
+          //     const values = Object.values(data);
+          //     return keys?.reduce((counts, key) => {
+          //       counts[key] = values?.filter((value) => value === key).length;
+          //       return counts;
+          //     }, {});
+          //   };
 
-          const holidaysAndAbsent = countOccurrences(workingHrs, keysToCount);
+          //   const holidaysAndAbsent = countOccurrences(workingHrs, keysToCount);
 
-          const countLeaveTypes = () => {
-            let newLeaveCount = {
-              AL: 0,
-              CL: 0,
-              UAL: 0,
-              SL: 0,
-            };
+          //   const countLeaveTypes = () => {
+          //     let newLeaveCount = {
+          //       AL: 0,
+          //       CL: 0,
+          //       UAL: 0,
+          //       SL: 0,
+          //     };
 
-            for (const date in workingHrs) {
-              const value = workingHrs[date];
+          //     for (const date in workingHrs) {
+          //       const value = workingHrs[date];
 
-              // Check for specific leave types (AL, CL, UAL, SL)
-              if (value?.startsWith("HAL")) {
-                newLeaveCount.AL += 0.5;
-              } else if (value === "AL") {
-                newLeaveCount.AL += 1;
-              } else if (value?.startsWith("HCL")) {
-                newLeaveCount.CL += 0.5;
-              } else if (value === "CL") {
-                newLeaveCount.CL += 1;
-              } else if (value?.startsWith("HSL")) {
-                newLeaveCount.SL += 0.5;
-              } else if (value === "SL") {
-                newLeaveCount.SL += 1;
-              } else if (value?.startsWith("HUAL")) {
-                newLeaveCount.UAL += 0.5;
-              } else if (value === "UAL") {
-                newLeaveCount.UAL += 1;
-              }
-            }
-            return newLeaveCount;
-          };
-          const leaveCounts = countLeaveTypes();
+          //       // Check for specific leave types (AL, CL, UAL, SL)
+          //       if (value?.startsWith("HAL")) {
+          //         newLeaveCount.AL += 0.5;
+          //       } else if (value === "AL") {
+          //         newLeaveCount.AL += 1;
+          //       } else if (value?.startsWith("HCL")) {
+          //         newLeaveCount.CL += 0.5;
+          //       } else if (value === "CL") {
+          //         newLeaveCount.CL += 1;
+          //       } else if (value?.startsWith("HSL")) {
+          //         newLeaveCount.SL += 0.5;
+          //       } else if (value === "SL") {
+          //         newLeaveCount.SL += 1;
+          //       } else if (value?.startsWith("HUAL")) {
+          //         newLeaveCount.UAL += 0.5;
+          //       } else if (value === "UAL") {
+          //         newLeaveCount.UAL += 1;
+          //       }
+          //     }
+          //     return newLeaveCount;
+          //   };
+          //   const leaveCounts = countLeaveTypes();
 
           return empLeaveCount
             ? {
                 ...val,
                 workingHrs: workingHrs,
-                // leaveCounts: empLeaveCount.leaveCounts,
-                leaveCounts: leaveCounts,
-                hollydayCounts: holidaysAndAbsent,
+                leaveCounts: empLeaveCount.leaveCounts,
+                // leaveCounts: leaveCounts,
+                // hollydayCounts: holidaysAndAbsent,
                 newDate: getDate.date,
                 location: res?.[0],
                 jobcode: jobcode?.[0],
@@ -658,7 +664,7 @@ export const ApplyVSFunction = ({
               }
             : {
                 ...val,
-                hollydayCounts: holidaysAndAbsent,
+                // hollydayCounts: holidaysAndAbsent,
                 workingHrs: workingHrs,
                 leaveCounts: {},
                 newDate: getDate.date,
@@ -705,17 +711,16 @@ export const ApplyVSFunction = ({
         // const FinalData = await processWorkingHrs(addLeaveTypeCount);
         // console.log("FinalData : ", FinalData);
         // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        async function updateFieldBasedOnConditions(inputData) {
+        const updateFieldBasedOnConditions = async (inputData) => {
+          const keysToCount = ["OFF", "PH", "PHD", "A"];
 
-            const keysToCount = ["OFF", "PH", "PHD", "A"];
-
-            const countOccurrences = (data, keys) => {
-                const values = Object.values(data);
-                return keys?.reduce((counts, key) => {
-                    counts[key] = values?.filter((value) => value === key).length;
-                    return counts;
-                }, {});
-            };
+          const countOccurrences = (data, keys) => {
+            const values = Object.values(data);
+            return keys?.reduce((counts, key) => {
+              counts[key] = values?.filter((value) => value === key).length;
+              return counts;
+            }, {});
+          };
 
           inputData.forEach((data, index) => {
             inputData.forEach((compareData, compareIndex) => {
@@ -747,173 +752,207 @@ export const ApplyVSFunction = ({
                 }
               }
             });
-            const holidaysAndAbsent = countOccurrences(data.workingHrs, keysToCount);
+            const holidaysAndAbsent = countOccurrences(
+              data.workingHrs,
+              keysToCount
+            );
 
             const countLeaveTypes = () => {
-                let newLeaveCount = {
-                    AL: 0,
-                    CL: 0,
-                    UAL: 0,
-                    SL: 0,
-                };
-    
-                for (const date in data.workingHrs) {
-                    const value = data.workingHrs[date];
-    
-                    // Check for specific leave types (AL, CL, UAL, SL)
-                    if (value?.startsWith("HAL")) {
-                        newLeaveCount.AL += 0.5;
-                    } else if (value === "AL") {
-                        newLeaveCount.AL += 1;
-                    } else if (value?.startsWith("HCL")) {
-                        newLeaveCount.CL += 0.5;
-                    } else if (value === "CL") {
-                        newLeaveCount.CL += 1;
-                    } else if (value?.startsWith("HSL")) {
-                        newLeaveCount.SL += 0.5;
-                    } else if (value === "SL") {
-                        newLeaveCount.SL += 1;
-                    } else if (value?.startsWith("HUAL")) {
-                        newLeaveCount.UAL += 0.5;
-                    } else if (value === "UAL") {
-                        newLeaveCount.UAL += 1;
-                    }
+              let newLeaveCount = {
+                AL: 0,
+                CL: 0,
+                UAL: 0,
+                SL: 0,
+              };
+
+              for (const date in data.workingHrs) {
+                const value = data.workingHrs[date];
+
+                // Check for specific leave types (AL, CL, UAL, SL)
+                if (value?.startsWith("HAL")) {
+                  newLeaveCount.AL += 0.5;
+                } else if (value === "AL") {
+                  newLeaveCount.AL += 1;
+                } else if (value?.startsWith("HCL")) {
+                  newLeaveCount.CL += 0.5;
+                } else if (value === "CL") {
+                  newLeaveCount.CL += 1;
+                } else if (value?.startsWith("HSL")) {
+                  newLeaveCount.SL += 0.5;
+                } else if (value === "SL") {
+                  newLeaveCount.SL += 1;
+                } else if (value?.startsWith("HUAL")) {
+                  newLeaveCount.UAL += 0.5;
+                } else if (value === "UAL") {
+                  newLeaveCount.UAL += 1;
                 }
-                return newLeaveCount;
+              }
+              return newLeaveCount;
             };
-    
+
             const leaveCounts = countLeaveTypes();
-    
+
             data.hollydayCounts = holidaysAndAbsent;
             data.leaveCounts = leaveCounts;
           });
 
           return inputData;
-        }
+        };
 
         // Example usage
         const updatedData = await updateFieldBasedOnConditions(
           addLeaveTypeCount
         );
-        console.log(updatedData);
-        // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
-        const transformedData = updatedData
-          .map((item) => {
-            const initialMatch = mergedData?.find((datasetItem) => {
-              // Ensure data types match and check for null/undefined
-              const empBadgeNoMatch =
-                datasetItem.empBadgeNo &&
-                item.empBadgeNo &&
-                String(datasetItem.empBadgeNo) === String(item.empBadgeNo);
+        const getSummaryUpdaterName = async (updatedData) => {
+          // Use Promise.all to handle the asynchronous operations
+          const results = await Promise.all(
+            updatedData.map(async (val) => {
+              const getHisID = val.data.find((fin) => fin);
 
-              const sapNoMatch =
-                datasetItem.sapNo &&
-                item.fidNo &&
-                String(datasetItem.sapNo) === String(item.fidNo);
-
-              return empBadgeNoMatch || sapNoMatch;
-            });
-
-            const selectedFields = initialMatch
-              ? (({
-                  empID,
-                  name,
-                  sapNo,
-                  empBadgeNo,
-                  workHrs,
-                  workMonth,
-                  salaryType,
-                  days,
-                }) => ({
-                  empID,
-                  name,
-                  sapNo,
-                  empBadgeNo,
-                  workHrs,
-                  workMonth,
-                  salaryType,
-                  days,
-                }))(initialMatch)
-              : {};
-
-            const getEmpDateRange = item.data.find((first) => first.date);
-
-            const empName = item?.data?.map((m) => m.empName);
-
-            const empLeaveCount = item?.leaveCounts;
-            const workingHrs = item?.workingHrs;
-            const dateForSelectMY = item?.newDate;
-            const location = item?.location;
-            const hollydayCounts = item?.hollydayCounts;
-
-            const overtimeHours = Array.from({ length: dayCounts }, (_, i) => {
-              const currentDay = new Date(getStartDate);
-              currentDay.setDate(getStartDate.getDate() + i); // Increment date
-              return currentDay;
-            }).reduce((acc, currentDay) => {
-              // Create the key in "day-month-year" format
-              const dayStr = `${currentDay.getDate()}-${
-                currentDay.getMonth() + 1
-              }-${currentDay.getFullYear()}`;
-
-              // Find matching data for the current day
-              const entry = item?.data?.find(({ date }) => {
-                const entryDate = new Date(date);
-                // console.log(
-                //   entryDate.getDate(),
-                //   " Day : ",
-                //   currentDay.getDate(),
-                //   "  Month : ",
-                //   entryDate.getMonth(),
-                //   " : ",
-                //   currentDay.getMonth()
-                // );
-                return (
-                  entryDate.getDate() === currentDay.getDate() &&
-                  entryDate.getMonth() === currentDay.getMonth() &&
-                  entryDate.getFullYear() === currentDay.getFullYear()
+              if (getHisID && getHisID.assignBy) {
+                const getHisName = await GetViewSummaryUpdater(
+                  getHisID.assignBy
                 );
-              });
-
-              // Initialize overtime hours from the entry
-              const overtimeHours = entry?.empWorkInfo[0]?.OVERTIMEHRS
-                ? parseInt(entry.empWorkInfo[0].OVERTIMEHRS)
-                : null;
-
-              // Add the overtime hours to the accumulator
-              if (overtimeHours !== null || overtimeHours !== undefined) {
-                acc[dayStr] = overtimeHours;
-              } else {
-                acc[dayStr] = 0; // Default to "A" if no overtime
+                return { ...val, timeKeeper: getHisName?.name || null };
               }
 
-              return acc;
-            }, {});
+              // Return the original object if no assignBy is found
+              return { ...val, timeKeeper: null };
+            })
+          );
 
-            const jobcode = item.data.map(
-              ({ empWorkInfo }) => empWorkInfo[0]?.JOBCODE
-            );
+          // console.log(results);
+          return results;
+        };
 
-            return {
-              empName: empName,
-              jobcode: jobcode[0] || "",
-              dateForSelectMY: dateForSelectMY,
-              ...selectedFields,
-              // NORMALWORKHRSPERDAY: normalWorkHours,
-              OVERTIMEHRS: overtimeHours,
-              empLeaveCount: empLeaveCount,
-              hollydayCounts: hollydayCounts,
-              workingHrs: workingHrs,
-              location: location,
-            };
-          })
-          .filter(Boolean);
+        // Call the function with updatedData
+        const UpdaterNameAdded = await getSummaryUpdaterName(updatedData);
+
+        // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+        const transformedData = UpdaterNameAdded?.map((item) => {
+          const initialMatch = mergedData?.find((datasetItem) => {
+            // Ensure data types match and check for null/undefined
+            const empBadgeNoMatch =
+              datasetItem.empBadgeNo &&
+              item.empBadgeNo &&
+              String(datasetItem.empBadgeNo) === String(item.empBadgeNo);
+
+            const sapNoMatch =
+              datasetItem.sapNo &&
+              item.fidNo &&
+              String(datasetItem.sapNo) === String(item.fidNo);
+
+            return empBadgeNoMatch || sapNoMatch;
+          });
+
+          const selectedFields = initialMatch
+            ? (({
+                empID,
+                name,
+                sapNo,
+                empBadgeNo,
+                workHrs,
+                workMonth,
+                salaryType,
+                days,
+              }) => ({
+                empID,
+                name,
+                sapNo,
+                empBadgeNo,
+                workHrs,
+                workMonth,
+                salaryType,
+                days,
+              }))(initialMatch)
+            : {};
+
+          const getEmpDateRange = item.data.find((first) => first.date);
+
+          const empName = item?.data?.map((m) => m.empName);
+
+          const empLeaveCount = item?.leaveCounts;
+          const workingHrs = item?.workingHrs;
+          const dateForSelectMY = item?.newDate;
+          const location = item?.location;
+          const hollydayCounts = item?.hollydayCounts;
+          const timeKeeper = item?.timeKeeper;
+
+          const overtimeHours = Array.from({ length: dayCounts }, (_, i) => {
+            const currentDay = new Date(getStartDate);
+            currentDay.setDate(getStartDate.getDate() + i); // Increment date
+            return currentDay;
+          }).reduce((acc, currentDay) => {
+            // Create the key in "day-month-year" format
+            const dayStr = `${currentDay.getDate()}-${
+              currentDay.getMonth() + 1
+            }-${currentDay.getFullYear()}`;
+
+            // Find matching data for the current day
+            const entry = item?.data?.find(({ date }) => {
+              const entryDate = new Date(date);
+              // console.log(
+              //   entryDate.getDate(),
+              //   " Day : ",
+              //   currentDay.getDate(),
+              //   "  Month : ",
+              //   entryDate.getMonth(),
+              //   " : ",
+              //   currentDay.getMonth()
+              // );
+
+              return (
+                //   entryDate === currentDay
+                entryDate.getDate() === currentDay.getDate() &&
+                entryDate.getMonth() === currentDay.getMonth() &&
+                entryDate.getFullYear() === currentDay.getFullYear()
+              );
+            });
+            console.log(entry);
+            // Initialize overtime hours from the entry
+            const overtimeHours = entry?.empWorkInfo[0]?.OVERTIMEHRS
+              ? parseInt(entry?.empWorkInfo[0].OVERTIMEHRS)
+              : null;
+
+            // Add the overtime hours to the accumulator
+            if (overtimeHours !== null || overtimeHours !== undefined) {
+              acc[dayStr] = overtimeHours;
+            } else {
+              acc[dayStr] = 0; // Default to "A" if no overtime
+            }
+
+            return acc;
+          }, {});
+
+          const jobcode = item.data.map(
+            ({ empWorkInfo }) => empWorkInfo[0]?.JOBCODE
+          );
+
+          return {
+            empName: empName,
+            jobcode: jobcode[0] || "",
+            dateForSelectMY: dateForSelectMY,
+            ...selectedFields,
+            // NORMALWORKHRSPERDAY: normalWorkHours,
+            OVERTIMEHRS: overtimeHours,
+            empLeaveCount: empLeaveCount,
+            hollydayCounts: hollydayCounts,
+            workingHrs: workingHrs,
+            location: location,
+            timeKeeper:timeKeeper,
+          };
+        }).filter(Boolean);
         console.log(transformedData);
+
         await ProcessedDataFunc(transformedData);
       };
-
-      fetchData();
+      if (convertedStringToArrayObj && convertedStringToArrayObj.length > 0) {
+        fetchData();
+      } else {
+        ProcessedDataFunc(null);
+      }
     }, [convertedStringToArrayObj]);
   } catch (err) {
     console.log("ERROR : ", err);

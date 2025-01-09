@@ -1,9 +1,14 @@
+import React, { useEffect, useState } from "react";
+import { FilterTable } from "./FilterTable";
+import { useLocation } from "react-router-dom";
 
-import React, { useEffect, useState } from 'react';
-import { FilterTable } from './FilterTable';
-
-export const TrainingRCData = ({ allData, typeOfReport, reportTitle }) => {
+export const TrainingRCData = () => {
+  const location = useLocation();
+  const { allData, title } = location.state || {};
   const [tableBody, setTableBody] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [tableHead, setTableHead] = useState([
     "Emp ID",
     "Badge No",
@@ -22,7 +27,7 @@ export const TrainingRCData = ({ allData, typeOfReport, reportTitle }) => {
     "Mandatory/ Supplementary",
     "E-CERTS RECEIVED",
     "ORIGINAL CERTS RECEIVED",
-    "REMARKS"
+    "REMARKS",
   ]);
 
   const formatDate = (date) => {
@@ -43,7 +48,15 @@ export const TrainingRCData = ({ allData, typeOfReport, reportTitle }) => {
   };
 
   const resignationMergedData = (data) => {
-    return data.map((item) => ({
+    
+    return data.filter((item) => {
+      const certifiExpiryDates = item.certifiExpiry || [];
+      const lastDate = certifiExpiryDates[certifiExpiryDates.length - 1];
+      if (!lastDate) return false;
+
+      const certifiExpiry = new Date(lastDate);
+      return certifiExpiry;
+    }).map((item) => ({
       empID: item.empID || "-",
       empBadgeNo: item.empBadgeNo || "-",
       name: item.name || "-",
@@ -56,11 +69,17 @@ export const TrainingRCData = ({ allData, typeOfReport, reportTitle }) => {
       DIVISION: item.DIVISION || "-",
       traineeSD: formatDate(item.traineeSD) || "-",
       traineeED: formatDate(item.traineeED) || "-",
-      certifiExpiry: formatDate(item.certifiExpiry) || "-",
-      expAndValid: checkExpiryStatus(item.certifiExpiry), // Check expiry status
+      certifiExpiry: Array.isArray(item.certifiExpiry)
+      ? formatDate(item.certifiExpiry[item.certifiExpiry.length - 1])
+      : "-",
+      expAndValid: checkExpiryStatus(item.certifiExpiry), 
       traineeStatus: item.traineeStatus || "-",
-      eCertifiDate: formatDate(item.eCertifiDate) || "-",
-      orgiCertifiDate: formatDate(item.orgiCertifiDate) || "-",
+      eCertifiDate: Array.isArray(item.eCertifiDate)
+      ? formatDate(item.eCertifiDate[item.eCertifiDate.length - 1])
+      : "-",
+      orgiCertifiDate: Array.isArray(item.orgiCertifiDate)
+      ? formatDate(item.orgiCertifiDate[item.orgiCertifiDate.length - 1])
+      : "-",
       remark: item.remark || "-",
     }));
   };
@@ -69,9 +88,66 @@ export const TrainingRCData = ({ allData, typeOfReport, reportTitle }) => {
     setTableBody(resignationMergedData(allData));
   }, [allData]);
 
-  return (
-    <div>
-      <FilterTable tableBody={tableBody} tableHead={tableHead} typeOfReport={typeOfReport} reportTitle={reportTitle} />
+      const handleDate = (e, type) => {
+        const value = e.target.value;
+    
+        if (type === "startDate") setStartDate(value);
+        if (type === "endDate") setEndDate(value);
+    
+        const start = type === "startDate" ? new Date(value) : startDate ? new Date(startDate) : null;
+        const end = type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
+    
+        const filtered = allData.filter((data) => {
+          const expiryArray = data.certifiExpiry || [];
+          const expiryDate = expiryArray.length
+            ? new Date(expiryArray[expiryArray.length - 1])
+            : null;
+    
+          if (!expiryDate || isNaN(expiryDate.getTime())) return false;
+    
+          if (start && end) return expiryDate >= start && expiryDate <= end;
+          if (start) return expiryDate >= start;
+          if (end) return expiryDate <= end;
+    
+          return true;
+        }).map((item) => ({
+          empID: item.empID || "-",
+      empBadgeNo: item.empBadgeNo || "-",
+      name: item.name || "-",
+      MRNo: item.MRNo || "-",
+      poNo: item.poNo || "-",
+      courseCode: item.courseCode || "-",
+      courseName: item.courseName || "-",
+      company: item.company || "-",
+      traineeCourseFee: item.traineeCourseFee || "-",
+      DIVISION: item.DIVISION || "-",
+      traineeSD: formatDate(item.traineeSD) || "-",
+      traineeED: formatDate(item.traineeED) || "-",
+      certifiExpiry: Array.isArray(item.certifiExpiry)
+      ? formatDate(item.certifiExpiry[item.certifiExpiry.length - 1])
+      : "-",
+      expAndValid: checkExpiryStatus(item.certifiExpiry), 
+      traineeStatus: item.traineeStatus || "-",
+      eCertifiDate: Array.isArray(item.eCertifiDate)
+      ? formatDate(item.eCertifiDate[item.eCertifiDate.length - 1])
+      : "-",
+      orgiCertifiDate: Array.isArray(item.orgiCertifiDate)
+      ? formatDate(item.orgiCertifiDate[item.orgiCertifiDate.length - 1])
+      : "-",
+      remark: item.remark || "-",        
+        }));
+    
+        setFilteredData(filtered);
+      };
+    return (
+      <div>
+        <FilterTable
+                tableBody={filteredData.length ? filteredData : tableBody}
+          // tableBody={tableBody}
+          tableHead={tableHead}
+          title={title}
+          handleDate={handleDate}
+      />
     </div>
   );
 };

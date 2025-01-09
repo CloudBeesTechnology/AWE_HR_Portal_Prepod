@@ -3,10 +3,15 @@ import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
 import { EditTimeSheet } from "./EditTimeSheet";
 import { generateClient } from "@aws-amplify/api";
 
-import { listBlngs, listEmpPersonalInfos, listEmpWorkInfos } from "../../graphql/queries";
+import {
+  listBlngs,
+  listEmpPersonalInfos,
+  listEmpWorkInfos,
+} from "../../graphql/queries";
 import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
 import { SuccessMessage } from "./ModelForSuccessMess/SuccessMessage";
 import { PopupForMissMatchExcelSheet } from "./ModelForSuccessMess/PopupForMissMatchExcelSheet";
+// import { IoCheckmarkCircleSharp } from "react-icons/io5";
 
 import "../../../src/index.css";
 import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
@@ -14,9 +19,14 @@ import { PopupForAssignManager } from "./ModelForSuccessMess/PopupForAssignManag
 import { createTimeSheet, updateTimeSheet } from "../../graphql/mutations";
 import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
 
+
 import { Notification } from "./customTimeSheet/Notification";
 import { MergeTableForNotification } from "./customTimeSheet/MergeTableForNotification";
 import { sendEmail } from "../../services/EmailServices";
+import { PopupForAddRemark } from "./ModelForSuccessMess/PopupForAddRemark";
+import { FindSpecificTimeKeeper } from "./customTimeSheet/FindSpecificTimeKeeper";
+import { PopupForSFApproves } from "./ModelForSuccessMess/PopupForSFApproves";
+import { IoCheckmarkCircleSharp } from "react-icons/io5";
 const client = generateClient();
 
 export const ViewBLNGsheet = ({
@@ -27,6 +37,7 @@ export const ViewBLNGsheet = ({
   setExcelData,
   Position,
   fileName,
+  showRejectedItemTable,
 }) => {
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
 
@@ -43,12 +54,18 @@ export const ViewBLNGsheet = ({
   const [response, setResponse] = useState(null);
   const [showStatusCol, setShowStatusCol] = useState(null);
 
+  const [toggleForRemark, setToggleForRemark] = useState(null);
+  const [allApprovedData, setAllApprovedData] = useState([]);
+  const [allRejectedData, setAllRejectedData] = useState([]);
+  const [passSelectedData, setPassSelectedData] = useState(null);
+  const [checkedItems, setCheckedItems] = useState({});
+  const [checkedItemsTwo, setCheckedItemsTwo] = useState({});
+
   const { handleScroll, visibleData, setVisibleData } = UseScrollableView(
     data,
     "TimeKeeper"
   );
-
-  
+  const [storingMess, setStoringMess] = useState(null);
   // useEffect(() => {
   //   if (excelData) {
   //     const fetchData = async () => {
@@ -104,7 +121,7 @@ export const ViewBLNGsheet = ({
   //     fetchData();
   //   }
   // }, [excelData]);
-  
+
   useEffect(() => {
     try {
       if (excelData) {
@@ -126,21 +143,23 @@ export const ViewBLNGsheet = ({
             async function fetchAllData(queryName) {
               let allData = [];
               let nextToken = null;
-            
+
               do {
                 const response = await client.graphql({
                   query: queryName,
                   variables: { nextToken },
                 });
-            
-                const items = response.data[Object.keys(response.data)[0]].items; // Extract items
+
+                const items =
+                  response.data[Object.keys(response.data)[0]].items; // Extract items
                 allData = [...allData, ...items]; // Append fetched items
-                nextToken = response.data[Object.keys(response.data)[0]].nextToken; // Get nextToken
+                nextToken =
+                  response.data[Object.keys(response.data)[0]].nextToken; // Get nextToken
               } while (nextToken); // Continue if there's more data
-            
+
               return allData;
             }
-            
+
             const fetchWorkInfo = async () => {
               try {
                 // Fetch all data with pagination
@@ -148,40 +167,39 @@ export const ViewBLNGsheet = ({
                   fetchAllData(listEmpPersonalInfos),
                   fetchAllData(listEmpWorkInfos),
                 ]);
-            
+
                 const empInfo = employeeInfo; // All employee personal info
                 const workInfo = empWorkInfos; // All employee work info
-            
+
                 // Remove sapNo from work info
                 const sapNoRemoved = workInfo.map(({ sapNo, ...rest }) => rest);
-            
+
                 const mergedDatas = empInfo
                   .map((empInf) => {
                     const interviewDetails = sapNoRemoved.find(
                       (item) => item?.empID === empInf?.empID
                     );
-            
+
                     // Return null if all details are undefined
                     if (!interviewDetails) {
                       return null;
                     }
-            
+
                     return {
                       ...empInf,
                       ...interviewDetails,
                     };
                   })
                   .filter((item) => item !== null);
-            
+
                 console.log(fetchedData);
-            
+
                 // Merge fetchedData with workInfo based on FID
                 const mergedData = fetchedData.map((item) => {
                   const workInfoItem = mergedDatas.find(
                     (info) => info?.sapNo == item?.FID
                   );
-              
-               
+
                   return {
                     ...item,
                     NORMALWORKINGHRSPERDAY: workInfoItem
@@ -189,9 +207,9 @@ export const ViewBLNGsheet = ({
                       : null,
                   };
                 });
-            
+
                 console.log(mergedData);
-            
+
                 // Set merged data in state
                 setData(mergedData);
                 setSecondaryData(mergedData);
@@ -199,9 +217,8 @@ export const ViewBLNGsheet = ({
                 console.error("Error fetching work info:", error.message);
               }
             };
-            
+
             fetchWorkInfo();
-            
           } catch (err) {
           } finally {
             // setLoading is removed ;
@@ -213,9 +230,7 @@ export const ViewBLNGsheet = ({
       console.log("Error : ", err);
     }
   }, [excelData]);
-  
-  
-  
+
   useEffect(() => {
     const getPosition = localStorage.getItem("userType");
     if (getPosition === "Manager") {
@@ -337,9 +352,9 @@ export const ViewBLNGsheet = ({
       // setLoading is removed ;
     };
 
-    if (returnedTHeader && returnedTHeader.length > 0) {
+    if (returnedTHeader && returnedTHeader?.length > 0) {
       checkKeys();
-    } else if (!returnedTHeader) {
+    } else if (!returnedTHeader && showRejectedItemTable !== "Rejected") {
       const fetchData = async () => {
         setCurrentStatus(true);
         // setLoading is removed
@@ -369,11 +384,45 @@ export const ViewBLNGsheet = ({
 
       // Call the fetchData function asynchronously
       fetchData();
+    } else if (!returnedTHeader && showRejectedItemTable === "Rejected") {
+      const fetchData = async () => {
+        setCurrentStatus(true);
+        // setLoading(true);
+        try {
+          const dataPromise = new Promise((resolve, reject) => {
+            if (convertedStringToArrayObj) {
+              resolve(convertedStringToArrayObj);
+            } else {
+              setTimeout(() => {
+                reject("No data found after waiting.");
+              }, 5000);
+            }
+          });
+
+          const fetchedData = await dataPromise;
+
+          if (userIdentification !== "Manager") {
+            const finalData = await FindSpecificTimeKeeper(fetchedData);
+            pendingData(finalData);
+          }
+        } catch (err) {
+        } finally {
+          // setLoading(false);
+        }
+      };
+
+      // Call the fetchData function asynchronously
+      fetchData();
     } else {
       setCurrentStatus(false);
       //  setLoading is removed ;
     }
-  }, [returnedTHeader, convertedStringToArrayObj]);
+  }, [
+    returnedTHeader,
+    convertedStringToArrayObj,
+    userIdentification,
+    showRejectedItemTable,
+  ]);
 
   const editBLNG = (data) => {
     setEditObject(data);
@@ -420,26 +469,33 @@ export const ViewBLNGsheet = ({
   };
 
   const editBLNGFunction = (getObject) => {
-    const result = Array.isArray(data[0]?.data)
-      ? editNestedData(data, getObject)
-      : editFlatData(data, getObject);
+    try {
+      const result = Array.isArray(data[0]?.data)
+        ? editNestedData(data, getObject)
+        : editFlatData(data, getObject);
 
       const updatedData = result?.map((item) => {
         // Check if jobLocaWhrs is a non-null, non-empty array and assign LOCATION if valid
-        if (Array.isArray(item.jobLocaWhrs) && item.jobLocaWhrs.length > 0) {
-          item.LOCATION = item.jobLocaWhrs[0].LOCATION;
+        if (Array.isArray(item?.jobLocaWhrs) && item?.jobLocaWhrs?.length > 0) {
+          item.LOCATION = item?.jobLocaWhrs[0]?.LOCATION;
         } else {
           item.LOCATION = null; // Default to null or any other fallback value
         }
         return item;
       });
-    setData(updatedData);
+      setData(updatedData);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const AllFieldData = useTableFieldData(titleName);
 
   const renameKeysFunctionAndSubmit = async (managerData) => {
-    if (userIdentification !== "Manager") {
+    if (
+      userIdentification !== "Manager" &&
+      showRejectedItemTable !== "Rejected"
+    ) {
       const result =
         data &&
         data.map((val, i) => {
@@ -476,6 +532,7 @@ export const ViewBLNGsheet = ({
       });
 
       const sendTimeSheets = async (timeSheetData) => {
+        let successCount = 0;
         let successFlag = false;
 
         for (const timeSheet of timeSheetData) {
@@ -491,10 +548,17 @@ export const ViewBLNGsheet = ({
                 response.data.createTimeSheet
               );
               const responseData = response.data.createTimeSheet;
+              successCount++;
+
+              if (successCount === data.length) {
+                setStoringMess(false);
+                setVisibleData([]);
+                setData(null);
+              }
 
               if (!successFlag) {
                 toggleSFAMessage(true, responseData); // Only toggle success message once
-
+                setStoringMess(true);
                 const result = await MergeTableForNotification(responseData);
 
                 if (result) {
@@ -518,7 +582,8 @@ export const ViewBLNGsheet = ({
                     "MergeTableForNotification returned undefined!"
                   );
                 }
-
+                setVisibleData([]);
+                setData(null);
                 successFlag = true; // Set the flag to true
               }
             }
@@ -535,31 +600,40 @@ export const ViewBLNGsheet = ({
 
       // }
     } else if (userIdentification === "Manager") {
-      const MultipleBLNGfile =
-        data &&
-        data.map((val) => {
-          return {
-            id: val.id,
-            // fileName: val.fileName,
-            fidNo: val?.FID || 0,
-            empName: val?.NAMEFLAST || "",
-            date: val?.ENTRANCEDATEUSED || "",
-            inTime: val?.ENTRANCEDATETIME || "",
-            outTime: val?.EXITDATETIME || "",
-            // day: val?.DAYDIFFERENCE || 0,
-            avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
-            totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
-            aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
-            normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
-            actualWorkHrs: val?.WORKINGHOURS || 0,
-            otTime: val?.OT || 0,
-            empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+      const MergedData = [...allApprovedData, ...allRejectedData];
 
-            fileType: "BLNG",
-            status: "Approved",
-            remarks: val?.REMARKS || "",
-          };
-        });
+      const uniqueArray = MergedData?.filter(
+        (item, index, self) =>
+          index === self.findIndex((obj) => obj.id === item.id)
+      );
+
+      const InitialBLNGUpdate =
+        uniqueArray && uniqueArray.length > 0
+          ? uniqueArray.map((val) => {
+              return {
+                id: val.id,
+                // fileName: val.fileName,
+                fidNo: val?.FID || 0,
+                empName: val?.NAMEFLAST || "",
+                date: val?.ENTRANCEDATEUSED || "",
+                inTime: val?.ENTRANCEDATETIME || "",
+                outTime: val?.EXITDATETIME || "",
+                // day: val?.DAYDIFFERENCE || 0,
+                avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
+                totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
+                aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
+                normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+                actualWorkHrs: val?.WORKINGHOURS || 0,
+                otTime: val?.OT || 0,
+                empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+
+                fileType: "BLNG",
+
+                status: val.status,
+                remarks: val?.REMARKS || "",
+              };
+            })
+          : [];
 
       const updateTimeSheetFuction = async (timeSheetData) => {
         let successFlag = false;
@@ -607,8 +681,6 @@ export const ViewBLNGsheet = ({
 
                 successFlag = true; // Set the flag to true
               }
-              setVisibleData([]);
-              setData(null);
             }
           } catch (error) {
             console.error("Error creating TimeSheet:", error);
@@ -617,10 +689,180 @@ export const ViewBLNGsheet = ({
         }
       };
 
-      updateTimeSheetFuction(MultipleBLNGfile);
+      updateTimeSheetFuction(InitialBLNGUpdate);
+
+      // updateTimeSheetFuction(MultipleBLNGfile);
+    } else if (
+      userIdentification !== "Manager" &&
+      showRejectedItemTable === "Rejected"
+    ) {
+      const updatedRejectedItems =
+        data && data.length > 0
+          ? data.map((val) => {
+              return {
+                id: val.id,
+                // fileName: val.fileName,
+                fidNo: val?.FID || 0,
+                empName: val?.NAMEFLAST || "",
+                date: val?.ENTRANCEDATEUSED || "",
+                inTime: val?.ENTRANCEDATETIME || "",
+                outTime: val?.EXITDATETIME || "",
+                // day: val?.DAYDIFFERENCE || 0,
+                avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
+                totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
+                aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
+                normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+                actualWorkHrs: val?.WORKINGHOURS || 0,
+                otTime: val?.OT || 0,
+                empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+
+                fileType: "BLNG",
+                status: "Pending",
+
+                remarks: val?.REMARKS || "",
+              };
+            })
+          : [];
+
+      const updateTimeSheetFunction = async (timeSheetData) => {
+        let successFlag = false;
+        for (const timeSheet of timeSheetData) {
+          try {
+            const response = await client.graphql({
+              query: updateTimeSheet,
+              variables: {
+                input: timeSheet, // Send each object individually
+              },
+            });
+
+            if (response?.data?.updateTimeSheet) {
+              console.log(
+                "TimeSheet created successfully:",
+                response.data.updateTimeSheet
+              );
+              const responseData = response.data.updateTimeSheet;
+
+              if (!successFlag) {
+                toggleSFAMessage(true, responseData); // Only toggle success message once
+
+                const result = await MergeTableForNotification(responseData);
+
+                if (result) {
+                  // Call the Notification function
+                  const emailDetails = await Notification({
+                    getEmail: result, // Fix: Pass 'getEmail' instead of 'result'
+                    Position,
+                  });
+
+                  if (emailDetails) {
+                    // Log email details
+                    const { subject, message, fromAddress, toAddress } =
+                      emailDetails;
+
+                    await sendEmail(subject, message, fromAddress, toAddress);
+                  } else {
+                    console.error("Notification returned undefined!");
+                  }
+                } else {
+                  console.error(
+                    "MergeTableForNotification returned undefined!"
+                  );
+                }
+                setVisibleData([]);
+                setData(null);
+                successFlag = true; // Set the flag to true
+              }
+            }
+          } catch (err) {}
+        }
+      };
+
+      updateTimeSheetFunction(updatedRejectedItems);
     }
   };
 
+  const toggleForRemarkFunc = () => {
+    setToggleForRemark(!toggleForRemark);
+  };
+
+  const storeOnlySelectedItem = (data, action) => {
+    if (action === "Approved") {
+      setAllApprovedData((prevApprovedData) => {
+        // Replace old data if ID matches, otherwise keep existing data
+        const updatedData = prevApprovedData.filter(
+          (item) => item.id !== data.id
+        );
+        const updateStatus = { ...data, status: "Approved" };
+
+        return [...updatedData, updateStatus]; // Add the new data
+      });
+    } else if (action === "Rejected") {
+      setAllRejectedData((prevRejectedData) => {
+        // Replace old data if ID matches, otherwise keep existing data
+        const updatedData = prevRejectedData.filter(
+          (item) => item.id !== data.id
+        );
+        return [...updatedData, data]; // Add the new data
+      });
+      setPassSelectedData(data); // Update the selected data
+    }
+  };
+  const addRemarks = (data) => {
+    const dataAlongWithRemark = allRejectedData.map((m) => {
+      if (m.id === data.id) {
+        return { ...data, REMARKS: data.REMARKS };
+      } else {
+        return m;
+      }
+    });
+
+    setAllRejectedData(dataAlongWithRemark);
+  };
+  // console.log(allApprovedData, " : ", allRejectedData);
+  const removeExistingData = (data, action) => {
+    if (action === "Approved") {
+      const afterRemoved = allApprovedData.filter((fil) => fil.id !== data.id);
+      setAllApprovedData(afterRemoved);
+    } else if (action === "Rejected") {
+      const afterRemoved = allRejectedData.filter((fil) => fil.id !== data.id);
+      setAllRejectedData(afterRemoved);
+    }
+  };
+
+  const removeCheckedItem = useCallback(() => {
+    // Combine approved and rejected data
+    const mergedData = [...allApprovedData, ...allRejectedData];
+
+    // Filter out items that have matching sapNo in mergedData
+    const afterRemoved = data?.filter(
+      (val) => !mergedData.some((fil) => val.id === fil.id)
+    );
+
+    // Update the state with the filtered data
+    setData(afterRemoved);
+    // setAllApprovedData([]);
+    // setAllRejectedData([]);
+  }, [allApprovedData, allRejectedData, data]);
+
+  const convertToISODate = (dateString) => {
+    const [year, month, day] = dateString.split("/");
+
+    return `${month}/${year}/${day}`; // 'M/D/YYYY'
+  };
+
+  const ENTRANCEDATETIME = (getDate) => {
+    const inputDate = String(getDate);
+    const date = new Date(inputDate);
+
+    // Extract parts
+    const day = date.getDate(); // 2
+    const month = date.getMonth() + 1; // Months are 0-indexed, so add 1
+    const year = date.getFullYear(); // 2024
+    const time = inputDate?.split(" ")[1] + " " + inputDate?.split(" ")[2]; // "5:50:59 AM"
+
+    // Format the new date
+    return `${day}/${month}/${year} ${time}`;
+  };
   return (
     <div>
       <div>
@@ -644,7 +886,7 @@ export const ViewBLNGsheet = ({
                 className="styled-table "
                 // className="table-auto text-center w-full  border-2 border-lite_grey"
               >
-                <thead className="sticky-header">
+                <thead className="sticky-header w-[100%]">
                   <tr
                     // className="bg-lite_grey  text-dark_grey text_size_5"
                     className="text_size_5"
@@ -662,14 +904,40 @@ export const ViewBLNGsheet = ({
                         </td>
                       </tr>
                     )}
-                    {showStatusCol === true ? (
-                      ""
-                    ) : (
-                      <td className="px-4 text-center text_size_7">STATUS</td>
+                    {!showStatusCol && (
+                      <>
+                        <td
+                          className={`${
+                            showRejectedItemTable === "Rejected"
+                              ? "hidden"
+                              : "px-5 flex-1 text_size_7"
+                          }`}
+                        >
+                          STATUS
+                        </td>
+                        <td
+                          className={`${
+                            showRejectedItemTable === "Rejected"
+                              ? "hidden"
+                              : "px-5 flex-1 text_size_7"
+                          }`}
+                        >
+                          APPROVE
+                        </td>
+                        <td
+                          className={`${
+                            showRejectedItemTable === "Rejected"
+                              ? "hidden"
+                              : "px-5 flex-1 text_size_7"
+                          }`}
+                        >
+                          REJECT
+                        </td>
+                      </>
                     )}
                   </tr>
                 </thead>
-                {console.log(visibleData)}
+
                 <tbody>
                   {visibleData && visibleData?.length > 0 ? (
                     visibleData.map((value, index) => {
@@ -701,13 +969,14 @@ export const ViewBLNGsheet = ({
                               {rowData?.NAMEFLAST}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {rowData?.ENTRANCEDATEUSED}
+                              {convertToISODate(rowData?.ENTRANCEDATEUSED)}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {rowData?.ENTRANCEDATETIME}
+                              {ENTRANCEDATETIME(rowData?.ENTRANCEDATETIME)}
+                              {/* {ENTRANCEDATETIME("9/2/2024 5:50:59 AM")} */}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {rowData?.EXITDATETIME}
+                              {ENTRANCEDATETIME(rowData?.EXITDATETIME)}
                             </td>
                             {/* <td className="text-center px-4 flex-1">
                               {rowData?.DAYDIFFERENCE || 0}
@@ -733,7 +1002,7 @@ export const ViewBLNGsheet = ({
                             <td className="text-center px-4 flex-1">
                               {rowData?.REMARKS}
                             </td>
-                            {isStatusPending && (
+                            {/* {isStatusPending && (
                               <td
                                 className={`text-center px-4 flex-1 ${
                                   rowData?.status === "Approved"
@@ -743,6 +1012,74 @@ export const ViewBLNGsheet = ({
                               >
                                 {rowData?.status}
                               </td>
+                            )} */}
+                            {isStatusPending && (
+                              <React.Fragment>
+                                <td
+                                  className={`text-center px-4 flex-1 ${
+                                    rowData?.status === "Approved"
+                                      ? "text-[#0CB100]"
+                                      : "text_size_8"
+                                  }`}
+                                >
+                                  {rowData?.status}
+                                </td>
+                                <td>
+                                  <input
+                                    className="h-4 w-4"
+                                    type="checkbox"
+                                    checked={checkedItems[rowData.id] || false}
+                                    onClick={(e) => e.stopPropagation()}
+                                    onChange={(e) => {
+                                      if (e.target.checked) {
+                                        setCheckedItems((prev) => ({
+                                          ...prev,
+                                          [rowData.id]: e.target.checked, // Toggle the checked state for this specific ID
+                                        }));
+                                        storeOnlySelectedItem(
+                                          rowData,
+                                          "Approved"
+                                        );
+                                      } else {
+                                        removeExistingData(rowData, "Approved");
+                                        setCheckedItems((prev) => ({
+                                          ...prev,
+                                          [rowData.id]: false, // Toggle the checked state for this specific ID
+                                        }));
+                                      }
+                                    }}
+                                  />
+                                </td>
+                                <td>
+                                  <input
+                                    className="h-4 w-4"
+                                    type="checkbox"
+                                    checked={
+                                      checkedItemsTwo[rowData.id] || false
+                                    }
+                                    onClick={(e) => e.stopPropagation()}
+                                    onChange={(e) => {
+                                      if (e.target.checked) {
+                                        setCheckedItemsTwo((prev) => ({
+                                          ...prev,
+                                          [rowData.id]: e.target.checked, // Toggle the checked state for this specific ID
+                                        }));
+                                        storeOnlySelectedItem(
+                                          rowData,
+                                          "Rejected"
+                                        );
+                                        toggleForRemarkFunc();
+                                      } else {
+                                        removeExistingData(rowData, "Rejected");
+                                        setCheckedItemsTwo((prev) => ({
+                                          ...prev,
+                                          [rowData.id]: false, // Toggle the checked state for this specific ID
+                                        }));
+                                      }
+                                    }}
+                                  />
+                                </td>
+                              </React.Fragment>
                             )}
                           </tr>
                         );
@@ -759,9 +1096,7 @@ export const ViewBLNGsheet = ({
                         colSpan="100%"
                         className="text-center text-dark_ash text_size_5 bg-white"
                       >
-                        <p className="px-6 py-6">
-                          Please wait few seconds.
-                        </p>
+                        <p className="px-6 py-6">Please wait few seconds.</p>
                       </td>
                     </tr>
                   )}
@@ -783,11 +1118,12 @@ export const ViewBLNGsheet = ({
                     toggleFunctionForAssiMana();
                   } else if (userIdentification === "Manager") {
                     renameKeysFunctionAndSubmit();
+                    removeCheckedItem();
                   }
                 }}
               >
                 {userIdentification === "Manager"
-                  ? "Approve"
+                  ? "Finalize and Submit"
                   : "Assign Manager"}
               </button>
             </div>
@@ -810,16 +1146,39 @@ export const ViewBLNGsheet = ({
           Position={Position}
         />
       )}
-      <SuccessMessage
-        successMess={successMess}
-        toggleSFAMessage={toggleSFAMessage}
-        setExcelData={setExcelData}
-        userIdentification={userIdentification}
-      />
+      {storingMess === true ? (
+        <PopupForSFApproves
+          toggleSFAMessage={toggleSFAMessage}
+          icons={<IoCheckmarkCircleSharp />}
+          iconColor="text-[#2BEE48]"
+          textColor="text-[#05b01f]"
+          title={"Processing..."}
+          message={`Data is being saved, `}
+          messageTwo={"this might take a few seconds..."}
+          // btnText={"OK"}
+        />
+      ) : storingMess === false ? (
+        <SuccessMessage
+          successMess={successMess}
+          toggleSFAMessage={toggleSFAMessage}
+          setExcelData={setExcelData}
+          userIdentification={userIdentification}
+        />
+      ) : (
+        ""
+      )}
       {toggleAssignManager === true && (
         <PopupForAssignManager
           toggleFunctionForAssiMana={toggleFunctionForAssiMana}
           renameKeysFunctionAndSubmit={renameKeysFunctionAndSubmit}
+        />
+      )}
+
+      {toggleForRemark === true && (
+        <PopupForAddRemark
+          toggleForRemarkFunc={toggleForRemarkFunc}
+          addRemarks={addRemarks}
+          passSelectedData={passSelectedData}
         />
       )}
     </div>

@@ -1,11 +1,18 @@
-import React, { useEffect, useState } from 'react'
-import { FilterTable } from './FilterTable'
+import React, { useEffect, useState } from "react";
+import { FilterTable } from "./FilterTable";
+import { useLocation } from "react-router-dom";
 
-export const GroupHSData = ({allData,typeOfReport,reportTitle}) => {
+export const GroupHSData = () => {
+  const location = useLocation();
+  const { allData, title } = location.state || {};
   const [tableBody, setTableBody] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [tableHead, setTableHead] = useState([
-       "Name",
+    "Emp ID",
     "Employee Badge",
+    "Name",
     "Nationality",
     "Department",
     "Position",
@@ -26,33 +33,91 @@ export const GroupHSData = ({allData,typeOfReport,reportTitle}) => {
   // Generate table body dynamically from mergedData
   const probationReviewMergedData = (data) => {
     return data
-    .filter((item) => item.groupInsEndDate) // Only include items with termiDate
-    .map((item) => ({
-        name: item.name || "-",
-        empBadgeNo: item.empBadgeNo || "-",
+    .filter((item) => {      
+      // Ensure groupInsEffectDate is a valid array with non-empty and valid date entries
+      return (
+        Array.isArray(item.groupInsEffectDate) &&
+        item.groupInsEffectDate.length > 0 &&
+        item.groupInsEffectDate.every((date) => date && !isNaN(new Date(date).getTime()))
+      );
+    })
+    .filter((item) => {
+      const groupInsEffectDate = item.groupInsEffectDate[item.groupInsEffectDate.length - 1];
+      return groupInsEffectDate;
+    })      .map((item) => ({
+      empID: item.empID || "-",
+      empBadgeNo: item.empBadgeNo || "-",
+      name: item.name || "-",
         nationality: item.nationality || "-",
         department: item.department || "-",
         position: item.position || "-",
         groupIns: item.groupIns || "-",
         groupInsEffectDate: Array.isArray(item.groupInsEffectDate)
-        ? formatDate(item.groupInsEffectDate[item.groupInsEffectDate.length - 1])
-        : "-", 
-        groupInsEndDate:  Array.isArray(item.groupInsEndDate)
-        ? formatDate(item.groupInsEndDate[item.groupInsEndDate.length - 1])
-        : "-", 
-    }));
-};
+          ? formatDate(
+              item.groupInsEffectDate[item.groupInsEffectDate.length - 1]
+            )
+          : "-",
+        groupInsEndDate: Array.isArray(item.groupInsEndDate)
+          ? formatDate(item.groupInsEndDate[item.groupInsEndDate.length - 1])
+          : "-",
+      }));
+  };
 
-  useEffect(()=>{
-    
-      setTableBody(probationReviewMergedData(allData))
-    },[allData])
-console.log(tableBody);
+  useEffect(() => {
+    setTableBody(probationReviewMergedData(allData));
+  }, [allData]);
+  // console.log(tableBody);
 
-  return (
-    <div>
-
-      <FilterTable tableBody={tableBody} tableHead={tableHead} typeOfReport={typeOfReport} reportTitle={reportTitle}/>
+ const handleDate = (e, type) => {
+     const value = e.target.value;
+ 
+     if (type === "startDate") setStartDate(value);
+     if (type === "endDate") setEndDate(value);
+ 
+     const start = type === "startDate" ? new Date(value) : startDate ? new Date(startDate) : null;
+     const end = type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
+ 
+     const filtered = allData.filter((data) => {
+       const expiryArray = data.groupInsEffectDate || [];
+       const expiryDate = expiryArray.length
+         ? new Date(expiryArray[expiryArray.length - 1])
+         : null;
+ 
+       if (!expiryDate || isNaN(expiryDate.getTime())) return false;
+ 
+       if (start && end) return expiryDate >= start && expiryDate <= end;
+       if (start) return expiryDate >= start;
+       if (end) return expiryDate <= end;
+ 
+       return true;
+     }).map((item) => ({
+      empID: item.empID || "-",
+      empBadgeNo: item.empBadgeNo || "-",
+      name: item.name || "-",
+        nationality: item.nationality || "-",
+        department: item.department || "-",
+        position: item.position || "-",
+        groupIns: item.groupIns || "-",
+        groupInsEffectDate: Array.isArray(item.groupInsEffectDate)
+          ? formatDate(
+              item.groupInsEffectDate[item.groupInsEffectDate.length - 1]
+            )
+          : "-",
+        groupInsEndDate: Array.isArray(item.groupInsEndDate)
+          ? formatDate(item.groupInsEndDate[item.groupInsEndDate.length - 1])
+          : "-",
+     }));
+ 
+     setFilteredData(filtered);
+   };
+   return (
+     <div>
+       <FilterTable
+          tableBody={filteredData.length ? filteredData : tableBody}
+          tableHead={tableHead}
+          title={title}
+          handleDate={handleDate}
+      />
     </div>
-  )
-}
+  );
+};

@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { FilterTable } from "./FilterTable";
 import logo from "../../assets/logo/logo-with-name.svg";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ProbationForm } from "./ProbationForm";
 import { VscClose } from "react-icons/vsc";
 
-export const ProbationReview = ({ allData, typeOfReport, reportTitle }) => {
+export const ProbationReview = () => {
+  const location = useLocation();
+  const { allData,title } = location.state || {}; 
   const [tableBody, setTableBody] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [tableHead] = useState([
     "Emp ID",
     "Employee Badge",
@@ -82,10 +87,10 @@ export const ProbationReview = ({ allData, typeOfReport, reportTitle }) => {
   useEffect(() => {
     if (allData && Array.isArray(allData)) {
       const mergedData = probationReviewMergedData(allData);
-      console.log("Merged Data:", mergedData);
+      // console.log("Merged Data:", mergedData);
       setTableBody(mergedData);
     } else {
-      console.warn("Invalid or missing allData:", allData);
+      console.warn("Invalid or missing allData:");
     }
   }, [allData]);
   // Function to handle viewing details
@@ -93,7 +98,7 @@ export const ProbationReview = ({ allData, typeOfReport, reportTitle }) => {
     console.log("Person State:", personData);
     setSelectedPerson(personData); // Set selected person's data
   };
-  console.log("Selected Person State:", selectedPerson);
+  // console.log("Selected Person State:", selectedPerson);
   const closeModal = () => {
     setSelectedPerson(null); // Close modal
   };
@@ -107,14 +112,49 @@ export const ProbationReview = ({ allData, typeOfReport, reportTitle }) => {
     }
   };
 
+   const handleDate = (e, type) => {
+    const value = e.target.value;
+    if (type === "startDate") setStartDate(value);
+    if (type === "endDate") setEndDate(value);
+  
+    const start = type === "startDate" ? new Date(value) : startDate ? new Date(startDate) : null;
+    const end = type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
+  
+    const filtered = allData
+      .filter((data) => {
+        const resignDate = data.resignDate ? new Date(data.resignDate) : null;
+  
+        if (!resignDate || isNaN(resignDate.getTime())) return false;
+  
+        if (start && end) return resignDate >= start && resignDate <= end;
+        if (start) return resignDate >= start;
+        if (end) return resignDate <= end;
+  
+        return true;
+      })
+      .map((item) => ({
+        empID: item.empID || "-",
+        empBadgeNo: item.empBadgeNo || "-",
+        name: item.name || "-",
+        doj: item.doj || "-",
+        nationality: item.nationality || "-",
+        department: item.department || "-",
+        position: item.position || "-",
+        resignDate: formatDate(item.resignDate) || "-",
+        reasonResign: item.reasonResign || "-",
+      }));
+  
+    setFilteredData(filtered);
+  };
+  
+
   return (
     <div>
       <FilterTable
-        tableBody={tableBody}
+        tableBody={filteredData.length ? filteredData : tableBody}
         tableHead={tableHead}
-        typeOfReport={typeOfReport}
-        reportTitle={reportTitle}
-        allData={allData}
+        title={title}
+        handleDate={handleDate}
         handleViewDetails={handleViewDetails} // Pass the function to FilterTable
       />
 

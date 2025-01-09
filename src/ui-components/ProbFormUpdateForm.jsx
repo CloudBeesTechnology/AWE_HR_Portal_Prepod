@@ -52,6 +52,16 @@ export default function ProbFormUpdateForm(props) {
     gmApproved: "",
     managerApproved: "",
     supervisorApproved: "",
+    communicationDetails: "",
+    qualityDetails: "",
+    paceDetails: "",
+    initiativeDetails: "",
+    attitudeDetails: "",
+    adaptabilityDetails: "",
+    teamworkDetails: "",
+    responsibilityDetails: "",
+    diligentDetails: "",
+    commitmentDetails: "",
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [adaptability, setAdaptability] = React.useState(
@@ -106,6 +116,36 @@ export default function ProbFormUpdateForm(props) {
   const [supervisorApproved, setSupervisorApproved] = React.useState(
     initialValues.supervisorApproved
   );
+  const [communicationDetails, setCommunicationDetails] = React.useState(
+    initialValues.communicationDetails
+  );
+  const [qualityDetails, setQualityDetails] = React.useState(
+    initialValues.qualityDetails
+  );
+  const [paceDetails, setPaceDetails] = React.useState(
+    initialValues.paceDetails
+  );
+  const [initiativeDetails, setInitiativeDetails] = React.useState(
+    initialValues.initiativeDetails
+  );
+  const [attitudeDetails, setAttitudeDetails] = React.useState(
+    initialValues.attitudeDetails
+  );
+  const [adaptabilityDetails, setAdaptabilityDetails] = React.useState(
+    initialValues.adaptabilityDetails
+  );
+  const [teamworkDetails, setTeamworkDetails] = React.useState(
+    initialValues.teamworkDetails
+  );
+  const [responsibilityDetails, setResponsibilityDetails] = React.useState(
+    initialValues.responsibilityDetails
+  );
+  const [diligentDetails, setDiligentDetails] = React.useState(
+    initialValues.diligentDetails
+  );
+  const [commitmentDetails, setCommitmentDetails] = React.useState(
+    initialValues.commitmentDetails
+  );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = probFormRecord
@@ -138,6 +178,16 @@ export default function ProbFormUpdateForm(props) {
     setGmApproved(cleanValues.gmApproved);
     setManagerApproved(cleanValues.managerApproved);
     setSupervisorApproved(cleanValues.supervisorApproved);
+    setCommunicationDetails(cleanValues.communicationDetails);
+    setQualityDetails(cleanValues.qualityDetails);
+    setPaceDetails(cleanValues.paceDetails);
+    setInitiativeDetails(cleanValues.initiativeDetails);
+    setAttitudeDetails(cleanValues.attitudeDetails);
+    setAdaptabilityDetails(cleanValues.adaptabilityDetails);
+    setTeamworkDetails(cleanValues.teamworkDetails);
+    setResponsibilityDetails(cleanValues.responsibilityDetails);
+    setDiligentDetails(cleanValues.diligentDetails);
+    setCommitmentDetails(cleanValues.commitmentDetails);
     setErrors({});
   };
   const [probFormRecord, setProbFormRecord] = React.useState(probFormModelProp);
@@ -184,6 +234,16 @@ export default function ProbFormUpdateForm(props) {
     gmApproved: [],
     managerApproved: [],
     supervisorApproved: [],
+    communicationDetails: [],
+    qualityDetails: [],
+    paceDetails: [],
+    initiativeDetails: [],
+    attitudeDetails: [],
+    adaptabilityDetails: [],
+    teamworkDetails: [],
+    responsibilityDetails: [],
+    diligentDetails: [],
+    commitmentDetails: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -238,6 +298,16 @@ export default function ProbFormUpdateForm(props) {
           gmApproved: gmApproved ?? null,
           managerApproved: managerApproved ?? null,
           supervisorApproved: supervisorApproved ?? null,
+          communicationDetails: communicationDetails ?? null,
+          qualityDetails: qualityDetails ?? null,
+          paceDetails: paceDetails ?? null,
+          initiativeDetails: initiativeDetails ?? null,
+          attitudeDetails: attitudeDetails ?? null,
+          adaptabilityDetails: adaptabilityDetails ?? null,
+          teamworkDetails: teamworkDetails ?? null,
+          responsibilityDetails: responsibilityDetails ?? null,
+          diligentDetails: diligentDetails ?? null,
+          commitmentDetails: commitmentDetails ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -325,6 +395,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -375,6 +455,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.adaptability ?? value;
@@ -425,6 +515,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.additionalInfo ?? value;
@@ -475,6 +575,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.attention ?? value;
@@ -525,6 +635,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.attitude ?? value;
@@ -575,6 +695,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.commitment ?? value;
@@ -625,6 +755,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.communication ?? value;
@@ -675,6 +815,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.deadline ?? value;
@@ -725,6 +875,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.diligent ?? value;
@@ -775,6 +935,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.extensionPeriod ?? value;
@@ -825,6 +995,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.gmDate ?? value;
@@ -875,6 +1055,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.hrDate ?? value;
@@ -925,6 +1115,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.hrName ?? value;
@@ -975,6 +1175,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.initiative ?? value;
@@ -1025,6 +1235,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.managerDate ?? value;
@@ -1075,6 +1295,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.managerName ?? value;
@@ -1125,6 +1355,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.pace ?? value;
@@ -1175,6 +1415,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.quality ?? value;
@@ -1225,6 +1475,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.recommendation ?? value;
@@ -1275,6 +1535,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.responsibility ?? value;
@@ -1325,6 +1595,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.supervisorDate ?? value;
@@ -1375,6 +1655,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.supervisorName ?? value;
@@ -1425,6 +1715,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.teamwork ?? value;
@@ -1475,6 +1775,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.extendProbED ?? value;
@@ -1525,6 +1835,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved: value,
               managerApproved,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.gmApproved ?? value;
@@ -1575,6 +1895,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved: value,
               supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.managerApproved ?? value;
@@ -1625,6 +1955,16 @@ export default function ProbFormUpdateForm(props) {
               gmApproved,
               managerApproved,
               supervisorApproved: value,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
             };
             const result = onChange(modelFields);
             value = result?.supervisorApproved ?? value;
@@ -1640,6 +1980,616 @@ export default function ProbFormUpdateForm(props) {
         errorMessage={errors.supervisorApproved?.errorMessage}
         hasError={errors.supervisorApproved?.hasError}
         {...getOverrideProps(overrides, "supervisorApproved")}
+      ></TextField>
+      <TextField
+        label="Communication details"
+        isRequired={false}
+        isReadOnly={false}
+        value={communicationDetails}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              adaptability,
+              additionalInfo,
+              attention,
+              attitude,
+              commitment,
+              communication,
+              deadline,
+              diligent,
+              extensionPeriod,
+              gmDate,
+              hrDate,
+              hrName,
+              initiative,
+              managerDate,
+              managerName,
+              pace,
+              quality,
+              recommendation,
+              responsibility,
+              supervisorDate,
+              supervisorName,
+              teamwork,
+              extendProbED,
+              gmApproved,
+              managerApproved,
+              supervisorApproved,
+              communicationDetails: value,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
+            };
+            const result = onChange(modelFields);
+            value = result?.communicationDetails ?? value;
+          }
+          if (errors.communicationDetails?.hasError) {
+            runValidationTasks("communicationDetails", value);
+          }
+          setCommunicationDetails(value);
+        }}
+        onBlur={() =>
+          runValidationTasks("communicationDetails", communicationDetails)
+        }
+        errorMessage={errors.communicationDetails?.errorMessage}
+        hasError={errors.communicationDetails?.hasError}
+        {...getOverrideProps(overrides, "communicationDetails")}
+      ></TextField>
+      <TextField
+        label="Quality details"
+        isRequired={false}
+        isReadOnly={false}
+        value={qualityDetails}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              adaptability,
+              additionalInfo,
+              attention,
+              attitude,
+              commitment,
+              communication,
+              deadline,
+              diligent,
+              extensionPeriod,
+              gmDate,
+              hrDate,
+              hrName,
+              initiative,
+              managerDate,
+              managerName,
+              pace,
+              quality,
+              recommendation,
+              responsibility,
+              supervisorDate,
+              supervisorName,
+              teamwork,
+              extendProbED,
+              gmApproved,
+              managerApproved,
+              supervisorApproved,
+              communicationDetails,
+              qualityDetails: value,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
+            };
+            const result = onChange(modelFields);
+            value = result?.qualityDetails ?? value;
+          }
+          if (errors.qualityDetails?.hasError) {
+            runValidationTasks("qualityDetails", value);
+          }
+          setQualityDetails(value);
+        }}
+        onBlur={() => runValidationTasks("qualityDetails", qualityDetails)}
+        errorMessage={errors.qualityDetails?.errorMessage}
+        hasError={errors.qualityDetails?.hasError}
+        {...getOverrideProps(overrides, "qualityDetails")}
+      ></TextField>
+      <TextField
+        label="Pace details"
+        isRequired={false}
+        isReadOnly={false}
+        value={paceDetails}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              adaptability,
+              additionalInfo,
+              attention,
+              attitude,
+              commitment,
+              communication,
+              deadline,
+              diligent,
+              extensionPeriod,
+              gmDate,
+              hrDate,
+              hrName,
+              initiative,
+              managerDate,
+              managerName,
+              pace,
+              quality,
+              recommendation,
+              responsibility,
+              supervisorDate,
+              supervisorName,
+              teamwork,
+              extendProbED,
+              gmApproved,
+              managerApproved,
+              supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails: value,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
+            };
+            const result = onChange(modelFields);
+            value = result?.paceDetails ?? value;
+          }
+          if (errors.paceDetails?.hasError) {
+            runValidationTasks("paceDetails", value);
+          }
+          setPaceDetails(value);
+        }}
+        onBlur={() => runValidationTasks("paceDetails", paceDetails)}
+        errorMessage={errors.paceDetails?.errorMessage}
+        hasError={errors.paceDetails?.hasError}
+        {...getOverrideProps(overrides, "paceDetails")}
+      ></TextField>
+      <TextField
+        label="Initiative details"
+        isRequired={false}
+        isReadOnly={false}
+        value={initiativeDetails}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              adaptability,
+              additionalInfo,
+              attention,
+              attitude,
+              commitment,
+              communication,
+              deadline,
+              diligent,
+              extensionPeriod,
+              gmDate,
+              hrDate,
+              hrName,
+              initiative,
+              managerDate,
+              managerName,
+              pace,
+              quality,
+              recommendation,
+              responsibility,
+              supervisorDate,
+              supervisorName,
+              teamwork,
+              extendProbED,
+              gmApproved,
+              managerApproved,
+              supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails: value,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
+            };
+            const result = onChange(modelFields);
+            value = result?.initiativeDetails ?? value;
+          }
+          if (errors.initiativeDetails?.hasError) {
+            runValidationTasks("initiativeDetails", value);
+          }
+          setInitiativeDetails(value);
+        }}
+        onBlur={() =>
+          runValidationTasks("initiativeDetails", initiativeDetails)
+        }
+        errorMessage={errors.initiativeDetails?.errorMessage}
+        hasError={errors.initiativeDetails?.hasError}
+        {...getOverrideProps(overrides, "initiativeDetails")}
+      ></TextField>
+      <TextField
+        label="Attitude details"
+        isRequired={false}
+        isReadOnly={false}
+        value={attitudeDetails}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              adaptability,
+              additionalInfo,
+              attention,
+              attitude,
+              commitment,
+              communication,
+              deadline,
+              diligent,
+              extensionPeriod,
+              gmDate,
+              hrDate,
+              hrName,
+              initiative,
+              managerDate,
+              managerName,
+              pace,
+              quality,
+              recommendation,
+              responsibility,
+              supervisorDate,
+              supervisorName,
+              teamwork,
+              extendProbED,
+              gmApproved,
+              managerApproved,
+              supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails: value,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
+            };
+            const result = onChange(modelFields);
+            value = result?.attitudeDetails ?? value;
+          }
+          if (errors.attitudeDetails?.hasError) {
+            runValidationTasks("attitudeDetails", value);
+          }
+          setAttitudeDetails(value);
+        }}
+        onBlur={() => runValidationTasks("attitudeDetails", attitudeDetails)}
+        errorMessage={errors.attitudeDetails?.errorMessage}
+        hasError={errors.attitudeDetails?.hasError}
+        {...getOverrideProps(overrides, "attitudeDetails")}
+      ></TextField>
+      <TextField
+        label="Adaptability details"
+        isRequired={false}
+        isReadOnly={false}
+        value={adaptabilityDetails}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              adaptability,
+              additionalInfo,
+              attention,
+              attitude,
+              commitment,
+              communication,
+              deadline,
+              diligent,
+              extensionPeriod,
+              gmDate,
+              hrDate,
+              hrName,
+              initiative,
+              managerDate,
+              managerName,
+              pace,
+              quality,
+              recommendation,
+              responsibility,
+              supervisorDate,
+              supervisorName,
+              teamwork,
+              extendProbED,
+              gmApproved,
+              managerApproved,
+              supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails: value,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
+            };
+            const result = onChange(modelFields);
+            value = result?.adaptabilityDetails ?? value;
+          }
+          if (errors.adaptabilityDetails?.hasError) {
+            runValidationTasks("adaptabilityDetails", value);
+          }
+          setAdaptabilityDetails(value);
+        }}
+        onBlur={() =>
+          runValidationTasks("adaptabilityDetails", adaptabilityDetails)
+        }
+        errorMessage={errors.adaptabilityDetails?.errorMessage}
+        hasError={errors.adaptabilityDetails?.hasError}
+        {...getOverrideProps(overrides, "adaptabilityDetails")}
+      ></TextField>
+      <TextField
+        label="Teamwork details"
+        isRequired={false}
+        isReadOnly={false}
+        value={teamworkDetails}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              adaptability,
+              additionalInfo,
+              attention,
+              attitude,
+              commitment,
+              communication,
+              deadline,
+              diligent,
+              extensionPeriod,
+              gmDate,
+              hrDate,
+              hrName,
+              initiative,
+              managerDate,
+              managerName,
+              pace,
+              quality,
+              recommendation,
+              responsibility,
+              supervisorDate,
+              supervisorName,
+              teamwork,
+              extendProbED,
+              gmApproved,
+              managerApproved,
+              supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails: value,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
+            };
+            const result = onChange(modelFields);
+            value = result?.teamworkDetails ?? value;
+          }
+          if (errors.teamworkDetails?.hasError) {
+            runValidationTasks("teamworkDetails", value);
+          }
+          setTeamworkDetails(value);
+        }}
+        onBlur={() => runValidationTasks("teamworkDetails", teamworkDetails)}
+        errorMessage={errors.teamworkDetails?.errorMessage}
+        hasError={errors.teamworkDetails?.hasError}
+        {...getOverrideProps(overrides, "teamworkDetails")}
+      ></TextField>
+      <TextField
+        label="Responsibility details"
+        isRequired={false}
+        isReadOnly={false}
+        value={responsibilityDetails}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              adaptability,
+              additionalInfo,
+              attention,
+              attitude,
+              commitment,
+              communication,
+              deadline,
+              diligent,
+              extensionPeriod,
+              gmDate,
+              hrDate,
+              hrName,
+              initiative,
+              managerDate,
+              managerName,
+              pace,
+              quality,
+              recommendation,
+              responsibility,
+              supervisorDate,
+              supervisorName,
+              teamwork,
+              extendProbED,
+              gmApproved,
+              managerApproved,
+              supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails: value,
+              diligentDetails,
+              commitmentDetails,
+            };
+            const result = onChange(modelFields);
+            value = result?.responsibilityDetails ?? value;
+          }
+          if (errors.responsibilityDetails?.hasError) {
+            runValidationTasks("responsibilityDetails", value);
+          }
+          setResponsibilityDetails(value);
+        }}
+        onBlur={() =>
+          runValidationTasks("responsibilityDetails", responsibilityDetails)
+        }
+        errorMessage={errors.responsibilityDetails?.errorMessage}
+        hasError={errors.responsibilityDetails?.hasError}
+        {...getOverrideProps(overrides, "responsibilityDetails")}
+      ></TextField>
+      <TextField
+        label="Diligent details"
+        isRequired={false}
+        isReadOnly={false}
+        value={diligentDetails}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              adaptability,
+              additionalInfo,
+              attention,
+              attitude,
+              commitment,
+              communication,
+              deadline,
+              diligent,
+              extensionPeriod,
+              gmDate,
+              hrDate,
+              hrName,
+              initiative,
+              managerDate,
+              managerName,
+              pace,
+              quality,
+              recommendation,
+              responsibility,
+              supervisorDate,
+              supervisorName,
+              teamwork,
+              extendProbED,
+              gmApproved,
+              managerApproved,
+              supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails: value,
+              commitmentDetails,
+            };
+            const result = onChange(modelFields);
+            value = result?.diligentDetails ?? value;
+          }
+          if (errors.diligentDetails?.hasError) {
+            runValidationTasks("diligentDetails", value);
+          }
+          setDiligentDetails(value);
+        }}
+        onBlur={() => runValidationTasks("diligentDetails", diligentDetails)}
+        errorMessage={errors.diligentDetails?.errorMessage}
+        hasError={errors.diligentDetails?.hasError}
+        {...getOverrideProps(overrides, "diligentDetails")}
+      ></TextField>
+      <TextField
+        label="Commitment details"
+        isRequired={false}
+        isReadOnly={false}
+        value={commitmentDetails}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              adaptability,
+              additionalInfo,
+              attention,
+              attitude,
+              commitment,
+              communication,
+              deadline,
+              diligent,
+              extensionPeriod,
+              gmDate,
+              hrDate,
+              hrName,
+              initiative,
+              managerDate,
+              managerName,
+              pace,
+              quality,
+              recommendation,
+              responsibility,
+              supervisorDate,
+              supervisorName,
+              teamwork,
+              extendProbED,
+              gmApproved,
+              managerApproved,
+              supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.commitmentDetails ?? value;
+          }
+          if (errors.commitmentDetails?.hasError) {
+            runValidationTasks("commitmentDetails", value);
+          }
+          setCommitmentDetails(value);
+        }}
+        onBlur={() =>
+          runValidationTasks("commitmentDetails", commitmentDetails)
+        }
+        errorMessage={errors.commitmentDetails?.errorMessage}
+        hasError={errors.commitmentDetails?.hasError}
+        {...getOverrideProps(overrides, "commitmentDetails")}
       ></TextField>
       <Flex
         justifyContent="space-between"
