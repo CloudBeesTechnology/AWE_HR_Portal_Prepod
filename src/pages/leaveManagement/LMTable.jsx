@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Pagination } from "./Pagination";
 import { getUrl } from "@aws-amplify/storage";
 import { useOutletContext } from "react-router-dom";
@@ -7,6 +7,7 @@ import { Searchbox } from "../../utils/Searchbox";
 import { NavigateLM } from "./NavigateLM";
 import { IoSearch } from "react-icons/io5";
 import { DateFormat } from "../../utils/DateFormat";
+import { DataSupply } from "../../utils/DataStoredContext";
 
 export const LMTable = () => {
   const {
@@ -17,6 +18,8 @@ export const LMTable = () => {
     userID,
     loading
   } = useOutletContext();
+
+  const {empPIData}=useContext(DataSupply)
 
   const [lastUploadUrl, setPPLastUP] = useState(""); // State to store the last uploaded file's URL
   const [matchData, setMatchData] = useState([]);
@@ -45,7 +48,7 @@ export const LMTable = () => {
           items?.empStatus !== "Cancelled"
         ) {
           return items.managerEmpID === userID;
-        } else if (userType === "SuperAdmin" || userType === "HR") {
+        } else if ((userType === "SuperAdmin" || userType === "HR") && items?.empStatus !== "Cancelled") {
           return true;
         }
         return false;
@@ -243,6 +246,10 @@ export const LMTable = () => {
               {matchData && matchData.length > 0 ? (
                 matchData.map((item, index) => {
                   const displayIndex = startIndex + index + 1;
+                  const managerName=empPIData.filter((val)=> val.empID === item.managerEmpID)
+                  const supervisorName=empPIData.filter((val)=> val.empID === item.supervisorEmpID)
+            
+                  
                   return (
                     <tr
                       key={index}
@@ -255,7 +262,7 @@ export const LMTable = () => {
                         {DateFormat(item.leaveStatusCreatedAt)}
                       </td>
                       {userType !== "Supervisor" && userType !== "Manager" && (
-                        <td className="py-3">{item.supervisorName || "N/A"}</td>
+                        <td className="py-3">{supervisorName[0]?.name || "N/A"}</td>
                       )}
                       {userType !== "Manager" && (
                         <td className="py-3">
@@ -263,7 +270,7 @@ export const LMTable = () => {
                         </td>
                       )}
                       {userType !== "Manager" && userType !== "Supervisor" && (
-                        <td className="py-3">{item.managerName || "N/A"}</td>
+                        <td className="py-3">{managerName[0]?.name || "N/A"}</td>
                       )}
                       {userType !== "Supervisor" && (
                         <td className="py-3">

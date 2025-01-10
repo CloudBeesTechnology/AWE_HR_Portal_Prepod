@@ -23,10 +23,16 @@ import { UpdateWIData } from "../../../services/updateMethod/UpdateWIData";
 import { WIRowTwo } from "./WIRowTwo";
 import { WIRowThree } from "./WIRowThree";
 import { WIRowOne } from "./WIRowOne";
+import { CreateLeaveData } from "../../../services/createMethod/CreateLeaveData";
+import { CreateTerminate } from "../../../services/createMethod/CreateTerminate";
+import { CreateSRData } from "../../../services/createMethod/CreateSRData";
 
 export const WorkInfo = () => {
   const { WIUpdateData } = UpdateWIData();
   const { SubmitWIData } = WorkInfoFunc();
+  const { SRDataValue } = CreateSRData();
+  const { LeaveDataValue } = CreateLeaveData();
+  const { TerminateDataValue } = CreateTerminate();
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
@@ -200,23 +206,30 @@ export const WorkInfo = () => {
   // };
 
   const getArrayDateValue = (value) => {
-    const formatToTitleCase = (input) =>
-      input
+    const formatToTitleCase = (input) => {
+      if (typeof input !== "string" || !input) {
+        return ""; // Return an empty string if input is invalid
+      }
+  
+      return input
         .toLowerCase()
         .split(" ")
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(" ");
-
+    };
+  
     if (Array.isArray(value) && value.length > 0) {
-      return formatToTitleCase(value[value.length - 1]?.trim());
+      const lastValue = value[value.length - 1]?.trim();
+      return formatToTitleCase(lastValue);
     }
-
+  
     if (typeof value === "string") {
       return formatToTitleCase(value.trim());
     }
-
-    return null;
+  
+    return null; // Return null if value is not a valid array or string
   };
+  
 
   const searchResult = (result) => {
     // console.log(result);
@@ -387,11 +400,9 @@ export const WorkInfo = () => {
     const fileName = fileNameWithExtension?.split(".").slice(0, -1).join("."); // Remove extension
     return fileName;
   };
+
   const onSubmit = async (data) => {
     try {
-      // console.log("Received data:", data);  // Log the received data from the form
-
-      // Find existing records
       const checkingPITable =
         empPIData?.find((match) => match.empID === data.empID) || null;
       const terminateDataRecord =
@@ -405,7 +416,6 @@ export const WorkInfo = () => {
 
       // Check each record and handle accordingly
       if (SRDataRecord) {
-        // If SRDataRecord exists, update SR data
         const workInfoUpValue = {
           ...data,
           SRDataRecord: SRDataRecord,
@@ -417,20 +427,18 @@ export const WorkInfo = () => {
         };
         // console.log("SR Data Update Value:", workInfoUpValue);
         await WIUpdateData({ workInfoUpValue });
-        // console.log("SR Update request sent");
       } else {
-        // If SRDataRecord doesn't exist, create a new SR record
-        const workInfoValue = {
+        const SRValue = {
           ...data,
+          empID: data.empID,
           uploadPR: JSON.stringify(nameServiceUp.uploadPR),
           uploadSP: JSON.stringify(nameServiceUp.uploadSP),
           uploadLP: JSON.stringify(nameServiceUp.uploadLP),
           uploadAL: JSON.stringify(nameServiceUp.uploadAL),
           uploadDep: JSON.stringify(nameServiceUp.uploadDep),
         };
-        // console.log("Create SR Data Value:", workInfoValue);
-        await SubmitWIData({ workInfoValue });
-        // console.log("SR Create request sent");
+        // console.log("Create SR Data Value:", SRValue);
+        await SRDataValue({ SRValue });
       }
 
       if (leaveDetailsDataRecord) {
@@ -441,16 +449,13 @@ export const WorkInfo = () => {
         };
         // console.log("Leave Details Update Value:", workInfoUpValue);
         await WIUpdateData({ workInfoUpValue });
-        // console.log("Leave Details Update request sent");
       } else {
-        // If leaveDetailsDataRecord doesn't exist, create a new leave details record
-        const workInfoValue = {
+        const LeaveValue = {
           ...data,
           empID: data.empID,
         };
-        // console.log("Create Leave Details Value:", workInfoValue);
-        await SubmitWIData({ workInfoValue });
-        // console.log("Leave Details Create request sent");
+        // console.log("Create Leave Details Value:", LeaveValue);
+        await LeaveDataValue({ LeaveValue });
       }
 
       if (workInfoDataRecord) {
@@ -458,44 +463,19 @@ export const WorkInfo = () => {
           ...data,
           sapNo: checkingPITable?.sapNo,
           workInfoDataRecord: workInfoDataRecord,
-          terminateDataRecord: terminateDataRecord,
-          WIContract: JSON.stringify(nameServiceUp.WIContract),
-          WIProbation: JSON.stringify(nameServiceUp.WIProbation),
-          WIResignation: JSON.stringify(nameServiceUp.WIResignation),
-          WITermination: JSON.stringify(nameServiceUp.WITermination),
-          WILeaveEntitle: JSON.stringify(nameServiceUp.WILeaveEntitle),
-          uploadPR: JSON.stringify(nameServiceUp.uploadPR),
-          uploadSP: JSON.stringify(nameServiceUp.uploadSP),
-          uploadLP: JSON.stringify(nameServiceUp.uploadLP),
-          uploadAL: JSON.stringify(nameServiceUp.uploadAL),
-          uploadDep: JSON.stringify(nameServiceUp.uploadDep),
         };
         // console.log("Work Info Update Value:", workInfoUpValue);
         await WIUpdateData({ workInfoUpValue });
-        // console.log("Work Info Update request sent");
       } else {
-        // If workInfoDataRecord doesn't exist, create a new work info record
         const workInfoValue = {
           ...data,
           sapNo: checkingPITable?.sapNo,
-          WIContract: JSON.stringify(nameServiceUp.WIContract),
-          WIProbation: JSON.stringify(nameServiceUp.WIProbation),
-          WIResignation: JSON.stringify(nameServiceUp.WIResignation),
-          WITermination: JSON.stringify(nameServiceUp.WITermination),
-          WILeaveEntitle: JSON.stringify(nameServiceUp.WILeaveEntitle),
-          uploadPR: JSON.stringify(nameServiceUp.uploadPR),
-          uploadSP: JSON.stringify(nameServiceUp.uploadSP),
-          uploadLP: JSON.stringify(nameServiceUp.uploadLP),
-          uploadAL: JSON.stringify(nameServiceUp.uploadAL),
-          uploadDep: JSON.stringify(nameServiceUp.uploadDep),
         };
         // console.log("Create Work Info Value:", workInfoValue);
         await SubmitWIData({ workInfoValue });
-        // console.log("Work Info Create request sent");
       }
 
       if (terminateDataRecord) {
-        // If terminateDataRecord exists, update terminate data
         const workInfoUpValue = {
           ...data,
           terminateDataRecord: terminateDataRecord,
@@ -504,14 +484,11 @@ export const WorkInfo = () => {
           WIResignation: JSON.stringify(nameServiceUp.WIResignation),
           WITermination: JSON.stringify(nameServiceUp.WITermination),
           WILeaveEntitle: JSON.stringify(nameServiceUp.WILeaveEntitle),
-          // Add specific properties to the update request if necessary
         };
         // console.log("Terminate Update Value:", workInfoUpValue);
         await WIUpdateData({ workInfoUpValue });
-        // console.log("Terminate Update request sent");
       } else {
-        // If terminateDataRecord doesn't exist, create a new terminate record
-        const workInfoValue = {
+        const TerminateValue = {
           ...data,
           empID: data.empID,
           WIContract: JSON.stringify(nameServiceUp.WIContract),
@@ -519,14 +496,11 @@ export const WorkInfo = () => {
           WIResignation: JSON.stringify(nameServiceUp.WIResignation),
           WITermination: JSON.stringify(nameServiceUp.WITermination),
           WILeaveEntitle: JSON.stringify(nameServiceUp.WILeaveEntitle),
-          // Include other fields as necessary
         };
-        // console.log("Create Terminate Data Value:", workInfoValue);
-        await SubmitWIData({ workInfoValue });
-        // console.log("Terminate Create request sent");
+        // console.log("Create Terminate Data Value:", TerminateValue);
+        await TerminateDataValue({ TerminateValue });
       }
 
-      // If you want to show a success notification or message
       setShowTitle("Employee Work Info Stored successfully");
       setNotification(true);
     } catch (err) {

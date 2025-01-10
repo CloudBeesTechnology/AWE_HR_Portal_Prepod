@@ -49,7 +49,7 @@ export const LeaveSummaryPopUp = ({
     return new Date(year, month - 1, day);
   };
   // console.log(mergedData);
-  const formatToTwoDecimals = (num) => parseFloat(num.toFixed(1));
+  const formatToTwoDecimals = (num) => parseFloat(num.toFixed(2));
 
 
   // Normalize the time to 00:00:00 for accurate date comparisons

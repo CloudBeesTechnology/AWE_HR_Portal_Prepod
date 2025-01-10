@@ -280,7 +280,7 @@ export const WorkPassView = ({
 
   return (
     <section>
-      <div ref={mainRef} className="py-8 bg-gray-50 rounded-lg">
+      <div ref={mainRef} className="py-8 px-10 bg-gray-50 rounded-lg">
         <h6 className="uppercase text_size_5 mb-6">WorkPass Details:</h6>
         <div className="space-y-6">
           {sections.map(({ name, data, upload }, index) => (
@@ -293,7 +293,7 @@ export const WorkPassView = ({
         </div>
       </div>
       {/* Grouped Documents under Categories */}
-      <div className="mt-8">
+      <div className="mt-8 px-10">
         <h6 className="uppercase text_size_5  my-3">Uploaded Documents:</h6>
         {/* Render Documents for each category */}
         {renderDocumentCategory(sawpEmpUpload, "SAWP")}

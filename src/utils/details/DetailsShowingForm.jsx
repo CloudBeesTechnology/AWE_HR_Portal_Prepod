@@ -43,10 +43,10 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     onAfterPrint: () => console.log("Print complete for Item 2"),
     pageStyle: `
       @page {
-        margin: 0;
+        margin: 500mm;
       }
       body {
-        font-family: 'Times New Roman', serif;
+        
       }
       .page {
         page-break-after: always;
@@ -339,9 +339,8 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     hospLeave,
     pervAnnualLeaveBal,
   } = passingValue;
-  console.log(address);
 
-  console.log(insuranceClaims);
+
 
   const personalDetails = {
     Name: name,
@@ -392,7 +391,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Bank account number": bankAccNo,
   };
 
-  console.log("LOG SAP NO", sapNo);
+
 
   const employeeDocument = {
     EmpUpDocs: empUpDocs,
@@ -421,8 +420,8 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     // dependPass: dependPass,
   };
 
-  console.log(bruneiME);
-  console.log(overME);
+
+
 
   const dependenPass = {
     DependPass: dependPass,

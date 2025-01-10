@@ -69,7 +69,7 @@ export const AllEmployee = () => {
       const result = await data;
       setData(result);
     } catch (error) {
-      console.error("Error search data", error);
+      // console.error("Error search data", error);
     }
   };
 
@@ -145,6 +145,9 @@ export const AllEmployee = () => {
             insuranceClaimsData.find(
               (item) => item.empID === empPIItem.empID
             ) || {};
+
+
+            
           return {
             ...empPIItem,
             ...idMatch,
@@ -165,6 +168,7 @@ export const AllEmployee = () => {
             ...userMatch,
             ...swapMatch,
             ...insClaimMatch,
+            sapNo: empPIItem.sapNo,
           };
         })
         .filter((item) => item?.empID) // Only include items with a valid empID
@@ -178,6 +182,7 @@ export const AllEmployee = () => {
         a.empID.localeCompare(b.empID)
       );
 
+// console.log(sorted);
 
       setMergeData(sorted);
       setFilteredData(sorted);
@@ -186,12 +191,12 @@ export const AllEmployee = () => {
         setLoading(false);
         setError(null);
       } else {
-        setError("No data found.");
-        setLoading(false);
+        setLoading(true);
       }
     } else {
-      setLoading(true);
-    }
+      setError("No data found.");
+}
+   
   }, [
     userData,
     empLeaveStatusData,
@@ -260,12 +265,22 @@ export const AllEmployee = () => {
   }, [filteredData, currentPage, rowsPerPage]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    <div>
+      <div className="flex items-center justify-center h-[82vh]">
+        <p className="text-sm font-semibold">Loading...</p>
+      </div>
+    </div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
-  }
+    return (
+      <div>
+        <div className="flex items-center justify-center h-[82vh]">
+          <p className="text-sm font-semibold">{error}</p>
+        </div>
+      </div>
+);
+}
   const handleFormShow = (value) => {
     setShowForm(!showForm);
     setPassingValue(value);
@@ -293,7 +308,6 @@ export const AllEmployee = () => {
   );
 };
 
-  console.log(mergeData);
 
 
   return (
@@ -353,56 +367,60 @@ export const AllEmployee = () => {
               </tr>
             </thead>
             <tbody className="bg-white text-center text-sm font-semibold text-dark_grey cursor-pointer">
-              {paginatedData.map((candidate, index) => (
-                <tr
-                  key={index}
-                  className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
-                  onClick={() => {
-                    {
+              {paginatedData.length > 0 ? (
+                paginatedData.map((candidate, index) => (
+                  <tr
+                    key={index}
+                    className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
+                    onClick={() => {
                       handleFormShow(candidate);
-                      console.log("CANDY_DATA", candidate);
-                      
-                    }
-                  }}
-                >
-                  <td className=" py-4 px-4 ">{candidate?.empID || "N/A"}</td>
-                  <td className=" py-4 px-4 ">
-                    {candidate?.empBadgeNo || "N/A"}
-                  </td>
-                  <td className="py-4 px-4 ">{candidate?.name || "N/A"}</td>
-                  <td className="py-4 px-4">
-                    {formatDate(candidate?.dob || "N/A")}
-                  </td>
-                  <td className="py-4 px-4">
-                    {candidate?.nationality || "N/A"}
-                  </td>
-                  <td className="py-4 px-4">
-                    {candidate?.contractType?.[
-                      candidate.contractType.length - 1
-                    ] || "N/A"}
-                  </td>
-                  <td className="py-4 px-4">
-                    {candidate?.empType?.[candidate.empType.length - 1] ||
-                      "N/A"}
-                  </td>
-
-                  <td className="py-4 px-4 ">{candidate?.email || "N/A"}</td>
-                  <td className="py-4 px-4 ">
-                    {candidate?.contactNo || "N/A"}
-                  </td>
-                  <td
-                    className={`py-4 px-4 font-bold ${getStatusClass(
-                      candidate?.workStatus?.[
-                        candidate?.workStatus.length - 1
-                      ] || "N/A"
-                    )}`}
+                      // console.log("CANDY_DATA", candidate);
+                    }}
                   >
-                    {candidate?.workStatus?.[
-                      candidate?.workStatus.length - 1
-                    ] || "N/A"}
+                    <td className="py-4 px-4">{candidate?.empID || "N/A"}</td>
+                    <td className="py-4 px-4">
+                      {candidate?.empBadgeNo || "N/A"}
+                    </td>
+                    <td className="py-4 px-4">{candidate?.name || "N/A"}</td>
+                    <td className="py-4 px-4">
+                      {formatDate(candidate?.dob || "N/A")}
+                    </td>
+                    <td className="py-4 px-4">
+                      {candidate?.nationality || "N/A"}
+                    </td>
+                    <td className="py-4 px-4">
+                      {candidate?.contractType?.[
+                        candidate.contractType.length - 1
+                      ] || "N/A"}
+                    </td>
+                    <td className="py-4 px-4">
+                      {candidate?.empType?.[candidate.empType.length - 1] ||
+                        "N/A"}
+                    </td>
+                    <td className="py-4 px-4">{candidate?.email || "N/A"}</td>
+                    <td className="py-4 px-4">
+                      {candidate?.contactNo || "N/A"}
+                    </td>
+                    <td
+                      className={`py-4 px-4 font-bold ${getStatusClass(
+                        candidate?.workStatus?.[
+                          candidate?.workStatus.length - 1
+                        ] || "N/A"
+                      )}`}
+                    >
+                      {candidate?.workStatus?.[
+                        candidate?.workStatus.length - 1
+                      ] || "N/A"}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="10" className="py-4 px-4 text-center">
+                    No data available
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
@@ -414,22 +432,24 @@ export const AllEmployee = () => {
         />
       )}
       {/* Pagination Controls */}
-      <div className="flex justify-center">
-        <div className="ml-[750px] flex justify-between mt-12 px-10">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={Math.ceil(filteredData.length / rowsPerPage)}
-            onPageChange={(newPage) => {
-              if (
-                newPage >= 1 &&
-                newPage <= Math.ceil(filteredData.length / rowsPerPage)
-              ) {
-                setCurrentPage(newPage);
-              }
-            }}
-          />
+      {paginatedData.length > 0 && (
+        <div className="flex justify-center">
+          <div className="ml-[750px] flex justify-between mt-12 px-10">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.ceil(filteredData.length / rowsPerPage)}
+              onPageChange={(newPage) => {
+                if (
+                  newPage >= 1 &&
+                  newPage <= Math.ceil(filteredData.length / rowsPerPage)
+                ) {
+                  setCurrentPage(newPage);
+                }
+              }}
+            />
+          </div>
         </div>
-      </div>
+      )}
     </section>
   );
 };

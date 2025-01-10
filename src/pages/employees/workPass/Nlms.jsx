@@ -9,12 +9,14 @@ import { FormField } from '../../../utils/FormField';
 import { UpdateNlmsData } from '../../../services/updateMethod/UpdateNlmsData';
 import { DataSupply } from '../../../utils/DataStoredContext';
 import { useOutletContext } from 'react-router-dom';
+import { WorkPermitDD } from '../../../utils/DropDownMenus';
 
 export const Nlms = () => {
   const { searchResultData } = useOutletContext();
   
-  const { DNData,dropDownVal } = useContext(DataSupply);
+  const { DNData } = useContext(DataSupply);
   const { uploadNlmsFun } = UpdateNlmsData();
+
 
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState('');
@@ -134,10 +136,7 @@ export const Nlms = () => {
     return date ? new Date(date).toLocaleDateString('en-CA') : null;
   };
 
-  const workPermitDD = dropDownVal[0]?.workPermitDD.map((item) => ({
-    value: item,
-    label: item,
-  }));
+ 
   const onSubmit = async (data) => {
     try {
 
@@ -210,7 +209,7 @@ export const Nlms = () => {
           register={register}
           name="permitType"
           type="select"
-          options={workPermitDD}
+          options={WorkPermitDD}
           errors={errors}
         />
 

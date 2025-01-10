@@ -18,12 +18,13 @@ console.log(PPValidsData);
   };
 
 // Link 1:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PassportValid+Prod/PassportValid.csv"
+// Link 2:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PassportValid+Prod/PassportValid+1.csv"
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PassportValid+Prod/PassportValid.csv",        {
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PassportValid+Prod/PassportValid+1.csv",        {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
       );
@@ -56,6 +57,9 @@ console.log(PPValidsData);
       });
       // console.log("All Data:", transformedData);
       for (const ImmiValue of transformedData) {
+        if (!ImmiValue.empID) {
+          continue;
+        }
         if (ImmiValue.empID) {
           ImmiValue.empID = String(ImmiValue.empID);
         }

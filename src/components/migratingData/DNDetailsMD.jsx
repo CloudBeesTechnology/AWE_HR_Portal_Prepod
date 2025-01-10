@@ -13,7 +13,7 @@ export const DNDetailsMD = () => {
   const { DNData } = useContext(DataSupply);
   const { CrerDoeFunData } = CreateDoe();
   const { UpdateMPData } = UpdateDataFun();
-console.log(DNData);
+  console.log(DNData);
 
   const excelDateToJSDate = (serial) => {
     const excelEpoch = new Date(Date.UTC(1900, 0, 1)); // Start from Jan 1, 1900
@@ -21,15 +21,16 @@ console.log(DNData);
     return new Date(excelEpoch.getTime() + daysOffset * 24 * 60 * 60 * 1000);
   };
 
-// Link 1:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNDetails.csv"
-// Link 2:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNdetails+1.csv"
+  // Link 1:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNDetails.csv"
+  // Link 2:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNdetails+1.csv"
+  // Link 3:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNDetails+2.csv"
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNDetails.csv",
-        // "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNdetails+1.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/DNDetails+Prod/DNDetails+2.csv",
+
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
@@ -46,8 +47,12 @@ console.log(DNData);
       // Convert sheet data to JSON format
       const sheetData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
       const dateKeys = [
-        "doeEmpValid","nlmsEmpValid","doeEmpSubmit","doeEmpApproval","nlmsEmpApproval","nlmsEmpSubmit"
-        
+        "doeEmpValid",
+        "nlmsEmpValid",
+        "doeEmpSubmit",
+        "doeEmpApproval",
+        "nlmsEmpApproval",
+        "nlmsEmpSubmit",
       ];
       const transformedData = sheetData.slice(1).map((row) => {
         let result = {};
@@ -63,6 +68,9 @@ console.log(DNData);
       });
       // console.log("All Data:", transformedData);
       for (const DoeValue of transformedData) {
+        if (!DoeValue.empID) {
+          continue;
+        }
         if (DoeValue.empID) {
           DoeValue.empID = String(DoeValue.empID);
           //   DoeValue.ppExpiry = [DoeValue.ppExpiry];

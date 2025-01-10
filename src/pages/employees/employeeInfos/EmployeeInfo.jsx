@@ -372,7 +372,7 @@ export const EmployeeInfo = () => {
         return [parsedItem];
       }
     } catch (error) {
-      console.error("Error cleaning and parsing familyDetails:", error);
+      // console.error("Error cleaning and parsing familyDetails:", error);
       return []; // Return empty array if parsing fails
     }
   };

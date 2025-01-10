@@ -87,7 +87,7 @@ export const ViewForm = ({
               `Leave Request ${status}`,
               `Dear ${
                 leaveData.empName || "Not mention"
-              }, Leave request for From Date : ${formattedDateFrom} To Date : ${formattedDateTo} has been Status: ${status} by Manager Name : ${
+              }, applied leave request for the period : ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Manager Name : ${
                 managerName.name || "Not mention"
               }. View at : https://employee.adininworks.co `,
               "leave_no-reply@adininworks.com",
@@ -99,7 +99,7 @@ export const ViewForm = ({
               `Leave Request ${status}`,
               `Employee ${
                 leaveData.empName || "Not mention"
-              }, Leave request for From Date : ${formattedDateFrom} To Date : ${formattedDateTo} has been Status: ${status} by Manager Name : ${
+              }, applied leave request for the period : ${formattedDateFrom} to ${formattedDateTo} has been ${status} by Manager Name : ${
                 managerName.name || "Not mention"
               }. View at : https://hr.adininworks.co `,
               "leave_no-reply@adininworks.com",
@@ -651,7 +651,7 @@ export const ViewForm = ({
                             </td>
                           </tr>
                         )}
-                        <tr>
+                     {leaveData.supervisorEmpID !=="" &&    <tr>
                           <td className="py-2">Supervisor</td>
                           <td className="py-2">
                             {" "}
@@ -676,7 +676,7 @@ export const ViewForm = ({
                               </p>
                             )}
                           </td>
-                        </tr>
+                        </tr>}
                       </tbody>
                     </table>
                   </div>
@@ -751,7 +751,7 @@ export const ViewForm = ({
                       </div>
                     )}
 
-                    {leaveData.supervisorEmpID && (
+                    {leaveData.supervisorEmpID !== "" && (
                       <div className=" w-full text-center text_size_6 shadow-md pt-3">
                         <table className="w-full ">
                           <thead className=" bg-[#D8D8D8]">

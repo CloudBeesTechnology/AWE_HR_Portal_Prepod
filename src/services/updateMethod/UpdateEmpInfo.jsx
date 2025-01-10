@@ -46,8 +46,7 @@ export const UpdateEmpInfo = () => {
       paafCvevUpload,
       ppUpload,
       supportDocUpload,
-
-      age,
+  
       aTQualify,
       alternateNo,
       agent,
@@ -59,7 +58,6 @@ export const UpdateEmpInfo = () => {
       dob,
       educLevel,
       email,
-      eduDetails,
       empBadgeNo,
       empType,
       familyDetails,
@@ -72,7 +70,6 @@ export const UpdateEmpInfo = () => {
       permanentAddress,
       position,
       sapNo,
-
       bankName,
       bankAccNo,
     } = collectValue;
@@ -80,7 +77,7 @@ export const UpdateEmpInfo = () => {
     const totalData = {
       id: PITableID,
       empID,
-      age,
+ 
       aTQualify,
       alternateNo,
       agent,
@@ -92,7 +89,6 @@ export const UpdateEmpInfo = () => {
       dob,
       educLevel,
       email,
-      eduDetails,
       empBadgeNo,
       empType,
       familyDetails,

@@ -9,7 +9,7 @@ export const LabourMedicalInfoMD = () => {
   const { LMIData } = useContext(DataSupply);
   const { SubmitMPData } = MedicalPassFunc();
   const { updateMedicalSubmit } = UpdateMedical();
-console.log(LMIData);
+  console.log(LMIData);
 
   const excelDateToJSDate = (serial) => {
     const excelEpoch = new Date(Date.UTC(1900, 0, 1)); // Start from Jan 1, 1900
@@ -17,13 +17,15 @@ console.log(LMIData);
     return new Date(excelEpoch.getTime() + daysOffset * 24 * 60 * 60 * 1000);
   };
 
-// Link 1:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LabourMedicalInfo+Prod/LabourMedicalInfo.csv"
+  // Link 1:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LabourMedicalInfo+Prod/LabourMedicalInfo.csv"
+  // Link 2:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LabourMedicalInfo+Prod/LabourMedicalInfo+1.csv"
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LabourMedicalInfo+Prod/LabourMedicalInfo.csv",        {
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LabourMedicalInfo+Prod/LabourMedicalInfo+1.csv",
+        {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
       );
@@ -38,9 +40,7 @@ console.log(LMIData);
 
       // Convert sheet data to JSON format
       const sheetData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-      const dateKeys = [
-        "bruneiME",      
-      ];
+      const dateKeys = ["bruneiME"];
       const transformedData = sheetData.slice(1).map((row) => {
         let result = {};
         sheetData[0].forEach((key, index) => {
@@ -55,6 +55,9 @@ console.log(LMIData);
       });
       // console.log("All Data:", transformedData);
       for (const labValue of transformedData) {
+        if (!labValue.empID) {
+          continue;
+        }
         if (labValue.empID) {
           labValue.empID = String(labValue.empID);
         }

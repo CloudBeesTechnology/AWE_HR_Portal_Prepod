@@ -42,7 +42,7 @@ const PersonalDetailsView = ({
   // Helper function to fetch the cloud URL
   const linkToStorageFile = async (pathUrl) => {
     if (!pathUrl) {
-      console.error("No URL provided for the file.");
+      // console.error("No URL provided for the file.");
       return; // Exit early if no path is provided
     }
     try {
@@ -52,14 +52,14 @@ const PersonalDetailsView = ({
       setViewingDocument(pathUrl); // Update the state to show the selected document
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching the file URL:", error);
+      // console.error("Error fetching the file URL:", error);
       setLoading(false);
     }
   };
 
   const linkToImageFile = async (pathUrl) => {
     if (!pathUrl) {
-      console.error("No URL provided for the file.");
+      // console.error("No URL provided for the file.");
       return; // Exit early if no path is provided
     }
     
@@ -86,7 +86,7 @@ const PersonalDetailsView = ({
       }
       return [];
     } catch (error) {
-      console.error("Error parsing document data:", error);
+      // console.error("Error parsing document data:", error);
       return [];
     }
   };
@@ -113,7 +113,7 @@ const PersonalDetailsView = ({
 
       return [];
     } catch (error) {
-      console.error("Error parsing inducBriefUp data:", error);
+      // console.error("Error parsing inducBriefUp data:", error);
       return [];
     } 
   };
@@ -347,13 +347,13 @@ const PersonalDetailsView = ({
   };
 
   return (
-    <section className="py-8 bg-gray-50 rounded-lg">
-      <div ref={mainRef} >
+    <section ref={mainRef} className="page py-8 px-10 bg-gray-50 rounded-lg">
+      <div  >
       <h6 className="uppercase text_size_5 my-3">Personal Details:</h6>
-      <div ref={mainRef}  className="flex flex-col md:flex-row items-start justify-between gap-8">
+      <div className="flex flex-col md:flex-row items-start justify-between gap-8">
         {/* Personal details */}
         <div className="flex-1">{renderDetails(personalDetails)}</div>
-        <div className="w-[250px] h-[350px] rounded-lg overflow-hidden border border-gray-200 shadow-md">
+        <div className="w-[138px] h-[177px] rounded-lg overflow-hidden border border-gray-200 shadow-md">
           <img
             src={imageUrl || defaultAvatar}
             alt="Profile"
@@ -367,7 +367,7 @@ const PersonalDetailsView = ({
         <h6 className="uppercase text_size_5  my-3">Education Details:</h6>
         <div className="flex flex-col md:flex-row items-start justify-between gap-8">
           <div className="flex-1">{renderDetails(educationalDetails)}</div>
-          <div className="w-[250px] rounded-lg overflow-hidden "> </div>
+          <div className="w-[138px] rounded-lg overflow-hidden "> </div>
         </div>
       </section>
       </div>

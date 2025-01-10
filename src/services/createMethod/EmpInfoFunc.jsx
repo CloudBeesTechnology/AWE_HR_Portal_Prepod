@@ -15,7 +15,7 @@ export const EmpInfoFunc = () => {
       }
       const {
         empID,
-        age,
+
         aTQualify,
         alternateNo,
         agent,
@@ -27,7 +27,7 @@ export const EmpInfoFunc = () => {
         dob,
         educLevel,
         email,
-        eduDetails,
+
         empBadgeNo,
         empType,
         familyDetails,
@@ -108,7 +108,7 @@ export const EmpInfoFunc = () => {
 
       const totalData = {
         empID,
-        age,
+
         aTQualify,
         alternateNo,
         agent,
@@ -121,7 +121,7 @@ export const EmpInfoFunc = () => {
         educLevel,
         email,
         officialEmail,
-        eduDetails,
+
         empBadgeNo,
         empType,
         familyDetails,
@@ -140,10 +140,7 @@ export const EmpInfoFunc = () => {
       // console.log(totalData,"totalData");
 
       try {
-        const [
-          idResponse,
-           empInfoResponse
-        ] = await Promise.all([
+        const [idResponse, empInfoResponse] = await Promise.all([
           client.graphql({
             query: createIDDetails,
             variables: {
@@ -159,6 +156,8 @@ export const EmpInfoFunc = () => {
             },
           }),
         ]);
+
+        // console.log(empInfoResponse);
       } catch (error) {
         console.error("Error executing GraphQL requests:", error);
         throw error; // Rethrow error if needed

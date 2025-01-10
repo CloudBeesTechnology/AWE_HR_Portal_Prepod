@@ -323,7 +323,7 @@ const InsuranceDetails = ({
   // }
 
   return (
-    <section ref={mainRef} className="py-3">
+    <section ref={mainRef} className="py-3 px-10">
       <h6 className="uppercase text_size_5 my-3">Insurance Details:</h6>
       <div className="flex flex-col md:flex-row items-start justify-between gap-8">
         <div className="flex-1">

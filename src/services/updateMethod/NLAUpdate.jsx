@@ -8,10 +8,7 @@ export const NLAUpdate = () => {
 
   // Function to update non-local accommodation details
   const NLAUpdateFun = useCallback(async ({ NLAValue }) => {
-    if (!NLAValue || !NLAValue.empID || !NLAValue.accommodation || !NLAValue.accommodationAddress || !NLAValue.IDTable) {
-      console.log(NLAValue.IDTable);
-      
-      
+    if (!NLAValue ) {
       // Ensure all required parameters are provided
       setErrorEmpID("All fields (empID, accommodation, accommodationAddress, IDTable) are required.");
       throw new Error("Missing required parameters");
