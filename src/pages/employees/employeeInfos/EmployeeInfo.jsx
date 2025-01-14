@@ -341,12 +341,12 @@ export const EmployeeInfo = () => {
 
       // Capitalize words utility function
       const capitalizeWords = (str) =>
-        str
-          .split(" ")
-          .map(
-            (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-          )
-          .join(" ");
+        str.toUpperCase()
+          // .split(" ")
+          // .map(
+          //   (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+          // )
+          // .join(" ");
 
       // After cleaning, the string should be a valid JSON array
       if (cleanedString.startsWith("[") && cleanedString.endsWith("]")) {
@@ -435,25 +435,51 @@ export const EmployeeInfo = () => {
       "position",
       "sapNo",
       // "officialEmail",
-      "contractType", "empType",
+      "contractType", 
+      "empType",
       "bwnIcColour",
       "gender",
     ];
+// Set values for other fields
+keysToSet.forEach((key) => {
+  let valueToSet = result[key];
 
+  // Handle undefined or null values
+  if (valueToSet === undefined || valueToSet === null) {
+    valueToSet = "";
+  }
+
+  if (typeof valueToSet === "string") {
+    // Trim and convert string to uppercase
+    const storedValue = valueToSet.trim().toUpperCase();
+    console.log(key, storedValue);
+    setValue(key, storedValue); // Set the processed string value
+  } else if (Array.isArray(valueToSet) && valueToSet.length > 0) {
+    // Get the last value from the array, trim, and convert to uppercase
+    const arrayData = valueToSet[valueToSet.length - 1]
+      .trim()
+      .toUpperCase();
+    console.log(key, arrayData);
+    setValue(key, [arrayData]);
+  } else {
+    // Set the value as is for non-string, non-array types
+    setValue(key, valueToSet);
+  }
+});
     // Set values for other fields
-    keysToSet.forEach((key) => {
-      let valueToSet = result[key];
-      if (valueToSet === undefined || valueToSet === null) {
-        valueToSet = "";
-      }
-      if (typeof valueToSet === "string") {
-        const storedValue = valueToSet.trim().toUpperCase();
-        setValue(key, storedValue); // Set the trimmed value
-      } else {
-        // If it's not a string, just set the value as is (or handle as needed)
-        setValue(key, valueToSet);
-      }
-    });
+    // keysToSet.forEach((key) => {
+    //   let valueToSet = result[key];
+    //   if (valueToSet === undefined || valueToSet === null) {
+    //     valueToSet = "";
+    //   }
+    //   if (typeof valueToSet === "string") {
+    //     const storedValue = valueToSet.trim().toUpperCase();
+    //     setValue(key, storedValue); // Set the trimmed value
+    //   } else {
+    //     // If it's not a string, just set the value as is (or handle as needed)
+    //     setValue(key, valueToSet);
+    //   }
+    // });
 
     // const fields = ["contractType", "empType"];
     // fields.forEach((field) =>
