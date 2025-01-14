@@ -45,7 +45,7 @@ export const DateFormat = (dateToString) => {
 
 export const capitalizedLetter = (value) => {
   if (!value || typeof value !== 'string') {
-    return "N/A";
+    return "";
   }
   const changedValue = value
     .toLowerCase()
