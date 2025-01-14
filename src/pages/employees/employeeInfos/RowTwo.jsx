@@ -54,7 +54,9 @@ export const RowTwo = ({ register, errors, watch, setValue, control }) => {
             label="Employee Type"
             name={field.name}
             type="selectOption"
-            value={field.value}
+            value={field.value
+              // typeof field.value === "string" ? field.value?.trim().toUpperCase() : ""
+            }
             setValue={setValue}
             options={EmpTypeDD}
             watch={watch}

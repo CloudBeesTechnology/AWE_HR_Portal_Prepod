@@ -131,6 +131,7 @@ export const FormField = ({
           value={value}
           className="input-field border"
           {...register(name)} // Connect to React Hook Form
+          
         />
       )}
 

@@ -227,35 +227,6 @@ export const EmployeeInfo = () => {
     }
   }, [uploadedDocs, watchedProfilePhoto]);
 
-  const capitalizeFirstLetter = (str) => {
-    if (typeof str === "string") {
-      // Capitalize the first letter and make the rest lowercase
-      return str.toUpperCase();
-    }
-    return str; // Return non-string values as-is
-  };
-
-  // const getLastValue = (value, field) => {
-  //   // Ensure value is always an array
-  //   const arrayValue = Array.isArray(value) ? value : value ? [value] : []; // If it's not an array, wrap it in an array
-  //   console.log(capitalizedLetter(arrayValue[arrayValue?.length - 1]));
-  //   console.log(value);
-
-  //   if (
-  //     arrayValue[arrayValue?.length - 1] !== "LPA" &&
-  //     arrayValue[arrayValue?.length - 1] !== "SAWP"
-  //   ) {
-  //     const changedValue = capitalizedLetter(
-  //       arrayValue[arrayValue?.length - 1]
-  //     );
-  //     console.log(changedValue);
-
-  //     return [changedValue]; // Return last element of the array
-  //   } else {
-  //     return arrayValue;
-  //   }
-  // };
-
   const getLastArrayValue = (value, field) => {
     // If the value is an array, get the last value
     const lastValue = Array.isArray(value) ? value[value.length - 1] : value;
@@ -290,7 +261,7 @@ export const EmployeeInfo = () => {
 
   const preprocessJSONString = (str) => {
     try {
-      // Replace `=` with `:`
+      // Replace = with :
       let processedStr = str.replace(/=/g, ":");
 
       // Add quotes around keys
@@ -340,13 +311,12 @@ export const EmployeeInfo = () => {
       cleanedString = cleanedString.replace(/\\/g, "");
 
       // Capitalize words utility function
-      const capitalizeWords = (str) =>
-        str.toUpperCase()
-          // .split(" ")
-          // .map(
-          //   (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-          // )
-          // .join(" ");
+      const capitalizeWords = (str) => str.toUpperCase();
+      // .split(" ")
+      // .map(
+      //   (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      // )
+      // .join(" ");
 
       // After cleaning, the string should be a valid JSON array
       if (cleanedString.startsWith("[") && cleanedString.endsWith("]")) {
@@ -390,15 +360,20 @@ export const EmployeeInfo = () => {
   };
 
   const searchResult = async (result) => {
-    console.log("Result", result);
-    const fieldValue = ["empID", "email", "officialEmail","bankAccNo",
-      "empBadgeNo",];
+    // console.log("Result", result);
+    const fieldValue = [
+      "empID",
+      "email",
+      "officialEmail",
+      "bankAccNo",
+      "empBadgeNo",
+    ];
 
     fieldValue.forEach((val) => {
       const data = result[val];
-    
+
       // Ensure the data is a string before setting the value
-      setValue(val, typeof data === "string" ? data : "");
+      setValue(val, typeof data === "string" ? data : "");
     });
     const keysToSet = [
       // "empID",
@@ -435,56 +410,35 @@ export const EmployeeInfo = () => {
       "position",
       "sapNo",
       // "officialEmail",
-      "contractType", 
+      "contractType",
       "empType",
       "bwnIcColour",
       "gender",
     ];
-// Set values for other fields
-keysToSet.forEach((key) => {
-  let valueToSet = result[key];
-
-  // Handle undefined or null values
-  if (valueToSet === undefined || valueToSet === null) {
-    valueToSet = "";
-  }
-
-  if (typeof valueToSet === "string") {
-    // Trim and convert string to uppercase
-    const storedValue = valueToSet.trim().toUpperCase();
-    console.log(key, storedValue);
-    setValue(key, storedValue); // Set the processed string value
-  } else if (Array.isArray(valueToSet) && valueToSet.length > 0) {
-    // Get the last value from the array, trim, and convert to uppercase
-    const arrayData = valueToSet[valueToSet.length - 1]
-      .trim()
-      .toUpperCase();
-    console.log(key, arrayData);
-    setValue(key, [arrayData]);
-  } else {
-    // Set the value as is for non-string, non-array types
-    setValue(key, valueToSet);
-  }
-});
     // Set values for other fields
-    // keysToSet.forEach((key) => {
-    //   let valueToSet = result[key];
-    //   if (valueToSet === undefined || valueToSet === null) {
-    //     valueToSet = "";
-    //   }
-    //   if (typeof valueToSet === "string") {
-    //     const storedValue = valueToSet.trim().toUpperCase();
-    //     setValue(key, storedValue); // Set the trimmed value
-    //   } else {
-    //     // If it's not a string, just set the value as is (or handle as needed)
-    //     setValue(key, valueToSet);
-    //   }
-    // });
+    keysToSet.forEach((key) => {
+      let valueToSet = result[key];
 
-    // const fields = ["contractType", "empType"];
-    // fields.forEach((field) =>
-    //   setValue(field, getLastValue(result[field], field))
-    // );
+      // Handle undefined or null values
+      if (valueToSet === undefined || valueToSet === null) {
+        valueToSet = "";
+      }
+
+      if (typeof valueToSet === "string") {
+        // Trim and convert string to uppercase
+        const storedValue = valueToSet.trim().toUpperCase();
+        setValue(key, storedValue); // Set the processed string value
+      } else if (Array.isArray(valueToSet) && valueToSet.length > 0) {
+        // Get the last value from the array, trim, and convert to uppercase
+        const arrayData = valueToSet[valueToSet.length - 1]
+          .trim()
+          .toUpperCase();
+        setValue(key, [arrayData]);
+      } else {
+        // Set the value as is for non-string, non-array types
+        setValue(key, valueToSet);
+      }
+    });
 
     const fieldsArray = ["bwnIcExpiry", "ppExpiry", "ppIssued"];
     fieldsArray.forEach((field) =>
@@ -588,51 +542,53 @@ keysToSet.forEach((key) => {
       "ppUpload",
       "supportDocUpload",
     ];
-
-    uploadFields.map((field) => {
+    
+    uploadFields.forEach((field) => {
       const fieldData = result[field];
       if (!fieldData) {
-        setValue(field, []);
+        setValue(field, []); // Clear the field value
         setUploadedFiles((prev) => ({ ...prev, [field]: [] }));
-        setUploadedFileNames((prev) => ({ ...prev, [field]: "" }));
+        setUploadedFileNames((prev) => ({ ...prev, [field]: "" })); // Clear the file name
         return;
       }
-
+    
       try {
-        const outerParsed = JSON.parse(result[field]);
-        const parsedArray = Array.isArray(outerParsed)
-          ? outerParsed
-          : [outerParsed];
-
+        // Parse the field data
+        const outerParsed = JSON.parse(fieldData);
+        const parsedArray = Array.isArray(outerParsed) ? outerParsed : [outerParsed];
+    
         const parsedFiles = parsedArray.map((item) => {
           if (typeof item === "string") {
             try {
               const validJSON = preprocessJSONString(item);
               return JSON.parse(validJSON);
-            } catch (e) {
+            } catch {
               return item;
             }
           }
           return item;
         });
-
+    
+        // Get the last file name
         const lastFile = parsedFiles[parsedFiles.length - 1];
         const lastFileName = lastFile?.upload
           ? getFileName(lastFile.upload)
-          : lastFile[0]?.upload
+          : Array.isArray(lastFile) && lastFile[0]?.upload
           ? getFileName(lastFile[0].upload)
-          : null;
-
+          : "";
+    
+        // Update state
         setValue(field, parsedFiles);
         setUploadedFiles((prev) => ({ ...prev, [field]: parsedFiles }));
         setUploadedFileNames((prev) => ({
           ...prev,
-          [field]: lastFileName || "",
+          [field]: lastFileName, // Assign the extracted file name
         }));
       } catch (error) {
-        // console.error(`Failed to parse ${field}:`, error);
+        console.error(`Failed to parse ${field}:`, error);
       }
     });
+    
   };
 
   const getFileName = (filePath) => {
