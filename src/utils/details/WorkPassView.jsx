@@ -236,7 +236,19 @@ export const WorkPassView = ({
     );
   };
 
+
   const renderDetails = (details) => {
+    const capitalizeWords = (str) => {
+      if (str === "N/A") {
+        return "N/A"; // Return "N/A" without change
+      }
+  
+      return str
+        .split(' ') // Split by space if it's multi-word
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' '); // Rejoin the words
+    };
+  
     return (
       <div className="grid grid-cols-3 gap-y-4 items-center font-semibold text-sm">
         {Object.entries(details).map(([key, value], index) => (
@@ -260,15 +272,14 @@ export const WorkPassView = ({
                                   : "" // Only highlight the latest value if there are multiple values
                               }`}
                             >
-                              {item}
+                              {capitalizeWords(item)} {/* Capitalize the words */}
                             </span>
-                            {idx < value.length - 1 && <span>,&nbsp;</span>}
-                            {/* Add a comma except for the last item */}
+                            {idx < value.length - 1 && <span>,&nbsp;</span>} {/* Add a comma except for the last item */}
                           </span>
                         ))
                     : "N/A" // Show "N/A" if the array only contains null or is empty
                   : value !== null && value !== undefined && value !== ""
-                  ? value
+                  ? capitalizeWords(value) // Capitalize the value if not an array
                   : "N/A" // Show "N/A" for null or undefined non-array values
               }
             </span>
@@ -277,7 +288,7 @@ export const WorkPassView = ({
       </div>
     );
   };
-
+  
   return (
     <section>
       <div ref={mainRef} className="py-8 px-10 bg-gray-50 rounded-lg">

@@ -19,12 +19,13 @@ export const LabourMedicalInfoMD = () => {
 
   // Link 1:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LabourMedicalInfo+Prod/LabourMedicalInfo.csv"
   // Link 2:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LabourMedicalInfo+Prod/LabourMedicalInfo+1.csv"
+  // Link 3:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LabourMedicalInfo+Prod/LabourMedicalInfo+2.csv"
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LabourMedicalInfo+Prod/LabourMedicalInfo+1.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LabourMedicalInfo+Prod/LabourMedicalInfo+2.csv",
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
@@ -71,7 +72,7 @@ export const LabourMedicalInfoMD = () => {
           console.log(labValue, "update");
           const LabUpValue = {
             ...labValue,
-            id: checkingLMITable.id,
+            LabTable: checkingLMITable.id,
           };
           await updateMedicalSubmit({ LabUpValue });
         } else {

@@ -114,8 +114,8 @@ export const SalaryPayDD = [
   { value: "Daily", label: "Daily" },
 ];
 export const EmpTypeDD = [
-  { value: "ONSHORE", label: "ONSHORE" },
-  { value: "OFFSHORE", label: "OFFSHORE" },
+  { value: "Onshore", label: "Onshore" },
+  { value: "Offsore", label: "Offsore" },
 ];
 
 export const CountryORDD = [

@@ -29,6 +29,7 @@ import { DataSupply } from "../../../utils/DataStoredContext";
 import { UpdateEmpInfo } from "../../../services/updateMethod/UpdateEmpInfo";
 import { getUrl } from "@aws-amplify/storage";
 import { RowThirteen } from "./RowThirteen";
+import { capitalizedLetter } from "../../../utils/DateFormat";
 
 export const EmployeeInfo = () => {
   useEffect(() => {
@@ -228,18 +229,31 @@ export const EmployeeInfo = () => {
 
   const capitalizeFirstLetter = (str) => {
     if (typeof str === "string") {
+      // Capitalize the first letter and make the rest lowercase
       return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
     }
-    return str;
+    return str; // Return non-string values as-is
   };
 
   const getLastValue = (value, field) => {
-    if (field === "contractType" || field === "empType") {
-      return capitalizeFirstLetter(value);
-    }
+    // Ensure value is always an array
+    const arrayValue = Array.isArray(value) ? value : value ? [value] : []; // If it's not an array, wrap it in an array
+    console.log(capitalizedLetter(arrayValue[arrayValue?.length - 1]));
+    console.log(value);
 
-    const processedValue = Array.isArray(value) ? value : value ? [value] : [];
-    return processedValue.map(capitalizeFirstLetter);
+    if (
+      arrayValue[arrayValue?.length - 1] !== "LPA" &&
+      arrayValue[arrayValue?.length - 1] !== "SAWP"
+    ) {
+      const changedValue = capitalizedLetter(
+        arrayValue[arrayValue?.length - 1]
+      );
+      console.log(changedValue);
+
+      return [changedValue]; // Return last element of the array
+    } else {
+      return arrayValue;
+    }
   };
 
   const getLastArrayValue = (value, field) => {
@@ -264,9 +278,7 @@ export const EmployeeInfo = () => {
     if (!date) {
       return "";
     }
-
     const d = new Date(date);
-
     // Ensure the date is formatted as yyyy-MM-dd
     const year = d.getFullYear();
     const month = (d.getMonth() + 1).toString().padStart(2, "0"); // Months are 0-indexed, so add 1
@@ -372,13 +384,13 @@ export const EmployeeInfo = () => {
         return [parsedItem];
       }
     } catch (error) {
-      // console.error("Error cleaning and parsing familyDetails:", error);
+      console.error("Error cleaning and parsing familyDetails:", error);
       return []; // Return empty array if parsing fails
     }
   };
 
   const searchResult = async (result) => {
-    // console.log(result);
+    console.log("Result", result);
 
     const keysToSet = [
       "empID",
@@ -406,7 +418,6 @@ export const EmployeeInfo = () => {
       "email",
       "eduDetails",
       "empBadgeNo",
-      "empType",
       "bankName",
       "bankAccNo",
       "lang",
@@ -426,26 +437,19 @@ export const EmployeeInfo = () => {
       if (valueToSet === undefined || valueToSet === null) {
         valueToSet = "";
       }
-      if (typeof valueToSet === "string" && valueToSet.trim() !== "") {
-        valueToSet = valueToSet
-          .toLowerCase()
-          .split(" ")
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(" ");
-      }
-      if (key === "empBadgeNo") {
-        valueToSet = valueToSet?.toUpperCase();
-      } else if (key === "email" || key === "officialEmail") {
-        valueToSet = valueToSet;
-      }
-      if (valueToSet !== undefined && valueToSet !== null) {
-        // console.log(`Key: ${key}, Original: ${result[key]}, Transformed: ${valueToSet}`);
+      if (typeof valueToSet === "string") {
+        const storedValue = capitalizedLetter(valueToSet).trim();
+        setValue(key, storedValue); // Set the trimmed value
+      } else {
+        // If it's not a string, just set the value as is (or handle as needed)
         setValue(key, valueToSet);
       }
     });
 
     const fields = ["contractType", "empType"];
-    fields.forEach((field) => setValue(field, getLastValue(result[field])));
+    fields.forEach((field) =>
+      setValue(field, getLastValue(result[field], field))
+    );
 
     const fieldsArray = ["bwnIcExpiry", "ppExpiry", "ppIssued"];
     fieldsArray.forEach((field) =>
@@ -499,22 +503,28 @@ export const EmployeeInfo = () => {
       setFamilyData([]);
     }
 
+    setValue("profilePhoto", result?.profilePhoto?.toString() || "");
+    setValue("inducBriefUp", result?.inducBriefUp?.toString() || "");
+
+    setUploadedDocs((prev) => ({
+      profilePhoto: result.profilePhoto || "",
+      inducBriefUp: result.inducBriefUp || "",
+    }));
     // Handle file uploads and names
-    if (result.inducBriefUp) {
+    if (result.inducBriefUp && result.inducBriefUp !== null) {
       setUploadedFileNames((prev) => ({
         ...prev,
         inducBriefUp: getFileName(result.inducBriefUp) || "",
       }));
+    } else {
+      // Clear the previous value if inducBriefUp is null
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        inducBriefUp: "",
+      }));
     }
 
-    setValue("profilePhoto", result?.profilePhoto?.toString() || null);
-    setValue("inducBriefUp", result?.inducBriefUp?.toString() || "");
-    setUploadedDocs((prev) => ({
-      profilePhoto: result.profilePhoto || null,
-      inducBriefUp: result.inducBriefUp || "",
-    }));
-
-    const profilePhotoString = result?.profilePhoto || null;
+    const profilePhotoString = result?.profilePhoto;
     const linkToStorageFile = async (pathUrl) => {
       try {
         if (!pathUrl) {
@@ -527,7 +537,7 @@ export const EmployeeInfo = () => {
           setPPLastUP(result.url?.toString());
         }
       } catch (err) {
-        // console.log("Error fetching file from storage:", err);
+        console.log("Error fetching file from storage:", err);
       }
     };
     linkToStorageFile(profilePhotoString);
@@ -545,41 +555,47 @@ export const EmployeeInfo = () => {
     ];
 
     uploadFields.map((field) => {
-      if (result && result[field]) {
-        try {
-          const outerParsed = JSON.parse(result[field]);
-          const parsedArray = Array.isArray(outerParsed)
-            ? outerParsed
-            : [outerParsed];
+      const fieldData = result[field];
+      if (!fieldData) {
+        setValue(field, []);
+        setUploadedFiles((prev) => ({ ...prev, [field]: [] }));
+        setUploadedFileNames((prev) => ({ ...prev, [field]: "" }));
+        return;
+      }
 
-          const parsedFiles = parsedArray.map((item) => {
-            if (typeof item === "string") {
-              try {
-                const validJSON = preprocessJSONString(item);
-                return JSON.parse(validJSON);
-              } catch (e) {
-                return item;
-              }
+      try {
+        const outerParsed = JSON.parse(result[field]);
+        const parsedArray = Array.isArray(outerParsed)
+          ? outerParsed
+          : [outerParsed];
+
+        const parsedFiles = parsedArray.map((item) => {
+          if (typeof item === "string") {
+            try {
+              const validJSON = preprocessJSONString(item);
+              return JSON.parse(validJSON);
+            } catch (e) {
+              return item;
             }
-            return item;
-          });
+          }
+          return item;
+        });
 
-          const lastFile = parsedFiles[parsedFiles.length - 1];
-          const lastFileName = lastFile?.upload
-            ? getFileName(lastFile.upload)
-            : lastFile[0]?.upload
-            ? getFileName(lastFile[0].upload)
-            : null;
+        const lastFile = parsedFiles[parsedFiles.length - 1];
+        const lastFileName = lastFile?.upload
+          ? getFileName(lastFile.upload)
+          : lastFile[0]?.upload
+          ? getFileName(lastFile[0].upload)
+          : null;
 
-          setValue(field, parsedFiles);
-          setUploadedFiles((prev) => ({ ...prev, [field]: parsedFiles }));
-          setUploadedFileNames((prev) => ({
-            ...prev,
-            [field]: lastFileName || "",
-          }));
-        } catch (error) {
-          // console.error(`Failed to parse ${field}:`, error);
-        }
+        setValue(field, parsedFiles);
+        setUploadedFiles((prev) => ({ ...prev, [field]: parsedFiles }));
+        setUploadedFileNames((prev) => ({
+          ...prev,
+          [field]: lastFileName || "",
+        }));
+      } catch (error) {
+        // console.error(`Failed to parse ${field}:`, error);
       }
     });
   };
@@ -596,6 +612,7 @@ export const EmployeeInfo = () => {
   const onSubmit = async (data) => {
     data.contractType = contractTypes;
     data.empType = empTypes;
+    // console.log(data);
 
     const formatDate = (date) =>
       date ? new Date(date).toLocaleDateString("en-CA") : null;

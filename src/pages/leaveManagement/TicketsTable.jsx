@@ -6,14 +6,14 @@ import { IoSearch } from "react-icons/io5";
 import { Pagination } from "./Pagination";
 import { Filter } from "./Filter";
 import { NavigateLM } from "./NavigateLM";
-import { DateFormat } from "../../utils/DateFormat";
+import { capitalizedLetter, DateFormat } from "../../utils/DateFormat";
 
 export const TicketsTable = () => {
   const { handleViewClick, handleClickForToggle, userType } =
     useOutletContext();
 
   const [searchResults, setSearchResults] = useState([]);
-  // const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [secondartyData, setSecondartyData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -21,7 +21,7 @@ export const TicketsTable = () => {
   const [data, setData] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
-  const { ticketMerged, loading } = useLeaveManage();
+  const { ticketMerged } = useLeaveManage();
 
   // Add new state to track all filters
   const [filters, setFilters] = useState({
@@ -40,6 +40,7 @@ export const TicketsTable = () => {
   // Modify useEffect to handle all filters together
   useEffect(() => {
     // If no filters are active, show all data
+    setLoading(true);
     if (
       !filters.date &&
       filters.search.length === 0 &&
@@ -108,7 +109,6 @@ export const TicketsTable = () => {
         return matches;
       });
     }
-
     setData(filteredResults);
     setFilteredData([]);
     setCurrentPage(1);
@@ -125,10 +125,12 @@ export const TicketsTable = () => {
       dateError,
     };
     setErrorState(errorState); // Add this state if not already present
+    setLoading(false);
   }, [filters, ticketMerged]);
 
   // Separate useEffect for pagination to avoid race conditions
   useEffect(() => {
+    setLoading(true);
     if (!data.length) {
       setFilteredData([]);
       return;
@@ -156,7 +158,9 @@ export const TicketsTable = () => {
       startIndex,
       startIndex + rowsPerPage
     );
+
     setFilteredData(paginatedData);
+    setLoading(false);
   }, [currentPage, rowsPerPage, data]);
 
   // Console log for debugging
@@ -236,18 +240,8 @@ export const TicketsTable = () => {
     setData(sortedData);
   }, [ticketMerged]);
 
-  if (loading) {
-    return (
-      <div>
-        <div className="flex items-center justify-center h-[60vh]">
-          <p className="text-sm font-semibold">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  // console.log(loading);
 
-  console.log(loading);
-  
   return (
     <section className="w-full">
       <div className="flex justify-between flex-wrap mb-5">
@@ -282,7 +276,11 @@ export const TicketsTable = () => {
         </div>
       </div>
       <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl ">
-        {errorState.noResults ? (
+        {loading ? (
+          <div className="text-center mt-6 py-20">
+            <p>Loading...</p>
+          </div>
+        ) : errorState.noResults ? (
           <div className="text-center mt-6 py-20">
             <p>No matching results found for your search.</p>
           </div>
@@ -300,44 +298,44 @@ export const TicketsTable = () => {
             <tbody>
               {filteredData.map((item, index) => {
                 const displayIndex = startIndex + index + 1; // Adjust index based on pagination
-                // console.log(item.empID);
-
                 return (
                   <tr
                     key={index}
                     className="text-center text-sm shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
                   >
-                    <td className="border-b-2  border-[#CECECE] py-5">
+                    <td className="border-b-2 border-[#CECECE] py-5">
                       {displayIndex}
                     </td>
-                    <td className="border-b-2  border-[#CECECE] py-5">
+                    <td className="border-b-2 border-[#CECECE] py-5">
                       {item?.empID}
                     </td>
-                    <td className="border-b-2  border-[#CECECE] py-5">
-                      {item?.empName || "N/A"}
+                    <td className="border-b-2 border-[#CECECE] py-5">
+                      {capitalizedLetter(item?.empName) || "N/A"}
                     </td>
                     <td className="border-b-2 border-[#CECECE] py-5">
                       {Array.isArray(item.department)
-                        ? item.department[item.department.length - 1] || "N/A"
+                        ? capitalizedLetter(
+                            item.department[item.department.length - 1]
+                          ) || "N/A"
                         : "N/A"}
                     </td>
                     <td className="border-b-2 border-[#CECECE] py-5">
                       {Array.isArray(item.position)
-                        ? item.position[item.position.length - 1] || "N/A"
+                        ? capitalizedLetter(
+                            item.position[item.position.length - 1]
+                          ) || "N/A"
                         : "N/A"}
                     </td>
-
-                    <td className="border-b-2  border-[#CECECE] py-5">
+                    <td className="border-b-2 border-[#CECECE] py-5">
                       {DateFormat(item.createdAt)}
                     </td>
-                    <td className="border-b-2  border-[#CECECE] py-5">
+                    <td className="border-b-2 border-[#CECECE] py-5">
                       {DateFormat(item.departureDate)}
                     </td>
-                    <td className="border-b-2  border-[#CECECE] py-5">
+                    <td className="border-b-2 border-[#CECECE] py-5">
                       {DateFormat(item.arrivalDate)}
                     </td>
-
-                    <td className="border-b-2  border-[#CECECE] cursor-pointer py-5">
+                    <td className="border-b-2 border-[#CECECE] cursor-pointer py-5">
                       <span
                         className="border-b-2 text-[blue] "
                         onClick={() => {
@@ -380,6 +378,7 @@ export const TicketsTable = () => {
           </div>
         )}
       </div>
+
       <div className="center pt-10">
         <div>
           <Pagination

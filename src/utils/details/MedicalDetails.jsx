@@ -312,7 +312,7 @@ const MedicalDetails = ({
   };
 
   return (
-    <section ref={mainRef} className="py-8 px-10 bg-gray-50 rounded-lg">
+    <section ref={mainRef} className="py-8 bg-gray-50 rounded-lg">
       <h6 className="uppercase text_size_5 my-3 mb-6">Medical Info</h6>
 
       {/* Personal Info Section */}

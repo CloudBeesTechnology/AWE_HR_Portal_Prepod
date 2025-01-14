@@ -6,7 +6,7 @@ import { Filter } from "./Filter";
 import { Searchbox } from "../../utils/Searchbox";
 import { NavigateLM } from "./NavigateLM";
 import { IoSearch } from "react-icons/io5";
-import { DateFormat } from "../../utils/DateFormat";
+import { capitalizedLetter, DateFormat } from "../../utils/DateFormat";
 import { DataSupply } from "../../utils/DataStoredContext";
 
 export const LMTable = () => {
@@ -190,6 +190,7 @@ export const LMTable = () => {
   );
 
 
+
    if (loading) {
     return (
       <div>
@@ -199,6 +200,8 @@ export const LMTable = () => {
       </div>
     );
   }
+
+
   return (
     <section className="flex flex-col w-full mt-4">
       <section className="flex flex-wrap justify-between items-center mb-5">
@@ -257,12 +260,12 @@ export const LMTable = () => {
                     >
                       <td className="py-3">{displayIndex}</td>
                       <td className="py-3">{item.empID}</td>
-                      <td className="py-3">{item.empName || "N/A"}</td>
+                      <td className="py-3">{capitalizedLetter(item.empName) || "N/A"}</td>
                       <td className="py-3">
                         {DateFormat(item.leaveStatusCreatedAt)}
                       </td>
                       {userType !== "Supervisor" && userType !== "Manager" && (
-                        <td className="py-3">{supervisorName[0]?.name || "N/A"}</td>
+                        <td className="py-3">{capitalizedLetter(supervisorName[0]?.name) || "N/A"}</td>
                       )}
                       {userType !== "Manager" && (
                         <td className="py-3">
@@ -270,7 +273,7 @@ export const LMTable = () => {
                         </td>
                       )}
                       {userType !== "Manager" && userType !== "Supervisor" && (
-                        <td className="py-3">{managerName[0]?.name || "N/A"}</td>
+                        <td className="py-3">{capitalizedLetter(managerName[0]?.name) || "N/A"}</td>
                       )}
                       {userType !== "Supervisor" && (
                         <td className="py-3">
@@ -305,6 +308,8 @@ export const LMTable = () => {
                           onClick={() => {
                             handleClickForToggle();
                             handleViewClick(item, "LM");
+                            // console.log(item);
+                            
                           }}
                         >
                           {item["submitted Form"] || "View"}

@@ -3211,6 +3211,10 @@ export const onCreateLeaveStatus = /* GraphQL */ `
       empStatus
       empDate
       empRemarks
+      selectedTo
+      selectedFrom
+      startDate
+      endDate
       createdAt
       updatedAt
       __typename
@@ -3244,6 +3248,10 @@ export const onUpdateLeaveStatus = /* GraphQL */ `
       empStatus
       empDate
       empRemarks
+      selectedTo
+      selectedFrom
+      startDate
+      endDate
       createdAt
       updatedAt
       __typename
@@ -3277,6 +3285,10 @@ export const onDeleteLeaveStatus = /* GraphQL */ `
       empStatus
       empDate
       empRemarks
+      selectedTo
+      selectedFrom
+      startDate
+      endDate
       createdAt
       updatedAt
       __typename

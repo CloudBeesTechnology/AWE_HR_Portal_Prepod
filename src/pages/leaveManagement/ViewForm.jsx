@@ -8,6 +8,7 @@ import { useCreateNotification } from "../../hooks/useCreateNotification"; // Im
 import { UpdateLeaveData } from "../../services/updateMethod/UpdateLeaveData";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { sendEmail } from "../../services/EmailServices";
+import { DateFormat } from "../../utils/DateFormat";
 
 export const ViewForm = ({
   handleClickForToggle,
@@ -16,7 +17,6 @@ export const ViewForm = ({
   source,
   userType,
   personalInfo,
-  formatDate,
 }) => {
   // console.log(leaveData.empOfficialEmail);
 
@@ -52,25 +52,26 @@ export const ViewForm = ({
       updateData.supervisorRemarks = remark;
       updateData.supervisorDate = currentDate;
     }
-    function formatDate(isoString) {
-      const date = new Date(isoString);
-      const day = String(date.getDate()).padStart(2, "0");
-      const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
-      const year = date.getFullYear();
-      return `${day}/${month}/${year}`;
-    }
+
+    // function DateFormat(isoString) {
+    //   const date = new Date(isoString);
+    //   const day = String(date.getDate()).padStart(2, "0");
+    //   const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+    //   const year = date.getFullYear();
+    //   return `${day}/${month}/${year}`;
+    // }
 
     // Handle Leave status update
     if (source === "LM") {
-      const fromDate = leaveData.empLeaveStartDate;
-      const toDate = leaveData.empLeaveEndDate;
-      const formattedDateFrom = formatDate(fromDate);
-      const formattedDateTo = formatDate(toDate);
+      const fromDate = leaveData.empLeaveSelectedFrom;
+      const toDate = leaveData.empLeaveSelectedTo;
+      const formattedDateFrom = DateFormat(fromDate);
+      const formattedDateTo = DateFormat(toDate);
 
       handleUpdateLeaveStatus(leaveData.id, updateData)
         .then(() => {
           setNotificationText(
-            `Leave ${status} by ${personalInfo.name} on ${formatDate(
+            `Leave ${status} by ${personalInfo.name} on ${DateFormat(
               currentDate
             )}`
           );
@@ -356,13 +357,13 @@ export const ViewForm = ({
       updateData.hrStatus = status; // Set the status for the ticket request
       updateData.hrRemarks = remark;
       updateData.hrDate = currentDate;
-      const formattedDatedeparture = formatDate(ticketData.departureDate);
-      const formattedDatearrival = formatDate(ticketData.arrivalDate);
+      const formattedDatedeparture = DateFormat(ticketData.departureDate);
+      const formattedDatearrival = DateFormat(ticketData.arrivalDate);
 
       handleUpdateTicketRequest(ticketData.id, updateData)
         .then(() => {
           setNotificationText(
-            `Ticket request ${status} by ${personalInfo.name} on ${formatDate(
+            `Ticket request ${status} by ${personalInfo.name} on ${DateFormat(
               currentDate
             )}`
           );
@@ -589,11 +590,11 @@ export const ViewForm = ({
                   { label: "Leave Type", value: leaveData.empLeaveType },
                   {
                     label: "Applied Dates",
-                    value: ` ${formatDate(
-                      leaveData.empLeaveStartDate
-                    )} to ${formatDate(leaveData.empLeaveEndDate)} `,
+                    value: leaveData.empLeaveSelectedFrom && leaveData.empLeaveSelectedTo
+                      ? `${DateFormat(leaveData.empLeaveSelectedFrom )} to ${DateFormat(leaveData.empLeaveSelectedTo )}`
+                      : "N/A"
                   },
-                  { label: "Total No of Days", value: leaveData.leaveDays },
+                   { label: "Total No of Days", value: leaveData.leaveDays },
                   // { label: "Leave Balance", value: leaveData.balance },
                   { label: "Reason", value: leaveData.reason },
                 ].map((item, index) => (
@@ -651,32 +652,34 @@ export const ViewForm = ({
                             </td>
                           </tr>
                         )}
-                     {leaveData.supervisorEmpID !=="" &&    <tr>
-                          <td className="py-2">Supervisor</td>
-                          <td className="py-2">
-                            {" "}
-                            <p
-                              className={`w-full break-words overflow-hidden ${
-                                leaveData.supervisorStatus === "Approved"
-                                  ? "text-[green]"
-                                  : leaveData.supervisorStatus === "Rejected"
-                                  ? "text-[red]"
-                                  : "text-dark_grey"
-                              }`}
-                            >{`${leaveData.supervisorStatus}`}</p>
-                          </td>
-                          <td className="py-2">
-                            {(leaveData.supervisorStatus === "Approved" ||
-                              leaveData.supervisorStatus === "Rejected" ||
-                              leaveData.supervisorStatus === "Pending") && (
-                              <p className="w-full break-words overflow-hidden ">
-                                {`${
-                                  leaveData.supervisorRemarks || "no remark"
+                        {leaveData.supervisorEmpID !== "" && (
+                          <tr>
+                            <td className="py-2">Supervisor</td>
+                            <td className="py-2">
+                              {" "}
+                              <p
+                                className={`w-full break-words overflow-hidden ${
+                                  leaveData.supervisorStatus === "Approved"
+                                    ? "text-[green]"
+                                    : leaveData.supervisorStatus === "Rejected"
+                                    ? "text-[red]"
+                                    : "text-dark_grey"
                                 }`}
-                              </p>
-                            )}
-                          </td>
-                        </tr>}
+                              >{`${leaveData.supervisorStatus}`}</p>
+                            </td>
+                            <td className="py-2">
+                              {(leaveData.supervisorStatus === "Approved" ||
+                                leaveData.supervisorStatus === "Rejected" ||
+                                leaveData.supervisorStatus === "Pending") && (
+                                <p className="w-full break-words overflow-hidden ">
+                                  {`${
+                                    leaveData.supervisorRemarks || "no remark"
+                                  }`}
+                                </p>
+                              )}
+                            </td>
+                          </tr>
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -874,7 +877,7 @@ export const ViewForm = ({
                   },
                   {
                     label: "Date of Join",
-                    value: formatDate(ticketData.doj) || "N/A",
+                    value: DateFormat(ticketData.doj) || "N/A",
                   },
                   {
                     label: "Destination",
@@ -882,11 +885,11 @@ export const ViewForm = ({
                   },
                   {
                     label: "Departure Date",
-                    value: formatDate(ticketData.departureDate),
+                    value: DateFormat(ticketData.departureDate),
                   },
                   {
                     label: "Arrival Date",
-                    value: formatDate(ticketData.arrivalDate),
+                    value: DateFormat(ticketData.arrivalDate),
                   },
                   {
                     label: "Employee Remarks",

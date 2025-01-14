@@ -770,5 +770,9 @@ type LeaveStatus @model @auth(rules: [{allow: public}]) {
   empStatus: String
   empDate: AWSDateTime
   empRemarks: String
+  selectedTo: String
+  selectedFrom: String
+  startDate: AWSDate
+  endDate: AWSDate
 }
  

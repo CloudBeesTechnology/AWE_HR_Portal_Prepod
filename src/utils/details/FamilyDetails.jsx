@@ -1,3 +1,5 @@
+
+
 import React from "react";
 
 const FamilyDetails = ({ familyDetails, mainRef }) => {
@@ -78,11 +80,13 @@ const FamilyDetails = ({ familyDetails, mainRef }) => {
                 <span className="text-dark_grey">
                   {family?.contact || "N/A"}
                 </span>
+
                 <span className="text-dark_grey pr-2">Address</span>
                 <span className="text-gray-500 text-center">:</span>
                 <span className="text-dark_grey">
                   {family?.address || "N/A"}
-      </span>
+                </span>
+
               </div>
             </div>
           ))

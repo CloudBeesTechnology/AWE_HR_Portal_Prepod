@@ -850,6 +850,10 @@ type LeaveStatus @aws_iam @aws_api_key {
   empStatus: String
   empDate: AWSDateTime
   empRemarks: String
+  selectedTo: String
+  selectedFrom: String
+  startDate: AWSDate
+  endDate: AWSDate
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -5994,6 +5998,10 @@ input ModelLeaveStatusFilterInput {
   empStatus: ModelStringInput
   empDate: ModelStringInput
   empRemarks: ModelStringInput
+  selectedTo: ModelStringInput
+  selectedFrom: ModelStringInput
+  startDate: ModelStringInput
+  endDate: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelLeaveStatusFilterInput]
@@ -6023,6 +6031,10 @@ input ModelLeaveStatusConditionInput {
   empStatus: ModelStringInput
   empDate: ModelStringInput
   empRemarks: ModelStringInput
+  selectedTo: ModelStringInput
+  selectedFrom: ModelStringInput
+  startDate: ModelStringInput
+  endDate: ModelStringInput
   and: [ModelLeaveStatusConditionInput]
   or: [ModelLeaveStatusConditionInput]
   not: ModelLeaveStatusConditionInput
@@ -6053,6 +6065,10 @@ input CreateLeaveStatusInput {
   empStatus: String
   empDate: AWSDateTime
   empRemarks: String
+  selectedTo: String
+  selectedFrom: String
+  startDate: AWSDate
+  endDate: AWSDate
 }
 
 input UpdateLeaveStatusInput {
@@ -6078,6 +6094,10 @@ input UpdateLeaveStatusInput {
   empStatus: String
   empDate: AWSDateTime
   empRemarks: String
+  selectedTo: String
+  selectedFrom: String
+  startDate: AWSDate
+  endDate: AWSDate
 }
 
 input DeleteLeaveStatusInput {
@@ -6107,6 +6127,10 @@ input ModelSubscriptionLeaveStatusFilterInput {
   empStatus: ModelSubscriptionStringInput
   empDate: ModelSubscriptionStringInput
   empRemarks: ModelSubscriptionStringInput
+  selectedTo: ModelSubscriptionStringInput
+  selectedFrom: ModelSubscriptionStringInput
+  startDate: ModelSubscriptionStringInput
+  endDate: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionLeaveStatusFilterInput]

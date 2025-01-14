@@ -1,4 +1,3 @@
-import { CountryORDD, NationalityDD } from "../../../utils/DropDownMenus";
 import { FormField } from "../../../utils/FormField";
 
 export const RowSix = ({
@@ -8,7 +7,8 @@ export const RowSix = ({
   handleCountryChange,
   selectedNationality,
   selectedCountry,
-  watch,dropDownVal
+  watch,
+  dropDownVal,
 }) => {
   const oCOfOrigin = watch("oCOfOrigin" || "");
   const otherNation = watch("otherNation" || "");
@@ -16,15 +16,17 @@ export const RowSix = ({
   const countryofOrigin = watch("ctryOfOrigin" || "");
   const nationalityDD = dropDownVal[0]?.nationalityDD.map((item) => ({
     value: item,
-    label: item.split(" ") // Split the string into words
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
-    .join(" "),
+    label: item
+      .split(" ") // Split the string into words
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+      .join(" "),
   }));
   const countryORDD = dropDownVal[0]?.countryORDD.map((item) => ({
     value: item,
-    label: item.split(" ") // Split the string into words
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
-    .join(" "),
+    label: item
+      .split(" ") // Split the string into words
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+      .join(" "),
   }));
   return (
     <div className="flex gap-5 form-group">
@@ -41,8 +43,8 @@ export const RowSix = ({
         />
 
         {/* Conditionally render the 'Other Nationality' input field */}
-        {(selectedNationality === "OTHER" ||
-          (otherNation && nation === "OTHER")) && (
+        {(selectedNationality === "Other" ||
+          (otherNation && nation === "Other")) && (
           <FormField
             label="Other Nationality"
             register={register}
@@ -66,8 +68,8 @@ export const RowSix = ({
         />
 
         {/* Conditionally render the 'Other Country of Origin' input field */}
-        {(selectedCountry === "OTHER" ||
-          (oCOfOrigin && countryofOrigin === "OTHER")) && (
+        {(selectedCountry === "Other" ||
+          (oCOfOrigin && countryofOrigin === "Other")) && (
           <FormField
             label="Other Country of Origin"
             register={register}

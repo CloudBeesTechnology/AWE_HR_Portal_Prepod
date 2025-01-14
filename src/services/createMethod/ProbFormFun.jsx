@@ -37,6 +37,17 @@ export const ProbFormFun = () => {
         supervisorDate: ProbValue.supervisorDate,
         supervisorName: ProbValue.supervisorName,
         teamwork: ProbValue.teamwork, 
+        communicationDetails: ProbValue.communicationDetails,
+        qualityDetails: ProbValue.qualityDetails,
+        paceDetails: ProbValue.paceDetails,
+        initiativeDetails: ProbValue.initiativeDetails,
+        attitudeDetails: ProbValue.attitudeDetails,
+        adaptabilityDetails: ProbValue.adaptabilityDetails,
+        teamworkDetails: ProbValue.teamworkDetails,
+        responsibilityDetails: ProbValue.responsibilityDetails,
+        diligentDetails: ProbValue.diligentDetails,
+        commitmentDetails: ProbValue.commitmentDetails,
+        probStatus:ProbValue.probStatus
     };
     console.log(totalData);
 

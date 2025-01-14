@@ -42,7 +42,7 @@ const PersonalDetailsView = ({
   // Helper function to fetch the cloud URL
   const linkToStorageFile = async (pathUrl) => {
     if (!pathUrl) {
-      // console.error("No URL provided for the file.");
+      console.error("No URL provided for the file.");
       return; // Exit early if no path is provided
     }
     try {
@@ -52,14 +52,14 @@ const PersonalDetailsView = ({
       setViewingDocument(pathUrl); // Update the state to show the selected document
       setLoading(false);
     } catch (error) {
-      // console.error("Error fetching the file URL:", error);
+      console.error("Error fetching the file URL:", error);
       setLoading(false);
     }
   };
 
   const linkToImageFile = async (pathUrl) => {
     if (!pathUrl) {
-      // console.error("No URL provided for the file.");
+      console.error("No URL provided for the file.");
       return; // Exit early if no path is provided
     }
     
@@ -86,7 +86,7 @@ const PersonalDetailsView = ({
       }
       return [];
     } catch (error) {
-      // console.error("Error parsing document data:", error);
+      console.error("Error parsing document data:", error);
       return [];
     }
   };
@@ -113,7 +113,7 @@ const PersonalDetailsView = ({
 
       return [];
     } catch (error) {
-      // console.error("Error parsing inducBriefUp data:", error);
+      console.error("Error parsing inducBriefUp data:", error);
       return [];
     } 
   };

@@ -5,7 +5,7 @@ import { Searchbox } from "../../utils/Searchbox";
 import { Filter } from "./Filter";
 import { IoSearch } from "react-icons/io5";
 import { Pagination } from "./Pagination";
-import { DateFormat } from "../../utils/DateFormat";
+import { capitalizedLetter, DateFormat } from "../../utils/DateFormat";
 
 export const HOLTable = () => {
   const { userType, mergedData, userID, loading } = useOutletContext();
@@ -60,11 +60,11 @@ export const HOLTable = () => {
         const selectedDateObj = new Date(selectedDate);
 
         // Convert supervisor and manager dates to Date objects
-        const empLeaveEndDate = item.empLeaveEndDate
-          ? new Date(item.empLeaveEndDate)
+        const empLeaveEndDate = item. empLeaveSelectedTo
+          ? new Date(item. empLeaveSelectedTo)
           : null;
-        const empLeaveStartDate = item.empLeaveStartDate
-          ? new Date(item.empLeaveStartDate)
+        const empLeaveStartDate = item. empLeaveSelectedFrom
+          ? new Date(item. empLeaveSelectedFrom)
           : null;
 
         const selectedDateFormatted = DateFormat(selectedDateObj);
@@ -200,16 +200,16 @@ export const HOLTable = () => {
                     >
                       <td className="py-3">{displayIndex}</td>
                       <td className="py-3">{item.empID}</td>
-                      <td className="py-3">{item.empName || "N/A"}</td>
-                      <td className="py-3">{item.empLeaveType}</td>
+                      <td className="py-3">{capitalizedLetter(item.empName) || "N/A"}</td>
+                      <td className="py-3">{capitalizedLetter(item.empLeaveType)}</td>
                       <td className="py-3">
-                        {DateFormat(item.empLeaveStartDate)}
+                        {DateFormat(item. empLeaveSelectedFrom) || "N/A" }
                       </td>
                       <td className="py-3">
-                        {DateFormat(item.empLeaveEndDate)}
+                        {DateFormat(item. empLeaveSelectedTo) || "N/A"}
                       </td>
                       <td className="py-3 w-[20%] break-words overflow-hidden">
-                        {item.reason}
+                        {capitalizedLetter(item.reason)}
                       </td>
                       <td
                         className={`font-semibold ${getStatusClass(

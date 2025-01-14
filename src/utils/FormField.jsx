@@ -23,25 +23,14 @@ export const FormField = ({
   const [selectedOption, setSelectedOption] = useState(
     value || (isArray ? [] : "")
   );
+
   useEffect(() => {
     if (value !== undefined) {
       // Trim whitespace from the fetched value
       const updatedValue = Array.isArray(value)
-        ? value.map((val) =>
-            val
-              .trim()
-              .toLowerCase()
-              .split(" ")
-              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(" ")
-          ) // Trim and capitalize each value in the array
-        : value
-            .trim()
-            .toLowerCase()
-            .split(" ")
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" "); // Trim and capitalize the string value
-  
+        ? value.map((val) => val.trim()) // Trim each value in the array
+        : value.trim(); // Trim the string value
+
       setSelectedOption(updatedValue);
     }
   }, [value, isArray]);
@@ -49,10 +38,7 @@ export const FormField = ({
   const errorMessage = get(errors, name)?.message;
 
   const handleSelectChange = (e) => {
-    const selectedValue = e.target.value .toLowerCase()
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" "); // Transform the value
+    const selectedValue = e.target.value
 
     if (append) {
       const newSelectedOption = selectedOption.includes(selectedValue)
@@ -77,22 +63,10 @@ export const FormField = ({
     ...option,
     value:
       typeof option?.value === "string"
-        ? option.value
-            .trim()
-            .toLowerCase()
-            .split(" ")
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" ")
-        : option?.value, // Ensure value is a string and transform it
+        ? option?.value.trim()
+        : option?.value, // Ensure value is a string before applying trim and toUpperCase
     label:
-      typeof option?.label === "string"
-        ? option.label
-            .trim()
-            .toLowerCase()
-            .split(" ")
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" ")
-        : option?.label, // Ensure label is a string and transform it
+      typeof option?.label === "string" ? option?.label.trim() : option?.label, // Ensure label is a string before applying trim
   }));
 
   return (

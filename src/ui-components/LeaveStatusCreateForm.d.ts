@@ -43,6 +43,10 @@ export declare type LeaveStatusCreateFormInputValues = {
     empStatus?: string;
     empDate?: string;
     empRemarks?: string;
+    selectedTo?: string;
+    selectedFrom?: string;
+    startDate?: string;
+    endDate?: string;
 };
 export declare type LeaveStatusCreateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -66,6 +70,10 @@ export declare type LeaveStatusCreateFormValidationValues = {
     empStatus?: ValidationFunction<string>;
     empDate?: ValidationFunction<string>;
     empRemarks?: ValidationFunction<string>;
+    selectedTo?: ValidationFunction<string>;
+    selectedFrom?: ValidationFunction<string>;
+    startDate?: ValidationFunction<string>;
+    endDate?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type LeaveStatusCreateFormOverridesProps = {
@@ -91,6 +99,10 @@ export declare type LeaveStatusCreateFormOverridesProps = {
     empStatus?: PrimitiveOverrideProps<TextFieldProps>;
     empDate?: PrimitiveOverrideProps<TextFieldProps>;
     empRemarks?: PrimitiveOverrideProps<TextFieldProps>;
+    selectedTo?: PrimitiveOverrideProps<TextFieldProps>;
+    selectedFrom?: PrimitiveOverrideProps<TextFieldProps>;
+    startDate?: PrimitiveOverrideProps<TextFieldProps>;
+    endDate?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type LeaveStatusCreateFormProps = React.PropsWithChildren<{
     overrides?: LeaveStatusCreateFormOverridesProps | undefined | null;

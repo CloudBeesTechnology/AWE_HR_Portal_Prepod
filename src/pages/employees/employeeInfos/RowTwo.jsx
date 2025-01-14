@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { ContractTypeDD, EmpTypeDD } from "../../../utils/DropDownMenus";
 import { FormField } from "../../../utils/FormField";
 import { Controller } from "react-hook-form";
@@ -8,6 +7,7 @@ export const RowTwo = ({ register, errors, watch, setValue, control }) => {
   const empBadgeNo = watch("empBadgeNo" || "");
   const contractType = watch("contractType" || []);
   const empType = watch("empType" || []);
+
   return (
     <div className="form-group grid grid-cols-1 md:grid-cols-4 gap-5">
       <FormField
@@ -59,9 +59,6 @@ export const RowTwo = ({ register, errors, watch, setValue, control }) => {
             options={EmpTypeDD}
             watch={watch}
             register={() => field}
-            // setValue={(name, value) =>
-            //   console.log(`${name} updated to:`, value)
-            // }
             errors={errors}
             append={true}
           />

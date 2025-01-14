@@ -340,7 +340,12 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     pervAnnualLeaveBal,
   } = passingValue;
 
+  console.log(passingValue);
+  
+  
+  console.log(address);
 
+  console.log(insuranceClaims);
 
   const personalDetails = {
     Name: name,
@@ -391,7 +396,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Bank account number": bankAccNo,
   };
 
-
+  console.log("LOG SAP NO", sapNo);
 
   const employeeDocument = {
     EmpUpDocs: empUpDocs,
@@ -420,8 +425,8 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     // dependPass: dependPass,
   };
 
-
-
+  console.log(bruneiME);
+  console.log(overME);
 
   const dependenPass = {
     DependPass: dependPass,

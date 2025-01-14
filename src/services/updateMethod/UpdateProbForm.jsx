@@ -37,6 +37,17 @@ export const UpdateProbForm = () => {
         supervisorDate: PbFDataUp.supervisorDate,
         supervisorName: PbFDataUp.supervisorName,
         teamwork: PbFDataUp.teamwork, 
+        communicationDetails: PbFDataUp.communicationDetails,
+        qualityDetails: PbFDataUp.qualityDetails,
+        paceDetails: PbFDataUp.paceDetails,
+        initiativeDetails: PbFDataUp.initiativeDetails,
+        attitudeDetails: PbFDataUp.attitudeDetails,
+        adaptabilityDetails: PbFDataUp.adaptabilityDetails,
+        teamworkDetails: PbFDataUp.teamworkDetails,
+        responsibilityDetails: PbFDataUp.responsibilityDetails,
+        diligentDetails: PbFDataUp.diligentDetails,
+        commitmentDetails: PbFDataUp.commitmentDetails,
+        probStatus:PbFDataUp.probStatus
 
     };
     // console.log(totalData);

@@ -8,8 +8,8 @@ import { UpdateImmigra } from "../../services/updateMethod/UpdateImmigra";
 export const PassportValidMD = () => {
   const { PPValidsData } = useContext(DataSupply);
   const { ImmigrationData } = ImmigrationFun();
-    const { UpdateImmigraData } = UpdateImmigra();
-console.log(PPValidsData);
+  const { UpdateImmigraData } = UpdateImmigra();
+  console.log(PPValidsData);
 
   const excelDateToJSDate = (serial) => {
     const excelEpoch = new Date(Date.UTC(1900, 0, 1)); // Start from Jan 1, 1900
@@ -17,14 +17,16 @@ console.log(PPValidsData);
     return new Date(excelEpoch.getTime() + daysOffset * 24 * 60 * 60 * 1000);
   };
 
-// Link 1:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PassportValid+Prod/PassportValid.csv"
-// Link 2:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PassportValid+Prod/PassportValid+1.csv"
+  // Link 1:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PassportValid+Prod/PassportValid.csv"
+  // Link 2:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PassportValid+Prod/PassportValid+1.csv"
+  // Link 3:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PassportValid+Prod/PassportValid+2.csv"
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PassportValid+Prod/PassportValid+1.csv",        {
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/PassportValid+Prod/PassportValid+2.csv",
+        {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
       );
@@ -39,10 +41,7 @@ console.log(PPValidsData);
 
       // Convert sheet data to JSON format
       const sheetData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-      const dateKeys = [
-        "empPassExp","immigApproval","ppSubmit"
-        
-      ];
+      const dateKeys = ["empPassExp", "immigApproval", "ppSubmit"];
       const transformedData = sheetData.slice(1).map((row) => {
         let result = {};
         sheetData[0].forEach((key, index) => {

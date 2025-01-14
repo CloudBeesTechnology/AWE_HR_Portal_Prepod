@@ -57,7 +57,7 @@ export const useLeaveManage = () => {
       const fetchedTicketRequests =
         ticketRequestsData?.data?.listTicketRequests?.items || [];
 
-
+        // console.log(fetchedEmpPersonalInfos, "EMPINFO");
         
       // Create lookup maps
       const empInfoMap = fetchedEmpPersonalInfos.reduce((acc, item) => {
@@ -111,7 +111,9 @@ export const useLeaveManage = () => {
           position: workInfo.position || "",
           department: workInfo.department || "",
           empLeaveStartDate: leaveStatus.fromDate,
+          empLeaveSelectedFrom: leaveStatus.selectedFrom,
           empLeaveEndDate: leaveStatus.toDate,
+          empLeaveSelectedTo: leaveStatus.selectedTo,
           empLeaveUpdatedAt: leaveStatus.updatedAt,
           compassionateLeave: leaveDetails.compasLeave || 0,
           annualLeave: leaveDetails.annualLeave || 0,

@@ -5,7 +5,7 @@ import { IoSearch } from "react-icons/io5";
 import { Searchbox } from "../../utils/Searchbox";
 import { LeaveSummaryPopUp } from "./LeaveSummaryPopUp";
 import { NavigateLM } from "./NavigateLM";
-import { DateFormat } from "../../utils/DateFormat";
+import { capitalizedLetter, DateFormat } from "../../utils/DateFormat";
 
 export const EmpLeaveBalance = () => {
   const { mergedData, userType, loading } = useOutletContext();
@@ -30,7 +30,7 @@ export const EmpLeaveBalance = () => {
     "Department",
     "Summary",
   ];
-console.log("DATA EMO LEAVE",mergedData);
+// console.log("DATA EMO LEAVE",mergedData);
 
 useEffect(() => {
   const userID = localStorage.getItem("userID");
@@ -214,19 +214,19 @@ useEffect(() => {
                     >
                       <td className="py-3">{displayIndex}</td>
                       <td className="py-3">{item.empID}</td>
-                      <td className="py-3">{item.empName || "N/A"}</td>
+                      <td className="py-3">{capitalizedLetter(item.empName) || "N/A"}</td>
                       <td className="py-3">{item.empBadgeNo || "N/A"}</td>
                       <td className="py-3">{DateFormat(item.doj) || "N/A"}</td>
                       <td className="py-3">
                         {" "}
                         {Array.isArray(item.position)
-                          ? item.position[item.position.length - 1] || "N/A"
+                          ? capitalizedLetter(item.position[item.position.length - 1]) || "N/A"
                           : "N/A"}
                       </td>
                       <td className="py-3">
                         {" "}
                         {Array.isArray(item.department)
-                          ? item.department[item.department.length - 1] || "N/A"
+                          ? capitalizedLetter(item.department[item.department.length - 1]) || "N/A"
                           : "N/A"}
                       </td>
                       <td className="py-3">

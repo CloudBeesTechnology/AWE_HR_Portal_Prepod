@@ -20,6 +20,9 @@ import {
 import { UploadingFiles } from "../../employees/medicalDep/FileUploadField";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { UpdateWIData } from "../../../services/updateMethod/UpdateWIData";
+import { UpdateWISRData } from "../../../services/updateMethod/UpdateWISRData";
+import { UpdateWILeaveData } from "../../../services/updateMethod/UpdateWILeaveData";
+import { UpdateWITerminateData } from "../../../services/updateMethod/UpdateWITerminateData";
 import { WIRowTwo } from "./WIRowTwo";
 import { WIRowThree } from "./WIRowThree";
 import { WIRowOne } from "./WIRowOne";
@@ -29,6 +32,9 @@ import { CreateSRData } from "../../../services/createMethod/CreateSRData";
 
 export const WorkInfo = () => {
   const { WIUpdateData } = UpdateWIData();
+  const { WIUpdateSRData } = UpdateWISRData();
+  const { WIUpdateLeaveData } = UpdateWILeaveData();
+  const { WIUpdateTerminateData } = UpdateWITerminateData();
   const { SubmitWIData } = WorkInfoFunc();
   const { SRDataValue } = CreateSRData();
   const { LeaveDataValue } = CreateLeaveData();
@@ -199,40 +205,62 @@ export const WorkInfo = () => {
   };
 
   // const getArrayDateValue = (value) => {
-  //   if (Array.isArray(value) && value.length > 0) {
-  //     return value[value.length - 1]?.toUpperCase();
-  //   }
-  //   return typeof value === "string" ? value.toUpperCase() : null;
-  // };
+  //   const formatToTitleCase = (input) => {
+  //     if (typeof input !== "string" || !input) {
+  //       return ""; // Return an empty string if input is invalid
+  //     }
 
+  //     return input
+  //       .toLowerCase()
+  //       .split(" ")
+  //       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+  //       .join(" ");
+  //   };
+
+  //   if (Array.isArray(value) && value.length > 0) {
+  //     const lastValue = value[value.length - 1]?.trim();
+  //     return formatToTitleCase(lastValue);
+  //   }
+
+  //   if (typeof value === "string") {
+  //     return formatToTitleCase(value.trim());
+  //   }
+
+  //   return null; // Return null if value is not a valid array or string
+  // };
   const getArrayDateValue = (value) => {
     const formatToTitleCase = (input) => {
       if (typeof input !== "string" || !input) {
         return ""; // Return an empty string if input is invalid
       }
-  
+
+      // Check if the value matches the special allowed uppercase values
+      const allowedUppercase = ["BLNG", "CPD", "SBW", "", "LBD"];
+      if (allowedUppercase.includes(input.toUpperCase())) {
+        return input.toUpperCase(); // Return the value as uppercase if it's one of the allowed values
+      }
+
       return input
-        .toLowerCase()
-        .split(" ")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ");
+        // .toLowerCase()
+        // .split(" ")
+        // .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        // .join(" ");
     };
-  
+
     if (Array.isArray(value) && value.length > 0) {
       const lastValue = value[value.length - 1]?.trim();
       return formatToTitleCase(lastValue);
     }
-  
+
     if (typeof value === "string") {
       return formatToTitleCase(value.trim());
     }
-  
+
     return null; // Return null if value is not a valid array or string
   };
-  
 
   const searchResult = (result) => {
-    // console.log(result);
+    // console.log("Result", result);
 
     const keysToSet = [
       "empID",
@@ -276,10 +304,10 @@ export const WorkInfo = () => {
 
       const toTitleCase = (input) =>
         input
-          .toLowerCase()
-          .split(" ")
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(" ");
+          // .toLowerCase()
+          // .split(" ")
+          // .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          // .join(" ");
 
       let value = toTitleCase(rawValue);
 
@@ -289,7 +317,7 @@ export const WorkInfo = () => {
         key === "resignNotProb" ||
         key === "resignNotConf"
       ) {
-        value = value.toUpperCase();
+        value = value;
       }
 
       setValue(key, value);
@@ -343,6 +371,9 @@ export const WorkInfo = () => {
 
       setValue(field, getArrayDateValue(valueToSet)); // Use getArrayDateValue for all fields
     });
+    // console.log("key",arrayDateField);
+// console.log("res",result);
+
 
     setValue("hr", "Hr-notification@adininworks.com");
 
@@ -389,7 +420,7 @@ export const WorkInfo = () => {
                 : "",
           }));
         } catch (error) {
-          console.error(`Failed to parse ${field}:`, error);
+          console.error(`Failed to parse ${field}:, error`);
         }
       }
     });
@@ -416,7 +447,7 @@ export const WorkInfo = () => {
 
       // Check each record and handle accordingly
       if (SRDataRecord) {
-        const workInfoUpValue = {
+        const SRUpValue = {
           ...data,
           SRDataRecord: SRDataRecord,
           uploadPR: JSON.stringify(nameServiceUp.uploadPR),
@@ -425,8 +456,8 @@ export const WorkInfo = () => {
           uploadAL: JSON.stringify(nameServiceUp.uploadAL),
           uploadDep: JSON.stringify(nameServiceUp.uploadDep),
         };
-        // console.log("SR Data Update Value:", workInfoUpValue);
-        await WIUpdateData({ workInfoUpValue });
+        console.log("SR Data Update Value:", SRUpValue);
+        await WIUpdateSRData({ SRUpValue });
       } else {
         const SRValue = {
           ...data,
@@ -443,12 +474,12 @@ export const WorkInfo = () => {
 
       if (leaveDetailsDataRecord) {
         // If leaveDetailsDataRecord exists, update leave details data
-        const workInfoUpValue = {
+        const LeaveUpValue = {
           ...data,
           leaveDetailsDataRecord: leaveDetailsDataRecord,
         };
-        // console.log("Leave Details Update Value:", workInfoUpValue);
-        await WIUpdateData({ workInfoUpValue });
+        console.log("Leave Details Update Value:", LeaveUpValue);
+        await WIUpdateLeaveData({ LeaveUpValue });
       } else {
         const LeaveValue = {
           ...data,
@@ -464,7 +495,7 @@ export const WorkInfo = () => {
           sapNo: checkingPITable?.sapNo,
           workInfoDataRecord: workInfoDataRecord,
         };
-        // console.log("Work Info Update Value:", workInfoUpValue);
+        console.log("Work Info Update Value:", workInfoUpValue);
         await WIUpdateData({ workInfoUpValue });
       } else {
         const workInfoValue = {
@@ -476,7 +507,7 @@ export const WorkInfo = () => {
       }
 
       if (terminateDataRecord) {
-        const workInfoUpValue = {
+        const TerminateUpValue = {
           ...data,
           terminateDataRecord: terminateDataRecord,
           WIContract: JSON.stringify(nameServiceUp.WIContract),
@@ -485,8 +516,8 @@ export const WorkInfo = () => {
           WITermination: JSON.stringify(nameServiceUp.WITermination),
           WILeaveEntitle: JSON.stringify(nameServiceUp.WILeaveEntitle),
         };
-        // console.log("Terminate Update Value:", workInfoUpValue);
-        await WIUpdateData({ workInfoUpValue });
+        console.log("Terminate Update Value:", TerminateUpValue);
+        await WIUpdateTerminateData({ TerminateUpValue });
       } else {
         const TerminateValue = {
           ...data,
@@ -507,7 +538,7 @@ export const WorkInfo = () => {
       console.log("Error during submission:", err);
     }
   };
-return (
+  return (
     <section
       className="bg-[#F5F6F1CC] mx-auto p-10"
       onClick={() => {
@@ -673,7 +704,7 @@ return (
                   <input
                     type={field.type}
                     {...register(field.name)}
-                    // defaultValue={field.value || ""}
+                    defaultValue={field.value || ""}
                     className="input-field"
                   />
                 )}
@@ -695,7 +726,7 @@ return (
           <div className="grid grid-cols-2 form-group gap-5">
             {terminationFields.map((field, index) => {
               const selectedValue = watchFields[index]; // Get the watched value for the current field
-              const isOtherSelected = selectedValue === "OTHER";
+              const isOtherSelected = selectedValue === "Other";
 
               return (
                 <div key={index} className="form-group">
@@ -723,7 +754,7 @@ return (
                               value={
                                 optionValue === "Select"
                                   ? ""
-                                  : String(optionValue).toUpperCase()
+                                  : String(optionValue)
                               }
                             >
                               {optionLabel}
@@ -737,27 +768,14 @@ return (
                           <input
                             type="text"
                             placeholder="Please specify"
-                            {...register(
-                              `other${
-                                field.name.charAt(0).toUpperCase() +
-                                field.name.slice(1)
-                              }`,
-                              {
-                                required:
-                                  "This field is required when 'Other' is selected",
-                              }
-                            )}
+                            {...register(`Other`, {
+                              required:
+                                "This field is required when 'Other' is selected",
+                            })}
                             className="input-field"
                           />
                           <p className="text-[red] text-[13px] mt-1">
-                            {
-                              errors[
-                                `other${
-                                  field.name.charAt(0).toUpperCase() +
-                                  field.name.slice(1)
-                                }`
-                              ]?.message
-                            }
+                            {errors[`Other`]?.message}
                           </p>
                         </>
                       )}
