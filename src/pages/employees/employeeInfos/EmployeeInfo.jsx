@@ -227,22 +227,6 @@ export const EmployeeInfo = () => {
     }
   }, [uploadedDocs, watchedProfilePhoto]);
 
-  const getLastValue = (value, field) => {
-    // Ensure value is always an array
-    const arrayValue = Array.isArray(value) ? value : value ? [value] : []; // If it's not an array, wrap it in an array
-    if (
-      arrayValue[arrayValue?.length - 1] !== "LPA" &&
-      arrayValue[arrayValue?.length - 1] !== "SAWP"
-    ) {
-      const changedValue = capitalizedLetter(
-        arrayValue[arrayValue?.length - 1]
-      );
-      return [changedValue]; // Return last element of the array
-    } else {
-      return arrayValue;
-    }
-  };
-
   const getLastArrayValue = (value, field) => {
     // If the value is an array, get the last value
     const lastValue = Array.isArray(value) ? value[value.length - 1] : value;
@@ -277,8 +261,13 @@ export const EmployeeInfo = () => {
 
   const preprocessJSONString = (str) => {
     try {
+      // Replace = with :
       let processedStr = str.replace(/=/g, ":");
+
+      // Add quotes around keys
       processedStr = processedStr.replace(/([{,])\s*(\w+)\s*:/g, '$1"$2":');
+
+      // Add quotes around string values
       processedStr = processedStr.replace(/:\s*([^"{[\]},]+)/g, ': "$1"');
 
       return processedStr;
@@ -290,32 +279,44 @@ export const EmployeeInfo = () => {
 
   const cleanFamilyDetailsString = (familyDetailsInput) => {
     try {
+      // Check if it's already a string
       let familyDetailsString = familyDetailsInput;
+
+      // If it's an object, convert it to a string
       if (typeof familyDetailsString === "object") {
+        // If it's an array, we join the array elements into a string
         if (Array.isArray(familyDetailsString)) {
           familyDetailsString = JSON.stringify(familyDetailsString);
         } else {
+          // If it's an object, use JSON.stringify to convert it to a string
           familyDetailsString = JSON.stringify([familyDetailsString]);
         }
       }
 
+      // Remove the surrounding quotes if they exist
       let cleanedString = familyDetailsString.trim();
 
+      // Remove surrounding quotes (if any) after trimming
       if (cleanedString.startsWith('"') && cleanedString.endsWith('"')) {
         cleanedString = cleanedString.slice(1, -1); // Remove surrounding quotes
       }
 
+      // Fix malformed JSON by ensuring property names are wrapped in double quotes
       cleanedString = cleanedString.replace(/([a-zA-Z0-9_]+)(:)/g, '"$1"$2');
 
+      // Handle potential single quotes around values or unescaped characters
       cleanedString = cleanedString.replace(/"(?!\\)/g, '\\"'); // Escape any unescaped quotes
+
+      // Handle special characters that might be causing issues (like '/')
       cleanedString = cleanedString.replace(/\\/g, "");
-      const capitalizeWords = (str) =>
-        str
-          .split(" ")
-          .map(
-            (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-          )
-          .join(" ");
+
+      // Capitalize words utility function
+      const capitalizeWords = (str) => str.toUpperCase();
+      // .split(" ")
+      // .map(
+      //   (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      // )
+      // .join(" ");
 
       // After cleaning, the string should be a valid JSON array
       if (cleanedString.startsWith("[") && cleanedString.endsWith("]")) {
@@ -360,11 +361,26 @@ export const EmployeeInfo = () => {
 
   const searchResult = async (result) => {
     console.log("Result", result);
+    const fieldValue = [
+      "empID",
+      "email",
+      "officialEmail",
+      "bankAccNo",
+      "empBadgeNo",
+    ];
 
+    fieldValue.forEach((val) => {
+      const data = result[val];
+
+      // Ensure the data is a string before setting the value
+      setValue(val, typeof data === "string" ? data : "");
+    });
     const keysToSet = [
+      // "empID",
       "driveLic",
       "inducBrief",
       "myIcNo",
+      "nationality",
       "nationalCat",
       "otherNation",
       "otherRace",
@@ -382,49 +398,47 @@ export const EmployeeInfo = () => {
       "ctryOfOrigin",
       "chinese",
       "educLevel",
+      // "email",
       "eduDetails",
-      "empBadgeNo",
+      // "empBadgeNo",
       "bankName",
-      "bankAccNo",
+      // "bankAccNo",
       "lang",
       "marital",
       "name",
       "oCOfOrigin",
       "position",
       "sapNo",
+      // "officialEmail",
+      "contractType",
+      "empType",
       "bwnIcColour",
       "gender",
-      "nationality",
     ];
-
     // Set values for other fields
     keysToSet.forEach((key) => {
       let valueToSet = result[key];
+
+      // Handle undefined or null values
       if (valueToSet === undefined || valueToSet === null) {
         valueToSet = "";
       }
+
       if (typeof valueToSet === "string") {
-        const storedValue = capitalizedLetter(valueToSet).trim();
-        setValue(key, storedValue); // Set the trimmed value
+        // Trim and convert string to uppercase
+        const storedValue = valueToSet.trim().toUpperCase();
+        setValue(key, storedValue); // Set the processed string value
+      } else if (Array.isArray(valueToSet) && valueToSet.length > 0) {
+        // Get the last value from the array, trim, and convert to uppercase
+        const arrayData = valueToSet[valueToSet.length - 1]
+          .trim()
+          .toUpperCase();
+        setValue(key, [arrayData]);
       } else {
-        // If it's not a string, just set the value as is (or handle as needed)
+        // Set the value as is for non-string, non-array types
         setValue(key, valueToSet);
       }
     });
-    const fieldValue = ["empID", "email", "officialEmail"];
-
-    fieldValue.forEach((val) => {
-      const data = result[val];
-      setValue(val, typeof data === "string" ? data : "");
-    });
-
-    if (result.nationality === "BRUNEI PR") {
-      setValue("nationality", "Brunei PR");
-    }
-    const fields = ["contractType", "empType"];
-    fields.forEach((field) =>
-      setValue(field, getLastValue(result[field], field))
-    );
 
     const fieldsArray = ["bwnIcExpiry", "ppExpiry", "ppIssued"];
     fieldsArray.forEach((field) =>
@@ -528,7 +542,7 @@ export const EmployeeInfo = () => {
       "ppUpload",
       "supportDocUpload",
     ];
-
+    
     uploadFields.forEach((field) => {
       const fieldData = result[field];
       if (!fieldData) {
@@ -537,14 +551,12 @@ export const EmployeeInfo = () => {
         setUploadedFileNames((prev) => ({ ...prev, [field]: "" })); // Clear the file name
         return;
       }
-
+    
       try {
         // Parse the field data
         const outerParsed = JSON.parse(fieldData);
-        const parsedArray = Array.isArray(outerParsed)
-          ? outerParsed
-          : [outerParsed];
-
+        const parsedArray = Array.isArray(outerParsed) ? outerParsed : [outerParsed];
+    
         const parsedFiles = parsedArray.map((item) => {
           if (typeof item === "string") {
             try {
@@ -556,7 +568,7 @@ export const EmployeeInfo = () => {
           }
           return item;
         });
-
+    
         // Get the last file name
         const lastFile = parsedFiles[parsedFiles.length - 1];
         const lastFileName = lastFile?.upload
@@ -564,7 +576,7 @@ export const EmployeeInfo = () => {
           : Array.isArray(lastFile) && lastFile[0]?.upload
           ? getFileName(lastFile[0].upload)
           : "";
-
+    
         // Update state
         setValue(field, parsedFiles);
         setUploadedFiles((prev) => ({ ...prev, [field]: parsedFiles }));
@@ -576,6 +588,7 @@ export const EmployeeInfo = () => {
         console.error(`Failed to parse ${field}:`, error);
       }
     });
+    
   };
 
   const getFileName = (filePath) => {

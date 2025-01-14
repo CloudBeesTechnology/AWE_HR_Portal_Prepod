@@ -43,8 +43,8 @@ export const RowSix = ({
         />
 
         {/* Conditionally render the 'Other Nationality' input field */}
-        {(selectedNationality === "Other" ||
-          (otherNation && nation === "Other")) && (
+        {(selectedNationality === "OTHER" ||
+          (otherNation && nation === "OTHER")) && (
           <FormField
             label="Other Nationality"
             register={register}
@@ -68,8 +68,8 @@ export const RowSix = ({
         />
 
         {/* Conditionally render the 'Other Country of Origin' input field */}
-        {(selectedCountry === "Other" ||
-          (oCOfOrigin && countryofOrigin === "Other")) && (
+        {(selectedCountry === "OTHER" ||
+          (oCOfOrigin && countryofOrigin === "OTHER")) && (
           <FormField
             label="Other Country of Origin"
             register={register}

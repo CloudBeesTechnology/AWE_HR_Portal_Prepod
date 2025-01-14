@@ -204,17 +204,38 @@ export const WorkInfo = () => {
     }
   };
 
+
+  const getArrayDateValue = (value) => {
+    const formatToTitleCase = (input) =>
+      input
+        .toLowerCase()
+        .split(" ")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+
+    if (Array.isArray(value) && value.length > 0) {
+      return value[value.length - 1]?.trim().toUpperCase();
+    }
+    return typeof value === "string" ? value.trim().toUpperCase() : null;
+  };
+ 
   // const getArrayDateValue = (value) => {
   //   const formatToTitleCase = (input) => {
   //     if (typeof input !== "string" || !input) {
   //       return ""; // Return an empty string if input is invalid
   //     }
 
+  //     // Check if the value matches the special allowed uppercase values
+  //     const allowedUppercase = ["BLNG", "CPD", "SBW", "", "LBD"];
+  //     if (allowedUppercase.includes(input.toUpperCase())) {
+  //       return input.toUpperCase(); // Return the value as uppercase if it's one of the allowed values
+  //     }
+
   //     return input
-  //       .toLowerCase()
-  //       .split(" ")
-  //       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-  //       .join(" ");
+  //       // .toLowerCase()
+  //       // .split(" ")
+  //       // .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+  //       // .join(" ");
   //   };
 
   //   if (Array.isArray(value) && value.length > 0) {
@@ -228,42 +249,22 @@ export const WorkInfo = () => {
 
   //   return null; // Return null if value is not a valid array or string
   // };
-  const getArrayDateValue = (value) => {
-    const formatToTitleCase = (input) => {
-      if (typeof input !== "string" || !input) {
-        return ""; // Return an empty string if input is invalid
-      }
-
-      // Check if the value matches the special allowed uppercase values
-      const allowedUppercase = ["BLNG", "CPD", "SBW", "", "LBD"];
-      if (allowedUppercase.includes(input.toUpperCase())) {
-        return input.toUpperCase(); // Return the value as uppercase if it's one of the allowed values
-      }
-
-      return input
-        // .toLowerCase()
-        // .split(" ")
-        // .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        // .join(" ");
-    };
-
-    if (Array.isArray(value) && value.length > 0) {
-      const lastValue = value[value.length - 1]?.trim();
-      return formatToTitleCase(lastValue);
-    }
-
-    if (typeof value === "string") {
-      return formatToTitleCase(value.trim());
-    }
-
-    return null; // Return null if value is not a valid array or string
-  };
 
   const searchResult = (result) => {
-    // console.log("Result", result);
+    console.log("Result", result);
+
+    const fieldValue = ["empID"];
+
+fieldValue.forEach((val) => {
+  const data = result[val];
+
+  // Ensure the data is a string before setting the value
+  setValue(val, typeof data === "string" ? data : "");
+});
+    
 
     const keysToSet = [
-      "empID",
+      // "empID",
       "doj",
       "hospLeave",
       "skillPool",
@@ -299,9 +300,9 @@ export const WorkInfo = () => {
     keysToSet.forEach((key) => {
       let rawValue =
         result[key] !== undefined && result[key] !== null
-          ? result[key].toString().trim()
+          ? result[key].toString().trim().toUpperCase()
           : "";
-
+      
       const toTitleCase = (input) =>
         input
           // .toLowerCase()
@@ -433,6 +434,8 @@ export const WorkInfo = () => {
   };
 
   const onSubmit = async (data) => {
+    console.log(data);
+    
     try {
       const checkingPITable =
         empPIData?.find((match) => match.empID === data.empID) || null;
@@ -589,7 +592,7 @@ export const WorkInfo = () => {
           dropDownVal={dropDownVal}
         />
 
-        <div className="grid grid-cols-3 gap-5 form-group mt-5">
+<div className="grid grid-cols-3 gap-5 form-group mt-5">
           {workFields.map((field, index) => (
             <div key={index} className="form-group">
               <label className="mb-1 text_size_5">{field.label}</label>
@@ -601,20 +604,18 @@ export const WorkInfo = () => {
                   watch={watch(field.name)}
                   readOnly={field.readOnly || false}
                 >
-                  {(field.options || []).map((option, i) => {
-                    const formattedOption = option
-                      .trim()
-                      .toLowerCase()
-                      .replace(/^\w/, (c) => c.toUpperCase()); // Capitalize first letter
-                    return (
-                      <option
-                        key={i}
-                        value={option.trim() === "Select" ? "" : option.trim()}
-                      >
-                        {formattedOption}
-                      </option>
-                    );
-                  })}
+                  {(field.options || []).map((option, i) => (
+                    <option
+                      key={i}
+                      value={
+                        option.trim() === "Select"
+                          ? ""
+                          : option.trim().toUpperCase()
+                      }
+                    >
+                      {option.trim().toUpperCase()}
+                    </option>
+                  ))}
                 </select>
               ) : (
                 <input
@@ -695,7 +696,7 @@ export const WorkInfo = () => {
                             option.trim() === "Select" ? "" : option.trim()
                           }
                         >
-                          {formattedOption}
+                          {formattedOption.toUpperCase()}
                         </option>
                       );
                     })}
@@ -726,7 +727,7 @@ export const WorkInfo = () => {
           <div className="grid grid-cols-2 form-group gap-5">
             {terminationFields.map((field, index) => {
               const selectedValue = watchFields[index]; // Get the watched value for the current field
-              const isOtherSelected = selectedValue === "Other";
+              const isOtherSelected = selectedValue === "OTHER";
 
               return (
                 <div key={index} className="form-group">
@@ -754,10 +755,10 @@ export const WorkInfo = () => {
                               value={
                                 optionValue === "Select"
                                   ? ""
-                                  : String(optionValue)
+                                  : String(optionValue).toUpperCase()
                               }
                             >
-                              {optionLabel}
+                              {optionLabel.toUpperCase()}
                             </option>
                           );
                         })}
@@ -768,14 +769,27 @@ export const WorkInfo = () => {
                           <input
                             type="text"
                             placeholder="Please specify"
-                            {...register(`Other`, {
-                              required:
-                                "This field is required when 'Other' is selected",
-                            })}
+                            {...register(
+                              `other${
+                                field.name.charAt(0).toUpperCase() +
+                                field.name.slice(1)
+                              }`,
+                              {
+                                required:
+                                  "This field is required when 'Other' is selected",
+                              }
+                            )}
                             className="input-field"
                           />
                           <p className="text-[red] text-[13px] mt-1">
-                            {errors[`Other`]?.message}
+                            {
+                              errors[
+                                `other${
+                                  field.name.charAt(0).toUpperCase() +
+                                  field.name.slice(1)
+                                }`
+                              ]?.message
+                            }
                           </p>
                         </>
                       )}
@@ -884,13 +898,13 @@ export const WorkInfo = () => {
           </button>
         </div>
       </form>
-      {notification && (
+      {/* {notification && (
         <SpinLogo
           text={showTitle}
           notification={notification}
           path="/workInfo"
         />
-      )}
+      )} */}
     </section>
   );
 };

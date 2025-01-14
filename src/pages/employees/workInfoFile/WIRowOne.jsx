@@ -196,8 +196,8 @@ export const WIRowOne = ({
           />
         </div>
         <div>
-          {(selection.department === "Other" ||
-          (otherDepartment && department === "Other")) && (
+          {(selection.department === "OTHER" ||
+          (otherDepartment && department === "OTHER")) && (
             <FormField
               label="Other Department"
               register={register}
@@ -224,8 +224,8 @@ export const WIRowOne = ({
         </div>
         {/* Conditionally render the 'Other Country of Origin' input field */}
         <div>
-        {(selection.position === "Other" ||
-          (otherPosition && position === "Other")) && (
+        {(selection.position === "OTHER" ||
+          (otherPosition && position === "OTHER")) && (
           <FormField
             label="Other Position"
             register={register}
@@ -252,8 +252,8 @@ export const WIRowOne = ({
           
         </div>
         <div>
-        {(selection.jobCat === "Other" ||
-          (otherJobCat && jobCat === "Other")) && (
+        {(selection.jobCat === "OTHER" ||
+          (otherJobCat && jobCat === "OTHER")) && (
           <FormField
             label="Other Job"
             register={register}
