@@ -230,31 +230,31 @@ export const EmployeeInfo = () => {
   const capitalizeFirstLetter = (str) => {
     if (typeof str === "string") {
       // Capitalize the first letter and make the rest lowercase
-      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+      return str.toUpperCase();
     }
     return str; // Return non-string values as-is
   };
 
-  const getLastValue = (value, field) => {
-    // Ensure value is always an array
-    const arrayValue = Array.isArray(value) ? value : value ? [value] : []; // If it's not an array, wrap it in an array
-    console.log(capitalizedLetter(arrayValue[arrayValue?.length - 1]));
-    console.log(value);
+  // const getLastValue = (value, field) => {
+  //   // Ensure value is always an array
+  //   const arrayValue = Array.isArray(value) ? value : value ? [value] : []; // If it's not an array, wrap it in an array
+  //   console.log(capitalizedLetter(arrayValue[arrayValue?.length - 1]));
+  //   console.log(value);
 
-    if (
-      arrayValue[arrayValue?.length - 1] !== "LPA" &&
-      arrayValue[arrayValue?.length - 1] !== "SAWP"
-    ) {
-      const changedValue = capitalizedLetter(
-        arrayValue[arrayValue?.length - 1]
-      );
-      console.log(changedValue);
+  //   if (
+  //     arrayValue[arrayValue?.length - 1] !== "LPA" &&
+  //     arrayValue[arrayValue?.length - 1] !== "SAWP"
+  //   ) {
+  //     const changedValue = capitalizedLetter(
+  //       arrayValue[arrayValue?.length - 1]
+  //     );
+  //     console.log(changedValue);
 
-      return [changedValue]; // Return last element of the array
-    } else {
-      return arrayValue;
-    }
-  };
+  //     return [changedValue]; // Return last element of the array
+  //   } else {
+  //     return arrayValue;
+  //   }
+  // };
 
   const getLastArrayValue = (value, field) => {
     // If the value is an array, get the last value
@@ -391,9 +391,17 @@ export const EmployeeInfo = () => {
 
   const searchResult = async (result) => {
     console.log("Result", result);
+    const fieldValue = ["empID", "email", "officialEmail","bankAccNo",
+      "empBadgeNo",];
 
+    fieldValue.forEach((val) => {
+      const data = result[val];
+    
+      // Ensure the data is a string before setting the value
+      setValue(val, typeof data === "string" ? data : "");
+    });
     const keysToSet = [
-      "empID",
+      // "empID",
       "driveLic",
       "inducBrief",
       "myIcNo",
@@ -415,18 +423,19 @@ export const EmployeeInfo = () => {
       "ctryOfOrigin",
       "chinese",
       "educLevel",
-      "email",
+      // "email",
       "eduDetails",
-      "empBadgeNo",
+      // "empBadgeNo",
       "bankName",
-      "bankAccNo",
+      // "bankAccNo",
       "lang",
       "marital",
       "name",
       "oCOfOrigin",
       "position",
       "sapNo",
-      "officialEmail",
+      // "officialEmail",
+      "contractType", "empType",
       "bwnIcColour",
       "gender",
     ];
@@ -438,7 +447,7 @@ export const EmployeeInfo = () => {
         valueToSet = "";
       }
       if (typeof valueToSet === "string") {
-        const storedValue = capitalizedLetter(valueToSet).trim();
+        const storedValue = valueToSet.trim().toUpperCase();
         setValue(key, storedValue); // Set the trimmed value
       } else {
         // If it's not a string, just set the value as is (or handle as needed)
@@ -446,10 +455,10 @@ export const EmployeeInfo = () => {
       }
     });
 
-    const fields = ["contractType", "empType"];
-    fields.forEach((field) =>
-      setValue(field, getLastValue(result[field], field))
-    );
+    // const fields = ["contractType", "empType"];
+    // fields.forEach((field) =>
+    //   setValue(field, getLastValue(result[field], field))
+    // );
 
     const fieldsArray = ["bwnIcExpiry", "ppExpiry", "ppIssued"];
     fieldsArray.forEach((field) =>

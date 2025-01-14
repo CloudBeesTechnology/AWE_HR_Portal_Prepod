@@ -40,7 +40,7 @@ export const RowFour = ({
         onChange={handleRelegianChange}
         errors={errors}
       />
-   {(selectedReligion === "Other" || (otherReligion && religion === "Other")) && (
+   {(selectedReligion === "OTHER" || (otherReligion && religion === "OTHER")) && (
           <FormField
             label="Other Religion"
             register={register}
@@ -66,7 +66,7 @@ export const RowFour = ({
         />
 
         {/* Conditionally render the 'Other Race' input beside Race dropdown */}
-        {(selectedRace === "Other" || (otherRace && race === "Other")) && (
+        {(selectedRace === "OTHER" || (otherRace && race === "OTHER")) && (
           <FormField
             label="Other Race"
             register={register}
