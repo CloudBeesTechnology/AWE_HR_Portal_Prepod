@@ -58,19 +58,48 @@ export const NonLocalAcco = () => {
   } = useForm({
     resolver: yupResolver(NonLocalAccovalidationSchema),
   });
-  const getArrayDateValue = (value) => {
-    return Array.isArray(value) ? value[value.length - 1] : value;
-  };
-  const searchResult = (result) => {
-    // console.log("Search Result:", result);  // Log the result to confirm the empID is included
-    const keysToSet = ["empID", "empBadgeNo", "name", "accommodation", "accommodationAddress"];
-    keysToSet.forEach((key) => setValue(key, result[key]));
-    const arrayDateField = ["accommodation", "accommodationAddress"];
+// Function to process values, handle arrays, and convert to uppercase
+const getArrayDateValue = (value) => {
+  if (Array.isArray(value) && value.length > 0) {
+    // If value is an array, return the last element in uppercase
+    return value[value.length - 1]?.toString().trim().toUpperCase();
+  }
+  if (typeof value === "string") {
+    // If value is a string, trim and convert to uppercase
+    return value.trim().toUpperCase();
+  }
+  return null; // Return null if value is neither a string nor an array
+};
 
-    arrayDateField.forEach((field) => {
+// Function to handle search results and set form values
+const searchResult = (result) => {
+
+  const fieldValue = ["empID","empBadgeNo"];
+
+  fieldValue.forEach((val) => {
+    const data = result[val];
+  
+    // Ensure the data is a string before setting the value
+    setValue(val, typeof data === "string" ? data : "");
+  });
+  const keysToSet = ["name", "accommodation", "accommodationAddress"];
+
+  keysToSet.forEach((key) => {
+    const value = result[key] !== undefined && result[key] !== null
+      ? result[key].toString().trim().toUpperCase()
+      : ""; // Default to an empty string if the value is undefined or null
+    
+    setValue(key, value); // Set the processed value using setValue
+  });
+  // Special handling for fields requiring array processing
+  const arrayDateField = ["accommodation", "accommodationAddress"];
+  arrayDateField.forEach((field) => {
+    if (result[field] !== undefined) {
       setValue(field, getArrayDateValue(result[field]));
-    });
-  };
+    }
+  });
+};
+
 
   const onSubmit = async (data) => {
     // console.log("Submitted Data:", data);  // Check if empID is part of the data
@@ -177,8 +206,8 @@ export const NonLocalAcco = () => {
               {...register("accommodation")}
             >
               <option value=""></option>
-              <option value="Company Premises">Company Premises</option>
-              <option value="Own Premises">Own Premises</option>
+               <option value="COMPANY PREMISES">COMPANY PREMISES</option>
+               <option value="OWN PREMISES">OWN PREMISES</option>
             </select>
             {errors.accommodation && (
               <p className="text-[red] text-[12px] mt-1">
@@ -205,15 +234,14 @@ export const NonLocalAcco = () => {
           <button type="submit" className="primary_btn">
             Save
           </button>
-        </div>
-        
-        {/* {notification && (
+        </div>  
+        {notification && (
           <SpinLogo
             text={showTitle}
             notification={notification}
             path="/employee"
           />
-        )} */}
+        )}
       </form>
     </div>
   );

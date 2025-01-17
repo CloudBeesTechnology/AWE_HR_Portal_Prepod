@@ -360,7 +360,7 @@ export const EmployeeInfo = () => {
   };
 
   const searchResult = async (result) => {
-    console.log("Result", result);
+    // console.log("Result", result);
     const fieldValue = [
       "empID",
       "email",

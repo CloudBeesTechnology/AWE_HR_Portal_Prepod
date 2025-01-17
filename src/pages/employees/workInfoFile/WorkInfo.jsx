@@ -251,7 +251,7 @@ export const WorkInfo = () => {
   // };
 
   const searchResult = (result) => {
-    console.log("Result", result);
+    // console.log("Result", result);
 
     const fieldValue = ["empID"];
 
@@ -898,13 +898,13 @@ fieldValue.forEach((val) => {
           </button>
         </div>
       </form>
-      {/* {notification && (
+      {notification && (
         <SpinLogo
           text={showTitle}
           notification={notification}
           path="/workInfo"
         />
-      )} */}
+      )}
     </section>
   );
 };

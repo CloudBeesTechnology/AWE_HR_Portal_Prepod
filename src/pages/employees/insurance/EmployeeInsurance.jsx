@@ -221,7 +221,7 @@ export const EmployeeInsurance = () => {
         .filter((item) => {
           const expiryDate = new Date(item.workmenCompExp);
           return (
-            item.empStatusType === empStatusTypeValue && expiryDate > currentDate
+            item.empStatusType?.toUpperCase() === empStatusTypeValue && expiryDate > currentDate
           );
         })
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -236,8 +236,7 @@ export const EmployeeInsurance = () => {
     }
   }, [empStatusTypeValue, setValue, watch, workMenDetails]);
 
-  const defaultOptions = ["OffShore", "OnShore", "General"];
-
+  const defaultOptions = ["OFFSHORE", "ONSHORE", "GENERAL"];
   const onSubmit = async (data) => {
     // console.log(data, "data");
     const existingEmpInsurance = EmpInsuranceData.find(
@@ -291,12 +290,12 @@ export const EmployeeInsurance = () => {
           <label className="mb-1 text_size_5">{label}</label>
           {type === "select" ? (
             <select {...register(key)} className={`input-field select-custom ${className}`}>
-              <option value="">Select</option>
+              <option value="">SELECT</option>
               {options.map((option) => (
                 typeof option === "string" ? (
-                  <option key={option} value={option.toUpperCase()}>{option}</option>
+                  <option key={option} value={option.toUpperCase()}>{option.toUpperCase()}</option>
                 ) : (
-                  <option key={option.value} value={option.value.toUpperCase()}>{option.label}</option>
+                  <option key={option.value} value={option.value.toUpperCase()}>{option.label.toUpperCase()}</option>
                 )
               ))}
             </select>
@@ -327,7 +326,7 @@ export const EmployeeInsurance = () => {
           className="input-field select-custom "
           onChange={(e) => setEmpStatusTypeValue(e.target.value)} // Update empStatusTypeValue on change
           value={empStatusTypeValue}
-        >              <option value="">Select</option>
+        >              <option value="">SELECT</option>
 
           {defaultOptions.map((status) => (
             <option key={status} value={status}>
@@ -363,8 +362,8 @@ export const EmployeeInsurance = () => {
               {...register("accidentIns")}
             >
               <option value="">Select</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
+              <option value="YES">YES</option>
+              <option value="NO">NO</option>
             </select>
            </div>
          

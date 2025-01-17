@@ -33,44 +33,74 @@ export const SearchDisplay = ({
   }, [toggleHandle, newFormData]);
 
   const filterDatabyClickSearchIcon = useCallback(() => {
-    if (filteredEmployees && filteredEmployees.length > 0) {
-      const result = filteredEmployees.find((fi) => {
-        if (fi.empID === searchQuery) {
-          return fi;
-        }
-      });
+    if (newFormData && newFormData.length > 0) {
+      const normalizedQuery = searchQuery.toString().toUpperCase();
+
+      const result = newFormData.find((emp) =>
+        [emp.empID, emp.name, emp.empBadgeNo, emp.sapNo]?.some(
+          (field) => field?.toString().toUpperCase() === normalizedQuery
+        )
+      );
       if (result) {
         searchResult(result);
       } else {
-        alert("Employee Id is not found.");
+        alert("Employee not found.");
         searchResult({});
       }
-    } else {
-      alert("Employee Id is not found.");
-      searchResult({});
     }
-  }, [searchQuery, filteredEmployees]);
+  }, [searchQuery, newFormData]);
   const handleSearch = (e) => {
-    const query = e.target.value.toLowerCase();
+    const query = e.target.value.toUpperCase();
     setSearchQuery(query);
     searchedValue?.(id, query);
 
-    if (query) {
-      const results =
-        newFormData &&
-        newFormData?.filter(
-          (employee) =>
-            employee.name?.toLowerCase().includes(query) ||
-            employee.empID?.toLowerCase().includes(query) ||
-            employee.JOBCODE?.toLowerCase().includes(query) ||
-            employee.location?.toLowerCase().includes(query) ||
-            employee.empBadgeNo?.toLowerCase().includes(query)
+    // if (query) {
+    //   const results =
+    //     newFormData &&
+    //     newFormData?.filter(
+    //       (employee) =>
+    //         employee.name?.toUpperCase().includes(query) ||
+    //         employee.empID?.toUpperCase().includes(query) ||
+    //         employee.empBadgeNo?.toUpperCase().includes(query) ||
+    //         employee.sapNo?.toUpperCase().includes(query)
+    //     );
 
-          // employee.email?.toLowerCase().includes(query) ||
-          // employee.id?.toLowerCase().includes(query) ||
-          // employee.name?.toLowerCase().includes(query)
-        );
-      setFilteredEmployees?.(results);
+    if (query) {
+      const results = newFormData?.filter((employee) =>
+        [
+          employee.name,
+          employee.empID,
+          employee.empBadgeNo,
+          employee.sapNo,
+        ]?.some((field) => field?.toUpperCase().includes(query))
+      );
+
+      // Prioritize exact matches and empIDs starting with the query
+      const sortedResults = results?.sort((a, b) => {
+        const aEmpID = a.empID?.toString().toUpperCase();
+        const bEmpID = b.empID?.toString().toUpperCase();
+        const aName = a.name?.toUpperCase();
+        const bName = b.name?.toUpperCase();
+
+        const isExactMatchA = aEmpID === query || aName === query;
+
+        const isExactMatchB = bEmpID === query || bName === query;
+
+        const startsWithA =
+          aEmpID?.startsWith(query) || aName?.startsWith(query);
+        const startsWithB =
+          bEmpID?.startsWith(query) || bName?.startsWith(query);
+
+        if (isExactMatchA && !isExactMatchB) return -1;
+        if (!isExactMatchA && isExactMatchB) return 1;
+
+        if (startsWithA && !startsWithB) return -1;
+        if (!startsWithA && startsWithB) return 1;
+
+        return 0;
+      });
+      console.log(sortedResults);
+      setFilteredEmployees?.(sortedResults);
       // console.log("if FilteredEmployees : ", results);
     } else {
       // console.log("Else FilteredEmployees : ", filteredEmployees);
@@ -119,18 +149,6 @@ export const SearchDisplay = ({
                   setSearchQuery("");
                 }
 
-                if (employee.JOBCODE) {
-                  setSearchQuery(employee.JOBCODE);
-                  searchResult(employee, id);
-                  // setToggleHandle(!toggleHandle);
-                }
-
-                if (employee.location) {
-                  setSearchQuery(employee.location);
-                  searchResult(employee, id);
-
-                  // setToggleHandle(!toggleHandle);
-                }
                 setToggleHandle(false);
                 setFilteredEmployees?.([]); // Clear the filtered results
                 // searchResult(employee);
