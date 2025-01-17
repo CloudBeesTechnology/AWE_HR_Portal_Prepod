@@ -137,10 +137,7 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
     },
     {
       LeaveManagement: [
-        "Request Leave",
-        "History of leave",
-        "Employee Leave Balance",
-        "Request Tickets",
+        "LeaveManagement"
       ],
     },
     {
