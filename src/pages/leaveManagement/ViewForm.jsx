@@ -63,8 +63,8 @@ export const ViewForm = ({
 
     // Handle Leave status update
     if (source === "LM") {
-      const fromDate = leaveData.empLeaveSelectedFrom;
-      const toDate = leaveData.empLeaveSelectedTo;
+      const fromDate = leaveData.empLeaveSelectedFrom || leaveData.empLeaveStartDate;
+      const toDate = leaveData.empLeaveSelectedTo || leaveData.empLeaveEndDate;
       const formattedDateFrom = DateFormat(fromDate);
       const formattedDateTo = DateFormat(toDate);
 
@@ -590,11 +590,18 @@ export const ViewForm = ({
                   { label: "Leave Type", value: leaveData.empLeaveType },
                   {
                     label: "Applied Dates",
-                    value: leaveData.empLeaveSelectedFrom && leaveData.empLeaveSelectedTo
-                      ? `${DateFormat(leaveData.empLeaveSelectedFrom )} to ${DateFormat(leaveData.empLeaveSelectedTo )}`
-                      : "N/A"
+                    value:
+                      (leaveData.empLeaveSelectedFrom &&
+                        leaveData.empLeaveSelectedTo) ||
+                      (leaveData.empLeaveStartDate && leaveData.empLeaveEndDate)
+                        ? `${DateFormat(
+                            leaveData.empLeaveSelectedFrom || leaveData.empLeaveStartDate
+                          )} to ${DateFormat(
+                            leaveData.empLeaveSelectedTo || leaveData.empLeaveEndDate
+                          )}`
+                        : "N/A",
                   },
-                   { label: "Total No of Days", value: leaveData.leaveDays },
+                  { label: "Total No of Days", value: leaveData.leaveDays },
                   // { label: "Leave Balance", value: leaveData.balance },
                   { label: "Reason", value: leaveData.reason },
                 ].map((item, index) => (

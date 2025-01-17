@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Pagination } from "./Pagination";
 import { getUrl } from "@aws-amplify/storage";
 import { useOutletContext } from "react-router-dom";
@@ -6,8 +6,9 @@ import { Filter } from "./Filter";
 import { Searchbox } from "../../utils/Searchbox";
 import { NavigateLM } from "./NavigateLM";
 import { IoSearch } from "react-icons/io5";
-import { capitalizedLetter, DateFormat } from "../../utils/DateFormat";
-import { DataSupply } from "../../utils/DataStoredContext";
+import { DateFormat } from "../../utils/DateFormat";
+import { FiLoader } from "react-icons/fi";
+
 
 export const LMTable = () => {
   const {
@@ -16,10 +17,8 @@ export const LMTable = () => {
     userType,
     mergedData,
     userID,
-    loading
+    loading,
   } = useOutletContext();
-
-  const {empPIData}=useContext(DataSupply)
 
   const [lastUploadUrl, setPPLastUP] = useState(""); // State to store the last uploaded file's URL
   const [matchData, setMatchData] = useState([]);
@@ -48,7 +47,7 @@ export const LMTable = () => {
           items?.empStatus !== "Cancelled"
         ) {
           return items.managerEmpID === userID;
-        } else if ((userType === "SuperAdmin" || userType === "HR") && items?.empStatus !== "Cancelled") {
+        } else if (userType === "SuperAdmin" || userType === "HR") {
           return true;
         }
         return false;
@@ -189,19 +188,18 @@ export const LMTable = () => {
       rowsPerPage
   );
 
-
-
-   if (loading) {
+  if (loading) {
     return (
-      <div>
-        <div className="flex items-center justify-center h-[60vh]">
-          <p className="text-sm font-semibold">Loading...</p>
+      <div className="flex items-center justify-center h-[60vh] bg-transparent">
+        <div className="flex justify-between gap-2">
+          <p className="text-sm font-semibold">Loading </p>
+          <p>
+            <FiLoader className="animate-spin mt-[4px]" size={15} />
+          </p>
         </div>
       </div>
     );
   }
-
-
   return (
     <section className="flex flex-col w-full mt-4">
       <section className="flex flex-wrap justify-between items-center mb-5">
@@ -249,10 +247,6 @@ export const LMTable = () => {
               {matchData && matchData.length > 0 ? (
                 matchData.map((item, index) => {
                   const displayIndex = startIndex + index + 1;
-                  const managerName=empPIData.filter((val)=> val.empID === item.managerEmpID)
-                  const supervisorName=empPIData.filter((val)=> val.empID === item.supervisorEmpID)
-            
-                  
                   return (
                     <tr
                       key={index}
@@ -260,12 +254,12 @@ export const LMTable = () => {
                     >
                       <td className="py-3">{displayIndex}</td>
                       <td className="py-3">{item.empID}</td>
-                      <td className="py-3">{capitalizedLetter(item.empName) || "N/A"}</td>
+                      <td className="py-3">{item.empName || "N/A"}</td>
                       <td className="py-3">
                         {DateFormat(item.leaveStatusCreatedAt)}
                       </td>
                       {userType !== "Supervisor" && userType !== "Manager" && (
-                        <td className="py-3">{capitalizedLetter(supervisorName[0]?.name) || "N/A"}</td>
+                        <td className="py-3">{item.supervisorName || "N/A"}</td>
                       )}
                       {userType !== "Manager" && (
                         <td className="py-3">
@@ -273,7 +267,7 @@ export const LMTable = () => {
                         </td>
                       )}
                       {userType !== "Manager" && userType !== "Supervisor" && (
-                        <td className="py-3">{capitalizedLetter(managerName[0]?.name) || "N/A"}</td>
+                        <td className="py-3">{item.managerName || "N/A"}</td>
                       )}
                       {userType !== "Supervisor" && (
                         <td className="py-3">
@@ -308,8 +302,6 @@ export const LMTable = () => {
                           onClick={() => {
                             handleClickForToggle();
                             handleViewClick(item, "LM");
-                            // console.log(item);
-                            
                           }}
                         >
                           {item["submitted Form"] || "View"}

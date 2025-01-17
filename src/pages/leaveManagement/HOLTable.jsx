@@ -60,16 +60,22 @@ export const HOLTable = () => {
         const selectedDateObj = new Date(selectedDate);
 
         // Convert supervisor and manager dates to Date objects
-        const empLeaveEndDate = item. empLeaveSelectedTo
-          ? new Date(item. empLeaveSelectedTo)
-          : null;
-        const empLeaveStartDate = item. empLeaveSelectedFrom
-          ? new Date(item. empLeaveSelectedFrom)
-          : null;
+        const empLeaveEndDate =
+          item.empLeaveSelectedTo || item.empLeaveEndDate
+            ? new Date(item.empLeaveSelectedTo || item.empLeaveEndDate)
+            : null;
+        const empLeaveStartDate =
+          item.empLeaveSelectedFrom || item.empLeaveStartDate
+            ? new Date(item.empLeaveSelectedFrom || item.empLeaveStartDate)
+            : null;
 
         const selectedDateFormatted = DateFormat(selectedDateObj);
-        const empLeaveEndDateFormatted = DateFormat(empLeaveEndDate);
-        const empLeaveStartDateFormatted = DateFormat(empLeaveStartDate);
+        const empLeaveEndDateFormatted = DateFormat(
+          empLeaveEndDate || item.empLeaveEndDate
+        );
+        const empLeaveStartDateFormatted = DateFormat(
+          empLeaveStartDate || item.empLeaveStartDate
+        );
 
         // Compare formatted dates
         return (
@@ -200,13 +206,21 @@ export const HOLTable = () => {
                     >
                       <td className="py-3">{displayIndex}</td>
                       <td className="py-3">{item.empID}</td>
-                      <td className="py-3">{capitalizedLetter(item.empName) || "N/A"}</td>
-                      <td className="py-3">{capitalizedLetter(item.empLeaveType)}</td>
                       <td className="py-3">
-                        {DateFormat(item. empLeaveSelectedFrom) || "N/A" }
+                        {capitalizedLetter(item.empName) || "N/A"}
                       </td>
                       <td className="py-3">
-                        {DateFormat(item. empLeaveSelectedTo) || "N/A"}
+                        {capitalizedLetter(item.empLeaveType)}
+                      </td>
+                      <td className="py-3">
+                        {DateFormat(
+                          item.empLeaveSelectedFrom || item.empLeaveStartDate
+                        ) || "N/A"}
+                      </td>
+                      <td className="py-3">
+                        {DateFormat(
+                          item.empLeaveSelectedTo || item.empLeaveEndDate
+                        ) || "N/A"}
                       </td>
                       <td className="py-3 w-[20%] break-words overflow-hidden">
                         {capitalizedLetter(item.reason)}

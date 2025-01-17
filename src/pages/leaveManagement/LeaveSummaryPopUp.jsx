@@ -33,10 +33,24 @@ export const LeaveSummaryPopUp = ({
   });
 
   const isCurrentYear = (dateStr) => {
+    if (!dateStr || typeof dateStr !== "string") {
+      return false;
+    }
+    const [datePart] = dateStr.split(" ");
+
+    // Convert datePart to ISO format if needed
+    const formattedDateStr = datePart
+      .replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3-$2-$1") // Convert dd/mm/yyyy to yyyy-mm-dd
+      .replace(/(\d{2})-(\d{2})-(\d{4})/, "$3-$2-$1");
     const currentYear = new Date().getFullYear();
-    const dateYear = new Date(dateStr).getFullYear();
+    const parsedDate = new Date(formattedDateStr);
+    if (isNaN(parsedDate)) {
+      return false;
+    }
+    const dateYear = parsedDate.getFullYear();
     return currentYear === dateYear;
   };
+
   // console.log(mergedData);
   const formatToTwoDecimals = (num) => parseFloat(num.toFixed(2));
 
@@ -55,6 +69,8 @@ export const LeaveSummaryPopUp = ({
             annualLeaveBal: val.empPervAnnualLeaveBal,
             compassionateLeave: initializeLeaveType(0, true),
             unPaidAuthorisedLeave: initializeLeaveType(0, true),
+            unPaidAuthorizeSick: initializeLeaveType(0, true),
+            unPaidAuthorizeAnnual: initializeLeaveType(0, true),
             annualLeave: initializeLeaveType(
               formatToTwoDecimals(
                 Number(
@@ -99,12 +115,17 @@ export const LeaveSummaryPopUp = ({
           "Paternity Leave": "paternityLeave",
           "Unpaid Authorize Leave": "unPaidAuthorisedLeave",
           "Compensate Leave": "compensateLeave",
+          "Unpaid Authorize - Sick": "unPaidAuthorizeSick",
+          "Unpaid Authorize - Annual": "unPaidAuthorizeAnnual",
         };
 
         const leaveKey = leaveTypeKeyMap[val.empLeaveType];
+        // console.log(leaveKey);
 
-        const applicationStartDate = val.empLeaveSelectedFrom; // Assuming format is "yyyy-mm-dd"
-        const applicationEndDate = val.empLeaveSelectedTo;
+        const applicationStartDate =
+          val.empLeaveSelectedFrom || val.empLeaveStartDate || ""; // Assuming format is "yyyy-mm-dd"
+        const applicationEndDate =
+          val.empLeaveSelectedTo || val.empLeaveEndDate || "";
 
         // Normalize the dates to midnight (ignoring time)
         const filterStartDate = DateFormat(startDate);
@@ -113,6 +134,18 @@ export const LeaveSummaryPopUp = ({
         const appEndDate = DateFormat(applicationEndDate);
 
         // Log the parsed dates for debugging
+        // console.log("Raw Dates:", {
+        //   applicationStartDate,
+        //   applicationEndDate,
+        //   startDate,
+        //   endDate,
+        // });
+        // console.log("Formatted Dates:", {
+        //   filterStartDate,
+        //   filterEndDate,
+        //   appStartDate,
+        //   appEndDate,
+        // });
 
         let shouldProcessLeave = false;
 
@@ -141,14 +174,18 @@ export const LeaveSummaryPopUp = ({
           }
         } else {
           // console.log('startDate and endDate are not defined, defaulting to current year');
-          shouldProcessLeave = isCurrentYear(val.empLeaveSelectedFrom);
+          shouldProcessLeave = isCurrentYear(
+            val.empLeaveSelectedFrom || val.empLeaveStartDate
+          );
         }
 
         // Log whether the leave will be processed based on the date checks
         // console.log('Should process leave for', val.empID, ':', shouldProcessLeave);
+        // console.log(leaveKey);
 
         if (shouldProcessLeave && leaveKey) {
           // console.log(`Processing leave for ${val.empLeaveType} of employee ${val.empID}`);
+          // console.log(val.managerStatus,"manager status");
 
           if (
             val.managerStatus === "Approved" &&
@@ -156,6 +193,7 @@ export const LeaveSummaryPopUp = ({
           ) {
             // console.log('Leave is approved and not cancelled');
             acc[val.empID][leaveKey].taken += Number(val.leaveDays) || 0;
+            // console.log(acc[val.empID][leaveKey].taken,"leace approved");
           } else if (
             val.managerStatus === "Pending" &&
             val.supervisorStatus !== "Rejected" &&
@@ -163,6 +201,7 @@ export const LeaveSummaryPopUp = ({
           ) {
             // console.log('Leave is pending and not rejected');
             acc[val.empID][leaveKey].waitingLeave += Number(val.leaveDays) || 0;
+            // console.log(acc[val.empID][leaveKey].waitingLeaves,"dfghj");
           }
 
           if (
@@ -170,31 +209,35 @@ export const LeaveSummaryPopUp = ({
               "compassionateLeave",
               "unPaidAuthorisedLeave",
               "compensateLeave",
+              "unPaidAuthorizeSick",
+              "unPaidAuthorizeAnnual",
             ].includes(leaveKey)
           ) {
             const total = acc[val.empID][leaveKey].total || 0;
             const taken = acc[val.empID][leaveKey].taken || 0;
             const waiting = acc[val.empID][leaveKey].waitingLeave || 0;
 
-            const remaining = Math.floor(total - (taken + waiting));
+            const remaining = total - (taken + waiting)
             // console.log('Leave remaining:', remaining);
             acc[val.empID][leaveKey].remaining = remaining;
           }
         } else {
-          // console.log('Leave will not be processed for employee', val.empID);
+          // console.log("Leave will not be processed for employee", val.empID);
         }
 
         return acc;
       }, {});
 
       const summary = result[empDetails.empID]; // Find the leave summary for the employee
+      // console.log(summary);
+
       setLeaveSummary(summary); // Set the leave summary for the employee
-      console.log(leaveSummary);
+      // console.log(leaveSummary);
     };
 
     fetchedData();
   }, [mergedData, startDate, endDate, empDetails]);
-  console.log(leaveSummary, "SM");
+  // console.log(leaveSummary, "SM");
 
   const leaveTypes = [
     "annualLeave",
@@ -206,6 +249,8 @@ export const LeaveSummaryPopUp = ({
     "compassionateLeave",
     "marriageLeave",
     "unPaidAuthorisedLeave",
+    "unPaidAuthorizeSick",
+    "unPaidAuthorizeAnnual",
   ];
 
   // Format leave type name
@@ -376,7 +421,8 @@ export const LeaveSummaryPopUp = ({
                   const isSpecialLeave = [
                     "compassionateLeave",
                     "unPaidAuthorisedLeave",
-                    "compensateLeave",
+                    "compensateLeave", "unPaidAuthorizeSick",
+                    "unPaidAuthorizeAnnual",
                   ].includes(leaveType);
 
                   // console.log('Gender:', leaveSummary?.gender);

@@ -38,6 +38,10 @@ export default function TicketRequestUpdateForm(props) {
     hrRemarks: "",
     hrName: "",
     hrEmpID: "",
+    from: "",
+    to: "",
+    fromDate: "",
+    toDate: "",
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [empStatus, setEmpStatus] = React.useState(initialValues.empStatus);
@@ -58,6 +62,10 @@ export default function TicketRequestUpdateForm(props) {
   const [hrRemarks, setHrRemarks] = React.useState(initialValues.hrRemarks);
   const [hrName, setHrName] = React.useState(initialValues.hrName);
   const [hrEmpID, setHrEmpID] = React.useState(initialValues.hrEmpID);
+  const [from, setFrom] = React.useState(initialValues.from);
+  const [to, setTo] = React.useState(initialValues.to);
+  const [fromDate, setFromDate] = React.useState(initialValues.fromDate);
+  const [toDate, setToDate] = React.useState(initialValues.toDate);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = ticketRequestRecord
@@ -76,6 +84,10 @@ export default function TicketRequestUpdateForm(props) {
     setHrRemarks(cleanValues.hrRemarks);
     setHrName(cleanValues.hrName);
     setHrEmpID(cleanValues.hrEmpID);
+    setFrom(cleanValues.from);
+    setTo(cleanValues.to);
+    setFromDate(cleanValues.fromDate);
+    setToDate(cleanValues.toDate);
     setErrors({});
   };
   const [ticketRequestRecord, setTicketRequestRecord] = React.useState(
@@ -110,6 +122,10 @@ export default function TicketRequestUpdateForm(props) {
     hrRemarks: [],
     hrName: [],
     hrEmpID: [],
+    from: [],
+    to: [],
+    fromDate: [],
+    toDate: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -167,6 +183,10 @@ export default function TicketRequestUpdateForm(props) {
           hrRemarks: hrRemarks ?? null,
           hrName: hrName ?? null,
           hrEmpID: hrEmpID ?? null,
+          from: from ?? null,
+          to: to ?? null,
+          fromDate: fromDate ?? null,
+          toDate: toDate ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -240,6 +260,10 @@ export default function TicketRequestUpdateForm(props) {
               hrRemarks,
               hrName,
               hrEmpID,
+              from,
+              to,
+              fromDate,
+              toDate,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -276,6 +300,10 @@ export default function TicketRequestUpdateForm(props) {
               hrRemarks,
               hrName,
               hrEmpID,
+              from,
+              to,
+              fromDate,
+              toDate,
             };
             const result = onChange(modelFields);
             value = result?.empStatus ?? value;
@@ -314,6 +342,10 @@ export default function TicketRequestUpdateForm(props) {
               hrRemarks,
               hrName,
               hrEmpID,
+              from,
+              to,
+              fromDate,
+              toDate,
             };
             const result = onChange(modelFields);
             value = result?.empDate ?? value;
@@ -350,6 +382,10 @@ export default function TicketRequestUpdateForm(props) {
               hrRemarks,
               hrName,
               hrEmpID,
+              from,
+              to,
+              fromDate,
+              toDate,
             };
             const result = onChange(modelFields);
             value = result?.empRemarks ?? value;
@@ -388,6 +424,10 @@ export default function TicketRequestUpdateForm(props) {
               hrRemarks,
               hrName,
               hrEmpID,
+              from,
+              to,
+              fromDate,
+              toDate,
             };
             const result = onChange(modelFields);
             value = result?.departureDate ?? value;
@@ -426,6 +466,10 @@ export default function TicketRequestUpdateForm(props) {
               hrRemarks,
               hrName,
               hrEmpID,
+              from,
+              to,
+              fromDate,
+              toDate,
             };
             const result = onChange(modelFields);
             value = result?.arrivalDate ?? value;
@@ -462,6 +506,10 @@ export default function TicketRequestUpdateForm(props) {
               hrRemarks,
               hrName,
               hrEmpID,
+              from,
+              to,
+              fromDate,
+              toDate,
             };
             const result = onChange(modelFields);
             value = result?.destination ?? value;
@@ -498,6 +546,10 @@ export default function TicketRequestUpdateForm(props) {
               hrRemarks,
               hrName,
               hrEmpID,
+              from,
+              to,
+              fromDate,
+              toDate,
             };
             const result = onChange(modelFields);
             value = result?.remarks ?? value;
@@ -534,6 +586,10 @@ export default function TicketRequestUpdateForm(props) {
               hrRemarks,
               hrName,
               hrEmpID,
+              from,
+              to,
+              fromDate,
+              toDate,
             };
             const result = onChange(modelFields);
             value = result?.hrStatus ?? value;
@@ -572,6 +628,10 @@ export default function TicketRequestUpdateForm(props) {
               hrRemarks,
               hrName,
               hrEmpID,
+              from,
+              to,
+              fromDate,
+              toDate,
             };
             const result = onChange(modelFields);
             value = result?.hrDate ?? value;
@@ -608,6 +668,10 @@ export default function TicketRequestUpdateForm(props) {
               hrRemarks: value,
               hrName,
               hrEmpID,
+              from,
+              to,
+              fromDate,
+              toDate,
             };
             const result = onChange(modelFields);
             value = result?.hrRemarks ?? value;
@@ -644,6 +708,10 @@ export default function TicketRequestUpdateForm(props) {
               hrRemarks,
               hrName: value,
               hrEmpID,
+              from,
+              to,
+              fromDate,
+              toDate,
             };
             const result = onChange(modelFields);
             value = result?.hrName ?? value;
@@ -680,6 +748,10 @@ export default function TicketRequestUpdateForm(props) {
               hrRemarks,
               hrName,
               hrEmpID: value,
+              from,
+              to,
+              fromDate,
+              toDate,
             };
             const result = onChange(modelFields);
             value = result?.hrEmpID ?? value;
@@ -693,6 +765,168 @@ export default function TicketRequestUpdateForm(props) {
         errorMessage={errors.hrEmpID?.errorMessage}
         hasError={errors.hrEmpID?.hasError}
         {...getOverrideProps(overrides, "hrEmpID")}
+      ></TextField>
+      <TextField
+        label="From"
+        isRequired={false}
+        isReadOnly={false}
+        value={from}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              empStatus,
+              empDate,
+              empRemarks,
+              departureDate,
+              arrivalDate,
+              destination,
+              remarks,
+              hrStatus,
+              hrDate,
+              hrRemarks,
+              hrName,
+              hrEmpID,
+              from: value,
+              to,
+              fromDate,
+              toDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.from ?? value;
+          }
+          if (errors.from?.hasError) {
+            runValidationTasks("from", value);
+          }
+          setFrom(value);
+        }}
+        onBlur={() => runValidationTasks("from", from)}
+        errorMessage={errors.from?.errorMessage}
+        hasError={errors.from?.hasError}
+        {...getOverrideProps(overrides, "from")}
+      ></TextField>
+      <TextField
+        label="To"
+        isRequired={false}
+        isReadOnly={false}
+        value={to}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              empStatus,
+              empDate,
+              empRemarks,
+              departureDate,
+              arrivalDate,
+              destination,
+              remarks,
+              hrStatus,
+              hrDate,
+              hrRemarks,
+              hrName,
+              hrEmpID,
+              from,
+              to: value,
+              fromDate,
+              toDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.to ?? value;
+          }
+          if (errors.to?.hasError) {
+            runValidationTasks("to", value);
+          }
+          setTo(value);
+        }}
+        onBlur={() => runValidationTasks("to", to)}
+        errorMessage={errors.to?.errorMessage}
+        hasError={errors.to?.hasError}
+        {...getOverrideProps(overrides, "to")}
+      ></TextField>
+      <TextField
+        label="From date"
+        isRequired={false}
+        isReadOnly={false}
+        type="date"
+        value={fromDate}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              empStatus,
+              empDate,
+              empRemarks,
+              departureDate,
+              arrivalDate,
+              destination,
+              remarks,
+              hrStatus,
+              hrDate,
+              hrRemarks,
+              hrName,
+              hrEmpID,
+              from,
+              to,
+              fromDate: value,
+              toDate,
+            };
+            const result = onChange(modelFields);
+            value = result?.fromDate ?? value;
+          }
+          if (errors.fromDate?.hasError) {
+            runValidationTasks("fromDate", value);
+          }
+          setFromDate(value);
+        }}
+        onBlur={() => runValidationTasks("fromDate", fromDate)}
+        errorMessage={errors.fromDate?.errorMessage}
+        hasError={errors.fromDate?.hasError}
+        {...getOverrideProps(overrides, "fromDate")}
+      ></TextField>
+      <TextField
+        label="To date"
+        isRequired={false}
+        isReadOnly={false}
+        type="date"
+        value={toDate}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              empStatus,
+              empDate,
+              empRemarks,
+              departureDate,
+              arrivalDate,
+              destination,
+              remarks,
+              hrStatus,
+              hrDate,
+              hrRemarks,
+              hrName,
+              hrEmpID,
+              from,
+              to,
+              fromDate,
+              toDate: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.toDate ?? value;
+          }
+          if (errors.toDate?.hasError) {
+            runValidationTasks("toDate", value);
+          }
+          setToDate(value);
+        }}
+        onBlur={() => runValidationTasks("toDate", toDate)}
+        errorMessage={errors.toDate?.errorMessage}
+        hasError={errors.toDate?.hasError}
+        {...getOverrideProps(overrides, "toDate")}
       ></TextField>
       <Flex
         justifyContent="space-between"

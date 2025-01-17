@@ -745,6 +745,10 @@ type TicketRequest @model @auth(rules: [{allow: public}]) {
   hrRemarks: String
   hrName: String
   hrEmpID: String
+  from: String
+  to: String
+  fromDate: AWSDate
+  toDate: AWSDate
 }
 
 type LeaveStatus @model @auth(rules: [{allow: public}]) {

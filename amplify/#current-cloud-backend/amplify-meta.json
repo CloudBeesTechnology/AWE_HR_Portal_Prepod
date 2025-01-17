@@ -36,12 +36,12 @@
       },
       "providerPlugin": "awscloudformation",
       "service": "AppSync",
-      "lastPushTimeStamp": "2025-01-13T11:59:11.870Z",
+      "lastPushTimeStamp": "2025-01-16T11:56:19.916Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-aweadininprod-prod-954b8-deployment/amplify-cfn-templates/api/cloudformation-template.json",
         "logicalId": "apiaweadininprod"
       },
-      "lastPushDirHash": "sLIJSM5KrcDhzC8Irux//Z980ww="
+      "lastPushDirHash": "9xMsracd1Ds/cBIPpggBjoH3d+k="
     }
   },
   "auth": {
@@ -77,7 +77,7 @@
         "IdentityPoolName": "aweadininprod215ef038_identitypool_215ef038__prod",
         "UserPoolName": "aweadininprod215ef038_userpool_215ef038"
       },
-      "lastPushTimeStamp": "2025-01-13T11:59:11.729Z",
+      "lastPushTimeStamp": "2025-01-16T11:56:19.774Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-aweadininprod-prod-954b8-deployment/amplify-cfn-templates/auth/aweadininprod215ef038-cloudformation-template.json",
         "logicalId": "authaweadininprod215ef038"
@@ -93,7 +93,7 @@
         "BucketName": "aweadininprod2024954b8-prod",
         "Region": "ap-southeast-1"
       },
-      "lastPushTimeStamp": "2025-01-13T11:59:11.731Z",
+      "lastPushTimeStamp": "2025-01-16T11:56:19.776Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-aweadininprod-prod-954b8-deployment/amplify-cfn-templates/storage/cloudformation-template.json",
         "logicalId": "storageaweAdininProd"

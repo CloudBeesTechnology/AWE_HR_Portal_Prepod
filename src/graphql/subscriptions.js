@@ -3128,6 +3128,10 @@ export const onCreateTicketRequest = /* GraphQL */ `
       hrRemarks
       hrName
       hrEmpID
+      from
+      to
+      fromDate
+      toDate
       createdAt
       updatedAt
       __typename
@@ -3153,6 +3157,10 @@ export const onUpdateTicketRequest = /* GraphQL */ `
       hrRemarks
       hrName
       hrEmpID
+      from
+      to
+      fromDate
+      toDate
       createdAt
       updatedAt
       __typename
@@ -3178,6 +3186,10 @@ export const onDeleteTicketRequest = /* GraphQL */ `
       hrRemarks
       hrName
       hrEmpID
+      from
+      to
+      fromDate
+      toDate
       createdAt
       updatedAt
       __typename

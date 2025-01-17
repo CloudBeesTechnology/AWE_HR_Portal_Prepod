@@ -8,8 +8,14 @@ export const DateFormat = (dateToString) => {
   // Check if the date string contains "T" (ISO 8601 format)
   if (dateToString.includes("T")) {
     // If the date is in ISO format (e.g., "2025-01-12T12:16:28.816Z")
-    const dateParts = dateToString.split("T")[0]; // Get the date part before 'T'
-    [year, month, day] = dateParts.split("-"); // Split the date part into year, month, day
+    // const dateParts = dateToString.split("T")[0]; // Get the date part before 'T'
+    // [year, month, day] = dateParts.split("-"); // Split the date part into year, month, day
+    const localDate = new Date(dateToString);
+    
+    // Extract day, month, and year from local date
+    day = localDate.getDate().toString(); // Get day of the month
+    month = (localDate.getMonth() + 1).toString(); // Get month (0-based index, add 1)
+    year = localDate.getFullYear().toString(); 
   } else if (dateToString.includes("/")) {
     // If the format is DD/MM/YYYY (e.g., "03/03/2025")
     [day, month, year] = dateToString.split("/");

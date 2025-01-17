@@ -112,12 +112,16 @@ import { PassportValidMD } from "../components/migratingData/PassportValidMD";
 import { NlmsMD } from "../components/migratingData/NlmsMD";
 import { LabourMedicalInfoMD } from "../components/migratingData/LabourMedicalInfoMD";
 import { ContractFormPDF } from "../pages/reports/ContractFormPDF";
+import { ProbationPDF } from "../pages/reports/ProbationPDF";
+import { FiLoader } from "react-icons/fi";
 
 const client = generateClient();
 
 const NavigationLinks = () => {
   const loginAuth = localStorage.getItem("userID")?.toUpperCase();
   const [mainCategories, setMainCategories] = useState([]);
+  const [userID, setUserID] = useState("");
+  const [userType, setUserType] = useState("");
   // const [defaultRoute, setDefaultRoute] = useState("");
   const [firstCategory, setFirstCategory] = useState(null); // To hold the first matching category
 
@@ -127,6 +131,7 @@ const NavigationLinks = () => {
       try {
         // const userID = localStorage.getItem("userID").toUpperCase();
         const userType = localStorage.getItem("userType");
+        const userID = localStorage.getItem("userID");
         const res = await client.graphql({
           query: listUsers,
           variables: {
@@ -144,7 +149,8 @@ const NavigationLinks = () => {
         const permissionsString = result?.setPermissions[0];
         const categories = extractMainCategories(permissionsString);
         // console.log(categories.includes("Dashboard"));
-
+        setUserID(userID);
+        setUserType(userType);
         setMainCategories(categories);
         setFirstCategory(findFirstValidCategory(categories));
       } catch (error) {
@@ -187,9 +193,12 @@ const NavigationLinks = () => {
 
   if (loading) {
     return (
-      <div>
-        <div className="flex items-center justify-center h-[82vh]">
-          <p className="text-sm font-semibold">Loading...</p>
+      <div className="flex items-center justify-center h-[82vh] bg-transparent">
+        <div className="flex justify-between gap-2">
+          <p className="text-sm font-semibold">Loading </p>
+          <p>
+            <FiLoader className="animate-spin mt-[4px]" size={15} />
+          </p>
         </div>
       </div>
     );
@@ -210,11 +219,11 @@ const NavigationLinks = () => {
       "BenefitsAndRewards",
     ].includes(category)
   );
+
   return (
     <TempIDProvider>
       <Routes>
         <Route path="/changePassword" element={<ChangePassword />} />
-
         <Route path="/migrationDataID" element={<IDDetailsMD />} />
         <Route path="/migrationDataEPI" element={<EmpPersonalMD />} />
         <Route path="/migrationDataWorkI" element={<WorkInfoMD />} />
@@ -224,19 +233,17 @@ const NavigationLinks = () => {
         <Route path="/migrationDataNLA" element={<NonLocalAccMD />} />
         <Route path="/migrationDataDN" element={<DNDetailsMD />} />
         <Route path="/migrationDataTerminated" element={<TerminatedMD />} />
-        <Route path="/migrationDataBJL" element={<BJLDetailsMD />} />        {/* Redirect to the first matching allowed category */}
+        <Route path="/migrationDataBJL" element={<BJLDetailsMD />} />{" "}
+        {/* Redirect to the first matching allowed category */}
         <Route path="/migrationPPValid" element={<PassportValidMD />} />
         <Route path="/migrationLMInfo" element={<LabourMedicalInfoMD />} />
         <Route path="/migrationNlms" element={<NlmsMD />} />
-
         <Route
           path="/"
           element={<Navigate to={`/${firstCategory?.toLowerCase()}`} />}
         />
-
         {/* Personal Information Route */}
         <Route path="/personalInformation" element={<PersonalInformation />} />
-
         {/* Only show the routes that are in allowedCategories */}
         {allowedCategories.includes("Dashboard") && (
           <Route path="/dashboard" element={<Dashboard />} />
@@ -381,16 +388,22 @@ const NavigationLinks = () => {
             <Route path="/lbdKpi" Component={LbdKpi} />
             <Route path="/groupHS" Component={GroupHSData} />
             <Route path="/leavePass" Component={LeavePassData} />
-            <Route path="/contractForms" Component={ContractPDF} />
+            <Route
+              path="/contractForms"
+              element={<ContractPDF userID={userID} userType={userType} />}
+            />
             <Route path="/promotion" Component={PromotionRep} />
-
+            <Route path="/probFormUpdate" Component={ProbationPDF} />
+            <Route
+              path="/ContractUp"
+              element={<ContractPDF userID={userID} userType={userType} />}
+            />
           </>
         )}
         {allowedCategories.includes("BenefitsAndRewards") && (
           <Route path="/benfitsAndrewards" Component={BenfitsAndRewards} />
         )}
         <Route path="/logout" Component={Logout} />
-
         {/* Default redirect route if no category is matched */}
         <Route
           path="*"
