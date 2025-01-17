@@ -237,7 +237,7 @@ useEffect(() => {
                         <button
                           onClick={() => {
                             handleViewSummary(item)
-                            // console.log(item);
+                            console.log(item);
                             
                           }}
                           className="border-b-2 text-[blue]"

@@ -242,7 +242,7 @@ export const TicketsTable = () => {
   }, [ticketMerged]);
 
   // console.log(loading);
-  // console.log(filteredData);
+  console.log(filteredData);
 
   return (
     <section className="w-full">
