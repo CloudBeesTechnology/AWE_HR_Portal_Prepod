@@ -63,23 +63,24 @@ export const Reports = () => {
     const mergeData = empPIData.map((piData) => {
       const data = {
         ...piData,
-        ...IDData.find((item) => item.empID === piData.empID),
-        ...workInfoData.find((item) => item.empID === piData.empID),
-        ...terminateData.find((item) => item.empID === piData.empID),
-        ...DNData.find((item) => item.empID === piData.empID),
-        ...PPValidsData.find((item) => item.empID === piData.empID),
-        ...LMIData.find((item) => item.empID === piData.empID),
-        ...EmpInsuranceData.find((item) => item.empID === piData.empID),
-        ...WeldeInfo.find((item) => item.empID === piData.empID),
-        ...BastingInfo.find((item) => item.empID === piData.empID),
-        ...leaveDetailsData.find((item) => item.empID === piData.empID),
-        ...trainingCertifi.find((item) => item.empID === piData.empID),
-        ...AddEmpReq.find((item) => item.empID === piData.empID),
-        ...ProbFData.find((item) => item.empID === piData.empID),
-        ...contractForms.find((item) => item.empID === piData.empID),
+        ...(IDData?.find((item) => item.empID === piData.empID) || {}),
+        ...(workInfoData?.find((item) => item.empID === piData.empID) || {}),
+        ...(terminateData?.find((item) => item.empID === piData.empID) || {}),
+        ...(DNData?.find((item) => item.empID === piData.empID) || {}),
+        ...(PPValidsData?.find((item) => item.empID === piData.empID) || {}),
+        ...(LMIData?.find((item) => item.empID === piData.empID) || {}),
+        ...(EmpInsuranceData?.find((item) => item.empID === piData.empID) || {}),
+        ...(WeldeInfo?.find((item) => item.empID === piData.empID) || {}),
+        ...(BastingInfo?.find((item) => item.empID === piData.empID) || {}),
+        ...(leaveDetailsData?.find((item) => item.empID === piData.empID) || {}),
+        ...(trainingCertifi?.find((item) => item.empID === piData.empID) || {}),
+        ...(AddEmpReq?.find((item) => item.empID === piData.empID) || {}),
+        ...(ProbFData?.find((item) => item.empID === piData.empID) || {}),
+        ...(contractForms?.find((item) => item.empID === piData.empID) || {}),
       };
       return data;
     });
+    
     setMergeData(mergeData);
     setLoading(false);
   }, [

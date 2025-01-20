@@ -49,7 +49,7 @@ export const ProbFormFun = () => {
         commitmentDetails: ProbValue.commitmentDetails,
         probStatus:ProbValue.probStatus
     };
-    console.log(totalData);
+    // console.log(totalData);
 
     try {
       const storedData = await Promise.all([
@@ -60,7 +60,7 @@ export const ProbFormFun = () => {
           },
         }),
       ]);
-      console.log(storedData, "successfully stored data");
+      // console.log(storedData, "successfully stored data");
       
     } catch (error) {
       console.error("Error executing GraphQL requests:", error);
