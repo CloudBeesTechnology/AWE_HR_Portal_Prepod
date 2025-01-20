@@ -38,9 +38,9 @@ export const App = () => {
       } else {
         setLoginId("");
         setUserType("");
-        // if (!hideLogin.includes(location.pathname)) {
-        //   navigate("/login"); 
-        // }
+        if (!hideLogin.includes(location.pathname)) {
+          navigate("/login"); 
+        }
       }
     };
 
@@ -51,7 +51,7 @@ export const App = () => {
       // localStorage.clear();
       // sessionStorage.clear();
 
-      window.open("https://dev.dxtlxvdrz6jj5.amplifyapp.com");
+      window.open("https://hr.adininworks.co");
     };
 
     window.addEventListener("beforeunload", handleTabClose);
