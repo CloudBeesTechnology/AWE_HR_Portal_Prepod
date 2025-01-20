@@ -66,15 +66,13 @@ export const CreateJob = () => {
         setUploadedFileNames((prev) => ({
           uploadJobDetails: selectedFile.name, // Dynamically store file name
         }));
-        const url = `https://71n903ao01.execute-api.ap-southeast-1.amazonaws.com/adininfile/commonfiles/recruiment%2FapplyJob%2F${encodeURIComponent(
-          watchedJobTitle
-        )}%2F${encodeURIComponent(selectedFile.name)}`;
-console.log(url);
+        const url = `https://71n903ao01.execute-api.ap-southeast-1.amazonaws.com/adininfile/commonfiles/${encodeURIComponent(selectedFile.name)}`;
+// console.log(url);
 
         const URLPath = `https://commonfiles.s3.ap-southeast-1.amazonaws.com/recruiment/applyJob/${watchedJobTitle}/${encodeURIComponent(
           selectedFile.name
         )}`;
-console.log(URLPath);
+// console.log(URLPath);
 
         setUploadedDocs(URLPath);
 
@@ -94,7 +92,7 @@ console.log(URLPath);
         }
 
         const result = await response.json(); // Parse JSON response if applicable
-        console.log("File uploaded successfully:", result);
+        // console.log("File uploaded successfully:", result);
       } catch (err) {
         console.log(err);
       }
@@ -118,8 +116,8 @@ console.log(URLPath);
       // console.log(storedvalue);
 
       SubmitJobData({ jobValue: storedvalue });
-      // setShowTitle("Posted Job successfully");
-      // setNotification(true);
+      setShowTitle("Posted Job successfully");
+      setNotification(true);
     } catch (error) {
       console.log(error);
     }
