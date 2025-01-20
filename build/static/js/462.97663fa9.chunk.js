@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkcheckingproject=self.webpackChunkcheckingproject||[]).push([[462],{462:(c,e,t)=>{t.r(e),t.d(e,{ForgotOtp:()=>o});t(5043);var r=t(579);const o=()=>(0,r.jsx)("div",{children:"ForgotOtp"})}}]);
+//# sourceMappingURL=462.97663fa9.chunk.js.map
