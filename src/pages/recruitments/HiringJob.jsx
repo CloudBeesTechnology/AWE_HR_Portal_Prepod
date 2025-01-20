@@ -10,7 +10,7 @@ export const HiringJob = () => {
     });
   }, []);
   const { hiringData } = useContext(DataSupply);
-  // console.log(hiringData);
+  console.log(hiringData);
   
   const latestData = hiringData.sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)

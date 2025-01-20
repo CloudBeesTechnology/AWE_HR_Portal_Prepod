@@ -39,6 +39,8 @@ export const CreateJobFunc = () => {
           query: createHiringJob,
           variables: { input: createHireData },
         });
+        console.log(response);
+        
       }
        catch (error) {
         console.error("Error updating data:", error);

@@ -1,5 +1,5 @@
 {
-  "proxy": "https://71n903ao01.execute-api.ap-southeast-1.amazonaws.com",
+  "proxy": "https://hr.adininworks.co/",
   "name": "checkingproject",
   "version": "0.1.0",
   "private": true,
