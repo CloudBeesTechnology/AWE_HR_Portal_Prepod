@@ -8,17 +8,24 @@ export const EditViewSummary = ({
   FinalEditedData,
 }) => {
   const [formData, setFormData] = useState({
+    id: summaryObject?.id,
     badgeNo: summaryObject?.empBadgeNo || "",
     empName: summaryObject?.empName || "",
     sapNo: summaryObject?.sapNo || "",
     location: summaryObject?.location || "",
     jobcode: summaryObject?.jobcode || "",
     NWHPD: summaryObject?.workHrs || "",
+    NWHPM: summaryObject?.workMonth || "",
     workingHrs: summaryObject?.workingHrs || "",
     overtimeHrs: summaryObject?.ot || "",
     workingHrsKey: summaryObject?.workingHrsKey || "",
-  });
+    // mealAllow: Array.isArray(summaryObject?.mealAllow)
+    //   ? summaryObject?.mealAllow[summaryObject?.mealAllow.length - 1]
+    //   : summaryObject?.mealAllow || "",
 
+    mealAllow: summaryObject?.mealAllow || "",
+  });
+  console.log(summaryObject);
   // Step 2: Handle changes dynamically
   const handleChange = (e) => {
     const { name, value } = e.target; // Get the name and value from the input
@@ -122,6 +129,32 @@ export const EditViewSummary = ({
                   value={formData.NWHPD}
                   onChange={handleChange}
                   readOnly
+                />
+              </div>
+            </div>
+            <div className="flex justify-between">
+              <div>
+                <label className="block text-sm font-medium ">
+                  Normal Working Hours Per Month
+                </label>
+                <input
+                  type="text"
+                  className="mt-1 block w-full border border-dark_grey outline-none rounded text-sm py-1.5 px-3"
+                  name="NWHPM"
+                  value={formData.NWHPM}
+                  onChange={handleChange}
+                  readOnly
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium ">Meal Allow</label>
+                <input
+                  type="text"
+                  className="mt-1 block w-full border border-dark_grey outline-none rounded text-sm py-1.5 px-3"
+                  name="mealAllow"
+                  value={formData.mealAllow || ""}
+                  onChange={handleChange}
                 />
               </div>
             </div>

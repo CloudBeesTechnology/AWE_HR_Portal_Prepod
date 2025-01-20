@@ -235,6 +235,7 @@ export const useTableFieldData = (titleName) => {
       return {
         fieldObj: {
           NAME: null,
+          TRADE: null,
           NO: null,
           LOCATION: null,
           DATE: null,
@@ -248,6 +249,7 @@ export const useTableFieldData = (titleName) => {
         },
         fields: [
           "NAME",
+          "TRADE",
           "NO",
           "LOCATION",
           "DATE",
@@ -261,6 +263,7 @@ export const useTableFieldData = (titleName) => {
         ],
         tableHeader: [
           "EMPLOYEE NAME",
+          "TRADE",
           "SAP ID",
           "LOCATION",
           "DATE",

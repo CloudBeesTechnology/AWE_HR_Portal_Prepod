@@ -6,7 +6,7 @@ const client = generateClient();
 
 export const useMergeTableForNotification = (responseData) => {
   const [email, setEmail] = useState(null);
-  console.log("Response Data:", responseData);
+ 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,6 +43,5 @@ export const useMergeTableForNotification = (responseData) => {
     fetchData();
   }, [responseData]);
 
-  console.log("Email State:", email);
   return email;
 };

@@ -21,6 +21,7 @@ import { generateClient } from "@aws-amplify/api";
 import { useFetchData } from "../pages/timeSheet/customTimeSheet/UseFetchData";
 import { UploadEditedORMC } from "../pages/timeSheet/uploadManuallyEditedExcel/UploadEditedORMC";
 import { UploadEditedSBW } from "../pages/timeSheet/uploadManuallyEditedExcel/UploadEditedSBW";
+import { useTempID } from "./TempIDContext";
 
 const client = generateClient();
 export const TimeSheetBrowser = ({ title }) => {
@@ -214,21 +215,37 @@ export const TimeSheetBrowser = ({ title }) => {
     setFileName("");
     fileInputRef.current.value = "";
   };
-
+  const { setStartDate, setEndDate, setSearchQuery } = useTempID();
   return (
     <div className="p-10 bg-[#fafaf6] min-h-screen  flex-col items-center">
       <div
         className={`flex ${
-          getPosition === "Manager" ? "justify-start" : "justify-center"
-        }  mt-5`}
+          getPosition === "Manager" ? "justify-start" : "justify-between"
+        }  mt-5 `}
       >
-        <div>
-          <Link to="/timeSheet" className="text-xl flex-1 text-grey w-1/12">
+        <div className="text-start ">
+          <Link
+            to="/timeSheet"
+            className="text-xl flex-1 text-grey  "
+            onClick={() => {
+              setSearchQuery(null);
+              setStartDate(null);
+
+              setEndDate(null);
+            }}
+          >
             <FaArrowLeft />
           </Link>
         </div>
+        {/* <div className="flex justify-between items-center mt-5 border">
+      
+        <div className="border text-start">
+          <Link to="/timeSheet" className="text-xl text-grey flex-1">
+            <FaArrowLeft />
+          </Link>
+        </div> */}
         {getPosition !== "Manager" && (
-          <div className="flex justify-center gap-11 w-11/12 pr-5 ">
+          <div className="flex justify-center gap-11  pr-5">
             <p
               className={`${
                 count === 0 && "border-b-4 border-b-primary"
@@ -251,6 +268,7 @@ export const TimeSheetBrowser = ({ title }) => {
             </p>
           </div>
         )}
+        <div></div>
       </div>
 
       <div>
@@ -386,7 +404,7 @@ export const TimeSheetBrowser = ({ title }) => {
           </div>
         )}
       </div>
-      {excelData && (
+      {excelData && count === 0 && (
         <div>
           {titleName === "Offshore" && (
             <ViewTSTBeforeSave

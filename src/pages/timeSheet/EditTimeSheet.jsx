@@ -1,5 +1,3 @@
-
-
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import { SearchDisplay } from "../../utils/SearchDisplay";
@@ -25,7 +23,7 @@ export const EditTimeSheet = ({
   const [warningMess, setWarningMess] = useState(null);
   const [warningMessForAdinin, setWarningMessForAdinin] = useState(null);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
-
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     fieldObj,
   });
@@ -82,13 +80,13 @@ export const EditTimeSheet = ({
   useEffect(() => {
     if (editObject) {
       setFormData(editObject);
-      console.log(editObject);
+      // console.log(editObject);
       const validJobLocaWhrs =
         editObject?.jobLocaWhrs?.filter(
           (item) => item !== null && item !== undefined
         ) || [];
 
-      console.log("Valid Job Location & Working Hours:", validJobLocaWhrs);
+      // console.log("Valid Job Location & Working Hours:", validJobLocaWhrs);
 
       if (validJobLocaWhrs.length > 0) {
         const resultData = validJobLocaWhrs.map((m, index) => {
@@ -124,7 +122,7 @@ export const EditTimeSheet = ({
   }, [editObject]);
 
   const searchedValueForJOBCODE = (id, searcValue) => {
-    console.log(searcValue);
+    // console.log(searcValue);
     if (searcValue !== "" || searcValue === "") {
       setSections((prevSections) =>
         prevSections.map((section) =>
@@ -164,20 +162,7 @@ export const EditTimeSheet = ({
     }
   };
 
-  // const searchedValueForLOCATION = (id, searcValue) => {
-  //   if (searcValue === "") {
-  //     setSections((prevSections) =>
-  //       prevSections.map((section) =>
-  //         section.id === id
-  //           ? {
-  //               ...section,
-  //               LOCATION: searcValue || null,
-  //             }
-  //           : section
-  //       )
-  //     );
-  //   }
-  // };
+ 
   const searchResultForJOBCODE = (jobcode, id) => {
     // setJobCode(jobcode);
 
@@ -214,14 +199,7 @@ export const EditTimeSheet = ({
   ]);
 
   const addSection = () => {
-    // const newId = sections.length + 1;
-    // while (sections.some(section => section.id === newId)) {
-    //   newId++; // Increment ID until it's unique
-    // }
-    // const newSection = {
-    //   id: newId,
-    // };
-    // setSections([...sections, newSection]);
+
 
     setSections((prevSections) => {
       // Generate a unique ID
@@ -262,10 +240,6 @@ export const EditTimeSheet = ({
     );
   }, []);
 
-
-
-
-
   useEffect(() => {
     const formatTime = (decimalHours) => {
       const hours = Math.floor(decimalHours); // Extract hours
@@ -274,7 +248,6 @@ export const EditTimeSheet = ({
     };
 
     const updateFormData = (workingHoursKey, actualHoursKey) => {
- 
       // };
       const ConvertHours = (sections) => {
         let totalMinutes = 0; // Initialize totalMinutes to avoid undefined error
@@ -309,7 +282,7 @@ export const EditTimeSheet = ({
       // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
       const sumHoursAndMinutes = (sections, key) => {
         let totalMinutes = sections.reduce((total, sec) => {
-          console.log(sec);
+          // console.log(sec);
 
           if (sec[key]) {
             // Replace "." with ":" to handle decimal formats like "8.20" → "8:20"
@@ -335,10 +308,10 @@ export const EditTimeSheet = ({
         return `${hours}:${minutes.toString().padStart(2, "0")}`;
       };
       // Calculate total working hours and overtime hours
-      const totalWorkingHrs = sumHoursAndMinutes(sections, "WORKINGHRS");
-      const totalOvertimeHrs = sumHoursAndMinutes(sections, "OVERTIMEHRS");
+      let totalWorkingHrs = sumHoursAndMinutes(sections, "WORKINGHRS");
+      let totalOvertimeHrs = sumHoursAndMinutes(sections, "OVERTIMEHRS");
 
-      console.log(totalWorkingHrs, " : ", totalOvertimeHrs);
+      // console.log(totalWorkingHrs, " : ", totalOvertimeHrs);
       setFormData((prevFormData) => {
         const updatedWorkingHours =
           parseFloat(totalWorkingHrs?.split(":")[0]) +
@@ -394,8 +367,6 @@ export const EditTimeSheet = ({
     }
   }, [sections]);
 
- 
-
   useEffect(() => {
     const totalOvertimeHrs = sections.reduce((total, sec) => {
       let overtime = sec.OVERTIMEHRS || "0:00"; // Default value if empty
@@ -421,7 +392,7 @@ export const EditTimeSheet = ({
     const minutes = totalOvertimeHrs % 60;
     const formattedTime = `${hours}:${minutes.toString().padStart(2, "0")}`;
 
-    console.log(formattedTime);
+    // console.log(formattedTime);
 
     // Update formData with formattedTime if totalOvertimeHrs exists
     if (totalOvertimeHrs > 0) {
@@ -439,8 +410,8 @@ export const EditTimeSheet = ({
         return {
           JOBCODE: val?.JOBCODE,
           LOCATION: val?.LOCATION,
-          WORKINGHRS: val?.WORKINGHRS,
-          OVERTIMEHRS: val?.OVERTIMEHRS,
+          WORKINGHRS: val?.WORKINGHRS || "",
+          OVERTIMEHRS: val?.OVERTIMEHRS || "",
         };
       });
 
@@ -462,30 +433,7 @@ export const EditTimeSheet = ({
         [name]: value,
       };
 
-      //
-      // If WORKINGHOURS field is changed, calculate OT and set a warning message if needed
-      if (name === "WORKINGHOURS" || name === "TOTALACTUALHOURS") {
-        const updatedWorkingHours = parseInt(value) || 0;
-        const normalWorkingHours =
-          parseInt(prevFormData.NORMALWORKINGHRSPERDAY) || 0;
-
-        const calculatedOT =
-          updatedWorkingHours - normalWorkingHours <= 0
-            ? "0"
-            : updatedWorkingHours - normalWorkingHours;
-
-        if (updatedWorkingHours > normalWorkingHours) {
-          setWarningMess(true);
-        } else {
-          setWarningMess(false);
-        }
-
-        return {
-          ...updatedData,
-          // WORKINGHOURS: updatedWorkingHours,
-          OT: calculatedOT,
-        };
-      }
+    
 
       return updatedData;
     });
@@ -499,6 +447,26 @@ export const EditTimeSheet = ({
     });
     setSections(result);
   };
+  const handleValidation = () => {
+    const newErrors = {};
+    sections.forEach((section, index) => {
+      if (!section.JOBCODE) {
+        newErrors[`JOBCODE-${index}`] = "Job Code is required.";
+      }
+      if (!section.LOCATION) {
+        newErrors[`LOCATION-${index}`] = "Location is required.";
+      }
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+  const handleSave = () => {
+    if (handleValidation()) {
+      // Proceed with saving
+      addJCandLocaWhrs();
+      toggleFunction();
+    }
+  };
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 "
@@ -507,214 +475,236 @@ export const EditTimeSheet = ({
         setFilteredEmployees([]);
       }}
     >
-      <section className="bg-[#FBFBFB] p-5 gap-2 flex flex-col item-center rounded-lg shadow-md border-4 border-[#EBEBEB] h-[600px] w-[900px] overflow-y-auto">
-        <div className="flex justify-end">
-          <RxCross2
-            className="text-2xl cursor-pointer"
-            onClick={toggleFunction}
-          />
-        </div>
-        <div className="flex justify-center ">
-          <img className="size-32 h-12 w-full" src={img} alt="not found" />
-        </div>
-        <div className="flex justify-center py-2 ">
-          <p className="text-dark_grey text_size_2">Edit Access</p>
-        </div>
-        {fields?.map((field, index) => (
-          <div key={index} className="grid grid-cols-2 pl-5 gap-5">
-            <p className="text-dark_grey text_size_6 pt-2">
-              {tableHeader[index]}
-            </p>
-
-            <div>
-              <input
-                type="text"
-                name={field}
-                className="border border-dark_grey rounded text-dark_grey text-[16px] outline-none w-full py-1 px-3 cursor-auto bg-white"
-                // value={editObject.FID}
-                value={formData[field] || ""}
-                onChange={handleChange}
-                readOnly={index < 7}
+      {/* h-[600px] w-[900px] */}
+      <section className="bg-[#f9fafb] p-5 gap-2 flex flex-col item-center rounded-lg shadow-md   border-[#EBEBEB] w-[50%] h-[80%] overflow-y-auto ">
+        <div className="mx-10 my-5">
+          <header className="flex justify-between my-5">
+            <div className="flex justify-center ">
+              <img className="size-36 h-12 w-full" src={img} alt="not found" />
+            </div>
+            <div className="flex justify-center py-2 ">
+              <p className="text-dark_grey font-semibold text-[22px]">
+                EDIT ACCESS
+              </p>
+            </div>
+            <div className="flex justify-end pt-2">
+              <RxCross2
+                className="text-[28px] cursor-pointer"
+                onClick={toggleFunction}
               />
+            </div>
+          </header>
+          {fields?.map((field, index) => (
+            <div key={index} className="grid grid-cols-2  space-y-3 ">
+              <div>
+                <p className="text-dark_grey text_size_5 pt-5">
+                  {tableHeader[index]}
+                </p>
+              </div>
+              <div>
+                <input
+                  type="text"
+                  name={field}
+                  className="border border-slate_grey bg-[#f1f5f9] rounded text-dark_grey text-[16px] text_size_5 outline-none w-full py-[7px] px-3 cursor-auto "
+                  // value={editObject.FID}
+                  value={formData[field] || ""}
+                  onChange={handleChange}
+                  readOnly={Position !== "Manager" ? index < 8 : true}
+                />
 
-              {/* TOTALACTUALHOURS */}
-              {warningMess === true &&
-              warningMessForAdinin === false &&
-              titleName === "BLNG"
-                ? (field === "WORKINGHOURS" ||
-                    field === "TOTALACTUALHOURS") && (
-                    <span className="text_size_9 mt-2 text-red">
-                      {`Working hours exceed the NWHPD`}
-                    </span>
-                  )
-                : warningMess === false &&
-                  warningMessForAdinin === true &&
-                  titleName === "BLNG"
-                ? (field === "WORKINGHOURS" ||
-                    field === "TOTALACTUALHOURS") && (
-                    <span className="text_size_9 mt-2 text-red">
-                      {`Working hours + OT exceed the AW & ESB`}
-                    </span>
-                  )
-                : warningMess === true &&
-                  warningMessForAdinin === true &&
-                  titleName === "BLNG"
-                ? (field === "WORKINGHOURS" ||
-                    field === "TOTALACTUALHOURS") && (
-                    <span className="text_size_9 mt-2 text-red">
-                      {`Working hours + OT exceed the NWHPD, AW & ESB`}
-                    </span>
-                  )
-                : warningMess &&
-                  titleName !== "BLNG" ?
-                  (field === "WORKINGHOURS" ||
-                    field === "TOTALACTUALHOURS") && (
-                    <span className="text_size_9 mt-2 text-red">
-                      {`Working hours exceed the NWHPD`}
-                    </span>
-                  ):""}
-              {/* {warningMessForAdinin &&
+                {/* TOTALACTUALHOURS */}
+                {warningMess === true &&
+                warningMessForAdinin === false &&
+                titleName === "BLNG"
+                  ? (field === "WORKINGHOURS" ||
+                      field === "TOTALACTUALHOURS") && (
+                      <span className="text_size_9 mt-2 text-red">
+                        {`Working hours exceed the NWHPD`}
+                      </span>
+                    )
+                  : warningMess === false &&
+                    warningMessForAdinin === true &&
+                    titleName === "BLNG"
+                  ? (field === "WORKINGHOURS" ||
+                      field === "TOTALACTUALHOURS") && (
+                      <span className="text_size_9 mt-2 text-red">
+                        {`Working hours + OT exceed the AW & ESB`}
+                      </span>
+                    )
+                  : warningMess === true &&
+                    warningMessForAdinin === true &&
+                    titleName === "BLNG"
+                  ? (field === "WORKINGHOURS" ||
+                      field === "TOTALACTUALHOURS") && (
+                      <span className="text_size_9 mt-2 text-red">
+                        {`Working hours + OT exceed the NWHPD, AW & ESB`}
+                      </span>
+                    )
+                  : warningMess && titleName !== "BLNG"
+                  ? (field === "WORKINGHOURS" ||
+                      field === "TOTALACTUALHOURS") && (
+                      <span className="text_size_9 mt-2 text-red">
+                        {`Working hours exceed the NWHPD`}
+                      </span>
+                    )
+                  : ""}
+                {/* {warningMessForAdinin &&
                 (field === "WORKINGHOURS" || field === "TOTALACTUALHOURS") && (
                   <span className="text_size_9 mt-2 text-red">
                  {" "} and AW & ESB
                   </span>
                 )} */}
+              </div>
             </div>
-          </div>
-        ))}
-        {Position === "Manager" && (
-          <div className="grid grid-cols-2 pl-5 gap-5">
-            <p className="text-dark_grey text_size_6 pt-2">STATUS</p>
-            <input
-              type="text"
-              className="border border-dark_grey rounded text-dark_grey text-[16px] outline-none w-full py-1 px-3 cursor-auto bg-white"
-              value="Pending"
-              readOnly
-            />
-          </div>
-        )}
-        {/*  */}
-        <section
-          className="grid grid-cols-1 pl-4 "
-          // onClick={() => {
-          //   setFilteredEmployees([]);
-          // }}
-        >
-          <div className="grid grid-cols-[10fr,10fr,10fr,10fr,0.6fr] gap-0 pt-5">
-            <label className="text_size_6 text-dark_grey ">JOBCODE</label>
-            <label className="text_size_6 text-dark_grey ">LOCATION</label>
-            <label className="text_size_6 text-dark_grey ">WORKING HOURS</label>
-            <label className="text_size_6 text-dark_grey ">
-              OVERTIME HOURS
-            </label>
-          </div>
-          {sections &&
-            sections.map((section, index) => {
-              return (
-                <div
-                  key={index}
-                  className="grid grid-cols-[5fr,5fr,5fr,5fr,0fr] gap-4 pt-1 pb-2"
-                >
-                  <div className="w-fit">
-                    <SearchDisplayForTimeSheet
-                      // filteredEmployees={filteredEmployees}
-                      // setFilteredEmployees={setFilteredEmployees}
-                      newFormData={JOBCODES}
-                      placeholder="Search Job Code"
-                      rounded="rounded"
-                      searchResult={searchResultForJOBCODE}
-                      searchedValue={searchedValueForJOBCODE}
-                      setDrpValue={section?.JOBCODE || null}
-                      id={section.id}
-                    />
-                  </div>
-                  <div className="w-fit">
-                    <SearchDisplayForTimeSheet
-                      newFormData={LocationData}
-                      placeholder="Search Location"
-                      rounded="rounded"
-                      searchResult={searchResultForLocation}
-                      setDrpValue={section.LOCATION || null}
-                      searchedValue={searchedValueForLOCATION}
-                      id={section.id}
-                    />
+          ))}
+          {Position === "Manager" && (
+            <div className="grid grid-cols-2  space-y-3">
+              <p className="text-dark_grey text_size_5 pt-2">STATUS</p>
+              <input
+                type="text"
+                className="border border-slate_grey bg-[#f1f5f9]  rounded text-dark_grey text_size_5 outline-none w-full py-2 px-3 cursor-auto "
+                value="Pending"
+                readOnly
+              />
+            </div>
+          )}
+          {/*  */}
+          <section
+            className="grid grid-cols-1 "
+            // onClick={() => {
+            //   setFilteredEmployees([]);
+            // }}
+          >
+            <div className="grid grid-cols-[10fr,10fr,10fr,10fr,0.6fr] gap-0 pt-5">
+              <label className="text_size_5 text-dark_grey ">JOBCODE</label>
+              <label className="text_size_5 text-dark_grey ">LOCATION</label>
+              <label className="text_size_5 text-dark_grey ">
+                WORKING HOURS
+              </label>
+              <label className="text_size_5 text-dark_grey ">
+                OVERTIME HOURS
+              </label>
+            </div>
+            {sections &&
+              sections.map((section, index) => {
+                return (
+                  <div
+                    key={index}
+                    className="grid grid-cols-[5fr,5fr,5fr,5fr,0fr] gap-4 pt-1 pb-2 "
+                    style={Position === "Manager" ? { pointerEvents: "none" } : undefined}
+                  >
+                    <div className="w-fit">
+                      <SearchDisplayForTimeSheet
+                        // filteredEmployees={filteredEmployees}
+                        // setFilteredEmployees={setFilteredEmployees}
+                        newFormData={JOBCODES}
+                        placeholder="Search Job Code"
+                        rounded="rounded"
+                        searchResult={searchResultForJOBCODE}
+                        searchedValue={searchedValueForJOBCODE}
+                        setDrpValue={section?.JOBCODE || null}
+                        id={section.id}
+                      />
+                      {errors[`JOBCODE-${index}`] && (
+                        <span className="text-red text_size_8">
+                          {errors[`JOBCODE-${index}`]}
+                        </span>
+                      )}
+                    </div>
+                    <div className="w-fit">
+                      <SearchDisplayForTimeSheet
+                        newFormData={LocationData}
+                        placeholder="Search Location"
+                        rounded="rounded"
+                        searchResult={searchResultForLocation}
+                        setDrpValue={section.LOCATION || null}
+                        searchedValue={searchedValueForLOCATION}
+                        id={section.id}
+                      />
 
-                    {!section.LOCATION && (
+                      {/* {!section.LOCATION && (
                       <span className="text_size_9 mt-2 text-red">
                         Location must not be empty.
                       </span>
-                    )}
-                  </div>
-                  <div className="w-fit ">
-                    <input
-                      type="text"
-                      id={`workingHours-${index}`}
-                      value={section.WORKINGHRS || ""}
-                      onChange={(e) => {
-                        handleWorkingHoursChange(
-                          section.id,
-                          e.target.value,
-                          "WorkingHrs"
-                        );
-                      }}
-                      placeholder="Enter Hours"
-                      className="border border-lite_grey rounded text-dark_grey text_size_5 outline-none w-full py-2 px-3 cursor-auto bg-white"
-                      readOnly={!section.LOCATION}
-                    />
-                  </div>
-                  <div className="w-fit">
-                    <input
-                      type="text"
-                      id={`OverTimeHours-${index}`}
-                      value={section.OVERTIMEHRS || ""}
-                      onChange={(e) => {
-                        handleWorkingHoursChange(
-                          section.id,
-                          e.target.value,
-                          "OvertimeHrs"
-                        );
-
-                        // combineAllData(section.id, e.target.value)
-                      }}
-                      placeholder="Enter Overtime "
-                      className="border border-lite_grey rounded text-dark_grey text_size_5 outline-none w-full py-2 px-3 cursor-auto bg-white"
-                      readOnly={!section.LOCATION}
-                    />
-                  </div>
-                  <div className="pt-2.5">
-                    {index === 0 ? (
-                      <FaRegSquarePlus
-                        className={`text-xl text-dark_ash cursor-pointer`}
-                        onClick={() => {
-                          addSection();
+                    )} */}
+                      {errors[`LOCATION-${index}`] && (
+                        <span className="text-red text_size_8">
+                          {errors[`LOCATION-${index}`]}
+                        </span>
+                      )}
+                    </div>
+                    <div className="w-fit ">
+                      <input
+                        type="text"
+                        id={`workingHours-${index}`}
+                        value={section.WORKINGHRS || ""}
+                        onChange={(e) => {
+                          handleWorkingHoursChange(
+                            section.id,
+                            e.target.value,
+                            "WorkingHrs"
+                          );
                         }}
+                        placeholder="Enter Hours"
+                        className="border border-lite_grey rounded text-dark_grey text_size_5 outline-none w-full py-2 px-3 cursor-auto bg-white"
+                        readOnly={!section.LOCATION}
                       />
-                    ) : (
-                      <FaRegSquareMinus
-                        className={`text-xl text-dark_ash cursor-pointer`}
-                        onClick={() => {
-                          // addSection();
-                          removeItem(section.id);
+                    </div>
+                    <div className="w-fit">
+                      <input
+                        type="text"
+                        id={`OverTimeHours-${index}`}
+                        value={section.OVERTIMEHRS || ""}
+                        onChange={(e) => {
+                          handleWorkingHoursChange(
+                            section.id,
+                            e.target.value,
+                            "OvertimeHrs"
+                          );
+
+                          // combineAllData(section.id, e.target.value)
                         }}
+                        placeholder="Enter Overtime "
+                        className="border border-lite_grey rounded text-dark_grey text_size_5 outline-none w-full py-2 px-3 cursor-auto bg-white"
+                        readOnly={!section.LOCATION}
                       />
-                    )}
+                    </div>
+                    <div className="pt-2.5">
+                      {index === 0 ? (
+                        <FaRegSquarePlus
+                          className={`text-xl text-dark_ash cursor-pointer`}
+                          onClick={() => {
+                            addSection();
+                          }}
+                        />
+                      ) : (
+                        <FaRegSquareMinus
+                          className={`text-xl text-dark_ash cursor-pointer`}
+                          onClick={() => {
+                            // addSection();
+                            removeItem(section.id);
+                          }}
+                        />
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-        </section>
+                );
+              })}
+          </section>
 
-        <div className=" flex justify-center">
-          <button
-            className=" text-dark_grey text_size_3 rounded bg-[#FEF116] px-9 m-5 py-2"
-            onClick={() => {
-              addJCandLocaWhrs();
+          <div className=" flex justify-center">
+            <button
+              className=" text-dark_grey text_size_3 rounded bg-[#FEF116] px-9 m-5 py-2"
+              onClick={() => {
+                handleSave();
+                // addJCandLocaWhrs();
 
-              toggleFunction();
-            }}
-          >
-            Save
-          </button>
+                // toggleFunction();
+              }}
+            >
+              Save
+            </button>
+          </div>
         </div>
       </section>
     </div>

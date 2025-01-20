@@ -1,3 +1,4 @@
+
 import React from "react";
 
 export const PopupForSFApproves = ({
@@ -20,7 +21,7 @@ export const PopupForSFApproves = ({
           >
             {icons}
           </div>
-          <div className="border w-[409px] h-[218px]  border-lite_grey rounded shadow-md  bg-white pt-12">
+          <div className="border w-[409px] h-[225px]  border-lite_grey rounded shadow-md  bg-white pt-12">
             <div>
               <div className=" flex flex-col items-center gap-5">
                 <p className={`text_size_2 ${textColor}`}>{title}</p>
@@ -30,6 +31,7 @@ export const PopupForSFApproves = ({
                     {messageTwo}
                   </p>
                 )}
+
                 {!messageTwo && (
                   <button
                     className=" p-2 rounded border-[#FEF116] bg-[#FEF116] text-dark_grey text_size_5 w-52"

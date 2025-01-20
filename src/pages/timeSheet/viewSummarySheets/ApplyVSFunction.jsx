@@ -107,7 +107,7 @@ export const ApplyVSFunction = ({
         // const leaveStatusData = leaveStatus?.data?.listLeaveStatuses?.items;
         const leaveStatusData = leaveStatuses;
 
-        const approvedLeaveStatus = leaveStatusData.filter(
+        const approvedLeaveStatus = dummyLeaveStatus.filter(
           (fil) => fil.managerStatus === "Approved"
         );
 
@@ -254,7 +254,22 @@ export const ApplyVSFunction = ({
         }
         const seperatedGroupedData =
           groupByEmpIdAndLocation(seperatedEmpByDate);
-        console.log(seperatedGroupedData);
+
+        seperatedGroupedData.forEach((item) => {
+          if (Array.isArray(item.data)) {
+            item.data.forEach((dataEntry) => {
+              if (Array.isArray(dataEntry.empWorkInfo)) {
+                dataEntry.empWorkInfo.forEach((workInfo) => {
+                  if (!workInfo.WORKINGHRS) {
+                    workInfo.WORKINGHRS = "A";
+                  }
+                });
+              }
+            });
+          }
+        });
+
+        console.log("seperatedGroupedData : ", seperatedGroupedData);
         const merged = mergedData.flatMap((val) => {
           // Filter all matching entries from approvedLeaveStatus
           const matches = approvedLeaveStatus.filter(
@@ -272,7 +287,7 @@ export const ApplyVSFunction = ({
           // If no match is found, just return the original `val`
           return [val];
         });
-        console.log(merged);
+        console.log("merged : ", merged);
         const filteredData = merged.filter((leave) => {
           return seperatedGroupedData.some((emp) => {
             // console.log(leave.empBadgeNo === emp.badge)
@@ -314,27 +329,6 @@ export const ApplyVSFunction = ({
 
         console.log("filteredData : ", filteredData);
 
-        // const leaveCounts = filteredData.reduce((acc, entry) => {
-        //   const { empBadgeNo, leaveType } = entry;
-
-        //   // Ensure an entry exists for the sapNo
-        //   if (!acc[empBadgeNo]) {
-        //     acc[empBadgeNo] = {};
-        //   }
-
-        //   // Increment the count for the specific leaveType
-        //   acc[empBadgeNo][leaveType] = (acc[empBadgeNo][leaveType] || 0) + 1;
-
-        //   return acc;
-        // }, {});
-
-        // const leaveCount = Object.entries(leaveCounts).map(
-        //   ([empBadgeNo, leaveTypes]) => ({
-        //     empBadgeNo,
-        //     leaveCounts: leaveTypes,
-        //   })
-        // );
-
         const leaveTypeAbbreviation = {
           "Annual Leave": "AL",
           "Compassionate Leave": "CL",
@@ -359,6 +353,7 @@ export const ApplyVSFunction = ({
               fromDate,
               toDate,
               days,
+              workHrs,
             } = entry;
 
             if (!result[empID]) {
@@ -387,6 +382,7 @@ export const ApplyVSFunction = ({
               listDate: generateDateList(
                 fromDate,
                 toDate,
+                workHrs,
                 leaveTypeAbbreviation[leaveType],
                 days === 0.5 // Pass half-day indicator
               ),
@@ -416,18 +412,24 @@ export const ApplyVSFunction = ({
         const generateDateList = (
           fromDate,
           toDate,
+          workHrs,
           abbreviation,
           isHalfDay
         ) => {
           const start = new Date(fromDate);
           const end = new Date(toDate);
           const listDate = {};
-
+          const NWHPD =
+            workHrs && workHrs?.length > 0 ? workHrs[workHrs?.length - 1] : 0;
+          const devidedNWHPD = parseFloat(NWHPD) / 2;
+          // console.log(NWHPD);
           while (start <= end) {
             const dayStr = `${start.getDate()}-${
               start.getMonth() + 1
             }-${start.getFullYear()}`;
-            listDate[dayStr] = isHalfDay ? `H${abbreviation}4` : abbreviation;
+            listDate[dayStr] = isHalfDay
+              ? `H${abbreviation}${devidedNWHPD}`
+              : abbreviation;
             start.setDate(start.getDate() + 1);
           }
 
@@ -435,9 +437,9 @@ export const ApplyVSFunction = ({
         };
 
         const leaveCount_ = transformData(filteredData);
-        console.log("leaveCount_ : ", leaveCount_);
-        console.log("seperatedGroupedData : ", seperatedGroupedData);
-        //
+        // console.log("leaveCount_ : ", leaveCount_);
+        // console.log("seperatedGroupedData : ", seperatedGroupedData);
+
         const holidayDates = dummyHolidayList.CompanyHolidays2025.flatMap(
           (holiday) => holiday.dates || [holiday.date]
         );
@@ -498,6 +500,7 @@ export const ApplyVSFunction = ({
             }
           });
           const getDate = val.data.find((f) => f);
+          const id = getDate.id;
 
           const res = getDate.empWorkInfo.map((val) => val?.LOCATION);
           const jobcode = getDate.empWorkInfo.map((val) => val?.JOBCODE);
@@ -512,10 +515,19 @@ export const ApplyVSFunction = ({
             const dayStr = `${currentDay.getDate()}-${monthKey}-${currentDay.getFullYear()}`;
 
             // Format key as "MM-DD"
-            const entry = val.data.find(
-              ({ date }) => new Date(date).getDate() === currentDay.getDate()
-            );
+            // const entry = val?.data.find(
+            //   ({ date }) => new Date(date).getDate() === currentDay.getDate()
+            // );
 
+            const entry = val?.data.find(({ date }) => {
+              const entryDate = new Date(date);
+              return (
+                //   entryDate === currentDay
+                entryDate.getDate() === currentDay.getDate() &&
+                entryDate.getMonth() === currentDay.getMonth() &&
+                entryDate.getFullYear() === currentDay.getFullYear()
+              );
+            });
             // const dayOfWeek = currentDay.toLocaleDateString("en-US", {
             //   weekday: "long",
             // }); // Get the day name
@@ -551,20 +563,18 @@ export const ApplyVSFunction = ({
               ]?.toLowerCase(); // Convert to lowercase for case-insensitive matching
 
             // Define salary type categories
-            const monthlyTypes = ["monthly", "month", "m"];
-            const dailyTypes = ["daily", "day", "d"];
 
             // Prioritize conditions
             if (checkEntry) {
               // If there are working hours, prioritize them
-              const workingHrs = parseFloat(checkEntry);
+              const workingHrs = parseFloat(checkEntry) || "A";
               if (workingHrs < (entry?.normalWorkHrs || 0)) {
                 const absence = (
                   (entry?.normalWorkHrs || 0) - workingHrs
                 ).toFixed(1);
                 acc[dayStr] = `x(${absence})${workingHrs}`; // Format as "absence(workingHrs)"
               } else {
-                acc[dayStr] = workingHrs.toString();
+                acc[dayStr] = workingHrs.toString() || "A";
               }
             } else if (isPublicHoliday) {
               acc[dayStr] = "PH";
@@ -572,7 +582,6 @@ export const ApplyVSFunction = ({
               acc[dayStr] = leaveType; // Use leave type if available
             } else if (dayOfWeek === "Saturday") {
               const result = parseFloat(entry?.normalWorkHrs) / 2;
-              console.log(workInfoData?.salaryType);
 
               // Extract salary type and normalize it to lowercase
               const salaryType =
@@ -599,60 +608,16 @@ export const ApplyVSFunction = ({
               acc[dayStr] = "";
             } else {
               // Default condition: Mark as "A" (absent)
-              acc[dayStr] = "A";
+              acc[dayStr] = "";
             }
 
             return acc;
           }, {});
-          //   const keysToCount = ["OFF", "PH", "PHD", "A"];
-
-          //   const countOccurrences = (data, keys) => {
-          //     const values = Object.values(data);
-          //     return keys?.reduce((counts, key) => {
-          //       counts[key] = values?.filter((value) => value === key).length;
-          //       return counts;
-          //     }, {});
-          //   };
-
-          //   const holidaysAndAbsent = countOccurrences(workingHrs, keysToCount);
-
-          //   const countLeaveTypes = () => {
-          //     let newLeaveCount = {
-          //       AL: 0,
-          //       CL: 0,
-          //       UAL: 0,
-          //       SL: 0,
-          //     };
-
-          //     for (const date in workingHrs) {
-          //       const value = workingHrs[date];
-
-          //       // Check for specific leave types (AL, CL, UAL, SL)
-          //       if (value?.startsWith("HAL")) {
-          //         newLeaveCount.AL += 0.5;
-          //       } else if (value === "AL") {
-          //         newLeaveCount.AL += 1;
-          //       } else if (value?.startsWith("HCL")) {
-          //         newLeaveCount.CL += 0.5;
-          //       } else if (value === "CL") {
-          //         newLeaveCount.CL += 1;
-          //       } else if (value?.startsWith("HSL")) {
-          //         newLeaveCount.SL += 0.5;
-          //       } else if (value === "SL") {
-          //         newLeaveCount.SL += 1;
-          //       } else if (value?.startsWith("HUAL")) {
-          //         newLeaveCount.UAL += 0.5;
-          //       } else if (value === "UAL") {
-          //         newLeaveCount.UAL += 1;
-          //       }
-          //     }
-          //     return newLeaveCount;
-          //   };
-          //   const leaveCounts = countLeaveTypes();
 
           return empLeaveCount
             ? {
                 ...val,
+                id: id,
                 workingHrs: workingHrs,
                 leaveCounts: empLeaveCount.leaveCounts,
                 // leaveCounts: leaveCounts,
@@ -664,6 +629,7 @@ export const ApplyVSFunction = ({
               }
             : {
                 ...val,
+                id: id,
                 // hollydayCounts: holidaysAndAbsent,
                 workingHrs: workingHrs,
                 leaveCounts: {},
@@ -676,40 +642,6 @@ export const ApplyVSFunction = ({
         // Example usage:
         console.log(addLeaveTypeCount);
 
-        // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        // const sameAddLeaveTypeCount = addLeaveTypeCount;
-        // // // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        // const processWorkingHrs = async (addLeaveTypeCount) => {
-        //   return await addLeaveTypeCount?.map((entry) => {
-        //     // Process only if empBadgeNo matches
-        //     sameAddLeaveTypeCount?.forEach((item) => {
-        //       if (entry?.empBadgeNo === item?.empBadgeNo) {
-        //         Object.keys(entry.workingHrs).forEach((key) => {
-        //           // Check if any other value for the same key across the data is not "A"
-        //           const hasValidValue = sameAddLeaveTypeCount?.some(
-        //             (item) =>
-        //               (item?.empBadgeNo === entry?.empBadgeNo &&
-        //                 item.workingHrs[key] &&
-        //                 item.workingHrs[key] !== "A")
-        //           );
-
-        //           if (
-        //             // item.workingHrs[key] === "UAL" ||
-        //            ( item.workingHrs[key] === "A" ) &&
-        //             hasValidValue
-        //           ) {
-        //             entry.workingHrs[key] = "0";
-        //           }
-        //         });
-        //       }
-        //     });
-        //     return entry;
-        //   });
-        // };
-
-        // const FinalData = await processWorkingHrs(addLeaveTypeCount);
-        // console.log("FinalData : ", FinalData);
         // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         const updateFieldBasedOnConditions = async (inputData) => {
           const keysToCount = ["OFF", "PH", "PHD", "A"];
@@ -828,7 +760,7 @@ export const ApplyVSFunction = ({
 
         // Call the function with updatedData
         const UpdaterNameAdded = await getSummaryUpdaterName(updatedData);
-
+        console.log(UpdaterNameAdded);
         // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
         const transformedData = UpdaterNameAdded?.map((item) => {
@@ -870,7 +802,9 @@ export const ApplyVSFunction = ({
             : {};
 
           const getEmpDateRange = item.data.find((first) => first.date);
+          const getMealAllow = item.data.map((m) => m.mealAllow);
 
+          const id = item?.id;
           const empName = item?.data?.map((m) => m.empName);
 
           const empLeaveCount = item?.leaveCounts;
@@ -879,7 +813,7 @@ export const ApplyVSFunction = ({
           const location = item?.location;
           const hollydayCounts = item?.hollydayCounts;
           const timeKeeper = item?.timeKeeper;
-
+          console.log(item?.data);
           const overtimeHours = Array.from({ length: dayCounts }, (_, i) => {
             const currentDay = new Date(getStartDate);
             currentDay.setDate(getStartDate.getDate() + i); // Increment date
@@ -913,8 +847,13 @@ export const ApplyVSFunction = ({
             console.log(entry);
             // Initialize overtime hours from the entry
             const overtimeHours = entry?.empWorkInfo[0]?.OVERTIMEHRS
-              ? parseInt(entry?.empWorkInfo[0].OVERTIMEHRS)
+              ? parseFloat(entry?.empWorkInfo[0].OVERTIMEHRS)
               : null;
+
+            const getVerification = entry?.getVerify;
+            if (getVerification !== null && getVerification !== undefined) {
+              acc[dayStr] = getVerification;
+            }
 
             // Add the overtime hours to the accumulator
             if (overtimeHours !== null || overtimeHours !== undefined) {
@@ -925,12 +864,71 @@ export const ApplyVSFunction = ({
 
             return acc;
           }, {});
+          console.log(overtimeHours);
 
-          const jobcode = item.data.map(
+          const processEntries = (
+            item,
+            dayCounts,
+            getStartDate,
+            extractValue
+          ) => {
+            return Array.from({ length: dayCounts }, (_, i) => {
+              // Generate the date for the current iteration
+              const currentDay = new Date(getStartDate);
+              currentDay.setDate(getStartDate.getDate() + i); // Increment date
+              return currentDay;
+            }).reduce((acc, currentDay) => {
+              // Format the date as "day-month-year"
+              const dayStr = `${currentDay.getDate()}-${
+                currentDay.getMonth() + 1
+              }-${currentDay.getFullYear()}`;
+
+              // Find matching entry from the data
+              const entry = item?.data?.find(({ date }) => {
+                const entryDate = new Date(date);
+                return (
+                  entryDate.getDate() === currentDay.getDate() &&
+                  entryDate.getMonth() === currentDay.getMonth() &&
+                  entryDate.getFullYear() === currentDay.getFullYear()
+                );
+              });
+
+              // Use extractValue function to determine the value to assign
+              acc[dayStr] = extractValue(entry, currentDay);
+
+              return acc;
+            }, {});
+          };
+
+          // Function to get 'verify' or null
+          const getVerify = processEntries(
+            item,
+            dayCounts,
+            getStartDate,
+            (entry) => {
+              return entry?.verify ?? null;
+            }
+          );
+
+          // Function to get 'updatedAt' if 'verify' is "Yes", otherwise null
+          const assignUpdaterDateTime = processEntries(
+            item,
+            dayCounts,
+            getStartDate,
+            (entry) => {
+              return entry?.verify === "Yes" ? entry.updatedAt : null;
+            }
+          );
+
+          console.log(getVerify);
+          console.log(assignUpdaterDateTime);
+
+          const jobcode = item?.data?.map(
             ({ empWorkInfo }) => empWorkInfo[0]?.JOBCODE
           );
 
           return {
+            id: id,
             empName: empName,
             jobcode: jobcode[0] || "",
             dateForSelectMY: dateForSelectMY,
@@ -941,7 +939,10 @@ export const ApplyVSFunction = ({
             hollydayCounts: hollydayCounts,
             workingHrs: workingHrs,
             location: location,
-            timeKeeper:timeKeeper,
+            timeKeeper: timeKeeper,
+            getVerify: getVerify,
+            assignUpdaterDateTime: assignUpdaterDateTime,
+            mealAllow: getMealAllow,
           };
         }).filter(Boolean);
         console.log(transformedData);
@@ -957,59 +958,4 @@ export const ApplyVSFunction = ({
   } catch (err) {
     console.log("ERROR : ", err);
   }
-
-  //   &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-  //   try {
-  //     useEffect(() => {
-  //       if (!secondaryData || secondaryData.length === 0) return;
-
-  //       let filteredData = [...secondaryData];
-
-  //       // Filter by selectedLocation if it's not "All"
-  //       if (selectedLocation && selectedLocation !== "All Location") {
-  //         filteredData = filteredData.filter(
-  //           (item) => item.location === selectedLocation
-  //         );
-  //       }
-
-  //       if (!startDate) {
-  //         // Reset to filtered data if startDate is empty
-  //         setData(filteredData);
-  //       } else {
-  //         // Filter data based on startDate
-  //         const inputDate = new Date(startDate);
-
-  //         filteredData = filteredData.filter((item) => {
-  //           const itemDate = new Date(item.dateForSelectMY);
-  //           return (
-  //             itemDate.getMonth() === inputDate.getMonth() &&
-  //             itemDate.getFullYear() === inputDate.getFullYear()
-  //           );
-  //         });
-
-  //         setData(filteredData);
-  //       }
-  //     }, [startDate, secondaryData, selectedLocation]);
-  //   } catch (err) {}
-  //   const searchResult = async (searchedData) => {
-  //     try {
-  //       const result = await searchedData;
-  //       setData(result);
-  //     } catch (error) {
-  //       console.error("Error fetching user data:", error);
-  //     }
-  //   };
-
-  //   const selectLocation = async (loca) => {
-  //     try {
-  //       const result = await loca;
-  //       //   console.log(result);
-  //       setSelectedLocation(result.location);
-  //     } catch (error) {
-  //       console.error("Error fetching user data:", error);
-  //     }
-  //   };
-
-  // Calculate the number of days in the range (inclusive of both start and end dates)
-  // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 };

@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
+import { IoSearch } from "react-icons/io5";
+
 export const FilterTable = ({
   tableBody,
   tableHead,
@@ -9,14 +12,14 @@ export const FilterTable = ({
   allData,
   handleViewDetails,
   handleDate,
+  startDate, 
+  endDate
 }) => {
-  // console.log(handleDate);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+ 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 30; // Set the number of items per page
+  const itemsPerPage = 30; 
 
   const parseDate = (dateStr) => {
     if (!dateStr) return null;
@@ -35,37 +38,17 @@ export const FilterTable = ({
         .includes(query) ||
       String(row.empBadgeNo || "")
         .toLowerCase()
-        .includes(query) ||
-      String(row.department || "")
-        .toLowerCase()
-        .includes(query) ||
-      String(row.position || "")
-        .toLowerCase()
         .includes(query);
 
     // Date filtering logic for doj (Date of Joining)
-    if (startDate && endDate) {
-      const dojDate = parseDate(allData.doj); // Assuming this function returns a Date object
-      if (!dojDate) return false; // skip the row if doj is invalid
-
-      // Parse the start and end dates
-      const start = parseDate(startDate);
-      const end = parseDate(endDate);
-
-      // Ensure valid date range
-      if (!start || !end) return false; // skip the row if the date range is invalid
-
-      // Include row only if doj falls within the range
-      return matchesQuery && dojDate >= start && dojDate <= end;
-    }
-
+   
     // If no date filtering, just apply search query
     return matchesQuery;
   });
 
   // Pagination Logic
-  const totalPages = Math.ceil(filteredTableBody.length / itemsPerPage);
-  const currentItems = filteredTableBody.slice(
+  const totalPages = Math?.ceil(filteredTableBody?.length / itemsPerPage);
+  const currentItems = filteredTableBody?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -104,78 +87,104 @@ export const FilterTable = ({
   };
 
   const downloadExcel = () => {
-    // Function to format keys dynamically to Proper Case (e.g., "empBadgeNo" -> "Emp Badge No")
     const formatKey = (key) => {
-      // Convert camelCase or snake_case to Proper Case
       return key
-        .replace(/([A-Z])/g, ' $1')               // Insert space before capital letters
-        .replace(/([a-z])([A-Z])/g, '$1 $2')       // Ensure we don't add extra spaces (for camel case)
-        .replace(/_/g, ' ')                       // Replace underscores with spaces
-        .toUpperCase();                           // Convert everything to uppercase
+        .replace(/([A-Z])/g, " $1")
+        .replace(/([a-z])([A-Z])/g, "$1 $2")
+        .replace(/_/g, " ")
+        .toUpperCase();
     };
   
-    // Process the data to handle array values and dynamically rename keys
     const processedData = filteredTableBody.map((row) => {
       const processedRow = {};
-  
-      // Iterate over each column in the row and handle array values
       for (const [key, value] of Object.entries(row)) {
-        // Format the key dynamically
         const formattedKey = formatKey(key);
-  
-        if (Array.isArray(value)) {
-          // If the value is an array, join it into a string with a comma separator
-          processedRow[formattedKey] = value.join(", ");
-        } else {
-          // Otherwise, keep the value as is
-          processedRow[formattedKey] = value;
-        }
+        processedRow[formattedKey] = Array.isArray(value) ? value.join(", ") : value;
       }
-  
       return processedRow;
     });
   
-    // Convert the processed data to an Excel worksheet
-    const ws = XLSX.utils.json_to_sheet(processedData);
+    // Create a workbook and worksheet with a dynamic sheet name based on the title prop
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet(title);  // Use the title as the sheet name
   
-    // Default column size for the header (in pixels)
-    const defaultHeaderWidth = 120; // Set a default width for headers
+    // Add the title as the first row (merged cell spanning all columns)
+    const headerRow = worksheet.addRow([title]);
+    headerRow.font = { bold: true, size: 16 };
+    headerRow.alignment = { horizontal: "center", vertical: "middle" };
+    
+    // Merge the cells for the title
+    worksheet.mergeCells(1, 1, 1, Object.keys(processedData[0]).length);
   
-    // Get the maximum length of each column to auto-size
-    const colWidths = [];
+    // Add a blank row after the title for spacing
+    // worksheet.addRow([]);
   
-    // Calculate maximum length for each column in data (excluding header)
+    // Add the Start Date and End Date as rows
+    const dateRow = [];
+    if (startDate) {
+      dateRow.push(`Start Date: ${startDate}`);
+    } else {
+      dateRow.push('Start Date: Not Provided');
+    }
+  
+    if (endDate) {
+      dateRow.push(`End Date: ${endDate}`);
+    } else {
+      dateRow.push('End Date: Not Provided');
+    }
+  
+    worksheet.addRow(dateRow);
+    worksheet.addRow([]); // Add another blank row for spacing
+  
+    // Add header row with formatted keys
+    const tableHeader = Object.keys(processedData[0]).map(formatKey);
+    worksheet.addRow(tableHeader);
+  
+    // Add data rows
     processedData.forEach((row) => {
-      Object.entries(row).forEach(([key, value], index) => {
-        const length = value ? value.toString().length : 0; // Calculate string length
-        if (!colWidths[index] || length > colWidths[index]) {
-          colWidths[index] = length; // Update max length if necessary
-        }
+      worksheet.addRow(Object.values(row));
+    });
+  
+
+    const header = worksheet.getRow(4); // 3rd row (after title and date filter)
+    header.eachCell((cell) => {
+      cell.font = { bold: true, color: { argb: "FFFFFFFF" } }; // Bold white font
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FF808080" }, // Grey background
+      };
+      cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true }; // Center alignment with wrap text
+    });
+
+    
+  
+    // Apply styles for all data rows
+    worksheet.eachRow((row, rowIndex) => {
+      row.eachCell((cell) => {
+        cell.alignment = { wrapText: true, vertical: "top" }; // Wrap text for all cells
       });
     });
   
-    // Set the column widths: default width for the header and auto-sized width for data
-    const wscols = colWidths.map((width) => ({
-      wpx: Math.max(width * 7, defaultHeaderWidth), // Use defaultHeaderWidth as minimum width
-    }));
+    // Auto-size columns based on content length
+    worksheet.columns.forEach((column) => {
+      let maxLength = 0;
+      column.eachCell({ includeEmpty: true }, (cell) => {
+        const value = cell.value ? cell.value.toString() : "";
+        maxLength = Math.max(maxLength, value.length);
+      });
+      column.width = maxLength + 2; // Add padding for readability
+    });
   
-    // Set column widths for the header, ensuring default size is respected
-    ws["!cols"] = wscols;
-  
-    // Log the worksheet content (similar to "downloaded content")
-    console.log("Generated Excel Worksheet with Auto Column Widths:", ws);
-  
-    // Create a new workbook and append the worksheet
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-  
-    // Log the workbook structure before the file is written
-    console.log("Generated Workbook:", wb);
-  
-    // Write the file and prompt download
-    XLSX.writeFile(wb, "FilteredTable.xlsx");
+    // Generate and download the Excel file
+    workbook.xlsx.writeBuffer().then((buffer) => {
+      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      saveAs(blob, `${title}.xlsx`);  // Use the title as part of the file name
+    });
   };
+
   
+ 
   return (
     <div className="w-full px-7">
 
@@ -190,47 +199,55 @@ export const FilterTable = ({
           </h1>
         </div>
 
-        <div className="text-center flex flex-col flex-1 gap-4 items-end">
+        <div className="text-center flex flex-col flex-1 gap-4 items-end relative">
           <input
             type="text"
-            placeholder="Search Result"
+            placeholder="Search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="outline-none rounded-lg px-4 py-2 shadow-md border border-[#C5C5C5]"
+            className="outline-none rounded-lg px-4 py-2 shadow-md border border-[#C5C5C5] text-grey"
           />
+          <div className=" absolute right-3 top-2 bg-white text-[24px]">
+          <IoSearch/>
+
+          </div>
         </div>
       </div>
       <div className="flex justify-between items-end w-full">
-        {/*Date Filter*/}
-       <div className="flex justify-center items-center gap-5">
-         <div>
-          <label htmlFor="start-date" className="block text-[16px] font-medium">
-            Start Date
-          </label>
-          <input
-            id="start-date"
-            type="date"
-            onChange={(e) => handleDate(e, "startDate")}
-            className="outline-none text-grey border rounded-md p-2"
-          />
-        </div>
-        <div>
-          <label htmlFor="end-date" className="block text-[16px] font-medium">
-            End Date
-          </label>
-          <input
-            id="end-date"
-            type="date"
-            onChange={(e) => handleDate(e, "endDate")}
-            className="outline-none text-grey border rounded-md p-2"
-          />
-        </div>
-        </div>
+  
+        {(title !== "Probation Form Update" && title !== "Contract Expiry Form Update") && (
+            <div className="flex justify-center items-center gap-5">
+            <div>
+             <label htmlFor="start-date" className="block text-[16px] font-medium">
+               Start Date
+             </label>
+             <input
+               id="start-date"
+               type="date"
+               onChange={(e) => handleDate(e, "startDate")}
+               className="outline-none text-grey border rounded-md p-2"
+             />
+           </div>
+           <div>
+             <label htmlFor="end-date" className="block text-[16px] font-medium">
+               End Date
+             </label>
+             <input
+               id="end-date"
+               type="date"
+               onChange={(e) => handleDate(e, "endDate")}
+               className="outline-none text-grey border rounded-md p-2"
+             />
+           </div>
+           </div>
+
+        )}
+     
       {/* Download Button */}
         <div className="text-center">
         <button
           onClick={downloadExcel}
-          class="bg-[#FEF116] text-dark_grey w-[126px] p-3 rounded"
+          className="bg-[#FEF116] text-dark_grey w-[126px] p-3 rounded"
         >
           Download
         </button>
@@ -286,6 +303,14 @@ export const FilterTable = ({
                         View Details
                       </td>
                     )}
+                    {title === "Probation Form Update" && (
+                      <td
+                        className="underline text-center border-[#CECECE] p-2 cursor-pointer text-[blue]"
+                        onClick={() => handleViewDetails(row)}
+                      >
+                        View Details
+                      </td>
+                    )}
                     {title === "Recruitment & Mobilization" && (
                       <td
                         className="underline text-center border-[#CECECE] p-2 cursor-pointer text-[blue]"
@@ -295,6 +320,14 @@ export const FilterTable = ({
                       </td>
                     )}
                       {title === "Contract Expiry Review" && (
+                        <td
+                          className="underline text-center border-[#CECECE] p-2 cursor-pointer text-[blue]"
+                          onClick={() => handleViewDetails(row)}
+                        >
+                          View Details
+                        </td>
+                      )}
+                      {title === "Contract Expiry Form Update" && (
                         <td
                           className="underline text-center border-[#CECECE] p-2 cursor-pointer text-[blue]"
                           onClick={() => handleViewDetails(row)}
@@ -325,7 +358,6 @@ export const FilterTable = ({
                 <FaArrowLeft className="text-[16px]" />
                 <span>Previous</span>
               </button>
-
               {/* Pagination Buttons */}
               {getDisplayedPages().map((page) => (
                 <button
@@ -340,7 +372,6 @@ export const FilterTable = ({
                   {page}
                 </button>
               ))}
-
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}

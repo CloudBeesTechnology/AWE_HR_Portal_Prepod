@@ -10,9 +10,10 @@ import "../../../src/index.css";
 import { useNavigate } from "react-router-dom";
 
 import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
-import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
+
 import { useTempID } from "../../utils/TempIDContext";
 import { ViewTimeSheet } from "./ViewTimeSheet";
+import { Pagination } from "./timeSheetSearch/Pagination";
 
 export const VTimeSheetTable = (
   {
@@ -24,11 +25,12 @@ export const VTimeSheetTable = (
 ) => {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
-  const [tableData, setTableData] = useState(null);
+  // const [tableData, setTableData] = useState(null);
   const [data, setData] = useState(null);
-  const [secondaryData, setSecondaryData] = useState(null);
+  const [secondaryData, setSecondaryData] = useState([]);
 
-  const [categoryFilters, setCategoryFilters] = useState(null);
+  // const [categoryFilters, setCategoryFilters] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const savedData = localStorage.getItem("timeSheetData");
   // console.log(savedData)
   const {
@@ -37,6 +39,10 @@ export const VTimeSheetTable = (
     startDate,
     endDate,
     searchQuery,
+    setCategoryFilters,
+    categoryFilters,
+    setTableData,
+    tableData,
   } = useTempID();
   const nav = useNavigate();
   // console.log(typeof savedData === "object", Array.isArray(savedData));
@@ -49,10 +55,7 @@ export const VTimeSheetTable = (
         currentPath === "/viewTsheetDetails" ||
         currentPath === "/viewTsheetDetails/"
       ) {
-        // window.history.replaceState(null, "", "/viewTimesheet"); // Replace URL in history
         nav("/viewTimesheet");
-        // window.location.href = "/viewTimesheet";
-        // window.location.reload(); // Reload to apply changes
       }
     }
   }, []);
@@ -65,130 +68,55 @@ export const VTimeSheetTable = (
   }, [timeSheetFileData]);
 
   const AllFieldData = useTableFieldData(categoryFilters);
-  console.log(AllFieldData);
 
-  // const { startDate, endDate, searchQuery } = useOutletContext();
+  const safeData = data || [];
+  const itemsPerPage = 10;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentData = safeData.slice(indexOfFirstItem, indexOfLastItem);
 
-  // const convertStringToObject = (fetchedData) => {
-  //   const processedData = fetchedData.map((item) => {
-  //     const rawSheet = item.dailySheet;
-  //     if (Array.isArray(rawSheet) && rawSheet.length > 0) {
-  //       const rawData = rawSheet[0];
-  //       const id = item.id;
-  //       const Status = item.status;
+  const totalPages = Math.ceil(safeData.length / itemsPerPage);
 
-  //       try {
-  //         const cleanedData = rawData
-  //           .replace(/^"|\s*'|\s*"$|\\'/g, "")
-  //           .replace(/\\"/g, '"')
-  //           .replace(/\\n/g, "")
-  //           .replace(/\\\//g, "/");
-  //         const arrayOfObjects = JSON.parse(cleanedData);
-  //         const dataWithStatus = arrayOfObjects.map((obj) => ({
-  //           ...obj,
-  //           status: Status,
-  //         }));
-  //         return [{ id: id }, dataWithStatus];
-  //       } catch (error) {
-  //         console.error("Error parsing JSON:", error);
-  //         return null;
-  //       }
-  //     }
-  //     return null;
-  //   });
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  let visibleData = currentData;
 
-  //   const addProKey = processedData
-  //     .map((value) => ({
-  //       id: value[0]?.id,
-  //       data: value[1]?.filter(Boolean),
-  //     }))
-  //     .filter((item) => item.data?.length > 0);
-  //   setData(addProKey);
-  //   setSecondaryData(addProKey);
-
-  // };
-
-  const { handleScroll, visibleData, setVisibleData } = UseScrollableView(
-    data,
-    "TimeKeeper"
-  );
-
-  // useEffect(() => {
-  //   if (!secondaryData || secondaryData.length === 0) return;
-  //   // if (secondaryData && secondaryData.length > 0) {
-  //   let filteredData = [...secondaryData];
-
-  //   if (searchQuery) {
-  //     filteredData = searchQuery.filter((fil) => fil);
-  //   }
-
-  //   if (!startDate && !endDate) {
-  //     setData(filteredData);
-  //   } else if (startDate && endDate) {
-  //     const start = new Date(startDate).toLocaleDateString().toString();
-  //     const end = new Date(endDate).toLocaleDateString().toString();
-
-  //     filteredData = filteredData.filter((val) => {
-  //       const itemDate = new Date(val.date).toLocaleDateString().toString();
-  //       return itemDate >= start && itemDate <= end;
-  //     });
-  //     console.log(filteredData);
-  //     if (!filteredData[0]) {
-  //       setVisibleData([]);
-  //     } else {
-  //       setData(filteredData);
-  //     }
-  //   }
-
-  //   // }
-  //   setLoading(false);
-  // }, [secondaryData, startDate, endDate, searchQuery]);
-
-  // console.log(fileData)
-
-  console.log(secondaryData);
   useEffect(() => {
-    if (!secondaryData || secondaryData.length === 0) {
-      setData([]);
-      setVisibleData([]);
+    if (secondaryData && secondaryData.length > 0) {
+      setCurrentPage(1);
+
       setLoading(false);
-      setMessage("No matching results found.");
-      return;
+
+      let filteredData = [...secondaryData];
+
+      // Filter by search query
+      if (searchQuery) {
+        filteredData = searchQuery;
+      }
+
+      if (startDate && endDate) {
+        const start = new Date(startDate); // Start date as "MM/DD/YYYY"
+        const end = new Date(endDate); // End date as "MM/DD/YYYY"
+
+        // Filter the data array
+        filteredData = filteredData.filter((item) => {
+          const itemDate = new Date(item.date); // Convert item.DATE to a Date object
+          itemDate?.setHours(0, 0, 0, 0);
+          start?.setHours(0, 0, 0, 0);
+          end?.setHours(0, 0, 0, 0);
+          return itemDate >= start && itemDate <= end;
+        });
+      }
+
+      // Final filtered data handling
+      setData(filteredData);
+
+      setLoading(false);
     }
-
-    let filteredData = [...secondaryData];
-
-    // Filter by search query
-    if (searchQuery) {
-      filteredData = searchQuery;
-
-      setVisibleData(filteredData);
-    }
-
-    // Filter by date range
-    if (startDate && endDate) {
-      console.log(startDate && endDate);
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-
-      filteredData = filteredData.filter((item) => {
-        const itemDate = new Date(item.date.split("/").reverse().join("-")); // Converts '18/10/2024' to '2024-10-18'
-        return itemDate >= start && itemDate <= end;
-      });
-    }
-
-    // Final filtered data handling
-    setData(filteredData);
-    setVisibleData(filteredData.length > 0 ? filteredData : []);
-    setLoading(false);
   }, [secondaryData, startDate, endDate, searchQuery]);
 
   useEffect(() => {
     if (!timeSheetFileData) return;
     if (timeSheetFileData) {
-      setData(null);
-      setSecondaryData(null);
-      setVisibleData([]);
       setData(timeSheetFileData?.updatedAt);
       setSecondaryData(timeSheetFileData?.updatedAt);
       // setData(fileData?.updatedAt);
@@ -212,22 +140,15 @@ export const VTimeSheetTable = (
   }, [data]);
 
   return (
-    // <section className={`${showListTimeSheet ? "hidden" : "h-screen bg-[#fafaf6]"}`}>
-    <section className="h-screen bg-[#fafaf6]">
-      {/* <article
-        className={`flex justify-center text_size_5  text-dark_grey ${
-          loading && "pt-6"
-        }`}
-      >
-        {loading && <p>Please wait few seconds...</p>}
-      </article> */}
+    <section className="h-screen bg-[#fafaf6] ">
+      {/* <header className="flex justify-between"> */}
+
       <ViewTimeSheet />
-      <div className="screen-size">
-        <div className="table-container" onScroll={handleScroll}>
-          {/* <div className="mt-9  max-h-[500px] table-wrp block overflow-x-scroll border-2 border-lite_grey"> */}
-          {/* w-[1190px] */}
-          {/* <table className="styled-table text-center w-full rounded-md overflow-hidden shadow-md overflow-y-auto"> */}
-          <table className="styled-table w-[100%]">
+
+      {/* </header> */}
+      <div className="screen-size top-0 ">
+        <div className="table-container ">
+          <table className="styled-table  w-[100%]">
             <thead className="sticky-header">
               <tr className="text_size_7">
                 {categoryFilters !== "HO" && (
@@ -289,15 +210,15 @@ export const VTimeSheetTable = (
         </div>
       </div>
       {/* </div> */}
-      <div className="flex justify-center p-7">
-        <button
-          className="rounded px-3 py-2 bg-[#FEF116] text_size_5 text-dark_grey"
-          onClick={() => {
-            ExportTableToExcel(categoryFilters || "TimeSheet", tableData);
-          }}
-        >
-          Download
-        </button>
+
+      <div className="flex justify-center py-7">
+        {visibleData.length > 0 && (
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            paginate={paginate}
+          />
+        )}
       </div>
     </section>
   );

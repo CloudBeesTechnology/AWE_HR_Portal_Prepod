@@ -304,47 +304,76 @@ const PersonalDetailsView = ({
 
   // Updated rendering for personal details to handle arrays
   const renderDetails = (details) => {
-    return (
-      <div className="grid grid-cols-3 gap-y-4 items-center font-semibold text-sm">
-        {Object.entries(details).map(([key, value], index) => (
-
-          <React.Fragment key={index}>
-            <span className="text-dark_grey">{key}</span>
-            <span className="text-center text-gray-700">:</span>
-            <span className="text-dark_grey">
-              {
-                Array.isArray(value)
-                  ? value.some((v) => v !== null) // Check if the array has any non-null values
-                    ? value
-                        .filter((v) => v !== null) // Remove null values from the array
-                        .slice(-1) // Get the last element
-                        .concat(value.slice(0, -1))
-                        .map((item, idx, arr) => (
-                          <span key={idx}>
-                            <span
-                              className={`${
-                                arr.length > 1 && idx === 0
-                                  ? "rounded-md text-primary"
-                                  : "" // Only highlight the latest value if there are multiple values
-                              }`}
-                            >
-                              {item}
-                            </span>
-                            {idx < value.length - 1 && <span>,&nbsp;</span>}
-                            {/* Add a comma except for the last item */}
-                          </span>
-                        ))
-                    : "N/A" // Show "N/A" if the array only contains null or is empty
-                  : value !== null && value !== undefined && value !== ""
-                  ? value
-                  : "N/A" // Show "N/A" for null or undefined non-array values
-              }
-            </span>
-          </React.Fragment>
-        ))}
-      </div>
-    );
-  };
+     const capitalizeWords = (str) => {
+       if (!str || str === "N/A") {
+         return "N/A"; // Return "N/A" for null, undefined, or "N/A"
+       }
+   
+       return str
+         .split(' ') // Split by space if it's multi-word
+         .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+         .join(' '); // Rejoin the words
+     };
+   
+     return (
+       <div className="grid grid-cols-3 gap-y-4 items-center font-semibold text-sm">
+         {Object.entries(details).map(([key, value], index) => (
+           <React.Fragment key={index}>
+             <span className="text-dark_grey">{key}</span>
+             <span className="text-center text-gray-700">:</span>
+             <span className="text-dark_grey">
+               {
+                 Array.isArray(value)
+                   ? value.length > 0 // Check if array is not empty
+                     ? value
+                         .map((v, idx, arr) => {
+                           // Replace null, undefined, or empty string with "N/A"
+                           if (v === null || v === undefined || v === '') {
+                             return "N/A"; // Replace with "N/A"
+                           }
+                           // Remove consecutive duplicates, case-insensitive
+                           return v.toLowerCase() === arr[idx - 1]?.toLowerCase() ? null : v;
+                         })
+                         .filter((v, idx, arr) => v !== null) // Remove null values (duplicates and N/A's)
+                         .reduce((acc, item) => {
+                           // Consolidate consecutive "N/A"s into a single one
+                           if (item === "N/A" && acc[acc.length - 1] !== "N/A") {
+                             acc.push("N/A");
+                           } else if (item !== "N/A") {
+                             acc.push(item);
+                           }
+                           return acc;
+                         }, [])
+                         .reverse() // Reverse the order to move the latest value to the front
+                         .map((item, idx, arr) => {
+                           // Ensure the latest value is first
+                           return (
+                             <span key={idx}>
+                               <span
+                                  className={`${
+                                   arr.length > 1 && idx === 0
+                                     ? "rounded-md text-primary"
+                                     : "" // Only highlight the latest value if there are multiple values
+                                 }`}
+                               >
+                                 {capitalizeWords(item)} {/* Capitalize the words */}
+                               </span>
+                               {idx < arr.length - 1 && <span>,&nbsp;</span>} {/* Add a comma except for the last item */}
+                             </span>
+                           );
+                         })
+                     : "N/A" // Show "N/A" if the array is empty or contains only null/empty values
+                   : value === null || value === undefined || value === ''
+                   ? "N/A" // Show "N/A" if the value is null, undefined, or empty string
+                   : capitalizeWords(value) // Capitalize the value if not an array
+               }
+             </span>
+           </React.Fragment>
+         ))}
+       </div>
+     );
+   };
+   
 
   return (
     <section ref={mainRef} className="page py-8 px-10 bg-gray-50 rounded-lg">
@@ -381,9 +410,9 @@ const PersonalDetailsView = ({
 
       <div className="mt-8">
         <h6 className="uppercase text_size_5  my-3">Uploaded Documents:</h6>
-        {renderDocumentCategory([myIcUpload], "Brunei IC")}
+        {renderDocumentCategory([bwnUpload], "Brunei IC")}
 
-        {renderDocumentCategory([bwnUpload], "Malaysian IC")}
+        {renderDocumentCategory([myIcUpload], "Malaysian IC")}
 
         {renderDocumentCategory([ppUpload], "Passport Copy")}
 

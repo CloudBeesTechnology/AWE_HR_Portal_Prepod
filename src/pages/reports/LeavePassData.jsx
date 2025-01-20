@@ -62,7 +62,7 @@ export const LeavePassData = () => {
         empID:item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
         name: item.name || "-",
-        doj: formatDate(item.doj),
+        dateOfJoin: formatDate(item.doj),
         nationality: item.nationality || "-",
         position: item.position || "-",
         department: item.department || "-",
@@ -103,7 +103,7 @@ export const LeavePassData = () => {
       empID:item.empID || "-",
       empBadgeNo: item.empBadgeNo || "-",
       name: item.name || "-",
-      doj: formatDate(item.doj),
+      dateOfJoin: formatDate(item.doj),
       nationality: item.nationality || "-",
       position: item.position || "-",
       department: item.department || "-",
@@ -121,6 +121,8 @@ export const LeavePassData = () => {
          tableBody={filteredData.length ? filteredData : tableBody}
          tableHead={tableHead}
          title={title}
+         startDate={startDate}
+         endDate={endDate}
          handleDate={handleDate}
       />
     </div>

@@ -1,97 +1,110 @@
-
-import { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useContext } from "react";
 import { DataSupply } from "../../utils/DataStoredContext";
 
+// Function to parse date strings into Date objects
+const parseDate = (date) => {
+  if (!date) return null; // Return null for invalid date
+  // Handle DD/MM/YYYY format
+  const dateParts = date.split("/");
+  if (dateParts.length === 3) {
+    const day = dateParts[0];
+    const month = dateParts[1] - 1; // Month is 0-indexed in JavaScript Date
+    const year = dateParts[2];
+    const parsedDate = new Date(year, month, day); // Return Date object
+    return isNaN(parsedDate.getTime()) ? null : parsedDate; // Return null if invalid
+  }
+  // Fallback to standard Date parsing (ISO format, YYYY-MM-DD)
+  const parsedDate = new Date(date);
+  return isNaN(parsedDate.getTime()) ? null : parsedDate; // Return null if invalid
+};
+
 export const Round = () => {
-  const { empPIData, IDData ,hiringData} = useContext(DataSupply);
-// console.log(hiringData);
+  const { hiringData, empPDData } = useContext(DataSupply);
+  // console.log(hiringData);
 
-  const [mergeData, setMergeData] = useState([]);
-  const [bruneianCount, setBruneianCount] = useState(0);
-  const [totalCount, setTotalCount] = useState(0);
-  const [LPACount, setLPACount] = useState(0);
-  const [SAWPCount, setSAWPCount] = useState(0);
-  
-  const calculateCounts = () => {
-    try {
-      const candidates = [...empPIData, ...IDData];
+  const validData = hiringData?.filter((item) => {
+    const currentDate = new Date(); // Current date
+    const expiryDate = parseDate(item.expiryDate); // Parsing expiryDate as a Date object
+    // If expiryDate is invalid (null), skip this item
+    if (!expiryDate) return false;
+    // Check if expiryDate is today or in the future
+    const isToday =
+      expiryDate?.getDate() === currentDate?.getDate() &&
+      expiryDate?.getMonth() === currentDate?.getMonth() &&
+      expiryDate?.getFullYear() === currentDate?.getFullYear();
 
-      setMergeData(candidates);
-    
-      const bruneian = candidates.filter(
-        (item) => Array.isArray(item.contractType) && item.contractType.includes("Local")
-      ).length;
-      setBruneianCount(bruneian);
+    return expiryDate > currentDate || isToday; // Include items expiring today or in the future
+  });
 
-      // Calculate LPA count
-      const LPA = candidates.filter(
-        (item) => Array.isArray(item.contractType) && item.contractType.includes("LPA")
-      ).length;
-      setLPACount(LPA);
-
-      // Calculate SAWP count
-      const SAWP = candidates.filter(
-        (item) => Array.isArray(item.contractType) && item.contractType.includes("SAWP")
-      ).length;
-      setSAWPCount(SAWP);
-
-      // Total count
-      // setTotalCount(bruneian + LPA + SAWP);
-    } catch (err) {
-      // console.error("Error calculating counts:", err.message);
-    }
-  };
-
-  useEffect(() => {
-    calculateCounts();
-  }, []);
+  // Sort by createdAt (descending) and get the last 4 entries
+  const latestData = validData
+    ?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 4);
 
   return (
-    <div className="flex justify-center h-full p-2 w-full">
-    <div className="rounded-lg shadow-md w-full ">
-      <div className=" font-semibold p-3">
-        <h2 className=" mx-2">Application Received</h2>
+    <div className="flex justify-center h-full flex-col p-2 w-full">
+      <div className="bg-lite_grey rounded-t-2xl font-semibold p-3">
+        <h2 className="mx-2">Application Received</h2>
       </div>
-       
-       <div className=" h-full flex flex-col  items-center gap-16 mt-5 p-1">
-       <div className="w-full flex justify-evenly items-center gap-2">
-       <div className="rounded-lg shadow-lg flex items-center h-[140px] w-[180px] border border-lite_grey">
-            <div className="w-2 h-32  rounded-md bg-[#6E349E]"></div>
-            <div className="w-full flex justify-center items-center flex-col m-1">
-              <p className="text-sm font-medium">Marker Fitter</p>
-              <h1 className="text-3xl font-bold">{totalCount}</h1>
-            </div>   
-            </div>  
+      <div className="rounded-lg shadow-md w-full center h-full">
+        <div className="flex flex-col items-center justify-center p-1">
+          <div className="w-full flex flex-wrap justify-evenly items-center custom-gap gap-3">
+            {latestData?.some(
+              (item) => parseDate(item.expiryDate) >= new Date()
+            ) ? (
+              latestData.map((item, index) => {
+                // Parse start and expiry dates
+                const startDate = parseDate(item.startDate);
+                const expiryDate = parseDate(item.expiryDate);
 
-        <div className="rounded-lg shadow-lg flex items-center justify-between h-[140px] w-[180px] border border-lite_grey">
-            <div className="w-2 h-32  rounded-md bg-[#F1A924]"></div>
-            <div  className="w-full flex justify-center items-center flex-col m-1">
-              <p className="text-sm font-medium">Welder</p>
-              <h1 className="text-3xl font-bold">{LPACount}</h1>
-            </div>
+                // Check if the job post is expired
+                if (expiryDate < new Date()) return null;
+
+                // Count matching positions in empPDData
+                const positionCount = empPDData?.filter((emp) => {
+                  const empCreatedAt = new Date(emp.createdAt);
+                  return (
+                    emp.position === item.jobTitle && // Matching jobTitle
+                    empCreatedAt >= startDate &&
+                    empCreatedAt <= expiryDate // CreatedAt is within the date range
+                  );
+                }).length;
+
+                return (
+                  <div
+                    key={index}
+                    className="rounded-lg shadow-lg flex items-center border h-[120px] w-[150px] border-lite_grey"
+                  >
+                    {/* Vertical bar for color */}
+                    <div
+                      className={`w-2 h-28 rounded-md ${
+                        index === 0
+                          ? "bg-[#6E349E]"
+                          : index === 1
+                          ? "bg-[#F1A924]"
+                          : index === 2
+                          ? "bg-[#E61A1A]"
+                          : "bg-[#17C900]"
+                      }`}
+                    ></div>
+                    <div className="w-full flex justify-center items-center flex-col m-1">
+                      {/* Job Title */}
+                      <p className="text-sm font-medium">{item.jobTitle}</p>
+                      {/* Count of matching positions */}
+                      <p className="text-lg mt-2">{positionCount}</p>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="flex justify-center items-center w-full h-full">
+                <p className="text-dark_grey text-lg ">
+                  No Hiring Job Posts Available
+                </p>
+              </div>
+            )}
           </div>
-       </div>
-
-         <div className="w-full flex justify-evenly items-center gap-2 ">
-         <div className="rounded-lg shadow-lg flex items-center h-[140px] w-[180px] border border-lite_grey">
-         <div className="w-2 h-32 rounded-md bg-[#E61A1A]"></div>
-            <div className="w-full  flex justify-center items-center flex-col m-1">
-              <p className="text-sm font-medium">Blasting/Painter</p>
-              <h1 className="text-3xl font-bold">{totalCount}</h1>
-            </div>     
         </div>
-
-        <div className="rounded-lg shadow-lg flex items-center justify-between h-[140px] w-[180px] border border-lite_grey ">
-        <div className="w-2 h-32 rounded-md bg-[#17C900] "></div>
-            <div  className="w-full flex justify-center items-center flex-col m-1">
-              <p className="text-sm font-medium">Trainer</p>
-              <h1 className="text-3xl font-bold">{LPACount}</h1>
-            </div>
-          </div>
-         </div>
-       </div>
-       
       </div>
     </div>
   );

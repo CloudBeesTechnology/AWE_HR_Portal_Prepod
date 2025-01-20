@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { useTempID } from "../../../utils/TempIDContext";
 import { ViewSummaryFilterData } from "./ViewSummaryFilterData";
 import { downloadPDF } from "../../../utils/DownloadPDF";
+// import tableLogo from "../../../assets/logo/aweLogo.png";
 
 export const ViewSummaryTable = ({
   dayCounts,
@@ -18,9 +19,11 @@ export const ViewSummaryTable = ({
   resetTableFunc,
   toggleEditViewSummaryFunc,
   editViewSummaryObject,
+
   // setEmptyTableMess
 }) => {
-  const { selectedLocation, getStartDate, startDate, endDate } = useTempID();
+  const { selectedLocation, getStartDate, getEndDate, startDate, endDate } =
+    useTempID();
 
   function calculateTotalWorkingHours(data) {
     let totalHours = 0;
@@ -59,6 +62,30 @@ export const ViewSummaryTable = ({
     }
   }
 
+  // Calculate Total Absence
+  function calculateTotalAbsence(inputData, getLastIndexOfNWhrs) {
+    try {
+      let totalAbsence = 0;
+
+      for (let date in inputData) {
+        const value = inputData[date];
+
+        if (value?.startsWith("x(")) {
+          // Extract the number inside x()
+          const absenceMatch = value?.match(/x\(([\d.]+)\)/);
+          if (absenceMatch) {
+            totalAbsence += parseFloat(absenceMatch[1]);
+          }
+        } else if (value === "A") {
+          totalAbsence += parseFloat(getLastIndexOfNWhrs); // Add 8 for each "A"
+        }
+      }
+
+      return totalAbsence;
+    } catch (err) {
+      console.log(err);
+    }
+  }
   const handlePrint = () => {
     // Get the table by its ID
     const table = document.getElementById("downloadTable");
@@ -68,32 +95,57 @@ export const ViewSummaryTable = ({
       return;
     }
 
-    // Open a new window for printing
-    const printWindow = window.open("", "", "height=600,width=800");
+    // Create a hidden iframe
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "absolute";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "none";
 
-    // Write the HTML and CSS styles for the table and page
-    printWindow.document.write("<html><head><title>Print Table</title>");
-    printWindow.document.write("<style>");
+    // Append the iframe to the document body
+    document.body.appendChild(iframe);
 
-    // Add custom styles for table borders and other formatting
-    printWindow.document.write(`
+    // Write content to the iframe
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    iframeDoc.open();
+    iframeDoc.write("<html><head><title>Print Table</title>");
+    iframeDoc.write("<style>");
+
+    // Add custom styles for the table, logo, and text content
+    iframeDoc.write(`
       body { font-family: Arial, sans-serif; margin: 20px; }
+      .content { margin-bottom: 20px; }
+      .logo { max-width: 100px; margin-bottom: 10px; }
       table { width: 100%; border-collapse: collapse; }
       th, td { padding: 8px; text-align: left; border: 1px solid black; }
       th { background-color: #f2f2f2; }
     `);
 
-    printWindow.document.write("</style>");
-    printWindow.document.write("</head><body>");
+    iframeDoc.write("</style>");
+    iframeDoc.write("</head><body>");
 
-    // Append the table content into the new window's body
-    printWindow.document.body.appendChild(table.cloneNode(true)); // Clone the table to avoid affecting the original
+    // Add logo and text content
+    iframeDoc.write(`
+      <div class="content">
+        <img src="assets/logo/aweLogo.png" class="logo" alt="Logo"> <!-- Replace with your logo path -->
+        <h2>Printed Table Report</h2>
+        <p>This is the report containing the table data. You can add any other descriptive text as needed.</p>
+      </div>
+    `);
 
-    printWindow.document.write("</body></html>");
-    printWindow.document.close(); // Close the document to finish writing content
+    // Append the table content into the iframe's body
+    iframeDoc.body.appendChild(table.cloneNode(true)); // Clone the table to avoid affecting the original
+    iframeDoc.write("</body></html>");
+    iframeDoc.close();
 
-    // Trigger the print dialog
-    printWindow.print();
+    // Trigger the print dialog in the iframe
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+
+    // Remove the iframe after printing
+    setTimeout(() => {
+      document.body.removeChild(iframe);
+    }, 1000);
   };
 
   return (
@@ -101,7 +153,14 @@ export const ViewSummaryTable = ({
       <div className="screen-size p-4">
         <header className="my-5 flex justify-between">
           <div className="flex items-center ">
-            <Link to="/timeSheet" className="text-xl flex-1 text-grey">
+            <Link
+              to="/timeSheet"
+              className="text-xl flex-1 text-grey"
+              onClick={() => {
+                getStartDate(null);
+                getEndDate(null);
+              }}
+            >
               <FaArrowLeft />
             </Link>
           </div>
@@ -137,7 +196,7 @@ export const ViewSummaryTable = ({
                   Employee Name
                 </th>
                 <th className="border px-2 py-2 border-dark_grey" rowSpan="2">
-                  Project
+                  PROJECT
                 </th>
 
                 {Array.from({ length: dayCounts }, (_, i) => {
@@ -162,6 +221,9 @@ export const ViewSummaryTable = ({
                 <th className="border  px-2 py-2 border-dark_grey">A</th>
                 <th className="border  px-2 py-2 border-dark_grey">UAL</th>
                 <th className="border  px-2 py-2 border-dark_grey">OT</th>
+                <th className="border  px-2 py-2 border-dark_grey">
+                  MEAL ALLOW
+                </th>
                 <th className="border  px-2 py-2 border-dark_grey">Verified</th>
                 <th className="border  px-2 py-2 border-dark_grey">Updater</th>
               </tr>
@@ -178,11 +240,13 @@ export const ViewSummaryTable = ({
                   //   0
                   // );
                   // const NormalDays = normalWorkHours.length;
-
+                  console.log(employee);
+                  //Calculate Total OT
                   const totalOT = Object.values(
                     employee?.OVERTIMEHRS || {}
                   ).reduce((acc, ot) => acc + parseInt(ot || 0), 0);
 
+                  // Calculate Total NH(Normal working Hrs)
                   const getTotalHours =
                     calculateTotalWorkingHours(employee?.workingHrs) || 0;
                   const roundedNumberOfTotalHours = Number(
@@ -190,10 +254,65 @@ export const ViewSummaryTable = ({
                   );
                   const totalHours = roundedNumberOfTotalHours;
 
+                  const getLastIndexOfNWhrs =
+                    employee?.workHrs && employee?.workHrs?.length > 0
+                      ? employee?.workHrs[employee?.workHrs?.length - 1]
+                      : "";
+                  // Calculate Total ND(Normal Day)
                   const getNormalDays =
-                    totalHours / parseFloat(employee?.workHrs) || 0;
+                    totalHours / parseFloat(getLastIndexOfNWhrs) || 0;
                   const roundedNumber = Number(getNormalDays.toFixed(2));
                   const NormalDays = roundedNumber;
+
+                  // Calculate Total Absence
+                  const totalAbsence = calculateTotalAbsence(
+                    employee?.workingHrs,
+                    getLastIndexOfNWhrs
+                  );
+                  const totalAbsentiesHrs =
+                    totalAbsence / parseFloat(getLastIndexOfNWhrs) || 0;
+                  const roundedTotalAbsentiesHrs = Number(
+                    totalAbsentiesHrs.toFixed(2)
+                  );
+                  // Check all hours verified
+                  const checkVerifiedAll = Array.from(
+                    { length: dayCounts },
+                    (_, i) => {
+                      const currentDay = new Date(getStartDate);
+                      currentDay.setDate(getStartDate.getDate() + i); // Increment the date
+
+                      // Format the date as "day-month-year"
+                      const formattedDate = `${currentDay.getDate()}-${
+                        currentDay.getMonth() + 1
+                      }-${currentDay.getFullYear()}`;
+
+                      // Get the verification status for the current date
+                      const isVerified =
+                        employee?.getVerify?.[formattedDate] || "";
+
+                      // Check if the day is a special day
+                      const isSpecialDay = ["PH", "PHD", "OFF"].includes(
+                        employee?.workingHrs?.[formattedDate]
+                      );
+
+                      // Determine the final value based on conditions
+                      const finalValue = isSpecialDay
+                        ? "Yes"
+                        : isVerified || null;
+
+                      return {
+                        date: formattedDate,
+                        value: finalValue,
+                      };
+                    }
+                  ).reduce((acc, { date, value }) => {
+                    acc[date] = value;
+                    return acc;
+                  }, {});
+
+                  const allFieldsYes = Object.values(checkVerifiedAll).every(
+                    (value) => value === "Yes"
+                  );
 
                   return (
                     <React.Fragment key={index}>
@@ -211,8 +330,8 @@ export const ViewSummaryTable = ({
                           </span>
                           <br />
                           <span>{`Hours/Day : ${
-                            employee.workHrs && employee.workHrs.length > 0
-                              ? employee.workHrs
+                            employee?.workHrs && employee?.workHrs.length > 0
+                              ? employee?.workHrs[employee?.workHrs?.length - 1]
                               : ""
                           }  `}</span>
                           <span>{`Days/Month : ${
@@ -252,6 +371,7 @@ export const ViewSummaryTable = ({
                               onClick={() => {
                                 toggleEditViewSummaryFunc();
                                 const empDetails = {
+                                  id: employee?.id,
                                   empName: employee?.name,
                                   sapNo: employee.sapNo,
                                   empBadgeNo: employee?.empBadgeNo,
@@ -261,17 +381,18 @@ export const ViewSummaryTable = ({
                                     employee?.workingHrs?.[currentDayKey],
                                   ot: employee?.OVERTIMEHRS?.[currentDayKey],
                                   workHrs:
-                                    employee.workHrs &&
-                                    employee.workHrs.length > 0
-                                      ? employee.workHrs
+                                    employee?.workHrs &&
+                                    employee?.workHrs.length > 0
+                                      ? employee?.workHrs
                                       : "",
                                   workMonth:
-                                    employee.workMonth &&
-                                    employee.workMonth.length > 0
-                                      ? employee.workMonth
+                                    employee?.workMonth &&
+                                    employee?.workMonth?.length > 0
+                                      ? employee?.workMonth
                                       : "",
 
                                   workingHrsKey: currentDayKey,
+                                  mealAllow: employee?.mealAllow,
                                 };
                                 console.log(empDetails);
                                 editViewSummaryObject(empDetails);
@@ -304,7 +425,7 @@ export const ViewSummaryTable = ({
                           {employee?.hollydayCounts?.OFF || 0}
                         </td>
                         <td className="border px-2 py-1" rowSpan="2">
-                          {employee?.hollydayCounts?.A || 0}
+                          {roundedTotalAbsentiesHrs || 0}
                         </td>
                         <td className="border px-2 py-1" rowSpan="2">
                           {employee?.empLeaveCount?.UAL || 0}
@@ -313,10 +434,14 @@ export const ViewSummaryTable = ({
                           {totalOT || 0}
                         </td>
                         <td className="border px-2 py-1" rowSpan="2">
-                          yes
+                          {employee?.mealAllow || ""}
                         </td>
                         <td className="border px-2 py-1" rowSpan="2">
-                           {employee?.timeKeeper}
+                          {allFieldsYes ? "Yes" : ""}
+                        </td>
+                        {/* {employee} */}
+                        <td className="border px-2 py-1" rowSpan="2">
+                          {employee?.timeKeeper}
                         </td>
                       </tr>
                       <tr>
@@ -345,8 +470,9 @@ export const ViewSummaryTable = ({
                         <td className="border px-2 py-1" colSpan={1}>
                           {" "}
                         </td>
+                        <td></td>
 
-                        {Array.from({ length: dayCounts + 1 }, (_, i) => {
+                        {/* {Array.from({ length: dayCounts + 1 }, (_, i) => {
                           const currentDayIndex = i + 1;
 
                           return (
@@ -363,6 +489,122 @@ export const ViewSummaryTable = ({
                               />
                             </td>
                           );
+                        })} */}
+                        {/* {Array.from({ length: dayCounts }, (_, i) => {
+                          const currentDay = new Date(getStartDate);
+                          currentDay.setDate(getStartDate.getDate() + i); // Increment the date
+                          const formattedDate = `${currentDay.getDate()}-${
+                            currentDay.getMonth() + 1
+                          }-${currentDay.getFullYear()}`;
+
+                          const isVerified =
+                            employee?.getVerify?.[formattedDate];
+                          // console.log(employee?.getVerify);
+                          // const isVerified = employee?.getVerify?.some(
+                          //   (entry) => entry[formattedDate] === "Yes"
+                          // );
+                      
+
+                          const isSpecialDay = ["PH", "PHD", "OFF"].includes(
+                            employee?.workingHrs?.[formattedDate]
+                          );
+
+                          const finalValue = isSpecialDay
+                            ? "Yes"
+                            : isVerified || null;
+                          const EnsureVerifiedWHours = {
+                            date: formattedDate,
+                            value: finalValue,
+                          };
+
+                          console.log(EnsureVerifiedWHours);
+
+                          console.log(isSpecialDay);
+                          const isChecked = isVerified || isSpecialDay;
+
+                       
+                          return (
+                            <td
+                              className="border px-2 py-2 border-dark_grey"
+                              key={currentDay.toDateString()} // Unique key for each column
+                            >
+                              <input
+                                className={`py-10`}
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={() => {}}
+                              />
+                            </td>
+                          );
+                        })} */}
+
+                        {Array.from({ length: dayCounts }, (_, i) => {
+                          const currentDay = new Date(getStartDate);
+                          currentDay.setDate(getStartDate.getDate() + i); // Increment the date
+
+                          // Format the date as "day-month-year"
+                          const formattedDate = `${currentDay.getDate()}-${
+                            currentDay.getMonth() + 1
+                          }-${currentDay.getFullYear()}`;
+
+                          // Get verification status for the current date
+                          const isVerified =
+                            employee?.getVerify?.[formattedDate];
+
+                          // Check if the day is a special day
+                          const isSpecialDay = ["PH", "PHD", "OFF"].includes(
+                            employee?.workingHrs?.[formattedDate]
+                          );
+
+                          // Determine checkbox checked status
+                          const isChecked = Boolean(isVerified || isSpecialDay);
+                          const updatedDateTime =
+                            employee?.assignUpdaterDateTime?.[formattedDate];
+
+                          const options = {
+                            timeZone: "Asia/Brunei",
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                          };
+
+                          let bruneiTime;
+                          if (updatedDateTime) {
+                            bruneiTime = new Intl.DateTimeFormat(
+                              "en-BN",
+                              options
+                            ).format(new Date(updatedDateTime));
+                          }
+                          // weekday: "long",
+
+                          // Return the table cell
+                          return (
+                            <td
+                              className="border px-2 py-2 border-dark_grey"
+                              key={currentDay.toDateString()} // Unique key for each column
+                            >
+                              {isChecked && (
+                                <>
+                                  <input
+                                    className="py-10"
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={() => {
+                                      // Add logic for handling checkbox change
+                                      console.log(
+                                        `Checkbox for ${formattedDate} changed.`
+                                      );
+                                    }}
+                                  />
+                                  <br />
+                                  <span>{bruneiTime || ""}</span>
+                                </>
+                              )}
+                            </td>
+                          );
                         })}
                         {/* ))} */}
                         <td className="border px-2 py-1">{""}</td>
@@ -376,6 +618,7 @@ export const ViewSummaryTable = ({
                         <td className="border px-2 py-1">{""}</td>
                         <td className="border px-2 py-1">{""}</td>
                         <td className="border px-2 py-1">{""}</td>
+                        <td className="border px-2 py-1"></td>
                         <td className="border px-2 py-1"></td>
                         <td className="border px-2 py-1"></td>
                       </tr>
@@ -405,8 +648,8 @@ export const ViewSummaryTable = ({
                           {employee?.hollydayCounts?.PHD || 0}
                         </td>
                         <td className="border px-2 py-1">
-                          {`${employee.empLeaveCount.AL || 0} /
-                               ${employee.empLeaveCount.CL || 0}`}
+                          {`${employee?.empLeaveCount?.AL || 0} /
+                               ${employee?.empLeaveCount?.CL || 0}`}
                         </td>
                         <td className="border px-2 py-1">
                           {employee.empLeaveCount?.SL || 0}
@@ -415,12 +658,13 @@ export const ViewSummaryTable = ({
                           {employee?.hollydayCounts?.OFF || 0}
                         </td>
                         <td className="border px-2 py-1">
-                          {employee?.hollydayCounts?.A || 0}
+                          {roundedTotalAbsentiesHrs || 0}
                         </td>
                         <td className="border px-2 py-1">
                           {employee?.empLeaveCount?.UAL || 0}
                         </td>
                         <td className="border px-2 py-1">{totalOT}</td>
+                        <td className="border px-2 py-1"></td>
                         <td className="border px-2 py-1"></td>
                         <td className="border px-2 py-1"></td>
                       </tr>

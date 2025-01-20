@@ -10,7 +10,7 @@ export const AutoFetchForAssignManager = () => {
   const [data, setData] = useState(null);
   useEffect(() => {
     async function fetchAllData(queryName) {
-      let allData = [];
+      let allData = [];   
       let nextToken = null;
 
       do {
@@ -66,3 +66,4 @@ export const AutoFetchForAssignManager = () => {
   }, []);
   return data;
 };
+

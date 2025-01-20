@@ -116,6 +116,8 @@ export const GroupHSData = () => {
           tableBody={filteredData.length ? filteredData : tableBody}
           tableHead={tableHead}
           title={title}
+          startDate={startDate}
+          endDate={endDate}
           handleDate={handleDate}
       />
     </div>

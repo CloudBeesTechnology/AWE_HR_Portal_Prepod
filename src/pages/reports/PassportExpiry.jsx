@@ -10,8 +10,9 @@ export const PassportExpiry = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [tableHead, setTableHead] = useState([
-    "Name",
+    "Emp ID",
     "Employee Badge",
+    "Name",
     "Nationality",
     "Department",
     "Position",
@@ -50,8 +51,9 @@ export const PassportExpiry = () => {
 
   useEffect(() => {
     const data = filterPassportExpiry(allData).map((item) => ({
-      name: item.name || "-",
+      empID: item.empID || "-",
       empBadgeNo: item.empBadgeNo || "-",
+      name: item.name || "-",
       nationality: item.nationality || "-",
       department: item.department || "-",
       position: item.position || "-",
@@ -84,8 +86,9 @@ export const PassportExpiry = () => {
 
       return true;
     }).map((item) => ({
-      name: item.name || "-",
+      empID: item.empID || "-",
       empBadgeNo: item.empBadgeNo || "-",
+      name: item.name || "-",
       nationality: item.nationality || "-",
       department: item.department || "-",
       position: item.position || "-",
@@ -101,6 +104,8 @@ export const PassportExpiry = () => {
         tableBody={filteredData.length ? filteredData : tableBody}
         tableHead={tableHead}
         title={title}
+        startDate={startDate}
+        endDate={endDate}
         handleDate={handleDate}
       />
     </div>

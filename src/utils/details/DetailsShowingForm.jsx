@@ -12,6 +12,7 @@ import logo from "../../assets/logo/logo-with-name.svg";
 import { useReactToPrint } from "react-to-print";
 import { FaPrint } from "react-icons/fa";
 
+
 export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
   const [activeTab, setActiveTab] = useState(0); // Track active tab
   const [currentPage, setCurrentPage] = useState(1);
@@ -340,12 +341,12 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     pervAnnualLeaveBal,
   } = passingValue;
 
-  console.log(passingValue);
+  // console.log(passingValue);
   
-  
-  console.log(address);
 
-  console.log(insuranceClaims);
+  // console.log(address);
+
+  // console.log(insuranceClaims);
 
   const personalDetails = {
     Name: name,
@@ -396,8 +397,6 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Bank account number": bankAccNo,
   };
 
-  console.log("LOG SAP NO", sapNo);
-
   const employeeDocument = {
     EmpUpDocs: empUpDocs,
   };
@@ -413,20 +412,19 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
   };
 
   const medicalInfo = {
-    "Overseas Medical Fitness issued date": formatDate(overMD), // overseas medical
-    "Overseas Medical Fitness Expiry": formatDate(overME), //overseas expiray
-    //  UploadFitness: uploadFitness,
-    "Date submitted of BruHims Registration": formatDate(bruhimsRD), // registration date
+    "Overseas Medical Fitness issued date": overMD, // overseas medical
+    "Overseas Medical Fitness Expiry": overME, // overseas expiry
+    "Date submitted of BruHims Registration": bruhimsRD, // registration date
     "BruHims Registration Number": bruhimsRNo, // registration no
-    // "BruHims Medical Details": uploadBwn,
-    "Brunei Medical Appointment Date": formatDate(bruneiMAD), // medical appointment date
-    "Brunei Medical Fitness Expiry": formatDate(bruneiME), // medical expiray
-    // "Brunei Medical Details": uploadRegis,
-    // dependPass: dependPass,
+    "Brunei Medical Appointment Date": bruneiMAD, // medical appointment date
+    "Brunei Medical Fitness Expiry": bruneiME, // medical expiry
   };
+  
+  
+// console.log(medicalInfo);
 
-  console.log(bruneiME);
-  console.log(overME);
+//  console.log(medicalInfo);
+ 
 
   const dependenPass = {
     DependPass: dependPass,
@@ -443,14 +441,21 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       formatDate(groupInsEffectDate),
     "Group H&S Insurance Enrollment End Date": formatDate(groupInsEndDate),
     "Workmen Compensation Insurance": empStatusType,
-    "Workmen compensation insurance policy number": workmenCompNo,
+    "Workmen compensation insurance policy number": workmePolicyNo,
     "Personal Accident Insurance": accidentIns,
     "Travelling Insurance": travelIns,
   };
 
+
+  // workmePolicyNo,
+  // workmenComp,
+
   const DependentInsurance = {
     "Dependent Insurance": depInsurance,
   };
+
+
+  
 
   const InsuranceClaim = {
     "Insurance Claim": insuranceClaims,

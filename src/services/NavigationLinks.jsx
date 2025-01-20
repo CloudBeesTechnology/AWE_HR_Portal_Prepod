@@ -77,7 +77,6 @@ import { ListTimeSheet } from "../pages/timeSheet/ListTimeSheet";
 import { VTimeSheetTable } from "../pages/timeSheet/VTimeSheetTable";
 import { RM } from "../pages/reports/RM";
 import { Resignation } from "../pages/reports/Resignation";
-import { TempIDProvider } from "../utils/TempIDContext";
 import { AddEmpReq } from "../pages/training/trainingForm/AddEmpReq";
 import { BlngCertify } from "../pages/training/trainingForm/BlngCertify";
 import { HRSplit } from "../pages/training/trainingForm/HRSplit";
@@ -114,6 +113,9 @@ import { LabourMedicalInfoMD } from "../components/migratingData/LabourMedicalIn
 import { ContractFormPDF } from "../pages/reports/ContractFormPDF";
 import { ProbationPDF } from "../pages/reports/ProbationPDF";
 import { FiLoader } from "react-icons/fi";
+// import ForgotEmail from "../pages/forgotPassword/ForgotEmail";
+// import ForgotOtp from "../pages/forgotPassword/ForgotOtp";
+// import ForgotPassword from "../pages/forgotPassword/ForgotPassword";
 
 const client = generateClient();
 
@@ -221,9 +223,11 @@ const NavigationLinks = () => {
   );
 
   return (
-    <TempIDProvider>
       <Routes>
-        <Route path="/changePassword" element={<ChangePassword />} />
+        {/* <Route path="/changePassword" element={<ChangePassword />} />
+        <Route path="/forgotEmail" element={<ForgotEmail />} />
+        <Route path="/forgotOtp" element={<ForgotOtp />} />
+        <Route path="/forgotPassword" element={<ForgotPassword/>} /> */}
         <Route path="/migrationDataID" element={<IDDetailsMD />} />
         <Route path="/migrationDataEPI" element={<EmpPersonalMD />} />
         <Route path="/migrationDataWorkI" element={<WorkInfoMD />} />
@@ -410,7 +414,6 @@ const NavigationLinks = () => {
           element={<Navigate to={`/${firstCategory?.toLowerCase()}`} />}
         />
       </Routes>
-    </TempIDProvider>
   );
 };
 export default NavigationLinks;

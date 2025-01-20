@@ -1,8 +1,4 @@
 import React, { useContext, useEffect, useState } from "react";
-// import {searchIcon} from "../../assets/recruitment/search.svg";
-import searchIcon from "../../assets/recruitment/search.svg";
-import { useNavigate } from "react-router-dom";
-// import { getEmployeePersonalInfo, listEmployeePersonalDocs, listEmployeePersonalInfos } from '../../graphql/queries';
 import { generateClient } from "@aws-amplify/api";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { DetailsShowingForm } from "../../utils/details/DetailsShowingForm";
@@ -10,7 +6,6 @@ import { Pagination } from "../../pages/leaveManagement/Pagination";
 import { IoSearch } from "react-icons/io5";
 import { Searchbox } from "../../utils/Searchbox";
 import { FiLoader } from "react-icons/fi";
-const client = generateClient();
 
 export const AllEmployee = () => {
   const {
@@ -34,16 +29,15 @@ export const AllEmployee = () => {
     SawpDetails,
     insuranceClaimsData,
   } = useContext(DataSupply);
-  // console.log(depInsuranceData, "DATA dep")
-  const [searchTerm, setSearchTerm] = useState("");
-  const [mergeData, setMergeData] = useState([]); // To store merged data
-  const [filteredData, setFilteredData] = useState([]); // To store filtered data for search
-  const [loading, setLoading] = useState(true); // To track loading state
-  const [error, setError] = useState(null); // To track error state
+ 
+  const [mergeData, setMergeData] = useState([]); 
+  const [filteredData, setFilteredData] = useState([]); 
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [passingValue, setPassingValue] = useState([]);
   const [paginateLoading, setPaginateLoading] = useState(true);
-  const [filteredEmployees, setFilteredEmployees] = useState(mergeData);
+
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,7 +57,7 @@ export const AllEmployee = () => {
       );
       setFilteredData(results);
     } else {
-      setFilteredData(mergeData); // Reset to original data if search query is empty
+      setFilteredData(mergeData); 
     }
   };
 
@@ -168,15 +162,16 @@ export const AllEmployee = () => {
             ...swapMatch,
             ...insClaimMatch,
             ...empPIItem,
+            position:workInfoMatch.position,
           };
         })
-        .filter((item) => item?.empID) // Only include items with a valid empID
+        .filter((item) => item?.empID) 
         .reduce((unique, item) => {
           if (!unique.some((emp) => emp.empID === item.empID)) {
             unique.push(item);
           }
           return unique;
-        }, []); // Initialize with an empty array to store unique items
+        }, []); 
       const sorted = allDataValues.sort((a, b) =>
         a.empID.localeCompare(b.empID)
       );
@@ -215,8 +210,10 @@ export const AllEmployee = () => {
     empPIData,
   ]);
 
+
+  
   const handleFilterChange = (e) => {
-    const selectedStatus = e.target.value.toLowerCase(); // Normalize to lowercase
+    const selectedStatus = e.target.value.toLowerCase(); 
 
     if (selectedStatus === "all") {
       setFilteredData(mergeData);
@@ -298,7 +295,7 @@ export const AllEmployee = () => {
   };
 
   const getStatusClass = (workStatus) => {
-    const normalizedStatus = workStatus?.toLowerCase(); // Normalize to lowercase
+    const normalizedStatus = workStatus?.toLowerCase(); 
 
     return (
       {
@@ -310,7 +307,7 @@ export const AllEmployee = () => {
     );
   };
 
-  console.log(mergeData);
+  // console.log("me",mergeData);
 
   return (
     <section className="bg-[#F5F6F1CC] w-full flex items-center flex-col h-screen pt-14">
@@ -378,7 +375,7 @@ export const AllEmployee = () => {
                     className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
                     onClick={() => {
                       handleFormShow(candidate);
-                      console.log("CANDY_DATA", candidate);
+                      console.log("CANDY_DATA 2.0 all data", candidate);
                     }}
                   >
                     <td className="py-4 px-4">{candidate?.empID || "N/A"}</td>

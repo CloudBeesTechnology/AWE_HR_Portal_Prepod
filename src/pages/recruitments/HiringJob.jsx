@@ -11,7 +11,10 @@ export const HiringJob = () => {
   }, []);
   const { hiringData } = useContext(DataSupply);
   // console.log(hiringData);
-  const latestData = hiringData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  
+  const latestData = hiringData.sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
   const heading = [
     "Job Title",
     "Experience",
@@ -20,11 +23,12 @@ export const HiringJob = () => {
     "Quantity",
     "Start Date",
     "Expiry Date",
+    "Download",
     "Status",
   ];
   const getStatus = (expiryDate) => {
-    if (!expiryDate) {
-      return "Live"; // Default status if expiryDate is not available
+    if (!expiryDate || expiryDate === "N/A") {
+      return "N/A"; // Return "N/A" when expiryDate is not available or explicitly "N/A"
     }
 
     const normalizedDate = expiryDate.replace(/[-/]/g, "-");
@@ -39,8 +43,7 @@ export const HiringJob = () => {
   const getStatusClass = (status) => {
     return status === "Completed" ? "text-[green]" : "text-[#E8A317]";
   };
-  
-  
+
   return (
     <section className="bg-[#F5F6F1CC] mx-auto p-10 min-h-screen ">
       <div className="mb-5 flex justify-between">
@@ -72,6 +75,8 @@ export const HiringJob = () => {
           {latestData && latestData.length > 0 ? (
             latestData.map((val, idx) => {
               const status = getStatus(val?.expiryDate);
+              // console.log(val);
+              
               return (
                 <tr
                   key={idx}
@@ -86,6 +91,11 @@ export const HiringJob = () => {
                   <td className=" pl-4 py-4">{val?.quantityPerson || "N/A"}</td>
                   <td className=" pl-4 py-4">{val?.startDate || "N/A"}</td>
                   <td className=" pl-4 py-4">{val?.expiryDate || "N/A"}</td>
+                  <td className={`pl-4 py-4 ${val?.uploadJobDetails ? "text-[#3c3cc2]" : "text-dark_grey"} `}>
+                    <a href={val?.uploadJobDetails}>
+                      {val?.uploadJobDetails ? "Download" : "N/A"}
+                    </a>{" "}
+                  </td>
                   <td className={` pl-4 py-4 ${getStatusClass(status)}`}>
                     {status}
                   </td>
@@ -101,7 +111,6 @@ export const HiringJob = () => {
           )}
         </tbody>
       </table>
-      
     </section>
   );
 };

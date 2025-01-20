@@ -1,15 +1,14 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FaAngleDown } from "react-icons/fa";
+import { IoMdDownload } from "react-icons/io";
 import { Link } from "react-router-dom";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
 import { FilterForTimeSheet } from "./FilterForTimeSheet";
 import { useFetchData } from "./customTimeSheet/UseFetchData";
-
 import { FaArrowLeft } from "react-icons/fa";
-import { generateClient } from "@aws-amplify/api";
-import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
 import { ListTimeSheet } from "./ListTimeSheet";
 import { useTempID } from "../../utils/TempIDContext";
+import { ExportTableToExcel } from "./customTimeSheet/DownloadTableToExcel";
 
 export const ViewTimeSheet = () => {
   const prevCategoryRef = useRef(null);
@@ -25,13 +24,14 @@ export const ViewTimeSheet = () => {
   const [allExcelSheetData, setAllExcelSheetData] = useState(null);
   const [message, setMessage] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const {
     startDate,
     setStartDate,
     endDate,
     setEndDate,
-    searchQuery,
+
     setSearchQuery,
     showListTimeSheet,
     setShowListTimeSheet,
@@ -39,6 +39,10 @@ export const ViewTimeSheet = () => {
     setTimeSheetFileData,
     categoryFilter,
     setCategoryFilter,
+    categoryFilters,
+    setCategoryFilters,
+    tableData,
+    setTableData,
   } = useTempID();
 
   const { convertedStringToArrayObj } = useFetchData(
@@ -46,43 +50,18 @@ export const ViewTimeSheet = () => {
     "viewTimeSheet"
   );
 
-  const { handleScroll, visibleData, setVisibleData } = UseScrollableView(
-    allExcelSheetData,
-    "TimeKeeper"
-  );
+  let visibleData;
 
-  console.log(allExcelSheetData);
-  console.log(visibleData);
-  // useEffect(() => {
-  //   function groupByUpdatedAt(data) {
-  //     const groupedData = {};
-
-  //     data.forEach((item) => {
-  //       const updatedAtDate = item.updatedAt.split("T")[0];
-  //       const status = item.status.includes("Pending");
-
-  //       if (!groupedData[updatedAtDate]) {
-  //         groupedData[updatedAtDate] = {
-  //           fileName: item.fileName,
-  //           fileType: item.fileType,
-  //           date: updatedAtDate,
-  //           status: status === true ? "Pending" : "Approved",
-  //           updatedAt: [],
-  //         };
-  //       }
-
-  //       groupedData[updatedAtDate].updatedAt.push(item);
-  //     });
-
-  //     return Object.values(groupedData);
-  //   }
-
-  //   const groupedData = groupByUpdatedAt(convertedStringToArrayObj);
-  //   console.log(groupedData);
-  //   setAllExcelSheetData(groupedData);
-  //   setSecondaryData(groupedData);
-  // }, [convertedStringToArrayObj]);
-
+  useEffect(() => {
+    if (categoryFilter) {
+      const result = ["Offshore", "HO", "BLNG", "SBW", "ORMC"].includes(
+        categoryFilter
+      );
+      if (result) {
+        setMessage("Processing your request, Please wait a few seconds...");
+      }
+    }
+  }, [categoryFilter]);
   useEffect(() => {
     function groupByUpdatedAtAndStatus(data) {
       const groupedData = {};
@@ -113,7 +92,7 @@ export const ViewTimeSheet = () => {
     }
 
     const groupedData = groupByUpdatedAtAndStatus(convertedStringToArrayObj);
-    console.log(groupedData);
+
     setAllExcelSheetData(groupedData);
     setSecondaryData(groupedData);
   }, [convertedStringToArrayObj]);
@@ -122,7 +101,7 @@ export const ViewTimeSheet = () => {
 
   useEffect(() => {
     if (!secondaryData || secondaryData.length === 0) return;
-
+    setCurrentPage(1);
     let filteredData = [...secondaryData];
 
     if (selectedCategory !== "All") {
@@ -132,18 +111,22 @@ export const ViewTimeSheet = () => {
     }
 
     if (startDate) {
-      const inputDate = new Date(startDate).toLocaleDateString();
+      const inputDate = new Date(startDate);
+      inputDate?.setHours(0, 0, 0, 0); // Resetting time to midnight
 
       filteredData = filteredData.filter((item) => {
-        const itemDate = new Date(item.date).toLocaleDateString();
-        return itemDate === inputDate;
+        const itemDate = new Date(item.date);
+        itemDate?.setHours(0, 0, 0, 0); // Resetting time to midnight
+
+        // Comparing the dates directly as strings
+        return itemDate.getTime() === inputDate.getTime();
       });
     }
 
     if (filteredData.length > 0) {
       setAllExcelSheetData(filteredData);
     } else {
-      setVisibleData([]);
+      setAllExcelSheetData([]);
       setMessage("No matching results found.");
     }
   }, [secondaryData, startDate, selectedCategory]);
@@ -166,7 +149,6 @@ export const ViewTimeSheet = () => {
 
   const searchResult = (result) => {
     setSearchQuery(result);
-    console.log(result);
   };
 
   const handleForSelectTSheet = (category) => {
@@ -175,8 +157,19 @@ export const ViewTimeSheet = () => {
 
   const newSearchFunction = useCallback((allData) => {
     setData(allData?.updatedAt);
-    console.log(allData);
   }, []);
+
+  const itemsPerPage = 10;
+  const safeData = allExcelSheetData || [];
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentData = safeData.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(safeData.length / itemsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  visibleData = currentData;
 
   return (
     <div
@@ -193,7 +186,9 @@ export const ViewTimeSheet = () => {
       }}
     >
       <div
-        className={`${showListTimeSheet ? "w-[1300px]" : "screen-size"} m-9`}
+        className={`${
+          showListTimeSheet ? "w-[1300px]" : "screen-size"
+        } mt-9 mx-9`}
       >
         <div className="flex items-center w-full">
           <Link
@@ -204,6 +199,8 @@ export const ViewTimeSheet = () => {
               setEndDate("");
               setShowListTimeSheet(true);
               setTimeSheetFileData(null);
+              setCategoryFilters(null);
+              setTableData(null);
             }}
           >
             <FaArrowLeft />
@@ -212,6 +209,17 @@ export const ViewTimeSheet = () => {
           <header className="text_size_2 py-5 flex-grow text-dark_grey text-center">
             <p>View Time Sheet</p>
           </header>
+          {categoryFilters !== null && (
+            <div
+              className="flex space-x-3  items-center rounded px-3 py-2 bg-[#FEF116]"
+              onClick={() => {
+                ExportTableToExcel(categoryFilters || "TimeSheet", tableData);
+              }}
+            >
+              <button className=" text_size_5 text-dark_grey">Download</button>
+              <IoMdDownload className="text-black cursor-pointer" />
+            </div>
+          )}
         </div>
 
         <div className="flex justify-between items-center w-full">
@@ -222,7 +230,7 @@ export const ViewTimeSheet = () => {
               </label>
               <input
                 type="date"
-                value={startDate}
+                value={startDate || ""}
                 className="border border-[#D9D9D9] rounded outline-none p-2 text-[#000000] text-sm"
                 onChange={(e) => setStartDate(e.target.value)}
               />
@@ -232,7 +240,7 @@ export const ViewTimeSheet = () => {
                 <label className="text_size_6">End Date</label>
                 <input
                   type="date"
-                  value={endDate}
+                  value={endDate || ""}
                   className="border border-[#D9D9D9] rounded outline-none p-2 text-[#000000] text-sm"
                   onChange={(e) => setEndDate(e.target.value)}
                 />
@@ -280,7 +288,6 @@ export const ViewTimeSheet = () => {
 
                           setAllExcelSheetData(null);
                           setSecondaryData(null);
-                          setVisibleData([]);
 
                           prevCategoryRef.current = category;
                         }
@@ -333,23 +340,14 @@ export const ViewTimeSheet = () => {
         {showListTimeSheet && (
           <ListTimeSheet
             visibleData={visibleData}
-            setVisibleData={setVisibleData}
             newSearchFunction={newSearchFunction}
             message={message}
+            totalPages={totalPages}
+            currentPage={currentPage}
+            paginate={paginate}
           />
         )}
-
-        {/* <div>
-          <VTimeSheetTable
-            AllFieldData={AllFieldData}
-            categoryFilter={categoryFilter}
-            data={visibleData}
-            handleScroll={handleScroll}
-          />
-        </div> */}
       </div>
     </div>
   );
 };
-// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
