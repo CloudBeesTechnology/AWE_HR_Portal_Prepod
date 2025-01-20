@@ -8,7 +8,7 @@ import { NavigateLM } from "./NavigateLM";
 import { IoSearch } from "react-icons/io5";
 import { capitalizedLetter, DateFormat } from "../../utils/DateFormat";
 import { DataSupply } from "../../utils/DataStoredContext";
-
+import { FiLoader } from "react-icons/fi";
 export const LMTable = () => {
   const {
     handleClickForToggle,
@@ -189,13 +189,14 @@ export const LMTable = () => {
       rowsPerPage
   );
 
-
-
-   if (loading) {
+  if (loading) {
     return (
-      <div>
-        <div className="flex items-center justify-center h-[60vh]">
-          <p className="text-sm font-semibold">Loading...</p>
+      <div className="flex items-center justify-center h-[60vh] bg-transparent">
+        <div className="flex justify-between gap-2">
+          <p className="text-sm font-semibold">Loading </p>
+          <p>
+            <FiLoader className="animate-spin mt-[4px]" size={15} />
+          </p>
         </div>
       </div>
     );
