@@ -21,7 +21,6 @@ export const Reports = () => {
     empPIData,
     LMIData,
     PPValidsData,
-    empPDData,
     IDData,
     workInfoData,
     terminateData,
