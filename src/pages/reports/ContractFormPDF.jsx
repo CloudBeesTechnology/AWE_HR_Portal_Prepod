@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useContext } from "react";
 import "jspdf-autotable"; // Ensure this is imported
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { downloadPDF } from "../../utils/DownloadPDF";
 import { ContractForm } from "../../services/createMethod/CreateContract";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { UpdateContractData } from "../../services/updateMethod/UpdateContractForm";
 import { sendEmail } from "../../services/EmailServices";
+import { FaArrowLeft } from "react-icons/fa";
+import { SpinLogo } from "../../utils/SpinLogo";
 
 export const ContractFormPDF = ({ contentRef }) => {
   const { contractForm } = ContractForm();
@@ -15,7 +17,12 @@ export const ContractFormPDF = ({ contentRef }) => {
   const { employeeData } = location.state || {};
   const [userID, setUserID] = useState("");
   const [userType, setUserType] = useState("");
-  const [isEditing, setIsEditing] = useState(false);
+  const [showTitle, setShowTitle] = useState("");
+  const [notification, setNotification] = useState(false);
+
+  // const [isEditing, setIsEditing] = useState(false);
+
+  // console.log(employeeData, "Hello");
 
   const [managerData, setManagerData] = useState({
     managerEmpID: "",
@@ -23,8 +30,6 @@ export const ContractFormPDF = ({ contentRef }) => {
     hrEmail: "hr_no-reply@adininworks.com",
     genManagerEamil: "",
   });
-
-
 
   const [formData, setFormData] = useState({
     contract: {
@@ -34,14 +39,15 @@ export const ContractFormPDF = ({ contentRef }) => {
       hrManager: "",
       genManager: "",
       remarks: "",
+      status: "",
     },
   });
 
-  console.log(workInfoData, "WF DATA");
+  // console.log(workInfoData, "WF DATA");
 
-  const handleEditClick = () => {
-    setIsEditing(!isEditing);
-  };
+  // const handleEditClick = () => {
+  //   setIsEditing(!isEditing);
+  // };
 
   // console.log("Fetched contract form",contractForms);
 
@@ -88,25 +94,26 @@ export const ContractFormPDF = ({ contentRef }) => {
             }));
           }
         }
-
       }
     }
   }, [workInfoData, employeeData?.empID, empPIData]); // Depend on all the relevant data sources
 
-  console.log("hello world ---- working");
-  
+  // console.log("hello world ---- working");
 
   // Filter workInfoData to find entries where position includes "GENERAL MANAGER"
-const generalManagerPositions = workInfoData.filter(item => item.position.includes("GENERAL MANAGER"));
+  const generalManagerPositions = workInfoData.filter((item) =>
+    item.position.includes("GENERAL MANAGER")
+  );
 
-// Log the count of "GENERAL MANAGER" entries
-console.log("LIST",generalManagerPositions);
+  // Log the count of "GENERAL MANAGER" entries
+  // console.log("LIST",generalManagerPositions);
 
+  const employeeDataT = workInfoData.filter((item) => item.empID === "33333");
 
+  // Log the number of entries with empID === "12345"
+  // console.log(`Found ${employeeDataT.length} entries with empID "33333"`);
 
-// Log the number of entries with empID === "12345"
-
-console.log(managerData);
+  // Log the number of entries with empID === "12345"
 
   useEffect(() => {
     if (contractForms.length > 0) {
@@ -144,6 +151,7 @@ console.log(managerData);
       hrManager: formData.contract.hrManager,
       genManager: formData.contract.genManager,
       remarks: formData.contract.remarks,
+      contStatus: true,
     };
 
     try {
@@ -155,20 +163,29 @@ console.log(managerData);
           hrManager: formData.contract.hrManager,
           genManager: formData.contract.genManager,
           remarks: formData.contract.remarks,
+          contStatus: true,
         };
-        await contractDetails({ ContractValue: formattedData })
+        await contractDetails({ ContractValue: formattedData });
         console.log("Updated Data", formattedData);
-        
-         if (userType === "HR") {
-          sendEmail(subject, message, from, formData.contract.managerOfficialMail, );
-        } 
-       
+        setShowTitle("Contract Form Updated Successfully");
+        setNotification(true);
+
+        if (userType === "HR") {
+          sendEmail(
+            subject,
+            message,
+            from,
+            formData.contract.managerOfficialMail
+          );
+        }
       } else {
         await contractForm(createFormattedData);
         if (userType === "Manager") {
           sendEmail(subject, message, from, to);
-        } 
+        }
         console.log("Create Data", createFormattedData);
+        setShowTitle("Contract Form Updated Successfully");
+        setNotification(true);
       }
     } catch (err) {
       console.log("error", err);
@@ -200,38 +217,25 @@ console.log(managerData);
     >
       <div className="relative">
         {/* Edit Icon or Close Icon */}
-        <button
-          onClick={handleEditClick}
-          id="edit-button"
-          className="absolute top-0 right-0 p-2 border rounded-full"
-        >
-          {isEditing ? (
-            <span className="text-xl">❌</span> // Close icon when editing
-          ) : (
-            <span className="text-xl">✏</span> // Edit icon when not editing
-          )}
-        </button>
 
-        <div className="text-center text-lg font-bold uppercase mb-4">
-          Contract Completion Form for the Month of January 2024
+        <div className="flex items-center">
+          <Link to="/reports" className="text-xl text-start w-[50px] text-grey">
+            <FaArrowLeft />
+          </Link>
+          <div className="text-center text-lg font-bold uppercase  flel-1 w-full">
+            Contract Completion Form for the Month of January 2024
+          </div>
         </div>
 
-        <div className="mb-16 mt-10">
+        <div className="mb-16 mt-16">
           <label className="font-semibold">Attention:</label>
-          {isEditing ? (
-            <input
-              type="text"
-              name="conAttn"
-              value={formData.contract.conAttn}
-              onChange={handleInputChange}
-              className="ml-2 border-b-2 border-black focus:outline-none"
-            />
-          ) : (
-            <span>{formData.contract.conAttn}</span>
-          )}
-          {!isEditing && (
-            <div className="border-b-2 border-black w-52 ml-[9%]"></div>
-          )}
+          <input
+            type="text"
+            name="conAttn"
+            value={formData.contract.conAttn}
+            onChange={handleInputChange}
+            className="ml-2 border-b-2 border-black focus:outline-none"
+          />
         </div>
 
         {/* Table */}
@@ -305,98 +309,77 @@ console.log(managerData);
         {/* Remarks Section */}
         <div className="mt-7">
           <label className="text-sm font-semibold">Remarks:</label>
-          {isEditing ? (
-            <textarea
-              type="text"
-              name="remarks"
-              value={formData.contract.remarks}
-              onChange={handleInputChange}
-              className="border w-full text-sm font-semibold rounded resize-none outline-none"
-            />
-          ) : (
-            <span>{formData.contract.remarks}</span>
-          )}
+          <textarea
+            type="text"
+            name="remarks"
+            value={formData.contract.remarks}
+            onChange={handleInputChange}
+            className="border w-full text-sm font-semibold rounded resize-none outline-none p-2"
+          />
         </div>
 
         {/* Footer */}
         <div className="mt-20 flex justify-between items-center">
           <div className="text-center">
-            <p className="font-semibold mb-10">Recommended By:</p>
-            {isEditing ? (
-              <input
-                type="text"
-                name="depHead"
-                value={formData.contract.depHead}
-                onChange={handleInputChange}
-                className="border-b-2 border-black w-52 mx-auto"
-              />
-            ) : (
-              <span>{formData.contract.depHead}</span>
-            )}
-
-            {!isEditing && (
-              <div className="border-b-2 border-black w-52 mx-auto"></div>
-            )}
+            <p className="font-semibold mb-5">Recommended By:</p>
+            <input
+              type="text"
+              name="depHead"
+              value={formData.contract.depHead}
+              onChange={handleInputChange}
+              className="border-b-2 border-black w-56 mx-auto outline-none text-center"
+            />
 
             <p className="mt-3">Department Head</p>
           </div>
 
           <div className="text-center">
-            <p className="font-semibold mb-10">Acknowledged & Checked By:</p>
-            {isEditing ? (
-              <input
-                type="text"
-                name="hrManager"
-                value={formData.contract.hrManager}
-                onChange={handleInputChange}
-                className="border-b-2 border-black w-52 mx-auto"
-              />
-            ) : (
-              <span>{formData.contract.hrManager}</span>
-            )}
-            {!isEditing && (
-              <div className="border-b-2 border-black w-52 mx-auto"></div>
-            )}
+            <p className="font-semibold mb-5">Acknowledged & Checked By:</p>
+            <input
+              type="text"
+              name="hrManager"
+              value={formData.contract.hrManager}
+              onChange={handleInputChange}
+              className="border-b-2 border-black w-56 mx-auto outline-none text-center"
+            />
+
             <p className="mt-3">HRM</p>
           </div>
           <div className="text-center">
-            <p className="font-semibold mb-10">Approved By:</p>
-            {isEditing ? (
-              <input
-                type="text"
-                name="genManager"
-                value={formData.contract.genManager}
-                onChange={handleInputChange}
-                className="border-b-2 border-black w-52 mx-auto"
-              />
-            ) : (
-              <span>{formData.contract.genManager}</span>
-            )}
-            {!isEditing && (
-              <div className="border-b-2 border-black w-52 mx-auto"></div>
-            )}
+            <p className="font-semibold mb-5">Approved By:</p>
+            <input
+              type="text"
+              name="genManager"
+              value={formData.contract.genManager}
+              onChange={handleInputChange}
+              className="border-b-2 border-black w-56 mx-auto outline-none text-center"
+            />
+
             <p className="mt-3">GM</p>
           </div>
         </div>
 
         {/* Save Button */}
-        {isEditing && (
-          <div className="mt-8 text-center">
-            <button
-              onClick={() => {
-                handleSubmit();
-                setIsEditing(false);
-              }}
-              className="bg-grey text-white px-4 py-2 rounded"
-            >
-              Save
-            </button>
-          </div>
-        )}
+        <div className="mt-8 text-center">
+          <button
+            onClick={() => {
+              handleSubmit();
+            }}
+            className="bg-grey text-white px-4 py-2 rounded"
+          >
+            Save
+          </button>
+        </div>
 
         {/* Download Button */}
-      
       </div>
+      {notification && (
+        <SpinLogo
+          text={showTitle}
+          notification={notification}
+          path="/reports"
+        />
+      )}
     </div>
   );
 };

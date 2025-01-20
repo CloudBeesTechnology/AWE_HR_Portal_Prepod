@@ -1,14 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-import searchIcon from "../../assets/recruitment/search.svg";
-import { useNavigate } from "react-router-dom";
-// import { getEmployeePersonalInfo, listEmployeePersonalDocs, listEmployeePersonalInfos } from '../../graphql/queries';
 import { generateClient } from "@aws-amplify/api";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { DetailsShowingForm } from "../../utils/details/DetailsShowingForm";
 import { Pagination } from "../../pages/leaveManagement/Pagination";
-
+import { IoSearch } from "react-icons/io5";
 import { Searchbox } from "../../utils/Searchbox";
-const client = generateClient();
+import { FiLoader } from "react-icons/fi";
 
 export const AllEmployee = () => {
   const {
@@ -32,15 +29,15 @@ export const AllEmployee = () => {
     SawpDetails,
     insuranceClaimsData,
   } = useContext(DataSupply);
-  // console.log(depInsuranceData, "DATA dep")
-  const [searchTerm, setSearchTerm] = useState("");
-  const [mergeData, setMergeData] = useState([]); // To store merged data
-  const [filteredData, setFilteredData] = useState([]); // To store filtered data for search
-  const [loading, setLoading] = useState(true); // To track loading state
-  const [error, setError] = useState(null); // To track error state
+ 
+  const [mergeData, setMergeData] = useState([]); 
+  const [filteredData, setFilteredData] = useState([]); 
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [passingValue, setPassingValue] = useState([]);
-  const [filteredEmployees, setFilteredEmployees] = useState(mergeData);
+  const [paginateLoading, setPaginateLoading] = useState(true);
+
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -60,7 +57,7 @@ export const AllEmployee = () => {
       );
       setFilteredData(results);
     } else {
-      setFilteredData(mergeData); // Reset to original data if search query is empty
+      setFilteredData(mergeData); 
     }
   };
 
@@ -69,7 +66,7 @@ export const AllEmployee = () => {
       const result = await data;
       setData(result);
     } catch (error) {
-      // console.error("Error search data", error);
+      console.error("Error search data", error);
     }
   };
 
@@ -145,11 +142,7 @@ export const AllEmployee = () => {
             insuranceClaimsData.find(
               (item) => item.empID === empPIItem.empID
             ) || {};
-
-
-            
           return {
-            ...empPIItem,
             ...idMatch,
             ...empPDMatch,
             ...sdnMatch,
@@ -168,21 +161,20 @@ export const AllEmployee = () => {
             ...userMatch,
             ...swapMatch,
             ...insClaimMatch,
-            sapNo: empPIItem.sapNo,
+            ...empPIItem,
+            position:workInfoMatch.position,
           };
         })
-        .filter((item) => item?.empID) // Only include items with a valid empID
+        .filter((item) => item?.empID) 
         .reduce((unique, item) => {
           if (!unique.some((emp) => emp.empID === item.empID)) {
             unique.push(item);
           }
           return unique;
-        }, []); // Initialize with an empty array to store unique items
+        }, []); 
       const sorted = allDataValues.sort((a, b) =>
         a.empID.localeCompare(b.empID)
       );
-
-// console.log(sorted);
 
       setMergeData(sorted);
       setFilteredData(sorted);
@@ -195,14 +187,11 @@ export const AllEmployee = () => {
       }
     } else {
       setError("No data found.");
-}
-   
+    }
   }, [
     userData,
     empLeaveStatusData,
     educDetailsData,
-    empPDData,
-    empPIData,
     IDData,
     workInfoData,
     terminateData,
@@ -217,25 +206,35 @@ export const AllEmployee = () => {
     NLAData,
     SawpDetails,
     insuranceClaimsData,
+    empPDData,
+    empPIData,
   ]);
 
-  const handleFilterChange = (e) => {
-    const selectedStatus = e.target.value.toLowerCase(); // Normalize to lowercase
+
   
+  const handleFilterChange = (e) => {
+    const selectedStatus = e.target.value.toLowerCase(); 
+
     if (selectedStatus === "all") {
       setFilteredData(mergeData);
     } else {
       const filtered = mergeData.filter((candidate) => {
-        const contractType = getLatestValue(candidate.contractType)?.toLowerCase();
+        const contractType = getLatestValue(
+          candidate.contractType
+        )?.toLowerCase();
         const empType = getLatestValue(candidate.empType)?.toLowerCase();
         const workStatus = getLatestValue(candidate.workStatus)?.toLowerCase();
-        const nationality = getLatestValue(candidate.nationality)?.toLowerCase();
-  
+        const nationality = getLatestValue(
+          candidate.nationality
+        )?.toLowerCase();
+
         switch (selectedStatus) {
           case "local":
             return ["bruneian", "brunei pr"].includes(nationality);
           case "foreigner":
-            return nationality && !["bruneian", "brunei pr"].includes(nationality);
+            return (
+              nationality && !["bruneian", "brunei pr"].includes(nationality)
+            );
           case "lpa":
             return contractType === "lpa";
           case "sawp":
@@ -256,31 +255,32 @@ export const AllEmployee = () => {
       setFilteredData(filtered);
     }
   };
-  
-  // Handle pagination
+
   useEffect(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const paginated = filteredData.slice(startIndex, startIndex + rowsPerPage);
     setPaginatedData(paginated);
+
+    // Update loading state when data is paginated
+    if (paginated.length > 0) {
+      setPaginateLoading(false);
+    }
   }, [filteredData, currentPage, rowsPerPage]);
 
-  if (loading) {
-    <div>
-      <div className="flex items-center justify-center h-[82vh]">
-        <p className="text-sm font-semibold">Loading...</p>
-      </div>
-    </div>;
-  }
-
-  if (error) {
+  // Conditional rendering for loading state
+  if (paginateLoading) {
     return (
-      <div>
-        <div className="flex items-center justify-center h-[82vh]">
-          <p className="text-sm font-semibold">{error}</p>
+      <div className="flex items-center justify-center h-[82vh] bg-transparent">
+        <div className="flex justify-between gap-2">
+          <p className="text-sm font-semibold">Loading </p>
+          <p>
+            <FiLoader className="animate-spin mt-[4px]" size={15} />
+          </p>
         </div>
       </div>
-);
-}
+    );
+  }
+  
   const handleFormShow = (value) => {
     setShowForm(!showForm);
     setPassingValue(value);
@@ -291,24 +291,23 @@ export const AllEmployee = () => {
     const day = date.getDate().toString().padStart(2, "0");
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
-
     return `${day}/${month}/${year}`;
   };
 
   const getStatusClass = (workStatus) => {
-  const normalizedStatus = workStatus?.toLowerCase(); // Normalize to lowercase
+    const normalizedStatus = workStatus?.toLowerCase(); 
 
-  return (
-    {
-      active: "text-[green]",
-      probationary: "text-[#E8A317]",
-      resignation: "text-red",
-      termination: "text-[red]",
-    }[normalizedStatus] || "text-medium_grey"
-  );
-};
+    return (
+      {
+        active: "text-[green]",
+        probationary: "text-[#E8A317]",
+        resignation: "text-red",
+        termination: "text-[red]",
+      }[normalizedStatus] || "text-medium_grey"
+    );
+  };
 
-
+  // console.log("me",mergeData);
 
   return (
     <section className="bg-[#F5F6F1CC] w-full flex items-center flex-col h-screen pt-14">
@@ -320,16 +319,18 @@ export const AllEmployee = () => {
           <div className="relative">
             <Searchbox
               type="text"
-              placeholder="Search by Name or Emp ID"
+              placeholder="Emp ID or Badge No or Name"
               allEmpDetails={mergeData}
               searchUserList={setFilteredData}
               className="py-2 px-4 "
+              // searchIcon2={<FiSearch />}
+              searchIcon2={<IoSearch />}
             />
-            <img
+            {/* <img
               src={searchIcon}
               alt="Search Icon"
               className="absolute top-1/2 right-2 transform -translate-y-1/2 w-4 h-4"
-            />
+            /> */}
           </div>
           <select
             className="py-[7px] px-2 border border-lite_grey focus:outline-none focus:ring-0"
@@ -349,8 +350,8 @@ export const AllEmployee = () => {
           </select>
         </div>
       </div>
-      <div className=" overflow-x-auto  mt-8 w-[100%] ml-4 rounded-xl">
-        <div className="w-full px-4 max-h-[calc(70vh-7rem)] overflow-y-auto">
+      <div className="allEmployeeTable overflow-x-auto  mt-8 w-[100%] ml-4 rounded-xl">
+        <div className="allEmployeeTable w-full px-4 max-h-[calc(70vh-7rem)] overflow-y-auto">
           <table className="w-full rounded-xl table-auto">
             <thead className="bg-[#939393] text-center text-white sticky top-0">
               <tr>
@@ -374,7 +375,7 @@ export const AllEmployee = () => {
                     className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
                     onClick={() => {
                       handleFormShow(candidate);
-                      // console.log("CANDY_DATA", candidate);
+                      console.log("CANDY_DATA 2.0 all data", candidate);
                     }}
                   >
                     <td className="py-4 px-4">{candidate?.empID || "N/A"}</td>
@@ -402,7 +403,7 @@ export const AllEmployee = () => {
                       {candidate?.contactNo || "N/A"}
                     </td>
                     <td
-                      className={`py-4 px-4 font-bold ${getStatusClass(
+                      className={`uppercase py-4 px-4 font-bold ${getStatusClass(
                         candidate?.workStatus?.[
                           candidate?.workStatus.length - 1
                         ] || "N/A"

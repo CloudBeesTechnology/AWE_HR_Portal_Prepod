@@ -51,7 +51,7 @@ const FamilyDetails = ({ familyDetails, mainRef }) => {
 
   return (
     <section ref={mainRef} className="py-8 px-10 bg-gray-50 rounded-lg">
-      <h6 className="uppercase text_size_5 mb-6">Family Details:</h6>
+      <h6 className="text_size_5 mb-6">Family Details:</h6>
       <div className="space-y-6">
         {familyData.length > 0 ? (
           familyData.map((family, index) => (

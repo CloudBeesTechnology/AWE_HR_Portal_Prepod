@@ -7,6 +7,7 @@ import { Pagination } from "./Pagination";
 import { Filter } from "./Filter";
 import { NavigateLM } from "./NavigateLM";
 import { capitalizedLetter, DateFormat } from "../../utils/DateFormat";
+import { FiLoader } from "react-icons/fi";
 
 export const TicketsTable = () => {
   const { handleViewClick, handleClickForToggle, userType } =
@@ -241,6 +242,7 @@ export const TicketsTable = () => {
   }, [ticketMerged]);
 
   // console.log(loading);
+  console.log(filteredData);
 
   return (
     <section className="w-full">
@@ -278,7 +280,12 @@ export const TicketsTable = () => {
       <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl ">
         {loading ? (
           <div className="text-center mt-6 py-20">
-            <p>Loading...</p>
+            <p className="inline-flex items-center text-sm font-semibold">
+              Loading
+              <span>
+                <FiLoader className="animate-spin ml-2" size={15} />
+              </span>
+            </p>
           </div>
         ) : errorState.noResults ? (
           <div className="text-center mt-6 py-20">
@@ -330,10 +337,13 @@ export const TicketsTable = () => {
                       {DateFormat(item.createdAt)}
                     </td>
                     <td className="border-b-2 border-[#CECECE] py-5">
-                      {DateFormat(item.departureDate)}
+                      {DateFormat(
+                        item.empDepartureDate || item.departureDate
+                      ) || "N/A"}
                     </td>
                     <td className="border-b-2 border-[#CECECE] py-5">
-                      {DateFormat(item.arrivalDate)}
+                      {DateFormat(item.empArrivalDate || item.arrivalDate) ||
+                        "N/A"}
                     </td>
                     <td className="border-b-2 border-[#CECECE] cursor-pointer py-5">
                       <span

@@ -823,6 +823,10 @@ type TicketRequest @aws_iam @aws_api_key {
   hrRemarks: String
   hrName: String
   hrEmpID: String
+  from: String
+  to: String
+  fromDate: AWSDate
+  toDate: AWSDate
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -5883,6 +5887,10 @@ input ModelTicketRequestFilterInput {
   hrRemarks: ModelStringInput
   hrName: ModelStringInput
   hrEmpID: ModelStringInput
+  from: ModelStringInput
+  to: ModelStringInput
+  fromDate: ModelStringInput
+  toDate: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelTicketRequestFilterInput]
@@ -5904,6 +5912,10 @@ input ModelTicketRequestConditionInput {
   hrRemarks: ModelStringInput
   hrName: ModelStringInput
   hrEmpID: ModelStringInput
+  from: ModelStringInput
+  to: ModelStringInput
+  fromDate: ModelStringInput
+  toDate: ModelStringInput
   and: [ModelTicketRequestConditionInput]
   or: [ModelTicketRequestConditionInput]
   not: ModelTicketRequestConditionInput
@@ -5926,6 +5938,10 @@ input CreateTicketRequestInput {
   hrRemarks: String
   hrName: String
   hrEmpID: String
+  from: String
+  to: String
+  fromDate: AWSDate
+  toDate: AWSDate
 }
 
 input UpdateTicketRequestInput {
@@ -5943,6 +5959,10 @@ input UpdateTicketRequestInput {
   hrRemarks: String
   hrName: String
   hrEmpID: String
+  from: String
+  to: String
+  fromDate: AWSDate
+  toDate: AWSDate
 }
 
 input DeleteTicketRequestInput {
@@ -5964,6 +5984,10 @@ input ModelSubscriptionTicketRequestFilterInput {
   hrRemarks: ModelSubscriptionStringInput
   hrName: ModelSubscriptionStringInput
   hrEmpID: ModelSubscriptionStringInput
+  from: ModelSubscriptionStringInput
+  to: ModelSubscriptionStringInput
+  fromDate: ModelSubscriptionStringInput
+  toDate: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionTicketRequestFilterInput]

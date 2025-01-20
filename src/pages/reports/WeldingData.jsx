@@ -4,9 +4,9 @@ import { FilterTable } from './FilterTable';
 export const WeldingData = ({ allData, typeOfReport, reportTitle }) => {
   const [tableBody, setTableBody] = useState([]);
   const [tableHead, setTableHead] = useState([
-    "Name",
     "Emp ID",
     "Badge No",
+    "Name",
     "Nationality",
     "STAMP NO",
     "WQR Number",
@@ -44,9 +44,9 @@ export const WeldingData = ({ allData, typeOfReport, reportTitle }) => {
     return data
       .filter((item) => item.WQExpiry) 
       .map((item) => ({
-        name: item.name || "-",
         empID: item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
+        name: item.name || "-",
         nationality: item.nationality || "-",
         weldingStampNor: item.weldingStampNor || "-",
         WQRNo: item.WQRNo || "-",

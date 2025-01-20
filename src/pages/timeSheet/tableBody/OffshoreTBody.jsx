@@ -39,8 +39,9 @@ export const OffshoreTBody = ({ data, loading, setTableData, message }) => {
                 >
                   <td className="text-start px-4 flex-1">{index + 1}</td>
                   <td className="text-start px-4 flex-1">{m.empName}</td>
+                  <td className="text-start px-4 flex-1">{m.trade}</td>
                   <td className="text-center px-4 flex-1">{m.fidNo}</td>
-                  <td className="text-center px-4 flex-1">{m.companyName}</td>
+                  <td className="text-center px-4 flex-1">{m.location}</td>
                   <td className="text-center px-4 flex-1">
                     {convertToISODate(m.date)}
                   </td>

@@ -66,7 +66,7 @@ const DocumentViewer = ({
 
         {/* Download Button */}
         <div className="mt-2">
-          <a href={documentFile} download className="text-blue-600 hover:text-blue-800">
+          <a href={documentFile}  className="text-blue-600 hover:text-blue-800">
             Download Document
           </a>
         </div>

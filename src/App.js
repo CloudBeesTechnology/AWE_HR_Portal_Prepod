@@ -1,22 +1,25 @@
 import { Helmet, HelmetProvider } from "react-helmet-async";
-
 import { useLocation, useNavigate } from "react-router-dom";
-
 import { lazy, Suspense, useEffect, useState } from "react";
 import DataStoredContext from "./utils/DataStoredContext";
+import { TempIDProvider } from "./utils/TempIDContext";
 
-// import { API } from 'aws-amplify';
+// Lazy loading components
 const NavigationLinks = lazy(() => import("./services/NavigationLinks"));
 const Navbar = lazy(() => import("./components/Navbar"));
 const Sidebar = lazy(() => import("./components/Sidebar"));
 const Login = lazy(() => import("./pages/login/Login"));
 
+const ForgotEmail = lazy(() => import("./pages/forgotPassword/ForgotEmail"));
+const ForgotOtp = lazy(() => import("./pages/forgotPassword/ForgotOtp"));
+const ForgotPassword = lazy(() => import("./pages/forgotPassword/ForgotPassword"));
+
 export const App = () => {
   const location = useLocation();
-  const hideNavbar = ["/login", "/changePassword"];
+  const hideNavbar = ["/login", "/changePassword", "/forgotEmail", "/forgotOtp", "/forgotPassword"];
   const navigate = useNavigate();
 
-  const hideLogin = ["/changePassword"];
+  const hideLogin = ["/changePassword",];
   const [loginId, setLoginId] = useState("");
   const [userType, setUserType] = useState("");
 
@@ -24,32 +27,29 @@ export const App = () => {
     const checkLoginStatus = () => {
       const storedLoginId = localStorage.getItem("userID");
       const storedUserType = localStorage.getItem("userType");
+
+      // If the user is logged in, redirect to the dashboard and set state accordingly
       if (storedLoginId && storedUserType) {
         setLoginId(storedLoginId);
         setUserType(storedUserType);
+        if (location.pathname === "/login") {
+          navigate("/dashboard"); // Redirect to dashboard after login
+        }
       } else {
         setLoginId("");
         setUserType("");
-        navigate("/login");
+        // if (!hideLogin.includes(location.pathname)) {
+        //   navigate("/login"); 
+        // }
       }
     };
 
-    // Call the function to check login status on component mount
     checkLoginStatus();
 
-    // const storedLoginId = localStorage.getItem("userID");
-    // const storedUserType = localStorage.getItem("userType");
-    // if (storedLoginId && storedUserType) {
-    //   setLoginId(storedLoginId);
-    //   setUserType(storedUserType);
-    // }else {
-    //   // Redirect to login if no login data
-    //   navigate("/login");
-    // }
     const handleTabClose = async (event) => {
       // await signOut();
       // localStorage.clear();
-      // sessionStorage.clear()
+      // sessionStorage.clear();
 
       window.open("https://dev.dxtlxvdrz6jj5.amplifyapp.com");
     };
@@ -58,15 +58,15 @@ export const App = () => {
     return () => {
       window.removeEventListener("beforeunload", handleTabClose);
     };
-  }, []);
+  }, [location, navigate]);
 
   return (
     <HelmetProvider>
       <Helmet>
         <link rel="canonical" href={window.location.href} />
       </Helmet>
-      {/* fallback={<div>Loading...</div>} */}
       <Suspense>
+        {/* Show Navbar and Sidebar if not on the login or forgot pages and user is logged in */}
         {!hideNavbar.includes(location.pathname) && loginId && userType && (
           <>
             <Navbar />
@@ -75,13 +75,21 @@ export const App = () => {
         )}
 
         {!hideLogin.includes(location.pathname) && !loginId && !userType && (
-          <Login />
+          <>
+            {location.pathname === "/forgotEmail" && <ForgotEmail />}
+            {location.pathname === "/forgotOtp" && <ForgotOtp />}
+            {location.pathname === "/forgotPassword" && <ForgotPassword />}
+            {location.pathname === "/login" && <Login />}
+          </>
         )}
 
+        {/* Main App Content */}
         {loginId && userType && (
           <div className="mt-28 ml-64">
             <DataStoredContext>
-              <NavigationLinks />
+              <TempIDProvider>
+                <NavigationLinks />
+              </TempIDProvider>
             </DataStoredContext>
           </div>
         )}
@@ -89,3 +97,4 @@ export const App = () => {
     </HelmetProvider>
   );
 };
+

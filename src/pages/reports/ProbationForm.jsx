@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form"; // Import useForm from react-hook-for
 import logo from "../../assets/logo/logo-with-name.svg";
 import { ConfirmationForm } from "./ConfirmationForm";
 import { ContractChoose } from "./ContractChoose";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { useState } from "react";
 import { ProbFormFun } from "../../services/createMethod/ProbFormFun";
@@ -12,51 +12,28 @@ import { UpdateProbForm } from "../../services/updateMethod/UpdateProbForm";
 import { probationFormSchema } from "../../services/ReportValidation";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { useContext } from "react";
+import { sendEmail } from "../../services/EmailServices";
+import { FaArrowLeft } from "react-icons/fa";
 
 export const ProbationForm = forwardRef(() => {
-  const { empPIData, workInfoData, ProbFData } = useContext(DataSupply);
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
-
+  const location = useLocation();
+  const { employeeData } = location.state || {};
+  const [userID, setUserID] = useState("");
+  const [userType, setUserType] = useState("");
   const { ProbFormsData } = ProbFormFun();
   const { UpdateProb } = UpdateProbForm();
+  const { empPIData, workInfoData, ProbFData } = useContext(DataSupply);
 
-  console.log(ProbFData);
+  const [emailData, setEmailData] = useState({
+    supervisorEmpID: "",
+    managerEmpID: "",
+    supervisorOfficialMail: "",
+    managerOfficialMail: "",
+    hrOfficialmail: "",
+    gmOfficialMail: "",
+    skilledAndUnskilled: "",
+  });
 
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const mergedData = empPIData
-          .map((emp) => {
-            const WIDetails = workInfoData
-              ? workInfoData.find((user) => user.empID === emp.empID)
-              : {};
-            const provDetails = ProbFData
-              ? ProbFData.find((user) => user.empID === emp.empID)
-              : {};
-
-            return {
-              ...emp,
-              ...WIDetails,
-              ...provDetails,
-            };
-          })
-          .filter(Boolean);
-
-        setUserDetails(mergedData);
-        setAllEmpDetails(mergedData);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchData();
-  }, [empPIData, workInfoData, ProbFData]);
-
-  const location = useLocation();
-
-  const { employeeData } = location.state || {};
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [formData, setFormData] = useState({
@@ -116,6 +93,157 @@ export const ProbationForm = forwardRef(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
+  //email process start
+
+  useEffect(() => {
+    const userID = localStorage.getItem("userID");
+    setUserID(userID);
+    const userType = localStorage.getItem("userType");
+    setUserType(userType);
+  }, []);
+
+  useEffect(() => {
+    // console.log("Effect triggered");
+
+    // Ensure the required data is available before proceeding
+    if (!workInfoData.length || !empPIData.length || !employeeData?.empID) {
+      console.log("Data is not available yet");
+      return;
+    }
+
+    // Step 1: Extract supervisorEmpID, managerEmpID, and hrEmpID from workInfoData
+    const workInfo = workInfoData.find(
+      (data) => data.empID === employeeData.empID
+    );
+
+    if (workInfo) {
+      // Get the most recent values from the arrays
+      const supervisorEmpID =
+        workInfo.supervisor[workInfo.supervisor.length - 1];
+      const managerEmpID = workInfo.manager[workInfo.manager.length - 1];
+      const hrOfficialmail = workInfo.hr[workInfo.hr.length - 1];
+
+      // console.log("Supervisor EmpID:", supervisorEmpID);
+      // console.log("Manager EmpID:", managerEmpID);
+      // console.log("HR mail:", hrOfficialmail);
+
+      // Step 2: Update emailData with supervisorEmpID, managerEmpID, and hrOfficialmail
+      setEmailData((prevData) => ({
+        ...prevData,
+        supervisorEmpID,
+        managerEmpID,
+        hrOfficialmail,
+      }));
+
+      // Step 3: Fetch manager's official email
+      if (managerEmpID) {
+        // console.log("Fetching Manager's Email...");
+        const managerInfo = empPIData.find(
+          (data) => data.empID === String(managerEmpID)
+        );
+        // console.log("Manager Info:", managerInfo);
+        if (managerInfo) {
+          setEmailData((prevData) => ({
+            ...prevData,
+            managerOfficialMail: managerInfo.officialEmail, // Assuming this field exists.
+          }));
+        } else {
+          // console.log("Manager Info not found.");
+        }
+      }
+
+      // Step 4: Fetch supervisor's official email
+      if (supervisorEmpID) {
+        // console.log("Fetching Supervisor's Email...");
+        const supervisorInfo = empPIData.find(
+          (data) => data.empID === String(supervisorEmpID)
+        );
+        // console.log("Supervisor Info:", supervisorInfo);
+        if (supervisorInfo) {
+          setEmailData((prevData) => ({
+            ...prevData,
+            supervisorOfficialMail: supervisorInfo.officialEmail, // Assuming this field exists.
+          }));
+        } else {
+          // console.log("Supervisor Info not found.");
+        }
+      }
+
+      // Step 5: Check skillPool for "Skilled" or "UnSkilled"
+      if (workInfo.skillPool) {
+        if (
+          workInfo.skillPool.includes("Skilled") ||
+          workInfo.skillPool.includes("UnSkilled")
+        ) {
+          setEmailData((prevData) => ({
+            ...prevData,
+            skilledAndUnskilled: workInfo.skillPool, // Store the value of skillPool if it contains "Skilled" or "UnSkilled"
+          }));
+        }
+      }
+
+      // Step 6: Fetch General Manager's email (if applicable)
+      const generalManagerPositions = workInfoData.filter((item) =>
+        item.position.includes("GENERAL MANAGER")
+      );
+
+      if (generalManagerPositions.length > 0) {
+        const gmInfo = empPIData.find(
+          (data) => data.empID === String(generalManagerPositions[0].empID)
+        );
+        if (gmInfo) {
+          setEmailData((prevData) => ({
+            ...prevData,
+            gmOfficialMail: gmInfo.officialEmail,
+          }));
+        } else {
+          console.log("GM Info not found.");
+        }
+      }
+    } else {
+      console.log("No work info found for employee ID:", employeeData?.empID);
+    }
+  }, [workInfoData, employeeData?.empID, empPIData]);
+
+  // Log the final emailData when it changes
+  useEffect(() => {
+    // console.log("Email Data has changed:", emailData);
+  }, [emailData]);
+
+  //email process end
+
+  // console.log(emailData);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const mergedData = empPIData
+          .map((emp) => {
+            const WIDetails = workInfoData
+              ? workInfoData.find((user) => user.empID === emp.empID)
+              : {};
+            const provDetails = ProbFData
+              ? ProbFData.find((user) => user.empID === emp.empID)
+              : {};
+
+            return {
+              ...emp,
+              ...WIDetails,
+              ...provDetails,
+            };
+          })
+          .filter(Boolean);
+
+        setUserDetails(mergedData);
+        setAllEmpDetails(mergedData);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchData();
+  }, [empPIData, workInfoData, ProbFData]);
+  // console.log(ProbFData);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -139,78 +267,37 @@ export const ProbationForm = forwardRef(() => {
     fetchData();
   }, [empPIData, workInfoData, ProbFData]);
 
+  // auto fetch
   useEffect(() => {
-    console.log("Effect triggered");
-  
-    if (ProbFData.length > 0) {
-      console.log("ProbFData has data:", ProbFData);
-  
-      const fetchedProbData = ProbFData.find(
-        (data) => data.empID === employeeData?.empID
+    if (ProbFData.length === 0 || !employeeData?.empID) {
+      console.log(
+        ProbFData.length === 0 ? "No data in ProbFData" : "No employee ID found"
       );
-      console.log("Contract data found:", fetchedProbData);
-  
-      if (fetchedProbData) {
-        console.log("Setting form data...");
-  
-        setFormData({
-          probData: {
-            adaptability: fetchedProbData.adaptability || "",  // Default to empty string if null or undefined
-            additionalInfo: fetchedProbData.additionalInfo || "",
-            attention: fetchedProbData.attention || "",
-            attitude: fetchedProbData.attitude || "",
-            commitment: fetchedProbData.commitment || "",
-            communication: fetchedProbData.communication || "",
-            deadline: fetchedProbData.deadline || "",
-            diligent: fetchedProbData.diligent || "",
-            extensionPeriod: fetchedProbData.extensionPeriod || "",
-            gmDate: fetchedProbData.gmDate || "",
-            hrDate: fetchedProbData.hrDate || "",
-            hrName: fetchedProbData.hrName || "",
-            initiative: fetchedProbData.initiative || "",
-            managerDate: fetchedProbData.managerDate || "",
-            managerName: fetchedProbData.managerName || "",
-            pace: fetchedProbData.pace || "",
-            quality: fetchedProbData.quality || "",
-            recommendation: fetchedProbData.recommendation || "",
-            responsibility: fetchedProbData.responsibility || "",
-            supervisorDate: fetchedProbData.supervisorDate || "",
-            supervisorName: fetchedProbData.supervisorName || "",
-            teamwork: fetchedProbData.teamwork || "",
-            extendProbED: fetchedProbData.extendProbED || "",
-            gmApproved: fetchedProbData.gmApproved || "",
-            managerApproved: fetchedProbData.managerApproved || "",
-            supervisorApproved: fetchedProbData.supervisorApproved || "",
-            communicationDetails: fetchedProbData.communicationDetails || "",
-            qualityDetails: fetchedProbData.qualityDetails || "",
-            paceDetails: fetchedProbData.paceDetails || "",
-            initiativeDetails: fetchedProbData.initiativeDetails || "",
-            attitudeDetails: fetchedProbData.attitudeDetails || "",
-            adaptabilityDetails: fetchedProbData.adaptabilityDetails || "",
-            teamworkDetails: fetchedProbData.teamworkDetails || "",
-            responsibilityDetails: fetchedProbData.responsibilityDetails || "",
-            diligentDetails: fetchedProbData.diligentDetails || "",
-            commitmentDetails: fetchedProbData.commitmentDetails || "",
-          },
-        });
-  
-        console.log("Form data set:", {
-          probData: {
-            adaptability: formData.probData.adaptability,
-            attention: formData.probData.attention,
-          },
-        });
-      } else {
-        console.log("No matching contract data found");
-      }
-    } else {
-      console.log("No data in ProbFData");
+      return;
     }
+
+    const fetchedProbData = ProbFData.find(
+      (data) => data.empID === employeeData.empID
+    );
+
+    if (!fetchedProbData) {
+      console.log("No matching contract data found");
+      return;
+    }
+
+    const defaultFormData = Object.keys(fetchedProbData).reduce((acc, key) => {
+      acc[key] = fetchedProbData[key] || "";
+      return acc;
+    }, {});
+
+    setFormData({ probData: defaultFormData });
   }, [ProbFData, employeeData?.empID]);
-  
-  
 
   const handleInputChange = (e) => {
+    if (!e.target) {
+      console.error("Event target is undefined");
+      return;
+    }
     const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
@@ -221,44 +308,95 @@ export const ProbationForm = forwardRef(() => {
     }));
   };
 
-  // useEffect(() => {
-  //   if (ProbFData?.length > 0 && location.state?.employeeData) {
-  //     const probationDataValue = ProbFData.find(
-  //       (data) => data.empID === location.state.employeeData.empID
-  //     );
-  //     if (probationDataValue) {
-  //       Object.entries(probationDataValue).forEach(([key, value]) =>
-  //         setValue(key, value)
-  //       );
-  //       setFormData(probationDataValue);
-  //       console.log(formData);
-
-  //     }
-  //   }
-  // }, [ProbFData, location.state, setValue]);
-
-  // const handleInputChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFormData((prevState) => ({
-  //     ...prevState,
-  //     [name]: value,
-  //   }));
-  //   setValue(name, value);
-  // };
+  const subject = "Contract Form approved";
+  const message = "Dear Hari employee Arjun contract period is expired...";
+  const from = "hr_no-reply@adininworks.com";
 
   const onSubmit = async (data) => {
+    console.log(data);
+
     try {
       const PFDataRecord = ProbFData.find(
         (match) => match.empID === data.empID
       );
 
+      // Common fields to extract from formData
+      const probFields = [
+        "adaptability",
+        "additionalInfo",
+        "attention",
+        "attitude",
+        "commitment",
+        "communication",
+        "deadline",
+        "diligent",
+        "extensionPeriod",
+        "gmDate",
+        "hrDate",
+        "hrName",
+        "initiative",
+        "managerDate",
+        "managerName",
+        "pace",
+        "quality",
+        "recommendation",
+        "responsibility",
+        "supervisorDate",
+        "supervisorName",
+        "teamwork",
+        "extendProbED",
+        "gmApproved",
+        "managerApproved",
+        "supervisorApproved",
+        "communicationDetails",
+        "qualityDetails",
+        "paceDetails",
+        "initiativeDetails",
+        "attitudeDetails",
+        "adaptabilityDetails",
+        "teamworkDetails",
+        "responsibilityDetails",
+        "diligentDetails",
+        "commitmentDetails",
+        "probStatus",
+      ];
+
+      const formDataValues = probFields.reduce((acc, field) => {
+        acc[field] = formData.probData[field];
+        return acc;
+      }, {});
+
       if (PFDataRecord) {
-        const PbFDataUp = { ...data, id: PFDataRecord.id };
-        await UpdateProb({ PbFDataUp });
+        // Update existing record
+        const formattedData = {
+          id: PFDataRecord.id,
+          ...formDataValues,
+          probStatus: true,
+        };
+        await UpdateProb({ PbFDataUp: formattedData });
+
+        if (userType === "Manager") {
+          if (emailData.skilledAndUnskilled === null) {
+            sendEmail(subject, message, from, emailData.gmOfficialMail);
+          } else {
+            sendEmail(subject, message, from, emailData.hrOfficialmail);
+          }
+        } else if (userType === "GM") {
+          sendEmail(subject, message, from, emailData.hrOfficialmail);
+        }
+
         setShowTitle("Probation Form Updated successfully");
+        console.log("Updated", formattedData);
       } else {
-        const ProbValue = { ...data };
+        // Create new record
+        const ProbValue = { ...data, ...formDataValues, probStatus: true };
         await ProbFormsData({ ProbValue });
+
+        if (userType === "Supervisor") {
+          sendEmail(subject, message, from, emailData.managerOfficialMail);
+        }
+
+        console.log("create", ProbValue);
         setShowTitle("Probation Form Saved successfully");
       }
       setNotification(true);
@@ -273,12 +411,15 @@ export const ProbationForm = forwardRef(() => {
       className="p-10 bg-white shadow-md w-full px-20 mx-auto"
     >
       {/* Header */}
-      <section className="center mb-16">
-        <div className="max-w-[400px] w-full">
-          <img className="w-full" src={logo} alt="Logo not found" />
+      <section className="flex items-center mb-16">
+      <Link to="/reports" className="text-xl text-start w-[50px] text-grey">
+          <FaArrowLeft />
+        </Link>
+        <div className=" w-full center pr-10">
+          <img className=" max-w-[400px]" src={logo} alt="Logo not found" />
         </div>
       </section>
-
+     
       <div className="mb-10">
         <p className="text-md mt-2">
           For the attention of:{" "}
@@ -295,8 +436,9 @@ export const ProbationForm = forwardRef(() => {
           Deadline submit to Human Resources Department by{" "}
           <input
             type="text"
+            name="deadline"
             {...register("deadline")}
-            value={formData.deadline}
+            value={formData.probData.deadline}
             onChange={handleInputChange}
             className="border-b border-black outline-none px-1"
           />
@@ -406,11 +548,15 @@ export const ProbationForm = forwardRef(() => {
         </table>
       </div>
 
-      <ContractChoose register={register} />
+      <ContractChoose
+        register={register}
+        formData={formData}
+        handleInputChange={handleInputChange}
+      />
       <ConfirmationForm
         register={register}
         formData={formData}
-        onChange={handleInputChange}
+        handleInputChange={handleInputChange}
       />
 
       {/* Save Button */}
@@ -419,13 +565,13 @@ export const ProbationForm = forwardRef(() => {
           Save
         </button>
       </div>
-      {/* {notification && (
+      {notification && (
           <SpinLogo
             text={showTitle}
             notification={notification}
             path="/reports"
           />
-        )} */}
+        )}
     </form>
   );
 });

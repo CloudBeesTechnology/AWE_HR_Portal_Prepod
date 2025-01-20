@@ -4,6 +4,18 @@ export const LoginSchema = Yup.object({
   userID: Yup.string().required("UserID is mandatory"),
   password: Yup.string().required("Password is Required"),
 });
+export const newPasswordSchema = Yup.object({
+  newPassword: Yup.string()
+  .required("New Password is required")
+  .min(8, "Password must be at least 8 characters"),
+rePassword: Yup.string()
+  .required("Please confirm your password")
+  .oneOf([Yup.ref("newPassword"), null], "Passwords must match"),
+});
+export const EmailSchema = Yup.object({
+  userName: Yup.string().required("User Name is mandatory"),
+
+});
 
 export const UserSchema = Yup.object({
   empID: Yup.string().required("Employee ID is required"),

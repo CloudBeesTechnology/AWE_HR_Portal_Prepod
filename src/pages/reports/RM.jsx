@@ -6,13 +6,13 @@ import { useLocation } from "react-router-dom";
 
 export const RM = () => {
   const location = useLocation();
-  const { allData,title } = location.state || {};  
+  const { allData, title } = location.state || {};
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [tableBody, setTableBody] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [tableHead] = useState([ 
+  const [tableHead] = useState([
     "Emp ID",
     "Employee Badge",
     "Employee Name",
@@ -95,7 +95,7 @@ export const RM = () => {
     if (allData) {
       setTableBody(generateFullDetails(allData));
     }
-  }, [allData]);  // Dependency on allData
+  }, [allData]); // Dependency on allData
 
   const handleViewDetails = (person) => {
     const fullDetails = allData.find((item) => item.empID === person.empID);
@@ -117,56 +117,62 @@ export const RM = () => {
     const value = e.target.value;
     if (type === "startDate") setStartDate(value);
     if (type === "endDate") setEndDate(value);
-  
-    const start = type === "startDate" ? new Date(value) : startDate ? new Date(startDate) : null;
-    const end = type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
-  
+
+    const start =
+      type === "startDate"
+        ? new Date(value)
+        : startDate
+        ? new Date(startDate)
+        : null;
+    const end =
+      type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
+
     const filtered = allData
       .filter((data) => {
         const doj = data.doj ? new Date(data.doj) : null;
-  
+
         if (!doj || isNaN(doj.getTime())) return false;
-  
+
         if (start && end) return doj >= start && doj <= end;
         if (start) return doj >= start;
         if (end) return doj <= end;
-  
+
         return true;
       })
       .map((item) => ({
-        empID: item.empID || "-",
-      empBadgeNo: item.empBadgeNo || "-",
-      name: item.name || "-",
-      gender: item.gender || "-",
-      dateOfBirth: formatDate(item.dob) || "-",
-      dateOfJoin: formatDate(item.doj) || "-",
-      nationality: item.nationality || "-",
-      position: item.position || "-",
-      contactNo: item.contactNo || "-",
-      contractType: item.contractType || "-",
-      cvReceived: item.cvReceived || "-",
-      BruneiIcNo: item.bwnIcNo || "-",
-      BruneiIcExpiry: Array.isArray(item.bwnIcExpiry)
-        ? formatDate(item.bwnIcExpiry[item.bwnIcExpiry.length - 1])
-        : "-",
-      MalaysianIcNo: item.myIcNo || "-",
-      PassportNo: item.ppNo || "-",
-      PassportExpiry: Array.isArray(item.ppExpiry)
-        ? formatDate(item.ppExpiry[item.ppExpiry.length - 1])
-        : "-",
-      employeePassExpiry: Array.isArray(item.empPassExp)
-        ? formatDate(item.empPassExp[item.empPassExp.length - 1])
-        : "-",
-      department: item.department || "-",
-      contractStart: Array.isArray(item.contractStart)
-        ? formatDate(item.contractStart[item.contractStart.length - 1])
-        : "-",
-      contractEnd: Array.isArray(item.contractEnd)
-        ? formatDate(item.contractEnd[item.contractEnd.length - 1])
-        : "-",
-      PreviousEmployment: item.preEmp || "-",
+        empId: item.empID || "-",
+        empBadgeNo: item.empBadgeNo || "-",
+        name: item.name || "-",
+        gender: item.gender || "-",
+        dateOfBirth: formatDate(item.dob) || "-",
+        dateOfJoin: formatDate(item.doj) || "-",
+        nationality: item.nationality || "-",
+        position: item.position || "-",
+        contactNo: item.contactNo || "-",
+        contractType: item.contractType || "-",
+        cvReceived: item.cvReceived || "-",
+        BruneiIcNo: item.bwnIcNo || "-",
+        BruneiIcExpiry: Array.isArray(item.bwnIcExpiry)
+          ? formatDate(item.bwnIcExpiry[item.bwnIcExpiry.length - 1])
+          : "-",
+        MalaysianIcNo: item.myIcNo || "-",
+        PassportNo: item.ppNo || "-",
+        PassportExpiry: Array.isArray(item.ppExpiry)
+          ? formatDate(item.ppExpiry[item.ppExpiry.length - 1])
+          : "-",
+        employeePassExpiry: Array.isArray(item.empPassExp)
+          ? formatDate(item.empPassExp[item.empPassExp.length - 1])
+          : "-",
+        department: item.department || "-",
+        contractStart: Array.isArray(item.contractStart)
+          ? formatDate(item.contractStart[item.contractStart.length - 1])
+          : "-",
+        contractEnd: Array.isArray(item.contractEnd)
+          ? formatDate(item.contractEnd[item.contractEnd.length - 1])
+          : "-",
+        PreviousEmployment: item.preEmp || "-",
       }));
-  
+
     setFilteredData(filtered);
   };
 
@@ -174,7 +180,10 @@ export const RM = () => {
     <div>
       <FilterTable
         tableBody={filteredData.length ? filteredData : tableBody}
-         tableHead={tableHead} title={title}
+        tableHead={tableHead}
+        title={title}
+        startDate={startDate}
+        endDate={endDate}
         handleDate={handleDate}
         handleViewDetails={handleViewDetails}
       />
@@ -194,27 +203,20 @@ export const RM = () => {
               Recruitment & Mobilization
             </h2>
             {selectedPerson[0] && (
-              <div className="flex flex-col justify-evenly pl-20 ">
-                <table className="table-auto w-full text-left ">
-                  <thead>
-                    <tr>
-                      <th className="px-4 py-2 font-medium">Field Name</th>
-                      <th className="px-4 py-2 font-medium">:</th>
-                      <th className="px-4 py-2 font-medium">Value</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Object.entries(selectedPerson[0]).map(([key, value]) => (
-                      <tr key={key}>
-                        <td className="px-4 py-2 font-medium">
-                          {formatLabel(key)}
-                        </td>
-                        <td className="px-4 py-2">:</td>
-                        <td className="px-4 py-2">{value}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="flex flex-col  px-10">
+                <div>
+                  {Object.entries(selectedPerson[0]).map(([key, value]) => (
+                    <div key={key} className="flex ">
+                      <p className="py-2 text-[14px] font-bold flex-1">
+                        {formatLabel(key)}
+                      </p>
+                      <p className="py-2 px-10">:</p>
+                      <p className="py-2 flex-1 text-[14px] break-words overflow-hidden w-full">
+                        {value}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>

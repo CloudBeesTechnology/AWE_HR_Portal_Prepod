@@ -1,13 +1,15 @@
+
 import { useEffect, useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import logo from "../../../assets/logo/logo-with-name.svg";
-import { AutoFetchForAssignManager } from "../customTimeSheet/AutoFetchForAssignManager";
+
 import { SearchDisplay } from "../../../utils/SearchDisplay";
 import { IoSearch } from "react-icons/io5";
 
 export const PopupForAssignManager = ({
   toggleFunctionForAssiMana,
   renameKeysFunctionAndSubmit,
+  mergedData,
 }) => {
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [formData, setFormData] = useState({
@@ -20,7 +22,6 @@ export const PopupForAssignManager = ({
 
   const [errors, setErrors] = useState({});
 
-  const mergedData = AutoFetchForAssignManager();
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -33,29 +34,28 @@ export const PopupForAssignManager = ({
     }));
   };
 
-  useEffect(() => {
-    if (mergedData?.length > 0) {
-      // Initialize filteredEmployees with all employees on component mount
-      setFilteredEmployees(mergedData);
-    }
-  }, [mergedData]);
+  const validateForm = () => {
+    const newErrors = {};
+    const { mbadgeNo, mName, mdepartment, mfromDate, muntilDate } = formData;
+
+    // Required field checks
+    if (!mbadgeNo) newErrors.mbadgeNo = "Badge No is required.";
+
+    if (!mName) newErrors.mName = "Name is required.";
+
+    if (!mdepartment) newErrors.mdepartment = "Department is required.";
+
+    if (!mfromDate) newErrors.mfromDate = "From Date is required.";
+
+    if (!muntilDate) newErrors.muntilDate = "Until Date is required.";
+    else if (new Date(muntilDate) < new Date(mfromDate))
+      newErrors.muntilDate = "Until Date cannot be before From Date.";
+
+    return newErrors;
+  };
 
   const handleSubmit = () => {
-    const newErrors = {};
-
-    // Validation
-    Object.keys(formData).forEach((key) => {
-      if (!formData[key]) {
-        const fieldName = {
-          mbadgeNo: "Badge No",
-          mName: "Name",
-          mdepartment: "Department",
-          mfromDate: "From Date",
-          muntilDate: "Until Date",
-        }[key];
-        newErrors[key] = `${fieldName} is required.`;
-      }
-    });
+    const newErrors = validateForm();
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -63,14 +63,11 @@ export const PopupForAssignManager = ({
     }
 
     // Submit form
-
     renameKeysFunctionAndSubmit(formData);
     toggleFunctionForAssiMana();
   };
 
   const searchResult = (result) => {
-    console.log(result);
-    // setFormData(result);
     setFormData({
       mbadgeNo: result?.empBadgeNo || "",
       mName: result?.name || "",
@@ -92,10 +89,8 @@ export const PopupForAssignManager = ({
         <div className=" flex items-center justify-between pb-5 ">
           <img className="max-w-[220px] w-full" src={logo} alt="not found" />
           <RxCross2
-            className="text-2xl  text-dark_grey cursor-pointer "
-            onClick={() => {
-              toggleFunctionForAssiMana();
-            }}
+            className="text-2xl text-dark_grey cursor-pointer"
+            onClick={toggleFunctionForAssiMana}
           />
         </div>
 
@@ -107,14 +102,13 @@ export const PopupForAssignManager = ({
           <form className="grid grid-cols-1 gap-4">
             <div className="flex-1">
               <SearchDisplay
-                searchResult={searchResult} // Pass the filtered employee list
-                newFormData={mergedData} // Original employee data, used to find details
+                searchResult={searchResult}
+                newFormData={mergedData}
                 searchIcon2={<IoSearch />}
                 placeholder="Search Employee Id"
                 rounded="rounded-lg"
                 filteredEmployees={filteredEmployees}
                 setFilteredEmployees={setFilteredEmployees}
-                // onSelectEmployee={handleEmployeeSelect} // Pass the handler for employee selection
               />
             </div>
             <div>
@@ -159,7 +153,7 @@ export const PopupForAssignManager = ({
               )}
             </div>
 
-            <p className="text-dark_grey text_size_2 ">Timesheet Period:</p>
+            <p className="text-dark_grey text_size_2">Timesheet Period:</p>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-600">

@@ -61,8 +61,8 @@ export const LbdKpi = () => {
         empBadgeNo: item.empBadgeNo || "-",
         name: item.name || "-",
         gender: item.gender || "-",
-        dob: item.dob || "-",
-        doj: item.doj || "-",
+        dateOfBirth:formatDate(item.dob)  || "-",
+        dateOfJoin: formatDate(item.doj)  || "-",
         nationality: item.nationality || "-",
         skillPool: item.skillPool || "-",
         position: item.position || "-",
@@ -70,16 +70,16 @@ export const LbdKpi = () => {
           ? formatDate(item.upgradePosition[item.upgradePosition.length - 1])
           : "-",
         contactNo: item.contactNo || "-",
-        bwnIcNo: item.bwnIcNo || "-",
-        bwnIcExpiry: Array.isArray(item.bwnIcExpiry)
+        bruneiIcNo: item.bwnIcNo || "-",
+        bruneiIcExpiry: Array.isArray(item.bwnIcExpiry)
           ? formatDate(item.bwnIcExpiry[item.bwnIcExpiry.length - 1])
           : "-",
-        myIcNo: item.myIcNo || "-",
-        ppNo: Array.isArray(item.ppNo)
+          malaysianIcNo: item.myIcNo || "-",
+          passportNo: Array.isArray(item.ppNo)
           ? formatDate(item.ppNo[item.ppNo.length - 1])
           : "-",
         immigRefNo: item.immigRefNo || "-",
-        empPassExp: Array.isArray(item.empPassExp)
+        passExpiry: Array.isArray(item.empPassExp)
           ? formatDate(item.empPassExp[item.empPassExp.length - 1])
           : "-",
         educLevel: item.educLevel || "-",
@@ -117,8 +117,8 @@ const handleDate = (e, type) => {
         empBadgeNo: item.empBadgeNo || "-",
         name: item.name || "-",
         gender: item.gender || "-",
-        dob: item.dob || "-",
-        doj: item.doj || "-",
+        dateOfBirth:formatDate(item.dob)  || "-",
+        dateOfJoin: formatDate(item.doj) || "-",
         nationality: item.nationality || "-",
         skillPool: item.skillPool || "-",
         position: item.position || "-",
@@ -126,16 +126,16 @@ const handleDate = (e, type) => {
           ? formatDate(item.upgradePosition[item.upgradePosition.length - 1])
           : "-",
         contactNo: item.contactNo || "-",
-        bwnIcNo: item.bwnIcNo || "-",
-        bwnIcExpiry: Array.isArray(item.bwnIcExpiry)
+        bruneiIcNo: item.bwnIcNo || "-",
+        bruneiIcExpiry: Array.isArray(item.bwnIcExpiry)
           ? formatDate(item.bwnIcExpiry[item.bwnIcExpiry.length - 1])
           : "-",
-        myIcNo: item.myIcNo || "-",
-        ppNo: Array.isArray(item.ppNo)
+          malaysianIcNo: item.myIcNo || "-",
+          passportNo: Array.isArray(item.ppNo)
           ? formatDate(item.ppNo[item.ppNo.length - 1])
           : "-",
         immigRefNo: item.immigRefNo || "-",
-        empPassExp: Array.isArray(item.empPassExp)
+        passExpiry: Array.isArray(item.empPassExp)
           ? formatDate(item.empPassExp[item.empPassExp.length - 1])
           : "-",
         educLevel: item.educLevel || "-",
@@ -150,6 +150,8 @@ const handleDate = (e, type) => {
         tableBody={filteredData.length ? filteredData : tableBody}
          tableHead={tableHead}
          title={title}
+         startDate={startDate}
+         endDate={endDate}
          handleDate={handleDate}
       />
     </div>

@@ -5,10 +5,10 @@ export const PopupForAddRemark = ({
   toggleForRemarkFunc,
   addRemarks,
   passSelectedData,
+  addEditedRemarks,
 }) => {
   const [remark, setRemark] = useState("");
 
-  console.log(passSelectedData);
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white rounded-lg shadow-lg p-6 w-96">
@@ -36,6 +36,7 @@ export const PopupForAddRemark = ({
             className="mt-1 p-2 w-full border rounded-md "
             rows="4"
             placeholder="Enter your remark..."
+            data-gramm="false"
           ></textarea>
         </div>
 
@@ -43,13 +44,14 @@ export const PopupForAddRemark = ({
         <div className="flex justify-center mt-6">
           <button
             onClick={() => {
-              if (passSelectedData ) {
+              if (passSelectedData) {
                 const data = {
                   ...passSelectedData,
                   REMARKS: remark,
-                  status:"Rejected"
+                  status: "Rejected",
                 };
                 addRemarks(data);
+                addEditedRemarks?.(data);
               }
 
               toggleForRemarkFunc();

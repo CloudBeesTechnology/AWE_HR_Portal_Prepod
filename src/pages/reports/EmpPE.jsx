@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { FilterTable } from './FilterTable';
-import { useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { FilterTable } from "./FilterTable";
+import { useLocation } from "react-router-dom";
 
 export const EmpPE = () => {
   const location = useLocation();
-  const { allData,title } = location.state || {}; 
+  const { allData, title } = location.state || {};
   const [tableBody, setTableBody] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [startDate, setStartDate] = useState("");
@@ -38,8 +38,16 @@ export const EmpPE = () => {
     const today = new Date();
 
     // Calculate the start and end of the next month
-    const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1); // First day of next month
-    const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);  // Last day of next month
+    const startOfNextMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() + 1,
+      1
+    ); // First day of next month
+    const endOfNextMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() + 2,
+      0
+    ); // Last day of next month
 
     // Check if expiry date falls in the next month
     return expiry >= startOfNextMonth && expiry <= endOfNextMonth;
@@ -53,7 +61,9 @@ export const EmpPE = () => {
         return (
           Array.isArray(item.empPassExp) &&
           item.empPassExp.length > 0 &&
-          item.empPassExp.every((date) => date && !isNaN(new Date(date).getTime()))
+          item.empPassExp.every(
+            (date) => date && !isNaN(new Date(date).getTime())
+          )
         );
       })
       .filter((item) => {
@@ -67,16 +77,16 @@ export const EmpPE = () => {
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
           nationality: item.nationality || "-",
-          doj: formatDate(item.doj) || "-",
+          dateOfJoin: formatDate(item.doj) || "-",
           position: item.position || "-",
           department: item.department || "-",
-          empPassExp: formatDate(lastPassExp) || "-",
+          passExpiry: formatDate(lastPassExp) || "-",
         };
       });
   };
 
   useEffect(() => {
-      setTableBody(empPassMergedData(allData));
+    setTableBody(empPassMergedData(allData));
   }, [allData]);
 
   const handleDate = (e, type) => {
@@ -85,34 +95,43 @@ export const EmpPE = () => {
     if (type === "startDate") setStartDate(value);
     if (type === "endDate") setEndDate(value);
 
-    const start = type === "startDate" ? new Date(value) : startDate ? new Date(startDate) : null;
-    const end = type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
-
-    const filtered = allData.filter((data) => {
-      const expiryArray = data.empPassExp || [];
-      const expiryDate = expiryArray.length
-        ? new Date(expiryArray[expiryArray.length - 1])
+    const start =
+      type === "startDate"
+        ? new Date(value)
+        : startDate
+        ? new Date(startDate)
         : null;
+    const end =
+      type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
 
-      if (!expiryDate || isNaN(expiryDate.getTime())) return false;
+    const filtered = allData
+      .filter((data) => {
+        const expiryArray = data.empPassExp || [];
+        const expiryDate = expiryArray.length
+          ? new Date(expiryArray[expiryArray.length - 1])
+          : null;
 
-      if (start && end) return expiryDate >= start && expiryDate <= end;
-      if (start) return expiryDate >= start;
-      if (end) return expiryDate <= end;
+        if (!expiryDate || isNaN(expiryDate.getTime())) return false;
 
-      return true;
-    }).map((item) => {
-      const lastPassExp = item.empPassExp[item.empPassExp.length - 1];
-      return {
-      empID: item.empID || "-",
-      empBadgeNo: item.empBadgeNo || "-",
-      name: item.name || "-",
-      nationality: item.nationality || "-",
-      doj: formatDate(item.doj) || "-",
-      position: item.position || "-",
-      department: item.department || "-",
-      empPassExp: formatDate(lastPassExp) || "-",
-  }});
+        if (start && end) return expiryDate >= start && expiryDate <= end;
+        if (start) return expiryDate >= start;
+        if (end) return expiryDate <= end;
+
+        return true;
+      })
+      .map((item) => {
+        const lastPassExp = item.empPassExp[item.empPassExp.length - 1];
+        return {
+          empId: item.empID || "-",
+          empBadgeNo: item.empBadgeNo || "-",
+          name: item.name || "-",
+          nationality: item.nationality || "-",
+          dateOfJoin: formatDate(item.doj) || "-",
+          position: item.position || "-",
+          department: item.department || "-",
+          passExpiry: formatDate(lastPassExp) || "-",
+        };
+      });
 
     setFilteredData(filtered);
   };
@@ -120,10 +139,12 @@ export const EmpPE = () => {
   return (
     <div>
       <FilterTable
-             tableBody={filteredData.length ? filteredData : tableBody}
-             tableHead={tableHead}
-             title={title}
-             handleDate={handleDate}
+        tableBody={filteredData.length ? filteredData : tableBody}
+        tableHead={tableHead}
+        title={title}
+        startDate={startDate}
+        endDate={endDate}
+        handleDate={handleDate}
       />
     </div>
   );

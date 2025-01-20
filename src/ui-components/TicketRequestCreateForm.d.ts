@@ -35,6 +35,10 @@ export declare type TicketRequestCreateFormInputValues = {
     hrRemarks?: string;
     hrName?: string;
     hrEmpID?: string;
+    from?: string;
+    to?: string;
+    fromDate?: string;
+    toDate?: string;
 };
 export declare type TicketRequestCreateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -50,6 +54,10 @@ export declare type TicketRequestCreateFormValidationValues = {
     hrRemarks?: ValidationFunction<string>;
     hrName?: ValidationFunction<string>;
     hrEmpID?: ValidationFunction<string>;
+    from?: ValidationFunction<string>;
+    to?: ValidationFunction<string>;
+    fromDate?: ValidationFunction<string>;
+    toDate?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type TicketRequestCreateFormOverridesProps = {
@@ -67,6 +75,10 @@ export declare type TicketRequestCreateFormOverridesProps = {
     hrRemarks?: PrimitiveOverrideProps<TextFieldProps>;
     hrName?: PrimitiveOverrideProps<TextFieldProps>;
     hrEmpID?: PrimitiveOverrideProps<TextFieldProps>;
+    from?: PrimitiveOverrideProps<TextFieldProps>;
+    to?: PrimitiveOverrideProps<TextFieldProps>;
+    fromDate?: PrimitiveOverrideProps<TextFieldProps>;
+    toDate?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type TicketRequestCreateFormProps = React.PropsWithChildren<{
     overrides?: TicketRequestCreateFormOverridesProps | undefined | null;

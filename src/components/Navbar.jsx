@@ -171,19 +171,15 @@ const Navbar = () => {
           </div>
         </section> */}
         <section className="flex-initial flex item-center gap-5 ">
-          <div className="my-auto px-2">
-            <span>
-              <MdOutlineMail className="text-2xl" />
-            </span>
-          </div>
+          
           <div className=" my-auto">
             <p className="relative">
               <Link to="/notifications">
                 {" "}
                 <IoMdNotificationsOutline className="text-2xl" />
               </Link>
-              <span className="absolute -top-3 -right-3 rounded-full h-5 w-5 text-dark_grey bg-primary text-xs center">
-                1{" "}
+              <span className="absolute -top-[4px] right-[2px] rounded-full h-2 w-2 text-dark_grey bg-[#d04545] text-xs center">
+                
               </span>
             </p>
           </div>

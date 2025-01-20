@@ -6,6 +6,7 @@ import { Searchbox } from "../../utils/Searchbox";
 import { LeaveSummaryPopUp } from "./LeaveSummaryPopUp";
 import { NavigateLM } from "./NavigateLM";
 import { capitalizedLetter, DateFormat } from "../../utils/DateFormat";
+import { FiLoader } from "react-icons/fi";
 
 export const EmpLeaveBalance = () => {
   const { mergedData, userType, loading } = useOutletContext();
@@ -160,11 +161,14 @@ useEffect(() => {
     }
   };
 
-  if (loading) {
+ if (loading) {
     return (
-      <div>
-        <div className="flex items-center justify-center h-[60vh]">
-          <p className="text-sm font-semibold">Loading...</p>
+      <div className="flex items-center justify-center h-[60vh] bg-transparent">
+        <div className="flex justify-between gap-2">
+          <p className="text-sm font-semibold">Loading </p>
+          <p>
+            <FiLoader className="animate-spin mt-[4px]" size={15} />
+          </p>
         </div>
       </div>
     );

@@ -167,7 +167,7 @@ export const WorkInfoSchema = Yup.object().shape({
     .max(new Date(), "Date of Join cannot be in the future"),
 
   jobDesc: Yup.string().required("Job Description is mandatory"),
-  // skillPool: Yup.string().required("Skill Pool is mandatory"),
+  skillPool: Yup.string().required("Skill Pool is mandatory"),
   hr: Yup.string().notRequired(),
   manager: Yup.string().required("Manager is mandatory"),
   supervisor: Yup.string().notRequired(),

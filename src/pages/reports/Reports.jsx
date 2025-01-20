@@ -32,6 +32,7 @@ export const Reports = () => {
     leaveDetailsData,
     trainingCertifi,
     AddEmpReq,
+    ProbFData,contractForms
   } = useContext(DataSupply);
 
   const [mergedData, setMergeData] = useState([]);
@@ -43,8 +44,9 @@ export const Reports = () => {
     { title: "Resignation", icon: Resignation, path: "/resignation" },
     { title: "Termination", icon: terminate, path: "/termination" },
     { title: "Probation Review", icon: probation, path: "/probationReview" },
+    { title: "Probation Form Update", icon: probation, path: "/probFormUpdate" },
     { title: "Contract Expiry Review", icon: contract, path: "/contractReview" },
-    { title: "Contract Expiry Form", icon: contract, path: "/contractForms" },
+    { title: "Contract Expiry Form Update", icon: contract, path: "/ContractUp" },
     { title: "Employment Pass Expiry", icon: passExpiry, path: "/empPassExpiry" },
     { title: "LD Expiry", icon: LD, path: "/ldExpiry" },
     { title: "Passport Expiry", icon: passport, path: "/passportExpiry" },
@@ -73,6 +75,8 @@ export const Reports = () => {
         ...leaveDetailsData.find((item) => item.empID === piData.empID),
         ...trainingCertifi.find((item) => item.empID === piData.empID),
         ...AddEmpReq.find((item) => item.empID === piData.empID),
+        ...ProbFData.find((item) => item.empID === piData.empID),
+        ...contractForms.find((item) => item.empID === piData.empID),
       };
       return data;
     });
@@ -92,6 +96,7 @@ export const Reports = () => {
     leaveDetailsData,
     trainingCertifi,
     AddEmpReq,
+    ProbFData,contractForms
   ]);
 
   if (loading) return <p>Loading data...</p>;

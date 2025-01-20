@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-export const HoTBody = ({ data, loading, setTableData ,message}) => {
+export const HoTBody = ({ data, loading, setTableData, message }) => {
   useEffect(() => {
     if (loading === false) {
       const rows = document.querySelectorAll("tbody tr");
@@ -26,7 +26,7 @@ export const HoTBody = ({ data, loading, setTableData ,message}) => {
       return `${month}/${year}/${day}`; // 'M/D/YYYY'
     } catch {}
   };
-  
+
   return (
     <tbody>
       {loading === false && data && data?.length > 0
@@ -44,7 +44,9 @@ export const HoTBody = ({ data, loading, setTableData ,message}) => {
                   <td className="text-center px-4 flex-1">{m.empID}</td>
                   <td className="text-center px-4 flex-1">{m.empBadgeNo}</td>
                   <td className="text-center px-4 flex-1">{m.empName}</td>
-                  <td className="text-center px-4 flex-1">{convertToISODate(m.date)}</td>
+                  <td className="text-center px-4 flex-1">
+                    {convertToISODate(m.date)}
+                  </td>
                   <td className="text-center px-4 flex-1">{m.onAM}</td>
                   <td className="text-center px-4 flex-1">{m.offAM}</td>
                   <td className="text-center px-4 flex-1">{m.onPM}</td>
@@ -86,13 +88,12 @@ export const HoTBody = ({ data, loading, setTableData ,message}) => {
                 className="text-center text-dark_ash text_size_5 bg-white"
               >
                 <p className="p-5">{message || "Please wait few seconds."}</p>
-              </td>  
-            </tr>  
-            
+              </td>
+            </tr>
           ) ?? (
-               <tr>
+            <tr>
               <td
-                  colSpan="15"
+                colSpan="15"
                 className="text-center text-dark_ash text_size_5 bg-white"
               >
                 {/* <p className="p-5">No Table Data Available Here</p> */}

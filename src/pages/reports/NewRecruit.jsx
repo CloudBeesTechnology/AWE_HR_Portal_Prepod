@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FilterTable } from './FilterTable';
 import { useLocation } from 'react-router-dom';
+import { usePrevious } from '@react-pdf-viewer/core';
 
 export const NewRecruit = () => {
   const location = useLocation();
@@ -10,6 +11,7 @@ export const NewRecruit = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [tableHead, setTableHead] = useState([
+    "Emp ID",
     "Employee Badge",
     "Name",
     "Date of Joined",
@@ -59,17 +61,18 @@ export const NewRecruit = () => {
       .filter((item) => isDateInCurrentMonth(item.doj)) // Filter only current month dates
       .map((item) => {
         return {
+          empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
-          doj: formatDate(item.doj) || "-",
+          dateOfJoin: formatDate(item.doj) || "-",
           gender: item.gender || "-",
-          dob: formatDate(item.dob) || "-",
+          dateOfBirth: formatDate(item.dob) || "-",
           nationality: item.nationality || "-",
           position: item.position || "-",
           contactNo: item.contactNo || "-",
-          bwnIcNo: item.bwnIcNo || "-",
-          ppNo: item.ppNo || "-",
-          ppExpiry: Array.isArray(item.ppExpiry)
+          bruneiIcNo: item.bwnIcNo || "-",
+          passportNo: item.ppNo || "-",
+          passporExpiry: Array.isArray(item.ppExpiry)
           ? formatDate(item.ppExpiry[item.ppExpiry.length - 1])
           : "-",
           department: item.department || "-",
@@ -80,7 +83,7 @@ export const NewRecruit = () => {
           ? formatDate(item.contractEnd[item.contractEnd.length - 1])
           : "-",
           educLevel: item.educLevel || "-",
-          preEmp: item.preEmp || "-",
+          previousEmployee: item.preEmp || "-",
         };
       });
   };
@@ -110,17 +113,18 @@ export const NewRecruit = () => {
         return true;
       })
       .map((item) => ({
+        empID: item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
-          doj: formatDate(item.doj) || "-",
+          dateOfJoin: formatDate(item.doj) || "-",
           gender: item.gender || "-",
-          dob: formatDate(item.dob) || "-",
+          dateOfBirth: formatDate(item.dob) || "-",
           nationality: item.nationality || "-",
           position: item.position || "-",
           contactNo: item.contactNo || "-",
-          bwnIcNo: item.bwnIcNo || "-",
-          ppNo: item.ppNo || "-",
-          ppExpiry: Array.isArray(item.ppExpiry)
+          bruneiIcNo: item.bwnIcNo || "-",
+          passportNo: item.ppNo || "-",
+          passporExpiry: Array.isArray(item.ppExpiry)
           ? formatDate(item.ppExpiry[item.ppExpiry.length - 1])
           : "-",
           department: item.department || "-",
@@ -131,7 +135,7 @@ export const NewRecruit = () => {
           ? formatDate(item.contractEnd[item.contractEnd.length - 1])
           : "-",
           educLevel: item.educLevel || "-",
-          preEmp: item.preEmp || "-",
+          previousEmployee: item.preEmp || "-",
       }));
   
     setFilteredData(filtered);
@@ -142,6 +146,8 @@ export const NewRecruit = () => {
         tableBody={filteredData.length ? filteredData : tableBody}
          tableHead={tableHead}
          title={title}
+         startDate={startDate}
+         endDate={endDate}
          handleDate={handleDate}
       />
     </div>

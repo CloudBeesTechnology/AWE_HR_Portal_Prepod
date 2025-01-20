@@ -11,6 +11,7 @@ import { SpinLogo } from "../../utils/SpinLogo";
 import { GoUpload } from "react-icons/go";
 import { uploadDocs } from "../../services/uploadDocsS3/UploadDocs";
 import axios from "axios";
+import { getUrl } from "@aws-amplify/storage";
 
 export const CreateJob = () => {
   const { SubmitJobData } = CreateJobFunc();
@@ -35,6 +36,7 @@ export const CreateJob = () => {
   const [uploadedDocs, setUploadedDocs] = useState(null);
   const [uploadedFileNames, setUploadedFileNames] = useState({});
   const watchedJobTitle = watch("jobTitle");
+
   const handleFileUpload = async (e, type) => {
     if (!watchedJobTitle) {
       alert("Please enter the Job Title before uploading files.");
@@ -64,41 +66,32 @@ export const CreateJob = () => {
         setUploadedFileNames((prev) => ({
           uploadJobDetails: selectedFile.name, // Dynamically store file name
         }));
-        const url = `https://71n903ao01.execute-api.ap-southeast-1.amazonaws.com/adininfile/commonfiles/recruitment%2FapplyJob.jpg`;
+        const url = `https://71n903ao01.execute-api.ap-southeast-1.amazonaws.com/adininfile/commonfiles/${encodeURIComponent(selectedFile.name)}`;
+// console.log(url);
+
+        const URLPath = `https://commonfiles.s3.ap-southeast-1.amazonaws.com/recruiment/applyJob/${watchedJobTitle}/${encodeURIComponent(
+          selectedFile.name
+        )}`;
+// console.log(URLPath);
+
+        setUploadedDocs(URLPath);
+
         const response = await fetch(url, {
           method: "PUT",
-          // headers: {
-          //   "Content-Type": "application/octet-stream",
-          //   // "referer" : "https://71n903ao01.execute-api.ap-southeast-1.amazonaws.com"
-          // },
+          headers: {
+            "Content-Type": "application/octet-stream", // Correct header for file uploads
+          },
           body: selectedFile,
         });
-        console.log(response, "Res File upload");
 
-        // ${
-        //   watchedJobTitle
-        // }%2f${selectedFile.name}
-        // const file = new File(['content'], 'icons.png', { type: 'image/png' });
-
-        // const response = await axios.put(
-        //   `https://71n903ao01.execute-api.ap-southeast-1.amazonaws.com/adininfile/commonfiles/${encodeURIComponent(
-        //     selectedFile.name
-        //   )}`,
-        //   selectedFile,
-        //   {
-        //     headers: {
-        //       "Content-Type": "application/octet-stream",
-        //     },
-        //   }
-        // );
         // Check if the response indicates success
-        // if (!response.ok) {
-        //   throw new Error(
-        //     `Failed to upload. Status: ${response.status}, Message: ${response.statusText}`
-        //   );
-        // }
+        if (!response.ok) {
+          throw new Error(
+            `Failed to upload. Status: ${response.status}, Message: ${response.statusText}`
+          );
+        }
 
-        // const result = await response.json(); // Parse JSON response if applicable
+        const result = await response.json(); // Parse JSON response if applicable
         // console.log("File uploaded successfully:", result);
       } catch (err) {
         console.log(err);
@@ -113,12 +106,12 @@ export const CreateJob = () => {
   // console.log(uploadedDocs);
 
   const onSubmit = handleSubmit((data) => {
-    console.log(data);
+    // console.log(data);
 
     try {
       const storedvalue = {
         ...data,
-        uploadJobDetails: uploadedDocs?.uploadJobDetails || null,
+        uploadJobDetails: uploadedDocs,
       };
       // console.log(storedvalue);
 
@@ -129,25 +122,6 @@ export const CreateJob = () => {
       console.log(error);
     }
   });
-
-  const fileUploading = (e) => {
-    try {
-      const selectedFile = e.target.files[0];
-      axios({
-        method: "PUT",
-        url: "https://71n903ao01.execute-api.ap-southeast-1.amazonaws.com/adininfile/commonfiles/rec.jpg",
-        data: selectedFile,
-      })
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((error) => {
-          console.log(error, "catch");
-        });
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   return (
     <section className="bg-[#F5F6F1CC] mx-auto p-10">
@@ -162,7 +136,7 @@ export const CreateJob = () => {
 
       <div className="form-group flex flex-col gap-6">
         <div className="grid grid-cols-2 gap-5 ">
-          {hiringJob?.map((field, index) => {
+          {hiringJob.map((field, index) => {
             return (
               <div key={index}>
                 <FormField
@@ -216,22 +190,6 @@ export const CreateJob = () => {
           </button>
         </div>
       </div>
-{/* 
-      <div>
-      <label className="flex items-center px-3 py-2 p-2.5 bg-lite_skyBlue w-72 border border-[#dedddd] rounded-md cursor-pointer">
-            <input
-              type="file"
-              onChange={(e) => fileUploading(e)}
-              className="hidden"
-              accept=".pdf, .jpg, .jpeg, .png"
-            />
-            <span className="ml-2 flex p-1 text-grey gap-10">
-              <GoUpload /> PDF
-            </span>
-          </label>
-
-      </div> */}
-
       {notification && (
         <SpinLogo
           text={showTitle}

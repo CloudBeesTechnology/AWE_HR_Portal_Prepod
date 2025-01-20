@@ -13,13 +13,19 @@ import { PopupForAssignManager } from "./ModelForSuccessMess/PopupForAssignManag
 
 import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
 import { createTimeSheet, updateTimeSheet } from "../../graphql/mutations";
-import { UseScrollableView } from "./customTimeSheet/UseScrollableView";
+
 import { Notification } from "./customTimeSheet/Notification";
 import { MergeTableForNotification } from "./customTimeSheet/MergeTableForNotification";
 import { sendEmail } from "../../services/EmailServices";
 import { PopupForAddRemark } from "./ModelForSuccessMess/PopupForAddRemark";
 import { FindSpecificTimeKeeper } from "./customTimeSheet/FindSpecificTimeKeeper";
 import { PopupForSFApproves } from "./ModelForSuccessMess/PopupForSFApproves";
+import { DateFilter } from "./timeSheetSearch/DateFilter";
+import { useTempID } from "../../utils/TempIDContext";
+import { SpinLogo } from "../../utils/SpinLogo";
+import { Pagination } from "./timeSheetSearch/Pagination";
+import { AutoFetchForAssignManager } from "./customTimeSheet/AutoFetchForAssignManager";
+import { TimeSheetsCRUDoperations } from "./customTimeSheet/TimeSheetsCRUDoperations";
 
 const client = generateClient();
 export const ViewORMCsheet = ({
@@ -40,6 +46,8 @@ export const ViewORMCsheet = ({
   const [currentStatus, setCurrentStatus] = useState(defaultValue);
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedItemsTwo, setCheckedItemsTwo] = useState({});
+  const [notification, setNotification] = useState(false);
+  const [showTitle, setShowTitle] = useState("");
 
   const [editObject, setEditObject] = useState();
   const [toggleHandler, setToggleHandler] = useState(false);
@@ -53,13 +61,16 @@ export const ViewORMCsheet = ({
   const [allApprovedData, setAllApprovedData] = useState([]);
   const [allRejectedData, setAllRejectedData] = useState([]);
   const [passSelectedData, setPassSelectedData] = useState(null);
-  const { handleScroll, visibleData, setVisibleData } = UseScrollableView(
-    data,
-    "TimeKeeper"
-  );
- const [storingMess, setStoringMess] = useState(null);
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  let visibleData;
+
+  const [storingMess, setStoringMess] = useState(null);
   const processedData = useTableMerged(excelData);
 
+  const mergedData = AutoFetchForAssignManager();
+  const { startDate, endDate, searchQuery, setSearchQuery } = useTempID();
   useEffect(() => {
     try {
       if (processedData && processedData.length > 0) {
@@ -72,7 +83,8 @@ export const ViewORMCsheet = ({
   const searchResult = async (searchedData) => {
     try {
       const result = await searchedData;
-      setData(result);
+      // setData(result);
+      setSearchQuery(result);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
@@ -290,6 +302,22 @@ export const ViewORMCsheet = ({
       }),
     }));
   };
+
+  const addEditedRemarks = (object) => {
+    const addedRemarkForReject =
+      data &&
+      data.length > 0 &&
+      data.map((val) => {
+        if (val.DEPTDIV === object.DEPTDIV && val.BADGE === object.BADGE) {
+          return { ...val, REMARKS: object.REMARKS };
+        } else {
+          return val;
+        }
+      });
+
+    setData(addedRemarkForReject);
+  };
+
   const editFlatData = (data, getObject) => {
     return data.map((val) => {
       if (val.IN === getObject.IN && val.OUT === getObject.OUT) {
@@ -322,7 +350,10 @@ export const ViewORMCsheet = ({
   };
   const AllFieldData = useTableFieldData(titleName);
   const renameKeysFunctionAndSubmit = async (managerData) => {
-    if (userIdentification !== "Manager") {
+    if (
+      userIdentification !== "Manager" &&
+      showRejectedItemTable !== "Rejected"
+    ) {
       const result =
         data &&
         data.map((val) => {
@@ -355,75 +386,21 @@ export const ViewORMCsheet = ({
           ...val,
           assignTo: managerData.mbadgeNo,
           assignBy: uploaderID,
-          trade: managerData.mfromDate,
-          tradeCode: managerData.muntilDate,
+          fromDate: managerData.mfromDate,
+          untilDate: managerData.muntilDate,
         };
       });
-
-      const sendTimeSheets = async (timeSheetData) => {
-        let successCount = 0;
-        let successFlag = false;
-        for (const timeSheet of timeSheetData) {
-          try {
-            const response = await client.graphql({
-              query: createTimeSheet,
-              variables: { input: timeSheet },
-            });
-
-            if (response?.data?.createTimeSheet) {
-              console.log(
-                "TimeSheet created successfully:",
-                response.data.createTimeSheet
-              );
-              const responseData = response.data.createTimeSheet;
-              successCount++;
-
-              if (successCount === data.length) {
-                setStoringMess(false);
-                setVisibleData([]);
-                setData(null);
-              }
-
-              if (!successFlag) {
-                toggleSFAMessage(true, responseData); // Only toggle success message once
-                setStoringMess(true);
-
-                const result = await MergeTableForNotification(responseData);
-
-                if (result) {
-                  // Call the Notification function
-                  const emailDetails = await Notification({
-                    getEmail: result, // Fix: Pass 'getEmail' instead of 'result'
-                    Position,
-                  });
-
-                  if (emailDetails) {
-                    // Log email details
-                    const { subject, message, fromAddress, toAddress } =
-                      emailDetails;
-
-                    await sendEmail(subject, message, fromAddress, toAddress);
-                  } else {
-                    console.error("Notification returned undefined!");
-                  }
-                } else {
-                  console.error(
-                    "MergeTableForNotification returned undefined!"
-                  );
-                }
-
-                successFlag = true; // Set the flag to true
-              }
-            }
-          } catch (error) {
-            console.error("Error creating TimeSheet:", error);
-            toggleSFAMessage(false);
-          }
-        }
-      };
-
-      sendTimeSheets(finalResult);
+      let action = "create";
+      await TimeSheetsCRUDoperations({
+        finalResult,
+        toggleSFAMessage,
+        setStoringMess,
+        setData,
+        Position,
+        action,
+      });
     } else if (userIdentification === "Manager") {
+      setNotification(false);
       const MergedData = [...allApprovedData, ...allRejectedData];
 
       const uniqueArray = MergedData?.filter(
@@ -458,61 +435,20 @@ export const ViewORMCsheet = ({
             })
           : [];
 
-      const updateTimeSheetFuction = async (timeSheetData) => {
-        let successFlag = false;
-        for (const timeSheet of timeSheetData) {
-          try {
-            const response = await client.graphql({
-              query: updateTimeSheet,
-              variables: {
-                input: timeSheet, // Send each object individually
-              },
-            });
-
-            if (response?.data?.updateTimeSheet) {
-              console.log(
-                "TimeSheet Updated successfully:",
-                response.data.updateTimeSheet
-              );
-              const responseData = response.data.updateTimeSheet;
-              if (!successFlag) {
-                toggleSFAMessage(true, responseData); // Only toggle success message once
-
-                const result = await MergeTableForNotification(responseData);
-
-                if (result) {
-                  // Call the Notification function
-                  const emailDetails = await Notification({
-                    getEmail: result, // Fix: Pass 'getEmail' instead of 'result'
-                    Position,
-                  });
-
-                  if (emailDetails) {
-                    // Log email details
-                    const { subject, message, fromAddress, toAddress } =
-                      emailDetails;
-
-                    await sendEmail(subject, message, fromAddress, toAddress);
-                  } else {
-                    console.error("Notification returned undefined!");
-                  }
-                } else {
-                  console.error(
-                    "MergeTableForNotification returned undefined!"
-                  );
-                }
-
-                successFlag = true; // Set the flag to true
-              }
-            }
-          } catch (error) {
-            console.error("Error creating TimeSheet:", error);
-            toggleSFAMessage(false);
-          }
-        }
-      };
-
-      updateTimeSheetFuction(InitialBLNGUpdate);
+      let finalResult = InitialBLNGUpdate;
+      let action = "update";
+      await TimeSheetsCRUDoperations({
+        finalResult,
+        toggleSFAMessage,
+        setStoringMess,
+        setData,
+        Position,
+        action,
+        setShowTitle,
+        setNotification,
+        setAllApprovedData,
+        setAllRejectedData,
+      });
     } else if (
       userIdentification !== "Manager" &&
       showRejectedItemTable === "Rejected"
@@ -540,63 +476,24 @@ export const ViewORMCsheet = ({
                 empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
                 fileType: "ORMC",
                 status: "Pending",
+                companyName: val?.LOCATION,
               };
             })
           : [];
-      const updateTimeSheetFunction = async (timeSheetData) => {
-        let successFlag = false;
-        for (const timeSheet of timeSheetData) {
-          try {
-            const response = await client.graphql({
-              query: updateTimeSheet,
-              variables: {
-                input: timeSheet, // Send each object individually
-              },
-            });
-
-            if (response?.data?.updateTimeSheet) {
-              console.log(
-                "TimeSheet created successfully:",
-                response.data.updateTimeSheet
-              );
-              const responseData = response.data.updateTimeSheet;
-
-              if (!successFlag) {
-                toggleSFAMessage(true, responseData); // Only toggle success message once
-
-                const result = await MergeTableForNotification(responseData);
-
-                if (result) {
-                  // Call the Notification function
-                  const emailDetails = await Notification({
-                    getEmail: result, // Fix: Pass 'getEmail' instead of 'result'
-                    Position,
-                  });
-
-                  if (emailDetails) {
-                    // Log email details
-                    const { subject, message, fromAddress, toAddress } =
-                      emailDetails;
-
-                    await sendEmail(subject, message, fromAddress, toAddress);
-                  } else {
-                    console.error("Notification returned undefined!");
-                  }
-                } else {
-                  console.error(
-                    "MergeTableForNotification returned undefined!"
-                  );
-                }
-                setVisibleData([]);
-                setData(null);
-                successFlag = true; // Set the flag to true
-              }
-            }
-          } catch (err) {}
-        }
-      };
-
-      updateTimeSheetFunction(updatedRejectedItems);
+      let finalResult = updatedRejectedItems;
+      let action = "ResubmitRejectedItems";
+      await TimeSheetsCRUDoperations({
+        finalResult,
+        toggleSFAMessage,
+        setStoringMess,
+        setData,
+        Position,
+        action,
+        setShowTitle,
+        setNotification,
+        setAllApprovedData,
+        setAllRejectedData,
+      });
     }
   };
   const toggleForRemarkFunc = () => {
@@ -668,24 +565,71 @@ export const ViewORMCsheet = ({
       return `${month}/${year}/${day}`; // 'M/D/YYYY'
     } catch {}
   };
+
+  useEffect(() => {
+    if (secondaryData && secondaryData.length > 0) {
+      // Fixed typo
+      setCurrentPage(1);
+      let filteredData = [...secondaryData];
+      if (searchQuery) {
+        filteredData = searchQuery;
+      }
+      if (startDate && endDate) {
+        const start = new Date(startDate); // Start date as "MM/DD/YYYY"
+        const end = new Date(endDate); // End date as "MM/DD/YYYY"
+
+        // Filter the data array
+        filteredData = filteredData.filter((item) => {
+          const itemDate = new Date(item.DATE); // Convert item.DATE to a Date object
+
+          itemDate?.setHours(0, 0, 0, 0);
+          start?.setHours(0, 0, 0, 0);
+          end?.setHours(0, 0, 0, 0);
+          return itemDate >= start && itemDate <= end;
+        });
+      }
+      // Example usage
+      // const startDate = "12/23/2024"; // Start date in "MM/DD/YYYY"
+      // const endDate = "12/25/2024"; // End date in "MM/DD/YYYY"
+
+      console.log(filteredData);
+      setData(filteredData);
+    }
+  }, [startDate, endDate, secondaryData, searchQuery]);
+
+  const safeData = data || [];
+  const itemsPerPage = 10;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentData = safeData.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(safeData.length / itemsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  visibleData = currentData;
   return (
     <div>
       <div>
         {currentStatus === true ? (
           <div>
-            <div className="flex justify-end w-full mr-7">
-              <SearchBoxForTimeSheet
-                allEmpDetails={data}
-                searchResult={searchResult}
-                secondaryData={secondaryData}
-                Position={Position}
-                placeholder="Badge No."
-              />
+            <div className="flex justify-between w-full mr-7">
+              <div>
+                <DateFilter />
+              </div>
+              <div className="pt-5">
+                <SearchBoxForTimeSheet
+                  allEmpDetails={data}
+                  searchResult={searchResult}
+                  secondaryData={secondaryData}
+                  Position={Position}
+                  placeholder="Badge No."
+                />
+              </div>
             </div>
-            <div className="table-container" onScroll={handleScroll}>
+            <div className="table-container">
               <table className="styled-table w-[100%]">
                 <thead className="sticky-header">
-                  <tr className="text_size_5">
+                  <tr className="text_size_5 h-16">
                     <td className="px-5 text-center text_size_7">S No.</td>
 
                     {AllFieldData?.tableHeader.map((header, index) => (
@@ -737,17 +681,19 @@ export const ViewORMCsheet = ({
                     ? visibleData.map((value, index) => {
                         const renderRows = (m, ind) => {
                           const isStatusPending = m?.status === "Pending";
+                          const serialNumber =
+                            (currentPage - 1) * itemsPerPage + index + 1;
                           return (
                             <tr
                               key={index + 1}
-                              className="text-dark_grey h-[40px] text-sm rounded-sm shadow-md border-b-2 border-[#CECECE] bg-white"
+                              className="text-dark_grey h-[50px] text-sm rounded-sm shadow-md border-b-2 border-[#CECECE] bg-white hover:bg-[#f1f5f9] cursor-pointer"
                               onClick={() => {
                                 toggleFunction();
                                 editBLNG(m);
                               }}
                             >
                               <td className="text-center px-4 flex-1">
-                                {index + 1}
+                                {serialNumber}
                               </td>
                               <td className="text-start px-4 flex-1">
                                 {m?.NAME}
@@ -888,27 +834,35 @@ export const ViewORMCsheet = ({
               </table>
             </div>
             <div
-              className={`flex justify-center my-5 gap-5 ${
+              className={`flex justify-between items-center my-5 mt-10  ${
                 visibleData && visibleData.length > 0 ? "" : "hidden"
               }`}
             >
-              <button
-                className={`rounded px-3 py-2 ${
-                  userIdentification === "Manager" ? "w-40" : "w-52"
-                } bg-[#FEF116] text_size_5 text-dark_grey mb-10`}
-                onClick={() => {
-                  if (userIdentification !== "Manager") {
-                    toggleFunctionForAssiMana();
-                  } else if (userIdentification === "Manager") {
-                    renameKeysFunctionAndSubmit();
-                    removeCheckedItem();
-                  }
-                }}
-              >
-                {userIdentification === "Manager"
-                  ? "Approve"
-                  : "Assign Manager"}
-              </button>
+              <div className="flex-1"></div>
+              <div className="flex-1 flex justify-center">
+                <button
+                  className="rounded px-3 py-2.5 w-52 bg-[#FEF116] text_size_5 text-dark_grey"
+                  onClick={() => {
+                    if (userIdentification !== "Manager") {
+                      toggleFunctionForAssiMana();
+                    } else if (userIdentification === "Manager") {
+                      renameKeysFunctionAndSubmit();
+                      removeCheckedItem();
+                    }
+                  }}
+                >
+                  {userIdentification === "Manager"
+                    ? "Finalize and Submit"
+                    : "Assign Manager"}
+                </button>
+              </div>
+              <div className="flex-1">
+                <Pagination
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  paginate={paginate}
+                />
+              </div>
             </div>
           </div>
         ) : currentStatus === false && closePopup === true ? (
@@ -940,7 +894,7 @@ export const ViewORMCsheet = ({
           textColor="text-[#05b01f]"
           title={"Processing..."}
           message={`Data is being saved, `}
-          messageTwo={"this might take a few seconds..."}
+          messageTwo={"This might take a few seconds..."}
           // btnText={"OK"}
         />
       ) : storingMess === false ? (
@@ -957,6 +911,7 @@ export const ViewORMCsheet = ({
         <PopupForAssignManager
           toggleFunctionForAssiMana={toggleFunctionForAssiMana}
           renameKeysFunctionAndSubmit={renameKeysFunctionAndSubmit}
+          mergedData={mergedData}
         />
       )}
       {toggleForRemark === true && (
@@ -964,6 +919,15 @@ export const ViewORMCsheet = ({
           toggleForRemarkFunc={toggleForRemarkFunc}
           addRemarks={addRemarks}
           passSelectedData={passSelectedData}
+          addEditedRemarks={addEditedRemarks}
+        />
+      )}
+
+      {notification && (
+        <SpinLogo
+          text={showTitle}
+          notification={notification}
+          // path="/timesheetSBW"
         />
       )}
     </div>
