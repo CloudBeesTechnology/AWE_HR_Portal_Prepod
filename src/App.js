@@ -74,7 +74,6 @@ export const App = () => {
           </>
         )}
 
-        {/* Show Login or Forgot Pages if user is not logged in */}
         {!hideLogin.includes(location.pathname) && !loginId && !userType && (
           <>
             {location.pathname === "/forgotEmail" && <ForgotEmail />}
