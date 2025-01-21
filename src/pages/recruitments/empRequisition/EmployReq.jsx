@@ -172,7 +172,7 @@ export const EmployReq = ({}) => {
                         {item.remarkReq}
                       </span>
                       <div className="w-6 h-6 flex justify-center items-center">
-                        {localStorage.getItem("userType") === "GM" &&
+                        {localStorage.getItem("userType") === "Manager" &&
                           !item.remarkReq && (
                             <FaPencilAlt
                               className="text-[brown] cursor-pointer"
@@ -187,13 +187,13 @@ export const EmployReq = ({}) => {
           </table>
         </div>
       ) : (
-        <div className="text-center py-4">No Requisitions Found</div>
+        <p className="text-center py-4">No Requisitions Found</p>
       )}
 
       <RequisitionReviewForm
         isVisible={isReviewFormVisible}
         onClose={handleReviewFormClose}
-        isGmView={localStorage.getItem("userType") === "GM"}
+        isManagerView={localStorage.getItem("userType") === "Manager"}
         selectedRequest={selectedRequest}
         onStatusChange={handleStatusChange}
       />

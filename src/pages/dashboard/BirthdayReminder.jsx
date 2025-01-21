@@ -49,7 +49,7 @@ export const BirthdayReminder = () => {
             <div key={index} className="flex items-center space-x-3 bg-[#F5F7FB] p-2 rounded-md shadow-sm">
               <p className="w-10 h-10 text-[50px] rounded-full center"><IoPersonCircleOutline /></p>
               <div>
-                <p className="text-[14px] font-semibold">{person.name}</p>
+                <p className="text-[10px] font-semibold">{person.name}</p>
                 <p className="text-[10px] text-grey">{person.message || "Happy Birthday!"}</p>
                 <p className="text-[10px] text-grey">{format(new Date(person.dob), 'MMMM dd')}</p>
               </div>

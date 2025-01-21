@@ -143,6 +143,7 @@ const NavigationLinks = () => {
                 { selectType: { eq: userType } },
               ],
             },
+            limit:20000
           },
         });
 

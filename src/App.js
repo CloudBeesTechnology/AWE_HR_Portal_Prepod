@@ -38,9 +38,8 @@ export const App = () => {
       } else {
         setLoginId("");
         setUserType("");
-        if (!hideLogin.includes(location.pathname)) {
           navigate("/login"); 
-        }
+        
       }
     };
 
@@ -76,10 +75,11 @@ export const App = () => {
 
         {!hideLogin.includes(location.pathname) && !loginId && !userType && (
           <>
-            {location.pathname === "/forgotEmail" && <ForgotEmail />}
+            {/* {location.pathname === "/forgotEmail" && <ForgotEmail />}
             {location.pathname === "/forgotOtp" && <ForgotOtp />}
             {location.pathname === "/forgotPassword" && <ForgotPassword />}
-            {location.pathname === "/login" && <Login />}
+            {location.pathname === "/login" && <Login />} */}
+            <Login/>
           </>
         )}
 

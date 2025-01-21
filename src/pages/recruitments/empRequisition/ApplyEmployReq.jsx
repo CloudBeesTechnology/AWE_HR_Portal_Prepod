@@ -13,49 +13,43 @@ export const ApplyEmployReq = () => {
   const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [error, setError] = useState(null);
+  const userType = localStorage.getItem("userType");
 
-// Fetch requisition data
-const fetchRequisitionData = async () => {
-  try {
-    // Retrieve the userID from localStorage
-    const userID = localStorage.getItem("userID");
-    if (!userID) {
-      throw new Error("User ID is not available in localStorage");
-    }
+  const fetchRequisitionData = async () => {
+    try {
+      const userID = localStorage.getItem("userID");
+      if (!userID) {
+        throw new Error("User ID is not available in localStorage");
+      }
 
-    // GraphQL query with filter
-    const response = await client.graphql({
-      query: listEmpRequisitions,
-      variables: {
-        filter: {
-          requestorID: { eq: userID }, // Filter by the logged-in user's ID
+      const response = await client.graphql({
+        query: listEmpRequisitions,
+        variables: {
+          filter: {
+            requestorID: { eq: userID }, 
+          },
         },
-      },
-    });
+      });
 
-    // Extract and set the filtered requisition data
-    const fetchedData = response?.data?.listEmpRequisitions?.items || [];
-    setRequisitionData(fetchedData);
-    setError(null);
-  } catch (err) {
-    console.error("Error fetching requisition data:", err);
-    setError("Failed to fetch requisition data");
-    setRequisitionData([]);
-  }
-};
-
+      const fetchedData = response?.data?.listEmpRequisitions?.items || [];
+      setRequisitionData(fetchedData);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching requisition data:", err);
+      setError("Failed to fetch requisition data");
+      setRequisitionData([]);
+    }
+  };
 
   useEffect(() => {
     fetchRequisitionData();
   }, []);
 
-  // Handle "View" link click
   const handleViewClick = (request) => {
     setSelectedRequest(request);
     setIsReviewFormVisible(true);
   };
 
-  // Close the review form
   const handleReviewFormClose = () => {
     setSelectedRequest(null);
     setIsReviewFormVisible(false);
@@ -67,7 +61,7 @@ const fetchRequisitionData = async () => {
       : status === "Approved"
       ? "text-[#339933]"
       : status === "Pending"
-      ? "text-dark_grey"
+      ? "text-[#E8A317]"
       : "text-[#E8A317]";
   };
 
@@ -79,36 +73,34 @@ const fetchRequisitionData = async () => {
       document.body.style.overflow = "auto";
     }
 
-    // Cleanup on unmount
     return () => {
       document.body.style.overflow = "auto";
     };
   }, [isFormVisible, isReviewFormVisible]);
 
   return (
-    <section className=" bg-[#F5F6F1]">
+    <section className="bg-[#F5F6F1]">
       <div className="screen-size">
-        {/* Header Buttons */}
         <div className="flex justify-between my-8">
           <p className="bg-[#faf362] py-2 px-3 rounded-lg text-[18px] font-semibold">
             My Requisition List
           </p>
-          <button
-            className="hover:bg-[#f4bf71] border-2 border-[#f4bf71] py-2 px-3 rounded-lg text-[18px] font-semibold"
-            onClick={() => setIsFormVisible(true)}
-          >
-            Apply New Requisition
-          </button>
+          {userType === "Manager" && (
+            <button
+              className="hover:bg-[#f4bf71] border-2 border-[#f4bf71] py-2 px-3 rounded-lg text-[18px] font-semibold"
+              onClick={() => setIsFormVisible(true)}
+            >
+              Apply New Requisition
+            </button>
+          )}
         </div>
 
-        {/* Error Display */}
         {error && <div className="text-[red]">{error}</div>}
 
-        {/* Requisition Table */}
         {requisitionData.length > 0 ? (
-        <div className="h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-lg">
+          <div className="h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-lg">
             <table className="w-full">
-            <thead className="bg-[#939393] text-white sticky top-0 rounded-lg">
+              <thead className="bg-[#939393] text-white sticky top-0 rounded-lg">
                 <tr>
                   {/* <th className="pl-4 py-3">Requestor</th> */}
                   {/* <th className="pl-4">Department</th> */}
@@ -167,7 +159,7 @@ const fetchRequisitionData = async () => {
             </table>
           </div>
         ) : (
-          <p>No requisition data available.</p>
+          <p className="text-center py-4">No Requisitions Found</p>
         )}
 
         {/* Requisition Form Modal */}
