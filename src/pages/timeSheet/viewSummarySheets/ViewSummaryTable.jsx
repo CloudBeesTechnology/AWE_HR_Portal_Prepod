@@ -112,10 +112,7 @@ export const ViewSummaryTable = ({
             <Link
               to="/timeSheet"
               className="text-xl flex-1 text-grey"
-              onClick={() => {
-                getStartDate(null);
-                getEndDate(null);
-              }}
+          
             >
               <FaArrowLeft />
             </Link>

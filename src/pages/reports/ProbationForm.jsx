@@ -385,7 +385,7 @@ export const ProbationForm = forwardRef(() => {
           ...formDataValues,
           probStatus: true,
         };
-        // await UpdateProb({ PbFDataUp: formattedData });
+        await UpdateProb({ PbFDataUp: formattedData });
 
         if (userType === "Manager") {
           if (emailData.skilledAndUnskilled === null) {
@@ -397,21 +397,21 @@ export const ProbationForm = forwardRef(() => {
           sendEmail(subject, message, from, emailData.hrOfficialmail);
         }
 
-        // setShowTitle("Probation Form Updated successfully");
+        setShowTitle("Probation Form Updated successfully");
         console.log("Updated", formattedData);
       } else {
         // Create new record
         const ProbValue = { ...data, ...formDataValues, probStatus: true };
-        // await ProbFormsData({ ProbValue });
+        await ProbFormsData({ ProbValue });
 
         if (userType === "Supervisor") {
           sendEmail(subject, message, from, emailData.managerOfficialMail);
         }
 
         console.log("create", ProbValue);
-        // setShowTitle("Probation Form Saved successfully");
+        setShowTitle("Probation Form Saved successfully");
       }
-      // setNotification(true);
+      setNotification(true);
     } catch (err) {
       console.error("Error submitting form:", err);
     }

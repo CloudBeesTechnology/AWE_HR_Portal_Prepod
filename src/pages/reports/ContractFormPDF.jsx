@@ -109,12 +109,8 @@ export const ContractFormPDF = ({ contentRef }) => {
               genManagerEmail: gmInfo.officialEmail,
             }));
             // console.log("Updated Email Data with GM Email:", gmInfo.officialEmail);
-          } else {
-            console.log("GM Info not found.");
-          }
-        } else {
-          console.log("No General Manager positions found.");
-        }
+          } 
+        } 
       }
     }
   }, [workInfoData, employeeData?.empID, empPIData]);
@@ -176,9 +172,9 @@ export const ContractFormPDF = ({ contentRef }) => {
           contStatus: true,
         };
         await contractDetails({ ContractValue: formattedData });
-        console.log("Updated Data", formattedData);
+        // console.log("Updated Data", formattedData);
         setShowTitle("Contract Form Updated Successfully");
-        // setNotification(true);
+        setNotification(true);
 
         if (userType === "HR") {
           sendEmail(subject, message, from, managerData.genManagerEmail);
@@ -190,7 +186,7 @@ export const ContractFormPDF = ({ contentRef }) => {
         if (userType === "Manager") {
           sendEmail(subject, message, from, managerData.hrEmail);
         }
-        console.log("Create Data", createFormattedData);
+        // console.log("Create Data", createFormattedData);
         setShowTitle("Contract Form Saved Successfully");
         setNotification(true);
       }

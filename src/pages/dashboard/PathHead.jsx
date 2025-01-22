@@ -27,20 +27,26 @@ export const PathHead = () => {
       const bruneian = candidates.filter(
         (item) =>
           Array.isArray(item.contractType) &&
-          item.contractType.map((type) => type.toUpperCase()).includes("LOCAL")
+          item.contractType.length > 0 &&
+          item.contractType[item.contractType.length - 1].toUpperCase() === "LOCAL"
       ).length;
       
       setBruneianCount(bruneian);
+      
 
       // Calculate LPA count
       const LPA = candidates.filter(
-        (item) => Array.isArray(item.contractType) && item.contractType.map((type) => type.toUpperCase()).includes("LPA")
+        (item) => Array.isArray(item.contractType) &&
+        item.contractType.length > 0 &&
+        item.contractType[item.contractType.length - 1].toUpperCase() === ("LPA")
       ).length;
       setLPACount(LPA);
 
       // Calculate SAWP count
       const SAWP = candidates.filter(
-        (item) => Array.isArray(item.contractType) && item.contractType.map((type) => type.toUpperCase()).includes("SAWP")
+        (item) => Array.isArray(item.contractType) &&
+        item.contractType.length > 0 &&
+        item.contractType[item.contractType.length - 1].toUpperCase() ===("SAWP")
       ).length;
       setSAWPCount(SAWP);
 
