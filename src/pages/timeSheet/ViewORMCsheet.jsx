@@ -12,11 +12,7 @@ import { useTableMerged } from "./customTimeSheet/UserTableMerged";
 import { PopupForAssignManager } from "./ModelForSuccessMess/PopupForAssignManager";
 
 import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
-import { createTimeSheet, updateTimeSheet } from "../../graphql/mutations";
 
-import { Notification } from "./customTimeSheet/Notification";
-import { MergeTableForNotification } from "./customTimeSheet/MergeTableForNotification";
-import { sendEmail } from "../../services/EmailServices";
 import { PopupForAddRemark } from "./ModelForSuccessMess/PopupForAddRemark";
 import { FindSpecificTimeKeeper } from "./customTimeSheet/FindSpecificTimeKeeper";
 import { PopupForSFApproves } from "./ModelForSuccessMess/PopupForSFApproves";
@@ -86,7 +82,7 @@ export const ViewORMCsheet = ({
       // setData(result);
       setSearchQuery(result);
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      // console.error("Error fetching user data:", error);
     }
   };
   useEffect(() => {
@@ -113,7 +109,7 @@ export const ViewORMCsheet = ({
               );
             }
           } catch (error) {
-            console.error("Error parsing empWorkInfo for ID:", val.id, error);
+            // console.error("Error parsing empWorkInfo for ID:", val.id, error);
           }
           return {
             id: val.id,
@@ -172,18 +168,7 @@ export const ViewORMCsheet = ({
         // "ot",
         // "remarks",
       ];
-      // const requiredKeys = [
-      //   "DEPTDIV",
-      //   "BADGE",
-      //   "DATE",
-      //   "IN",
-      //   "OUT",
-      //   "TOTALINOUT",
-      //   "ALLDAYMINHRS",
-      //   "NETMINUTES",
-      //   "TOTALHOURS",
-      //   "REMARKS",
-      // ];
+
       const checkedKeys = () => {
         return new Promise((resolve) => {
           const keyCheckResult = convertedData.every((item) =>
@@ -345,7 +330,7 @@ export const ViewORMCsheet = ({
       });
       setData(updatedData);
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   };
   const AllFieldData = useTableFieldData(titleName);
@@ -533,7 +518,7 @@ export const ViewORMCsheet = ({
 
     setAllRejectedData(dataAlongWithRemark);
   };
-  // console.log(allApprovedData, " : ", allRejectedData);
+
   const removeExistingData = (data, action) => {
     if (action === "Approved") {
       const afterRemoved = allApprovedData.filter((fil) => fil.id !== data.id);
@@ -555,6 +540,7 @@ export const ViewORMCsheet = ({
 
     // Update the state with the filtered data
     setData(afterRemoved);
+    setSecondaryData(afterRemoved);
     setAllApprovedData([]);
     setAllRejectedData([]);
   }, [allApprovedData, allRejectedData, data]);
@@ -592,7 +578,6 @@ export const ViewORMCsheet = ({
       // const startDate = "12/23/2024"; // Start date in "MM/DD/YYYY"
       // const endDate = "12/25/2024"; // End date in "MM/DD/YYYY"
 
-      console.log(filteredData);
       setData(filteredData);
     }
   }, [startDate, endDate, secondaryData, searchQuery]);

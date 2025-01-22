@@ -19,7 +19,7 @@ export const useFetchData = (titleName, cardName) => {
         try {
           setLoading(true); // Start loading indicator
 
-          // Map titleName to appropriate query and data keys
+       
 
           let nextToken = null;
           let allData = [];
@@ -72,7 +72,7 @@ export const useFetchData = (titleName, cardName) => {
 
           setConvertedStringToArrayObj(allData); // Update state with all data
         } catch (error) {
-          console.error(`Error fetching data for ${titleName}:`, error);
+          // console.error(`Error fetching data for ${titleName}:`, error);
         } finally {
           setLoading(false); // Stop loading indicator
         }
@@ -83,13 +83,10 @@ export const useFetchData = (titleName, cardName) => {
         fetchData();
       }
     }, [titleName]);
-    // const { handleScroll, visibleData, setVisibleData } = useScrollableView(
-    //   convertedStringToArrayObj,
-    //   "Manager"
-    // );
+  
 
     return { convertedStringToArrayObj, getPosition, loading };
   } catch (err) {
-    console.log("ERROR : ", err);
+    // console.log("ERROR : ", err);
   }
 };

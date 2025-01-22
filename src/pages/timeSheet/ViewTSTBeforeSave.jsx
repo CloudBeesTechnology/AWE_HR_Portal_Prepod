@@ -7,11 +7,7 @@ import React, {
 } from "react";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
 
-// import {
-//   createOffshoreSheet,
-//   deleteOffshoreSheet,
-//   updateOffshoreSheet,
-// } from "../../graphql/mutations";
+
 import { generateClient } from "@aws-amplify/api";
 import { PopupForMissMatchExcelSheet } from "./ModelForSuccessMess/PopupForMissMatchExcelSheet";
 import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
@@ -53,7 +49,7 @@ export const ViewTSTBeforeSave = ({
   showRejectedItemTable,
 }) => {
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
-  // console.log(convertedStringToArrayObj);
+
   // State to trigger re-render for Notification component
   const [closePopup, setClosePopup] = useState(false);
   const [data, setData] = useState(null);
@@ -105,7 +101,7 @@ export const ViewTSTBeforeSave = ({
             });
 
             const fetchedData = await dataPromise;
-            // console.log(fetchedData);
+          
             async function fetchAllData(queryName) {
               let allData = [];
               let nextToken = null;
@@ -158,7 +154,7 @@ export const ViewTSTBeforeSave = ({
                   })
                   .filter((item) => item !== null);
 
-                // console.log(mergedDatas);
+              
 
                 // Merge fetchedData with workInfo based on FID
                 const mergedData = fetchedData.map((item) => {
@@ -166,7 +162,7 @@ export const ViewTSTBeforeSave = ({
                     (info) => info?.sapNo == item?.NO
                   );
 
-                  // console.log(workInfoItem);
+                  
                   return {
                     ...item,
                     NORMALWORKINGHRSPERDAY: workInfoItem
@@ -175,13 +171,13 @@ export const ViewTSTBeforeSave = ({
                   };
                 });
 
-                // console.log(mergedData);
+               
 
                 // Set merged data in state
                 setData(mergedData);
                 setSecondaryData(mergedData);
               } catch (error) {
-                console.error("Error fetching work info:", error.message);
+                // console.error("Error fetching work info:", error.message);
               }
             };
 
@@ -194,7 +190,7 @@ export const ViewTSTBeforeSave = ({
         fetchData();
       }
     } catch (err) {
-      console.log("Error : ", err);
+      // console.log("Error : ", err);
     }
   }, [excelData]);
   useEffect(() => {
@@ -219,7 +215,7 @@ export const ViewTSTBeforeSave = ({
             );
           }
         } catch (error) {
-          console.error("Error parsing empWorkInfo for ID:", val.id, error);
+          // console.error("Error parsing empWorkInfo for ID:", val.id, error);
         }
 
         return {
@@ -255,7 +251,7 @@ export const ViewTSTBeforeSave = ({
       // setData(result);
       setSearchQuery(result);
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      // console.error("Error fetching user data:", error);
     }
   };
 
@@ -297,7 +293,7 @@ export const ViewTSTBeforeSave = ({
         resolve(keyCheckResult);
       });
       setClosePopup(true);
-      // console.log(result);
+    
       setShowStatusCol(result);
       setCurrentStatus(result); // Assuming setCurrentStatus is defined
       setLoading(false);
@@ -391,9 +387,7 @@ export const ViewTSTBeforeSave = ({
       setResponse(null);
     }
   }, []);
-  // const toggleSFAMessage = async (value, responseData) => {
 
-  // };
 
   const toggleFunctionForAssiMana = () => {
     setToggleAssignManager(!toggleAssignManager);
@@ -442,9 +436,9 @@ export const ViewTSTBeforeSave = ({
       const result = Array.isArray(data[0]?.data)
         ? editNestedData(data, getObject)
         : editFlatData(data, getObject);
-      // console.log(result);
+      
       const updatedData = result?.map((item) => {
-        // console.log(item);
+       
         // Check if jobLocaWhrs is a non-null, non-empty array and assign LOCATION if valid
         if (Array.isArray(item?.jobLocaWhrs) && item?.jobLocaWhrs?.length > 0) {
           item.LOCATIONATTOP = item?.jobLocaWhrs[0]?.LOCATION;
@@ -456,7 +450,7 @@ export const ViewTSTBeforeSave = ({
 
       setData(updatedData);
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   };
 
@@ -612,9 +606,9 @@ export const ViewTSTBeforeSave = ({
   };
 
   const storeOnlySelectedItem = (data, action) => {
-    // console.log(action);
+ 
     if (action === "Approved") {
-      // console.log(data);
+     
       setAllApprovedData((prevApprovedData) => {
         // Replace old data if ID matches, otherwise keep existing data
         const updatedData = prevApprovedData.filter(
@@ -626,7 +620,7 @@ export const ViewTSTBeforeSave = ({
       });
     } else if (action === "Rejected") {
       setPassSelectedData(data);
-      // console.log(data);
+     
       setAllRejectedData((prevRejectedData) => {
         // Replace old data if ID matches, otherwise keep existing data
         const updatedData = prevRejectedData.filter(
@@ -638,10 +632,10 @@ export const ViewTSTBeforeSave = ({
     }
   };
   const addRemarks = (data) => {
-    // console.log(data);
+  
     const dataAlongWithRemark = allRejectedData.map((m) => {
       if (m.id === data.id) {
-        // console.log(data);
+        console.log(data);
         return { ...data, REMARKS: data.REMARKS };
       } else {
         return m;
@@ -678,7 +672,7 @@ export const ViewTSTBeforeSave = ({
     setAllRejectedData([]);
   }, [allApprovedData, allRejectedData, data]);
 
-  // console.log(allApprovedData, " : ", allRejectedData);
+
 
   const convertToISODate = (dateString) => {
     try {
@@ -714,7 +708,7 @@ export const ViewTSTBeforeSave = ({
       // const startDate = "12/23/2024"; // Start date in "MM/DD/YYYY"
       // const endDate = "12/25/2024"; // End date in "MM/DD/YYYY"
 
-      // console.log(filteredData);
+     
       setData(filteredData);
     }
   }, [startDate, endDate, secondaryData, searchQuery]);
@@ -873,7 +867,7 @@ export const ViewTSTBeforeSave = ({
                                     checked={checkedItems[m.id] || false}
                                     onClick={(e) => e.stopPropagation()}
                                     onChange={(e) => {
-                                      // console.log(m);
+                                     
 
                                       if (e.target.checked) {
                                         setCheckedItems((prev) => ({
@@ -881,7 +875,6 @@ export const ViewTSTBeforeSave = ({
                                           [m.id]: e.target.checked, // Toggle the checked state for this specific ID
                                         }));
                                         storeOnlySelectedItem(m, "Approved");
-                                        setAllRejectedData([]);
                                       } else {
                                         removeExistingData(m, "Approved");
                                         setCheckedItems((prev) => ({
@@ -906,7 +899,6 @@ export const ViewTSTBeforeSave = ({
                                         }));
                                         storeOnlySelectedItem(m, "Rejected");
                                         toggleForRemarkFunc();
-                                        setAllApprovedData([]);
                                       } else {
                                         removeExistingData(m, "Rejected");
                                         // setCheckedItemsTwo({});

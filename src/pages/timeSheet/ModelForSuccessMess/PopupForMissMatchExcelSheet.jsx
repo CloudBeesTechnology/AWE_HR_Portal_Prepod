@@ -3,7 +3,7 @@ import { MdCancel } from "react-icons/md";
 
 export const PopupForMissMatchExcelSheet = ({ setClosePopup }) => {
   return (
-
+ 
     <div className="flex justify-center">
       <div className="relative flex flex-col items-center gap-5 p-5 px-16 rounded shadow-lg border border-lite_grey bg-white">
         {/* Cancel Icon */}

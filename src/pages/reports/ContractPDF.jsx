@@ -121,8 +121,8 @@ export const ContractPDF = ({ userID, userType }) => {
             ? item.supervisor[item.supervisor.length - 1]
             : null;
         const lastManager =
-          item.manager && item.manager.length > 0
-            ? item.manager[item.manager.length - 1]
+          item.manager && item.manager?.length > 0
+            ? item.manager[item.manager?.length - 1]
             : null;
 
         const isDepartmentHead = item.depHead !== null;
@@ -156,9 +156,9 @@ export const ContractPDF = ({ userID, userType }) => {
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
           nationality: item.nationality || "-",
-          doj: formatDate(item.doj) || "-",
-          department: item.department || "-",
-          position: item.position || "-",
+          dateOfJoin: formatDate(item.doj) || "-",
+          department: item.department[item.department.length - 1],
+          position: item.position[item.position.length - 1],
           contractStartDate: formatDate(startDate) || "-",
           contractEndDate: formatDate(lastDate) || "-",
           balanceMonths: balanceMonths,
@@ -215,9 +215,9 @@ export const ContractPDF = ({ userID, userType }) => {
         empBadgeNo: item.empBadgeNo || "-",
         name: item.name || "-",
         nationality: item.nationality || "-",
-        doj: formatDate(item.doj) || "-",
-        department: item.department || "-",
-        position: item.position || "-",
+        dateOfJoin: formatDate(item.doj) || "-",
+        department: item.department[item.department?.length - 1] || "-",
+        position: item.position[item.position?.length - 1] || "-",
         contractStartDate: formatDate(startDate) || "-",
         contractEndDate: formatDate(lastDate) || "-",      
       };
@@ -292,7 +292,7 @@ export const ContractPDF = ({ userID, userType }) => {
 
             <div className="flex justify-evenly items-center p-3">
               <button
-                className="mt-4 bg-green text-white px-4 py-2 rounded"
+                className="primary_btn"
                 onClick={handleNavigate}
               >
                 Go to Contract Form

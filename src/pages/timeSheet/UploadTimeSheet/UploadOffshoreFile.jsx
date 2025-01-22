@@ -11,18 +11,13 @@ export const UploadOffshoreFile = (
     const workbook = XLSX.read(excelFile, { type: "buffer" });
 
     const worksheetNameLength = workbook.SheetNames;
-    // console.log("WorkSheet Names :", worksheetNameLength);
+  
     const allSheets = [];
 
     worksheetNameLength.forEach((sheetName) => {
       const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
       allSheets.push({ sheetName, data: sheet });
     });
-
-
-    var dataWithDateAndLocation = [];
-
- 
 
     const mapKeys = (row, header) => {
       const mappedObj = {};
@@ -113,13 +108,12 @@ export const UploadOffshoreFile = (
         let totalIndex = MergeDateLocation.findIndex(
           (item) => item.NAME === "TOTAL"
         );
-        // console.log(tbodyData);
-        console.log(totalIndex);
+       
         if (totalIndex > -1) {
           let slicedData = MergeDateLocation.slice(0, totalIndex);
-          // console.log(slicedData);
+         
           let filteredData = slicedData.filter((item) => item.NAME !== null);
-          // console.log(filteredData);
+         
           const filterdData = filteredData.flat();
 
           finalFilterdData.push(...filterdData);
@@ -158,7 +152,7 @@ export const UploadOffshoreFile = (
           date: formattedDate,
         };
       });
-    // console.log(result);
+    
     function cleanKey(key) {
       if (typeof key !== "string") {
         return key; // Return value if not a string (e.g., number, object)
@@ -176,7 +170,7 @@ export const UploadOffshoreFile = (
 
       return cleanedItem;
     });
-    // console.log("formattedData : ", formattedData);
+    
     setExcelData(formattedData);
     setLoading(false);
     return tbodyHeader;

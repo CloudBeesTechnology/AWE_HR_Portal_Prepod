@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { getCurrentUser, signIn } from "@aws-amplify/auth";
 import { generateClient } from "@aws-amplify/api";
 import { listUsers } from "../../graphql/queries";
+import { Link } from "react-router-dom";
 
 const client = generateClient();
 
@@ -23,16 +24,21 @@ const Login = () => {
   const Submit = handleSubmit(async (data) => {
     try {
       const username = data.userID;
+      // console.log(username);
 
       const resultUser = await client.graphql({
         query: listUsers,
-        variables:{limit:20000}
-
+        variables: {
+          limit: 20000,
+        },
       });
+      // console.log(resultUser?.data?.listUsers?.items);
 
-      const user = resultUser?.data?.listUsers?.items.find(
-        (val) => val.empID === username.toUpperCase()
-      );
+      const user = resultUser?.data?.listUsers?.items.find((val) => {
+        // console.log(val.empID);
+        return val.empID === username;
+      });
+      // console.log(user);
 
       if (user && user.status === "Active") {
         const password = data.password;
@@ -54,7 +60,7 @@ const Login = () => {
           } else {
             console.error("userType not found");
             alert(
-              "Access denied: Your account is inactive. Please contact the administrator for assistance"
+              "User not found. Please contact the administrator for assistance"
             );
           }
         }
@@ -144,10 +150,17 @@ const Login = () => {
             <p className="text-[red] text-sm my-2 ml-5">
               {errors.password?.message}
             </p>
-            {/* <div className="flex justify-end my-3">
-              <p className="text-[#7A7A7A] text_size_7">Forgot password?</p>
-            </div> */}
           </div>
+
+          <div>
+            <Link
+              to="/forgotEmail"
+              className="flex justify-center items-center pt-3 "
+            >
+              <p className="text-[#24A1D7] text_size_7">Forgot password?</p>
+            </Link>
+          </div>
+
           <div className="center ">
             <button className="primary_btn text_size_4 my-5" onClick={Submit}>
               Login

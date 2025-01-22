@@ -21,7 +21,6 @@ export const Reports = () => {
     empPIData,
     LMIData,
     PPValidsData,
-    empPDData,
     IDData,
     workInfoData,
     terminateData,
@@ -63,23 +62,24 @@ export const Reports = () => {
     const mergeData = empPIData.map((piData) => {
       const data = {
         ...piData,
-        ...IDData?.find((item) => item.empID === piData.empID),
-        ...workInfoData?.find((item) => item.empID === piData.empID),
-        ...terminateData?.find((item) => item.empID === piData.empID),
-        ...DNData?.find((item) => item.empID === piData.empID),
-        ...PPValidsData?.find((item) => item.empID === piData.empID),
-        ...LMIData?.find((item) => item.empID === piData.empID),
-        ...EmpInsuranceData?.find((item) => item.empID === piData.empID),
-        ...WeldeInfo?.find((item) => item.empID === piData.empID),
-        ...BastingInfo?.find((item) => item.empID === piData.empID),
-        ...leaveDetailsData?.find((item) => item.empID === piData.empID),
-        ...trainingCertifi?.find((item) => item.empID === piData.empID),
-        ...AddEmpReq?.find((item) => item.empID === piData.empID),
-        ...ProbFData?.find((item) => item.empID === piData.empID),
-        ...contractForms?.find((item) => item.empID === piData.empID),
+        ...(IDData?.find((item) => item.empID === piData.empID) || {}),
+        ...(workInfoData?.find((item) => item.empID === piData.empID) || {}),
+        ...(terminateData?.find((item) => item.empID === piData.empID) || {}),
+        ...(DNData?.find((item) => item.empID === piData.empID) || {}),
+        ...(PPValidsData?.find((item) => item.empID === piData.empID) || {}),
+        ...(LMIData?.find((item) => item.empID === piData.empID) || {}),
+        ...(EmpInsuranceData?.find((item) => item.empID === piData.empID) || {}),
+        ...(WeldeInfo?.find((item) => item.empID === piData.empID) || {}),
+        ...(BastingInfo?.find((item) => item.empID === piData.empID) || {}),
+        ...(leaveDetailsData?.find((item) => item.empID === piData.empID) || {}),
+        ...(trainingCertifi?.find((item) => item.empID === piData.empID) || {}),
+        ...(AddEmpReq?.find((item) => item.empID === piData.empID) || {}),
+        ...(ProbFData?.find((item) => item.empID === piData.empID) || {}),
+        ...(contractForms?.find((item) => item.empID === piData.empID) || {}),
       };
       return data;
     });
+    
     setMergeData(mergeData);
     setLoading(false);
   }, [
@@ -99,7 +99,6 @@ export const Reports = () => {
     ProbFData,contractForms
   ]);
 
-  if (loading) return <p>Loading data...</p>;
 
   return (
     <div className="p-10 w-full bg-[#F5F6F1CC]">
@@ -110,7 +109,7 @@ export const Reports = () => {
         {reportTiles.map((tile, index) => (
           <div
             key={index}
-            className="flex flex-col items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg cursor-pointer border-2 border-[#EAD892] w-[200px] h-[150px]"
+            className="flex flex-col justify-center items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg cursor-pointer border-2 border-[#EAD892] w-[200px] h-[150px]"
             onClick={() => navigate(tile.path, { state: { allData: mergedData,title:tile.title
             }})}
           >

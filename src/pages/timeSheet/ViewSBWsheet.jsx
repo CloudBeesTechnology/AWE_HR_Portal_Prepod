@@ -57,7 +57,6 @@ export const ViewSBWsheet = ({
   const [allRejectedData, setAllRejectedData] = useState([]);
   const [passSelectedData, setPassSelectedData] = useState(null);
 
-  const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
   let visibleData;
@@ -81,23 +80,9 @@ export const ViewSBWsheet = ({
       // setData(result);
       setSearchQuery(result);
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      // console.error("Error fetching user data:", error);
     }
   };
-  // useEffect(() => {
-  //   const fetchWorkInfo = async () => {
-  //     // Fetch the BLNG data using GraphQL
-  //     const [empWorkInfos] = await Promise.all([
-  //       client.graphql({
-  //         query: listTimeSheets,
-  //       }),
-  //     ]);
-  //     const workInfo = empWorkInfos?.data?.listTimeSheets?.items;
-  //     const k = workInfo.filter((fil) => fil.fileType === "SBW");
-  //     console.log(k);
-  //   };
-  //   fetchWorkInfo();
-  // }, []);
 
   useEffect(() => {
     const getPosition = localStorage.getItem("userType");
@@ -122,7 +107,7 @@ export const ViewSBWsheet = ({
               );
             }
           } catch (error) {
-            console.error("Error parsing empWorkInfo for ID:", val.id, error);
+            // console.error("Error parsing empWorkInfo for ID:", val.id, error);
           }
           return {
             id: val.id,
@@ -148,7 +133,7 @@ export const ViewSBWsheet = ({
             status: val.status || "",
           };
         });
-      // console.log(result);
+
       setData(result);
       setSecondaryData(result);
     }
@@ -222,7 +207,7 @@ export const ViewSBWsheet = ({
 
           if (userIdentification === "Manager") {
             const finalData = await SendDataToManager(fetchedData);
-            // console.log(finalData);
+
             pendingData(finalData);
           }
         } catch (err) {
@@ -322,8 +307,10 @@ export const ViewSBWsheet = ({
   };
 
   const editFlatData = (data, getObject) => {
+  
     return data.map((val) => {
       if (val.DEPTDIV === getObject.DEPTDIV && val.BADGE === getObject.BADGE) {
+       
         return getObject;
       } else {
         return val;
@@ -332,26 +319,26 @@ export const ViewSBWsheet = ({
   };
 
   const editSBWFunction = (getObject) => {
-    try {
-      const result = Array.isArray(data[0]?.data)
-        ? editNestedData(data, getObject)
-        : editFlatData(data, getObject);
+    const result = Array.isArray(data[0]?.data)
+      ? editNestedData(data, getObject)
+      : editFlatData(data, getObject);
 
-      const updatedData = result?.map((item) => {
-        // Check if jobLocaWhrs is a non-null, non-empty array and assign LOCATION if valid
-        if (Array.isArray(item?.jobLocaWhrs) && item?.jobLocaWhrs?.length > 0) {
-          item.LOCATION = item?.jobLocaWhrs[0]?.LOCATION;
-        } else {
-          item.LOCATION = null; // Default to null or any other fallback value
-        }
-        return item;
-      });
+    const updatedData = result?.map((item) => {
+      // Check if jobLocaWhrs is a non-null, non-empty array and assign LOCATION if valid
+      if (Array.isArray(item?.jobLocaWhrs) && item?.jobLocaWhrs?.length > 0) {
+        item.LOCATION = item?.jobLocaWhrs[0]?.LOCATION;
+      } else {
+        item.LOCATION = null; // Default to null or any other fallback value
+      }
+      return item;
+    });
 
-      setData(updatedData);
-      // console.log(updatedData);
-    } catch (err) {
-      console.log(err);
-    }
+   
+    setData(updatedData);
+
+    // } catch (err) {
+    //   console.log(err);
+    // }
   };
 
   const AllFieldData = useTableFieldData(titleName);
@@ -542,7 +529,7 @@ export const ViewSBWsheet = ({
 
     setAllRejectedData(dataAlongWithRemark);
   };
-  // console.log(allApprovedData, " : ", allRejectedData);
+
   const removeExistingData = (data, action) => {
     if (action === "Approved") {
       const afterRemoved = allApprovedData.filter((fil) => fil.id !== data.id);
@@ -565,9 +552,10 @@ export const ViewSBWsheet = ({
 
     // Update the state with the filtered data
     setData(afterRemoved);
+    setSecondaryData(afterRemoved);
     setAllApprovedData([]);
     setAllRejectedData([]);
-  }, []);
+  }, [allApprovedData, allRejectedData, data]);
   // }, [allApprovedData, allRejectedData, data]);
   const convertToISODate = (dateString) => {
     try {
@@ -581,16 +569,18 @@ export const ViewSBWsheet = ({
     if (secondaryData && secondaryData.length > 0) {
       // Fixed typo
       setCurrentPage(1);
-      let newFilteredData = [...(secondaryData || [])];
+      let filteredData = [...secondaryData];
       if (searchQuery) {
-        newFilteredData = searchQuery;
+        filteredData = searchQuery;
+
+        // setVisibleData(filteredData);
       }
       if (startDate && endDate) {
         const start = new Date(startDate); // Start date as "MM/DD/YYYY"
         const end = new Date(endDate); // End date as "MM/DD/YYYY"
 
         // Filter the data array
-        newFilteredData = newFilteredData.filter((item) => {
+        filteredData = filteredData.filter((item) => {
           const itemDate = new Date(item.DATE); // Convert item.DATE to a Date object
 
           itemDate?.setHours(0, 0, 0, 0);
@@ -599,20 +589,24 @@ export const ViewSBWsheet = ({
           return itemDate >= start && itemDate <= end;
         });
       }
+      // Example usage
+      // const startDate = "12/23/2024"; // Start date in "MM/DD/YYYY"
+      // const endDate = "12/25/2024"; // End date in "MM/DD/YYYY"
 
-      setFilteredData(newFilteredData);
+      setData(filteredData);
+      // setVisibleData(filteredData.length > 0 ? filteredData : []);
     }
   }, [startDate, endDate, secondaryData, searchQuery]);
-  const itemsPerPage = 10;
-  const safeData = filteredData.length > 0 ? filteredData : data || [];
+  const itemsPerPage = 25;
+  const safeData = data || [];
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentData = safeData.slice(indexOfFirstItem, indexOfLastItem);
+  const currentData = safeData?.slice(indexOfFirstItem, indexOfLastItem);
 
   const totalPages = Math.ceil(safeData.length / itemsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  // console.log(currentData);
   visibleData = currentData;
   return (
     <div>

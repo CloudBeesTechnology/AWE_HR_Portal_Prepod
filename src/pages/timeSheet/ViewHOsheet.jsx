@@ -78,19 +78,7 @@ export const ViewHOsheet = ({
       setSecondaryData(processedData);
     }
   }, [processedData]);
-  // useEffect(()=>{
-  //   const fetchWorkInfo = async () => {
-  //     // Fetch the BLNG data using GraphQL
-  //     const [empWorkInfos] = await Promise.all([
-  //       client.graphql({
-  //         query: listTimeSheets,
-  //       }),
-  //     ]);
-  //     const workInfo = empWorkInfos?.data?.listTimeSheets?.items;
-  //     console.log(workInfo)
-  //   }
-  //     fetchWorkInfo();
-  // },[])
+  
   useEffect(() => {
     const getPosition = localStorage.getItem("userType");
     if (getPosition === "Manager") {
@@ -115,7 +103,7 @@ export const ViewHOsheet = ({
               );
             }
           } catch (error) {
-            console.error("Error parsing empWorkInfo for ID:", val.id, error);
+            // console.error("Error parsing empWorkInfo for ID:", val.id, error);
           }
           return {
             id: val.id,
@@ -154,9 +142,7 @@ export const ViewHOsheet = ({
       setSecondaryData(result);
     }
   };
-  // const searchResult = (result) => {
-  //   setData(result);
-  // };
+
   const searchResult = async (searchedData) => {
     try {
       const result = await searchedData;
@@ -585,7 +571,7 @@ export const ViewHOsheet = ({
 
     setAllRejectedData(dataAlongWithRemark);
   };
-  // console.log(allApprovedData, " : ", allRejectedData);
+ 
   const removeExistingData = (data, action) => {
     if (action === "Approved") {
       const afterRemoved = allApprovedData.filter((fil) => fil.id !== data.id);
@@ -618,7 +604,7 @@ export const ViewHOsheet = ({
 
       return `${month}/${year}/${day}`; // 'M/D/YYYY'
     } catch (err) {
-      console.log(err, " : ERROR");
+      // console.log(err, " : ERROR");
     }
   };
 
@@ -928,6 +914,91 @@ export const ViewHOsheet = ({
                   onClick={() => {
                     if (userIdentification !== "Manager") {
                       toggleFunctionForAssiMana();
+                      //   const fetchDataAndDelete = async () => {
+                      //   try {
+                      //     console.log("Fetching and Deleting SBW Data...");
+                      //     // setIsDeleting(true); // Set loading state
+                      //     let nextToken = null; // Initialize nextToken for pagination
+
+                      //     do {
+                      //       // Define the filter for fetching SBW data
+                      //       const filter = {
+                      //         and: [{ fileType: { eq: "HO" } }],
+                      //       };
+
+                      //       // Fetch the BLNG data using GraphQL with pagination
+                      //       const response = await client.graphql({
+                      //         query: listTimeSheets,
+                      //         variables: { filter: filter, nextToken: nextToken }, // Pass nextToken for pagination
+                      //       });
+
+                      //       // Extract data and nextToken
+                      //       const SBWdata =
+                      //         response?.data?.listTimeSheets?.items || [];
+                      //       nextToken = response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
+
+                      //       console.log("Fetched SBW Data:", SBWdata);
+
+                      //       // Delete each item in the current batch
+                      //       await Promise.all(
+                      //         SBWdata.map(async (item) => {
+                      //           try {
+                      //             const deleteResponse = await client.graphql({
+                      //               query: deleteTimeSheet,
+                      //               variables: { input: { id: item.id } },
+                      //             });
+                      //             console.log(
+                      //               "Deleted Item Response:",
+                      //               deleteResponse
+                      //             );
+                      //           } catch (deleteError) {
+                      //             console.error(
+                      //               `Error deleting item with ID ${item.id}:`,
+                      //               deleteError
+                      //             );
+                      //           }
+                      //         })
+                      //       );
+
+                      //       console.log("Batch deletion completed.");
+                      //     } while (nextToken); // Continue fetching until no more data
+
+                      //     console.log(
+                      //       "All SBW items deletion process completed."
+                      //     );
+                      //   } catch (fetchError) {
+                      //     console.error(
+                      //       "Error in fetchDataAndDelete:",
+                      //       fetchError
+                      //     );
+                      //   } finally {
+                      //     // setIsDeleting(false); // Reset loading state
+                      //   }
+                      // };
+                      // fetchDataAndDelete();
+
+                      // fetchData();
+                      // FOR DELETE
+                      // const deleteFunction = async () => {
+                      //   const weaklysheet = {
+                      //     id: "3deaccb4-7b1e-43b3-aa94-fd7d4cf46f56",
+                      //   };
+
+                      //   await client
+                      //     .graphql({
+                      //       query: deleteHeadOffice,
+                      //       variables: {
+                      //         input: weaklysheet,
+                      //       },
+                      //     })
+                      //     .then((res) => {
+                      //       console.log(res);
+                      //     })
+                      //     .catch((err) => {
+                      //       console.log(err);
+                      //     });
+                      // };
+                      // deleteFunction();
                     } else if (userIdentification === "Manager") {
                       renameKeysFunctionAndSubmit();
                       removeCheckedItem();

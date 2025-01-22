@@ -12,11 +12,12 @@ import "jspdf-autotable";
 
 import { useTempID } from "../../../utils/TempIDContext";
 import { GetViewSummaryUpdater } from "../customTimeSheet/GetViewSummaryUpdater";
+
 const client = generateClient();
 export const ApplyVSFunction = ({
   convertedStringToArrayObj,
   ProcessedDataFunc,
-  dummyHolidayList,
+  publicHoliday,
   dummyLeaveStatus,
   dayCounts,
 }) => {
@@ -107,7 +108,7 @@ export const ApplyVSFunction = ({
         // const leaveStatusData = leaveStatus?.data?.listLeaveStatuses?.items;
         const leaveStatusData = leaveStatuses;
 
-        const approvedLeaveStatus = dummyLeaveStatus.filter(
+        const approvedLeaveStatus = leaveStatusData?.filter(
           (fil) => fil.managerStatus === "Approved"
         );
 
@@ -167,7 +168,7 @@ export const ApplyVSFunction = ({
           groupBySapNo(convertedStringToArrayObj || [])
         );
 
-        console.log("grouped : ", grouped);
+        // console.log("grouped : ", grouped);
 
         const seperateDateMethod = (inputData) => {
           return inputData
@@ -437,21 +438,20 @@ export const ApplyVSFunction = ({
         };
 
         const leaveCount_ = transformData(filteredData);
-        // console.log("leaveCount_ : ", leaveCount_);
-        // console.log("seperatedGroupedData : ", seperatedGroupedData);
+        console.log("leaveCount_ : ", leaveCount_);
+        console.log("seperatedGroupedData : ", seperatedGroupedData);
 
-        const holidayDates = dummyHolidayList.CompanyHolidays2025.flatMap(
+        const holidayDates = publicHoliday?.CompanyHolidays2025.flatMap(
           (holiday) => holiday.dates || [holiday.date]
         );
 
-        const formattedHolidayDates = holidayDates.map((dateStr) => {
+        const formattedHolidayDates = holidayDates?.map((dateStr) => {
           const parts = dateStr.split(",")[1].trim(); // Extract "1st October 2024"
           const [day, month, year] = parts.split(" "); // Split into day, month, and year
           const dayNumber = day.replace(/\D/g, ""); // Remove non-numeric characters from the day
           const monthNumber = new Date(`${month} 1, 2000`).getMonth() + 1; // Convert month name to number
           return `${year}-${monthNumber}-${dayNumber}`; // Format as "MM/DD/YYYY"
         });
-        console.log(formattedHolidayDates);
 
         // const getStartDate = new Date("2024-9-21");
         // const getEndDate = new Date("2024-10-20");
@@ -537,12 +537,12 @@ export const ApplyVSFunction = ({
 
             const checkEntry = entry?.empWorkInfo[0]?.WORKINGHRS;
 
-            const isPublicHoliday = formattedHolidayDates.some(
+            const isPublicHoliday = formattedHolidayDates?.some(
               (formattedDate) => {
                 const formattedDateObject = new Date(formattedDate);
-                const formattedDay = `${formattedDateObject.getDate()}-${
-                  formattedDateObject.getMonth() + 1
-                }-${formattedDateObject.getFullYear()}`;
+                const formattedDay = `${formattedDateObject?.getDate()}-${
+                  formattedDateObject?.getMonth() + 1
+                }-${formattedDateObject?.getFullYear()}`;
                 return formattedDay === dayStr;
               }
             );
@@ -640,7 +640,6 @@ export const ApplyVSFunction = ({
         });
 
         // Example usage:
-        console.log(addLeaveTypeCount);
 
         // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         const updateFieldBasedOnConditions = async (inputData) => {
@@ -760,7 +759,7 @@ export const ApplyVSFunction = ({
 
         // Call the function with updatedData
         const UpdaterNameAdded = await getSummaryUpdaterName(updatedData);
-        console.log(UpdaterNameAdded);
+
         // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
         const transformedData = UpdaterNameAdded?.map((item) => {
@@ -813,7 +812,7 @@ export const ApplyVSFunction = ({
           const location = item?.location;
           const hollydayCounts = item?.hollydayCounts;
           const timeKeeper = item?.timeKeeper;
-          console.log(item?.data);
+
           const overtimeHours = Array.from({ length: dayCounts }, (_, i) => {
             const currentDay = new Date(getStartDate);
             currentDay.setDate(getStartDate.getDate() + i); // Increment date
@@ -827,15 +826,6 @@ export const ApplyVSFunction = ({
             // Find matching data for the current day
             const entry = item?.data?.find(({ date }) => {
               const entryDate = new Date(date);
-              // console.log(
-              //   entryDate.getDate(),
-              //   " Day : ",
-              //   currentDay.getDate(),
-              //   "  Month : ",
-              //   entryDate.getMonth(),
-              //   " : ",
-              //   currentDay.getMonth()
-              // );
 
               return (
                 //   entryDate === currentDay
@@ -844,7 +834,7 @@ export const ApplyVSFunction = ({
                 entryDate.getFullYear() === currentDay.getFullYear()
               );
             });
-            console.log(entry);
+
             // Initialize overtime hours from the entry
             const overtimeHours = entry?.empWorkInfo[0]?.OVERTIMEHRS
               ? parseFloat(entry?.empWorkInfo[0].OVERTIMEHRS)
@@ -864,7 +854,6 @@ export const ApplyVSFunction = ({
 
             return acc;
           }, {});
-          console.log(overtimeHours);
 
           const processEntries = (
             item,
@@ -920,9 +909,6 @@ export const ApplyVSFunction = ({
             }
           );
 
-          console.log(getVerify);
-          console.log(assignUpdaterDateTime);
-
           const jobcode = item?.data?.map(
             ({ empWorkInfo }) => empWorkInfo[0]?.JOBCODE
           );
@@ -945,7 +931,6 @@ export const ApplyVSFunction = ({
             mealAllow: getMealAllow,
           };
         }).filter(Boolean);
-        console.log(transformedData);
 
         await ProcessedDataFunc(transformedData);
       };
@@ -956,6 +941,6 @@ export const ApplyVSFunction = ({
       }
     }, [convertedStringToArrayObj]);
   } catch (err) {
-    console.log("ERROR : ", err);
+    // console.log("ERROR : ", err);
   }
 };

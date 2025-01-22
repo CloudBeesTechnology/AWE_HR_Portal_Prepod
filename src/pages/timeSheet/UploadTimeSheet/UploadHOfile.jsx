@@ -21,7 +21,6 @@ export const UploadHOfile = (
       });
 
       // console.log(allSheets);
-      const AddData = [];
 
       const getResult =
         allSheets &&
@@ -30,8 +29,6 @@ export const UploadHOfile = (
           // console.log(data);
 
           var headerSlicedData = data.slice(1, 2);
-
-          var name = "";
 
           const changedHeader = headerSlicedData.map((columns) => {
             const foundKey = Object.entries(columns).map(([key, value]) => {
@@ -130,8 +127,6 @@ export const UploadHOfile = (
         return `${day}/${month}/${year}`;
       }
 
-      
-
       const updatedDataArray =
         formattedData &&
         formattedData.map((item) => {
@@ -159,7 +154,6 @@ export const UploadHOfile = (
 
             const formattedDate = convertDateFormat(dateObject);
             item.DATE = formattedDate;
-            
           }
 
           return item;

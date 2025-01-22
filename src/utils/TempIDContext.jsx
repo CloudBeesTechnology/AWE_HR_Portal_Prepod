@@ -46,7 +46,7 @@ export const TempIDProvider = ({ children }) => {
 
       const gmPosition = generalManagerPosition[0];
 
-      // console.log("General Manager Positions:", generalManagerPosition);
+      console.log("General Manager Positions:", generalManagerPosition);
 
       if (gmPosition && gmPosition.position.length > 0) {
         const lastPosition =

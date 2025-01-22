@@ -358,7 +358,7 @@ export const ViewForm = ({
                 managerName.name || "Not mentioned"
               }.
                   </p>
-                  <p>Click here https://hr.adininworks.co" to view the updates. sup</p>
+                  <p>Click here https://hr.adininworks.co" to view the updates.</p>
                 </body>
               </html>`,
               "leave_no-reply@adininworks.com",
@@ -377,7 +377,7 @@ export const ViewForm = ({
                 managerName.name || "Not mention"
               }. 
                </p>
-               <p>Click here https://employee.adininworks.co to view the status. emp</p>
+               <p>Click here https://employee.adininworks.co to view the status.</p>
               </body>
               </html>`,
               "leave_no-reply@adininworks.com",
@@ -398,7 +398,7 @@ export const ViewForm = ({
                 managerName.name || "Not mentioned"
               }.
                   </p>
-                  <p>Click here https://hr.adininworks.co" to view the updates. hr</p>
+                  <p>Click here https://hr.adininworks.co" to view the updates.</p>
                 </body>
               </html>`,
               "leave_no-reply@adininworks.com",

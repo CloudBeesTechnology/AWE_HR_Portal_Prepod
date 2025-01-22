@@ -51,9 +51,9 @@ export const InsurancePaths = [
 ];
 export const LeaveManagement = [
   "/leaveManagement",
-  "/leaveManage/historyLeave",
-  "/leaveManage/leaveBalance",
-  "/leaveManage/requestTickets",
+  "/leaveManagement/historyLeave",
+  "/leaveManagement/leaveBalance",
+  "/leaveManagement/requestTickets",
 ];
 
 export const TimePaths = [

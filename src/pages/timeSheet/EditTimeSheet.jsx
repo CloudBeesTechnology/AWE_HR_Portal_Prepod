@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { RxCross2 } from "react-icons/rx";
-import { SearchDisplay } from "../../utils/SearchDisplay";
-import { FaPlus } from "react-icons/fa6";
+import { IoCloseCircleOutline } from "react-icons/io5";
 import { FaRegSquarePlus } from "react-icons/fa6";
 import { FaRegSquareMinus } from "react-icons/fa6";
 import "../../../src/index.css";
 import img from "../../assets/logo/logo-with-name.svg";
 import { SearchDisplayForTimeSheet } from "./timeSheetSearch/SearchDisplayForTS";
+
 export const EditTimeSheet = ({
   editObject,
   toggleFunction,
@@ -58,35 +57,33 @@ export const EditTimeSheet = ({
   ];
 
   const LocationData = [
-    { id: 1, location: "Offshore" },
-    { id: 2, location: "Head Office" },
+    { id: 1, location: "OFFSHORE" },
+    { id: 2, location: "HEAD OFFICE" },
     { id: 3, location: "ORMC" },
     { id: 4, location: "SBW" },
     { id: 5, location: "BLNG" },
-    { id: 6, location: "Crest Centurion 2" },
+    { id: 6, location: "CREST CENTURION 2" },
     { id: 7, location: "DAY TRIPPING" },
-    { id: 8, location: "Icon Aliza" },
-    { id: 9, location: "Icon Valiant" },
-    { id: 10, location: "Khalifa" },
-    { id: 11, location: "Masshor Princess" },
-    { id: 12, location: "MV Falgout" },
-    { id: 13, location: "Accounts" },
+    { id: 8, location: "ICON ALIZA" },
+    { id: 9, location: "ICON VALIANT" },
+    { id: 10, location: "KHALIFA" },
+    { id: 11, location: "MASSHOR PRINCESS" },
+    { id: 12, location: "MV FALGOUT" },
+    { id: 13, location: "ACCOUNTS" },
     { id: 14, location: "HR" },
-    { id: 15, location: "Purchasing" },
-    { id: 16, location: "Corporate" },
+    { id: 15, location: "PURCHASING" },
+    { id: 16, location: "CORPORATE" },
     { id: 17, location: "CPT" },
   ];
 
   useEffect(() => {
     if (editObject) {
       setFormData(editObject);
-      // console.log(editObject);
+
       const validJobLocaWhrs =
         editObject?.jobLocaWhrs?.filter(
           (item) => item !== null && item !== undefined
         ) || [];
-
-      // console.log("Valid Job Location & Working Hours:", validJobLocaWhrs);
 
       if (validJobLocaWhrs.length > 0) {
         const resultData = validJobLocaWhrs.map((m, index) => {
@@ -122,7 +119,6 @@ export const EditTimeSheet = ({
   }, [editObject]);
 
   const searchedValueForJOBCODE = (id, searcValue) => {
-    // console.log(searcValue);
     if (searcValue !== "" || searcValue === "") {
       setSections((prevSections) =>
         prevSections.map((section) =>
@@ -162,7 +158,20 @@ export const EditTimeSheet = ({
     }
   };
 
- 
+  // const searchedValueForLOCATION = (id, searcValue) => {
+  //   if (searcValue === "") {
+  //     setSections((prevSections) =>
+  //       prevSections.map((section) =>
+  //         section.id === id
+  //           ? {
+  //               ...section,
+  //               LOCATION: searcValue || null,
+  //             }
+  //           : section
+  //       )
+  //     );
+  //   }
+  // };
   const searchResultForJOBCODE = (jobcode, id) => {
     // setJobCode(jobcode);
 
@@ -199,7 +208,14 @@ export const EditTimeSheet = ({
   ]);
 
   const addSection = () => {
-
+    // const newId = sections.length + 1;
+    // while (sections.some(section => section.id === newId)) {
+    //   newId++; // Increment ID until it's unique
+    // }
+    // const newSection = {
+    //   id: newId,
+    // };
+    // setSections([...sections, newSection]);
 
     setSections((prevSections) => {
       // Generate a unique ID
@@ -282,8 +298,6 @@ export const EditTimeSheet = ({
       // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
       const sumHoursAndMinutes = (sections, key) => {
         let totalMinutes = sections.reduce((total, sec) => {
-          // console.log(sec);
-
           if (sec[key]) {
             // Replace "." with ":" to handle decimal formats like "8.20" → "8:20"
             let time = sec[key].includes(".")
@@ -311,7 +325,6 @@ export const EditTimeSheet = ({
       let totalWorkingHrs = sumHoursAndMinutes(sections, "WORKINGHRS");
       let totalOvertimeHrs = sumHoursAndMinutes(sections, "OVERTIMEHRS");
 
-      // console.log(totalWorkingHrs, " : ", totalOvertimeHrs);
       setFormData((prevFormData) => {
         const updatedWorkingHours =
           parseFloat(totalWorkingHrs?.split(":")[0]) +
@@ -392,8 +405,6 @@ export const EditTimeSheet = ({
     const minutes = totalOvertimeHrs % 60;
     const formattedTime = `${hours}:${minutes.toString().padStart(2, "0")}`;
 
-    // console.log(formattedTime);
-
     // Update formData with formattedTime if totalOvertimeHrs exists
     if (totalOvertimeHrs > 0) {
       setFormData((prevFormData) => ({
@@ -432,8 +443,6 @@ export const EditTimeSheet = ({
         ...prevFormData,
         [name]: value,
       };
-
-    
 
       return updatedData;
     });
@@ -477,25 +486,31 @@ export const EditTimeSheet = ({
     >
       {/* h-[600px] w-[900px] */}
       <section className="bg-[#f9fafb] p-5 gap-2 flex flex-col item-center rounded-lg shadow-md   border-[#EBEBEB] w-[50%] h-[80%] overflow-y-auto ">
-        <div className="mx-10 my-5">
-          <header className="flex justify-between my-5">
-            <div className="flex justify-center ">
-              <img className="size-36 h-12 w-full" src={img} alt="not found" />
-            </div>
-            <div className="flex justify-center py-2 ">
+        <header className="flex justify-between mt-5 ">
+          <div className="flex-1"></div>
+          <div className="flex justify-center flex-1">
+            <img className="size-36 h-12 w-52" src={img} alt="not found" />
+          </div>
+          {/* <div className="flex justify-center py-2 ">
               <p className="text-dark_grey font-semibold text-[22px]">
                 EDIT ACCESS
               </p>
-            </div>
-            <div className="flex justify-end pt-2">
-              <RxCross2
-                className="text-[28px] cursor-pointer"
-                onClick={toggleFunction}
-              />
-            </div>
-          </header>
+            </div> */}
+          <div className="flex justify-end pt-2 flex-1">
+            <IoCloseCircleOutline
+              className="text-[30px] cursor-pointer"
+              onClick={toggleFunction}
+            />
+          </div>
+        </header>
+        <div className="mx-7 mt-2 mb-14">
+          <div className="flex items-center justify-center  text-dark_grey font-bold text-[25px] mb-3">
+            <u>
+              <p>Edit Form</p>
+            </u>
+          </div>
           {fields?.map((field, index) => (
-            <div key={index} className="grid grid-cols-2  space-y-3 ">
+            <div key={index} className="grid grid-cols-2  space-y-3  ">
               <div>
                 <p className="text-dark_grey text_size_5 pt-5">
                   {tableHeader[index]}
@@ -548,33 +563,24 @@ export const EditTimeSheet = ({
                       </span>
                     )
                   : ""}
-                {/* {warningMessForAdinin &&
-                (field === "WORKINGHOURS" || field === "TOTALACTUALHOURS") && (
-                  <span className="text_size_9 mt-2 text-red">
-                 {" "} and AW & ESB
-                  </span>
-                )} */}
               </div>
             </div>
           ))}
           {Position === "Manager" && (
             <div className="grid grid-cols-2  space-y-3">
-              <p className="text-dark_grey text_size_5 pt-2">STATUS</p>
+              <p className="text-dark_grey text_size_5 pt-5">STATUS</p>
+
               <input
+                name="STATUS"
                 type="text"
                 className="border border-slate_grey bg-[#f1f5f9]  rounded text-dark_grey text_size_5 outline-none w-full py-2 px-3 cursor-auto "
-                value="Pending"
+                value={formData.STATUS || ""}
                 readOnly
               />
             </div>
           )}
           {/*  */}
-          <section
-            className="grid grid-cols-1 "
-            // onClick={() => {
-            //   setFilteredEmployees([]);
-            // }}
-          >
+          <section className="grid grid-cols-1 ">
             <div className="grid grid-cols-[10fr,10fr,10fr,10fr,0.6fr] gap-0 pt-5">
               <label className="text_size_5 text-dark_grey ">JOBCODE</label>
               <label className="text_size_5 text-dark_grey ">LOCATION</label>
@@ -591,12 +597,14 @@ export const EditTimeSheet = ({
                   <div
                     key={index}
                     className="grid grid-cols-[5fr,5fr,5fr,5fr,0fr] gap-4 pt-1 pb-2 "
-                    style={Position === "Manager" ? { pointerEvents: "none" } : undefined}
+                    style={
+                      Position === "Manager"
+                        ? { pointerEvents: "none" }
+                        : undefined
+                    }
                   >
                     <div className="w-fit">
                       <SearchDisplayForTimeSheet
-                        // filteredEmployees={filteredEmployees}
-                        // setFilteredEmployees={setFilteredEmployees}
                         newFormData={JOBCODES}
                         placeholder="Search Job Code"
                         rounded="rounded"
@@ -622,11 +630,6 @@ export const EditTimeSheet = ({
                         id={section.id}
                       />
 
-                      {/* {!section.LOCATION && (
-                      <span className="text_size_9 mt-2 text-red">
-                        Location must not be empty.
-                      </span>
-                    )} */}
                       {errors[`LOCATION-${index}`] && (
                         <span className="text-red text_size_8">
                           {errors[`LOCATION-${index}`]}
@@ -661,8 +664,6 @@ export const EditTimeSheet = ({
                             e.target.value,
                             "OvertimeHrs"
                           );
-
-                          // combineAllData(section.id, e.target.value)
                         }}
                         placeholder="Enter Overtime "
                         className="border border-lite_grey rounded text-dark_grey text_size_5 outline-none w-full py-2 px-3 cursor-auto bg-white"
@@ -692,9 +693,13 @@ export const EditTimeSheet = ({
               })}
           </section>
 
-          <div className=" flex justify-center">
+          <div
+            className={`flex justify-center ${
+              Position === "Manager" ? "hidden " : ""
+            }`}
+          >
             <button
-              className=" text-dark_grey text_size_3 rounded bg-[#FEF116] px-9 m-5 py-2"
+              className={`text-dark_grey text_size_3 rounded bg-[#FEF116] px-9 m-5 py-2 `}
               onClick={() => {
                 handleSave();
                 // addJCandLocaWhrs();

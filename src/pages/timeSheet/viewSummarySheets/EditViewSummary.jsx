@@ -19,9 +19,6 @@ export const EditViewSummary = ({
     workingHrs: summaryObject?.workingHrs || "",
     overtimeHrs: summaryObject?.ot || "",
     workingHrsKey: summaryObject?.workingHrsKey || "",
-    // mealAllow: Array.isArray(summaryObject?.mealAllow)
-    //   ? summaryObject?.mealAllow[summaryObject?.mealAllow.length - 1]
-    //   : summaryObject?.mealAllow || "",
 
     mealAllow: summaryObject?.mealAllow || "",
   });
@@ -31,9 +28,10 @@ export const EditViewSummary = ({
     const { name, value } = e.target; // Get the name and value from the input
     setFormData({
       ...formData, // Spread the existing values
-      [name]: value, // Update only the changed field
+      [name]: value, // Update only the changed fields
     });
-  };
+  };  
+  
   return (
     <section className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white w-[90%] max-w-[550px] rounded-lg shadow-lg p-7 ">

@@ -29,22 +29,22 @@ export const JOBCODES = [
 ];
 
 export const LocationData = [
-  { id: 1, location: "Offshore" },
-  { id: 2, location: "Head Office" },
+  { id: 1, location: "OFFSHORE" },
+  { id: 2, location: "HEAD OFFICE" },
   { id: 3, location: "ORMC" },
   { id: 4, location: "SBW" },
   { id: 5, location: "BLNG" },
-  { id: 6, location: "Crest Centurion 2" },
+  { id: 6, location: "CREST CENTURION 2" },
   { id: 7, location: "DAY TRIPPING" },
-  { id: 8, location: "Icon Aliza" },
-  { id: 9, location: "Icon Valiant" },
-  { id: 10, location: "Khalifa" },
-  { id: 11, location: "Masshor Princess" },
-  { id: 12, location: "MV Falgout" },
-  { id: 13, location: "Accounts" },
+  { id: 8, location: "ICON ALIZA" },
+  { id: 9, location: "ICON VALIANT" },
+  { id: 10, location: "KHALIFA" },
+  { id: 11, location: "MASSHOR PRINCESS" },
+  { id: 12, location: "MV FALGOUT" },
+  { id: 13, location: "ACCOUNTS" },
   { id: 14, location: "HR" },
-  { id: 15, location: "Purchasing" },
-  { id: 16, location: "Corporate" },
+  { id: 15, location: "PURCHASING" },
+  { id: 16, location: "CORPORATE" },
   { id: 17, location: "CPT" },
 ];
 

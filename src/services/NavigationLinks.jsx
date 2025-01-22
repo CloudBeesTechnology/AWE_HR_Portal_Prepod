@@ -143,6 +143,7 @@ const NavigationLinks = () => {
                 { selectType: { eq: userType } },
               ],
             },
+            limit:20000
           },
         });
 
@@ -397,8 +398,8 @@ const NavigationLinks = () => {
               element={<ContractPDF userID={userID} userType={userType} />}
             />
             <Route path="/promotion" Component={PromotionRep} />
-            <Route path="/probFormUpdate" Component={ProbationPDF} />
-            <Route
+            <Route path="/probFormUpdate" element={<ProbationPDF userID={userID} userType={userType}/>} />           
+             <Route
               path="/ContractUp"
               element={<ContractPDF userID={userID} userType={userType} />}
             />

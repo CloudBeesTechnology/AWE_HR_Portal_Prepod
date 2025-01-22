@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import { IoSearch } from "react-icons/io5";
+import { DateFormat } from "../../utils/DateFormat";
 
 export const FilterTable = ({
   tableBody,
@@ -122,13 +123,13 @@ export const FilterTable = ({
     // Add the Start Date and End Date as rows
     const dateRow = [];
     if (startDate) {
-      dateRow.push(`Start Date: ${startDate}`);
+      dateRow.push(`Start Date: ${DateFormat(startDate)}`);
     } else {
       dateRow.push('Start Date: Not Provided');
     }
   
     if (endDate) {
-      dateRow.push(`End Date: ${endDate}`);
+      dateRow.push(`End Date: ${DateFormat(endDate)}`);
     } else {
       dateRow.push('End Date: Not Provided');
     }

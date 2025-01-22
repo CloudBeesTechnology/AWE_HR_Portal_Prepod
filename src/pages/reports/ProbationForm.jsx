@@ -53,6 +53,7 @@ export const ProbationForm = forwardRef(() => {
       initiative: "",
       managerDate: "",
       managerName: "",
+      gmName: "",
       pace: "",
       quality: "",
       recommendation: "",
@@ -121,7 +122,7 @@ export const ProbationForm = forwardRef(() => {
       const supervisorEmpID =
         workInfo.supervisor[workInfo.supervisor.length - 1];
       const managerEmpID = workInfo.manager[workInfo.manager.length - 1];
-      const hrOfficialmail = workInfo.hr[workInfo.hr.length - 1];
+      const hrOfficialmail =  workInfo.hr[workInfo.hr.length - 1];
 
       // console.log("Supervisor EmpID:", supervisorEmpID);
       // console.log("Manager EmpID:", managerEmpID);
@@ -184,22 +185,32 @@ export const ProbationForm = forwardRef(() => {
 
       // Step 6: Fetch General Manager's email (if applicable)
       const generalManagerPositions = workInfoData.filter((item) =>
-        item.position.includes("GENERAL MANAGER")
+        item.position[item.position.length - 1]?.includes("General Manager")
       );
-
+      
+      // console.log("Filtered General Manager Positions:", generalManagerPositions);
+      
       if (generalManagerPositions.length > 0) {
         const gmInfo = empPIData.find(
           (data) => data.empID === String(generalManagerPositions[0].empID)
         );
+      
+        // console.log("GM Info:", gmInfo);
+      
         if (gmInfo) {
           setEmailData((prevData) => ({
             ...prevData,
             gmOfficialMail: gmInfo.officialEmail,
           }));
+          // console.log("Updated Email Data with GM Email:", gmInfo.officialEmail);
         } else {
           console.log("GM Info not found.");
         }
+      } else {
+        console.log("No General Manager positions found.");
       }
+      
+      
     } else {
       console.log("No work info found for employee ID:", employeeData?.empID);
     }
@@ -212,7 +223,7 @@ export const ProbationForm = forwardRef(() => {
 
   //email process end
 
-  // console.log(emailData);
+  // console.log(emailData);  27, 1705, 19, 2512, 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -337,6 +348,7 @@ export const ProbationForm = forwardRef(() => {
         "initiative",
         "managerDate",
         "managerName",
+        "gmName",
         "pace",
         "quality",
         "recommendation",
@@ -373,7 +385,7 @@ export const ProbationForm = forwardRef(() => {
           ...formDataValues,
           probStatus: true,
         };
-        await UpdateProb({ PbFDataUp: formattedData });
+        // await UpdateProb({ PbFDataUp: formattedData });
 
         if (userType === "Manager") {
           if (emailData.skilledAndUnskilled === null) {
@@ -385,25 +397,28 @@ export const ProbationForm = forwardRef(() => {
           sendEmail(subject, message, from, emailData.hrOfficialmail);
         }
 
-        setShowTitle("Probation Form Updated successfully");
+        // setShowTitle("Probation Form Updated successfully");
         console.log("Updated", formattedData);
       } else {
         // Create new record
         const ProbValue = { ...data, ...formDataValues, probStatus: true };
-        await ProbFormsData({ ProbValue });
+        // await ProbFormsData({ ProbValue });
 
         if (userType === "Supervisor") {
           sendEmail(subject, message, from, emailData.managerOfficialMail);
         }
 
         console.log("create", ProbValue);
-        setShowTitle("Probation Form Saved successfully");
+        // setShowTitle("Probation Form Saved successfully");
       }
-      setNotification(true);
+      // setNotification(true);
     } catch (err) {
       console.error("Error submitting form:", err);
     }
   };
+
+  console.log(emailData);
+  
 
   return (
     <form
@@ -517,7 +532,7 @@ export const ProbationForm = forwardRef(() => {
               <td className="p-2 border-b">
                 <input
                   {...register("doj")}
-                  defaultValue={employeeData?.doj || ""}
+                  defaultValue={employeeData?.dateOfJoin || ""}
                   className="w-full outline-none"
                 />
               </td>

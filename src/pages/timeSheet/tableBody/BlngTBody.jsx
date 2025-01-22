@@ -1,6 +1,13 @@
 import { useEffect } from "react";
 
-export const BlngTBody = ({ data, loading, setTableData, message }) => {
+export const BlngTBody = ({
+  data,
+  loading,
+  setTableData,
+  message,
+  assignObjectFun,
+  toggleFunction,
+}) => {
   useEffect(() => {
     if (loading === false) {
       const rows = document.querySelectorAll("tbody tr");
@@ -50,7 +57,11 @@ export const BlngTBody = ({ data, loading, setTableData, message }) => {
               return (
                 <tr
                   key={index}
-                  className="text-dark_grey h-[53px]  bg-white text-sm rounded-sm shadow-md text-start border-b-2 border-[#CECECE]"
+                  className="text-dark_grey h-[53px]  bg-white text-sm rounded-sm shadow-md text-start border-b-2 border-[#CECECE]  hover:bg-[#f1f5f9] cursor-pointer"
+                  onClick={() => {
+                    assignObjectFun(rowData, "BLNG");
+                    toggleFunction();
+                  }}
                 >
                   <td className="text-start px-4 flex-1">{index + 1}</td>
                   <td className="text-start px-4 flex-1">{rowData?.fidNo}</td>
@@ -93,15 +104,6 @@ export const BlngTBody = ({ data, loading, setTableData, message }) => {
                   <td className="text-center px-4 flex-1">
                     {rowData?.remarks}
                   </td>
-                  {/* <td
-                    className={`text-center px-4 flex-1 ${
-                      rowData.status === "Approved"
-                        ? "text-[#0CB100]"
-                        : "text_size_8"
-                    }`}
-                  >
-                    {rowData.status}
-                  </td> */}
                 </tr>
               );
             };

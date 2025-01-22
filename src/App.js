@@ -38,9 +38,8 @@ export const App = () => {
       } else {
         setLoginId("");
         setUserType("");
-        // if (!hideLogin.includes(location.pathname)) {
-        //   navigate("/login"); 
-        // }
+          navigate("/login"); 
+        
       }
     };
 
@@ -51,7 +50,7 @@ export const App = () => {
       // localStorage.clear();
       // sessionStorage.clear();
 
-      window.open("https://dev.dxtlxvdrz6jj5.amplifyapp.com");
+      window.open("https://hr.adininworks.co");
     };
 
     window.addEventListener("beforeunload", handleTabClose);
@@ -76,10 +75,11 @@ export const App = () => {
 
         {!hideLogin.includes(location.pathname) && !loginId && !userType && (
           <>
-            {location.pathname === "/forgotEmail" && <ForgotEmail />}
+            {/* {location.pathname === "/forgotEmail" && <ForgotEmail />}
             {location.pathname === "/forgotOtp" && <ForgotOtp />}
             {location.pathname === "/forgotPassword" && <ForgotPassword />}
-            {location.pathname === "/login" && <Login />}
+            {location.pathname === "/login" && <Login />} */}
+            <Login/>
           </>
         )}
 

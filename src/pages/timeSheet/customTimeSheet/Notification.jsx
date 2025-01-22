@@ -24,7 +24,7 @@ export const Notification = async ({ getEmail, Position, correctionMade }) => {
       Position === "Manager"
         ? getEmail?.TimeKeeperDetails?.name
         : getEmail?.ManagerDetails?.name;
-    console.log(getEmail?.TimeKeeperDetails, " : ", getEmail?.ManagerDetails);
+
     const fromAddress = `"Dear ${empName}" <timesheet_no-reply@adininworks.com>`;
     const toAddress =
       Position === "Manager"
@@ -74,7 +74,7 @@ export const Notification = async ({ getEmail, Position, correctionMade }) => {
       }.</p>
             <p><strong>Details:</strong></p>
             <ul>
-              <li>Employee Name: ${getEmail?.ManagerDetails?.name}</li>
+              <li>Manager Name: ${getEmail?.ManagerDetails?.name}</li>
               <li>${
                 status === "Approved" ? "Approval" : "Rejection"
               } Date: ${todayDate}</li>
@@ -110,7 +110,7 @@ export const Notification = async ({ getEmail, Position, correctionMade }) => {
     }
 
     hasSentEmail = true;
-    console.log(subject, message, fromAddress, toAddress);
+    // console.log(subject, message, fromAddress, toAddress);
     return {
       subject,
       message,
@@ -120,6 +120,6 @@ export const Notification = async ({ getEmail, Position, correctionMade }) => {
     };
     // await sendEmail(subject, message, fromAddress, toAddress);
   } catch (error) {
-    console.error("Error sending email:", error);
+    // console.error("Error sending email:", error);
   }
 };

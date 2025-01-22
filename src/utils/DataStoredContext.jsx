@@ -116,7 +116,7 @@ const DataStoredContext = ({ children }) => {
         const responses = await Promise.all(
           queries.map(({ query }) =>
             client.graphql({ query, variables: { limit } }).catch((error) => {
-              console.error("GraphQL Error:", error);
+              // console.error("GraphQL Error:", error);
               return { data: { items: [] } }; // fallback for failed query
             })
           )

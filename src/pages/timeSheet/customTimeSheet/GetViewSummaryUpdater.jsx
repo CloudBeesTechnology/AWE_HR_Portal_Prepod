@@ -41,7 +41,7 @@ export const GetViewSummaryUpdater = (getEmpID) => {
   }
 
   const returnEmpDetails = fetchEmployeeData();
-  console.log(returnEmpDetails);
+  
 
   return returnEmpDetails;
 };

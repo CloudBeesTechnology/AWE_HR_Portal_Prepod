@@ -27,9 +27,11 @@ export const ContractFormPDF = ({ contentRef }) => {
   const [managerData, setManagerData] = useState({
     managerEmpID: "",
     managerOfficialMail: "",
-    hrEmail: "hr_no-reply@adininworks.com",
-    genManagerEamil: "",
+    hrEmail: "",
+    genManagerEmail: "",
   });
+
+  // console.log(managerData);
 
   const [formData, setFormData] = useState({
     contract: {
@@ -42,14 +44,6 @@ export const ContractFormPDF = ({ contentRef }) => {
       status: "",
     },
   });
-
-  // console.log(workInfoData, "WF DATA");
-
-  // const handleEditClick = () => {
-  //   setIsEditing(!isEditing);
-  // };
-
-  // console.log("Fetched contract form",contractForms);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -90,33 +84,50 @@ export const ContractFormPDF = ({ contentRef }) => {
           if (managerInfo) {
             setManagerData((prevData) => ({
               ...prevData,
-              managerOfficialMail: managerInfo.officialEmail, // Assuming this field exists.
+              managerOfficialMail: managerInfo.officialEmail,
             }));
           }
         }
+
+        // Step 6: Fetch General Manager's email (if applicable)
+        const generalManagerPositions = workInfoData.filter((item) =>
+          item.position[item.position.length - 1]?.includes("General Manager")
+        );
+
+        // console.log("Filtered General Manager Positions:", generalManagerPositions);
+
+        if (generalManagerPositions.length > 0) {
+          const gmInfo = empPIData.find(
+            (data) => data.empID === String(generalManagerPositions[0].empID)
+          );
+
+          // console.log("GM Info:", gmInfo);
+
+          if (gmInfo) {
+            setManagerData((prevData) => ({
+              ...prevData,
+              genManagerEmail: gmInfo.officialEmail,
+            }));
+            // console.log("Updated Email Data with GM Email:", gmInfo.officialEmail);
+          } else {
+            console.log("GM Info not found.");
+          }
+        } else {
+          console.log("No General Manager positions found.");
+        }
       }
     }
-  }, [workInfoData, employeeData?.empID, empPIData]); // Depend on all the relevant data sources
+  }, [workInfoData, employeeData?.empID, empPIData]);
 
-  // console.log("hello world ---- working");
+  // const employeeDataT = workInfoData.filter((item) => item.empID === "33333");
 
-  // Filter workInfoData to find entries where position includes "GENERAL MANAGER"
-  const generalManagerPositions = workInfoData.filter((item) =>
-    item.position.includes("GENERAL MANAGER")
-  );
+  // // Log the number of entries with empID === "12345"
+  // // console.log(`Found ${employeeDataT.length} entries with empID "33333"`);
 
-  // Log the count of "GENERAL MANAGER" entries
-  // console.log("LIST",generalManagerPositions);
-
-  const employeeDataT = workInfoData.filter((item) => item.empID === "33333");
-
-  // Log the number of entries with empID === "12345"
-  // console.log(`Found ${employeeDataT.length} entries with empID "33333"`);
-
-  // Log the number of entries with empID === "12345"
+  // // Log the number of entries with empID === "12345"
 
   useEffect(() => {
-    if (contractForms.length > 0) {
+    if (contractForms?.length > 0) {
       const contractData = contractForms.find(
         (data) => data.empID === employeeData?.empID
       ); // Assuming we want to take the first item
@@ -137,7 +148,6 @@ export const ContractFormPDF = ({ contentRef }) => {
   const subject = "Contract Form approved";
   const message = "Dear Hari employee Arjun contract period is expired...";
   const from = "hr_no-reply@adininworks.com";
-  const to = "hariharanofficial2812@gmail.com";
 
   const handleSubmit = async () => {
     const selectedData = contractForms.find(
@@ -168,23 +178,20 @@ export const ContractFormPDF = ({ contentRef }) => {
         await contractDetails({ ContractValue: formattedData });
         console.log("Updated Data", formattedData);
         setShowTitle("Contract Form Updated Successfully");
-        setNotification(true);
+        // setNotification(true);
 
         if (userType === "HR") {
-          sendEmail(
-            subject,
-            message,
-            from,
-            formData.contract.managerOfficialMail
-          );
+          sendEmail(subject, message, from, managerData.genManagerEmail);
+        } else if (userType === "Manager") {
+          sendEmail(subject, message, from, managerData.hrEmail);
         }
       } else {
         await contractForm(createFormattedData);
         if (userType === "Manager") {
-          sendEmail(subject, message, from, to);
+          sendEmail(subject, message, from, managerData.hrEmail);
         }
         console.log("Create Data", createFormattedData);
-        setShowTitle("Contract Form Updated Successfully");
+        setShowTitle("Contract Form Saved Successfully");
         setNotification(true);
       }
     } catch (err) {
@@ -278,7 +285,7 @@ export const ContractFormPDF = ({ contentRef }) => {
                     {employeeData?.nationality}
                   </td>
                   <td className="border border-black p-2">
-                    {employeeData?.doj}
+                    {employeeData?.dateOfJoin}
                   </td>
                   <td className="border border-black p-2">
                     {employeeData?.contractStartDate}
@@ -365,7 +372,7 @@ export const ContractFormPDF = ({ contentRef }) => {
             onClick={() => {
               handleSubmit();
             }}
-            className="bg-grey text-white px-4 py-2 rounded"
+            className="primary_btn"
           >
             Save
           </button>

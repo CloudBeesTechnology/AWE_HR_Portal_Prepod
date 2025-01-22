@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import logo from "../../../assets/logo/logo-with-name.svg";

@@ -63,7 +63,11 @@ export const RM = () => {
       dateOfBirth: formatDate(item.dob) || "-",
       dateOfJoin: formatDate(item.doj) || "-",
       nationality: item.nationality || "-",
-      position: item.position || "-",
+      // department: item.department[item.department?.length - 1] || "-",
+          position: Array.isArray(item.position)
+          ? (item.position[item.position.length - 1])
+          : "-",
+      // position: item.position || "-",
       contactNo: item.contactNo || "-",
       contractType: item.contractType || "-",
       cvReceived: item.cvReceived || "-",
@@ -79,7 +83,9 @@ export const RM = () => {
       employeePassExpiry: Array.isArray(item.empPassExp)
         ? formatDate(item.empPassExp[item.empPassExp.length - 1])
         : "-",
-      department: item.department || "-",
+      department: Array.isArray(item.department)
+      ? (item.department[item.department.length - 1])
+      : "-",
       contractStart: Array.isArray(item.contractStart)
         ? formatDate(item.contractStart[item.contractStart.length - 1])
         : "-",
@@ -147,7 +153,9 @@ export const RM = () => {
         dateOfBirth: formatDate(item.dob) || "-",
         dateOfJoin: formatDate(item.doj) || "-",
         nationality: item.nationality || "-",
-        position: item.position || "-",
+        position: Array.isArray(item.position)
+        ? (item.position[item.position.length - 1])
+        : "-",
         contactNo: item.contactNo || "-",
         contractType: item.contractType || "-",
         cvReceived: item.cvReceived || "-",
@@ -163,7 +171,9 @@ export const RM = () => {
         employeePassExpiry: Array.isArray(item.empPassExp)
           ? formatDate(item.empPassExp[item.empPassExp.length - 1])
           : "-",
-        department: item.department || "-",
+        department: Array.isArray(item.department)
+        ? (item.department[item.department.length - 1])
+        : "-",
         contractStart: Array.isArray(item.contractStart)
           ? formatDate(item.contractStart[item.contractStart.length - 1])
           : "-",

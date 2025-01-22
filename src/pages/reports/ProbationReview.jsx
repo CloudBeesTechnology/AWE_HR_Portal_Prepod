@@ -104,7 +104,7 @@ export const ProbationReview = () => {
   }, [allData]);
 
   const handleViewDetails = (personData) => {
-    console.log("Person State:", personData);
+    // console.log("Person State:", personData);
     setSelectedPerson(personData); // Set selected person's data
   };
 
@@ -166,8 +166,8 @@ export const ProbationReview = () => {
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
           dateOfJoin: formatDate(item.doj) || "-",
-          department: item.department || "-",
-          position: item.position || "-",
+          department: item.department[item.department?.length - 1] || "-",
+          position: item.position[item.position?.length - 1] || "-",
           probationEnd: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
         };
@@ -231,7 +231,7 @@ export const ProbationReview = () => {
 
             <div className="flex justify-evenly items-center p-3">
               <button
-                className="mt-4 bg-green text-white px-4 py-2 rounded"
+                className="primary_btn"
                 onClick={handleDownload} // Handle the download action by navigating to the form
               >
                 Go to Probation Form

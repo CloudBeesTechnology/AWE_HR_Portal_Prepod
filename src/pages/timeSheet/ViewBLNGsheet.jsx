@@ -168,7 +168,7 @@ export const ViewBLNGsheet = ({
                 setData(mergedData);
                 setSecondaryData(mergedData);
               } catch (error) {
-                console.error("Error fetching work info:", error.message);
+                // console.error("Error fetching work info:", error.message);
               }
             };
 
@@ -181,7 +181,7 @@ export const ViewBLNGsheet = ({
         fetchData();
       }
     } catch (err) {
-      console.log("Error : ", err);
+      // console.log("Error : ", err);
     }
   }, [excelData]);
 
@@ -213,7 +213,7 @@ export const ViewBLNGsheet = ({
               );
             }
           } catch (error) {
-            console.error("Error parsing empWorkInfo for ID:", val.id, error);
+            // console.error("Error parsing empWorkInfo for ID:", val.id, error);
           }
 
           return {
@@ -247,7 +247,7 @@ export const ViewBLNGsheet = ({
           setTimeout(processChunk, 0);
         } else {
           // All chunks processed
-          console.log(result.length);
+
           setData(result);
           setSecondaryData(result);
         }
@@ -264,7 +264,7 @@ export const ViewBLNGsheet = ({
       // setData(result);
       setSearchQuery(result);
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      // console.error("Error fetching user data:", error);
     }
   };
 
@@ -317,7 +317,7 @@ export const ViewBLNGsheet = ({
           });
         resolve(keyCheckResult);
       });
-      // console.log("Result: ", result);
+
       setClosePopup(true);
       setShowStatusCol(result);
       setCurrentStatus(result); // Assuming setCurrentStatus is defined
@@ -476,7 +476,7 @@ export const ViewBLNGsheet = ({
       });
       setData(updatedData);
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   };
 
@@ -511,7 +511,7 @@ export const ViewBLNGsheet = ({
             companyName: val?.LOCATION,
           };
         });
-      // console.log(data.length);
+
       const finalResult = result.map((val) => {
         return {
           ...val,
@@ -667,7 +667,7 @@ export const ViewBLNGsheet = ({
 
     setAllRejectedData(dataAlongWithRemark);
   };
-  // console.log(allApprovedData, " : ", allRejectedData);
+
   const removeExistingData = (data, action) => {
     if (action === "Approved") {
       const afterRemoved = allApprovedData.filter((fil) => fil.id !== data.id);

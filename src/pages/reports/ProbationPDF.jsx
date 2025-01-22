@@ -111,8 +111,8 @@ export const ProbationPDF = ({ userID, userType }) => {
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
           dateOfJoin: formatDate(item.doj) || "-",
-          department: item.department || "-",
-          position: item.position || "-",
+          department: item.department[item.department?.length - 1] || "-",
+          position: item.position[item.position?.length - 1] || "-",
           probationEndDate: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
         };
@@ -257,7 +257,7 @@ export const ProbationPDF = ({ userID, userType }) => {
 
             <div className="flex justify-evenly items-center p-3">
               <button
-                className="mt-4 bg-green text-white px-4 py-2 rounded"
+                className="primary_btn"
                 onClick={handleDownload}
               >
                 Go to Probation Form

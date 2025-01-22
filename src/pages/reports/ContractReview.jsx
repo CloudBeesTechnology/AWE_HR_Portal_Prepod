@@ -114,11 +114,11 @@ export const ContractReview = () => {
           name: item.name || "-",
           nationality: item.nationality || "-",
           dateOfJoin: formatDate(item.doj) || "-",
-          department: item.department || "-",
-          position: item.position || "-",
+          department: item.department[item.department?.length - 1] || "-",
+          position: item.position[item.position?.length - 1] || "-",
           contractStartDate: formatDate(startDate) || "-",
           contractEndDate: formatDate(lastDate) || "-",
-          balanceMonths: calculateBalanceMonths(startDate, lastDate),
+          contractRenewalDuration: calculateBalanceMonths(startDate, lastDate),
         };
       });
   };
@@ -187,7 +187,7 @@ export const ContractReview = () => {
           position: item.position || "-",
           contractStartDate: formatDate(startDate) || "-",
           contractEndDate: formatDate(lastDate) || "-",
-          balanceMonths: calculateBalanceMonths(startDate, lastDate),
+          contractRenewalDuration: calculateBalanceMonths(startDate, lastDate),
         };
       });
 
@@ -244,7 +244,7 @@ export const ContractReview = () => {
 
             <div className="flex justify-evenly items-center p-3">
               <button
-                className="mt-4 bg-green text-white px-4 py-2 rounded"
+                className="primary_btn"
                 onClick={handleNavigate}
               >
                 Go to Contract Form

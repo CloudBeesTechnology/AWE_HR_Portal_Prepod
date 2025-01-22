@@ -512,16 +512,9 @@ export const WorkInfoSchema = Yup.object().shape({
 export const employeeInfoSchema = Yup.object().shape({
   empID: Yup.string().required("Employee ID Number is mandatory"),
   profilePhoto: Yup.string().required("Upload Photo is mandatory"),
-  contractType: Yup.array()
-    .of(Yup.string().required("Each Contract Type is mandatory"))
-    .min(1, "At least one Contract Type is required")
-    .required("Contract Type is mandatory"),
-
-  empType: Yup.array()
-    .of(Yup.string().required("Each Employee Type is mandatory"))
-    .min(1, "At least one Employee Type is required")
+  contractType: Yup.string().required("Contract Type is mandatory"),
+  empType: Yup.string()
     .required("Employee Type is mandatory"),
-
   name: Yup.string()
     .min(3, "Name must be at least 3 characters") // Minimum length check
     .matches(/[A-Za-z\s]/, "Name cannot contain numbers or special characters") // Regex to allow only letters and spaces

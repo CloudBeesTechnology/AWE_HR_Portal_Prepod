@@ -35,8 +35,8 @@ export const AutoFetchForAssignManager = () => {
           fetchAllData(listEmpWorkInfos),
         ]);
 
-        const candidates = empPersonalInfos; // Data from listEmpPersonalInfos
-        const interviews = empWorkInfos; // Data from listEmpWorkInfos
+        const candidates = empPersonalInfos; 
+        const interviews = empWorkInfos; 
 
         const mergedData = candidates
           .map((candidate) => {

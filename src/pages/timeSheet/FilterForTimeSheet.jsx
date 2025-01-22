@@ -1,13 +1,16 @@
-
 import React, { useState } from "react";
 import { IoFilterOutline } from "react-icons/io5";
 
-export const FilterForTimeSheet = ({ handleFilterChange, toggleDropdown, isOpen }) => {
-  const [selectedFilter, setSelectedFilter] = useState("All"); // State to track the selected filter
+export const FilterForTimeSheet = ({
+  handleFilterChange,
+  toggleDropdown,
+  isOpen,
+}) => {
+  const [selectedFilter, setSelectedFilter] = useState("All");
 
   const onFilterSelect = (filter) => {
-    setSelectedFilter(filter); // Update the selected filter
-    handleFilterChange(filter); // Call the parent handler
+    setSelectedFilter(filter);
+    handleFilterChange(filter);
   };
 
   return (
@@ -22,7 +25,7 @@ export const FilterForTimeSheet = ({ handleFilterChange, toggleDropdown, isOpen 
         {isOpen && (
           <div className="top-10 absolute w-fit shadow-xl bg-white z-50">
             <div className="p-1 shadow-md flex flex-col bg-white ">
-              {["All", "Pending", "Approved","Rejected"].map((filter) => (
+              {["All", "Pending", "Approved", "Rejected"].map((filter) => (
                 <button
                   key={filter}
                   onClick={() => onFilterSelect(filter)}

@@ -61,7 +61,7 @@ export const TimeSheetsCRUDoperations = async ({
                       getEmail: result,
                       Position,
                     });
-                    // console.log(result);
+
                     if (emailDetails) {
                       const { subject, message, fromAddress, toAddress } =
                         emailDetails;
@@ -72,9 +72,9 @@ export const TimeSheetsCRUDoperations = async ({
                       // console.error("Notification returned undefined!");
                     }
                   } else {
-                    console.error(
-                      "MergeTableForNotification returned undefined!"
-                    );
+                    // console.error(
+                    // "MergeTableForNotification returned undefined!"
+                    // );
                   }
 
                   setData(null);
@@ -110,7 +110,8 @@ export const TimeSheetsCRUDoperations = async ({
     const updateTimeSheetFunction = async (timeSheetData) => {
       let successFlag = false;
       let successCount = 0; // To track successful updates
-
+      setNotification?.(true);
+      setShowTitle?.("Data has been submitted successfully");
       const chunks = chunkArray(timeSheetData, 1000); // Adjust the chunk size as needed
 
       for (const chunk of chunks) {
@@ -134,7 +135,6 @@ export const TimeSheetsCRUDoperations = async ({
 
                   if (!successFlag) {
                     const responseData = response.data.updateTimeSheet;
-                    // console.log(responseData);
 
                     successFlag = true; // Set the flag to avoid multiple notifications
                     // setStoringMess(true);
@@ -161,8 +161,7 @@ export const TimeSheetsCRUDoperations = async ({
                           toAddress
                         );
 
-                        setShowTitle?.("Data has been submitted successfully");
-                        setNotification?.(true);
+                        setNotification?.(false);
                         setAllApprovedData?.([]);
                         setAllRejectedData?.([]);
                       } else {
@@ -176,6 +175,7 @@ export const TimeSheetsCRUDoperations = async ({
                   }
                 }
               } catch (error) {
+                setNotification?.(false);
                 // console.error(
                 //   `Error updating TimeSheet with ID ${timeSheet.id}:`,
                 //   error

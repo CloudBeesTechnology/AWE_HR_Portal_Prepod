@@ -20,7 +20,7 @@ export const SubmitInterviewSchedule = () => {
         query: createInterviewSchedule,
         variables: { input: formattedData },
       });
-      console.log("API Response:", res);
+      // console.log("API Response:", res);
       setNotification(true); // Assume success
     } catch (err) {
       console.error("Error during API call:", err);

@@ -26,7 +26,7 @@ export const UpdateViewSummary = async (object) => {
     ot: object?.overtimeHrs || "",
     mealAllow: object?.mealAllow || "",
   };
-  // console.log(obj);
+  
   async function fetchAllData(queryName) {
     let allData = [];
     let nextToken = null;
@@ -67,7 +67,7 @@ export const UpdateViewSummary = async (object) => {
           const Responses = response?.data?.updateTimeSheet;
           resData.push(Responses);
         } catch (err) {
-          console.error(err);
+          // console.error(err);
         }
       }
     }
@@ -98,7 +98,7 @@ export const UpdateViewSummary = async (object) => {
           }
           return info;
         });
-        // console.log(obj.mealAllow);
+      
         return {
           ...val,
           verify: "Yes",

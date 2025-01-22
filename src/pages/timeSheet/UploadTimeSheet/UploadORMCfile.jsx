@@ -21,50 +21,25 @@ export const UploadORMCfile = (
         allSheets.push({ sheetName, data: sheet });
       });
 
-      // console.log(allSheets);
-
       const getResult =
         allSheets &&
         allSheets.map((sheet) => {
           const data = sheet.data;
-          // console.log(data);
 
           var headerSlicedData = data.slice(0, 1);
-          //   console.log(headerSlicedData);
-          // console.log(headerSlicedData);
+
           const hasNameAndDate = headerSlicedData.some((obj) =>
             ["NAME", "DATE"].every((key) => key in obj)
           );
-          // console.log(hasNameAndDate);
-          checkTrueOrFalse = hasNameAndDate;
-          // const changedHeader = headerSlicedData.map((columns) => {
-          //   const foundKey = Object.entries(columns).map(([key, value]) => {
-          //     return [{ key, value }];
-          //   });
-          //   return foundKey;
-          // });
 
-          //   console.log(changedHeader);
-          // const result = changedHeader.flat().flat();
+          checkTrueOrFalse = hasNameAndDate;
 
           var bodySlicedData = data.slice(0);
           tableBodyData.push(bodySlicedData);
-          // bodySlicedData.forEach((bodyData) => {
-          //   const row = {};
 
-          //   Object.entries(bodyData).forEach(([key, value]) => {
-          //     const headerKey = result.find((header) => header.key === key);
-
-          //     if (headerKey) {
-          //       row[headerKey.value] = value;
-          //     }
-          //   });
-
-          //   tableBodyData.push(row);
-          // });
           return headerSlicedData;
         });
-      // console.log(checkTrueOrFalse);
+
       if (checkTrueOrFalse === true) {
         const convertDecimalToTime = (decimal, value) => {
           if (value === "time") {
@@ -92,7 +67,6 @@ export const UploadORMCfile = (
           }
         };
 
-        // console.log(tableBodyData);
         function cleanKey(key) {
           if (typeof key !== "string") {
             return key; // Return value if not a string (e.g., number, object)
@@ -107,19 +81,9 @@ export const UploadORMCfile = (
             const cleanedKey = cleanKey(key); // Clean the key
             cleanedItem[cleanedKey] = item[key]; // Set the value using the cleaned key
           }
-          // console.log(cleanedItem);
+
           return cleanedItem;
         });
-        // const formattedData = tableBodyData.map((item) => {
-        //   const cleanedItem = {};
-
-        //   for (const key in item) {
-        //     const cleanedKey = cleanKey(key); // Clean the key
-        //     cleanedItem[cleanedKey] = item[key]; // Set the value using the cleaned key
-        //   }
-
-        //   return cleanedItem;
-        // });
 
         const updatedDataArray =
           formattedData &&
@@ -138,82 +102,45 @@ export const UploadORMCfile = (
 
             return item;
           });
-        // console.log(updatedDataArray);
-        // console.log(updatedDataArray);
-        // const removeTotalEmployees = updatedDataArray.filter(
-        //   (val) => !val.NAME?.includes("TOTAL EMPLOYEES")
-        // );
-        // const filteHighlightedData = updatedDataArray.filter((item) => {
-        //   if (
-        //     item.NAME &&
-        //     item.ALLDAYMINHRS &&
-        //     item.NETMINUTES >= 0 &&
-        //     item.TOTALHOURS >= 0
-        //   ) {
-        //     return item;
-        //   }
-        // });
-
-        // const getLastOccurrencePerFIDDate = (dataArray) => {
-        //   const map = new Map();
-
-        //   // Iterate over each object and store the last occurrence of each unique FID-date combination
-        //   dataArray.forEach((obj) => {
-        //     // Check if "ENTRANCEDATEUSED" exists in the object
-        //     if (obj.hasOwnProperty("NAME")) {
-        //       const key = `${obj.NAME}`; // Create a unique key based on FID and ENTRANCEDATEUSED
-        //       map.set(key, obj); // Overwrite previous entries with the same FID and ENTRANCEDATEUSED
-        //     }
-        //   });
-
-        //   // Convert the map values to an array of the last occurrences for each FID-date pair
-        //   return Array.from(map.values());
-        // };
 
         const filteHighlightedData = updatedDataArray.filter(
           (item) => item.IN && item.OUT
         );
-        console.log("filteHighlightedData : ",filteHighlightedData)
 
         const getCleanedDate = (obj) => {
-          const date = obj?.DATE?.trim() || '';
+          const date = obj?.DATE?.trim() || "";
           // Remove "(Tue)" or similar day abbreviations
-          return date.replace(/\(\w+\)/, '').trim();
-      };
-      
-      // Check the first object's DATE, fallback to the second object if needed
-      let dateValue = getCleanedDate(updatedDataArray[0]);
-      if (!dateValue) {
-          dateValue = getCleanedDate(updatedDataArray[1]);
-      }
-      
-     
-    
-      function convertDateFormat(dateStr) {
-        // Split the input string by '/'
-        const parts = dateStr.split("/");
+          return date.replace(/\(\w+\)/, "").trim();
+        };
 
-        // Validate the input format
-        if (parts.length !== 3) {
-          throw new Error("Invalid date format. Expected DD/MM/YYYY");
+        // Check the first object's DATE, fallback to the second object if needed
+        let dateValue = getCleanedDate(updatedDataArray[0]);
+        if (!dateValue) {
+          dateValue = getCleanedDate(updatedDataArray[1]);
         }
 
-        // Rearrange the parts to MM/DD/YYYY
-        const [day, month, year] = parts;
-        return `${day}/${month}/${year}`;
-      }
+        function convertDateFormat(dateStr) {
+          // Split the input string by '/'
+          const parts = dateStr.split("/");
+
+          // Validate the input format
+          if (parts.length !== 3) {
+            throw new Error("Invalid date format. Expected DD/MM/YYYY");
+          }
+
+          // Rearrange the parts to MM/DD/YYYY
+          const [day, month, year] = parts;
+          return `${day}/${month}/${year}`;
+        }
         // const lastOccurrenceObjects =
         //   getLastOccurrencePerFIDDate(updatedDataArray);
         const dateObject = new Date(dateValue).toLocaleDateString();
         const formattedDate = convertDateFormat(dateObject);
-        console.log(formattedDate)
-          // console.log(lastOccurrenceObjects)
-          filteHighlightedData.forEach(obj => {
-        
-            obj.DATE = formattedDate;
+
+        filteHighlightedData.forEach((obj) => {
+          obj.DATE = formattedDate;
         });
 
-        // console.log(updatedDataArray);
         setExcelData(filteHighlightedData);
         setLoading(false);
 
@@ -227,8 +154,7 @@ export const UploadORMCfile = (
     fileInputRef.current.value = "";
     setExcelFile(null);
   } catch (err) {
-    console.log("ERROR", err);
+    // console.log("ERROR", err);
   }
   //   headerSlicedData
 };
-

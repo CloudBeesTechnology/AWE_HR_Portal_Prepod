@@ -20,6 +20,7 @@ import { listUsers } from "../graphql/queries";
 import {
   EmployeePaths,
   InsurancePaths,
+  LeaveManagement,
   RecruitmentPaths,
   ReportPaths,
   TimePaths,
@@ -255,12 +256,12 @@ const Sidebar = () => {
                   to="/leaveManagement"
                   className={({ isActive }) =>
                     `flex items-center gap-3 py-2 pl-1  rounded-lg ${
-                      isActive ? "bg-primary text-secondary" : ""
+                  isAnyActive(LeaveManagement) ? "bg-primary text-secondary" : ""
                     }`
                   }
                 >
                   <span>
-                    {location.pathname === "/leaveManagement" ? (
+                    {isAnyActive(LeaveManagement) ? (
                       <LeaveIcons color="#303030" />
                     ) : (
                       <LeaveIcons color="white" />
