@@ -93,7 +93,7 @@ export const ViewForm = ({
               leaveData.supervisorEmpID === "") &&
             (status === "Approved" || status === "Rejected")
           ) {
-            console.log("checking manager");
+            // console.log("checking manager");
             //employee got email
             sendEmail(
               `Leave Application ${status}`,
@@ -132,7 +132,7 @@ export const ViewForm = ({
                 </body>
               </html>`,
               "leave_no-reply@adininworks.com",
-              "hr-notification@adininworks.com"
+              "Hr-notification@adininworks.com"
             );
 
             //employee notify
@@ -152,7 +152,7 @@ export const ViewForm = ({
               leaveType: leaveData.empLeaveType,
               message: `Leave request for ${leaveData.empName} has been ${status} by Manager ${managerName.name}`,
               senderEmail: "leave_no-reply@adininworks.com", // Sender email
-              receipentEmail: "hr-notification@adininworks.com", // Using the employee's official email
+              receipentEmail: "Hr-notification@adininworks.com", // Using the employee's official email
               status: "Unread",
             });
           } else if (
@@ -210,7 +210,7 @@ export const ViewForm = ({
                   </body>
                 </html>`,
                 "leave_no-reply@adininworks.com",
-                "hr-notification@adininworks.com"
+                "Hr-notification@adininworks.com"
               );
 
               //manager notify
@@ -230,7 +230,7 @@ export const ViewForm = ({
                 leaveType: leaveData.empLeaveType,
                 message: `Leave request for ${leaveData.empName} has been ${status} by Supervisor ${supervisorName.name}`,
                 senderEmail: "leave_no-reply@adininworks.com", // Sender email
-                receipentEmail: "hr-notification@adininworks.com", // Using the employee's official email
+                receipentEmail: "Hr-notification@adininworks.com", // Using the employee's official email
                 status: "Unread",
               });
             }
@@ -254,7 +254,7 @@ export const ViewForm = ({
                   </body>
                 </html>`,
                 "leave_no-reply@adininworks.com",
-                "hr-notification@adininworks.com"
+                "Hr-notification@adininworks.com"
               );
 
               //manager email
@@ -325,7 +325,7 @@ export const ViewForm = ({
                 leaveType: leaveData.empLeaveType,
                 message: `Leave request for ${leaveData.empName} has been ${status} by Supervisor ${supervisorName.name}`,
                 senderEmail: "leave_no-reply@adininworks.com", // Sender email
-                receipentEmail: "hr-notification@adininworks.com", // Using the employee's official email
+                receipentEmail: "Hr-notification@adininworks.com", // Using the employee's official email
                 status: "Unread",
               });
             }
@@ -402,7 +402,7 @@ export const ViewForm = ({
                 </body>
               </html>`,
               "leave_no-reply@adininworks.com",
-              "hr-notification@adininworks.com"
+              "Hr-notification@adininworks.com"
             );
 
 
@@ -444,7 +444,7 @@ export const ViewForm = ({
                 managerName.name || "Not mentioned"
               }.`,
               senderEmail: "leave_no-reply@adininworks.com", // Sender email
-              receipentEmail: "hr-notification@adininworks.com", // Using the employee's official email
+              receipentEmail: "Hr-notification@adininworks.com", // Using the employee's official email
               status: "Unread",
             });
           }

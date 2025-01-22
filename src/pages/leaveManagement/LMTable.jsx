@@ -309,7 +309,7 @@ export const LMTable = () => {
                           onClick={() => {
                             handleClickForToggle();
                             handleViewClick(item, "LM");
-                            console.log(item);
+                            // console.log(item);
                             
                           }}
                         >

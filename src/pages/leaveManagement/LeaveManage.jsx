@@ -45,7 +45,7 @@ export const LeaveManage = () => {
       setSelectedLeaveData(data); // Leave Data
       setSelectedTicketData(null); // Clear ticket data
     } else if (source === "Tickets") {
-      console.log(data);
+      // console.log(data);
 
       setSelectedTicketData(data); // Ticket Data
       setSelectedLeaveData(null); // Clear leave data

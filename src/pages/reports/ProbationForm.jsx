@@ -203,16 +203,8 @@ export const ProbationForm = forwardRef(() => {
             gmOfficialMail: gmInfo.officialEmail,
           }));
           // console.log("Updated Email Data with GM Email:", gmInfo.officialEmail);
-        } else {
-          console.log("GM Info not found.");
-        }
-      } else {
-        console.log("No General Manager positions found.");
-      }
-      
-      
-    } else {
-      console.log("No work info found for employee ID:", employeeData?.empID);
+        } 
+      } 
     }
   }, [workInfoData, employeeData?.empID, empPIData]);
 
@@ -417,7 +409,7 @@ export const ProbationForm = forwardRef(() => {
     }
   };
 
-  console.log(emailData);
+  // console.log(emailData);
   
 
   return (
