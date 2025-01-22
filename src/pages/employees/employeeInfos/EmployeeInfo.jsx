@@ -367,6 +367,7 @@ export const EmployeeInfo = () => {
       "officialEmail",
       "bankAccNo",
       "empBadgeNo",
+      "sapNo",
     ];
 
     fieldValue.forEach((val) => {
@@ -408,7 +409,7 @@ export const EmployeeInfo = () => {
       "name",
       "oCOfOrigin",
       "position",
-      "sapNo",
+      // "sapNo",
       // "officialEmail",
       "contractType",
       "empType",
