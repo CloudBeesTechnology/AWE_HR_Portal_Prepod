@@ -51,12 +51,12 @@ export const LbdKpi = () => {
 
   // Generate table body dynamically from mergedData
   const generateTableBodyFromMergedData = (data) => {
-    console.log(data);
+    // console.log(data);
 
     return data
     .filter((item) => item.doj)
-    .map((item) => {
-      return {
+    .map((item) => ({
+    
         empID: item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
         name: item.name || "-",
@@ -84,8 +84,10 @@ export const LbdKpi = () => {
           : "-",
         educLevel: item.educLevel || "-",
         agent: item.agent || "-",
-      };
-    });
+        rawDateOfJoin: new Date(item.doj), // Raw date for sorting
+      }))
+      .sort((a, b) => a.rawDateOfJoin - b.rawDateOfJoin)
+      .map(({ rawDateOfJoin, ...rest }) => rest); // Remove rawDateOfJoin after sorting
   };
 
   useEffect(() => {
@@ -140,7 +142,10 @@ const handleDate = (e, type) => {
           : "-",
         educLevel: item.educLevel || "-",
         agent: item.agent || "-",
-      }));
+        rawDateOfJoin: new Date(item.doj), // Raw date for sorting
+      }))
+      .sort((a, b) => a.rawDateOfJoin - b.rawDateOfJoin) // Sort by rawDateOfJoin in ascending order
+      .map(({ rawDateOfJoin, ...rest }) => rest); // Remove rawDateOfJoin after sorting
   
     setFilteredData(filtered);
   };

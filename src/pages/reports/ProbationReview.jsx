@@ -53,39 +53,33 @@ export const ProbationReview = () => {
 
   const probationReviewMergedData = (data) => {
     const today = new Date();
-    const firstDayOfNextMonth = new Date(
-      today.getFullYear(),
-      today.getMonth() + 1
-    );
-    const lastDayOfNextMonth = new Date(
-      today.getFullYear(),
-      today.getMonth() + 2,
-      0
-    );
-
-    return data
+    const firstDayOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    const lastDayOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 1);
+    lastDayOfNextMonth.setMilliseconds(-1); // Set to the end of the next month
+  
+    const sortedData = data
       ?.filter((item) => {
+        // Filter items where probStatus is falsy
         if (!item.probStatus) {
-          // console.log(item.probStatus);
-
           const probationEndDates = item.probationEnd || [];
-          const lastDate = probationEndDates[probationEndDates?.length - 1];
-          if (!lastDate) return false;
-
+          const lastDate = probationEndDates[probationEndDates.length - 1];
+  
+          if (!lastDate) return false; // Skip items without a probation end date
+  
           const probationEnd = new Date(lastDate);
-          return (
-            probationEnd >= firstDayOfNextMonth &&
-            probationEnd <= lastDayOfNextMonth
-          );
-        } // Exclude items with probStatus true
+          return probationEnd >= firstDayOfNextMonth && probationEnd <= lastDayOfNextMonth;
+        }
+        return false; // Exclude items with probStatus true
       })
       .map((item) => {
         const probationEndDates = item.probationEnd || [];
         const lastDate = probationEndDates[probationEndDates.length - 1];
+  
         const contractStartDates = item.contractStart || [];
         const startDate = contractStartDates[contractStartDates.length - 1];
-
+  
         return {
+          lastDate: new Date(lastDate), // Keep for sorting only
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
@@ -95,8 +89,14 @@ export const ProbationReview = () => {
           probationEndDate: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
         };
-      });
+      })
+      .sort((a, b) => a.lastDate - b.lastDate); // Sort using lastDate
+  
+    // Remove lastDate after sorting
+    return sortedData.map(({ lastDate, ...rest }) => rest);
   };
+  
+    
 
   useEffect(() => {
     const mergedData = probationReviewMergedData(allData);
@@ -121,11 +121,11 @@ export const ProbationReview = () => {
 
   const handleDate = (e, type) => {
     const value = e.target.value;
-
+  
     // Update the appropriate date state
     if (type === "startDate") setStartDate(value);
     if (type === "endDate") setEndDate(value);
-
+  
     // Parse start and end dates
     const start =
       type === "startDate"
@@ -135,48 +135,56 @@ export const ProbationReview = () => {
         : null;
     const end =
       type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
-
-    // Filter the data based on probStatus, probationEnd, and date range
+  
+    // Filter and sort the data
     const filtered = allData
-      .filter((item) => {
-        if (!item.probStatus) {
-          console.log(item.probStatus);
-
-          // Exclude items with probStatus true
-          const expiryArray = item.probationEnd || [];
-          const expiryDate = expiryArray.length
-            ? new Date(expiryArray[expiryArray.length - 1])
+      ?.filter((item) => {
+        // Exclude items with probStatus true
+        if (item.probStatus) return false;
+  
+        const probationEndDates = item.probationEnd || [];
+        const lastDate =
+          probationEndDates.length > 0
+            ? new Date(probationEndDates[probationEndDates.length - 1])
             : null;
-
-          if (!expiryDate || isNaN(expiryDate.getTime())) return false;
-
-          if (start && end) return expiryDate >= start && expiryDate <= end;
-          if (start) return expiryDate >= start;
-          if (end) return expiryDate <= end;
-
-          return true;
-        }
+  
+        // If lastDate is invalid, exclude the item
+        if (!lastDate || isNaN(lastDate.getTime())) return false;
+  
+        // Apply date range filters
+        if (start && end) return lastDate >= start && lastDate <= end;
+        if (start) return lastDate >= start;
+        if (end) return lastDate <= end;
+  
+        // If no filters, include the item
+        return true;
       })
       .map((item) => {
         const probationEndDates = item.probationEnd || [];
-        const lastDate = probationEndDates[probationEndDates.length - 1];
-
+        const lastDate =
+          probationEndDates.length > 0
+            ? probationEndDates[probationEndDates.length - 1]
+            : null;
+  
         return {
+          lastDate: new Date(lastDate), // Keep for sorting
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
           dateOfJoin: formatDate(item.doj) || "-",
-          department: item.department[item.department?.length - 1] || "-",
-          position: item.position[item.position?.length - 1] || "-",
+          department: item.department?.[item.department?.length - 1] || "-",
+          position: item.position?.[item.position?.length - 1] || "-",
           probationEnd: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
         };
-      });
-
-    // Update filtered data
+      })
+      .sort((a, b) => a.lastDate - b.lastDate) // Sort by lastDate
+      .map(({ lastDate, ...rest }) => rest); // Remove lastDate after sorting
+  
+    // Update filtered data state
     setFilteredData(filtered);
   };
-
+  
   return (
     <div>
       <FilterTable

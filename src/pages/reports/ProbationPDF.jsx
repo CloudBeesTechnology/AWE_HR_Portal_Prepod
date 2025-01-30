@@ -107,6 +107,7 @@ export const ProbationPDF = ({ userID, userType }) => {
         const lastDate = probationEndDates[probationEndDates.length - 1];
 
         const formattedData = {
+          lastDate: new Date(lastDate), // Keep for sorting
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
@@ -117,7 +118,9 @@ export const ProbationPDF = ({ userID, userType }) => {
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
         };
         return formattedData;
-      });
+      }).sort((a, b) => a.lastDate - b.lastDate) // Sort by lastDate
+      .map(({ lastDate, ...rest }) => rest); // Remove lastDate after sorting
+  
     return filteredData;
   };
 

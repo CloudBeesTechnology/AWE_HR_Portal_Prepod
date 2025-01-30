@@ -82,7 +82,10 @@ export const TrainingRCData = () => {
           ? formatDate(item.orgiCertifiDate[item.orgiCertifiDate.length - 1])
           : "-",
         remark: item.remark || "-",
-      }));
+        rawCertifiExpiry: new Date(item.certifiExpiry), // Raw date for sorting
+
+      })) .sort((a, b) => a.rawCertifiExpiry - b.rawCertifiExpiry)
+      .map(({ rawCertifiExpiry, ...rest }) => rest);
   };
 
   useEffect(() => {
@@ -144,8 +147,10 @@ export const TrainingRCData = () => {
           ? formatDate(item.orgiCertifiDate[item.orgiCertifiDate.length - 1])
           : "-",
         remark: item.remark || "-",
-      }));
+        rawCertifiExpiry: new Date(item.certifiExpiry), // Raw date for sorting
 
+      })) .sort((a, b) => a.rawCertifiExpiry - b.rawCertifiExpiry)
+      .map(({ rawCertifiExpiry, ...rest }) => rest);
     setFilteredData(filtered);
   };
   return (

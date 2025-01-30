@@ -50,51 +50,53 @@ export const RM = () => {
   };
 
   const generateFullDetails = (data) => {
-    if (!Array.isArray(data)) {
-      // console.error("Expected an array but got", data);
-      return [];
-    }
-
-    return data.map((item) => ({
-      empID: item.empID || "-",
-      empBadgeNo: item.empBadgeNo || "-",
-      name: item.name || "-",
-      gender: item.gender || "-",
-      dateOfBirth: formatDate(item.dob) || "-",
-      dateOfJoin: formatDate(item.doj) || "-",
-      nationality: item.nationality || "-",
-      // department: item.department[item.department?.length - 1] || "-",
-          position: Array.isArray(item.position)
-          ? (item.position[item.position.length - 1])
+    // Sort the data by dateOfJoin (doj) in ascending order
+    const sortedData = data
+      .filter((item) => item.doj) // Filter out items without doj
+      .sort((a, b) => {
+        const dateA = new Date(a.doj);
+        const dateB = new Date(b.doj);
+        return dateA - dateB; // Sort by date in ascending order
+      })
+      .map((item) => ({
+        empID: item.empID || "-",
+        empBadgeNo: item.empBadgeNo || "-",
+        name: item.name || "-",
+        gender: item.gender || "-",
+        dateOfBirth: formatDate(item.dob) || "-",
+        dateOfJoin: formatDate(item.doj) || "-",
+        nationality: item.nationality || "-",
+        position: Array.isArray(item.position) ? item.position[item.position.length - 1] : "-",
+        contactNo: item.contactNo || "-",
+        contractType: item.contractType || "-",
+        cvReceived: item.cvReceived || "-",
+        BruneiIcNo: item.bwnIcNo || "-",
+        BruneiIcExpiry: Array.isArray(item.bwnIcExpiry)
+          ? formatDate(item.bwnIcExpiry[item.bwnIcExpiry.length - 1])
           : "-",
-      // position: item.position || "-",
-      contactNo: item.contactNo || "-",
-      contractType: item.contractType || "-",
-      cvReceived: item.cvReceived || "-",
-      BruneiIcNo: item.bwnIcNo || "-",
-      BruneiIcExpiry: Array.isArray(item.bwnIcExpiry)
-        ? formatDate(item.bwnIcExpiry[item.bwnIcExpiry.length - 1])
-        : "-",
-      MalaysianIcNo: item.myIcNo || "-",
-      PassportNo: item.ppNo || "-",
-      PassportExpiry: Array.isArray(item.ppExpiry)
-        ? formatDate(item.ppExpiry[item.ppExpiry.length - 1])
-        : "-",
-      employeePassExpiry: Array.isArray(item.empPassExp)
-        ? formatDate(item.empPassExp[item.empPassExp.length - 1])
-        : "-",
-      department: Array.isArray(item.department)
-      ? (item.department[item.department.length - 1])
-      : "-",
-      contractStart: Array.isArray(item.contractStart)
-        ? formatDate(item.contractStart[item.contractStart.length - 1])
-        : "-",
-      contractEnd: Array.isArray(item.contractEnd)
-        ? formatDate(item.contractEnd[item.contractEnd.length - 1])
-        : "-",
-      PreviousEmployment: item.preEmp || "-",
-    }));
+        MalaysianIcNo: item.myIcNo || "-",
+        PassportNo: item.ppNo || "-",
+        PassportExpiry: Array.isArray(item.ppExpiry)
+          ? formatDate(item.ppExpiry[item.ppExpiry.length - 1])
+          : "-",
+        employeePassExpiry: Array.isArray(item.empPassExp)
+          ? formatDate(item.empPassExp[item.empPassExp.length - 1])
+          : "-",
+        department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+        contractStart: Array.isArray(item.contractStart)
+          ? formatDate(item.contractStart[item.contractStart.length - 1])
+          : "-",
+        contractEnd: Array.isArray(item.contractEnd)
+          ? formatDate(item.contractEnd[item.contractEnd.length - 1])
+          : "-",
+        PreviousEmployment: item.preEmp || "-",
+      }));
+  
+    return sortedData;
   };
+  
 
   // Ensure that useEffect is always called and will only update when `allData` changes
   useEffect(() => {
@@ -123,7 +125,7 @@ export const RM = () => {
     const value = e.target.value;
     if (type === "startDate") setStartDate(value);
     if (type === "endDate") setEndDate(value);
-
+  
     const start =
       type === "startDate"
         ? new Date(value)
@@ -132,17 +134,23 @@ export const RM = () => {
         : null;
     const end =
       type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
-
-    const filtered = allData
+  
+    // Sort and filter the data
+    const sortedData = allData
+      .filter((data) => data.doj) // Filter out items without doj
+      .sort((a, b) => {
+        const dateA = new Date(a.doj);
+        const dateB = new Date(b.doj);
+        return dateA - dateB; // Sort by date in ascending order
+      })
       .filter((data) => {
-        const doj = data.doj ? new Date(data.doj) : null;
-
+        const doj = new Date(data.doj);
         if (!doj || isNaN(doj.getTime())) return false;
-
+  
         if (start && end) return doj >= start && doj <= end;
         if (start) return doj >= start;
         if (end) return doj <= end;
-
+  
         return true;
       })
       .map((item) => ({
@@ -153,38 +161,26 @@ export const RM = () => {
         dateOfBirth: formatDate(item.dob) || "-",
         dateOfJoin: formatDate(item.doj) || "-",
         nationality: item.nationality || "-",
-        position: Array.isArray(item.position)
-        ? (item.position[item.position.length - 1])
-        : "-",
+        position: Array.isArray(item.position) ? item.position[item.position.length - 1] : "-",
         contactNo: item.contactNo || "-",
         contractType: item.contractType || "-",
         cvReceived: item.cvReceived || "-",
         BruneiIcNo: item.bwnIcNo || "-",
-        BruneiIcExpiry: Array.isArray(item.bwnIcExpiry)
-          ? formatDate(item.bwnIcExpiry[item.bwnIcExpiry.length - 1])
-          : "-",
+        BruneiIcExpiry: Array.isArray(item.bwnIcExpiry) ? formatDate(item.bwnIcExpiry[item.bwnIcExpiry.length - 1]) : "-",
         MalaysianIcNo: item.myIcNo || "-",
         PassportNo: item.ppNo || "-",
-        PassportExpiry: Array.isArray(item.ppExpiry)
-          ? formatDate(item.ppExpiry[item.ppExpiry.length - 1])
-          : "-",
-        employeePassExpiry: Array.isArray(item.empPassExp)
-          ? formatDate(item.empPassExp[item.empPassExp.length - 1])
-          : "-",
-        department: Array.isArray(item.department)
-        ? (item.department[item.department.length - 1])
-        : "-",
-        contractStart: Array.isArray(item.contractStart)
-          ? formatDate(item.contractStart[item.contractStart.length - 1])
-          : "-",
-        contractEnd: Array.isArray(item.contractEnd)
-          ? formatDate(item.contractEnd[item.contractEnd.length - 1])
-          : "-",
+        PassportExpiry: Array.isArray(item.ppExpiry) ? formatDate(item.ppExpiry[item.ppExpiry.length - 1]) : "-",
+        employeePassExpiry: Array.isArray(item.empPassExp) ? formatDate(item.empPassExp[item.empPassExp.length - 1]) : "-",
+        department: Array.isArray(item.department) ? item.department[item.department.length - 1] : "-",
+        contractStart: Array.isArray(item.contractStart) ? formatDate(item.contractStart[item.contractStart.length - 1]) : "-",
+        contractEnd: Array.isArray(item.contractEnd) ? formatDate(item.contractEnd[item.contractEnd.length - 1]) : "-",
         PreviousEmployment: item.preEmp || "-",
       }));
-
-    setFilteredData(filtered);
+  
+    setFilteredData(sortedData);
   };
+  
+  
 
   return (
     <div>

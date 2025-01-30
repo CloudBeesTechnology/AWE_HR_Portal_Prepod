@@ -48,12 +48,12 @@ export const EmploymentMedical = () => {
     // Calculate the start and end of the next month
     const startOfNextMonth = new Date(
       today.getFullYear(),
-      today.getMonth() + 1 + 1 + 1
+      today.getMonth() + 3,1
     ); // First day of next month
     const endOfNextMonth = new Date(
       today.getFullYear(),
       today.getMonth() + 4,
-      0
+      1
     ); // Last day of next month
 
     // Check if expiry date falls in the next month
@@ -79,7 +79,7 @@ export const EmploymentMedical = () => {
       currentDate.getFullYear(),
       currentDate.getMonth() + 3,
       1
-    ); // 24th March 2025
+    ); 
 
     // Format currentDate and threeMonthsAhead to 'YYYY-MM-DD' for comparison
     const formattedThreeMonthsAhead = `${threeMonthsAhead.getFullYear()}-${(
@@ -139,7 +139,6 @@ export const EmploymentMedical = () => {
     });
     setTableBody(result);
   }, [allData]);
-  // console.log(tableBody); // Ensure tableBody is correctly logged
 
   const handleDate = (e, type) => {
     const value = e.target.value;

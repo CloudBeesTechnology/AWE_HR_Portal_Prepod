@@ -41,20 +41,29 @@ export const Termination = () => {
 
   // Generate table body dynamically from mergedData
   const resignationMergedData = (data) => {
-    return data
+    const sortedData = data
       ?.filter((item) => item.termiDate) // Only include items with termiDate
-      .map((item) => ({
-        empID: item.empID || "-",
-        empBadgeNo: item.empBadgeNo || "-",
-        name: item.name || "-",
-        dateOfJoin: formatDate(item.doj) || "-",
-        nationality: item.nationality || "-",
-        position: item.position || "-",
-        department: item.department || "-",
-        terminateDate: formatDate(item.termiDate) || "-", // Corrected to display termination date
-        reasonTerminate: item.reasonTerminate || "-", // Corrected to display termination note (if any)
-      }));
+      .map((item) => {
+        const termiDate = new Date(item.termiDate); // Parse termiDate for sorting
+        return {
+          termiDate, // Keep raw date for sorting
+          empID: item.empID || "-",
+          empBadgeNo: item.empBadgeNo || "-",
+          name: item.name || "-",
+          dateOfJoin: formatDate(item.doj) || "-",
+          nationality: item.nationality || "-",
+          position: item.position || "-",
+          department: item.department || "-",
+          terminateDate: formatDate(item.termiDate) || "-", // Display termination date
+          reasonTerminate: item.reasonTerminate || "-", // Display termination note (if any)
+        };
+      })
+      .sort((a, b) => a.termiDate - b.termiDate) // Sort by termiDate in ascending order
+      .map(({ termiDate, ...rest }) => rest); // Remove termiDate after sorting
+  
+    return sortedData; // Return the sorted and formatted data
   };
+  
 
   useEffect(() => {
     setTableBody(resignationMergedData(allData));
@@ -74,32 +83,35 @@ export const Termination = () => {
     const end =
       type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
 
-    const filtered = allData
+      const filtered = allData
       .filter((data) => {
         const termiDate = data.termiDate ? new Date(data.termiDate) : null;
-
+    
         if (!termiDate || isNaN(termiDate.getTime())) return false;
-
+    
         if (start && end) return termiDate >= start && termiDate <= end;
         if (start) return termiDate >= start;
         if (end) return termiDate <= end;
-
+    
         return true;
       })
       .map((item) => ({
         empId: item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
         name: item.name || "-",
-        dateOfJoin: item.doj || "-",
+        dateOfJoin: formatDate(item.doj) || "-", // Ensures date is formatted
         nationality: item.nationality || "-",
         position: item.position || "-",
         department: item.department || "-",
-        terminateDate: formatDate(item.termiDate) || "-", // Corrected to display termination date
-        reasonTerminate: item.reasonTerminate || "-", // Corrected to display termination note (if any)
-      }));
-
+        terminateDate: formatDate(item.termiDate) || "-", // Display formatted termination date
+        reasonTerminate: item.reasonTerminate || "-", // Display termination reason
+        rawTermiDate: new Date(item.termiDate), // Add raw date for sorting
+      }))
+      .sort((a, b) => a.rawTermiDate - b.rawTermiDate) // Sort by raw termiDate
+      .map(({ rawTermiDate, ...rest }) => rest); // Remove raw date after sorting
+    
     setFilteredData(filtered);
-  };
+    }    
 
   return (
     <div>

@@ -45,7 +45,7 @@ export const LeavePassData = () => {
   const generateTableBodyFromMergedData = (data) => {
     return data
     .filter((item) => {
-      console.log(item.annualLeaveDate);
+      // console.log(item.annualLeaveDate);
       
       // Ensure annualLeaveDate is a valid array with non-empty and valid date entries
       return (
@@ -70,7 +70,10 @@ export const LeavePassData = () => {
         contractEnd: formatDate(item.contractEnd),
         annualLeaveDate: formatDate(item.annualLeaveDate),
         destinateLeavePass: item.destinateLeavePass || "-",
-      }));
+        rawAld: new Date(item.annualLeaveDate), // Raw date for sorting
+      }))
+      .sort((a, b) => a.rawAld - b.rawAld)
+      .map(({ rawAld, ...rest }) => rest); // Remove rawDateOfJoin after sorting
   };
 
   useEffect(() => {
@@ -111,8 +114,11 @@ export const LeavePassData = () => {
       contractEnd: formatDate(item.contractEnd),
       annualLeaveDate: formatDate(item.annualLeaveDate),
       destinateLeavePass: item.destinateLeavePass || "-",
-    }));
-
+      rawAld: new Date(item.annualLeaveDate), // Raw date for sorting
+      }))
+      .sort((a, b) => a.rawAld - b.rawAld)
+      .map(({ rawAld, ...rest }) => rest); // Remove rawDateOfJoin after sorting
+  
     setFilteredData(filtered);
   };
   return (
