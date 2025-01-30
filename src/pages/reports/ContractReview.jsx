@@ -26,6 +26,7 @@ export const ContractReview = () => {
     "Position",
     "Contract Start Date",
     "Contract End Date",
+    "LD Expiry",
     "Duration of Renewal Contract",
     "Form",
   ];
@@ -116,6 +117,9 @@ export const ContractReview = () => {
           position: item.position?.[item.position?.length - 1] || "-",
           contractStartDate: formatDate(startDate) || "-",
           contractEndDate: formatDate(lastDate) || "-",
+          nlmsEmpApproval: Array.isArray(item.nlmsEmpValid)
+          ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
+          : "-",
           contractRenewalDuration: calculateBalanceMonths(startDate, lastDate),
         };
       })
@@ -198,6 +202,9 @@ export const ContractReview = () => {
           position: item.position?.[item.position?.length - 1] || "-",
           contractStartDate: formatDate(startDate) || "-",
           contractEndDate: formatDate(lastDate) || "-",
+          nlmsEmpApproval: Array.isArray(item.nlmsEmpValid)
+          ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
+          : "-",
           contractRenewalDuration: calculateBalanceMonths(startDate, lastDate),
         };
       }) .sort((a, b) => a.lastDate - b.lastDate) // Sort by lastDate

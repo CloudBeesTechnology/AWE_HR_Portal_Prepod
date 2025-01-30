@@ -33,6 +33,8 @@ import {
   listEmailNotifis,
   listWPTrackings,
   listKeyValueStores,
+  listContractForms,
+  listLocalMobilizations
 } from "../graphql/queries";
 
 export const DataSupply = createContext();
@@ -73,6 +75,8 @@ const DataStoredContext = ({ children }) => {
     EmailNotifi:[],
     WPTrackings:[],
     dropDownVal:[],
+    contractForms:[],
+    localMobiliz:[],
   });
 
   useEffect(() => {
@@ -111,12 +115,15 @@ const DataStoredContext = ({ children }) => {
           { query: listEmailNotifis, key: "EmailNotifi" },
           { query: listWPTrackings, key: "WPTrackings" },
           { query: listKeyValueStores, key: "dropDownVal" },
+          { query: listContractForms, key: "contractForms" },
+          { query: listLocalMobilizations, key: "localMobiliz" },
+
         ];
         const limit = 20000;
         const responses = await Promise.all(
           queries.map(({ query }) =>
             client.graphql({ query, variables: { limit } }).catch((error) => {
-              // console.error("GraphQL Error:", error);
+              console.error("GraphQL Error:", error);
               return { data: { items: [] } }; // fallback for failed query
             })
           )

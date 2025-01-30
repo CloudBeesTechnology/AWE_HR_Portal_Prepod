@@ -382,6 +382,10 @@ export const ContractFormPDF = ({ contentRef }) => {
                 <th className="border border-black p-2">Date Of Join</th>
                 <th className="border border-black p-2">Contract Start Date</th>
                 <th className="border border-black p-2">Contract End Date</th>
+                <th className="border border-black p-2">LD Expiry</th>
+                <th className="border border-black p-2">
+                  Duration of Renewal Contract
+                </th>
                 
               </tr>
             </thead>
@@ -399,25 +403,32 @@ export const ContractFormPDF = ({ contentRef }) => {
                     {employeeData?.empBadgeNo}
                   </td>
                   <td className="border border-black p-2">
-                    {employeeData?.position}
+                    {employeeData?.position || "N/A"}
                   </td>
                   <td className="border border-black p-2">
-                    {employeeData?.department}
+                    {employeeData?.department || "N/A"}
                   </td>
                   <td className="border border-black p-2">
-                    {employeeData?.nationality}
+                    {employeeData?.nationality || "N/A"}
                   </td>
                   <td className="border border-black p-2">
                     {employeeData?.dateOfJoin}
                   </td>
                   <td className="border border-black p-2">
-                    {employeeData?.contractStartDate}
+                    {employeeData?.contractStartDate || "N/A"}
                   </td>
                   <td className="border border-black p-2">
-                    {employeeData?.contractEndDate}
+                    {employeeData?.contractEndDate || "N/A"}
+                  </td>
+                  <td className="border border-black p-2">
+                    {employeeData?.nlmsEmpApproval || "N/A"}
+                  </td>
+                  <td className="border border-black p-2">
+                    {employeeData?.contractRenewalDuration || "N/A"}
                   </td>
                 </tr>
               ))}
+                 
             </tbody>
           </table>
         </div>

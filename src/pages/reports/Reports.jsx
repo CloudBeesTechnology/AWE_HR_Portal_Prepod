@@ -35,10 +35,16 @@ export const Reports = () => {
     contractForms,
     IVSSDetails,
     WPTrackings,
-    localMobiliz
+    localMobiliz,
+    empPDData
   } = useContext(DataSupply);
 console.log(IVSSDetails);
 
+IVSSDetails.forEach((employee) => {
+  if (employee.tempID === "TEMP015") {
+    console.log(employee);
+  }
+});
   const [mergedData, setMergeData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userID, setUserID] = useState("");
@@ -94,121 +100,15 @@ console.log(IVSSDetails);
     (tile) => tile.show !== false
   );
 
-const DataExample=[
-  {    
-    title: "Contract Expiry Form Update",
-    icon: "contract",
-    submitdateendorsement: "03-07-2000",
-    show: "Supervisor",
-    tempID: "TEMP016"  
-  },
-  {    
-    title1: "Contract Expiry Form Update 17",
-    icon1: "contract 17",
-    path1: "ContractUp 17",
-    show1: "Supervisor 17",
-    tempID: "TEMP017", 
-    empID:"8011" 
-  },
-]
-const DataExample1=[
-  {    
-    title1: "Contract ggg 16",
-    receiptno: "444 5555 666 gg16",
-    path1: "ContractUp  gggggggggg16",
-    jitpaamount: "334355555555555555555555",
-    tempID: "TEMP016",
-    empID:"011"
-  },
-  {    
-    title1: "Contract Expiry Form Update 17",
-    icon1: "contract 17",
-    path1: "ContractUp 17",
-    show1: "Supervisor 17",
-    tempID: "TEMP017", 
-    empID:"8011" 
-  },
-  {    
-    title1: "Contract 88888888888 18",
-    icon1: "contract 88888888888 18",
-    path1: "ContractUp 88888888888 18",
-    show1: "Supervisor 88888888888 18",
-    tempID: "TEMP018" ,
-    empID:"7716"
-  },
-]
-const DataExample2=[
-  {    
-    title2: "Cont555555",
-    icon2: "4444444444",
-    path2: "33333333333333",
-    receiptno: "22222222222",
-    tempID: "TEMP016"  
-  },
-  {    
-    title2: "Contract Expiry Form Update 28",
-    icon2: "contract 28",
-    path2: "ContractUp 28",
-    show2: "Supervisor 28",
-    tempID: "TEMP018"  
-  },
-]
-
-  // useEffect(() => {
-  //   const mergeData = empPIData.map((piData) => {
-  //     const data = {
-  //       ...piData,
-  //       ...(IDData?.find((item) => item.empID === piData.empID) || {}),
-  //       ...(workInfoData?.find((item) => item.empID === piData.empID) || {}),
-  //       ...(terminateData?.find((item) => item.empID === piData.empID) || {}),
-  //       ...(DNData?.find((item) => item.empID === piData.empID) || {}),
-  //       ...(PPValidsData?.find((item) => item.empID === piData.empID) || {}),
-  //       ...(LMIData?.find((item) => item.empID === piData.empID) || {}),
-  //       ...(EmpInsuranceData?.find((item) => item.empID === piData.empID) ||
-  //         {}),
-  //       ...(WeldeInfo?.find((item) => item.empID === piData.empID) || {}),
-  //       ...(BastingInfo?.find((item) => item.empID === piData.empID) || {}),
-  //       ...(leaveDetailsData?.find((item) => item.empID === piData.empID) ||
-  //         {}),
-  //       ...(trainingCertifi?.find((item) => item.empID === piData.empID) || {}),
-  //       ...(AddEmpReq?.find((item) => item.empID === piData.empID) || {}),
-  //       ...(ProbFData?.find((item) => item.empID === piData.empID) || {}),
-  //       ...(contractForms?.find((item) => item.empID === piData.empID) || {}),
-  //       ...(IVSSDetails?.find((item) => item.empID === piData.empID) || {}),
-  //     };
-  //     return data;
-  //   });
-
-  //   setMergeData(mergeData);
-
-  //   setLoading(false);
-  // }, [
-  //   empPIData,
-  //   IDData,
-  //   workInfoData,
-  //   terminateData,
-  //   DNData,
-  //   PPValidsData,
-  //   LMIData,
-  //   EmpInsuranceData,
-  //   WeldeInfo,
-  //   BastingInfo,
-  //   leaveDetailsData,
-  //   trainingCertifi,
-  //   AddEmpReq,
-  //   ProbFData,
-  //   contractForms,
-  //   IVSSDetails,
-  // ]);
   useEffect(() => {
     if (!empPIData || empPIData.length === 0) return;
   
-    const mergedExampleData = DataExample1.map((item1) => {
+    const mergedExampleData = IVSSDetails.map((item1) => {
       const { empID, tempID } = item1;
   
-      // Step 2: Find matching tempID data in DataExample2 and DataExample
-      const matchingData2 = DataExample2.find((item2) => item2.tempID === tempID) || {};
-      const matchingData = DataExample.find((item3) => item3.tempID === tempID) || {};
+      // Step 2: Find matching tempID data in WPTrackings and localMobiliz
+      const matchingData2 = WPTrackings.find((item2) => item2.tempID === tempID) || {};
+      const matchingData = localMobiliz.find((item3) => item3.tempID === tempID) || {};
   
       // Step 3: Merge all data together
       return {
@@ -255,8 +155,7 @@ const DataExample2=[
   }, [
     empPIData, IDData, workInfoData, terminateData, DNData, PPValidsData, 
     LMIData, EmpInsuranceData, WeldeInfo, BastingInfo, leaveDetailsData, 
-    trainingCertifi, AddEmpReq, ProbFData, contractForms, IVSSDetails, 
-    DataExample1, DataExample2, DataExample
+    trainingCertifi, AddEmpReq, ProbFData, contractForms, IVSSDetails, WPTrackings, localMobiliz
   ]);
   
   

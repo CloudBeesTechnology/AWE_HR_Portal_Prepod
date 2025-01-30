@@ -132,7 +132,6 @@ export const ProbationPDF = ({ userID, userType }) => {
         // console.log("Last probation end date:", lastDate);  // Log last probation end date
   
         const formattedData = {
-          lastDate: new Date(lastDate), // Keep for sorting
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",

@@ -6,6 +6,8 @@ import { CandiToEmp } from "./ConvertCandiToEmp";
 import { generateClient } from "@aws-amplify/api";
 import { listEmpPersonalInfos } from "../../../graphql/queries";
 import { SpinLogo } from "../../../utils/SpinLogo";
+import { UpdateMobilization } from "../../../services/updateMethod/UpdateMobilization";
+
 
 const client = generateClient();
 export const MobilizationRecru = ({
@@ -15,6 +17,7 @@ export const MobilizationRecru = ({
   urlValue,
 }) => {
   const { SumbitCandiToEmp } = CandiToEmp();
+  const {submitMobilization}  = UpdateMobilization();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const [selectedCandi, setSelectedCandi] = useState([]);
@@ -43,24 +46,51 @@ export const MobilizationRecru = ({
     setIsReviewFormVisible(!isReviewFormVisible);
   };
 
-  console.log("hello world");
-  
-
   const getTotalCount = async () => {
     try {
       const result = await client.graphql({
         query: listEmpPersonalInfos,
+        variables: { limit: 20000 }
       });
       const items = result?.data?.listEmpPersonalInfos?.items || [];
-      return items.length; // Return the count of all entries
+      const filteringData = items.map((val) => val.empID);
+  
+      // Sorting function
+      const sortedData = filteringData.sort((a, b) => {
+        const numA = a.match(/\d+/) ? parseInt(a.match(/\d+/)[0], 10) : 0;
+        const numB = b.match(/\d+/) ? parseInt(b.match(/\d+/)[0], 10) : 0;
+  
+        const prefixA = a.replace(/\d+/g, "") || "";
+        const prefixB = b.replace(/\d+/g, "") || "";
+  
+        if (prefixA === prefixB) {
+          return numA - numB; // Sort numerically if prefixes match
+        }
+        return prefixA.localeCompare(prefixB); // Sort alphabetically if different prefixes
+      });
+  
+      const maxValue = sortedData[sortedData.length - 1]; // Get the last (largest) value
+  
+      console.log(sortedData);
+      return maxValue;
     } catch (error) {
       console.error("Error fetching total count:", error);
-      return 0; // Return 0 if there's an error
+      return 0;
     }
   };
+  
+
   const generateNextTempID = (totalCount) => {
-    const nextNumber = totalCount + 1;
-    return  String(nextNumber);
+    // Check if the string contains a non-numeric prefix
+    const prefixMatch = totalCount.match(/[^\d]+/);
+    const prefix = prefixMatch ? prefixMatch[0] : "";
+    const numberMatch = totalCount.match(/\d+/);
+    const numberPart = numberMatch ? parseInt(numberMatch[0], 10) : 0;
+    const nextNumber = numberPart + 1;
+    const nextTempID = `${prefix}${nextNumber}`;
+    console.log(nextTempID);
+
+    return nextTempID;
   };
 
   useEffect(() => {
@@ -80,7 +110,9 @@ export const MobilizationRecru = ({
       ...candi,
       empID: latestTempIDData,
     };
+    // console.log(storedData);
     await SumbitCandiToEmp({ storedData });
+    await submitMobilization({mob:storedData})
     setShowTitle(
       "Candidate conversion to employee has been completed successfully."
     );

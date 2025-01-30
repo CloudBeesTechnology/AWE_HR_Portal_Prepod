@@ -26,6 +26,7 @@ export const ContractPDF = ({ userID, userType }) => {
     "Position",
     "Contract Start Date",
     "Contract End Date",
+    "LD Expiry",
     "Duration of Renewal Contract",
     "Form",
   ]);
@@ -153,7 +154,10 @@ export const ContractPDF = ({ userID, userType }) => {
           position: item.position[item.position.length - 1],
           contractStartDate: formatDate(startDate) || "-",
           contractEndDate: formatDate(lastDate) || "-",
-          balanceMonths: balanceMonths,
+          nlmsEmpApproval: Array.isArray(item.nlmsEmpValid)
+          ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
+          : "-",
+          contractRenewalDuration: balanceMonths,
         };
       })
       .filter((item) => item !== null);
@@ -220,6 +224,9 @@ export const ContractPDF = ({ userID, userType }) => {
           position: item.position[item.position?.length - 1] || "-",
           contractStartDate: formatDate(startDate) || "-",
           contractEndDate: formatDate(lastDate) || "-",
+          nlmsEmpApproval: Array.isArray(item.nlmsEmpValid)
+          ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
+          : "-",
         };
       });
 
