@@ -16,6 +16,9 @@ export const TimeSheetsCRUDoperations = async ({
   setNotification,
   setAllApprovedData,
   setAllRejectedData,
+  handleAssignManager,
+  selectedRows,
+  handleManagerReload,
 }) => {
   if (action === "create") {
     const chunkArray = (array, size) => {
@@ -30,7 +33,7 @@ export const TimeSheetsCRUDoperations = async ({
       let successCount = 0;
       let successFlag = false;
       const chunks = chunkArray(data, 1000);
-
+      setStoringMess(true);
       for (const chunk of chunks) {
         try {
           await Promise.all(
@@ -43,17 +46,65 @@ export const TimeSheetsCRUDoperations = async ({
               });
 
               if (response?.data?.createTimeSheet) {
-                // console.log(
-                //   "TimeSheet created successfully:",
-                //   response.data.createTimeSheet
-                // );
                 successCount++;
 
                 if (!successFlag) {
-                  successFlag = true; // Set the flag immediately to prevent multiple executions
+                  successFlag = true;
 
                   const responseData = response.data.createTimeSheet;
+                }
+                if (successCount === data.length) {
+                  setStoringMess(false);
+                  toggleSFAMessage(true);
+                  setData(null);
+                }
+              }
+            })
+          );
+        } catch (error) {
+          setStoringMess(false);
 
+          toggleSFAMessage(false);
+        }
+      }
+    };
+
+    sendTimeSheets(finalResult);
+  } else if (action === "updateStoredData") {
+    const chunkArray = (array, size) => {
+      const result = [];
+      for (let i = 0; i < array.length; i += size) {
+        result.push(array.slice(i, i + size));
+      }
+      return result;
+    };
+
+    const sendTimeSheets = async (data) => {
+      let successCount = 0;
+      let successFlag = false;
+      setNotification?.(true);
+      setShowTitle?.("Data has been submitted successfully");
+      const chunks = chunkArray(data, 1000);
+
+      for (const chunk of chunks) {
+        try {
+          await Promise.all(
+            chunk.map(async (item) => {
+              const response = await client.graphql({
+                query: updateTimeSheet,
+                variables: {
+                  input: item,
+                },
+              });
+
+              if (response?.data?.updateTimeSheet) {
+                successCount++;
+
+                if (!successFlag) {
+                  successFlag = true;
+
+                  const responseData = response.data.updateTimeSheet;
+                  
                   const result = await MergeTableForNotification(responseData);
 
                   if (result) {
@@ -66,35 +117,25 @@ export const TimeSheetsCRUDoperations = async ({
                       const { subject, message, fromAddress, toAddress } =
                         emailDetails;
                       await sendEmail(subject, message, fromAddress, toAddress);
-                      toggleSFAMessage(true, responseData); // Show success message once
-                      setStoringMess(true);
+                      setTimeout(() => {
+                        handleAssignManager();
+                        setNotification?.(false);
+                      }, 1500);
+                     
                     } else {
-                      // console.error("Notification returned undefined!");
                     }
                   } else {
-                    // console.error(
-                    // "MergeTableForNotification returned undefined!"
-                    // );
                   }
-
-                  setData(null);
-                }
-
-                if (successCount === data.length) {
-                  setStoringMess(false);
-
-                  setData(null);
                 }
               }
             })
           );
         } catch (error) {
+          setStoringMess(false);
           // console.error("Error creating TimeSheet:", error);
-          toggleSFAMessage(false); // Show error message if batch fails
+          toggleSFAMessage(false);
         }
       }
-      // console.log(`Total successful responses: ${successCount}`);
-      // console.log("All data saved");
     };
 
     sendTimeSheets(finalResult);
@@ -109,10 +150,11 @@ export const TimeSheetsCRUDoperations = async ({
 
     const updateTimeSheetFunction = async (timeSheetData) => {
       let successFlag = false;
-      let successCount = 0; // To track successful updates
+      let successCount = 0;
+      let allResponse = [];
       setNotification?.(true);
       setShowTitle?.("Data has been submitted successfully");
-      const chunks = chunkArray(timeSheetData, 1000); // Adjust the chunk size as needed
+      const chunks = chunkArray(timeSheetData, 1000);
 
       for (const chunk of chunks) {
         try {
@@ -127,55 +169,22 @@ export const TimeSheetsCRUDoperations = async ({
                 });
 
                 if (response?.data?.updateTimeSheet) {
-                  // console.log(
-                  //   "TimeSheet Updated successfully:",
-                  //   response.data.updateTimeSheet
-                  // );
-                  successCount++; // Increment successful count
-
+                  successCount++;
+                  const resData = response.data.updateTimeSheet;
+                  allResponse.push(resData);
+                  // console.log("allResponse : ", allResponse);
                   if (!successFlag) {
                     const responseData = response.data.updateTimeSheet;
 
-                    successFlag = true; // Set the flag to avoid multiple notifications
-                    // setStoringMess(true);
+                    successFlag = true;
 
-                    toggleSFAMessage(true, responseData); // Show success message once
-
-                    const result = await MergeTableForNotification(
-                      responseData
-                    );
-
-                    if (result) {
-                      const emailDetails = await Notification({
-                        getEmail: result,
-                        Position,
-                      });
-
-                      if (emailDetails) {
-                        const { subject, message, fromAddress, toAddress } =
-                          emailDetails;
-                        await sendEmail(
-                          subject,
-                          message,
-                          fromAddress,
-                          toAddress
-                        );
-
-                        setNotification?.(false);
-                        setAllApprovedData?.([]);
-                        setAllRejectedData?.([]);
-                      } else {
-                        // console.error("Notification returned undefined!");
-                      }
-                    } else {
-                      // console.error(
-                      //   "MergeTableForNotification returned undefined!"
-                      // );
-                    }
+                    toggleSFAMessage(true); // Show success message once
                   }
                 }
               } catch (error) {
+                setStoringMess(false);
                 setNotification?.(false);
+                toggleSFAMessage(false);
                 // console.error(
                 //   `Error updating TimeSheet with ID ${timeSheet.id}:`,
                 //   error
@@ -190,6 +199,74 @@ export const TimeSheetsCRUDoperations = async ({
         }
       }
 
+      // Function to group by status
+      const groupByStatus = (data) => {
+        return data.reduce((acc, item) => {
+          const { status } = item;
+          if (!acc[status]) {
+            acc[status] = [];
+          }
+          acc[status].push(item);
+          return acc;
+        }, {});
+      };
+
+      const groupedResponse = groupByStatus(allResponse);
+      // console.log("Grouped Response:", groupedResponse);
+
+      // Handle Rejected
+      if (groupedResponse.Rejected?.length > 0) {
+        const rejectedData = groupedResponse.Rejected[0]; // Get first rejected record
+        // console.log("Rejected Notification Data:", rejectedData);
+
+        MergeTableForNotification(rejectedData).then(async (result) => {
+          if (result) {
+            const emailDetails = await Notification({
+              getEmail: result,
+              Position,
+            });
+
+            if (emailDetails) {
+              const { subject, message, fromAddress, toAddress } = emailDetails;
+              await sendEmail(subject, message, fromAddress, toAddress);
+              setTimeout(() => {
+             
+                handleManagerReload?.();
+                setNotification?.(false);
+              }, 1500);
+            }
+          }
+        });
+      }
+
+      // Handle Approved
+      if (groupedResponse.Approved?.length > 0) {
+        const approvedData = groupedResponse.Approved[0]; // Get first approved record
+        // console.log("Approved Notification Data:", approvedData);
+
+        MergeTableForNotification(approvedData).then(async (result) => {
+          if (result) {
+            const emailDetails = await Notification({
+              getEmail: result,
+              Position,
+            });
+
+            if (emailDetails) {
+              const { subject, message, fromAddress, toAddress } = emailDetails;
+              await sendEmail(subject, message, fromAddress, toAddress);
+
+              setTimeout(() => {
+                
+                handleManagerReload?.();
+                setNotification?.(false);
+              }, 1500);
+            }
+          }
+        });
+      }
+
+      setAllApprovedData?.([]);
+      setAllRejectedData?.([]);
       // console.log(`Total successful updates: ${successCount}`);
     };
 
@@ -206,6 +283,9 @@ export const TimeSheetsCRUDoperations = async ({
     const UpdateRejectedTimeSheets = async (data) => {
       let successCount = 0;
       let successFlag = false;
+      setNotification?.(true);
+      setShowTitle?.("Data has been submitted successfully");
+
       const chunks = chunkArray(data, 1000);
 
       for (const chunk of chunks) {
@@ -220,15 +300,11 @@ export const TimeSheetsCRUDoperations = async ({
               });
 
               if (response?.data?.updateTimeSheet) {
-                // console.log(
-                //   "TimeSheet created successfully:",
-                //   response.data.updateTimeSheet
-                // );
                 successCount++;
 
                 if (!successFlag) {
-                  successFlag = true; // Set the flag immediately to prevent multiple executions
-
+                  successFlag = true;
+                  toggleSFAMessage(true);
                   const responseData = response.data.updateTimeSheet;
 
                   const result = await MergeTableForNotification(responseData);
@@ -244,36 +320,25 @@ export const TimeSheetsCRUDoperations = async ({
                       const { subject, message, fromAddress, toAddress } =
                         emailDetails;
                       await sendEmail(subject, message, fromAddress, toAddress);
-
-                      toggleSFAMessage(true, responseData); // Show success message once
-                      setStoringMess(true);
+                      setTimeout(() => {
+                        handleAssignManager();
+                        setNotification?.(false);
+                      }, 1500);
                     } else {
-                      // console.error("Notification returned undefined!");
                     }
                   } else {
-                    // console.error(
-                    //   "MergeTableForNotification returned undefined!"
-                    // );
                   }
-
-                  setData(null);
-                }
-
-                if (successCount === data.length) {
-                  setStoringMess(false);
-
-                  setData(null);
                 }
               }
             })
           );
         } catch (error) {
+          setNotification?.(false);
+          setStoringMess(false);
           // console.error("Error creating TimeSheet:", error);
-          toggleSFAMessage(false); // Show error message if batch fails
+          toggleSFAMessage(false);
         }
       }
-      // console.log(`Total successful responses: ${successCount}`);
-      // console.log("All data saved");
     };
 
     UpdateRejectedTimeSheets(finalResult);

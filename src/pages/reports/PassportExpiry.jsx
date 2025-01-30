@@ -11,8 +11,9 @@ export const PassportExpiry = () => {
   const [endDate, setEndDate] = useState("");
   const [tableHead, setTableHead] = useState([
     "Emp ID",
-    "Employee Badge",
+    "Badge No",
     "Name",
+    "Date of Join",
     "Nationality",
     "Department",
     "Position",
@@ -61,6 +62,7 @@ export const PassportExpiry = () => {
         empID: item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
         name: item.name || "-",
+        dateOfJoin: formatDate(item.doj)  || "-",
         nationality: item.nationality || "-",
         department: item.department || "-",
         position: item.position || "-",
@@ -101,6 +103,7 @@ export const PassportExpiry = () => {
         empID: item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
         name: item.name || "-",
+        dateOfJoin: formatDate(item.doj)  || "-",
         nationality: item.nationality || "-",
         department: item.department || "-",
         position: item.position || "-",

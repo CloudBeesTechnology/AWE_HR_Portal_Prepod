@@ -18,12 +18,12 @@ export const ContractReview = () => {
 
   const tableHead = [
     "Emp ID",
-    "Employee Badge",
+    "Badge No",
     "Name",
     "Nationality",
-    "Date of Joined",
+    "Date of Join",
     "Department",
-    "Work Position",
+    "Position",
     "Contract Start Date",
     "Contract End Date",
     "Duration of Renewal Contract",

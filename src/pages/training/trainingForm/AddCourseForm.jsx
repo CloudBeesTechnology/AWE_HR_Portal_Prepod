@@ -96,6 +96,8 @@ export const AddCourseForm = ({ closeModal }) => {
 
         // console.log("Updating data:", AddCFUpp);
         await AddCUpdateFun({ AddCFUpp });
+        setShowTitle("Training Add Course Form Updated successfully");
+        setNotification(true);
       } else {
         // Create logic
         const AddCFCre = {
@@ -234,7 +236,7 @@ export const AddCourseForm = ({ closeModal }) => {
           <SpinLogo
             text={showTitle}
             notification={notification}
-            path="/training"
+            path="/training/AcTc"
           />
         )}
       </section>

@@ -26,6 +26,7 @@ export const VTimeSheetTable = () => {
   const [toggleForViewTS, setToggleForViewTS] = useState(false);
   const [viewDetails, setViewDetails] = useState(null);
   // const [categoryFilters, setCategoryFilters] = useState(null);
+  const [editFormTitle, setEditFormTitle] = useState("Edit Form");
 
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -141,15 +142,20 @@ export const VTimeSheetTable = () => {
   };
 
   const assignObjectFun = async (obj, type) => {
-    
     if (obj) {
-    
       const result = await ViewTimesheetDetails(obj, type);
       setFileType(type);
       setViewDetails(result);
     }
   };
 
+  const editFormTitleFunc = (title) => {
+    if (title === "View Form") {
+      setEditFormTitle(title);
+    } else {
+      setEditFormTitle("Edit Form");
+    }
+  };
   return (
     <section className="h-screen bg-[#fafaf6] ">
       {/* <header className="flex justify-between"> */}
@@ -225,6 +231,7 @@ export const VTimeSheetTable = () => {
                 message={message}
                 assignObjectFun={assignObjectFun}
                 toggleFunction={toggleFunction}
+                editFormTitleFunc={editFormTitleFunc}
               />
             )}
           </table>
@@ -250,6 +257,7 @@ export const VTimeSheetTable = () => {
           titleName={fileType}
           Position="Manager"
           editObject={viewDetails}
+          editFormTitle={editFormTitle}
         />
       )}
     </section>

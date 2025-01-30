@@ -20,11 +20,19 @@ export const UseFetchDataForSummary = (
     const parsedDate = new Date(date);
     const parsedStart = new Date(start);
     const parsedEnd = new Date(end);
-   
 
     parsedDate.setHours(0, 0, 0, 0);
     parsedStart.setHours(0, 0, 0, 0);
     parsedEnd.setHours(0, 0, 0, 0);
+    console.log(
+      parsedDate,
+      " : ",
+      parsedStart,
+      "---",
+      parsedDate,
+      " : ",
+      parsedEnd
+    );
     return parsedDate >= parsedStart && parsedDate <= parsedEnd; // Check if within range
   };
 
@@ -41,7 +49,7 @@ export const UseFetchDataForSummary = (
 
           let nextToken = null; // Pagination token
           let allData = []; // Store all fetched data
-         
+
           do {
             const filter = {
               and: [
@@ -76,9 +84,7 @@ export const UseFetchDataForSummary = (
             isDateInRange(item.date, startDate, endDate)
           );
 
-          console.log(allData);
-         
-          console.log("Filtered DATA : ", filteredData);
+          // console.log("Filtered DATA : ", filteredData);
           if (filteredData && filteredData.length > 0) {
             setLoading(true);
             setConvertedStringToArrayObj(filteredData); // Set filtered data

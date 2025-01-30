@@ -303,6 +303,50 @@
         }
       }
     },
+    "AddCourseIAMRoleDefaultPolicyD661B30F": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:DescribeTable"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "AddCourseTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "AddCourseIAMRoleDefaultPolicyD661B30F",
+        "Roles": [
+          {
+            "Ref": "AddCourseIAMRole4C773DD9"
+          }
+        ]
+      }
+    },
     "AddCourseDataSource": {
       "Type": "AWS::AppSync::DataSource",
       "Properties": {

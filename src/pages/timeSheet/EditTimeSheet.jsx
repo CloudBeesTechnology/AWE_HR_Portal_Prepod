@@ -15,6 +15,8 @@ export const EditTimeSheet = ({
   fieldObj,
   titleName,
   Position,
+  handleSubmit,
+  editFormTitle,
 }) => {
   const [jobCode, setJobCode] = useState(null);
   const [allLocation, setAllLocation] = useState(null);
@@ -26,6 +28,7 @@ export const EditTimeSheet = ({
   const [formData, setFormData] = useState({
     fieldObj,
   });
+
   const JOBCODES = [
     { id: 1, JOBCODE: "J9001" },
     { id: 2, JOBCODE: "J9002" },
@@ -78,7 +81,48 @@ export const EditTimeSheet = ({
 
   useEffect(() => {
     if (editObject) {
-      setFormData(editObject);
+      const formatDateTime = (getDate) => {
+        // Check if dateTime is already a string
+
+        const inputDate = String(getDate);
+        const date = new Date(inputDate);
+
+        // Extract parts
+        const day = date.getDate(); // 2
+        const month = date.getMonth() + 1; // Months are 0-indexed, so add 1
+        const year = date.getFullYear(); // 2024
+        const time = inputDate?.split(" ")[1] + " " + inputDate?.split(" ")[2]; // "5:50:59 AM"
+
+        // Format the new date
+        return `${day}/${month}/${year} ${time}`;
+      };
+      // Format both fields
+      const formattedEntranceDateTime = formatDateTime(
+        editObject.ENTRANCEDATETIME
+      );
+      const formattedExitDateTime = formatDateTime(editObject.EXITDATETIME);
+
+      const isDateField = editObject.DATE !== undefined;
+      const fieldToUpdate = isDateField ? "DATE" : "ENTRANCEDATEUSED";
+      const originalDate = editObject[fieldToUpdate];
+
+      // Convert the date from DD/MM/YYYY to MM/DD/YYYY for display
+      const displayedDate = originalDate
+        ? `${originalDate.split("/")[1]}/${originalDate.split("/")[0]}/${
+            originalDate.split("/")[2]
+          }`
+        : null;
+
+      // Create the updated object with the transformed date for display
+      const updatedEditObject = {
+        ...editObject,
+
+        [`formatted_${fieldToUpdate}`]: displayedDate, // Add a new field for the formatted date
+        ENTRANCEDATETIME: formattedEntranceDateTime,
+        EXITDATETIME: formattedExitDateTime,
+      };
+
+      setFormData(updatedEditObject);
 
       const validJobLocaWhrs =
         editObject?.jobLocaWhrs?.filter(
@@ -432,6 +476,7 @@ export const EditTimeSheet = ({
     };
 
     editFunction(result);
+    handleSubmit(result);
   }, [sections, formData]);
 
   const handleChange = (e) => {
@@ -459,9 +504,9 @@ export const EditTimeSheet = ({
   const handleValidation = () => {
     const newErrors = {};
     sections.forEach((section, index) => {
-      if (!section.JOBCODE) {
-        newErrors[`JOBCODE-${index}`] = "Job Code is required.";
-      }
+      // if (!section.JOBCODE) {
+      //   newErrors[`JOBCODE-${index}`] = "Job Code is required.";
+      // }
       if (!section.LOCATION) {
         newErrors[`LOCATION-${index}`] = "Location is required.";
       }
@@ -470,9 +515,29 @@ export const EditTimeSheet = ({
     return Object.keys(newErrors).length === 0;
   };
   const handleSave = () => {
+    // if (handleValidation()) {
+    //   // Proceed with saving
+
+    //   addJCandLocaWhrs();
+    //   toggleFunction();
+    // }
+
     if (handleValidation()) {
-      // Proceed with saving
-      addJCandLocaWhrs();
+      // Prepare data with the original date format before saving
+      const isDateField = formData.DATE !== undefined;
+      const fieldToSave = isDateField ? "DATE" : "ENTRANCEDATEUSED";
+
+      // Remove the formatted date field and restore the original date
+      const dataToSave = {
+        ...formData,
+        [fieldToSave]: editObject[fieldToSave], // Use the original date
+      };
+
+      // Clean up unnecessary fields (like formatted_DATE)
+      delete dataToSave[`formatted_${fieldToSave}`];
+
+      // Save the data
+      addJCandLocaWhrs(dataToSave);
       toggleFunction();
     }
   };
@@ -506,7 +571,7 @@ export const EditTimeSheet = ({
         <div className="mx-7 mt-2 mb-14">
           <div className="flex items-center justify-center  text-dark_grey font-bold text-[25px] mb-3">
             <u>
-              <p>Edit Form</p>
+              <p>{editFormTitle || "Edit Form"}</p>
             </u>
           </div>
           {fields?.map((field, index) => (
@@ -519,10 +584,20 @@ export const EditTimeSheet = ({
               <div>
                 <input
                   type="text"
-                  name={field}
+                  // name={field}
+                  name={
+                    field === "DATE"
+                      ? "formatted_DATE"
+                      : field === "ENTRANCEDATEUSED"
+                      ? "formatted_ENTRANCEDATEUSED"
+                      : field
+                  }
                   className="border border-slate_grey bg-[#f1f5f9] rounded text-dark_grey text-[16px] text_size_5 outline-none w-full py-[7px] px-3 cursor-auto "
                   // value={editObject.FID}
-                  value={formData[field] || ""}
+                  // value={formData[field] || ""}
+                  value={
+                    formData[`formatted_${field}`] || formData[field] || ""
+                  }
                   onChange={handleChange}
                   readOnly={Position !== "Manager" ? index < 8 : true}
                 />
@@ -574,7 +649,7 @@ export const EditTimeSheet = ({
                 name="STATUS"
                 type="text"
                 className="border border-slate_grey bg-[#f1f5f9]  rounded text-dark_grey text_size_5 outline-none w-full py-2 px-3 cursor-auto "
-                value={formData.STATUS || ""}
+                value={formData.STATUS || formData.status || ""}
                 readOnly
               />
             </div>
@@ -613,11 +688,11 @@ export const EditTimeSheet = ({
                         setDrpValue={section?.JOBCODE || null}
                         id={section.id}
                       />
-                      {errors[`JOBCODE-${index}`] && (
+                      {/* {errors[`JOBCODE-${index}`] && (
                         <span className="text-red text_size_8">
                           {errors[`JOBCODE-${index}`]}
                         </span>
-                      )}
+                      )} */}
                     </div>
                     <div className="w-fit">
                       <SearchDisplayForTimeSheet
@@ -702,6 +777,7 @@ export const EditTimeSheet = ({
               className={`text-dark_grey text_size_3 rounded bg-[#FEF116] px-9 m-5 py-2 `}
               onClick={() => {
                 handleSave();
+
                 // addJCandLocaWhrs();
 
                 // toggleFunction();

@@ -12,6 +12,8 @@ rePassword: Yup.string()
   .required("Please confirm your password")
   .oneOf([Yup.ref("newPassword"), null], "Passwords must match"),
 });
+
+
 export const EmailSchema = Yup.object({
   userName: Yup.string().required("User Name is mandatory"),
 

@@ -35,33 +35,40 @@ export const TempIDProvider = ({ children }) => {
     setUserID(userID);
     const userType = localStorage.getItem("userType");
     setUserType(userType);
+    // console.log(userType);
+    
   }, []);
 
   useEffect(() => {
 
     if (workInfoData && userType === "Manager") {
       const generalManagerPosition = workInfoData.filter((item) =>
-        item.position.includes("GENERAL MANAGER")
+        item.position.includes("General Manager")
       );
-
-      const gmPosition = generalManagerPosition[0];
-
-      console.log("General Manager Positions:", generalManagerPosition);
-
+    
+      // console.log("General Manager Positions:", generalManagerPosition); // Log the filtered array
+      
+      const gmPosition = generalManagerPosition[0]; 
+      // console.log("gmPosition:", gmPosition); // Log gmPosition after filtering
+    
       if (gmPosition && gmPosition.position.length > 0) {
-        const lastPosition =
-          gmPosition.position[gmPosition.position.length - 1];
+        const lastPosition = gmPosition.position[gmPosition.position.length - 1];
+        // console.log("Last Position:", lastPosition); 
+    
         if (userID === gmPosition.empID) {
           setGmPosition(lastPosition);
+          // console.log("Gm Position Set:", lastPosition); 
         }
       }
     }
+    
+    // console.log("Final gmPosition Outside:", gmPosition); 
+    
 
     // console.log("gm 4", gmPosition);
-
     if (workInfoData && empPIData) {
       const generalManagerPositions = workInfoData.filter((item) =>
-        item.position.includes("GENERAL MANAGER")
+        item.position.includes("General Manager")
       );
       setGmCount(generalManagerPositions.length);
 
@@ -74,7 +81,7 @@ export const TempIDProvider = ({ children }) => {
           // console.log("GM Info:", gmInfo);
           setGmMail(gmInfo.officialEmail);
         } else {
-          console.log("GM Info not found.");
+          // console.log("GM Info not found.");
         }
       }
 
@@ -92,7 +99,7 @@ export const TempIDProvider = ({ children }) => {
           // console.log("HR Manager Info:", hrManagerInfo);
           setHrManagerMail(hrManagerInfo.officialEmail);
         } else {
-          console.log("HR Manager Info not found.");
+          // console.log("HR Manager Info not found.");
         }
       }
     }

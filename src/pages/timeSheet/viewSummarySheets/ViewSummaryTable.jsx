@@ -112,7 +112,7 @@ export const ViewSummaryTable = ({
             <Link
               to="/timeSheet"
               className="text-xl flex-1 text-grey"
-          
+      
             >
               <FaArrowLeft />
             </Link>

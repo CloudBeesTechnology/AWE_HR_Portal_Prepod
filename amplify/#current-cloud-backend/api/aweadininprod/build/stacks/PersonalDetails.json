@@ -303,6 +303,50 @@
         }
       }
     },
+    "PersonalDetailsIAMRoleDefaultPolicyE0B4F6DB": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:DescribeTable"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "PersonalDetailsTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "PersonalDetailsIAMRoleDefaultPolicyE0B4F6DB",
+        "Roles": [
+          {
+            "Ref": "PersonalDetailsIAMRole26AE599A"
+          }
+        ]
+      }
+    },
     "PersonalDetailsDataSource": {
       "Type": "AWS::AppSync::DataSource",
       "Properties": {

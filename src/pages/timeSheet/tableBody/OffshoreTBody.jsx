@@ -7,6 +7,7 @@ export const OffshoreTBody = ({
   message,
   assignObjectFun,
   toggleFunction,
+  editFormTitleFunc,
 }) => {
   useEffect(() => {
     if (loading === false) {
@@ -46,6 +47,7 @@ export const OffshoreTBody = ({
                   onClick={() => {
                     assignObjectFun(m, "Offshore");
                     toggleFunction();
+                    editFormTitleFunc("View Form");
                   }}
                 >
                   <td className="text-start px-4 flex-1">{index + 1}</td>

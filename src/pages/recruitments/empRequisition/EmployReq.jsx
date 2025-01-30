@@ -193,7 +193,6 @@ export const EmployReq = ({}) => {
       <RequisitionReviewForm
         isVisible={isReviewFormVisible}
         onClose={handleReviewFormClose}
-        isManagerView={localStorage.getItem("userType") === "Manager"}
         selectedRequest={selectedRequest}
         onStatusChange={handleStatusChange}
       />

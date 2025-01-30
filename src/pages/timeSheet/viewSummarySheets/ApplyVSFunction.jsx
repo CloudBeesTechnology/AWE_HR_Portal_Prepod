@@ -270,7 +270,7 @@ export const ApplyVSFunction = ({
           }
         });
 
-        console.log("seperatedGroupedData : ", seperatedGroupedData);
+        // console.log("seperatedGroupedData : ", seperatedGroupedData);
         const merged = mergedData.flatMap((val) => {
           // Filter all matching entries from approvedLeaveStatus
           const matches = approvedLeaveStatus.filter(
@@ -288,7 +288,7 @@ export const ApplyVSFunction = ({
           // If no match is found, just return the original `val`
           return [val];
         });
-        console.log("merged : ", merged);
+        // console.log("merged : ", merged);
         const filteredData = merged.filter((leave) => {
           return seperatedGroupedData.some((emp) => {
             // console.log(leave.empBadgeNo === emp.badge)
@@ -328,7 +328,7 @@ export const ApplyVSFunction = ({
           });
         });
 
-        console.log("filteredData : ", filteredData);
+        // console.log("filteredData : ", filteredData);
 
         const leaveTypeAbbreviation = {
           "Annual Leave": "AL",
@@ -438,8 +438,8 @@ export const ApplyVSFunction = ({
         };
 
         const leaveCount_ = transformData(filteredData);
-        console.log("leaveCount_ : ", leaveCount_);
-        console.log("seperatedGroupedData : ", seperatedGroupedData);
+        // console.log("leaveCount_ : ", leaveCount_);
+        // console.log("seperatedGroupedData : ", seperatedGroupedData);
 
         const holidayDates = publicHoliday?.CompanyHolidays2025.flatMap(
           (holiday) => holiday.dates || [holiday.date]
@@ -557,23 +557,21 @@ export const ApplyVSFunction = ({
               });
             }
 
-            const salaryType =
-              workInfoData?.salaryType[
-                workInfoData?.salaryType.length - 1
-              ]?.toLowerCase(); // Convert to lowercase for case-insensitive matching
-
             // Define salary type categories
-
+            // console.log(checkEntry);
             // Prioritize conditions
             if (checkEntry) {
               // If there are working hours, prioritize them
               const workingHrs = parseFloat(checkEntry) || "A";
+             
               if (workingHrs < (entry?.normalWorkHrs || 0)) {
                 const absence = (
                   (entry?.normalWorkHrs || 0) - workingHrs
                 ).toFixed(1);
+               
                 acc[dayStr] = `x(${absence})${workingHrs}`; // Format as "absence(workingHrs)"
               } else {
+              
                 acc[dayStr] = workingHrs.toString() || "A";
               }
             } else if (isPublicHoliday) {
@@ -639,6 +637,7 @@ export const ApplyVSFunction = ({
               };
         });
 
+      
         // Example usage:
 
         // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

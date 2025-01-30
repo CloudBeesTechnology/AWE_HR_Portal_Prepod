@@ -1,1 +1,0 @@
-{"version":3,"file":"static/js/462.97663fa9.chunk.js","mappings":"qKAGO,MAAMA,EAAYA,KAErBC,EAAAA,EAAAA,KAAA,OAAAC,SAAK,a","sources":["pages/forgotPassword/ForgotOtp.jsx"],"sourcesContent":["\r\nimport React from 'react'\r\n\r\nexport const ForgotOtp = () => {\r\n  return (\r\n    <div>ForgotOtp</div>\r\n  )\r\n}\r\n"],"names":["ForgotOtp","_jsx","children"],"sourceRoot":""}

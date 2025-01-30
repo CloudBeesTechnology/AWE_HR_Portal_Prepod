@@ -14,11 +14,11 @@ export const ProbationReview = () => {
   const [endDate, setEndDate] = useState("");
   const [tableHead] = useState([
     "Emp ID",
-    "Employee Badge",
+    "Badge no",
     "Name",
     "Date of Join",
     "Department",
-    "Work Position",
+    "Position",
     "Probation Expiry Date",
     "Deadline to Return to HRD",
     "Probation Form",

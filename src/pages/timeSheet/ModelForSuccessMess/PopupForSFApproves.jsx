@@ -37,6 +37,7 @@ export const PopupForSFApproves = ({
                     onClick={() => {
                       toggleSFAMessage(null);
                       setExcelData?.(null);
+                      window.location.reload();
                     }}
                   >
                     {btnText}

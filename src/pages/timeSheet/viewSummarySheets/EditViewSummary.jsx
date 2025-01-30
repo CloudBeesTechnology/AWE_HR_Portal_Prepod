@@ -22,7 +22,7 @@ export const EditViewSummary = ({
 
     mealAllow: summaryObject?.mealAllow || "",
   });
-  console.log(summaryObject);
+  
   // Step 2: Handle changes dynamically
   const handleChange = (e) => {
     const { name, value } = e.target; // Get the name and value from the input

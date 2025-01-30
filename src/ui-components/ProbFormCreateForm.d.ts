@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, SwitchFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -59,6 +59,8 @@ export declare type ProbFormCreateFormInputValues = {
     responsibilityDetails?: string;
     diligentDetails?: string;
     commitmentDetails?: string;
+    probStatus?: boolean;
+    gmName?: string;
 };
 export declare type ProbFormCreateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -98,6 +100,8 @@ export declare type ProbFormCreateFormValidationValues = {
     responsibilityDetails?: ValidationFunction<string>;
     diligentDetails?: ValidationFunction<string>;
     commitmentDetails?: ValidationFunction<string>;
+    probStatus?: ValidationFunction<boolean>;
+    gmName?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type ProbFormCreateFormOverridesProps = {
@@ -139,6 +143,8 @@ export declare type ProbFormCreateFormOverridesProps = {
     responsibilityDetails?: PrimitiveOverrideProps<TextFieldProps>;
     diligentDetails?: PrimitiveOverrideProps<TextFieldProps>;
     commitmentDetails?: PrimitiveOverrideProps<TextFieldProps>;
+    probStatus?: PrimitiveOverrideProps<SwitchFieldProps>;
+    gmName?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type ProbFormCreateFormProps = React.PropsWithChildren<{
     overrides?: ProbFormCreateFormOverridesProps | undefined | null;

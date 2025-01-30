@@ -21,6 +21,10 @@ import { DateFilter } from "./timeSheetSearch/DateFilter";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { Pagination } from "./timeSheetSearch/Pagination";
 import { TimeSheetsCRUDoperations } from "./customTimeSheet/TimeSheetsCRUDoperations";
+import { listTimeSheets } from "../../graphql/queries";
+import { deleteTimeSheet } from "../../graphql/mutations";
+import { generateClient } from "@aws-amplify/api";
+import { useRowSelection } from "./customTimeSheet/useRowSelection";
 
 export const ViewSBWsheet = ({
   excelData,
@@ -31,6 +35,7 @@ export const ViewSBWsheet = ({
   Position,
   fileName,
   showRejectedItemTable,
+  submittedData,
 }) => {
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
 
@@ -51,22 +56,27 @@ export const ViewSBWsheet = ({
   const [successMess, setSuccessMess] = useState(null);
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
+  const [rejectTab, setRejectTab] = useState(false);
 
   const [toggleForRemark, setToggleForRemark] = useState(null);
   const [allApprovedData, setAllApprovedData] = useState([]);
   const [allRejectedData, setAllRejectedData] = useState([]);
   const [passSelectedData, setPassSelectedData] = useState(null);
+  const [storingMess, setStoringMess] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
 
   let visibleData;
 
   const { startDate, endDate, searchQuery, setSearchQuery } = useTempID();
-  const [storingMess, setStoringMess] = useState(null);
+  const { selectedRows, setSelectedRows, handleCheckboxChange, handleSubmit } =
+    useRowSelection();
+
   const processedData = useTableMerged(excelData);
 
   const mergedData = AutoFetchForAssignManager();
 
+  const client = generateClient();
   useEffect(() => {
     if (processedData && processedData.length > 0) {
       setData(processedData);
@@ -85,6 +95,16 @@ export const ViewSBWsheet = ({
   };
 
   useEffect(() => {
+    if (submittedData && submittedData.length > 0) {
+      setShowStatusCol(true);
+      setCurrentStatus(true);
+
+      setData(submittedData);
+      setSecondaryData(submittedData);
+    }
+  }, [submittedData]);
+
+  useEffect(() => {
     const getPosition = localStorage.getItem("userType");
     if (getPosition === "Manager") {
       setUserIdentification("Manager");
@@ -92,6 +112,7 @@ export const ViewSBWsheet = ({
       setUserIdentification("TimeKeeper");
     }
   }, [convertedStringToArrayObj]);
+
   const pendingData = (data) => {
     if (data && data.length > 0) {
       setCurrentStatus(true);
@@ -221,6 +242,7 @@ export const ViewSBWsheet = ({
     } else if (!returnedTHeader && showRejectedItemTable === "Rejected") {
       const fetchData = async () => {
         setCurrentStatus(true);
+        setRejectTab(true);
         // setLoading(true);
         try {
           const dataPromise = new Promise((resolve, reject) => {
@@ -263,13 +285,9 @@ export const ViewSBWsheet = ({
   const toggleFunction = () => {
     setToggleHandler(!toggleHandler);
   };
-  const toggleSFAMessage = async (value, responseData) => {
+  const toggleSFAMessage = useCallback(async (value, responseData) => {
     setSuccessMess(value);
-
-    if (value === true && responseData) {
-      setResponse(responseData);
-    }
-  };
+  }, []);
 
   const toggleFunctionForAssiMana = () => {
     setToggleAssignManager(!toggleAssignManager);
@@ -307,10 +325,8 @@ export const ViewSBWsheet = ({
   };
 
   const editFlatData = (data, getObject) => {
-  
     return data.map((val) => {
       if (val.DEPTDIV === getObject.DEPTDIV && val.BADGE === getObject.BADGE) {
-       
         return getObject;
       } else {
         return val;
@@ -333,7 +349,6 @@ export const ViewSBWsheet = ({
       return item;
     });
 
-   
     setData(updatedData);
 
     // } catch (err) {
@@ -341,16 +356,27 @@ export const ViewSBWsheet = ({
     // }
   };
 
+  const handleAssignManager = () => {
+    const remainingData = data?.filter(
+      (row) => !selectedRows.some((selected) => selected.id === row.id)
+    );
+    setData(remainingData);
+    setSecondaryData(remainingData);
+    setSelectedRows([]);
+  };
+
   const AllFieldData = useTableFieldData(titleName);
   const renameKeysFunctionAndSubmit = async (managerData) => {
     if (
       userIdentification !== "Manager" &&
-      showRejectedItemTable !== "Rejected"
+      showRejectedItemTable !== "Rejected" &&
+      selectedRows &&
+      selectedRows.length > 0
     ) {
       const processedData = await Promise.all(
-        data.map(async (val) => {
+        selectedRows.map(async (val) => {
           return {
-            fileName: fileName,
+            id: val.id,
             empName: val.NAME || "",
             empDept: val.DEPTDIV || "",
             empBadgeNo: val.BADGE || "",
@@ -373,7 +399,7 @@ export const ViewSBWsheet = ({
         })
       );
 
-      const result = await processedData;
+      const result = processedData;
 
       const finalResult = result.map((val) => {
         return {
@@ -385,17 +411,20 @@ export const ViewSBWsheet = ({
         };
       });
 
-      let action = "create";
+      let action = "updateStoredData";
       await TimeSheetsCRUDoperations({
+        setNotification,
+        setShowTitle,
         finalResult,
         toggleSFAMessage,
         setStoringMess,
-        setData,
+
         Position,
         action,
+        handleAssignManager,
+        selectedRows,
       });
     } else if (userIdentification === "Manager") {
-      setNotification(false);
       const MergedData = [...allApprovedData, ...allRejectedData];
 
       const uniqueArray = MergedData?.filter(
@@ -446,11 +475,13 @@ export const ViewSBWsheet = ({
       });
     } else if (
       userIdentification !== "Manager" &&
-      showRejectedItemTable === "Rejected"
+      showRejectedItemTable === "Rejected" &&
+      selectedRows &&
+      selectedRows.length > 0
     ) {
       const updatedRejectedItems =
-        data && data.length > 0
-          ? data.map((val) => {
+        selectedRows && selectedRows.length > 0
+          ? selectedRows.map((val) => {
               return {
                 id: val.id,
                 // fileName: val.fileName,
@@ -492,6 +523,49 @@ export const ViewSBWsheet = ({
       });
     }
   };
+
+  const storeInitialData = async () => {
+    const result =
+      data &&
+      data.length > 0 &&
+      data.map((val) => {
+        return {
+          fileName: fileName,
+          empName: val.NAME || "",
+          empDept: val.DEPTDIV || "",
+          empBadgeNo: val.BADGE || "",
+          date: val.DATE || "",
+          inTime: val.IN || "",
+          outTime: val.OUT || "",
+          totalInOut: val.TOTALINOUT || "",
+          allDayHrs: val.ALLDAYMINHRS || "",
+          netMins: val.NETMINUTES || "",
+          totalHrs: val.TOTALHOURS || "",
+          normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+          actualWorkHrs: val.WORKINGHOURS || "",
+          otTime: val.OT || "",
+          companyName: val?.LOCATION,
+          remarks: val.REMARKS || "",
+          empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+          assignBy: uploaderID,
+          fileType: "SBW",
+          status: "All",
+        };
+      });
+
+    let action = "create";
+    let finalResult = result;
+
+    await TimeSheetsCRUDoperations({
+      finalResult,
+      toggleSFAMessage,
+      setStoringMess,
+      setData,
+      Position,
+      action,
+    });
+  };
+
   const toggleForRemarkFunc = () => {
     setToggleForRemark(!toggleForRemark);
   };
@@ -541,47 +615,39 @@ export const ViewSBWsheet = ({
   };
 
   const removeCheckedItem = useCallback(() => {
-    // Combine approved and rejected data
     const mergedData = [...allApprovedData, ...allRejectedData];
 
-    // console.log(mergedData);
-    // Filter out items that have matching sapNo in mergedData
     const afterRemoved = data?.filter(
       (val) => !mergedData.some((fil) => val.id === fil.id)
     );
 
-    // Update the state with the filtered data
     setData(afterRemoved);
     setSecondaryData(afterRemoved);
     setAllApprovedData([]);
     setAllRejectedData([]);
   }, [allApprovedData, allRejectedData, data]);
-  // }, [allApprovedData, allRejectedData, data]);
+
   const convertToISODate = (dateString) => {
     try {
       const [year, month, day] = dateString.split("/");
 
-      return `${month}/${year}/${day}`; // 'M/D/YYYY'
+      return `${month}/${year}/${day}`;
     } catch {}
   };
 
   useEffect(() => {
     if (secondaryData && secondaryData.length > 0) {
-      // Fixed typo
       setCurrentPage(1);
       let filteredData = [...secondaryData];
       if (searchQuery) {
         filteredData = searchQuery;
-
-        // setVisibleData(filteredData);
       }
       if (startDate && endDate) {
-        const start = new Date(startDate); // Start date as "MM/DD/YYYY"
-        const end = new Date(endDate); // End date as "MM/DD/YYYY"
+        const start = new Date(startDate);
+        const end = new Date(endDate);
 
-        // Filter the data array
         filteredData = filteredData.filter((item) => {
-          const itemDate = new Date(item.DATE); // Convert item.DATE to a Date object
+          const itemDate = new Date(item.DATE);
 
           itemDate?.setHours(0, 0, 0, 0);
           start?.setHours(0, 0, 0, 0);
@@ -589,12 +655,8 @@ export const ViewSBWsheet = ({
           return itemDate >= start && itemDate <= end;
         });
       }
-      // Example usage
-      // const startDate = "12/23/2024"; // Start date in "MM/DD/YYYY"
-      // const endDate = "12/25/2024"; // End date in "MM/DD/YYYY"
 
       setData(filteredData);
-      // setVisibleData(filteredData.length > 0 ? filteredData : []);
     }
   }, [startDate, endDate, secondaryData, searchQuery]);
   const itemsPerPage = 25;
@@ -674,6 +736,13 @@ export const ViewSBWsheet = ({
                           REJECT
                         </td>
                       </>
+                    )}
+
+                    {(submittedData && submittedData.length > 0) ||
+                    (rejectTab && rejectTab) ? (
+                      <td>Edited</td>
+                    ) : (
+                      ""
                     )}
                   </tr>
                 </thead>
@@ -799,6 +868,24 @@ export const ViewSBWsheet = ({
                                   </td>
                                 </React.Fragment>
                               )}
+
+                              {(submittedData && submittedData.length > 0) ||
+                              (rejectTab && rejectTab) ? (
+                                <td
+                                  className="cursor-pointer px-4 py-2"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedRows.some(
+                                      (r) => r.id === m.id
+                                    )}
+                                    onChange={() => handleCheckboxChange(m)}
+                                  />
+                                </td>
+                              ) : (
+                                ""
+                              )}
                             </tr>
                           );
                         };
@@ -844,66 +931,101 @@ export const ViewSBWsheet = ({
               <div className="flex-1"></div>
               <div className="flex-1 flex justify-center">
                 <button
-                  className="rounded px-3 py-2.5 w-52 bg-[#FEF116] text_size_5 text-dark_grey"
+                  className={`rounded px-3 py-2.5 w-52 bg-[#FEF116] text_size_5 text-dark_grey ${
+                    selectedRows && selectedRows.length > 0
+                      ? "bg-[#FEF116]"
+                      : (allApprovedData && allApprovedData.length > 0) ||
+                        (allRejectedData && allRejectedData.length > 0)
+                      ? "bg-[#FEF116]"
+                      : excelData
+                      ? "bg-[#FEF116]"
+                      : "bg-[#eee542] cursor-not-allowed"
+                  }`}
+                  disabled={
+                    userIdentification !== "Manager"
+                      ? !(selectedRows?.length > 0 || excelData)
+                      : !(
+                          allApprovedData?.length > 0 ||
+                          allRejectedData?.length > 0
+                        )
+                  }
                   onClick={() => {
                     if (userIdentification !== "Manager") {
-                      toggleFunctionForAssiMana();
-
-                      // Uncomment and modify this block if you want to use the fetchDataAndDelete function.
-                      /*
-          const fetchDataAndDelete = async () => {
-            try {
-              console.log("Fetching and Deleting SBW Data...");
-              let nextToken = null;
-
-              do {
-                const filter = {
-                  and: [{ fileType: { eq: "SBW" } }],
-                };
-
-                const response = await client.graphql({
-                  query: listTimeSheets,
-                  variables: { filter: filter, nextToken: nextToken },
-                });
-
-                const SBWdata = response?.data?.listTimeSheets?.items || [];
-                nextToken = response?.data?.listTimeSheets?.nextToken;
-
-                console.log("Fetched SBW Data:", SBWdata);
-
-                await Promise.all(
-                  SBWdata.map(async (item) => {
-                    try {
-                      const deleteResponse = await client.graphql({
-                        query: deleteTimeSheet,
-                        variables: { input: { id: item.id } },
-                      });
-                      console.log("Deleted Item Response:", deleteResponse);
-                    } catch (deleteError) {
-                      console.error(`Error deleting item with ID ${item.id}:`, deleteError);
-                    }
-                  })
-                );
-
-                console.log("Batch deletion completed.");
-              } while (nextToken);
-
-              console.log("All SBW items deletion process completed.");
-            } catch (fetchError) {
-              console.error("Error in fetchDataAndDelete:", fetchError);
-            }
-          };
-          fetchDataAndDelete();
-          */
+                      if (selectedRows && selectedRows.length > 0) {
+                        toggleFunctionForAssiMana();
+                      } else if (excelData && excelData) {
+                        storeInitialData();
+                      }
+                      // const fetchDataAndDelete = async () => {
+                      //   try {
+                      //     console.log("Fetching and Deleting SBW Data...");
+                      //     // setIsDeleting(true); // Set loading state
+                      //     let nextToken = null; // Initialize nextToken for pagination
+                      //     do {
+                      //       // Define the filter for fetching SBW data
+                      //       const filter = {
+                      //         and: [{ fileType: { eq: "SBW" } }],
+                      //       };
+                      //       // Fetch the BLNG data using GraphQL with pagination
+                      //       const response = await client.graphql({
+                      //         query: listTimeSheets,
+                      //         variables: { filter: filter, nextToken: nextToken }, // Pass nextToken for pagination
+                      //       });
+                      //       // Extract data and nextToken
+                      //       const SBWdata =
+                      //         response?.data?.listTimeSheets?.items || [];
+                      //       nextToken = response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
+                      //       console.log("Fetched SBW Data:", SBWdata);
+                      //       // Delete each item in the current batch
+                      //       await Promise.all(
+                      //         SBWdata.map(async (item) => {
+                      //           try {
+                      //             const deleteResponse = await client.graphql({
+                      //               query: deleteTimeSheet,
+                      //               variables: { input: { id: item.id } },
+                      //             });
+                      //             console.log(
+                      //               "Deleted Item Response:",
+                      //               deleteResponse
+                      //             );
+                      //           } catch (deleteError) {
+                      //             console.error(
+                      //               `Error deleting item with ID ${item.id}:`,
+                      //               deleteError
+                      //             );
+                      //           }
+                      //         })
+                      //       );
+                      //       console.log("Batch deletion completed.");
+                      //     } while (nextToken); // Continue fetching until no more data
+                      //     console.log(
+                      //       "All SBW items deletion process completed."
+                      //     );
+                      //   } catch (fetchError) {
+                      //     console.error(
+                      //       "Error in fetchDataAndDelete:",
+                      //       fetchError
+                      //     );
+                      //   } finally {
+                      //     // setIsDeleting(false); // Reset loading state
+                      //   }
+                      // };
+                      // fetchDataAndDelete();
                     } else if (userIdentification === "Manager") {
                       renameKeysFunctionAndSubmit();
                       removeCheckedItem();
+
+                      // setCheckedItems({});
                     }
                   }}
                 >
                   {userIdentification === "Manager"
                     ? "Finalize and Submit"
-                    : "Assign Manager"}
+                    : submittedData && submittedData.length > 0
+                    ? "Assign Manager"
+                    : showRejectedItemTable === "Rejected"
+                    ? "Assign Manager"
+                    : "Submit"}
                 </button>
               </div>
               <div className="flex-1">
@@ -931,6 +1053,7 @@ export const ViewSBWsheet = ({
           editFunction={editSBWFunction}
           titleName={titleName}
           Position={Position}
+          handleSubmit={handleSubmit}
         />
       )}
       {storingMess === true ? (

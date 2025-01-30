@@ -12,20 +12,21 @@ export const NewRecruit = () => {
   const [endDate, setEndDate] = useState("");
   const [tableHead] = useState([
     "Emp ID",
-    "Employee Badge",
+    "Badge No",
     "Name",
-    "Date of Joined",
-    "Gender",
     "Date of Birth",
+    "Gender",
+    "Date of Join",
     "Nationality",
-    "work Position",
+    "Position",
     "contactNo",
     "Brunei I/C No",
     "Passport No",
-    "Employee Pass Expiry",
+    "Pass Expiry",
     "Department",
     "Contract Start Date",
     "Contract End Date",
+    "IMMIGRATION REFERENCE NUMBER",
     "EDUCATION LEVEL",
     "Previous Company Name",
   ]);
@@ -63,9 +64,9 @@ export const NewRecruit = () => {
         empID: item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
         name: item.name || "-",
-        dateOfJoin: formatDate(item.doj) || "-",
-        gender: item.gender || "-",
         dateOfBirth: formatDate(item.dob) || "-",
+        gender: item.gender || "-",
+        dateOfJoin: formatDate(item.doj) || "-",
         nationality: item.nationality || "-",
         position: item.position || "-",
         contactNo: item.contactNo || "-",
@@ -81,6 +82,7 @@ export const NewRecruit = () => {
         contractEnd: Array.isArray(item.contractEnd)
           ? formatDate(item.contractEnd[item.contractEnd.length - 1])
           : "-",
+          immigRefNo: item.immigRefNo || "-",
         educLevel: item.educLevel || "-",
         previousEmployee: item.preEmp || "-",
         rawDateOfJoin: new Date(item.doj), // Raw date for sorting
@@ -117,9 +119,9 @@ export const NewRecruit = () => {
         empID: item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
         name: item.name || "-",
-        dateOfJoin: formatDate(item.doj) || "-",
-        gender: item.gender || "-",
         dateOfBirth: formatDate(item.dob) || "-",
+        gender: item.gender || "-",
+        dateOfJoin: formatDate(item.doj) || "-",
         nationality: item.nationality || "-",
         position: item.position || "-",
         contactNo: item.contactNo || "-",
@@ -135,6 +137,7 @@ export const NewRecruit = () => {
         contractEnd: Array.isArray(item.contractEnd)
           ? formatDate(item.contractEnd[item.contractEnd.length - 1])
           : "-",
+          immigRefNo: item.immigRefNo || "-",
         educLevel: item.educLevel || "-",
         previousEmployee: item.preEmp || "-",
         rawDateOfJoin: new Date(item.doj), // Raw date for sorting

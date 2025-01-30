@@ -11,9 +11,9 @@ export const PromotionRep = () => {
   const [endDate, setEndDate] = useState("");
   const [tableHead] = useState([
     "Emp ID",
-    "Employee Badge No",
+    "Badge No",
     "Name",
-    "Nationality",
+    "Date of Join",
     "Position",
     "Department",
     "UPGRADE POSITION",
@@ -56,7 +56,7 @@ export const PromotionRep = () => {
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
-          nationality: item.nationality || "-",
+          dateOfJoin: formatDate(item.doj) || "-",
           position: item.position || "-",
           department: item.department || "-",
           upgradePosition: Array.isArray(item.upgradePosition)
@@ -105,7 +105,7 @@ export const PromotionRep = () => {
         empID: item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
         name: item.name || "-",
-        nationality: item.nationality || "-",
+        dateOfJoin: formatDate(item.doj) || "-",
         position: item.position || "-",
         department: item.department || "-",
         upgradePosition: Array.isArray(item.upgradePosition)

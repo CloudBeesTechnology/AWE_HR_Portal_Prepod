@@ -11,7 +11,7 @@ export const Termination = () => {
   const [endDate, setEndDate] = useState("");
   const [tableHead, setTableHead] = useState([
     "Emp ID",
-    "Employee Badge No",
+    "Badge No",
     "Name",
     "Date of join",
     "Nationality",

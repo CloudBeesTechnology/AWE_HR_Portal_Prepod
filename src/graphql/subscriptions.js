@@ -13,6 +13,7 @@ export const onCreateContractForm = /* GraphQL */ `
       hrManager
       genManager
       remarks
+      contStatus
       createdAt
       updatedAt
       __typename
@@ -31,6 +32,7 @@ export const onUpdateContractForm = /* GraphQL */ `
       hrManager
       genManager
       remarks
+      contStatus
       createdAt
       updatedAt
       __typename
@@ -49,6 +51,7 @@ export const onDeleteContractForm = /* GraphQL */ `
       hrManager
       genManager
       remarks
+      contStatus
       createdAt
       updatedAt
       __typename
@@ -717,6 +720,8 @@ export const onCreateProbForm = /* GraphQL */ `
       responsibilityDetails
       diligentDetails
       commitmentDetails
+      probStatus
+      gmName
       createdAt
       updatedAt
       __typename
@@ -764,6 +769,8 @@ export const onUpdateProbForm = /* GraphQL */ `
       responsibilityDetails
       diligentDetails
       commitmentDetails
+      probStatus
+      gmName
       createdAt
       updatedAt
       __typename
@@ -811,6 +818,8 @@ export const onDeleteProbForm = /* GraphQL */ `
       responsibilityDetails
       diligentDetails
       commitmentDetails
+      probStatus
+      gmName
       createdAt
       updatedAt
       __typename
@@ -2764,6 +2773,7 @@ export const onCreateInterviewSchedule = /* GraphQL */ `
       department
       otherDepartment
       status
+      empID
       createdAt
       updatedAt
       __typename
@@ -2788,6 +2798,7 @@ export const onUpdateInterviewSchedule = /* GraphQL */ `
       department
       otherDepartment
       status
+      empID
       createdAt
       updatedAt
       __typename
@@ -2812,6 +2823,7 @@ export const onDeleteInterviewSchedule = /* GraphQL */ `
       department
       otherDepartment
       status
+      empID
       createdAt
       updatedAt
       __typename

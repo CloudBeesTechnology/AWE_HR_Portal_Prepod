@@ -95,9 +95,14 @@ export const ViewTimeSheet = () => {
 
       const identifyAssignData = async () => {
         if (Position === "Manager") {
-          var filterManagerData = await SendDataToManager(
+          const ManagerData = await SendDataToManager(
             convertedStringToArrayObj
           );
+
+          const removeStatusAll = ManagerData.filter(
+            (fil) => fil.status !== "All"
+          );
+          var filterManagerData = removeStatusAll;
         } else if (Position !== "Manager") {
           var filterManagerData = await FindSpecificTimeKeeper(
             convertedStringToArrayObj
@@ -273,14 +278,14 @@ export const ViewTimeSheet = () => {
               <input
                 value={categoryFilter}
                 placeholder="Select type"
-                className="border border-[#D9D9D9] cursor-pointer rounded outline-none p-2 text-[#000000] text_size_8"
+                className="border border-[#D9D9D9] cursor-pointer rounded outline-none p-2 text-[#1b1b1b] text_size_8"
                 onClick={() => {
                   setToggleClick(!toggleClick);
                 }}
                 readOnly
               />
               <span className="absolute right-2 top-2">
-                <FaAngleDown className="text-xl text-dark_grey" />
+                <FaAngleDown className="text-xl text-dark_ash" />
               </span>
               {toggleClick && (
                 <div

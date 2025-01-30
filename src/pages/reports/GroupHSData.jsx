@@ -12,8 +12,9 @@ export const GroupHSData = () => {
   const [endDate, setEndDate] = useState("");
   const [tableHead] = useState([
     "Emp ID",
-    "Employee Badge",
+    "Badge No",
     "Name",
+    "Date of Join",
     "Nationality",
     "Department",
     "Position",
@@ -49,6 +50,8 @@ export const GroupHSData = () => {
       empID: item.empID || "-",
       empBadgeNo: item.empBadgeNo || "-",
       name: item.name || "-",
+      dateOfJoin: DateFormat(item.doj),
+
         nationality: item.nationality || "-",
         department: item.department || "-",
         position: item.position || "-",
@@ -99,6 +102,8 @@ export const GroupHSData = () => {
       empID: item.empID || "-",
       empBadgeNo: item.empBadgeNo || "-",
       name: item.name || "-",
+      dateOfJoin: DateFormat(item.doj),
+
         nationality: item.nationality || "-",
         department: item.department || "-",
         position: item.position || "-",

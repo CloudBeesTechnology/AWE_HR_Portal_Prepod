@@ -24,6 +24,8 @@ import { SpinLogo } from "../../utils/SpinLogo";
 import { Pagination } from "./timeSheetSearch/Pagination";
 import { AutoFetchForAssignManager } from "./customTimeSheet/AutoFetchForAssignManager";
 import { TimeSheetsCRUDoperations } from "./customTimeSheet/TimeSheetsCRUDoperations";
+import { listTimeSheets } from "../../graphql/queries";
+import { useRowSelection } from "./customTimeSheet/useRowSelection";
 const client = generateClient();
 
 export const ViewHOsheet = ({
@@ -35,6 +37,7 @@ export const ViewHOsheet = ({
   titleName,
   fileName,
   showRejectedItemTable,
+  submittedData,
 }) => {
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
 
@@ -52,6 +55,7 @@ export const ViewHOsheet = ({
   const [response, setResponse] = useState(null);
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedItemsTwo, setCheckedItemsTwo] = useState({});
+  const [rejectTab, setRejectTab] = useState(false);
 
   const [toggleForRemark, setToggleForRemark] = useState(null);
   const [allApprovedData, setAllApprovedData] = useState([]);
@@ -72,13 +76,26 @@ export const ViewHOsheet = ({
   const mergedData = AutoFetchForAssignManager();
   // }
   const { startDate, endDate, searchQuery, setSearchQuery } = useTempID();
+  const { selectedRows, setSelectedRows, handleCheckboxChange, handleSubmit } =
+    useRowSelection();
+
+  useEffect(() => {
+    if (submittedData && submittedData.length > 0) {
+      setShowStatusCol(true);
+      setCurrentStatus(true);
+
+      setData(submittedData);
+      setSecondaryData(submittedData);
+    }
+  }, [submittedData]);
+
   useEffect(() => {
     if (processedData && processedData.length > 0) {
       setData(processedData);
       setSecondaryData(processedData);
     }
   }, [processedData]);
-  
+
   useEffect(() => {
     const getPosition = localStorage.getItem("userType");
     if (getPosition === "Manager") {
@@ -247,6 +264,7 @@ export const ViewHOsheet = ({
     } else if (!returnedTHeader && showRejectedItemTable === "Rejected") {
       const fetchData = async () => {
         setCurrentStatus(true);
+        setRejectTab(true);
         // setLoading(true);
         try {
           const dataPromise = new Promise((resolve, reject) => {
@@ -292,12 +310,10 @@ export const ViewHOsheet = ({
     setToggleHandler(!toggleHandler);
   };
 
-  const toggleSFAMessage = async (value, responseData) => {
+  const toggleSFAMessage = useCallback(async (value, responseData) => {
     setSuccessMess(value);
-    if (value === true && responseData) {
-      setResponse(responseData);
-    }
-  };
+  }, []);
+
   const toggleFunctionForAssiMana = () => {
     setToggleAssignManager(!toggleAssignManager);
   };
@@ -359,18 +375,29 @@ export const ViewHOsheet = ({
     setData(updatedData);
   };
 
+  const handleAssignManager = () => {
+    const remainingData = data?.filter(
+      (row) => !selectedRows.some((selected) => selected.id === row.id)
+    );
+    setData(remainingData);
+    setSecondaryData(remainingData);
+    setSelectedRows([]);
+  };
   const AllfieldData = useTableFieldData(titleName);
 
   const renameKeysFunctionAndSubmit = async (managerData) => {
     if (
       userIdentification !== "Manager" &&
-      showRejectedItemTable !== "Rejected"
+      showRejectedItemTable !== "Rejected" &&
+      selectedRows &&
+      selectedRows.length > 0
     ) {
       const result =
-        data &&
-        data.map((val) => {
+        selectedRows &&
+        selectedRows.length > 0 &&
+        selectedRows.map((val) => {
           return {
-            fileName: fileName,
+            id: val.id,
             rec: val.REC || "",
             ctr: val.CTR || "",
             empDept: val.DEPT || "",
@@ -409,19 +436,20 @@ export const ViewHOsheet = ({
         };
       });
 
-      //   CREATE
-
-      let action = "create";
+      let action = "updateStoredData";
       await TimeSheetsCRUDoperations({
+        setNotification,
+        setShowTitle,
         finalResult,
         toggleSFAMessage,
         setStoringMess,
-        setData,
+
         Position,
         action,
+        handleAssignManager,
+        selectedRows,
       });
     } else if (userIdentification === "Manager") {
-      setNotification(false);
       const MergedData = [...allApprovedData, ...allRejectedData];
 
       const uniqueArray = MergedData?.filter(
@@ -480,11 +508,13 @@ export const ViewHOsheet = ({
       });
     } else if (
       userIdentification !== "Manager" &&
-      showRejectedItemTable === "Rejected"
+      showRejectedItemTable === "Rejected" &&
+      selectedRows &&
+      selectedRows.length > 0
     ) {
       const updatedRejectedItems =
-        data && data.length > 0
-          ? data.map((val) => {
+        selectedRows && selectedRows.length > 0
+          ? selectedRows.map((val) => {
               return {
                 id: val.id,
                 // fileName: val.fileName,
@@ -534,6 +564,56 @@ export const ViewHOsheet = ({
       });
     }
   };
+
+  const storeInitialData = async () => {
+    const result =
+      data &&
+      data.map((val) => {
+        return {
+          fileName: fileName,
+          rec: val.REC || "",
+          ctr: val.CTR || "",
+          empDept: val.DEPT || "",
+          empID: val.EMPLOYEEID || "",
+          empBadgeNo: val.BADGE || "",
+          empName: val.NAME || "",
+          date: val.DATE || "",
+          onAM: val.ONAM || "",
+          offAM: val.OFFAM || "",
+          onPM: val.ONPM || "",
+          offPM: val.OFFPM || "",
+          inTime: val.IN || "",
+          outTime: val.OUT || "",
+          totalInOut: val.TOTALINOUT || "",
+          allDayHrs: val.ALLDAYMINUTES || "",
+          netMins: val.NETMINUTES || "",
+          totalHrs: val.TOTALHOURS || "",
+          normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+          actualWorkHrs: val?.WORKINGHOURS || 0,
+          otTime: val?.OT || 0,
+          actualWorkHrs: val.TOTALACTUALHOURS || "",
+          empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+          fileType: "HO",
+          status: "All",
+          assignBy: uploaderID,
+          remarks: val.REMARKS || "",
+          companyName: val?.LOCATION || "",
+        };
+      });
+
+    let action = "create";
+    let finalResult = result;
+
+    await TimeSheetsCRUDoperations({
+      finalResult,
+      toggleSFAMessage,
+      setStoringMess,
+      setData,
+      Position,
+      action,
+    });
+  };
+
   const toggleForRemarkFunc = () => {
     setToggleForRemark(!toggleForRemark);
   };
@@ -571,7 +651,7 @@ export const ViewHOsheet = ({
 
     setAllRejectedData(dataAlongWithRemark);
   };
- 
+
   const removeExistingData = (data, action) => {
     if (action === "Approved") {
       const afterRemoved = allApprovedData.filter((fil) => fil.id !== data.id);
@@ -583,17 +663,14 @@ export const ViewHOsheet = ({
   };
 
   const removeCheckedItem = useCallback(() => {
-    // Combine approved and rejected data
     const mergedData = [...allApprovedData, ...allRejectedData];
 
-    // Filter out items that have matching sapNo in mergedData
     const afterRemoved = data?.filter(
       (val) => !mergedData.some((fil) => val.id === fil.id)
     );
 
-    // Update the state with the filtered data
     setData(afterRemoved);
-    setSecondaryData(afterRemoved);
+    // setSecondaryData(afterRemoved);
     setAllApprovedData([]);
     setAllRejectedData([]);
   }, [allApprovedData, allRejectedData, data]);
@@ -719,6 +796,12 @@ export const ViewHOsheet = ({
                           REJECT
                         </td>
                       </>
+                    )}
+                    {(submittedData && submittedData.length > 0) ||
+                    (rejectTab && rejectTab) ? (
+                      <td>Edited</td>
+                    ) : (
+                      ""
                     )}
                   </tr>
                 </thead>
@@ -866,6 +949,24 @@ export const ViewHOsheet = ({
                                   </td>
                                 </React.Fragment>
                               )}
+
+                              {(submittedData && submittedData.length > 0) ||
+                              (rejectTab && rejectTab) ? (
+                                <td
+                                  className="cursor-pointer px-4 py-2"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedRows.some(
+                                      (r) => r.id === m.id
+                                    )}
+                                    onChange={() => handleCheckboxChange(m)}
+                                  />
+                                </td>
+                              ) : (
+                                ""
+                              )}
                             </tr>
                           );
                         };
@@ -910,35 +1011,55 @@ export const ViewHOsheet = ({
               <div className="flex-1"></div>
               <div className="flex-1 flex justify-center">
                 <button
-                  className="rounded px-3 py-2.5 w-52 bg-[#FEF116] text_size_5 text-dark_grey"
+                  className={`rounded px-3 py-2.5 w-52 bg-[#FEF116] text_size_5 text-dark_grey ${
+                    selectedRows && selectedRows.length > 0
+                      ? "bg-[#FEF116]"
+                      : (allApprovedData && allApprovedData.length > 0) ||
+                        (allRejectedData && allRejectedData.length > 0)
+                      ? "bg-[#FEF116]"
+                      : excelData
+                      ? "bg-[#FEF116]"
+                      : "bg-[#eee542] cursor-not-allowed"
+                  }`}
+                  disabled={
+                    userIdentification !== "Manager"
+                      ? !(selectedRows?.length > 0 || excelData)
+                      : !(
+                          allApprovedData?.length > 0 ||
+                          allRejectedData?.length > 0
+                        )
+                  }
                   onClick={() => {
                     if (userIdentification !== "Manager") {
-                      toggleFunctionForAssiMana();
-                      //   const fetchDataAndDelete = async () => {
+                      if (selectedRows && selectedRows.length > 0) {
+                        toggleFunctionForAssiMana();
+                      } else if (excelData && excelData) {
+                        storeInitialData();
+                      }
+                      // const fetchDataAndDelete = async () => {
                       //   try {
                       //     console.log("Fetching and Deleting SBW Data...");
                       //     // setIsDeleting(true); // Set loading state
                       //     let nextToken = null; // Initialize nextToken for pagination
-
                       //     do {
                       //       // Define the filter for fetching SBW data
                       //       const filter = {
                       //         and: [{ fileType: { eq: "HO" } }],
                       //       };
-
                       //       // Fetch the BLNG data using GraphQL with pagination
                       //       const response = await client.graphql({
                       //         query: listTimeSheets,
-                      //         variables: { filter: filter, nextToken: nextToken }, // Pass nextToken for pagination
+                      //         variables: {
+                      //           filter: filter,
+                      //           nextToken: nextToken,
+                      //         }, // Pass nextToken for pagination
                       //       });
-
                       //       // Extract data and nextToken
                       //       const SBWdata =
                       //         response?.data?.listTimeSheets?.items || [];
-                      //       nextToken = response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
-
+                      //       nextToken =
+                      //         response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
                       //       console.log("Fetched SBW Data:", SBWdata);
-
                       //       // Delete each item in the current batch
                       //       await Promise.all(
                       //         SBWdata.map(async (item) => {
@@ -959,10 +1080,8 @@ export const ViewHOsheet = ({
                       //           }
                       //         })
                       //       );
-
                       //       console.log("Batch deletion completed.");
                       //     } while (nextToken); // Continue fetching until no more data
-
                       //     console.log(
                       //       "All SBW items deletion process completed."
                       //     );
@@ -975,40 +1094,23 @@ export const ViewHOsheet = ({
                       //     // setIsDeleting(false); // Reset loading state
                       //   }
                       // };
+
                       // fetchDataAndDelete();
-
-                      // fetchData();
-                      // FOR DELETE
-                      // const deleteFunction = async () => {
-                      //   const weaklysheet = {
-                      //     id: "3deaccb4-7b1e-43b3-aa94-fd7d4cf46f56",
-                      //   };
-
-                      //   await client
-                      //     .graphql({
-                      //       query: deleteHeadOffice,
-                      //       variables: {
-                      //         input: weaklysheet,
-                      //       },
-                      //     })
-                      //     .then((res) => {
-                      //       console.log(res);
-                      //     })
-                      //     .catch((err) => {
-                      //       console.log(err);
-                      //     });
-                      // };
-                      // deleteFunction();
                     } else if (userIdentification === "Manager") {
                       renameKeysFunctionAndSubmit();
                       removeCheckedItem();
+
+                      // setCheckedItems({});
                     }
                   }}
                 >
                   {userIdentification === "Manager"
                     ? "Finalize and Submit"
-                    : "Assign Manager"}
-                  {/* Send for Approval */}
+                    : submittedData && submittedData.length > 0
+                    ? "Assign Manager"
+                    : showRejectedItemTable === "Rejected"
+                    ? "Assign Manager"
+                    : "Submit"}
                 </button>
               </div>
               <div className="flex-1">
@@ -1036,6 +1138,7 @@ export const ViewHOsheet = ({
           editFunction={editHOFunction}
           titleName={titleName}
           Position={Position}
+          handleSubmit={handleSubmit}
         />
       )}
       {storingMess === true ? (

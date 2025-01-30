@@ -12,11 +12,11 @@ export const EmpPE = () => {
   const [endDate, setEndDate] = useState("");
   const [tableHead, setTableHead] = useState([
     "Emp ID",
-    "Employee Badge",
+    "Badge No",
     "Name",
     "Nationality",
     "Date of Join",
-    "Work Position",
+    "Position",
     "Department",
     "Pass Expiry",
   ]);

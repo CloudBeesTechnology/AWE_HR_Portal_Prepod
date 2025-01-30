@@ -268,49 +268,6 @@ const MedicalDetails = ({
     );
   };
 
-  // Updated rendering for personal details to handle arrays
-  // const renderPersonalDetails = () => {
-  //   return (
-  //     <div className="grid grid-cols-3 gap-y-4 items-center font-semibold text-sm">
-  //       {Object.entries(medicalInfo).map(([key, value], index) => (
-  //         <React.Fragment key={index}>
-  //           <span className="text-dark_grey">{key}</span>
-  //           <span className="text-center text-gray-700">:</span>
-  //           <span className="text-dark_grey">
-  //             {
-  //               Array.isArray(value)
-  //                 ? value.some((v) => v !== null) // Check if the array has any non-null values
-  //                   ? value
-  //                       .filter((v) => v !== null) // Remove null values from the array
-  //                       .slice(-1) // Get the last element
-  //                       .concat(value.slice(0, -1))
-  //                       .map((item, idx, arr) => (
-  //                         <span key={idx}>
-  //                           <span
-  //                             className={`${
-  //                               arr.length > 1 && idx === 0
-  //                                 ? "rounded-md text-primary"
-  //                                 : "" // Only highlight the latest value if there are multiple values
-  //                             }`}
-  //                           >
-  //                             {item}
-  //                           </span>
-  //                           {idx < value.length - 1 && <span>,&nbsp;</span>}
-  //                           {/* Add a comma except for the last item */}
-  //                         </span>
-  //                       ))
-  //                   : "N/A" // Show "N/A" if the array only contains null or is empty
-  //                 : value !== null && value !== undefined && value !== ""
-  //                 ? value
-  //                 : "N/A" // Show "N/A" for null or undefined non-array values
-  //             }
-  //           </span>
-  //         </React.Fragment>
-  //       ))}
-  //     </div>
-  //   );
-  // };
-
    const  renderPersonalDetails = (details) => {
       const capitalizeWords = (str) => {
         if (!str || str === "N/A") {
@@ -360,7 +317,7 @@ const MedicalDetails = ({
                                 <span
                                    className={`${
                                     arr.length > 1 && idx === 0
-                                      ? "rounded-md text-primary"
+                                      ? "rounded-md font-black italic"
                                       : "" // Only highlight the latest value if there are multiple values lo
                                   }`}
                                 >

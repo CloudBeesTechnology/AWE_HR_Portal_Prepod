@@ -1,6 +1,7 @@
 export const statusOptions = [
+  "Select status",
   "LOI",
-  "CVEC",
+  "CVEV",
   "PAAF",
   "MOBILIZATION",
   "SAWP",

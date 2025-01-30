@@ -11,9 +11,9 @@ export const LeavePassData = () => {
   const [endDate, setEndDate] = useState("");
   const [tableHead, setTableHead] = useState([
     "Emp ID",
-    "Employee Badge",
+    "Badge No",
     "Name",
-    "Date of Joined",
+    "Date of Join",
     "Nationality",
     "Position",
     "Department",
@@ -62,15 +62,15 @@ export const LeavePassData = () => {
         empID:item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
         name: item.name || "-",
-        dateOfJoin: formatDate(item.doj),
+        dateOfJoin: formatDate(item.doj)|| "-",
         nationality: item.nationality || "-",
         position: item.position || "-",
         department: item.department || "-",
-        contractStart: formatDate(item.contractStart),
-        contractEnd: formatDate(item.contractEnd),
-        annualLeaveDate: formatDate(item.annualLeaveDate),
+        contractStart: formatDate(item.contractStart) || "-",
+        contractEnd: formatDate(item.contractEnd) || "-",
+        annualLeaveDate: formatDate(item.annualLeaveDate) || "-",
         destinateLeavePass: item.destinateLeavePass || "-",
-        rawAld: new Date(item.annualLeaveDate), // Raw date for sorting
+        rawAld: new Date(item.annualLeaveDate) || "-", // Raw date for sorting
       }))
       .sort((a, b) => a.rawAld - b.rawAld)
       .map(({ rawAld, ...rest }) => rest); // Remove rawDateOfJoin after sorting
@@ -106,15 +106,15 @@ export const LeavePassData = () => {
       empID:item.empID || "-",
       empBadgeNo: item.empBadgeNo || "-",
       name: item.name || "-",
-      dateOfJoin: formatDate(item.doj),
+      dateOfJoin: formatDate(item.doj)|| "-",
       nationality: item.nationality || "-",
       position: item.position || "-",
       department: item.department || "-",
-      contractStart: formatDate(item.contractStart),
-      contractEnd: formatDate(item.contractEnd),
-      annualLeaveDate: formatDate(item.annualLeaveDate),
+      contractStart: formatDate(item.contractStart)|| "-",
+      contractEnd: formatDate(item.contractEnd)|| "-",
+      annualLeaveDate: formatDate(item.annualLeaveDate)|| "-",
       destinateLeavePass: item.destinateLeavePass || "-",
-      rawAld: new Date(item.annualLeaveDate), // Raw date for sorting
+      rawAld: new Date(item.annualLeaveDate)|| "-", // Raw date for sorting
       }))
       .sort((a, b) => a.rawAld - b.rawAld)
       .map(({ rawAld, ...rest }) => rest); // Remove rawDateOfJoin after sorting

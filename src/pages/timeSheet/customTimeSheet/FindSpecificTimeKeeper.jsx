@@ -7,7 +7,6 @@ import {
 
 const client = generateClient();
 
-
 const fetchAllData = async (queryName) => {
   let allData = [];
   let nextToken = null;
@@ -29,7 +28,7 @@ const fetchAllData = async (queryName) => {
 export const FindSpecificTimeKeeper = async (filterPending) => {
   try {
     const loginAuth = localStorage.getItem("userID")?.toUpperCase();
-  
+
     const fetchData = async () => {
       // Fetch all paginated data from GraphQL queries
       const [empPersonalInfos, usersData] = await Promise.all([
@@ -41,16 +40,16 @@ export const FindSpecificTimeKeeper = async (filterPending) => {
       // Merge data based on empID
       const mergedData = empPersonalInfos
         .map((candidate) => {
-        //   const interviewDetails = empWorkInfos.find(
-        //     (item) => item.empID === candidate.empID
-        //   );
+          //   const interviewDetails = empWorkInfos.find(
+          //     (item) => item.empID === candidate.empID
+          //   );
 
           const allUser = usersData.find(
             (item) => item.empID === candidate.empID
           );
 
           // Return null if all details are undefined
-          if ( !allUser) {
+          if (!allUser) {
             return null;
           }
 
@@ -73,8 +72,8 @@ export const FindSpecificTimeKeeper = async (filterPending) => {
     // Fetch merged data
     const getOneObject = await fetchData();
 
-
     // Filter pending items based on manager assignments
+
     const finalOutput = filterPending?.filter((pendingItem) => {
       return getOneObject.some((manager) => {
         // const lastDepartment =
@@ -87,14 +86,10 @@ export const FindSpecificTimeKeeper = async (filterPending) => {
       });
     });
 
- 
-
-
     const filteredOutput = finalOutput.filter(
       (item) => item !== null && item !== undefined
     );
 
-  
     return filteredOutput;
   } catch (err) {
     // console.log("ERROR : ", err);

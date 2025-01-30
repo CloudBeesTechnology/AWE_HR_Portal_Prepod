@@ -11,6 +11,7 @@ export const getContractForm = /* GraphQL */ `
       hrManager
       genManager
       remarks
+      contStatus
       createdAt
       updatedAt
       __typename
@@ -32,6 +33,7 @@ export const listContractForms = /* GraphQL */ `
         hrManager
         genManager
         remarks
+        contStatus
         createdAt
         updatedAt
         __typename
@@ -548,6 +550,8 @@ export const getProbForm = /* GraphQL */ `
       responsibilityDetails
       diligentDetails
       commitmentDetails
+      probStatus
+      gmName
       createdAt
       updatedAt
       __typename
@@ -600,6 +604,8 @@ export const listProbForms = /* GraphQL */ `
         responsibilityDetails
         diligentDetails
         commitmentDetails
+        probStatus
+        gmName
         createdAt
         updatedAt
         __typename
@@ -2031,6 +2037,7 @@ export const getInterviewSchedule = /* GraphQL */ `
       department
       otherDepartment
       status
+      empID
       createdAt
       updatedAt
       __typename
@@ -2062,6 +2069,7 @@ export const listInterviewSchedules = /* GraphQL */ `
         department
         otherDepartment
         status
+        empID
         createdAt
         updatedAt
         __typename

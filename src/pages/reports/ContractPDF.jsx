@@ -3,10 +3,12 @@ import { FilterTable } from "./FilterTable";
 import { useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo/logo-with-name.svg";
 import { VscClose } from "react-icons/vsc";
+import { useTempID } from "../../utils/TempIDContext";
 
 export const ContractPDF = ({ userID, userType }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { gmPosition } = useTempID();
   const { allData, title } = location.state || {};
   const [tableBody, setTableBody] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -16,12 +18,12 @@ export const ContractPDF = ({ userID, userType }) => {
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [tableHead] = useState([
     "Emp ID",
-    "Employee Badge",
+    "Badge No",
     "Name",
     "Nationality",
-    "Date of Joined",
+    "Date of Join",
     "Department",
-    "Work Position",
+    "Position",
     "Contract Start Date",
     "Contract End Date",
     "Duration of Renewal Contract",
@@ -76,34 +78,26 @@ export const ContractPDF = ({ userID, userType }) => {
       ? `${balanceMonths} months`
       : "Few days more";
   };
+  
 
   const contractExpiryMergedData = (data) => {
     const today = new Date();
-    const startOfNextMonth = new Date(
-      today.getFullYear(),
-      today.getMonth() + 1,
-      1
-    );
-    const endOfTwoMonthsAfter = new Date(
-      today.getFullYear(),
-      today.getMonth() + 3,
-      0
-    );
-
+    const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    const endOfTwoMonthsAfter = new Date(today.getFullYear(), today.getMonth() + 3, 0);
+  
     // console.log("Today:", today);
     // console.log("Start of Next Month:", startOfNextMonth);
     // console.log("End of Two Months After:", endOfTwoMonthsAfter);
-
+  
     const filteredData = data
       .filter((item) => {
         const contractEndDates = item.contractEnd || [];
         const lastDate = contractEndDates[contractEndDates.length - 1];
         const isContractActive = lastDate && item.contStatus === true;
-
+  
         // console.log("Contract End Date:", lastDate);
         // console.log("Is Contract Active:", isContractActive);
-
-        // Only include entries with contractEnd and contStatus is true
+  
         return isContractActive;
       })
       .map((item) => {
@@ -111,46 +105,44 @@ export const ContractPDF = ({ userID, userType }) => {
         const lastDate = contractEndDates[contractEndDates.length - 1];
         const contractStartDates = item.contractStart || [];
         const startDate = contractStartDates[contractStartDates.length - 1];
-
+  
         const balanceMonths = calculateBalanceMonths(startDate, lastDate);
         // console.log("Balance Months:", balanceMonths);
-
-        // User-specific filtering
-        const lastSupervisor =
-          item.supervisor && item.supervisor.length > 0
-            ? item.supervisor[item.supervisor.length - 1]
-            : null;
-        const lastManager =
-          item.manager && item.manager?.length > 0
-            ? item.manager[item.manager?.length - 1]
-            : null;
-
+  
+        const lastSupervisor = item.supervisor && item.supervisor.length > 0
+          ? item.supervisor[item.supervisor.length - 1]
+          : null;
+        const lastManager = item.manager && item.manager.length > 0
+          ? item.manager[item.manager.length - 1]
+          : null;
+  
         const isDepartmentHead = item.depHead !== null;
-        const isGm = item.genManager !== null;
+        const isHr = item.hrManager !== null;
+  
 
-        // Filtering logic based on user role
-        if (userType === "Supervisor" && lastSupervisor !== userID) {
+         // Filtering logic based on user role
+         if (userType === "Supervisor" && lastSupervisor !== userID) {
           // console.log("Skipping item, Supervisor does not match.");
           return null; // Skip item if supervisor doesn't match
         }
-
-        if (userType === "Manager" && lastManager !== userID) {
-          // console.log(
-          //   "Skipping item, Manager does not match or Supervisor not approved."
-          // );
-          return null; // Skip item if manager doesn't match or supervisor not approved
+  
+        // HR userType check
+        if (userType === "HR" && !isDepartmentHead) {
+          // console.log("Skipping item, HR userType and Department Head exists:", item);
+          return null; // Skip item if department head exists for HR
         }
-
-        if (userType === "GM" && isDepartmentHead) {
-          // console.log("Skipping item, Manager has not approved.");
-          return null; // Skip item if manager has not approved
+  
+        if (userType === "Manager" && !gmPosition && lastManager !== userID) {
+          // console.log("Skipping item, Manager does not match or Supervisor not approved.");
+          return null;
         }
-
-        if (userType === "HR" && isGm) {
-          // console.log("Skipping item, GM has not approved.");
+  
+        // Check gmPosition value and log
+        if (gmPosition === "General Manager" && !isHr) {
+          // console.log("GM Position is General Manager and HR approval is missing:", item);
           return null; // Skip item if GM has not approved
         }
-
+  
         return {
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
@@ -165,69 +157,79 @@ export const ContractPDF = ({ userID, userType }) => {
         };
       })
       .filter((item) => item !== null);
-
-    // console.log("Filtered Data:", filteredData);
+  
+    // console.log("Filtered Data for HR:", filteredData);
+  
     setStoreData(filteredData);
     return filteredData;
   };
+  
 
   // console.log("stored data", storedData);
 
   useEffect(() => {
-   
     const data = contractExpiryMergedData(allData);
     // console.log("Processed Data to set:", data);
 
     setTableBody(data);
   }, [allData]);
 
- const handleDate = (e, type) => {
+  const handleDate = (e, type) => {
     const value = e.target.value;
-  
+
     if (type === "startDate") setStartDate(value);
     if (type === "endDate") setEndDate(value);
-  
-    const start = type === "startDate" ? new Date(value) : startDate ? new Date(startDate) : null;
-    const end = type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
-  
-    const filtered = tableBody.filter((data) => {
-      const expiryArray = data?.contractEnd || [];
-      const expiryDate = expiryArray.length
-        ? new Date(expiryArray[expiryArray.length - 1])
-        : null;
-  
-      if (!expiryDate || isNaN(expiryDate.getTime())) return false;
-  
-      if (start && end) return expiryDate >= start && expiryDate <= end;
-      if (start) return expiryDate >= start;
-      if (end) return expiryDate <= end;
-  
-      return true;
-    }).map((item) => {
-      const contractEndDates = item.contractEnd || [];
-      const lastDate = contractEndDates[contractEndDates.length - 1];
-      const contractStartDates = item.contractStart || [];
-      const startDate = contractStartDates[contractStartDates.length - 1];
 
-  
-      return {
-        empID: item.empID || "-",
-        empBadgeNo: item.empBadgeNo || "-",
-        name: item.name || "-",
-        nationality: item.nationality || "-",
-        dateOfJoin: formatDate(item.doj) || "-",
-        department: item.department[item.department?.length - 1] || "-",
-        position: item.position[item.position?.length - 1] || "-",
-        contractStartDate: formatDate(startDate) || "-",
-        contractEndDate: formatDate(lastDate) || "-",      
-      };
-    });
-  
+    const start =
+      type === "startDate"
+        ? new Date(value)
+        : startDate
+        ? new Date(startDate)
+        : null;
+    const end =
+      type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
+
+    const filtered = tableBody
+      .filter((data) => {
+        const expiryArray = data?.contractEnd || [];
+        const expiryDate = expiryArray.length
+          ? new Date(expiryArray[expiryArray.length - 1])
+          : null;
+
+        if (!expiryDate || isNaN(expiryDate.getTime())) return false;
+
+        if (start && end) return expiryDate >= start && expiryDate <= end;
+        if (start) return expiryDate >= start;
+        if (end) return expiryDate <= end;
+
+        return true;
+      })
+      .map((item) => {
+        const contractEndDates = item.contractEnd || [];
+        const lastDate = contractEndDates[contractEndDates.length - 1];
+        const contractStartDates = item.contractStart || [];
+        const startDate = contractStartDates[contractStartDates.length - 1];
+
+        return {
+          empID: item.empID || "-",
+          empBadgeNo: item.empBadgeNo || "-",
+          name: item.name || "-",
+          nationality: item.nationality || "-",
+          dateOfJoin: formatDate(item.doj) || "-",
+          department: item.department[item.department?.length - 1] || "-",
+          position: item.position[item.position?.length - 1] || "-",
+          contractStartDate: formatDate(startDate) || "-",
+          contractEndDate: formatDate(lastDate) || "-",
+        };
+      });
+
     setFilteredData(filtered);
   };
 
   const handleViewDetails = (personData) => {
     setSelectedPerson(personData);
+    // console.log(personData);
+    
   };
 
   const closeModal = () => {
@@ -304,4 +306,3 @@ export const ContractPDF = ({ userID, userType }) => {
     </div>
   );
 };
-

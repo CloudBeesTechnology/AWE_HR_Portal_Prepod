@@ -107,7 +107,6 @@ export const useTableFieldData = (titleName) => {
           "WORKINGHOURS",
           "OT",
           "REMARKS",
-         
         ],
 
         tableHeader: [
@@ -276,6 +275,7 @@ export const useTableFieldData = (titleName) => {
           "ACTUAL WORKING HOURS",
           "OT",
           "REMARKS",
+          
         ],
       };
     }

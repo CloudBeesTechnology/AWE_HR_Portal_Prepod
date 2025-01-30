@@ -1,3 +1,5 @@
+
+
 import React from "react";
 import { useEffect } from "react";
 import { TiTick } from "react-icons/ti";
@@ -137,6 +139,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
       <div className="mt-20 space-y-16">
       {/* Supervisor Section */}
       <div className="flex justify-between items-center space-x-8">
+
         <div className="flex justify-center items-center">
           <label className="text-sm font-medium">Name of Supervisor :</label>
           <input
@@ -148,8 +151,9 @@ export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
             className="border-b outline-none px-1"
           />
         </div>
+
         <div className="flex items-center space-x-10 border-b">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 ">
             <input
               type="radio"
               name="supervisorApproved"
@@ -191,6 +195,8 @@ export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
             className="outline-none"
           />
         </div>
+
+        
       </div>
 
       {/* Manager Section */}
@@ -206,7 +212,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
             className="border-b outline-none px-1"
           />
         </div>
-        <div className="flex items-center space-x-10">
+        <div className="flex items-center space-x-10 border-b">
           <div className="flex items-center space-x-2">
             <input
               type="radio"
@@ -238,7 +244,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
             </label>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 border-b">
           <input
             type="date"
             name="managerDate"

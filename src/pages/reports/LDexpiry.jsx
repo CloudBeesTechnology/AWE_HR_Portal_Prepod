@@ -11,13 +11,15 @@ export const LDexpiry = () => {
   const [endDate, setEndDate] = useState("");
   const [tableHead] = useState([
     "Emp ID",
-    "Employee Badge No",
+    "Badge No",
     "Name",
     "Nationality",
     "Position",
     "Department",
     "LD Approved",
     "LD Expiry",
+    "ENERGY DEPARTMENT APPROVAL VALIDITY DATE",
+    "ENERGY DEPARTMENT APPROVAL REFERENCE NUMBER"
   ]);
 
   const formatDate = (date, type) => {
@@ -82,6 +84,10 @@ export const LDexpiry = () => {
               ? formatDate(item.nlmsEmpApproval[item.nlmsEmpApproval.length - 1])
               : "-",
             nlmsEmpValid: formatDate(lastValidDate) || "-",
+            nlmsEmpSubmit:Array.isArray(item.nlmsEmpSubmit)
+            ? formatDate(item.nlmsEmpSubmit[item.nlmsEmpSubmit.length - 1])
+            : "-",
+            nlmsEmpSubmitRefNo:item.nlmsEmpSubmitRefNo,
           };
         })
         .sort((a, b) => a.lastValidDate - b.lastValidDate); // Sort using lastValidDate (temporary date object)

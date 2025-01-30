@@ -303,6 +303,50 @@
         }
       }
     },
+    "TrainingCertificatesIAMRoleDefaultPolicyBA94C41F": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:DescribeTable"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "TrainingCertificatesTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "TrainingCertificatesIAMRoleDefaultPolicyBA94C41F",
+        "Roles": [
+          {
+            "Ref": "TrainingCertificatesIAMRoleF922FA09"
+          }
+        ]
+      }
+    },
     "TrainingCertificatesDataSource": {
       "Type": "AWS::AppSync::DataSource",
       "Properties": {

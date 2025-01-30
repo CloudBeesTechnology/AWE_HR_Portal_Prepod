@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 
@@ -11,7 +9,7 @@ export const SearchBoxForTimeSheet = ({
   Position,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   const handleSearch = (e) => {
     const query = e.target.value.trim().toUpperCase();
     setSearchQuery(query);
@@ -29,7 +27,9 @@ export const SearchBoxForTimeSheet = ({
               item?.empBadgeNo?.toString().toUpperCase().includes(query) ||
               item?.BADGE?.toString().toUpperCase().includes(query) ||
               item?.sapNo?.toString().toUpperCase().includes(query) ||
-              item?.empID?.toString().toUpperCase().includes(query) 
+              item?.empID?.toString().toUpperCase().includes(query) ||
+              item?.NAME?.toString().toUpperCase().includes(query) ||
+              item?.empName?.toString().toUpperCase().includes(query)
             );
           };
 

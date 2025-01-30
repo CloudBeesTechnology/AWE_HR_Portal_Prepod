@@ -6,6 +6,7 @@ type ContractForm @aws_iam @aws_api_key {
   hrManager: String
   genManager: String
   remarks: String
+  contStatus: Boolean
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -200,6 +201,8 @@ type ProbForm @aws_iam @aws_api_key {
   responsibilityDetails: String
   diligentDetails: String
   commitmentDetails: String
+  probStatus: Boolean
+  gmName: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -723,6 +726,7 @@ type InterviewSchedule @aws_iam @aws_api_key {
   department: String
   otherDepartment: String
   status: String
+  empID: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -1025,6 +1029,7 @@ input ModelContractFormFilterInput {
   hrManager: ModelStringInput
   genManager: ModelStringInput
   remarks: ModelStringInput
+  contStatus: ModelBooleanInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelContractFormFilterInput]
@@ -1124,6 +1129,7 @@ input ModelContractFormConditionInput {
   hrManager: ModelStringInput
   genManager: ModelStringInput
   remarks: ModelStringInput
+  contStatus: ModelBooleanInput
   and: [ModelContractFormConditionInput]
   or: [ModelContractFormConditionInput]
   not: ModelContractFormConditionInput
@@ -1139,6 +1145,7 @@ input CreateContractFormInput {
   hrManager: String
   genManager: String
   remarks: String
+  contStatus: Boolean
 }
 
 input UpdateContractFormInput {
@@ -1149,6 +1156,7 @@ input UpdateContractFormInput {
   hrManager: String
   genManager: String
   remarks: String
+  contStatus: Boolean
 }
 
 input DeleteContractFormInput {
@@ -1289,6 +1297,7 @@ input ModelSubscriptionContractFormFilterInput {
   hrManager: ModelSubscriptionStringInput
   genManager: ModelSubscriptionStringInput
   remarks: ModelSubscriptionStringInput
+  contStatus: ModelSubscriptionBooleanInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionContractFormFilterInput]
@@ -2340,6 +2349,8 @@ input ModelProbFormFilterInput {
   responsibilityDetails: ModelStringInput
   diligentDetails: ModelStringInput
   commitmentDetails: ModelStringInput
+  probStatus: ModelBooleanInput
+  gmName: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelProbFormFilterInput]
@@ -2385,6 +2396,8 @@ input ModelProbFormConditionInput {
   responsibilityDetails: ModelStringInput
   diligentDetails: ModelStringInput
   commitmentDetails: ModelStringInput
+  probStatus: ModelBooleanInput
+  gmName: ModelStringInput
   and: [ModelProbFormConditionInput]
   or: [ModelProbFormConditionInput]
   not: ModelProbFormConditionInput
@@ -2431,6 +2444,8 @@ input CreateProbFormInput {
   responsibilityDetails: String
   diligentDetails: String
   commitmentDetails: String
+  probStatus: Boolean
+  gmName: String
 }
 
 input UpdateProbFormInput {
@@ -2472,6 +2487,8 @@ input UpdateProbFormInput {
   responsibilityDetails: String
   diligentDetails: String
   commitmentDetails: String
+  probStatus: Boolean
+  gmName: String
 }
 
 input DeleteProbFormInput {
@@ -2517,6 +2534,8 @@ input ModelSubscriptionProbFormFilterInput {
   responsibilityDetails: ModelSubscriptionStringInput
   diligentDetails: ModelSubscriptionStringInput
   commitmentDetails: ModelSubscriptionStringInput
+  probStatus: ModelSubscriptionBooleanInput
+  gmName: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionProbFormFilterInput]
@@ -5343,6 +5362,7 @@ input ModelInterviewScheduleFilterInput {
   department: ModelStringInput
   otherDepartment: ModelStringInput
   status: ModelStringInput
+  empID: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelInterviewScheduleFilterInput]
@@ -5363,6 +5383,7 @@ input ModelInterviewScheduleConditionInput {
   department: ModelStringInput
   otherDepartment: ModelStringInput
   status: ModelStringInput
+  empID: ModelStringInput
   and: [ModelInterviewScheduleConditionInput]
   or: [ModelInterviewScheduleConditionInput]
   not: ModelInterviewScheduleConditionInput
@@ -5384,6 +5405,7 @@ input CreateInterviewScheduleInput {
   department: String
   otherDepartment: String
   status: String
+  empID: String
 }
 
 input UpdateInterviewScheduleInput {
@@ -5400,6 +5422,7 @@ input UpdateInterviewScheduleInput {
   department: String
   otherDepartment: String
   status: String
+  empID: String
 }
 
 input DeleteInterviewScheduleInput {
@@ -5420,6 +5443,7 @@ input ModelSubscriptionInterviewScheduleFilterInput {
   department: ModelSubscriptionStringInput
   otherDepartment: ModelSubscriptionStringInput
   status: ModelSubscriptionStringInput
+  empID: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionInterviewScheduleFilterInput]

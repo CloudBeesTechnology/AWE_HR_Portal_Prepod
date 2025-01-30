@@ -19,6 +19,14 @@ export const PopupForAddRemark = ({
           </div>
           <button
             onClick={() => {
+              if (passSelectedData) {
+                const data = {
+                  ...passSelectedData,
+                  status: "Rejected",
+                };
+                addRemarks(data);
+                addEditedRemarks?.(data);
+              }
               toggleForRemarkFunc();
             }}
             className="text-dark_grey "
@@ -33,7 +41,7 @@ export const PopupForAddRemark = ({
           <textarea
             value={remark}
             onChange={(e) => setRemark(e.target.value)}
-            className="mt-1 p-2 w-full border rounded-md "
+            className="mt-1 p-2 w-full border rounded-md outline-none"
             rows="4"
             placeholder="Enter your remark..."
             data-gramm="false"

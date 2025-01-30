@@ -40,7 +40,6 @@ export const FormField = ({
   const handleSelectChange = (e) => {
     const selectedValue = e.target.value.toUpperCase();
 
-
     if (append) {
       const newSelectedOption = selectedOption.includes(selectedValue)
         ? selectedOption
@@ -64,10 +63,10 @@ export const FormField = ({
     ...option,
     value:
       typeof option?.value === "string"
-        ? option?.value.trim().toUpperCase()
-        : option?.value.trim().toUpperCase(), // Ensure value is a string before applying trim and toUpperCase
+      ? option?.value.trim().toUpperCase()
+      : option?.value.trim().toUpperCase(), 
     label:
-      typeof option?.label === "string" ? option?.label.trim().toUpperCase() : option?.label, // Ensure label is a string before applying trim
+    typeof option?.label === "string" ? option?.label.trim().toUpperCase() : option?.label,
   }));
 
   return (
@@ -131,7 +130,6 @@ export const FormField = ({
           value={value}
           className="input-field border"
           {...register(name)} // Connect to React Hook Form
-          
         />
       )}
 

@@ -25,8 +25,8 @@ export const TrainingRCData = () => {
     "CERT. EXP",
     "EXPIRED/VALID",
     "Mandatory/ Supplementary",
-    "E-CERTS RECEIVED",
-    "ORIGINAL CERTS RECEIVED",
+    "E-CERT RECEIVED",
+    "ORIGINAL CERT RECEIVED",
     "REMARKS",
   ]);
 

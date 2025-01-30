@@ -263,11 +263,11 @@ export const FilterTable = ({
           <div className="w-full overflow-x-auto overflow-y-auto h-[500px] scrollbar-hide shadow-lg my-5">
             <table className=" border-collapse w-full ">
               <thead className="w-full">
-                <tr className="bg-[#C5C5C5] rounded-sm">
+                <tr className="bg-grey rounded-sm">
                   {tableHead.map((head, idx) => (
                     <th
                       key={idx}
-                      className="px-6 py-5 text-[15px] text-secondary w-full"
+                      className="px-6 py-5 text-[15px] text-white w-full"
                     >
                       <span className="w-[120px] center uppercase">{head}</span>
                     </th>
