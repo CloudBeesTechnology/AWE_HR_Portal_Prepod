@@ -571,7 +571,6 @@ export const ViewForm = ({
     const isSupervisor = userType === "Supervisor";
     const isNotSuperAdminOrHR = userType !== "SuperAdmin" && userType !== "HR";
 
-    // Case 1: Supervisor approved, Manager pending, Supervisor not SuperAdmin/HR
     if (
       isApproved &&
       supervisorStatus !== "Rejected" &&
