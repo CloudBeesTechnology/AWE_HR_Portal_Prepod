@@ -4,6 +4,7 @@ import { DataSupply } from "../../utils/DataStoredContext";
 import { getUrl } from "@aws-amplify/storage";
 import avatar from "../../assets/navabar/avatar.jpeg";
 import { Link } from "react-router-dom";
+import { DateFormat } from "../../utils/DateFormat";
 
 export const NewJoineeTable = () => {
   const { empPIData, workInfoData, IDData } = useContext(DataSupply);
@@ -101,7 +102,7 @@ export const NewJoineeTable = () => {
                 />
                 <span className="text-grey">{joinee.name}</span>
               </td>
-              <td className="py-4 text-grey text-center">{joinee.doj || "N/A"}</td>
+              <td className="py-4 text-grey text-center">{DateFormat(joinee.doj) || "N/A"}</td>
               <td className="py-4 px-6 text-grey">{joinee.nationality || "N/A"}</td>
               <td className="py-4 px-6 text-grey">{joinee.position || "N/A"}</td>
               <td className="py-4 px-6 text-grey">{joinee.empType || "N/A"}</td>

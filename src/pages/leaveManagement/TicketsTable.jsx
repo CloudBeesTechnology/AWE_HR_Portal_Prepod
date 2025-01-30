@@ -202,7 +202,7 @@ export const TicketsTable = () => {
         }));
       }
     } catch (error) {
-      console.error("Error search data", error);
+      // console.error("Error search data", error);
       setData([]);
       setFilteredData([]);
       setErrorState((prev) => ({
@@ -242,7 +242,7 @@ export const TicketsTable = () => {
   }, [ticketMerged]);
 
   // console.log(loading);
-  console.log(filteredData);
+  // console.log(filteredData);
 
   return (
     <section className="w-full">
@@ -351,6 +351,8 @@ export const TicketsTable = () => {
                         onClick={() => {
                           handleClickForToggle();
                           handleViewClick(item, "Tickets");
+                          // console.log(item);
+                          
                         }}
                       >
                         {"View"}

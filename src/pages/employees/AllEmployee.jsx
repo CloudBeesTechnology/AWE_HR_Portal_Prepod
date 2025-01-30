@@ -375,7 +375,7 @@ export const AllEmployee = () => {
                     className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
                     onClick={() => {
                       handleFormShow(candidate);
-                      console.log("CANDY_DATA 2.0 all data", candidate);
+                      // console.log("CANDY_DATA 2.0 all data", candidate);
                     }}
                   >
                     <td className="py-4 px-4">{candidate?.empID || "N/A"}</td>

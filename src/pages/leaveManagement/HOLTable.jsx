@@ -23,7 +23,7 @@ export const HOLTable = () => {
   });
   const startIndex = (currentPage - 1) * rowsPerPage;
 
-  console.log(mergedData);
+  // console.log(mergedData);
 
   useEffect(() => {
     // Step 1: Initial filtering based on user type

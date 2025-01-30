@@ -382,10 +382,6 @@ export const ContractFormPDF = ({ contentRef }) => {
                 <th className="border border-black p-2">Date Of Join</th>
                 <th className="border border-black p-2">Contract Start Date</th>
                 <th className="border border-black p-2">Contract End Date</th>
-                <th className="border border-black p-2">LD Expiry</th>
-                <th className="border border-black p-2">
-                  Duration of Renewal Contract
-                </th>
                 
               </tr>
             </thead>
@@ -419,12 +415,6 @@ export const ContractFormPDF = ({ contentRef }) => {
                   </td>
                   <td className="border border-black p-2">
                     {employeeData?.contractEndDate}
-                  </td>
-                  <td className="border border-black p-2">
-                    {employeeData?.ldEx || "N/A"}
-                  </td>
-                  <td className="border border-black p-2">
-                    {employeeData?.balanceMonths || "N/A"}
                   </td>
                 </tr>
               ))}

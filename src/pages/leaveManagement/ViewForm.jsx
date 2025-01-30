@@ -167,7 +167,7 @@ export const ViewForm = ({
                 });
               } catch (err) {
                 console.error("An error occurred:", err);
-                alert(`Error occurred: ${err.message}`);
+                // alert(`Error occurred: ${err.message}`);
               }
             };
 
@@ -350,7 +350,7 @@ export const ViewForm = ({
                 }
               } catch (err) {
                 console.error("An error occurred:", err);
-                alert(`Error occurred: ${err.message}`);
+                // alert(`Error occurred: ${err.message}`);
               }
             };
             processEmailsAndNotifySup();
@@ -471,7 +471,7 @@ export const ViewForm = ({
                 });
               } catch (err) {
                 console.error("An error occurred:", err);
-                alert(`Error occurred: ${err.message}`);
+                // alert(`Error occurred: ${err.message}`);
               }
             };
             processEmailsAndNotifyManager();
@@ -705,20 +705,17 @@ export const ViewForm = ({
                   },
                   {
                     label: "Job Title",
-                    value:
-                      Array.isArray(leaveData.position) &&
-                      leaveData.position.length > 0
-                        ? leaveData.position[leaveData.position.length - 1]
-                        : "N/A",
+                    value: (Array.isArray(leaveData.position) && leaveData.position.length > 0)
+                      ? leaveData.position[leaveData.position.length - 1]
+                      : "N/A",
                   },
                   {
                     label: "Department",
-                    value:
-                      Array.isArray(leaveData.department) &&
-                      leaveData.department.length > 0
-                        ? leaveData.department[leaveData.department.length - 1]
-                        : "N/A",
+                    value: (Array.isArray(leaveData.department) && leaveData.department.length > 0)
+                      ? leaveData.department[leaveData.department.length - 1]
+                      : "N/A",
                   },
+                  
                   { label: "Leave Type", value: leaveData.empLeaveType },
                   {
                     label: "Applied Dates",

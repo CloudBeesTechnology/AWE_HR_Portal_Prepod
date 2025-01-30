@@ -99,13 +99,12 @@ export const EmployeeInfo = () => {
     mode: "onChange",
     defaultValues: {
       familyDetails: JSON.stringify([]),
-      contractType: [],
-      empType: [],
+    
     },
   });
 
-  const contractTypes = watch("contractType");
-  const empTypes = watch("empType");
+  // const contractTypes = watch("contractType");
+  // const empTypes = watch("empType");
   const watchedEmpID = watch("empID");
   const watchedProfilePhoto = watch("profilePhoto" || "");
 
@@ -279,49 +278,44 @@ export const EmployeeInfo = () => {
 
   const cleanFamilyDetailsString = (familyDetailsInput) => {
     try {
-      // Check if it's already a string
       let familyDetailsString = familyDetailsInput;
-
-      // If it's an object, convert it to a string
+  
+      // Convert to string if input is an object
       if (typeof familyDetailsString === "object") {
-        // If it's an array, we join the array elements into a string
-        if (Array.isArray(familyDetailsString)) {
-          familyDetailsString = JSON.stringify(familyDetailsString);
-        } else {
-          // If it's an object, use JSON.stringify to convert it to a string
-          familyDetailsString = JSON.stringify([familyDetailsString]);
-        }
+        familyDetailsString = JSON.stringify(Array.isArray(familyDetailsString) ? familyDetailsString : [familyDetailsString]);
       }
-
-      // Remove the surrounding quotes if they exist
+  
+      // Ensure proper formatting by trimming whitespace
       let cleanedString = familyDetailsString.trim();
-
-      // Remove surrounding quotes (if any) after trimming
+  
+      // Remove surrounding quotes if present
       if (cleanedString.startsWith('"') && cleanedString.endsWith('"')) {
-        cleanedString = cleanedString.slice(1, -1); // Remove surrounding quotes
+        cleanedString = cleanedString.slice(1, -1);
       }
-
-      // Fix malformed JSON by ensuring property names are wrapped in double quotes
-      cleanedString = cleanedString.replace(/([a-zA-Z0-9_]+)(:)/g, '"$1"$2');
-
-      // Handle potential single quotes around values or unescaped characters
-      cleanedString = cleanedString.replace(/"(?!\\)/g, '\\"'); // Escape any unescaped quotes
-
-      // Handle special characters that might be causing issues (like '/')
+  
+      // Ensure property names are wrapped in double quotes (fix malformed JSON)
+      cleanedString = cleanedString.replace(/([{,])\s*([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
+  
+      // Handle potential single quotes around values
+      cleanedString = cleanedString.replace(/'([^']+)'/g, '"$1"');
+  
+      // Remove unnecessary backslashes
       cleanedString = cleanedString.replace(/\\/g, "");
-
+  
       // Capitalize words utility function
-      const capitalizeWords = (str) => str.toUpperCase();
-      // .split(" ")
-      // .map(
-      //   (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-      // )
-      // .join(" ");
-
-      // After cleaning, the string should be a valid JSON array
-      if (cleanedString.startsWith("[") && cleanedString.endsWith("]")) {
-        // If it's an array-like string, parse it directly
-        return JSON.parse(cleanedString).map((item) => {
+      const capitalizeWords = (str) =>
+        str
+          .split(" ")
+          .map(
+            (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+          )
+          .join(" ");
+  
+      // Parse the cleaned JSON string
+      const parsedData = JSON.parse(cleanedString);
+  
+      if (Array.isArray(parsedData)) {
+        return parsedData.map((item) => {
           if (typeof item === "string") {
             return capitalizeWords(item);
           }
@@ -336,27 +330,29 @@ export const EmployeeInfo = () => {
           return item;
         });
       } else {
-        // If it's not in array format, wrap it in an array and parse it
-        const parsedItem = JSON.parse(cleanedString);
-        if (typeof parsedItem === "string") {
-          return [capitalizeWords(parsedItem)];
-        }
-        if (typeof parsedItem === "object") {
-          return [
-            Object.fromEntries(
-              Object.entries(parsedItem).map(([key, value]) => [
-                key,
-                typeof value === "string" ? capitalizeWords(value) : value,
-              ])
-            ),
-          ];
-        }
-        return [parsedItem];
+        return [
+          typeof parsedData === "string"
+            ? capitalizeWords(parsedData)
+            : Object.fromEntries(
+                Object.entries(parsedData).map(([key, value]) => [
+                  key,
+                  typeof value === "string" ? capitalizeWords(value) : value,
+                ])
+              ),
+        ];
       }
     } catch (error) {
       console.error("Error cleaning and parsing familyDetails:", error);
       return []; // Return empty array if parsing fails
     }
+  };
+  
+
+  const getArrayDateValue = (value) => {
+    if (Array.isArray(value) && value.length > 0) {
+      return value[value.length - 1]?.trim().toUpperCase();
+    }
+    return typeof value === "string" ? value.trim().toUpperCase() : null;
   };
 
   const searchResult = async (result) => {
@@ -367,6 +363,7 @@ export const EmployeeInfo = () => {
       "officialEmail",
       "bankAccNo",
       "empBadgeNo",
+      "sapNo",
     ];
 
     fieldValue.forEach((val) => {
@@ -408,10 +405,8 @@ export const EmployeeInfo = () => {
       "name",
       "oCOfOrigin",
       "position",
-      "sapNo",
+      // "sapNo",
       // "officialEmail",
-      "contractType",
-      "empType",
       "bwnIcColour",
       "gender",
     ];
@@ -439,7 +434,17 @@ export const EmployeeInfo = () => {
         setValue(key, valueToSet);
       }
     });
+  const arrayDateField = [
+      "empType",
+    "contractType"
+    ];
 
+    // Set values for date fields and handle salaryType condition
+    arrayDateField.forEach((field) => {
+      const valueToSet = result[field];
+
+      setValue(field, getArrayDateValue(valueToSet)); // Use getArrayDateValue for all fields
+    });
     const fieldsArray = ["bwnIcExpiry", "ppExpiry", "ppIssued"];
     fieldsArray.forEach((field) =>
       setValue(field, getLastArrayValue(result[field]))
@@ -601,8 +606,8 @@ export const EmployeeInfo = () => {
   };
 
   const onSubmit = async (data) => {
-    data.contractType = contractTypes;
-    data.empType = empTypes;
+    // data.contractType = contractTypes;
+    // data.empType = empTypes;
     // console.log(data);
 
     const formatDate = (date) =>
@@ -611,12 +616,37 @@ export const EmployeeInfo = () => {
     const bwnIcExpiry = formatDate(data.bwnIcExpiry);
     const ppIssued = formatDate(data.ppIssued);
     const ppExpiry = formatDate(data.ppExpiry);
+    const contractType = data.contractType;
+    const empType = data.empType;
 
+    // const removeLeadingNulls = (array, newValue) => {
+    //   const newArray = [...(array || []), newValue]; // Combine old array and new value
+    //   let firstValidIndex = newArray.findIndex((item) => item !== null);
+    //   if (firstValidIndex !== -1) {
+    //     return newArray.map((item) => (item === null ? "N/A" : item));
+    //   } else {
+    //     return [];
+    //   }
+    // };
     const removeLeadingNulls = (array, newValue) => {
       const newArray = [...(array || []), newValue]; // Combine old array and new value
       let firstValidIndex = newArray.findIndex((item) => item !== null);
+      
       if (firstValidIndex !== -1) {
-        return newArray.map((item) => (item === null ? "N/A" : item));
+        // Map through the newArray and remove consecutive duplicates
+        const result = [];
+        let lastAdded = null;
+    
+        newArray.forEach((item) => {
+          if (item !== null && item !== lastAdded) {
+            result.push(item === null ? "N/A" : item);
+            lastAdded = item; // Update lastAdded to the current item
+          } else if (item === null) {
+            result.push("N/A");
+          }
+        });
+    
+        return result;
       } else {
         return [];
       }
@@ -643,7 +673,14 @@ export const EmployeeInfo = () => {
           checkingIDTable.ppIssued,
           ppIssued
         );
-
+ const updateContract = removeLeadingNulls(
+          checkingPITable.contractType,
+          contractType
+        );
+        const updateEmpType = removeLeadingNulls(
+          checkingPITable.empType,
+          empType
+        );
         const collectValue = {
           ...data,
           profilePhoto: uploadedDocs.profilePhoto,
@@ -652,6 +689,8 @@ export const EmployeeInfo = () => {
           bwnIcExpiry: updatedbwnIcExpiry,
           ppIssued: updatedppIssued,
           ppExpiry: updatedppExpiry,
+          contractType: updateContract,
+          empType:updateEmpType,
           applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
           cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
           loiUpload: JSON.stringify(uploadedFiles.loiUpload),
@@ -673,6 +712,8 @@ export const EmployeeInfo = () => {
         const updatedbwnIcExpiry = removeLeadingNulls([], bwnIcExpiry);
         const updatedppExpiry = removeLeadingNulls([], ppExpiry);
         const updatedppIssued = removeLeadingNulls([], ppIssued);
+        const updateContract = removeLeadingNulls([], contractType);
+        const updateEmpType = removeLeadingNulls([], empType);
 
         const empValue = {
           ...data,
@@ -682,6 +723,8 @@ export const EmployeeInfo = () => {
           bwnIcExpiry: updatedbwnIcExpiry,
           ppIssued: updatedppIssued,
           ppExpiry: updatedppExpiry,
+          contractType: updateContract,
+          empType:updateEmpType,
           applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
           cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
           loiUpload: JSON.stringify(uploadedFiles.loiUpload),

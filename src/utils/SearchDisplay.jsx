@@ -99,7 +99,7 @@ export const SearchDisplay = ({
 
         return 0;
       });
-      console.log(sortedResults);
+      
       setFilteredEmployees?.(sortedResults);
       // console.log("if FilteredEmployees : ", results);
     } else {

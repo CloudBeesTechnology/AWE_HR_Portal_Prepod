@@ -74,14 +74,14 @@ const Login = () => {
     // <Authenticator>
 
     <section className="screen-size mx-auto flex h-screen">
-      <div className="flex-1 border-r-2  border-[#E9E9E9] center ">
+      <div className="flex-1 border-r-2  border-[#E9E9E9] center">
         <img
           className="w-full max-w-[450px]"
           src={rightImage}
           alt="Rightside Pic not found"
         />
       </div>
-      <div className="flex-1 flex items-center gap-8 py-14 flex-col w-full px-3">
+      <div className="flex-1 flex items-center gap-8 py-20 flex-col w-full px-3">
         <div>
           {" "}
           <img
@@ -159,15 +159,15 @@ const Login = () => {
           </div>
 
           <div className="center ">
-            <button className="primary_btn text_size_4 my-2" onClick={Submit}>
+            <button className="primary_btn text_size_4 my-5" onClick={Submit}>
               Login
             </button>
           </div>
-          <hr className="border-[1.5px] text-[#B3B3B3]" />
-          {/* <div className="center">
+          {/* <hr className="border-[1.5px] text-[#B3B3B3]" />
+          <div className="center">
             <Link
               to="/changePassword"
-              className="text-[#7A7A7A] text_size_6 text-center mb-5"
+              className="text-[#7A7A7A] text_size_6 text-center my-5"
             >
               Change Password
             </Link>

@@ -34,7 +34,7 @@ export const LMTable = () => {
     dateError: false,
     noResults: false,
   });
-  console.log(mergedData);
+  // console.log(mergedData);
 
   useEffect(() => {
     // Step 1: Initial filtering based on user type
@@ -309,7 +309,7 @@ export const LMTable = () => {
                           onClick={() => {
                             handleClickForToggle();
                             handleViewClick(item, "LM");
-                            console.log(item);
+                            // console.log(item);
                             
                           }}
                         >

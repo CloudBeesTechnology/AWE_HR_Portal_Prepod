@@ -25,19 +25,28 @@ export const PathHead = () => {
       setMergeData(candidates);
     
       const bruneian = candidates.filter(
-        (item) => Array.isArray(item.contractType) && item.contractType.includes("Local")
+        (item) =>
+          Array.isArray(item.contractType) &&
+          item.contractType.length > 0 &&
+          item.contractType[item.contractType.length - 1].toUpperCase() === "LOCAL"
       ).length;
+      
       setBruneianCount(bruneian);
+      
 
       // Calculate LPA count
       const LPA = candidates.filter(
-        (item) => Array.isArray(item.contractType) && item.contractType.includes("LPA")
+        (item) => Array.isArray(item.contractType) &&
+        item.contractType.length > 0 &&
+        item.contractType[item.contractType.length - 1].toUpperCase() === ("LPA")
       ).length;
       setLPACount(LPA);
 
       // Calculate SAWP count
       const SAWP = candidates.filter(
-        (item) => Array.isArray(item.contractType) && item.contractType.includes("SAWP")
+        (item) => Array.isArray(item.contractType) &&
+        item.contractType.length > 0 &&
+        item.contractType[item.contractType.length - 1].toUpperCase() ===("SAWP")
       ).length;
       setSAWPCount(SAWP);
 
@@ -57,7 +66,7 @@ export const PathHead = () => {
       <div className="grid grid-cols-4 p-4 gap-5">
         {/* Total Employees Card */}
         <Link
-          to="/employeeDetails"
+          to="/allempDetails"
           className="p-4 bg-gradient-to-r from-[#FFAAAA] to-[#EBEBEB] rounded-lg shadow-lg flex items-center justify-between"
         >
           <div className="flex items-center">
@@ -73,7 +82,8 @@ export const PathHead = () => {
         </Link>
 
         {/* LPA Card */}
-        <div className="p-4 bg-gradient-to-r from-[#DAFFA6] to-[#EBEBEB] rounded-lg shadow-lg flex items-center justify-between">
+        <Link
+          to="/allempDetails" className="p-4 bg-gradient-to-r from-[#DAFFA6] to-[#EBEBEB] rounded-lg shadow-lg flex items-center justify-between">
           <div className="flex items-center">
             <div className="w-1 h-16 mr-4 border rounded-md bg-[#91A672] border-[#91A672]"></div>
             <div>
@@ -84,10 +94,11 @@ export const PathHead = () => {
           <div className="flex items-center justify-center p-2">
             <img src={Group2} alt="icon2" />
           </div>
-        </div>
+        </Link>
 
         {/* SAWP Card */}
-        <div className="p-4 bg-gradient-to-r from-[#C9DFFF] to-[#EBEBEB] rounded-lg shadow-lg flex items-center justify-between">
+        <Link
+          to="/allempDetails" className="p-4 bg-gradient-to-r from-[#C9DFFF] to-[#EBEBEB] rounded-lg shadow-lg flex items-center justify-between">
           <div className="flex items-center">
             <div className="w-1 h-16 mr-4 border rounded-md bg-[#687FA4] border-[#B17A7A]"></div>
             <div>
@@ -98,10 +109,11 @@ export const PathHead = () => {
           <div className="flex items-center justify-center p-2">
             <img src={Group3} alt="icon3" />
           </div>
-        </div>
+        </Link>
 
         {/* Bruneian Card */}
-        <div className="p-4 bg-gradient-to-r from-[#FFDFAB] to-[#EBEBEB] rounded-lg shadow-lg flex items-center justify-between">
+        <Link
+          to="/allempDetails" className="p-4 bg-gradient-to-r from-[#FFDFAB] to-[#EBEBEB] rounded-lg shadow-lg flex items-center justify-between">
           <div className="flex items-center">
             <div className="w-1 h-16 mr-4 border rounded-md bg-[#AB8851] border-[#B17A7A]"></div>
             <div>
@@ -115,7 +127,7 @@ export const PathHead = () => {
           <div className="flex items-center justify-center p-2">
             <img src={Group4} alt="icon4" />
           </div>
-        </div>
+        </Link>
       </div>
     </div>
   );
