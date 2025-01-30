@@ -11,7 +11,7 @@ import { FaWindowClose } from "react-icons/fa";
 import logo from "../../assets/logo/logo-with-name.svg";
 import { useReactToPrint } from "react-to-print";
 import { FaPrint } from "react-icons/fa";
-
+import { DateFormat } from "../DateFormat";
 
 export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
   const [activeTab, setActiveTab] = useState(0); // Track active tab
@@ -341,13 +341,6 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     pervAnnualLeaveBal,
   } = passingValue;
 
-  // console.log(passingValue);
-  
-
-  // console.log(address);
-
-  // console.log(insuranceClaims);
-
   const personalDetails = {
     Name: name,
     "Chinese character": chinese,
@@ -420,11 +413,6 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Brunei Medical Fitness Expiry": bruneiME, // medical expiry
   };
   
-  
-// console.log(medicalInfo);
-
-//  console.log(medicalInfo);
- 
 
   const dependenPass = {
     DependPass: dependPass,
@@ -435,6 +423,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Accommodation Address": accommodationAddress,
   };
 
+ 
   const insuranceInfo = {
     "Group H&S Insurance": groupIns,
     "Group H&S Insurance Enrollment Effective Date":
@@ -446,17 +435,13 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Travelling Insurance": travelIns,
   };
 
-
   // workmePolicyNo,
   // workmenComp,
 
   const DependentInsurance = {
     "Dependent Insurance": depInsurance,
   };
-
-
   
-
   const InsuranceClaim = {
     "Insurance Claim": insuranceClaims,
   };

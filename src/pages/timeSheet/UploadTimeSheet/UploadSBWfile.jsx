@@ -21,45 +21,21 @@ export const UploadSBWfile = (
         allSheets.push({ sheetName, data: sheet });
       });
 
-      // console.log(allSheets);
-
       const getResult =
         allSheets &&
         allSheets.map((sheet) => {
           const data = sheet.data;
-          // console.log(data);
 
           var headerSlicedData = data.slice(0, 1);
           const hasNameAndDate = headerSlicedData.some((obj) =>
             ["NAME", "DATE"].every((key) => key in obj)
           );
           checkTrueOrFalse = hasNameAndDate;
-          // const changedHeader = headerSlicedData.map((columns) => {
-          //   const foundKey = Object.entries(columns).map(([key, value]) => {
-          //     return [{ key, value }];
-          //   });
-          //   return foundKey;
-          // });
-
-          //   console.log(changedHeader);
-          // const result = changedHeader.flat().flat();
 
           var bodySlicedData = data.slice(0);
-          // console.log(bodySlicedData);
+
           tableBodyData.push(bodySlicedData);
-          // bodySlicedData.forEach((bodyData) => {
-          //   const row = {};
 
-          //   Object.entries(bodyData).forEach(([key, value]) => {
-          //     const headerKey = result.find((header) => header.key === key);
-
-          //     if (headerKey) {
-          //       row[headerKey.value] = value;
-          //     }
-          //   });
-
-          //   tableBodyData.push(row);
-          // });
           return headerSlicedData;
         });
       if (checkTrueOrFalse === true) {
@@ -89,7 +65,6 @@ export const UploadSBWfile = (
           }
         };
 
-        // console.log(tableBodyData);
         function cleanKey(key) {
           if (typeof key !== "string") {
             return key; // Return value if not a string (e.g., number, object)
@@ -105,10 +80,9 @@ export const UploadSBWfile = (
             const cleanedKey = cleanKey(key); // Clean the key
             cleanedItem[cleanedKey] = item[key]; // Set the value using the cleaned key
           }
-          // console.log(cleanedItem);
+
           return cleanedItem;
         });
-        // console.log("formattedData : ", formattedData);
 
         const updatedDataArray =
           formattedData &&
@@ -127,58 +101,32 @@ export const UploadSBWfile = (
 
             return item;
           });
-          
-        // console.log(updatedDataArray);
-        // console.log(updatedDataArray);
-        // const removeTotalEmployees = updatedDataArray.filter(
-        //   (val) => !val.NAME?.includes("TOTAL EMPLOYEES")
-        // );
 
-        // const getLastOccurrencePerFIDDate = (dataArray) => {
-        //   const map = new Map();
-
-        //   // Iterate over each object and store the last occurrence of each unique FID-date combination
-        //   dataArray.forEach((obj) => {
-        //     // Check if "ENTRANCEDATEUSED" exists in the object
-        //     if (obj.hasOwnProperty("BADGE")) {
-        //       const key = `${obj.BADGE}`; // Create a unique key based on FID and ENTRANCEDATEUSED
-        //       map.set(key, obj); // Overwrite previous entries with the same FID and ENTRANCEDATEUSED
-        //     }
-        //   });
-
-        //   // Convert the map values to an array of the last occurrences for each FID-date pair
-        //   return Array.from(map.values());
-        // };
-        // const lastOccurrenceObjects =
-        //   getLastOccurrencePerFIDDate(updatedDataArray);
-        // console.log(lastOccurrenceObjects);
-
-        // Get Date from array of object
         const getCleanedDate = (obj) => {
-          const date = obj?.DATE?.trim() || '';
+          const date = obj?.DATE?.trim() || "";
           // Remove "(Tue)" or similar day abbreviations
-          return date.replace(/\(\w+\)/, '').trim();
-      };
-      
-      // Check the first object's DATE, fallback to the second object if needed
-      let dateValue = getCleanedDate(updatedDataArray[0]);
-      if (!dateValue) {
-          dateValue = getCleanedDate(updatedDataArray[1]);
-      }
-      
-      function convertDateFormat(dateStr) {
-        // Split the input string by '/'
-        const parts = dateStr.split("/");
+          return date.replace(/\(\w+\)/, "").trim();
+        };
 
-        // Validate the input format
-        if (parts.length !== 3) {
-          throw new Error("Invalid date format. Expected DD/MM/YYYY");
+        // Check the first object's DATE, fallback to the second object if needed
+        let dateValue = getCleanedDate(updatedDataArray[0]);
+        if (!dateValue) {
+          dateValue = getCleanedDate(updatedDataArray[1]);
         }
 
-        // Rearrange the parts to MM/DD/YYYY
-        const [day, month, year] = parts;
-        return `${day}/${month}/${year}`;
-      }
+        function convertDateFormat(dateStr) {
+          // Split the input string by '/'
+          const parts = dateStr.split("/");
+
+          // Validate the input format
+          if (parts.length !== 3) {
+            throw new Error("Invalid date format. Expected DD/MM/YYYY");
+          }
+
+          // Rearrange the parts to MM/DD/YYYY
+          const [day, month, year] = parts;
+          return `${day}/${month}/${year}`;
+        }
 
         const filteHighlightedData = updatedDataArray.filter(
           (item) => item.IN && item.OUT
@@ -186,10 +134,10 @@ export const UploadSBWfile = (
 
         const dateObject = new Date(dateValue).toLocaleDateString();
         const formattedDate = convertDateFormat(dateObject);
-        filteHighlightedData.forEach(obj => {
+        filteHighlightedData.forEach((obj) => {
           obj.DATE = formattedDate;
-      });
-        console.log(filteHighlightedData)
+        });
+
         setExcelData(filteHighlightedData);
         setLoading(false);
         const theaderResult = getResult.flat();

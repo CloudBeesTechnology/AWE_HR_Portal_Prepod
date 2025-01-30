@@ -176,7 +176,6 @@ export const ApplyEmployReq = () => {
           <RequisitionReviewForm
             isVisible={isReviewFormVisible}
             onClose={handleReviewFormClose}
-            isMdView={false}
             selectedRequest={selectedRequest}
           />
         )}

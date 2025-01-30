@@ -1,5 +1,3 @@
-
-
 import { useTempID } from "../../utils/TempIDContext";
 import {
   dummyHolidayList,
@@ -15,6 +13,7 @@ import { ViewSummaryTable } from "./viewSummarySheets/ViewSummaryTable";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
 
 import { useCallback, useEffect, useState } from "react";
+import { GetHolidayList } from "./customTimeSheet/GetHolidayList";
 
 export const ViewSummary = () => {
   const [data, setData] = useState(null);
@@ -32,7 +31,8 @@ export const ViewSummary = () => {
     setGetEndDate,
   } = useTempID();
 
-  // console.log(startDate, endDate, selectedLocation);
+  const publicHoliday = GetHolidayList();
+
   const ProcessedDataFunc = async (data) => {
     setData(data);
     setSecondaryData(data);
@@ -93,9 +93,6 @@ export const ViewSummary = () => {
   //     "workingHrsKey": "1-7-2024"
   // }
   const assignWhrslocaly = async (responseData) => {
-    // console.log(data);
-    // console.log(responseData);
-
     responseData?.forEach((input) => {
       // Convert the date format from MM/DD/YYYY to D-M-YYYY
       const [month, day, year] = input.date.split("/");
@@ -130,18 +127,16 @@ export const ViewSummary = () => {
               existingObj.mealAllow = Array.isArray(input.mealAllow)
                 ? input.mealAllow[0]
                 : input.mealAllow || "";
-              // console.log()
             }
           }
         });
       }
     });
     setLoadingMess(true);
-    // console.log(data); // It's more meaningful to log 'data' here to see the updates
   };
   const FinalEditedData = async (getObject) => {
     setLoadingMess(false);
-    // console.log(getObject);
+
     const resData = await UpdateViewSummary(getObject);
 
     await assignWhrslocaly(resData);
@@ -193,16 +188,6 @@ export const ViewSummary = () => {
     }
   };
 
-  // useEffect(() => {
-  //   const assignUpdatedWhrs = () => {
-  //     console.log(data);
-  //     console.log(updatedResData);
-  //   };
-  //   if (updatedResData) {
-  //     assignUpdatedWhrs();
-  //   }
-  // }, [updatedResData]);
-
   const dayCounts =
     Math.ceil((getEndDate - getStartDate) / (1000 * 60 * 60 * 24)) + 1;
   return (
@@ -210,7 +195,7 @@ export const ViewSummary = () => {
       <ApplyVSFunction
         convertedStringToArrayObj={convertedStringToArrayObj}
         ProcessedDataFunc={ProcessedDataFunc}
-        dummyHolidayList={dummyHolidayList}
+        publicHoliday={publicHoliday}
         dummyLeaveStatus={dummyLeaveStatus}
         dayCounts={dayCounts}
       />

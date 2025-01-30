@@ -1,3 +1,4 @@
+
 export const Notification = async ({ getEmail, Position, correctionMade }) => {
   let hasSentEmail = false; // Track email sending
 
@@ -24,7 +25,7 @@ export const Notification = async ({ getEmail, Position, correctionMade }) => {
       Position === "Manager"
         ? getEmail?.TimeKeeperDetails?.name
         : getEmail?.ManagerDetails?.name;
-    console.log(getEmail?.TimeKeeperDetails, " : ", getEmail?.ManagerDetails);
+
     const fromAddress = `"Dear ${empName}" <timesheet_no-reply@adininworks.com>`;
     const toAddress =
       Position === "Manager"
@@ -42,16 +43,12 @@ export const Notification = async ({ getEmail, Position, correctionMade }) => {
   <html>
     <body>
       <p>Dear ${getEmail?.ManagerDetails?.name},</p>
-      <p>The corrected ${getEmail?.TimeSheetData?.fileType} timesheet for ${getEmail?.TimeKeeperDetails?.name} has been resubmitted and is now awaiting your review and approval.</p>
-      <p><strong>Details:</strong></p>
-      <ul>
-        <li>Employee: ${getEmail?.TimeKeeperDetails?.name}</li>
-        <li>Period: ${fromDate} - ${untilDate}</li>
-        <li>Resubmission Date: ${todayDate}</li>
-      </ul>
-      <p>To review and approve the corrected timesheet, please click the link below:</p>
-      <p><a href="${url}">${url}</a></p>
-      <p>Best regards,<br>The Timesheet Management Team</p>
+      <p>The corrected ${getEmail?.TimeSheetData?.fileType} timesheet for the period from ${fromDate} until ${untilDate} has been submitted by Timekeeper ${getEmail?.TimeKeeperDetails?.name}
+      </p>
+      
+      <p>Click here <a href="${url}">${url}</a> to Review and update the Status.</p>
+      
+   
     </body>
   </html>
 `;
@@ -69,22 +66,16 @@ export const Notification = async ({ getEmail, Position, correctionMade }) => {
             <p>Dear ${getEmail?.TimeKeeperDetails?.name},</p>
             <p>Your submitted ${
               getEmail?.TimeSheetData?.fileType
-            } timesheet for the period ${fromDate} to ${untilDate} has been ${status} by ${
+            } timesheet for the period ${fromDate} to ${untilDate} has been ${status} by Manager ${
         getEmail?.ManagerDetails?.name
       }.</p>
-            <p><strong>Details:</strong></p>
-            <ul>
-              <li>Employee Name: ${getEmail?.ManagerDetails?.name}</li>
-              <li>${
-                status === "Approved" ? "Approval" : "Rejection"
-              } Date: ${todayDate}</li>
-            </ul>
+           
+           
             ${
               status === "Rejected"
                 ? "<p>Please review the timesheet and make the necessary corrections.</p>"
                 : ""
-            }
-            <p>Best regards,<br>The Timesheet Management Team</p>
+            }       
           </body>
         </html>
       `;
@@ -94,23 +85,17 @@ export const Notification = async ({ getEmail, Position, correctionMade }) => {
         <html>
           <body>
             <p>Dear ${getEmail?.ManagerDetails?.name},</p>
-            <p>The ${getEmail?.TimeSheetData?.fileType} timesheet for ${getEmail?.TimeKeeperDetails?.name} has been submitted and is awaiting your approval.</p>
-            <p><strong>Details:</strong></p>
-            <ul>
-              <li>Employee Name: ${getEmail?.TimeKeeperDetails?.name}</li>
-              <li>Time Period: From date ${fromDate} Until date ${untilDate}</li>
-              <li>Date Submitted: ${todayDate}</li>
-            </ul>
-            <p>To review and approve the timesheet, please click the link below:</p>
-            <p><a href="${url}">${url}</a></p>
-            <p>Best regards,<br>The Timesheet Management Team</p>
+            <p>The ${getEmail?.TimeSheetData?.fileType} timesheet for the period from ${fromDate} until ${untilDate} has been submitted by Timekeeper 
+           ${getEmail?.TimeKeeperDetails?.name}</p>
+                   
+            <p>Click here <a href="${url}">${url}</a> to Review and update the Status.</p>   
           </body>
         </html>
       `;
     }
 
     hasSentEmail = true;
-    console.log(subject, message, fromAddress, toAddress);
+    // console.log(subject, message, fromAddress, toAddress);
     return {
       subject,
       message,
@@ -120,6 +105,6 @@ export const Notification = async ({ getEmail, Position, correctionMade }) => {
     };
     // await sendEmail(subject, message, fromAddress, toAddress);
   } catch (error) {
-    console.error("Error sending email:", error);
+    // console.error("Error sending email:", error);
   }
 };

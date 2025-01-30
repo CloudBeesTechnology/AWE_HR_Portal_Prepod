@@ -280,7 +280,7 @@ const WorkInfoView = ({
                               <span
                                  className={`${
                                   arr.length > 1 && idx === 0
-                                    ? "rounded-md text-primary"
+                                    ? "rounded-md font-black italic"
                                     : "" // Only highlight the latest value if there are multiple values lo
                                 }`}
                               >

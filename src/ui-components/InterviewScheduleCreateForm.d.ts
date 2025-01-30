@@ -34,6 +34,7 @@ export declare type InterviewScheduleCreateFormInputValues = {
     department?: string;
     otherDepartment?: string;
     status?: string;
+    empID?: string;
 };
 export declare type InterviewScheduleCreateFormValidationValues = {
     interDate?: ValidationFunction<string>;
@@ -48,6 +49,7 @@ export declare type InterviewScheduleCreateFormValidationValues = {
     department?: ValidationFunction<string>;
     otherDepartment?: ValidationFunction<string>;
     status?: ValidationFunction<string>;
+    empID?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type InterviewScheduleCreateFormOverridesProps = {
@@ -64,6 +66,7 @@ export declare type InterviewScheduleCreateFormOverridesProps = {
     department?: PrimitiveOverrideProps<TextFieldProps>;
     otherDepartment?: PrimitiveOverrideProps<TextFieldProps>;
     status?: PrimitiveOverrideProps<TextFieldProps>;
+    empID?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type InterviewScheduleCreateFormProps = React.PropsWithChildren<{
     overrides?: InterviewScheduleCreateFormOverridesProps | undefined | null;

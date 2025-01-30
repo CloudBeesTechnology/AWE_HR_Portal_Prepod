@@ -90,6 +90,7 @@ export const useTableFieldData = (titleName) => {
           WORKINGHOURS: null,
           OT: null,
           REMARKS: null,
+          // STATUS: null,
         },
 
         fields: [
@@ -274,6 +275,7 @@ export const useTableFieldData = (titleName) => {
           "ACTUAL WORKING HOURS",
           "OT",
           "REMARKS",
+          
         ],
       };
     }

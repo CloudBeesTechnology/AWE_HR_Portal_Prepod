@@ -8,9 +8,15 @@ import { UpdateContractData } from "../../services/updateMethod/UpdateContractFo
 import { sendEmail } from "../../services/EmailServices";
 import { FaArrowLeft } from "react-icons/fa";
 import { SpinLogo } from "../../utils/SpinLogo";
+import { useTempID } from "../../utils/TempIDContext";
+import { ContractFormSchema } from "../../services/ReportValidation";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
+
 
 export const ContractFormPDF = ({ contentRef }) => {
   const { contractForm } = ContractForm();
+  const { gmPosition } = useTempID();
   const { contractDetails } = UpdateContractData();
   const { contractForms, workInfoData, empPIData } = useContext(DataSupply);
   const location = useLocation();
@@ -20,16 +26,14 @@ export const ContractFormPDF = ({ contentRef }) => {
   const [showTitle, setShowTitle] = useState("");
   const [notification, setNotification] = useState(false);
 
-  // const [isEditing, setIsEditing] = useState(false);
-
-  // console.log(employeeData, "Hello");
-
   const [managerData, setManagerData] = useState({
     managerEmpID: "",
     managerOfficialMail: "",
-    hrEmail: "hr_no-reply@adininworks.com",
-    genManagerEamil: "",
+    managerName: "",
+    hrEmail: "Hr-notification@adininworks.com",
+    genManagerEmail: "",
   });
+
 
   const [formData, setFormData] = useState({
     contract: {
@@ -42,14 +46,6 @@ export const ContractFormPDF = ({ contentRef }) => {
       status: "",
     },
   });
-
-  // console.log(workInfoData, "WF DATA");
-
-  // const handleEditClick = () => {
-  //   setIsEditing(!isEditing);
-  // };
-
-  // console.log("Fetched contract form",contractForms);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -68,6 +64,7 @@ export const ContractFormPDF = ({ contentRef }) => {
     const userType = localStorage.getItem("userType");
     setUserType(userType);
   }, []);
+
 
   useEffect(() => {
     // Step 1: Extract managerEmpID from workInfoData based on employeeData.empID
@@ -90,30 +87,42 @@ export const ContractFormPDF = ({ contentRef }) => {
           if (managerInfo) {
             setManagerData((prevData) => ({
               ...prevData,
-              managerOfficialMail: managerInfo.officialEmail, // Assuming this field exists.
+              managerOfficialMail: managerInfo.officialEmail,
+              managerName: managerInfo.name,
             }));
           }
         }
+
+        // Step 6: Fetch General Manager's email (if applicable)
+        const generalManagerPositions = workInfoData.filter((item) =>
+          item.position[item.position.length - 1]?.includes("General Manager")
+        );
+
+        // console.log("Filtered General Manager Positions:", generalManagerPositions);
+
+        if (generalManagerPositions.length > 0) {
+          const gmInfo = empPIData.find(
+            (data) => data.empID === String(generalManagerPositions[0].empID)
+          );
+
+          // console.log("GM Info:", gmInfo);
+
+          if (gmInfo) {
+            setManagerData((prevData) => ({
+              ...prevData,
+              genManagerEmail: gmInfo.officialEmail,
+            }));
+            // console.log("Updated Email Data with GM Email:", gmInfo.officialEmail);
+          } else {
+            console.log("GM Info not found.");
+          }
+        } else {
+          console.log("No General Manager positions found.");
+        }
       }
     }
-  }, [workInfoData, employeeData?.empID, empPIData]); // Depend on all the relevant data sources
+  }, [workInfoData, employeeData?.empID, empPIData]);
 
-  // console.log("hello world ---- working");
-
-  // Filter workInfoData to find entries where position includes "GENERAL MANAGER"
-  const generalManagerPositions = workInfoData.filter((item) =>
-    item.position.includes("GENERAL MANAGER")
-  );
-
-  // Log the count of "GENERAL MANAGER" entries
-  // console.log("LIST",generalManagerPositions);
-
-  const employeeDataT = workInfoData.filter((item) => item.empID === "33333");
-
-  // Log the number of entries with empID === "12345"
-  // console.log(`Found ${employeeDataT.length} entries with empID "33333"`);
-
-  // Log the number of entries with empID === "12345"
 
   useEffect(() => {
     if (contractForms.length > 0) {
@@ -134,18 +143,18 @@ export const ContractFormPDF = ({ contentRef }) => {
     }
   }, [contractForms, employeeData?.empID]);
 
-  const subject = "Contract Form approved";
-  const message = "Dear Hari employee Arjun contract period is expired...";
+  const subject = "Contract Completion Form Review";
   const from = "hr_no-reply@adininworks.com";
-  const to = "hariharanofficial2812@gmail.com";
 
   const handleSubmit = async () => {
+
     const selectedData = contractForms.find(
       (data) => data.empID === employeeData?.empID
     );
+    
 
     const createFormattedData = {
-      empID: employeeData?.empID || "",
+      empID: employeeData.empID,
       conAttn: formData.contract.conAttn,
       depHead: formData.contract.depHead,
       hrManager: formData.contract.hrManager,
@@ -153,6 +162,27 @@ export const ContractFormPDF = ({ contentRef }) => {
       remarks: formData.contract.remarks,
       contStatus: true,
     };
+
+
+    const empPIRecord = empPIData.find(
+      (match) => match?.empID === selectedData?.empID
+    );
+
+    const WorkInfoRecord = workInfoData.find(
+      (match) => match?.empID === selectedData?.empID
+    );
+
+    console.log(WorkInfoRecord, empPIRecord);
+    
+
+    const probationEndFormatted =
+      Array.isArray(WorkInfoRecord?.probationEnd) &&
+      WorkInfoRecord?.probationEnd?.length > 0
+        ? WorkInfoRecord?.probationEnd[WorkInfoRecord?.probationEnd?.length - 1]
+            .split("-")
+            .reverse()
+            .join("/")
+        : "Not mentioned";
 
     try {
       if (selectedData) {
@@ -165,26 +195,125 @@ export const ContractFormPDF = ({ contentRef }) => {
           remarks: formData.contract.remarks,
           contStatus: true,
         };
+
+        
+        if (userType === "HR" && !formData.contract.hrManager) {
+          alert("HR Name is is required!");
+          return;
+        }
+
+        if (gmPosition === "General Manager" && !formData.contract.genManager) {
+          alert("GM Name is is required!");
+          return;
+        }
+
         await contractDetails({ ContractValue: formattedData });
-        console.log("Updated Data", formattedData);
+        // console.log("Updated Data", formattedData);
         setShowTitle("Contract Form Updated Successfully");
         setNotification(true);
 
         if (userType === "HR") {
           sendEmail(
             subject,
-            message,
+            `<html>
+            <body>
+               <p> 
+                 Your Employee Mr./Ms. ${
+                   empPIRecord?.name || "Not mentioned"
+                 }'s contract period ending on ${
+              probationEndFormatted || "Not Mentioned"
+            },
+               <br/>
+                  has been verified and checked by HR.
+               </p>
+              <p>Click here https://hr.adininworks.co" to view the updates.</p>
+           </body>
+         </html>`,
             from,
-            formData.contract.managerOfficialMail
+            managerData.genManagerEmail
+          );
+        } else if (userType === "Manager" && !gmPosition) {
+          sendEmail(
+            subject,
+            `<html>
+                        <body>
+                           <p> 
+                             Your Employee Mr./Ms. ${
+                               empPIRecord?.name || "Not mentioned"
+                             }'s contract period ending on ${
+              probationEndFormatted || "Not Mentioned"
+            },
+                           <br/>
+                               has been reviewed and added remarks by Manager, ${
+                                managerData?.managerName || "Not Mentioned"
+                              }.
+                           </p>
+                          <p>Click here https://hr.adininworks.co" to view the updates.</p>
+                       </body>
+                     </html>`,
+            from,
+            // "hariharanofficial2812@gmail.com"
+            managerData.hrEmail
+          );
+        } else if (gmPosition === "General Manager") {
+          sendEmail(
+            subject,
+            `<html>
+            <body>
+               <p> 
+                 Your Employee Mr./Ms. ${
+                   empPIRecord?.name || "Not mentioned"
+                 }'s contract period ending on ${
+              probationEndFormatted || "Not Mentioned"
+            },
+               <br/>
+                  been confirmed by the General manager,
+               </p>
+               <p>Please proceed with the necessary actions.</p>
+              <p>Click here https://hr.adininworks.co to view the updates.</p>
+           </body>
+         </html>`,
+            from,
+            managerData.hrEmail
+          );
+
+        }
+      } 
+      else {
+
+        if (userType === "Manager" && !gmPosition && !formData.contract.depHead) {
+          alert("Manager Name is is required!");
+          return;
+        }
+
+        await contractForm(createFormattedData);
+
+        if (userType === "Manager" && !gmPosition) {
+          sendEmail(
+            subject,
+            `<html>
+                        <body>
+                           <p> 
+                             Your Employee Mr./Ms. ${
+                               empPIRecord?.name || "Not mentioned"
+                             }'s contract period ending on ${
+              probationEndFormatted || "Not Mentioned"
+            },
+                           <br/>
+                              has been reviewed and added remarks by Manager, ${
+                                managerData?.managerName || "Not Mentioned"
+                              }.
+                           </p>
+                          <p>Click here https://hr.adininworks.co to view the contract completion  form.</p>
+                       </body>
+                     </html>`,
+            from,
+            // "hariharanofficial2812@gmail.com"
+            managerData.hrEmail
           );
         }
-      } else {
-        await contractForm(createFormattedData);
-        if (userType === "Manager") {
-          sendEmail(subject, message, from, to);
-        }
-        console.log("Create Data", createFormattedData);
-        setShowTitle("Contract Form Updated Successfully");
+        // console.log("Create Data", createFormattedData);
+        setShowTitle("Contract Form Created Successfully");
         setNotification(true);
       }
     } catch (err) {
@@ -245,6 +374,7 @@ export const ContractFormPDF = ({ contentRef }) => {
               <tr>
                 <th className="border border-black p-2">No.</th>
                 <th className="border border-black p-2">Employee Name</th>
+                <th className="border border-black p-2">Emp ID</th>
                 <th className="border border-black p-2">Badge No.</th>
                 <th className="border border-black p-2">Position</th>
                 <th className="border border-black p-2">Department</th>
@@ -256,6 +386,7 @@ export const ContractFormPDF = ({ contentRef }) => {
                 <th className="border border-black p-2">
                   Duration of Renewal Contract
                 </th>
+                
               </tr>
             </thead>
             <tbody>
@@ -264,6 +395,9 @@ export const ContractFormPDF = ({ contentRef }) => {
                   <td className="border border-black p-2">{i + 1}</td>
                   <td className="border border-black p-2">
                     {employeeData?.name}
+                  </td>
+                  <td className="border border-black p-2">
+                    {employeeData?.empID}
                   </td>
                   <td className="border border-black p-2">
                     {employeeData?.empBadgeNo}
@@ -278,7 +412,7 @@ export const ContractFormPDF = ({ contentRef }) => {
                     {employeeData?.nationality}
                   </td>
                   <td className="border border-black p-2">
-                    {employeeData?.doj}
+                    {employeeData?.dateOfJoin}
                   </td>
                   <td className="border border-black p-2">
                     {employeeData?.contractStartDate}
@@ -290,7 +424,7 @@ export const ContractFormPDF = ({ contentRef }) => {
                     {employeeData?.ldEx || "N/A"}
                   </td>
                   <td className="border border-black p-2">
-                    {employeeData?.balanceMonths}
+                    {employeeData?.balanceMonths || "N/A"}
                   </td>
                 </tr>
               ))}
@@ -365,7 +499,7 @@ export const ContractFormPDF = ({ contentRef }) => {
             onClick={() => {
               handleSubmit();
             }}
-            className="bg-grey text-white px-4 py-2 rounded"
+            className="primary_btn"
           >
             Save
           </button>

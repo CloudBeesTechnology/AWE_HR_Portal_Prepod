@@ -5,7 +5,7 @@ import { HoTBody } from "./tableBody/HoTBody";
 import { OffshoreTBody } from "./tableBody/OffshoreTBody";
 import { OrmcTBody } from "./tableBody/OrmcTBody";
 import { SbwTBody } from "./tableBody/SbwTBody";
-import { ExportTableToExcel } from "./customTimeSheet/DownloadTableToExcel";
+
 import "../../../src/index.css";
 import { useNavigate } from "react-router-dom";
 
@@ -14,24 +14,25 @@ import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
 import { useTempID } from "../../utils/TempIDContext";
 import { ViewTimeSheet } from "./ViewTimeSheet";
 import { Pagination } from "./timeSheetSearch/Pagination";
+import { EditTimeSheet } from "./EditTimeSheet";
+import { ViewTimesheetDetails } from "./customTimeSheet/ViewTimesheetDetails";
 
-export const VTimeSheetTable = (
-  {
-    // AllFieldData,
-    // categoryFilters,
-    // data,
-    // handleScroll,
-  }
-) => {
+export const VTimeSheetTable = () => {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   // const [tableData, setTableData] = useState(null);
   const [data, setData] = useState(null);
   const [secondaryData, setSecondaryData] = useState([]);
-
+  const [toggleForViewTS, setToggleForViewTS] = useState(false);
+  const [viewDetails, setViewDetails] = useState(null);
   // const [categoryFilters, setCategoryFilters] = useState(null);
+  const [editFormTitle, setEditFormTitle] = useState("Edit Form");
+
   const [currentPage, setCurrentPage] = useState(1);
-  const savedData = localStorage.getItem("timeSheetData");
+
+  const [fileType, setFileType] = useState("");
+  const AllfieldData = useTableFieldData(fileType);
+
   // console.log(savedData)
   const {
     showListTimeSheet,
@@ -45,9 +46,7 @@ export const VTimeSheetTable = (
     tableData,
   } = useTempID();
   const nav = useNavigate();
-  // console.log(typeof savedData === "object", Array.isArray(savedData));
-  // const [startDate, setStartDate] = useState("");
-  // const [endDate, setEndDate] = useState("");
+
   useLayoutEffect(() => {
     if (showListTimeSheet === true) {
       const currentPath = window.location.pathname;
@@ -63,7 +62,6 @@ export const VTimeSheetTable = (
   useEffect(() => {
     if (timeSheetFileData) {
       localStorage.setItem("timeSheetData", timeSheetFileData?.updatedAt);
-      // console.log(savedData?.updatedAt)
     }
   }, [timeSheetFileData]);
 
@@ -139,6 +137,25 @@ export const VTimeSheetTable = (
     }
   }, [data]);
 
+  const toggleFunction = () => {
+    setToggleForViewTS(!toggleForViewTS);
+  };
+
+  const assignObjectFun = async (obj, type) => {
+    if (obj) {
+      const result = await ViewTimesheetDetails(obj, type);
+      setFileType(type);
+      setViewDetails(result);
+    }
+  };
+
+  const editFormTitleFunc = (title) => {
+    if (title === "View Form") {
+      setEditFormTitle(title);
+    } else {
+      setEditFormTitle("Edit Form");
+    }
+  };
   return (
     <section className="h-screen bg-[#fafaf6] ">
       {/* <header className="flex justify-between"> */}
@@ -172,6 +189,8 @@ export const VTimeSheetTable = (
                 loading={loading}
                 setTableData={setTableData}
                 message={message}
+                assignObjectFun={assignObjectFun}
+                toggleFunction={toggleFunction}
               />
             )}
             {categoryFilters === "HO" && (
@@ -180,6 +199,8 @@ export const VTimeSheetTable = (
                 loading={loading}
                 setTableData={setTableData}
                 message={message}
+                assignObjectFun={assignObjectFun}
+                toggleFunction={toggleFunction}
               />
             )}
             {categoryFilters === "SBW" && (
@@ -188,6 +209,8 @@ export const VTimeSheetTable = (
                 loading={loading}
                 setTableData={setTableData}
                 message={message}
+                assignObjectFun={assignObjectFun}
+                toggleFunction={toggleFunction}
               />
             )}
             {categoryFilters === "ORMC" && (
@@ -196,6 +219,8 @@ export const VTimeSheetTable = (
                 loading={loading}
                 setTableData={setTableData}
                 message={message}
+                assignObjectFun={assignObjectFun}
+                toggleFunction={toggleFunction}
               />
             )}
             {categoryFilters === "Offshore" && (
@@ -204,6 +229,9 @@ export const VTimeSheetTable = (
                 loading={loading}
                 setTableData={setTableData}
                 message={message}
+                assignObjectFun={assignObjectFun}
+                toggleFunction={toggleFunction}
+                editFormTitleFunc={editFormTitleFunc}
               />
             )}
           </table>
@@ -220,6 +248,18 @@ export const VTimeSheetTable = (
           />
         )}
       </div>
+      {toggleForViewTS && viewDetails && (
+        <EditTimeSheet
+          fieldObj={AllfieldData?.fieldObj || {}}
+          fields={AllfieldData?.fields || []}
+          tableHeader={AllfieldData?.tableHeader || []}
+          toggleFunction={toggleFunction}
+          titleName={fileType}
+          Position="Manager"
+          editObject={viewDetails}
+          editFormTitle={editFormTitle}
+        />
+      )}
     </section>
   );
 };

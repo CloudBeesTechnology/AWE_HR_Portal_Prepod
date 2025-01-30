@@ -44,15 +44,15 @@ const Sidebar = () => {
         const filteredResults = result.filter((val) => {
           // console.log(val);
         
-          if (val.empID.toString().toLowerCase() === userID.toString() && val.selectType === userType) {
-            const empID = val.empID.toString().toLowerCase();
-            const isEqual = empID === userID.toString().toLowerCase();
+          if (val?.empID.toString().toLowerCase() === userID?.toString() && val?.selectType === userType) {
+            const empID = val?.empID.toString().toLowerCase();
+            const isEqual = empID === userID?.toString().toLowerCase();
             return isEqual;
           }
         });
         
         if (filteredResults.length > 0) {
-          const permissionsString = filteredResults[0].setPermissions[0];
+          const permissionsString = filteredResults[0]?.setPermissions[0];
           // console.log(permissionsString);
           
           const categories = extractMainCategories(permissionsString);

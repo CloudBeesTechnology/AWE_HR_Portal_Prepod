@@ -10,22 +10,23 @@ export const NewRecruit = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [tableHead, setTableHead] = useState([
+  const [tableHead] = useState([
     "Emp ID",
-    "Employee Badge",
+    "Badge No",
     "Name",
-    "Date of Joined",
-    "Gender",
     "Date of Birth",
+    "Gender",
+    "Date of Join",
     "Nationality",
-    "work Position",
+    "Position",
     "contactNo",
     "Brunei I/C No",
     "Passport No",
-    "Employee Pass Expiry",
+    "Pass Expiry",
     "Department",
     "Contract Start Date",
     "Contract End Date",
+    "IMMIGRATION REFERENCE NUMBER",
     "EDUCATION LEVEL",
     "Previous Company Name",
   ]);
@@ -59,39 +60,41 @@ export const NewRecruit = () => {
   const generateTableBodyFromMergedData = (data) => {
     return data
       .filter((item) => isDateInCurrentMonth(item.doj)) // Filter only current month dates
-      .map((item) => {
-        return {
-          empID: item.empID || "-",
-          empBadgeNo: item.empBadgeNo || "-",
-          name: item.name || "-",
-          dateOfJoin: formatDate(item.doj) || "-",
-          gender: item.gender || "-",
-          dateOfBirth: formatDate(item.dob) || "-",
-          nationality: item.nationality || "-",
-          position: item.position || "-",
-          contactNo: item.contactNo || "-",
-          bruneiIcNo: item.bwnIcNo || "-",
-          passportNo: item.ppNo || "-",
-          passporExpiry: Array.isArray(item.ppExpiry)
+      .map((item) => ({
+        empID: item.empID || "-",
+        empBadgeNo: item.empBadgeNo || "-",
+        name: item.name || "-",
+        dateOfBirth: formatDate(item.dob) || "-",
+        gender: item.gender || "-",
+        dateOfJoin: formatDate(item.doj) || "-",
+        nationality: item.nationality || "-",
+        position: item.position || "-",
+        contactNo: item.contactNo || "-",
+        bruneiIcNo: item.bwnIcNo || "-",
+        passportNo: item.ppNo || "-",
+        passporExpiry: Array.isArray(item.ppExpiry)
           ? formatDate(item.ppExpiry[item.ppExpiry.length - 1])
           : "-",
-          department: item.department || "-",
-          contractStart: Array.isArray(item.contractStart)
+        department: item.department || "-",
+        contractStart: Array.isArray(item.contractStart)
           ? formatDate(item.contractStart[item.contractStart.length - 1])
           : "-",
-          contractEnd: Array.isArray(item.contractEnd)
+        contractEnd: Array.isArray(item.contractEnd)
           ? formatDate(item.contractEnd[item.contractEnd.length - 1])
           : "-",
-          educLevel: item.educLevel || "-",
-          previousEmployee: item.preEmp || "-",
-        };
-      });
+          immigRefNo: item.immigRefNo || "-",
+        educLevel: item.educLevel || "-",
+        previousEmployee: item.preEmp || "-",
+        rawDateOfJoin: new Date(item.doj), // Raw date for sorting
+      }))
+      .sort((a, b) => a.rawDateOfJoin - b.rawDateOfJoin)
+      .map(({ rawDateOfJoin, ...rest }) => rest); // Remove rawDateOfJoin after sorting
   };
-
+  
   useEffect(() => {
     setTableBody(generateTableBodyFromMergedData(allData));
   }, [allData]);
-
+  
   const handleDate = (e, type) => {
     const value = e.target.value;
     if (type === "startDate") setStartDate(value);
@@ -115,31 +118,36 @@ export const NewRecruit = () => {
       .map((item) => ({
         empID: item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
-          name: item.name || "-",
-          dateOfJoin: formatDate(item.doj) || "-",
-          gender: item.gender || "-",
-          dateOfBirth: formatDate(item.dob) || "-",
-          nationality: item.nationality || "-",
-          position: item.position || "-",
-          contactNo: item.contactNo || "-",
-          bruneiIcNo: item.bwnIcNo || "-",
-          passportNo: item.ppNo || "-",
-          passporExpiry: Array.isArray(item.ppExpiry)
+        name: item.name || "-",
+        dateOfBirth: formatDate(item.dob) || "-",
+        gender: item.gender || "-",
+        dateOfJoin: formatDate(item.doj) || "-",
+        nationality: item.nationality || "-",
+        position: item.position || "-",
+        contactNo: item.contactNo || "-",
+        bruneiIcNo: item.bwnIcNo || "-",
+        passportNo: item.ppNo || "-",
+        passporExpiry: Array.isArray(item.ppExpiry)
           ? formatDate(item.ppExpiry[item.ppExpiry.length - 1])
           : "-",
-          department: item.department || "-",
-          contractStart: Array.isArray(item.contractStart)
+        department: item.department || "-",
+        contractStart: Array.isArray(item.contractStart)
           ? formatDate(item.contractStart[item.contractStart.length - 1])
           : "-",
-          contractEnd: Array.isArray(item.contractEnd)
+        contractEnd: Array.isArray(item.contractEnd)
           ? formatDate(item.contractEnd[item.contractEnd.length - 1])
           : "-",
-          educLevel: item.educLevel || "-",
-          previousEmployee: item.preEmp || "-",
-      }));
+          immigRefNo: item.immigRefNo || "-",
+        educLevel: item.educLevel || "-",
+        previousEmployee: item.preEmp || "-",
+        rawDateOfJoin: new Date(item.doj), // Raw date for sorting
+      }))
+      .sort((a, b) => a.rawDateOfJoin - b.rawDateOfJoin) // Sort by rawDateOfJoin in ascending order
+      .map(({ rawDateOfJoin, ...rest }) => rest); // Remove rawDateOfJoin after sorting
   
     setFilteredData(filtered);
   };
+  
    return (
      <div>
        <FilterTable

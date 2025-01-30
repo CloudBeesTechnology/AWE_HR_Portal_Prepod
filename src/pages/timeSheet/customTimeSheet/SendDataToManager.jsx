@@ -76,13 +76,7 @@ export const SendDataToManager = async (filterPending) => {
     // Filter pending items based on manager assignments
     const finalOutput = filterPending?.filter((pendingItem) => {
       return getOneObject.some((manager) => {
-        // const lastDepartment =
-        //   manager.department[manager.department.length - 1]; // Get the latest department
-
-        return (
-          pendingItem.assignTo === manager.empBadgeNo
-          // pendingItem.mdepartment === lastDepartment
-        );
+        return pendingItem.assignTo === manager.empBadgeNo;
       });
     });
 
@@ -93,6 +87,6 @@ export const SendDataToManager = async (filterPending) => {
 
     return filteredOutput;
   } catch (err) {
-    console.log("ERROR : ", err);
+    // console.log("ERROR : ", err);
   }
 };

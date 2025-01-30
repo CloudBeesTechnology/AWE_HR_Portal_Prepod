@@ -1,9 +1,11 @@
 import { SelectTiles } from "../../utils/SelectTiles";
-import icons3 from "../../assets/timeSheet/icons3.svg";
-import icons5 from "../../assets/timeSheet/icons5.svg";
-import icons8 from "../../assets/timeSheet/icons8.svg";
-import icons10 from "../../assets/timeSheet/icons10.svg";
-import icons11 from "../../assets/timeSheet/icons11.svg";
+import icon1 from "../../assets/timeSheet/icon1.svg";
+import icon2 from "../../assets/timeSheet/icon2.svg";
+import icon3 from "../../assets/timeSheet/icon3.svg";
+import icon4 from "../../assets/timeSheet/icon4.svg";
+import icon5 from "../../assets/timeSheet/icon5.svg";
+import icon6 from "../../assets/timeSheet/icon6.svg";
+import icon7 from "../../assets/timeSheet/icon7.svg";
 import usePermission from "../../hooks/usePermissionDashInside";
 
 export const TimeSheet = () => {
@@ -21,16 +23,16 @@ export const TimeSheet = () => {
           {/* ONSHORE */}
           {timeSheetPermissions.includes("HO") && (
             <SelectTiles
-              img={icons5}
+              img={icon5}
               text1="HO"
-              borderColor="border-[#B70B36]"
+              borderColor="border-[#4E00BC]"
               bgColor="bg-white"
               link="/timesheetHO"
             />
           )}
           {timeSheetPermissions.includes("SBW") && (
             <SelectTiles
-              img={icons5}
+              img={icon1}
               text1="SBW"
               borderColor="border-[#B70B36]"
               bgColor="bg-white"
@@ -40,9 +42,9 @@ export const TimeSheet = () => {
 
           {timeSheetPermissions.includes("ORMC") && (
             <SelectTiles
-              img={icons5}
+              img={icon7}
               text1="ORMC"
-              borderColor="border-[#B70B36]"
+              borderColor="border-[#06830E]"
               bgColor="bg-white"
               link="/timesheetORMC"
             />
@@ -51,9 +53,9 @@ export const TimeSheet = () => {
 
           {timeSheetPermissions.includes("Offshore") && (
             <SelectTiles
-              img={icons3}
+              img={icon3}
               text1="Offshore"
-              borderColor="border-[#EB9916]"
+              borderColor="border-[#B70BA0]"
               bgColor="bg-white"
               link="/timesheetOffshore"
             />
@@ -64,9 +66,9 @@ export const TimeSheet = () => {
           {/* BLNG */}
           {timeSheetPermissions.includes("BLNG") && (
             <SelectTiles
-              img={icons10}
+              img={icon2}
               text1="BLNG"
-              borderColor="border-[#4E00BC]"
+              borderColor="border-[#EB9916]"
               bgColor="bg-white"
               link="/timesheetBlng"
             />
@@ -74,10 +76,10 @@ export const TimeSheet = () => {
           {/* VIEW TIME SHEET */}
           {timeSheetPermissions.includes("View Time Sheet") && (
             <SelectTiles
-              img={icons11}
+              img={icon4}
               text1="View Time"
               text2="sheet"
-              borderColor="border-[#4E00BC]"
+              borderColor="border-[#D0D716]"
               bgColor="bg-white"
               link="/viewTimesheet"
             />
@@ -86,7 +88,7 @@ export const TimeSheet = () => {
 
           {timeSheetPermissions.includes("View Summary") && (
             <SelectTiles
-              img={icons8}
+              img={icon6}
               text1="View"
               text2="Summary"
               borderColor="border-[#107B8E]"

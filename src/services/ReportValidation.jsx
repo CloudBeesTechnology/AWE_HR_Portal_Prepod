@@ -13,6 +13,7 @@ export const probationFormSchema = Yup.object({
   // extendProbED: Yup.string().notRequired(),
   // gmApproved: Yup.string().notRequired(),
   // gmDate: Yup.string().notRequired(),
+  // gmName: Yup.string().notRequired(),
   // hrDate: Yup.string().notRequired(),
   // hrName: Yup.string().notRequired(),
   // initiative: Yup.string().notRequired(),
@@ -27,4 +28,9 @@ export const probationFormSchema = Yup.object({
   // // supervisorDate: Yup.string().notRequired(),
   // supervisorName: Yup.string().notRequired(),
   // teamwork: Yup.string().notRequired(),
+});
+export const ContractFormSchema = Yup.object({
+  empID: Yup.string().required("UserID is mandatory"),
+  adaptability: Yup.string().notRequired(),
+
 });

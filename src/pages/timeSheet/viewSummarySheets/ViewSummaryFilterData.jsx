@@ -4,23 +4,23 @@ import { useTempID } from "../../../utils/TempIDContext";
 import { FaAngleDown } from "react-icons/fa";
 import { SearchDisplayForTimeSheet } from "../timeSheetSearch/SearchDisplayForTS";
 import { SearchBoxForTimeSheet } from "../../../utils/SearchBoxForTimeSheet";
+import { FiSearch } from "react-icons/fi";
 
 export const ViewSummaryFilterData = ({
   LocationData,
   secondaryData,
   data,
   searchResult,
-//   setEmptyTableMess
-resetTableFunc,
+  //   setEmptyTableMess
+  resetTableFunc,
 }) => {
   const { setStartDate, setEndDate, setSelectedLocation } = useTempID();
   const selectLocationFunc = async (data) => {
-    resetTableFunc()
+    resetTableFunc();
     if (data.location) {
       setSelectedLocation(data.location);
     }
   };
-
 
   return (
     <div className="flex  justify-between items-center w-full mb-5">
@@ -51,7 +51,9 @@ resetTableFunc,
             searchResult={selectLocationFunc}
             placeholder="Search Location"
             rounded="rounded"
-            searchIcon2={<FaAngleDown />}
+            searchIcon2={<FiSearch />}
+            identify="viewSummary"
+            setSelectedLocation={setSelectedLocation}
           />
         </div>
 

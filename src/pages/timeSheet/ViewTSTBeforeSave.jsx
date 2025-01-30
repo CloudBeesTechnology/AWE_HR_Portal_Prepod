@@ -7,11 +7,6 @@ import React, {
 } from "react";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
 
-// import {
-//   createOffshoreSheet,
-//   deleteOffshoreSheet,
-//   updateOffshoreSheet,
-// } from "../../graphql/mutations";
 import { generateClient } from "@aws-amplify/api";
 import { PopupForMissMatchExcelSheet } from "./ModelForSuccessMess/PopupForMissMatchExcelSheet";
 import { useTableFieldData } from "./customTimeSheet/UseTableFieldData";
@@ -39,6 +34,8 @@ import { Pagination } from "./timeSheetSearch/Pagination";
 import { AutoFetchForAssignManager } from "./customTimeSheet/AutoFetchForAssignManager";
 
 import { TimeSheetsCRUDoperations } from "./customTimeSheet/TimeSheetsCRUDoperations";
+import { deleteTimeSheet } from "../../graphql/mutations";
+import { useRowSelection } from "./customTimeSheet/useRowSelection";
 
 const client = generateClient();
 
@@ -46,14 +43,18 @@ export const ViewTSTBeforeSave = ({
   excelData,
   returnedTHeader,
   Position,
-  convertedStringToArrayObj,
+  // convertedStringToArrayObj,
   titleName,
   setExcelData,
   fileName,
   showRejectedItemTable,
+  allItems,
+  submittedData,
+  wholeData,
+  ManagerData,
 }) => {
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
-  // console.log(convertedStringToArrayObj);
+
   // State to trigger re-render for Notification component
   const [closePopup, setClosePopup] = useState(false);
   const [data, setData] = useState(null);
@@ -66,16 +67,15 @@ export const ViewTSTBeforeSave = ({
   const [successMess, setSuccessMess] = useState(null);
   const [toggleAssignManager, setToggleAssignManager] = useState(false);
   const [toggleForRemark, setToggleForRemark] = useState(null);
-  const [response, setResponse] = useState(null);
+
   const [showStatusCol, setShowStatusCol] = useState(null);
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
+  const [rejectTab, setRejectTab] = useState(false);
 
   const [allApprovedData, setAllApprovedData] = useState([]);
   const [allRejectedData, setAllRejectedData] = useState([]);
   const [passSelectedData, setPassSelectedData] = useState(null);
-
-  const [emailInfo, setEmailInfo] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -85,118 +85,127 @@ export const ViewTSTBeforeSave = ({
   const [storingMess, setStoringMess] = useState(null);
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedItemsTwo, setCheckedItemsTwo] = useState({});
+  const [editFormTitle, setEditFormTitle] = useState("");
 
   const { startDate, endDate, searchQuery, setSearchQuery } = useTempID();
+  const { selectedRows, setSelectedRows, handleCheckboxChange, handleSubmit } =
+    useRowSelection();
 
   useEffect(() => {
     try {
-      if (excelData) {
-        const fetchData = async () => {
-          // setLoading is removed
-          try {
-            const dataPromise = new Promise((resolve, reject) => {
-              if (excelData) {
-                resolve(excelData);
-              } else {
-                setTimeout(() => {
-                  reject("No data found after waiting.");
-                }, 5000);
-              }
-            });
-
-            const fetchedData = await dataPromise;
-            // console.log(fetchedData);
-            async function fetchAllData(queryName) {
-              let allData = [];
-              let nextToken = null;
-
-              do {
-                const response = await client.graphql({
-                  query: queryName,
-                  variables: { nextToken },
-                });
-
-                const items =
-                  response.data[Object.keys(response.data)[0]].items; // Extract items
-                allData = [...allData, ...items]; // Append fetched items
-                nextToken =
-                  response.data[Object.keys(response.data)[0]].nextToken; // Get nextToken
-              } while (nextToken); // Continue if there's more data
-
-              return allData;
+      // if (excelData) {
+      const fetchData = async () => {
+        // setLoading is removed
+        try {
+          const dataPromise = new Promise((resolve, reject) => {
+            if (excelData) {
+              resolve(excelData);
+            } else {
+              setTimeout(() => {
+                reject("No data found after waiting.");
+              }, 2000);
             }
+          });
 
-            const fetchWorkInfo = async () => {
-              try {
-                // Fetch all data with pagination
-                const [employeeInfo, empWorkInfos] = await Promise.all([
-                  fetchAllData(listEmpPersonalInfos),
-                  fetchAllData(listEmpWorkInfos),
-                ]);
+          const fetchedData = await dataPromise;
 
-                const empInfo = employeeInfo; // All employee personal info
-                const workInfo = empWorkInfos; // All employee work info
+          async function fetchAllData(queryName) {
+            let allData = [];
+            let nextToken = null;
 
-                // Remove sapNo from work info
-                const sapNoRemoved = workInfo.map(({ sapNo, ...rest }) => rest);
+            do {
+              const response = await client.graphql({
+                query: queryName,
+                variables: { nextToken },
+              });
 
-                const mergedDatas = empInfo
-                  .map((empInf) => {
-                    const interviewDetails = sapNoRemoved.find(
-                      (item) => item?.empID === empInf?.empID
-                    );
+              const items = response.data[Object.keys(response.data)[0]].items; // Extract items
+              allData = [...allData, ...items]; // Append fetched items
+              nextToken =
+                response.data[Object.keys(response.data)[0]].nextToken; // Get nextToken
+            } while (nextToken); // Continue if there's more data
 
-                    // Return null if all details are undefined
-                    if (!interviewDetails) {
-                      return null;
-                    }
+            return allData;
+          }
 
-                    return {
-                      ...empInf,
-                      ...interviewDetails,
-                    };
-                  })
-                  .filter((item) => item !== null);
+          const fetchWorkInfo = async () => {
+            try {
+              // Fetch all data with pagination
+              const [employeeInfo, empWorkInfos] = await Promise.all([
+                fetchAllData(listEmpPersonalInfos),
+                fetchAllData(listEmpWorkInfos),
+              ]);
 
-                // console.log(mergedDatas);
+              const empInfo = employeeInfo; // All employee personal info
+              const workInfo = empWorkInfos; // All employee work info
 
-                // Merge fetchedData with workInfo based on FID
-                const mergedData = fetchedData.map((item) => {
-                  const workInfoItem = mergedDatas.find(
-                    (info) => info?.sapNo == item?.NO
+              // Remove sapNo from work info
+              const sapNoRemoved = workInfo.map(({ sapNo, ...rest }) => rest);
+
+              const mergedDatas = empInfo
+                .map((empInf) => {
+                  const interviewDetails = sapNoRemoved.find(
+                    (item) => item?.empID === empInf?.empID
                   );
 
-                  // console.log(workInfoItem);
+                  // Return null if all details are undefined
+                  if (!interviewDetails) {
+                    return null;
+                  }
+
                   return {
-                    ...item,
-                    NORMALWORKINGHRSPERDAY: workInfoItem
-                      ? workInfoItem?.workHrs[workInfoItem?.workHrs.length - 1]
-                      : null,
+                    ...empInf,
+                    ...interviewDetails,
                   };
-                });
+                })
+                .filter((item) => item !== null);
 
-                // console.log(mergedData);
+              // Merge fetchedData with workInfo based on FID
+              const mergedData = fetchedData.map((item) => {
+                const workInfoItem = mergedDatas.find(
+                  (info) => info?.sapNo == item?.NO
+                );
 
-                // Set merged data in state
-                setData(mergedData);
-                setSecondaryData(mergedData);
-              } catch (error) {
-                console.error("Error fetching work info:", error.message);
-              }
-            };
+                return {
+                  ...item,
+                  NORMALWORKINGHRSPERDAY: workInfoItem
+                    ? workInfoItem?.workHrs[workInfoItem?.workHrs.length - 1]
+                    : null,
+                };
+              });
 
-            fetchWorkInfo();
-          } catch (err) {
-          } finally {
-            // setLoading is removed ;
-          }
-        };
-        fetchData();
-      }
+              // Set merged data in state
+              setData(mergedData);
+              setSecondaryData(mergedData);
+            } catch (error) {
+              // console.error("Error fetching work info:", error.message);
+            }
+          };
+
+          fetchWorkInfo();
+        } catch (err) {
+        } finally {
+          // setLoading is removed ;
+        }
+      };
+
+      fetchData();
+      // }
     } catch (err) {
-      console.log("Error : ", err);
+      // console.log("Error : ", err);
     }
   }, [excelData]);
+
+  useEffect(() => {
+    if (submittedData && submittedData.length > 0) {
+      setShowStatusCol(true);
+      setCurrentStatus(true);
+
+      setData(submittedData);
+      setSecondaryData(submittedData);
+    }
+  }, [submittedData]);
+
   useEffect(() => {
     const getPosition = localStorage.getItem("userType");
     if (getPosition === "Manager") {
@@ -219,7 +228,7 @@ export const ViewTSTBeforeSave = ({
             );
           }
         } catch (error) {
-          console.error("Error parsing empWorkInfo for ID:", val.id, error);
+          // console.error("Error parsing empWorkInfo for ID:", val.id, error);
         }
 
         return {
@@ -255,7 +264,7 @@ export const ViewTSTBeforeSave = ({
       // setData(result);
       setSearchQuery(result);
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      // console.error("Error fetching user data:", error);
     }
   };
 
@@ -267,6 +276,7 @@ export const ViewTSTBeforeSave = ({
     // Removes all non-alphanumeric characters
   };
   useEffect(() => {
+    // if (!allItems) {
     const checkKeys = async () => {
       const cleanData =
         returnedTHeader &&
@@ -297,7 +307,7 @@ export const ViewTSTBeforeSave = ({
         resolve(keyCheckResult);
       });
       setClosePopup(true);
-      // console.log(result);
+
       setShowStatusCol(result);
       setCurrentStatus(result); // Assuming setCurrentStatus is defined
       setLoading(false);
@@ -311,8 +321,8 @@ export const ViewTSTBeforeSave = ({
         // setLoading(true);
         try {
           const dataPromise = new Promise((resolve, reject) => {
-            if (convertedStringToArrayObj) {
-              resolve(convertedStringToArrayObj);
+            if (ManagerData && ManagerData.length > 0) {
+              resolve(ManagerData);
             } else {
               setTimeout(() => {
                 reject("No data found after waiting.");
@@ -325,7 +335,7 @@ export const ViewTSTBeforeSave = ({
           if (userIdentification === "Manager") {
             const finalData = await SendDataToManager(fetchedData);
 
-            pendingData(finalData);
+            pendingData(fetchedData);
           }
         } catch (err) {
         } finally {
@@ -338,11 +348,12 @@ export const ViewTSTBeforeSave = ({
     } else if (!returnedTHeader && showRejectedItemTable === "Rejected") {
       const fetchData = async () => {
         setCurrentStatus(true);
+        setRejectTab(true);
         // setLoading(true);
         try {
           const dataPromise = new Promise((resolve, reject) => {
-            if (convertedStringToArrayObj) {
-              resolve(convertedStringToArrayObj);
+            if (wholeData && wholeData.length > 0) {
+              resolve(wholeData);
             } else {
               setTimeout(() => {
                 reject("No data found after waiting.");
@@ -354,7 +365,8 @@ export const ViewTSTBeforeSave = ({
 
           if (userIdentification !== "Manager") {
             const finalData = await FindSpecificTimeKeeper(fetchedData);
-            pendingData(finalData);
+
+            pendingData(fetchedData);
           }
         } catch (err) {
         } finally {
@@ -368,12 +380,8 @@ export const ViewTSTBeforeSave = ({
       setCurrentStatus(false);
       setLoading(false);
     }
-  }, [
-    returnedTHeader,
-    convertedStringToArrayObj,
-    userIdentification,
-    showRejectedItemTable,
-  ]);
+    // }
+  }, [returnedTHeader, ManagerData, userIdentification, showRejectedItemTable]);
 
   const editBLNG = (data) => {
     setEditObject(data);
@@ -385,20 +393,18 @@ export const ViewTSTBeforeSave = ({
 
   const toggleSFAMessage = useCallback(async (value, responseData) => {
     setSuccessMess(value);
-    if (value === true && responseData) {
-      setResponse(responseData);
-    } else {
-      setResponse(null);
-    }
   }, []);
-  // const toggleSFAMessage = async (value, responseData) => {
-
-  // };
 
   const toggleFunctionForAssiMana = () => {
     setToggleAssignManager(!toggleAssignManager);
   };
-
+  const editFormTitleFunc = () => {
+    if (Position === "Manager") {
+      setEditFormTitle("View Form");
+    } else {
+      setEditFormTitle("Edit Form");
+    }
+  };
   const editNestedData = (data, getObject) => {
     return data.map((m) => ({
       id: m.id,
@@ -417,7 +423,7 @@ export const ViewTSTBeforeSave = ({
       data &&
       data.length > 0 &&
       data.map((val) => {
-        if (val.NO === object.NO) {
+        if (val.id === object.id) {
           return { ...val, REMARKS: object.REMARKS };
         } else {
           return val;
@@ -442,9 +448,8 @@ export const ViewTSTBeforeSave = ({
       const result = Array.isArray(data[0]?.data)
         ? editNestedData(data, getObject)
         : editFlatData(data, getObject);
-      // console.log(result);
+
       const updatedData = result?.map((item) => {
-        // console.log(item);
         // Check if jobLocaWhrs is a non-null, non-empty array and assign LOCATION if valid
         if (Array.isArray(item?.jobLocaWhrs) && item?.jobLocaWhrs?.length > 0) {
           item.LOCATIONATTOP = item?.jobLocaWhrs[0]?.LOCATION;
@@ -456,22 +461,48 @@ export const ViewTSTBeforeSave = ({
 
       setData(updatedData);
     } catch (err) {
-      console.log(err);
+      // console.log(err);
+    }
+  };
+  const handleAssignManager = () => {
+    const remainingData = data?.filter(
+      (row) => !selectedRows.some((selected) => selected.id === row.id)
+    );
+    setData(remainingData);
+    setSecondaryData(remainingData);
+    setSelectedRows([]);
+    if (remainingData && remainingData.length === 0) {
+      window.location.reload();
     }
   };
 
+  const handleManagerReload = () => {
+    let mergedData = [...allApprovedData, ...allRejectedData];
+    const remainingData = data?.filter(
+      (row) => !mergedData.some((selected) => selected.id === row.id)
+    );
+    setData(remainingData);
+    setSecondaryData(remainingData);
+
+    if (remainingData && remainingData.length === 0) {
+      window.location.reload();
+    }
+  };
   const AllFieldData = useTableFieldData(titleName);
 
   const renameKeysFunctionAndSubmit = async (managerData) => {
     if (
       userIdentification !== "Manager" &&
-      showRejectedItemTable !== "Rejected"
+      showRejectedItemTable !== "Rejected" &&
+      selectedRows &&
+      selectedRows.length > 0
     ) {
       const result =
-        data &&
-        data.map((val) => {
+        selectedRows &&
+        selectedRows.length > 0 &&
+        selectedRows.map((val) => {
           return {
-            fileName: fileName,
+            id: val.id,
             empName: val.NAME || "",
             fidNo: val.NO || "",
             companyName: val.LOCATIONATTOP || "",
@@ -502,18 +533,19 @@ export const ViewTSTBeforeSave = ({
         };
       });
 
-      let action = "create";
+      let action = "updateStoredData";
       await TimeSheetsCRUDoperations({
+        setNotification,
+        setShowTitle,
         finalResult,
         toggleSFAMessage,
         setStoringMess,
-        setData,
         Position,
         action,
+        handleAssignManager,
+        selectedRows,
       });
     } else if (userIdentification === "Manager") {
-      setNotification(false);
-
       const MergedData = [...allApprovedData, ...allRejectedData];
 
       const uniqueArray = MergedData?.filter(
@@ -559,14 +591,17 @@ export const ViewTSTBeforeSave = ({
         setNotification,
         setAllApprovedData,
         setAllRejectedData,
+        handleManagerReload
       });
     } else if (
       userIdentification !== "Manager" &&
-      showRejectedItemTable === "Rejected"
+      showRejectedItemTable === "Rejected" &&
+      selectedRows &&
+      selectedRows.length > 0
     ) {
       const updatedRejectedItems =
-        data && data.length > 0
-          ? data.map((val) => {
+        selectedRows && selectedRows.length > 0
+          ? selectedRows.map((val) => {
               return {
                 id: val.id,
                 // fileName: val.fileName,
@@ -591,20 +626,60 @@ export const ViewTSTBeforeSave = ({
           : [];
 
       let finalResult = updatedRejectedItems;
+
       let action = "ResubmitRejectedItems";
+
       await TimeSheetsCRUDoperations({
+        setNotification,
+        setShowTitle,
         finalResult,
         toggleSFAMessage,
         setStoringMess,
-        setData,
         Position,
         action,
-        setShowTitle,
-        setNotification,
-        setAllApprovedData,
-        setAllRejectedData,
+        handleAssignManager,
+        selectedRows,
       });
     }
+  };
+  const storeInitialData = async () => {
+    const result =
+      data &&
+      data.length > 0 &&
+      data.map((val) => {
+        return {
+          fileName: fileName,
+          empName: val.NAME || "",
+          fidNo: val.NO || "",
+          companyName: val.LOCATIONATTOP || "",
+          location: val.LOCATION || "",
+          trade: val.TRADE || "",
+          date: val.DATE || "",
+          totalNT: val.TOTALHOURS || "",
+          totalOT: val.TOTALHOURS2 || "",
+          totalNTOT: val.TOTALHOURS3 || "",
+          normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+          actualWorkHrs: val.WORKINGHOURS || "",
+          otTime: val.OT || "",
+          remarks: val.REMARKS || "",
+          empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+          assignBy: uploaderID,
+          fileType: "Offshore",
+          status: "All",
+        };
+      });
+
+    let action = "create";
+    let finalResult = result;
+
+    await TimeSheetsCRUDoperations({
+      finalResult,
+      toggleSFAMessage,
+      setStoringMess,
+      setData,
+      Position,
+      action,
+    });
   };
 
   const toggleForRemarkFunc = () => {
@@ -612,36 +687,29 @@ export const ViewTSTBeforeSave = ({
   };
 
   const storeOnlySelectedItem = (data, action) => {
-    // console.log(action);
     if (action === "Approved") {
-      // console.log(data);
       setAllApprovedData((prevApprovedData) => {
-        // Replace old data if ID matches, otherwise keep existing data
         const updatedData = prevApprovedData.filter(
           (item) => item.id !== data.id
         );
         const updateStatus = { ...data, status: "Approved" };
 
-        return [...updatedData, updateStatus]; // Add the new data
+        return [...updatedData, updateStatus];
       });
     } else if (action === "Rejected") {
       setPassSelectedData(data);
-      // console.log(data);
       setAllRejectedData((prevRejectedData) => {
-        // Replace old data if ID matches, otherwise keep existing data
         const updatedData = prevRejectedData.filter(
           (item) => item.id !== data.id
         );
-        return [...updatedData, data]; // Add the new data
+        return [...updatedData, data];
       });
-      // Update the selected data
     }
   };
+
   const addRemarks = (data) => {
-    // console.log(data);
     const dataAlongWithRemark = allRejectedData.map((m) => {
       if (m.id === data.id) {
-        // console.log(data);
         return { ...data, REMARKS: data.REMARKS };
       } else {
         return m;
@@ -650,7 +718,7 @@ export const ViewTSTBeforeSave = ({
 
     setAllRejectedData(dataAlongWithRemark);
   };
-  // console.log(allApprovedData, " : ", allRejectedData);
+
   const removeExistingData = (data, action) => {
     if (action === "Approved") {
       const afterRemoved = allApprovedData.filter((fil) => fil.id !== data.id);
@@ -662,23 +730,16 @@ export const ViewTSTBeforeSave = ({
   };
 
   const removeCheckedItem = useCallback(() => {
-    // Combine approved and rejected data
     const mergedData = [...allApprovedData, ...allRejectedData];
 
-    // console.log(mergedData);
-    // Filter out items that have matching sapNo in mergedData
     const afterRemoved = data?.filter(
       (val) => !mergedData.some((fil) => val.id === fil.id)
     );
-
-    // console.log(afterRemoved);
-    // Update the state with the filtered data
+    // console.log(allApprovedData, " : ", allRejectedData);
     setData(afterRemoved);
     setAllApprovedData([]);
     setAllRejectedData([]);
   }, [allApprovedData, allRejectedData, data]);
-
-  // console.log(allApprovedData, " : ", allRejectedData);
 
   const convertToISODate = (dateString) => {
     try {
@@ -697,12 +758,12 @@ export const ViewTSTBeforeSave = ({
         filteredData = searchQuery;
       }
       if (startDate && endDate) {
-        const start = new Date(startDate); // Start date as "MM/DD/YYYY"
-        const end = new Date(endDate); // End date as "MM/DD/YYYY"
+        const start = new Date(startDate);
+        const end = new Date(endDate);
 
         // Filter the data array
         filteredData = filteredData.filter((item) => {
-          const itemDate = new Date(item.DATE); // Convert item.DATE to a Date object
+          const itemDate = new Date(item.DATE);
 
           itemDate?.setHours(0, 0, 0, 0);
           start?.setHours(0, 0, 0, 0);
@@ -710,11 +771,7 @@ export const ViewTSTBeforeSave = ({
           return itemDate >= start && itemDate <= end;
         });
       }
-      // Example usage
-      // const startDate = "12/23/2024"; // Start date in "MM/DD/YYYY"
-      // const endDate = "12/25/2024"; // End date in "MM/DD/YYYY"
 
-      // console.log(filteredData);
       setData(filteredData);
     }
   }, [startDate, endDate, secondaryData, searchQuery]);
@@ -798,6 +855,12 @@ export const ViewTSTBeforeSave = ({
                       </td>
                     </>
                   )}
+                  {(submittedData && submittedData.length > 0) ||
+                  (rejectTab && rejectTab) ? (
+                    <td>Edited</td>
+                  ) : (
+                    ""
+                  )}
                 </tr>
               </thead>
 
@@ -811,10 +874,18 @@ export const ViewTSTBeforeSave = ({
                         return (
                           <tr
                             key={index + 1}
-                            className="text-dark_grey h-[50px] text-sm rounded-sm shadow-md border-b-2 border-[#CECECE] bg-white hover:bg-[#f1f5f9] cursor-pointer"
+                            className={`text-dark_grey h-[50px] text-sm rounded-sm shadow-md border-b-2 border-[#CECECE] bg-white hover:bg-[#f1f5f9] ${
+                              excelData && excelData.length > 0
+                                ? ""
+                                : "cursor-pointer"
+                            }`}
                             onClick={() => {
-                              toggleFunction();
-                              editBLNG(m);
+                              if (excelData && excelData.length > 0) {
+                              } else {
+                                toggleFunction();
+                                editBLNG(m);
+                                editFormTitleFunc();
+                              }
                             }}
                           >
                             <td className="text-center px-4 flex-1">
@@ -873,21 +944,24 @@ export const ViewTSTBeforeSave = ({
                                     checked={checkedItems[m.id] || false}
                                     onClick={(e) => e.stopPropagation()}
                                     onChange={(e) => {
-                                      // console.log(m);
-
                                       if (e.target.checked) {
                                         setCheckedItems((prev) => ({
                                           ...prev,
-                                          [m.id]: e.target.checked, // Toggle the checked state for this specific ID
+                                          [m.id]: e.target.checked,
+                                        }));
+                                        // Uncheck the Rejected checkbox
+                                        setCheckedItemsTwo((prev) => ({
+                                          ...prev,
+                                          [m.id]: false,
                                         }));
                                         storeOnlySelectedItem(m, "Approved");
-                                        setAllRejectedData([]);
+                                        removeExistingData(m, "Rejected");
                                       } else {
-                                        removeExistingData(m, "Approved");
                                         setCheckedItems((prev) => ({
                                           ...prev,
-                                          [m.id]: false, // Toggle the checked state for this specific ID
+                                          [m.id]: false,
                                         }));
+                                        removeExistingData(m, "Approved");
                                       }
                                     }}
                                   />
@@ -902,23 +976,45 @@ export const ViewTSTBeforeSave = ({
                                       if (e.target.checked) {
                                         setCheckedItemsTwo((prev) => ({
                                           ...prev,
-                                          [m.id]: e.target.checked, // Toggle the checked state for this specific ID
+                                          [m.id]: e.target.checked,
+                                        }));
+                                        // Uncheck the Approved checkbox
+                                        setCheckedItems((prev) => ({
+                                          ...prev,
+                                          [m.id]: false,
                                         }));
                                         storeOnlySelectedItem(m, "Rejected");
                                         toggleForRemarkFunc();
-                                        setAllApprovedData([]);
+                                        removeExistingData(m, "Approved");
                                       } else {
-                                        removeExistingData(m, "Rejected");
-                                        // setCheckedItemsTwo({});
                                         setCheckedItemsTwo((prev) => ({
                                           ...prev,
-                                          [m.id]: false, // Toggle the checked state for this specific ID
+                                          [m.id]: false,
                                         }));
+                                        removeExistingData(m, "Rejected");
                                       }
                                     }}
                                   />
                                 </td>
                               </React.Fragment>
+                            )}
+
+                            {(submittedData && submittedData.length > 0) ||
+                            (rejectTab && rejectTab) ? (
+                              <td
+                                className="cursor-pointer px-4 py-2"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={selectedRows.some(
+                                    (r) => r.id === m.id
+                                  )}
+                                  onChange={() => handleCheckboxChange(m)}
+                                />
+                              </td>
+                            ) : (
+                              ""
                             )}
                           </tr>
                         );
@@ -927,7 +1023,6 @@ export const ViewTSTBeforeSave = ({
                       return userIdentification === "Manager"
                         ? renderRows(value)
                         : userIdentification !== "Manager" && renderRows(value);
-                      // : setData(null);
                     })
                   : (
                       <tr>
@@ -958,36 +1053,54 @@ export const ViewTSTBeforeSave = ({
           >
             <div className="flex-1"></div>
             <div className="flex-1 flex justify-center">
+              {/* allApprovedData, ...allRejectedData */}
               <button
-                className={`rounded px-3 py-2.5 w-52 bg-[#FEF116] text_size_5 text-dark_grey`}
+                className={`rounded px-3 py-2.5 w-52 bg-[#FEF116] text_size_5 text-dark_grey ${
+                  selectedRows && selectedRows.length > 0
+                    ? "bg-[#FEF116]"
+                    : (allApprovedData && allApprovedData.length > 0) ||
+                      (allRejectedData && allRejectedData.length > 0)
+                    ? "bg-[#FEF116]"
+                    : excelData
+                    ? "bg-[#FEF116]"
+                    : "bg-[#eee542] cursor-not-allowed"
+                }`}
+                disabled={
+                  userIdentification !== "Manager"
+                    ? !(selectedRows?.length > 0 || excelData)
+                    : !(
+                        allApprovedData?.length > 0 ||
+                        allRejectedData?.length > 0
+                      )
+                }
                 onClick={() => {
                   if (userIdentification !== "Manager") {
-                    toggleFunctionForAssiMana();
+                    if (selectedRows && selectedRows.length > 0) {
+                      toggleFunctionForAssiMana();
+                    } else if (excelData && excelData) {
+                      storeInitialData();
+                    }
+
                     // const fetchDataAndDelete = async () => {
                     //   try {
                     //     console.log("Fetching and Deleting SBW Data...");
                     //     // setIsDeleting(true); // Set loading state
                     //     let nextToken = null; // Initialize nextToken for pagination
-
                     //     do {
                     //       // Define the filter for fetching SBW data
                     //       const filter = {
                     //         and: [{ fileType: { eq: "Offshore" } }],
                     //       };
-
                     //       // Fetch the BLNG data using GraphQL with pagination
                     //       const response = await client.graphql({
                     //         query: listTimeSheets,
                     //         variables: { filter: filter, nextToken: nextToken }, // Pass nextToken for pagination
                     //       });
-
                     //       // Extract data and nextToken
                     //       const SBWdata =
                     //         response?.data?.listTimeSheets?.items || [];
                     //       nextToken = response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
-
                     //       console.log("Fetched SBW Data:", SBWdata);
-
                     //       // Delete each item in the current batch
                     //       await Promise.all(
                     //         SBWdata.map(async (item) => {
@@ -1008,21 +1121,24 @@ export const ViewTSTBeforeSave = ({
                     //           }
                     //         })
                     //       );
-
                     //       console.log("Batch deletion completed.");
                     //     } while (nextToken); // Continue fetching until no more data
-
-                    //     console.log("All SBW items deletion process completed.");
+                    //     console.log(
+                    //       "All SBW items deletion process completed."
+                    //     );
                     //   } catch (fetchError) {
-                    //     console.error("Error in fetchDataAndDelete:", fetchError);
+                    //     console.error(
+                    //       "Error in fetchDataAndDelete:",
+                    //       fetchError
+                    //     );
                     //   } finally {
                     //     // setIsDeleting(false); // Reset loading state
                     //   }
                     // };
                     // fetchDataAndDelete();
                   } else if (userIdentification === "Manager") {
-                    renameKeysFunctionAndSubmit();
                     removeCheckedItem();
+                    renameKeysFunctionAndSubmit();
 
                     // setCheckedItems({});
                   }
@@ -1030,7 +1146,11 @@ export const ViewTSTBeforeSave = ({
               >
                 {userIdentification === "Manager"
                   ? "Finalize and Submit"
-                  : "Assign Manager"}
+                  : submittedData && submittedData.length > 0
+                  ? "Assign Manager"
+                  : showRejectedItemTable === "Rejected"
+                  ? "Assign Manager"
+                  : "Submit"}
               </button>
             </div>
             <div className="flex-1">
@@ -1058,6 +1178,8 @@ export const ViewTSTBeforeSave = ({
           editFunction={editOffShoreFunction}
           titleName={titleName}
           Position={Position}
+          handleSubmit={handleSubmit}
+          editFormTitle={editFormTitle}
         />
       )}
       {storingMess === true ? (

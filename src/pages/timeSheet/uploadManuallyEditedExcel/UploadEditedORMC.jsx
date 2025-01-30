@@ -12,7 +12,6 @@ export const UploadEditedORMC = (
     const worksheetNameLength = workbook.SheetNames;
 
     const allSheets = [];
-    const MultipleExcel = [];
 
     const tableBodyData = [];
     worksheetNameLength.map((sheetName) => {
@@ -20,16 +19,12 @@ export const UploadEditedORMC = (
       allSheets.push({ sheetName, data: sheet });
     });
 
-    const AddData = [];
-
     const getResult =
       allSheets &&
       allSheets.map((sheet) => {
         const data = sheet.data;
 
         var headerSlicedData = data.slice(1, 2);
-
-        var name = "";
 
         const changedHeader = headerSlicedData.map((columns) => {
           const foundKey = Object.entries(columns).map(([key, value]) => {

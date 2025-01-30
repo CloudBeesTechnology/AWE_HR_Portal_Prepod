@@ -37,6 +37,7 @@ export default function InterviewScheduleUpdateForm(props) {
     department: "",
     otherDepartment: "",
     status: "",
+    empID: "",
   };
   const [interDate, setInterDate] = React.useState(initialValues.interDate);
   const [interTime, setInterTime] = React.useState(initialValues.interTime);
@@ -54,6 +55,7 @@ export default function InterviewScheduleUpdateForm(props) {
     initialValues.otherDepartment
   );
   const [status, setStatus] = React.useState(initialValues.status);
+  const [empID, setEmpID] = React.useState(initialValues.empID);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = interviewScheduleRecord
@@ -71,6 +73,7 @@ export default function InterviewScheduleUpdateForm(props) {
     setDepartment(cleanValues.department);
     setOtherDepartment(cleanValues.otherDepartment);
     setStatus(cleanValues.status);
+    setEmpID(cleanValues.empID);
     setErrors({});
   };
   const [interviewScheduleRecord, setInterviewScheduleRecord] = React.useState(
@@ -104,6 +107,7 @@ export default function InterviewScheduleUpdateForm(props) {
     department: [],
     otherDepartment: [],
     status: [],
+    empID: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -143,6 +147,7 @@ export default function InterviewScheduleUpdateForm(props) {
           department: department ?? null,
           otherDepartment: otherDepartment ?? null,
           status: status ?? null,
+          empID: empID ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -215,6 +220,7 @@ export default function InterviewScheduleUpdateForm(props) {
               department,
               otherDepartment,
               status,
+              empID,
             };
             const result = onChange(modelFields);
             value = result?.interDate ?? value;
@@ -250,6 +256,7 @@ export default function InterviewScheduleUpdateForm(props) {
               department,
               otherDepartment,
               status,
+              empID,
             };
             const result = onChange(modelFields);
             value = result?.interTime ?? value;
@@ -285,6 +292,7 @@ export default function InterviewScheduleUpdateForm(props) {
               department,
               otherDepartment,
               status,
+              empID,
             };
             const result = onChange(modelFields);
             value = result?.venue ?? value;
@@ -320,6 +328,7 @@ export default function InterviewScheduleUpdateForm(props) {
               department,
               otherDepartment,
               status,
+              empID,
             };
             const result = onChange(modelFields);
             value = result?.interType ?? value;
@@ -355,6 +364,7 @@ export default function InterviewScheduleUpdateForm(props) {
               department,
               otherDepartment,
               status,
+              empID,
             };
             const result = onChange(modelFields);
             value = result?.bagdeNo ?? value;
@@ -390,6 +400,7 @@ export default function InterviewScheduleUpdateForm(props) {
               department,
               otherDepartment,
               status,
+              empID,
             };
             const result = onChange(modelFields);
             value = result?.message ?? value;
@@ -425,6 +436,7 @@ export default function InterviewScheduleUpdateForm(props) {
               department,
               otherDepartment,
               status,
+              empID,
             };
             const result = onChange(modelFields);
             value = result?.tempID ?? value;
@@ -460,6 +472,7 @@ export default function InterviewScheduleUpdateForm(props) {
               department,
               otherDepartment,
               status,
+              empID,
             };
             const result = onChange(modelFields);
             value = result?.manager ?? value;
@@ -495,6 +508,7 @@ export default function InterviewScheduleUpdateForm(props) {
               department,
               otherDepartment,
               status,
+              empID,
             };
             const result = onChange(modelFields);
             value = result?.candidateStatus ?? value;
@@ -530,6 +544,7 @@ export default function InterviewScheduleUpdateForm(props) {
               department: value,
               otherDepartment,
               status,
+              empID,
             };
             const result = onChange(modelFields);
             value = result?.department ?? value;
@@ -565,6 +580,7 @@ export default function InterviewScheduleUpdateForm(props) {
               department,
               otherDepartment: value,
               status,
+              empID,
             };
             const result = onChange(modelFields);
             value = result?.otherDepartment ?? value;
@@ -600,6 +616,7 @@ export default function InterviewScheduleUpdateForm(props) {
               department,
               otherDepartment,
               status: value,
+              empID,
             };
             const result = onChange(modelFields);
             value = result?.status ?? value;
@@ -613,6 +630,42 @@ export default function InterviewScheduleUpdateForm(props) {
         errorMessage={errors.status?.errorMessage}
         hasError={errors.status?.hasError}
         {...getOverrideProps(overrides, "status")}
+      ></TextField>
+      <TextField
+        label="Emp id"
+        isRequired={false}
+        isReadOnly={false}
+        value={empID}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              interDate,
+              interTime,
+              venue,
+              interType,
+              bagdeNo,
+              message,
+              tempID,
+              manager,
+              candidateStatus,
+              department,
+              otherDepartment,
+              status,
+              empID: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.empID ?? value;
+          }
+          if (errors.empID?.hasError) {
+            runValidationTasks("empID", value);
+          }
+          setEmpID(value);
+        }}
+        onBlur={() => runValidationTasks("empID", empID)}
+        errorMessage={errors.empID?.errorMessage}
+        hasError={errors.empID?.hasError}
+        {...getOverrideProps(overrides, "empID")}
       ></TextField>
       <Flex
         justifyContent="space-between"

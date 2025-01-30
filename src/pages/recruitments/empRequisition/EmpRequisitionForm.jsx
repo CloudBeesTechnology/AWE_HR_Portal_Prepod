@@ -29,13 +29,13 @@ export const EmpRequisitionForm = ({ isVisible, onClose }) => {
 
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
-  
+
   useEffect(() => {
     const userID = localStorage.getItem("userID");
     const userType = localStorage.getItem("userType");
     setUserID(userID);
     setUserType(userType);
- }, []);
+  }, []);
 
   const { personalInfo, workInfo } = useEmployeePersonalInfo(userID);
 
@@ -43,7 +43,7 @@ export const EmpRequisitionForm = ({ isVisible, onClose }) => {
     try {
       const requestorID = personalInfo.empID || userID;
       if (!requestorID) throw new Error("Requestor ID is missing.");
-  
+
       const EmpReqValue = {
         ...data,
         reqName: personalInfo.name,
@@ -61,37 +61,53 @@ export const EmpRequisitionForm = ({ isVisible, onClose }) => {
         approverID: personalInfo.officialEmail,
         remarkReq: data.remarkReq,
       };
-  
+
       await SubmitReqData({ EmpReqValue });
       setNotification(true);
       setShowTitle("Your Requisition Submitted Successfully");
-  
+
       if (userType === "Manager") {
         if (gmMail) {
           console.log("Sending email to GM at:", gmMail);
           await sendEmail(
             `Employee Requisition Request`,
-            `Dear GM, 
-            Your Manager ${personalInfo.name || "N/A"} has submitted the Employee Requisition Form.
-            View the details at: https://hr.adininworks.co`,
+            `<html>
+    <body>
+      <p>
+        Dear GM,<br><br>
+        Your Manager ${
+          personalInfo.name || "N/A"
+        } has submitted the Employee Requisition Form.<br/><br/>
+       Click here https://hr.adininworks.co to view the request.
+      </p>
+    </body>
+  </html>`,
             "hr_no-reply@adininworks.com",
             gmMail
           );
         } else {
           console.error("General Manager email not found.");
         }
-  
+
         if (hrManagerMail) {
           console.log("Sending email to HR at:", hrManagerMail);
           await sendEmail(
             `Employee Requisition Request`,
-            `Dear HR, 
-            Your Manager ${personalInfo.name || "N/A"} has submitted the Employee Requisition Form.
-            View the details at: https://hr.adininworks.co`,
+            `<html>
+    <body>
+      <p>
+        Dear HR,<br><br>
+        Your Manager ${
+          personalInfo.name || "N/A"
+        } has submitted the Employee Requisition Form.<br/><br/>
+        View the details at: https://hr.adininworks.co
+      </p>
+    </body>
+  </html>`,
             "hr_no-reply@adininworks.com",
             hrManagerMail
           );
-          console.log("Email to HR sent successfully."); 
+          console.log("Email to HR sent successfully.");
         } else {
           console.error("Human Resource Manager email not found.");
         }
@@ -100,7 +116,6 @@ export const EmpRequisitionForm = ({ isVisible, onClose }) => {
       console.error("Error submitting data:", error);
     }
   };
-  
 
   const applyFields = [
     { label: "Department", name: "department", type: "text" },
@@ -133,7 +148,11 @@ export const EmpRequisitionForm = ({ isVisible, onClose }) => {
   return (
     <div className="bg-white w-full max-w-[900px] rounded-lg relative">
       <div className="text-center p-2">
-        <img src={AweLogo} alt="Logo" className="max-w-[250px] w-full mx-28 mb-3"/>
+        <img
+          src={AweLogo}
+          alt="Logo"
+          className="max-w-[250px] w-full mx-28 mb-3"
+        />
         <h2 className="text-lg font-semibold underline my-6">
           Apply for Employee Requisition
         </h2>
@@ -176,6 +195,3 @@ export const EmpRequisitionForm = ({ isVisible, onClose }) => {
     </div>
   );
 };
-
-
-

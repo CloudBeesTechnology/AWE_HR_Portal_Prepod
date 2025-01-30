@@ -24,21 +24,15 @@ const Login = () => {
   const Submit = handleSubmit(async (data) => {
     try {
       const username = data.userID;
-      // console.log(username);
 
       const resultUser = await client.graphql({
         query: listUsers,
-        variables: {
-          limit: 20000,
-        },
+        variables: { limit: 20000 },
       });
-      // console.log(resultUser?.data?.listUsers?.items);
 
-      const user = resultUser?.data?.listUsers?.items.find((val) => {
-        // console.log(val.empID);
-        return val.empID === username;
-      });
-      // console.log(user);
+      const user = resultUser?.data?.listUsers?.items.find(
+        (val) => val.empID === username.toUpperCase()
+      );
 
       if (user && user.status === "Active") {
         const password = data.password;
@@ -60,7 +54,7 @@ const Login = () => {
           } else {
             console.error("userType not found");
             alert(
-              "User not found. Please contact the administrator for assistance"
+              "Access denied: Your account is inactive. Please contact the administrator for assistance"
             );
           }
         }
@@ -152,13 +146,16 @@ const Login = () => {
             </p>
           </div>
 
-          <div>
-            <Link
-              to="/forgotEmail"
-              className="flex justify-center items-center pt-3 "
+          <div className="flex justify-end">
+            <button
+              onClick={() => {
+                localStorage.setItem("FEmail", "FEmail");
+                window.location.href = "/forgotEmail";
+              }}
+              className="flex justify-end items-center pt-3 "
             >
               <p className="text-[#24A1D7] text_size_7">Forgot password?</p>
-            </Link>
+            </button>
           </div>
 
           <div className="center ">

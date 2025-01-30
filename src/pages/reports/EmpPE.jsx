@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FilterTable } from "./FilterTable";
 import { useLocation } from "react-router-dom";
+import { DateFormat } from "../../utils/DateFormat";
 
 export const EmpPE = () => {
   const location = useLocation();
@@ -11,26 +12,18 @@ export const EmpPE = () => {
   const [endDate, setEndDate] = useState("");
   const [tableHead, setTableHead] = useState([
     "Emp ID",
-    "Employee Badge",
+    "Badge No",
     "Name",
     "Nationality",
     "Date of Join",
-    "Work Position",
+    "Position",
     "Department",
     "Pass Expiry",
   ]);
 
-  const formatDate = (date) => {
-    if (!date) return "-";
-    const parsedDate = new Date(date);
-    if (isNaN(parsedDate.getTime())) return "-";
-    const day = String(parsedDate.getDate()).padStart(2, "0");
-    const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
-    const year = parsedDate.getFullYear();
-    return `${day}-${month}-${year}`;
-  };
 
   // Check if the date is strictly in the next month
+  
   const isInNextMonth = (expiryDate) => {
     if (!expiryDate) return false;
 
@@ -46,7 +39,7 @@ export const EmpPE = () => {
     const endOfNextMonth = new Date(
       today.getFullYear(),
       today.getMonth() + 2,
-      0
+      1
     ); // Last day of next month
 
     // Check if expiry date falls in the next month
@@ -55,7 +48,7 @@ export const EmpPE = () => {
 
   // Filter and map the employee pass data
   const empPassMergedData = (data) => {
-    return data
+    const sortedData = data
       .filter((item) => {
         // Ensure empPassExp is a valid array with non-empty and valid date entries
         return (
@@ -73,16 +66,20 @@ export const EmpPE = () => {
       .map((item) => {
         const lastPassExp = item.empPassExp[item.empPassExp.length - 1];
         return {
+          lastPassExp: new Date(lastPassExp), // Keep for sorting only
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
           nationality: item.nationality || "-",
-          dateOfJoin: formatDate(item.doj) || "-",
+          dateOfJoin: DateFormat(item.doj) || "-",
           position: item.position || "-",
           department: item.department || "-",
-          passExpiry: formatDate(lastPassExp) || "-",
+          passExpiry: DateFormat(lastPassExp) || "-",
         };
-      });
+      })      .sort((a, b) => a.lastPassExp - b.lastPassExp); // Sort using lastPassExp
+  
+      // Remove lastPassExp after sorting
+      return sortedData.map(({ lastPassExp, ...rest }) => rest);
   };
 
   useEffect(() => {
@@ -122,17 +119,20 @@ export const EmpPE = () => {
       .map((item) => {
         const lastPassExp = item.empPassExp[item.empPassExp.length - 1];
         return {
+          lastPassExp: new Date(lastPassExp), // Keep for sorting only
           empId: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
           nationality: item.nationality || "-",
-          dateOfJoin: formatDate(item.doj) || "-",
+          dateOfJoin: DateFormat(item.doj) || "-",
           position: item.position || "-",
           department: item.department || "-",
-          passExpiry: formatDate(lastPassExp) || "-",
+          passExpiry: DateFormat(lastPassExp) || "-",
         };
-      });
-
+      })
+      .sort((a, b) => a.lastPassExp - b.lastPassExp) // Sort by lastPassExp
+      .map(({ lastPassExp, ...rest }) => rest); // Remove lastPassExp after sorting
+  
     setFilteredData(filtered);
   };
 

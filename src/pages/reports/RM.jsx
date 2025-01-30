@@ -3,6 +3,7 @@ import { FilterTable } from "./FilterTable";
 import { VscClose } from "react-icons/vsc";
 import logo from "../../assets/logo/logo-with-name.svg";
 import { useLocation } from "react-router-dom";
+import { DateFormat } from "../../utils/DateFormat";
 
 export const RM = () => {
   const location = useLocation();
@@ -14,26 +15,60 @@ export const RM = () => {
   const [endDate, setEndDate] = useState("");
   const [tableHead] = useState([
     "Emp ID",
-    "Employee Badge",
-    "Employee Name",
+    "Badge No",
+    "Name",
     "Gender",
     "Date of Birth",
-    "Date of Joined",
+    "Date of Join",
     "Nationality",
     "Position",
+    "Department",
     "Contact No",
     "Type of Application: Local/LPA/SAWP",
-    "CV Received Form",
+    "EMPLOYEE REQUISITION FORM APPROVAL DATE",
+    "CV Received From",
     "Brunei I/C No",
     "Brunei I/C Expiry",
     "Malaysian IC No",
     "Passport No",
     "Passport Expiry",
     "Employee Pass Expiry",
-    "Department",
-    "Contract Start Date",
-    "Contract End Date",
-    "Previous Company Name",
+    "INTERVIEW DATE",
+    "DATE OF LOI ISSUED",
+    "DATE OF LOI ACCEPTANCE",
+    "CVEV APPROVAL DATE",
+    "PAAF APPROVAL DATE",
+    "DATE REQUESTED FOR CLIENT'S SUPPORT LETTER",
+    "DATE RECEIVED FROM CLIENT",
+    "DATE SUBMITTED TO DOE",
+    "DATE APPROVED BY DOE",
+    "DOE VALIDITY DATE",
+    "DOE REFERENCE NUMBER",
+    "DATE SUBMITTED TO LD",
+    "LD SUBMISSION REF NO",
+    "LD APPROVED DATE",
+    "LD REFERENCE NUMBER",
+    "BG SUBMITTED DATE",
+    "BG RECEIVED DATE",
+    "DATE PURCHASED FROM TBA FOR JITPA",
+    "BG NO.",
+    "BG AMT",
+    "JITPA AMT",
+    "LABOUR DEP NO.",
+    "LABOUR DEP AMT",
+    "DATE ENDORSEMENT OF BG",
+    "DATE ENDROSEMENT OF JITPA",
+    "DATE ENDROSEMENT OF LABOUR",
+    "DATE SUBMITTED TO IMMIGRATION",
+    "DATE APPROVED BY IMMIGRATION",
+    "VISA REFERENCE NUMBER",
+    "MOBILIZATION DATE",
+    "MOBILIZATION DESTINATION FOR NON-LOCAL",
+    "MOBILIZATION AIRFARE",
+    "REMARKS FOR RECRUITMENT",
+    // "Contract Start Date",
+    // "Contract End Date",
+    // "Previous Company Name",
     "View All Details",
   ]);
 
@@ -50,47 +85,95 @@ export const RM = () => {
   };
 
   const generateFullDetails = (data) => {
-    if (!Array.isArray(data)) {
-      // console.error("Expected an array but got", data);
-      return [];
-    }
+    // Sort the data by dateOfJoin (doj) in ascending order
 
-    return data.map((item) => ({
-      empID: item.empID || "-",
-      empBadgeNo: item.empBadgeNo || "-",
-      name: item.name || "-",
-      gender: item.gender || "-",
-      dateOfBirth: formatDate(item.dob) || "-",
-      dateOfJoin: formatDate(item.doj) || "-",
-      nationality: item.nationality || "-",
-      position: item.position || "-",
-      contactNo: item.contactNo || "-",
-      contractType: item.contractType || "-",
-      cvReceived: item.cvReceived || "-",
-      BruneiIcNo: item.bwnIcNo || "-",
-      BruneiIcExpiry: Array.isArray(item.bwnIcExpiry)
-        ? formatDate(item.bwnIcExpiry[item.bwnIcExpiry.length - 1])
-        : "-",
-      MalaysianIcNo: item.myIcNo || "-",
-      PassportNo: item.ppNo || "-",
-      PassportExpiry: Array.isArray(item.ppExpiry)
-        ? formatDate(item.ppExpiry[item.ppExpiry.length - 1])
-        : "-",
-      employeePassExpiry: Array.isArray(item.empPassExp)
-        ? formatDate(item.empPassExp[item.empPassExp.length - 1])
-        : "-",
-      department: item.department || "-",
-      contractStart: Array.isArray(item.contractStart)
-        ? formatDate(item.contractStart[item.contractStart.length - 1])
-        : "-",
-      contractEnd: Array.isArray(item.contractEnd)
-        ? formatDate(item.contractEnd[item.contractEnd.length - 1])
-        : "-",
-      PreviousEmployment: item.preEmp || "-",
-    }));
+    const sortedData = data
+
+      .filter((item) => item.doj) // Filter out items without doj
+      .sort((a, b) => {
+        const dateA = new Date(b.doj);
+        const dateB = new Date(a.doj);
+        return dateA - dateB; // Sort by date in ascending order
+      })
+
+      .map((item) => ({  
+        empID: item.empID || "-",
+        empBadgeNo: item.empBadgeNo || "-",
+        name: item.name || "-",
+        gender: item.gender || "-",
+        dateOfBirth: formatDate(item.dob) || "-",
+        dateOfJoin: formatDate(item.doj) || "-",
+        nationality: item.nationality || "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
+        department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+        contactNo: item.contactNo || "-",
+        contractType: item.contractType || "-",
+        requisiationApr: "-",
+        agent: item.agent || "-",
+        BruneiIcNo: item.bwnIcNo || "-",
+        BruneiIcExpiry: Array.isArray(item.bwnIcExpiry)
+          ? formatDate(item.bwnIcExpiry[item.bwnIcExpiry.length - 1])
+          : "-",
+        MalaysianIcNo: item.myIcNo || "-",
+        PassportNo: item.ppNo || "-",
+        PassportExpiry: Array.isArray(item.ppExpiry)
+          ? formatDate(item.ppExpiry[item.ppExpiry.length - 1])
+          : "-",
+        employeePassExpiry: Array.isArray(item.empPassExp)
+          ? formatDate(item.empPassExp[item.empPassExp.length - 1])
+          : "-",
+        interDate: formatDate(item.interDate) || "-",
+        loiIssueDate: formatDate(item.loiIssueDate) || "-",
+        loiAcceptDate: formatDate(item.loiAcceptDate) || "-",
+        cvecApproveDate: formatDate(item.cvecApproveDate) || "-",
+        paafApproveDate: formatDate(item.paafApproveDate) || "-",
+        sawpDate: formatDate(item.sawpDate) || "-",
+        sawpRecivedDate: formatDate(item.sawpRecivedDate) || "-",
+        doesubmitdate: formatDate(item.doesubmitdate) || "-",
+        doeapprovedate: formatDate(item.doeapprovedate) || "-",
+        doeexpirydate: formatDate(item.doeexpirydate) || "-",
+        doerefno: item.doerefno || "-",
+        nlmssubmitdate: formatDate(item.nlmssubmitdate) || "-",
+        submissionrefrenceno: item.submissionrefrenceno || "-",
+        nlmsapprovedate: formatDate(item.nlmsapprovedate) || "-",
+        ldreferenceno: item.ldreferenceno || "-",
+        bgsubmitdate: formatDate(item.bgsubmitdate) || "-",
+        bgreceivedate: formatDate(item.bgreceivedate) || "-",
+        tbapurchasedate: formatDate(item.tbapurchasedate) || "-",
+        referenceno: item.referenceno || "-",
+        bgamount: item.bgamount || "-",
+        jitpaamount: item.jitpaamount || "-",
+        lbrDepoNum: item.lbrDepoNum || "-",
+        lbrDepoAmount: item.lbrDepoAmount || "-",
+        missingsubmitdateendorsement: formatDate(item.missingSubmitdateendorsement) || "-",
+        submitdateendorsement: formatDate(item.submitdateendorsement) || "-",
+        lbrEndroseDate: formatDate(item.lbrEndroseDate) || "-",
+        docsubmitdate: formatDate(item.docsubmitdate) || "-",
+        visaapprovedate: formatDate(item.visaapprovedate) || "-",
+        visareferenceno: item.visareferenceno || "-",
+        mobSignDate: formatDate(item.mobSignDate) || "-",
+        cityname: item.cityname || "-",
+        airfare: item.airfare || "-",
+        remarkNLMob: item.remarkNLMob || "-",
+
+        // contractStart: Array.isArray(item.contractStart)
+        //   ? formatDate(item.contractStart[item.contractStart.length - 1])
+        //   : "-",
+        // contractEnd: Array.isArray(item.contractEnd)
+        //   ? formatDate(item.contractEnd[item.contractEnd.length - 1])
+        //   : "-",
+        // PreviousEmployment: item.preEmp || "-",
+      }));
+    console.log(data.interDate);
+
+    return sortedData;
   };
 
-  // Ensure that useEffect is always called and will only update when `allData` changes
+  // Ensure that useEffect is always called and will only update when allData changes
   useEffect(() => {
     if (allData) {
       setTableBody(generateFullDetails(allData));
@@ -127,10 +210,16 @@ export const RM = () => {
     const end =
       type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
 
-    const filtered = allData
+    // Sort and filter the data
+    const sortedData = allData
+      .filter((data) => data.doj) // Filter out items without doj
+      .sort((a, b) => {
+        const dateA = new Date(a.doj);
+        const dateB = new Date(b.doj);
+        return dateA - dateB; // Sort by date in ascending order
+      })
       .filter((data) => {
-        const doj = data.doj ? new Date(data.doj) : null;
-
+        const doj = new Date(data.doj);
         if (!doj || isNaN(doj.getTime())) return false;
 
         if (start && end) return doj >= start && doj <= end;
@@ -140,17 +229,23 @@ export const RM = () => {
         return true;
       })
       .map((item) => ({
-        empId: item.empID || "-",
+        empID: item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
         name: item.name || "-",
         gender: item.gender || "-",
         dateOfBirth: formatDate(item.dob) || "-",
         dateOfJoin: formatDate(item.doj) || "-",
         nationality: item.nationality || "-",
-        position: item.position || "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
+        department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
         contactNo: item.contactNo || "-",
         contractType: item.contractType || "-",
-        cvReceived: item.cvReceived || "-",
+        requisiationApr: "-",
+        agent: item.agent || "-",
         BruneiIcNo: item.bwnIcNo || "-",
         BruneiIcExpiry: Array.isArray(item.bwnIcExpiry)
           ? formatDate(item.bwnIcExpiry[item.bwnIcExpiry.length - 1])
@@ -163,17 +258,45 @@ export const RM = () => {
         employeePassExpiry: Array.isArray(item.empPassExp)
           ? formatDate(item.empPassExp[item.empPassExp.length - 1])
           : "-",
-        department: item.department || "-",
-        contractStart: Array.isArray(item.contractStart)
-          ? formatDate(item.contractStart[item.contractStart.length - 1])
-          : "-",
-        contractEnd: Array.isArray(item.contractEnd)
-          ? formatDate(item.contractEnd[item.contractEnd.length - 1])
-          : "-",
-        PreviousEmployment: item.preEmp || "-",
+        interDate: formatDate(item.interDate) || "-",
+        loiIssueDate: formatDate(item.loiIssueDate) || "-",
+        loiAcceptDate: formatDate(item.loiAcceptDate) || "-",
+        cvecApproveDate: formatDate(item.cvecApproveDate) || "-",
+        paafApproveDate: formatDate(item.paafApproveDate) || "-",
+        sawpDate: formatDate(item.sawpDate) || "-",
+        sawpRecivedDate: formatDate(item.sawpRecivedDate) || "-",
+        doesubmitdate: formatDate(item.doesubmitdate) || "-",
+        doeapprovedate: formatDate(item.doeapprovedate) || "-",
+        doeexpirydate: formatDate(item.doeexpirydate) || "-",
+        doerefno: item.doerefno || "-",
+        nlmssubmitdate: formatDate(item.nlmssubmitdate) || "-",
+        submissionrefrenceno: item.submissionrefrenceno || "-",
+        nlmsapprovedate: formatDate(item.nlmsapprovedate) || "-",
+        ldreferenceno: item.ldreferenceno || "-",
+        bgsubmitdate: formatDate(item.bgsubmitdate) || "-",
+        bgreceivedate: formatDate(item.bgreceivedate) || "-",
+        tbapurchasedate: formatDate(item.tbapurchasedate) || "-",
+        referenceno: item.referenceno || "-",
+        bgamount: item.bgamount || "-",
+        jitpaamount: item.jitpaamount || "-",
+        lbrDepoNum: item.lbrDepoNum || "-",
+        lbrDepoAmount: item.lbrDepoAmount || "-",
+        missingSubmitdateendorsement: formatDate(item.missingSubmitdateendorsement) || "-",
+        submitdateendorsement: formatDate(item.submitdateendorsement) || "-",
+        lbrEndroseDate: formatDate(item.lbrEndroseDate) || "-",
+        docsubmitdate: formatDate(item.docsubmitdate) || "-",
+        visaapprovedate: formatDate(item.visaapprovedate) || "-",
+        visareferenceno: item.visareferenceno || "-",
+        mobSignDate: formatDate(item.mobSignDate) || "-",
+        cityname: item.cityname || "-",
+        airfare: item.airfare || "-",
+        remarkNLMob: item.remarkNLMob || "-",
+        // contractStart: Array.isArray(item.contractStart) ? formatDate(item.contractStart[item.contractStart.length - 1]) : "-",
+        // contractEnd: Array.isArray(item.contractEnd) ? formatDate(item.contractEnd[item.contractEnd.length - 1]) : "-",
+        // PreviousEmployment: item.preEmp || "-",
       }));
 
-    setFilteredData(filtered);
+    setFilteredData(sortedData);
   };
 
   return (

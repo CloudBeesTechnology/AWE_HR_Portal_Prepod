@@ -1,7 +1,6 @@
 import React from "react";
 
 const AccommodationDetails = ({ accommodationInfo, mainRef }) => {
-  // console.log(accommodationInfo);
 
   return (
     <>
@@ -31,6 +30,7 @@ const AccommodationDetails = ({ accommodationInfo, mainRef }) => {
                 </React.Fragment>
               );
             })}
+            
           </div>
         </div>
       </section>

@@ -1,10 +1,5 @@
 import * as XLSX from "xlsx";
-import { generateClient } from "@aws-amplify/api";
-import {
-  listEmpPersonalInfos,
-  listEmpWorkInfos,
-} from "../../../graphql/queries";
-const client = generateClient();
+
 export const UploadBLNGfile = (
   excelFile,
   setExcelData,
@@ -152,9 +147,8 @@ export const UploadBLNGfile = (
               item.ENTRANCEDATETIME,
               "dateTime"
             );
-          
+
             item.ENTRANCEDATETIME = formatDateTime(entranceDate);
-           
           }
           if (typeof item.ENTRANCEDATEUSED === "number") {
             const entranceDate = excelSerialToDate(
@@ -162,10 +156,9 @@ export const UploadBLNGfile = (
               "date"
             );
             const dateObject = new Date(entranceDate);
-           
-        
+
             item.ENTRANCEDATEUSED = dateObject.toLocaleDateString();
-            console.log(dateObject.toLocaleDateString());
+           
           }
           if (typeof item.AVGDAILYTOTALBYDAY === "number") {
             const entranceDate = excelSerialToDate(
@@ -229,16 +222,16 @@ export const UploadBLNGfile = (
             ENTRANCEDATEUSED: ENTRANCEDATEUSED, // Keep date as is
             ENTRANCEDATETIME: [ENTRANCEDATETIME], // Initialize as array
             EXITDATETIME: [EXITDATETIME], // Initialize as array
-            AVGDAILYTOTALBYDAY:AVGDAILYTOTALBYDAY,
+            AVGDAILYTOTALBYDAY: AVGDAILYTOTALBYDAY,
             ADININWORKSENGINEERINGSDNBHD: AVGDAILYTOTALBYDAY,
             ...rest, // Include other properties
           });
-          console.log("Working...");
+          
         }
 
         return acc;
       }, []);
-      console.log("transformedData : ", transformedData);
+     
 
       transformedData.forEach((entry) => {
         if (entry.FID && entry.ENTRANCEDATEUSED) {

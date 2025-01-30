@@ -303,6 +303,50 @@
         }
       }
     },
+    "TicketRequestIAMRoleDefaultPolicy462CAD83": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:DescribeTable"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "TicketRequestTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "TicketRequestIAMRoleDefaultPolicy462CAD83",
+        "Roles": [
+          {
+            "Ref": "TicketRequestIAMRoleFB2174E2"
+          }
+        ]
+      }
+    },
     "TicketRequestDataSource": {
       "Type": "AWS::AppSync::DataSource",
       "Properties": {

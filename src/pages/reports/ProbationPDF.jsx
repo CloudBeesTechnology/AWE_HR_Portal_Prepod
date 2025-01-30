@@ -3,22 +3,24 @@ import { FilterTable } from "./FilterTable";
 import logo from "../../assets/logo/logo-with-name.svg";
 import { useLocation, useNavigate } from "react-router-dom";
 import { VscClose } from "react-icons/vsc";
+import { useTempID } from "../../utils/TempIDContext";
 
 export const ProbationPDF = ({ userID, userType }) => {
   const location = useLocation();
   const { allData, title } = location.state || {};
+  const { gmPosition } = useTempID();
   const [tableBody, setTableBody] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [loading, setLoading] = useState(true); // Loading state
+  const [loading, setLoading] = useState(true); 
   const [tableHead] = useState([
     "Emp ID",
-    "Employee Badge",
+    "Badge no",
     "Name",
     "Date of Join",
     "Department",
-    "Work Position",
+    "Position",
     "Probation End Date",
     "Deadline to Return to HRD",
     "Probation Form",
@@ -26,7 +28,6 @@ export const ProbationPDF = ({ userID, userType }) => {
 
   const [selectedPerson, setSelectedPerson] = useState(null);
   const navigate = useNavigate();
-  
 
   const formatDate = (date) => {
     if (Array.isArray(date)) {
@@ -52,74 +53,104 @@ export const ProbationPDF = ({ userID, userType }) => {
     return date.toISOString().split("T")[0];
   };
 
-  // console.log("all", allData);
-
   const probationReviewMergedData = (data) => {
+    let supervisorCount = 0;
+    let managerCount = 0;  // Add manager count
+  
+    // console.log("Initial data:", data);  // Log the raw data
+  
     const filteredData = data
       .filter((item) => {
-        // Check if probation is active
-        const isProbationActive =
-          item.probStatus === true &&
-          item.probationEnd &&
-          item.probationEnd.length > 0;
-
-        // Access the last supervisor and manager IDs if they are arrays
-        const lastSupervisor =
-          item.supervisor && item.supervisor.length > 0
+        // console.log("Processing item:", item);  // Log each item being processed
+    
+        const isProbationActive = 
+          item.probStatus === true && item.probationEnd?.length > 0;
+        // console.log("Is probation active:", isProbationActive);  // Log if probation is active
+  
+        const lastSupervisor = 
+          Array.isArray(item.supervisor) && item.supervisor.length > 0
             ? item.supervisor[item.supervisor.length - 1]
             : null;
-        const lastManager =
-          item.manager && item.manager.length > 0
-            ? item.manager[item.manager.length - 1]
-            : null;
-
-        const isSupervisorApproved = item.supervisorApproved === "Approved"; 
-        const isManagerApproved = item.managerApproved === "Approved"; 
+        // console.log("Last supervisor:", lastSupervisor);  // Log the last supervisor
+  
+        if (lastSupervisor === userID) {
+          supervisorCount++;
+          // console.log("Supervisor count increased:", supervisorCount);
+        }
+  
+        const lastManager = 
+          item.manager?.length > 0 ? item.manager[item.manager.length - 1] : null;
+        // console.log("Last manager:", lastManager);  // Log the last manager
+  
+        if (lastManager === userID) {
+          managerCount++;
+          // console.log("Manager count increased:", managerCount);
+        }
+  
+        const isSupervisorApproved = item.supervisorApproved === "Approved";
+        const isManagerApproved = item.managerApproved === "Approved";
         const isGmApproved = item.gmApproved === "Approved";
-
-        // If user is a Supervisor, filter by supervisor
+        // console.log("Supervisor approved:", isSupervisorApproved);
+        // console.log("Manager approved:", isManagerApproved);
+        // console.log("GM approved:", isGmApproved);
+  
+        // Supervisor: filter based on last supervisor
         if (userType === "Supervisor") {
-          const isSupervisorMatch = lastSupervisor === userID;
-          // Return filtered data if probation is active and supervisor matches
-          return isProbationActive && isSupervisorMatch;
+          const supervisorFilter = isProbationActive && lastSupervisor === userID;
+          // console.log("Supervisor filter result:", supervisorFilter);
+          return supervisorFilter;
         }
-
-        // If user is a Manager, filter by manager
-        if (userType === "Manager") {
-          const isManagerMatch = lastManager === userID;             
-          // Return filtered data if probation is active and manager matches
-          return isProbationActive && isManagerMatch && isSupervisorApproved;
+  
+        // Manager: filter based on last manager, supervisor must have approved
+        if (userType === "Manager" && !gmPosition) {
+          const managerFilter = isProbationActive && lastManager === userID && isSupervisorApproved;
+          // console.log("Manager filter result:", managerFilter);
+          return managerFilter;
         }
-
-        if (userType === "GM")  {
-          return isProbationActive && isManagerApproved;
-        } 
-
+  
+        // General Manager: filter based on manager approval
+        if (userType === "General Manager" || gmPosition === "General Manager") {
+          const gmFilter = isProbationActive && isManagerApproved;
+          // console.log("GM filter result:", gmFilter);
+          return gmFilter;
+        }
+  
+        // HR: filter based on GM approval
         if (userType === "HR") {
-          return isProbationActive && isGmApproved
+          const hrFilter = isProbationActive && isGmApproved;
+          // console.log("HR filter result:", hrFilter);
+          return hrFilter;
         }
-
-        // If the user is neither a Supervisor nor a Manager, show all data
+  
         return isProbationActive;
       })
       .map((item) => {
+        // console.log("Mapping item:", item);  // Log the item before mapping
+  
         const probationEndDates = item.probationEnd || [];
         const lastDate = probationEndDates[probationEndDates.length - 1];
-
+        // console.log("Last probation end date:", lastDate);  // Log last probation end date
+  
         const formattedData = {
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
           dateOfJoin: formatDate(item.doj) || "-",
-          department: item.department || "-",
-          position: item.position || "-",
+          department: item.department?.slice(-1)[0] || "-",
+          position: item.position?.slice(-1)[0] || "-",
           probationEndDate: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
         };
+  
+        // console.log("Formatted data:", formattedData);  // Log the formatted data
+  
         return formattedData;
       });
+  
+    // console.log("Filtered and formatted data:", filteredData);  // Log the final filtered and formatted data
     return filteredData;
   };
+  
 
   useEffect(() => {
     setLoading(true);
@@ -257,7 +288,7 @@ export const ProbationPDF = ({ userID, userType }) => {
 
             <div className="flex justify-evenly items-center p-3">
               <button
-                className="mt-4 bg-green text-white px-4 py-2 rounded"
+                className="primary_btn"
                 onClick={handleDownload}
               >
                 Go to Probation Form

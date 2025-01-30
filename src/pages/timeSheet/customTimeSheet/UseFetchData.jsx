@@ -19,8 +19,6 @@ export const useFetchData = (titleName, cardName) => {
         try {
           setLoading(true); // Start loading indicator
 
-          // Map titleName to appropriate query and data keys
-
           let nextToken = null;
           let allData = [];
           let fetchedData = [];
@@ -39,12 +37,17 @@ export const useFetchData = (titleName, cardName) => {
                     { status: { eq: "Approved" } },
                     { fileType: { eq: titleName } },
                   ]
-                : cardName === "timeKeeper"
+                : cardName === "rejectedItems"
                 ? [
                     { status: { eq: "Rejected" } },
                     { fileType: { eq: titleName } },
                   ]
-                : [{ fileType: { eq: titleName } }],
+                : cardName === "All"
+                ? [{ status: { eq: "All" } }, { fileType: { eq: titleName } }]
+                : [
+                    { status: { eq: "nothing" } },
+                    { fileType: { eq: titleName } },
+                  ],
           };
           // Fetch data in a paginated manner
           do {
@@ -70,9 +73,13 @@ export const useFetchData = (titleName, cardName) => {
             allData = [...allData, ...fetchedData];
           } while (nextToken);
 
-          setConvertedStringToArrayObj(allData); // Update state with all data
+         
+
+          setConvertedStringToArrayObj(allData);
+
+          // Update state with all data
         } catch (error) {
-          console.error(`Error fetching data for ${titleName}:`, error);
+          // console.error(`Error fetching data for ${titleName}:`, error);
         } finally {
           setLoading(false); // Stop loading indicator
         }
@@ -82,14 +89,10 @@ export const useFetchData = (titleName, cardName) => {
       if ((Position === "Manager" && titleName) || Position !== "Manager") {
         fetchData();
       }
-    }, [titleName]);
-    // const { handleScroll, visibleData, setVisibleData } = useScrollableView(
-    //   convertedStringToArrayObj,
-    //   "Manager"
-    // );
+    }, [titleName, cardName]);
 
     return { convertedStringToArrayObj, getPosition, loading };
   } catch (err) {
-    console.log("ERROR : ", err);
+    // console.log("ERROR : ", err);
   }
 };

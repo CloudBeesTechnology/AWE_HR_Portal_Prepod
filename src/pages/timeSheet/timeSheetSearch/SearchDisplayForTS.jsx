@@ -10,6 +10,8 @@ export const SearchDisplayForTimeSheet = ({
   setDrpValue,
   searchedValue,
   id,
+  identify,
+  setSelectedLocation,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredEmployees, setFilteredEmployees] = useState([]);
@@ -91,12 +93,23 @@ export const SearchDisplayForTimeSheet = ({
         <input
           type="text"
           placeholder={placeholder}
-          className="outline-none w-full cursor-pointer "
+          className="outline-none w-full cursor-pointer"
           value={searchQuery}
           onChange={handleSearch}
           onClick={toggleDropdown}
         />
-        <div className="text-dark_grey text-1xl">{searchIcon2}</div>
+        <div
+          className={`text-dark_grey cursor-pointer ${
+            identify === "viewSummary" ? "text-[20px]" : "text-1xl"
+          }`}
+          onClick={() => {
+            if (identify === "viewSummary") {
+              setSelectedLocation?.(searchQuery);
+            }
+          }}
+        >
+          {searchIcon2}
+        </div>
       </div>
 
       {isDropdownVisible && filteredEmployees?.length > 0 && (

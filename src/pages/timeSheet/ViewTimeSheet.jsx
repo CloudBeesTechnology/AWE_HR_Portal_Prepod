@@ -9,10 +9,12 @@ import { FaArrowLeft } from "react-icons/fa";
 import { ListTimeSheet } from "./ListTimeSheet";
 import { useTempID } from "../../utils/TempIDContext";
 import { ExportTableToExcel } from "./customTimeSheet/DownloadTableToExcel";
+import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
+import { FindSpecificTimeKeeper } from "./customTimeSheet/FindSpecificTimeKeeper";
 
 export const ViewTimeSheet = () => {
   const prevCategoryRef = useRef(null);
-
+  const Position = localStorage.getItem("userType");
   // const [categoryFilter, setCategoryFilter] = useState("Select Excel Sheet");
   const [toggleClick, setToggleClick] = useState(false);
 
@@ -31,7 +33,6 @@ export const ViewTimeSheet = () => {
     setStartDate,
     endDate,
     setEndDate,
-
     setSearchQuery,
     showListTimeSheet,
     setShowListTimeSheet,
@@ -63,38 +64,57 @@ export const ViewTimeSheet = () => {
     }
   }, [categoryFilter]);
   useEffect(() => {
-    function groupByUpdatedAtAndStatus(data) {
-      const groupedData = {};
+    try {
+      function groupByUpdatedAtAndStatus(data) {
+        const groupedData = {};
 
-      data.forEach((item) => {
-        const updatedAtDate = item.updatedAt.split("T")[0]; // Extract date
-        const status = item.status; // Get status
+        data.forEach((item) => {
+          const updatedAtDate = item.updatedAt.split("T")[0]; // Extract date
+          const status = item.status; // Get status
 
-        // Create a key combining date and status
-        const key = `${updatedAtDate}_${status}`;
+          // Create a key combining date and status
+          const key = `${updatedAtDate}_${status}`;
 
-        // Initialize if the key doesn't exist
-        if (!groupedData[key]) {
-          groupedData[key] = {
-            fileName: item.fileName,
-            fileType: item.fileType,
-            date: updatedAtDate,
-            status: status, // Keep the actual status
-            updatedAt: [],
-          };
+          // Initialize if the key doesn't exist
+          if (!groupedData[key]) {
+            groupedData[key] = {
+              fileName: item.fileName,
+              fileType: item.fileType,
+              date: updatedAtDate,
+              status: status, // Keep the actual status
+              updatedAt: [],
+            };
+          }
+
+          // Push the item into the grouped array
+          groupedData[key].updatedAt.push(item);
+        });
+
+        return Object.values(groupedData); // Return grouped data as an array
+      }
+
+      const identifyAssignData = async () => {
+        if (Position === "Manager") {
+          const ManagerData = await SendDataToManager(
+            convertedStringToArrayObj
+          );
+
+          const removeStatusAll = ManagerData.filter(
+            (fil) => fil.status !== "All"
+          );
+          var filterManagerData = removeStatusAll;
+        } else if (Position !== "Manager") {
+          var filterManagerData = await FindSpecificTimeKeeper(
+            convertedStringToArrayObj
+          );
         }
+        const groupedData = groupByUpdatedAtAndStatus(filterManagerData);
 
-        // Push the item into the grouped array
-        groupedData[key].updatedAt.push(item);
-      });
-
-      return Object.values(groupedData); // Return grouped data as an array
-    }
-
-    const groupedData = groupByUpdatedAtAndStatus(convertedStringToArrayObj);
-
-    setAllExcelSheetData(groupedData);
-    setSecondaryData(groupedData);
+        setAllExcelSheetData(groupedData);
+        setSecondaryData(groupedData);
+      };
+      identifyAssignData();
+    } catch (err) {}
   }, [convertedStringToArrayObj]);
 
   // const AllFieldData = useTableFieldData(categoryFilter);
@@ -140,6 +160,7 @@ export const ViewTimeSheet = () => {
   }, [visibleData]);
 
   const handleFilterChange = (category) => {
+    setAllExcelSheetData([]);
     setSelectedCategory(category);
   };
 
@@ -257,14 +278,14 @@ export const ViewTimeSheet = () => {
               <input
                 value={categoryFilter}
                 placeholder="Select type"
-                className="border border-[#D9D9D9] cursor-pointer rounded outline-none p-2 text-[#000000] text_size_8"
+                className="border border-[#D9D9D9] cursor-pointer rounded outline-none p-2 text-[#1b1b1b] text_size_8"
                 onClick={() => {
                   setToggleClick(!toggleClick);
                 }}
                 readOnly
               />
               <span className="absolute right-2 top-2">
-                <FaAngleDown className="text-xl text-dark_grey" />
+                <FaAngleDown className="text-xl text-dark_ash" />
               </span>
               {toggleClick && (
                 <div
@@ -332,11 +353,6 @@ export const ViewTimeSheet = () => {
           </div>
         </div>
 
-        {/* {loading && (
-          <div className="flex justify-center text_size_6">
-            <p>Please wait a few seconds...</p>
-          </div>
-        )} */}
         {showListTimeSheet && (
           <ListTimeSheet
             visibleData={visibleData}

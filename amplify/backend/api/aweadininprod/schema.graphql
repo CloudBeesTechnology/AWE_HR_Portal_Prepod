@@ -6,6 +6,7 @@ type ContractForm @model @auth(rules: [{allow: public}]) {
   hrManager: String
   genManager: String
   remarks: String
+  contStatus: Boolean
 }
 
 type KeyValueStore @model @auth(rules: [{allow: public}]) {
@@ -178,6 +179,8 @@ type ProbForm @model @auth(rules: [{allow: public}]) {
   responsibilityDetails: String
   diligentDetails: String
   commitmentDetails: String
+  probStatus: Boolean
+  gmName: String
 }
 
 type EmailNotifi @model @auth(rules: [{allow: public}]) {
@@ -653,6 +656,7 @@ type InterviewSchedule @model @auth(rules: [{allow: public}]) {
   department: String
   otherDepartment: String
   status: String
+  empID: String
 }
 
 type EducationDetails @model @auth(rules: [{allow: public}]) {

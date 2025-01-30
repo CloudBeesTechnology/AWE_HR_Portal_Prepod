@@ -11,9 +11,9 @@ export const PromotionRep = () => {
   const [endDate, setEndDate] = useState("");
   const [tableHead] = useState([
     "Emp ID",
-    "Employee Badge No",
+    "Badge No",
     "Name",
-    "Nationality",
+    "Date of Join",
     "Position",
     "Department",
     "UPGRADE POSITION",
@@ -41,8 +41,6 @@ export const PromotionRep = () => {
   const LDReviewMergedData = (data) => {
     return data
       .filter((item) => {
-        console.log(item.upgradeDate);
-
         // Ensure upgradeDate is a valid array with non-empty and valid date entries
         return (
           Array.isArray(item.upgradeDate) &&
@@ -52,76 +50,76 @@ export const PromotionRep = () => {
           )
         );
       })
-      .filter((item) => {
-        const lastPassExp = item.upgradeDate[item.upgradeDate.length - 1];
-        return lastPassExp;
-      })
       .map((item) => {
         const lastPassExp = item.upgradeDate[item.upgradeDate.length - 1];
         return {
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
-          nationality: item.nationality || "-",
+          dateOfJoin: formatDate(item.doj) || "-",
           position: item.position || "-",
           department: item.department || "-",
           upgradePosition: Array.isArray(item.upgradePosition)
             ? item.upgradePosition[item.upgradePosition.length - 1]
             : "-",
           upgradeDate: formatDate(lastPassExp) || "-",
+          rawUD: new Date(lastPassExp), // Raw date for sorting
         };
-      });
+      })
+      .sort((a, b) => a.rawUD - b.rawUD) // Sort by rawUD (upgradeDate)
+      .map(({ rawUD, ...rest }) => rest); // Remove rawUD after sorting
   };
+  
   useEffect(() => {
     const data = LDReviewMergedData(allData);
     setTableBody(data);
   }, [allData]);
-
+  
   const handleDate = (e, type) => {
     const value = e.target.value;
-
+  
     if (type === "startDate") setStartDate(value);
     if (type === "endDate") setEndDate(value);
-
+  
     const start =
-      type === "startDate"
-        ? new Date(value)
-        : startDate
-        ? new Date(startDate)
-        : null;
+      type === "startDate" ? new Date(value) : startDate ? new Date(startDate) : null;
     const end =
       type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
-
+  
     const filtered = allData
       .filter((data) => {
         const expiryArray = data.upgradeDate || [];
         const expiryDate = expiryArray.length
           ? new Date(expiryArray[expiryArray.length - 1])
           : null;
-
+  
         if (!expiryDate || isNaN(expiryDate.getTime())) return false;
-
+  
         if (start && end) return expiryDate >= start && expiryDate <= end;
         if (start) return expiryDate >= start;
         if (end) return expiryDate <= end;
-
+  
         return true;
       })
       .map((item) => ({
         empID: item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
         name: item.name || "-",
-        nationality: item.nationality || "-",
+        dateOfJoin: formatDate(item.doj) || "-",
         position: item.position || "-",
         department: item.department || "-",
         upgradePosition: Array.isArray(item.upgradePosition)
           ? item.upgradePosition[item.upgradePosition.length - 1]
           : "-",
         upgradeDate: formatDate(item.upgradeDate[item.upgradeDate.length - 1]),
-      }));
-
+        rawUD: new Date(item.upgradeDate[item.upgradeDate.length - 1]), // Raw date for sorting
+      }))
+      .sort((a, b) => a.rawUD - b.rawUD) // Sort by rawUD (upgradeDate)
+      .map(({ rawUD, ...rest }) => rest); // Remove rawUD after sorting
+  
     setFilteredData(filtered);
   };
+  
   return (
     <div>
       <FilterTable

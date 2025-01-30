@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {  useEffect, useRef, useState } from "react";
 import { GoDotFill } from "react-icons/go";
 import { Link } from "react-router-dom";
-import * as XLSX from "xlsx";
+
 import { Popup } from "../pages/timeSheet/Popup";
 import { PopupForSave } from "../pages/timeSheet/PopupForSave";
 import { ViewTSTBeforeSave } from "../pages/timeSheet/ViewTSTBeforeSave";
@@ -16,15 +16,25 @@ import { UploadORMCfile } from "../pages/timeSheet/UploadTimeSheet/UploadORMCfil
 import { UploadSBWfile } from "../pages/timeSheet/UploadTimeSheet/UploadSBWfile";
 import { UploadHOfile } from "../pages/timeSheet/UploadTimeSheet/UploadHOfile";
 import { UploadBLNGfile } from "../pages/timeSheet/UploadTimeSheet/UploadBLNGfile";
-import { listBlngs, listHeadOffices } from "../graphql/queries";
+
 import { generateClient } from "@aws-amplify/api";
 import { useFetchData } from "../pages/timeSheet/customTimeSheet/UseFetchData";
 import { UploadEditedORMC } from "../pages/timeSheet/uploadManuallyEditedExcel/UploadEditedORMC";
 import { UploadEditedSBW } from "../pages/timeSheet/uploadManuallyEditedExcel/UploadEditedSBW";
 import { useTempID } from "./TempIDContext";
+import { FindSpecificTimeKeeper } from "../pages/timeSheet/customTimeSheet/FindSpecificTimeKeeper";
+import { useFetchDataTwo } from "../pages/timeSheet/customTimeSheet/useFetchDataTwo";
+import { LoadingMessRejectTab } from "../pages/timeSheet/customTimeSheet/LoadingMessRejectTab";
+import { LoadingMessManagerTable } from "../pages/timeSheet/customTimeSheet/LoadingMessManagerTable";
+import { FiLoader } from "react-icons/fi";
 
 const client = generateClient();
-export const TimeSheetBrowser = ({ title }) => {
+export const TimeSheetBrowser = ({
+  title,
+  submittedData,
+  ManagerData,
+  showing,
+}) => {
   const fileInputRef = useRef(null);
   const [error, setError] = useState("");
   const [fileName, setFileName] = useState("");
@@ -41,10 +51,14 @@ export const TimeSheetBrowser = ({ title }) => {
   const [isChecked, setIsChecked] = useState(false);
   const [assignPosition, setAssignPosition] = useState("");
 
+  const Position = localStorage.getItem("userType");
+
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
+
     setExcelData(null);
   };
+
   useEffect(() => {
     if (isChecked === true) {
       setTitleName("ORMC");
@@ -52,19 +66,25 @@ export const TimeSheetBrowser = ({ title }) => {
       setTitleName(title);
     }
   }, [isChecked]);
-  const Position = localStorage.getItem("userType");
+
   useEffect(() => {
     if (Position === "Manager") {
       setAssignPosition("Manager");
     } else {
-      setAssignPosition("timeKeeper");
+      setAssignPosition("rejectedItems");
     }
   }, [Position, count]);
-  const { convertedStringToArrayObj, getPosition } = useFetchData(
-    titleName,
-    assignPosition
+  const { convertedStringToArrayObj } = useFetchData(titleName, assignPosition);
+
+  const { finalData } = useFetchDataTwo(titleName, assignPosition);
+
+  const { wholeData, loadingState, showRejectTable } = LoadingMessRejectTab(
+    finalData && finalData
   );
 
+  const { managerWholeData, loadingStateManager, showManagerTable } =
+    LoadingMessManagerTable(ManagerData && ManagerData);
+  // let convertedStringToArrayObj;
   const handleForErrorMsg = (e) => {
     const file = e.target.files[0];
     const allowedExtensions = ["xlsx", "xls"];
@@ -203,7 +223,7 @@ export const TimeSheetBrowser = ({ title }) => {
         setExcelFile(null);
       }
     } catch (err) {
-      console.log("ERROR", err);
+      // console.log("ERROR", err);
     }
   };
 
@@ -216,11 +236,69 @@ export const TimeSheetBrowser = ({ title }) => {
     fileInputRef.current.value = "";
   };
   const { setStartDate, setEndDate, setSearchQuery } = useTempID();
+
+  if (loadingStateManager.isLoading && Position === "Manager") {
+    return (
+      <div className="flex items-center justify-center h-[82vh] bg-transparent">
+        <div className="flex justify-between gap-2">
+          {loadingState.message === "No Data Available" ? (
+            <p className="text-sm font-semibold">{loadingState.message}</p>
+          ) : (
+            <div className="flex justify-between gap-2">
+              <p className="text-sm font-semibold">Loading </p>
+              <p>
+                <FiLoader className="animate-spin mt-[4px]" size={15} />
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (showing === 0 && Position !== "Manager") {
+    return (
+      <div className="flex items-center justify-center h-[82vh] bg-transparent">
+        <div className="flex justify-between gap-2">
+          {loadingState.message === "No Data Available" ? (
+            <p className="text-sm font-semibold">{loadingState.message}</p>
+          ) : (
+            <div className="flex justify-between gap-2">
+              <p className="text-sm font-semibold">Loading </p>
+              <p>
+                <FiLoader className="animate-spin mt-[4px]" size={15} />
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // if (loadingState.isLoading && Position !== "Manager") {
+  //   return (
+  //     <div className="flex items-center justify-center h-[82vh] bg-transparent">
+  //       <div className="flex justify-between gap-2">
+  // {loadingState.message === "No Data Available" ? (
+  //   <p className="text-sm font-semibold">{loadingState.message}</p>
+  // ) : (
+  //   <div className="flex justify-between gap-2">
+  //     <p className="text-sm font-semibold">Loading </p>
+  //     <p>
+  //       <FiLoader className="animate-spin mt-[4px]" size={15} />
+  //     </p>
+  //   </div>
+  // )}
+  //       </div>
+  //     </div>
+  //   );
+  // }
+
   return (
     <div className="p-10 bg-[#fafaf6] min-h-screen  flex-col items-center">
       <div
         className={`flex ${
-          getPosition === "Manager" ? "justify-start" : "justify-between"
+          Position === "Manager" ? "justify-start" : "justify-between"
         }  mt-5 `}
       >
         <div className="text-start ">
@@ -244,18 +322,32 @@ export const TimeSheetBrowser = ({ title }) => {
             <FaArrowLeft />
           </Link>
         </div> */}
-        {getPosition !== "Manager" && (
+        {Position !== "Manager" && (
           <div className="flex justify-center gap-11  pr-5">
-            <p
-              className={`${
-                count === 0 && "border-b-4 border-b-primary"
-              } pb-1 cursor-pointer text_size_5`}
-              onClick={() => {
-                setCount(0);
-              }}
-            >
-              {`Upload ${title} Excel Sheet`}
-            </p>
+            {submittedData && submittedData.length > 0 ? (
+              <p
+                className={`${
+                  count === 0 && "border-b-4 border-b-primary"
+                } pb-1 cursor-pointer text_size_5`}
+                onClick={() => {
+                  setCount(0);
+                }}
+              >
+                {`${title} Submitted Items`}
+              </p>
+            ) : (
+              <p
+                className={`${
+                  count === 0 && "border-b-4 border-b-primary"
+                } pb-1 cursor-pointer text_size_5`}
+                onClick={() => {
+                  setCount(0);
+                }}
+              >
+                {`Upload ${title} Excel Sheet`}
+              </p>
+            )}
+
             <p
               className={`${
                 count === 1 && "border-b-4 border-b-primary"
@@ -277,7 +369,7 @@ export const TimeSheetBrowser = ({ title }) => {
         >
           <p
             className={`${
-              count === 0
+              count === 0 && showing === 2
                 ? "text-2xl font-semibold text-dark_grey uppercase mt-4"
                 : "hidden"
             }`}
@@ -285,99 +377,109 @@ export const TimeSheetBrowser = ({ title }) => {
             {title}
           </p>
 
-          {getPosition !== "Manager" && count === 0 && (
-            <div className="my-2 flex flex-col gap-5">
-              <div className="flex gap-5">
-                <div className=" flex flex-col items-center  gap-5">
-                  <div className="border-[#30303080] border-2">
-                    <input
-                      className="outline-none py-2 px-3 text-sm w-64"
-                      type="text"
-                      placeholder="Please Upload the Time Sheet"
-                      value={fileName || ""}
-                      onChange={(e) => {
-                        setFileName(e.target.value);
-                      }}
-                      readOnly
-                    />
-                  </div>
-                  <div className="flex gap-2 p">
-                    <span>
-                      <GoDotFill className="text-xs mt-1.5" />
-                    </span>
-                    <span className="text-dark_grey">XLS / CSV Files only</span>
-                  </div>
-                </div>
-                <div className="">
-                  {!fileName && (
-                    <div>
-                      <button
-                        className="text_size_4 border-[#30303080] border-2 py-1 px-10 text-dark_grey rounded-md bg-[#FEF116]"
-                        onClick={() => {
-                          handleImageClick();
+          {Position !== "Manager" &&
+            count === 0 &&
+            showing === 2 &&
+            submittedData.length === 0 && (
+              <div className="my-2 flex flex-col gap-5">
+                <div className="flex gap-5">
+                  <div className=" flex flex-col items-center  gap-5">
+                    <div className="border-[#30303080] border-2">
+                      <input
+                        className="outline-none py-2 px-3 text-sm w-64"
+                        type="text"
+                        placeholder="Please Upload the Time Sheet"
+                        value={fileName || ""}
+                        onChange={(e) => {
+                          setFileName(e.target.value);
                         }}
-                      >
-                        Upload
-                      </button>
-                      {title === "Offshore" && (
-                        <div className="flex items-center space-x-3 m-5">
-                          <input
-                            type="checkbox"
-                            className="h-5 w-5 text-dark_grey rounded checked:bg-red checked:border-transparent"
-                            checked={isChecked}
-                            onChange={handleCheckboxChange}
-                          />
-                          <label
-                            htmlFor="custom-checkbox"
-                            className="text-dark_grey text_size_4 "
-                          >
-                            ORMC
-                          </label>
-                        </div>
-                      )}
+                        readOnly
+                      />
                     </div>
-                  )}
-                  {fileName && (
-                    <div className="flex gap-5">
-                      <button
-                        className="text_size_4 border-[#30303080] border-2 py-1 px-10 text-dark_grey rounded-md bg-[#FEF116]"
-                        onClick={() => {
-                          setLoading(true);
-
-                          setTimeout(() => {
-                            UploadFile();
-                          }, 1000);
-                          setEnsureExcelFile();
-                          setFileName();
-
-                          // clearFileInput();
-                        }}
-                      >
-                        Submit
-                      </button>
-                      <button
-                        className="text_size_4 border-[#30303080] border-2 py-1 px-10 text-dark_grey rounded-md "
-                        onClick={() => {
-                          clearFileInput();
-                        }}
-                      >
-                        Cancel
-                      </button>
+                    <div className="flex gap-2 p">
+                      <span>
+                        <GoDotFill className="text-xs mt-1.5" />
+                      </span>
+                      <span className="text-dark_grey">
+                        XLS / CSV Files only
+                      </span>
                     </div>
-                  )}
-                </div>
+                  </div>
+                  <div className="">
+                    {!fileName && (
+                      <div>
+                        <button
+                          className="text_size_4 border-[#30303080] border-2 py-1 px-10 text-dark_grey rounded-md bg-[#FEF116]"
+                          onClick={() => {
+                            handleImageClick();
+                          }}
+                        >
+                          Upload
+                        </button>
+                        {title === "Offshore" && (
+                          <div className="flex items-center space-x-3 m-5">
+                            <input
+                              type="checkbox"
+                              className="h-5 w-5 text-dark_grey rounded checked:bg-red checked:border-transparent"
+                              checked={isChecked}
+                              onChange={handleCheckboxChange}
+                            />
+                            <label
+                              htmlFor="custom-checkbox"
+                              className="text-dark_grey text_size_4 "
+                            >
+                              ORMC
+                            </label>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {fileName && (
+                      <div className="flex gap-5">
+                        <button
+                          className="text_size_4 border-[#30303080] border-2 py-1 px-10 text-dark_grey rounded-md bg-[#FEF116]"
+                          onClick={() => {
+                            setLoading(true);
 
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  className="hidden"
-                  onChange={(e) => {
-                    handleFile(e);
-                    handleForErrorMsg(e);
-                  }}
-                  accept=".xls,.xlsx"
-                />
+                            setTimeout(() => {
+                              UploadFile();
+                            }, 1000);
+                            setEnsureExcelFile();
+                            setFileName();
+
+                            // clearFileInput();
+                          }}
+                        >
+                          Submit
+                        </button>
+                        <button
+                          className="text_size_4 border-[#30303080] border-2 py-1 px-10 text-dark_grey rounded-md "
+                          onClick={() => {
+                            clearFileInput();
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="hidden"
+                    onChange={(e) => {
+                      handleFile(e);
+                      handleForErrorMsg(e);
+                    }}
+                    accept=".xls,.xlsx"
+                  />
+                </div>
               </div>
+            )}
+          {showing === 0 && count === 0 && (
+            <div className="flex justify-center items-center py-3  w-full">
+              <p className="text-dark_grey text_size_5">Loading...</p>
             </div>
           )}
         </div>
@@ -411,7 +513,7 @@ export const TimeSheetBrowser = ({ title }) => {
               setExcelData={setExcelData}
               excelData={excelData}
               returnedTHeader={returnedTHeader}
-              Position={getPosition}
+              Position={Position}
               titleName={titleName}
               fileName={fileNameForSuccessful}
             />
@@ -421,7 +523,7 @@ export const TimeSheetBrowser = ({ title }) => {
               setExcelData={setExcelData}
               excelData={excelData}
               returnedTHeader={returnedTHeader}
-              Position={getPosition}
+              Position={Position}
               titleName={titleName}
               fileName={fileNameForSuccessful}
             />
@@ -431,7 +533,7 @@ export const TimeSheetBrowser = ({ title }) => {
               setExcelData={setExcelData}
               excelData={excelData}
               returnedTHeader={returnedTHeader}
-              Position={getPosition}
+              Position={Position}
               titleName={titleName}
               fileName={fileNameForSuccessful}
             />
@@ -441,7 +543,7 @@ export const TimeSheetBrowser = ({ title }) => {
               setExcelData={setExcelData}
               excelData={excelData}
               returnedTHeader={returnedTHeader}
-              Position={getPosition}
+              Position={Position}
               titleName={titleName}
               fileName={fileNameForSuccessful}
             />
@@ -451,103 +553,187 @@ export const TimeSheetBrowser = ({ title }) => {
               excelData={excelData}
               setExcelData={setExcelData}
               returnedTHeader={returnedTHeader}
-              Position={getPosition}
+              Position={Position}
               titleName={titleName}
               fileName={fileNameForSuccessful}
             />
           )}
         </div>
       )}
-      {!excelData && getPosition === "Manager" && titleName === "BLNG" && (
+      {!excelData && Position === "Manager" && titleName === "BLNG" && (
         <ViewBLNGsheet
           titleName={titleName}
           returnedTHeader={null}
-          convertedStringToArrayObj={convertedStringToArrayObj}
-          Position={getPosition}
+          convertedStringToArrayObj={ManagerData}
+          Position={Position}
           fileName={fileNameForSuccessful}
         />
       )}
-      {!excelData && getPosition === "Manager" && titleName === "HO" && (
+      {!excelData && Position === "Manager" && titleName === "HO" && (
         <ViewHOsheet
           titleName={titleName}
           returnedTHeader={null}
-          convertedStringToArrayObj={convertedStringToArrayObj}
-          Position={getPosition}
+          convertedStringToArrayObj={ManagerData}
+          Position={Position}
           fileName={fileNameForSuccessful}
         />
       )}
-      {!excelData && getPosition === "Manager" && titleName === "SBW" && (
+      {!excelData && Position === "Manager" && titleName === "SBW" && (
         <ViewSBWsheet
           titleName={titleName}
           returnedTHeader={null}
-          convertedStringToArrayObj={convertedStringToArrayObj}
-          Position={getPosition}
+          convertedStringToArrayObj={ManagerData}
+          Position={Position}
           fileName={fileNameForSuccessful}
         />
       )}
-      {!excelData && getPosition === "Manager" && titleName === "ORMC" && (
+      {!excelData && Position === "Manager" && titleName === "ORMC" && (
         <ViewORMCsheet
           titleName={titleName}
           returnedTHeader={null}
-          convertedStringToArrayObj={convertedStringToArrayObj}
-          Position={getPosition}
+          convertedStringToArrayObj={ManagerData}
+          Position={Position}
           fileName={fileNameForSuccessful}
         />
       )}
-      {!excelData && getPosition === "Manager" && titleName === "Offshore" && (
-        <ViewTSTBeforeSave
-          titleName={titleName}
-          returnedTHeader={null}
-          convertedStringToArrayObj={convertedStringToArrayObj}
-          Position={getPosition}
-          fileName={fileNameForSuccessful}
-        />
+      {/* managerWholeData, loadingStateManager, showManagerTable */}
+      {loadingStateManager.isLoading && Position === "Manager" && (
+        <div className="flex justify-center items-center py-3  w-full">
+          <p className="text-dark_grey text_size_5">
+            {loadingStateManager.message}
+          </p>
+        </div>
       )}
+
+      {!excelData &&
+        Position === "Manager" &&
+        titleName === "Offshore" &&
+        !loadingStateManager.isLoading &&
+        showManagerTable && (
+          <ViewTSTBeforeSave
+            titleName={titleName}
+            returnedTHeader={null}
+            ManagerData={managerWholeData}
+            Position={Position}
+            fileName={fileNameForSuccessful}
+          />
+        )}
 
       {/* Show Rejected Items Only */}
-      {titleName === "Offshore" && getPosition !== "Manager" && count === 1 && (
-        <ViewTSTBeforeSave
-          titleName={titleName}
-          showRejectedItemTable="Rejected"
-          convertedStringToArrayObj={convertedStringToArrayObj}
-          Position={getPosition}
-        />
+      {loadingState.isLoading && count === 1 && (
+        <div className="flex justify-center items-center py-3  w-full">
+          <p className="text-dark_grey text_size_5">{loadingState.message}</p>
+        </div>
       )}
 
-      {titleName === "BLNG" && getPosition !== "Manager" && count === 1 && (
+      {/* {loadingState.message === "No Data Available" && count === 1 ? (
+        <p className="text-sm font-semibold">{loadingState.message}</p>
+      ) : (
+        <div className="flex justify-between gap-2 w-8 ">
+          <p className="text-sm font-semibold">Loading </p>
+          <p>
+            <FiLoader className="animate-spin mt-[4px]" size={15} />
+          </p>
+        </div>
+      )} */}
+      {!loadingState.isLoading &&
+        showRejectTable &&
+        titleName === "Offshore" &&
+        Position !== "Manager" &&
+        count === 1 && (
+          <ViewTSTBeforeSave
+            titleName={titleName}
+            showRejectedItemTable="Rejected"
+            wholeData={wholeData}
+            Position={Position}
+          />
+        )}
+
+      {titleName === "BLNG" && Position !== "Manager" && count === 1 && (
         <ViewBLNGsheet
           titleName={titleName}
           showRejectedItemTable="Rejected"
-          convertedStringToArrayObj={convertedStringToArrayObj}
-          Position={getPosition}
+          wholeData={wholeData}
+          Position={Position}
         />
       )}
-      {titleName === "HO" && getPosition !== "Manager" && count === 1 && (
+      {titleName === "HO" && Position !== "Manager" && count === 1 && (
         <ViewHOsheet
           titleName={titleName}
           showRejectedItemTable="Rejected"
-          convertedStringToArrayObj={convertedStringToArrayObj}
-          Position={getPosition}
+          wholeData={wholeData}
+          Position={Position}
         />
       )}
 
-      {titleName === "ORMC" && getPosition !== "Manager" && count === 1 && (
+      {titleName === "ORMC" && Position !== "Manager" && count === 1 && (
         <ViewORMCsheet
           titleName={titleName}
           showRejectedItemTable="Rejected"
-          convertedStringToArrayObj={convertedStringToArrayObj}
-          Position={getPosition}
+          wholeData={wholeData}
+          Position={Position}
         />
       )}
 
-      {titleName === "SBW" && getPosition !== "Manager" && count === 1 && (
+      {titleName === "SBW" && Position !== "Manager" && count === 1 && (
         <ViewSBWsheet
           titleName={titleName}
           showRejectedItemTable="Rejected"
-          convertedStringToArrayObj={convertedStringToArrayObj}
-          Position={getPosition}
+          wholeData={wholeData}
+          Position={Position}
         />
       )}
+
+      {/* {console.log("Checjk it again : ", submittedData)} */}
+      {/* Show only Submitted Items */}
+      {titleName === "Offshore" &&
+        Position !== "Manager" &&
+        count === 0 &&
+        showing === 1 &&
+        submittedData.length > 0 && (
+          <ViewTSTBeforeSave
+            titleName={titleName}
+            allItems="allItems"
+            submittedData={submittedData}
+            Position={Position}
+          />
+        )}
+
+      {titleName === "HO" &&
+        Position !== "Manager" &&
+        count === 0 &&
+        submittedData.length > 0 && (
+          <ViewHOsheet
+            titleName={titleName}
+            allItems="allItems"
+            submittedData={submittedData}
+            Position={Position}
+          />
+        )}
+
+      {titleName === "SBW" &&
+        Position !== "Manager" &&
+        count === 0 &&
+        submittedData.length > 0 && (
+          <ViewSBWsheet
+            titleName={titleName}
+            allItems="allItems"
+            submittedData={submittedData}
+            Position={Position}
+          />
+        )}
+
+      {titleName === "ORMC" &&
+        Position !== "Manager" &&
+        count === 0 &&
+        submittedData.length > 0 && (
+          <ViewORMCsheet
+            titleName={titleName}
+            allItems="allItems"
+            submittedData={submittedData}
+            Position={Position}
+          />
+        )}
 
       {closeSavedModel && (
         <div className="flex flex-col items-center">

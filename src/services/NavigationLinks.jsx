@@ -77,6 +77,7 @@ import { ListTimeSheet } from "../pages/timeSheet/ListTimeSheet";
 import { VTimeSheetTable } from "../pages/timeSheet/VTimeSheetTable";
 import { RM } from "../pages/reports/RM";
 import { Resignation } from "../pages/reports/Resignation";
+import { TempIDProvider } from "../utils/TempIDContext";
 import { AddEmpReq } from "../pages/training/trainingForm/AddEmpReq";
 import { BlngCertify } from "../pages/training/trainingForm/BlngCertify";
 import { HRSplit } from "../pages/training/trainingForm/HRSplit";
@@ -113,10 +114,7 @@ import { LabourMedicalInfoMD } from "../components/migratingData/LabourMedicalIn
 import { ContractFormPDF } from "../pages/reports/ContractFormPDF";
 import { ProbationPDF } from "../pages/reports/ProbationPDF";
 import { FiLoader } from "react-icons/fi";
-// import ForgotEmail from "../pages/forgotPassword/ForgotEmail";
-// import ForgotOtp from "../pages/forgotPassword/ForgotOtp";
-// import ForgotPassword from "../pages/forgotPassword/ForgotPassword";
-
+import {LeaveStatus} from "../components/migratingData/LeaveStatus"
 const client = generateClient();
 
 const NavigationLinks = () => {
@@ -225,10 +223,10 @@ const NavigationLinks = () => {
 
   return (
       <Routes>
-        {/* <Route path="/changePassword" element={<ChangePassword />} />
-        <Route path="/forgotEmail" element={<ForgotEmail />} />
-        <Route path="/forgotOtp" element={<ForgotOtp />} />
-        <Route path="/forgotPassword" element={<ForgotPassword/>} /> */}
+        {/* Change Password */}
+        <Route path="/changePassword" element={<ChangePassword />} />
+
+        {/* Migration Data */}
         <Route path="/migrationDataID" element={<IDDetailsMD />} />
         <Route path="/migrationDataEPI" element={<EmpPersonalMD />} />
         <Route path="/migrationDataWorkI" element={<WorkInfoMD />} />
@@ -243,6 +241,7 @@ const NavigationLinks = () => {
         <Route path="/migrationPPValid" element={<PassportValidMD />} />
         <Route path="/migrationLMInfo" element={<LabourMedicalInfoMD />} />
         <Route path="/migrationNlms" element={<NlmsMD />} />
+        <Route path="/migrationLeaveData" element={<LeaveStatus/> } /> 
         <Route
           path="/"
           element={<Navigate to={`/${firstCategory?.toLowerCase()}`} />}
@@ -396,9 +395,9 @@ const NavigationLinks = () => {
             <Route
               path="/contractForms"
               element={<ContractPDF userID={userID} userType={userType} />}
-            />
+            /> 
             <Route path="/promotion" Component={PromotionRep} />
-            <Route path="/probFormUpdate" Component={ProbationPDF} />
+            <Route path="/probFormUpdate" element={<ProbationPDF userID={userID} userType={userType}/>} />
             <Route
               path="/ContractUp"
               element={<ContractPDF userID={userID} userType={userType} />}

@@ -12,11 +12,7 @@ import { useTableMerged } from "./customTimeSheet/UserTableMerged";
 import { PopupForAssignManager } from "./ModelForSuccessMess/PopupForAssignManager";
 
 import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
-import { createTimeSheet, updateTimeSheet } from "../../graphql/mutations";
 
-import { Notification } from "./customTimeSheet/Notification";
-import { MergeTableForNotification } from "./customTimeSheet/MergeTableForNotification";
-import { sendEmail } from "../../services/EmailServices";
 import { PopupForAddRemark } from "./ModelForSuccessMess/PopupForAddRemark";
 import { FindSpecificTimeKeeper } from "./customTimeSheet/FindSpecificTimeKeeper";
 import { PopupForSFApproves } from "./ModelForSuccessMess/PopupForSFApproves";
@@ -26,6 +22,9 @@ import { SpinLogo } from "../../utils/SpinLogo";
 import { Pagination } from "./timeSheetSearch/Pagination";
 import { AutoFetchForAssignManager } from "./customTimeSheet/AutoFetchForAssignManager";
 import { TimeSheetsCRUDoperations } from "./customTimeSheet/TimeSheetsCRUDoperations";
+import { listTimeSheets } from "../../graphql/queries";
+import { deleteTimeSheet } from "../../graphql/mutations";
+import { useRowSelection } from "./customTimeSheet/useRowSelection";
 
 const client = generateClient();
 export const ViewORMCsheet = ({
@@ -38,6 +37,7 @@ export const ViewORMCsheet = ({
   fileName,
   defaultValue,
   showRejectedItemTable,
+  submittedData,
 }) => {
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
   const [closePopup, setClosePopup] = useState(false);
@@ -48,6 +48,7 @@ export const ViewORMCsheet = ({
   const [checkedItemsTwo, setCheckedItemsTwo] = useState({});
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
+  const [rejectTab, setRejectTab] = useState(false);
 
   const [editObject, setEditObject] = useState();
   const [toggleHandler, setToggleHandler] = useState(false);
@@ -71,6 +72,10 @@ export const ViewORMCsheet = ({
 
   const mergedData = AutoFetchForAssignManager();
   const { startDate, endDate, searchQuery, setSearchQuery } = useTempID();
+
+  const { selectedRows, setSelectedRows, handleCheckboxChange, handleSubmit } =
+    useRowSelection();
+
   useEffect(() => {
     try {
       if (processedData && processedData.length > 0) {
@@ -86,9 +91,20 @@ export const ViewORMCsheet = ({
       // setData(result);
       setSearchQuery(result);
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      // console.error("Error fetching user data:", error);
     }
   };
+
+  useEffect(() => {
+    if (submittedData && submittedData.length > 0) {
+      setShowStatusCol(true);
+      setCurrentStatus(true);
+
+      setData(submittedData);
+      setSecondaryData(submittedData);
+    }
+  }, [submittedData]);
+
   useEffect(() => {
     const getPosition = localStorage.getItem("userType");
     if (getPosition === "Manager") {
@@ -113,7 +129,7 @@ export const ViewORMCsheet = ({
               );
             }
           } catch (error) {
-            console.error("Error parsing empWorkInfo for ID:", val.id, error);
+            // console.error("Error parsing empWorkInfo for ID:", val.id, error);
           }
           return {
             id: val.id,
@@ -145,130 +161,121 @@ export const ViewORMCsheet = ({
   };
 
   useEffect(() => {
-    const checkKeys = async () => {
-      const convertKeys = (obj) => {
-        return Object.keys(obj).reduce((acc, key) => {
-          // Remove spaces and special characters, and convert to lowercase
-          const newKey = key.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
-          acc[newKey] = obj[key];
-          return acc;
-        }, {});
-      };
+    try {
+      const checkKeys = async () => {
+        const convertKeys = (obj) => {
+          return Object.keys(obj).reduce((acc, key) => {
+            // Remove spaces and special characters, and convert to lowercase
+            const newKey = key.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+            acc[newKey] = obj[key];
+            return acc;
+          }, {});
+        };
 
-      const convertedData = returnedTHeader.map(convertKeys);
+        const convertedData = returnedTHeader.map(convertKeys);
 
-      const requiredKeys = [
-        // "deptdiv",
-        "name",
-        // "badge",
-        // "date",
-        // "in",
-        // "out",
-        // "totalinout",
-        // "alldayminhrs",
-        // "netminutes",
-        // "totalhours",
-        // "workinghours",
-        // "ot",
-        // "remarks",
-      ];
-      // const requiredKeys = [
-      //   "DEPTDIV",
-      //   "BADGE",
-      //   "DATE",
-      //   "IN",
-      //   "OUT",
-      //   "TOTALINOUT",
-      //   "ALLDAYMINHRS",
-      //   "NETMINUTES",
-      //   "TOTALHOURS",
-      //   "REMARKS",
-      // ];
-      const checkedKeys = () => {
-        return new Promise((resolve) => {
-          const keyCheckResult = convertedData.every((item) =>
-            requiredKeys.every((key) =>
-              Object.keys(item)
-                .map((k) => k.toLowerCase())
-                .includes(key.toLowerCase())
-            )
-          );
-          resolve(keyCheckResult);
-        });
-      };
+        const requiredKeys = [
+          // "deptdiv",
+          "name",
+          // "badge",
+          // "date",
+          // "in",
+          // "out",
+          // "totalinout",
+          // "alldayminhrs",
+          // "netminutes",
+          // "totalhours",
+          // "workinghours",
+          // "ot",
+          // "remarks",
+        ];
 
-      const result = await checkedKeys();
-
-      setClosePopup(true);
-      setCurrentStatus(result); // Assuming setCurrentStatus is defined
-      setShowStatusCol(result);
-      // setLoading(false);
-    };
-
-    if (returnedTHeader && returnedTHeader.length > 0) {
-      checkKeys();
-    } else if (!returnedTHeader && showRejectedItemTable !== "Rejected") {
-      const fetchData = async () => {
-        setCurrentStatus(true);
-        // setLoading(true);
-        try {
-          const dataPromise = new Promise((resolve, reject) => {
-            if (convertedStringToArrayObj) {
-              resolve(convertedStringToArrayObj);
-            } else {
-              setTimeout(() => {
-                reject("No data found after waiting.");
-              }, 5000);
-            }
+        const checkedKeys = () => {
+          return new Promise((resolve) => {
+            const keyCheckResult = convertedData.every((item) =>
+              requiredKeys.every((key) =>
+                Object.keys(item)
+                  .map((k) => k.toLowerCase())
+                  .includes(key.toLowerCase())
+              )
+            );
+            resolve(keyCheckResult);
           });
+        };
 
-          const fetchedData = await dataPromise;
+        const result = await checkedKeys();
 
-          if (Position === "Manager") {
-            const finalData = await SendDataToManager(fetchedData);
-            pendingData(finalData);
-          }
-        } catch (err) {
-        } finally {
-          // setLoading(false);
-        }
+        setClosePopup(true);
+        setCurrentStatus(result); // Assuming setCurrentStatus is defined
+        setShowStatusCol(result);
+        // setLoading(false);
       };
 
-      // Call the fetchData function asynchronously
-      fetchData();
-    } else if (!returnedTHeader && showRejectedItemTable === "Rejected") {
-      const fetchData = async () => {
-        setCurrentStatus(true);
-        // setLoading(true);
-        try {
-          const dataPromise = new Promise((resolve, reject) => {
-            if (convertedStringToArrayObj) {
-              resolve(convertedStringToArrayObj);
-            } else {
-              setTimeout(() => {
-                reject("No data found after waiting.");
-              }, 5000);
+      if (returnedTHeader && returnedTHeader.length > 0) {
+        checkKeys();
+      } else if (!returnedTHeader && showRejectedItemTable !== "Rejected") {
+        const fetchData = async () => {
+          setCurrentStatus(true);
+          // setLoading(true);
+          try {
+            const dataPromise = new Promise((resolve, reject) => {
+              if (convertedStringToArrayObj) {
+                resolve(convertedStringToArrayObj);
+              } else {
+                setTimeout(() => {
+                  reject("No data found after waiting.");
+                }, 5000);
+              }
+            });
+
+            const fetchedData = await dataPromise;
+
+            if (Position === "Manager") {
+              const finalData = await SendDataToManager(fetchedData);
+              pendingData(finalData);
             }
-          });
-
-          const fetchedData = await dataPromise;
-
-          if (userIdentification !== "Manager") {
-            const finalData = await FindSpecificTimeKeeper(fetchedData);
-            pendingData(finalData);
+          } catch (err) {
+          } finally {
+            // setLoading(false);
           }
-        } catch (err) {
-        } finally {
-          // setLoading(false);
-        }
-      };
+        };
 
-      // Call the fetchData function asynchronously
-      fetchData();
-    } else {
-      setCurrentStatus(false);
-      setLoading(false);
-    }
+        // Call the fetchData function asynchronously
+        fetchData();
+      } else if (!returnedTHeader && showRejectedItemTable === "Rejected") {
+        const fetchData = async () => {
+          setCurrentStatus(true);
+          // setLoading(true);
+          try {
+            const dataPromise = new Promise((resolve, reject) => {
+              if (convertedStringToArrayObj) {
+                resolve(convertedStringToArrayObj);
+              } else {
+                setTimeout(() => {
+                  reject("No data found after waiting.");
+                }, 5000);
+              }
+            });
+
+            const fetchedData = await dataPromise;
+
+            if (userIdentification !== "Manager") {
+              const finalData = await FindSpecificTimeKeeper(fetchedData);
+              pendingData(finalData);
+            }
+          } catch (err) {
+          } finally {
+            // setLoading(false);
+          }
+        };
+
+        // Call the fetchData function asynchronously
+        fetchData();
+      } else {
+        setCurrentStatus(false);
+        setLoading(false);
+      }
+    } catch (err) {}
   }, [
     returnedTHeader,
     convertedStringToArrayObj,
@@ -281,12 +288,11 @@ export const ViewORMCsheet = ({
   const toggleFunction = () => {
     setToggleHandler(!toggleHandler);
   };
-  const toggleSFAMessage = async (value, responseData) => {
+
+  const toggleSFAMessage = useCallback(async (value, responseData) => {
     setSuccessMess(value);
-    if (value === true && responseData) {
-      setResponse(responseData);
-    }
-  };
+  }, []);
+
   const toggleFunctionForAssiMana = () => {
     setToggleAssignManager(!toggleAssignManager);
   };
@@ -345,20 +351,34 @@ export const ViewORMCsheet = ({
       });
       setData(updatedData);
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   };
+
+  const handleAssignManager = () => {
+    const remainingData = data?.filter(
+      (row) => !selectedRows.some((selected) => selected.id === row.id)
+    );
+    setData(remainingData);
+    setSecondaryData(remainingData);
+    setSelectedRows([]);
+  };
+
   const AllFieldData = useTableFieldData(titleName);
   const renameKeysFunctionAndSubmit = async (managerData) => {
     if (
       userIdentification !== "Manager" &&
-      showRejectedItemTable !== "Rejected"
+      showRejectedItemTable !== "Rejected" &&
+      selectedRows &&
+      selectedRows.length > 0
     ) {
       const result =
-        data &&
-        data.map((val) => {
+        selectedRows &&
+        selectedRows.length > 0 &&
+        selectedRows.map((val) => {
           return {
-            fileName: fileName,
+            id: val.id,
+
             empName: val.NAME || "",
             empDept: val.DEPTDIV || "",
             empBadgeNo: val.BADGE || "",
@@ -390,14 +410,18 @@ export const ViewORMCsheet = ({
           untilDate: managerData.muntilDate,
         };
       });
-      let action = "create";
+      let action = "updateStoredData";
       await TimeSheetsCRUDoperations({
+        setNotification,
+        setShowTitle,
         finalResult,
         toggleSFAMessage,
         setStoringMess,
-        setData,
+
         Position,
         action,
+        handleAssignManager,
+        selectedRows,
       });
     } else if (userIdentification === "Manager") {
       setNotification(false);
@@ -451,11 +475,13 @@ export const ViewORMCsheet = ({
       });
     } else if (
       userIdentification !== "Manager" &&
-      showRejectedItemTable === "Rejected"
+      showRejectedItemTable === "Rejected" &&
+      selectedRows &&
+      selectedRows.length > 0
     ) {
       const updatedRejectedItems =
-        data && data.length > 0
-          ? data.map((val) => {
+        selectedRows && selectedRows.length > 0
+          ? selectedRows.map((val) => {
               return {
                 id: val.id,
                 // fileName: val.fileName,
@@ -496,6 +522,49 @@ export const ViewORMCsheet = ({
       });
     }
   };
+
+  const storeInitialData = async () => {
+    const result =
+      data &&
+      data.length > 0 &&
+      data.map((val) => {
+        return {
+          fileName: fileName,
+          empName: val.NAME || "",
+          empDept: val.DEPTDIV || "",
+          empBadgeNo: val.BADGE || "",
+          date: val.DATE || "",
+          inTime: val.IN || "",
+          outTime: val.OUT || "",
+          totalInOut: val.TOTALINOUT || "",
+          allDayHrs: val.ALLDAYMINHRS || "",
+          netMins: val.NETMINUTES || "",
+          totalHrs: val.TOTALHOURS || "",
+          normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
+          actualWorkHrs: val.WORKINGHOURS || "",
+          otTime: val.OT || "",
+          remarks: val.REMARKS || "",
+          empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
+          assignBy: uploaderID,
+          fileType: "ORMC",
+          status: "All",
+          companyName: val?.LOCATION,
+        };
+      });
+
+    let action = "create";
+    let finalResult = result;
+
+    await TimeSheetsCRUDoperations({
+      finalResult,
+      toggleSFAMessage,
+      setStoringMess,
+      setData,
+      Position,
+      action,
+    });
+  };
+
   const toggleForRemarkFunc = () => {
     setToggleForRemark(!toggleForRemark);
   };
@@ -533,7 +602,7 @@ export const ViewORMCsheet = ({
 
     setAllRejectedData(dataAlongWithRemark);
   };
-  // console.log(allApprovedData, " : ", allRejectedData);
+
   const removeExistingData = (data, action) => {
     if (action === "Approved") {
       const afterRemoved = allApprovedData.filter((fil) => fil.id !== data.id);
@@ -555,6 +624,7 @@ export const ViewORMCsheet = ({
 
     // Update the state with the filtered data
     setData(afterRemoved);
+    setSecondaryData(afterRemoved);
     setAllApprovedData([]);
     setAllRejectedData([]);
   }, [allApprovedData, allRejectedData, data]);
@@ -592,7 +662,6 @@ export const ViewORMCsheet = ({
       // const startDate = "12/23/2024"; // Start date in "MM/DD/YYYY"
       // const endDate = "12/25/2024"; // End date in "MM/DD/YYYY"
 
-      console.log(filteredData);
       setData(filteredData);
     }
   }, [startDate, endDate, secondaryData, searchQuery]);
@@ -673,6 +742,12 @@ export const ViewORMCsheet = ({
                           REJECT
                         </td>
                       </>
+                    )}
+                    {(submittedData && submittedData.length > 0) ||
+                    (rejectTab && rejectTab) ? (
+                      <td>Edited</td>
+                    ) : (
+                      ""
                     )}
                   </tr>
                 </thead>
@@ -797,6 +872,24 @@ export const ViewORMCsheet = ({
                                   </td>
                                 </React.Fragment>
                               )}
+
+                              {(submittedData && submittedData.length > 0) ||
+                              (rejectTab && rejectTab) ? (
+                                <td
+                                  className="cursor-pointer px-4 py-2"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedRows.some(
+                                      (r) => r.id === m.id
+                                    )}
+                                    onChange={() => handleCheckboxChange(m)}
+                                  />
+                                </td>
+                              ) : (
+                                ""
+                              )}
                             </tr>
                           );
                         };
@@ -841,19 +934,101 @@ export const ViewORMCsheet = ({
               <div className="flex-1"></div>
               <div className="flex-1 flex justify-center">
                 <button
-                  className="rounded px-3 py-2.5 w-52 bg-[#FEF116] text_size_5 text-dark_grey"
+                  className={`rounded px-3 py-2.5 w-52 bg-[#FEF116] text_size_5 text-dark_grey ${
+                    selectedRows && selectedRows.length > 0
+                      ? "bg-[#FEF116]"
+                      : (allApprovedData && allApprovedData.length > 0) ||
+                        (allRejectedData && allRejectedData.length > 0)
+                      ? "bg-[#FEF116]"
+                      : excelData
+                      ? "bg-[#FEF116]"
+                      : "bg-[#eee542] cursor-not-allowed"
+                  }`}
+                  disabled={
+                    userIdentification !== "Manager"
+                      ? !(selectedRows?.length > 0 || excelData)
+                      : !(
+                          allApprovedData?.length > 0 ||
+                          allRejectedData?.length > 0
+                        )
+                  }
                   onClick={() => {
                     if (userIdentification !== "Manager") {
-                      toggleFunctionForAssiMana();
+                      if (selectedRows && selectedRows.length > 0) {
+                        toggleFunctionForAssiMana();
+                      } else if (excelData && excelData) {
+                        storeInitialData();
+                      }
+                      // const fetchDataAndDelete = async () => {
+                      //   try {
+                      //     console.log("Fetching and Deleting SBW Data...");
+                      //     // setIsDeleting(true); // Set loading state
+                      //     let nextToken = null; // Initialize nextToken for pagination
+                      //     do {
+                      //       // Define the filter for fetching SBW data
+                      //       const filter = {
+                      //         and: [{ fileType: { eq: "Offshore" } }],
+                      //       };
+                      //       // Fetch the BLNG data using GraphQL with pagination
+                      //       const response = await client.graphql({
+                      //         query: listTimeSheets,
+                      //         variables: { filter: filter, nextToken: nextToken }, // Pass nextToken for pagination
+                      //       });
+                      //       // Extract data and nextToken
+                      //       const SBWdata =
+                      //         response?.data?.listTimeSheets?.items || [];
+                      //       nextToken = response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
+                      //       console.log("Fetched SBW Data:", SBWdata);
+                      //       // Delete each item in the current batch
+                      //       await Promise.all(
+                      //         SBWdata.map(async (item) => {
+                      //           try {
+                      //             const deleteResponse = await client.graphql({
+                      //               query: deleteTimeSheet,
+                      //               variables: { input: { id: item.id } },
+                      //             });
+                      //             console.log(
+                      //               "Deleted Item Response:",
+                      //               deleteResponse
+                      //             );
+                      //           } catch (deleteError) {
+                      //             console.error(
+                      //               `Error deleting item with ID ${item.id}:`,
+                      //               deleteError
+                      //             );
+                      //           }
+                      //         })
+                      //       );
+                      //       console.log("Batch deletion completed.");
+                      //     } while (nextToken); // Continue fetching until no more data
+                      //     console.log(
+                      //       "All SBW items deletion process completed."
+                      //     );
+                      //   } catch (fetchError) {
+                      //     console.error(
+                      //       "Error in fetchDataAndDelete:",
+                      //       fetchError
+                      //     );
+                      //   } finally {
+                      //     // setIsDeleting(false); // Reset loading state
+                      //   }
+                      // };
+                      // fetchDataAndDelete();
                     } else if (userIdentification === "Manager") {
                       renameKeysFunctionAndSubmit();
                       removeCheckedItem();
+
+                      // setCheckedItems({});
                     }
                   }}
                 >
                   {userIdentification === "Manager"
                     ? "Finalize and Submit"
-                    : "Assign Manager"}
+                    : submittedData && submittedData.length > 0
+                    ? "Assign Manager"
+                    : showRejectedItemTable === "Rejected"
+                    ? "Assign Manager"
+                    : "Submit"}
                 </button>
               </div>
               <div className="flex-1">
@@ -884,6 +1059,7 @@ export const ViewORMCsheet = ({
           editFunction={editSBWFunction}
           titleName={titleName}
           Position={Position}
+          handleSubmit={handleSubmit}
         />
       )}
       {storingMess === true ? (

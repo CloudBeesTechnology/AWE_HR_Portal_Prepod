@@ -5,8 +5,11 @@ import { FaArrowLeft } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useTempID } from "../../../utils/TempIDContext";
 import { ViewSummaryFilterData } from "./ViewSummaryFilterData";
-import { downloadPDF } from "../../../utils/DownloadPDF";
+import { IoMdDownload } from "react-icons/io";
 // import tableLogo from "../../../assets/logo/aweLogo.png";
+import { BiSolidPrinter } from "react-icons/bi";
+import { DownloadExcelPDF } from "../timeSheetSearch/DownloadExcelPDF";
+import { PrintExcelSheet } from "../timeSheetSearch/PrintExcelSheet";
 
 export const ViewSummaryTable = ({
   dayCounts,
@@ -58,7 +61,7 @@ export const ViewSummaryTable = ({
 
       return totalHours;
     } catch (err) {
-      console.log(err, " : ERROR");
+      // console.log(err, " : ERROR");
     }
   }
 
@@ -83,70 +86,23 @@ export const ViewSummaryTable = ({
 
       return totalAbsence;
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   }
-  const handlePrint = () => {
-    // Get the table by its ID
-    const table = document.getElementById("downloadTable");
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
 
-    if (!table) {
-      console.error("Table with the given ID not found");
-      return;
-    }
+    // Extract the day, month, and year
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+    const year = date.getFullYear();
 
-    // Create a hidden iframe
-    const iframe = document.createElement("iframe");
-    iframe.style.position = "absolute";
-    iframe.style.width = "0";
-    iframe.style.height = "0";
-    iframe.style.border = "none";
-
-    // Append the iframe to the document body
-    document.body.appendChild(iframe);
-
-    // Write content to the iframe
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-    iframeDoc.open();
-    iframeDoc.write("<html><head><title>Print Table</title>");
-    iframeDoc.write("<style>");
-
-    // Add custom styles for the table, logo, and text content
-    iframeDoc.write(`
-      body { font-family: Arial, sans-serif; margin: 20px; }
-      .content { margin-bottom: 20px; }
-      .logo { max-width: 100px; margin-bottom: 10px; }
-      table { width: 100%; border-collapse: collapse; }
-      th, td { padding: 8px; text-align: left; border: 1px solid black; }
-      th { background-color: #f2f2f2; }
-    `);
-
-    iframeDoc.write("</style>");
-    iframeDoc.write("</head><body>");
-
-    // Add logo and text content
-    iframeDoc.write(`
-      <div class="content">
-        <img src="assets/logo/aweLogo.png" class="logo" alt="Logo"> <!-- Replace with your logo path -->
-        <h2>Printed Table Report</h2>
-        <p>This is the report containing the table data. You can add any other descriptive text as needed.</p>
-      </div>
-    `);
-
-    // Append the table content into the iframe's body
-    iframeDoc.body.appendChild(table.cloneNode(true)); // Clone the table to avoid affecting the original
-    iframeDoc.write("</body></html>");
-    iframeDoc.close();
-
-    // Trigger the print dialog in the iframe
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-
-    // Remove the iframe after printing
-    setTimeout(() => {
-      document.body.removeChild(iframe);
-    }, 1000);
+    // Return the formatted date
+    return `${day}-${month}-${year}`;
   };
+  const formattedStartDate = formatDate(startDate);
+  const formattedEndDate = formatDate(endDate);
+  const location = selectedLocation?.toUpperCase();
 
   return (
     <div className="bg-[#fafaf6] h-screen">
@@ -156,10 +112,7 @@ export const ViewSummaryTable = ({
             <Link
               to="/timeSheet"
               className="text-xl flex-1 text-grey"
-              onClick={() => {
-                getStartDate(null);
-                getEndDate(null);
-              }}
+      
             >
               <FaArrowLeft />
             </Link>
@@ -167,15 +120,19 @@ export const ViewSummaryTable = ({
           <header className="flex justify-center text_size_2 py-5 text-dark_grey ">
             <p>View Summary</p>
           </header>
-          <div className="flex items-center">
-            <button
-              className="rounded text_size_5 text-dark_grey bg-primary  py-2  px-7"
-              onClick={() => {
-                handlePrint();
-              }}
-            >
-              Print
-            </button>
+          <div
+            className="flex space-x-3  items-center rounded px-3  h-10 bg-[#FEF116]"
+            onClick={() => {
+              PrintExcelSheet(
+                "downloadTable",
+                location,
+                formattedStartDate,
+                formattedEndDate
+              );
+            }}
+          >
+            <button className="text_size_5 text-dark_grey">Print</button>
+            <BiSolidPrinter className="text-black cursor-pointer" />
           </div>
         </header>
         <ViewSummaryFilterData
@@ -240,7 +197,7 @@ export const ViewSummaryTable = ({
                   //   0
                   // );
                   // const NormalDays = normalWorkHours.length;
-                  console.log(employee);
+
                   //Calculate Total OT
                   const totalOT = Object.values(
                     employee?.OVERTIMEHRS || {}
@@ -394,7 +351,7 @@ export const ViewSummaryTable = ({
                                   workingHrsKey: currentDayKey,
                                   mealAllow: employee?.mealAllow,
                                 };
-                                console.log(empDetails);
+
                                 editViewSummaryObject(empDetails);
                               }}
                             >
@@ -472,72 +429,6 @@ export const ViewSummaryTable = ({
                         </td>
                         <td></td>
 
-                        {/* {Array.from({ length: dayCounts + 1 }, (_, i) => {
-                          const currentDayIndex = i + 1;
-
-                          return (
-                            <td
-                              className={`${
-                                i === 0 ? "border" : "border-b"
-                              } text-center py-1`}
-                              key={currentDayIndex} // Unique key for each column
-                            >
-                              <input
-                                className={`${i === 0 && "hidden"} py-10`}
-                                type="checkbox"
-                                onChange={() => {}}
-                              />
-                            </td>
-                          );
-                        })} */}
-                        {/* {Array.from({ length: dayCounts }, (_, i) => {
-                          const currentDay = new Date(getStartDate);
-                          currentDay.setDate(getStartDate.getDate() + i); // Increment the date
-                          const formattedDate = `${currentDay.getDate()}-${
-                            currentDay.getMonth() + 1
-                          }-${currentDay.getFullYear()}`;
-
-                          const isVerified =
-                            employee?.getVerify?.[formattedDate];
-                          // console.log(employee?.getVerify);
-                          // const isVerified = employee?.getVerify?.some(
-                          //   (entry) => entry[formattedDate] === "Yes"
-                          // );
-                      
-
-                          const isSpecialDay = ["PH", "PHD", "OFF"].includes(
-                            employee?.workingHrs?.[formattedDate]
-                          );
-
-                          const finalValue = isSpecialDay
-                            ? "Yes"
-                            : isVerified || null;
-                          const EnsureVerifiedWHours = {
-                            date: formattedDate,
-                            value: finalValue,
-                          };
-
-                          console.log(EnsureVerifiedWHours);
-
-                          console.log(isSpecialDay);
-                          const isChecked = isVerified || isSpecialDay;
-
-                       
-                          return (
-                            <td
-                              className="border px-2 py-2 border-dark_grey"
-                              key={currentDay.toDateString()} // Unique key for each column
-                            >
-                              <input
-                                className={`py-10`}
-                                type="checkbox"
-                                checked={isChecked}
-                                onChange={() => {}}
-                              />
-                            </td>
-                          );
-                        })} */}
-
                         {Array.from({ length: dayCounts }, (_, i) => {
                           const currentDay = new Date(getStartDate);
                           currentDay.setDate(getStartDate.getDate() + i); // Increment the date
@@ -594,9 +485,6 @@ export const ViewSummaryTable = ({
                                     checked={isChecked}
                                     onChange={() => {
                                       // Add logic for handling checkbox change
-                                      console.log(
-                                        `Checkbox for ${formattedDate} changed.`
-                                      );
                                     }}
                                   />
                                   <br />
@@ -701,14 +589,23 @@ export const ViewSummaryTable = ({
           </table>
         </div>
         <footer className="flex justify-center py-10 space-x-10">
-          <button
-            className=" rounded text_size_5 text-dark_grey bg-primary px-3 py-2 w-[180px]"
-            onClick={() => {
-              downloadPDF("downloadTable", "Theader");
-            }}
-          >
-            Download
-          </button>
+          <div className="flex space-x-3  items-center rounded px-3 py-2 bg-[#FEF116]">
+            <button
+              className=" text_size_5 text-dark_grey"
+              onClick={() => {
+                DownloadExcelPDF(
+                  "downloadTable",
+                  // "Theader",
+                  location,
+                  formattedStartDate,
+                  formattedEndDate
+                );
+              }}
+            >
+              Download
+            </button>
+            <IoMdDownload className="text-black cursor-pointer" />
+          </div>
         </footer>
       </div>
     </div>

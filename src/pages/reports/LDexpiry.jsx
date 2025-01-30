@@ -11,13 +11,15 @@ export const LDexpiry = () => {
   const [endDate, setEndDate] = useState("");
   const [tableHead] = useState([
     "Emp ID",
-    "Employee Badge No",
+    "Badge No",
     "Name",
     "Nationality",
     "Position",
     "Department",
     "LD Approved",
     "LD Expiry",
+    "ENERGY DEPARTMENT APPROVAL VALIDITY DATE",
+    "ENERGY DEPARTMENT APPROVAL REFERENCE NUMBER"
   ]);
 
   const formatDate = (date, type) => {
@@ -47,7 +49,7 @@ export const LDexpiry = () => {
   
       // Calculate the start and end of the next month
       const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1 +1+1); // First day of next month
-      const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 4, 0);  // Last day of next month
+      const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 4, 1);  // Last day of next month
   
       // Check if expiry date falls in the next month
       return expiry >= startOfNextMonth && expiry <= endOfNextMonth;
@@ -55,10 +57,8 @@ export const LDexpiry = () => {
   
     // Filter and map the employee pass data
     const LDReviewMergedData = (data) => {
-      return data
+      const sortedData = data
         .filter((item) => {
-          // console.log(item.nlmsEmpValid);
-          
           // Ensure nlmsEmpValid is a valid array with non-empty and valid date entries
           return (
             Array.isArray(item.nlmsEmpValid) &&
@@ -67,13 +67,13 @@ export const LDexpiry = () => {
           );
         })
         .filter((item) => {
-          const lastPassExp = item.nlmsEmpValid[item.nlmsEmpValid.length - 1];
-          return isInNextMonth(lastPassExp);
+          const lastValidDate = item.nlmsEmpValid[item.nlmsEmpValid.length - 1];
+          return isInNextMonth(lastValidDate); // Assuming `isInNextMonth` is a function you defined
         })
         .map((item) => {
-          const lastPassExp = item.nlmsEmpValid[item.nlmsEmpValid.length - 1];
+          const lastValidDate = item.nlmsEmpValid[item.nlmsEmpValid.length - 1];
           return {
-            
+            lastValidDate: new Date(lastValidDate), // Keep for sorting only
             empID: item.empID || "-",
             empBadgeNo: item.empBadgeNo || "-",
             name: item.name || "-",
@@ -81,55 +81,72 @@ export const LDexpiry = () => {
             position: item.position || "-",
             department: item.department || "-",
             nlmsEmpApproval: Array.isArray(item.nlmsEmpApproval)
-                  ? formatDate(item.nlmsEmpApproval[item.nlmsEmpApproval.length - 1])
-                  : "-",
-            nlmsEmpValid: formatDate(lastPassExp) || "-",
-    
+              ? formatDate(item.nlmsEmpApproval[item.nlmsEmpApproval.length - 1])
+              : "-",
+            nlmsEmpValid: formatDate(lastValidDate) || "-",
+            nlmsEmpSubmit:Array.isArray(item.nlmsEmpSubmit)
+            ? formatDate(item.nlmsEmpSubmit[item.nlmsEmpSubmit.length - 1])
+            : "-",
+            nlmsEmpSubmitRefNo:item.nlmsEmpSubmitRefNo,
           };
-        });
+        })
+        .sort((a, b) => a.lastValidDate - b.lastValidDate); // Sort using lastValidDate (temporary date object)
+    
+      // Remove lastValidDate after sorting
+      return sortedData.map(({ lastValidDate, ...rest }) => rest);
     };
+    
     useEffect(() => {
       const data = LDReviewMergedData(allData);
       setTableBody(data);
     }, [allData]);
-
+    
     const handleDate = (e, type) => {
       const value = e.target.value;
-  
+    
       if (type === "startDate") setStartDate(value);
       if (type === "endDate") setEndDate(value);
-  
+    
       const start = type === "startDate" ? new Date(value) : startDate ? new Date(startDate) : null;
       const end = type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
-  
-      const filtered = allData.filter((data) => {
-        const expiryArray = data.nlmsEmpValid || [];
-        const expiryDate = expiryArray.length
-          ? new Date(expiryArray[expiryArray.length - 1])
-          : null;
-  
-        if (!expiryDate || isNaN(expiryDate.getTime())) return false;
-  
-        if (start && end) return expiryDate >= start && expiryDate <= end;
-        if (start) return expiryDate >= start;
-        if (end) return expiryDate <= end;
-  
-        return true;
-      }).map((item) => ({
-        empID: item.empID || "-",
-        empBadgeNo: item.empBadgeNo || "-",
-        name: item.name || "-",
-        nationality: item.nationality || "-",
-        position: item.position || "-",
-        department: item.department || "-",
-        nlmsEmpApproval: Array.isArray(item.nlmsEmpApproval)
-        ? formatDate(item.nlmsEmpApproval[item.nlmsEmpApproval.length - 1])
-        : "-",
-        nlmsEmpValid: formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1]),
-      }));
-  
+    
+      const filtered = allData
+        .filter((data) => {
+          const expiryArray = data.nlmsEmpValid || [];
+          const expiryDate = expiryArray.length
+            ? new Date(expiryArray[expiryArray.length - 1])
+            : null;
+    
+          if (!expiryDate || isNaN(expiryDate.getTime())) return false;
+    
+          if (start && end) return expiryDate >= start && expiryDate <= end;
+          if (start) return expiryDate >= start;
+          if (end) return expiryDate <= end;
+    
+          return true;
+        })
+        .map((item) => {
+          const lastValidDate = item.nlmsEmpValid[item.nlmsEmpValid.length - 1];
+          return {
+            lastValidDate: new Date(lastValidDate), // Keep for sorting only
+            empID: item.empID || "-",
+            empBadgeNo: item.empBadgeNo || "-",
+            name: item.name || "-",
+            nationality: item.nationality || "-",
+            position: item.position || "-",
+            department: item.department || "-",
+            nlmsEmpApproval: Array.isArray(item.nlmsEmpApproval)
+              ? formatDate(item.nlmsEmpApproval[item.nlmsEmpApproval.length - 1])
+              : "-",
+            nlmsEmpValid: formatDate(lastValidDate),
+          };
+        })
+        .sort((a, b) => a.lastValidDate - b.lastValidDate) // Sort by lastValidDate (temporary date object)
+        .map(({ lastValidDate, ...rest }) => rest); // Remove lastValidDate after sorting
+    
       setFilteredData(filtered);
     };
+    
   return (
     <div>
       <FilterTable

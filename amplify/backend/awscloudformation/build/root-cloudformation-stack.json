@@ -214,7 +214,7 @@
             "Ref": "UnauthRoleName"
           },
           "S3DeploymentBucket": "amplify-aweadininprod-prod-954b8-deployment",
-          "S3DeploymentRootKey": "amplify-appsync-files/7b378f81787cd4ab8e8982a163061d90fd7d3af0",
+          "S3DeploymentRootKey": "amplify-appsync-files/775836901a909345508a0438857c646ac02b4bb0",
           "env": "prod"
         }
       }

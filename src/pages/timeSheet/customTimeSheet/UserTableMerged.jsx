@@ -83,6 +83,7 @@ export const useTableMerged = (excelData) => {
               };
             });
 
+           
             setData(finalData); // Assuming setData is your state setter
           };
           fetchWorkInfo();

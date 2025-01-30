@@ -31,22 +31,60 @@ export const Reports = () => {
     leaveDetailsData,
     trainingCertifi,
     AddEmpReq,
-    ProbFData,contractForms
+    ProbFData,
+    contractForms,
+    IVSSDetails,
+    WPTrackings,
+    localMobiliz,
+    empPDData
   } = useContext(DataSupply);
+console.log(IVSSDetails);
 
+IVSSDetails.forEach((employee) => {
+  if (employee.tempID === "TEMP015") {
+    console.log(employee);
+  }
+});
   const [mergedData, setMergeData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [userID, setUserID] = useState("");
+  const [userType, setUserType] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const userID = localStorage.getItem("userID");
+    setUserID(userID);
+    const userType = localStorage.getItem("userType");
+    setUserType(userType);
+  }, []);
 
   const reportTiles = [
     { title: "Recruitment & Mobilization", icon: rm, path: "/rm" },
     { title: "Resignation", icon: Resignation, path: "/resignation" },
     { title: "Termination", icon: terminate, path: "/termination" },
     { title: "Probation Review", icon: probation, path: "/probationReview" },
-    { title: "Probation Form Update", icon: probation, path: "/probFormUpdate" },
-    { title: "Contract Expiry Review", icon: contract, path: "/contractReview" },
-    { title: "Contract Expiry Form Update", icon: contract, path: "/ContractUp" },
-    { title: "Employment Pass Expiry", icon: passExpiry, path: "/empPassExpiry" },
+    {
+      title: "Probation Form Update",
+      icon: probation,
+      path: "/probFormUpdate",
+    },
+    {
+      title: "Contract Expiry Review",
+      icon: contract,
+      path: "/contractReview",
+      show: userType !== "Supervisor",
+    },
+    {
+      title: "Contract Expiry Form Update",
+      icon: contract,
+      path: "/ContractUp",
+      show: userType !== "Supervisor",
+    },
+    {
+      title: "Employment Pass Expiry",
+      icon: passExpiry,
+      path: "/empPassExpiry",
+    },
     { title: "LD Expiry", icon: LD, path: "/ldExpiry" },
     { title: "Passport Expiry", icon: passport, path: "/passportExpiry" },
     { title: "Employment Medical", icon: medical, path: "/empMedical" },
@@ -58,64 +96,89 @@ export const Reports = () => {
     { title: "Promotion", icon: rm, path: "/promotion" },
   ];
 
+  const filteredReportTiles = reportTiles.filter(
+    (tile) => tile.show !== false
+  );
+
   useEffect(() => {
-    const mergeData = empPIData.map((piData) => {
-      const data = {
-        ...piData,
-        ...(IDData?.find((item) => item.empID === piData.empID) || {}),
-        ...(workInfoData?.find((item) => item.empID === piData.empID) || {}),
-        ...(terminateData?.find((item) => item.empID === piData.empID) || {}),
-        ...(DNData?.find((item) => item.empID === piData.empID) || {}),
-        ...(PPValidsData?.find((item) => item.empID === piData.empID) || {}),
-        ...(LMIData?.find((item) => item.empID === piData.empID) || {}),
-        ...(EmpInsuranceData?.find((item) => item.empID === piData.empID) || {}),
-        ...(WeldeInfo?.find((item) => item.empID === piData.empID) || {}),
-        ...(BastingInfo?.find((item) => item.empID === piData.empID) || {}),
-        ...(leaveDetailsData?.find((item) => item.empID === piData.empID) || {}),
-        ...(trainingCertifi?.find((item) => item.empID === piData.empID) || {}),
-        ...(AddEmpReq?.find((item) => item.empID === piData.empID) || {}),
-        ...(ProbFData?.find((item) => item.empID === piData.empID) || {}),
-        ...(contractForms?.find((item) => item.empID === piData.empID) || {}),
+    if (!empPIData || empPIData.length === 0) return;
+  
+    const mergedExampleData = IVSSDetails.map((item1) => {
+      const { empID, tempID } = item1;
+  
+      // Step 2: Find matching tempID data in WPTrackings and localMobiliz
+      const matchingData2 = WPTrackings.find((item2) => item2.tempID === tempID) || {};
+      const matchingData = localMobiliz.find((item3) => item3.tempID === tempID) || {};
+  
+      // Step 3: Merge all data together
+      return {
+        ...item1,
+        ...matchingData2,
+        ...matchingData,
       };
-      return data;
     });
-    
-    setMergeData(mergeData);
+  
+    const finalMergedData = empPIData.map((piData) => {
+      const empID = piData.empID;
+  
+      const additionalData = mergedExampleData.find((exData) => exData.empID === empID) || {};
+  
+      return {
+        ...piData,
+        ...(IDData?.find((item) => item.empID === empID) || {}),
+        ...(workInfoData?.find((item) => item.empID === empID) || {}),
+        ...(terminateData?.find((item) => item.empID === empID) || {}),
+        ...(DNData?.find((item) => item.empID === empID) || {}),
+        ...(PPValidsData?.find((item) => item.empID === empID) || {}),
+        ...(LMIData?.find((item) => item.empID === empID) || {}),
+        ...(EmpInsuranceData?.find((item) => item.empID === empID) || {}),
+        ...(WeldeInfo?.find((item) => item.empID === empID) || {}),
+        ...(BastingInfo?.find((item) => item.empID === empID) || {}),
+        ...(leaveDetailsData?.find((item) => item.empID === empID) || {}),
+        ...(trainingCertifi?.find((item) => item.empID === empID) || {}),
+        ...(AddEmpReq?.find((item) => item.empID === empID) || {}),
+        ...(ProbFData?.find((item) => item.empID === empID) || {}),
+        ...(contractForms?.find((item) => item.empID === empID) || {}),
+        ...(IVSSDetails?.find((item) => item.empID === empID) || {}),
+        ...additionalData, // Add the merged example data
+      };
+    });
+  
+    // Check if finalMergedData is different before updating state
+    setMergeData((prev) => {
+      const isEqual =
+        JSON.stringify(prev) === JSON.stringify(finalMergedData);
+      return isEqual ? prev : finalMergedData;
+    });
+  
     setLoading(false);
   }, [
-    empPIData,
-    IDData,
-    workInfoData,
-    terminateData,
-    DNData,
-    PPValidsData,
-    LMIData,
-    EmpInsuranceData,
-    WeldeInfo,
-    BastingInfo,
-    leaveDetailsData,
-    trainingCertifi,
-    AddEmpReq,
-    ProbFData,contractForms
+    empPIData, IDData, workInfoData, terminateData, DNData, PPValidsData, 
+    LMIData, EmpInsuranceData, WeldeInfo, BastingInfo, leaveDetailsData, 
+    trainingCertifi, AddEmpReq, ProbFData, contractForms, IVSSDetails, WPTrackings, localMobiliz
   ]);
-
-  if (loading) return <p>Loading data...</p>;
-
+  
+  
   return (
     <div className="p-10 w-full bg-[#F5F6F1CC]">
       <p className="text-2xl font-semibold text-dark_grey text-center uppercase ">
         Report
       </p>
-      <div className="flex justify-between items-center flex-wrap gap-5 mt-14">
-        {reportTiles.map((tile, index) => (
+      <div className="grid grid-cols-4 flex-wrap gap-5 mt-14">
+        {filteredReportTiles.map((tile, index) => (
           <div
             key={index}
-            className="flex flex-col items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg cursor-pointer border-2 border-[#EAD892] w-[200px] h-[150px]"
-            onClick={() => navigate(tile.path, { state: { allData: mergedData,title:tile.title
-            }})}
+            className="flex flex-col justify-center items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg cursor-pointer border-2 border-[#EAD892] w-[200px] h-[150px]"
+            onClick={() =>
+              navigate(tile.path, {
+                state: { allData: mergedData, title: tile.title },
+              })
+            }
           >
             <img src={tile.icon} alt={tile.title} className="mb-4 w-12 h-12" />
-            <p className="text-center font-medium text-gray-700">{tile.title}</p>
+            <p className="text-center font-medium text-gray-700">
+              {tile.title}
+            </p>
           </div>
         ))}
       </div>

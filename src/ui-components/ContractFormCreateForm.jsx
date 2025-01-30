@@ -6,7 +6,13 @@
 
 /* eslint-disable */
 import * as React from "react";
-import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
+import {
+  Button,
+  Flex,
+  Grid,
+  SwitchField,
+  TextField,
+} from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { generateClient } from "aws-amplify/api";
 import { createContractForm } from "../graphql/mutations";
@@ -29,6 +35,7 @@ export default function ContractFormCreateForm(props) {
     hrManager: "",
     genManager: "",
     remarks: "",
+    contStatus: false,
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [conAttn, setConAttn] = React.useState(initialValues.conAttn);
@@ -36,6 +43,7 @@ export default function ContractFormCreateForm(props) {
   const [hrManager, setHrManager] = React.useState(initialValues.hrManager);
   const [genManager, setGenManager] = React.useState(initialValues.genManager);
   const [remarks, setRemarks] = React.useState(initialValues.remarks);
+  const [contStatus, setContStatus] = React.useState(initialValues.contStatus);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setEmpID(initialValues.empID);
@@ -44,6 +52,7 @@ export default function ContractFormCreateForm(props) {
     setHrManager(initialValues.hrManager);
     setGenManager(initialValues.genManager);
     setRemarks(initialValues.remarks);
+    setContStatus(initialValues.contStatus);
     setErrors({});
   };
   const validations = {
@@ -53,6 +62,7 @@ export default function ContractFormCreateForm(props) {
     hrManager: [],
     genManager: [],
     remarks: [],
+    contStatus: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -86,6 +96,7 @@ export default function ContractFormCreateForm(props) {
           hrManager,
           genManager,
           remarks,
+          contStatus,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -154,6 +165,7 @@ export default function ContractFormCreateForm(props) {
               hrManager,
               genManager,
               remarks,
+              contStatus,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -183,6 +195,7 @@ export default function ContractFormCreateForm(props) {
               hrManager,
               genManager,
               remarks,
+              contStatus,
             };
             const result = onChange(modelFields);
             value = result?.conAttn ?? value;
@@ -212,6 +225,7 @@ export default function ContractFormCreateForm(props) {
               hrManager,
               genManager,
               remarks,
+              contStatus,
             };
             const result = onChange(modelFields);
             value = result?.depHead ?? value;
@@ -241,6 +255,7 @@ export default function ContractFormCreateForm(props) {
               hrManager: value,
               genManager,
               remarks,
+              contStatus,
             };
             const result = onChange(modelFields);
             value = result?.hrManager ?? value;
@@ -270,6 +285,7 @@ export default function ContractFormCreateForm(props) {
               hrManager,
               genManager: value,
               remarks,
+              contStatus,
             };
             const result = onChange(modelFields);
             value = result?.genManager ?? value;
@@ -299,6 +315,7 @@ export default function ContractFormCreateForm(props) {
               hrManager,
               genManager,
               remarks: value,
+              contStatus,
             };
             const result = onChange(modelFields);
             value = result?.remarks ?? value;
@@ -313,6 +330,36 @@ export default function ContractFormCreateForm(props) {
         hasError={errors.remarks?.hasError}
         {...getOverrideProps(overrides, "remarks")}
       ></TextField>
+      <SwitchField
+        label="Cont status"
+        defaultChecked={false}
+        isDisabled={false}
+        isChecked={contStatus}
+        onChange={(e) => {
+          let value = e.target.checked;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              conAttn,
+              depHead,
+              hrManager,
+              genManager,
+              remarks,
+              contStatus: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.contStatus ?? value;
+          }
+          if (errors.contStatus?.hasError) {
+            runValidationTasks("contStatus", value);
+          }
+          setContStatus(value);
+        }}
+        onBlur={() => runValidationTasks("contStatus", contStatus)}
+        errorMessage={errors.contStatus?.errorMessage}
+        hasError={errors.contStatus?.hasError}
+        {...getOverrideProps(overrides, "contStatus")}
+      ></SwitchField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

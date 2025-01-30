@@ -416,7 +416,7 @@ export const TrainingCertificatesForm = () => {
         <SpinLogo
         text={showTitle}
         notification={notification}
-          path="/training/hr"
+          path="/training/trainingCertify"
         />
       )}
     </section>

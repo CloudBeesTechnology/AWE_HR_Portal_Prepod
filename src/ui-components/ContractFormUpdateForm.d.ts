@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, SwitchFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -28,6 +28,7 @@ export declare type ContractFormUpdateFormInputValues = {
     hrManager?: string;
     genManager?: string;
     remarks?: string;
+    contStatus?: boolean;
 };
 export declare type ContractFormUpdateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -36,6 +37,7 @@ export declare type ContractFormUpdateFormValidationValues = {
     hrManager?: ValidationFunction<string>;
     genManager?: ValidationFunction<string>;
     remarks?: ValidationFunction<string>;
+    contStatus?: ValidationFunction<boolean>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type ContractFormUpdateFormOverridesProps = {
@@ -46,6 +48,7 @@ export declare type ContractFormUpdateFormOverridesProps = {
     hrManager?: PrimitiveOverrideProps<TextFieldProps>;
     genManager?: PrimitiveOverrideProps<TextFieldProps>;
     remarks?: PrimitiveOverrideProps<TextFieldProps>;
+    contStatus?: PrimitiveOverrideProps<SwitchFieldProps>;
 } & EscapeHatchProps;
 export declare type ContractFormUpdateFormProps = React.PropsWithChildren<{
     overrides?: ContractFormUpdateFormOverridesProps | undefined | null;

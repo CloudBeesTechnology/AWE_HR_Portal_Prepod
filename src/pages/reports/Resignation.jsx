@@ -51,10 +51,14 @@ export const Resignation = () => {
         nationality: item.nationality || "-",
         department: item.department || "-",
         position: item.position || "-",
-        resignDate: formatDate(item.resignDate) || "-",
-        reasonResign: item.reasonResign || "-",
-      }));
+        resignDate: formatDate(item.resignDate) || "-", // Display formatted resignDate
+        rawResignDate: new Date(item.resignDate), // Add raw date for sorting
+        reasonResign: item.reasonResign || "-", // Display reason for resignation
+      }))
+      .sort((a, b) => a.rawResignDate - b.rawResignDate) // Sort by raw resignDate
+      .map(({ rawResignDate, ...rest }) => rest); // Remove rawResignDate after sorting
   };
+  
 
   useEffect(() => {
     const data = resignationMergedData(allData);
@@ -97,8 +101,10 @@ export const Resignation = () => {
         department: item.department || "-",
         position: item.position || "-",
         resignDate: formatDate(item.resignDate) || "-",
+        rawResignDate: new Date(item.resignDate), // Add raw date for sorting
         reasonResign: item.reasonResign || "-",
-      }));
+      })).sort((a, b) => a.rawResignDate - b.rawResignDate) // Sort by raw termiDate
+      .map(({ rawResignDate, ...rest }) => rest); // Remove raw date after sorting
 
     setFilteredData(filtered);
   };
