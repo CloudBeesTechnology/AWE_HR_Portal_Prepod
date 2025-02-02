@@ -144,6 +144,12 @@ export const HOLTable = () => {
       rowsPerPage
   );
 
+  const isValidDateFormat = (date) => {
+    const datePatternSlash = /^\d{4}\/\d{1,2}\/\d{1,2}$/; // matches yyyy/m/d
+    const datePatternDash = /^\d{4}-\d{2}-\d{2}$/;   // matches yyyy-mm-dd
+    return datePatternSlash.test(date) || datePatternDash.test(date);
+  };
+
   if (loading) {
     return (
       <div>
@@ -213,15 +219,29 @@ export const HOLTable = () => {
                         {capitalizedLetter(item.empLeaveType)}
                       </td>
                       <td className="py-3">
-                        {DateFormat(
-                          item.empLeaveSelectedFrom || item.empLeaveStartDate
-                        ) || "N/A"}
-                      </td>
-                      <td className="py-3">
-                        {DateFormat(
-                          item.empLeaveSelectedTo || item.empLeaveEndDate
-                        ) || "N/A"}
-                      </td>
+  {item.empLeaveSelectedFrom
+    ? isValidDateFormat(item.empLeaveSelectedFrom)
+      ? DateFormat(item.empLeaveSelectedFrom)
+      : item.empLeaveSelectedFrom
+    : item.empLeaveStartDate
+    ? isValidDateFormat(item.empLeaveStartDate)
+      ? DateFormat(item.empLeaveStartDate)
+      : item.empLeaveStartDate
+    : "N/A"}
+</td>
+
+<td className="py-3">
+  {item.empLeaveSelectedTo
+    ? isValidDateFormat(item.empLeaveSelectedTo)
+      ? DateFormat(item.empLeaveSelectedTo)
+      : item.empLeaveSelectedTo
+    : item.empLeaveEndDate
+    ? isValidDateFormat(item.empLeaveEndDate)
+      ? DateFormat(item.empLeaveEndDate)
+      : item.empLeaveEndDate
+    : "N/A"}
+</td>
+
                       <td className="py-3 w-[20%] break-words overflow-hidden">
                         {capitalizedLetter(item.reason)}
                       </td>
