@@ -29,12 +29,12 @@ const filterOptions = [
 ];
 
 export const Status = () => {
-  const [data, setData] = useState(null); // Data fetched from API
+  // const [data, setData] = useState(null); // Data fetched from API
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cvTypeDropdownOpen, setCvTypeDropdownOpen] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState([]);
-  const [selectedRows, setSelectedRows] = useState([]);
+  // const [selectedRows, setSelectedRows] = useState([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [selectedInterviewCandidate, setSelectedInterviewCandidate] =
     useState(null);
@@ -43,7 +43,7 @@ export const Status = () => {
   const [selectedFilters, setSelectedFilters] = useState("Interview Scheduled");
   const [filterBoxTitle, setFilterBoxTitle] = useState("Interview Scheduled");
   const filterBoxRef = useRef(null);
-  const [selectedCandidates, setSelectedCandidates] = useState([]);
+  // const [selectedCandidates, setSelectedCandidates] = useState([]);
   const [mergeData, setMergeData] = useState([]);
   const [urlValue, setURLValue] = useState("");
   const [dropOption, setDropOption] = useState();
@@ -66,7 +66,6 @@ export const Status = () => {
 
   const flattenObject = (data) => {
     const result = { ...data };
-    console.log(data, "D");
 
     // Flatten `interviewDetails`
     if (result.interviewDetails) {
@@ -289,43 +288,52 @@ export const Status = () => {
     setIsFilterBoxOpen((prevState) => !prevState);
   };
 
-  // Handle filter change
+
   const handleFilterChange = (event) => {
     const selectedValue = event.target.value;
+    
+    // console.log("Selected Value: ", selectedValue); // Log selected value
     setSelectedFilters(selectedValue);
     setFilterBoxTitle(selectedValue);
-
-    if (!mergeData) return; // Guard clause for null mergeData
-
+  };
+  
+  useEffect(() => {
+    if (!mergeData || !selectedFilters) return;
+  
+    // console.log("Selected Filter: ", selectedFilters); // Log selected filter
+    // console.log("Merge Data: ", mergeData); // Log mergeData
+  
     let filtered = [];
-    switch (selectedValue) {
+    switch (selectedFilters) {
       case "Interview Scheduled":
         filtered = mergeData.filter(
           (val) =>
             val?.interviewDetails_status?.toLowerCase() === "interviewscheduled"
         );
         break;
-
+  
       case "Selected Candidate":
         filtered = mergeData.filter(
           (val) => val?.interviewDetails_status === "Selected"
         );
         break;
-
+  
       case "LOI":
         filtered = mergeData.filter(
-          (val) => val?.interviewDetails_status?.toUpperCase() === "LOI"
-        );
-        break;
-
-      case "CVEV_OffShore":
-        filtered = mergeData.filter(
           (val) =>
-            val?.interviewDetails_status?.toUpperCase() === "CVEV" &&
-            val?.empType === "Offshore"
+            val?.interviewDetails_status?.toUpperCase() === "LOI" 
         );
         break;
 
+        case "CVEV_OffShore":
+          filtered = mergeData.filter(
+            (val) =>
+              val?.interviewDetails_status?.toUpperCase() === "CVEV" &&
+              val?.empType === "Offshore"
+          );
+          break;
+  
+  
       case "PAAF_OnShore":
         filtered = mergeData.filter(
           (val) =>
@@ -333,7 +341,7 @@ export const Status = () => {
             val?.empType === "Onshore"
         );
         break;
-
+  
       case "Mobilization":
         filtered = mergeData.filter(
           (val) =>
@@ -341,17 +349,21 @@ export const Status = () => {
             val?.interviewDetails_status?.toLowerCase() === "mobilization"
         );
         break;
-
+  
       default:
         filtered = mergeData.filter(
           (val) => val?.interviewDetails_status?.toLowerCase() === "pending"
         );
         break;
     }
-
+  
+    // console.log("Filtered Data: ", filtered); // Log filtered data
+  
     setFilteredData(filtered);
     setIsFilterBoxOpen(false);
-  };
+  
+  }, [selectedFilters, mergeData]); // Depend on `selectedFilters` and `mergeData`
+  
 
   // console.log("Hello World", mergeData);
   // Handle edit click
@@ -361,7 +373,7 @@ export const Status = () => {
   };
 
   // Close form
-  const closeForm = () => {
+  const closeForm = () => {   
     setIsFormVisible(false);
     setSelectedInterviewCandidate(null); // Clear the selected candidate
   };
@@ -378,7 +390,7 @@ export const Status = () => {
     setMergeData((prevMergeData) => updateCandidates(prevMergeData)); // Update mergeData
     setFilteredData((prevFilteredData) => updateCandidates(prevFilteredData)); // Update filteredData
 
-    setIsFormVisible(false); // Close the form after saving
+    setIsFormVisible(false); 
   };
 
   // const flattenedData = filteredData.map(flattenObject);
@@ -394,9 +406,9 @@ export const Status = () => {
 
     const day = date.getDate().toString().padStart(2, "0"); // Local day
     const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Local month
-    const year = date.getFullYear(); // Local year
+    const year = date.getFullYear(); 
 
-    return `${day}-${month}-${year}`; // Format as DD/MM/YYYY
+    return `${day}-${month}-${year}`; 
   };
 
   const fileUpload = async (files) => {
@@ -427,7 +439,7 @@ export const Status = () => {
       return null;
     }
   };
-
+ 
   const renderComponent = () => {
     switch (selectedFilters) {
       case "Interview Scheduled":

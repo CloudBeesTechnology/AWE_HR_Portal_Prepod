@@ -25,18 +25,22 @@ import { listTimeSheets } from "../../graphql/queries";
 import { deleteTimeSheet } from "../../graphql/mutations";
 import { generateClient } from "@aws-amplify/api";
 import { useRowSelection } from "./customTimeSheet/useRowSelection";
+import { useNavigate } from "react-router-dom";
 
 export const ViewSBWsheet = ({
   excelData,
   returnedTHeader,
   titleName,
   setExcelData,
-  convertedStringToArrayObj,
+
   Position,
   fileName,
   showRejectedItemTable,
   submittedData,
+  wholeData,
+  ManagerData,
 }) => {
+  const nav = useNavigate();
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
 
   const [closePopup, setClosePopup] = useState(false);
@@ -48,6 +52,7 @@ export const ViewSBWsheet = ({
   const [toggleHandler, setToggleHandler] = useState(false);
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedItemsTwo, setCheckedItemsTwo] = useState({});
+  const [editFormTitle, setEditFormTitle] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [userIdentification, setUserIdentification] = useState("");
@@ -65,6 +70,7 @@ export const ViewSBWsheet = ({
   const [storingMess, setStoringMess] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
+  const client = generateClient();
 
   let visibleData;
 
@@ -76,7 +82,6 @@ export const ViewSBWsheet = ({
 
   const mergedData = AutoFetchForAssignManager();
 
-  const client = generateClient();
   useEffect(() => {
     if (processedData && processedData.length > 0) {
       setData(processedData);
@@ -111,7 +116,7 @@ export const ViewSBWsheet = ({
     } else if (getPosition !== "Manager") {
       setUserIdentification("TimeKeeper");
     }
-  }, [convertedStringToArrayObj]);
+  }, [wholeData]);
 
   const pendingData = (data) => {
     if (data && data.length > 0) {
@@ -171,16 +176,6 @@ export const ViewSBWsheet = ({
         }, {});
       };
 
-      // Convert keys for each object in the array `k`
-      const k = [
-        {
-          alldayminhrs: "14:37:50",
-          badge: "3907A",
-          deptdiv: "HRD",
-          in: "14:37:50",
-          out: "14:37:50",
-        },
-      ];
       const convertedData = returnedTHeader.map(convertKeys);
 
       const requiredKeys = ["deptdiv", "name", "badge"];
@@ -215,8 +210,8 @@ export const ViewSBWsheet = ({
         // setLoading(true);
         try {
           const dataPromise = new Promise((resolve, reject) => {
-            if (convertedStringToArrayObj) {
-              resolve(convertedStringToArrayObj);
+            if (ManagerData && ManagerData.length > 0) {
+              resolve(ManagerData);
             } else {
               setTimeout(() => {
                 reject("No data found after waiting.");
@@ -229,7 +224,7 @@ export const ViewSBWsheet = ({
           if (userIdentification === "Manager") {
             const finalData = await SendDataToManager(fetchedData);
 
-            pendingData(finalData);
+            pendingData(fetchedData);
           }
         } catch (err) {
         } finally {
@@ -246,8 +241,8 @@ export const ViewSBWsheet = ({
         // setLoading(true);
         try {
           const dataPromise = new Promise((resolve, reject) => {
-            if (convertedStringToArrayObj) {
-              resolve(convertedStringToArrayObj);
+            if (wholeData && wholeData.length > 0) {
+              resolve(wholeData);
             } else {
               setTimeout(() => {
                 reject("No data found after waiting.");
@@ -259,7 +254,7 @@ export const ViewSBWsheet = ({
 
           if (userIdentification !== "Manager") {
             const finalData = await FindSpecificTimeKeeper(fetchedData);
-            pendingData(finalData);
+            pendingData(fetchedData);
           }
         } catch (err) {
         } finally {
@@ -273,12 +268,7 @@ export const ViewSBWsheet = ({
       setCurrentStatus(false);
       setLoading(false);
     }
-  }, [
-    returnedTHeader,
-    convertedStringToArrayObj,
-    userIdentification,
-    showRejectedItemTable,
-  ]);
+  }, [returnedTHeader, ManagerData, userIdentification, showRejectedItemTable]);
   const editBLNG = (data) => {
     setEditObject(data);
   };
@@ -291,6 +281,14 @@ export const ViewSBWsheet = ({
 
   const toggleFunctionForAssiMana = () => {
     setToggleAssignManager(!toggleAssignManager);
+  };
+
+  const editFormTitleFunc = () => {
+    if (Position === "Manager") {
+      setEditFormTitle("View Form");
+    } else {
+      setEditFormTitle("Edit Form");
+    }
   };
 
   const editNestedData = (data, getObject) => {
@@ -314,7 +312,7 @@ export const ViewSBWsheet = ({
       data &&
       data.length > 0 &&
       data.map((val) => {
-        if (val.DEPTDIV === object.DEPTDIV && val.BADGE === object.BADGE) {
+        if (val.id === object.id) {
           return { ...val, REMARKS: object.REMARKS };
         } else {
           return val;
@@ -363,8 +361,26 @@ export const ViewSBWsheet = ({
     setData(remainingData);
     setSecondaryData(remainingData);
     setSelectedRows([]);
+
+    if (remainingData && remainingData.length === 0) {
+      // window.location.reload();
+      nav("/timeSheet")
+    }
   };
 
+  const handleManagerReload = () => {
+    let mergedData = [...allApprovedData, ...allRejectedData];
+    const remainingData = data?.filter(
+      (row) => !mergedData.some((selected) => selected.id === row.id)
+    );
+    setData(remainingData);
+    setSecondaryData(remainingData);
+
+    if (remainingData && remainingData.length === 0) {
+      nav("/timeSheet"); // Navigate to home page
+      window.location.reload();
+    }
+  };
   const AllFieldData = useTableFieldData(titleName);
   const renameKeysFunctionAndSubmit = async (managerData) => {
     if (
@@ -472,6 +488,7 @@ export const ViewSBWsheet = ({
         setNotification,
         setAllApprovedData,
         setAllRejectedData,
+        handleManagerReload,
       });
     } else if (
       userIdentification !== "Manager" &&
@@ -510,16 +527,15 @@ export const ViewSBWsheet = ({
       let finalResult = updatedRejectedItems;
       let action = "ResubmitRejectedItems";
       await TimeSheetsCRUDoperations({
+        setNotification,
+        setShowTitle,
         finalResult,
         toggleSFAMessage,
         setStoringMess,
-        setData,
         Position,
         action,
-        setShowTitle,
-        setNotification,
-        setAllApprovedData,
-        setAllRejectedData,
+        handleAssignManager,
+        selectedRows,
       });
     }
   };
@@ -573,23 +589,21 @@ export const ViewSBWsheet = ({
   const storeOnlySelectedItem = (data, action) => {
     if (action === "Approved") {
       setAllApprovedData((prevApprovedData) => {
-        // Replace old data if ID matches, otherwise keep existing data
         const updatedData = prevApprovedData.filter(
           (item) => item.id !== data.id
         );
         const updateStatus = { ...data, status: "Approved" };
 
-        return [...updatedData, updateStatus]; // Add the new data
+        return [...updatedData, updateStatus];
       });
     } else if (action === "Rejected") {
+      setPassSelectedData(data);
       setAllRejectedData((prevRejectedData) => {
-        // Replace old data if ID matches, otherwise keep existing data
         const updatedData = prevRejectedData.filter(
           (item) => item.id !== data.id
         );
-        return [...updatedData, data]; // Add the new data
+        return [...updatedData, data];
       });
-      setPassSelectedData(data); // Update the selected data
     }
   };
   const addRemarks = (data) => {
@@ -622,9 +636,9 @@ export const ViewSBWsheet = ({
     );
 
     setData(afterRemoved);
-    setSecondaryData(afterRemoved);
-    setAllApprovedData([]);
-    setAllRejectedData([]);
+    // setSecondaryData(afterRemoved);
+    // setAllApprovedData([]);
+    // setAllRejectedData([]);
   }, [allApprovedData, allRejectedData, data]);
 
   const convertToISODate = (dateString) => {
@@ -756,10 +770,18 @@ export const ViewSBWsheet = ({
                           return (
                             <tr
                               key={index + 1}
-                              className="text-dark_grey h-[50px] text-sm rounded-sm shadow-md border-b-2 border-[#CECECE] bg-white hover:bg-[#f1f5f9] cursor-pointer"
+                              className={`text-dark_grey h-[50px] text-sm rounded-sm shadow-md border-b-2 border-[#CECECE] bg-white hover:bg-[#f1f5f9] ${
+                                excelData && excelData.length > 0
+                                  ? ""
+                                  : "cursor-pointer"
+                              }`}
                               onClick={() => {
-                                toggleFunction();
-                                editBLNG(m);
+                                if (excelData && excelData.length > 0) {
+                                } else {
+                                  toggleFunction();
+                                  editBLNG(m);
+                                  editFormTitleFunc();
+                                }
                               }}
                             >
                               <td className="text-center px-4 flex-1">
@@ -831,13 +853,18 @@ export const ViewSBWsheet = ({
                                             ...prev,
                                             [m.id]: e.target.checked, // Toggle the checked state for this specific ID
                                           }));
+                                          setCheckedItemsTwo((prev) => ({
+                                            ...prev,
+                                            [m.id]: false,
+                                          }));
                                           storeOnlySelectedItem(m, "Approved");
+                                          removeExistingData(m, "Rejected");
                                         } else {
-                                          removeExistingData(m, "Approved");
                                           setCheckedItems((prev) => ({
                                             ...prev,
                                             [m.id]: false, // Toggle the checked state for this specific ID
                                           }));
+                                          removeExistingData(m, "Approved");
                                         }
                                       }}
                                     />
@@ -854,14 +881,19 @@ export const ViewSBWsheet = ({
                                             ...prev,
                                             [m.id]: e.target.checked, // Toggle the checked state for this specific ID
                                           }));
+                                          setCheckedItems((prev) => ({
+                                            ...prev,
+                                            [m.id]: false,
+                                          }));
                                           storeOnlySelectedItem(m, "Rejected");
                                           toggleForRemarkFunc();
+                                          removeExistingData(m, "Approved");
                                         } else {
-                                          removeExistingData(m, "Rejected");
                                           setCheckedItemsTwo((prev) => ({
                                             ...prev,
                                             [m.id]: false, // Toggle the checked state for this specific ID
                                           }));
+                                          removeExistingData(m, "Rejected");
                                         }
                                       }}
                                     />
@@ -1012,9 +1044,8 @@ export const ViewSBWsheet = ({
                       // };
                       // fetchDataAndDelete();
                     } else if (userIdentification === "Manager") {
-                      renameKeysFunctionAndSubmit();
                       removeCheckedItem();
-
+                      renameKeysFunctionAndSubmit();
                       // setCheckedItems({});
                     }
                   }}
@@ -1054,6 +1085,7 @@ export const ViewSBWsheet = ({
           titleName={titleName}
           Position={Position}
           handleSubmit={handleSubmit}
+          editFormTitle={editFormTitle}
         />
       )}
       {storingMess === true ? (

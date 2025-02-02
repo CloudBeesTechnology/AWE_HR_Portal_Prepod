@@ -99,19 +99,15 @@ export const ViewSummary = () => {
       const formattedDate = `${parseInt(day)}-${parseInt(month)}-${year}`;
 
       // Find the corresponding object in existingData
-      let existingObj = false;
-      existingObj = data?.find(
+      let existingObj = data?.find(
         (obj) =>
-          obj.empBadgeNo &&
-          input.empBadgeNo &&
-          String(obj.empBadgeNo) === String(input.empBadgeNo)
+          (obj.empBadgeNo &&
+            input.empBadgeNo &&
+            String(obj.empBadgeNo) === String(input.empBadgeNo)) ||
+          (obj.sapNo &&
+            input.fidNo &&
+            String(obj.sapNo) === String(input.fidNo))
       );
-
-      existingObj = data?.find(
-        (obj) =>
-          obj.sapNo && input.fidNo && String(obj.sapNo) === String(input.fidNo)
-      );
-
       if (existingObj && Array.isArray(input.empWorkInfo)) {
         const parsedEmpWorkInfo = input.empWorkInfo.flatMap((info) =>
           typeof info === "string" ? JSON.parse(info) : info
@@ -119,14 +115,12 @@ export const ViewSummary = () => {
 
         parsedEmpWorkInfo.forEach((info) => {
           if (info.JOBCODE === existingObj.jobcode) {
+          
             // Check if the date exists in getVerify and update its value
             if (existingObj.getVerify.hasOwnProperty(formattedDate)) {
               existingObj.getVerify[formattedDate] = input.verify;
               existingObj.assignUpdaterDateTime[formattedDate] =
                 input.updatedAt;
-              existingObj.mealAllow = Array.isArray(input.mealAllow)
-                ? input.mealAllow[0]
-                : input.mealAllow || "";
             }
           }
         });
@@ -136,9 +130,9 @@ export const ViewSummary = () => {
   };
   const FinalEditedData = async (getObject) => {
     setLoadingMess(false);
-
+    console.log(getObject);
     const resData = await UpdateViewSummary(getObject);
-
+    console.log("resData : ", resData);
     await assignWhrslocaly(resData);
     if (resData && resData.length > 0) {
       const {

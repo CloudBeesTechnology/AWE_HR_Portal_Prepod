@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { RiFileEditLine } from "react-icons/ri";
-import { StatusForm } from "./StatusForm";
 import { ReviewForm } from "../ReviewForm";
 import { WorkpassForm } from "./WorkpassForm";
 
-export const JitpaTable = ({ data, formatDate }) => {
+export const JitpaTable = ({ data, formatDate, fileUpload, urlValue }) => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const [selectedCandi, setSelectedCandi] = useState([]);
@@ -21,7 +20,7 @@ export const JitpaTable = ({ data, formatDate }) => {
     "Form",
     "Edit Form",
   ];
-  console.log(data);
+
   const handleShowForm = (candi) => {
     setSelectedCandi(candi);
     setIsFormVisible(!isFormVisible);
@@ -57,17 +56,46 @@ export const JitpaTable = ({ data, formatDate }) => {
                     <td className="py-3">{item.tempID}</td>
                     <td className="py-3">{item.name || "N/A"}</td>
                     <td className="py-3">{item.nationality || "N/A"}</td>
-                    <td className="py-3">
-                      {formatDate(item.interviewDetails_interDate) || "N/A"}
-                    </td>
-                    <td className="py-3">
-                      {item.interviewDetails_interTime || "N/A"}
-                    </td>
-                    <td className="py-3">
-                      {item.interviewDetails_venue || "N/A"}
-                    </td>
+
                     <td className="py-3">
                       {item.interviewDetails_manager || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_tbapurchasedate || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_submitdateendorsement || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_jitpaexpirydate || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_jitpaamount || "N/A"}
+                    </td>
+                  
+                    <td className="py-3">
+                      {item.WPTrackDetails_jitpafile ? (
+                        <a
+                          href={urlValue}
+                          onClick={(e) => {
+                            if (!item.WPTrackDetails_jitpafile) {
+                              e.preventDefault();
+                            } else {
+                              fileUpload(item.WPTrackDetails_jitpafile);
+                            }
+                          }}
+                          download
+                          className={
+                            item.WPTrackDetails_jitpafile
+                              ? "border-b-2 border-[orange] text-[orange]"
+                              : ""
+                          }
+                        >
+                          {item.WPTrackDetails_jitpafile ? "Download" : "N/A"}
+                        </a>
+                      ) : (
+                        <p>N/A</p>
+                      )}
                     </td>
                     <td
                       className="py-3 text-center"
@@ -95,11 +123,7 @@ export const JitpaTable = ({ data, formatDate }) => {
         </div>
       )}
       {isReviewFormVisible && (
-        <ReviewForm
-          candidate={selectedCandi}
-          onClose={handleShowReviewForm}
-       
-        />
+        <ReviewForm candidate={selectedCandi} onClose={handleShowReviewForm} />
       )}
       {isFormVisible && (
         <WorkpassForm

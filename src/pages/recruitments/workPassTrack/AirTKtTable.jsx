@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { RiFileEditLine } from "react-icons/ri";
-import { StatusForm } from "./StatusForm";
 import { ReviewForm } from "../ReviewForm";
 import { WorkpassForm } from "./WorkpassForm";
 
-export const AirTKtTable = ({ data, formatDate }) => {
+export const AirTKtTable = ({ data, formatDate, fileUpload, urlValue }) => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const [selectedCandi, setSelectedCandi] = useState([]);
@@ -12,14 +11,16 @@ export const AirTKtTable = ({ data, formatDate }) => {
     "TempID",
     "Name",
     "Nationality",
-    "Interview Date",
-    "Time",
-    "Venue",
-    "Interviewer",
+    "Position",
+    "Date of Departure",
+    "Date of Arrival",
+    "City of Departure",
+    "AirFare",
+    "Air Ticket PDF",
     "Form",
     "Edit Form",
   ];
-  console.log(data);
+
   const handleShowForm = (candi) => {
     setSelectedCandi(candi);
     setIsFormVisible(!isFormVisible);
@@ -56,16 +57,43 @@ export const AirTKtTable = ({ data, formatDate }) => {
                     <td className="py-3">{item.name || "N/A"}</td>
                     <td className="py-3">{item.nationality || "N/A"}</td>
                     <td className="py-3">
-                      {formatDate(item.interviewDetails_interDate) || "N/A"}
-                    </td>
-                    <td className="py-3">
-                      {item.interviewDetails_interTime || "N/A"}
-                    </td>
-                    <td className="py-3">
-                      {item.interviewDetails_venue || "N/A"}
-                    </td>
-                    <td className="py-3">
                       {item.interviewDetails_manager || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_departuredate|| "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_arrivaldate || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_cityname || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_airfare || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_airticketfile ? (
+                        <a
+                          href={urlValue}
+                          onClick={(e) => {
+                            if (!item.WPTrackDetails_airticketfile) {
+                              e.preventDefault();
+                            } else {
+                              fileUpload(item.WPTrackDetails_airticketfile);
+                            }
+                          }}
+                          download
+                          className={
+                            item.WPTrackDetails_airticketfile
+                              ? "border-b-2 border-[orange] text-[orange]"
+                              : ""
+                          }
+                        >
+                          {item.WPTrackDetails_airticketfile ? "Download" : "N/A"}
+                        </a>
+                      ) : (
+                        <p>N/A</p>
+                      )}
                     </td>
                     <td
                       className="py-3 text-center"

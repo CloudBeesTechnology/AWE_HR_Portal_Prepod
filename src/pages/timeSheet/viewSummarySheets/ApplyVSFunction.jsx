@@ -557,22 +557,23 @@ export const ApplyVSFunction = ({
               });
             }
 
-            // Define salary type categories
-            // console.log(checkEntry);
             // Prioritize conditions
             if (checkEntry) {
-              // If there are working hours, prioritize them
-              const workingHrs = parseFloat(checkEntry) || "A";
-             
-              if (workingHrs < (entry?.normalWorkHrs || 0)) {
-                const absence = (
-                  (entry?.normalWorkHrs || 0) - workingHrs
-                ).toFixed(1);
-               
-                acc[dayStr] = `x(${absence})${workingHrs}`; // Format as "absence(workingHrs)"
+              if (isNaN(checkEntry) || !checkEntry) {
+                acc[dayStr] = checkEntry; // Assign "NaN" if checkEntry is NaN
               } else {
-              
-                acc[dayStr] = workingHrs.toString() || "A";
+                // If there are working hours, prioritize them
+                const workingHrs = parseFloat(checkEntry);
+
+                if (workingHrs < (entry?.normalWorkHrs || 0)) {
+                  const absence = (
+                    (entry?.normalWorkHrs || 0) - workingHrs
+                  ).toFixed(1);
+
+                  acc[dayStr] = `x(${absence})${workingHrs}`; // Format as "absence(workingHrs)"
+                } else {
+                  acc[dayStr] = workingHrs.toString();
+                }
               }
             } else if (isPublicHoliday) {
               acc[dayStr] = "PH";
@@ -606,7 +607,7 @@ export const ApplyVSFunction = ({
               acc[dayStr] = "";
             } else {
               // Default condition: Mark as "A" (absent)
-              acc[dayStr] = "";
+              acc[dayStr] = "A";
             }
 
             return acc;
@@ -637,7 +638,6 @@ export const ApplyVSFunction = ({
               };
         });
 
-      
         // Example usage:
 
         // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -804,7 +804,17 @@ export const ApplyVSFunction = ({
 
           const id = item?.id;
           const empName = item?.data?.map((m) => m.empName);
-
+          // const fileType = item?.data?.map((m) => m.fileType);
+          // console.log(fileType);
+          // const getAllFileType = item?.data.reduce(
+          //   (accumulator, currentValue) => {
+          //     accumulator.push(currentValue.fileType);
+          //     return accumulator;
+          //   },
+          //   []
+          // );
+          // const getFileType=getAllFileType[0] || [];
+          const firstFileType = item?.data?.[0]?.fileType;
           const empLeaveCount = item?.leaveCounts;
           const workingHrs = item?.workingHrs;
           const dateForSelectMY = item?.newDate;
@@ -926,11 +936,11 @@ export const ApplyVSFunction = ({
             location: location,
             timeKeeper: timeKeeper,
             getVerify: getVerify,
+            firstFileType: firstFileType,
             assignUpdaterDateTime: assignUpdaterDateTime,
-            mealAllow: getMealAllow,
           };
         }).filter(Boolean);
-
+        // console.log("transformedData : ", transformedData);
         await ProcessedDataFunc(transformedData);
       };
       if (convertedStringToArrayObj && convertedStringToArrayObj.length > 0) {

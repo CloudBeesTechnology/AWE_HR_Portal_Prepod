@@ -45,7 +45,7 @@ export const AirTktForm = ({ candidate }) => {
   });
 
   const AirTktUpload = watch("airTktFile", "");
-  console.log(interviewSchedules);
+  // console.log(interviewSchedules);
 
   useEffect(() => {
     if (interviewSchedules.length > 0) {
@@ -74,13 +74,13 @@ export const AirTktForm = ({ candidate }) => {
             ...prev,
             airTktFile: fileName,
           }));
-          console.log("Uploaded file name set:", fileName);
+          // console.log("Uploaded file name set:", fileName);
         }
       } else {
-        console.log("No interviewData found for candidate:", candidate.tempID);
+        // console.log("No interviewData found for candidate:", candidate.tempID);
       }
     } else {
-      console.log("No interview schedules available.");
+      // console.log("No interview schedules available.");
     }
   }, [interviewSchedules, candidate.tempID]);
 
@@ -150,11 +150,11 @@ export const AirTktForm = ({ candidate }) => {
       };
       setNotification(true);
 
-      console.log("Submitting interview details with status:", interStatus);
+      // console.log("Submitting interview details with status:", interStatus);
 
       await interviewDetails({ InterviewValue: interStatus });
 
-      console.log("Interview status updated:", interStatus);
+      // console.log("Interview status updated:", interStatus);
 
       // console.log("Response from WPTrackingDetails:", response);
 

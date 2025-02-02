@@ -1,33 +1,39 @@
 import React, { useState } from "react";
 import { RiFileEditLine } from "react-icons/ri";
-import { StatusForm } from "./StatusForm";
 import { ReviewForm } from "../ReviewForm";
 import { WorkpassForm } from "./WorkpassForm";
 
-export const ImmigrationTable = ({ data,formatDate }) => {
+export const ImmigrationTable = ({
+  data,
+  formatDate,
+  fileUpload,
+  urlValue,
+}) => {
   const [isFormVisible, setIsFormVisible] = useState(false);
-    const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
+  const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const [selectedCandi, setSelectedCandi] = useState([]);
   const heading = [
     "TempID",
     "Name",
     "Nationality",
-    "Interview Date",
-    "Time",
-    "Venue",
-    "Interviewer",
+    "Position",
+    "Date of Submission",
+    "Date of Approval",
+    "Immigration Reference Number",
+    "Visa Reference Number",
+    "Immigration PDF",
     "Form",
     "Edit Form",
   ];
-  console.log(data);
-const handleShowForm=(candi)=>{
-  setSelectedCandi(candi);
-    setIsFormVisible(!isFormVisible)
-}
-const handleShowReviewForm = (candi) => {
-  setSelectedCandi(candi);
-  setIsReviewFormVisible(!isReviewFormVisible);
-};
+
+  const handleShowForm = (candi) => {
+    setSelectedCandi(candi);
+    setIsFormVisible(!isFormVisible);
+  };
+  const handleShowReviewForm = (candi) => {
+    setSelectedCandi(candi);
+    setIsReviewFormVisible(!isReviewFormVisible);
+  };
   return (
     <div>
       {data && data.length > 0 ? (
@@ -56,19 +62,47 @@ const handleShowReviewForm = (candi) => {
                     <td className="py-3">{item.name || "N/A"}</td>
                     <td className="py-3">{item.nationality || "N/A"}</td>
                     <td className="py-3">
-                      {formatDate(item.interviewDetails_interDate) || "N/A"}
-                    </td>
-                    <td className="py-3">
-                      {item.interviewDetails_interTime || "N/A"}
-                    </td>
-                    <td className="py-3">
-                      {item.interviewDetails_venue || "N/A"}
-                    </td>
-                    <td className="py-3">
                       {item.interviewDetails_manager || "N/A"}
                     </td>
-                    <td className="py-3 text-center" onClick={() => handleShowReviewForm(item)} >View</td>
-                    <td className="text-2xl cursor-pointer py-3 center" onClick={()=>handleShowForm(item)}>
+                    <td className="py-3">{item.WPTrackDetails_docsubmitdate || "N/A"}</td>
+                    <td className="py-3">{item.WPTrackDetails_visaapprovedate || "N/A"}</td>
+                    <td className="py-3">{item.WPTrackDetails_immbdno || "N/A"}</td>
+                    <td className="py-3">{item.WPTrackDetails_visareferenceno || "N/A"}</td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_visaFile ? (
+                        <a
+                          href={urlValue}
+                          onClick={(e) => {
+                            if (!item.WPTrackDetails_visaFile) {
+                              e.preventDefault();
+                            } else {
+                              fileUpload(item.WPTrackDetails_visaFile);
+                            }
+                          }}
+                          download
+                          className={
+                            item.WPTrackDetails_visaFile
+                              ? "border-b-2 border-[orange] text-[orange]"
+                              : ""
+                          }
+                        >
+                          {item.WPTrackDetails_visaFile ? "Download" : "N/A"}
+                        </a>
+                      ) : (
+                        <p>N/A</p>
+                      )}
+                    </td>
+
+                    <td
+                      className="py-3 text-center"
+                      onClick={() => handleShowReviewForm(item)}
+                    >
+                      View
+                    </td>
+                    <td
+                      className="text-2xl cursor-pointer py-3 center"
+                      onClick={() => handleShowForm(item)}
+                    >
                       <RiFileEditLine />
                     </td>
                   </tr>
@@ -81,19 +115,19 @@ const handleShowReviewForm = (candi) => {
         </table>
       ) : (
         <div className="text-center mt-6 py-20">
-
           <p className="text-lg text-dark_grey mt-2">No Data Available</p>
         </div>
       )}
-      {isReviewFormVisible && <ReviewForm candidate={selectedCandi} onClose={handleShowReviewForm} />}
+      {isReviewFormVisible && (
+        <ReviewForm candidate={selectedCandi} onClose={handleShowReviewForm} />
+      )}
       {isFormVisible && (
         <WorkpassForm
-        candidate={selectedCandi}
-        //   onSave={handleFormSave}
+          candidate={selectedCandi}
+          //   onSave={handleFormSave}
           onClose={handleShowForm}
         />
       )}
     </div>
   );
 };
-

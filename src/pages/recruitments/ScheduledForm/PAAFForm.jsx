@@ -8,6 +8,7 @@ import { UpdateLoiData } from "../../../services/updateMethod/UpdateLoi";
 import { useFetchInterview } from "../../../hooks/useFetchInterview";
 import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
 import { statusOptions } from "../../../utils/StatusDropdown";
+import { SpinLogo } from "../../../utils/SpinLogo";
 // Define validation schema using Yup
 const PAAFFormSchema = Yup.object().shape({
   paafApproveDate: Yup.date().notRequired(),
@@ -23,6 +24,7 @@ export const PAAFForm = ({ candidate }) => {
   const { loiDetails } = UpdateLoiData();
   const { mergedInterviewData } = useFetchInterview();
   const { interviewDetails } = UpdateInterviewData();
+  const [notification, setNotification] = useState(false);
   const [formData, setFormData] = useState({
     interview: {
       id: "",
@@ -129,8 +131,8 @@ export const PAAFForm = ({ candidate }) => {
         },
       });
 
-      console.log("Data stored successfully...");
-      // setNotification(true);
+      // console.log("Data stored successfully...");
+      setNotification(true);
     } catch (error) {
       console.error("Error submitting interview details:", error);
       alert("Failed to update interview details. Please try again.");
@@ -177,9 +179,7 @@ export const PAAFForm = ({ candidate }) => {
               accept="application/pdf"
               register={register}
               fileName={
-                uploadedFileNames.paafFile ||
-                extractFileName(PAAFUpload) ||
-                formData.interview.paafFile
+                uploadedFileNames.paafFile || extractFileName(PAAFUpload)
               }
               value={formData.interview.paafFile}
             />
@@ -212,6 +212,13 @@ export const PAAFForm = ({ candidate }) => {
           Submit
         </button>
       </div>
+      {notification && (
+        <SpinLogo
+          text="PAAF Updated Successfully"
+          notification={notification}
+          path="/recrutiles/status"
+        />
+      )}
     </form>
   );
 };

@@ -1,19 +1,25 @@
 import { useEffect, useMemo, useState } from "react";
 import { TimeSheetBrowser } from "../../utils/TimeSheetBrowser";
-import { useFetchData } from "./customTimeSheet/UseFetchData";
+
 import { FindSpecificTimeKeeper } from "./customTimeSheet/FindSpecificTimeKeeper";
+
+import { useFetchData } from "./customTimeSheet/UseFetchData";
 
 export const Blng = () => {
   const [submittedData, setSubmittedData] = useState([]);
   const [ManagerData, setManagerData] = useState([]);
   const [showing, setShowing] = useState(0);
+  const [isFetching, setIsFetching] = useState(true); // Track fetching state
   const Position = localStorage.getItem("userType");
-  let userIdetification =
+
+  const userIdetification =
     Position === "Manager" ? "Manager" : Position !== "Manager" ? "All" : "";
-  let titleName = "BLNG";
-  let cardName = userIdetification;
+  const titleName = "BLNG";
+  const cardName = userIdetification;
+
   const memoizedTitleName = useMemo(() => titleName, [titleName]);
   const memoizedCardName = useMemo(() => cardName, [cardName]);
+
   const { convertedStringToArrayObj } = useFetchData(
     memoizedTitleName,
     memoizedCardName
@@ -21,7 +27,7 @@ export const Blng = () => {
 
   const pendingData = (data) => {
     if (data && data.length > 0) {
-      const result = data?.map((val) => {
+      return data.map((val) => {
         let parsedEmpWorkInfo = [];
         try {
           if (Array.isArray(val.empWorkInfo)) {
@@ -30,20 +36,41 @@ export const Blng = () => {
             );
           }
         } catch (error) {
-          // console.error("Error parsing empWorkInfo for ID:", val.id, error);
+          // Handle parsing errors
         }
-
+        // {
+        //   BPCOMPANY: "ADININ WORKS & ENGINEERING SDN BHD";
+        //   DAILY: "12h 47m";
+        //   DAILYTOTAL: "12h 47m";
+        //   DAYDIFFERENCE: 0;
+        //   EARLIESTENTRYTIME: 45628.2416550926;
+        //   ENTRANCEDATE: 45628;
+        //   ENTRYTIME: 45628.2416550926;
+        //   EXITTIME: 45628.7739930556;
+        //   FID: 596;
+        //   LATESTENTRYTIME: 45628.7739930556;
+        //   NAMEFLAST: "UNTING AK GENA";
+        //   NORMALWORKINGHRSPERDAY: "";
+        //   OT: "";
+        //   REMARKS: "";
+        //   WORKINGHOURS: "";
+        // }
         return {
           id: val.id,
           fileName: val.fileName,
+          BPCOMPANY: val.bpCompany || "",
+
           FID: val.fidNo || 0,
           NAMEFLAST: val.empName || "",
-          ENTRANCEDATEUSED: val.date || "",
-          ENTRANCEDATETIME: val.inTime?.replace(/[\[\]]/g, "") || "",
-          EXITDATETIME: val.outTime?.replace(/[\[\]]/g, "") || "",
-          AVGDAILYTOTALBYDAY: val.avgDailyTD || "",
-          AHIGHLIGHTDAILYTOTALBYGROUP: val.totalHrs || "",
-          ADININWORKSENGINEERINGSDNBHD: val.aweSDN || "",
+          ENTRANCEDATE: val.date || "",
+          EARLIESTENTRYTIME:
+            val.earliestEntryTime?.replace(/[\[\]]/g, "") || "",
+          LATESTENTRYTIME: val.latestEntryTime.replace(/[\[\]]/g, "") || "",
+          ENTRYTIME: val.inTime?.replace(/[\[\]]/g, "") || "",
+          EXITTIME: val.outTime?.replace(/[\[\]]/g, "") || "",
+          DAILYTOTAL: val.avgDailyTD || "",
+
+          DAILY: val.aweSDN || "",
           WORKINGHOURS: val.actualWorkHrs || 0,
           OT: val.otTime || 0,
           NORMALWORKINGHRSPERDAY: val?.normalWorkHrs || 0,
@@ -55,82 +82,66 @@ export const Blng = () => {
           status: val.status || "",
         };
       });
-      return result;
-      // setData(result);
-      // setSecondaryData(result);
     }
+    return [];
   };
+
   useEffect(() => {
+    let timeoutId;
+
     if (Position !== "Manager") {
       const fetchData = async () => {
-        // setLoading(true);
+        setIsFetching(true); // Start fetching
         try {
-          const dataPromise = await new Promise((resolve, reject) => {
+          // Wait for the data to arrive
+          const hasData = await new Promise((resolve) => {
+            timeoutId = setTimeout(() => resolve(false), 2000); // Fallback after 30 seconds
             if (
               convertedStringToArrayObj &&
               convertedStringToArrayObj.length > 0
             ) {
-              resolve(convertedStringToArrayObj);
-            } else {
-              setTimeout(() => {
-                setShowing(2);
-                reject("No data found after waiting.");
-              }, 30000);
+              clearTimeout(timeoutId); // Clear fallback timeout
+              resolve(true);
             }
           });
 
-          const fetchedData = await dataPromise;
-
-          if (Position !== "Manager" && fetchedData && fetchedData.length > 0) {
-            const finalData = await FindSpecificTimeKeeper(fetchedData);
+          if (hasData) {
+            const finalData = await FindSpecificTimeKeeper(
+              convertedStringToArrayObj
+            );
             if (finalData && finalData.length > 0) {
-              const result = pendingData(finalData);
-
-              setSubmittedData(result);
-              setShowing(1);
+              setSubmittedData(pendingData(finalData));
+              setShowing(1); // Data available
             } else {
-              setShowing(2);
+              setShowing(2); // No valid data
             }
+          } else {
+            setShowing(2); // Data not fetched in time
           }
-          // else {
-          //   setTimeout(() => {
-          //     if (showing === 0 || showing !== 1) {
-          //       setShowing(2);
-          //     }
-          //   }, 30000);
-          // }
         } catch (err) {
+          setShowing(2); // Handle error case
         } finally {
-          // setLoading(false);
+          setIsFetching(false); // Done fetching
         }
       };
 
       fetchData();
     } else if (Position === "Manager") {
+      setShowing(null);
       setManagerData(convertedStringToArrayObj);
     }
-  }, [convertedStringToArrayObj]);
+
+    return () => clearTimeout(timeoutId); // Cleanup timeout on unmount
+  }, [convertedStringToArrayObj, Position]);
 
   return (
     <div>
-      {showing === 0 && (
-        <div className="flex justify-center items-center h-[85vh] w-full">
-          <p className="text-dark_grey text_size_5 ">Loading...</p>
-        </div>
-      )}
-
-      {showing === 1 && submittedData.length > 0 && (
-        <TimeSheetBrowser title="BLNG" submittedData={submittedData || []} />
-      )}
-
-      {showing === 2 && <TimeSheetBrowser title="BLNG" submittedData={[]} />}
-      {Position === "Manager" && (
-        <TimeSheetBrowser
-          title="BLNG"
-          submittedData={[]}
-          ManagerData={ManagerData}
-        />
-      )}
+      <TimeSheetBrowser
+        title="BLNG"
+        submittedData={submittedData || []}
+        showing={showing}
+        ManagerData={ManagerData}
+      />
     </div>
   );
 };

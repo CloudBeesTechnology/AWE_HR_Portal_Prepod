@@ -36,6 +36,7 @@ import { AutoFetchForAssignManager } from "./customTimeSheet/AutoFetchForAssignM
 import { TimeSheetsCRUDoperations } from "./customTimeSheet/TimeSheetsCRUDoperations";
 import { deleteTimeSheet } from "../../graphql/mutations";
 import { useRowSelection } from "./customTimeSheet/useRowSelection";
+import { useNavigate } from "react-router-dom";
 
 const client = generateClient();
 
@@ -48,11 +49,12 @@ export const ViewTSTBeforeSave = ({
   setExcelData,
   fileName,
   showRejectedItemTable,
-  allItems,
+
   submittedData,
   wholeData,
   ManagerData,
 }) => {
+  const nav = useNavigate();
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
 
   // State to trigger re-render for Notification component
@@ -213,7 +215,7 @@ export const ViewTSTBeforeSave = ({
     } else if (getPosition !== "Manager") {
       setUserIdentification("TimeKeeper");
     }
-  }, []);
+  }, [wholeData]);
 
   const pendingData = (data) => {
     if (data && data.length > 0) {
@@ -472,7 +474,7 @@ export const ViewTSTBeforeSave = ({
     setSecondaryData(remainingData);
     setSelectedRows([]);
     if (remainingData && remainingData.length === 0) {
-      window.location.reload();
+      nav("/timeSheet");
     }
   };
 
@@ -532,7 +534,7 @@ export const ViewTSTBeforeSave = ({
           untilDate: managerData.muntilDate,
         };
       });
-
+      console.log("finalResult : ", finalResult);
       let action = "updateStoredData";
       await TimeSheetsCRUDoperations({
         setNotification,
@@ -591,7 +593,7 @@ export const ViewTSTBeforeSave = ({
         setNotification,
         setAllApprovedData,
         setAllRejectedData,
-        handleManagerReload
+        handleManagerReload,
       });
     } else if (
       userIdentification !== "Manager" &&
@@ -737,8 +739,8 @@ export const ViewTSTBeforeSave = ({
     );
     // console.log(allApprovedData, " : ", allRejectedData);
     setData(afterRemoved);
-    setAllApprovedData([]);
-    setAllRejectedData([]);
+    // setAllApprovedData([]);
+    // setAllRejectedData([]);
   }, [allApprovedData, allRejectedData, data]);
 
   const convertToISODate = (dateString) => {
@@ -777,7 +779,7 @@ export const ViewTSTBeforeSave = ({
   }, [startDate, endDate, secondaryData, searchQuery]);
 
   const safeData = data || [];
-  const itemsPerPage = 10;
+  const itemsPerPage = 25;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentData = safeData.slice(indexOfFirstItem, indexOfLastItem);

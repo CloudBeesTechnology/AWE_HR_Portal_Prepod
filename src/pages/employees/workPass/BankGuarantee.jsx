@@ -9,8 +9,10 @@ import { FormField } from "../../../utils/FormField";
 import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
 import { BJLDataFun } from "../../../services/createMethod/BJLDataFun";
 import { UpdateBJL } from "../../../services/updateMethod/UpdateBJL";
+import { FileUploadNew } from "../medicalDep/FileUploadField";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { useOutletContext } from "react-router-dom";
+import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteBJLUp";
 
 export const BankGuarantee = () => {
   const { searchResultData } = useOutletContext();
@@ -43,6 +45,10 @@ export const BankGuarantee = () => {
   });
   const [uploadBG, setUploadBG] = useState({
     bankEmpUpload: [],
+  });
+
+  const [id, setID] = useState({
+    bankID: "",
   });
 
   const watchInducBgUpload = watch("bankEmpUpload", ""); // Watch the bankEmpUpload field
@@ -103,6 +109,64 @@ export const BankGuarantee = () => {
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
 
+  const handleFileChange = async (e, label) => {
+    const watchedEmpID = watch("empID");
+    if (!watchedEmpID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
+    }
+
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
+    }
+
+    // Fetch current files (including backend-stored ones)
+    const currentFiles = watch(label) || []; // React Hook Form state
+
+    // Count only newly uploaded files, ignoring backend-stored files
+    let newUploads = []; // Declare it outside the if block to access later
+    if (Array.isArray(currentFiles)) {
+      newUploads = currentFiles.filter(file => file instanceof File);
+    }
+    
+    if (newUploads.length > 0) {
+      alert("You can only upload one new file. Please delete the existing file before uploading another.");
+      return;
+    }
+    
+
+    if (newUploads.length > 0) {
+      alert(
+        "You can only upload one new file. Please delete the existing file before uploading another."
+      );
+      return;
+    }
+
+    // Append the new file to the form state
+    setValue(label, [...currentFiles, selectedFile]);
+
+    try {
+      await uploadDocs(selectedFile, label, setUploadBG, watchedEmpID);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [label]: selectedFile.name,
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     setValue("empID", searchResultData.empID);
     const fields = [
@@ -122,6 +186,16 @@ export const BankGuarantee = () => {
       setValue(field, value);
     });
 
+    const bankRecord = BJLData.find(
+      (match) => match.empID === searchResultData.empID
+    );
+    if (bankRecord) {
+      setID((prevData) => ({
+        ...prevData,
+        bankID: bankRecord.id,
+      }));
+    }
+
     if (searchResultData && searchResultData.bankEmpUpload) {
       try {
         const parsedArray = JSON.parse(searchResultData.bankEmpUpload);
@@ -129,7 +203,7 @@ export const BankGuarantee = () => {
         const parsedFiles = parsedArray.map((item) =>
           typeof item === "string" ? JSON.parse(item) : item
         );
-        console.log(parsedFiles);
+        // console.log(parsedFiles);
         setValue("bankEmpUpload", parsedFiles);
 
         setUploadBG((prev) => ({
@@ -139,10 +213,7 @@ export const BankGuarantee = () => {
 
         setUploadedFileNames((prev) => ({
           ...prev,
-          bankEmpUpload:
-            parsedFiles.length > 0
-              ? getFileName(parsedFiles[parsedFiles.length - 1].upload)
-              : "",
+          bankEmpUpload: parsedFiles.map((file) => getFileName(file.upload)),
         }));
       } catch (error) {
         console.error(
@@ -153,37 +224,36 @@ export const BankGuarantee = () => {
     }
   }, [searchResultData, setValue]);
 
-  const handleFileChange = async (e, label, empID) => {
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
-
-    const allowedTypes = [
-      "application/pdf",
-    ];
-
-    // Check for empID before proceeding with the upload
-    if (!empID) {
-      alert("Employee ID is required to upload files.");
-      window.location.reload();
-      return;
-    }
-
-    if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file ");
-      return;
-    }
-
-    const currentFiles = watch(label) || [];
-    setValue(label, [...currentFiles, selectedFile]);
+  const deleteFile = async (fileType, fileName) => {
+    const deleteID = id.bankID;
 
     try {
-      await uploadDocs(selectedFile, label, setUploadBG, empID);
-      setUploadedFileNames((prev) => ({
-        ...prev,
-        [label]: selectedFile.name, // Store just the file name
+      await handleDeleteFile(
+        fileType,
+        fileName,
+        empID,
+        setUploadedFileNames,
+        deleteID,
+        setValue
+      );
+
+      const currentFiles = watch(fileType) || [];
+
+      // Filter out the deleted file
+      const updatedFiles = currentFiles.filter(
+        (file) => file.name !== fileName
+      );
+
+      // Update form state with the new file list
+      setValue(fileType, updatedFiles);
+
+      // Update UI state
+      setUploadBG((prevState) => ({
+        ...prevState,
+        [fileType]: updatedFiles,
       }));
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.error("Error deleting file:", error);
     }
   };
 
@@ -326,15 +396,16 @@ export const BankGuarantee = () => {
           errors={errors}
         />
         <div>
-          <FileUploadField
+          <FileUploadNew
             label="Upload File"
-            onChangeFunc={(e) => handleFileChange(e, "bankEmpUpload", empID)}
+            onChangeFunc={(e) => handleFileChange(e, "bankEmpUpload")}
             register={register}
-            error={errors}
-            fileName={
-              uploadedFileNames.bankEmpUpload ||
-              extractFileName(watchInducBgUpload)
-            }
+            name="bankEmpUpload"
+            error={errors.bankEmpUpload}
+            fileName={uploadedFileNames.bankEmpUpload || ""}
+            uploadedFileNames={uploadedFileNames}
+            deleteFile={deleteFile}
+            field={{ title: "bankEmpUpload" }}
           />
         </div>
       </div>

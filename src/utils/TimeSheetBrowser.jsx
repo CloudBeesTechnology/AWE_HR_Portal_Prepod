@@ -1,4 +1,4 @@
-import {  useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GoDotFill } from "react-icons/go";
 import { Link } from "react-router-dom";
 
@@ -74,7 +74,6 @@ export const TimeSheetBrowser = ({
       setAssignPosition("rejectedItems");
     }
   }, [Position, count]);
-  const { convertedStringToArrayObj } = useFetchData(titleName, assignPosition);
 
   const { finalData } = useFetchDataTwo(titleName, assignPosition);
 
@@ -84,7 +83,7 @@ export const TimeSheetBrowser = ({
 
   const { managerWholeData, loadingStateManager, showManagerTable } =
     LoadingMessManagerTable(ManagerData && ManagerData);
-  // let convertedStringToArrayObj;
+
   const handleForErrorMsg = (e) => {
     const file = e.target.files[0];
     const allowedExtensions = ["xlsx", "xls"];
@@ -217,6 +216,8 @@ export const TimeSheetBrowser = ({
           fileInputRef,
           setLoading
         );
+
+        console.log(result);
         setReturnedTHeader(result);
 
         fileInputRef.current.value = "";
@@ -369,7 +370,7 @@ export const TimeSheetBrowser = ({
         >
           <p
             className={`${
-              count === 0 && showing === 2
+              (count === 0 && showing === 2) || Position === "Manager"
                 ? "text-2xl font-semibold text-dark_grey uppercase mt-4"
                 : "hidden"
             }`}
@@ -560,42 +561,60 @@ export const TimeSheetBrowser = ({
           )}
         </div>
       )}
-      {!excelData && Position === "Manager" && titleName === "BLNG" && (
-        <ViewBLNGsheet
-          titleName={titleName}
-          returnedTHeader={null}
-          convertedStringToArrayObj={ManagerData}
-          Position={Position}
-          fileName={fileNameForSuccessful}
-        />
-      )}
-      {!excelData && Position === "Manager" && titleName === "HO" && (
-        <ViewHOsheet
-          titleName={titleName}
-          returnedTHeader={null}
-          convertedStringToArrayObj={ManagerData}
-          Position={Position}
-          fileName={fileNameForSuccessful}
-        />
-      )}
-      {!excelData && Position === "Manager" && titleName === "SBW" && (
-        <ViewSBWsheet
-          titleName={titleName}
-          returnedTHeader={null}
-          convertedStringToArrayObj={ManagerData}
-          Position={Position}
-          fileName={fileNameForSuccessful}
-        />
-      )}
-      {!excelData && Position === "Manager" && titleName === "ORMC" && (
-        <ViewORMCsheet
-          titleName={titleName}
-          returnedTHeader={null}
-          convertedStringToArrayObj={ManagerData}
-          Position={Position}
-          fileName={fileNameForSuccessful}
-        />
-      )}
+
+      {/* Show Manager Data */}
+      {!excelData &&
+        Position === "Manager" &&
+        titleName === "BLNG" &&
+        !loadingStateManager.isLoading &&
+        showManagerTable && (
+          <ViewBLNGsheet
+            titleName={titleName}
+            returnedTHeader={null}
+            ManagerData={managerWholeData}
+            Position={Position}
+            fileName={fileNameForSuccessful}
+          />
+        )}
+      {!excelData &&
+        Position === "Manager" &&
+        titleName === "HO" &&
+        !loadingStateManager.isLoading &&
+        showManagerTable && (
+          <ViewHOsheet
+            titleName={titleName}
+            returnedTHeader={null}
+            ManagerData={managerWholeData}
+            Position={Position}
+            fileName={fileNameForSuccessful}
+          />
+        )}
+      {!excelData &&
+        Position === "Manager" &&
+        titleName === "SBW" &&
+        !loadingStateManager.isLoading &&
+        showManagerTable && (
+          <ViewSBWsheet
+            titleName={titleName}
+            returnedTHeader={null}
+            ManagerData={managerWholeData}
+            Position={Position}
+            fileName={fileNameForSuccessful}
+          />
+        )}
+      {!excelData &&
+        Position === "Manager" &&
+        titleName === "ORMC" &&
+        !loadingStateManager.isLoading &&
+        showManagerTable && (
+          <ViewORMCsheet
+            titleName={titleName}
+            returnedTHeader={null}
+            ManagerData={managerWholeData}
+            Position={Position}
+            fileName={fileNameForSuccessful}
+          />
+        )}
       {/* managerWholeData, loadingStateManager, showManagerTable */}
       {loadingStateManager.isLoading && Position === "Manager" && (
         <div className="flex justify-center items-center py-3  w-full">
@@ -649,42 +668,57 @@ export const TimeSheetBrowser = ({
           />
         )}
 
-      {titleName === "BLNG" && Position !== "Manager" && count === 1 && (
-        <ViewBLNGsheet
-          titleName={titleName}
-          showRejectedItemTable="Rejected"
-          wholeData={wholeData}
-          Position={Position}
-        />
-      )}
-      {titleName === "HO" && Position !== "Manager" && count === 1 && (
-        <ViewHOsheet
-          titleName={titleName}
-          showRejectedItemTable="Rejected"
-          wholeData={wholeData}
-          Position={Position}
-        />
-      )}
+      {!loadingState.isLoading &&
+        showRejectTable &&
+        titleName === "BLNG" &&
+        Position !== "Manager" &&
+        count === 1 && (
+          <ViewBLNGsheet
+            titleName={titleName}
+            showRejectedItemTable="Rejected"
+            wholeData={wholeData}
+            Position={Position}
+          />
+        )}
+      {!loadingState.isLoading &&
+        showRejectTable &&
+        titleName === "HO" &&
+        Position !== "Manager" &&
+        count === 1 && (
+          <ViewHOsheet
+            titleName={titleName}
+            showRejectedItemTable="Rejected"
+            wholeData={wholeData}
+            Position={Position}
+          />
+        )}
 
-      {titleName === "ORMC" && Position !== "Manager" && count === 1 && (
-        <ViewORMCsheet
-          titleName={titleName}
-          showRejectedItemTable="Rejected"
-          wholeData={wholeData}
-          Position={Position}
-        />
-      )}
+      {!loadingState.isLoading &&
+        showRejectTable &&
+        titleName === "ORMC" &&
+        Position !== "Manager" &&
+        count === 1 && (
+          <ViewORMCsheet
+            titleName={titleName}
+            showRejectedItemTable="Rejected"
+            wholeData={wholeData}
+            Position={Position}
+          />
+        )}
 
-      {titleName === "SBW" && Position !== "Manager" && count === 1 && (
-        <ViewSBWsheet
-          titleName={titleName}
-          showRejectedItemTable="Rejected"
-          wholeData={wholeData}
-          Position={Position}
-        />
-      )}
+      {!loadingState.isLoading &&
+        showRejectTable &&
+        titleName === "SBW" &&
+        Position !== "Manager" &&
+        count === 1 && (
+          <ViewSBWsheet
+            titleName={titleName}
+            showRejectedItemTable="Rejected"
+            wholeData={wholeData}
+            Position={Position}
+          />
+        )}
 
-      {/* {console.log("Checjk it again : ", submittedData)} */}
       {/* Show only Submitted Items */}
       {titleName === "Offshore" &&
         Position !== "Manager" &&
@@ -699,9 +733,23 @@ export const TimeSheetBrowser = ({
           />
         )}
 
+      {titleName === "BLNG" &&
+        Position !== "Manager" &&
+        count === 0 &&
+        showing === 1 &&
+        submittedData.length > 0 && (
+          <ViewBLNGsheet
+            titleName={titleName}
+            allItems="allItems"
+            submittedData={submittedData}
+            Position={Position}
+          />
+        )}
+
       {titleName === "HO" &&
         Position !== "Manager" &&
         count === 0 &&
+        showing === 1 &&
         submittedData.length > 0 && (
           <ViewHOsheet
             titleName={titleName}
@@ -714,6 +762,7 @@ export const TimeSheetBrowser = ({
       {titleName === "SBW" &&
         Position !== "Manager" &&
         count === 0 &&
+        showing === 1 &&
         submittedData.length > 0 && (
           <ViewSBWsheet
             titleName={titleName}
@@ -726,6 +775,7 @@ export const TimeSheetBrowser = ({
       {titleName === "ORMC" &&
         Position !== "Manager" &&
         count === 0 &&
+        showing === 1 &&
         submittedData.length > 0 && (
           <ViewORMCsheet
             titleName={titleName}

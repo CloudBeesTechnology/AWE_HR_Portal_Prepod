@@ -11,7 +11,6 @@ export const HiringJob = () => {
   }, []);
   const { hiringData } = useContext(DataSupply);
   // console.log(hiringData);
-  
   const latestData = hiringData.sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
@@ -27,8 +26,8 @@ export const HiringJob = () => {
     "Status",
   ];
   const getStatus = (expiryDate) => {
-    if (!expiryDate || expiryDate === "N/A") {
-      return "N/A"; // Return "N/A" when expiryDate is not available or explicitly "N/A"
+    if (!expiryDate) {
+      return "Live"; // Default status if expiryDate is not available
     }
 
     const normalizedDate = expiryDate.replace(/[-/]/g, "-");

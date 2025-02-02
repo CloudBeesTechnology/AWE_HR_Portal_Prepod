@@ -1,34 +1,26 @@
-import { useEffect, useContext } from "react";
+
+import { useEffect, useState } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { FaRegMinusSquare } from "react-icons/fa";
-import { CiSquarePlus } from "react-icons/ci";
+import { LuPlus, LuMinus } from "react-icons/lu";
 import { EducationSchema } from "../../services/Validation"; // Adjust import as necessary
 import { useLocation, useNavigate } from "react-router-dom";
-import { useOutletContext } from "react-router-dom";
-
-import { DataSupply } from "../../utils/DataStoredContext";
-import { useTempID } from "../../utils/TempIDContext";
+import { generateClient } from "aws-amplify/api";
+const client = generateClient();
 
 export const EducationDetails = () => {
-  // const { tempID } = useOutletContext();
-  const { tempID } = useTempID();
-  const { educDetailsData } = useContext(DataSupply);
-
   const location = useLocation();
   const navigatingPersonalData = location.state?.FormData;
-
+  // console.log("Received form data:", navigatingPersonalData );
   useEffect(() => {
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
   }, []);
-
   const {
     handleSubmit,
     control,
-    setValue,
     formState: { errors },
     watch,
   } = useForm({
@@ -91,8 +83,6 @@ export const EducationDetails = () => {
     });
   };
 
-  console.log(tempID)
-  
   const handleAddReferee = () => {
     // Append a new referee object with isNew flag set to true
     appendCharacterReferee({
@@ -114,79 +104,21 @@ export const EducationDetails = () => {
     });
   };
 
-  const onSubmit = (data) => {
-    // console.log(data);
 
-    localStorage.setItem("educationFormData", JSON.stringify(data));
+  const onSubmit = (data) => {
+    console.log(data);
     const navigatingEduData = {
       ...data,
       ...navigatingPersonalData,
     };
+    // setNavigateEduData(navigatingEduData)
+    console.log(navigatingEduData);
+    // handleNext();
     navigate("/addCandidates/otherDetails", {
       state: { FormData: navigatingEduData },
     });
   };
 
-  useEffect(() => {
-    if (tempID) {
-      // Retrieve saved data from localStorage
-      const savedData = JSON.parse(localStorage.getItem("educationFormData"));
-    console.log('Saved data:', savedData);    // Debugging log
-  
-      // Ensure savedData is not null or undefined and is an object
-      if (savedData && typeof savedData === 'object') {
-        // Log the keys to check if they match your form field names
-        Object.keys(savedData).forEach((key) => {
-          console.log('Setting value for field:', key, 'Value:', savedData[key]);
-          setValue(key, savedData[key]);
-        });
-      }
-  
-      // Ensure educDetailsData is an array and has length
-      if (Array.isArray(educDetailsData) && educDetailsData.length > 0) {
-        const interviewData = educDetailsData.find((data) => data.tempID === tempID);
-        if (interviewData) {
-          console.log('Interview data found:', interviewData); // Debugging log
-  
-          // If interviewData found, iterate over savedData keys
-          Object.keys(savedData || {}).forEach((key) => {
-            console.log('Setting value from interview data:', key, 'Value:', savedData[key]);
-            if (Array.isArray(savedData[key])) {
-              setValue(key, savedData[key]);
-            } else if (savedData[key]) {
-              setValue(key, savedData[key]);
-            }
-          });
-        }
-      }
-    }
-  }, [tempID, setValue]);
-  
-
-  // useEffect(() => {
-  //   if (tempID) {
-  //     const savedData = JSON.parse(localStorage.getItem("educationFormData"));
-  //     if (savedData) {
-  //       Object.keys(savedData).forEach((key) => setValue(key, savedData[key]));
-  //     }
-
-  //     if (educDetailsData.length > 0) {
-  //       const interviewData = educDetailsData.find((data) => data.tempID === tempID);
-  //       if (interviewData) {
-  //       Object.keys(savedData).forEach((key) => {
-         
-  //         if (Array.isArray(savedData[key])) {
-  //           setValue(key, savedData[key]);
-  //         } else if (savedData[key]) {
-  //           setValue(key, savedData[key]);
-  //         }
-  //       });
-  //     }
-  //     }
-  //   }
-  // }, [tempID, setValue]);
-
-  console.log(educDetailsData)
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="">
       {/* h-screen overflow-y-auto scrollbar-hide */}
@@ -250,7 +182,7 @@ export const EducationDetails = () => {
                 onClick={() => removeCharacterReferee(index)} // Remove specific field set
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <FaRegMinusSquare />
+                <LuMinus />
               </button>
             )}
           </div>
@@ -260,7 +192,7 @@ export const EducationDetails = () => {
           onClick={handleAddReferee} // Add a new referee with isNew: true
           className="absolute top-11 -right-7 text-medium_grey text-[18px]"
         >
-          <CiSquarePlus />
+          <LuPlus />
         </button>
       </div>
 
@@ -311,7 +243,7 @@ export const EducationDetails = () => {
                 onClick={() => removeRelative(index)} // Remove specific field set
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <FaRegMinusSquare /> {/* Minus icon */}
+                <LuMinus /> {/* Minus icon */}
               </button>
             )}
           </div>
@@ -321,7 +253,7 @@ export const EducationDetails = () => {
           onClick={handleAddRelative}
           className="absolute top-11 -right-7 text-medium_grey text-[18px]"
         >
-          <CiSquarePlus />
+          <LuPlus />
         </button>
       </div>
 
@@ -444,7 +376,7 @@ export const EducationDetails = () => {
                 onClick={() => removeEmergency(index)} // Remove specific field set
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <FaRegMinusSquare /> {/* Minus icon */}
+                <LuMinus /> {/* Minus icon */}
               </button>
             )}
           </div>
@@ -454,7 +386,7 @@ export const EducationDetails = () => {
           onClick={handleAddEmergency}
           className="absolute top-11 -right-7 text-medium_grey text-[18px]"
         >
-          <CiSquarePlus />
+          <LuPlus />
         </button>
       </div>
 

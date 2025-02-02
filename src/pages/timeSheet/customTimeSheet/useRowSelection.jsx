@@ -11,10 +11,19 @@ export const useRowSelection = () => {
     }
   };
 
+ 
   const handleSubmit = (editedObj) => {
     if (editedObj) {
-      console.log(editedObj);
-      if (!selectedRows.some((row) => row.id === editedObj.id)) {
+      const exists = selectedRows.some((row) => row.id === editedObj.id);
+
+      if (exists) {
+        // Update the existing row
+        const updatedRows = selectedRows.map((row) =>
+          row.id === editedObj.id ? editedObj : row
+        );
+        setSelectedRows(updatedRows);
+      } else {
+        // Add new row
         setSelectedRows([...selectedRows, editedObj]);
       }
     }

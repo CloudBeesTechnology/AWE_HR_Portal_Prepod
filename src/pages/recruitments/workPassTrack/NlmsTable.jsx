@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { RiFileEditLine } from "react-icons/ri";
-import { StatusForm } from "./StatusForm";
 import { ReviewForm } from "../ReviewForm";
 import { WorkpassForm } from "./WorkpassForm";
 
-export const NlmsTable = ({ data, formatDate }) => {
+export const NlmsTable = ({ data, formatDate, fileUpload, urlValue }) => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const [selectedCandi, setSelectedCandi] = useState([]);
@@ -22,7 +21,7 @@ export const NlmsTable = ({ data, formatDate }) => {
     "Form",
     "Edit Form",
   ];
-  console.log(data);
+  // console.log(data);
   const handleShowForm = (candi) => {
     setSelectedCandi(candi);
     setIsFormVisible(!isFormVisible);
@@ -59,17 +58,49 @@ export const NlmsTable = ({ data, formatDate }) => {
                     <td className="py-3">{item.name || "N/A"}</td>
                     <td className="py-3">{item.nationality || "N/A"}</td>
                     <td className="py-3">
-                      {formatDate(item.interviewDetails_interDate) || "N/A"}
-                    </td>
-                    <td className="py-3">
-                      {item.interviewDetails_interTime || "N/A"}
-                    </td>
-                    <td className="py-3">
-                      {item.interviewDetails_venue || "N/A"}
-                    </td>
-                    <td className="py-3">
                       {item.interviewDetails_manager || "N/A"}
                     </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_nlmssubmitdate || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_referenceno || "N/A"}
+                    </td>
+
+                    <td className="py-3">
+                      {item.WPTrackDetails_nlmsapprovedate || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_nlmsexpirydate || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_ldreferenceno || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_nlmsfile ? (
+                        <a
+                          href={urlValue}
+                          onClick={(e) => {
+                            if (!item.WPTrackDetails_nlmsfile) {
+                              e.preventDefault();
+                            } else {
+                              fileUpload(item.WPTrackDetails_nlmsfile);
+                            }
+                          }}
+                          download
+                          className={
+                            item.WPTrackDetails_nlmsfile
+                              ? "border-b-2 border-[orange] text-[orange]"
+                              : ""
+                          }
+                        >
+                          {item.WPTrackDetails_nlmsfile ? "Download" : "N/A"}
+                        </a>
+                      ) : (
+                        <p>N/A</p>
+                      )}
+                    </td>
+
                     <td
                       className="py-3 text-center"
                       onClick={() => handleShowReviewForm(item)}
@@ -96,11 +127,7 @@ export const NlmsTable = ({ data, formatDate }) => {
         </div>
       )}
       {isReviewFormVisible && (
-        <ReviewForm
-          candidate={selectedCandi}
-          onClose={handleShowReviewForm}
-       
-        />
+        <ReviewForm candidate={selectedCandi} onClose={handleShowReviewForm} />
       )}
       {isFormVisible && (
         <WorkpassForm

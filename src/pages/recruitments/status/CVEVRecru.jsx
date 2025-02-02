@@ -7,6 +7,8 @@ export const CVEVRecru = ({ data, formatDate, fileUpload, urlValue }) => {
   const [isFormVisible, setIsFormVisible] = useState(false);
     const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
     const [selectedCandi, setSelectedCandi] = useState([]);
+
+
   const heading = [
     "TempID",
     "Name",

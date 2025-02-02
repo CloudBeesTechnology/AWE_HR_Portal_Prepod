@@ -93,9 +93,9 @@ export const FileUploadNew = ({
 }) => {
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col max-w-[300px]">
       {label && <label className="text_size_5">{label}</label>}
-      <label className="w-full mt-2 max-w-[300px] flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer">
+      <label className="w-full mt-2  flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer">
         <input
           type="file"
           className="hidden"
@@ -110,7 +110,7 @@ export const FileUploadNew = ({
       {/* <p className="text-grey text-sm my-1">{fileName || ""}</p> */}
 
       {/* Display uploaded files */}
-      <p className="text-xs mt-1 text-grey px-1 border">
+      <p className="text-xs mt-1 text-grey px-1 ">
         {uploadedFileNames?.[field.title] ? (
           Array.isArray(uploadedFileNames[field.title]) ? (
             uploadedFileNames[field.title]

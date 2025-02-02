@@ -4,7 +4,7 @@ import React from "react";
 import { useEffect } from "react";
 import { TiTick } from "react-icons/ti";
 
-export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
+export const ConfirmationForm = ({ register, formData, handleInputChange, userType, gmPosition }) => {
   const [selectedValue, setSelectedValue] = React.useState("");  
   
   useEffect(() => {
@@ -109,6 +109,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
               value="terminated"
               checked={selectedValue === "terminated"}
               onChange={handleInputChange}
+              
               className="mr-2 w-6 h-6 border-2 bg-white appearance-none rounded-none"
             />
             <span className="radio-label flex items-center">
@@ -148,6 +149,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
             {...register("supervisorName")}
             value={formData.probData.supervisorName || ""}
             onChange={handleInputChange}
+            disabled={userType !== "Supervisor"}
             className="border-b outline-none px-1"
           />
         </div>
@@ -162,6 +164,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
               checked={formData.probData.supervisorApproved === "Approved"}
               onChange={handleInputChange}
               id="saApproved"
+              disabled={userType !== "Supervisor"}
               className="h-4 w-4 form-checkbox"
             />
             <label htmlFor="saApproved" className="text-sm">
@@ -177,6 +180,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
               checked={formData.probData.supervisorApproved === "Rejected"}
               onChange={handleInputChange}
               id="saReject"
+              disabled={userType !== "Supervisor"}
               className="h-4 w-4 form-checkbox"
             />
             <label htmlFor="saReject" className="text-sm">
@@ -192,6 +196,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
             {...register("supervisorDate")}
             value={formData.probData.supervisorDate || ""}
             onChange={handleInputChange}
+            disabled={userType !== "Supervisor"}
             className="outline-none"
           />
         </div>
@@ -209,6 +214,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
             {...register("managerName")}
             value={formData.probData.managerName || ""}
             onChange={handleInputChange}
+            disabled={userType !== "Manager"}
             className="border-b outline-none px-1"
           />
         </div>
@@ -222,6 +228,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
               checked={formData.probData.managerApproved === "Approved"}
               onChange={handleInputChange}
               id="managerApproved"
+              disabled={userType !== "Manager"}
               className="h-4 w-4 form-checkbox"
             />
             <label htmlFor="managerApproved" className="text-sm">
@@ -237,6 +244,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
               checked={formData.probData.managerApproved === "Rejected"}
               onChange={handleInputChange}
               id="managerReject"
+              disabled={userType !== "Manager"}
               className="h-4 w-4 form-checkbox"
             />
             <label htmlFor="managerReject" className="text-sm">
@@ -251,6 +259,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
             {...register("managerDate")}
             value={formData.probData.managerDate || ""}
             onChange={handleInputChange}
+            disabled={userType !== "Manager"}
             className="outline-none"
           />
         </div>
@@ -267,6 +276,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
             {...register("gmName")}
             value={formData.probData.gmName || ""}
             onChange={handleInputChange}
+            disabled={gmPosition !== "General Manager"} 
             className="border-b outline-none px-1"
           />
           <p className="text-[12px]">(For Staff Category Only)</p>
@@ -281,6 +291,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
               checked={formData.probData.gmApproved === "Approved"}
               onChange={handleInputChange}
               id="gmApproved"
+              disabled={gmPosition !== "General Manager"} 
               className="h-4 w-4 form-checkbox"
             />
             <label htmlFor="gmApproved" className="text-sm">
@@ -296,6 +307,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
               checked={formData.probData.gmApproved === "Rejected"}
               onChange={handleInputChange}
               id="gmReject"
+              disabled={gmPosition !== "General Manager"} 
               className="h-4 w-4 form-checkbox"
             />
             <label htmlFor="gmReject" className="text-sm">
@@ -310,6 +322,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
             {...register("gmDate")}
             value={formData.probData.gmDate || ""}
             onChange={handleInputChange}
+            disabled={gmPosition !== "General Manager"} 
             className="outline-none"
           />
         </div>
@@ -331,6 +344,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
               {...register("hrName")}
               value={formData.probData.hrName || ""}
               onChange={handleInputChange}
+              disabled={userType !== "HR"} 
               className="border-b outline-none px-1"
             />
           </div>
@@ -341,6 +355,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange }) => {
               {...register("hrDate")}
               value={formData.probData.hrDate || ""}
               onChange={handleInputChange}
+              disabled={userType !== "HR"}
               className="outline-none"
             />
           </div>

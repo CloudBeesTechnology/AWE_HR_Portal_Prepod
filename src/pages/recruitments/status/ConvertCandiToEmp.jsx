@@ -12,6 +12,10 @@ export const CandiToEmp = () => {
   const client = generateClient();
   const SumbitCandiToEmp = useCallback(
     async ({ storedData }) => {
+
+      if (!storedData) {
+        throw new Error("Missing required parameters");
+      }
       // const MigrationData = {
       //   empID: storedData.empID,
       //   age: storedData.age,
@@ -134,6 +138,7 @@ export const CandiToEmp = () => {
         race: storedData.race,
         religion: storedData.religion,
       };
+
       const CandiToEmpTable = {
         empID: storedData.empID,
         crime: storedData.crime,
@@ -173,6 +178,7 @@ export const CandiToEmp = () => {
         interTime: storedData.interviewDetails_interTime,
         interType: storedData.interviewDetails_interType,
       };
+
       const workInfoTable = {
         empID: storedData.empID,
         department: [storedData.interviewDetails_department],

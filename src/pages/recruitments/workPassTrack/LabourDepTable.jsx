@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { RiFileEditLine } from "react-icons/ri";
-import { StatusForm } from "./StatusForm";
 import { ReviewForm } from "../ReviewForm";
 import { WorkpassForm } from "./WorkpassForm";
 
-export const LabourDepTable = ({ data, formatDate }) => {
+export const LabourDepTable = ({ data, formatDate, fileUpload, urlValue }) => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const [selectedCandi, setSelectedCandi] = useState([]);
@@ -20,7 +19,7 @@ export const LabourDepTable = ({ data, formatDate }) => {
     "Form",
     "Edit Form",
   ];
-  console.log(data);
+  // console.log(data);
   const handleShowForm = (candi) => {
     setSelectedCandi(candi);
     setIsFormVisible(!isFormVisible);
@@ -56,18 +55,45 @@ export const LabourDepTable = ({ data, formatDate }) => {
                     <td className="py-3">{item.tempID}</td>
                     <td className="py-3">{item.name || "N/A"}</td>
                     <td className="py-3">{item.nationality || "N/A"}</td>
-                    <td className="py-3">
-                      {formatDate(item.interviewDetails_interDate) || "N/A"}
-                    </td>
-                    <td className="py-3">
-                      {item.interviewDetails_interTime || "N/A"}
-                    </td>
-                    <td className="py-3">
-                      {item.interviewDetails_venue || "N/A"}
-                    </td>
+
                     <td className="py-3">
                       {item.interviewDetails_manager || "N/A"}
                     </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_lbrDepoNum || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_lbrEndroseDate || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_lbrDepoAmount || "N/A"}
+                    </td>
+
+                    <td className="py-3">
+                      {item.WPTrackDetails_lbrFile ? (
+                        <a
+                          href={urlValue}
+                          onClick={(e) => {
+                            if (!item.WPTrackDetails_lbrFile) {
+                              e.preventDefault();
+                            } else {
+                              fileUpload(item.WPTrackDetails_lbrFile);
+                            }
+                          }}
+                          download
+                          className={
+                            item.WPTrackDetails_lbrFile
+                              ? "border-b-2 border-[orange] text-[orange]"
+                              : ""
+                          }
+                        >
+                          {item.WPTrackDetails_lbrFile ? "Download" : "N/A"}
+                        </a>
+                      ) : (
+                        <p>N/A</p>
+                      )}
+                    </td>
+
                     <td
                       className="py-3 text-center"
                       onClick={() => handleShowReviewForm(item)}
@@ -94,11 +120,7 @@ export const LabourDepTable = ({ data, formatDate }) => {
         </div>
       )}
       {isReviewFormVisible && (
-        <ReviewForm
-          candidate={selectedCandi}
-          onClose={handleShowReviewForm}
-
-        />
+        <ReviewForm candidate={selectedCandi} onClose={handleShowReviewForm} />
       )}
       {isFormVisible && (
         <WorkpassForm

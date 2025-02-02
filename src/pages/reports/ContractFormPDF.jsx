@@ -426,6 +426,12 @@ export const ContractFormPDF = ({ contentRef }) => {
                   <td className="border border-black p-2">
                     {employeeData?.contractRenewalDuration || "N/A"}
                   </td>
+                  {/* <td className="border border-black p-2">
+                    {employeeData?.ldEx || "N/A"}
+                  </td>
+                  <td className="border border-black p-2">
+                    {employeeData?.balanceMonths || "N/A"}
+                  </td> */}
                 </tr>
               ))}
                  
@@ -455,6 +461,7 @@ export const ContractFormPDF = ({ contentRef }) => {
 
         {/* Footer */}
         <div className="mt-20 flex justify-between items-center">
+          
           <div className="text-center">
             <p className="font-semibold mb-5">Recommended By:</p>
             <input
@@ -462,6 +469,7 @@ export const ContractFormPDF = ({ contentRef }) => {
               name="depHead"
               value={formData.contract.depHead}
               onChange={handleInputChange}
+              disabled={userType !== "Manager"} 
               className="border-b-2 border-black w-56 mx-auto outline-none text-center"
             />
 
@@ -475,6 +483,7 @@ export const ContractFormPDF = ({ contentRef }) => {
               name="hrManager"
               value={formData.contract.hrManager}
               onChange={handleInputChange}
+              disabled={userType !== "HR"} 
               className="border-b-2 border-black w-56 mx-auto outline-none text-center"
             />
 
@@ -487,6 +496,7 @@ export const ContractFormPDF = ({ contentRef }) => {
               name="genManager"
               value={formData.contract.genManager}
               onChange={handleInputChange}
+              disabled={gmPosition !== "General Manger"} 
               className="border-b-2 border-black w-56 mx-auto outline-none text-center"
             />
 

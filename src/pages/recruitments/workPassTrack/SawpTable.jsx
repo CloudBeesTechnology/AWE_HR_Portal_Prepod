@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { RiFileEditLine } from "react-icons/ri";
-
 import { ReviewForm } from "../ReviewForm";
-import { StatusForm } from "../status/StatusForm";
 import { WorkpassForm } from "./WorkpassForm";
 import { DateFormat } from "../../../utils/DateFormat";
 
@@ -21,7 +19,7 @@ export const SawpTable = ({ data, fileUpload, urlValue }) => {
     "Form",
     "Edit Form",
   ];
-  console.log(data);
+
   const handleShowForm = (candi) => {
     setSelectedCandi(candi);
     setIsFormVisible(!isFormVisible);

@@ -58,11 +58,11 @@ export const ProbationForm = forwardRef(() => {
       extensionPeriod: "",
       gmDate: "",
       hrDate: "",
-      hrName: "",
+      hrName: null,
       initiative: "",
       managerDate: "",
       managerName: "",
-      gmName: "",
+      gmName: null,
       pace: "",
       quality: "",
       recommendation: "",
@@ -72,8 +72,8 @@ export const ProbationForm = forwardRef(() => {
       teamwork: "",
       extendProbED: "",
       gmApproved: "",
-      managerApproved: "",
-      supervisorApproved: "",
+      managerApproved: null,
+      supervisorApproved: null,
       communicationDetails: "",
       qualityDetails: "",
       paceDetails: "",
@@ -698,6 +698,7 @@ const sendEmails = async (data, empPIRecord, probationEndFormatted, PFDataRecord
         skillPool={emailData.skilledAndUnskilled}
         errors={errors}
         userType={userType}
+        gmPosition={gmPosition}
         
       />
 

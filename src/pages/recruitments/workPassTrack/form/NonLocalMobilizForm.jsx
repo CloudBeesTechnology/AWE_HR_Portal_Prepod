@@ -9,12 +9,18 @@ import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPT
 import { UpdateInterviewData } from "../../../../services/updateMethod/UpdateInterview";
 import { statusOptions } from "../../../../utils/StatusDropdown";
 import { SpinLogo } from "../../../../utils/SpinLogo";
+import { DataSupply } from "../../../../utils/DataStoredContext";
 
 export const NonLocalMobilizForm = ({ candidate }) => {
   const { interviewSchedules } = useFetchCandy();
+  const { IVSSDetails } = useContext(DataSupply);
   const { wpTrackingDetails } = useUpdateWPTracking();
   const { interviewDetails } = UpdateInterviewData();
   const [notification, setNotification] = useState(false);
+
+    // Logging IVSSDetails during every render
+    // console.log("IVSS Details: ", IVSSDetails);
+
 
   const [formData, setFormData] = useState({
     interview: {
@@ -44,6 +50,10 @@ export const NonLocalMobilizForm = ({ candidate }) => {
   });
 
   const MobilizUpload = watch("mobFile", "");
+  // console.log(interviewSchedules);
+  // console.log("IVSS", IVSSDetails);
+  
+  
 
   useEffect(() => {
     if (interviewSchedules.length > 0) {
@@ -71,13 +81,13 @@ export const NonLocalMobilizForm = ({ candidate }) => {
             ...prev,
             mobFile: fileName,
           }));
-          console.log("Uploaded file name set:", fileName);
+          // console.log("Uploaded file name set:", fileName);
         }
       } else {
-        console.log("No interviewData found for candidate:", candidate.tempID);
+        // console.log("No interviewData found for candidate:", candidate.tempID);
       }
     } else {
-      console.log("No interview schedules available.");
+      // console.log("No interview schedules available.");
     }
   }, [interviewSchedules, candidate.tempID]);
 
@@ -121,7 +131,7 @@ export const NonLocalMobilizForm = ({ candidate }) => {
     );
 
     const selectedInterviewDataStatus = interviewSchedules.find(
-      (data) => data.IDDetails.tempID === candidate?.tempID
+      (data) => data.DDetails?.tempID === candidate?.tempID
     );
 
     const interviewScheduleId = selectedInterviewData?.id;
@@ -156,16 +166,16 @@ export const NonLocalMobilizForm = ({ candidate }) => {
       };
       setNotification(true);
 
-      console.log("Submitting interview details with status:", interStatus);
+      // console.log("Submitting interview details with status:", interStatus);
 
       await interviewDetails({ InterviewValue: interStatus });
 
-      console.log("Interview status updated:", interStatus);
+      // console.log("Interview status updated:", interStatus);
 
       // console.log("Response from WPTrackingDetails:", response);
 
       if (response.errors && response.errors.length > 0) {
-        console.error("Response errors:", response.errors);
+        // console.error("Response errors:", response.errors);
       }
     } catch (err) {
       console.error("Error submitting interview details:", err);

@@ -69,18 +69,24 @@ export const CreateJob = () => {
         const url = `https://71n903ao01.execute-api.ap-southeast-1.amazonaws.com/adininfile/commonfiles/${encodeURIComponent(selectedFile.name)}`;
 // console.log(url);
 
-        const URLPath = `https://commonfiles.s3.ap-southeast-1.amazonaws.com/recruiment/applyJob/${watchedJobTitle}/${encodeURIComponent(
-          selectedFile.name
-        )}`;
+//s3 bucket link
+        // const URLPath = `https://commonfiles.s3.ap-southeast-1.amazonaws.com/recruiment/applyJob/${watchedJobTitle}/${encodeURIComponent(
+        //   selectedFile.name
+        // )}`;
 // console.log(URLPath);
 
-        setUploadedDocs(URLPath);
+        // setUploadedDocs(URLPath);
 
         const response = await fetch(url, {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/octet-stream", // Correct header for file uploads
-          },
+          headers:{ 
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'PUT, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With'
+        },
+          // headers: {
+          //   "Content-Type": "application/octet-stream", // Correct header for file uploads
+          // },
           body: selectedFile,
         });
 

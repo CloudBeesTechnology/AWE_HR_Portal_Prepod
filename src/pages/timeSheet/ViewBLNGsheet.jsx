@@ -16,11 +16,6 @@ import { PopupForMissMatchExcelSheet } from "./ModelForSuccessMess/PopupForMissM
 import "../../../src/index.css";
 import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
 import { PopupForAssignManager } from "./ModelForSuccessMess/PopupForAssignManager";
-import {
-  createTimeSheet,
-  deleteTimeSheet,
-  updateTimeSheet,
-} from "../../graphql/mutations";
 
 import { PopupForAddRemark } from "./ModelForSuccessMess/PopupForAddRemark";
 import { FindSpecificTimeKeeper } from "./customTimeSheet/FindSpecificTimeKeeper";
@@ -33,20 +28,25 @@ import { Pagination } from "./timeSheetSearch/Pagination";
 import { AutoFetchForAssignManager } from "./customTimeSheet/AutoFetchForAssignManager";
 import { TimeSheetsCRUDoperations } from "./customTimeSheet/TimeSheetsCRUDoperations";
 import { useRowSelection } from "./customTimeSheet/useRowSelection";
+import { deleteTimeSheet } from "../../graphql/mutations";
+import { useNavigate } from "react-router-dom";
 
 const client = generateClient();
 
 export const ViewBLNGsheet = ({
   excelData,
   returnedTHeader,
-  convertedStringToArrayObj,
+
   titleName,
   setExcelData,
   Position,
   fileName,
   showRejectedItemTable,
   submittedData,
+  wholeData,
+  ManagerData,
 }) => {
+  const nav = useNavigate();
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
 
   const [closePopup, setClosePopup] = useState(false);
@@ -72,6 +72,8 @@ export const ViewBLNGsheet = ({
   const [approveMessage, setApproveMessage] = useState(null);
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedItemsTwo, setCheckedItemsTwo] = useState({});
+  const [editFormTitle, setEditFormTitle] = useState("");
+
   const [currentPage, setCurrentPage] = useState(1);
 
   let visibleData;
@@ -172,6 +174,7 @@ export const ViewBLNGsheet = ({
 
                 // Set merged data in state
                 setData(mergedData);
+                console.log("Incomming Data : ", mergedData);
                 setSecondaryData(mergedData);
               } catch (error) {
                 // console.error("Error fetching work info:", error.message);
@@ -195,7 +198,7 @@ export const ViewBLNGsheet = ({
     if (submittedData && submittedData.length > 0) {
       setShowStatusCol(true);
       setCurrentStatus(true);
-
+      console.log("submittedData : ", submittedData);
       setData(submittedData);
       setSecondaryData(submittedData);
     }
@@ -208,7 +211,7 @@ export const ViewBLNGsheet = ({
     } else if (getPosition === "TimeKeeper") {
       setUserIdentification("TimeKeeper");
     }
-  }, [convertedStringToArrayObj]);
+  }, [wholeData]);
 
   const pendingData = (data) => {
     if (data && data.length > 0) {
@@ -235,14 +238,18 @@ export const ViewBLNGsheet = ({
           return {
             id: val.id,
             fileName: val.fileName,
+            BPCOMPANY: val.bpCompany || "",
+
             FID: val.fidNo || 0,
             NAMEFLAST: val.empName || "",
-            ENTRANCEDATEUSED: val.date || "",
-            ENTRANCEDATETIME: val.inTime?.replace(/[\[\]]/g, "") || "",
-            EXITDATETIME: val.outTime?.replace(/[\[\]]/g, "") || "",
-            AVGDAILYTOTALBYDAY: val.avgDailyTD || "",
-            AHIGHLIGHTDAILYTOTALBYGROUP: val.totalHrs || "",
-            ADININWORKSENGINEERINGSDNBHD: val.aweSDN || "",
+            ENTRANCEDATE: val.date || "",
+            EARLIESTENTRYTIME: val.earliestEntryTime || "",
+            LATESTENTRYTIME: val.latestEntryTime || "",
+            ENTRYTIME: val.inTime?.replace(/[\[\]]/g, "") || "",
+            EXITTIME: val.outTime?.replace(/[\[\]]/g, "") || "",
+            DAILYTOTAL: val.avgDailyTD || "",
+
+            DAILY: val.aweSDN || "",
             WORKINGHOURS: val.actualWorkHrs || 0,
             OT: val.otTime || 0,
             NORMALWORKINGHRSPERDAY: val?.normalWorkHrs || 0,
@@ -302,17 +309,17 @@ export const ViewBLNGsheet = ({
 
         return cleanedItem;
       });
-
+      console.log(cleanData);
       const requiredKeys = [
-        "ADININWORKSENGINEERINGSDNBHD",
+        "BPCOMPANY",
         "FID",
-        "NameFLAST",
-        "EntranceDateUsed",
-        "EntranceDatetime",
-        "ExitDatetime",
-        "DayDifference",
-        "AvgDailyTotalByDay",
-        "AHighlightDailyTotalByGroup",
+        "NAMEFLAST",
+        "ENTRANCEDATE",
+        "ENTRYTIME",
+        "EXITTIME",
+        "DAYDIFFERENCE",
+        "DAILY",
+        "DAILYTOTAL",
         // "WORKINGHOURS",
         // "OT",
         // "REMARKS",
@@ -333,7 +340,7 @@ export const ViewBLNGsheet = ({
           });
         resolve(keyCheckResult);
       });
-
+      console.log(result);
       setClosePopup(true);
       setShowStatusCol(result);
       setCurrentStatus(result); // Assuming setCurrentStatus is defined
@@ -348,8 +355,8 @@ export const ViewBLNGsheet = ({
         // setLoading is removed
         try {
           const dataPromise = new Promise((resolve, reject) => {
-            if (convertedStringToArrayObj) {
-              resolve(convertedStringToArrayObj);
+            if (ManagerData && ManagerData.length > 0) {
+              resolve(ManagerData);
             } else {
               setTimeout(() => {
                 reject("No data found after waiting.");
@@ -362,7 +369,7 @@ export const ViewBLNGsheet = ({
           if (userIdentification === "Manager") {
             const finalData = await SendDataToManager(fetchedData);
 
-            pendingData(finalData);
+            pendingData(fetchedData);
           }
         } catch (err) {
         } finally {
@@ -379,8 +386,8 @@ export const ViewBLNGsheet = ({
         // setLoading(true);
         try {
           const dataPromise = new Promise((resolve, reject) => {
-            if (convertedStringToArrayObj) {
-              resolve(convertedStringToArrayObj);
+            if (wholeData && wholeData.length > 0) {
+              resolve(wholeData);
             } else {
               setTimeout(() => {
                 reject("No data found after waiting.");
@@ -392,7 +399,7 @@ export const ViewBLNGsheet = ({
 
           if (userIdentification !== "Manager") {
             const finalData = await FindSpecificTimeKeeper(fetchedData);
-            pendingData(finalData);
+            pendingData(fetchedData);
           }
         } catch (err) {
         } finally {
@@ -406,12 +413,7 @@ export const ViewBLNGsheet = ({
       setCurrentStatus(false);
       //  setLoading is removed ;
     }
-  }, [
-    returnedTHeader,
-    convertedStringToArrayObj,
-    userIdentification,
-    showRejectedItemTable,
-  ]);
+  }, [returnedTHeader, ManagerData, userIdentification, showRejectedItemTable]);
 
   const editBLNG = (data) => {
     setEditObject(data);
@@ -427,6 +429,15 @@ export const ViewBLNGsheet = ({
   const toggleFunctionForAssiMana = () => {
     setToggleAssignManager(!toggleAssignManager);
   };
+
+  const editFormTitleFunc = () => {
+    if (Position === "Manager") {
+      setEditFormTitle("View Form");
+    } else {
+      setEditFormTitle("Edit Form");
+    }
+  };
+
   const editNestedData = (data, getObject) => {
     return data.map((m) => ({
       id: m.id,
@@ -448,10 +459,7 @@ export const ViewBLNGsheet = ({
       data &&
       data.length > 0 &&
       data.map((val) => {
-        if (
-          val.FID === object.FID &&
-          val.ENTRANCEDATEUSED === object.ENTRANCEDATEUSED
-        ) {
+        if (val.id === object.id) {
           return { ...val, REMARKS: object.REMARKS };
         } else {
           return val;
@@ -502,6 +510,22 @@ export const ViewBLNGsheet = ({
     setData(remainingData);
     setSecondaryData(remainingData);
     setSelectedRows([]);
+    if (remainingData && remainingData.length === 0) {
+      nav("/timeSheet");
+    }
+  };
+
+  const handleManagerReload = () => {
+    let mergedData = [...allApprovedData, ...allRejectedData];
+    const remainingData = data?.filter(
+      (row) => !mergedData.some((selected) => selected.id === row.id)
+    );
+    setData(remainingData);
+    setSecondaryData(remainingData);
+
+    if (remainingData && remainingData.length === 0) {
+      window.location.reload();
+    }
   };
 
   const AllFieldData = useTableFieldData(titleName);
@@ -519,15 +543,19 @@ export const ViewBLNGsheet = ({
         selectedRows.map((val, i) => {
           return {
             id: val.id,
+            bpCompany: val?.BPCOMPANY || "",
             fidNo: val?.FID || 0,
             empName: val?.NAMEFLAST || "",
-            date: val?.ENTRANCEDATEUSED || "",
-            inTime: val?.ENTRANCEDATETIME || "",
-            outTime: val?.EXITDATETIME || "",
+            date: val?.ENTRANCEDATE || "",
+            earliestEntryTime: val?.EARLIESTENTRYTIME || "",
+            latestEntryTime: val?.LATESTENTRYTIME || "",
+
+            inTime: val?.ENTRYTIME || "",
+            outTime: val?.EXITTIME || "",
             // day: val?.DAYDIFFERENCE || 0,
-            avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
-            totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
-            aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
+            avgDailyTD: val?.DAILYTOTAL || "",
+
+            aweSDN: val?.DAILY || "",
             normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
             actualWorkHrs: val?.WORKINGHOURS || 0,
             otTime: val?.OT || 0,
@@ -556,7 +584,7 @@ export const ViewBLNGsheet = ({
         finalResult,
         toggleSFAMessage,
         setStoringMess,
-        setData,
+
         Position,
         action,
         handleAssignManager,
@@ -577,15 +605,18 @@ export const ViewBLNGsheet = ({
               return {
                 id: val.id,
                 // fileName: val.fileName,
+                bpCompany: val?.BPCOMPANY || "",
                 fidNo: val?.FID || 0,
                 empName: val?.NAMEFLAST || "",
-                date: val?.ENTRANCEDATEUSED || "",
-                inTime: val?.ENTRANCEDATETIME || "",
-                outTime: val?.EXITDATETIME || "",
+                date: val?.ENTRANCEDATE || "",
+                earliestEntryTime: val?.EARLIESTENTRYTIME || "",
+                latestEntryTime: val?.LATESTENTRYTIME || "",
+                inTime: val?.ENTRYTIME || "",
+                outTime: val?.EXITTIME || "",
                 // day: val?.DAYDIFFERENCE || 0,
-                avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
-                totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
-                aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
+                avgDailyTD: val?.DAILYTOTAL || "",
+
+                aweSDN: val?.DAILY || "",
                 normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
                 actualWorkHrs: val?.WORKINGHOURS || 0,
                 otTime: val?.OT || 0,
@@ -611,7 +642,25 @@ export const ViewBLNGsheet = ({
         setNotification,
         setAllApprovedData,
         setAllRejectedData,
+        handleManagerReload,
       });
+      // {
+      //   BPCOMPANY: "ADININ WORKS & ENGINEERING SDN BHD";
+      //   DAILY: "12h 47m";
+      //   DAILYTOTAL: "12h 47m";
+      //   DAYDIFFERENCE: 0;
+      //   EARLIESTENTRYTIME: 45628.2416550926;
+      //   ENTRANCEDATE: 45628;
+      //   ENTRYTIME: 45628.2416550926;
+      //   EXITTIME: 45628.7739930556;
+      //   FID: 596;
+      //   LATESTENTRYTIME: 45628.7739930556;
+      //   NAMEFLAST: "UNTING AK GENA";
+      //   NORMALWORKINGHRSPERDAY: "";
+      //   OT: "";
+      //   REMARKS: "";
+      //   WORKINGHOURS: "";
+      // }
     } else if (
       userIdentification !== "Manager" &&
       showRejectedItemTable === "Rejected" &&
@@ -624,15 +673,18 @@ export const ViewBLNGsheet = ({
               return {
                 id: val.id,
                 // fileName: val.fileName,
+                bpCompany: val?.BPCOMPANY || "",
                 fidNo: val?.FID || 0,
                 empName: val?.NAMEFLAST || "",
-                date: val?.ENTRANCEDATEUSED || "",
-                inTime: val?.ENTRANCEDATETIME || "",
-                outTime: val?.EXITDATETIME || "",
+                date: val?.ENTRANCEDATE || "",
+                earliestEntryTime: val?.EARLIESTENTRYTIME || "",
+                latestEntryTime: val?.LATESTENTRYTIME || "",
+                inTime: val?.ENTRYTIME || "",
+                outTime: val?.EXITTIME || "",
                 // day: val?.DAYDIFFERENCE || 0,
-                avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
-                totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
-                aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
+                avgDailyTD: val?.DAILYTOTAL || "",
+
+                aweSDN: val?.DAILY || "",
                 normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
                 actualWorkHrs: val?.WORKINGHOURS || 0,
                 otTime: val?.OT || 0,
@@ -649,16 +701,15 @@ export const ViewBLNGsheet = ({
       let finalResult = updatedRejectedItems;
       let action = "ResubmitRejectedItems";
       await TimeSheetsCRUDoperations({
+        setNotification,
+        setShowTitle,
         finalResult,
         toggleSFAMessage,
         setStoringMess,
-        setData,
         Position,
         action,
-        setShowTitle,
-        setNotification,
-        setAllApprovedData,
-        setAllRejectedData,
+        handleAssignManager,
+        selectedRows,
       });
     }
   };
@@ -670,15 +721,20 @@ export const ViewBLNGsheet = ({
       data.map((val) => {
         return {
           fileName: fileName,
+          bpCompany: val?.BPCOMPANY || "",
+
           fidNo: val?.FID || 0,
           empName: val?.NAMEFLAST || "",
-          date: val?.ENTRANCEDATEUSED || "",
-          inTime: val?.ENTRANCEDATETIME || "",
-          outTime: val?.EXITDATETIME || "",
+          date: val?.ENTRANCEDATE || "",
+          earliestEntryTime: val?.EARLIESTENTRYTIME || "",
+          latestEntryTime: val?.LATESTENTRYTIME || "",
+
+          inTime: val?.ENTRYTIME || "",
+          outTime: val?.EXITTIME || "",
           // day: val?.DAYDIFFERENCE || 0,
-          avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
-          totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
-          aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
+          avgDailyTD: val?.DAILYTOTAL || "",
+
+          aweSDN: val?.DAILY || "",
           normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
           actualWorkHrs: val?.WORKINGHOURS || 0,
           otTime: val?.OT || 0,
@@ -711,23 +767,21 @@ export const ViewBLNGsheet = ({
   const storeOnlySelectedItem = (data, action) => {
     if (action === "Approved") {
       setAllApprovedData((prevApprovedData) => {
-        // Replace old data if ID matches, otherwise keep existing data
         const updatedData = prevApprovedData.filter(
           (item) => item.id !== data.id
         );
         const updateStatus = { ...data, status: "Approved" };
 
-        return [...updatedData, updateStatus]; // Add the new data
+        return [...updatedData, updateStatus];
       });
     } else if (action === "Rejected") {
+      setPassSelectedData(data);
       setAllRejectedData((prevRejectedData) => {
-        // Replace old data if ID matches, otherwise keep existing data
         const updatedData = prevRejectedData.filter(
           (item) => item.id !== data.id
         );
-        return [...updatedData, data]; // Add the new data
+        return [...updatedData, data];
       });
-      setPassSelectedData(data); // Update the selected data
     }
   };
   const addRemarks = (data) => {
@@ -753,38 +807,44 @@ export const ViewBLNGsheet = ({
   };
 
   const removeCheckedItem = useCallback(() => {
-    // Combine approved and rejected data
     const mergedData = [...allApprovedData, ...allRejectedData];
 
-    // Filter out items that have matching sapNo in mergedData
     const afterRemoved = data?.filter(
       (val) => !mergedData.some((fil) => val.id === fil.id)
     );
 
-    // Update the state with the filtered data
     setData(afterRemoved);
+    setSecondaryData(afterRemoved);
     // setAllApprovedData([]);
     // setAllRejectedData([]);
   }, [allApprovedData, allRejectedData, data]);
 
   const convertToISODate = (dateString) => {
-    const [year, month, day] = dateString?.split("/");
+    try {
+      const [year, month, day] = dateString?.split("/");
 
-    return `${month}/${year}/${day}`; // 'M/D/YYYY'
+      return `${month}/${year}/${day}`; // 'M/D/YYYY'
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const ENTRANCEDATETIME = (getDate) => {
-    const inputDate = String(getDate);
-    const date = new Date(inputDate);
+    try {
+      const inputDate = String(getDate);
+      const date = new Date(inputDate);
 
-    // Extract parts
-    const day = date.getDate(); // 2
-    const month = date.getMonth() + 1; // Months are 0-indexed, so add 1
-    const year = date.getFullYear(); // 2024
-    const time = inputDate?.split(" ")[1] + " " + inputDate?.split(" ")[2]; // "5:50:59 AM"
+      // Extract parts
+      const day = date.getDate(); // 2
+      const month = date.getMonth() + 1; // Months are 0-indexed, so add 1
+      const year = date.getFullYear(); // 2024
+      const time = inputDate?.split(" ")[1] + " " + inputDate?.split(" ")[2]; // "5:50:59 AM"
 
-    // Format the new date
-    return `${day}/${month}/${year} ${time}`;
+      // Format the new date
+      return `${day}/${month}/${year} ${time}`;
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   useEffect(() => {
@@ -916,7 +976,7 @@ export const ViewBLNGsheet = ({
 
                 <tbody>
                   {visibleData && visibleData?.length > 0 ? (
-                    visibleData.map((value, index) => {
+                    visibleData.slice(0, 10).map((value, index) => {
                       const renderRows = (rowData, ind) => {
                         const isStatusPending = rowData?.status === "Pending";
                         const serialNumber =
@@ -928,14 +988,25 @@ export const ViewBLNGsheet = ({
                                 ? index + 1
                                 : index + 1
                             }
-                            className="text-dark_grey h-[50px] text-sm rounded-sm shadow-md border-b-2 border-[#CECECE] bg-white hover:bg-[#f1f5f9] cursor-pointer"
+                            className={`text-dark_grey h-[50px] text-sm rounded-sm shadow-md border-b-2 border-[#CECECE] bg-white hover:bg-[#f1f5f9] ${
+                              excelData && excelData.length > 0
+                                ? ""
+                                : "cursor-pointer"
+                            }`}
                             onClick={() => {
-                              toggleFunction();
-                              editBLNG(rowData);
+                              if (excelData && excelData.length > 0) {
+                              } else {
+                                toggleFunction();
+                                editBLNG(rowData);
+                                editFormTitleFunc();
+                              }
                             }}
                           >
                             <td className="text-center px-4 flex-1">
                               {serialNumber}
+                            </td>
+                            <td className="text-start px-4 flex-1">
+                              {rowData?.BPCOMPANY}
                             </td>
                             <td className="text-start px-4 flex-1">
                               {rowData?.FID}
@@ -944,26 +1015,33 @@ export const ViewBLNGsheet = ({
                               {rowData?.NAMEFLAST}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {convertToISODate(rowData?.ENTRANCEDATEUSED)}
+                              {convertToISODate(rowData?.ENTRANCEDATE)}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {ENTRANCEDATETIME(rowData?.ENTRANCEDATETIME)}
+                              {rowData?.EARLIESTENTRYTIME}
                               {/* {ENTRANCEDATETIME("9/2/2024 5:50:59 AM")} */}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {ENTRANCEDATETIME(rowData?.EXITDATETIME)}
+                              {rowData?.LATESTENTRYTIME}
+                            </td>
+                            <td className="text-center px-4 flex-1">
+                              {ENTRANCEDATETIME(rowData?.ENTRYTIME)}
+                              {/* {ENTRANCEDATETIME("9/2/2024 5:50:59 AM")} */}
+                            </td>
+                            <td className="text-center px-4 flex-1">
+                              {ENTRANCEDATETIME(rowData?.EXITTIME)}
                             </td>
                             {/* <td className="text-center px-4 flex-1">
                               {rowData?.DAYDIFFERENCE || 0}
                             </td> */}
                             <td className="text-center px-4 flex-1">
-                              {rowData?.AVGDAILYTOTALBYDAY}
+                              {rowData?.DAILYTOTAL}
                             </td>
-                            <td className="text-center px-4 flex-1">
+                            {/* <td className="text-center px-4 flex-1">
                               {rowData?.AHIGHLIGHTDAILYTOTALBYGROUP || ""}
-                            </td>
+                            </td> */}
                             <td className="text-center px-4 flex-1">
-                              {rowData?.ADININWORKSENGINEERINGSDNBHD || 0}
+                              {rowData?.DAILY || 0}
                             </td>
                             <td className="text-center px-4 flex-1">
                               {rowData?.NORMALWORKINGHRSPERDAY || 0}
@@ -1001,16 +1079,22 @@ export const ViewBLNGsheet = ({
                                           ...prev,
                                           [rowData.id]: e.target.checked, // Toggle the checked state for this specific ID
                                         }));
+                                        setCheckedItemsTwo((prev) => ({
+                                          ...prev,
+                                          [rowData.id]: false,
+                                        }));
+
                                         storeOnlySelectedItem(
                                           rowData,
                                           "Approved"
                                         );
+                                        removeExistingData(rowData, "Rejected");
                                       } else {
-                                        removeExistingData(rowData, "Approved");
                                         setCheckedItems((prev) => ({
                                           ...prev,
                                           [rowData.id]: false, // Toggle the checked state for this specific ID
                                         }));
+                                        removeExistingData(rowData, "Approved");
                                       }
                                     }}
                                   />
@@ -1029,17 +1113,22 @@ export const ViewBLNGsheet = ({
                                           ...prev,
                                           [rowData.id]: e.target.checked, // Toggle the checked state for this specific ID
                                         }));
+                                        setCheckedItems((prev) => ({
+                                          ...prev,
+                                          [rowData.id]: false,
+                                        }));
                                         storeOnlySelectedItem(
                                           rowData,
                                           "Rejected"
                                         );
                                         toggleForRemarkFunc();
+                                        removeExistingData(rowData, "Approved");
                                       } else {
-                                        removeExistingData(rowData, "Rejected");
                                         setCheckedItemsTwo((prev) => ({
                                           ...prev,
                                           [rowData.id]: false, // Toggle the checked state for this specific ID
                                         }));
+                                        removeExistingData(rowData, "Rejected");
                                       }
                                     }}
                                   />
@@ -1114,66 +1203,70 @@ export const ViewBLNGsheet = ({
                   }
                   onClick={() => {
                     if (userIdentification !== "Manager") {
-                      if (selectedRows && selectedRows.length > 0) {
-                        toggleFunctionForAssiMana();
-                      } else if (excelData && excelData) {
-                        storeInitialData();
-                      }
-                      // const fetchDataAndDelete = async () => {
-                      //   try {
-                      //     console.log("Fetching and Deleting SBW Data...");
-                      //     // setIsDeleting(true); // Set loading state
-                      //     let nextToken = null; // Initialize nextToken for pagination
-                      //     do {
-                      //       // Define the filter for fetching SBW data
-                      //       const filter = {
-                      //         and: [{ fileType: { eq: "BLNG" } }],
-                      //       };
-                      //       // Fetch the BLNG data using GraphQL with pagination
-                      //       const response = await client.graphql({
-                      //         query: listTimeSheets,
-                      //         variables: { filter: filter, nextToken: nextToken }, // Pass nextToken for pagination
-                      //       });
-                      //       // Extract data and nextToken
-                      //       const SBWdata =
-                      //         response?.data?.listTimeSheets?.items || [];
-                      //       nextToken = response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
-                      //       console.log("Fetched SBW Data:", SBWdata);
-                      //       // Delete each item in the current batch
-                      //       await Promise.all(
-                      //         SBWdata.map(async (item) => {
-                      //           try {
-                      //             const deleteResponse = await client.graphql({
-                      //               query: deleteTimeSheet,
-                      //               variables: { input: { id: item.id } },
-                      //             });
-                      //             console.log(
-                      //               "Deleted Item Response:",
-                      //               deleteResponse
-                      //             );
-                      //           } catch (deleteError) {
-                      //             console.error(
-                      //               `Error deleting item with ID ${item.id}:`,
-                      //               deleteError
-                      //             );
-                      //           }
-                      //         })
-                      //       );
-                      //       console.log("Batch deletion completed.");
-                      //     } while (nextToken); // Continue fetching until no more data
-                      //     console.log(
-                      //       "All SBW items deletion process completed."
-                      //     );
-                      //   } catch (fetchError) {
-                      //     console.error(
-                      //       "Error in fetchDataAndDelete:",
-                      //       fetchError
-                      //     );
-                      //   } finally {
-                      //     // setIsDeleting(false); // Reset loading state
-                      //   }
-                      // };
-                      // fetchDataAndDelete();
+                      // if (selectedRows && selectedRows.length > 0) {
+                      //   toggleFunctionForAssiMana();
+                      // } else if (excelData && excelData) {
+                      //   storeInitialData();
+                      // }
+                      const fetchDataAndDelete = async () => {
+                        try {
+                          console.log("Fetching and Deleting SBW Data...");
+                          // setIsDeleting(true); // Set loading state
+                          let nextToken = null; // Initialize nextToken for pagination
+                          do {
+                            // Define the filter for fetching SBW data
+                            const filter = {
+                              and: [{ fileType: { eq: "BLNG" } }],
+                            };
+                            // Fetch the BLNG data using GraphQL with pagination
+                            const response = await client.graphql({
+                              query: listTimeSheets,
+                              variables: {
+                                filter: filter,
+                                nextToken: nextToken,
+                              }, // Pass nextToken for pagination
+                            });
+                            // Extract data and nextToken
+                            const SBWdata =
+                              response?.data?.listTimeSheets?.items || [];
+                            nextToken =
+                              response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
+                            console.log("Fetched SBW Data:", SBWdata);
+                            // Delete each item in the current batch
+                            await Promise.all(
+                              SBWdata.map(async (item) => {
+                                try {
+                                  const deleteResponse = await client.graphql({
+                                    query: deleteTimeSheet,
+                                    variables: { input: { id: item.id } },
+                                  });
+                                  console.log(
+                                    "Deleted Item Response:",
+                                    deleteResponse
+                                  );
+                                } catch (deleteError) {
+                                  console.error(
+                                    `Error deleting item with ID ${item.id}:`,
+                                    deleteError
+                                  );
+                                }
+                              })
+                            );
+                            console.log("Batch deletion completed.");
+                          } while (nextToken); // Continue fetching until no more data
+                          console.log(
+                            "All SBW items deletion process completed."
+                          );
+                        } catch (fetchError) {
+                          console.error(
+                            "Error in fetchDataAndDelete:",
+                            fetchError
+                          );
+                        } finally {
+                          // setIsDeleting(false); // Reset loading state
+                        }
+                      };
+                      fetchDataAndDelete();
                     } else if (userIdentification === "Manager") {
                       renameKeysFunctionAndSubmit();
                       removeCheckedItem();
@@ -1217,6 +1310,7 @@ export const ViewBLNGsheet = ({
           titleName={titleName}
           Position={Position}
           handleSubmit={handleSubmit}
+          editFormTitle={editFormTitle}
         />
       )}
       {storingMess === true ? (
@@ -1236,17 +1330,6 @@ export const ViewBLNGsheet = ({
           toggleSFAMessage={toggleSFAMessage}
           setExcelData={setExcelData}
           userIdentification={userIdentification}
-        />
-      ) : approveMessage === true ? (
-        <PopupForSFApproves
-          toggleSFAMessage={toggleSFAMessage}
-          icons={<IoCheckmarkCircleSharp />}
-          iconColor="text-[#2BEE48]"
-          textColor="text-[#05b01f]"
-          title={"Success!"}
-          message={`The rejected item has been returned`}
-          messageThree={"to the original timekeeper"}
-          btnText={"OK"}
         />
       ) : (
         ""

@@ -5,11 +5,12 @@ import { SawpEmpSchema } from "../../../services/EmployeeValidation";
 import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
 import { SawpDataFun } from "../../../services/createMethod/SawpDataFun";
 import { FormField } from "../../../utils/FormField";
-import { FileUploadField } from "../medicalDep/FileUploadField";
+import { FileUploadNew } from "../medicalDep/FileUploadField";
 import { SawpUpdate } from "../../../services/updateMethod/SawpUpdate";
 import { useOutletContext } from "react-router-dom";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { SpinLogo } from "../../../utils/SpinLogo";
+import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteSawpUp";
 
 export const Sawp = () => {
   const { searchResultData } = useOutletContext();
@@ -27,6 +28,10 @@ export const Sawp = () => {
   const [uploadSawp, setUploadSawp] = useState({
     sawpEmpUpload: [],
   });
+  const [id, setID] = useState({
+    sawpID:"",
+  });
+  const [fieldTitle, setFieldTitle] = useState("sawpEmpUpload");
 
   const {
     register,
@@ -46,13 +51,13 @@ export const Sawp = () => {
   const contractTypes = watch("sawpEmpLtrReq");
   const contractTypes1 = watch("sawpEmpLtrReci");
   const empID = watch("empID");
-  const watchInducSwapUpload = watch("sawpEmpUpload", ""); 
+  const watchInducSwapUpload = watch("sawpEmpUpload", "");
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
-      return url.split("/").pop(); 
+      return url.split("/").pop();
     }
-    return ""; 
+    return "";
   };
 
   const getFileName = (input) => {
@@ -63,8 +68,8 @@ export const Sawp = () => {
     }
 
     try {
-      const urlObj = new URL(input); 
-      const filePath = urlObj.pathname; 
+      const urlObj = new URL(input);
+      const filePath = urlObj.pathname;
       const decodedUrl = decodeURIComponent(filePath);
       return decodedUrl.substring(decodedUrl.lastIndexOf("/") + 1);
     } catch (e) {
@@ -79,39 +84,92 @@ export const Sawp = () => {
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
 
+  const handleFileChange = async (e, label) => {
+    const watchedEmpID = watch("empID");
+    if (!watchedEmpID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
+    }
+  
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+  
+    const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/jpg"];
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
+    }
+  
+    // Fetch current files (including backend-stored ones)
+    const currentFiles = watch(label) || []; // React Hook Form state
+  
+    // Count only newly uploaded files, ignoring backend-stored files
+    let newUploads = []; // Declare it outside the if block to access later
+    if (Array.isArray(currentFiles)) {
+      newUploads = currentFiles.filter(file => file instanceof File);
+    }
+    
+    if (newUploads.length > 0) {
+      alert("You can only upload one new file. Please delete the existing file before uploading another.");
+      return;
+    }
+    
+  
+    // Append the new file to the form state
+    setValue(label, [...currentFiles, selectedFile]);
+  
+    try {
+      await uploadDocs(selectedFile, label, setUploadSawp, watchedEmpID);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [label]: selectedFile.name,
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  
+
   useEffect(() => {
     setValue("empID", searchResultData.empID);
     setValue("sawpEmpLtrReq", searchResultData.sawpEmpLtrReq || []);
     setRequestDate(searchResultData.sawpEmpLtrReq || []);
     setValue("sawpEmpLtrReci", searchResultData.sawpEmpLtrReci || []);
     setRecivedDate(searchResultData.sawpEmpLtrReci || []);
+
     const fields = ["sawpEmpLtrReci", "sawpEmpLtrReq"];
     fields.forEach((field) => {
       const value = getLastValue(searchResultData[field], field);
       setValue(field, value);
     });
+
+    const sawpRecord = SawpDetails.find((match) => match.empID === searchResultData.empID);
+    if (sawpRecord) {
+      setID((prevData) => ({
+        ...prevData,
+        sawpID: sawpRecord.id, // Assuming this field exists.
+      }))}
+
     if (searchResultData && searchResultData.sawpEmpUpload) {
       try {
         const parsedArray = JSON.parse(searchResultData.sawpEmpUpload);
-
         const parsedFiles = parsedArray.map((item) =>
           typeof item === "string" ? JSON.parse(item) : item
         );
 
-        setValue("sawpEmpUpload", parsedFiles);
-        setEmpID(searchResultData.empID);
+        setValue("sawpEmpUpload", parsedFiles); // Set parsed files to the form
 
+        setEmpID(searchResultData.empID);
         setUploadSawp((prev) => ({
           ...prev,
           sawpEmpUpload: parsedFiles,
         }));
 
+        // Set all file names, not just the last one
         setUploadedFileNames((prev) => ({
           ...prev,
-          sawpEmpUpload:
-            parsedFiles.length > 0
-              ? getFileName(parsedFiles[parsedFiles.length - 1].upload)
-              : "",
+          sawpEmpUpload: parsedFiles.map((file) => getFileName(file.upload)), // Get names of all files
         }));
       } catch (error) {
         console.error(`Failed to parse ${searchResultData.sawpEmpUpload}:`, error);
@@ -119,34 +177,39 @@ export const Sawp = () => {
     }
   }, [searchResultData, setValue]);
 
-  const handleFileChange = async (e, label, empID) => {
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
+  // console.log(searchResultData);
+  
 
-    const allowedTypes = ["application/pdf"];
-
-    if (!empID) {
-      alert("Employee ID is required to upload files.");
-      window.location.reload();
-      return;
-    }
-
-    if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file");
-      return;
-    }
-
-    const currentFiles = watch(label) || [];
-    setValue(label, [...currentFiles, selectedFile]);
+  const deleteFile = async (fileType, fileName) => {
+    const deleteID = id.sawpID; // Assuming this comes from your searchResultData object
 
     try {
-      await uploadDocs(selectedFile, label, setUploadSawp, empID);
-      setUploadedFileNames((prev) => ({
-        ...prev,
-        [label]: selectedFile.name, 
+      await handleDeleteFile(
+        fileType,
+        fileName,
+        empID,
+        setUploadedFileNames,
+        deleteID,
+        setValue
+      );
+
+      const currentFiles = watch(fileType) || [];
+
+      // Filter out the deleted file
+      const updatedFiles = currentFiles.filter(
+        (file) => file.name !== fileName
+      );
+
+      // Update form state with the new file list
+      setValue(fileType, updatedFiles);
+
+      // Update UI state
+      setUploadSawp((prevState) => ({
+        ...prevState,
+        [fileType]: updatedFiles,
       }));
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.error("Error deleting file:", error);
     }
   };
 
@@ -162,17 +225,11 @@ export const Sawp = () => {
 
       if (checkingEIDTable) {
         const updatedReqDate = [
-          ...new Set([
-            ...(checkingEIDTable.sawpEmpLtrReq || []),
-            sawpEmpLtrReq,
-          ]),
+          ...new Set([...(checkingEIDTable.sawpEmpLtrReq || []), sawpEmpLtrReq]),
         ];
 
         const updatedReciDate = [
-          ...new Set([
-            ...(checkingEIDTable.sawpEmpLtrReci || []),
-            sawpEmpLtrReci,
-          ]),
+          ...new Set([...(checkingEIDTable.sawpEmpLtrReci || []), sawpEmpLtrReci]),
         ];
 
         const SawpUpValue = {
@@ -241,16 +298,17 @@ export const Sawp = () => {
           watch={contractTypes1}
         />
       </div>
-      <FileUploadField
+
+      <FileUploadNew
         label="Upload File"
-        onChangeFunc={(e) => handleFileChange(e, "sawpEmpUpload", empID)}
+        onChangeFunc={(e) => handleFileChange(e, "sawpEmpUpload")}
         register={register}
         name="sawpEmpUpload"
-        error={errors}
-        fileName={
-          uploadedFileNames.sawpEmpUpload ||
-          extractFileName(watchInducSwapUpload)
-        }
+        error={errors.sawpEmpUpload}
+        fileName={uploadedFileNames.sawpEmpUpload || ""}
+        uploadedFileNames={uploadedFileNames}
+        deleteFile={deleteFile}
+        field={{ title: "sawpEmpUpload" }}
       />
 
       <div className="center">
@@ -258,13 +316,15 @@ export const Sawp = () => {
           Save
         </button>
       </div>
+
       {notification && (
         <SpinLogo
           text={showTitle}
           notification={notification}
           path="/sawp"
         />
-      )}   
-       </form>
+      )}
+    </form>
   );
 };
+

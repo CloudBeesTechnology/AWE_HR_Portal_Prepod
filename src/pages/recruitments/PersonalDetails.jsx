@@ -1,23 +1,19 @@
+
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { PersonalSchema } from "../../services/Validation";
-import { FaRegMinusSquare } from "react-icons/fa";
-import { CiSquarePlus } from "react-icons/ci";
+import { LuPlus, LuMinus } from "react-icons/lu";
 import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
-import { useEffect, useContext } from "react";
+import { useEffect, useState } from "react";
+import { generateClient } from "aws-amplify/api";
 import { BwnIcColourDD, LanguageDD } from "../../utils/DropDownMenus";
-import { useTempID } from "../../utils/TempIDContext";
-import { DataSupply } from "../../utils/DataStoredContext";
+const client = generateClient();
 
 export const PersonalDetails = () => {
-  // const { tempID } = useOutletContext();
-  const { tempID } = useTempID();
-   const { empPDData } = useContext(DataSupply);
   const location = useLocation();
   const applicationData = location.state?.FormData;
-  console.log(tempID)
 
-  console.log("Received form data:", tempID);
+  // console.log("Received form data:", applicationData);
 
   useEffect(() => {
     window.scrollTo({
@@ -25,21 +21,19 @@ export const PersonalDetails = () => {
       behavior: "smooth",
     });
   }, []);
-  
   const {
     register,
     handleSubmit,
     control,
     setValue,
-    watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(PersonalSchema(applicationData?.nationality)),
 
     defaultValues: {
-      familyDetails: { name: "", relationship: "", occupation: "" },
-       eduDetails: { university: "", fromDate: "", toDate: "", degree: "" },
-       workExperience: { company: "", position: "", from: "", to: "" },
+      familyDetails: [{}], // Initialize with one empty family detail
+      eduDetails: [{ university: "", fromDate: "", toDate: "", degree: "" }], // Initialize with one empty education detail
+      workExperience: [{}], // Initialize with one empty employment detail
     },
   });
   // useEffect(() => {
@@ -89,8 +83,8 @@ export const PersonalDetails = () => {
   };
 
   const navigate = useNavigate();
- 
 
+  // const { handleNext } = useOutletContext();
   const onSubmit = (data) => {
     // const personalData = data;
     // console.log(data);
@@ -106,33 +100,7 @@ export const PersonalDetails = () => {
     navigate("/addCandidates/educationDetails", {
       state: { FormData: navigatingData },
     });
-    console.log("Personal Data", navigatingData)
   };
-
-  useEffect(() => {
-    if (tempID) {
-      const savedData = JSON.parse(localStorage.getItem("personalFormData"));
-       console.log('Saved data:', savedData); 
-      if (savedData) {
-        Object.keys(savedData).forEach((key) => setValue(key, savedData[key]));
-      }
-      if (empPDData.length > 0) {
-        const interviewData = empPDData.find((data) => data.tempID === tempID);
-        if (interviewData) {
-          console.log('Interview data found:', interviewData);
-        Object.keys(savedData).forEach((key) => {
-          // If the field is an array, set it using `setValue` directly for the array field
-          if (Array.isArray(savedData[key])) {
-            setValue(key, savedData[key]);
-          } else if (savedData[key]) {
-            setValue(key, savedData[key]);
-          }
-        });
-      }
-      }
-    }
-  }, [tempID, setValue]);
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className=" mx-auto py-6">
       {/* h-screen overflow-y-auto scrollbar-hide */}
@@ -364,7 +332,7 @@ export const PersonalDetails = () => {
                 onClick={() => removeFamily(index)} // Remove specific field set
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <FaRegMinusSquare /> {/* Minus icon */}
+                <LuMinus /> {/* Minus icon */}
               </button>
             )}
           </div>
@@ -376,7 +344,7 @@ export const PersonalDetails = () => {
           // onClick={() => appendFamily({})}
           className="absolute top-11 -right-7 text-medium_grey text-[18px]"
         >
-          <CiSquarePlus />
+          <LuPlus />
         </button>
       </div>
 
@@ -466,7 +434,7 @@ export const PersonalDetails = () => {
                 onClick={() => removeEducation(index)} // Remove specific field set
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <FaRegMinusSquare /> {/* Minus icon */}
+                <LuMinus /> {/* Minus icon */}
               </button>
             )}
           </div>
@@ -477,7 +445,7 @@ export const PersonalDetails = () => {
           // onClick={() => appendEducation({})}
           className="absolute top-12 -right-7 text-medium_grey text-[18px]"
         >
-          <CiSquarePlus />
+          <LuPlus />
         </button>
       </div>
 
@@ -531,7 +499,7 @@ export const PersonalDetails = () => {
                 onClick={() => removeEmployment(index)} // Remove specific field set
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <FaRegMinusSquare /> {/* Minus icon */}
+                <LuMinus /> {/* Minus icon */}
               </button>
             )}
           </div>
@@ -542,7 +510,7 @@ export const PersonalDetails = () => {
           // onClick={() => appendEmployment({})}
           className="absolute top-11 -right-7 text-medium_grey text-[18px]"
         >
-          <CiSquarePlus />
+          <LuPlus />
         </button>
       </div>
 

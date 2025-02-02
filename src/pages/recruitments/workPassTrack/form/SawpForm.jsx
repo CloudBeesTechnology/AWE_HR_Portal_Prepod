@@ -24,11 +24,11 @@ export const SawpForm = ({ candidate }) => {
       sawpDate: "",
       sawpRecivedDate: "",
       sawpFile: "",
-      status: "",
+      status: "", 
     },
   });
 
-  console.log(interviewSchedules, "DATA");
+  // console.log(interviewSchedules, "DATA");
   
   const [uploadedFileNames, setUploadedFileNames] = useState({
     sawpFile: null,
@@ -77,10 +77,10 @@ export const SawpForm = ({ candidate }) => {
           // console.log("Uploaded file name set:", fileName);
         }
       } else {
-        console.log("No interviewData found for candidate:", candidate.tempID);
+        // console.log("No interviewData found for candidate:", candidate.tempID);
       }
     } else {
-      console.log("No interview schedules available.");
+      // console.log("No interview schedules available.");
     }
   }, [interviewSchedules, candidate.tempID]);
 

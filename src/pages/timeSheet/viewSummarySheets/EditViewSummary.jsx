@@ -19,10 +19,10 @@ export const EditViewSummary = ({
     workingHrs: summaryObject?.workingHrs || "",
     overtimeHrs: summaryObject?.ot || "",
     workingHrsKey: summaryObject?.workingHrsKey || "",
-
-    mealAllow: summaryObject?.mealAllow || "",
+    firstFileType: summaryObject?.firstFileType,
   });
-  
+  let verify = summaryObject.verify || "";
+
   // Step 2: Handle changes dynamically
   const handleChange = (e) => {
     const { name, value } = e.target; // Get the name and value from the input
@@ -30,8 +30,8 @@ export const EditViewSummary = ({
       ...formData, // Spread the existing values
       [name]: value, // Update only the changed fields
     });
-  };  
-  
+  };
+
   return (
     <section className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white w-[90%] max-w-[550px] rounded-lg shadow-lg p-7 ">
@@ -46,7 +46,9 @@ export const EditViewSummary = ({
         </div>
 
         <header className="flex justify-between items-center pb-4 border-b">
-          <h2 className="text-dark_grey text_size_2">Edit Access</h2>
+          <h2 className="text-dark_grey text_size_2">
+            {verify === "Yes" ? "View Form" : "Edit Form"}
+          </h2>
         </header>
 
         <main className="mt-4">
@@ -130,32 +132,7 @@ export const EditViewSummary = ({
                 />
               </div>
             </div>
-            <div className="flex justify-between">
-              <div>
-                <label className="block text-sm font-medium ">
-                  Normal Working Hours Per Month
-                </label>
-                <input
-                  type="text"
-                  className="mt-1 block w-full border border-dark_grey outline-none rounded text-sm py-1.5 px-3"
-                  name="NWHPM"
-                  value={formData.NWHPM}
-                  onChange={handleChange}
-                  readOnly
-                />
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium ">Meal Allow</label>
-                <input
-                  type="text"
-                  className="mt-1 block w-full border border-dark_grey outline-none rounded text-sm py-1.5 px-3"
-                  name="mealAllow"
-                  value={formData.mealAllow || ""}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
             <div className="flex justify-between">
               <div>
                 <label className="block text-sm font-medium ">
@@ -186,15 +163,21 @@ export const EditViewSummary = ({
         </main>
 
         <footer className="flex justify-center mt-6 space-x-3">
-          <button
-            className="px-5 py-2 bg-[#FEF116] text_size_5 text-dark_grey rounded"
-            onClick={() => {
-              FinalEditedData(formData);
-              toggleEditViewSummaryFunc();
-            }}
-          >
-            Verify
-          </button>
+          {verify === "Yes" ? (
+            <button className="px-5 py-2 bg-[#48f748] text_size_5 text-dark_grey rounded cursor-not-allowed">
+              Verified
+            </button>
+          ) : (
+            <button
+              className="px-5 py-2 bg-[#FEF116] text_size_5 text-dark_grey rounded"
+              onClick={() => {
+                FinalEditedData(formData);
+                toggleEditViewSummaryFunc();
+              }}
+            >
+              Verify
+            </button>
+          )}
         </footer>
       </div>
     </section>

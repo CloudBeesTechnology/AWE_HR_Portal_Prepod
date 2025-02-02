@@ -26,6 +26,7 @@ import { AutoFetchForAssignManager } from "./customTimeSheet/AutoFetchForAssignM
 import { TimeSheetsCRUDoperations } from "./customTimeSheet/TimeSheetsCRUDoperations";
 import { listTimeSheets } from "../../graphql/queries";
 import { useRowSelection } from "./customTimeSheet/useRowSelection";
+import { useNavigate } from "react-router-dom";
 const client = generateClient();
 
 export const ViewHOsheet = ({
@@ -33,12 +34,15 @@ export const ViewHOsheet = ({
   excelData,
   returnedTHeader,
   Position,
-  convertedStringToArrayObj,
+
   titleName,
   fileName,
   showRejectedItemTable,
   submittedData,
+  wholeData,
+  ManagerData,
 }) => {
+  const nav = useNavigate();
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
 
   const [closePopup, setClosePopup] = useState(false);
@@ -55,6 +59,7 @@ export const ViewHOsheet = ({
   const [response, setResponse] = useState(null);
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedItemsTwo, setCheckedItemsTwo] = useState({});
+  const [editFormTitle, setEditFormTitle] = useState("");
   const [rejectTab, setRejectTab] = useState(false);
 
   const [toggleForRemark, setToggleForRemark] = useState(null);
@@ -103,7 +108,7 @@ export const ViewHOsheet = ({
     } else if (getPosition !== "Manager") {
       setUserIdentification("TimeKeeper");
     }
-  }, [convertedStringToArrayObj]);
+  }, [wholeData]);
 
   const pendingData = (data) => {
     if (data && data?.length > 0) {
@@ -237,8 +242,8 @@ export const ViewHOsheet = ({
         // setLoading(true);
         try {
           const dataPromise = new Promise((resolve, reject) => {
-            if (convertedStringToArrayObj) {
-              resolve(convertedStringToArrayObj);
+            if (ManagerData && ManagerData.length > 0) {
+              resolve(ManagerData);
             } else {
               setTimeout(() => {
                 reject("No data found after waiting.");
@@ -251,7 +256,7 @@ export const ViewHOsheet = ({
           if (userIdentification === "Manager") {
             const finalData = await SendDataToManager(fetchedData);
 
-            pendingData(finalData);
+            pendingData(fetchedData);
           }
         } catch (err) {
         } finally {
@@ -268,8 +273,8 @@ export const ViewHOsheet = ({
         // setLoading(true);
         try {
           const dataPromise = new Promise((resolve, reject) => {
-            if (convertedStringToArrayObj) {
-              resolve(convertedStringToArrayObj);
+            if (wholeData && wholeData.length > 0) {
+              resolve(wholeData);
             } else {
               setTimeout(() => {
                 reject("No data found after waiting.");
@@ -281,7 +286,7 @@ export const ViewHOsheet = ({
 
           if (userIdentification !== "Manager") {
             const finalData = await FindSpecificTimeKeeper(fetchedData);
-            pendingData(finalData);
+            pendingData(fetchedData);
           }
         } catch (err) {
         } finally {
@@ -295,12 +300,7 @@ export const ViewHOsheet = ({
       setCurrentStatus(false);
       // setLoading(false);
     }
-  }, [
-    returnedTHeader,
-    convertedStringToArrayObj,
-    userIdentification,
-    showRejectedItemTable,
-  ]);
+  }, [returnedTHeader, ManagerData, userIdentification, showRejectedItemTable]);
 
   const editBLNG = (data) => {
     setEditObject(data);
@@ -317,6 +317,15 @@ export const ViewHOsheet = ({
   const toggleFunctionForAssiMana = () => {
     setToggleAssignManager(!toggleAssignManager);
   };
+
+  const editFormTitleFunc = () => {
+    if (Position === "Manager") {
+      setEditFormTitle("View Form");
+    } else {
+      setEditFormTitle("Edit Form");
+    }
+  };
+
   const editNestedData = (data, getObject) => {
     return data.map((m) => ({
       id: m.id,
@@ -335,7 +344,7 @@ export const ViewHOsheet = ({
       data &&
       data.length > 0 &&
       data.map((val) => {
-        if (val.EMPLOYEEID === object.EMPLOYEEID && val.DATE === object.DATE) {
+        if (val.id === object.id) {
           return { ...val, REMARKS: object.REMARKS };
         } else {
           return val;
@@ -382,7 +391,25 @@ export const ViewHOsheet = ({
     setData(remainingData);
     setSecondaryData(remainingData);
     setSelectedRows([]);
+
+    if (remainingData && remainingData.length === 0) {
+      nav("/timeSheet")
+    }
   };
+
+  const handleManagerReload = () => {
+    let mergedData = [...allApprovedData, ...allRejectedData];
+    const remainingData = data?.filter(
+      (row) => !mergedData.some((selected) => selected.id === row.id)
+    );
+    setData(remainingData);
+    setSecondaryData(remainingData);
+
+    if (remainingData && remainingData.length === 0) {
+      window.location.reload();
+    }
+  };
+
   const AllfieldData = useTableFieldData(titleName);
 
   const renameKeysFunctionAndSubmit = async (managerData) => {
@@ -505,6 +532,7 @@ export const ViewHOsheet = ({
         setNotification,
         setAllApprovedData,
         setAllRejectedData,
+        handleManagerReload,
       });
     } else if (
       userIdentification !== "Manager" &&
@@ -551,16 +579,15 @@ export const ViewHOsheet = ({
       let finalResult = updatedRejectedItems;
       let action = "ResubmitRejectedItems";
       await TimeSheetsCRUDoperations({
+        setNotification,
+        setShowTitle,
         finalResult,
         toggleSFAMessage,
         setStoringMess,
-        setData,
         Position,
         action,
-        setShowTitle,
-        setNotification,
-        setAllApprovedData,
-        setAllRejectedData,
+        handleAssignManager,
+        selectedRows,
       });
     }
   };
@@ -621,23 +648,21 @@ export const ViewHOsheet = ({
   const storeOnlySelectedItem = (data, action) => {
     if (action === "Approved") {
       setAllApprovedData((prevApprovedData) => {
-        // Replace old data if ID matches, otherwise keep existing data
         const updatedData = prevApprovedData.filter(
           (item) => item.id !== data.id
         );
         const updateStatus = { ...data, status: "Approved" };
 
-        return [...updatedData, updateStatus]; // Add the new data
+        return [...updatedData, updateStatus];
       });
     } else if (action === "Rejected") {
+      setPassSelectedData(data);
       setAllRejectedData((prevRejectedData) => {
-        // Replace old data if ID matches, otherwise keep existing data
         const updatedData = prevRejectedData.filter(
           (item) => item.id !== data.id
         );
-        return [...updatedData, data]; // Add the new data
+        return [...updatedData, data];
       });
-      setPassSelectedData(data); // Update the selected data
     }
   };
   const addRemarks = (data) => {
@@ -671,8 +696,8 @@ export const ViewHOsheet = ({
 
     setData(afterRemoved);
     // setSecondaryData(afterRemoved);
-    setAllApprovedData([]);
-    setAllRejectedData([]);
+    // setAllApprovedData([]);
+    // setAllRejectedData([]);
   }, [allApprovedData, allRejectedData, data]);
 
   const convertToISODate = (dateString) => {
@@ -815,10 +840,18 @@ export const ViewHOsheet = ({
                           return (
                             <tr
                               key={index + 1}
-                              className="text-dark_grey h-[50px] text-sm rounded-sm shadow-md border-b-2 border-[#CECECE] bg-white hover:bg-[#f1f5f9] cursor-pointer"
+                              className={`text-dark_grey h-[50px] text-sm rounded-sm shadow-md border-b-2 border-[#CECECE] bg-white hover:bg-[#f1f5f9] ${
+                                excelData && excelData.length > 0
+                                  ? ""
+                                  : "cursor-pointer"
+                              }`}
                               onClick={() => {
-                                toggleFunction();
-                                editBLNG(m);
+                                if (excelData && excelData.length > 0) {
+                                } else {
+                                  toggleFunction();
+                                  editBLNG(m);
+                                  editFormTitleFunc();
+                                }
                               }}
                             >
                               <td className="text-center px-4 flex-1">
@@ -911,13 +944,18 @@ export const ViewHOsheet = ({
                                             ...prev,
                                             [m.id]: e.target.checked, // Toggle the checked state for this specific ID
                                           }));
+                                          setCheckedItemsTwo((prev) => ({
+                                            ...prev,
+                                            [m.id]: false,
+                                          }));
                                           storeOnlySelectedItem(m, "Approved");
+                                          removeExistingData(m, "Rejected");
                                         } else {
-                                          removeExistingData(m, "Approved");
                                           setCheckedItems((prev) => ({
                                             ...prev,
                                             [m.id]: false, // Toggle the checked state for this specific ID
                                           }));
+                                          removeExistingData(m, "Approved");
                                         }
                                       }}
                                     />
@@ -934,15 +972,20 @@ export const ViewHOsheet = ({
                                             ...prev,
                                             [m.id]: e.target.checked, // Toggle the checked state for this specific ID
                                           }));
-
+                                          setCheckedItems((prev) => ({
+                                            ...prev,
+                                            [m.id]: false,
+                                          }));
                                           storeOnlySelectedItem(m, "Rejected");
                                           toggleForRemarkFunc();
+                                          removeExistingData(m, "Approved");
                                         } else {
                                           removeExistingData(m, "Rejected");
                                           setCheckedItemsTwo((prev) => ({
                                             ...prev,
                                             [m.id]: false, // Toggle the checked state for this specific ID
                                           }));
+                                          removeExistingData(m, "Rejected");
                                         }
                                       }}
                                     />
@@ -1139,6 +1182,7 @@ export const ViewHOsheet = ({
           titleName={titleName}
           Position={Position}
           handleSubmit={handleSubmit}
+          editFormTitle={editFormTitle}
         />
       )}
       {storingMess === true ? (

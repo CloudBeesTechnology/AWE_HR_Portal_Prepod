@@ -25,6 +25,7 @@ import { TimeSheetsCRUDoperations } from "./customTimeSheet/TimeSheetsCRUDoperat
 import { listTimeSheets } from "../../graphql/queries";
 import { deleteTimeSheet } from "../../graphql/mutations";
 import { useRowSelection } from "./customTimeSheet/useRowSelection";
+import { useNavigate } from "react-router-dom";
 
 const client = generateClient();
 export const ViewORMCsheet = ({
@@ -32,13 +33,16 @@ export const ViewORMCsheet = ({
   returnedTHeader,
   titleName,
   setExcelData,
-  convertedStringToArrayObj,
+
   Position,
   fileName,
   defaultValue,
   showRejectedItemTable,
   submittedData,
+  wholeData,
+  ManagerData,
 }) => {
+  const nav = useNavigate();
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
   const [closePopup, setClosePopup] = useState(false);
   const [data, setData] = useState(null);
@@ -46,6 +50,7 @@ export const ViewORMCsheet = ({
   const [currentStatus, setCurrentStatus] = useState(defaultValue);
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedItemsTwo, setCheckedItemsTwo] = useState({});
+  const [editFormTitle, setEditFormTitle] = useState("");
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
   const [rejectTab, setRejectTab] = useState(false);
@@ -112,7 +117,7 @@ export const ViewORMCsheet = ({
     } else if (getPosition !== "Manager") {
       setUserIdentification("TimeKeeper");
     }
-  }, [convertedStringToArrayObj]);
+  }, [wholeData]);
 
   const pendingData = (data) => {
     if (data && data.length > 0) {
@@ -219,8 +224,8 @@ export const ViewORMCsheet = ({
           // setLoading(true);
           try {
             const dataPromise = new Promise((resolve, reject) => {
-              if (convertedStringToArrayObj) {
-                resolve(convertedStringToArrayObj);
+              if (ManagerData && ManagerData.length > 0) {
+                resolve(ManagerData);
               } else {
                 setTimeout(() => {
                   reject("No data found after waiting.");
@@ -232,7 +237,7 @@ export const ViewORMCsheet = ({
 
             if (Position === "Manager") {
               const finalData = await SendDataToManager(fetchedData);
-              pendingData(finalData);
+              pendingData(fetchedData);
             }
           } catch (err) {
           } finally {
@@ -248,8 +253,8 @@ export const ViewORMCsheet = ({
           // setLoading(true);
           try {
             const dataPromise = new Promise((resolve, reject) => {
-              if (convertedStringToArrayObj) {
-                resolve(convertedStringToArrayObj);
+              if (wholeData && wholeData.length > 0) {
+                resolve(wholeData);
               } else {
                 setTimeout(() => {
                   reject("No data found after waiting.");
@@ -261,7 +266,7 @@ export const ViewORMCsheet = ({
 
             if (userIdentification !== "Manager") {
               const finalData = await FindSpecificTimeKeeper(fetchedData);
-              pendingData(finalData);
+              pendingData(fetchedData);
             }
           } catch (err) {
           } finally {
@@ -276,12 +281,7 @@ export const ViewORMCsheet = ({
         setLoading(false);
       }
     } catch (err) {}
-  }, [
-    returnedTHeader,
-    convertedStringToArrayObj,
-    userIdentification,
-    showRejectedItemTable,
-  ]);
+  }, [returnedTHeader, ManagerData, userIdentification, showRejectedItemTable]);
   const editBLNG = (data) => {
     setEditObject(data);
   };
@@ -296,6 +296,15 @@ export const ViewORMCsheet = ({
   const toggleFunctionForAssiMana = () => {
     setToggleAssignManager(!toggleAssignManager);
   };
+
+  const editFormTitleFunc = () => {
+    if (Position === "Manager") {
+      setEditFormTitle("View Form");
+    } else {
+      setEditFormTitle("Edit Form");
+    }
+  };
+
   const editNestedData = (data, getObject) => {
     return data.map((m) => ({
       id: m.id,
@@ -314,7 +323,7 @@ export const ViewORMCsheet = ({
       data &&
       data.length > 0 &&
       data.map((val) => {
-        if (val.DEPTDIV === object.DEPTDIV && val.BADGE === object.BADGE) {
+        if (val.id === object.id) {
           return { ...val, REMARKS: object.REMARKS };
         } else {
           return val;
@@ -362,6 +371,22 @@ export const ViewORMCsheet = ({
     setData(remainingData);
     setSecondaryData(remainingData);
     setSelectedRows([]);
+    if (remainingData && remainingData.length === 0) {
+      nav("/timeSheet")
+    }
+  };
+
+  const handleManagerReload = () => {
+    let mergedData = [...allApprovedData, ...allRejectedData];
+    const remainingData = data?.filter(
+      (row) => !mergedData.some((selected) => selected.id === row.id)
+    );
+    setData(remainingData);
+    setSecondaryData(remainingData);
+
+    if (remainingData && remainingData.length === 0) {
+      window.location.reload();
+    }
   };
 
   const AllFieldData = useTableFieldData(titleName);
@@ -472,6 +497,7 @@ export const ViewORMCsheet = ({
         setNotification,
         setAllApprovedData,
         setAllRejectedData,
+        handleManagerReload,
       });
     } else if (
       userIdentification !== "Manager" &&
@@ -509,16 +535,15 @@ export const ViewORMCsheet = ({
       let finalResult = updatedRejectedItems;
       let action = "ResubmitRejectedItems";
       await TimeSheetsCRUDoperations({
+        setNotification,
+        setShowTitle,
         finalResult,
         toggleSFAMessage,
         setStoringMess,
-        setData,
         Position,
         action,
-        setShowTitle,
-        setNotification,
-        setAllApprovedData,
-        setAllRejectedData,
+        handleAssignManager,
+        selectedRows,
       });
     }
   };
@@ -572,23 +597,21 @@ export const ViewORMCsheet = ({
   const storeOnlySelectedItem = (data, action) => {
     if (action === "Approved") {
       setAllApprovedData((prevApprovedData) => {
-        // Replace old data if ID matches, otherwise keep existing data
         const updatedData = prevApprovedData.filter(
           (item) => item.id !== data.id
         );
         const updateStatus = { ...data, status: "Approved" };
 
-        return [...updatedData, updateStatus]; // Add the new data
+        return [...updatedData, updateStatus];
       });
     } else if (action === "Rejected") {
+      setPassSelectedData(data);
       setAllRejectedData((prevRejectedData) => {
-        // Replace old data if ID matches, otherwise keep existing data
         const updatedData = prevRejectedData.filter(
           (item) => item.id !== data.id
         );
-        return [...updatedData, data]; // Add the new data
+        return [...updatedData, data];
       });
-      setPassSelectedData(data); // Update the selected data
     }
   };
   const addRemarks = (data) => {
@@ -614,19 +637,16 @@ export const ViewORMCsheet = ({
   };
 
   const removeCheckedItem = useCallback(() => {
-    // Combine approved and rejected data
     const mergedData = [...allApprovedData, ...allRejectedData];
 
-    // Filter out items that have matching sapNo in mergedData
     const afterRemoved = data?.filter(
       (val) => !mergedData.some((fil) => val.id === fil.id)
     );
 
-    // Update the state with the filtered data
     setData(afterRemoved);
     setSecondaryData(afterRemoved);
-    setAllApprovedData([]);
-    setAllRejectedData([]);
+    // setAllApprovedData([]);
+    // setAllRejectedData([]);
   }, [allApprovedData, allRejectedData, data]);
   const convertToISODate = (dateString) => {
     try {
@@ -761,10 +781,18 @@ export const ViewORMCsheet = ({
                           return (
                             <tr
                               key={index + 1}
-                              className="text-dark_grey h-[50px] text-sm rounded-sm shadow-md border-b-2 border-[#CECECE] bg-white hover:bg-[#f1f5f9] cursor-pointer"
+                              className={`text-dark_grey h-[50px] text-sm rounded-sm shadow-md border-b-2 border-[#CECECE] bg-white hover:bg-[#f1f5f9] ${
+                                excelData && excelData.length > 0
+                                  ? ""
+                                  : "cursor-pointer"
+                              }`}
                               onClick={() => {
-                                toggleFunction();
-                                editBLNG(m);
+                                if (excelData && excelData.length > 0) {
+                                } else {
+                                  toggleFunction();
+                                  editBLNG(m);
+                                  editFormTitleFunc();
+                                }
                               }}
                             >
                               <td className="text-center px-4 flex-1">
@@ -836,13 +864,18 @@ export const ViewORMCsheet = ({
                                             ...prev,
                                             [m.id]: e.target.checked, // Toggle the checked state for this specific ID
                                           }));
+                                          setCheckedItemsTwo((prev) => ({
+                                            ...prev,
+                                            [m.id]: false,
+                                          }));
                                           storeOnlySelectedItem(m, "Approved");
+                                          removeExistingData(m, "Rejected");
                                         } else {
-                                          removeExistingData(m, "Approved");
                                           setCheckedItems((prev) => ({
                                             ...prev,
                                             [m.id]: false, // Toggle the checked state for this specific ID
                                           }));
+                                          removeExistingData(m, "Approved");
                                         }
                                       }}
                                     />
@@ -858,14 +891,19 @@ export const ViewORMCsheet = ({
                                             ...prev,
                                             [m.id]: e.target.checked, // Toggle the checked state for this specific ID
                                           }));
+                                          setCheckedItems((prev) => ({
+                                            ...prev,
+                                            [m.id]: false,
+                                          }));
                                           storeOnlySelectedItem(m, "Rejected");
                                           toggleForRemarkFunc();
+                                          removeExistingData(m, "Approved");
                                         } else {
-                                          removeExistingData(m, "Rejected");
                                           setCheckedItemsTwo((prev) => ({
                                             ...prev,
                                             [m.id]: false, // Toggle the checked state for this specific ID
                                           }));
+                                          removeExistingData(m, "Rejected");
                                         }
                                       }}
                                     />
@@ -1015,9 +1053,8 @@ export const ViewORMCsheet = ({
                       // };
                       // fetchDataAndDelete();
                     } else if (userIdentification === "Manager") {
-                      renameKeysFunctionAndSubmit();
                       removeCheckedItem();
-
+                      renameKeysFunctionAndSubmit();
                       // setCheckedItems({});
                     }
                   }}
@@ -1060,6 +1097,7 @@ export const ViewORMCsheet = ({
           titleName={titleName}
           Position={Position}
           handleSubmit={handleSubmit}
+          editFormTitle={editFormTitle}
         />
       )}
       {storingMess === true ? (

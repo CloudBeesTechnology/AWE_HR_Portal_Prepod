@@ -17,10 +17,13 @@ export const InterviewForm = ({ candidate }) => {
       venue: "",
       interviewType: "",
       interviewer: "",
-      message: "",
+      message: "",  
     },
   });
-  console.log(candidate)
+  // console.log(candidate)
+
+
+  
 
   // Effect hook to auto-fetch and populate form data when IVSSDetails changes or candidate's tempID changes
   useEffect(() => {
@@ -103,7 +106,7 @@ export const InterviewForm = ({ candidate }) => {
           manager: formData.interview.interviewer,
         },
       });
-      console.log("Data stored successfully...");
+      // console.log("Data stored successfully...");
       setNotification(true);
     } catch (error) {
       console.error("Error submitting interview details:", error);
@@ -118,7 +121,6 @@ export const InterviewForm = ({ candidate }) => {
     { field: "interviewType", label: "Interview Type", type: "text" },
     { field: "interviewer", label: "Interviewer", type: "text" },
     { field: "message", label: "Message", type: "textarea" },
-  
   ];
 
   return (

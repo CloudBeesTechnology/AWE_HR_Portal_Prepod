@@ -24,6 +24,7 @@ export const MobilizationRecru = ({
   const [latestTempIDData, setLatesTempIDData] = useState("");
   const [showTitle, setShowTitle] = useState("");
   const [notification, setNotification] = useState(false);
+  
   const heading = [
     "TempID",
     "Name",
@@ -71,7 +72,7 @@ export const MobilizationRecru = ({
   
       const maxValue = sortedData[sortedData.length - 1]; // Get the last (largest) value
   
-      console.log(sortedData);
+      // console.log(sortedData);
       return maxValue;
     } catch (error) {
       console.error("Error fetching total count:", error);
@@ -79,6 +80,31 @@ export const MobilizationRecru = ({
     }
   };
   
+
+  // const getTotalCount = async () => {
+  //   try {
+  //     const result = await client.graphql({
+  //       query: listEmpPersonalInfos,
+  //       variables:{limit:20000}
+  //     });
+  //     const items = result?.data?.listEmpPersonalInfos?.items || [];
+  //     const filteringData = items.map((val) => val.empID);
+  //     const sortedData = filteringData.sort((a, b) => a - b);
+  //     const maxValue = sortedData[sortedData.length - 1]; // Get the last value in the sorted array
+  //     console.log(sortedData);
+
+  //     return maxValue; // Return the count of all entries
+  //   } catch (error) {
+  //     console.error("Error fetching total count:", error);
+  //     return 0; // Return 0 if there's an error
+  //   }
+  // };
+  // const generateNextTempID = (totalCount) => {
+  //   const nextNumber = Number(totalCount + 1);
+  //   console.log(nextNumber);
+
+  //   return  String(nextNumber);
+  // };
 
   const generateNextTempID = (totalCount) => {
     // Check if the string contains a non-numeric prefix
@@ -88,7 +114,7 @@ export const MobilizationRecru = ({
     const numberPart = numberMatch ? parseInt(numberMatch[0], 10) : 0;
     const nextNumber = numberPart + 1;
     const nextTempID = `${prefix}${nextNumber}`;
-    console.log(nextTempID);
+    // console.log(nextTempID);
 
     return nextTempID;
   };
@@ -104,15 +130,15 @@ export const MobilizationRecru = ({
 
   // console.log(latestTempIDData);
 
-  const OnSubmit = async (candi) => {
+  const OnSubmit = async (candi) => {    
     // console.log(candi);
     const storedData = {
-      ...candi,
+      ...candi,  
       empID: latestTempIDData,
     };
     // console.log(storedData);
     await SumbitCandiToEmp({ storedData });
-    await submitMobilization({mob:storedData})
+    await submitMobilization({ mob:storedData })
     setShowTitle(
       "Candidate conversion to employee has been completed successfully."
     );

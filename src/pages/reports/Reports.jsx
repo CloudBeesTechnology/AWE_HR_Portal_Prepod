@@ -38,11 +38,12 @@ export const Reports = () => {
     localMobiliz,
     empPDData
   } = useContext(DataSupply);
-console.log(IVSSDetails);
+  
+// console.log(IVSSDetails);
 
 IVSSDetails.forEach((employee) => {
   if (employee.tempID === "TEMP015") {
-    console.log(employee);
+    // console.log(employee);
   }
 });
   const [mergedData, setMergeData] = useState([]);

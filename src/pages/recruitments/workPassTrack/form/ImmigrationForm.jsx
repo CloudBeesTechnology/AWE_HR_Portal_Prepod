@@ -75,13 +75,13 @@ export const ImmigrationForm = ({ candidate }) => {
             ...prev,
             visaFile: fileName,
           }));
-          console.log("Uploaded file name set:", fileName);
+          // console.log("Uploaded file name set:", fileName);
         }
       } else {
-        console.log("No interviewData found for candidate:", candidate.tempID);
+        // console.log("No interviewData found for candidate:", candidate.tempID);
       }
     } else {
-      console.log("No interview schedules available.");
+      // console.log("No interview schedules available.");
     }
   }, [interviewSchedules, candidate.tempID]);
 

@@ -84,13 +84,13 @@ export const NlmsForm = ({ candidate }) => {
             ...prev,
             nlmsFile: fileName,
           }));
-          console.log("Uploaded file name set:", fileName);
+          // console.log("Uploaded file name set:", fileName);
         }
       } else {
-        console.log("No interviewData found for candidate:", candidate.tempID);
+        // console.log("No interviewData found for candidate:", candidate.tempID);
       }
     } else {
-      console.log("No interview schedules available.");
+      // console.log("No interview schedules available.");
     }
   }, [interviewSchedules, candidate.tempID]);
 
@@ -119,7 +119,7 @@ export const NlmsForm = ({ candidate }) => {
   };
 
   const handleInputChange = (field, value) => {
-    console.log("Input changed:", field, value); // Log input change
+    // console.log("Input changed:", field, value); // Log input change
     setFormData((prev) => ({
       ...prev,
       interview: {

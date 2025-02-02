@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { RiFileEditLine } from "react-icons/ri";
-import { StatusForm } from "./StatusForm";
 import { ReviewForm } from "../ReviewForm";
 import { WorkpassForm } from "./WorkpassForm";
 
-export const BankFormTable = ({ data, formatDate }) => {
+export const BankFormTable = ({ data, formatDate, fileUpload, urlValue }) => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const [selectedCandi, setSelectedCandi] = useState([]);
@@ -22,7 +21,7 @@ export const BankFormTable = ({ data, formatDate }) => {
     "Form",
     "Edit Form",
   ];
-  console.log(data);
+
   const handleShowForm = (candi) => {
     setSelectedCandi(candi);
     setIsFormVisible(!isFormVisible);
@@ -31,6 +30,7 @@ export const BankFormTable = ({ data, formatDate }) => {
     setSelectedCandi(candi);
     setIsReviewFormVisible(!isReviewFormVisible);
   };
+
   return (
     <div>
       {data && data.length > 0 ? (
@@ -59,17 +59,49 @@ export const BankFormTable = ({ data, formatDate }) => {
                     <td className="py-3">{item.name || "N/A"}</td>
                     <td className="py-3">{item.nationality || "N/A"}</td>
                     <td className="py-3">
-                      {formatDate(item.interviewDetails_interDate) || "N/A"}
-                    </td>
-                    <td className="py-3">
-                      {item.interviewDetails_interTime || "N/A"}
-                    </td>
-                    <td className="py-3">
-                      {item.interviewDetails_venue || "N/A"}
-                    </td>
-                    <td className="py-3">
                       {item.interviewDetails_manager || "N/A"}
                     </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_bgsubmitdate || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_bgreceivedate || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_bgexpirydate || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_bgamount || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_referenceno || "N/A"}
+                    </td>
+                  
+                    <td className="py-3">
+                      {item.WPTrackDetails_bgfile ? (
+                        <a
+                          href={urlValue}
+                          onClick={(e) => {
+                            if (!item.WPTrackDetails_bgfile) {
+                              e.preventDefault();
+                            } else {
+                              fileUpload(item.WPTrackDetails_bgfile);
+                            }
+                          }}
+                          download
+                          className={
+                            item.WPTrackDetails_bgfile
+                              ? "border-b-2 border-[orange] text-[orange]"
+                              : ""
+                          }
+                        >
+                          {item.WPTrackDetails_bgfile ? "Download" : "N/A"}
+                        </a>
+                      ) : (
+                        <p>N/A</p>
+                      )}
+                    </td>
+
                     <td
                       className="py-3 text-center"
                       onClick={() => handleShowReviewForm(item)}
@@ -96,11 +128,7 @@ export const BankFormTable = ({ data, formatDate }) => {
         </div>
       )}
       {isReviewFormVisible && (
-        <ReviewForm
-          candidate={selectedCandi}
-          onClose={handleShowReviewForm}
-      
-        />
+        <ReviewForm candidate={selectedCandi} onClose={handleShowReviewForm} />
       )}
       {isFormVisible && (
         <WorkpassForm

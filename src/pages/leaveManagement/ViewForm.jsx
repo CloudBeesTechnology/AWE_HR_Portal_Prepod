@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import AweLogo from "../../assets/logo/logo-with-name.svg";
 import { VscClose } from "react-icons/vsc";
-import { useNavigate } from "react-router-dom";
 import { useLeaveManage } from "../../hooks/useLeaveManage";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { useCreateNotification } from "../../hooks/useCreateNotification"; // Importing the custom hook
@@ -9,7 +8,7 @@ import { UpdateLeaveData } from "../../services/updateMethod/UpdateLeaveData";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { sendEmail } from "../../services/EmailServices";
 import { DateFormat } from "../../utils/DateFormat";
-import { useTempID } from "../../utils/TempIDContext";
+
 
 export const ViewForm = ({
   handleClickForToggle,
@@ -22,7 +21,6 @@ export const ViewForm = ({
   // console.log(leaveData.empOfficialEmail);
 
   const { empPIData } = useContext(DataSupply);
-  const { gmPosition } = useTempID();
   const [remark, setRemark] = useState("");
   const [notification, setNotification] = useState(false);
   const [notificationText, setNotificationText] = useState("");
@@ -40,7 +38,9 @@ export const ViewForm = ({
     return findingSupervisorName;
   });
 
-  console.log("GM", gmPosition);
+  // console.log("GM", gmPosition);
+
+  
   
 
   const getStatusClass = (status) => {
@@ -349,7 +349,7 @@ export const ViewForm = ({
                   });
                 }
               } catch (err) {
-                console.error("An error occurred:", err);
+                // console.error("An error occurred:", err);
                 // alert(`Error occurred: ${err.message}`);
               }
             };
@@ -560,17 +560,22 @@ export const ViewForm = ({
 
   const handleApprove = () => handleUpdateStatus("Approved");
   const handleReject = () => handleUpdateStatus("Rejected");
-
-  const handleVerify = () => handleUpdateStatus("Verified");
-  const handleNotEligible = () => handleUpdateStatus("NotEligible");
+  const isValidDateFormat = (date) => {
+    const datePatternSlash = /^\d{4}\/\d{1,2}\/\d{1,2}$/; // matches yyyy/m/d
+    const datePatternDash = /^\d{4}-\d{2}-\d{2}$/;   // matches yyyy-mm-dd
+    return datePatternSlash.test(date) || datePatternDash.test(date);
+  };
 
   const renderButtons = () => {
+  
+
     const { supervisorStatus, managerStatus, supervisorEmpID } = leaveData;
     const isPending = managerStatus === "Pending";
     const isApproved = supervisorStatus === "Approved";
     const isSupervisor = userType === "Supervisor";
     const isNotSuperAdminOrHR = userType !== "SuperAdmin" && userType !== "HR";
 
+    // Case 1: Supervisor approved, Manager pending, Supervisor not SuperAdmin/HR
     if (
       isApproved &&
       supervisorStatus !== "Rejected" &&
@@ -666,6 +671,8 @@ export const ViewForm = ({
     return null; // Default case if none of the conditions match
   };
 
+  
+  
   return (
     <main className="flex flex-col items-center justify-center bg-grey bg-opacity-75 inset-0 z-50 fixed">
       <div className="center min-h-screen overflow-y-auto">
@@ -704,33 +711,37 @@ export const ViewForm = ({
                   },
                   {
                     label: "Job Title",
-                    value: (Array.isArray(leaveData.position) && leaveData.position.length > 0)
-                      ? leaveData.position[leaveData.position.length - 1]
-                      : "N/A",
+                    value:
+                      Array.isArray(leaveData.position) &&
+                      leaveData.position.length > 0
+                        ? leaveData.position[leaveData.position.length - 1]
+                        : "N/A",
                   },
                   {
                     label: "Department",
-                    value: (Array.isArray(leaveData.department) && leaveData.department.length > 0)
-                      ? leaveData.department[leaveData.department.length - 1]
-                      : "N/A",
+                    value:
+                      Array.isArray(leaveData.department) &&
+                      leaveData.department.length > 0
+                        ? leaveData.department[leaveData.department.length - 1]
+                        : "N/A",
                   },
-                  
                   { label: "Leave Type", value: leaveData.empLeaveType },
                   {
                     label: "Applied Dates",
-                    value:
-                      (leaveData.empLeaveSelectedFrom &&
-                        leaveData.empLeaveSelectedTo) ||
-                      (leaveData.empLeaveStartDate && leaveData.empLeaveEndDate)
-                        ? `${DateFormat(
-                            leaveData.empLeaveSelectedFrom ||
-                              leaveData.empLeaveStartDate
-                          )} to ${DateFormat(
-                            leaveData.empLeaveSelectedTo ||
-                              leaveData.empLeaveEndDate
-                          )}`
-                        : "N/A",
+                    value: (leaveData.empLeaveSelectedFrom && leaveData.empLeaveSelectedTo)
+                      ? isValidDateFormat(leaveData.empLeaveSelectedFrom) && isValidDateFormat(leaveData.empLeaveSelectedTo)
+                        ? `${DateFormat(leaveData.empLeaveSelectedFrom)} to ${DateFormat(leaveData.empLeaveSelectedTo)}`
+                        : `${leaveData.empLeaveSelectedFrom} to ${leaveData.empLeaveSelectedTo}`
+                      : (leaveData.empLeaveStartDate && leaveData.empLeaveEndDate)
+                      ? isValidDateFormat(leaveData.empLeaveStartDate) && isValidDateFormat(leaveData.empLeaveEndDate)
+                        ? `${DateFormat(leaveData.empLeaveStartDate)} to ${DateFormat(leaveData.empLeaveEndDate)}`
+                        : `${leaveData.empLeaveStartDate} to ${leaveData.empLeaveEndDate}`
+                      : "N/A"
                   },
+                  
+                  // Helper function to check if the date is in yyyy/m/d format
+                              
+                  
                   { label: "Total No of Days", value: leaveData.leaveDays },
                   // { label: "Leave Balance", value: leaveData.balance },
                   { label: "Reason", value: leaveData.reason },
@@ -1076,24 +1087,6 @@ export const ViewForm = ({
                   <>
                     <button
                       className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
-                      onClick={handleNotEligible}
-                    >
-                      Not Eligible
-                    </button>
-                    <button
-                      className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
-                      onClick={handleVerify}
-                    >
-                      Verify
-                    </button>
-                  </>
-                )}
-              </div>
-              <div className="flex justify-evenly mt-7 ">
-                {ticketData.hrStatus === "Pending" && gmPosition === "General Manager" && (
-                  <>
-                    <button
-                      className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
                       onClick={handleApprove}
                     >
                       Approved
@@ -1102,11 +1095,12 @@ export const ViewForm = ({
                       className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
                       onClick={handleReject}
                     >
-                      Rejected
+                      Reject
                     </button>
                   </>
                 )}
               </div>
+           
             </section>
           )}
         </header>

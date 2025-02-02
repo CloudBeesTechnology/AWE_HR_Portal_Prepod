@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { LocalMobilization } from "../../../services/createMethod/CreateLOI"; // Import the hook
 import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
@@ -7,14 +7,18 @@ import { useFetchInterview } from "../../../hooks/useFetchInterview";
 import { UpdateLoiData } from "../../../services/updateMethod/UpdateLoi";
 import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
 import { statusOptions } from "../../../utils/StatusDropdown";
+import { SpinLogo } from "../../../utils/SpinLogo";
+import { DataSupply } from "../../../utils/DataStoredContext";
 
 export const LOIForm = ({ candidate }) => {
   // Ensure candidate is passed as prop
-  const { localMobilization, isLoading, notification, error } =
+  const { localMobilization, isLoading, error } =
     LocalMobilization();
   const { loiDetails } = UpdateLoiData();
+  const { IVSSDetails } = useContext(DataSupply);
   const { interviewDetails } = UpdateInterviewData();
   const { mergedInterviewData } = useFetchInterview();
+  const [notification, setNotification] = useState(false);
   const [uploadedFileNames, setUploadedFileNames] = useState({
     loiFile: null,
   });
@@ -66,29 +70,29 @@ export const LOIForm = ({ candidate }) => {
   };
 
   // Handle form submission for creating a new LOI
-  const onSubmit = async (data) => {
-    const selectedInterviewData = mergedInterviewData.find(
-      (data) => data.tempID === candidate?.tempID
-    );
+  // const onSubmit = async (data) => {
+  //   const selectedInterviewData = mergedInterviewData.find(
+  //     (data) => data.tempID === candidate?.tempID
+  //   );
 
-    const interviewScheduleId = selectedInterviewData?.id;
+  //   const interviewScheduleId = selectedInterviewData?.id;
 
-    const formattedData = {
-      loiIssueDate: data.loiIssueDate,
-      loiAcceptDate: data.loiAcceptDate,
-      loiDeclineDate: data.loiDeclineDate,
-      declineReason: data.declineReason,
-      loiFile: uploadedLOI.loiFile,
-      tempID: candidate.tempID,
-    };
+  //   const formattedData = {
+  //     loiIssueDate: data.loiIssueDate,
+  //     loiAcceptDate: data.loiAcceptDate,
+  //     loiDeclineDate: data.loiDeclineDate,
+  //     declineReason: data.declineReason,
+  //     loiFile: uploadedLOI.loiFile,
+  //     tempID: candidate.tempID,
+  //   };
 
-    // Call the createLOI function from the custom hook
-    try {
-      await localMobilization(formattedData);
-    } catch (err) {
-      console.error("LOI creation failed:", err);
-    }
-  };
+  //   // Call the createLOI function from the custom hook
+  //   try {
+  //     await localMobilization(formattedData);
+  //   } catch (err) {
+  //     console.error("LOI creation failed:", err);
+  //   }
+  // };
 
   // Handle form submission for updating an existing LOI
   const handleSubmitTwo = async (e) => {
@@ -108,14 +112,9 @@ export const LOIForm = ({ candidate }) => {
       loiAcceptDate: formData.interview.loiAcceptDate,
       loiDeclineDate: formData.interview.loiDeclineDate,
       declineReason: formData.interview.declineReason,
-      loiFile: uploadedLOI.loiFile || formData.interview.loiFile, 
+      loiFile: uploadedLOI.loiFile || formData.interview.loiFile,
       tempID: candidate.tempID,
     };
-
-    // const interStatus = {
-    //   id: interviewScheduleId,
-    // status: selectedInterviewData.empType === "Offshore" ? "CVEV" : "PAAF",
-    // };
 
     const interStatus = {
       id: interviewScheduleId, // Dynamically use the correct id
@@ -128,8 +127,9 @@ export const LOIForm = ({ candidate }) => {
       // Call the update LOI API function
       await loiDetails({ LoiValue: formattedData });
       await interviewDetails({ InterviewValue: interStatus });
-      console.log("status", interStatus);
-      console.log("Data updated successfully...");
+      setNotification(true);
+      // console.log("status", interStatus);
+      // console.log("Data updated successfully...");
     } catch (error) {
       console.error("Error updating LOI:", error);
       alert("Failed to update LOI. Please try again.");
@@ -245,7 +245,7 @@ export const LOIForm = ({ candidate }) => {
               <FileUploadField
                 label="Upload File"
                 onChangeFunc={(e) => handleFileChange(e, "loiFile")}
-                {...register("loiFile")}
+                register={register}
                 accept="application/pdf"
                 className="hidden"
                 fileName={uploadedFileNames.loiFile || extractFileName(LOIFile)}
@@ -257,7 +257,7 @@ export const LOIForm = ({ candidate }) => {
         <div>
           <label htmlFor="status">Status</label>
           <select
-            className="w-full border p-2 rounded mt-1"
+            className="w-full border p-2 rounded mt-1 outline-none"
             id="status"
             {...register("status")}
             value={formData.interview.status}
@@ -270,7 +270,6 @@ export const LOIForm = ({ candidate }) => {
               </option>
             ))}
           </select>
-         
         </div>
       </div>
 
@@ -279,28 +278,26 @@ export const LOIForm = ({ candidate }) => {
           type="submit"
           className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
           disabled={isLoading}
-          onClick={onSubmit}
+          onClick={handleSubmitTwo}
         >
           {isLoading ? "Submitting..." : "Submit"}
         </button>
 
-        <button
-          type="submit"
-          className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
-          disabled={isLoading}
-          onClick={handleSubmitTwo} // Handles updating the existing LOI
-        >
-          {isLoading ? "Updating..." : "Update"}
-        </button>
-
         {/* Success notification */}
-        {notification && (
+        {/* {notification && (
           <p className="text-green-500">LOI created successfully!</p>
-        )}
+        )} */}
 
         {/* Error notification */}
         {error && <p className="text-red-500">{error.message}</p>}
       </div>
+      {notification && (
+        <SpinLogo
+          text="LOI Updated Successfully"
+          notification={notification}
+          path="/recrutiles/status"
+        />
+      )}
     </form>
   );
 };

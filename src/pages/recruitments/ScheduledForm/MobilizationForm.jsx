@@ -8,6 +8,7 @@ import { useFetchInterview } from "../../../hooks/useFetchInterview";
 import { FileUploadField } from "../../employees/medicalDep/FileUploadField";
 import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
 import { statusOptions } from "../../../utils/StatusDropdown";
+import { SpinLogo } from "../../../utils/SpinLogo";
 
 // Define validation schema using Yup
 const MOBFormSchema = Yup.object().shape({
@@ -24,6 +25,7 @@ export const MobilizationForm = ({ candidate }) => {
   const { loiDetails } = UpdateLoiData();
   const { mergedInterviewData } = useFetchInterview();
   const { interviewDetails } = UpdateInterviewData();
+  const [notification, setNotification] = useState(false);
   const [formData, setFormData] = useState({
     interview: {
       id: "",
@@ -130,8 +132,8 @@ export const MobilizationForm = ({ candidate }) => {
         },
       });
 
-      console.log("Data stored successfully...");
-      // setNotification(true);
+      // console.log("Data stored successfully...");
+      setNotification(true);
     } catch (error) {
       console.error("Error submitting interview details:", error);
       alert("Failed to update interview details. Please try again.");
@@ -158,7 +160,7 @@ export const MobilizationForm = ({ candidate }) => {
             className="w-full border p-2 rounded mt-1"
             type="date"
             id="mobSignDate"
-            {...register("mobSignDate")}
+        
             value={formData.interview.mobSignDate}
             onChange={(e) => handleInputChange("mobSignDate", e.target.value)}
           />
@@ -175,11 +177,7 @@ export const MobilizationForm = ({ candidate }) => {
               className="hidden"
               accept="application/pdf"
               register={register}
-              fileName={
-                uploadedFileNames.mobFile ||
-                extractFileName(MOBUpload) ||
-                formData.interview.mobFile
-              }
+              fileName={uploadedFileNames.mobFile || extractFileName(MOBUpload)}
               value={formData.interview.mobFile}
             />
           </div>
@@ -189,7 +187,7 @@ export const MobilizationForm = ({ candidate }) => {
           <select
             className="w-full border p-2 rounded mt-1"
             id="status"
-            {...register("status")}
+            // register={register}
             value={formData.interview.status}
             onChange={(e) => handleInputChange("status", e.target.value)}
           >
@@ -211,6 +209,13 @@ export const MobilizationForm = ({ candidate }) => {
           Submit
         </button>
       </div>
+      {notification && (
+              <SpinLogo
+                text="Mobilization Updated Successfully"
+                notification={notification}
+                path="/recrutiles/status"
+              />
+            )}
     </form>
   );
 };

@@ -11,7 +11,7 @@ export const EmploymentMedical = () => {
   const [endDate, setEndDate] = useState(null);
   const { allData, title } = location.state || {};
 
-  console.log("All data received:", allData);
+  // console.log("All data received:", allData);
 
   const [tableHead] = useState([
     "Emp ID",
@@ -27,7 +27,7 @@ export const EmploymentMedical = () => {
   const parseDate = (dateString) => {
     if (!dateString) return null;
 
-    console.log("Parsing date:", dateString);
+    // console.log("Parsing date:", dateString);
 
     const standardizedDate = dateString.replace(/-/g, "/");
     const parts = standardizedDate.split("/");
@@ -48,14 +48,14 @@ export const EmploymentMedical = () => {
       return null;
     }
     const parsedDate = new Date(year, month - 1, day);
-    console.log("Parsed date:", parsedDate);
+    // console.log("Parsed date:", parsedDate);
     return parsedDate;
   };
 
   const formatDate = (dateString) => {
     if (typeof dateString !== "string") return null;
 
-    console.log("Formatting date:", dateString);
+    // console.log("Formatting date:", dateString);
 
     const standardizedDate = dateString.replace(/-/g, "/");
     const parts = standardizedDate.split("/");
@@ -76,31 +76,31 @@ export const EmploymentMedical = () => {
       return null;
     }
     const formattedDate = `${day}-${month}-${year}`;
-    console.log("Formatted date:", formattedDate);
+    // console.log("Formatted date:", formattedDate);
     return formattedDate;
   };
 
   const isInNextThreeMonths = (expiryDate) => {
     if (!expiryDate) return false;
 
-    console.log("Checking expiry date within next three months:", expiryDate);
+    // console.log("Checking expiry date within next three months:", expiryDate);
 
     const expiry = parseDate(expiryDate);
     const today = new Date();
     const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 3, 1);
     const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 4, 1);
 
-    console.log("Expiry:", expiry, "Start of next 3 months:", startOfNextMonth, "End of next 3 months:", endOfNextMonth);
+    // console.log("Expiry:", expiry, "Start of next 3 months:", startOfNextMonth, "End of next 3 months:", endOfNextMonth);
 
     return expiry >= startOfNextMonth && expiry <= endOfNextMonth;
   };
 
   const medicalReviewMergedData = (data) => {
-    console.log("Processing medical review data:", data);
+    // console.log("Processing medical review data:", data);
 
     const filteringValue = data?.map((val) => {
       if (!val.bruneiME || val?.bruneiME?.length === 0) {
-        console.log("Skipping entry due to missing bruneiME:", val);
+        // console.log("Skipping entry due to missing bruneiME:", val);
         return false;
       }
 
@@ -108,7 +108,7 @@ export const EmploymentMedical = () => {
       const isExpiryInNextThreeMonths = isInNextThreeMonths(medicalExpiryDate);
 
       if (!isExpiryInNextThreeMonths) {
-        console.log("Skipping entry due to expiry not in range:", val);
+        // console.log("Skipping entry due to expiry not in range:", val);
         return false;
       }
 
@@ -123,17 +123,17 @@ export const EmploymentMedical = () => {
         medicalExpiryDate: formatDate(medicalExpiryDate) || "-",
       };
 
-      console.log("Filtered entry:", formattedEntry);
+      // console.log("Filtered entry:", formattedEntry);
       return formattedEntry;
     }).filter((val) => val !== false);
 
-    console.log("Final filtered data:", filteringValue);
+    // console.log("Final filtered data:", filteringValue);
     return filteringValue;
   };
 
   useEffect(() => {
     const data = medicalReviewMergedData(allData);
-    console.log("Setting tableBody with:", data);
+    // console.log("Setting tableBody with:", data);
     setTableBody(data);
   }, [allData]);
 

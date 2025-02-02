@@ -6,11 +6,20 @@ import { SawpTable } from "./SawpTable";
 import { DateFormat } from "../../../utils/DateFormat";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { getUrl } from "@aws-amplify/storage";
+import { DoeTable } from "./DoeTable";
+import { NlmsTable } from "./NlmsTable";
+import { BankFormTable } from "./BankFormTable";
+import { JitpaTable } from "./JitpaTable";
+import { LabourDepTable } from "./LabourDepTable";
+import { ImmigrationTable } from "./ImmigrationTable";
+import { AirTKtTable } from "./AirTKtTable";
+import { NonLocalMobTable } from "./NonLocalMobTable";
 
 export const WorkpassTracking = () => {
+  // const client = generateClient();
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // const [loading, setLoading] = useState(true);
+  // const [error, setError] = useState(null);
   // const [selectedOption, setSelectedOption] = useState("");
   // const [selectedRows, setSelectedRows] = useState([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
@@ -32,34 +41,34 @@ export const WorkpassTracking = () => {
       acc[item.tempID] = item;
       return acc;
     }, {});
-
+    
     const IVSSMap = IVSSDetails.reduce((acc, item) => {
       acc[item.tempID] = item;
       return acc;
     }, {});
-
+    
     const WPTackingMap = WPTrackings.reduce((acc, item) => {
       acc[item.tempID] = item;
       return acc;
     }, {});
-
-    // Filter out candidates where the tempID is present in all three datasets
+    
+    // Filter candidates where tempID is present in both empPDMap and IVSSMap
     const mergedInterviewData = Object.values(empPDMap)
-      .filter((candi) => IVSSMap[candi.tempID] && WPTackingMap[candi.tempID]) // Ensure tempID is in all maps
+      .filter((candi) => IVSSMap[candi.tempID]) // Ensure tempID is in both empPDMap and IVSSMap
       .map((candi) => {
-        const WPTrack = WPTackingMap[candi.tempID] || {};
         const IVSS = IVSSMap[candi.tempID] || {};
-
+        const WPTrack = WPTackingMap[candi.tempID] || null; // WPTrack may be null if not available
+    
         return {
           ...candi,
           interviewDetails: IVSS,
-          WPTrackDetails: WPTrack,
+          WPTrackDetails: WPTrack, // WPTrackDetails is added only if available
         };
       });
-
+    
+    
     const flattenObject = mergedInterviewData.map((data) => {
       const result = { ...data };
-      console.log(data, "D");
 
       // Flatten `interviewDetails`
       if (result.interviewDetails) {
@@ -80,13 +89,20 @@ export const WorkpassTracking = () => {
       return result;
     });
     // console.log(flattenObject, "FLAT");
-
     if (flattenObject && flattenObject.length > 0) {
+      // console.log("flattenObject:", flattenObject);
+    
       // Filter candidates based on approvalStatus
-      const initialFiltered = flattenObject.filter(
-        (val) => val?.interviewDetails_status?.toUpperCase() === "SAWP"
-      );
-
+      const initialFiltered = flattenObject.filter((val) => {
+        // console.log("Checking item:", val); // Log the value being checked
+        // console.log("Status:", val?.interviewDetails_status); // Log the status
+    
+        return val?.interviewDetails_status === "SAWP";
+      });
+    
+      // console.log("Filtered result:", initialFiltered);
+    
+      // Set the filtered data
       setFilteredData(initialFiltered);
       setData(flattenObject);
     } else {
@@ -108,12 +124,12 @@ export const WorkpassTracking = () => {
     const selectedValue = event.target.value;
     setSelectedFilters(selectedValue);
     setFilterBoxTitle(selectedValue);
-  
+
     if (!data) return;
-  
+
     // Apply the initial filter based on status
     let filtered = applyFiltersBasedOnStatus(selectedValue, data);
-    
+
     // Now apply the candidate type filters if any are selected
     if (selectedCandidateType.length > 0) {
       filtered = filtered.filter((candidate) => {
@@ -122,53 +138,81 @@ export const WorkpassTracking = () => {
             return candidate.contractType === "SAWP";
           }
           if (opt === "LPA") {
-            return candidate.contractType === "LPA" && (candidate.empType === "OnShore" || candidate.empType === "OffShore");
+            return (
+              candidate.contractType === "LPA" &&
+              (candidate.empType === "OnShore" ||
+                candidate.empType === "OffShore")
+            );
           }
           if (opt === "OnShore") {
-            return candidate.empType === "OnShore" && candidate.contractType !== "SAWP"; // Exclude SAWP for OnShore
+            return (
+              candidate.empType === "OnShore" &&
+              candidate.contractType !== "SAWP"
+            ); // Exclude SAWP for OnShore
           }
           if (opt === "OffShore") {
-            return candidate.empType === "OffShore" && candidate.contractType !== "SAWP"; // Exclude SAWP for OffShore
+            return (
+              candidate.empType === "OffShore" &&
+              candidate.contractType !== "SAWP"
+            ); // Exclude SAWP for OffShore
           }
           return true;
         });
       });
     }
-  
+
     setFilteredData(filtered);
     setIsFilterBoxOpen(false);
   };
-  
+
   const applyFiltersBasedOnStatus = (status, data) => {
     let filtered = [];
-  
+
     switch (status) {
       case "SAWP":
-        filtered = data.filter((val) => val?.interviewDetails_status?.toUpperCase() === "SAWP");
+        filtered = data.filter(
+          (val) => val?.interviewDetails_status?.toUpperCase() === "SAWP"
+        );
         break;
       case "DOE":
-        filtered = data.filter((val) => val?.interviewDetails_status?.toUpperCase() === "DOE");
+        filtered = data.filter(
+          (val) => val?.interviewDetails_status?.toUpperCase() === "DOE"
+        );
         break;
       case "NLMS":
-        filtered = data.filter((val) => val?.interviewDetails_status?.toUpperCase() === "NLMS");
+        filtered = data.filter(
+          (val) => val?.interviewDetails_status?.toUpperCase() === "NLMS"
+        );
         break;
       case "Bank Guarantee":
-        filtered = data.filter((val) => val?.interviewDetails_status === "Bank Guarantee");
+        filtered = data.filter(
+          (val) => val?.interviewDetails_status === "Bank Guarantee"
+        );
         break;
       case "JITPA":
-        filtered = data.filter((val) => val?.interviewDetails_status?.toUpperCase() === "JITPA");
+        filtered = data.filter(
+          (val) => val?.interviewDetails_status?.toUpperCase() === "JITPA"
+        );
         break;
       case "Labour Deposit":
-        filtered = data.filter((val) => val?.interviewDetails_status === "Labour Deposit");
+        filtered = data.filter(
+          (val) => val?.interviewDetails_status === "Labour Deposit"
+        );
         break;
       case "Immigration":
-        filtered = data.filter((val) => val?.interviewDetails_status?.toLowerCase() === "immigration");
+        filtered = data.filter(
+          (val) => val?.interviewDetails_status?.toLowerCase() === "immigration"
+        );
         break;
       case "Air Ticket":
-        filtered = data.filter((val) => val?.interviewDetails_status === "Air Ticket");
+        filtered = data.filter(
+          (val) => val?.interviewDetails_status === "Air Ticket"
+        );
         break;
       case "NonLocal Mobilization":
-        filtered = data.filter((val) => val?.interviewDetails_status === "NonLocal Mobilization");
+        filtered = data.filter(
+          (val) => val?.interviewDetails_status === "NonLocal Mobilization"
+        );
         break;
       default:
         filtered = data;
@@ -176,10 +220,10 @@ export const WorkpassTracking = () => {
     }
     return filtered;
   };
-  
+
   const handleCandidateTypeSelect = (option) => {
     let updatedOptions = [...selectedCandidateType];
-  
+
     // Disable SAWP and LPA based on selection
     if (option === "SAWP" && !updatedOptions.includes("SAWP")) {
       // Disable LPA if SAWP is selected
@@ -212,12 +256,12 @@ export const WorkpassTracking = () => {
         updatedOptions.push(option);
       }
     }
-  
+
     setSelectedCandidateType(updatedOptions);
-  
+
     // After updating candidate type selection, apply both candidate type and status filters together
     let filtered = data;
-  
+
     // Apply the candidate type filter
     if (updatedOptions.length > 0) {
       filtered = data.filter((d) => {
@@ -226,7 +270,10 @@ export const WorkpassTracking = () => {
             return d.contractType === "SAWP";
           }
           if (opt === "LPA") {
-            return d.contractType === "LPA" && (d.empType === "OnShore" || d.empType === "OffShore");
+            return (
+              d.contractType === "LPA" &&
+              (d.empType === "OnShore" || d.empType === "OffShore")
+            );
           }
           if (opt === "OnShore") {
             return d.empType === "OnShore" && d.contractType !== "SAWP"; // Exclude SAWP for OnShore
@@ -238,15 +285,14 @@ export const WorkpassTracking = () => {
         });
       });
     }
-  
+
     // Now apply the status filter (same as in handleFilterChange)
     if (selectedFilters) {
       filtered = applyFiltersBasedOnStatus(selectedFilters, filtered);
     }
-  
+
     setFilteredData(filtered);
   };
-  
 
   const closeForm = () => setIsFormVisible(false);
   useEffect(() => {
@@ -279,6 +325,21 @@ export const WorkpassTracking = () => {
     setIsFormVisible(false);
   };
 
+  const formatDate = (dateToString) => {
+    if (!dateToString || isNaN(new Date(dateToString).getTime())) {
+      return "";
+    }
+
+    const date = new Date(dateToString);
+
+    const day = date.getDate().toString().padStart(2, "0"); // Local day
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Local month
+    const year = date.getFullYear(); // Local year
+
+    return `${day}-${month}-${year}`; // Format as DD/MM/YYYY
+  };
+
+
   const fileUpload = async (files) => {
     try {
       // Check if input is a string
@@ -307,6 +368,101 @@ export const WorkpassTracking = () => {
       return null;
     }
   };
+
+  const renderComponent = () => {
+    switch (selectedFilters) {
+      case "SAWP":
+        return (
+          <SawpTable
+            data={filteredData}
+            formatDate={formatDate}
+            fileUpload={fileUpload}
+            urlValue={urlValue}
+          />
+        );
+      case "DOE":
+        return (
+          <DoeTable
+            data={filteredData}
+            formatDate={formatDate}
+            fileUpload={fileUpload}
+            urlValue={urlValue}
+          />
+        );
+      case "NLMS":
+        return (
+          <NlmsTable
+            data={filteredData}
+            formatDate={formatDate}
+            fileUpload={fileUpload}
+            urlValue={urlValue}
+          />
+        );
+      case "Bank Guarantee":
+        return (
+          <BankFormTable
+            data={filteredData}
+            formatDate={formatDate}
+            fileUpload={fileUpload}
+            urlValue={urlValue}
+          />
+        );
+      case "JITPA":
+        return (
+          <JitpaTable
+            data={filteredData}
+            formatDate={formatDate}
+            fileUpload={fileUpload}
+            urlValue={urlValue}
+          />
+        );
+      case "Labour Deposit":
+        return (
+          <LabourDepTable
+            data={filteredData}
+            formatDate={formatDate}
+            fileUpload={fileUpload}
+            urlValue={urlValue}
+          />
+        );
+      case "Immigration":
+        return (
+          <ImmigrationTable
+            data={filteredData}
+            formatDate={formatDate}
+            fileUpload={fileUpload}
+            urlValue={urlValue}
+          />
+        );
+      case "Air Ticket":
+        return (
+          <AirTKtTable
+            data={filteredData}
+            formatDate={formatDate}
+            fileUpload={fileUpload}
+            urlValue={urlValue}
+          />
+        );
+      case "NonLocal Mobilization":
+        return (
+          <NonLocalMobTable
+            data={filteredData}
+            formatDate={formatDate}
+            fileUpload={fileUpload}
+            urlValue={urlValue}
+          />
+        );
+      default:
+        return (
+          <SawpTable
+            data={filteredData}
+            formatDate={formatDate}
+            fileUpload={fileUpload}
+          />
+        );
+    }
+  };
+
   return (
     <section className="screen-size min-h-screen mb-4 ">
       <div className="relative">
@@ -407,7 +563,7 @@ export const WorkpassTracking = () => {
           </div>
         )}
 
-        {loading && !error ? (
+        {/* {loading && !error ? (
           filteredData.length > 0 ? (
             <SawpTable
               data={filteredData}
@@ -416,7 +572,6 @@ export const WorkpassTracking = () => {
               urlValue={urlValue}
             />
           ) : (
-      
             <div className="text-center text-grey py-10">No data found</div>
           )
         ) : (
@@ -425,7 +580,9 @@ export const WorkpassTracking = () => {
               ? "Loading..."
               : "Error fetching data. Check your Internet connection."}
           </div>
-        )}
+        )} */}
+
+        {renderComponent()}
 
         {isFormVisible && selectedCandidate && (
           <WorkpassForm

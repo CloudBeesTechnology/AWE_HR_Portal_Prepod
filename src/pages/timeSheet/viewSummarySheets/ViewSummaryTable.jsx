@@ -109,11 +109,7 @@ export const ViewSummaryTable = ({
       <div className="screen-size p-4">
         <header className="my-5 flex justify-between">
           <div className="flex items-center ">
-            <Link
-              to="/timeSheet"
-              className="text-xl flex-1 text-grey"
-      
-            >
+            <Link to="/timeSheet" className="text-xl flex-1 text-grey">
               <FaArrowLeft />
             </Link>
           </div>
@@ -168,6 +164,7 @@ export const ViewSummaryTable = ({
                     </th>
                   );
                 })}
+
                 <th className="border  px-2 py-2 border-dark_grey">NH</th>
                 <th className="border  px-2 py-2 border-dark_grey">ND</th>
                 <th className="border  px-2 py-2 border-dark_grey">PH</th>
@@ -178,9 +175,9 @@ export const ViewSummaryTable = ({
                 <th className="border  px-2 py-2 border-dark_grey">A</th>
                 <th className="border  px-2 py-2 border-dark_grey">UAL</th>
                 <th className="border  px-2 py-2 border-dark_grey">OT</th>
-                <th className="border  px-2 py-2 border-dark_grey">
+                {/* <th className="border  px-2 py-2 border-dark_grey">
                   MEAL ALLOW
-                </th>
+                </th> */}
                 <th className="border  px-2 py-2 border-dark_grey">Verified</th>
                 <th className="border  px-2 py-2 border-dark_grey">Updater</th>
               </tr>
@@ -248,14 +245,16 @@ export const ViewSummaryTable = ({
                         employee?.getVerify?.[formattedDate] || "";
 
                       // Check if the day is a special day
-                      const isSpecialDay = ["PH", "PHD", "OFF"].includes(
-                        employee?.workingHrs?.[formattedDate]
-                      );
+                      // const isSpecialDay = ["PH", "PHD", "OFF"].includes(
+                      //   employee?.workingHrs?.[formattedDate]
+                      // );
 
                       // Determine the final value based on conditions
-                      const finalValue = isSpecialDay
-                        ? "Yes"
-                        : isVerified || null;
+                      // const finalValue = isSpecialDay
+                      //   ? "Yes"
+                      //   : isVerified || null;
+
+                      const finalValue = isVerified;
 
                       return {
                         date: formattedDate,
@@ -349,7 +348,8 @@ export const ViewSummaryTable = ({
                                       : "",
 
                                   workingHrsKey: currentDayKey,
-                                  mealAllow: employee?.mealAllow,
+                                  verify: employee?.getVerify?.[currentDayKey],
+                                  firstFileType: employee.firstFileType || "",
                                 };
 
                                 editViewSummaryObject(empDetails);
@@ -390,9 +390,9 @@ export const ViewSummaryTable = ({
                         <td className="border px-2 py-1" rowSpan="2">
                           {totalOT || 0}
                         </td>
-                        <td className="border px-2 py-1" rowSpan="2">
+                        {/* <td className="border px-2 py-1" rowSpan="2">
                           {employee?.mealAllow || ""}
-                        </td>
+                        </td> */}
                         <td className="border px-2 py-1" rowSpan="2">
                           {allFieldsYes ? "Yes" : ""}
                         </td>
@@ -443,12 +443,13 @@ export const ViewSummaryTable = ({
                             employee?.getVerify?.[formattedDate];
 
                           // Check if the day is a special day
-                          const isSpecialDay = ["PH", "PHD", "OFF"].includes(
-                            employee?.workingHrs?.[formattedDate]
-                          );
+                          // const isSpecialDay = ["PH", "PHD", "OFF"].includes(
+                          //   employee?.workingHrs?.[formattedDate]
+                          // );
 
                           // Determine checkbox checked status
-                          const isChecked = Boolean(isVerified || isSpecialDay);
+                          // const isChecked = Boolean(isVerified || isSpecialDay);
+                          const isChecked = Boolean(isVerified);
                           const updatedDateTime =
                             employee?.assignUpdaterDateTime?.[formattedDate];
 
@@ -508,7 +509,7 @@ export const ViewSummaryTable = ({
                         <td className="border px-2 py-1">{""}</td>
                         <td className="border px-2 py-1"></td>
                         <td className="border px-2 py-1"></td>
-                        <td className="border px-2 py-1"></td>
+                        {/* <td className="border px-2 py-1"></td> */}
                       </tr>
                       <tr>
                         <td className="border px-2 py-1" colSpan={1}>
@@ -554,7 +555,7 @@ export const ViewSummaryTable = ({
                         <td className="border px-2 py-1">{totalOT}</td>
                         <td className="border px-2 py-1"></td>
                         <td className="border px-2 py-1"></td>
-                        <td className="border px-2 py-1"></td>
+                        {/* <td className="border px-2 py-1"></td> */}
                       </tr>
                     </React.Fragment>
                   );

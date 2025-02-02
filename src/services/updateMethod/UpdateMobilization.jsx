@@ -30,5 +30,5 @@ export const UpdateMobilization = () => {
     // Handle API call or other logic here
   }, []);
 
-  return { submitMobilization }; // Return the function directly
+  return { submitMobilization }; 
 };

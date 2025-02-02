@@ -103,7 +103,7 @@ export const ListofCandi = () => {
     }
   }
 
-  console.log("Candidates",candidate)
+  // console.log("Candidates",candidate)
 
   return (
     <section className="screen-size min-h-screen w-full my-5">

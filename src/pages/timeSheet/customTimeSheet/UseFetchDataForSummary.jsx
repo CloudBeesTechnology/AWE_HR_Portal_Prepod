@@ -24,15 +24,7 @@ export const UseFetchDataForSummary = (
     parsedDate.setHours(0, 0, 0, 0);
     parsedStart.setHours(0, 0, 0, 0);
     parsedEnd.setHours(0, 0, 0, 0);
-    console.log(
-      parsedDate,
-      " : ",
-      parsedStart,
-      "---",
-      parsedDate,
-      " : ",
-      parsedEnd
-    );
+   
     return parsedDate >= parsedStart && parsedDate <= parsedEnd; // Check if within range
   };
 

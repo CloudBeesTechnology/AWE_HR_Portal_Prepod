@@ -81,7 +81,7 @@ export const handleDeleteFile = async (
         (item) => extractFileName(item.upload) !== fileName
       );
   
-      console.log(updatedUploadData);
+      // console.log(updatedUploadData);
       setValue(fileType, updatedUploadData);
 
     } catch (error) {

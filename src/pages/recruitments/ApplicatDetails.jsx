@@ -1,39 +1,29 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import avatar from "../../assets/navabar/avatar.jpeg";
 import { ApplicantSchema } from "../../services/Validation";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { IoCameraOutline } from "react-icons/io5";
 import { uploadDocs } from "../../services/uploadDocsS3/UploadDocs";
 import { FormField } from "../../utils/FormField";
-import { useOutletContext } from "react-router-dom";
-import { DataSupply } from "../../utils/DataStoredContext";
-import { getUrl } from "@aws-amplify/storage";
-import { useTempID } from "../../utils/TempIDContext";
-import avatar from "../../assets/navabar/avatar.jpeg";
-
-import {
-  ContractTypeDD,
-  GenderDD,
-  MaritalDD,
-  NationalityDD,
-  RaceDD,
-  ReligionDD,
-} from "../../utils/DropDownMenus";
-
+import { ContractTypeDD, GenderDD, MaritalDD, NationalityDD, RaceDD, ReligionDD } from "../../utils/DropDownMenus";
 
 export const ApplicantDetails = () => {
-  const { empPDData } = useContext(DataSupply);
-  // const { tempID } = useOutletContext();
-   const { tempID } = useTempID();
-  const navigate = useNavigate();
 
+  
   useEffect(() => {
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
   }, []);
+
+  const navigate = useNavigate();
+  const [file, setFile] = useState(null);
+  const location = useLocation();
+  const data = location.state?.editingData;
+
   const {
     register,
     handleSubmit,
@@ -46,103 +36,23 @@ export const ApplicantDetails = () => {
   });
   const [uploadedDocs, setUploadedDocs] = useState({ profilePhoto: null });
   const [profilePhoto, setProfilePhoto] = useState(null);
-  const [imageUrl, setImageUrl] = useState("");
 
-  const linkToImageFile = async (pathUrl) => {
-    const result = await getUrl({
-      path: pathUrl,
-    });
-    setImageUrl(result.url.toString());
-  };
-
-  const profile = watch("profilePhoto")
-
-  useEffect(() => {
-    if (tempID) {
-      const savedData = JSON.parse(localStorage.getItem("applicantFormData"));
-      console.log('Saved data:', savedData); 
-      if (savedData) {
-        Object.keys(savedData).forEach((key) => setValue(key, savedData[key]));
-      }
-  
-      if (empPDData.length > 0) {
-        const interviewData = empPDData.find((data) => data.tempID === tempID);
-        if (interviewData) {
-          console.log('Interview data found:', interviewData);
-          // Set form fields with empPDData if available
-          Object.keys(interviewData).forEach((key) => {
-            if (interviewData[key]) {
-              setValue(key, interviewData[key]);
-            }
-          });
-          // Load profile photo from empPDData (if available)
-          if (interviewData.profilePhoto) {
-            setUploadedDocs((prev) => ({
-              ...prev,
-              profilePhoto: interviewData.profilePhoto,
-            }));
-          }
-        }
-      }
-  
-      // Fetch profile photo URL if available
-      if (uploadedDocs.profilePhoto) {
-        linkToImageFile(uploadedDocs.profilePhoto);
-      }
-    }
-  }, [empPDData, tempID, setValue, uploadedDocs.profilePhoto]);
-  
-  
   // Load form data from localStorage when the component mounts
   // useEffect(() => {
-  //   if (tempID) {
-  //     const savedData = JSON.parse(localStorage.getItem("applicantFormData"));
-  //     console.log('Saved data:', savedData); 
-  //     if (savedData) {
-  //       Object.keys(savedData).forEach((key) => setValue(key, savedData[key]));
-  //     }
-
-  //     if (empPDData.length > 0) {
-  //       const interviewData = empPDData.find((data) => data.tempID === tempID);
-  //       if (interviewData) {
-  //         console.log('Interview data found:', interviewData);
-  //         // Set form fields with empPDData if available
-  //         Object.keys(interviewData).forEach((key) => {
-  //           if (interviewData[key]) {
-  //             setValue(key, interviewData[key]);
-  //           }
-  //         });
-  //         // Load profile photo from empPDData (if available)
-  //         if (interviewData.profilePhoto) {
-  //           setUploadedDocs((prev) => ({
-  //             ...prev,
-  //             profilePhoto: interviewData.profilePhoto,
-  //           }));
-  //         }
-  //       }
-  //     }
-
-  //     // Fetch profile photo URL if available
-  //     if (uploadedDocs.profilePhoto) {
-  //       linkToImageFile(uploadedDocs.profilePhoto);
-  //     }
+  //   const savedData = JSON.parse(localStorage.getItem("applicantFormData"));
+  //   if (savedData) {
+  //     Object.keys(savedData).forEach((key) => setValue(key, savedData[key]));
   //   }
-  // }, [empPDData, tempID, setValue, uploadedDocs.profilePhoto]);
+  // }, [setValue]);
 
   // Handle file upload and set the profile photo URL
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
-
     if (selectedFile) {
-      // Handle the file object
-      setProfilePhoto(selectedFile); // Store the file object in state
-      setValue("profilePhoto", selectedFile); // Set form value for profilePhoto
-      await uploadDocs(
-        selectedFile,
-        "profilePhoto",
-        setUploadedDocs,
-        "Employee"
-      );
+      setProfilePhoto(selectedFile);
+      setValue("profilePhoto", selectedFile);
+
+      await uploadDocs(selectedFile, "profilePhoto", setUploadedDocs, "Employee");
     }
   };
 
@@ -152,7 +62,7 @@ export const ApplicantDetails = () => {
       console.log(data);
       const applicationUpdate = {
         ...data,
-        profilePhoto: uploadedDocs.profilePhoto || profile,
+        profilePhoto: uploadedDocs.profilePhoto,
       };
       // Save form data to localStorage before navigating
       localStorage.setItem(
@@ -163,8 +73,6 @@ export const ApplicantDetails = () => {
       navigate("/addCandidates/personalDetails", {
         state: { FormData: applicationUpdate },
       });
-
-      console.log("APP DATA", applicationUpdate)
       setUploadedDocs({ profilePhoto: null });
     } catch (error) {
       console.log(error);
@@ -211,6 +119,7 @@ export const ApplicantDetails = () => {
             )}
           </div>
 
+          {/* Upload Photo */}
           <div className="py-2 center flex-col max-w-[160px]">
             <input
               type="file"
@@ -220,23 +129,23 @@ export const ApplicantDetails = () => {
               onChange={handleFileChange}
               className="hidden"
             />
-            <div className="h-[120px] max-w-[120px] relative rounded-md bg-lite_skyBlue">
+           <div className="h-[120px] max-w-[120px] relative rounded-md bg-lite_skyBlue">
               <img
                 src={
-                  imageUrl
-                    ? imageUrl
-                    : profilePhoto
+                  profilePhoto
                     ? URL.createObjectURL(profilePhoto)
-                    : uploadedDocs.profilePhoto || avatar
+                    : uploadedDocs.profilePhoto
+                    ? uploadedDocs.profilePhoto
+                    : avatar
                 }
                 id="previewImg"
                 alt="profile"
                 className="object-cover w-full h-full"
-                onError={(e) => (e.target.src = avatar)} // Handle image load errors
+                onError={(e) => (e.target.src = avatar)}
               />
-              {(profilePhoto || uploadedDocs.profilePhoto || imageUrl) && (
+              {(profilePhoto || uploadedDocs.profilePhoto) && (
                 <div
-                  className="absolute top-24 -right-3 bg-lite_grey p-[2px] rounded-full cursor-pointer"
+                  className="absolute top-24 -right-3  bg-lite_grey p-[2px] rounded-full cursor-pointer"
                   onClick={() => document.getElementById("fileInput").click()}
                 >
                   <IoCameraOutline className="w-6 h-6 p-1" />
@@ -244,7 +153,7 @@ export const ApplicantDetails = () => {
               )}
             </div>
 
-            {!profilePhoto && !uploadedDocs.profilePhoto && !imageUrl && (
+            {!profilePhoto && !uploadedDocs.profilePhoto && (
               <div className="mt-1 rounded-lg text-center">
                 <button
                   type="button"
@@ -262,8 +171,7 @@ export const ApplicantDetails = () => {
               </p>
             )}
           </div>
-
-  
+           
         </div>
 
         {/* Form Fields */}
@@ -275,7 +183,7 @@ export const ApplicantDetails = () => {
               type: "select",
               options: ContractTypeDD,
             },
-            { label: "CV Received From", name: "agent", type: "text" },
+            { label: "Agent", name: "agent", type: "text" },
 
             { label: "Name", name: "name", type: "text" },
             {
@@ -303,7 +211,7 @@ export const ApplicantDetails = () => {
               label: "Nationality",
               name: "nationality",
               type: "select",
-              options: NationalityDD,
+              options:  NationalityDD,
             },
             {
               label: "Other Nationality",
@@ -327,7 +235,7 @@ export const ApplicantDetails = () => {
               label: "Religion",
               name: "religion",
               type: "select",
-              options: ReligionDD,
+              options:ReligionDD,
             },
             {
               label: "Other Religion",
@@ -343,7 +251,7 @@ export const ApplicantDetails = () => {
                   {...register(field.name)}
                   className="mt-2 p-2.5 text_size_7 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full"
                 >
-                  <option value=""></option>
+                    <option value=""></option>
                   {(field.options || []).map((option, i) => (
                     <option key={i} value={option.value}>
                       {option.label}

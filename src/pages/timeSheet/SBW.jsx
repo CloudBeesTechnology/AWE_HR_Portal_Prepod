@@ -1,19 +1,27 @@
+
+
 import { useEffect, useMemo, useState } from "react";
 import { TimeSheetBrowser } from "../../utils/TimeSheetBrowser";
-import { useFetchData } from "./customTimeSheet/UseFetchData";
+
 import { FindSpecificTimeKeeper } from "./customTimeSheet/FindSpecificTimeKeeper";
+
+import { useFetchData } from "./customTimeSheet/UseFetchData";
 
 export const SBW = () => {
   const [submittedData, setSubmittedData] = useState([]);
   const [ManagerData, setManagerData] = useState([]);
   const [showing, setShowing] = useState(0);
+  const [isFetching, setIsFetching] = useState(true); // Track fetching state
   const Position = localStorage.getItem("userType");
-  let userIdetification =
+
+  const userIdetification =
     Position === "Manager" ? "Manager" : Position !== "Manager" ? "All" : "";
-  let titleName = "SBW";
-  let cardName = userIdetification;
+  const titleName = "SBW";
+  const cardName = userIdetification;
+
   const memoizedTitleName = useMemo(() => titleName, [titleName]);
   const memoizedCardName = useMemo(() => cardName, [cardName]);
+
   const { convertedStringToArrayObj } = useFetchData(
     memoizedTitleName,
     memoizedCardName
@@ -21,7 +29,7 @@ export const SBW = () => {
 
   const pendingData = (data) => {
     if (data && data.length > 0) {
-      const result = data?.map((val) => {
+      return data.map((val) => {
         let parsedEmpWorkInfo = [];
         try {
           if (Array.isArray(val.empWorkInfo)) {
@@ -30,7 +38,7 @@ export const SBW = () => {
             );
           }
         } catch (error) {
-          // console.error("Error parsing empWorkInfo for ID:", val.id, error);
+          // Handle parsing errors
         }
 
         return {
@@ -57,83 +65,66 @@ export const SBW = () => {
           status: val.status || "",
         };
       });
-      return result;
-      // setData(result);
-      // setSecondaryData(result);
     }
+    return [];
   };
 
   useEffect(() => {
+    let timeoutId;
+
     if (Position !== "Manager") {
       const fetchData = async () => {
-        // setLoading(true);
+        setIsFetching(true); // Start fetching
         try {
-          const dataPromise = await new Promise((resolve, reject) => {
+          // Wait for the data to arrive
+          const hasData = await new Promise((resolve) => {
+            timeoutId = setTimeout(() => resolve(false), 15000); // Fallback after 30 seconds
             if (
               convertedStringToArrayObj &&
               convertedStringToArrayObj.length > 0
             ) {
-              resolve(convertedStringToArrayObj);
-            } else {
-              setTimeout(() => {
-                setShowing(2);
-                reject("No data found after waiting.");
-              }, 30000);
+              clearTimeout(timeoutId); // Clear fallback timeout
+              resolve(true);
             }
           });
 
-          const fetchedData = await dataPromise;
-
-          if (Position !== "Manager" && fetchedData && fetchedData.length > 0) {
-            const finalData = await FindSpecificTimeKeeper(fetchedData);
+          if (hasData) {
+            const finalData = await FindSpecificTimeKeeper(
+              convertedStringToArrayObj
+            );
             if (finalData && finalData.length > 0) {
-              const result = pendingData(finalData);
-
-              setSubmittedData(result);
-              setShowing(1);
+              setSubmittedData(pendingData(finalData));
+              setShowing(1); // Data available
             } else {
-              setShowing(2);
+              setShowing(2); // No valid data
             }
+          } else {
+            setShowing(2); // Data not fetched in time
           }
-          // else {
-          //   setTimeout(() => {
-          //     if (showing === 0 || showing !== 1) {
-          //       setShowing(2);
-          //     }
-          //   }, 30000);
-          // }
         } catch (err) {
+          setShowing(2); // Handle error case
         } finally {
-          // setLoading(false);
+          setIsFetching(false); // Done fetching
         }
       };
 
       fetchData();
     } else if (Position === "Manager") {
+      setShowing(null);
       setManagerData(convertedStringToArrayObj);
     }
-  }, [convertedStringToArrayObj]);
+
+    return () => clearTimeout(timeoutId); // Cleanup timeout on unmount
+  }, [convertedStringToArrayObj, Position]);
+
   return (
     <div>
-      {showing === 0 && (
-        <div className="flex justify-center items-center h-[85vh] w-full">
-          <p className="text-dark_grey text_size_5 ">Loading...</p>
-        </div>
-      )}
-
-      {showing === 1 && submittedData.length > 0 && (
-        <TimeSheetBrowser title="SBW" submittedData={submittedData || []} />
-      )}
-
-      {showing === 2 && <TimeSheetBrowser title="SBW" submittedData={[]} />}
-
-      {Position === "Manager" && (
-        <TimeSheetBrowser
-          title="SBW"
-          submittedData={[]}
-          ManagerData={ManagerData}
-        />
-      )}
+      <TimeSheetBrowser
+        title="SBW"
+        submittedData={submittedData || []}
+        showing={showing}
+        ManagerData={ManagerData}
+      />
     </div>
   );
 };

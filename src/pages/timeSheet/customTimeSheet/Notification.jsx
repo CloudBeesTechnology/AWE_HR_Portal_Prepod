@@ -1,4 +1,3 @@
-
 export const Notification = async ({ getEmail, Position, correctionMade }) => {
   let hasSentEmail = false; // Track email sending
 
@@ -70,11 +69,11 @@ export const Notification = async ({ getEmail, Position, correctionMade }) => {
         getEmail?.ManagerDetails?.name
       }.</p>
            
-           
+             
             ${
               status === "Rejected"
-                ? "<p>Please review the timesheet and make the necessary corrections.</p>"
-                : ""
+                ? `<p>Click here <a href="${url}">${url}</a> to review and make the necessary corrections.</p>`
+                : `<p>Click here <a href="${url}">${url}</a> to check the status.</p>`
             }       
           </body>
         </html>

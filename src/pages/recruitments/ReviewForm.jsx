@@ -4,7 +4,6 @@ import { ScheduleInter } from "./Form/ScheduleInter";
 import { updateInterviewSchedule } from "../../graphql/mutations";
 import { generateClient } from "@aws-amplify/api";
 import { SpinLogo } from "../../utils/SpinLogo";
-import { useLeaveManage } from "../../hooks/useLeaveManage";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { getUrl } from "@aws-amplify/storage";
 
@@ -157,6 +156,21 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     }
   }, [candidate?.profilePhoto]); // Only run when candidate.profilePhoto changes
 
+  console.log(candidate);
+
+  const parseJson = (jsonString) => {
+    try {
+      return JSON.parse(jsonString);
+    } catch (e) {
+      return []; // Return an empty array if parsing fails
+    }
+  };
+
+  // Parse work experience, education details, and family details
+  const workExperience = parseJson(candidate.workExperience);
+  const eduDetails = parseJson(candidate.eduDetails);
+  const familyDetails = parseJson(candidate.familyDetails);
+
   return (
     <section>
       {/* Main Review Form */}
@@ -257,6 +271,81 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                 <span className="w-full col-span-2">: &nbsp;{item.value}</span>
               </div>
             ))}
+
+            {familyDetails?.length > 0 && (
+              <div>
+                <h3 className="font-bold">Family Details</h3>
+                {familyDetails.map((item, idx) => (
+                  <div key={idx}>
+                    <strong className="w-full">Occupation:</strong>
+                    <span className="w-full col-span-2">{item.occupation || "N/A"}</span>
+                    <p>
+                      <strong>Name:</strong> {item.name || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Place of Occupation:</strong>{" "}
+                      {item.placeOfOccupation || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Relationship:</strong>{" "}
+                      {item.relationship || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Age:</strong> {item.age || "N/A"}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Display work experience */}
+            {workExperience?.length > 0 && (
+              <div>
+                <h3 className="font-bold">Work Experience</h3>
+                {workExperience.map((item, idx) => (
+                  <div key={idx}>
+                    <p>
+                      <strong>Company:</strong> {item.company || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Position:</strong> {item.position || "N/A"}
+                    </p>
+                    <p>
+                      <strong>From:</strong> {item.from || "N/A"} -{" "}
+                      <strong>To:</strong> {item.to || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Reason For Leaving:</strong>{" "}
+                      {item.reasonForLeaving || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Salary:</strong> {item.salary || "N/A"}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Display education details */}
+            {eduDetails?.length > 0 && (
+              <div>
+                <h3 className="font-bold">Education Details</h3>
+                {eduDetails.map((item, idx) => (
+                  <div key={idx}>
+                    <p>
+                      <strong>University:</strong> {item.university || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Degree:</strong> {item.degree || "N/A"}
+                    </p>
+                    <p>
+                      <strong>From:</strong> {item.fromDate || "N/A"} -{" "}
+                      <strong>To:</strong> {item.toDate || "N/A"}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Bottom Buttons: Reject and Schedule Interview */}

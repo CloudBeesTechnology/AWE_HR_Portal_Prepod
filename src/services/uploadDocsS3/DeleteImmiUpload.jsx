@@ -83,7 +83,7 @@ export const handleDeleteFile = async (
       setValue(fileType, updatedUploadData);
       trigger(fileType);
    
-    alert(`File "${fileName}" deleted successfully`);
+    // alert(`File "${fileName}" deleted successfully`);
 
 
     

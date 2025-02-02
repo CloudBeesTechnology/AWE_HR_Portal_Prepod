@@ -5,7 +5,7 @@ import { ReviewForm } from "../ReviewForm";
 
 export const InterviewTable = ({ data,formatDate }) => {
   const [isFormVisible, setIsFormVisible] = useState(false);
-    const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
+  const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const [selectedCandi, setSelectedCandi] = useState([]);
   const heading = [
     "TempID",

@@ -1,38 +1,130 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { RiFileEditLine } from "react-icons/ri";
-import { StatusForm } from "./StatusForm";
 import { ReviewForm } from "../ReviewForm";
 import { WorkpassForm } from "./WorkpassForm";
+import { generateClient } from "@aws-amplify/api";
+import { listEmpPersonalInfos } from "../../../graphql/queries";
+import { CandiToEmp } from "../status/ConvertCandiToEmp";
+import { SpinLogo } from "../../../utils/SpinLogo";
+import { UpdateMobilization } from "../../../services/updateMethod/UpdateMobilization";
 
 
-export const NonLocalMobTable = ({ data,formatDate }) => {
+export const NonLocalMobTable = ({ data, formatDate, fileUpload, urlValue }) => {
+  const client = generateClient();
+  const { SumbitCandiToEmp } = CandiToEmp();
+  const {submitMobilization}  = UpdateMobilization();
   const [isFormVisible, setIsFormVisible] = useState(false);
-    const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
+  const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const [selectedCandi, setSelectedCandi] = useState([]);
+  const [latestTempIDData, setLatesTempIDData] = useState("");
+  const [showTitle, setShowTitle] = useState("");
+  const [notification, setNotification] = useState(false);
+
   const heading = [
     "TempID",
     "Name",
     "Nationality",
-    "Interview Date",
-    "Time",
-    "Venue",
-    "Interviewer",
+    "Position",
+    "Date of Mobilization",
+    "Agent Name",
+    "Recruitment Remarks",
+    "Non Local Mobilization",
     "Form",
     "Edit Form",
+    "Status",
   ];
-  console.log(data);
-const handleShowForm=(candi)=>{
-  setSelectedCandi(candi);
-    setIsFormVisible(!isFormVisible)
-}
-const handleShowReviewForm = (candi) => {
-  setSelectedCandi(candi);
-  setIsReviewFormVisible(!isReviewFormVisible);
-};
+
+  // console.log(data);
+
+  const handleShowForm = (candi) => {
+    setSelectedCandi(candi);
+    setIsFormVisible(!isFormVisible);
+  };
+
+  const handleShowReviewForm = (candi) => {
+    setSelectedCandi(candi);
+    setIsReviewFormVisible(!isReviewFormVisible);
+  };
+
+  const getTotalCount = async () => {
+    const limit = 5000;
+    try {
+      // Step 1: Fetch data
+      const result = await client.graphql({
+        query: listEmpPersonalInfos,
+        variables: { limit },
+      });
+      const items = result?.data?.listEmpPersonalInfos?.items || [];
+      // console.log("Fetched items:", items);
+  
+      // Step 2: Extract empID and filter out the ones that are already converted.
+      const filteringData = items
+        .map((val) => val.empID); // Extract empID from each item
+      // console.log("Extracted empIDs:", filteringData);
+  
+      // Step 3: Filter only those empIDs that start with 'AWE'
+      const filteredData = filteringData.filter((empID) => empID.startsWith("AWE"));
+      // console.log('Filtered empIDs starting with "AWE":', filteredData);
+  
+      // Step 4: Sort the empIDs numerically (based on the number part of the ID)
+      const sortedData = filteredData.sort((a, b) => {
+        const numA = parseInt(a.replace(/[^\d]/g, ''), 10);
+        const numB = parseInt(b.replace(/[^\d]/g, ''), 10);
+        // console.log(`Comparing ${a} and ${b} -> ${numA} vs ${numB}`);
+        return numA - numB;
+      });
+      // console.log('Sorted empIDs:', sortedData);
+  
+      // Step 5: Get the last valid TempID
+      const maxValue = sortedData[sortedData.length - 1];
+      // console.log('Max empID:', maxValue);
+  
+      return maxValue;
+    } catch (error) {
+      console.error('Error fetching total count:', error);
+      return 0; // Return 0 if there's an error
+    }
+  };
+  
+  const generateNextTempID = (lastTempID) => {
+    const prefixMatch = lastTempID.match(/[^\d]+/);
+    const prefix = prefixMatch ? prefixMatch[0] : "";
+    const numberMatch = lastTempID.match(/\d+/);
+    const numberPart = numberMatch ? parseInt(numberMatch[0], 10) : 0;
+    const nextNumber = numberPart + 1;
+    const nextTempID = `${prefix}${nextNumber}`;
+    // console.log("Next TempID", nextTempID);
+
+    return nextTempID;
+  };
+
+  useEffect(() => {
+    const fetchNextTempID = async () => {
+      const lastTempID = await getTotalCount();
+      const nextTempID = generateNextTempID(lastTempID);
+      setLatesTempIDData(nextTempID); // Set the generated ID
+    };
+    fetchNextTempID();
+  }, []);
+
+  const OnSubmit = async (candi) => {
+    const storedData = {
+      ...candi,
+      empID: latestTempIDData,
+    };
+    // console.log("stored", storedData);
+    
+    await SumbitCandiToEmp({ storedData });
+    await submitMobilization({ mob:storedData })
+    
+    // setShowTitle("Candidate conversion to employee has been completed successfully.");
+    // setNotification(true);
+  };
+
   return (
     <div>
       {data && data.length > 0 ? (
-        <table className=" w-full">
+        <table className="w-full">
           <thead className="bg-[#939393] text-white">
             <tr>
               {heading.map((header, index) => (
@@ -43,55 +135,81 @@ const handleShowReviewForm = (candi) => {
             </tr>
           </thead>
           <tbody>
-            {data && data.length > 0 ? (
-              data.map((item, index) => {
-                //   const displayIndex = startIndex + index + 1; // Adjust index based on pagination
-
-                return (
-                  <tr
-                    key={index}
-                    className="text-center text-[16px] shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
+            {data.map((item, index) => {
+              return (
+                <tr
+                  key={index}
+                  className="text-center text-[16px] shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
+                >
+                  <td className="py-3">{item.tempID}</td>
+                  <td className="py-3">{item.name || "N/A"}</td>
+                  <td className="py-3">{item.nationality || "N/A"}</td>
+                  <td className="py-3">{item.interviewDetails_manager || "N/A"}</td>
+                  <td className="py-3">{item.WPTrackDetails_mobSignDate || "N/A"}</td>
+                  <td className="py-3">{item.WPTrackDetails_agentname || "N/A"}</td>
+                  <td className="py-3">{item.WPTrackDetails_remarkNLMob || "N/A"}</td>
+                  <td className="py-3">
+                    {item.WPTrackDetails_mobFile ? (
+                      <a
+                        href={urlValue}
+                        onClick={(e) => {
+                          if (!item.WPTrackDetails_mobFile) {
+                            e.preventDefault();
+                          } else {
+                            fileUpload(item.WPTrackDetails_mobFile);
+                          }
+                        }}
+                        download
+                        className={item.WPTrackDetails_mobFile ? "border-b-2 border-[orange] text-[orange]" : ""}
+                      >
+                        {item.WPTrackDetails_mobFile ? "Download" : "N/A"}
+                      </a>
+                    ) : (
+                      <p>N/A</p>
+                    )}
+                  </td>
+                  <td
+                    className="py-3 text-center"
+                    onClick={() => handleShowReviewForm(item)}
                   >
-                    {/* <td className="py-3">{displayIndex}</td> */}
-                    <td className="py-3">{item.tempID}</td>
-                    <td className="py-3">{item.name || "N/A"}</td>
-                    <td className="py-3">{item.nationality || "N/A"}</td>
-                    <td className="py-3">
-                      {formatDate(item.interviewDetails_interDate) || "N/A"}
-                    </td>
-                    <td className="py-3">
-                      {item.interviewDetails_interTime || "N/A"}
-                    </td>
-                    <td className="py-3">
-                      {item.interviewDetails_venue || "N/A"}
-                    </td>
-                    <td className="py-3">
-                      {item.interviewDetails_manager || "N/A"}
-                    </td>
-                    <td className="py-3 text-center" onClick={() => handleShowReviewForm(item)} >View</td>
-                    <td className="text-2xl cursor-pointer py-3 center" onClick={()=>handleShowForm(item)}>
-                      <RiFileEditLine />
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr></tr>
-            )}
+                    View
+                  </td>
+                  <td
+                    className="text-2xl cursor-pointer py-3 center"
+                    onClick={() => handleShowForm(item)}
+                  >
+                    <RiFileEditLine />
+                  </td>
+                  <td
+                    className="text-sm cursor-pointer py-3"
+                    onClick={() => OnSubmit(item)}
+                  >
+                    Convert Employee
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       ) : (
         <div className="text-center mt-6 py-20">
-
           <p className="text-lg text-dark_grey mt-2">No Data Available</p>
         </div>
       )}
-      {isReviewFormVisible && <ReviewForm candidate={selectedCandi} onClose={handleShowReviewForm} />}
+      {isReviewFormVisible && (
+        <ReviewForm candidate={selectedCandi} onClose={handleShowReviewForm} />
+      )}
       {isFormVisible && (
         <WorkpassForm
-        candidate={selectedCandi}
-        //   onSave={handleFormSave}
+          candidate={selectedCandi}
           onClose={handleShowForm}
+        />
+      )}
+      {notification && (
+        <SpinLogo
+          text={showTitle}
+          notification={notification}
+          path="/recrutiles/status"
         />
       )}
     </div>

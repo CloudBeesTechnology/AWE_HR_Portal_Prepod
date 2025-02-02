@@ -4,13 +4,14 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { ImmigEmpSchema } from '../../../services/EmployeeValidation'; 
 import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
 import { SpinLogo } from '../../../utils/SpinLogo';
-import { FileUploadField } from '../medicalDep/FileUploadField';
+import { FileUploadNew } from '../medicalDep/FileUploadField';
 import { FormField } from '../../../utils/FormField';
 import { ImmigrationFun } from '../../../services/createMethod/ImmigrationFun';
 import { useOutletContext } from 'react-router-dom';
 import { DataSupply } from '../../../utils/DataStoredContext';
 import { useContext } from 'react';
 import { UpdateImmigra } from '../../../services/updateMethod/UpdateImmigra';
+import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteImmiUpload";
 
 export const Immigration = () => {
   const { searchResultData } = useOutletContext();
@@ -22,9 +23,8 @@ export const Immigration = () => {
   const { PPValidsData } = useContext(DataSupply);
   const { UpdateImmigraData } = UpdateImmigra();
 
-  const { register, handleSubmit,watch, formState: { errors }, setValue } = useForm({
+  const { register, handleSubmit , watch, trigger, formState: { errors }, setValue } = useForm({
     resolver: yupResolver(ImmigEmpSchema),
-    
     arrivStampExp: [],
     empPassExp: [],
     immigApproval: [],
@@ -33,13 +33,7 @@ export const Immigration = () => {
   });
   
   const [notification, setNotification] = useState(false);
-  const [showTitle,setShowTitle]=useState("")
-  const [arrivStampExps, setArrivStampExp] = useState([]);
-  const [empPassExps, setEmpPassExp] = useState([]);
-  const [immigApprovals, setImmigApproval] = useState([]);
-  const [ppSubmits, setPpSubmit] = useState([]);
-  const [reEntryVisaExps, setReEntryVisaExp] = useState([]);
-
+  const [showTitle, setShowTitle]=useState("")
 
   const [uploadedFileNames, setUploadedFileNames] = useState({
     arrivStampUpload: null,
@@ -51,7 +45,8 @@ export const Immigration = () => {
     immigEmpUpload: [],
     reEntryUpload: [],
   });
-  
+  const [id, setID] = useState({immigrationID:"",});
+
   const watchInducImmUpAS = watch("arrivStampUpload", ""); // Watch the arrivStampUpload field
   const watchInducImmUpIE = watch("immigEmpUpload", ""); // Watch the arrivStampUpload field
   const watchInducImmUpRE = watch("reEntryUpload", ""); // Watch the arrivStampUpload field
@@ -64,17 +59,7 @@ export const Immigration = () => {
     return ""; 
   };
 
-  // const getFileName = (url) => {
-  //   const urlObj = new URL(url);
-  //   const filePath = urlObj.pathname;
-  //   const decodedUrl = decodeURIComponent(filePath);
 
-  //   const fileNameWithExtension = decodedUrl.substring(
-  //     decodedUrl.lastIndexOf("/") + 1
-  //   );
-
-  //   return fileNameWithExtension;
-  // };
 
   const getFileName = (input) => {
     // Check if input is an object and has the 'upload' property
@@ -120,17 +105,28 @@ export const Immigration = () => {
       return undefined;
     }
   };
-  
 
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
 
   useEffect(() => {
+
+    if (!searchResultData) return;
+
+  const immiRecord = PPValidsData.find((match) => match.empID === searchResultData.empID);
+  
+  if (immiRecord) {
+    setID((prevData) => ({
+      ...prevData,
+      immigrationID: immiRecord.id, // Ensure this field exists in SRData.
+    }));
+  }
+
     setValue("empID", searchResultData.empID);
-    const fields = [ "ppLocation","arrivStampUpload","immigEmpUpload","reEntryUpload","arrivStampExp",
+    const field = [ "ppLocation","arrivStampUpload","immigEmpUpload","reEntryUpload","arrivStampExp",
       "immigRefNo","ppSubmit","empPassExp","empPassStatus","airTktStatus","reEntryVisa","immigApproval",
       "reEntryVisaExp","remarkImmig"];
-    fields.forEach((field) =>
+    field.forEach((field) =>
       setValue(field, getLastValue(searchResultData[field]))
     );
   
@@ -152,9 +148,8 @@ export const Immigration = () => {
           setUploadedFileNames((prev) => ({
             ...prev,
             [field]:
-              parsedFiles.length > 0
-                ? getFileName(parsedFiles[parsedFiles.length - 1].upload)
-                : "",
+            parsedFiles.map((file) => getFileName(file.upload)), // Get names of all files
+       
           }));
         } catch (error) {
           console.error(`Failed to parse ${searchResultData[field]}:`, error);
@@ -167,30 +162,83 @@ export const Immigration = () => {
     parseUploadField("reEntryUpload");
   }, [searchResultData, setValue]);
   
-  const handleFileChange = async (e, label, empID) => {
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
-
-    const allowedTypes = [
-      "application/pdf",
-    ];
-
-    if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file");
+  const handleFileChange = async (e, label) => {
+    const watchedEmpID = watch("empID");
+    if (!watchedEmpID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
       return;
     }
-
-    const currentFiles = watch(label) || [];
+  
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+  
+    const allowedTypes = ["application/pdf"];
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file");
+                return;
+    }
+  
+    // Fetch current files (including backend-stored ones)
+    const currentFiles = watch(label) || []; // React Hook Form state
+  
+    // Count only newly uploaded files, ignoring backend-stored files
+    const newUploads = currentFiles.filter(file => file instanceof File);
+  
+    if (newUploads.length > 0) {
+      alert("You can only upload one new file. Please delete the existing file before uploading another.");
+      return;
+    }
+  
+    // Ensure the file was not previously deleted
+    // if (deletedFiles[label]?.includes(selectedFile.name)) {
+    //   alert("This file was previously deleted and cannot be re-added.");
+    //   return;
+    // }
+  
+    // Append the new file to the form state
     setValue(label, [...currentFiles, selectedFile]);
-
+  
     try {
-      await uploadDocs(selectedFile, label, setUploadedImmigrate, empID);
+      await uploadDocs(selectedFile, label, setUploadedImmigrate, watchedEmpID);
       setUploadedFileNames((prev) => ({
         ...prev,
-        [label]: selectedFile.name, // Store just the file name
+        [label]: selectedFile.name,
       }));
     } catch (err) {
-      console.log(err);
+      console.error(err);
+    }
+  };
+
+  const deleteFile = async (fileType, fileName) => {
+    const watchedEmpID = watch("empID");
+    const immigrationID = id.immigrationID;
+
+    try {
+      await handleDeleteFile(
+        fileType,
+        fileName,
+        watchedEmpID,
+        setUploadedFileNames,
+        setValue,
+        trigger,
+        immigrationID
+      );
+      const currentFiles = watch(fileType) || []; 
+      // Filter out the deleted file
+      const updatedFiles = currentFiles.filter(
+        (file) => file.name !== fileName
+      );
+      // Update form state with the new file list
+      setValue(fileType, updatedFiles);
+
+      // Update UI state
+      setUploadedImmigrate((prevState) => ({
+        ...prevState,
+        [fileType]: updatedFiles,
+      }));
+    } catch (error) {
+      console.error("Error deleting file:", error);
     }
   };
 
@@ -331,16 +379,21 @@ export const Immigration = () => {
           type="date"
           errors={errors}
         />
-        <FileUploadField
+        <FileUploadNew
           label="Upload File"
-          onChangeFunc={(e) => handleFileChange(e, "arrivStampUpload", empID)}
+          onChangeFunc={(e) => handleFileChange(e, "arrivStampUpload")}
           name="arrivStampUpload"
           register={register}
           error={errors}
           fileName={
-            uploadedFileNames.arrivStampUpload ||
-            extractFileName(watchInducImmUpAS)
-          }         
+            uploadedFileNames.arrivStampUpload || "" 
+            // extractFileName(watchInducImmUpAS)
+          }  
+          uploadedFileNames={uploadedFileNames}
+          deleteFile={deleteFile}
+
+          field={{ title: "arrivStampUpload" }}
+       
           />
       </div> 
 
@@ -378,7 +431,7 @@ export const Immigration = () => {
           type="text"
           errors={errors}
         />     
-        <FileUploadField
+        <FileUploadNew
           label="Upload File"
           onChangeFunc={(e) => handleFileChange(e, "immigEmpUpload")}
           register={register}
@@ -386,9 +439,13 @@ export const Immigration = () => {
           error={errors}
           fileName={
             uploadedFileNames.immigEmpUpload ||
-            extractFileName(watchInducImmUpIE)
-          }        
+""          } 
+          uploadedFileNames={uploadedFileNames}
+          deleteFile={deleteFile}
+          field={{ title: "immigEmpUpload" }}
+       
           />
+
       </div> 
 <hr className='text-lite_grey mt-5'/>
  <div className="grid grid-cols-2 mt-10 gap-5 ">
@@ -431,7 +488,7 @@ export const Immigration = () => {
           errors={errors}
         />
         
-        <FileUploadField
+        <FileUploadNew
           label="Upload File"
           onChangeFunc={(e) => handleFileChange(e, "reEntryUpload")}
           register={register}
@@ -439,8 +496,11 @@ export const Immigration = () => {
           error={errors}
           fileName={
             uploadedFileNames.reEntryUpload ||
-            extractFileName(watchInducImmUpRE)
-          }        />
+""          }  
+          uploadedFileNames={uploadedFileNames}
+          deleteFile={deleteFile} 
+          field={{ title: "reEntryUpload" }}
+          />
        
       
         </div>

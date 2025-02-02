@@ -150,13 +150,13 @@ export const handleDeleteFile = async (
 
       // console.log("API RESPONSE", updateIDResponse);
     //   alert(`File "${fileName}" deleted from the database successfully!`);
-    alert(`File "${fileName}" deleted successfully`);
+    // alert(`File "${fileName}" deleted successfully`);
 
 
     
   } catch (err) {
     // console.error("Error deleting file:", err);
-    // alert("Error processing the file deletion.");
+    alert("Error processing the file deletion.");
     // console.log("Error:", err);
   }
 };
