@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { FormField } from "../../../utils/FormField";
-import { FileUploadField } from "./FileUploadField";
+import { FileUploadFieldArr } from "./FileUploadField";
 import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
 import { FaRegMinusSquare } from "react-icons/fa";
 import { CiSquarePlus } from "react-icons/ci";
@@ -283,14 +283,14 @@ export const DependentPass = ({
               errors={errors}
               register={register}
             />
-            <FileUploadField
+            <FileUploadFieldArr
               label="Upload Dependent Pass"
               onChangeFunc={(e) => handleFileChange(e, "uploadDp", index)}
               register={register(`dependPass[${index}].uploadDp`)}
               error={errors?.dependPass?.[index]?.uploadDp}
               fileName={arrayFileNames[`${index}_uploadDp`] || ""}
             />
-            <FileUploadField
+            <FileUploadFieldArr
               label="Upload Dependent Passport"
               onChangeFunc={(e) => handleFileChange(e, "uploadDr", index)}
               register={register(`dependPass[${index}].uploadDr`)}

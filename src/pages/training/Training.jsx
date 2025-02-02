@@ -13,12 +13,11 @@ export const Training = () => {
       behavior: "smooth",
     });
   }, []);
-  const recruitmentPermissions = usePermission("userID", "Training");
+  const trainingPermissions = usePermission("userID", "Training");
 
   return (
     <section className="min-h-screen p-10 bg-[#F5F6F1CC] flex gap-16">
-
-      {recruitmentPermissions.includes("HR") && (
+      {trainingPermissions.includes("HR") && (
         <SelectTiles
           img={icon1}
           text1="HR"
@@ -29,7 +28,7 @@ export const Training = () => {
         />
       )}
 
-      {recruitmentPermissions.includes("Training Requestor") && (
+      {trainingPermissions.includes("Training Requestor") && (
         <SelectTiles
           img={icon2}
           text1="Training Requestor"
@@ -39,8 +38,8 @@ export const Training = () => {
           link="/trainingReq"
         />
       )}
-         
-       <SelectTiles
+      {trainingPermissions.includes("BLNG") && (
+        <SelectTiles
           img={icon3}
           text1="BLNG"
           fontSize="text_size_5 "
@@ -48,18 +47,17 @@ export const Training = () => {
           bgColor="bg-white"
           link="/blngCertify"
         />
-        {/* {recruitmentPermissions.includes("OME") && ( */}
+      )}
+      {trainingPermissions.includes("OME") && (
         <SelectTiles
-          img={icon3}
+          img={icon4}
           text1="OME"
           fontSize="text_size_5 "
           borderColor="border-[#F589C1]"
           bgColor="bg-white"
           link="/omgCertify"
         />
-      {/* )} */}
+      )}
     </section>
   );
 };
-
-

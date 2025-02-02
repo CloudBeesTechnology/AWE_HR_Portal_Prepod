@@ -65,7 +65,7 @@ export const AddNewForm = () => {
 
     // Convert the random bytes into a readable string
     const charset =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+{}:"<>?|[];,./-=';
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$()_{}';
     let randomString = "";
     for (let i = 0; i < length; i++) {
       randomString += charset[array[i] % charset.length];
@@ -202,7 +202,6 @@ export const AddNewForm = () => {
         const username = data.empID;
         const password = data.password;
         const email = data.officialEmail;
-        const userType = data.selectType;
         await signUp({
           username,
           password,
@@ -214,55 +213,29 @@ export const AddNewForm = () => {
           },
         })
           .then(async (res) => {
-            if (userType !== "Employee") {
-              sendEmail(
-                `Verify Your Email to Activate Your Account`,
-                `
-                <html>
-                  <body>
-                    <p>Dear ${nameperson},</p>
-                    <p>Please verify your email to activate your account before attempting to log in or change your password. <br/>
-                    You must complete the email verification process using the verification email sent to you earlier. <br/>
-                    Once verified, you can log in using the credentials provided below:
-                    </p>
-                    <p><strong>Username:</strong> ${username} <br /><strong>Temporary Password:</strong> ${password}</p>
-                  
-                    <p>Visit Employee Portal: <a href="http://employee.adininworks.co"> http://employee.adininworks.co </a> <br /> HR Portal: <a href="http://hr.adininworks.co"> http://employee.adininworks.co </a>  to log in. <br />Please note that changing your password is mandatory for account security. <br />Update your password immediately after logging in for the first time.</p>
-                    <p><strong>Important:</strong> Ensure you verify your email first to avoid any issues during login or password changes.</p>
-                  
-                    <p>Best regards,</p>
-                    <p>AWE Team</p>
-                  </body>
-                </html>
-              `,
-                "hr_no-reply@adininworks.com",
-                email
-              );
-            } else {
-              sendEmail(
-                `Verify Your Email to Activate Your Account`,
-                `
-                <html>
-                  <body>
-                    <p>Dear ${nameperson},</p>
-                    <p>Please verify your email to activate your account before attempting to log in or change your password. <br/>
-                    You must complete the email verification process using the verification email sent to you earlier. <br/>
-                    Once verified, you can log in using the credentials provided below:
-                    </p>
-                    <p><strong>Username:</strong> ${username} <br /><strong>Temporary Password:</strong> ${password}</p>
-                  
-                    <p>Visit Employee Portal: <a href="http://employee.adininworks.co"> http://employee.adininworks.co </a> to log in. <br />Please note that changing your password is mandatory for account security. <br />Update your password immediately after logging in for the first time.</p>
-                    <p><strong>Important:</strong> Ensure you verify your email first to avoid any issues during login or password changes.</p>
-                  
-                    <p>Best regards,</p>
-                    <p>AWE Team</p>
-                  </body>
-                </html>
-              `,
-                "hr_no-reply@adininworks.com",
-                email
-              );
-            }
+            sendEmail(
+              `Verify Your Email to Activate Your Account`,
+              `
+              <html>
+                <body>
+                  <p>Dear ${nameperson},</p>
+                  <p>Please verify your email to activate your account before attempting to log in or change your password. <br/>
+                  You must complete the email verification process using the verification email sent to you earlier. <br/>
+                  Once verified, you can log in using the credentials provided below:
+                  </p>
+                  <p><strong>Username:</strong> ${username} <br /><strong>Temporary Password:</strong> ${password}</p>
+                
+                  <p>Visit <a href="http://employee.adininworks.co"> http://employee.adininworks.co </a> to log in. <br />Please note that changing your password is mandatory for account security. <br />Update your password immediately after logging in for the first time.</p>
+                  <p><strong>Important:</strong> Ensure you verify your email first to avoid any issues during login or password changes.</p>
+                
+                  <p>Best regards,</p>
+                  <p>AWE Team</p>
+                </body>
+              </html>
+            `,
+              "hr_no-reply@adininworks.com",
+              email
+            );
 
             const createNewUser = {
               empID: data.empID,
@@ -297,47 +270,6 @@ export const AddNewForm = () => {
       console.log(err);
     }
   });
-
-  const CheckingEmail = async () => {
-    const username = "1234";
-    const password = "123456789@10";
-    const email = "Mark.Chiong@adininworks.net";
-    await signUp({
-      username,
-      password,
-      options: {
-        userAttributes: {
-          email,
-        },
-      },
-    }).then(() => {
-      console.log("sent done");
-
-      sendEmail(
-        `Verify Your Email to Activate Your Account`,
-        `
-      <html>
-        <body>
-          <p>Dear Mam/Sir,</p>
-          <p>Please verify your email to activate your account before attempting to log in or change your password. <br/>
-          You must complete the email verification process using the verification email sent to you earlier. <br/>
-          Once verified, you can log in using the credentials provided below:
-          </p>
-          <p><strong>Username:</strong> Just Testing <br /><strong>Temporary Password:</strong> Just Testing</p>
-        
-          <p>Visit <a href="http://employee.adininworks.co"> http://employee.adininworks.co </a> to log in. <br />Please note that changing your password is mandatory for account security. <br />Update your password immediately after logging in for the first time.</p>
-          <p><strong>Important:</strong> Ensure you verify your email first to avoid any issues during login or password changes.</p>
-        
-          <p>Best regards,</p>
-          <p>AWE Team</p>
-        </body>
-      </html>
-    `,
-        "hr_no-reply@adininworks.com",
-        email
-      );
-    });
-  };
 
   return (
     <div
@@ -576,14 +508,7 @@ export const AddNewForm = () => {
           </button>
         </div>
       </form>
-      {/* <div className="mt-10 w-full center">
-          <button
-            type="submit"
-            className="p-3 text-white rounded-md primary_btn" onClick={CheckingEmail}
-          >
-            Checking
-          </button>
-        </div> */}
+
       {notification && (
         <SpinLogo text={showTitle} notification={notification} path="/user" />
       )}

@@ -17,6 +17,8 @@ import {
   leavePassDD,
   workInfoUploads,
 } from "../../../utils/DropDownMenus";
+import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteDocsWI";
+import { MdCancel } from "react-icons/md";
 import { UploadingFiles } from "../../employees/medicalDep/FileUploadField";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { UpdateWIData } from "../../../services/updateMethod/UpdateWIData";
@@ -39,6 +41,10 @@ export const WorkInfo = () => {
   const { SRDataValue } = CreateSRData();
   const { LeaveDataValue } = CreateLeaveData();
   const { TerminateDataValue } = CreateTerminate();
+  const [id, setID] = useState({
+    terminateID:"",
+    serviceID:"",
+  });
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
@@ -57,7 +63,7 @@ export const WorkInfo = () => {
     control,
     setValue,
     getValues,
-    watch,
+    watch,trigger,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -177,30 +183,83 @@ export const WorkInfo = () => {
   }, [empPIData, terminateData, workInfoData, leaveDetailsData, SRData]);
 
   const handleFileChange = async (e, label) => {
+    const watchedEmpID = watch("empID");
     if (!watchedEmpID) {
       alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
       return;
     }
-
+  
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
+  
     const allowedTypes = ["application/pdf"];
     if (!allowedTypes.includes(selectedFile.type)) {
       alert("Upload must be a PDF file");
       return;
     }
-
-    const currentFiles = watch(label) || [];
+  
+    // Fetch current files (including backend-stored ones)
+    const currentFiles = watch(label) || []; // React Hook Form state
+  
+    // Count only newly uploaded files, ignoring backend-stored files
+    const newUploads = currentFiles.filter(file => file instanceof File);
+  
+    if (newUploads.length > 0) {
+      alert("You can only upload one new file. Please delete the existing file before uploading another.");
+      return;
+    }
+  
+    // Ensure the file was not previously deleted
+    // if (deletedFiles[label]?.includes(selectedFile.name)) {
+    //   alert("This file was previously deleted and cannot be re-added.");
+    //   return;
+    // }
+  
+    // Append the new file to the form state
     setValue(label, [...currentFiles, selectedFile]);
+  
     try {
-      // Dynamically set field based on label
       await uploadDocs(selectedFile, label, setNameServiceUp, watchedEmpID);
       setUploadedFileNames((prev) => ({
         ...prev,
         [label]: selectedFile.name,
       }));
     } catch (err) {
-      console.log(err);
+      console.error(err);
+    }
+  };
+
+  const deleteFile = async (fileType, fileName) => {
+    const watchedEmpID = watch("empID");
+    const serviceID = id.serviceID;
+    const terminateID = id.terminateID;
+
+    try {
+      await handleDeleteFile(
+        fileType,
+        fileName,
+        watchedEmpID,
+        setUploadedFileNames,
+        setValue,
+        trigger,
+        terminateID,serviceID
+      );
+      const currentFiles = watch(fileType) || []; 
+      // Filter out the deleted file
+      const updatedFiles = currentFiles.filter(
+        (file) => file.name !== fileName
+      );
+      // Update form state with the new file list
+      setValue(fileType, updatedFiles);
+
+      // Update UI state
+      setNameServiceUp((prevState) => ({
+        ...prevState,
+        [fileType]: updatedFiles,
+      }));
+    } catch (error) {
+      console.error("Error deleting file:", error);
     }
   };
 
@@ -252,6 +311,20 @@ export const WorkInfo = () => {
 
   const searchResult = (result) => {
     // console.log("Result", result);
+    const terminateRecord = terminateData.find((match) => match.empID === result.empID);
+    const serviceRecord = SRData.find((match) => match.empID === result.empID);
+   
+
+    if (terminateRecord) {
+      setID((prevData) => ({
+        ...prevData,
+        terminateID: terminateRecord.id, // Assuming this field exists.
+      }))}
+    if (serviceRecord) {
+      setID((prevData) => ({
+        ...prevData,
+        serviceID: serviceRecord.id, // Assuming this field exists.
+      }))}
 
     const fieldValue = ["empID"];
 
@@ -392,7 +465,7 @@ fieldValue.forEach((val) => {
     ];
 
     // Handle file uploads
-    uploadFields.forEach((field) => {
+     uploadFields.forEach((field) => {
       if (result[field]) {
         try {
           const rawArrayString = result[field][0]; // Access the first element of the array
@@ -415,22 +488,18 @@ fieldValue.forEach((val) => {
           setNameServiceUp((prev) => ({ ...prev, [field]: parsedFiles }));
           setUploadedFileNames((prev) => ({
             ...prev,
-            [field]:
-              parsedFiles.length > 0
-                ? getFileName(parsedFiles[parsedFiles.length - 1].upload)
-                : "",
+            [field]: parsedFiles.map((file) => getFileName(file.upload)), // Show all file names
           }));
         } catch (error) {
-          console.error(`Failed to parse ${field}:, error`);
+          console.error(`Failed to parse ${field}:`, error);
         }
       }
     });
   };
 
   const getFileName = (filePath) => {
-    const fileNameWithExtension = filePath?.split("/").pop(); // Get file name with extension
-    const fileName = fileNameWithExtension?.split(".").slice(0, -1).join("."); // Remove extension
-    return fileName;
+    const fileNameWithExtension = filePath.split("/").pop();
+    return fileNameWithExtension;
   };
 
   const onSubmit = async (data) => {
@@ -833,8 +902,49 @@ fieldValue.forEach((val) => {
                       {field.label}
                     </span>
                   </label>
-                  <p className="text-xs mt-1 text-grey">
-                    {uploadedFileNames?.[field.title] || ""}
+                  <p className="text-xs mt-1 text-grey px-1">
+                    {uploadedFileNames?.[field.title] ? (
+                      Array.isArray(uploadedFileNames[field.title]) ? (
+                        uploadedFileNames[field.title]
+                          .slice() // Create a shallow copy to avoid mutating the original array
+                          .reverse()
+                          .map((fileName, fileIndex) => (
+                            <span
+                              key={fileIndex}
+                              className="mt-2 flex justify-between items-center"
+                            >
+                              {fileName}
+                              <button
+                                type="button"
+                                className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                                onClick={() =>
+                                  deleteFile(field.title, fileName)
+                                }
+                              >
+                                <MdCancel />
+                              </button>
+                            </span>
+                          ))
+                      ) : (
+                        <span className="mt-2 flex justify-between items-center">
+                          {uploadedFileNames[field.title]}
+                          <button
+                            type="button"
+                            className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                            onClick={() =>
+                              deleteFile(
+                                field.title,
+                                uploadedFileNames[field.title]
+                              )
+                            }
+                          >
+                            <MdCancel />
+                          </button>
+                        </span>
+                      )
+                    ) : (
+                      <span></span>
+                    )}
                   </p>
                   {errors[field.title] && (
                     <p className="text-red text-xs mt-1">

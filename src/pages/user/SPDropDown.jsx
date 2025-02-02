@@ -119,7 +119,7 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
       ],
     },
     {
-      Insurance: ["Insurance", "Insurance Info", "Insurance Claim"],
+      Insurance: ["Insurance"],
     },
     {
       Training: ["HR", "Training Requestor", "BLNG", "OME"],
@@ -137,7 +137,10 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
     },
     {
       LeaveManagement: [
-        "LeaveManagement"
+        "Request Leave",
+        "History of leave",
+        "Employee Leave Balance",
+        "Request Tickets",
       ],
     },
     {
