@@ -73,7 +73,7 @@ export const useNotifiCenter = () => {
       notificationsList = [...notificationsList, ...formattedHRNotifications];
     }
 
-    console.log("Final Matching Notifications:", notificationsList); 
+    // console.log("Final Matching Notifications:", notificationsList); 
     setMatchingNotifications(notificationsList);
 
     // Calculate unread count
@@ -103,7 +103,7 @@ export const useNotifiCenter = () => {
       );
 
       setUnreadCount((prevCount) => prevCount - 1);
-      console.log("Updated Unread Count:", unreadCount);
+      // console.log("Updated Unread Count:", unreadCount);
 
     } catch (error) {
       console.error("Failed to update notification status:", error);

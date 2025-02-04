@@ -120,7 +120,7 @@ export const EmpPE = () => {
         const lastPassExp = item.empPassExp[item.empPassExp.length - 1];
         return {
           lastPassExp: new Date(lastPassExp), // Keep for sorting only
-          empId: item.empID || "-",
+          empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
           nationality: item.nationality || "-",

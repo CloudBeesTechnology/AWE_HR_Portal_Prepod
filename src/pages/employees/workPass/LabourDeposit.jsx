@@ -117,13 +117,10 @@ export const LabourDeposit = () => {
     if (!selectedFile) return;
 
     const allowedTypes = [
-      "application/pdf",
-      "image/jpeg",
-      "image/png",
-      "image/jpg",
+      "application/pdf"
     ];
     if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      alert("Upload must be a PDF file");
       return;
     }
 
@@ -165,7 +162,7 @@ export const LabourDeposit = () => {
 
   useEffect(() => {
     setValue("empID", searchResultData.empID);
-    const fields = ["lbrReceiptNo", "lbrDepoAmt", "lbrDepoSubmit"];
+    const fields = ["lbrReceiptNo", "lbrDepoAmt", "lbrDepoSubmit", "lbrDepoUpload"];
     fields.forEach((field) =>
       setValue(field, getLastValue(searchResultData[field]))
     );
@@ -270,7 +267,7 @@ export const LabourDeposit = () => {
         };
 
         await UpdateLDData({ LDValue });
-        setShowTitle("Labour Info Updated Successfully");
+        setShowTitle("Labour Info Stored Successfully");
         setNotification(true);
       } else {
         const creLabpaValue = {

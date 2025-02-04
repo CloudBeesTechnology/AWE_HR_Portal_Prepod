@@ -15,6 +15,7 @@ import LBDKPI from "../../assets/ReportIcon/LBDKPI.svg";
 import groupHS from "../../assets/ReportIcon/groupHS.svg";
 import Resignation from "../../assets/ReportIcon/Resignation.svg";
 import leavePass from "../../assets/ReportIcon/leavePass.svg";
+import usePermission from "../../hooks/usePermissionDashInside";
 
 export const Reports = () => {
   const {
@@ -36,16 +37,18 @@ export const Reports = () => {
     IVSSDetails,
     WPTrackings,
     localMobiliz,
-    empPDData
+    empPDData,
   } = useContext(DataSupply);
-  
-// console.log(IVSSDetails);
+  // console.log(leaveDetailsData);
 
-IVSSDetails.forEach((employee) => {
-  if (employee.tempID === "TEMP015") {
-    // console.log(employee);
-  }
-});
+  const reportPermissions = usePermission("userID", "Report");
+  // console.log(IVSSDetails);
+
+  IVSSDetails.forEach((employee) => {
+    if (employee.tempID === "TEMP015") {
+      // console.log(employee);
+    }
+  });
   const [mergedData, setMergeData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userID, setUserID] = useState("");
@@ -58,6 +61,8 @@ IVSSDetails.forEach((employee) => {
     const userType = localStorage.getItem("userType");
     setUserType(userType);
   }, []);
+
+  // console.log(userType);
 
   const reportTiles = [
     { title: "Recruitment & Mobilization", icon: rm, path: "/rm" },
@@ -97,20 +102,20 @@ IVSSDetails.forEach((employee) => {
     { title: "Promotion", icon: rm, path: "/promotion" },
   ];
 
-  const filteredReportTiles = reportTiles.filter(
-    (tile) => tile.show !== false
-  );
+  const filteredReportTiles = reportTiles.filter((tile) => tile.show !== false);
 
   useEffect(() => {
     if (!empPIData || empPIData.length === 0) return;
-  
+
     const mergedExampleData = IVSSDetails.map((item1) => {
       const { empID, tempID } = item1;
-  
+
       // Step 2: Find matching tempID data in WPTrackings and localMobiliz
-      const matchingData2 = WPTrackings.find((item2) => item2.tempID === tempID) || {};
-      const matchingData = localMobiliz.find((item3) => item3.tempID === tempID) || {};
-  
+      const matchingData2 =
+        WPTrackings.find((item2) => item2.tempID === tempID) || {};
+      const matchingData =
+        localMobiliz.find((item3) => item3.tempID === tempID) || {};
+
       // Step 3: Merge all data together
       return {
         ...item1,
@@ -118,12 +123,13 @@ IVSSDetails.forEach((employee) => {
         ...matchingData,
       };
     });
-  
+
     const finalMergedData = empPIData.map((piData) => {
       const empID = piData.empID;
-  
-      const additionalData = mergedExampleData.find((exData) => exData.empID === empID) || {};
-  
+
+      const additionalData =
+        mergedExampleData.find((exData) => exData.empID === empID) || {};
+
       return {
         ...piData,
         ...(IDData?.find((item) => item.empID === empID) || {}),
@@ -144,29 +150,45 @@ IVSSDetails.forEach((employee) => {
         ...additionalData, // Add the merged example data
       };
     });
-  
+
     // Check if finalMergedData is different before updating state
     setMergeData((prev) => {
-      const isEqual =
-        JSON.stringify(prev) === JSON.stringify(finalMergedData);
+      const isEqual = JSON.stringify(prev) === JSON.stringify(finalMergedData);
       return isEqual ? prev : finalMergedData;
     });
-  
+
     setLoading(false);
   }, [
-    empPIData, IDData, workInfoData, terminateData, DNData, PPValidsData, 
-    LMIData, EmpInsuranceData, WeldeInfo, BastingInfo, leaveDetailsData, 
-    trainingCertifi, AddEmpReq, ProbFData, contractForms, IVSSDetails, WPTrackings, localMobiliz
+    empPIData,
+    IDData,
+    workInfoData,
+    terminateData,
+    DNData,
+    PPValidsData,
+    LMIData,
+    EmpInsuranceData,
+    WeldeInfo,
+    BastingInfo,
+    leaveDetailsData,
+    trainingCertifi,
+    AddEmpReq,
+    ProbFData,
+    contractForms,
+    IVSSDetails,
+    WPTrackings,
+    localMobiliz,
   ]);
-  
-  
+
+  const filteredCards = reportTiles.filter((card) =>
+    reportPermissions.includes(card.title)
+  );
   return (
-    <div className="p-10 w-full bg-[#F5F6F1CC]">
+    <div className="p-10 w-full bg-[#F5F6F1CC] min-h-screen">
       <p className="text-2xl font-semibold text-dark_grey text-center uppercase ">
         Report
       </p>
       <div className="grid grid-cols-4 flex-wrap gap-5 mt-14">
-        {filteredReportTiles.map((tile, index) => (
+        {filteredCards.map((tile, index) => (
           <div
             key={index}
             className="flex flex-col justify-center items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg cursor-pointer border-2 border-[#EAD892] w-[200px] h-[150px]"

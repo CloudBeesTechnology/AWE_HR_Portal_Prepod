@@ -300,7 +300,7 @@ export const Jitpa = () => {
         };
 
         await UpdateJitpaData({ JitpaValue });
-        setShowTitle("JITPA Info Updated Successfully");
+        setShowTitle("JITPA Info Stored Successfully");
         setNotification(true);
       } else {
         const creJitpaValue = {

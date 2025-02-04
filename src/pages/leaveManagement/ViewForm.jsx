@@ -38,10 +38,7 @@ export const ViewForm = ({
     return findingSupervisorName;
   });
 
-  // console.log("GM", gmPosition);
-
-  
-  
+  // console.log("GM", gmPosition); 
 
   const getStatusClass = (status) => {
     return status === "Rejected"

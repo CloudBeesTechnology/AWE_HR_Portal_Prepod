@@ -58,7 +58,7 @@ export const TrainingRCData = () => {
         return certifiExpiry;
       })
       .map((item) => ({
-        empId: item.empID || "-",
+        empID: item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
         name: item.name || "-",
         MRNo: item.MRNo || "-",
@@ -123,7 +123,7 @@ export const TrainingRCData = () => {
         return true;
       })
       .map((item) => ({
-        empId: item.empID || "-",
+        empID: item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
         name: item.name || "-",
         MRNo: item.MRNo || "-",

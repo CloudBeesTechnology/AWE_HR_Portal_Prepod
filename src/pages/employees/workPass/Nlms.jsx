@@ -144,13 +144,10 @@ export const Nlms = () => {
     if (!selectedFile) return;
 
     const allowedTypes = [
-      "application/pdf",
-      "image/jpeg",
-      "image/png",
-      "image/jpg",
+      "application/pdf"
     ];
     if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      alert("Upload must be a PDF file");
       return;
     }
 
@@ -318,7 +315,7 @@ export const Nlms = () => {
       };
 
       await uploadNlmsFun({ DoeValue });
-      setShowTitle("NLMS Info Saved Successfully");
+      setShowTitle("NLMS Info Stored Successfully");
       setNotification(true);
     } catch (error) {
       console.error("Error submitting data:", error);

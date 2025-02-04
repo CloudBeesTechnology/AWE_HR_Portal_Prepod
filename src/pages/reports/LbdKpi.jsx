@@ -95,7 +95,7 @@ export const LbdKpi = () => {
   }, [allData]);
   // console.log(tableBody);
 const handleDate = (e, type) => {
-    const value = e.target.value;
+  const value = e.target.value;
     if (type === "startDate") setStartDate(value);
     if (type === "endDate") setEndDate(value);
   
@@ -114,41 +114,39 @@ const handleDate = (e, type) => {
   
         return true;
       })
-      .map((item) => ({
-        empID: item.empID || "-",
-        empBadgeNo: item.empBadgeNo || "-",
-        name: item.name || "-",
-        gender: item.gender || "-",
-        dateOfBirth:formatDate(item.dob)  || "-",
-        dateOfJoin: formatDate(item.doj) || "-",
-        nationality: item.nationality || "-",
-        skillPool: item.skillPool || "-",
-        position: item.position || "-",
-        upgradePosition: Array.isArray(item.upgradePosition)
-          ? formatDate(item.upgradePosition[item.upgradePosition.length - 1])
-          : "-",
-        contactNo: item.contactNo || "-",
-        bruneiIcNo: item.bwnIcNo || "-",
-        // bruneiIcExpiry: Array.isArray(item.bwnIcExpiry)
-        //   ? formatDate(item.bwnIcExpiry[item.bwnIcExpiry.length - 1])
-        //   : "-",
-          malaysianIcNo: item.myIcNo || "-",
-          passportNo: Array.isArray(item.ppNo)
-          ? formatDate(item.ppNo[item.ppNo.length - 1])
-          : "-",
-        immigRefNo: item.immigRefNo || "-",
-        passExpiry: Array.isArray(item.empPassExp)
-          ? formatDate(item.empPassExp[item.empPassExp.length - 1])
-          : "-",
-        educLevel: item.educLevel || "-",
-        agent: item.agent || "-",
-        rawDateOfJoin: new Date(item.doj), // Raw date for sorting
-      }))
-      .sort((a, b) => a.rawDateOfJoin - b.rawDateOfJoin) // Sort by rawDateOfJoin in ascending order
-      .map(({ rawDateOfJoin, ...rest }) => rest); // Remove rawDateOfJoin after sorting
-  
-    setFilteredData(filtered);
-  };
+    .map((item) => ({
+      empID: item.empID || "-",
+      empBadgeNo: item.empBadgeNo || "-",
+      name: item.name || "-",
+      gender: item.gender || "-",
+      dateOfBirth: formatDate(item.dob) || "-",
+      dateOfJoin: formatDate(item.doj) || "-",
+      nationality: item.nationality || "-",
+      skillPool: item.skillPool || "-",
+      position: item.position || "-",
+      upgradePosition: Array.isArray(item.upgradePosition)
+        ? formatDate(item.upgradePosition[item.upgradePosition.length - 1])
+        : "-",
+      contactNo: item.contactNo || "-",
+      bruneiIcNo: item.bwnIcNo || "-",
+      malaysianIcNo: item.myIcNo || "-",
+      passportNo: Array.isArray(item.ppNo)
+        ? formatDate(item.ppNo[item.ppNo.length - 1])
+        : "-",
+      immigRefNo: item.immigRefNo || "-",
+      passExpiry: Array.isArray(item.empPassExp)
+        ? formatDate(item.empPassExp[item.empPassExp.length - 1])
+        : "-",
+      educLevel: item.educLevel || "-",
+      agent: item.agent || "-",
+      // rawDateOfJoin: new Date(item.doj), // Raw date for sorting
+    }))
+    // .sort((a, b) => a.rawDateOfJoin - b.rawDateOfJoin); // Sort by rawDateOfJoin in ascending order
+
+  // Remove the rawDateOfJoin after sorting and update the filtered data
+  setFilteredData(filtered);
+};
+
    return (
      <div>
        <FilterTable

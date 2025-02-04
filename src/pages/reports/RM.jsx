@@ -200,32 +200,20 @@ export const RM = () => {
     const value = e.target.value;
     if (type === "startDate") setStartDate(value);
     if (type === "endDate") setEndDate(value);
-
-    const start =
-      type === "startDate"
-        ? new Date(value)
-        : startDate
-        ? new Date(startDate)
-        : null;
-    const end =
-      type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
-
-    // Sort and filter the data
-    const sortedData = allData
-      .filter((data) => data.doj) // Filter out items without doj
-      .sort((a, b) => {
-        const dateA = new Date(a.doj);
-        const dateB = new Date(b.doj);
-        return dateA - dateB; // Sort by date in ascending order
-      })
+  
+    const start = type === "startDate" ? new Date(value) : startDate ? new Date(startDate) : null;
+    const end = type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
+  
+    const filtered = allData
       .filter((data) => {
-        const doj = new Date(data.doj);
+        const doj = data.doj ? new Date(data.doj) : null;
+  
         if (!doj || isNaN(doj.getTime())) return false;
-
+  
         if (start && end) return doj >= start && doj <= end;
         if (start) return doj >= start;
         if (end) return doj <= end;
-
+  
         return true;
       })
       .map((item) => ({
@@ -296,7 +284,7 @@ export const RM = () => {
         // PreviousEmployment: item.preEmp || "-",
       }));
 
-    setFilteredData(sortedData);
+    setFilteredData(filtered);
   };
 
   return (

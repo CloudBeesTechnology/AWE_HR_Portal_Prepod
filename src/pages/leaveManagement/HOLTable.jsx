@@ -111,6 +111,8 @@ export const HOLTable = () => {
       : "text-[#E8A317]";
   };
 
+
+
   const handleDateChange = (event) => {
     const date = event.target.value;
     setSelectedDate(date);
@@ -146,7 +148,7 @@ export const HOLTable = () => {
 
   const isValidDateFormat = (date) => {
     const datePatternSlash = /^\d{4}\/\d{1,2}\/\d{1,2}$/; // matches yyyy/m/d
-    const datePatternDash = /^\d{4}-\d{2}-\d{2}$/;   // matches yyyy-mm-dd
+    const datePatternDash = /^\d{4}-\d{2}-\d{2}$/; // matches yyyy-mm-dd
     return datePatternSlash.test(date) || datePatternDash.test(date);
   };
 
@@ -219,28 +221,28 @@ export const HOLTable = () => {
                         {capitalizedLetter(item.empLeaveType)}
                       </td>
                       <td className="py-3">
-  {item.empLeaveSelectedFrom
-    ? isValidDateFormat(item.empLeaveSelectedFrom)
-      ? DateFormat(item.empLeaveSelectedFrom)
-      : item.empLeaveSelectedFrom
-    : item.empLeaveStartDate
-    ? isValidDateFormat(item.empLeaveStartDate)
-      ? DateFormat(item.empLeaveStartDate)
-      : item.empLeaveStartDate
-    : "N/A"}
-</td>
+                        {item.empLeaveSelectedFrom
+                          ? isValidDateFormat(item.empLeaveSelectedFrom)
+                            ? DateFormat(item.empLeaveSelectedFrom)
+                            : item.empLeaveSelectedFrom
+                          : DateFormat(item.empLeaveStartDate)
+                          ? isValidDateFormat(item.empLeaveStartDate)
+                            ? DateFormat(item.empLeaveStartDate)
+                            : DateFormat(item.empLeaveStartDate)
+                          : "N/A"}
+                      </td>
 
-<td className="py-3">
-  {item.empLeaveSelectedTo
-    ? isValidDateFormat(item.empLeaveSelectedTo)
-      ? DateFormat(item.empLeaveSelectedTo)
-      : item.empLeaveSelectedTo
-    : item.empLeaveEndDate
-    ? isValidDateFormat(item.empLeaveEndDate)
-      ? DateFormat(item.empLeaveEndDate)
-      : item.empLeaveEndDate
-    : "N/A"}
-</td>
+                      <td className="py-3">
+                        {item.empLeaveSelectedTo
+                          ? isValidDateFormat(item.empLeaveSelectedTo)
+                            ? DateFormat(item.empLeaveSelectedTo)
+                            : item.empLeaveSelectedTo
+                          : item.empLeaveEndDate
+                          ? isValidDateFormat(item.empLeaveEndDate)
+                            ? DateFormat(item.empLeaveEndDate)
+                            : DateFormat(item.empLeaveEndDate)
+                          : "N/A"}
+                      </td>
 
                       <td className="py-3 w-[20%] break-words overflow-hidden">
                         {capitalizedLetter(item.reason)}

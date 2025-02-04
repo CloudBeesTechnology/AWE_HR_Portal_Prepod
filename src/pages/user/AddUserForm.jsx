@@ -189,7 +189,7 @@ export const AddNewForm = () => {
           })
           .then((res) => {
             // console.log(res);
-            setShowTitle("User saved Successfully");
+            setShowTitle("User updated Successfully");
             setNotification(true);
           })
           .catch((err) => {

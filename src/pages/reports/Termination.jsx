@@ -96,7 +96,7 @@ export const Termination = () => {
         return true;
       })
       .map((item) => ({
-        empId: item.empID || "-",
+        empID: item.empID || "-",
         empBadgeNo: item.empBadgeNo || "-",
         name: item.name || "-",
         dateOfJoin: formatDate(item.doj) || "-", // Ensures date is formatted
