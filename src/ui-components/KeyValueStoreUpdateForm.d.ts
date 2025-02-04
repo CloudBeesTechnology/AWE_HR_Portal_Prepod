@@ -36,9 +36,9 @@ export declare type KeyValueStoreUpdateFormInputValues = {
     termiNotifProbDD?: string[];
     resignNotifConfDD?: string[];
     termiNotifConfDD?: string[];
-    workPermitDD?: string;
     insuHSDD?: string[];
     insuClaimDD?: string[];
+    permitWorkDD?: string[];
 };
 export declare type KeyValueStoreUpdateFormValidationValues = {
     departmentDD?: ValidationFunction<string>;
@@ -55,9 +55,9 @@ export declare type KeyValueStoreUpdateFormValidationValues = {
     termiNotifProbDD?: ValidationFunction<string>;
     resignNotifConfDD?: ValidationFunction<string>;
     termiNotifConfDD?: ValidationFunction<string>;
-    workPermitDD?: ValidationFunction<string>;
     insuHSDD?: ValidationFunction<string>;
     insuClaimDD?: ValidationFunction<string>;
+    permitWorkDD?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type KeyValueStoreUpdateFormOverridesProps = {
@@ -76,9 +76,9 @@ export declare type KeyValueStoreUpdateFormOverridesProps = {
     termiNotifProbDD?: PrimitiveOverrideProps<TextFieldProps>;
     resignNotifConfDD?: PrimitiveOverrideProps<TextFieldProps>;
     termiNotifConfDD?: PrimitiveOverrideProps<TextFieldProps>;
-    workPermitDD?: PrimitiveOverrideProps<TextFieldProps>;
     insuHSDD?: PrimitiveOverrideProps<TextFieldProps>;
     insuClaimDD?: PrimitiveOverrideProps<TextFieldProps>;
+    permitWorkDD?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type KeyValueStoreUpdateFormProps = React.PropsWithChildren<{
     overrides?: KeyValueStoreUpdateFormOverridesProps | undefined | null;

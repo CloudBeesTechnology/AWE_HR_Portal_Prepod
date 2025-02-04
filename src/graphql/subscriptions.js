@@ -78,9 +78,9 @@ export const onCreateKeyValueStore = /* GraphQL */ `
       termiNotifProbDD
       resignNotifConfDD
       termiNotifConfDD
-      workPermitDD
       insuHSDD
       insuClaimDD
+      permitWorkDD
       createdAt
       updatedAt
       __typename
@@ -107,9 +107,9 @@ export const onUpdateKeyValueStore = /* GraphQL */ `
       termiNotifProbDD
       resignNotifConfDD
       termiNotifConfDD
-      workPermitDD
       insuHSDD
       insuClaimDD
+      permitWorkDD
       createdAt
       updatedAt
       __typename
@@ -136,9 +136,9 @@ export const onDeleteKeyValueStore = /* GraphQL */ `
       termiNotifProbDD
       resignNotifConfDD
       termiNotifConfDD
-      workPermitDD
       insuHSDD
       insuClaimDD
+      permitWorkDD
       createdAt
       updatedAt
       __typename
