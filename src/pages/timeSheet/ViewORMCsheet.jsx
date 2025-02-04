@@ -372,7 +372,7 @@ export const ViewORMCsheet = ({
     setSecondaryData(remainingData);
     setSelectedRows([]);
     if (remainingData && remainingData.length === 0) {
-      nav("/timeSheet")
+      window.location.reload();
     }
   };
 
@@ -385,6 +385,7 @@ export const ViewORMCsheet = ({
     setSecondaryData(remainingData);
 
     if (remainingData && remainingData.length === 0) {
+      nav("/timeSheet");
       window.location.reload();
     }
   };

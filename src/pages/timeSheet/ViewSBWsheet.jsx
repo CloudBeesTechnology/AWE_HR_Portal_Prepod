@@ -363,8 +363,7 @@ export const ViewSBWsheet = ({
     setSelectedRows([]);
 
     if (remainingData && remainingData.length === 0) {
-      // window.location.reload();
-      nav("/timeSheet")
+      window.location.reload();
     }
   };
 
@@ -377,7 +376,7 @@ export const ViewSBWsheet = ({
     setSecondaryData(remainingData);
 
     if (remainingData && remainingData.length === 0) {
-      nav("/timeSheet"); // Navigate to home page
+      nav("/timeSheet");
       window.location.reload();
     }
   };

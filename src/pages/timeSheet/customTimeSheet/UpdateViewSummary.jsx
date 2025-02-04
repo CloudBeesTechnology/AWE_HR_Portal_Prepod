@@ -117,7 +117,7 @@ export const UpdateViewSummary = async (object) => {
         otTime: object?.overtimeHrs || "",
         normalWorkHrs: object?.NWHPD[object?.NWHPD.length - 1] || "",
         empWorkInfo: [JSON.stringify(jobLocaWhrs)] || [],
-        fileType:object.firstFileType || "",
+        fileType: object.firstFileType || "",
         status: "Approved",
         verify: "Yes",
       };
@@ -155,7 +155,7 @@ export const UpdateViewSummary = async (object) => {
     async function fetchEmployeeData(empDetails) {
       // const empDetails = await fetchAllData(listTimeSheets);
       // console.log("Response : ", empDetails);
-
+     
       const candidates = empDetails;
       function extractNumber(input) {
         const match = input?.match(/-?\d+(\.\d+)?/g); // Matches numbers like 1.5, 7.532648, etc.
@@ -190,7 +190,7 @@ export const UpdateViewSummary = async (object) => {
       await UpdateMethod(assignUpdatedWorkHrs);
     }
     const empDetails = await fetchAllData(listTimeSheets);
-   
+    // console.log("empDetails : ", empDetails);
     if (empDetails && empDetails.length > 0) {
       await fetchEmployeeData(empDetails);
     } else if (empDetails.length === 0) {

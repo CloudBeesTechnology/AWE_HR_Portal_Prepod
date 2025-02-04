@@ -217,7 +217,6 @@ export const TimeSheetBrowser = ({
           setLoading
         );
 
-        console.log(result);
         setReturnedTHeader(result);
 
         fileInputRef.current.value = "";
@@ -261,16 +260,16 @@ export const TimeSheetBrowser = ({
     return (
       <div className="flex items-center justify-center h-[82vh] bg-transparent">
         <div className="flex justify-between gap-2">
-          {loadingState.message === "No Data Available" ? (
+          {/* {loadingState.message === "No Data Available" ? (
             <p className="text-sm font-semibold">{loadingState.message}</p>
-          ) : (
-            <div className="flex justify-between gap-2">
-              <p className="text-sm font-semibold">Loading </p>
-              <p>
-                <FiLoader className="animate-spin mt-[4px]" size={15} />
-              </p>
-            </div>
-          )}
+          ) : ( */}
+          <div className="flex justify-between gap-2">
+            <p className="text-sm font-semibold">Loading </p>
+            <p>
+              <FiLoader className="animate-spin mt-[4px]" size={15} />
+            </p>
+          </div>
+          {/* )} */}
         </div>
       </div>
     );

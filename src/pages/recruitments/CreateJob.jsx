@@ -66,45 +66,22 @@ export const CreateJob = () => {
         setUploadedFileNames((prev) => ({
           uploadJobDetails: selectedFile.name, // Dynamically store file name
         }));
-        const url = `https://71n903ao01.execute-api.ap-southeast-1.amazonaws.com/adininfile/commonfiles/${encodeURIComponent(
+
+        const url = `https://gnth2qx5cf.execute-api.ap-southeast-1.amazonaws.com/fileupload/commonfiles/recruiment%2FapplyJob%2F${watchedJobTitle}%2F${selectedFile.name}`;
+        //s3 bucket link
+        const URLPath = `https://commonfiles.s3.ap-southeast-1.amazonaws.com/recruiment/applyJob/${watchedJobTitle}/${encodeURIComponent(
           selectedFile.name
         )}`;
-        // console.log(url);
+        // console.log(URLPath);
 
-//s3 bucket link
-        // const URLPath = `https://commonfiles.s3.ap-southeast-1.amazonaws.com/recruiment/applyJob/${watchedJobTitle}/${encodeURIComponent(
-        //   selectedFile.name
-        // )}`;
-// console.log(URLPath);
+        setUploadedDocs(URLPath);
 
-        // setUploadedDocs(URLPath);
+        const response = await axios.put(url, selectedFile);
 
-        const response = await fetch(url, {
-          method: "PUT",
-          headers:{ 
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'PUT, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With'
-        },
-          // headers: {
-          //   "Content-Type": "application/octet-stream", // Correct header for file uploads
-          // },
-          body: selectedFile,
-        });
-
-        // Check if the response indicates success
-        if (!response.ok) {
-          throw new Error(
-            `Failed to upload. Status: ${response.status}, Message: ${response.statusText}`
-          );
-        }
-
-        const result = await response.json(); // Parse JSON response if applicable
-        console.log("File uploaded successfully:", result);
+        // console.log("Upload response:", response.data);
       } catch (err) {
-        console.log(err);
+        console.log(err, "1547");
       }
-   
     }
   };
   // console.log(uploadedDocs);
@@ -126,24 +103,6 @@ export const CreateJob = () => {
       console.log(error);
     }
   });
-
-  const newApiChecking = () => {
-    const y = {
-      a: 20,
-      b: 2,
-    };
-    axios({
-      method: "Put",
-      url: "https://gnth2qx5cf.execute-api.ap-southeast-1.amazonaws.com/fileupload",
-      data: y,
-    })
-      .then((res) => {
-        console.log(res, "dfghj");
-      })
-      .catch((err) => {
-        console.log(err, "7415");
-      });
-  };
 
   return (
     <section className="bg-[#F5F6F1CC] mx-auto p-10">
@@ -211,10 +170,6 @@ export const CreateJob = () => {
             Post
           </button>
         </div>
-      </div>
-
-      <div className="bg-primary my-10">
-        <button onClick={newApiChecking}>Checking</button>
       </div>
       {notification && (
         <SpinLogo

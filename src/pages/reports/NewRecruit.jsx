@@ -140,10 +140,10 @@ export const NewRecruit = () => {
           immigRefNo: item.immigRefNo || "-",
         educLevel: item.educLevel || "-",
         previousEmployee: item.preEmp || "-",
-        rawDateOfJoin: new Date(item.doj), // Raw date for sorting
+        // rawDateOfJoin: new Date(item.doj), // Raw date for sorting
       }))
-      .sort((a, b) => a.rawDateOfJoin - b.rawDateOfJoin) // Sort by rawDateOfJoin in ascending order
-      .map(({ rawDateOfJoin, ...rest }) => rest); // Remove rawDateOfJoin after sorting
+      // .sort((a, b) => a.rawDateOfJoin - b.rawDateOfJoin) // Sort by rawDateOfJoin in ascending order
+      // .map(({ rawDateOfJoin, ...rest }) => rest); // Remove rawDateOfJoin after sorting
   
     setFilteredData(filtered);
   };

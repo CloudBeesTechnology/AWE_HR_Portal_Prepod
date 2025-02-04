@@ -74,41 +74,18 @@ export const useTableFieldData = (titleName) => {
       };
       // return { fieldObj, fields, tableHeader };
     }
-
-    {
-      /* {{
-                  BPCOMPANY: "ADININ WORKS & ENGINEERING SDN BHD",
-                  DAILY: "12h 47m",
-                  DAILYTOTAL: "12h 47m",
-                  DAYDIFFERENCE: 0,
-                  EARLIESTENTRYTIME: ["02/12/2024 05:56:49 am"],
-                  ENTRANCEDATE: "12/2/2024",
-                  ENTRYTIME: ["02/12/2024 05:56:49 am"],
-                  EXITTIME: ["02/12/2024 06:43:23 pm"],
-                  FID: 596,
-                  LATESTENTRYTIME: ["02/12/2024 06:43:23 pm"],
-                  NAMEFLAST: "UNTING AK GENA",
-                  NORMALWORKINGHRSPERDAY: "7",
-                  OT: "",
-                  REMARKS: "",
-                  WORKINGHOURS: "",
-                }} */
-    }
     if (type === "BLNG") {
       return {
         fieldObj: {
-          BPCOMPANY:null,
           FID: null,
           NAMEFLAST: null,
-          ENTRANCEDATE: null,
-          EARLIESTENTRYTIME:null,
-          LATESTENTRYTIME:null,
-          ENTRYTIME: null,
-          EXITTIME: null,
+          ENTRANCEDATEUSED: null,
+          ENTRANCEDATETIME: null,
+          EXITDATETIME: null,
           // DAYDIFFERENCE: null,
-          DAILYTOTAL: null,
-
-          DAILY: null,
+          AVGDAILYTOTALBYDAY: null,
+          AHIGHLIGHTDAILYTOTALBYGROUP: null,
+          ADININWORKSENGINEERINGSDNBHD: null,
           NORMALWORKINGHRSPERDAY: null,
           WORKINGHOURS: null,
           OT: null,
@@ -117,17 +94,15 @@ export const useTableFieldData = (titleName) => {
         },
 
         fields: [
-          "BPCOMPANY",
           "FID",
           "NAMEFLAST",
-          "ENTRANCEDATE",
-          "EARLIESTENTRYTIME",
-          "LATESTENTRYTIME",
-          "ENTRYTIME",
-          "EXITTIME",
+          "ENTRANCEDATEUSED",
+          "ENTRANCEDATETIME",
+          "EXITDATETIME",
           // "DAYDIFFERENCE",
-          "DAILYTOTAL",
-          "DAILY",
+          "AVGDAILYTOTALBYDAY",
+          "AHIGHLIGHTDAILYTOTALBYGROUP",
+          "ADININWORKSENGINEERINGSDNBHD",
           "NORMALWORKINGHRSPERDAY",
           "WORKINGHOURS",
           "OT",
@@ -135,17 +110,15 @@ export const useTableFieldData = (titleName) => {
         ],
 
         tableHeader: [
-          "BPCOMPANY",
           "FID",
           "NAME (FLAST)",
-          "ENTRANCE DATE",
-          "EARLIEST ENTRYTIME",
-          "LATEST ENTRYTIME",
-          "ENTRY TIME",
-          "EXIT TIME",
+          "ENTRANCE DATE USED",
+          "ENTRANCE DATETIME",
+          "EXIT DATETIME",
           // "DAY DIFFERENCE",
-          "DAILY TOTAL",
-          "DAILY",
+          "AVG. DAILY TOTAL BY DAY",
+          "A HIGHLIGHT DAILY TOTAL BY GROUP",
+          "ADININ WORK & ENGINEERING SDN BHD",
           "NORMAL WORKING HRS PER DAY",
           "ACTUAL WORKING HOURS",
           "OT",
@@ -302,6 +275,7 @@ export const useTableFieldData = (titleName) => {
           "ACTUAL WORKING HOURS",
           "OT",
           "REMARKS",
+          
         ],
       };
     }

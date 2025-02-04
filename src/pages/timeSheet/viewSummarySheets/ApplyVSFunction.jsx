@@ -332,7 +332,7 @@ export const ApplyVSFunction = ({
 
         const leaveTypeAbbreviation = {
           "Annual Leave": "AL",
-          "Compassionate Leave": "CL",
+          "Compensate Leave": "CL",
           "Unpaid Authorise Leave": "UAL",
           "Sick Leave": "SL",
         };
@@ -370,7 +370,7 @@ export const ApplyVSFunction = ({
             if (isHalfDayLeave(leaveTypeAbbreviation[leaveType])) {
               result[empID].leaveCounts[leaveType] =
                 (result[empID].leaveCounts[leaveType] || 0) + 0.5;
-            } else if (!(leaveType === "Compassionate Leave" && days === 0.5)) {
+            } else if (!(leaveType === "Compensate Leave" && days === 0.5)) {
               result[empID].leaveCounts[leaveType] =
                 (result[empID].leaveCounts[leaveType] || 0) + 1;
             }
@@ -638,6 +638,7 @@ export const ApplyVSFunction = ({
               };
         });
 
+        // console.log("addLeaveTypeCount : ", addLeaveTypeCount);
         // Example usage:
 
         // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -733,7 +734,7 @@ export const ApplyVSFunction = ({
         const updatedData = await updateFieldBasedOnConditions(
           addLeaveTypeCount
         );
-
+        // console.log("updatedData : ", updatedData);
         const getSummaryUpdaterName = async (updatedData) => {
           // Use Promise.all to handle the asynchronous operations
           const results = await Promise.all(
@@ -800,7 +801,6 @@ export const ApplyVSFunction = ({
             : {};
 
           const getEmpDateRange = item.data.find((first) => first.date);
-          const getMealAllow = item.data.map((m) => m.mealAllow);
 
           const id = item?.id;
           const empName = item?.data?.map((m) => m.empName);

@@ -103,7 +103,9 @@ export const ViewTimeSheet = () => {
             (fil) => fil.status !== "All"
           );
           var filterManagerData = removeStatusAll;
-        } else if (Position !== "Manager") {
+        } else if (Position === "SuperAdmin") {
+          var filterManagerData = convertedStringToArrayObj;
+        } else {
           var filterManagerData = await FindSpecificTimeKeeper(
             convertedStringToArrayObj
           );

@@ -94,6 +94,7 @@ export const ViewSummary = () => {
   // }
   const assignWhrslocaly = async (responseData) => {
     responseData?.forEach((input) => {
+      // console.log("input : ", input);
       // Convert the date format from MM/DD/YYYY to D-M-YYYY
       const [month, day, year] = input.date.split("/");
       const formattedDate = `${parseInt(day)}-${parseInt(month)}-${year}`;
@@ -112,10 +113,12 @@ export const ViewSummary = () => {
         const parsedEmpWorkInfo = input.empWorkInfo.flatMap((info) =>
           typeof info === "string" ? JSON.parse(info) : info
         );
-
+        // console.log("Working... 1");
+        // console.log("input : ", input);
         parsedEmpWorkInfo.forEach((info) => {
+          // console.log(info.JOBCODE, "---", existingObj.jobcode);
           if (info.JOBCODE === existingObj.jobcode) {
-          
+            // console.log("Working... 2");
             // Check if the date exists in getVerify and update its value
             if (existingObj.getVerify.hasOwnProperty(formattedDate)) {
               existingObj.getVerify[formattedDate] = input.verify;
@@ -130,9 +133,9 @@ export const ViewSummary = () => {
   };
   const FinalEditedData = async (getObject) => {
     setLoadingMess(false);
-    console.log(getObject);
+    // console.log(getObject);
     const resData = await UpdateViewSummary(getObject);
-    console.log("resData : ", resData);
+    // console.log("resData : ", resData);
     await assignWhrslocaly(resData);
     if (resData && resData.length > 0) {
       const {

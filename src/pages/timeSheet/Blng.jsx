@@ -58,19 +58,14 @@ export const Blng = () => {
         return {
           id: val.id,
           fileName: val.fileName,
-          BPCOMPANY: val.bpCompany || "",
-
           FID: val.fidNo || 0,
           NAMEFLAST: val.empName || "",
-          ENTRANCEDATE: val.date || "",
-          EARLIESTENTRYTIME:
-            val.earliestEntryTime?.replace(/[\[\]]/g, "") || "",
-          LATESTENTRYTIME: val.latestEntryTime.replace(/[\[\]]/g, "") || "",
-          ENTRYTIME: val.inTime?.replace(/[\[\]]/g, "") || "",
-          EXITTIME: val.outTime?.replace(/[\[\]]/g, "") || "",
-          DAILYTOTAL: val.avgDailyTD || "",
-
-          DAILY: val.aweSDN || "",
+          ENTRANCEDATEUSED: val.date || "",
+          ENTRANCEDATETIME: val.inTime?.replace(/[\[\]]/g, "") || "",
+          EXITDATETIME: val.outTime?.replace(/[\[\]]/g, "") || "",
+          AVGDAILYTOTALBYDAY: val.avgDailyTD || "",
+          AHIGHLIGHTDAILYTOTALBYGROUP: val.totalHrs || "",
+          ADININWORKSENGINEERINGSDNBHD: val.aweSDN || "",
           WORKINGHOURS: val.actualWorkHrs || 0,
           OT: val.otTime || 0,
           NORMALWORKINGHRSPERDAY: val?.normalWorkHrs || 0,
@@ -95,7 +90,7 @@ export const Blng = () => {
         try {
           // Wait for the data to arrive
           const hasData = await new Promise((resolve) => {
-            timeoutId = setTimeout(() => resolve(false), 2000); // Fallback after 30 seconds
+            timeoutId = setTimeout(() => resolve(false), 15000); // Fallback after 30 seconds
             if (
               convertedStringToArrayObj &&
               convertedStringToArrayObj.length > 0

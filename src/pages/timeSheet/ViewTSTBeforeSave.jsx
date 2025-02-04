@@ -474,7 +474,7 @@ export const ViewTSTBeforeSave = ({
     setSecondaryData(remainingData);
     setSelectedRows([]);
     if (remainingData && remainingData.length === 0) {
-      nav("/timeSheet");
+      window.location.reload();
     }
   };
 
@@ -487,6 +487,7 @@ export const ViewTSTBeforeSave = ({
     setSecondaryData(remainingData);
 
     if (remainingData && remainingData.length === 0) {
+      nav("/timeSheet");
       window.location.reload();
     }
   };
@@ -534,7 +535,7 @@ export const ViewTSTBeforeSave = ({
           untilDate: managerData.muntilDate,
         };
       });
-      console.log("finalResult : ", finalResult);
+     
       let action = "updateStoredData";
       await TimeSheetsCRUDoperations({
         setNotification,

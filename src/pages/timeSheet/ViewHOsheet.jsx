@@ -393,7 +393,7 @@ export const ViewHOsheet = ({
     setSelectedRows([]);
 
     if (remainingData && remainingData.length === 0) {
-      nav("/timeSheet")
+      window.location.reload();
     }
   };
 
@@ -406,6 +406,7 @@ export const ViewHOsheet = ({
     setSecondaryData(remainingData);
 
     if (remainingData && remainingData.length === 0) {
+      nav("/timeSheet");
       window.location.reload();
     }
   };

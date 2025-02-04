@@ -118,9 +118,11 @@ export const EditTimeSheet = ({
         ...editObject,
 
         [`formatted_${fieldToUpdate}`]: displayedDate, // Add a new field for the formatted date
-        ENTRANCEDATETIME: formattedEntranceDateTime,
-        EXITDATETIME: formattedExitDateTime,
+        [`formatted_${"ENTRANCEDATETIME"}`]: formattedEntranceDateTime,
+        [`formatted_${"EXITDATETIME"}`]: formattedExitDateTime,
       };
+
+    
 
       setFormData(updatedEditObject);
 
@@ -463,6 +465,7 @@ export const EditTimeSheet = ({
       sections &&
       sections.map((val) => {
         return {
+          ...val,
           JOBCODE: val?.JOBCODE,
           LOCATION: val?.LOCATION,
           WORKINGHRS: val?.WORKINGHRS || "",
@@ -526,15 +529,21 @@ export const EditTimeSheet = ({
       // Prepare data with the original date format before saving
       const isDateField = formData.DATE !== undefined;
       const fieldToSave = isDateField ? "DATE" : "ENTRANCEDATEUSED";
+      const entranceDateTime = "ENTRANCEDATETIME";
+      const exitDateTime = "EXITDATETIME";
 
       // Remove the formatted date field and restore the original date
       const dataToSave = {
         ...formData,
         [fieldToSave]: editObject[fieldToSave], // Use the original date
+        [entranceDateTime]: editObject[entranceDateTime],
+        [exitDateTime]: editObject[exitDateTime],
       };
 
       // Clean up unnecessary fields (like formatted_DATE)
       delete dataToSave[`formatted_${fieldToSave}`];
+      delete dataToSave[`formatted_${entranceDateTime}`];
+      delete dataToSave[`formatted_${exitDateTime}`];
 
       // Save the data
       addJCandLocaWhrs(dataToSave);
@@ -584,12 +593,20 @@ export const EditTimeSheet = ({
               <div>
                 <input
                   type="text"
+                  // delete dataToSave[`formatted_${entranceDateTime}`];
+                  // delete dataToSave[`formatted_${exitDateTime}`];
+                  // [`formatted_${ENTRANCEDATETIME}`]: formattedEntranceDateTime,
+                  // [`formatted_${EXITDATETIME}`]: formattedExitDateTime,
                   // name={field}
                   name={
                     field === "DATE"
                       ? "formatted_DATE"
                       : field === "ENTRANCEDATEUSED"
                       ? "formatted_ENTRANCEDATEUSED"
+                      : field === "ENTRANCEDATETIME"
+                      ? "formatted_ENTRANCEDATETIME"
+                      : field === "EXITDATETIME"
+                      ? "formatted_EXITDATETIME"
                       : field
                   }
                   className="border border-slate_grey bg-[#f1f5f9] rounded text-dark_grey text-[16px] text_size_5 outline-none w-full py-[7px] px-3 cursor-auto "

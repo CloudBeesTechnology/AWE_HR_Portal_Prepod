@@ -16,6 +16,11 @@ import { PopupForMissMatchExcelSheet } from "./ModelForSuccessMess/PopupForMissM
 import "../../../src/index.css";
 import { SendDataToManager } from "./customTimeSheet/SendDataToManager";
 import { PopupForAssignManager } from "./ModelForSuccessMess/PopupForAssignManager";
+import {
+  createTimeSheet,
+  deleteTimeSheet,
+  updateTimeSheet,
+} from "../../graphql/mutations";
 
 import { PopupForAddRemark } from "./ModelForSuccessMess/PopupForAddRemark";
 import { FindSpecificTimeKeeper } from "./customTimeSheet/FindSpecificTimeKeeper";
@@ -28,7 +33,6 @@ import { Pagination } from "./timeSheetSearch/Pagination";
 import { AutoFetchForAssignManager } from "./customTimeSheet/AutoFetchForAssignManager";
 import { TimeSheetsCRUDoperations } from "./customTimeSheet/TimeSheetsCRUDoperations";
 import { useRowSelection } from "./customTimeSheet/useRowSelection";
-import { deleteTimeSheet } from "../../graphql/mutations";
 import { useNavigate } from "react-router-dom";
 
 const client = generateClient();
@@ -36,7 +40,7 @@ const client = generateClient();
 export const ViewBLNGsheet = ({
   excelData,
   returnedTHeader,
-
+  convertedStringToArrayObj,
   titleName,
   setExcelData,
   Position,
@@ -64,6 +68,7 @@ export const ViewBLNGsheet = ({
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
   const [rejectTab, setRejectTab] = useState(false);
+  const [editFormTitle, setEditFormTitle] = useState("");
 
   const [toggleForRemark, setToggleForRemark] = useState(null);
   const [allApprovedData, setAllApprovedData] = useState([]);
@@ -72,8 +77,6 @@ export const ViewBLNGsheet = ({
   const [approveMessage, setApproveMessage] = useState(null);
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedItemsTwo, setCheckedItemsTwo] = useState({});
-  const [editFormTitle, setEditFormTitle] = useState("");
-
   const [currentPage, setCurrentPage] = useState(1);
 
   let visibleData;
@@ -174,7 +177,6 @@ export const ViewBLNGsheet = ({
 
                 // Set merged data in state
                 setData(mergedData);
-                console.log("Incomming Data : ", mergedData);
                 setSecondaryData(mergedData);
               } catch (error) {
                 // console.error("Error fetching work info:", error.message);
@@ -198,7 +200,7 @@ export const ViewBLNGsheet = ({
     if (submittedData && submittedData.length > 0) {
       setShowStatusCol(true);
       setCurrentStatus(true);
-      console.log("submittedData : ", submittedData);
+
       setData(submittedData);
       setSecondaryData(submittedData);
     }
@@ -211,7 +213,7 @@ export const ViewBLNGsheet = ({
     } else if (getPosition === "TimeKeeper") {
       setUserIdentification("TimeKeeper");
     }
-  }, [wholeData]);
+  }, [convertedStringToArrayObj]);
 
   const pendingData = (data) => {
     if (data && data.length > 0) {
@@ -238,18 +240,14 @@ export const ViewBLNGsheet = ({
           return {
             id: val.id,
             fileName: val.fileName,
-            BPCOMPANY: val.bpCompany || "",
-
             FID: val.fidNo || 0,
             NAMEFLAST: val.empName || "",
-            ENTRANCEDATE: val.date || "",
-            EARLIESTENTRYTIME: val.earliestEntryTime || "",
-            LATESTENTRYTIME: val.latestEntryTime || "",
-            ENTRYTIME: val.inTime?.replace(/[\[\]]/g, "") || "",
-            EXITTIME: val.outTime?.replace(/[\[\]]/g, "") || "",
-            DAILYTOTAL: val.avgDailyTD || "",
-
-            DAILY: val.aweSDN || "",
+            ENTRANCEDATEUSED: val.date || "",
+            ENTRANCEDATETIME: val.inTime?.replace(/[\[\]]/g, "") || "",
+            EXITDATETIME: val.outTime?.replace(/[\[\]]/g, "") || "",
+            AVGDAILYTOTALBYDAY: val.avgDailyTD || "",
+            AHIGHLIGHTDAILYTOTALBYGROUP: val.totalHrs || "",
+            ADININWORKSENGINEERINGSDNBHD: val.aweSDN || "",
             WORKINGHOURS: val.actualWorkHrs || 0,
             OT: val.otTime || 0,
             NORMALWORKINGHRSPERDAY: val?.normalWorkHrs || 0,
@@ -309,17 +307,17 @@ export const ViewBLNGsheet = ({
 
         return cleanedItem;
       });
-      console.log(cleanData);
+
       const requiredKeys = [
-        "BPCOMPANY",
+        "ADININWORKSENGINEERINGSDNBHD",
         "FID",
-        "NAMEFLAST",
-        "ENTRANCEDATE",
-        "ENTRYTIME",
-        "EXITTIME",
-        "DAYDIFFERENCE",
-        "DAILY",
-        "DAILYTOTAL",
+        "NameFLAST",
+        "EntranceDateUsed",
+        "EntranceDatetime",
+        "ExitDatetime",
+        "DayDifference",
+        "AvgDailyTotalByDay",
+        "AHighlightDailyTotalByGroup",
         // "WORKINGHOURS",
         // "OT",
         // "REMARKS",
@@ -340,7 +338,7 @@ export const ViewBLNGsheet = ({
           });
         resolve(keyCheckResult);
       });
-      console.log(result);
+
       setClosePopup(true);
       setShowStatusCol(result);
       setCurrentStatus(result); // Assuming setCurrentStatus is defined
@@ -437,7 +435,6 @@ export const ViewBLNGsheet = ({
       setEditFormTitle("Edit Form");
     }
   };
-
   const editNestedData = (data, getObject) => {
     return data.map((m) => ({
       id: m.id,
@@ -511,7 +508,7 @@ export const ViewBLNGsheet = ({
     setSecondaryData(remainingData);
     setSelectedRows([]);
     if (remainingData && remainingData.length === 0) {
-      nav("/timeSheet");
+      window.location.reload();
     }
   };
 
@@ -524,10 +521,10 @@ export const ViewBLNGsheet = ({
     setSecondaryData(remainingData);
 
     if (remainingData && remainingData.length === 0) {
+      nav("/timeSheet");
       window.location.reload();
     }
   };
-
   const AllFieldData = useTableFieldData(titleName);
 
   const renameKeysFunctionAndSubmit = async (managerData) => {
@@ -543,19 +540,15 @@ export const ViewBLNGsheet = ({
         selectedRows.map((val, i) => {
           return {
             id: val.id,
-            bpCompany: val?.BPCOMPANY || "",
             fidNo: val?.FID || 0,
             empName: val?.NAMEFLAST || "",
-            date: val?.ENTRANCEDATE || "",
-            earliestEntryTime: val?.EARLIESTENTRYTIME || "",
-            latestEntryTime: val?.LATESTENTRYTIME || "",
-
-            inTime: val?.ENTRYTIME || "",
-            outTime: val?.EXITTIME || "",
+            date: val?.ENTRANCEDATEUSED || "",
+            inTime: val?.ENTRANCEDATETIME || "",
+            outTime: val?.EXITDATETIME || "",
             // day: val?.DAYDIFFERENCE || 0,
-            avgDailyTD: val?.DAILYTOTAL || "",
-
-            aweSDN: val?.DAILY || "",
+            avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
+            totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
+            aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
             normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
             actualWorkHrs: val?.WORKINGHOURS || 0,
             otTime: val?.OT || 0,
@@ -591,7 +584,6 @@ export const ViewBLNGsheet = ({
         selectedRows,
       });
     } else if (userIdentification === "Manager") {
-      setNotification(false);
       const MergedData = [...allApprovedData, ...allRejectedData];
 
       const uniqueArray = MergedData?.filter(
@@ -605,18 +597,15 @@ export const ViewBLNGsheet = ({
               return {
                 id: val.id,
                 // fileName: val.fileName,
-                bpCompany: val?.BPCOMPANY || "",
                 fidNo: val?.FID || 0,
                 empName: val?.NAMEFLAST || "",
-                date: val?.ENTRANCEDATE || "",
-                earliestEntryTime: val?.EARLIESTENTRYTIME || "",
-                latestEntryTime: val?.LATESTENTRYTIME || "",
-                inTime: val?.ENTRYTIME || "",
-                outTime: val?.EXITTIME || "",
+                date: val?.ENTRANCEDATEUSED || "",
+                inTime: val?.ENTRANCEDATETIME || "",
+                outTime: val?.EXITDATETIME || "",
                 // day: val?.DAYDIFFERENCE || 0,
-                avgDailyTD: val?.DAILYTOTAL || "",
-
-                aweSDN: val?.DAILY || "",
+                avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
+                totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
+                aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
                 normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
                 actualWorkHrs: val?.WORKINGHOURS || 0,
                 otTime: val?.OT || 0,
@@ -644,23 +633,6 @@ export const ViewBLNGsheet = ({
         setAllRejectedData,
         handleManagerReload,
       });
-      // {
-      //   BPCOMPANY: "ADININ WORKS & ENGINEERING SDN BHD";
-      //   DAILY: "12h 47m";
-      //   DAILYTOTAL: "12h 47m";
-      //   DAYDIFFERENCE: 0;
-      //   EARLIESTENTRYTIME: 45628.2416550926;
-      //   ENTRANCEDATE: 45628;
-      //   ENTRYTIME: 45628.2416550926;
-      //   EXITTIME: 45628.7739930556;
-      //   FID: 596;
-      //   LATESTENTRYTIME: 45628.7739930556;
-      //   NAMEFLAST: "UNTING AK GENA";
-      //   NORMALWORKINGHRSPERDAY: "";
-      //   OT: "";
-      //   REMARKS: "";
-      //   WORKINGHOURS: "";
-      // }
     } else if (
       userIdentification !== "Manager" &&
       showRejectedItemTable === "Rejected" &&
@@ -673,18 +645,15 @@ export const ViewBLNGsheet = ({
               return {
                 id: val.id,
                 // fileName: val.fileName,
-                bpCompany: val?.BPCOMPANY || "",
                 fidNo: val?.FID || 0,
                 empName: val?.NAMEFLAST || "",
-                date: val?.ENTRANCEDATE || "",
-                earliestEntryTime: val?.EARLIESTENTRYTIME || "",
-                latestEntryTime: val?.LATESTENTRYTIME || "",
-                inTime: val?.ENTRYTIME || "",
-                outTime: val?.EXITTIME || "",
+                date: val?.ENTRANCEDATEUSED || "",
+                inTime: val?.ENTRANCEDATETIME || "",
+                outTime: val?.EXITDATETIME || "",
                 // day: val?.DAYDIFFERENCE || 0,
-                avgDailyTD: val?.DAILYTOTAL || "",
-
-                aweSDN: val?.DAILY || "",
+                avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
+                totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
+                aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
                 normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
                 actualWorkHrs: val?.WORKINGHOURS || 0,
                 otTime: val?.OT || 0,
@@ -721,20 +690,15 @@ export const ViewBLNGsheet = ({
       data.map((val) => {
         return {
           fileName: fileName,
-          bpCompany: val?.BPCOMPANY || "",
-
           fidNo: val?.FID || 0,
           empName: val?.NAMEFLAST || "",
-          date: val?.ENTRANCEDATE || "",
-          earliestEntryTime: val?.EARLIESTENTRYTIME || "",
-          latestEntryTime: val?.LATESTENTRYTIME || "",
-
-          inTime: val?.ENTRYTIME || "",
-          outTime: val?.EXITTIME || "",
+          date: val?.ENTRANCEDATEUSED || "",
+          inTime: val?.ENTRANCEDATETIME || "",
+          outTime: val?.EXITDATETIME || "",
           // day: val?.DAYDIFFERENCE || 0,
-          avgDailyTD: val?.DAILYTOTAL || "",
-
-          aweSDN: val?.DAILY || "",
+          avgDailyTD: val?.AVGDAILYTOTALBYDAY || "",
+          totalHrs: val?.AHIGHLIGHTDAILYTOTALBYGROUP || "",
+          aweSDN: val?.ADININWORKSENGINEERINGSDNBHD || "",
           normalWorkHrs: val?.NORMALWORKINGHRSPERDAY || 0,
           actualWorkHrs: val?.WORKINGHOURS || 0,
           otTime: val?.OT || 0,
@@ -814,7 +778,6 @@ export const ViewBLNGsheet = ({
     );
 
     setData(afterRemoved);
-    setSecondaryData(afterRemoved);
     // setAllApprovedData([]);
     // setAllRejectedData([]);
   }, [allApprovedData, allRejectedData, data]);
@@ -824,9 +787,7 @@ export const ViewBLNGsheet = ({
       const [year, month, day] = dateString?.split("/");
 
       return `${month}/${year}/${day}`; // 'M/D/YYYY'
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   };
 
   const ENTRANCEDATETIME = (getDate) => {
@@ -842,9 +803,7 @@ export const ViewBLNGsheet = ({
 
       // Format the new date
       return `${day}/${month}/${year} ${time}`;
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   };
 
   useEffect(() => {
@@ -976,7 +935,7 @@ export const ViewBLNGsheet = ({
 
                 <tbody>
                   {visibleData && visibleData?.length > 0 ? (
-                    visibleData.slice(0, 10).map((value, index) => {
+                    visibleData.map((value, index) => {
                       const renderRows = (rowData, ind) => {
                         const isStatusPending = rowData?.status === "Pending";
                         const serialNumber =
@@ -1006,42 +965,32 @@ export const ViewBLNGsheet = ({
                               {serialNumber}
                             </td>
                             <td className="text-start px-4 flex-1">
-                              {rowData?.BPCOMPANY}
-                            </td>
-                            <td className="text-start px-4 flex-1">
                               {rowData?.FID}
                             </td>
                             <td className="text-center px-4 flex-1">
                               {rowData?.NAMEFLAST}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {convertToISODate(rowData?.ENTRANCEDATE)}
+                              {convertToISODate(rowData?.ENTRANCEDATEUSED)}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {rowData?.EARLIESTENTRYTIME}
+                              {ENTRANCEDATETIME(rowData?.ENTRANCEDATETIME)}
                               {/* {ENTRANCEDATETIME("9/2/2024 5:50:59 AM")} */}
                             </td>
                             <td className="text-center px-4 flex-1">
-                              {rowData?.LATESTENTRYTIME}
-                            </td>
-                            <td className="text-center px-4 flex-1">
-                              {ENTRANCEDATETIME(rowData?.ENTRYTIME)}
-                              {/* {ENTRANCEDATETIME("9/2/2024 5:50:59 AM")} */}
-                            </td>
-                            <td className="text-center px-4 flex-1">
-                              {ENTRANCEDATETIME(rowData?.EXITTIME)}
+                              {ENTRANCEDATETIME(rowData?.EXITDATETIME)}
                             </td>
                             {/* <td className="text-center px-4 flex-1">
                               {rowData?.DAYDIFFERENCE || 0}
                             </td> */}
                             <td className="text-center px-4 flex-1">
-                              {rowData?.DAILYTOTAL}
+                              {rowData?.AVGDAILYTOTALBYDAY}
                             </td>
-                            {/* <td className="text-center px-4 flex-1">
-                              {rowData?.AHIGHLIGHTDAILYTOTALBYGROUP || ""}
-                            </td> */}
                             <td className="text-center px-4 flex-1">
-                              {rowData?.DAILY || 0}
+                              {rowData?.AHIGHLIGHTDAILYTOTALBYGROUP || ""}
+                            </td>
+                            <td className="text-center px-4 flex-1">
+                              {rowData?.ADININWORKSENGINEERINGSDNBHD || 0}
                             </td>
                             <td className="text-center px-4 flex-1">
                               {rowData?.NORMALWORKINGHRSPERDAY || 0}
@@ -1083,7 +1032,6 @@ export const ViewBLNGsheet = ({
                                           ...prev,
                                           [rowData.id]: false,
                                         }));
-
                                         storeOnlySelectedItem(
                                           rowData,
                                           "Approved"
@@ -1113,6 +1061,7 @@ export const ViewBLNGsheet = ({
                                           ...prev,
                                           [rowData.id]: e.target.checked, // Toggle the checked state for this specific ID
                                         }));
+
                                         setCheckedItems((prev) => ({
                                           ...prev,
                                           [rowData.id]: false,
@@ -1203,70 +1152,70 @@ export const ViewBLNGsheet = ({
                   }
                   onClick={() => {
                     if (userIdentification !== "Manager") {
-                      // if (selectedRows && selectedRows.length > 0) {
-                      //   toggleFunctionForAssiMana();
-                      // } else if (excelData && excelData) {
-                      //   storeInitialData();
-                      // }
-                      const fetchDataAndDelete = async () => {
-                        try {
-                          console.log("Fetching and Deleting SBW Data...");
-                          // setIsDeleting(true); // Set loading state
-                          let nextToken = null; // Initialize nextToken for pagination
-                          do {
-                            // Define the filter for fetching SBW data
-                            const filter = {
-                              and: [{ fileType: { eq: "BLNG" } }],
-                            };
-                            // Fetch the BLNG data using GraphQL with pagination
-                            const response = await client.graphql({
-                              query: listTimeSheets,
-                              variables: {
-                                filter: filter,
-                                nextToken: nextToken,
-                              }, // Pass nextToken for pagination
-                            });
-                            // Extract data and nextToken
-                            const SBWdata =
-                              response?.data?.listTimeSheets?.items || [];
-                            nextToken =
-                              response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
-                            console.log("Fetched SBW Data:", SBWdata);
-                            // Delete each item in the current batch
-                            await Promise.all(
-                              SBWdata.map(async (item) => {
-                                try {
-                                  const deleteResponse = await client.graphql({
-                                    query: deleteTimeSheet,
-                                    variables: { input: { id: item.id } },
-                                  });
-                                  console.log(
-                                    "Deleted Item Response:",
-                                    deleteResponse
-                                  );
-                                } catch (deleteError) {
-                                  console.error(
-                                    `Error deleting item with ID ${item.id}:`,
-                                    deleteError
-                                  );
-                                }
-                              })
-                            );
-                            console.log("Batch deletion completed.");
-                          } while (nextToken); // Continue fetching until no more data
-                          console.log(
-                            "All SBW items deletion process completed."
-                          );
-                        } catch (fetchError) {
-                          console.error(
-                            "Error in fetchDataAndDelete:",
-                            fetchError
-                          );
-                        } finally {
-                          // setIsDeleting(false); // Reset loading state
-                        }
-                      };
-                      fetchDataAndDelete();
+                      if (selectedRows && selectedRows.length > 0) {
+                        toggleFunctionForAssiMana();
+                      } else if (excelData && excelData) {
+                        storeInitialData();
+                      }
+                      // const fetchDataAndDelete = async () => {
+                      //   try {
+                      //     console.log("Fetching and Deleting SBW Data...");
+                      //     // setIsDeleting(true); // Set loading state
+                      //     let nextToken = null; // Initialize nextToken for pagination
+                      //     do {
+                      //       // Define the filter for fetching SBW data
+                      //       const filter = {
+                      //         and: [{ fileType: { eq: "BLNG" } }],
+                      //       };
+                      //       // Fetch the BLNG data using GraphQL with pagination
+                      //       const response = await client.graphql({
+                      //         query: listTimeSheets,
+                      //         variables: {
+                      //           filter: filter,
+                      //           nextToken: nextToken,
+                      //         }, // Pass nextToken for pagination
+                      //       });
+                      //       // Extract data and nextToken
+                      //       const SBWdata =
+                      //         response?.data?.listTimeSheets?.items || [];
+                      //       nextToken =
+                      //         response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
+                      //       console.log("Fetched SBW Data:", SBWdata);
+                      //       // Delete each item in the current batch
+                      //       await Promise.all(
+                      //         SBWdata.map(async (item) => {
+                      //           try {
+                      //             const deleteResponse = await client.graphql({
+                      //               query: deleteTimeSheet,
+                      //               variables: { input: { id: item.id } },
+                      //             });
+                      //             console.log(
+                      //               "Deleted Item Response:",
+                      //               deleteResponse
+                      //             );
+                      //           } catch (deleteError) {
+                      //             console.error(
+                      //               `Error deleting item with ID ${item.id}:`,
+                      //               deleteError
+                      //             );
+                      //           }
+                      //         })
+                      //       );
+                      //       console.log("Batch deletion completed.");
+                      //     } while (nextToken); // Continue fetching until no more data
+                      //     console.log(
+                      //       "All SBW items deletion process completed."
+                      //     );
+                      //   } catch (fetchError) {
+                      //     console.error(
+                      //       "Error in fetchDataAndDelete:",
+                      //       fetchError
+                      //     );
+                      //   } finally {
+                      //     // setIsDeleting(false); // Reset loading state
+                      //   }
+                      // };
+                      // fetchDataAndDelete();
                     } else if (userIdentification === "Manager") {
                       renameKeysFunctionAndSubmit();
                       removeCheckedItem();
