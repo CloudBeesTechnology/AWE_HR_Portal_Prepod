@@ -972,6 +972,7 @@ fieldValue.forEach((val) => {
                   register={register}
                   handleFileChange={handleFileChange}
                   uploadedFileNames={uploadedFileNames}
+                  deleteFile={deleteFile}
                   errors={errors}
                 />
               ) : (

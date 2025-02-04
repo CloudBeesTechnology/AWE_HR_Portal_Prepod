@@ -10,6 +10,7 @@ import { FileUploadNew } from "../medicalDep/FileUploadField";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { useOutletContext } from "react-router-dom";
 import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteDoeNlmsUp";
+import { WorkPermitDD } from "../../../utils/DropDownMenus";
 
 export const Nlms = () => {
   const { searchResultData } = useOutletContext();
@@ -271,10 +272,12 @@ export const Nlms = () => {
     return date ? new Date(date).toLocaleDateString("en-CA") : null;
   };
 
-  const workPermitDD = dropDownVal[0]?.workPermitDD.map((item) => ({
-    value: item,
-    label: item,
-  }));
+//   const workPermitDD = WorkPermitDD?.map((item) => ({
+//     value: item,
+//     label: item,
+//   }));
+// log
+
   const onSubmit = async (data) => {
     try {
       const nlmsEmpSubmit = formatDate(data.nlmsEmpSubmit);
@@ -348,7 +351,7 @@ export const Nlms = () => {
           register={register}
           name="permitType"
           type="select"
-          options={workPermitDD}
+          options={WorkPermitDD}
           errors={errors}
         />
 

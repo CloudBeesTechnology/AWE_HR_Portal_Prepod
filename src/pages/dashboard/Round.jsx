@@ -89,7 +89,7 @@ export const Round = () => {
                     ></div>
                     <div className="w-full flex justify-center items-center flex-col m-1">
                       {/* Job Title */}
-                      <p className="text-sm font-medium">{item.jobTitle}</p>
+                      <p className="text-sm font-medium text-center">{item.jobTitle}</p>
                       {/* Count of matching positions */}
                       <p className="text-lg mt-2">{positionCount}</p>
                     </div>

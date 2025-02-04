@@ -66,8 +66,10 @@ export const CreateJob = () => {
         setUploadedFileNames((prev) => ({
           uploadJobDetails: selectedFile.name, // Dynamically store file name
         }));
-        const url = `https://71n903ao01.execute-api.ap-southeast-1.amazonaws.com/adininfile/commonfiles/${encodeURIComponent(selectedFile.name)}`;
-// console.log(url);
+        const url = `https://71n903ao01.execute-api.ap-southeast-1.amazonaws.com/adininfile/commonfiles/${encodeURIComponent(
+          selectedFile.name
+        )}`;
+        // console.log(url);
 
 //s3 bucket link
         // const URLPath = `https://commonfiles.s3.ap-southeast-1.amazonaws.com/recruiment/applyJob/${watchedJobTitle}/${encodeURIComponent(
@@ -98,15 +100,11 @@ export const CreateJob = () => {
         }
 
         const result = await response.json(); // Parse JSON response if applicable
-        // console.log("File uploaded successfully:", result);
+        console.log("File uploaded successfully:", result);
       } catch (err) {
         console.log(err);
       }
-      // await uploadDocs(selectedFile, type, setUploadedDocs, watchedJobTitle);
-      // setUploadedFileNames((prev) => ({
-      //   ...prev,
-      //   [type]: selectedFile.name, // Dynamically store file name
-      // }));
+   
     }
   };
   // console.log(uploadedDocs);
@@ -128,6 +126,24 @@ export const CreateJob = () => {
       console.log(error);
     }
   });
+
+  const newApiChecking = () => {
+    const y = {
+      a: 20,
+      b: 2,
+    };
+    axios({
+      method: "Put",
+      url: "https://gnth2qx5cf.execute-api.ap-southeast-1.amazonaws.com/fileupload",
+      data: y,
+    })
+      .then((res) => {
+        console.log(res, "dfghj");
+      })
+      .catch((err) => {
+        console.log(err, "7415");
+      });
+  };
 
   return (
     <section className="bg-[#F5F6F1CC] mx-auto p-10">
@@ -195,6 +211,10 @@ export const CreateJob = () => {
             Post
           </button>
         </div>
+      </div>
+
+      <div className="bg-primary my-10">
+        <button onClick={newApiChecking}>Checking</button>
       </div>
       {notification && (
         <SpinLogo
