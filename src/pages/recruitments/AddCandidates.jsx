@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { FaArrowLeft } from "react-icons/fa6";
+import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
 
 export const AddCandidates = () => {
 
@@ -58,9 +59,14 @@ export const AddCandidates = () => {
     <section className="w-full bg-[#F5F6F1] ">
       {/* min-h-screen overflow-y-auto */}
       <div className="w-11/12 relative mx-auto p-6">
-        <h2 className="text-[20px] font-bold mb-4 text-center">
+    <div className=" flex items-center mb-4">
+    <Link to="/recrutiles/candidate" className="text-xl text-grey">
+          <FaArrowLeft />
+        </Link>
+        <h2 className="text-[20px] font-bold flex-1 text-center">
           Application Form
         </h2>
+    </div>
 
         {/* Tab Navigation */}
         <div className="flex justify-between border-b mb-4 text-[14px] font-semibold">

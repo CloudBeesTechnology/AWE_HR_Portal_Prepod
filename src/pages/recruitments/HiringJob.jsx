@@ -1,6 +1,7 @@
 import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { DataSupply } from "../../utils/DataStoredContext";
+import { FaArrowLeft } from "react-icons/fa6";
 
 export const HiringJob = () => {
   useEffect(() => {
@@ -45,6 +46,11 @@ export const HiringJob = () => {
 
   return (
     <section className="bg-[#F5F6F1CC] mx-auto p-10 min-h-screen ">
+          <div className=" flex items-center mb-7">
+          <Link to="/recruitment" className="text-xl text-grey">
+                <FaArrowLeft />
+              </Link>         
+          </div>
       <div className="mb-5 flex justify-between">
         {" "}
         <span className="bg-[#faf362] py-2 px-3 rounded-lg text-[18px] font-semibold">

@@ -138,7 +138,7 @@ export const Sawp = () => {
     setValue("sawpEmpLtrReci", searchResultData.sawpEmpLtrReci || []);
     setRecivedDate(searchResultData.sawpEmpLtrReci || []);
 
-    const fields = ["sawpEmpLtrReci", "sawpEmpLtrReq"];
+    const fields = ["sawpEmpLtrReci", "sawpEmpLtrReq","sawpEmpUpload"];
     fields.forEach((field) => {
       const value = getLastValue(searchResultData[field], field);
       setValue(field, value);

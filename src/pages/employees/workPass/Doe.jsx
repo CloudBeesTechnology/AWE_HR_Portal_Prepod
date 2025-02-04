@@ -148,6 +148,7 @@ export const Doe = () => {
       "doeEmpApproval",
       "doeEmpValid",
       "doeEmpRefNo",
+      "doeEmpUpload"
     ];
     fields.forEach((field) =>
       setValue(field, getLastValue(searchResultData[field]))
