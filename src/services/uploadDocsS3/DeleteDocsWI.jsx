@@ -156,7 +156,7 @@ export const handleDeleteFile = async (
     
   } catch (err) {
     // console.error("Error deleting file:", err);
-    alert("Error processing the file deletion.");
+    // alert("Error processing the file deletion.");
     // console.log("Error:", err);
   }
 };

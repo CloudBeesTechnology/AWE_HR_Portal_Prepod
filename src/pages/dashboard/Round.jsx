@@ -20,7 +20,8 @@ const parseDate = (date) => {
 
 export const Round = () => {
   const { hiringData, empPDData } = useContext(DataSupply);
-  // console.log(hiringData);
+  console.log(hiringData);
+  console.log(empPDData);
 
   const validData = hiringData?.filter((item) => {
     const currentDate = new Date(); // Current date
@@ -61,14 +62,14 @@ export const Round = () => {
                 if (expiryDate < new Date()) return null;
 
                 // Count matching positions in empPDData
-                const positionCount = empPDData?.filter((emp) => {
-                  const empCreatedAt = new Date(emp.createdAt);
-                  return (
-                    emp.position === item.jobTitle && // Matching jobTitle
-                    empCreatedAt >= startDate &&
-                    empCreatedAt <= expiryDate // CreatedAt is within the date range
-                  );
-                }).length;
+                  const positionCount = empPDData?.filter((emp) => {
+                    const empCreatedAt = new Date(emp.createdAt);
+                    return (
+                      emp.position.trim().toLowerCase() === item.jobTitle.trim().toLowerCase() && // Matching jobTitle
+                      empCreatedAt >= startDate &&
+                      empCreatedAt <= expiryDate // CreatedAt is within the date range
+                    );
+                  }).length || 0;
 
                 return (
                   <div
@@ -89,9 +90,9 @@ export const Round = () => {
                     ></div>
                     <div className="w-full flex justify-center items-center flex-col m-1">
                       {/* Job Title */}
-                      <p className="text-sm font-medium">{item.jobTitle}</p>
+                      <p className="text-sm font-medium text-center">{item.jobTitle}</p>
                       {/* Count of matching positions */}
-                      <p className="text-lg mt-2">{positionCount}</p>
+                      <p className="text-lg mt-2 text-center">{positionCount}</p>
                     </div>
                   </div>
                 );
