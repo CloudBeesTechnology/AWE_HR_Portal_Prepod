@@ -115,6 +115,7 @@ import { ContractFormPDF } from "../pages/reports/ContractFormPDF";
 import { ProbationPDF } from "../pages/reports/ProbationPDF";
 import { FiLoader } from "react-icons/fi";
 import {LeaveStatus} from "../components/migratingData/LeaveStatus"
+import { AddDropDown } from "../components/migratingData/AddDropDown";
 const client = generateClient();
 
 const NavigationLinks = () => {
@@ -225,7 +226,7 @@ const NavigationLinks = () => {
       <Routes>
         {/* Change Password */}
         <Route path="/changePassword" element={<ChangePassword />} />
-
+        <Route path="/dropdown" Component={AddDropDown} />
         {/* Migration Data */}
         <Route path="/migrationDataID" element={<IDDetailsMD />} />
         <Route path="/migrationDataEPI" element={<EmpPersonalMD />} />

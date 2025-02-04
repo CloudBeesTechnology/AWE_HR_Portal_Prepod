@@ -27,9 +27,9 @@ type KeyValueStore @aws_iam @aws_api_key {
   termiNotifProbDD: [String]
   resignNotifConfDD: [String]
   termiNotifConfDD: [String]
-  workPermitDD: String
   insuHSDD: [String]
   insuClaimDD: [String]
+  permitWorkDD: [String]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -1451,9 +1451,9 @@ input ModelKeyValueStoreFilterInput {
   termiNotifProbDD: ModelStringInput
   resignNotifConfDD: ModelStringInput
   termiNotifConfDD: ModelStringInput
-  workPermitDD: ModelStringInput
   insuHSDD: ModelStringInput
   insuClaimDD: ModelStringInput
+  permitWorkDD: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelKeyValueStoreFilterInput]
@@ -1476,9 +1476,9 @@ input ModelKeyValueStoreConditionInput {
   termiNotifProbDD: ModelStringInput
   resignNotifConfDD: ModelStringInput
   termiNotifConfDD: ModelStringInput
-  workPermitDD: ModelStringInput
   insuHSDD: ModelStringInput
   insuClaimDD: ModelStringInput
+  permitWorkDD: ModelStringInput
   and: [ModelKeyValueStoreConditionInput]
   or: [ModelKeyValueStoreConditionInput]
   not: ModelKeyValueStoreConditionInput
@@ -1502,9 +1502,9 @@ input CreateKeyValueStoreInput {
   termiNotifProbDD: [String]
   resignNotifConfDD: [String]
   termiNotifConfDD: [String]
-  workPermitDD: String
   insuHSDD: [String]
   insuClaimDD: [String]
+  permitWorkDD: [String]
 }
 
 input UpdateKeyValueStoreInput {
@@ -1523,9 +1523,9 @@ input UpdateKeyValueStoreInput {
   termiNotifProbDD: [String]
   resignNotifConfDD: [String]
   termiNotifConfDD: [String]
-  workPermitDD: String
   insuHSDD: [String]
   insuClaimDD: [String]
+  permitWorkDD: [String]
 }
 
 input DeleteKeyValueStoreInput {
@@ -1548,9 +1548,9 @@ input ModelSubscriptionKeyValueStoreFilterInput {
   termiNotifProbDD: ModelSubscriptionStringInput
   resignNotifConfDD: ModelSubscriptionStringInput
   termiNotifConfDD: ModelSubscriptionStringInput
-  workPermitDD: ModelSubscriptionStringInput
   insuHSDD: ModelSubscriptionStringInput
   insuClaimDD: ModelSubscriptionStringInput
+  permitWorkDD: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionKeyValueStoreFilterInput]

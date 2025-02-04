@@ -25,9 +25,9 @@ type KeyValueStore @model @auth(rules: [{allow: public}]) {
   termiNotifProbDD: [String]
   resignNotifConfDD: [String]
   termiNotifConfDD: [String]
-  workPermitDD: String
   insuHSDD: [String]
   insuClaimDD: [String]
+  permitWorkDD: [String]
 }
 
 type BastingPaint @model @auth(rules: [{allow: public}]) {

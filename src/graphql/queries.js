@@ -61,9 +61,9 @@ export const getKeyValueStore = /* GraphQL */ `
       termiNotifProbDD
       resignNotifConfDD
       termiNotifConfDD
-      workPermitDD
       insuHSDD
       insuClaimDD
+      permitWorkDD
       createdAt
       updatedAt
       __typename
@@ -93,9 +93,9 @@ export const listKeyValueStores = /* GraphQL */ `
         termiNotifProbDD
         resignNotifConfDD
         termiNotifConfDD
-        workPermitDD
         insuHSDD
         insuClaimDD
+        permitWorkDD
         createdAt
         updatedAt
         __typename

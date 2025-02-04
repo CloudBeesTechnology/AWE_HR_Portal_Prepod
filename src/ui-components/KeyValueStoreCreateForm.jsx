@@ -203,9 +203,9 @@ export default function KeyValueStoreCreateForm(props) {
     termiNotifProbDD: [],
     resignNotifConfDD: [],
     termiNotifConfDD: [],
-    workPermitDD: "",
     insuHSDD: [],
     insuClaimDD: [],
+    permitWorkDD: [],
   };
   const [departmentDD, setDepartmentDD] = React.useState(
     initialValues.departmentDD
@@ -241,12 +241,12 @@ export default function KeyValueStoreCreateForm(props) {
   const [termiNotifConfDD, setTermiNotifConfDD] = React.useState(
     initialValues.termiNotifConfDD
   );
-  const [workPermitDD, setWorkPermitDD] = React.useState(
-    initialValues.workPermitDD
-  );
   const [insuHSDD, setInsuHSDD] = React.useState(initialValues.insuHSDD);
   const [insuClaimDD, setInsuClaimDD] = React.useState(
     initialValues.insuClaimDD
+  );
+  const [permitWorkDD, setPermitWorkDD] = React.useState(
+    initialValues.permitWorkDD
   );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
@@ -278,11 +278,12 @@ export default function KeyValueStoreCreateForm(props) {
     setCurrentResignNotifConfDDValue("");
     setTermiNotifConfDD(initialValues.termiNotifConfDD);
     setCurrentTermiNotifConfDDValue("");
-    setWorkPermitDD(initialValues.workPermitDD);
     setInsuHSDD(initialValues.insuHSDD);
     setCurrentInsuHSDDValue("");
     setInsuClaimDD(initialValues.insuClaimDD);
     setCurrentInsuClaimDDValue("");
+    setPermitWorkDD(initialValues.permitWorkDD);
+    setCurrentPermitWorkDDValue("");
     setErrors({});
   };
   const [currentDepartmentDDValue, setCurrentDepartmentDDValue] =
@@ -330,6 +331,9 @@ export default function KeyValueStoreCreateForm(props) {
   const [currentInsuClaimDDValue, setCurrentInsuClaimDDValue] =
     React.useState("");
   const insuClaimDDRef = React.createRef();
+  const [currentPermitWorkDDValue, setCurrentPermitWorkDDValue] =
+    React.useState("");
+  const permitWorkDDRef = React.createRef();
   const validations = {
     departmentDD: [],
     positionDD: [],
@@ -345,9 +349,9 @@ export default function KeyValueStoreCreateForm(props) {
     termiNotifProbDD: [],
     resignNotifConfDD: [],
     termiNotifConfDD: [],
-    workPermitDD: [],
     insuHSDD: [],
     insuClaimDD: [],
+    permitWorkDD: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -389,9 +393,9 @@ export default function KeyValueStoreCreateForm(props) {
           termiNotifProbDD,
           resignNotifConfDD,
           termiNotifConfDD,
-          workPermitDD,
           insuHSDD,
           insuClaimDD,
+          permitWorkDD,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -464,9 +468,9 @@ export default function KeyValueStoreCreateForm(props) {
               termiNotifProbDD,
               resignNotifConfDD,
               termiNotifConfDD,
-              workPermitDD,
               insuHSDD,
               insuClaimDD,
+              permitWorkDD,
             };
             const result = onChange(modelFields);
             values = result?.departmentDD ?? values;
@@ -527,9 +531,9 @@ export default function KeyValueStoreCreateForm(props) {
               termiNotifProbDD,
               resignNotifConfDD,
               termiNotifConfDD,
-              workPermitDD,
               insuHSDD,
               insuClaimDD,
+              permitWorkDD,
             };
             const result = onChange(modelFields);
             values = result?.positionDD ?? values;
@@ -590,9 +594,9 @@ export default function KeyValueStoreCreateForm(props) {
               termiNotifProbDD,
               resignNotifConfDD,
               termiNotifConfDD,
-              workPermitDD,
               insuHSDD,
               insuClaimDD,
+              permitWorkDD,
             };
             const result = onChange(modelFields);
             values = result?.jobCatDD ?? values;
@@ -651,9 +655,9 @@ export default function KeyValueStoreCreateForm(props) {
               termiNotifProbDD,
               resignNotifConfDD,
               termiNotifConfDD,
-              workPermitDD,
               insuHSDD,
               insuClaimDD,
+              permitWorkDD,
             };
             const result = onChange(modelFields);
             values = result?.raceDD ?? values;
@@ -712,9 +716,9 @@ export default function KeyValueStoreCreateForm(props) {
               termiNotifProbDD,
               resignNotifConfDD,
               termiNotifConfDD,
-              workPermitDD,
               insuHSDD,
               insuClaimDD,
+              permitWorkDD,
             };
             const result = onChange(modelFields);
             values = result?.religionDD ?? values;
@@ -775,9 +779,9 @@ export default function KeyValueStoreCreateForm(props) {
               termiNotifProbDD,
               resignNotifConfDD,
               termiNotifConfDD,
-              workPermitDD,
               insuHSDD,
               insuClaimDD,
+              permitWorkDD,
             };
             const result = onChange(modelFields);
             values = result?.nationalityDD ?? values;
@@ -838,9 +842,9 @@ export default function KeyValueStoreCreateForm(props) {
               termiNotifProbDD,
               resignNotifConfDD,
               termiNotifConfDD,
-              workPermitDD,
               insuHSDD,
               insuClaimDD,
+              permitWorkDD,
             };
             const result = onChange(modelFields);
             values = result?.countryORDD ?? values;
@@ -901,9 +905,9 @@ export default function KeyValueStoreCreateForm(props) {
               termiNotifProbDD,
               resignNotifConfDD,
               termiNotifConfDD,
-              workPermitDD,
               insuHSDD,
               insuClaimDD,
+              permitWorkDD,
             };
             const result = onChange(modelFields);
             values = result?.educLevelDD ?? values;
@@ -964,9 +968,9 @@ export default function KeyValueStoreCreateForm(props) {
               termiNotifProbDD,
               resignNotifConfDD,
               termiNotifConfDD,
-              workPermitDD,
               insuHSDD,
               insuClaimDD,
+              permitWorkDD,
             };
             const result = onChange(modelFields);
             values = result?.workStatusDD ?? values;
@@ -1027,9 +1031,9 @@ export default function KeyValueStoreCreateForm(props) {
               termiNotifProbDD,
               resignNotifConfDD,
               termiNotifConfDD,
-              workPermitDD,
               insuHSDD,
               insuClaimDD,
+              permitWorkDD,
             };
             const result = onChange(modelFields);
             values = result?.relationshipDD ?? values;
@@ -1090,9 +1094,9 @@ export default function KeyValueStoreCreateForm(props) {
               termiNotifProbDD,
               resignNotifConfDD,
               termiNotifConfDD,
-              workPermitDD,
               insuHSDD,
               insuClaimDD,
+              permitWorkDD,
             };
             const result = onChange(modelFields);
             values = result?.resignNotifProbDD ?? values;
@@ -1159,9 +1163,9 @@ export default function KeyValueStoreCreateForm(props) {
               termiNotifProbDD: values,
               resignNotifConfDD,
               termiNotifConfDD,
-              workPermitDD,
               insuHSDD,
               insuClaimDD,
+              permitWorkDD,
             };
             const result = onChange(modelFields);
             values = result?.termiNotifProbDD ?? values;
@@ -1225,9 +1229,9 @@ export default function KeyValueStoreCreateForm(props) {
               termiNotifProbDD,
               resignNotifConfDD: values,
               termiNotifConfDD,
-              workPermitDD,
               insuHSDD,
               insuClaimDD,
+              permitWorkDD,
             };
             const result = onChange(modelFields);
             values = result?.resignNotifConfDD ?? values;
@@ -1294,9 +1298,9 @@ export default function KeyValueStoreCreateForm(props) {
               termiNotifProbDD,
               resignNotifConfDD,
               termiNotifConfDD: values,
-              workPermitDD,
               insuHSDD,
               insuClaimDD,
+              permitWorkDD,
             };
             const result = onChange(modelFields);
             values = result?.termiNotifConfDD ?? values;
@@ -1341,46 +1345,6 @@ export default function KeyValueStoreCreateForm(props) {
           {...getOverrideProps(overrides, "termiNotifConfDD")}
         ></TextField>
       </ArrayField>
-      <TextField
-        label="Work permit dd"
-        isRequired={false}
-        isReadOnly={false}
-        value={workPermitDD}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              departmentDD,
-              positionDD,
-              jobCatDD,
-              raceDD,
-              religionDD,
-              nationalityDD,
-              countryORDD,
-              educLevelDD,
-              workStatusDD,
-              relationshipDD,
-              resignNotifProbDD,
-              termiNotifProbDD,
-              resignNotifConfDD,
-              termiNotifConfDD,
-              workPermitDD: value,
-              insuHSDD,
-              insuClaimDD,
-            };
-            const result = onChange(modelFields);
-            value = result?.workPermitDD ?? value;
-          }
-          if (errors.workPermitDD?.hasError) {
-            runValidationTasks("workPermitDD", value);
-          }
-          setWorkPermitDD(value);
-        }}
-        onBlur={() => runValidationTasks("workPermitDD", workPermitDD)}
-        errorMessage={errors.workPermitDD?.errorMessage}
-        hasError={errors.workPermitDD?.hasError}
-        {...getOverrideProps(overrides, "workPermitDD")}
-      ></TextField>
       <ArrayField
         onChange={async (items) => {
           let values = items;
@@ -1400,9 +1364,9 @@ export default function KeyValueStoreCreateForm(props) {
               termiNotifProbDD,
               resignNotifConfDD,
               termiNotifConfDD,
-              workPermitDD,
               insuHSDD: values,
               insuClaimDD,
+              permitWorkDD,
             };
             const result = onChange(modelFields);
             values = result?.insuHSDD ?? values;
@@ -1461,9 +1425,9 @@ export default function KeyValueStoreCreateForm(props) {
               termiNotifProbDD,
               resignNotifConfDD,
               termiNotifConfDD,
-              workPermitDD,
               insuHSDD,
               insuClaimDD: values,
+              permitWorkDD,
             };
             const result = onChange(modelFields);
             values = result?.insuClaimDD ?? values;
@@ -1503,6 +1467,69 @@ export default function KeyValueStoreCreateForm(props) {
           ref={insuClaimDDRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "insuClaimDD")}
+        ></TextField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              departmentDD,
+              positionDD,
+              jobCatDD,
+              raceDD,
+              religionDD,
+              nationalityDD,
+              countryORDD,
+              educLevelDD,
+              workStatusDD,
+              relationshipDD,
+              resignNotifProbDD,
+              termiNotifProbDD,
+              resignNotifConfDD,
+              termiNotifConfDD,
+              insuHSDD,
+              insuClaimDD,
+              permitWorkDD: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.permitWorkDD ?? values;
+          }
+          setPermitWorkDD(values);
+          setCurrentPermitWorkDDValue("");
+        }}
+        currentFieldValue={currentPermitWorkDDValue}
+        label={"Permit work dd"}
+        items={permitWorkDD}
+        hasError={errors?.permitWorkDD?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("permitWorkDD", currentPermitWorkDDValue)
+        }
+        errorMessage={errors?.permitWorkDD?.errorMessage}
+        setFieldValue={setCurrentPermitWorkDDValue}
+        inputFieldRef={permitWorkDDRef}
+        defaultFieldValue={""}
+      >
+        <TextField
+          label="Permit work dd"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentPermitWorkDDValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.permitWorkDD?.hasError) {
+              runValidationTasks("permitWorkDD", value);
+            }
+            setCurrentPermitWorkDDValue(value);
+          }}
+          onBlur={() =>
+            runValidationTasks("permitWorkDD", currentPermitWorkDDValue)
+          }
+          errorMessage={errors.permitWorkDD?.errorMessage}
+          hasError={errors.permitWorkDD?.hasError}
+          ref={permitWorkDDRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "permitWorkDD")}
         ></TextField>
       </ArrayField>
       <Flex
