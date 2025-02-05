@@ -43,6 +43,15 @@ export const EmployeeInfo = () => {
   const { SubmitEIData, errorEmpID } = EmpInfoFunc();
   const { UpdateEIValue } = UpdateEmpInfo();
   const { empPIData, IDData, dropDownVal } = useContext(DataSupply);
+// console.log(empPIData);
+
+  // empPIData.forEach((item) => {
+  //   if (item.empID === "629") {
+  //     console.log(item);
+  //   }
+  // });
+  
+
 
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
