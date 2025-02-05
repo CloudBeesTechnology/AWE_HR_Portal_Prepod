@@ -1,26 +1,31 @@
-
-import { useEffect, useState } from "react";
+import { useEffect, useContext } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { LuPlus, LuMinus } from "react-icons/lu";
-import { EducationSchema } from "../../services/Validation"; // Adjust import as necessary
+import { FaRegMinusSquare } from "react-icons/fa";
+import { CiSquarePlus } from "react-icons/ci";
+import { EducationSchema } from "../../services/Validation"; 
 import { useLocation, useNavigate } from "react-router-dom";
-import { generateClient } from "aws-amplify/api";
-const client = generateClient();
+import { DataSupply } from "../../utils/DataStoredContext";
+import { useTempID } from "../../utils/TempIDContext";
 
-export const EducationDetails = () => {
+export const EducationDetails = ({ fetchedData }) => {
+  const { tempID } = useTempID();
+  const { educDetailsData } = useContext(DataSupply);
+
   const location = useLocation();
   const navigatingPersonalData = location.state?.FormData;
-  // console.log("Received form data:", navigatingPersonalData );
+
   useEffect(() => {
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
   }, []);
+
   const {
     handleSubmit,
     control,
+    setValue,
     formState: { errors },
     watch,
   } = useForm({
@@ -45,8 +50,20 @@ export const EducationDetails = () => {
       crimeDesc: "",
     },
   });
+
+  useEffect(() => {
+    if (fetchedData) {
+      setValue("disease", fetchedData.disease || "no");
+      setValue("liquor", fetchedData.liquor || "no");
+      setValue("crime", fetchedData.crime || "no");
+      setValue("diseaseDesc", fetchedData.diseaseDesc || "");
+      setValue("liquorDesc", fetchedData.liquorDesc || "");
+      setValue("crimeDesc", fetchedData.crimeDesc || "");
+    }
+  }, [fetchedData, setValue]);
+
   const navigate = useNavigate();
-  // const { handleNext } = useOutletContext();
+
   const {
     fields: emgDetails,
     append: appendEmergency,
@@ -83,8 +100,9 @@ export const EducationDetails = () => {
     });
   };
 
+  
   const handleAddReferee = () => {
-    // Append a new referee object with isNew flag set to true
+ 
     appendCharacterReferee({
       name: "",
       address: "",
@@ -95,7 +113,7 @@ export const EducationDetails = () => {
   };
 
   const handleAddRelative = () => {
-    // Append a new empty field set with isNew flag to identify it as newly added
+
     appendRelative({
       name: "",
       positionHeld: "",
@@ -104,25 +122,98 @@ export const EducationDetails = () => {
     });
   };
 
+  useEffect(() => {
+
+    const savedData = JSON.parse(localStorage.getItem("educationFormData"));
+    if (savedData) {
+      Object.keys(savedData).forEach((key) => setValue(key, savedData[key]));
+    }
+  
+    const handleBeforeUnload = () => {
+      localStorage.removeItem("educationFormData");
+    };
+  
+    window.addEventListener("beforeunload", handleBeforeUnload);
+  
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [location, setValue]); 
 
   const onSubmit = (data) => {
-    console.log(data);
+ 
     const navigatingEduData = {
       ...data,
       ...navigatingPersonalData,
     };
-    // setNavigateEduData(navigatingEduData)
-    console.log(navigatingEduData);
-    // handleNext();
+
+    localStorage.setItem("educationFormData", JSON.stringify(navigatingEduData));
+
     navigate("/addCandidates/otherDetails", {
       state: { FormData: navigatingEduData },
     });
   };
 
+
+  useEffect(() => {
+    const parseDetails = (data) => {
+      try {
+        let cleanedData = data.replace(/\\/g, ""); 
+        cleanedData = cleanedData.replace(/'/g, '"'); 
+        cleanedData = cleanedData.replace(/([{,])(\s*)([a-zA-Z0-9_]+)(\s*):/g, '$1"$3":'); 
+        cleanedData = cleanedData.replace(/:([a-zA-Z0-9_/.\s]+)(?=\s|,|\})/g, ':"$1"'); 
+        if (cleanedData.startsWith('"') && cleanedData.endsWith('"')) {
+          cleanedData = cleanedData.slice(1, -1); 
+        }
+  
+        const parsedData = JSON.parse(cleanedData);
+  
+        if (!Array.isArray(parsedData)) {
+          return [];
+        }
+  
+        return parsedData;
+      } catch (error) {
+        console.error("Error parsing details:", error);
+        return [];
+      }
+    };
+  
+    if (tempID) {
+      if (educDetailsData.length > 0) {
+        const interviewData = educDetailsData.find((data) => data.tempID === tempID);
+        if (interviewData) {
+          Object.keys(interviewData).forEach((key) => {
+
+            if (key === "emgDetails" || key === "referees" || key === "relatives") {
+              if (Array.isArray(interviewData[key]) && typeof interviewData[key][0] === "string") {
+      
+                let parsedData = parseDetails(interviewData[key][0]);
+                if (parsedData.length > 0) {
+                  setValue(key, parsedData);
+                }
+              }
+            } else if (interviewData[key]) {
+              setValue(key, interviewData[key]);
+            } else {
+              // console.log(`No value for key ${key}`);
+            }
+          });
+        } else {
+          // console.log("No interview data found for tempID:", tempID);
+        }
+      } else {
+        // console.log("educDetailsData is empty");
+      }
+    } else {
+      // console.log("tempID is not set");
+    }
+  }, [tempID, setValue, educDetailsData]);
+   
+  
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="">
-      {/* h-screen overflow-y-auto scrollbar-hide */}
-      {/* Character Referees */}
+   
       <div className="relative mt-10">
         <label className="text_size_6 mb-3">
           Characters Referees{" "}
@@ -179,24 +270,23 @@ export const EducationDetails = () => {
             {referee.isNew && (
               <button
                 type="button"
-                onClick={() => removeCharacterReferee(index)} // Remove specific field set
+                onClick={() => removeCharacterReferee(index)} 
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <LuMinus />
+                <FaRegMinusSquare />
               </button>
             )}
           </div>
         ))}
         <button
           type="button"
-          onClick={handleAddReferee} // Add a new referee with isNew: true
+          onClick={handleAddReferee} 
           className="absolute top-11 -right-7 text-medium_grey text-[18px]"
         >
-          <LuPlus />
+          <CiSquarePlus />
         </button>
       </div>
 
-      {/* Relatives Employed by the Company */}
       <div className="relative">
         <label className="text_size_6 mb-3">
           Relatives Employed by the company
@@ -240,10 +330,10 @@ export const EducationDetails = () => {
             {relative.isNew && (
               <button
                 type="button"
-                onClick={() => removeRelative(index)} // Remove specific field set
+                onClick={() => removeRelative(index)} 
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <LuMinus /> {/* Minus icon */}
+                <FaRegMinusSquare /> 
               </button>
             )}
           </div>
@@ -253,17 +343,17 @@ export const EducationDetails = () => {
           onClick={handleAddRelative}
           className="absolute top-11 -right-7 text-medium_grey text-[18px]"
         >
-          <LuPlus />
+          <CiSquarePlus />
         </button>
       </div>
 
-      {/* Brief Description of Present Duties */}
+    
       <div>
         <label className="text_size_6 mb-3">
           Brief Description of Present Duties
         </label>
         <Controller
-          name="description"
+          name="desc"
           control={control}
           render={({ field }) => (
             <textarea
@@ -275,7 +365,6 @@ export const EducationDetails = () => {
         />
       </div>
 
-      {/* Emergency Contact */}
       <div className="mb-4 relative text_size_6">
         <label className="block mb-1">In Case of Accident / Emergency</label>
         {emgDetails.map((emergency, index) => (
@@ -373,10 +462,10 @@ export const EducationDetails = () => {
             {emergency.isNew && (
               <button
                 type="button"
-                onClick={() => removeEmergency(index)} // Remove specific field set
+                onClick={() => removeEmergency(index)} 
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <LuMinus /> {/* Minus icon */}
+                <FaRegMinusSquare /> 
               </button>
             )}
           </div>
@@ -386,11 +475,10 @@ export const EducationDetails = () => {
           onClick={handleAddEmergency}
           className="absolute top-11 -right-7 text-medium_grey text-[18px]"
         >
-          <LuPlus />
+          <CiSquarePlus />
         </button>
       </div>
 
-      {/* Yes or NO */}
 
       {[
         {
@@ -412,50 +500,32 @@ export const EducationDetails = () => {
           </div>
           <div className="flex justify-between items-center mb-5">
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Controller
-                  name={section.field}
-                  control={control}
-                  defaultValue="no" // Set initial value
-                  render={({ field }) => (
-                    <>
-                      <input
-                        type="radio"
-                        id={`${section.field}_yes`}
-                        {...field}
-                        value="yes"
-                        name={`${section.field}`}
-                        className="border p-2.5 rounded"
-                      />
-                      <label htmlFor={`${section.field}_yes`}>Yes</label>
-                    </>
-                  )}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <Controller
-                  name={section.field}
-                  control={control}
-                  defaultValue="no" // Set initial value
-                  render={({ field }) => (
-                    <>
-                      <input
-                        type="radio"
-                        id={`${section.field}_no`}
-                        {...field}
-                        value="no"
-                        name={`${section.field}`}
-                        defaultChecked
-                        className="border p-2.5 rounded"
-                      />
-                      <label htmlFor={`${section.field}_no`}>No</label>
-                    </>
-                  )}
-                />
-              </div>
+              {["yes", "no"].map((value) => (
+                <div key={value} className="flex items-center gap-2">
+                  <Controller
+                    name={section.field}
+                    control={control}
+                    render={({ field }) => (
+                      <>
+                        <input
+                          type="radio"
+                          id={`${section.field}_${value}`}
+                          {...field}
+                          value={value}
+                          checked={field.value === value}
+                          onChange={() => setValue(section.field, value)}
+                          className="border p-2.5 rounded"
+                        />
+                        <label htmlFor={`${section.field}_${value}`}>
+                          {value.charAt(0).toUpperCase() + value.slice(1)}
+                        </label>
+                      </>
+                    )}
+                  />
+                </div>
+              ))}
             </div>
 
-            {/* Conditional Description Input */}
             <div className="items-center">
               <label
                 htmlFor={`${section.field}Desc`}
@@ -466,7 +536,6 @@ export const EducationDetails = () => {
               <Controller
                 name={`${section.field}Desc`}
                 control={control}
-                defaultValue="" // Set initial value
                 render={({ field }) => (
                   <input
                     id={`${section.field}Desc`}
@@ -474,7 +543,7 @@ export const EducationDetails = () => {
                     className={`w-[450px] mt-2 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded ${
                       errors[`${section.field}Desc`] ? "border-red-500" : ""
                     }`}
-                    disabled={watch(section.field) !== "yes"} // Disable when "No" is selected
+                    disabled={watch(section.field) !== "yes"} 
                   />
                 )}
               />
@@ -488,7 +557,6 @@ export const EducationDetails = () => {
         </div>
       ))}
 
-      {/* Submit Button */}
       <div className="flex justify-center my-7 gap-10">
         <button type="submit" className="primary_btn">
           Next

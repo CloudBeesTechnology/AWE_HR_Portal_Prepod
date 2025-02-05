@@ -1,19 +1,20 @@
-
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { PersonalSchema } from "../../services/Validation";
-import { LuPlus, LuMinus } from "react-icons/lu";
-import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { generateClient } from "aws-amplify/api";
+import { FaRegMinusSquare } from "react-icons/fa";
+import { CiSquarePlus } from "react-icons/ci";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useContext } from "react";
 import { BwnIcColourDD, LanguageDD } from "../../utils/DropDownMenus";
-const client = generateClient();
+import { useTempID } from "../../utils/TempIDContext";
+import { DataSupply } from "../../utils/DataStoredContext";
+
 
 export const PersonalDetails = () => {
+  const { tempID } = useTempID();
+  const { empPDData } = useContext(DataSupply);
   const location = useLocation();
   const applicationData = location.state?.FormData;
-
-  // console.log("Received form data:", applicationData);
 
   useEffect(() => {
     window.scrollTo({
@@ -21,27 +22,25 @@ export const PersonalDetails = () => {
       behavior: "smooth",
     });
   }, []);
+
   const {
     register,
-    handleSubmit,
+    handleSubmit, 
     control,
     setValue,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(PersonalSchema(applicationData?.nationality)),
 
     defaultValues: {
-      familyDetails: [{}], // Initialize with one empty family detail
-      eduDetails: [{ university: "", fromDate: "", toDate: "", degree: "" }], // Initialize with one empty education detail
-      workExperience: [{}], // Initialize with one empty employment detail
+      familyDetails: [{ name: "", relationship: "", age: "", occupation: "", placeOfOccupation: "" }],
+      eduDetails: [{ university: "", fromDate: "", toDate: "", degree: "" }],
+      workExperience: [{ company: "", position: "", from: "", to: "" }],
     },
   });
-  // useEffect(() => {
-  //   const savedData = JSON.parse(localStorage.getItem("personalFormData"));
-  //   if (savedData) {
-  //     Object.keys(savedData).forEach((key) => setValue(key, savedData[key]));
-  //   }
-  // }, [setValue]);
+
+
   const {
     fields: familyFields,
     append: appendFamily,
@@ -70,43 +69,115 @@ export const PersonalDetails = () => {
   });
 
   const handleAddFamily = () => {
-    // Append a new empty field set with isNew flag to identify it as newly added
+    
     appendFamily({ isNew: true });
   };
   const handleAddEducation = () => {
-    // Append a new empty field set with isNew flag to identify it as newly added
+    
     appendEducation({ isNew: true });
   };
   const handleAddEmployment = () => {
-    // Append a new empty field set with isNew flag to identify it as newly added
+    
     appendEmployment({ isNew: true });
   };
 
   const navigate = useNavigate();
 
-  // const { handleNext } = useOutletContext();
+  useEffect(() => {
+
+  const savedData = JSON.parse(localStorage.getItem("personalFormData"));
+  if (savedData) {
+    Object.keys(savedData).forEach((key) => setValue(key, savedData[key]));
+  }
+
+  const handleBeforeUnload = () => {
+    localStorage.removeItem("personalFormData");
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+  };
+}, [location, setValue]); 
+
+
   const onSubmit = (data) => {
-    // const personalData = data;
-    // console.log(data);
+ 
     const navigatingData = {
       ...data,
       ...applicationData,
     };
     localStorage.setItem("personalFormData", JSON.stringify(navigatingData));
 
-    // setNavigateData(navigatingData);
-    // handleNext();
-    console.log(navigatingData);
     navigate("/addCandidates/educationDetails", {
       state: { FormData: navigatingData },
     });
+   
   };
+
+
+  useEffect(() => {
+  
+    const parseDetails = (data) => {
+      try {
+        let cleanedData = data.replace(/\\/g, ""); 
+        cleanedData = cleanedData.replace(/'/g, '"'); 
+        cleanedData = cleanedData.replace(/([{,])(\s*)([a-zA-Z0-9_]+)(\s*):/g, '$1"$3":'); 
+        cleanedData = cleanedData.replace(/:([a-zA-Z0-9_/.\s]+)(?=\s|,|\})/g, ':"$1"'); 
+        if (cleanedData.startsWith('"') && cleanedData.endsWith('"')) {
+          cleanedData = cleanedData.slice(1, -1); 
+        }
+  
+        const parsedData = JSON.parse(cleanedData);
+  
+        if (!Array.isArray(parsedData)) {
+          return [];
+        }
+  
+        return parsedData;
+      } catch (error) {
+        console.error("Error parsing details:", error);
+        return [];
+      }
+    };
+  
+    if (tempID) {
+      if (empPDData.length > 0) {
+        const interviewData = empPDData.find((data) => data.tempID === tempID);
+        if (interviewData) { 
+          Object.keys(interviewData).forEach((key) => {
+            if (key === "familyDetails" || key === "workExperience" || key === "eduDetails") {
+              if (Array.isArray(interviewData[key]) && typeof interviewData[key][0] === "string") {
+                
+                let parsedData = parseDetails(interviewData[key][0]);
+                if (parsedData.length > 0) {
+                  setValue(key, parsedData);
+                }
+              }
+            } else if (interviewData[key]) {
+              setValue(key, interviewData[key]);
+            } else {
+              // console.log(`No value for key ${key}`);
+            }
+          });
+        } else {
+          // console.log("No interview data found for tempID:", tempID);
+        }
+      } else {
+        // console.log("empPDData is empty");
+      }
+    } else {
+      // console.log("tempID is not set");
+    }
+  }, [tempID, setValue, empPDData]);
+   
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className=" mx-auto py-6">
-      {/* h-screen overflow-y-auto scrollbar-hide */}
-      {/* Passport No and Contact No */}
+
       <div className="grid grid-cols-2 gap-4 mb-4 text_size_6">
-      <div>
+        <div>
           <label className="block mb-1">Contact Number</label>
           <input
             type="text"
@@ -130,10 +201,9 @@ export const PersonalDetails = () => {
             </p>
           )}
         </div>
-
       </div>
 
-      {/* Present Address and Permanent Address */}
+   
       <div className="grid grid-cols-2 gap-4 mb-4 text_size_6">
         <div>
           <label className="block mb-1">Present Address</label>
@@ -161,7 +231,7 @@ export const PersonalDetails = () => {
         </div>
       </div>
 
-      {/* Driving License Class and Language Proficiency */}
+ 
       <div className="grid grid-cols-2 gap-4 mb-4 text_size_6">
         <div>
           <label className="block mb-1">Driving License Class</label>
@@ -190,7 +260,6 @@ export const PersonalDetails = () => {
         </div>
       </div>
 
-      {/* I/C No and I/C Colour */}
       <div className="grid grid-cols-3 gap-4 mb-4 text_size_6">
         <div>
           <label className="block mb-1">Brunei I/C No</label>
@@ -215,9 +284,7 @@ export const PersonalDetails = () => {
                 {option.label}
               </option>
             ))}
-            {/* <option value="Green">Green</option>
-            <option value="Yellow">Yellow</option>
-            <option value="Red">Red</option> */}
+    
           </select>
           {errors.bwnIcColour && (
             <p className="text-[red] text-[12px]">
@@ -288,67 +355,81 @@ export const PersonalDetails = () => {
           )}
         </div>
       </div>
-      {/* Family Details */}
+    
       <div className="mb-4 relative text_size_6">
         <label className="block mb-1">
           Particulars of Immediate Family (Spouse, Children, Parents, Brothers &
           Sisters)
         </label>
-        {familyFields.map((family, index) => (
-          <div key={family.id} className="grid grid-cols-5 gap-4 mb-2">
-            <input
-              type="text"
-              {...register(`familyDetails.${index}.name`)}
-              placeholder="Name"
-              className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
-            />
-            <input
-              type="text"
-              {...register(`familyDetails.${index}.relationship`)}
-              placeholder="Relationship"
-              className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
-            />
-            <input
-              type="text"
-              {...register(`familyDetails.${index}.age`)}
-              placeholder="Age"
-              className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
-            />
-            <input
-              type="text"
-              {...register(`familyDetails.${index}.occupation`)}
-              placeholder="Occupation"
-              className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
-            />
-            <input
-              type="text"
-              {...register(`familyDetails.${index}.placeOfOccupation`)}
-              placeholder="Place of Occupation"
-              className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
-            />
-            {family.isNew && (
-              <button
-                type="button"
-                onClick={() => removeFamily(index)} // Remove specific field set
-                className="absolute top-15 -right-7 text-medium_grey text-[18px]"
-              >
-                <LuMinus /> {/* Minus icon */}
-              </button>
-            )}
-          </div>
-        ))}
+        {Object.keys(familyFields).map((key, index) => {
+    
+          const family = familyFields[key];
+
+          return (
+            <div key={family.id} className="grid grid-cols-5 gap-4 mb-2">
+              <input
+                type="text"
+                {...register(`familyDetails[${index}].name`)}
+                defaultValue={family.name}
+                placeholder="Name"
+                className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+              />
+              <input
+                type="text"
+                {...register(`familyDetails.${index}.relationship`)}
+                defaultValue={family.relationship}
+                placeholder="Relationship"
+                className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+              />
+              <input
+                type="text"
+                {...register(`familyDetails.${index}.age`)}
+                defaultValue={family.age}
+                placeholder="Age"
+                className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+              />
+              <input
+                type="text"
+                {...register(`familyDetails.${index}.occupation`)}
+                defaultValue={family.occupation}
+                placeholder="Occupation"
+                className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+              />
+              <input
+                type="text"
+                {...register(`familyDetails.${index}.placeOfOccupation`)}
+                defaultValue={family.placeOfOccupation}
+                placeholder="Place of Occupation"
+                className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+              />
+              {family.isNew && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    console.log(`Removing family member at index: ${index}`);
+                    removeFamily(index);
+                  }}
+                  className="absolute top-15 -right-7 text-medium_grey text-[18px]"
+                >
+                  <FaRegMinusSquare /> 
+                </button>
+              )}
+            </div>
+          );
+        })}
 
         <button
           type="button"
-          onClick={handleAddFamily}
-          // onClick={() => appendFamily({})}
+          onClick={() => {
+            handleAddFamily() 
+          }}
           className="absolute top-11 -right-7 text-medium_grey text-[18px]"
         >
-          <LuPlus />
+          <CiSquarePlus />
         </button>
       </div>
 
-      {/* Education Details */}
+
       <div className="mb-4 relative text_size_6">
         <label className="block mb-1">Education Details</label>
         {educationFields.map((education, index) => (
@@ -431,25 +512,28 @@ export const PersonalDetails = () => {
             {education.isNew && (
               <button
                 type="button"
-                onClick={() => removeEducation(index)} // Remove specific field set
+                onClick={() => {
+                  removeEducation(index);
+                }}
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <LuMinus /> {/* Minus icon */}
+                <FaRegMinusSquare /> 
               </button>
             )}
           </div>
         ))}
         <button
           type="button"
-          onClick={handleAddEducation}
-          // onClick={() => appendEducation({})}
+          onClick={() => {
+            handleAddEducation() 
+          }}
+       
           className="absolute top-12 -right-7 text-medium_grey text-[18px]"
         >
-          <LuPlus />
+          <CiSquarePlus />
         </button>
       </div>
 
-      {/* Employment Details */}
       <div className="mb-4 relative text_size_6">
         <label className="block mb-1">
           Previous Employment Including Temporary Work
@@ -496,10 +580,12 @@ export const PersonalDetails = () => {
             {employment.isNew && (
               <button
                 type="button"
-                onClick={() => removeEmployment(index)} // Remove specific field set
+                onClick={() => {
+                  removeEmployment(index);
+                }}
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <LuMinus /> {/* Minus icon */}
+                <FaRegMinusSquare /> 
               </button>
             )}
           </div>
@@ -507,19 +593,18 @@ export const PersonalDetails = () => {
         <button
           type="button"
           onClick={handleAddEmployment}
-          // onClick={() => appendEmployment({})}
           className="absolute top-11 -right-7 text-medium_grey text-[18px]"
         >
-          <LuPlus />
+          <CiSquarePlus />
         </button>
       </div>
 
-      {/* Submit Button */}
       <div className="flex justify-center mt-12 gap-10">
         <button type="submit" className="primary_btn">
           Next
         </button>
       </div>
+
     </form>
   );
 };
