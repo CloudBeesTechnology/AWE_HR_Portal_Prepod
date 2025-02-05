@@ -33,47 +33,63 @@ export const ChangePassword = () => {
   const Submit = handleSubmit(async (data) => {
     const { password: newPassword, currentPassword: oldPassword } = data;
     try {
-
       const currentUser = await getCurrentUser();
       const userID = localStorage.getItem("userID")?.toUpperCase();
+
       if (currentUser) {
-        // Call updatePassword directly
         await updatePassword({
           oldPassword: oldPassword,
           newPassword: newPassword,
         });
-        const userData = await client.graphql({
-          query: listUsers,
-          variables: { filter: { empID: { eq: userID } } },
-        });
 
-        const id = userData?.data?.listUsers?.items[0].id;
-        await client
-          .graphql({
-            query: updateUser,
+        let userData = [];
+        let nextToken = null;
+
+        do {
+          const response = await client.graphql({
+            query: listUsers,
             variables: {
-              input: {
-                id: id,
-                password: newPassword,
-              },
+              filter: { empID: { eq: userID } },
+              nextToken,
             },
-          })
-          .then(async(res) => {
-            console.log(res);
-            localStorage.removeItem("userID");
-            localStorage.removeItem("userType");
-            await signOut()
-            window.location.href = "/login";
           });
 
-        console.log("Password reset successfully");
+          userData = [...userData, ...(response?.data?.listUsers?.items || [])];
+          nextToken = response?.data?.listUsers?.nextToken;
+        } while (nextToken);
+
+        if (userData.length > 0) {
+          const id = userData[0].id;
+
+          await client
+            .graphql({
+              query: updateUser,
+              variables: {
+                input: {
+                  id: id,
+                  password: newPassword,
+                },
+              },
+            })
+            .then(async (res) => {
+              console.log(res);
+              localStorage.removeItem("userID");
+              localStorage.removeItem("userType");
+              await signOut();
+              window.location.href = "/login";
+            });
+
+          console.log("Password reset successfully");
+        } else {
+          console.log("User not found");
+        }
       }
     } catch (error) {
       console.log(error);
-
       setError(error.message);
     }
   });
+  
   return (
     // <Authenticator>
 

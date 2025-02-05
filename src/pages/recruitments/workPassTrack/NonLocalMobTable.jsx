@@ -7,7 +7,7 @@ import { listEmpPersonalInfos } from "../../../graphql/queries";
 import { CandiToEmp } from "../status/ConvertCandiToEmp";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { UpdateMobilization } from "../../../services/updateMethod/UpdateMobilization";
-
+ 
 
 export const NonLocalMobTable = ({ data, formatDate, fileUpload, urlValue }) => {
   const client = generateClient();
@@ -47,44 +47,47 @@ export const NonLocalMobTable = ({ data, formatDate, fileUpload, urlValue }) => 
   };
 
   const getTotalCount = async () => {
-    const limit = 5000;
+   
+    let allEmpIDs = [];
+    let nextToken = null;
+  
     try {
-      // Step 1: Fetch data
-      const result = await client.graphql({
-        query: listEmpPersonalInfos,
-        variables: { limit },
-      });
-      const items = result?.data?.listEmpPersonalInfos?.items || [];
-      // console.log("Fetched items:", items);
+      
+      do {
+        const result = await client.graphql({
+          query: listEmpPersonalInfos,
+          variables: { nextToken },
+        });
   
-      // Step 2: Extract empID and filter out the ones that are already converted.
-      const filteringData = items
-        .map((val) => val.empID); // Extract empID from each item
-      // console.log("Extracted empIDs:", filteringData);
+        const items = result?.data?.listEmpPersonalInfos?.items || [];
+        // Extract empIDs from the fetched items
+        const filteringData = items.map((val) => val.empID);
+        allEmpIDs = [...allEmpIDs, ...filteringData];
   
-      // Step 3: Filter only those empIDs that start with 'AWE'
-      const filteredData = filteringData.filter((empID) => empID.startsWith("AWE"));
-      // console.log('Filtered empIDs starting with "AWE":', filteredData);
+        // Update nextToken for the next iteration
+        nextToken = result?.data?.listEmpPersonalInfos?.nextToken;
+      } while (nextToken); 
   
-      // Step 4: Sort the empIDs numerically (based on the number part of the ID)
+      // Step 2: Filter only empIDs that start with 'AWE'
+      const filteredData = allEmpIDs.filter((empID) => empID.startsWith("AWE"));
+  
+      // Step 3: Sort the empIDs numerically (based on the number part of the ID)
       const sortedData = filteredData.sort((a, b) => {
         const numA = parseInt(a.replace(/[^\d]/g, ''), 10);
         const numB = parseInt(b.replace(/[^\d]/g, ''), 10);
-        // console.log(`Comparing ${a} and ${b} -> ${numA} vs ${numB}`);
         return numA - numB;
       });
-      // console.log('Sorted empIDs:', sortedData);
   
-      // Step 5: Get the last valid TempID
+      // Step 4: Get the last valid empID (maximum empID)
       const maxValue = sortedData[sortedData.length - 1];
-      // console.log('Max empID:', maxValue);
   
       return maxValue;
     } catch (error) {
-      console.error('Error fetching total count:', error);
-      return 0; // Return 0 if there's an error
+      console.error("Error fetching total count:", error);
+      return 0; 
     }
   };
+  
   
   const generateNextTempID = (lastTempID) => {
     const prefixMatch = lastTempID.match(/[^\d]+/);

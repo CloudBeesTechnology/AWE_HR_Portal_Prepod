@@ -34,7 +34,6 @@ export const WeldingDataUp = () => {
           query: updateWeldingInfo,
           variables: {
             input: totalData,
-            limit: 20000,
           },
         }),
       ]);

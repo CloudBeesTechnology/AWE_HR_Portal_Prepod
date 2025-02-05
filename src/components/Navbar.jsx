@@ -94,43 +94,51 @@ const Navbar = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const empPersonalInfosData = await client.graphql({
-          query: listEmpPersonalInfos,
-          variables: { limit: 20000 },
-        });
+        let allEmployees = []; 
+        let nextToken = null;  
 
-        const empPersonalInfos =
-          empPersonalInfosData?.data?.listEmpPersonalInfos?.items || [];
+        do {
+          const response = await client.graphql({
+            query: listEmpPersonalInfos,
+            variables: {
+              nextToken: nextToken, 
+            },
+          });
+  
+          allEmployees = [...allEmployees, ...response.data.listEmpPersonalInfos.items];
+  
 
-        // Check if any data is fetched
+          nextToken = response.data.listEmpPersonalInfos.nextToken;
+        } while (nextToken); 
+  
+        // console.log(allEmployees, "All Employees Data"); 
+  
+     
+        const empPersonalInfos = allEmployees;
+ 
         if (empPersonalInfos.length === 0) {
           // console.log("No employee data found.");
           return;
         }
-
+  
         // Find the employee matching the userID, ignoring case
         const userPersonalInfo = empPersonalInfos.find(
-          (emp) => emp.empID.toString().toLowerCase() === userID.toString().toLowerCase() 
+          (emp) => emp.empID.toString().toLowerCase() === userID.toString().toLowerCase()
         );
-
+  
         if (userPersonalInfo) {
           const profilePhotoString =
             userPersonalInfo?.profilePhoto ||
             "public/profilePhoto/User-avatar.svg.png";
-          // console.log(profilePhotoString);
-
-          // const trimmedProfilePhotoString = profilePhotoString?.replace(/^public\//, '');
-          // console.log(trimmedProfilePhotoString);
-
+  
           const linkToStorageFile = async (pathUrl) => {
             const result = await getUrl({
               path: pathUrl,
             });
-            // console.log(result?.url?.toString());
-
+  
             return setPersonalInfo({
-              name: userPersonalInfo?.name, // Use the name
-              profilePhoto: result?.url?.toString(), // Set the profile photo
+              name: userPersonalInfo?.name, 
+              profilePhoto: result?.url?.toString(),
               email: userPersonalInfo?.email,
               contactNo: userPersonalInfo?.contactNo || "",
             });
@@ -143,7 +151,7 @@ const Navbar = () => {
         console.log("Error fetching employee personal infos:", err);
       }
     };
-
+  
     if (userID) {
       fetchData();
     }

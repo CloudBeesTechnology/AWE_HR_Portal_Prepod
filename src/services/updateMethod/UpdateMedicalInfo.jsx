@@ -32,7 +32,7 @@ export const UpdateMedical = () => {
       const updatedData = await client.graphql({
         query: updateLabourMedicalInfo,
         variables: {
-          input: updateData, limit:20000,
+          input: updateData,
         },
       });
 

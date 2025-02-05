@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { generateClient } from "@aws-amplify/api";
-import { listEmailNotifis } from "../graphql/queries"; // Assuming you have the query for listEmailNotifis
+import { listEmailNotifis } from "../graphql/queries";
 
 const client = generateClient();
 
@@ -12,20 +12,31 @@ export const useNotification = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      setError(null);
+
+      let allEmailNotifications = [];
+      let nextToken = null;
+
       try {
-        const emailNotifData = await client.graphql({
-          query: listEmailNotifis,           variables: { limit: 20000 },
-          // Query to fetch email notifications
-        });
+        do {
+          const response = await client.graphql({
+            query: listEmailNotifis,
+            variables: {
+              nextToken,
+            },
+          });
 
+          allEmailNotifications = [
+            ...allEmailNotifications,
+            ...response.data.listEmailNotifis.items,
+          ];
 
-        const fetchedEmailNotifications =
-          emailNotifData?.data?.listEmailNotifis?.items || [];
+          nextToken = response.data.listEmailNotifis.nextToken;
+        } while (nextToken);      
 
-        // console.log("Fetched Email Notifications:", fetchedEmailNotifications);
-        setEmailNotifications(fetchedEmailNotifications);
+        setEmailNotifications(allEmailNotifications);
       } catch (err) {
-        setError(err);
+        setError("Error fetching email notifications.");
         console.error("Error fetching email notifications:", err);
       } finally {
         setLoading(false);
@@ -34,8 +45,6 @@ export const useNotification = () => {
 
     fetchData();
   }, []);
-
-  // console.log("notification",emailNotifications)
 
   return { emailNotifications, loading, error };
 };

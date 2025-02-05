@@ -22,7 +22,7 @@ export const UpdateMobilization = () => {
           input: totalValue,
         },
       });
-      console.log(result);
+      // console.log(result);
     } catch (error) {
       console.error("Error executing GraphQL requests:", error);
       throw error; // Rethrow error if needed

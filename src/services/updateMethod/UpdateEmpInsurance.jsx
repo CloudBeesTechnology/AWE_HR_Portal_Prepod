@@ -28,8 +28,7 @@ export const UpdateEmpInsDataFun = () => {
            client.graphql({
              query: updateEmpInsurance,
              variables: {
-               input: totalData, limit:20000,
-             },
+               input: totalData,            },
            })
          ])
         //  console.log(storedData,"successfully Updated data");

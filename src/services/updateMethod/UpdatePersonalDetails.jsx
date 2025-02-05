@@ -14,7 +14,7 @@ export const CandyDetails = () => {
     }
 
     const {
-      id,
+      // id,
       tempID,
       crime,
       crimeDesc,
@@ -72,11 +72,13 @@ export const CandyDetails = () => {
       uploadCertificate,
       uploadPp,
       status,
+      PDTableID,
+      EDTableID
     } = reqValue;
-
+ 
 
     const totalData = {
-      id,
+      id:PDTableID,
       tempID,
       age,
       alternateNo,
@@ -117,7 +119,7 @@ export const CandyDetails = () => {
     };
 
     const totalDataTwo = {
-      id,
+      id:EDTableID,
       tempID,
       crime,
       crimeDesc,
@@ -148,17 +150,17 @@ export const CandyDetails = () => {
     // console.log("Total DataT",totalDataTwo);
 
     try {
-      const [personaldetails] = await Promise.all([
-        // client.graphql({
-        //   query: updatePersonalDetails,
-        //   variables: { input: totalData },
-        // }),
+      const [personaldetails,educationDetails] = await Promise.all([
+        client.graphql({
+          query: updatePersonalDetails,
+          variables: { input: totalData },
+        }),
         client.graphql({
           query: updateEducationDetails,
-          variables: { input: totalDataTwo, limit:20000, },
+          variables: { input: totalDataTwo,  },
         }),
       ]);
-      // console.log("Response", personaldetails);
+      // console.log("update", personaldetails,educationDetails);
       // localStorage.removeItem("applicantFormData");
       // localStorage.removeItem("personalFormData");
     } catch (error) {

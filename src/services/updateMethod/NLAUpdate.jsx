@@ -28,11 +28,11 @@ export const NLAUpdate = () => {
       // Call the AWS Amplify GraphQL client to update the record
       const response = await client.graphql({
         query: updateEmployeeNonLocalAcco,
-        variables: { input: updatedData, limit:20000, },
+        variables: { input: updatedData, },
       });
 
       // Log the response to confirm the update
-      console.log("Data successfully updated:", response);
+      // console.log("Data successfully updated:", response);
 
       // Reset the error state on successful update
       setErrorEmpID("");  // Clear any previous error messages
@@ -46,3 +46,4 @@ export const NLAUpdate = () => {
 
   return { NLAUpdateFun, errorEmpID };
 };
+

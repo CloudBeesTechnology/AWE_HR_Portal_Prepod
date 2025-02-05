@@ -18,64 +18,80 @@ export const useLeaveManageTwo = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      setError(null);
+
+      let allEmpPersonalInfos = [];
+      let allTicketRequests = [];
+      let allEmpWorkInfos = [];
+
+      let nextTokenEmpPersonalInfos = null;
+      let nextTokenTicketRequests = null;
+      let nextTokenEmpWorkInfos = null;
+
       try {
-        // Fetch the data from multiple sources concurrently
-        const [empPersonalInfosData, ticketRequestsData, empWorkInfosData] =
-          await Promise.all([
-            client.graphql({
-              query: listEmpPersonalInfos,
-              variables: { limit: 20000 },
-            }),
-            client.graphql({
-              query: listTicketRequests,
-              variables: { limit: 20000 },
-            }),
-            client.graphql({
-              query: listEmpWorkInfos,
-              variables: { limit: 20000 },
-            }),
-          ]);
+        do {
+          const response = await client.graphql({
+            query: listEmpPersonalInfos,
+            variables: { nextToken: nextTokenEmpPersonalInfos, limit: 20000 },
+          });
 
-        // Extract data or use empty array as fallback
-        const fetchedEmpPersonalInfos =
-          empPersonalInfosData?.data?.listEmpPersonalInfos?.items || [];
-        const fetchedTicketRequests =
-          ticketRequestsData?.data?.listTicketRequests?.items || [];
-        const fetchedEmpWorkInfos =
-          empWorkInfosData?.data?.listEmpWorkInfos?.items || [];
+          allEmpPersonalInfos = [
+            ...allEmpPersonalInfos,
+            ...response.data.listEmpPersonalInfos.items,
+          ];
 
-        // console.log("Fetched Employee Personal Infos:", fetchedEmpPersonalInfos);
-        // console.log("Fetched Ticket Request Details:", fetchedTicketRequests);
-        // console.log("Fetched Employee Work Infos:", fetchedEmpWorkInfos);
+          nextTokenEmpPersonalInfos = response.data.listEmpPersonalInfos.nextToken;
+        } while (nextTokenEmpPersonalInfos);
 
-        // Set ticket requests to state
-        setTicketRequests(fetchedTicketRequests);
+        do {
+          const response = await client.graphql({
+            query: listTicketRequests,
+            variables: { nextToken: nextTokenTicketRequests, limit: 20000 },
+          });
 
-        // Create a mapping of employee personal info by empID
-        const empInfoMap = fetchedEmpPersonalInfos.reduce((acc, emp) => {
+          allTicketRequests = [
+            ...allTicketRequests,
+            ...response.data.listTicketRequests.items,
+          ];
+
+          nextTokenTicketRequests = response.data.listTicketRequests.nextToken;
+        } while (nextTokenTicketRequests);
+
+        do {
+          const response = await client.graphql({
+            query: listEmpWorkInfos,
+            variables: { nextToken: nextTokenEmpWorkInfos, limit: 20000 },
+          });
+
+          allEmpWorkInfos = [
+            ...allEmpWorkInfos,
+            ...response.data.listEmpWorkInfos.items,
+          ];
+
+          nextTokenEmpWorkInfos = response.data.listEmpWorkInfos.nextToken;
+        } while (nextTokenEmpWorkInfos);
+
+        const empInfoMap = allEmpPersonalInfos.reduce((acc, emp) => {
           acc[emp.empID] = emp;
           return acc;
         }, {});
 
-        // Create a mapping of employee work info by empID
-        const empWorkInfoMap = fetchedEmpWorkInfos.reduce((acc, workInfo) => {
+        const empWorkInfoMap = allEmpWorkInfos.reduce((acc, workInfo) => {
           acc[workInfo.empID] = workInfo;
           return acc;
         }, {});
 
-        // Merge employee personal info and work info into ticket requests
-        const merged = fetchedTicketRequests.map((ticket) => ({
+        const merged = allTicketRequests.map((ticket) => ({
           ...ticket,
-          employeeInfo: empInfoMap[ticket.empID] || {}, // Add employee personal info
-          workInfo: empWorkInfoMap[ticket.empID] || {}, // Add employee work info
+          employeeInfo: empInfoMap[ticket.empID] || {},
+          workInfo: empWorkInfoMap[ticket.empID] || {},
         }));
 
-        // console.log("Merged Data with Work Info 6.0:", merged);
-
-        // Set the merged data to state
+        setTicketRequests(allTicketRequests);
         setTicketMerged(merged);
+
       } catch (err) {
-        setError(err);
+        setError("Error fetching data.");
         console.error("Error fetching data:", err);
       } finally {
         setLoading(false);
@@ -83,11 +99,7 @@ export const useLeaveManageTwo = () => {
     };
 
     fetchData();
-  }, []); // Empty dependency array means this effect runs only once when the component mounts
-
-  // useEffect(() => {
-  //   console.log("28267780", ticketMerged);
-  // }, [ticketMerged]);
+  }, []);
 
   return { ticketMerged, ticketRequests, loading, error };
 };

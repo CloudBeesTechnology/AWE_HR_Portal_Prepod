@@ -14,18 +14,18 @@ export const AddCFUpdate = () => {
         courseName:AddCFUpp.courseName,
         company:AddCFUpp.company,
     };
-    console.log(totalData);
+    // console.log(totalData);
 
     try {
       const storedData=   await Promise.all([
            client.graphql({
              query: updateAddCourse,
              variables: {
-               input: totalData, limit:20000,
+               input: totalData, 
              },
            })
          ])
-         console.log(storedData,"successfully Updated data");
+        //  console.log(storedData,"successfully Updated data");
 
        } catch (error) {
         console.log(error);

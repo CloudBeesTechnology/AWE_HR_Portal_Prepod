@@ -21,7 +21,7 @@ const client = generateClient();
 
 const filterOptions = [
   "Interview Scheduled",
-  "Selected Candidate",
+  "Selected Candidate", 
   "LOI",
   "CVEV_OffShore",
   "PAAF_OnShore",
@@ -89,34 +89,63 @@ export const Status = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Pagination helpers
+        const fetchInterviewData = async () => {
+          let allInterviewSchedules = [];
+          let nextToken = null;
+          do {
+            const response = await client.graphql({
+              query: listInterviewSchedules,
+              variables: { nextToken },
+            });
+            const interviews = response?.data?.listInterviewSchedules?.items || [];
+            allInterviewSchedules = [...allInterviewSchedules, ...interviews];
+            nextToken = response?.data?.listInterviewSchedules?.nextToken;
+          } while (nextToken);
+          return allInterviewSchedules;
+        };
+  
+        const fetchLocalMobilizationData = async () => {
+          let allLocalMobilizations = [];
+          let nextToken = null;
+          do {
+            const response = await client.graphql({
+              query: listLocalMobilizations,
+              variables: { nextToken },
+            });
+            const mobilizations =
+              response?.data?.listLocalMobilizations?.items || [];
+            allLocalMobilizations = [
+              ...allLocalMobilizations,
+              ...mobilizations,
+            ];
+            nextToken = response?.data?.listLocalMobilizations?.nextToken;
+          } while (nextToken);
+          return allLocalMobilizations;
+        };
+  
+        // Fetch interview and mobilization data in parallel
         const [interviewDatas, localMobilizationData] = await Promise.all([
-          client.graphql({
-            query: listInterviewSchedules,
-            variables: { limit: 20000 },
-          }),
-          client.graphql({
-            query: listLocalMobilizations,
-            variables: { limit: 20000 },
-          }),
+          fetchInterviewData(),
+          fetchLocalMobilizationData(),
         ]);
-
-        const interviews =
-          interviewDatas?.data?.listInterviewSchedules?.items || [];
-        const localMobilizations =
-          localMobilizationData?.data?.listLocalMobilizations?.items || [];
-
+  
+        const interviews = interviewDatas || [];
+        const localMobilizations = localMobilizationData || [];
+  
         if (empPDData && educDetailsData && IVSSDetails) {
+          // Filter data based on IVSSDetails
           const filteredEmpPDData = empPDData.filter((emp) =>
             IVSSDetails.some((ivss) => ivss.tempID === emp.tempID)
           );
-
+  
           const merged = mergeContextData(filteredEmpPDData, educDetailsData);
-
+  
           const interviewsMap = interviews.reduce((acc, interview) => {
             acc[interview.tempID] = interview;
             return acc;
           }, {});
-
+  
           const mobilizationsMap = localMobilizations.reduce(
             (acc, mobilization) => {
               acc[mobilization.tempID] = mobilization;
@@ -124,26 +153,28 @@ export const Status = () => {
             },
             {}
           );
-
+  
+          // Merge and flatten the data
           const flattenedData = merged.map((candidate) => {
             const interview = interviewsMap[candidate.tempID] || {};
             const mobilization = mobilizationsMap[candidate.tempID] || {};
-
+  
             return {
               ...candidate,
               interviewDetails: interview,
               mobilizationDetails: mobilization,
             };
           });
+  
           const flattingData = flattenedData.map(flattenObject);
+  
           setMergeData(flattingData);
-
+  
           const initialFiltered = flattingData.filter(
             (val) =>
-              val?.interviewDetails_status?.toLowerCase() ===
-              "interviewscheduled"
+              val?.interviewDetails_status?.toLowerCase() === "interviewscheduled"
           );
-
+  
           setFilteredData(initialFiltered);
           setDropOption(initialFiltered);
           setLoading(false);
@@ -153,9 +184,10 @@ export const Status = () => {
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, [empPDData, educDetailsData, IVSSDetails]);
+  
 
   const handleOptionSelect = (option) => {
     setSelectedOptions((prevSelectedOptions) => {
@@ -334,13 +366,27 @@ export const Status = () => {
           break;
   
   
-      case "PAAF_OnShore":
-        filtered = mergeData.filter(
-          (val) =>
-            val?.interviewDetails_status?.toUpperCase() === "PAAF" &&
-            val?.empType === "Onshore"
-        );
-        break;
+          case "PAAF_OnShore":
+            // console.log("Case 'PAAF_OnShore' triggered.");
+            // console.log("Merge data:", mergeData); // Log the entire mergeData array
+          
+            filtered = mergeData.filter((val) => {
+              // Log each value being processed in the filter function
+              // console.log("Processing value:", val);
+          
+              const statusCheck = val?.interviewDetails_status?.toUpperCase() === "PAAF";
+              const empTypeCheck = val?.empType === "Onshore";
+          
+              // console.log("Status check:", statusCheck); // Log status check
+              // console.log("Employee type check:", empTypeCheck); // Log employee type check
+          
+              // Return the filtered value
+              return statusCheck && empTypeCheck;
+            });
+          
+            // console.log("Filtered results:", filtered); // Log the final filtered result
+            break;
+          
   
       case "Mobilization":
         filtered = mergeData.filter(

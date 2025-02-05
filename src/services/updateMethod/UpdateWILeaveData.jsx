@@ -136,7 +136,7 @@ export const UpdateWILeaveData = () => {
         try {
           const Leave = await client.graphql({
             query: updateEmpLeaveDetails,
-            variables: { input: totalData1, limit: 20000 },
+            variables: { input: totalData1},
           });
           console.log(Leave);
         } catch (err) {

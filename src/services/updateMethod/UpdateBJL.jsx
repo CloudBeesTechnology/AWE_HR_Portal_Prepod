@@ -27,11 +27,11 @@ export const UpdateBJL = () => {
            client.graphql({
              query: updateBJLDetails,
              variables: {
-               input: totalData, limit:20000,
+               input: totalData, 
              },
            })
          ])
-         console.log(storedData,"successfully Updated data");
+        //  console.log(storedData,"successfully Updated data");
 
        } catch (error) {
         console.log(error);

@@ -148,14 +148,12 @@ export const UpdateEmpInfo = () => {
           query: updateEmpPersonalInfo,
           variables: {
             input: totalData,
-            limit: 20000,
           },
         }),
         client.graphql({
           query: updateIDDetails,
           variables: {
             input: totalData1,
-            limit: 20000,
           },
         }),
       ]);

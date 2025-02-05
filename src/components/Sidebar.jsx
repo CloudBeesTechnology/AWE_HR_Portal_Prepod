@@ -37,35 +37,60 @@ const Sidebar = () => {
   useEffect(() => {
     async function fetchUserData() {
       try {
-        const res = await client.graphql({ query: listUsers,variables:{limit:20000} });
-        const result = res?.data?.listUsers?.items;
+        let allUsers = []; 
+        let nextToken = null; 
+  
+     
+        do {
+          const res = await client.graphql({
+            query: listUsers,
+            variables: {
+              nextToken: nextToken, 
+            },
+          });
+  
+          const result = res?.data?.listUsers?.items;
+  
+          allUsers = [...allUsers, ...result];
+
+          nextToken = res?.data?.listUsers?.nextToken;
+        } while (nextToken); 
+  
+        // Now we have all the users in allUsers array
         const userID = localStorage.getItem("userID");
         const userType = localStorage.getItem("userType");
-        const filteredResults = result.filter((val) => {
-          // console.log(val);
+  
+        // console.log("ALL Users", allUsers);
         
-          if (val?.empID.toString().toLowerCase() === userID?.toString() && val?.selectType === userType) {
-            const empID = val?.empID.toString().toLowerCase();
-            const isEqual = empID === userID?.toString().toLowerCase();
+        const filteredResults = allUsers.filter((val) => {
+          // Filtering users based on empID and selectType
+          if (val.empID.toString().toLowerCase() === userID.toString() && val.selectType === userType) {
+            const empID = val.empID.toString().toLowerCase();
+            const isEqual = empID === userID.toString().toLowerCase();
             return isEqual;
           }
         });
-        
+  
+        // If a matching user is found, process their permissions
         if (filteredResults.length > 0) {
-          const permissionsString = filteredResults[0]?.setPermissions[0];
-          // console.log(permissionsString);
+          const permissionsString = filteredResults[0].setPermissions[0];
           
+          // Extract main categories from permissions string
           const categories = extractMainCategories(permissionsString);
-          // const desiredOrder = ["Dashboard", "User", "Recruitment","Employee","Training","Time Sheet" ,"Leave Management" ,"Notification center" ,"Report","Benefits & Rewards"];
+          
+          // Sort the categories as desired
           const orderedCategories = sortCategories(categories, desiredOrder);
+          
+          // Set the sorted categories in state
           setMainCategories(orderedCategories);
         } 
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
     }
+  
     fetchUserData();
-  }, []);
+  }, []); 
 
   const extractMainCategories = (permissionsString) => {
     const regex = /(\w+)=\[/g;

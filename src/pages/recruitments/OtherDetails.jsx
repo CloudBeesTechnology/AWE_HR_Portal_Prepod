@@ -13,7 +13,7 @@ import { DataSupply } from "../../utils/DataStoredContext";
 import { useTempID } from "../../utils/TempIDContext";
 import { CandyDetails } from "../../services/updateMethod/UpdatePersonalDetails";
 
-const client = generateClient();
+const client = generateClient(); 
 
 export const OtherDetails = ({ fetchedData }) => {
   const { submitODFunc } = RecODFunc();
@@ -258,18 +258,29 @@ export const OtherDetails = ({ fetchedData }) => {
   };
 
   const getTotalCount = async () => {
+    let totalCount = 0;
+    let nextToken = null;
+  
     try {
-      const result = await client.graphql({
-        query: listPersonalDetails,
-      });
-      const items = result?.data?.listPersonalDetails?.items || [];
-      return items.length; 
+      do {
+        const result = await client.graphql({
+          query: listPersonalDetails,
+          variables: { nextToken },
+        });
+  
+        const items = result?.data?.listPersonalDetails?.items || [];
+        totalCount += items.length;
+  
+        nextToken = result?.data?.listPersonalDetails?.nextToken;
+      } while (nextToken);
+  
+      return totalCount;
     } catch (error) {
       console.error("Error fetching total count:", error);
-      return 0; 
+      return 0;
     }
   };
-
+  
   const generateNextTempID = (totalCount) => {
     const nextNumber = totalCount + 1;
     return String(nextNumber);

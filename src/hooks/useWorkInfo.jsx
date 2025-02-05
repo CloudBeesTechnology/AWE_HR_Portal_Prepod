@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { generateClient } from "@aws-amplify/api";
-import { listEmpWorkInfos } from "../graphql/queries"; // Assuming you have the query for listEmailNotifis
+import { listEmpWorkInfos } from "../graphql/queries";
 
 const client = generateClient();
 
@@ -12,20 +12,31 @@ export const useWorkInfo = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      let allEmpWorkInfos = [];
+      let nextToken = null;
+
       try {
-        const workInfoData = await client.graphql({
-          query: listEmpWorkInfos,           variables: { limit: 20000 },
-          // Query to fetch email notifications
-        });
+        do {
+          const workInfoData = await client.graphql({
+            query: listEmpWorkInfos,
+            variables: {
+              nextToken,
+            },
+          });
 
-        const fetchedEmpWorkInfo =
-        workInfoData?.data?.listEmpWorkInfos?.items || [];
+          const fetchedEmpWorkInfo = workInfoData?.data?.listEmpWorkInfos?.items || [];
+          allEmpWorkInfos = [...allEmpWorkInfos, ...fetchedEmpWorkInfo];
 
-        // console.log("Fetched Email Notifications:", fetchedEmpWorkInfo);
-        setEmpWorkInfo(fetchedEmpWorkInfo);
+          
+          nextToken = workInfoData?.data?.listEmpWorkInfos?.nextToken;
+
+        } while (nextToken);
+
+        setEmpWorkInfo(allEmpWorkInfos);
+
       } catch (err) {
         setError(err);
-        console.error("Error fetching workinfo:", err);
+        console.error("Error fetching work info:", err);
       } finally {
         setLoading(false);
       }
@@ -33,8 +44,6 @@ export const useWorkInfo = () => {
 
     fetchData();
   }, []);
-
-  // console.log("workInfo data",empWorkInfo)
 
   return { empWorkInfo, loading, error };
 };

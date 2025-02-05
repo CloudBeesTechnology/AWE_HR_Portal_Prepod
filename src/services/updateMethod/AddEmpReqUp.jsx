@@ -25,18 +25,18 @@ export const AddEmpReqUp = () => {
       traineeCourseFee: TMRDataUp.traineeCourseFee,
       mediRequired: TMRDataUp.mediRequired,
     };
-    console.log(totalData);
+    // console.log(totalData);
 
     try {
       const storedData=   await Promise.all([
            client.graphql({
              query: updateTrainingReq,
              variables: {
-               input: totalData, limit:20000,
+               input: totalData 
              },
            })
          ])
-         console.log(storedData,"successfully update data");
+        //  console.log(storedData,"successfully update data");
 
        } catch (error) {
          console.error("Error executing GraphQL requests:", error);

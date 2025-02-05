@@ -1,5 +1,3 @@
-
-
 import React from "react";
 
 const FamilyDetails = ({ familyDetails, mainRef }) => {
@@ -7,47 +5,51 @@ const FamilyDetails = ({ familyDetails, mainRef }) => {
 
   const parseFamilyDetails = (data) => {
     try {
+      // Log raw familyDetails data before any manipulation
       // console.log("Raw familyDetails:", data);
-  
+
       // Step 1: Remove backslashes
       let cleanedData = data.replace(/\\/g, "");
-  
+      // console.log("Step 1: Remove backslashes:", cleanedData);
+
       // Step 2: Replace single quotes with double quotes if any (JSON requires double quotes)
       cleanedData = cleanedData.replace(/'/g, '"');
-  
+      // console.log("Step 2: Replace single quotes with double quotes:", cleanedData);
+
       // Step 3: Ensure keys are wrapped with double quotes if not already
       cleanedData = cleanedData.replace(/([{,])(\s*)([a-zA-Z0-9_]+)(\s*):/g, '$1"$3":');
-  
+      // console.log("Step 3: Ensure keys are wrapped with double quotes:", cleanedData);
+
       // Step 4: Ensure values are quoted (e.g., for strings)
       cleanedData = cleanedData.replace(/:([a-zA-Z0-9_/.\s]+)(?=\s|,|\})/g, ':"$1"');
-  
+      // console.log("Step 4: Ensure values are quoted:", cleanedData);
+
       // Step 5: Remove any surrounding quotes that could be around the whole string
       if (cleanedData.startsWith('"') && cleanedData.endsWith('"')) {
         cleanedData = cleanedData.slice(1, -1);
       }
-  
-      // console.log("Cleaned familyDetails:", cleanedData);
-  
+      // console.log("Step 5: Remove surrounding quotes if any:", cleanedData);
+
       // Step 6: Try parsing the cleaned string
       const parsedData = JSON.parse(cleanedData);
-  
+      // console.log("Step 6: Parsed data:", parsedData);
+
       // Ensure the data is in array format
       if (!Array.isArray(parsedData)) {
-        // console.error("Parsed data is not an array:", parsedData);
+        console.error("Parsed data is not an array:", parsedData);
         return [];
       }
-  
+
       return parsedData;
     } catch (error) {
-      // console.error("Error parsing familyDetails:", error);
+      console.error("Error parsing familyDetails:", error);
       return [];
     }
   };
-  
+
   if (Array.isArray(familyDetails) && typeof familyDetails[0] === "string") {
     familyData = parseFamilyDetails(familyDetails[0]);
   }
-  
 
   return (
     <section ref={mainRef} className="py-8 px-10 bg-gray-50 rounded-lg">
@@ -86,7 +88,6 @@ const FamilyDetails = ({ familyDetails, mainRef }) => {
                 <span className="text-dark_grey">
                   {family?.address || "N/A"}
                 </span>
-
               </div>
             </div>
           ))

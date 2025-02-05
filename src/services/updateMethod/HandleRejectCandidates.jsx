@@ -28,11 +28,11 @@ export const HandleRejectCandidates = () => {
     try {
       const response = await client.graphql({
         query: updatePersonalDetails,  // Mutation for updating candidate details
-        variables: { input: data, limit:20000, },
+        variables: { input: data, },
       });
 
       // Handle success
-      console.log("Candidate status updated to 'Inactive' successfully", response);
+      // console.log("Candidate status updated to 'Inactive' successfully", response);
       setIsRejected(true);
       onClose(); // Optionally close the modal after successful update
     } catch (err) {

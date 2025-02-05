@@ -21,6 +21,7 @@ export const UpdateProbForm = () => {
         diligent: PbFDataUp.diligent,
         extendProbED: PbFDataUp.extendProbED,
         extensionPeriod: PbFDataUp.extensionPeriod,
+        gmName: PbFDataUp.gmName,
         gmApproved: PbFDataUp.gmApproved,
         gmDate: PbFDataUp.gmDate,
         hrDate: PbFDataUp.hrDate,
@@ -57,7 +58,7 @@ export const UpdateProbForm = () => {
            client.graphql({
              query: updateProbForm,
              variables: {
-               input: totalData, limit:20000,
+               input: totalData, 
              },
            })
          ])

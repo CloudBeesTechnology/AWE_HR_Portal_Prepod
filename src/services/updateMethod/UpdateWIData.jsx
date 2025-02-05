@@ -228,7 +228,7 @@ export const UpdateWIData = () => {
       try {
         const Work = await client.graphql({
           query: updateEmpWorkInfo,
-          variables: { input: totalData, limit: 20000 },
+          variables: { input: totalData,},
         });
         console.log(Work);
       } catch (err) {

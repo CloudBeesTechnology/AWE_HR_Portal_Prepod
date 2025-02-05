@@ -29,7 +29,7 @@ export const SearchDisplay = ({
     } else if (toggleHandle === false) {
       setFilteredEmployees?.(newFormData);
     }
-    console.log(filteredEmployees);
+    // console.log(filteredEmployees);
   }, [toggleHandle, newFormData]);
 
   const filterDatabyClickSearchIcon = useCallback(() => {

@@ -157,7 +157,7 @@ export const UpdateWISRData = () => {
         try {
           const Service = await client.graphql({
             query: updateServiceRecord,
-            variables: { input: totalData3, limit: 20000 },
+            variables: { input: totalData3,},
           });
           // console.log(Service);
         } catch (err) {

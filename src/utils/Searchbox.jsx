@@ -18,9 +18,9 @@ export const Searchbox = ({
   }, [allEmpDetails, location]);
 
   const filterDataByclickSearchIcon = useCallback(() => {
-    console.log(allEmpDetails);
+    // console.log(allEmpDetails);
     if (allEmpDetails && allEmpDetails.length > 0) {
-      console.log(allEmpDetails);
+      // console.log(allEmpDetails);
 
       const normalizedQuery = searchQuery.toString().toUpperCase();
 

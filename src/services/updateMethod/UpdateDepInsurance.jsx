@@ -20,7 +20,7 @@ export const UpdateDepInsDataFun = () => {
         client.graphql({
           query: updateEmpDepInsurance,
           variables: {
-            input: totalData, limit:20000,
+            input: totalData,
           },
         }),
       ]);

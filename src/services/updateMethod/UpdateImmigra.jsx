@@ -33,7 +33,7 @@ export const UpdateImmigra = () => {
            client.graphql({
              query: updatePassportValid,
              variables: {
-               input: totalData, limit:20000,
+               input: totalData,
              },
            })
          ])

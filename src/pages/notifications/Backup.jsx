@@ -13,7 +13,7 @@ export const Notifications = () => {
   const [specificNotificationDetails, setSpecificNotificationDetails] =
     useState();
   const [popupData, setPopupData] = useState();
-  const client = generateClient();
+  const client = generateClient(); 
 
   const { emailNotifications } = useNotification();
   const { empPIData } = useContext(DataSupply);
@@ -39,61 +39,54 @@ export const Notifications = () => {
     setUserID(userID);
     // console.log(userID, "userid");
   }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const emailNotifis = await client.graphql({ query: listEmailNotifis });
-        const leaveNotification = emailNotifis?.data?.listEmailNotifis?.items;
-
-        // Log the receipentEmpID for debugging
-        // console.log(
-        //   "Leave Notifications (receipentEmpID):",
-        //   leaveNotification.map((notification) => notification.receipentEmpID)
-        // );
-
-        // Filter leave notifications for the logged-in user, ensuring recipientEmpID is not null or empty
-        const filteredLeaveNotifications = leaveNotification.filter(
-          (notification) => {
-            // Normalize both IDs to lowercase for case-insensitive comparison
-            const recipientEmpID = notification.receipentEmpID
-              ? notification.receipentEmpID.trim().toLowerCase()
-              : "";
-            const loggedInUserID = userID ? userID.trim().toLowerCase() : "";
-
-            // Log for debugging
-            // console.log(`Comparing: ${recipientEmpID} === ${loggedInUserID}`);
-
-            // Return the notification if recipientEmpID matches loggedInUserID and is not null or empty
-            return recipientEmpID === loggedInUserID && recipientEmpID !== ""; // Ensures valid recipientEmpID
-          }
-        );
-
-        // Log the filtered leave notifications
-        // console.log(
-        //   "Filtered Leave Notifications:",
-        //   filteredLeaveNotifications
-        // );
-
-        // Set leave notifications in the table
-        const additionalNotifications = filteredLeaveNotifications.map(
-          (notification) => ({
-            empID: notification.empID,
-            name: notification.name, // Adjust according to your data structure
-            subject: notification.leaveType,
-            message: notification.message,
-            date: new Date(notification.createdAt).toLocaleDateString(),
-            type: "Leave Notification",
-          })
-        );
-
+        let allNotifications = [];
+        let nextToken = null;
+  
+        do {
+          const emailNotifis = await client.graphql({
+            query: listEmailNotifis,
+            variables: { nextToken },
+          });
+  
+          const leaveNotification = emailNotifis?.data?.listEmailNotifis?.items || [];
+  
+          allNotifications = [...allNotifications, ...leaveNotification];
+  
+          nextToken = emailNotifis?.data?.listEmailNotifis?.nextToken;
+  
+        } while (nextToken);
+  
+        const filteredLeaveNotifications = allNotifications.filter((notification) => {
+          const recipientEmpID = notification.receipentEmpID
+            ? notification.receipentEmpID.trim().toLowerCase()
+            : "";
+          const loggedInUserID = userID ? userID.trim().toLowerCase() : "";
+  
+          return recipientEmpID === loggedInUserID && recipientEmpID !== "";
+        });
+  
+        const additionalNotifications = filteredLeaveNotifications.map((notification) => ({
+          empID: notification.empID,
+          name: notification.name,
+          subject: notification.leaveType,
+          message: notification.message,
+          date: new Date(notification.createdAt).toLocaleDateString(),
+          type: "Leave Notification",
+        }));
+  
         setLeaveOfNotifications(additionalNotifications);
       } catch (err) {
         console.error("Error fetching data:", err.message);
       }
     };
-
+  
     fetchData();
   }, [userID]);
+  
 
   // ---------------------------------------
   const calculateNotificationDate = (expiryDate, monthsBefore) => {

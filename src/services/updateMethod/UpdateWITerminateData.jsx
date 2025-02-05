@@ -65,7 +65,7 @@ export const UpdateWITerminateData = () => {
       try {
         const Terminate = await client.graphql({
           query: updateTerminationInfo,
-          variables: { input: totalData2, limit: 20000 },
+          variables: { input: totalData2 },
         });
         console.log(Terminate);
       } catch (err) {

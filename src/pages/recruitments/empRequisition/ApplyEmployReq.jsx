@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { EmpRequisitionForm } from "./EmpRequisitionForm";
 import { format } from "date-fns";
-import { RequisitionReviewForm } from "./RequisitionReviewForm";
+import { RequisitionReviewForm } from "./RequisitionReviewForm";  
 import { listEmpRequisitions } from "../../../graphql/queries";
 import { generateClient } from "@aws-amplify/api";
 
@@ -21,18 +21,28 @@ export const ApplyEmployReq = () => {
       if (!userID) {
         throw new Error("User ID is not available in localStorage");
       }
-
-      const response = await client.graphql({
-        query: listEmpRequisitions,
-        variables: {
-          filter: {
-            requestorID: { eq: userID }, 
+  
+      let allRequisitions = [];
+      let nextToken = null;
+  
+      do {
+        const response = await client.graphql({
+          query: listEmpRequisitions,
+          variables: {
+            filter: {
+              requestorID: { eq: userID },
+            },
+            nextToken,
           },
-        },
-      });
-
-      const fetchedData = response?.data?.listEmpRequisitions?.items || [];
-      setRequisitionData(fetchedData);
+        });
+  
+        const fetchedData = response?.data?.listEmpRequisitions?.items || [];
+        allRequisitions = [...allRequisitions, ...fetchedData];
+  
+        nextToken = response?.data?.listEmpRequisitions?.nextToken;
+      } while (nextToken);
+  
+      setRequisitionData(allRequisitions);
       setError(null);
     } catch (err) {
       console.error("Error fetching requisition data:", err);
@@ -40,6 +50,7 @@ export const ApplyEmployReq = () => {
       setRequisitionData([]);
     }
   };
+  
 
   useEffect(() => {
     fetchRequisitionData();

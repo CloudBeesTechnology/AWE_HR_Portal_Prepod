@@ -1,4 +1,3 @@
-// src/hooks/usePersonalInformation.js
 import { useState, useEffect } from "react";
 import { generateClient } from "@aws-amplify/api";
 import { listEmpPersonalInfos } from "../graphql/queries";
@@ -13,20 +12,42 @@ export const usePersonalInformation = (userID) => {
     email: "",
     contactNo: "",
     dob: "",
-    // _version: "",
   });
 
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+
+    let allEmpPersonalInfos = [];
+    let nextToken = null;
+
     try {
-      const empPersonalInfosData = await client.graphql({
-        query: listEmpPersonalInfos,          variables: { limit: 20000 },
+      do {
+        const response = await client.graphql({
+          query: listEmpPersonalInfos,
+          variables: {
+            nextToken,
+          },
+        });
 
-      });
+        allEmpPersonalInfos = [
+          ...allEmpPersonalInfos,
+          ...response.data.listEmpPersonalInfos.items,
+        ];
 
-      const empPersonalInfos = empPersonalInfosData?.data?.listEmpPersonalInfos?.items || [];
-      const userPersonalInfo = empPersonalInfos.find(emp => emp.empID.toLowerCase() === userID.toLowerCase());
+        // console.log("Personal Details", allEmpPersonalInfos);
+        
+
+        nextToken = response.data.listEmpPersonalInfos.nextToken;
+      } while (nextToken);
+
+      const userPersonalInfo = allEmpPersonalInfos.find(
+        (emp) => emp.empID.toLowerCase() === userID.toLowerCase()
+      );
 
       if (userPersonalInfo) {
         setPersonalInfo({
@@ -35,11 +56,15 @@ export const usePersonalInformation = (userID) => {
           email: userPersonalInfo.email,
           contactNo: userPersonalInfo.contactNo || "",
           dob: userPersonalInfo.dob || "",
-        //   _version: userPersonalInfo._version,
         });
+      } else {
+        setError(`No employee found with ID: ${userID}`);
       }
     } catch (err) {
-      console.error("Error fetching employee personal infos:", err);
+      setError("Error fetching employee personal information.");
+      console.error("Error fetching employee personal info:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,14 +76,12 @@ export const usePersonalInformation = (userID) => {
       email: personalInfo.email,
       contactNo: personalInfo.contactNo,
       dob: personalInfo.dob,
-    //   _version: personalInfo._version || 1,
     };
 
     try {
       const response = await client.graphql({
         query: updateEmpPersonalInfo,
-        variables: { input ,          variables: { limit: 20000 },
-      },
+        variables: { input },
       });
 
       if (response.data.updateEmpPersonalInfo) {
@@ -69,7 +92,6 @@ export const usePersonalInformation = (userID) => {
           email: updatedInfo.email,
           contactNo: updatedInfo.contactNo,
           dob: updatedInfo.dob,
-        //   _version: updatedInfo._version,
         });
         setIsEditing(false);
       }
@@ -83,7 +105,6 @@ export const usePersonalInformation = (userID) => {
       fetchData();
     }
   }, [userID]);
-  // console.log(personalInfo, "Ih")
 
   return {
     personalInfo,
@@ -91,5 +112,7 @@ export const usePersonalInformation = (userID) => {
     setIsEditing,
     handleSave,
     setPersonalInfo,
+    loading,
+    error,
   };
 };

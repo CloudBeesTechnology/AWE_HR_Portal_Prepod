@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { generateClient } from "@aws-amplify/api";
 import { listWPTrackings, listInterviewSchedules } from "../../graphql/queries";
@@ -6,7 +5,6 @@ import { listWPTrackings, listInterviewSchedules } from "../../graphql/queries";
 const client = generateClient();
 
 export const useFetchCandy = () => {
-
   const [interviewSchedules, setInterviewSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,37 +12,58 @@ export const useFetchCandy = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      let allWPTrack = [];
+      let allInterviewSchedules = [];
+      let nextTokenWPTrack = null;
+      let nextTokenInterview = null;
+
       try {
-        // Fetch the data from multiple sources concurrently
-        const [interviewSchedulesData, interStatus] = await Promise.all([
-          client.graphql({ query: listWPTrackings,variables:{limit:20000} }),
-          client.graphql({ query: listInterviewSchedules,variables:{limit:20000} }),
-        ]);
+        // Fetch WPTrackings in a loop to handle pagination
+        do {
+          const res = await client.graphql({
+            query: listWPTrackings,
+            variables: { nextToken: nextTokenWPTrack },
+          });
 
-        // Extract data or use empty array as fallback
-        const fetchedInterviewSchedules = interviewSchedulesData?.data?.listWPTrackings?.items || [];
-        const fetchedInterStatus = interStatus?.data?.listInterviewSchedules?.items || [];
-      
-        // Set interview schedules to state
-        setInterviewSchedules(fetchedInterviewSchedules);
+          const fetchedWPTrack = res?.data?.listWPTrackings?.items || [];
+          allWPTrack = [...allWPTrack, ...fetchedWPTrack];
+          nextTokenWPTrack = res?.data?.listWPTrackings?.nextToken;
+        } while (nextTokenWPTrack);
 
-        const interviewDetailsMap = fetchedInterviewSchedules.reduce((acc, detail) => {
+        // Fetch Interview Schedules in a loop to handle pagination
+        do {
+          const res = await client.graphql({
+            query: listInterviewSchedules,
+            variables: { nextToken: nextTokenInterview },
+          });
+
+          const fetchedInterviewSchedules =
+            res?.data?.listInterviewSchedules?.items || [];
+          allInterviewSchedules = [
+            ...allInterviewSchedules,
+            ...fetchedInterviewSchedules,
+          ];
+          nextTokenInterview = res?.data?.listInterviewSchedules?.nextToken;
+        } while (nextTokenInterview);
+
+        // Create mapping objects for easy merging
+        const interviewDetailsMap = allWPTrack.reduce((acc, detail) => {
           acc[detail.tempID] = detail;
           return acc;
         }, {});
 
-        const statusDetailsMap = fetchedInterStatus.reduce((acc, detail) => {
+        const statusDetailsMap = allInterviewSchedules.reduce((acc, detail) => {
           acc[detail.tempID] = detail;
           return acc;
         }, {});
 
-         // Merge interview schedules with personal details and local mobilizations
-         const merged = fetchedInterviewSchedules.map((schedule) => ({
+        // Merge data
+        const mergedData = allWPTrack.map((schedule) => ({
           ...schedule,
-          IDDetails: statusDetailsMap[schedule.tempID] || {}, // Add local mobilization info
+          IDDetails: statusDetailsMap[schedule.tempID] || {}, // Add interview status info
         }));
-    setInterviewSchedules(merged)
-        
+
+        setInterviewSchedules(mergedData);
       } catch (err) {
         setError(err);
         console.error("Error fetching data:", err);
@@ -54,7 +73,7 @@ export const useFetchCandy = () => {
     };
 
     fetchData();
-  }, []); // Empty dependency array means this effect runs only once when the component mounts
+  }, []); // Runs only once when the component mounts
 
   return { interviewSchedules, loading, error };
 };

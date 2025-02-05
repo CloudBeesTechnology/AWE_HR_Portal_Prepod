@@ -1,28 +1,40 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { generateClient } from "@aws-amplify/api";
-import { listEmpLeaveDetails } from "../graphql/queries"; // Assuming you have the query for listEmpLeaveDetails
+import { listEmpLeaveDetails } from "../graphql/queries";
 
-const client = generateClient(); 
+const client = generateClient();
 
 export const useEmpLeaveDetails = () => {
   const [empLeaveDetails, setEmpLeaveDetails] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [nextToken, setNextToken] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      setError(null);
+      let allEmpLeaveDetails = [];
+      let currentNextToken = nextToken;
+
       try {
-        const empLeaveData = await client.graphql({
-          query: listEmpLeaveDetails,           variables: { limit: 20000 },
-          // Query to fetch employee leave details
-        });
+        do {
+          const response = await client.graphql({
+            query: listEmpLeaveDetails,
+            variables: {
+              nextToken: currentNextToken,
+            },
+          });
 
-        const fetchedEmpLeaveDetails =
-          empLeaveData?.data?.listEmpLeaveDetails?.items || [];
+          allEmpLeaveDetails = [
+            ...allEmpLeaveDetails,
+            ...response.data.listEmpLeaveDetails.items,
+          ];
 
-        // console.log("Fetched Employee Leave Details:", fetchedEmpLeaveDetails);
-        setEmpLeaveDetails(fetchedEmpLeaveDetails);
+          currentNextToken = response.data.listEmpLeaveDetails.nextToken;
+        } while (currentNextToken);
+
+        setEmpLeaveDetails(allEmpLeaveDetails);
       } catch (err) {
         setError(err);
         console.error("Error fetching employee leave details:", err);
@@ -32,9 +44,13 @@ export const useEmpLeaveDetails = () => {
     };
 
     fetchData();
-  }, []);
+  }, [nextToken]);
 
-  // console.log("Employee Leave Details:", empLeaveDetails);
+  useEffect(() => {
+    if (empLeaveDetails.length > 0) {
+      console.log("Fetched Employee Leave Details:", empLeaveDetails);
+    }
+  }, [empLeaveDetails]);
 
   return { empLeaveDetails, loading, error };
 };

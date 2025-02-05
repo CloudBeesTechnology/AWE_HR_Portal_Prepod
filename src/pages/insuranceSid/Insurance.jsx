@@ -76,11 +76,26 @@ export const Insurance = () => {
   useEffect(() => {
     const fetchInsuranceData = async () => {
       try {
-        const response = await client.graphql({
-          query: listInsuranceTypes,
-        });
-        const rawData = response.data.listInsuranceTypes.items;
-        const groupedData = groupByTypeIns(rawData);
+        let allInsuranceTypes = [];
+        let nextToken = null;
+
+        do {
+          const response = await client.graphql({
+            query: listInsuranceTypes,
+            variables: {
+              nextToken: nextToken,
+            },
+          });
+
+          const rawData = response?.data?.listInsuranceTypes?.items || [];
+
+          allInsuranceTypes = [...allInsuranceTypes, ...rawData];
+
+          nextToken = response?.data?.listInsuranceTypes?.nextToken;
+        } while (nextToken);
+
+        const groupedData = groupByTypeIns(allInsuranceTypes);
+
         setInsuranceData(groupedData);
         setLoading(false);
       } catch (error) {

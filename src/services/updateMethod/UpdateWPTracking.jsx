@@ -119,11 +119,11 @@ export const useUpdateWPTracking = () => {
 
       const response = await client.graphql({
         query: updateWPTracking,
-        variables: { input: updatedData, limit:20000, },
+        variables: { input: updatedData, },
       });
 
       // Log the response to confirm the update
-      console.log("WPTracking data successfully updated:", response);
+      // console.log("WPTracking data successfully updated:", response);
     } catch (err) {
       console.error("Error updating WPTracking data:", err);
     } finally {

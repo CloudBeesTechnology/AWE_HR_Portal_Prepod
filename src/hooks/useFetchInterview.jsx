@@ -17,40 +17,92 @@ export const useFetchInterview = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      setError(null);
+
+      let allInterviewSchedules = [];
+      let allPersonalDetails = [];
+      let allLocalMobilizations = [];
+
+      let nextTokenInterviewSchedules = null;
+      let nextTokenPersonalDetails = null;
+      let nextTokenLocalMobilizations = null;
+
+      // console.log("Fetching data..."); 
+
       try {
-        // Fetch the data from multiple sources concurrently
-        const [
-          interviewSchedulesData,
-          personalDetailsData,
-          localMobilizationsData,
-        ] = await Promise.all([
-          client.graphql({
+        do {
+          const response = await client.graphql({
             query: listInterviewSchedules,
-            variables: { limit: 20000 },
-          }),
-          client.graphql({
+            variables: {
+              nextToken: nextTokenInterviewSchedules,
+            },
+          });
+
+          if (response.data && response.data.listInterviewSchedules) {
+
+          } else {
+            // console.log("No interview schedules found in response.");
+          }
+
+          allInterviewSchedules = [
+            ...allInterviewSchedules,
+            ...response.data.listInterviewSchedules.items,
+          ];
+
+          nextTokenInterviewSchedules = response.data.listInterviewSchedules.nextToken;
+        } while (nextTokenInterviewSchedules);
+
+        // Fetching personal details
+        do {
+
+          const response = await client.graphql({
             query: listPersonalDetails,
-            variables: { limit: 20000 },
-          }),
-          client.graphql({
+            variables: {
+              nextToken: nextTokenPersonalDetails,
+            },
+          });
+
+          if (response.data && response.data.listPersonalDetails) {
+  
+          } else {
+            // console.log("No personal details found in response.");
+          }
+
+          allPersonalDetails = [
+            ...allPersonalDetails,
+            ...response.data.listPersonalDetails.items,
+          ];
+
+          nextTokenPersonalDetails = response.data.listPersonalDetails.nextToken;
+        } while (nextTokenPersonalDetails);
+
+        // Fetching local mobilizations
+        do {
+
+          const response = await client.graphql({
             query: listLocalMobilizations,
-            variables: { limit: 20000 },
-          }),
-        ]);
+            variables: {
+              nextToken: nextTokenLocalMobilizations,
+            },
+          });
 
-        // Extract data or use empty array as fallback
-        const fetchedInterviewSchedules =
-          interviewSchedulesData?.data?.listInterviewSchedules?.items || [];
-        const fetchedPersonalDetails =
-          personalDetailsData?.data?.listPersonalDetails?.items || [];
-        const fetchedLocalMobilizations =
-          localMobilizationsData?.data?.listLocalMobilizations?.items || [];
+          if (response.data && response.data.listLocalMobilizations) {
 
-        // Set interview schedules to state
-        setInterviewSchedules(fetchedInterviewSchedules);
+          } else {
+            // console.log("No local mobilizations found in response.");
+          }
 
-        // Create a mapping of personal details by empID
-        const interviewDetailsMap = fetchedInterviewSchedules.reduce(
+          allLocalMobilizations = [
+            ...allLocalMobilizations,
+            ...response.data.listLocalMobilizations.items,
+          ];
+
+          nextTokenLocalMobilizations = response.data.listLocalMobilizations.nextToken;
+        } while (nextTokenLocalMobilizations);
+
+        setInterviewSchedules(allInterviewSchedules);
+
+        const interviewDetailsMap = allInterviewSchedules.reduce(
           (acc, detail) => {
             acc[detail.tempID] = detail;
             return acc;
@@ -58,8 +110,7 @@ export const useFetchInterview = () => {
           {}
         );
 
-        // Create a mapping of local mobilizations by empID
-        const localMobilizationsMap = fetchedLocalMobilizations.reduce(
+        const localMobilizationsMap = allLocalMobilizations.reduce(
           (acc, mobilization) => {
             acc[mobilization.tempID] = mobilization;
             return acc;
@@ -67,17 +118,15 @@ export const useFetchInterview = () => {
           {}
         );
 
-        // Merge interview schedules with personal details and local mobilizations
-        const merged = fetchedPersonalDetails.map((schedule) => ({
+        const merged = allPersonalDetails.map((schedule) => ({
           ...schedule,
-          interviewSchedules: interviewDetailsMap[schedule.tempID] || {}, // Add personal details
-          localMobilization: localMobilizationsMap[schedule.tempID] || {}, // Add local mobilization info
+          interviewSchedules: interviewDetailsMap[schedule.tempID] || {},
+          localMobilization: localMobilizationsMap[schedule.tempID] || {},
         }));
 
-        // Set the merged data to state
         setMergedInterviewData(merged);
       } catch (err) {
-        setError(err);
+        setError("Error fetching data.");
         console.error("Error fetching data:", err);
       } finally {
         setLoading(false);
@@ -85,7 +134,7 @@ export const useFetchInterview = () => {
     };
 
     fetchData();
-  }, []); // Empty dependency array means this effect runs only once when the component mounts
+  }, []);
 
   return { mergedInterviewData, interviewSchedules, loading, error };
 };

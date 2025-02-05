@@ -19,18 +19,18 @@ export const BlastDataUp = () => {
         blastingQulifiExp:  BlastUpValue.blastingQulifiExp,
         blastingUpload: [JSON.stringify(BlastUpValue.blastingUpload)],
     };
-    console.log(totalData);
+    // console.log(totalData);
 
     try {
       const storedData=   await Promise.all([
            client.graphql({
              query: updateBastingPaint,
              variables: {
-               input: totalData, limit:20000,
+               input: totalData,
              },
            })
          ])
-         console.log(storedData,"successfully Updated data");
+        //  console.log(storedData,"successfully Updated data");
 
        } catch (error) {
         console.log(error);

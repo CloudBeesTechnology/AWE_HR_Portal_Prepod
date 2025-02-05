@@ -144,26 +144,38 @@ export const PersonalAcci = () => {
   useEffect(() => {
     const fetchInsuranceData = async () => {
       try {
-        const response = await client.graphql({
-          query: listPersonalAccidents,
-        });
-        const items = response.data.listPersonalAccidents.items;
-
-        // Filter out expired policies
-        const filteredData = items.filter((data) => {
+        let allPersonalAccidents = [];
+        let nextToken = null;
+  
+        do {
+          const response = await client.graphql({
+            query: listPersonalAccidents,
+            variables: {
+              nextToken: nextToken,
+            },
+          });
+  
+          const items = response?.data?.listPersonalAccidents?.items || [];
+  
+          allPersonalAccidents = [...allPersonalAccidents, ...items];
+  
+          nextToken = response?.data?.listPersonalAccidents?.nextToken;
+        } while (nextToken);
+  
+        const filteredData = allPersonalAccidents.filter((data) => {
           const expiryDate = new Date(data.perAccExp);
           return expiryDate >= new Date();
         });
-
+  
         setInsuranceData(filteredData);
-        setLoading(false); // Set loading to false when data is fetched
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching insurance data:", error);
-        setError("insuranceData", { message: "Error fetching data" }); // Set error using setError
+        setError("insuranceData", { message: "Error fetching data" });
         setLoading(false);
       }
     };
-
+  
     fetchInsuranceData();
   }, []);
 

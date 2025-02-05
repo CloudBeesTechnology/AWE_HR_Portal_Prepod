@@ -43,7 +43,7 @@ export const UpdateInterviewData = () => {
 
       const response = await client.graphql({
         query: updateInterviewSchedule,
-        variables: { input: updatedData , limit:20000,},
+        variables: { input: updatedData , },
       });
 
       // // Log the response to confirm the update

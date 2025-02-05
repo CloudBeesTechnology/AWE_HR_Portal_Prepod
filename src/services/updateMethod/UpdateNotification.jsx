@@ -20,7 +20,7 @@ export const UpdateNlmsData = () => {
 
       const response = await client.graphql({
         query: updateEmailNotifi,
-        variables: { input: updatedData, limit:20000, },
+        variables: { input: updatedData },
       });
 
       // console.log("Data successfully updated:", response);

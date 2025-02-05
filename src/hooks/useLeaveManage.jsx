@@ -27,59 +27,120 @@ export const useLeaveManage = () => {
 
   const fetchAllData = useCallback(async () => {
     setLoading(true);
+
+    let allLeaveStatuses = [];
+    let allEmpPersonalInfos = [];
+    let allWorkInfo = [];
+    let allEmpLeaveDetails = [];
+    let allTicketRequests = [];
+
+    let nextTokenLeaveStatuses = null;
+    let nextTokenEmpPersonalInfos = null;
+    let nextTokenWorkInfo = null;
+    let nextTokenEmpLeaveDetails = null;
+    let nextTokenTicketRequests = null;
+
     try {
+      do {
+        const response = await client.graphql({
+          query: listLeaveStatuses,
+          variables: { nextToken: nextTokenLeaveStatuses },
+        });
 
-      const limit = 3000;
+        allLeaveStatuses = [
+          ...allLeaveStatuses,
+          ...response.data.listLeaveStatuses.items,
+        ];
 
-      const [
-        leaveStatusesData,
-        empPersonalInfosData,
-        workInfoData,
-        empLeaveData,
-        ticketRequestsData,
-      ] = await Promise.all([
-        client.graphql({ query: listLeaveStatuses, variables: { limit } }),
-        client.graphql({ query: listEmpPersonalInfos, variables: { limit } }),
-        client.graphql({ query: listEmpWorkInfos, variables: { limit } }),
-        client.graphql({ query: listEmpLeaveDetails, variables: { limit } }),
-        client.graphql({ query: listTicketRequests, variables: { limit } }),
-      
-      ]);
+        // console.log("LeaveStatus", allLeaveStatuses);
 
-      // Extract items from responses
-      const fetchedLeaveStatuses =
-        leaveStatusesData?.data?.listLeaveStatuses?.items || [];
-      const fetchedEmpPersonalInfos =
-        empPersonalInfosData?.data?.listEmpPersonalInfos?.items || [];
-      const fetchedWorkInfo = workInfoData?.data?.listEmpWorkInfos?.items || [];
-      const fetchedLeaveDetails =
-        empLeaveData?.data?.listEmpLeaveDetails?.items || [];
-      const fetchedTicketRequests =
-        ticketRequestsData?.data?.listTicketRequests?.items || [];
+        nextTokenLeaveStatuses = response.data.listLeaveStatuses.nextToken;
+      } while (nextTokenLeaveStatuses);
 
-        // console.log(fetchedEmpPersonalInfos, "EMPINFO");
-        
+      do {
+        const response = await client.graphql({
+          query: listEmpPersonalInfos,
+          variables: { nextToken: nextTokenEmpPersonalInfos },
+        });
+
+        allEmpPersonalInfos = [
+          ...allEmpPersonalInfos,
+          ...response.data.listEmpPersonalInfos.items,
+        ];
+
+        // console.log("PersonalInfo", allEmpPersonalInfos);
+
+        nextTokenEmpPersonalInfos =
+          response.data.listEmpPersonalInfos.nextToken;
+      } while (nextTokenEmpPersonalInfos);
+
+      // Fetching work info
+      do {
+        const response = await client.graphql({
+          query: listEmpWorkInfos,
+          variables: { nextToken: nextTokenWorkInfo },
+        });
+
+        allWorkInfo = [...allWorkInfo, ...response.data.listEmpWorkInfos.items];
+
+        // console.log("WorkInfo", allWorkInfo);
+
+        nextTokenWorkInfo = response.data.listEmpWorkInfos.nextToken;
+      } while (nextTokenWorkInfo);
+
+      // Fetching employee leave details
+      do {
+        const response = await client.graphql({
+          query: listEmpLeaveDetails,
+          variables: { nextToken: nextTokenEmpLeaveDetails },
+        });
+
+        allEmpLeaveDetails = [
+          ...allEmpLeaveDetails,
+          ...response.data.listEmpLeaveDetails.items,
+        ];
+
+        // console.log("LeaveDetails", allEmpLeaveDetails);
+
+        nextTokenEmpLeaveDetails = response.data.listEmpLeaveDetails.nextToken;
+      } while (nextTokenEmpLeaveDetails);
+
+      // Fetching ticket requests
+      do {
+        const response = await client.graphql({
+          query: listTicketRequests,
+          variables: { nextToken: nextTokenTicketRequests },
+        });
+
+        allTicketRequests = [
+          ...allTicketRequests,
+          ...response.data.listTicketRequests.items,
+        ];
+
+        // console.log("TicketRequest", allTicketRequests);
+
+        nextTokenTicketRequests = response.data.listTicketRequests.nextToken;
+      } while (nextTokenTicketRequests);
+
       // Create lookup maps
-      const empInfoMap = fetchedEmpPersonalInfos.reduce((acc, item) => {
+      const empInfoMap = allEmpPersonalInfos.reduce((acc, item) => {
         acc[item.empID] = item;
         return acc;
       }, {});
 
-      const workInfoMap = fetchedWorkInfo.reduce((acc, item) => {
+      const workInfoMap = allWorkInfo.reduce((acc, item) => {
         acc[item.empID] = item;
         return acc;
       }, {});
 
-      const leaveDetailsMap = fetchedLeaveDetails.reduce((acc, item) => {
+      const leaveDetailsMap = allEmpLeaveDetails.reduce((acc, item) => {
         acc[item.empID] = item;
         return acc;
       }, {});
 
       // Merge leave status data
-      const mergedLeaveData = fetchedLeaveStatuses.map((leaveStatus) => {
+      const mergedLeaveData = allLeaveStatuses.map((leaveStatus) => {
         const empInfo = empInfoMap[leaveStatus.empID] || {};
-        // console.log(empInfo, "EMP INFO");
-        
         const workInfo = workInfoMap[leaveStatus.empID] || {};
         const leaveDetails = leaveDetailsMap[leaveStatus.empID] || {};
         // console.log(empInfoMap);
@@ -94,6 +155,7 @@ export const useLeaveManage = () => {
           doj: workInfo.doj,
           leaveStatusCreatedAt: leaveStatus.createdAt,
           leaveDays: leaveStatus.days,
+          // leaveType: leaveStatus.leaveType,
           supervisorName: leaveStatus.supervisorName,
           supervisorEmpID: leaveStatus.supervisorEmpID,
           supervisorStatus: leaveStatus.supervisorStatus,
@@ -123,13 +185,13 @@ export const useLeaveManage = () => {
           hospitalLeave: leaveDetails.hospLeave || 0,
           marriageLeave: leaveDetails.mrageLeave || 0,
           empPervAnnualLeaveBal: leaveDetails.pervAnnualLeaveBal || 0,
-          leaveDetailsCreatedAt:leaveDetails.createdAt,
-          leaveDetailsUpdatedAt:leaveDetails.updatedAt
+          leaveDetailsCreatedAt: leaveDetails.createdAt,
+          leaveDetailsUpdatedAt: leaveDetails.updatedAt,
         };
       });
 
       // Merge ticket request data
-      const mergedTicketData = fetchedTicketRequests.map((ticket) => {
+      const mergedTicketData = allTicketRequests.map((ticket) => {
         const empInfo = empInfoMap[ticket.empID] || {};
         const workInfo = workInfoMap[ticket.empID] || {};
 
@@ -143,7 +205,9 @@ export const useLeaveManage = () => {
           empBadgeNo: empInfo.empBadgeNo,
           empOfficialEmail: empInfo.officialEmail,
           departureDate: ticket.departureDate,
+          empDepartureDate: ticket.from,
           arrivalDate: ticket.arrivalDate,
+          empArrivalDate: ticket.to,
           destination: ticket.destination,
           empStatus: ticket.empStatus,
           empDate: ticket.empDate,
@@ -161,8 +225,10 @@ export const useLeaveManage = () => {
       setData({
         mergedData: mergedLeaveData,
         ticketMerged: mergedTicketData,
-        personalDetails: fetchedEmpPersonalInfos,
+        personalDetails: allEmpPersonalInfos,
       });
+
+      // console.log(data);
     } catch (err) {
       setError(err);
       console.error("Error fetching data:", err);
@@ -293,6 +359,6 @@ export const useLeaveManage = () => {
     handleUpdateLeaveStatus,
     handleUpdateTicketRequest,
     handleUpdateEmpLeaveDetails,
-    refreshData: fetchAllData, // Expose refresh function if needed
+    refreshData: fetchAllData,
   };
 };

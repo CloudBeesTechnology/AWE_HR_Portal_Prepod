@@ -9,7 +9,7 @@ import { SpinLogo } from "../../../utils/SpinLogo";
 import { sendEmail } from "../../../services/EmailServices";
 import { useTempID } from "../../../utils/TempIDContext";
 
-const client = generateClient();
+const client = generateClient(); 
 
 export const RequisitionReviewForm = ({
   isVisible,
@@ -44,41 +44,57 @@ export const RequisitionReviewForm = ({
     if (isVisible) {
       const fetchRequisitions = async () => {
         try {
-          const response = await client.graphql({
-            query: listEmpRequisitions,
-          });
-
-          const fetchedData = response?.data?.listEmpRequisitions?.items.map(
-            (item) => ({
-              id: item.id,
-              requestorID: item.requestorID,
-              approverID: item.approverID,
-              reqName: item.reqName,
-              department: item.department,
-              position: item.position,
-              project: item.project,
-              quantity: item.quantity,
-              reasonForReq: item.reasonForReq,
-              justification: item.justification,
-              replacementFor: item.replacementFor || "N/A",
-              qualification: item.qualification,
-              tentativeDate: item.tentativeDate,
-              status: item.status,
-              remarkReq: item.remarkReq,
-              date: item.createdAt,
-            })
-          );
-
-          setRequestData(fetchedData);
+          let allRequisitions = [];
+          let nextToken = null;
+  
+          do {
+            const response = await client.graphql({
+              query: listEmpRequisitions,
+              variables: {
+                nextToken,
+              },
+            });
+  
+            const fetchedData = response?.data?.listEmpRequisitions?.items.map(
+              (item) => ({
+                id: item.id,
+                requestorID: item.requestorID,
+                approverID: item.approverID,
+                reqName: item.reqName,
+                department: item.department,
+                position: item.position,
+                project: item.project,
+                quantity: item.quantity,
+                reasonForReq: item.reasonForReq,
+                justification: item.justification,
+                replacementFor: item.replacementFor || "N/A",
+                qualification: item.qualification,
+                tentativeDate: item.tentativeDate,
+                status: item.status,
+                remarkReq: item.remarkReq,
+                date: item.createdAt,
+              })
+            );
+  
+            allRequisitions = [...allRequisitions, ...fetchedData];
+  
+            nextToken = response?.data?.listEmpRequisitions?.nextToken;
+          } while (nextToken);
+  
+          setRequestData(allRequisitions);
+          console.log("DE", allRequisitions);
+          
+          setError(null);
         } catch (err) {
           console.error("Error fetching requisition data:", err);
           setError("Error fetching requisition data");
         }
       };
-
+  
       fetchRequisitions();
     }
   }, [isVisible]);
+  
 
   const handleStatusUpdate = async (statusUpdate) => {
     try {
@@ -88,6 +104,7 @@ export const RequisitionReviewForm = ({
       });
       setNotification(true);
       setShowTitle("Form Status Updated Successfully");
+
       if (onStatusChange) {
         onStatusChange({ id: selectedRequest.id, status: statusUpdate });
       }
@@ -134,7 +151,10 @@ export const RequisitionReviewForm = ({
         console.error("HR email not found.");
       }
 
-      setTimeout(() => onClose(), 4000);
+      setTimeout(() => {
+      onClose()
+      }, 4000);
+  
     } catch (err) {
       console.error("Error updating status or sending email:", err);
     }

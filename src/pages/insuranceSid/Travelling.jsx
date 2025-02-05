@@ -309,26 +309,38 @@ export const Travelling = () => {
   useEffect(() => {
     const fetchInsuranceData = async () => {
       try {
-        const response = await client.graphql({
-          query: listTravelIns,
-        });
-        const items = response.data.listTravelIns.items;
-
-        // Filter out expired policies
-        const filteredData = items.filter((data) => {
+        let allTravelIns = [];
+        let nextToken = null;
+  
+        do {
+          const response = await client.graphql({
+            query: listTravelIns,
+            variables: {
+              nextToken: nextToken,
+            },
+          });
+  
+          const items = response?.data?.listTravelIns?.items || [];
+  
+          allTravelIns = [...allTravelIns, ...items];
+  
+          nextToken = response?.data?.listTravelIns?.nextToken;
+        } while (nextToken);
+  
+        const filteredData = allTravelIns.filter((data) => {
           const expiryDate = new Date(data.travelExp);
-          return expiryDate >= new Date(); // Include only non-expired policies
+          return expiryDate >= new Date();
         });
-
+  
         setInsuranceData(filteredData);
-        setLoading(false); // Set loading to false when data is fetched
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching insurance data:", error);
-        setError("insuranceData", { message: "Error fetching data" }); // Set error using setError
+        setError("insuranceData", { message: "Error fetching data" });
         setLoading(false);
       }
     };
-
+  
     fetchInsuranceData();
   }, []);
 

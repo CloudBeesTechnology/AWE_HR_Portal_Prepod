@@ -13,7 +13,7 @@ const client = generateClient();
 export const MobilizationRecru = ({
   data,
   formatDate,
-  fileUpload,
+  fileUpload, 
   urlValue,
 }) => {
   const { SumbitCandiToEmp } = CandiToEmp();
@@ -49,15 +49,25 @@ export const MobilizationRecru = ({
 
   const getTotalCount = async () => {
     try {
-      const result = await client.graphql({
-        query: listEmpPersonalInfos,
-        variables: { limit: 20000 }
-      });
-      const items = result?.data?.listEmpPersonalInfos?.items || [];
-      const filteringData = items.map((val) => val.empID);
+      let allEmpIDs = [];
+      let nextToken = null;
   
-      // Sorting function
-      const sortedData = filteringData.sort((a, b) => {
+      do {
+        const result = await client.graphql({
+          query: listEmpPersonalInfos,
+          variables: {
+            nextToken,
+          },
+        });
+  
+        const items = result?.data?.listEmpPersonalInfos?.items || [];
+        const empIDs = items.map((val) => val.empID);
+        allEmpIDs = [...allEmpIDs, ...empIDs];
+  
+        nextToken = result?.data?.listEmpPersonalInfos?.nextToken;
+      } while (nextToken);
+  
+      const sortedData = allEmpIDs.sort((a, b) => {
         const numA = a.match(/\d+/) ? parseInt(a.match(/\d+/)[0], 10) : 0;
         const numB = b.match(/\d+/) ? parseInt(b.match(/\d+/)[0], 10) : 0;
   
@@ -65,14 +75,13 @@ export const MobilizationRecru = ({
         const prefixB = b.replace(/\d+/g, "") || "";
   
         if (prefixA === prefixB) {
-          return numA - numB; // Sort numerically if prefixes match
+          return numA - numB;
         }
-        return prefixA.localeCompare(prefixB); // Sort alphabetically if different prefixes
+        return prefixA.localeCompare(prefixB);
       });
   
-      const maxValue = sortedData[sortedData.length - 1]; // Get the last (largest) value
+      const maxValue = sortedData[sortedData.length - 1];
   
-      // console.log(sortedData);
       return maxValue;
     } catch (error) {
       console.error("Error fetching total count:", error);
@@ -80,31 +89,6 @@ export const MobilizationRecru = ({
     }
   };
   
-
-  // const getTotalCount = async () => {
-  //   try {
-  //     const result = await client.graphql({
-  //       query: listEmpPersonalInfos,
-  //       variables:{limit:20000}
-  //     });
-  //     const items = result?.data?.listEmpPersonalInfos?.items || [];
-  //     const filteringData = items.map((val) => val.empID);
-  //     const sortedData = filteringData.sort((a, b) => a - b);
-  //     const maxValue = sortedData[sortedData.length - 1]; // Get the last value in the sorted array
-  //     console.log(sortedData);
-
-  //     return maxValue; // Return the count of all entries
-  //   } catch (error) {
-  //     console.error("Error fetching total count:", error);
-  //     return 0; // Return 0 if there's an error
-  //   }
-  // };
-  // const generateNextTempID = (totalCount) => {
-  //   const nextNumber = Number(totalCount + 1);
-  //   console.log(nextNumber);
-
-  //   return  String(nextNumber);
-  // };
 
   const generateNextTempID = (totalCount) => {
     // Check if the string contains a non-numeric prefix

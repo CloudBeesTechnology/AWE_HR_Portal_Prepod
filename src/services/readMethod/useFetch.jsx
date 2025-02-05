@@ -1,72 +1,3 @@
-// import { useEffect, useState } from "react";
-// import { generateClient } from "@aws-amplify/api";
-// import {
-//   listInterviewSchedules,
-//   listPersonalDetails,
-//   listLocalMobilizations,
-// } from "../graphql/queries";
-
-// const client = generateClient();
-
-// export const useFetchInterview = () => {
-//   const [mergedInterviewData, setMergedInterviewData] = useState([]);
-//   const [interviewSchedules, setInterviewSchedules] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       setLoading(true);
-//       try {
-//         // Fetch the data from multiple sources concurrently
-//         const [interviewSchedulesData, personalDetailsData, localMobilizationsData] = await Promise.all([
-//           client.graphql({ query: listInterviewSchedules }),
-//           client.graphql({ query: listPersonalDetails }),
-//           client.graphql({ query: listLocalMobilizations }),
-//         ]);
-
-//         // Extract data or use empty array as fallback
-//         const fetchedInterviewSchedules = interviewSchedulesData?.data?.listInterviewSchedules?.items || [];
-//         const fetchedPersonalDetails = personalDetailsData?.data?.listPersonalDetails?.items || [];
-//         const fetchedLocalMobilizations = localMobilizationsData?.data?.listLocalMobilizations?.items || [];
-
-//         // Set interview schedules to state
-//         setInterviewSchedules(fetchedInterviewSchedules);
-
-//         // Create a mapping of personal details by empID
-//         const personalDetailsMap = fetchedPersonalDetails.reduce((acc, detail) => {
-//           acc[detail.empID] = detail;
-//           return acc;
-//         }, {});
-
-//         // Create a mapping of local mobilizations by empID
-//         const localMobilizationsMap = fetchedLocalMobilizations.reduce((acc, mobilization) => {
-//           acc[mobilization.empID] = mobilization;
-//           return acc;
-//         }, {});
-
-//         // Merge interview schedules with personal details and local mobilizations
-//         const merged = fetchedInterviewSchedules.map((schedule) => ({
-//           ...schedule,
-//           personalDetails: personalDetailsMap[schedule.empID] || {}, // Add personal details
-//           localMobilization: localMobilizationsMap[schedule.empID] || {}, // Add local mobilization info
-//         }));
-
-//         // Set the merged data to state
-//         setMergedInterviewData(merged);
-//       } catch (err) {
-//         setError(err);
-//         console.error("Error fetching data:", err);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchData();
-//   }, []); // Empty dependency array means this effect runs only once when the component mounts
-
-//   return { mergedInterviewData, interviewSchedules, loading, error };
-// };
 import { useEffect, useState } from "react";
 import { generateClient } from "@aws-amplify/api";
 import {
@@ -84,40 +15,70 @@ export const useFetchInterview = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAllData = async () => {
       setLoading(true);
-      try {
-        // Fetch the data from multiple sources concurrently
-        const [interviewSchedulesData, personalDetailsData, localMobilizationsData] = await Promise.all([
-          client.graphql({ query: listInterviewSchedules }),
-          client.graphql({ query: listPersonalDetails }),
-          client.graphql({ query: listLocalMobilizations }),
-        ]);
 
-        // Extract data or use empty array as fallback
-        const fetchedInterviewSchedules = interviewSchedulesData?.data?.listInterviewSchedules?.items || [];
-        const fetchedPersonalDetails = personalDetailsData?.data?.listPersonalDetails?.items || [];
-        const fetchedLocalMobilizations = localMobilizationsData?.data?.listLocalMobilizations?.items || [];
+      let nextTokenIS = null;
+      let nextTokenPD = null;
+      let nextTokenLM = null;
+
+      let allIS = [];
+      let allPD = [];
+      let allLM = [];
+
+      try {
+        // Fetch all pages of interview schedules
+        do {
+          const response = await client.graphql({
+            query: listInterviewSchedules,
+            variables: { nextToken: nextTokenIS },
+          });
+          const fetchedData = response?.data?.listInterviewSchedules;
+          allIS = [...allIS, ...(fetchedData?.items || [])];
+          nextTokenIS = fetchedData?.nextToken;
+        } while (nextTokenIS);
+
+        // Fetch all pages of personal details
+        do {
+          const response = await client.graphql({
+            query: listPersonalDetails,
+            variables: { nextToken: nextTokenPD },
+          });
+          const fetchedData = response?.data?.listPersonalDetails;
+          allPD = [...allPD, ...(fetchedData?.items || [])];
+          nextTokenPD = fetchedData?.nextToken;
+        } while (nextTokenPD);
+
+        // Fetch all pages of local mobilizations
+        do {
+          const response = await client.graphql({
+            query: listLocalMobilizations,
+            variables: { nextToken: nextTokenLM },
+          });
+          const fetchedData = response?.data?.listLocalMobilizations;
+          allLM = [...allLM, ...(fetchedData?.items || [])];
+          nextTokenLM = fetchedData?.nextToken;
+        } while (nextTokenLM);
 
         // Set interview schedules to state
-        setInterviewSchedules(fetchedInterviewSchedules);
+        setInterviewSchedules(allIS);
 
-        // Create a mapping of personal details by empID;
-        const interviewDetailsMap = fetchedInterviewSchedules.reduce((acc, detail) => {
+        // Create a mapping of personal details by tempID
+        const interviewDetailsMap = allIS.reduce((acc, detail) => {
           acc[detail.tempID] = detail;
           return acc;
         }, {});
 
-        // Create a mapping of local mobilizations by empID
-        const localMobilizationsMap = fetchedLocalMobilizations.reduce((acc, mobilization) => {
+        // Create a mapping of local mobilizations by tempID
+        const localMobilizationsMap = allLM.reduce((acc, mobilization) => {
           acc[mobilization.tempID] = mobilization;
           return acc;
         }, {});
 
         // Merge interview schedules with personal details and local mobilizations
-        const merged = fetchedPersonalDetails.map((schedule) => ({
+        const merged = allPD.map((schedule) => ({
           ...schedule,
-          interviewSchedules: interviewDetailsMap[schedule.tempID] || {}, // Add personal details
+          interviewSchedules: interviewDetailsMap[schedule.tempID] || {}, // Add interview details
           localMobilization: localMobilizationsMap[schedule.tempID] || {}, // Add local mobilization info
         }));
 
@@ -131,8 +92,8 @@ export const useFetchInterview = () => {
       }
     };
 
-    fetchData();
-  }, []); // Empty dependency array means this effect runs only once when the component mounts
+    fetchAllData();
+  }, []); // Runs only once when the component mounts
 
   return { mergedInterviewData, interviewSchedules, loading, error };
 };

@@ -7,7 +7,7 @@ import { RemarksDialog } from "../empRequisition/RemarksDialog";
 import { format } from "date-fns";
 import { listEmpRequisitions } from "../../../graphql/queries";
 import { generateClient } from "@aws-amplify/api";
-
+  
 const client = generateClient();
 
 export const EmployReq = ({}) => {
@@ -21,9 +21,24 @@ export const EmployReq = ({}) => {
 
   const fetchRequisitionData = async () => {
     try {
-      const response = await client.graphql({ query: listEmpRequisitions });
-      const fetchedData = response?.data?.listEmpRequisitions?.items || [];
-      setRequisitionData(fetchedData);
+      let allRequisitions = [];
+      let nextToken = null;
+  
+      do {
+        const response = await client.graphql({
+          query: listEmpRequisitions,
+          variables: {
+            nextToken,
+          },
+        });
+  
+        const fetchedData = response?.data?.listEmpRequisitions?.items || [];
+        allRequisitions = [...allRequisitions, ...fetchedData];
+  
+        nextToken = response?.data?.listEmpRequisitions?.nextToken;
+      } while (nextToken);
+  
+      setRequisitionData(allRequisitions);
       setError(null);
     } catch (err) {
       console.error("Error fetching requisition data:", err);
@@ -31,10 +46,11 @@ export const EmployReq = ({}) => {
       setRequisitionData([]);
     }
   };
-
+  
   useEffect(() => {
     fetchRequisitionData();
   }, []);
+  
 
   const handleViewClick = (request) => {
     setSelectedRequest(request);

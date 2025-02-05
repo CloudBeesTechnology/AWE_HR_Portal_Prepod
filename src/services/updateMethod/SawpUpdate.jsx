@@ -16,18 +16,18 @@ export const SawpUpdate = () => {
         sawpEmpUpload:SawpUpValue.sawpEmpUpload,
 
     };
-    console.log(totalData);
+    // console.log(totalData);
 
     try {
       const storedData=   await Promise.all([
            client.graphql({
              query: updateSawpDetails,
              variables: {
-               input: totalData, limit:20000,
+               input: totalData, 
              },
            })
          ])
-         console.log(storedData,"successfully Updated data");
+        //  console.log(storedData,"successfully Updated data");
 
        } catch (error) {
         console.log(error);

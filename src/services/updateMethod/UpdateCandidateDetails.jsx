@@ -101,7 +101,7 @@ export const UpdateCandidateDetails = () => {
       // Send the updated data to the backend
       const response = await client.graphql({
         query: updateIDDetails, // The mutation for updating candidate details
-        variables: { input: updatedData, limit:20000, },
+        variables: { input: updatedData, },
       });
 
       // Log the response to confirm the update

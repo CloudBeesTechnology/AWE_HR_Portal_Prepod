@@ -30,7 +30,7 @@ export const UpdateJitpaFun = () => {
 
       const response = await client.graphql({
         query: updateBJLDetails,
-        variables: { input: updatedData, limit:20000, },
+        variables: { input: updatedData, },
       });
 
       // // Log the response to confirm the update

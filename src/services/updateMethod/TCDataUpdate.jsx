@@ -26,7 +26,7 @@ export const TCDataUpdate = () => {
            client.graphql({
              query: updateTrainingCertificates,
              variables: {
-               input: totalData, limit:20000,
+               input: totalData,
              },
            })
          ])

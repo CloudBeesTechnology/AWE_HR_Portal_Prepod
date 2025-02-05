@@ -20,7 +20,7 @@ export const UpdateEmpReqData = async ({ requestId, newStatus, newRemark }) => {
   try {
     const response = await client.graphql({
       query: updateEmpRequisition,
-      variables: { input: updateData, limit:20000, },
+      variables: { input: updateData, },
     });
     // console.log("Successfully updated requisition data:", response);
     return response; 

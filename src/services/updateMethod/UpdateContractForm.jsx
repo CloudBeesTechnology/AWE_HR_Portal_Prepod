@@ -11,7 +11,7 @@ export const UpdateContractData = () => {
     }
 
     try {
-      const { conAttn, depHead, hrManager, genManager, remarks, id } = ContractValue;
+      const { conAttn, depHead,contStatus, hrManager, genManager, remarks, id } = ContractValue;
 
       const updatedData = {
         conAttn,
@@ -19,14 +19,15 @@ export const UpdateContractData = () => {
         hrManager,
         genManager,
         remarks,
+        contStatus,
         id,
       };
 
       const response = await client.graphql({
         query: updateContractForm,
-        variables: { input: updatedData, limit: 20000 },
+        variables: { input: updatedData},
       });
-      console.log("Data successfully updated:", response);
+      // console.log("Data successfully updated:", response);
     } catch (error) {
       console.error("Error updating data:", error);
       throw error; 
