@@ -6,7 +6,7 @@ import { FaRegMinusSquare } from "react-icons/fa";
 import { CiSquarePlus } from "react-icons/ci";
 import { LabourTypeDD } from "../../../utils/DropDownMenus";
 import { useFieldArray } from "react-hook-form";
-import { handleDeleteFile } from "../../../services/uploadDocsS3/LabourImmiUpload";
+// import { handleDeleteFile } from "../../../services/uploadDocsS3/LabourImmiUpload";
 
 export const DependentPass = ({
   errors,
@@ -139,25 +139,25 @@ export const DependentPass = ({
     }
   };
 
-  const handleDeleteFile = async (fileType, fileName, index) => {
-    const watchedEmpID = watch("empID");
-    const { serviceID, terminateID } = id;
+  // const handleDeleteFile = async (fileType, fileName, index) => {
+  //   const watchedEmpID = watch("empID");
+  //   const { serviceID, terminateID } = id;
 
-    try {
-      await deleteFile(fileType, fileName, watchedEmpID, setArrayFileNames, setValue, trigger, terminateID, serviceID);
+  //   try {
+  //     await deleteFile(fileType, fileName, watchedEmpID, setArrayFileNames, setValue, trigger, terminateID, serviceID);
 
-      const currentFiles = getValues(`dependPass[${index}].${fileType}`) || [];
-      const updatedFiles = currentFiles.filter((file) => file.name !== fileName);
+  //     const currentFiles = getValues(`dependPass[${index}].${fileType}`) || [];
+  //     const updatedFiles = currentFiles.filter((file) => file.name !== fileName);
 
-      setValue(`dependPass[${index}].${fileType}`, updatedFiles);
-      setDocsUploaded((prev) => ({
-        ...prev,
-        [`${index}_${fileType}`]: updatedFiles,
-      }));
-    } catch (error) {
-      console.error("Error deleting file:", error);
-    }
-  };
+  //     setValue(`dependPass[${index}].${fileType}`, updatedFiles);
+  //     setDocsUploaded((prev) => ({
+  //       ...prev,
+  //       [`${index}_${fileType}`]: updatedFiles,
+  //     }));
+  //   } catch (error) {
+  //     console.error("Error deleting file:", error);
+  //   }
+  // };
 
   useEffect(() => {
     setArrayUploadDocs(docsUploaded);
@@ -249,9 +249,9 @@ export const DependentPass = ({
             register={register(`dependPass[${index}].uploadDp`)}
             error={errors?.dependPass?.[index]?.uploadDp}
             arrayFileNames={arrayFileNames}
-            deleteFile={(fieldTitle, fileName) =>
-              handleDeleteFile(fieldTitle, fileName, index)
-            }
+            // deleteFile={(fieldTitle, fileName) =>
+            //   handleDeleteFile(fieldTitle, fileName, index)
+            // }
             field={{ title: `${index}_uploadDp` }}
           />
           <FileUploadFieldArr
@@ -260,9 +260,9 @@ export const DependentPass = ({
             register={register(`dependPass[${index}].uploadDr`)}
             error={errors?.dependPass?.[index]?.uploadDr}
             arrayFileNames={arrayFileNames}
-            deleteFile={(fieldTitle, fileName) =>
-              handleDeleteFile(fieldTitle, fileName, index)
-            }
+            // deleteFile={(fieldTitle, fileName) =>
+            //   handleDeleteFile(fieldTitle, fileName, index)
+            // }
             field={{ title: `${index}_uploadDr` }}
           />
           {index !== 0 && (

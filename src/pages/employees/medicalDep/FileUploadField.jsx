@@ -63,13 +63,13 @@ export const FileUploadFieldArr = ({
       {arrayFileNames?.[field.title] && (
         <p className="text-xs mt-1 text-grey px-1 border flex justify-between items-center">
           {arrayFileNames[field.title]}
-          <button
+          {/* <button
             type="button"
             className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
             onClick={() => deleteFile(field.title, arrayFileNames[field.title])}
           >
             <MdCancel />
-          </button>
+          </button> */}
         </p>
       )}
 
@@ -88,7 +88,7 @@ export const FileUploadNew = ({
   error,
   fileName,
   uploadedFileNames,
-  deleteFile,
+  // deleteFile,
   field
 }) => {
 
@@ -119,19 +119,19 @@ export const FileUploadNew = ({
               .map((fileName, fileIndex) => (
                 <span key={fileIndex} className="mt-2 flex justify-between items-center">
                   {fileName}
-                  <button
+                  {/* <button
                     type="button"
                     className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
                     onClick={() => deleteFile(field.title, fileName)}
                   >
                     <MdCancel />
-                  </button>
+                  </button> */}
                 </span>
               ))
           ) : (
             <span className="mt-2 flex justify-between items-center">
               {uploadedFileNames[field.title]}
-              <button
+              {/* <button
                 type="button"
                 className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
                 onClick={() =>
@@ -139,7 +139,7 @@ export const FileUploadNew = ({
                 }
               >
                 <MdCancel />
-              </button>
+              </button> */}
             </span>
           )
         ) : (
@@ -159,7 +159,7 @@ export const UploadingFiles = ({
   handleFileChange,
   uploadedFileNames,
   errors,watchedEmpID,
-  deleteFile
+  // deleteFile
 }) => {
   // console.log(uploadedFileNames);
 
@@ -199,19 +199,19 @@ export const UploadingFiles = ({
                   className="mt-2 flex justify-between items-center"
                 >
                   {fileName}
-                  <button
+                  {/* <button
                     type="button"
                     className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
                     onClick={() => deleteFile(field.name, fileName)}
                   >
                     <MdCancel />
-                  </button>
+                  </button> */}
                 </span>
               ))
           ) : (
             <span className="mt-2 flex justify-between items-center">
               {uploadedFileNames[field.name]}
-              <button
+              {/* <button
                 type="button"
                 className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
                 onClick={() =>
@@ -219,7 +219,7 @@ export const UploadingFiles = ({
                 }
               >
                 <MdCancel />
-              </button>
+              </button> */}
             </span>
           )}
         </p>

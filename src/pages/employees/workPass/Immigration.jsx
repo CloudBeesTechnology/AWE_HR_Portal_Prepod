@@ -11,7 +11,7 @@ import { useOutletContext } from 'react-router-dom';
 import { DataSupply } from '../../../utils/DataStoredContext';
 import { useContext } from 'react';
 import { UpdateImmigra } from '../../../services/updateMethod/UpdateImmigra';
-import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteImmiUpload";
+// import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteImmiUpload";
 
 export const Immigration = () => {
   const { searchResultData } = useOutletContext();
@@ -45,7 +45,7 @@ export const Immigration = () => {
     immigEmpUpload: [],
     reEntryUpload: [],
   });
-  const [id, setID] = useState({immigrationID:"",});
+  // const [id, setID] = useState({immigrationID:"",});
 
   const watchInducImmUpAS = watch("arrivStampUpload", ""); // Watch the arrivStampUpload field
   const watchInducImmUpIE = watch("immigEmpUpload", ""); // Watch the arrivStampUpload field
@@ -113,14 +113,14 @@ export const Immigration = () => {
 
     if (!searchResultData) return;
 
-  const immiRecord = PPValidsData.find((match) => match.empID === searchResultData.empID);
+  // const immiRecord = PPValidsData.find((match) => match.empID === searchResultData.empID);
   
-  if (immiRecord) {
-    setID((prevData) => ({
-      ...prevData,
-      immigrationID: immiRecord.id, // Ensure this field exists in SRData.
-    }));
-  }
+  // if (immiRecord) {
+  //   setID((prevData) => ({
+  //     ...prevData,
+  //     immigrationID: immiRecord.id, // Ensure this field exists in SRData.
+  //   }));
+  // }
 
     setValue("empID", searchResultData.empID);
     const field = [ "ppLocation","arrivStampUpload","immigEmpUpload","reEntryUpload","arrivStampExp",
@@ -186,7 +186,7 @@ export const Immigration = () => {
     const newUploads = currentFiles.filter(file => file instanceof File);
   
     if (newUploads.length > 0) {
-      alert("You can only upload one new file. Please delete the existing file before uploading another.");
+      alert("You can only upload one new file.");
       return;
     }
   
@@ -210,37 +210,37 @@ export const Immigration = () => {
     }
   };
 
-  const deleteFile = async (fileType, fileName) => {
-    const watchedEmpID = watch("empID");
-    const immigrationID = id.immigrationID;
+  // const deleteFile = async (fileType, fileName) => {
+  //   const watchedEmpID = watch("empID");
+  //   const immigrationID = id.immigrationID;
 
-    try {
-      await handleDeleteFile(
-        fileType,
-        fileName,
-        watchedEmpID,
-        setUploadedFileNames,
-        setValue,
-        trigger,
-        immigrationID
-      );
-      const currentFiles = watch(fileType) || []; 
-      // Filter out the deleted file
-      const updatedFiles = currentFiles.filter(
-        (file) => file.name !== fileName
-      );
-      // Update form state with the new file list
-      setValue(fileType, updatedFiles);
+  //   try {
+  //     await handleDeleteFile(
+  //       fileType,
+  //       fileName,
+  //       watchedEmpID,
+  //       setUploadedFileNames,
+  //       setValue,
+  //       trigger,
+  //       immigrationID
+  //     );
+  //     const currentFiles = watch(fileType) || []; 
+  //     // Filter out the deleted file
+  //     const updatedFiles = currentFiles.filter(
+  //       (file) => file.name !== fileName
+  //     );
+  //     // Update form state with the new file list
+  //     setValue(fileType, updatedFiles);
 
-      // Update UI state
-      setUploadedImmigrate((prevState) => ({
-        ...prevState,
-        [fileType]: updatedFiles,
-      }));
-    } catch (error) {
-      console.error("Error deleting file:", error);
-    }
-  };
+  //     // Update UI state
+  //     setUploadedImmigrate((prevState) => ({
+  //       ...prevState,
+  //       [fileType]: updatedFiles,
+  //     }));
+  //   } catch (error) {
+  //     console.error("Error deleting file:", error);
+  //   }
+  // };
 
   const onSubmit = async (data) => {    
     try {
@@ -390,7 +390,7 @@ export const Immigration = () => {
             // extractFileName(watchInducImmUpAS)
           }  
           uploadedFileNames={uploadedFileNames}
-          deleteFile={deleteFile}
+          // deleteFile={deleteFile}
 
           field={{ title: "arrivStampUpload" }}
        
@@ -441,7 +441,7 @@ export const Immigration = () => {
             uploadedFileNames.immigEmpUpload ||
 ""          } 
           uploadedFileNames={uploadedFileNames}
-          deleteFile={deleteFile}
+          // deleteFile={deleteFile}
           field={{ title: "immigEmpUpload" }}
        
           />
@@ -498,7 +498,7 @@ export const Immigration = () => {
             uploadedFileNames.reEntryUpload ||
 ""          }  
           uploadedFileNames={uploadedFileNames}
-          deleteFile={deleteFile} 
+          // deleteFile={deleteFile} 
           field={{ title: "reEntryUpload" }}
           />
        

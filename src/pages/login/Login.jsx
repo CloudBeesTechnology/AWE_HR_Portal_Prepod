@@ -22,28 +22,30 @@ const Login = () => {
   const [error, setError] = useState("");
 
   const Submit = handleSubmit(async (data) => {
-  
     try {
       const username = data.userID;
-      let user = [];
+
+      let totalUser = [];
       let nextToken = null;
+      let foundUser = null;
 
       do {
         const resultUser = await client.graphql({
           query: listUsers,
-          variables: { nextToken }, 
+          variables: { nextToken },
         });
-  
+
         const users = resultUser?.data?.listUsers?.items || [];
-  
-        user = users.find((val) => val.empID === username.toUpperCase());
-  
+        totalUser = [...totalUser, ...users];
+
+        foundUser = totalUser.find(
+          (val) => val.empID?.toString() === username?.toString()
+        );
+
         nextToken = resultUser?.data?.listUsers?.nextToken;
-  
-      } while (nextToken);
+      } while (nextToken && !foundUser);
 
-
-      if (user && user.status === "Active") {
+      if (foundUser && foundUser.status === "Active") {
         const password = data.password;
         const { isSignedIn } = await signIn({
           username,
@@ -54,27 +56,21 @@ const Login = () => {
         if (isSignedIn || currentUser) {
           const userToStore = currentUser ? currentUser.username : username;
           localStorage.setItem("userID", userToStore);
-
           // Store userType and redirect to dashboard
-          const userType = user.selectType;
-          if (userType) {
-            localStorage.setItem("userType", userType);
-            window.location.href = "/dashboard";
-          } else {
-            console.error("userType not found");
-            alert(
-              "Access denied: Your account is inactive. Please contact the administrator for assistance"
-            );
-          }
+          const userType = foundUser.selectType;
+          localStorage.setItem("userType", userType);
+          window.location.href = "/dashboard";
+        } else {
+          alert("Invalid credentials. Please try again.");
         }
       } else {
-        console.error("User is not active");
+        // console.error("User is not active");
         alert(
           "Access denied: Your account is inactive. Please contact the administrator for assistance"
         );
       }
     } catch (error) {
-      console.error("Error during sign-in process:", error);
+      // console.error("Error during sign-in process:", error);
       setError(error.message);
     }
   });

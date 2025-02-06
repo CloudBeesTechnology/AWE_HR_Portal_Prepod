@@ -115,7 +115,7 @@ export const Doe = () => {
     }
     
     if (newUploads.length > 0) {
-      alert("You can only upload one new file. Please delete the existing file before uploading another.");
+      alert("You can only upload one new file.");
       return;
     }
     
@@ -192,38 +192,38 @@ export const Doe = () => {
     }
   }, [searchResultData, setValue]);
 
-  const deleteFile = async (fileType, fileName) => {
-    const deleteID = id.doeID; 
+  // const deleteFile = async (fileType, fileName) => {
+  //   const deleteID = id.doeID; 
 
-    try {
-      await handleDeleteFile(
-        fileType,
-        fileName,
-        empID,
-        setUploadedFileNames,
-        deleteID,
-        setValue
-      );
+  //   try {
+  //     await handleDeleteFile(
+  //       fileType,
+  //       fileName,
+  //       empID,
+  //       setUploadedFileNames,
+  //       // deleteID,
+  //       setValue
+  //     );
 
-      const currentFiles = watch(fileType) || [];
+  //     const currentFiles = watch(fileType) || [];
 
-      // Filter out the deleted file
-      const updatedFiles = currentFiles.filter(
-        (file) => file.name !== fileName
-      );
+  //     // Filter out the deleted file
+  //     const updatedFiles = currentFiles.filter(
+  //       (file) => file.name !== fileName
+  //     );
 
-      // Update form state with the new file list
-      setValue(fileType, updatedFiles);
+  //     // Update form state with the new file list
+  //     setValue(fileType, updatedFiles);
 
-      // Update UI state
-      setUploadDoe((prevState) => ({
-        ...prevState,
-        [fileType]: updatedFiles,
-      }));
-    } catch (error) {
-      console.error("Error deleting file:", error);
-    }
-  };
+  //     // Update UI state
+  //     setUploadDoe((prevState) => ({
+  //       ...prevState,
+  //       [fileType]: updatedFiles,
+  //     }));
+  //   } catch (error) {
+  //     console.error("Error deleting file:", error);
+  //   }
+  // };
 
   const onSubmit = async (data) => {
     try {
@@ -349,7 +349,7 @@ export const Doe = () => {
           error={errors.doeEmpUpload}
           fileName={uploadedFileNames.doeEmpUpload || ""}
           uploadedFileNames={uploadedFileNames}
-          deleteFile={deleteFile}
+          // deleteFile={deleteFile}
           field={{ title: "doeEmpUpload" }}
         />
       </div>

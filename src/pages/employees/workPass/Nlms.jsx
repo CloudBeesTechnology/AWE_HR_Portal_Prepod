@@ -9,7 +9,7 @@ import { UpdateNlmsData } from "../../../services/updateMethod/UpdateNlmsData";
 import { FileUploadNew } from "../medicalDep/FileUploadField";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { useOutletContext } from "react-router-dom";
-import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteDoeNlmsUp";
+// import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteDoeNlmsUp";
 
 export const Nlms = () => {
   const { searchResultData } = useOutletContext();
@@ -26,9 +26,9 @@ export const Nlms = () => {
     nlmsEmpUpload: [],
   });
 
-  const [id, setID] = useState({
-    nlmsID: "",
-  });
+  // const [id, setID] = useState({
+  //   nlmsID: "",
+  // });
 
     const [fieldTitle, setFieldTitle] = useState("nlmsEmpUpload");
 
@@ -203,15 +203,15 @@ export const Nlms = () => {
       setValue(field, getLastValue(searchResultData[field]))
     );
 
-    const nlmsRecord = DNData.find(
-      (match) => match.empID === searchResultData.empID
-    );
-    if (nlmsRecord) {
-      setID((prevData) => ({
-        ...prevData,
-        nlmsID: nlmsRecord.id,
-      }));
-    }
+    // const nlmsRecord = DNData.find(
+    //   (match) => match.empID === searchResultData.empID
+    // );
+    // if (nlmsRecord) {
+    //   setID((prevData) => ({
+    //     ...prevData,
+    //     nlmsID: nlmsRecord.id,
+    //   }));
+    // }
 
     if (searchResultData?.nlmsEmpUpload) {
       try {
@@ -231,38 +231,38 @@ export const Nlms = () => {
     }
   }, [searchResultData, setValue]);
 
-  const deleteFile = async (fileType, fileName) => {
-    const deleteID = id.nlmsID;
+  // const deleteFile = async (fileType, fileName) => {
+  //   const deleteID = id.nlmsID;
 
-    try {
-      await handleDeleteFile(
-        fileType,
-        fileName,
-        empID,
-        setUploadedFileNames,
-        deleteID,
-        setValue
-      );
+  //   try {
+  //     await handleDeleteFile(
+  //       fileType,
+  //       fileName,
+  //       empID,
+  //       setUploadedFileNames,
+  //       deleteID,
+  //       setValue
+  //     );
 
-      const currentFiles = watch(fileType) || [];
+  //     const currentFiles = watch(fileType) || [];
 
-      // Filter out the deleted file
-      const updatedFiles = currentFiles.filter(
-        (file) => file.name !== fileName
-      );
+  //     // Filter out the deleted file
+  //     const updatedFiles = currentFiles.filter(
+  //       (file) => file.name !== fileName
+  //     );
 
-      // Update form state with the new file list
-      setValue(fileType, updatedFiles);
+  //     // Update form state with the new file list
+  //     setValue(fileType, updatedFiles);
 
-      // Update UI state
-      setUploadNlms((prevState) => ({
-        ...prevState,
-        [fileType]: updatedFiles,
-      }));
-    } catch (error) {
-      console.error("Error deleting file:", error);
-    }
-  };
+  //     // Update UI state
+  //     setUploadNlms((prevState) => ({
+  //       ...prevState,
+  //       [fileType]: updatedFiles,
+  //     }));
+  //   } catch (error) {
+  //     console.error("Error deleting file:", error);
+  //   }
+  // };
 
   const formatDate = (date) => {
     return date ? new Date(date).toLocaleDateString("en-CA") : null;
@@ -395,7 +395,7 @@ export const Nlms = () => {
           error={errors.nlmsEmpUpload}
           fileName={uploadedFileNames.nlmsEmpUpload || ""}
           uploadedFileNames={uploadedFileNames}
-          deleteFile={deleteFile}
+          // deleteFile={deleteFile}
           field={{ title: "nlmsEmpUpload" }}
         />
       </div>

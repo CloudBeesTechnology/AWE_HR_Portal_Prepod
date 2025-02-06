@@ -11,7 +11,7 @@ import { FileUploadNew } from "../medicalDep/FileUploadField";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { useOutletContext } from "react-router-dom";
 import { JitpaCreFun } from "../../../services/createMethod/JitpaCreFun";
-import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteBJLUp";
+// import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteBJLUp";
 
 export const Jitpa = () => {
   const { searchResultData } = useOutletContext();
@@ -49,9 +49,9 @@ export const Jitpa = () => {
     jpEmpUpload: [],
   });
 
-  const [id, setID] = useState({
-    jitpaID: "",
-  });
+  // const [id, setID] = useState({
+  //   jitpaID: "",
+  // });
 
   const watchInducJitpaUpload = watch("jpEmpUpload", "");
 
@@ -123,13 +123,11 @@ export const Jitpa = () => {
 
     const allowedTypes = [
       "application/pdf",
-      "image/jpeg",
-      "image/png",
-      "image/jpg",
+     
     ];
     
     if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      alert("Upload must be a PDF file");
       return;
     }
 
@@ -143,17 +141,10 @@ export const Jitpa = () => {
     }
     
     if (newUploads.length > 0) {
-      alert("You can only upload one new file. Please delete the existing file before uploading another.");
+      alert("You can only upload one new file");
       return;
     }
-    
-
-    if (newUploads.length > 0) {
-      alert(
-        "You can only upload one new file. Please delete the existing file before uploading another."
-      );
-      return;
-    }
+  
 
     // Append the new file to the form state
     setValue(label, [...currentFiles, selectedFile]);
@@ -182,15 +173,15 @@ export const Jitpa = () => {
       setValue(field, getLastValue(searchResultData[field]))
     );
 
-    const jitpaRecord = BJLData.find(
-      (match) => match.empID === searchResultData.empID
-    );
-    if (jitpaRecord) {
-      setID((prevData) => ({
-        ...prevData,
-        jitpaID: jitpaRecord.id,
-      }));
-    }
+    // const jitpaRecord = BJLData.find(
+    //   (match) => match.empID === searchResultData.empID
+    // );
+    // if (jitpaRecord) {
+    //   setID((prevData) => ({
+    //     ...prevData,
+    //     jitpaID: jitpaRecord.id,
+    //   }));
+    // }
 
     if (searchResultData && searchResultData.jpEmpUpload) {
       try {
@@ -219,38 +210,38 @@ export const Jitpa = () => {
     }
   }, [searchResultData, setValue]);
 
-  const deleteFile = async (fileType, fileName) => {
-    const deleteID = id.jitpaID;
+  // const deleteFile = async (fileType, fileName) => {
+  //   const deleteID = id.jitpaID;
 
-    try {
-      await handleDeleteFile(
-        fileType,
-        fileName,
-        empID,
-        setUploadedFileNames,
-        deleteID,
-        setValue
-      );
+  //   try {
+  //     await handleDeleteFile(
+  //       fileType,
+  //       fileName,
+  //       empID,
+  //       setUploadedFileNames,
+  //       deleteID,
+  //       setValue
+  //     );
 
-      const currentFiles = watch(fileType) || [];
+  //     const currentFiles = watch(fileType) || [];
 
-      // Filter out the deleted file
-      const updatedFiles = currentFiles.filter(
-        (file) => file.name !== fileName
-      );
+  //     // Filter out the deleted file
+  //     const updatedFiles = currentFiles.filter(
+  //       (file) => file.name !== fileName
+  //     );
 
-      // Update form state with the new file list
-      setValue(fileType, updatedFiles);
+  //     // Update form state with the new file list
+  //     setValue(fileType, updatedFiles);
 
-      // Update UI state
-      setUploadjitpa((prevState) => ({
-        ...prevState,
-        [fileType]: updatedFiles,
-      }));
-    } catch (error) {
-      console.error("Error deleting file:", error);
-    }
-  };
+  //     // Update UI state
+  //     setUploadjitpa((prevState) => ({
+  //       ...prevState,
+  //       [fileType]: updatedFiles,
+  //     }));
+  //   } catch (error) {
+  //     console.error("Error deleting file:", error);
+  //   }
+  // };
 
   const empID = watch("empID");
 
@@ -381,7 +372,7 @@ export const Jitpa = () => {
               extractFileName(watchInducJitpaUpload)
             }
             uploadedFileNames={uploadedFileNames}
-            deleteFile={deleteFile}
+            // deleteFile={deleteFile}
             field={{ title: "jpEmpUpload" }}
           />
         </div>

@@ -12,7 +12,7 @@ import { UpdateBJL } from "../../../services/updateMethod/UpdateBJL";
 import { FileUploadNew } from "../medicalDep/FileUploadField";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { useOutletContext } from "react-router-dom";
-import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteBJLUp";
+// import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteBJLUp";
 
 export const BankGuarantee = () => {
   const { searchResultData } = useOutletContext();
@@ -148,7 +148,7 @@ export const BankGuarantee = () => {
 
     if (newUploads.length > 0) {
       alert(
-        "You can only upload one new file. Please delete the existing file before uploading another."
+        "You can only upload one new file."
       );
       return;
     }
@@ -224,38 +224,38 @@ export const BankGuarantee = () => {
     }
   }, [searchResultData, setValue]);
 
-  const deleteFile = async (fileType, fileName) => {
-    const deleteID = id.bankID;
+  // const deleteFile = async (fileType, fileName) => {
+  //   const deleteID = id.bankID;
 
-    try {
-      await handleDeleteFile(
-        fileType,
-        fileName,
-        empID,
-        setUploadedFileNames,
-        deleteID,
-        setValue
-      );
+  //   try {
+  //     await handleDeleteFile(
+  //       fileType,
+  //       fileName,
+  //       empID,
+  //       setUploadedFileNames,
+  //       deleteID,
+  //       setValue
+  //     );
 
-      const currentFiles = watch(fileType) || [];
+  //     const currentFiles = watch(fileType) || [];
 
-      // Filter out the deleted file
-      const updatedFiles = currentFiles.filter(
-        (file) => file.name !== fileName
-      );
+  //     // Filter out the deleted file
+  //     const updatedFiles = currentFiles.filter(
+  //       (file) => file.name !== fileName
+  //     );
 
-      // Update form state with the new file list
-      setValue(fileType, updatedFiles);
+  //     // Update form state with the new file list
+  //     setValue(fileType, updatedFiles);
 
-      // Update UI state
-      setUploadBG((prevState) => ({
-        ...prevState,
-        [fileType]: updatedFiles,
-      }));
-    } catch (error) {
-      console.error("Error deleting file:", error);
-    }
-  };
+  //     // Update UI state
+  //     setUploadBG((prevState) => ({
+  //       ...prevState,
+  //       [fileType]: updatedFiles,
+  //     }));
+  //   } catch (error) {
+  //     console.error("Error deleting file:", error);
+  //   }
+  // };
 
   const onSubmit = async (data) => {
     try {
@@ -404,7 +404,7 @@ export const BankGuarantee = () => {
             error={errors.bankEmpUpload}
             fileName={uploadedFileNames.bankEmpUpload || ""}
             uploadedFileNames={uploadedFileNames}
-            deleteFile={deleteFile}
+            // deleteFile={deleteFile}
             field={{ title: "bankEmpUpload" }}
           />
         </div>

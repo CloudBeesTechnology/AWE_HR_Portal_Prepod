@@ -17,7 +17,7 @@ import {
   leavePassDD,
   workInfoUploads,
 } from "../../../utils/DropDownMenus";
-import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteDocsWI";
+// import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteDocsWI";
 import { MdCancel } from "react-icons/md";
 import { UploadingFiles } from "../../employees/medicalDep/FileUploadField";
 import { SpinLogo } from "../../../utils/SpinLogo";
@@ -41,10 +41,10 @@ export const WorkInfo = () => {
   const { SRDataValue } = CreateSRData();
   const { LeaveDataValue } = CreateLeaveData();
   const { TerminateDataValue } = CreateTerminate();
-  const [id, setID] = useState({
-    terminateID:"",
-    serviceID:"",
-  });
+  // const [id, setID] = useState({
+  //   terminateID:"",
+  //   serviceID:"",
+  // });
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
@@ -210,12 +210,6 @@ export const WorkInfo = () => {
       return;
     }
   
-    // Ensure the file was not previously deleted
-    // if (deletedFiles[label]?.includes(selectedFile.name)) {
-    //   alert("This file was previously deleted and cannot be re-added.");
-    //   return;
-    // }
-  
     // Append the new file to the form state
     setValue(label, [...currentFiles, selectedFile]);
   
@@ -227,39 +221,6 @@ export const WorkInfo = () => {
       }));
     } catch (err) {
       console.error(err);
-    }
-  };
-
-  const deleteFile = async (fileType, fileName) => {
-    const watchedEmpID = watch("empID");
-    const serviceID = id.serviceID;
-    const terminateID = id.terminateID;
-
-    try {
-      await handleDeleteFile(
-        fileType,
-        fileName,
-        watchedEmpID,
-        setUploadedFileNames,
-        setValue,
-        trigger,
-        terminateID,serviceID
-      );
-      const currentFiles = watch(fileType) || []; 
-      // Filter out the deleted file
-      const updatedFiles = currentFiles.filter(
-        (file) => file.name !== fileName
-      );
-      // Update form state with the new file list
-      setValue(fileType, updatedFiles);
-
-      // Update UI state
-      setNameServiceUp((prevState) => ({
-        ...prevState,
-        [fileType]: updatedFiles,
-      }));
-    } catch (error) {
-      console.error("Error deleting file:", error);
     }
   };
 
@@ -278,53 +239,9 @@ export const WorkInfo = () => {
     return typeof value === "string" ? value.trim().toUpperCase() : null;
   };
  
-  // const getArrayDateValue = (value) => {
-  //   const formatToTitleCase = (input) => {
-  //     if (typeof input !== "string" || !input) {
-  //       return ""; // Return an empty string if input is invalid
-  //     }
-
-  //     // Check if the value matches the special allowed uppercase values
-  //     const allowedUppercase = ["BLNG", "CPD", "SBW", "", "LBD"];
-  //     if (allowedUppercase.includes(input.toUpperCase())) {
-  //       return input.toUpperCase(); // Return the value as uppercase if it's one of the allowed values
-  //     }
-
-  //     return input
-  //       // .toLowerCase()
-  //       // .split(" ")
-  //       // .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-  //       // .join(" ");
-  //   };
-
-  //   if (Array.isArray(value) && value.length > 0) {
-  //     const lastValue = value[value.length - 1]?.trim();
-  //     return formatToTitleCase(lastValue);
-  //   }
-
-  //   if (typeof value === "string") {
-  //     return formatToTitleCase(value.trim());
-  //   }
-
-  //   return null; // Return null if value is not a valid array or string
-  // };
 
   const searchResult = (result) => {
-    // console.log("Result", result);
-    const terminateRecord = terminateData.find((match) => match.empID === result.empID);
-    const serviceRecord = SRData.find((match) => match.empID === result.empID);
    
-
-    if (terminateRecord) {
-      setID((prevData) => ({
-        ...prevData,
-        terminateID: terminateRecord.id, // Assuming this field exists.
-      }))}
-    if (serviceRecord) {
-      setID((prevData) => ({
-        ...prevData,
-        serviceID: serviceRecord.id, // Assuming this field exists.
-      }))}
 
     const fieldValue = ["empID"];
 
@@ -914,7 +831,7 @@ fieldValue.forEach((val) => {
                               className="mt-2 flex justify-between items-center"
                             >
                               {fileName}
-                              <button
+                              {/* <button
                                 type="button"
                                 className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
                                 onClick={() =>
@@ -922,13 +839,13 @@ fieldValue.forEach((val) => {
                                 }
                               >
                                 <MdCancel />
-                              </button>
+                              </button> */}
                             </span>
                           ))
                       ) : (
                         <span className="mt-2 flex justify-between items-center">
                           {uploadedFileNames[field.title]}
-                          <button
+                          {/* <button
                             type="button"
                             className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
                             onClick={() =>
@@ -939,7 +856,7 @@ fieldValue.forEach((val) => {
                             }
                           >
                             <MdCancel />
-                          </button>
+                          </button> */}
                         </span>
                       )
                     ) : (
@@ -973,7 +890,7 @@ fieldValue.forEach((val) => {
                   handleFileChange={handleFileChange}
                   uploadedFileNames={uploadedFileNames}
                   watchedEmpID={watchedEmpID}
-                  deleteFile={deleteFile}
+                  // deleteFile={deleteFile}
                   errors={errors}
                 />
               ) : (
