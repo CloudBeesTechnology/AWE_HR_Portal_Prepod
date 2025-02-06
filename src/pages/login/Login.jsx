@@ -22,26 +22,17 @@ const Login = () => {
   const [error, setError] = useState("");
 
   const Submit = handleSubmit(async (data) => {
-  
     try {
       const username = data.userID;
-      let user = [];
-      let nextToken = null;
 
-      do {
-        const resultUser = await client.graphql({
-          query: listUsers,
-          variables: { nextToken }, 
-        });
-  
-        const users = resultUser?.data?.listUsers?.items || [];
-  
-        user = users.find((val) => val.empID === username.toUpperCase());
-  
-        nextToken = resultUser?.data?.listUsers?.nextToken;
-  
-      } while (nextToken);
+      const resultUser = await client.graphql({
+        query: listUsers,
+        variables: { limit: 20000 },
+      });
 
+      const user = resultUser?.data?.listUsers?.items.find(
+        (val) => val.empID === username.toUpperCase()
+      );
 
       if (user && user.status === "Active") {
         const password = data.password;
