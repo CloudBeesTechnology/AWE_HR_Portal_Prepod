@@ -152,7 +152,9 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
         "Resignation",
         "Termination",
         "Probation Review",
+        "Probation Form Update",
         "Contract Expiry Review",
+        "Contract Expiry Form Update",
         "Employment Pass Expiry",
         "LD Expiry",
         "Passport Expiry",
@@ -162,6 +164,7 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
         "LBD KPI",
         "Group H&S",
         "Leave Passage",
+        "Promotion",
       ],
     },
     {
