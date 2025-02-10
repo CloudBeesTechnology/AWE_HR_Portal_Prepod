@@ -6,15 +6,16 @@ import { generateClient } from "@aws-amplify/api";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { getUrl } from "@aws-amplify/storage";
+import { sendEmail } from "../../services/EmailServices";
 
 const client = generateClient();
 
 export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
-  // Pass showDecisionButtons as a prop
   const { IVSSDetails } = useContext(DataSupply);
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [notification, setNotification] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleScheduleInterview = () => {
     setIsScheduleOpen(true);
@@ -27,10 +28,28 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
   // console.log("hey buddy", personalDetails);
 
   const handleRejected = async (dataCandi) => {
+    const REJECTED_CANDY_SUB = `Candidate Rejection Notification:`;
+    const REJECTED_CANDY_MSG = `
+    <html>
+      <body>
+        <p>Subject: Candidate Rejection Update Position:– ${dataCandi[0]?.position}</p>    
+        <p>Dear HR,</p>    
+        <p>After careful evaluation, the following candidates have been rejected for the position: <strong>${dataCandi[0]?.position}</strong>.</p>
+        <p>Candidate name: <strong>${dataCandi[0]?.name}.</strong></p>
+        <p>Best regards,<br>HR Team.</p>
+      </body>
+    </html>
+  `;
+
+    const FROM_ADDRESS = "hr_no-reply@adininworks.com";
+    const TO_ADDRESS = "Hr-notification@adininworks.com"     ;
+
     try {
       if (!Array.isArray(dataCandi)) {
         throw new Error("dataCandi must be an array.");
       }
+
+
 
       const matchTempIDs = dataCandi.map((val) => {
         return IVSSDetails?.find((match) => val.tempID === match?.tempID);
@@ -40,43 +59,71 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
 
       if (validMatches.length === 0) {
         console.error("No matching candidates found.");
-        // console.log("dataCandi:", dataCandi);
-        // console.log("IVSSDetails:", IVSSDetails);
         return;
       }
 
       for (const match of validMatches) {
-        // console.log("Updating candidate with ID:", match.id);
-
         const data = {
           id: match.id,
           candidateStatus: "Rejected",
         };
 
         try {
+
+          setIsLoading(true); 
+
           const response = await client.graphql({
             query: updateInterviewSchedule,
             variables: { input: data },
           });
 
-          // console.log("Update successful for candidate ID",match.id, ":", response);
-          setNotification(true); // Show notification on success
+          await sendEmail(
+            REJECTED_CANDY_SUB,
+            REJECTED_CANDY_MSG,
+            FROM_ADDRESS,
+            TO_ADDRESS
+          );
+
+          setIsLoading(false);
+          setTimeout(() => {
+            setNotification(true);
+          }, 100);
         } catch (err) {
           console.error("Error updating candidate ID", match.id, ":", err);
         }
       }
 
-      onClose(); // Close the modal after rejection
+      onClose();
     } catch (err) {
       console.error("Error in handleRejected function:", err);
+      // setEmailSuccessMessage("Failed to send email. Please try again later.");
     }
   };
 
   const handleSelected = async (dataCandi) => {
+    const SELECTED_CANDY_SUB = `Candidate Selected Notification:`;
+
+    const SELECTED_CANDY_MSG = `
+    <html>
+      <body>
+        <p>Subject: Selected Candidates Notification:</p> 
+        <p>Dear HR,</p>    
+        <p>We have completed the selection process, and 
+        the following candidates have been selected for the position: <Strong>${dataCandi[0]?.position}</Strong>.</p>
+        <p>Candidate name: <strong>${dataCandi[0]?.name}.</strong></p>
+        <p>Best regards,<br>HR Team.</p>
+      </body>
+    </html>
+  `;
+
+    const FROM_ADDRESS = "hr_no-reply@adininworks.com";
+    const TO_ADDRESS = "Hr-notification@adininworks.com";     ;
+
     try {
       if (!Array.isArray(dataCandi)) {
         throw new Error("dataCandi must be an array.");
       }
+
 
       const matchTempIDs = dataCandi.map((val) => {
         return IVSSDetails?.find((match) => val.tempID === match?.tempID);
@@ -89,36 +136,40 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
       }
 
       for (const match of validMatches) {
-        // console.log("Updating candidate with ID:", match.id);
-
         const data = {
           id: match.id,
           status: "Selected",
         };
 
         try {
+
+          setIsLoading(true);
+
           const response = await client.graphql({
             query: updateInterviewSchedule,
             variables: { input: data },
           });
 
-          console.log(
-            "Update successful for candidate ID",
-            match.id,
-            ":",
-            response
+          await sendEmail(
+            SELECTED_CANDY_SUB,
+            SELECTED_CANDY_MSG,
+            FROM_ADDRESS,
+            TO_ADDRESS
           );
-          setNotification(true);
-        } catch (err) {
-          console.log(err);
 
-          console.error("Error updating candidate ID", match.id, ":", err);
+          setIsLoading(false);
+
+          setTimeout(() => {
+            setNotification(true);
+          }, 500);
+        } catch (err) {
+          console.log("error: ", err);
         }
       }
     } catch (err) {
       console.log(err);
-
       console.error("Error in handleSelected function:", err);
+      // setEmailSuccessMessage("Failed to send email. Please try again later.");
     }
   };
 
@@ -133,13 +184,12 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
   }, []);
 
   const formatDate = (dateString) => {
-    // Check if the dateString is empty or invalid before processing
     if (!dateString || isNaN(new Date(dateString).getTime())) {
-      return ""; // Return an empty string or a custom message if invalid
+      return "";
     }
     const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, "0"); // Adds leading zero if day is single digit
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // getMonth() returns 0-11, so we add 1
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
 
     return `${day}/${month}/${year}`;
@@ -154,15 +204,13 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     if (candidate?.profilePhoto) {
       linkToImageFile(candidate.profilePhoto);
     }
-  }, [candidate?.profilePhoto]); // Only run when candidate.profilePhoto changes
-
-  console.log(candidate);
+  }, [candidate?.profilePhoto]);
 
   const parseJson = (jsonString) => {
     try {
       return JSON.parse(jsonString);
     } catch (e) {
-      return []; // Return an empty array if parsing fails
+      return [];
     }
   };
 
@@ -204,14 +252,9 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             {[
               { label: "Applying For", value: candidate.position || "N/A" },
               { label: "Experience", value: candidate.noExperience || "N/A" },
-              {
-                label: "Previous Company",
-                value: candidate.workExperience || "N/A",
-              },
               { label: "Contract", value: candidate.contractType || "N/A" },
               { label: "Type", value: candidate.empType || "N/A" },
               { label: "CV Received From", value: candidate.agent || "N/A" },
-              { label: "Qualification", value: candidate.eduDetails || "N/A" },
               { label: "Name", value: candidate.name || "N/A" },
               { label: "Nationality", value: candidate.nationality || "N/A" },
               { label: "Race", value: candidate.race || "N/A" },
@@ -257,14 +300,6 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                 label: "Passport Issued Place",
                 value: candidate.ppDestinate || "N/A",
               },
-              {
-                label: "Next of Kin Info",
-                value: candidate.familyDetails || "N/A",
-              },
-              {
-                label: "Emergency Contact",
-                value: candidate.emgDetails || "N/A",
-              },
             ].map((item, index) => (
               <div key={index} className="grid grid-cols-3 gap-4 mb-4">
                 <strong className="w-full">{item.label}</strong>
@@ -278,7 +313,9 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                 {familyDetails.map((item, idx) => (
                   <div key={idx}>
                     <strong className="w-full">Occupation:</strong>
-                    <span className="w-full col-span-2">{item.occupation || "N/A"}</span>
+                    <span className="w-full col-span-2">
+                      {item.occupation || "N/A"}
+                    </span>
                     <p>
                       <strong>Name:</strong> {item.name || "N/A"}
                     </p>
@@ -362,7 +399,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                     </button>
                     <button
                       className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
-                      onClick={handleScheduleInterview} // Opens the schedule interview form
+                      onClick={handleScheduleInterview}
                     >
                       Schedule Interview
                     </button>
@@ -375,25 +412,27 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                     <button
                       className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
                       onClick={() => {
-                        handleRejected([candidate]); // Pass candidate as an array
+                        handleRejected([candidate]);
                       }}
+                      disabled={isLoading}
                     >
-                      Rejected
+                      {isLoading ? "Loading..." : "Rejected"}
                     </button>
 
                     <button
                       className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
                       onClick={() => {
-                        handleSelected([candidate]);
-                        console.log(candidate);
+                        handleSelected([candidate]);   
                       }}
+                      disabled={isLoading}
                     >
-                      Selected
+                      {isLoading ? "Loading..." : "Selected"}
                     </button>
                   </>
                 )}
               </>
             )}
+
             {notification && (
               <SpinLogo
                 text="Candidate Selected Successfully"
@@ -402,6 +441,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
               />
             )}
           </div>
+    
         </div>
       </div>
 

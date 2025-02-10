@@ -21,7 +21,6 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
           <VscClose size={20} />
         </button>
         <div className="p-4 rounded-md bg-[#f7f183ea]">
-
           <div className="grid grid-cols-1 sm:grid-cols-4 text-xs font-semibold">
             <div>
               <span className="font-semibold">TempID:</span> {candidate?.tempID}
@@ -30,10 +29,12 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
               <span className="font-semibold">Name:</span> {candidate?.name}
             </div>
             <div>
-              <span className="font-semibold">Contract Type:</span> {candidate?.contractType}
+              <span className="font-semibold">Contract Type:</span>{" "}
+              {candidate?.contractType}
             </div>
             <div>
-              <span className="font-semibold">Employee Type:</span> {candidate?.empType}
+              <span className="font-semibold">Employee Type:</span>{" "}
+              {candidate?.empType}
             </div>
           </div>
         </div>
@@ -69,41 +70,45 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
           >
             LOI
           </h3>
-          <h4
-            className={` px-3 py-1 rounded-lg whitespace-nowrap  ${
-              show === 3
-                ? "border-2 border-[#FEF116] bg-[#FFFEF4]"
-                : "bg-[#DDDDDD]"
-            }`}
-            onClick={() => setShow(3)}
-          >
-            CVEV
-          </h4>
 
-          <h5
-            className={`  px-3 py-1 rounded-lg whitespace-nowrap  ${
-              show === 4
-                ? "border-2 border-[#FEF116] bg-[#FFFEF4]"
-                : "bg-[#DDDDDD]"
-            }`}
-            onClick={() => setShow(4)}
-          >
-            PAAF
-          </h5>
-          
-          {candidate?.contractType === "Local" && (
-               <h6
-               className={`  px-3 py-1 rounded-lg whitespace-nowrap  ${
-                 show === 5
-                   ? "border-2 border-[#FEF116] bg-[#FFFEF4]"
-                   : "bg-[#DDDDDD]"
-               }`}
-               onClick={() => setShow(5)}
-             >
-               Mobilization
-             </h6>
+          {candidate?.empType === "Offshore" && (
+            <h4
+              className={` px-3 py-1 rounded-lg whitespace-nowrap  ${
+                show === 3
+                  ? "border-2 border-[#FEF116] bg-[#FFFEF4]"
+                  : "bg-[#DDDDDD]"
+              }`}
+              onClick={() => setShow(3)}
+            >
+              CVEV
+            </h4>
           )}
-       
+
+          {candidate?.empType === "Onshore" && (
+            <h5
+              className={`  px-3 py-1 rounded-lg whitespace-nowrap  ${
+                show === 4
+                  ? "border-2 border-[#FEF116] bg-[#FFFEF4]"
+                  : "bg-[#DDDDDD]"
+              }`}
+              onClick={() => setShow(4)}
+            >
+              PAAF
+            </h5>
+          )}
+
+          {candidate?.contractType === "Local" && (
+            <h6
+              className={`  px-3 py-1 rounded-lg whitespace-nowrap  ${
+                show === 5
+                  ? "border-2 border-[#FEF116] bg-[#FFFEF4]"
+                  : "bg-[#DDDDDD]"
+              }`}
+              onClick={() => setShow(5)}
+            >
+              Mobilization
+            </h6>
+          )}
         </article>
         {show === 0 && <InterviewForm candidate={candidate} />}
         {show === 1 && <CandidateForm candidate={candidate} />}

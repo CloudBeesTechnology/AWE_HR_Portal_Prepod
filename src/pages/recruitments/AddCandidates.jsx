@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FaArrowLeft } from "react-icons/fa6";
+import { FaArrowLeft } from "react-icons/fa";
 import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
 
 export const AddCandidates = () => {
@@ -59,7 +59,7 @@ export const AddCandidates = () => {
     <section className="w-full bg-[#F5F6F1] ">
       {/* min-h-screen overflow-y-auto */}
       <div className="w-11/12 relative mx-auto p-6">
-    <div className=" flex items-center mb-4">
+      <div className=" flex items-center mb-4">
     <Link to="/recrutiles/candidate" className="text-xl text-grey">
           <FaArrowLeft />
         </Link>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate, Outlet } from "react-router-dom";
 import { RecDashdetails } from "./RecDashdetails";
 import usePermission from "../../hooks/usePermissionDashInside";
+import { useTempID } from "../../utils/TempIDContext";
 
 export const RecruTiles = () => {
   useEffect(() => {
@@ -12,6 +13,7 @@ export const RecruTiles = () => {
   }, []);
   const navigate = useNavigate();
   const location = useLocation();
+  const { tempID, setTempID } = useTempID();
   const [selectedTile, setSelectedTile] = useState("");
   const recruitmentPermissions = usePermission("userID", "Recruitment");
   useEffect(() => {
@@ -21,6 +23,10 @@ export const RecruTiles = () => {
       setSelectedTile("Employee Requisition");
     } else if (location.pathname.includes("candidate")) {
       setSelectedTile("Candidate");
+      setTempID(null);
+      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem('personalFormData');
+      localStorage.removeItem('educationFormData');
     } else if (location.pathname.includes("localcandi")) {
       setSelectedTile("Local CV");
     } else if (location.pathname.includes("nonloccandi")) {

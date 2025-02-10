@@ -100,14 +100,14 @@ export const NonLocalMobilizForm = ({ candidate }) => {
 
   const handleFileChange = async (e, type) => {
     const file = e.target.files[0];
-    setValue(type, file); // Set file value for validation
+    setValue(type, file); 
     if (file) {
       if (type === "mobFile") {
         await uploadDocs(file, "mobFile", setUploadedMobiliz, "personName");
 
         setUploadedFileNames((prev) => ({
           ...prev,
-          mobFile: file.name, // Store the file name for display
+          mobFile: file.name, 
         }));
       }
     }
@@ -131,7 +131,7 @@ export const NonLocalMobilizForm = ({ candidate }) => {
     );
 
     const selectedInterviewDataStatus = interviewSchedules.find(
-      (data) => data.DDetails?.tempID === candidate?.tempID
+      (data) => data.IDDetails?.tempID === candidate?.tempID
     );
 
     const interviewScheduleId = selectedInterviewData?.id;
@@ -174,7 +174,7 @@ export const NonLocalMobilizForm = ({ candidate }) => {
 
       // console.log("Response from WPTrackingDetails:", response);
 
-      if (response.errors && response.errors.length > 0) {
+      if (response.errors && response.errors.length > 0) { 
         // console.error("Response errors:", response.errors);
       }
     } catch (err) {

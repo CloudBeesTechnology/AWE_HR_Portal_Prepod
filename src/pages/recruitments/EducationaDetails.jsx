@@ -210,7 +210,7 @@ export const EducationDetails = ({ fetchedData }) => {
     }
   }, [tempID, setValue, educDetailsData]);
    
-  
+  // console.log("educ",educDetailsData)
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="">
    

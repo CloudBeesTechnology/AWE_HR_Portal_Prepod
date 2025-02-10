@@ -19,12 +19,188 @@ export const NonLocalAccovalidationSchema = Yup.object().shape({
 
 export const LabourImmigrationSchema = Yup.object().shape({
   empID: Yup.string().required("Employee ID is mandatory"),
-  overMD: Yup.string().notRequired(),
-  overME: Yup.string().notRequired(),
-  bruhimsRD: Yup.string().notRequired(),
+  overMD: Yup.string()
+  .notRequired(),
+  // .test(
+  //   "validDate",
+  //   "Invalid date format or year must be a valid 4-digit year without leading zeros",
+  //   (value) => {
+  //     // If empty, it's valid because it's optional
+  //     if (!value) return true;
+
+  //     // Convert Date object to string (ISO format)
+  //     const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+
+  //     // Validate the date format YYYY-MM-DD (ISO format)
+  //     const regex = /^\d{4}-\d{2}-\d{2}$/;
+  //     if (!regex.test(dateString)) return false;
+
+  //     // Split the value into year, month, and day
+  //     const [year, month, day] = dateString.split("-");
+
+  //     // Validate that the year is exactly 4 digits
+  //     if (year.length !== 4) return false;
+
+  //     // Validate that the year doesn't start with '0' unless it's '0000'
+  //     if (year.startsWith("0") && year !== "0000") return false;
+
+  //     // Validate the month and day are valid
+  //     const monthNum = parseInt(month, 10);
+  //     const dayNum = parseInt(day, 10);
+
+  //     // Check if the month is between 01 and 12 and the day is between 01 and 31
+  //     if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+
+  //     return true;
+  //   }
+  // ),
+
+  overME: Yup.string()
+  .notRequired(),
+  // .test(
+  //   "validDate",
+  //   "Invalid date format or year must be a valid 4-digit year without leading zeros",
+  //   (value) => {
+  //     // If empty, it's valid because it's optional
+  //     if (!value) return true;
+
+  //     // Convert Date object to string (ISO format)
+  //     const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+
+  //     // Validate the date format YYYY-MM-DD (ISO format)
+  //     const regex = /^\d{4}-\d{2}-\d{2}$/;
+  //     if (!regex.test(dateString)) return false;
+
+  //     // Split the value into year, month, and day
+  //     const [year, month, day] = dateString.split("-");
+
+  //     // Validate that the year is exactly 4 digits
+  //     if (year.length !== 4) return false;
+
+  //     // Validate that the year doesn't start with '0' unless it's '0000'
+  //     if (year.startsWith("0") && year !== "0000") return false;
+
+  //     // Validate the month and day are valid
+  //     const monthNum = parseInt(month, 10);
+  //     const dayNum = parseInt(day, 10);
+
+  //     // Check if the month is between 01 and 12 and the day is between 01 and 31
+  //     if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+
+  //     return true;
+  //   }
+  // ),
+
+  bruhimsRD:
+  Yup.string()
+  .notRequired()
+  .test(
+    "validDate",
+    "Invalid date format or year must be a valid 4-digit year without leading zeros",
+    (value) => {
+      // If empty, it's valid because it's optional
+      if (!value) return true;
+
+      // Convert Date object to string (ISO format)
+      const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+
+      // Validate the date format YYYY-MM-DD (ISO format)
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!regex.test(dateString)) return false;
+
+      // Split the value into year, month, and day
+      const [year, month, day] = dateString.split("-");
+
+      // Validate that the year is exactly 4 digits
+      if (year.length !== 4) return false;
+
+      // Validate that the year doesn't start with '0' unless it's '0000'
+      if (year.startsWith("0") && year !== "0000") return false;
+
+      // Validate the month and day are valid
+      const monthNum = parseInt(month, 10);
+      const dayNum = parseInt(day, 10);
+
+      // Check if the month is between 01 and 12 and the day is between 01 and 31
+      if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+
+      return true;
+    }
+  ),
+
   bruhimsRNo: Yup.string().notRequired(),
-  bruneiMAD: Yup.string().notRequired(),
-  bruneiME: Yup.string().notRequired(),
+  bruneiMAD:  Yup.string()
+  .notRequired()
+  .test(
+    "validDate",
+    "Invalid date format or year must be a valid 4-digit year without leading zeros",
+    (value) => {
+      // If empty, it's valid because it's optional
+      if (!value) return true;
+
+      // Convert Date object to string (ISO format)
+      const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+
+      // Validate the date format YYYY-MM-DD (ISO format)
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!regex.test(dateString)) return false;
+
+      // Split the value into year, month, and day
+      const [year, month, day] = dateString.split("-");
+
+      // Validate that the year is exactly 4 digits
+      if (year.length !== 4) return false;
+
+      // Validate that the year doesn't start with '0' unless it's '0000'
+      if (year.startsWith("0") && year !== "0000") return false;
+
+      // Validate the month and day are valid
+      const monthNum = parseInt(month, 10);
+      const dayNum = parseInt(day, 10);
+
+      // Check if the month is between 01 and 12 and the day is between 01 and 31
+      if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+
+      return true;
+    }
+  ),
+
+  bruneiME:  Yup.string()
+  .notRequired()
+  .test(
+    "validDate",
+    "Invalid date format or year must be a valid 4-digit year without leading zeros",
+    (value) => {
+      // If empty, it's valid because it's optional
+      if (!value) return true;
+
+      // Convert Date object to string (ISO format)
+      const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+
+      // Validate the date format YYYY-MM-DD (ISO format)
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!regex.test(dateString)) return false;
+
+      // Split the value into year, month, and day
+      const [year, month, day] = dateString.split("-");
+
+      // Validate that the year is exactly 4 digits
+      if (year.length !== 4) return false;
+
+      // Validate that the year doesn't start with '0' unless it's '0000'
+      if (year.startsWith("0") && year !== "0000") return false;
+
+      // Validate the month and day are valid
+      const monthNum = parseInt(month, 10);
+      const dayNum = parseInt(day, 10);
+
+      // Check if the month is between 01 and 12 and the day is between 01 and 31
+      if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+
+      return true;
+    }
+  ),
+
   uploadFitness: Yup.array()
     .of(
       Yup.mixed()
@@ -164,7 +340,40 @@ export const WorkInfoSchema = Yup.object().shape({
     .nullable()
     .transform((value, originalValue) => (originalValue === "" ? null : value))
     .required("Date of Join is mandatory")
-    .max(new Date(), "Date of Join cannot be in the future"),
+    .max(new Date(), "Date of Join cannot be in the future")
+    .test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
+      }
+    ),
 
   jobDesc: Yup.string().required("Job Description is mandatory"),
   skillPool: Yup.string().required("Skill Pool is mandatory"),
@@ -174,9 +383,73 @@ export const WorkInfoSchema = Yup.object().shape({
   relationship: Yup.string().required("Employee Status is mandatory"),
 
   upgradePosition: Yup.string().notRequired(),
-  upgradeDate: Yup.string().notRequired(),
+  upgradeDate: Yup.string().notRequired().test(
+    "validDate",
+    "Invalid date format or year must be a valid 4-digit year without leading zeros",
+    (value) => {
+      // If empty, it's valid because it's optional
+      if (!value) return true;
+
+      // Convert Date object to string (ISO format)
+      const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+
+      // Validate the date format YYYY-MM-DD (ISO format)
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!regex.test(dateString)) return false;
+
+      // Split the value into year, month, and day
+      const [year, month, day] = dateString.split("-");
+
+      // Validate that the year is exactly 4 digits
+      if (year.length !== 4) return false;
+
+      // Validate that the year doesn't start with '0' unless it's '0000'
+      if (year.startsWith("0") && year !== "0000") return false;
+
+      // Validate the month and day are valid
+      const monthNum = parseInt(month, 10);
+      const dayNum = parseInt(day, 10);
+
+      // Check if the month is between 01 and 12 and the day is between 01 and 31
+      if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+
+      return true;
+    }
+  ),
   contractPeriod: Yup.string().notRequired(),
-  contractStart: Yup.string().notRequired(),
+  contractStart: Yup.string().notRequired().test(
+    "validDate",
+    "Invalid date format or year must be a valid 4-digit year without leading zeros",
+    (value) => {
+      // If empty, it's valid because it's optional
+      if (!value) return true;
+
+      // Convert Date object to string (ISO format)
+      const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+
+      // Validate the date format YYYY-MM-DD (ISO format)
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!regex.test(dateString)) return false;
+
+      // Split the value into year, month, and day
+      const [year, month, day] = dateString.split("-");
+
+      // Validate that the year is exactly 4 digits
+      if (year.length !== 4) return false;
+
+      // Validate that the year doesn't start with '0' unless it's '0000'
+      if (year.startsWith("0") && year !== "0000") return false;
+
+      // Validate the month and day are valid
+      const monthNum = parseInt(month, 10);
+      const dayNum = parseInt(day, 10);
+
+      // Check if the month is between 01 and 12 and the day is between 01 and 31
+      if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+
+      return true;
+    }
+  ),
   contractEnd: Yup.string()
     .notRequired()
     .test(
@@ -190,6 +463,38 @@ export const WorkInfoSchema = Yup.object().shape({
         const contractEndDate = new Date(value);
 
         return contractEndDate > contractStartDate; // Contract End must be after Contract Start
+      }
+    ).test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
       }
     ),
   workStatus: Yup.string()
@@ -208,6 +513,38 @@ export const WorkInfoSchema = Yup.object().shape({
         const probationStartDate = new Date(value);
         return probationStartDate >= dojDate;
       }
+    ).test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
+      }
     ),
   probationEnd: Yup.string()
     .notRequired()
@@ -223,6 +560,39 @@ export const WorkInfoSchema = Yup.object().shape({
 
         return probationEndDate > probationStartDate; // Contract End must be after Contract Start
       }
+    )
+    .test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
+      }
     ),
   probDuration: Yup.string().notRequired(),
   workHrs: Yup.string().required("Normal Working Hours mandatory"),
@@ -232,8 +602,72 @@ export const WorkInfoSchema = Yup.object().shape({
     .required("Type of Salary Pay is mandatory")
     .notOneOf([""], "Type of Salary Pay is mandatory"),
   pervAnnualLeaveBal: Yup.string().notRequired(),
-  resignDate: Yup.string().notRequired(),
-  termiDate: Yup.string().notRequired(),
+  resignDate: Yup.string().notRequired().test(
+    "validDate",
+    "Invalid date format or year must be a valid 4-digit year without leading zeros",
+    (value) => {
+      // If empty, it's valid because it's optional
+      if (!value) return true;
+
+      // Convert Date object to string (ISO format)
+      const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+
+      // Validate the date format YYYY-MM-DD (ISO format)
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!regex.test(dateString)) return false;
+
+      // Split the value into year, month, and day
+      const [year, month, day] = dateString.split("-");
+
+      // Validate that the year is exactly 4 digits
+      if (year.length !== 4) return false;
+
+      // Validate that the year doesn't start with '0' unless it's '0000'
+      if (year.startsWith("0") && year !== "0000") return false;
+
+      // Validate the month and day are valid
+      const monthNum = parseInt(month, 10);
+      const dayNum = parseInt(day, 10);
+
+      // Check if the month is between 01 and 12 and the day is between 01 and 31
+      if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+
+      return true;
+    }
+  ),
+  termiDate: Yup.string().notRequired().test(
+    "validDate",
+    "Invalid date format or year must be a valid 4-digit year without leading zeros",
+    (value) => {
+      // If empty, it's valid because it's optional
+      if (!value) return true;
+
+      // Convert Date object to string (ISO format)
+      const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+
+      // Validate the date format YYYY-MM-DD (ISO format)
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!regex.test(dateString)) return false;
+
+      // Split the value into year, month, and day
+      const [year, month, day] = dateString.split("-");
+
+      // Validate that the year is exactly 4 digits
+      if (year.length !== 4) return false;
+
+      // Validate that the year doesn't start with '0' unless it's '0000'
+      if (year.startsWith("0") && year !== "0000") return false;
+
+      // Validate the month and day are valid
+      const monthNum = parseInt(month, 10);
+      const dayNum = parseInt(day, 10);
+
+      // Check if the month is between 01 and 12 and the day is between 01 and 31
+      if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+
+      return true;
+    }
+  ),
   resignNotProb: Yup.string().notRequired(),
   otherResignNotProb: Yup.string().notRequired(),
   termiNotProb: Yup.string().notRequired(),
@@ -248,7 +682,39 @@ export const WorkInfoSchema = Yup.object().shape({
   dateLeavePass: Yup.string()
     .nullable()
     .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .notRequired(),
+    .notRequired().test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
+      }
+    ),
   destinateLeavePass: Yup.string().notRequired(),
 
   durLeavePass: Yup.string().notRequired(),
@@ -258,9 +724,74 @@ export const WorkInfoSchema = Yup.object().shape({
   annualLeaveDate: Yup.date()
     .nullable()
     .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .notRequired(),
+    .notRequired()
+    .test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
+      }
+    ),
   sickLeave: Yup.string().notRequired(),
-  sickLeaveDate: Yup.string().notRequired(),
+  sickLeaveDate: Yup.string().notRequired().test(
+    "validDate",
+    "Invalid date format or year must be a valid 4-digit year without leading zeros",
+    (value) => {
+      // If empty, it's valid because it's optional
+      if (!value) return true;
+
+      // Convert Date object to string (ISO format)
+      const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+
+      // Validate the date format YYYY-MM-DD (ISO format)
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!regex.test(dateString)) return false;
+
+      // Split the value into year, month, and day
+      const [year, month, day] = dateString.split("-");
+
+      // Validate that the year is exactly 4 digits
+      if (year.length !== 4) return false;
+
+      // Validate that the year doesn't start with '0' unless it's '0000'
+      if (year.startsWith("0") && year !== "0000") return false;
+
+      // Validate the month and day are valid
+      const monthNum = parseInt(month, 10);
+      const dayNum = parseInt(day, 10);
+
+      // Check if the month is between 01 and 12 and the day is between 01 and 31
+      if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+
+      return true;
+    }
+  ),
   materLeave: Yup.string().notRequired(),
   paterLeave: Yup.string().notRequired(),
   mrageLeave: Yup.string().notRequired(),
@@ -374,32 +905,200 @@ export const WorkInfoSchema = Yup.object().shape({
   positionRevDate: Yup.date()
     .nullable()
     .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .notRequired(),
+    .notRequired()
+    .test(
+    "validDate",
+    "Invalid date format or year must be a valid 4-digit year without leading zeros",
+    (value) => {
+      // If empty, it's valid because it's optional
+      if (!value) return true;
+
+      // Convert Date object to string (ISO format)
+      const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+
+      // Validate the date format YYYY-MM-DD (ISO format)
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!regex.test(dateString)) return false;
+
+      // Split the value into year, month, and day
+      const [year, month, day] = dateString.split("-");
+
+      // Validate that the year is exactly 4 digits
+      if (year.length !== 4) return false;
+
+      // Validate that the year doesn't start with '0' unless it's '0000'
+      if (year.startsWith("0") && year !== "0000") return false;
+
+      // Validate the month and day are valid
+      const monthNum = parseInt(month, 10);
+      const dayNum = parseInt(day, 10);
+
+      // Check if the month is between 01 and 12 and the day is between 01 and 31
+      if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+
+      return true;
+    }
+  ),
 
   revSalary: Yup.string().notRequired(),
   revSalaryDate: Yup.date()
     .nullable()
     .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .notRequired(),
+    .notRequired()
+    .test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
+      }
+    ),
 
   revLeavePass: Yup.string().notRequired(),
   revLeaveDate: Yup.date()
     .nullable()
     .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .notRequired(),
+    .notRequired()
+    .test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
+      }
+    ),
 
   revAnnualLeave: Yup.string().notRequired(),
 
   revALD: Yup.date()
     .nullable()
     .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .notRequired(),
+    .notRequired()
+    .test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
+      }
+    ),
 
   depEmp: Yup.string().notRequired(),
   depEmpDate: Yup.date()
-    .nullable()
-    .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .notRequired(),
+  .nullable()
+  .transform((value, originalValue) => {
+    return originalValue === "" ? null : value;
+  })
+  .notRequired()
+  .test(
+    "validDate",
+    "Invalid date format or year must be a valid 4-digit year without leading zeros",
+    (value) => {
+      // If empty, it's valid because it's optional
+      if (!value) return true;
+
+      // Convert Date object to string (ISO format)
+      const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+
+      // Validate the date format YYYY-MM-DD (ISO format)
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!regex.test(dateString)) return false;
+
+      // Split the value into year, month, and day
+      const [year, month, day] = dateString.split("-");
+
+      // Validate that the year is exactly 4 digits
+      if (year.length !== 4) return false;
+
+      // Validate that the year doesn't start with '0' unless it's '0000'
+      if (year.startsWith("0") && year !== "0000") return false;
+
+      // Validate the month and day are valid
+      const monthNum = parseInt(month, 10);
+      const dayNum = parseInt(day, 10);
+
+      // Check if the month is between 01 and 12 and the day is between 01 and 31
+      if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+
+      return true;
+    }
+  ),
+
 
   remarkWI: Yup.string().notRequired(),
   uploadPR: Yup.array()
@@ -638,7 +1337,40 @@ export const employeeInfoSchema = Yup.object().shape({
       return true;
     }
   ),
-  inducBrief: Yup.string().required("Induction Briefing Date is mandatory"),
+  inducBrief: Yup.string()
+  .required("Induction Briefing Date is mandatory") 
+   .test(
+    'validDate',
+    'Invalid date format or year must be a valid 4-digit year without leading zeros',
+    (value) => {
+      // If empty, it's valid because it's optional
+      if (!value) return true;
+
+      // Validate the date format YYYY-MM-DD (ISO format)
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      const match = value.match(regex);
+
+      if (!match) return false; // Invalid format
+
+      // Split the value into year, month, and day
+      const [year, month, day] = value.split('-');
+
+      // Validate that the year is exactly 4 digits
+      if (year.length !== 4) return false;
+
+      // Validate that the year doesn't start with '0' unless it's '0000'
+      if (year.startsWith('0') && year !== '0000') return false;
+
+      // Validate the month and day are valid
+      const monthNum = parseInt(month, 10);
+      const dayNum = parseInt(day, 10);
+
+      // Check if the month is between 01 and 12 and the day is between 01 and 31
+      if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+
+      return true;
+    }
+  ),
   inducBriefUp: Yup.string().notRequired(),
   preEmp: Yup.string().notRequired(),
   preEmpPeriod: Yup.string().notRequired(),
@@ -912,7 +1644,10 @@ export const AddInsuranceSchema = Yup.object().shape({
 // Yup InsuranceInfoSchema validation schema
 export const GroupHSSchema = Yup.object().shape({
   groupHSNo: Yup.string().required("Group HS Number is required"), // Adjusted to .notRequired() as per your initial code
-  groupHSExp: Yup.string().notRequired(), // Adjusted to .notRequired() as per your initial code
+  groupHSExp: Yup.string()
+  .notRequired(),
+  
+
   groupHSUpload: Yup.array()
     .of(
       Yup.mixed()
@@ -1039,8 +1774,39 @@ export const SawpEmpSchema = Yup.object().shape({
     .required("Requested Date is required")
     .test("is-not-future-date", "Future Date Not Allowed", (value) => {
       return !value || value <= new Date();
-    }),
-
+    }).test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
+      }
+    ),
   sawpEmpLtrReci: Yup.date()
     .nullable()
     .transform((value, originalValue) => (originalValue === "" ? null : value))
@@ -1051,6 +1817,38 @@ export const SawpEmpSchema = Yup.object().shape({
       function (value) {
         const { sawpEmpLtrReq } = this.parent;
         return !value || !sawpEmpLtrReq || value >= sawpEmpLtrReq;
+      }
+    ).test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
       }
     ),
 
@@ -1087,7 +1885,39 @@ export const DoeEmpSchema = Yup.object().shape({
     .required("Submission Date is required")
     .test("is-not-future-date", "Future Date Not Allowed", function (value) {
       return !value || new Date(value) <= new Date();
-    }),
+    })  .test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
+      }
+    ),
   doeEmpApproval: Yup.date()
     .nullable()
     .transform((value, originalValue) => (originalValue === "" ? null : value))
@@ -1100,6 +1930,38 @@ export const DoeEmpSchema = Yup.object().shape({
         return (
           !value || !doeEmpSubmit || new Date(value) >= new Date(doeEmpSubmit)
         );
+      }
+    )  .test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
       }
     ),
   doeEmpValid: Yup.date()
@@ -1116,6 +1978,38 @@ export const DoeEmpSchema = Yup.object().shape({
           !doeEmpApproval ||
           new Date(value) >= new Date(doeEmpApproval)
         );
+      }
+    )  .test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
       }
     ),
 
@@ -1164,6 +2058,38 @@ export const NlmsEmpSchema = Yup.object().shape({
       "is-not-future-date",
       "Future Date Not Allowed",
       (value) => !value || new Date(value) <= new Date()
+    )  .test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
+      }
     ),
   nlmsEmpSubmitRefNo: Yup.string().notRequired(),
   nlmsEmpApproval: Yup.date()
@@ -1178,6 +2104,38 @@ export const NlmsEmpSchema = Yup.object().shape({
         return (
           !value || !nlmsEmpSubmit || new Date(value) >= new Date(nlmsEmpSubmit)
         );
+      }
+    )  .test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
       }
     ),
   nlmsRefNo: Yup.string().notRequired(),
@@ -1195,6 +2153,38 @@ export const NlmsEmpSchema = Yup.object().shape({
           !nlmsEmpApproval ||
           new Date(value) >= new Date(nlmsEmpApproval)
         );
+      }
+    )  .test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
       }
     ),
   nlmsEmpUpload: Yup.array()
@@ -1237,7 +2227,39 @@ export const BankEmpSchema = Yup.object().shape({
     .required("Submission Date is required")
     .test("is-not-future-date", "Future Date Not Allowed", function (value) {
       return !value || new Date(value) <= new Date();
-    }),
+    })  .test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
+      }
+    ),
 
   bankRece: Yup.date()
     .nullable()
@@ -1249,6 +2271,38 @@ export const BankEmpSchema = Yup.object().shape({
       function (value) {
         const { bankSubmit } = this.parent;
         return !value || !bankSubmit || new Date(value) >= new Date(bankSubmit);
+      }
+    )  .test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
       }
     ),
   bankRefNo: Yup.string().notRequired(),
@@ -1264,6 +2318,38 @@ export const BankEmpSchema = Yup.object().shape({
         const { bankRece } = this.parent;
         return !value || !bankRece || new Date(value) >= new Date(bankRece);
       }
+    )  .test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
+      }
     ),
 
   bankEndorse: Yup.date()
@@ -1276,6 +2362,38 @@ export const BankEmpSchema = Yup.object().shape({
       function (value) {
         const { bankSubmit } = this.parent;
         return !value || !bankSubmit || new Date(value) > new Date(bankSubmit);
+      }
+    )  .test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
       }
     ),
   bankEmpUpload: Yup.array()
@@ -1313,6 +2431,38 @@ export const JitpaEmpSchema = Yup.object().shape({
       "is-not-future-date",
       "Future Date Not Allowed",
       (value) => !value || new Date(value) <= new Date()
+    )  .test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
+      }
     ),
 
   jitpaAmt: Yup.string().notRequired(),
@@ -1325,6 +2475,38 @@ export const JitpaEmpSchema = Yup.object().shape({
       "is-not-past-date",
       "Valid Until Date must be in the future",
       (value) => !value || new Date(value) > new Date()
+    )  .test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
+      }
     ),
 
   jpEndorse: Yup.date()
@@ -1339,6 +2521,38 @@ export const JitpaEmpSchema = Yup.object().shape({
         return (
           !value || !tbaPurchase || new Date(value) > new Date(tbaPurchase)
         );
+      }
+    )  .test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
       }
     ),
 
@@ -1381,7 +2595,39 @@ export const LabourDepositSchema = Yup.object().shape({
     .required("Submit Date is required")
     .test("is-not-future-date", "Future Date Not Allowed", function (value) {
       return !value || new Date(value) <= new Date();
-    }),
+    })  .test(
+      "validDate",
+      "Invalid date format or year must be a valid 4-digit year without leading zeros",
+      (value) => {
+        // If empty, it's valid because it's optional
+        if (!value) return true;
+  
+        // Convert Date object to string (ISO format)
+        const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+  
+        // Validate the date format YYYY-MM-DD (ISO format)
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(dateString)) return false;
+  
+        // Split the value into year, month, and day
+        const [year, month, day] = dateString.split("-");
+  
+        // Validate that the year is exactly 4 digits
+        if (year.length !== 4) return false;
+  
+        // Validate that the year doesn't start with '0' unless it's '0000'
+        if (year.startsWith("0") && year !== "0000") return false;
+  
+        // Validate the month and day are valid
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+  
+        // Check if the month is between 01 and 12 and the day is between 01 and 31
+        if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+  
+        return true;
+      }
+    ),
   lbrDepoUpload: Yup.array()
     .of(
       Yup.mixed()
@@ -1489,13 +2735,109 @@ export const ImmigEmpSchema = Yup.object().shape({
     )
     .notRequired(),
 
-  arrivStampExp: Yup.string().notRequired(),
+  arrivStampExp: Yup.string().notRequired().test(
+    "validDate",
+    "Invalid date format or year must be a valid 4-digit year without leading zeros",
+    (value) => {
+      // If empty, it's valid because it's optional
+      if (!value) return true;
+
+      // Convert Date object to string (ISO format)
+      const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+
+      // Validate the date format YYYY-MM-DD (ISO format)
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!regex.test(dateString)) return false;
+
+      // Split the value into year, month, and day
+      const [year, month, day] = dateString.split("-");
+
+      // Validate that the year is exactly 4 digits
+      if (year.length !== 4) return false;
+
+      // Validate that the year doesn't start with '0' unless it's '0000'
+      if (year.startsWith("0") && year !== "0000") return false;
+
+      // Validate the month and day are valid
+      const monthNum = parseInt(month, 10);
+      const dayNum = parseInt(day, 10);
+
+      // Check if the month is between 01 and 12 and the day is between 01 and 31
+      if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+
+      return true;
+    }
+  ),
   immigRefNo: Yup.string()
     .nullable()
     .transform((value, originalValue) => (originalValue === "" ? null : value)),
 
-  ppSubmit: Yup.string().notRequired(),
-  empPassExp: Yup.string().notRequired(),
+  ppSubmit: Yup.string().notRequired().test(
+    "validDate",
+    "Invalid date format or year must be a valid 4-digit year without leading zeros",
+    (value) => {
+      // If empty, it's valid because it's optional
+      if (!value) return true;
+
+      // Convert Date object to string (ISO format)
+      const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+
+      // Validate the date format YYYY-MM-DD (ISO format)
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!regex.test(dateString)) return false;
+
+      // Split the value into year, month, and day
+      const [year, month, day] = dateString.split("-");
+
+      // Validate that the year is exactly 4 digits
+      if (year.length !== 4) return false;
+
+      // Validate that the year doesn't start with '0' unless it's '0000'
+      if (year.startsWith("0") && year !== "0000") return false;
+
+      // Validate the month and day are valid
+      const monthNum = parseInt(month, 10);
+      const dayNum = parseInt(day, 10);
+
+      // Check if the month is between 01 and 12 and the day is between 01 and 31
+      if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+
+      return true;
+    }
+  ),
+  empPassExp: Yup.string().notRequired().test(
+    "validDate",
+    "Invalid date format or year must be a valid 4-digit year without leading zeros",
+    (value) => {
+      // If empty, it's valid because it's optional
+      if (!value) return true;
+
+      // Convert Date object to string (ISO format)
+      const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+
+      // Validate the date format YYYY-MM-DD (ISO format)
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!regex.test(dateString)) return false;
+
+      // Split the value into year, month, and day
+      const [year, month, day] = dateString.split("-");
+
+      // Validate that the year is exactly 4 digits
+      if (year.length !== 4) return false;
+
+      // Validate that the year doesn't start with '0' unless it's '0000'
+      if (year.startsWith("0") && year !== "0000") return false;
+
+      // Validate the month and day are valid
+      const monthNum = parseInt(month, 10);
+      const dayNum = parseInt(day, 10);
+
+      // Check if the month is between 01 and 12 and the day is between 01 and 31
+      if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+
+      return true;
+    }
+  ),
   empPassStatus: Yup.string()
     .nullable()
     .transform((value, originalValue) => (originalValue === "" ? null : value)),
@@ -1510,8 +2852,72 @@ export const ImmigEmpSchema = Yup.object().shape({
     .nullable()
     .transform((value, originalValue) => (originalValue === "" ? null : value)),
 
-  immigApproval: Yup.string().notRequired(),
-  reEntryVisaExp: Yup.string().notRequired(),
+  immigApproval: Yup.string().notRequired().test(
+    "validDate",
+    "Invalid date format or year must be a valid 4-digit year without leading zeros",
+    (value) => {
+      // If empty, it's valid because it's optional
+      if (!value) return true;
+
+      // Convert Date object to string (ISO format)
+      const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+
+      // Validate the date format YYYY-MM-DD (ISO format)
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!regex.test(dateString)) return false;
+
+      // Split the value into year, month, and day
+      const [year, month, day] = dateString.split("-");
+
+      // Validate that the year is exactly 4 digits
+      if (year.length !== 4) return false;
+
+      // Validate that the year doesn't start with '0' unless it's '0000'
+      if (year.startsWith("0") && year !== "0000") return false;
+
+      // Validate the month and day are valid
+      const monthNum = parseInt(month, 10);
+      const dayNum = parseInt(day, 10);
+
+      // Check if the month is between 01 and 12 and the day is between 01 and 31
+      if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+
+      return true;
+    }
+  ),
+  reEntryVisaExp: Yup.string().notRequired().test(
+    "validDate",
+    "Invalid date format or year must be a valid 4-digit year without leading zeros",
+    (value) => {
+      // If empty, it's valid because it's optional
+      if (!value) return true;
+
+      // Convert Date object to string (ISO format)
+      const dateString = value instanceof Date ? value.toISOString().split("T")[0] : value;
+
+      // Validate the date format YYYY-MM-DD (ISO format)
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!regex.test(dateString)) return false;
+
+      // Split the value into year, month, and day
+      const [year, month, day] = dateString.split("-");
+
+      // Validate that the year is exactly 4 digits
+      if (year.length !== 4) return false;
+
+      // Validate that the year doesn't start with '0' unless it's '0000'
+      if (year.startsWith("0") && year !== "0000") return false;
+
+      // Validate the month and day are valid
+      const monthNum = parseInt(month, 10);
+      const dayNum = parseInt(day, 10);
+
+      // Check if the month is between 01 and 12 and the day is between 01 and 31
+      if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) return false;
+
+      return true;
+    }
+  ),
   remarkImmig: Yup.string()
     .max(500, "Remarks can't exceed 500 characters")
     .nullable()

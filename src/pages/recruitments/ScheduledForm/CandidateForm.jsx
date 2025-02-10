@@ -3,16 +3,14 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { DepartmentDD } from "../../../utils/DropDownMenus";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useFetchInterview } from "../../../hooks/useFetchInterview";
 import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
-import { DataSupply } from "../../../utils/DataStoredContext";
 import { SpinLogo } from "../../../utils/SpinLogo";
 
 export const CandidateForm = ({ candidate }) => {
   const { mergedInterviewData } = useFetchInterview();
   const { interviewDetails } = UpdateInterviewData();
-  // const { IVSSDetails } = useContext(DataSupply);
   const [notification, setNotification] = useState(false);
   const [formData, setFormData] = useState({
     interview: {
@@ -45,13 +43,11 @@ export const CandidateForm = ({ candidate }) => {
     },
   });
 
-  // console.log("Merged Data:", mergedInterviewData);
-  // Filter the merged interview data based on the selected candidate's tempID
   useEffect(() => {
     if (mergedInterviewData.length > 0 && candidate?.tempID) {
       const interviewData = mergedInterviewData.find(
         (data) => data.tempID === candidate.tempID
-      ); // Use the candidate's tempID to filter the data
+      ); 
       if (interviewData) {
         setFormData({
           interview: {
@@ -63,6 +59,9 @@ export const CandidateForm = ({ candidate }) => {
       }
     }
   }, [mergedInterviewData, candidate?.tempID]);
+
+  // console.log("MERGE",mergedInterviewData);
+  
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -77,7 +76,6 @@ export const CandidateForm = ({ candidate }) => {
   const handleSubmitCandy = async (e) => {
     e.preventDefault();
 
-    // Find the correct interview data using the tempID of the selected candidate
     const selectedInterviewData = mergedInterviewData.find(
       (data) => data.tempID === candidate?.tempID
     );
@@ -88,7 +86,6 @@ export const CandidateForm = ({ candidate }) => {
       return;
     }
 
-    // Now, get the interviewSchedules ID from the selected interview data
     const interviewScheduleId = selectedInterviewData?.interviewSchedules?.id;
 
     if (!interviewScheduleId) {
@@ -98,13 +95,12 @@ export const CandidateForm = ({ candidate }) => {
     }
 
     try {
-      // Use the interviewScheduleId to update the interview details
       await interviewDetails({
         InterviewValue: {
-          id: interviewScheduleId, // Dynamically use the correct id
+          id: interviewScheduleId, 
           department: formData.interview.department,
           otherDepartment: formData.interview.otherDepartment,
-          // status: "LOI",
+  
         },
       });
 
