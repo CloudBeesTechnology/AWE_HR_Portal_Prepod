@@ -78,13 +78,11 @@ export const Reports = () => {
       title: "Contract Expiry Review",
       icon: contract,
       path: "/contractReview",
-      show: userType !== "Supervisor",
     },
     {
       title: "Contract Expiry Form Update",
       icon: contract,
       path: "/ContractUp",
-      show: userType !== "Supervisor",
     },
     {
       title: "Employment Pass Expiry",

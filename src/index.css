@@ -129,7 +129,14 @@
   appearance: none; /* Remove default arrow */
   padding: 0 33px 0 5px;
 }
-
+.select-filter {
+  background: url("./assets/filter.png") no-repeat;
+  background-position: right 4% center;
+  background-color: #f5f7fb;
+  background-size: 18px 18px; /* Adjust size if needed */
+  appearance: none; /* Remove default arrow */
+  
+}
 /* added by hari --------------------------------------*/
 
 .leaveManagementTable::-webkit-scrollbar {

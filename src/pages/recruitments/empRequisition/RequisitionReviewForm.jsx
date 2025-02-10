@@ -21,7 +21,7 @@ export const RequisitionReviewForm = ({
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
-  const [isLoading, setIsLoading] = useState(false); 
+  const [isLoading, setIsLoading] = useState(false);
   const userType = localStorage.getItem("userType");
   const { hrManagerMail, gmPosition } = useTempID();
 
@@ -41,8 +41,6 @@ export const RequisitionReviewForm = ({
 
   const request = selectedRequest || defaultRequest;
 
-  console.log(selectedRequest, "H");
-  
 
   useEffect(() => {
     if (isVisible) {
@@ -99,8 +97,11 @@ export const RequisitionReviewForm = ({
 
   const handleStatusUpdate = async (statusUpdate) => {
     try {
-      // Start loading
       setIsLoading(true);
+      await UpdateEmpReqData({
+        requestId: selectedRequest.id,
+        newStatus: statusUpdate,
+      });
 
       // Update status (e.g., make API call)
       if (onStatusChange) {
@@ -153,7 +154,6 @@ export const RequisitionReviewForm = ({
       // Optionally, trigger a success notification
       setNotification(true);
       setShowTitle("Form Status Updated Successfully");
-
     } catch (err) {
       console.error("Error updating status or sending email:", err);
 
@@ -174,7 +174,9 @@ export const RequisitionReviewForm = ({
 
   return (
     <div
-      className={`fixed inset-0 ${isVisible ? "flex" : "hidden"} bg-grey bg-opacity-75 flex items-center justify-center z-50`}
+      className={`fixed inset-0 ${
+        isVisible ? "flex" : "hidden"
+      } bg-grey bg-opacity-75 flex items-center justify-center z-50`}
     >
       <div className="center min-h-screen overflow-y-auto ">
         <header className="bg-white w-full max-w-[600px] rounded-lg relative p-5">
@@ -223,20 +225,20 @@ export const RequisitionReviewForm = ({
 
             {gmPosition && (
               <>
-                {request.status !== "Approved" ||
+                {request.status !== "Approved" &&
                 request.status !== "Rejected" ? (
                   <div className="flex justify-evenly pb-5">
                     <button
                       className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
                       onClick={() => handleStatusUpdate("Rejected")}
-                      disabled={isLoading}  
+                      disabled={isLoading}
                     >
                       {isLoading ? "Loading..." : "Reject"}
                     </button>
                     <button
                       className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
                       onClick={() => handleStatusUpdate("Approved")}
-                      disabled={isLoading}  
+                      disabled={isLoading}
                     >
                       {isLoading ? "Loading..." : "Approve"}
                     </button>

@@ -14,8 +14,9 @@ export const LDexpiry = () => {
     "Badge No",
     "Name",
     "Nationality",
-    "Position",
     "Department",
+    "Other Department",
+    "Position",
     "LD Approved",
     "LD Expiry",
     "ENERGY DEPARTMENT APPROVAL VALIDITY DATE",
@@ -78,8 +79,15 @@ export const LDexpiry = () => {
             empBadgeNo: item.empBadgeNo || "-",
             name: item.name || "-",
             nationality: item.nationality || "-",
-            position: item.position || "-",
-            department: item.department || "-",
+             department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
             nlmsEmpApproval: Array.isArray(item.nlmsEmpApproval)
               ? formatDate(item.nlmsEmpApproval[item.nlmsEmpApproval.length - 1])
               : "-",
@@ -133,12 +141,24 @@ export const LDexpiry = () => {
             empBadgeNo: item.empBadgeNo || "-",
             name: item.name || "-",
             nationality: item.nationality || "-",
-            position: item.position || "-",
-            department: item.department || "-",
+             department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
             nlmsEmpApproval: Array.isArray(item.nlmsEmpApproval)
               ? formatDate(item.nlmsEmpApproval[item.nlmsEmpApproval.length - 1])
               : "-",
-            nlmsEmpValid: formatDate(lastValidDate),
+            nlmsEmpValid: formatDate(lastValidDate)|| "-",
+            nlmsEmpSubmit:Array.isArray(item.nlmsEmpSubmit)
+            ? formatDate(item.nlmsEmpSubmit[item.nlmsEmpSubmit.length - 1])
+            : "-",
+            nlmsEmpSubmitRefNo:item.nlmsEmpSubmitRefNo||"-",
+
           };
         })
         .sort((a, b) => a.lastValidDate - b.lastValidDate) // Sort by lastValidDate (temporary date object)

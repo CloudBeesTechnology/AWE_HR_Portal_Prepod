@@ -15,8 +15,9 @@ export const LeavePassData = () => {
     "Name",
     "Date of Join",
     "Nationality",
-    "Position",
     "Department",
+    "Other Department",
+    "Position",
     "Contract Start Date",
     "Contract End Date",
     "LEAVE PASSAGE ENTITLEMENT",
@@ -64,8 +65,15 @@ export const LeavePassData = () => {
         name: item.name || "-",
         dateOfJoin: formatDate(item.doj)|| "-",
         nationality: item.nationality || "-",
-        position: item.position || "-",
-        department: item.department || "-",
+        department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
         contractStart: formatDate(item.contractStart) || "-",
         contractEnd: formatDate(item.contractEnd) || "-",
         annualLeaveDate: formatDate(item.annualLeaveDate) || "-",
@@ -108,8 +116,15 @@ export const LeavePassData = () => {
       name: item.name || "-",
       dateOfJoin: formatDate(item.doj)|| "-",
       nationality: item.nationality || "-",
-      position: item.position || "-",
-      department: item.department || "-",
+      department: Array.isArray(item.department)
+      ? item.department[item.department.length - 1]
+      : "-",
+      otherDepartment:Array.isArray(item.otherDepartment)
+      ? item.otherDepartment[item.otherDepartment.length - 1]
+      : "-",
+    position: Array.isArray(item.position)
+      ? item.position[item.position.length - 1]
+      : "-",
       contractStart: formatDate(item.contractStart)|| "-",
       contractEnd: formatDate(item.contractEnd)|| "-",
       annualLeaveDate: formatDate(item.annualLeaveDate)|| "-",

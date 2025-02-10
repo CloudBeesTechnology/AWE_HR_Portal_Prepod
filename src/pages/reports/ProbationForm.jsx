@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form"; // Import useForm from react-hook-form
+import { useForm } from "react-hook-form"; 
 import logo from "../../assets/logo/logo-with-name.svg";
 import { ConfirmationForm } from "./ConfirmationForm";
 import { ContractChoose } from "./ContractChoose";
@@ -114,29 +114,20 @@ export const ProbationForm = forwardRef(() => {
 
   useEffect(() => {
     
-
-    // Ensure the required data is available before proceeding
     if (!workInfoData.length || !empPIData.length || !employeeData?.empID) {
-      // console.log("Data is not available yet");
       return;
     }
 
-    // Step 1: Extract supervisorEmpID, managerEmpID, and hrEmpID from workInfoData
     const workInfo = workInfoData.find(
       (data) => data.empID === employeeData.empID
     );
 
     if (workInfo) {
-      // Get the most recent values from the arrays
+
       const supervisorEmpID =
         workInfo.supervisor[workInfo.supervisor.length - 1];
       const managerEmpID = workInfo.manager[workInfo.manager.length - 1];
       const hrOfficialmail = workInfo.hr[workInfo.hr.length - 1];
-
-      // console.log("Supervisor EmpID:", supervisorEmpID);
-      // console.log("Manager EmpID:", managerEmpID);
-      // console.log("HR mail:", hrOfficialmail);
-      // Step 2: Update emailData with supervisorEmpID, managerEmpID, and hrOfficialmail
 
       setEmailData((prevData) => ({
         ...prevData,
@@ -145,13 +136,11 @@ export const ProbationForm = forwardRef(() => {
         hrOfficialmail,
       }));
 
-      // Step 3: Fetch manager's official email
-      if (managerEmpID) {
-        // console.log("Fetching Manager's Email...");
+      if (managerEmpID) { 
         const managerInfo = empPIData.find(
           (data) => data.empID === String(managerEmpID)
         );
-        // console.log("Manager Info:", managerInfo);
+
         if (managerInfo) {
           setEmailData((prevData) => ({
             ...prevData,
@@ -163,13 +152,13 @@ export const ProbationForm = forwardRef(() => {
         }
       }
 
-      // Step 4: Fetch supervisor's official email
+
       if (supervisorEmpID) {
-        // console.log("Fetching Supervisor's Email...");
+        
         const supervisorInfo = empPIData.find(
           (data) => data.empID === String(supervisorEmpID)
         );
-        // console.log("Supervisor Info:", supervisorInfo);
+   
         if (supervisorInfo) {
           setEmailData((prevData) => ({
             ...prevData,
@@ -181,7 +170,6 @@ export const ProbationForm = forwardRef(() => {
         }
       }
 
-      // Step 5: Check skillPool for "Skilled" or "UnSkilled"
       if (workInfo.skillPool) {
         if (
           workInfo.skillPool.includes("Skilled") ||
@@ -194,19 +182,14 @@ export const ProbationForm = forwardRef(() => {
         }
       }
 
-      // Step 6: Fetch General Manager's email (if applicable)
       const generalManagerPositions = workInfoData.filter((item) =>
         item.position[item.position.length - 1]?.includes("General Manager")
       );
-
-      // console.log("Filtered General Manager Positions:", generalManagerPositions);
 
       if (generalManagerPositions.length > 0) {
         const gmInfo = empPIData.find(
           (data) => data.empID === String(generalManagerPositions[0].empID)
         );
-
-        // console.log("GM Info:", gmInfo);
 
         if (gmInfo) {
           setEmailData((prevData) => ({
@@ -226,14 +209,11 @@ export const ProbationForm = forwardRef(() => {
     }
   }, [workInfoData, employeeData?.empID, empPIData]);
 
-  // Log the final emailData when it changes
+
   useEffect(() => {
     // console.log("Email Data has changed:", emailData);
   }, [emailData]);
 
-  //email process end
-
-  // console.log(emailData);  27, 1705, 19, 2512,
 
   useEffect(() => {
     const fetchData = async () => {
@@ -263,7 +243,6 @@ export const ProbationForm = forwardRef(() => {
     };
     fetchData();
   }, [empPIData, workInfoData, ProbFData]);
-  // console.log(ProbFData);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -329,24 +308,19 @@ export const ProbationForm = forwardRef(() => {
     }));
   };
 
-  // console.log(formData);
-  // console.log(formData);
+
   
   const from = "hr_no-reply@adininworks.com";
   const gmSubject = "Probation Assessment Review";
   const hrSubject = "Probation Period Expiry Notification";
-  const to = "hariharanofficial2812@gmail.com"  
+  // const to = "hariharanofficial2812@gmail.com"  
 
  const onSubmit = async (data) => {
-  // console.log(data.supervisorApproved);
 
   try {
     const PFDataRecord = ProbFData.find((match) => match.empID === data.empID);
-    // console.log("rec", PFDataRecord);
-
     const empPIRecord = empPIData.find((match) => match.empID === data.empID);
     const WorkInfoRecord = workInfoData.find((match) => match.empID === data.empID);
-
     const probationEndFormatted = Array.isArray(WorkInfoRecord.probationEnd) && WorkInfoRecord.probationEnd.length > 0
       ? WorkInfoRecord.probationEnd[WorkInfoRecord.probationEnd.length - 1]
         .split("-")

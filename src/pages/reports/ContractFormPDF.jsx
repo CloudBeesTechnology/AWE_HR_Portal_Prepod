@@ -73,7 +73,7 @@ export const ContractFormPDF = ({ contentRef }) => {
         (data) => data.empID === employeeData.empID
       );
       if (workInfo) {
-        const managerEmpID = workInfo.manager; // Assuming this field exists and contains the manager's employee ID.
+        const managerEmpID = workInfo.manager; 
         setManagerData((prevData) => ({
           ...prevData,
           managerEmpID: managerEmpID,

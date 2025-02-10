@@ -19,8 +19,9 @@ export const EmploymentMedical = () => {
     "Name",
     "Date of Join",
     "Nationality",
-    "Position",
     "Department",
+    "Other Department",
+    "Position",
     "Medical Expiry",
   ]);
 
@@ -118,8 +119,15 @@ export const EmploymentMedical = () => {
         name: val?.name,
         dateOfJoin: formatDate(val?.doj) || "-",
         nationality: val?.nationality,
-        position: val?.position,
-        department: val?.department,
+        department: Array.isArray(val.department)
+        ? val.department[val.department.length - 1]
+        : "-",
+        otherDepartment:Array.isArray(val.otherDepartment)
+        ? val.otherDepartment[val.otherDepartment.length - 1]
+        : "-",
+      position: Array.isArray(val.position)
+        ? val.position[val.position.length - 1]
+        : "-",
         medicalExpiryDate: formatDate(medicalExpiryDate) || "-",
       };
 
@@ -170,8 +178,15 @@ export const EmploymentMedical = () => {
           name: item?.name,
           dateOfJoin: formatDate(item?.doj) || "-",
           nationality: item?.nationality,
-          position: item?.position,
-          department: item?.department,
+          department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
           medicalExpiryDate: formatDate(lastValidDate),
         };
       });

@@ -14,8 +14,9 @@ export const PromotionRep = () => {
     "Badge No",
     "Name",
     "Date of Join",
-    "Position",
     "Department",
+    "Other Department",
+    "Position",
     "UPGRADE POSITION",
     "UPGRADE POSITION EFFECTIVE DATE",
   ]);
@@ -57,8 +58,15 @@ export const PromotionRep = () => {
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
           dateOfJoin: formatDate(item.doj) || "-",
-          position: item.position || "-",
-          department: item.department || "-",
+          department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
           upgradePosition: Array.isArray(item.upgradePosition)
             ? item.upgradePosition[item.upgradePosition.length - 1]
             : "-",
@@ -106,8 +114,15 @@ export const PromotionRep = () => {
         empBadgeNo: item.empBadgeNo || "-",
         name: item.name || "-",
         dateOfJoin: formatDate(item.doj) || "-",
-        position: item.position || "-",
-        department: item.department || "-",
+        department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
         upgradePosition: Array.isArray(item.upgradePosition)
           ? item.upgradePosition[item.upgradePosition.length - 1]
           : "-",

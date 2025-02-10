@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import { IoSearch } from "react-icons/io5";
 import { DateFormat } from "../../utils/DateFormat";
+import { DataSupply } from "../../utils/DataStoredContext";
 
 export const FilterTable = ({
   tableBody,
@@ -17,34 +18,36 @@ export const FilterTable = ({
   endDate
 }) => {
 
+ const { dropDownVal,} = useContext(DataSupply);
+console.log(dropDownVal);
+
   const [searchQuery, setSearchQuery] = useState("");
- 
+  const [selectedDepartment, setSelectedDepartment] = useState(""); // New state for department filter
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 30; 
+  const itemsPerPage = 30;
+  const departmentOptions = dropDownVal[0]?.departmentDD?.map((item) => ({
+    value: item?.split(" ") // Split the string into words
+      .map((word) => word.charAt(0)?.toUpperCase() + word?.slice(1)) // Capitalize the first letter of each word
+      .join(" "),
+    label: item?.split(" ")
+      .map((word) => word.charAt(0)?.toUpperCase() + word?.slice(1)) // Capitalize the first letter of each word
+      .join(" "), // This will be used for display in the <option> tag
+  }));
 
-  const parseDate = (dateStr) => {
-    if (!dateStr) return null;
-    const [day, month, year] = dateStr.split("-");
-    return new Date(`${year}-${month}-${day}`);
-  };
 
-  const filteredTableBody = tableBody?.filter((row) => {
-    const query = searchQuery.toLowerCase();
-    const matchesQuery =
-      String(row.name || "")
-        .toLowerCase()
-        .includes(query) ||
-      String(row.empID || "")
-        .toLowerCase()
-        .includes(query) ||
-      String(row.empBadgeNo || "")
-        .toLowerCase()
-        .includes(query);
+  // Step 1: Filter by department
+  let filteredTableBody = selectedDepartment
+    ? tableBody?.filter((row) => row?.department?.toUpperCase() === selectedDepartment?.toUpperCase())
+    : tableBody;
 
-    // Date filtering logic for doj (Date of Joining)
-   
-    // If no date filtering, just apply search query
-    return matchesQuery;
+  // Step 2: Apply search filter on department-filtered data
+  filteredTableBody = filteredTableBody?.filter((row) => {
+    const query = searchQuery?.toLowerCase();
+    return (
+      String(row.name || "")?.toLowerCase()?.includes(query) ||
+      String(row.empID || "")?.toLowerCase()?.includes(query) ||
+      String(row.empBadgeNo || "")?.toLowerCase()?.includes(query)
+    );
   });
 
   // Pagination Logic
@@ -187,7 +190,7 @@ export const FilterTable = ({
   
  
   return (
-    <div className="w-full px-7">
+    <div className="w-full px-7 bg-[#F5F6F1CC]">
 
       <div className="w-full flex items-center justify-between gap-5 ">
         <Link to="/reports" className="text-xl flex-1 text-grey ">
@@ -216,33 +219,52 @@ export const FilterTable = ({
       </div>
       <div className="flex justify-between items-end w-full">
   
-        {(title !== "Probation Form Update" && title !== "Contract Expiry Form Update") && (
-            <div className="flex justify-center items-center gap-5">
-            <div>
-             <label htmlFor="start-date" className="block text-[16px] font-medium">
-               Start Date
-             </label>
-             <input
-               id="start-date"
-               type="date"
-               onChange={(e) => handleDate(e, "startDate")}
-               className="outline-none text-grey border rounded-md p-2"
-             />
-           </div>
-           <div>
-             <label htmlFor="end-date" className="block text-[16px] font-medium">
-               End Date
-             </label>
-             <input
-               id="end-date"
-               type="date"
-               onChange={(e) => handleDate(e, "endDate")}
-               className="outline-none text-grey border rounded-md p-2"
-             />
-           </div>
-           </div>
+      {title !== "Probation Form Update" && title !== "Contract Expiry Form Update" && (
+  <div className="flex justify-center items-center gap-5">
+    <div>
+      <label htmlFor="start-date" className="block text-[16px] font-medium">
+        Start Date
+      </label>
+      <input
+        id="start-date"
+        type="date"
+        onChange={(e) => handleDate(e, "startDate")}
+        className="outline-none text-grey border rounded-md p-2"
+      />
+    </div>
+    <div>
+      <label htmlFor="end-date" className="block text-[16px] font-medium">
+        End Date
+      </label>
+      <input
+        id="end-date"
+        type="date"
+        onChange={(e) => handleDate(e, "endDate")}
+        className="outline-none text-grey border rounded-md p-2"
+      />
+    </div>
+  </div>
+) }
 
-        )}
+{title !== "Training Records" &&( 
+
+<div className=" ">
+<label className="block text-[16px] font-medium">
+        Department
+      </label>
+
+      <select
+  value={selectedDepartment}
+  onChange={(e) => setSelectedDepartment(e.target.value)}
+  className="outline-none rounded-lg p-2 shadow-md border border-[#8a8888] text-grey select-custom w-[200px] h-[45px] select-filter">
+  <option value="">All Departments</option>
+  {departmentOptions?.map((dept, index) => (
+    <option key={index} value={dept.value}>
+      {dept.label}
+    </option>
+  ))}
+</select>
+</div>)}
      
       {/* Download Button */}
         <div className="text-center">
@@ -275,6 +297,37 @@ export const FilterTable = ({
                 </tr>
               </thead>
               <tbody className="bg-white">
+  {currentItems.map((row, rowIndex) => (
+    <tr key={rowIndex} className="text-sm border-b-2 border-[#CECECE]">
+      {Object.entries(row).map(([key, col], colIndex) => {
+        const isExpired =
+          key === "expAndValid" && col === "EXPIRED";
+        // Check if the column value is undefined or null, and display "N/A" if true
+        const displayValue = col == null ? "N/A" : Array.isArray(col) ? `${col[col.length - 1]}` : `${col}`;
+        return (
+          <td
+            key={colIndex}
+            className={`border-b-2 text-center uppercase border-[#CECECE] p-2 ${
+              isExpired ? "text-[red]" : ""
+            }`}
+          >
+            {displayValue}
+          </td>
+        );
+      })}
+      {["Probation Review", "Probation Form Update", "Recruitment & Mobilization", "Contract Expiry Review", "Contract Expiry Form Update"].includes(title) && (
+        <td
+          className="underline text-center border-[#CECECE] p-2 cursor-pointer text-[blue]"
+          onClick={() => handleViewDetails(row)}
+        >
+          View Details
+        </td>
+      )}
+    </tr>
+  ))}
+</tbody>
+
+              {/* <tbody className="bg-white">
                 {currentItems.map((row, rowIndex) => (
                   <tr
                     key={rowIndex}
@@ -286,7 +339,7 @@ export const FilterTable = ({
                       return (
                         <td
                           key={colIndex}
-                          className={`border-b-2 text-center border-[#CECECE] p-2 ${
+                          className={`border-b-2 text-center uppercase border-[#CECECE] p-2 ${
                             isExpired ? "text-[red]" : ""
                           }`}
                         >
@@ -338,7 +391,7 @@ export const FilterTable = ({
                       )}
                   </tr>
                 ))}
-              </tbody>
+              </tbody> */}
             </table>
           </div>
         </div>
