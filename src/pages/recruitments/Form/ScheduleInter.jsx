@@ -49,9 +49,9 @@ export const ScheduleInter = ({ candidate, onClose }) => {
         empID: result?.empID,
         manager: result?.name,
         managerEmail: result?.officialEmail,
-        managerName: candidate?.name,
+        managerName: result?.name,
         candyEmail: candidate?.email,
-        hrEmail: "Hr-notification@adininworks.com",
+        hrEmail: "hr-recruitment@adininworks.com",
         candyName: candidate?.name,
         candyPosition: candidate?.position,
       },
@@ -83,7 +83,7 @@ export const ScheduleInter = ({ candidate, onClose }) => {
 
     try {
       setIsLoading(true);
-      // Ensure the schedule is created first
+      // // Ensure the schedule is created first
       await createSchedule(formattedData);
       await localMobilization(mobilizationData);
       // // Send emails sequentially
@@ -102,7 +102,7 @@ export const ScheduleInter = ({ candidate, onClose }) => {
     const from = "hr_no-reply@adininworks.com";
     const ManagerSubject = "Interview Scheduled";
     const hrSubject = "Interview Scheduled";
-    const candySubject =  "Interview Scheduled"
+    const candySubject = "Interview Scheduled";
     const MANAGER_NAME = formData.interview.managerName;
     const CANDY_NAME = formData.interview.candyName;
 
@@ -127,13 +127,13 @@ export const ScheduleInter = ({ candidate, onClose }) => {
     const emailContent = `
     <html>
       <body>
-        <p>Subject: Interview Notification – ${CANDY_NAME}</p>
+        <p>Subject: Interview Notification</p>
         
         <p>Dear ${MANAGER_NAME},</p>
         
         <p>This is to notify you that an interview has been scheduled for ${
           formData.interview.candyName
-        } for the <strong> ${
+        } the <strong> ${
       formData.interview.candyPosition
     } </strong> position.</p>      
         <p><strong>Date:</strong> ${formattedDateString}</p>
@@ -146,24 +146,20 @@ export const ScheduleInter = ({ candidate, onClose }) => {
     </html>
   `;
 
-  const emailContentCandy = `
+    const emailContentCandy = `
   <html>
     <body>
-      <p>Subject: Interview Notification – ${CANDY_NAME}</p>
+      <p>Subject: Interview Notification</p>
       
-      <p>Dear Candidate,</p>
+      <p>Dear ${formData.interview.candyName},</p>
       
-      <p>This is to notify you that an interview has been scheduled for ${
-        formData.interview.candyName
-      } for the <strong> ${
-    formData.interview.candyPosition
-  } </strong> position.</p>      
+      <p>This is to notify you that an interview has been scheduled for the <strong> ${
+        formData.interview.candyPosition
+      } </strong> position.</p>      
       <p><strong>Date:</strong> ${formattedDateString}</p>
       <p><strong>Time:</strong> ${formattedTime}</p>
       <p><strong>Mode:</strong> ${data.interType || "Not specified"}</p>
       <p><strong>Venue:</strong> ${data.venue || "Not provided"}</p>
-      
-      <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the form.</p>
     </body>
   </html>
 `;
@@ -193,7 +189,6 @@ export const ScheduleInter = ({ candidate, onClose }) => {
           from,
           formData.interview.candyEmail
         );
-   
       }
     } catch (error) {
       console.error("Error sending emails:", error);
@@ -325,7 +320,7 @@ export const ScheduleInter = ({ candidate, onClose }) => {
             <button
               className="border-2 border-[#F7EC3D] text-dark_grey font-medium hover:bg-yellow py-1 px-2 rounded w-32"
               onClick={() => onSubmit()}
-              disabled={isLoading} 
+              disabled={isLoading}
             >
               {isLoading ? "Loading..." : "Send"}
             </button>
@@ -338,7 +333,6 @@ export const ScheduleInter = ({ candidate, onClose }) => {
             />
           )}
         </div>
-        
       </div>
     </section>
   );

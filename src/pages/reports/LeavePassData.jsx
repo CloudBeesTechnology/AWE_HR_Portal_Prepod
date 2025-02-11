@@ -47,8 +47,7 @@ export const LeavePassData = () => {
     return data
     .filter((item) => {
       // console.log(item.annualLeaveDate);
-      
-      // Ensure annualLeaveDate is a valid array with non-empty and valid date entries
+   
       return (
         Array.isArray(item.annualLeaveDate) &&
         item.annualLeaveDate.length > 0 &&
@@ -74,9 +73,15 @@ export const LeavePassData = () => {
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
           : "-",
-        contractStart: formatDate(item.contractStart) || "-",
-        contractEnd: formatDate(item.contractEnd) || "-",
-        annualLeaveDate: formatDate(item.annualLeaveDate) || "-",
+        contractStart: Array.isArray(item.contractStart)
+            ? formatDate(item.contractStart[item.contractStart.length - 1])
+            : "-",
+        contractEnd: Array.isArray(item.contractEnd)
+            ? formatDate(item.contractEnd[item.contractEnd.length - 1])
+            : "-",
+        annualLeaveDate: Array.isArray(item.annualLeaveDate)
+            ? formatDate(item.annualLeaveDate[item.annualLeaveDate.length - 1])
+            : "-", 
         destinateLeavePass: item.destinateLeavePass || "-",
         rawAld: new Date(item.annualLeaveDate) || "-", // Raw date for sorting
       }))
@@ -122,12 +127,16 @@ export const LeavePassData = () => {
       otherDepartment:Array.isArray(item.otherDepartment)
       ? item.otherDepartment[item.otherDepartment.length - 1]
       : "-",
-    position: Array.isArray(item.position)
+      position: Array.isArray(item.position)
       ? item.position[item.position.length - 1]
       : "-",
-      contractStart: formatDate(item.contractStart)|| "-",
-      contractEnd: formatDate(item.contractEnd)|| "-",
-      annualLeaveDate: formatDate(item.annualLeaveDate)|| "-",
+      contractStart: Array.isArray(item.contractStart)
+            ? formatDate(item.contractStart[item.contractStart.length - 1])
+            : "-",
+      contractEnd: Array.isArray(item.contractEnd)
+            ? formatDate(item.contractEnd[item.contractEnd.length - 1])
+            : "-",
+      annualLeaveDate: formatDate(item.annualLeaveDate) || "-",
       destinateLeavePass: item.destinateLeavePass || "-",
       rawAld: new Date(item.annualLeaveDate)|| "-", // Raw date for sorting
       }))
@@ -136,6 +145,7 @@ export const LeavePassData = () => {
   
     setFilteredData(filtered);
   };
+
   return (
     <div>
       <FilterTable

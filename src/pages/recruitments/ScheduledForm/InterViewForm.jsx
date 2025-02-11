@@ -37,7 +37,7 @@ export const InterviewForm = ({ candidate }) => {
         // Update the formData with the interview data of the selected candidate
         setFormData({
           interview: {
-            date: interviewData.interDate.split("T")[0], // Extract date from timestamp
+            date: interviewData.interDate?.split("T")[0], // Extract date from timestamp
             time: interviewData.interTime,
             venue: interviewData.venue,
             interviewType: interviewData.interType,

@@ -38,10 +38,10 @@ export const HiringJob = () => {
 
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    return expiry < today ? "Completed" : "Live";
+    return expiry < today ? "Expired" : "Live";
   };
   const getStatusClass = (status) => {
-    return status === "Completed" ? "text-[green]" : "text-[#E8A317]";
+    return status === "Expired" ? "text-[green]" : "text-[#E8A317]";
   };
 
   return (
