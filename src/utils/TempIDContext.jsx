@@ -43,7 +43,7 @@ export const TempIDProvider = ({ children }) => {
 
     if (workInfoData && userType === "Manager") {
       const generalManagerPosition = workInfoData.filter((item) =>
-        item.position.includes("General Manager")
+        item.position.includes("GENERAL MANAGER")
       );
     
       // console.log("General Manager Positions:", generalManagerPosition); // Log the filtered array
@@ -68,7 +68,7 @@ export const TempIDProvider = ({ children }) => {
     // console.log("gm 4", gmPosition);
     if (workInfoData && empPIData) {
       const generalManagerPositions = workInfoData.filter((item) =>
-        item.position.includes("General Manager")
+        item.position.includes("GENERAL MANAGER")
       );
       setGmCount(generalManagerPositions.length);
 

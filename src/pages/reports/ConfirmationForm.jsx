@@ -141,7 +141,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
       {/* Supervisor Section */}
       <div className="flex justify-between items-center space-x-8">
 
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center w-[380px]">
           <label className="text-sm font-medium">Name of Supervisor :</label>
           <input
             type="text"
@@ -150,7 +150,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
             value={formData.probData.supervisorName || ""}
             onChange={handleInputChange}
             disabled={userType !== "Supervisor"}
-            className="border-b outline-none px-1"
+            className="border-b outline-none px-1 w-full"
           />
         </div>
 
@@ -206,7 +206,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
 
       {/* Manager Section */}
       <div className="flex justify-between items-center space-x-8">
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center w-[380px]">
           <label className="text-sm font-medium">Name of Manager :</label>
           <input
             type="text"
@@ -215,7 +215,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
             value={formData.probData.managerName || ""}
             onChange={handleInputChange}
             disabled={userType !== "Manager"}
-            className="border-b outline-none px-1"
+            className="border-b outline-none px-1 w-full"
           />
         </div>
         <div className="flex items-center space-x-10 border-b">
@@ -267,7 +267,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
 
       {/* GM Section */}
       <div className="flex justify-between items-center">
-        <div className="w-[360px]">
+        <div className="w-[380px]">
         <label className="text-sm font-medium">Concurred By GM :</label>
 
           <input
@@ -276,8 +276,8 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
             {...register("gmName")}
             value={formData.probData.gmName || ""}
             onChange={handleInputChange}
-            disabled={gmPosition !== "General Manager"} 
-            className="border-b outline-none px-1"
+            disabled={gmPosition !== "GENERAL MANAGER"} 
+            className="border-b outline-none px-1 w-[250px]"
           />
           <p className="text-[12px]">(For Staff Category Only)</p>
           </div>
@@ -291,7 +291,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
               checked={formData.probData.gmApproved === "Approved"}
               onChange={handleInputChange}
               id="gmApproved"
-              disabled={gmPosition !== "General Manager"} 
+              disabled={gmPosition !== "GENERAL MANAGER"} 
               className="h-4 w-4 form-checkbox"
             />
             <label htmlFor="gmApproved" className="text-sm">
@@ -307,7 +307,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
               checked={formData.probData.gmApproved === "Rejected"}
               onChange={handleInputChange}
               id="gmReject"
-              disabled={gmPosition !== "General Manager"} 
+              disabled={gmPosition !== "GENERAL MANAGER"} 
               className="h-4 w-4 form-checkbox"
             />
             <label htmlFor="gmReject" className="text-sm">
@@ -315,14 +315,14 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
             </label>
           </div>
         </div>
-        <div className="flex items-center space-x-2 border-b">
+        <div className="flex items-center space-x-2 border-b ">
           <input
             type="date"
             name="gmDate"
             {...register("gmDate")}
             value={formData.probData.gmDate || ""}
             onChange={handleInputChange}
-            disabled={gmPosition !== "General Manager"} 
+            disabled={gmPosition !== "GENERAL MANAGER"} 
             className="outline-none"
           />
         </div>

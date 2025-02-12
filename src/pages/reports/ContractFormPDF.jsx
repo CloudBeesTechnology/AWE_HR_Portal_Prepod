@@ -43,6 +43,9 @@ export const ContractFormPDF = ({ contentRef }) => {
       hrManager: "",
       genManager: "",
       remarks: "",
+        remarkHr: "",
+        remarkGm: "",
+        renewalContract:"",
       status: "",
     },
   });
@@ -93,12 +96,12 @@ export const ContractFormPDF = ({ contentRef }) => {
           }
         }
 
-        // Step 6: Fetch General Manager's email (if applicable)
+        // Step 6: Fetch GENERAL MANAGER's email (if applicable)
         const generalManagerPositions = workInfoData.filter((item) =>
-          item.position[item.position.length - 1]?.includes("General Manager")
+          item.position[item.position.length - 1]?.includes("GENERAL MANAGER")
         );
 
-        // console.log("Filtered General Manager Positions:", generalManagerPositions);
+        // console.log("Filtered GENERAL MANAGER Positions:", generalManagerPositions);
 
         if (generalManagerPositions.length > 0) {
           const gmInfo = empPIData.find(
@@ -117,7 +120,7 @@ export const ContractFormPDF = ({ contentRef }) => {
             console.log("GM Info not found.");
           }
         } else {
-          console.log("No General Manager positions found.");
+          console.log("No GENERAL MANAGER positions found.");
         }
       }
     }
@@ -137,6 +140,9 @@ export const ContractFormPDF = ({ contentRef }) => {
             hrManager: contractData.hrManager,
             genManager: contractData.genManager,
             remarks: contractData.remarks,
+            remarkHr: contractData.remarkHr,
+            remarkGm: contractData.remarkGm,  
+            renewalContract: contractData.renewalContract,  
           },
         });
       }
@@ -160,6 +166,9 @@ export const ContractFormPDF = ({ contentRef }) => {
       hrManager: formData.contract.hrManager,
       genManager: formData.contract.genManager,
       remarks: formData.contract.remarks,
+      remarkHr: formData.contract.remarkHr,
+      remarkGm: formData.contract.remarkGm, 
+      renewalContract: formData.contract.renewalContract,  
       contStatus: true,
     };
 
@@ -193,16 +202,18 @@ export const ContractFormPDF = ({ contentRef }) => {
           hrManager: formData.contract.hrManager,
           genManager: formData.contract.genManager,
           remarks: formData.contract.remarks,
+          remarkHr: formData.contract.remarkHr,
+          remarkGm: formData.contract.remarkGm, 
+          renewalContract: formData.contract.renewalContract,  
           contStatus: true,
         };
-
-        
+       
         if (userType === "HR" && !formData.contract.hrManager) {
           alert("HR Name is is required!");
           return;
         }
 
-        if (gmPosition === "General Manager" && !formData.contract.genManager) {
+        if (gmPosition === "GENERAL MANAGER" && !formData.contract.genManager) {
           alert("GM Name is is required!");
           return;
         }
@@ -255,7 +266,7 @@ export const ContractFormPDF = ({ contentRef }) => {
             // "hariharanofficial2812@gmail.com"
             managerData.hrEmail
           );
-        } else if (gmPosition === "General Manager") {
+        } else if (gmPosition === "GENERAL MANAGER") {
           sendEmail(
             subject,
             `<html>
@@ -267,7 +278,7 @@ export const ContractFormPDF = ({ contentRef }) => {
               probationEndFormatted || "Not Mentioned"
             },
                <br/>
-                  been confirmed by the General manager,
+                  been confirmed by the GENERAL MANAGER,
                </p>
                <p>Please proceed with the necessary actions.</p>
               <p>Click here https://hr.adininworks.co to view the updates.</p>
@@ -385,8 +396,7 @@ export const ContractFormPDF = ({ contentRef }) => {
                 <th className="border border-black p-2">LD Expiry</th>
                 <th className="border border-black p-2">
                   Duration of Renewal Contract
-                </th>
-                
+                </th>               
               </tr>
             </thead>
             <tbody>
@@ -423,9 +433,18 @@ export const ContractFormPDF = ({ contentRef }) => {
                   <td className="border border-black p-2">
                     {employeeData?.nlmsEmpApproval || "N/A"}
                   </td>
-                  <td className="border border-black p-2">
-                    {employeeData?.contractRenewalDuration || "N/A"}
-                  </td>
+                  <td className="border border-black p-2 h-full ">
+  <input
+    type="text"
+    className="border outline-none border-none p-1 w-full h-full"
+    name="renewalContract"
+    value={formData.contract.renewalContract}
+    onChange={handleInputChange}
+    disabled={userType !== "Manager"}
+    // defaultValue={employeeData?.contract || ""}
+  />
+</td>
+
                   {/* <td className="border border-black p-2">
                     {employeeData?.ldEx || "N/A"}
                   </td>
@@ -446,15 +465,38 @@ export const ContractFormPDF = ({ contentRef }) => {
             of Contract Completion Report
           </p>
         </div>
-
+      
         {/* Remarks Section */}
         <div className="mt-7">
-          <label className="text-sm font-semibold">Remarks:</label>
+          <label className="text-sm font-semibold">Remarks Manager:</label>
           <textarea
             type="text"
             name="remarks"
             value={formData.contract.remarks}
             onChange={handleInputChange}
+            disabled={userType !== "Manager"} 
+            className="border w-full text-sm font-semibold rounded resize-none outline-none p-2"
+          />
+        </div>
+        <div className="mt-7">
+          <label className="text-sm font-semibold">Remarks HR:</label>
+          <textarea
+            type="text"
+            name="remarkHr"
+            value={formData.contract.remarkHr}
+            onChange={handleInputChange}
+            disabled={userType !== "HR"} 
+            className="border w-full text-sm font-semibold rounded resize-none outline-none p-2"
+          />
+        </div>
+        <div className="mt-7">
+          <label className="text-sm font-semibold">Remarks GM:</label>
+          <textarea
+            type="text"
+            name="remarkGm"
+            value={formData.contract.remarkGm}
+            onChange={handleInputChange}
+            disabled={gmPosition !== "GENERAL MANAGER"} 
             className="border w-full text-sm font-semibold rounded resize-none outline-none p-2"
           />
         </div>
@@ -496,7 +538,7 @@ export const ContractFormPDF = ({ contentRef }) => {
               name="genManager"
               value={formData.contract.genManager}
               onChange={handleInputChange}
-              disabled={gmPosition !== "General Manger"} 
+              disabled={gmPosition !== "GENERAL MANAGER"} 
               className="border-b-2 border-black w-56 mx-auto outline-none text-center"
             />
 
