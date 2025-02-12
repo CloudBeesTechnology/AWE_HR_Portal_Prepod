@@ -99,7 +99,6 @@ export const EmployeeInfo = () => {
     mode: "onChange",
     defaultValues: {
       familyDetails: JSON.stringify([]),
-    
     },
   });
 
@@ -279,29 +278,36 @@ export const EmployeeInfo = () => {
   const cleanFamilyDetailsString = (familyDetailsInput) => {
     try {
       let familyDetailsString = familyDetailsInput;
-  
+
       // Convert to string if input is an object
       if (typeof familyDetailsString === "object") {
-        familyDetailsString = JSON.stringify(Array.isArray(familyDetailsString) ? familyDetailsString : [familyDetailsString]);
+        familyDetailsString = JSON.stringify(
+          Array.isArray(familyDetailsString)
+            ? familyDetailsString
+            : [familyDetailsString]
+        );
       }
-  
+
       // Ensure proper formatting by trimming whitespace
       let cleanedString = familyDetailsString.trim();
-  
+
       // Remove surrounding quotes if present
       if (cleanedString.startsWith('"') && cleanedString.endsWith('"')) {
         cleanedString = cleanedString.slice(1, -1);
       }
-  
+
       // Ensure property names are wrapped in double quotes (fix malformed JSON)
-      cleanedString = cleanedString.replace(/([{,])\s*([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
-  
+      cleanedString = cleanedString.replace(
+        /([{,])\s*([a-zA-Z0-9_]+)\s*:/g,
+        '$1"$2":'
+      );
+
       // Handle potential single quotes around values
       // cleanedString = cleanedString.replace(/'([^']+)'/g, '"$1"');
   
       // Remove unnecessary backslashes
       cleanedString = cleanedString.replace(/\\/g, "");
-  
+
       // Capitalize words utility function
       const capitalizeWords = (str) =>
         str
@@ -310,10 +316,10 @@ export const EmployeeInfo = () => {
             (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
           )
           .join(" ");
-  
+
       // Parse the cleaned JSON string
       const parsedData = JSON.parse(cleanedString);
-  
+
       if (Array.isArray(parsedData)) {
         return parsedData.map((item) => {
           if (typeof item === "string") {
@@ -346,7 +352,6 @@ export const EmployeeInfo = () => {
       return []; // Return empty array if parsing fails
     }
   };
-  
 
   const getArrayDateValue = (value) => {
     if (Array.isArray(value) && value.length > 0) {
@@ -434,10 +439,7 @@ export const EmployeeInfo = () => {
         setValue(key, valueToSet);
       }
     });
-  const arrayDateField = [
-      "empType",
-    "contractType"
-    ];
+    const arrayDateField = ["empType", "contractType"];
 
     // Set values for date fields and handle salaryType condition
     arrayDateField.forEach((field) => {
@@ -547,7 +549,7 @@ export const EmployeeInfo = () => {
       "ppUpload",
       "supportDocUpload",
     ];
-    
+
     uploadFields.forEach((field) => {
       const fieldData = result[field];
       if (!fieldData) {
@@ -593,7 +595,6 @@ export const EmployeeInfo = () => {
         console.error(`Failed to parse ${field}:`, error);
       }
     });
-    
   };
 
   const getFileName = (filePath) => {
@@ -631,12 +632,12 @@ export const EmployeeInfo = () => {
     const removeLeadingNulls = (array, newValue) => {
       const newArray = [...(array || []), newValue]; // Combine old array and new value
       let firstValidIndex = newArray.findIndex((item) => item !== null);
-      
+
       if (firstValidIndex !== -1) {
         // Map through the newArray and remove consecutive duplicates
         const result = [];
         let lastAdded = null;
-    
+
         newArray.forEach((item) => {
           if (item !== null && item !== lastAdded) {
             result.push(item === null ? "N/A" : item);
@@ -645,7 +646,7 @@ export const EmployeeInfo = () => {
             result.push("N/A");
           }
         });
-    
+
         return result;
       } else {
         return [];
@@ -673,7 +674,7 @@ export const EmployeeInfo = () => {
           checkingIDTable.ppIssued,
           ppIssued
         );
- const updateContract = removeLeadingNulls(
+        const updateContract = removeLeadingNulls(
           checkingPITable.contractType,
           contractType
         );
@@ -690,7 +691,7 @@ export const EmployeeInfo = () => {
           ppIssued: updatedppIssued,
           ppExpiry: updatedppExpiry,
           contractType: updateContract,
-          empType:updateEmpType,
+          empType: updateEmpType,
           applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
           cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
           loiUpload: JSON.stringify(uploadedFiles.loiUpload),
@@ -704,6 +705,7 @@ export const EmployeeInfo = () => {
           email: data.email.trim().toLowerCase(),
           officialEmail: data.officialEmail.trim().toLowerCase(),
         };
+// console.log("updated", collectValue);
 
         await UpdateEIValue({ collectValue });
         setShowTitle("Employee Personal Info updated successfully");
@@ -724,7 +726,7 @@ export const EmployeeInfo = () => {
           ppIssued: updatedppIssued,
           ppExpiry: updatedppExpiry,
           contractType: updateContract,
-          empType:updateEmpType,
+          empType: updateEmpType,
           applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
           cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
           loiUpload: JSON.stringify(uploadedFiles.loiUpload),
@@ -736,6 +738,7 @@ export const EmployeeInfo = () => {
           email: data.email.trim().toLowerCase(),
           officialEmail: data.officialEmail.trim().toLowerCase(),
         };
+        // console.log("created", empValue);
 
         await SubmitEIData({ empValue });
         setShowTitle("Employee Personal Info saved successfully");
