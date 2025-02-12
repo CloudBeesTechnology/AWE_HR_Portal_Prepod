@@ -24,6 +24,7 @@ export const ApplyEmployReq = () => {
   
       let allRequisitions = [];
       let nextToken = null;
+      let hasMoreData = true;
   
       do {
         const response = await client.graphql({
@@ -40,7 +41,8 @@ export const ApplyEmployReq = () => {
         allRequisitions = [...allRequisitions, ...fetchedData];
   
         nextToken = response?.data?.listEmpRequisitions?.nextToken;
-      } while (nextToken);
+        hasMoreData = !!nextToken;
+      } while (hasMoreData);
   
       setRequisitionData(allRequisitions);
       setError(null);
@@ -58,11 +60,12 @@ export const ApplyEmployReq = () => {
 
   const handleViewClick = (request) => {
     setSelectedRequest(request);
+    console.log("REQ", request);
+    
     setIsReviewFormVisible(true);
   };
 
   const handleReviewFormClose = () => {
-    setSelectedRequest(null);
     setIsReviewFormVisible(false);
   };
 

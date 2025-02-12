@@ -16,8 +16,9 @@ export const EmpPE = () => {
     "Name",
     "Nationality",
     "Date of Join",
-    "Position",
     "Department",
+    "Other Department",
+    "Position",
     "Pass Expiry",
   ]);
 
@@ -72,8 +73,15 @@ export const EmpPE = () => {
           name: item.name || "-",
           nationality: item.nationality || "-",
           dateOfJoin: DateFormat(item.doj) || "-",
-          position: item.position || "-",
-          department: item.department || "-",
+           department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
           passExpiry: DateFormat(lastPassExp) || "-",
         };
       })      .sort((a, b) => a.lastPassExp - b.lastPassExp); // Sort using lastPassExp
@@ -125,8 +133,15 @@ export const EmpPE = () => {
           name: item.name || "-",
           nationality: item.nationality || "-",
           dateOfJoin: DateFormat(item.doj) || "-",
-          position: item.position || "-",
-          department: item.department || "-",
+           department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
           passExpiry: DateFormat(lastPassExp) || "-",
         };
       })

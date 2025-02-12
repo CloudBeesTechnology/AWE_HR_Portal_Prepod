@@ -30,8 +30,6 @@ import { UpdateEmpInfo } from "../../../services/updateMethod/UpdateEmpInfo";
 import { getUrl } from "@aws-amplify/storage";
 import { RowThirteen } from "./RowThirteen";
 import { capitalizedLetter } from "../../../utils/DateFormat";
-import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteDocs";
-import { MdCancel } from "react-icons/md";
 
 export const EmployeeInfo = () => {
   useEffect(() => {
@@ -43,13 +41,6 @@ export const EmployeeInfo = () => {
   const { SubmitEIData, errorEmpID } = EmpInfoFunc();
   const { UpdateEIValue } = UpdateEmpInfo();
   const { empPIData, IDData, dropDownVal } = useContext(DataSupply);
-  // console.log(empPIData);
-
-  // empPIData.forEach((item) => {
-  //   if (item.empID === "629") {
-  //     console.log(item);
-  //   }
-  // });
 
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
@@ -83,8 +74,6 @@ export const EmployeeInfo = () => {
   const [IBLastUP, setIBLastUP] = useState(null);
   const [familyData, setFamilyData] = useState([]);
   const [showTitle, setShowTitle] = useState("");
-  const [deletedFiles, setDeletedFiles] = useState({});
-  const [id, setID] = useState("");
   const handleNationalityChange = (e) => {
     setSelectedNationality(e.target.value);
   };
@@ -104,7 +93,6 @@ export const EmployeeInfo = () => {
     setValue,
     watch,
     control,
-    trigger,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(employeeInfoSchema),
@@ -180,134 +168,36 @@ export const EmployeeInfo = () => {
   };
 
   const handleFileChange = async (e, label) => {
-    const watchedEmpID = watch("empID");
     if (!watchedEmpID) {
       alert("Please enter the Employee ID before uploading files.");
       window.location.href = "/employeeInfo";
       return;
     }
-
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
-
-    const allowedTypes = ["application/pdf"];
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
     if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file");
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
       return;
     }
-
-    // Fetch current files (including backend-stored ones)
-    const currentFiles = watch(label) || []; // React Hook Form state
-
-    // Count only newly uploaded files, ignoring backend-stored files
-    const newUploads = currentFiles.filter((file) => file instanceof File);
-
-    if (newUploads.length > 0) {
-      alert(
-        "You can only upload one new file. Please delete the existing file before uploading another."
-      );
-      return;
-    }
-
-    // Ensure the file was not previously deleted
-    if (deletedFiles[label]?.includes(selectedFile.name)) {
-      alert("This file was previously deleted and cannot be re-added.");
-      return;
-    }
-
-    // Append the new file to the form state
+    const currentFiles = watch(label) || [];
     setValue(label, [...currentFiles, selectedFile]);
-
     try {
+      // Dynamically set field based on label
       await uploadDocs(selectedFile, label, setUploadedFiles, watchedEmpID);
       setUploadedFileNames((prev) => ({
         ...prev,
         [label]: selectedFile.name,
       }));
     } catch (err) {
-      console.error(err);
+      console.log(err);
     }
   };
-
-  const deleteFile = async (fileType, fileName) => {
-    const watchedEmpID = watch("empID");
-    const deleteID = id;
-
-    try {
-      await handleDeleteFile(
-        fileType,
-        fileName,
-        watchedEmpID,
-        setUploadedFileNames,
-        deleteID,
-        setValue,
-        watch,
-        trigger
-      );
-      const currentFiles = watch(fileType) || [];
-      // Filter out the deleted file
-      const updatedFiles = currentFiles.filter(
-        (file) => file.name !== fileName
-      );
-      // Update form state with the new file list
-      setValue(fileType, updatedFiles);
-
-      // Update UI state
-      setUploadedFiles((prevState) => ({
-        ...prevState,
-        [fileType]: updatedFiles,
-      }));
-    } catch (error) {
-      console.error("Error deleting file:", error);
-    }
-  };
-  // const deleteFile = async (fileType, fileName) => {
-  //   try {
-  //     const watchedEmpID = watch("empID");
-  //     const deleteID = id;
-
-  //     console.log("Deleting file with ID:", deleteID);
-
-  //     // Call API to remove file from S3 and update database
-  //     const isDeleted = await handleDeleteFile(fileType, fileName, watchedEmpID, setUploadedFileNames, deleteID, setValue,watch,trigger);
-
-  //     if (!isDeleted) {
-  //       console.error("File deletion failed, aborting UI update.");
-  //       return;
-  //     }
-
-  //     // Track deleted files
-  //     setDeletedFiles((prev) => ({
-  //       ...prev,
-  //       [fileType]: [...(prev[fileType] || []), fileName], // Keep track of deleted files
-  //     }));
-
-  //     // Remove the deleted file from the form state
-  //     const currentFiles = watch(fileType) || [];
-  //     const updatedFiles = currentFiles.filter((file) => file.name !== fileName);
-
-  //     // Ensure setValue is called only after file deletion
-  //     setValue(fileType, updatedFiles);
-
-  //     // Update UI state with the new uploaded files
-  //     setUploadedFiles((prevState) => ({
-  //       ...prevState,
-  //       [fileType]: updatedFiles,
-  //     }));
-
-  //     // Update the file names state
-  //     setUploadedFileNames((prev) => {
-  //       const updated = { ...prev };
-  //       delete updated[fileType]; // Remove deleted file from the names
-  //       return updated;
-  //     });
-
-  //     console.log(`File "${fileName}" removed from UI.`);
-  //   } catch (error) {
-  //     console.error("Error deleting file:", error);
-  //     alert("Error processing the file deletion.");
-  //   }
-  // };
 
   useEffect(() => {
     if (
@@ -413,8 +303,8 @@ export const EmployeeInfo = () => {
       );
 
       // Handle potential single quotes around values
-      // cleanedString = cleanedString.replace(/'([^\\]+)'/g, '"$1"');
-
+      // cleanedString = cleanedString.replace(/'([^']+)'/g, '"$1"');
+  
       // Remove unnecessary backslashes
       cleanedString = cleanedString.replace(/\\/g, "");
 
@@ -472,10 +362,6 @@ export const EmployeeInfo = () => {
 
   const searchResult = async (result) => {
     // console.log("Result", result);
-
-    const extractID = result.id;
-    setID(extractID);
-
     const fieldValue = [
       "empID",
       "email",
@@ -665,33 +551,48 @@ export const EmployeeInfo = () => {
     ];
 
     uploadFields.forEach((field) => {
-      if (result[field]) {
-        try {
-          const rawArrayString = result[field][0]; // Access the first element of the array
-          const trimmedString =
-            rawArrayString.startsWith('"') && rawArrayString.endsWith('"')
-              ? rawArrayString.slice(1, -1)
-              : rawArrayString;
-
-          const properJsonString = trimmedString.replace(/\\"/g, '"');
-          const parsedArray = JSON.parse(properJsonString);
-
-          if (!Array.isArray(parsedArray)) {
-            throw new Error(`Parsed result is not an array for ${field}`);
+      const fieldData = result[field];
+      if (!fieldData) {
+        setValue(field, []); // Clear the field value
+        setUploadedFiles((prev) => ({ ...prev, [field]: [] }));
+        setUploadedFileNames((prev) => ({ ...prev, [field]: "" })); // Clear the file name
+        return;
+      }
+    
+      try {
+        // Parse the field data
+        const outerParsed = JSON.parse(fieldData);
+        const parsedArray = Array.isArray(outerParsed) ? outerParsed : [outerParsed];
+    
+        const parsedFiles = parsedArray.map((item) => {
+          if (typeof item === "string") {
+            try {
+              const validJSON = preprocessJSONString(item);
+              return JSON.parse(validJSON);
+            } catch {
+              return item;
+            }
           }
-          const parsedFiles = parsedArray.map((item) =>
-            typeof item === "string" ? JSON.parse(item) : item
-          );
-
-          setValue(field, parsedFiles);
-          setUploadedFiles((prev) => ({ ...prev, [field]: parsedFiles }));
-          setUploadedFileNames((prev) => ({
-            ...prev,
-            [field]: parsedFiles.map((file) => getFileName(file.upload)), // Show all file names
-          }));
-        } catch (error) {
-          console.error(`Failed to parse ${field}:`, error);
-        }
+          return item;
+        });
+    
+        // Get the last file name
+        const lastFile = parsedFiles[parsedFiles.length - 1];
+        const lastFileName = lastFile?.upload
+          ? getFileName(lastFile.upload)
+          : Array.isArray(lastFile) && lastFile[0]?.upload
+          ? getFileName(lastFile[0].upload)
+          : "";
+    
+        // Update state
+        setValue(field, parsedFiles);
+        setUploadedFiles((prev) => ({ ...prev, [field]: parsedFiles }));
+        setUploadedFileNames((prev) => ({
+          ...prev,
+          [field]: lastFileName, // Assign the extracted file name
+        }));
+      } catch (error) {
+        console.error(`Failed to parse ${field}:`, error);
       }
     });
   };
@@ -700,10 +601,9 @@ export const EmployeeInfo = () => {
     if (!filePath || typeof filePath !== "string") {
       return ""; // Return an empty string if the file path is invalid
     }
-
-    const fileNameWithExtension = filePath.split("/").pop(); // This splits and grabs the file name with extension
-
-    return fileNameWithExtension; // Returns "Website Deployment Document.pdf"
+    const fileNameWithExtension = filePath.split("/").pop(); // Get file name with extension
+    const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
+    return fileName;
   };
 
   const onSubmit = async (data) => {
@@ -1061,52 +961,9 @@ export const EmployeeInfo = () => {
                       {field.label}
                     </span>
                   </label>
-
-                  <p className="text-xs mt-1 text-grey px-1">
-                    {uploadedFileNames?.[field.title] ? (
-                      Array.isArray(uploadedFileNames[field.title]) ? (
-                        uploadedFileNames[field.title]
-                          .slice() // Create a shallow copy to avoid mutating the original array
-                          .reverse()
-                          .map((fileName, fileIndex) => (
-                            <span
-                              key={fileIndex}
-                              className="mt-2 flex justify-between items-center"
-                            >
-                              {fileName}
-                              <button
-                                type="button"
-                                className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-                                onClick={() =>
-                                  deleteFile(field.title, fileName)
-                                }
-                              >
-                                <MdCancel />
-                              </button>
-                            </span>
-                          ))
-                      ) : (
-                        <span className="mt-2 flex justify-between items-center">
-                          {uploadedFileNames[field.title]}
-                          <button
-                            type="button"
-                            className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-                            onClick={() =>
-                              deleteFile(
-                                field.title,
-                                uploadedFileNames[field.title]
-                              )
-                            }
-                          >
-                            <MdCancel />
-                          </button>
-                        </span>
-                      )
-                    ) : (
-                      <span></span>
-                    )}
+                  <p className="text-xs mt-1 text-grey">
+                    {uploadedFileNames?.[field.title] || ""}
                   </p>
-
                   {/* Display validation error if any */}
                   {errors[field.title] && (
                     <p className="text-red-500 text-xs mt-1">

@@ -45,6 +45,7 @@ export const ApplicantDetails = () => {
   const [uploadedDocs, setUploadedDocs] = useState({ profilePhoto: null });
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
+  const [profilePreview, setProfilePreview] = useState("");
 
   const linkToImageFile = async (pathUrl) => {
     const result = await getUrl({
@@ -52,31 +53,50 @@ export const ApplicantDetails = () => {
     });
     setImageUrl(result.url.toString());
   };
-
+  
   const profile = watch("profilePhoto");
 
   useEffect(() => {
-
+ 
     const savedData = JSON.parse(localStorage.getItem("applicantFormData"));
     if (savedData) {
-      Object.keys(savedData).forEach((key) => setValue(key, savedData[key]));
+      
+      Object.keys(savedData).forEach(async (key) => {
+        if (key === "profilePhoto" && savedData[key]) {
+          try {
+       
+            const result = await getUrl({ path: savedData[key] });
+            const imageUrl = result.url.toString();
+            setProfilePreview(imageUrl);
+            setValue(key, imageUrl); 
+          } catch (error) {
+            console.error(`Error setting value for ${key}:`, error);
+          }
+        } else {
+          setValue(key, savedData[key]);
+        }
+      });
+    } else {
+      console.log('No saved data in localStorage');
     }
-
+  
     const handleBeforeUnload = () => {
       localStorage.removeItem("applicantFormData");
     };
-
+  
     window.addEventListener("beforeunload", handleBeforeUnload);
-
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [location, setValue]);
+  
 
   useEffect(() => {
     if (tempID && empPDData.length > 0) {
       const interviewData = empPDData.find((data) => data.tempID === tempID);
       if (interviewData) {
+        console.log(interviewData);
+        
         Object.keys(interviewData).forEach((key) => {
           if (interviewData[key]) {
             setValue(key, interviewData[key]);
@@ -131,8 +151,6 @@ export const ApplicantDetails = () => {
         "applicantFormData",
         JSON.stringify(applicationUpdate)
       );
-
-      console.log("step 1:", applicationUpdate);
 
       navigate("/addCandidates/personalDetails", {
         state: { FormData: applicationUpdate },
@@ -197,7 +215,7 @@ export const ApplicantDetails = () => {
                     ? imageUrl
                     : profilePhoto
                     ? URL.createObjectURL(profilePhoto)
-                    : uploadedDocs.profilePhoto || avatar
+                    : uploadedDocs.profilePhoto ? profilePreview : profilePreview || avatar
                 }
                 id="previewImg"
                 alt="profile"
@@ -205,7 +223,7 @@ export const ApplicantDetails = () => {
                 onError={(e) => (e.target.src = avatar)}
               />
 
-              {(profilePhoto || uploadedDocs.profilePhoto || imageUrl) && (
+              {(profilePreview || profilePhoto || uploadedDocs.profilePhoto || imageUrl) && (
                 <div
                   className="absolute top-24 -right-3 bg-lite_grey p-[2px] rounded-full cursor-pointer"
                   onClick={() => document.getElementById("fileInput").click()}
@@ -215,7 +233,7 @@ export const ApplicantDetails = () => {
               )}
             </div>
 
-            {!profilePhoto && !uploadedDocs.profilePhoto && !imageUrl && (
+            {!profilePreview && !profilePhoto && !uploadedDocs.profilePhoto && !imageUrl && (
               <div className="mt-1 rounded-lg text-center">
                 <button
                   type="button"
@@ -258,7 +276,7 @@ export const ApplicantDetails = () => {
               options: GenderDD,
             },
             { label: "Date of Birth", name: "dob", type: "date" },
-            { label: "Age", name: "age", type: "number", min: 20, max: 99 }, // Modified for age input
+            { label: "Age", name: "age", type: "number", min: 20, max: 99 }, 
             { label: "Email ID", name: "email", type: "email" },
             {
               label: "Marital Status",

@@ -91,7 +91,7 @@ export const MobilizationRecru = ({
   
 
   const generateNextTempID = (totalCount) => {
-    // Check if the string contains a non-numeric prefix
+
     const prefixMatch = totalCount.match(/[^\d]+/);
     const prefix = prefixMatch ? prefixMatch[0] : "";
     const numberMatch = totalCount.match(/\d+/);
@@ -107,7 +107,7 @@ export const MobilizationRecru = ({
     const fetchNextTempID = async () => {
       const totalCount = await getTotalCount();
       const nextTempID = generateNextTempID(totalCount);
-      setLatesTempIDData(nextTempID); // Set the generated ID
+      setLatesTempIDData(nextTempID);
     };
     fetchNextTempID();
   }, []);
@@ -115,12 +115,10 @@ export const MobilizationRecru = ({
   // console.log(latestTempIDData);
 
   const OnSubmit = async (candi) => {    
-    // console.log(candi);
     const storedData = {
       ...candi,  
       empID: latestTempIDData,
     };
-    // console.log(storedData);
     await SumbitCandiToEmp({ storedData });
     await submitMobilization({ mob:storedData })
     setShowTitle(

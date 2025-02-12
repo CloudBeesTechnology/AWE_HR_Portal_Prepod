@@ -35,7 +35,7 @@ export const CreateJob = () => {
   });
   const [uploadedDocs, setUploadedDocs] = useState(null);
   const [uploadedFileNames, setUploadedFileNames] = useState({});
-  const watchedJobTitle = watch("jobTitle");
+  const watchedJobTitle = watch("jobTitle")?.replace(/\s+/g, "");
 
   const handleFileUpload = async (e, type) => {
     if (!watchedJobTitle) {

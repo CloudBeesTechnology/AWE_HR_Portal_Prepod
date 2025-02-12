@@ -16,6 +16,7 @@ export const PassportExpiry = () => {
     "Date of Join",
     "Nationality",
     "Department",
+    "Other Department",
     "Position",
     "Passport Expiry",
   ]);
@@ -64,8 +65,15 @@ export const PassportExpiry = () => {
         name: item.name || "-",
         dateOfJoin: formatDate(item.doj)  || "-",
         nationality: item.nationality || "-",
-        department: item.department || "-",
-        position: item.position || "-",
+         department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
         ppExpiry: formatDate(item.ppExpiry[item.ppExpiry.length - 1]), // Format the expiry date
         rawExpiryDate: new Date(item.ppExpiry[item.ppExpiry.length - 1]) // Raw date for sorting
       }))
@@ -105,8 +113,15 @@ export const PassportExpiry = () => {
         name: item.name || "-",
         dateOfJoin: formatDate(item.doj)  || "-",
         nationality: item.nationality || "-",
-        department: item.department || "-",
-        position: item.position || "-",
+         department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
         ppExpiry: formatDate(item.ppExpiry[item.ppExpiry.length - 1]),
         rawExpiryDate: new Date(item.ppExpiry[item.ppExpiry.length - 1]) // Raw date for sorting
       }))

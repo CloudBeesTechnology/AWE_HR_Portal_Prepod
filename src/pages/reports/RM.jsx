@@ -23,6 +23,7 @@ export const RM = () => {
     "Nationality",
     "Position",
     "Department",
+    "Other Department",
     "Contact No",
     "Type of Application: Local/LPA/SAWP",
     "EMPLOYEE REQUISITION FORM APPROVAL DATE",
@@ -107,8 +108,12 @@ export const RM = () => {
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
           : "-",
+          
         department: Array.isArray(item.department)
           ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
           : "-",
         contactNo: item.contactNo || "-",
         contractType: item.contractType || "-",
@@ -229,6 +234,9 @@ export const RM = () => {
           : "-",
         department: Array.isArray(item.department)
           ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
           : "-",
         contactNo: item.contactNo || "-",
         contractType: item.contractType || "-",

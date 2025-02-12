@@ -10,7 +10,7 @@ import { SawpUpdate } from "../../../services/updateMethod/SawpUpdate";
 import { useOutletContext } from "react-router-dom";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { SpinLogo } from "../../../utils/SpinLogo";
-import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteSawpUp";
+// import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteSawpUp";
 
 export const Sawp = () => {
   const { searchResultData } = useOutletContext();
@@ -28,9 +28,9 @@ export const Sawp = () => {
   const [uploadSawp, setUploadSawp] = useState({
     sawpEmpUpload: [],
   });
-  const [id, setID] = useState({
-    sawpID:"",
-  });
+  // const [id, setID] = useState({
+  //   sawpID:"",
+  // });
   const [fieldTitle, setFieldTitle] = useState("sawpEmpUpload");
 
   const {
@@ -144,12 +144,12 @@ export const Sawp = () => {
       setValue(field, value);
     });
 
-    const sawpRecord = SawpDetails.find((match) => match.empID === searchResultData.empID);
-    if (sawpRecord) {
-      setID((prevData) => ({
-        ...prevData,
-        sawpID: sawpRecord.id, // Assuming this field exists.
-      }))}
+    // const sawpRecord = SawpDetails.find((match) => match.empID === searchResultData.empID);
+    // if (sawpRecord) {
+    //   setID((prevData) => ({
+    //     ...prevData,
+    //     sawpID: sawpRecord.id, // Assuming this field exists.
+    //   }))}
 
     if (searchResultData && searchResultData.sawpEmpUpload) {
       try {
@@ -180,38 +180,38 @@ export const Sawp = () => {
   // console.log(searchResultData);
   
 
-  const deleteFile = async (fileType, fileName) => {
-    const deleteID = id.sawpID; // Assuming this comes from your searchResultData object
+  // const deleteFile = async (fileType, fileName) => {
+  //   const deleteID = id.sawpID; // Assuming this comes from your searchResultData object
 
-    try {
-      await handleDeleteFile(
-        fileType,
-        fileName,
-        empID,
-        setUploadedFileNames,
-        deleteID,
-        setValue
-      );
+  //   try {
+  //     await handleDeleteFile(
+  //       fileType,
+  //       fileName,
+  //       empID,
+  //       setUploadedFileNames,
+  //       deleteID,
+  //       setValue
+  //     );
 
-      const currentFiles = watch(fileType) || [];
+  //     const currentFiles = watch(fileType) || [];
 
-      // Filter out the deleted file
-      const updatedFiles = currentFiles.filter(
-        (file) => file.name !== fileName
-      );
+  //     // Filter out the deleted file
+  //     const updatedFiles = currentFiles.filter(
+  //       (file) => file.name !== fileName
+  //     );
 
-      // Update form state with the new file list
-      setValue(fileType, updatedFiles);
+  //     // Update form state with the new file list
+  //     setValue(fileType, updatedFiles);
 
-      // Update UI state
-      setUploadSawp((prevState) => ({
-        ...prevState,
-        [fileType]: updatedFiles,
-      }));
-    } catch (error) {
-      console.error("Error deleting file:", error);
-    }
-  };
+  //     // Update UI state
+  //     setUploadSawp((prevState) => ({
+  //       ...prevState,
+  //       [fileType]: updatedFiles,
+  //     }));
+  //   } catch (error) {
+  //     console.error("Error deleting file:", error);
+  //   }
+  // };
 
   const onSubmit = async (data) => {
     try {
@@ -307,7 +307,7 @@ export const Sawp = () => {
         error={errors.sawpEmpUpload}
         fileName={uploadedFileNames.sawpEmpUpload || ""}
         uploadedFileNames={uploadedFileNames}
-        deleteFile={deleteFile}
+        // deleteFile={deleteFile}
         field={{ title: "sawpEmpUpload" }}
       />
 

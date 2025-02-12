@@ -4,86 +4,64 @@ import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { IoSearch } from "react-icons/io5";
 import { MdDelete } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
-import { Searchbox } from "../../utils/Searchbox";
 import { useNavigate } from "react-router-dom";
 import { DataSupply } from "../../utils/DataStoredContext";
+import { SearchNonLocalCandy } from "./Search/SearchNonLocal";
+import { SearchLocalCandy } from "./Search/SearchLocalCandy";
+import { useTempID } from "../../utils/TempIDContext";
 
 export const NonlocCandi = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
-  const [selectedRows, setSelectedRows] = useState([]); // Track selected rows for edit/delete
-  const [selectedRow, setSelectedRow] = useState(null); // Handle the review form
-  const { empPDData, IVSSDetails } = useContext(DataSupply); // Fetching data from context
-  const navigate = useNavigate();
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedRow, setSelectedRow] = useState(null);
   const [editingData, setEditingData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const { setTempID } = useTempID();
+  const { empPDData, IVSSDetails } = useContext(DataSupply);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const bruneiCandidates = empPDData
+      .filter(
+        (candidate) =>
+          candidate.nationality !== "Bruneian" &&
+          candidate.nationality !== "Brunei PR"
+      )
+      .filter(
+        (candidate) =>
+          !IVSSDetails.some((detail) => detail.tempID === candidate.tempID)
+      );
+    setFilteredData(bruneiCandidates);
+    setLoading(false);
+  }, [empPDData, IVSSDetails, searchTerm]);
 
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
   };
 
-  // Handle row click to open the review form
   const handleRowClick = (row) => {
     setSelectedRow(row);
   };
 
   const EditedData = (editdata) => {
-    // console.log(editdata);
     setEditingData(editdata);
   };
 
-  // Handle delete button click
   const handleDeleteClick = () => {
-    const remainingCandidates = otherCandidates.filter(
+    const remainingCandidates = filteredData.filter(
       (candidate) => !selectedRows.includes(candidate.id)
     );
-    // Handle delete logic here (update state, API call, etc.)
-    setSelectedRows([]); // Clear selection after delete
+    setSelectedRows([]);
   };
 
-  // Handle row selection from checkboxes
   const handleRowSelect = (updatedSelectedRows) => {
     setSelectedRows(updatedSelectedRows);
   };
-  // console.log(empPDData);
-  
-  const otherCandidates = empPDData.filter((candidate) => {
-    const isOtherNationality =
-      candidate.nationality !== "Bruneian" &&
-      candidate.nationality !== "Brunei PR";
-  
-    const matchesContract =
-      !selectedOption ||
-      (selectedOption === "LPA" &&
-        candidate.contractType.toLowerCase() === "lpa") ||
-      (selectedOption === "SAWP" &&
-        candidate.contractType.toLowerCase() === "sawp");
-  
-    const matchesSearch =
-      candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      candidate.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      candidate.nationality.toLowerCase().includes(searchTerm.toLowerCase());
-  
-    const notInIVSSDetails = !IVSSDetails.some(
-      (detail) => detail.tempID === candidate.tempID
-    );
-  
-    // Return true if all conditions are met
-    return isOtherNationality && matchesContract && matchesSearch && notInIVSSDetails;
-  });
-  
-  useEffect(() => {
-    if (otherCandidates.length > 0) {
-      setLoading(false);
 
-      setError(null);
-    } else {
-      setError("No data available.");
-    }
-  }, [otherCandidates]);
-  // Handle dropdown option selection
   const handleOptionSelect = (option) => {
     setSelectedOption(option === "Show All" ? "" : option);
     setDropdownVisible(false);
@@ -93,16 +71,20 @@ export const NonlocCandi = () => {
     "Name",
     "Gender",
     "Nationality",
+    "TempID",
     "Position",
-    "Experience",
     "Contract",
     "Type",
     "Email",
     "Contact",
   ];
 
-console.log(otherCandidates);
-
+  const getTemp = () => {
+    if (selectedRows.length === 1) {
+      const selectedTempID = filteredData[selectedRows[0]]?.tempID;
+      setTempID(selectedTempID);
+    }
+  };
 
   return (
     <section className="screen-size min-h-screen w-full my-5">
@@ -144,14 +126,15 @@ console.log(otherCandidates);
         </div>
 
         <div className=" flex-1 flex justify-end ">
-          <Searchbox
-            newFormData={otherCandidates}
-            searchHandler={setSearchTerm} // Updated to pass the state updater directly
-            emptySearch={() => console.log("Search cleared!")} // Handle clearing search results
-            searchIcon1={<IoSearch />}
+          <SearchNonLocalCandy
+            type="text"
+            allEmpDetails={empPDData}
+            searchUserList={setFilteredData}
+            searchIcon2={<IoSearch />}
             placeholder="Search"
             border="rounded-full"
             shadow="shadow-[0_1px_6px_1px_rgba(0,0,0,0.2)]"
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
@@ -161,19 +144,16 @@ console.log(otherCandidates);
           className=" absolute top-1/2 right-14 transform -translate-y-1/2 text-2xl hover:text-3xl flex items-center cursor-pointer"
           onClick={() => {
             if (selectedRows.length === 1) {
-              // If exactly one row is selected, navigate to addCandidates page
               navigate("/addCandidates", {
                 state: { editingData: selectedRows[0] },
               });
             } else if (selectedRows.length > 1) {
-              // If more than one row is selected, show this alert
               alert("Please select only one row to edit.");
             } else {
-              // If no rows are selected, show this alert
               alert("Please select a row before editing.");
             }
           }}
-          disabled={selectedRows.length === 0} // Disable button if no row selected
+          disabled={selectedRows.length === 0}
         >
           <FaEdit className="mr-2" />
         </div>
@@ -191,7 +171,6 @@ console.log(otherCandidates);
         </div>
       )}
 
-      {/* Table Component */}
       {loading ? (
         <div className="text-center py-10">Loading...</div>
       ) : error ? (
@@ -200,9 +179,9 @@ console.log(otherCandidates);
         <Table
           columns={columns}
           rowClickHandler={handleRowClick}
-          data={otherCandidates}
-          selectedRows={selectedRows} // Pass selected rows to Table
-          onRowSelect={handleRowSelect} // Add handler to update selected rows
+          data={filteredData}
+          selectedRows={selectedRows}
+          onRowSelect={handleRowSelect}
           edited={EditedData}
         />
       )}

@@ -3,8 +3,7 @@ import AweLogo from "../../assets/logo/logo-with-name.svg";
 import { VscClose } from "react-icons/vsc";
 import { useLeaveManage } from "../../hooks/useLeaveManage";
 import { SpinLogo } from "../../utils/SpinLogo";
-import { useCreateNotification } from "../../hooks/useCreateNotification"; // Importing the custom hook
-import { UpdateLeaveData } from "../../services/updateMethod/UpdateLeaveData";
+import { useCreateNotification } from "../../hooks/useCreateNotification"; 
 import { DataSupply } from "../../utils/DataStoredContext";
 import { sendEmail } from "../../services/EmailServices";
 import { DateFormat } from "../../utils/DateFormat";
@@ -18,7 +17,6 @@ export const ViewForm = ({
   userType,
   personalInfo,
 }) => {
-  // console.log(leaveData.empOfficialEmail);
 
   const { empPIData } = useContext(DataSupply);
   const [remark, setRemark] = useState("");
@@ -38,9 +36,6 @@ export const ViewForm = ({
     return findingSupervisorName;
   });
 
-  // console.log("GM", gmPosition);
-
-  // console.log("Leave Data - ", leaveData);
 
   const getStatusClass = (status) => {
     return status === "Rejected"
@@ -138,7 +133,6 @@ export const ViewForm = ({
                   "leave_no-reply@adininworks.com",                
                   leaveData.empOfficialEmail
                 );
-
                 // alert("Email sent successfully to Employee");
 
 //____________________________________________________________ HR got email_______________________________________________________________________________________    
@@ -159,8 +153,7 @@ export const ViewForm = ({
                     </body>
                   </html>`,
                   "leave_no-reply@adininworks.com",
-                  "Hr-notification@adininworks.com"
-                 
+                  "Hr-notification@adininworks.com"             
                 );
                 // alert("Email sent successfully to HR");
 //____________________________________________________________ Employee got notification_______________________________________________________________________________________    
@@ -227,8 +220,7 @@ export const ViewForm = ({
                       </body>
                     </html>`,
                     "leave_no-reply@adininworks.com",
-                    FindingEmail[0].officialEmail
-                    
+                    FindingEmail[0].officialEmail                   
                   );
                   // alert("Email sent successfully to Manager");
 //____________________________________________________________ HR got email_______________________________________________________________________________________
@@ -249,8 +241,7 @@ export const ViewForm = ({
                       </body>
                     </html>`,
                     "leave_no-reply@adininworks.com",
-                    "Hr-notification@adininworks.com"
-                   
+                    "Hr-notification@adininworks.com"                  
                   );
                   // alert("Email sent successfully to HR");
 //____________________________________________________________ manager got notification_______________________________________________________________________________________
@@ -551,7 +542,7 @@ export const ViewForm = ({
               ticketData.empName || "Not mention"
             } , Your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${status} by HR ${
               personalInfo.name || "Not mention"
-            }. View at : <a href="https://employee.adininworks.co"></a> `,
+            }. View at : <a href="https://employee.adininworks.co">employee.adininworks.co</a> `,
             "hr_no-reply@adininworks.com",
             ticketData.empOfficialEmail
           );
@@ -1050,17 +1041,26 @@ export const ViewForm = ({
                   {
                     label: "Departure Date",
                     value:
-                      DateFormat(
-                        ticketData.empDepartureDate || ticketData.departureDate
-                      ) || "N/A",
+                      ticketData.empDepartureDate
+                        ? isValidDateFormat(ticketData.empDepartureDate)
+                          ? `${DateFormat(ticketData.empDepartureDate)}`
+                          : `${ticketData.empDepartureDate}`
+                        : ticketData.departureDate
+                        ? `${DateFormat(ticketData.departureDate)}`
+                        : "N/A",
                   },
                   {
                     label: "Arrival Date",
                     value:
-                      DateFormat(
-                        ticketData.empArrivalDate || ticketData.arrivalDate
-                      ) || "N/A",
+                      ticketData.empArrivalDate
+                        ? isValidDateFormat(ticketData.empArrivalDate)
+                          ? `${DateFormat(ticketData.empArrivalDate)}`
+                          : `${ticketData.empArrivalDate}`
+                        : ticketData.arrivalDate
+                        ? `${DateFormat(ticketData.arrivalDate)}`
+                        : "N/A",
                   },
+                  
                   {
                     label: "Employee Remarks",
                     value: ticketData.empRemarks || "N/A",

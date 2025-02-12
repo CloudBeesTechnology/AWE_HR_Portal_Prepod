@@ -9,7 +9,7 @@ import { SpinLogo } from "../../../utils/SpinLogo";
 import { sendEmail } from "../../../services/EmailServices";
 import { useTempID } from "../../../utils/TempIDContext";
 
-const client = generateClient(); 
+const client = generateClient();
 
 export const RequisitionReviewForm = ({
   isVisible,
@@ -21,6 +21,7 @@ export const RequisitionReviewForm = ({
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const userType = localStorage.getItem("userType");
   const { hrManagerMail, gmPosition } = useTempID();
 
@@ -40,13 +41,14 @@ export const RequisitionReviewForm = ({
 
   const request = selectedRequest || defaultRequest;
 
+
   useEffect(() => {
     if (isVisible) {
       const fetchRequisitions = async () => {
         try {
           let allRequisitions = [];
           let nextToken = null;
-  
+
           do {
             const response = await client.graphql({
               query: listEmpRequisitions,
@@ -54,7 +56,7 @@ export const RequisitionReviewForm = ({
                 nextToken,
               },
             });
-  
+
             const fetchedData = response?.data?.listEmpRequisitions?.items.map(
               (item) => ({
                 id: item.id,
@@ -75,40 +77,39 @@ export const RequisitionReviewForm = ({
                 date: item.createdAt,
               })
             );
-  
+
             allRequisitions = [...allRequisitions, ...fetchedData];
-  
+
             nextToken = response?.data?.listEmpRequisitions?.nextToken;
           } while (nextToken);
-  
+
           setRequestData(allRequisitions);
-          console.log("DE", allRequisitions);
-          
           setError(null);
         } catch (err) {
           console.error("Error fetching requisition data:", err);
           setError("Error fetching requisition data");
         }
       };
-  
+
       fetchRequisitions();
     }
   }, [isVisible]);
-  
 
   const handleStatusUpdate = async (statusUpdate) => {
     try {
-      const response = await UpdateEmpReqData({
+      setIsLoading(true);
+      await UpdateEmpReqData({
         requestId: selectedRequest.id,
         newStatus: statusUpdate,
       });
-      setNotification(true);
-      setShowTitle("Form Status Updated Successfully");
 
+      // Update status (e.g., make API call)
       if (onStatusChange) {
         onStatusChange({ id: selectedRequest.id, status: statusUpdate });
       }
+
       const { reqName, position, approverID } = request;
+
       if (approverID) {
         await sendEmail(
           `Employee Requisition Request ${statusUpdate}`,
@@ -119,14 +120,12 @@ export const RequisitionReviewForm = ({
         Your requisition request for the position of ${position} 
         has been <strong>${statusUpdate}</strong> by the General Manager.<br/><br/>
         Click here https://hr.adininworks.co to view the Status.
-      </p>
-    </body>
-  </html>`,
+       </p>
+       </body>
+    </html>`,
           "hr_no-reply@adininworks.com",
           approverID
         );
-      } else {
-        console.error("Approver email not found.");
       }
 
       if (hrManagerMail) {
@@ -134,7 +133,7 @@ export const RequisitionReviewForm = ({
           `Requisition ${statusUpdate}`,
           `<html>
     <body>
-      <>
+      <p>
        Dear HR,<br/><br/>
         The requisition request for the position of ${position} 
         submitted by ${reqName} has been <strong>${statusUpdate}</strong> 
@@ -147,16 +146,19 @@ export const RequisitionReviewForm = ({
           "hr_no-reply@adininworks.com",
           hrManagerMail
         );
-      } else {
-        console.error("HR email not found.");
       }
 
-      setTimeout(() => {
-      onClose()
-      }, 4000);
-  
+      // Stop loading after success
+      setIsLoading(false);
+
+      // Optionally, trigger a success notification
+      setNotification(true);
+      setShowTitle("Form Status Updated Successfully");
     } catch (err) {
       console.error("Error updating status or sending email:", err);
+
+      // Stop loading on error
+      setIsLoading(false);
     }
   };
 
@@ -196,6 +198,7 @@ export const RequisitionReviewForm = ({
           </div>
 
           <form className="px-5 bg-white shadow-xl">
+            {/* Replace this part with the actual form fields */}
             {[
               { label: "Requested Manager", value: request.reqName },
               { label: "Department", value: request.department },
@@ -228,14 +231,16 @@ export const RequisitionReviewForm = ({
                     <button
                       className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
                       onClick={() => handleStatusUpdate("Rejected")}
+                      disabled={isLoading}
                     >
-                      Reject
+                      {isLoading ? "Loading..." : "Reject"}
                     </button>
                     <button
                       className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
                       onClick={() => handleStatusUpdate("Approved")}
+                      disabled={isLoading}
                     >
-                      Approve
+                      {isLoading ? "Loading..." : "Approve"}
                     </button>
                   </div>
                 ) : (
@@ -255,20 +260,7 @@ export const RequisitionReviewForm = ({
               </>
             )}
 
-            {!gmPosition && (
-              <div className="mx-20 border center gap-3 rounded-lg [background:linear-gradient(to_right,_#f5ee6ad7,_#faf362,_#ffe89d,_#f5ee6ad7)] shadow-[0_4px_6px_rgba(255,250,150,0.5)]">
-                <h3 className="text-lg text-[#6a2b2b] p-1.5 font-bold">
-                  Requisition Status :
-                </h3>
-                <p
-                  className={`text-xl font-semibold ${getStatusClass(
-                    request.status
-                  )}`}
-                >
-                  {request.status || "Pending"}
-                </p>
-              </div>
-            )}
+            {/* other components */}
             {notification && (
               <SpinLogo
                 text={showTitle}

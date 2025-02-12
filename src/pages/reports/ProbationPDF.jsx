@@ -20,6 +20,7 @@ export const ProbationPDF = ({ userID, userType }) => {
     "Name",
     "Date of Join",
     "Department",
+    "Other Department",
     "Position",
     "Probation End Date",
     "Deadline to Return to HRD",
@@ -136,8 +137,15 @@ export const ProbationPDF = ({ userID, userType }) => {
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
           dateOfJoin: formatDate(item.doj) || "-",
-          department: item.department?.slice(-1)[0] || "-",
-          position: item.position?.slice(-1)[0] || "-",
+          department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
           probationEndDate: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
         };
@@ -219,8 +227,15 @@ export const ProbationPDF = ({ userID, userType }) => {
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
           dateOfJoin: formatDate(item.doj) || "-",
-          department: item.department || "-",
-          position: item.position || "-",
+          department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
           probationEndDate: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
         };

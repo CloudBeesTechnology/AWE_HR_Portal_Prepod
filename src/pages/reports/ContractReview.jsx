@@ -23,6 +23,7 @@ export const ContractReview = () => {
     "Nationality",
     "Date of Join",
     "Department",
+    "Other Department",
     "Position",
     "Contract Start Date",
     "Contract End Date",
@@ -113,8 +114,15 @@ export const ContractReview = () => {
           name: item.name || "-",
           nationality: item.nationality || "-",
           dateOfJoin: formatDate(item.doj) || "-",
-          department: item.department?.[item.department?.length - 1] || "-",
-          position: item.position?.[item.position?.length - 1] || "-",
+          department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
           contractStartDate: formatDate(startDate) || "-",
           contractEndDate: formatDate(lastDate) || "-",
           nlmsEmpApproval: Array.isArray(item.nlmsEmpValid)
@@ -198,8 +206,15 @@ export const ContractReview = () => {
           name: item.name || "-",
           nationality: item.nationality || "-",
           dateOfJoin: formatDate(item.doj) || "-",
-          department: item.department?.[item.department?.length - 1] || "-",
-          position: item.position?.[item.position?.length - 1] || "-",
+          department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
           contractStartDate: formatDate(startDate) || "-",
           contractEndDate: formatDate(lastDate) || "-",
           nlmsEmpApproval: Array.isArray(item.nlmsEmpValid)

@@ -18,6 +18,8 @@ export const LbdKpi = () => {
     "Date of Join",
     "Nationality",
     "SKILL POOL",
+    "department",
+    "Other Department",
     "Position",
     "Upgrade Position",
     "contact No",
@@ -65,8 +67,16 @@ export const LbdKpi = () => {
         dateOfJoin: formatDate(item.doj)  || "-",
         nationality: item.nationality || "-",
         skillPool: item.skillPool || "-",
-        position: item.position || "-",
-        upgradePosition: Array.isArray(item.upgradePosition)
+        department: Array.isArray(item.department)
+        ? item.department[item.department.length - 1]
+        : "-",
+        otherDepartment:Array.isArray(item.otherDepartment)
+        ? item.otherDepartment[item.otherDepartment.length - 1]
+        : "-",
+      position: Array.isArray(item.position)
+        ? item.position[item.position.length - 1]
+        : "-",
+                upgradePosition: Array.isArray(item.upgradePosition)
           ? formatDate(item.upgradePosition[item.upgradePosition.length - 1])
           : "-",
         contactNo: item.contactNo || "-",
@@ -123,8 +133,16 @@ const handleDate = (e, type) => {
       dateOfJoin: formatDate(item.doj) || "-",
       nationality: item.nationality || "-",
       skillPool: item.skillPool || "-",
-      position: item.position || "-",
-      upgradePosition: Array.isArray(item.upgradePosition)
+      department: Array.isArray(item.department)
+      ? item.department[item.department.length - 1]
+      : "-",
+      otherDepartment:Array.isArray(item.otherDepartment)
+      ? item.otherDepartment[item.otherDepartment.length - 1]
+      : "-",
+    position: Array.isArray(item.position)
+      ? item.position[item.position.length - 1]
+      : "-",
+            upgradePosition: Array.isArray(item.upgradePosition)
         ? formatDate(item.upgradePosition[item.upgradePosition.length - 1])
         : "-",
       contactNo: item.contactNo || "-",

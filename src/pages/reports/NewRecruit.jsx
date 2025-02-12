@@ -18,12 +18,13 @@ export const NewRecruit = () => {
     "Gender",
     "Date of Join",
     "Nationality",
+    "Department",
+    "Other Department",
     "Position",
     "contactNo",
     "Brunei I/C No",
     "Passport No",
     "Pass Expiry",
-    "Department",
     "Contract Start Date",
     "Contract End Date",
     "IMMIGRATION REFERENCE NUMBER",
@@ -68,14 +69,20 @@ export const NewRecruit = () => {
         gender: item.gender || "-",
         dateOfJoin: formatDate(item.doj) || "-",
         nationality: item.nationality || "-",
-        position: item.position || "-",
-        contactNo: item.contactNo || "-",
+        department: Array.isArray(item.department)
+        ? item.department[item.department.length - 1]
+        : "-",
+        otherDepartment:Array.isArray(item.otherDepartment)
+        ? item.otherDepartment[item.otherDepartment.length - 1]
+        : "-",
+      position: Array.isArray(item.position)
+        ? item.position[item.position.length - 1]
+        : "-",        contactNo: item.contactNo || "-",
         bruneiIcNo: item.bwnIcNo || "-",
         passportNo: item.ppNo || "-",
         passporExpiry: Array.isArray(item.ppExpiry)
           ? formatDate(item.ppExpiry[item.ppExpiry.length - 1])
           : "-",
-        department: item.department || "-",
         contractStart: Array.isArray(item.contractStart)
           ? formatDate(item.contractStart[item.contractStart.length - 1])
           : "-",
@@ -123,14 +130,20 @@ export const NewRecruit = () => {
         gender: item.gender || "-",
         dateOfJoin: formatDate(item.doj) || "-",
         nationality: item.nationality || "-",
-        position: item.position || "-",
-        contactNo: item.contactNo || "-",
+        department: Array.isArray(item.department)
+        ? item.department[item.department.length - 1]
+        : "-",
+        otherDepartment:Array.isArray(item.otherDepartment)
+        ? item.otherDepartment[item.otherDepartment.length - 1]
+        : "-",
+      position: Array.isArray(item.position)
+        ? item.position[item.position.length - 1]
+        : "-",        contactNo: item.contactNo || "-",
         bruneiIcNo: item.bwnIcNo || "-",
         passportNo: item.ppNo || "-",
         passporExpiry: Array.isArray(item.ppExpiry)
           ? formatDate(item.ppExpiry[item.ppExpiry.length - 1])
           : "-",
-        department: item.department || "-",
         contractStart: Array.isArray(item.contractStart)
           ? formatDate(item.contractStart[item.contractStart.length - 1])
           : "-",

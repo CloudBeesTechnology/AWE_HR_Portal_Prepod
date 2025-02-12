@@ -327,9 +327,9 @@ export const OtherDetails = ({ fetchedData }) => {
       if (checkingPDTable && checkingEDTable) {
         const updateReqValue = {
           ...reqValue,
-          uploadResume: uploadedDocs.uploadResume || formData.interview.uploadResume,
-          uploadCertificate: uploadedDocs.uploadCertificate || formData.interview.uploadCertificate,
-          uploadPp: uploadedDocs.uploadPassport || formData.interview.uploadPassport,
+          uploadResume: uploadedDocs.uploadResume,
+          uploadCertificate: uploadedDocs.uploadCertificate,
+          uploadPp: uploadedDocs.uploadPassport,
           PDTableID: checkingPDTable.id,
           EDTableID: checkingEDTable.id,
         };

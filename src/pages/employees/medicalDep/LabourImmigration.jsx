@@ -15,7 +15,7 @@ import { MedicalPassFunc } from "../../../services/createMethod/MedicalPassFunc"
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { UpdateMedical } from "../../../services/updateMethod/UpdateMedicalInfo";
-import { handleDeleteFile } from "../../../services/uploadDocsS3/LabourImmiUpload";
+// import { handleDeleteFile } from "../../../services/uploadDocsS3/LabourImmiUpload";
 
 const LabourImmigration = () => {
   useEffect(() => {
@@ -38,9 +38,9 @@ const LabourImmigration = () => {
   const [notification, setNotification] = useState(false);
   const [dependPassData, setDependPassData] = useState(null);
   const [showTitle, setShowTitle] = useState("");
-  const [id, setID] = useState({
-    LabourImmiID:"",
-  });
+  // const [id, setID] = useState({
+  //   LabourImmiID:"",
+  // });
   const {
     register,
     handleSubmit,
@@ -109,7 +109,7 @@ const LabourImmigration = () => {
     const newUploads = currentFiles.filter(file => file instanceof File);
   
     if (newUploads.length > 0) {
-      alert("You can only upload one new file. Please delete the existing file before uploading another.");
+      alert("You can only upload one new file.");
       return;
     }
   
@@ -127,38 +127,38 @@ const LabourImmigration = () => {
     }
   };
 
-  const deleteFile = async (fileType, fileName) => {
-    const watchedEmpID = watch("empID");
-    // const serviceID = id.serviceID;
-    const LabourImmiID = id.LabourImmiID;
+  // const deleteFile = async (fileType, fileName) => {
+  //   const watchedEmpID = watch("empID");
+  //   // const serviceID = id.serviceID;
+  //   const LabourImmiID = id.LabourImmiID;
 
-    try {
-      await handleDeleteFile(
-        fileType,
-        fileName,
-        watchedEmpID,
-        setUploadedFileNames,
-        setValue,
-        trigger,
-        LabourImmiID
-      );
-      const currentFiles = watch(fileType) || []; 
-      // Filter out the deleted file
-      const updatedFiles = currentFiles.filter(
-        (file) => file.name !== fileName
-      );
-      // Update form state with the new file list
-      setValue(fileType, updatedFiles);
+  //   try {
+  //     await handleDeleteFile(
+  //       fileType,
+  //       fileName,
+  //       watchedEmpID,
+  //       setUploadedFileNames,
+  //       setValue,
+  //       trigger,
+  //       LabourImmiID
+  //     );
+  //     const currentFiles = watch(fileType) || []; 
+  //     // Filter out the deleted file
+  //     const updatedFiles = currentFiles.filter(
+  //       (file) => file.name !== fileName
+  //     );
+  //     // Update form state with the new file list
+  //     setValue(fileType, updatedFiles);
 
-      // Update UI state
-      setDocsUploaded((prevState) => ({
-        ...prevState,
-        [fileType]: updatedFiles,
-      }));
-    } catch (error) {
-      console.error("Error deleting file:", error);
-    }
-  };
+  //     // Update UI state
+  //     setDocsUploaded((prevState) => ({
+  //       ...prevState,
+  //       [fileType]: updatedFiles,
+  //     }));
+  //   } catch (error) {
+  //     console.error("Error deleting file:", error);
+  //   }
+  // };
   // const getLastValue = (value) => {
   //   return Array.isArray(value) ? value[value.length - 1] : value;
   // };
@@ -228,14 +228,14 @@ const LabourImmigration = () => {
   const searchResult = (result) => {
     // console.log(result);
 
-    const LabourImmiRecord = LMIData.find((match) => match.empID === result.empID);
+    // const LabourImmiRecord = LMIData.find((match) => match.empID === result.empID);
    
 
-    if (LabourImmiRecord) {
-      setID((prevData) => ({
-        ...prevData,
-        LabourImmiID: LabourImmiRecord.id, // Assuming this field exists.
-      }))}
+    // if (LabourImmiRecord) {
+    //   setID((prevData) => ({
+    //     ...prevData,
+    //     LabourImmiID: LabourImmiRecord.id, // Assuming this field exists.
+    //   }))}
 
     const keysToSet = ["empID", "bruhimsRNo", "overMD", "overME", "bruhimsRD"];
 
@@ -489,7 +489,7 @@ const LabourImmigration = () => {
               handleFileChange={handleFileChange}
               uploadedFileNames={uploadedFileNames}
               watchedEmpID={watchedEmpID}
-              deleteFile={deleteFile}
+              // deleteFile={deleteFile}
               errors={errors}
             />
           ))}
@@ -509,10 +509,10 @@ const LabourImmigration = () => {
         errors={errors}
         watch={watch}
         trigger={trigger}
-        id={id}
+        // id={id}
         value={dependPassData}
         watchedEmpID={watchedEmpID}
-        deleteFile={deleteFile}
+        // deleteFile={deleteFile}
         getValues={getValues}
       />
 

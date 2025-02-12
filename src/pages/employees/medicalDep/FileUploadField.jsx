@@ -63,13 +63,13 @@ export const FileUploadFieldArr = ({
       {arrayFileNames?.[field.title] && (
         <p className="text-xs mt-1 text-grey px-1 border flex justify-between items-center">
           {arrayFileNames[field.title]}
-          <button
+          {/* <button
             type="button"
             className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
             onClick={() => deleteFile(field.title, arrayFileNames[field.title])}
           >
             <MdCancel />
-          </button>
+          </button> */}
         </p>
       )}
 
@@ -88,7 +88,7 @@ export const FileUploadNew = ({
   error,
   fileName,
   uploadedFileNames,
-  deleteFile,
+  // deleteFile,
   field
 }) => {
 
@@ -119,19 +119,19 @@ export const FileUploadNew = ({
               .map((fileName, fileIndex) => (
                 <span key={fileIndex} className="mt-2 flex justify-between items-center">
                   {fileName}
-                  <button
+                  {/* <button
                     type="button"
                     className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
                     onClick={() => deleteFile(field.title, fileName)}
                   >
                     <MdCancel />
-                  </button>
+                  </button> */}
                 </span>
               ))
           ) : (
             <span className="mt-2 flex justify-between items-center">
               {uploadedFileNames[field.title]}
-              <button
+              {/* <button
                 type="button"
                 className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
                 onClick={() =>
@@ -139,7 +139,7 @@ export const FileUploadNew = ({
                 }
               >
                 <MdCancel />
-              </button>
+              </button> */}
             </span>
           )
         ) : (
@@ -159,7 +159,7 @@ export const UploadingFiles = ({
   handleFileChange,
   uploadedFileNames,
   errors,watchedEmpID,
-  deleteFile
+  // deleteFile
 }) => {
   // console.log(uploadedFileNames);
 
@@ -167,68 +167,74 @@ export const UploadingFiles = ({
     <div className="form-group">
       <label className="mb-1 text_size_6">{field.label}</label>
       {field.type === "text" || field.type === "date" ? (
-        <input
-          type={field.type}
-          {...register(field.name)}
-          className="input-field"
-        />
-      ) : field.type === "file" ? (
-        <label className="w-full mt-2  flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer">
+        <>
           <input
-            type="file"
-            className="hidden"
-            accept=".pdf"
+            type={field.type}
             {...register(field.name)}
-            onChange={(e) => handleFileChange(e, field.name, watchedEmpID)}
+            className="input-field"
           />
-          <span className="ml-2 text-grey font-normal flex justify-between items-center gap-20">
-            <GoUpload /> PDF Only
-          </span>
-        </label>
-      ) : null}
-
-{uploadedFileNames[field.name] && (
-        <p className="text-grey text-sm my-1">
-          {Array.isArray(uploadedFileNames[field.name]) ? (
-            uploadedFileNames[field.name]
-              .slice() // Create a shallow copy to avoid mutating the original array
-              .reverse()
-              .map((fileName, fileIndex) => (
-                <span
-                  key={fileIndex}
-                  className="mt-2 flex justify-between items-center"
-                >
-                  {fileName}
-                  <button
+          {errors[field.name] && (
+            <p className="text-[red] text-[12px] pt-1">{errors[field.name]?.message}</p>
+          )}
+        </>
+      ) : field.type === "file" ? (
+        <>
+          <label className="w-full mt-2 flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer">
+            <input
+              type="file"
+              className="hidden"
+              accept=".pdf"
+              {...register(field.name)}
+              onChange={(e) => handleFileChange(e, field.name, watchedEmpID)}
+            />
+            <span className="ml-2 text-grey font-normal flex justify-between items-center gap-20">
+              <GoUpload /> PDF Only
+            </span>
+          </label>
+  
+          {uploadedFileNames[field.name] && (
+            <p className="text-grey text-sm my-1">
+              {Array.isArray(uploadedFileNames[field.name]) ? (
+                uploadedFileNames[field.name]
+                  .slice() // Create a shallow copy to avoid mutating the original array
+                  .reverse()
+                  .map((fileName, fileIndex) => (
+                    <span
+                      key={fileIndex}
+                      className="mt-2 flex justify-between items-center"
+                    >
+                      {fileName}
+                      {/* <button
+                        type="button"
+                        className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                        onClick={() => deleteFile(field.name, fileName)}
+                      >
+                        <MdCancel />
+                      </button> */}
+                    </span>
+                  ))
+              ) : (
+                <span className="mt-2 flex justify-between items-center">
+                  {uploadedFileNames[field.name]}
+                  {/* <button
                     type="button"
                     className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-                    onClick={() => deleteFile(field.name, fileName)}
+                    onClick={() =>
+                      deleteFile(field.name, uploadedFileNames[field.name])
+                    }
                   >
                     <MdCancel />
-                  </button>
+                  </button> */}
                 </span>
-              ))
-          ) : (
-            <span className="mt-2 flex justify-between items-center">
-              {uploadedFileNames[field.name]}
-              <button
-                type="button"
-                className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-                onClick={() =>
-                  deleteFile(field.name, uploadedFileNames[field.name])
-                }
-              >
-                <MdCancel />
-              </button>
-            </span>
+              )}
+            </p>
           )}
-        </p>
-      )}
-     {!uploadedFileNames[field.name] && errors[field.name] && (
-  <p className="text-[red] text-[12px] pt-2">
-    {errors[field.name]?.message}
-  </p>
-)}
+  
+          {errors[field.name] && (
+            <p className="text-[red] text-[12px] pt-2">{errors[field.name]?.message}</p>
+          )}
+        </>
+      ) : null}
     </div>
   );
 };

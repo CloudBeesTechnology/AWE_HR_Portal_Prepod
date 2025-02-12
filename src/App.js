@@ -101,7 +101,7 @@ export const App = () => {
 
   return (
     <IdleTimerProvider 
-      timeout={1000 * 60 * 10 } 
+      timeout={1000 * 60 * 60 * 4 } 
       onIdle={handleOnIdle}
       onActive={handleOnActive}
     >

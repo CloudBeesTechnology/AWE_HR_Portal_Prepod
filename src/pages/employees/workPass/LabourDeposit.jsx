@@ -12,7 +12,7 @@ import { FormField } from "../../../utils/FormField";
 import { FileUploadField } from "../medicalDep/FileUploadField";
 import { useOutletContext } from "react-router-dom";
 import { LabCreFun } from "../../../services/createMethod/LabCreFun";
-import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteBJLUp";
+// import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteBJLUp";
 
 export const LabourDeposit = () => {
   const { searchResultData } = useOutletContext();
@@ -44,9 +44,9 @@ export const LabourDeposit = () => {
     lbrDepoUpload: [],
   });
 
-  const [id, setID] = useState({
-    lbrID: "",
-  });
+  // const [id, setID] = useState({
+  //   lbrID: "",
+  // });
 
   const watchInducLdUpload = watch("lbrDepoUpload", "");
 
@@ -167,15 +167,15 @@ export const LabourDeposit = () => {
       setValue(field, getLastValue(searchResultData[field]))
     );
 
-    const lbrRecord = BJLData.find(
-      (match) => match.empID === searchResultData.empID
-    );
-    if (lbrRecord) {
-      setID((prevData) => ({
-        ...prevData,
-        lbrID: lbrRecord.id,
-      }));
-    }
+    // const lbrRecord = BJLData.find(
+    //   (match) => match.empID === searchResultData.empID
+    // );
+    // if (lbrRecord) {
+    //   setID((prevData) => ({
+    //     ...prevData,
+    //     lbrID: lbrRecord.id,
+    //   }));
+    // }
     if (searchResultData && searchResultData.lbrDepoUpload) {
       try {
         const parsedArray = JSON.parse(searchResultData.lbrDepoUpload);
@@ -204,38 +204,38 @@ export const LabourDeposit = () => {
     }
   }, [searchResultData, setValue]);
 
-  const deleteFile = async (fileType, fileName) => {
-    const deleteID = id.lbrID;
+  // const deleteFile = async (fileType, fileName) => {
+  //   const deleteID = id.lbrID;
 
-    try {
-      await handleDeleteFile(
-        fileType,
-        fileName,
-        empID,
-        setUploadedFileNames,
-        deleteID,
-        setValue
-      );
+  //   try {
+  //     await handleDeleteFile(
+  //       fileType,
+  //       fileName,
+  //       empID,
+  //       setUploadedFileNames,
+  //       deleteID,
+  //       setValue
+  //     );
 
-      const currentFiles = watch(fileType) || [];
+  //     const currentFiles = watch(fileType) || [];
 
-      // Filter out the deleted file
-      const updatedFiles = currentFiles.filter(
-        (file) => file.name !== fileName
-      );
+  //     // Filter out the deleted file
+  //     const updatedFiles = currentFiles.filter(
+  //       (file) => file.name !== fileName
+  //     );
 
-      // Update form state with the new file list
-      setValue(fileType, updatedFiles);
+  //     // Update form state with the new file list
+  //     setValue(fileType, updatedFiles);
 
-      // Update UI state
-      setUploadLD((prevState) => ({
-        ...prevState,
-        [fileType]: updatedFiles,
-      }));
-    } catch (error) {
-      console.error("Error deleting file:", error);
-    }
-  };
+  //     // Update UI state
+  //     setUploadLD((prevState) => ({
+  //       ...prevState,
+  //       [fileType]: updatedFiles,
+  //     }));
+  //   } catch (error) {
+  //     console.error("Error deleting file:", error);
+  //   }
+  // };
 
   const empID = watch("empID");
 
@@ -339,7 +339,7 @@ export const LabourDeposit = () => {
               extractFileName(watchInducLdUpload)
             }
             uploadedFileNames={uploadedFileNames}
-            deleteFile={deleteFile}
+            // deleteFile={deleteFile}
             field={{ title: "lbrDepoUpload" }}
           />
         </div>

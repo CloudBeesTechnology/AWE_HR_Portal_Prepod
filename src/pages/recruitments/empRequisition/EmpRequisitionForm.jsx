@@ -37,7 +37,14 @@ export const EmpRequisitionForm = ({ isVisible, onClose }) => {
     setUserType(userType);
   }, []);
 
-  const { personalInfo, workInfo } = useEmployeePersonalInfo(userID);
+  const { personalInfo } = useEmployeePersonalInfo(userID);
+
+  useEffect(() => {
+    console.log("PINFRO",personalInfo);
+
+  }, [personalInfo])
+ 
+  
 
   const onSubmit = async (data) => {
     try {
@@ -63,8 +70,6 @@ export const EmpRequisitionForm = ({ isVisible, onClose }) => {
       };
 
       await SubmitReqData({ EmpReqValue });
-      setNotification(true);
-      setShowTitle("Your Requisition Submitted Successfully");
 
       if (userType === "Manager") {
         if (gmMail) {
@@ -112,6 +117,12 @@ export const EmpRequisitionForm = ({ isVisible, onClose }) => {
           console.error("Human Resource Manager email not found.");
         }
       }
+
+      setTimeout(() => {
+        setNotification(true);
+        setShowTitle("Your Requisition Submitted Successfully");
+      }, 300);
+      
     } catch (error) {
       console.error("Error submitting data:", error);
     }
