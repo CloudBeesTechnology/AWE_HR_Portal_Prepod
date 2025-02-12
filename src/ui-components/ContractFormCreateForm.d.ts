@@ -29,6 +29,9 @@ export declare type ContractFormCreateFormInputValues = {
     genManager?: string;
     remarks?: string;
     contStatus?: boolean;
+    remarkHr?: string;
+    remarkGm?: string;
+    renewalContract?: string;
 };
 export declare type ContractFormCreateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -38,6 +41,9 @@ export declare type ContractFormCreateFormValidationValues = {
     genManager?: ValidationFunction<string>;
     remarks?: ValidationFunction<string>;
     contStatus?: ValidationFunction<boolean>;
+    remarkHr?: ValidationFunction<string>;
+    remarkGm?: ValidationFunction<string>;
+    renewalContract?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type ContractFormCreateFormOverridesProps = {
@@ -49,6 +55,9 @@ export declare type ContractFormCreateFormOverridesProps = {
     genManager?: PrimitiveOverrideProps<TextFieldProps>;
     remarks?: PrimitiveOverrideProps<TextFieldProps>;
     contStatus?: PrimitiveOverrideProps<SwitchFieldProps>;
+    remarkHr?: PrimitiveOverrideProps<TextFieldProps>;
+    remarkGm?: PrimitiveOverrideProps<TextFieldProps>;
+    renewalContract?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type ContractFormCreateFormProps = React.PropsWithChildren<{
     overrides?: ContractFormCreateFormOverridesProps | undefined | null;

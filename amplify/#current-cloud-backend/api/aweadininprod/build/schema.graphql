@@ -7,6 +7,9 @@ type ContractForm @aws_iam @aws_api_key {
   genManager: String
   remarks: String
   contStatus: Boolean
+  remarkHr: String
+  remarkGm: String
+  renewalContract: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -1030,6 +1033,9 @@ input ModelContractFormFilterInput {
   genManager: ModelStringInput
   remarks: ModelStringInput
   contStatus: ModelBooleanInput
+  remarkHr: ModelStringInput
+  remarkGm: ModelStringInput
+  renewalContract: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelContractFormFilterInput]
@@ -1130,6 +1136,9 @@ input ModelContractFormConditionInput {
   genManager: ModelStringInput
   remarks: ModelStringInput
   contStatus: ModelBooleanInput
+  remarkHr: ModelStringInput
+  remarkGm: ModelStringInput
+  renewalContract: ModelStringInput
   and: [ModelContractFormConditionInput]
   or: [ModelContractFormConditionInput]
   not: ModelContractFormConditionInput
@@ -1146,6 +1155,9 @@ input CreateContractFormInput {
   genManager: String
   remarks: String
   contStatus: Boolean
+  remarkHr: String
+  remarkGm: String
+  renewalContract: String
 }
 
 input UpdateContractFormInput {
@@ -1157,6 +1169,9 @@ input UpdateContractFormInput {
   genManager: String
   remarks: String
   contStatus: Boolean
+  remarkHr: String
+  remarkGm: String
+  renewalContract: String
 }
 
 input DeleteContractFormInput {
@@ -1298,6 +1313,9 @@ input ModelSubscriptionContractFormFilterInput {
   genManager: ModelSubscriptionStringInput
   remarks: ModelSubscriptionStringInput
   contStatus: ModelSubscriptionBooleanInput
+  remarkHr: ModelSubscriptionStringInput
+  remarkGm: ModelSubscriptionStringInput
+  renewalContract: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionContractFormFilterInput]

@@ -43,15 +43,13 @@ export const EmployeeInfo = () => {
   const { SubmitEIData, errorEmpID } = EmpInfoFunc();
   const { UpdateEIValue } = UpdateEmpInfo();
   const { empPIData, IDData, dropDownVal } = useContext(DataSupply);
-// console.log(empPIData);
+  // console.log(empPIData);
 
   // empPIData.forEach((item) => {
   //   if (item.empID === "629") {
   //     console.log(item);
   //   }
   // });
-  
-
 
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
@@ -105,14 +103,14 @@ export const EmployeeInfo = () => {
     handleSubmit,
     setValue,
     watch,
-    control,trigger,
+    control,
+    trigger,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(employeeInfoSchema),
     mode: "onChange",
     defaultValues: {
       familyDetails: JSON.stringify([]),
-    
     },
   });
 
@@ -188,36 +186,38 @@ export const EmployeeInfo = () => {
       window.location.href = "/employeeInfo";
       return;
     }
-  
+
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
-  
+
     const allowedTypes = ["application/pdf"];
     if (!allowedTypes.includes(selectedFile.type)) {
       alert("Upload must be a PDF file");
       return;
     }
-  
+
     // Fetch current files (including backend-stored ones)
     const currentFiles = watch(label) || []; // React Hook Form state
-  
+
     // Count only newly uploaded files, ignoring backend-stored files
-    const newUploads = currentFiles.filter(file => file instanceof File);
-  
+    const newUploads = currentFiles.filter((file) => file instanceof File);
+
     if (newUploads.length > 0) {
-      alert("You can only upload one new file. Please delete the existing file before uploading another.");
+      alert(
+        "You can only upload one new file. Please delete the existing file before uploading another."
+      );
       return;
     }
-  
+
     // Ensure the file was not previously deleted
     if (deletedFiles[label]?.includes(selectedFile.name)) {
       alert("This file was previously deleted and cannot be re-added.");
       return;
     }
-  
+
     // Append the new file to the form state
     setValue(label, [...currentFiles, selectedFile]);
-  
+
     try {
       await uploadDocs(selectedFile, label, setUploadedFiles, watchedEmpID);
       setUploadedFileNames((prev) => ({
@@ -228,7 +228,7 @@ export const EmployeeInfo = () => {
       console.error(err);
     }
   };
-   
+
   const deleteFile = async (fileType, fileName) => {
     const watchedEmpID = watch("empID");
     const deleteID = id;
@@ -243,8 +243,8 @@ export const EmployeeInfo = () => {
         setValue,
         watch,
         trigger
-              );
-      const currentFiles = watch(fileType) || []; 
+      );
+      const currentFiles = watch(fileType) || [];
       // Filter out the deleted file
       const updatedFiles = currentFiles.filter(
         (file) => file.name !== fileName
@@ -261,53 +261,53 @@ export const EmployeeInfo = () => {
       console.error("Error deleting file:", error);
     }
   };
-// const deleteFile = async (fileType, fileName) => {
-//   try {
-//     const watchedEmpID = watch("empID");
-//     const deleteID = id;
+  // const deleteFile = async (fileType, fileName) => {
+  //   try {
+  //     const watchedEmpID = watch("empID");
+  //     const deleteID = id;
 
-//     console.log("Deleting file with ID:", deleteID);
+  //     console.log("Deleting file with ID:", deleteID);
 
-//     // Call API to remove file from S3 and update database
-//     const isDeleted = await handleDeleteFile(fileType, fileName, watchedEmpID, setUploadedFileNames, deleteID, setValue,watch,trigger);
+  //     // Call API to remove file from S3 and update database
+  //     const isDeleted = await handleDeleteFile(fileType, fileName, watchedEmpID, setUploadedFileNames, deleteID, setValue,watch,trigger);
 
-//     if (!isDeleted) {
-//       console.error("File deletion failed, aborting UI update.");
-//       return;
-//     }
+  //     if (!isDeleted) {
+  //       console.error("File deletion failed, aborting UI update.");
+  //       return;
+  //     }
 
-//     // Track deleted files
-//     setDeletedFiles((prev) => ({
-//       ...prev,
-//       [fileType]: [...(prev[fileType] || []), fileName], // Keep track of deleted files
-//     }));
+  //     // Track deleted files
+  //     setDeletedFiles((prev) => ({
+  //       ...prev,
+  //       [fileType]: [...(prev[fileType] || []), fileName], // Keep track of deleted files
+  //     }));
 
-//     // Remove the deleted file from the form state
-//     const currentFiles = watch(fileType) || [];
-//     const updatedFiles = currentFiles.filter((file) => file.name !== fileName);
+  //     // Remove the deleted file from the form state
+  //     const currentFiles = watch(fileType) || [];
+  //     const updatedFiles = currentFiles.filter((file) => file.name !== fileName);
 
-//     // Ensure setValue is called only after file deletion
-//     setValue(fileType, updatedFiles);
+  //     // Ensure setValue is called only after file deletion
+  //     setValue(fileType, updatedFiles);
 
-//     // Update UI state with the new uploaded files
-//     setUploadedFiles((prevState) => ({
-//       ...prevState,
-//       [fileType]: updatedFiles,
-//     }));
+  //     // Update UI state with the new uploaded files
+  //     setUploadedFiles((prevState) => ({
+  //       ...prevState,
+  //       [fileType]: updatedFiles,
+  //     }));
 
-//     // Update the file names state
-//     setUploadedFileNames((prev) => {
-//       const updated = { ...prev };
-//       delete updated[fileType]; // Remove deleted file from the names
-//       return updated;
-//     });
+  //     // Update the file names state
+  //     setUploadedFileNames((prev) => {
+  //       const updated = { ...prev };
+  //       delete updated[fileType]; // Remove deleted file from the names
+  //       return updated;
+  //     });
 
-//     console.log(`File "${fileName}" removed from UI.`);
-//   } catch (error) {
-//     console.error("Error deleting file:", error);
-//     alert("Error processing the file deletion.");
-//   }
-// };
+  //     console.log(`File "${fileName}" removed from UI.`);
+  //   } catch (error) {
+  //     console.error("Error deleting file:", error);
+  //     alert("Error processing the file deletion.");
+  //   }
+  // };
 
   useEffect(() => {
     if (
@@ -388,29 +388,36 @@ export const EmployeeInfo = () => {
   const cleanFamilyDetailsString = (familyDetailsInput) => {
     try {
       let familyDetailsString = familyDetailsInput;
-  
+
       // Convert to string if input is an object
       if (typeof familyDetailsString === "object") {
-        familyDetailsString = JSON.stringify(Array.isArray(familyDetailsString) ? familyDetailsString : [familyDetailsString]);
+        familyDetailsString = JSON.stringify(
+          Array.isArray(familyDetailsString)
+            ? familyDetailsString
+            : [familyDetailsString]
+        );
       }
-  
+
       // Ensure proper formatting by trimming whitespace
       let cleanedString = familyDetailsString.trim();
-  
+
       // Remove surrounding quotes if present
       if (cleanedString.startsWith('"') && cleanedString.endsWith('"')) {
         cleanedString = cleanedString.slice(1, -1);
       }
-  
+
       // Ensure property names are wrapped in double quotes (fix malformed JSON)
-      cleanedString = cleanedString.replace(/([{,])\s*([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
-  
+      cleanedString = cleanedString.replace(
+        /([{,])\s*([a-zA-Z0-9_]+)\s*:/g,
+        '$1"$2":'
+      );
+
       // Handle potential single quotes around values
-      cleanedString = cleanedString.replace(/'([^']+)'/g, '"$1"');
-  
+      // cleanedString = cleanedString.replace(/'([^\\]+)'/g, '"$1"');
+
       // Remove unnecessary backslashes
       cleanedString = cleanedString.replace(/\\/g, "");
-  
+
       // Capitalize words utility function
       const capitalizeWords = (str) =>
         str
@@ -419,10 +426,10 @@ export const EmployeeInfo = () => {
             (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
           )
           .join(" ");
-  
+
       // Parse the cleaned JSON string
       const parsedData = JSON.parse(cleanedString);
-  
+
       if (Array.isArray(parsedData)) {
         return parsedData.map((item) => {
           if (typeof item === "string") {
@@ -455,7 +462,6 @@ export const EmployeeInfo = () => {
       return []; // Return empty array if parsing fails
     }
   };
-  
 
   const getArrayDateValue = (value) => {
     if (Array.isArray(value) && value.length > 0) {
@@ -547,10 +553,7 @@ export const EmployeeInfo = () => {
         setValue(key, valueToSet);
       }
     });
-  const arrayDateField = [
-      "empType",
-    "contractType"
-    ];
+    const arrayDateField = ["empType", "contractType"];
 
     // Set values for date fields and handle salaryType condition
     arrayDateField.forEach((field) => {
@@ -660,7 +663,7 @@ export const EmployeeInfo = () => {
       "ppUpload",
       "supportDocUpload",
     ];
-    
+
     uploadFields.forEach((field) => {
       if (result[field]) {
         try {
@@ -691,7 +694,6 @@ export const EmployeeInfo = () => {
         }
       }
     });
-    
   };
 
   const getFileName = (filePath) => {
@@ -702,8 +704,7 @@ export const EmployeeInfo = () => {
     const fileNameWithExtension = filePath.split("/").pop(); // This splits and grabs the file name with extension
 
     return fileNameWithExtension; // Returns "Website Deployment Document.pdf"
-  };  
-  
+  };
 
   const onSubmit = async (data) => {
     // data.contractType = contractTypes;
@@ -731,12 +732,12 @@ export const EmployeeInfo = () => {
     const removeLeadingNulls = (array, newValue) => {
       const newArray = [...(array || []), newValue]; // Combine old array and new value
       let firstValidIndex = newArray.findIndex((item) => item !== null);
-      
+
       if (firstValidIndex !== -1) {
         // Map through the newArray and remove consecutive duplicates
         const result = [];
         let lastAdded = null;
-    
+
         newArray.forEach((item) => {
           if (item !== null && item !== lastAdded) {
             result.push(item === null ? "N/A" : item);
@@ -745,7 +746,7 @@ export const EmployeeInfo = () => {
             result.push("N/A");
           }
         });
-    
+
         return result;
       } else {
         return [];
@@ -773,7 +774,7 @@ export const EmployeeInfo = () => {
           checkingIDTable.ppIssued,
           ppIssued
         );
- const updateContract = removeLeadingNulls(
+        const updateContract = removeLeadingNulls(
           checkingPITable.contractType,
           contractType
         );
@@ -790,7 +791,7 @@ export const EmployeeInfo = () => {
           ppIssued: updatedppIssued,
           ppExpiry: updatedppExpiry,
           contractType: updateContract,
-          empType:updateEmpType,
+          empType: updateEmpType,
           applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
           cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
           loiUpload: JSON.stringify(uploadedFiles.loiUpload),
@@ -804,6 +805,7 @@ export const EmployeeInfo = () => {
           email: data.email.trim().toLowerCase(),
           officialEmail: data.officialEmail.trim().toLowerCase(),
         };
+// console.log("updated", collectValue);
 
         await UpdateEIValue({ collectValue });
         setShowTitle("Employee Personal Info updated successfully");
@@ -824,7 +826,7 @@ export const EmployeeInfo = () => {
           ppIssued: updatedppIssued,
           ppExpiry: updatedppExpiry,
           contractType: updateContract,
-          empType:updateEmpType,
+          empType: updateEmpType,
           applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
           cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
           loiUpload: JSON.stringify(uploadedFiles.loiUpload),
@@ -836,6 +838,7 @@ export const EmployeeInfo = () => {
           email: data.email.trim().toLowerCase(),
           officialEmail: data.officialEmail.trim().toLowerCase(),
         };
+        // console.log("created", empValue);
 
         await SubmitEIData({ empValue });
         setShowTitle("Employee Personal Info saved successfully");
@@ -1059,7 +1062,7 @@ export const EmployeeInfo = () => {
                     </span>
                   </label>
 
-                  <p className="text-xs mt-1 text-grey px-1" >
+                  <p className="text-xs mt-1 text-grey px-1">
                     {uploadedFileNames?.[field.title] ? (
                       Array.isArray(uploadedFileNames[field.title]) ? (
                         uploadedFileNames[field.title]

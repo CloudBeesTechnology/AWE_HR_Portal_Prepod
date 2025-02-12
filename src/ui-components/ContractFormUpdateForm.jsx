@@ -38,6 +38,9 @@ export default function ContractFormUpdateForm(props) {
     genManager: "",
     remarks: "",
     contStatus: false,
+    remarkHr: "",
+    remarkGm: "",
+    renewalContract: "",
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [conAttn, setConAttn] = React.useState(initialValues.conAttn);
@@ -46,6 +49,11 @@ export default function ContractFormUpdateForm(props) {
   const [genManager, setGenManager] = React.useState(initialValues.genManager);
   const [remarks, setRemarks] = React.useState(initialValues.remarks);
   const [contStatus, setContStatus] = React.useState(initialValues.contStatus);
+  const [remarkHr, setRemarkHr] = React.useState(initialValues.remarkHr);
+  const [remarkGm, setRemarkGm] = React.useState(initialValues.remarkGm);
+  const [renewalContract, setRenewalContract] = React.useState(
+    initialValues.renewalContract
+  );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = contractFormRecord
@@ -58,6 +66,9 @@ export default function ContractFormUpdateForm(props) {
     setGenManager(cleanValues.genManager);
     setRemarks(cleanValues.remarks);
     setContStatus(cleanValues.contStatus);
+    setRemarkHr(cleanValues.remarkHr);
+    setRemarkGm(cleanValues.remarkGm);
+    setRenewalContract(cleanValues.renewalContract);
     setErrors({});
   };
   const [contractFormRecord, setContractFormRecord] = React.useState(
@@ -86,6 +97,9 @@ export default function ContractFormUpdateForm(props) {
     genManager: [],
     remarks: [],
     contStatus: [],
+    remarkHr: [],
+    remarkGm: [],
+    renewalContract: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -120,6 +134,9 @@ export default function ContractFormUpdateForm(props) {
           genManager: genManager ?? null,
           remarks: remarks ?? null,
           contStatus: contStatus ?? null,
+          remarkHr: remarkHr ?? null,
+          remarkGm: remarkGm ?? null,
+          renewalContract: renewalContract ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -187,6 +204,9 @@ export default function ContractFormUpdateForm(props) {
               genManager,
               remarks,
               contStatus,
+              remarkHr,
+              remarkGm,
+              renewalContract,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -217,6 +237,9 @@ export default function ContractFormUpdateForm(props) {
               genManager,
               remarks,
               contStatus,
+              remarkHr,
+              remarkGm,
+              renewalContract,
             };
             const result = onChange(modelFields);
             value = result?.conAttn ?? value;
@@ -247,6 +270,9 @@ export default function ContractFormUpdateForm(props) {
               genManager,
               remarks,
               contStatus,
+              remarkHr,
+              remarkGm,
+              renewalContract,
             };
             const result = onChange(modelFields);
             value = result?.depHead ?? value;
@@ -277,6 +303,9 @@ export default function ContractFormUpdateForm(props) {
               genManager,
               remarks,
               contStatus,
+              remarkHr,
+              remarkGm,
+              renewalContract,
             };
             const result = onChange(modelFields);
             value = result?.hrManager ?? value;
@@ -307,6 +336,9 @@ export default function ContractFormUpdateForm(props) {
               genManager: value,
               remarks,
               contStatus,
+              remarkHr,
+              remarkGm,
+              renewalContract,
             };
             const result = onChange(modelFields);
             value = result?.genManager ?? value;
@@ -337,6 +369,9 @@ export default function ContractFormUpdateForm(props) {
               genManager,
               remarks: value,
               contStatus,
+              remarkHr,
+              remarkGm,
+              renewalContract,
             };
             const result = onChange(modelFields);
             value = result?.remarks ?? value;
@@ -367,6 +402,9 @@ export default function ContractFormUpdateForm(props) {
               genManager,
               remarks,
               contStatus: value,
+              remarkHr,
+              remarkGm,
+              renewalContract,
             };
             const result = onChange(modelFields);
             value = result?.contStatus ?? value;
@@ -381,6 +419,105 @@ export default function ContractFormUpdateForm(props) {
         hasError={errors.contStatus?.hasError}
         {...getOverrideProps(overrides, "contStatus")}
       ></SwitchField>
+      <TextField
+        label="Remark hr"
+        isRequired={false}
+        isReadOnly={false}
+        value={remarkHr}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              conAttn,
+              depHead,
+              hrManager,
+              genManager,
+              remarks,
+              contStatus,
+              remarkHr: value,
+              remarkGm,
+              renewalContract,
+            };
+            const result = onChange(modelFields);
+            value = result?.remarkHr ?? value;
+          }
+          if (errors.remarkHr?.hasError) {
+            runValidationTasks("remarkHr", value);
+          }
+          setRemarkHr(value);
+        }}
+        onBlur={() => runValidationTasks("remarkHr", remarkHr)}
+        errorMessage={errors.remarkHr?.errorMessage}
+        hasError={errors.remarkHr?.hasError}
+        {...getOverrideProps(overrides, "remarkHr")}
+      ></TextField>
+      <TextField
+        label="Remark gm"
+        isRequired={false}
+        isReadOnly={false}
+        value={remarkGm}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              conAttn,
+              depHead,
+              hrManager,
+              genManager,
+              remarks,
+              contStatus,
+              remarkHr,
+              remarkGm: value,
+              renewalContract,
+            };
+            const result = onChange(modelFields);
+            value = result?.remarkGm ?? value;
+          }
+          if (errors.remarkGm?.hasError) {
+            runValidationTasks("remarkGm", value);
+          }
+          setRemarkGm(value);
+        }}
+        onBlur={() => runValidationTasks("remarkGm", remarkGm)}
+        errorMessage={errors.remarkGm?.errorMessage}
+        hasError={errors.remarkGm?.hasError}
+        {...getOverrideProps(overrides, "remarkGm")}
+      ></TextField>
+      <TextField
+        label="Renewal contract"
+        isRequired={false}
+        isReadOnly={false}
+        value={renewalContract}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              conAttn,
+              depHead,
+              hrManager,
+              genManager,
+              remarks,
+              contStatus,
+              remarkHr,
+              remarkGm,
+              renewalContract: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.renewalContract ?? value;
+          }
+          if (errors.renewalContract?.hasError) {
+            runValidationTasks("renewalContract", value);
+          }
+          setRenewalContract(value);
+        }}
+        onBlur={() => runValidationTasks("renewalContract", renewalContract)}
+        errorMessage={errors.renewalContract?.errorMessage}
+        hasError={errors.renewalContract?.hasError}
+        {...getOverrideProps(overrides, "renewalContract")}
+      ></TextField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

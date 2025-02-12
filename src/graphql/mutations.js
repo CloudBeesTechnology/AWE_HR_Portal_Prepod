@@ -15,6 +15,9 @@ export const createContractForm = /* GraphQL */ `
       genManager
       remarks
       contStatus
+      remarkHr
+      remarkGm
+      renewalContract
       createdAt
       updatedAt
       __typename
@@ -35,6 +38,9 @@ export const updateContractForm = /* GraphQL */ `
       genManager
       remarks
       contStatus
+      remarkHr
+      remarkGm
+      renewalContract
       createdAt
       updatedAt
       __typename
@@ -55,6 +61,9 @@ export const deleteContractForm = /* GraphQL */ `
       genManager
       remarks
       contStatus
+      remarkHr
+      remarkGm
+      renewalContract
       createdAt
       updatedAt
       __typename
