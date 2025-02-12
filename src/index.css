@@ -129,6 +129,12 @@
   appearance: none; /* Remove default arrow */
   padding: 0 33px 0 5px;
 }
+input:disabled {
+  background-color: white;
+  color: black; /* Optional: Ensure text is visible */
+  opacity: 1; /* Override default opacity */
+  cursor: not-allowed; /* Optional: Show disabled state */
+}
 .select-filter {
   background: url("./assets/filter.png") no-repeat;
   background-position: right 4% center;
