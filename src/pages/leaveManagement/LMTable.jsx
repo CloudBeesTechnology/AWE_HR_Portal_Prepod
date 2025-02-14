@@ -21,7 +21,7 @@ export const LMTable = () => {
 
   const {empPIData}=useContext(DataSupply)
 
-  const [lastUploadUrl, setPPLastUP] = useState(""); // State to store the last uploaded file's URL
+  const [lastUploadUrl, setPPLastUP] = useState(""); 
   const [matchData, setMatchData] = useState([]);
   const [secondartyData, setSecondartyData] = useState([]);
   const [searchResults, setSearchResults] = useState([]);

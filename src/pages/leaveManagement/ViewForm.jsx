@@ -707,6 +707,8 @@ export const ViewForm = ({
     return null; // Default case if none of the conditions match
   };
 
+  console.log(isValidDateFormat(ticketData.arrivalDate), "ARR");
+  
   return (
     <main className="flex flex-col items-center justify-center bg-grey bg-opacity-75 inset-0 z-50 fixed">
       <div className="center min-h-screen overflow-y-auto">
@@ -1050,17 +1052,25 @@ export const ViewForm = ({
                   {
                     label: "Departure Date",
                     value:
-                      DateFormat(
-                        ticketData.empDepartureDate || ticketData.departureDate
-                      ) || "N/A",
+                      ticketData.empDepartureDate
+                        ? isValidDateFormat(ticketData.empDepartureDate)
+                          ? `${DateFormat(ticketData.empDepartureDate)}`
+                          : `${ticketData.empDepartureDate}`
+                        : ticketData.departureDate
+                        ? `${DateFormat(ticketData.departureDate)}`
+                        : "N/A",
                   },
                   {
                     label: "Arrival Date",
                     value:
-                      DateFormat(
-                        ticketData.empArrivalDate || ticketData.arrivalDate
-                      ) || "N/A",
-                  },
+                      ticketData.empArrivalDate
+                        ? isValidDateFormat(ticketData.empArrivalDate)
+                          ? `${DateFormat(ticketData.empArrivalDate)}`
+                          : `${ticketData.empArrivalDate}`
+                        : ticketData.arrivalDate
+                        ? `${DateFormat(ticketData.arrivalDate)}`
+                        : "N/A",
+                  },                  
                   {
                     label: "Employee Remarks",
                     value: ticketData.empRemarks || "N/A",
