@@ -55,7 +55,7 @@ export const LeaveManage = () => {
 
   const handleUpdate = async (empID, newStatus, remark) => {
     try {
-      await handleUpdateLeaveStatus(empID, { status: newStatus, remark }); // Use the hook's update function
+      await handleUpdateLeaveStatus(empID, { status: newStatus, remark }); 
       setSelectedLeaveData(null);
       setToggleClick(false);
       // console.log("Update successful for:", empID);
