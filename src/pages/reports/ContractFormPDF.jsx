@@ -50,6 +50,10 @@ export const ContractFormPDF = ({ contentRef }) => {
     },
   });
 
+  const currentDate = new Date();
+  const monthName = currentDate.toLocaleString("en-US", { month: "long" });
+  const year = currentDate.getFullYear();
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
@@ -141,7 +145,8 @@ export const ContractFormPDF = ({ contentRef }) => {
             genManager: contractData.genManager,
             remarks: contractData.remarks,
             remarkHr: contractData.remarkHr,
-            remarkGm: contractData.remarkGm,  
+            remarkGm: contractData.remarkGm, 
+            createdAt: contractData.createdAt, 
             renewalContract: contractData.renewalContract,  
           },
         });
@@ -362,9 +367,15 @@ export const ContractFormPDF = ({ contentRef }) => {
           <Link to="/reports" className="text-xl text-start w-[50px] text-grey">
             <FaArrowLeft />
           </Link>
-          <div className="text-center text-lg font-bold uppercase  flel-1 w-full">
-            Contract Completion Form for the Month of January 2024
-          </div>
+          
+          <div className="text-center text-lg font-bold uppercase w-full">
+  {formData.contract?.createdAt
+    ? `Contract Completion Form for the Month of ${new Date(formData.contract.createdAt).toLocaleDateString('en-US', {
+        month: 'long',
+        year: 'numeric',
+      })}`
+    : `Contract Completion Form for the Month of ${monthName} ${year}`}
+</div>
         </div>
 
         <div className="mb-16 mt-16">

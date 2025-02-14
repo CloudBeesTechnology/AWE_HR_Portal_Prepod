@@ -246,7 +246,7 @@ console.log(dropDownVal);
   </div>
 ) }
 
-{title !== "Training Records" &&( 
+{/* {title !== "Training Records" &&(  */}
 
 <div className=" ">
 <label className="block text-[16px] font-medium">
@@ -264,7 +264,8 @@ console.log(dropDownVal);
     </option>
   ))}
 </select>
-</div>)}
+</div>
+{/* )} */}
      
       {/* Download Button */}
         <div className="text-center">
@@ -326,72 +327,6 @@ console.log(dropDownVal);
     </tr>
   ))}
 </tbody>
-
-              {/* <tbody className="bg-white">
-                {currentItems.map((row, rowIndex) => (
-                  <tr
-                    key={rowIndex}
-                    className="text-sm border-b-2 border-[#CECECE]"
-                  >
-                    {Object.entries(row).map(([key, col], colIndex) => {
-                      const isExpired =
-                        key === "expAndValid" && col === "EXPIRED";
-                      return (
-                        <td
-                          key={colIndex}
-                          className={`border-b-2 text-center uppercase border-[#CECECE] p-2 ${
-                            isExpired ? "text-[red]" : ""
-                          }`}
-                        >
-                          {Array.isArray(col)
-                            ? `${col[col.length - 1]}`
-                            : `${col}`}
-                        </td>
-                      );
-                    })}
-                    {title === "Probation Review" && (
-                      <td
-                        className="underline text-center border-[#CECECE] p-2 cursor-pointer text-[blue]"
-                        onClick={() => handleViewDetails(row)}
-                      >
-                        View Details
-                      </td>
-                    )}
-                    {title === "Probation Form Update" && (
-                      <td
-                        className="underline text-center border-[#CECECE] p-2 cursor-pointer text-[blue]"
-                        onClick={() => handleViewDetails(row)}
-                      >
-                        View Details
-                      </td>
-                    )}
-                    {title === "Recruitment & Mobilization" && (
-                      <td
-                        className="underline text-center border-[#CECECE] p-2 cursor-pointer text-[blue]"
-                        onClick={() => handleViewDetails(row)}
-                      >
-                        View Details
-                      </td>
-                    )}
-                      {title === "Contract Expiry Review" && (
-                        <td
-                          className="underline text-center border-[#CECECE] p-2 cursor-pointer text-[blue]"
-                          onClick={() => handleViewDetails(row)}
-                        >
-                          View Details
-                        </td>
-                      )}
-                      {title === "Contract Expiry Form Update" && (
-                        <td
-                          className="underline text-center border-[#CECECE] p-2 cursor-pointer text-[blue]"
-                          onClick={() => handleViewDetails(row)}
-                        >
-                          View Details
-                        </td>
-                      )}
-                  </tr>
-                ))}
-              </tbody> */}
             </table>
           </div>
         </div>

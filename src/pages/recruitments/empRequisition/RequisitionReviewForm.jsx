@@ -41,6 +41,9 @@ export const RequisitionReviewForm = ({
 
   const request = selectedRequest || defaultRequest;
 
+console.log("HR M",hrManagerMail);
+console.log("Gm", gmPosition);
+
 
   useEffect(() => {
     if (isVisible) {

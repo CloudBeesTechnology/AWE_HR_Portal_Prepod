@@ -30,7 +30,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
   // };
 
   return (
-    <form className="w-full mx-auto mt-5">
+    <div className="w-full mx-auto mt-5">
       {/* Additional Information Section */}
       <div className="mb-8">
         <p className="mb-4">
@@ -134,6 +134,14 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
           approach, and ability in performing the duties or responsibilities
           assigned.)
         </p>
+        <textarea
+          {...register("extensionPeriod")}
+          name="extensionPeriod"
+          value={formData?.probData?.extensionPeriod || ""}
+          onChange={handleInputChange}
+          className="w-full h-32 border p-2 rounded resize-none outline-none"
+          // placeholder="Enter additional information here"
+        />
       </div>
 
       {/* Signature Section */}
@@ -361,13 +369,6 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
           </div>
         </div>
       </div>
-
-      {/* Submit Button */}
-      <div className="mt-8">
-        <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">
-          Submit
-        </button>
-      </div>
-    </form>
+    </div>
   );
 };

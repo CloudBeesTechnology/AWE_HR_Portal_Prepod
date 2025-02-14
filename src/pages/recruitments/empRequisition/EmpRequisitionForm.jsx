@@ -42,8 +42,10 @@ export const EmpRequisitionForm = ({ isVisible, onClose }) => {
   useEffect(() => {
     console.log("PINFRO",personalInfo);
 
-  }, [personalInfo])
- 
+  }, [personalInfo]);
+
+  console.log("HR M",hrManagerMail);
+  console.log("Gm", gmMail);
   
 
   const onSubmit = async (data) => {

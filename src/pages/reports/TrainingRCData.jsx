@@ -19,7 +19,8 @@ export const TrainingRCData = () => {
     "COURSE / PROGRAMME",
     "CONDUCTED BY",
     "Course Fee",
-    "DIVISION",
+    "Department",
+    "Other Department",
     "START DATE",
     "END DATE",
     "CERT. EXP",
@@ -67,8 +68,12 @@ export const TrainingRCData = () => {
         courseName: item.courseName || "-",
         company: item.company || "-",
         traineeCourseFee: item.traineeCourseFee || "-",
-        DIVISION: item.DIVISION || "-",
-        traineeSD: formatDate(item.traineeSD) || "-",
+ department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",        traineeSD: formatDate(item.traineeSD) || "-",
         traineeED: formatDate(item.traineeED) || "-",
         certifiExpiry: Array.isArray(item.certifiExpiry)
           ? formatDate(item.certifiExpiry[item.certifiExpiry.length - 1])
@@ -132,8 +137,12 @@ export const TrainingRCData = () => {
         courseName: item.courseName || "-",
         company: item.company || "-",
         traineeCourseFee: item.traineeCourseFee || "-",
-        DIVISION: item.DIVISION || "-",
-        traineeSD: formatDate(item.traineeSD) || "-",
+ department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",        traineeSD: formatDate(item.traineeSD) || "-",
         traineeED: formatDate(item.traineeED) || "-",
         certifiExpiry: Array.isArray(item.certifiExpiry)
           ? formatDate(item.certifiExpiry[item.certifiExpiry.length - 1])
