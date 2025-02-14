@@ -14,27 +14,29 @@ import { AddEmpReqUp } from "../../../services/updateMethod/AddEmpReqUp";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { sendEmail } from "../../../services/EmailServices";
 import { DateFormat } from "../../../utils/DateFormat";
+import { useCreateNotification } from "../../../hooks/useCreateNotification"; 
+import useEmployeePersonalInfo from "../../../hooks/useEmployeePersonalInfo";
 
 export const AddEmployeeForm = () => {
-
-  const {  empPIData, workInfoData, AddCourseDetails, AddEmpReq } =
+  const { empPIData, workInfoData, AddCourseDetails, AddEmpReq } =
     useContext(DataSupply);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
-
+  const { createNotification } = useCreateNotification(); // Hook for creating notification
   const { AddEmpData } = AddEmpFun();
   const { TrReqUp } = AddEmpReqUp();
   const [userID, setUserID] = useState("");
   const [userType, setUserType] = useState("");
+ 
   const [emailData, setEmailData] = useState({
     managerEmpID: "",
     managerOfficialMail: "",
     managerName: "",
-    hrOfficialmail:""
+    hrOfficialmail: "",
   });
-
+  
   const {
     register,
     handleSubmit,
@@ -48,6 +50,17 @@ export const AddEmployeeForm = () => {
       mediRequired: false,
     },
   });
+
+  useEffect(() => {
+    const userID = localStorage.getItem("userID");
+    setUserID(userID);
+    const userType = localStorage.getItem("userType");
+    setUserType(userType);
+  }, []);
+  const {personalInfo} = useEmployeePersonalInfo(userID);
+
+  // console.log(personalInfo);
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -164,15 +177,6 @@ export const AddEmployeeForm = () => {
   };
 
   useEffect(() => {
-    const userID = localStorage.getItem("userID");
-    setUserID(userID);
-    const userType = localStorage.getItem("userType");
-    setUserType(userType);
-  }, []);
-
-  
-
-  useEffect(() => {
     // Set initial showMedicalFields based on form state
     setShowMedicalFields(getValues("mediRequired"));
   }, [getValues]);
@@ -181,13 +185,52 @@ export const AddEmployeeForm = () => {
     Array.isArray(value) ? value[value.length - 1] : value;
 
   const searchResult = (result) => {
+
+    const workInfo = workInfoData.find(
+      (data) => data.empID === result.empID
+    );
+
+    if (workInfo) {
+      // console.log("Work Info:", workInfo);
+      const managerEmpID = workInfo.manager[workInfo.manager.length - 1];
+      // console.log("Manager Employee ID:", managerEmpID);
+
+      const hrOfficialmail = "hr-training@adininworks.com";
+      // Update HR email in emailData
+      setEmailData((prevData) => ({
+        ...prevData,
+        hrOfficialmail,
+      }));
+
+      if (managerEmpID) {
+        // Find the manager's information from empPIData
+        const managerInfo = empPIData.find(
+          (data) => data.empID === String(managerEmpID)
+        );
+
+        if (managerInfo) {
+          // console.log("Manager Info:", managerInfo);
+
+          // Update manager's official email and name in emailData
+          setEmailData((prevData) => ({
+            ...prevData,
+            managerOfficialMail: managerInfo.officialEmail,
+            managerName: managerInfo.name,
+            managerEmpID: managerInfo.empID
+          }));
+        }
+        // else {
+        //   console.warn(`Manager with empID ${managerEmpID} not found in empPIData`);
+        // }
+      }
+    } else {
+      console.warn(
+        `Work info for managerEmpID ${emailData.managerEmpID} not found`
+      );
+    }
     // console.log("Search result:", result);
 
-    setEmailData((prevData) => ({
-      ...prevData,
-      managerEmpID: result.empID
-    }));
-
+  
 
     const keysToSet = [
       "empID",
@@ -273,53 +316,51 @@ export const AddEmployeeForm = () => {
     setShowMedicalFields(mediRequired);
   };
 
-  useEffect(() => {
-    // Find the work info for the selected manager
-    const workInfo = workInfoData.find(
-      (data) => data.empID === emailData.managerEmpID
-    );
-  
-    if (workInfo) {
-      // console.log("Work Info:", workInfo);
-  
-      // Extract the manager's employee ID (last in the manager array)
-      const managerEmpID = workInfo.manager[workInfo.manager.length - 1];
-      // console.log("Manager Employee ID:", managerEmpID);
-  
-      // Default HR email address
-      const hrOfficialmail = "hr-training@adininworks.com";
-  
-      // Update HR email in emailData
-      setEmailData((prevData) => ({
-        ...prevData,
-        hrOfficialmail,
-      }));
-  
-      if (managerEmpID) {
-        // Find the manager's information from empPIData
-        const managerInfo = empPIData.find(
-          (data) => data.empID === String(managerEmpID)
-        );
-  
-        if (managerInfo) {
-          // console.log("Manager Info:", managerInfo);
-  
-          // Update manager's official email and name in emailData
-          setEmailData((prevData) => ({
-            ...prevData,
-            managerOfficialMail: managerInfo.officialEmail,
-            managerName: managerInfo.name,
-          }));
-        } 
-        // else {
-        //   console.warn(`Manager with empID ${managerEmpID} not found in empPIData`);
-        // }
-      }
-    } 
-    // else {
-    //   console.warn(`Work info for managerEmpID ${emailData.managerEmpID} not found`);
-    // }
-  }, [workInfoData, empPIData, emailData.managerEmpID]);
+  // useEffect(() => {
+  //   // Find the work info for the selected manager
+  //   const workInfo = workInfoData.find(
+  //     (data) => data.empID === emailData.managerEmpID
+  //   );
+
+  //   if (workInfo) {
+  //     // console.log("Work Info:", workInfo);
+  //     const managerEmpID = workInfo.manager[workInfo.manager.length - 1];
+  //     // console.log("Manager Employee ID:", managerEmpID);
+
+  //     const hrOfficialmail = "hr-training@adininworks.com";
+  //     // Update HR email in emailData
+  //     setEmailData((prevData) => ({
+  //       ...prevData,
+  //       hrOfficialmail,
+  //     }));
+
+  //     if (managerEmpID) {
+  //       // Find the manager's information from empPIData
+  //       const managerInfo = empPIData.find(
+  //         (data) => data.empID === String(managerEmpID)
+  //       );
+
+  //       if (managerInfo) {
+  //         // console.log("Manager Info:", managerInfo);
+
+  //         // Update manager's official email and name in emailData
+  //         setEmailData((prevData) => ({
+  //           ...prevData,
+  //           managerOfficialMail: managerInfo.officialEmail,
+  //           managerName: managerInfo.name,
+  //         }));
+  //       }
+  //       // else {
+  //       //   console.warn(`Manager with empID ${managerEmpID} not found in empPIData`);
+  //       // }
+  //     }
+  //   } else {
+  //     console.warn(
+  //       `Work info for managerEmpID ${emailData.managerEmpID} not found`
+  //     );
+  //   }
+  // }, [workInfoData, empPIData, emailData.managerEmpID]);
+
   
   // useEffect(() => {
   //   console.log("Email data", emailData);
@@ -339,6 +380,7 @@ export const AddEmployeeForm = () => {
         };
 
         await TrReqUp({ TMRDataUp });
+
         setShowTitle("Training details Updated successfully");
         setNotification(true);
       } else {
@@ -347,6 +389,7 @@ export const AddEmployeeForm = () => {
           medicalReport: uploadMedicalReports.medicalReport,
         };
         await AddEmpData({ AddEmpValue });
+
         // Email Subject and Body
         const emailSubject = `Employee Training Notification - ${data.name} `;
         const emailBody = `
@@ -357,8 +400,8 @@ export const AddEmployeeForm = () => {
           <strong>${DateFormat(data.traineeSD)}</strong> to 
           <strong>${DateFormat(data.traineeED)}</strong>.
         </p>
-      `;       
-       const emailBody1 = `
+      `;
+        const emailBody1 = `
 <p>Dear HR,</p>
  <p>
           Please be informed that ${data.name} is scheduled for training on 
@@ -379,8 +422,40 @@ export const AddEmployeeForm = () => {
             emailBody1,
             "hr_no-reply@adininworks.com", 
             emailData.hrOfficialmail
+            
           );
 
+          sendEmail(
+            emailSubject,
+            emailBody1,
+            "hr_no-reply@adininworks.com", 
+            "hr-training@adininworks.com"       
+          );
+
+        await createNotification({
+          empID: data.empID,
+          leaveType: "Training Requestor",
+          message: `Employee Training Notification - ${data.name}. Dear Hr, Please be informed that ${data.name} is scheduled for training on 
+          ${data.courseName} from 
+          ${DateFormat(data.traineeSD)} to 
+          ${DateFormat(data.traineeED)}.`,
+          senderEmail:"hr_no-reply@adininworks.com",
+          receipentEmail: emailData.hrOfficialmail,
+          status: "Unread",
+        });
+       
+        await createNotification({
+          empID: data.empID,
+          leaveType: "Training Requestor",
+          message: `Employee Training Notification - ${data.name}. Dear ${emailData.managerName}, Please be informed that ${data.name} is scheduled for training on 
+          ${data.courseName} from 
+          ${DateFormat(data.traineeSD)} to 
+          ${DateFormat(data.traineeED)}.`,
+          senderEmail:"hr_no-reply@adininworks.com",
+          receipentEmail: emailData.managerOfficialMail,
+          receipentEmpID: emailData.managerEmpID,
+          status: "Unread",
+        });
 
         setShowTitle("Training details Saved successfully");
         setNotification(true);
@@ -571,6 +646,11 @@ export const AddEmployeeForm = () => {
                 className={`input-field `}
                 {...register("traineeSD")}
               />
+               {errors.traineeSD && (
+                <p className="text-[red] text-[13px] mt-1">
+                  {errors.traineeSD.message}
+                </p>
+              )}
             </div>
 
             <div>
@@ -580,6 +660,11 @@ export const AddEmployeeForm = () => {
                 className={`input-field `}
                 {...register("traineeED")}
               />
+               {errors.traineeED && (
+                <p className="text-[red] text-[13px] mt-1">
+                  {errors.traineeED.message}
+                </p>
+              )}
             </div>
 
             <div>
@@ -602,24 +687,41 @@ export const AddEmployeeForm = () => {
           </div>
 
           <div className="col-span-2 flex items-center gap-5 my-5">
-            <div className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                id="mediRequired"
-                {...register("mediRequired")}
-                checked={getValues("mediRequired")} // Fetch the value directly from the form state
-                onChange={() => {
-                  const newValue = !getValues("mediRequired");
-                  setShowMedicalFields(newValue); // Update showMedicalFields state
-                  setValue("mediRequired", newValue); // Sync the form state
-                }}
-                className="w-[14px] h-[14px] border bg-gray cursor-pointer appearance-none checked:bg-green"
-              />
-              <label htmlFor="mediRequired" className="cursor-pointer">
-                if Medical Required
-              </label>
-            </div>
-          </div>
+  <div className="flex items-center gap-2 cursor-pointer">
+    {/* Visible Checkbox */}
+    <input
+      type="checkbox"
+      id="mediRequired"
+      {...register("mediRequired")}
+      checked={getValues("mediRequired")}
+      onChange={() => {
+        const newValue = !getValues("mediRequired");
+        setShowMedicalFields(newValue);
+        setValue("mediRequired", newValue);
+      }}
+      className="w-[18px] h-[18px] border border-grey rounded appearance-none flex items-center justify-center cursor-pointer"
+    />
+    
+    {/* Checkmark Icon inside Checkbox (only visible when checked) */}
+    {getValues("mediRequired") && (
+      <svg
+        className="w-5 h-5 text-[white] bg-green -ml-[26px] pointer-events-none rounded"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+      </svg>
+    )}
+
+    {/* Clickable Label */}
+    <label htmlFor="mediRequired" className="cursor-pointer">
+      If Medical Required
+    </label>
+  </div>
+</div>
 
           {/* Conditionally render input fields if showMedicalFields is true */}
           {showMedicalFields && (

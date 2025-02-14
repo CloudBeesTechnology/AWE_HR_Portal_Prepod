@@ -9,6 +9,7 @@ import { IoSearch } from "react-icons/io5";
 import { capitalizedLetter, DateFormat } from "../../utils/DateFormat";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { FiLoader } from "react-icons/fi";
+
 export const LMTable = () => {
   const {
     handleClickForToggle,
@@ -19,8 +20,7 @@ export const LMTable = () => {
     loading
   } = useOutletContext();
 
-  const {empPIData}=useContext(DataSupply)
-
+  const {empPIData}=useContext(DataSupply);
   const [lastUploadUrl, setPPLastUP] = useState(""); 
   const [matchData, setMatchData] = useState([]);
   const [secondartyData, setSecondartyData] = useState([]);
@@ -34,10 +34,9 @@ export const LMTable = () => {
     dateError: false,
     noResults: false,
   });
-  // console.log(mergedData);
 
   useEffect(() => {
-    // Step 1: Initial filtering based on user type
+
     let filteredData = mergedData
       .filter((items) => {
         if (userType === "Supervisor" && items?.empStatus !== "Cancelled") {
@@ -71,37 +70,25 @@ export const LMTable = () => {
       });
     }
 
-    // Step 3: Apply date filter with proper date comparison
     if (selectedDate) {
       filteredData = filteredData.filter((item) => {
-        // Convert selectedDate to Date object
         const selectedDateObj = new Date(selectedDate);
-
-        // Convert supervisor and manager dates to Date objects
-        const supervisorDate = item.supervisorDate
-          ? new Date(item.supervisorDate)
-          : null;
-        const managerDate = item.managerDate
-          ? new Date(item.managerDate)
-          : null;
-
-        const selectedDateFormatted = DateFormat(selectedDateObj);
-        const supervisorDateFormatted = DateFormat(supervisorDate);
-        const managerDateFormatted = DateFormat(managerDate);
-
-        // Compare formatted dates
+        const supervisorDate = item.supervisorDate ? new Date(item.supervisorDate) : null;
+        const managerDate = item.managerDate ? new Date(item.managerDate) : null;
+        const selectedDateFormatted = selectedDateObj.toISOString().split('T')[0];  
+        const supervisorDateFormatted = supervisorDate ? supervisorDate.toISOString().split('T')[0] : null;
+        const managerDateFormatted = managerDate ? managerDate.toISOString().split('T')[0] : null;
+    
         return (
           supervisorDateFormatted === selectedDateFormatted ||
           managerDateFormatted === selectedDateFormatted
         );
       });
     }
-
+    
     setSecondartyData(filteredData);
     setMatchData(filteredData);
   }, [mergedData, userType, userID, filterStatus, selectedDate]);
-
-  // console.log(matchData);
 
   // Logic to get the URL of the uploaded file
   const linkToStorageFile = async (pathUrl) => {
@@ -114,7 +101,6 @@ export const LMTable = () => {
   };
 
   const startIndex = (currentPage - 1) * rowsPerPage;
-
   // Conditional table headers based on userType
   const heading = [
     "S. No",
@@ -190,6 +176,7 @@ export const LMTable = () => {
   );
 
   if (loading) {
+
     return (
       <div className="flex items-center justify-center h-[60vh] bg-transparent">
         <div className="flex justify-between gap-2">
@@ -201,7 +188,6 @@ export const LMTable = () => {
       </div>
     );
   }
-
 
   return (
     <section className="flex flex-col w-full mt-4">
@@ -228,7 +214,6 @@ export const LMTable = () => {
               onChange={handleDateChange}
             />
           </div>
-
           {(userType === "Supervisor" || userType === "Manager") && (
             <Filter name={filterStatus} AfterFilter={handleFilterChange} />
           )}
@@ -252,8 +237,6 @@ export const LMTable = () => {
                   const displayIndex = startIndex + index + 1;
                   const managerName=empPIData.filter((val)=> val.empID === item.managerEmpID)
                   const supervisorName=empPIData.filter((val)=> val.empID === item.supervisorEmpID)
-            
-                  
                   return (
                     <tr
                       key={index}
@@ -309,8 +292,8 @@ export const LMTable = () => {
                           onClick={() => {
                             handleClickForToggle();
                             handleViewClick(item, "LM");
-                            // console.log(item);
-                            
+                         
+                                                  
                           }}
                         >
                           {item["submitted Form"] || "View"}

@@ -7,7 +7,7 @@ import { RemarksDialog } from "../empRequisition/RemarksDialog";
 import { format } from "date-fns";
 import { listEmpRequisitions } from "../../../graphql/queries";
 import { generateClient } from "@aws-amplify/api";
-  
+import { SearchListOfCandy } from "../Search/SearchListOfCandy";
 const client = generateClient();
 
 export const EmployReq = ({}) => {
@@ -112,18 +112,19 @@ export const EmployReq = ({}) => {
       document.body.style.overflow = "auto";
     };
   }, [isReviewFormVisible]);
-
+  
+ 
   return (
     <section className="screen-size w-full mt-5 mb-1">
       <div className="mb-8 flex justify-between items-center">
         <button className="bg-[#faf362] py-2 px-3 rounded-lg text-[18px] font-semibold">
           Employee Requisition Review
         </button>
-        <Searchbox
+        <SearchListOfCandy
           allEmpDetails={requisitionData}
           searchUserList={setFilteredData}
-          searchIcon1={<IoSearch />}
-          placeholder="Search by Name or Position"
+          searchIcon2={<IoSearch />}
+          placeholder="Search by Position"
         />
       </div>
 

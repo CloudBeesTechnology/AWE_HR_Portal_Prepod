@@ -3,9 +3,11 @@ import iconList from '../../assets/recruitment/candidate/candylist.svg';
 import iconAdd from '../../assets/recruitment/candidate/add-candidate.svg';
 import { useNavigate } from 'react-router-dom';
 import { Outlet } from 'react-router-dom';
+import { useTempID } from "../../utils/TempIDContext";
 
 export const Candidate = () => {
   const navigate = useNavigate();
+  const { setTempID } = useTempID();
 
   return (
     <section className="min-h-screen bg-[#F5F6F1]">
@@ -25,7 +27,18 @@ export const Candidate = () => {
         </div>
 
         <div
-          onClick={() => navigate('/addCandidates')} 
+          onClick={() => {
+            const allowedPaths = [
+              "/addCandidates",
+              "/addCandidates/personalDetails",
+              "/addCandidates/educationDetails",
+              "/addCandidates/otherDetails",
+            ];
+            navigate('/addCandidates')
+            if (!allowedPaths) {
+              setTempID(null);
+            }
+          }} 
           className="border-1 shadow-[0_1px_4px_1px_rgba(0,0,0,0.2)] bg-white rounded-xl w-64 h-72 p-5 cursor-pointer hover:border-4 hover:border-[#0D4B8F]"
         >
           <div className="bg-[#CDE4FD] rounded-full my-10 w-24 h-24 flex justify-center items-center m-auto">

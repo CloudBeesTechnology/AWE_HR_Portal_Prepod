@@ -18,7 +18,7 @@ export const InterviewTable = ({ data,formatDate }) => {
     "Form",
     "Edit Form",
   ];
-  // console.log(data);
+
 const handleShowForm=(candi)=>{
   setSelectedCandi(candi);
     setIsFormVisible(!isFormVisible)
@@ -43,14 +43,11 @@ const handleShowReviewForm = (candi) => {
           <tbody>
             {data && data.length > 0 ? (
               data.map((item, index) => {
-                //   const displayIndex = startIndex + index + 1; // Adjust index based on pagination
-
                 return (
                   <tr
                     key={index}
                     className="text-center text-[16px] shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
                   >
-                    {/* <td className="py-3">{displayIndex}</td> */}
                     <td className="py-3">{item.tempID}</td>
                     <td className="py-3">{item.name || "N/A"}</td>
                     <td className="py-3">{item.nationality || "N/A"}</td>
@@ -88,8 +85,7 @@ const handleShowReviewForm = (candi) => {
       {isFormVisible && (
         <StatusForm
         candidate={selectedCandi}
-        //   onSave={handleFormSave}
-          onClose={handleShowForm}
+        onClose={handleShowForm}
         />
       )}
     </div>

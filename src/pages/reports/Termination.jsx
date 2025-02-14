@@ -16,6 +16,7 @@ export const Termination = () => {
     "Date of join",
     "Nationality",
     "Department",
+    "Other Department",
     "Position",
     "Date of Termination",
     "Reason of Termination",
@@ -52,8 +53,15 @@ export const Termination = () => {
           name: item.name || "-",
           dateOfJoin: formatDate(item.doj) || "-",
           nationality: item.nationality || "-",
-          position: item.position || "-",
-          department: item.department || "-",
+          department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
           terminateDate: formatDate(item.termiDate) || "-", // Display termination date
           reasonTerminate: item.reasonTerminate || "-", // Display termination note (if any)
         };
@@ -101,8 +109,15 @@ export const Termination = () => {
         name: item.name || "-",
         dateOfJoin: formatDate(item.doj) || "-", // Ensures date is formatted
         nationality: item.nationality || "-",
-        position: item.position || "-",
-        department: item.department || "-",
+        department: Array.isArray(item.department)
+        ? item.department[item.department.length - 1]
+        : "-",
+        otherDepartment:Array.isArray(item.otherDepartment)
+        ? item.otherDepartment[item.otherDepartment.length - 1]
+        : "-",
+      position: Array.isArray(item.position)
+        ? item.position[item.position.length - 1]
+        : "-",
         terminateDate: formatDate(item.termiDate) || "-", // Display formatted termination date
         reasonTerminate: item.reasonTerminate || "-", // Display termination reason
         rawTermiDate: new Date(item.termiDate), // Add raw date for sorting

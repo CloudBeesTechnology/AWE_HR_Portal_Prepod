@@ -18,6 +18,7 @@ export const ProbationReview = () => {
     "Name",
     "Date of Join",
     "Department",
+    "Other Department",
     "Position",
     "Probation Expiry Date",
     "Deadline to Return to HRD",
@@ -84,8 +85,15 @@ export const ProbationReview = () => {
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
           dateOfJoin: formatDate(item.doj) || "-",
-          department: item.department || "-",
-          position: item.position || "-",
+          department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
           probationEndDate: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
         };
@@ -172,8 +180,15 @@ export const ProbationReview = () => {
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
           dateOfJoin: formatDate(item.doj) || "-",
-          department: item.department?.[item.department?.length - 1] || "-",
-          position: item.position?.[item.position?.length - 1] || "-",
+          department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
           probationEnd: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
         };

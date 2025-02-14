@@ -50,7 +50,7 @@ export const CVEVForm = ({ candidate }) => {
     resolver: yupResolver(CVEVFormSchema),
   });
 
-  const CVECUpload = watch("cvecFile", "");
+  const CVECUpload = watch("cvecFile");
 
   // console.log("DATA 3.0", mergedInterviewData);
 
@@ -126,7 +126,7 @@ export const CVEVForm = ({ candidate }) => {
         LoiValue: {
           id: localMobilizationId,
           cvecApproveDate: formData.interview.cvecApproveDate,
-          cvecFile: uploadedCVEC.cvecFile || formData.cvecFile,
+          cvecFile: uploadedCVEC.cvecFile,
         },
       });
 

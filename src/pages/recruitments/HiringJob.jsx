@@ -1,7 +1,7 @@
 import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { DataSupply } from "../../utils/DataStoredContext";
-import { FaArrowLeft } from "react-icons/fa6";
+import { FaArrowLeft } from "react-icons/fa";
 
 export const HiringJob = () => {
   useEffect(() => {
@@ -38,16 +38,16 @@ export const HiringJob = () => {
 
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    return expiry < today ? "Completed" : "Live";
+    return expiry < today ? "Expired" : "Live";
   };
   const getStatusClass = (status) => {
-    return status === "Completed" ? "text-[green]" : "text-[#E8A317]";
+    return status === "Expired" ? "text-[green]" : "text-[#E8A317]";
   };
 
   return (
     <section className="bg-[#F5F6F1CC] mx-auto p-10 min-h-screen ">
-          <div className=" flex items-center mb-7">
-          <Link to="/recruitment" className="text-xl text-grey">
+                <div className=" flex items-center mb-7">
+        <Link to="/recruitment" className="text-xl text-grey">
                 <FaArrowLeft />
               </Link>         
           </div>
@@ -80,7 +80,7 @@ export const HiringJob = () => {
           {latestData && latestData.length > 0 ? (
             latestData.map((val, idx) => {
               const status = getStatus(val?.expiryDate);
-              // console.log(val);
+              // console.log(val?.uploadJobDetails,val.jobTitle);
               
               return (
                 <tr

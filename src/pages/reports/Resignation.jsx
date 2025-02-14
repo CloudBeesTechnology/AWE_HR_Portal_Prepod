@@ -16,6 +16,7 @@ export const Resignation = () => {
     "Date of join",
     "Nationality",
     "Department",
+    "Other Department",
     "Position",
     "Date of Resignation",
     "Reason of Resignation",
@@ -49,8 +50,15 @@ export const Resignation = () => {
         name: item.name || "-",
         dateOfJoin: formatDate(item.doj) || "-",
         nationality: item.nationality || "-",
-        department: item.department || "-",
-        position: item.position || "-",
+        department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
         resignDate: formatDate(item.resignDate) || "-", // Display formatted resignDate
         rawResignDate: new Date(item.resignDate), // Add raw date for sorting
         reasonResign: item.reasonResign || "-", // Display reason for resignation
@@ -98,8 +106,15 @@ export const Resignation = () => {
         name: item.name || "-",
         dateOfJoin: formatDate(item.doj) || "-",
         nationality: item.nationality || "-",
-        department: item.department || "-",
-        position: item.position || "-",
+        department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
         resignDate: formatDate(item.resignDate) || "-",
         rawResignDate: new Date(item.resignDate), // Add raw date for sorting
         reasonResign: item.reasonResign || "-",

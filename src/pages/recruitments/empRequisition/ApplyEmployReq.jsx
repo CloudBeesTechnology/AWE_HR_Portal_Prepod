@@ -10,10 +10,17 @@ const client = generateClient();
 export const ApplyEmployReq = () => {
   const [requisitionData, setRequisitionData] = useState([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [userID, setUserID] = useState("");
   const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [error, setError] = useState(null);
   const userType = localStorage.getItem("userType");
+
+  
+  useEffect(() => {
+    const userID = localStorage.getItem("userID");
+    setUserID(userID);
+  }, []);
 
   const fetchRequisitionData = async () => {
     try {
@@ -24,6 +31,7 @@ export const ApplyEmployReq = () => {
   
       let allRequisitions = [];
       let nextToken = null;
+      let hasMoreData = true;
   
       do {
         const response = await client.graphql({
@@ -40,7 +48,8 @@ export const ApplyEmployReq = () => {
         allRequisitions = [...allRequisitions, ...fetchedData];
   
         nextToken = response?.data?.listEmpRequisitions?.nextToken;
-      } while (nextToken);
+        hasMoreData = !!nextToken;
+      } while (hasMoreData);
   
       setRequisitionData(allRequisitions);
       setError(null);
@@ -58,11 +67,11 @@ export const ApplyEmployReq = () => {
 
   const handleViewClick = (request) => {
     setSelectedRequest(request);
+    
     setIsReviewFormVisible(true);
   };
 
   const handleReviewFormClose = () => {
-    setSelectedRequest(null);
     setIsReviewFormVisible(false);
   };
 
@@ -168,7 +177,7 @@ export const ApplyEmployReq = () => {
                   ))}
               </tbody>
             </table>
-          </div>
+          </div> 
         ) : (
           <p className="text-center py-4">No Requisitions Found</p>
         )}
@@ -177,7 +186,7 @@ export const ApplyEmployReq = () => {
         {isFormVisible && (
           <div className="fixed inset-0 bg-grey bg-opacity-75 flex items-center justify-center z-50">
             <div className="bg-white p-8 rounded-lg shadow-lg w-[90%] max-w-xl">
-              <EmpRequisitionForm onClose={() => setIsFormVisible(false)} />
+              <EmpRequisitionForm userID={userID} onClose={() => setIsFormVisible(false)} />
             </div>
           </div>
         )}

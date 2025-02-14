@@ -15,7 +15,6 @@ export const LOIForm = ({ candidate }) => {
   const { localMobilization, isLoading, error } =
     LocalMobilization();
   const { loiDetails } = UpdateLoiData();
-  const { IVSSDetails } = useContext(DataSupply);
   const { interviewDetails } = UpdateInterviewData();
   const { mergedInterviewData } = useFetchInterview();
   const [notification, setNotification] = useState(false);
@@ -50,49 +49,25 @@ export const LOIForm = ({ candidate }) => {
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
-      return url.split("/").pop(); // Extract the file name from URL
+      return url.split("/").pop(); 
     }
     return "";
   };
 
   const handleFileChange = async (e, type) => {
     const file = e.target.files[0];
-    setValue(type, file); // Set file value for validation
+    setValue(type, file); 
     if (file) {
       if (type === "loiFile") {
         await uploadDocs(file, "loiFile", setUploadedLOI, "personName");
         setUploadedFileNames((prev) => ({
           ...prev,
-          loiFile: file.name, // Store the file name for display
+          loiFile: file.name, 
         }));
       }
     }
   };
 
-  // Handle form submission for creating a new LOI
-  // const onSubmit = async (data) => {
-  //   const selectedInterviewData = mergedInterviewData.find(
-  //     (data) => data.tempID === candidate?.tempID
-  //   );
-
-  //   const interviewScheduleId = selectedInterviewData?.id;
-
-  //   const formattedData = {
-  //     loiIssueDate: data.loiIssueDate,
-  //     loiAcceptDate: data.loiAcceptDate,
-  //     loiDeclineDate: data.loiDeclineDate,
-  //     declineReason: data.declineReason,
-  //     loiFile: uploadedLOI.loiFile,
-  //     tempID: candidate.tempID,
-  //   };
-
-  //   // Call the createLOI function from the custom hook
-  //   try {
-  //     await localMobilization(formattedData);
-  //   } catch (err) {
-  //     console.error("LOI creation failed:", err);
-  //   }
-  // };
 
   // Handle form submission for updating an existing LOI
   const handleSubmitTwo = async (e) => {
@@ -117,7 +92,7 @@ export const LOIForm = ({ candidate }) => {
     };
 
     const interStatus = {
-      id: interviewScheduleId, // Dynamically use the correct id
+      id: interviewScheduleId, 
       department: formData.interview.department,
       otherDepartment: formData.interview.otherDepartment,
       status: formData.interview.status,

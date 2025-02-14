@@ -17,6 +17,7 @@ export const GroupHSData = () => {
     "Date of Join",
     "Nationality",
     "Department",
+    "Other Department",
     "Position",
     "Group H&S Insurance",
     "Group H&S Insurance Enrollment Effective Date",
@@ -53,8 +54,15 @@ export const GroupHSData = () => {
       dateOfJoin: DateFormat(item.doj),
 
         nationality: item.nationality || "-",
-        department: item.department || "-",
-        position: item.position || "-",
+         department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
         groupIns: item.groupIns || "-",
         groupInsEffectDate: Array.isArray(item.groupInsEffectDate)
           ? DateFormat(
@@ -105,8 +113,15 @@ export const GroupHSData = () => {
       dateOfJoin: DateFormat(item.doj),
 
         nationality: item.nationality || "-",
-        department: item.department || "-",
-        position: item.position || "-",
+         department: Array.isArray(item.department)
+          ? item.department[item.department.length - 1]
+          : "-",
+          otherDepartment:Array.isArray(item.otherDepartment)
+          ? item.otherDepartment[item.otherDepartment.length - 1]
+          : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
         groupIns: item.groupIns || "-",
         groupInsEffectDate: Array.isArray(item.groupInsEffectDate)
           ? DateFormat(
