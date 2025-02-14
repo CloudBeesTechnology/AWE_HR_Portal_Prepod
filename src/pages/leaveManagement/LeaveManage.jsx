@@ -13,7 +13,7 @@ export const LeaveManage = () => {
   const [selectedTicketData, setSelectedTicketData] = useState(null);
   const [userType, setUserType] = useState("");
   const [userID, setUserID] = useState("");
-
+ 
   const {
     mergedData,
     handleDeleteLeaveStatus,
