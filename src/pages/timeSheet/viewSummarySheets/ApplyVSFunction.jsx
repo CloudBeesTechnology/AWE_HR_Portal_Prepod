@@ -128,7 +128,7 @@ export const ApplyVSFunction = ({
         const grouped = Object.values(
           groupBySapNo(convertedStringToArrayObj || [])
         );
-        console.log("grouped : ", grouped);
+     
         const seperateDateMethod = (inputData) => {
           return inputData
             .map((entry) => {
@@ -176,8 +176,9 @@ export const ApplyVSFunction = ({
                     dateObj.getMonth() + 1
                   }`;
                   const YearKey = `${dateObj.getFullYear()}`;
-                  const key = `${emp.empBadgeNo}-${emp.fidNo}-${location}-${jobcode}-${YearKey}`;
+
                   // const key = `${emp.empBadgeNo}-${emp.fidNo}-${location}-${jobcode}-${monthYearKey}`;
+                  const key = `${emp.empBadgeNo}-${emp.fidNo}-${location}-${jobcode}-${YearKey}`;
 
                   if (!groupedData.has(key)) {
                     groupedData.set(key, {
@@ -610,7 +611,7 @@ export const ApplyVSFunction = ({
         const updatedData = await updateFieldBasedOnConditions(
           addLeaveTypeCount
         );
-        console.log("addLeaveTypeCount : ", addLeaveTypeCount);
+       
         const getSummaryUpdaterName = async (updatedData) => {
           const results = await Promise.all(
             updatedData.map(async (val) => {
@@ -798,7 +799,7 @@ export const ApplyVSFunction = ({
             assignUpdaterDateTime: assignUpdaterDateTime,
           };
         }).filter(Boolean);
-
+      
         await ProcessedDataFunc(transformedData);
       };
       if (convertedStringToArrayObj && convertedStringToArrayObj.length > 0) {

@@ -9,10 +9,7 @@ import { sendEmail } from "../../services/EmailServices";
 import { FaArrowLeft } from "react-icons/fa";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { useTempID } from "../../utils/TempIDContext";
-import { ContractFormSchema } from "../../services/ReportValidation";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
-
+import { useCreateNotification } from "../../hooks/useCreateNotification";
 
 export const ContractFormPDF = ({ contentRef }) => {
   const { contractForm } = ContractForm();
@@ -21,6 +18,7 @@ export const ContractFormPDF = ({ contentRef }) => {
   const { contractForms, workInfoData, empPIData } = useContext(DataSupply);
   const location = useLocation();
   const { employeeData } = location.state || {};
+  const { createNotification } = useCreateNotification();
   const [userID, setUserID] = useState("");
   const [userType, setUserType] = useState("");
   const [showTitle, setShowTitle] = useState("");
@@ -30,10 +28,9 @@ export const ContractFormPDF = ({ contentRef }) => {
     managerEmpID: "",
     managerOfficialMail: "",
     managerName: "",
-    hrEmail: "Hr-notification@adininworks.com",
+    hrEmail: "hr-notification@adininworks.com",
     genManagerEmail: "",
   });
-
 
   const [formData, setFormData] = useState({
     contract: {
@@ -43,17 +40,15 @@ export const ContractFormPDF = ({ contentRef }) => {
       hrManager: "",
       genManager: "",
       remarks: "",
-        remarkHr: "",
-        remarkGm: "",
-        renewalContract:"",
+      remarkHr: "",
+      remarkGm: "",
+      renewalContract: "",
       status: "",
+      createdAt: "",
     },
   });
 
-  const currentDate = new Date();
-  const monthName = currentDate.toLocaleString("en-US", { month: "long" });
-  const year = currentDate.getFullYear();
-
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
@@ -65,13 +60,16 @@ export const ContractFormPDF = ({ contentRef }) => {
     }));
   };
 
+  const currentDate = new Date();
+  const monthName = currentDate.toLocaleString("en-US", { month: "long" });
+  const year = currentDate.getFullYear();
+
   useEffect(() => {
     const userID = localStorage.getItem("userID");
     setUserID(userID);
     const userType = localStorage.getItem("userType");
     setUserType(userType);
   }, []);
-
 
   useEffect(() => {
     // Step 1: Extract managerEmpID from workInfoData based on employeeData.empID
@@ -80,7 +78,7 @@ export const ContractFormPDF = ({ contentRef }) => {
         (data) => data.empID === employeeData.empID
       );
       if (workInfo) {
-        const managerEmpID = workInfo.manager; 
+        const managerEmpID = workInfo.manager;
         setManagerData((prevData) => ({
           ...prevData,
           managerEmpID: managerEmpID,
@@ -130,7 +128,6 @@ export const ContractFormPDF = ({ contentRef }) => {
     }
   }, [workInfoData, employeeData?.empID, empPIData]);
 
-
   useEffect(() => {
     if (contractForms.length > 0) {
       const contractData = contractForms.find(
@@ -145,9 +142,9 @@ export const ContractFormPDF = ({ contentRef }) => {
             genManager: contractData.genManager,
             remarks: contractData.remarks,
             remarkHr: contractData.remarkHr,
-            remarkGm: contractData.remarkGm, 
-            createdAt: contractData.createdAt, 
-            renewalContract: contractData.renewalContract,  
+            remarkGm: contractData.remarkGm,
+            createdAt: contractData.createdAt,
+            renewalContract: contractData.renewalContract,
           },
         });
       }
@@ -158,12 +155,12 @@ export const ContractFormPDF = ({ contentRef }) => {
   const from = "hr_no-reply@adininworks.com";
 
   const handleSubmit = async () => {
-
     const selectedData = contractForms.find(
       (data) => data.empID === employeeData?.empID
     );
-    
 
+    // console.log("SELECTED DATA", selectedData);
+    
     const createFormattedData = {
       empID: employeeData.empID,
       conAttn: formData.contract.conAttn,
@@ -172,11 +169,10 @@ export const ContractFormPDF = ({ contentRef }) => {
       genManager: formData.contract.genManager,
       remarks: formData.contract.remarks,
       remarkHr: formData.contract.remarkHr,
-      remarkGm: formData.contract.remarkGm, 
-      renewalContract: formData.contract.renewalContract,  
+      remarkGm: formData.contract.remarkGm,
+      renewalContract: formData.contract.renewalContract,
       contStatus: true,
     };
-
 
     const empPIRecord = empPIData.find(
       (match) => match?.empID === selectedData?.empID
@@ -186,8 +182,7 @@ export const ContractFormPDF = ({ contentRef }) => {
       (match) => match?.empID === selectedData?.empID
     );
 
-    console.log(WorkInfoRecord, empPIRecord);
-    
+    // console.log("EMPData",empPIRecord);
 
     const probationEndFormatted =
       Array.isArray(WorkInfoRecord?.probationEnd) &&
@@ -197,6 +192,24 @@ export const ContractFormPDF = ({ contentRef }) => {
             .reverse()
             .join("/")
         : "Not mentioned";
+
+    const notifyMessageGM = `Your Employee Mr./Ms. ${
+      empPIRecord?.name || "Not mentioned"
+    }'s contract period ending on ${probationEndFormatted || "Not Mentioned"},
+      has been confirmed by the GENERAL MANAGER.
+      `;
+
+    const notifyMessageHR = `Your Employee Mr./Ms. ${
+      empPIRecord?.name || "Not mentioned"
+    }'s contract period ending on ${probationEndFormatted || "Not Mentioned"},
+      has been verified and checked by HR.`;
+
+    const notifyMessageManager = `Your Employee Mr./Ms. ${
+      empPIRecord?.name || "Not mentioned"
+    }'s contract period ending on ${probationEndFormatted || "Not Mentioned"},
+      has been reviewed and added remarks by Manager, ${
+        managerData?.managerName || "Not Mentioned"
+      }.`;
 
     try {
       if (selectedData) {
@@ -208,11 +221,11 @@ export const ContractFormPDF = ({ contentRef }) => {
           genManager: formData.contract.genManager,
           remarks: formData.contract.remarks,
           remarkHr: formData.contract.remarkHr,
-          remarkGm: formData.contract.remarkGm, 
-          renewalContract: formData.contract.renewalContract,  
+          remarkGm: formData.contract.remarkGm,
+          renewalContract: formData.contract.renewalContract,
           contStatus: true,
         };
-       
+
         if (userType === "HR" && !formData.contract.hrManager) {
           alert("HR Name is is required!");
           return;
@@ -237,9 +250,9 @@ export const ContractFormPDF = ({ contentRef }) => {
                  Your Employee Mr./Ms. ${
                    empPIRecord?.name || "Not mentioned"
                  }'s contract period ending on ${
-              probationEndFormatted || "Not Mentioned"
-            },
-               <br/>
+                  probationEndFormatted || "Not Mentioned"
+                  },
+                 <br/>
                   has been verified and checked by HR.
                </p>
               <p>Click here https://hr.adininworks.co" to view the updates.</p>
@@ -248,6 +261,15 @@ export const ContractFormPDF = ({ contentRef }) => {
             from,
             managerData.genManagerEmail
           );
+
+          await createNotification({
+            empID: employeeData.empID,
+            leaveType: subject,
+            message: notifyMessageHR,
+            senderEmail: "hr_no-reply@adininworks.com",
+            receipentEmail: managerData.genManagerEmail,
+          });
+
         } else if (userType === "Manager" && !gmPosition) {
           sendEmail(
             subject,
@@ -257,12 +279,12 @@ export const ContractFormPDF = ({ contentRef }) => {
                              Your Employee Mr./Ms. ${
                                empPIRecord?.name || "Not mentioned"
                              }'s contract period ending on ${
-              probationEndFormatted || "Not Mentioned"
-            },
-                           <br/>
-                               has been reviewed and added remarks by Manager, ${
-                                managerData?.managerName || "Not Mentioned"
-                              }.
+                              probationEndFormatted || "Not Mentioned"
+                              },
+                              <br/>
+                              has been reviewed and added remarks by Manager, ${
+                              managerData?.managerName || "Not Mentioned"
+                               }.
                            </p>
                           <p>Click here https://hr.adininworks.co" to view the updates.</p>
                        </body>
@@ -271,6 +293,14 @@ export const ContractFormPDF = ({ contentRef }) => {
             // "hariharanofficial2812@gmail.com"
             managerData.hrEmail
           );
+
+          await createNotification({
+            empID: employeeData.empID,
+            leaveType: subject,
+            message: notifyMessageManager,
+            senderEmail: "hr_no-reply@adininworks.com",
+            receipentEmail: managerData.hrEmail,
+          });
         } else if (gmPosition === "GENERAL MANAGER") {
           sendEmail(
             subject,
@@ -280,10 +310,10 @@ export const ContractFormPDF = ({ contentRef }) => {
                  Your Employee Mr./Ms. ${
                    empPIRecord?.name || "Not mentioned"
                  }'s contract period ending on ${
-              probationEndFormatted || "Not Mentioned"
-            },
-               <br/>
-                  been confirmed by the GENERAL MANAGER,
+                 probationEndFormatted || "Not Mentioned"
+                 },
+                 <br/>
+                 has been confirmed by the GENERAL MANAGER,
                </p>
                <p>Please proceed with the necessary actions.</p>
               <p>Click here https://hr.adininworks.co to view the updates.</p>
@@ -293,16 +323,25 @@ export const ContractFormPDF = ({ contentRef }) => {
             managerData.hrEmail
           );
 
+          await createNotification({
+            empID: employeeData.empID,
+            leaveType: subject,
+            message: notifyMessageGM,
+            senderEmail: "hr_no-reply@adininworks.com",
+            receipentEmail: managerData.hrEmail,
+          });
         }
-      } 
-      else {
-
-        if (userType === "Manager" && !gmPosition && !formData.contract.depHead) {
+      } else {
+        if (
+          userType === "Manager" &&
+          !gmPosition &&
+          !formData.contract.depHead
+        ) {
           alert("Manager Name is is required!");
           return;
         }
 
-        await contractForm(createFormattedData);
+        // await contractForm(createFormattedData);
 
         if (userType === "Manager" && !gmPosition) {
           sendEmail(
@@ -313,9 +352,9 @@ export const ContractFormPDF = ({ contentRef }) => {
                              Your Employee Mr./Ms. ${
                                empPIRecord?.name || "Not mentioned"
                              }'s contract period ending on ${
-              probationEndFormatted || "Not Mentioned"
-            },
-                           <br/>
+                              probationEndFormatted || "Not Mentioned"
+                              },
+                              <br/>
                               has been reviewed and added remarks by Manager, ${
                                 managerData?.managerName || "Not Mentioned"
                               }.
@@ -327,6 +366,13 @@ export const ContractFormPDF = ({ contentRef }) => {
             // "hariharanofficial2812@gmail.com"
             managerData.hrEmail
           );
+          await createNotification({
+            empID: employeeData.empID,
+            leaveType: subject,
+            message: notifyMessageManager,
+            senderEmail: "hr_no-reply@adininworks.com",
+            receipentEmail: managerData.hrEmail,
+          });
         }
         // console.log("Create Data", createFormattedData);
         setShowTitle("Contract Form Created Successfully");
@@ -367,15 +413,21 @@ export const ContractFormPDF = ({ contentRef }) => {
           <Link to="/reports" className="text-xl text-start w-[50px] text-grey">
             <FaArrowLeft />
           </Link>
-          
+
+          {/* <div className="text-center text-lg font-bold uppercase  flel-1 w-full">
+            Contract Completion Form for the Month of January 2024
+          </div> */}
+
           <div className="text-center text-lg font-bold uppercase w-full">
-  {formData.contract?.createdAt
-    ? `Contract Completion Form for the Month of ${new Date(formData.contract.createdAt).toLocaleDateString('en-US', {
-        month: 'long',
-        year: 'numeric',
-      })}`
-    : `Contract Completion Form for the Month of ${monthName} ${year}`}
-</div>
+            {formData.contract?.createdAt
+              ? `Contract Completion Form for the Month of ${new Date(
+                  formData.contract.createdAt
+                ).toLocaleDateString("en-US", {
+                  month: "long",
+                  year: "numeric",
+                })}`
+              : `Contract Completion Form for the Month of ${monthName} ${year}`}
+          </div>
         </div>
 
         <div className="mb-16 mt-16">
@@ -391,23 +443,23 @@ export const ContractFormPDF = ({ contentRef }) => {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="min-w-full table-auto border-collapse border border-black">
+          <table className="min-w-full text-center table-auto border-collapse border border-black">
             <thead>
               <tr>
                 <th className="border border-black p-2">No.</th>
-                <th className="border border-black p-2">Employee Name</th>
-                <th className="border border-black p-2">Emp ID</th>
-                <th className="border border-black p-2">Badge No.</th>
+                <th className="border border-black p-2 py-2 px-[30px]">Employee Name</th>
+                <th className="border border-black p-2 py-2 px-[30px]">Emp ID</th>
+                <th className="border border-black py-2 px-[40px]">Badge No.</th>
                 <th className="border border-black p-2">Position</th>
                 <th className="border border-black p-2">Department</th>
                 <th className="border border-black p-2">Nationality</th>
-                <th className="border border-black p-2">Date Of Join</th>
-                <th className="border border-black p-2">Contract Start Date</th>
-                <th className="border border-black p-2">Contract End Date</th>
-                <th className="border border-black p-2">LD Expiry</th>
-                <th className="border border-black p-2">
+                <th className="border border-black py-2 px-[40px]">Date Of Join</th>
+                <th className="border border-black py-2 px-[30px]">Contract Start Date</th>
+                <th className="border border-black py-2 px-[30px]">Contract End Date</th>
+                <th className="border border-black py-2 px-[30px]">LD Expiry</th>
+                <th className="border border-black py-2 px-[30px]">
                   Duration of Renewal Contract
-                </th>               
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -445,16 +497,16 @@ export const ContractFormPDF = ({ contentRef }) => {
                     {employeeData?.nlmsEmpApproval || "N/A"}
                   </td>
                   <td className="border border-black p-2 h-full ">
-  <input
-    type="text"
-    className="border outline-none border-none p-1 w-full h-full"
-    name="renewalContract"
-    value={formData.contract.renewalContract}
-    onChange={handleInputChange}
-    disabled={userType !== "Manager"}
-    // defaultValue={employeeData?.contract || ""}
-  />
-</td>
+                    <input
+                      type="text"
+                      className="border outline-none border-none p-1 w-full h-full"
+                      name="renewalContract"
+                      value={formData.contract.renewalContract}
+                      onChange={handleInputChange}
+                      disabled={userType !== "Manager"}
+                      // defaultValue={employeeData?.contract || ""}
+                    />
+                  </td>
 
                   {/* <td className="border border-black p-2">
                     {employeeData?.ldEx || "N/A"}
@@ -464,7 +516,6 @@ export const ContractFormPDF = ({ contentRef }) => {
                   </td> */}
                 </tr>
               ))}
-                 
             </tbody>
           </table>
         </div>
@@ -476,7 +527,7 @@ export const ContractFormPDF = ({ contentRef }) => {
             of Contract Completion Report
           </p>
         </div>
-      
+
         {/* Remarks Section */}
         <div className="mt-7">
           <label className="text-sm font-semibold">Remarks Manager:</label>
@@ -485,7 +536,7 @@ export const ContractFormPDF = ({ contentRef }) => {
             name="remarks"
             value={formData.contract.remarks}
             onChange={handleInputChange}
-            disabled={userType !== "Manager"} 
+            disabled={userType !== "Manager"}
             className="border w-full text-sm font-semibold rounded resize-none outline-none p-2"
           />
         </div>
@@ -496,7 +547,7 @@ export const ContractFormPDF = ({ contentRef }) => {
             name="remarkHr"
             value={formData.contract.remarkHr}
             onChange={handleInputChange}
-            disabled={userType !== "HR"} 
+            disabled={userType !== "HR"}
             className="border w-full text-sm font-semibold rounded resize-none outline-none p-2"
           />
         </div>
@@ -507,14 +558,13 @@ export const ContractFormPDF = ({ contentRef }) => {
             name="remarkGm"
             value={formData.contract.remarkGm}
             onChange={handleInputChange}
-            disabled={gmPosition !== "GENERAL MANAGER"} 
+            disabled={gmPosition !== "GENERAL MANAGER"}
             className="border w-full text-sm font-semibold rounded resize-none outline-none p-2"
           />
         </div>
 
         {/* Footer */}
         <div className="mt-20 flex justify-between items-center">
-          
           <div className="text-center">
             <p className="font-semibold mb-5">Recommended By:</p>
             <input
@@ -522,7 +572,7 @@ export const ContractFormPDF = ({ contentRef }) => {
               name="depHead"
               value={formData.contract.depHead}
               onChange={handleInputChange}
-              disabled={userType !== "Manager"} 
+              disabled={userType !== "Manager"}
               className="border-b-2 border-black w-56 mx-auto outline-none text-center"
             />
 
@@ -536,7 +586,7 @@ export const ContractFormPDF = ({ contentRef }) => {
               name="hrManager"
               value={formData.contract.hrManager}
               onChange={handleInputChange}
-              disabled={userType !== "HR"} 
+              disabled={userType !== "HR"}
               className="border-b-2 border-black w-56 mx-auto outline-none text-center"
             />
 
@@ -549,7 +599,7 @@ export const ContractFormPDF = ({ contentRef }) => {
               name="genManager"
               value={formData.contract.genManager}
               onChange={handleInputChange}
-              disabled={gmPosition !== "GENERAL MANAGER"} 
+              disabled={gmPosition !== "GENERAL MANAGER"}
               className="border-b-2 border-black w-56 mx-auto outline-none text-center"
             />
 

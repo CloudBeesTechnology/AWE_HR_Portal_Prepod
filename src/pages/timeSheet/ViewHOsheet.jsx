@@ -1219,7 +1219,7 @@ export const ViewHOsheet = ({
                       //       console.log("Batch deletion completed.");
                       //     } while (nextToken); // Continue fetching until no more data
                       //     console.log(
-                      //       "All SBW items deletion process completed."
+                      //       "All HO items deletion process completed."
                       //     );
                       //   } catch (fetchError) {
                       //     console.error(

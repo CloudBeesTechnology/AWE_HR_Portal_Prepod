@@ -30,7 +30,6 @@ export const LoadingMessRejectTab = ({ finalData }) => {
       };
       fetchData();
     } else if (Position !== "Manager" && finalData && finalData.length === 0) {
-      
       setLoadingState({
         isLoading: true,
         message: "No Data Available",
@@ -41,6 +40,8 @@ export const LoadingMessRejectTab = ({ finalData }) => {
         message: "Please wait few seconds...",
       });
     }
+
+  
   }, [finalData, Position]);
 
   return { wholeData, loadingState, showRejectTable };

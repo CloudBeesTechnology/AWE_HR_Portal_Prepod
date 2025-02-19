@@ -372,7 +372,7 @@ export const ViewSBWsheet = ({
     }
   };
 
-  const handleManagerReload = async() => {
+  const handleManagerReload = async () => {
     let mergedData = [...allApprovedData, ...allRejectedData];
     const remainingData = data?.filter(
       (row) => !mergedData.some((selected) => selected.id === row.id)
@@ -520,7 +520,7 @@ export const ViewSBWsheet = ({
         setAllApprovedData,
         setAllRejectedData,
         // handleManagerReload,
-        storeApproveRej
+        storeApproveRej,
       });
 
       if (notifiyCenterData && notifiyCenterData.length > 0) {
@@ -554,7 +554,7 @@ export const ViewSBWsheet = ({
         );
 
         storeApproveRej = [];
-      await handleManagerReload();
+        await handleManagerReload();
       }
     } else if (
       userIdentification !== "Manager" &&

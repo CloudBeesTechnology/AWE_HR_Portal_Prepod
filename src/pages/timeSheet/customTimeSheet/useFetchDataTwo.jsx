@@ -55,12 +55,12 @@ export const useFetchDataTwo = (titleName, cardName) => {
         } while (nextToken);
 
         if (allData.length === 0) {
-          setFinalData(null);
+          setFinalData([]);
         } else {
           setFinalData(allData);
         }
       } catch (error) {
-        setFinalData(null);
+        setFinalData([]);
       } finally {
         setLoading(false);
       }

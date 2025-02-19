@@ -13,10 +13,21 @@ export const FilterForTimeSheet = ({
     setSelectedFilter(filter);
     handleFilterChange(filter);
   };
+
   const filterOptions =
     Position === "Manager"
       ? ["All Records", "Pending", "Approved", "Verified", "Rejected"]
+      : Position === "SuperAdmin"
+      ? [
+          "All Records",
+          "Unsubmitted",
+          "Pending",
+          "Approved",
+          "Verified",
+          "Rejected",
+        ]
       : ["All Records", "Unsubmitted", "Approved", "Verified", "Rejected"];
+
   return (
     <section className="w-fit grid grid-cols-1">
       <div
