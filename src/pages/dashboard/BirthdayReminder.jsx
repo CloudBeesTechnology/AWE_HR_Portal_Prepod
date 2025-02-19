@@ -57,7 +57,7 @@ export const BirthdayReminder = () => {
   }, [birthdays]);
 
   return (
-    <div className="max-w-md w-full shadow-md rounded-2xl h-full bg-white">
+    <div className="max-w-md w-full shadow-md rounded-2xl bg-white h-[100%] overflow-hidden">
       <div className="bg-lite_grey p-4 rounded-t-2xl">
         <h2 className="text-lg font-semibold">Birthday Reminder</h2>
       </div>
@@ -85,7 +85,7 @@ export const BirthdayReminder = () => {
             </div>
           ))}
           {birthdays.length > 0 && (
-            <button onClick={() => setShowModal(true)} className="text-[green] underline mt-4">
+            <button onClick={() => setShowModal(true)} className="text-[green] underline ">
               View More
             </button>
           )}

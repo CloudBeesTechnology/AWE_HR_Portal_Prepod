@@ -1,11 +1,11 @@
 import React, { useEffect, useCallback } from "react";
-import { Round } from "./Round";
+import { ApplicationReceived} from "./ApplicationReceived";
 import { PathHead } from "./PathHead";
-import { NewsEvent } from "./NewsEvent";
+import { RecentNotify } from "./RecentNotify";
 import { NewJoineeTable } from "./NewJoineeTable";
 import { BirthdayReminder } from "./BirthdayReminder";
 import { UserProgress } from "./UserProgress ";
-import usePermission  from "../../hooks/usePermissionDashInside";
+import usePermission from "../../hooks/usePermissionDashInside";
 
 export const Dashboard = () => {
   const dashboardPermissions = usePermission("userID", "Dashboard");
@@ -20,38 +20,40 @@ export const Dashboard = () => {
   // Memoized component rendering function
   const renderComponent = useCallback(() => {
     return (
-      <>
-        {dashboardPermissions.includes("Employee count") && <PathHead />}
-        <div className="flex gap-2 px-3 my-5 w-full">
+      <div className="flex flex-col">
+        {dashboardPermissions.includes("Employee count") && (
+          <div>
+            <PathHead />
+          </div>
+        )}
+        <div className="flex gap-2 px-3 w-full">
           {/* Column 1: Recent Notifications */}
           {dashboardPermissions.includes("Recent Notifications") && (
-            <div className="flex-1 w-full ">
-              <div className="w-full h-full">
-                <NewsEvent />
-              </div>
+            <div className="flex-1 w-full">
+              <RecentNotify />
             </div>
           )}
 
           {/* Column 2: Attendance */}
           {dashboardPermissions.includes("Application Received") && (
-            <div className="flex-1 w-full">
-              <div className="w-full h-full">
-                <Round />
+            
+              <div className="w-full flex-1">
+                <ApplicationReceived/>
               </div>
-            </div>
+           
           )}
 
           {/* Column 3: User Action and Birthday Reminder */}
           {(dashboardPermissions.includes("User Action") ||
             dashboardPermissions.includes("Birthday Reminder")) && (
-            <div className="flex-1 gap-4 pb-1 flex flex-col justify-between items-end overflow-hidden px-1">
+            <div className="flex-1 gap-2 pb-1 flex flex-col justify-between items-end h-full px-1">
               {dashboardPermissions.includes("User Action") && (
-                <div className="w-full">
+                <div className="w-full flex-1">
                   <UserProgress />
                 </div>
               )}
               {dashboardPermissions.includes("Birthday Reminder") && (
-                <div className="w-full h-full">
+                <div className="w-full flex-1">
                   <BirthdayReminder />
                 </div>
               )}
@@ -60,8 +62,8 @@ export const Dashboard = () => {
         </div>
 
         {/* New Joinee Table */}
-        {dashboardPermissions.includes("New Joinee") && <NewJoineeTable />}
-      </>
+        {dashboardPermissions.includes("New Joinee") && <div> <NewJoineeTable /></div>}
+      </div>
     );
   }, [dashboardPermissions]);
 

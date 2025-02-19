@@ -1,4 +1,3 @@
-
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 
 export const Pagination = ({ totalPages, currentPage, paginate }) => {
@@ -13,7 +12,6 @@ export const Pagination = ({ totalPages, currentPage, paginate }) => {
 
   return (
     <div className="pagination flex justify-center space-x-5 ">
-      {/* Previous Button */}
       <div
         onClick={() => paginate(currentPage - 1)}
         className={` py-1.5 flex items-center justify-center space-x-2 rounded-lg border border-dark_ash bg-white cursor-pointer w-28 ${

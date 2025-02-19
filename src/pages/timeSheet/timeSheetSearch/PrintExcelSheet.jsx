@@ -5,31 +5,25 @@ export const PrintExcelSheet = (
   formattedStartDate,
   formattedEndDate
 ) => {
-  // Get the table by its ID
   const table = document.getElementById(downloadTable);
-  // console.log(downloadTable)
+
   if (!table) {
-    // console.error("Table with the given ID not found");
     return;
   }
 
-  // Create a hidden iframe
   const iframe = document.createElement("iframe");
   iframe.style.position = "absolute";
   iframe.style.width = "0";
   iframe.style.height = "0";
   iframe.style.border = "none";
 
-  // Append the iframe to the document body
   document.body.appendChild(iframe);
 
-  // Write content to the iframe
   const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
   iframeDoc.open();
   iframeDoc.write("<html><head><title>Print Table</title>");
   iframeDoc.write("<style>");
 
-  // Add custom styles for the table, logo, and text content
   iframeDoc.write(`
       body { font-family: Arial, sans-serif; margin: 20px; }
       .content { margin-bottom: 20px; }
@@ -42,7 +36,6 @@ export const PrintExcelSheet = (
   iframeDoc.write("</style>");
   iframeDoc.write("</head><body>");
 
-  // Add logo and text content
   iframeDoc.write(`
       <div class="content">
         <img src=${img} class="logo" alt="Logo"> 
@@ -51,16 +44,13 @@ export const PrintExcelSheet = (
       </div>
     `);
 
-  // Append the table content into the iframe's body
-  iframeDoc.body.appendChild(table.cloneNode(true)); // Clone the table to avoid affecting the original
+  iframeDoc.body.appendChild(table.cloneNode(true));
   iframeDoc.write("</body></html>");
   iframeDoc.close();
 
-  // Trigger the print dialog in the iframe
   iframe.contentWindow.focus();
   iframe.contentWindow.print();
 
-  // Remove the iframe after printing
   setTimeout(() => {
     document.body.removeChild(iframe);
   }, 1000);

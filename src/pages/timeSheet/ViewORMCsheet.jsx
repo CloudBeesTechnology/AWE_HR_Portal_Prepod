@@ -26,6 +26,8 @@ import { listTimeSheets } from "../../graphql/queries";
 import { deleteTimeSheet } from "../../graphql/mutations";
 import { useRowSelection } from "./customTimeSheet/useRowSelection";
 import { useNavigate } from "react-router-dom";
+import { useCreateNotification } from "../../hooks/useCreateNotification";
+import { TimeSheetSpinner } from "./customTimeSheet/TimeSheetSpinner";
 
 const client = generateClient();
 export const ViewORMCsheet = ({
@@ -36,7 +38,7 @@ export const ViewORMCsheet = ({
 
   Position,
   fileName,
-  defaultValue,
+  // defaultValue,
   showRejectedItemTable,
   submittedData,
   wholeData,
@@ -47,7 +49,7 @@ export const ViewORMCsheet = ({
   const [closePopup, setClosePopup] = useState(false);
   const [data, setData] = useState(null);
   const [secondaryData, setSecondaryData] = useState(null);
-  const [currentStatus, setCurrentStatus] = useState(defaultValue);
+  const [currentStatus, setCurrentStatus] = useState(null);
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedItemsTwo, setCheckedItemsTwo] = useState({});
   const [editFormTitle, setEditFormTitle] = useState("");
@@ -62,7 +64,7 @@ export const ViewORMCsheet = ({
   const [userIdentification, setUserIdentification] = useState("");
   const [showStatusCol, setShowStatusCol] = useState(null);
   const [successMess, setSuccessMess] = useState(null);
-  const [response, setResponse] = useState(null);
+
   const [toggleForRemark, setToggleForRemark] = useState(null);
   const [allApprovedData, setAllApprovedData] = useState([]);
   const [allRejectedData, setAllRejectedData] = useState([]);
@@ -80,7 +82,7 @@ export const ViewORMCsheet = ({
 
   const { selectedRows, setSelectedRows, handleCheckboxChange, handleSubmit } =
     useRowSelection();
-
+  const { createNotification } = useCreateNotification();
   useEffect(() => {
     try {
       if (processedData && processedData.length > 0) {
@@ -95,9 +97,7 @@ export const ViewORMCsheet = ({
       const result = await searchedData;
       // setData(result);
       setSearchQuery(result);
-    } catch (error) {
-      // console.error("Error fetching user data:", error);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -133,9 +133,7 @@ export const ViewORMCsheet = ({
                 typeof info === "string" ? JSON.parse(info) : info
               );
             }
-          } catch (error) {
-            // console.error("Error parsing empWorkInfo for ID:", val.id, error);
-          }
+          } catch (error) {}
           return {
             id: val.id,
             fileName: val.fileName,
@@ -170,7 +168,6 @@ export const ViewORMCsheet = ({
       const checkKeys = async () => {
         const convertKeys = (obj) => {
           return Object.keys(obj).reduce((acc, key) => {
-            // Remove spaces and special characters, and convert to lowercase
             const newKey = key.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
             acc[newKey] = obj[key];
             return acc;
@@ -211,7 +208,7 @@ export const ViewORMCsheet = ({
         const result = await checkedKeys();
 
         setClosePopup(true);
-        setCurrentStatus(result); // Assuming setCurrentStatus is defined
+        setCurrentStatus(result);
         setShowStatusCol(result);
         // setLoading(false);
       };
@@ -221,6 +218,7 @@ export const ViewORMCsheet = ({
       } else if (!returnedTHeader && showRejectedItemTable !== "Rejected") {
         const fetchData = async () => {
           setCurrentStatus(true);
+
           // setLoading(true);
           try {
             const dataPromise = new Promise((resolve, reject) => {
@@ -245,11 +243,11 @@ export const ViewORMCsheet = ({
           }
         };
 
-        // Call the fetchData function asynchronously
         fetchData();
       } else if (!returnedTHeader && showRejectedItemTable === "Rejected") {
         const fetchData = async () => {
           setCurrentStatus(true);
+          setRejectTab(true);
           // setLoading(true);
           try {
             const dataPromise = new Promise((resolve, reject) => {
@@ -274,14 +272,19 @@ export const ViewORMCsheet = ({
           }
         };
 
-        // Call the fetchData function asynchronously
         fetchData();
       } else {
         setCurrentStatus(false);
         setLoading(false);
       }
     } catch (err) {}
-  }, [returnedTHeader, ManagerData, userIdentification, showRejectedItemTable]);
+  }, [
+    returnedTHeader,
+    ManagerData,
+    wholeData,
+    userIdentification,
+    showRejectedItemTable,
+  ]);
   const editBLNG = (data) => {
     setEditObject(data);
   };
@@ -350,18 +353,15 @@ export const ViewORMCsheet = ({
         : editFlatData(data, getObject);
 
       const updatedData = result?.map((item) => {
-        // Check if jobLocaWhrs is a non-null, non-empty array and assign LOCATION if valid
         if (Array.isArray(item?.jobLocaWhrs) && item?.jobLocaWhrs?.length > 0) {
           item.LOCATION = item?.jobLocaWhrs[0]?.LOCATION;
         } else {
-          item.LOCATION = null; // Default to null or any other fallback value
+          item.LOCATION = null;
         }
         return item;
       });
       setData(updatedData);
-    } catch (err) {
-      // console.log(err);
-    }
+    } catch (err) {}
   };
 
   const handleAssignManager = () => {
@@ -376,7 +376,7 @@ export const ViewORMCsheet = ({
     }
   };
 
-  const handleManagerReload = () => {
+  const handleManagerReload = async() => {
     let mergedData = [...allApprovedData, ...allRejectedData];
     const remainingData = data?.filter(
       (row) => !mergedData.some((selected) => selected.id === row.id)
@@ -437,7 +437,7 @@ export const ViewORMCsheet = ({
         };
       });
       let action = "updateStoredData";
-      await TimeSheetsCRUDoperations({
+      const notifiyCenterData = await TimeSheetsCRUDoperations({
         setNotification,
         setShowTitle,
         finalResult,
@@ -449,6 +449,34 @@ export const ViewORMCsheet = ({
         handleAssignManager,
         selectedRows,
       });
+
+      if (notifiyCenterData) {
+        const {
+          subject,
+          message,
+          fromAddress,
+          toAddress,
+          empID,
+          timeKeeperEmpID,
+          ManagerEmpID,
+          managerName,
+          fileType,
+          timeKeeperName,
+          fromDate,
+          untilDate,
+          senderEmail,
+        } = notifiyCenterData;
+        await createNotification({
+          empID: empID,
+          leaveType: `${fileType} excel sheet submitted for Approval`,
+          message: `The ${fileType} timesheet for the period from ${fromDate} until ${untilDate} has been submitted by Timekeeper : 
+          ${timeKeeperName}`,
+          senderEmail: senderEmail,
+          receipentEmail: toAddress,
+          receipentEmpID: empID,
+          status: "Unread",
+        });
+      }
     } else if (userIdentification === "Manager") {
       setNotification(false);
       const MergedData = [...allApprovedData, ...allRejectedData];
@@ -487,7 +515,8 @@ export const ViewORMCsheet = ({
 
       let finalResult = InitialBLNGUpdate;
       let action = "update";
-      await TimeSheetsCRUDoperations({
+      let storeApproveRej = [];
+      const notifiyCenterData = await TimeSheetsCRUDoperations({
         finalResult,
         toggleSFAMessage,
         setStoringMess,
@@ -498,8 +527,43 @@ export const ViewORMCsheet = ({
         setNotification,
         setAllApprovedData,
         setAllRejectedData,
-        handleManagerReload,
+        // handleManagerReload,
+        storeApproveRej,
       });
+
+      if (notifiyCenterData && notifiyCenterData.length > 0) {
+        notifiyCenterData.forEach(
+          async ({
+            subject,
+            message,
+            fromAddress,
+            toAddress,
+            empID,
+            timeKeeperEmpID,
+            ManagerEmpID,
+            managerName,
+            fileType,
+            timeKeeperName,
+            fromDate,
+            untilDate,
+            senderEmail,
+            sheetStatus,
+          }) => {
+            await createNotification({
+              empID: empID,
+              leaveType: `${fileType} Time Sheet ${sheetStatus}`,
+              message: `Your submitted ${fileType} timesheet for the period ${fromDate} to ${untilDate} has been ${sheetStatus} by Manager : ${managerName}.`,
+              senderEmail: senderEmail,
+              receipentEmail: toAddress,
+              receipentEmpID: empID,
+              status: "Unread",
+            });
+          }
+        );
+
+        storeApproveRej = [];
+        await  handleManagerReload();
+      }
     } else if (
       userIdentification !== "Manager" &&
       showRejectedItemTable === "Rejected" &&
@@ -533,9 +597,19 @@ export const ViewORMCsheet = ({
               };
             })
           : [];
-      let finalResult = updatedRejectedItems;
+
+      const Result = updatedRejectedItems.map((val) => {
+        return {
+          ...val,
+          assignTo: managerData.mbadgeNo,
+          assignBy: uploaderID,
+          fromDate: managerData.mfromDate,
+          untilDate: managerData.muntilDate,
+        };
+      });
+      let finalResult = Result;
       let action = "ResubmitRejectedItems";
-      await TimeSheetsCRUDoperations({
+      const notifiyCenterData = await TimeSheetsCRUDoperations({
         setNotification,
         setShowTitle,
         finalResult,
@@ -546,6 +620,34 @@ export const ViewORMCsheet = ({
         handleAssignManager,
         selectedRows,
       });
+      if (notifiyCenterData) {
+        const {
+          subject,
+          message,
+          fromAddress,
+          toAddress,
+          empID,
+          timeKeeperEmpID,
+          ManagerEmpID,
+          managerName,
+          fileType,
+          timeKeeperName,
+          fromDate,
+          untilDate,
+          senderEmail,
+        } = notifiyCenterData;
+
+        await createNotification({
+          empID: empID,
+          leaveType: `Corrected ${fileType} Time Sheet Submitted for Approval`,
+          message: `The ${fileType} timesheet for the period from ${fromDate} until ${untilDate} has been submitted by Timekeeper
+          ${timeKeeperName}`,
+          senderEmail: senderEmail,
+          receipentEmail: toAddress,
+          receipentEmpID: empID,
+          status: "Unread",
+        });
+      }
     }
   };
 
@@ -573,7 +675,7 @@ export const ViewORMCsheet = ({
           empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
           assignBy: uploaderID,
           fileType: "ORMC",
-          status: "All",
+          status: "Unsubmitted",
           companyName: val?.LOCATION,
         };
       });
@@ -645,7 +747,7 @@ export const ViewORMCsheet = ({
     );
 
     setData(afterRemoved);
-    setSecondaryData(afterRemoved);
+    // setSecondaryData(afterRemoved);
     // setAllApprovedData([]);
     // setAllRejectedData([]);
   }, [allApprovedData, allRejectedData, data]);
@@ -653,7 +755,7 @@ export const ViewORMCsheet = ({
     try {
       const [year, month, day] = dateString.split("/");
 
-      return `${month}/${year}/${day}`; // 'M/D/YYYY'
+      return `${month}/${year}/${day}`;
     } catch {}
   };
 
@@ -666,12 +768,12 @@ export const ViewORMCsheet = ({
         filteredData = searchQuery;
       }
       if (startDate && endDate) {
-        const start = new Date(startDate); // Start date as "MM/DD/YYYY"
-        const end = new Date(endDate); // End date as "MM/DD/YYYY"
+        const start = new Date(startDate);
+        const end = new Date(endDate);
 
         // Filter the data array
         filteredData = filteredData.filter((item) => {
-          const itemDate = new Date(item.DATE); // Convert item.DATE to a Date object
+          const itemDate = new Date(item.DATE);
 
           itemDate?.setHours(0, 0, 0, 0);
           start?.setHours(0, 0, 0, 0);
@@ -679,16 +781,14 @@ export const ViewORMCsheet = ({
           return itemDate >= start && itemDate <= end;
         });
       }
-      // Example usage
-      // const startDate = "12/23/2024"; // Start date in "MM/DD/YYYY"
-      // const endDate = "12/25/2024"; // End date in "MM/DD/YYYY"
 
       setData(filteredData);
     }
   }, [startDate, endDate, secondaryData, searchQuery]);
 
+  const itemsPerPage = 25;
   const safeData = data || [];
-  const itemsPerPage = 10;
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentData = safeData.slice(indexOfFirstItem, indexOfLastItem);
@@ -712,7 +812,7 @@ export const ViewORMCsheet = ({
                   searchResult={searchResult}
                   secondaryData={secondaryData}
                   Position={Position}
-                  placeholder="Badge No."
+                  placeholder="Badge No / Name."
                 />
               </div>
             </div>
@@ -863,7 +963,7 @@ export const ViewORMCsheet = ({
                                         if (e.target.checked) {
                                           setCheckedItems((prev) => ({
                                             ...prev,
-                                            [m.id]: e.target.checked, // Toggle the checked state for this specific ID
+                                            [m.id]: e.target.checked,
                                           }));
                                           setCheckedItemsTwo((prev) => ({
                                             ...prev,
@@ -874,7 +974,7 @@ export const ViewORMCsheet = ({
                                         } else {
                                           setCheckedItems((prev) => ({
                                             ...prev,
-                                            [m.id]: false, // Toggle the checked state for this specific ID
+                                            [m.id]: false,
                                           }));
                                           removeExistingData(m, "Approved");
                                         }
@@ -885,12 +985,13 @@ export const ViewORMCsheet = ({
                                     <input
                                       className="h-4 w-4"
                                       type="checkbox"
+                                      checked={checkedItemsTwo[m.id] || false}
                                       onClick={(e) => e.stopPropagation()}
                                       onChange={(e) => {
                                         if (e.target.checked) {
                                           setCheckedItemsTwo((prev) => ({
                                             ...prev,
-                                            [m.id]: e.target.checked, // Toggle the checked state for this specific ID
+                                            [m.id]: e.target.checked,
                                           }));
                                           setCheckedItems((prev) => ({
                                             ...prev,
@@ -902,7 +1003,7 @@ export const ViewORMCsheet = ({
                                         } else {
                                           setCheckedItemsTwo((prev) => ({
                                             ...prev,
-                                            [m.id]: false, // Toggle the checked state for this specific ID
+                                            [m.id]: false,
                                           }));
                                           removeExistingData(m, "Rejected");
                                         }
@@ -920,6 +1021,9 @@ export const ViewORMCsheet = ({
                                 >
                                   <input
                                     type="checkbox"
+                                    disabled={
+                                      !selectedRows.some((r) => r.id === m.id)
+                                    }
                                     checked={selectedRows.some(
                                       (r) => r.id === m.id
                                     )}
@@ -1006,17 +1110,21 @@ export const ViewORMCsheet = ({
                       //     do {
                       //       // Define the filter for fetching SBW data
                       //       const filter = {
-                      //         and: [{ fileType: { eq: "Offshore" } }],
+                      //         and: [{ fileType: { eq: "ORMC" } }],
                       //       };
                       //       // Fetch the BLNG data using GraphQL with pagination
                       //       const response = await client.graphql({
                       //         query: listTimeSheets,
-                      //         variables: { filter: filter, nextToken: nextToken }, // Pass nextToken for pagination
+                      //         variables: {
+                      //           filter: filter,
+                      //           nextToken: nextToken,
+                      //         }, // Pass nextToken for pagination
                       //       });
                       //       // Extract data and nextToken
                       //       const SBWdata =
                       //         response?.data?.listTimeSheets?.items || [];
-                      //       nextToken = response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
+                      //       nextToken =
+                      //         response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
                       //       console.log("Fetched SBW Data:", SBWdata);
                       //       // Delete each item in the current batch
                       //       await Promise.all(
@@ -1079,10 +1187,8 @@ export const ViewORMCsheet = ({
             </div>
           </div>
         ) : currentStatus === false && closePopup === true ? (
-          // {data ? ("True case") : data == false ? ("False case") : ("Default case")}
           <PopupForMissMatchExcelSheet setClosePopup={setClosePopup} />
         ) : (
-          // setShowPopup
           ""
         )}
       </div>
@@ -1139,9 +1245,9 @@ export const ViewORMCsheet = ({
       )}
 
       {notification && (
-        <SpinLogo
+        <TimeSheetSpinner
           text={showTitle}
-          notification={notification}
+          // notification={notification}
           // path="/timesheetSBW"
         />
       )}

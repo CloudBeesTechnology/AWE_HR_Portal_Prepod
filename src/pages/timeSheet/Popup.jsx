@@ -7,7 +7,6 @@ export const Popup = ({
   setEnsureExcelFile,
   setFileName,
   clearUseRefObject,
-
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -27,7 +26,7 @@ export const Popup = ({
                 className="absolute right-2 top-2"
                 onClick={() => {
                   clearUseRefObject();
-                
+
                   setEnsureExcelFile(true);
                   setFileName(null);
                 }}
@@ -41,12 +40,9 @@ export const Popup = ({
                 Error: Please upload CSV or XLS file type only{" "}
               </p>
             </div>
-           )} 
+          )}
         </section>
-     )} 
+      )}
     </div>
- 
- 
   );
 };
-// "border w-72 m-5 border-white rounded shadow-md flex flex-col items-center gap-2 py-5"

@@ -9,6 +9,8 @@ export const EditViewSummary = ({
 }) => {
   const [formData, setFormData] = useState({
     id: summaryObject?.id,
+    data: summaryObject?.data,
+    grouped: summaryObject?.grouped,
     badgeNo: summaryObject?.empBadgeNo || "",
     empName: summaryObject?.empName || "",
     sapNo: summaryObject?.sapNo || "",
@@ -23,12 +25,12 @@ export const EditViewSummary = ({
   });
   let verify = summaryObject.verify || "";
 
-  // Step 2: Handle changes dynamically
+  
   const handleChange = (e) => {
-    const { name, value } = e.target; // Get the name and value from the input
+    const { name, value } = e.target; 
     setFormData({
-      ...formData, // Spread the existing values
-      [name]: value, // Update only the changed fields
+      ...formData, 
+      [name]: value, 
     });
   };
 

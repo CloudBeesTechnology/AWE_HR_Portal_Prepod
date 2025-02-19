@@ -13,7 +13,11 @@ export const Offshore = () => {
   const Position = localStorage.getItem("userType");
 
   const userIdetification =
-    Position === "Manager" ? "Manager" : Position !== "Manager" ? "All" : "";
+    Position === "Manager"
+      ? "Manager"
+      : Position !== "Manager"
+      ? "Unsubmitted"
+      : "";
   const titleName = "Offshore";
   const cardName = userIdetification;
 
@@ -66,21 +70,20 @@ export const Offshore = () => {
   };
 
   useEffect(() => {
-    let timeoutId;
-
     if (Position !== "Manager") {
       const fetchData = async () => {
-        setIsFetching(true); // Start fetching
+        setIsFetching(true);
         try {
-          // Wait for the data to arrive
           const hasData = await new Promise((resolve) => {
-            timeoutId = setTimeout(() => resolve(false), 15000); // Fallback after 30 seconds
             if (
               convertedStringToArrayObj &&
               convertedStringToArrayObj.length > 0
             ) {
-              clearTimeout(timeoutId); // Clear fallback timeout
               resolve(true);
+            } else if (!convertedStringToArrayObj) {
+              setShowing(0);
+            } else if (convertedStringToArrayObj.length === 0) {
+              setShowing(2);
             }
           });
 
@@ -90,17 +93,17 @@ export const Offshore = () => {
             );
             if (finalData && finalData.length > 0) {
               setSubmittedData(pendingData(finalData));
-              setShowing(1); // Data available
+              setShowing(1);
             } else {
-              setShowing(2); // No valid data
+              setShowing(2);
             }
           } else {
-            setShowing(2); // Data not fetched in time
+            setShowing(2);
           }
         } catch (err) {
-          setShowing(2); // Handle error case
+          setShowing(2);
         } finally {
-          setIsFetching(false); // Done fetching
+          setIsFetching(false);
         }
       };
 
@@ -109,8 +112,6 @@ export const Offshore = () => {
       setShowing(null);
       setManagerData(convertedStringToArrayObj);
     }
-
-    return () => clearTimeout(timeoutId); // Cleanup timeout on unmount
   }, [convertedStringToArrayObj, Position]);
 
   return (

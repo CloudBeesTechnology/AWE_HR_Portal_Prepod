@@ -180,7 +180,7 @@ export const useTableFieldData = (titleName) => {
         ],
       };
     }
-    if (type === "ORMC") {
+    if (type === "ORMC" ) {
       return {
         fieldObj: {
           NAME: null,
@@ -232,7 +232,7 @@ export const useTableFieldData = (titleName) => {
         ],
       };
     }
-    if (type === "Offshore") {
+    if (type === "Offshore" || type === "Offshore's ORMC") {
       return {
         fieldObj: {
           NAME: null,
@@ -275,7 +275,6 @@ export const useTableFieldData = (titleName) => {
           "ACTUAL WORKING HOURS",
           "OT",
           "REMARKS",
-          
         ],
       };
     }

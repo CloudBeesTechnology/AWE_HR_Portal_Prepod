@@ -58,12 +58,12 @@ export const HoTBody = ({
                   <td className="text-center px-4 flex-1">
                     {convertToISODate(m.date)}
                   </td>
-                  <td className="text-center px-4 flex-1">{m.onAM}</td>
-                  <td className="text-center px-4 flex-1">{m.offAM}</td>
-                  <td className="text-center px-4 flex-1">{m.onPM}</td>
-                  <td className="text-center px-4 flex-1">{m.offPM}</td>
-                  <td className="text-center px-4 flex-1">{m.inTime}</td>
-                  <td className="text-center px-4 flex-1">{m.outTime}</td>
+                  <td className="text-center px-4 flex-1">{m.onAM || 0}</td>
+                  <td className="text-center px-4 flex-1">{m.offAM || 0}</td>
+                  <td className="text-center px-4 flex-1">{m.onPM || 0}</td>
+                  <td className="text-center px-4 flex-1">{m.offPM || 0}</td>
+                  <td className="text-center px-4 flex-1">{m.inTime || 0}</td>
+                  <td className="text-center px-4 flex-1">{m.outTime || 0}</td>
                   <td className="text-center px-4 flex-1">
                     {m.totalInOut || 0}
                   </td>

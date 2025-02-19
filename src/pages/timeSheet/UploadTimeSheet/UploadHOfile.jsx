@@ -20,13 +20,10 @@ export const UploadHOfile = (
         allSheets.push({ sheetName, data: sheet });
       });
 
-      // console.log(allSheets);
-
       const getResult =
         allSheets &&
         allSheets.map((sheet) => {
           const data = sheet.data;
-          // console.log(data);
 
           var headerSlicedData = data.slice(1, 2);
 
@@ -79,50 +76,31 @@ export const UploadHOfile = (
         }
       };
 
-      // console.log(tableBodyData);
       function cleanKey(key) {
         if (typeof key !== "string") {
-          return key; // Return value if not a string (e.g., number, object)
+          return key;
         }
-        return key.replace(/[^a-zA-Z0-9]/g, ""); // Removes all non-alphanumeric characters
+        return key.replace(/[^a-zA-Z0-9]/g, "");
       }
 
       const formattedData = tableBodyData.map((item) => {
         const cleanedItem = {};
 
         for (const key in item) {
-          const cleanedKey = cleanKey(key); // Clean the key
-          cleanedItem[cleanedKey] = item[key]; // Set the value using the cleaned key
+          const cleanedKey = cleanKey(key);
+          cleanedItem[cleanedKey] = item[key];
         }
 
         return cleanedItem;
       });
 
-      // // const filteHighlightedData = finalData.filter(
-      // //   (item) => item.NAME && item.IN && item.OUT
-      // // );
-      // // console.log(filteHighlightedData);
-
-      // const filterHighlightedData =
-      //   finalData &&
-      //   finalData.map((m) => {
-      //     if ("NAME" in m && "IN" in m && "OUT" in m) {
-      //       return { ...m, data: true };
-      //     } else {
-      //       return { ...m, data: false };
-      //     }
-      //   });
-
       function convertDateFormat(dateStr) {
-        // Split the input string by '/'
         const parts = dateStr.split("/");
 
-        // Validate the input format
         if (parts.length !== 3) {
           throw new Error("Invalid date format. Expected DD/MM/YYYY");
         }
 
-        // Rearrange the parts to MM/DD/YYYY
         const [day, month, year] = parts;
         return `${day}/${month}/${year}`;
       }
@@ -174,7 +152,5 @@ export const UploadHOfile = (
 
     fileInputRef.current.value = "";
     setExcelFile(null);
-  } catch (err) {
-    console.log(err);
-  }
+  } catch (err) {}
 };

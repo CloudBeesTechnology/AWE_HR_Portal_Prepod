@@ -26,6 +26,8 @@ import { deleteTimeSheet } from "../../graphql/mutations";
 import { generateClient } from "@aws-amplify/api";
 import { useRowSelection } from "./customTimeSheet/useRowSelection";
 import { useNavigate } from "react-router-dom";
+import { useCreateNotification } from "../../hooks/useCreateNotification";
+import { TimeSheetSpinner } from "./customTimeSheet/TimeSheetSpinner";
 
 export const ViewSBWsheet = ({
   excelData,
@@ -56,7 +58,7 @@ export const ViewSBWsheet = ({
 
   const [loading, setLoading] = useState(true);
   const [userIdentification, setUserIdentification] = useState("");
-  const [response, setResponse] = useState(null);
+
   const [showStatusCol, setShowStatusCol] = useState(null);
   const [successMess, setSuccessMess] = useState(null);
   const [notification, setNotification] = useState(false);
@@ -74,10 +76,17 @@ export const ViewSBWsheet = ({
 
   let visibleData;
 
-  const { startDate, endDate, searchQuery, setSearchQuery } = useTempID();
+  const {
+    startDate,
+    endDate,
+    searchQuery,
+    setSearchQuery,
+    setGetNotifyCenterData,
+    getNotifyCenterData,
+  } = useTempID();
   const { selectedRows, setSelectedRows, handleCheckboxChange, handleSubmit } =
     useRowSelection();
-
+  const { createNotification } = useCreateNotification();
   const processedData = useTableMerged(excelData);
 
   const mergedData = AutoFetchForAssignManager();
@@ -94,9 +103,7 @@ export const ViewSBWsheet = ({
       const result = await searchedData;
       // setData(result);
       setSearchQuery(result);
-    } catch (error) {
-      // console.error("Error fetching user data:", error);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -132,9 +139,7 @@ export const ViewSBWsheet = ({
                 typeof info === "string" ? JSON.parse(info) : info
               );
             }
-          } catch (error) {
-            // console.error("Error parsing empWorkInfo for ID:", val.id, error);
-          }
+          } catch (error) {}
           return {
             id: val.id,
             fileName: val.fileName,
@@ -169,7 +174,6 @@ export const ViewSBWsheet = ({
     const checkKeys = async () => {
       const convertKeys = (obj) => {
         return Object.keys(obj).reduce((acc, key) => {
-          // Remove spaces and special characters, and convert to lowercase
           const newKey = key.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
           acc[newKey] = obj[key];
           return acc;
@@ -197,7 +201,7 @@ export const ViewSBWsheet = ({
       const result = await checkedKeys();
 
       setClosePopup(true);
-      setCurrentStatus(result); // Assuming setCurrentStatus is defined
+      setCurrentStatus(result);
       setShowStatusCol(result);
       // setLoading(false);
     };
@@ -232,7 +236,6 @@ export const ViewSBWsheet = ({
         }
       };
 
-      // Call the fetchData function asynchronously
       fetchData();
     } else if (!returnedTHeader && showRejectedItemTable === "Rejected") {
       const fetchData = async () => {
@@ -262,13 +265,18 @@ export const ViewSBWsheet = ({
         }
       };
 
-      // Call the fetchData function asynchronously
       fetchData();
     } else {
       setCurrentStatus(false);
       setLoading(false);
     }
-  }, [returnedTHeader, ManagerData, userIdentification, showRejectedItemTable]);
+  }, [
+    returnedTHeader,
+    ManagerData,
+    wholeData,
+    userIdentification,
+    showRejectedItemTable,
+  ]);
   const editBLNG = (data) => {
     setEditObject(data);
   };
@@ -333,25 +341,22 @@ export const ViewSBWsheet = ({
   };
 
   const editSBWFunction = (getObject) => {
-    const result = Array.isArray(data[0]?.data)
-      ? editNestedData(data, getObject)
-      : editFlatData(data, getObject);
+    try {
+      const result = Array.isArray(data[0]?.data)
+        ? editNestedData(data, getObject)
+        : editFlatData(data, getObject);
 
-    const updatedData = result?.map((item) => {
-      // Check if jobLocaWhrs is a non-null, non-empty array and assign LOCATION if valid
-      if (Array.isArray(item?.jobLocaWhrs) && item?.jobLocaWhrs?.length > 0) {
-        item.LOCATION = item?.jobLocaWhrs[0]?.LOCATION;
-      } else {
-        item.LOCATION = null; // Default to null or any other fallback value
-      }
-      return item;
-    });
+      const updatedData = result?.map((item) => {
+        if (Array.isArray(item?.jobLocaWhrs) && item?.jobLocaWhrs?.length > 0) {
+          item.LOCATION = item?.jobLocaWhrs[0]?.LOCATION;
+        } else {
+          item.LOCATION = null;
+        }
+        return item;
+      });
 
-    setData(updatedData);
-
-    // } catch (err) {
-    //   console.log(err);
-    // }
+      setData(updatedData);
+    } catch (err) {}
   };
 
   const handleAssignManager = () => {
@@ -367,7 +372,7 @@ export const ViewSBWsheet = ({
     }
   };
 
-  const handleManagerReload = () => {
+  const handleManagerReload = async() => {
     let mergedData = [...allApprovedData, ...allRejectedData];
     const remainingData = data?.filter(
       (row) => !mergedData.some((selected) => selected.id === row.id)
@@ -427,18 +432,44 @@ export const ViewSBWsheet = ({
       });
 
       let action = "updateStoredData";
-      await TimeSheetsCRUDoperations({
+      const notifiyCenterData = await TimeSheetsCRUDoperations({
         setNotification,
         setShowTitle,
         finalResult,
         toggleSFAMessage,
         setStoringMess,
-
         Position,
         action,
         handleAssignManager,
         selectedRows,
       });
+      if (notifiyCenterData) {
+        const {
+          subject,
+          message,
+          fromAddress,
+          toAddress,
+          empID,
+          timeKeeperEmpID,
+          ManagerEmpID,
+          managerName,
+          fileType,
+          timeKeeperName,
+          fromDate,
+          untilDate,
+          senderEmail,
+        } = notifiyCenterData;
+        await createNotification({
+          empID: empID,
+          leaveType: `${fileType} excel sheet submitted for Approval`,
+          message: `The ${fileType} timesheet for the period from ${fromDate} until ${untilDate} has been submitted by Timekeeper : 
+          ${timeKeeperName}`,
+          senderEmail: senderEmail,
+          receipentEmail: toAddress,
+          receipentEmpID: empID,
+          status: "Unread",
+        });
+      }
     } else if (userIdentification === "Manager") {
       const MergedData = [...allApprovedData, ...allRejectedData];
 
@@ -475,8 +506,9 @@ export const ViewSBWsheet = ({
           : [];
 
       let finalResult = InitialBLNGUpdate;
+      let storeApproveRej = [];
       let action = "update";
-      await TimeSheetsCRUDoperations({
+      const notifiyCenterData = await TimeSheetsCRUDoperations({
         finalResult,
         toggleSFAMessage,
         setStoringMess,
@@ -487,8 +519,43 @@ export const ViewSBWsheet = ({
         setNotification,
         setAllApprovedData,
         setAllRejectedData,
-        handleManagerReload,
+        // handleManagerReload,
+        storeApproveRej
       });
+
+      if (notifiyCenterData && notifiyCenterData.length > 0) {
+        notifiyCenterData.forEach(
+          async ({
+            subject,
+            message,
+            fromAddress,
+            toAddress,
+            empID,
+            timeKeeperEmpID,
+            ManagerEmpID,
+            managerName,
+            fileType,
+            timeKeeperName,
+            fromDate,
+            untilDate,
+            senderEmail,
+            sheetStatus,
+          }) => {
+            await createNotification({
+              empID: empID,
+              leaveType: `${fileType} Time Sheet ${sheetStatus}`,
+              message: `Your submitted ${fileType} timesheet for the period ${fromDate} to ${untilDate} has been ${sheetStatus} by Manager : ${managerName}.`,
+              senderEmail: senderEmail,
+              receipentEmail: toAddress,
+              receipentEmpID: empID,
+              status: "Unread",
+            });
+          }
+        );
+
+        storeApproveRej = [];
+      await handleManagerReload();
+      }
     } else if (
       userIdentification !== "Manager" &&
       showRejectedItemTable === "Rejected" &&
@@ -523,9 +590,17 @@ export const ViewSBWsheet = ({
             })
           : [];
 
-      let finalResult = updatedRejectedItems;
+      const finalResult = updatedRejectedItems.map((val) => {
+        return {
+          ...val,
+          assignTo: managerData.mbadgeNo,
+          assignBy: uploaderID,
+          fromDate: managerData.mfromDate,
+          untilDate: managerData.muntilDate,
+        };
+      });
       let action = "ResubmitRejectedItems";
-      await TimeSheetsCRUDoperations({
+      const notifiyCenterData = await TimeSheetsCRUDoperations({
         setNotification,
         setShowTitle,
         finalResult,
@@ -536,6 +611,35 @@ export const ViewSBWsheet = ({
         handleAssignManager,
         selectedRows,
       });
+
+      if (notifiyCenterData) {
+        const {
+          subject,
+          message,
+          fromAddress,
+          toAddress,
+          empID,
+          timeKeeperEmpID,
+          ManagerEmpID,
+          managerName,
+          fileType,
+          timeKeeperName,
+          fromDate,
+          untilDate,
+          senderEmail,
+        } = notifiyCenterData;
+
+        await createNotification({
+          empID: empID,
+          leaveType: `Corrected ${fileType} Time Sheet Submitted for Approval`,
+          message: `The ${fileType} timesheet for the period from ${fromDate} until ${untilDate} has been submitted by Timekeeper
+          ${timeKeeperName}`,
+          senderEmail: senderEmail,
+          receipentEmail: toAddress,
+          receipentEmpID: empID,
+          status: "Unread",
+        });
+      }
     }
   };
 
@@ -564,7 +668,7 @@ export const ViewSBWsheet = ({
           empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
           assignBy: uploaderID,
           fileType: "SBW",
-          status: "All",
+          status: "Unsubmitted",
         };
       });
 
@@ -698,7 +802,7 @@ export const ViewSBWsheet = ({
                   searchResult={searchResult}
                   secondaryData={secondaryData}
                   Position={Position}
-                  placeholder="Badge No."
+                  placeholder="Badge No / Name."
                 />
               </div>
             </div>
@@ -850,7 +954,7 @@ export const ViewSBWsheet = ({
                                         if (e.target.checked) {
                                           setCheckedItems((prev) => ({
                                             ...prev,
-                                            [m.id]: e.target.checked, // Toggle the checked state for this specific ID
+                                            [m.id]: e.target.checked,
                                           }));
                                           setCheckedItemsTwo((prev) => ({
                                             ...prev,
@@ -861,7 +965,7 @@ export const ViewSBWsheet = ({
                                         } else {
                                           setCheckedItems((prev) => ({
                                             ...prev,
-                                            [m.id]: false, // Toggle the checked state for this specific ID
+                                            [m.id]: false,
                                           }));
                                           removeExistingData(m, "Approved");
                                         }
@@ -878,7 +982,7 @@ export const ViewSBWsheet = ({
                                         if (e.target.checked) {
                                           setCheckedItemsTwo((prev) => ({
                                             ...prev,
-                                            [m.id]: e.target.checked, // Toggle the checked state for this specific ID
+                                            [m.id]: e.target.checked,
                                           }));
                                           setCheckedItems((prev) => ({
                                             ...prev,
@@ -890,7 +994,7 @@ export const ViewSBWsheet = ({
                                         } else {
                                           setCheckedItemsTwo((prev) => ({
                                             ...prev,
-                                            [m.id]: false, // Toggle the checked state for this specific ID
+                                            [m.id]: false,
                                           }));
                                           removeExistingData(m, "Rejected");
                                         }
@@ -908,6 +1012,9 @@ export const ViewSBWsheet = ({
                                 >
                                   <input
                                     type="checkbox"
+                                    disabled={
+                                      !selectedRows.some((r) => r.id === m.id)
+                                    }
                                     checked={selectedRows.some(
                                       (r) => r.id === m.id
                                     )}
@@ -987,6 +1094,7 @@ export const ViewSBWsheet = ({
                       } else if (excelData && excelData) {
                         storeInitialData();
                       }
+
                       // const fetchDataAndDelete = async () => {
                       //   try {
                       //     console.log("Fetching and Deleting SBW Data...");
@@ -1000,12 +1108,16 @@ export const ViewSBWsheet = ({
                       //       // Fetch the BLNG data using GraphQL with pagination
                       //       const response = await client.graphql({
                       //         query: listTimeSheets,
-                      //         variables: { filter: filter, nextToken: nextToken }, // Pass nextToken for pagination
+                      //         variables: {
+                      //           filter: filter,
+                      //           nextToken: nextToken,
+                      //         }, // Pass nextToken for pagination
                       //       });
                       //       // Extract data and nextToken
                       //       const SBWdata =
                       //         response?.data?.listTimeSheets?.items || [];
-                      //       nextToken = response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
+                      //       nextToken =
+                      //         response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
                       //       console.log("Fetched SBW Data:", SBWdata);
                       //       // Delete each item in the current batch
                       //       await Promise.all(
@@ -1127,9 +1239,9 @@ export const ViewSBWsheet = ({
       )}
 
       {notification && (
-        <SpinLogo
+        <TimeSheetSpinner
           text={showTitle}
-          notification={notification}
+          // notification={notification}
           // path="/timesheetSBW"
         />
       )}

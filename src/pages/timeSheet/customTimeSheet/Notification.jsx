@@ -1,17 +1,16 @@
 export const Notification = async ({ getEmail, Position, correctionMade }) => {
-  let hasSentEmail = false; // Track email sending
+  let hasSentEmail = false;
 
   const formatToDDMMYYYY = (inputDate) => {
-    if (!inputDate) return "Invalid date"; // Handle null or undefined input
+    if (!inputDate) return "Invalid date";
     const date = new Date(inputDate);
-    if (isNaN(date.getTime())) return "Invalid date"; // Handle invalid date
+    if (isNaN(date.getTime())) return "Invalid date";
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
 
-  // Exit if email already sent or no data
   if (!getEmail || hasSentEmail) return;
 
   try {
@@ -65,7 +64,7 @@ export const Notification = async ({ getEmail, Position, correctionMade }) => {
             <p>Dear ${getEmail?.TimeKeeperDetails?.name},</p>
             <p>Your submitted ${
               getEmail?.TimeSheetData?.fileType
-            } timesheet for the period ${fromDate} to ${untilDate} has been ${status} by Manager ${
+            } timesheet for the period ${fromDate} to ${untilDate} has been ${status} by Manager : ${
         getEmail?.ManagerDetails?.name
       }.</p>
            
@@ -94,16 +93,40 @@ export const Notification = async ({ getEmail, Position, correctionMade }) => {
     }
 
     hasSentEmail = true;
-    // console.log(subject, message, fromAddress, toAddress);
+
+    const empID =
+      Position === "Manager"
+        ? getEmail?.TimeKeeperDetails?.empID
+        : getEmail?.ManagerDetails?.empID;
+    const timeKeeperEmpID = getEmail?.TimeKeeperDetails?.empID;
+    const ManagerEmpID = getEmail?.TimeKeeperDetails?.empID;
+    const managerName = getEmail?.ManagerDetails?.name;
+
+    const fileType = getEmail?.TimeSheetData?.fileType;
+    const timeKeeperName = getEmail?.TimeKeeperDetails?.name;
+
+    const senderEmail = "timesheet_no-reply@adininworks.com";
+    const sheetStatus = status === "Approved"
+    ? "Approved"
+    : status === "Rejected"
+    ? "Rejected"
+    : ""
     return {
       subject,
       message,
       fromAddress,
       toAddress,
       // toAddress: "sriramc2810@gmail.com",
+      empID,
+      timeKeeperEmpID,
+      ManagerEmpID,
+      managerName,
+      fileType,
+      timeKeeperName,
+      fromDate,
+      untilDate,
+      senderEmail,
+      sheetStatus
     };
-    // await sendEmail(subject, message, fromAddress, toAddress);
-  } catch (error) {
-    // console.error("Error sending email:", error);
-  }
+  } catch (error) {}
 };

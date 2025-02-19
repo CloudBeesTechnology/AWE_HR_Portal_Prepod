@@ -11,12 +11,11 @@ import { useTempID } from "../../utils/TempIDContext";
 export const EducationDetails = ({ fetchedData }) => {
   const { tempID } = useTempID();
   const { educDetailsData } = useContext(DataSupply);
-
   const location = useLocation();
   const navigatingPersonalData = location.state?.FormData;
 
   useEffect(() => {
-    window.scrollTo({
+    window.scrollTo({ 
       top: 0,
       behavior: "smooth",
     });
@@ -30,8 +29,9 @@ export const EducationDetails = ({ fetchedData }) => {
     watch,
   } = useForm({
     resolver: yupResolver(EducationSchema),
+    
     defaultValues: {
-      referees: [{ name: "", address: "", telephone: "", profession: "" }],
+      referees: [{ name: "", address: "", phoneNumber: "", profession: "" }],
       relatives: [{ name: "", positionHeld: "", relationship: "" }],
       emgDetails: [
         {
@@ -106,7 +106,7 @@ export const EducationDetails = ({ fetchedData }) => {
     appendCharacterReferee({
       name: "",
       address: "",
-      telephone: "",
+      phoneNumber: "",
       profession: "",
       isNew: true,
     });
@@ -147,11 +147,15 @@ export const EducationDetails = ({ fetchedData }) => {
       ...navigatingPersonalData,
     };
 
-    localStorage.setItem("educationFormData", JSON.stringify(navigatingEduData));
+    console.log("Step 3", navigatingEduData);
+    
 
+    localStorage.setItem("educationFormData", JSON.stringify(navigatingEduData));
+    
     navigate("/addCandidates/otherDetails", {
       state: { FormData: navigatingEduData },
-    });
+    }); 
+
   };
 
 
@@ -182,9 +186,9 @@ export const EducationDetails = ({ fetchedData }) => {
     if (tempID) {
       if (educDetailsData.length > 0) {
         const interviewData = educDetailsData.find((data) => data.tempID === tempID);
-        if (interviewData) {
+        if (interviewData) {   
           Object.keys(interviewData).forEach((key) => {
-
+          
             if (key === "emgDetails" || key === "referees" || key === "relatives") {
               if (Array.isArray(interviewData[key]) && typeof interviewData[key][0] === "string") {
       
@@ -246,7 +250,7 @@ export const EducationDetails = ({ fetchedData }) => {
               )}
             />
             <Controller
-              name={`referees.${index}.telephone`}
+              name={`referees.${index}.phoneNumber`}
               control={control}
               render={({ field }) => (
                 <input
@@ -283,7 +287,7 @@ export const EducationDetails = ({ fetchedData }) => {
           onClick={handleAddReferee} 
           className="absolute top-11 -right-7 text-medium_grey text-[18px]"
         >
-          <CiSquarePlus />
+          <CiSquarePlus /> 
         </button>
       </div>
 
@@ -292,6 +296,7 @@ export const EducationDetails = ({ fetchedData }) => {
           Relatives Employed by the company
         </label>
         {relatives.map((relative, index) => (
+          
           <div key={relative.id} className="grid grid-cols-3 gap-4 mb-7">
             <Controller
               name={`relatives.${index}.name`}
@@ -438,7 +443,7 @@ export const EducationDetails = ({ fetchedData }) => {
                       {errors.emgDetails[index].phoneNumber.message}
                     </p>
                   )}
-                </div>
+                </div> 
               )}
             />
             <Controller

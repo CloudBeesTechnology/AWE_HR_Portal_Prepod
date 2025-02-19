@@ -9,7 +9,6 @@ import { BwnIcColourDD, LanguageDD } from "../../utils/DropDownMenus";
 import { useTempID } from "../../utils/TempIDContext";
 import { DataSupply } from "../../utils/DataStoredContext";
 
-
 export const PersonalDetails = () => {
   const { tempID } = useTempID();
   const { empPDData } = useContext(DataSupply);
@@ -25,7 +24,7 @@ export const PersonalDetails = () => {
 
   const {
     register,
-    handleSubmit, 
+    handleSubmit,
     control,
     setValue,
     watch,
@@ -34,15 +33,24 @@ export const PersonalDetails = () => {
     resolver: yupResolver(PersonalSchema(applicationData?.nationality)),
 
     defaultValues: {
-      familyDetails: [{ name: "", relationship: "", age: "", occupation: "", placeOfOccupation: "" }],
+      familyDetails: [
+        {
+          name: "",
+          relationship: "",
+          age: "",
+          occupation: "",
+          placeOfOccupation: "",
+        },
+      ],
       eduDetails: [{ university: "", fromDate: "", toDate: "", degree: "" }],
       workExperience: [{ company: "", position: "", from: "", to: "" }],
     },
   });
 
+  const navigate = useNavigate();
 
   const {
-    fields: familyFields,
+    fields: familyDetails,
     append: appendFamily,
     remove: removeFamily,
   } = useFieldArray({
@@ -51,7 +59,7 @@ export const PersonalDetails = () => {
   });
 
   const {
-    fields: educationFields,
+    fields: eduDetails,
     append: appendEducation,
     remove: removeEducation,
   } = useFieldArray({
@@ -60,7 +68,7 @@ export const PersonalDetails = () => {
   });
 
   const {
-    fields: employmentFields,
+    fields: workExperience,
     append: appendEmployment,
     remove: removeEmployment,
   } = useFieldArray({
@@ -69,90 +77,123 @@ export const PersonalDetails = () => {
   });
 
   const handleAddFamily = () => {
-    
-    appendFamily({ isNew: true });
+    appendFamily({
+      name: "",
+      relationship: "",
+      age: "",
+      occupation: "",
+      placeOfOccupation: "",
+      isNew: true,
+    });
   };
   const handleAddEducation = () => {
-    
-    appendEducation({ isNew: true });
+    appendEducation({
+      university: "",
+      fromDate: "",
+      toDate: "",
+      degree: "",
+      isNew: true,
+    });
   };
   const handleAddEmployment = () => {
-    
-    appendEmployment({ isNew: true });
+    appendEmployment({
+      company: "",
+      position: "",
+      from: "",
+      to: "",
+      isNew: true,
+    });
   };
-
-  const navigate = useNavigate();
 
   useEffect(() => {
+    const savedData = JSON.parse(localStorage.getItem("personalFormData"));
+    if (savedData) {
+      Object.keys(savedData).forEach((key) => setValue(key, savedData[key]));
+    }
 
-  const savedData = JSON.parse(localStorage.getItem("personalFormData"));
-  if (savedData) {
-    Object.keys(savedData).forEach((key) => setValue(key, savedData[key]));
-  }
+    const handleBeforeUnload = () => {
+      localStorage.removeItem("personalFormData");
+    };
 
-  const handleBeforeUnload = () => {
-    localStorage.removeItem("personalFormData");
-  };
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
-  window.addEventListener("beforeunload", handleBeforeUnload);
-
-  return () => {
-    window.removeEventListener("beforeunload", handleBeforeUnload);
-  };
-}, [location, setValue]); 
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [location, setValue]);
 
 
   const onSubmit = (data) => {
  
     const navigatingData = {
-      ...data,
-      ...applicationData,
+      ...applicationData,  
+      ...data
     };
+  
     localStorage.setItem("personalFormData", JSON.stringify(navigatingData));
-
+  
     navigate("/addCandidates/educationDetails", {
       state: { FormData: navigatingData },
     });
-   
   };
 
-
-  useEffect(() => {
   
+  useEffect(() => {
     const parseDetails = (data) => {
       try {
-        let cleanedData = data.replace(/\\/g, ""); 
-        cleanedData = cleanedData.replace(/'/g, '"'); 
-        cleanedData = cleanedData.replace(/([{,])(\s*)([a-zA-Z0-9_]+)(\s*):/g, '$1"$3":'); 
-        cleanedData = cleanedData.replace(/:([a-zA-Z0-9_/.\s]+)(?=\s|,|\})/g, ':"$1"'); 
+        let cleanedData = data.replace(/\\/g, "");
+        cleanedData = cleanedData.replace(/'/g, '"');
+        cleanedData = cleanedData.replace(
+          /([{,])(\s*)([a-zA-Z0-9_]+)(\s*):/g,
+          '$1"$3":'
+        );
+        cleanedData = cleanedData.replace(
+          /:([a-zA-Z0-9_/.\s]+)(?=\s|,|\})/g,
+          ':"$1"'
+        );
         if (cleanedData.startsWith('"') && cleanedData.endsWith('"')) {
-          cleanedData = cleanedData.slice(1, -1); 
+          cleanedData = cleanedData.slice(1, -1);
         }
-  
+
         const parsedData = JSON.parse(cleanedData);
-  
+
         if (!Array.isArray(parsedData)) {
           return [];
         }
-  
+
         return parsedData;
       } catch (error) {
         console.error("Error parsing details:", error);
         return [];
       }
     };
-  
+
+    const selectedFields = [
+      "alternateNo", "bwnIcColour", "bwnIcExpiry", "bwnIcNo", "contactNo",
+      "driveLic", "eduDetails", "familyDetails", "lang", "permanentAddress",
+      "ppDestinate", "ppExpiry", "ppIssued", "ppNo", "presentAddress", "workExperience"
+    ];
+
     if (tempID) {
       if (empPDData.length > 0) {
         const interviewData = empPDData.find((data) => data.tempID === tempID);
-        if (interviewData) { 
-          Object.keys(interviewData).forEach((key) => {
-            if (key === "familyDetails" || key === "workExperience" || key === "eduDetails") {
-              if (Array.isArray(interviewData[key]) && typeof interviewData[key][0] === "string") {
-                
+        if (interviewData) {
+          // console.log(interviewData, "1");
+
+          selectedFields.forEach((key) => {
+         
+            if (
+              key === "familyDetails" ||
+              key === "workExperience" ||
+              key === "eduDetails"
+            ) {
+              if (
+                Array.isArray(interviewData[key]) &&
+                typeof interviewData[key][0] === "string"
+              ) {
                 let parsedData = parseDetails(interviewData[key][0]);
                 if (parsedData.length > 0) {
-                  setValue(key, parsedData);
+                  setValue(key, parsedData);         
                 }
               }
             } else if (interviewData[key]) {
@@ -171,11 +212,9 @@ export const PersonalDetails = () => {
       // console.log("tempID is not set");
     }
   }, [tempID, setValue, empPDData]);
-   
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className=" mx-auto py-6">
-
       <div className="grid grid-cols-2 gap-4 mb-4 text_size_6">
         <div>
           <label className="block mb-1">Contact Number</label>
@@ -202,8 +241,6 @@ export const PersonalDetails = () => {
           )}
         </div>
       </div>
-
-   
       <div className="grid grid-cols-2 gap-4 mb-4 text_size_6">
         <div>
           <label className="block mb-1">Present Address</label>
@@ -230,8 +267,6 @@ export const PersonalDetails = () => {
           </p>
         </div>
       </div>
-
- 
       <div className="grid grid-cols-2 gap-4 mb-4 text_size_6">
         <div>
           <label className="block mb-1">Driving License Class</label>
@@ -259,7 +294,6 @@ export const PersonalDetails = () => {
           )}
         </div>
       </div>
-
       <div className="grid grid-cols-3 gap-4 mb-4 text_size_6">
         <div>
           <label className="block mb-1">Brunei I/C No</label>
@@ -284,7 +318,6 @@ export const PersonalDetails = () => {
                 {option.label}
               </option>
             ))}
-    
           </select>
           {errors.bwnIcColour && (
             <p className="text-[red] text-[12px]">
@@ -306,7 +339,6 @@ export const PersonalDetails = () => {
           )}
         </div>
       </div>
-
       <div className="grid grid-cols-4 gap-4 mb-4 text_size_6">
         <div>
           <label className="block mb-1">Passport Number</label>
@@ -332,7 +364,7 @@ export const PersonalDetails = () => {
         </div>
         <div>
           <label className="block mb-1">Passport Expiry</label>
-          <input
+          <input 
             type="date"
             {...register("ppExpiry")}
             className="mt-2 text_size_9 p-2.5 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full"
@@ -355,54 +387,79 @@ export const PersonalDetails = () => {
           )}
         </div>
       </div>
-    
+
       <div className="mb-4 relative text_size_6">
         <label className="block mb-1">
           Particulars of Immediate Family (Spouse, Children, Parents, Brothers &
           Sisters)
         </label>
-        {Object.keys(familyFields).map((key, index) => {
-    
-          const family = familyFields[key];
+        {familyDetails.map((key, index) => {
 
           return (
-            <div key={family.id} className="grid grid-cols-5 gap-4 mb-2">
-              <input
-                type="text"
-                {...register(`familyDetails[${index}].name`)}
-                defaultValue={family.name}
-                placeholder="Name"
-                className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+            <div key={key.id} className="grid grid-cols-5 gap-4 mb-2">
+              {/* Use Controller for each field */}
+              <Controller
+                name={`familyDetails[${index}].name`}
+                control={control}
+                render={({ field }) => (
+                  <input
+                    type="text"
+                    {...field}
+                    placeholder="Name"
+                    className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+                  />
+                )}
               />
-              <input
-                type="text"
-                {...register(`familyDetails.${index}.relationship`)}
-                defaultValue={family.relationship}
-                placeholder="Relationship"
-                className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+              <Controller
+                name={`familyDetails[${index}].relationship`}
+                control={control}
+                render={({ field }) => (
+                  <input
+                    type="text"
+                    {...field}
+                    placeholder="Relationship"
+                    className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+                  />
+                )}
               />
-              <input
-                type="text"
-                {...register(`familyDetails.${index}.age`)}
-                defaultValue={family.age}
-                placeholder="Age"
-                className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+              <Controller
+                name={`familyDetails[${index}].age`}
+                control={control}
+                render={({ field }) => (
+                  <input
+                    type="text"
+                    {...field}
+                    placeholder="Age"
+                    className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+                  />
+                )}
               />
-              <input
-                type="text"
-                {...register(`familyDetails.${index}.occupation`)}
-                defaultValue={family.occupation}
-                placeholder="Occupation"
-                className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+              <Controller
+                name={`familyDetails[${index}].occupation`}
+                control={control}
+                render={({ field }) => (
+                  <input
+                    type="text"
+                    {...field}
+                    placeholder="Occupation"
+                    className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+                  />
+                )}
               />
-              <input
-                type="text"
-                {...register(`familyDetails.${index}.placeOfOccupation`)}
-                defaultValue={family.placeOfOccupation}
-                placeholder="Place of Occupation"
-                className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+              <Controller
+                name={`familyDetails[${index}].placeOfOccupation`}
+                control={control}
+                render={({ field }) => (
+                  <input
+                    type="text"
+                    {...field}
+                    placeholder="Place of Occupation"
+                    className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+                  />
+                )}
               />
-              {family.isNew && (
+
+              {familyDetails.isNew && (
                 <button
                   type="button"
                   onClick={() => {
@@ -411,7 +468,7 @@ export const PersonalDetails = () => {
                   }}
                   className="absolute top-15 -right-7 text-medium_grey text-[18px]"
                 >
-                  <FaRegMinusSquare /> 
+                  <FaRegMinusSquare />
                 </button>
               )}
             </div>
@@ -421,18 +478,16 @@ export const PersonalDetails = () => {
         <button
           type="button"
           onClick={() => {
-            handleAddFamily() 
+            handleAddFamily();
           }}
           className="absolute top-11 -right-7 text-medium_grey text-[18px]"
         >
           <CiSquarePlus />
         </button>
       </div>
-
-
       <div className="mb-4 relative text_size_6">
         <label className="block mb-1">Education Details</label>
-        {educationFields.map((education, index) => (
+        {eduDetails.map((education, index) => (
           <div key={education.id} className="grid grid-cols-4 gap-4 mb-2">
             <Controller
               name={`eduDetails.${index}.university`}
@@ -517,7 +572,7 @@ export const PersonalDetails = () => {
                 }}
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <FaRegMinusSquare /> 
+                <FaRegMinusSquare />
               </button>
             )}
           </div>
@@ -525,86 +580,121 @@ export const PersonalDetails = () => {
         <button
           type="button"
           onClick={() => {
-            handleAddEducation() 
+            handleAddEducation();
           }}
-       
           className="absolute top-12 -right-7 text-medium_grey text-[18px]"
         >
           <CiSquarePlus />
         </button>
       </div>
-
       <div className="mb-4 relative text_size_6">
         <label className="block mb-1">
           Previous Employment Including Temporary Work
         </label>
-        {employmentFields.map((employment, index) => (
+        {workExperience.map((employment, index) => (
           <div key={employment.id} className="grid grid-cols-6 gap-4 mb-2">
-            <input
-              type="text"
-              {...register(`workExperience.${index}.name`)}
-              placeholder="Name and Address"
-              className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+            <Controller
+              name={`workExperience.${index}.name`}
+              control={control}
+              // defaultValue={employment.name}
+              render={({ field }) => (
+                <input
+                  {...field}
+                  placeholder="Name and Address"
+                  className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+                />
+              )}
             />
-            <input
-              type="text"
-              {...register(`workExperience.${index}.position`)}
-              placeholder="Position Held"
-              className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+            <Controller
+              name={`workExperience.${index}.position`}
+              control={control}
+              // defaultValue={employment.position}
+              render={({ field }) => (
+                <input
+                  {...field}
+                  placeholder="Position Held"
+                  className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+                />
+              )}
             />
-            <input
-              type="date"
-              {...register(`workExperience.${index}.from`)}
-              placeholder="From"
-              className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+            <Controller
+              name={`workExperience.${index}.from`}
+              control={control}
+              // defaultValue={employment.from}
+              render={({ field }) => (
+                <input
+                  {...field}
+                  type="date"
+                  placeholder="From"
+                  className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+                />
+              )}
             />
-            <input
-              type="date"
-              {...register(`workExperience.${index}.to`)}
-              placeholder="To"
-              className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+            <Controller
+              name={`workExperience.${index}.to`}
+              control={control}
+              // defaultValue={employment.to}
+              render={({ field }) => (
+                <input
+                  {...field}
+                  type="date"
+                  placeholder="To"
+                  className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+                />
+              )}
             />
-            <input
-              type="text"
-              {...register(`workExperience.${index}.salary`)}
-              placeholder="Salary"
-              className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+            <Controller
+              name={`workExperience.${index}.salary`}
+              control={control}
+              // defaultValue={employment.salary}
+              render={({ field }) => (
+                <input
+                  {...field}
+                  placeholder="Salary"
+                  className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+                />
+              )}
             />
-            <input
-              type="text"
-              {...register(`workExperience.${index}.reasonForLeaving`)}
-              placeholder="Reason for Leaving"
-              className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+            <Controller
+              name={`workExperience.${index}.reasonForLeaving`}
+              control={control}
+              // defaultValue={employment.reasonForLeaving}
+              render={({ field }) => (
+                <input
+                  {...field}
+                  placeholder="Reason for Leaving"
+                  className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
+                />
+              )}
             />
 
             {employment.isNew && (
               <button
                 type="button"
                 onClick={() => {
-                  removeEmployment(index);
+                  removeEmployment(index); // Make sure to define this function
                 }}
                 className="absolute top-15 -right-7 text-medium_grey text-[18px]"
               >
-                <FaRegMinusSquare /> 
+                <FaRegMinusSquare />
               </button>
             )}
           </div>
         ))}
+
         <button
           type="button"
-          onClick={handleAddEmployment}
+          onClick={handleAddEmployment} // Ensure this function is defined to handle adding a new employment
           className="absolute top-11 -right-7 text-medium_grey text-[18px]"
         >
           <CiSquarePlus />
         </button>
       </div>
-
       <div className="flex justify-center mt-12 gap-10">
         <button type="submit" className="primary_btn">
           Next
         </button>
       </div>
-
     </form>
   );
 };

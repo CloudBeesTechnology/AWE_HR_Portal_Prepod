@@ -8,13 +8,14 @@ import { Filter } from "./Filter";
 import { NavigateLM } from "./NavigateLM";
 import { capitalizedLetter, DateFormat } from "../../utils/DateFormat";
 import { FiLoader } from "react-icons/fi";
+import { useTempID } from "../../utils/TempIDContext";
 
 export const TicketsTable = () => {
   const { handleViewClick, handleClickForToggle, userType } =
     useOutletContext();
 
   const [searchResults, setSearchResults] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [secondartyData, setSecondartyData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -22,7 +23,8 @@ export const TicketsTable = () => {
   const [data, setData] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
-  const { ticketMerged } = useLeaveManage();
+  const { gmPosition } = useTempID();
+  const { ticketMerged, loading } = useLeaveManage();
 
   // Add new state to track all filters
   const [filters, setFilters] = useState({
@@ -38,24 +40,48 @@ export const TicketsTable = () => {
     dateError: false,
   });
 
-  // Modify useEffect to handle all filters together
+  const GM = "GENERAL MANAGER";
+  const HR = "HR";
+
   useEffect(() => {
     // If no filters are active, show all data
-    setLoading(true);
+    // setLoading(true);
     if (
       !filters.date &&
       filters.search.length === 0 &&
       filters.status === "All"
     ) {
-      const sortedData = [...ticketMerged].sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
-      setData(sortedData);
-      setErrorState({
-        noResults: false,
-        searchError: false,
-        dateError: false,
+      const sortedData = [...ticketMerged].sort((a, b) => {
+        if (a.hrStatus === "Pending" && b.hrStatus !== "Pending" || a.gmStatus === "Pending" && b.gmStatus !== "Pending") {
+          return -1; 
+        }
+        if (a.hrStatus !== "Pending" && b.hrStatus === "Pending" || a.gmStatus !== "Pending" && b.gmStatus === "Pending") {
+          return 1; 
+        }
+        return new Date(b.createdAt) - new Date(a.createdAt);
       });
+
+      if (gmPosition === "GENERAL MANAGER") {
+        const filterGMData = sortedData.filter(
+          (item) => item.hrStatus === "Verified" && item.hrStatus !== "Pending"
+        );
+     
+        setData(filterGMData);
+        setErrorState({
+          noResults: false,
+          searchError: false,
+          dateError: false,
+        });
+        
+      } else {
+        setData(sortedData);
+        setErrorState({
+          noResults: false,
+          searchError: false,
+          dateError: false,
+        });
+  
+      }
       return;
     }
 
@@ -68,7 +94,9 @@ export const TicketsTable = () => {
     // Apply status filter
     if (filters.status !== "All") {
       filteredResults = filteredResults.filter(
-        (item) => item.hrStatus === filters.status
+        (item) =>
+          (userType === HR && item.hrStatus === filters.status) ||
+          (gmPosition === GM && item.gmStatus === filters.status)
       );
     }
 
@@ -110,9 +138,34 @@ export const TicketsTable = () => {
         return matches;
       });
     }
-    setData(filteredResults);
-    setFilteredData([]);
-    setCurrentPage(1);
+
+    const sortedFilteredData = filteredResults.sort((a, b) => {
+
+      if (a.hrStatus === "Pending" && b.hrStatus !== "Pending" || a.gmStatus === "Pending" && b.gmStatus !== "Pending") {
+        return -1; 
+      }
+      if (a.hrStatus !== "Pending" && b.hrStatus === "Pending" || a.gmStatus !== "Pending" && b.gmStatus === "Pending") {
+        return 1; 
+      }
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+    
+    if (gmPosition === "GENERAL MANAGER") {
+      const filterGMData = sortedFilteredData.filter(
+        (item) => item.hrStatus === "Verified" && item.hrStatus !== "Pending"
+      );
+
+      setData(filterGMData);
+      setFilteredData([]);
+      setCurrentPage(1);
+
+    } else {
+      setData(sortedFilteredData);
+      setFilteredData([]);
+      setCurrentPage(1);
+
+    }
+   
 
     // Update the error message state or flag if needed
     const noResults = filteredResults.length === 0;
@@ -125,13 +178,13 @@ export const TicketsTable = () => {
       searchError,
       dateError,
     };
-    setErrorState(errorState); // Add this state if not already present
-    setLoading(false);
+    setErrorState(errorState);
+    // setLoading(false);
   }, [filters, ticketMerged]);
 
   // Separate useEffect for pagination to avoid race conditions
   useEffect(() => {
-    setLoading(true);
+    // setLoading(true);
     if (!data.length) {
       setFilteredData([]);
       return;
@@ -161,11 +214,8 @@ export const TicketsTable = () => {
     );
 
     setFilteredData(paginatedData);
-    setLoading(false);
+    // setLoading(false);
   }, [currentPage, rowsPerPage, data]);
-
-  // Console log for debugging
-  // useEffect(() => {}, [filteredData, data]);
 
   // Update handlers to use new filters state
   const handleDateChange = (event) => {
@@ -186,8 +236,8 @@ export const TicketsTable = () => {
 
       // If search result is empty, show no results message immediately
       if (result.length === 0) {
-        setData([]); // Clear the data to show no results
-        setFilteredData([]); // Clear filtered data
+        setData([]);
+        setFilteredData([]);
         setErrorState((prev) => ({
           ...prev,
           searchError: true,
@@ -202,7 +252,7 @@ export const TicketsTable = () => {
         }));
       }
     } catch (error) {
-      // console.error("Error search data", error);
+      console.error("Error search data", error);
       setData([]);
       setFilteredData([]);
       setErrorState((prev) => ({
@@ -215,16 +265,14 @@ export const TicketsTable = () => {
 
   // Update total pages calculation
   const totalPages = Math.ceil(data.length / rowsPerPage);
-
   const startIndex = (currentPage - 1) * rowsPerPage;
-
   const heading = [
     "S.No",
     "Emp ID",
     "Name",
     "Department",
     "Position",
-    "Date Join",
+    "Date Join", 
     "Departure date",
     "Arrival date",
     "Submitted form",
@@ -234,15 +282,43 @@ export const TicketsTable = () => {
   // console.log(ticketMerged);
 
   useEffect(() => {
-    const sortedData = ticketMerged.sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    );
-    setSecondartyData(sortedData);
-    setData(sortedData);
-  }, [ticketMerged]);
 
-  // console.log(loading);
-  // console.log(filteredData);
+    const sortedData = ticketMerged.sort((a, b) => {
+      if (a.hrStatus === "Pending" && b.hrStatus !== "Pending" || a.gmStatus === "Pending" && b.gmStatus !== "Pending") {
+        return -1; 
+      }
+      if (a.hrStatus !== "Pending" && b.hrStatus === "Pending" || a.gmStatus !== "Pending" && b.gmStatus === "Pending") {
+        return 1; 
+      }
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+  
+    // Filter data based on GM position
+    if (gmPosition === "GENERAL MANAGER") {
+      const filterGMData = sortedData.filter(
+        (item) => item.hrStatus === "Verified" && item.hrStatus !== "Pending"
+      );
+      setSecondartyData(filterGMData);
+      setData(filterGMData);
+    } else {
+      setSecondartyData(sortedData);
+      setData(sortedData);
+    }
+  }, [ticketMerged, gmPosition]);
+  
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[60vh] bg-transparent">
+        <div className="flex justify-between gap-2">
+          <p className="text-sm font-semibold">Loading </p>
+          <p>
+            <FiLoader className="animate-spin mt-[4px]" size={15} />
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <section className="w-full">
@@ -270,28 +346,24 @@ export const TicketsTable = () => {
               onChange={handleDateChange}
             />
           </div>
-          {userType === "HR" && (
+          {(gmPosition === "GENERAL MANAGER" || userType === "HR") && (
             <div>
-              <Filter name={filterStatus} AfterFilter={handleFilterChange} />
+              <Filter
+                name={filterStatus}
+                AfterFilter={handleFilterChange}
+                userType={userType}
+                gmPosition={gmPosition}
+              />
             </div>
           )}
         </div>
       </div>
       <div className="leaveManagementTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl ">
-        {loading ? (
-          <div className="text-center mt-6 py-20">
-            <p className="inline-flex items-center text-sm font-semibold">
-              Loading
-              <span>
-                <FiLoader className="animate-spin ml-2" size={15} />
-              </span>
-            </p>
-          </div>
-        ) : errorState.noResults ? (
+        {errorState.noResults ? (
           <div className="text-center mt-6 py-20">
             <p>No matching results found for your search.</p>
           </div>
-        ) : filteredData && filteredData.length > 0 ? (
+        ) : data && data.length > 0 ? (
           <table className="w-full font-semibold text-sm">
             <thead className="bg-[#939393] sticky top-0 rounded-t-lg">
               <tr className="px-6">
@@ -303,8 +375,8 @@ export const TicketsTable = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredData.map((item, index) => {
-                const displayIndex = startIndex + index + 1; // Adjust index based on pagination
+              {data.map((item, index) => {
+                const displayIndex = startIndex + index + 1;
                 return (
                   <tr
                     key={index}
@@ -337,12 +409,13 @@ export const TicketsTable = () => {
                       {DateFormat(item.createdAt)}
                     </td>
                     <td className="border-b-2 border-[#CECECE] py-5">
-                      {DateFormat(
-                        item.empDepartureDate || item.departureDate
-                      ) || "N/A"}
+                      {item.empDepartureDate ||
+                        DateFormat(item.departureDate) ||
+                        "N/A"}
                     </td>
                     <td className="border-b-2 border-[#CECECE] py-5">
-                      {DateFormat(item.empArrivalDate || item.arrivalDate) ||
+                      {item.empArrivalDate ||
+                        DateFormat(item.arrivalDate) ||
                         "N/A"}
                     </td>
                     <td className="border-b-2 border-[#CECECE] cursor-pointer py-5">
@@ -351,19 +424,18 @@ export const TicketsTable = () => {
                         onClick={() => {
                           handleClickForToggle();
                           handleViewClick(item, "Tickets");
-          
-                          
+                          // console.log("Ticket", item);
                         }}
                       >
                         {"View"}
                       </span>
                     </td>
-                    {userType !== "SuperAdmin" && (
+                    {userType !== "SuperAdmin" && !gmPosition && (
                       <td
                         className={`border-b-2 border-[#CECECE] py-5 ${
-                          item.hrStatus === "Rejected"
+                          item.hrStatus === "Not Eligible"
                             ? "text-[red]"
-                            : item.hrStatus === "Approved"
+                            : item.hrStatus === "Verified"
                             ? "text-[#339933]"
                             : item.hrStatus === "Pending"
                             ? "text-[#E8A317]"
@@ -373,6 +445,22 @@ export const TicketsTable = () => {
                         {item.hrStatus}
                       </td>
                     )}
+                    {userType !== "SuperAdmin" &&
+                      gmPosition === "GENERAL MANAGER" && (
+                        <td
+                          className={`border-b-2 border-[#CECECE] py-5 ${
+                            item.gmStatus === "Rejected"
+                              ? "text-[red]"
+                              : item.gmStatus === "Approved"
+                              ? "text-[#339933]"
+                              : item.gmStatus === "Pending"
+                              ? "text-[#E8A317]"
+                              : ""
+                          }`}
+                        >
+                          {item.gmStatus || "Pending"}
+                        </td>
+                      )}
                   </tr>
                 );
               })}

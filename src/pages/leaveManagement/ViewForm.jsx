@@ -3,11 +3,11 @@ import AweLogo from "../../assets/logo/logo-with-name.svg";
 import { VscClose } from "react-icons/vsc";
 import { useLeaveManage } from "../../hooks/useLeaveManage";
 import { SpinLogo } from "../../utils/SpinLogo";
-import { useCreateNotification } from "../../hooks/useCreateNotification"; 
+import { useCreateNotification } from "../../hooks/useCreateNotification";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { sendEmail } from "../../services/EmailServices";
 import { DateFormat } from "../../utils/DateFormat";
-import { set } from "react-hook-form";
+import { useTempID } from "../../utils/TempIDContext";
 
 export const ViewForm = ({
   handleClickForToggle,
@@ -17,15 +17,15 @@ export const ViewForm = ({
   userType,
   personalInfo,
 }) => {
-
   const { empPIData } = useContext(DataSupply);
+  const { gmPosition, gmMail, GMEmpID } = useTempID();
   const [remark, setRemark] = useState("");
   const [notification, setNotification] = useState(false);
   const [notificationText, setNotificationText] = useState("");
   const [path, setPath] = useState("");
   const { handleUpdateLeaveStatus, handleUpdateTicketRequest } =
     useLeaveManage();
-  const { createNotification } = useCreateNotification(); // Hook for creating notification
+  const { createNotification } = useCreateNotification();
 
   const managerName = empPIData.find((val) => {
     const findingManagerName = leaveData?.managerEmpID === val.empID;
@@ -35,7 +35,6 @@ export const ViewForm = ({
     const findingSupervisorName = leaveData?.supervisorEmpID === val.empID;
     return findingSupervisorName;
   });
-
 
   const getStatusClass = (status) => {
     return status === "Rejected"
@@ -47,16 +46,35 @@ export const ViewForm = ({
       : "text-[#E8A317]";
   };
 
+  const getHrStatusClass = (status) => {
+    return status === "Not Eligible"
+      ? "text-[red]"
+      : status === "Verified"
+      ? "text-[#339933]"
+      : status === "Pending"
+      ? "text-[#E8A317]"
+      : "text-[#E8A317]";
+  };
+
+  const getGmStatusClass = (status) => {
+    return status === "Rejected"
+      ? "text-[red]"
+      : status === "Approved"
+      ? "text-[#339933]"
+      : status === "Pending"
+      ? "text-[#E8A317]"
+      : "text-[#E8A317]";
+  };
+
   const isValidDateFormat = (date) => {
-    const datePatternSlash = /^\d{4}\/\d{1,2}\/\d{1,2}$/; 
-    const datePatternDash = /^\d{4}-\d{2}-\d{2}$/; 
+    const datePatternSlash = /^\d{4}\/\d{1,2}\/\d{1,2}$/;
+    const datePatternDash = /^\d{4}-\d{2}-\d{2}$/;
     return datePatternSlash.test(date) || datePatternDash.test(date);
   };
-  // console.log("Ticket", ticketData);
-  
 
   const handleUpdateStatus = async (status) => {
     const updateData = {};
+    const ticketUpdatedData = {};
     const userType = localStorage.getItem("userType");
     const currentDate = new Date().toISOString();
 
@@ -80,7 +98,6 @@ export const ViewForm = ({
 
     // Handle Leave status update
     if (source === "LM") {
-  
       const leavePeriod =
         leaveData.empLeaveSelectedFrom && leaveData.empLeaveSelectedTo
           ? isValidDateFormat(leaveData.empLeaveSelectedFrom) &&
@@ -114,8 +131,8 @@ export const ViewForm = ({
           ) {
             // console.log("checking manager");
             const processEmailsAndNotifications = async () => {
-              try {              
-//____________________________________________________________ Employee got email_______________________________________________________________________________________    
+              try {
+                //____________________________________________________________ Employee got email_______________________________________________________________________________________
                 await sendEmail(
                   `Leave Application ${status}`,
                   `<html>
@@ -124,39 +141,39 @@ export const ViewForm = ({
                         Dear ${leaveData.empName || "Not mentioned"}, <br />
                         Your ${leaveData.empLeaveType} request for the period 
                         ${leavePeriod} has been ${status} by Manager, ${
-                        managerName.name || "Not mentioned"
-                        }.
+                    managerName.name || "Not mentioned"
+                  }.
                       </p>
                        <p>Click here <a href="https://employee.adininworks.co">employee.adininworks.co</a> to view the status.</p>
                     </body>
                   </html>`,
-                  "leave_no-reply@adininworks.com",                
+                  "leave_no-reply@adininworks.com",
                   leaveData.empOfficialEmail
                 );
                 // alert("Email sent successfully to Employee");
 
-//____________________________________________________________ HR got email_______________________________________________________________________________________    
+                //____________________________________________________________ HR got email_______________________________________________________________________________________
                 await sendEmail(
                   `Leave Application ${status}`,
                   `<html>
                     <body>
                       <p> 
                         Your Employee Mr/Ms. ${
-                        leaveData.empName || "Not mentioned"
+                          leaveData.empName || "Not mentioned"
                         }'s, ${
-                        leaveData.empLeaveType
-                        } request for the period ${leavePeriod} has been ${status} by Manager, ${
-                        managerName.name || "Not mentioned"
-                        }.
+                    leaveData.empLeaveType
+                  } request for the period ${leavePeriod} has been ${status} by Manager, ${
+                    managerName.name || "Not mentioned"
+                  }.
                       </p>
                       <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
                     </body>
                   </html>`,
                   "leave_no-reply@adininworks.com",
-                  "Hr-notification@adininworks.com"             
+                  "hr-notification@adininworks.com"
                 );
                 // alert("Email sent successfully to HR");
-//____________________________________________________________ Employee got notification_______________________________________________________________________________________    
+                //____________________________________________________________ Employee got notification_______________________________________________________________________________________
                 await createNotification({
                   empID: leaveData.empID,
                   leaveType: leaveData.empLeaveType,
@@ -166,13 +183,13 @@ export const ViewForm = ({
                   receipentEmpID: leaveData.empID,
                   status: "Unread",
                 });
-//____________________________________________________________ HR got notification_______________________________________________________________________________________    
+                //____________________________________________________________ HR got notification_______________________________________________________________________________________
                 await createNotification({
                   empID: leaveData.empID,
                   leaveType: leaveData.empLeaveType,
                   message: `Leave request for ${leaveData.empName} has been ${status} by Manager ${managerName.name}`,
                   senderEmail: "leave_no-reply@adininworks.com",
-                  receipentEmail: "Hr-notification@adininworks.com",
+                  receipentEmail: "hr-notification@adininworks.com",
                   status: "Unread",
                 });
               } catch (err) {
@@ -184,7 +201,6 @@ export const ViewForm = ({
             setTimeout(() => {
               processEmailsAndNotifications();
             }, 100);
-
           } else if (
             userType === "Supervisor" &&
             leaveData.supervisorEmpID &&
@@ -201,96 +217,7 @@ export const ViewForm = ({
             const processEmailsAndNotifySup = async () => {
               try {
                 if (status === "Approved") {
-//____________________________________________________________ manager got email_______________________________________________________________________________________
-                  await sendEmail(
-                    `Leave Application ${status}`,
-                    `<html>
-                      <body>
-                        <p>
-                          Your Employee Mr/Ms. ${
-                          leaveData.empName || "Not mentioned"
-                          }'s, ${
-                          leaveData.empLeaveType
-                          } request for the period   ${leavePeriod}, 
-                          which has been ${status} by Supervisor, ${
-                          supervisorName.name || "Not mentioned"
-                          }.
-                        </p>
-                        <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the status.</p>
-                      </body>
-                    </html>`,
-                    "leave_no-reply@adininworks.com",
-                    FindingEmail[0].officialEmail                   
-                  );
-                  // alert("Email sent successfully to Manager");
-//____________________________________________________________ HR got email_______________________________________________________________________________________
-                  await sendEmail(
-                    `Leave Application ${status}`,
-                    `<html>
-                      <body>
-                        <p> 
-                          Your Employee Mr/Ms. ${
-                            leaveData.empName || "Not mentioned"
-                          }'s, ${
-                          leaveData.empLeaveType
-                          } request for the period ${leavePeriod} has been ${status} by Supervisor, ${
-                          supervisorName.name || "Not mentioned"
-                          }.
-                        </p>
-                        <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
-                      </body>
-                    </html>`,
-                    "leave_no-reply@adininworks.com",
-                    "Hr-notification@adininworks.com"                  
-                  );
-                  // alert("Email sent successfully to HR");
-//____________________________________________________________ manager got notification_______________________________________________________________________________________
-                  await createNotification({
-                    empID: leaveData.empID,
-                    leaveType: leaveData.empLeaveType,
-                    message: `Leave request for ${leaveData.empName} has been ${status} by Supervisor ${supervisorName.name}`,
-                    senderEmail: "leave_no-reply@adininworks.com", 
-                    receipentEmail: FindingEmail[0].officialEmail, 
-                    receipentEmpID: leaveData.managerEmpID,
-                    status: "Unread",
-                  });
-
-                  //hr notify
-//____________________________________________________________ HR got notification_______________________________________________________________________________________                  
-                  await createNotification({
-                    empID: leaveData.empID,
-                    leaveType: leaveData.empLeaveType,
-                    message: `Leave request for ${leaveData.empName} has been ${status} by Supervisor ${supervisorName.name}`,
-                    senderEmail: "leave_no-reply@adininworks.com", 
-                    receipentEmail: "Hr-notification@adininworks.com", 
-                    status: "Unread",
-                  });
-                }
-
-                if (status === "Rejected") {                
-//_____________________________________________________________HR got email______________________________________________________________________________________________________   
-                  await sendEmail(
-                    `Leave Application ${status}`,
-                    `<html>
-                      <body>
-                        <p> 
-                          Your Employee Mr/Ms. ${
-                            leaveData.empName || "Not mentioned"
-                          }'s, ${
-                          leaveData.empLeaveType
-                          } request for the period ${leavePeriod} has been ${status} by Supervisor, ${
-                          supervisorName.name || "Not mentioned"
-                          }.
-                        </p>
-                        <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
-                      </body>
-                    </html>`,
-                    "leave_no-reply@adininworks.com",
-                    "Hr-notification@adininworks.com"
-                   
-                  );
-                  // alert("Email sent successfully to HR");             
-//____________________________________________________________ Manager got email_______________________________________________________________________________________    
+                  //____________________________________________________________ manager got email_______________________________________________________________________________________
                   await sendEmail(
                     `Leave Application ${status}`,
                     `<html>
@@ -299,21 +226,108 @@ export const ViewForm = ({
                           Your Employee Mr/Ms. ${
                             leaveData.empName || "Not mentioned"
                           }'s, ${
-                          leaveData.empLeaveType
-                          } request for the period ${leavePeriod}, 
+                      leaveData.empLeaveType
+                    } request for the period   ${leavePeriod}, 
                           which has been ${status} by Supervisor, ${
-                          supervisorName.name || "Not mentioned"
-                         }.
+                      supervisorName.name || "Not mentioned"
+                    }.
                         </p>
                         <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the status.</p>
                       </body>
                     </html>`,
                     "leave_no-reply@adininworks.com",
                     FindingEmail[0].officialEmail
-                   
                   );
                   // alert("Email sent successfully to Manager");
-//____________________________________________________________ Employee got email_______________________________________________________________________________________    
+                  //____________________________________________________________ HR got email_______________________________________________________________________________________
+                  await sendEmail(
+                    `Leave Application ${status}`,
+                    `<html>
+                      <body>
+                        <p> 
+                          Your Employee Mr/Ms. ${
+                            leaveData.empName || "Not mentioned"
+                          }'s, ${
+                      leaveData.empLeaveType
+                    } request for the period ${leavePeriod} has been ${status} by Supervisor, ${
+                      supervisorName.name || "Not mentioned"
+                    }.
+                        </p>
+                        <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
+                      </body>
+                    </html>`,
+                    "leave_no-reply@adininworks.com",
+                    "hr-notification@adininworks.com"
+                  );
+                  // alert("Email sent successfully to HR");
+                  //____________________________________________________________ manager got notification_______________________________________________________________________________________
+                  await createNotification({
+                    empID: leaveData.empID,
+                    leaveType: leaveData.empLeaveType,
+                    message: `Leave request for ${leaveData.empName} has been ${status} by Supervisor ${supervisorName.name}`,
+                    senderEmail: "leave_no-reply@adininworks.com",
+                    receipentEmail: FindingEmail[0].officialEmail,
+                    receipentEmpID: leaveData.managerEmpID,
+                    status: "Unread",
+                  });
+
+                  //hr notify
+                  //____________________________________________________________ HR got notification_______________________________________________________________________________________
+                  await createNotification({
+                    empID: leaveData.empID,
+                    leaveType: leaveData.empLeaveType,
+                    message: `Leave request for ${leaveData.empName} has been ${status} by Supervisor ${supervisorName.name}`,
+                    senderEmail: "leave_no-reply@adininworks.com",
+                    receipentEmail: "hr-notification@adininworks.com",
+                    status: "Unread",
+                  });
+                }
+
+                if (status === "Rejected") {
+                  //_____________________________________________________________HR got email______________________________________________________________________________________________________
+                  await sendEmail(
+                    `Leave Application ${status}`,
+                    `<html>
+                      <body>
+                        <p> 
+                          Your Employee Mr/Ms. ${
+                            leaveData.empName || "Not mentioned"
+                          }'s, ${
+                      leaveData.empLeaveType
+                    } request for the period ${leavePeriod} has been ${status} by Supervisor, ${
+                      supervisorName.name || "Not mentioned"
+                    }.
+                        </p>
+                        <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
+                      </body>
+                    </html>`,
+                    "leave_no-reply@adininworks.com",
+                    "hr-notification@adininworks.com"
+                  );
+                  // alert("Email sent successfully to HR");
+                  //____________________________________________________________ Manager got email_______________________________________________________________________________________
+                  await sendEmail(
+                    `Leave Application ${status}`,
+                    `<html>
+                      <body>
+                        <p>
+                          Your Employee Mr/Ms. ${
+                            leaveData.empName || "Not mentioned"
+                          }'s, ${
+                      leaveData.empLeaveType
+                    } request for the period ${leavePeriod}, 
+                          which has been ${status} by Supervisor, ${
+                      supervisorName.name || "Not mentioned"
+                    }.
+                        </p>
+                        <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the status.</p>
+                      </body>
+                    </html>`,
+                    "leave_no-reply@adininworks.com",
+                    FindingEmail[0].officialEmail
+                  );
+                  // alert("Email sent successfully to Manager");
+                  //____________________________________________________________ Employee got email_______________________________________________________________________________________
                   await sendEmail(
                     `Leave Application ${status}`,
                     `<html>
@@ -322,46 +336,45 @@ export const ViewForm = ({
                         Dear ${
                           leaveData.empName || "Not mention"
                         }, <br /> Your ${
-                        leaveData.empLeaveType
-                        } request for the period ${leavePeriod} has been ${status} by Supervisor, ${
-                        supervisorName.name || "Not mention"
-                        }. 
+                      leaveData.empLeaveType
+                    } request for the period ${leavePeriod} has been ${status} by Supervisor, ${
+                      supervisorName.name || "Not mention"
+                    }. 
                      </p>
                       <p>Click here <a href="https://employee.adininworks.co">employee.adininworks.co</a> to view the status.</p>
                      </body>
                      </html>`,
                     "leave_no-reply@adininworks.com",
                     leaveData.empOfficialEmail
-                   
                   );
                   // alert("Email sent successfully to Employee");
-//____________________________________________________________ Manager got notification_______________________________________________________________________________________    
+                  //____________________________________________________________ Manager got notification_______________________________________________________________________________________
                   await createNotification({
                     empID: leaveData.empID,
                     leaveType: leaveData.empLeaveType,
                     message: `Leave request for ${leaveData.empName} has been ${status} by Supervisor ${supervisorName.name}`,
-                    senderEmail: "leave_no-reply@adininworks.com", 
-                    receipentEmail: FindingEmail[0].officialEmail, 
+                    senderEmail: "leave_no-reply@adininworks.com",
+                    receipentEmail: FindingEmail[0].officialEmail,
                     receipentEmpID: leaveData.managerEmpID,
                     status: "Unread",
                   });
-//____________________________________________________________ Employee got notification_______________________________________________________________________________________                      
+                  //____________________________________________________________ Employee got notification_______________________________________________________________________________________
                   await createNotification({
                     empID: leaveData.empID,
                     leaveType: leaveData.empLeaveType,
                     message: `Leave request for ${leaveData.empName} has been ${status} by Supervisor ${supervisorName.name}`,
-                    senderEmail: "leave_no-reply@adininworks.com", 
-                    receipentEmail: leaveData.empOfficialEmail, 
+                    senderEmail: "leave_no-reply@adininworks.com",
+                    receipentEmail: leaveData.empOfficialEmail,
                     receipentEmpID: leaveData.empID,
                     status: "Unread",
                   });
-//____________________________________________________________ HR got notification_______________________________________________________________________________________    
+                  //____________________________________________________________ HR got notification_______________________________________________________________________________________
                   await createNotification({
                     empID: leaveData.empID,
                     leaveType: leaveData.empLeaveType,
                     message: `Leave request for ${leaveData.empName} has been ${status} by Supervisor ${supervisorName.name}`,
-                    senderEmail: "leave_no-reply@adininworks.com", 
-                    receipentEmail: "Hr-notification@adininworks.com", 
+                    senderEmail: "leave_no-reply@adininworks.com",
+                    receipentEmail: "hr-notification@adininworks.com",
                     status: "Unread",
                   });
                 }
@@ -371,9 +384,9 @@ export const ViewForm = ({
               }
             };
             setTimeout(() => {
-              processEmailsAndNotifySup();              
+              processEmailsAndNotifySup();
             }, 100);
-           
+
             // console.log("manager");
           } else if (
             userType === "Manager" &&
@@ -392,68 +405,71 @@ export const ViewForm = ({
             const processEmailsAndNotifyManager = async () => {
               try {
                 //supervisor got email
-//____________________________________________________________ Supervisor got email_______________________________________________________________________________________    
-              await sendEmail(
-              `Leave Application ${status}`,
-              `<html>
+                //____________________________________________________________ Supervisor got email_______________________________________________________________________________________
+                await sendEmail(
+                  `Leave Application ${status}`,
+                  `<html>
                    <body>
                      <p> 
-                      Your Employee Mr/Ms. ${leaveData.empName || "Not mentioned"}'s ${
-                      leaveData.empLeaveType
-                    } request for the period ${leavePeriod} has been ${status} by Manager, ${
-                      managerName.name || "Not mentioned"
-                    }.
+                      Your Employee Mr/Ms. ${
+                        leaveData.empName || "Not mentioned"
+                      }'s ${
+                    leaveData.empLeaveType
+                  } request for the period ${leavePeriod} has been ${status} by Manager, ${
+                    managerName.name || "Not mentioned"
+                  }.
                     </p>
                  <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
                  </body>
                </html>`,
-              "leave_no-reply@adininworks.com",
-              FindingEmail[0].officialEmail
-             
+                  "leave_no-reply@adininworks.com",
+                  FindingEmail[0].officialEmail
                 );
                 // alert("Email sent successfully to Supervisor");
-//____________________________________________________________ Employee got email_______________________________________________________________________________________    
+                //____________________________________________________________ Employee got email_______________________________________________________________________________________
                 await sendEmail(
                   `Leave Application ${status}`,
                   `<html>
                     <body>
                      <p> 
-                       Dear ${leaveData.empName || "Not mention"}, <br /> Your ${
-                       leaveData.empLeaveType
-                       } request for the period ${leavePeriod} has been ${status} by Manager, ${
-                       managerName.name || "Not mention"
-                       }. 
+                       Dear ${
+                         leaveData.empName || "Not mention"
+                       }, <br /> Your ${
+                    leaveData.empLeaveType
+                  } request for the period ${leavePeriod} has been ${status} by Manager, ${
+                    managerName.name || "Not mention"
+                  }. 
                     </p>
                     <p>Click here <a href="https://employee.adininworks.co">employee.adininworks.co</a> to view the status.</p>
                    </body>
                  </html>`,
                   "leave_no-reply@adininworks.com",
                   leaveData.empOfficialEmail
-                 
                 );
                 // alert("Email sent successfully to Employee");
-//____________________________________________________________ HR got email_______________________________________________________________________________________    
+                //____________________________________________________________ HR got email_______________________________________________________________________________________
                 await sendEmail(
                   `Leave Application ${status}`,
                   `<html>
                      <body>
                        <p> 
-                          Your Employee Mr/Ms. ${leaveData.empName || "Not mentioned"}'s ${
-                          leaveData.empLeaveType
-                          } request for the period ${leavePeriod} has been ${status} by Manager, ${
-                          managerName.name || "Not mentioned"
-                          }.
+                          Your Employee Mr/Ms. ${
+                            leaveData.empName || "Not mentioned"
+                          }'s ${
+                    leaveData.empLeaveType
+                  } request for the period ${leavePeriod} has been ${status} by Manager, ${
+                    managerName.name || "Not mentioned"
+                  }.
                        </p>
                        <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
                      </body>
                  </html>`,
                   "leave_no-reply@adininworks.com",
-                  "Hr-notification@adininworks.com"
-                 
+                  "hr-notification@adininworks.com"
                 );
                 // alert("Email sent successfully to HR");
                 // Create notification for Employeee
-//____________________________________________________________ Employee got notification_______________________________________________________________________________________    
+                //____________________________________________________________ Employee got notification_______________________________________________________________________________________
                 await createNotification({
                   empID: leaveData.empID,
                   leaveType: leaveData.empLeaveType,
@@ -462,12 +478,12 @@ export const ViewForm = ({
                   } has been ${status} by Manager ${
                     managerName.name || "Not mentioned"
                   } .`,
-                  senderEmail: "leave_no-reply@adininworks.com", 
-                  receipentEmail: leaveData.empOfficialEmail, 
+                  senderEmail: "leave_no-reply@adininworks.com",
+                  receipentEmail: leaveData.empOfficialEmail,
                   receipentEmpID: leaveData.empID,
                   status: "Unread",
                 });
-//____________________________________________________________ Supervisor got notification_______________________________________________________________________________________    
+                //____________________________________________________________ Supervisor got notification_______________________________________________________________________________________
                 await createNotification({
                   empID: leaveData.empID,
                   leaveType: leaveData.empLeaveType,
@@ -476,12 +492,12 @@ export const ViewForm = ({
                   } has been ${status} by Manager ${
                     managerName.name || "Not mentioned"
                   }.`,
-                  senderEmail: "leave_no-reply@adininworks.com", 
-                  receipentEmail: FindingEmail[0].officialEmail, 
+                  senderEmail: "leave_no-reply@adininworks.com",
+                  receipentEmail: FindingEmail[0].officialEmail,
                   receipentEmpID: leaveData.supervisorEmpID,
                   status: "Unread",
                 });
-//____________________________________________________________ HR got notification_______________________________________________________________________________________    
+                //____________________________________________________________ HR got notification_______________________________________________________________________________________
                 await createNotification({
                   empID: leaveData.empID,
                   leaveType: leaveData.empLeaveType,
@@ -490,8 +506,8 @@ export const ViewForm = ({
                   } has been ${status} by Manager ${
                     managerName.name || "Not mentioned"
                   }.`,
-                  senderEmail: "leave_no-reply@adininworks.com", 
-                  receipentEmail: "Hr-notification@adininworks.com", 
+                  senderEmail: "leave_no-reply@adininworks.com",
+                  receipentEmail: "hr-notification@adininworks.com",
                   status: "Unread",
                 });
               } catch (err) {
@@ -501,26 +517,32 @@ export const ViewForm = ({
             };
 
             setTimeout(() => {
-              processEmailsAndNotifyManager();             
-            }, 100);
-           
+              processEmailsAndNotifyManager();
+            }, 200);
           }
-          
+
           setTimeout(() => {
-             setNotification(true);
-             setPath("/leaveManagement");           
-          }, 600);
-         
+            setNotification(true);
+            setPath("/leaveManagement");
+          }, 500);
         })
         .catch((err) => console.log(err));
     } else if (source === "Tickets") {
-      updateData.hrStatus = status; 
-      updateData.hrRemarks = remark;
-      updateData.hrDate = currentDate;
-      const formattedDatedeparture = DateFormat(ticketData.departureDate);
-      const formattedDatearrival = DateFormat(ticketData.arrivalDate);
+      
+      if (userType === "HR") {
+        ticketUpdatedData.hrStatus = status;
+        ticketUpdatedData.hrRemarks = remark;
+        ticketUpdatedData.hrDate = currentDate;
+      } else if (gmPosition === "GENERAL MANAGER") {
+        ticketUpdatedData.gmStatus = status;
+        ticketUpdatedData.gmRemarks = remark;
+        ticketUpdatedData.gmDate = currentDate;
+      }
 
-      handleUpdateTicketRequest(ticketData.id, updateData)
+      const formattedDatedeparture = ticketData.empDepartureDate || DateFormat(ticketData.departureDate);
+      const formattedDatearrival = ticketData.empArrivalDate || DateFormat(ticketData.arrivalDate);
+
+      handleUpdateTicketRequest(ticketData.id, ticketUpdatedData)
         .then(async () => {
           setNotificationText(
             `Ticket request ${status} by ${personalInfo.name} on ${DateFormat(
@@ -533,60 +555,197 @@ export const ViewForm = ({
           const findingManagerEmail = empPIData.find(
             (val) => val.empID === managerEmpID
           );
-          // console.log(findingManagerEmail.officialEmail);
 
-          //employee send email
-          await sendEmail(
-            `Ticket Request ${status}`,
-            `Dear  ${
-              ticketData.empName || "Not mention"
-            } , Your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${status} by HR ${
-              personalInfo.name || "Not mention"
-            }. View at : <a href="https://employee.adininworks.co">employee.adininworks.co</a> `,
-            "hr_no-reply@adininworks.com",
-            ticketData.empOfficialEmail
-          );
-          // alert("Email sent successfully to Employee");
+          if (userType === "HR") {
+            //employee send email
+            await sendEmail(
+              `Ticket Request ${status}`,
+              `Dear  ${
+                ticketData.empName || "Not mention"
+              } , Your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
+                status === "Verified" ? "verified" : "marked as not eligible"
+              } by HR ${
+                personalInfo.name || "Not mention"
+              }. <p>View at : <a href="https://employee.adininworks.co">employee.adininworks.co</a></p> `,
+              "hr_no-reply@adininworks.com",
+              ticketData.empOfficialEmail
+            );
 
-          //manager send email
-          await sendEmail(
-            `Ticket Request ${status}`,
-            `Employee  ${
-              ticketData.empName || "Not mention"
-            } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${status} by HR ${
-              personalInfo.name || "Not mention"
-            }. `,
-            "hr_no-reply@adininworks.com",
-            findingManagerEmail.officialEmail
-          );
-          // alert("Email sent successfully to Manager");
+            //manager send email
+            await sendEmail(
+              `Ticket Request  ${
+                status === "Verified" ? "verified" : "marked as not eligible"
+              }`,
+              `Your employee  ${
+                ticketData.empName || "Not mention"
+              } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
+                status === "Verified" ? "verified" : "marked as not eligible"
+              } by HR ${personalInfo.name || "Not mention"}. 
+              <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
+              `,
+              "hr_no-reply@adininworks.com",
+              findingManagerEmail.officialEmail
+            );
 
-          // Create notification for the ticket status update employee
-          await createNotification({
-            empID: ticketData.empID,
-            leaveType: "Ticket Request", 
-            message: `Ticket request for ${ticketData.empName} has been ${status} by HR ${personalInfo.name}`,
-            senderEmail: "ticket_no-reply@adininworks.com", 
-            receipentEmail: ticketData.empOfficialEmail, 
-            receipentEmpID: ticketData.empID,
-            status: "Unread",
-          });
+            //GM send email
+            await sendEmail(
+              `Ticket Request  ${
+                status === "" ? "verified" : "marked as not eligible"
+              }`,
+              `Your employee  ${
+                ticketData.empName || "Not mention"
+              } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
+                status === "Verified" ? "verified" : "marked as not eligible"
+              } by HR ${personalInfo.name || "Not mention"}.
+              <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
+               `,
+              "hr_no-reply@adininworks.com",
+              gmMail
+            );
 
-          // Create notification for the ticket status update manager
-          await createNotification({
-            empID: ticketData.empID,
-            leaveType: "Ticket Request", 
-            message: `Ticket request for ${ticketData.empName} has been ${status} by HR ${personalInfo.name}`,
-            senderEmail: "ticket_no-reply@adininworks.com", 
-            receipentEmail: findingManagerEmail.officialEmail, 
-            receipentEmpID: ticketData.empID,
-            status: "Unread",
-          });
+            // Create notification for the ticket status update employee
+            // await createNotification({
+            //   empID: ticketData.empID,
+            //   leaveType: "Ticket Request",
+            //   message: `Ticket request for ${ticketData.empName} has been ${
+            //     status === "Verified" ? "verified" : "marked as not eligible"
+            //   } by HR ${personalInfo.name}`,
+            //   senderEmail: "hr_no-reply@adininworks.com",
+            //   receipentEmail: ticketData.empOfficialEmail,
+            //   receipentEmpID: ticketData.empID,
+            //   status: "Unread",
+            // });
+
+            await createNotification({
+              empID: ticketData.empID,
+              leaveType: "Ticket Request",
+              message: `Dear ${
+                ticketData.empName || "Not mentioned"
+              }, your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
+                status === "Verified" ? "verified" : "marked as not eligible"
+              } by HR ${personalInfo.name || "Not mentioned"}.`,
+              senderEmail: "hr_no-reply@adininworks.com",
+              receipentEmail: ticketData.empOfficialEmail,
+              receipentEmpID: ticketData.empID,
+              status: "Unread",
+            });
+
+            // Create notification for the ticket status update manager
+            await createNotification({
+              empID: ticketData.empID,
+              leaveType: "Ticket Request",
+              message: `Your employee ${
+                ticketData.empName || "Not mentioned"
+              }, your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
+                status === "Verified" ? "verified" : "marked as not eligible"
+              } by HR ${personalInfo.name}`,
+              senderEmail: "hr_no-reply@adininworks.com",
+              receipentEmail: findingManagerEmail.officialEmail,
+              receipentEmpID: ticketData.managerEmpID,
+              status: "Unread",
+            });
+
+            await createNotification({
+              empID: ticketData.empID,
+              leaveType: "Ticket Request",
+              message: `Your employee ${
+                ticketData.empName || "Not mentioned"
+              }, your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
+                status === "Verified" ? "verified" : "marked as not eligible"
+              } by HR ${personalInfo.name}`,
+              senderEmail: "hr_no-reply@adininworks.com",
+              receipentEmail: gmMail,
+              receipentEmpID: GMEmpID,
+              status: "Unread",
+            });
+          } else if (gmPosition === "GENERAL MANAGER") {
+            await sendEmail(
+              `Ticket Request ${status}`,
+              `Dear  ${
+                ticketData.empName || "Not mention"
+              } , Your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${status} by GM ${
+                personalInfo.name || "Not mention"
+              }. <p>View at : <a href="https://employee.adininworks.co">employee.adininworks.co</a></p> `,
+              "hr_no-reply@adininworks.com",
+              ticketData.empOfficialEmail
+            );
+
+            //manager send email
+            await sendEmail(
+              `Ticket Request ${status}`,
+              `Your employee  ${
+                ticketData.empName || "Not mention"
+              } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been  ${status} by GM ${
+                personalInfo.name || "Not mention"
+              }.
+                <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p> 
+              `,
+              "hr_no-reply@adininworks.com",
+              findingManagerEmail.officialEmail
+            );
+
+            await sendEmail(
+              `Ticket Request ${status}`,
+              `Your employee  ${
+                ticketData.empName || "Not mention"
+              } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been  ${status} by GM ${
+                personalInfo.name || "Not mention"
+              }.
+                <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p> 
+              `,
+              "hr_no-reply@adininworks.com",
+              "hr-notification@adininworks.com"
+            );
+
+            // Create notification for the ticket status update employee
+            await createNotification({
+              empID: ticketData.empID,
+              leaveType: "Ticket Request",
+              message: `Dear ${
+                ticketData.empName || "Not mentioned"
+              }, your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${status} by General Manager ${
+                personalInfo.name
+              }`,
+              senderEmail: "hr_no-reply@adininworks.com",
+              receipentEmail: ticketData.empOfficialEmail,
+              receipentEmpID: ticketData.empID,
+              status: "Unread",
+            });
+
+            // Create notification for the ticket status update manager
+            await createNotification({
+              empID: ticketData.empID,
+              leaveType: "Ticket Request",
+              message: `Your employee ${
+                ticketData.empName || "Not mentioned"
+              }, your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${status} by General Manager ${
+                personalInfo.name
+              }`,
+              senderEmail: "hr_no-reply@adininworks.com",
+              receipentEmail: findingManagerEmail.officialEmail,
+              receipentEmpID: ticketData.empID,
+              status: "Unread",
+            });
+
+            // create notification for HR
+            await createNotification({
+              empID: ticketData.empID,
+              leaveType: "Ticket Request",
+              message: `Your employee ${
+                ticketData.empName || "Not mentioned"
+              }, your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${status} by General Manager ${
+                personalInfo.name
+              }`,
+              senderEmail: "hr_no-reply@adininworks.com",
+              receipentEmail: "hr-notification@adininworks.com",
+              status: "Unread",
+            });
+          }
 
           setTimeout(() => {
             setNotification(true);
-            setPath("/leaveManagement/requestTickets");           
-          }, 600);
+            setPath("/leaveManagement/requestTickets");
+          }, 500);
         })
         .catch((err) => console.log(err));
     }
@@ -594,6 +753,8 @@ export const ViewForm = ({
 
   const handleApprove = () => handleUpdateStatus("Approved");
   const handleReject = () => handleUpdateStatus("Rejected");
+  const handleVerify = () => handleUpdateStatus("Verified");
+  const handleNotEligible = () => handleUpdateStatus("Not Eligible");
 
   const renderButtons = () => {
     const { supervisorStatus, managerStatus, supervisorEmpID } = leaveData;
@@ -692,10 +853,10 @@ export const ViewForm = ({
 
     // Case 5: Supervisor and Manager both approved, User not SuperAdmin/HR
     if (managerStatus === "Approved" && isApproved && isNotSuperAdminOrHR) {
-      return null; // No buttons rendered in this case
+      return null;
     }
 
-    return null; // Default case if none of the conditions match
+    return null;
   };
 
   return (
@@ -764,8 +925,8 @@ export const ViewForm = ({
                           : `${leaveData.empLeaveSelectedFrom} to ${leaveData.empLeaveSelectedTo}`
                         : leaveData.empLeaveStartDate &&
                           leaveData.empLeaveEndDate
-                        ? isValidDateFormat(leaveData.empLeaveStartDate) &&
-                          isValidDateFormat(leaveData.empLeaveEndDate)
+                        ? !isValidDateFormat(leaveData.empLeaveStartDate) &&
+                          !isValidDateFormat(leaveData.empLeaveEndDate)
                           ? `${DateFormat(
                               leaveData.empLeaveStartDate
                             )} to ${DateFormat(leaveData.empLeaveEndDate)}`
@@ -1038,29 +1199,26 @@ export const ViewForm = ({
                     label: "Destination",
                     value: ticketData.destination,
                   },
-                  {
+                  { 
                     label: "Departure Date",
-                    value:
-                      ticketData.empDepartureDate
-                        ? isValidDateFormat(ticketData.empDepartureDate)
-                          ? `${DateFormat(ticketData.empDepartureDate)}`
-                          : `${ticketData.empDepartureDate}`
-                        : ticketData.departureDate
-                        ? `${DateFormat(ticketData.departureDate)}`
-                        : "N/A",
+                    value: ticketData.empDepartureDate
+                      ? isValidDateFormat(ticketData.empDepartureDate)
+                        ? `${DateFormat(ticketData.empDepartureDate)}`
+                        : `${ticketData.empDepartureDate}`
+                      : ticketData.departureDate
+                      ? `${DateFormat(ticketData.departureDate)}`
+                      : "N/A",
                   },
                   {
                     label: "Arrival Date",
-                    value:
-                      ticketData.empArrivalDate
-                        ? isValidDateFormat(ticketData.empArrivalDate)
-                          ? `${DateFormat(ticketData.empArrivalDate)}`
-                          : `${ticketData.empArrivalDate}`
-                        : ticketData.arrivalDate
-                        ? `${DateFormat(ticketData.arrivalDate)}`
-                        : "N/A",
+                    value: ticketData.empArrivalDate
+                      ? isValidDateFormat(ticketData.empArrivalDate)
+                        ? `${DateFormat(ticketData.empArrivalDate)}`
+                        : `${ticketData.empArrivalDate}`
+                      : ticketData.arrivalDate
+                      ? `${DateFormat(ticketData.arrivalDate)}`
+                      : "N/A",
                   },
-                  
                   {
                     label: "Employee Remarks",
                     value: ticketData.empRemarks || "N/A",
@@ -1077,7 +1235,9 @@ export const ViewForm = ({
                   ))}
 
                 {(userType === "SuperAdmin" ||
-                  (userType === "HR" && ticketData.hrStatus !== "Pending")) && (
+                  userType === "HR" ||
+                  gmPosition === "GENERAL MANAGER"
+                  ) && ticketData.hrStatus !== "Pending" && (
                   <table className="w-full mt-5 border-collapse">
                     <thead className="bg-gradient-to-r from-[#f5ee6ad7] via-[#faf362] to-[#f5ee6ad7] shadow-[0_4px_6px_rgba(255,250,150,0.5)]">
                       <tr className="text-[#6a2b2b] font-bold text-center">
@@ -1090,19 +1250,39 @@ export const ViewForm = ({
                     </thead>
                     <tbody>
                       {/* HR Row */}
-                      <tr className="border-b border-lite_grey">
-                        <td className="p-2 text-center font-semibold">HR</td>
-                        <td
-                          className={`text-center font-bold p-2 ${getStatusClass(
-                            ticketData.hrStatus
-                          )}`}
-                        >
-                          {ticketData.hrStatus}
-                        </td>
-                        <td className="p-2 break-words max-w-[200px] text-center text-grey">
-                          {ticketData.hrRemarks || "No remarks"}
-                        </td>
-                      </tr>
+                    
+                        <tr className="border-b border-lite_grey">
+                          <td className="p-2 text-center font-semibold">HR</td>
+                          <td
+                            className={`text-center font-bold p-2 ${getHrStatusClass(
+                              ticketData.hrStatus
+                            )}`}
+                          >
+                            {ticketData.hrStatus}
+                          </td>
+                          <td className="p-2 break-words max-w-[200px] text-center text-grey">
+                            {ticketData.hrRemarks || "No remarks"}
+                          </td>
+                        </tr>
+                
+
+                      {/* GM Row */}
+                      {(ticketData.gmStatus === "Approved" ||
+                        ticketData.gmStatus === "Rejected") && (
+                        <tr className="border-b border-lite_grey">
+                          <td className="p-2 text-center font-semibold">GM</td>
+                          <td
+                            className={`text-center font-bold p-2 ${getGmStatusClass(
+                              ticketData.gmStatus
+                            )}`}
+                          >
+                            {ticketData.gmStatus}
+                          </td>
+                          <td className="p-2 break-words max-w-[200px] text-center text-grey">
+                            {ticketData.gmRemarks || "No remarks"}
+                          </td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 )}
@@ -1123,24 +1303,63 @@ export const ViewForm = ({
                       />
                     </div>
                   )}
+
+                {gmPosition === "GENERAL MANAGER" &&
+                  ticketData.gmStatus === "Pending" &&
+                  ticketData.hrStatus !== "Pending" &&
+                  userType !== "SuperAdmin" && (
+                    <div className="grid grid-cols-[150px_auto_1fr] gap-2 items-center mt-4">
+                      <label className="font-semibold" htmlFor="remark">
+                        Remark
+                      </label>
+                      <span className="text-center">:</span>
+                      <input
+                        id="remark"
+                        type="text"
+                        value={remark}
+                        onChange={(e) => setRemark(e.target.value)}
+                        className="border border-lite_grey h-9 outline-none pl-2"
+                      />
+                    </div>
+                  )}
               </div>
               <div className="flex justify-evenly mt-7 ">
                 {ticketData.hrStatus === "Pending" && userType === "HR" && (
                   <>
                     <button
                       className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
-                      onClick={handleApprove}
+                      onClick={handleNotEligible}
                     >
-                      Approved
+                      Not Eligible
                     </button>
                     <button
                       className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
-                      onClick={handleReject}
+                      onClick={handleVerify}
                     >
-                      Reject
+                      Verify
                     </button>
                   </>
                 )}
+              </div>
+              <div className="flex justify-evenly mt-7 ">
+                {ticketData.gmStatus === "Pending" &&
+                  ticketData.hrStatus !== "Pending" &&
+                  gmPosition === "GENERAL MANAGER" && (
+                    <>
+                      <button
+                        className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
+                        onClick={handleReject}
+                      >
+                        Reject
+                      </button>
+                      <button
+                        className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
+                        onClick={handleApprove}
+                      >
+                        Approve
+                      </button>
+                    </>
+                  )}
               </div>
             </section>
           )}

@@ -29,7 +29,7 @@ export const PopupForAssignManager = ({
     }));
     setErrors((prevErrors) => ({
       ...prevErrors,
-      [name]: "", // Clear error when user starts typing
+      [name]: "",
     }));
   };
 
@@ -37,7 +37,6 @@ export const PopupForAssignManager = ({
     const newErrors = {};
     const { mbadgeNo, mName, mdepartment, mfromDate, muntilDate } = formData;
 
-    // Required field checks
     if (!mbadgeNo) newErrors.mbadgeNo = "Badge No is required.";
 
     if (!mName) newErrors.mName = "Name is required.";
@@ -61,7 +60,6 @@ export const PopupForAssignManager = ({
       return;
     }
 
-    // Submit form
     renameKeysFunctionAndSubmit(formData);
     toggleFunctionForAssiMana();
   };

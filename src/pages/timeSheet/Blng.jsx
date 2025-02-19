@@ -9,11 +9,15 @@ export const Blng = () => {
   const [submittedData, setSubmittedData] = useState([]);
   const [ManagerData, setManagerData] = useState([]);
   const [showing, setShowing] = useState(0);
-  const [isFetching, setIsFetching] = useState(true); // Track fetching state
+  const [isFetching, setIsFetching] = useState(true);
   const Position = localStorage.getItem("userType");
 
   const userIdetification =
-    Position === "Manager" ? "Manager" : Position !== "Manager" ? "All" : "";
+    Position === "Manager"
+      ? "Manager"
+      : Position !== "Manager"
+      ? "Unsubmitted"
+      : "";
   const titleName = "BLNG";
   const cardName = userIdetification;
 
@@ -38,23 +42,7 @@ export const Blng = () => {
         } catch (error) {
           // Handle parsing errors
         }
-        // {
-        //   BPCOMPANY: "ADININ WORKS & ENGINEERING SDN BHD";
-        //   DAILY: "12h 47m";
-        //   DAILYTOTAL: "12h 47m";
-        //   DAYDIFFERENCE: 0;
-        //   EARLIESTENTRYTIME: 45628.2416550926;
-        //   ENTRANCEDATE: 45628;
-        //   ENTRYTIME: 45628.2416550926;
-        //   EXITTIME: 45628.7739930556;
-        //   FID: 596;
-        //   LATESTENTRYTIME: 45628.7739930556;
-        //   NAMEFLAST: "UNTING AK GENA";
-        //   NORMALWORKINGHRSPERDAY: "";
-        //   OT: "";
-        //   REMARKS: "";
-        //   WORKINGHOURS: "";
-        // }
+
         return {
           id: val.id,
           fileName: val.fileName,
@@ -82,21 +70,24 @@ export const Blng = () => {
   };
 
   useEffect(() => {
-    let timeoutId;
+    
 
     if (Position !== "Manager") {
       const fetchData = async () => {
-        setIsFetching(true); // Start fetching
+        setIsFetching(true);
         try {
-          // Wait for the data to arrive
           const hasData = await new Promise((resolve) => {
-            timeoutId = setTimeout(() => resolve(false), 15000); // Fallback after 30 seconds
+          
             if (
               convertedStringToArrayObj &&
               convertedStringToArrayObj.length > 0
             ) {
-              clearTimeout(timeoutId); // Clear fallback timeout
+              
               resolve(true);
+            }else if (!convertedStringToArrayObj) {
+              setShowing(0);
+            } else if (convertedStringToArrayObj.length === 0) {
+              setShowing(2);
             }
           });
 
@@ -106,17 +97,17 @@ export const Blng = () => {
             );
             if (finalData && finalData.length > 0) {
               setSubmittedData(pendingData(finalData));
-              setShowing(1); // Data available
+              setShowing(1);
             } else {
-              setShowing(2); // No valid data
+              setShowing(2);
             }
           } else {
-            setShowing(2); // Data not fetched in time
+            setShowing(2);
           }
         } catch (err) {
-          setShowing(2); // Handle error case
+          setShowing(2);
         } finally {
-          setIsFetching(false); // Done fetching
+          setIsFetching(false);
         }
       };
 
@@ -126,7 +117,7 @@ export const Blng = () => {
       setManagerData(convertedStringToArrayObj);
     }
 
-    return () => clearTimeout(timeoutId); // Cleanup timeout on unmount
+    
   }, [convertedStringToArrayObj, Position]);
 
   return (

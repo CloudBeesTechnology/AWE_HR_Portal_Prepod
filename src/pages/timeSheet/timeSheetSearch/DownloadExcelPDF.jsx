@@ -15,18 +15,15 @@ export const DownloadExcelPDF = (
   const input = document.getElementById(elementID);
 
   if (!input) {
-    // console.error(`Element with ID ${elementID} not found`);
     return;
   }
 
-  // Temporarily adjust the table container to ensure all content is visible
   const container = input.parentElement;
   const originalHeight = container.style.height;
-  container.style.height = "auto"; // Ensure the container is tall enough to show all content
+  container.style.height = "auto";
 
   html2canvas(input, { useCORS: true, scale: 2 })
     .then((canvas) => {
-      // Revert the height change
       container.style.height = originalHeight;
 
       const imgData = canvas.toDataURL("image/png");
@@ -36,15 +33,13 @@ export const DownloadExcelPDF = (
         format: "a4",
       });
 
-      // Add margins (in mm)
       const marginTop = 5;
       const marginBottom = 0;
       const marginLeft = 5;
       const marginRight = 5;
 
-      // Add logo at the top
-      const logoUrl = tableLogo; // Logo URL or base64
-      pdf.addImage(logoUrl, "SVG", marginLeft, marginTop, 30, 5); // Adjust logo size
+      const logoUrl = tableLogo;
+      pdf.addImage(logoUrl, "SVG", marginLeft, marginTop, 30, 5);
 
       pdf.setFontSize(4);
 
@@ -60,7 +55,7 @@ export const DownloadExcelPDF = (
         marginLeft,
         marginTop + 10
       );
-      // Calculate dimensions and scaling for the captured table image
+
       const pdfWidth =
         pdf.internal.pageSize.getWidth() - marginLeft - marginRight;
       const pdfHeight =
@@ -69,20 +64,14 @@ export const DownloadExcelPDF = (
       const imgHeight = canvas.height;
       const scale = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
 
-      // Calculate positioning with margins
       const x = marginLeft + (pdfWidth - imgWidth * scale) / 2;
-      const y = marginTop + 10 + 3; // Adjust spacing after logo and text
+      const y = marginTop + 10 + 3;
 
-      // Add the table image to the PDF
       pdf.addImage(imgData, "SVG", x, y, imgWidth * scale, imgHeight * scale);
 
-      // Save the PDF
       pdf.save(
         `TIMESHEET SUMMARY - ${location} DIVISION FOR THE PERIOD ${formattedStartDate} TO ${formattedEndDate}.pdf`
       );
-      pdf.save(`.pdf`);
     })
-    .catch((error) => {
-    //   console.error("Error generating PDF:", error); // Catch any errors
-    });
+    .catch((error) => {});
 };

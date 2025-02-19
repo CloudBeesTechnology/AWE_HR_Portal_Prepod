@@ -77,17 +77,17 @@ export const UploadEditedSBW = (
 
     function cleanKey(key) {
       if (typeof key !== "string") {
-        return key; // Return value if not a string (e.g., number, object)
+        return key;
       }
-      return key.replace(/[^a-zA-Z0-9]/g, ""); // Removes all non-alphanumeric characters
+      return key.replace(/[^a-zA-Z0-9]/g, "");
     }
 
     const formattedData = tableBodyData.map((item) => {
       const cleanedItem = {};
 
       for (const key in item) {
-        const cleanedKey = cleanKey(key); // Clean the key
-        cleanedItem[cleanedKey] = item[key]; // Set the value using the cleaned key
+        const cleanedKey = cleanKey(key);
+        cleanedItem[cleanedKey] = item[key];
       }
 
       return cleanedItem;
@@ -111,21 +111,17 @@ export const UploadEditedSBW = (
         return item;
       });
 
-    // const removeTotalEmployees = updatedDataArray.filter(
-    //   (val) => !val.NAME?.includes("TOTAL EMPLOYEES")
-    // );
     const filteHighlightedData = updatedDataArray.filter(
       (item) => item.IN && item.OUT
     );
 
     setExcelData(filteHighlightedData);
-    // For Re-corrected theader
+
     const transformData = (data) => {
       return data.map((innerArray) =>
         innerArray.map((item) => {
-          // Dynamically create a new object with swapped keys and values
           return Object.entries(item).reduce((acc, [key, value]) => {
-            acc[value] = key; // Set the value as key and key as value
+            acc[value] = key;
             return acc;
           }, {});
         })

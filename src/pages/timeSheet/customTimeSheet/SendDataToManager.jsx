@@ -7,7 +7,6 @@ import {
 
 const client = generateClient();
 
-// Function to handle pagination and fetch all data
 const fetchAllData = async (queryName) => {
   let allData = [];
   let nextToken = null;
@@ -18,27 +17,32 @@ const fetchAllData = async (queryName) => {
       variables: { nextToken },
     });
 
-    const items = response.data[Object.keys(response.data)[0]].items; // Extract items
-    allData = [...allData, ...items]; // Append fetched items
-    nextToken = response.data[Object.keys(response.data)[0]].nextToken; // Update nextToken
-  } while (nextToken); // Continue fetching if more pages exist
+    const items = response.data[Object.keys(response.data)[0]].items || [];
+    allData = [...allData, ...items];
+    nextToken = response.data[Object.keys(response.data)[0]].nextToken;
+  } while (nextToken);
 
   return allData;
 };
 
-export const SendDataToManager = async (filterPending) => {
+export const SendDataToManager = async (
+  filterPending,
+  setLoading,
+  setMessage
+) => {
   try {
+    setLoading?.(true);
+    setMessage?.("Please wait a few seconds...");
+
     const loginAuth = localStorage.getItem("userID")?.toUpperCase();
 
     const fetchData = async () => {
-      // Fetch all paginated data from GraphQL queries
       const [empPersonalInfos, empWorkInfos, usersData] = await Promise.all([
         fetchAllData(listEmpPersonalInfos),
         fetchAllData(listEmpWorkInfos),
         fetchAllData(listUsers),
       ]);
 
-      // Merge data based on empID
       const mergedData = empPersonalInfos
         .map((candidate) => {
           const interviewDetails = empWorkInfos.find(
@@ -49,7 +53,6 @@ export const SendDataToManager = async (filterPending) => {
             (item) => item.empID === candidate.empID
           );
 
-          // Return null if all details are undefined
           if (!interviewDetails && !allUser) {
             return null;
           }
@@ -60,9 +63,8 @@ export const SendDataToManager = async (filterPending) => {
             ...allUser,
           };
         })
-        .filter((item) => item !== null); // Remove null values
+        .filter((item) => item !== null);
 
-      // Filter data for the logged-in Manager
       const filteredData = mergedData.filter(
         (value) => value.empID === loginAuth && value.selectType === "Manager"
       );
@@ -70,23 +72,30 @@ export const SendDataToManager = async (filterPending) => {
       return filteredData;
     };
 
-    // Fetch merged data
     const getOneObject = await fetchData();
 
-    // Filter pending items based on manager assignments
     const finalOutput = filterPending?.filter((pendingItem) => {
       return getOneObject.some((manager) => {
         return pendingItem.assignTo === manager.empBadgeNo;
       });
     });
 
-    // Remove null and undefined values from the filtered output
     const filteredOutput = finalOutput.filter(
       (item) => item !== null && item !== undefined
     );
 
+    setLoading?.(false);
+
+    if (filteredOutput.length === 0) {
+      setMessage?.("No data available");
+    } else {
+      setMessage?.("");
+    }
+
     return filteredOutput;
   } catch (err) {
-    // console.log("ERROR : ", err);
+    console.error("ERROR:", err);
+    setLoading?.(false);
+    setMessage?.("An error occurred. Please try again.");
   }
 };

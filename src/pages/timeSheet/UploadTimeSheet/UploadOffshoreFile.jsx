@@ -11,7 +11,7 @@ export const UploadOffshoreFile = (
     const workbook = XLSX.read(excelFile, { type: "buffer" });
 
     const worksheetNameLength = workbook.SheetNames;
-  
+
     const allSheets = [];
 
     worksheetNameLength.forEach((sheetName) => {
@@ -74,7 +74,6 @@ export const UploadOffshoreFile = (
         };
 
         tbodyHeader.push(combinedTbodyHeader);
-        // console.log(combinedTbodyHeader);
 
         const tbodyRows = sheet.data
           .slice(8)
@@ -88,7 +87,6 @@ export const UploadOffshoreFile = (
         };
       });
 
-    // console.log(processedSheets);
     const finalFilterdData = [];
 
     processedSheets &&
@@ -108,12 +106,12 @@ export const UploadOffshoreFile = (
         let totalIndex = MergeDateLocation.findIndex(
           (item) => item.NAME === "TOTAL"
         );
-       
+
         if (totalIndex > -1) {
           let slicedData = MergeDateLocation.slice(0, totalIndex);
-         
+
           let filteredData = slicedData.filter((item) => item.NAME !== null);
-         
+
           const filterdData = filteredData.flat();
 
           finalFilterdData.push(...filterdData);
@@ -127,15 +125,12 @@ export const UploadOffshoreFile = (
     }
 
     function convertDateFormat(dateStr) {
-      // Split the input string by '/'
       const parts = dateStr.split("/");
 
-      // Validate the input format
       if (parts.length !== 3) {
         throw new Error("Invalid date format. Expected DD/MM/YYYY");
       }
 
-      // Rearrange the parts to MM/DD/YYYY
       const [day, month, year] = parts;
       return `${day}/${month}/${year}`;
     }
@@ -145,32 +140,32 @@ export const UploadOffshoreFile = (
         const dates = getDate.date.flat();
         let jsDate = excelDateToJSDate(dates);
         const dateObject = jsDate.toLocaleDateString();
-       const formattedDate= convertDateFormat(dateObject)
-        
+        const formattedDate = convertDateFormat(dateObject);
+
         return {
           ...getDate,
           date: formattedDate,
         };
       });
-    
+
     function cleanKey(key) {
       if (typeof key !== "string") {
-        return key; // Return value if not a string (e.g., number, object)
+        return key;
       }
-      return key.replace(/[^a-zA-Z0-9]/g, ""); // Removes all non-alphanumeric characters
+      return key.replace(/[^a-zA-Z0-9]/g, "");
     }
 
     const formattedData = result.map((item) => {
       const cleanedItem = {};
 
       for (const key in item) {
-        const cleanedKey = cleanKey(key).toUpperCase(); // Clean the key
-        cleanedItem[cleanedKey] = item[key]; // Set the value using the cleaned key
+        const cleanedKey = cleanKey(key).toUpperCase();
+        cleanedItem[cleanedKey] = item[key];
       }
 
       return cleanedItem;
     });
-    
+
     setExcelData(formattedData);
     setLoading(false);
     return tbodyHeader;

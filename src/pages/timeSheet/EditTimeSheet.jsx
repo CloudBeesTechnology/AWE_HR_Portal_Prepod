@@ -82,21 +82,17 @@ export const EditTimeSheet = ({
   useEffect(() => {
     if (editObject) {
       const formatDateTime = (getDate) => {
-        // Check if dateTime is already a string
-
         const inputDate = String(getDate);
         const date = new Date(inputDate);
 
-        // Extract parts
-        const day = date.getDate(); // 2
-        const month = date.getMonth() + 1; // Months are 0-indexed, so add 1
-        const year = date.getFullYear(); // 2024
-        const time = inputDate?.split(" ")[1] + " " + inputDate?.split(" ")[2]; // "5:50:59 AM"
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        const time = inputDate?.split(" ")[1] + " " + inputDate?.split(" ")[2];
 
-        // Format the new date
         return `${day}/${month}/${year} ${time}`;
       };
-      // Format both fields
+
       const formattedEntranceDateTime = formatDateTime(
         editObject.ENTRANCEDATETIME
       );
@@ -106,23 +102,19 @@ export const EditTimeSheet = ({
       const fieldToUpdate = isDateField ? "DATE" : "ENTRANCEDATEUSED";
       const originalDate = editObject[fieldToUpdate];
 
-      // Convert the date from DD/MM/YYYY to MM/DD/YYYY for display
       const displayedDate = originalDate
         ? `${originalDate.split("/")[1]}/${originalDate.split("/")[0]}/${
             originalDate.split("/")[2]
           }`
         : null;
 
-      // Create the updated object with the transformed date for display
       const updatedEditObject = {
         ...editObject,
 
-        [`formatted_${fieldToUpdate}`]: displayedDate, // Add a new field for the formatted date
+        [`formatted_${fieldToUpdate}`]: displayedDate,
         [`formatted_${"ENTRANCEDATETIME"}`]: formattedEntranceDateTime,
         [`formatted_${"EXITDATETIME"}`]: formattedExitDateTime,
       };
-
-    
 
       setFormData(updatedEditObject);
 
@@ -133,9 +125,9 @@ export const EditTimeSheet = ({
 
       if (validJobLocaWhrs.length > 0) {
         const resultData = validJobLocaWhrs.map((m, index) => {
-          // const newId = sections.length + 1;
           return {
-            id: index + 1,
+            // id: index + 1,
+            id: m.id || index + 1,
             JOBCODE: m.JOBCODE,
             LOCATION: m.LOCATION,
             WORKINGHRS: m.WORKINGHRS,
@@ -149,15 +141,6 @@ export const EditTimeSheet = ({
         setSections([
           {
             id: 1,
-            // jobCodeData: {
-            //   newFormData: JOBCODES,
-            //   searchResult: searchResultForJOBCODE,
-            // },
-            // locationData: {
-            //   newFormData: LocationData,
-            //   searchResult: searchResultForLocation,
-            // },
-            // WORKINGHRS: "",
           },
         ]);
       }
@@ -204,23 +187,7 @@ export const EditTimeSheet = ({
     }
   };
 
-  // const searchedValueForLOCATION = (id, searcValue) => {
-  //   if (searcValue === "") {
-  //     setSections((prevSections) =>
-  //       prevSections.map((section) =>
-  //         section.id === id
-  //           ? {
-  //               ...section,
-  //               LOCATION: searcValue || null,
-  //             }
-  //           : section
-  //       )
-  //     );
-  //   }
-  // };
   const searchResultForJOBCODE = (jobcode, id) => {
-    // setJobCode(jobcode);
-
     setSections((prevSections) =>
       prevSections.map((section) =>
         section.id === id
@@ -254,34 +221,18 @@ export const EditTimeSheet = ({
   ]);
 
   const addSection = () => {
-    // const newId = sections.length + 1;
-    // while (sections.some(section => section.id === newId)) {
-    //   newId++; // Increment ID until it's unique
-    // }
-    // const newSection = {
-    //   id: newId,
-    // };
-    // setSections([...sections, newSection]);
-
     setSections((prevSections) => {
-      // Generate a unique ID
       let newId = prevSections.length + 1;
 
-      // Ensure the ID is unique
       while (prevSections.some((section) => section.id === newId)) {
-        newId++; // Increment ID until unique
+        newId++;
       }
 
-      // Create a new section
       const newSection = { id: newId };
 
-      // Return updated sections
-      return [...prevSections, newSection]; // No reassignment here
+      return [...prevSections, newSection];
     });
   };
-
-  // jobCode
-  // Original
 
   const handleWorkingHoursChange = useCallback((id, value, type) => {
     setSections((prevSections) =>
@@ -304,70 +255,61 @@ export const EditTimeSheet = ({
 
   useEffect(() => {
     const formatTime = (decimalHours) => {
-      const hours = Math.floor(decimalHours); // Extract hours
-      const minutes = Math.round((decimalHours - hours) * 60); // Calculate minutes
-      return `${hours}:${minutes.toString().padStart(2, "0")}`; // Format as HH:MM
+      const hours = Math.floor(decimalHours);
+      const minutes = Math.round((decimalHours - hours) * 60);
+      return `${hours}:${minutes.toString().padStart(2, "0")}`;
     };
 
     const updateFormData = (workingHoursKey, actualHoursKey) => {
       // };
       const ConvertHours = (sections) => {
-        let totalMinutes = 0; // Initialize totalMinutes to avoid undefined error
+        let totalMinutes = 0;
 
         if (sections) {
-          // Replace "." with ":" to handle decimal formats like "8.20" → "8:20"
           let time = sections.includes(".")
             ? sections.replace(".", ":")
             : sections;
 
-          // Handle whole numbers like "8" → "8:00"
           if (!time.includes(":")) {
             time = `${time}:00`;
           }
 
-          // Split into hours and minutes
           const [hours, minutes] = time.split(":").map(Number);
 
-          // Validate hours and minutes
           if (isNaN(hours) || isNaN(minutes)) {
             throw new Error("Invalid time format");
           }
 
-          totalMinutes = hours * 60 + minutes; // Convert to total minutes
+          totalMinutes = hours * 60 + minutes;
         }
 
-        // Convert total minutes back to HH:MM format
         const outputHours = Math.floor(totalMinutes / 60);
         const outputMinutes = totalMinutes % 60;
         return `${outputHours}:${outputMinutes.toString().padStart(2, "0")}`;
       };
-      // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
       const sumHoursAndMinutes = (sections, key) => {
         let totalMinutes = sections.reduce((total, sec) => {
           if (sec[key]) {
-            // Replace "." with ":" to handle decimal formats like "8.20" → "8:20"
             let time = sec[key].includes(".")
               ? sec[key].replace(".", ":")
               : sec[key];
 
-            // Handle whole numbers like "8" → "8:00"
             if (!time.includes(":")) {
               time = `${time}:00`;
             }
 
-            // Split into hours and minutes
             const [hours, minutes] = time.split(":").map(Number);
-            total += hours * 60 + (minutes || 0); // Convert to total minutes
+            total += hours * 60 + (minutes || 0);
           }
           return total;
         }, 0);
 
-        // Convert total minutes back to HH:MM format
         const hours = Math.floor(totalMinutes / 60);
         const minutes = totalMinutes % 60;
         return `${hours}:${minutes.toString().padStart(2, "0")}`;
       };
-      // Calculate total working hours and overtime hours
+
       let totalWorkingHrs = sumHoursAndMinutes(sections, "WORKINGHRS");
       let totalOvertimeHrs = sumHoursAndMinutes(sections, "OVERTIMEHRS");
 
@@ -379,13 +321,12 @@ export const EditTimeSheet = ({
         const convertNWPD =
           parseFloat(normalWH?.split(":")[0]) +
           parseFloat(normalWH?.split(":")[1]) / 60;
-        // Calculate overtime
+
         const calculatedOT =
           updatedWorkingHours - convertNWPD <= 0
             ? 0
             : updatedWorkingHours - convertNWPD;
 
-        // Update warning messages
         setWarningMess(updatedWorkingHours > convertNWPD);
         const adininWorks = ConvertHours(
           prevFormData?.ADININWORKSENGINEERINGSDNBHD
@@ -395,7 +336,6 @@ export const EditTimeSheet = ({
           parseFloat(adininWorks?.split(":")[0]) +
           parseFloat(adininWorks?.split(":")[1]) / 60;
 
-        // Example for additional warnings
         const updatedTotalOvertimeHrs =
           parseFloat(totalOvertimeHrs?.split(":")[0]) +
           parseFloat(totalOvertimeHrs?.split(":")[1]) / 60;
@@ -410,13 +350,12 @@ export const EditTimeSheet = ({
 
         return {
           ...prevFormData,
-          [actualHoursKey]: totalWorkingHrs, // Already formatted as HH:MM
-          OT: formatTime(calculatedOT), // Format OT as HH:MM
+          [actualHoursKey]: totalWorkingHrs,
+          OT: formatTime(calculatedOT),
         };
       });
     };
 
-    // Handle different cases based on titleName
     if (titleName === "HO") {
       updateFormData("TOTALACTUALHOURS", "TOTALACTUALHOURS");
     } else if (titleName === "BLNG") {
@@ -428,30 +367,22 @@ export const EditTimeSheet = ({
 
   useEffect(() => {
     const totalOvertimeHrs = sections.reduce((total, sec) => {
-      let overtime = sec.OVERTIMEHRS || "0:00"; // Default value if empty
+      let overtime = sec.OVERTIMEHRS || "0:00";
 
       if (overtime.includes(".")) {
-        // Handle decimal format like "8.20"
-        // const [whole, fraction] = overtime.split(".");
-        // const mins = Math.round((parseFloat(`0.${fraction}`) || 0) * 60); // Convert decimal to minutes
-        // overtime = `${whole}:${mins.toString().padStart(2, "0")}`; // Format as hh:mm
         overtime = overtime.replace(".", ":");
       } else if (!overtime.includes(":")) {
-        // Handle whole number format like "8"
-        overtime = `${overtime}:00`; // Convert to hh:mm
+        overtime = `${overtime}:00`;
       }
 
-      // Split and calculate total minutes
       const [hrs, mins] = overtime.split(":").map(Number);
-      return total + hrs * 60 + mins; // Convert to total minutes
+      return total + hrs * 60 + mins;
     }, 0);
 
-    // Convert total minutes back to hh:mm format
     const hours = Math.floor(totalOvertimeHrs / 60);
     const minutes = totalOvertimeHrs % 60;
     const formattedTime = `${hours}:${minutes.toString().padStart(2, "0")}`;
 
-    // Update formData with formattedTime if totalOvertimeHrs exists
     if (totalOvertimeHrs > 0) {
       setFormData((prevFormData) => ({
         ...prevFormData,
@@ -485,7 +416,6 @@ export const EditTimeSheet = ({
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Update the form field value
     setFormData((prevFormData) => {
       const updatedData = {
         ...prevFormData,
@@ -507,9 +437,6 @@ export const EditTimeSheet = ({
   const handleValidation = () => {
     const newErrors = {};
     sections.forEach((section, index) => {
-      // if (!section.JOBCODE) {
-      //   newErrors[`JOBCODE-${index}`] = "Job Code is required.";
-      // }
       if (!section.LOCATION) {
         newErrors[`LOCATION-${index}`] = "Location is required.";
       }
@@ -518,34 +445,23 @@ export const EditTimeSheet = ({
     return Object.keys(newErrors).length === 0;
   };
   const handleSave = () => {
-    // if (handleValidation()) {
-    //   // Proceed with saving
-
-    //   addJCandLocaWhrs();
-    //   toggleFunction();
-    // }
-
     if (handleValidation()) {
-      // Prepare data with the original date format before saving
       const isDateField = formData.DATE !== undefined;
       const fieldToSave = isDateField ? "DATE" : "ENTRANCEDATEUSED";
       const entranceDateTime = "ENTRANCEDATETIME";
       const exitDateTime = "EXITDATETIME";
 
-      // Remove the formatted date field and restore the original date
       const dataToSave = {
         ...formData,
-        [fieldToSave]: editObject[fieldToSave], // Use the original date
+        [fieldToSave]: editObject[fieldToSave],
         [entranceDateTime]: editObject[entranceDateTime],
         [exitDateTime]: editObject[exitDateTime],
       };
 
-      // Clean up unnecessary fields (like formatted_DATE)
       delete dataToSave[`formatted_${fieldToSave}`];
       delete dataToSave[`formatted_${entranceDateTime}`];
       delete dataToSave[`formatted_${exitDateTime}`];
 
-      // Save the data
       addJCandLocaWhrs(dataToSave);
       toggleFunction();
     }
@@ -553,23 +469,17 @@ export const EditTimeSheet = ({
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 "
-      // className="table-container z-50 fixed inset-0"
       onClick={() => {
         setFilteredEmployees([]);
       }}
     >
-      {/* h-[600px] w-[900px] */}
       <section className="bg-[#f9fafb] p-5 gap-2 flex flex-col item-center rounded-lg shadow-md   border-[#EBEBEB] w-[50%] h-[80%] overflow-y-auto ">
         <header className="flex justify-between mt-5 ">
           <div className="flex-1"></div>
           <div className="flex justify-center flex-1">
             <img className="size-36 h-12 w-52" src={img} alt="not found" />
           </div>
-          {/* <div className="flex justify-center py-2 ">
-              <p className="text-dark_grey font-semibold text-[22px]">
-                EDIT ACCESS
-              </p>
-            </div> */}
+
           <div className="flex justify-end pt-2 flex-1">
             <IoCloseCircleOutline
               className="text-[30px] cursor-pointer"
@@ -593,11 +503,6 @@ export const EditTimeSheet = ({
               <div>
                 <input
                   type="text"
-                  // delete dataToSave[`formatted_${entranceDateTime}`];
-                  // delete dataToSave[`formatted_${exitDateTime}`];
-                  // [`formatted_${ENTRANCEDATETIME}`]: formattedEntranceDateTime,
-                  // [`formatted_${EXITDATETIME}`]: formattedExitDateTime,
-                  // name={field}
                   name={
                     field === "DATE"
                       ? "formatted_DATE"
@@ -610,8 +515,6 @@ export const EditTimeSheet = ({
                       : field
                   }
                   className="border border-slate_grey bg-[#f1f5f9] rounded text-dark_grey text-[16px] text_size_5 outline-none w-full py-[7px] px-3 cursor-auto "
-                  // value={editObject.FID}
-                  // value={formData[field] || ""}
                   value={
                     formData[`formatted_${field}`] || formData[field] || ""
                   }
@@ -619,7 +522,6 @@ export const EditTimeSheet = ({
                   readOnly={Position !== "Manager" ? index < 8 : true}
                 />
 
-                {/* TOTALACTUALHOURS */}
                 {warningMess === true &&
                 warningMessForAdinin === false &&
                 titleName === "BLNG"
@@ -705,11 +607,6 @@ export const EditTimeSheet = ({
                         setDrpValue={section?.JOBCODE || null}
                         id={section.id}
                       />
-                      {/* {errors[`JOBCODE-${index}`] && (
-                        <span className="text-red text_size_8">
-                          {errors[`JOBCODE-${index}`]}
-                        </span>
-                      )} */}
                     </div>
                     <div className="w-fit">
                       <SearchDisplayForTimeSheet
@@ -794,10 +691,6 @@ export const EditTimeSheet = ({
               className={`text-dark_grey text_size_3 rounded bg-[#FEF116] px-9 m-5 py-2 `}
               onClick={() => {
                 handleSave();
-
-                // addJCandLocaWhrs();
-
-                // toggleFunction();
               }}
             >
               Save

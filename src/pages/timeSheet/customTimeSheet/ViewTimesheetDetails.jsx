@@ -7,7 +7,7 @@ export const ViewTimesheetDetails = async (obj, type) => {
       );
     }
   } catch (error) {
-    // console.error("Error parsing empWorkInfo for ID:", obj.id, error);
+    
   }
   if (obj && type === "HO") {
     const sheetData = {
@@ -52,7 +52,7 @@ export const ViewTimesheetDetails = async (obj, type) => {
       WORKINGHOURS: obj.actualWorkHrs || 0,
       OT: obj?.otTime || 0,
       NORMALWORKINGHRSPERDAY: obj?.normalWorkHrs || 0,
-      jobLocaWhrs: parsedEmpWorkInfo.flat() || [], // Use parsed empWorkInfo
+      jobLocaWhrs: parsedEmpWorkInfo.flat() || [], 
       REMARKS: obj.remarks || "",
       STATUS: obj.status || "",
     };
@@ -74,6 +74,24 @@ export const ViewTimesheetDetails = async (obj, type) => {
       OT: obj?.otTime || 0,
       jobLocaWhrs: parsedEmpWorkInfo.flat() || [],
 
+      REMARKS: obj.remarks || "",
+      STATUS: obj.status || "",
+    };
+    return sheetData;
+  } else if (obj && type === "Offshore's ORMC") {
+    const sheetData = {
+      NAME: obj.empName || "",
+      NO: obj.fidNo || "",
+      LOCATION: obj.location || "",
+      TRADE: obj.trade || "",
+      DATE: obj.date || "",
+      TOTALHOURS: obj.totalNT || 0,
+      TOTALHOURS2: obj.totalOT || 0,
+      TOTALHOURS3: obj.totalNTOT || 0,
+      WORKINGHOURS: obj.actualWorkHrs || 0,
+      OT: obj?.otTime || 0,
+      NORMALWORKINGHRSPERDAY: obj?.normalWorkHrs || 0,
+      jobLocaWhrs: parsedEmpWorkInfo.flat() || [], 
       REMARKS: obj.remarks || "",
       STATUS: obj.status || "",
     };

@@ -13,8 +13,6 @@ export const TimeSheet = () => {
 
   return (
     <section className="p-16 bg-[#f5f6f1cc] h-screen">
-      {/* grid grid-flow-col */}
-      {/* <div className="grid grid-cols-4  gap-10 my-5 "></div> */}
       <div className=" screen-size">
         <h4 className="text_size_4  w-fit py-2    text-dark_grey ">
           Upload Time Sheet
@@ -51,17 +49,19 @@ export const TimeSheet = () => {
           )}
           {/* OFF SHORE */}
 
-          {timeSheetPermissions.includes("Offshore") && (
+          {timeSheetPermissions.includes("Offshore") ||
+          timeSheetPermissions.includes("Offshore's ORMC") ? (
             <SelectTiles
               img={icon3}
-              text1="Offshore"
+              text1="Offshore's "
+              text2="excel Sheet"
               borderColor="border-[#B70BA0]"
               bgColor="bg-white"
-              link="/timesheetOffshore"
+              link="/OffshoreSheets"
             />
-          )}
+          ) : null}
         </div>
-        {/* <div className="flex justify-center gap-20"> */}
+
         <div className="flex justify-start gap-20">
           {/* BLNG */}
           {timeSheetPermissions.includes("BLNG") && (

@@ -7,7 +7,7 @@ export const handleDeleteFile = async (
   fileType,
   fileName,
   empID,
-  setUploadedFileNames,
+  setUploadedFileNames, 
   deleteID,
   setValue,
   watch,

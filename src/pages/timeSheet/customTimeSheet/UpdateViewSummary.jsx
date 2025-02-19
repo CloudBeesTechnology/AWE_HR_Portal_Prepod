@@ -7,35 +7,15 @@ const client = generateClient();
 export const UpdateViewSummary = async (object) => {
   try {
     let resData = [];
+    let newresData = [];
 
-    // Convert to ISO date format
     const convertToISODate = async (dateString) => {
       const [day, month, year] = dateString.split("-");
-      const formattedMonth = parseInt(month, 10); // Remove leading zeros
+      const formattedMonth = parseInt(month, 10);
       const formattedDay = parseInt(day, 10);
-      return `${formattedMonth}/${formattedDay}/${year}`; // 'M/D/YYYY'
+      return `${formattedMonth}/${formattedDay}/${year}`;
     };
 
-    //   {
-    //     "id": "3ffb5b70-7960-4ac4-93a5-cbff8723ed03",
-    //     "badgeNo": "3907A",
-    //     "empName": "Lisa",
-    //     "sapNo": "261450",
-    //     "location": "OFFSHORE",
-    //     "jobcode": "",
-    //     "NWHPD": [
-    //         "12"
-    //     ],
-    //     "NWHPM": [
-    //         "25"
-    //     ],
-    //     "workingHrs": "x(7.0)5",
-    //     "overtimeHrs": 2,
-    //     "workingHrsKey": "16-7-2024",
-    //     "mealAllow": [
-    //         null
-    //     ]
-    // }
     const obj = {
       id: object?.id,
       empName: object?.empName,
@@ -49,68 +29,96 @@ export const UpdateViewSummary = async (object) => {
       normalWorkHrs: object?.NWHPD || "",
     };
 
-    async function fetchAllData(queryName) {
-      let allData = [];
-      let nextToken = null;
-      const filData = () => {
-        return object.firstFileType === "Offshore" ||
-          object.firstFileType === "BLNG"
-          ? { fidNo: { eq: obj.sapNo || null } }
-          : { empBadgeNo: { eq: obj.empBadgeNo || null } };
-      };
+    async function findMatchingObject(inputData) {
+      try {
+        if (
+          !inputData ||
+          !inputData.data ||
+          !Array.isArray(inputData.data) ||
+          !inputData.workingHrsKey
+        ) {
+          return [];
+        }
 
-      const filter = {
-        // and: [
-
-        //   {
-        //     // empBadgeNo: { eq: obj.empBadgeNo || null },
-        //     // fidNo: { eq: obj.sapNo || null },
-
-        //     date: { eq: obj.date },
-        //     companyName: { eq: obj.location },
-        //   },
-        // ],
-        and: [
-          ...(object.firstFileType === "Offshore" ||
-          object.firstFileType === "BLNG"
-            ? [{ fidNo: { eq: obj.sapNo || null } }]
-            : [{ empBadgeNo: { eq: obj.empBadgeNo || null } }]),
-          { date: { eq: obj.date } },
-          { companyName: { eq: obj.location } },
-        ],
-      };
-      do {
-        const response = await client.graphql({
-          query: queryName,
-          variables: { filter: filter, nextToken },
+        const matchedObject = inputData?.data.find((item) => {
+          const dateObj = new Date(item?.date);
+          const day = dateObj?.getDate();
+          const month = dateObj?.getMonth() + 1; // Months are zero-based in JS
+          const year = dateObj?.getFullYear();
+          const formattedDate = `${day}-${month}-${year}`;
+          return formattedDate === inputData?.workingHrsKey;
         });
 
-        const items = response.data[Object.keys(response.data)[0]].items;
-        allData = [...allData, ...items];
-        nextToken = response.data[Object.keys(response.data)[0]].nextToken;
-      } while (nextToken);
-
-      return allData;
+        return matchedObject ? matchedObject : null;
+      } catch (err) {
+        return null;
+      }
     }
 
+    const MatchingObject = async (existingObj, outputData) => {
+      if (!existingObj?.grouped || !Array.isArray(existingObj.grouped)) {
+        return null;
+      }
+
+      const matchedEmp = existingObj.grouped.find(
+        (emp) =>
+          (emp?.empBadgeNo &&
+            outputData?.empBadgeNo &&
+            String(emp?.empBadgeNo) === String(outputData?.empBadgeNo)) ||
+          (emp?.fidNo &&
+            outputData?.fidNo &&
+            String(emp?.fidNo) === String(outputData?.fidNo))
+      );
+
+      if (!matchedEmp?.data || !Array.isArray(matchedEmp.data)) {
+        return null;
+      }
+
+      return (
+        matchedEmp.data.find((record) => record.date === outputData.date) ||
+        null
+      );
+    };
+
+    const findFileName =
+      object &&
+      object?.data?.find(
+        async (fi) => fi.fileName !== null || fi.fileName !== undefined
+      );
+
+    const findDepartment =
+      object &&
+      object?.data?.find(
+        async (fi) => fi.empDept !== null || fi.empDept !== undefined
+      );
+    console.log("object?.data : ", object?.data);
+    let idCounter = 10;
     const summaryCreateMethod = async () => {
       const jobLocaWhrs = [
         {
+          id: idCounter++,
           JOBCODE: object?.jobcode || "",
           LOCATION: object?.location || "",
           WORKINGHRS: object?.workingHrs || "",
           OVERTIMEHRS: object?.overtimeHrs || "",
+          verify: "Yes",
         },
       ];
       const item = {
         empName: object?.empName,
         // fidNo: object?.sapNo || "",
-        [object.firstFileType === "Offshore" || object.firstFileType === "BLNG"
+        [object.firstFileType === "Offshore" ||
+        object.firstFileType === "BLNG" ||
+        object.firstFileType === "Offshore's ORMC"
           ? "fidNo"
           : "empBadgeNo"]:
-          object.firstFileType === "Offshore" || object.firstFileType === "BLNG"
+          object.firstFileType === "Offshore" ||
+          object.firstFileType === "BLNG" ||
+          object.firstFileType === "Offshore's ORMC"
             ? object?.sapNo || ""
             : object?.badgeNo || "",
+        fileName: (await findFileName?.fileName) || "N/A",
+        empDept: (await findDepartment?.empDept) || "N/A",
         date: await convertToISODate(object?.workingHrsKey || ""),
         actualWorkHrs: object?.workingHrs || "",
         companyName: object?.location || "",
@@ -118,8 +126,8 @@ export const UpdateViewSummary = async (object) => {
         normalWorkHrs: object?.NWHPD[object?.NWHPD.length - 1] || "",
         empWorkInfo: [JSON.stringify(jobLocaWhrs)] || [],
         fileType: object.firstFileType || "",
-        status: "Approved",
-        verify: "Yes",
+        status: "Verified",
+        // verify: "Yes",
       };
 
       try {
@@ -128,55 +136,50 @@ export const UpdateViewSummary = async (object) => {
           variables: { input: item },
         });
         const Responses = response?.data?.createTimeSheet;
-        resData = [Responses];
-      } catch (err) {
-        // console.error(err);
-      }
+
+        newresData = [Responses];
+      } catch (err) {}
     };
+
     const UpdateMethod = async (finalData) => {
-      if (finalData && finalData.length > 0) {
-        for (const timeSheet of finalData) {
-          const { __typename, createdAt, updatedAt, ...validTimeSheet } =
-            timeSheet;
-          try {
-            const response = await client.graphql({
-              query: updateTimeSheet,
-              variables: { input: validTimeSheet },
-            });
-            const Responses = response?.data?.updateTimeSheet;
-            resData = [Responses];
-          } catch (err) {
-            // console.error(err);
-          }
+      if (finalData) {
+        const { __typename, createdAt, updatedAt, ...validTimeSheet } =
+          finalData;
+        try {
+          const response = await client.graphql({
+            query: updateTimeSheet,
+            variables: { input: validTimeSheet },
+          });
+          const Responses = response?.data?.updateTimeSheet;
+
+          resData = [Responses];
+        } catch (err) {
+          console.error(err);
         }
       }
     };
 
     async function fetchEmployeeData(empDetails) {
-      // const empDetails = await fetchAllData(listTimeSheets);
-      // console.log("Response : ", empDetails);
-     
-      const candidates = empDetails;
+      const val = empDetails;
       function extractNumber(input) {
-        const match = input?.match(/-?\d+(\.\d+)?/g); // Matches numbers like 1.5, 7.532648, etc.
+        const match = input?.match(/-?\d+(\.\d+)?/g);
 
-        return match ? match?.[match.length - 1] : null; // Returns last number or null if no match
+        return match ? match?.[match.length - 1] : null;
       }
-      const assignUpdatedWorkHrs = candidates.map((val) => {
-        if (Array.isArray(val.empWorkInfo)) {
+      const assignUpdatedWorkHrs = async (val) => {
+        if (Array.isArray(val?.empWorkInfo)) {
           const parsedEmpWorkInfo = val.empWorkInfo.map((info) =>
             typeof info === "string" ? JSON.parse(info) : info
           );
           const processedWorkInfo = parsedEmpWorkInfo.flat();
           const updatedWorkInfo = processedWorkInfo.map((info) => {
-            if (info.JOBCODE === obj.jobcode) {
-              return {
-                ...info,
-                WORKINGHRS: extractNumber(obj.workingHrs) || "",
-                OVERTIMEHRS: obj.ot || "",
-              };
-            }
-            return info;
+            return {
+              ...info,
+              JOBCODE: obj.jobcode || "",
+              LOCATION: object?.location || "",
+              WORKINGHRS: extractNumber(obj.workingHrs) || "",
+              OVERTIMEHRS: obj.ot || "",
+            };
           });
 
           return {
@@ -185,22 +188,64 @@ export const UpdateViewSummary = async (object) => {
             empWorkInfo: [JSON.stringify(updatedWorkInfo)],
           };
         }
-      });
+      };
 
-      await UpdateMethod(assignUpdatedWorkHrs);
+      const insertUpdatedObject = async (updatedObject, seperatedData) => {
+        if (Array.isArray(updatedObject.empWorkInfo)) {
+          const parsedEmpWorkInfo = updatedObject.empWorkInfo.map((info) =>
+            typeof info === "string" ? JSON.parse(info) : info
+          );
+
+          const seperatedDataEmpWorkInfo = seperatedData.empWorkInfo.map(
+            (info) => (typeof info === "string" ? JSON.parse(info) : info)
+          );
+
+          const processedWorkInfo = parsedEmpWorkInfo.flat();
+
+          const updatedWorkInfo = seperatedDataEmpWorkInfo.map((info) => {
+            const matchingInfo = processedWorkInfo.find(
+              (seperatedInfo) => info.id === seperatedInfo.id
+            );
+
+            if (matchingInfo) {
+              return {
+                ...info,
+                JOBCODE: obj.jobcode || "",
+                LOCATION: object?.location || "",
+                WORKINGHRS: extractNumber(obj.workingHrs) || "",
+                OVERTIMEHRS: obj.ot || "",
+                verify: "Yes",
+              };
+            }
+            return info;
+          });
+
+          return {
+            ...seperatedData,
+            // verify: "Yes",
+            status: "Verified",
+            empWorkInfo: [JSON.stringify(updatedWorkInfo)],
+          };
+        }
+      };
+
+      const updatedObject = await assignUpdatedWorkHrs(val);
+
+      const seperatedData = await MatchingObject(object, updatedObject);
+
+      var finalData = await insertUpdatedObject(updatedObject, seperatedData);
+
+      await UpdateMethod(finalData);
     }
-    const empDetails = await fetchAllData(listTimeSheets);
-    // console.log("empDetails : ", empDetails);
-    if (empDetails && empDetails.length > 0) {
+
+    const empDetails = await findMatchingObject(object);
+
+    if (empDetails !== null) {
       await fetchEmployeeData(empDetails);
-    } else if (empDetails.length === 0) {
+    } else if (!empDetails) {
       await summaryCreateMethod();
-    } else {
-      // console.log("Warning");
     }
 
-    return resData; // Return the collected response data
-  } catch (err) {
-    // console.log(err);
-  }
+    return { resData, object, newresData };
+  } catch (err) {}
 };

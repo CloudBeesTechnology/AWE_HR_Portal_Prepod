@@ -27,6 +27,7 @@ import { useFetchDataTwo } from "../pages/timeSheet/customTimeSheet/useFetchData
 import { LoadingMessRejectTab } from "../pages/timeSheet/customTimeSheet/LoadingMessRejectTab";
 import { LoadingMessManagerTable } from "../pages/timeSheet/customTimeSheet/LoadingMessManagerTable";
 import { FiLoader } from "react-icons/fi";
+import { ViewOffshoreORMCsheet } from "../pages/timeSheet/ViewOffshoreORMCsheet";
 
 const client = generateClient();
 export const TimeSheetBrowser = ({
@@ -53,12 +54,6 @@ export const TimeSheetBrowser = ({
 
   const Position = localStorage.getItem("userType");
 
-  const handleCheckboxChange = () => {
-    setIsChecked(!isChecked);
-
-    setExcelData(null);
-  };
-
   useEffect(() => {
     if (isChecked === true) {
       setTitleName("ORMC");
@@ -77,12 +72,12 @@ export const TimeSheetBrowser = ({
 
   const { finalData } = useFetchDataTwo(titleName, assignPosition);
 
-  const { wholeData, loadingState, showRejectTable } = LoadingMessRejectTab(
-    finalData && finalData
-  );
+  const { wholeData, loadingState, showRejectTable } = LoadingMessRejectTab({
+    finalData,
+  });
 
   const { managerWholeData, loadingStateManager, showManagerTable } =
-    LoadingMessManagerTable(ManagerData && ManagerData);
+    LoadingMessManagerTable({ ManagerData });
 
   const handleForErrorMsg = (e) => {
     const file = e.target.files[0];
@@ -171,7 +166,18 @@ export const TimeSheetBrowser = ({
 
           setReturnedTHeader(editedResult);
         }
+        fileInputRef.current.value = "";
+        setExcelFile(null);
+      } else if (titleName === "Offshore's ORMC") {
+        const result = UploadOffshoreFile(
+          excelFile,
+          setExcelData,
+          setExcelFile,
+          fileInputRef,
+          setLoading
+        );
 
+        setReturnedTHeader(result);
         fileInputRef.current.value = "";
         setExcelFile(null);
       } else if (titleName === "SBW") {
@@ -237,24 +243,24 @@ export const TimeSheetBrowser = ({
   };
   const { setStartDate, setEndDate, setSearchQuery } = useTempID();
 
-  if (loadingStateManager.isLoading && Position === "Manager") {
-    return (
-      <div className="flex items-center justify-center h-[82vh] bg-transparent">
-        <div className="flex justify-between gap-2">
-          {loadingState.message === "No Data Available" ? (
-            <p className="text-sm font-semibold">{loadingState.message}</p>
-          ) : (
-            <div className="flex justify-between gap-2">
-              <p className="text-sm font-semibold">Loading </p>
-              <p>
-                <FiLoader className="animate-spin mt-[4px]" size={15} />
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
+  // if (loadingStateManager.isLoading && Position === "Manager") {
+  //   return (
+  //     <div className="flex items-center justify-center h-[82vh] bg-transparent">
+  //       <div className="flex justify-between gap-2">
+  //         {loadingState.message === "No Data Available" ? (
+  //           <p className="text-sm font-semibold">{loadingState.message}</p>
+  //         ) : (
+  //           <div className="flex justify-between gap-2">
+  //             <p className="text-sm font-semibold">Loading </p>
+  //             <p>
+  //               <FiLoader className="animate-spin mt-[4px]" size={15} />
+  //             </p>
+  //           </div>
+  //         )}
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   if (showing === 0 && Position !== "Manager") {
     return (
@@ -274,25 +280,6 @@ export const TimeSheetBrowser = ({
       </div>
     );
   }
-
-  // if (loadingState.isLoading && Position !== "Manager") {
-  //   return (
-  //     <div className="flex items-center justify-center h-[82vh] bg-transparent">
-  //       <div className="flex justify-between gap-2">
-  // {loadingState.message === "No Data Available" ? (
-  //   <p className="text-sm font-semibold">{loadingState.message}</p>
-  // ) : (
-  //   <div className="flex justify-between gap-2">
-  //     <p className="text-sm font-semibold">Loading </p>
-  //     <p>
-  //       <FiLoader className="animate-spin mt-[4px]" size={15} />
-  //     </p>
-  //   </div>
-  // )}
-  //       </div>
-  //     </div>
-  //   );
-  // }
 
   return (
     <div className="p-10 bg-[#fafaf6] min-h-screen  flex-col items-center">
@@ -315,13 +302,7 @@ export const TimeSheetBrowser = ({
             <FaArrowLeft />
           </Link>
         </div>
-        {/* <div className="flex justify-between items-center mt-5 border">
-      
-        <div className="border text-start">
-          <Link to="/timeSheet" className="text-xl text-grey flex-1">
-            <FaArrowLeft />
-          </Link>
-        </div> */}
+
         {Position !== "Manager" && (
           <div className="flex justify-center gap-11  pr-5">
             {submittedData && submittedData.length > 0 ? (
@@ -416,7 +397,7 @@ export const TimeSheetBrowser = ({
                         >
                           Upload
                         </button>
-                        {title === "Offshore" && (
+                        {/* {title === "Offshore" && (
                           <div className="flex items-center space-x-3 m-5">
                             <input
                               type="checkbox"
@@ -431,7 +412,7 @@ export const TimeSheetBrowser = ({
                               ORMC
                             </label>
                           </div>
-                        )}
+                        )} */}
                       </div>
                     )}
                     {fileName && (
@@ -502,7 +483,7 @@ export const TimeSheetBrowser = ({
       <div>
         {loading === true && (
           <div className="flex justify-center items-center text_size_5 text-dark_grey m-2">
-            <p>Please wait a few seconds.....</p>
+            <p>Please wait a few seconds...</p>
           </div>
         )}
       </div>
@@ -540,6 +521,16 @@ export const TimeSheetBrowser = ({
           )}
           {titleName === "ORMC" && (
             <ViewORMCsheet
+              setExcelData={setExcelData}
+              excelData={excelData}
+              returnedTHeader={returnedTHeader}
+              Position={Position}
+              titleName={titleName}
+              fileName={fileNameForSuccessful}
+            />
+          )}
+          {titleName === "Offshore's ORMC" && (
+            <ViewOffshoreORMCsheet
               setExcelData={setExcelData}
               excelData={excelData}
               returnedTHeader={returnedTHeader}
@@ -607,6 +598,20 @@ export const TimeSheetBrowser = ({
         !loadingStateManager.isLoading &&
         showManagerTable && (
           <ViewORMCsheet
+            titleName={titleName}
+            returnedTHeader={null}
+            ManagerData={managerWholeData}
+            Position={Position}
+            fileName={fileNameForSuccessful}
+          />
+        )}
+
+      {!excelData &&
+        Position === "Manager" &&
+        titleName === "Offshore's ORMC" &&
+        !loadingStateManager.isLoading &&
+        showManagerTable && (
+          <ViewOffshoreORMCsheet
             titleName={titleName}
             returnedTHeader={null}
             ManagerData={managerWholeData}
@@ -707,6 +712,19 @@ export const TimeSheetBrowser = ({
 
       {!loadingState.isLoading &&
         showRejectTable &&
+        titleName === "Offshore's ORMC" &&
+        Position !== "Manager" &&
+        count === 1 && (
+          <ViewOffshoreORMCsheet
+            titleName={titleName}
+            showRejectedItemTable="Rejected"
+            wholeData={wholeData}
+            Position={Position}
+          />
+        )}
+
+      {!loadingState.isLoading &&
+        showRejectTable &&
         titleName === "SBW" &&
         Position !== "Manager" &&
         count === 1 && (
@@ -777,6 +795,19 @@ export const TimeSheetBrowser = ({
         showing === 1 &&
         submittedData.length > 0 && (
           <ViewORMCsheet
+            titleName={titleName}
+            allItems="allItems"
+            submittedData={submittedData}
+            Position={Position}
+          />
+        )}
+
+      {titleName === "Offshore's ORMC" &&
+        Position !== "Manager" &&
+        count === 0 &&
+        showing === 1 &&
+        submittedData.length > 0 && (
+          <ViewOffshoreORMCsheet
             titleName={titleName}
             allItems="allItems"
             submittedData={submittedData}

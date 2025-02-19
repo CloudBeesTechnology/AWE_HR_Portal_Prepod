@@ -2,7 +2,7 @@ import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 
 export const ExportTableToExcel = (reportTitle, tableData) => {
-  // Extract table header (th) data
+  
   try {
     if (reportTitle && tableData) {
       const selectThead = document.querySelectorAll("table thead tr");
@@ -14,19 +14,19 @@ export const ExportTableToExcel = (reportTitle, tableData) => {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet(`${reportTitle}`);
 
-      // Add header row
+     
       const headerRow = worksheet.addRow(theadData[0]);
       headerRow.height = 30;
       worksheet.columns = theadData[0].map((header) => ({
         header,
-        width: header.length < 20 ? 20 : header.length, // Dynamically adjust width based on header length
+        width: header.length < 20 ? 20 : header.length, 
       }));
       const commonBorder = {
-        style: "thin", // Border style
-        color: { argb: "FF000000" }, // Black color
+        style: "thin", 
+        color: { argb: "FF000000" }, 
       };
       headerRow.eachCell((cell) => {
-        cell.font = { bold: true, size: 12, color: { argb: "f9f9f9" } }; // Red font
+        cell.font = { bold: true, size: 12, color: { argb: "f9f9f9" } }; 
         cell.fill = {
           type: "pattern",
           pattern: "solid",
@@ -43,8 +43,8 @@ export const ExportTableToExcel = (reportTitle, tableData) => {
       worksheet.eachRow((row, rowNumber) => {
         if (rowNumber !== 1) {
           row.eachCell((cell) => {
-            cell.font = { size: 12, color: { argb: "FF000000" } }; // Black font
-            cell.alignment = { horizontal: "left" }; // Left alignment
+            cell.font = { size: 12, color: { argb: "FF000000" } }; 
+            cell.alignment = { horizontal: "left" }; 
           });
         }
         row.border = {
@@ -55,7 +55,7 @@ export const ExportTableToExcel = (reportTitle, tableData) => {
         };
       });
 
-      // Export the Excel file
+    
       workbook.xlsx.writeBuffer().then((buffer) => {
         const blob = new Blob([buffer], {
           type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -65,6 +65,6 @@ export const ExportTableToExcel = (reportTitle, tableData) => {
       });
     }
   } catch (err) {
-    // console.log("Error");
+    
   }
 };

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { FaArrowLeft } from "react-icons/fa";
 
@@ -6,14 +6,15 @@ import { Link } from "react-router-dom";
 import { useTempID } from "../../../utils/TempIDContext";
 import { ViewSummaryFilterData } from "./ViewSummaryFilterData";
 import { IoMdDownload } from "react-icons/io";
-// import tableLogo from "../../../assets/logo/aweLogo.png";
+
 import { BiSolidPrinter } from "react-icons/bi";
 import { DownloadExcelPDF } from "../timeSheetSearch/DownloadExcelPDF";
 import { PrintExcelSheet } from "../timeSheetSearch/PrintExcelSheet";
+import { Pagination } from "../timeSheetSearch/Pagination";
 
 export const ViewSummaryTable = ({
   dayCounts,
-  data,
+  data: allExcelSheetData,
   LocationData,
   secondaryData,
   searchResult,
@@ -22,9 +23,8 @@ export const ViewSummaryTable = ({
   resetTableFunc,
   toggleEditViewSummaryFunc,
   editViewSummaryObject,
-
-  // setEmptyTableMess
 }) => {
+  const [currentPage, setCurrentPage] = useState(1);
   const { selectedLocation, getStartDate, getEndDate, startDate, endDate } =
     useTempID();
 
@@ -34,7 +34,6 @@ export const ViewSummaryTable = ({
       for (const key in data) {
         const value = data[key];
 
-        // Match patterns like x(0.5)9.5
         const xPattern = /^x\((\d+(\.\d+)?)\)(\d+(\.\d+)?)$/;
         const xMatch = value?.match(xPattern);
         if (xMatch) {
@@ -42,14 +41,12 @@ export const ViewSummaryTable = ({
           continue;
         }
 
-        // Match patterns like "10"
         const numberPattern = /^\d+(\.\d+)?$/;
         if (value?.match(numberPattern)) {
           totalHours += parseFloat(value);
           continue;
         }
 
-        // Match patterns like HAL5, HCL5, etc.
         const halPattern = /^H[A-Z]*\d+$/;
         if (value?.match(halPattern)) {
           const hours = parseFloat(value?.replace(/[^0-9]/g, ""));
@@ -60,12 +57,9 @@ export const ViewSummaryTable = ({
       }
 
       return totalHours;
-    } catch (err) {
-      // console.log(err, " : ERROR");
-    }
+    } catch (err) {}
   }
 
-  // Calculate Total Absence
   function calculateTotalAbsence(inputData, getLastIndexOfNWhrs) {
     try {
       let totalAbsence = 0;
@@ -74,36 +68,43 @@ export const ViewSummaryTable = ({
         const value = inputData[date];
 
         if (value?.startsWith("x(")) {
-          // Extract the number inside x()
           const absenceMatch = value?.match(/x\(([\d.]+)\)/);
           if (absenceMatch) {
             totalAbsence += parseFloat(absenceMatch[1]);
           }
         } else if (value === "A") {
-          totalAbsence += parseFloat(getLastIndexOfNWhrs); // Add 8 for each "A"
+          totalAbsence += parseFloat(getLastIndexOfNWhrs);
         }
       }
 
       return totalAbsence;
-    } catch (err) {
-      // console.log(err);
-    }
+    } catch (err) {}
   }
   const formatDate = (dateString) => {
     const date = new Date(dateString);
 
-    // Extract the day, month, and year
     const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+    const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
 
-    // Return the formatted date
     return `${day}-${month}-${year}`;
   };
   const formattedStartDate = formatDate(startDate);
   const formattedEndDate = formatDate(endDate);
   const location = selectedLocation?.toUpperCase();
 
+  // Pagination
+  const itemsPerPage = 10;
+  const safeData = allExcelSheetData || [];
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentData = safeData.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(safeData.length / itemsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  var data = currentData;
   return (
     <div className="bg-[#fafaf6] h-screen">
       <div className="screen-size p-4">
@@ -117,7 +118,7 @@ export const ViewSummaryTable = ({
             <p>View Summary</p>
           </header>
           <div
-            className="flex space-x-3  items-center rounded px-3  h-10 bg-[#FEF116]"
+            className="flex space-x-3 shadow-md items-center rounded px-3  h-10 bg-[#FEF116]"
             onClick={() => {
               PrintExcelSheet(
                 "downloadTable",
@@ -127,7 +128,7 @@ export const ViewSummaryTable = ({
               );
             }}
           >
-            <button className="text_size_5 text-dark_grey">Print</button>
+            <button className="text_size_5 text-dark_grey ">Print</button>
             <BiSolidPrinter className="text-black cursor-pointer" />
           </div>
         </header>
@@ -175,9 +176,7 @@ export const ViewSummaryTable = ({
                 <th className="border  px-2 py-2 border-dark_grey">A</th>
                 <th className="border  px-2 py-2 border-dark_grey">UAL</th>
                 <th className="border  px-2 py-2 border-dark_grey">OT</th>
-                {/* <th className="border  px-2 py-2 border-dark_grey">
-                  MEAL ALLOW
-                </th> */}
+
                 <th className="border  px-2 py-2 border-dark_grey">Verified</th>
                 <th className="border  px-2 py-2 border-dark_grey">Updater</th>
               </tr>
@@ -186,21 +185,10 @@ export const ViewSummaryTable = ({
             <tbody>
               {loading && data && data?.length > 0 ? (
                 data.map((employee, index) => {
-                  // const normalWorkHours = Object.values(
-                  //   employee.NORMALWORKHRSPERDAY || {}
-                  // );
-                  // const totalHours = normalWorkHours.reduce(
-                  //   (acc, hour) => acc + parseInt(hour || 0, 10),
-                  //   0
-                  // );
-                  // const NormalDays = normalWorkHours.length;
-
-                  //Calculate Total OT
                   const totalOT = Object.values(
                     employee?.OVERTIMEHRS || {}
                   ).reduce((acc, ot) => acc + parseInt(ot || 0), 0);
 
-                  // Calculate Total NH(Normal working Hrs)
                   const getTotalHours =
                     calculateTotalWorkingHours(employee?.workingHrs) || 0;
                   const roundedNumberOfTotalHours = Number(
@@ -212,13 +200,12 @@ export const ViewSummaryTable = ({
                     employee?.workHrs && employee?.workHrs?.length > 0
                       ? employee?.workHrs[employee?.workHrs?.length - 1]
                       : "";
-                  // Calculate Total ND(Normal Day)
+
                   const getNormalDays =
                     totalHours / parseFloat(getLastIndexOfNWhrs) || 0;
                   const roundedNumber = Number(getNormalDays.toFixed(2));
                   const NormalDays = roundedNumber;
 
-                  // Calculate Total Absence
                   const totalAbsence = calculateTotalAbsence(
                     employee?.workingHrs,
                     getLastIndexOfNWhrs
@@ -228,31 +215,19 @@ export const ViewSummaryTable = ({
                   const roundedTotalAbsentiesHrs = Number(
                     totalAbsentiesHrs.toFixed(2)
                   );
-                  // Check all hours verified
+
                   const checkVerifiedAll = Array.from(
                     { length: dayCounts },
                     (_, i) => {
                       const currentDay = new Date(getStartDate);
-                      currentDay.setDate(getStartDate.getDate() + i); // Increment the date
+                      currentDay.setDate(getStartDate.getDate() + i);
 
-                      // Format the date as "day-month-year"
                       const formattedDate = `${currentDay.getDate()}-${
                         currentDay.getMonth() + 1
                       }-${currentDay.getFullYear()}`;
 
-                      // Get the verification status for the current date
                       const isVerified =
                         employee?.getVerify?.[formattedDate] || "";
-
-                      // Check if the day is a special day
-                      // const isSpecialDay = ["PH", "PHD", "OFF"].includes(
-                      //   employee?.workingHrs?.[formattedDate]
-                      // );
-
-                      // Determine the final value based on conditions
-                      // const finalValue = isSpecialDay
-                      //   ? "Yes"
-                      //   : isVerified || null;
 
                       const finalValue = isVerified;
 
@@ -307,27 +282,42 @@ export const ViewSummaryTable = ({
                             }`}
                           </span>
                         </td>
-                        <td className="border px-2 py-1" rowSpan="2">
+                        <td className="border px-2 py-1 " rowSpan="2">
                           {employee.jobcode}
                         </td>
 
                         {Array.from({ length: dayCounts }, (_, i) => {
-                          const currentDay = new Date(getStartDate); // Assume getStartDate is a valid Date object
-                          currentDay.setDate(getStartDate.getDate() + i); // Increment the date
+                          const currentDay = new Date(getStartDate);
+                          currentDay.setDate(getStartDate.getDate() + i);
 
-                          // Format the key as "day-month-year"
                           const currentDayKey = `${currentDay.getDate()}-${
                             currentDay.getMonth() + 1
                           }-${currentDay.getFullYear()}`;
 
+                          const dayOfWeek = new Intl.DateTimeFormat("en-BN", {
+                            weekday: "long",
+                          }).format(currentDay);
+
+                          const isVerified =
+                            employee?.getVerify?.[currentDayKey];
+                          const isChecked = Boolean(isVerified);
                           return (
                             <td
-                              className="border px-2 py-1 border-dark_grey cursor-pointer"
-                              key={currentDayKey} // Unique key for each column
+                              className={`border px-2 py-1 border-dark_grey cursor-pointer                      
+                               ${
+                                 isChecked
+                                   ? "bg-[#f59a51] bg-opacity-50 z-0"
+                                   : dayOfWeek === "Sunday"
+                                   ? "bg-yellow bg-opacity-50 z-0"
+                                   : ""
+                               }`}
+                              key={currentDayKey}
                               onClick={() => {
                                 toggleEditViewSummaryFunc();
                                 const empDetails = {
                                   id: employee?.id,
+                                  data: employee?.data,
+                                  grouped: employee.grouped,
                                   empName: employee?.name,
                                   sapNo: employee.sapNo,
                                   empBadgeNo: employee?.empBadgeNo,
@@ -372,8 +362,10 @@ export const ViewSummaryTable = ({
                           {employee?.hollydayCounts?.PHD || 0}
                         </td>
                         <td className="border px-2 py-1" rowSpan="2">
-                          {`${employee?.empLeaveCount?.AL || 0} /
-                               ${employee?.empLeaveCount?.CL || 0} `}
+                          {/* {`${employee?.empLeaveCount?.AL || 0} /
+                               ${employee?.empLeaveCount?.CL || 0} `} */}
+                          {parseInt(employee?.empLeaveCount?.AL) +
+                            parseInt(employee?.empLeaveCount?.CL) || 0}
                         </td>
                         <td className="border px-2 py-1" rowSpan="2">
                           {employee.empLeaveCount?.SL || 0}
@@ -390,9 +382,7 @@ export const ViewSummaryTable = ({
                         <td className="border px-2 py-1" rowSpan="2">
                           {totalOT || 0}
                         </td>
-                        {/* <td className="border px-2 py-1" rowSpan="2">
-                          {employee?.mealAllow || ""}
-                        </td> */}
+
                         <td className="border px-2 py-1" rowSpan="2">
                           {allFieldsYes ? "Yes" : ""}
                         </td>
@@ -403,53 +393,63 @@ export const ViewSummaryTable = ({
                       </tr>
                       <tr>
                         {Array.from({ length: dayCounts }, (_, i) => {
-                          const currentDay = new Date(getStartDate); // Assume getStartDate is a valid Date object
-                          currentDay.setDate(getStartDate.getDate() + i); // Increment the date
+                          const currentDay = new Date(getStartDate);
+                          currentDay.setDate(getStartDate.getDate() + i);
 
-                          // Format the key as "day-month-year"
                           const currentDayKey = `${currentDay.getDate()}-${
                             currentDay.getMonth() + 1
                           }-${currentDay.getFullYear()}`;
 
+                          const dayOfWeek = new Intl.DateTimeFormat("en-BN", {
+                            weekday: "long",
+                          }).format(currentDay);
+
+                          const isVerified =
+                            employee?.getVerify?.[currentDayKey];
+
+                          const isChecked = Boolean(isVerified);
                           return (
                             <td
-                              className="border px-2 py-1 border-dark_grey"
-                              key={currentDayKey} // Unique key for each column
+                              className={`border px-2 py-1 border-dark_grey  ${
+                                isChecked
+                                  ? "bg-[#f59a51] bg-opacity-50 z-0"
+                                  : dayOfWeek === "Sunday"
+                                  ? "bg-yellow bg-opacity-50 z-0"
+                                  : ""
+                              }`}
+                              key={currentDayKey}
                             >
                               {employee?.OVERTIMEHRS?.[currentDayKey] || "0"}{" "}
-                              {/* Use '0' if no value is found */}
                             </td>
                           );
                         })}
-                        {/* ))} */}
                       </tr>
-                      <tr>
-                        <td className="border px-2 py-1" colSpan={1}>
+                      <tr className="border px-2 py-1 bg-white bg-opacity-50 z-0">
+                        <td
+                          className="border px-2 py-1 bg-white bg-opacity-50 z-0"
+                          colSpan={1}
+                        >
                           {" "}
                         </td>
-                        <td></td>
+                        <td className="bg-white bg-opacity-50 z-0"></td>
 
                         {Array.from({ length: dayCounts }, (_, i) => {
                           const currentDay = new Date(getStartDate);
-                          currentDay.setDate(getStartDate.getDate() + i); // Increment the date
+                          currentDay.setDate(getStartDate.getDate() + i);
 
-                          // Format the date as "day-month-year"
                           const formattedDate = `${currentDay.getDate()}-${
                             currentDay.getMonth() + 1
                           }-${currentDay.getFullYear()}`;
 
-                          // Get verification status for the current date
                           const isVerified =
                             employee?.getVerify?.[formattedDate];
 
-                          // Check if the day is a special day
-                          // const isSpecialDay = ["PH", "PHD", "OFF"].includes(
-                          //   employee?.workingHrs?.[formattedDate]
-                          // );
-
-                          // Determine checkbox checked status
-                          // const isChecked = Boolean(isVerified || isSpecialDay);
                           const isChecked = Boolean(isVerified);
+
+                          const dayOfWeek = new Intl.DateTimeFormat("en-BN", {
+                            weekday: "long",
+                          }).format(currentDay);
+
                           const updatedDateTime =
                             employee?.assignUpdaterDateTime?.[formattedDate];
 
@@ -463,20 +463,40 @@ export const ViewSummaryTable = ({
                             second: "2-digit",
                           };
 
-                          let bruneiTime;
                           if (updatedDateTime) {
-                            bruneiTime = new Intl.DateTimeFormat(
+                            var bruneiTime = new Intl.DateTimeFormat(
                               "en-BN",
                               options
                             ).format(new Date(updatedDateTime));
                           }
-                          // weekday: "long",
 
-                          // Return the table cell
+                          const dateObj = new Date(bruneiTime);
+
+                          const day = String(dateObj.getDate()).padStart(
+                            2,
+                            "0"
+                          );
+                          const month = String(dateObj.getMonth() + 1).padStart(
+                            2,
+                            "0"
+                          );
+                          const year = dateObj.getFullYear();
+
+                          const time = String(bruneiTime).split(", ")[1];
+
+                          const formattedBruneiDateTime = `${day}/${month}/${year} ${time}`;
                           return (
                             <td
-                              className="border px-2 py-2 border-dark_grey"
-                              key={currentDay.toDateString()} // Unique key for each column
+                              className={`border px-2 py-2 border-dark_grey
+                              ${
+                                isChecked
+                                  ? "bg-[#f59a51] bg-opacity-50  z-0"
+                                  : dayOfWeek === "Sunday"
+                                  ? "bg-yellow bg-opacity-50 z-0"
+                                  : "bg-white bg-opacity-50 z-0"
+                              }
+                            `}
+                              key={currentDay.toDateString()}
                             >
                               {isChecked && (
                                 <>
@@ -484,19 +504,17 @@ export const ViewSummaryTable = ({
                                     className="py-10"
                                     type="checkbox"
                                     checked={isChecked}
-                                    onChange={() => {
-                                      // Add logic for handling checkbox change
-                                    }}
+                                    onChange={() => {}}
                                   />
                                   <br />
-                                  <span>{bruneiTime || ""}</span>
+                                  <span>{formattedBruneiDateTime || ""}</span>
                                 </>
                               )}
                             </td>
                           );
                         })}
                         {/* ))} */}
-                        <td className="border px-2 py-1">{""}</td>
+                        <td className="border px-2 py-1 ">{""}</td>
                         <td className="border px-2 py-1">{""}</td>
 
                         <td className="border px-2 py-1">{""}</td>
@@ -511,7 +529,7 @@ export const ViewSummaryTable = ({
                         <td className="border px-2 py-1"></td>
                         {/* <td className="border px-2 py-1"></td> */}
                       </tr>
-                      <tr>
+                      <tr className="bg-[#d8d3d3] bg-opacity-50">
                         <td className="border px-2 py-1" colSpan={1}>
                           Total
                         </td>
@@ -522,7 +540,7 @@ export const ViewSummaryTable = ({
                           return (
                             <td
                               className={`${i === 0 ? "border" : "border-b"}`}
-                              key={currentDayIndex} // Unique key for each column
+                              key={currentDayIndex}
                             ></td>
                           );
                         })}
@@ -537,8 +555,10 @@ export const ViewSummaryTable = ({
                           {employee?.hollydayCounts?.PHD || 0}
                         </td>
                         <td className="border px-2 py-1">
-                          {`${employee?.empLeaveCount?.AL || 0} /
-                               ${employee?.empLeaveCount?.CL || 0}`}
+                          {/* {`${employee?.empLeaveCount?.AL || 0} /
+                               ${employee?.empLeaveCount?.CL || 0}`} */}
+                               {parseInt(employee?.empLeaveCount?.AL) +
+                            parseInt(employee?.empLeaveCount?.CL) || 0}
                         </td>
                         <td className="border px-2 py-1">
                           {employee.empLeaveCount?.SL || 0}
@@ -589,23 +609,39 @@ export const ViewSummaryTable = ({
             </tbody>
           </table>
         </div>
-        <footer className="flex justify-center py-10 space-x-10">
-          <div className="flex space-x-3  items-center rounded px-3 py-2 bg-[#FEF116]">
+
+        <footer className="flex items-center justify-between py-6 ">
+          <div className="flex-1"></div>
+
+          {/* Download Button Section */}
+          <div className="flex-1 flex justify-center ">
             <button
-              className=" text_size_5 text-dark_grey"
+              className="flex items-center space-x-2 rounded px-4 py-2  bg-[#FEF116] shadow-md"
               onClick={() => {
                 DownloadExcelPDF(
                   "downloadTable",
-                  // "Theader",
                   location,
                   formattedStartDate,
                   formattedEndDate
                 );
               }}
             >
-              Download
+              <span className="cursor-pointer text-dark_grey text_size_5">
+                Download
+              </span>
+              <IoMdDownload className="text-lg text-black" />
             </button>
-            <IoMdDownload className="text-black cursor-pointer" />
+          </div>
+
+          {/* Pagination Section */}
+          <div className="flex-1 flex justify-end">
+            {data && data.length > 0 && (
+              <Pagination
+                totalPages={totalPages}
+                currentPage={currentPage}
+                paginate={paginate}
+              />
+            )}
           </div>
         </footer>
       </div>

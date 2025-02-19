@@ -77,17 +77,17 @@ export const UploadEditedORMC = (
 
     function cleanKey(key) {
       if (typeof key !== "string") {
-        return key; // Return value if not a string (e.g., number, object)
+        return key;
       }
-      return key.replace(/[^a-zA-Z0-9]/g, ""); // Removes all non-alphanumeric characters
+      return key.replace(/[^a-zA-Z0-9]/g, "");
     }
 
     const formattedData = tableBodyData.map((item) => {
       const cleanedItem = {};
 
       for (const key in item) {
-        const cleanedKey = cleanKey(key); // Clean the key
-        cleanedItem[cleanedKey] = item[key]; // Set the value using the cleaned key
+        const cleanedKey = cleanKey(key);
+        cleanedItem[cleanedKey] = item[key];
       }
 
       return cleanedItem;
@@ -111,37 +111,20 @@ export const UploadEditedORMC = (
         return item;
       });
 
-    // const removeTotalEmployees = updatedDataArray.filter(
-    //   (val) => !val.NAME?.includes("TOTAL EMPLOYEES")
-    // );
-    // const filteHighlightedData = updatedDataArray.filter((item) => {
-    //   if (
-    //     item.NAME &&
-    //     item.ALLDAYMINHRS &&
-    //     item.NETMINUTES >= 0 &&
-    //     item.TOTALHOURS >= 0
-    //   ) {
-    //     return item;
-    //   }
-    // });
     function filterDataByDateFormat(data) {
-      const dateFormatRegex = /^\d{1,2}\/\d{1,2}\/\d{4}$/; // Matches MM/DD/YYYY format
+      const dateFormatRegex = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
 
-      return data.filter((obj) => obj.IN && obj.OUT); // Ensure both IN and OUT exist
-      // .filter((obj) => dateFormatRegex.test(obj.DATE)) // Check if DATE is in MM/DD/YYYY format
+      return data.filter((obj) => obj.IN && obj.OUT);
     }
     const filteredData = filterDataByDateFormat(updatedDataArray);
 
     setExcelData(filteredData);
-    // setExcelData(filteHighlightedData);
 
-    // For Re-corrected theader
     const transformData = (data) => {
       return data.map((innerArray) =>
         innerArray.map((item) => {
-          // Dynamically create a new object with swapped keys and values
           return Object.entries(item).reduce((acc, [key, value]) => {
-            acc[value] = key; // Set the value as key and key as value
+            acc[value] = key;
             return acc;
           }, {});
         })
@@ -157,5 +140,4 @@ export const UploadEditedORMC = (
 
   fileInputRef.current.value = "";
   setExcelFile(null);
-  //   headerSlicedData
 };
