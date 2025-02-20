@@ -151,11 +151,13 @@ export const EmployeeInfo = () => {
       "image/jpg",
     ];
 
+
     if (!allowedTypes.includes(selectedFile.type)) {
       alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
       return;
     }
 
+    
     setValue(type, selectedFile);
 
     if (selectedFile) {
@@ -166,6 +168,7 @@ export const EmployeeInfo = () => {
       }));
     }
   };
+console.log(uploadedDocs);
 
   const handleFileChange = async (e, label) => {
     if (!watchedEmpID) {

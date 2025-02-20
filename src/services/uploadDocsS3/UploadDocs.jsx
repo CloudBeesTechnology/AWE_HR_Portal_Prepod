@@ -105,6 +105,11 @@ export const deleteDocs = async (fileUrl, fileType, setUploadedDocs, empID, inde
     console.error(`Error deleting ${fileType}:`, error);
   }
 };
+
+
+
+
+
 // import { getCurrentUser } from "@aws-amplify/auth";
 // import { uploadData } from "@aws-amplify/storage";
 
