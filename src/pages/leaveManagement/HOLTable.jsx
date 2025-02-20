@@ -2,11 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { NavigateLM } from "./NavigateLM";
 import { Searchbox } from "../../utils/Searchbox";
-import { Filter } from "./Filter";
 import { IoSearch } from "react-icons/io5";
 import { Pagination } from "./Pagination";
 import { capitalizedLetter, DateFormat } from "../../utils/DateFormat";
-import { FiLoader } from "react-icons/fi";
 
 export const HOLTable = () => {
   const { userType, mergedData, userID, loading } = useOutletContext();
@@ -52,72 +50,40 @@ export const HOLTable = () => {
         (a, b) =>
           new Date(b.leaveStatusCreatedAt) - new Date(a.leaveStatusCreatedAt)
       );
-    // console.log(filteredData);
 
     if (selectedDate) {
-      // console.log('Selected Date:', selectedDate);
-    
       filteredData = filteredData.filter((item) => {
-        // Convert selectedDate to Date object
+ 
         const selectedDateObj = new Date(selectedDate);
-        // console.log('Selected Date Object:', selectedDateObj);
-    
-        // Helper function to normalize and validate dates
-        const normalizeDate = (date) => {
-          if (!date) return null;
-    
-          // Check if the date is in 'DD/MM/YYYY' format and convert it to a Date object
-          const isValidDate = /^\d{2}\/\d{2}\/\d{4}$/.test(date);  // Match DD/MM/YYYY format
-          if (isValidDate) {
-            const [day, month, year] = date.split('/');
-            return new Date(`${year}-${month}-${day}`); // Convert to 'YYYY-MM-DD' format
-          }
-    
-          // If it's not in the expected format, assume it's already a valid ISO string
-          return new Date(date);
-        };
-    
-        // Normalize employee leave dates to Date objects
-        const empLeaveStartDate = normalizeDate(item.empLeaveSelectedFrom);
-        const empLeaveEndDate = normalizeDate(item.empLeaveSelectedTo);
-        const empLeaveSelectedFrom = normalizeDate(item.empLeaveSelectedFrom);  // Use this as well
-        const empLeaveSelectedTo = normalizeDate(item.empLeaveSelectedTo);      // Use this as well
-    
+        const empLeaveEndDate =
+          item.empLeaveSelectedTo || item.empLeaveEndDate
+            ? new Date(item.empLeaveSelectedTo || item.empLeaveEndDate)
+            : null;
+        const empLeaveStartDate =
+          item.empLeaveSelectedFrom || item.empLeaveStartDate
+            ? new Date(item.empLeaveSelectedFrom || item.empLeaveStartDate)
+            : null;
 
-    
-        // Normalize the selected date
-        const selectedDateFormatted = selectedDateObj.toISOString().split('T')[0]; // Format YYYY-MM-DD
-        // console.log('Formatted Selected Date:', selectedDateFormatted);
-    
-        // Handle missing start or end dates and check if the selected date is within any available range
-        const isWithinLeavePeriod =
-          ((empLeaveStartDate && selectedDateFormatted >= empLeaveStartDate.toISOString().split('T')[0]) ||
-            !empLeaveStartDate) &&
-          ((empLeaveEndDate && selectedDateFormatted <= empLeaveEndDate.toISOString().split('T')[0]) ||
-            !empLeaveEndDate) &&
-          ((empLeaveSelectedFrom && selectedDateFormatted >= empLeaveSelectedFrom.toISOString().split('T')[0]) ||
-            !empLeaveSelectedFrom) &&
-          ((empLeaveSelectedTo && selectedDateFormatted <= empLeaveSelectedTo.toISOString().split('T')[0]) ||
-            !empLeaveSelectedTo);
-    
-        // Fallback to checking if the selected date matches exactly with any of the four leave dates
-        const isExactDateMatch =
-          selectedDateFormatted === empLeaveStartDate?.toISOString().split('T')[0] ||
-          selectedDateFormatted === empLeaveEndDate?.toISOString().split('T')[0] ||
-          selectedDateFormatted === empLeaveSelectedFrom?.toISOString().split('T')[0] ||
-          selectedDateFormatted === empLeaveSelectedTo?.toISOString().split('T')[0];
-  
-    
-        // Return true if the selected date is within the leave period or exactly matches any of the four leave dates
-        return isWithinLeavePeriod || isExactDateMatch;
+        const selectedDateFormatted = DateFormat(selectedDateObj);
+        const empLeaveEndDateFormatted = DateFormat(
+          empLeaveEndDate || item.empLeaveEndDate
+        );
+        const empLeaveStartDateFormatted = DateFormat(
+          empLeaveStartDate || item.empLeaveStartDate
+        );
+
+        return (
+          empLeaveEndDateFormatted === selectedDateFormatted ||
+          empLeaveStartDateFormatted === selectedDateFormatted
+        );
       });
     }
-    
-  
+    // console.log(filteredData);
 
     setSecondartyData(filteredData);
     setMatchData(filteredData);
   }, [mergedData, userType, userID, selectedDate]);
+  // console.log(matchData);
 
   const heading = [
     "S.No",
@@ -139,6 +105,7 @@ export const HOLTable = () => {
       : "text-[#E8A317]";
   };
 
+
   const handleDateChange = (event) => {
     const date = event.target.value;
     setSelectedDate(date);
@@ -153,8 +120,6 @@ export const HOLTable = () => {
 
   useEffect(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
-
-    // Use the filtered data from secondaryData
     let finalData = secondartyData;
 
     // Apply search filter if exists
@@ -173,19 +138,16 @@ export const HOLTable = () => {
   );
 
   const isValidDateFormat = (date) => {
-    const datePatternSlash = /^\d{4}\/\d{1,2}\/\d{1,2}$/; // matches yyyy/m/d
-    const datePatternDash = /^\d{4}-\d{2}-\d{2}$/;   // matches yyyy-mm-dd
+    const datePatternSlash = /^\d{4}\/\d{1,2}\/\d{1,2}$/; 
+    const datePatternDash = /^\d{4}-\d{2}-\d{2}$/; 
     return datePatternSlash.test(date) || datePatternDash.test(date);
   };
-  
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[60vh] bg-transparent">
-        <div className="flex justify-between gap-2">
-          <p className="text-sm font-semibold">Loading </p>
-          <p>
-            <FiLoader className="animate-spin mt-[4px]" size={15} />
-          </p>
+      <div>
+        <div className="flex items-center justify-center h-[60vh]">
+          <p className="text-sm font-semibold">Loading...</p>
         </div>
       </div>
     );
@@ -234,12 +196,12 @@ export const HOLTable = () => {
             <tbody>
               {matchData &&
                 matchData.map((item, index) => {
-                  const displayIndex = startIndex + index + 1; 
+                  const displayIndex = startIndex + index + 1; // Adjust index based on pagination
 
                   return (
                     <tr
                       key={index}
-                      className="text-center text-sm shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
+                      className="text-center text-sm border-b-2 bg-white border-[#C7BCBC] text-[#303030] hover:bg-medium_blue"
                     >
                       <td className="py-3">{displayIndex}</td>
                       <td className="py-3">{item.empID}</td>
@@ -254,10 +216,8 @@ export const HOLTable = () => {
                           ? isValidDateFormat(item.empLeaveSelectedFrom)
                             ? DateFormat(item.empLeaveSelectedFrom)
                             : item.empLeaveSelectedFrom
-                          : DateFormat(item.empLeaveStartDate)
-                          ? isValidDateFormat(item.empLeaveStartDate)
+                          : item.empLeaveStartDate                
                             ? DateFormat(item.empLeaveStartDate)
-                            : DateFormat(item.empLeaveStartDate)
                           : "N/A"}
                       </td>
 
@@ -267,9 +227,7 @@ export const HOLTable = () => {
                             ? DateFormat(item.empLeaveSelectedTo)
                             : item.empLeaveSelectedTo
                           : item.empLeaveEndDate
-                          ? isValidDateFormat(item.empLeaveEndDate)
-                            ? DateFormat(item.empLeaveEndDate)
-                            : DateFormat(item.empLeaveEndDate)
+                            ? DateFormat(item.empLeaveEndDate)       
                           : "N/A"}
                       </td>
 

@@ -6,6 +6,10 @@ import icon4 from "../../assets/timeSheet/icon4.svg";
 import icon5 from "../../assets/timeSheet/icon5.svg";
 import icon6 from "../../assets/timeSheet/icon6.svg";
 import icon7 from "../../assets/timeSheet/icon7.svg";
+import icon8 from "../../assets/timeSheet/icon8.svg";
+import icon9 from "../../assets/timeSheet/icon9.svg";
+import icon10 from "../../assets/timeSheet/icon10.svg";
+
 import usePermission from "../../hooks/usePermissionDashInside";
 
 export const TimeSheet = () => {
@@ -76,10 +80,10 @@ export const TimeSheet = () => {
           {/* VIEW TIME SHEET */}
           {timeSheetPermissions.includes("View Time Sheet") && (
             <SelectTiles
-              img={icon4}
+              img={icon8}
               text1="View Time"
               text2="sheet"
-              borderColor="border-[#D0D716]"
+              borderColor="border-[#9B9F27]"
               bgColor="bg-white"
               link="/viewTimesheet"
             />

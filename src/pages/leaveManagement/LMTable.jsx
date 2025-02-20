@@ -254,7 +254,7 @@ export const LMTable = () => {
                   return (
                     <tr
                       key={index}
-                      className="text-center text-sm shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
+                      className="text-center text-sm border-b-2 bg-white border-[#C7BCBC] text-[#303030] hover:bg-medium_blue"
                     >
                       <td className="py-3">{displayIndex}</td>
                       <td className="py-3">{item.empID}</td>
@@ -305,7 +305,9 @@ export const LMTable = () => {
                           className="border-b-2 border-[blue] text-[blue]"
                           onClick={() => {
                             handleClickForToggle();
-                            handleViewClick(item, "LM");             
+                            handleViewClick(item, "LM");  
+                            console.log("item", item);
+                    
                           }}
                         >
                           {item["submitted Form"] || "View"}

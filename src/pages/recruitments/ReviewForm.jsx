@@ -42,14 +42,12 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
   `;
 
     const FROM_ADDRESS = "hr_no-reply@adininworks.com";
-    const TO_ADDRESS = "Hr-notification@adininworks.com"     ;
+    const TO_ADDRESS = "Hr-notification@adininworks.com";
 
     try {
       if (!Array.isArray(dataCandi)) {
         throw new Error("dataCandi must be an array.");
       }
-
-
 
       const matchTempIDs = dataCandi.map((val) => {
         return IVSSDetails?.find((match) => val.tempID === match?.tempID);
@@ -69,8 +67,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
         };
 
         try {
-
-          setIsLoading(true); 
+          setIsLoading(true);
 
           const response = await client.graphql({
             query: updateInterviewSchedule,
@@ -117,13 +114,12 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
   `;
 
     const FROM_ADDRESS = "hr_no-reply@adininworks.com";
-    const TO_ADDRESS = "Hr-notification@adininworks.com";     ;
+    const TO_ADDRESS = "Hr-notification@adininworks.com";
 
     try {
       if (!Array.isArray(dataCandi)) {
         throw new Error("dataCandi must be an array.");
       }
-
 
       const matchTempIDs = dataCandi.map((val) => {
         return IVSSDetails?.find((match) => val.tempID === match?.tempID);
@@ -142,7 +138,6 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
         };
 
         try {
-
           setIsLoading(true);
 
           const response = await client.graphql({
@@ -169,7 +164,6 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     } catch (err) {
       console.log(err);
       console.error("Error in handleSelected function:", err);
-      // setEmailSuccessMessage("Failed to send email. Please try again later.");
     }
   };
 
@@ -249,136 +243,181 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                 className="w-32 h-36 border-2 border-lite_grey shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)]"
               />
             </div>
-            {[
-              { label: "Applying For", value: candidate.position || "N/A" },
-              { label: "Experience", value: candidate.noExperience || "N/A" },
-              { label: "Contract", value: candidate.contractType || "N/A" },
-              { label: "Type", value: candidate.empType || "N/A" },
-              { label: "CV Received From", value: candidate.agent || "N/A" },
-              { label: "Name", value: candidate.name || "N/A" },
-              { label: "Nationality", value: candidate.nationality || "N/A" },
-              { label: "Race", value: candidate.race || "N/A" },
-              { label: "Gender", value: candidate.gender || "N/A" },
-              {
-                label: "Date of Birth",
-                value: formatDate(candidate.dob) || "N/A",
-              },
-              { label: "Age", value: candidate.age || "N/A" },
-              { label: "Marital Status", value: candidate.marital || "N/A" },
-              { label: "Religion", value: candidate.religion || "N/A" },
-              { label: "Country of Birth", value: candidate.cob || "N/A" },
-              { label: "Language Profiency", value: candidate.lang || "N/A" },
-              {
-                label: "Home Address",
-                value: candidate.permanentAddress || "N/A",
-              },
-              { label: "Email", value: candidate.email || "N/A" },
-              { label: "Contact", value: candidate.contactNo || "N/A" },
-              { label: "Brunei IC No.", value: candidate.bwnIcNo || "N/A" },
-              {
-                label: "Brunei IC Colour.",
-                value: candidate.bwnIcColour || "N/A",
-              },
-              {
-                label: "Brunei IC Expiry",
-                value: formatDate(candidate.bwnIcExpiry) || "N/A",
-              },
-              {
-                label: "Malaysia IC No.",
-                value: candidate.alternateNo || "N/A",
-              },
-              { label: "Passport No.", value: candidate.ppNo || "N/A" },
-              {
-                label: "Passport Issue Date",
-                value: candidate.ppIssued || "N/A",
-              },
-              {
-                label: "Passport Expiry Date",
-                value: candidate.ppExpiry || "N/A",
-              },
-              {
-                label: "Passport Issued Place",
-                value: candidate.ppDestinate || "N/A",
-              },
-            ].map((item, index) => (
-              <div key={index} className="grid grid-cols-3 gap-4 mb-4">
-                <strong className="w-full">{item.label}</strong>
-                <span className="w-full col-span-2">: &nbsp;{item.value}</span>
-              </div>
-            ))}
 
+            {/* Section One */}
+            <div className="mt-6">
+              {[
+                { label: "Applying For", value: candidate.position || "N/A" },
+                { label: "Experience", value: candidate.noExperience || "N/A" },
+                { label: "Contract", value: candidate.contractType || "N/A" },
+                { label: "Type", value: candidate.empType || "N/A" },
+                { label: "CV Received From", value: candidate.agent || "N/A" },
+                { label: "Name", value: candidate.name || "N/A" },
+                { label: "Nationality", value: candidate.nationality || "N/A" },
+                { label: "Race", value: candidate.race || "N/A" },
+                { label: "Gender", value: candidate.gender || "N/A" },
+                {
+                  label: "Date of Birth",
+                  value: formatDate(candidate.dob) || "N/A",
+                },
+                { label: "Age", value: candidate.age || "N/A" },
+                { label: "Marital Status", value: candidate.marital || "N/A" },
+                { label: "Religion", value: candidate.religion || "N/A" },
+                { label: "Country of Birth", value: candidate.cob || "N/A" },
+                { label: "Language Profiency", value: candidate.lang || "N/A" },
+                {
+                  label: "Home Address",
+                  value: candidate.permanentAddress || "N/A",
+                },
+                { label: "Email", value: candidate.email || "N/A" },
+                { label: "Contact", value: candidate.contactNo || "N/A" },
+                { label: "Brunei IC No.", value: candidate.bwnIcNo || "N/A" },
+                {
+                  label: "Brunei IC Colour.",
+                  value: candidate.bwnIcColour || "N/A",
+                },
+                {
+                  label: "Brunei IC Expiry",
+                  value: formatDate(candidate.bwnIcExpiry) || "N/A",
+                },
+                {
+                  label: "Malaysia IC No.",
+                  value: candidate.alternateNo || "N/A",
+                },
+                { label: "Passport No.", value: candidate.ppNo || "N/A" },
+                {
+                  label: "Passport Issue Date",
+                  value: formatDate(candidate.ppIssued) || "N/A",
+                },
+                {
+                  label: "Passport Expiry Date",
+                  value: formatDate(candidate.ppExpiry) || "N/A",
+                },
+                {
+                  label: "Passport Issued Place",
+                  value: candidate.ppDestinate || "N/A",
+                },
+              ].map((item, index) => (
+                <div key={index} className="grid grid-cols-3 gap-4 mb-4">
+                  <strong className="w-full">{item.label}</strong>
+                  <span className="w-full col-span-2">
+                    : &nbsp;{item.value}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Section Two (Family Details) */}
             {familyDetails?.length > 0 && (
-              <div>
-                <h3 className="font-bold">Family Details</h3>
+              <div className="mt-6">
                 {familyDetails.map((item, idx) => (
-                  <div key={idx}>
-                    <strong className="w-full">Occupation:</strong>
-                    <span className="w-full col-span-2">
-                      {item.occupation || "N/A"}
-                    </span>
-                    <p>
-                      <strong>Name:</strong> {item.name || "N/A"}
-                    </p>
-                    <p>
-                      <strong>Place of Occupation:</strong>{" "}
-                      {item.placeOfOccupation || "N/A"}
-                    </p>
-                    <p>
-                      <strong>Relationship:</strong>{" "}
-                      {item.relationship || "N/A"}
-                    </p>
-                    <p>
-                      <strong>Age:</strong> {item.age || "N/A"}
-                    </p>
+                  <div key={idx} className="mb-6 border rounded p-4">
+                    <h3 className="font-bold underline mb-4">Family Details {idx + 1}</h3>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Occupation</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.occupation || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Name</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.name || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Place of Occupation</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.placeOfOccupation || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Relationship</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.relationship || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Age</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.age || "N/A"}
+                      </span>
+                    </div>
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Display work experience */}
+            {/* Work Experience */}
             {workExperience?.length > 0 && (
-              <div>
-                <h3 className="font-bold">Work Experience</h3>
+              <div className="mt-6">
                 {workExperience.map((item, idx) => (
-                  <div key={idx}>
-                    <p>
-                      <strong>Company:</strong> {item.company || "N/A"}
-                    </p>
-                    <p>
-                      <strong>Position:</strong> {item.position || "N/A"}
-                    </p>
-                    <p>
-                      <strong>From:</strong> {item.from || "N/A"} -{" "}
-                      <strong>To:</strong> {item.to || "N/A"}
-                    </p>
-                    <p>
-                      <strong>Reason For Leaving:</strong>{" "}
-                      {item.reasonForLeaving || "N/A"}
-                    </p>
-                    <p>
-                      <strong>Salary:</strong> {item.salary || "N/A"}
-                    </p>
+                  <div key={idx} className="mb-6 border rounded p-4">
+                    <h3 className="font-bold underline mb-4">
+                      Work Experience {idx + 1}
+                    </h3>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Company</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.company || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Position</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.position || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">From</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.from || "N/A"} - {item.to || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Reason For Leaving</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.reasonForLeaving || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Salary</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.salary || "N/A"}
+                      </span>
+                    </div>
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Display education details */}
+            {/* Education Details */}
             {eduDetails?.length > 0 && (
-              <div>
-                <h3 className="font-bold">Education Details</h3>
+              <div className="mt-6">
                 {eduDetails.map((item, idx) => (
-                  <div key={idx}>
-                    <p>
-                      <strong>University:</strong> {item.university || "N/A"}
-                    </p>
-                    <p>
-                      <strong>Degree:</strong> {item.degree || "N/A"}
-                    </p>
-                    <p>
-                      <strong>From:</strong> {item.fromDate || "N/A"} -{" "}
-                      <strong>To:</strong> {item.toDate || "N/A"}
-                    </p>
+                  <div key={idx} className="mb-6 border rounded p-4">
+                    <h3 className="font-bold underline mb-4">
+                      Education Details {idx + 1}
+                    </h3>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">University</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.university || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Degree</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.degree || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">From</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.fromDate || "N/A"} -{" "}
+                        {item.toDate || "N/A"}
+                      </span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -386,22 +425,22 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
           </div>
 
           {/* Bottom Buttons: Reject and Schedule Interview */}
-          <div className="flex justify-center mt-6 gap-5">
+          <div className="flex justify-center py-12 gap-12">
             {showDecisionButtons !== undefined && (
               <>
                 {!showDecisionButtons && (
                   <>
                     <button
-                      className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
+                      className="hover:bg-medium_red hover:border-black border-2 border-black px-20 py-3 shadow-xl rounded-md"
                       onClick={handleRejected}
                     >
                       Reject
                     </button>
                     <button
-                      className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
+                      className="hover:bg-[#d7d23c] bg-[#faf362] px-16 py-3 font-medium shadow-xl rounded-md"
                       onClick={handleScheduleInterview}
                     >
-                      Schedule Interview
+                      Schedule Interview 
                     </button>
                   </>
                 )}
@@ -410,19 +449,19 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                 {showDecisionButtons && (
                   <>
                     <button
-                      className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
+                      className="hover:bg-medium_red hover:border-black border-2 border-black px-20 py-3 shadow-xl rounded-md"
                       onClick={() => {
                         handleRejected([candidate]);
                       }}
                       disabled={isLoading}
                     >
-                      {isLoading ? "Loading..." : "Rejected"}
+                      {isLoading ? "Loading..." : "Reject"}
                     </button>
 
                     <button
-                      className="hover:bg-[#faf362] border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"
+                      className="hover:bg-[#d7d23c] bg-[#faf362] px-16 py-3 font-medium shadow-xl rounded-md"
                       onClick={() => {
-                        handleSelected([candidate]);   
+                        handleSelected([candidate]);
                       }}
                       disabled={isLoading}
                     >
@@ -441,7 +480,6 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
               />
             )}
           </div>
-    
         </div>
       </div>
 

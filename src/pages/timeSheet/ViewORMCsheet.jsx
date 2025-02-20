@@ -812,7 +812,7 @@ export const ViewORMCsheet = ({
                   searchResult={searchResult}
                   secondaryData={secondaryData}
                   Position={Position}
-                  placeholder="Badge No / Name."
+                  placeholder="Badge No / Name"
                 />
               </div>
             </div>

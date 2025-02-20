@@ -12,6 +12,7 @@ import { IoCameraOutline } from "react-icons/io5";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { uploadFields } from "../../../utils/DropDownMenus";
 import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
+import { uploadDocString } from "../../../services/uploadDocsS3/UploadDocs";
 import { RowTwo } from "./RowTwo";
 import { RowThree } from "./RowThree";
 import { RowFour } from "./RowFour";
@@ -151,21 +152,24 @@ export const EmployeeInfo = () => {
       "image/jpg",
     ];
 
+
     if (!allowedTypes.includes(selectedFile.type)) {
       alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
       return;
     }
 
+
     setValue(type, selectedFile);
 
     if (selectedFile) {
-      await uploadDocs(selectedFile, type, setUploadedDocs, watchedEmpID);
+      await uploadDocString(selectedFile, type, setUploadedDocs, watchedEmpID);
       setUploadedFileNames((prev) => ({
         ...prev,
         [type]: selectedFile.name, // Dynamically store file name
       }));
     }
   };
+console.log(uploadedDocs);
 
   const handleFileChange = async (e, label) => {
     if (!watchedEmpID) {
@@ -211,7 +215,7 @@ export const EmployeeInfo = () => {
             path: url,
           });
 
-          return setPPLastUP(result.url.toString());
+          return setPPLastUP(result?.url?.toString());
         };
         linkToStorageFile(lastUploadProf);
       }
@@ -592,7 +596,7 @@ export const EmployeeInfo = () => {
           [field]: lastFileName, // Assign the extracted file name
         }));
       } catch (error) {
-        console.error(`Failed to parse ${field}:`, error);
+        console.error(`Failed to parse ${field}:, error`);
       }
     });
   };

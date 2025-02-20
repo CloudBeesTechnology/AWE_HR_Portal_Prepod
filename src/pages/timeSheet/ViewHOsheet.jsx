@@ -99,6 +99,7 @@ export const ViewHOsheet = ({
     if (processedData && processedData.length > 0) {
       setData(processedData);
       setSecondaryData(processedData);
+     
     }
   }, [processedData]);
 
@@ -181,14 +182,15 @@ export const ViewHOsheet = ({
 
   useEffect(() => {
     const checkKeys = async () => {
-      const cleanData = returnedTHeader.map((item) => {
-        const cleanedItem = {};
-        for (const key in item) {
-          cleanedItem[key] = cleanValue(item[key]);
-        }
+      const convertKeys = (obj) => {
+        return Object.keys(obj).reduce((acc, key) => {
+          const newKey = key.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+          acc[newKey] = obj[key];
+          return acc;
+        }, {});
+      };
 
-        return cleanedItem;
-      });
+      const convertedData = returnedTHeader.map(convertKeys);
 
       const requiredKeys = [
         "REC",
@@ -197,38 +199,41 @@ export const ViewHOsheet = ({
         "EMPLOYEEID",
         "BADGE",
         "NAME",
-        "DATE",
-        "ONAM",
-        "OFFAM",
-        "ONPM",
-        "OFFPM",
-        "IN",
-        "OUT",
-        "TOTALINOUT",
-        "ALLDAYMINUTES",
-        "NETMINUTES",
-        "TOTALHOURS",
+        // "DATE",
+        // "ONAM",
+        // "OFFAM",
+        // "ONPM",
+        // "OFFPM",
+        // "IN",
+        // "OUT",
+        // "TOTALINOUT",
+        // "ALLDAYMINUTES",
+        // "NETMINUTES",
+        // "TOTALHOURS",
         // "TOTALACTUALHOURS",
-        "REMARKS",
+        // "REMARKS",
       ];
 
-      const result = await new Promise((resolve) => {
-        const keyCheckResult =
-          cleanData &&
-          cleanData.every((m) => {
-            return requiredKeys.every((key) =>
-              Object.values(m)
-                .map((value) =>
-                  typeof value === "string" ? value.toUpperCase() : value
-                )
-                .includes(key.toUpperCase())
-            );
-          });
-        resolve(keyCheckResult);
-      });
+      const checkedKeys = () => {
+        return new Promise((resolve) => {
+          const keyCheckResult = convertedData.every((item) =>
+            requiredKeys.every((key) =>
+              Object.keys(item)
+                .map((k) => k.toLowerCase())
+                .includes(key.toLowerCase())
+            )
+          );
+          resolve(keyCheckResult);
+        });
+      };
+
+      // Usage
+      const result = await checkedKeys();
+      
       setClosePopup(true);
-      setShowStatusCol(result);
       setCurrentStatus(result);
+      setShowStatusCol(result);
+      // setLoading(false);
     };
 
     if (returnedTHeader && returnedTHeader.length > 0) {
@@ -859,7 +864,7 @@ export const ViewHOsheet = ({
                   searchResult={searchResult}
                   secondaryData={secondaryData}
                   Position={Position}
-                  placeholder="Employee ID / Badge No / Name."
+                  placeholder="Employee ID / Badge No / Name"
                 />
               </div>
             </div>

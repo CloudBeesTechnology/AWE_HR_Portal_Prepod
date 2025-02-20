@@ -72,7 +72,7 @@ export const NewJoineeTable = () => {
     if (latestJoinees.length > 0) {
       fetchProfilePhotos();
     }
-  }, []);
+  }, [latestJoinees]);
 
   return (
     <div className="bg-white shadow-md rounded-2xl overflow-hidden m-2">

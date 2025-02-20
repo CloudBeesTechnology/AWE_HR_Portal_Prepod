@@ -15,6 +15,8 @@ export const UploadHOfile = (
       const allSheets = [];
 
       const tableBodyData = [];
+      var checkTrueOrFalse = false;
+
       worksheetNameLength.forEach((sheetName) => {
         const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
         allSheets.push({ sheetName, data: sheet });
@@ -25,35 +27,19 @@ export const UploadHOfile = (
         allSheets.map((sheet) => {
           const data = sheet.data;
 
-          var headerSlicedData = data.slice(1, 2);
+          var headerSlicedData = data.slice(0, 1);
 
-          const changedHeader = headerSlicedData.map((columns) => {
-            const foundKey = Object.entries(columns).map(([key, value]) => {
-              return [{ key, value }];
-            });
-            return foundKey;
-          });
+          const hasNameAndDate = headerSlicedData.some((obj) =>
+            ["NAME", "DATE"].every((key) => key in obj)
+          );
 
-          const result = changedHeader.flat().flat();
-
-          var bodySlicedData = data.slice(2);
-
-          bodySlicedData.forEach((bodyData) => {
-            const row = {};
-
-            Object.entries(bodyData).forEach(([key, value]) => {
-              const headerKey = result.find((header) => header.key === key);
-
-              if (headerKey) {
-                row[headerKey.value] = value;
-              }
-            });
-
-            tableBodyData.push(row);
-          });
+          checkTrueOrFalse = hasNameAndDate;
+          var bodySlicedData = data.slice(0);
+          tableBodyData.push(bodySlicedData);
           return headerSlicedData;
         });
 
+      // if (checkTrueOrFalse === true) {
       const convertDecimalToTime = (decimal, value) => {
         if (value === "time") {
           const totalHours = decimal * 24;
@@ -83,7 +69,8 @@ export const UploadHOfile = (
         return key.replace(/[^a-zA-Z0-9]/g, "");
       }
 
-      const formattedData = tableBodyData.map((item) => {
+      const data = tableBodyData.flat();
+      const formattedData = data.map((item) => {
         const cleanedItem = {};
 
         for (const key in item) {

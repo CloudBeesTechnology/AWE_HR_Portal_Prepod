@@ -159,7 +159,7 @@ export const Table = ({
           {filteredData.map((value, index) => (
             <tr
               key={index}
-              className={`shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] ${
+              className={`border-b-2 bg-white border-[#C7BCBC] text-[15px] text-[#303030] ${
                 showCheckboxes
                   ? localSelectedRows.includes(index)
                     ? "bg-medium_blue"

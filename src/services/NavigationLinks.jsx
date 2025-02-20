@@ -116,6 +116,8 @@ import { ProbationPDF } from "../pages/reports/ProbationPDF";
 import { FiLoader } from "react-icons/fi";
 import {LeaveStatus} from "../components/migratingData/LeaveStatus"
 import { AddDropDown } from "../components/migratingData/AddDropDown";
+import { OffshoreORMC } from "../pages/timeSheet/OffshoreORMC";
+import { OffshoreExcelSheets } from "../pages/timeSheet/OffshoreExcelSheets";
 const client = generateClient();
 
 const NavigationLinks = () => {
@@ -344,23 +346,28 @@ const NavigationLinks = () => {
             <Route path="/training/tcView" Component={TcViewData} />
           </>
         )}
-        {allowedCategories.includes("TimeSheet") && (
-          <>
-            <Route path="/timeSheet" element={<TimeSheet />} />
-            <Route path="/timesheetHO" element={<HO />} />
-            <Route path="/timesheetSBW" element={<SBW />} />
-            <Route path="/timesheetORMC" element={<ORMC />} />
-            <Route path="/timesheetOffshore" element={<Offshore />} />
-            <Route path="/timesheetBlng" element={<Blng />} />
+         {allowedCategories.includes("TimeSheet") && (
+        <>
+          <Route path="/timeSheet" element={<TimeSheet />} />
+          <Route path="/timesheetHO" element={<HO />} />
+          <Route path="/timesheetSBW" element={<SBW />} />
+          <Route path="/timesheetORMC" element={<ORMC />} />
+          <Route path="/timesheetOffshore" element={<Offshore />} />
+          <Route path="/timesheetBlng" element={<Blng />} />
+          <Route path="/OffshoreSheets" element={<OffshoreExcelSheets />} />
+          <Route
+            path="/OffshoreSheets/OffshoreORMC"
+            element={<OffshoreORMC />}
+          />
 
-            <Route path="/viewTimesheet" element={<ViewTimeSheet />} />
-            <Route path="/viewTSheetList" element={<ListTimeSheet />} />
+          <Route path="/viewTimesheet" element={<ViewTimeSheet />} />
+          <Route path="/viewTSheetList" element={<ListTimeSheet />} />
 
-            <Route path="/viewTsheetDetails" element={<VTimeSheetTable />} />
+          <Route path="/viewTsheetDetails" element={<VTimeSheetTable />} />
 
-            <Route path="/viewSummary" element={<ViewSummary />} />
-          </>
-        )}
+          <Route path="/viewSummary" element={<ViewSummary />} />
+        </>
+      )}
         {allowedCategories.includes("LeaveManagement") && (
           <Route path="/leaveManagement" Component={LeaveManage}>
             <Route index element={<LMTable />} />

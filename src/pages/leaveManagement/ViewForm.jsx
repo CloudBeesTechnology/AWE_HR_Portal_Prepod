@@ -66,8 +66,6 @@ export const ViewForm = ({
       : "text-[#E8A317]";
   };
 
-  console.log("GM MAIL", gmMail);
-  
   const isValidDateFormat = (date) => {
     const datePatternSlash = /^\d{4}\/\d{1,2}\/\d{1,2}$/;
     const datePatternDash = /^\d{4}-\d{2}-\d{2}$/;
@@ -90,14 +88,6 @@ export const ViewForm = ({
       updateData.supervisorDate = currentDate;
     }
 
-    // function DateFormat(isoString) {
-    //   const date = new Date(isoString);
-    //   const day = String(date.getDate()).padStart(2, "0");
-    //   const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
-    //   const year = date.getFullYear();
-    //   return `${day}/${month}/${year}`;
-    // }
-
     // Handle Leave status update
     if (source === "LM") {
       const leavePeriod =
@@ -109,12 +99,9 @@ export const ViewForm = ({
               )}`
             : `${leaveData.empLeaveSelectedFrom} to ${leaveData.empLeaveSelectedTo}`
           : leaveData.empLeaveStartDate && leaveData.empLeaveEndDate
-          ? isValidDateFormat(leaveData.empLeaveStartDate) &&
-            isValidDateFormat(leaveData.empLeaveEndDate)
-            ? `${DateFormat(leaveData.empLeaveStartDate)} to ${DateFormat(
-                leaveData.empLeaveEndDate
-              )}`
-            : `${leaveData.empLeaveStartDate} to ${leaveData.empLeaveEndDate}`
+          ? `${DateFormat(leaveData.empLeaveStartDate)} to ${DateFormat(
+              leaveData.empLeaveEndDate
+            )}`
           : "N/A";
 
       handleUpdateLeaveStatus(leaveData.id, updateData)
@@ -530,7 +517,6 @@ export const ViewForm = ({
         })
         .catch((err) => console.log(err));
     } else if (source === "Tickets") {
-      
       if (userType === "HR") {
         ticketUpdatedData.hrStatus = status;
         ticketUpdatedData.hrRemarks = remark;
@@ -541,8 +527,10 @@ export const ViewForm = ({
         ticketUpdatedData.gmDate = currentDate;
       }
 
-      const formattedDatedeparture = ticketData.empDepartureDate || DateFormat(ticketData.departureDate);
-      const formattedDatearrival = ticketData.empArrivalDate || DateFormat(ticketData.arrivalDate);
+      const formattedDatedeparture =
+        ticketData.empDepartureDate || DateFormat(ticketData.departureDate);
+      const formattedDatearrival =
+        ticketData.empArrivalDate || DateFormat(ticketData.arrivalDate);
 
       handleUpdateTicketRequest(ticketData.id, ticketUpdatedData)
         .then(async () => {
@@ -927,12 +915,9 @@ export const ViewForm = ({
                           : `${leaveData.empLeaveSelectedFrom} to ${leaveData.empLeaveSelectedTo}`
                         : leaveData.empLeaveStartDate &&
                           leaveData.empLeaveEndDate
-                        ? !isValidDateFormat(leaveData.empLeaveStartDate) &&
-                          !isValidDateFormat(leaveData.empLeaveEndDate)
-                          ? `${DateFormat(
-                              leaveData.empLeaveStartDate
-                            )} to ${DateFormat(leaveData.empLeaveEndDate)}`
-                          : `${leaveData.empLeaveStartDate} to ${leaveData.empLeaveEndDate}`
+                        ? `${DateFormat(
+                            leaveData.empLeaveStartDate
+                          )} to ${DateFormat(leaveData.empLeaveEndDate)}`
                         : "N/A",
                   },
 
@@ -1201,7 +1186,7 @@ export const ViewForm = ({
                     label: "Destination",
                     value: ticketData.destination,
                   },
-                  { 
+                  {
                     label: "Departure Date",
                     value: ticketData.empDepartureDate
                       ? isValidDateFormat(ticketData.empDepartureDate)
@@ -1238,21 +1223,23 @@ export const ViewForm = ({
 
                 {(userType === "SuperAdmin" ||
                   userType === "HR" ||
-                  gmPosition === "GENERAL MANAGER"
-                  ) && ticketData.hrStatus !== "Pending" && (
-                  <table className="w-full mt-5 border-collapse">
-                    <thead className="bg-gradient-to-r from-[#f5ee6ad7] via-[#faf362] to-[#f5ee6ad7] shadow-[0_4px_6px_rgba(255,250,150,0.5)]">
-                      <tr className="text-[#6a2b2b] font-bold text-center">
-                        <th className=" p-1.5 rounded-tl-lg shadow-lg">Role</th>
-                        <th className=" p-1.5 shadow-md">Status</th>
-                        <th className=" p-1.5 rounded-tr-lg shadow-lg">
-                          Remarks
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {/* HR Row */}
-                    
+                  gmPosition === "GENERAL MANAGER") &&
+                  ticketData.hrStatus !== "Pending" && (
+                    <table className="w-full mt-5 border-collapse">
+                      <thead className="bg-gradient-to-r from-[#f5ee6ad7] via-[#faf362] to-[#f5ee6ad7] shadow-[0_4px_6px_rgba(255,250,150,0.5)]">
+                        <tr className="text-[#6a2b2b] font-bold text-center">
+                          <th className=" p-1.5 rounded-tl-lg shadow-lg">
+                            Role
+                          </th>
+                          <th className=" p-1.5 shadow-md">Status</th>
+                          <th className=" p-1.5 rounded-tr-lg shadow-lg">
+                            Remarks
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {/* HR Row */}
+
                         <tr className="border-b border-lite_grey">
                           <td className="p-2 text-center font-semibold">HR</td>
                           <td
@@ -1266,28 +1253,29 @@ export const ViewForm = ({
                             {ticketData.hrRemarks || "No remarks"}
                           </td>
                         </tr>
-                
 
-                      {/* GM Row */}
-                      {(ticketData.gmStatus === "Approved" ||
-                        ticketData.gmStatus === "Rejected") && (
-                        <tr className="border-b border-lite_grey">
-                          <td className="p-2 text-center font-semibold">GM</td>
-                          <td
-                            className={`text-center font-bold p-2 ${getGmStatusClass(
-                              ticketData.gmStatus
-                            )}`}
-                          >
-                            {ticketData.gmStatus}
-                          </td>
-                          <td className="p-2 break-words max-w-[200px] text-center text-grey">
-                            {ticketData.gmRemarks || "No remarks"}
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                )}
+                        {/* GM Row */}
+                        {(ticketData.gmStatus === "Approved" ||
+                          ticketData.gmStatus === "Rejected") && (
+                          <tr className="border-b border-lite_grey">
+                            <td className="p-2 text-center font-semibold">
+                              GM
+                            </td>
+                            <td
+                              className={`text-center font-bold p-2 ${getGmStatusClass(
+                                ticketData.gmStatus
+                              )}`}
+                            >
+                              {ticketData.gmStatus}
+                            </td>
+                            <td className="p-2 break-words max-w-[200px] text-center text-grey">
+                              {ticketData.gmRemarks || "No remarks"}
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  )}
 
                 {ticketData.hrStatus === "Pending" &&
                   userType !== "SuperAdmin" && (

@@ -2,6 +2,8 @@ import React from "react";
 
 const FamilyDetails = ({ familyDetails, mainRef }) => {
   let familyData = [];
+  console.log(familyDetails);
+  
 
   const parseFamilyDetails = (data) => {
     try {

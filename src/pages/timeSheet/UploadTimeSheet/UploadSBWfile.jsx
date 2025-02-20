@@ -25,8 +25,9 @@ export const UploadSBWfile = (
         allSheets &&
         allSheets.map((sheet) => {
           const data = sheet.data;
-
+         
           var headerSlicedData = data.slice(0, 1);
+   
           const hasNameAndDate = headerSlicedData.some((obj) =>
             ["NAME", "DATE"].every((key) => key in obj)
           );

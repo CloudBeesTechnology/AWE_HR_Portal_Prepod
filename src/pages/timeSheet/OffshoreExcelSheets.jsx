@@ -4,11 +4,13 @@ import icon7 from "../../assets/timeSheet/icon7.svg";
 import icon3 from "../../assets/timeSheet/icon3.svg";
 import { Link } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
+import icon9 from "../../assets/timeSheet/icon9.svg";
+import icon10 from "../../assets/timeSheet/icon10.svg";
 import usePermission from "../../hooks/usePermissionDashInside";
 export const OffshoreExcelSheets = () => {
   const timeSheetPermissions = usePermission("userID", "TimeSheet");
   return (
-    <section className="p-16 bg-[#f5f6f1cc] h-screen ">
+    <section className="p-16 bg-[#F5F6F1] h-screen ">
       <div className="text-start screen-size mb-3">
         <Link to="/timeSheet" className="text-xl flex-1 text-grey  ">
           <FaArrowLeft />
@@ -22,18 +24,18 @@ export const OffshoreExcelSheets = () => {
         <div className="flex justify-start gap-20">
           {timeSheetPermissions.includes("Offshore") && (
             <SelectTiles
-              img={icon3}
+              img={icon9}
               text1="Offshore"
-              borderColor="border-[#B70BA0]"
+              borderColor="border-[#B7610B]"
               bgColor="bg-white"
               link="/timesheetOffshore"
             />
           )}
           {timeSheetPermissions.includes("Offshore's ORMC") && (
             <SelectTiles
-              img={icon7}
+              img={icon10}
               text1="ORMC"
-              borderColor="border-[#06830E]"
+              borderColor="border-[#0B47B7]"
               bgColor="bg-white"
               link="/OffshoreSheets/OffshoreORMC"
             />

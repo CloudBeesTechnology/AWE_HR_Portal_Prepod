@@ -882,7 +882,7 @@ export const ViewTSTBeforeSave = ({
                 searchResult={searchResult}
                 secondaryData={secondaryData}
                 Position={Position}
-                placeholder="Sap No / Name."
+                placeholder="Sap No / Name"
               />
             </div>
           </div>
