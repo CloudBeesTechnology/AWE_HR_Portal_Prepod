@@ -36,7 +36,7 @@ export const ApplicationReceived = () => {
     .slice(0, 4);
 
   return (
-    <div className="flex justify-center  h-full flex-col p-2 w-full">
+    <div className="flex justify-center  h-full flex-col w-full">
       <div className="bg-lite_grey rounded-t-2xl font-semibold p-3">
         <h2 className="mx-2">Application Received</h2>
       </div>

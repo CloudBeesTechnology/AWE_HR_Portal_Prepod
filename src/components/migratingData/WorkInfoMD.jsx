@@ -125,7 +125,7 @@ export const WorkInfoMD = () => {
 //   createKeyValueStore,
 //   updateKeyValueStore,
 // } from "../../graphql/mutations";
-// import { WorkDataPass } from "../../pages/employees/WorkDataPass";
+// import {  } from "../../pages/employees/WorkDataPass";
 
 // const client = generateClient();
 

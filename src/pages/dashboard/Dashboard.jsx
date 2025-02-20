@@ -26,7 +26,7 @@ export const Dashboard = () => {
             <PathHead />
           </div>
         )}
-        <div className="flex gap-2 px-3 w-full">
+        <div className="flex gap-2 px-3 w-full py-2">
           {/* Column 1: Recent Notifications */}
           {dashboardPermissions.includes("Recent Notifications") && (
             <div className="flex-1 w-full">
@@ -46,7 +46,7 @@ export const Dashboard = () => {
           {/* Column 3: User Action and Birthday Reminder */}
           {(dashboardPermissions.includes("User Action") ||
             dashboardPermissions.includes("Birthday Reminder")) && (
-            <div className="flex-1 gap-2 pb-1 flex flex-col justify-between items-end h-full px-1">
+            <div className="flex-1 gap-2  flex flex-col justify-between items-end h-full ">
               {dashboardPermissions.includes("User Action") && (
                 <div className="w-full flex-1">
                   <UserProgress />
