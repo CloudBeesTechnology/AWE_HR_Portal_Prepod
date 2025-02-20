@@ -217,6 +217,10 @@ export const useLeaveManage = () => {
           hrRemarks: ticket.hrRemarks,
           hrName: ticket.hrName,
           hrEmpID: ticket.hrEmpID,
+          gmStatus: ticket.gmStatus,
+          gmDate: ticket.gmDate,
+          gmRemarks: ticket.gmRemarks,
+          gmEmpID: ticket.gmEmpID,
           managerEmpID: workInfo.manager || "",
           createdAt: ticket.createdAt,
         };
