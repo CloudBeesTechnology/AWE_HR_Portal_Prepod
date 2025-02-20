@@ -2320,6 +2320,10 @@ export const getTicketRequest = /* GraphQL */ `
       to
       fromDate
       toDate
+      gmDate
+      gmEmpID
+      gmRemarks
+      gmStatus
       createdAt
       updatedAt
       __typename
@@ -2352,6 +2356,10 @@ export const listTicketRequests = /* GraphQL */ `
         to
         fromDate
         toDate
+        gmDate
+        gmEmpID
+        gmRemarks
+        gmStatus
         createdAt
         updatedAt
         __typename

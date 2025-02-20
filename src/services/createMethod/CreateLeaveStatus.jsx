@@ -10,14 +10,14 @@ export const CRLeaveData = () => {
       throw new Error("Missing required parameters");
     }
     const DateFormat = (date) => {
-    
-      date = date.replace(/-/g, "/");
+      if (!date) return null;
+      date = date?.replace(/-/g, "/");
       console.log(date);
-      const parts = date.split("/");
+      const parts = date?.split("/");
 
       if (parts.length === 3) {
         let [part1, part2, part3] = parts;
-    
+
         // Check the format based on the length of the parts
         if (part1.length === 4) {
           // This is the yyyy/mm/dd format
@@ -37,7 +37,7 @@ export const CRLeaveData = () => {
         return "";
       }
     };
-    
+
     const {
       empID,
       leaveType,
@@ -68,18 +68,24 @@ export const CRLeaveData = () => {
     const fromValue = DateFormat(fromDate);
     console.log(fromValue);
 
-    const timingchangeFromDate = new Date(fromValue).toISOString();
+    const timingchangeFromDate = fromValue
+      ? new Date(fromValue).toISOString()
+      : null;
     console.log(timingchangeFromDate);
     const toValue = DateFormat(toDate);
-    const timingchangeToDate = new Date(toValue).toISOString();
+    const timingchangeToDate = toValue ? new Date(toValue).toISOString() : null;
     console.log(timingchangeToDate);
     const supervisorDatevalue = DateFormat(supervisorDate);
     console.log(supervisorDatevalue);
 
-    const timingchangeSupDate = new Date(supervisorDatevalue).toISOString();
+    const timingchangeSupDate = supervisorDatevalue
+      ? new Date(supervisorDatevalue).toISOString()
+      : null;
     console.log(timingchangeSupDate);
     const managervalue = DateFormat(managerDate);
-    const timingchangemanagerDate = new Date(managervalue).toISOString();
+    const timingchangemanagerDate = managervalue
+      ? new Date(managervalue).toISOString()
+      : null;
     console.log(timingchangemanagerDate);
     const applyToArray = applyTo.split(",").map((item) => item.trim());
     console.log(applyToArray, "applyTo as array");
@@ -108,8 +114,8 @@ export const CRLeaveData = () => {
       empRemarks,
       selectedFrom,
       selectedTo,
-      startDate:DateFormat(startDate),
-      endDate:DateFormat(endDate),
+      startDate: DateFormat(startDate),
+      endDate: DateFormat(endDate),
     };
 
     console.log(totalData);
