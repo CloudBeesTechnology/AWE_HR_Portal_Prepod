@@ -424,7 +424,7 @@ export const TicketsTable = () => {
                         onClick={() => {
                           handleClickForToggle();
                           handleViewClick(item, "Tickets");
-                          // console.log("Ticket", item);
+                          console.log("Ticket", item);
                         }}
                       >
                         {"View"}
