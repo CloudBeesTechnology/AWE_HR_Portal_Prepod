@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-// import img from "../../assets/logo/logo-with-name.svg";
+
 import img from "../../../assets/logo/logo-with-name.svg";
 export const PopupForAddRemark = ({
   toggleForRemarkFunc,
@@ -26,8 +26,8 @@ export const PopupForAddRemark = ({
                 };
                 addRemarks(data);
                 addEditedRemarks?.(data);
+                toggleForRemarkFunc();
               }
-              toggleForRemarkFunc();
             }}
             className="text-dark_grey "
           >

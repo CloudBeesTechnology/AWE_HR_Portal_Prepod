@@ -30,7 +30,7 @@ export const BlngTBody = ({
     try {
       const [year, month, day] = dateString.split("/");
 
-      return `${month}/${year}/${day}`; // 'M/D/YYYY'
+      return `${month}/${year}/${day}`;
     } catch {}
   };
 
@@ -39,13 +39,11 @@ export const BlngTBody = ({
       const inputDate = String(getDate);
       const date = new Date(inputDate);
 
-      // Extract parts
-      const day = date.getDate(); // 2
-      const month = date.getMonth() + 1; // Months are 0-indexed, so add 1
-      const year = date.getFullYear(); // 2024
-      const time = inputDate?.split(" ")[1] + " " + inputDate?.split(" ")[2]; // "5:50:59 AM"
+      const day = date.getDate();
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+      const time = inputDate?.split(" ")[1] + " " + inputDate?.split(" ")[2];
 
-      // Format the new date
       return `${day}/${month}/${year} ${time}`;
     } catch {}
   };
@@ -73,24 +71,22 @@ export const BlngTBody = ({
                   </td>
                   <td className="text-center px-4 flex-1">
                     {ENTRANCEDATETIME(
-                      rowData?.inTime?.replace(/[\[\]]/g, "") || ""
+                      rowData?.inTime?.replace(/[\[\]]/g, "") || 0
                     )}
                   </td>
                   <td className="text-center px-4 flex-1">
                     {ENTRANCEDATETIME(
-                      rowData?.outTime?.replace(/[\[\]]/g, "") || ""
+                      rowData?.outTime?.replace(/[\[\]]/g, "") || 0
                     )}
                   </td>
-                  {/* <td className="text-center px-4 flex-1">
-                    {rowData.avgDailyTD || 0}
-                  </td> */}
+
                   <td className="text-center px-4 flex-1">
                     {rowData?.avgDailyTD || 0}
                   </td>
                   <td className="text-center px-4 flex-1">
-                    {rowData?.totalHrs || ""}
+                    {rowData?.totalHrs || 0}
                   </td>
-                  <td className="text-center px-4 flex-1">{rowData?.aweSDN}</td>
+                  <td className="text-center px-4 flex-1">{rowData?.aweSDN || 0}</td>
 
                   <td className="text-center px-4 flex-1">
                     {rowData?.normalWorkHrs || 0}
@@ -124,9 +120,7 @@ export const BlngTBody = ({
               <td
                 colSpan="50"
                 className="text-center text-dark_ash text_size_5 bg-white"
-              >
-                {/* <p className="p-5">No Table Data Available Here.</p> */}
-              </td>
+              ></td>
             </tr>
           )}
     </tbody>

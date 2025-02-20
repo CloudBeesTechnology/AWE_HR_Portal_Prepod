@@ -2,12 +2,16 @@ import { useState, useEffect } from "react";
 import { generateClient } from "@aws-amplify/api";
 import { listTimeSheets } from "../../../graphql/queries";
 
-export const useFetchData = (titleName, cardName) => {
-  const [loading, setLoading] = useState(false);
-  const client = generateClient(); // GraphQL client
-  const [convertedStringToArrayObj, setConvertedStringToArrayObj] = useState(
-    []
-  );
+export const useFetchData = (
+  titleName,
+  cardName,
+  setLoading,
+  loading,
+  setMessage
+) => {
+  const client = generateClient();
+  const [convertedStringToArrayObj, setConvertedStringToArrayObj] =
+    useState(null);
   const [getPosition, setGetPosition] = useState(null);
 
   try {
@@ -17,7 +21,8 @@ export const useFetchData = (titleName, cardName) => {
 
       const fetchData = async () => {
         try {
-          setLoading(true); // Start loading indicator
+          setLoading?.(true);
+          setMessage?.("Please wait a few seconds...");
 
           let nextToken = null;
           let allData = [];
@@ -42,8 +47,11 @@ export const useFetchData = (titleName, cardName) => {
                     { status: { eq: "Rejected" } },
                     { fileType: { eq: titleName } },
                   ]
-                : cardName === "All"
-                ? [{ status: { eq: "All" } }, { fileType: { eq: titleName } }]
+                : cardName === "Unsubmitted"
+                ? [
+                    { status: { eq: "Unsubmitted" } },
+                    { fileType: { eq: titleName } },
+                  ]
                 : [
                     { status: { eq: "nothing" } },
                     { fileType: { eq: titleName } },
@@ -64,7 +72,7 @@ export const useFetchData = (titleName, cardName) => {
 
             fetchedData = response?.data?.listTimeSheets?.items || [];
 
-            nextToken = response?.data?.listTimeSheets?.nextToken; // Update nextToken for next page
+            nextToken = response?.data?.listTimeSheets?.nextToken;
 
             const validData = fetchedData.filter(
               (item) => item !== null && item !== undefined
@@ -72,20 +80,20 @@ export const useFetchData = (titleName, cardName) => {
 
             allData = [...allData, ...fetchedData];
           } while (nextToken);
-
          
-
           setConvertedStringToArrayObj(allData);
 
-          // Update state with all data
+          if (allData.length === 0) {
+            setMessage?.("No data available");
+          } else {
+            setMessage?.("");
+          }
         } catch (error) {
-          // console.error(`Error fetching data for ${titleName}:`, error);
         } finally {
-          setLoading(false); // Stop loading indicator
+          setLoading?.(false);
         }
       };
 
-      // Fetch only if titleName and Position are valid
       if ((Position === "Manager" && titleName) || Position !== "Manager") {
         fetchData();
       }
@@ -93,6 +101,8 @@ export const useFetchData = (titleName, cardName) => {
 
     return { convertedStringToArrayObj, getPosition, loading };
   } catch (err) {
-    // console.log("ERROR : ", err);
+    setLoading?.(false);
+
+    setMessage("An error occurred. Please try again.");
   }
 };

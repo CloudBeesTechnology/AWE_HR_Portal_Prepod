@@ -50,10 +50,7 @@ export const ChangePasswordSchema = Yup.object({
 
 export const ApplicantSchema = Yup.object().shape({
   profilePhoto: Yup.mixed()
-    .required("Upload Photo is mandatory")
-    .test("fileType", "Profile photo must be a JPG or PNG file", (value) =>
-      value ? /\.(jpg|jpeg|png)$/.test(value.name) : false
-    ),
+  .notRequired("Upload Photo is mandatory"),
   agent: Yup.string().notRequired(),
   position: Yup.string().required("Position is mandatory"),
   contractType: Yup.string().required("Contract Type mandatory"),
@@ -238,77 +235,77 @@ export const CandidatesSchema = Yup.object().shape({
   }),
   supportInfo: Yup.string(),
 
-  // File validation for resume (e.g., PDF, Word, Excel, or images)
-  uploadResume: Yup.mixed()
-    .required("Resume is required")
-    .test(
-      "fileType",
-      "Only PDF, Word, Excel, or image formats (JPEG, JPG, PNG, SVG) are allowed",
-      (value) => {
-        return (
-          value &&
-          [
-            "application/pdf", // PDF
-            "application/msword", // Word .doc
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // Word .docx
-            "application/vnd.ms-excel", // Excel .xls
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Excel .xlsx
-            "image/jpeg",
-            "image/jpg",
-            "image/png",
-            "image/svg+xml", // Images
-          ].includes(value.type)
-        );
-      }
-    ),
+  // // File validation for resume (e.g., PDF, Word, Excel, or images)
+  // uploadResume: Yup.mixed()
+  //   .required("Resume is required")
+  //   .test(
+  //     "fileType",
+  //     "Only PDF, Word, Excel, or image formats (JPEG, JPG, PNG, SVG) are allowed",
+  //     (value) => {
+  //       return (
+  //         value &&
+  //         [
+  //           "application/pdf", // PDF
+  //           "application/msword", // Word .doc
+  //           "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // Word .docx
+  //           "application/vnd.ms-excel", // Excel .xls
+  //           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Excel .xlsx
+  //           "image/jpeg",
+  //           "image/jpg",
+  //           "image/png",
+  //           "image/svg+xml", // Images
+  //         ].includes(value.type)
+  //       );
+  //     }
+  //   ),
 
-  // File validation for certificate (e.g., PDF, Word, Excel, or images)
-  uploadCertificate: Yup.mixed()
-    .required("Certificate is required")
-    .test(
-      "fileType",
-      "Only PDF, Word, Excel, or image formats (JPEG, JPG, PNG, SVG) are allowed",
-      (value) => {
-        return (
-          value &&
-          [
-            "application/pdf", // PDF
-            "application/msword", // Word .doc
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // Word .docx
-            "application/vnd.ms-excel", // Excel .xls
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Excel .xlsx
-            "image/jpeg",
-            "image/jpg",
-            "image/png",
-            "image/svg+xml", // Images
-          ].includes(value.type)
-        );
-      }
-    ),
+  // // File validation for certificate (e.g., PDF, Word, Excel, or images)
+  // uploadCertificate: Yup.mixed()
+  //   .required("Certificate is required")
+  //   .test(
+  //     "fileType",
+  //     "Only PDF, Word, Excel, or image formats (JPEG, JPG, PNG, SVG) are allowed",
+  //     (value) => {
+  //       return (
+  //         value &&
+  //         [
+  //           "application/pdf", // PDF
+  //           "application/msword", // Word .doc
+  //           "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // Word .docx
+  //           "application/vnd.ms-excel", // Excel .xls
+  //           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Excel .xlsx
+  //           "image/jpeg",
+  //           "image/jpg",
+  //           "image/png",
+  //           "image/svg+xml", // Images
+  //         ].includes(value.type)
+  //       );
+  //     }
+  //   ),
 
-  // File validation for passport (e.g., PDF, Word, Excel, or images)
-  uploadPp: Yup.mixed()
-    .required("Passport is required")
-    .test(
-      "fileType",
-      "Only PDF, Word, Excel, or image formats (JPEG, JPG, PNG, SVG) are allowed",
-      (value) => {
-        return (
-          value &&
-          [
-            "application/pdf", // PDF
-            "application/msword", // Word .doc
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // Word .docx
-            "application/vnd.ms-excel", // Excel .xls
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Excel .xlsx
-            "image/jpeg",
-            "image/jpg",
-            "image/png",
-            "image/svg+xml", // Images
-          ].includes(value.type)
-        );
-      }
-    ),
+  // // File validation for passport (e.g., PDF, Word, Excel, or images)
+  // uploadPp: Yup.mixed()
+  //   .required("Passport is required")
+  //   .test(
+  //     "fileType",
+  //     "Only PDF, Word, Excel, or image formats (JPEG, JPG, PNG, SVG) are allowed",
+  //     (value) => {
+  //       return (
+  //         value &&
+  //         [
+  //           "application/pdf", // PDF
+  //           "application/msword", // Word .doc
+  //           "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // Word .docx
+  //           "application/vnd.ms-excel", // Excel .xls
+  //           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Excel .xlsx
+  //           "image/jpeg",
+  //           "image/jpg",
+  //           "image/png",
+  //           "image/svg+xml", // Images
+  //         ].includes(value.type)
+  //       );
+  //     }
+  //   ),
 });
 
 // Define the validation schema using Yup

@@ -13,35 +13,31 @@ export const GetViewSummaryUpdater = (getEmpID) => {
         variables: { nextToken },
       });
 
-      const items = response.data[Object.keys(response.data)[0]].items; // Extract items
-      allData = [...allData, ...items]; // Append fetched items
-      nextToken = response.data[Object.keys(response.data)[0]].nextToken; // Get nextToken
-    } while (nextToken); // Continue if there's more data
+      const items = response.data[Object.keys(response.data)[0]].items;
+      allData = [...allData, ...items];
+      nextToken = response.data[Object.keys(response.data)[0]].nextToken;
+    } while (nextToken);
 
     return allData;
   }
 
   async function fetchEmployeeData() {
     try {
-      // Fetch all data with pagination
       const [empPersonalInfos] = await Promise.all([
         fetchAllData(listEmpPersonalInfos),
       ]);
 
-      const candidates = empPersonalInfos; // Data from listEmpPersonalInfos
+      const candidates = empPersonalInfos;
 
       const getSummaryUpdaterName = candidates?.find(
         (fin) => fin.empID === getEmpID
       );
 
       return getSummaryUpdaterName;
-    } catch (err) {
-      // console.error("Error fetching data:", err.message);
-    }
+    } catch (err) {}
   }
 
   const returnEmpDetails = fetchEmployeeData();
-  
 
   return returnEmpDetails;
 };

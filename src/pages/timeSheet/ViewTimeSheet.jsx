@@ -18,10 +18,10 @@ export const ViewTimeSheet = () => {
   // const [categoryFilter, setCategoryFilter] = useState("Select Excel Sheet");
   const [toggleClick, setToggleClick] = useState(false);
 
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState("All Records");
   const [data, setData] = useState(null);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [secondaryData, setSecondaryData] = useState(null);
   const [allExcelSheetData, setAllExcelSheetData] = useState(null);
   const [message, setMessage] = useState("");
@@ -48,85 +48,93 @@ export const ViewTimeSheet = () => {
 
   const { convertedStringToArrayObj } = useFetchData(
     categoryFilter,
-    "viewTimeSheet"
+    "viewTimeSheet",
+    setLoading,
+    loading,
+    setMessage
   );
 
   let visibleData;
 
   useEffect(() => {
-    if (categoryFilter) {
-      const result = ["Offshore", "HO", "BLNG", "SBW", "ORMC"].includes(
-        categoryFilter
-      );
-      if (result) {
-        setMessage("Processing your request, Please wait a few seconds...");
-      }
-    }
-  }, [categoryFilter]);
-  useEffect(() => {
     try {
-      function groupByUpdatedAtAndStatus(data) {
+      async function groupByUpdatedAtAndStatus(data) {
         const groupedData = {};
 
         data.forEach((item) => {
-          const updatedAtDate = item.updatedAt.split("T")[0]; // Extract date
+          const updatedAtDate = item.updatedAt.split("T")[0];
           const status = item.status; // Get status
 
-          // Create a key combining date and status
           const key = `${updatedAtDate}_${status}`;
 
-          // Initialize if the key doesn't exist
           if (!groupedData[key]) {
             groupedData[key] = {
               fileName: item.fileName,
               fileType: item.fileType,
               date: updatedAtDate,
-              status: status, // Keep the actual status
+              status: status,
               updatedAt: [],
             };
           }
 
-          // Push the item into the grouped array
           groupedData[key].updatedAt.push(item);
         });
 
-        return Object.values(groupedData); // Return grouped data as an array
+        return Object.values(groupedData);
       }
 
       const identifyAssignData = async () => {
-        if (Position === "Manager") {
+        if (Position === "Manager" && categoryFilter !== "Select Excel Sheet") {
           const ManagerData = await SendDataToManager(
-            convertedStringToArrayObj
+            convertedStringToArrayObj,
+            setLoading,
+            setMessage
           );
 
           const removeStatusAll = ManagerData.filter(
-            (fil) => fil.status !== "All"
+            (fil) => fil.status !== "Unsubmitted"
           );
           var filterManagerData = removeStatusAll;
         } else if (Position === "SuperAdmin") {
           var filterManagerData = convertedStringToArrayObj;
         } else {
-          var filterManagerData = await FindSpecificTimeKeeper(
-            convertedStringToArrayObj
+          var findTimeKeeper = await FindSpecificTimeKeeper(
+            convertedStringToArrayObj,
+            setLoading,
+            setMessage
           );
+          const removeStatusAll = findTimeKeeper.filter(
+            (fil) => fil.status !== "Pending"
+          );
+
+          var filterManagerData = removeStatusAll;
         }
-        const groupedData = groupByUpdatedAtAndStatus(filterManagerData);
+
+        const groupedData = await groupByUpdatedAtAndStatus(filterManagerData);
 
         setAllExcelSheetData(groupedData);
         setSecondaryData(groupedData);
       };
-      identifyAssignData();
-    } catch (err) {}
-  }, [convertedStringToArrayObj]);
 
-  // const AllFieldData = useTableFieldData(categoryFilter);
+      if (categoryFilter === "Select Excel Sheet") {
+        setMessage("Select an Excel sheet from the dropdown to display data.");
+      } else if (!convertedStringToArrayObj) {
+        setMessage("Please wait a few seconds...");
+      } else if (
+        convertedStringToArrayObj &&
+        convertedStringToArrayObj.length > 0
+      ) {
+        identifyAssignData();
+      }
+    } catch (err) {}
+  }, [convertedStringToArrayObj, categoryFilter]);
 
   useEffect(() => {
     if (!secondaryData || secondaryData.length === 0) return;
     setCurrentPage(1);
     let filteredData = [...secondaryData];
 
-    if (selectedCategory !== "All") {
+    if (selectedCategory !== "All Records") {
       filteredData = filteredData.filter(
         (item) => item.status === selectedCategory
       );
@@ -134,13 +142,12 @@ export const ViewTimeSheet = () => {
 
     if (startDate) {
       const inputDate = new Date(startDate);
-      inputDate?.setHours(0, 0, 0, 0); // Resetting time to midnight
+      inputDate?.setHours(0, 0, 0, 0);
 
       filteredData = filteredData.filter((item) => {
         const itemDate = new Date(item.date);
-        itemDate?.setHours(0, 0, 0, 0); // Resetting time to midnight
+        itemDate?.setHours(0, 0, 0, 0);
 
-        // Comparing the dates directly as strings
         return itemDate.getTime() === inputDate.getTime();
       });
     }
@@ -153,16 +160,8 @@ export const ViewTimeSheet = () => {
     }
   }, [secondaryData, startDate, selectedCategory]);
 
-  useEffect(() => {
-    if (visibleData) {
-      setLoading(false);
-    } else {
-      setLoading(false);
-    }
-  }, [visibleData]);
-
   const handleFilterChange = (category) => {
-    setAllExcelSheetData([]);
+    // setAllExcelSheetData([]);
     setSelectedCategory(category);
   };
 
@@ -296,7 +295,14 @@ export const ViewTimeSheet = () => {
                     setToggleClick(!toggleClick);
                   }}
                 >
-                  {["Offshore", "HO", "SBW", "ORMC", "BLNG"].map((category) => (
+                  {[
+                    "Offshore",
+                    "HO",
+                    "SBW",
+                    "ORMC",
+                    "Offshore's ORMC",
+                    "BLNG",
+                  ].map((category) => (
                     <p
                       key={category}
                       className={`p-1 cursor-pointer ${
@@ -306,7 +312,7 @@ export const ViewTimeSheet = () => {
                       }`}
                       onClick={() => {
                         if (category !== prevCategoryRef.current) {
-                          setLoading(true);
+                          // setLoading(true);
                           handleForSelectTSheet(category);
 
                           setAllExcelSheetData(null);
@@ -334,6 +340,8 @@ export const ViewTimeSheet = () => {
                     ? "BADGE NO"
                     : timeSheetFileData?.fileType === "ORMC"
                     ? "BADGE NO"
+                    : timeSheetFileData?.fileType === "Offshore's ORMC"
+                    ? "BADGE NO"
                     : timeSheetFileData?.fileType === "BLNG"
                     ? "FID"
                     : "Search..."
@@ -359,6 +367,7 @@ export const ViewTimeSheet = () => {
           <ListTimeSheet
             visibleData={visibleData}
             newSearchFunction={newSearchFunction}
+            loading={loading}
             message={message}
             totalPages={totalPages}
             currentPage={currentPage}

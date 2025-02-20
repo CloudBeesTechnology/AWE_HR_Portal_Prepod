@@ -10,7 +10,7 @@ export const AutoFetchForAssignManager = () => {
   const [data, setData] = useState(null);
   useEffect(() => {
     async function fetchAllData(queryName) {
-      let allData = [];   
+      let allData = [];
       let nextToken = null;
 
       do {
@@ -19,24 +19,23 @@ export const AutoFetchForAssignManager = () => {
           variables: { nextToken },
         });
 
-        const items = response.data[Object.keys(response.data)[0]].items; // Extract items
-        allData = [...allData, ...items]; // Append fetched items
-        nextToken = response.data[Object.keys(response.data)[0]].nextToken; // Get nextToken
-      } while (nextToken); // Continue if there's more data
+        const items = response.data[Object.keys(response.data)[0]].items;
+        allData = [...allData, ...items];
+        nextToken = response.data[Object.keys(response.data)[0]].nextToken;
+      } while (nextToken);
 
       return allData;
     }
 
     async function fetchEmployeeData() {
       try {
-        // Fetch all data with pagination
         const [empPersonalInfos, empWorkInfos] = await Promise.all([
           fetchAllData(listEmpPersonalInfos),
           fetchAllData(listEmpWorkInfos),
         ]);
 
-        const candidates = empPersonalInfos; 
-        const interviews = empWorkInfos; 
+        const candidates = empPersonalInfos;
+        const interviews = empWorkInfos;
 
         const mergedData = candidates
           .map((candidate) => {
@@ -44,7 +43,6 @@ export const AutoFetchForAssignManager = () => {
               (item) => item.empID === candidate.empID
             );
 
-            // Return null if all details are undefined
             if (!interviewDetails) {
               return null;
             }
@@ -57,13 +55,10 @@ export const AutoFetchForAssignManager = () => {
           .filter((item) => item !== null);
 
         setData(mergedData);
-      } catch (err) {
-        // console.error("Error fetching data:", err.message);
-      }
+      } catch (err) {}
     }
 
     fetchEmployeeData();
   }, []);
   return data;
 };
-

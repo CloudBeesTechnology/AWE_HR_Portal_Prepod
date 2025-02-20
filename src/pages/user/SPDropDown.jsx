@@ -130,6 +130,7 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
         "SBW",
         "ORMC",
         "Offshore",
+        "Offshore's ORMC",
         "BLNG",
         "View Time Sheet",
         "View Summary",

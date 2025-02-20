@@ -58,8 +58,8 @@ export const OffshoreTBody = ({
                   <td className="text-center px-4 flex-1">
                     {convertToISODate(m.date)}
                   </td>
-                  <td className="text-center px-4 flex-1">{m.totalNT}</td>
-                  <td className="text-center px-4 flex-1">{m.totalOT}</td>
+                  <td className="text-center px-4 flex-1">{m.totalNT || 0}</td>
+                  <td className="text-center px-4 flex-1">{m.totalOT || 0}</td>
                   <td className="text-center px-4 flex-1">
                     {m.totalNTOT || 0}
                   </td>

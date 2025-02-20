@@ -1,6 +1,4 @@
 import React from "react";
-// import "./App.css"; // CSS file for styles
-// import "../index.css";
 import "../../../../src/index.css";
 export const ScrollableTable = () => {
   const data = Array.from({ length: 50 }, (_, i) => ({

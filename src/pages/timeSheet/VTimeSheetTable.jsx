@@ -33,7 +33,6 @@ export const VTimeSheetTable = () => {
   const [fileType, setFileType] = useState("");
   const AllfieldData = useTableFieldData(fileType);
 
-  // console.log(savedData)
   const {
     showListTimeSheet,
     timeSheetFileData,
@@ -86,18 +85,16 @@ export const VTimeSheetTable = () => {
 
       let filteredData = [...secondaryData];
 
-      // Filter by search query
       if (searchQuery) {
         filteredData = searchQuery;
       }
 
       if (startDate && endDate) {
-        const start = new Date(startDate); // Start date as "MM/DD/YYYY"
-        const end = new Date(endDate); // End date as "MM/DD/YYYY"
+        const start = new Date(startDate);
+        const end = new Date(endDate);
 
-        // Filter the data array
         filteredData = filteredData.filter((item) => {
-          const itemDate = new Date(item.date); // Convert item.DATE to a Date object
+          const itemDate = new Date(item.date);
           itemDate?.setHours(0, 0, 0, 0);
           start?.setHours(0, 0, 0, 0);
           end?.setHours(0, 0, 0, 0);
@@ -105,7 +102,6 @@ export const VTimeSheetTable = () => {
         });
       }
 
-      // Final filtered data handling
       setData(filteredData);
 
       setLoading(false);
@@ -117,8 +113,7 @@ export const VTimeSheetTable = () => {
     if (timeSheetFileData) {
       setData(timeSheetFileData?.updatedAt);
       setSecondaryData(timeSheetFileData?.updatedAt);
-      // setData(fileData?.updatedAt);
-      // setSecondaryData(fileData?.updatedAt);
+
       setCategoryFilters(timeSheetFileData?.fileType);
     }
   }, [timeSheetFileData]);
@@ -126,12 +121,10 @@ export const VTimeSheetTable = () => {
   useEffect(() => {
     if (data) {
       setTimeout(() => {
-        // setMessage("Please wait few seconds.");
         setLoading(false);
       }, 3000);
     } else {
       setTimeout(() => {
-        // setMessage("No Table Data Available Here.");
         setLoading(false);
       }, 3000);
     }
@@ -158,8 +151,6 @@ export const VTimeSheetTable = () => {
   };
   return (
     <section className="h-screen bg-[#fafaf6] ">
-      {/* <header className="flex justify-between"> */}
-
       <ViewTimeSheet />
 
       {/* </header> */}
@@ -221,6 +212,18 @@ export const VTimeSheetTable = () => {
                 message={message}
                 assignObjectFun={assignObjectFun}
                 toggleFunction={toggleFunction}
+              />
+            )}
+
+            {categoryFilters === "Offshore's ORMC" && (
+              <OffshoreTBody
+                data={visibleData}
+                loading={loading}
+                setTableData={setTableData}
+                message={message}
+                assignObjectFun={assignObjectFun}
+                toggleFunction={toggleFunction}
+                editFormTitleFunc={editFormTitleFunc}
               />
             )}
             {categoryFilters === "Offshore" && (

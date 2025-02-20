@@ -16,10 +16,12 @@ import { sendEmail } from "../../services/EmailServices";
 import { FaArrowLeft } from "react-icons/fa";
 import { useTempID } from "../../utils/TempIDContext";
 import { DateFormat } from "../../utils/DateFormat";
+import { useCreateNotification } from "../../hooks/useCreateNotification";
 
 export const ProbationForm = forwardRef(() => {
   const location = useLocation();
   const { gmPosition } = useTempID();
+  const { createNotification } = useCreateNotification();
   const { employeeData } = location.state || {};
   const [userID, setUserID] = useState("");
   const [userType, setUserType] = useState("");
@@ -83,6 +85,7 @@ export const ProbationForm = forwardRef(() => {
       teamworkDetails: "",
       responsibilityDetails: "",
       diligentDetails: "",
+      createdAt: "",
       commitmentDetails: "",
     },
   });
@@ -103,11 +106,10 @@ export const ProbationForm = forwardRef(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  //email process start
-
   const currentDate = new Date();
   const monthName = currentDate.toLocaleString("en-US", { month: "long" });
   const year = currentDate.getFullYear();
+  //email process start
 
   useEffect(() => {
     const userID = localStorage.getItem("userID");
@@ -329,6 +331,29 @@ export const ProbationForm = forwardRef(() => {
               .join("/")
           : "Not mentioned";
 
+      
+      const subject = "Probation Assessment Review";
+      
+      const notifyMessageSup = `Your Employee Mr./Ms. ${empPIRecord?.name
+      }'s probation period ending on ${probationEndFormatted || "Not Mentioned"} has been ${
+      data?.supervisorApproved || PFDataRecord.supervisorApproved
+      } by Supervisor, ${emailData?.supervisorName || "Not Mentioned"}.`;
+
+      const notifyMessageManager = `Your Employee Mr./Ms. ${empPIRecord?.name}'s probation period ending on ${
+        probationEndFormatted || "Not Mentioned"
+      }
+      has been reviewed and ${
+        data?.managerApproved || PFDataRecord.managerApproved
+      } by the Manager, ${emailData?.managerName || "Not Mentioned"}.`;
+      
+      const notifyMessageGM = `Your Employee Mr./Ms. ${empPIRecord?.name}'s probation period ending on ${
+        probationEndFormatted || "Not Mentioned"
+      }
+      has been reviewed and ${
+        data?.gmApproved || PFDataRecord.gmApproved
+      } by the General Manager, ${emailData?.managerName || "Not Mentioned"}.`;
+
+      
       const probFields = [
         "adaptability",
         "additionalInfo",
@@ -368,6 +393,7 @@ export const ProbationForm = forwardRef(() => {
         "diligentDetails",
         "commitmentDetails",
         "probStatus",
+        "createdAt",
       ];
 
       const formDataValues = probFields.reduce((acc, field) => {
@@ -430,7 +456,7 @@ export const ProbationForm = forwardRef(() => {
         // console.log("update", formattedData);
 
         setTimeout(() => {
-          sendEmails(data, empPIRecord, probationEndFormatted, PFDataRecord);
+          sendEmails(data, empPIRecord, probationEndFormatted, PFDataRecord, subject, notifyMessageSup, notifyMessageManager, notifyMessageGM);
         }, 100);
       } else {
         const ProbValue = { ...data, ...formDataValues, probStatus: true };
@@ -471,7 +497,7 @@ export const ProbationForm = forwardRef(() => {
 
         // console.log("create");
         setTimeout(() => {
-          sendEmails(data, empPIRecord, probationEndFormatted);
+          sendEmails(data, empPIRecord, probationEndFormatted, subject, notifyMessageSup, notifyMessageManager, notifyMessageGM);
         }, 100);
 
         // console.log("Created", ProbValue);
@@ -485,7 +511,11 @@ export const ProbationForm = forwardRef(() => {
     data,
     empPIRecord,
     probationEndFormatted,
-    PFDataRecord
+    PFDataRecord,
+    subject,
+    notifyMessageSup,
+    notifyMessageManager,
+    notifyMessageGM
   ) => {
     try {
       if (userType === "Supervisor") {
@@ -510,6 +540,14 @@ export const ProbationForm = forwardRef(() => {
           from,
           emailData.managerOfficialMail
         );
+
+        await createNotification({
+          empID: employeeData.empID,
+          leaveType: subject,
+          message: notifyMessageSup,
+          senderEmail: "hr_no-reply@adininworks.com",
+          receipentEmail: emailData.genManagerEmail,
+        });
 
         // If the email is sent successfully, the log will be visible, and you can trigger the alert here.
         // alert(`Email sent successfully to Manager's mail: ${emailData.managerOfficialMail}\n\nEmail Content:\nYour Employee Mr./Ms. ${empPIRecord?.name}'s probation period ending on ${probationEndFormatted || "Not Mentioned"}\n\nhas been ${data?.supervisorApproved || PFDataRecord.supervisorApproved} by Supervisor, ${emailData?.supervisorName || "Not Mentioned"}.`);
@@ -539,6 +577,15 @@ export const ProbationForm = forwardRef(() => {
             emailData.gmOfficialMail
           );
 
+          
+        await createNotification({
+          empID: employeeData.empID,
+          leaveType: subject,
+          message: notifyMessageManager,
+          senderEmail: "hr_no-reply@adininworks.com",
+          receipentEmail: emailData.gmOfficialMail,
+        });
+
           // alert(`Email sent successfully to GM's mail: ${emailData.gmOfficialMail}\n\nEmail Content:\nYour Employee Mr./Ms. ${empPIRecord?.name}'s probation period ending on ${probationEndFormatted || "Not Mentioned"}\n\nhas been reviewed and ${data?.managerApproved || PFDataRecord.managerApproved} by the Manager, ${emailData?.managerName || "Not Mentioned"}.`);
         } else {
           await sendEmail(
@@ -563,6 +610,14 @@ export const ProbationForm = forwardRef(() => {
             emailData.hrOfficialmail
           );
 
+          await createNotification({
+            empID: employeeData.empID,
+            leaveType: subject,
+            message: notifyMessageManager,
+            senderEmail: "hr_no-reply@adininworks.com",
+            receipentEmail: emailData.hrOfficialmail,
+          });
+
           // alert(`Email sent successfully to HR's mail: ${emailData.hrOfficialmail}\n\nEmail Content:\nYour Employee Mr./Ms. ${empPIRecord?.name || "Not mentioned"}'s probation period ending on ${probationEndFormatted || "Not Mentioned"}\n\nhas been reviewed and ${data?.managerApproved || PFDataRecord.managerApproved} by the Manager, ${emailData?.managerName || "Not Mentioned"}.\n\nPlease proceed with the necessary actions.`);
         }
       } else if (gmPosition === "General Manager") {
@@ -578,7 +633,7 @@ export const ProbationForm = forwardRef(() => {
           }</p>
             <p>has been reviewed and ${
               data?.gmApproved || PFDataRecord.gmApproved
-            } by the Manager, ${emailData?.managerName || "Not Mentioned"}.</p>
+            } by the General Manager, ${emailData?.managerName || "Not Mentioned"}.</p>
             <p>Please proceed with the necessary actions.</p>
             <p>Click here https://hr.adininworks.co to view the updates.</p>
           </body>
@@ -586,6 +641,15 @@ export const ProbationForm = forwardRef(() => {
           from,
           emailData.hrOfficialmail
         );
+
+        await createNotification({
+          empID: employeeData.empID,
+          leaveType: subject,
+          message: notifyMessageManager,
+          senderEmail: "hr_no-reply@adininworks.com",
+          receipentEmail: emailData.hrOfficialmail,
+        });
+
 
         // alert(`Email sent successfully to HR's mail: ${emailData.hrOfficialmail}\n\nEmail Content:\nYour Employee Mr./Ms. ${empPIRecord?.name || "Not mentioned"}'s probation period ending on ${probationEndFormatted || "Not Mentioned"}\n\nhas been reviewed and ${data?.gmApproved  || PFDataRecord.gmApproved} by the Manager, ${emailData?.managerName || "Not Mentioned"}.\n\nPlease proceed with the necessary actions.`);
       }
@@ -621,7 +685,7 @@ export const ProbationForm = forwardRef(() => {
           : `Probation Completion Form for the Month of ${monthName} ${year}`}
       </div>
 
-      <div className="mb-10">
+      <div className="mb-10 mt-5">
         <p className="text-md mt-2">
           For the attention of:{" "}
           <input

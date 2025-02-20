@@ -27,6 +27,8 @@ import { TimeSheetsCRUDoperations } from "./customTimeSheet/TimeSheetsCRUDoperat
 import { listTimeSheets } from "../../graphql/queries";
 import { useRowSelection } from "./customTimeSheet/useRowSelection";
 import { useNavigate } from "react-router-dom";
+import { useCreateNotification } from "../../hooks/useCreateNotification";
+import { TimeSheetSpinner } from "./customTimeSheet/TimeSheetSpinner";
 const client = generateClient();
 
 export const ViewHOsheet = ({
@@ -52,11 +54,11 @@ export const ViewHOsheet = ({
   const [toggleHandler, setToggleHandler] = useState(false);
   const [currentStatus, setCurrentStatus] = useState(null);
   const [toggleAssignManager, setToggleAssignManager] = useState(false);
-  // const [loading, setLoading] = useState(true);
+
   const [userIdentification, setUserIdentification] = useState("");
   const [showStatusCol, setShowStatusCol] = useState(null);
   const [successMess, setSuccessMess] = useState(null);
-  const [response, setResponse] = useState(null);
+
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedItemsTwo, setCheckedItemsTwo] = useState({});
   const [editFormTitle, setEditFormTitle] = useState("");
@@ -68,22 +70,21 @@ export const ViewHOsheet = ({
   const [passSelectedData, setPassSelectedData] = useState(null);
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
-  const [filteredData, setFilteredData] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
 
   let visibleData;
 
   const [storingMess, setStoringMess] = useState(null);
-  // if (Position !== "Manager") {
+
   const processedData = useTableMerged(excelData);
 
   const mergedData = AutoFetchForAssignManager();
-  // }
+
   const { startDate, endDate, searchQuery, setSearchQuery } = useTempID();
   const { selectedRows, setSelectedRows, handleCheckboxChange, handleSubmit } =
     useRowSelection();
-
+  const { createNotification } = useCreateNotification();
   useEffect(() => {
     if (submittedData && submittedData.length > 0) {
       setShowStatusCol(true);
@@ -124,9 +125,7 @@ export const ViewHOsheet = ({
                 typeof info === "string" ? JSON.parse(info) : info
               );
             }
-          } catch (error) {
-            // console.error("Error parsing empWorkInfo for ID:", val.id, error);
-          }
+          } catch (error) {}
           return {
             id: val.id,
             fileName: val.fileName,
@@ -175,9 +174,9 @@ export const ViewHOsheet = ({
 
   const cleanValue = (value) => {
     if (typeof value !== "string") {
-      return value; // Return value if not a string (e.g., number, object)
+      return value;
     }
-    return value.replace(/[^a-zA-Z0-9]/g, ""); // Removes all non-alphanumeric characters
+    return value.replace(/[^a-zA-Z0-9]/g, "");
   };
 
   useEffect(() => {
@@ -185,7 +184,7 @@ export const ViewHOsheet = ({
       const cleanData = returnedTHeader.map((item) => {
         const cleanedItem = {};
         for (const key in item) {
-          cleanedItem[key] = cleanValue(item[key]); // Clean the value, not the key
+          cleanedItem[key] = cleanValue(item[key]);
         }
 
         return cleanedItem;
@@ -217,21 +216,19 @@ export const ViewHOsheet = ({
         const keyCheckResult =
           cleanData &&
           cleanData.every((m) => {
-            return requiredKeys.every(
-              (key) =>
-                Object.values(m)
-                  .map((value) =>
-                    typeof value === "string" ? value.toUpperCase() : value
-                  ) // Convert string values to uppercase
-                  .includes(key.toUpperCase()) // Compare with key in uppercase
+            return requiredKeys.every((key) =>
+              Object.values(m)
+                .map((value) =>
+                  typeof value === "string" ? value.toUpperCase() : value
+                )
+                .includes(key.toUpperCase())
             );
           });
         resolve(keyCheckResult);
       });
       setClosePopup(true);
       setShowStatusCol(result);
-      setCurrentStatus(result); // Assuming setCurrentStatus is defined
-      // setLoading(false);
+      setCurrentStatus(result);
     };
 
     if (returnedTHeader && returnedTHeader.length > 0) {
@@ -239,7 +236,7 @@ export const ViewHOsheet = ({
     } else if (!returnedTHeader && showRejectedItemTable !== "Rejected") {
       const fetchData = async () => {
         setCurrentStatus(true);
-        // setLoading(true);
+
         try {
           const dataPromise = new Promise((resolve, reject) => {
             if (ManagerData && ManagerData.length > 0) {
@@ -260,11 +257,9 @@ export const ViewHOsheet = ({
           }
         } catch (err) {
         } finally {
-          // setLoading(false);
         }
       };
 
-      // Call the fetchData function asynchronously
       fetchData();
     } else if (!returnedTHeader && showRejectedItemTable === "Rejected") {
       const fetchData = async () => {
@@ -294,13 +289,18 @@ export const ViewHOsheet = ({
         }
       };
 
-      // Call the fetchData function asynchronously
       fetchData();
     } else {
       setCurrentStatus(false);
       // setLoading(false);
     }
-  }, [returnedTHeader, ManagerData, userIdentification, showRejectedItemTable]);
+  }, [
+    returnedTHeader,
+    ManagerData,
+    wholeData,
+    userIdentification,
+    showRejectedItemTable,
+  ]);
 
   const editBLNG = (data) => {
     setEditObject(data);
@@ -373,18 +373,17 @@ export const ViewHOsheet = ({
       : editFlatData(data, getObject);
 
     const updatedData = result?.map((item) => {
-      // Check if jobLocaWhrs is a non-null, non-empty array and assign LOCATION if valid
       if (Array.isArray(item?.jobLocaWhrs) && item?.jobLocaWhrs?.length > 0) {
         item.LOCATION = item?.jobLocaWhrs[0]?.LOCATION;
       } else {
-        item.LOCATION = null; // Default to null or any other fallback value
+        item.LOCATION = null;
       }
       return item;
     });
     setData(updatedData);
   };
 
-  const handleAssignManager = () => {
+  const handleAssignManager = async () => {
     const remainingData = data?.filter(
       (row) => !selectedRows.some((selected) => selected.id === row.id)
     );
@@ -397,7 +396,7 @@ export const ViewHOsheet = ({
     }
   };
 
-  const handleManagerReload = () => {
+  const handleManagerReload = async () => {
     let mergedData = [...allApprovedData, ...allRejectedData];
     const remainingData = data?.filter(
       (row) => !mergedData.some((selected) => selected.id === row.id)
@@ -465,7 +464,7 @@ export const ViewHOsheet = ({
       });
 
       let action = "updateStoredData";
-      await TimeSheetsCRUDoperations({
+      const notifiyCenterData = await TimeSheetsCRUDoperations({
         setNotification,
         setShowTitle,
         finalResult,
@@ -477,6 +476,33 @@ export const ViewHOsheet = ({
         handleAssignManager,
         selectedRows,
       });
+      if (notifiyCenterData) {
+        const {
+          subject,
+          message,
+          fromAddress,
+          toAddress,
+          empID,
+          timeKeeperEmpID,
+          ManagerEmpID,
+          managerName,
+          fileType,
+          timeKeeperName,
+          fromDate,
+          untilDate,
+          senderEmail,
+        } = notifiyCenterData;
+        await createNotification({
+          empID: empID,
+          leaveType: `${fileType} excel sheet submitted for Approval`,
+          message: `The ${fileType} timesheet for the period from ${fromDate} until ${untilDate} has been submitted by Timekeeper : 
+          ${timeKeeperName}`,
+          senderEmail: senderEmail,
+          receipentEmail: toAddress,
+          receipentEmpID: empID,
+          status: "Unread",
+        });
+      }
     } else if (userIdentification === "Manager") {
       const MergedData = [...allApprovedData, ...allRejectedData];
 
@@ -521,8 +547,9 @@ export const ViewHOsheet = ({
           : [];
 
       let finalResult = InitialBLNGUpdate;
+      let storeApproveRej = [];
       let action = "update";
-      await TimeSheetsCRUDoperations({
+      const notifiyCenterData = await TimeSheetsCRUDoperations({
         finalResult,
         toggleSFAMessage,
         setStoringMess,
@@ -533,8 +560,43 @@ export const ViewHOsheet = ({
         setNotification,
         setAllApprovedData,
         setAllRejectedData,
-        handleManagerReload,
+        // handleManagerReload,
+        storeApproveRej,
       });
+
+      if (notifiyCenterData && notifiyCenterData.length > 0) {
+        notifiyCenterData.forEach(
+          async ({
+            subject,
+            message,
+            fromAddress,
+            toAddress,
+            empID,
+            timeKeeperEmpID,
+            ManagerEmpID,
+            managerName,
+            fileType,
+            timeKeeperName,
+            fromDate,
+            untilDate,
+            senderEmail,
+            sheetStatus,
+          }) => {
+            await createNotification({
+              empID: empID,
+              leaveType: `${fileType} Time Sheet ${sheetStatus}`,
+              message: `Your submitted ${fileType} timesheet for the period ${fromDate} to ${untilDate} has been ${sheetStatus} by Manager : ${managerName}.`,
+              senderEmail: senderEmail,
+              receipentEmail: toAddress,
+              receipentEmpID: empID,
+              status: "Unread",
+            });
+          }
+        );
+
+        storeApproveRej = [];
+        await handleManagerReload();
+      }
     } else if (
       userIdentification !== "Manager" &&
       showRejectedItemTable === "Rejected" &&
@@ -577,9 +639,17 @@ export const ViewHOsheet = ({
             })
           : [];
 
-      let finalResult = updatedRejectedItems;
+      const finalResult = updatedRejectedItems.map((val) => {
+        return {
+          ...val,
+          assignTo: managerData.mbadgeNo,
+          assignBy: uploaderID,
+          fromDate: managerData.mfromDate,
+          untilDate: managerData.muntilDate,
+        };
+      });
       let action = "ResubmitRejectedItems";
-      await TimeSheetsCRUDoperations({
+      const notifiyCenterData = await TimeSheetsCRUDoperations({
         setNotification,
         setShowTitle,
         finalResult,
@@ -590,6 +660,35 @@ export const ViewHOsheet = ({
         handleAssignManager,
         selectedRows,
       });
+
+      if (notifiyCenterData) {
+        const {
+          subject,
+          message,
+          fromAddress,
+          toAddress,
+          empID,
+          timeKeeperEmpID,
+          ManagerEmpID,
+          managerName,
+          fileType,
+          timeKeeperName,
+          fromDate,
+          untilDate,
+          senderEmail,
+        } = notifiyCenterData;
+
+        await createNotification({
+          empID: empID,
+          leaveType: `Corrected ${fileType} Time Sheet Submitted for Approval`,
+          message: `The ${fileType} timesheet for the period from ${fromDate} until ${untilDate} has been submitted by Timekeeper
+          ${timeKeeperName}`,
+          senderEmail: senderEmail,
+          receipentEmail: toAddress,
+          receipentEmpID: empID,
+          status: "Unread",
+        });
+      }
     }
   };
 
@@ -622,7 +721,7 @@ export const ViewHOsheet = ({
           actualWorkHrs: val.TOTALACTUALHOURS || "",
           empWorkInfo: [JSON.stringify(val?.jobLocaWhrs)] || [],
           fileType: "HO",
-          status: "All",
+          status: "Unsubmitted",
           assignBy: uploaderID,
           remarks: val.REMARKS || "",
           companyName: val?.LOCATION || "",
@@ -705,29 +804,23 @@ export const ViewHOsheet = ({
     try {
       const [year, month, day] = dateString.split("/");
 
-      return `${month}/${year}/${day}`; // 'M/D/YYYY'
-    } catch (err) {
-      // console.log(err, " : ERROR");
-    }
+      return `${month}/${year}/${day}`;
+    } catch (err) {}
   };
 
   useEffect(() => {
     if (secondaryData && secondaryData.length > 0) {
-      // Fixed typo
       setCurrentPage(1);
       let filteredData = [...secondaryData];
       if (searchQuery) {
         filteredData = searchQuery;
-
-        // setVisibleData(filteredData);
       }
       if (startDate && endDate) {
-        const start = new Date(startDate); // Start date as "MM/DD/YYYY"
-        const end = new Date(endDate); // End date as "MM/DD/YYYY"
+        const start = new Date(startDate);
+        const end = new Date(endDate);
 
-        // Filter the data array
         filteredData = filteredData.filter((item) => {
-          const itemDate = new Date(item.DATE); // Convert item.DATE to a Date object
+          const itemDate = new Date(item.DATE);
 
           itemDate?.setHours(0, 0, 0, 0);
           start?.setHours(0, 0, 0, 0);
@@ -735,12 +828,8 @@ export const ViewHOsheet = ({
           return itemDate >= start && itemDate <= end;
         });
       }
-      // Example usage
-      // const startDate = "12/23/2024"; // Start date in "MM/DD/YYYY"
-      // const endDate = "12/25/2024"; // End date in "MM/DD/YYYY"
 
       setData(filteredData);
-      // setVisibleData(filteredData.length > 0 ? filteredData : []);
     }
   }, [startDate, endDate, secondaryData, searchQuery]);
 
@@ -770,7 +859,7 @@ export const ViewHOsheet = ({
                   searchResult={searchResult}
                   secondaryData={secondaryData}
                   Position={Position}
-                  placeholder="Badge No."
+                  placeholder="Employee ID / Badge No / Name."
                 />
               </div>
             </div>
@@ -943,7 +1032,7 @@ export const ViewHOsheet = ({
                                         if (e.target.checked) {
                                           setCheckedItems((prev) => ({
                                             ...prev,
-                                            [m.id]: e.target.checked, // Toggle the checked state for this specific ID
+                                            [m.id]: e.target.checked,
                                           }));
                                           setCheckedItemsTwo((prev) => ({
                                             ...prev,
@@ -954,7 +1043,7 @@ export const ViewHOsheet = ({
                                         } else {
                                           setCheckedItems((prev) => ({
                                             ...prev,
-                                            [m.id]: false, // Toggle the checked state for this specific ID
+                                            [m.id]: false,
                                           }));
                                           removeExistingData(m, "Approved");
                                         }
@@ -971,7 +1060,7 @@ export const ViewHOsheet = ({
                                         if (e.target.checked) {
                                           setCheckedItemsTwo((prev) => ({
                                             ...prev,
-                                            [m.id]: e.target.checked, // Toggle the checked state for this specific ID
+                                            [m.id]: e.target.checked,
                                           }));
                                           setCheckedItems((prev) => ({
                                             ...prev,
@@ -984,7 +1073,7 @@ export const ViewHOsheet = ({
                                           removeExistingData(m, "Rejected");
                                           setCheckedItemsTwo((prev) => ({
                                             ...prev,
-                                            [m.id]: false, // Toggle the checked state for this specific ID
+                                            [m.id]: false,
                                           }));
                                           removeExistingData(m, "Rejected");
                                         }
@@ -1002,6 +1091,9 @@ export const ViewHOsheet = ({
                                 >
                                   <input
                                     type="checkbox"
+                                    disabled={
+                                      !selectedRows.some((r) => r.id === m.id)
+                                    }
                                     checked={selectedRows.some(
                                       (r) => r.id === m.id
                                     )}
@@ -1127,7 +1219,7 @@ export const ViewHOsheet = ({
                       //       console.log("Batch deletion completed.");
                       //     } while (nextToken); // Continue fetching until no more data
                       //     console.log(
-                      //       "All SBW items deletion process completed."
+                      //       "All HO items deletion process completed."
                       //     );
                       //   } catch (fetchError) {
                       //     console.error(
@@ -1143,8 +1235,6 @@ export const ViewHOsheet = ({
                     } else if (userIdentification === "Manager") {
                       renameKeysFunctionAndSubmit();
                       removeCheckedItem();
-
-                      // setCheckedItems({});
                     }
                   }}
                 >
@@ -1226,9 +1316,9 @@ export const ViewHOsheet = ({
       )}
 
       {notification && (
-        <SpinLogo
+        <TimeSheetSpinner
           text={showTitle}
-          notification={notification}
+          // notification={notification}
           // path="/timesheetSBW"
         />
       )}

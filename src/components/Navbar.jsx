@@ -1,24 +1,25 @@
-import { IoSearchOutline } from "react-icons/io5";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import logo from "../assets/logo/logo-with-name.svg";
-import { MdOutlineMail } from "react-icons/md";
 import avatar from "../assets/navabar/avatar.jpeg";
 import { Link } from "react-router-dom";
-import { signOut } from "@aws-amplify/auth";
 import { useEffect, useRef, useState } from "react";
 import { GoPencil } from "react-icons/go";
 import { Profile } from "../pages/profile/Profile";
 import { generateClient } from "@aws-amplify/api";
 import { listEmpPersonalInfos } from "../graphql/queries";
 import { getUrl } from "@aws-amplify/storage";
+import { useNotifiCenter } from "../hooks/useNotifiCenter";
 
 const client = generateClient();
 const Navbar = () => {
+  const { unreadCount } = useNotifiCenter();
+  useEffect(() => {}, [unreadCount]);
+
   const [isOpen, setIsOpen] = useState(false);
   const [userName, setUserName] = useState("");
   const [currentTimeValue, setCurrentTimeValue] = useState("");
   const [currentDateValue, setCurrentDateValue] = useState("");
-
+  const [getPPhotoString, setGetPPhotoString] = useState(null);
   const [personalInfo, setPersonalInfo] = useState({
     profilePhoto: "",
     name: "",
@@ -94,55 +95,61 @@ const Navbar = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let allEmployees = []; 
-        let nextToken = null;  
+        let allEmployees = [];
+        let nextToken = null;
 
         do {
           const response = await client.graphql({
             query: listEmpPersonalInfos,
             variables: {
-              nextToken: nextToken, 
+              nextToken: nextToken,
             },
           });
-  
-          allEmployees = [...allEmployees, ...response.data.listEmpPersonalInfos.items];
-  
+
+          allEmployees = [
+            ...allEmployees,
+            ...response.data.listEmpPersonalInfos.items,
+          ];
 
           nextToken = response.data.listEmpPersonalInfos.nextToken;
-        } while (nextToken); 
-  
-        // console.log(allEmployees, "All Employees Data"); 
-  
-     
+        } while (nextToken);
+
+        // console.log(allEmployees, "All Employees Data");
+
         const empPersonalInfos = allEmployees;
- 
+
         if (empPersonalInfos.length === 0) {
           // console.log("No employee data found.");
           return;
         }
-  
+
         // Find the employee matching the userID, ignoring case
         const userPersonalInfo = empPersonalInfos.find(
-          (emp) => emp.empID.toString().toLowerCase() === userID.toString().toLowerCase()
+          (emp) =>
+            emp.empID.toString().toLowerCase() ===
+            userID.toString().toLowerCase()
         );
-  
+
         if (userPersonalInfo) {
           const profilePhotoString =
             userPersonalInfo?.profilePhoto ||
             "public/profilePhoto/User-avatar.svg.png";
-  
+          // console.log(userPersonalInfo?.profilePhoto);
+          setGetPPhotoString(profilePhotoString);
           const linkToStorageFile = async (pathUrl) => {
             const result = await getUrl({
               path: pathUrl,
             });
-  
+            // console.log(pathUrl);
+
             return setPersonalInfo({
-              name: userPersonalInfo?.name, 
+              name: userPersonalInfo?.name,
               profilePhoto: result?.url?.toString(),
               email: userPersonalInfo?.email,
               contactNo: userPersonalInfo?.contactNo || "",
             });
           };
+
           linkToStorageFile(profilePhotoString);
         } else {
           console.log(`No matching employee found for userID: ${userID}`);
@@ -151,11 +158,11 @@ const Navbar = () => {
         console.log("Error fetching employee personal infos:", err);
       }
     };
-  
+
     if (userID) {
       fetchData();
     }
-  }, [userID]);
+  }, [userID, getPPhotoString]);
 
   return (
     <nav className="center bg-medium_white h-28 fixed top-0 w-full z-50 shadow-sm">
@@ -179,16 +186,20 @@ const Navbar = () => {
           </div>
         </section> */}
         <section className="flex-initial flex item-center gap-5 ">
-          
           <div className=" my-auto">
             <p className="relative">
               <Link to="/notifications">
                 {" "}
                 <IoMdNotificationsOutline className="text-2xl" />
               </Link>
-              <span className="absolute -top-[4px] right-[2px] rounded-full h-2 w-2 text-dark_grey bg-[#d04545] text-xs center">
-                
-              </span>
+
+              {unreadCount > 0 && (
+                <span className="absolute -top-[4px] right-[2px] rounded-full h-2 w-2 text-dark_grey bg-[#d04545] text-xs center">
+                  {" "}
+                </span>
+              )}
+
+              {/* // )} */}
             </p>
           </div>
           <div className="flex items-center gap-5 px-5">
@@ -233,6 +244,8 @@ const Navbar = () => {
                     email={personalInfo?.email}
                     profilePhoto={personalInfo?.profilePhoto}
                     contactNo={personalInfo?.contactNo}
+                    getPPhotoString={getPPhotoString}
+                    setPersonalInfo={setPersonalInfo}
                   />
                 </div>
               )}

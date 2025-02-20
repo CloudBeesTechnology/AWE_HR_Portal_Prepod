@@ -21,24 +21,22 @@ export const useTableMerged = (excelData) => {
             variables: { nextToken },
           });
 
-          const items = response.data[Object.keys(response.data)[0]].items; // Extract items
-          allData = [...allData, ...items]; // Append fetched items
-          nextToken = response.data[Object.keys(response.data)[0]].nextToken; // Get nextToken
-        } while (nextToken); // Continue if there's more data
-
+          const items = response.data[Object.keys(response.data)[0]].items;
+          allData = [...allData, ...items];
+          nextToken = response.data[Object.keys(response.data)[0]].nextToken;
+        } while (nextToken);
         return allData;
       }
 
       async function fetchEmployeeData() {
         try {
-          // Fetch all data with pagination
           const [empPersonalInfos, empWorkInfos] = await Promise.all([
             fetchAllData(listEmpPersonalInfos),
             fetchAllData(listEmpWorkInfos),
           ]);
 
-          const candidates = empPersonalInfos; // Data from listEmpPersonalInfos
-          const interviews = empWorkInfos; // Data from listEmpWorkInfos
+          const candidates = empPersonalInfos;
+          const interviews = empWorkInfos;
 
           const mergedData = candidates
             .map((candidate) => {
@@ -46,7 +44,6 @@ export const useTableMerged = (excelData) => {
                 (item) => item.empID === candidate.empID
               );
 
-              // Return null if all details are undefined
               if (!interviewDetails) {
                 return null;
               }
@@ -72,7 +69,7 @@ export const useTableMerged = (excelData) => {
           const fetchWorkInfo = async () => {
             const finalData = fetchedData?.map((item) => {
               const workInfoItem = mergedData?.find(
-                (info) => info.empBadgeNo === item.BADGE
+                (info) => String(info.empBadgeNo) === String(item.BADGE)
               );
 
               return {
@@ -83,13 +80,10 @@ export const useTableMerged = (excelData) => {
               };
             });
 
-           
-            setData(finalData); // Assuming setData is your state setter
+            setData(finalData);
           };
           fetchWorkInfo();
-        } catch (err) {
-          // console.error("Error fetching data:", err.message);
-        }
+        } catch (err) {}
       }
 
       fetchEmployeeData();

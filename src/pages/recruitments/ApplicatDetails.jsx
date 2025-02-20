@@ -4,16 +4,17 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { ApplicantSchema } from "../../services/Validation";
 import { useNavigate, useLocation } from "react-router-dom";
 import { IoCameraOutline } from "react-icons/io5";
-import { uploadDocs } from "../../services/uploadDocsS3/UploadDocs";
+import { uploadDocString } from "../../services/uploadDocsS3/UploadDocs";
 import { FormField } from "../../utils/FormField";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { getUrl } from "@aws-amplify/storage";
 import { useTempID } from "../../utils/TempIDContext";
 import avatar from "../../assets/navabar/avatar.jpeg";
 
+
 import {
   ContractTypeDD,
-  GenderDD,
+  GenderDD, 
   MaritalDD,
   NationalityDD,
   RaceDD,
@@ -77,7 +78,7 @@ export const ApplicantDetails = () => {
         }
       });
     } else {
-      console.log('No saved data in localStorage');
+      // console.log('No saved data in localStorage');
     }
   
     const handleBeforeUnload = () => {
@@ -91,38 +92,119 @@ export const ApplicantDetails = () => {
   }, [location, setValue]);
   
 
-  useEffect(() => {
-    if (tempID && empPDData.length > 0) {
-      const interviewData = empPDData.find((data) => data.tempID === tempID);
-      if (interviewData) {
-        console.log(interviewData);
+  // useEffect(() => {
+  //   if (tempID && empPDData.length > 0) {
+  //     const interviewData = empPDData.find((data) => data.tempID === tempID);
+  //     if (interviewData) {
+  //       console.log(interviewData);
         
-        Object.keys(interviewData).forEach((key) => {
-          if (interviewData[key]) {
-            setValue(key, interviewData[key]);
-          }
-        });
+  //       Object.keys(interviewData).forEach((key) => {
+  //         if (interviewData[key]) {
+  //           setValue(key, interviewData[key]);
+  //         }
+  //       });
 
-        if (interviewData.profilePhoto) {
-          setUploadedDocs((prev) => ({
-            ...prev,
-            profilePhoto: interviewData.profilePhoto,
-          }));
-          setValue("profilePhoto", interviewData.profilePhoto);
+  //       if (interviewData.profilePhoto) {
+  //         setUploadedDocs((prev) => ({
+  //           ...prev,
+  //           profilePhoto: interviewData.profilePhoto,
+  //         }));
+  //         setValue("profilePhoto", interviewData.profilePhoto);
+  //       }
+  //     }
+  //   }
+  // }, [empPDData, tempID, setValue]);
+
+  useEffect(() => {
+    const parseDetails = (data) => {
+      try {
+        let cleanedData = data.replace(/\\/g, "");
+        cleanedData = cleanedData.replace(/'/g, '"');
+        cleanedData = cleanedData.replace(
+          /([{,])(\s*)([a-zA-Z0-9_]+)(\s*):/g,
+          '$1"$3":'
+        );
+        cleanedData = cleanedData.replace(
+          /:([a-zA-Z0-9_/.\s]+)(?=\s|,|\})/g,
+          ':"$1"'
+        );
+        if (cleanedData.startsWith('"') && cleanedData.endsWith('"')) {
+          cleanedData = cleanedData.slice(1, -1);
         }
-      }
-    }
-  }, [empPDData, tempID, setValue]);
 
+        const parsedData = JSON.parse(cleanedData);
+
+        if (!Array.isArray(parsedData)) {
+          return [];
+        }
+
+        return parsedData;
+      } catch (error) {
+        console.error("Error parsing details:", error);
+        return [];
+      }
+    };
+
+    const selectedFields = [
+      "age", "agent", "chinese", "cob", "contractType", "dob", "email",
+      "empType", "gender", "marital", "name", "nationality", "otherNation",
+      "otherRace", "otherReligion", "position", "profilePhoto", "race", "religion"
+    ];
+
+    if (tempID) {
+      if (empPDData.length > 0) {
+        const interviewData = empPDData.find((data) => data.tempID === tempID);
+        if (interviewData) {
+          selectedFields.forEach((key) => {
+         
+            if (
+              key === "familyDetails" ||
+              key === "workExperience" ||
+              key === "eduDetails"
+            ) {
+              if (
+                Array.isArray(interviewData[key]) &&
+                typeof interviewData[key][0] === "string"
+              ) {
+                let parsedData = parseDetails(interviewData[key][0]);
+                if (parsedData.length > 0) {
+                  setValue(key, parsedData);       
+                }
+              }
+            } else if (interviewData[key]) {
+              setValue(key, interviewData[key]);
+            } else {
+              // console.log(`No value for key ${key}`);
+            }
+          });
+
+          if (interviewData.profilePhoto) {
+            setUploadedDocs((prev) => ({
+              ...prev,
+              profilePhoto: interviewData.profilePhoto,
+            }));
+            setValue("profilePhoto", interviewData.profilePhoto);
+          }
+
+        } else {
+          // console.log("No interview data found for tempID:", tempID);
+        }
+      } else {
+        // console.log("empPDData is empty");
+      }
+    } else {
+      // console.log("tempID is not set");
+    }
+  }, [tempID, setValue, empPDData]); 
 
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
-
+ 
     if (selectedFile) {
       
       setProfilePhoto(selectedFile);
       setValue("profilePhoto", selectedFile);
-      await uploadDocs(
+      await uploadDocString(
         selectedFile,
         "profilePhoto",
         setUploadedDocs,
@@ -141,10 +223,9 @@ export const ApplicantDetails = () => {
 
   const onSubmit = async (data) => {
     try {
-      console.log(data);
       const applicationUpdate = {
         ...data,
-        profilePhoto: uploadedDocs.profilePhoto || profile,
+        profilePhoto: uploadedDocs.profilePhoto,
       };
 
       localStorage.setItem(

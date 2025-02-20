@@ -12,6 +12,7 @@ import { IoCameraOutline } from "react-icons/io5";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { uploadFields } from "../../../utils/DropDownMenus";
 import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
+import { uploadDocString } from "../../../services/uploadDocsS3/UploadDocs";
 import { RowTwo } from "./RowTwo";
 import { RowThree } from "./RowThree";
 import { RowFour } from "./RowFour";
@@ -157,11 +158,11 @@ export const EmployeeInfo = () => {
       return;
     }
 
-    
+
     setValue(type, selectedFile);
 
     if (selectedFile) {
-      await uploadDocs(selectedFile, type, setUploadedDocs, watchedEmpID);
+      await uploadDocString(selectedFile, type, setUploadedDocs, watchedEmpID);
       setUploadedFileNames((prev) => ({
         ...prev,
         [type]: selectedFile.name, // Dynamically store file name
@@ -214,7 +215,7 @@ console.log(uploadedDocs);
             path: url,
           });
 
-          return setPPLastUP(result.url.toString());
+          return setPPLastUP(result?.url?.toString());
         };
         linkToStorageFile(lastUploadProf);
       }

@@ -6,7 +6,7 @@ export const GetHolidayList = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch data from the provided URL
+   
     fetch(
       "https://commonfiles.s3.ap-southeast-1.amazonaws.com/Leave+Details/CompanyHolidays2025.json"
     )

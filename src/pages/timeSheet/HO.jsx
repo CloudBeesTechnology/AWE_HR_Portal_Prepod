@@ -1,35 +1,3 @@
-// return {
-//   id: val.id,
-//   fileName: val.fileName,
-//   REC: val.rec || 0,
-//   CTR: val.ctr || "",
-//   DEPT: val.empDept || "",
-//   EMPLOYEEID: val.empID || "",
-//   BADGE: val.empBadgeNo || "",
-//   NAME: val.empName || 0,
-//   DATE: val.date || "",
-//   ONAM: val.onAM || "",
-//   OFFAM: val.offAM || "",
-//   ONPM: val.onPM || 0,
-//   OFFPM: val.offPM || 0,
-//   IN: val?.inTime || 0,
-//   OUT: val.outTime || 0,
-//   TOTALINOUT: val.totalInOut || "",
-//   ALLDAYMINUTES: val.allDayHrs || "",
-//   NETMINUTES: val.netMins || "",
-//   TOTALHOURS: val.totalHrs || "",
-//   NORMALWORKINGHRSPERDAY: val?.normalWorkHrs || 0,
-//   WORKINGHOURS: val?.actualWorkHrs || 0,
-//   OT: val?.otTime || 0,
-//   TOTALACTUALHOURS: val.actualWorkHrs || "",
-//   jobLocaWhrs: parsedEmpWorkInfo.flat() || [],
-//   fileType: val.fileType,
-//   timeKeeper: val.assignBy,
-//   manager: val.assignTo,
-//   REMARKS: val.remarks || "",
-//   status: val.status || "",
-// };
-
 import { useEffect, useMemo, useState } from "react";
 import { TimeSheetBrowser } from "../../utils/TimeSheetBrowser";
 
@@ -41,11 +9,15 @@ export const HO = () => {
   const [submittedData, setSubmittedData] = useState([]);
   const [ManagerData, setManagerData] = useState([]);
   const [showing, setShowing] = useState(0);
-  const [isFetching, setIsFetching] = useState(true); // Track fetching state
+  const [isFetching, setIsFetching] = useState(true);
   const Position = localStorage.getItem("userType");
 
   const userIdetification =
-    Position === "Manager" ? "Manager" : Position !== "Manager" ? "All" : "";
+    Position === "Manager"
+      ? "Manager"
+      : Position !== "Manager"
+      ? "Unsubmitted"
+      : "";
   const titleName = "HO";
   const cardName = userIdetification;
 
@@ -67,9 +39,7 @@ export const HO = () => {
               typeof info === "string" ? JSON.parse(info) : info
             );
           }
-        } catch (error) {
-          // Handle parsing errors
-        }
+        } catch (error) {}
 
         return {
           id: val.id,
@@ -102,28 +72,26 @@ export const HO = () => {
           REMARKS: val.remarks || "",
           status: val.status || "",
         };
-
       });
     }
     return [];
   };
 
   useEffect(() => {
-    let timeoutId;
-
     if (Position !== "Manager") {
       const fetchData = async () => {
-        setIsFetching(true); // Start fetching
+        setIsFetching(true);
         try {
-          // Wait for the data to arrive
           const hasData = await new Promise((resolve) => {
-            timeoutId = setTimeout(() => resolve(false), 15000); // Fallback after 30 seconds
             if (
               convertedStringToArrayObj &&
               convertedStringToArrayObj.length > 0
             ) {
-              clearTimeout(timeoutId); // Clear fallback timeout
               resolve(true);
+            } else if (!convertedStringToArrayObj) {
+              setShowing(0);
+            } else if (convertedStringToArrayObj.length === 0) {
+              setShowing(2);
             }
           });
 
@@ -133,17 +101,17 @@ export const HO = () => {
             );
             if (finalData && finalData.length > 0) {
               setSubmittedData(pendingData(finalData));
-              setShowing(1); // Data available
+              setShowing(1);
             } else {
-              setShowing(2); // No valid data
+              setShowing(2);
             }
           } else {
-            setShowing(2); // Data not fetched in time
+            setShowing(2);
           }
         } catch (err) {
-          setShowing(2); // Handle error case
+          setShowing(2);
         } finally {
-          setIsFetching(false); // Done fetching
+          setIsFetching(false);
         }
       };
 
@@ -152,8 +120,6 @@ export const HO = () => {
       setShowing(null);
       setManagerData(convertedStringToArrayObj);
     }
-
-    return () => clearTimeout(timeoutId); // Cleanup timeout on unmount
   }, [convertedStringToArrayObj, Position]);
 
   return (

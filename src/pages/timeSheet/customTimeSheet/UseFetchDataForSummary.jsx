@@ -8,14 +8,13 @@ export const UseFetchDataForSummary = (
   location,
   ProcessedDataFunc
 ) => {
-  const [loading, setLoading] = useState(null); // Loading state
+  const [loading, setLoading] = useState(null);
   const [emptyTableMess, setEmptyTableMess] = useState(null);
-  const client = generateClient(); // GraphQL client
+  const client = generateClient();
   const [convertedStringToArrayObj, setConvertedStringToArrayObj] =
-    useState(null); // Fetched data
-  const [getPosition, setGetPosition] = useState(null); // Position state
+    useState(null);
+  const [getPosition, setGetPosition] = useState(null);
 
-  // Function to compare dates for filtering
   const isDateInRange = (date, start, end) => {
     const parsedDate = new Date(date);
     const parsedStart = new Date(start);
@@ -24,28 +23,33 @@ export const UseFetchDataForSummary = (
     parsedDate.setHours(0, 0, 0, 0);
     parsedStart.setHours(0, 0, 0, 0);
     parsedEnd.setHours(0, 0, 0, 0);
-   
-    return parsedDate >= parsedStart && parsedDate <= parsedEnd; // Check if within range
+
+    return parsedDate >= parsedStart && parsedDate <= parsedEnd;
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(false); // Start loading indicator
+      setLoading(false);
       setEmptyTableMess(false);
       ProcessedDataFunc(null);
       try {
-        // Proceed only if all required parameters are available
         if (startDate && endDate && location) {
           const Position = localStorage.getItem("userType");
-          setGetPosition(Position); // Set position from localStorage
+          setGetPosition(Position);
 
-          let nextToken = null; // Pagination token
-          let allData = []; // Store all fetched data
+          let nextToken = null;
+          let allData = [];
 
           do {
             const filter = {
               and: [
-                { status: { eq: "Approved" } },
+                // { status: { eq: "Approved" } },
+                {
+                  or: [
+                    { status: { eq: "Approved" } },
+                    { status: { eq: "Verified" } },
+                  ],
+                },
                 { companyName: { eq: location } },
               ],
             };
@@ -54,48 +58,42 @@ export const UseFetchDataForSummary = (
               query: listTimeSheets,
               variables: {
                 filter: filter,
-                limit: 100, // Fetch 300 records per call
+                limit: 100,
                 nextToken,
               },
             });
 
-            // Extract data and nextToken
             const fetchedData = response?.data?.listTimeSheets?.items || [];
             nextToken = response?.data?.listTimeSheets?.nextToken;
 
-            // Append data while filtering null/undefined values
             allData = [
               ...allData,
               ...fetchedData.filter(
                 (item) => item !== null && item !== undefined
               ),
             ];
-          } while (nextToken); // Continue fetching until no more pages
+          } while (nextToken);
 
           const filteredData = allData.filter((item) =>
             isDateInRange(item.date, startDate, endDate)
           );
 
-          // console.log("Filtered DATA : ", filteredData);
           if (filteredData && filteredData.length > 0) {
             setLoading(true);
-            setConvertedStringToArrayObj(filteredData); // Set filtered data
+            setConvertedStringToArrayObj(filteredData);
             setEmptyTableMess(false);
           } else {
             setEmptyTableMess(true);
           }
         }
       } catch (error) {
-        // console.log("ERROR : ", error);
       } finally {
-        // setLoading(true); // Stop loading indicator
       }
     };
 
     fetchData();
-  }, [startDate, endDate, location]); // Added startDate and endDate dependencies
+  }, [startDate, endDate, location]);
 
-  // Return fetched data and states
   return {
     convertedStringToArrayObj,
     getPosition,

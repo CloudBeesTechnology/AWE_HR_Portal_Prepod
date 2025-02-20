@@ -9,11 +9,15 @@ export const ORMC = () => {
   const [submittedData, setSubmittedData] = useState([]);
   const [ManagerData, setManagerData] = useState([]);
   const [showing, setShowing] = useState(0);
-  const [isFetching, setIsFetching] = useState(true); // Track fetching state
+  const [isFetching, setIsFetching] = useState(true);
   const Position = localStorage.getItem("userType");
 
   const userIdetification =
-    Position === "Manager" ? "Manager" : Position !== "Manager" ? "All" : "";
+    Position === "Manager"
+      ? "Manager"
+      : Position !== "Manager"
+      ? "Unsubmitted"
+      : "";
   const titleName = "ORMC";
   const cardName = userIdetification;
 
@@ -35,9 +39,7 @@ export const ORMC = () => {
               typeof info === "string" ? JSON.parse(info) : info
             );
           }
-        } catch (error) {
-          // Handle parsing errors
-        }
+        } catch (error) {}
 
         return {
           id: val.id,
@@ -68,21 +70,22 @@ export const ORMC = () => {
   };
 
   useEffect(() => {
-    let timeoutId;
+    
 
     if (Position !== "Manager") {
       const fetchData = async () => {
-        setIsFetching(true); // Start fetching
+        setIsFetching(true);
         try {
-          // Wait for the data to arrive
           const hasData = await new Promise((resolve) => {
-            timeoutId = setTimeout(() => resolve(false), 15000); // Fallback after 30 seconds
             if (
               convertedStringToArrayObj &&
               convertedStringToArrayObj.length > 0
             ) {
-              clearTimeout(timeoutId); // Clear fallback timeout
               resolve(true);
+            } else if (!convertedStringToArrayObj) {
+              setShowing(0);
+            } else if (convertedStringToArrayObj.length === 0) {
+              setShowing(2);
             }
           });
 
@@ -90,19 +93,20 @@ export const ORMC = () => {
             const finalData = await FindSpecificTimeKeeper(
               convertedStringToArrayObj
             );
+           
             if (finalData && finalData.length > 0) {
               setSubmittedData(pendingData(finalData));
-              setShowing(1); // Data available
+              setShowing(1);
             } else {
-              setShowing(2); // No valid data
+              setShowing(2);
             }
           } else {
-            setShowing(2); // Data not fetched in time
+            setShowing(2);
           }
         } catch (err) {
-          setShowing(2); // Handle error case
+          setShowing(2);
         } finally {
-          setIsFetching(false); // Done fetching
+          setIsFetching(false);
         }
       };
 
@@ -112,7 +116,6 @@ export const ORMC = () => {
       setManagerData(convertedStringToArrayObj);
     }
 
-    return () => clearTimeout(timeoutId); // Cleanup timeout on unmount
   }, [convertedStringToArrayObj, Position]);
 
   return (

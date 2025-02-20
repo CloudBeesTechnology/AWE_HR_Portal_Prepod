@@ -57,35 +57,46 @@ export const BirthdayReminder = () => {
   }, [birthdays]);
 
   return (
-    <div className="max-w-md w-full shadow-md rounded-2xl h-full bg-white">
+    <div className=" w-full shadow-md rounded-2xl bg-white h-[100%] overflow-hidden ">
       <div className="bg-lite_grey p-4 rounded-t-2xl">
         <h2 className="text-lg font-semibold">Birthday Reminder</h2>
       </div>
       <div className="p-4">
         <h3 className="text-base font-medium">Today's Birthday</h3>
-        <div className="mt-4 grid grid-cols-2 gap-5">
+        <div className="mt-4 grid grid-cols-2 gap-5 ">
           {birthdays.slice(0, 2).map((person, index) => (
-            <div key={index} className="flex items-center space-x-3 bg-[#F5F7FB] p-2 rounded-md shadow-sm">
-              <p className="w-10 h-10 text-[50px] rounded-full center">
-                {profileImages[person.name] ? (
-                  <img
-                    src={profileImages[person.name]}
-                    alt={person.name}
-                    className="w-full h-full rounded-full object-cover"
-                  />
-                ) : (
-                  <IoPersonCircleOutline />
-                )}
-              </p>
-              <div >
-                <p className="text-[10px] font-semibold">{person.name}</p>
-                <p className="text-[10px] text-grey">{person.message || "Happy Birthday!"}</p>
-                <p className="text-[10px] text-grey">{format(new Date(person.dob), 'MMMM dd')}</p>
-              </div>
+            <div
+            key={index}
+            className="grid grid-cols-[auto,1fr] gap-2 items-center bg-[#F5F7FB] p-2  rounded-md shadow-sm"
+          >
+            {/* Profile Image */}
+            <div className="w-10 h-10">
+              {profileImages[person.name] ? (
+                <img
+                  src={profileImages[person.name]}
+                  alt={person.name}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              ) : (
+                <IoPersonCircleOutline className="w-10 h-10 rounded-full" />
+              )}
             </div>
+          
+            {/* Text Content */}
+            <div className="p-1 min-w-0">
+              <p className="text-[10px] font-medium">{person.name}</p>
+              <p className="text-[10px] text-gray-600">
+                {person.message || "Happy Birthday!"}
+              </p>
+              <p className="text-[10px] text-gray-500">
+                {format(new Date(person.dob), "MMMM dd")}
+              </p>
+            </div>
+          </div>
+          
           ))}
           {birthdays.length > 0 && (
-            <button onClick={() => setShowModal(true)} className="text-[green] underline mt-4">
+            <button onClick={() => setShowModal(true)} className="text-[green] underline ">
               View More
             </button>
           )}

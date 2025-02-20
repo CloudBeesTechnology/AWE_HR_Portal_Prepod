@@ -17,14 +17,12 @@ export const SearchDisplayForTimeSheet = ({
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
-  // Sync external dropdown value with search query
   useEffect(() => {
     if (setDrpValue) {
       setSearchQuery(setDrpValue);
     }
   }, [setDrpValue]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (!event.target.closest(".dropdown-container")) {
@@ -38,12 +36,10 @@ export const SearchDisplayForTimeSheet = ({
     };
   }, []);
 
-  // Toggle dropdown visibility
   const toggleDropdown = useCallback(() => {
     setIsDropdownVisible((prev) => !prev);
   }, []);
 
-  // Handle search query and filter results
   const handleSearch = (e) => {
     const query = e.target.value.toUpperCase();
     setSearchQuery(query);
@@ -58,7 +54,58 @@ export const SearchDisplayForTimeSheet = ({
           employee.location?.toUpperCase().includes(query) ||
           employee.empBadgeNo?.toUpperCase().includes(query)
       );
-      setFilteredEmployees(results);
+
+      const sortedResults = results?.sort((a, b) => {
+        const aEmpID = a.empID?.toString().toUpperCase();
+        const bEmpID = b.empID?.toString().toUpperCase();
+        const aName = a.name?.toUpperCase();
+        const bName = b.name?.toUpperCase();
+        const aJobcode = a.JOBCODE?.toString().toUpperCase();
+        const bJobcode = b.JOBCODE?.toString().toUpperCase();
+
+        const aLocation = a.location?.toString().toUpperCase();
+        const bLocation = b.location?.toString().toUpperCase();
+
+        const aEmpBadgeNo = a.empBadgeNo?.toString().toUpperCase();
+        const bEmpBadgeNo = b.empBadgeNo?.toString().toUpperCase();
+
+        const isExactMatchA =
+          aEmpID === query ||
+          aName === query ||
+          aJobcode === query ||
+          aLocation === query ||
+          aEmpBadgeNo === query;
+
+        const isExactMatchB =
+          bEmpID === query ||
+          bName === query ||
+          bJobcode === query ||
+          bLocation === query ||
+          bEmpBadgeNo === query;
+
+        const startsWithA =
+          aEmpID?.startsWith(query) ||
+          aName?.startsWith(query) ||
+          aJobcode?.startsWith(query) ||
+          aLocation?.startsWith(query) ||
+          aEmpBadgeNo?.startsWith(query);
+
+        const startsWithB =
+          bEmpID?.startsWith(query) ||
+          bName?.startsWith(query) ||
+          bJobcode?.startsWith(query) ||
+          bLocation?.startsWith(query) ||
+          bEmpBadgeNo?.startsWith(query);
+
+        if (isExactMatchA && !isExactMatchB) return -1;
+        if (!isExactMatchA && isExactMatchB) return 1;
+
+        if (startsWithA && !startsWithB) return -1;
+        if (!startsWithA && startsWithB) return 1;
+
+        return 0;
+      });
+      setFilteredEmployees(sortedResults);
     } else {
       setFilteredEmployees(newFormData);
     }
@@ -67,7 +114,6 @@ export const SearchDisplayForTimeSheet = ({
   useEffect(() => {
     setFilteredEmployees(newFormData);
   }, [isDropdownVisible]);
-  // Handle item selection
   const handleSelect = (employee) => {
     if (employee.empID || employee.name) {
       setSearchQuery(`${employee.empID} - ${employee.name || ""}`);
@@ -99,16 +145,26 @@ export const SearchDisplayForTimeSheet = ({
           onClick={toggleDropdown}
         />
         <div
-          className={`text-dark_grey cursor-pointer ${
+          className={`text-dark_grey cursor-pointer mb-1${
             identify === "viewSummary" ? "text-[20px]" : "text-1xl"
           }`}
           onClick={() => {
             if (identify === "viewSummary") {
               setSelectedLocation?.(searchQuery);
+              toggleDropdown();
             }
           }}
         >
-          {searchIcon2}
+          {/* {searchIcon2} */}
+          <span
+            className={`${
+              identify === "viewSummary"
+                ? "border rounded-full px-2 py-1  text-[13px] text-[#555252] "
+                : "hidden"
+            }`}
+          >
+            Search
+          </span>
         </div>
       </div>
 

@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
+import { useCallback, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 export const SearchBoxForTimeSheet = ({
   allEmpDetails,
@@ -7,58 +8,106 @@ export const SearchBoxForTimeSheet = ({
   searchResult,
   placeholder,
   Position,
+  searchIcon1,
+  searchIcon2,
+  border,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const location = useLocation();
+
+  useEffect(() => {
+    setSearchQuery("");
+  }, [secondaryData, location]);
+
+  const filterDataByclickSearchIcon = useCallback(() => {
+    if (secondaryData && secondaryData.length > 0) {
+      const normalizedQuery = searchQuery.toString().toUpperCase();
+
+      const result = secondaryData.find((emp) =>
+        [
+          emp.no,
+          emp.NO,
+          emp.fidNo,
+          emp.FID,
+          emp.empBadgeNo,
+          emp.BADGE,
+          emp.sapNo,
+          emp.empID,
+          emp.EMPLOYEEID,
+          emp.NAME,
+          emp.empName,
+          emp.name,
+        ].some((field) => field?.toString().toUpperCase() === normalizedQuery)
+      );
+
+      if (result) {
+        searchResult([result]);
+      } else {
+        alert("Employee not found.");
+        searchResult([]);
+      }
+    }
+  }, [secondaryData, searchQuery, searchResult]);
 
   const handleSearch = (e) => {
-    const query = e.target.value.trim().toUpperCase();
+    const query = e.target.value.toUpperCase();
     setSearchQuery(query);
 
     if (query) {
-      const filteredResults =
-        secondaryData &&
-        secondaryData?.map((employee) => {
-          const checkSearchMatch = (item) => {
-            return (
-              item?.no?.toString().toUpperCase().includes(query) ||
-              item?.NO?.toString().toUpperCase().includes(query) ||
-              item?.fidNo?.toString().toUpperCase().includes(query) ||
-              item?.FID?.toString().toUpperCase().includes(query) ||
-              item?.empBadgeNo?.toString().toUpperCase().includes(query) ||
-              item?.BADGE?.toString().toUpperCase().includes(query) ||
-              item?.sapNo?.toString().toUpperCase().includes(query) ||
-              item?.empID?.toString().toUpperCase().includes(query) ||
-              item?.NAME?.toString().toUpperCase().includes(query) ||
-              item?.empName?.toString().toUpperCase().includes(query)
-            );
-          };
+      const results = secondaryData.filter((employee) => {
+        return [
+          employee?.no,
+          employee?.NO,
+          employee?.fidNo,
+          employee?.FID,
+          employee?.empBadgeNo,
+          employee?.EMPLOYEEID,
+          employee?.BADGE,
+          employee?.sapNo,
+          employee?.empID,
+          employee?.NAME,
+          employee?.empName,
+          employee?.name,
+        ].some((field) => field?.toString().toUpperCase().includes(query));
+      });
 
-          if (Position === "Manager_") {
-            const matchingData = employee.data.filter(checkSearchMatch);
+      // Prioritize exact matches and empIDs starting with the query
+      const sortedResults = results.sort((a, b) => {
+        const fields = [
+          "no",
+          "NO",
+          "fidNo",
+          "FID",
+          "empBadgeNo",
+          "BADGE",
+          "sapNo",
+          "empID",
+          "EMPLOYEEID",
+          "NAME",
+          "empName",
+          "name",
+        ];
 
-            if (matchingData.length > 0) {
-              return { id: employee.id, data: matchingData }; // Return matched data
-            }
-          } else if (Position === "ViewTimeSheet_") {
-            const matchingData = employee.data.filter(checkSearchMatch);
-            if (matchingData.length > 0) {
-              return { id: employee.id, data: matchingData }; // Return matched data
-            }
-          } else {
-            const isMatch = checkSearchMatch(employee);
+        const isExactMatch = (emp) =>
+          fields.some(
+            (field) => emp[field]?.toString().toUpperCase() === query
+          );
 
-            // if (isMatch) {
-            //   // console.log(`TimeKeeper Match Found:`, employee);
-            // }
-            return isMatch ? employee : null;
-          }
-        });
+        const startsWithQuery = (emp) =>
+          fields.some((field) =>
+            emp[field]?.toString().toUpperCase().startsWith(query)
+          );
 
-      const validResults = filteredResults?.filter(
-        (result) => result !== null && result !== undefined
-      );
+        if (isExactMatch(a) && !isExactMatch(b)) return -1;
+        if (!isExactMatch(a) && isExactMatch(b)) return 1;
 
-      searchResult(validResults);
+        if (startsWithQuery(a) && !startsWithQuery(b)) return -1;
+        if (!startsWithQuery(a) && startsWithQuery(b)) return 1;
+
+        return 0;
+      });
+
+      searchResult(sortedResults);
     } else {
       searchResult(secondaryData);
     }
@@ -74,7 +123,12 @@ export const SearchBoxForTimeSheet = ({
         onChange={handleSearch}
       />
       <span className="ml-2">
-        <FiSearch className="text-xl text-dark_grey" />
+        <FiSearch
+          className="text-xl text-dark_grey"
+          onClick={() => {
+            filterDataByclickSearchIcon();
+          }}
+        />
       </span>
     </div>
   );

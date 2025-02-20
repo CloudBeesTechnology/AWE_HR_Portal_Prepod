@@ -83,7 +83,8 @@ export const PathHead = () => {
 
         {/* LPA Card */}
         <Link
-          to="/allempDetails" className="p-4 bg-gradient-to-r from-[#DAFFA6] to-[#EBEBEB] rounded-lg shadow-lg flex items-center justify-between">
+          to="/allempDetails" 
+          className="p-4 bg-gradient-to-r from-[#DAFFA6] to-[#EBEBEB] rounded-lg shadow-lg flex items-center justify-between">
           <div className="flex items-center">
             <div className="w-1 h-16 mr-4 border rounded-md bg-[#91A672] border-[#91A672]"></div>
             <div>
@@ -98,7 +99,7 @@ export const PathHead = () => {
 
         {/* SAWP Card */}
         <Link
-          to="/allempDetails" className="p-4 bg-gradient-to-r from-[#C9DFFF] to-[#EBEBEB] rounded-lg shadow-lg flex items-center justify-between">
+          to="/allempDetails"  className="p-4 bg-gradient-to-r from-[#C9DFFF] to-[#EBEBEB] rounded-lg shadow-lg flex items-center justify-between">
           <div className="flex items-center">
             <div className="w-1 h-16 mr-4 border rounded-md bg-[#687FA4] border-[#B17A7A]"></div>
             <div>
@@ -113,7 +114,7 @@ export const PathHead = () => {
 
         {/* Bruneian Card */}
         <Link
-          to="/allempDetails" className="p-4 bg-gradient-to-r from-[#FFDFAB] to-[#EBEBEB] rounded-lg shadow-lg flex items-center justify-between">
+          to="/allempDetails"  className="p-4 bg-gradient-to-r from-[#FFDFAB] to-[#EBEBEB] rounded-lg shadow-lg flex items-center justify-between">
           <div className="flex items-center">
             <div className="w-1 h-16 mr-4 border rounded-md bg-[#AB8851] border-[#B17A7A]"></div>
             <div>

@@ -8,7 +8,7 @@ import { useLocation } from "react-router-dom";
 import { listPersonalDetails } from "../../graphql/queries";
 import { RecODFunc } from "../../services/createMethod/RecODFunc";
 import { SpinLogo } from "../../utils/SpinLogo";
-import { uploadDocs } from "../../services/uploadDocsS3/UploadDocs";
+import { uploadDocString } from "../../services/uploadDocsS3/UploadDocs";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { useTempID } from "../../utils/TempIDContext";
 import { CandyDetails } from "../../services/updateMethod/UpdatePersonalDetails";
@@ -34,68 +34,6 @@ export const OtherDetails = ({ fetchedData }) => {
     uploadResume: null,
     uploadCertificate: null,
     uploadPassport: null,
-  });
-
-  const [formData, setFormData] = useState({
-    interview: {
-      id: "",
-      crime: "",
-      crimeDesc: "",
-      emgDetails: "", 
-      noExperience: "",
-      empStatement: "",
-      desc: "",
-      disease: "",
-      diseaseDesc: "",
-      liquor: "",
-      liquorDesc: "",
-      noticePeriod: "",
-      perIS: "no", 
-      perIDesc: "",
-      referees: "", 
-      relatives: "", 
-      salaryExpectation: "",
-      supportInfo: "",
-      uploadResume: "", 
-      uploadCertificate: "", 
-      uploadPp: "", 
-      age: "",
-      alternateNo: "",
-      agent: "",
-      bwnIcNo: "",
-      bwnIcExpiry: "",
-      bwnIcColour: "",
-      contactNo: "",
-      cob: "", 
-      contractType: "",
-      chinese: "", 
-      dob: "",
-      driveLic: "",
-      email: "",
-      empType: "",
-      eduDetails: "", 
-      familyDetails: "", 
-      gender: "",
-      lang: "", 
-      marital: "",
-      name: "",
-      nationality: "",
-      otherNation: "",
-      otherRace: "",
-      otherReligion: "",
-      ppNo: "",
-      ppIssued: "",
-      ppExpiry: "",
-      ppDestinate: "",
-      presentAddress: "",
-      permanentAddress: "",
-      profilePhoto: "", 
-      position: "",
-      race: "",
-      religion: "",
-      workExperience: "", 
-      status: "", 
-    },
   });
 
   const {
@@ -142,7 +80,7 @@ export const OtherDetails = ({ fetchedData }) => {
     }
     return "";
   };
-
+  
 
   useEffect(() => {
     const parseDetails = (data) => {
@@ -201,7 +139,7 @@ export const OtherDetails = ({ fetchedData }) => {
             } else if (interviewData[key]) {
               setValue(key, interviewData[key])
             } else {
-              console.log(`No value for key ${key}`);
+              // console.log(`No value for key ${key}`);
             }
           });
 
@@ -216,11 +154,12 @@ export const OtherDetails = ({ fetchedData }) => {
             }));
           }
         } else {
-          console.log("No interview data found for tempID:", tempID);
+          // console.log("No interview data found for tempID:", tempID);
         }
       }
-    }
+    } 
   }, [tempID, setValue, educDetailsData]);
+
 
   const handleFileChange = async (e, type) => {
     const file = e.target.files[0];
@@ -228,14 +167,14 @@ export const OtherDetails = ({ fetchedData }) => {
     const personName = navigatingEducationData?.name;
     if (file) {
       if (type === "uploadResume") {
-        await uploadDocs(file, "uploadResume", setUploadedDocs, personName);
+        await uploadDocString(file, "uploadResume", setUploadedDocs, personName);
 
         setUploadedFileNames((prev) => ({
           ...prev,
           uploadResume: file.name, 
         }));
       } else if (type === "uploadCertificate") {
-        await uploadDocs(
+        await uploadDocString(
           file,
           "uploadCertificate",
           setUploadedDocs,
@@ -247,7 +186,7 @@ export const OtherDetails = ({ fetchedData }) => {
           uploadCertificate: file.name, 
         }));
       } else if (type === "uploadPp") {
-        await uploadDocs(file, "uploadPassport", setUploadedDocs, personName);
+        await uploadDocString(file, "uploadPassport", setUploadedDocs, personName);
 
         setUploadedFileNames((prev) => ({
           ...prev,
@@ -298,7 +237,6 @@ export const OtherDetails = ({ fetchedData }) => {
 
   const onSubmit = async (data) => {
     try {
-  
       const formattedFamilyDetails = JSON.stringify(navigatingEducationData?.familyDetails);
       const formattedEduDetails = JSON.stringify(navigatingEducationData?.eduDetails);
       const formattedWorkExperience = JSON.stringify(navigatingEducationData?.workExperience);
@@ -315,37 +253,39 @@ export const OtherDetails = ({ fetchedData }) => {
         emgDetails: formattedEmgDetails,
         referees: formattedReferees,
         relatives: formattedRelatives,
-        uploadResume: uploadedDocs.uploadResume,
-        uploadCertificate: uploadedDocs.uploadCertificate,
-        uploadPp: uploadedDocs.uploadPassport,
+        // uploadResume: uploadedDocs.uploadResume,
+        // uploadCertificate: uploadedDocs.uploadCertificate,
+        // uploadPp: uploadedDocs.uploadPassport,
         status: "Active",
       };
-
+  
       const checkingPDTable = empPDData.find((match) => match.tempID === data.tempID);
       const checkingEDTable = educDetailsData.find((match) => match.tempID === data.tempID);
-
+  
       if (checkingPDTable && checkingEDTable) {
         const updateReqValue = {
           ...reqValue,
-          uploadResume: uploadedDocs.uploadResume,
-          uploadCertificate: uploadedDocs.uploadCertificate,
-          uploadPp: uploadedDocs.uploadPassport,
+          uploadResume: reqValue.uploadResume || uploadedDocs.uploadResume,
+          uploadCertificate: reqValue.uploadCertificate || uploadedDocs.uploadCertificate,
+          uploadPp: reqValue.uploadPp || uploadedDocs.uploadPassport,
           PDTableID: checkingPDTable.id,
           EDTableID: checkingEDTable.id,
         };
   
+        // console.log("Updated VALUES", updateReqValue); 
         await candyDetails({ reqValue: updateReqValue });
         setNotification(true);
-     
+  
       } else {
-
-        await submitODFunc({ reqValue, latestTempIDData });
+        // console.log("Create VALUES", reqValue);
+        await submitODFunc({ reqValue, latestTempIDData });  
         setNotification(true);
       }
     } catch (error) {
       console.error("Error submitting data:", error);
     }
   };
+  
 
   return (
     <div>

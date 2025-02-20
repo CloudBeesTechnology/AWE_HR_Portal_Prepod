@@ -387,71 +387,71 @@ export const WorkDataPass = () => {
   };
 };
 
-//  //      formField1 : [
-//   //         { label: "Employee Badge Number", key: "empBadgeNo", type: "text" },
-//   //         { label: "Employee Name", key: "name", type: "text" },
-//   //         { label: "Department", key: "department", type: "text" },
-//   //         { label: "Position", key: "position", type: "text" },
-//   //         { label: "Date of Joining", key: "doj", type: "date" },
-//   //         { label: "Gender", key: "gender", type: "select", options: GenderDD },
-//   //         { label: "Brunei I/C Number", key: "bwnIcNo", type: "text" },
-//   //         { label: "Passport Number for Non-Local", key: "ppNo", type: "text" },
-//   //         { label: "Date of Birth", key: "dob", type: "date" },
-//   //         {
-//   //           label: "Marital Status",
-//   //           key: "marital",
-//   //           type: "select",
-//   //           options: MaritalDD,
-//   //         },
-//   //         {
-//   //           label: "Nationality",
-//   //           key: "nationality",
-//   //           type: "select",
-//   //           options: NationalityDD,
-//   //         },
-//   //         // { label: "Other Nationality", key: "otherNation", type: "text" }
-//   //       ],
-//   // formField2:[
-//   //   {
-//   //     label: "Group H&S Insurance",
-//   //     key: "groupIns",
-//   //     type: "select",
-//   //     options: [
-//   //       "Single",
-//   //       "Employee & spouse",
-//   //       "Employee & Child",
-//   //       "Employee & Family",
-//   //       "Decline",
-//   //       "Others",
-//   //     ],
-//   //   },
-//   //   {
-//   //     label: "Group H&S Insurance Enrollment Effective Date",
-//   //     key: "groupInsEffectDate",
-//   //     type: "date",
-//   //   },
-//   //   {
-//   //     label: "Group H&S Insurance Enrollment End Date",
-//   //     key: "groupInsEndDate",
-//   //     type: "date",
-//   //   },
-//   //   {
-//   //     label: "Workmen Compensation Insurance",
-//   //     key: "workmenComp",
-//   //     type: "select",
-//   //     options: ["Offshore", "Onshore", "General"],
-//   //   },
-//   //   { label: "Policy Number", key: "workmePolicyNo", type: "text" },
-//   //   {
-//   //     label: "Travelling Insurance",
-//   //     key: "travelIns",
-//   //     type: "select",
-//   //     options: ["Yes", "No"],
-//   //   },
-//   //   {
-//   //     label: "Personal Accident Insurance",
-//   //     key: "accidentIns",
-//   //     type: "select",
-//   //     options: ["Yes", "No"],
-//   //   },
-//   // ]
+ //      formField1 : [
+  //         { label: "Employee Badge Number", key: "empBadgeNo", type: "text" },
+  //         { label: "Employee Name", key: "name", type: "text" },
+  //         { label: "Department", key: "department", type: "text" },
+  //         { label: "Position", key: "position", type: "text" },
+  //         { label: "Date of Joining", key: "doj", type: "date" },
+  //         { label: "Gender", key: "gender", type: "select", options: GenderDD },
+  //         { label: "Brunei I/C Number", key: "bwnIcNo", type: "text" },
+  //         { label: "Passport Number for Non-Local", key: "ppNo", type: "text" },
+  //         { label: "Date of Birth", key: "dob", type: "date" },
+  //         {
+  //           label: "Marital Status",
+  //           key: "marital",
+  //           type: "select",
+  //           options: MaritalDD,
+  //         },
+  //         {
+  //           label: "Nationality",
+  //           key: "nationality",
+  //           type: "select",
+  //           options: NationalityDD,
+  //         },
+  //         // { label: "Other Nationality", key: "otherNation", type: "text" }
+  //       ],
+  // formField2:[
+  //   {
+  //     label: "Group H&S Insurance",
+  //     key: "groupIns",
+  //     type: "select",
+  //     options: [
+  //       "Single",
+  //       "Employee & spouse",
+  //       "Employee & Child",
+  //       "Employee & Family",
+  //       "Decline",
+  //       "Others",
+  //     ],
+  //   },
+  //   {
+  //     label: "Group H&S Insurance Enrollment Effective Date",
+  //     key: "groupInsEffectDate",
+  //     type: "date",
+  //   },
+  //   {
+  //     label: "Group H&S Insurance Enrollment End Date",
+  //     key: "groupInsEndDate",
+  //     type: "date",
+  //   },
+  //   {
+  //     label: "Workmen Compensation Insurance",
+  //     key: "workmenComp",
+  //     type: "select",
+  //     options: ["Offshore", "Onshore", "General"],
+  //   },
+  //   { label: "Policy Number", key: "workmePolicyNo", type: "text" },
+  //   {
+  //     label: "Travelling Insurance",
+  //     key: "travelIns",
+  //     type: "select",
+  //     options: ["Yes", "No"],
+  //   },
+  //   {
+  //     label: "Personal Accident Insurance",
+  //     key: "accidentIns",
+  //     type: "select",
+  //     options: ["Yes", "No"],
+  //   },
+  // ]

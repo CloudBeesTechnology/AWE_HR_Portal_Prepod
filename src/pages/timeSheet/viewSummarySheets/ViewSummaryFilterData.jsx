@@ -1,7 +1,7 @@
 import React from "react";
 
 import { useTempID } from "../../../utils/TempIDContext";
-import { FaAngleDown } from "react-icons/fa";
+
 import { SearchDisplayForTimeSheet } from "../timeSheetSearch/SearchDisplayForTS";
 import { SearchBoxForTimeSheet } from "../../../utils/SearchBoxForTimeSheet";
 import { FiSearch } from "react-icons/fi";
@@ -14,7 +14,8 @@ export const ViewSummaryFilterData = ({
   //   setEmptyTableMess
   resetTableFunc,
 }) => {
-  const { setStartDate, setEndDate, setSelectedLocation } = useTempID();
+  const { setStartDate, startDate, setEndDate, endDate, setSelectedLocation } =
+    useTempID();
   const selectLocationFunc = async (data) => {
     resetTableFunc();
     if (data.location) {
@@ -22,6 +23,29 @@ export const ViewSummaryFilterData = ({
     }
   };
 
+  const handleStartDateChange = (e) => {
+    const value = e.target.value;
+
+    const dateParts = value.split("-");
+    if (
+      dateParts.length === 3 &&
+      dateParts[0].length === 4 &&
+      dateParts[1].length === 2 &&
+      dateParts[2].length === 2 &&
+      dateParts[0].startsWith("2")
+    ) {
+      const formattedDate = new Date(value); // Directly use the input value as a date
+      if (!isNaN(formattedDate.getTime())) {
+        const year = formattedDate.getFullYear();
+        const month = (formattedDate.getMonth() + 1)
+          .toString()
+          .padStart(2, "0");
+        const day = formattedDate.getDate().toString().padStart(2, "0");
+        const newDate = `${year}-${month}-${day}`;
+        setStartDate(newDate);
+      }
+    }
+  };
   return (
     <div className="flex  justify-between items-center w-full mb-5">
       <div className="flex justify-start gap-4 ">
@@ -30,8 +54,8 @@ export const ViewSummaryFilterData = ({
 
           <input
             type="date"
-            className="border border-[#D9D9D9] rounded outline-none p-2 text-[#000000] text-sm"
-            onChange={(e) => setStartDate(e.target.value)}
+            className="border border-[#D9D9D9]  text_size_6 rounded outline-none p-2 text-[#252525] text-sm"
+            onChange={handleStartDateChange}
           />
         </div>
         <div className="relative grid grid-cols-1 ">
@@ -39,7 +63,7 @@ export const ViewSummaryFilterData = ({
 
           <input
             type="date"
-            className="border border-[#D9D9D9] rounded outline-none p-2 text-[#000000] text-sm"
+            className="border border-[#D9D9D9]  text_size_6 rounded outline-none p-2 text-[#252525] text-sm"
             onChange={(e) => setEndDate(e.target.value)}
           />
         </div>
@@ -49,7 +73,7 @@ export const ViewSummaryFilterData = ({
           <SearchDisplayForTimeSheet
             newFormData={LocationData}
             searchResult={selectLocationFunc}
-            placeholder="Search Location"
+            placeholder="Location"
             rounded="rounded"
             searchIcon2={<FiSearch />}
             identify="viewSummary"

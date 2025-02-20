@@ -13,17 +13,11 @@ export const useFetchDataTwo = (titleName, cardName) => {
     const Position = localStorage.getItem("userType");
     setGetPosition(Position);
 
-    // if (!titleName || !Position) {
-    //   console.error("Missing titleName or Position");
-    //   return; // Avoid fetch if necessary data is not available
-    // }
-
     const fetchData = async () => {
-      setLoading(true); // Start loading indicator
+      setLoading(true);
       let nextToken = null;
       let allData = [];
 
-      // Generate the filter based on the cardName and titleName
       const filter = {
         and: [
           cardName === "Manager"
@@ -36,11 +30,9 @@ export const useFetchDataTwo = (titleName, cardName) => {
             ? { status: { eq: "Rejected" }, fileType: { eq: titleName } }
             : cardName === "All"
             ? { status: { eq: "All" }, fileType: { eq: titleName } }
-            : { status: { eq: "nothing" }, fileType: { eq: titleName } }, // return null if cardName doesn't match any known value
-        ].filter(Boolean), // Remove any null values from the array
+            : { status: { eq: "nothing" }, fileType: { eq: titleName } },
+        ].filter(Boolean),
       };
-
-   
 
       try {
         do {
@@ -62,22 +54,20 @@ export const useFetchDataTwo = (titleName, cardName) => {
           allData = [...allData, ...validData];
         } while (nextToken);
 
-        // If no data is found, return null or an empty array based on your preference
         if (allData.length === 0) {
-          setFinalData(null); // or []
+          setFinalData([]);
         } else {
-          setFinalData(allData); // Set fetched data
+          setFinalData(allData);
         }
       } catch (error) {
-        // console.error("Error fetching data:", error);
-        setFinalData(null); // Set to null on error as well
+        setFinalData([]);
       } finally {
-        setLoading(false); // Stop loading indicator
+        setLoading(false);
       }
     };
 
-    fetchData(); // Call the fetch function
-  }, [titleName, cardName]); // Dependency array to only trigger when titleName or cardName changes
+    fetchData();
+  }, [titleName, cardName]);
 
   return { finalData };
 };

@@ -52,11 +52,11 @@ export const ViewSummary = () => {
 
   useEffect(() => {
     if (startDate) {
-      setGetStartDate(new Date(startDate.replace(/-/g, "/"))); // Handle date formatting
+      setGetStartDate(new Date(startDate.replace(/-/g, "/")));
       setEmptyTableMess(false);
     }
     if (endDate) {
-      setGetEndDate(new Date(endDate.replace(/-/g, "/"))); // Handle date formatting
+      setGetEndDate(new Date(endDate.replace(/-/g, "/")));
       setEmptyTableMess(false);
     }
   }, [startDate, endDate]);
@@ -81,107 +81,207 @@ export const ViewSummary = () => {
       setSummaryObject(object);
     }
   };
-  //   {
-  //     "badgeNo": "",
-  //     "empName": "",
-  //     "sapNo": "",
-  //     "location": "Offshore",
-  //     "jobcode": "J9009M433",
-  //     "NWHPD": "",
-  //     "workingHrs": "8",
-  //     "overtimeHrs": "2",
-  //     "workingHrsKey": "1-7-2024"
-  // }
-  const assignWhrslocaly = async (responseData) => {
-    responseData?.forEach((input) => {
-      // console.log("input : ", input);
-      // Convert the date format from MM/DD/YYYY to D-M-YYYY
+
+  const assignWhrslocaly = async (responseData, object) => {
+    const empMap = new Map();
+
+    // Populate the map for quick lookups
+    data?.forEach((entry) => {
+      const key = entry.empBadgeNo || entry.sapNo;
+      if (key) {
+        empMap.set(String(key), entry);
+      }
+    });
+
+    object?.data?.forEach((input) => {
       const [month, day, year] = input.date.split("/");
       const formattedDate = `${parseInt(day)}-${parseInt(month)}-${year}`;
 
-      // Find the corresponding object in existingData
-      let existingObj = data?.find(
-        (obj) =>
-          (obj.empBadgeNo &&
-            input.empBadgeNo &&
-            String(obj.empBadgeNo) === String(input.empBadgeNo)) ||
-          (obj.sapNo &&
-            input.fidNo &&
-            String(obj.sapNo) === String(input.fidNo))
-      );
-      if (existingObj && Array.isArray(input.empWorkInfo)) {
-        const parsedEmpWorkInfo = input.empWorkInfo.flatMap((info) =>
-          typeof info === "string" ? JSON.parse(info) : info
-        );
-        // console.log("Working... 1");
-        // console.log("input : ", input);
-        parsedEmpWorkInfo.forEach((info) => {
-          // console.log(info.JOBCODE, "---", existingObj.jobcode);
-          if (info.JOBCODE === existingObj.jobcode) {
-            // console.log("Working... 2");
-            // Check if the date exists in getVerify and update its value
-            if (existingObj.getVerify.hasOwnProperty(formattedDate)) {
-              existingObj.getVerify[formattedDate] = input.verify;
-              existingObj.assignUpdaterDateTime[formattedDate] =
-                input.updatedAt;
+      const key = input.empBadgeNo || input.fidNo;
+      const existingEntry = empMap.get(String(key));
+
+      if (existingEntry) {
+        existingEntry.data.forEach((m) => {
+          const [mMonth, mDay, mYear] = String(object.workingHrsKey).split("-");
+          const formattedWorkingHrsKey = `${parseInt(mDay)}/${parseInt(
+            mMonth
+          )}/${mYear}`;
+
+          if (
+            m.date === formattedWorkingHrsKey &&
+            formattedWorkingHrsKey === input.date
+          ) {
+            if (Array.isArray(input.empWorkInfo)) {
+              const parsedEmpWorkInfo = input.empWorkInfo.flatMap((info) =>
+                typeof info === "string" ? JSON.parse(info) : info
+              );
+
+              parsedEmpWorkInfo.forEach((info) => {
+                const existingEmpWorkInfo = m.empWorkInfo.find(
+                  (workInfo) => workInfo.id === info.id
+                );
+
+                if (existingEmpWorkInfo) {
+                  existingEmpWorkInfo.verify = "Yes";
+                  existingEntry.getVerify[object.workingHrsKey] = "Yes";
+                  existingEntry.assignUpdaterDateTime[object.workingHrsKey] =
+                    input.updatedAt;
+                }
+              });
             }
           }
         });
       }
     });
+
     setLoadingMess(true);
   };
+
   const FinalEditedData = async (getObject) => {
     setLoadingMess(false);
-    // console.log(getObject);
-    const resData = await UpdateViewSummary(getObject);
-    // console.log("resData : ", resData);
-    await assignWhrslocaly(resData);
+
+    const { resData, object, newresData } = await UpdateViewSummary(getObject);
+
+    const {
+      badgeNo,
+      data: objectData,
+      sapNo,
+      jobcode,
+      location,
+      workingHrsKey,
+      workingHrs,
+      overtimeHrs,
+    } = getObject;
+
     if (resData && resData.length > 0) {
-      const {
-        badgeNo,
-        sapNo,
-        jobcode,
-        location,
-        workingHrsKey,
-        workingHrs,
-        overtimeHrs,
-      } = getObject;
+      try {
+        await assignWhrslocaly(resData, object);
 
-      // Iterate through mainData array
-      const result = data.map((obj) => {
-        // Check if the workingHrsKey exists in the current object's workingHrs
-        const empBadgeNoMatch =
-          obj.empBadgeNo &&
-          badgeNo &&
-          String(obj.empBadgeNo) === String(badgeNo);
+        const objData = objectData.flatMap((ma) => {
+          return ma.empWorkInfo.find((info) => {
+            return info.id;
+          });
+        });
 
-        const sapNoMatch =
-          obj.sapNo && sapNo && String(obj.sapNo) === String(sapNo);
+        const result = data.map((obj) => {
+          const empBadgeNoMatch =
+            obj.empBadgeNo &&
+            badgeNo &&
+            String(obj.empBadgeNo) === String(badgeNo);
 
-        if (
-          (empBadgeNoMatch || sapNoMatch) &&
-          obj.jobcode === jobcode &&
-          obj.location === location &&
-          obj.workingHrs.hasOwnProperty(workingHrsKey)
-        ) {
-          return {
-            ...obj,
-            workingHrs: {
-              ...obj.workingHrs, // Keep existing keys
-              [workingHrsKey]: workingHrs, // Update the matching key
-            },
-            OVERTIMEHRS: {
-              ...obj.OVERTIMEHRS,
-              [workingHrsKey]: overtimeHrs,
-            },
-          };
-        }
-        return obj; // Return the object unchanged if no match
-      });
+          const sapNoMatch =
+            obj.sapNo && sapNo && String(obj.sapNo) === String(sapNo);
 
-      setData(result);
-      setSecondaryData(result);
+          let updatedObj = { ...obj };
+
+          const isUpdated = obj.data.some((val) => {
+            const pickObj = objData.find((fi) => fi.id);
+            const getId = val.empWorkInfo.find((emp) => emp.id);
+
+            const [month, day, year] = val.date.split("/");
+            const formattedDate = `${parseInt(day)}-${parseInt(month)}-${year}`;
+
+            if (
+              (empBadgeNoMatch || sapNoMatch) &&
+              formattedDate === workingHrsKey &&
+              getId.id === pickObj.id &&
+              obj.workingHrs.hasOwnProperty(workingHrsKey)
+            ) {
+              updatedObj = {
+                ...obj,
+                workingHrs: {
+                  ...obj.workingHrs,
+                  [workingHrsKey]: workingHrs,
+                },
+                OVERTIMEHRS: {
+                  ...obj.OVERTIMEHRS,
+                  [workingHrsKey]: overtimeHrs,
+                },
+              };
+
+              return true;
+            }
+            return false;
+          });
+
+          return isUpdated ? updatedObj : obj;
+        });
+
+        setData(result);
+        setSecondaryData(result);
+      } catch (err) {
+      } finally {
+        setLoadingMess(true);
+      }
+    } else if (newresData && newresData.length > 0) {
+      try {
+        newresData.forEach((newItem) => {
+          const empBadgeNo = newItem.empBadgeNo;
+          const fidNo = newItem.fidNo;
+
+          const empWorkInfo = JSON.parse(newItem.empWorkInfo[0]);
+          const jobCode = empWorkInfo[0]?.JOBCODE;
+
+          const matchedData = data.find(
+            (item) =>
+              (item.empBadgeNo &&
+                empBadgeNo &&
+                String(item.empBadgeNo) === String(empBadgeNo) &&
+                item.jobcode === jobCode) ||
+              (item.sapNo &&
+                fidNo &&
+                String(item.sapNo) === String(fidNo) &&
+                item.jobcode === jobCode)
+          );
+
+          if (matchedData) {
+            const [month, day, year] = newItem.date.split("/");
+            const formattedDate = `${parseInt(day)}-${parseInt(month)}-${year}`;
+
+            matchedData.data.push({ ...newItem, empWorkInfo: empWorkInfo });
+
+            matchedData.getVerify[formattedDate] = "Yes";
+            matchedData.assignUpdaterDateTime[formattedDate] =
+              newItem.updatedAt;
+          }
+        });
+
+        const result = data.map((obj) => {
+          const empBadgeNoMatch =
+            obj.empBadgeNo &&
+            badgeNo &&
+            String(obj.empBadgeNo) === String(badgeNo);
+
+          const sapNoMatch =
+            obj.sapNo && sapNo && String(obj.sapNo) === String(sapNo);
+
+          if (
+            (empBadgeNoMatch || sapNoMatch) &&
+            obj.jobcode === jobcode &&
+            obj.location === location &&
+            obj.workingHrs.hasOwnProperty(workingHrsKey)
+          ) {
+            return {
+              ...obj,
+              workingHrs: {
+                ...obj.workingHrs,
+                [workingHrsKey]: workingHrs,
+              },
+              OVERTIMEHRS: {
+                ...obj.OVERTIMEHRS,
+                [workingHrsKey]: overtimeHrs,
+              },
+            };
+          }
+          setLoadingMess(true);
+          return obj;
+        });
+        setData(result);
+        setSecondaryData(result);
+      } catch (err) {
+      } finally {
+        setLoadingMess(true);
+      }
     }
   };
 

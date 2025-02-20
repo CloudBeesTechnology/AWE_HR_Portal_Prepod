@@ -24,12 +24,11 @@ export const UploadBLNGfile = (
         allSheets.push({ sheetName, data: sheet });
       });
 
-      // console.log(allSheets);
       const getResult =
         allSheets &&
         allSheets.map((sheet) => {
           const data = sheet.data;
-          // console.log(data);
+
           var headerSlicedData = data.slice(0, 1);
           const changedHeader = headerSlicedData.map((columns) => {
             const foundKey = Object.entries(columns).map(([key, value]) => {
@@ -39,7 +38,7 @@ export const UploadBLNGfile = (
           });
           const result = changedHeader.flat().flat();
           var bodySlicedData = data.slice(1);
-          // console.log(bodySlicedData);
+
           bodySlicedData.forEach((bodyData) => {
             const row = {};
 
@@ -57,20 +56,19 @@ export const UploadBLNGfile = (
           return headerSlicedData;
         });
 
-      // remove space, symbol
       function cleanKey(key) {
         if (typeof key !== "string") {
-          return key; // Return value if not a string (e.g., number, object)
+          return key;
         }
-        return key.replace(/[^a-zA-Z0-9]/g, ""); // Removes all non-alphanumeric characters
+        return key.replace(/[^a-zA-Z0-9]/g, "");
       }
 
       const formattedData = tableDatawithSpace.map((item) => {
         const cleanedItem = {};
 
         for (const key in item) {
-          const cleanedKey = cleanKey(key).toUpperCase(); // Clean the key
-          cleanedItem[cleanedKey] = item[key]; // Set the value using the cleaned key
+          const cleanedKey = cleanKey(key).toUpperCase();
+          cleanedItem[cleanedKey] = item[key];
         }
         const NewKeyValueAdded = {
           ...cleanedItem,
@@ -158,7 +156,6 @@ export const UploadBLNGfile = (
             const dateObject = new Date(entranceDate);
 
             item.ENTRANCEDATEUSED = dateObject.toLocaleDateString();
-           
           }
           if (typeof item.AVGDAILYTOTALBYDAY === "number") {
             const entranceDate = excelSerialToDate(
@@ -179,7 +176,6 @@ export const UploadBLNGfile = (
 
           return item;
         });
-      // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
       const transformedData = updatedDataArray.reduce((acc, curr) => {
         const {
@@ -193,13 +189,11 @@ export const UploadBLNGfile = (
           ...rest
         } = curr;
 
-        // Retrieve the last entry in acc to carry forward FID and NAMEFLAST if missing
         const lastEntry = acc[acc.length - 1] || {};
         const currFID = FID || lastEntry.FID;
         const currName = NAMEFLAST || lastEntry.NAMEFLAST;
         const currEntraDUsed = ENTRANCEDATEUSED || lastEntry.ENTRANCEDATEUSED;
 
-        // Find existing entry with the same FID, NAMEFLAST, and ENTRANCEDATEUSED
         const existingEntry = acc.find(
           (item) =>
             item.FID === currFID &&
@@ -208,40 +202,33 @@ export const UploadBLNGfile = (
         );
 
         if (existingEntry) {
-          // If found, push new times into the respective arrays
           existingEntry.ENTRANCEDATETIME.push(ENTRANCEDATETIME);
           existingEntry.EXITDATETIME.push(EXITDATETIME);
-          // existingEntry.ADININWORKSENGINEERINGSDNBHD.push(
-          //   ADININWORKSENGINEERINGSDNBHD
-          // );
         } else {
-          // Create a new entry if it doesn't exist
           acc.push({
-            FID: currFID || "", // Carry forward or default to empty string
-            NAMEFLAST: currName || "", // Carry forward or default to empty string
-            ENTRANCEDATEUSED: ENTRANCEDATEUSED, // Keep date as is
-            ENTRANCEDATETIME: [ENTRANCEDATETIME], // Initialize as array
-            EXITDATETIME: [EXITDATETIME], // Initialize as array
+            FID: currFID || "",
+            NAMEFLAST: currName || "",
+            ENTRANCEDATEUSED: ENTRANCEDATEUSED,
+            ENTRANCEDATETIME: [ENTRANCEDATETIME],
+            EXITDATETIME: [EXITDATETIME],
             AVGDAILYTOTALBYDAY: AVGDAILYTOTALBYDAY,
             ADININWORKSENGINEERINGSDNBHD: AVGDAILYTOTALBYDAY,
-            ...rest, // Include other properties
+            ...rest,
           });
-          
         }
 
         return acc;
       }, []);
-     
 
       transformedData.forEach((entry) => {
         if (entry.FID && entry.ENTRANCEDATEUSED) {
           if (entry.EXITDATETIME.length > 1) {
             entry.EXITDATETIME = [
               entry.EXITDATETIME[entry.EXITDATETIME.length - 1],
-            ]; // Keep only the last EXITDATETIME
+            ];
           }
           if (entry.ENTRANCEDATETIME.length > 1) {
-            entry.ENTRANCEDATETIME = [entry.ENTRANCEDATETIME[0]]; // Keep only the last EXITDATETIME
+            entry.ENTRANCEDATETIME = [entry.ENTRANCEDATETIME[0]];
           }
         }
       });

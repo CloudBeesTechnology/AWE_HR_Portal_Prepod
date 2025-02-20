@@ -7,6 +7,7 @@ export const ListTimeSheet = ({
   newSearchFunction,
   visibleData,
   message,
+  loading,
   totalPages,
   currentPage,
   paginate,
@@ -27,12 +28,10 @@ export const ListTimeSheet = ({
   const formattedDate = (date) => {
     const dateObj = new Date(date);
 
-    // Extract the day, month, and year
     const day = dateObj.getDate();
-    const month = dateObj.getMonth() + 1; // Months are zero-based
+    const month = dateObj.getMonth() + 1;
     const year = dateObj.getFullYear();
 
-    // Format the date as "day-month-year"
     return `${day} - ${month} - ${year}`;
   };
 
@@ -50,15 +49,14 @@ export const ListTimeSheet = ({
               <th>Status</th>
             </tr>
           </thead>
-          {/* context={{ allExcelSheetData, AllFieldData, categoryFilter, visibleData, handleScroll }} */}
+
           <tbody>
-            {visibleData && visibleData.length > 0 ? (
+            {!loading && visibleData && visibleData.length > 0 ? (
               visibleData.map((val, index) => {
                 return (
-                  // <React.Fragment key={index}>
                   <tr
                     key={index}
-                    className="text-dark_grey h-[53px] text-sm bg-white  rounded-sm shadow-md text-start border-b-2 border-[#CECECE]"
+                    className="text-dark_grey h-[53px] text-[15px] bg-white  rounded-sm shadow-md text-start border-b-2 border-[#CECECE]"
                   >
                     <td>{index + 1}</td>
                     <td>{val.fileName}</td>
@@ -76,16 +74,19 @@ export const ListTimeSheet = ({
                     <td
                       className={
                         val.status === "Approved"
-                          ? "text-[#16a34a] text_size_7"
+                          ? "text-[#16a34a] text-[15px] font-bold"
                           : val.status === "Rejected"
-                          ? "text-[#a31f16] text_size_7"
-                          : "text-[#272727] text_size_7"
+                          ? "text-[#a31f16] text-[15px] font-bold"
+                          : val.status === "Unsubmitted"
+                          ? "text-[#f57340] text-[15px] font-bold"
+                          : val.status === "Verified"
+                          ? "text-[#9226ad] text-[15px] font-bold"
+                          : "text-[#272727] text-[15px] font-bold"
                       }
                     >
                       {val.status}
                     </td>
                   </tr>
-                  // </React.Fragment>
                 );
               })
             ) : (
@@ -95,8 +96,8 @@ export const ListTimeSheet = ({
                   className="text-center text-dark_ash text_size_5 bg-white"
                 >
                   <p className="p-5">
-                    {message ||
-                      "Please select an Excel Sheet from the dropdown to display the data."}
+                    {!loading && message}
+                    {loading && message}
                   </p>
                 </td>
               </tr>

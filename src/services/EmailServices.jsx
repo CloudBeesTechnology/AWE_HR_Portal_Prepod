@@ -8,10 +8,8 @@ export const sendEmail = async (subject, message,fromaddress, toaddress) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": apiKey,  // Add your API key here
-
+            "x-api-key": apiKey, 
             // "Access-Control-Allow-Origin": "http://127.0.0.1:5173",
-
           },
           body: JSON.stringify({
             subject,
@@ -31,6 +29,9 @@ export const sendEmail = async (subject, message,fromaddress, toaddress) => {
         console.log("Email Response:", data);
         if (data.message === "Email sent successfully") {
           console.log("Email sent successfully");
+          return "success";
+        } else {
+          return "failed";
         }
 
       }  catch (e) {

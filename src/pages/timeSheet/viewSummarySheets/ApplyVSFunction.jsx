@@ -28,17 +28,16 @@ export const ApplyVSFunction = ({
       let allData = [];
       let nextToken = null;
 
-      // Loop until all pages are fetched
       do {
         const response = await client.graphql({
           query: queryName,
           variables: { nextToken },
         });
 
-        const items = response.data[Object.keys(response.data)[0]].items; // Extract items
-        allData = [...allData, ...items]; // Append fetched items
-        nextToken = response.data[Object.keys(response.data)[0]].nextToken; // Update nextToken
-      } while (nextToken); // Continue fetching until no more pages
+        const items = response.data[Object.keys(response.data)[0]].items;
+        allData = [...allData, ...items];
+        nextToken = response.data[Object.keys(response.data)[0]].nextToken;
+      } while (nextToken);
 
       return allData;
     };
@@ -55,8 +54,8 @@ export const ApplyVSFunction = ({
         const mergedData = empPersonalInfos
           .map((candidate) => {
             const sapNoRemoved = empWorkInfos?.map((item) => {
-              const { sapNo, ...rest } = item; // Destructure to exclude `sapNo`
-              return rest; // Return the modified object without `sapNo`
+              const { sapNo, ...rest } = item;
+              return rest;
             });
 
             const interviewDetails = sapNoRemoved.find(
@@ -73,7 +72,7 @@ export const ApplyVSFunction = ({
               // ...leaveDetail,
             };
           })
-          .filter((item) => item !== null); // Remove null values
+          .filter((item) => item !== null);
 
         convertedStringToArrayObj?.forEach((sheet) => {
           try {
@@ -96,85 +95,43 @@ export const ApplyVSFunction = ({
               return (sheet.empWorkInfo = sheet.empWorkInfo);
             }
           } catch (err) {
-            // console.error(
-            //   `Error processing empWorkInfo for id ${sheet.id}:`,
-            //   err
-            // );
-            // console.log("ERROR : ", err);
             return (sheet.empWorkInfo = sheet.empWorkInfo);
           }
         });
 
-        // const leaveStatusData = leaveStatus?.data?.listLeaveStatuses?.items;
         const leaveStatusData = leaveStatuses;
 
         const approvedLeaveStatus = leaveStatusData?.filter(
           (fil) => fil.managerStatus === "Approved"
         );
 
-        // You can use this function to all Excel Sheet
-        // Grouping data based on empID
-
-        // const groupBySapNo = (data) => {
-        //   const grouped = data.reduce((acc, item) => {
-        //     const keyOfEmpBadgeNo = String(item.empBadgeNo);
-        //     const keyOfFidNo = String(item.fidNo);
-        //     let existingGroup = null;
-        //     if (keyOfEmpBadgeNo) {
-        //       existingGroup = acc.find(
-        //         (group) => group.empBadgeNo === keyOfEmpBadgeNo
-        //       );
-        //     } else {
-        //       existingGroup = acc.find((group) => group.fidNo === keyOfFidNo);
-        //     }
-
-        //     if (!existingGroup) {
-        //       existingGroup = { empBadgeNo: keyOfEmpBadgeNo, data: [] };
-        //       acc.push(existingGroup);
-        //     }
-
-        //     existingGroup.data.push(item);
-        //     return acc;
-        //   }, []);
-
-        //   return grouped;
-        // };
-        // const grouped = groupBySapNo(convertedStringToArrayObj);
         const groupBySapNo = (data) => {
           return data?.reduce((acc, item) => {
-            // Determine key based on empBadgeNo or fidNo
             const key = item.empBadgeNo
               ? `empBadgeNo-${item.empBadgeNo}`
               : `fidNo-${item.fidNo}`;
 
-            // Initialize group if it doesn't exist
             if (!acc[key]) {
               acc[key] = {
-                empBadgeNo: item.empBadgeNo || null, // Include empBadgeNo if available
-                fidNo: item.fidNo || null, // Include fidNo if available
+                empBadgeNo: item.empBadgeNo || null,
+                fidNo: item.fidNo || null,
                 data: [],
               };
             }
 
-            // Push the current item into the group
             acc[key].data.push(item);
 
             return acc;
           }, {});
         };
 
-        // Convert grouped object into an array
         const grouped = Object.values(
           groupBySapNo(convertedStringToArrayObj || [])
         );
-
-        // console.log("grouped : ", grouped);
-
+     
         const seperateDateMethod = (inputData) => {
           return inputData
             .map((entry) => {
-              // Group by Month/Year
-
               const groupedByMonthYear = entry?.data?.reduce((acc, record) => {
                 const date = new Date(record.date);
                 const monthYear = `${
@@ -189,7 +146,6 @@ export const ApplyVSFunction = ({
                 return acc;
               }, {});
 
-              // Construct final output for each Month/Year group
               return Object.entries(groupedByMonthYear).map(
                 ([monthYear, records]) => ({
                   empBadgeNo: entry.empBadgeNo || null,
@@ -201,7 +157,6 @@ export const ApplyVSFunction = ({
             .flat();
         };
         const seperatedEmpByDate = seperateDateMethod(grouped);
-        // console.log("seperatedEmpByDate : ", seperatedEmpByDate);
 
         function groupByEmpIdAndLocation(dataArray) {
           const groupedData = new Map();
@@ -209,12 +164,10 @@ export const ApplyVSFunction = ({
 
           dataArray.forEach((emp) => {
             emp.data.forEach((dataEntry) => {
-              // Check if empWorkInfo exists and is an array
               if (
                 Array.isArray(dataEntry.empWorkInfo) &&
                 dataEntry.empWorkInfo
               ) {
-                // Process entries with valid empWorkInfo
                 dataEntry.empWorkInfo.forEach((job) => {
                   const location = job?.LOCATION || "";
                   const jobcode = job?.JOBCODE || "";
@@ -222,7 +175,10 @@ export const ApplyVSFunction = ({
                   const monthYearKey = `${dateObj.getFullYear()}-${
                     dateObj.getMonth() + 1
                   }`;
-                  const key = `${emp.empBadgeNo}-${emp.fidNo}-${location}-${jobcode}-${monthYearKey}`;
+                  const YearKey = `${dateObj.getFullYear()}`;
+
+                  // const key = `${emp.empBadgeNo}-${emp.fidNo}-${location}-${jobcode}-${monthYearKey}`;
+                  const key = `${emp.empBadgeNo}-${emp.fidNo}-${location}-${jobcode}-${YearKey}`;
 
                   if (!groupedData.has(key)) {
                     groupedData.set(key, {
@@ -232,17 +188,15 @@ export const ApplyVSFunction = ({
                     });
                   }
 
-                  // Add the current dataEntry to the group
                   const group = groupedData.get(key);
                   group.data.push({
                     ...dataEntry,
-                    empWorkInfo: [job], // Include only the current job entry
+                    empWorkInfo: [job],
                   });
                 });
               } else {
-                // Handle entries with no or invalid empWorkInfo
                 ungroupedData.push({
-                  empBadgeNo: emp.empBadgeNo,
+                  empBadgeNo: emp.empBadgeNo || null,
                   fidNo: emp.fidNo || null,
                   data: [{ ...dataEntry, empWorkInfo: [] }],
                 });
@@ -250,7 +204,6 @@ export const ApplyVSFunction = ({
             });
           });
 
-          // Combine grouped data with ungrouped data
           return [...Array.from(groupedData.values()), ...ungroupedData];
         }
         const seperatedGroupedData =
@@ -270,28 +223,23 @@ export const ApplyVSFunction = ({
           }
         });
 
-        // console.log("seperatedGroupedData : ", seperatedGroupedData);
         const merged = mergedData.flatMap((val) => {
-          // Filter all matching entries from approvedLeaveStatus
           const matches = approvedLeaveStatus.filter(
             (so) => val.empID === so.empID
           );
 
           if (matches.length > 0) {
-            // Map over matches and merge each one with the current `val`
             return matches.map((match) => ({
               ...val,
               ...match,
             }));
           }
 
-          // If no match is found, just return the original `val`
           return [val];
         });
-        // console.log("merged : ", merged);
+
         const filteredData = merged.filter((leave) => {
           return seperatedGroupedData.some((emp) => {
-            // console.log(leave.empBadgeNo === emp.badge)
             const empBadgeNoMatch =
               leave.empBadgeNo &&
               emp.empBadgeNo &&
@@ -302,21 +250,9 @@ export const ApplyVSFunction = ({
               emp.fidNo &&
               String(leave.sapNo) === String(emp.fidNo);
             if (empBadgeNoMatch || sapNoMatch) {
-              // console.log(leave.empBadgeNo, " | ", emp.badge);
-              //   console.log(typeof leave.sapNo, " : ", typeof emp.fidNo);
               return emp.data.some((entry) => {
                 const leaveDate = new Date(leave.toDate);
                 const empDate = new Date(entry.date);
-
-                // console.log(leaveDate.getMonth() ,":", empDate.getMonth());
-
-                // console.log(
-                //   "empDate : ",
-                //   empDate.toLocaleDateString(),
-                //   " | ",
-                //   "leaveDate : ",
-                //   leaveDate.toLocaleDateString()
-                // );
 
                 return (
                   leaveDate.getFullYear() === empDate.getFullYear() &&
@@ -328,12 +264,10 @@ export const ApplyVSFunction = ({
           });
         });
 
-        // console.log("filteredData : ", filteredData);
-
         const leaveTypeAbbreviation = {
           "Annual Leave": "AL",
           "Compensate Leave": "CL",
-          "Unpaid Authorise Leave": "UAL",
+          "Unpaid Authorize - Annual": "UAL",
           "Sick Leave": "SL",
         };
 
@@ -366,7 +300,6 @@ export const ApplyVSFunction = ({
               };
             }
 
-            // Handle leaveCounts
             if (isHalfDayLeave(leaveTypeAbbreviation[leaveType])) {
               result[empID].leaveCounts[leaveType] =
                 (result[empID].leaveCounts[leaveType] || 0) + 0.5;
@@ -375,7 +308,6 @@ export const ApplyVSFunction = ({
                 (result[empID].leaveCounts[leaveType] || 0) + 1;
             }
 
-            // Generate listDate and calculate days difference
             result[empID].dateDifferences.push({
               leaveType,
               fromDate,
@@ -385,13 +317,12 @@ export const ApplyVSFunction = ({
                 toDate,
                 workHrs,
                 leaveTypeAbbreviation[leaveType],
-                days === 0.5 // Pass half-day indicator
+                days === 0.5
               ),
               daysDifference: days,
             });
           });
 
-          // Sum up all specific half-day leaves and update leaveCounts
           Object.values(result).forEach((emp) => {
             emp.dateDifferences.forEach(({ listDate }) => {
               Object.values(listDate).forEach((value) => {
@@ -409,7 +340,6 @@ export const ApplyVSFunction = ({
           return Object.values(result);
         };
 
-        // Mock function to generate listDate
         const generateDateList = (
           fromDate,
           toDate,
@@ -423,7 +353,7 @@ export const ApplyVSFunction = ({
           const NWHPD =
             workHrs && workHrs?.length > 0 ? workHrs[workHrs?.length - 1] : 0;
           const devidedNWHPD = parseFloat(NWHPD) / 2;
-          // console.log(NWHPD);
+
           while (start <= end) {
             const dayStr = `${start.getDate()}-${
               start.getMonth() + 1
@@ -438,40 +368,23 @@ export const ApplyVSFunction = ({
         };
 
         const leaveCount_ = transformData(filteredData);
-        // console.log("leaveCount_ : ", leaveCount_);
-        // console.log("seperatedGroupedData : ", seperatedGroupedData);
 
         const holidayDates = publicHoliday?.CompanyHolidays2025.flatMap(
           (holiday) => holiday.dates || [holiday.date]
         );
 
         const formattedHolidayDates = holidayDates?.map((dateStr) => {
-          const parts = dateStr.split(",")[1].trim(); // Extract "1st October 2024"
-          const [day, month, year] = parts.split(" "); // Split into day, month, and year
-          const dayNumber = day.replace(/\D/g, ""); // Remove non-numeric characters from the day
-          const monthNumber = new Date(`${month} 1, 2000`).getMonth() + 1; // Convert month name to number
-          return `${year}-${monthNumber}-${dayNumber}`; // Format as "MM/DD/YYYY"
+          const parts = dateStr.split(",")[1].trim();
+          const [day, month, year] = parts.split(" ");
+          const dayNumber = day.replace(/\D/g, "");
+          const monthNumber = new Date(`${month} 1, 2000`).getMonth() + 1;
+          return `${year}-${monthNumber}-${dayNumber}`;
         });
 
-        // const getStartDate = new Date("2024-9-21");
-        // const getEndDate = new Date("2024-10-20");
-
-        // Calculate number of days in the range
-
-        // const dayCounts = null;
-        // useEffect(() => {
-        //   if (getEndDate && getStartDate) {
-        // const dayCount = dayCounts;
         const dayCount =
-          (getEndDate - getStartDate) / (1000 * 60 * 60 * 24) + 1; // Include both start and end dates
-        //   }
-        // }, [getStartDate, getEndDate]);
+          (getEndDate - getStartDate) / (1000 * 60 * 60 * 24) + 1;
 
         const addLeaveTypeCount = seperatedGroupedData.map((val) => {
-          //   const empLeaveCount = leaveCount_.find(
-          //     (fi) => val.empBadgeNo === fi.empBadgeNo
-          //   );
-
           const empLeaveCount = leaveCount_.find((fi) => {
             if (
               val.empBadgeNo &&
@@ -483,10 +396,6 @@ export const ApplyVSFunction = ({
               return fi;
             }
           });
-
-          //   const workInfoData = mergedData?.find(
-          //     (fi) => val.empBadgeNo === fi.empBadgeNo
-          //   );
 
           const workInfoData = mergedData?.find((fi) => {
             if (
@@ -507,30 +416,21 @@ export const ApplyVSFunction = ({
 
           const workingHrs = Array.from({ length: dayCounts }, (_, i) => {
             const currentDay = new Date(getStartDate);
-            currentDay.setDate(getStartDate.getDate() + i); // Increment date
+            currentDay.setDate(getStartDate.getDate() + i);
             return currentDay;
           }).reduce((acc, currentDay) => {
-            // const dayStr = currentDay.getDate().toString();
-            const monthKey = currentDay.getMonth() + 1; // Month index starts at 0, so add 1
+            const monthKey = currentDay.getMonth() + 1;
             const dayStr = `${currentDay.getDate()}-${monthKey}-${currentDay.getFullYear()}`;
-
-            // Format key as "MM-DD"
-            // const entry = val?.data.find(
-            //   ({ date }) => new Date(date).getDate() === currentDay.getDate()
-            // );
 
             const entry = val?.data.find(({ date }) => {
               const entryDate = new Date(date);
               return (
-                //   entryDate === currentDay
                 entryDate.getDate() === currentDay.getDate() &&
                 entryDate.getMonth() === currentDay.getMonth() &&
                 entryDate.getFullYear() === currentDay.getFullYear()
               );
             });
-            // const dayOfWeek = currentDay.toLocaleDateString("en-US", {
-            //   weekday: "long",
-            // }); // Get the day name
+
             const dayOfWeek = new Intl.DateTimeFormat("en-BN", {
               weekday: "long",
             }).format(currentDay);
@@ -547,22 +447,19 @@ export const ApplyVSFunction = ({
               }
             );
 
-            // Check if the current day is in the leave list for the employee
             let leaveType = null;
             if (empLeaveCount) {
               empLeaveCount.dateDifferences.forEach((leave) => {
                 if (leave.listDate.hasOwnProperty(dayStr)) {
-                  leaveType = leave.listDate[dayStr]; // Get leave type (e.g., "UAL", "CL")
+                  leaveType = leave.listDate[dayStr];
                 }
               });
             }
 
-            // Prioritize conditions
             if (checkEntry) {
               if (isNaN(checkEntry) || !checkEntry) {
-                acc[dayStr] = checkEntry; // Assign "NaN" if checkEntry is NaN
+                acc[dayStr] = checkEntry;
               } else {
-                // If there are working hours, prioritize them
                 const workingHrs = parseFloat(checkEntry);
 
                 if (workingHrs < (entry?.normalWorkHrs || 0)) {
@@ -570,7 +467,7 @@ export const ApplyVSFunction = ({
                     (entry?.normalWorkHrs || 0) - workingHrs
                   ).toFixed(1);
 
-                  acc[dayStr] = `x(${absence})${workingHrs}`; // Format as "absence(workingHrs)"
+                  acc[dayStr] = `x(${absence})${workingHrs}`;
                 } else {
                   acc[dayStr] = workingHrs.toString();
                 }
@@ -578,35 +475,30 @@ export const ApplyVSFunction = ({
             } else if (isPublicHoliday) {
               acc[dayStr] = "PH";
             } else if (leaveType) {
-              acc[dayStr] = leaveType; // Use leave type if available
+              acc[dayStr] = leaveType;
             } else if (dayOfWeek === "Saturday") {
               const result = parseFloat(entry?.normalWorkHrs) / 2;
 
-              // Extract salary type and normalize it to lowercase
               const salaryType =
                 workInfoData?.salaryType[
                   workInfoData?.salaryType.length - 1
-                ]?.toLowerCase(); // Convert to lowercase for case-insensitive matching
+                ]?.toLowerCase();
 
-              // Define salary type categories
               const monthlyTypes = ["monthly", "month", "m"];
               const dailyTypes = ["daily", "day", "d"];
 
-              // Evaluate conditions
               if (!checkEntry && monthlyTypes.includes(salaryType)) {
                 acc[dayStr] = "PHD";
               } else if (!checkEntry && dailyTypes.includes(salaryType)) {
                 acc[dayStr] = "OFF";
-              } else if (result === parseInt(checkEntry)) {
+              } else if (result === parseFloat(checkEntry)) {
                 acc[dayStr] = "HPHD";
               } else {
-                acc[dayStr] = checkEntry; // Default to checkEntry
+                acc[dayStr] = checkEntry;
               }
             } else if (dayOfWeek === "Sunday") {
-              // Sunday condition: Leave blank
               acc[dayStr] = "";
             } else {
-              // Default condition: Mark as "A" (absent)
               acc[dayStr] = "A";
             }
 
@@ -619,17 +511,15 @@ export const ApplyVSFunction = ({
                 id: id,
                 workingHrs: workingHrs,
                 leaveCounts: empLeaveCount.leaveCounts,
-                // leaveCounts: leaveCounts,
-                // hollydayCounts: holidaysAndAbsent,
+
                 newDate: getDate.date,
                 location: res?.[0],
                 jobcode: jobcode?.[0],
-                // dateDifferences:empLeaveCount.dateDifferences,
               }
             : {
                 ...val,
                 id: id,
-                // hollydayCounts: holidaysAndAbsent,
+
                 workingHrs: workingHrs,
                 leaveCounts: {},
                 newDate: getDate.date,
@@ -638,10 +528,6 @@ export const ApplyVSFunction = ({
               };
         });
 
-        // console.log("addLeaveTypeCount : ", addLeaveTypeCount);
-        // Example usage:
-
-        // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         const updateFieldBasedOnConditions = async (inputData) => {
           const keysToCount = ["OFF", "PH", "PHD", "A"];
 
@@ -656,27 +542,20 @@ export const ApplyVSFunction = ({
           inputData.forEach((data, index) => {
             inputData.forEach((compareData, compareIndex) => {
               if (index !== compareIndex) {
-                // Compare only different objects
-
-                // Check if empBadgeNo, date, and different jobcode match
                 if (
                   data.empBadgeNo === compareData.empBadgeNo &&
                   //   data.date === compareData.date &&
                   data.jobcode !== compareData.jobcode
                 ) {
-                  // Iterate through workingHrs keys (dates)
                   Object.keys(data.workingHrs).forEach((dateKey) => {
                     const value = data.workingHrs[dateKey];
                     const compareValue = compareData.workingHrs[dateKey];
 
-                    // Condition to check for the specific patterns
-                    const regex = /^x\(\d+(\.\d+)?\)\d+(\.\d+)?$/; // Matches x(0.9)7.1 or similar
+                    const regex = /^x\(\d+(\.\d+)?\)\d+(\.\d+)?$/;
 
                     if (regex.test(value) && !regex.test(compareValue)) {
-                      // Assign 0 to the compareData field if value matches the pattern and compareValue does not
                       compareData.workingHrs[dateKey] = "0";
                     } else if (!regex.test(value) && regex.test(compareValue)) {
-                      // Assign 0 to the data field if compareValue matches the pattern and value does not
                       data.workingHrs[dateKey] = "0";
                     }
                   });
@@ -699,7 +578,6 @@ export const ApplyVSFunction = ({
               for (const date in data.workingHrs) {
                 const value = data.workingHrs[date];
 
-                // Check for specific leave types (AL, CL, UAL, SL)
                 if (value?.startsWith("HAL")) {
                   newLeaveCount.AL += 0.5;
                 } else if (value === "AL") {
@@ -730,13 +608,11 @@ export const ApplyVSFunction = ({
           return inputData;
         };
 
-        // Example usage
         const updatedData = await updateFieldBasedOnConditions(
           addLeaveTypeCount
         );
-        // console.log("updatedData : ", updatedData);
+       
         const getSummaryUpdaterName = async (updatedData) => {
-          // Use Promise.all to handle the asynchronous operations
           const results = await Promise.all(
             updatedData.map(async (val) => {
               const getHisID = val.data.find((fin) => fin);
@@ -748,23 +624,17 @@ export const ApplyVSFunction = ({
                 return { ...val, timeKeeper: getHisName?.name || null };
               }
 
-              // Return the original object if no assignBy is found
               return { ...val, timeKeeper: null };
             })
           );
 
-          // console.log(results);
           return results;
         };
 
-        // Call the function with updatedData
         const UpdaterNameAdded = await getSummaryUpdaterName(updatedData);
-
-        // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
         const transformedData = UpdaterNameAdded?.map((item) => {
           const initialMatch = mergedData?.find((datasetItem) => {
-            // Ensure data types match and check for null/undefined
             const empBadgeNoMatch =
               datasetItem.empBadgeNo &&
               item.empBadgeNo &&
@@ -804,17 +674,9 @@ export const ApplyVSFunction = ({
 
           const id = item?.id;
           const empName = item?.data?.map((m) => m.empName);
-          // const fileType = item?.data?.map((m) => m.fileType);
-          // console.log(fileType);
-          // const getAllFileType = item?.data.reduce(
-          //   (accumulator, currentValue) => {
-          //     accumulator.push(currentValue.fileType);
-          //     return accumulator;
-          //   },
-          //   []
-          // );
-          // const getFileType=getAllFileType[0] || [];
+
           const firstFileType = item?.data?.[0]?.fileType;
+          const data = item?.data;
           const empLeaveCount = item?.leaveCounts;
           const workingHrs = item?.workingHrs;
           const dateForSelectMY = item?.newDate;
@@ -824,15 +686,13 @@ export const ApplyVSFunction = ({
 
           const overtimeHours = Array.from({ length: dayCounts }, (_, i) => {
             const currentDay = new Date(getStartDate);
-            currentDay.setDate(getStartDate.getDate() + i); // Increment date
+            currentDay.setDate(getStartDate.getDate() + i);
             return currentDay;
           }).reduce((acc, currentDay) => {
-            // Create the key in "day-month-year" format
             const dayStr = `${currentDay.getDate()}-${
               currentDay.getMonth() + 1
             }-${currentDay.getFullYear()}`;
 
-            // Find matching data for the current day
             const entry = item?.data?.find(({ date }) => {
               const entryDate = new Date(date);
 
@@ -844,7 +704,6 @@ export const ApplyVSFunction = ({
               );
             });
 
-            // Initialize overtime hours from the entry
             const overtimeHours = entry?.empWorkInfo[0]?.OVERTIMEHRS
               ? parseFloat(entry?.empWorkInfo[0].OVERTIMEHRS)
               : null;
@@ -854,11 +713,10 @@ export const ApplyVSFunction = ({
               acc[dayStr] = getVerification;
             }
 
-            // Add the overtime hours to the accumulator
             if (overtimeHours !== null || overtimeHours !== undefined) {
               acc[dayStr] = overtimeHours;
             } else {
-              acc[dayStr] = 0; // Default to "A" if no overtime
+              acc[dayStr] = 0;
             }
 
             return acc;
@@ -871,17 +729,14 @@ export const ApplyVSFunction = ({
             extractValue
           ) => {
             return Array.from({ length: dayCounts }, (_, i) => {
-              // Generate the date for the current iteration
               const currentDay = new Date(getStartDate);
-              currentDay.setDate(getStartDate.getDate() + i); // Increment date
+              currentDay.setDate(getStartDate.getDate() + i);
               return currentDay;
             }).reduce((acc, currentDay) => {
-              // Format the date as "day-month-year"
               const dayStr = `${currentDay.getDate()}-${
                 currentDay.getMonth() + 1
               }-${currentDay.getFullYear()}`;
 
-              // Find matching entry from the data
               const entry = item?.data?.find(({ date }) => {
                 const entryDate = new Date(date);
                 return (
@@ -891,20 +746,19 @@ export const ApplyVSFunction = ({
                 );
               });
 
-              // Use extractValue function to determine the value to assign
               acc[dayStr] = extractValue(entry, currentDay);
 
               return acc;
             }, {});
           };
 
-          // Function to get 'verify' or null
           const getVerify = processEntries(
             item,
             dayCounts,
             getStartDate,
             (entry) => {
-              return entry?.verify ?? null;
+              // return entry?.verify ?? null;
+              return entry?.empWorkInfo?.[0]?.verify ?? null;
             }
           );
 
@@ -914,7 +768,10 @@ export const ApplyVSFunction = ({
             dayCounts,
             getStartDate,
             (entry) => {
-              return entry?.verify === "Yes" ? entry.updatedAt : null;
+              // return entry?.verify === "Yes" ? entry.updatedAt : null;
+              return entry?.empWorkInfo?.[0]?.verify === "Yes"
+                ? entry.updatedAt
+                : null;
             }
           );
 
@@ -924,6 +781,8 @@ export const ApplyVSFunction = ({
 
           return {
             id: id,
+            data: data,
+            grouped: grouped,
             empName: empName,
             jobcode: jobcode[0] || "",
             dateForSelectMY: dateForSelectMY,
@@ -940,7 +799,7 @@ export const ApplyVSFunction = ({
             assignUpdaterDateTime: assignUpdaterDateTime,
           };
         }).filter(Boolean);
-        // console.log("transformedData : ", transformedData);
+      
         await ProcessedDataFunc(transformedData);
       };
       if (convertedStringToArrayObj && convertedStringToArrayObj.length > 0) {
@@ -949,7 +808,5 @@ export const ApplyVSFunction = ({
         ProcessedDataFunc(null);
       }
     }, [convertedStringToArrayObj]);
-  } catch (err) {
-    // console.log("ERROR : ", err);
-  }
+  } catch (err) {}
 };

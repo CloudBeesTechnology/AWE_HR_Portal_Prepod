@@ -67,9 +67,9 @@ export const UploadSBWfile = (
 
         function cleanKey(key) {
           if (typeof key !== "string") {
-            return key; // Return value if not a string (e.g., number, object)
+            return key;
           }
-          return key.replace(/[^a-zA-Z0-9]/g, ""); // Removes all non-alphanumeric characters
+          return key.replace(/[^a-zA-Z0-9]/g, "");
         }
 
         const data = tableBodyData.flat();
@@ -77,8 +77,8 @@ export const UploadSBWfile = (
           const cleanedItem = {};
 
           for (const key in item) {
-            const cleanedKey = cleanKey(key); // Clean the key
-            cleanedItem[cleanedKey] = item[key]; // Set the value using the cleaned key
+            const cleanedKey = cleanKey(key);
+            cleanedItem[cleanedKey] = item[key];
           }
 
           return cleanedItem;
@@ -104,26 +104,22 @@ export const UploadSBWfile = (
 
         const getCleanedDate = (obj) => {
           const date = obj?.DATE?.trim() || "";
-          // Remove "(Tue)" or similar day abbreviations
+
           return date.replace(/\(\w+\)/, "").trim();
         };
 
-        // Check the first object's DATE, fallback to the second object if needed
         let dateValue = getCleanedDate(updatedDataArray[0]);
         if (!dateValue) {
           dateValue = getCleanedDate(updatedDataArray[1]);
         }
 
         function convertDateFormat(dateStr) {
-          // Split the input string by '/'
           const parts = dateStr.split("/");
 
-          // Validate the input format
           if (parts.length !== 3) {
             throw new Error("Invalid date format. Expected DD/MM/YYYY");
           }
 
-          // Rearrange the parts to MM/DD/YYYY
           const [day, month, year] = parts;
           return `${day}/${month}/${year}`;
         }

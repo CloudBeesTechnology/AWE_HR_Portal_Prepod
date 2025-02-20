@@ -14,6 +14,7 @@ export const TempIDProvider = ({ children }) => {
   const [endDate, setEndDate] = useState("");
   const [searchQuery, setSearchQuery] = useState(null);
   const [showListTimeSheet, setShowListTimeSheet] = useState(true);
+
   const [categoryFilter, setCategoryFilter] = useState("Select Excel Sheet");
   const [categoryFilters, setCategoryFilters] = useState(null);
   const [tableData, setTableData] = useState(null);
@@ -21,6 +22,7 @@ export const TempIDProvider = ({ children }) => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [getStartDate, setGetStartDate] = useState(new Date());
   const [getEndDate, setGetEndDate] = useState(new Date());
+
   const [gmMail, setGmMail] = useState();
   const [hrManagerMail, setHrManagerMail] = useState();
   const [gmCount, setGmCount] = useState(0);
@@ -28,6 +30,7 @@ export const TempIDProvider = ({ children }) => {
   const [userType, setUserType] = useState("");
   const [userID, setUserID] = useState("");
   const [gmPosition, setGmPosition] = useState("");
+  const [GMEmpID, setGMEmpID] = useState("")
   const { workInfoData, empPIData } = useContext(DataSupply);
 
   useEffect(() => {
@@ -36,34 +39,32 @@ export const TempIDProvider = ({ children }) => {
     const userType = localStorage.getItem("userType");
     setUserType(userType);
     // console.log(userType);
-    
   }, []);
 
   useEffect(() => {
-
     if (workInfoData && userType === "Manager") {
       const generalManagerPosition = workInfoData.filter((item) =>
         item.position.includes("GENERAL MANAGER")
       );
     
-      // console.log("General Manager Positions:", generalManagerPosition); // Log the filtered array
+      // console.log("General Manager Positions:", generalManagerPosition); 
       
       const gmPosition = generalManagerPosition[0]; 
       // console.log("gmPosition:", gmPosition); // Log gmPosition after filtering
-    
+
       if (gmPosition && gmPosition.position.length > 0) {
-        const lastPosition = gmPosition.position[gmPosition.position.length - 1];
-        // console.log("Last Position:", lastPosition); 
-    
+        const lastPosition =
+          gmPosition.position[gmPosition.position.length - 1];
+        // console.log("Last Position:", lastPosition);
+
         if (userID === gmPosition.empID) {
           setGmPosition(lastPosition);
-          // console.log("Gm Position Set:", lastPosition); 
+          // console.log("Gm Position Set:", lastPosition);
         }
       }
     }
-    
-    // console.log("Final gmPosition Outside:", gmPosition); 
-    
+
+    // console.log("Final gmPosition Outside:", gmPosition);
 
     // console.log("gm 4", gmPosition);
     if (workInfoData && empPIData) {
@@ -80,6 +81,7 @@ export const TempIDProvider = ({ children }) => {
         if (gmInfo) {
           // console.log("GM Info:", gmInfo);
           setGmMail(gmInfo.officialEmail);
+          setGMEmpID(gmInfo.empID);
         } else {
           // console.log("GM Info not found.");
         }
@@ -110,6 +112,7 @@ export const TempIDProvider = ({ children }) => {
       value={{
         gmMail,
         gmPosition,
+        GMEmpID,
         hrManagerMail,
         gmCount,
         hrManagerCount,

@@ -123,7 +123,7 @@ export const LeaveSummaryPopUp = ({
         // console.log(leaveKey);
 
         const applicationStartDate =
-          val.empLeaveSelectedFrom || val.empLeaveStartDate || ""; // Assuming format is "yyyy-mm-dd"
+          val.empLeaveSelectedFrom || val.empLeaveStartDate || ""; 
         const applicationEndDate =
           val.empLeaveSelectedTo || val.empLeaveEndDate || "";
 
@@ -133,75 +133,45 @@ export const LeaveSummaryPopUp = ({
         const appStartDate = DateFormat(applicationStartDate);
         const appEndDate = DateFormat(applicationEndDate);
 
-        // Log the parsed dates for debugging
-        // console.log("Raw Dates:", {
-        //   applicationStartDate,
-        //   applicationEndDate,
-        //   startDate,
-        //   endDate,
-        // });
-        // console.log("Formatted Dates:", {
-        //   filterStartDate,
-        //   filterEndDate,
-        //   appStartDate,
-        //   appEndDate,
-        // });
 
         let shouldProcessLeave = false;
 
         if (startDate && endDate) {
-          // console.log('Both startDate and endDate are defined');
-
-          // Check if leave starts within the filter date range
+  
           if (
             appStartDate >= filterStartDate &&
             appStartDate <= filterEndDate
           ) {
-            // console.log('Leave start date is within the filter range.');
+       
             shouldProcessLeave = true;
           }
 
-          // Check if leave ends within the filter date range
           if (appEndDate >= filterStartDate && appEndDate <= filterEndDate) {
-            // console.log('Leave end date is within the filter range.');
             shouldProcessLeave = true;
           }
 
-          // Check if leave fully contains the filter range
           if (appStartDate <= filterStartDate && appEndDate >= filterEndDate) {
-            // console.log('Leave period fully contains the filter range.');
             shouldProcessLeave = true;
           }
         } else {
-          // console.log('startDate and endDate are not defined, defaulting to current year');
           shouldProcessLeave = isCurrentYear(
             val.empLeaveSelectedFrom || val.empLeaveStartDate
           );
         }
 
-        // Log whether the leave will be processed based on the date checks
-        // console.log('Should process leave for', val.empID, ':', shouldProcessLeave);
-        // console.log(leaveKey);
-
         if (shouldProcessLeave && leaveKey) {
-          // console.log(`Processing leave for ${val.empLeaveType} of employee ${val.empID}`);
-          // console.log(val.managerStatus,"manager status");
 
           if (
             val.managerStatus === "Approved" &&
             val.empStatus !== "Cancelled"
-          ) {
-            // console.log('Leave is approved and not cancelled');
+          ) {    
             acc[val.empID][leaveKey].taken += Number(val.leaveDays) || 0;
-            // console.log(acc[val.empID][leaveKey].taken,"leace approved");
           } else if (
             val.managerStatus === "Pending" &&
             val.supervisorStatus !== "Rejected" &&
             val.empStatus !== "Cancelled"
-          ) {
-            // console.log('Leave is pending and not rejected');
+          ) {    
             acc[val.empID][leaveKey].waitingLeave += Number(val.leaveDays) || 0;
-            // console.log(acc[val.empID][leaveKey].waitingLeaves,"dfghj");
           }
 
           if (
@@ -217,9 +187,10 @@ export const LeaveSummaryPopUp = ({
             const taken = acc[val.empID][leaveKey].taken || 0;
             const waiting = acc[val.empID][leaveKey].waitingLeave || 0;
 
-            const remaining = total - (taken + waiting)
-            // console.log('Leave remaining:', remaining);
-            acc[val.empID][leaveKey].remaining = remaining;
+            const remaining = total - (taken + waiting);
+            const formattedRemaining = remaining < 5 ? Math.floor(remaining) : remaining;
+
+            acc[val.empID][leaveKey].remaining = formattedRemaining;
           }
         } else {
           // console.log("Leave will not be processed for employee", val.empID);
@@ -228,10 +199,10 @@ export const LeaveSummaryPopUp = ({
         return acc;
       }, {});
 
-      const summary = result[empDetails.empID]; // Find the leave summary for the employee
+      const summary = result[empDetails.empID]; 
       // console.log(summary);
 
-      setLeaveSummary(summary); // Set the leave summary for the employee
+      setLeaveSummary(summary); 
       // console.log(leaveSummary);
     };
 
@@ -253,7 +224,7 @@ export const LeaveSummaryPopUp = ({
     "unPaidAuthorizeAnnual",
   ];
 
-  // Format leave type name
+
   const formatLeaveType = (type) => {
     return type
       .replace(/Leave/g, "")
@@ -265,7 +236,7 @@ export const LeaveSummaryPopUp = ({
     content: () => LeaveDoc.current,
     onBeforePrint: () => console.log("Preparing print..."),
     onAfterPrint: () => console.log("Print complete"),
-    pageStyle: "print", // This ensures the print view uses a different CSS style
+    pageStyle: "print", 
   });
 
   const getDisplayDateRange = () => {
@@ -424,21 +395,16 @@ export const LeaveSummaryPopUp = ({
                     "compensateLeave", "unPaidAuthorizeSick",
                     "unPaidAuthorizeAnnual",
                   ].includes(leaveType);
-
-                  // console.log('Gender:', leaveSummary?.gender);
-
-                  // Conditional rendering based on gender
+             
                   if (
                     (leaveType === "maternityLeave" &&
-                      leaveSummary?.gender !== "Female") || // Hide maternity for males
+                      leaveSummary?.gender !== "Female") || 
                     (leaveType === "paternityLeave" &&
-                      leaveSummary?.gender !== "Male") // Hide paternity for females
-                  ) {
-                    // console.log(`Skipping ${leaveType} for ${leaveSummary?.gender}`);
-                    return null; // Skip rendering this row if gender doesn't match
+                      leaveSummary?.gender !== "Male") 
+                  ) {               
+                    return null;
                   }
-
-                  // console.log(`Rendering row for ${leaveType} for ${leaveSummary?.gender}`);
+           
                   return (
                     <tr key={leaveType}>
                       <td className="border px-4 py-2">

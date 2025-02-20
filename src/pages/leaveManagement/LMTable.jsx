@@ -52,10 +52,23 @@ export const LMTable = () => {
         }
         return false;
       })
-      .sort(
-        (a, b) =>
-          new Date(b.leaveStatusCreatedAt) - new Date(a.leaveStatusCreatedAt)
-      );
+      .sort((a, b) => {
+        // Check for manager status first, then supervisor status if manager status is not "Pending"
+        const isManagerPendingA = a.managerStatus === "Pending";
+        const isManagerPendingB = b.managerStatus === "Pending";
+        const isSupervisorPendingA = a.supervisorStatus === "Pending";
+        const isSupervisorPendingB = b.supervisorStatus === "Pending";
+  
+        // Sort Pending statuses separately
+        if (isManagerPendingA && !isManagerPendingB) return -1;
+        if (!isManagerPendingA && isManagerPendingB) return 1;
+        
+        if (isSupervisorPendingA && !isSupervisorPendingB) return -1;
+        if (!isSupervisorPendingA && isSupervisorPendingB) return 1;
+  
+        // Handle sorting by leaveStatusCreatedAt if not "Pending"
+        return new Date(b.leaveStatusCreatedAt) - new Date(a.leaveStatusCreatedAt);
+      });
 
     // Step 2: Apply status filter
     if (filterStatus !== "All") {
@@ -147,6 +160,7 @@ export const LMTable = () => {
       noResults: false,
     });
   };
+  
   useEffect(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
 
@@ -291,9 +305,7 @@ export const LMTable = () => {
                           className="border-b-2 border-[blue] text-[blue]"
                           onClick={() => {
                             handleClickForToggle();
-                            handleViewClick(item, "LM");
-                         
-                                                  
+                            handleViewClick(item, "LM");             
                           }}
                         >
                           {item["submitted Form"] || "View"}

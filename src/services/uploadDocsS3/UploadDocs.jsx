@@ -1,7 +1,7 @@
 import { getCurrentUser } from "@aws-amplify/auth";
 import { uploadData, remove } from "@aws-amplify/storage";
 
-export const uploadDocs = async (
+export const uploadDocString = async (
   file,
   fileType,
   setUploadedDocs,
@@ -10,7 +10,6 @@ export const uploadDocs = async (
 ) => {
   try {
     const currentUser = await getCurrentUser();
-    console.log(empID);
 
     if (currentUser) {
       const result = await uploadData({
@@ -18,7 +17,6 @@ export const uploadDocs = async (
         data: file,
       }).result;
       const fileUrl = result.path;
-      console.log(fileUrl);
 
       const uploadDate = new Date().toISOString().split("T")[0];
 
@@ -44,16 +42,86 @@ export const uploadDocs = async (
 
           return updatedUploads;
         });
-      } else if (
-        fileType === "profilePhoto" ||
-        fileType === "inducBriefUp" ||
-        fileType === "uploadJobDetails"
-      ) {
+      } 
+      // else if (
+      //   fileType === "profilePhoto" ||
+      //   fileType === "inducBriefUp" ||
+      //   fileType === "uploadJobDetails"||
+      //   fileType === "loiFile"
+      // ) {
         setUploadedDocs((prevState) => ({
           ...prevState,
           [fileType]: fileUrl,
         }));
-      } else {
+      // } 
+      // else {
+      //   setUploadedDocs((prev) => ({
+      //     ...prev,
+      //     [fileType]: [
+      //       ...(prev[fileType] || []),
+      //       { upload: fileUrl, date: uploadDate },
+      //     ],
+      //   }));
+      // }
+    }
+  } catch (error) {
+    // console.log(`Error uploading ${fileType}:`, error);
+  }
+};
+export const uploadDocs = async (
+  file,
+  fileType,
+  setUploadedDocs,
+  empID,
+  index
+) => {
+  try {
+    const currentUser = await getCurrentUser();
+
+    if (currentUser) {
+      const result = await uploadData({
+        path: `public/${fileType}/${empID}/${file.name}`,
+        data: file,
+      }).result;
+      const fileUrl = result.path;
+
+      const uploadDate = new Date().toISOString().split("T")[0];
+
+      if (typeof index === "number") {
+        setUploadedDocs((prev) => {
+          const updatedUploads = { ...prev };
+
+          // Initialize the array if it doesn't exist
+          updatedUploads[fileType] = updatedUploads[fileType] || [];
+          updatedUploads[fileType][index] =
+            updatedUploads[fileType][index] || [];
+
+          const existingUpload = updatedUploads[fileType][index].find(
+            (item) => item.upload === fileUrl
+          );
+
+          if (!existingUpload) {
+            updatedUploads[fileType][index].push({
+              upload: fileUrl,
+              date: uploadDate,
+            });
+          }
+
+          return updatedUploads;
+        });
+      } 
+      // else if (
+      //   fileType === "profilePhoto" ||
+      //   fileType === "inducBriefUp" ||
+      //   fileType === "uploadJobDetails"||
+      //   fileType === "loiFile"
+      // ) {
+      //   setUploadedDocs((prevState) => ({
+      //     ...prevState,
+      //     [fileType]: fileUrl,
+      //   }));
+      // } 
+      // else {
         setUploadedDocs((prev) => ({
           ...prev,
           [fileType]: [
@@ -62,14 +130,20 @@ export const uploadDocs = async (
           ],
         }));
       }
-    }
+    // }
   } catch (error) {
-    console.log(`Error uploading ${fileType}:`, error);
+    // console.log(`Error uploading ${fileType}:`, error);
   }
 };
 
 // Delete file from S3 and update state
-export const deleteDocs = async (fileUrl, fileType, setUploadedDocs, empID, index) => {
+export const deleteDocs = async (
+  fileUrl,
+  fileType,
+  setUploadedDocs,
+  empID,
+  index
+) => {
   try {
     // Delete from S3
     await remove(fileUrl);
@@ -78,10 +152,13 @@ export const deleteDocs = async (fileUrl, fileType, setUploadedDocs, empID, inde
     setUploadedDocs((prev) => {
       const updatedUploads = { ...prev };
 
-      if (typeof index === "number" && Array.isArray(updatedUploads[fileType])) {
-        updatedUploads[fileType][index] = updatedUploads[fileType][index].filter(
-          (item) => item.upload !== fileUrl
-        );
+      if (
+        typeof index === "number" &&
+        Array.isArray(updatedUploads[fileType])
+      ) {
+        updatedUploads[fileType][index] = updatedUploads[fileType][
+          index
+        ].filter((item) => item.upload !== fileUrl);
 
         // Remove the index array if it becomes empty
         if (updatedUploads[fileType][index].length === 0) {
@@ -99,17 +176,10 @@ export const deleteDocs = async (fileUrl, fileType, setUploadedDocs, empID, inde
 
       return updatedUploads;
     });
-
-    console.log(`File with URL ${fileUrl} deleted from S3 and state.`);
   } catch (error) {
     console.error(`Error deleting ${fileType}:`, error);
   }
 };
-
-
-
-
-
 // import { getCurrentUser } from "@aws-amplify/auth";
 // import { uploadData } from "@aws-amplify/storage";
 

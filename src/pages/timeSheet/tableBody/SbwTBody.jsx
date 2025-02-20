@@ -56,17 +56,17 @@ export const SbwTBody = ({
                   <td className="text-center px-4 flex-1">
                     {convertToISODate(m.date)}
                   </td>
-                  <td className="text-center px-4 flex-1">{m.inTime}</td>
-                  <td className="text-center px-4 flex-1">{m.outTime}</td>
-                  <td className="text-center px-4 flex-1">{m.totalInOut}</td>
-                  <td className="text-center px-4 flex-1">{m.allDayHrs}</td>
-                  <td className="text-center px-4 flex-1">{m.netMins}</td>
-                  <td className="text-center px-4 flex-1">{m.totalHrs}</td>
+                  <td className="text-center px-4 flex-1">{m.inTime || 0}</td>
+                  <td className="text-center px-4 flex-1">{m.outTime || 0}</td>
+                  <td className="text-center px-4 flex-1">{m.totalInOut || 0}</td>
+                  <td className="text-center px-4 flex-1">{m.allDayHrs || 0}</td>
+                  <td className="text-center px-4 flex-1">{m.netMins || 0}</td>
+                  <td className="text-center px-4 flex-1">{m.totalHrs || 0}</td>
                   <td className="text-center px-4 flex-1">
                     {m.normalWorkHrs || 0}
                   </td>
-                  <td className="text-center px-4 flex-1">{m.actualWorkHrs}</td>
-                  <td className="text-center px-4 flex-1">{m.otTime}</td>
+                  <td className="text-center px-4 flex-1">{m.actualWorkHrs || 0}</td>
+                  <td className="text-center px-4 flex-1">{m.otTime || 0}</td>
                   <td className="text-center px-4 flex-1">{m.remarks}</td>
                 </tr>
               );
