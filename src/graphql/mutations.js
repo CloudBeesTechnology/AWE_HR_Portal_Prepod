@@ -3295,6 +3295,10 @@ export const createTicketRequest = /* GraphQL */ `
       to
       fromDate
       toDate
+      gmDate
+      gmEmpID
+      gmRemarks
+      gmStatus
       createdAt
       updatedAt
       __typename
@@ -3325,6 +3329,10 @@ export const updateTicketRequest = /* GraphQL */ `
       to
       fromDate
       toDate
+      gmDate
+      gmEmpID
+      gmRemarks
+      gmStatus
       createdAt
       updatedAt
       __typename
@@ -3355,6 +3363,10 @@ export const deleteTicketRequest = /* GraphQL */ `
       to
       fromDate
       toDate
+      gmDate
+      gmEmpID
+      gmRemarks
+      gmStatus
       createdAt
       updatedAt
       __typename
