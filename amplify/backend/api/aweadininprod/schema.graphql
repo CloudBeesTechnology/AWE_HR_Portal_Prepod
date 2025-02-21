@@ -789,5 +789,6 @@ type LeaveStatus @model @auth(rules: [{allow: public}]) {
   selectedFrom: String
   startDate: AWSDate
   endDate: AWSDate
+  receivedDate: String
 }
  

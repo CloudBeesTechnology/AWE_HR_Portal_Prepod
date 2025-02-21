@@ -869,6 +869,7 @@ type LeaveStatus @aws_iam @aws_api_key {
   selectedFrom: String
   startDate: AWSDate
   endDate: AWSDate
+  receivedDate: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -6092,6 +6093,7 @@ input ModelLeaveStatusFilterInput {
   selectedFrom: ModelStringInput
   startDate: ModelStringInput
   endDate: ModelStringInput
+  receivedDate: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelLeaveStatusFilterInput]
@@ -6125,6 +6127,7 @@ input ModelLeaveStatusConditionInput {
   selectedFrom: ModelStringInput
   startDate: ModelStringInput
   endDate: ModelStringInput
+  receivedDate: ModelStringInput
   and: [ModelLeaveStatusConditionInput]
   or: [ModelLeaveStatusConditionInput]
   not: ModelLeaveStatusConditionInput
@@ -6159,6 +6162,7 @@ input CreateLeaveStatusInput {
   selectedFrom: String
   startDate: AWSDate
   endDate: AWSDate
+  receivedDate: String
 }
 
 input UpdateLeaveStatusInput {
@@ -6188,6 +6192,7 @@ input UpdateLeaveStatusInput {
   selectedFrom: String
   startDate: AWSDate
   endDate: AWSDate
+  receivedDate: String
 }
 
 input DeleteLeaveStatusInput {
@@ -6221,6 +6226,7 @@ input ModelSubscriptionLeaveStatusFilterInput {
   selectedFrom: ModelSubscriptionStringInput
   startDate: ModelSubscriptionStringInput
   endDate: ModelSubscriptionStringInput
+  receivedDate: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionLeaveStatusFilterInput]

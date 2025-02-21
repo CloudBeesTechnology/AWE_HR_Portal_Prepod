@@ -2398,6 +2398,7 @@ export const getLeaveStatus = /* GraphQL */ `
       selectedFrom
       startDate
       endDate
+      receivedDate
       createdAt
       updatedAt
       __typename
@@ -2438,6 +2439,7 @@ export const listLeaveStatuses = /* GraphQL */ `
         selectedFrom
         startDate
         endDate
+        receivedDate
         createdAt
         updatedAt
         __typename

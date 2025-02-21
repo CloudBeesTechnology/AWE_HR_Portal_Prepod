@@ -47,6 +47,7 @@ export declare type LeaveStatusUpdateFormInputValues = {
     selectedFrom?: string;
     startDate?: string;
     endDate?: string;
+    receivedDate?: string;
 };
 export declare type LeaveStatusUpdateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -74,6 +75,7 @@ export declare type LeaveStatusUpdateFormValidationValues = {
     selectedFrom?: ValidationFunction<string>;
     startDate?: ValidationFunction<string>;
     endDate?: ValidationFunction<string>;
+    receivedDate?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type LeaveStatusUpdateFormOverridesProps = {
@@ -103,6 +105,7 @@ export declare type LeaveStatusUpdateFormOverridesProps = {
     selectedFrom?: PrimitiveOverrideProps<TextFieldProps>;
     startDate?: PrimitiveOverrideProps<TextFieldProps>;
     endDate?: PrimitiveOverrideProps<TextFieldProps>;
+    receivedDate?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type LeaveStatusUpdateFormProps = React.PropsWithChildren<{
     overrides?: LeaveStatusUpdateFormOverridesProps | undefined | null;
