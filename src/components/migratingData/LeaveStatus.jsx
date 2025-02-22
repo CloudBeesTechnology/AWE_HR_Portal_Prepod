@@ -38,12 +38,13 @@ export const LeaveStatus = () => {
   // Link 3:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus/LeaveStatus2025.csv"
   // Link 4:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus/LeaveStatus2025Supervisor.csv"
   // Link 5:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus+Dev/LeaveStatusTesting+Prod.csv" date:22-02-2025 time:12:40
+  // Link 6:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus/LeaveStatus2025.csv" date:22-02-2025 time:5:52
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus+Dev/LeaveStatusTesting+Prod.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus/LeaveStatus2025.csv",
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
@@ -140,9 +141,9 @@ export const LeaveStatus = () => {
           LeaveValue.empID = String(LeaveValue.empID);
           // console.log(LeaveValue.applyTo);
         }
-        // console.log("Leave value processed", LeaveValue);
+        console.log("Leave value processed", LeaveValue);
 
-        await CRLeaveDetails({ LeaveValue });
+        // await CRLeaveDetails({ LeaveValue });
       }
     } catch (error) {
       console.error("Error fetching Excel file:", error);
@@ -156,6 +157,7 @@ export const LeaveStatus = () => {
     </div>
   );
 };
+
 // import axios from "axios";
 // import React, { useContext } from "react";
 // import * as XLSX from "xlsx";

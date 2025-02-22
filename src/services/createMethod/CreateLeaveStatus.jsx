@@ -130,18 +130,18 @@ const creatingDate=DateFormat(receivedDate)
 
     console.log(totalData);
 
-    // try {
-    //   const res = await Promise.all([
-    //     client.graphql({
-    //       query: createLeaveStatus,
-    //       variables: { input: totalData },
-    //     }),
-    //   ]);
-    //   console.log("Response", res);
-    // } catch (error) {
-    //   console.error("Error executing GraphQL requests:", error);
-    //   throw error;
-    // }
+    try {
+      const res = await Promise.all([
+        client.graphql({
+          query: createLeaveStatus,
+          variables: { input: totalData },
+        }),
+      ]);
+      console.log("Response", res);
+    } catch (error) {
+      console.error("Error executing GraphQL requests:", error);
+      throw error;
+    }
   }, []);
 
   return { CRLeaveDetails };
