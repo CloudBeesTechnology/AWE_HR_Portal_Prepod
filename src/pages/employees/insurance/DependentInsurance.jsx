@@ -71,10 +71,15 @@ export const DependentInsurance = () => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
     // Allowed file types
-    const allowedTypes = ["application/pdf"];
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
     if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file");
-      return;
+        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+        return;
     }
     setValue(`depInsurance[${index}].depenInfUpload, selectedFile`);
     try {

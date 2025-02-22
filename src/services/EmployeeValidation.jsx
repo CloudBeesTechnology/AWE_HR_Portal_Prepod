@@ -209,7 +209,7 @@ export const LabourImmigrationSchema = Yup.object().shape({
           "Only PDF allowed", // Custom error message
           (value) => {
             if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(value.type);
             }
             if (typeof value === "string") {
               return isValidUrl(value); // Check if the string is a valid URL
@@ -230,7 +230,7 @@ export const LabourImmigrationSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(value.type);
             }
 
             // If value is a string, check if it's a valid URL
@@ -253,7 +253,7 @@ export const LabourImmigrationSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(value.type);
             }
 
             // If value is a string, check if it's a valid URL
@@ -290,7 +290,7 @@ export const LabourImmigrationSchema = Yup.object().shape({
             "Only PDF, image files, or valid URLs are allowed",
             (value) => {
               if (value instanceof File) {
-                return ["application/pdf", "image/jpeg", "image/png"].includes(
+                return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                   value.type
                 );
               }
@@ -310,7 +310,7 @@ export const LabourImmigrationSchema = Yup.object().shape({
             "Only PDF, image files, or valid URLs are allowed",
             (value) => {
               if (value instanceof File) {
-                return ["application/pdf", "image/jpeg", "image/png"].includes(
+                return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                   value.type
                 );
               }
@@ -805,7 +805,7 @@ export const WorkInfoSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(value.type);
             }
             if (typeof value === "string") {
               return isValidUrl(value); // Check if the string is a valid URL
@@ -826,7 +826,7 @@ export const WorkInfoSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(value.type);
             }
             if (typeof value === "string") {
               return isValidUrl(value); // Check if the string is a valid URL
@@ -847,7 +847,7 @@ export const WorkInfoSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(value.type);
             }
             if (typeof value === "string") {
               return isValidUrl(value); // Check if the string is a valid URL
@@ -868,7 +868,7 @@ export const WorkInfoSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(value.type);
             }
             if (typeof value === "string") {
               return isValidUrl(value); // Check if the string is a valid URL
@@ -889,7 +889,7 @@ export const WorkInfoSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(value.type);
             }
             if (typeof value === "string") {
               return isValidUrl(value); // Check if the string is a valid URL
@@ -1110,7 +1110,7 @@ export const WorkInfoSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(value.type);
             }
             if (typeof value === "string") {
               return isValidUrl(value); // Check if the string is a valid URL
@@ -1131,7 +1131,7 @@ export const WorkInfoSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(value.type);
             }
             if (typeof value === "string") {
               return isValidUrl(value); // Check if the string is a valid URL
@@ -1152,7 +1152,7 @@ export const WorkInfoSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(value.type);
             }
             if (typeof value === "string") {
               return isValidUrl(value); // Check if the string is a valid URL
@@ -1173,7 +1173,7 @@ export const WorkInfoSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(value.type);
             }
             if (typeof value === "string") {
               return isValidUrl(value); // Check if the string is a valid URL
@@ -1194,7 +1194,7 @@ export const WorkInfoSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(value.type);
             }
             if (typeof value === "string") {
               return isValidUrl(value); // Check if the string is a valid URL
@@ -1327,7 +1327,7 @@ export const employeeInfoSchema = Yup.object().shape({
     "Invalid family details",
     function (value) {
       const { path, createError } = this;
-      const isValid = getFamilyDetailsValidationSchema(value);
+      const isValid = getFamilyDetailsValidationSchema(value); 
       if (!isValid) {
         return createError({
           path,
@@ -1386,7 +1386,7 @@ export const employeeInfoSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf", "image/jpeg", "image/png"].includes(
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                 value.type
               );
             }
@@ -1412,7 +1412,7 @@ export const employeeInfoSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf", "image/jpeg", "image/png"].includes(
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                 value.type
               );
             }
@@ -1437,7 +1437,7 @@ export const employeeInfoSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf", "image/jpeg", "image/png"].includes(
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                 value.type
               );
             }
@@ -1462,7 +1462,7 @@ export const employeeInfoSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf", "image/jpeg", "image/png"].includes(
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                 value.type
               );
             }
@@ -1487,7 +1487,7 @@ export const employeeInfoSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf", "image/jpeg", "image/png"].includes(
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                 value.type
               );
             }
@@ -1512,7 +1512,7 @@ export const employeeInfoSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf", "image/jpeg", "image/png"].includes(
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                 value.type
               );
             }
@@ -1537,7 +1537,7 @@ export const employeeInfoSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf", "image/jpeg", "image/png"].includes(
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                 value.type
               );
             }
@@ -1562,7 +1562,7 @@ export const employeeInfoSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf", "image/jpeg", "image/png"].includes(
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                 value.type
               );
             }
@@ -1659,7 +1659,7 @@ export const EmpInsuranceschema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf", "image/jpeg", "image/png"].includes(
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                 value.type
               );
             }
@@ -1752,7 +1752,7 @@ export const GroupHSSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(value.type);
             }
             if (typeof value === "string") {
               return isValidUrl(value); // Check if the string is a valid URL
@@ -1809,7 +1809,7 @@ export const WorkmenCompSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(value.type);
             }
             if (typeof value === "string") {
               return isValidUrl(value); // Check if the string is a valid URL
@@ -1865,7 +1865,7 @@ export const TravellingSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(value.type);
             }
             if (typeof value === "string") {
               return isValidUrl(value); // Check if the string is a valid URL
@@ -1921,7 +1921,7 @@ export const PersonalAcciSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf"].includes(value.type);
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(value.type);
             }
             if (typeof value === "string") {
               return isValidUrl(value); // Check if the string is a valid URL
@@ -2049,7 +2049,7 @@ export const SawpEmpSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf", "image/jpeg", "image/png"].includes(
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                 value.type
               );
             }
@@ -2211,7 +2211,7 @@ export const DoeEmpSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf", "image/jpeg", "image/png"].includes(
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                 value.type
               );
             }
@@ -2383,7 +2383,7 @@ export const NlmsEmpSchema = Yup.object().shape({
           "Only PDF, image files, or valid URLs are allowed", // Custom error message
           (value) => {
             if (value instanceof File) {
-              return ["application/pdf", "image/jpeg", "image/png"].includes(
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                 value.type
               );
             }
@@ -2592,7 +2592,7 @@ export const BankEmpSchema = Yup.object().shape({
           "Only PDF, image files, or valid URLs are allowed", // Custom error message
           (value) => {
             if (value instanceof File) {
-              return ["application/pdf", "image/jpeg", "image/png"].includes(
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                 value.type
               );
             }
@@ -2753,7 +2753,7 @@ export const JitpaEmpSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf", "image/jpeg", "image/png"].includes(
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                 value.type
               );
             }
@@ -2825,7 +2825,7 @@ export const LabourDepositSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf", "image/jpeg", "image/png"].includes(
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                 value.type
               );
             }
@@ -2860,7 +2860,7 @@ export const ImmigEmpSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf", "image/jpeg", "image/png"].includes(
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                 value.type
               );
             }
@@ -2884,7 +2884,7 @@ export const ImmigEmpSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf", "image/jpeg", "image/png"].includes(
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                 value.type
               );
             }
@@ -2908,7 +2908,7 @@ export const ImmigEmpSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf", "image/jpeg", "image/png"].includes(
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                 value.type
               );
             }
