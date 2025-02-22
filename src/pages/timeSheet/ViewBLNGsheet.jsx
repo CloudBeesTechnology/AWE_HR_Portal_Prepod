@@ -914,6 +914,7 @@ export const ViewBLNGsheet = ({
   const totalPages = Math.ceil(safeData.length / itemsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  currentData.sort((a, b) => a.NAMEFLAST.localeCompare(b.NAMEFLAST));
   visibleData = currentData;
   return (
     <div>

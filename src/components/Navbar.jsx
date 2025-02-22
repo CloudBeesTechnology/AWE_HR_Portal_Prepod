@@ -20,6 +20,8 @@ const Navbar = () => {
   const [currentTimeValue, setCurrentTimeValue] = useState("");
   const [currentDateValue, setCurrentDateValue] = useState("");
   const [getPPhotoString, setGetPPhotoString] = useState(null);
+  const [callAfterUploaded, setCallAfterUploaded] = useState(false);
+  const [loading, setLoading] = useState(null);
   const [personalInfo, setPersonalInfo] = useState({
     profilePhoto: "",
     name: "",
@@ -66,7 +68,7 @@ const Navbar = () => {
       const ampm = hours >= 12 ? "PM" : "AM";
 
       hours = hours % 12;
-      hours = hours ? hours : 12; // The hour '0' should be '12'
+      hours = hours ? hours : 12;
 
       const paddedMinutes = minutes < 10 ? "0" + minutes : minutes;
       const paddedSeconds = seconds < 10 ? "0" + seconds : seconds;
@@ -76,7 +78,7 @@ const Navbar = () => {
       setCurrentTimeValue(formattedDateTime);
     };
 
-    const intervalId = setInterval(updateTime, 1000); // Update every second
+    const intervalId = setInterval(updateTime, 1000);
 
     // Cleanup the interval when the component unmounts
     return () => clearInterval(intervalId);
@@ -92,6 +94,9 @@ const Navbar = () => {
     setUserID(userID);
   }, []);
 
+  const handleAfterUpload = async () => {
+    setCallAfterUploaded(!callAfterUploaded);
+  };
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -114,12 +119,9 @@ const Navbar = () => {
           nextToken = response.data.listEmpPersonalInfos.nextToken;
         } while (nextToken);
 
-        // console.log(allEmployees, "All Employees Data");
-
         const empPersonalInfos = allEmployees;
 
         if (empPersonalInfos.length === 0) {
-          // console.log("No employee data found.");
           return;
         }
 
@@ -131,17 +133,19 @@ const Navbar = () => {
         );
 
         if (userPersonalInfo) {
-          const profilePhotoString =
-            userPersonalInfo?.profilePhoto ||
-            "public/profilePhoto/User-avatar.svg.png";
-          // console.log(userPersonalInfo?.profilePhoto);
+          let splitfunc = userPersonalInfo?.profilePhoto.split("/").pop();
+
+          let profilePhotoString =
+            splitfunc === "null"
+              ? "User-avatar.svg.png"
+              : userPersonalInfo?.profilePhoto;
+
           setGetPPhotoString(profilePhotoString);
           const linkToStorageFile = async (pathUrl) => {
             const result = await getUrl({
               path: pathUrl,
             });
-            // console.log(pathUrl);
-
+            setLoading(false);
             return setPersonalInfo({
               name: userPersonalInfo?.name,
               profilePhoto: result?.url?.toString(),
@@ -152,17 +156,16 @@ const Navbar = () => {
 
           linkToStorageFile(profilePhotoString);
         } else {
-          console.log(`No matching employee found for userID: ${userID}`);
+          // console.log(`No matching employee found for userID: ${userID}`);
         }
       } catch (err) {
-        console.log("Error fetching employee personal infos:", err);
+        // console.log("Error fetching employee personal infos:", err);
       }
     };
-
     if (userID) {
       fetchData();
     }
-  }, [userID, getPPhotoString]);
+  }, [userID, callAfterUploaded]);
 
   return (
     <nav className="center bg-medium_white h-28 fixed top-0 w-full z-50 shadow-sm">
@@ -224,6 +227,7 @@ const Navbar = () => {
                     className="w-full object-center"
                     src={personalInfo?.profilePhoto || avatar}
                     alt="avatar not found"
+                    onError={(e) => (e.target.src = avatar)}
                   />
                 </div>
                 <p
@@ -246,6 +250,9 @@ const Navbar = () => {
                     contactNo={personalInfo?.contactNo}
                     getPPhotoString={getPPhotoString}
                     setPersonalInfo={setPersonalInfo}
+                    handleAfterUpload={handleAfterUpload}
+                    loading={loading}
+                    setLoading={setLoading}
                   />
                 </div>
               )}

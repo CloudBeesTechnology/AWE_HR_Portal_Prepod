@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormField } from "../../utils/FormField";
-import { uploadDocs } from "../../services/uploadDocsS3/UploadDocs";
-import { FileUploadField } from "../employees/medicalDep/FileUploadField";
+import { uploadDocs } from "../../services/uploadsDocsS3/UploadDocs";
+import { FileUpload } from "../employees/medicalDep/FileUploadField";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { WorkmenCompSchema } from "../../services/EmployeeValidation";
 import { generateClient } from "@aws-amplify/api";
@@ -13,9 +13,10 @@ import { FaTimes, FaDownload, FaPrint } from "react-icons/fa";
 import { Document, Page } from "react-pdf";
 import { pdfjs } from "react-pdf";
 import { getUrl } from "@aws-amplify/storage";
+import { DeleteWorkComp } from "./DeleteUpload/DeleteWorkComp";
+import { handleDeleteFile } from "../../services/uploadsDocsS3/DeleteDocs";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
-import * as pdfjsLib from 'pdfjs-dist';
-
+import * as pdfjsLib from 'pdfjs-dist'; 
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { useReactToPrint } from "react-to-print";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -29,9 +30,15 @@ export const WorkmenComp = () => {
   const [insuranceData, setInsuranceData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [isUploading, setIsUploading] = useState({
+    workmenComUp: false,
+      });
+
   const [uploadedFileNames, setUploadedFileNames] = useState({
     workmenComUp: null,
   });
+
   const [uploadWCU, setUploadWCU] = useState({
     workmenComUp: [],
   });
@@ -95,29 +102,89 @@ export const WorkmenComp = () => {
     }
   };
 
-  const handleFileChange = async (e, label) => {
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
-    const allowedTypes = ["application/pdf"];
-
-    if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file ");
-      return;
-    }
-
-    const currentFiles = watch(label) || [];
-    setValue(label, [...currentFiles, selectedFile]);
-
-    try {
-      await uploadDocs(selectedFile, label, setUploadWCU);
-      setUploadedFileNames((prev) => ({
+ const updateUploadingState = (label, value) => {
+      setIsUploading((prev) => ({
         ...prev,
-        [label]: selectedFile.name, // Store just the file name
+        [label]: value,
       }));
-    } catch (err) {
-      console.log(err);
-    }
-  };
+      console.log(value);
+    };
+  
+    const handleFileChange = async (e, label) => {
+      const workmenCompNo = watch("workmenCompNo");
+      if (!workmenCompNo) {
+          alert("Please enter the Policy Number before uploading files.");
+          window.location.href = "/insuranceHr";
+          return;
+      }
+  
+      const selectedFile = e.target.files[0];
+      if (!selectedFile) return;
+  
+      const allowedTypes = [
+        "application/pdf",
+       
+      ];
+      if (!allowedTypes.includes(selectedFile.type)) {
+          alert("Upload must be a PDF file.");
+          return;
+      }
+  
+      // Ensure no duplicate files are added
+      const currentFiles = watch(label) || [];
+      if (currentFiles.some((file) => file.name === selectedFile.name)) {
+          alert("This file has already been uploaded.");
+          return;
+      }
+  
+      setValue(label, [...currentFiles, selectedFile]);
+  
+      try {
+        updateUploadingState(label, true);
+        await uploadDocs(selectedFile, label, setUploadWCU, workmenCompNo);
+        setUploadedFileNames((prev) => ({
+          ...prev,
+          [label]: selectedFile.name,
+        }));
+      } catch (err) {
+          console.error(err);
+      }
+    };
+  
+    const deleteFile = async (fileType, fileName) => {
+      try {
+        const workmenCompNo = watch("workmenCompNo");
+        if (!workmenCompNo) {
+          alert("Please provide the Policy Number before deleting files.");
+          return;
+        }
+  
+        const isDeleted = await handleDeleteFile(
+          fileType,
+          fileName,
+          workmenCompNo
+        );
+        const isDeletedArrayUploaded = await DeleteWorkComp(
+          fileType,
+          fileName,
+          workmenCompNo,
+          setUploadedFileNames,
+          setUploadWCU,
+          setIsUploading
+        );
+  
+        if (!isDeleted || isDeletedArrayUploaded) {
+          console.error(
+            `Failed to delete file: ${fileName}, skipping UI update.`
+          );
+          return;
+        }
+        // console.log(`Deleted "${fileName}". Remaining files:`);
+      } catch (error) {
+        console.error("Error deleting file:", error);
+        alert("Error processing the file deletion.");
+      }
+    };
 
   const onSubmit = async (data) => {
     try {
@@ -175,15 +242,12 @@ export const WorkmenComp = () => {
   
     fetchInsuranceData();
   }, []);
-
-
+  
 
   const openPopup = (fileUrl) => {
     setPopupImage(fileUrl); // Set the URL for the image or file
     setPopupVisible(true); // Show the popup
   };
-
-  
 
   const onDocumentLoadSuccess = async ({ numPages, document }) => {
     let totalWidth = 0;
@@ -276,8 +340,6 @@ export const WorkmenComp = () => {
     }
   };
   
-
- 
   const isReadyToPrint = pdfHeight ;
 
   useEffect(() => {
@@ -287,9 +349,6 @@ export const WorkmenComp = () => {
       // You can call handlePrint here or other actions related to print readiness
     }
   }, [isReadyToPrint]); // Trigger the effect when dimensions are ready
-
-
-
 
   const openModal = (uploadUrl) => {
     setPPLastUP(uploadUrl);
@@ -485,21 +544,16 @@ export const WorkmenComp = () => {
 
             {/* File Upload Field */}
             <div className="mb-2 relative">
-              <FileUploadField
-                label="Upload File"
+              <FileUpload                label="Upload File"
                 onChangeFunc={(e) => handleFileChange(e, "workmenComUp")}
+                handleFileChange={handleFileChange}
+                uploadedFileNames={uploadedFileNames}
+                isUploading={isUploading}
+                deleteFile={deleteFile}
                 register={register}
                 name="workmenComUp"
                 error={errors}
               />
-
-              <div className="absolute">
-                {uploadedFileNames.workmenComUp && (
-                  <span className="text-sm text-grey ">
-                    {uploadedFileNames.workmenComUp}
-                  </span>
-                )}
-              </div>
             </div>
           </div>
         </div>

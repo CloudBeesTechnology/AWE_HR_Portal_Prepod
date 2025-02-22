@@ -4,7 +4,7 @@ import { GoUpload } from "react-icons/go";
 import { ClaimInsuranceSchema } from "../../services/EmployeeValidation";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { uploadDocs } from "../../services/uploadDocsS3/UploadDocs";
+import { uploadDocs } from "../../services/uploadsDocsS3/UploadDocs";
 import { InsClaimFun } from "../../services/createMethod/InsClaimFun";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { useOutletContext } from "react-router-dom";
@@ -50,9 +50,7 @@ export const InsuranceClaim = () => {
 
   const insuClaimDD = dropDownVal[0]?.insuClaimDD.map((item) => ({
     value: item,
-    label: item.split(" ") // Split the string into words
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
-    .join(" "),
+    label: item,
   }));
   useEffect(() => {
     const fetchData = async () => {

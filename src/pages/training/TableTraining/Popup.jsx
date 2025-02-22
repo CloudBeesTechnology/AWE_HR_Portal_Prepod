@@ -46,7 +46,7 @@ const Popup = ({ details, popupAll, onClose }) => {
   return (
     <div className="fixed top-0 w-full left-0 bg-black bg-opacity-50 z-[9999] py-7 min-h-screen flex items-center justify-center ">
       <div className="bg-white rounded-lg shadow-lg p-6 w-[40%] h-[550px] overflow-y-auto scrollBar ">
-       <div className="flex justify-between items-center pb-3 ">
+      <div className="flex justify-between items-center pb-3 ">
 <div className="w-full center">
 <img src={AweLogo} alt="Logo" className="max-w-[200px] " />
 </div>       

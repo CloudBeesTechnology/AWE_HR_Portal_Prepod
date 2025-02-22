@@ -29,7 +29,11 @@ export const Insurance = () => {
     },
   });
 
-  const { fields: insuranceFields, append, remove } = useFieldArray({
+  const {
+    fields: insuranceFields,
+    append,
+    remove,
+  } = useFieldArray({
     control,
     name: "insDetails",
   });
@@ -72,7 +76,7 @@ export const Insurance = () => {
       console.error("Error submitting data:", error);
     }
   };
-  
+
   useEffect(() => {
     const fetchInsuranceData = async () => {
       try {
@@ -110,62 +114,63 @@ export const Insurance = () => {
 
   return (
     <section>
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto  pt-2 px-10 mt-10 bg-[#F5F6F1CC]"
-    >
-      <div className="mb-3">
-        <div className="grid grid-cols-2 gap-x-14">
-          <FormField
-            name="typeIns"
-            type="text"
-            placeholder="Enter Insurance Type"
-            label="Insurance Type"
-            register={register}
-            errors={errors}
-          />
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="mx-auto  pt-2 px-10 mt-10 bg-[#F5F6F1CC]"
+      >
+        <div className="mb-3">
+          <div className="grid grid-cols-2 gap-x-14">
+            <FormField
+              name="typeIns"
+              type="text"
+              placeholder="Enter Insurance Type"
+              label="Insurance Type"
+              register={register}
+              errors={errors}
+            />
+          </div>
+
+          <div className="flex justify-end items-end">
+            <button
+              type="button"
+              onClick={handleAddInsurance}
+              className="mt-4 flex items-center text-medium_grey text-[25px]"
+            >
+              <CiSquarePlus /> <span className="text-[16px]"> Add Company</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-x-14">
+            {insuranceFields.map((field, index) => (
+              <div key={field.id} className="mb-2 relative">
+                <FormField
+                  name={`insDetails.${index}.company`}
+                  type="text"
+                  placeholder="Enter Insurance Company"
+                  label="Insurance Company"
+                  register={register}
+                  errors={errors}
+                />
+                {insuranceFields.length > 1 &&
+                  index !== 0 && ( // Add condition to exclude first element
+                    <button
+                      type="button"
+                      onClick={() => remove(index)}
+                      className="absolute top-10 -right-10 text-medium_grey text-[25px]"
+                    >
+                      <FaRegMinusSquare />
+                    </button>
+                  )}
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="flex justify-end items-end">
-          <button
-            type="button"
-            onClick={handleAddInsurance}
-            className="mt-4 flex items-center text-medium_grey text-[25px]"
-          >
-            <CiSquarePlus /> <span className="text-[16px]"> Add Company</span>
+        <div className="flex justify-center items-center mt-10">
+          <button type="submit" className="primary_btn">
+            Save
           </button>
         </div>
-
-        <div className="grid grid-cols-2 gap-x-14">
-    {insuranceFields.map((field, index) => (
-      <div key={field.id} className="mb-2 relative">
-        <FormField
-          name={`insDetails.${index}.company`}
-          type="text"
-          placeholder="Enter Insurance Company"
-          label="Insurance Company"
-          register={register}
-          errors={errors}
-        />
-        {insuranceFields.length > 1 && index !== 0 && ( // Add condition to exclude first element
-          <button
-            type="button"
-            onClick={() => remove(index)}
-            className="absolute top-10 -right-10 text-medium_grey text-[25px]"
-          >
-            <FaRegMinusSquare />
-          </button>
-        )}
-      </div>
-    ))}
-      </div>
-      </div>
-
-      <div className="flex justify-center items-center mt-10">
-        <button type="submit" className="primary_btn">
-          Save
-        </button>
-      </div>
       </form>
 
       {notification && (
@@ -176,42 +181,51 @@ export const Insurance = () => {
         />
       )}
 
-      {loading && <p className="text-center mt-10">Loading insurance data...</p>}
+      {loading && (
+        <p className="text-center mt-10">Loading insurance data...</p>
+      )}
 
       {error && <p className="text-center mt-10 text-red-600">{error}</p>}
 
       <div className="mt-20">
-      <p className="text-xl font-bold mb-10 p-3 rounded-lg border-2 border-[#FEF116] bg-[#FFFEF4] w-[250px]">
+        <p className="text-xl font-bold mb-10 p-3 rounded-lg border-2 border-[#FEF116] bg-[#FFFEF4] w-[250px]">
           View Insurance Info
         </p>
 
         {insuranceData.length > 0 ? (
-                <div className=' h-[400px] overflow-y-auto scrollBar'>
-          <table className="w-full text-center">
-            <thead className=" bg-[#939393] text-white">
-              <tr>
-                <th className="pl-4 py-4 rounded-tl-lg">Insurance Type</th>
-                <th className="pl-4 py-4 rounded-tr-lg">Insurance Companies</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white cursor-pointer">
-        {insuranceData.map((data, index) => (
-          <tr key={index} className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue">
-            <td className="pl-4 py-4">{data.typeIns}</td>
-            <td className="pl-4 py-4">
-              {data.insDetails.map((detail, detailIndex) => (
-                <div key={detailIndex}>{detail}</div>  
-              ))}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-          </table>
+          <div className=" h-[400px] overflow-y-auto scrollBar">
+            <table className="w-full text-center">
+              <thead className=" bg-[#939393] text-white">
+                <tr>
+                  <th className="pl-4 py-4 rounded-tl-lg">Insurance Type</th>
+                  <th className="pl-4 py-4 rounded-tr-lg">
+                    Insurance Companies
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white cursor-pointer">
+                {insuranceData.map((data, index) => (
+                  <tr
+                    key={index}
+                    className="shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
+                  >
+                    <td className="pl-4 py-4">{data.typeIns}</td>
+                    <td className="pl-4 py-4">
+                      {data.insDetails.map((detail, detailIndex) => (
+                        <div key={detailIndex}>{detail}</div>
+                      ))}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         ) : (
-          <p className="text-center mt-10">No insurance information available.</p>
+          <p className="text-center mt-10">
+            No insurance information available.
+          </p>
         )}
       </div>
-      </section>
+    </section>
   );
 };

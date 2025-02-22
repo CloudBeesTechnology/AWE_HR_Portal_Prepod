@@ -2,17 +2,19 @@ import { useContext, useEffect,useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { trainingCertificatesValidation } from "../../../services/TrainingValidation";
-import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
+import { uploadDocs } from "../../../services/uploadsDocsS3/UploadDocs";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { TCDataFun } from "../../../services/createMethod/TCDataFun";
 import { DataSupply } from "../../../utils/DataStoredContext";
-import { FileUploadField } from "../../employees/medicalDep/FileUploadField";
+import { FileUpload } from "../../employees/medicalDep/FileUploadField";
 import { SearchDisplay } from "../../../utils/SearchDisplay";
 import { IoSearch } from "react-icons/io5";
 import { FormField } from "../../../utils/FormField";
 import { TCDataUpdate } from "../../../services/updateMethod/TCDataUpdate";
 import { Link } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa6";
+import { DeleteDocsTrainingTC } from "../../../services/uploadDocsDelete/DeleteDocsTrainingTC";
+import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 
 export const TrainingCertificatesForm = () => {
   const { empPIData, workInfoData, trainingCertifi, AddEmpReq} =useContext(DataSupply);
@@ -27,7 +29,9 @@ export const TrainingCertificatesForm = () => {
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [showTitle, setShowTitle] = useState("");
-
+  const [isUploading, setIsUploading] = useState({
+    trainingUpCertifi: false,
+  });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     trainingUpCertifi: null,
   });
@@ -81,48 +85,99 @@ export const TrainingCertificatesForm = () => {
 
   const watchTCUpload = watch("trainingUpCertifi", ""); // Watch the trainingUpCertifi field
 
-  const extractFileName = (url) => {
-    if (typeof url === "string" && url) {
-      return url.split("/").pop(); // Extract the file name from URL
-    }
-    return ""; 
-  };
 
   const getFileName = (filePath) => {
     const fileNameWithExtension = filePath.split("/").pop(); // Get file name with extension
-    const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
-    return fileName;
+    // const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
+    return fileNameWithExtension;
   };
   
-  const handleFileChange = async (e, label) => {
-    if (!watchedEmpID) {
-      alert("Please enter the Employee ID before uploading files.");
-      return;
-    }
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
-
-    const allowedTypes = [
-      "application/pdf",
-    ];
-    if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file ");
-      return;
-    }
-
-    const currentFiles = watch(label) || [];
-    setValue(label, [...currentFiles, selectedFile]);
-
-    try {
-      await uploadDocs(selectedFile, label, setUploadTC, watchedEmpID);
-      setUploadedFileNames((prev) => ({
-        ...prev,
-        [label]: selectedFile.name, // Store just the file name
-      }));
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  const updateUploadingState = (label, value) => {
+       setIsUploading((prev) => ({
+         ...prev,
+         [label]: value,
+       }));
+       console.log(value);
+     };
+   
+     const handleFileChange = async (e, label) => {
+       const watchedEmpID = watch("empID");
+       if (!watchedEmpID) {
+           alert("Please enter the Employee ID before uploading files.");
+           window.location.href = "/employeeInfo";
+           return;
+       }
+   
+       const selectedFile = e.target.files[0];
+       if (!selectedFile) return;
+   
+       const allowedTypes = [
+         "application/pdf",
+         "image/jpeg",
+         "image/png",
+         "image/jpg",
+       ];
+       if (!allowedTypes.includes(selectedFile.type)) {
+           alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+           return;
+       }
+   
+       // Ensure no duplicate files are added
+       const currentFiles = watch(label) || [];
+       if (currentFiles?.some((file) => file.name === selectedFile.name)) {
+           alert("This file has already been uploaded.");
+           return;
+       }
+   
+   
+       setValue(label, [...currentFiles, selectedFile]);
+   
+       try {
+         updateUploadingState(label, true);
+         await uploadDocs(selectedFile, label, setUploadTC, watchedEmpID);
+         setUploadedFileNames((prev) => ({
+           ...prev,
+           [label]: selectedFile.name,
+         }));
+       } catch (err) {
+           console.error(err);
+       }
+     };
+   
+     const deleteFile = async (fileType, fileName) => {
+       try {
+         const watchedEmpID = watch("empID");
+         if (!watchedEmpID) {
+           alert("Please provide the Employee ID before deleting files.");
+           return;
+         }
+   
+         const isDeleted = await handleDeleteFile(
+           fileType,
+           fileName,
+           watchedEmpID
+         );
+         const isDeletedArrayUploaded = await DeleteDocsTrainingTC(
+           fileType,
+           fileName,
+           watchedEmpID,
+           setUploadedFileNames,
+           setUploadTC,
+           setIsUploading
+         );
+   
+         if (!isDeleted || isDeletedArrayUploaded) {
+           console.error(
+             `Failed to delete file: ${fileName}, skipping UI update.`
+           );
+           return;
+         }
+         // console.log(`Deleted "${fileName}". Remaining files:`);
+       } catch (error) {
+         console.error("Error deleting file:", error);
+         alert("Error processing the file deletion.");
+       }
+     };
 
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
@@ -166,28 +221,26 @@ export const TrainingCertificatesForm = () => {
         try {
           const parsedArray = JSON.parse(result?.[field][0]);
           setValue(field, parsedArray);
-    
           setUploadTC((prev) => ({ ...prev, [field]: parsedArray }));
     
-          // Check if parsedArray is valid and non-empty
+          // ✅ Ensure parsedArray is valid
           if (Array.isArray(parsedArray) && parsedArray.length > 0) {
-            const lastItem = parsedArray[parsedArray.length - 1];
-    
-            // Check if lastItem has the upload property
-            const fileName = lastItem?.upload
-              ? getFileName(lastItem.upload)
-              : "Unknown file";
+            // ✅ Extract all filenames instead of just the last one
+            const fileNames = parsedArray.map((item) =>
+              item?.upload ? getFileName(item.upload) : "Unknown file"
+            );
     
             setUploadedFileNames((prev) => ({
               ...prev,
-              [field]: fileName,
+              [field]: fileNames, // ✅ Store all filenames as an array
             }));
-          } 
+          }
         } catch (error) {
           console.error(`Error parsing upload field ${field}:`, error);
         }
       }
     });
+    
   };
   
 
@@ -392,17 +445,17 @@ export const TrainingCertificatesForm = () => {
             </div>
 
 
-<FileUploadField
-        label="Upload File"
-        onChangeFunc={(e) => handleFileChange(e, "trainingUpCertifi")}
-        register={register}
-        name="trainingUpCertifi"
-        error={errors}
-        fileName={
-          uploadedFileNames.trainingUpCertifi ||
-          extractFileName(watchTCUpload)
-        }
-      />
+            <FileUpload
+  label="Upload File"
+  name="trainingUpCertifi"
+  register={register}
+  uploadedFileNames={uploadedFileNames} // Ensure this exists
+  isUploading={isUploading} // Ensure this exists
+  handleFileChange={handleFileChange}
+  deleteFile={deleteFile}
+  error={errors?.trainingUpCertifi}
+/>
+
 
        </div>
         <div className="center py-5">
