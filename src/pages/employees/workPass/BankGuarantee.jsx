@@ -6,13 +6,14 @@ import { BankEmpSchema } from "../../../services/EmployeeValidation";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { FileUploadField } from "../medicalDep/FileUploadField";
 import { FormField } from "../../../utils/FormField";
-import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
+import { uploadDocs } from "../../../services/uploadsDocsS3/UploadDocs";
 import { BJLDataFun } from "../../../services/createMethod/BJLDataFun";
 import { UpdateBJL } from "../../../services/updateMethod/UpdateBJL";
 import { FileUploadNew } from "../medicalDep/FileUploadField";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { useOutletContext } from "react-router-dom";
-// import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteBJLUp";
+import { DeleteBJLUp } from "../../../services/uploadDocsDelete/DeleteBJLUp";
+import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 
 export const BankGuarantee = () => {
   const { searchResultData } = useOutletContext();
@@ -39,7 +40,9 @@ export const BankGuarantee = () => {
 
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
-
+  const [isUploading, setIsUploading] = useState({
+    bankEmpUpload: false,
+    });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     bankEmpUpload: null,
   });
@@ -109,63 +112,89 @@ export const BankGuarantee = () => {
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
 
-  const handleFileChange = async (e, label) => {
-    const watchedEmpID = watch("empID");
-    if (!watchedEmpID) {
-      alert("Please enter the Employee ID before uploading files.");
-      window.location.href = "/employeeInfo";
-      return;
-    }
-
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
-
-    const allowedTypes = [
-      "application/pdf",
-      "image/jpeg",
-      "image/png",
-      "image/jpg",
-    ];
-    if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-      return;
-    }
-
-    // Fetch current files (including backend-stored ones)
-    const currentFiles = watch(label) || []; // React Hook Form state
-
-    // Count only newly uploaded files, ignoring backend-stored files
-    let newUploads = []; // Declare it outside the if block to access later
-    if (Array.isArray(currentFiles)) {
-      newUploads = currentFiles.filter(file => file instanceof File);
-    }
-    
-    if (newUploads.length > 0) {
-      alert("You can only upload one new file. Please delete the existing file before uploading another.");
-      return;
-    }
-    
-
-    if (newUploads.length > 0) {
-      alert(
-        "You can only upload one new file."
-      );
-      return;
-    }
-
-    // Append the new file to the form state
-    setValue(label, [...currentFiles, selectedFile]);
-
-    try {
-      await uploadDocs(selectedFile, label, setUploadBG, watchedEmpID);
-      setUploadedFileNames((prev) => ({
-        ...prev,
-        [label]: selectedFile.name,
-      }));
-    } catch (err) {
-      console.error(err);
-    }
-  };
+const updateUploadingState = (label, value) => {
+     setIsUploading((prev) => ({
+       ...prev,
+       [label]: value,
+     }));
+     console.log(value);
+   };
+ 
+   const handleFileChange = async (e, label) => {
+     const watchedEmpID = watch("empID");
+     if (!watchedEmpID) {
+         alert("Please enter the Employee ID before uploading files.");
+         window.location.href = "/employeeInfo";
+         return;
+     }
+ 
+     const selectedFile = e.target.files[0];
+     if (!selectedFile) return;
+ 
+     const allowedTypes = [
+       "application/pdf",   
+     ];
+     if (!allowedTypes.includes(selectedFile.type)) {
+         alert("Upload must be a PDF file.");
+         return;
+     }
+ 
+     // Ensure no duplicate files are added
+     const currentFiles = watch(label) || [];
+     if (currentFiles.some((file) => file.name === selectedFile.name)) {
+         alert("This file has already been uploaded.");
+         return;
+     }
+ 
+     setValue(label, [...currentFiles, selectedFile]);
+ 
+     try {
+       updateUploadingState(label, true);
+       await uploadDocs(selectedFile, label, setUploadBG, watchedEmpID);
+       setUploadedFileNames((prev) => ({
+         ...prev,
+         [label]: selectedFile.name,
+       }));
+     } catch (err) {
+         console.error(err);
+     }
+   };
+ 
+   const deleteFile = async (fileType, fileName) => {
+     try {
+       const watchedEmpID = watch("empID");
+       if (!watchedEmpID) {
+         alert("Please provide the Employee ID before deleting files.");
+         return;
+       }
+ 
+       const isDeleted = await handleDeleteFile(
+         fileType,
+         fileName,
+         watchedEmpID
+       );
+       const isDeletedArrayUploaded = await DeleteBJLUp(
+         fileType,
+         fileName,
+         watchedEmpID,
+         setUploadedFileNames,
+         setUploadBG,
+         setIsUploading
+       );
+ 
+       if (!isDeleted || isDeletedArrayUploaded) {
+         console.error(
+           `Failed to delete file: ${fileName}, skipping UI update.`
+         );
+         return;
+       }
+       // console.log(`Deleted "${fileName}". Remaining files:`);
+     } catch (error) {
+       console.error("Error deleting file:", error);
+       alert("Error processing the file deletion.");
+     }
+   };
+  
 
   useEffect(() => {
     setValue("empID", searchResultData.empID);
@@ -186,15 +215,6 @@ export const BankGuarantee = () => {
       setValue(field, value);
     });
 
-    const bankRecord = BJLData.find(
-      (match) => match.empID === searchResultData.empID
-    );
-    if (bankRecord) {
-      setID((prevData) => ({
-        ...prevData,
-        bankID: bankRecord.id,
-      }));
-    }
 
     if (searchResultData && searchResultData.bankEmpUpload) {
       try {
@@ -224,38 +244,6 @@ export const BankGuarantee = () => {
     }
   }, [searchResultData, setValue]);
 
-  // const deleteFile = async (fileType, fileName) => {
-  //   const deleteID = id.bankID;
-
-  //   try {
-  //     await handleDeleteFile(
-  //       fileType,
-  //       fileName,
-  //       empID,
-  //       setUploadedFileNames,
-  //       deleteID,
-  //       setValue
-  //     );
-
-  //     const currentFiles = watch(fileType) || [];
-
-  //     // Filter out the deleted file
-  //     const updatedFiles = currentFiles.filter(
-  //       (file) => file.name !== fileName
-  //     );
-
-  //     // Update form state with the new file list
-  //     setValue(fileType, updatedFiles);
-
-  //     // Update UI state
-  //     setUploadBG((prevState) => ({
-  //       ...prevState,
-  //       [fileType]: updatedFiles,
-  //     }));
-  //   } catch (error) {
-  //     console.error("Error deleting file:", error);
-  //   }
-  // };
 
   const onSubmit = async (data) => {
     try {
@@ -403,8 +391,10 @@ export const BankGuarantee = () => {
             name="bankEmpUpload"
             error={errors.bankEmpUpload}
             fileName={uploadedFileNames.bankEmpUpload || ""}
+            handleFileChange={handleFileChange}
             uploadedFileNames={uploadedFileNames}
-            // deleteFile={deleteFile}
+            isUploading={isUploading}
+            deleteFile={deleteFile}
             field={{ title: "bankEmpUpload" }}
           />
         </div>

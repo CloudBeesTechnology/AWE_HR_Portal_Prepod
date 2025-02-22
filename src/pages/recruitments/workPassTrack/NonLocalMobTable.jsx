@@ -127,7 +127,7 @@ export const NonLocalMobTable = ({ data, formatDate, fileUpload, urlValue }) => 
   return (
     <div>
       {data && data.length > 0 ? (
-        <table className="w-full">
+        <table className="w-full rounded-lg overflow-hidden">
           <thead className="bg-[#939393] text-white">
             <tr>
               {heading.map((header, index) => (
@@ -142,7 +142,7 @@ export const NonLocalMobTable = ({ data, formatDate, fileUpload, urlValue }) => 
               return (
                 <tr
                   key={index}
-                  className="text-center text-[16px] shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
+                  className="text-center border-b-2 bg-white border-[#C7BCBC] text-[15px] text-[#303030] hover:bg-medium_blue"
                 >
                   <td className="py-3">{item.tempID}</td>
                   <td className="py-3">{item.name || "N/A"}</td>
@@ -184,7 +184,7 @@ export const NonLocalMobTable = ({ data, formatDate, fileUpload, urlValue }) => 
                     <RiFileEditLine />
                   </td>
                   <td
-                    className="text-sm cursor-pointer py-3"
+                    className="text-sm text-[#EA4F4F] cursor-pointer py-3"
                     onClick={() => OnSubmit(item)}
                   >
                     Convert Employee

@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { LabourDepositSchema } from "../../../services/EmployeeValidation";
 import { SpinLogo } from "../../../utils/SpinLogo";
-import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
+import { uploadDocs } from "../../../services/uploadsDocsS3/UploadDocs";
 import { FileUploadNew } from "../medicalDep/FileUploadField";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { UpdateLDFun } from "../../../services/updateMethod/UpdateLDFun";
@@ -12,7 +12,8 @@ import { FormField } from "../../../utils/FormField";
 import { FileUploadField } from "../medicalDep/FileUploadField";
 import { useOutletContext } from "react-router-dom";
 import { LabCreFun } from "../../../services/createMethod/LabCreFun";
-// import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteBJLUp";
+import { DeleteDocsLD } from "../../../services/uploadDocsDelete/DeleteDocsLD";
+import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 
 export const LabourDeposit = () => {
   const { searchResultData } = useOutletContext();
@@ -37,6 +38,9 @@ export const LabourDeposit = () => {
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
   const [labourDate, setLabourDate] = useState([]);
+   const [isUploading, setIsUploading] = useState({
+    lbrDepoUpload: false,
+      });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     lbrDepoUpload: null,
   });
@@ -44,9 +48,6 @@ export const LabourDeposit = () => {
     lbrDepoUpload: [],
   });
 
-  // const [id, setID] = useState({
-  //   lbrID: "",
-  // });
 
   const watchInducLdUpload = watch("lbrDepoUpload", "");
 
@@ -105,77 +106,102 @@ export const LabourDeposit = () => {
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
 
-  const handleFileChange = async (e, label) => {
-    const watchedEmpID = watch("empID");
-    if (!watchedEmpID) {
-      alert("Please enter the Employee ID before uploading files.");
-      window.location.href = "/employeeInfo";
-      return;
-    }
-
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
-
-    const allowedTypes = [
-      "application/pdf"
-    ];
-    if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file");
-      return;
-    }
-
-    // Fetch current files (including backend-stored ones)
-    const currentFiles = watch(label) || []; // React Hook Form state
-
-    // Count only newly uploaded files, ignoring backend-stored files
-    let newUploads = []; // Declare it outside the if block to access later
-    if (Array.isArray(currentFiles)) {
-      newUploads = currentFiles.filter(file => file instanceof File);
-    }
-    
-    if (newUploads.length > 0) {
-      alert("You can only upload one new file. Please delete the existing file before uploading another.");
-      return;
-    }
-    
-
-    if (newUploads.length > 0) {
-      alert(
-        "You can only upload one new file. Please delete the existing file before uploading another."
-      );
-      return;
-    }
-
-    // Append the new file to the form state
-    setValue(label, [...currentFiles, selectedFile]);
-
-    try {
-      await uploadDocs(selectedFile, label, setUploadLD, watchedEmpID);
-      setUploadedFileNames((prev) => ({
-        ...prev,
-        [label]: selectedFile.name,
-      }));
-    } catch (err) {
-      console.error(err);
-    }
-  };
+   const updateUploadingState = (label, value) => {
+       setIsUploading((prev) => ({
+         ...prev,
+         [label]: value,
+       }));
+       console.log(value);
+     };
+   
+     const handleFileChange = async (e, label) => {
+       const watchedEmpID = watch("empID");
+       if (!watchedEmpID) {
+           alert("Please enter the Employee ID before uploading files.");
+           window.location.href = "/employeeInfo";
+           return;
+       }
+   
+       const selectedFile = e.target.files[0];
+       if (!selectedFile) return;
+   
+       const allowedTypes = [
+         "application/pdf",
+       ];
+       if (!allowedTypes.includes(selectedFile.type)) {
+           alert("Upload must be a PDF file.");
+           return;
+       }
+   
+       // Ensure no duplicate files are added
+       const currentFiles = watch(label) || [];
+       if (currentFiles.some((file) => file.name === selectedFile.name)) {
+           alert("This file has already been uploaded.");
+           return;
+       }
+   
+       // **Check if the file was previously deleted and prevent re-adding**
+      //  if (deletedFiles[label]?.includes(selectedFile.name)) {
+      //      alert("This file was previously deleted and cannot be re-added.");
+      //      return;
+      //  }
+   
+       setValue(label, [...currentFiles, selectedFile]);
+   
+       try {
+         updateUploadingState(label, true);
+         await uploadDocs(selectedFile, label, setUploadLD, watchedEmpID);
+         setUploadedFileNames((prev) => ({
+           ...prev,
+           [label]: selectedFile.name,
+         }));
+       } catch (err) {
+           console.error(err);
+       }
+     };
+   
+     const deleteFile = async (fileType, fileName) => {
+       try {
+         const watchedEmpID = watch("empID");
+         if (!watchedEmpID) {
+           alert("Please provide the Employee ID before deleting files.");
+           return;
+         }
+   
+         const isDeleted = await handleDeleteFile(
+           fileType,
+           fileName,
+           watchedEmpID
+         );
+         const isDeletedArrayUploaded = await DeleteDocsLD(
+           fileType,
+           fileName,
+           watchedEmpID,
+           setUploadedFileNames,
+           setUploadLD,
+           setIsUploading
+         );
+   
+         if (!isDeleted || isDeletedArrayUploaded) {
+           console.error(
+             `Failed to delete file: ${fileName}, skipping UI update.`
+           );
+           return;
+         }
+         // console.log(`Deleted "${fileName}". Remaining files:`);
+       } catch (error) {
+         console.error("Error deleting file:", error);
+         alert("Error processing the file deletion.");
+       }
+     };
 
   useEffect(() => {
     setValue("empID", searchResultData.empID);
-    const fields = ["lbrReceiptNo", "lbrDepoAmt", "lbrDepoSubmit", "lbrDepoUpload"];
+    const fields = ["lbrReceiptNo", "lbrDepoAmt", "lbrDepoSubmit","lbrDepoUpload"];
     fields.forEach((field) =>
       setValue(field, getLastValue(searchResultData[field]))
     );
 
-    // const lbrRecord = BJLData.find(
-    //   (match) => match.empID === searchResultData.empID
-    // );
-    // if (lbrRecord) {
-    //   setID((prevData) => ({
-    //     ...prevData,
-    //     lbrID: lbrRecord.id,
-    //   }));
-    // }
     if (searchResultData && searchResultData.lbrDepoUpload) {
       try {
         const parsedArray = JSON.parse(searchResultData.lbrDepoUpload);
@@ -204,38 +230,7 @@ export const LabourDeposit = () => {
     }
   }, [searchResultData, setValue]);
 
-  // const deleteFile = async (fileType, fileName) => {
-  //   const deleteID = id.lbrID;
 
-  //   try {
-  //     await handleDeleteFile(
-  //       fileType,
-  //       fileName,
-  //       empID,
-  //       setUploadedFileNames,
-  //       deleteID,
-  //       setValue
-  //     );
-
-  //     const currentFiles = watch(fileType) || [];
-
-  //     // Filter out the deleted file
-  //     const updatedFiles = currentFiles.filter(
-  //       (file) => file.name !== fileName
-  //     );
-
-  //     // Update form state with the new file list
-  //     setValue(fileType, updatedFiles);
-
-  //     // Update UI state
-  //     setUploadLD((prevState) => ({
-  //       ...prevState,
-  //       [fileType]: updatedFiles,
-  //     }));
-  //   } catch (error) {
-  //     console.error("Error deleting file:", error);
-  //   }
-  // };
 
   const empID = watch("empID");
 
@@ -267,7 +262,7 @@ export const LabourDeposit = () => {
         };
 
         await UpdateLDData({ LDValue });
-        setShowTitle("Labour Info Stored Successfully");
+        setShowTitle("Labour Info Updated Successfully");
         setNotification(true);
       } else {
         const creLabpaValue = {
@@ -339,7 +334,9 @@ export const LabourDeposit = () => {
               extractFileName(watchInducLdUpload)
             }
             uploadedFileNames={uploadedFileNames}
-            // deleteFile={deleteFile}
+            handleFileChange={handleFileChange}
+            isUploading={isUploading}
+            deleteFile={deleteFile}
             field={{ title: "lbrDepoUpload" }}
           />
         </div>

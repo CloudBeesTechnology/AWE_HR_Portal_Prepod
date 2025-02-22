@@ -22,22 +22,16 @@ export const InterviewForm = ({ candidate }) => {
   });
   // console.log(candidate)
 
-
-  
-
-  // Effect hook to auto-fetch and populate form data when IVSSDetails changes or candidate's tempID changes
   useEffect(() => {
     if (IVSSDetails.length > 0 && candidate?.tempID) {
-      // Find the interview data for the selected candidate using the tempID
       const interviewData = IVSSDetails.find(
         (data) => data.tempID === candidate.tempID
       );
 
       if (interviewData) {
-        // Update the formData with the interview data of the selected candidate
         setFormData({
           interview: {
-            date: interviewData.interDate?.split("T")[0], // Extract date from timestamp
+            date: interviewData.interDate?.split("T")[0], 
             time: interviewData.interTime,
             venue: interviewData.venue,
             interviewType: interviewData.interType,
@@ -59,7 +53,6 @@ export const InterviewForm = ({ candidate }) => {
     }));
   };
 
-  // Function to handle file input changes
   const handleFileChange = (field, file) => {
     setFormData((prev) => ({
       ...prev,
@@ -73,7 +66,6 @@ export const InterviewForm = ({ candidate }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Find the correct interview data using the tempID of the selected candidate
     const selectedInterviewData = IVSSDetails.find(
       (data) => data.tempID === candidate?.tempID
     );
@@ -84,7 +76,6 @@ export const InterviewForm = ({ candidate }) => {
       return;
     }
 
-    // Now, get the interviewSchedules ID from the selected interview data
     const interviewScheduleId = selectedInterviewData?.id;
 
     if (!interviewScheduleId) {
@@ -138,7 +129,7 @@ export const InterviewForm = ({ candidate }) => {
               />
             ) : input.type === "textarea" ? (
               <textarea
-                className="w-full border p-2 rounded mt-1"
+                className="w-full border p-2 rounded mt-1 h-[42px]"
                 value={formData.interview[input.field]}
                 onChange={(e) => handleInputChange(input.field, e.target.value)}
               />
@@ -167,7 +158,7 @@ export const InterviewForm = ({ candidate }) => {
       <div className="center">
         <button
           type="submit"
-          className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
+          className="py-2 px-12 font-medium rounded shadow-lg bg-yellow hover:bg-yellow"
         >
           Submit
         </button>

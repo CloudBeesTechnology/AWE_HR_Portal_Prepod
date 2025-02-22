@@ -5,13 +5,14 @@ import { JitpaEmpSchema } from "../../../services/EmployeeValidation";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { FileUploadField } from "../medicalDep/FileUploadField";
 import { FormField } from "../../../utils/FormField";
-import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
+import { uploadDocs } from "../../../services/uploadsDocsS3/UploadDocs";
 import { UpdateJitpaFun } from "../../../services/updateMethod/UpdateJitpaFun";
 import { FileUploadNew } from "../medicalDep/FileUploadField";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { useOutletContext } from "react-router-dom";
 import { JitpaCreFun } from "../../../services/createMethod/JitpaCreFun";
-// import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteBJLUp";
+import { DeleteDocsJitpa } from "../../../services/uploadDocsDelete/DeleteDocsJitpa";
+import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 
 export const Jitpa = () => {
   const { searchResultData } = useOutletContext();
@@ -41,17 +42,15 @@ export const Jitpa = () => {
   // const [jpPurchaseDta,setJpPurchaseDta]=useState("")
   // const [jpValidation,setJpValidation]=useState("")
   // const [jpEndorsement,setJpEndorsement]=useState("")
-
+const [isUploading, setIsUploading] = useState({
+  jpEmpUpload: false,
+    });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     jpEmpUpload: null,
   });
   const [uploadjitpa, setUploadjitpa] = useState({
     jpEmpUpload: [],
   });
-
-  // const [id, setID] = useState({
-  //   jitpaID: "",
-  // });
 
   const watchInducJitpaUpload = watch("jpEmpUpload", "");
 
@@ -110,55 +109,95 @@ export const Jitpa = () => {
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
 
-  const handleFileChange = async (e, label) => {
-    const watchedEmpID = watch("empID");
-    if (!watchedEmpID) {
-      alert("Please enter the Employee ID before uploading files.");
-      window.location.href = "/employeeInfo";
-      return;
-    }
-
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
-
-    const allowedTypes = [
-      "application/pdf",
-     
-    ];
-    
-    if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file");
-      return;
-    }
-
-    // Fetch current files (including backend-stored ones)
-    const currentFiles = watch(label) || []; // React Hook Form state
-
-    // Count only newly uploaded files, ignoring backend-stored files
-    let newUploads = []; // Declare it outside the if block to access later
-    if (Array.isArray(currentFiles)) {
-      newUploads = currentFiles.filter(file => file instanceof File);
-    }
-    
-    if (newUploads.length > 0) {
-      alert("You can only upload one new file");
-      return;
-    }
-  
-
-    // Append the new file to the form state
-    setValue(label, [...currentFiles, selectedFile]);
-
-    try {
-      await uploadDocs(selectedFile, label, setUploadjitpa, watchedEmpID);
-      setUploadedFileNames((prev) => ({
-        ...prev,
-        [label]: selectedFile.name,
-      }));
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const updateUploadingState = (label, value) => {
+     setIsUploading((prev) => ({
+       ...prev,
+       [label]: value,
+     }));
+     console.log(value);
+   };
+ 
+   const handleFileChange = async (e, label) => {
+     const watchedEmpID = watch("empID");
+     if (!watchedEmpID) {
+         alert("Please enter the Employee ID before uploading files.");
+         window.location.href = "/employeeInfo";
+         return;
+     }
+ 
+     const selectedFile = e.target.files[0];
+     if (!selectedFile) return;
+ 
+     const allowedTypes = [
+       "application/pdf",
+      
+     ];
+     if (!allowedTypes.includes(selectedFile.type)) {
+         alert("Upload must be a PDF file.");
+         return;
+     }
+ 
+     // Ensure no duplicate files are added
+     const currentFiles = watch(label) || [];
+     if (currentFiles.some((file) => file.name === selectedFile.name)) {
+         alert("This file has already been uploaded.");
+         return;
+     }
+ 
+     // **Check if the file was previously deleted and prevent re-adding**
+    //  if (deletedFiles[label]?.includes(selectedFile.name)) {
+    //      alert("This file was previously deleted and cannot be re-added.");
+    //      return;
+    //  }
+ 
+     setValue(label, [...currentFiles, selectedFile]);
+ 
+     try {
+       updateUploadingState(label, true);
+       await uploadDocs(selectedFile, label, setUploadjitpa, watchedEmpID);
+       setUploadedFileNames((prev) => ({
+         ...prev,
+         [label]: selectedFile.name,
+       }));
+     } catch (err) {
+         console.error(err);
+     }
+   };
+ 
+   const deleteFile = async (fileType, fileName) => {
+     try {
+       const watchedEmpID = watch("empID");
+       if (!watchedEmpID) {
+         alert("Please provide the Employee ID before deleting files.");
+         return;
+       }
+ 
+       const isDeleted = await handleDeleteFile(
+         fileType,
+         fileName,
+         watchedEmpID
+       );
+       const isDeletedArrayUploaded = await DeleteDocsJitpa(
+         fileType,
+         fileName,
+         watchedEmpID,
+         setUploadedFileNames,
+         setUploadjitpa,
+         setIsUploading
+       );
+ 
+       if (!isDeleted || isDeletedArrayUploaded) {
+         console.error(
+           `Failed to delete file: ${fileName}, skipping UI update.`
+         );
+         return;
+       }
+       // console.log(`Deleted "${fileName}". Remaining files:`);
+     } catch (error) {
+       console.error("Error deleting file:", error);
+       alert("Error processing the file deletion.");
+     }
+   };
 
   useEffect(() => {
     setValue("empID", searchResultData.empID);
@@ -173,15 +212,7 @@ export const Jitpa = () => {
       setValue(field, getLastValue(searchResultData[field]))
     );
 
-    // const jitpaRecord = BJLData.find(
-    //   (match) => match.empID === searchResultData.empID
-    // );
-    // if (jitpaRecord) {
-    //   setID((prevData) => ({
-    //     ...prevData,
-    //     jitpaID: jitpaRecord.id,
-    //   }));
-    // }
+   
 
     if (searchResultData && searchResultData.jpEmpUpload) {
       try {
@@ -210,38 +241,7 @@ export const Jitpa = () => {
     }
   }, [searchResultData, setValue]);
 
-  // const deleteFile = async (fileType, fileName) => {
-  //   const deleteID = id.jitpaID;
 
-  //   try {
-  //     await handleDeleteFile(
-  //       fileType,
-  //       fileName,
-  //       empID,
-  //       setUploadedFileNames,
-  //       deleteID,
-  //       setValue
-  //     );
-
-  //     const currentFiles = watch(fileType) || [];
-
-  //     // Filter out the deleted file
-  //     const updatedFiles = currentFiles.filter(
-  //       (file) => file.name !== fileName
-  //     );
-
-  //     // Update form state with the new file list
-  //     setValue(fileType, updatedFiles);
-
-  //     // Update UI state
-  //     setUploadjitpa((prevState) => ({
-  //       ...prevState,
-  //       [fileType]: updatedFiles,
-  //     }));
-  //   } catch (error) {
-  //     console.error("Error deleting file:", error);
-  //   }
-  // };
 
   const empID = watch("empID");
 
@@ -291,7 +291,7 @@ export const Jitpa = () => {
         };
 
         await UpdateJitpaData({ JitpaValue });
-        setShowTitle("JITPA Info Stored Successfully");
+        setShowTitle("JITPA Info Updated Successfully");
         setNotification(true);
       } else {
         const creJitpaValue = {
@@ -372,7 +372,9 @@ export const Jitpa = () => {
               extractFileName(watchInducJitpaUpload)
             }
             uploadedFileNames={uploadedFileNames}
-            // deleteFile={deleteFile}
+            handleFileChange={handleFileChange}
+            isUploading={isUploading}
+            deleteFile={deleteFile}
             field={{ title: "jpEmpUpload" }}
           />
         </div>

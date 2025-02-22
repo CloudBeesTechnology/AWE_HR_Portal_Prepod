@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ImmigEmpSchema } from '../../../services/EmployeeValidation'; 
-import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
+import { uploadDocs } from "../../../services/uploadsDocsS3/UploadDocs";
 import { SpinLogo } from '../../../utils/SpinLogo';
 import { FileUploadNew } from '../medicalDep/FileUploadField';
 import { FormField } from '../../../utils/FormField';
@@ -11,7 +11,8 @@ import { useOutletContext } from 'react-router-dom';
 import { DataSupply } from '../../../utils/DataStoredContext';
 import { useContext } from 'react';
 import { UpdateImmigra } from '../../../services/updateMethod/UpdateImmigra';
-// import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteImmiUpload";
+import { DeleteImmiUpload } from "../../../services/uploadDocsDelete/DeleteImmiUpload";
+import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 
 export const Immigration = () => {
   const { searchResultData } = useOutletContext();
@@ -34,7 +35,11 @@ export const Immigration = () => {
   
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle]=useState("")
-
+ const [isUploading, setIsUploading] = useState({
+  arrivStampUpload: false,
+  immigEmpUpload: false,
+    reEntryUpload: false,
+    });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     arrivStampUpload: null,
     immigEmpUpload: null,
@@ -45,21 +50,6 @@ export const Immigration = () => {
     immigEmpUpload: [],
     reEntryUpload: [],
   });
-  // const [id, setID] = useState({immigrationID:"",});
-
-  const watchInducImmUpAS = watch("arrivStampUpload", ""); // Watch the arrivStampUpload field
-  const watchInducImmUpIE = watch("immigEmpUpload", ""); // Watch the arrivStampUpload field
-  const watchInducImmUpRE = watch("reEntryUpload", ""); // Watch the arrivStampUpload field
-  const empID = watch("empID");
-
-  const extractFileName = (url) => {
-    if (typeof url === "string" && url) {
-      return url.split("/").pop(); // Extract the file name from URL
-    }
-    return ""; 
-  };
-
-
 
   const getFileName = (input) => {
     // Check if input is an object and has the 'upload' property
@@ -113,15 +103,6 @@ export const Immigration = () => {
 
     if (!searchResultData) return;
 
-  // const immiRecord = PPValidsData.find((match) => match.empID === searchResultData.empID);
-  
-  // if (immiRecord) {
-  //   setID((prevData) => ({
-  //     ...prevData,
-  //     immigrationID: immiRecord.id, // Ensure this field exists in SRData.
-  //   }));
-  // }
-
     setValue("empID", searchResultData.empID);
     const field = [ "ppLocation","arrivStampUpload","immigEmpUpload","reEntryUpload","arrivStampExp",
       "immigRefNo","ppSubmit","empPassExp","empPassStatus","airTktStatus","reEntryVisa","immigApproval",
@@ -162,85 +143,89 @@ export const Immigration = () => {
     parseUploadField("reEntryUpload");
   }, [searchResultData, setValue]);
   
-  const handleFileChange = async (e, label) => {
-    const watchedEmpID = watch("empID");
-    if (!watchedEmpID) {
-      alert("Please enter the Employee ID before uploading files.");
-      window.location.href = "/employeeInfo";
-      return;
-    }
-  
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
-  
-    const allowedTypes = ["application/pdf"];
-    if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file");
-                return;
-    }
-  
-    // Fetch current files (including backend-stored ones)
-    const currentFiles = watch(label) || []; // React Hook Form state
-  
-    // Count only newly uploaded files, ignoring backend-stored files
-    const newUploads = currentFiles.filter(file => file instanceof File);
-  
-    if (newUploads.length > 0) {
-      alert("You can only upload one new file.");
-      return;
-    }
-  
-    // Ensure the file was not previously deleted
-    // if (deletedFiles[label]?.includes(selectedFile.name)) {
-    //   alert("This file was previously deleted and cannot be re-added.");
-    //   return;
-    // }
-  
-    // Append the new file to the form state
-    setValue(label, [...currentFiles, selectedFile]);
-  
-    try {
-      await uploadDocs(selectedFile, label, setUploadedImmigrate, watchedEmpID);
-      setUploadedFileNames((prev) => ({
-        ...prev,
-        [label]: selectedFile.name,
-      }));
-    } catch (err) {
-      console.error(err);
-    }
-  };
+const updateUploadingState = (label, value) => {
+     setIsUploading((prev) => ({
+       ...prev,
+       [label]: value,
+     }));
+     console.log(value);
+   };
+ 
+   const handleFileChange = async (e, label) => {
+     const watchedEmpID = watch("empID");
+     if (!watchedEmpID) {
+         alert("Please enter the Employee ID before uploading files.");
+         window.location.href = "/employeeInfo";
+         return;
+     }
+ 
+     const selectedFile = e.target.files[0];
+     if (!selectedFile) return;
+ 
+     const allowedTypes = [
+       "application/pdf",
+     ];
+     if (!allowedTypes.includes(selectedFile.type)) {
+         alert("Upload must be a PDF file.");
+         return;
+     }
+ 
+     // Ensure no duplicate files are added
+     const currentFiles = watch(label) || [];
+     if (currentFiles.some((file) => file.name === selectedFile.name)) {
+         alert("This file has already been uploaded.");
+         return;
+     }
 
-  // const deleteFile = async (fileType, fileName) => {
-  //   const watchedEmpID = watch("empID");
-  //   const immigrationID = id.immigrationID;
-
-  //   try {
-  //     await handleDeleteFile(
-  //       fileType,
-  //       fileName,
-  //       watchedEmpID,
-  //       setUploadedFileNames,
-  //       setValue,
-  //       trigger,
-  //       immigrationID
-  //     );
-  //     const currentFiles = watch(fileType) || []; 
-  //     // Filter out the deleted file
-  //     const updatedFiles = currentFiles.filter(
-  //       (file) => file.name !== fileName
-  //     );
-  //     // Update form state with the new file list
-  //     setValue(fileType, updatedFiles);
-
-  //     // Update UI state
-  //     setUploadedImmigrate((prevState) => ({
-  //       ...prevState,
-  //       [fileType]: updatedFiles,
-  //     }));
-  //   } catch (error) {
-  //     console.error("Error deleting file:", error);
-  //   }
-  // };
+ 
+     setValue(label, [...currentFiles, selectedFile]);
+ 
+     try {
+       updateUploadingState(label, true);
+       await uploadDocs(selectedFile, label, setUploadedImmigrate, watchedEmpID);
+       setUploadedFileNames((prev) => ({
+         ...prev,
+         [label]: selectedFile.name,
+       }));
+     } catch (err) {
+         console.error(err);
+     }
+   };
+ 
+   const deleteFile = async (fileType, fileName) => {
+     try {
+       const watchedEmpID = watch("empID");
+       if (!watchedEmpID) {
+         alert("Please provide the Employee ID before deleting files.");
+         return;
+       }
+ 
+       const isDeleted = await handleDeleteFile(
+         fileType,
+         fileName,
+         watchedEmpID
+       );
+       const isDeletedArrayUploaded = await DeleteImmiUpload(
+         fileType,
+         fileName,
+         watchedEmpID,
+         setUploadedFileNames,
+         setUploadedImmigrate,
+         setIsUploading
+       );
+ 
+       if (!isDeleted || isDeletedArrayUploaded) {
+         console.error(
+           `Failed to delete file: ${fileName}, skipping UI update.`
+         );
+         return;
+       }
+       // console.log(`Deleted "${fileName}". Remaining files:`);
+     } catch (error) {
+       console.error("Error deleting file:", error);
+       alert("Error processing the file deletion.");
+     }
+   };
 
   const onSubmit = async (data) => {    
     try {
@@ -390,8 +375,9 @@ export const Immigration = () => {
             // extractFileName(watchInducImmUpAS)
           }  
           uploadedFileNames={uploadedFileNames}
-          // deleteFile={deleteFile}
-
+          handleFileChange={handleFileChange}
+          isUploading={isUploading}
+          deleteFile={deleteFile}
           field={{ title: "arrivStampUpload" }}
        
           />
@@ -441,7 +427,9 @@ export const Immigration = () => {
             uploadedFileNames.immigEmpUpload ||
 ""          } 
           uploadedFileNames={uploadedFileNames}
-          // deleteFile={deleteFile}
+          handleFileChange={handleFileChange}
+          isUploading={isUploading}
+          deleteFile={deleteFile}
           field={{ title: "immigEmpUpload" }}
        
           />
@@ -498,7 +486,9 @@ export const Immigration = () => {
             uploadedFileNames.reEntryUpload ||
 ""          }  
           uploadedFileNames={uploadedFileNames}
-          // deleteFile={deleteFile} 
+          handleFileChange={handleFileChange}
+          isUploading={isUploading}
+          deleteFile={deleteFile} 
           field={{ title: "reEntryUpload" }}
           />
        

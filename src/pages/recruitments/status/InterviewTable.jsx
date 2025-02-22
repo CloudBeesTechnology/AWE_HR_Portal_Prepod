@@ -30,7 +30,7 @@ const handleShowReviewForm = (candi) => {
   return (
     <div>
       {data && data.length > 0 ? (
-        <table className=" w-full">
+        <table className="w-full table-auto rounded-lg overflow-hidden">
           <thead className="bg-[#939393] text-white">
             <tr>
               {heading.map((header, index) => (
@@ -46,7 +46,7 @@ const handleShowReviewForm = (candi) => {
                 return (
                   <tr
                     key={index}
-                    className="text-center text-[16px] shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
+                    className="text-center bg-white border-b-2 border-[#C7BCBC] text-[15px] text-[#303030] hover:bg-medium_blue"
                   >
                     <td className="py-3">{item.tempID}</td>
                     <td className="py-3">{item.name || "N/A"}</td>
@@ -64,7 +64,7 @@ const handleShowReviewForm = (candi) => {
                       {item.interviewDetails_manager || "N/A"}
                     </td>
                     <td className="py-3 text-center" onClick={() => handleShowReviewForm(item)} >View</td>
-                    <td className="text-2xl cursor-pointer py-3 center" onClick={()=>handleShowForm(item)}>
+                    <td className="text-2xl text-[#EA4F4F] cursor-pointer py-3 center" onClick={()=>handleShowForm(item)}>
                       <RiFileEditLine />
                     </td>
                   </tr>

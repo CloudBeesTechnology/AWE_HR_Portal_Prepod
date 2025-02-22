@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { uploadDocs } from "../../../../services/uploadDocsS3/UploadDocs";
+import { uploadDocString } from "../../../../services/uploadsDocsS3/UploadDocs";
 import { FileUploadField } from "../../../employees/medicalDep/FileUploadField";
 import { AirTktFormSchema } from "../../../../services/Validation";
 import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
@@ -9,6 +9,8 @@ import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPT
 import { UpdateInterviewData } from "../../../../services/updateMethod/UpdateInterview";
 import { statusOptions } from "../../../../utils/StatusDropdown";
 import { SpinLogo } from "../../../../utils/SpinLogo";
+import { handleDeleteFile } from "../../../../services/uploadsDocsS3/DeleteDocs";
+import { DeleteUploadAirTicket } from "../deleteUpload/DeleteUploadAirTicket";
 
 export const AirTktForm = ({ candidate }) => {
   const { interviewSchedules } = useFetchCandy();
@@ -26,6 +28,10 @@ export const AirTktForm = ({ candidate }) => {
       airticketfile: "",
       status: "",
     },
+  });
+
+  const [isUploadingString, setIsUploadingString] = useState({
+    airTktFile: false,
   });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     airTktFile: null,
@@ -45,17 +51,14 @@ export const AirTktForm = ({ candidate }) => {
   });
 
   const AirTktUpload = watch("airTktFile", "");
-  // console.log(interviewSchedules);
 
   useEffect(() => {
     if (interviewSchedules.length > 0) {
-      // Find the interviewData for the candidate
       const interviewData = interviewSchedules.find(
         (data) => data.tempID === candidate.tempID
       );
 
       if (interviewData) {
-        // Set the form data
         setFormData({
           interview: {
             departuredate: interviewData.departuredate,
@@ -67,7 +70,6 @@ export const AirTktForm = ({ candidate }) => {
           },
         });
 
-        // Check if sawpFile exists and update the file names
         if (interviewData.airticketfile) {
           const fileName = extractFileName(interviewData.airticketfile);
           setUploadedFileNames((prev) => ({
@@ -86,23 +88,85 @@ export const AirTktForm = ({ candidate }) => {
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
-      return url.split("/").pop(); // Extract the file name from URL
+      const decodedUrl = decodeURIComponent(url);
+      const fileNameWithParams = decodedUrl.split("/").pop();
+      return fileNameWithParams.split("?")[0].split(",")[0].split("#")[0];
     }
     return "";
   };
 
-  const handleFileChange = async (e, type) => {
-    const file = e.target.files[0];
-    setValue(type, file); // Set file value for validation
-    if (file) {
-      if (type === "airTktFile") {
-        await uploadDocs(file, "airTktFile", setUploadedAirTkt, "personName");
+  const updateUploadingString = (type, value) => {
+    setIsUploadingString((prev) => ({
+      ...prev,
+      [type]: value,
+    }));
+    // console.log(value);
+  };
 
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          airTktFile: file.name, // Store the file name for display
-        }));
+  const handleFileUpload = async (e, type) => {
+    const tempID = candidate.tempID;
+
+    if (!tempID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
+    }
+
+    let selectedFile = e.target.files[0];
+
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
+
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
+    }
+
+    setValue(type, selectedFile);
+
+    if (selectedFile) {
+      updateUploadingString(type, true);
+      await uploadDocString(selectedFile, type, setUploadedAirTkt, tempID);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [type]: selectedFile.name,
+      }));
+    }
+  };
+
+  const deletedStringUpload = async (fileType, fileName) => {
+    try {
+      const tempID = candidate.tempID;
+
+      if (!tempID) {
+        alert("Please provide the Employee ID before deleting files.");
+        return;
       }
+
+      const isDeleted = await handleDeleteFile(fileType, fileName, tempID);
+      const isDeletedArrayUploaded = await DeleteUploadAirTicket(
+        fileType,
+        fileName,
+        tempID,
+        setUploadedFileNames,
+        setUploadedAirTkt,
+        setIsUploadingString
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
     }
   };
 
@@ -138,14 +202,13 @@ export const AirTktForm = ({ candidate }) => {
           arrivaldate: formData.interview.arrivaldate,
           cityname: formData.interview.cityname,
           airfare: formData.interview.airfare,
-          airticketfile: uploadedAirTkt.airTktFile
-            ? uploadedAirTkt.airTktFile
-            : formData.interview.airticketfile,
+          airticketfile:
+            uploadedAirTkt.airTktFile || formData.interview.airticketfile,
         },
       });
 
       const interStatus = {
-        id: interviewScheduleStatusId, // Dynamically use the correct id
+        id: interviewScheduleStatusId,
         status: formData.interview.status,
       };
       setNotification(true);
@@ -183,7 +246,7 @@ export const AirTktForm = ({ candidate }) => {
           <div>
             <label htmlFor="departuredate">Date of Departure</label>
             <input
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               type="date"
               id="departuredate"
               {...register("departuredate")}
@@ -197,7 +260,7 @@ export const AirTktForm = ({ candidate }) => {
           <div>
             <label htmlFor="arrivaldate">Date of Arrival</label>
             <input
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               type="date"
               id="arrivaldate"
               {...register("arrivaldate")}
@@ -208,7 +271,7 @@ export const AirTktForm = ({ candidate }) => {
           <div>
             <label htmlFor="cityname">City of Departure</label>
             <input
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               type="text"
               id="cityname"
               {...register("cityname")}
@@ -219,7 +282,7 @@ export const AirTktForm = ({ candidate }) => {
           <div>
             <label htmlFor="airfare">AirFare</label>
             <input
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               type="text"
               id="airfare"
               {...register("airfare")}
@@ -227,32 +290,15 @@ export const AirTktForm = ({ candidate }) => {
               onChange={(e) => handleInputChange("airfare", e.target.value)}
             />
           </div>
-
-          <div className="">
-            <div className="flex items-center gap-5 mt-1">
-              <FileUploadField
-                label="Upload File"
-                className="p-4"
-                onChangeFunc={(e) => handleFileChange(e, "airTktFile")}
-                accept="application/pdf"
-                register={register}
-                fileName={
-                  uploadedFileNames.airTktFile || extractFileName(AirTktUpload)
-                }
-                value={formData.interview.airfare}
-              />
-            </div>
-          </div>
           <div>
             <label htmlFor="status">Status</label>
             <select
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               id="status"
               {...register("status")}
               value={formData.interview.status}
               onChange={(e) => handleInputChange("status", e.target.value)}
             >
-              {/* <option value="">Select Status</option> */}
               {statusOptions.map((status, index) => (
                 <option key={index} value={status}>
                   {status}
@@ -260,12 +306,26 @@ export const AirTktForm = ({ candidate }) => {
               ))}
             </select>
           </div>
+          <div className="">
+            <div className="">
+              <FileUploadField
+                label="Upload File"
+                register={register}
+                fileKey="airTktFile"
+                handleFileUpload={handleFileUpload}
+                uploadedFileNames={uploadedFileNames}
+                deletedStringUpload={deletedStringUpload}
+                isUploadingString={isUploadingString}
+                error={errors.airTktFile}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="mt-5 flex justify-center">
           <button
             type="submit"
-            className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
+            className="py-2 px-12 font-medium rounded shadow-lg bg-yellow hover:bg-yellow"
           >
             Submit
           </button>

@@ -7,7 +7,7 @@ import { CVEVForm } from "../ScheduledForm/CVEVForm";
 import { PAAFForm } from "../ScheduledForm/PAAFForm";
 import { MobilizationForm } from "../ScheduledForm/MobilizationForm";
 // getLocalMobilization
-
+ 
 export const StatusForm = ({ candidate, onClose, onSave }) => {
   // const [activeTab, setActiveTab] = useState('Interview'); // Default active tab is 'Interview'
   const [show, setShow] = useState(0);
@@ -20,10 +20,10 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
         >
           <VscClose size={20} />
         </button>
-        <div className="p-4 rounded-md bg-[#f7f183ea]">
-          <div className="grid grid-cols-1 sm:grid-cols-4 text-xs font-semibold">
+        <div className="p-4 shadow-md bg-[#FBFCFF]">
+          <div className="flex gap-4 text-[13px] font-semibold">
             <div>
-              <span className="font-semibold">TempID:</span> {candidate?.tempID}
+              <span className="font-semibold">TEMP ID:</span> {candidate?.tempID}
             </div>
             <div>
               <span className="font-semibold">Name:</span> {candidate?.name}
@@ -41,30 +41,30 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
 
         <article className="flex-1 flex gap-5 text-black mt-5">
           <h1
-            className={`  px-3 py-1 rounded-lg whitespace-nowrap  ${
+            className={`  px-3 py-1 rounded whitespace-nowrap  ${
               show === 0
-                ? "border-2 border-[#FEF116] bg-[#FFFEF4]"
-                : "bg-[#DDDDDD]"
+                ? "border-2 border-[#EEEBEB] bg-[#F9F9F9]"
+                : "bg-[#F9F9F9]"
             }`}
             onClick={() => setShow(0)}
           >
             Interview
           </h1>
           <h2
-            className={`  px-3 py-1 rounded-lg whitespace-nowrap  ${
+            className={`  px-3 py-1 rounded whitespace-nowrap  ${
               show === 1
-                ? "border-2 border-[#FEF116] bg-[#FFFEF4]"
-                : "bg-[#DDDDDD]"
+                ? "border-2 border-[#EEEBEB] bg-[#F9F9F9]"
+                : "bg-[#F9F9F9]"
             }`}
             onClick={() => setShow(1)}
           >
             Candidate
           </h2>
           <h3
-            className={`  px-3 py-1 rounded-lg whitespace-nowrap  ${
+            className={`  px-3 py-1 rounded whitespace-nowrap  ${
               show === 2
-                ? "border-2 border-[#FEF116] bg-[#FFFEF4]"
-                : "bg-[#DDDDDD]"
+                ? "border-2 border-[#EEEBEB] bg-[#F9F9F9]"
+                : "bg-[#F9F9F9]"
             }`}
             onClick={() => setShow(2)}
           >
@@ -73,10 +73,10 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
 
           {candidate?.empType === "Offshore" && (
             <h4
-              className={` px-3 py-1 rounded-lg whitespace-nowrap  ${
+              className={` px-3 py-1 rounded whitespace-nowrap  ${
                 show === 3
-                  ? "border-2 border-[#FEF116] bg-[#FFFEF4]"
-                  : "bg-[#DDDDDD]"
+                  ? "border-2 border-[#EEEBEB] bg-[#F9F9F9]"
+                  : "bg-[#F9F9F9]"
               }`}
               onClick={() => setShow(3)}
             >
@@ -86,10 +86,10 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
 
           {candidate?.empType === "Onshore" && (
             <h5
-              className={`  px-3 py-1 rounded-lg whitespace-nowrap  ${
+              className={`  px-3 py-1 rounded whitespace-nowrap  ${
                 show === 4
-                  ? "border-2 border-[#FEF116] bg-[#FFFEF4]"
-                  : "bg-[#DDDDDD]"
+                  ? "border-2 border-[#EEEBEB] bg-[#F9F9F9]"
+                  : "bg-[#F9F9F9]"
               }`}
               onClick={() => setShow(4)}
             >
@@ -99,10 +99,10 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
 
           {candidate?.contractType === "Local" && (
             <h6
-              className={`  px-3 py-1 rounded-lg whitespace-nowrap  ${
+              className={`px-3 py-1 rounded whitespace-nowrap  ${
                 show === 5
-                  ? "border-2 border-[#FEF116] bg-[#FFFEF4]"
-                  : "bg-[#DDDDDD]"
+                  ? "border-2 border-[#EEEBEB] bg-[#F9F9F9]"
+                  : "bg-[#F9F9F9]"
               }`}
               onClick={() => setShow(5)}
             >

@@ -1,12 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { FormField } from "../../../utils/FormField";
-import { FileUploadFieldArr } from "./FileUploadField";
-import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
+import { FileUploadFieldNew } from "./FileUploadField";
+import { uploadDocs } from "../../../services/uploadsDocsS3/UploadDocs";
 import { FaRegMinusSquare } from "react-icons/fa";
 import { CiSquarePlus } from "react-icons/ci";
-import { LabourTypeDD } from "../../../utils/DropDownMenus";
+import { LabourTypeDD, uploadFields } from "../../../utils/DropDownMenus";
+import { DataSupply } from "../../../utils/DataStoredContext";
 import { useFieldArray } from "react-hook-form";
-// import { handleDeleteFile } from "../../../services/uploadDocsS3/LabourImmiUpload";
+import { DeleteDocsDependPass } from "../../../services/uploadDocsDelete/DeleteDocsDependPass";
+import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 
 export const DependentPass = ({
   errors,
@@ -17,32 +19,20 @@ export const DependentPass = ({
   value,
   getValues,
   watch,
-  id,
-  trigger,
-  deleteFile,
+  UploadingFiles,
 }) => {
   const isInitialMount = useRef(true);
   const [docsUploaded, setDocsUploaded] = useState({});
-  const [arrayFileNames, setArrayFileNames] = useState({});
+  const [isUploading, setIsUploading] = useState({
+    uploadDp: false,
+    uploadDr: false,
+  });
+  const [uploadedFileNames, setUploadedFileNames] = useState({});
 
   const { fields, append, remove, replace } = useFieldArray({
     control,
     name: "dependPass",
   });
-
-  const getFileName = (filePath) => {
-    if (!filePath) return "";
-
-    if (typeof filePath === "object" && filePath.name) {
-      return filePath.name;
-    }
-
-    if (typeof filePath === "string") {
-      return filePath.split("/").pop();
-    }
-
-    return "";
-  };
 
   useEffect(() => {
     if (isInitialMount.current) {
@@ -50,8 +40,20 @@ export const DependentPass = ({
         const parsedValue = typeof value === "string" ? JSON.parse(value) : value;
         const normalizedValue = parsedValue.map((item) => ({
           ...item,
-          uploadDp: Array.isArray(item.uploadDp) ? item.uploadDp : [item.uploadDp],
-          uploadDr: Array.isArray(item.uploadDr) ? item.uploadDr : [item.uploadDr],
+          uploadDp: Array.isArray(item.uploadDp)
+            ? item.uploadDp
+            : [
+                typeof item.uploadDp === "string"
+                  ? JSON.parse(item.uploadDp)
+                  : item.uploadDp,
+              ],
+          uploadDr: Array.isArray(item.uploadDr)
+            ? item.uploadDr
+            : [
+                typeof item.uploadDr === "string"
+                  ? JSON.parse(item.uploadDr)
+                  : item.uploadDr,
+              ],
         }));
 
         replace(normalizedValue);
@@ -75,8 +77,20 @@ export const DependentPass = ({
       const parsedValue = typeof value === "string" ? JSON.parse(value) : value;
       const normalizedValue = parsedValue.map((item) => ({
         ...item,
-        uploadDp: Array.isArray(item.uploadDp) ? item.uploadDp : [item.uploadDp],
-        uploadDr: Array.isArray(item.uploadDr) ? item.uploadDr : [item.uploadDr],
+        uploadDp: Array.isArray(item.uploadDp)
+          ? item.uploadDp
+          : [
+              typeof item.uploadDp === "string"
+                ? JSON.parse(item.uploadDp)
+                : item.uploadDp,
+            ],
+        uploadDr: Array.isArray(item.uploadDr)
+          ? item.uploadDr
+          : [
+              typeof item.uploadDr === "string"
+                ? JSON.parse(item.uploadDr)
+                : item.uploadDr,
+            ],
       }));
 
       replace(normalizedValue);
@@ -88,18 +102,35 @@ export const DependentPass = ({
         if (normalizedValue && Array.isArray(normalizedValue)) {
           normalizedValue.forEach((item, idx) => {
             const url = item?.[field];
-            const parsedFiles = Array.isArray(url) ? url : [url];
 
-            setDocsUploaded((prev) => ({
+            const parsedFiles = Array.isArray(url)
+              ? url.map((fileItem) => {
+                  if (fileItem && typeof fileItem === "object" && fileItem.upload) {
+                    return typeof fileItem === "string" ? JSON.parse(fileItem) : fileItem;
+                  }
+                  return null;
+                }).filter(Boolean)
+              : [];
+
+            setDocsUploaded((prev) => {
+              const updatedDepInsurance = Array.isArray(prev[field])
+                ? [...prev[field]]
+                : [];
+              updatedDepInsurance[idx] = parsedFiles;
+
+              return {
+                ...prev,
+                [field]: updatedDepInsurance,
+              };
+            });
+
+            const fileNames = parsedFiles.map((file) =>
+              file && file.upload ? getFileName(file.upload) : ""
+            );
+
+            setUploadedFileNames((prev) => ({
               ...prev,
-              [`${idx}_${field}`]: parsedFiles,
-            }));
-
-            const fileName = parsedFiles.length > 0 ? getFileName(parsedFiles[parsedFiles.length - 1]) : "";
-
-            setArrayFileNames((prev) => ({
-              ...prev,
-              [`${idx}_${field}`]: fileName,
+              [`${idx}_${field}`]: fileNames,
             }));
           });
         }
@@ -107,14 +138,22 @@ export const DependentPass = ({
     }
   }, [value, append, replace, setValue]);
 
+  const getFileName = (filePath) => {
+    if (!filePath) {
+      return "";
+    }
+    const fileNameWithExtension = filePath.split("/").pop();
+    return fileNameWithExtension;
+  };
+
+  const watchedEmpID = watch("empID");
+
   const handleFileChange = async (e, fieldName, index) => {
-    const watchedEmpID = watch("empID");
     if (!watchedEmpID) {
       alert("Please enter the Employee ID before uploading files.");
       window.location.href = "/labourImmigration";
       return;
     }
-
     const file = e.target.files[0];
     if (!file) return;
 
@@ -122,7 +161,6 @@ export const DependentPass = ({
       alert("Upload must be a PDF file");
       return;
     }
-
     const currentFiles = getValues(`dependPass[${index}].${fieldName}`) || [];
     const updatedFiles = [...currentFiles, file];
 
@@ -130,34 +168,70 @@ export const DependentPass = ({
 
     try {
       await uploadDocs(file, fieldName, setDocsUploaded, watchedEmpID, index);
-      setArrayFileNames((prev) => ({
+
+      setUploadedFileNames((prev) => ({
         ...prev,
-        [`${index}_${fieldName}`]: file.name,
+        [`${index}_${fieldName}`]: [...(prev[`${index}_${fieldName}`] || []), file.name],
       }));
     } catch (error) {
       console.error("File upload error:", error);
     }
   };
 
-  // const handleDeleteFile = async (fileType, fileName, index) => {
-  //   const watchedEmpID = watch("empID");
-  //   const { serviceID, terminateID } = id;
-
-  //   try {
-  //     await deleteFile(fileType, fileName, watchedEmpID, setArrayFileNames, setValue, trigger, terminateID, serviceID);
-
-  //     const currentFiles = getValues(`dependPass[${index}].${fileType}`) || [];
-  //     const updatedFiles = currentFiles.filter((file) => file.name !== fileName);
-
-  //     setValue(`dependPass[${index}].${fileType}`, updatedFiles);
-  //     setDocsUploaded((prev) => ({
-  //       ...prev,
-  //       [`${index}_${fileType}`]: updatedFiles,
-  //     }));
-  //   } catch (error) {
-  //     console.error("Error deleting file:", error);
-  //   }
-  // };
+  const deleteFile = async (fileType, fileName, index) => {
+    try {
+      const watchedEmpID = watch("empID");
+      if (!watchedEmpID) {
+        alert("Please provide the Employee ID before deleting files.");
+        return;
+      }
+  
+      // Delete the file from the server
+      const isDeleted = await handleDeleteFile(fileType, fileName, watchedEmpID);
+      const isDeletedArrayUploaded = await DeleteDocsDependPass(
+        fileType,
+        fileName,
+        watchedEmpID,
+        setUploadedFileNames,
+        setDocsUploaded,
+        setIsUploading
+      );
+  
+      if (isDeleted || isDeletedArrayUploaded) {
+        // Update the form state using setValue
+        const currentFiles = getValues(`dependPass[${index}].${fileType}`) || [];
+        const updatedFiles = currentFiles.filter((file) => {
+          // Ensure we're comparing the correct file name
+          const filePath = file?.upload || file?.name;
+          return getFileName(filePath) !== fileName;
+        });
+  
+        setValue(`dependPass[${index}].${fileType}`, updatedFiles);
+  
+        // Update the local state (uploadedFileNames and docsUploaded)
+        setUploadedFileNames((prev) => ({
+          ...prev,
+          [`${index}_${fileType}`]: updatedFiles.map((file) => getFileName(file?.upload || file?.name)),
+        }));
+  
+        setDocsUploaded((prev) => {
+          const updatedDocs = { ...prev };
+          if (Array.isArray(updatedDocs[fileType])) {
+            updatedDocs[fileType][index] = updatedFiles;
+          }
+          return updatedDocs;
+        });
+  
+        console.log("File deleted successfully:", fileName);
+      } else {
+        console.error("Failed to delete file from the server:", fileName);
+      }
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
+    }
+  };
+console.log(docsUploaded);
 
   useEffect(() => {
     setArrayUploadDocs(docsUploaded);
@@ -181,116 +255,120 @@ export const DependentPass = ({
     <div className="form-group mt-5">
       <div className="flex justify-between mb-5 text-dark_grey">
         <label className="text_size_3">Dependent Pass Info</label>
-        <button type="button" className="px-3 py-1 rounded" onClick={handleAddDependPass}>
+        <button
+          type="button"
+          className="px-3 py-1 rounded"
+          onClick={handleAddDependPass}
+        >
           <CiSquarePlus className="text-xl" />
         </button>
       </div>
-      {fields.map((field, index) => (
-        <div key={field.id} className="grid grid-cols-4 gap-4 mb-2 relative">
-          <FormField
-            label="Dependent Name"
-            type="text"
-            name={`dependPass[${index}].dependName`}
-            placeholder="Enter Name"
-            errors={errors}
-            register={register}
-          />
-          <FormField
-            label="Passport Number"
-            type="text"
-            name={`dependPass[${index}].dependPpNo`}
-            placeholder="Enter Passport Number"
-            errors={errors}
-            register={register}
-          />
-          <FormField
-            label="Date of Birth"
-            type="date"
-            name={`dependPass[${index}].dependPpE`}
-            placeholder="Enter Date of Birth"
-            errors={errors}
-            register={register}
-          />
-          <FormField
-            label="Relation"
-            type="text"
-            name={`dependPass[${index}].relation`}
-            placeholder="Enter Relation"
-            errors={errors}
-            register={register}
-          />
-          <FormField
-            label="Labour Deposit By"
-            type="select"
-            name={`dependPass[${index}].labourDPBy`}
-            options={LabourTypeDD}
-            errors={errors}
-            register={register}
-          />
-          <FormField
-            label="Labour Deposit Received Number"
-            type="text"
-            name={`dependPass[${index}].labourDRNo`}
-            placeholder="Enter Deposit Number"
-            errors={errors}
-            register={register}
-          />
-          <FormField
-            label="Labour Deposit Amount"
-            type="text"
-            name={`dependPass[${index}].labourDAmount`}
-            placeholder="Enter Deposit Amount"
-            errors={errors}
-            register={register}
-          />
-          <FileUploadFieldArr
-            label="Upload Dependent Pass"
-            onChangeFunc={(e) => handleFileChange(e, "uploadDp", index)}
-            register={register(`dependPass[${index}].uploadDp`)}
-            error={errors?.dependPass?.[index]?.uploadDp}
-            arrayFileNames={arrayFileNames}
-            // deleteFile={(fieldTitle, fileName) =>
-            //   handleDeleteFile(fieldTitle, fileName, index)
-            // }
-            field={{ title: `${index}_uploadDp` }}
-          />
-          <FileUploadFieldArr
-            label="Upload Dependent Passport"
-            onChangeFunc={(e) => handleFileChange(e, "uploadDr", index)}
-            register={register(`dependPass[${index}].uploadDr`)}
-            error={errors?.dependPass?.[index]?.uploadDr}
-            arrayFileNames={arrayFileNames}
-            // deleteFile={(fieldTitle, fileName) =>
-            //   handleDeleteFile(fieldTitle, fileName, index)
-            // }
-            field={{ title: `${index}_uploadDr` }}
-          />
-          {index !== 0 && (
-            <button
-              type="button"
-              onClick={() => remove(index)}
-              className="absolute top-0 right-0 text-medium_grey text-[18px]"
-            >
-              <FaRegMinusSquare />
-            </button>
-          )}
-        </div>
-      ))}
+      {fields.map((field, index) => {
+        return (
+          <div key={field.id} className="grid grid-cols-4 gap-4 mb-2 relative">
+            <FormField
+              label="Dependent Name"
+              type="text"
+              name={`dependPass[${index}].dependName`}
+              placeholder="Enter Name"
+              errors={errors}
+              register={register}
+            />
+            <FormField
+              label="Passport Number"
+              type="text"
+              name={`dependPass[${index}].dependPpNo`}
+              placeholder="Enter Passport Number"
+              errors={errors}
+              register={register}
+            />
+            <FormField
+              label="Date of Birth"
+              type="date"
+              name={`dependPass[${index}].dependPpE`}
+              placeholder="Enter Date of Birth"
+              errors={errors}
+              register={register}
+            />
+            <FormField
+              label="Relation"
+              type="text"
+              name={`dependPass[${index}].relation`}
+              placeholder="Enter Relation"
+              errors={errors}
+              register={register}
+            />
+            <FormField
+              label="Labour Deposit By"
+              type="select"
+              name={`dependPass[${index}].labourDPBy`}
+              options={LabourTypeDD}
+              errors={errors}
+              register={register}
+            />
+            <FormField
+              label="Labour Deposit Received Number"
+              type="text"
+              name={`dependPass[${index}].labourDRNo`}
+              placeholder="Enter Deposit Number"
+              errors={errors}
+              register={register}
+            />
+            <FormField
+              label="Labour Deposit Amount"
+              type="number"
+              inputmode="numeric"
+              name={`dependPass[${index}].labourDAmount`}
+              placeholder="Enter Deposit Amount"
+              errors={errors}
+              register={register}
+            />
+            <FileUploadFieldNew
+              label="Upload Dependent Pass"
+              onChangeFunc={(e) => handleFileChange(e, "uploadDp", index)}
+              register={register(`dependPass[${index}].uploadDp`)}
+              error={errors?.dependPass?.[index]?.uploadDp}
+              deleteFile={(fileName) => deleteFile("uploadDp", fileName, index)}
+              uploadedFileNames={uploadedFileNames}
+              fileName={uploadedFileNames[`${index}_uploadDp`] || ""}
+              fileType="uploadDp"
+            />
+            <FileUploadFieldNew
+              label="Upload Dependent Passport"
+              onChangeFunc={(e) => handleFileChange(e, "uploadDr", index)}
+              register={register(`dependPass[${index}].uploadDr`)}
+              error={errors?.dependPass?.[index]?.uploadDr}
+              deleteFile={(fileName) => deleteFile("uploadDr", fileName, index)}
+              fileName={uploadedFileNames[`${index}_uploadDr`] || ""}
+              fileType="uploadDr"
+            />
+            {index !== 0 && (
+              <button
+                type="button"
+                onClick={() => remove(index)}
+                className="absolute top-0 right-0 text-medium_grey text-[18px]"
+              >
+                <FaRegMinusSquare />
+              </button>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };
 
 
-
 // import React, { useEffect, useRef, useState } from "react";
 // import { FormField } from "../../../utils/FormField";
-// import { FileUploadFieldArr } from "./FileUploadFieldArr";
-// import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
+// import { FileUploadFieldArr } from "./FileUploadField";
+// import { uploadDocs } from "../../../services/uploadsDocsS3/UploadDocs";
 // import { FaRegMinusSquare } from "react-icons/fa";
 // import { CiSquarePlus } from "react-icons/ci";
 // import { LabourTypeDD } from "../../../utils/DropDownMenus";
 // import { useFieldArray } from "react-hook-form";
-// import { handleDeleteFile } from "../../../services/uploadDocsS3/LabourImmiUpload";
+// import { DeleteDocsDependPass } from "../../../services/uploadDocsDelete/DeleteDocsDependPass";
+// import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 
 // export const DependentPass = ({
 //   errors,
@@ -301,15 +379,14 @@ export const DependentPass = ({
 //   value,
 //   getValues,
 //   watch,
-//   // setArrayFileNames,
-//   // arrayFileNames,
 //   id,
 //   trigger,
-//   deleteFile,
+//   setUploadedFileNames,
 // }) => {
 //   const isInitialMount = useRef(true);
 //   const [docsUploaded, setDocsUploaded] = useState({});
-//   const [arrayFileNames, setArrayFileNames] = useState({});
+//   const [uploadedFileNames, setUploadedFileNames] = useState({});
+//   const [isUploading, setIsUploading] = useState({});
 
 //   const { fields, append, remove, replace } = useFieldArray({
 //     control,
@@ -341,9 +418,7 @@ export const DependentPass = ({
 //         }));
 
 //         replace(normalizedValue);
-        
 //         setValue("dependPass", normalizedValue);
-//         console.log(normalizedValue,"fffffffffffffffff");
 //       } else {
 //         append({
 //           dependName: "",
@@ -383,9 +458,9 @@ export const DependentPass = ({
 //               [`${idx}_${field}`]: parsedFiles,
 //             }));
 
-//             const fileName = parsedFiles.length > 0 ? getFileName(parsedFiles[parsedFiles.length - 1]) : "";
+//             const fileName = parsedFiles.length > 0 ? getFileName(parsedFiles[parsedFiles.length]) : "";
 
-//             setArrayFileNames((prev) => ({
+//             setUploadedFileNames((prev) => ({
 //               ...prev,
 //               [`${idx}_${field}`]: fileName,
 //             }));
@@ -395,56 +470,101 @@ export const DependentPass = ({
 //     }
 //   }, [value, append, replace, setValue]);
 
-//   const handleFileChange = async (e, fieldName, index) => {
+//   const updateUploadingState = (label, value) => {
+//     setIsUploading((prev) => ({
+//       ...prev,
+//       [label]: value,
+//     }));
+//     console.log(value);
+//   };
+
+//   const handleFileChange = async (e, label, index) => {
 //     const watchedEmpID = watch("empID");
 //     if (!watchedEmpID) {
 //       alert("Please enter the Employee ID before uploading files.");
-//       window.location.href = "/labourImmigration";
+//       window.location.href = "/employeeInfo";
 //       return;
 //     }
 
-//     const file = e.target.files[0];
-//     if (!file) return;
+//     const selectedFile = e.target.files[0];
+//     if (!selectedFile) return;
 
-//     if (file.type !== "application/pdf") {
-//       alert("Upload must be a PDF file");
+//     const allowedTypes = [
+//       "application/pdf",
+//       "image/jpeg",
+//       "image/png",
+//       "image/jpg",
+//     ];
+//     if (!allowedTypes.includes(selectedFile.type)) {
+//       alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
 //       return;
 //     }
 
-//     const currentFiles = getValues(`dependPass[${index}].${fieldName}`) || [];
-//     const updatedFiles = [...currentFiles, file];
+//     // Ensure no duplicate files are added
+//     const currentFiles = watch(`dependPass[${index}].${label}`) || [];
+//     if (currentFiles.some((file) => file.name === selectedFile.name)) {
+//       alert("This file has already been uploaded.");
+//       return;
+//     }
 
-//     setValue(`dependPass[${index}].${fieldName}`, updatedFiles);
+//     setValue(`dependPass[${index}].${label}`, [...currentFiles, selectedFile]);
 
 //     try {
-//       await uploadDocs(file, fieldName, setDocsUploaded, watchedEmpID, index);
-//       setArrayFileNames((prev) => ({
+//       updateUploadingState(label, true);
+//       await uploadDocs(selectedFile, label, setDocsUploaded, watchedEmpID);
+
+//       const newFileName = selectedFile.name;
+
+//       // ✅ Fix uploadedFileNames state update
+//       setUploadedFileNames((prev) => ({
 //         ...prev,
-//         [`${index}_${fieldName}`]: file.name,
+//         [`${index}_${label}`]: newFileName, // Use correct key format
 //       }));
-//     } catch (error) {
-//       console.error("File upload error:", error);
+
+//       setUploadedFileNames((prev) => ({
+//         ...prev,
+//         [`${index}_${label}`]: newFileName,
+//       }));
+//     } catch (err) {
+//       console.error(err);
 //     }
 //   };
 
-//   const handleDeleteFile = async (fileType, fileName, index) => {
-//     const watchedEmpID = watch("empID");
-//     const { serviceID, terminateID } = id;
-//     console.log(arrayFileNames);
-
+//   const deleteFile = async (fieldTitle, fileName, index) => {
 //     try {
-//       await deleteFile(fileType, fileName, watchedEmpID, setArrayFileNames, setValue, trigger, terminateID, serviceID);
+//       const watchedEmpID = watch("empID");
+//       if (!watchedEmpID) {
+//         alert("Please provide the Employee ID before deleting files.");
+//         return;
+//       }
 
-//       const currentFiles = getValues(`dependPass[${index}].${fileType}`) || [];
-//       const updatedFiles = currentFiles.filter((file) => file.name !== fileName);
+//       const isDeleted = await handleDeleteFile(fieldTitle, fileName, watchedEmpID);
+//       const isDeletedArrayUploaded = await DeleteDocsDependPass(
+//         fieldTitle,
+//         fileName,
+//         watchedEmpID,
+//         setUploadedFileNames,
+//         setDocsUploaded,
+//         setIsUploading
+//       );
 
-//       setValue(`dependPass[${index}].${fileType}`, updatedFiles);
-//       setDocsUploaded((prev) => ({
-//         ...prev,
-//         [`${index}_${fileType}`]: updatedFiles,
-//       }));
+//       if (!isDeleted || isDeletedArrayUploaded) {
+//         console.error(`Failed to delete file: ${fileName}, skipping UI update.`);
+//         return;
+//       }
+
+//       // Update uploadedFileNames state
+//       setUploadedFileNames((prev) => {
+//         const updatedFileNames = { ...prev };
+//         const key = `${index}_${fieldTitle}`;
+//         if (updatedFileNames[key]) {
+//           updatedFileNames[key] = updatedFileNames[key].filter((name) => name !== fileName);
+//         }
+//         return updatedFileNames;
+//       });
 //     } catch (error) {
 //       console.error("Error deleting file:", error);
+//       alert("Error processing the file deletion.");
 //     }
 //   };
 
@@ -532,28 +652,24 @@ export const DependentPass = ({
 //             errors={errors}
 //             register={register}
 //           />
-//          <FileUploadFieldArr
-//   label="Upload Dependent Pass"
-//   onChangeFunc={(e) => handleFileChange(e, "uploadDp", index)}
-//   register={register(`dependPass[${index}].uploadDp`)}
-//   error={errors?.dependPass?.[index]?.uploadDp}
-//   arrayFileNames={arrayFileNames}
-//   deleteFile={(fieldTitle, fileName) =>
-//     handleDeleteFile(fieldTitle, fileName, index)
-//   }
-//   field={{ title: `dependPass[${index}].uploadDp` }}
-// />
-// <FileUploadFieldArr
-//   label="Upload Dependent Passport"
-//   onChangeFunc={(e) => handleFileChange(e, "uploadDr", index)}
-//   register={register(`dependPass[${index}].uploadDr`)}
-//   error={errors?.dependPass?.[index]?.uploadDr}
-//   arrayFileNames={arrayFileNames}
-//   deleteFile={(fieldTitle, fileName) =>
-//     handleDeleteFile(fieldTitle, fileName, index)
-//   }
-//   field={{ title: `dependPass[${index}].uploadDr` }}
-// />
+//           <FileUploadFieldArr
+//             label="Upload Dependent Pass"
+//             onChangeFunc={(e) => handleFileChange(e, "uploadDp", index)}
+//             register={register(`dependPass[${index}].uploadDp`)}
+//             error={errors?.dependPass?.[index]?.uploadDp}
+//             uploadedFileNames={uploadedFileNames}
+//             deleteFile={(fieldTitle, fileName) => deleteFile(fieldTitle, fileName, index)}
+//             field={{ title: `${index}uploadDp` }}
+//           />
+//           <FileUploadFieldArr
+//             label="Upload Dependent Passport"
+//             onChangeFunc={(e) => handleFileChange(e, "uploadDr", index)}
+//             register={register(`dependPass[${index}].uploadDr`)}
+//             error={errors?.dependPass?.[index]?.uploadDr}
+//             uploadedFileNames={uploadedFileNames}
+//             deleteFile={(fieldTitle, fileName) => deleteFile(fieldTitle, fileName, index)}
+//             field={{ title: `uploadDr` }}
+//           />
 //           {index !== 0 && (
 //             <button
 //               type="button"

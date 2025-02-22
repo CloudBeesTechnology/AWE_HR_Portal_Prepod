@@ -15,6 +15,7 @@ import LBDKPI from "../../assets/ReportIcon/LBDKPI.svg";
 import groupHS from "../../assets/ReportIcon/groupHS.svg";
 import Resignation from "../../assets/ReportIcon/Resignation.svg";
 import leavePass from "../../assets/ReportIcon/leavePass.svg";
+import promotion from "../../assets/ReportIcon/promotion.svg";
 import usePermission from "../../hooks/usePermissionDashInside";
 
 export const Reports = () => {
@@ -97,7 +98,7 @@ export const Reports = () => {
     { title: "LBD KPI", icon: LBDKPI, path: "/lbdKpi" },
     { title: "Group H&S", icon: groupHS, path: "/groupHS" },
     { title: "Leave Passage", icon: leavePass, path: "/leavePass" },
-    { title: "Promotion", icon: rm, path: "/promotion" },
+    { title: "Promotion", icon: promotion, path: "/promotion" },
   ];
 
   const filteredReportTiles = reportTiles.filter((tile) => tile.show !== false);

@@ -134,16 +134,16 @@ export const useLeaveManage = () => {
       }, {});
 
       const leaveDetailsMap = allEmpLeaveDetails.reduce((acc, item) => {
+        
         acc[item.empID] = item;
         return acc;
       }, {});
-
       // Merge leave status data
       const mergedLeaveData = allLeaveStatuses.map((leaveStatus) => {
+        
         const empInfo = empInfoMap[leaveStatus.empID] || {};
         const workInfo = workInfoMap[leaveStatus.empID] || {};
         const leaveDetails = leaveDetailsMap[leaveStatus.empID] || {};
-        // console.log(empInfoMap);
 
         return {
           id: leaveStatus.id,
@@ -154,6 +154,7 @@ export const useLeaveManage = () => {
           empOfficialEmail: empInfo.officialEmail,
           doj: workInfo.doj,
           leaveStatusCreatedAt: leaveStatus.createdAt,
+          leaveStatusReceivedDate: leaveStatus.receivedDate,
           leaveDays: leaveStatus.days,
           // leaveType: leaveStatus.leaveType,
           supervisorName: leaveStatus.supervisorName,
@@ -187,6 +188,7 @@ export const useLeaveManage = () => {
           empPervAnnualLeaveBal: leaveDetails.pervAnnualLeaveBal || 0,
           leaveDetailsCreatedAt: leaveDetails.createdAt,
           leaveDetailsUpdatedAt: leaveDetails.updatedAt,
+
         };
       });
 
@@ -349,7 +351,7 @@ export const useLeaveManage = () => {
       }));
     } catch (err) {
       setError(err);
-      console.error("Error updating leave status:", err);
+      console.error("Error updating ticket request:", err);
     } finally {
       setLoading(false);
     }

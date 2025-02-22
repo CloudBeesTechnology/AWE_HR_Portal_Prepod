@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { LocalMobilization } from "../../../services/createMethod/CreateLOI"; // Import the hook
-import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
+import { uploadDocString } from "../../../services/uploadsDocsS3/UploadDocs";
 import { FileUploadField } from "../../employees/medicalDep/FileUploadField";
 import { useFetchInterview } from "../../../hooks/useFetchInterview";
 import { UpdateLoiData } from "../../../services/updateMethod/UpdateLoi";
@@ -9,8 +9,10 @@ import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterv
 import { statusOptions } from "../../../utils/StatusDropdown";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { DataSupply } from "../../../utils/DataStoredContext";
-
+import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
+import { DeleteUploadLOI } from "../deleteDocsRecruit/DeleteUploadLOI";
 export const LOIForm = ({ candidate }) => {
+  
   // Ensure candidate is passed as prop
   const { localMobilization, isLoading, error } =
     LocalMobilization();
@@ -18,9 +20,15 @@ export const LOIForm = ({ candidate }) => {
   const { interviewDetails } = UpdateInterviewData();
   const { mergedInterviewData } = useFetchInterview();
   const [notification, setNotification] = useState(false);
+
+    const [isUploadingString, setIsUploadingString] = useState({
+      loiFile: false,
+    });
+
   const [uploadedFileNames, setUploadedFileNames] = useState({
     loiFile: null,
   });
+  
   const [uploadedLOI, setUploadedLOI] = useState({
     loiFile: null,
   });
@@ -44,30 +52,94 @@ export const LOIForm = ({ candidate }) => {
     },
   });
 
-  // console.log(mergedInterviewData, "TV");
+
   const LOIFile = watch("loiFile", "");
-
+  
   const extractFileName = (url) => {
-    if (typeof url === "string" && url) {
-      return url.split("/").pop(); 
-    }
-    return "";
-  };
+  if (typeof url === "string" && url) {
+    const decodedUrl = decodeURIComponent(url); 
+    const fileNameWithParams = decodedUrl.split("/").pop(); 
+    return fileNameWithParams.split("?")[0].split(",")[0].split("#")[0]; 
+  }
+  return "";
+};
 
-  const handleFileChange = async (e, type) => {
-    const file = e.target.files[0];
-    setValue(type, file); 
-    if (file) {
-      if (type === "loiFile") {
-        await uploadDocs(file, "loiFile", setUploadedLOI, "personName");
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          loiFile: file.name, 
-        }));
+   const updateUploadingString = (type, value) => {
+     setIsUploadingString((prev) => ({
+       ...prev,
+       [type]: value,
+     }));
+     // console.log(value);
+   };
+ 
+   const handleFileUpload = async (e, type) => {
+     const tempID= candidate.tempID;
+     
+     if (!tempID
+) {
+       alert("Please enter the Employee ID before uploading files.");
+       window.location.href = "/employeeInfo";
+       return;
+     }
+ 
+     let selectedFile = e.target.files[0];
+ 
+     // Allowed file types
+     const allowedTypes = [
+       "application/pdf",
+       "image/jpeg",
+       "image/png",
+       "image/jpg",
+     ];
+ 
+     if (!allowedTypes.includes(selectedFile.type)) {
+       alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+       return;
+     }
+ 
+     setValue(type, selectedFile); 
+ 
+     if (selectedFile) {
+       updateUploadingString(type, true);
+       await uploadDocString(selectedFile, type, setUploadedLOI, tempID);
+       setUploadedFileNames((prev) => ({
+         ...prev,
+         [type]: selectedFile.name, 
+       }));
+     }
+   };
+
+ const deletedStringUpload = async (fileType, fileName) => {
+    try {
+      const tempID= candidate.tempID;
+
+      const isDeleted = await handleDeleteFile(
+        fileType,
+        fileName,
+        tempID
+
+      );
+      const isDeletedArrayUploaded = await DeleteUploadLOI(
+        fileType,
+        fileName,
+        tempID,
+        setUploadedFileNames,
+        setUploadedLOI,
+        setIsUploadingString,
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
       }
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
     }
   };
-
 
   // Handle form submission for updating an existing LOI
   const handleSubmitTwo = async (e) => {
@@ -87,10 +159,10 @@ export const LOIForm = ({ candidate }) => {
       loiAcceptDate: formData.interview.loiAcceptDate,
       loiDeclineDate: formData.interview.loiDeclineDate,
       declineReason: formData.interview.declineReason,
-      loiFile: uploadedLOI.loiFile || formData.interview.loiFile,
+      loiFile: uploadedLOI.loiFile,
       tempID: candidate.tempID,
     };
-
+    
     const interStatus = {
       id: interviewScheduleId, 
       department: formData.interview.department,
@@ -137,6 +209,7 @@ export const LOIForm = ({ candidate }) => {
       }
     }
   }, [mergedInterviewData, candidate.tempID]);
+  // console.log(candidate);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -202,7 +275,7 @@ export const LOIForm = ({ candidate }) => {
         <div>
           <label htmlFor="declineReason">Decline Reason</label>
           <textarea
-            className="w-full border p-2 rounded mt-1"
+            className="w-full border p-2 rounded mt-1 h-[44px]"
             id="declineReason"
             rows="2"
             {...register("declineReason")}
@@ -214,31 +287,14 @@ export const LOIForm = ({ candidate }) => {
           )}
         </div>
         <div>
-          <div className="flex items-center justify-between mt-3 mb-5 gap-5">
-            {/* LOI File Upload */}
-            <div>
-              <FileUploadField
-                label="Upload File"
-                onChangeFunc={(e) => handleFileChange(e, "loiFile")}
-                register={register}
-                accept="application/pdf"
-                className="hidden"
-                fileName={uploadedFileNames.loiFile || extractFileName(LOIFile)}
-                value={formData.interview.loiFile}
-              />
-            </div>
-          </div>
-        </div>
-        <div>
           <label htmlFor="status">Status</label>
           <select
-            className="w-full border p-2 rounded mt-1 outline-none"
+            className="w-full border p-2 rounded mt-1 outline-none h-[44px]"
             id="status"
             {...register("status")}
             value={formData.interview.status}
             onChange={(e) => handleInputChange("status", e.target.value)}
           >
-            {/* <option value="">Select Status</option> */}
             {statusOptions.map((status, index) => (
               <option key={index} value={status}>
                 {status}
@@ -246,24 +302,36 @@ export const LOIForm = ({ candidate }) => {
             ))}
           </select>
         </div>
+        <div>
+          <div className="">
+            {/* LOI File Upload */}
+            <div>
+              <FileUploadField
+                label="Upload File"
+                // label="Induction Form"
+                register={register} 
+                fileKey="loiFile"
+                handleFileUpload={handleFileUpload}
+                uploadedFileNames={uploadedFileNames}
+                deletedStringUpload={deletedStringUpload}
+                isUploadingString={isUploadingString}
+                error={errors.loiFile}
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="center mt-5">
         <button
           type="submit"
-          className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
+          className="py-2 px-12 font-medium rounded shadow-lg bg-yellow hover:bg-yellow"
           disabled={isLoading}
           onClick={handleSubmitTwo}
         >
           {isLoading ? "Submitting..." : "Submit"}
         </button>
-
-        {/* Success notification */}
-        {/* {notification && (
-          <p className="text-green-500">LOI created successfully!</p>
-        )} */}
-
-        {/* Error notification */}
+       
         {error && <p className="text-red-500">{error.message}</p>}
       </div>
       {notification && (

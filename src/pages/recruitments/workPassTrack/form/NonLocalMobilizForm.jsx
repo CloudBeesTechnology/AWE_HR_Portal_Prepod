@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { uploadDocs } from "../../../../services/uploadDocsS3/UploadDocs";
+import { uploadDocString } from "../../../../services/uploadsDocsS3/UploadDocs";
 import { FileUploadField } from "../../../employees/medicalDep/FileUploadField";
 import { NonLocalMOBFormSchema } from "../../../../services/Validation";
 import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
@@ -10,6 +10,8 @@ import { UpdateInterviewData } from "../../../../services/updateMethod/UpdateInt
 import { statusOptions } from "../../../../utils/StatusDropdown";
 import { SpinLogo } from "../../../../utils/SpinLogo";
 import { DataSupply } from "../../../../utils/DataStoredContext";
+import { handleDeleteFile } from "../../../../services/uploadsDocsS3/DeleteDocs";
+import { DeleteUploadNonLocal } from "../deleteUpload/DeleteUploadNonLocal";
 
 export const NonLocalMobilizForm = ({ candidate }) => {
   const { interviewSchedules } = useFetchCandy();
@@ -17,10 +19,6 @@ export const NonLocalMobilizForm = ({ candidate }) => {
   const { wpTrackingDetails } = useUpdateWPTracking();
   const { interviewDetails } = UpdateInterviewData();
   const [notification, setNotification] = useState(false);
-
-    // Logging IVSSDetails during every render
-    // console.log("IVSS Details: ", IVSSDetails);
-
 
   const [formData, setFormData] = useState({
     interview: {
@@ -31,6 +29,10 @@ export const NonLocalMobilizForm = ({ candidate }) => {
       mobFile: "",
       status: "",
     },
+  });
+
+  const [isUploadingString, setIsUploadingString] = useState({
+    mobFile: false,
   });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     mobFile: null,
@@ -50,20 +52,14 @@ export const NonLocalMobilizForm = ({ candidate }) => {
   });
 
   const MobilizUpload = watch("mobFile", "");
-  // console.log(interviewSchedules);
-  // console.log("IVSS", IVSSDetails);
-  
-  
 
   useEffect(() => {
     if (interviewSchedules.length > 0) {
-      // Find the interviewData for the candidate
       const interviewData = interviewSchedules.find(
         (data) => data.tempID === candidate.tempID
       );
 
       if (interviewData) {
-        // Set the form data
         setFormData({
           interview: {
             mobSignDate: interviewData.mobSignDate,
@@ -74,7 +70,6 @@ export const NonLocalMobilizForm = ({ candidate }) => {
           },
         });
 
-        // Check if sawpFile exists and update the file names
         if (interviewData.mobFile) {
           const fileName = extractFileName(interviewData.mobFile);
           setUploadedFileNames((prev) => ({
@@ -93,23 +88,86 @@ export const NonLocalMobilizForm = ({ candidate }) => {
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
-      return url.split("/").pop(); // Extract the file name from URL
+      const decodedUrl = decodeURIComponent(url);
+      const fileNameWithParams = decodedUrl.split("/").pop();
+      return fileNameWithParams.split("?")[0].split(",")[0].split("#")[0];
     }
     return "";
   };
 
-  const handleFileChange = async (e, type) => {
-    const file = e.target.files[0];
-    setValue(type, file); 
-    if (file) {
-      if (type === "mobFile") {
-        await uploadDocs(file, "mobFile", setUploadedMobiliz, "personName");
+  const updateUploadingString = (type, value) => {
+    setIsUploadingString((prev) => ({
+      ...prev,
+      [type]: value,
+    }));
+    // console.log(value);
+  };
 
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          mobFile: file.name, 
-        }));
+  const handleFileUpload = async (e, type) => {
+    const tempID = candidate.tempID;
+
+    if (!tempID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
+    }
+
+    let selectedFile = e.target.files[0];
+
+    // Allowed file types
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
+
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
+    }
+
+    setValue(type, selectedFile);
+
+    if (selectedFile) {
+      updateUploadingString(type, true);
+      await uploadDocString(selectedFile, type, setUploadedMobiliz, tempID);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [type]: selectedFile.name,
+      }));
+    }
+  };
+
+  const deletedStringUpload = async (fileType, fileName) => {
+    try {
+      const tempID = candidate.tempID;
+
+      if (!tempID) {
+        alert("Please provide the Employee ID before deleting files.");
+        return;
       }
+
+      const isDeleted = await handleDeleteFile(fileType, fileName, tempID);
+      const isDeletedArrayUploaded = await DeleteUploadNonLocal(
+        fileType,
+        fileName,
+        tempID,
+        setUploadedFileNames,
+        setUploadedMobiliz,
+        setIsUploadingString
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
     }
   };
 
@@ -154,14 +212,12 @@ export const NonLocalMobilizForm = ({ candidate }) => {
           mobSignDate: formData.interview.mobSignDate,
           agentname: formData.interview.agentname,
           remarkNLMob: formData.interview.remarkNLMob,
-          mobFile: uploadedMobiliz.mobFile
-            ? uploadedMobiliz.mobFile
-            : formData.interview.mobFile,
+          mobFile: uploadedMobiliz.mobFile || formData.interview.mobFile,
         },
       });
 
       const interStatus = {
-        id: interviewScheduleStatusId, // Dynamically use the correct id
+        id: interviewScheduleStatusId,
         status: formData.interview.status,
       };
       setNotification(true);
@@ -174,7 +230,7 @@ export const NonLocalMobilizForm = ({ candidate }) => {
 
       // console.log("Response from WPTrackingDetails:", response);
 
-      if (response.errors && response.errors.length > 0) { 
+      if (response.errors && response.errors.length > 0) {
         // console.error("Response errors:", response.errors);
       }
     } catch (err) {
@@ -189,7 +245,7 @@ export const NonLocalMobilizForm = ({ candidate }) => {
           <div>
             <label htmlFor="mobSignDate">Date of Mobilization</label>
             <input
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               type="date"
               id="mobSignDate"
               {...register("mobSignDate")}
@@ -200,7 +256,7 @@ export const NonLocalMobilizForm = ({ candidate }) => {
           <div>
             <label htmlFor="agentname">Agent Name</label>
             <input
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               type="text"
               id="agentname"
               {...register("agentname")}
@@ -211,7 +267,7 @@ export const NonLocalMobilizForm = ({ candidate }) => {
           <div>
             <label htmlFor="remarkNLMob">Recruitment Remarks</label>
             <input
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               type="text"
               id="remarkNLMob"
               {...register("remarkNLMob")}
@@ -219,32 +275,15 @@ export const NonLocalMobilizForm = ({ candidate }) => {
               onChange={(e) => handleInputChange("remarkNLMob", e.target.value)}
             />
           </div>
-
-          <div className="">
-            <div className="flex items-center gap-5 mt-1">
-              <FileUploadField
-                label="Upload File"
-                className="p-4"
-                onChangeFunc={(e) => handleFileChange(e, "mobFile")}
-                accept="application/pdf"
-                register={register}
-                fileName={
-                  uploadedFileNames.mobFile || extractFileName(MobilizUpload)
-                }
-                value={formData.interview.mobFile}
-              />
-            </div>
-          </div>
           <div>
             <label htmlFor="status">Status</label>
             <select
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               id="status"
               {...register("status")}
               value={formData.interview.status}
               onChange={(e) => handleInputChange("status", e.target.value)}
             >
-              {/* <option value="">Select Status</option> */}
               {statusOptions.map((status, index) => (
                 <option key={index} value={status}>
                   {status}
@@ -252,12 +291,25 @@ export const NonLocalMobilizForm = ({ candidate }) => {
               ))}
             </select>
           </div>
+          <div className="">
+            <div className="">
+              <FileUploadField
+                label="Upload File"
+                register={register}
+                fileKey="mobFile"
+                handleFileUpload={handleFileUpload}
+                uploadedFileNames={uploadedFileNames}
+                deletedStringUpload={deletedStringUpload}
+                isUploadingString={isUploadingString}
+                error={errors.mobFile}
+              />
+            </div>
+          </div>
         </div>
-
         <div className="mt-5 flex justify-center">
           <button
             type="submit"
-            className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
+            className="py-2 px-12 font-medium rounded shadow-lg bg-yellow hover:bg-yellow"
           >
             Submit
           </button>

@@ -2,14 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
+import { uploadDocString } from "../../../services/uploadsDocsS3/UploadDocs";
 import { FileUploadField } from "../../employees/medicalDep/FileUploadField";
 import { UpdateLoiData } from "../../../services/updateMethod/UpdateLoi";
 import { useFetchInterview } from "../../../hooks/useFetchInterview";
 import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
 import { statusOptions } from "../../../utils/StatusDropdown";
 import { SpinLogo } from "../../../utils/SpinLogo";
-
+import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
+import { DeleteUploadCVEV } from "../deleteDocsRecruit/DeleteUploadCVEV";
 // Define validation schema using Yup
 const CVEVFormSchema = Yup.object().shape({
   cvecApproveDate: Yup.date().notRequired(),
@@ -34,7 +35,9 @@ export const CVEVForm = ({ candidate }) => {
       status: "",
     },
   });
-
+  const [isUploadingString, setIsUploadingString] = useState({
+    cvecFile: false,
+  });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     cvecFile: null,
   });
@@ -79,23 +82,90 @@ export const CVEVForm = ({ candidate }) => {
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
-      return url.split("/").pop(); // Extract the file name from URL
+      const decodedUrl = decodeURIComponent(url); // Decode URL if it has encoded characters
+      const fileNameWithParams = decodedUrl.split("/").pop(); // Extract the last part after "/"
+      return fileNameWithParams.split("?")[0].split(",")[0].split("#")[0]; // Remove query params, fragments, and other unnecessary parts
     }
     return "";
   };
 
-  const handleFileChange = async (e, type) => {
-    const file = e.target.files[0];
-    setValue(type, file); // Set file value for validation
-    if (file) {
-      if (type === "cvecFile") {
-        await uploadDocs(file, "cvecFile", setUploadedCVEC, "personName");
+  const updateUploadingString = (type, value) => {
+    setIsUploadingString((prev) => ({
+      ...prev,
+      [type]: value,
+    }));
+    // console.log(value);
+  };
 
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          cvecFile: file.name, // Store the file name for display
-        }));
+  const handleFileUpload = async (e, type) => {
+    const tempID = candidate.tempID;
+    console.log(tempID);
+
+    //      if (!tempID
+    // ) {
+    //        alert("Please enter the Employee ID before uploading files.");
+    //        window.location.href = "/employeeInfo";
+    //        return;
+    //      }
+
+    let selectedFile = e.target.files[0];
+
+    // Allowed file types
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
+
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
+    }
+
+    setValue(type, selectedFile); // Update form state with the selected file
+
+    if (selectedFile) {
+      updateUploadingString(type, true);
+      await uploadDocString(selectedFile, type, setUploadedCVEC, tempID);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [type]: selectedFile.name, // Dynamically store file name
+      }));
+    }
+  };
+
+  const deletedStringUpload = async (fileType, fileName) => {
+    try {
+      const tempID = candidate.tempID;
+      console.log(tempID);
+
+      //       if (!tempID
+      // ) {
+      //         alert("Please provide the Employee ID before deleting files.");
+      //         return;
+      //       }
+
+      const isDeleted = await handleDeleteFile(fileType, fileName, tempID);
+      const isDeletedArrayUploaded = await DeleteUploadCVEV(
+        fileType,
+        fileName,
+        tempID,
+        setUploadedFileNames,
+        setUploadedCVEC,
+        setIsUploadingString
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
       }
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
     }
   };
 
@@ -173,27 +243,24 @@ export const CVEVForm = ({ candidate }) => {
         </div>
 
         <div className="">
-          {/* <label>Choose File</label> */}
-          <div className="flex items-center gap-5 mt-1">
-            {/* <label className="flex items-center px-3 py-2 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer">
-              Upload CVEV */}
+          <div className="">
             <FileUploadField
               label="Upload File"
-              className="p-4"
-              onChangeFunc={(e) => handleFileChange(e, "cvecFile")}
-              accept="application/pdf"
               register={register}
-              fileName={
-                uploadedFileNames.cvecFile || extractFileName(CVECUpload)
-              }
-              value={formData.interview.cvecFile}
+              fileKey="cvecFile"
+              handleFileUpload={handleFileUpload}
+              uploadedFileNames={uploadedFileNames}
+              deletedStringUpload={deletedStringUpload}
+              isUploadingString={isUploadingString}
+              error={errors.cvecFile}
+              className="p-4"
             />
           </div>
         </div>
         <div>
           <label htmlFor="status">Status</label>
           <select
-            className="w-full border p-2 rounded mt-1"
+            className="w-full border p-2 rounded mt-1 h-[44px]"
             id="status"
             {...register("status")}
             value={formData.interview.status}
@@ -212,7 +279,7 @@ export const CVEVForm = ({ candidate }) => {
       <div className="mt-5 flex justify-center">
         <button
           type="submit"
-          className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
+          className="py-2 px-12 font-medium rounded shadow-lg bg-yellow hover:bg-yellow"
         >
           Submit
         </button>
@@ -227,139 +294,3 @@ export const CVEVForm = ({ candidate }) => {
     </form>
   );
 };
-// import React, { useState } from "react";
-// import { RiFileEditLine } from "react-icons/ri";
-// import { StatusForm } from "../status/StatusForm";
-// import { ReviewForm } from "../ReviewForm";
-// import { SpinLogo } from "../../../utils/SpinLogo";
-
-// export const CVEVForm = ({ data, formatDate, fileUpload, urlValue }) => {
-//   const [isFormVisible, setIsFormVisible] = useState(false);
-//   const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
-//   const [selectedCandi, setSelectedCandi] = useState([]);
-//   const [notification, setNotification] = useState(false);
-
-//   // console.log(data);
-
-//   const heading = [
-//     "TempID",
-//     "Name",
-//     "Nationality",
-//     "Position",
-//     "Approved Date",
-//     "CVEV PDF",
-//     "Status Update",
-//     "Form",
-//     "Edit Form",
-//   ];
-
-//   // console.log(data);
-//   const handleShowForm = (candi) => {
-//     setSelectedCandi(candi);
-//     setIsFormVisible(!isFormVisible);
-//   };
-//   const handleShowReviewForm = (candi) => {
-//     setSelectedCandi(candi);
-//     setIsReviewFormVisible(!isReviewFormVisible);
-//   };
-//   return (
-//     <div>
-//       {data && data.length > 0 ? (
-//         <table className=" w-full">
-//           <thead className="bg-[#939393] text-white">
-//             <tr>
-//               {heading.map((header, index) => (
-//                 <th key={index} className="py-4 text-[15px] text-white">
-//                   {header}
-//                 </th>
-//               ))}
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {data && data.length > 0 ? (
-//               data.map((item, index) => {
-//                 //   const displayIndex = startIndex + index + 1; // Adjust index based on pagination
-
-//                 return (
-//                   <tr
-//                     key={index}
-//                     className="text-center text-[16px] shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
-//                   >
-//                     {/* <td className="py-3">{displayIndex}</td> */}
-//                     <td className="py-3">{item.tempID}</td>
-//                     <td className="py-3">{item.name || "N/A"}</td>
-//                     <td className="py-3">{item.nationality || "N/A"}</td>
-//                     <td className="py-3">{item.position || "N/A"}</td>
-//                     <td className="py-3">
-//                       {formatDate(item.mobilizationDetails_cvecApproveDate) ||
-//                         "N/A"}
-//                     </td>
-//                     <td className="py-3">
-//                       {item.mobilizationDetails_cvecFile ? (
-//                         <a
-//                           href={urlValue}
-//                           onClick={(e) => {
-//                             if (!item.mobilizationDetails_cvecFile) {
-//                               e.preventDefault();
-//                             } else {
-//                               fileUpload(item.mobilizationDetails_cvecFile); // Fetch URL when clicked
-//                             }
-//                           }}
-//                           download
-//                           className={
-//                             item.mobilizationDetails_cvecFile
-//                               ? "border-b-2 border-[orange] text-[orange]"
-//                               : ""
-//                           }
-//                         >
-//                           {item.mobilizationDetails_cvecFile
-//                             ? "Download"
-//                             : "N/A"}
-//                         </a>
-//                       ) : (
-//                         <p>N/A</p>
-//                       )}
-//                     </td>
-//                     <td className="py-3">
-//                       {item.interviewDetails_status || "N/A"}
-//                     </td>
-
-//                     <td
-//                       className="py-3 text-center"
-//                       onClick={() => handleShowReviewForm(item)}
-//                     >
-//                       View
-//                     </td>
-//                     <td
-//                       className="text-2xl cursor-pointer py-3 center"
-//                       onClick={() => handleShowForm(item)}
-//                     >
-//                       <RiFileEditLine />
-//                     </td>
-//                   </tr>
-//                 );
-//               })
-//             ) : (
-//               <tr></tr>
-//             )}
-//           </tbody>
-//         </table>
-//       ) : (
-//         <div className="text-center mt-6 py-20">
-//           {" "}
-//           <p className="text-lg text-dark_grey mt-2">No Data Available</p>
-//         </div>
-//       )}
-//       {isReviewFormVisible && (
-//         <ReviewForm candidate={selectedCandi} onClose={handleShowReviewForm} />
-//       )}
-//       {isFormVisible && (
-//         <StatusForm
-//           candidate={selectedCandi}
-//           //   onSave={handleFormSave}
-//           onClose={handleShowForm}
-//         />
-//       )}
-//     </div>
-//   );
-// };

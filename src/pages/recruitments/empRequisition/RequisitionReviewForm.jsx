@@ -280,6 +280,21 @@ export const RequisitionReviewForm = ({
                 )}
               </>
             )}
+          
+          {!gmPosition && (
+                 <div className="mx-20 border center gap-3 rounded-lg bg-gradient-to-r from-[#f5ee6ad7] via-[#faf362] to-[#f5ee6ad7] shadow-[0_4px_6px_rgba(255,250,150,0.5)]">
+                    <h3 className="text-lg text-[#6a2b2b] p-1.5 font-bold">
+                      Requisition Status :
+                    </h3>
+                    <p
+                      className={`text-xl font-semibold ${getStatusClass(
+                        request.status
+                      )}`}
+                    >
+                      {request.status || "Pending"}
+                    </p>
+                  </div>
+          )}
 
             {/* other components */}
             {notification && (

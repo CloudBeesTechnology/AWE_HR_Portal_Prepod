@@ -3,17 +3,24 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CandidatesSchema } from "../../services/Validation";
 import { generateClient } from "aws-amplify/api";
-import { GoUpload } from "react-icons/go"; 
+import { GoUpload } from "react-icons/go";
 import { useLocation } from "react-router-dom";
 import { listPersonalDetails } from "../../graphql/queries";
 import { RecODFunc } from "../../services/createMethod/RecODFunc";
 import { SpinLogo } from "../../utils/SpinLogo";
-import { uploadDocString } from "../../services/uploadDocsS3/UploadDocs";
+import { FileUploadField } from "../employees/medicalDep/FileUploadField";
+
+import {
+  uploadDocs,
+  uploadDocString,
+} from "../../services/uploadsDocsS3/UploadDocs";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { useTempID } from "../../utils/TempIDContext";
 import { CandyDetails } from "../../services/updateMethod/UpdatePersonalDetails";
-
-const client = generateClient(); 
+import { handleDeleteFile } from "../../services/uploadsDocsS3/DeleteDocs";
+import { DeleteUploadApplication } from "../recruitments/deleteDocsRecruit/DeleteUploadApplication";
+import { MdCancel } from "react-icons/md";
+const client = generateClient();
 
 export const OtherDetails = ({ fetchedData }) => {
   const { submitODFunc } = RecODFunc();
@@ -21,19 +28,28 @@ export const OtherDetails = ({ fetchedData }) => {
   const { candyDetails } = CandyDetails();
   const location = useLocation();
   const navigatingEducationData = location.state?.FormData;
+  // console.log(navigatingEducationData);
+
   const [latestTempIDData, setLatesTempIDData] = useState("");
   const [mergedData, setMergedData] = useState([]);
+  const { tempID } = useTempID();
+  const { empPDData, educDetailsData } = useContext(DataSupply);
+
+  const [isUploadingString, setIsUploadingString] = useState({
+    uploadResume: false,
+    uploadCertificate: false,
+    uploadPp: false,
+  });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     uploadResume: null,
     uploadCertificate: null,
     uploadPp: null,
   });
-  const { tempID } = useTempID();
-  const { empPDData, educDetailsData } = useContext(DataSupply);
+
   const [uploadedDocs, setUploadedDocs] = useState({
     uploadResume: null,
     uploadCertificate: null,
-    uploadPassport: null,
+    uploadPp: null,
   });
 
   const {
@@ -61,42 +77,33 @@ export const OtherDetails = ({ fetchedData }) => {
   useEffect(() => {
     if (empPDData.length > 0 && educDetailsData.length > 0) {
       const merged = empPDData.map((empData) => {
-     
         const educData = educDetailsData.find(
           (educ) => educ.tempID === empData.tempID
         );
         return {
           ...empData,
-          ...(educData ? educData : {}), 
+          ...(educData ? educData : {}),
         };
       });
-      setMergedData(merged); 
+      setMergedData(merged);
     }
   }, [empPDData, educDetailsData]);
-
-  const extractFileName = (url) => {
-    if (typeof url === "string" && url) {
-      return url.split("/").pop(); 
-    }
-    return "";
-  };
-  
 
   useEffect(() => {
     const parseDetails = (data) => {
       try {
-        let cleanedData = data.replace(/\\/g, ""); 
+        let cleanedData = data.replace(/\\/g, "");
         cleanedData = cleanedData.replace(/'/g, '"');
         cleanedData = cleanedData.replace(
           /([{,])(\s*)([a-zA-Z0-9_]+)(\s*):/g,
           '$1"$3":'
-        ); 
+        );
         cleanedData = cleanedData.replace(
           /:([a-zA-Z0-9_/.\s]+)(?=\s|,|\})/g,
           ':"$1"'
-        ); 
+        );
         if (cleanedData.startsWith('"') && cleanedData.endsWith('"')) {
-          cleanedData = cleanedData.slice(1, -1); 
+          cleanedData = cleanedData.slice(1, -1);
         }
 
         const parsedData = JSON.parse(cleanedData);
@@ -118,9 +125,7 @@ export const OtherDetails = ({ fetchedData }) => {
           (data) => data.tempID === tempID
         );
         if (interviewData) {
-
           Object.keys(interviewData).forEach((key) => {
-
             if (
               key === "emgDetails" ||
               key === "referees" ||
@@ -130,20 +135,21 @@ export const OtherDetails = ({ fetchedData }) => {
                 Array.isArray(interviewData[key]) &&
                 typeof interviewData[key][0] === "string"
               ) {
-            
                 let parsedData = parseDetails(interviewData[key][0]);
                 if (parsedData.length > 0) {
                   setValue(key, parsedData);
                 }
               }
             } else if (interviewData[key]) {
-              setValue(key, interviewData[key])
+              setValue(key, interviewData[key]);
             } else {
               // console.log(`No value for key ${key}`);
             }
           });
 
           if (interviewData) {
+            console.log(interviewData.uploadPp, "poijhgh");
+
             setUploadedFileNames((prev) => ({
               ...prev,
               uploadCertificate: extractFileName(
@@ -152,74 +158,120 @@ export const OtherDetails = ({ fetchedData }) => {
               uploadPp: extractFileName(interviewData.uploadPp),
               uploadResume: extractFileName(interviewData.uploadResume),
             }));
+            setUploadedDocs((prev) => ({
+              ...prev,
+              uploadCertificate: interviewData.uploadCertificate,
+              uploadPp: interviewData.uploadPp,
+              uploadResume: interviewData.uploadResume,
+            }));
           }
         } else {
           // console.log("No interview data found for tempID:", tempID);
         }
       }
-    } 
+    }
   }, [tempID, setValue, educDetailsData]);
 
+  const extractFileName = (url) => {
+    if (typeof url === "string" && url) {
+      const decodedUrl = decodeURIComponent(url); // Decode URL if it has encoded characters
+      const fileNameWithParams = decodedUrl.split("/").pop(); // Extract the last part after "/"
+      return fileNameWithParams.split("?")[0].split(",")[0].split("#")[0]; // Remove query params, fragments, and other unnecessary parts
+    }
+    return "";
+  };
 
-  const handleFileChange = async (e, type) => {
+  const updateUploadingString = (type, value) => {
+    setIsUploadingString((prev) => ({
+      ...prev,
+      [type]: value,
+    }));
+  };
+
+  const handleFileUpload = async (e, type) => {
     const file = e.target.files[0];
-    setValue(type, file); 
-    const personName = navigatingEducationData?.name;
-    if (file) {
-      if (type === "uploadResume") {
-        await uploadDocString(file, "uploadResume", setUploadedDocs, personName);
+    if (!file) return;
 
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          uploadResume: file.name, 
-        }));
-      } else if (type === "uploadCertificate") {
-        await uploadDocString(
-          file,
-          "uploadCertificate",
-          setUploadedDocs,
-          personName
-        );
+    setValue(type, file);
 
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          uploadCertificate: file.name, 
-        }));
-      } else if (type === "uploadPp") {
-        await uploadDocString(file, "uploadPassport", setUploadedDocs, personName);
+    const tempID = navigatingEducationData?.tempID;
 
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          uploadPp: file.name, 
-        }));
+    const fileTypeMapping = {
+      uploadResume: "uploadResume",
+      uploadCertificate: "uploadCertificate",
+      uploadPp: "uploadPp",
+    };
+
+    if (fileTypeMapping[type]) {
+      updateUploadingString(type, true);
+      await uploadDocString(
+        file,
+        fileTypeMapping[type],
+        setUploadedDocs,
+        tempID
+      );
+
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [type]: file.name,
+      }));
+    }
+  };
+
+  const deletedStringUpload = async (fileType, fileName) => {
+    try {
+      const tempID = navigatingEducationData?.tempID;
+      if (!tempID) {
+        alert("Please provide the Employee ID before deleting files.");
+        return;
       }
+
+      const isDeleted = await handleDeleteFile(fileType, fileName, tempID);
+      const isDeletedArrayUploaded = await DeleteUploadApplication(
+        fileType,
+        fileName,
+        tempID,
+        setUploadedFileNames,
+        setUploadedDocs,
+        setIsUploadingString
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
     }
   };
 
   const getTotalCount = async () => {
     let totalCount = 0;
     let nextToken = null;
-  
+
     try {
       do {
         const result = await client.graphql({
           query: listPersonalDetails,
           variables: { nextToken },
         });
-  
+
         const items = result?.data?.listPersonalDetails?.items || [];
         totalCount += items.length;
-  
+
         nextToken = result?.data?.listPersonalDetails?.nextToken;
       } while (nextToken);
-  
+
       return totalCount;
     } catch (error) {
       console.error("Error fetching total count:", error);
       return 0;
     }
   };
-  
+
   const generateNextTempID = (totalCount) => {
     const nextNumber = totalCount + 1;
     return String(nextNumber);
@@ -229,21 +281,35 @@ export const OtherDetails = ({ fetchedData }) => {
     const fetchNextTempID = async () => {
       const totalCount = await getTotalCount();
       const nextTempID = generateNextTempID(totalCount);
-      setLatesTempIDData(nextTempID); 
+      setLatesTempIDData(nextTempID);
     };
     fetchNextTempID();
   }, []);
-
+  console.log(uploadedDocs);
 
   const onSubmit = async (data) => {
+    console.log(data);
+
     try {
-      const formattedFamilyDetails = JSON.stringify(navigatingEducationData?.familyDetails);
-      const formattedEduDetails = JSON.stringify(navigatingEducationData?.eduDetails);
-      const formattedWorkExperience = JSON.stringify(navigatingEducationData?.workExperience);
-      const formattedEmgDetails = JSON.stringify(navigatingEducationData?.emgDetails);
-      const formattedReferees = JSON.stringify(navigatingEducationData?.referees);
-      const formattedRelatives = JSON.stringify(navigatingEducationData?.relatives);
-  
+      const formattedFamilyDetails = JSON.stringify(
+        navigatingEducationData?.familyDetails
+      );
+      const formattedEduDetails = JSON.stringify(
+        navigatingEducationData?.eduDetails
+      );
+      const formattedWorkExperience = JSON.stringify(
+        navigatingEducationData?.workExperience
+      );
+      const formattedEmgDetails = JSON.stringify(
+        navigatingEducationData?.emgDetails
+      );
+      const formattedReferees = JSON.stringify(
+        navigatingEducationData?.referees
+      );
+      const formattedRelatives = JSON.stringify(
+        navigatingEducationData?.relatives
+      );
+
       const reqValue = {
         ...data,
         ...navigatingEducationData,
@@ -253,39 +319,38 @@ export const OtherDetails = ({ fetchedData }) => {
         emgDetails: formattedEmgDetails,
         referees: formattedReferees,
         relatives: formattedRelatives,
-        // uploadResume: uploadedDocs.uploadResume,
-        // uploadCertificate: uploadedDocs.uploadCertificate,
-        // uploadPp: uploadedDocs.uploadPassport,
+        uploadResume: uploadedDocs.uploadResume,
+        uploadCertificate: uploadedDocs.uploadCertificate,
+        uploadPp: uploadedDocs.uploadPp,
         status: "Active",
       };
-  
-      const checkingPDTable = empPDData.find((match) => match.tempID === data.tempID);
-      const checkingEDTable = educDetailsData.find((match) => match.tempID === data.tempID);
-  
+
+      const checkingPDTable = empPDData.find(
+        (match) => match.tempID === data.tempID
+      );
+      const checkingEDTable = educDetailsData.find(
+        (match) => match.tempID === data.tempID
+      );
+
       if (checkingPDTable && checkingEDTable) {
         const updateReqValue = {
           ...reqValue,
-          uploadResume: reqValue.uploadResume || uploadedDocs.uploadResume,
-          uploadCertificate: reqValue.uploadCertificate || uploadedDocs.uploadCertificate,
-          uploadPp: reqValue.uploadPp || uploadedDocs.uploadPassport,
           PDTableID: checkingPDTable.id,
           EDTableID: checkingEDTable.id,
         };
-  
-        // console.log("Updated VALUES", updateReqValue); 
+
+        console.log("Updated VALUES", updateReqValue);
         await candyDetails({ reqValue: updateReqValue });
         setNotification(true);
-  
       } else {
-        // console.log("Create VALUES", reqValue);
-        await submitODFunc({ reqValue, latestTempIDData });  
+        console.log("Create VALUES", reqValue);
+        await submitODFunc({ reqValue, latestTempIDData });
         setNotification(true);
       }
     } catch (error) {
       console.error("Error submitting data:", error);
     }
   };
-  
 
   return (
     <div>
@@ -317,7 +382,6 @@ export const OtherDetails = ({ fetchedData }) => {
             />
           </div>
         </div>
-
 
         <div className="mb-4">
           <label className="block text_size_6">
@@ -414,91 +478,52 @@ export const OtherDetails = ({ fetchedData }) => {
             {...register("supportInfo")}
             className="resize-none mt-2 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full"
             rows="4"
-       
           ></textarea>
         </div>
 
         {/* File Uploads */}
         <div className="my-5 ">
+          
           <label className="text_size_6">Choose file</label>
-          <div className="flex items-center justify-between mt-3 mb-10 gap-5">
-        
-            <div>
-              <label className="flex items-center px-3 py-2 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer">
-                Upload Resume
-                <input
-                  type="file"
-                  {...register("uploadResume")}
-                  onChange={(e) => handleFileChange(e, "uploadResume")}
-                  className="hidden"
-                  accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                />
-                <span className="ml-2">
-                  <GoUpload />
-                </span>
-              </label>
-      
-              {uploadedFileNames.uploadResume ? (
-                <p className="text-xs mt-1 text-grey">
-                  Uploaded: {uploadedFileNames.uploadResume}
-                </p>
-              ) : (
-                <p className="text-[red] text-xs mt-1">
-                  {errors?.uploadResume?.message}
-                </p>
-              )}
+          <div className=" grid grid-cols-3  mt-3 mb-10 gap-5 w-full">
+            <div >
+            <FileUploadField
+                              label="Upload Resume"
+                              register={register} // Ensuring register is passed correctly
+                              fileKey="uploadResume"
+                              handleFileUpload={handleFileUpload}
+                              uploadedFileNames={uploadedFileNames}
+                              deletedStringUpload={deletedStringUpload}
+                              isUploadingString={isUploadingString}
+                              error={errors.uploadResume}
+        />
+            
             </div>
 
-            <div>
-              <label className="flex items-center px-3 py-2 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer">
-                Qualification Certificate
-                <input
-                  type="file"
-                  {...register("uploadCertificate")}
-                  onChange={(e) => handleFileChange(e, "uploadCertificate")}
-                  className="hidden"
-                  accept="application/pdf, image/png, image/jpeg"
-                />
-                <span className="ml-2">
-                  <GoUpload />
-                </span>
-              </label>
-      
-              {uploadedFileNames.uploadCertificate ? (
-                <p className="text-xs mt-1 text-grey">
-                  Uploaded: {uploadedFileNames.uploadCertificate}
-                </p>
-              ) : (
-                <p className="text-[red] text-xs mt-1">
-                  {errors?.uploadCertificate?.message}
-                </p>
-              )}
+            <div >
+            <FileUploadField
+                              label="Qualification Certificate"
+                              register={register} // Ensuring register is passed correctly
+                              fileKey="uploadCertificate"
+                              handleFileUpload={handleFileUpload}
+                              uploadedFileNames={uploadedFileNames}
+                              deletedStringUpload={deletedStringUpload}
+                              isUploadingString={isUploadingString}
+                              error={errors.uploadCertificate}
+                            />
             </div>
 
-            <div>
-              <label className="flex items-center px-3 py-2 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer">
-                Upload IC / Passport
-                <input
-                  type="file"
-                  {...register("uploadPp")}
-                  onChange={(e) => handleFileChange(e, "uploadPp")}
-                  className="hidden"
-                  accept="application/pdf, image/png, image/jpeg"
-                />
-                <span className="ml-2">
-                  <GoUpload />
-                </span>
-              </label>
-           
-              {uploadedFileNames.uploadPp ? (
-                <p className="text-xs mt-1 text-grey">
-                  Uploaded: {uploadedFileNames.uploadPp}
-                </p>
-              ) : (
-                <p className="text-[red] text-xs mt-1">
-                  {errors?.uploadPp?.message}
-                </p>
-              )}
+            <div >
+               <FileUploadField
+                              label="Upload IC / Passport"
+                              register={register} // Ensuring register is passed correctly
+                              fileKey="uploadPp"
+                              handleFileUpload={handleFileUpload}
+                              uploadedFileNames={uploadedFileNames}
+                              deletedStringUpload={deletedStringUpload}
+                              isUploadingString={isUploadingString}
+                              error={errors.uploadPp}
+        />
             </div>
           </div>
         </div>

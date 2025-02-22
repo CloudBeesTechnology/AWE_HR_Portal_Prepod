@@ -25,7 +25,6 @@ export const CandidateForm = ({ candidate }) => {
     formState: { errors },
     watch,
   } = useForm({
-
     resolver: yupResolver(
       Yup.object().shape({
         position: Yup.string().required("Position is required"),
@@ -47,7 +46,7 @@ export const CandidateForm = ({ candidate }) => {
     if (mergedInterviewData.length > 0 && candidate?.tempID) {
       const interviewData = mergedInterviewData.find(
         (data) => data.tempID === candidate.tempID
-      ); 
+      );
       if (interviewData) {
         setFormData({
           interview: {
@@ -61,7 +60,6 @@ export const CandidateForm = ({ candidate }) => {
   }, [mergedInterviewData, candidate?.tempID]);
 
   // console.log("MERGE",mergedInterviewData);
-  
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -97,10 +95,9 @@ export const CandidateForm = ({ candidate }) => {
     try {
       await interviewDetails({
         InterviewValue: {
-          id: interviewScheduleId, 
+          id: interviewScheduleId,
           department: formData.interview.department,
           otherDepartment: formData.interview.otherDepartment,
-  
         },
       });
 
@@ -176,7 +173,7 @@ export const CandidateForm = ({ candidate }) => {
       <div className="center mt-10">
         <button
           type="submit"
-          className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
+          className="py-2 px-12 font-medium rounded shadow-lg bg-yellow hover:bg-yellow"
         >
           Submit
         </button>

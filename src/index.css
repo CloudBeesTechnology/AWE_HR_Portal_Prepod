@@ -162,6 +162,23 @@ input:disabled {
   background: #f1f1f1;
 }
 
+.allEmployeeTable::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.allEmployeeTable::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.allEmployeeTable::-webkit-scrollbar-thumb {
+  background: #d6cbcb80;
+}
+
+.allEmployeeTable::-webkit-scrollbar-thumb:hover {
+  background: #d6cbcb80;
+}
+
 .empScroll::-webkit-scrollbar {
   width: 6px;
   height: 2px;

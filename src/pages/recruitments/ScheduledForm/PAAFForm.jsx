@@ -3,12 +3,14 @@ import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FileUploadField } from "../../employees/medicalDep/FileUploadField";
-import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
+import { uploadDocString } from "../../../services/uploadsDocsS3/UploadDocs";
 import { UpdateLoiData } from "../../../services/updateMethod/UpdateLoi";
 import { useFetchInterview } from "../../../hooks/useFetchInterview";
 import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
 import { statusOptions } from "../../../utils/StatusDropdown";
 import { SpinLogo } from "../../../utils/SpinLogo";
+import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
+import { DeleteUploadPAAF } from "../deleteDocsRecruit/DeleteUploadPAAF";
 // Define validation schema using Yup
 const PAAFFormSchema = Yup.object().shape({
   paafApproveDate: Yup.date().notRequired(),
@@ -33,7 +35,9 @@ export const PAAFForm = ({ candidate }) => {
       status: "",
     },
   });
-
+  const [isUploadingString, setIsUploadingString] = useState({
+    paafFile: false,
+  });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     paafFile: null,
   });
@@ -76,35 +80,96 @@ export const PAAFForm = ({ candidate }) => {
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
-      return url.split("/").pop(); // Extract the file name from URL
+      const decodedUrl = decodeURIComponent(url);
+      const fileNameWithParams = decodedUrl.split("/").pop();
+      return fileNameWithParams.split("?")[0].split(",")[0].split("#")[0];
     }
     return "";
   };
 
-  const handleFileChange = async (e, type) => {
-    const file = e.target.files[0];
-    setValue(type, file); // Set file value for validation
-    if (file) {
-      if (type === "paafFile") {
-        await uploadDocs(file, "paafFile", setUploadedPAAF, "personName");
+  const updateUploadingString = (type, value) => {
+    setIsUploadingString((prev) => ({
+      ...prev,
+      [type]: value,
+    }));
+    // console.log(value);
+  };
 
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          paafFile: file.name, // Store the file name for display
-        }));
+  const handleFileUpload = async (e, type) => {
+    const tempID = candidate.tempID;
+
+    if (!tempID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
+    }
+
+    let selectedFile = e.target.files[0];
+
+    // Allowed file types
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
+
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
+    }
+
+    setValue(type, selectedFile);
+
+    if (selectedFile) {
+      updateUploadingString(type, true);
+      await uploadDocString(selectedFile, type, setUploadedPAAF, tempID);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [type]: selectedFile.name,
+      }));
+    }
+  };
+
+  const deletedStringUpload = async (fileType, fileName) => {
+    try {
+      const tempID = candidate.tempID;
+
+      if (!tempID) {
+        alert("Please provide the Employee ID before deleting files.");
+        return;
       }
+
+      const isDeleted = await handleDeleteFile(fileType, fileName, tempID);
+      const isDeletedArrayUploaded = await DeleteUploadPAAF(
+        fileType,
+        fileName,
+        tempID,
+        setUploadedFileNames,
+        setUploadedPAAF,
+        setIsUploadingString
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
     }
   };
 
   const handleSubmitTwo = async (e) => {
     e.preventDefault();
 
-    // Check if mergedInterviewData is available for the candidate
     const selectedInterviewData = mergedInterviewData.find(
       (data) => data.tempID === candidate?.tempID
     );
 
-    // Ensure the candidate and their localMobilization details exist
     if (!selectedInterviewData || !selectedInterviewData.localMobilization) {
       alert("Candidate or LOI data not found.");
       return;
@@ -118,13 +183,13 @@ export const PAAFForm = ({ candidate }) => {
         LoiValue: {
           id: localMobilizationId,
           paafApproveDate: formData.interview.paafApproveDate,
-          paafFile: uploadedPAAF.paafFile || formData.paafFile,
+          paafFile: uploadedPAAF.paafFile,
         },
       });
 
       await interviewDetails({
         InterviewValue: {
-          id: interviewScheduleId, // Dynamically use the correct id
+          id: interviewScheduleId, 
           status: formData.interview.status,
           // status: selectedInterviewData.empType === "Offshore" ? "CVEV" : "PAAF",
           // status: selectedInterviewData.contractType === "Local" ? "mobilization" : "workpass",
@@ -168,33 +233,29 @@ export const PAAFForm = ({ candidate }) => {
         </div>
 
         <div className="">
-          {/* <label>Choose File</label> */}
-          <div className="flex items-center gap-5 mt-1">
-            {/* <label className="flex items-center px-3 py-2 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer"> */}
+          <div className="">   
 
             <FileUploadField
               label="Upload File"
-              className="p-4"
-              onChangeFunc={(e) => handleFileChange(e, "paafFile")}
-              accept="application/pdf"
-              register={register}
-              fileName={
-                uploadedFileNames.paafFile || extractFileName(PAAFUpload)
-              }
-              value={formData.interview.paafFile}
+              register={register} 
+              fileKey="paafFile"
+              handleFileUpload={handleFileUpload}
+              uploadedFileNames={uploadedFileNames}
+              deletedStringUpload={deletedStringUpload}
+              isUploadingString={isUploadingString}
+              error={errors.paafFile}
             />
           </div>
         </div>
         <div>
           <label htmlFor="status">Status</label>
           <select
-            className="w-full border p-2 rounded mt-1"
+            className="w-full border p-2 rounded mt-1 h-[44px]"
             id="status"
             {...register("status")}
             value={formData.interview.status}
             onChange={(e) => handleInputChange("status", e.target.value)}
           >
-            {/* <option value="">Select Status</option> */}
             {statusOptions.map((status, index) => (
               <option key={index} value={status}>
                 {status}
@@ -207,7 +268,7 @@ export const PAAFForm = ({ candidate }) => {
       <div className="mt-5 flex justify-center">
         <button
           type="submit"
-          className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
+          className="py-2 px-12 font-medium rounded shadow-lg bg-yellow hover:bg-yellow"
         >
           Submit
         </button>

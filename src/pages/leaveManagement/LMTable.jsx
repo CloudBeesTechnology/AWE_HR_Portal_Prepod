@@ -53,21 +53,29 @@ export const LMTable = () => {
         return false;
       })
       .sort((a, b) => {
-        // Check for manager status first, then supervisor status if manager status is not "Pending"
+
+        if (userType === "SuperAdmin") {
+          const dateA = new Date(a.leaveStatusReceivedDate || a.leaveStatusCreatedAt);
+          const dateB = new Date(b.leaveStatusReceivedDate || b.leaveStatusCreatedAt);
+      
+          return dateB - dateA;
+        }
+
         const isManagerPendingA = a.managerStatus === "Pending";
         const isManagerPendingB = b.managerStatus === "Pending";
         const isSupervisorPendingA = a.supervisorStatus === "Pending";
         const isSupervisorPendingB = b.supervisorStatus === "Pending";
   
-        // Sort Pending statuses separately
         if (isManagerPendingA && !isManagerPendingB) return -1;
-        if (!isManagerPendingA && isManagerPendingB) return 1;
-        
+        if (!isManagerPendingA && isManagerPendingB) return 1;       
         if (isSupervisorPendingA && !isSupervisorPendingB) return -1;
         if (!isSupervisorPendingA && isSupervisorPendingB) return 1;
   
-        // Handle sorting by leaveStatusCreatedAt if not "Pending"
-        return new Date(b.leaveStatusCreatedAt) - new Date(a.leaveStatusCreatedAt);
+         const dateA = new Date(a.leaveStatusReceivedDate || a.leaveStatusCreatedAt);
+          const dateB = new Date(b.leaveStatusReceivedDate || b.leaveStatusCreatedAt);
+      
+        return dateB - dateA ;
+
       });
 
     // Step 2: Apply status filter
@@ -104,6 +112,8 @@ export const LMTable = () => {
   }, [mergedData, userType, userID, filterStatus, selectedDate]);
 
   // Logic to get the URL of the uploaded file
+
+  
   const linkToStorageFile = async (pathUrl) => {
     try {
       const result = await getUrl({ path: pathUrl });
@@ -260,7 +270,7 @@ export const LMTable = () => {
                       <td className="py-3">{item.empID}</td>
                       <td className="py-3">{capitalizedLetter(item.empName) || "N/A"}</td>
                       <td className="py-3">
-                        {DateFormat(item.leaveStatusCreatedAt)}
+                        {DateFormat(item?.leaveStatusReceivedDate) || DateFormat(item?.leaveStatusCreatedAt)}
                       </td>
                       {userType !== "Supervisor" && userType !== "Manager" && (
                         <td className="py-3">{capitalizedLetter(supervisorName[0]?.name) || "N/A"}</td>

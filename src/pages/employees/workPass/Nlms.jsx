@@ -2,14 +2,15 @@ import React, { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { NlmsEmpSchema } from "../../../services/EmployeeValidation";
-import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
+import { uploadDocs } from "../../../services/uploadsDocsS3/UploadDocs";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { FormField } from "../../../utils/FormField";
 import { UpdateNlmsData } from "../../../services/updateMethod/UpdateNlmsData";
 import { FileUploadNew } from "../medicalDep/FileUploadField";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { useOutletContext } from "react-router-dom";
-// import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteDoeNlmsUp";
+import { DeleteDocsNlms } from "../../../services/uploadDocsDelete/DeleteDocsNlms";
+import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 
 export const Nlms = () => {
   const { searchResultData } = useOutletContext();
@@ -18,6 +19,9 @@ export const Nlms = () => {
   const { uploadNlmsFun } = UpdateNlmsData();
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
+   const [isUploading, setIsUploading] = useState({
+    nlmsEmpUpload: false,
+        });
 
   const [uploadedFileNames, setUploadedFileNames] = useState({
     nlmsEmpUpload: null,
@@ -25,10 +29,6 @@ export const Nlms = () => {
   const [uploadNlms, setUploadNlms] = useState({
     nlmsEmpUpload: [],
   });
-
-  // const [id, setID] = useState({
-  //   nlmsID: "",
-  // });
 
     const [fieldTitle, setFieldTitle] = useState("nlmsEmpUpload");
 
@@ -51,26 +51,7 @@ export const Nlms = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const extractFileName = (input) => {
-    // Return empty string if input is null or undefined
-    if (input == null) {
-      return "";
-    }
 
-    // Handle the case when input is an object and contains the 'upload' property
-    if (typeof input === "object" && input.upload) {
-      const filePath = input.upload; // Extract the 'upload' path
-      return filePath.split("/").pop(); // Extract the file name from the path
-    }
-
-    // Handle the case when input is a valid URL string
-    if (typeof input === "string" && input) {
-      return input.split("/").pop(); // Extract the file name from URL
-    }
-
-    // Return an empty string if input is neither a valid string nor object
-    return "";
-  };
 
   const getFileName = (input) => {
     // Check if input is an object and has the 'upload' property
@@ -131,60 +112,94 @@ export const Nlms = () => {
     return Array.isArray(value) ? value[value.length - 1] : value;
   };
 
-  const handleFileChange = async (e, label) => {
-    const watchedEmpID = watch("empID");
-    if (!watchedEmpID) {
-      alert("Please enter the Employee ID before uploading files.");
-      window.location.href = "/employeeInfo";
-      return;
-    }
-
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
-
-    const allowedTypes = [
-      "application/pdf"
-    ];
-    if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file");
-      return;
-    }
-
-    // Fetch current files (including backend-stored ones)
-    const currentFiles = watch(label) || []; // React Hook Form state
-
-    // Count only newly uploaded files, ignoring backend-stored files
-    let newUploads = []; // Declare it outside the if block to access later
-    if (Array.isArray(currentFiles)) {
-      newUploads = currentFiles.filter(file => file instanceof File);
-    }
-    
-    if (newUploads.length > 0) {
-      alert("You can only upload one new file. Please delete the existing file before uploading another.");
-      return;
-    }
-    
-
-    if (newUploads.length > 0) {
-      alert(
-        "You can only upload one new file. Please delete the existing file before uploading another."
-      );
-      return;
-    }
-
-    // Append the new file to the form state
-    setValue(label, [...currentFiles, selectedFile]);
-
-    try {
-      await uploadDocs(selectedFile, label, setUploadNlms, watchedEmpID);
-      setUploadedFileNames((prev) => ({
-        ...prev,
-        [label]: selectedFile.name,
-      }));
-    } catch (err) {
-      console.error(err);
-    }
-  };
+   const updateUploadingState = (label, value) => {
+       setIsUploading((prev) => ({
+         ...prev,
+         [label]: value,
+       }));
+       console.log(value);
+     };
+   
+     const handleFileChange = async (e, label) => {
+       const watchedEmpID = watch("empID");
+       if (!watchedEmpID) {
+           alert("Please enter the Employee ID before uploading files.");
+           window.location.href = "/employeeInfo";
+           return;
+       }
+   
+       const selectedFile = e.target.files[0];
+       if (!selectedFile) return;
+   
+       const allowedTypes = [
+         "application/pdf",
+       ];
+       if (!allowedTypes.includes(selectedFile.type)) {
+           alert("Upload must be a PDF file.");
+           return;
+       }
+   
+       // Ensure no duplicate files are added
+       const currentFiles = watch(label) || [];
+       if (currentFiles.some((file) => file.name === selectedFile.name)) {
+           alert("This file has already been uploaded.");
+           return;
+       }
+   
+       // **Check if the file was previously deleted and prevent re-adding**
+      //  if (deletedFiles[label]?.includes(selectedFile.name)) {
+      //      alert("This file was previously deleted and cannot be re-added.");
+      //      return;
+      //  }
+   
+       setValue(label, [...currentFiles, selectedFile]);
+   
+       try {
+         updateUploadingState(label, true);
+         await uploadDocs(selectedFile, label, setUploadNlms, watchedEmpID);
+         setUploadedFileNames((prev) => ({
+           ...prev,
+           [label]: selectedFile.name,
+         }));
+       } catch (err) {
+           console.error(err);
+       }
+     };
+   
+     const deleteFile = async (fileType, fileName) => {
+       try {
+         const watchedEmpID = watch("empID");
+         if (!watchedEmpID) {
+           alert("Please provide the Employee ID before deleting files.");
+           return;
+         }
+   
+         const isDeleted = await handleDeleteFile(
+           fileType,
+           fileName,
+           watchedEmpID
+         );
+         const isDeletedArrayUploaded = await DeleteDocsNlms(
+           fileType,
+           fileName,
+           watchedEmpID,
+           setUploadedFileNames,
+           setUploadNlms,
+           setIsUploading
+         );
+   
+         if (!isDeleted || isDeletedArrayUploaded) {
+           console.error(
+             `Failed to delete file: ${fileName}, skipping UI update.`
+           );
+           return;
+         }
+         // console.log(`Deleted "${fileName}". Remaining files:`);
+       } catch (error) {
+         console.error("Error deleting file:", error);
+         alert("Error processing the file deletion.");
+       }
+     };
 
   useEffect(() => {
     setValue("empID", searchResultData.empID);
@@ -202,16 +217,6 @@ export const Nlms = () => {
     fields.forEach((field) =>
       setValue(field, getLastValue(searchResultData[field]))
     );
-
-    // const nlmsRecord = DNData.find(
-    //   (match) => match.empID === searchResultData.empID
-    // );
-    // if (nlmsRecord) {
-    //   setID((prevData) => ({
-    //     ...prevData,
-    //     nlmsID: nlmsRecord.id,
-    //   }));
-    // }
 
     if (searchResultData?.nlmsEmpUpload) {
       try {
@@ -231,49 +236,15 @@ export const Nlms = () => {
     }
   }, [searchResultData, setValue]);
 
-  // const deleteFile = async (fileType, fileName) => {
-  //   const deleteID = id.nlmsID;
 
-  //   try {
-  //     await handleDeleteFile(
-  //       fileType,
-  //       fileName,
-  //       empID,
-  //       setUploadedFileNames,
-  //       deleteID,
-  //       setValue
-  //     );
-
-  //     const currentFiles = watch(fileType) || [];
-
-  //     // Filter out the deleted file
-  //     const updatedFiles = currentFiles.filter(
-  //       (file) => file.name !== fileName
-  //     );
-
-  //     // Update form state with the new file list
-  //     setValue(fileType, updatedFiles);
-
-  //     // Update UI state
-  //     setUploadNlms((prevState) => ({
-  //       ...prevState,
-  //       [fileType]: updatedFiles,
-  //     }));
-  //   } catch (error) {
-  //     console.error("Error deleting file:", error);
-  //   }
-  // };
 
   const formatDate = (date) => {
     return date ? new Date(date).toLocaleDateString("en-CA") : null;
   };
-
   const workPermitDD = dropDownVal[0]?.permitWorkDD.map((item) => ({
     value: item,
     label: item,
   }));
-
-
   const onSubmit = async (data) => {
     try {
       const nlmsEmpSubmit = formatDate(data.nlmsEmpSubmit);
@@ -395,7 +366,9 @@ export const Nlms = () => {
           error={errors.nlmsEmpUpload}
           fileName={uploadedFileNames.nlmsEmpUpload || ""}
           uploadedFileNames={uploadedFileNames}
-          // deleteFile={deleteFile}
+          handleFileChange={handleFileChange}
+          isUploading={isUploading}
+          deleteFile={deleteFile}
           field={{ title: "nlmsEmpUpload" }}
         />
       </div>
