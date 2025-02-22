@@ -31,7 +31,7 @@ export const SawpTable = ({ data, fileUpload, urlValue }) => {
   return (
     <div>
       {data && data.length > 0 ? (
-        <table className=" w-full">
+        <table className=" w-full rounded-lg overflow-hidden">
           <thead className="bg-[#939393] text-white">
             <tr>
               {heading.map((header, index) => (
@@ -44,12 +44,12 @@ export const SawpTable = ({ data, fileUpload, urlValue }) => {
           <tbody>
             {data && data.length > 0 ? (
               data.map((item, index) => {
-                //   const displayIndex = startIndex + index + 1; // Adjust index based on pagination
+                //   const displayIndex = startIndex + index + 1; 
 
                 return (
                   <tr
                     key={index}
-                    className="text-center text-[16px] shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
+                    className="text-center border-b-2 bg-white border-[#C7BCBC] text-[15px] text-[#303030] hover:bg-medium_blue"
                   >
                     {/* <td className="py-3">{displayIndex}</td> */}
                     <td className="py-3">{item.tempID}</td>
@@ -70,7 +70,7 @@ export const SawpTable = ({ data, fileUpload, urlValue }) => {
                             if (!item.WPTrackDetails_sawpFile) {
                               e.preventDefault();
                             } else {
-                              fileUpload(item.WPTrackDetails_sawpFile); // Fetch URL when clicked
+                              fileUpload(item.WPTrackDetails_sawpFile); 
                             }
                           }}
                           download
@@ -93,7 +93,7 @@ export const SawpTable = ({ data, fileUpload, urlValue }) => {
                       View
                     </td>
                     <td
-                      className="text-2xl cursor-pointer py-3 center"
+                      className="text-2xl text-[#EA4F4F] cursor-pointer py-3 center"
                       onClick={() => handleShowForm(item)}
                     >
                       <RiFileEditLine />
@@ -117,7 +117,6 @@ export const SawpTable = ({ data, fileUpload, urlValue }) => {
       {isFormVisible && (
         <WorkpassForm
           candidate={selectedCandi}
-          //   onSave={handleFormSave}
           onClose={handleShowForm}
         />
       )}

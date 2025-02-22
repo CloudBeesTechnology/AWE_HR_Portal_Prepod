@@ -2,14 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
+import { uploadDocString } from "../../../services/uploadsDocsS3/UploadDocs";
 import { UpdateLoiData } from "../../../services/updateMethod/UpdateLoi";
 import { useFetchInterview } from "../../../hooks/useFetchInterview";
 import { FileUploadField } from "../../employees/medicalDep/FileUploadField";
 import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
 import { statusOptions } from "../../../utils/StatusDropdown";
 import { SpinLogo } from "../../../utils/SpinLogo";
-
+import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
+import { DeleteUploadLOI } from "../deleteDocsRecruit/DeleteUploadLOI";
 // Define validation schema using Yup
 const MOBFormSchema = Yup.object().shape({
   mobSignDate: Yup.date().notRequired(),
@@ -36,6 +37,10 @@ export const MobilizationForm = ({ candidate }) => {
   });
   // const [uploadedFileName, setUploadedFileName] = useState(null);
   // const [uploadedMOB, setUploadedMOB] = useState(null);
+  const [isUploadingString, setIsUploadingString] = useState({
+    mobFile: false,
+  });
+
   const [uploadedFileNames, setUploadedFileNames] = useState({
     mobFile: null,
   });
@@ -79,23 +84,88 @@ export const MobilizationForm = ({ candidate }) => {
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
-      return url.split("/").pop(); // Extract the file name from URL
+      const decodedUrl = decodeURIComponent(url);
+      const fileNameWithParams = decodedUrl.split("/").pop();
+      return fileNameWithParams.split("?")[0].split(",")[0].split("#")[0];
     }
     return "";
   };
 
-  const handleFileChange = async (e, type) => {
-    const file = e.target.files[0];
-    setValue(type, file); // Set file value for validation
-    if (file) {
-      if (type === "mobFile") {
-        await uploadDocs(file, "mobFile", setUploadedMOB, "personName");
+  const updateUploadingString = (type, value) => {
+    setIsUploadingString((prev) => ({
+      ...prev,
+      [type]: value,
+    }));
+    // console.log(value);
+  };
 
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          mobFile: file.name, // Store the file name for display
-        }));
+  const handleFileUpload = async (e, type) => {
+    const tempID = candidate.tempID;
+    console.log(tempID);
+
+    //      if (!tempID
+    // ) {
+    //        alert("Please enter the Employee ID before uploading files.");
+    //        window.location.href = "/employeeInfo";
+    //        return;
+    //      }
+
+    let selectedFile = e.target.files[0];
+
+    // Allowed file types
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
+
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
+    }
+
+    setValue(type, selectedFile);
+
+    if (selectedFile) {
+      updateUploadingString(type, true);
+      await uploadDocString(selectedFile, type, setUploadedMOB, tempID);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [type]: selectedFile.name,
+      }));
+    }
+  };
+
+  const deletedStringUpload = async (fileType, fileName) => {
+    try {
+      const tempID = candidate.tempID;
+
+      if (!tempID) {
+        alert("Please provide the Employee ID before deleting files.");
+        return;
       }
+
+      const isDeleted = await handleDeleteFile(fileType, fileName, tempID);
+      const isDeletedArrayUploaded = await DeleteUploadLOI(
+        fileType,
+        fileName,
+        tempID,
+        setUploadedFileNames,
+        setUploadedMOB,
+        setIsUploadingString
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
     }
   };
 
@@ -121,12 +191,12 @@ export const MobilizationForm = ({ candidate }) => {
         LoiValue: {
           id: localMobilizationId,
           mobSignDate: formData.interview.mobSignDate,
-          mobFile: uploadedMOB.mobFile || formData.mobfFile,
+          mobFile: uploadedMOB.mobFile,
         },
       });
       await interviewDetails({
         InterviewValue: {
-          id: interviewScheduleId, // Dynamically use the correct id
+          id: interviewScheduleId, 
           status: formData.interview.status,
           // status: selectedInterviewData.contractType === "Local" ? "mobilization" : "workpass",
         },
@@ -160,38 +230,35 @@ export const MobilizationForm = ({ candidate }) => {
             className="w-full border p-2 rounded mt-1"
             type="date"
             id="mobSignDate"
-        
             value={formData.interview.mobSignDate}
             onChange={(e) => handleInputChange("mobSignDate", e.target.value)}
           />
         </div>
 
         <div className="">
-          {/* <label>Choose File</label> */}
-          <div className="flex items-center gap-5 mt-1">
-            {/* <label className="flex items-center px-3 py-2 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer"> */}
 
+          <div className="">
             <FileUploadField
               label="Upload File"
-              onChangeFunc={(e) => handleFileChange(e, "mobFile")}
-              className="hidden"
-              accept="application/pdf"
               register={register}
-              fileName={uploadedFileNames.mobFile || extractFileName(MOBUpload)}
-              value={formData.interview.mobFile}
+              fileKey="mobFile"
+              handleFileUpload={handleFileUpload}
+              uploadedFileNames={uploadedFileNames}
+              deletedStringUpload={deletedStringUpload}
+              isUploadingString={isUploadingString}
+              error={errors.mobFile}
             />
           </div>
         </div>
         <div>
           <label htmlFor="status">Status</label>
           <select
-            className="w-full border p-2 rounded mt-1"
+            className="w-full border p-2 rounded mt-1 h-[44px]"
             id="status"
             // register={register}
             value={formData.interview.status}
             onChange={(e) => handleInputChange("status", e.target.value)}
           >
-            {/* <option value="">Select Status</option> */}
             {statusOptions.map((status, index) => (
               <option key={index} value={status}>
                 {status}
@@ -204,18 +271,18 @@ export const MobilizationForm = ({ candidate }) => {
       <div className="mt-5 flex justify-center">
         <button
           type="submit"
-          className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
+          className="py-2 px-12 font-medium rounded shadow-lg bg-yellow hover:bg-yellow"
         >
           Submit
         </button>
       </div>
       {notification && (
-              <SpinLogo
-                text="Mobilization Updated Successfully"
-                notification={notification}
-                path="/recrutiles/status"
-              />
-            )}
+        <SpinLogo
+          text="Mobilization Updated Successfully"
+          notification={notification}
+          path="/recrutiles/status"
+        />
+      )}
     </form>
   );
 };

@@ -35,7 +35,7 @@ export const DoeTable = ({ data, formatDate, fileUpload, urlValue }) => {
   return (
     <div>
       {data && data.length > 0 ? (
-        <table className=" w-full">
+        <table className=" w-full rounded-lg overflow-hidden table-auto">
           <thead className="bg-[#939393] text-white">
             <tr>
               {heading.map((header, index) => (
@@ -48,14 +48,11 @@ export const DoeTable = ({ data, formatDate, fileUpload, urlValue }) => {
           <tbody>
             {data && data.length > 0 ? (
               data.map((item, index) => {
-                //   const displayIndex = startIndex + index + 1; // Adjust index based on pagination
-
                 return (
                   <tr
                     key={index}
-                    className="text-center text-[16px] shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
+                    className="text-center border-b-2 bg-white border-[#C7BCBC] text-[15px] text-[#303030] hover:bg-medium_blue"
                   >
-                    {/* <td className="py-3">{displayIndex}</td> */}
                     <td className="py-3">{item.tempID}</td>
                     <td className="py-3">{item.name || "N/A"}</td>
                     <td className="py-3">{item.nationality || "N/A"}</td>
@@ -106,7 +103,7 @@ export const DoeTable = ({ data, formatDate, fileUpload, urlValue }) => {
                       View
                     </td>
                     <td
-                      className="text-2xl cursor-pointer py-3 center"
+                      className="text-2xl text-[#EA4F4F] cursor-pointer py-3 center"
                       onClick={() => handleShowForm(item)}
                     >
                       <RiFileEditLine />

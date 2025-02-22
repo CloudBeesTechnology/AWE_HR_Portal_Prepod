@@ -4,13 +4,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { ApplicantSchema } from "../../services/Validation";
 import { useNavigate, useLocation } from "react-router-dom";
 import { IoCameraOutline } from "react-icons/io5";
-import { uploadDocString } from "../../services/uploadDocsS3/UploadDocs";
+import { uploadDocString } from "../../services/uploadsDocsS3/UploadDocs";
 import { FormField } from "../../utils/FormField";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { getUrl } from "@aws-amplify/storage";
 import { useTempID } from "../../utils/TempIDContext";
 import avatar from "../../assets/navabar/avatar.jpeg";
-
 
 import {
   ContractTypeDD,
@@ -199,7 +198,7 @@ export const ApplicantDetails = () => {
 
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
- 
+
     if (selectedFile) {
       
       setProfilePhoto(selectedFile);

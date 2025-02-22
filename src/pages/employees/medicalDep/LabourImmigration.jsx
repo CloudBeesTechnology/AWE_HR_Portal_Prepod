@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { LabourImmigrationSchema } from "../../../services/EmployeeValidation";
 import { FaArrowLeft } from "react-icons/fa";
 import { IoSearch } from "react-icons/io5";
-import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
+import { uploadDocs } from "../../../services/uploadsDocsS3/UploadDocs";
 import { EmpDataPass } from "../EmpDataPass";
 import { SearchDisplay } from "../../../utils/SearchDisplay";
 import { UploadingFiles } from "./FileUploadField";
@@ -15,7 +15,8 @@ import { MedicalPassFunc } from "../../../services/createMethod/MedicalPassFunc"
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { UpdateMedical } from "../../../services/updateMethod/UpdateMedicalInfo";
-// import { handleDeleteFile } from "../../../services/uploadDocsS3/LabourImmiUpload";
+import { LabourImmiUpload } from "../../../services/uploadDocsDelete/LabourImmiUpload";
+import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 
 const LabourImmigration = () => {
   useEffect(() => {
@@ -30,6 +31,11 @@ const LabourImmigration = () => {
   const [arrayUploadDocs, setArrayUploadDocs] = useState([]);
   const [uploadedFileNames, setUploadedFileNames] = useState({});
   const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [isUploading, setIsUploading] = useState({
+    uploadFitness: false,
+    uploadRegis: false,
+    uploadBwn: false,
+  });
   const [docsUploaded, setDocsUploaded] = useState({
     uploadFitness: [],
     uploadRegis: [],
@@ -38,17 +44,15 @@ const LabourImmigration = () => {
   const [notification, setNotification] = useState(false);
   const [dependPassData, setDependPassData] = useState(null);
   const [showTitle, setShowTitle] = useState("");
-  // const [id, setID] = useState({
-  //   LabourImmiID:"",
-  // });
+ 
   const {
     register,
     handleSubmit,
     setValue,
     watch,
     control,
-    getValues,
     trigger,
+    getValues,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -84,84 +88,94 @@ const LabourImmigration = () => {
 
   const watchedEmpID = watch("empID");
 
-  
-  const handleFileChange = async (e, label) => {
-    const watchedEmpID = watch("empID");
-    if (!watchedEmpID) {
-      alert("Please enter the Employee ID before uploading files.");
-      window.location.href = "/employeeInfo";
-      return;
-    }
-  
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
-  
-    const allowedTypes = ["application/pdf"];
-    if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file");
-      return;
-    }
-  
-    // Fetch current files (including backend-stored ones)
-    const currentFiles = watch(label) || []; // React Hook Form state
-  
-    // Count only newly uploaded files, ignoring backend-stored files
-    const newUploads = currentFiles.filter(file => file instanceof File);
-  
-    if (newUploads.length > 0) {
-      alert("You can only upload one new file.");
-      return;
-    }
-  
-    // Append the new file to the form state
-    setValue(label, [...currentFiles, selectedFile]);
-  
-    try {
-      await uploadDocs(selectedFile, label, setDocsUploaded, watchedEmpID);
-      setUploadedFileNames((prev) => ({
-        ...prev,
-        [label]: selectedFile.name,
-      }));
-    } catch (err) {
-      console.error(err);
-    }
-  };
+const updateUploadingState = (label, value) => {
+       setIsUploading((prev) => ({
+         ...prev,
+         [label]: value,
+       }));
+       console.log(value);
+     };
+   
+     const handleFileChange = async (e, label) => {
+       const watchedEmpID = watch("empID");
+       if (!watchedEmpID) {
+           alert("Please enter the Employee ID before uploading files.");
+           window.location.href = "/employeeInfo";
+           return;
+       }
+   
+       const selectedFile = e.target.files[0];
+       if (!selectedFile) return;
+   
+       const allowedTypes = [
+         "application/pdf",
+         "image/jpeg",
+         "image/png",
+         "image/jpg",
+       ];
+       if (!allowedTypes.includes(selectedFile.type)) {
+           alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+           return;
+       }
+   
+       // Ensure no duplicate files are added
+       const currentFiles = watch(label) || [];
+       if (currentFiles?.some((file) => file.name === selectedFile.name)) {
+           alert("This file has already been uploaded.");
+           return;
+       }
+   
+   
+       setValue(label, [...currentFiles, selectedFile]);
+   
+       try {
+         updateUploadingState(label, true);
+         await uploadDocs(selectedFile, label, setDocsUploaded, watchedEmpID);
+         setUploadedFileNames((prev) => ({
+           ...prev,
+           [label]: selectedFile.name,
+         }));
+       } catch (err) {
+           console.error(err);
+       }
+     };
+   
+     const deleteFile = async (fileType, fileName) => {
+       try {
+         const watchedEmpID = watch("empID");
+         if (!watchedEmpID) {
+           alert("Please provide the Employee ID before deleting files.");
+           return;
+         }
+   
+         const isDeleted = await handleDeleteFile(
+           fileType,
+           fileName,
+           watchedEmpID
+         );
+         const isDeletedArrayUploaded = await LabourImmiUpload(
+           fileType,
+           fileName,
+           watchedEmpID,
+           setUploadedFileNames, 
+           setDocsUploaded,
+           setIsUploading
+         );
+   
+         if (!isDeleted || isDeletedArrayUploaded) {
+           console.error(
+             `Failed to delete file: ${fileName}, skipping UI update.`
+           );
+           return;
+         }
+         // console.log(`Deleted "${fileName}". Remaining files:`);
+       } catch (error) {
+         console.error("Error deleting file:", error);
+         alert("Error processing the file deletion.");
+       }
+     };
 
-  // const deleteFile = async (fileType, fileName) => {
-  //   const watchedEmpID = watch("empID");
-  //   // const serviceID = id.serviceID;
-  //   const LabourImmiID = id.LabourImmiID;
-
-  //   try {
-  //     await handleDeleteFile(
-  //       fileType,
-  //       fileName,
-  //       watchedEmpID,
-  //       setUploadedFileNames,
-  //       setValue,
-  //       trigger,
-  //       LabourImmiID
-  //     );
-  //     const currentFiles = watch(fileType) || []; 
-  //     // Filter out the deleted file
-  //     const updatedFiles = currentFiles.filter(
-  //       (file) => file.name !== fileName
-  //     );
-  //     // Update form state with the new file list
-  //     setValue(fileType, updatedFiles);
-
-  //     // Update UI state
-  //     setDocsUploaded((prevState) => ({
-  //       ...prevState,
-  //       [fileType]: updatedFiles,
-  //     }));
-  //   } catch (error) {
-  //     console.error("Error deleting file:", error);
-  //   }
-  // };
-  // const getLastValue = (value) => {
-  //   return Array.isArray(value) ? value[value.length - 1] : value;
-  // };
+  
   const getLastValue = (value) => {
     if (Array.isArray(value)) {
       const lastValue = value[value.length - 1];
@@ -177,16 +191,10 @@ const LabourImmigration = () => {
 
   const formatDateValue = (dateString) => {
     if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
-      const [part1, part2, year] = dateString.split("/");
-
-      // Determine if the format is MM/dd/yyyy or dd/MM/yyyy
-      const isMMDDYYYY = parseInt(part1, 10) > 12; // If the first part is greater than 12, it's a day
-      const day = isMMDDYYYY ? part1 : part2;
-      const month = isMMDDYYYY ? part2 : part1;
-
-      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+      const [day, month, year] = dateString.split("/");
+      return `${year}-${month}-${day}`;
     }
-    return dateString; // Return original string if it doesn't match
+    return dateString;
   };
 
   const convertDateFormat = (dateStr) => {
@@ -226,42 +234,26 @@ const LabourImmigration = () => {
   };
 
   const searchResult = (result) => {
-    // console.log(result);
-
-    // const LabourImmiRecord = LMIData.find((match) => match.empID === result.empID);
-   
-
-    // if (LabourImmiRecord) {
-    //   setID((prevData) => ({
-    //     ...prevData,
-    //     LabourImmiID: LabourImmiRecord.id, // Assuming this field exists.
-    //   }))}
+  
+console.log(result);
 
     const keysToSet = ["empID", "bruhimsRNo", "overMD", "overME", "bruhimsRD"];
 
     keysToSet.forEach((key) => {
-      let value = result[key];
-
-      if (value === null || value === undefined) {
-        value = ""; // Set empty string for null or undefined values
+      if (result[key]) {
+        let value = result[key];
+        if (key === "overMD" || key === "overME" || key === "bruhimsRD") {
+          value = convertDateFormat(value);
+        }
+        setValue(key, value);
       }
-
-      if (key === "overMD" || key === "overME" || key === "bruhimsRD") {
-        value = value ? convertDateFormat(value) : ""; // Format only if value exists
-      }
-
-      setValue(key, value); // Set the value (formatted or empty)
     });
 
     const fields = ["bruneiMAD", "bruneiME"];
     // fields.forEach((field) => setValue(field, getLastValue(result[field])));
     fields.forEach((field) => {
       const cleanedValue = getLastValue(result[field]);
-      // console.log(cleanedValue);
-
       const formattedValue = formatDateValue(cleanedValue);
-      // console.log(formattedValue);
-
       setValue(field, formattedValue);
     });
 
@@ -270,13 +262,13 @@ const LabourImmigration = () => {
         const parsedData = JSON.parse(result.dependPass);
         setDependPassData(parsedData);
       } catch (error) {
-        // console.error("Failed to parse dependPass:", error);
+        console.error("Failed to parse dependPass:", error);
       }
     }
 
     const uploadFields = ["uploadFitness", "uploadRegis", "uploadBwn"];
 
-      uploadFields.forEach((field) => {
+    uploadFields.forEach((field) => {
       if (result && result[field]) {
         try {
           // Parse the field data if it exists
@@ -306,13 +298,12 @@ const LabourImmigration = () => {
   };
   const getFileName = (filePath) => {
     const fileNameWithExtension = filePath.split("/").pop(); // Get file name with extension
-    const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
-    return fileName;
+    // const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
+    return fileNameWithExtension;
   };
 
   const onSubmit = async (data) => {
     // console.log(data);
-
     try {
       const checkingPITable = empPIData.find(
         (match) => match.empID === data.empID
@@ -371,10 +362,10 @@ const LabourImmigration = () => {
           dependPass: JSON.stringify(
             data.dependPass.map((val, index) => {
               const uploadDp =
-                arrayUploadDocs?.uploadDp?.[index] || val.uploadDp;
+                arrayUploadDocs?.uploadDp?.[index] ;
 
               const uploadDr =
-                arrayUploadDocs?.uploadDr?.[index] || val.uploadDr;
+                arrayUploadDocs?.uploadDr?.[index] ;
               return {
                 ...val,
                 uploadDp, // Assign the array for uploadDp
@@ -489,7 +480,8 @@ const LabourImmigration = () => {
               handleFileChange={handleFileChange}
               uploadedFileNames={uploadedFileNames}
               watchedEmpID={watchedEmpID}
-              // deleteFile={deleteFile}
+              deleteFile={deleteFile}
+              isUploading={isUploading}
               errors={errors}
             />
           ))}
@@ -509,10 +501,10 @@ const LabourImmigration = () => {
         errors={errors}
         watch={watch}
         trigger={trigger}
-        // id={id}
+        isUploading={isUploading}
         value={dependPassData}
         watchedEmpID={watchedEmpID}
-        // deleteFile={deleteFile}
+        deleteFile={deleteFile}
         getValues={getValues}
       />
 

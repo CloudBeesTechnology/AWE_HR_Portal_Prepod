@@ -16,12 +16,8 @@ import { AirTKtTable } from "./AirTKtTable";
 import { NonLocalMobTable } from "./NonLocalMobTable";
 
 export const WorkpassTracking = () => {
-  // const client = generateClient();
+
   const [data, setData] = useState([]);
-  // const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState(null);
-  // const [selectedOption, setSelectedOption] = useState("");
-  // const [selectedRows, setSelectedRows] = useState([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [isFilterBoxOpen, setIsFilterBoxOpen] = useState(false);
@@ -33,7 +29,6 @@ export const WorkpassTracking = () => {
   const [candidateTypeDropdownOpen, setCandidateTypeDropdownOpen] =
     useState(false);
   const [urlValue, setURLValue] = useState("");
-
   const { WPTrackings, empPDData, IVSSDetails } = useContext(DataSupply);
 
   useEffect(() => {

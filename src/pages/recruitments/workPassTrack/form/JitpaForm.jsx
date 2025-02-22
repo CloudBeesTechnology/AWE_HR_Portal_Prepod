@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { uploadDocs } from "../../../../services/uploadDocsS3/UploadDocs";
+import { uploadDocString } from "../../../../services/uploadsDocsS3/UploadDocs";
 import { FileUploadField } from "../../../employees/medicalDep/FileUploadField";
 import { JitpaFormSchema } from "../../../../services/Validation";
 import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
@@ -9,6 +9,8 @@ import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPT
 import { UpdateInterviewData } from "../../../../services/updateMethod/UpdateInterview";
 import { statusOptions } from "../../../../utils/StatusDropdown";
 import { SpinLogo } from "../../../../utils/SpinLogo";
+import { handleDeleteFile } from "../../../../services/uploadsDocsS3/DeleteDocs";
+import { DeleteUploadJitpa } from "../deleteUpload/DeleteUploadJitpa";
 
 export const JitpaForm = ({ candidate }) => {
   const { interviewSchedules } = useFetchCandy();
@@ -25,6 +27,10 @@ export const JitpaForm = ({ candidate }) => {
       jitpafile: "",
       status: "",
     },
+  });
+
+  const [isUploadingString, setIsUploadingString] = useState({
+    jitpaFile: false,
   });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     jitpaFile: null,
@@ -47,15 +53,11 @@ export const JitpaForm = ({ candidate }) => {
 
   useEffect(() => {
     if (interviewSchedules.length > 0) {
-      // Find the interviewData for the candidate
       const interviewData = interviewSchedules.find(
         (data) => data.tempID === candidate.tempID
       );
 
-      //  console.log("Found interviewData:", interviewData);
-
       if (interviewData) {
-        // Set the form data
         setFormData({
           interview: {
             tbapurchasedate: interviewData.tbapurchasedate,
@@ -67,7 +69,6 @@ export const JitpaForm = ({ candidate }) => {
           },
         });
 
-        // Check if sawpFile exists and update the file names
         if (interviewData.jitpafile) {
           const fileName = extractFileName(interviewData.jitpafile);
           setUploadedFileNames((prev) => ({
@@ -83,26 +84,87 @@ export const JitpaForm = ({ candidate }) => {
       // console.log("No interview schedules available.");
     }
   }, [interviewSchedules, candidate.tempID]);
-
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
-      return url.split("/").pop(); // Extract the file name from URL
+      const decodedUrl = decodeURIComponent(url);
+      const fileNameWithParams = decodedUrl.split("/").pop();
+      return fileNameWithParams.split("?")[0].split(",")[0].split("#")[0];
     }
     return "";
   };
 
-  const handleFileChange = async (e, type) => {
-    const file = e.target.files[0];
-    setValue(type, file); // Set file value for validation
-    if (file) {
-      if (type === "jitpaFile") {
-        await uploadDocs(file, "jitpaFile", setUploadedJitpa, "personName");
+  const updateUploadingString = (type, value) => {
+    setIsUploadingString((prev) => ({
+      ...prev,
+      [type]: value,
+    }));
+    // console.log(value);
+  };
 
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          jitpaFile: file.name, // Store the file name for display
-        }));
+  const handleFileUpload = async (e, type) => {
+    const tempID = candidate.tempID;
+
+    if (!tempID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
+    }
+
+    let selectedFile = e.target.files[0];
+
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
+
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
+    }
+
+    setValue(type, selectedFile);
+
+    if (selectedFile) {
+      updateUploadingString(type, true);
+      await uploadDocString(selectedFile, type, setUploadedJitpa, tempID);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [type]: selectedFile.name,
+      }));
+    }
+  };
+
+  const deletedStringUpload = async (fileType, fileName) => {
+    try {
+      const tempID = candidate.tempID;
+
+      if (!tempID) {
+        alert("Please provide the Employee ID before deleting files.");
+        return;
       }
+
+      const isDeleted = await handleDeleteFile(fileType, fileName, tempID);
+      const isDeletedArrayUploaded = await DeleteUploadJitpa(
+        fileType,
+        fileName,
+        tempID,
+        setUploadedFileNames,
+        setUploadedJitpa,
+        setIsUploadingString
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
     }
   };
 
@@ -138,9 +200,7 @@ export const JitpaForm = ({ candidate }) => {
           submitdateendorsement: formData.interview.submitdateendorsement,
           jitpaexpirydate: formData.interview.jitpaexpirydate,
           jitpaamount: formData.interview.jitpaamount,
-          jitpafile: uploadedJitpa.jitpaFile
-            ? uploadedJitpa.jitpaFile
-            : formData.interview.jitpafile,
+          jitpafile: uploadedJitpa.jitpaFile || formData.interview.jitpafile,
         },
       });
 
@@ -150,11 +210,11 @@ export const JitpaForm = ({ candidate }) => {
       };
       setNotification(true);
 
-      console.log("Submitting interview details with status:", interStatus);
+      // console.log("Submitting interview details with status:", interStatus);
 
       await interviewDetails({ InterviewValue: interStatus });
 
-      console.log("Interview status updated:", interStatus);
+      // console.log("Interview status updated:", interStatus);
 
       // console.log("Response from WPTrackingDetails:", response);
 
@@ -183,7 +243,7 @@ export const JitpaForm = ({ candidate }) => {
           <div>
             <label htmlFor="tbapurchasedate">Date of Purchase</label>
             <input
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               type="date"
               id="tbapurchasedate"
               {...register("tbapurchasedate")}
@@ -196,7 +256,7 @@ export const JitpaForm = ({ candidate }) => {
           <div>
             <label htmlFor="submitdateendorsement">Date of Endrosement</label>
             <input
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               type="date"
               id="submitdateendorsement"
               {...register("submitdateendorsement")}
@@ -209,7 +269,7 @@ export const JitpaForm = ({ candidate }) => {
           <div>
             <label htmlFor="jitpaexpirydate">Valid Until</label>
             <input
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               type="date"
               id="jitpaexpirydate"
               {...register("jitpaexpirydate")}
@@ -222,7 +282,7 @@ export const JitpaForm = ({ candidate }) => {
           <div>
             <label htmlFor="jitpaamount">JITPA Amount</label>
             <input
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               type="text"
               id="jitpaamount"
               {...register("jitpaamount")}
@@ -230,25 +290,11 @@ export const JitpaForm = ({ candidate }) => {
               onChange={(e) => handleInputChange("jitpaamount", e.target.value)}
             />
           </div>
-          <div className="">
-            <div className="flex items-center gap-5 mt-1">
-              <FileUploadField
-                label="Upload File"
-                className="p-4"
-                onChangeFunc={(e) => handleFileChange(e, "jitpaFile")}
-                accept="application/pdf"
-                register={register}
-                fileName={
-                  uploadedFileNames.jitpaFile || extractFileName(JitpaUpload)
-                }
-                value={formData.interview.jitpafile}
-              />
-            </div>
-          </div>
+
           <div>
             <label htmlFor="status">Status</label>
             <select
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               id="status"
               {...register("status")}
               value={formData.interview.status}
@@ -262,12 +308,28 @@ export const JitpaForm = ({ candidate }) => {
               ))}
             </select>
           </div>
+
+          <div className="">
+            <div className="">
+              <FileUploadField
+                label="Upload File"
+                register={register} 
+                fileKey="jitpaFile"
+                handleFileUpload={handleFileUpload}
+                uploadedFileNames={uploadedFileNames}
+                deletedStringUpload={deletedStringUpload}
+                isUploadingString={isUploadingString}
+                error={errors.jitpaFile}
+              />
+            </div>
+          </div>
+          
         </div>
 
         <div className="mt-5 flex justify-center">
           <button
             type="submit"
-            className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
+            className="py-2 px-12 font-medium rounded shadow-lg bg-yellow hover:bg-yellow"
           >
             Submit
           </button>

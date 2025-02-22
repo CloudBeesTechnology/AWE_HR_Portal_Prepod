@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import AweLogo from "../../../../assets/logo/logo-with-name.svg";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { uploadDocs } from "../../../../services/uploadDocsS3/UploadDocs";
+import { uploadDocString } from "../../../../services/uploadsDocsS3/UploadDocs";
 import { FileUploadField } from "../../../employees/medicalDep/FileUploadField";
 import { NlmsFormSchema } from "../../../../services/Validation";
 import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPTracking";
@@ -10,12 +9,14 @@ import { UpdateInterviewData } from "../../../../services/updateMethod/UpdateInt
 import { useFetchCandy } from "../../../../services/readMethod/FetchCandyToEmp";
 import { statusOptions } from "../../../../utils/StatusDropdown";
 import { SpinLogo } from "../../../../utils/SpinLogo";
+import { handleDeleteFile } from "../../../../services/uploadsDocsS3/DeleteDocs";
+import { DeleteUploadNlms } from "../deleteUpload/DeleteUploadNlms";
 
 export const NlmsForm = ({ candidate }) => {
   const { interviewSchedules } = useFetchCandy();
   const { interviewDetails } = UpdateInterviewData();
   const { wpTrackingDetails, isLoading, error } = useUpdateWPTracking();
-  const [notification, setNotification] = useState(false); 
+  const [notification, setNotification] = useState(false);
   const [formData, setFormData] = useState({
     interview: {
       id: "",
@@ -29,6 +30,9 @@ export const NlmsForm = ({ candidate }) => {
     },
   });
 
+  const [isUploadingString, setIsUploadingString] = useState({
+    nlmsFile: false,
+  });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     nlmsFile: null,
   });
@@ -49,19 +53,14 @@ export const NlmsForm = ({ candidate }) => {
   const NlmsUpload = watch("nlmsFile");
 
   useEffect(() => {
- 
-    // console.log("interviewSchedules:", interviewSchedules);
     if (interviewSchedules.length > 0) {
-      // Find the interviewData for the candidate
       const interviewData = interviewSchedules.find(
         (data) => data.tempID === candidate.tempID
       );
 
-      // Log the found interviewData
-      // console.log("Found interviewData:", interviewData);
 
       if (interviewData) {
-        // Set the form data
+     
         setFormData({
           interview: {
             nlmssubmitdate: interviewData.nlmssubmitdate,
@@ -73,11 +72,7 @@ export const NlmsForm = ({ candidate }) => {
             status: interviewData.IDDetails.status,
           },
         });
-        // console.log("Form data set:", {
-        //   nlmssubmitdate: interviewData.nlmssubmitdate,
-        // });
-
-        // Check if sawpFile exists and update the file names
+   
         if (interviewData.nlmsfile) {
           const fileName = extractFileName(interviewData.nlmsfile);
           setUploadedFileNames((prev) => ({
@@ -96,30 +91,89 @@ export const NlmsForm = ({ candidate }) => {
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
-      return url.split("/").pop(); // Extract the file name from URL
+      const decodedUrl = decodeURIComponent(url);
+      const fileNameWithParams = decodedUrl.split("/").pop();
+      return fileNameWithParams.split("?")[0].split(",")[0].split("#")[0];
     }
     return "";
   };
 
-  const handleFileChange = async (e, type) => {
-    const file = e.target.files[0];
-    setValue(type, file); // Set file value for validation
-    if (file) {
-      console.log("File selected:", file.name);
-      if (type === "nlmsFile") {
-        await uploadDocs(file, "nlmsFile", setUploadedNlms, "personName");
+  const updateUploadingString = (type, value) => {
+    setIsUploadingString((prev) => ({
+      ...prev,
+      [type]: value,
+    }));
+    // console.log(value);
+  };
 
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          nlmsFile: file.name, // Store the file name for display
-        }));
-        console.log("Uploaded file name:", file.name);
+  const handleFileUpload = async (e, type) => {
+    const tempID = candidate.tempID;
+
+    if (!tempID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
+    }
+
+    let selectedFile = e.target.files[0];
+
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
+
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
+    }
+
+    setValue(type, selectedFile);
+
+    if (selectedFile) {
+      updateUploadingString(type, true);
+      await uploadDocString(selectedFile, type, setUploadedNlms, tempID);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [type]: selectedFile.name,
+      }));
+    }
+  };
+
+  const deletedStringUpload = async (fileType, fileName) => {
+    try {
+      const tempID = candidate.tempID;
+
+      if (!tempID) {
+        alert("Please provide the Employee ID before deleting files.");
+        return;
       }
+
+      const isDeleted = await handleDeleteFile(fileType, fileName, tempID);
+      const isDeletedArrayUploaded = await DeleteUploadNlms(
+        fileType,
+        fileName,
+        tempID,
+        setUploadedFileNames,
+        setUploadedNlms,
+        setIsUploadingString
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
     }
   };
 
   const handleInputChange = (field, value) => {
-    // console.log("Input changed:", field, value); // Log input change
     setFormData((prev) => ({
       ...prev,
       interview: {
@@ -129,7 +183,6 @@ export const NlmsForm = ({ candidate }) => {
     }));
   };
 
-  // Handle form submission and use wpTrackingDetails for update
   const handleSubmitTwo = async (data) => {
     data.preventDefault();
 
@@ -143,11 +196,6 @@ export const NlmsForm = ({ candidate }) => {
 
     const interviewScheduleId = selectedInterviewData?.id;
     const interviewScheduleStatusId = selectedInterviewDataStatus.IDDetails?.id;
-
-    console.log("Selected Interview Data:", selectedInterviewData);
-    console.log("Interview Schedule ID:", interviewScheduleId);
-    console.log("Form Data before submission:", formData);
-    console.log("Uploaded Nlms File:", uploadedNlms.nlmsFile);
 
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
@@ -163,23 +211,21 @@ export const NlmsForm = ({ candidate }) => {
           nlmsapprovedate: formData.interview.nlmsapprovedate,
           nlmsexpirydate: formData.interview.nlmsexpirydate,
           ldreferenceno: formData.interview.ldreferenceno,
-          nlmsfile: uploadedNlms.nlmsFile
-            ? uploadedNlms.nlmsFile
-            : formData.interview.nlmsfile,
+          nlmsfile: uploadedNlms.nlmsFile || formData.interview.nlmsfile,
         },
       });
 
       const interStatus = {
-        id: interviewScheduleStatusId, 
+        id: interviewScheduleStatusId,
         status: formData.interview.status,
       };
       setNotification(true);
 
-      console.log("Submitting interview details with status:", interStatus);
+      // console.log("Submitting interview details with status:", interStatus);
 
       await interviewDetails({ InterviewValue: interStatus });
 
-      console.log("Interview status updated:", interStatus);
+      // console.log("Interview status updated:", interStatus);
 
       // console.log("WPTracking response:", response);
     } catch (err) {
@@ -194,7 +240,7 @@ export const NlmsForm = ({ candidate }) => {
           <div>
             <label htmlFor="nlmssubmitdate">Date of Submission</label>
             <input
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               type="date"
               id="nlmssubmitdate"
               {...register("nlmssubmitdate")}
@@ -209,7 +255,7 @@ export const NlmsForm = ({ candidate }) => {
               Submission Reference Number
             </label>
             <input
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               type="text"
               id="submissionrefrenceno"
               {...register("submissionrefrenceno")}
@@ -222,7 +268,7 @@ export const NlmsForm = ({ candidate }) => {
           <div>
             <label htmlFor="nlmsapprovedate">Date of Approval</label>
             <input
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               type="date"
               id="nlmsapprovedate"
               {...register("nlmsapprovedate")}
@@ -235,7 +281,7 @@ export const NlmsForm = ({ candidate }) => {
           <div>
             <label htmlFor="nlmsexpirydate">Valid Until</label>
             <input
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               type="date"
               id="nlmsexpirydate"
               {...register("nlmsexpirydate")}
@@ -248,7 +294,7 @@ export const NlmsForm = ({ candidate }) => {
           <div>
             <label htmlFor="ldreferenceno">LD Reference Number</label>
             <input
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               type="text"
               id="ldreferenceno"
               {...register("ldreferenceno")}
@@ -258,38 +304,36 @@ export const NlmsForm = ({ candidate }) => {
               }
             />
           </div>
-
-          <div>
-            <div className="flex items-center gap-5 mt-1">
-              <FileUploadField
-                label="Upload File"
-                className="p-4"
-                onChangeFunc={(e) => handleFileChange(e, "nlmsFile")}
-                accept="application/pdf"
-                register={register}
-                fileName={
-                  uploadedFileNames.nlmsFile || extractFileName(NlmsUpload)
-                }
-                value={formData.interview.nlmsfile}
-              />
-            </div>
-          </div>
           <div>
             <label htmlFor="status">Status</label>
             <select
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               id="status"
               {...register("status")}
               value={formData.interview.status}
               onChange={(e) => handleInputChange("status", e.target.value)}
             >
-              {/* <option value="">Select Status</option> */}
               {statusOptions.map((status, index) => (
                 <option key={index} value={status}>
                   {status}
                 </option>
               ))}
             </select>
+          </div>
+
+          <div>
+            <div className="">
+              <FileUploadField
+                label="Upload File"
+                register={register}
+                fileKey="nlmsFile"
+                handleFileUpload={handleFileUpload}
+                uploadedFileNames={uploadedFileNames}
+                deletedStringUpload={deletedStringUpload}
+                isUploadingString={isUploadingString}
+                error={errors.nlmsFile}
+              />
+            </div>
           </div>
         </div>
 
@@ -300,7 +344,7 @@ export const NlmsForm = ({ candidate }) => {
         <div className="mt-5 flex justify-center">
           <button
             type="submit"
-            className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
+            className="py-2 px-12 font-medium rounded shadow-lg bg-yellow hover:bg-yellow"
           >
             Submit
           </button>

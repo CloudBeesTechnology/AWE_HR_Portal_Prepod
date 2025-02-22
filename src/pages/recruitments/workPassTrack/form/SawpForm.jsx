@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { uploadDocs } from "../../../../services/uploadDocsS3/UploadDocs";
+import { uploadDocString } from "../../../../services/uploadsDocsS3/UploadDocs";
 import { FileUploadField } from "../../../employees/medicalDep/FileUploadField";
 import { SawpFormSchema } from "../../../../services/Validation";
 import { useCreateWPTracking } from "../../../../services/createMethod/CreateWPTracking";
@@ -10,6 +10,8 @@ import { UpdateInterviewData } from "../../../../services/updateMethod/UpdateInt
 import { useUpdateWPTracking } from "../../../../services/updateMethod/UpdateWPTracking";
 import { statusOptions } from "../../../../utils/StatusDropdown";
 import { SpinLogo } from "../../../../utils/SpinLogo";
+import { handleDeleteFile } from "../../../../services/uploadsDocsS3/DeleteDocs";
+import { DeleteUploadSawp } from "../deleteUpload/DeleteUploadSawp";
 
 export const SawpForm = ({ candidate }) => {
   const { interviewSchedules } = useFetchCandy();
@@ -24,12 +26,14 @@ export const SawpForm = ({ candidate }) => {
       sawpDate: "",
       sawpRecivedDate: "",
       sawpFile: "",
-      status: "", 
+      status: "",
     },
   });
 
   // console.log(interviewSchedules, "DATA");
-  
+  const [isUploadingString, setIsUploadingString] = useState({
+    sawpFile: false,
+  });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     sawpFile: null,
   });
@@ -51,13 +55,12 @@ export const SawpForm = ({ candidate }) => {
 
   useEffect(() => {
     if (interviewSchedules.length > 0) {
-      // Find the interviewData for the candidate
+     
       const interviewData = interviewSchedules.find(
         (data) => data.tempID === candidate.tempID
       );
 
       if (interviewData) {
-        // Set the form data
         setFormData({
           interview: {
             sawpDate: interviewData.sawpDate,
@@ -86,101 +89,91 @@ export const SawpForm = ({ candidate }) => {
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
-      return url.split("/").pop(); // Extract the file name from URL
+      const decodedUrl = decodeURIComponent(url);
+      const fileNameWithParams = decodedUrl.split("/").pop();
+      return fileNameWithParams.split("?")[0].split(",")[0].split("#")[0];
     }
     return "";
   };
 
-  const handleFileChange = async (e, type) => {
-    const file = e.target.files[0];
-    setValue(type, file); // Set file value for validation
-    if (file) {
-      if (type === "sawpFile") {
-        await uploadDocs(file, "sawpFile", setUploadedSawp, "personName");
+  const updateUploadingString = (type, value) => {
+    setIsUploadingString((prev) => ({
+      ...prev,
+      [type]: value,
+    }));
+    // console.log(value);
+  };
 
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          sawpFile: file.name, // Store the file name for display
-        }));
-      }
+  const handleFileUpload = async (e, type) => {
+    const tempID = candidate.tempID;
+
+    if (!tempID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
+    }
+
+    let selectedFile = e.target.files[0];
+
+    // Allowed file types
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
+
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
+    }
+
+    setValue(type, selectedFile);
+
+    if (selectedFile) {
+      updateUploadingString(type, true);
+      await uploadDocString(selectedFile, type, setUploadedSawp, tempID);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [type]: selectedFile.name,
+      }));
     }
   };
 
-  //create call
-  // const onSubmit = async (data) => {
-  //   data.preventDefault();
-  //   // Ensure form fields are populated
-  //   const requestData = {
-  //     reqValue: {
-  //       ...formData.interview,
-  //       sawpFile: uploadedSawp.sawpFile ? uploadedSawp.sawpFile : formData.interview.sawpFile,
-  //       sawpDate: formData.interview.sawpDate,
-  //       sawpRecivedDate: formData.interview.sawpRecivedDate,
-  //       tempID: candidate.tempID,
-  //     },
-  //   };
+  const deletedStringUpload = async (fileType, fileName) => {
+    try {
+      const tempID = candidate.tempID;
+      console.log(tempID);
 
-  //   try {
-  //     await createWPTrackingHandler(requestData); // Call the createWPTrackingHandler with form data
-  //     console.log(requestData, "Form submitted successfully!");
-  //   } catch (error) {
-  //     console.error("Error submitting form", error);
-  //     // alert("Error submitting form");
-  //   }
-  // };
+      if (!tempID) {
+        alert("Please provide the Employee ID before deleting files.");
+        return;
+      }
 
-  // const handleSubmitTwo = async (data) => {
-  //   data.preventDefault();
-  
-  //   const selectedInterviewData = interviewSchedules.find(
-  //     (data) => data.tempID === candidate?.tempID
-  //   );
-  //   const selectedInterviewDataStatus = interviewSchedules.find(
-  //     (data) => data.IDDetails.tempID === candidate?.tempID
-  //   );
-  
-  //   const interviewScheduleId = selectedInterviewData?.id;
-  //   const interviewScheduleStatusId = selectedInterviewDataStatus.IDDetails?.id;
-  
-  //   if (!formData?.interview) {
-  //     console.error("Error: formData.interview is undefined.");
-  //     return;
-  //   }
-  
-  //   if (!formData?.interview?.status) {
-  //     console.error("Missing interview status in formData.");
-  //     return;
-  //   }
-  
-  //   try {
-  //     // Logging form data and candidate
-  //     console.log("Form data being submitted:", formData);
-  
-  //     const response = await wpTrackingDetails({
-  //       WPTrackingValue: {
-  //         id: interviewScheduleId,
-  //         sawpDate: formData.interview.sawpDate,
-  //         sawpRecivedDate: formData.interview.sawpRecivedDate,
-  //         sawpFile: uploadedSawp.sawpFile || formData.interview.sawpFile,
-  //         tempID: candidate.tempID,
-  //       },
-  //     });
-  //     console.log("Response from wpTrackingDetails:", response ? response.data : "No response data");
+      const isDeleted = await handleDeleteFile(fileType, fileName, tempID);
+      const isDeletedArrayUploaded = await DeleteUploadSawp(
+        fileType,
+        fileName,
+        tempID,
+        setUploadedFileNames,
+        setUploadedSawp,
+        setIsUploadingString
+      );
 
-  //     const interStatus = {
-  //       id: interviewScheduleStatusId,
-  //       status: formData.interview.status,
-  //     };
-  
-  //     const interviewResponse = await interviewDetails({ InterviewValue: interStatus });
-  //     console.log("Response from interviewDetails:", interviewResponse ? interviewResponse.data : "No response data");
-  
-  //   } catch (err) {
-  //     console.error("Error occurred during API call:", err?.response?.data || err);
-  //   }
-  // };
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
+    }
+  };
 
-   const onSubmit = async (data) => {
+  const onSubmit = async (data) => {
     data.preventDefault();
     const existingInterviewData = interviewSchedules.find(
       (data) => data.tempID === candidate.tempID
@@ -189,7 +182,7 @@ export const SawpForm = ({ candidate }) => {
     const requestData = {
       reqValue: {
         ...formData.interview,
-        sawpFile: uploadedSawp.sawpFile || formData.interview.sawpFile,
+        sawpFile: uploadedSawp.sawpFile,
         sawpDate: formData.interview.sawpDate,
         sawpRecivedDate: formData.interview.sawpRecivedDate,
         tempID: candidate.tempID,
@@ -198,7 +191,6 @@ export const SawpForm = ({ candidate }) => {
 
     try {
       if (existingInterviewData) {
-        // If data exists, update the WPTracking
         await wpTrackingDetails({
           WPTrackingValue: {
             id: existingInterviewData.id,
@@ -215,13 +207,10 @@ export const SawpForm = ({ candidate }) => {
         };
 
         await interviewDetails({ InterviewValue: interviewStatus });
-        console.log("Update call");
-        
+        // console.log("Update call");
       } else {
-        // If no existing interview data, create new WPTracking
         await createWPTrackingHandler(requestData);
-        console.log("Create call", requestData);
-        
+        // console.log("Create call", requestData);
       }
 
       setNotification(true);
@@ -230,7 +219,6 @@ export const SawpForm = ({ candidate }) => {
       console.error("Error submitting form", error);
     }
   };
-  
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -249,7 +237,7 @@ export const SawpForm = ({ candidate }) => {
           <div>
             <label htmlFor="sawpDate">Sawp Request Date</label>
             <input
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               type="date"
               id="sawpDate"
               {...register("sawpDate")}
@@ -261,7 +249,7 @@ export const SawpForm = ({ candidate }) => {
           <div>
             <label htmlFor="sawpRecivedDate">Sawp Recieved Date</label>
             <input
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               type="date"
               id="sawpRecivedDate"
               {...register("sawpRecivedDate")}
@@ -272,30 +260,15 @@ export const SawpForm = ({ candidate }) => {
             />
           </div>
 
-          <div className="">
-            <div className="flex items-center gap-5 mt-1">
-              <FileUploadField
-                label="Upload File"
-                className="p-4"
-                onChangeFunc={(e) => handleFileChange(e, "sawpFile")}
-                accept="application/pdf"
-                fileName={
-                  uploadedFileNames.sawpFile || extractFileName(SawpUpload)
-                }
-                value={formData.interview.sawpFile}
-              />
-            </div>
-          </div>
           <div>
             <label htmlFor="status">Status</label>
             <select
-              className="w-full border p-2 rounded mt-1"
+              className="w-full border p-2 rounded mt-1 h-[46px]"
               id="status"
               {...register("status")}
               value={formData.interview.status}
               onChange={(e) => handleInputChange("status", e.target.value)}
             >
-              {/* <option value="">Select Status</option> */}
               {statusOptions.map((status, index) => (
                 <option key={index} value={status}>
                   {status}
@@ -303,12 +276,27 @@ export const SawpForm = ({ candidate }) => {
               ))}
             </select>
           </div>
+
+          <div className="">
+            <div className="">
+              <FileUploadField
+                label="Upload File"
+                register={register}
+                fileKey="sawpFile"
+                handleFileUpload={handleFileUpload}
+                uploadedFileNames={uploadedFileNames}
+                deletedStringUpload={deletedStringUpload}
+                isUploadingString={isUploadingString}
+                error={errors.sawpFile}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="mt-5 flex justify-center">
           <button
             type="submit"
-            className="py-1 px-5 rounded-xl shadow-lg border-2 border-yellow hover:bg-yellow"
+            className="py-2 px-12 font-medium rounded shadow-lg bg-yellow hover:bg-yellow"
           >
             Submit
           </button>
