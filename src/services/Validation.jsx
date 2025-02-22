@@ -381,9 +381,7 @@ export const SawpFormSchema = Yup.object().shape({
   sawpFile: Yup.mixed()
     .nullable()
     .notRequired()
-    .test("fileType", "Only PDF files are allowed", (value) =>
-      value ? value.type === "application/pdf" : false
-    ),
+    
 });
 export const DoeFormSchema = Yup.object().shape({
   tempID: Yup.string().required("Temporary ID is Required"),
@@ -394,9 +392,7 @@ export const DoeFormSchema = Yup.object().shape({
   doeFile: Yup.mixed()
     .nullable()
     .notRequired()
-    .test("fileType", "Only PDF files are allowed", (value) =>
-      value ? value.type === "application/pdf" : false
-    ),
+    
 });
 export const NlmsFormSchema = Yup.object().shape({
   tempID: Yup.string().required("Temporary ID is Required"),
@@ -408,9 +404,7 @@ export const NlmsFormSchema = Yup.object().shape({
   nlmsFile: Yup.mixed()
     .nullable()
     .notRequired()
-    .test("fileType", "Only PDF files are allowed", (value) =>
-      value ? value.type === "application/pdf" : false
-    ),
+    
 });
 export const BankFormSchema = Yup.object().shape({
   tempID: Yup.string().required("Temporary ID is Required"),
@@ -422,9 +416,7 @@ export const BankFormSchema = Yup.object().shape({
   bgFile: Yup.mixed()
     .nullable()
     .notRequired()
-    .test("fileType", "Only PDF files are allowed", (value) =>
-      value ? value.type === "application/pdf" : false
-    ),
+    
 });
 export const JitpaFormSchema = Yup.object().shape({
   tempID: Yup.string().required("Temporary ID is Required"),
@@ -435,9 +427,7 @@ export const JitpaFormSchema = Yup.object().shape({
   jitpaFile: Yup.mixed()
     .nullable()
     .notRequired()
-    .test("fileType", "Only PDF files are allowed", (value) =>
-      value ? value.type === "application/pdf" : false
-    ),
+    
 });
 export const LabourDepFormSchema = Yup.object().shape({
   tempID: Yup.string().required("Temporary ID is Required"),
@@ -447,9 +437,7 @@ export const LabourDepFormSchema = Yup.object().shape({
   labDepFile: Yup.mixed()
     .nullable()
     .notRequired()
-    .test("fileType", "Only PDF files are allowed", (value) =>
-      value ? value.type === "application/pdf" : false
-    ),
+    
 });
 export const ImmigrationFormSchema = Yup.object().shape({
   tempID: Yup.string().required("Temporary ID is Required"),
@@ -460,9 +448,7 @@ export const ImmigrationFormSchema = Yup.object().shape({
   visaFile: Yup.mixed()
     .nullable()
     .notRequired()
-    .test("fileType", "Only PDF files are allowed", (value) =>
-      value ? value.type === "application/pdf" : false
-    ),
+    
 });
 export const AirTktFormSchema = Yup.object().shape({
   tempID: Yup.string().required("Temporary ID is Required"),
@@ -473,9 +459,7 @@ export const AirTktFormSchema = Yup.object().shape({
   airTktFile: Yup.mixed()
     .nullable()
     .notRequired()
-    .test("fileType", "Only PDF files are allowed", (value) =>
-      value ? value.type === "application/pdf" : false
-    ),
+    
 });
 export const NonLocalMOBFormSchema = Yup.object().shape({
   tempID: Yup.string().required("Temporary ID is Required"),
@@ -485,7 +469,5 @@ export const NonLocalMOBFormSchema = Yup.object().shape({
   mobFile: Yup.mixed()
     .nullable()
     .notRequired()
-    .test("fileType", "Only PDF files are allowed", (value) =>
-      value ? value.type === "application/pdf" : false
-    ),
+    
 });

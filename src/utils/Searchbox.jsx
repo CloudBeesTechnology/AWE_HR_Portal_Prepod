@@ -18,10 +18,7 @@ export const Searchbox = ({
   }, [allEmpDetails, location]);
 
   const filterDataByclickSearchIcon = useCallback(() => {
-    // console.log(allEmpDetails);
     if (allEmpDetails && allEmpDetails.length > 0) {
-      // console.log(allEmpDetails);
-
       const normalizedQuery = searchQuery.toString().toUpperCase();
 
       const result = allEmpDetails.find((emp) =>
@@ -29,15 +26,17 @@ export const Searchbox = ({
           (field) => field?.toString().toUpperCase() === normalizedQuery
         )
       );
-      if (result) {
+      if (result && searchQuery) {
         searchUserList([result]);
+      } else if (!searchQuery) {
+        alert("Your search box is empty. Enter a value to start searching.");
       } else {
         alert("Employee not found.");
         searchUserList([]);
       }
     }
   }, [allEmpDetails, searchQuery]);
-  
+
   const handleSearch = (e) => {
     const query = e.target.value.toUpperCase();
     setSearchQuery(query);
@@ -92,9 +91,13 @@ export const Searchbox = ({
           b.sapNo?.toString().toUpperCase() === query;
 
         const startsWithA =
-          aEmpID?.startsWith(query) || aName?.startsWith(query) || aEmpBadgeNo?.startsWith(query);
+          aEmpID?.startsWith(query) ||
+          aName?.startsWith(query) ||
+          aEmpBadgeNo?.startsWith(query);
         const startsWithB =
-          bEmpID?.startsWith(query) || bName?.startsWith(query) || bEmpBadgeNo?.startsWith(query);
+          bEmpID?.startsWith(query) ||
+          bName?.startsWith(query) ||
+          bEmpBadgeNo?.startsWith(query);
 
         if (isExactMatchA && !isExactMatchB) return -1;
         if (!isExactMatchA && isExactMatchB) return 1;
@@ -104,6 +107,7 @@ export const Searchbox = ({
 
         return 0;
       });
+
       // Always call searchUserList with the results, even if empty
       searchUserList(sortedResults);
     } else {

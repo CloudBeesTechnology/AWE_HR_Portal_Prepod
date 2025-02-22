@@ -679,7 +679,7 @@ export const EmployeeInfo = () => {
       if (!fieldData) {
         setValue(field, []); // Clear the field value
         setUploadedFiles((prev) => ({ ...prev, [field]: [] }));
-        setUploadedFileNames((prev) => ({ ...prev, [field]: "" })); // Clear the file name
+        setUploadedFileNames((prev) => ({ ...prev, [field]: "" })); 
         return;
       }
     

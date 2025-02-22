@@ -157,10 +157,15 @@ export const DependentPass = ({
     const file = e.target.files[0];
     if (!file) return;
 
-    if (file.type !== "application/pdf") {
-      alert("Upload must be a PDF file");
+    if (file.type !== "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg") {
+        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
       return;
     }
+
+    
     const currentFiles = getValues(`dependPass[${index}].${fieldName}`) || [];
     const updatedFiles = [...currentFiles, file];
 

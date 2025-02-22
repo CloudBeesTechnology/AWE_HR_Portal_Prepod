@@ -75,7 +75,7 @@ export const TrainVT = ({ mergering, columns, popupAll }) => {
                 paginatedData.map((candidate, index) => (
                   <tr key={index} className="shadow cursor-pointer">
                     {columns.map((column, idx) => (
-                    <td key={idx} className="py-4 px-4 break-words overflow-hidden w-full">
+                      <td key={idx} className="py-4 px-4 break-words overflow-hidden w-full">
                         {candidate[column?.key] || "N/A"}
                       </td>
                     ))}

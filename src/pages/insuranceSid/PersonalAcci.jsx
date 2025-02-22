@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { uploadDocs } from "../../services/uploadDocsS3/UploadDocs";
+import { uploadDocs } from "../../services/uploadsDocsS3/UploadDocs";
 import { FormField } from "../../utils/FormField";
-import { FileUploadField } from "../employees/medicalDep/FileUploadField";
+import { FileUpload } from "../employees/medicalDep/FileUploadField";
 import { SpinLogo } from "../../utils/SpinLogo";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
@@ -13,11 +13,14 @@ import { createPersonalAccident } from "../../graphql/mutations";
 import { listPersonalAccidents } from "../../graphql/queries";
 import { FaDownload, FaPrint, FaTimes } from "react-icons/fa";
 import { Page } from "react-pdf";
-import { pdfjs } from "react-pdf";
+import { pdfjs } from "react-pdf"; 
 import { getUrl } from "@aws-amplify/storage";
+import { DeletePersonalAcciUp } from "./DeleteUpload/DeletePersonalAcciUp";
+import { handleDeleteFile } from "../../services/uploadsDocsS3/DeleteDocs";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { useReactToPrint } from "react-to-print";
+
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
   import.meta.url
@@ -25,6 +28,10 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 
 export const PersonalAcci = () => {
   const client = generateClient();
+
+  const [isUploading, setIsUploading] = useState({
+    perAccUp: false,
+      });
 
   const [uploadedFileNames, setUploadedFileNames] = useState({
     perAccUp: null,
@@ -98,29 +105,90 @@ export const PersonalAcci = () => {
       return [];
     }
   };
-  const handleFileChange = async (e, label) => {
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
 
-    const allowedTypes = ["application/pdf"];
-    if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file");
-      return;
-    }
-
-    const currentFiles = watch(label) || [];
-    setValue(label, [...currentFiles, selectedFile]);
-
-    try {
-      await uploadDocs(selectedFile, label, setUploadPAU);
-      setUploadedFileNames((prev) => ({
-        ...prev,
-        [label]: selectedFile.name, // Store just the file name
-      }));
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  const updateUploadingState = (label, value) => {
+     setIsUploading((prev) => ({
+       ...prev,
+       [label]: value,
+     }));
+     console.log(value);
+   };
+ 
+   const handleFileChange = async (e, label) => {
+     const perAccNo = watch("perAccNo");
+     if (!perAccNo) {
+         alert("Please enter the Policy Number before uploading files.");
+         window.location.href = "/insuranceHr";
+         return;
+     }
+ 
+     const selectedFile = e.target.files[0];
+     if (!selectedFile) return;
+ 
+     const allowedTypes = [
+       "application/pdf",
+      
+     ];
+     if (!allowedTypes.includes(selectedFile.type)) {
+         alert("Upload must be a PDF file.");
+         return;
+     }
+ 
+     // Ensure no duplicate files are added
+     const currentFiles = watch(label) || [];
+     if (currentFiles.some((file) => file.name === selectedFile.name)) {
+         alert("This file has already been uploaded.");
+         return;
+     }
+ 
+     setValue(label, [...currentFiles, selectedFile]);
+ 
+     try {
+       updateUploadingState(label, true);
+       await uploadDocs(selectedFile, label, setUploadPAU, perAccNo);
+       setUploadedFileNames((prev) => ({
+         ...prev,
+         [label]: selectedFile.name,
+       }));
+     } catch (err) {
+         console.error(err);
+     }
+   };
+ 
+   const deleteFile = async (fileType, fileName) => {
+     try {
+       const perAccNo = watch("perAccNo");
+       if (!perAccNo) {
+         alert("Please provide the Policy Number before deleting files.");
+         return;
+       }
+ 
+       const isDeleted = await handleDeleteFile(
+         fileType,
+         fileName,
+         perAccNo
+       );
+       const isDeletedArrayUploaded = await DeletePersonalAcciUp(
+         fileType,
+         fileName,
+         perAccNo,
+         setUploadedFileNames,
+         setUploadPAU,
+         setIsUploading
+       );
+ 
+       if (!isDeleted || isDeletedArrayUploaded) {
+         console.error(
+           `Failed to delete file: ${fileName}, skipping UI update.`
+         );
+         return;
+       }
+       // console.log(`Deleted "${fileName}". Remaining files:`);
+     } catch (error) {
+       console.error("Error deleting file:", error);
+       alert("Error processing the file deletion.");
+     }
+   };
 
   const onSubmit = async (data) => {
     try {
@@ -178,7 +246,7 @@ export const PersonalAcci = () => {
   
     fetchInsuranceData();
   }, []);
-
+  
   // useEffect(() => {
   //   const fetchInsuranceData = async () => {
   //     try {
@@ -423,20 +491,18 @@ export const PersonalAcci = () => {
 
             {/* File Upload */}
             <div className="mb-2 relative">
-              <FileUploadField
+              <FileUpload
                 label="Upload File"
                 onChangeFunc={(e) => handleFileChange(e, "perAccUp")}
+                handleFileChange={handleFileChange}
+          uploadedFileNames={uploadedFileNames}
+          isUploading={isUploading}
+          deleteFile={deleteFile}
                 register={register}
                 name="perAccUp"
                 error={errors}
               />
-              <div className="absolute">
-                {uploadedFileNames.perAccUp && (
-                  <span className="text-sm text-grey">
-                    {uploadedFileNames.perAccUp}
-                  </span>
-                )}
-              </div>
+             
             </div>
           </div>
         </div>

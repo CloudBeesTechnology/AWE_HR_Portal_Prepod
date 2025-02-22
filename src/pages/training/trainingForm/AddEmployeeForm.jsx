@@ -6,16 +6,18 @@ import { SearchDisplay } from "../../../utils/SearchDisplay";
 import { IoSearch } from "react-icons/io5";
 import { FaArrowLeft } from "react-icons/fa";
 import { data, Link } from "react-router-dom";
-import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
+import { uploadDocs } from "../../../services/uploadsDocsS3/UploadDocs";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { AddEmpFun } from "../../../services/createMethod/AddEmpFun";
-import { FileUploadField } from "../../employees/medicalDep/FileUploadField";
+import { FileUpload } from "../../employees/medicalDep/FileUploadField";
 import { AddEmpReqUp } from "../../../services/updateMethod/AddEmpReqUp";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { sendEmail } from "../../../services/EmailServices";
 import { DateFormat } from "../../../utils/DateFormat";
 import { useCreateNotification } from "../../../hooks/useCreateNotification"; 
 import useEmployeePersonalInfo from "../../../hooks/useEmployeePersonalInfo";
+import { DeleteDocsTriningEmpR } from "../../../services/uploadDocsDelete/DeleteDocsTriningEmpR";
+import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 
 export const AddEmployeeForm = () => {
   const { empPIData, workInfoData, AddCourseDetails, AddEmpReq } =
@@ -104,6 +106,9 @@ export const AddEmployeeForm = () => {
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [showTitle, setShowTitle] = useState("");
+  const [isUploading, setIsUploading] = useState({
+    medicalReport: false,
+  });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     medicalReport: null,
   });
@@ -139,42 +144,96 @@ export const AddEmployeeForm = () => {
 
   const getFileName = (filePath) => {
     const fileNameWithExtension = filePath.split("/").pop(); // Get file name with extension
-    const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
-    return fileName;
+    // const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
+    return fileNameWithExtension;
   };
 
-  const handleFileChange = async (e, label) => {
-    if (!watchedEmpID) {
-      alert("Please enter the Employee ID before uploading files.");
-      return;
-    }
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
-
-    const allowedTypes = ["application/pdf"];
-    if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file ");
-      return;
-    }
-
-    const currentFiles = watch(label) || [];
-    setValue(label, [...currentFiles, selectedFile]);
-
-    try {
-      await uploadDocs(
-        selectedFile,
-        label,
-        setUploadMedicalReports,
-        watchedEmpID
-      );
-      setUploadedFileNames((prev) => ({
-        ...prev,
-        [label]: selectedFile.name, // Store just the file name
-      }));
-    } catch (err) {
-      console.log(err);
-    }
-  };
+const updateUploadingState = (label, value) => {
+       setIsUploading((prev) => ({
+         ...prev,
+         [label]: value,
+       }));
+       console.log(value);
+     };
+   
+     const handleFileChange = async (e, label) => {
+       const watchedEmpID = watch("empID");
+       if (!watchedEmpID) {
+           alert("Please enter the Employee ID before uploading files.");
+           window.location.href = "/employeeInfo";
+           return;
+       }
+   
+       const selectedFile = e.target.files[0];
+       if (!selectedFile) return;
+   
+       const allowedTypes = [
+         "application/pdf",
+         "image/jpeg",
+         "image/png",
+         "image/jpg",
+       ];
+       if (!allowedTypes.includes(selectedFile.type)) {
+           alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+           return;
+       }
+   
+       // Ensure no duplicate files are added
+       const currentFiles = watch(label) || [];
+       if (currentFiles?.some((file) => file.name === selectedFile.name)) {
+           alert("This file has already been uploaded.");
+           return;
+       }
+   
+   
+       setValue(label, [...currentFiles, selectedFile]);
+   
+       try {
+         updateUploadingState(label, true);
+         await uploadDocs(selectedFile, label, setUploadMedicalReports, watchedEmpID);
+         setUploadedFileNames((prev) => ({
+           ...prev,
+           [label]: selectedFile.name,
+         }));
+       } catch (err) {
+           console.error(err);
+       }
+     };
+   
+     const deleteFile = async (fileType, fileName) => {
+       try {
+         const watchedEmpID = watch("empID");
+         if (!watchedEmpID) {
+           alert("Please provide the Employee ID before deleting files.");
+           return;
+         }
+   
+         const isDeleted = await handleDeleteFile(
+           fileType,
+           fileName,
+           watchedEmpID
+         );
+         const isDeletedArrayUploaded = await DeleteDocsTriningEmpR(
+           fileType,
+           fileName,
+           watchedEmpID,
+           setUploadedFileNames,
+           setUploadMedicalReports,
+           setIsUploading
+         );
+   
+         if (!isDeleted || isDeletedArrayUploaded) {
+           console.error(
+             `Failed to delete file: ${fileName}, skipping UI update.`
+           );
+           return;
+         }
+         // console.log(`Deleted "${fileName}". Remaining files:`);
+       } catch (error) {
+         console.error("Error deleting file:", error);
+         alert("Error processing the file deletion.");
+       }
+     };
 
   useEffect(() => {
     // Set initial showMedicalFields based on form state
@@ -282,24 +341,16 @@ export const AddEmployeeForm = () => {
         try {
           const parsedArray = JSON.parse(result?.[field][0]);
           setValue(field, parsedArray);
-
-          setUploadMedicalReports((prev) => ({
-            ...prev,
-            [field]: parsedArray,
-          }));
-
-          // Check if parsedArray is valid and non-empty
+          setUploadMedicalReports((prev) => ({ ...prev, [field]: parsedArray }));
+    
           if (Array.isArray(parsedArray) && parsedArray.length > 0) {
-            const lastItem = parsedArray[parsedArray.length - 1];
-
-            // Check if lastItem has the upload property
-            const fileName = lastItem?.upload
-              ? getFileName(lastItem.upload)
-              : "Unknown file";
-
+            const fileNames = parsedArray.map((item) =>
+              item?.upload ? getFileName(item.upload) : "Unknown file"
+            );
+    
             setUploadedFileNames((prev) => ({
               ...prev,
-              [field]: fileName,
+              [field]: fileNames, 
             }));
           }
         } catch (error) {
@@ -315,56 +366,6 @@ export const AddEmployeeForm = () => {
     setValue("mediRequired", mediRequired);
     setShowMedicalFields(mediRequired);
   };
-
-  // useEffect(() => {
-  //   // Find the work info for the selected manager
-  //   const workInfo = workInfoData.find(
-  //     (data) => data.empID === emailData.managerEmpID
-  //   );
-
-  //   if (workInfo) {
-  //     // console.log("Work Info:", workInfo);
-  //     const managerEmpID = workInfo.manager[workInfo.manager.length - 1];
-  //     // console.log("Manager Employee ID:", managerEmpID);
-
-  //     const hrOfficialmail = "hr-training@adininworks.com";
-  //     // Update HR email in emailData
-  //     setEmailData((prevData) => ({
-  //       ...prevData,
-  //       hrOfficialmail,
-  //     }));
-
-  //     if (managerEmpID) {
-  //       // Find the manager's information from empPIData
-  //       const managerInfo = empPIData.find(
-  //         (data) => data.empID === String(managerEmpID)
-  //       );
-
-  //       if (managerInfo) {
-  //         // console.log("Manager Info:", managerInfo);
-
-  //         // Update manager's official email and name in emailData
-  //         setEmailData((prevData) => ({
-  //           ...prevData,
-  //           managerOfficialMail: managerInfo.officialEmail,
-  //           managerName: managerInfo.name,
-  //         }));
-  //       }
-  //       // else {
-  //       //   console.warn(`Manager with empID ${managerEmpID} not found in empPIData`);
-  //       // }
-  //     }
-  //   } else {
-  //     console.warn(
-  //       `Work info for managerEmpID ${emailData.managerEmpID} not found`
-  //     );
-  //   }
-  // }, [workInfoData, empPIData, emailData.managerEmpID]);
-
-  
-  // useEffect(() => {
-  //   console.log("Email data", emailData);
-  // }, [emailData]);
 
   const onSubmit = async (data) => {
     try {
@@ -424,14 +425,13 @@ export const AddEmployeeForm = () => {
             emailData.hrOfficialmail
             
           );
-
           sendEmail(
             emailSubject,
             emailBody1,
             "hr_no-reply@adininworks.com", 
             "hr-training@adininworks.com"       
           );
-
+          
         await createNotification({
           empID: data.empID,
           leaveType: "Training Requestor",
@@ -776,8 +776,17 @@ export const AddEmployeeForm = () => {
                   </p>
                 )}
               </div>
-
-              <FileUploadField
+         <FileUpload
+                label="Upload Medical Report"
+                name="medicalReport"
+  register={register}
+  uploadedFileNames={uploadedFileNames} // Ensure this exists
+  isUploading={isUploading} // Ensure this exists
+  handleFileChange={handleFileChange}
+  deleteFile={deleteFile}
+  error={errors?.medicalReport}
+/>
+              {/* <FileUploadField
                 label="Upload Medical Report"
                 onChangeFunc={(e) => handleFileChange(e, "medicalReport")}
                 register={register}
@@ -787,7 +796,7 @@ export const AddEmployeeForm = () => {
                   uploadedFileNames.medicalReport ||
                   extractFileName(watchMRUpload)
                 }
-              />
+              /> */}
               {/* File Upload */}
             </div>
           )}

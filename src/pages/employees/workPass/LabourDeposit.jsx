@@ -126,12 +126,15 @@ export const LabourDeposit = () => {
        if (!selectedFile) return;
    
        const allowedTypes = [
-         "application/pdf",
-       ];
-       if (!allowedTypes.includes(selectedFile.type)) {
-           alert("Upload must be a PDF file.");
-           return;
-       }
+        "application/pdf",
+        "image/jpeg",
+        "image/png",
+        "image/jpg",
+      ];
+      if (!allowedTypes.includes(selectedFile.type)) {
+          alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+          return;
+      }
    
        // Ensure no duplicate files are added
        const currentFiles = watch(label) || [];

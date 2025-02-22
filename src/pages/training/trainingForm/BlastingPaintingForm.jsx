@@ -4,7 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import {blastingPaintingSchema} from '../../../services/TrainingValidation'
 import { DataSupply } from '../../../utils/DataStoredContext';
 import { useContext } from 'react';
-import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
+import { uploadDocs } from "../../../services/uploadsDocsS3/UploadDocs";
 import { SearchDisplay } from "../../../utils/SearchDisplay";
 import { IoSearch } from "react-icons/io5";
 import { FileUploadField } from "../../employees/medicalDep/FileUploadField";

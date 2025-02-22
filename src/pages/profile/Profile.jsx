@@ -2,9 +2,15 @@ import { IoCameraOutline } from "react-icons/io5";
 import { IoMdLogOut } from "react-icons/io";
 import { Link } from "react-router-dom";
 import { signOut } from "@aws-amplify/auth";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { PPPopUp } from "./PPPopUp";
-
+import { UploadProfile } from "../../services/uploadsDocsS3/UploadProfile";
+import avatar from "../../assets/navabar/avatar.jpeg";
+import { handleDeleteFile } from "../../services/uploadsDocsS3/DeleteDocs";
+import { generateClient } from "@aws-amplify/api";
+import { listEmpPersonalInfos } from "../../graphql/queries";
+import { updateEmpPersonalInfo } from "../../graphql/mutations";
+const client = generateClient();
 export const Profile = ({
   setIsOpen,
   profilePhoto,
@@ -13,8 +19,18 @@ export const Profile = ({
   contactNo,
   getPPhotoString,
   setPersonalInfo,
+  handleAfterUpload,
+  loading,
+  setLoading,
 }) => {
+  const fileInputRef = useRef(null);
+  const watchedEmpID = localStorage.getItem("userID").toString().toUpperCase();
+  const [changeProfilePhoto, setChangeProfilePhoto] = useState("");
+
+  const [PPLastUP, setPPLastUP] = useState(null);
   const [popup, setPopUp] = useState(false);
+
+  const [message, setMessage] = useState("");
   const handleProfile = () => {
     setPopUp(!popup);
   };
@@ -24,11 +40,158 @@ export const Profile = ({
       await signOut();
       localStorage.removeItem("userID");
       localStorage.removeItem("userType");
-     
+
       window.location.href = "/login";
     } catch (error) {
       // console.log("Error signing out", error);
     }
+  };
+
+  const deleteFile = async (fileName, watchedEmpID) => {
+    try {
+      await handleDeleteFile("profilePhoto", fileName, watchedEmpID);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+    }
+  };
+
+  const removeProfilePhoto = useCallback(async () => {
+    try {
+      setLoading(true);
+      setMessage("Removing profile photo...");
+      const fileName = getPPhotoString.split("/").pop();
+
+      await deleteFile(fileName, watchedEmpID);
+
+      setChangeProfilePhoto("");
+      setPersonalInfo(({ profilePhoto, ...rest }) => ({
+        ...rest,
+        profilePhoto: null,
+      }));
+      setPPLastUP(null);
+
+      await onSubmit(null, watchedEmpID);
+      // await handleAfterUpload();
+    } catch (err) {
+    } finally {
+    }
+  }, [getPPhotoString]);
+
+  const onSubmit = async (fileName, watchedEmpID) => {
+    async function fetchAllData(queryName) {
+      let allData = [];
+      let nextToken = null;
+      const filter = {
+        and: [
+          {
+            empID: { eq: watchedEmpID || null },
+          },
+        ],
+      };
+      do {
+        const response = await client.graphql({
+          query: queryName,
+          variables: { filter: filter, nextToken },
+        });
+
+        const items = response.data[Object.keys(response.data)[0]].items;
+        allData = [...allData, ...items];
+        nextToken = response.data[Object.keys(response.data)[0]].nextToken;
+      } while (nextToken);
+
+      return allData;
+    }
+
+    async function updateProfile(data) {
+      try {
+        for (const input of data) {
+          const { __typename, createdAt, updatedAt, ...validTimeSheet } = input;
+          const response = await client.graphql({
+            query: updateEmpPersonalInfo,
+            variables: { input: validTimeSheet },
+          });
+
+          const empDetails = response.data.updateEmpPersonalInfo;
+
+          // window.location.reload();
+
+          // setPPLastUP(null);
+
+          let result = empDetails?.profilePhoto;
+          const fileName = result?.split("/").pop();
+          if (fileName !== "null") {
+            await handleAfterUpload();
+            // setLoading(false);
+          } else if (fileName === "null") {
+            setLoading(false);
+          }
+
+          const message =
+            fileName === "null"
+              ? "Profile photo removed."
+              : fileName
+              ? "Profile photo added."
+              : "Change Profile File";
+
+          setMessage(message);
+        }
+      } catch (error) {
+        console.error("Error fetching employee data: ", error);
+      }
+    }
+
+    async function fetchEmployeeData() {
+      const empDetails = await fetchAllData(listEmpPersonalInfos);
+
+      const fileKey = `public/${"profilePhoto"}/${watchedEmpID}/${fileName}`;
+      const updatedData = empDetails.map((val) => {
+        return {
+          ...val,
+          profilePhoto: fileKey || null,
+        };
+      });
+      updateProfile(updatedData);
+    }
+
+    fetchEmployeeData();
+  };
+
+  const handleFileUpload = async (e, type) => {
+    try {
+      setLoading(true);
+      setMessage("Uploading profile photo...");
+      const fileInput = e.target;
+
+      const file = fileInput.files[0];
+
+      if (!file) return;
+
+      // Allowed file types
+      const allowedTypes = [
+        "application/pdf",
+        "image/jpeg",
+        "image/png",
+        "image/jpg",
+      ];
+      if (!allowedTypes.includes(file.type)) {
+        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+        return;
+      }
+
+      if (file) {
+        setPopUp(true);
+      }
+
+      // setSelectedFile(file.name);
+      await deleteFile(file.name, watchedEmpID);
+      await UploadProfile(file, type, setChangeProfilePhoto, watchedEmpID);
+      await onSubmit(file.name, watchedEmpID);
+      fileInput.value = "";
+    } catch (err) {}
+  };
+
+  const handleUploadButtonClick = () => {
+    fileInputRef.current.click();
   };
 
   return (
@@ -38,13 +201,25 @@ export const Profile = ({
           <div className="max-w-10 h-10 w-full rounded-full center relative overflow-hidden shadow-md shadow-[#00000033]">
             <img
               className="w-full object-cover h-full "
-              src={profilePhoto}
+              src={profilePhoto || avatar}
               alt="avatar not found"
+              onError={(e) => (e.target.src = avatar)}
             />
           </div>
+          <input
+            type="file"
+            id="fileInput"
+            name="profilePhoto"
+            ref={fileInputRef}
+            accept=".jpg,.jpeg,.png"
+            onChange={(e) => handleFileUpload(e, "profilePhoto")}
+            className="hidden"
+          />
           <p
             className="absolute -right-2 bottom-0 h-5 w-5 rounded-full bg-[#D9D9D9] center"
-            onClick={handleProfile}
+            onClick={() => {
+              handleUploadButtonClick();
+            }}
           >
             <IoCameraOutline className="text-xs text-dark_grey cursor-pointer" />
           </p>
@@ -126,8 +301,13 @@ export const Profile = ({
         <PPPopUp
           handleProfile={handleProfile}
           profilePhoto={profilePhoto}
-          getPPhotoString={getPPhotoString}
-          setPersonalInfo={setPersonalInfo}
+          changeProfilePhoto={changeProfilePhoto}
+          handleFileUpload={handleFileUpload}
+          PPLastUP={PPLastUP}
+          setPPLastUP={setPPLastUP}
+          loading={loading}
+          message={message}
+          removeProfilePhoto={removeProfilePhoto}
         />
       )}
     </section>

@@ -126,10 +126,15 @@ export const EmployeeInsurance = () => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
 
-    const allowedTypes = ["application/pdf"];
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
     if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file");
-      return;
+        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+        return;
     }
 
     setEmpInsUpload((prevUpload) => {

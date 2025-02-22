@@ -28,7 +28,7 @@ export const CourceValidationSchema = Yup.object().shape({
         (value) => {
           // If value is a file, check for valid file types
           if (value instanceof File) {
-            return ["application/pdf", "image/jpeg", "image/png"].includes(
+            return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
               value.type
             );
           }
@@ -160,7 +160,7 @@ export const trainingCertificatesValidation = Yup.object().shape({
             (value) => {
               // If value is a file, check for valid file types
               if (value instanceof File) {
-                return ["application/pdf", "image/jpeg", "image/png"].includes(
+                return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
                   value.type
                 );
               }
@@ -377,7 +377,7 @@ export const TrainingValidationSchema = Yup.object().shape({
         (value) => {
           // If value is a file, check for valid file types
           if (value instanceof File) {
-            return ["application/pdf", "image/jpeg", "image/png"].includes(
+            return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(
               value.type
             );
           }

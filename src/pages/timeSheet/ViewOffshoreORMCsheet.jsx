@@ -869,6 +869,7 @@ export const ViewOffshoreORMCsheet = ({
   const totalPages = Math.ceil(safeData.length / itemsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  currentData.sort((a, b) => a.NAME.localeCompare(b.NAME));
   visibleData = currentData;
   return (
     <div>

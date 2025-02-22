@@ -39,7 +39,6 @@ export const UploadHOfile = (
           return headerSlicedData;
         });
 
-      // if (checkTrueOrFalse === true) {
       const convertDecimalToTime = (decimal, value) => {
         if (value === "time") {
           const totalHours = decimal * 24;
@@ -89,6 +88,7 @@ export const UploadHOfile = (
         }
 
         const [day, month, year] = parts;
+
         return `${day}/${month}/${year}`;
       }
 
@@ -113,11 +113,14 @@ export const UploadHOfile = (
           if (typeof item.OUT === "number") {
             item.OUT = convertDecimalToTime(item.OUT, "time");
           }
+  
           if (typeof item.DATE === "number") {
             const jsDate = convertDecimalToTime(item.DATE, "date");
+
             const dateObject = new Date(jsDate).toLocaleDateString();
 
             const formattedDate = convertDateFormat(dateObject);
+
             item.DATE = formattedDate;
           }
 

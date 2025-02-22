@@ -2,10 +2,10 @@ import { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormField } from "../../utils/FormField";
-import { FileUploadField } from "../employees/medicalDep/FileUploadField";
+import { FileUpload } from "../employees/medicalDep/FileUploadField";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { GroupHSSchema } from "../../services/EmployeeValidation";
-import { uploadDocs } from "../../services/uploadDocsS3/UploadDocs";
+import { uploadDocs } from "../../services/uploadsDocsS3/UploadDocs";
 import { generateClient } from "@aws-amplify/api";
 import { createGroupHandS } from "../../graphql/mutations";
 import { listGroupHandS } from "../../graphql/queries";
@@ -14,6 +14,8 @@ import { Document, Page } from "react-pdf";
 import { pdfjs } from "react-pdf";
 import { getUrl } from "@aws-amplify/storage";
 import { useReactToPrint } from "react-to-print";
+import { DeleteGroupUp } from "./DeleteUpload/DeleteGroupUp";
+import { handleDeleteFile } from "../../services/uploadsDocsS3/DeleteDocs";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 
@@ -23,7 +25,9 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 export const GroupHS = () => {
   const client = generateClient();
-
+  const [isUploading, setIsUploading] = useState({
+    groupHSUpload: false,
+      });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     groupHSUpload: null,
   });
@@ -33,7 +37,6 @@ export const GroupHS = () => {
   const [notification, setNotification] = useState(false);
   const [insuranceData, setInsuranceData] = useState([]);
   const [loading, setLoading] = useState(true); // Track loading state
-
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupImage, setPopupImage] = useState("");
   const [viewingDocument, setViewingDocument] = useState(null);
@@ -46,7 +49,7 @@ export const GroupHS = () => {
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, setError }, // Destructure setError here
+    formState: { errors, setError },
   } = useForm({
     resolver: yupResolver(GroupHSSchema),
   });
@@ -79,7 +82,7 @@ export const GroupHS = () => {
       if (Array.isArray(parsedData)) {
         return parsedData.map((doc) => {
           if (doc.upload) {
-            doc.fileName = doc.upload.split("/").pop(); // Extract file name from path
+            doc.fileName = doc.upload.split("/").pop(); 
           }
           return doc;
         });
@@ -90,32 +93,89 @@ export const GroupHS = () => {
       return [];
     }
   };
-
-  const handleFileChange = async (e, label) => {
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
-
-    const allowedTypes = ["application/pdf"];
-
-    if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file ");
-      return;
-    }
-
-    const currentFiles = watch(label) || [];
-    setValue(label, [...currentFiles, selectedFile]);
-
-    try {
-      await uploadDocs(selectedFile, label, setUploadGHsU);
-      setUploadedFileNames((prev) => ({
-        ...prev,
-        [label]: selectedFile.name,
-      }));
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
+const updateUploadingState = (label, value) => {
+     setIsUploading((prev) => ({
+       ...prev,
+       [label]: value,
+     }));
+     console.log(value);
+   };
+ 
+   const handleFileChange = async (e, label) => {
+     const groupHSNo = watch("groupHSNo");
+     if (!groupHSNo) {
+         alert("Please enter the Policy Number before uploading files.");
+         window.location.href = "/insuranceHr";
+         return;
+     }
+ 
+     const selectedFile = e.target.files[0];
+     if (!selectedFile) return;
+ 
+     const allowedTypes = [
+       "application/pdf",
+      
+     ];
+     if (!allowedTypes.includes(selectedFile.type)) {
+         alert("Upload must be a PDF file.");
+         return;
+     }
+ 
+     // Ensure no duplicate files are added
+     const currentFiles = watch(label) || [];
+     if (currentFiles.some((file) => file.name === selectedFile.name)) {
+         alert("This file has already been uploaded.");
+         return;
+     }
+ 
+     setValue(label, [...currentFiles, selectedFile]);
+ 
+     try {
+       updateUploadingState(label, true);
+       await uploadDocs(selectedFile, label, setUploadGHsU, groupHSNo);
+       setUploadedFileNames((prev) => ({
+         ...prev,
+         [label]: selectedFile.name,
+       }));
+     } catch (err) {
+         console.error(err);
+     }
+   };
+ 
+   const deleteFile = async (fileType, fileName) => {
+     try {
+       const groupHSNo = watch("groupHSNo");
+       if (!groupHSNo) {
+         alert("Please provide the Policy Number before deleting files.");
+         return;
+       }
+ 
+       const isDeleted = await handleDeleteFile(
+         fileType,
+         fileName,
+         groupHSNo
+       );
+       const isDeletedArrayUploaded = await DeleteGroupUp(
+         fileType,
+         fileName,
+         groupHSNo,
+         setUploadedFileNames,
+         setUploadGHsU,
+         setIsUploading
+       );
+ 
+       if (!isDeleted || isDeletedArrayUploaded) {
+         console.error(
+           `Failed to delete file: ${fileName}, skipping UI update.`
+         );
+         return;
+       }
+       // console.log(`Deleted "${fileName}". Remaining files:`);
+     } catch (error) {
+       console.error("Error deleting file:", error);
+       alert("Error processing the file deletion.");
+     }
+   };
 
   const handlePrint = useReactToPrint({
     content: () => groupPrint.current,
@@ -276,6 +336,8 @@ export const GroupHS = () => {
   };
 
   const onSubmit = async (data) => {
+    // console.log("data", data);
+    
     try {
       const GHSreValue = {
         ...data,
@@ -294,7 +356,7 @@ export const GroupHS = () => {
       console.error("Error submitting data:", error);
     }
   };
-
+  
   useEffect(() => {
     const fetchInsuranceData = async () => {
       try {
@@ -332,6 +394,7 @@ export const GroupHS = () => {
   
     fetchInsuranceData();
   }, []);
+  
 
   return (
     <section>
@@ -359,20 +422,17 @@ export const GroupHS = () => {
               errors={errors}
             />
             <div className="mb-2 relative">
-              <FileUploadField
+              <FileUpload
                 label="Upload File"
                 onChangeFunc={(e) => handleFileChange(e, "groupHSUpload")}
+                handleFileChange={handleFileChange}
+          uploadedFileNames={uploadedFileNames}
+          isUploading={isUploading}
+          deleteFile={deleteFile}
                 register={register}
                 name="groupHSUpload"
                 error={errors}
               />
-              <div className="absolute">
-                {uploadedFileNames.groupHSUpload && (
-                  <span className="text-sm text-grey ">
-                    {uploadedFileNames.groupHSUpload}
-                  </span>
-                )}
-              </div>
             </div>
           </div>
         </div>

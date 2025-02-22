@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { uploadDocs } from "../../services/uploadDocsS3/UploadDocs";
+import { uploadDocs } from "../../services/uploadsDocsS3/UploadDocs";
 import { FormField } from "../../utils/FormField";
-import { FileUploadField } from "../employees/medicalDep/FileUploadField";
+import { FileUpload } from "../employees/medicalDep/FileUploadField";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { TravellingSchema } from "../../services/EmployeeValidation";
 import { generateClient } from "@aws-amplify/api";
@@ -13,6 +13,8 @@ import { FaTimes, FaDownload, FaPrint } from "react-icons/fa";
 import { Page } from "react-pdf";
 import { pdfjs } from "react-pdf";
 import { getUrl } from "@aws-amplify/storage";
+import { DeleteTravellingUp } from "./DeleteUpload/DeleteTravellingUp";
+import { handleDeleteFile } from "../../services/uploadsDocsS3/DeleteDocs";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { useReactToPrint } from "react-to-print";
@@ -21,15 +23,21 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url
 ).toString();
 
-export const Travelling = () => {
+export const Travelling = () => { 
   const client = generateClient();
+
+  const [isUploading, setIsUploading] = useState({
+    travelUp: false,
+      });
 
   const [uploadedFileNames, setUploadedFileNames] = useState({
     travelUp: null,
   });
+
   const [uploadTU, setUploadTU] = useState({
     travelUp: [],
   });
+
   const [notification, setNotification] = useState(false);
   const [insuranceData, setInsuranceData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -90,30 +98,89 @@ export const Travelling = () => {
     }
   };
 
-  const handleFileChange = async (e, label) => {
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
-
-    const allowedTypes = ["application/pdf"];
-
-    if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file ");
-      return;
-    }
-
-    const currentFiles = watch(label) || [];
-    setValue(label, [...currentFiles, selectedFile]);
-
-    try {
-      await uploadDocs(selectedFile, label, setUploadTU);
-      setUploadedFileNames((prev) => ({
+const updateUploadingState = (label, value) => {
+      setIsUploading((prev) => ({
         ...prev,
-        [label]: selectedFile.name,
+        [label]: value,
       }));
-    } catch (err) {
-      console.log(err);
-    }
-  };
+      console.log(value);
+    };
+  
+    const handleFileChange = async (e, label) => {
+      const travelNo = watch("travelNo");
+      if (!travelNo) {
+          alert("Please enter the Policy Number before uploading files.");
+          window.location.href = "/insuranceHr";
+          return;
+      }
+  
+      const selectedFile = e.target.files[0];
+      if (!selectedFile) return;
+  
+      const allowedTypes = [
+        "application/pdf",
+       
+      ];
+      if (!allowedTypes.includes(selectedFile.type)) {
+          alert("Upload must be a PDF file.");
+          return;
+      }
+  
+      // Ensure no duplicate files are added
+      const currentFiles = watch(label) || [];
+      if (currentFiles.some((file) => file.name === selectedFile.name)) {
+          alert("This file has already been uploaded.");
+          return;
+      }
+  
+      setValue(label, [...currentFiles, selectedFile]);
+  
+      try {
+        updateUploadingState(label, true);
+        await uploadDocs(selectedFile, label, setUploadTU, travelNo);
+        setUploadedFileNames((prev) => ({
+          ...prev,
+          [label]: selectedFile.name,
+        }));
+      } catch (err) {
+          console.error(err);
+      }
+    };
+  
+    const deleteFile = async (fileType, fileName) => {
+      try {
+        const travelNo = watch("travelNo");
+        if (!travelNo) {
+          alert("Please provide the Policy Number before deleting files.");
+          return;
+        }
+  
+        const isDeleted = await handleDeleteFile(
+          fileType,
+          fileName,
+          travelNo
+        );
+        const isDeletedArrayUploaded = await DeleteTravellingUp(
+          fileType,
+          fileName,
+          travelNo,
+          setUploadedFileNames,
+          setUploadTU,
+          setIsUploading
+        );
+  
+        if (!isDeleted || isDeletedArrayUploaded) {
+          console.error(
+            `Failed to delete file: ${fileName}, skipping UI update.`
+          );
+          return;
+        }
+        // console.log(`Deleted "${fileName}". Remaining files:`);
+      } catch (error) {
+        console.error("Error deleting file:", error);
+        alert("Error processing the file deletion.");
+      }
+    };
 
   const openPopup = (fileUrl) => {
     setPopupImage(fileUrl); // Set the URL for the image or file
@@ -343,6 +410,7 @@ export const Travelling = () => {
   
     fetchInsuranceData();
   }, []);
+  
 
   return (
     <section>
@@ -376,20 +444,24 @@ export const Travelling = () => {
 
             {/* File Upload */}
             <div className="mb-2 relative">
-              <FileUploadField
+              <FileUpload
                 label="Upload File"
                 onChangeFunc={(e) => handleFileChange(e, "travelUp")}
+                handleFileChange={handleFileChange}
+                uploadedFileNames={uploadedFileNames}
+                isUploading={isUploading}
+                deleteFile={deleteFile}
                 register={register}
                 name="travelUp"
                 error={errors}
               />
-              <div className="absolute">
+              {/* <div className="absolute">
                 {uploadedFileNames.travelUp && (
                   <span className="text-sm text-grey ">
                     {uploadedFileNames.travelUp}
                   </span>
                 )}
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

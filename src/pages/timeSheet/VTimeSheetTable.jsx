@@ -75,7 +75,10 @@ export const VTimeSheetTable = () => {
   const totalPages = Math.ceil(safeData.length / itemsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  currentData.sort((a, b) => a.empName.localeCompare(b.empName));
   let visibleData = currentData;
+
+  
 
   useEffect(() => {
     if (secondaryData && secondaryData.length > 0) {

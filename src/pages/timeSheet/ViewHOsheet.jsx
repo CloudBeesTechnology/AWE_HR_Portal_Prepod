@@ -99,7 +99,6 @@ export const ViewHOsheet = ({
     if (processedData && processedData.length > 0) {
       setData(processedData);
       setSecondaryData(processedData);
-     
     }
   }, [processedData]);
 
@@ -229,7 +228,7 @@ export const ViewHOsheet = ({
 
       // Usage
       const result = await checkedKeys();
-      
+
       setClosePopup(true);
       setCurrentStatus(result);
       setShowStatusCol(result);
@@ -848,7 +847,9 @@ export const ViewHOsheet = ({
   const totalPages = Math.ceil(safeData.length / itemsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  currentData.sort((a, b) => a.NAME.localeCompare(b.NAME));
   visibleData = currentData;
+
   return (
     <div>
       <div>

@@ -41,8 +41,10 @@ export const SearchDisplay = ({
           (field) => field?.toString().toUpperCase() === normalizedQuery
         )
       );
-      if (result) {
+      if (result && searchQuery) {
         searchResult(result);
+      }else if (!searchQuery) {
+        alert("Your search box is empty. Enter a value to start searching.");
       } else {
         alert("Employee not found.");
         searchResult({});
@@ -53,17 +55,6 @@ export const SearchDisplay = ({
     const query = e.target.value.toUpperCase();
     setSearchQuery(query);
     searchedValue?.(id, query);
-
-    // if (query) {
-    //   const results =
-    //     newFormData &&
-    //     newFormData?.filter(
-    //       (employee) =>
-    //         employee.name?.toUpperCase().includes(query) ||
-    //         employee.empID?.toUpperCase().includes(query) ||
-    //         employee.empBadgeNo?.toUpperCase().includes(query) ||
-    //         employee.sapNo?.toUpperCase().includes(query)
-    //     );
 
     if (query) {
       const results = newFormData?.filter((employee) =>
@@ -99,7 +90,7 @@ export const SearchDisplay = ({
 
         return 0;
       });
-      
+
       setFilteredEmployees?.(sortedResults);
       // console.log("if FilteredEmployees : ", results);
     } else {
@@ -146,7 +137,7 @@ export const SearchDisplay = ({
 
                   setSearchQuery(`${employee.empID} - ${employee.name || ""}`);
                   searchResult(employee);
-                  setSearchQuery("");
+                  // setSearchQuery("");
                 }
 
                 setToggleHandle(false);
