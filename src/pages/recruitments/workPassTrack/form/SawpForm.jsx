@@ -196,7 +196,7 @@ export const SawpForm = ({ candidate }) => {
             id: existingInterviewData.id,
             sawpDate: formData.interview.sawpDate,
             sawpRecivedDate: formData.interview.sawpRecivedDate,
-            sawpFile: uploadedSawp.sawpFile || formData.interview.sawpFile,
+            sawpFile: uploadedSawp.sawpFile,
             tempID: candidate.tempID,
           },
         });

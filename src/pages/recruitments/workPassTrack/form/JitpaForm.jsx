@@ -200,7 +200,7 @@ export const JitpaForm = ({ candidate }) => {
           submitdateendorsement: formData.interview.submitdateendorsement,
           jitpaexpirydate: formData.interview.jitpaexpirydate,
           jitpaamount: formData.interview.jitpaamount,
-          jitpafile: uploadedJitpa.jitpaFile || formData.interview.jitpafile,
+          jitpafile: uploadedJitpa.jitpaFile,
         },
       });
 

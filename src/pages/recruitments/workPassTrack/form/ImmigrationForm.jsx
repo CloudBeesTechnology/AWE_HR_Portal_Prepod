@@ -202,7 +202,7 @@ export const ImmigrationForm = ({ candidate }) => {
           docsubmitdate: formData.interview.docsubmitdate,
           visaapprovedate: formData.interview.visaapprovedate,
           visareferenceno: formData.interview.visareferenceno,
-          visaFile: uploadedVisa.visaFile || formData.interview.visaFile,
+          visaFile: uploadedVisa.visaFile,
         },
       });
 

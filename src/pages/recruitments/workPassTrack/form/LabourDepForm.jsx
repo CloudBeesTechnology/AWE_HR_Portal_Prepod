@@ -198,7 +198,7 @@ export const LabourDepForm = ({ candidate }) => {
           lbrDepoNum: formData.interview.lbrDepoNum,
           lbrEndroseDate: formData.interview.lbrEndroseDate,
           lbrDepoAmount: formData.interview.lbrDepoAmount,
-          lbrFile: uploadedLabDep.lbrFile || formData.interview.lbrFile,
+          lbrFile: uploadedLabDep.lbrFile,
         },
       });
 

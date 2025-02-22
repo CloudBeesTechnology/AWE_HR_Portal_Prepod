@@ -30,7 +30,11 @@ import { DataSupply } from "../../../utils/DataStoredContext";
 import { UpdateEmpInfo } from "../../../services/updateMethod/UpdateEmpInfo";
 import { getUrl } from "@aws-amplify/storage";
 import { RowThirteen } from "./RowThirteen";
-import { capitalizedLetter } from "../../../utils/DateFormat";
+import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
+import { DeletedArrayUpload } from "./DeletedArrayUpload";
+import { DeletedStringUploaded } from "./DeletedStringUploaded";
+import { FileUploadField } from "../medicalDep/FileUploadField";
+import { MdCancel } from "react-icons/md";
 
 export const EmployeeInfo = () => {
   useEffect(() => {
@@ -42,7 +46,6 @@ export const EmployeeInfo = () => {
   const { SubmitEIData, errorEmpID } = EmpInfoFunc();
   const { UpdateEIValue } = UpdateEmpInfo();
   const { empPIData, IDData, dropDownVal } = useContext(DataSupply);
-
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [selectedNationality, setSelectedNationality] = useState("");
@@ -51,6 +54,20 @@ export const EmployeeInfo = () => {
   const [selectedReligion, setSelectedReligion] = useState("");
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [notification, setNotification] = useState(false);
+  const [isUploading, setIsUploading] = useState({
+    bwnUpload: false,
+    applicationUpload: false,
+    cvCertifyUpload: false,
+    myIcUpload: false,
+    paafCvevUpload: false,
+    ppUpload: false,
+    supportDocUpload: false,
+    loiUpload: false,
+  });
+  const [isUploadingString, setIsUploadingString] = useState({
+    uploadProfilePhoto: false,
+    inducBriefUp: false,
+  });
   const [uploadedFiles, setUploadedFiles] = useState({
     bwnUpload: [],
     applicationUpload: [],
@@ -75,6 +92,8 @@ export const EmployeeInfo = () => {
   const [IBLastUP, setIBLastUP] = useState(null);
   const [familyData, setFamilyData] = useState([]);
   const [showTitle, setShowTitle] = useState("");
+  const [deletedFiles, setDeletedFiles] = useState({});
+
   const handleNationalityChange = (e) => {
     setSelectedNationality(e.target.value);
   };
@@ -134,8 +153,16 @@ export const EmployeeInfo = () => {
 
     fetchData();
   }, [empPIData, IDData]);
+  const updateUploadingString = (type, value) => {
+    setIsUploadingString((prev) => ({
+      ...prev,
+      [type]: value,
+    }));
+    // console.log(value);
+  };
 
   const handleFileUpload = async (e, type) => {
+    const watchedEmpID = watch("empID");
     if (!watchedEmpID) {
       alert("Please enter the Employee ID before uploading files.");
       window.location.href = "/employeeInfo";
@@ -152,16 +179,15 @@ export const EmployeeInfo = () => {
       "image/jpg",
     ];
 
-
     if (!allowedTypes.includes(selectedFile.type)) {
       alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
       return;
     }
 
-
-    setValue(type, selectedFile);
+    setValue(type, selectedFile); // Update form state with the selected file
 
     if (selectedFile) {
+      updateUploadingString(type, true);
       await uploadDocString(selectedFile, type, setUploadedDocs, watchedEmpID);
       setUploadedFileNames((prev) => ({
         ...prev,
@@ -169,16 +195,26 @@ export const EmployeeInfo = () => {
       }));
     }
   };
-console.log(uploadedDocs);
+
+  const updateUploadingState = (label, value) => {
+    setIsUploading((prev) => ({
+      ...prev,
+      [label]: value,
+    }));
+    console.log(value);
+  };
 
   const handleFileChange = async (e, label) => {
+    const watchedEmpID = watch("empID");
     if (!watchedEmpID) {
-      alert("Please enter the Employee ID before uploading files.");
-      window.location.href = "/employeeInfo";
-      return;
+        alert("Please enter the Employee ID before uploading files.");
+        window.location.href = "/employeeInfo";
+        return;
     }
+
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
+
     const allowedTypes = [
       "application/pdf",
       "image/jpeg",
@@ -186,20 +222,104 @@ console.log(uploadedDocs);
       "image/jpg",
     ];
     if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-      return;
+        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+        return;
     }
+
+    // Ensure no duplicate files are added
     const currentFiles = watch(label) || [];
+    if (currentFiles.some((file) => file.name === selectedFile.name)) {
+        alert("This file has already been uploaded.");
+        return;
+    }
+
+    // **Check if the file was previously deleted and prevent re-adding**
+    if (deletedFiles[label]?.includes(selectedFile.name)) {
+        alert("This file was previously deleted and cannot be re-added.");
+        return;
+    }
+
     setValue(label, [...currentFiles, selectedFile]);
+
     try {
-      // Dynamically set field based on label
+      updateUploadingState(label, true);
       await uploadDocs(selectedFile, label, setUploadedFiles, watchedEmpID);
       setUploadedFileNames((prev) => ({
         ...prev,
         [label]: selectedFile.name,
       }));
     } catch (err) {
-      console.log(err);
+        console.error(err);
+    }
+  };
+
+  const deleteFile = async (fileType, fileName) => {
+    try {
+      const watchedEmpID = watch("empID");
+      if (!watchedEmpID) {
+        alert("Please provide the Employee ID before deleting files.");
+        return;
+      }
+
+      const isDeleted = await handleDeleteFile(
+        fileType,
+        fileName,
+        watchedEmpID
+      );
+      const isDeletedArrayUploaded = await DeletedArrayUpload(
+        fileType,
+        fileName,
+        watchedEmpID,
+        setUploadedFileNames,
+        setUploadedFiles,
+        setIsUploading
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
+    }
+  };
+
+  const deletedStringUpload = async (fileType, fileName) => {
+    try {
+      const watchedEmpID = watch("empID");
+      if (!watchedEmpID) {
+        alert("Please provide the Employee ID before deleting files.");
+        return;
+      }
+
+      const isDeleted = await handleDeleteFile(
+        fileType,
+        fileName,
+        watchedEmpID
+      );
+      const isDeletedArrayUploaded = await DeletedStringUploaded(
+        fileType,
+        fileName,
+        watchedEmpID,
+        setUploadedFileNames,
+        setUploadedDocs,
+        setIsUploadingString,
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
     }
   };
 
@@ -606,8 +726,8 @@ console.log(uploadedDocs);
       return ""; // Return an empty string if the file path is invalid
     }
     const fileNameWithExtension = filePath.split("/").pop(); // Get file name with extension
-    const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
-    return fileName;
+    // const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
+    return fileNameWithExtension;
   };
 
   const onSubmit = async (data) => {
@@ -923,29 +1043,22 @@ console.log(uploadedDocs);
           <RowTwelve register={register} errors={errors} />
 
           <div>
-            <h2 className="text_size_5 mb-2">Upload Induction Form</h2>
-            <label className="flex items-center px-3 py-2 p-2.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer">
-              <input
-                type="file"
-                {...register("inducBriefUp")}
-                onChange={(e) => handleFileUpload(e, "inducBriefUp")}
-                className="hidden"
-                accept=".pdf, .jpg, .jpeg, .png"
-              />
-              <span className="ml-2 flex p-1 text-grey gap-10">
-                <GoUpload /> Induction Form
-              </span>
-            </label>
-
-            <p className="text-xs mt-1 text-grey">
-              {uploadedFileNames?.inducBriefUp}
-            </p>
-          </div>
+  <FileUploadField
+        label="Upload Induction Form"
+        register={register}
+        fileKey="inducBriefUp"
+        handleFileUpload={handleFileUpload}
+        uploadedFileNames={uploadedFileNames}
+        deletedStringUpload={deletedStringUpload}
+        isUploadingString={isUploadingString}
+        error={errors?.inducBriefUp}
+      />
+</div>
           <RowThirteen register={register} errors={errors} />
         </div>
 
         <div className="grid grid-cols-4 gap-5 form-group mt-5">
-          {uploadFields.map((field, index) => (
+        {uploadFields.map((field, index) => (
             <Controller
               key={index}
               name={field.title}
@@ -953,31 +1066,83 @@ console.log(uploadedDocs);
               render={({ field: { onChange, value } }) => (
                 <div className="form-group">
                   <h2 className="text_size_5">Upload {field.label}</h2>
-                  <label className="mt-2 flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer">
+                  <label
+                    onClick={() => {
+                      if (isUploading[field.title]) {
+                        alert(
+                          "Delete already uploaded Files or save an uploaded file."
+                        );
+                      }
+                    }}
+                    className="mt-2 flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer"
+                  >
                     <input
                       type="file"
                       className="hidden"
                       accept=".pdf,image/jpeg,image/png"
-                      onChange={(e) => handleFileChange(e, field.title)} // Pass field label for dynamic handling
+                      onChange={(e) => handleFileChange(e, field.title)} // Pass field title for dynamic handling
+                      disabled={isUploading[field.title]}
                     />
-                    <span className="ml-2 text-grey font-normal flex justify-between items-center gap-10">
-                      {field.icon}
+                    <span className="ml-2 text-grey w-full font-normal flex justify-between items-center gap-10">
                       {field.label}
+                      {field.icon}
                     </span>
                   </label>
-                  <p className="text-xs mt-1 text-grey">
-                    {uploadedFileNames?.[field.title] || ""}
+
+                  <p className="text-xs mt-1 text-grey px-1">
+                    {uploadedFileNames?.[field.title] ? (
+                      Array.isArray(uploadedFileNames[field.title]) ? (
+                        uploadedFileNames[field.title]
+                          .slice() // Create a shallow copy to avoid mutating the original array
+                          .reverse()
+                          .map((fileName, fileIndex) => (
+                            <span
+                              key={fileIndex}
+                              className="mt-2 flex justify-between items-center"
+                            >
+                              {fileName}
+                              <button
+                                type="button"
+                                className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                                onClick={() =>
+                                  deleteFile(field.title, fileName)
+                                }
+                              >
+                                <MdCancel />
+                              </button>
+                            </span>
+                          ))
+                      ) : (
+                        <span className="mt-2 flex justify-between items-center">
+                          {uploadedFileNames[field.title]}
+                          <button
+                            type="button"
+                            className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                            onClick={() =>
+                              deleteFile(
+                                field.title,
+                                uploadedFileNames[field.title]
+                              )
+                            }
+                          >
+                            <MdCancel />
+                          </button>
+                        </span>
+                      )
+                    ) : (
+                      <span></span>
+                    )}
                   </p>
-                  {/* Display validation error if any */}
-                  {errors[field.title] && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors[field.title].message}
-                    </p>
-                  )}
-                </div>
-              )}
+
+                        {errors[field.title] && (
+                            <p className="text-red-500 text-xs mt-1">
+                                {errors[field.title].message}
+                            </p>
+                        )}
+                    </div>
+                )}
             />
-          ))}
+        ))}
         </div>
 
         {/* Button */}

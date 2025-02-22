@@ -212,7 +212,7 @@ export const NonLocalMobilizForm = ({ candidate }) => {
           mobSignDate: formData.interview.mobSignDate,
           agentname: formData.interview.agentname,
           remarkNLMob: formData.interview.remarkNLMob,
-          mobFile: uploadedMobiliz.mobFile || formData.interview.mobFile,
+          mobFile: uploadedMobiliz.mobFile,
         },
       });
 

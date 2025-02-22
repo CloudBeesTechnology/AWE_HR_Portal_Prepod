@@ -211,7 +211,7 @@ export const NlmsForm = ({ candidate }) => {
           nlmsapprovedate: formData.interview.nlmsapprovedate,
           nlmsexpirydate: formData.interview.nlmsexpirydate,
           ldreferenceno: formData.interview.ldreferenceno,
-          nlmsfile: uploadedNlms.nlmsFile || formData.interview.nlmsfile,
+          nlmsfile: uploadedNlms.nlmsFile,
         },
       });
 
