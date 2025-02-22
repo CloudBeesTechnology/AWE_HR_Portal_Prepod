@@ -25,8 +25,15 @@ export const ViewSummaryTable = ({
   editViewSummaryObject,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const { selectedLocation, getStartDate, getEndDate, startDate, endDate } =
-    useTempID();
+  const {
+    selectedLocation,
+    getStartDate,
+    getEndDate,
+    startDate,
+    setStartDate,
+    setEndDate,
+    endDate,
+  } = useTempID();
 
   function calculateTotalWorkingHours(data) {
     let totalHours = 0;
@@ -110,7 +117,14 @@ export const ViewSummaryTable = ({
       <div className="screen-size p-4">
         <header className="my-5 flex justify-between">
           <div className="flex items-center ">
-            <Link to="/timeSheet" className="text-xl flex-1 text-grey">
+            <Link
+              to="/timeSheet"
+              className="text-xl flex-1 text-grey"
+              onClick={() => {
+                setStartDate("");
+                setEndDate("");
+              }}
+            >
               <FaArrowLeft />
             </Link>
           </div>
@@ -557,7 +571,7 @@ export const ViewSummaryTable = ({
                         <td className="border px-2 py-1">
                           {/* {`${employee?.empLeaveCount?.AL || 0} /
                                ${employee?.empLeaveCount?.CL || 0}`} */}
-                               {parseInt(employee?.empLeaveCount?.AL) +
+                          {parseInt(employee?.empLeaveCount?.AL) +
                             parseInt(employee?.empLeaveCount?.CL) || 0}
                         </td>
                         <td className="border px-2 py-1">
