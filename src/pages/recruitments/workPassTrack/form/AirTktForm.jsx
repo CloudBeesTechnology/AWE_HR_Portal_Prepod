@@ -203,7 +203,7 @@ export const AirTktForm = ({ candidate }) => {
           cityname: formData.interview.cityname,
           airfare: formData.interview.airfare,
           airticketfile:
-            uploadedAirTkt.airTktFile || formData.interview.airticketfile,
+            uploadedAirTkt.airTktFile,
         },
       });
 

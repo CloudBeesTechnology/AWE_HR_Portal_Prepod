@@ -204,7 +204,7 @@ export const BankForm = ({ candidate }) => {
           bgexpirydate: formData.interview.bgexpirydate,
           referenceno: formData.interview.referenceno,
           bgamount: formData.interview.bgamount,
-          bgfile: uploadedBank.bgFile || formData.interview.bgfile,
+          bgfile: uploadedBank.bgFile,
         },
       });
 

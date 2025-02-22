@@ -203,7 +203,7 @@ export const DoeForm = ({ candidate }) => {
           doerefno: formData.interview.doerefno,
           doeapprovedate: formData.interview.doeapprovedate,
           doeexpirydate: formData.interview.doeexpirydate,
-          doefile: uploadedDoe.doeFile || formData.interview.doefile,
+          doefile: uploadedDoe.doeFile,
         },
       });
       // console.log("WPTracking response:", response);

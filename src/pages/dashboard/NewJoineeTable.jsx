@@ -102,7 +102,7 @@ export const NewJoineeTable = () => {
         </thead>
         <tbody>
           {latestJoinees.map((joinee, index) => {
-            console.log(joinee);
+            // console.log(joinee);
 
             return (
               <tr key={index} className="border-b last:border-none text-sm">
