@@ -216,6 +216,7 @@ export default function LeaveStatusUpdateForm(props) {
     selectedFrom: "",
     startDate: "",
     endDate: "",
+    receivedDate: "",
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [leaveType, setLeaveType] = React.useState(initialValues.leaveType);
@@ -266,6 +267,9 @@ export default function LeaveStatusUpdateForm(props) {
   );
   const [startDate, setStartDate] = React.useState(initialValues.startDate);
   const [endDate, setEndDate] = React.useState(initialValues.endDate);
+  const [receivedDate, setReceivedDate] = React.useState(
+    initialValues.receivedDate
+  );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = leaveStatusRecord
@@ -297,6 +301,7 @@ export default function LeaveStatusUpdateForm(props) {
     setSelectedFrom(cleanValues.selectedFrom);
     setStartDate(cleanValues.startDate);
     setEndDate(cleanValues.endDate);
+    setReceivedDate(cleanValues.receivedDate);
     setErrors({});
   };
   const [leaveStatusRecord, setLeaveStatusRecord] =
@@ -344,6 +349,7 @@ export default function LeaveStatusUpdateForm(props) {
     selectedFrom: [],
     startDate: [],
     endDate: [],
+    receivedDate: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -413,6 +419,7 @@ export default function LeaveStatusUpdateForm(props) {
           selectedFrom: selectedFrom ?? null,
           startDate: startDate ?? null,
           endDate: endDate ?? null,
+          receivedDate: receivedDate ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -498,6 +505,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -546,6 +554,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.leaveType ?? value;
@@ -596,6 +605,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.fromDate ?? value;
@@ -646,6 +656,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.toDate ?? value;
@@ -698,6 +709,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.days ?? value;
@@ -742,6 +754,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             values = result?.applyTo ?? values;
@@ -815,6 +828,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.reason ?? value;
@@ -863,6 +877,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.medicalCertificate ?? value;
@@ -913,6 +928,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.supervisorName ?? value;
@@ -961,6 +977,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.supervisorEmpID ?? value;
@@ -1009,6 +1026,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.supervisorStatus ?? value;
@@ -1059,6 +1077,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.supervisorDate ?? value;
@@ -1107,6 +1126,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.supervisorRemarks ?? value;
@@ -1157,6 +1177,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.managerName ?? value;
@@ -1205,6 +1226,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.managerEmpID ?? value;
@@ -1253,6 +1275,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.managerStatus ?? value;
@@ -1303,6 +1326,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.managerDate ?? value;
@@ -1351,6 +1375,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.managerRemarks ?? value;
@@ -1399,6 +1424,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.empStatus ?? value;
@@ -1449,6 +1475,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.empDate ?? value;
@@ -1497,6 +1524,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.empRemarks ?? value;
@@ -1545,6 +1573,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.selectedTo ?? value;
@@ -1593,6 +1622,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom: value,
               startDate,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.selectedFrom ?? value;
@@ -1642,6 +1672,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate: value,
               endDate,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.startDate ?? value;
@@ -1691,6 +1722,7 @@ export default function LeaveStatusUpdateForm(props) {
               selectedFrom,
               startDate,
               endDate: value,
+              receivedDate,
             };
             const result = onChange(modelFields);
             value = result?.endDate ?? value;
@@ -1704,6 +1736,55 @@ export default function LeaveStatusUpdateForm(props) {
         errorMessage={errors.endDate?.errorMessage}
         hasError={errors.endDate?.hasError}
         {...getOverrideProps(overrides, "endDate")}
+      ></TextField>
+      <TextField
+        label="Received date"
+        isRequired={false}
+        isReadOnly={false}
+        value={receivedDate}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              leaveType,
+              fromDate,
+              toDate,
+              days,
+              applyTo,
+              reason,
+              medicalCertificate,
+              supervisorName,
+              supervisorEmpID,
+              supervisorStatus,
+              supervisorDate,
+              supervisorRemarks,
+              managerName,
+              managerEmpID,
+              managerStatus,
+              managerDate,
+              managerRemarks,
+              empStatus,
+              empDate,
+              empRemarks,
+              selectedTo,
+              selectedFrom,
+              startDate,
+              endDate,
+              receivedDate: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.receivedDate ?? value;
+          }
+          if (errors.receivedDate?.hasError) {
+            runValidationTasks("receivedDate", value);
+          }
+          setReceivedDate(value);
+        }}
+        onBlur={() => runValidationTasks("receivedDate", receivedDate)}
+        errorMessage={errors.receivedDate?.errorMessage}
+        hasError={errors.receivedDate?.hasError}
+        {...getOverrideProps(overrides, "receivedDate")}
       ></TextField>
       <Flex
         justifyContent="space-between"
