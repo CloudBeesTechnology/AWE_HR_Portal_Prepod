@@ -244,53 +244,48 @@ const updateUploadingState = (label, value) => {
     Array.isArray(value) ? value[value.length - 1] : value;
 
   const searchResult = (result) => {
-
-    const workInfo = workInfoData.find(
-      (data) => data.empID === result.empID
-    );
-
+    // Ensure result is defined
+    if (!result) {
+      console.warn("Search result is undefined or null");
+      return;
+    }
+  
+    // Find work info based on empID
+    const workInfo = workInfoData.find((data) => data.empID === result.empID);
+  
     if (workInfo) {
-      // console.log("Work Info:", workInfo);
-      const managerEmpID = workInfo.manager[workInfo.manager.length - 1];
-      // console.log("Manager Employee ID:", managerEmpID);
-
-      const hrOfficialmail = "hr-training@adininworks.com";
+      const managerEmpID = workInfo.manager?.[workInfo.manager.length - 1] || null;
+  
       // Update HR email in emailData
+      const hrOfficialmail = "hr-training@adininworks.com";
       setEmailData((prevData) => ({
         ...prevData,
         hrOfficialmail,
       }));
-
+  
       if (managerEmpID) {
         // Find the manager's information from empPIData
         const managerInfo = empPIData.find(
           (data) => data.empID === String(managerEmpID)
         );
-
+  
         if (managerInfo) {
-          // console.log("Manager Info:", managerInfo);
-
           // Update manager's official email and name in emailData
           setEmailData((prevData) => ({
             ...prevData,
-            managerOfficialMail: managerInfo.officialEmail,
-            managerName: managerInfo.name,
-            managerEmpID: managerInfo.empID
+            managerOfficialMail: managerInfo.officialEmail || "",
+            managerName: managerInfo.name || "",
+            managerEmpID: managerInfo.empID || "",
           }));
+        } else {
+          console.warn(`Manager with empID ${managerEmpID} not found in empPIData`);
         }
-        // else {
-        //   console.warn(`Manager with empID ${managerEmpID} not found in empPIData`);
-        // }
       }
     } else {
-      console.warn(
-        `Work info for managerEmpID ${emailData.managerEmpID} not found`
-      );
+      console.warn(`Work info for empID ${result.empID} not found`);
     }
-    // console.log("Search result:", result);
-
   
-
+    // Define keys to set
     const keysToSet = [
       "empID",
       "empBadgeNo",
@@ -304,65 +299,61 @@ const updateUploadingState = (label, value) => {
       "traineeStatus",
       "traineeCourseFee",
     ];
+  
     const fields = ["department", "courseCode", "courseName", "company"];
     const uploadFields = ["medicalReport"];
-
-    // Set simple fields
+  
+    // Set simple fields with fallback for undefined/null/empty values
     keysToSet.forEach((key) => {
-      if (result[key]) {
-        setValue(key, result[key]);
-      }
+      const value = result[key] || null; // Fallback to null if undefined, null, or empty string
+      setValue(key, value);
     });
-
+  
+    // Set fields with the last value in the array
     fields.forEach((field) => {
-      const value = getLastValue(result[field]);
-      if (value) {
-        setValue(field, value);
-
-        if (field === "courseName") {
-          setSelectedCourse((prev) => ({
-            ...prev,
-            courseName: Array.isArray(value) ? value : [value], // Ensure it is an array
-          }));
-        }
-
-        if (field === "company") {
-          setSelectedCourse((prev) => ({
-            ...prev,
-            company: Array.isArray(value) ? value : [value], // Ensure it is an array
-          }));
-        }
+      const value = getLastValue(result[field]) || null; // Fallback to null if undefined, null, or empty array
+      setValue(field, value);
+  
+      if (field === "courseName" || field === "company") {
+        setSelectedCourse((prev) => ({
+          ...prev,
+          [field]: Array.isArray(value) ? value : [value], // Ensure it is an array
+        }));
       }
     });
-
+  
     // Handle upload fields
     uploadFields.forEach((field) => {
-      if (result[field]) {
+      const fieldData = result[field]?.[0] || null; // Fallback to null if undefined, null, or empty array
+  
+      if (fieldData) {
         try {
-          const parsedArray = JSON.parse(result?.[field][0]);
+          const parsedArray = JSON.parse(fieldData);
           setValue(field, parsedArray);
           setUploadMedicalReports((prev) => ({ ...prev, [field]: parsedArray }));
-    
+  
           if (Array.isArray(parsedArray) && parsedArray.length > 0) {
             const fileNames = parsedArray.map((item) =>
               item?.upload ? getFileName(item.upload) : "Unknown file"
             );
-    
+  
             setUploadedFileNames((prev) => ({
               ...prev,
-              [field]: fileNames, 
+              [field]: fileNames,
             }));
           }
         } catch (error) {
           console.error(`Error parsing upload field ${field}:`, error);
         }
+      } else {
+        setValue(field, null); // Set to null if no data
+        setUploadMedicalReports((prev) => ({ ...prev, [field]: null }));
+        setUploadedFileNames((prev) => ({ ...prev, [field]: [] }));
       }
     });
-
-    const mediRequired =
-      result?.medicalName || result?.medicalExpiry ? true : false;
-
-    // Set the value for 'mediRequired'
+  
+    // Set medical required flag
+    const mediRequired = result?.medicalName || result?.medicalExpiry ? true : false;
     setValue("mediRequired", mediRequired);
     setShowMedicalFields(mediRequired);
   };

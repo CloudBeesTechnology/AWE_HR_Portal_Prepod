@@ -75,7 +75,7 @@ export const TrainingCertificatesForm = () => {
 
   const {
     register,
-    handleSubmit,setValue,watch,
+    handleSubmit,setValue,watch,reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(trainingCertificatesValidation),
@@ -183,9 +183,14 @@ export const TrainingCertificatesForm = () => {
     Array.isArray(value) ? value[value.length - 1] : value;
   
   const searchResult = (result) => {
-    console.log("Search result:", result); // Debugging
+    // Ensure result is defined
+    if (!result) {
+      console.warn("Search result is undefined or null");
+      return;
+    }
   
-    const keysToSet = ["empID","empBadgeNo","name","position"];
+    // Define keys to set
+    const keysToSet = ["empID", "empBadgeNo", "name", "position"];
     const fields = [
       "department",
       "courseCode",
@@ -195,52 +200,53 @@ export const TrainingCertificatesForm = () => {
       "eCertifiDate",
       "orgiCertifiDate",
       "poNo",
-      "addDescretion"
+      "addDescretion",
     ];
     const uploadFields = ["trainingUpCertifi"];
   
-    // Set simple fields
+    // Set simple fields with fallback for undefined/null/empty values
     keysToSet.forEach((key) => {
-      if (result[key]) {
-        setValue(key, result[key]);
-      }
+      const value = result[key] || null; // Fallback to null if undefined, null, or empty string
+      setValue(key, value);
     });
   
-   
-    // Set other fields
+    // Set other fields with the last value in the array
     fields.forEach((field) => {
-      const value = getLastValue(result[field]);
-      if (value) {
-        setValue(field, value);
-      }
+      const value = getLastValue(result[field]) || null; // Fallback to null if undefined, null, or empty array
+      setValue(field, value);
     });
-
-
+  
+    // Handle upload fields
     uploadFields.forEach((field) => {
-      if (result[field]) {
+      const fieldData = result[field]?.[0] || null; // Fallback to null if undefined, null, or empty array
+  
+      if (fieldData) {
         try {
-          const parsedArray = JSON.parse(result?.[field][0]);
+          const parsedArray = JSON.parse(fieldData);
           setValue(field, parsedArray);
           setUploadTC((prev) => ({ ...prev, [field]: parsedArray }));
-    
-          // ✅ Ensure parsedArray is valid
+  
+          // Ensure parsedArray is valid
           if (Array.isArray(parsedArray) && parsedArray.length > 0) {
-            // ✅ Extract all filenames instead of just the last one
+            // Extract all filenames
             const fileNames = parsedArray.map((item) =>
               item?.upload ? getFileName(item.upload) : "Unknown file"
             );
-    
+  
             setUploadedFileNames((prev) => ({
               ...prev,
-              [field]: fileNames, // ✅ Store all filenames as an array
+              [field]: fileNames, // Store all filenames as an array
             }));
           }
         } catch (error) {
           console.error(`Error parsing upload field ${field}:`, error);
         }
+      } else {
+        setValue(field, null); // Set to null if no data
+        setUploadTC((prev) => ({ ...prev, [field]: null }));
+        setUploadedFileNames((prev) => ({ ...prev, [field]: [] }));
       }
     });
-    
   };
   
 
