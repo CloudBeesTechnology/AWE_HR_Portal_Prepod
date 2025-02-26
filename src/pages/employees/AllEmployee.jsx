@@ -333,7 +333,7 @@ export const AllEmployee = () => {
             /> */}
           </div>
           <select
-            className="py-[7px] px-2 border border-lite_grey focus:outline-none focus:ring-0"
+            className="py-2.5 px-2 border border-lite_grey focus:outline-none focus:ring-0"
             onChange={handleFilterChange}
           >
             <option value="All">All</option>
@@ -434,8 +434,8 @@ export const AllEmployee = () => {
       )}
       {/* Pagination Controls */}
       {paginatedData.length > 0 && (
-        <div className="flex justify-center">
-          <div className="ml-[750px] flex justify-between mt-12 px-10">
+        <div className="flex justify-end items-end w-full">
+          <div className=" flex mt-12 px-5 ">
             <Pagination
               currentPage={currentPage}
               totalPages={Math.ceil(filteredData.length / rowsPerPage)}
