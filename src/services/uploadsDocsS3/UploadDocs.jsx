@@ -65,9 +65,10 @@ export const uploadDocString = async (
       // }
     }
   } catch (error) {
-    // console.log(`Error uploading ${fileType}:`, error);
+    // console.log(Error uploading ${fileType}:, error);
   }
 };
+
 export const uploadDocs = async (
   file,
   fileType,
@@ -84,7 +85,7 @@ export const uploadDocs = async (
         data: file,
       }).result;
       const fileUrl = result.path;
-
+ 
       const uploadDate = new Date().toISOString().split("T")[0];
 
       if (typeof index === "number") {
@@ -132,10 +133,111 @@ export const uploadDocs = async (
       }
     // }
   } catch (error) {
-    // console.log(`Error uploading ${fileType}:`, error);
+    console.log(`Error uploading ${fileType}:, error`);
   }
 };
 
+export const claimUploadDocs = async (
+  file,
+  fileType,
+  setUploadedDocs,
+  empID,
+  index
+) => {
+  try {
+    const currentUser = await getCurrentUser();
+
+    if (currentUser) {
+      const result = await uploadData({
+        path: `public/${fileType}/${empID}/${file.name}`,
+        data: file,
+      }).result;
+      const fileUrl = result.path;
+      const uploadDate = new Date().toISOString().split("T")[0];
+
+      setUploadedDocs((prev) => {
+        const updatedUploads = { ...prev };
+
+        // Ensure updatedUploads[fileType] is an object
+        if (!updatedUploads[fileType] || typeof updatedUploads[fileType] !== "object") {
+          updatedUploads[fileType] = {};
+        }
+
+        // Ensure updatedUploads[fileType][index] is an array
+        if (!Array.isArray(updatedUploads[fileType][index])) {
+          updatedUploads[fileType][index] = [];
+        }
+
+        // Prevent duplicate uploads
+        const existingUpload = updatedUploads[fileType][index].find(
+          (item) => item.upload === fileUrl
+        );
+
+        if (!existingUpload) {
+          updatedUploads[fileType][index].push({
+            upload: fileUrl,
+            date: uploadDate,
+          });
+        }
+
+        return updatedUploads;
+      });
+    }
+  } catch (error) {
+    console.log(`Error uploading ${fileType}:, error`);
+  }
+};
+
+export const dependUploadDocs = async (
+  file,
+  fileType,
+  setUploadedDocs,
+  empID,
+  index
+) => {
+  try {
+    const currentUser = await getCurrentUser();
+
+    if (currentUser) {
+      const result = await uploadData({
+        path: `public/${fileType}/${empID}/${file.name}`,
+        data: file,
+      }).result;
+      const fileUrl = result.path;
+      const uploadDate = new Date().toISOString().split("T")[0];
+
+      setUploadedDocs((prev) => {
+        const updatedUploads = { ...prev };
+
+        // Ensure updatedUploads[fileType] is an object
+        if (!updatedUploads[fileType] || typeof updatedUploads[fileType] !== "object") {
+          updatedUploads[fileType] = {};
+        }
+
+        // Ensure updatedUploads[fileType][index] is an array
+        if (!Array.isArray(updatedUploads[fileType][index])) {
+          updatedUploads[fileType][index] = [];
+        }
+
+        // Prevent duplicate uploads
+        const existingUpload = updatedUploads[fileType][index].find(
+          (item) => item.upload === fileUrl
+        );
+
+        if (!existingUpload) {
+          updatedUploads[fileType][index].push({
+            upload: fileUrl,
+            date: uploadDate,
+          });
+        }
+
+        return updatedUploads;
+      });
+    }
+  } catch (error) {
+    console.log(`Error uploading ${fileType}:, error`);
+  }
+};
 // Delete file from S3 and update state
 export const deleteDocs = async (
   fileUrl,
@@ -177,6 +279,6 @@ export const deleteDocs = async (
       return updatedUploads;
     });
   } catch (error) {
-    console.error(`Error deleting ${fileType}:`, error);
+    console.error(`Error deleting ${fileType}:, error`);
   }
 };

@@ -20,7 +20,7 @@ const InsuranceDetails = ({
   mainRef,
   InsuranceClaim,
 }) => {
-  const [viewingDocument, setViewingDocument] = useState(null); // Document URL or file being viewed
+  const [viewingDocument, setViewingDocument] = useState(null); 
   const [pageNumber, setPageNumber] = useState(1); // For paginated PDF documents
   const [numPages, setNumPages] = useState(null); // Total pages in the document
   const [dependInsurance, setDependInsurance] = useState([]);
@@ -32,9 +32,9 @@ const InsuranceDetails = ({
   const linkToStorageFile = async (pathUrl) => {
     try {
       const result = await getUrl({ path: pathUrl });
-      // console.log("File URL:", result.url.href); // Use .href to extract the URL as a string
-      setPPLastUP(result.url.href); // Store the URL as a string
-      setViewingDocument(pathUrl); // Update the state to show the selected document
+
+      setPPLastUP(result.url.href); 
+      setViewingDocument(pathUrl); 
       setLoading(false);
     } catch (error) {
       console.error("Error fetching the file URL:", error);
@@ -42,10 +42,9 @@ const InsuranceDetails = ({
     }
   };
 
-  // Function to handle document loading success (for pagination)
   const onDocumentLoadSuccess = ({ numPages }) => {
     setNumPages(numPages);
-    setPageNumber(1); // Reset to first page when a new document is loaded
+    setPageNumber(1); 
   };
 
   const handleDocumentClick = (document) => {
@@ -56,12 +55,12 @@ const InsuranceDetails = ({
   };
 
   useEffect(() => {
-    // Check if depInsurance is an array and not empty
+
     if (Array.isArray(depInsurance) && depInsurance.length > 0) {
-      // Check if the data at depInsurance[0] is a stringified JSON array
+
       if (typeof depInsurance[0] === "string") {
         try {
-          // Parse the string to remove escape characters if needed
+    
           const parsedString = JSON.parse(depInsurance[0]);
           setDependInsurance(parsedString);
         } catch (error) {
@@ -74,12 +73,12 @@ const InsuranceDetails = ({
   }, [depInsurance]);
 
   useEffect(() => {
-    // Check if depInsurance is an array and not empty
+
     if (Array.isArray(InsuranceClaim) && InsuranceClaim.length > 0) {
-      // Check if the data at depInsurance[0] is a stringified JSON array
+
       if (typeof InsuranceClaim[0] === "string") {
         try {
-          // Parse the string to remove escape characters if needed
+
           const parsedString = JSON.parse(InsuranceClaim[0]);
           setInsClaim(parsedString);
         } catch (error) {
@@ -97,7 +96,7 @@ const InsuranceDetails = ({
       if (Array.isArray(parsedData)) {
         return parsedData.map((doc) => {
           if (doc.upload) {
-            doc.fileName = doc.upload.split("/").pop(); // Extract file name from path
+            doc.fileName = doc.upload.split("/").pop(); 
           }
           return doc;
         });
@@ -110,8 +109,8 @@ const InsuranceDetails = ({
   };
 
   const handleClose = (e) => {
-    e.preventDefault(); // Prevent default action
-    setViewingDocument(null); // Close the viewer
+    e.preventDefault(); 
+    setViewingDocument(null); 
   };
 
   const closeModal = () => {
@@ -150,7 +149,7 @@ const InsuranceDetails = ({
                 Uploaded on: {formatDate(document.date)}
               </span>
               <button
-                onClick={() => linkToStorageFile(document.upload)} // Fetch the URL for the document
+                onClick={() => linkToStorageFile(document.upload)} 
                 className="text-dark_grey font-semibold text-sm"
               >
                 View Document
@@ -171,7 +170,7 @@ const InsuranceDetails = ({
 
                     <div className="absolute top-2 right-2">
                       <button
-                        onClick={closeModal} // Close the modal
+                        onClick={closeModal} 
                         className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
                       >
                         <FaTimes />
@@ -207,7 +206,7 @@ const InsuranceDetails = ({
                 <div className="relative mt-4">
                   <div ref={invoiceRef}>
                     <img
-                      src={lastUploadUrl} // Use the URL for the image
+                      src={lastUploadUrl} 
                       alt="Document Preview"
                       className="w-full h-auto"
                     />
@@ -215,7 +214,7 @@ const InsuranceDetails = ({
 
                   <div className="absolute top-2 right-2">
                     <button
-                      onClick={handleClose} // Close the viewer
+                      onClick={handleClose} 
                       className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
                     >
                       <FaTimes />
@@ -249,9 +248,6 @@ const InsuranceDetails = ({
     );
   };
 
-  // if (!Array.isArray(dependInsurance) || dependInsurance.length === 0) {
-  //   return <p>There was an error processing the dependent insurance data.</p>;
-  // }
 
   const renderDocumentCategory = (uploadArray, categoryName) => {
     const documents =
@@ -278,13 +274,13 @@ const InsuranceDetails = ({
      const  renderPersonalDetails = (details) => {
         const capitalizeWords = (str) => {
           if (!str || str === "N/A") {
-            return "N/A"; // Return "N/A" for null, undefined, or "N/A"
+            return "N/A"; 
           }
       
           return str
             .split(' ') // Split by space if it's multi-word
             .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-            .join(' '); // Rejoin the words
+            .join(' ');
         };
       
         return (
@@ -306,7 +302,7 @@ const InsuranceDetails = ({
                               // Remove consecutive duplicates, case-insensitive
                               return v.toLowerCase() === arr[idx - 1]?.toLowerCase() ? null : v;
                             })
-                            .filter((v, idx, arr) => v !== null) // Remove null values (duplicates and N/A's)
+                            .filter((v, idx, arr) => v !== null) 
                             .reduce((acc, item) => {
                               // Consolidate consecutive "N/A"s into a single one
                               if (item === "N/A" && acc[acc.length - 1] !== "N/A") {
@@ -375,54 +371,54 @@ const InsuranceDetails = ({
               <span className="text-dark_grey">Insurance Type</span>
               <span className="text-center text-gray-700">:</span>
               <span className="text-dark_grey">
-                {depend.depenInsType || "N/A"}
+                {depend?.depenInsType || "N/A"}
               </span>
 
               <span className="text-dark_grey">Dependent Name</span>
               <span className="text-center text-gray-700">:</span>
               <span className="text-dark_grey">
-                {depend.depenName || "N/A"}
+                {depend?.depenName || "N/A"}
               </span>
               <span className="text-dark_grey">Relation</span>
               <span className="text-center text-gray-700">:</span>
               <span className="text-dark_grey">
-                {depend.depenRelation || "N/A"}
+                {depend?.depenRelation || "N/A"}
               </span>
 
               <span className="text-dark_grey">Gender</span>
               <span className="text-center text-gray-700">:</span>
               <span className="text-dark_grey">
-                {depend.depenGender || "N/A"}
+                {depend?.depenGender || "N/A"}
               </span>
 
               <span className="text-dark_grey">Date of Birth</span>
               <span className="text-center text-gray-700">:</span>
               <span className="text-dark_grey">
-                {formatDate(depend.depenDob) || "N/A"}
+                {formatDate(depend?.depenDob) || "N/A"}
               </span>
 
               <span className="text-dark_grey">Nationality</span>
               <span className="text-center text-gray-700">:</span>
               <span className="text-dark_grey">
-                {depend.depenNation || "N/A"}
+                {depend?.depenNation || "N/A"}
               </span>
 
               <span className="text-dark_grey">Other Nation</span>
               <span className="text-center text-gray-700">:</span>
               <span className="text-dark_grey">
-                {depend.depenotherNation || "N/A"}
+                {depend?.depenotherNation || "N/A"}
               </span>
 
               <span className="text-dark_grey">Birth Certificate No</span>
               <span className="text-center text-gray-700">:</span>
               <span className="text-dark_grey">
-                {depend.depenBcNo || "N/A"}
+                {depend?.depenBcNo || "N/A"}
               </span>
 
               <span className="text-dark_grey">Brunei I/C Number</span>
               <span className="text-center text-gray-700">:</span>
               <span className="text-dark_grey">
-                {depend.depenIcNumber || "N/A"}
+                {depend?.depenIcNumber || "N/A"}
               </span>
 
               <span className="text-dark_grey">
@@ -430,7 +426,7 @@ const InsuranceDetails = ({
               </span>
               <span className="text-center text-gray-700">:</span>
               <span className="text-dark_grey">
-                {depend.depenPpNo || "N/A"}
+                {depend?.depenPpNo || "N/A"}
               </span>
 
               {/* <span className="text-dark_grey">Passport Expiry Date</span>
@@ -442,12 +438,12 @@ const InsuranceDetails = ({
               </span>
               <span className="text-center text-gray-700">:</span>
               <span className="text-dark_grey">
-                {formatDate(depend.depenGroupInsEffect) || "N/A"}
+                {formatDate(depend?.depenGroupInsEffect) || "N/A"}
               </span>
               <span className="text-dark_grey">Group Insurance End Date</span>
               <span className="text-center text-gray-700">:</span>
               <span className="text-dark_grey">
-                {formatDate(depend.depenGroupInsEnd) || "N/A"}
+                {formatDate(depend?.depenGroupInsEnd) || "N/A"}
               </span>
 
               <span className="text-dark_grey">
@@ -455,12 +451,12 @@ const InsuranceDetails = ({
               </span>
               <span className="text-center text-gray-700">:</span>
               <span className="text-dark_grey">
-                {formatDate(depend.depenTravelInsEffect) || "N/A"}
+                {formatDate(depend?.depenTravelInsEffect) || "N/A"}
               </span>
               <span className="text-dark_grey">Travel Insurance End Date</span>
               <span className="text-center text-gray-700">:</span>
               <span className="text-dark_grey">
-                {formatDate(depend.depenTravelInsEnd) || "N/A"}
+                {formatDate(depend?.depenTravelInsEnd) || "N/A"}
               </span>
 
               <span className="text-dark_grey">
@@ -468,13 +464,13 @@ const InsuranceDetails = ({
               </span>
               <span className="text-center text-gray-700">:</span>
               <span className="text-dark_grey">
-                {formatDate(depend.depenPersonInsEffect) || "N/A"}
+                {formatDate(depend?.depenPersonInsEffect) || "N/A"}
               </span>
 
               <span className="text-dark_grey">Person Insurance End Date</span>
               <span className="text-center text-gray-700">:</span>
               <span className="text-dark_grey">
-                {formatDate(depend.depenPersonInsEnd) || "N/A"}
+                {formatDate(depend?.depenPersonInsEnd) || "N/A"}
               </span>
             </div>
 
@@ -483,8 +479,8 @@ const InsuranceDetails = ({
               <h4 className="uppercase text_size_5  my-3">
                 Uploaded Documents:
               </h4>
-              {depend.depenInfUpload && depend.depenInfUpload.length > 0 ? (
-                renderDocumentsUnderCategory(JSON.parse(depend.depenInfUpload))
+              {depend?.depenInfUpload && depend?.depenInfUpload?.length > 0 ? (
+                renderDocumentsUnderCategory(JSON.parse(depend?.depenInfUpload))
               ) : (
                 <p>No documents uploaded.</p>
               )}

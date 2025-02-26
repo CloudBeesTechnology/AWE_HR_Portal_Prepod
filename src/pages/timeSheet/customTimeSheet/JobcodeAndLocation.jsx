@@ -45,7 +45,7 @@ export const LocationData = [
   { id: 14, location: "HR" },
   { id: 15, location: "PURCHASING" },
   { id: 16, location: "CORPORATE" },
-  { id: 17, location: "CPT" },
+  { id: 17, location: "CPD" },
 ];
 
 export const dummyLeaveStatus = [

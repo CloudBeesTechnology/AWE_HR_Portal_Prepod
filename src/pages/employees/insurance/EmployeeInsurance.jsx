@@ -5,17 +5,14 @@ import { FiMinusSquare, FiPlusSquare } from "react-icons/fi";
 import { GoUpload } from "react-icons/go";
 import { EmpInsuranceschema } from "../../../services/EmployeeValidation";
 import { SpinLogo } from "../../../utils/SpinLogo";
-import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
-import {
-  GenderDD,
-  MaritalDD,
-  NationalityDD,
-} from "../../../utils/DropDownMenus";
+import { uploadDocs } from "../../../services/uploadsDocsS3/UploadDocs";
 import { EmpInsDataFun } from "./EmpInsDataFun";
 import { useOutletContext } from "react-router-dom";
 import { FormField } from "../../../utils/FormField";
 import { UpdateEmpInsDataFun } from "../../../services/updateMethod/UpdateEmpInsurance";
 import { DataSupply } from "../../../utils/DataStoredContext";
+import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
+import { MdCancel } from "react-icons/md";
 
 export const EmployeeInsurance = () => {
   useEffect(() => {
@@ -23,7 +20,6 @@ export const EmployeeInsurance = () => {
   }, []);
   const { searchResultData } = useOutletContext();
   const { EmpInsuranceData , workMenDetails,dropDownVal } = useContext(DataSupply);
-  
   const { SubmitMPData } = EmpInsDataFun();
   const { UpdateEIDataSubmit } = UpdateEmpInsDataFun();
   const [notification, setNotification] = useState(false);
@@ -31,6 +27,7 @@ export const EmployeeInsurance = () => {
   const [inputFields, setInputFields] = useState([{}]); // Tracks each file input field
   const [empInsUpload, setEmpInsUpload] = useState([]);
   const [showTitle, setShowTitle] = useState("");
+  const [isUploading, setIsUploading] = useState({ empInsUpload: false });
 
   const {
     register,
@@ -54,12 +51,7 @@ export const EmployeeInsurance = () => {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
     .join(" "),
   }));
-  const nationalityDD = dropDownVal[0]?.nationalityDD.map((item) => ({
-    value: item,
-    label: item.split(" ") // Split the string into words
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
-    .join(" "),
-  }));
+ 
   const otherNationValue = watch("otherNation");
   const [empStatusTypeValue, setEmpStatusTypeValue] = useState("");
   const [filteredWorkmenCompNo, setFilteredWorkmenCompNo] = useState([]);
@@ -108,60 +100,100 @@ export const EmployeeInsurance = () => {
       options: ["Yes", "No"],
     },
   ];
-  // const selectedNationality = watch("nationality");
-  const handleAddFileClick = () => {
-    setInputFields((prevFields) => [...prevFields, {}]); // Add new input field
-    setEmpInsUpload((prevUpload) => [...prevUpload, []]);
-  };
 
-  // Handle removing a file input field
-  const handleRemoveField = (index) => {
+   const handleAddFileClick = () => {
+     setInputFields((prevFields) => [...prevFields, {}]);
+     setUploadedDocs((prevUploads) => ({
+       ...prevUploads,
+       empInsUpload: [...prevUploads.empInsUpload],
+     }));
+   };
+ 
+   const handleRemoveField = (index) => {
+    const watchedEmpID = watch("empID");
+    // Remove the field from inputFields
     setInputFields((prevFields) => prevFields.filter((_, i) => i !== index));
-    setEmpInsUpload((prevUploads) => prevUploads.filter((_, i) => i !== index)); // Remove the corresponding file array
-  };
 
-  // const watchedEmpID=watch("empID")
-
-  const handleFileChange = async (e, type, index) => {
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
-
-    const allowedTypes = [
-      "application/pdf",
-      "image/jpeg",
-      "image/png",
-      "image/jpg",
-    ];
-    if (!allowedTypes.includes(selectedFile.type)) {
-        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+    // Get the file path to be deleted
+    const fileToDelete = uploadedDocs.empInsUpload[index];
+    // console.log(fileToDelete,"11111111");
+    
+    if (!fileToDelete) {
+        console.error("File not found at index:", index);
         return;
     }
 
-    setEmpInsUpload((prevUpload) => {
-      const updatedFiles = [...prevUpload];
-      updatedFiles[index] = { name: selectedFile.name, file: selectedFile };
-      return updatedFiles;
-    });
+    // Extract the file name from the path
+    const fileNameToDelete = fileToDelete.upload.split("/").pop();
+    const fileName=fileNameToDelete;
+    // console.log(fileName, "2222222");
+    setUploadedDocs((prevUploads) => ({
+        ...prevUploads,
+        empInsUpload: prevUploads.empInsUpload.filter((_, i) => i !== index),
+    }));
+    handleDeleteFile('empInsUpload', fileName, watchedEmpID);
+};
 
-    try {
-      const fileUrl = await uploadDocs(
-        selectedFile,
-        type,
-        setUploadedDocs,
-        index
-      );
+const updateUploadingState = (label, value, idx) => {
+  setIsUploading((prev) => ({
+    ...prev,
+    [idx]: value, 
+  }));
+  // console.log(idx, value);
+};
+
+const handleFileChange = async (e, type, index) => {
+  const watchedEmpID = watch("empID");
+
+  const selectedFile = e.target.files?.[0];
+  if (!selectedFile) return;
+
+  // Check if a file is selected
+  if (!selectedFile) {
+      alert("Please select a file to upload.");
+      return;
+  }
+
+  // Check if a file already exists for the given index
+  if (uploadedDocs?.empInsUpload?.[index]?.upload) {
+      alert(`Please Select Add Upload + button to upload another file`);
+      e.target.value = ''; // Clear the input
+      return;
+  }
+
+  const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+  ];
+
+  // Check if the file type is allowed
+  if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
+  }
+
+  try {
+    updateUploadingState(type, true, index);
+
+      const fileUrl = await uploadDocs(selectedFile, type, setUploadedDocs, watchedEmpID);
       if (fileUrl) {
-        setEmpInsUpload((prevUpload) => {
-          const updatedUrls = [...prevUpload];
-          updatedUrls[index] = [fileUrl]; // Update with the URL instead of the file object
-          return updatedUrls; // Return the updated state
-        });
-        // console.log("File uploaded successfully. URL:", fileUrl);
+          setUploadedDocs((prev) => {
+              const updatedUploads = [...prev.empInsUpload];
+              updatedUploads[index] = { date: new Date().toISOString().split('T')[0], upload: fileUrl }; // Add date and file URL
+              return { ...prev, empInsUpload: updatedUploads };
+          });
+
+          setValue(`empInsUpload[${index}]`, fileUrl); // Update form state
       }
-    } catch (err) {
+  } catch (err) {
       console.error("Error uploading file:", err);
-    }
-  };
+      alert("An error occurred while uploading the file. Please try again.");
+  }
+};
+  
+// console.log(uploadedDocs,"1 ......");
 
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
@@ -204,19 +236,13 @@ export const EmployeeInsurance = () => {
 
     if (url) {
       try {
-        const parsedArray = JSON?.parse(url);
-        const parsedFiles = parsedArray?.map((item) =>
-          typeof item === "string" ? JSON?.parse(item) : item
-        );
-        setUploadedDocs((prev) => ({ ...prev, empInsUpload: parsedFiles }));
-      } catch (error) {
+        const parsedArray = JSON.parse(url);
+        setUploadedDocs((prev) => ({ ...prev, empInsUpload: parsedArray }));
+        setInputFields(parsedArray.map((file) => ({}))); // Initialize input fields
+      }  catch (error) {
         console.error("Failed to parse JSON:", error);
       }
-    } else {
-      console.warn(
-        "searchResultData?.empInsUpload is undefined or not a valid JSON string."
-      );
-    }
+    } 
   }, [searchResultData, setValue]);
 
   useEffect(() => {
@@ -242,32 +268,27 @@ export const EmployeeInsurance = () => {
   }, [empStatusTypeValue, setValue, watch, workMenDetails]);
 
   const defaultOptions = ["OFFSHORE", "ONSHORE", "GENERAL"];
+
   const onSubmit = async (data) => {
-    // console.log(data, "data");
     const existingEmpInsurance = EmpInsuranceData.find(
       (match) => match.empID === data.empID
     );
-
+  
+    const empInsValue = {
+      ...data,
+      empInsUpload: JSON.stringify(uploadedDocs.empInsUpload), // Include uploaded files
+    };
+  
     if (existingEmpInsurance) {
-      const empInsValue = {
-        ...data,
-        id: existingEmpInsurance.id,
-        empInsUpload: JSON.stringify(uploadedDocs.empInsUpload.flat()), // Flatten if necessary, otherwise keep as it is
-      };
-      // console.log("update", empInsValue);
-      await UpdateEIDataSubmit({empInsValue});
+      empInsValue.id = existingEmpInsurance.id;
+      await UpdateEIDataSubmit({ empInsValue });
       setShowTitle("Employee Insurance Info updated successfully");
-      setNotification(true);
     } else {
-      const empInsValue = {
-        ...data,
-        empInsUpload: JSON.stringify(uploadedDocs.empInsUpload.flat()), // Flatten if necessary, otherwise keep as it is
-      };
-      // console.log("create", empInsValue);
-      await SubmitMPData({empInsValue});
+      await SubmitMPData({ empInsValue });
       setShowTitle("Employee Insurance Info Saved successfully");
-        setNotification(true);
     }
+  
+    setNotification(true);
   };
 
   return (
@@ -373,56 +394,62 @@ export const EmployeeInsurance = () => {
            </div>
          
           </div>
-
-      <div className="grid grid-cols-3 gap-10 mt-12">
-        {inputFields.map((field, index) => (
-          <div key={index} className="form-group w-full relative">
-            <label className="w-full flex items-center px-3 py-3 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer">
-              Upload
-              <Controller
-                name={`empInsUpload[${index}]`}
-                control={control}
-                render={({ field }) => (
-                  <input
-                    type="file"
-                    onChange={(e) => {
-                      handleFileChange(e, "empInsUpload", index);
-                    }}
-                    className="hidden"
-                    accept=".pdf"
-                  />
-                )}
-              />
-              <span className="ml-2">
-                <GoUpload />
-              </span>
-            </label>
-            <p className="text-grey mt-1 text-xs">
-              {empInsUpload[index]?.name || ""}
-            </p>
-
-            {index === 0 && (
-              <button
-                type="button"
-                onClick={handleAddFileClick}
-                className="absolute top-1/2 -right-8 transform -translate-y-1/2 flex items-center text-medium_grey text-[20px]"
-              >
-                <FiPlusSquare className="mr-1" />
-              </button>
-            )}
-
-            {index > 0 && (
-              <button
-                type="button"
-                onClick={() => handleRemoveField(index)}
-                className="absolute top-1/2 -right-8 transform -translate-y-1/2 flex items-center text-medium_grey text-[20px]"
-              >
-                <FiMinusSquare className="mr-1" />
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
+         
+          <div>
+         <button
+          type="button"
+          onClick={handleAddFileClick}
+          className=" flex items-center text-[#5d5d5d] text-[20px] mt-10 gap-3 bg-white  p-2 rounded-md cursor-pointer"
+        >
+         <p >Add Upload</p> <FiPlusSquare className="mr-1" />
+        </button>
+         </div>
+          <div className="grid grid-cols-3 gap-10 mt-7">
+  {inputFields.map((field, index) => (
+    <div key={index} className="form-group w-full relative">
+      <label className="w-full flex items-center px-3 py-3 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer"
+      onClick={() => {
+        if (uploadedDocs?.empInsUpload?.[index]?.upload
+        ) {
+          alert(
+            "Please Select Add Upload + button to upload another file"
+          );
+        }
+      }}
+    >
+        Upload
+        <Controller
+          name={`empInsUpload[${index}]`}
+          control={control}
+          render={({ field }) => (
+            <input
+              type="file"
+              onChange={(e) => handleFileChange(e, "empInsUpload", index)}
+              className="hidden"
+              // accept=".pdf"
+              disabled={uploadedDocs?.empInsUpload?.[index]?.upload}
+            />
+          )}
+        />
+        <span className="ml-2">
+          <GoUpload />
+        </span>
+      </label>
+      <p className="text-grey mt-1 text-xs">
+        {uploadedDocs.empInsUpload[index]?.upload
+          ? uploadedDocs.empInsUpload[index].upload.split("/").pop()
+          : empInsUpload[index]?.name}
+      </p>
+        <button
+          type="button"
+          onClick={() => handleRemoveField(index)}
+          className="absolute top-1/2 -right-8 transform -translate-y-1/2 flex items-center text-medium_grey text-[20px]"
+        >          
+          <MdCancel className="mr-1 text-[red]" />
+        </button>
+    </div>
+  ))}
+</div>
 
       <div className="center my-10">
         <button type="submit" className="primary_btn">
@@ -433,7 +460,7 @@ export const EmployeeInsurance = () => {
         <SpinLogo
           text={showTitle}
           notification={notification}
-          path="/employee"
+          path="/insuranceAdd"
         />
       )}
     </form>

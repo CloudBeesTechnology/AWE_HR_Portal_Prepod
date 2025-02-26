@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { GoUpload } from "react-icons/go";
 import { MdCancel } from "react-icons/md";
 
-
 export const FileUpload = ({
   label,
   register,
@@ -23,7 +22,7 @@ export const FileUpload = ({
       <label
         onClick={() => {
           if (isUploading[name]) {
-            alert("Delete already uploaded files or save an uploaded file.");
+            alert("Please delete the previously uploaded file before uploading a new one.");
           }
         }}
         className={`mt-2 flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer
@@ -51,7 +50,10 @@ export const FileUpload = ({
               .slice() // Create a shallow copy to avoid mutating the original array
               .reverse()
               .map((fileName, fileIndex) => (
-                <span key={fileIndex} className="mt-2 flex justify-between items-center">
+                <span
+                  key={fileIndex}
+                  className="mt-2 flex justify-between items-center"
+                >
                   {fileName}
                   <button
                     type="button"
@@ -74,7 +76,7 @@ export const FileUpload = ({
               </button>
             </span>
           )}
-        </p> 
+        </p>
       )}
 
       {/* Display Error Message */}
@@ -104,10 +106,10 @@ export const FileUploadField = ({
         onClick={(e) => {
           if (isUploading) {
             e.preventDefault(); // Prevent default behavior
-            alert("Delete already uploaded Files or save an uploaded file.");
+            alert("Please delete the previously uploaded file before uploading a new one.");
           }
         }}
-        className="flex items-center px-3 py-2 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer"
+        className="flex items-center px-3 py-1.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer mt-2"
       >
         <input
           type="file"
@@ -116,7 +118,8 @@ export const FileUploadField = ({
             if (!isUploading) {
               handleFileUpload(e, fileKey);
             }
-          }}          className="hidden"
+          }}
+          className="hidden"
           accept=".pdf, .jpg, .jpeg, .png"
         />
         <span className="ml-2 flex p-1 text-grey gap-10">
@@ -126,20 +129,20 @@ export const FileUploadField = ({
 
       {/* Uploaded File Name Display */}
       {/* {uploadedFileNames?.[fileKey] && ( */}
-        <p className="text-xs mt-1 text-grey flex justify-between items-center">
-          {uploadedFileNames[fileKey]}
-          {uploadedFileNames[fileKey]?.length > 0 && (
-            <button
-              type="button"
-              className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-              onClick={() => deletedStringUpload(fileKey,                      
-                uploadedFileNames?.[fileKey]
-              )}
-            >
-              <MdCancel />
-            </button>
-          )}
-        </p>
+      <p className="text-xs mt-1 text-grey flex justify-between items-center">
+        {uploadedFileNames[fileKey]}
+        {uploadedFileNames[fileKey]?.length > 0 && (
+          <button
+            type="button"
+            className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+            onClick={() =>
+              deletedStringUpload(fileKey, uploadedFileNames?.[fileKey])
+            }
+          >
+            <MdCancel />
+          </button>
+        )}
+      </p>
       {/* )} */}
 
       {/* Error Message */}
@@ -153,12 +156,13 @@ export const FileUploadFieldArr = ({
   register,
   onChangeFunc,
   error,
-  arrayFileNames = {},
+  fileName = "",
   deleteFile,
   field,
 }) => {
   return (
     <div className="flex flex-col">
+      {/* Label for the file upload field */}
       {label && <label className="text_size_5">{label}</label>}
 
       {/* File Upload Input */}
@@ -171,19 +175,19 @@ export const FileUploadFieldArr = ({
           accept=".pdf, .jpg, .jpeg, .png"
         />
         <span className="ml-2 text-grey font-normal flex justify-between items-center gap-20 text-sm">
-          <GoUpload className="text-lg" /> PDF, JPG, JPEG, PNG Only
+          <GoUpload className="text-lg" /> PNG Only
         </span>
       </label>
 
-      {/* Display Uploaded Files */}
-      {arrayFileNames[`${field?.title}`] && (
+      {/* Display Uploaded File Name */}
+      {fileName && (
         <div className="mt-2">
           <div className="flex justify-between items-center text-sm text-grey my-1">
-            <span>{arrayFileNames[`${field?.title}`]}</span>
+            <span>{fileName}</span>
             <button
               type="button"
               className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-              onClick={() => deleteFile(field?.title, arrayFileNames[`${field?.title}`])}
+              onClick={() => deleteFile(field?.name, fileName)}
             >
               <MdCancel />
             </button>
@@ -196,6 +200,55 @@ export const FileUploadFieldArr = ({
     </div>
   );
 };
+
+// export const FileUploadFieldArr = ({
+//   label,
+//   register,
+//   onChangeFunc,
+//   error,
+//   arrayFileNames = {},
+//   deleteFile,
+//   field,
+// }) => {
+//   return (
+//     <div className="flex flex-col">
+//       {label && <label className="text_size_5">{label}</label>}
+
+//       {/* File Upload Input */}
+//       <label className="w-full mt-2 max-w-[300px] flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer">
+//         <input
+//           type="file"
+//           className="hidden"
+//           {...register}
+//           onChange={onChangeFunc}
+//           accept=".pdf, .jpg, .jpeg, .png"
+//         />
+//         <span className="ml-2 text-grey font-normal flex justify-between items-center gap-20 text-sm">
+//           <GoUpload className="text-lg" /> PDF, JPG, JPEG, PNG Only
+//         </span>
+//       </label>
+
+//       {/* Display Uploaded Files */}
+//       {arrayFileNames[`${field?.title}`] && (
+//         <div className="mt-2">
+//           <div className="flex justify-between items-center text-sm text-grey my-1">
+//             <span>{arrayFileNames[`${field?.title}`]}</span>
+//             <button
+//               type="button"
+//               className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+//               onClick={() => deleteFile(field?.title, arrayFileNames[`${field?.title}`])}
+//             >
+//               <MdCancel />
+//             </button>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Display Error Message */}
+//       {error && <p className="text-[red] text-[12px] mt-1">{error.message}</p>}
+//     </div>
+//   );
+// };
 
 // export const FileUploadField = ({
 //   label,
@@ -226,7 +279,6 @@ export const FileUploadFieldArr = ({
 //     </div>
 //   );
 // };
-
 
 // export const FileUploadFieldArr = ({
 //   label,
@@ -282,7 +334,6 @@ export const FileUploadFieldArr = ({
 //     </div>
 //   );
 // };
-
 export const FileUploadNew = ({
   label,
   error,
@@ -290,49 +341,44 @@ export const FileUploadNew = ({
   uploadedFileNames,
   isUploading,
   deleteFile,
-  field
+  field,
 }) => {
-
   return (
-    <div className="flex flex-col w-[400px] ">
+    <div className="flex flex-col w-[400px]">
       {label && <label className="text_size_5">{label}</label>}
       <label
-                    onClick={() => {
-                      
-                      if (isUploading[field.title]) {
-                        alert(
-                          "Delete already uploaded Files or save an uploaded file."
-                        );
-                      }
-                    }}
-                    className="mt-2 flex items-center px-3 py-5 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer"
-                  >
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept=".pdf,image/jpeg,image/png"
-                      onChange={(e) => handleFileChange(e, field.title)} // Pass field title for dynamic handling
-                      disabled={isUploading[field?.title]}
-                    />
-                    <span className="ml-2 text-[#636363] w-full font-medium flex justify-between items-center gap-10">
-                      {/* {field.label} */}
-                      <p>Only PDF</p>
-                      <GoUpload/>
-
-                      {/* {field.icon} */}
-                    </span>
-                  </label>
-      {/* <p className="text-grey text-sm my-1">{fileName || ""}</p> */}
+        onClick={() => {
+          if (isUploading[field.title]) {
+            alert("Please delete the previously uploaded file before uploading a new one.");
+          }
+        }}
+        className="mt-2 flex items-center px-3 py-5 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer"
+      >
+        <input
+          type="file"
+          className="hidden"
+          accept=".pdf,image/jpeg,image/png"
+          onChange={(e) => handleFileChange(e, field.title)} // Pass field title for dynamic handling
+          disabled={isUploading[field?.title]}
+        />
+        <span className="ml-2 text-[#636363] w-full font-medium flex justify-between items-center gap-10">
+          <p>Only PDF</p>
+          <GoUpload />
+        </span>
+      </label>
 
       {/* Display uploaded files */}
-      <p className="text-xs mt-1 text-grey px-1 ">
+      <p className="text-xs mt-1 text-grey px-1">
         {uploadedFileNames?.[field.title] ? (
           Array.isArray(uploadedFileNames[field.title]) ? (
             uploadedFileNames[field.title]
               .slice() // Create a shallow copy to avoid mutating the original array
               .reverse()
               .map((fileName, fileIndex) => (
-                <span key={fileIndex} className="mt-2 flex justify-between items-center">
+                <span
+                  key={fileIndex}
+                  className="mt-2 flex justify-between items-center"
+                >
                   {fileName}
                   <button
                     type="button"
@@ -376,7 +422,7 @@ export const UploadingFiles = ({
   errors,
   watchedEmpID,
   isUploading,
-  deleteFile
+  deleteFile,
 }) => {
   // console.log(uploadedFileNames);
 
@@ -391,36 +437,37 @@ export const UploadingFiles = ({
             className="input-field"
           />
           {errors[field.name] && (
-            <p className="text-[red] text-[12px] pt-1">{errors[field.name]?.message}</p>
+            <p className="text-[red] text-[12px] pt-1">
+              {errors[field.name]?.message}
+            </p>
           )}
         </>
       ) : field.type === "file" ? (
         <>
-           <label
-                    onClick={() => {
-                      
-                      if (isUploading[field.name]) {
-                        alert(
-                          "Delete already uploaded Files or save an uploaded file."
-                        );
-                      }
-                    }}
-                    className="mt-2 flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer"
-                  >
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept=".pdf,image/jpeg,image/png"
-                      onChange={(e) => handleFileChange(e, field.name)} // Pass field name for dynamic handling
-                      disabled={isUploading[field.name]}
-                    />
-                    <span className="ml-2 text-grey w-full font-normal flex justify-between items-center gap-10">
-                      {field.label}
-                      <GoUpload/>
-                      {/* {field.icon} */}
-                    </span>
-                  </label>
-  
+          <label
+            onClick={() => {
+              if (isUploading[field.name]) {
+                alert(
+                  "Please delete the previously uploaded file before uploading a new one."
+                );
+              }
+            }}
+            className="mt-2 flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer"
+          >
+            <input
+              type="file"
+              className="hidden"
+              accept=".pdf,image/jpeg,image/png"
+              onChange={(e) => handleFileChange(e, field.name)} // Pass field name for dynamic handling
+              disabled={isUploading[field.name]}
+            />
+            <span className="ml-2 text-grey w-full font-normal flex justify-between items-center gap-10">
+              {field.label}
+              <GoUpload />
+              {/* {field.icon} */}
+            </span>
+          </label>
+
           {uploadedFileNames[field.name] && (
             <p className="text-grey text-sm my-1">
               {Array.isArray(uploadedFileNames[field.name]) ? (
@@ -458,17 +505,17 @@ export const UploadingFiles = ({
               )}
             </p>
           )}
-  
+
           {errors[field.name] && (
-            <p className="text-[red] text-[12px] pt-2">{errors[field.name]?.message}</p>
+            <p className="text-[red] text-[12px] pt-2">
+              {errors[field.name]?.message}
+            </p>
           )}
         </>
       ) : null}
     </div>
   );
-}  
-
-
+};
 
 export const FileUploadFieldNew = ({
   label,
@@ -479,17 +526,29 @@ export const FileUploadFieldNew = ({
   uploadedFileNames,
   deleteFile,
   fileType,
+  isUploading,
+  field,
+  index,
+  disabled
 }) => {
   return (
     <div className="flex flex-col">
       {label && <label className="text_size_5">{label}</label>}
-      <label className="w-full mt-2 max-w-[300px] flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer">
+      <label
+        onClick={() => {
+          if (disabled) {
+            alert("Please delete the previously uploaded file before uploading a new one.");
+          }
+        }}
+        className="mt-2 flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer"
+      >
         <input
           type="file"
           className="hidden"
           {...register}
           onChange={onChangeFunc}
           accept=".pdf"
+          disabled={disabled}
         />
         <span className="ml-2 text-grey font-normal flex justify-between items-center gap-20 text-sm">
           <GoUpload className="text-lg" /> PDF Only
@@ -502,12 +561,17 @@ export const FileUploadFieldNew = ({
               .slice()
               .reverse()
               .map((file, fileIndex) => (
-                <span key={fileIndex} className="mt-2 flex justify-between items-center">
+                <span
+                  key={fileIndex}
+                  className="mt-2 flex justify-between items-center"
+                >
                   {file}
                   <button
                     type="button"
                     className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-                    onClick={() => deleteFile(file)} // Pass fileName
+                    onClick={() => {
+                      deleteFile(file);
+                    }}
                   >
                     <MdCancel />
                   </button>
@@ -519,7 +583,7 @@ export const FileUploadFieldNew = ({
               <button
                 type="button"
                 className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-                onClick={() => deleteFile(fileName)} // Pass fileName
+                onClick={() => deleteFile(fileName)}
               >
                 <MdCancel />
               </button>

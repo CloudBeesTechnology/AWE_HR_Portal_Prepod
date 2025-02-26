@@ -182,105 +182,114 @@ export const Status = () => {
 
   const handleOptionSelect = (option) => {
     setSelectedOptions((prevSelectedOptions) => {
-      // Handle toggling of options
+  
       if (prevSelectedOptions.includes(option)) {
-        return prevSelectedOptions.filter((opt) => opt !== option);
+        const newSelectedOptions = prevSelectedOptions.filter((opt) => opt !== option);
+        return newSelectedOptions;
       } else {
-        // Logic for disabling conflicting options
+  
         if (option === "LOCAL") {
-          // When LOCAL is selected, remove "NON LOCAL", "LPA", "SAWP" from the list
-          return [
+          const newSelectedOptions = [
             "LOCAL",
             ...prevSelectedOptions.filter(
               (opt) => opt !== "NON LOCAL" && opt !== "LPA" && opt !== "SAWP"
             ),
           ];
+          return newSelectedOptions;
         }
+        
         if (option === "NON LOCAL") {
-          // When NON LOCAL is selected, remove "LOCAL"
-          return [
+          const newSelectedOptions = [
             "NON LOCAL",
             ...prevSelectedOptions.filter((opt) => opt !== "LOCAL"),
           ];
+          return newSelectedOptions;
         }
+        
         if (option === "ONSHORE" || option === "OFFSHORE") {
-          // Ensure only one of ONSHORE or OFFSHORE is selected
-          return [
+          const newSelectedOptions = [
             option,
             ...prevSelectedOptions.filter(
               (opt) => opt !== "ONSHORE" && opt !== "OFFSHORE"
             ),
           ];
+          return newSelectedOptions;
         }
+  
         if (option === "LPA" || option === "SAWP") {
-          // Ensure only one of LPA or SAWP is selected
-          return [
+          const newSelectedOptions = [
             option,
             ...prevSelectedOptions.filter(
               (opt) => opt !== "LPA" && opt !== "SAWP"
             ),
           ];
+          return newSelectedOptions;
         }
-
-        // If none of the special rules apply, just add the option
-        return [...prevSelectedOptions, option];
+  
+        const newSelectedOptions = [...prevSelectedOptions, option];
+        return newSelectedOptions;
       }
     });
-
-    // Now filter mergeData based on the selected options
-    filterMergeDataBasedOnOptions();
   };
-
+  
+  useEffect(() => {
+    filterMergeDataBasedOnOptions();
+  }, [selectedOptions]);
+  
   const filterMergeDataBasedOnOptions = () => {
     let filteredData = dropOption;
-
-    // Filtering logic based on selected options
+  
     if (selectedOptions.includes("LOCAL")) {
       filteredData = filteredData.filter(
         (item) => item.contractType === "Local"
       );
     }
-
+  
     if (selectedOptions.includes("NON LOCAL")) {
       filteredData = filteredData.filter(
         (item) => item.contractType === "Non Local"
       );
     }
-
+  
     if (selectedOptions.includes("ONSHORE")) {
       filteredData = filteredData.filter((item) => item.empType === "Onshore");
     }
-
+  
     if (selectedOptions.includes("OFFSHORE")) {
       filteredData = filteredData.filter((item) => item.empType === "Offshore");
     }
-
+  
     if (selectedOptions.includes("LPA")) {
       filteredData = filteredData.filter((item) => item.contractType === "LPA");
     }
-
+  
     if (selectedOptions.includes("SAWP")) {
       filteredData = filteredData.filter(
         (item) => item.contractType === "SAWP"
       );
     }
-
-    // After applying all the filters, set the filtered data
+  
     setFilteredData(filteredData);
   };
-
+  
   const isOptionDisabled = (option) => {
+    
     if (selectedOptions.includes("LOCAL")) {
-      // Disable NON LOCAL, LPA, SAWP if LOCAL is selected
-      return option === "NON LOCAL" || option === "LPA" || option === "SAWP";
+      if (option === "NON LOCAL" || option === "LPA" || option === "SAWP") {
+        return true;
+      }
     }
+  
     if (selectedOptions.includes("NON LOCAL")) {
-      // Disable LOCAL if NON LOCAL is selected
-      return option === "LOCAL";
+      if (option === "LOCAL") {
+        return true;
+      }
     }
-    return false; // Default: no option is disabled
+  
+    return false;
   };
 
+  
   useEffect(() => {
     const handleClickOutside = (event) => {
       // Close CV type dropdown if clicked outside
