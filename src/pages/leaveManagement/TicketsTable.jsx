@@ -6,7 +6,7 @@ import { IoSearch } from "react-icons/io5";
 import { Pagination } from "./Pagination";
 import { Filter } from "./Filter";
 import { NavigateLM } from "./NavigateLM";
-import { capitalizedLetter, DateFormat } from "../../utils/DateFormat";
+import { capitalizedLetter, DateFormat, FTDateFormat } from "../../utils/DateFormat";
 import { FiLoader } from "react-icons/fi";
 import { useTempID } from "../../utils/TempIDContext";
 
@@ -410,12 +410,12 @@ export const TicketsTable = () => {
                     </td>
                     <td className="border-b-2 border-[#CECECE] py-5">
                       {item.empDepartureDate ||
-                        DateFormat(item.departureDate) ||
+                        FTDateFormat(item.departureDate) ||
                         "N/A"}
                     </td>
                     <td className="border-b-2 border-[#CECECE] py-5">
                       {item.empArrivalDate ||
-                        DateFormat(item.arrivalDate) ||
+                        FTDateFormat(item.arrivalDate) ||
                         "N/A"}
                     </td>
                     <td className="border-b-2 border-[#CECECE] cursor-pointer py-5">

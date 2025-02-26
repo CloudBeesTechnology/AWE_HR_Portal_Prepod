@@ -36,15 +36,17 @@ const LabourImmigration = () => {
     uploadRegis: false,
     uploadBwn: false,
   });
+
   const [docsUploaded, setDocsUploaded] = useState({
     uploadFitness: [],
     uploadRegis: [],
     uploadBwn: [],
   });
+
   const [notification, setNotification] = useState(false);
   const [dependPassData, setDependPassData] = useState(null);
   const [showTitle, setShowTitle] = useState("");
- 
+
   const {
     register,
     handleSubmit,
@@ -88,94 +90,92 @@ const LabourImmigration = () => {
 
   const watchedEmpID = watch("empID");
 
-const updateUploadingState = (label, value) => {
-       setIsUploading((prev) => ({
-         ...prev,
-         [label]: value,
-       }));
-       console.log(value);
-     };
-   
-     const handleFileChange = async (e, label) => {
-       const watchedEmpID = watch("empID");
-       if (!watchedEmpID) {
-           alert("Please enter the Employee ID before uploading files.");
-           window.location.href = "/employeeInfo";
-           return;
-       }
-   
-       const selectedFile = e.target.files[0];
-       if (!selectedFile) return;
-   
-       const allowedTypes = [
-         "application/pdf",
-         "image/jpeg",
-         "image/png",
-         "image/jpg",
-       ];
-       if (!allowedTypes.includes(selectedFile.type)) {
-           alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-           return;
-       }
-   
-       // Ensure no duplicate files are added
-       const currentFiles = watch(label) || [];
-       if (currentFiles?.some((file) => file.name === selectedFile.name)) {
-           alert("This file has already been uploaded.");
-           return;
-       }
-   
-   
-       setValue(label, [...currentFiles, selectedFile]);
-   
-       try {
-         updateUploadingState(label, true);
-         await uploadDocs(selectedFile, label, setDocsUploaded, watchedEmpID);
-         setUploadedFileNames((prev) => ({
-           ...prev,
-           [label]: selectedFile.name,
-         }));
-       } catch (err) {
-           console.error(err);
-       }
-     };
-   
-     const deleteFile = async (fileType, fileName) => {
-       try {
-         const watchedEmpID = watch("empID");
-         if (!watchedEmpID) {
-           alert("Please provide the Employee ID before deleting files.");
-           return;
-         }
-   
-         const isDeleted = await handleDeleteFile(
-           fileType,
-           fileName,
-           watchedEmpID
-         );
-         const isDeletedArrayUploaded = await LabourImmiUpload(
-           fileType,
-           fileName,
-           watchedEmpID,
-           setUploadedFileNames, 
-           setDocsUploaded,
-           setIsUploading
-         );
-   
-         if (!isDeleted || isDeletedArrayUploaded) {
-           console.error(
-             `Failed to delete file: ${fileName}, skipping UI update.`
-           );
-           return;
-         }
-         // console.log(`Deleted "${fileName}". Remaining files:`);
-       } catch (error) {
-         console.error("Error deleting file:", error);
-         alert("Error processing the file deletion.");
-       }
-     };
+  const updateUploadingState = (label, value) => {
+    setIsUploading((prev) => ({
+      ...prev,
+      [label]: value,
+    }));
+    // console.log(value);
+  };
 
-  
+  const handleFileChange = async (e, label) => {
+    const watchedEmpID = watch("empID");
+    if (!watchedEmpID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
+    }
+
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
+    }
+
+    // Ensure no duplicate files are added
+    const currentFiles = watch(label) || [];
+    if (currentFiles?.some((file) => file.name === selectedFile.name)) {
+      alert("This file has already been uploaded.");
+      return;
+    }
+
+    setValue(label, [...currentFiles, selectedFile]);
+
+    try {
+      updateUploadingState(label, true);
+      await uploadDocs(selectedFile, label, setDocsUploaded, watchedEmpID);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [label]: selectedFile.name,
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const deleteFile = async (fileType, fileName) => {
+    try {
+      const watchedEmpID = watch("empID");
+      if (!watchedEmpID) {
+        alert("Please provide the Employee ID before deleting files.");
+        return;
+      }
+
+      const isDeleted = await handleDeleteFile(
+        fileType,
+        fileName,
+        watchedEmpID
+      );
+      const isDeletedArrayUploaded = await LabourImmiUpload(
+        fileType,
+        fileName,
+        watchedEmpID,
+        setUploadedFileNames,
+        setDocsUploaded,
+        setIsUploading
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
+    }
+  };
+
   const getLastValue = (value) => {
     if (Array.isArray(value)) {
       const lastValue = value[value.length - 1];
@@ -234,12 +234,12 @@ const updateUploadingState = (label, value) => {
   };
 
   const searchResult = (result) => {
-  
-console.log(result);
+    // console.log(result);
 
     const keysToSet = ["empID", "bruhimsRNo", "overMD", "overME", "bruhimsRD"];
 
     keysToSet.forEach((key) => {
+      // console.log("key : ", key);
       if (result[key]) {
         let value = result[key];
         if (key === "overMD" || key === "overME" || key === "bruhimsRD") {
@@ -288,7 +288,7 @@ console.log(result);
 
           setUploadedFileNames((prev) => ({
             ...prev,
-            [field]: parsedFiles.map((file) => getFileName(file.upload))
+            [field]: parsedFiles.map((file) => getFileName(file.upload)),
           }));
         } catch (error) {
           console.error(`Failed to parse ${field}:`, error);
@@ -361,11 +361,9 @@ console.log(result);
           uploadBwn: JSON.stringify(docsUploaded.uploadBwn),
           dependPass: JSON.stringify(
             data.dependPass.map((val, index) => {
-              const uploadDp =
-                arrayUploadDocs?.uploadDp?.[index] ;
+              const uploadDp = arrayUploadDocs?.uploadDp?.[index];
 
-              const uploadDr =
-                arrayUploadDocs?.uploadDr?.[index] ;
+              const uploadDr = arrayUploadDocs?.uploadDr?.[index];
               return {
                 ...val,
                 uploadDp, // Assign the array for uploadDp
@@ -492,7 +490,7 @@ console.log(result);
 
       <DependentPass
         register={register}
-        uploadedFileNames={uploadedFileNames} 
+        uploadedFileNames={uploadedFileNames}
         setUploadedFileNames={setUploadedFileNames}
         control={control}
         setValue={setValue}

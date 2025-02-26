@@ -6,7 +6,7 @@ import { SpinLogo } from "../../utils/SpinLogo";
 import { useCreateNotification } from "../../hooks/useCreateNotification";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { sendEmail } from "../../services/EmailServices";
-import { DateFormat } from "../../utils/DateFormat";
+import { FTDateFormat, DateFormat } from "../../utils/DateFormat";
 import { useTempID } from "../../utils/TempIDContext";
 
 export const ViewForm = ({
@@ -94,12 +94,12 @@ export const ViewForm = ({
         leaveData.empLeaveSelectedFrom && leaveData.empLeaveSelectedTo
           ? isValidDateFormat(leaveData.empLeaveSelectedFrom) &&
             isValidDateFormat(leaveData.empLeaveSelectedTo)
-            ? `${DateFormat(leaveData.empLeaveSelectedFrom)} to ${DateFormat(
+            ? `${FTDateFormat(leaveData.empLeaveSelectedFrom)} to ${FTDateFormat(
                 leaveData.empLeaveSelectedTo
               )}`
             : `${leaveData.empLeaveSelectedFrom} to ${leaveData.empLeaveSelectedTo}`
           : leaveData.empLeaveStartDate && leaveData.empLeaveEndDate
-          ? `${DateFormat(leaveData.empLeaveStartDate)} to ${DateFormat(
+          ? `${FTDateFormat(leaveData.empLeaveStartDate)} to ${FTDateFormat(
               leaveData.empLeaveEndDate
             )}`
           : "N/A";
@@ -107,7 +107,7 @@ export const ViewForm = ({
       handleUpdateLeaveStatus(leaveData.id, updateData)
         .then(() => {
           setNotificationText(
-            `Leave ${status} by ${personalInfo.name} on ${DateFormat(
+            `Leave ${status} by ${personalInfo.name} on ${FTDateFormat(
               currentDate
             )}`
           );
@@ -528,14 +528,14 @@ export const ViewForm = ({
       }
 
       const formattedDatedeparture =
-        ticketData.empDepartureDate || DateFormat(ticketData.departureDate);
+        ticketData.empDepartureDate || FTDateFormat(ticketData.departureDate);
       const formattedDatearrival =
-        ticketData.empArrivalDate || DateFormat(ticketData.arrivalDate);
+        ticketData.empArrivalDate || FTDateFormat(ticketData.arrivalDate);
 
       handleUpdateTicketRequest(ticketData.id, ticketUpdatedData)
         .then(async () => {
           setNotificationText(
-            `Ticket request ${status} by ${personalInfo.name} on ${DateFormat(
+            `Ticket request ${status} by ${personalInfo.name} on ${FTDateFormat(
               currentDate
             )}`
           );
@@ -909,15 +909,15 @@ export const ViewForm = ({
                       leaveData.empLeaveSelectedTo
                         ? isValidDateFormat(leaveData.empLeaveSelectedFrom) &&
                           isValidDateFormat(leaveData.empLeaveSelectedTo)
-                          ? `${DateFormat(
+                          ? `${FTDateFormat(
                               leaveData.empLeaveSelectedFrom
-                            )} to ${DateFormat(leaveData.empLeaveSelectedTo)}`
+                            )} to ${FTDateFormat(leaveData.empLeaveSelectedTo)}`
                           : `${leaveData.empLeaveSelectedFrom} to ${leaveData.empLeaveSelectedTo}`
                         : leaveData.empLeaveStartDate &&
                           leaveData.empLeaveEndDate
-                        ? `${DateFormat(
+                        ? `${FTDateFormat(
                             leaveData.empLeaveStartDate
-                          )} to ${DateFormat(leaveData.empLeaveEndDate)}`
+                          )} to ${FTDateFormat(leaveData.empLeaveEndDate)}`
                         : "N/A",
                   },
 
@@ -1190,20 +1190,20 @@ export const ViewForm = ({
                     label: "Departure Date",
                     value: ticketData.empDepartureDate
                       ? isValidDateFormat(ticketData.empDepartureDate)
-                        ? `${DateFormat(ticketData.empDepartureDate)}`
+                        ? `${FTDateFormat(ticketData.empDepartureDate)}`
                         : `${ticketData.empDepartureDate}`
                       : ticketData.departureDate
-                      ? `${DateFormat(ticketData.departureDate)}`
+                      ? `${FTDateFormat(ticketData.departureDate)}`
                       : "N/A",
                   },
                   {
                     label: "Arrival Date",
                     value: ticketData.empArrivalDate
                       ? isValidDateFormat(ticketData.empArrivalDate)
-                        ? `${DateFormat(ticketData.empArrivalDate)}`
+                        ? `${FTDateFormat(ticketData.empArrivalDate)}`
                         : `${ticketData.empArrivalDate}`
                       : ticketData.arrivalDate
-                      ? `${DateFormat(ticketData.arrivalDate)}`
+                      ? `${FTDateFormat(ticketData.arrivalDate)}`
                       : "N/A",
                   },
                   {

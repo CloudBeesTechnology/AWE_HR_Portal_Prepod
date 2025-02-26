@@ -30,9 +30,9 @@ export const ViewSummaryTable = ({
     getStartDate,
     getEndDate,
     startDate,
+    endDate,
     setStartDate,
     setEndDate,
-    endDate,
   } = useTempID();
 
   function calculateTotalWorkingHours(data) {
@@ -201,7 +201,7 @@ export const ViewSummaryTable = ({
                 data.map((employee, index) => {
                   const totalOT = Object.values(
                     employee?.OVERTIMEHRS || {}
-                  ).reduce((acc, ot) => acc + parseInt(ot || 0), 0);
+                  ).reduce((acc, ot) => acc + parseFloat(ot || 0), 0);
 
                   const getTotalHours =
                     calculateTotalWorkingHours(employee?.workingHrs) || 0;

@@ -1,74 +1,79 @@
-// import React from 'react';
 
-// export const DeleteDocsDep = (fileType, fileName, empID, setUploadedFileNames, setUploadDepIns, setIsUploading) => {
-//   try {
-//     console.log("DeleteDocsDep triggered with:", { fileType, fileName, empID });
+export const DeleteDocsDep = (
+  fileType,
+  fileName,
+  empID,
+  setUploadedFileNames,
+  setUploadedDocs,
+  uploadedDocs,
+  index,
+  setIsUploading
+) => {
+  
 
-//     // Update uploaded file names
-//     setUploadedFileNames((prev) => {
-//       console.log("Previous uploadedFileNames:", prev);
+  try {
+    // console.log("Inside try block");
+    setUploadedFileNames((prev) => {
+      // console.log("Previous uploadedFileDep state:", prev);  depInsurance
 
-//       const updatedFiles = { ...prev };
-//       console.log("Copy of previous uploadedFileNames:", updatedFiles);
 
-//       if (Array.isArray(updatedFiles[fileType])) {
-//         console.log(`Removing ${fileName} from array of fileType: ${fileType}`);
-//         updatedFiles[fileType] = updatedFiles[fileType].filter((name) => name !== fileName);
-//       } else if (typeof updatedFiles[fileType] === "string") {
-//         console.log(`Checking string value for ${fileType}:`, updatedFiles[fileType]);
-//         if (updatedFiles[fileType] === fileName) {
-//           updatedFiles[fileType] = [];
-//         }
-//       }
+      const updatedDepFiles = { ...prev };
 
-//       if (!updatedFiles[fileType] || updatedFiles[fileType].length === 0) {
-//         console.log(`No files left for fileType ${fileType}, setting to empty array.`);
-//         updatedFiles[fileType] = [];
-//       }
+      // Find the key associated with the fileName and remove it
+      Object.keys(updatedDepFiles).forEach((key) => {
+        if (updatedDepFiles[key] === fileName) {
+          delete updatedDepFiles[key]; // Remove the key from the object
+        }
+      });
 
-//       console.log("Updated uploadedFileNames:", updatedFiles);
-//       return updatedFiles;
-//     });
+      // console.log("Updated uploadedFileDep state:", updatedDepFiles);
+      return updatedDepFiles;
+    });
+    
+    
+    
+    setUploadedDocs((prev) => {
+      const updatedFiles = { ...prev };
 
-//     // Update uploaded documents state
-//     setUploadDepIns((prev) => {
-//       console.log("Previous uploadDepIns state:", prev);
+      // Ensure `depInsurance` is an object
+      if (
+        !updatedFiles.depInsurance ||
+        typeof updatedFiles.depInsurance !== "object"
+      ) {
+        updatedFiles.depInsurance = {};
+      }
 
-//       const updatedFiles = { ...prev };
-//       console.log("Copy of previous uploadDepIns state:", updatedFiles);
+      // Ensure `depInsurance[index]` is an array
+      if (!Array.isArray(updatedFiles.depInsurance[index])) {
+        updatedFiles.depInsurance[index] = [];
+      }
 
-//       if (Array.isArray(updatedFiles[fileType])) {
-//         console.log(`Filtering out file with name: ${fileName} from uploadDepIns for fileType ${fileType}`);
-//         updatedFiles[fileType] = updatedFiles[fileType].filter(
-//           (file) => file.upload !== `public/${fileType}/${empID}/${fileName}`
-//         );
-        
-//         // If no files are left for that fileType, reset to empty array
-//         if (updatedFiles[fileType]) {
-//           console.log(`No files left in uploadDepIns for fileType ${fileType}, resetting array.`);
-//           updatedFiles[fileType] = []; // Explicit reset of array
-//         }
-//       }
+      // Find the object index to remove
+      const objectIndex = updatedFiles.depInsurance[index].findIndex(
+        (file) => file.upload === `public/${fileType}/${empID}/${fileName}`
+      );
+      //   console.log(objectIndex,"8952");
 
-//       console.log("Updated uploadDepIns:", updatedFiles);
-//       return updatedFiles;
-//     });
+      if (objectIndex !== -1) {
+        // Remove the found object while keeping the array structure intact
+        // console.log(updatedFiles.depInsurance[index]);
+        updatedFiles.depInsurance[index].splice(objectIndex, 1);
+      }
 
-//     // Set uploading state to false for the specific fileType only if no files are left
-//     setIsUploading((prev) => {
-//       console.log("Previous isUploading state:", prev);
-      
-//       // Check if the fileType is completely empty
-//       const updatedState = {
-//         ...prev,
-//         [fileType]: !Array.isArray(prev[fileType]) || prev[fileType]?.length === 0, // If fileType has no files, set to false
-//       };
+      // If the inner array is now empty, remove it from the object
+      if (updatedFiles.depInsurance[index].length === 0) {
+        delete updatedFiles.depInsurance[index];
+      }
 
-//       console.log("Updated isUploading state:", updatedState);
-//       return updatedState;
-//     });
+      return updatedFiles;
+    });
 
-//   } catch (error) {
-//     console.log("Error in DeleteDocsDep:", error, "deletedarrayUpload in employee info");
-//   }
-// };
+    setIsUploading((prev) => ({
+      ...prev,
+      [index]: false,
+    }));
+    // This should print if function is called
+  } catch (err) {
+    console.log("Caught error:", err);
+  }
+};

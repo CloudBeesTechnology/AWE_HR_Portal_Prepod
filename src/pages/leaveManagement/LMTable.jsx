@@ -51,33 +51,57 @@ export const LMTable = () => {
           return true;
         }
         return false;
-      })
-      .sort((a, b) => {
-
-        if (userType === "SuperAdmin") {
-          const dateA = new Date(a.leaveStatusReceivedDate || a.leaveStatusCreatedAt);
-          const dateB = new Date(b.leaveStatusReceivedDate || b.leaveStatusCreatedAt);
-      
-          return dateB - dateA;
+      })  .sort((a, b) => {
+     
+        function toISODate(dateString) {
+            // console.log("Original date string:", dateString); 
+  
+            const ddmmyyyyRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+            const iso8601Regex = /^\d{4}-\d{2}-\d{2}$/;
+    
+            if (ddmmyyyyRegex.test(dateString)) {
+                const [, day, month, year] = ddmmyyyyRegex.exec(dateString);
+                const formattedDate = `${year}-${month}-${day}`;
+                // console.log("Converted DD/MM/YYYY to ISO:", formattedDate); 
+                return formattedDate;  
+            }
+    
+            if (iso8601Regex.test(dateString)) {
+                const formattedDate = `${dateString}T00:00:00.000Z`;  
+                // console.log("Converted YYYY-MM-DD to ISO 8601:", formattedDate);  
+                return formattedDate; 
+            }
+    
+            const isoDate = new Date(dateString).toISOString();  
+            // console.log("Converted to full ISO 8601:", isoDate);  
+            return isoDate;  
         }
-
+    
+        if (userType === "SuperAdmin") {
+            const dateA = toISODate(a.leaveStatusReceivedDate || a.leaveStatusCreatedAt);
+            const dateB = toISODate(b.leaveStatusReceivedDate || b.leaveStatusCreatedAt);
+    
+            return new Date(dateB) - new Date(dateA);
+        }
+    
         const isManagerPendingA = a.managerStatus === "Pending";
         const isManagerPendingB = b.managerStatus === "Pending";
         const isSupervisorPendingA = a.supervisorStatus === "Pending";
         const isSupervisorPendingB = b.supervisorStatus === "Pending";
-  
+    
         if (isManagerPendingA && !isManagerPendingB) return -1;
         if (!isManagerPendingA && isManagerPendingB) return 1;       
         if (isSupervisorPendingA && !isSupervisorPendingB) return -1;
         if (!isSupervisorPendingA && isSupervisorPendingB) return 1;
-  
-         const dateA = new Date(a.leaveStatusReceivedDate || a.leaveStatusCreatedAt);
-          const dateB = new Date(b.leaveStatusReceivedDate || b.leaveStatusCreatedAt);
       
-        return dateB - dateA ;
-
-      });
-
+        const dateA = toISODate(a.leaveStatusCreatedAt || a.leaveStatusReceivedDate);
+        const dateB = toISODate(b.leaveStatusCreatedAt || b.leaveStatusReceivedDate);
+    
+        // console.log("Final DateA:", dateA, "Final DateB:", dateB);  
+      
+        return new Date(dateB) - new Date(dateA);
+    });
+    
     // Step 2: Apply status filter
     if (filterStatus !== "All") {
       filteredData = filteredData.filter((item) => {

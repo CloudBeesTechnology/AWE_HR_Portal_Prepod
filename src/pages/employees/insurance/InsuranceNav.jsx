@@ -169,7 +169,6 @@ export const InsuranceNav = () => {
             Dependent Insurance
           </button>
         </div>
-
         {/* Render Child Components */}
         <div>
           <Outlet context={{ activeNavTab, handleNext, searchResultData }} />

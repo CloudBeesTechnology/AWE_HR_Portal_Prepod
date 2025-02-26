@@ -1,10 +1,10 @@
 import { remove } from "aws-amplify/storage";
 
 export const handleDeleteFile = async (fileType, fileName, empID) => {
-  if (!empID) {
-    alert("Please provide the Employee ID before deleting files.");
-    return false;
-  }
+  // if (!empID) {
+  //   alert("Please provide the Employee ID before deleting files.");
+  //   return false;
+  // }
   if (!fileName) {
     alert("File name is missing. Please select a valid file to delete.");
     console.error("Missing fileName. Received parameters:", { fileType, empID, fileName });
