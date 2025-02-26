@@ -78,7 +78,7 @@ export const CRLeaveData = () => {
       : null;
     // console.log(timingchangeFromDate);
     const toValue = DateFormat(toDate);
-    const timingchangeToDate = toValue ? new Date(toValue).toISOString() : null;
+    const timingchangeToDate = toValue ? new Date(toValue)?.toISOString() : null;
     // console.log(timingchangeToDate);
     const supervisorDatevalue = DateFormat(supervisorDate);
     // console.log(supervisorDatevalue);
