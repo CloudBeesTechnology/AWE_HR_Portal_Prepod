@@ -60,8 +60,8 @@ export const ApplicationReceived = () => {
                 const positionCount = empPDData?.filter((emp) => {
                   const empCreatedAt = new Date(emp.createdAt);
                   return (
-                    emp.position.trim().toLowerCase() ===
-                      item.jobTitle.trim().toLowerCase() &&
+                    emp?.position?.trim().toLowerCase() ===
+                      item?.jobTitle?.trim().toLowerCase() &&
                     empCreatedAt >= startDate &&
                     empCreatedAt <= expiryDate
                   );
