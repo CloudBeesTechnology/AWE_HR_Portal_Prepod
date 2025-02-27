@@ -39,12 +39,15 @@ export const LeaveStatus = () => {
   // Link 4:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus/LeaveStatus2025Supervisor.csv"
   // Link 5:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus+Dev/LeaveStatusTesting+Prod.csv" date:22-02-2025 time:12:40
   // Link 6:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus/LeaveStatus2025.csv" date:22-02-2025 time:5:52
+  // Link 7:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus/LeaveStatus2025Supervisor.csv" date:25-02-2025 time:4:00
+  // Link 8:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus/LeaveStatuS2024.csv" date:25-02-2025 time:4:16
+  // Link 9:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus/LeaveStatus2024Supervisor.csv" date:25-02-2025 time:4:27
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus/LeaveStatus2025.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus/LeaveStatus2024Supervisor.csv",
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
