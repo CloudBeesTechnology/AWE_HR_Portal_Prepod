@@ -28,6 +28,7 @@ import { LoadingMessRejectTab } from "../pages/timeSheet/customTimeSheet/Loading
 import { LoadingMessManagerTable } from "../pages/timeSheet/customTimeSheet/LoadingMessManagerTable";
 import { FiLoader } from "react-icons/fi";
 import { ViewOffshoreORMCsheet } from "../pages/timeSheet/ViewOffshoreORMCsheet";
+import { UploadEditedHO } from "../pages/timeSheet/uploadManuallyEditedExcel/UploadEditedHO";
 
 const client = generateClient();
 export const TimeSheetBrowser = ({
@@ -212,6 +213,18 @@ export const TimeSheetBrowser = ({
           setLoading
         );
         setReturnedTHeader(result);
+
+        if (result === false) {
+          const editedResult =  UploadEditedHO(
+            excelFile,
+            setExcelData,
+            setExcelFile,
+            fileInputRef,
+            setLoading
+          );
+
+          setReturnedTHeader(editedResult);
+        }
         fileInputRef.current.value = "";
         setExcelFile(null);
       } else if (titleName === "BLNG") {

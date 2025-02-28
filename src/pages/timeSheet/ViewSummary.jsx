@@ -162,7 +162,10 @@ export const ViewSummary = () => {
             return info.id;
           });
         });
-
+        function getIndianRawTimeISO() {
+          return new Date().toISOString();
+        }
+        const UpdatedBruneDateTime = getIndianRawTimeISO();
         const result = data.map((obj) => {
           const empBadgeNoMatch =
             obj.empBadgeNo &&
@@ -173,7 +176,7 @@ export const ViewSummary = () => {
             obj.sapNo && sapNo && String(obj.sapNo) === String(sapNo);
 
           let updatedObj = { ...obj };
-
+          // obj.getVerify[formattedDate] = "Yes",
           const isUpdated = obj.data.some((val) => {
             const pickObj = objData.find((fi) => fi.id);
             const getId = val.empWorkInfo.find((emp) => emp.id);
@@ -197,6 +200,24 @@ export const ViewSummary = () => {
                   ...obj.OVERTIMEHRS,
                   [workingHrsKey]: overtimeHrs,
                 },
+                getVerify: {
+                  ...obj.getVerify,
+                  [workingHrsKey]: "Yes",
+                },
+
+                assignUpdaterDateTime: {
+                  ...obj.assignUpdaterDateTime,
+                  [workingHrsKey]: UpdatedBruneDateTime,
+                },
+
+                data: obj.data.map((item) => {
+                  return {
+                    ...item,
+                    empWorkInfo: item.empWorkInfo.map((emp) =>
+                      emp.id === pickObj.id ? { ...emp, verify: "Yes" } : emp
+                    ),
+                  };
+                }),
               };
 
               return true;

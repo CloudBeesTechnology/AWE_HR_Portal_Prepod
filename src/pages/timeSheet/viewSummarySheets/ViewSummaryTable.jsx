@@ -112,6 +112,7 @@ export const ViewSummaryTable = ({
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
   var data = currentData;
+ 
   return (
     <div className="bg-[#fafaf6] h-screen">
       <div className="screen-size p-4">
@@ -199,10 +200,10 @@ export const ViewSummaryTable = ({
             <tbody>
               {loading && data && data?.length > 0 ? (
                 data.map((employee, index) => {
-                  const totalOT = Object.values(
+                  const floatTotalOT = Object.values(
                     employee?.OVERTIMEHRS || {}
                   ).reduce((acc, ot) => acc + parseFloat(ot || 0), 0);
-
+                  const totalOT = Number(floatTotalOT.toFixed(2));
                   const getTotalHours =
                     calculateTotalWorkingHours(employee?.workingHrs) || 0;
                   const roundedNumberOfTotalHours = Number(

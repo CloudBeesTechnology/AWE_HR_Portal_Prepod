@@ -487,7 +487,7 @@ export const ViewBLNGsheet = ({
     }
   };
 
-  const handleManagerReload = async() => {
+  const handleManagerReload = async () => {
     let mergedData = [...allApprovedData, ...allRejectedData];
     const remainingData = data?.filter(
       (row) => !mergedData.some((selected) => selected.id === row.id)

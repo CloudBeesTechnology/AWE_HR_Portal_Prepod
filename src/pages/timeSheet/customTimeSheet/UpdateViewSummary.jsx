@@ -179,6 +179,7 @@ export const UpdateViewSummary = async (object) => {
               LOCATION: object?.location || "",
               WORKINGHRS: extractNumber(obj.workingHrs) || "",
               OVERTIMEHRS: obj.ot || "",
+              verify: "Yes"
             };
           });
 

@@ -6,7 +6,7 @@ import { IoSearch } from "react-icons/io5";
 import { Pagination } from "./Pagination";
 import { Filter } from "./Filter";
 import { NavigateLM } from "./NavigateLM";
-import { capitalizedLetter, DateFormat, FTDateFormat } from "../../utils/DateFormat";
+import { capitalizedLetter, DateFormat } from "../../utils/DateFormat";
 import { FiLoader } from "react-icons/fi";
 import { useTempID } from "../../utils/TempIDContext";
 
@@ -14,16 +14,16 @@ export const TicketsTable = () => {
   const { handleViewClick, handleClickForToggle, userType } =
     useOutletContext();
 
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState([]); 
   // const [loading, setLoading] = useState(false);
   const [secondartyData, setSecondartyData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(30);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
   const [data, setData] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
-  const { gmPosition } = useTempID();
+  const { gmPosition, HRMPosition  } = useTempID();
   const { ticketMerged, loading } = useLeaveManage();
 
   // Add new state to track all filters
@@ -41,7 +41,7 @@ export const TicketsTable = () => {
   });
 
   const GM = "GENERAL MANAGER";
-  const HR = "HR";
+  const HRM = "HR MANAGER"
 
   useEffect(() => {
     // If no filters are active, show all data
@@ -95,7 +95,7 @@ export const TicketsTable = () => {
     if (filters.status !== "All") {
       filteredResults = filteredResults.filter(
         (item) =>
-          (userType === HR && item.hrStatus === filters.status) ||
+          (HRMPosition === HRM && item.hrStatus === filters.status) ||
           (gmPosition === GM && item.gmStatus === filters.status)
       );
     }
@@ -165,8 +165,7 @@ export const TicketsTable = () => {
       setCurrentPage(1);
 
     }
-   
-
+  
     // Update the error message state or flag if needed
     const noResults = filteredResults.length === 0;
     const searchError = !searchMatches;
@@ -217,6 +216,7 @@ export const TicketsTable = () => {
     // setLoading(false);
   }, [currentPage, rowsPerPage, data]);
 
+  
   // Update handlers to use new filters state
   const handleDateChange = (event) => {
     const date = event.target.value;
@@ -272,7 +272,7 @@ export const TicketsTable = () => {
     "Name",
     "Department",
     "Position",
-    "Date Join", 
+    "Received Date", 
     "Departure date",
     "Arrival date",
     "Submitted form",
@@ -380,7 +380,7 @@ export const TicketsTable = () => {
                 return (
                   <tr
                     key={index}
-                    className="text-center text-sm shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
+                    className="text-center text-sm border-b-2 bg-white border-[#C7BCBC] text-[#303030] hover:bg-medium_blue"
                   >
                     <td className="border-b-2 border-[#CECECE] py-5">
                       {displayIndex}
@@ -410,12 +410,12 @@ export const TicketsTable = () => {
                     </td>
                     <td className="border-b-2 border-[#CECECE] py-5">
                       {item.empDepartureDate ||
-                        FTDateFormat(item.departureDate) ||
+                        DateFormat(item.departureDate) ||
                         "N/A"}
                     </td>
                     <td className="border-b-2 border-[#CECECE] py-5">
                       {item.empArrivalDate ||
-                        FTDateFormat(item.arrivalDate) ||
+                        DateFormat(item.arrivalDate) ||
                         "N/A"}
                     </td>
                     <td className="border-b-2 border-[#CECECE] cursor-pointer py-5">

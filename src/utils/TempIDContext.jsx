@@ -25,6 +25,7 @@ export const TempIDProvider = ({ children }) => {
 
   const [gmMail, setGmMail] = useState();
   const [hrManagerMail, setHrManagerMail] = useState();
+  const [HRMPosition, setHRMPosition] = useState("");
   const [gmCount, setGmCount] = useState(0);
   const [hrManagerCount, setHrManagerCount] = useState(0);
   const [userType, setUserType] = useState("");
@@ -90,6 +91,20 @@ export const TempIDProvider = ({ children }) => {
       const hrManagerPositions = workInfoData.filter((item) =>
         item.position.includes("HR MANAGER")
       );
+
+      const HRMPosition = hrManagerPositions[0]; 
+
+      if (HRMPosition && HRMPosition.position.length > 0) {
+        const lastPosition =
+          HRMPosition.position[HRMPosition.position.length - 1];
+        // console.log("Last Position:", lastPosition);
+
+        if (userID === HRMPosition.empID) {
+          setHRMPosition(lastPosition);
+          console.log("HRM Position Set:", lastPosition);
+        }
+      }
+
       setHrManagerCount(hrManagerPositions.length);
 
       if (hrManagerPositions.length > 0) {
@@ -110,6 +125,7 @@ export const TempIDProvider = ({ children }) => {
   return (
     <TempIDContext.Provider
       value={{
+        HRMPosition,
         gmMail,
         gmPosition,
         GMEmpID,

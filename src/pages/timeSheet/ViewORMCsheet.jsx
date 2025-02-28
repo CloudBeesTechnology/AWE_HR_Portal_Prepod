@@ -376,7 +376,7 @@ export const ViewORMCsheet = ({
     }
   };
 
-  const handleManagerReload = async() => {
+  const handleManagerReload = async () => {
     let mergedData = [...allApprovedData, ...allRejectedData];
     const remainingData = data?.filter(
       (row) => !mergedData.some((selected) => selected.id === row.id)
@@ -562,7 +562,7 @@ export const ViewORMCsheet = ({
         );
 
         storeApproveRej = [];
-        await  handleManagerReload();
+        await handleManagerReload();
       }
     } else if (
       userIdentification !== "Manager" &&
