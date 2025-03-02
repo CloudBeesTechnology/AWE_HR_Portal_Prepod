@@ -336,7 +336,7 @@ export const DependentPass = ({
 
         // console.log("File deleted successfully:", fileName);
       setdeleteTitle1(
-        `${fileName} Deleted Successfully`
+        `${fileName}`
       );
       handleDeleteMsg();
       }

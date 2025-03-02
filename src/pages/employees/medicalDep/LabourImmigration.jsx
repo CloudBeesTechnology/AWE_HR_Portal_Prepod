@@ -182,7 +182,7 @@ const LabourImmigration = () => {
       }
       // console.log(`Deleted "${fileName}". Remaining files:`);
       setdeleteTitle1(
-        `${fileName} Deleted Successfully`
+        `${fileName}`
       );
       handleDeleteMsg();
     } catch (error) {
