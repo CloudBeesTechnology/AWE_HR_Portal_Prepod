@@ -14,8 +14,10 @@ import { useOutletContext } from "react-router-dom";
 import { LabCreFun } from "../../../services/createMethod/LabCreFun";
 import { DeleteDocsLD } from "../../../services/uploadDocsDelete/DeleteDocsLD";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
-
+import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../../utils/DeletePopup";
 export const LabourDeposit = () => {
+   const { formattedPermissions } = useDeleteAccess();
   const { searchResultData } = useOutletContext();
 
   useEffect(() => {
@@ -25,6 +27,7 @@ export const LabourDeposit = () => {
   const { BJLData } = useContext(DataSupply);
   const { UpdateLDData } = UpdateLDFun();
   const { LabourCreData } = LabCreFun();
+  
   const {
     register,
     handleSubmit,
@@ -34,20 +37,20 @@ export const LabourDeposit = () => {
   } = useForm({
     resolver: yupResolver(LabourDepositSchema),
   });
-
+const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
   const [labourDate, setLabourDate] = useState([]);
-   const [isUploading, setIsUploading] = useState({
+  const [isUploading, setIsUploading] = useState({
     lbrDepoUpload: false,
-      });
+  });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     lbrDepoUpload: null,
   });
   const [uploadLD, setUploadLD] = useState({
     lbrDepoUpload: [],
   });
-
 
   const watchInducLdUpload = watch("lbrDepoUpload", "");
 
@@ -106,101 +109,103 @@ export const LabourDeposit = () => {
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
 
-   const updateUploadingState = (label, value) => {
-       setIsUploading((prev) => ({
-         ...prev,
-         [label]: value,
-       }));
-       console.log(value);
-     };
-   
-     const handleFileChange = async (e, label) => {
-       const watchedEmpID = watch("empID");
-       if (!watchedEmpID) {
-           alert("Please enter the Employee ID before uploading files.");
-           window.location.href = "/employeeInfo";
-           return;
-       }
-   
-       const selectedFile = e.target.files[0];
-       if (!selectedFile) return;
-   
-       const allowedTypes = [
-        "application/pdf",
-        "image/jpeg",
-        "image/png",
-        "image/jpg",
-      ];
-      if (!allowedTypes.includes(selectedFile.type)) {
-          alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-          return;
+  const updateUploadingState = (label, value) => {
+    setIsUploading((prev) => ({
+      ...prev,
+      [label]: value,
+    }));
+    console.log(value);
+  };
+
+  const handleFileChange = async (e, label) => {
+    const watchedEmpID = watch("empID");
+    if (!watchedEmpID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
+    }
+
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    const allowedTypes = ["application/pdf"];
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file.");
+      return;
+    }
+
+    // Ensure no duplicate files are added
+    const currentFiles = watch(label) || [];
+    if (currentFiles.some((file) => file.name === selectedFile.name)) {
+      alert("This file has already been uploaded.");
+      return;
+    }
+
+    setValue(label, [...currentFiles, selectedFile]);
+
+    try {
+      updateUploadingState(label, true);
+      await uploadDocs(selectedFile, label, setUploadLD, watchedEmpID);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [label]: selectedFile.name,
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
+  const deleteFile = async (fileType, fileName) => {
+    try {
+      const watchedEmpID = watch("empID");
+      if (!watchedEmpID) {
+        alert("Please provide the Employee ID before deleting files.");
+        return;
       }
-   
-       // Ensure no duplicate files are added
-       const currentFiles = watch(label) || [];
-       if (currentFiles.some((file) => file.name === selectedFile.name)) {
-           alert("This file has already been uploaded.");
-           return;
-       }
-   
-       // **Check if the file was previously deleted and prevent re-adding**
-      //  if (deletedFiles[label]?.includes(selectedFile.name)) {
-      //      alert("This file was previously deleted and cannot be re-added.");
-      //      return;
-      //  }
-   
-       setValue(label, [...currentFiles, selectedFile]);
-   
-       try {
-         updateUploadingState(label, true);
-         await uploadDocs(selectedFile, label, setUploadLD, watchedEmpID);
-         setUploadedFileNames((prev) => ({
-           ...prev,
-           [label]: selectedFile.name,
-         }));
-       } catch (err) {
-           console.error(err);
-       }
-     };
-   
-     const deleteFile = async (fileType, fileName) => {
-       try {
-         const watchedEmpID = watch("empID");
-         if (!watchedEmpID) {
-           alert("Please provide the Employee ID before deleting files.");
-           return;
-         }
-   
-         const isDeleted = await handleDeleteFile(
-           fileType,
-           fileName,
-           watchedEmpID
-         );
-         const isDeletedArrayUploaded = await DeleteDocsLD(
-           fileType,
-           fileName,
-           watchedEmpID,
-           setUploadedFileNames,
-           setUploadLD,
-           setIsUploading
-         );
-   
-         if (!isDeleted || isDeletedArrayUploaded) {
-           console.error(
-             `Failed to delete file: ${fileName}, skipping UI update.`
-           );
-           return;
-         }
-         // console.log(`Deleted "${fileName}". Remaining files:`);
-       } catch (error) {
-         console.error("Error deleting file:", error);
-         alert("Error processing the file deletion.");
-       }
-     };
+
+      const isDeleted = await handleDeleteFile(
+        fileType,
+        fileName,
+        watchedEmpID
+      );
+      const isDeletedArrayUploaded = await DeleteDocsLD(
+        fileType,
+        fileName,
+        watchedEmpID,
+        setUploadedFileNames,
+        setUploadLD,
+        setIsUploading
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+      setdeleteTitle1(
+        `${fileName} Deleted Successfully`
+      );
+      handleDeleteMsg();
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
+    }
+  };
 
   useEffect(() => {
     setValue("empID", searchResultData.empID);
-    const fields = ["lbrReceiptNo", "lbrDepoAmt", "lbrDepoSubmit","lbrDepoUpload"];
+    const fields = [
+      "lbrReceiptNo",
+      "lbrDepoAmt",
+      "lbrDepoSubmit",
+      "lbrDepoUpload",
+    ];
     fields.forEach((field) =>
       setValue(field, getLastValue(searchResultData[field]))
     );
@@ -222,7 +227,7 @@ export const LabourDeposit = () => {
 
         setUploadedFileNames((prev) => ({
           ...prev,
-          lbrDepoUpload: parsedFiles.map((file) => getFileName(file.upload))
+          lbrDepoUpload: parsedFiles.map((file) => getFileName(file.upload)),
         }));
       } catch (error) {
         console.error(
@@ -232,8 +237,6 @@ export const LabourDeposit = () => {
       }
     }
   }, [searchResultData, setValue]);
-
-
 
   const empID = watch("empID");
 
@@ -283,6 +286,12 @@ export const LabourDeposit = () => {
       console.error("Error submitting data:", error);
     }
   };
+
+  const requiredPermissions = [
+    "Work Pass",
+  ];
+
+  const access = "Employee"
 
   return (
     <form
@@ -341,6 +350,9 @@ export const LabourDeposit = () => {
             isUploading={isUploading}
             deleteFile={deleteFile}
             field={{ title: "lbrDepoUpload" }}
+            formattedPermissions={formattedPermissions}
+            requiredPermissions={requiredPermissions}
+            access={access}
           />
         </div>
       </div>
@@ -357,6 +369,12 @@ export const LabourDeposit = () => {
           path="/sawp/labourDeposit"
         />
       )}
+       {deletePopup && (
+                          <DeletePopup
+                            handleDeleteMsg={handleDeleteMsg}
+                            title1={deleteTitle1}
+                          />
+                        )}
     </form>
   );
 };

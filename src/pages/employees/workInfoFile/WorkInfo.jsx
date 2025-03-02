@@ -12,7 +12,7 @@ import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
 import { FormField } from "../../../utils/FormField";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import {leavePassDD,workInfoUploads} from "../../../utils/DropDownMenus";
-import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteDocsWI";
+import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 import { MdCancel } from "react-icons/md";
 import { UploadingFiles } from "../../employees/medicalDep/FileUploadField";
 import { SpinLogo } from "../../../utils/SpinLogo";
@@ -27,8 +27,11 @@ import { CreateLeaveData } from "../../../services/createMethod/CreateLeaveData"
 import { CreateTerminate } from "../../../services/createMethod/CreateTerminate";
 import { CreateSRData } from "../../../services/createMethod/CreateSRData";
 import { DeleteDocsWI } from "../../../services/uploadDocsDelete/DeleteDocsWI";
+import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../../utils/DeletePopup";
 
 export const WorkInfo = () => {
+  const { formattedPermissions } = useDeleteAccess();
   const { WIUpdateData } = UpdateWIData();
   const { WIUpdateSRData } = UpdateWISRData();
   const { WIUpdateLeaveData } = UpdateWILeaveData();
@@ -69,7 +72,8 @@ export const WorkInfo = () => {
     },
     resolver: yupResolver(WorkInfoSchema),
   });
-
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
@@ -247,6 +251,10 @@ export const WorkInfo = () => {
     }
   };
 
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
   const deleteFile = async (fileType, fileName) => {
     try {
       const watchedEmpID = watch("empID");
@@ -275,6 +283,10 @@ export const WorkInfo = () => {
         );
         return;
       }
+      setdeleteTitle1(
+        `${fileName}`
+      );
+      handleDeleteMsg();
       // console.log(`Deleted "${fileName}". Remaining files:`);
     } catch (error) {
       console.error("Error deleting file:", error);
@@ -584,6 +596,13 @@ fieldValue.forEach((val) => {
       console.log("Error during submission:", err);
     }
   };
+
+  const requiredPermissions = [
+    "Work Info",
+  ];
+
+  const access = "Employee"
+
   return (
     <section
       className="bg-[#F5F6F1CC] mx-auto p-10"
@@ -864,7 +883,6 @@ fieldValue.forEach((val) => {
                   <h2 className="text_size_5">Upload {field.label}</h2>
                   <label
                     onClick={() => {
-                      
                       if (isUploading[field.title]) {
                         alert(
                           "Delete already uploaded Files or save an uploaded file."
@@ -886,51 +904,54 @@ fieldValue.forEach((val) => {
                     </span>
                   </label>
 
-                     <p className="text-xs mt-1 text-grey px-1">
-                                      {uploadedFileNames?.[field.title] ? (
-                                        Array.isArray(uploadedFileNames[field.title]) ? (
-                                          uploadedFileNames[field.title]
-                                            .slice() // Create a shallow copy to avoid mutating the original array
-                                            .reverse()
-                                            .map((fileName, fileIndex) => (
-                                              <span
-                                                key={fileIndex}
-                                                className="mt-2 flex justify-between items-center"
-                                              >
-                                                {fileName}
-                                                <button
-                                                  type="button"
-                                                  className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-                                                  onClick={() =>
-                                                    deleteFile(field.title, fileName)
-                                                  }
-                                                >
-                                                  <MdCancel />
-                                                </button>
-                                              </span>
-                                            ))
-                                        ) : (
-                                          <span className="mt-2 flex justify-between items-center">
-                                            {uploadedFileNames[field.title]}
-                                            <button
-                                              type="button"
-                                              className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-                                              onClick={() =>
-                                                deleteFile(
-                                                  field.title,
-                                                  uploadedFileNames[field.title]
-                                                )
-                                              }
-                                            >
-                                              <MdCancel />
-                                            </button>
-                                          </span>
-                                        )
-                                      ) : (
-                                        <span></span>
-                                      )}
-                      </p>
-                 
+                  <p className="text-xs mt-1 text-grey px-1">
+                    {uploadedFileNames?.[field.title] ? (
+                      Array.isArray(uploadedFileNames[field.title]) ? (
+                        uploadedFileNames[field.title]
+                          .slice() // Create a shallow copy to avoid mutating the original array
+                          .reverse()
+                          .map((fileName, fileIndex) => (
+                            <span
+                              key={fileIndex}
+                              className="mt-2 flex justify-between items-center"
+                            >
+                              {fileName}
+                              {formattedPermissions?.deleteAccess?.Employee?.includes(
+                              "Work Info") && (
+                              <button
+                                type="button"
+                                className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                                onClick={() =>
+                                  deleteFile(field.title, fileName)
+                                }
+                              >
+                                <MdCancel />
+                              </button>
+                              )}
+                            </span>
+                          ))
+                      ) : (
+                        <span className="mt-2 flex justify-between items-center">
+                          {uploadedFileNames[field.title]}
+                          <button
+                            type="button"
+                            className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                            onClick={() =>
+                              deleteFile(
+                                field.title,
+                                uploadedFileNames[field.title]
+                              )
+                            }
+                          >
+                            <MdCancel />
+                          </button>
+                        </span>
+                      )
+                    ) : (
+                      <span></span>
+                    )}
+                  </p>
+
                   {errors[field.title] && (
                     <p className="text-red text-xs mt-1">
                       {errors[field.title].message}
@@ -961,6 +982,10 @@ fieldValue.forEach((val) => {
                   deleteFile={deleteFile}
                   isUploading={isUploading}
                   errors={errors}
+                  formattedPermissions={formattedPermissions}
+                  requiredPermissions={requiredPermissions}
+                  access={access}
+                  check={isUploading}
                 />
               ) : (
                 <div key={index}>
@@ -1003,6 +1028,12 @@ fieldValue.forEach((val) => {
           path="/workInfo"
         />
       )}
+       {deletePopup && (
+                          <DeletePopup
+                            handleDeleteMsg={handleDeleteMsg}
+                            title1={deleteTitle1}
+                          />
+                        )}
     </section>
   );
 };

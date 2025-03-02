@@ -12,8 +12,10 @@ import { useOutletContext } from "react-router-dom";
 import { CreateDoe } from "../../../services/createMethod/CreateDoe";
 import { DeleteDocsDoeUp } from "../../../services/uploadDocsDelete/DeleteDocsDoeUp";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
+import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../../utils/DeletePopup";
 
-export const Doe = () => {  
+export const Doe = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
@@ -22,6 +24,7 @@ export const Doe = () => {
   const { DNData } = useContext(DataSupply);
   const { CrerDoeFunData } = CreateDoe();
   const { UpdateMPData } = UpdateDataFun();
+  const { formattedPermissions } = useDeleteAccess();
 
   const {
     register,
@@ -35,19 +38,19 @@ export const Doe = () => {
     doeEmpApproval: [],
     doeEmpValid: [],
   });
-
+const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
-     const [isUploading, setIsUploading] = useState({
-      doeEmpUpload: false,
-      });
+  const [isUploading, setIsUploading] = useState({
+    doeEmpUpload: false,
+  });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     doeEmpUpload: null,
   });
   const [uploadDoe, setUploadDoe] = useState({
     doeEmpUpload: [],
   });
-
 
   // const [fieldTitle, setFieldTitle] = useState("doeEmpUpload");
   const empID = watch("empID");
@@ -83,112 +86,113 @@ export const Doe = () => {
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
 
- const updateUploadingState = (label, value) => {
-     setIsUploading((prev) => ({
-       ...prev,
-       [label]: value,
-     }));
-     console.log(value);
-   };
- 
-   const handleFileChange = async (e, label) => {
-     const watchedEmpID = watch("empID");
-     if (!watchedEmpID) {
-         alert("Please enter the Employee ID before uploading files.");
-         window.location.href = "/employeeInfo";
-         return;
-     }
- 
-     const selectedFile = e.target.files[0];
-     if (!selectedFile) return;
- 
-     const allowedTypes = [
-      "application/pdf",
-      "image/jpeg",
-      "image/png",
-      "image/jpg",
-    ];
-    if (!allowedTypes.includes(selectedFile.type)) {
-        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-        return;
+  const updateUploadingState = (label, value) => {
+    setIsUploading((prev) => ({
+      ...prev,
+      [label]: value,
+    }));
+    console.log(value);
+  };
+
+  const handleFileChange = async (e, label) => {
+    const watchedEmpID = watch("empID");
+    if (!watchedEmpID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
     }
- 
-     // Ensure no duplicate files are added
-     const currentFiles = watch(label) || [];
-     if (currentFiles.some((file) => file.name === selectedFile.name)) {
-         alert("This file has already been uploaded.");
-         return;
-     }
- 
-     // **Check if the file was previously deleted and prevent re-adding**
+
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    const allowedTypes = ["application/pdf"];
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file.");
+      return;
+    }
+
+    // Ensure no duplicate files are added
+    const currentFiles = watch(label) || [];
+    if (currentFiles.some((file) => file.name === selectedFile.name)) {
+      alert("This file has already been uploaded.");
+      return;
+    }
+
+    // **Check if the file was previously deleted and prevent re-adding**
     //  if (deletedFiles[label]?.includes(selectedFile.name)) {
     //      alert("This file was previously deleted and cannot be re-added.");
     //      return;
     //  }
- 
-     setValue(label, [...currentFiles, selectedFile]);
- 
-     try {
-       updateUploadingState(label, true);
-       await uploadDocs(selectedFile, label, setUploadDoe, watchedEmpID);
-       setUploadedFileNames((prev) => ({
-         ...prev,
-         [label]: selectedFile.name,
-       }));
-     } catch (err) {
-         console.error(err);
-     }
-   };
- 
-   const deleteFile = async (fileType, fileName) => {
-     try {
-       const watchedEmpID = watch("empID");
-       if (!watchedEmpID) {
-         alert("Please provide the Employee ID before deleting files.");
-         return;
-       }
- 
-       const isDeleted = await handleDeleteFile(
-         fileType,
-         fileName,
-         watchedEmpID
-       );
-       const isDeletedArrayUploaded = await DeleteDocsDoeUp(
-         fileType,
-         fileName,
-         watchedEmpID,
-         setUploadedFileNames,
-         setUploadDoe,
-         setIsUploading
-       );
- 
-       if (!isDeleted || isDeletedArrayUploaded) {
-         console.error(
-           `Failed to delete file: ${fileName}, skipping UI update.`
-         );
-         return;
-       }
-       // console.log(`Deleted "${fileName}". Remaining files:`);
-     } catch (error) {
-       console.error("Error deleting file:", error);
-       alert("Error processing the file deletion.");
-     }
-   };
-  
+
+    setValue(label, [...currentFiles, selectedFile]);
+
+    try {
+      updateUploadingState(label, true);
+      await uploadDocs(selectedFile, label, setUploadDoe, watchedEmpID);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [label]: selectedFile.name,
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
+  const deleteFile = async (fileType, fileName) => {
+    try {
+      const watchedEmpID = watch("empID");
+      if (!watchedEmpID) {
+        alert("Please provide the Employee ID before deleting files.");
+        return;
+      }
+
+      const isDeleted = await handleDeleteFile(
+        fileType,
+        fileName,
+        watchedEmpID
+      );
+      const isDeletedArrayUploaded = await DeleteDocsDoeUp(
+        fileType,
+        fileName,
+        watchedEmpID,
+        setUploadedFileNames,
+        setUploadDoe,
+        setIsUploading
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+      setdeleteTitle1(
+        `${fileName} Deleted Successfully`
+      );
+      handleDeleteMsg();
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
+    }
+  };
 
   useEffect(() => {
-    setValue("empID", searchResultData.empID); 
+    setValue("empID", searchResultData.empID);
     const fields = [
       "doeEmpSubmit",
       "doeEmpApproval",
       "doeEmpValid",
       "doeEmpRefNo",
-      "doeEmpUpload"
+      "doeEmpUpload",
     ];
     fields.forEach((field) =>
       setValue(field, getLastValue(searchResultData[field]))
     );
-
 
     if (searchResultData && searchResultData.doeEmpUpload) {
       try {
@@ -207,7 +211,7 @@ export const Doe = () => {
 
         setUploadedFileNames((prev) => ({
           ...prev,
-          doeEmpUpload: parsedFiles.map((file) => getFileName(file.upload)), 
+          doeEmpUpload: parsedFiles.map((file) => getFileName(file.upload)),
         }));
       } catch (error) {
         console.error(
@@ -217,7 +221,6 @@ export const Doe = () => {
       }
     }
   }, [searchResultData, setValue]);
-
 
   const onSubmit = async (data) => {
     try {
@@ -288,6 +291,12 @@ export const Doe = () => {
     }
   };
 
+  const requiredPermissions = [
+    "Work Pass",
+  ];
+
+  const access = "Employee"
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -347,6 +356,9 @@ export const Doe = () => {
           isUploading={isUploading}
           deleteFile={deleteFile}
           field={{ title: "doeEmpUpload" }}
+          formattedPermissions={formattedPermissions}
+          requiredPermissions={requiredPermissions}
+          access={access}
         />
       </div>
       <div className="flex justify-center items-center my-10">
@@ -361,6 +373,12 @@ export const Doe = () => {
           path="/sawp/doe"
         />
       )}
+       {deletePopup && (
+                          <DeletePopup
+                            handleDeleteMsg={handleDeleteMsg}
+                            title1={deleteTitle1}
+                          />
+                        )}
     </form>
   );
 };

@@ -23,6 +23,7 @@ export const AddNewForm = () => {
   const [isvisible, setIsVisible] = useState(false);
   const [dropDownVal, setDropDownVal] = useState([]);
   const [permissionData, setPermissionData] = useState(null);
+  const [deletePermissionData, setDeletePermissionData] = useState(null);
   const location = useLocation();
   const data = location.state?.editUserData;
   const addData = location.state?.addUserData;
@@ -32,11 +33,7 @@ export const AddNewForm = () => {
   const [showTitle, setShowTitle] = useState("");
   const userDataDetails = data?.userValue || addData?.userValue;
   const workInfoDataDetails = data?.workValue || addData?.workValue;
-  // console.log(userDataDetails );
-  // console.log(addData?.employeeValue);
-  // console.log(workInfoDataDetails);
 
-  console.log(data?.storedValue?.data);
 
   useEffect(() => {
     window.scrollTo({
@@ -65,12 +62,43 @@ export const AddNewForm = () => {
 
     // Convert the random bytes into a readable string
     const charset =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$()_{}';
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$()_{}";
     let randomString = "";
     for (let i = 0; i < length; i++) {
       randomString += charset[array[i] % charset.length];
     }
     return randomString;
+  };
+
+  const parsePermissions = (permissionsArray) => {
+    return permissionsArray.map((permissionStr) => {
+      if (!permissionStr || permissionStr === "{}") return {};
+
+      try {
+        let formattedStr = permissionStr
+          .replace(/(\w+)=/g, '"$1":') // Convert key=value to "key":value
+          .replace(/\[([^\]]+)\]/g, (_, match) => {
+            return `[${match
+              .split(", ")
+              .map((item) => `"${item}"`)
+              .join(", ")}]`; // Ensure array values are properly quoted
+          })
+          .replace(/"{/g, "{") // Remove accidental double quotes at object start
+          .replace(/}"/g, "}"); // Remove accidental double quotes at object end
+
+        // Debugging
+
+        return JSON.parse(formattedStr); // Convert corrected string to object
+      } catch (error) {
+        console.error(
+          "Parsing error:",
+          error,
+          "Original String:",
+          permissionStr
+        );
+        return {};
+      }
+    });
   };
 
   useEffect(() => {
@@ -84,7 +112,13 @@ export const AddNewForm = () => {
     const convertJson = convertToJSON(
       data?.storedValue?.data?.setPermissions[0]
     );
+
     setPermissionData(convertJson);
+
+    const [parsedPermissions] = parsePermissions([
+      data?.storedValue?.data?.setPermissions[1],
+    ]);
+    setDeletePermissionData(parsedPermissions);
   }, []);
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
@@ -128,8 +162,10 @@ export const AddNewForm = () => {
     setValue("position", getLastValue(result.position));
   };
 
-  const dropDownData = (value) => {
-    setDropDownVal([value]);
+  const dropDownData = (viewAccess, deleteAccess) => {
+    let finalData = [viewAccess, { deleteAccess: deleteAccess }];
+
+    setDropDownVal(finalData);
   };
 
   function convertToJSON(inputString) {
@@ -160,7 +196,8 @@ export const AddNewForm = () => {
   }
 
   const onSubmit = handleSubmit(async (data) => {
-    // console.log(data, "Data checking");
+    console.log(data, "Data  checking");
+console.log(dropDownVal,"setpermission");
 
     try {
       const desideCreateOrUpdate = userDataDetails.some((m) => {
@@ -180,6 +217,7 @@ export const AddNewForm = () => {
           setPermissions: dropDownVal,
           status: "Active",
         };
+        console.log("updateUserObject : ", updateUserObject);
         await client
           .graphql({
             query: updateUser,
@@ -494,7 +532,7 @@ export const AddNewForm = () => {
               <SPDropDown
                 dropDownData={dropDownData}
                 permissionData={permissionData}
-                // selectedDropDown={fetchedUserData}
+                deletePermissionData={deletePermissionData}
               />
             </div>
           </div>

@@ -35,6 +35,8 @@ import { DeletedArrayUpload } from "./DeletedArrayUpload";
 import { DeletedStringUploaded } from "./DeletedStringUploaded";
 import { FileUploadField } from "../medicalDep/FileUploadField";
 import { MdCancel } from "react-icons/md";
+import { DeletePopup } from "../../../utils/DeletePopup";
+import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
 
 export const EmployeeInfo = () => {
   useEffect(() => {
@@ -43,6 +45,9 @@ export const EmployeeInfo = () => {
       behavior: "smooth",
     });
   }, []);
+  const { formattedPermissions } = useDeleteAccess();
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const { SubmitEIData, errorEmpID } = EmpInfoFunc();
   const { UpdateEIValue } = UpdateEmpInfo();
   const { empPIData, IDData, dropDownVal } = useContext(DataSupply);
@@ -204,6 +209,10 @@ export const EmployeeInfo = () => {
     console.log(value);
   };
 
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
   const handleFileChange = async (e, label) => {
     const watchedEmpID = watch("empID");
     if (!watchedEmpID) {
@@ -281,6 +290,10 @@ export const EmployeeInfo = () => {
         );
         return;
       }
+      setdeleteTitle1(
+        `${fileName} `
+      );
+      handleDeleteMsg();
       // console.log(`Deleted "${fileName}". Remaining files:`);
     } catch (error) {
       console.error("Error deleting file:", error);
@@ -316,6 +329,10 @@ export const EmployeeInfo = () => {
         );
         return;
       }
+      setdeleteTitle1(
+        `${fileName} `
+      );
+      handleDeleteMsg();
       // console.log(`Deleted "${fileName}". Remaining files:`);
     } catch (error) {
       console.error("Error deleting file:", error);
@@ -872,7 +889,11 @@ export const EmployeeInfo = () => {
       console.log(error);
     }
   };
+  const requiredPermissions = [
+    "Employee Info",
+  ];
 
+  const access = "Employee"
   return (
     <section
       className="bg-[#F5F6F1CC] mx-auto p-10"
@@ -1043,22 +1064,27 @@ export const EmployeeInfo = () => {
           <RowTwelve register={register} errors={errors} />
 
           <div>
-  <FileUploadField
-        label="Upload Induction Form"
-        register={register}
-        fileKey="inducBriefUp"
-        handleFileUpload={handleFileUpload}
-        uploadedFileNames={uploadedFileNames}
-        deletedStringUpload={deletedStringUpload}
-        isUploadingString={isUploadingString}
-        error={errors?.inducBriefUp}
-      />
-</div>
+            <FileUploadField
+              label="Upload Induction Form"
+              register={register}
+              fileKey="inducBriefUp"
+              handleFileUpload={handleFileUpload}
+              uploadedFileNames={uploadedFileNames}
+              deletedStringUpload={deletedStringUpload}
+              isUploadingString={isUploadingString}
+              error={errors?.inducBriefUp}
+              formattedPermissions={formattedPermissions}
+              requiredPermissions={requiredPermissions}
+              access={access}
+              check={isUploadingString.inducBriefUp}         
+            />
+          </div>
+        
           <RowThirteen register={register} errors={errors} />
         </div>
 
         <div className="grid grid-cols-4 gap-5 form-group mt-5">
-        {uploadFields.map((field, index) => (
+          {uploadFields.map((field, index) => (
             <Controller
               key={index}
               name={field.title}
@@ -1101,15 +1127,19 @@ export const EmployeeInfo = () => {
                               className="mt-2 flex justify-between items-center"
                             >
                               {fileName}
-                              <button
-                                type="button"
-                                className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-                                onClick={() =>
-                                  deleteFile(field.title, fileName)
-                                }
-                              >
-                                <MdCancel />
-                              </button>
+                              {formattedPermissions?.deleteAccess?.Employee?.includes(
+                                "Employee Info"
+                              ) && (
+                                <button
+                                  type="button"
+                                  className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                                  onClick={() =>
+                                    deleteFile(field.title, fileName)
+                                  }
+                                >
+                                  <MdCancel />
+                                </button>
+                              )}
                             </span>
                           ))
                       ) : (
@@ -1134,15 +1164,15 @@ export const EmployeeInfo = () => {
                     )}
                   </p>
 
-                        {errors[field.title] && (
-                            <p className="text-red-500 text-xs mt-1">
-                                {errors[field.title].message}
-                            </p>
-                        )}
-                    </div>
-                )}
+                  {errors[field.title] && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors[field.title].message}
+                    </p>
+                  )}
+                </div>
+              )}
             />
-        ))}
+          ))}
         </div>
 
         {/* Button */}
@@ -1159,6 +1189,12 @@ export const EmployeeInfo = () => {
           />
         )}
       </form>
+      {deletePopup && (
+              <DeletePopup
+                handleDeleteMsg={handleDeleteMsg}
+                title1={deleteTitle1}
+              />
+            )}
     </section>
   );
 };

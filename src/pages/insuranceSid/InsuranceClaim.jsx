@@ -16,18 +16,24 @@ import { FormField } from "../../utils/FormField";
 import { handleDeleteFile } from "../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteClaim } from "./DeleteUpload/DeleteClaim";
 import { MdCancel } from "react-icons/md";
+import { useDeleteAccess } from "../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../utils/DeletePopup";
 
 export const InsuranceClaim = () => {
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  // useEffect(() => {
+  //   window.scrollTo({ top: 0, behavior: "smooth" });
+  // }, []);
   const { insuranceClaimsData, empPIData, dropDownVal } =
     useContext(DataSupply);
+  const { formattedPermissions } = useDeleteAccess();
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const { SubmitICData } = InsClaimFun();
   const { InsClaimUpData } = InsClaimUp();
   const [notification, setNotification] = useState(false);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
+
   const {
     register,
     handleSubmit,
@@ -84,29 +90,24 @@ export const InsuranceClaim = () => {
   const watchedEmpID = watch("empID");
 
   const handleRemoveFileClick = (index) => {
+    // Remove the insurance claim at the given index
     const newFields = insuranceClaims.filter((_, i) => i !== index);
     setinsuranceClaims(newFields);
     setValue("insuranceClaims", newFields);
 
+    // Remove the corresponding uploaded files from uploadedDocs
     setUploadedDocs((prev) => {
       const updatedDocs = { ...prev };
       delete updatedDocs[index]; // Remove the specific index
       return updatedDocs;
     });
 
+    // Remove the corresponding file dependency from uploadedFileDep
     setUploadedFileDep((prev) => {
       const updatedFileDep = { ...prev };
       delete updatedFileDep[index]; // Remove the specific index
       return updatedFileDep;
     });
-
-    const fullPath = insuranceClaims[index]?.fileName;
-    if (fullPath) {
-      const fileName = fullPath.split("/").pop();
-      //  console.log(fileName);
-
-      handleDeleteFile("insuranceClaims", fileName, watchedEmpID);
-    }
   };
 
   const updateUploadingState = (label, value, idx) => {
@@ -119,13 +120,18 @@ export const InsuranceClaim = () => {
   const handleFileChange = async (e, type, index) => {
     if (!watchedEmpID) {
       alert("Please enter the Employee ID before uploading files.");
-      window.location.href = "/insuranceAdd/dependentInsurance";
+      window.location.href = "/insuranceHr/insuranceClaim";
       return;
     }
-    const selectedFile = e.target.files?.[0];
+    const selectedFile = e.target.files[0];
     if (!selectedFile) return;
     // Allowed file types
-    const allowedTypes = ["application/pdf"];
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
     if (!allowedTypes.includes(selectedFile.type)) {
       alert("Upload must be a PDF file");
       return;
@@ -142,12 +148,10 @@ export const InsuranceClaim = () => {
         watchedEmpID,
         index
       );
-      setUploadedFileDep((prev) => {
-        // Ensure prev is an array; if not, initialize it as an empty array
-        const newUploadedFiles = Array.isArray(prev) ? [...prev] : [];
-        newUploadedFiles[index] = selectedFile.name; // Update only the specific index
-        return newUploadedFiles; // Return the updated array
-      });
+      setUploadedFileDep((prev) => ({
+        ...prev,
+        [index]: selectedFile.name,
+      }));
     } catch (err) {
       console.log(err);
     }
@@ -253,7 +257,9 @@ export const InsuranceClaim = () => {
     // const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
     return fileNameWithExtension;
   };
-
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
   const handleDeleteMethod = async (fileType, fileName, index) => {
     // console.log(fileName, index);
 
@@ -290,6 +296,8 @@ export const InsuranceClaim = () => {
         );
         return;
       }
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
       // console.log(`Deleted "${fileName}". Remaining files:`);
     } catch (error) {
       console.error("Error deleting file:", error);
@@ -343,8 +351,9 @@ export const InsuranceClaim = () => {
     }
   };
 
-  // console.log("Doc",uploadedDocs);
-  // console.log("Name", uploadedFileDep);
+  const requiredPermissions = ["Insurance"];
+
+  const access = "Insurance";
 
   return (
     <div
@@ -443,9 +452,9 @@ export const InsuranceClaim = () => {
                   <div className="">
                     <label
                       onClick={() => {
-                        if (uploadedDocs?.insuranceClaims?.[index]?.length > 0) {
+                        if (isUploading[index]) {
                           alert(
-                            "Please delete the previously uploaded file before uploading a new one."
+                            "Delete already uploaded Files or save an uploaded file."
                           );
                         }
                       }}
@@ -460,18 +469,32 @@ export const InsuranceClaim = () => {
                         }
                         accept="application/pdf"
                         className="hidden"
-                        disabled={
-                          uploadedDocs?.insuranceClaims?.[index]?.length > 0
-                        }
+                        disabled={isUploading[index]}
                       />
                       <GoUpload className="ml-1" />
                     </label>
-
-                    <div className="flex items-center">
+                    <div className="flex items-center justify-between">
                       <p className="text-secondary text-xs pt-1">
                         {uploadedFileDep[index]}
                       </p>
-                      {uploadedFileDep[index] && (
+                      {uploadedFileDep[index] &&
+                      formattedPermissions?.deleteAccess?.[access]?.some(
+                        (permission) => requiredPermissions.includes(permission)
+                      ) ? (
+                        <button
+                          type="button"
+                          className=" text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                          onClick={() =>
+                            handleDeleteMethod(
+                              "insuranceClaims",
+                              uploadedFileDep[index],
+                              index
+                            )
+                          }
+                        >
+                          <MdCancel />
+                        </button>
+                      ) : isUploading[index] === true ? (
                         <button
                           type="button"
                           className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
@@ -485,6 +508,8 @@ export const InsuranceClaim = () => {
                         >
                           <MdCancel />
                         </button>
+                      ) : (
+                        ""
                       )}
                     </div>
                     {errors?.claimUpload && (
@@ -522,6 +547,9 @@ export const InsuranceClaim = () => {
           />
         )}
       </form>
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
+      )}
     </div>
   );
 };

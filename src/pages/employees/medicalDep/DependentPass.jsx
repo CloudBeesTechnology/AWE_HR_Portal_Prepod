@@ -9,19 +9,25 @@ import { DataSupply } from "../../../utils/DataStoredContext";
 import { useFieldArray } from "react-hook-form";
 import { DeleteDocsDependPass } from "../../../services/uploadDocsDelete/DeleteDocsDependPass";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
+import { DeletePopup } from "../../../utils/DeletePopup";
 
 export const DependentPass = ({
   errors,
   register,
   setValue,
   setArrayUploadDocs,
-  control, 
+  control,
   value,
   getValues,
   watch,
   UploadingFiles,
+  formattedPermissions,
+  requiredPermissions,
+  access,
 }) => {
   const isInitialMount = useRef(true);
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [docsUploaded, setDocsUploaded] = useState({});
   const [isUploading, setIsUploading] = useState({
     uploadDp: false,
@@ -220,16 +226,18 @@ export const DependentPass = ({
       window.location.href = "/labourImmigration";
       return;
     }
-  
+
     const file = e.target.files?.[0];
     if (!file) return;
 
     if (docsUploaded?.fieldName?.[index]?.length > 0) {
-      alert("Only one file is allowed per index. Please delete the existing file before uploading a new one.");
-      e.target.value = ''; // Clear the input
+      alert(
+        "Only one file is allowed per index. Please delete the existing file before uploading a new one."
+      );
+      e.target.value = ""; // Clear the input
       return;
     }
-  
+
     // File type restriction (PDF only, similar to Method 1)
     const allowedTypes = ["application/pdf"];
     if (!allowedTypes.includes(file.type)) {
@@ -237,47 +245,47 @@ export const DependentPass = ({
       alert("Upload must be a PDF file.");
       return;
     }
-  
+
     // Ensure no duplicate files are added (checking against already uploaded files)
-  
+
     // Ensure no duplicate files are added (checking against already uploaded files)
     const currentFiles = getValues(`dependPass[${index}].${fieldName}`) || [];
     if (currentFiles.some((uploadedFile) => uploadedFile.name === file.name)) {
       alert("This file has already been uploaded.");
       return;
     }
-  
+
     // Update the form state with the uploaded file
     if (currentFiles.some((uploadedFile) => uploadedFile.name === file.name)) {
       alert("This file has already been uploaded.");
       return;
     }
-  
+
     // Update the form state with the uploaded file
     const updatedFiles = [...currentFiles, file];
     setValue(`dependPass[${index}].${fieldName}`, updatedFiles);
-  
-  
+
     try {
       updateUploadingState(fieldName, true);
       await uploadDocs(file, fieldName, setDocsUploaded, watchedEmpID, index);
-  
+
       // Set uploaded file names for display
-  
+
       // Set uploaded file names for display
       setUploadedFileNames((prev) => ({
         ...prev,
         [`${index}_${fieldName}`]: [file.name],
         [`${index}_${fieldName}`]: [file.name],
       }));
-  
-  
     } catch (error) {
       console.error("File upload error:", error);
     }
   };
-  
- 
+
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
   const deleteFile = async (fileType, fileName, index, field) => {
     try {
       const watchedEmpID = watch("empID");
@@ -312,11 +320,10 @@ export const DependentPass = ({
         setValue(`dependPass[${index}].${fileType}`, updatedFiles);
 
         setUploadedFileNames((prev) => ({
-          ...prev,       
-          [`${index}_${fileType}`]: updatedFiles.map((file) =>{
-           return getFileName(file?.upload || file?.name)
-          }
-          ),          
+          ...prev,
+          [`${index}_${fileType}`]: updatedFiles.map((file) => {
+            return getFileName(file?.upload || file?.name);
+          }),
         }));
 
         setDocsUploaded((prev) => {
@@ -328,6 +335,10 @@ export const DependentPass = ({
         });
 
         // console.log("File deleted successfully:", fileName);
+      setdeleteTitle1(
+        `${fileName} Deleted Successfully`
+      );
+      handleDeleteMsg();
       }
     } catch (error) {
       console.error("Error deleting file:", error);
@@ -357,33 +368,33 @@ export const DependentPass = ({
     const dependPass = getValues("dependPass");
     const removedItem = dependPass[index];
     const watchedEmpID = watch("empID"); // Get the Employee ID
-  
+
     if (!watchedEmpID) {
       alert("Please provide the Employee ID before deleting files.");
       return;
     }
-  
+
     // Delete uploaded files if any
     if (removedItem.uploadDp && removedItem.uploadDp.length > 0) {
       for (const file of removedItem.uploadDp) {
         const fileName = getFileName(file.upload || file.name);
         console.log(fileName);
-        
+
         await handleDeleteFile("uploadDp", fileName, watchedEmpID); // Delete from S3 or server
         await deleteFile("uploadDp", fileName, index, removedItem); // Update local state
       }
     }
-  
+
     if (removedItem.uploadDr && removedItem.uploadDr.length > 0) {
       for (const file of removedItem.uploadDr) {
         const fileName = getFileName(file.upload || file.name);
         console.log(fileName);
-        
+
         await handleDeleteFile("uploadDr", fileName, watchedEmpID); // Delete from S3 or server
         await deleteFile("uploadDr", fileName, index, removedItem); // Update local state
       }
     }
-  
+
     // Remove the item from the form
     remove(index);
   };
@@ -460,6 +471,7 @@ export const DependentPass = ({
               errors={errors}
               register={register}
             />
+
             <FileUploadFieldNew
               label="Upload Dependent Pass"
               onChangeFunc={(e) => handleFileChange(e, "uploadDp", index)}
@@ -474,8 +486,12 @@ export const DependentPass = ({
               fileType="uploadDp"
               isUploading={isUploading}
               index={index}
-              disabled={docsUploaded["uploadDp"]?.[index]?.length > 0} 
+              disabled={docsUploaded["uploadDp"]?.[index]?.length > 0}
+              formattedPermissions={formattedPermissions}
+              requiredPermissions={requiredPermissions}
+              access={access}
             />
+
             <FileUploadFieldNew
               label="Upload Dependent Passport"
               onChangeFunc={(e) => handleFileChange(e, "uploadDr", index)}
@@ -487,8 +503,10 @@ export const DependentPass = ({
               fileType="uploadDr"
               isUploading={isUploading}
               index={index}
-              disabled={docsUploaded["uploadDr"]?.[index]?.length > 0} 
-
+              disabled={docsUploaded["uploadDr"]?.[index]?.length > 0}
+              formattedPermissions={formattedPermissions}
+              requiredPermissions={requiredPermissions}
+              access={access}
             />
             {index !== 0 && (
               <button
@@ -502,7 +520,12 @@ export const DependentPass = ({
           </div>
         );
       })}
+       {deletePopup && (
+                    <DeletePopup
+                      handleDeleteMsg={handleDeleteMsg}
+                      title1={deleteTitle1}
+                    />
+                  )}
     </div>
   );
 };
-

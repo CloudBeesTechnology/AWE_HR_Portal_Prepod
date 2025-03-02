@@ -12,12 +12,16 @@ import { DataSupply } from "../../../utils/DataStoredContext";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { DeleteSawpUp } from "../../../services/uploadDocsDelete/DeleteSawpUp";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
-
+import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../../utils/DeletePopup";
 export const Sawp = () => {
+  const { formattedPermissions } = useDeleteAccess();
   const { searchResultData } = useOutletContext();
   const { SubmitMPData } = SawpDataFun();
   const { SawpDetails } = useContext(DataSupply);
   const { SawpUpdateFun } = SawpUpdate();
+  const [deletePopup, setdeletePopup] = useState(false);
+    const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
   const [requestDate, setRequestDate] = useState([]);
@@ -106,15 +110,12 @@ export const Sawp = () => {
      if (!selectedFile) return;
  
      const allowedTypes = [
-      "application/pdf",
-      "image/jpeg",
-      "image/png",
-      "image/jpg",
-    ];
-    if (!allowedTypes.includes(selectedFile.type)) {
-        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-        return;
-    }
+       "application/pdf",
+     ];
+     if (!allowedTypes.includes(selectedFile.type)) {
+         alert("Upload must be a PDF file.");
+         return;
+     }
  
      // Ensure no duplicate files are added
      const currentFiles = watch(label) || [];
@@ -137,6 +138,10 @@ export const Sawp = () => {
      }
    };
  
+   const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
    const deleteFile = async (fileType, fileName) => {
      try {
        const watchedEmpID = watch("empID");
@@ -166,6 +171,10 @@ export const Sawp = () => {
          return;
        }
        // console.log(`Deleted "${fileName}". Remaining files:`);
+       setdeleteTitle1(
+        `${fileName} Deleted Successfully`
+      );
+      handleDeleteMsg();
      } catch (error) {
        console.error("Error deleting file:", error);
        alert("Error processing the file deletion.");
@@ -262,6 +271,12 @@ export const Sawp = () => {
     }
   };
 
+  const requiredPermissions = [
+    "Work Pass",
+  ];
+
+  const access = "Employee"
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -315,6 +330,9 @@ export const Sawp = () => {
         deleteFile={deleteFile}
         isUploading={isUploading}
         field={{ title: "sawpEmpUpload" }}
+        formattedPermissions={formattedPermissions}
+        requiredPermissions={requiredPermissions}
+        access={access}
       />
 
       <div className="center">
@@ -330,6 +348,12 @@ export const Sawp = () => {
           path="/sawp"
         />
       )}
+       {deletePopup && (
+                          <DeletePopup
+                            handleDeleteMsg={handleDeleteMsg}
+                            title1={deleteTitle1}
+                          />
+                        )}
     </form>
   );
 };

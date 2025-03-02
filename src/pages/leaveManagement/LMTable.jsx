@@ -47,11 +47,12 @@ export const LMTable = () => {
           items?.empStatus !== "Cancelled"
         ) {
           return items.managerEmpID === userID;
-        } else if ((userType === "SuperAdmin" || userType === "HR") && items?.empStatus !== "Cancelled") {
+        } else if ((userType === "SuperAdmin" || userType === "HR" ) && items?.empStatus !== "Cancelled") {
           return true;
         }
         return false;
-      })  .sort((a, b) => {
+      })
+      .sort((a, b) => {
      
         function toISODate(dateString) {
             // console.log("Original date string:", dateString); 
@@ -101,7 +102,32 @@ export const LMTable = () => {
       
         return new Date(dateB) - new Date(dateA);
     });
-    
+      // .sort((a, b) => {
+
+      //   if (userType === "SuperAdmin") {
+      //     const dateA = new Date(a.leaveStatusReceivedDate || a.leaveStatusCreatedAt);
+      //     const dateB = new Date(b.leaveStatusReceivedDate || b.leaveStatusCreatedAt);
+      
+      //     return dateB - dateA;
+      //   }
+
+      //   const isManagerPendingA = a.managerStatus === "Pending";
+      //   const isManagerPendingB = b.managerStatus === "Pending";
+      //   const isSupervisorPendingA = a.supervisorStatus === "Pending";
+      //   const isSupervisorPendingB = b.supervisorStatus === "Pending";
+  
+      //   if (isManagerPendingA && !isManagerPendingB) return -1;
+      //   if (!isManagerPendingA && isManagerPendingB) return 1;       
+      //   if (isSupervisorPendingA && !isSupervisorPendingB) return -1;
+      //   if (!isSupervisorPendingA && isSupervisorPendingB) return 1;
+  
+      //   const dateA = new Date(a.leaveStatusCreatedAt || a.leaveStatusReceivedDate);
+      //   const dateB = new Date(b.leaveStatusCreatedAt || b.leaveStatusReceivedDate);
+      
+      //   return dateB - dateA ;
+
+      // });
+
     // Step 2: Apply status filter
     if (filterStatus !== "All") {
       filteredData = filteredData.filter((item) => {

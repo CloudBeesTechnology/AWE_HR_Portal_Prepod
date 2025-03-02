@@ -13,7 +13,13 @@ export const FileUpload = ({
   uploadedFileNames,
   handleFileChange,
   deleteFile,
+  formattedPermissions,
+  requiredPermissions,
+  access,
 }) => {
+  
+  console.log(isUploading);
+  
   return (
     <div className="flex flex-col">
       {label && <label className="text_size_5">{label}</label>}
@@ -22,7 +28,9 @@ export const FileUpload = ({
       <label
         onClick={() => {
           if (isUploading[name]) {
-            alert("Please delete the previously uploaded file before uploading a new one.");
+            alert(
+              "Please delete the previously uploaded file before uploading a new one."
+            );
           }
         }}
         className={`mt-2 flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer
@@ -55,13 +63,17 @@ export const FileUpload = ({
                   className="mt-2 flex justify-between items-center"
                 >
                   {fileName}
-                  <button
-                    type="button"
-                    className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-                    onClick={() => deleteFile(name, fileName)}
-                  >
-                    <MdCancel />
-                  </button>
+                  {formattedPermissions?.deleteAccess?.[access]?.some(
+                    (permission) => requiredPermissions.includes(permission)
+                  ) && (
+                    <button
+                      type="button"
+                      className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                      onClick={() => deleteFile(name, fileName)}
+                    >
+                      <MdCancel />
+                    </button>
+                  )}
                 </span>
               ))
           ) : (
@@ -69,7 +81,7 @@ export const FileUpload = ({
               {uploadedFileNames[name]}
               <button
                 type="button"
-                className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none "
                 onClick={() => deleteFile(name, uploadedFileNames[name])}
               >
                 <MdCancel />
@@ -94,8 +106,17 @@ export const FileUploadField = ({
   deletedStringUpload,
   isUploadingString,
   error,
+  formattedPermissions,
+  requiredPermissions,
+  access,
+  check
 }) => {
   const isUploading = isUploadingString?.[fileKey] ?? false;
+  const recruitmentStatus = formattedPermissions?.deleteAccess?.[access]
+
+  console.log(isUploading);
+  // console.log("Str", isUploadingString.loiFile);
+  
   return (
     <div className="flex flex-col">
       {/* Label */}
@@ -105,15 +126,17 @@ export const FileUploadField = ({
       <label
         onClick={(e) => {
           if (isUploading) {
-            e.preventDefault(); // Prevent default behavior
-            alert("Please delete the previously uploaded file before uploading a new one.");
+            e.preventDefault();
+            alert(
+              "Please delete the previously uploaded file before uploading a new one."
+            );
           }
         }}
         className="flex items-center px-3 py-1.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer mt-2"
       >
         <input
           type="file"
-          {...register(fileKey)} // Now register is always defined
+          {...register(fileKey)} 
           onChange={(e) => {
             if (!isUploading) {
               handleFileUpload(e, fileKey);
@@ -122,8 +145,9 @@ export const FileUploadField = ({
           className="hidden"
           accept=".pdf, .jpg, .jpeg, .png"
         />
-        <span className="ml-2 flex p-1 text-grey gap-10">
-          <GoUpload /> {label || "Upload File"}
+        
+        <span className=" w-full ml-2 flex p-1 justify-between items-center text-grey gap-10">
+           {label || "Upload File"} <GoUpload />
         </span>
       </label>
 
@@ -131,20 +155,32 @@ export const FileUploadField = ({
       {/* {uploadedFileNames?.[fileKey] && ( */}
       <p className="text-xs mt-1 text-grey flex justify-between items-center">
         {uploadedFileNames[fileKey]}
-        {uploadedFileNames[fileKey]?.length > 0 && (
+
+        {uploadedFileNames[fileKey]?.length > 0 &&
+        formattedPermissions?.deleteAccess?.[access]?.some((permission) =>
+          requiredPermissions.includes(permission)
+        ) ? (
           <button
             type="button"
-            className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+            className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none "
             onClick={() =>
               deletedStringUpload(fileKey, uploadedFileNames?.[fileKey])
             }
           >
             <MdCancel />
           </button>
-        )}
+        ) : uploadedFileNames[fileKey]?.length > 0 && isUploading  ? (
+          <button
+            type="button"
+            className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none "
+            onClick={() =>
+              deletedStringUpload(fileKey, uploadedFileNames?.[fileKey])
+            }
+          >
+            <MdCancel />
+          </button>
+        ) : "" }
       </p>
-      {/* )} */}
-
       {/* Error Message */}
       {error && <p className="text-[red] text-[12px] mt-1">{error.message}</p>}
     </div>
@@ -159,6 +195,7 @@ export const FileUploadFieldArr = ({
   fileName = "",
   deleteFile,
   field,
+  formattedPermissions,
 }) => {
   return (
     <div className="flex flex-col">
@@ -174,8 +211,8 @@ export const FileUploadFieldArr = ({
           onChange={onChangeFunc}
           accept=".pdf, .jpg, .jpeg, .png"
         />
-        <span className="ml-2 text-grey font-normal flex justify-between items-center gap-20 text-sm">
-          <GoUpload className="text-lg" /> PNG Only
+        <span className="ml-2 text-grey font-normal flex justify-between items-center gap-20 text-sm w-full ">
+        Upload File <GoUpload className="text-lg" /> 
         </span>
       </label>
 
@@ -184,6 +221,9 @@ export const FileUploadFieldArr = ({
         <div className="mt-2">
           <div className="flex justify-between items-center text-sm text-grey my-1">
             <span>{fileName}</span>
+            {/* {formattedPermissions?.deleteAccess?.Employee?.includes(
+              "Medical & Dependent Info"
+            ) && ( */}
             <button
               type="button"
               className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
@@ -191,6 +231,7 @@ export const FileUploadFieldArr = ({
             >
               <MdCancel />
             </button>
+    
           </div>
         </div>
       )}
@@ -201,139 +242,6 @@ export const FileUploadFieldArr = ({
   );
 };
 
-// export const FileUploadFieldArr = ({
-//   label,
-//   register,
-//   onChangeFunc,
-//   error,
-//   arrayFileNames = {},
-//   deleteFile,
-//   field,
-// }) => {
-//   return (
-//     <div className="flex flex-col">
-//       {label && <label className="text_size_5">{label}</label>}
-
-//       {/* File Upload Input */}
-//       <label className="w-full mt-2 max-w-[300px] flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer">
-//         <input
-//           type="file"
-//           className="hidden"
-//           {...register}
-//           onChange={onChangeFunc}
-//           accept=".pdf, .jpg, .jpeg, .png"
-//         />
-//         <span className="ml-2 text-grey font-normal flex justify-between items-center gap-20 text-sm">
-//           <GoUpload className="text-lg" /> PDF, JPG, JPEG, PNG Only
-//         </span>
-//       </label>
-
-//       {/* Display Uploaded Files */}
-//       {arrayFileNames[`${field?.title}`] && (
-//         <div className="mt-2">
-//           <div className="flex justify-between items-center text-sm text-grey my-1">
-//             <span>{arrayFileNames[`${field?.title}`]}</span>
-//             <button
-//               type="button"
-//               className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-//               onClick={() => deleteFile(field?.title, arrayFileNames[`${field?.title}`])}
-//             >
-//               <MdCancel />
-//             </button>
-//           </div>
-//         </div>
-//       )}
-
-//       {/* Display Error Message */}
-//       {error && <p className="text-[red] text-[12px] mt-1">{error.message}</p>}
-//     </div>
-//   );
-// };
-
-// export const FileUploadField = ({
-//   label,
-//   register,
-//   onChangeFunc,
-//   name,
-//   error,
-//   fileName,
-// }) => {
-//   return (
-//     <div className="flex flex-col">
-//       {label && <label className="text_size_5">{label}</label>}
-//       <label className="w-full mt-2 max-w-[300px] flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer">
-//         <input
-//           type="file"
-//           className="hidden"
-//           {...register}
-//           onChange={onChangeFunc}
-//           accept=".pdf"
-//         />
-//         <span className="ml-2 text-grey font-normal flex justify-between items-center gap-20 text-sm">
-//           <GoUpload className="text-lg" /> PDF Only
-//         </span>
-//       </label>
-//       <p className="text-grey text-sm my-1">{fileName || ""}</p>
-//       {/* Display error message if error is present */}
-//       {error && <p className="text-[red] text-[12px] mt-1">{error.message}</p>}
-//     </div>
-//   );
-// };
-
-// export const FileUploadFieldArr = ({
-//   label,
-//   register,
-//   onChangeFunc,
-//   error,
-//   arrayFileNames = {},
-//   deleteFile,
-//   field,
-// }) => {
-//   // Debugging: Ensure field and file names are correctly logged
-//   console.log("field.title:", field?.title);
-//   console.log("Uploaded Files:", arrayFileNames[field?.title] || "No files uploaded");
-
-//   return (
-//     <div className="flex flex-col">
-//       {label && <label className="text_size_5">{label}</label>}
-
-//       {/* File Upload Input */}
-//       <label className="w-full mt-2 max-w-[300px] flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer">
-//         <input
-//           type="file"
-//           className="hidden"
-//           {...register}
-//           onChange={onChangeFunc}
-//           accept=".pdf"
-//         />
-//         <span className="ml-2 text-grey font-normal flex justify-between items-center gap-20 text-sm">
-//           <GoUpload className="text-lg" /> PDF Only
-//         </span>
-//       </label>
-
-//       {/* Display Uploaded Files */}
-//       {arrayFileNames[field?.title]?.length > 0 && (
-//         <div className="mt-2">
-//           {arrayFileNames[field?.title].map((fileName, fileIndex) => (
-//             <div key={fileIndex} className="flex justify-between items-center text-sm text-grey my-1">
-//               <span>{fileName}</span>
-//               <button
-//                 type="button"
-//                 className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-//                 onClick={() => deleteFile(field?.title, fileName)}
-//               >
-//                 <MdCancel />
-//               </button>
-//             </div>
-//           ))}
-//         </div>
-//       )}
-
-//       {/* Display Error Message */}
-//       {error && <p className="text-[red] text-[12px] mt-1">{error.message}</p>}
-//     </div>
-//   );
-// };
 export const FileUploadNew = ({
   label,
   error,
@@ -342,14 +250,21 @@ export const FileUploadNew = ({
   isUploading,
   deleteFile,
   field,
+  formattedPermissions,
+  requiredPermissions,
+  access,
 }) => {
+ 
+
   return (
     <div className="flex flex-col w-[400px]">
       {label && <label className="text_size_5">{label}</label>}
       <label
         onClick={() => {
           if (isUploading[field.title]) {
-            alert("Please delete the previously uploaded file before uploading a new one.");
+            alert(
+              "Please delete the previously uploaded file before uploading a new one."
+            );
           }
         }}
         className="mt-2 flex items-center px-3 py-5 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer"
@@ -380,13 +295,17 @@ export const FileUploadNew = ({
                   className="mt-2 flex justify-between items-center"
                 >
                   {fileName}
-                  <button
-                    type="button"
-                    className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-                    onClick={() => deleteFile(field.title, fileName)}
-                  >
-                    <MdCancel />
-                  </button>
+                  {formattedPermissions?.deleteAccess?.[access]?.some(
+                    (permission) => requiredPermissions.includes(permission)
+                  ) && (
+                    <button
+                      type="button"
+                      className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                      onClick={() => deleteFile(field.title, fileName)}
+                    >
+                      <MdCancel />
+                    </button>
+                  )}
                 </span>
               ))
           ) : (
@@ -423,6 +342,11 @@ export const UploadingFiles = ({
   watchedEmpID,
   isUploading,
   deleteFile,
+  formattedPermissions,
+  requiredPermissions,
+  access,
+  check,
+
 }) => {
   // console.log(uploadedFileNames);
 
@@ -461,7 +385,7 @@ export const UploadingFiles = ({
               onChange={(e) => handleFileChange(e, field.name)} // Pass field name for dynamic handling
               disabled={isUploading[field.name]}
             />
-            <span className="ml-2 text-grey w-full font-normal flex justify-between items-center gap-10">
+            <span className="ml-2 text-grey w-full font-normal flex justify-between items-center gap-10 ">
               {field.label}
               <GoUpload />
               {/* {field.icon} */}
@@ -480,13 +404,18 @@ export const UploadingFiles = ({
                       className="mt-2 flex justify-between items-center"
                     >
                       {fileName}
-                      <button
-                        type="button"
-                        className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-                        onClick={() => deleteFile(field.name, fileName)}
-                      >
-                        <MdCancel />
-                      </button>
+                      {formattedPermissions?.deleteAccess?.[access]?.some(
+                        (permission) => requiredPermissions.includes(permission)
+                      ) && (
+                        // {console.log(formattedPermissions?.deleteAccess)}
+                        <button
+                          type="button"
+                          className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                          onClick={() => deleteFile(field.name, fileName)}
+                        >
+                          <MdCancel />
+                        </button>
+                      )}
                     </span>
                   ))
               ) : (
@@ -529,15 +458,22 @@ export const FileUploadFieldNew = ({
   isUploading,
   field,
   index,
-  disabled
+  disabled,
+  formattedPermissions,
+  requiredPermissions,
+  access,
 }) => {
+  // const access = "Employee";
+
   return (
     <div className="flex flex-col">
       {label && <label className="text_size_5">{label}</label>}
       <label
         onClick={() => {
           if (disabled) {
-            alert("Please delete the previously uploaded file before uploading a new one.");
+            alert(
+              "Please delete the previously uploaded file before uploading a new one."
+            );
           }
         }}
         className="mt-2 flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer"
@@ -550,8 +486,8 @@ export const FileUploadFieldNew = ({
           accept=".pdf"
           disabled={disabled}
         />
-        <span className="ml-2 text-grey font-normal flex justify-between items-center gap-20 text-sm">
-          <GoUpload className="text-lg" /> PDF Only
+        <span className="w-full ml-2 text-grey font-normal flex justify-between items-center gap-20 text-sm">
+        Upload File <GoUpload className="text-lg" /> 
         </span>
       </label>
       {fileName && (
@@ -566,20 +502,26 @@ export const FileUploadFieldNew = ({
                   className="mt-2 flex justify-between items-center"
                 >
                   {file}
-                  <button
-                    type="button"
-                    className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-                    onClick={() => {
-                      deleteFile(file);
-                    }}
-                  >
-                    <MdCancel />
-                  </button>
+                  {/* {console.log(formattedPermissions?.deleteAccess)} */}
+                  {formattedPermissions?.deleteAccess?.[access]?.some(
+                    (permission) => requiredPermissions.includes(permission)
+                  ) && (
+                    <button
+                      type="button"
+                      className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                      onClick={() => {
+                        deleteFile(file);
+                      }}
+                    >
+                      <MdCancel />
+                    </button>
+                  )}
                 </span>
               ))
-          ) : (
+          ) : fileName && (
             <span className="mt-2 flex justify-between items-center">
               {fileName}
+
               <button
                 type="button"
                 className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
@@ -595,4 +537,3 @@ export const FileUploadFieldNew = ({
     </div>
   );
 };
-

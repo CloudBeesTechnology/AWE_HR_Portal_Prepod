@@ -18,6 +18,7 @@ import { handleDeleteFile } from "../../services/uploadsDocsS3/DeleteDocs";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { useReactToPrint } from "react-to-print";
+import { DeletePopup } from "../../utils/DeletePopup";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
   import.meta.url
@@ -37,7 +38,8 @@ export const Travelling = () => {
   const [uploadTU, setUploadTU] = useState({
     travelUp: [],
   });
-
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [insuranceData, setInsuranceData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -110,7 +112,7 @@ const updateUploadingState = (label, value) => {
       const travelNo = watch("travelNo");
       if (!travelNo) {
           alert("Please enter the Policy Number before uploading files.");
-          window.location.href = "/insuranceHr";
+          window.location.href = "/insuranceHr/travelling";
           return;
       }
   
@@ -119,7 +121,9 @@ const updateUploadingState = (label, value) => {
   
       const allowedTypes = [
         "application/pdf",
-       
+       "image/jpeg",
+      "image/png",
+      "image/jpg",
       ];
       if (!allowedTypes.includes(selectedFile.type)) {
           alert("Upload must be a PDF file.");
@@ -146,7 +150,9 @@ const updateUploadingState = (label, value) => {
           console.error(err);
       }
     };
-  
+    const handleDeleteMsg = () => {
+      setdeletePopup(!deletePopup);
+    };
     const deleteFile = async (fileType, fileName) => {
       try {
         const travelNo = watch("travelNo");
@@ -175,6 +181,8 @@ const updateUploadingState = (label, value) => {
           );
           return;
         }
+        setdeleteTitle1(`${fileName}`);
+        handleDeleteMsg();
         // console.log(`Deleted "${fileName}". Remaining files:`);
       } catch (error) {
         console.error("Error deleting file:", error);
@@ -572,6 +580,9 @@ const updateUploadingState = (label, value) => {
           </div>
         </div>
       )}
+       {deletePopup && (
+              <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
+            )}
     </section>
   );
 };

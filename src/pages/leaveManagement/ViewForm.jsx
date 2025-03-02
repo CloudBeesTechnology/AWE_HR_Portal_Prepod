@@ -37,6 +37,8 @@ export const ViewForm = ({
     return findingSupervisorName;
   });
 
+  console.log(hrManagerMail);
+
   const getStatusClass = (status) => {
     return status === "Rejected"
       ? "text-[red]"
@@ -566,6 +568,7 @@ export const ViewForm = ({
               "hr_no-reply@adininworks.com",
               ticketData.empOfficialEmail
             );
+            // console.log("emp email", ticketData.empOfficialEmail);
 
             //manager send email
             await sendEmail(
@@ -576,12 +579,13 @@ export const ViewForm = ({
                 ticketData.empName || "Not mention"
               } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
                 status === "Verified" ? "Verified" : "marked as not eligible"
-              } by HR Manager ${personalInfo.name || "Not mention"}. 
+              } by HR Manager ${personalInfo.name || "Not mention"}.
               <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
               `,
               "hr_no-reply@adininworks.com",
               findingManagerEmail.officialEmail
             );
+            // console.log("manageremail", findingManagerEmail.officialEmail);
 
             //GM send email
             await sendEmail(
@@ -598,6 +602,7 @@ export const ViewForm = ({
               "hr_no-reply@adininworks.com",
               gmMail
             );
+            // console.log("gmemail", gmMail);
 
             // Create notification for the ticket status update employee
             await createNotification({
@@ -643,6 +648,7 @@ export const ViewForm = ({
               status: "Unread",
             });
           } else if (gmPosition === "GENERAL MANAGER") {
+            //employee email
             await sendEmail(
               `Ticket Request ${status}`,
               `Dear  ${
@@ -654,6 +660,8 @@ export const ViewForm = ({
               ticketData.empOfficialEmail
             );
 
+            // console.log("empemail", ticketData.empOfficialEmail);
+
             //manager send email
             await sendEmail(
               `Ticket Request ${status}`,
@@ -662,12 +670,15 @@ export const ViewForm = ({
               } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been  ${status} by GM ${
                 personalInfo.name || "Not mention"
               }.
-                <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p> 
+                <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
               `,
               "hr_no-reply@adininworks.com",
               findingManagerEmail.officialEmail
             );
 
+            // console.log("manager", findingManagerEmail.officialEmail);
+
+            //hr email
             await sendEmail(
               `Ticket Request ${status}`,
               `Your employee  ${
@@ -675,11 +686,12 @@ export const ViewForm = ({
               } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been  ${status} by GM ${
                 personalInfo.name || "Not mention"
               }.
-                <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p> 
+                <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
               `,
               "hr_no-reply@adininworks.com",
               hrManagerMail
             );
+            // console.log("hremail", hrManagerMail);
 
             // Create notification for the ticket status update employee
             await createNotification({
@@ -729,7 +741,7 @@ export const ViewForm = ({
           setTimeout(() => {
             setNotification(true);
             setPath("/leaveManagement/requestTickets");
-          }, 500);
+          }, 1000);
         })
         .catch((err) => console.log(err));
     }

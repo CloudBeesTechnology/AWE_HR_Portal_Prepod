@@ -69,7 +69,7 @@ export const TableWelding = () => {
         
         
         
-        console.log(updatedData);
+        // console.log(updatedData);
         setMergeData(updatedData);
         setLoading(false);
       } catch (err) {

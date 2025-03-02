@@ -14,8 +14,10 @@ import { DataSupply } from "../../../utils/DataStoredContext";
 import { useOutletContext } from "react-router-dom";
 import { DeleteBJLUp } from "../../../services/uploadDocsDelete/DeleteBJLUp";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
-
+import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../../utils/DeletePopup";
 export const BankGuarantee = () => {
+  const { formattedPermissions } = useDeleteAccess();
   const { searchResultData } = useOutletContext();
   const { BGData } = BJLDataFun();
   const { BJLData } = useContext(DataSupply);
@@ -37,12 +39,13 @@ export const BankGuarantee = () => {
     bankValid: [],
     bankEndorse: [],
   });
-
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
   const [isUploading, setIsUploading] = useState({
     bankEmpUpload: false,
-    });
+  });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     bankEmpUpload: null,
   });
@@ -112,92 +115,94 @@ export const BankGuarantee = () => {
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
 
-const updateUploadingState = (label, value) => {
-     setIsUploading((prev) => ({
-       ...prev,
-       [label]: value,
-     }));
-     console.log(value);
-   };
- 
-   const handleFileChange = async (e, label) => {
-     const watchedEmpID = watch("empID");
-     if (!watchedEmpID) {
-         alert("Please enter the Employee ID before uploading files.");
-         window.location.href = "/employeeInfo";
-         return;
-     }
- 
-     const selectedFile = e.target.files[0];
-     if (!selectedFile) return;
- 
-     const allowedTypes = [
-      "application/pdf",
-      "image/jpeg",
-      "image/png",
-      "image/jpg",
-    ];
-    if (!allowedTypes.includes(selectedFile.type)) {
-        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-        return;
+  const updateUploadingState = (label, value) => {
+    setIsUploading((prev) => ({
+      ...prev,
+      [label]: value,
+    }));
+   
+  };
+
+  const handleFileChange = async (e, label) => {
+    const watchedEmpID = watch("empID");
+    if (!watchedEmpID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
     }
- 
-     // Ensure no duplicate files are added
-     const currentFiles = watch(label) || [];
-     if (currentFiles.some((file) => file.name === selectedFile.name)) {
-         alert("This file has already been uploaded.");
-         return;
-     }
- 
-     setValue(label, [...currentFiles, selectedFile]);
- 
-     try {
-       updateUploadingState(label, true);
-       await uploadDocs(selectedFile, label, setUploadBG, watchedEmpID);
-       setUploadedFileNames((prev) => ({
-         ...prev,
-         [label]: selectedFile.name,
-       }));
-     } catch (err) {
-         console.error(err);
-     }
-   };
- 
-   const deleteFile = async (fileType, fileName) => {
-     try {
-       const watchedEmpID = watch("empID");
-       if (!watchedEmpID) {
-         alert("Please provide the Employee ID before deleting files.");
-         return;
-       }
- 
-       const isDeleted = await handleDeleteFile(
-         fileType,
-         fileName,
-         watchedEmpID
-       );
-       const isDeletedArrayUploaded = await DeleteBJLUp(
-         fileType,
-         fileName,
-         watchedEmpID,
-         setUploadedFileNames,
-         setUploadBG,
-         setIsUploading
-       );
- 
-       if (!isDeleted || isDeletedArrayUploaded) {
-         console.error(
-           `Failed to delete file: ${fileName}, skipping UI update.`
-         );
-         return;
-       }
-       // console.log(`Deleted "${fileName}". Remaining files:`);
-     } catch (error) {
-       console.error("Error deleting file:", error);
-       alert("Error processing the file deletion.");
-     }
-   };
-  
+
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    const allowedTypes = ["application/pdf"];
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file.");
+      return;
+    }
+
+    // Ensure no duplicate files are added
+    const currentFiles = watch(label) || [];
+    if (currentFiles.some((file) => file.name === selectedFile.name)) {
+      alert("This file has already been uploaded.");
+      return;
+    }
+
+    setValue(label, [...currentFiles, selectedFile]);
+
+    try {
+      updateUploadingState(label, true);
+      await uploadDocs(selectedFile, label, setUploadBG, watchedEmpID);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [label]: selectedFile.name,
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
+  const deleteFile = async (fileType, fileName) => {
+    try {
+      const watchedEmpID = watch("empID");
+      if (!watchedEmpID) {
+        alert("Please provide the Employee ID before deleting files.");
+        return;
+      }
+
+      const isDeleted = await handleDeleteFile(
+        fileType,
+        fileName,
+        watchedEmpID
+      );
+      const isDeletedArrayUploaded = await DeleteBJLUp(
+        fileType,
+        fileName,
+        watchedEmpID,
+        setUploadedFileNames,
+        setUploadBG,
+        setIsUploading
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+      setdeleteTitle1(
+        `${fileName} Deleted Successfully`
+      );
+      handleDeleteMsg();
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
+    }
+  };
 
   useEffect(() => {
     setValue("empID", searchResultData.empID);
@@ -217,7 +222,6 @@ const updateUploadingState = (label, value) => {
       const value = getLastValue(searchResultData[field], field); // Pass the field name to the function
       setValue(field, value);
     });
-
 
     if (searchResultData && searchResultData.bankEmpUpload) {
       try {
@@ -246,7 +250,6 @@ const updateUploadingState = (label, value) => {
       }
     }
   }, [searchResultData, setValue]);
-
 
   const onSubmit = async (data) => {
     try {
@@ -324,6 +327,12 @@ const updateUploadingState = (label, value) => {
     }
   };
 
+  const requiredPermissions = [
+    "Work Pass",
+  ];
+
+  const access = "Employee"
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -387,6 +396,7 @@ const updateUploadingState = (label, value) => {
           errors={errors}
         />
         <div>
+          
           <FileUploadNew
             label="Upload File"
             onChangeFunc={(e) => handleFileChange(e, "bankEmpUpload")}
@@ -399,6 +409,9 @@ const updateUploadingState = (label, value) => {
             isUploading={isUploading}
             deleteFile={deleteFile}
             field={{ title: "bankEmpUpload" }}
+            formattedPermissions={formattedPermissions}
+            requiredPermissions={requiredPermissions}
+            access={access}
           />
         </div>
       </div>
@@ -415,6 +428,12 @@ const updateUploadingState = (label, value) => {
           />
         )}
       </div>
+       {deletePopup && (
+                          <DeletePopup
+                            handleDeleteMsg={handleDeleteMsg}
+                            title1={deleteTitle1}
+                          />
+                        )}
     </form>
   );
 };

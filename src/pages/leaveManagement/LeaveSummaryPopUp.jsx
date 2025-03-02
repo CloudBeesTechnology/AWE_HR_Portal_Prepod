@@ -40,7 +40,7 @@ export const LeaveSummaryPopUp = ({
 
     // Convert datePart to ISO format if needed
     const formattedDateStr = datePart
-      .replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3-$2-$1") // Convert dd/mm/yyyy to yyyy-mm-dd
+      .replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3-$2-$1")
       .replace(/(\d{2})-(\d{2})-(\d{4})/, "$3-$2-$1");
     const currentYear = new Date().getFullYear();
     const parsedDate = new Date(formattedDateStr);
@@ -122,27 +122,48 @@ export const LeaveSummaryPopUp = ({
         const leaveKey = leaveTypeKeyMap[val.empLeaveType];
         // console.log(leaveKey);
 
+        // const applicationStartDate =
+        //   val.empLeaveSelectedFrom || val.empLeaveStartDate || "";
+        // const applicationEndDate =
+        //   val.empLeaveSelectedTo || val.empLeaveEndDate || "";
+
+        // // Normalize the dates to midnight (ignoring time)
+        // const filterStartDate = DateFormat(startDate);
+        // const filterEndDate = DateFormat(endDate);
+        // const appStartDate = DateFormat(applicationStartDate);
+        // const appEndDate = DateFormat(applicationEndDate);
+
+        // Get the start and end dates from employee leave data
         const applicationStartDate =
-          val.empLeaveSelectedFrom || val.empLeaveStartDate || ""; 
+          val.empLeaveSelectedFrom || DateFormat(val.empLeaveStartDate) || "";
         const applicationEndDate =
-          val.empLeaveSelectedTo || val.empLeaveEndDate || "";
+          val.empLeaveSelectedTo || DateFormat(val.empLeaveEndDate) || "";
+
+        // Log the application dates
+        // console.log("Application Start Date (Original):", applicationStartDate);
+        // console.log("Application End Date (Original):", applicationEndDate);
 
         // Normalize the dates to midnight (ignoring time)
         const filterStartDate = DateFormat(startDate);
+        console.log("LOG 1",filterStartDate);
+        
         const filterEndDate = DateFormat(endDate);
-        const appStartDate = DateFormat(applicationStartDate);
-        const appEndDate = DateFormat(applicationEndDate);
+        const appStartDate = applicationStartDate;
+        const appEndDate = applicationEndDate;
 
+        // Log the normalized dates
+        // console.log("Filter Start Date (Normalized):", filterStartDate);
+        // console.log("Filter End Date (Normalized):", filterEndDate);
+        // console.log("Application Start Date (Normalized):", appStartDate);
+        // console.log("Application End Date (Normalized):", appEndDate);
 
         let shouldProcessLeave = false;
 
         if (startDate && endDate) {
-  
           if (
             appStartDate >= filterStartDate &&
             appStartDate <= filterEndDate
           ) {
-       
             shouldProcessLeave = true;
           }
 
@@ -160,17 +181,16 @@ export const LeaveSummaryPopUp = ({
         }
 
         if (shouldProcessLeave && leaveKey) {
-
           if (
             val.managerStatus === "Approved" &&
             val.empStatus !== "Cancelled"
-          ) {    
+          ) {
             acc[val.empID][leaveKey].taken += Number(val.leaveDays) || 0;
           } else if (
             val.managerStatus === "Pending" &&
             val.supervisorStatus !== "Rejected" &&
             val.empStatus !== "Cancelled"
-          ) {    
+          ) {
             acc[val.empID][leaveKey].waitingLeave += Number(val.leaveDays) || 0;
           }
 
@@ -182,27 +202,27 @@ export const LeaveSummaryPopUp = ({
               "unPaidAuthorizeSick",
               "unPaidAuthorizeAnnual",
             ].includes(leaveKey)
+            
           ) {
             const total = acc[val.empID][leaveKey].total || 0;
             const taken = acc[val.empID][leaveKey].taken || 0;
             const waiting = acc[val.empID][leaveKey].waitingLeave || 0;
 
             const remaining = total - (taken + waiting);
-            const formattedRemaining = remaining < 5 ? Math.floor(remaining) : remaining;
+            const formattedRemaining =
+              remaining < 5 ? Math.floor(remaining) : remaining;
 
             acc[val.empID][leaveKey].remaining = formattedRemaining;
           }
-        } else {
-          // console.log("Leave will not be processed for employee", val.empID);
         }
 
         return acc;
       }, {});
 
-      const summary = result[empDetails.empID]; 
+      const summary = result[empDetails.empID];
       // console.log(summary);
 
-      setLeaveSummary(summary); 
+      setLeaveSummary(summary);
       // console.log(leaveSummary);
     };
 
@@ -224,7 +244,7 @@ export const LeaveSummaryPopUp = ({
     "unPaidAuthorizeAnnual",
   ];
 
-
+  // Format leave type name
   const formatLeaveType = (type) => {
     return type
       .replace(/Leave/g, "")
@@ -236,7 +256,7 @@ export const LeaveSummaryPopUp = ({
     content: () => LeaveDoc.current,
     onBeforePrint: () => console.log("Preparing print..."),
     onAfterPrint: () => console.log("Print complete"),
-    pageStyle: "print", 
+    pageStyle: "print",
   });
 
   const getDisplayDateRange = () => {
@@ -392,19 +412,20 @@ export const LeaveSummaryPopUp = ({
                   const isSpecialLeave = [
                     "compassionateLeave",
                     "unPaidAuthorisedLeave",
-                    "compensateLeave", "unPaidAuthorizeSick",
+                    "compensateLeave",
+                    "unPaidAuthorizeSick",
                     "unPaidAuthorizeAnnual",
                   ].includes(leaveType);
-             
+
                   if (
                     (leaveType === "maternityLeave" &&
-                      leaveSummary?.gender !== "Female") || 
+                      leaveSummary?.gender !== "Female") ||
                     (leaveType === "paternityLeave" &&
-                      leaveSummary?.gender !== "Male") 
-                  ) {               
+                      leaveSummary?.gender !== "Male")
+                  ) {
                     return null;
                   }
-           
+                  // console.log(`Rendering row for ${leaveType} for ${leaveSummary?.gender}`);
                   return (
                     <tr key={leaveType}>
                       <td className="border px-4 py-2">

@@ -122,7 +122,7 @@ export const BlastingPaintingForm = () => {
     Array.isArray(value) ? value[value.length - 1] : value;
   
   const searchResult = (result) => {
-    console.log("Search result:", result); // Debugging
+    // console.log("Search result:", result); // Debugging
   
     const keysToSet = ["empID","empBadgeNo","name","position",
       "blastingRemarks",

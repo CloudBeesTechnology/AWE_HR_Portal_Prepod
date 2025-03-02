@@ -17,8 +17,11 @@ import { DataSupply } from "../../../utils/DataStoredContext";
 import { UpdateMedical } from "../../../services/updateMethod/UpdateMedicalInfo";
 import { LabourImmiUpload } from "../../../services/uploadDocsDelete/LabourImmiUpload";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
+import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../../utils/DeletePopup";
 
 const LabourImmigration = () => {
+  const { formattedPermissions } = useDeleteAccess();
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
@@ -26,6 +29,9 @@ const LabourImmigration = () => {
   const { SubmitMPData } = MedicalPassFunc();
   const { updateMedicalSubmit } = UpdateMedical();
   const { empPIData, LMIData } = useContext(DataSupply);
+
+  // console.log("formattedPermissions : ", formattedPermissions);
+  // const [deletePermission, setDeletePermission] = useState(null);
 
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [arrayUploadDocs, setArrayUploadDocs] = useState([]);
@@ -42,7 +48,8 @@ const LabourImmigration = () => {
     uploadRegis: [],
     uploadBwn: [],
   });
-
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [dependPassData, setDependPassData] = useState(null);
   const [showTitle, setShowTitle] = useState("");
@@ -65,7 +72,7 @@ const LabourImmigration = () => {
     },
     resolver: yupResolver(LabourImmigrationSchema),
   });
-
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -141,6 +148,10 @@ const LabourImmigration = () => {
     }
   };
 
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
   const deleteFile = async (fileType, fileName) => {
     try {
       const watchedEmpID = watch("empID");
@@ -170,6 +181,10 @@ const LabourImmigration = () => {
         return;
       }
       // console.log(`Deleted "${fileName}". Remaining files:`);
+      setdeleteTitle1(
+        `${fileName} Deleted Successfully`
+      );
+      handleDeleteMsg();
     } catch (error) {
       console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
@@ -423,6 +438,9 @@ const LabourImmigration = () => {
     }
   };
 
+  const requiredPermissions = ["Medical & Dependent Info"];
+
+  const access = "Employee";
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -450,7 +468,6 @@ const LabourImmigration = () => {
           />
         </div>
       </div>
-
       {/* Form Fields */}
       <div className="flex justify-end items-center pt-10 pb-2">
         <div>
@@ -481,13 +498,14 @@ const LabourImmigration = () => {
               deleteFile={deleteFile}
               isUploading={isUploading}
               errors={errors}
+              formattedPermissions={formattedPermissions}
+              requiredPermissions={requiredPermissions}
+              access={access}
             />
           ))}
         </div>
       </div>
-
       <hr />
-
       <DependentPass
         register={register}
         uploadedFileNames={uploadedFileNames}
@@ -504,14 +522,15 @@ const LabourImmigration = () => {
         watchedEmpID={watchedEmpID}
         deleteFile={deleteFile}
         getValues={getValues}
+        formattedPermissions={formattedPermissions}
+        requiredPermissions={requiredPermissions}
+        access={access}
       />
-
       <div className="center">
         <button type="submit" className="primary_btn">
           Submit
         </button>
       </div>
-
       {/* Notification */}
       {notification && (
         <SpinLogo
@@ -520,6 +539,12 @@ const LabourImmigration = () => {
           path="/labourImmigration"
         />
       )}
+       {deletePopup && (
+                          <DeletePopup
+                            handleDeleteMsg={handleDeleteMsg}
+                            title1={deleteTitle1}
+                          />
+                        )}
     </form>
   );
 };

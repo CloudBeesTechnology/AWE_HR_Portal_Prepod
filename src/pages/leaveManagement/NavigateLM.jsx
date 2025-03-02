@@ -1,8 +1,12 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useTempID } from "../../utils/TempIDContext";
 
 export const NavigateLM = ({ userType }) => {
   const location = useLocation();
+  const { gmPosition, HRMPosition } = useTempID();
+  const GM = "GENERAL MANAGER";
+  const HRM = "HR MANAGER"
   return (
     <section className="flex text-center items-center py-3 text_size_5">
       <Link
@@ -33,7 +37,13 @@ export const NavigateLM = ({ userType }) => {
       >
         Employee Leave Balance
       </Link>{" "}
-      {(userType === "HR" || userType === "SuperAdmin") && (
+      {(
+        HRMPosition === HRM 
+      ||
+        userType === "SuperAdmin"
+        //  ||
+        // gmPosition === GM
+      ) && (
         <>
           {" "}
           <Link

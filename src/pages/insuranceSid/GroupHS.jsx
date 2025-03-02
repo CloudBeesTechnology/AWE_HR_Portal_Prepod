@@ -18,6 +18,7 @@ import { DeleteGroupUp } from "./DeleteUpload/DeleteGroupUp";
 import { handleDeleteFile } from "../../services/uploadsDocsS3/DeleteDocs";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
+import { DeletePopup } from "../../utils/DeletePopup";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
@@ -27,13 +28,15 @@ export const GroupHS = () => {
   const client = generateClient();
   const [isUploading, setIsUploading] = useState({
     groupHSUpload: false,
-      });
+  });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     groupHSUpload: null,
   });
   const [uploadGHsU, setUploadGHsU] = useState({
     groupHSUpload: [],
   });
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [insuranceData, setInsuranceData] = useState([]);
   const [loading, setLoading] = useState(true); // Track loading state
@@ -82,7 +85,7 @@ export const GroupHS = () => {
       if (Array.isArray(parsedData)) {
         return parsedData.map((doc) => {
           if (doc.upload) {
-            doc.fileName = doc.upload.split("/").pop(); 
+            doc.fileName = doc.upload.split("/").pop();
           }
           return doc;
         });
@@ -93,89 +96,96 @@ export const GroupHS = () => {
       return [];
     }
   };
-const updateUploadingState = (label, value) => {
-     setIsUploading((prev) => ({
-       ...prev,
-       [label]: value,
-     }));
-     console.log(value);
-   };
- 
-   const handleFileChange = async (e, label) => {
-     const groupHSNo = watch("groupHSNo");
-     if (!groupHSNo) {
-         alert("Please enter the Policy Number before uploading files.");
-         window.location.href = "/insuranceHr";
-         return;
-     }
- 
-     const selectedFile = e.target.files[0];
-     if (!selectedFile) return;
- 
-     const allowedTypes = [
-       "application/pdf",
-      
-     ];
-     if (!allowedTypes.includes(selectedFile.type)) {
-         alert("Upload must be a PDF file.");
-         return;
-     }
- 
-     // Ensure no duplicate files are added
-     const currentFiles = watch(label) || [];
-     if (currentFiles.some((file) => file.name === selectedFile.name)) {
-         alert("This file has already been uploaded.");
-         return;
-     }
- 
-     setValue(label, [...currentFiles, selectedFile]);
- 
-     try {
-       updateUploadingState(label, true);
-       await uploadDocs(selectedFile, label, setUploadGHsU, groupHSNo);
-       setUploadedFileNames((prev) => ({
-         ...prev,
-         [label]: selectedFile.name,
-       }));
-     } catch (err) {
-         console.error(err);
-     }
-   };
- 
-   const deleteFile = async (fileType, fileName) => {
-     try {
-       const groupHSNo = watch("groupHSNo");
-       if (!groupHSNo) {
-         alert("Please provide the Policy Number before deleting files.");
-         return;
-       }
- 
-       const isDeleted = await handleDeleteFile(
-         fileType,
-         fileName,
-         groupHSNo
-       );
-       const isDeletedArrayUploaded = await DeleteGroupUp(
-         fileType,
-         fileName,
-         groupHSNo,
-         setUploadedFileNames,
-         setUploadGHsU,
-         setIsUploading
-       );
- 
-       if (!isDeleted || isDeletedArrayUploaded) {
-         console.error(
-           `Failed to delete file: ${fileName}, skipping UI update.`
-         );
-         return;
-       }
-       // console.log(`Deleted "${fileName}". Remaining files:`);
-     } catch (error) {
-       console.error("Error deleting file:", error);
-       alert("Error processing the file deletion.");
-     }
-   };
+
+  const updateUploadingState = (label, value) => {
+    setIsUploading((prev) => ({
+      ...prev,
+      [label]: value,
+    }));
+    console.log(value);
+  };
+
+  const handleFileChange = async (e, label) => {
+    const groupHSNo = watch("groupHSNo");
+    if (!groupHSNo) {
+      alert("Please enter the Policy Number before uploading files.");
+      window.location.href = "/insuranceHr/groupHS";
+      return;
+    }
+
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file.");
+      return;
+    }
+
+    // Ensure no duplicate files are added
+    const currentFiles = watch(label) || [];
+    if (currentFiles.some((file) => file.name === selectedFile.name)) {
+      alert("This file has already been uploaded.");
+      return;
+    }
+
+    setValue(label, [...currentFiles, selectedFile]);
+
+    try {
+      updateUploadingState(label, true);
+      await uploadDocs(selectedFile, label, setUploadGHsU, groupHSNo);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [label]: selectedFile.name,
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
+  const deleteFile = async (fileType, fileName) => {
+    // console.log(fileType, fileName);
+
+    try {
+      const groupHSNo = watch("groupHSNo");
+      if (!groupHSNo) {
+        alert("Please provide the Policy Number before deleting files.");
+        return;
+      }
+
+      const isDeleted = await handleDeleteFile(fileType, fileName, groupHSNo);
+      const isDeletedArrayUploaded = await DeleteGroupUp(
+        fileType,
+        fileName,
+        groupHSNo,
+        setUploadedFileNames,
+        setUploadGHsU,
+        setIsUploading
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
+    }
+  };
 
   const handlePrint = useReactToPrint({
     content: () => groupPrint.current,
@@ -337,7 +347,7 @@ const updateUploadingState = (label, value) => {
 
   const onSubmit = async (data) => {
     // console.log("data", data);
-    
+
     try {
       const GHSreValue = {
         ...data,
@@ -356,13 +366,13 @@ const updateUploadingState = (label, value) => {
       console.error("Error submitting data:", error);
     }
   };
-  
+
   useEffect(() => {
     const fetchInsuranceData = async () => {
       try {
         let allInsuranceData = [];
         let nextToken = null;
-  
+
         do {
           const response = await client.graphql({
             query: listGroupHandS,
@@ -370,19 +380,19 @@ const updateUploadingState = (label, value) => {
               nextToken: nextToken,
             },
           });
-  
+
           const items = response?.data?.listGroupHandS?.items || [];
-  
+
           allInsuranceData = [...allInsuranceData, ...items];
-  
+
           nextToken = response?.data?.listGroupHandS?.nextToken;
         } while (nextToken);
-  
+
         const filteredData = allInsuranceData.filter((data) => {
           const expiryDate = new Date(data.groupHSExp);
           return expiryDate >= new Date();
         });
-  
+
         setInsuranceData(filteredData);
         setLoading(false);
       } catch (error) {
@@ -391,10 +401,9 @@ const updateUploadingState = (label, value) => {
         setLoading(false);
       }
     };
-  
+
     fetchInsuranceData();
   }, []);
-  
 
   return (
     <section>
@@ -426,9 +435,9 @@ const updateUploadingState = (label, value) => {
                 label="Upload File"
                 onChangeFunc={(e) => handleFileChange(e, "groupHSUpload")}
                 handleFileChange={handleFileChange}
-          uploadedFileNames={uploadedFileNames}
-          isUploading={isUploading}
-          deleteFile={deleteFile}
+                uploadedFileNames={uploadedFileNames}
+                isUploading={isUploading}
+                deleteFile={deleteFile}
                 register={register}
                 name="groupHSUpload"
                 error={errors}
@@ -540,6 +549,10 @@ const updateUploadingState = (label, value) => {
             )}
           </div>
         </div>
+      )}
+
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}
     </section>
   );
