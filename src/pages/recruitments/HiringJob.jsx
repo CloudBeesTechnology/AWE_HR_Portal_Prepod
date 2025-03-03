@@ -2,7 +2,7 @@ import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { FaArrowLeft } from "react-icons/fa";
-
+import { useDeleteAccess } from "../../hooks/useDeleteAccess";
 export const HiringJob = () => {
   useEffect(() => {
     window.scrollTo({
@@ -11,6 +11,7 @@ export const HiringJob = () => {
     });
   }, []);
   const { hiringData } = useContext(DataSupply);
+  const { formattedPermissions } = useDeleteAccess();
   // console.log(hiringData);
   const latestData = hiringData.sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -44,13 +45,19 @@ export const HiringJob = () => {
     return status === "Expired" ? "text-[green]" : "text-[#E8A317]";
   };
 
+    const requiredPermissions = [
+      "Status",
+    ];
+  
+    const access = "Recruitment"
+    
   return (
     <section className="bg-[#F5F6F1CC] mx-auto p-10 min-h-screen ">
-                <div className=" flex items-center mb-7">
+      <div className=" flex items-center mb-7">
         <Link to="/recruitment" className="text-xl text-grey">
-                <FaArrowLeft />
-              </Link>         
-          </div>
+          <FaArrowLeft />
+        </Link>
+      </div>
       <div className="mb-5 flex justify-between">
         {" "}
         <span className="bg-[#faf362] py-2 px-3 rounded-lg text-[18px] font-semibold">
@@ -81,7 +88,7 @@ export const HiringJob = () => {
             latestData.map((val, idx) => {
               const status = getStatus(val?.expiryDate);
               // console.log(val?.uploadJobDetails,val.jobTitle);
-              
+
               return (
                 <tr
                   key={idx}
@@ -96,7 +103,13 @@ export const HiringJob = () => {
                   <td className=" pl-4 py-4">{val?.quantityPerson || "N/A"}</td>
                   <td className=" pl-4 py-4">{val?.startDate || "N/A"}</td>
                   <td className=" pl-4 py-4">{val?.expiryDate || "N/A"}</td>
-                  <td className={`pl-4 py-4 ${val?.uploadJobDetails ? "text-[#3c3cc2]" : "text-dark_grey"} `}>
+                  <td
+                    className={`pl-4 py-4 ${
+                      val?.uploadJobDetails
+                        ? "text-[#3c3cc2]"
+                        : "text-dark_grey"
+                    } `}
+                  >
                     <a href={val?.uploadJobDetails}>
                       {val?.uploadJobDetails ? "Download" : "N/A"}
                     </a>{" "}

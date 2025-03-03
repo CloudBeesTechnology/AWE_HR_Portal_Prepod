@@ -376,7 +376,7 @@ export const ViewORMCsheet = ({
     }
   };
 
-  const handleManagerReload = async() => {
+  const handleManagerReload = async () => {
     let mergedData = [...allApprovedData, ...allRejectedData];
     const remainingData = data?.filter(
       (row) => !mergedData.some((selected) => selected.id === row.id)
@@ -552,7 +552,7 @@ export const ViewORMCsheet = ({
             await createNotification({
               empID: empID,
               leaveType: `${fileType} Time Sheet ${sheetStatus}`,
-              message: `Your submitted ${fileType} timesheet for the period ${fromDate} to ${untilDate} has been ${sheetStatus} by Manager : ${managerName}.`,
+              message: `The ${fileType} timesheet for the period ${fromDate} to ${untilDate} has been ${sheetStatus} by Manager : ${managerName}.`,
               senderEmail: senderEmail,
               receipentEmail: toAddress,
               receipentEmpID: empID,
@@ -562,7 +562,7 @@ export const ViewORMCsheet = ({
         );
 
         storeApproveRej = [];
-        await  handleManagerReload();
+        await handleManagerReload();
       }
     } else if (
       userIdentification !== "Manager" &&
@@ -796,7 +796,7 @@ export const ViewORMCsheet = ({
   const totalPages = Math.ceil(safeData.length / itemsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  currentData.sort((a, b) => a.NAME.localeCompare(b.NAME));
+  // currentData.sort((a, b) => a.NAME.localeCompare(b.NAME));
   visibleData = currentData;
   return (
     <div>

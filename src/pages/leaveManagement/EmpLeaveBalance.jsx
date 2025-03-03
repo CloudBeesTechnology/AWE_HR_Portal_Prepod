@@ -31,9 +31,11 @@ export const EmpLeaveBalance = () => {
     "Department",
     "Summary",
   ];
+  
 // console.log("DATA EMO LEAVE",mergedData);
 
 useEffect(() => {
+
   const userID = localStorage.getItem("userID");
 
   // Step 1: Create a map to track the most recent data by empID
@@ -155,7 +157,7 @@ useEffect(() => {
       setHasSearched(true);
       setCurrentPage(1);
     } catch (error) {
-      console.error("Error search data", error);
+      // console.error("Error search data", error);
       setSearchResults([]);
       setHasSearched(true);
     }
@@ -214,7 +216,7 @@ useEffect(() => {
                   return (
                     <tr
                       key={index}
-                      className="text-center text-sm shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)] hover:bg-medium_blue"
+                      className="text-center text-sm border-b-2 bg-white border-[#C7BCBC] text-[#303030] hover:bg-medium_blue"
                     >
                       <td className="py-3">{displayIndex}</td>
                       <td className="py-3">{item.empID}</td>
@@ -237,7 +239,7 @@ useEffect(() => {
                         <button
                           onClick={() => {
                             handleViewSummary(item)
-                            console.log(item);
+                            // console.log(item);
                             
                           }}
                           className="border-b-2 text-[blue]"

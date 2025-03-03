@@ -180,116 +180,158 @@ export const Status = () => {
     fetchData();
   }, [empPDData, educDetailsData, IVSSDetails]);
 
-  const handleOptionSelect = (option) => {
-    setSelectedOptions((prevSelectedOptions) => {
-  
-      if (prevSelectedOptions.includes(option)) {
-        const newSelectedOptions = prevSelectedOptions.filter((opt) => opt !== option);
-        return newSelectedOptions;
-      } else {
-  
-        if (option === "LOCAL") {
-          const newSelectedOptions = [
-            "LOCAL",
-            ...prevSelectedOptions.filter(
-              (opt) => opt !== "NON LOCAL" && opt !== "LPA" && opt !== "SAWP"
-            ),
-          ];
-          return newSelectedOptions;
-        }
-        
-        if (option === "NON LOCAL") {
-          const newSelectedOptions = [
-            "NON LOCAL",
-            ...prevSelectedOptions.filter((opt) => opt !== "LOCAL"),
-          ];
-          return newSelectedOptions;
-        }
-        
-        if (option === "ONSHORE" || option === "OFFSHORE") {
-          const newSelectedOptions = [
-            option,
-            ...prevSelectedOptions.filter(
-              (opt) => opt !== "ONSHORE" && opt !== "OFFSHORE"
-            ),
-          ];
-          return newSelectedOptions;
-        }
-  
-        if (option === "LPA" || option === "SAWP") {
-          const newSelectedOptions = [
-            option,
-            ...prevSelectedOptions.filter(
-              (opt) => opt !== "LPA" && opt !== "SAWP"
-            ),
-          ];
-          return newSelectedOptions;
-        }
-  
-        const newSelectedOptions = [...prevSelectedOptions, option];
-        return newSelectedOptions;
-      }
-    });
-  };
-  
-  useEffect(() => {
-    filterMergeDataBasedOnOptions();
-  }, [selectedOptions]);
-  
-  const filterMergeDataBasedOnOptions = () => {
-    let filteredData = dropOption;
-  
-    if (selectedOptions.includes("LOCAL")) {
-      filteredData = filteredData.filter(
-        (item) => item.contractType === "Local"
-      );
-    }
-  
-    if (selectedOptions.includes("NON LOCAL")) {
-      filteredData = filteredData.filter(
-        (item) => item.contractType === "Non Local"
-      );
-    }
-  
-    if (selectedOptions.includes("ONSHORE")) {
-      filteredData = filteredData.filter((item) => item.empType === "Onshore");
-    }
-  
-    if (selectedOptions.includes("OFFSHORE")) {
-      filteredData = filteredData.filter((item) => item.empType === "Offshore");
-    }
-  
-    if (selectedOptions.includes("LPA")) {
-      filteredData = filteredData.filter((item) => item.contractType === "LPA");
-    }
-  
-    if (selectedOptions.includes("SAWP")) {
-      filteredData = filteredData.filter(
-        (item) => item.contractType === "SAWP"
-      );
-    }
-  
-    setFilteredData(filteredData);
-  };
-  
-  const isOptionDisabled = (option) => {
-    
-    if (selectedOptions.includes("LOCAL")) {
-      if (option === "NON LOCAL" || option === "LPA" || option === "SAWP") {
-        return true;
-      }
-    }
-  
-    if (selectedOptions.includes("NON LOCAL")) {
-      if (option === "LOCAL") {
-        return true;
-      }
-    }
-  
-    return false;
-  };
+const handleOptionSelect = (option) => {
+  // console.log("Option selected:", option);
 
+  setSelectedOptions((prevSelectedOptions) => {
+    // console.log("Previous selected options:", prevSelectedOptions);
+
+    // Handle toggling of options
+    if (prevSelectedOptions.includes(option)) {
+      // console.log(`Option ${option} is already selected, removing it.`);
+      const newSelectedOptions = prevSelectedOptions.filter((opt) => opt !== option);
+      // console.log("New selected options after removal:", newSelectedOptions);
+      return newSelectedOptions;
+    } else {
+      // console.log(`Option ${option} is not selected, adding it.`);
+      
+      // Logic for disabling conflicting options
+      if (option === "LOCAL") {
+        // console.log("LOCAL selected, removing conflicting options: NON LOCAL, LPA, SAWP");
+        const newSelectedOptions = [
+          "LOCAL",
+          ...prevSelectedOptions.filter(
+            (opt) => opt !== "NON LOCAL" && opt !== "LPA" && opt !== "SAWP"
+          ),
+        ];
+        // console.log("New selected options after adding LOCAL:", newSelectedOptions);
+        return newSelectedOptions;
+      }
+      
+      if (option === "NON LOCAL") {
+        // console.log("NON LOCAL selected, removing conflicting option: LOCAL");
+        const newSelectedOptions = [
+          "NON LOCAL",
+          ...prevSelectedOptions.filter((opt) => opt !== "LOCAL"),
+        ];
+        // console.log("New selected options after adding NON LOCAL:", newSelectedOptions);
+        return newSelectedOptions;
+      }
+      
+      if (option === "ONSHORE" || option === "OFFSHORE") {
+        // console.log(`Selected either ONSHORE or OFFSHORE, ensuring only one is selected.`);
+        const newSelectedOptions = [
+          option,
+          ...prevSelectedOptions.filter(
+            (opt) => opt !== "ONSHORE" && opt !== "OFFSHORE"
+          ),
+        ];
+        // console.log("New selected options after adding ONSHORE/OFFSHORE:", newSelectedOptions);
+        return newSelectedOptions;
+      }
+
+      if (option === "LPA" || option === "SAWP") {
+        // console.log("Selected either LPA or SAWP, ensuring only one is selected.");
+        const newSelectedOptions = [
+          option,
+          ...prevSelectedOptions.filter(
+            (opt) => opt !== "LPA" && opt !== "SAWP"
+          ),
+        ];
+        // console.log("New selected options after adding LPA/SAWP:", newSelectedOptions);
+        return newSelectedOptions;
+      }
+
+      // If none of the special rules apply, just add the option
+      const newSelectedOptions = [...prevSelectedOptions, option];
+      // console.log("New selected options after adding:", newSelectedOptions);
+      return newSelectedOptions;
+    }
+  });
+};
+
+// UseEffect to trigger filterMergeDataBasedOnOptions after selectedOptions changes
+useEffect(() => {
+  // console.log("Selected options changed, filtering data...");
+  filterMergeDataBasedOnOptions();
+}, [selectedOptions]);  
+
+const filterMergeDataBasedOnOptions = () => {
+  let filteredData = dropOption;
+
+  // console.log("Initial filtered data:", filteredData);
+
+  // Filtering logic based on selected options
+  if (selectedOptions.includes("LOCAL")) {
+    // console.log("Filtering for LOCAL contractType.");
+    filteredData = filteredData.filter(
+      (item) => item.contractType === "Local"
+    );
+    // console.log("Filtered data after LOCAL filter:", filteredData);
+  }
+
+  if (selectedOptions.includes("NON LOCAL")) {
+    // console.log("Filtering for NON LOCAL contractType.");
+    filteredData = filteredData.filter(
+      (item) => item.contractType === "Non Local"
+    );
+    // console.log("Filtered data after NON LOCAL filter:", filteredData);
+  }
+
+  if (selectedOptions.includes("ONSHORE")) {
+    // console.log("Filtering for ONSHORE empType.");
+    filteredData = filteredData.filter((item) => item.empType === "Onshore");
+    // console.log("Filtered data after ONSHORE filter:", filteredData);
+  }
+
+  if (selectedOptions.includes("OFFSHORE")) {
+    // console.log("Filtering for OFFSHORE empType.");
+    filteredData = filteredData.filter((item) => item.empType === "Offshore");
+    // console.log("Filtered data after OFFSHORE filter:", filteredData);
+  }
+
+  if (selectedOptions.includes("LPA")) {
+    // console.log("Filtering for LPA contractType.");
+    filteredData = filteredData.filter((item) => item.contractType === "LPA");
+    // console.log("Filtered data after LPA filter:", filteredData);
+  }
+
+  if (selectedOptions.includes("SAWP")) {
+    // console.log("Filtering for SAWP contractType.");
+    filteredData = filteredData.filter(
+      (item) => item.contractType === "SAWP"
+    );
+    // console.log("Filtered data after SAWP filter:", filteredData);
+  }
+
+  // After applying all the filters, set the filtered data
+  // console.log("Final filtered data:", filteredData);
+  setFilteredData(filteredData);
+};
+
+const isOptionDisabled = (option) => {
+  // console.log("Checking if option is disabled for:", option);
   
+  if (selectedOptions.includes("LOCAL")) {
+    // Disable NON LOCAL, LPA, SAWP if LOCAL is selected
+    if (option === "NON LOCAL" || option === "LPA" || option === "SAWP") {
+      // console.log(`Option ${option} is disabled because LOCAL is selected.`);
+      return true;
+    }
+  }
+
+  if (selectedOptions.includes("NON LOCAL")) {
+    // Disable LOCAL if NON LOCAL is selected
+    if (option === "LOCAL") {
+      // console.log("Option LOCAL is disabled because NON LOCAL is selected.");
+      return true;
+    }
+  }
+
+  // console.log(`Option ${option} is not disabled.`);
+  return false;
+};
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       // Close CV type dropdown if clicked outside
@@ -400,11 +442,11 @@ export const Status = () => {
         break;
     }
 
-    // console.log("Filtered Data: ", filtered); // Log filtered data
+    // console.log("Filtered Data: ", filtered); 
 
     setFilteredData(filtered);
     setIsFilterBoxOpen(false);
-  }, [selectedFilters, mergeData]); // Depend on `selectedFilters` and `mergeData`
+  }, [selectedFilters, mergeData]); 
 
   // console.log("Hello World", mergeData);
   // Handle edit click
@@ -416,7 +458,7 @@ export const Status = () => {
   // Close form
   const closeForm = () => {
     setIsFormVisible(false);
-    setSelectedInterviewCandidate(null); // Clear the selected candidate
+    setSelectedInterviewCandidate(null); 
   };
 
   const handleFormSave = (updatedCandidate) => {
@@ -424,12 +466,12 @@ export const Status = () => {
     const updateCandidates = (candidates) =>
       candidates.map((candidate) =>
         candidate.tempID === updatedCandidate.tempID
-          ? { ...candidate, ...updatedCandidate } // Replace the old candidate data with the updated data
+          ? { ...candidate, ...updatedCandidate } 
           : candidate
       );
 
-    setMergeData((prevMergeData) => updateCandidates(prevMergeData)); // Update mergeData
-    setFilteredData((prevFilteredData) => updateCandidates(prevFilteredData)); // Update filteredData
+    setMergeData((prevMergeData) => updateCandidates(prevMergeData)); 
+    setFilteredData((prevFilteredData) => updateCandidates(prevFilteredData));
 
     setIsFormVisible(false);
   };
@@ -457,11 +499,11 @@ export const Status = () => {
       // Check if input is a string
       if (typeof files === "string") {
         let validJsonString = files
-          .replace(/=/g, ":") // Replace `=` with `:`
-          .replace(/([{,])(\s*[a-zA-Z0-9_]+)(?=\s*:)/g, '$1"$2"') // Wrap keys in quotes
-          .replace(/:\s*([^",}\]]+)/g, ': "$1"') // Wrap unquoted values in quotes
-          .replace(/"\s*[^"]+"\s*$/g, (match) => match.trim()) // Trim unnecessary spaces
-          .replace(/(\w)(,|})/g, "$1$2"); // Ensure commas and closing brackets are in place
+          .replace(/=/g, ":") 
+          .replace(/([{,])(\s*[a-zA-Z0-9_]+)(?=\s*:)/g, '$1"$2"') 
+          .replace(/:\s*([^",}\]]+)/g, ': "$1"')
+          .replace(/"\s*[^"]+"\s*$/g, (match) => match.trim()) 
+          .replace(/(\w)(,|})/g, "$1$2"); 
 
         const parsedArray = JSON.parse(validJsonString);
 
@@ -579,7 +621,7 @@ export const Status = () => {
                     className="mr-2"
                     checked={selectedOptions.includes(option)}
                     onChange={() => handleOptionSelect(option)}
-                    disabled={isOptionDisabled(option)} // Disable based on the logic
+                    disabled={isOptionDisabled(option)} 
                   />
                   {option}
                 </label>

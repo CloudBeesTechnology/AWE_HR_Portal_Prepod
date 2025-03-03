@@ -128,10 +128,6 @@ export const EmpRequisitionForm = ({ isVisible, onClose, userID }) => {
             "hr_no-reply@adininworks.com",
             recruMail        );
         }
-        
-        else {
-          console.error("Human Resource Manager email not found.");
-        }
       }
 
       setIsLoading(false);

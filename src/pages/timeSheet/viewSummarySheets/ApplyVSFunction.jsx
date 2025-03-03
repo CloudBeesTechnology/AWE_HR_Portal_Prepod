@@ -128,7 +128,7 @@ export const ApplyVSFunction = ({
         const grouped = Object.values(
           groupBySapNo(convertedStringToArrayObj || [])
         );
-     
+
         const seperateDateMethod = (inputData) => {
           return inputData
             .map((entry) => {
@@ -611,7 +611,7 @@ export const ApplyVSFunction = ({
         const updatedData = await updateFieldBasedOnConditions(
           addLeaveTypeCount
         );
-       
+
         const getSummaryUpdaterName = async (updatedData) => {
           const results = await Promise.all(
             updatedData.map(async (val) => {

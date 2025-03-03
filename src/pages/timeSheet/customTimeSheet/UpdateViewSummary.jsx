@@ -91,7 +91,7 @@ export const UpdateViewSummary = async (object) => {
       object?.data?.find(
         async (fi) => fi.empDept !== null || fi.empDept !== undefined
       );
-    console.log("object?.data : ", object?.data);
+
     let idCounter = 10;
     const summaryCreateMethod = async () => {
       const jobLocaWhrs = [
@@ -179,6 +179,7 @@ export const UpdateViewSummary = async (object) => {
               LOCATION: object?.location || "",
               WORKINGHRS: extractNumber(obj.workingHrs) || "",
               OVERTIMEHRS: obj.ot || "",
+              verify: "Yes",
             };
           });
 

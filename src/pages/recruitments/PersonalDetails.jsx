@@ -205,12 +205,8 @@ export const PersonalDetails = () => {
         } else {
           // console.log("No interview data found for tempID:", tempID);
         }
-      } else {
-        // console.log("empPDData is empty");
       }
-    } else {
-      // console.log("tempID is not set");
-    }
+    } 
   }, [tempID, setValue, empPDData]);
 
   return (
@@ -463,7 +459,7 @@ export const PersonalDetails = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    console.log(`Removing family member at index: ${index}`);
+                    // console.log(`Removing family member at index: ${index}`);
                     removeFamily(index);
                   }}
                   className="absolute top-15 -right-7 text-medium_grey text-[18px]"

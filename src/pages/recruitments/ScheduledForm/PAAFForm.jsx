@@ -11,6 +11,7 @@ import { statusOptions } from "../../../utils/StatusDropdown";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadPAAF } from "../deleteDocsRecruit/DeleteUploadPAAF";
+import { DeletePopup } from "../../../utils/DeletePopup";
 // Define validation schema using Yup
 const PAAFFormSchema = Yup.object().shape({
   paafApproveDate: Yup.date().notRequired(),
@@ -22,10 +23,12 @@ const PAAFFormSchema = Yup.object().shape({
     ),
 });
 
-export const PAAFForm = ({ candidate }) => {
+export const PAAFForm = ({ candidate, formattedPermissions }) => {
   const { loiDetails } = UpdateLoiData();
   const { mergedInterviewData } = useFetchInterview();
   const { interviewDetails } = UpdateInterviewData();
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [formData, setFormData] = useState({
     interview: {
@@ -131,6 +134,10 @@ export const PAAFForm = ({ candidate }) => {
     }
   };
 
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
   const deletedStringUpload = async (fileType, fileName) => {
     try {
       const tempID = candidate.tempID;
@@ -157,6 +164,8 @@ export const PAAFForm = ({ candidate }) => {
         return;
       }
       // console.log(`Deleted "${fileName}". Remaining files:`);
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
     } catch (error) {
       console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
@@ -189,7 +198,7 @@ export const PAAFForm = ({ candidate }) => {
 
       await interviewDetails({
         InterviewValue: {
-          id: interviewScheduleId, 
+          id: interviewScheduleId,
           status: formData.interview.status,
           // status: selectedInterviewData.empType === "Offshore" ? "CVEV" : "PAAF",
           // status: selectedInterviewData.contractType === "Local" ? "mobilization" : "workpass",
@@ -199,7 +208,7 @@ export const PAAFForm = ({ candidate }) => {
       // console.log("Data stored successfully...");
       setNotification(true);
     } catch (error) {
-      console.error("Error submitting interview details:", error);
+      // console.error("Error submitting interview details:", error);
       alert("Failed to update interview details. Please try again.");
     }
   };
@@ -214,6 +223,10 @@ export const PAAFForm = ({ candidate }) => {
       },
     }));
   };
+
+  const requiredPermissions = ["Status"];
+
+  const access = "Recruitment";
 
   return (
     <form onSubmit={handleSubmitTwo} className="p-5">
@@ -233,17 +246,20 @@ export const PAAFForm = ({ candidate }) => {
         </div>
 
         <div className="">
-          <div className="">   
-
+          <div className="">
             <FileUploadField
               label="Upload File"
-              register={register} 
+              register={register}
               fileKey="paafFile"
               handleFileUpload={handleFileUpload}
               uploadedFileNames={uploadedFileNames}
               deletedStringUpload={deletedStringUpload}
               isUploadingString={isUploadingString}
               error={errors.paafFile}
+              formattedPermissions={formattedPermissions}
+              requiredPermissions={requiredPermissions}
+              access={access}
+              check={isUploadingString.paafFile}
             />
           </div>
         </div>
@@ -279,6 +295,9 @@ export const PAAFForm = ({ candidate }) => {
           notification={notification}
           path="/recrutiles/status"
         />
+      )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}
     </form>
   );

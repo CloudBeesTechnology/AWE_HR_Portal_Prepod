@@ -35,20 +35,18 @@ export const WorkPass = () => {
       try {
         const mergedData = empPIData
           .map((emp) => {
-            const SpDetails = SawpDetails ? SawpDetails.find(
-              (user) => user.empID === emp.empID
-            ) : {};
-            const bjlDetails = BJLData ? BJLData.find(
-              (user) => user.empID === emp.empID
-            ): {};
-            const ppVDetails =PPValidsData ?  PPValidsData.find(
-              (user) => user.empID === emp.empID
-            ) :{};
-            const dndDetails = DNData ? DNData.find(
-              (user) => user.empID === emp.empID
-            ): {};
-
-        
+            const SpDetails = SawpDetails
+              ? SawpDetails.find((user) => user.empID === emp.empID)
+              : {};
+            const bjlDetails = BJLData
+              ? BJLData.find((user) => user.empID === emp.empID)
+              : {};
+            const ppVDetails = PPValidsData
+              ? PPValidsData.find((user) => user.empID === emp.empID)
+              : {};
+            const dndDetails = DNData
+              ? DNData.find((user) => user.empID === emp.empID)
+              : {};
 
             return {
               ...emp,

@@ -19,7 +19,7 @@ export const FilterTable = ({
 }) => {
 
  const { dropDownVal,} = useContext(DataSupply);
-console.log(dropDownVal);
+// console.log(dropDownVal);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState(""); // New state for department filter

@@ -4,6 +4,7 @@ import { DataSupply } from "../../../utils/DataStoredContext";
 import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
 import { SpinLogo } from "../../../utils/SpinLogo";
 
+
 export const InterviewForm = ({ candidate }) => {
   const { IVSSDetails } = useContext(DataSupply);
   const { interviewDetails } = UpdateInterviewData();
@@ -71,7 +72,7 @@ export const InterviewForm = ({ candidate }) => {
     );
 
     if (!selectedInterviewData) {
-      console.error("No interview data found for the selected candidate.");
+      // console.error("No interview data found for the selected candidate.");
       alert("No interview data found for the selected candidate.");
       return;
     }
@@ -79,7 +80,7 @@ export const InterviewForm = ({ candidate }) => {
     const interviewScheduleId = selectedInterviewData?.id;
 
     if (!interviewScheduleId) {
-      console.error("Interview schedule ID not found.");
+      // console.error("Interview schedule ID not found.");
       alert("Interview schedule ID not found.");
       return;
     }
@@ -100,7 +101,7 @@ export const InterviewForm = ({ candidate }) => {
       // console.log("Data stored successfully...");
       setNotification(true);
     } catch (error) {
-      console.error("Error submitting interview details:", error);
+      // console.error("Error submitting interview details:", error);
       alert("Failed to update interview details. Please try again.");
     }
   };

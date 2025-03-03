@@ -54,7 +54,7 @@ export const ApplyEmployReq = () => {
       setRequisitionData(allRequisitions);
       setError(null);
     } catch (err) {
-      console.error("Error fetching requisition data:", err);
+      // console.error("Error fetching requisition data:", err);
       setError("Failed to fetch requisition data");
       setRequisitionData([]);
     }

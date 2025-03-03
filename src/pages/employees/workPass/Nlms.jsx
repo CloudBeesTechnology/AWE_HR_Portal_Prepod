@@ -11,17 +11,21 @@ import { DataSupply } from "../../../utils/DataStoredContext";
 import { useOutletContext } from "react-router-dom";
 import { DeleteDocsNlms } from "../../../services/uploadDocsDelete/DeleteDocsNlms";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
+import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../../utils/DeletePopup";
 
 export const Nlms = () => {
   const { searchResultData } = useOutletContext();
-
+  const { formattedPermissions } = useDeleteAccess();
   const { DNData, dropDownVal } = useContext(DataSupply);
   const { uploadNlmsFun } = UpdateNlmsData();
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
-   const [isUploading, setIsUploading] = useState({
+  const [isUploading, setIsUploading] = useState({
     nlmsEmpUpload: false,
-        });
+  });
 
   const [uploadedFileNames, setUploadedFileNames] = useState({
     nlmsEmpUpload: null,
@@ -30,7 +34,7 @@ export const Nlms = () => {
     nlmsEmpUpload: [],
   });
 
-    const [fieldTitle, setFieldTitle] = useState("nlmsEmpUpload");
+  const [fieldTitle, setFieldTitle] = useState("nlmsEmpUpload");
 
   const {
     register,
@@ -44,14 +48,12 @@ export const Nlms = () => {
     nlmsEmpApproval: [],
     nlmsEmpValid: [],
   });
-  const watchInducNlmsUpload = watch("nlmsEmpUpload", ""); 
+  const watchInducNlmsUpload = watch("nlmsEmpUpload", "");
   const empID = watch("empID");
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
-
-
 
   const getFileName = (input) => {
     // Check if input is an object and has the 'upload' property
@@ -112,97 +114,103 @@ export const Nlms = () => {
     return Array.isArray(value) ? value[value.length - 1] : value;
   };
 
-   const updateUploadingState = (label, value) => {
-       setIsUploading((prev) => ({
-         ...prev,
-         [label]: value,
-       }));
-       console.log(value);
-     };
-   
-     const handleFileChange = async (e, label) => {
-       const watchedEmpID = watch("empID");
-       if (!watchedEmpID) {
-           alert("Please enter the Employee ID before uploading files.");
-           window.location.href = "/employeeInfo";
-           return;
-       }
-   
-       const selectedFile = e.target.files[0];
-       if (!selectedFile) return;
-   
-       const allowedTypes = [
-        "application/pdf",
-        "image/jpeg",
-        "image/png",
-        "image/jpg",
-      ];
-      if (!allowedTypes.includes(selectedFile.type)) {
-          alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-          return;
+  const updateUploadingState = (label, value) => {
+    setIsUploading((prev) => ({
+      ...prev,
+      [label]: value,
+    }));
+    console.log(value);
+  };
+
+  const handleFileChange = async (e, label) => {
+    const watchedEmpID = watch("empID");
+    if (!watchedEmpID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
+    }
+
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
+    if (!allowedTypes.includes(selectedFile.type)) {
+        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+        return;
+    }
+
+    // Ensure no duplicate files are added
+    const currentFiles = watch(label) || [];
+    if (currentFiles.some((file) => file.name === selectedFile.name)) {
+      alert("This file has already been uploaded.");
+      return;
+    }
+
+    // **Check if the file was previously deleted and prevent re-adding**
+    //  if (deletedFiles[label]?.includes(selectedFile.name)) {
+    //      alert("This file was previously deleted and cannot be re-added.");
+    //      return;
+    //  }
+
+    setValue(label, [...currentFiles, selectedFile]);
+
+    try {
+      updateUploadingState(label, true);
+      await uploadDocs(selectedFile, label, setUploadNlms, watchedEmpID);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [label]: selectedFile.name,
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
+  const deleteFile = async (fileType, fileName) => {
+    try {
+      const watchedEmpID = watch("empID");
+      if (!watchedEmpID) {
+        alert("Please provide the Employee ID before deleting files.");
+        return;
       }
-   
-       // Ensure no duplicate files are added
-       const currentFiles = watch(label) || [];
-       if (currentFiles.some((file) => file.name === selectedFile.name)) {
-           alert("This file has already been uploaded.");
-           return;
-       }
-   
-       // **Check if the file was previously deleted and prevent re-adding**
-      //  if (deletedFiles[label]?.includes(selectedFile.name)) {
-      //      alert("This file was previously deleted and cannot be re-added.");
-      //      return;
-      //  }
-   
-       setValue(label, [...currentFiles, selectedFile]);
-   
-       try {
-         updateUploadingState(label, true);
-         await uploadDocs(selectedFile, label, setUploadNlms, watchedEmpID);
-         setUploadedFileNames((prev) => ({
-           ...prev,
-           [label]: selectedFile.name,
-         }));
-       } catch (err) {
-           console.error(err);
-       }
-     };
-   
-     const deleteFile = async (fileType, fileName) => {
-       try {
-         const watchedEmpID = watch("empID");
-         if (!watchedEmpID) {
-           alert("Please provide the Employee ID before deleting files.");
-           return;
-         }
-   
-         const isDeleted = await handleDeleteFile(
-           fileType,
-           fileName,
-           watchedEmpID
-         );
-         const isDeletedArrayUploaded = await DeleteDocsNlms(
-           fileType,
-           fileName,
-           watchedEmpID,
-           setUploadedFileNames,
-           setUploadNlms,
-           setIsUploading
-         );
-   
-         if (!isDeleted || isDeletedArrayUploaded) {
-           console.error(
-             `Failed to delete file: ${fileName}, skipping UI update.`
-           );
-           return;
-         }
-         // console.log(`Deleted "${fileName}". Remaining files:`);
-       } catch (error) {
-         console.error("Error deleting file:", error);
-         alert("Error processing the file deletion.");
-       }
-     };
+
+      const isDeleted = await handleDeleteFile(
+        fileType,
+        fileName,
+        watchedEmpID
+      );
+      const isDeletedArrayUploaded = await DeleteDocsNlms(
+        fileType,
+        fileName,
+        watchedEmpID,
+        setUploadedFileNames,
+        setUploadNlms,
+        setIsUploading
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
+    }
+  };
 
   useEffect(() => {
     setValue("empID", searchResultData.empID);
@@ -231,15 +239,12 @@ export const Nlms = () => {
         setUploadNlms({ nlmsEmpUpload: parsedFiles });
         setUploadedFileNames({
           nlmsEmpUpload: parsedFiles.map((file) => getFileName(file.upload)),
-          
         });
       } catch (error) {
         console.error("Error parsing nlmsEmpUpload:", error);
       }
     }
   }, [searchResultData, setValue]);
-
-
 
   const formatDate = (date) => {
     return date ? new Date(date).toLocaleDateString("en-CA") : null;
@@ -294,6 +299,10 @@ export const Nlms = () => {
       console.error("Error submitting data:", error);
     }
   };
+
+  const requiredPermissions = ["Work Pass"];
+
+  const access = "Employee";
 
   return (
     <form
@@ -363,9 +372,9 @@ export const Nlms = () => {
 
         <FileUploadNew
           label="Upload File"
-          onChangeFunc={(e) => handleFileChange(e, fieldTitle , empID)}
+          onChangeFunc={(e) => handleFileChange(e, fieldTitle, empID)}
           register={register}
-          name="nlmsEmpUpload"   
+          name="nlmsEmpUpload"
           error={errors.nlmsEmpUpload}
           fileName={uploadedFileNames.nlmsEmpUpload || ""}
           uploadedFileNames={uploadedFileNames}
@@ -373,6 +382,9 @@ export const Nlms = () => {
           isUploading={isUploading}
           deleteFile={deleteFile}
           field={{ title: "nlmsEmpUpload" }}
+          formattedPermissions={formattedPermissions}
+          requiredPermissions={requiredPermissions}
+          access={access}
         />
       </div>
 
@@ -390,6 +402,9 @@ export const Nlms = () => {
           notification={notification}
           path="/sawp/nlms"
         />
+      )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}
     </form>
   );

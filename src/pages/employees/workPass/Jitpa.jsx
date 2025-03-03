@@ -13,17 +13,20 @@ import { useOutletContext } from "react-router-dom";
 import { JitpaCreFun } from "../../../services/createMethod/JitpaCreFun";
 import { DeleteDocsJitpa } from "../../../services/uploadDocsDelete/DeleteDocsJitpa";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
-
+import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../../utils/DeletePopup";
 export const Jitpa = () => {
+  const { formattedPermissions } = useDeleteAccess();
   const { searchResultData } = useOutletContext();
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
-  
+
   const { BJLData } = useContext(DataSupply);
   const { UpdateJitpaData } = UpdateJitpaFun();
   const { JitpaCreData } = JitpaCreFun();
+
   const {
     register,
     handleSubmit,
@@ -36,15 +39,16 @@ export const Jitpa = () => {
     // jpValid: [],
     // jpEndorse: [],
   });
-
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
   // const [jpPurchaseDta,setJpPurchaseDta]=useState("")
   // const [jpValidation,setJpValidation]=useState("")
   // const [jpEndorsement,setJpEndorsement]=useState("")
-const [isUploading, setIsUploading] = useState({
-  jpEmpUpload: false,
-    });
+  const [isUploading, setIsUploading] = useState({
+    jpEmpUpload: false,
+  });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     jpEmpUpload: null,
   });
@@ -110,25 +114,25 @@ const [isUploading, setIsUploading] = useState({
     Array.isArray(value) ? value[value.length - 1] : value;
 
   const updateUploadingState = (label, value) => {
-     setIsUploading((prev) => ({
-       ...prev,
-       [label]: value,
-     }));
-     console.log(value);
-   };
- 
-   const handleFileChange = async (e, label) => {
-     const watchedEmpID = watch("empID");
-     if (!watchedEmpID) {
-         alert("Please enter the Employee ID before uploading files.");
-         window.location.href = "/employeeInfo";
-         return;
-     }
- 
-     const selectedFile = e.target.files[0];
-     if (!selectedFile) return;
- 
-     const allowedTypes = [
+    setIsUploading((prev) => ({
+      ...prev,
+      [label]: value,
+    }));
+    console.log(value);
+  };
+
+  const handleFileChange = async (e, label) => {
+    const watchedEmpID = watch("empID");
+    if (!watchedEmpID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
+    }
+
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    const allowedTypes = [
       "application/pdf",
       "image/jpeg",
       "image/png",
@@ -138,67 +142,74 @@ const [isUploading, setIsUploading] = useState({
         alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
         return;
     }
-     // Ensure no duplicate files are added
-     const currentFiles = watch(label) || [];
-     if (currentFiles.some((file) => file.name === selectedFile.name)) {
-         alert("This file has already been uploaded.");
-         return;
-     }
- 
-     // **Check if the file was previously deleted and prevent re-adding**
+
+    // Ensure no duplicate files are added
+    const currentFiles = watch(label) || [];
+    if (currentFiles.some((file) => file.name === selectedFile.name)) {
+      alert("This file has already been uploaded.");
+      return;
+    }
+
+    // **Check if the file was previously deleted and prevent re-adding**
     //  if (deletedFiles[label]?.includes(selectedFile.name)) {
     //      alert("This file was previously deleted and cannot be re-added.");
     //      return;
     //  }
- 
-     setValue(label, [...currentFiles, selectedFile]);
- 
-     try {
-       updateUploadingState(label, true);
-       await uploadDocs(selectedFile, label, setUploadjitpa, watchedEmpID);
-       setUploadedFileNames((prev) => ({
-         ...prev,
-         [label]: selectedFile.name,
-       }));
-     } catch (err) {
-         console.error(err);
-     }
-   };
- 
-   const deleteFile = async (fileType, fileName) => {
-     try {
-       const watchedEmpID = watch("empID");
-       if (!watchedEmpID) {
-         alert("Please provide the Employee ID before deleting files.");
-         return;
-       }
- 
-       const isDeleted = await handleDeleteFile(
-         fileType,
-         fileName,
-         watchedEmpID
-       );
-       const isDeletedArrayUploaded = await DeleteDocsJitpa(
-         fileType,
-         fileName,
-         watchedEmpID,
-         setUploadedFileNames,
-         setUploadjitpa,
-         setIsUploading
-       );
- 
-       if (!isDeleted || isDeletedArrayUploaded) {
-         console.error(
-           `Failed to delete file: ${fileName}, skipping UI update.`
-         );
-         return;
-       }
-       // console.log(`Deleted "${fileName}". Remaining files:`);
-     } catch (error) {
-       console.error("Error deleting file:", error);
-       alert("Error processing the file deletion.");
-     }
-   };
+
+    setValue(label, [...currentFiles, selectedFile]);
+
+    try {
+      updateUploadingState(label, true);
+      await uploadDocs(selectedFile, label, setUploadjitpa, watchedEmpID);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [label]: selectedFile.name,
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
+  const deleteFile = async (fileType, fileName) => {
+    try {
+      const watchedEmpID = watch("empID");
+      if (!watchedEmpID) {
+        alert("Please provide the Employee ID before deleting files.");
+        return;
+      }
+
+      const isDeleted = await handleDeleteFile(
+        fileType,
+        fileName,
+        watchedEmpID
+      );
+      const isDeletedArrayUploaded = await DeleteDocsJitpa(
+        fileType,
+        fileName,
+        watchedEmpID,
+        setUploadedFileNames,
+        setUploadjitpa,
+        setIsUploading
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
+    }
+  };
 
   useEffect(() => {
     setValue("empID", searchResultData.empID);
@@ -212,8 +223,6 @@ const [isUploading, setIsUploading] = useState({
     fields.forEach((field) =>
       setValue(field, getLastValue(searchResultData[field]))
     );
-
-   
 
     if (searchResultData && searchResultData.jpEmpUpload) {
       try {
@@ -241,8 +250,6 @@ const [isUploading, setIsUploading] = useState({
       }
     }
   }, [searchResultData, setValue]);
-
-
 
   const empID = watch("empID");
 
@@ -313,6 +320,9 @@ const [isUploading, setIsUploading] = useState({
     }
   };
 
+  const requiredPermissions = ["Work Pass"];
+  const access = "Employee";
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -377,6 +387,9 @@ const [isUploading, setIsUploading] = useState({
             isUploading={isUploading}
             deleteFile={deleteFile}
             field={{ title: "jpEmpUpload" }}
+            formattedPermissions={formattedPermissions}
+            requiredPermissions={requiredPermissions}
+            access={access}
           />
         </div>
       </div>
@@ -393,6 +406,9 @@ const [isUploading, setIsUploading] = useState({
           notification={notification}
           path="/sawp/jitpa"
         />
+      )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}
     </form>
   );

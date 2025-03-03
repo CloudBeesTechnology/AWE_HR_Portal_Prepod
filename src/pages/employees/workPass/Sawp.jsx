@@ -12,20 +12,24 @@ import { DataSupply } from "../../../utils/DataStoredContext";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { DeleteSawpUp } from "../../../services/uploadDocsDelete/DeleteSawpUp";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
-
+import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../../utils/DeletePopup";
 export const Sawp = () => {
+  const { formattedPermissions } = useDeleteAccess();
   const { searchResultData } = useOutletContext();
   const { SubmitMPData } = SawpDataFun();
   const { SawpDetails } = useContext(DataSupply);
   const { SawpUpdateFun } = SawpUpdate();
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
   const [requestDate, setRequestDate] = useState([]);
   const [recivedDate, setRecivedDate] = useState([]);
   const [empId, setEmpID] = useState("");
-    const [isUploading, setIsUploading] = useState({
-      sawpEmpUpload: false,
-    });
+  const [isUploading, setIsUploading] = useState({
+    sawpEmpUpload: false,
+  });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     sawpEmpUpload: null,
   });
@@ -87,91 +91,96 @@ export const Sawp = () => {
     Array.isArray(value) ? value[value.length - 1] : value;
 
   const updateUploadingState = (label, value) => {
-     setIsUploading((prev) => ({
-       ...prev,
-       [label]: value,
-     }));
-     console.log(value);
-   };
- 
-   const handleFileChange = async (e, label) => {
-     const watchedEmpID = watch("empID");
-     if (!watchedEmpID) {
-         alert("Please enter the Employee ID before uploading files.");
-         window.location.href = "/employeeInfo";
-         return;
-     }
- 
-     const selectedFile = e.target.files[0];
-     if (!selectedFile) return;
- 
-     const allowedTypes = [
+    setIsUploading((prev) => ({
+      ...prev,
+      [label]: value,
+    }));
+    console.log(value);
+  };
+
+  const handleFileChange = async (e, label) => {
+    const watchedEmpID = watch("empID");
+    if (!watchedEmpID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
+    }
+
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    const allowedTypes = [
       "application/pdf",
       "image/jpeg",
       "image/png",
       "image/jpg",
     ];
     if (!allowedTypes.includes(selectedFile.type)) {
-        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-        return;
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
     }
- 
-     // Ensure no duplicate files are added
-     const currentFiles = watch(label) || [];
-     if (currentFiles.some((file) => file.name === selectedFile.name)) {
-         alert("This file has already been uploaded.");
-         return;
-     }
- 
-     setValue(label, [...currentFiles, selectedFile]);
- 
-     try {
-       updateUploadingState(label, true);
-       await uploadDocs(selectedFile, label, setUploadSawp, watchedEmpID);
-       setUploadedFileNames((prev) => ({
-         ...prev,
-         [label]: selectedFile.name,
-       }));
-     } catch (err) {
-         console.error(err);
-     }
-   };
- 
-   const deleteFile = async (fileType, fileName) => {
-     try {
-       const watchedEmpID = watch("empID");
-       if (!watchedEmpID) {
-         alert("Please provide the Employee ID before deleting files.");
-         return;
-       }
- 
-       const isDeleted = await handleDeleteFile(
-         fileType,
-         fileName,
-         watchedEmpID
-       );
-       const isDeletedArrayUploaded = await DeleteSawpUp(
-         fileType,
-         fileName,
-         watchedEmpID,
-         setUploadedFileNames,
-         setUploadSawp,
-         setIsUploading
-       );
- 
-       if (!isDeleted || isDeletedArrayUploaded) {
-         console.error(
-           `Failed to delete file: ${fileName}, skipping UI update.`
-         );
-         return;
-       }
-       // console.log(`Deleted "${fileName}". Remaining files:`);
-     } catch (error) {
-       console.error("Error deleting file:", error);
-       alert("Error processing the file deletion.");
-     }
-   };
-  
+
+    // Ensure no duplicate files are added
+    const currentFiles = watch(label) || [];
+    if (currentFiles.some((file) => file.name === selectedFile.name)) {
+      alert("This file has already been uploaded.");
+      return;
+    }
+
+    setValue(label, [...currentFiles, selectedFile]);
+
+    try {
+      updateUploadingState(label, true);
+      await uploadDocs(selectedFile, label, setUploadSawp, watchedEmpID);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [label]: selectedFile.name,
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
+  const deleteFile = async (fileType, fileName) => {
+    try {
+      const watchedEmpID = watch("empID");
+      if (!watchedEmpID) {
+        alert("Please provide the Employee ID before deleting files.");
+        return;
+      }
+
+      const isDeleted = await handleDeleteFile(
+        fileType,
+        fileName,
+        watchedEmpID
+      );
+      const isDeletedArrayUploaded = await DeleteSawpUp(
+        fileType,
+        fileName,
+        watchedEmpID,
+        setUploadedFileNames,
+        setUploadSawp,
+        setIsUploading
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
+    }
+  };
 
   useEffect(() => {
     setValue("empID", searchResultData.empID);
@@ -180,12 +189,11 @@ export const Sawp = () => {
     setValue("sawpEmpLtrReci", searchResultData.sawpEmpLtrReci || []);
     setRecivedDate(searchResultData.sawpEmpLtrReci || []);
 
-    const fields = ["sawpEmpLtrReci", "sawpEmpLtrReq","sawpEmpUpload"];
+    const fields = ["sawpEmpLtrReci", "sawpEmpLtrReq", "sawpEmpUpload"];
     fields.forEach((field) => {
       const value = getLastValue(searchResultData[field], field);
       setValue(field, value);
     });
-
 
     if (searchResultData && searchResultData.sawpEmpUpload) {
       try {
@@ -208,7 +216,10 @@ export const Sawp = () => {
           sawpEmpUpload: parsedFiles.map((file) => getFileName(file.upload)), // Get names of all files
         }));
       } catch (error) {
-        console.error(`Failed to parse ${searchResultData.sawpEmpUpload}:`, error);
+        console.error(
+          `Failed to parse ${searchResultData.sawpEmpUpload}:`,
+          error
+        );
       }
     }
   }, [searchResultData, setValue]);
@@ -221,17 +232,24 @@ export const Sawp = () => {
         ? SawpDetails.find((match) => match.empID === data.empID)
         : {};
 
-      const formatDate = (date) => (date ? new Date(date).toLocaleDateString("en-CA") : null);
+      const formatDate = (date) =>
+        date ? new Date(date).toLocaleDateString("en-CA") : null;
       const sawpEmpLtrReq = formatDate(data.sawpEmpLtrReq);
       const sawpEmpLtrReci = formatDate(data.sawpEmpLtrReci);
 
       if (checkingEIDTable) {
         const updatedReqDate = [
-          ...new Set([...(checkingEIDTable.sawpEmpLtrReq || []), sawpEmpLtrReq]),
+          ...new Set([
+            ...(checkingEIDTable.sawpEmpLtrReq || []),
+            sawpEmpLtrReq,
+          ]),
         ];
 
         const updatedReciDate = [
-          ...new Set([...(checkingEIDTable.sawpEmpLtrReci || []), sawpEmpLtrReci]),
+          ...new Set([
+            ...(checkingEIDTable.sawpEmpLtrReci || []),
+            sawpEmpLtrReci,
+          ]),
         ];
 
         const SawpUpValue = {
@@ -261,6 +279,10 @@ export const Sawp = () => {
       console.error("Error submitting data:", error);
     }
   };
+
+  const requiredPermissions = ["Work Pass"];
+
+  const access = "Employee";
 
   return (
     <form
@@ -315,6 +337,9 @@ export const Sawp = () => {
         deleteFile={deleteFile}
         isUploading={isUploading}
         field={{ title: "sawpEmpUpload" }}
+        formattedPermissions={formattedPermissions}
+        requiredPermissions={requiredPermissions}
+        access={access}
       />
 
       <div className="center">
@@ -324,11 +349,10 @@ export const Sawp = () => {
       </div>
 
       {notification && (
-        <SpinLogo
-          text={showTitle}
-          notification={notification}
-          path="/sawp"
-        />
+        <SpinLogo text={showTitle} notification={notification} path="/sawp" />
+      )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}
     </form>
   );

@@ -19,6 +19,7 @@ import { Viewer, Worker } from "@react-pdf-viewer/core";
 import * as pdfjsLib from 'pdfjs-dist'; 
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { useReactToPrint } from "react-to-print";
+import { DeletePopup } from "../../utils/DeletePopup";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
   import.meta.url
@@ -30,7 +31,8 @@ export const WorkmenComp = () => {
   const [insuranceData, setInsuranceData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [isUploading, setIsUploading] = useState({
     workmenComUp: false,
       });
@@ -107,14 +109,14 @@ export const WorkmenComp = () => {
         ...prev,
         [label]: value,
       }));
-      console.log(value);
+      // console.log(value);
     };
   
     const handleFileChange = async (e, label) => {
       const workmenCompNo = watch("workmenCompNo");
       if (!workmenCompNo) {
           alert("Please enter the Policy Number before uploading files.");
-          window.location.href = "/insuranceHr";
+          window.location.href = "/insuranceHr/workmenComp";
           return;
       }
   
@@ -123,10 +125,12 @@ export const WorkmenComp = () => {
   
       const allowedTypes = [
         "application/pdf",
-       
+        "image/jpeg",
+        "image/png",
+        "image/jpg",
       ];
       if (!allowedTypes.includes(selectedFile.type)) {
-          alert("Upload must be a PDF file.");
+        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
           return;
       }
   
@@ -150,7 +154,9 @@ export const WorkmenComp = () => {
           console.error(err);
       }
     };
-  
+    const handleDeleteMsg = () => {
+      setdeletePopup(!deletePopup);
+    };
     const deleteFile = async (fileType, fileName) => {
       try {
         const workmenCompNo = watch("workmenCompNo");
@@ -179,6 +185,9 @@ export const WorkmenComp = () => {
           );
           return;
         }
+        
+        setdeleteTitle1(`${fileName}`);
+        handleDeleteMsg();
         // console.log(`Deleted "${fileName}". Remaining files:`);
       } catch (error) {
         console.error("Error deleting file:", error);
@@ -234,7 +243,7 @@ export const WorkmenComp = () => {
         setInsuranceData(filteredData);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching insurance data:", error);
+        // console.error("Error fetching insurance data:", error);
         setError("insuranceData", { message: "Error fetching data" });
         setLoading(false);
       }
@@ -267,8 +276,6 @@ export const WorkmenComp = () => {
     setPdfHeight(averageHeight);
 
   };
-  console.log("h")
-  console.log("hello");
 
   const handlePrint = async () => {
     const pdfUrl = lastUploadUrl; // Path to your 10-page PDF
@@ -359,7 +366,7 @@ export const WorkmenComp = () => {
     setViewingDocument(null);
   };
 
-  console.log(pdfHeight);
+  // console.log(pdfHeight);
   
   const renderDocumentsUnderCategory = (documents) => {
     return (
@@ -661,6 +668,9 @@ export const WorkmenComp = () => {
           </div>
         </div>
       )}
+           {deletePopup && (
+              <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
+            )}
     </section>
   );
 };

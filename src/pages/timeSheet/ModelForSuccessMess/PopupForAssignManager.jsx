@@ -65,7 +65,7 @@ export const PopupForAssignManager = ({
   };
 
   const searchResult = (result) => {
-    console.log("result : ", result);
+   
     setFormData({
       mbadgeNo: result?.empBadgeNo || "",
       mName: result?.name || "",

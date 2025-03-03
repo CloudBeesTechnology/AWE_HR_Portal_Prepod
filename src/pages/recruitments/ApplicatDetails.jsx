@@ -55,6 +55,7 @@ export const ApplicantDetails = () => {
   };
   
   const profile = watch("profilePhoto");
+// console.log(tempID);
 
   useEffect(() => {
  
@@ -188,12 +189,8 @@ export const ApplicantDetails = () => {
         } else {
           // console.log("No interview data found for tempID:", tempID);
         }
-      } else {
-        // console.log("empPDData is empty");
-      }
-    } else {
-      // console.log("tempID is not set");
-    }
+      } 
+    } 
   }, [tempID, setValue, empPDData]); 
 
   const handleFileChange = async (e) => {

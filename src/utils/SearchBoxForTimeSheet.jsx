@@ -23,7 +23,7 @@ export const SearchBoxForTimeSheet = ({
     if (secondaryData && secondaryData.length > 0) {
       const normalizedQuery = searchQuery.toString().toUpperCase();
 
-      const result = secondaryData.find((emp) =>
+      const result = secondaryData.filter((emp) =>
         [
           emp.no,
           emp.NO,
@@ -40,8 +40,8 @@ export const SearchBoxForTimeSheet = ({
         ].some((field) => field?.toString().toUpperCase() === normalizedQuery)
       );
 
-      if (result) {
-        searchResult([result]);
+      if (result && result.length > 0) {
+        searchResult(result);
       } else {
         alert("Employee not found.");
         searchResult([]);
@@ -50,7 +50,7 @@ export const SearchBoxForTimeSheet = ({
   }, [secondaryData, searchQuery, searchResult]);
 
   const handleSearch = (e) => {
-    const query = e.target.value.toUpperCase();
+    const query = e.target.value.toString().toUpperCase();
     setSearchQuery(query);
 
     if (query) {
@@ -79,10 +79,10 @@ export const SearchBoxForTimeSheet = ({
           "fidNo",
           "FID",
           "empBadgeNo",
+          "EMPLOYEEID",
           "BADGE",
           "sapNo",
           "empID",
-          "EMPLOYEEID",
           "NAME",
           "empName",
           "name",
@@ -124,7 +124,7 @@ export const SearchBoxForTimeSheet = ({
       />
       <span className="ml-2">
         <FiSearch
-          className="text-xl text-dark_grey"
+          className="text-xl text-dark_grey cursor-pointer"
           onClick={() => {
             filterDataByclickSearchIcon();
           }}

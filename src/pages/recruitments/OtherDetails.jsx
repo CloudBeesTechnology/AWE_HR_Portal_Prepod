@@ -20,16 +20,21 @@ import { CandyDetails } from "../../services/updateMethod/UpdatePersonalDetails"
 import { handleDeleteFile } from "../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadApplication } from "../recruitments/deleteDocsRecruit/DeleteUploadApplication";
 import { MdCancel } from "react-icons/md";
+import { useDeleteAccess } from "../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../utils/DeletePopup";
+
 const client = generateClient();
 
 export const OtherDetails = ({ fetchedData }) => {
+  const { formattedPermissions } = useDeleteAccess();
   const { submitODFunc } = RecODFunc();
   const [notification, setNotification] = useState(false);
   const { candyDetails } = CandyDetails();
   const location = useLocation();
   const navigatingEducationData = location.state?.FormData;
   // console.log(navigatingEducationData);
-
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [latestTempIDData, setLatesTempIDData] = useState("");
   const [mergedData, setMergedData] = useState([]);
   const { tempID } = useTempID();
@@ -148,7 +153,7 @@ export const OtherDetails = ({ fetchedData }) => {
           });
 
           if (interviewData) {
-            console.log(interviewData.uploadPp, "poijhgh");
+            // console.log(interviewData.uploadPp, "poijhgh");
 
             setUploadedFileNames((prev) => ({
               ...prev,
@@ -218,6 +223,10 @@ export const OtherDetails = ({ fetchedData }) => {
     }
   };
 
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
   const deletedStringUpload = async (fileType, fileName) => {
     try {
       const tempID = navigatingEducationData?.tempID;
@@ -242,8 +251,10 @@ export const OtherDetails = ({ fetchedData }) => {
         );
         return;
       }
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
     } catch (error) {
-      console.error("Error deleting file:", error);
+      // console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
     }
   };
@@ -285,10 +296,10 @@ export const OtherDetails = ({ fetchedData }) => {
     };
     fetchNextTempID();
   }, []);
-  console.log(uploadedDocs);
+  // console.log(uploadedDocs);
 
   const onSubmit = async (data) => {
-    console.log(data);
+    // console.log(data);
 
     try {
       const formattedFamilyDetails = JSON.stringify(
@@ -339,11 +350,11 @@ export const OtherDetails = ({ fetchedData }) => {
           EDTableID: checkingEDTable.id,
         };
 
-        console.log("Updated VALUES", updateReqValue);
+        // console.log("Updated VALUES", updateReqValue);
         await candyDetails({ reqValue: updateReqValue });
         setNotification(true);
       } else {
-        console.log("Create VALUES", reqValue);
+        // console.log("Create VALUES", reqValue);
         await submitODFunc({ reqValue, latestTempIDData });
         setNotification(true);
       }
@@ -351,6 +362,10 @@ export const OtherDetails = ({ fetchedData }) => {
       console.error("Error submitting data:", error);
     }
   };
+
+  const requiredPermissions = ["Candidate"];
+
+  const access = "Recruitment";
 
   return (
     <div>
@@ -483,47 +498,54 @@ export const OtherDetails = ({ fetchedData }) => {
 
         {/* File Uploads */}
         <div className="my-5 ">
-          
           <label className="text_size_6">Choose file</label>
           <div className=" grid grid-cols-3  mt-3 mb-10 gap-5 w-full">
-            <div >
-            <FileUploadField
-                              label="Upload Resume"
-                              register={register} // Ensuring register is passed correctly
-                              fileKey="uploadResume"
-                              handleFileUpload={handleFileUpload}
-                              uploadedFileNames={uploadedFileNames}
-                              deletedStringUpload={deletedStringUpload}
-                              isUploadingString={isUploadingString}
-                              error={errors.uploadResume}
-        />
-            
+            <div>
+              <FileUploadField
+                label="Upload Resume"
+                register={register} // Ensuring register is passed correctly
+                fileKey="uploadResume"
+                handleFileUpload={handleFileUpload}
+                uploadedFileNames={uploadedFileNames}
+                deletedStringUpload={deletedStringUpload}
+                isUploadingString={isUploadingString}
+                error={errors.uploadResume}
+                formattedPermissions={formattedPermissions}
+                requiredPermissions={requiredPermissions}
+                access={access}
+              />
             </div>
 
-            <div >
-            <FileUploadField
-                              label="Qualification Certificate"
-                              register={register} // Ensuring register is passed correctly
-                              fileKey="uploadCertificate"
-                              handleFileUpload={handleFileUpload}
-                              uploadedFileNames={uploadedFileNames}
-                              deletedStringUpload={deletedStringUpload}
-                              isUploadingString={isUploadingString}
-                              error={errors.uploadCertificate}
-                            />
+            <div>
+              <FileUploadField
+                label="Qualification Certificate"
+                register={register} // Ensuring register is passed correctly
+                fileKey="uploadCertificate"
+                handleFileUpload={handleFileUpload}
+                uploadedFileNames={uploadedFileNames}
+                deletedStringUpload={deletedStringUpload}
+                isUploadingString={isUploadingString}
+                error={errors.uploadCertificate}
+                formattedPermissions={formattedPermissions}
+                requiredPermissions={requiredPermissions}
+                access={access}
+              />
             </div>
 
-            <div >
-               <FileUploadField
-                              label="Upload IC / Passport"
-                              register={register} // Ensuring register is passed correctly
-                              fileKey="uploadPp"
-                              handleFileUpload={handleFileUpload}
-                              uploadedFileNames={uploadedFileNames}
-                              deletedStringUpload={deletedStringUpload}
-                              isUploadingString={isUploadingString}
-                              error={errors.uploadPp}
-        />
+            <div>
+              <FileUploadField
+                label="Upload IC / Passport"
+                register={register} // Ensuring register is passed correctly
+                fileKey="uploadPp"
+                handleFileUpload={handleFileUpload}
+                uploadedFileNames={uploadedFileNames}
+                deletedStringUpload={deletedStringUpload}
+                isUploadingString={isUploadingString}
+                error={errors.uploadPp}
+                formattedPermissions={formattedPermissions}
+                requiredPermissions={requiredPermissions}
+                access={access}
+              />
             </div>
           </div>
         </div>
@@ -560,6 +582,9 @@ export const OtherDetails = ({ fetchedData }) => {
           notification={notification}
           path="/recrutiles/candidate"
         />
+      )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}
     </div>
   );

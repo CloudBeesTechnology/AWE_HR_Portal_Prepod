@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { FaEyeSlash, FaEye } from "react-icons/fa";
 
@@ -40,20 +39,26 @@ export const UserVF = ({ data, onclose }) => {
             <div key={index} className="grid grid-cols-3 gap-4 mb-4">
               <strong className="w-full">{item.label}</strong>
               <span className="flex items-center gap-3 col-span-2">
-            : &nbsp;{item.value}
-            {item.isPassword && (
-             <div className=" center"> <button
-             type="button"
-             className=" text-dark_grey underline text-xl"
-             onClick={togglePasswordVisibility}
-           >
-             {isPasswordVisible ? <FaEye /> : <FaEyeSlash/>}
-           </button></div>
-            )}
-          </span>            </div>
+                : &nbsp;{item.value}
+                {item.isPassword && (
+                  <div className=" center">
+                    {" "}
+                    <button
+                      type="button"
+                      className=" text-dark_grey underline text-xl"
+                      onClick={togglePasswordVisibility}
+                    >
+                      {isPasswordVisible ? <FaEye /> : <FaEyeSlash />}
+                    </button>
+                  </div>
+                )}
+              </span>{" "}
+            </div>
           ))}
           <div className="center mt-7">
-            <button className="primary_btn text_size_4" onClick={onclose}>Okay</button>
+            <button className="primary_btn text_size_4" onClick={onclose}>
+              Okay
+            </button>
           </div>
         </div>
       </div>

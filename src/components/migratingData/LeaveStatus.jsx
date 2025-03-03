@@ -42,12 +42,15 @@ export const LeaveStatus = () => {
   // Link 7:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus/LeaveStatus2025Supervisor.csv" date:25-02-2025 time:4:00
   // Link 8:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus/LeaveStatuS2024.csv" date:25-02-2025 time:4:16
   // Link 9:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus/LeaveStatus2024Supervisor.csv" date:25-02-2025 time:4:27
+  // Link 10:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus+Dev/LeaveStatusTestProd.csv" date:3-03-2025 time:3:57
+  // Link 10:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus/LeaveStatus+Feb+Supervisor.csv" date:3-03-2025 time:5:10
+  // Link 11:"https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus/LeaveStatus+Feb+Manager.csv" date:3-03-2025 time:5:10
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus/LeaveStatus2024Supervisor.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus/LeaveStatus+Feb+Manager.csv",
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
@@ -144,9 +147,9 @@ export const LeaveStatus = () => {
           LeaveValue.empID = String(LeaveValue.empID);
           // console.log(LeaveValue.applyTo);
         }
-        console.log("Leave value processed", LeaveValue);
+        // console.log("Leave value processed", LeaveValue);
 
-        // await CRLeaveDetails({ LeaveValue });
+        await CRLeaveDetails({ LeaveValue });
       }
     } catch (error) {
       console.error("Error fetching Excel file:", error);

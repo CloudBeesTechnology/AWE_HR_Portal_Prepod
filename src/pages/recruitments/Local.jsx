@@ -16,16 +16,18 @@ export const Localcandi = () => {
   const [loading, setLoading] = useState(true);
   const { formattedPermissions } = useDeleteAccess();
   const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteConfirm, setdeleteConfirm] = useState(false);
   const [deleteTitle1, setdeleteTitle1] = useState("");
+  const [deleteTitle2, setdeleteTitle2] = useState("");
   const [error, setError] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null);
-  const { empPDData, IVSSDetails } = useContext(DataSupply);
+  const { empPDData, IVSSDetails, educDetailsData } = useContext(DataSupply);
   const { setTempID } = useTempID();
   const navigate = useNavigate();
   const [editingData, setEditingData] = useState([]);
-  const { handleDeletePDDetails } = CandyDelete();
+  const { handleDeletePDDetails, handleDeleteEDDetails } = CandyDelete();
 
   useEffect(() => {
     const bruneiCandidates = empPDData
@@ -36,8 +38,7 @@ export const Localcandi = () => {
       )
       .filter(
         (candidate) =>
-          !IVSSDetails.some((detail) => detail.tempID === candidate.tempID) &&
-          candidate.status !== "Inactive"
+          !IVSSDetails.some((detail) => detail.tempID === candidate.tempID)
       );
     setFilteredData(bruneiCandidates);
     setLoading(false);
@@ -50,21 +51,82 @@ export const Localcandi = () => {
   const EditedData = (editdata) => {
     setEditingData(editdata);
   };
-  const handleDeleteMsg = () => {
-    setdeletePopup(!deletePopup);
-  };
 
-  const handleDeleteClick = async () => {
-    const selectedRowData = selectedRows.map((index) => filteredData[index]);
-    const deletingData = await selectedRowData.forEach(async (val, index) => {
-      await handleDeletePDDetails(val.id);
-      // console.log(ED);
-    });
-    setdeleteTitle1(`${selectedRowData.length} candidates.`);
-    await handleDeleteMsg();
+  // const handleDeleteClick = () => {
+  //   const remainingCandidates = filteredData.filter(
+  //     (candidate) => !selectedRows.includes(candidate.sno)
+  //   );
+  //   setSelectedRows([]);
+  // };
+  // const handleDeleteClick = () => {
+  //   console.log('Selected Rows before filtering:', selectedRows);
+    
+  //   const remainingCandidates = filteredData.filter(
+  //     (candidate) => !selectedRows.includes(candidate.sno)
+  //   );
+    
+  //   console.log('Remaining Candidates:', remainingCandidates);
+    
+  //   setSelectedRows([]);
+  //   console.log('Selected Rows after clearing:', selectedRows);
+  // };
+
+
+  // const handleDeleteClick = () => {
+  //   console.log('Selected Rows before filtering:', selectedRows);
+    
+  //   // Extract the objects from filteredData using the selected row indices
+  //   const selectedObjects = selectedRows.map(index => filteredData[index]);
+  
+  //   const selectedTempID = selectedObjects.tempID;
+  //   const eduTempID = educDetailsData.filter((item) => {
+  //     item.tempID === selectedTempID
+  //   })
+  //   console.log('Selected Objects:', selectedObjects);  // This will show the objects corresponding to the selected rows
+    
+  //   // Filter out the candidates from filteredData by checking if the index is not in selectedRows
+  //   const remainingCandidates = filteredData.filter((_, index) => !selectedRows.includes(index));
+    
+  //   console.log('Remaining Candidates:', remainingCandidates);
+    
+  //   // Clear the selected rows
+  //   // setSelectedRows([]);
+    
+  //   // Log the state of selected rows after clearing (it won't show the updated value immediately due to async state update)
+  //   console.log('Selected Rows after clearing:', selectedRows);
+  // };
+  
+  // const handleDeleteMsg = () => {
+  //   setdeletePopup(!deletePopup);
+  // };
+
+  // const handleDeleteConfirm = () => {
+  //   setdeleteConfirm(!deleteConfirm);
+  // };
+
+
+  const handleDeleteClick = () => {
+    // console.log('Selected Rows before filtering:', selectedRows);
+  
+    const selectedObjects = selectedRows.map(index => filteredData[index]);
+  
+    // console.log('Selected Objects:', selectedObjects);
+  
+    const selectedTempIDs = selectedObjects.map(obj => obj.tempID);
+  
+    const eduTempIDs = educDetailsData.filter((item) => selectedTempIDs.includes(item.tempID));
+  
+    // console.log('Matching Objects from educDetailsData:', eduTempIDs);
+  
+    const remainingCandidates = filteredData.filter((_, index) => !selectedRows.includes(index));
+  
+    // console.log('Remaining Candidates:', remainingCandidates);
+  
     setSelectedRows([]);
+  
+    // console.log('Selected Rows after clearing:', selectedRows);
   };
-
+  
   const handleRowSelect = (updatedSelectedRows) => {
     setSelectedRows(updatedSelectedRows);
   };
@@ -155,13 +217,15 @@ export const Localcandi = () => {
           edited={EditedData}
         />
       )}
-      {deletePopup && (
+      {/* {deletePopup && (
         <DeletePopup
           handleDeleteMsg={handleDeleteMsg}
+          handleDeleteConfirm={handleDeleteConfirm}
+          deleteConfirm={deleteConfirm}
           title1={deleteTitle1}
-          path="/recrutiles/localcandi"
+          title2={deleteTitle2}
         />
-      )}
+      )} */}
     </section>
   );
 };

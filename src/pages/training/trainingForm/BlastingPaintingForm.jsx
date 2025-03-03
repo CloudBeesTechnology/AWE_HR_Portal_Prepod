@@ -122,7 +122,7 @@ export const BlastingPaintingForm = () => {
     Array.isArray(value) ? value[value.length - 1] : value;
   
   const searchResult = (result) => {
-    console.log("Search result:", result); // Debugging
+    // console.log("Search result:", result); // Debugging
   
     const keysToSet = ["empID","empBadgeNo","name","position",
       "blastingRemarks",
@@ -210,7 +210,7 @@ export const BlastingPaintingForm = () => {
           blastingUpload:uploadeBlast.blastingUpload,
           id: BlastRecord.id,  
         };
-        console.log(BlastUpValue);
+        // console.log(BlastUpValue);
 
         await BlastUp({ BlastUpValue });
         setShowTitle("Training Blasting Painting Updated successfully");
@@ -221,7 +221,7 @@ export const BlastingPaintingForm = () => {
           blastingUpload:uploadeBlast.blastingUpload
 
         };
-    console.log(BlastValue,"Creact method");
+    // console.log(BlastValue,"Creact method");
     
         await BlastData({ BlastValue });
         setShowTitle("Training Blasting Painting Saved successfully");

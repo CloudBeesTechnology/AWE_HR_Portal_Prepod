@@ -9,10 +9,17 @@ import { DataSupply } from "../../utils/DataStoredContext";
 import { SearchNonLocalCandy } from "./Search/SearchNonLocal";
 import { SearchLocalCandy } from "./Search/SearchLocalCandy";
 import { useTempID } from "../../utils/TempIDContext";
+import { useDeleteAccess } from "../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../utils/DeletePopup";
+import { CandyDelete } from "../../services/deleteMethod/CandyDelete";
 
 export const NonlocCandi = () => {
+  const { formattedPermissions } = useDeleteAccess();
+  const { handleDeletePDDetails } = CandyDelete();
   const [searchTerm, setSearchTerm] = useState("");
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [selectedOption, setSelectedOption] = useState("");
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null);
@@ -21,7 +28,7 @@ export const NonlocCandi = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const { setTempID } = useTempID();
-  const { empPDData, IVSSDetails } = useContext(DataSupply);
+  const { empPDData, IVSSDetails, educDetailsData } = useContext(DataSupply);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,7 +40,8 @@ export const NonlocCandi = () => {
       )
       .filter(
         (candidate) =>
-          !IVSSDetails.some((detail) => detail.tempID === candidate.tempID)
+          !IVSSDetails.some((detail) => detail.tempID === candidate.tempID) &&
+          candidate.status !== "Inactive"
       );
     setFilteredData(bruneiCandidates);
     setLoading(false);
@@ -51,10 +59,18 @@ export const NonlocCandi = () => {
     setEditingData(editdata);
   };
 
-  const handleDeleteClick = () => {
-    const remainingCandidates = filteredData.filter(
-      (candidate) => !selectedRows.includes(candidate.id)
-    );
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
+  const handleDeleteClick = async () => {
+    const selectedRowData = selectedRows.map((index) => filteredData[index]);
+    const deletingData = await selectedRowData.forEach(async (val, index) => {
+      await handleDeletePDDetails(val.id);
+      // console.log(ED);
+    });
+    setdeleteTitle1(`${selectedRowData.length} candidates.`);
+    await handleDeleteMsg();
     setSelectedRows([]);
   };
 
@@ -85,6 +101,10 @@ export const NonlocCandi = () => {
       setTempID(selectedTempID);
     }
   };
+
+  const requiredPermissions = ["Non Local CV"];
+
+  const access = "Recruitment";
 
   return (
     <section className="screen-size min-h-screen w-full my-5">
@@ -139,11 +159,12 @@ export const NonlocCandi = () => {
         </div>
       </div>
 
-      <div className="flex relative mb-8 ">
+      <div className="flex mb-3 gap-3 justify-end">
         <div
-          className=" absolute top-1/2 right-14 transform -translate-y-1/2 text-2xl hover:text-3xl flex items-center cursor-pointer"
+          className="text-2xl hover:text-3xl flex items-center cursor-pointer"
           onClick={() => {
             if (selectedRows.length === 1) {
+              getTemp();
               navigate("/addCandidates", {
                 state: { editingData: selectedRows[0] },
               });
@@ -157,12 +178,16 @@ export const NonlocCandi = () => {
         >
           <FaEdit className="mr-2" />
         </div>
-        <div
-          className="absolute top-1/2 right-0 transform -translate-y-1/2 text-3xl hover:text-4xl cursor-pointer text-[#f42232cc] flex items-center"
-          onClick={handleDeleteClick}
-        >
-          <MdDelete className="mr-2" />
-        </div>
+        {formattedPermissions?.deleteAccess?.[access]?.some((permission) =>
+          requiredPermissions.includes(permission)
+        ) && (
+          <div
+            className="text-3xl hover:text-4xl cursor-pointer text-[#f42232cc] flex items-center"
+            onClick={handleDeleteClick}
+          >
+            <MdDelete className="mr-2" />
+          </div>
+        )}
       </div>
 
       {selectedOption && (
@@ -183,6 +208,14 @@ export const NonlocCandi = () => {
           selectedRows={selectedRows}
           onRowSelect={handleRowSelect}
           edited={EditedData}
+        />
+      )}
+
+      {deletePopup && (
+        <DeletePopup
+          handleDeleteMsg={handleDeleteMsg}
+          title1={deleteTitle1}
+          path="/recrutiles/nonloccandi"
         />
       )}
     </section>

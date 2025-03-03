@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useLocation, Link, Outlet, Navigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { ViewForm } from "./ViewForm";
 import { useLeaveManage } from "../../hooks/useLeaveManage";
-import useEmployeePersonalInfo from "../../hooks/useEmployeePersonalInfo";
 import { DateFormat } from "../../utils/DateFormat";
+import useEmployeePersonalInfo from "../../hooks/useEmployeePersonalInfo";
 
 
 export const LeaveManage = () => {
@@ -13,7 +13,7 @@ export const LeaveManage = () => {
   const [selectedTicketData, setSelectedTicketData] = useState(null);
   const [userType, setUserType] = useState("");
   const [userID, setUserID] = useState("");
- 
+
   const {
     mergedData,
     handleDeleteLeaveStatus,
@@ -23,8 +23,8 @@ export const LeaveManage = () => {
     loading
   } = useLeaveManage();
 
-  // console.log(mergedData);
-
+  // console.log("All leave status",ticketMerged);
+  
   useEffect(() => {
     const userID = localStorage.getItem("userID");
     setUserID(userID);
@@ -42,13 +42,13 @@ export const LeaveManage = () => {
   const handleViewClick = (data, source) => {
     setSource(source);
     if (source === "LM") {
-      setSelectedLeaveData(data); // Leave Data
-      setSelectedTicketData(null); // Clear ticket data
+      setSelectedLeaveData(data); 
+      setSelectedTicketData(null); 
     } else if (source === "Tickets") {
       // console.log(data);
 
-      setSelectedTicketData(data); // Ticket Data
-      setSelectedLeaveData(null); // Clear leave data
+      setSelectedTicketData(data); 
+      setSelectedLeaveData(null); 
     }
     setToggleClick(true);
   };
@@ -83,7 +83,7 @@ export const LeaveManage = () => {
               statusUpdate,
               mergedData,
               loading
-            }}
+            }} 
           />
         </section>
 
@@ -92,8 +92,8 @@ export const LeaveManage = () => {
       {toggleClick && (selectedLeaveData || selectedTicketData) && (
         <ViewForm
           handleClickForToggle={handleClickForToggle}
-          leaveData={selectedLeaveData} // If leave data is available
-          ticketData={selectedTicketData} // If ticket data is available
+          leaveData={selectedLeaveData} 
+          ticketData={selectedTicketData} 
           source={source}
           formatDate={DateFormat}
           onUpdate={handleUpdate}

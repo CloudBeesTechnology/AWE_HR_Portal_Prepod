@@ -49,15 +49,6 @@ export const TableWelding = () => {
           })
           .filter(Boolean) // Remove nulls
           .sort((a, b) => a.empID.localeCompare(b.empID));
-
-        // Update weldingUpload to show only the last item in the array
-        // const updatedData = mergedData.map((data) => ({
-        //   ...data,
-        //   weldingUpload: Array.isArray(data.weldingUpload) && data.weldingUpload.length > 0
-        //     ? JSON.stringify(data.weldingUpload[data.weldingUpload.length - 1]) // Ensure it's a valid JSON object
-        //     : "N/A", // Return "N/A" if the array is empty or not an array
-        //   WQExpiry: formatDate(data.WQExpiry),
-        // }));
         
         const updatedData = mergedData.map((data) => ({
           ...data,
@@ -69,7 +60,7 @@ export const TableWelding = () => {
         
         
         
-        console.log(updatedData);
+        // console.log(updatedData);
         setMergeData(updatedData);
         setLoading(false);
       } catch (err) {

@@ -13,10 +13,14 @@ import { handleDeleteFile } from "../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadJob } from "./workPassTrack/deleteUpload/DeleteUploadJob";
 import axios from "axios";
 import { getUrl } from "@aws-amplify/storage";
-
+import { useDeleteAccess } from "../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../utils/DeletePopup";
 export const CreateJob = () => {
   const { SubmitJobData } = CreateJobFunc();
+  const { formattedPermissions } = useDeleteAccess();
   const { hiringJob } = WorkDataPass();
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
   useEffect(() => {
@@ -34,13 +38,12 @@ export const CreateJob = () => {
   } = useForm({
     resolver: yupResolver(hiringJobSchema),
   });
-     const [isUploadingString, setIsUploadingString] = useState({
-      uploadJobDetails: false,
-        });
+  const [isUploadingString, setIsUploadingString] = useState({
+    uploadJobDetails: false,
+  });
   const [uploadedDocs, setUploadedDocs] = useState(null);
   const [uploadedFileNames, setUploadedFileNames] = useState({});
   const watchedJobTitle = watch("jobTitle")?.replace(/\s+/g, "");
-
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
@@ -68,7 +71,12 @@ export const CreateJob = () => {
     const selectedFile = e.target.files[0];
 
     // Allowed file types
-    const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/jpg"];
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
 
     if (!selectedFile || !allowedTypes.includes(selectedFile.type)) {
       alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
@@ -96,14 +104,22 @@ export const CreateJob = () => {
 
         // updateUploadingString(type, false);
       } catch (err) {
-        console.log(err, "1547");
+        console.log(err);
       }
     }
   };
 
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
   const deletedStringUpload = async (fileType, fileName) => {
     try {
-      const isDeleted = await handleDeleteFile(fileType, fileName, watchedJobTitle);
+      const isDeleted = await handleDeleteFile(
+        fileType,
+        fileName,
+        watchedJobTitle
+      );
       const isDeletedArrayUploaded = await DeleteUploadJob(
         fileType,
         fileName,
@@ -114,9 +130,13 @@ export const CreateJob = () => {
       );
 
       if (!isDeleted || isDeletedArrayUploaded) {
-        console.error(`Failed to delete file: ${fileName}, skipping UI update.`);
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
         return;
       }
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
 
       setUploadedFileNames((prev) => {
         const updatedNames = { ...prev };
@@ -126,11 +146,10 @@ export const CreateJob = () => {
 
       setUploadedDocs(null);
     } catch (error) {
-      console.error("Error deleting file:", error);
+      // console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
     }
   };
-
 
   const onSubmit = handleSubmit((data) => {
     // console.log(data);
@@ -140,7 +159,7 @@ export const CreateJob = () => {
         ...data,
         uploadJobDetails: uploadedDocs,
       };
-      console.log(storedvalue);
+      // console.log(storedvalue);
 
       SubmitJobData({ jobValue: storedvalue });
       setShowTitle("Posted Job successfully");
@@ -149,6 +168,10 @@ export const CreateJob = () => {
       console.log(error);
     }
   });
+
+  const requiredPermissions = ["Hiring Job"];
+
+  const access = "Recruitment";
 
   return (
     <section className="bg-[#F5F6F1CC] mx-auto p-10">
@@ -192,17 +215,19 @@ export const CreateJob = () => {
           )}
         </div>
         <div>
-
-        <FileUploadField
-      label="Upload Job Document"
-      register={register}
-      fileKey="uploadJobDetails"
-      handleFileUpload={handleFileUpload}
-      uploadedFileNames={uploadedFileNames}
-      deletedStringUpload={deletedStringUpload}
-      isUploadingString={isUploadingString}
-      error={errors?.uploadJobDetails}
-    />
+          <FileUploadField
+            label="Upload Job Document"
+            register={register}
+            fileKey="uploadJobDetails"
+            handleFileUpload={handleFileUpload}
+            uploadedFileNames={uploadedFileNames}
+            deletedStringUpload={deletedStringUpload}
+            isUploadingString={isUploadingString}
+            error={errors?.uploadJobDetails}
+            formattedPermissions={formattedPermissions}
+            requiredPermissions={requiredPermissions}
+            access={access}
+          />
         </div>
 
         <div className="w-full center">
@@ -218,10 +243,12 @@ export const CreateJob = () => {
           path="/hiringJob"
         />
       )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
+      )}
     </section>
   );
 };
-
 
 // import { useForm } from "react-hook-form";
 // import { hiringJobSchema } from "../../services/Validation";

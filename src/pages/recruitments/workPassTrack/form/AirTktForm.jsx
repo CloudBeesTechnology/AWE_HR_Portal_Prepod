@@ -11,12 +11,15 @@ import { statusOptions } from "../../../../utils/StatusDropdown";
 import { SpinLogo } from "../../../../utils/SpinLogo";
 import { handleDeleteFile } from "../../../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadAirTicket } from "../deleteUpload/DeleteUploadAirTicket";
-
+import { useDeleteAccess } from "../../../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../../../utils/DeletePopup";
 export const AirTktForm = ({ candidate }) => {
+  const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules } = useFetchCandy();
   const { wpTrackingDetails } = useUpdateWPTracking();
   const { interviewDetails } = UpdateInterviewData();
-
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [formData, setFormData] = useState({
     interview: {
@@ -78,9 +81,7 @@ export const AirTktForm = ({ candidate }) => {
           }));
           // console.log("Uploaded file name set:", fileName);
         }
-      } else {
-        // console.log("No interviewData found for candidate:", candidate.tempID);
-      }
+      } 
     } else {
       // console.log("No interview schedules available.");
     }
@@ -138,6 +139,10 @@ export const AirTktForm = ({ candidate }) => {
     }
   };
 
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
   const deletedStringUpload = async (fileType, fileName) => {
     try {
       const tempID = candidate.tempID;
@@ -164,8 +169,10 @@ export const AirTktForm = ({ candidate }) => {
         return;
       }
       // console.log(`Deleted "${fileName}". Remaining files:`);
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
     } catch (error) {
-      console.error("Error deleting file:", error);
+      // console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
     }
   };
@@ -202,8 +209,7 @@ export const AirTktForm = ({ candidate }) => {
           arrivaldate: formData.interview.arrivaldate,
           cityname: formData.interview.cityname,
           airfare: formData.interview.airfare,
-          airticketfile:
-            uploadedAirTkt.airTktFile,
+          airticketfile: uploadedAirTkt.airTktFile,
         },
       });
 
@@ -238,6 +244,10 @@ export const AirTktForm = ({ candidate }) => {
       },
     }));
   };
+
+  const requiredPermissions = ["WorkPass Tracking"];
+
+  const access = "Recruitment";
 
   return (
     <>
@@ -317,6 +327,9 @@ export const AirTktForm = ({ candidate }) => {
                 deletedStringUpload={deletedStringUpload}
                 isUploadingString={isUploadingString}
                 error={errors.airTktFile}
+                formattedPermissions={formattedPermissions}
+                requiredPermissions={requiredPermissions}
+                access={access}
               />
             </div>
           </div>
@@ -337,6 +350,9 @@ export const AirTktForm = ({ candidate }) => {
           notification={notification}
           path="/recrutiles/workpasstracking"
         />
+      )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}
     </>
   );

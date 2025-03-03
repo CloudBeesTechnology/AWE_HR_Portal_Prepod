@@ -47,6 +47,7 @@ export const BlngTBody = ({
       return `${day}/${month}/${year} ${time}`;
     } catch {}
   };
+
   return (
     <tbody>
       {loading === false && data && data?.length > 0
@@ -86,7 +87,9 @@ export const BlngTBody = ({
                   <td className="text-center px-4 flex-1">
                     {rowData?.totalHrs || 0}
                   </td>
-                  <td className="text-center px-4 flex-1">{rowData?.aweSDN || 0}</td>
+                  <td className="text-center px-4 flex-1">
+                    {rowData?.aweSDN || 0}
+                  </td>
 
                   <td className="text-center px-4 flex-1">
                     {rowData?.normalWorkHrs || 0}
@@ -95,7 +98,7 @@ export const BlngTBody = ({
                     {rowData?.actualWorkHrs || 0}
                   </td>
                   <td className="text-center px-4 flex-1">
-                    {rowData?.totalOT || 0}
+                    {rowData?.otTime || 0}
                   </td>
                   <td className="text-center px-4 flex-1">
                     {rowData?.remarks}

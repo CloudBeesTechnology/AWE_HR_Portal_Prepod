@@ -12,12 +12,16 @@ import { SpinLogo } from "../../../../utils/SpinLogo";
 import { DataSupply } from "../../../../utils/DataStoredContext";
 import { handleDeleteFile } from "../../../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadNonLocal } from "../deleteUpload/DeleteUploadNonLocal";
-
+import { useDeleteAccess } from "../../../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../../../utils/DeletePopup";
 export const NonLocalMobilizForm = ({ candidate }) => {
+  const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules } = useFetchCandy();
   const { IVSSDetails } = useContext(DataSupply);
   const { wpTrackingDetails } = useUpdateWPTracking();
   const { interviewDetails } = UpdateInterviewData();
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -78,12 +82,8 @@ export const NonLocalMobilizForm = ({ candidate }) => {
           }));
           // console.log("Uploaded file name set:", fileName);
         }
-      } else {
-        // console.log("No interviewData found for candidate:", candidate.tempID);
-      }
-    } else {
-      // console.log("No interview schedules available.");
-    }
+      } 
+    } 
   }, [interviewSchedules, candidate.tempID]);
 
   const extractFileName = (url) => {
@@ -139,6 +139,10 @@ export const NonLocalMobilizForm = ({ candidate }) => {
     }
   };
 
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
   const deletedStringUpload = async (fileType, fileName) => {
     try {
       const tempID = candidate.tempID;
@@ -165,6 +169,8 @@ export const NonLocalMobilizForm = ({ candidate }) => {
         return;
       }
       // console.log(`Deleted "${fileName}". Remaining files:`);
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
     } catch (error) {
       console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
@@ -238,6 +244,10 @@ export const NonLocalMobilizForm = ({ candidate }) => {
     }
   };
 
+  const requiredPermissions = ["WorkPass Tracking"];
+
+  const access = "Recruitment";
+
   return (
     <>
       <form onSubmit={handleSubmitTwo} className="p-5">
@@ -302,6 +312,9 @@ export const NonLocalMobilizForm = ({ candidate }) => {
                 deletedStringUpload={deletedStringUpload}
                 isUploadingString={isUploadingString}
                 error={errors.mobFile}
+                formattedPermissions={formattedPermissions}
+                requiredPermissions={requiredPermissions}
+                access={access}
               />
             </div>
           </div>
@@ -321,6 +334,9 @@ export const NonLocalMobilizForm = ({ candidate }) => {
           notification={notification}
           path="/recrutiles/workpasstracking"
         />
+      )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}
     </>
   );

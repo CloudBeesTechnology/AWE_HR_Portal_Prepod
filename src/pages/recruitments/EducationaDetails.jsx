@@ -147,7 +147,7 @@ export const EducationDetails = ({ fetchedData }) => {
       ...navigatingPersonalData,
     };
 
-    console.log("Step 3", navigatingEduData);
+    // console.log("Step 3", navigatingEduData);
     
 
     localStorage.setItem("educationFormData", JSON.stringify(navigatingEduData));
@@ -206,12 +206,8 @@ export const EducationDetails = ({ fetchedData }) => {
         } else {
           // console.log("No interview data found for tempID:", tempID);
         }
-      } else {
-        // console.log("educDetailsData is empty");
       }
-    } else {
-      // console.log("tempID is not set");
-    }
+    } 
   }, [tempID, setValue, educDetailsData]);
    
   // console.log("educ",educDetailsData)

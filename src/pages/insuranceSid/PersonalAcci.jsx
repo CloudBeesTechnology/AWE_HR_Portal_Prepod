@@ -13,13 +13,14 @@ import { createPersonalAccident } from "../../graphql/mutations";
 import { listPersonalAccidents } from "../../graphql/queries";
 import { FaDownload, FaPrint, FaTimes } from "react-icons/fa";
 import { Page } from "react-pdf";
-import { pdfjs } from "react-pdf"; 
+import { pdfjs } from "react-pdf";
 import { getUrl } from "@aws-amplify/storage";
 import { DeletePersonalAcciUp } from "./DeleteUpload/DeletePersonalAcciUp";
 import { handleDeleteFile } from "../../services/uploadsDocsS3/DeleteDocs";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { useReactToPrint } from "react-to-print";
+import { DeletePopup } from "../../utils/DeletePopup";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
@@ -31,7 +32,7 @@ export const PersonalAcci = () => {
 
   const [isUploading, setIsUploading] = useState({
     perAccUp: false,
-      });
+  });
 
   const [uploadedFileNames, setUploadedFileNames] = useState({
     perAccUp: null,
@@ -39,6 +40,8 @@ export const PersonalAcci = () => {
   const [uploadPAU, setUploadPAU] = useState({
     perAccUp: [],
   });
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [pageHeight, setPageHeight] = useState("auto");
   const [insuranceData, setInsuranceData] = useState([]);
@@ -66,7 +69,7 @@ export const PersonalAcci = () => {
     resolver: yupResolver(PersonalAcciSchema),
   });
 
-  console.log("J");
+  // console.log("J");
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -107,88 +110,90 @@ export const PersonalAcci = () => {
   };
 
   const updateUploadingState = (label, value) => {
-     setIsUploading((prev) => ({
-       ...prev,
-       [label]: value,
-     }));
-     console.log(value);
-   };
- 
-   const handleFileChange = async (e, label) => {
-     const perAccNo = watch("perAccNo");
-     if (!perAccNo) {
-         alert("Please enter the Policy Number before uploading files.");
-         window.location.href = "/insuranceHr";
-         return;
-     }
- 
-     const selectedFile = e.target.files[0];
-     if (!selectedFile) return;
- 
-     const allowedTypes = [
-       "application/pdf",
-      
-     ];
-     if (!allowedTypes.includes(selectedFile.type)) {
-         alert("Upload must be a PDF file.");
-         return;
-     }
- 
-     // Ensure no duplicate files are added
-     const currentFiles = watch(label) || [];
-     if (currentFiles.some((file) => file.name === selectedFile.name)) {
-         alert("This file has already been uploaded.");
-         return;
-     }
- 
-     setValue(label, [...currentFiles, selectedFile]);
- 
-     try {
-       updateUploadingState(label, true);
-       await uploadDocs(selectedFile, label, setUploadPAU, perAccNo);
-       setUploadedFileNames((prev) => ({
-         ...prev,
-         [label]: selectedFile.name,
-       }));
-     } catch (err) {
-         console.error(err);
-     }
-   };
- 
-   const deleteFile = async (fileType, fileName) => {
-     try {
-       const perAccNo = watch("perAccNo");
-       if (!perAccNo) {
-         alert("Please provide the Policy Number before deleting files.");
-         return;
-       }
- 
-       const isDeleted = await handleDeleteFile(
-         fileType,
-         fileName,
-         perAccNo
-       );
-       const isDeletedArrayUploaded = await DeletePersonalAcciUp(
-         fileType,
-         fileName,
-         perAccNo,
-         setUploadedFileNames,
-         setUploadPAU,
-         setIsUploading
-       );
- 
-       if (!isDeleted || isDeletedArrayUploaded) {
-         console.error(
-           `Failed to delete file: ${fileName}, skipping UI update.`
-         );
-         return;
-       }
-       // console.log(`Deleted "${fileName}". Remaining files:`);
-     } catch (error) {
-       console.error("Error deleting file:", error);
-       alert("Error processing the file deletion.");
-     }
-   };
+    setIsUploading((prev) => ({
+      ...prev,
+      [label]: value,
+    }));
+    // console.log(value);
+  };
+
+  const handleFileChange = async (e, label) => {
+    const perAccNo = watch("perAccNo");
+    if (!perAccNo) {
+      alert("Please enter the Policy Number before uploading files.");
+      window.location.href = "/insuranceHr/personalAcci";
+      return;
+    }
+
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
+    }
+
+    // Ensure no duplicate files are added
+    const currentFiles = watch(label) || [];
+    if (currentFiles.some((file) => file.name === selectedFile.name)) {
+      alert("This file has already been uploaded.");
+      return;
+    }
+
+    setValue(label, [...currentFiles, selectedFile]);
+
+    try {
+      updateUploadingState(label, true);
+      await uploadDocs(selectedFile, label, setUploadPAU, perAccNo);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [label]: selectedFile.name,
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+  const deleteFile = async (fileType, fileName) => {
+    try {
+      const perAccNo = watch("perAccNo");
+      if (!perAccNo) {
+        alert("Please provide the Policy Number before deleting files.");
+        return;
+      }
+
+      const isDeleted = await handleDeleteFile(fileType, fileName, perAccNo);
+      const isDeletedArrayUploaded = await DeletePersonalAcciUp(
+        fileType,
+        fileName,
+        perAccNo,
+        setUploadedFileNames,
+        setUploadPAU,
+        setIsUploading
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
+    }
+  };
 
   const onSubmit = async (data) => {
     try {
@@ -214,7 +219,7 @@ export const PersonalAcci = () => {
       try {
         let allPersonalAccidents = [];
         let nextToken = null;
-  
+
         do {
           const response = await client.graphql({
             query: listPersonalAccidents,
@@ -222,19 +227,19 @@ export const PersonalAcci = () => {
               nextToken: nextToken,
             },
           });
-  
+
           const items = response?.data?.listPersonalAccidents?.items || [];
-  
+
           allPersonalAccidents = [...allPersonalAccidents, ...items];
-  
+
           nextToken = response?.data?.listPersonalAccidents?.nextToken;
         } while (nextToken);
-  
+
         const filteredData = allPersonalAccidents.filter((data) => {
           const expiryDate = new Date(data.perAccExp);
           return expiryDate >= new Date();
         });
-  
+
         setInsuranceData(filteredData);
         setLoading(false);
       } catch (error) {
@@ -243,26 +248,9 @@ export const PersonalAcci = () => {
         setLoading(false);
       }
     };
-  
+
     fetchInsuranceData();
   }, []);
-  
-  // useEffect(() => {
-  //   const fetchInsuranceData = async () => {
-  //     try {
-  //       const response = await client.graphql({
-  //         query: listPersonalAccidents,
-  //       });
-  //       setInsuranceData(response.data.listPersonalAccidents.items);
-  //       setLoading(false);
-  //     } catch (error) {
-  //       console.error("Error fetching insurance data:", error);
-  //       setError("insuranceData", { message: "Error fetching data" });
-  //       setLoading(false);
-  //     }
-  //   };
-  //   fetchInsuranceData();
-  // }, []);
 
   const openPopup = (fileUrl) => {
     setPopupImage(fileUrl); // Set the URL for the image or file
@@ -273,7 +261,7 @@ export const PersonalAcci = () => {
     const measureHeight = () => {
       if (personAcciPrint.current) {
         const measuredHeight = personAcciPrint.current.offsetHeight;
-        console.log("Measured PDF height:", measuredHeight);
+        // console.log("Measured PDF height:", measuredHeight);
         if (measuredHeight > 0) {
           setPdfHeight(`${measuredHeight}px`);
           setIsLoading(false);
@@ -495,14 +483,13 @@ export const PersonalAcci = () => {
                 label="Upload File"
                 onChangeFunc={(e) => handleFileChange(e, "perAccUp")}
                 handleFileChange={handleFileChange}
-          uploadedFileNames={uploadedFileNames}
-          isUploading={isUploading}
-          deleteFile={deleteFile}
+                uploadedFileNames={uploadedFileNames}
+                isUploading={isUploading}
+                deleteFile={deleteFile}
                 register={register}
                 name="perAccUp"
                 error={errors}
               />
-             
             </div>
           </div>
         </div>
@@ -611,6 +598,9 @@ export const PersonalAcci = () => {
             )}
           </div>
         </div>
+      )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}
     </section>
   );

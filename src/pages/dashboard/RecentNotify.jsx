@@ -100,7 +100,7 @@ export const RecentNotify = () => {
               );
             })}
 
-            <div className="underline text-[#8bb4f1] text-center px-16  my-5">
+            <div className="underline text-[blue] text-center px-16  my-5">
               <Link to="/notifications">View More</Link>
             </div>
           </section>

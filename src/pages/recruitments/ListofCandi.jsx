@@ -7,11 +7,18 @@ import { useNavigate } from "react-router-dom";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { useTempID } from "../../utils/TempIDContext";
 import { SearchListOfCandy } from "./Search/SearchListOfCandy";
+import { DeletePopup } from "../../utils/DeletePopup";
+import { useDeleteAccess } from "../../hooks/useDeleteAccess";
+import { CandyDelete } from "../../services/deleteMethod/CandyDelete";
 
 export const ListofCandi = () => {
   const { empPDData, IVSSDetails } = useContext(DataSupply);
   const [selectedRow, setSelectedRow] = useState(null);
   const { setTempID } = useTempID();
+  const { handleDeletePDDetails } = CandyDelete();
+  const { formattedPermissions } = useDeleteAccess();
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [selectedRows, setSelectedRows] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [candidate, setCandidate] = useState([]);
@@ -30,7 +37,7 @@ export const ListofCandi = () => {
 
   useEffect(() => {
     const allCandidates = empPDData?.filter(
-      (candidate) => !tempIDsToExclude.includes(candidate.tempID)
+      (candidate) => !tempIDsToExclude.includes(candidate.tempID) && candidate.status !=="Inactive"
     );
 
     setFilteredData(allCandidates);
@@ -44,17 +51,23 @@ export const ListofCandi = () => {
   const EditedData = (editdata) => {
     setEditingData(editdata);
   };
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
 
-  const handleDeleteClick = () => {
-    const remainingCandidates = filteredData.filter(
-      (candidate) => !selectedRows.includes(candidate.id)
-    );
-    setSelectedRows([]);  
+  const handleDeleteClick = async () => {
+    const selectedRowData = selectedRows.map((index) => filteredData[index]);
+    const deletingData = await selectedRowData.forEach(async (val, index) => {
+      await handleDeletePDDetails(val.id);
+      // console.log(ED);
+    });
+    setdeleteTitle1(`${selectedRowData.length} candidates.`);
+    await handleDeleteMsg();
+    setSelectedRows([]);
   };
 
   const handleRowSelect = (updatedSelectedRows) => {
     setSelectedRows(updatedSelectedRows);
-
     const selectedTempIDs = updatedSelectedRows.map(
       (rowIndex) => filteredData[rowIndex]?.tempID
     );
@@ -77,7 +90,11 @@ export const ListofCandi = () => {
       setTempID(selectedTempID);
     }
   };
+  // console.log(filteredData);
+  
+  const requiredPermissions = ["Candidate"];
 
+  const access = "Recruitment";
   return (
     <section className="screen-size min-h-screen w-full my-5">
       <div className="mb-8 flex justify-between items-center">
@@ -101,14 +118,13 @@ export const ListofCandi = () => {
       </div>
 
       {/* Buttons for Edit and Delete */}
-      <div className="flex relative mb-8 ">
+      <div className="flex mb-3 gap-3 justify-end">
         <div
-          className=" absolute top-1/2 right-14 transform -translate-y-1/2 text-2xl hover:text-3xl flex items-center cursor-pointer"
+          className="text-2xl hover:text-3xl flex items-center cursor-pointer"
           onClick={() => {
             if (selectedRows.length === 1) {
-              getTemp();      
-              navigate("/addCandidates", {
-              });
+              getTemp();
+              navigate("/addCandidates", {});
             } else if (selectedRows.length > 1) {
               alert("Please select only one row to edit.");
             } else {
@@ -120,12 +136,16 @@ export const ListofCandi = () => {
           <FaEdit className="mr-2" />
         </div>
 
-        <div
-          className="absolute top-1/2 right-0 transform -translate-y-1/2 text-3xl hover:text-4xl cursor-pointer text-[#f42232cc] flex items-center"
-          onClick={handleDeleteClick}
-        >
-          <MdDelete className="mr-2" />
-        </div>
+        {formattedPermissions?.deleteAccess?.[access]?.some((permission) =>
+          requiredPermissions.includes(permission)
+        ) && (
+          <div
+            className="text-3xl hover:text-4xl cursor-pointer text-[#f42232cc] flex items-center"
+            onClick={handleDeleteClick}
+          >
+            <MdDelete className="mr-2" />
+          </div>
+        )}
       </div>
 
       {loading ? (
@@ -137,9 +157,16 @@ export const ListofCandi = () => {
           columns={columns}
           rowClickHandler={handleRowClick}
           data={filteredData}
-          selectedRows={selectedRows} 
-          onRowSelect={handleRowSelect} 
+          selectedRows={selectedRows}
+          onRowSelect={handleRowSelect}
           edited={EditedData}
+        />
+      )}
+      {deletePopup && (
+        <DeletePopup
+          handleDeleteMsg={handleDeleteMsg}
+          title1={deleteTitle1}
+          path="/recrutiles/listofcandi"
         />
       )}
     </section>

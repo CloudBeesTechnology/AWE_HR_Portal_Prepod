@@ -86,7 +86,7 @@ export const RequisitionReviewForm = ({
           setRequestData(allRequisitions);
           setError(null);
         } catch (err) {
-          console.error("Error fetching requisition data:", err);
+          // console.error("Error fetching requisition data:", err);
           setError("Error fetching requisition data");
         }
       };
@@ -176,7 +176,7 @@ export const RequisitionReviewForm = ({
       }
  
     } catch (err) {
-      console.error("Error updating status or sending email:", err);
+      // console.error("Error updating status or sending email:", err);
 
       // Stop loading on error
       setIsLoading(false);

@@ -21,6 +21,8 @@ export const TimeSheetsCRUDoperations = async ({
   // handleManagerReload,
   storeApproveRej,
 }) => {
+  let HRemailID = "hr-timesheet@adininworks.com";
+
   if (action === "create") {
     const chunkArray = (array, size) => {
       const result = [];
@@ -113,31 +115,49 @@ export const TimeSheetsCRUDoperations = async ({
                     const emailDetails = await Notification({
                       getEmail: result,
                       Position,
+                      identify: "General",
                     });
 
                     if (emailDetails) {
                       finalEmailDetails = emailDetails;
                       const { subject, message, fromAddress, toAddress } =
                         emailDetails;
-                      const result = await sendEmail(
-                        subject,
-                        message,
-                        fromAddress,
-                        toAddress
-                      );
+                      await sendEmail(subject, message, fromAddress, toAddress);
+                      const HRemailDetails = await Notification({
+                        getEmail: result,
+                        Position,
+                        identify: "HR",
+                      });
 
+                      if (HRemailDetails) {
+                        const { subject, message, fromAddress, toAddress } =
+                          HRemailDetails;
+                        const result = await sendEmail(
+                          subject,
+                          message,
+                          fromAddress,
+                          HRemailID
+                        );
+                        if (
+                          result === "success" &&
+                          successCount === data.length
+                        ) {
+                          await handleAssignManager();
+                          setNotification?.(false);
+                        }
+                      }
                       // setTimeout(() => {
                       //   handleAssignManager();
                       //   setNotification?.(false);
                       // }, 1500);
 
-                      if (
-                        result === "success" &&
-                        successCount === data.length
-                      ) {
-                        await handleAssignManager();
-                        setNotification?.(false);
-                      }
+                      // if (
+                      //   result === "success" &&
+                      //   successCount === data.length
+                      // ) {
+                      //   await handleAssignManager();
+                      //   setNotification?.(false);
+                      // }
                     } else {
                     }
                   } else {
@@ -233,28 +253,35 @@ export const TimeSheetsCRUDoperations = async ({
           const emailDetails = await Notification({
             getEmail: result,
             Position,
+            identify: "General",
           });
 
           if (emailDetails) {
             storeApproveRej.push(emailDetails);
 
             const { subject, message, fromAddress, toAddress } = emailDetails;
-            const result = await sendEmail(
-              subject,
-              message,
-              fromAddress,
-              toAddress
-            );
-            // setTimeout(() => {
-            //   handleManagerReload?.();
-            //   setNotification?.(false);
-            // }, 2100);
+            await sendEmail(subject, message, fromAddress, toAddress);
+            const HRemailDetails = await Notification({
+              getEmail: result,
+              Position,
+              identify: "HR",
+            });
 
-            if (result === "success") {
-              setTimeout(() => {
-                // handleManagerReload?.();
-                setNotification?.(false);
-              }, 1000);
+            if (HRemailDetails) {
+              const { subject, message, fromAddress, toAddress } =
+                HRemailDetails;
+              const result = await sendEmail(
+                subject,
+                message,
+                fromAddress,
+                HRemailID
+              );
+              if (result === "success") {
+                setTimeout(() => {
+                  // handleManagerReload?.();
+                  setNotification?.(false);
+                }, 1000);
+              }
             }
           }
         }
@@ -268,25 +295,35 @@ export const TimeSheetsCRUDoperations = async ({
           const emailDetails = await Notification({
             getEmail: result,
             Position,
+            identify: "General",
           });
 
           if (emailDetails) {
             storeApproveRej.push(emailDetails);
 
             const { subject, message, fromAddress, toAddress } = emailDetails;
-            const result = await sendEmail(
-              subject,
-              message,
-              fromAddress,
-              toAddress
-            );
-            console.log("result : ", result);
+            await sendEmail(subject, message, fromAddress, toAddress);
+            const HRemailDetails = await Notification({
+              getEmail: result,
+              Position,
+              identify: "HR",
+            });
 
-            if (result === "success") {
-              setTimeout(() => {
-                // handleManagerReload?.();
-                setNotification?.(false);
-              }, 1000);
+            if (HRemailDetails) {
+              const { subject, message, fromAddress, toAddress } =
+                HRemailDetails;
+              const result = await sendEmail(
+                subject,
+                message,
+                fromAddress,
+                HRemailID
+              );
+              if (result === "success") {
+                setTimeout(() => {
+                  // handleManagerReload?.();
+                  setNotification?.(false);
+                }, 1000);
+              }
             }
           }
         }
@@ -343,24 +380,39 @@ export const TimeSheetsCRUDoperations = async ({
                       getEmail: result,
                       Position,
                       correctionMade,
+                      identify: "General",
                     });
 
                     if (emailDetails) {
                       finalEmailDetails = emailDetails;
                       const { subject, message, fromAddress, toAddress } =
                         emailDetails;
-                      const result = await sendEmail(
-                        subject,
-                        message,
-                        fromAddress,
-                        toAddress
-                      );
-                      if (
-                        result === "success" &&
-                        successCount === data.length
-                      ) {
-                        await handleAssignManager();
-                        setNotification?.(false);
+                      await sendEmail(subject, message, fromAddress, toAddress);
+
+                      let correctionMade = true;
+                      const HRemailDetails = await Notification({
+                        getEmail: result,
+                        Position,
+                        correctionMade,
+                        identify: "HR",
+                      });
+
+                      if (HRemailDetails) {
+                        const { subject, message, fromAddress, toAddress } =
+                          HRemailDetails;
+                        const result = await sendEmail(
+                          subject,
+                          message,
+                          fromAddress,
+                          HRemailID
+                        );
+                        if (
+                          result === "success" &&
+                          successCount === data.length
+                        ) {
+                          await handleAssignManager();
+                          setNotification?.(false);
+                        }
                       }
                     } else {
                     }

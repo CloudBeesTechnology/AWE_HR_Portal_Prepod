@@ -223,6 +223,7 @@ export const ViewTimeSheet = () => {
               setTimeSheetFileData(null);
               setCategoryFilters(null);
               setTableData(null);
+              setSearchQuery(null);
             }}
           >
             <FaArrowLeft />

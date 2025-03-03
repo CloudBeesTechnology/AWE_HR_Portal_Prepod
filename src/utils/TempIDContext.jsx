@@ -14,7 +14,6 @@ export const TempIDProvider = ({ children }) => {
   const [endDate, setEndDate] = useState("");
   const [searchQuery, setSearchQuery] = useState(null);
   const [showListTimeSheet, setShowListTimeSheet] = useState(true);
-
   const [categoryFilter, setCategoryFilter] = useState("Select Excel Sheet");
   const [categoryFilters, setCategoryFilters] = useState(null);
   const [tableData, setTableData] = useState(null);
@@ -22,15 +21,15 @@ export const TempIDProvider = ({ children }) => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [getStartDate, setGetStartDate] = useState(new Date());
   const [getEndDate, setGetEndDate] = useState(new Date());
-
   const [gmMail, setGmMail] = useState();
   const [hrManagerMail, setHrManagerMail] = useState();
+  const [HRMPosition, setHRMPosition] = useState("");
   const [gmCount, setGmCount] = useState(0);
   const [hrManagerCount, setHrManagerCount] = useState(0);
   const [userType, setUserType] = useState("");
   const [userID, setUserID] = useState("");
   const [gmPosition, setGmPosition] = useState("");
-  const [GMEmpID, setGMEmpID] = useState("")
+  const [GMEmpID, setGMEmpID] = useState("");
   const { workInfoData, empPIData } = useContext(DataSupply);
 
   useEffect(() => {
@@ -44,17 +43,21 @@ export const TempIDProvider = ({ children }) => {
   useEffect(() => {
     if (workInfoData && userType === "Manager") {
       const generalManagerPosition = workInfoData.filter((item) =>
-        item.position.includes("GENERAL MANAGER")
+        item?.position?.includes("GENERAL MANAGER")
       );
-    
-      // console.log("General Manager Positions:", generalManagerPosition); 
-      
-      const gmPosition = generalManagerPosition[0]; 
-      // console.log("gmPosition:", gmPosition); // Log gmPosition after filtering
 
-      if (gmPosition && gmPosition.position.length > 0) {
+      // console.log("General Manager Positions:", generalManagerPosition);
+
+      const gmPosition = generalManagerPosition.find(
+        (item) => item.empID === userID
+      );
+
+      // const gmPosition = generalManagerPosition[0];
+      // console.log("gmPosition:", gmPosition);
+
+      if (gmPosition && gmPosition?.position?.length > 0) {
         const lastPosition =
-          gmPosition.position[gmPosition.position.length - 1];
+          gmPosition?.position[gmPosition?.position?.length - 1];
         // console.log("Last Position:", lastPosition);
 
         if (userID === gmPosition.empID) {
@@ -68,8 +71,8 @@ export const TempIDProvider = ({ children }) => {
 
     // console.log("gm 4", gmPosition);
     if (workInfoData && empPIData) {
-      const generalManagerPositions = workInfoData.filter((item) =>
-        item.position.includes("GENERAL MANAGER")
+      const generalManagerPositions = workInfoData?.filter((item) =>
+        item?.position?.includes("GENERAL MANAGER")
       );
       setGmCount(generalManagerPositions.length);
 
@@ -87,29 +90,90 @@ export const TempIDProvider = ({ children }) => {
         }
       }
 
-      const hrManagerPositions = workInfoData.filter((item) =>
-        item.position.includes("HR MANAGER")
-      );
-      setHrManagerCount(hrManagerPositions.length);
+      const hrManagerPositions = workInfoData.filter((item) => {
+        if (
+          item.empID === userID &&
+          Array.isArray(item.position) &&
+          item.position.length > 0 &&
+          item.position[item.position.length - 1]?.includes("HR MANAGER")
+        ) {
+          return item.position;
+        }
+      });
 
-      if (hrManagerPositions.length > 0) {
-        const hrManagerInfo = empPIData.find(
-          (data) => data.empID === String(hrManagerPositions[0].empID)
-        );
+      // console.log(hrManagerPositions);
 
-        if (hrManagerInfo) {
-          // console.log("HR Manager Info:", hrManagerInfo);
-          setHrManagerMail(hrManagerInfo.officialEmail);
-        } else {
-          // console.log("HR Manager Info not found.");
+      const HRMPosition = hrManagerPositions[0];
+
+      if (HRMPosition && HRMPosition.position.length > 0) {
+        const lastPosition =
+          HRMPosition.position[HRMPosition.position.length - 1];
+        // console.log("Last Position:", lastPosition);
+
+        if (userID === HRMPosition.empID) {
+          setHRMPosition(lastPosition);
+          // console.log("HRM Position Set:", lastPosition);
         }
       }
+
+      setHrManagerCount(hrManagerPositions.length);
+
+      if (workInfoData && empPIData) {
+        // Filter out all HR Managers from workInfoData
+        const HRMPositions = workInfoData.filter((item) =>
+          item?.position?.includes("HR MANAGER")
+        );
+      
+        // console.log("HRMPositions:", HRMPositions);
+        setHrManagerCount(HRMPositions.length);
+      
+        if (HRMPositions.length > 0) {
+          // Create an array to store the HR Manager emails
+          const hrManagerEmails = [];
+      
+          // Loop through all HRMPositions and find corresponding employee info
+          HRMPositions.forEach((HRMPosition) => {
+            const HRMInfo = empPIData.find(
+              (data) => data.empID === String(HRMPosition.empID)
+            );
+      
+            if (HRMInfo) {
+              // console.log("HRM Info:", HRMInfo);
+              // Add the official email to the array
+              hrManagerEmails.push(HRMInfo.officialEmail);
+            }
+          });
+      
+          // Set all HR Manager emails
+          setHrManagerMail(hrManagerEmails);
+        }
+      }
+  
+      // console.log(hrManagerMail);
+
+      // if (hrManagerPositions.length > 0) {
+      //   const hrManagerInfo = empPIData.find(
+      //     (data) => data.empID === String(hrManagerPositions[0].empID)
+      //   );
+
+      //   if (hrManagerInfo) {
+      //     // console.log("HR Manager Info:", hrManagerInfo);
+      //     setHrManagerMail(hrManagerInfo.officialEmail);
+      //   } else {
+      //     // console.log("HR Manager Info not found.");
+      //   }
+      // }
     }
   }, [workInfoData, empPIData]);
 
+  // console.log(gmMail);
+  // console.log(hrManagerMail);
+  
+  
   return (
     <TempIDContext.Provider
       value={{
+        HRMPosition,
         gmMail,
         gmPosition,
         GMEmpID,

@@ -173,7 +173,7 @@ export const RM = () => {
         //   : "-",
         // PreviousEmployment: item.preEmp || "-",
       }));
-    console.log(data.interDate);
+    // console.log(data.interDate);
 
     return sortedData;
   };
