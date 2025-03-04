@@ -444,7 +444,6 @@ export const EmployeeInfo = () => {
         '$1"$2":'
       );
 
-      // Handle potential single quotes around values
       // cleanedString = cleanedString.replace(/'([^']+)'/g, '"$1"');
 
       // Remove unnecessary backslashes
