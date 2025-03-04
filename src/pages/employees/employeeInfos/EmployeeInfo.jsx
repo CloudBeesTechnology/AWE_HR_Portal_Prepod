@@ -503,7 +503,8 @@ export const EmployeeInfo = () => {
   };
 
   const searchResult = async (result) => {
-    // console.log("Result", result);
+    // console.log(result);
+
     const fieldValue = [
       "empID",
       "email",
@@ -514,13 +515,11 @@ export const EmployeeInfo = () => {
     ];
 
     fieldValue.forEach((val) => {
-      const data = result[val];
-
-      // Ensure the data is a string before setting the value
+      const data = result[val] || "";
       setValue(val, typeof data === "string" ? data : "");
     });
+
     const keysToSet = [
-      // "empID",
       "driveLic",
       "inducBrief",
       "myIcNo",
@@ -542,56 +541,37 @@ export const EmployeeInfo = () => {
       "ctryOfOrigin",
       "chinese",
       "educLevel",
-      // "email",
       "eduDetails",
-      // "empBadgeNo",
       "bankName",
-      // "bankAccNo",
       "lang",
       "marital",
       "name",
       "oCOfOrigin",
       "position",
-      // "sapNo",
-      // "officialEmail",
       "bwnIcColour",
       "gender",
     ];
-    // Set values for other fields
-    keysToSet.forEach((key) => {
-      let valueToSet = result[key];
 
-      // Handle undefined or null values
-      if (valueToSet === undefined || valueToSet === null) {
-        valueToSet = "";
-      }
+    keysToSet.forEach((key) => {
+      let valueToSet = result[key] || "";
 
       if (typeof valueToSet === "string") {
-        // Trim and convert string to uppercase
-        const storedValue = valueToSet.trim().toUpperCase();
-        setValue(key, storedValue); // Set the processed string value
+        setValue(key, valueToSet.trim().toUpperCase());
       } else if (Array.isArray(valueToSet) && valueToSet.length > 0) {
-        // Get the last value from the array, trim, and convert to uppercase
-        const arrayData = valueToSet[valueToSet.length - 1]
-          .trim()
-          .toUpperCase();
-        setValue(key, [arrayData]);
+        setValue(key, [valueToSet[valueToSet.length - 1].trim().toUpperCase()]);
       } else {
-        // Set the value as is for non-string, non-array types
         setValue(key, valueToSet);
       }
     });
-    const arrayDateField = ["empType", "contractType"];
 
-    // Set values for date fields and handle salaryType condition
-    arrayDateField.forEach((field) => {
-      const valueToSet = result[field];
-
-      setValue(field, getArrayDateValue(valueToSet)); // Use getArrayDateValue for all fields
-    });
     const fieldsArray = ["bwnIcExpiry", "ppExpiry", "ppIssued"];
     fieldsArray.forEach((field) =>
       setValue(field, getLastArrayValue(result[field]))
+    );
+
+    const arrayDateField = ["empType", "contractType"];
+    arrayDateField.forEach((field) =>
+      setValue(field, getArrayDateValue(result[field]))
     );
 
     const changeString = [
@@ -601,20 +581,19 @@ export const EmployeeInfo = () => {
       "ppDestinate",
       "bwnIcNo",
     ];
+
     changeString.forEach((field) => {
       const value = result[field];
       if (Array.isArray(value)) {
-        // Join the array into a string and capitalize the first letter of each word
         const stringValue = value
           .join(", ")
-          .split(" ") // Split by spaces
+          .split(" ")
           .map(
             (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-          ) // Capitalize each word
-          .join(" "); // Rejoin with spaces
+          )
+          .join(" ");
         setValue(field, stringValue || "");
       } else if (typeof value === "string") {
-        // Capitalize the first letter of each word for a string
         const stringValue = value
           .split(" ")
           .map(
@@ -623,18 +602,16 @@ export const EmployeeInfo = () => {
           .join(" ");
         setValue(field, stringValue || "");
       } else {
-        // Set the value directly if not an array or string
         setValue(field, value || "");
       }
     });
 
-    // Handle familyDetails
     if (
       Array.isArray(result.familyDetails) &&
       result.familyDetails.length > 0
     ) {
       const cleanedFamilyDetails = cleanFamilyDetailsString(
-        result?.familyDetails[0]
+        result.familyDetails[0]
       );
       setFamilyData(cleanedFamilyDetails || []);
     } else {
@@ -648,14 +625,13 @@ export const EmployeeInfo = () => {
       profilePhoto: result.profilePhoto || "",
       inducBriefUp: result.inducBriefUp || "",
     }));
-    // Handle file uploads and names
+
     if (result.inducBriefUp && result.inducBriefUp !== null) {
       setUploadedFileNames((prev) => ({
         ...prev,
         inducBriefUp: getFileName(result.inducBriefUp) || "",
       }));
     } else {
-      // Clear the previous value if inducBriefUp is null
       setUploadedFileNames((prev) => ({
         ...prev,
         inducBriefUp: "",
@@ -668,10 +644,8 @@ export const EmployeeInfo = () => {
         if (!pathUrl) {
           setPPLastUP(avatar);
         }
-
         if (pathUrl) {
           const result = await getUrl({ path: pathUrl });
-
           setPPLastUP(result.url?.toString());
         }
       } catch (err) {
@@ -680,7 +654,6 @@ export const EmployeeInfo = () => {
     };
     linkToStorageFile(profilePhotoString);
 
-    // Handle multiple file uploads
     const uploadFields = [
       "bwnUpload",
       "applicationUpload",
@@ -694,15 +667,15 @@ export const EmployeeInfo = () => {
 
     uploadFields.forEach((field) => {
       const fieldData = result[field];
+
       if (!fieldData) {
-        setValue(field, []); // Clear the field value
+        setValue(field, []);
         setUploadedFiles((prev) => ({ ...prev, [field]: [] }));
         setUploadedFileNames((prev) => ({ ...prev, [field]: "" }));
         return;
       }
 
       try {
-        // Parse the field data
         const outerParsed = JSON.parse(fieldData);
         const parsedArray = Array.isArray(outerParsed)
           ? outerParsed
@@ -720,23 +693,18 @@ export const EmployeeInfo = () => {
           return item;
         });
 
-        // Get the last file name
-        const lastFile = parsedFiles[parsedFiles.length - 1];
-        const lastFileName = lastFile?.upload
-          ? getFileName(lastFile.upload)
-          : Array.isArray(lastFile) && lastFile[0]?.upload
-          ? getFileName(lastFile[0].upload)
-          : "";
+        // *Filter out deleted files before setting them back*
+        const filteredFiles = parsedFiles.filter(
+          (file) => !deletedFiles[field]?.includes(getFileName(file.upload))
+        );
 
-        // Update state
-        setValue(field, parsedFiles);
-        setUploadedFiles((prev) => ({ ...prev, [field]: parsedFiles }));
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          [field]: lastFileName, // Assign the extracted file name
-        }));
+        const fileNames = filteredFiles.map((file) => getFileName(file.upload));
+
+        setValue(field, filteredFiles);
+        setUploadedFiles((prev) => ({ ...prev, [field]: filteredFiles }));
+        setUploadedFileNames((prev) => ({ ...prev, [field]: fileNames }));
       } catch (error) {
-        console.error(`Failed to parse ${field}:, error`);
+        console.error(`Failed to parse ${field}:`, error);
       }
     });
   };

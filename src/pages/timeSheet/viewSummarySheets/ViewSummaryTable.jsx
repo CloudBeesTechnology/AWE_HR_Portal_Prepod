@@ -112,7 +112,7 @@ export const ViewSummaryTable = ({
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
   var data = currentData;
- 
+
   return (
     <div className="bg-[#fafaf6] h-screen">
       <div className="screen-size p-4">
@@ -260,6 +260,8 @@ export const ViewSummaryTable = ({
                     (value) => value === "Yes"
                   );
 
+                 const totalOfALCL= parseFloat(employee?.empLeaveCount?.AL) +
+                    parseFloat(employee?.empLeaveCount?.CL) || 0
                   return (
                     <React.Fragment key={index}>
                       <tr>
@@ -275,14 +277,18 @@ export const ViewSummaryTable = ({
                             }`}
                           </span>
                           <br />
+
                           <span>{`Hours/Day : ${
                             employee?.workHrs && employee?.workHrs.length > 0
                               ? employee?.workHrs[employee?.workHrs?.length - 1]
                               : ""
                           }  `}</span>
                           <span>{`Days/Month : ${
-                            employee.workMonth && employee.workMonth.length > 0
-                              ? employee.workMonth
+                            employee?.workMonth &&
+                            employee?.workMonth?.length > 0
+                              ? employee?.workMonth[
+                                  employee?.workMonth.length - 1
+                                ]
                               : ""
                           }`}</span>
                           <br />
@@ -337,7 +343,7 @@ export const ViewSummaryTable = ({
                                   sapNo: employee.sapNo,
                                   empBadgeNo: employee?.empBadgeNo,
                                   location: employee?.location,
-                                  jobcode: employee.jobcode,
+                                  jobcode: employee?.jobcode,
                                   workingHrs:
                                     employee?.workingHrs?.[currentDayKey],
                                   ot: employee?.OVERTIMEHRS?.[currentDayKey],
@@ -379,8 +385,9 @@ export const ViewSummaryTable = ({
                         <td className="border px-2 py-1" rowSpan="2">
                           {/* {`${employee?.empLeaveCount?.AL || 0} /
                                ${employee?.empLeaveCount?.CL || 0} `} */}
-                          {parseInt(employee?.empLeaveCount?.AL) +
-                            parseInt(employee?.empLeaveCount?.CL) || 0}
+                          {/* {parseInt(employee?.empLeaveCount?.AL) +
+                            parseInt(employee?.empLeaveCount?.CL) || 0} */}
+                            {totalOfALCL}
                         </td>
                         <td className="border px-2 py-1" rowSpan="2">
                           {employee.empLeaveCount?.SL || 0}
@@ -572,8 +579,9 @@ export const ViewSummaryTable = ({
                         <td className="border px-2 py-1">
                           {/* {`${employee?.empLeaveCount?.AL || 0} /
                                ${employee?.empLeaveCount?.CL || 0}`} */}
-                          {parseInt(employee?.empLeaveCount?.AL) +
-                            parseInt(employee?.empLeaveCount?.CL) || 0}
+                          {/* {parseFloat(employee?.empLeaveCount?.AL) +
+                            parseFloat(employee?.empLeaveCount?.CL) || 0} */}
+                            {totalOfALCL}
                         </td>
                         <td className="border px-2 py-1">
                           {employee.empLeaveCount?.SL || 0}

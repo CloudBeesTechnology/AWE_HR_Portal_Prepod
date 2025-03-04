@@ -100,7 +100,7 @@ export const ApplyVSFunction = ({
         });
 
         const leaveStatusData = leaveStatuses;
-
+      
         const approvedLeaveStatus = leaveStatusData?.filter(
           (fil) => fil.managerStatus === "Approved"
         );
@@ -799,7 +799,7 @@ export const ApplyVSFunction = ({
             assignUpdaterDateTime: assignUpdaterDateTime,
           };
         }).filter(Boolean);
-      
+
         await ProcessedDataFunc(transformedData);
       };
       if (convertedStringToArrayObj && convertedStringToArrayObj.length > 0) {

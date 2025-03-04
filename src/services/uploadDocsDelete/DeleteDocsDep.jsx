@@ -1,4 +1,3 @@
-
 export const DeleteDocsDep = (
   fileType,
   fileName,
@@ -9,29 +8,24 @@ export const DeleteDocsDep = (
   index,
   setIsUploading
 ) => {
-  
-
   try {
     // console.log("Inside try block");
-    setUploadedFileNames((prev) => {
-      // console.log("Previous uploadedFileDep state:", prev);  depInsurance
+    // setUploadedFileNames((prev) => {
+    //   // console.log("Previous uploadedFileDep state:", prev);  depInsurance
 
+    //   const updatedDepFiles = { ...prev };
+    //   console.log(updatedDepFiles);
+    //   // Find the key associated with the fileName and remove it
+    //   Object.keys(updatedDepFiles).forEach((key) => {
+    //     if (updatedDepFiles[key] === fileName) {
+    //       delete updatedDepFiles[key]; // Remove the key from the object
+    //     }
+    //   });
 
-      const updatedDepFiles = { ...prev };
+    //   // console.log("Updated uploadedFileDep state:", updatedDepFiles);
+    //   return updatedDepFiles;
+    // });
 
-      // Find the key associated with the fileName and remove it
-      Object.keys(updatedDepFiles).forEach((key) => {
-        if (updatedDepFiles[key] === fileName) {
-          delete updatedDepFiles[key]; // Remove the key from the object
-        }
-      });
-
-      // console.log("Updated uploadedFileDep state:", updatedDepFiles);
-      return updatedDepFiles;
-    });
-    
-    
-    
     setUploadedDocs((prev) => {
       const updatedFiles = { ...prev };
 
@@ -68,10 +62,10 @@ export const DeleteDocsDep = (
       return updatedFiles;
     });
 
-    setIsUploading((prev) => ({
-      ...prev,
-      [index]: false,
-    }));
+    // setIsUploading((prev) => ({
+    //   ...prev,
+    //   [index]: false,
+    // }));
     // This should print if function is called
   } catch (err) {
     console.log("Caught error:", err);

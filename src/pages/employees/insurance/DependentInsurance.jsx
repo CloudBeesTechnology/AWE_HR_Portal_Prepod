@@ -36,7 +36,6 @@ export const DependentInsurance = () => {
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const { depInsuData } = useOutletContext();
-  // console.log(depInsuData,"depins");
 
   const [selectedNationality, setSelectedNationality] = useState("");
   const {
@@ -45,6 +44,7 @@ export const DependentInsurance = () => {
     formState: { errors },
     setValue,
     watch,
+    trigger,
   } = useForm({
     resolver: yupResolver(DependentInsuranceSchema),
     defaultValues: {
@@ -81,32 +81,78 @@ export const DependentInsurance = () => {
   const handleAddFileClick = () => {
     const newField = { id: Date.now() };
     setDepInsurance((prev) => [...prev, newField]);
+   
   };
 
   const watchedEmpID = watch("empID");
-
+  const getDepInsurance = watch("depInsurance");
   const handleRemoveFileClick = (index) => {
     // const newFields = depInsurance
     //   .filter((_, i) => i !== index)
     //   .map((val, inx) => val);
     // const newFields = depInsurance?.filter((_, i) => i !== index);
-    const newFields = depInsurance.filter((item, i) => {
-      return i !== index;
-    });
-    // console.log("newFields : ", newFields);
+    // const newFields = depInsurance.filter((item, i) => {
+    //   return i !== index;
+    // });
+    const newFields = getDepInsurance
+      .filter((_, i) => i !== index) // Remove the item at the given index
+      .map((item) => ({ ...item }));
+    
     setDepInsurance(newFields);
     setValue("depInsurance", newFields);
 
-    // console.log("setUploadedDocs : ", uploadedDocs);
+  
+    // setUploadedDocs((prevDocs) => {
+    //   if (!prevDocs?.depInsurance || !(index in prevDocs.depInsurance))
+    //     return prevDocs;
 
-    const newUploadedDocs = { ...uploadedDocs }; // Create a copy of the object
+    //   // Step 1: Create a copy of depInsurance without the specific index
+    //   const newDepInsurance = { ...prevDocs.depInsurance };
+    //   delete newDepInsurance[index];
 
-    if (newUploadedDocs[index]) {
-      delete newUploadedDocs[index]; // Remove the entry that matches the index
-    }
+    //   // Step 2: Reindex the remaining items
+    //   const reindexedDepInsurance = Object.values(newDepInsurance).reduce(
+    //     (acc, item, newIndex) => {
+    //       acc[newIndex] = item;
+    //       return acc;
+    //     },
+    //     {}
+    //   );
 
-    // console.log("Updated uploadedDocs:", newUploadedDocs);
-    setUploadedDocs(newUploadedDocs); // Update state
+    //   // Step 3: Return updated state
+    //   return { ...prevDocs, depInsurance: reindexedDepInsurance };
+    // });
+
+    setUploadedDocs((prevDocs) => {
+      // if (!prevDocs?.depInsurance || !(index in prevDocs.depInsurance))
+      //   return prevDocs;
+
+      // Step 1: Create an array from the depInsurance object, filtering out the selected index
+      const filteredArray = Object.entries(prevDocs?.depInsurance)
+        .filter(([key]) => Number(key) !== index)
+        .map(([, value]) => value); // Keep only values (arrays of file objects)
+
+      // Step 2: Reconstruct the depInsurance object with new sequential keys
+      const reindexedDepInsurance = filteredArray?.reduce(
+        (acc, item, newIndex) => {
+          acc[newIndex] = item;
+          return acc;
+        },
+        {}
+      );
+    
+      // Step 3: Return the updated state
+      return { ...prevDocs, depInsurance: reindexedDepInsurance };
+    });
+
+    // setValue("depInsurance", (prev) => {
+    //   if (!Array.isArray(prev)) return [];
+    //   const filteredDepInsurance = prev.filter((_, i) => i !== index);
+
+    //   return filteredDepInsurance;
+    // });
+    trigger("depInsurance");
+    // setUploadedDocs(newUploadedDocs); // Update state
 
     // setUploadedDocs((prev) => {
     //   const updatedDocs = { ...prev };
@@ -126,7 +172,7 @@ export const DependentInsurance = () => {
     const fullPath = depInsurance[index]?.fileName;
     if (fullPath) {
       const fileName = fullPath.split("/").pop();
-      // console.log(fileName);
+      
       handleDeleteFile("depInsurance", fileName, watchedEmpID);
     }
 
@@ -140,6 +186,8 @@ export const DependentInsurance = () => {
     setIsUploading((prev) => filterAndReindex(prev, index));
     setUploadedFileNames((prev) => filterAndReindex(prev, index));
   };
+
+
 
   const insuClaimDD = dropDownVal[0]?.insuClaimDD.map((item) => ({
     value: item,
@@ -190,17 +238,14 @@ export const DependentInsurance = () => {
 
   const handleFileChange = async (e, type, index) => {
     // console.log("Event target files:", e.target.files); // Check if files exist
+    if (!watchedEmpID) {
+      alert("Please provide the Employee ID before deleting files.");
+      return;
+    }
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
 
     // console.log("Uploaded docs:", uploadedDocs); // Check uploadedDocs structure
-    if (uploadedDocs?.depInsurance?.[index]?.length > 0) {
-      alert(
-        "Only one file is allowed per index. Please delete the existing file before uploading a new one."
-      );
-      e.target.value = "";
-      return;
-    }
 
     const allowedTypes = [
       "application/pdf",
@@ -209,16 +254,16 @@ export const DependentInsurance = () => {
       "image/jpg",
     ];
     if (!allowedTypes.includes(selectedFile.type)) {
-        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-        return;
-    }
-
-    const currentFiles = watch(type) || [];
-    // console.log("Current files:", currentFiles); // Check currentFiles
-    if (currentFiles.some((file) => file.name === selectedFile.name)) {
-      alert("This file has already been uploaded.");
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
       return;
     }
+
+    // const currentFiles = watch(type) || [];
+    // // console.log("Current files:", currentFiles); // Check currentFiles
+    // if (currentFiles.some((file) => file.name === selectedFile.name)) {
+    //   alert("This file has already been uploaded.");
+    //   return;
+    // }
 
     setValue(`depInsurance[${index}].depenInfUpload`, selectedFile);
 
@@ -262,7 +307,7 @@ export const DependentInsurance = () => {
 
         if (parsedData && parsedData.length > 0) {
           setDepInsurance(parsedData);
-          // console.log("parsedData : ", parsedData);
+          
           setValue("depInsurance", parsedData);
 
           parsedData.forEach((item, idx) => {
@@ -300,9 +345,9 @@ export const DependentInsurance = () => {
                     [idx]: parsedFiles,
                   },
                 }));
-                {
-                  console.log("parsedData : ", parsedData);
-                }
+                // {
+                //   console.log("parsedData : ", parsedData);
+                // }
                 const updatingState = parsedData.map((file, ind) => {
                   const result = formattedPermissions?.deleteAccess?.[
                     access
@@ -399,7 +444,7 @@ export const DependentInsurance = () => {
         return;
       }
 
-      setdeleteTitle1(`${fileName}`);
+      setdeleteTitle1(`${fileName} Deleted Successfully`);
       handleDeleteMsg();
     } catch (error) {
       console.error("Error deleting file:", error);
@@ -414,7 +459,7 @@ export const DependentInsurance = () => {
       );
 
       // console.log("Table",checkingDITable);
-
+    
       if (checkingDITable) {
         const depValue = {
           ...data,
@@ -427,7 +472,7 @@ export const DependentInsurance = () => {
           }),
           id: checkingDITable.id,
         };
-        // console.log(depValue, "updatex");
+        // console.log("depValue : ", depValue);
         await UpdateDIData({ depValue });
         setShowTitle("Dependent Insurance Info Updated successfully");
         setNotification(true);
@@ -453,7 +498,7 @@ export const DependentInsurance = () => {
       console.error("Error in submitting data:", error);
     }
   };
-  console.log("depInsurance : ", depInsurance);
+
   return (
     <div className="bg-[#F5F6F1CC] mx-auto p-2 py-10">
       <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
@@ -492,103 +537,100 @@ export const DependentInsurance = () => {
                   !(Array.isArray(value) && value.length === 0)
               )
             )
-            .map((field, index) => (
-              <div key={index} className="flex flex-col gap-5 border-b pb-10">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <FormField
-                    label="Type of Insurance Claim"
-                    register={register}
-                    name={`depInsurance[${index}].depenInsType`}
-                    type="select"
-                    options={insuClaimDD}
-                    errors={errors.insuranceClaims?.[index]}
-                  />
-                  <div>
-                    <label className="mb-1 text_size_5">
-                      Dependent Information
-                    </label>
-                    <select
-                      {...register(`depInsurance[${index}].depenInfo`)}
-                      className="input-field select-custom"
-                    >
-                      <option value=""></option>
-                      <option value="Spouse">Spouse</option>
-                      <option value="Child">Child</option>
-                      <option value="Spouse&Child">Spouse & Child</option>
-                    </select>
-                    {errors.depInsurance?.[index]?.depenInfo && (
-                      <p className="text-[red] text-xs mt-1">
-                        {errors.depInsurance[index].depenInfo.message}
-                      </p>
-                    )}
+            .map((field, index) => {
+              console.log(uploadedFileNames[index], "sdefghj");
+              return (
+                <div key={index} className="flex flex-col gap-5 border-b pb-10">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <FormField
+                      label="Type of Insurance Claim"
+                      register={register}
+                      name={`depInsurance[${index}].depenInsType`}
+                      type="select"
+                      options={insuClaimDD}
+                      errors={errors.insuranceClaims?.[index]}
+                    />
+                    <div>
+                      <label className="mb-1 text_size_5">
+                        Dependent Information
+                      </label>
+                      <select
+                        {...register(`depInsurance[${index}].depenInfo`)}
+                        className="input-field select-custom"
+                      >
+                        <option value=""></option>
+                        <option value="Spouse">Spouse</option>
+                        <option value="Child">Child</option>
+                        <option value="Spouse&Child">Spouse & Child</option>
+                      </select>
+                      {errors.depInsurance?.[index]?.depenInfo && (
+                        <p className="text-[red] text-xs mt-1">
+                          {errors.depInsurance[index].depenInfo.message}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                <DependFirstFile
-                  register={register}
-                  errors={errors}
-                  index={index}
-                />
-                <DependSecondFile
-                  register={register}
-                  errors={errors}
-                  index={index}
-                  watch={watch}
-                  selectedNationality={selectedNationality}
-                  handleNationalityChange={handleNationalityChange}
-                  dropDownVal={dropDownVal}
-                />
+                  <DependFirstFile
+                    register={register}
+                    errors={errors}
+                    index={index}
+                  />
+                  <DependSecondFile
+                    register={register}
+                    errors={errors}
+                    index={index}
+                    watch={watch}
+                    selectedNationality={selectedNationality}
+                    handleNationalityChange={handleNationalityChange}
+                    dropDownVal={dropDownVal}
+                  />
 
-                <div className="grid grid-cols-3 gap-10">
-                  <div>
-                    <label
-                      onClick={() => {
-                        if (uploadedDocs?.depInsurance?.[index]?.length > 0) {
-                          alert(
-                            "Please delete the previously uploaded file before uploading a new one."
-                          );
-                        }
-                      }}
-                      className="flex items-center px-3 py-3 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer"
-                    >
-                      <input
-                        // label="Upload File"
-                        type="file"
-                        {...register(`depInsurance[${index}].depenInfUpload`)}
-                        onChange={(e) =>
-                          handleFileChange(e, "depInsurance", index)
-                        }
-                        accept="application/pdf"
-                        className="hidden"
-                        disabled={
-                          uploadedDocs?.depInsurance?.[index]?.length > 0
-                        }
-                      />
-                        <span className="ml-2 w-full font-normal flex justify-between items-center gap-10">
-                                      Upload
-                                <GoUpload />
-                              </span>
-                    </label>
+                  <div className="grid grid-cols-3 gap-10">
+                    <div>
+                      <label
+                        onClick={() => {
+                          if (uploadedDocs?.depInsurance?.[index]?.length > 0) {
+                            alert(
+                              "Please delete the previously uploaded file before uploading a new one."
+                            );
+                          }
+                        }}
+                        className="flex items-center px-3 py-3 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer"
+                      >
+                        Upload
+                        <input
+                          // label="Upload File"
+                          type="file"
+                          {...register(`depInsurance[${index}].depenInfUpload`)}
+                          onChange={(e) =>
+                            handleFileChange(e, "depInsurance", index)
+                          }
+                          accept="application/pdf"
+                          className="hidden"
+                          disabled={
+                            uploadedDocs?.depInsurance?.[index]?.length > 0
+                          }
+                        />
+                        <GoUpload className="ml-1" />
+                      </label>
 
-                    {/* <p className="text-secondary text-xs pt-1">
-                    {uploadedFileDep[index]}
-                  </p> */}
+                      {/* <p className="text-secondary text-xs pt-1">
+    {uploadedFileDep[index]}
+  </p> */}
 
                     {/* const [isUploading, setIsUploading] = useState({
     depInsurance: false,
   }); */}
-                    {console.log("IsUploading : ", isUploading)}
+                    {/* {console.log("IsUploading : ", isUploading)} */}
                     <div className="flex items-center">
                       <p className="text-secondary text-xs pt-1">
                         {uploadedDocs?.depInsurance?.[index]?.[0]?.upload
                           ?.split("/")
                           ?.pop()}
                       </p>
-                      {console.log("uploadedFileNames : ", uploadedFileNames)}
-                      {console.log(
-                        "uploadedDocs : ",
-                        uploadedDocs?.depInsurance[index]
-                      )}
+                      {/* {console.log("uploadedFileNames : ", uploadedFileNames)} */}
+                     
                       {uploadedFileNames[index]?.empInsUpload === true &&
                       uploadedFileNames &&
                       uploadedFileNames.length > 0 &&
@@ -641,18 +683,19 @@ export const DependentInsurance = () => {
                   </div>
                 </div>
 
-                {/* Remove button for individual fields */}
-                {index > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveFileClick(index)}
-                    className="text-red-500 mt-2 text-medium_grey text-[25px]"
-                  >
-                    <FiMinusSquare />
-                  </button>
-                )}
-              </div>
-            ))}
+                  {/* Remove button for individual fields */}
+                  {index > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveFileClick(index)}
+                      className="text-red-500 mt-2 text-medium_grey text-[25px]"
+                    >
+                      <FiMinusSquare />
+                    </button>
+                  )}
+                </div>
+              );
+            })}
 
         <div className="md:col-span-2 flex justify-center mt-10">
           <button type="submit" className="primary_btn">

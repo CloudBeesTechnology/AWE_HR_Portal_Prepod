@@ -69,64 +69,62 @@ export const EmpRequisitionForm = ({ isVisible, onClose, userID }) => {
       await SubmitReqData({ EmpReqValue });
 
       if (userType === "Manager") {
-        if (gmMail) {
- 
-          await sendEmail(
-                 `Employee Requisition Request`,
-                 `<html>
-                  <body>
+        if (gmMail && Array.isArray(gmMail)) {
+        
+          for (const email of gmMail) {
+            await sendEmail(
+              `Employee Requisition Request`,
+              `<html>
+                <body>
                   <p>
-                  Dear GM,<br><br>
-                  Your Manager ${
-                  personalInfo.name || "N/A"
-                 } has submitted the Employee Requisition Form.<br/><br/>
-                  Click here <a heref="https://hr.adininworks.co">hr.adininworks.co</a> to view the request.
+                    Dear GM,<br><br>
+                    Your Manager ${personalInfo.name || "N/A"} has submitted the Employee Requisition Form.<br/><br/>
+                    Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the request.
                   </p>
-                  </body>
-                  </html>`,
-                  "hr_no-reply@adininworks.com",
-                   gmMail
-          );
+                </body>
+              </html>`,
+              "hr_no-reply@adininworks.com",
+              email
+            );
+          }
         } else {
           console.error("General Manager email not found.");
         }
-
-        if (hrManagerMail) {
-
+      
+        if (hrManagerMail && Array.isArray(hrManagerMail)) {    
+          for (const email of hrManagerMail) {
+            await sendEmail(
+              `Employee Requisition Request`,
+              `<html>
+                <body>
+                  <p>
+                    Dear HR,<br><br>
+                    Your Manager ${personalInfo.name || "N/A"} has submitted the Employee Requisition Form.<br/><br/>
+                    View the details at: <a href="https://hr.adininworks.co">hr.adininworks.co</a>
+                  </p>
+                </body>
+              </html>`,
+              "hr_no-reply@adininworks.com",
+              email
+            );
+          }
+        }
+      
+        if (recruMail) {
           await sendEmail(
             `Employee Requisition Request`,
             `<html>
-             <body>
-             <p>
-             Dear HR,<br><br>
-             Your Manager ${
-             personalInfo.name || "N/A"
-            } has submitted the Employee Requisition Form.<br/><br/>
-             View the details at: <a heref="https://hr.adininworks.co">hr.adininworks.co</a>
-            </p>
-            </body>
+              <body>
+                <p>
+                  Dear HR,<br><br>
+                  Your Manager ${personalInfo.name || "N/A"} has submitted the Employee Requisition Form.<br/><br/>
+                  View the details at: <a href="https://hr.adininworks.co">hr.adininworks.co</a>
+                </p>
+              </body>
             </html>`,
             "hr_no-reply@adininworks.com",
-            hrManagerMail          );
-       
-        } 
-        
-        if (recruMail) {
-          await sendEmail(
-           `Employee Requisition Request`,
-           `<html>
-            <body>
-            <p>
-            Dear HR,<br><br>
-            Your Manager ${
-            personalInfo.name || "N/A"
-          } has submitted the Employee Requisition Form.<br/><br/>
-            View the details at: <a heref="https://hr.adininworks.co">hr.adininworks.co</a>
-            </p>
-            </body>
-            </html>`,
-            "hr_no-reply@adininworks.com",
-            recruMail        );
+            recruMail
+          );
         }
       }
 

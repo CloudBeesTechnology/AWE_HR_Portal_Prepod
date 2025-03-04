@@ -18,28 +18,19 @@ import { DeletePopup } from "../../../utils/DeletePopup";
 
 export const EmployeeInsurance = () => {
   const { formattedPermissions } = useDeleteAccess();
-  // useEffect(() => {
-  //   window.scrollTo({ top: 0, behavior: "smooth" });
-  // }, []);
   const { searchResultData } = useOutletContext();
-  // console.log(searchResultData,"empins");
-
-  const { EmpInsuranceData, workMenDetails, dropDownVal } =
-    useContext(DataSupply);
+  const { EmpInsuranceData, workMenDetails, dropDownVal } = useContext(DataSupply);
   const { SubmitMPData } = EmpInsDataFun();
   const { UpdateEIDataSubmit } = UpdateEmpInsDataFun();
-  const [deletePopup, setdeletePopup] = useState(false);
-  const [deleteTitle1, setdeleteTitle1] = useState("");
+  const [deletePopup, setDeletePopup] = useState(false);
+  const [deleteTitle1, setDeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [uploadedDocs, setUploadedDocs] = useState({ empInsUpload: [] });
-  const [uploadedFile, setUploadedFile] = useState({ empInsUpload: [] });
-  const [secondaryUploadedFile, setSecondaryUploadedFile] = useState({
-    empInsUpload: [],
-  });
-  const [inputFields, setInputFields] = useState([{}]); // Tracks each file input field
+  const [uploadedFile, setUploadedFile] = useState([]);
+  const [secondaryUploadedFile, setSecondaryUploadedFile] = useState([]);
+  const [inputFields, setInputFields] = useState([{}]);
   const [empInsUpload, setEmpInsUpload] = useState([]);
   const [showTitle, setShowTitle] = useState("");
-  // const [isUploading, setIsUploading] = useState({ empInsUpload: false });
   const [isUploading, setIsUploading] = useState([]);
   const {
     register,
@@ -56,17 +47,19 @@ export const EmployeeInsurance = () => {
     },
     resolver: yupResolver(EmpInsuranceschema),
   });
+
   const insuHSDD = dropDownVal[0]?.insuHSDD.map((item) => ({
     value: item,
     label: item
-      .split(" ") // Split the string into words
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" "),
   }));
 
   const otherNationValue = watch("otherNation");
   const [empStatusTypeValue, setEmpStatusTypeValue] = useState("");
   const [filteredWorkmenCompNo, setFilteredWorkmenCompNo] = useState([]);
+
   const formFields = [
     { label: "Employee Badge Number", key: "empBadgeNo", type: "text" },
     { label: "Employee Name", key: "name", type: "text" },
@@ -77,40 +70,13 @@ export const EmployeeInsurance = () => {
     { label: "Brunei I/C Number", key: "bwnIcNo", type: "text" },
     { label: "Passport Number for Non-Local", key: "ppNo", type: "text" },
     { label: "Date of Birth", key: "dob", type: "date" },
-    {
-      label: "Marital Status",
-      key: "marital",
-      type: "text",
-    },
-    {
-      label: "Nationality",
-      key: "nationality",
-      type: "text",
-    },
+    { label: "Marital Status", key: "marital", type: "text" },
+    { label: "Nationality", key: "nationality", type: "text" },
     { label: "Other Nationality", key: "otherNation", type: "text" },
-
-    {
-      label: "Group H&S Insurance",
-      key: "groupIns",
-      type: "select",
-      options: insuHSDD,
-    },
-    {
-      label: "Group H&S Insurance Enrollment Effective Date",
-      key: "groupInsEffectDate",
-      type: "date",
-    },
-    {
-      label: "Group H&S Insurance Enrollment End Date",
-      key: "groupInsEndDate",
-      type: "date",
-    },
-    {
-      label: "Travelling Insurance",
-      key: "travelIns",
-      type: "select",
-      options: ["Yes", "No"],
-    },
+    { label: "Group H&S Insurance", key: "groupIns", type: "select", options: insuHSDD },
+    { label: "Group H&S Insurance Enrollment Effective Date", key: "groupInsEffectDate", type: "date" },
+    { label: "Group H&S Insurance Enrollment End Date", key: "groupInsEndDate", type: "date" },
+    { label: "Travelling Insurance", key: "travelIns", type: "select", options: ["Yes", "No"] },
   ];
 
   const handleAddFileClick = () => {
@@ -123,28 +89,21 @@ export const EmployeeInsurance = () => {
 
   const handleRemoveField = (index) => {
     const watchedEmpID = watch("empID");
-    // Remove the field from inputFields
     setInputFields((prevFields) => prevFields.filter((_, i) => i !== index));
 
-    // Get the file path to be deleted
     const fileToDelete = uploadedDocs.empInsUpload[index];
-    // console.log(fileToDelete,"11111111");
-
     if (!fileToDelete) {
       console.error("File not found at index:", index);
       return;
     }
 
-    // Extract the file name from the path
     const fileNameToDelete = fileToDelete.upload.split("/").pop();
     const fileName = fileNameToDelete;
-    // console.log(fileName, "2222222");
     setUploadedDocs((prevUploads) => ({
       ...prevUploads,
       empInsUpload: prevUploads.empInsUpload.filter((_, i) => i !== index),
     }));
 
-    // Remove the corresponding entry in isUploading
     setIsUploading((prev) =>
       prev
         ?.filter((item) => item?.ind !== index)
@@ -156,8 +115,9 @@ export const EmployeeInsurance = () => {
         ?.filter((fil) => fil?.ind !== index)
         .map((val, inx) => ({ ...val, ind: inx }))
     );
+
     handleDeleteFile("empInsUpload", fileName, watchedEmpID);
-    setdeleteTitle1(`${fileName}`);
+    setDeleteTitle1(`${fileName}`);
     handleDeleteMsg();
   };
 
@@ -165,7 +125,7 @@ export const EmployeeInsurance = () => {
     setUploadedFile([]);
 
     setIsUploading((prev) => {
-      const isFirstUpdate = prev.length === 0; // If `prev` is empty, it's the first update
+      const isFirstUpdate = prev.length === 0;
 
       let uploadedFileFalse = [];
       if (isFirstUpdate) {
@@ -176,12 +136,11 @@ export const EmployeeInsurance = () => {
             );
             return {
               ...val,
-              empInsUpload: result, // Set empInsUpload based on permission check
+              empInsUpload: result,
             };
           }) || [];
       }
 
-      // Remove any existing entry with the same `ind` before adding a new one
       const updatedState = [
         ...prev.filter((item) => item.ind !== idx),
         { ind: idx, empInsUpload: value },
@@ -191,7 +150,6 @@ export const EmployeeInsurance = () => {
         ? [...uploadedFileFalse, ...updatedState]
         : updatedState;
     });
-    
   };
 
   const handleFileChange = async (e, type, index) => {
@@ -204,16 +162,9 @@ export const EmployeeInsurance = () => {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
 
-    // Check if a file is selected
-    if (!selectedFile) {
-      alert("Please select a file to upload.");
-      return;
-    }
-
-    // Check if a file already exists for the given index
     if (uploadedDocs?.empInsUpload?.[index]?.upload) {
-      alert(`Please Select Add Upload + button to upload another file`);
-      e.target.value = ""; // Clear the input
+      alert("Please Select Add Upload + button to upload another file");
+      e.target.value = "";
       return;
     }
 
@@ -224,17 +175,14 @@ export const EmployeeInsurance = () => {
       "image/png",
     ];
 
-    // Check if the file type is allowed
     if (!allowedTypes.includes(selectedFile.type)) {
       alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
       return;
     }
 
     try {
-      // First, set uploading state to true for the current index
       await updateUploadingState(type, true, index);
 
-      // Upload the file and get the URL
       const fileUrl = await uploadDocs(
         selectedFile,
         type,
@@ -242,36 +190,23 @@ export const EmployeeInsurance = () => {
         watchedEmpID
       );
       if (fileUrl) {
-        // Once file is uploaded successfully, update the state with the URL and file info
         setUploadedDocs((prev) => {
           const updatedUploads = [...prev.empInsUpload];
-
-          // Update the specific index with file URL, date, and value
           updatedUploads[index] = {
-            date: new Date().toISOString().split("T")[0], // Get the current date
-            upload: fileUrl, // The uploaded file URL
-            value: true, // Ensure value is set to true to indicate successful upload
+            date: new Date().toISOString().split("T")[0],
+            upload: fileUrl,
+            value: true,
           };
-
-          // Return the updated state
           return { ...prev, empInsUpload: updatedUploads };
         });
 
-        // Update the form state to store the uploaded file URL
-        setValue(`empInsUpload[${index}]`, fileUrl); // Update form state for the upload
+        setValue(`empInsUpload[${index}]`, fileUrl);
       }
-      // setIsUploading((prev) => {
-      //   const updatedUploading = [...prev];
-      //   updatedUploading[index] = true;
-      //   return updatedUploading;
-      // });
     } catch (err) {
       console.error("Error uploading file:", err);
       alert("An error occurred while uploading the file. Please try again.");
     }
   };
-
-  // console.log(uploadedDocs, "1 ......");
 
   const getLastValue = (value) =>
     Array.isArray(value) ? value[value.length - 1] : value;
@@ -279,13 +214,14 @@ export const EmployeeInsurance = () => {
   const getArrayDateValue = (value) => {
     return Array.isArray(value) ? value[value.length - 1] : value;
   };
+
   const handleDeleteMsg = () => {
-    setdeletePopup(!deletePopup);
+    setDeletePopup(!deletePopup);
   };
+
   useEffect(() => {
     if (!searchResultData) return;
 
-    // Set default values for specific fields
     setValue("empID", searchResultData.empID);
     const empStatusType = getLastValue(searchResultData.empStatusType);
     if (empStatusType) {
@@ -293,7 +229,6 @@ export const EmployeeInsurance = () => {
       setValue("empStatusType", empStatusType);
     }
 
-    // Set workmenCompNo value
     const workmenCompNo = getLastValue(searchResultData.workmenCompNo);
     if (workmenCompNo) {
       setValue("workmenCompNo", workmenCompNo);
@@ -306,20 +241,16 @@ export const EmployeeInsurance = () => {
     });
 
     const arrayDateField = ["accidentIns"];
-
     arrayDateField.forEach((field) => {
       setValue(field, getArrayDateValue(searchResultData[field]));
     });
 
-    // Parse uploaded documents
     const url = searchResultData?.empInsUpload;
-
     if (url) {
       try {
         const parsedArray = JSON.parse(url);
         setUploadedDocs((prev) => ({ ...prev, empInsUpload: parsedArray }));
         setInputFields(parsedArray.map((file) => ({})));
-        // Sync isUploading state based on existing uploaded docs
         const uploadingState = parsedArray.map((file, idx) => {
           const result = formattedPermissions?.deleteAccess?.[access]?.some(
             (permission) => requiredPermissions.includes(permission)
@@ -331,7 +262,6 @@ export const EmployeeInsurance = () => {
         });
         setUploadedFile(uploadingState);
         setSecondaryUploadedFile(uploadingState);
-        // setIsUploading(uploadingState);
       } catch (error) {
         console.error("Failed to parse JSON:", error);
       }
@@ -353,7 +283,6 @@ export const EmployeeInsurance = () => {
 
       setFilteredWorkmenCompNo(filteredWorkMen);
 
-      // If workmenCompNo is not already set, default to the first filtered item
       const currentWorkmenCompNo = watch("workmenCompNo");
       if (!currentWorkmenCompNo && filteredWorkMen.length > 0) {
         setValue("workmenCompNo", filteredWorkMen[0].workmenCompNo);
@@ -364,18 +293,15 @@ export const EmployeeInsurance = () => {
   const defaultOptions = ["OFFSHORE", "ONSHORE", "GENERAL"];
 
   const onSubmit = async (data) => {
-    // Filter out empty upload fields
     const filteredUploads = uploadedDocs.empInsUpload.filter(
-      (upload) => upload.upload // Keep only fields with a valid upload property
+      (upload) => upload.upload
     );
 
-    // Update the uploadedDocs state to remove empty fields
     setUploadedDocs((prev) => ({
       ...prev,
       empInsUpload: filteredUploads,
     }));
 
-    // Update the inputFields state to remove empty fields
     setInputFields((prevFields) => prevFields.slice(0, filteredUploads.length));
 
     const existingEmpInsurance = EmpInsuranceData.find(
@@ -398,9 +324,10 @@ export const EmployeeInsurance = () => {
 
     setNotification(true);
   };
-  const requiredPermissions = ["Insurance"];
 
+  const requiredPermissions = ["Insurance"];
   const access = "Employee";
+
   return (
     <section>
       <form
@@ -447,12 +374,12 @@ export const EmployeeInsurance = () => {
                       )
                     )}
                   </select>
-                ) : key === "otherNation" ? ( // Specifically check for 'otherNation'
+                ) : key === "otherNation" ? (
                   <input
                     type={type}
                     {...register(key)}
                     className={`input-field ${className}`}
-                    value={otherNationValue || "N/A"} // Display N/N if the field is empty
+                    value={otherNationValue || "N/A"}
                   />
                 ) : (
                   <input
@@ -479,7 +406,7 @@ export const EmployeeInsurance = () => {
             <select
               {...register("empStatusType")}
               className="input-field select-custom "
-              onChange={(e) => setEmpStatusTypeValue(e.target.value)} // Update empStatusTypeValue on change
+              onChange={(e) => setEmpStatusTypeValue(e.target.value)}
               value={empStatusTypeValue}
             >
               {" "}
@@ -492,7 +419,6 @@ export const EmployeeInsurance = () => {
             </select>
           </div>
 
-          {/* workmenCompNo Field */}
           <div className="form-group">
             <label className="mb-1 text_size_5">
               Workmen Compensation Policy Number
@@ -501,7 +427,7 @@ export const EmployeeInsurance = () => {
               {...register("workmenCompNo")}
               className="input-field select-custom "
               value={watch("workmenCompNo") || ""}
-              onChange={(e) => setValue("workmenCompNo", e.target.value)} // Ensure value is updated when changed
+              onChange={(e) => setValue("workmenCompNo", e.target.value)}
             >
               {filteredWorkmenCompNo.map((item) => (
                 <option key={item.id} value={item.workmenCompNo}>
@@ -560,23 +486,21 @@ export const EmployeeInsurance = () => {
                         handleFileChange(e, "empInsUpload", index);
                       }}
                       className="hidden"
-                      // accept=".pdf"
                       disabled={uploadedDocs?.empInsUpload?.[index]?.upload}
                     />
                   )}
                 />
                 <span className="ml-2 w-full font-normal flex justify-between items-center gap-10">
-                Upload
-          <GoUpload />
-        </span>
-                
+                  Upload
+                  <GoUpload />
+                </span>
               </label>
               <p className="text-grey mt-1 text-xs">
                 {uploadedDocs.empInsUpload[index]?.upload
                   ? uploadedDocs.empInsUpload[index].upload.split("/").pop()
                   : empInsUpload[index]?.name}
               </p>
-              
+
               {uploadedFile[index]?.empInsUpload === true &&
               uploadedFile &&
               uploadedFile.length > 0 &&
@@ -607,7 +531,6 @@ export const EmployeeInsurance = () => {
               ) : (
                 <span></span>
               )}
-             
             </div>
           ))}
         </div>

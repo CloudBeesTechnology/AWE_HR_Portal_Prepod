@@ -40,6 +40,7 @@ export const InsuranceClaim = () => {
     formState: { errors },
     setValue,
     watch,
+    trigger
   } = useForm({
     resolver: yupResolver(ClaimInsuranceSchema),
     defaultValues: {
@@ -89,25 +90,56 @@ export const InsuranceClaim = () => {
   };
   const watchedEmpID = watch("empID");
 
+const getInsurance = watch("insuranceClaims");
+
   const handleRemoveFileClick = (index) => {
     // Remove the insurance claim at the given index
-    const newFields = insuranceClaims.filter((_, i) => i !== index);
+    const newFields = getInsurance
+    .filter((_, i) => i !== index) // Remove the item at the given index
+    .map((item) => ({ ...item }));
+    // const newFields = insuranceClaims.filter((_, i) => i !== index);
     setinsuranceClaims(newFields);
     setValue("insuranceClaims", newFields);
 
-    // Remove the corresponding uploaded files from uploadedDocs
-    setUploadedDocs((prev) => {
-      const updatedDocs = { ...prev };
-      delete updatedDocs[index]; // Remove the specific index
-      return updatedDocs;
-    });
+    setUploadedDocs((prevDocs) => {
+      // if (!prevDocs?.insuranceClaims || !(index in prevDocs.insuranceClaims))
+      //   return prevDocs;
 
-    // Remove the corresponding file dependency from uploadedFileDep
-    setUploadedFileDep((prev) => {
-      const updatedFileDep = { ...prev };
-      delete updatedFileDep[index]; // Remove the specific index
-      return updatedFileDep;
+      // Step 1: Create an array from the insuranceClaims object, filtering out the selected index
+      const filteredArray = Object.entries(prevDocs?.insuranceClaims)
+        .filter(([key]) => Number(key) !== index)
+        .map(([, value]) => value); // Keep only values (arrays of file objects)
+
+      // Step 2: Reconstruct the insuranceClaims object with new sequential keys
+      const reindexedInsuranceClaims = filteredArray?.reduce(
+        (acc, item, newIndex) => {
+          acc[newIndex] = item;
+          return acc;
+        },
+        {}
+      );
+    
+      // Step 3: Return the updated state
+      return { ...prevDocs, insuranceClaims: reindexedInsuranceClaims };
     });
+    trigger("insuranceClaims");
+
+
+    const fullPath = insuranceClaims[index]?.fileName;
+    if (fullPath) {
+      const fileName = fullPath.split("/").pop();
+      
+      handleDeleteFile("insuranceClaims", fileName, watchedEmpID);
+    }
+    const filterAndReindex = (prev, index) =>
+      Array.isArray(prev)
+        ? prev
+            .filter((item) => item?.ind !== index)
+            .map((val, inx) => ({ ...val, ind: inx }))
+        : [];
+
+    setIsUploading((prev) => filterAndReindex(prev, index));
+    setUploadedFileDep((prev) => filterAndReindex(prev, index));
   };
 
   const updateUploadingState = (label, value, idx) => {

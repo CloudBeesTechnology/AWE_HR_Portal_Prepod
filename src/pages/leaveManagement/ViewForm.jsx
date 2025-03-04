@@ -552,8 +552,52 @@ export const ViewForm = ({
             (val) => val.empID === managerEmpID
           );
 
-          if (HRMPosition === HRM) {
-            //employee send email
+          if (HRMPosition === HRM && status === "Verified") {
+         
+            //GM send email
+            if (gmMail && Array.isArray(gmMail)) {
+              for (const email of gmMail) {
+            await sendEmail(
+              `Ticket Request  ${
+                status === "Verified" ? "verified" : "marked as not eligible"
+              }`,
+              `Your employee  ${
+                ticketData.empName || "Not mention"
+              } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
+                status === "Verified" ? "verified" : "marked as not eligible"
+              } by HR Manager ${personalInfo.name || "Not mention"}.
+              <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
+               `,
+              "hr_no-reply@adininworks.com",
+              email
+            );
+          }
+        } else {
+          console.log("Invalid email list");
+        }
+            // console.log("gmemail", gmMail);
+
+            if (gmMail && Array.isArray(gmMail) && GMEmpID && Array.isArray(GMEmpID)) {
+              for (let i = 0; i < gmMail.length; i++) {
+                await createNotification({
+                  empID: ticketData.empID,
+                  leaveType: "Ticket Request",
+                  message: `Your employee ${
+                    ticketData.empName || "Not mentioned"
+                  }, your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
+                    status === "Verified" ? "verified" : "marked as not eligible"
+                  } by HR Manager ${personalInfo.name}`,
+                  senderEmail: "hr_no-reply@adininworks.com",
+                  receipentEmail: gmMail[i], 
+                  receipentEmpID: GMEmpID[i], 
+                  status: "Unread",
+                });
+              }
+            } else {
+              console.log("Invalid GM email or Employee ID list");
+            }
+          } else if (HRMPosition === HRM && status === "Not Eligible") {
+
             await sendEmail(
               `Ticket Request  ${
                 status === "Verified" ? "verified" : "marked as not eligible"
@@ -587,23 +631,6 @@ export const ViewForm = ({
             );
             // console.log("manageremail", findingManagerEmail.officialEmail);
 
-            //GM send email
-            await sendEmail(
-              `Ticket Request  ${
-                status === "Verified" ? "verified" : "marked as not eligible"
-              }`,
-              `Your employee  ${
-                ticketData.empName || "Not mention"
-              } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
-                status === "Verified" ? "verified" : "marked as not eligible"
-              } by HR Manager ${personalInfo.name || "Not mention"}.
-              <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
-               `,
-              "hr_no-reply@adininworks.com",
-              gmMail
-            );
-            // console.log("gmemail", gmMail);
-
             // Create notification for the ticket status update employee
             await createNotification({
               empID: ticketData.empID,
@@ -634,20 +661,9 @@ export const ViewForm = ({
               status: "Unread",
             });
 
-            await createNotification({
-              empID: ticketData.empID,
-              leaveType: "Ticket Request",
-              message: `Your employee ${
-                ticketData.empName || "Not mentioned"
-              }, your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
-                status === "Verified" ? "verified" : "marked as not eligible"
-              } by HR Manager ${personalInfo.name}`,
-              senderEmail: "hr_no-reply@adininworks.com",
-              receipentEmail: gmMail,
-              receipentEmpID: GMEmpID,
-              status: "Unread",
-            });
-          } else if (gmPosition === "GENERAL MANAGER") {
+          } 
+          
+          else if (gmPosition === "GENERAL MANAGER") {
             //employee email
             await sendEmail(
               `Ticket Request ${status}`,

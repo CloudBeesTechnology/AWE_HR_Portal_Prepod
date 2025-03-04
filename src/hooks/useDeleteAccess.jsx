@@ -70,7 +70,7 @@ export const useDeleteAccess = () => {
         });
       };
 
-      const [parsedPermissions] = parsePermissions([result.setPermissions[1]]);
+      const [parsedPermissions] = parsePermissions([result?.setPermissions[1]]);
 
       // console.log("{ viewAccess, deleteAccess } : ", parsedPermissions);
       setFormattedPermissions(parsedPermissions);

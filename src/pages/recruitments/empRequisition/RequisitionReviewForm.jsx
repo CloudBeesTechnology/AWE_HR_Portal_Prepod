@@ -129,44 +129,50 @@ export const RequisitionReviewForm = ({
       }
 
       if (hrManagerMail) {
-        await sendEmail(
-          `Requisition ${statusUpdate}`,
-          `<html>
-    <body>
-      <p>
-       Dear HR,<br/><br/>
-        The requisition request for the position of ${position} 
-        submitted by ${reqName} has been <strong>${statusUpdate}</strong> 
-        by the General Manager.<br/><br/>
-        Please proceed with the necessary actions.<br/><br/>
-        Click here https://hr.adininworks.co to view the Status Update.
-      </p>
-    </body>
-  </html>`,
-          "hr_no-reply@adininworks.com",
-          hrManagerMail
-        );
+        if (Array.isArray(hrManagerMail)) {
+          for (const email of hrManagerMail) {
+            await sendEmail(
+              `Requisition ${statusUpdate}`,
+              `<html>
+                <body>
+                  <p>
+                    Dear HR,<br/><br/>
+                    The requisition request for the position of ${position} 
+                    submitted by ${reqName} has been <strong>${statusUpdate}</strong> 
+                    by the General Manager.<br/><br/>
+                    Please proceed with the necessary actions.<br/><br/>
+                    Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the Status Update.
+                  </p>
+                </body>
+              </html>`,
+              "hr_no-reply@adininworks.com",
+              email
+            );
+          }
+        }
       }
+      
       if (recruMail) {
         await sendEmail(
           `Requisition ${statusUpdate}`,
           `<html>
-    <body>
-      <p>
-       Dear HR,<br/><br/>
-        The requisition request for the position of ${position} 
-        submitted by ${reqName} has been <strong>${statusUpdate}</strong> 
-        by the General Manager.<br/><br/>
-        Please proceed with the necessary actions.<br/><br/>
-        Click here https://hr.adininworks.co to view the Status Update.
-      </p>
-    </body>
-  </html>`,
+            <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; text-align: center;">
+              <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                <p style="font-size: 16px; line-height: 1.5;">
+                  Dear HR,<br/><br/>
+                  The requisition request for the position of <strong>${position}</strong> 
+                  submitted by <strong>${reqName}</strong> has been <strong>${statusUpdate}</strong> 
+                  by the General Manager.<br/><br/>
+                  Please proceed with the necessary actions.<br/><br/>
+                  <a href="https://hr.adininworks.co" style="color: #007bff; text-decoration: none;">Click here to view the Status Update</a>.
+                </p>
+              </div>
+            </body>
+          </html>`,
           "hr_no-reply@adininworks.com",
           recruMail
         );
       }
-      
 
       setIsLoading(false);
 
