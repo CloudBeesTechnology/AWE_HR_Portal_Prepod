@@ -57,6 +57,12 @@ export const useLeaveManage = () => {
         nextTokenLeaveStatuses = response.data.listLeaveStatuses.nextToken;
       } while (nextTokenLeaveStatuses);
 
+      const filteredLeaveStatuses = allLeaveStatuses.filter(
+        (item) => item.empID === "5695"
+      );
+
+      console.log(filteredLeaveStatuses);
+
       do {
         const response = await client.graphql({
           query: listEmpPersonalInfos,
@@ -134,13 +140,11 @@ export const useLeaveManage = () => {
       }, {});
 
       const leaveDetailsMap = allEmpLeaveDetails.reduce((acc, item) => {
-        
         acc[item.empID] = item;
         return acc;
       }, {});
       // Merge leave status data
       const mergedLeaveData = allLeaveStatuses.map((leaveStatus) => {
-        
         const empInfo = empInfoMap[leaveStatus.empID] || {};
         const workInfo = workInfoMap[leaveStatus.empID] || {};
         const leaveDetails = leaveDetailsMap[leaveStatus.empID] || {};
@@ -188,7 +192,6 @@ export const useLeaveManage = () => {
           empPervAnnualLeaveBal: leaveDetails.pervAnnualLeaveBal || 0,
           leaveDetailsCreatedAt: leaveDetails.createdAt,
           leaveDetailsUpdatedAt: leaveDetails.updatedAt,
-
         };
       });
 

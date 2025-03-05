@@ -196,6 +196,23 @@ input:disabled {
   background: #f1f1f1;
 }
 
+.reqScroll::-webkit-scrollbar {
+  width: 6px;
+  height: 2px;
+}
+
+.reqScroll::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.reqScroll::-webkit-scrollbar-thumb {
+  background: #d6cbcb80;
+}
+
+.reqScroll::-webkit-scrollbar-thumb:hover {
+  background: #42434c63;
+}
+
 .checkbox-container {
   display: flex;
   align-items: center;

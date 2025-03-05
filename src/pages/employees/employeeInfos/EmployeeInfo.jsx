@@ -127,6 +127,7 @@ export const EmployeeInfo = () => {
     },
   });
 
+  // console.log("eee");w
   // const contractTypes = watch("contractType");
   // const empTypes = watch("empType");
   const watchedEmpID = watch("empID");
