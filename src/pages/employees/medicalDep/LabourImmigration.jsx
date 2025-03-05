@@ -72,7 +72,7 @@ const LabourImmigration = () => {
     },
     resolver: yupResolver(LabourImmigrationSchema),
   });
-  
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -104,6 +104,9 @@ const LabourImmigration = () => {
     }));
     // console.log(value);
   };
+
+  // console.log(uploadedFileNames);
+  // console.log(arrayUploadDocs)
 
   const handleFileChange = async (e, label) => {
     const watchedEmpID = watch("empID");
@@ -181,9 +184,7 @@ const LabourImmigration = () => {
         return;
       }
       // console.log(`Deleted "${fileName}". Remaining files:`);
-      setdeleteTitle1(
-        `${fileName}`
-      );
+      setdeleteTitle1(`${fileName}`);
       handleDeleteMsg();
     } catch (error) {
       console.error("Error deleting file:", error);
@@ -316,9 +317,10 @@ const LabourImmigration = () => {
     // const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
     return fileNameWithExtension;
   };
+  // console.log(arrayUploadDocs, "94652196532");
 
   const onSubmit = async (data) => {
-    // console.log(data);
+    // console.log(data.dependPass);
     try {
       const checkingPITable = empPIData.find(
         (match) => match.empID === data.empID
@@ -376,9 +378,33 @@ const LabourImmigration = () => {
           uploadBwn: JSON.stringify(docsUploaded.uploadBwn),
           dependPass: JSON.stringify(
             data.dependPass.map((val, index) => {
-              const uploadDp = arrayUploadDocs?.uploadDp?.[index];
+              const uploadDpArray = Array.isArray(arrayUploadDocs.uploadDp)
+                ? arrayUploadDocs.uploadDp
+                : Object.values(arrayUploadDocs.uploadDp || {});
 
-              const uploadDr = arrayUploadDocs?.uploadDr?.[index];
+              const uploadDrArray = Array.isArray(arrayUploadDocs.uploadDr)
+                ? arrayUploadDocs.uploadDr
+                : Object.values(arrayUploadDocs.uploadDr || {});
+
+              // console.log("Index:", index);
+              // console.log("uploadDpArray:", uploadDpArray);
+              // console.log("uploadDrArray:", uploadDrArray);
+
+              // Fetch correct index value
+              const uploadDp =
+                uploadDpArray[index] && uploadDpArray[index].length > 0
+                  ? uploadDpArray[index]
+                  : val.uploadDp || []; // Preserve existing value
+
+              const uploadDr =
+                uploadDrArray[index] && uploadDrArray[index].length > 0
+                  ? uploadDrArray[index]
+                  : val.uploadDr || [];
+              // const uploadDp = flatDocs[index]?.upload || val.uploadDp;
+
+              // console.log(uploadDp, "uploaddp");
+              // console.log(uploadDr, "uploaddr");
+
               return {
                 ...val,
                 uploadDp, // Assign the array for uploadDp
@@ -539,12 +565,9 @@ const LabourImmigration = () => {
           path="/labourImmigration"
         />
       )}
-       {deletePopup && (
-                          <DeletePopup
-                            handleDeleteMsg={handleDeleteMsg}
-                            title1={deleteTitle1}
-                          />
-                        )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
+      )}
     </form>
   );
 };

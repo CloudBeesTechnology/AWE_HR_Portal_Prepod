@@ -458,7 +458,7 @@ export const FileUploadFieldNew = ({
   fileType,
 }) => {
   // const access = "Employee";
-console.log(fileName);
+// console.log(filePath);
 
   return (
     <div className="flex flex-col">

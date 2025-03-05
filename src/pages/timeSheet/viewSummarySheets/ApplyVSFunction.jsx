@@ -99,8 +99,10 @@ export const ApplyVSFunction = ({
           }
         });
 
+        
         const leaveStatusData = leaveStatuses;
-      
+        // const leaveStatusData = dummyLeaveStatus;
+
         const approvedLeaveStatus = leaveStatusData?.filter(
           (fil) => fil.managerStatus === "Approved"
         );
@@ -225,7 +227,7 @@ export const ApplyVSFunction = ({
 
         const merged = mergedData.flatMap((val) => {
           const matches = approvedLeaveStatus.filter(
-            (so) => val.empID === so.empID
+            (so) => String(val.empID) === String(so.empID)
           );
 
           if (matches.length > 0) {
@@ -249,6 +251,7 @@ export const ApplyVSFunction = ({
               leave.sapNo &&
               emp.fidNo &&
               String(leave.sapNo) === String(emp.fidNo);
+
             if (empBadgeNoMatch || sapNoMatch) {
               return emp.data.some((entry) => {
                 const leaveDate = new Date(leave.toDate);
@@ -283,7 +286,7 @@ export const ApplyVSFunction = ({
             const {
               empID,
               empBadgeNo,
-              fidNo,
+              sapNo,
               leaveType,
               fromDate,
               toDate,
@@ -294,7 +297,7 @@ export const ApplyVSFunction = ({
             if (!result[empID]) {
               result[empID] = {
                 empBadgeNo: empBadgeNo,
-                fidNo: fidNo,
+                fidNo: sapNo,
                 leaveCounts: {},
                 dateDifferences: [],
               };
@@ -392,7 +395,7 @@ export const ApplyVSFunction = ({
               val.empBadgeNo === fi.empBadgeNo
             ) {
               return fi;
-            } else if (val.fidNo && fi.sapNo && val.fidNo === fi.sapNo) {
+            } else if (val.fidNo && fi.fidNo && val.fidNo === fi.fidNo) {
               return fi;
             }
           });
@@ -612,23 +615,42 @@ export const ApplyVSFunction = ({
           addLeaveTypeCount
         );
 
+        const isDateInRange = (date, start, end) => {
+          const parsedDate = new Date(date);
+          const parsedStart = new Date(start);
+          const parsedEnd = new Date(end);
+
+          parsedDate.setHours(0, 0, 0, 0);
+          parsedStart.setHours(0, 0, 0, 0);
+          parsedEnd.setHours(0, 0, 0, 0);
+
+          return parsedDate >= parsedStart && parsedDate <= parsedEnd;
+        };
+        // getStartDate, getEndDate
         const getSummaryUpdaterName = async (updatedData) => {
+          const filteredData = updatedData
+            ?.map((item) => ({
+              ...item,
+              data: item.data.filter((fin) =>
+                isDateInRange(fin.date, getStartDate, getEndDate)
+              ), // Filtered by date
+            }))
+            .filter((item) => item.data.length > 0); // Remove empty objects after filtering
+
           const results = await Promise.all(
-            updatedData.map(async (val) => {
-              const getHisID = val.data.find((fin) => fin);
+            filteredData.map(async (val) => {
+              const timeKeeperNames = await Promise.all(
+                val.data.map(async (fin) => {
+                  const getHisName = await GetViewSummaryUpdater(fin?.assignBy);
+                  return getHisName?.name || null;
+                })
+              );
 
-              if (getHisID && getHisID.assignBy) {
-                const getHisName = await GetViewSummaryUpdater(
-                  getHisID.assignBy
-                );
-                return { ...val, timeKeeper: getHisName?.name || null };
-              }
-
-              return { ...val, timeKeeper: null };
+              return { ...val, timeKeeper: timeKeeperNames }; // Assign timeKeeperNames after filtering
             })
           );
 
-          return results;
+          return results; // Return filtered results with all names
         };
 
         const UpdaterNameAdded = await getSummaryUpdaterName(updatedData);

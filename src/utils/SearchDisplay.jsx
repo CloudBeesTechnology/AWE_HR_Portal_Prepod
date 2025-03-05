@@ -43,7 +43,7 @@ export const SearchDisplay = ({
       );
       if (result && searchQuery) {
         searchResult(result);
-      }else if (!searchQuery) {
+      } else if (!searchQuery) {
         alert("Your search box is empty. Enter a value to start searching.");
       } else {
         alert("Employee not found.");
@@ -137,7 +137,7 @@ export const SearchDisplay = ({
 
                   setSearchQuery(`${employee.empID} - ${employee.name || ""}`);
                   searchResult(employee);
-                  // setSearchQuery("");
+                  setSearchQuery("");
                 }
 
                 setToggleHandle(false);

@@ -444,7 +444,7 @@ export const DependentInsurance = () => {
         return;
       }
 
-      setdeleteTitle1(`${fileName} Deleted Successfully`);
+      setdeleteTitle1(`${fileName}`);
       handleDeleteMsg();
     } catch (error) {
       console.error("Error deleting file:", error);

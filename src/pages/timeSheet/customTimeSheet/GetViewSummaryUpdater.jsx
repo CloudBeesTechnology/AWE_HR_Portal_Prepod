@@ -30,7 +30,7 @@ export const GetViewSummaryUpdater = (getEmpID) => {
       const candidates = empPersonalInfos;
 
       const getSummaryUpdaterName = candidates?.find(
-        (fin) => fin.empID === getEmpID
+        (fin) => String(fin.empID) === String(getEmpID)
       );
 
       return getSummaryUpdaterName;
