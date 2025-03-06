@@ -24,10 +24,17 @@ export const uploadDocString = async (
         setUploadedDocs((prev) => {
           const updatedUploads = { ...prev };
 
+          if (!updatedUploads[fileType]) {
+            updatedUploads[fileType] = [];
+          }
+          if (!Array.isArray(updatedUploads[fileType][index])) {
+            updatedUploads[fileType][index] = [];
+          }
+        
           // Initialize the array if it doesn't exist
-          updatedUploads[fileType] = updatedUploads[fileType] || [];
-          updatedUploads[fileType][index] =
-            updatedUploads[fileType][index] || [];
+          // updatedUploads[fileType] = updatedUploads[fileType] || [];
+          // updatedUploads[fileType][index] =
+          //   updatedUploads[fileType][index] || [];
 
           const existingUpload = updatedUploads[fileType][index].find(
             (item) => item.upload === fileUrl
