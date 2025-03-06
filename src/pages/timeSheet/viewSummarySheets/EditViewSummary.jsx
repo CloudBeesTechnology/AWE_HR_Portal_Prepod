@@ -150,13 +150,14 @@ export const EditViewSummary = ({
                   <label className="block text-dark_grey text_size_5">
                     Normal Working Hrs Per Day
                   </label>
+                 
                   <input
                     type="text"
                     className={`mt-1 block w-full border outline-none border-lite_grey text_size_7  rounded text-sm py-2 px-3 ${
                       formData.NWHPD ? "bg-lite_skyBlue" : "bg-white"
                     }`}
                     name="NWHPD"
-                    value={formData.NWHPD}
+                    value={formData.NWHPD[formData.NWHPD.length -1]}
                     onChange={handleChange}
                     readOnly
                   />

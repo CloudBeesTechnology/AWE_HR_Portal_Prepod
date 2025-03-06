@@ -265,12 +265,15 @@ export const ViewSummaryTable = ({
                       parseFloat(employee?.empLeaveCount?.CL) || 0;
 
                   const getTimeKeeperName = employee?.timeKeeper;
-                
+
                   const timeKeeperName = [...new Set(getTimeKeeperName)];
-                  const uniqueTimeKeeperName =
-                    timeKeeperName.length > 1
-                      ? timeKeeperName.join("  ")
-                      : timeKeeperName;
+                  // const uniqueTimeKeeperName =
+                  //   timeKeeperName.length > 1
+                  //     ? timeKeeperName.join(", ")
+                  //     : timeKeeperName;
+                  const uniqueTimeKeeperName = timeKeeperName
+                    .filter((name) => name !== null) // Remove null values
+                    .join(", ");
                  
                   return (
                     <React.Fragment key={index}>
