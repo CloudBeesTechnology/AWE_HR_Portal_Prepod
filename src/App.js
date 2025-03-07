@@ -5,6 +5,7 @@ import DataStoredContext from "./utils/DataStoredContext";
 import { TempIDProvider } from "./utils/TempIDContext";
 import { IdleTimerProvider } from 'react-idle-timer';
 import { signOut } from "@aws-amplify/auth";
+import { NotifiCenterProvider } from "./hooks/useNotifiCenter";
 
 
 
@@ -111,6 +112,8 @@ export const App = () => {
         <link rel="canonical" href={window.location.href} />
       </Helmet>
       {/* fallback={<div>Loading...</div>} */}
+      <NotifiCenterProvider>
+
       <Suspense>
         {!hideNavbar.includes(location.pathname) && loginId && userType && (
           <>
@@ -136,6 +139,8 @@ export const App = () => {
           </div>
         )}
       </Suspense>
+      </NotifiCenterProvider>
+
     </HelmetProvider>
     </IdleTimerProvider>
   );
