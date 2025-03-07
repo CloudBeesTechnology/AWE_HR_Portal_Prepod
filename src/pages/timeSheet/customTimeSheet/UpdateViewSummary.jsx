@@ -46,6 +46,7 @@ export const UpdateViewSummary = async (object) => {
           const month = dateObj?.getMonth() + 1; // Months are zero-based in JS
           const year = dateObj?.getFullYear();
           const formattedDate = `${day}-${month}-${year}`;
+         
           return formattedDate === inputData?.workingHrsKey;
         });
 
@@ -73,7 +74,7 @@ export const UpdateViewSummary = async (object) => {
       if (!matchedEmp?.data || !Array.isArray(matchedEmp.data)) {
         return null;
       }
-
+     
       return (
         matchedEmp.data.find((record) => record.date === outputData.date) ||
         null
@@ -129,7 +130,7 @@ export const UpdateViewSummary = async (object) => {
         status: "Verified",
         // verify: "Yes",
       };
-
+  
       try {
         const response = await client.graphql({
           query: createTimeSheet,
@@ -145,6 +146,7 @@ export const UpdateViewSummary = async (object) => {
       if (finalData) {
         const { __typename, createdAt, updatedAt, ...validTimeSheet } =
           finalData;
+        
         try {
           const response = await client.graphql({
             query: updateTimeSheet,

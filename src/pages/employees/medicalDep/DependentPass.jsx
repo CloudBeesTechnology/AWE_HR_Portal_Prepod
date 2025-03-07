@@ -5,7 +5,6 @@ import { uploadDocs } from "../../../services/uploadsDocsS3/UploadDocs";
 import { FaRegMinusSquare } from "react-icons/fa";
 import { CiSquarePlus } from "react-icons/ci";
 import { LabourTypeDD } from "../../../utils/DropDownMenus";
-import { DataSupply } from "../../../utils/DataStoredContext";
 import { useFieldArray } from "react-hook-form";
 import { DeleteDocsDependPass } from "../../../services/uploadDocsDelete/DeleteDocsDependPass";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
@@ -29,11 +28,9 @@ export const DependentPass = ({
   const [deletePopup, setdeletePopup] = useState(false);
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [docsUploaded, setDocsUploaded] = useState({});
-  const [isUploading, setIsUploading] = useState({
-    uploadDp: false,
-    uploadDr: false,
-  });
+  const [isUploading, setIsUploading] = useState({});
   const [uploadedFileNames, setUploadedFileNames] = useState({});
+  const [fileNames, setFileNames] = useState({});
 
   const { fields, append, remove, replace } = useFieldArray({
     control,
@@ -137,12 +134,17 @@ export const DependentPass = ({
                 [field]: updatedDepInsurance,
               };
             });
-
+            // setFileNames((prev) => ({
+            //   ...prev,
+            //   [`${idx}_${field}`]: parsedFiles.map((file) =>
+            //     file && file.upload ? getFileName(file.upload) : ""
+            //   ),
+            // }));
             const fileNames = parsedFiles.map((file) =>
               file && file.upload ? getFileName(file.upload) : ""
             );
 
-            setUploadedFileNames((prev) => ({
+            setFileNames((prev) => ({
               ...prev,
               [`${idx}_${field}`]: fileNames,
             }));
@@ -162,13 +164,14 @@ export const DependentPass = ({
 
   const watchedEmpID = watch("empID");
 
-  const updateUploadingState = (fieldName, value) => {
+  const updateUploadingState = (fieldName, value, index) => {
     setIsUploading((prev) => ({
       ...prev,
-      [fieldName]: value,
+      [`${index}_${fieldName}`]: value,
     }));
     // console.log(`Uploading state for ${fieldName}:`, value);
   };
+  // console.log(isUploading);
 
   const handleFileChange = async (e, fieldName, index) => {
     const watchedEmpID = watch("empID"); // Watch Employee ID
@@ -177,17 +180,16 @@ export const DependentPass = ({
       window.location.href = "/labourImmigration";
       return;
     }
-
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (docsUploaded?.fieldName?.[index]?.length > 0) {
-      alert(
-        "Only one file is allowed per index. Please delete the existing file before uploading a new one."
-      );
-      e.target.value = ""; // Clear the input
-      return;
-    }
+    // if (docsUploaded?.fieldName?.[index]?.length > 0) {
+    //   alert(
+    //     "Only one file is allowed per index. Please delete the existing file before uploading a new one."
+    //   );
+    //   e.target.value = ""; // Clear the input
+    //   return;
+    // }
 
     // File type restriction (PDF only, similar to Method 1)
     const allowedTypes = [
@@ -197,10 +199,10 @@ export const DependentPass = ({
       "image/jpg",
     ];
     if (!allowedTypes.includes(file.type)) {
-        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-        return;
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
     }
-  
+
     // Ensure no duplicate files are added (checking against already uploaded files)
 
     // Ensure no duplicate files are added (checking against already uploaded files)
@@ -221,7 +223,7 @@ export const DependentPass = ({
     setValue(`dependPass[${index}].${fieldName}`, updatedFiles);
 
     try {
-      updateUploadingState(fieldName, true);
+      updateUploadingState(fieldName, true, index);
       await uploadDocs(file, fieldName, setDocsUploaded, watchedEmpID, index);
 
       // Set uploaded file names for display
@@ -229,7 +231,6 @@ export const DependentPass = ({
       // Set uploaded file names for display
       setUploadedFileNames((prev) => ({
         ...prev,
-        [`${index}_${fieldName}`]: [file.name],
         [`${index}_${fieldName}`]: [file.name],
       }));
     } catch (error) {
@@ -259,9 +260,11 @@ export const DependentPass = ({
         fileName,
         watchedEmpID,
         setUploadedFileNames,
+        setFileNames,
         setDocsUploaded,
         setIsUploading,
-        field
+        field,
+        index
       );
 
       if (isDeleted || isDeletedArrayUploaded) {
@@ -274,36 +277,21 @@ export const DependentPass = ({
 
         setValue(`dependPass[${index}].${fileType}`, updatedFiles);
 
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          [`${index}_${fileType}`]: updatedFiles.map((file) => {
-            return getFileName(file?.upload || file?.name);
-          }),
-        }));
-
-        setDocsUploaded((prev) => {
-          const updatedDocs = { ...prev };
-          if (Array.isArray(updatedDocs[fileType])) {
-            updatedDocs[fileType][index] = updatedFiles;
-          }
-          return updatedDocs;
-        });
-
         // console.log("File deleted successfully:", fileName);
-      setdeleteTitle1(
-        `${fileName}`
-      );
-      handleDeleteMsg();
+        setdeleteTitle1(`${fileName}`);
+        handleDeleteMsg();
       }
     } catch (error) {
       console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
     }
   };
+// console.log(fileNames,"filenames");
 
   useEffect(() => {
     setArrayUploadDocs(docsUploaded);
   }, [docsUploaded, setArrayUploadDocs]);
+
 
   const handleAddDependPass = () => {
     append({
@@ -320,7 +308,10 @@ export const DependentPass = ({
   };
 
   const handleRemoveDependPass = async (index) => {
+    console.log(index);
+
     const dependPass = getValues("dependPass");
+
     const removedItem = dependPass[index];
     const watchedEmpID = watch("empID"); // Get the Employee ID
 
@@ -329,30 +320,111 @@ export const DependentPass = ({
       return;
     }
 
-    // Delete uploaded files if any
-    if (removedItem.uploadDp && removedItem.uploadDp.length > 0) {
-      for (const file of removedItem.uploadDp) {
+    if (removedItem?.uploadDp?.length > 0) {
+      for (let i = 0; i < removedItem.uploadDp.length; i++) {
+        const file = removedItem.uploadDp[i];
         const fileName = getFileName(file.upload || file.name);
-        console.log(fileName);
-
-        await handleDeleteFile("uploadDp", fileName, watchedEmpID); // Delete from S3 or server
-        await deleteFile("uploadDp", fileName, index, removedItem); // Update local state
+        console.log(`Deleting uploadDp file: ${fileName} at index ${index}`);
+        await handleDeleteFile("uploadDp", fileName, watchedEmpID); // Delete from S3
       }
     }
 
-    if (removedItem.uploadDr && removedItem.uploadDr.length > 0) {
-      for (const file of removedItem.uploadDr) {
+    if (removedItem?.uploadDr?.length > 0) {
+      for (let i = 0; i < removedItem.uploadDr.length; i++) {
+        const file = removedItem.uploadDr[i];
         const fileName = getFileName(file.upload || file.name);
-        console.log(fileName);
-
-        await handleDeleteFile("uploadDr", fileName, watchedEmpID); // Delete from S3 or server
-        await deleteFile("uploadDr", fileName, index, removedItem); // Update local state
+        console.log(`Deleting uploadDr file: ${fileName} at index ${index}`);
+        await handleDeleteFile("uploadDr", fileName, watchedEmpID); // Delete from S3
       }
     }
 
-    // Remove the item from the form
-    remove(index);
+    const updatedDependPass = dependPass.filter((_, i) => i !== index);
+    setValue("dependPass", [...updatedDependPass]);
+    setUploadedFileNames((prev) => {
+      const updated = { ...prev };
+      Object.keys(updated).forEach((key) => {
+        if (key.startsWith(`${index}_`)) {
+          delete updated[key];
+        }
+      });
+
+      // **Rebuild keys to shift indexes down**
+      const newUploadedFileNames = {};
+      Object.keys(updated).forEach((key) => {
+        const [oldIndex, type] = key.split("_");
+        const newIndex =
+          parseInt(oldIndex) > index
+            ? parseInt(oldIndex) - 1
+            : parseInt(oldIndex);
+        newUploadedFileNames[`${newIndex}_${type}`] = updated[key];
+      });
+
+      console.log("Updated uploadedFileNames:", newUploadedFileNames);
+      return newUploadedFileNames; // Return new object to trigger re-render
+    });
+    setFileNames((prev) => {
+      const updated = { ...prev };
+      Object.keys(updated).forEach((key) => {
+        if (key.startsWith(`${index}_`)) {
+          delete updated[key]; // Remove specific index from fileNames
+        }
+      });
+
+      // **Rebuild keys to shift indexes down**
+      const newFileNames = {};
+      Object.keys(updated).forEach((key) => {
+        const [oldIndex, type] = key.split("_");
+        const newIndex =
+          parseInt(oldIndex) > index
+            ? parseInt(oldIndex) - 1
+            : parseInt(oldIndex);
+        newFileNames[`${newIndex}_${type}`] = updated[key];
+      });
+
+      console.log("Updated fileNames:", newFileNames);
+      return newFileNames; // Return a new object to trigger re-render
+    });
+    setDocsUploaded((prev) => {
+      const updated = { ...prev };
+    
+      // **1️⃣ Remove specific index from each document category**
+      ["uploadDp", "uploadDr"].forEach((category) => {
+        if (Array.isArray(updated[category])) {
+          updated[category] = updated[category].map((arr, idx) =>
+            idx === index ? [] : arr // Clear only the selected index
+          );
+        }
+      });
+    
+      console.log("Updated state:", updated);
+      return updated; // ✅ Preserves other indexes correctly
+    });
+    
+    // // Delete uploaded files if any
+    // if (removedItem.uploadDp && removedItem.uploadDp.length > 0) {
+    //   for (const file of removedItem.uploadDp) {
+    //     const fileName = getFileName(file.upload || file.name);
+    //     // console.log(fileName);
+    //     await handleDeleteFile("uploadDp", fileName, watchedEmpID); // Delete from S3 or server
+    //   }
+    // }
+
+    // if (removedItem.uploadDr && removedItem.uploadDr.length > 0) {
+    //   for (const file of removedItem.uploadDr) {
+    //     const fileName = getFileName(file.upload || file.name);
+    //     // console.log(fileName);
+    //     await handleDeleteFile("uploadDr", fileName, watchedEmpID); // Delete from S3 or server
+    //   }
+    // }
+
+    console.log("Updated dependPass:", updatedDependPass);
+    // // Remove the item from the form
+    // console.log("Before removal:", getValues("dependPass"));
+    // remove(index);
+    // console.log("After removal:", getValues("dependPass"));
   };
+  // console.log(fileNames, "filePath");
+  // console.log(docsUploaded, "uploaddocs");
 
   return (
     <div className="form-group mt-5">
@@ -438,10 +510,10 @@ export const DependentPass = ({
               docsUploaded={docsUploaded}
               uploadedFileNames={uploadedFileNames}
               fileName={uploadedFileNames[`${index}_uploadDp`] || ""}
+              filePath={fileNames[`${index}_uploadDp`] || ""}
               fileType="uploadDp"
-              isUploading={isUploading}
+              isUploading={isUploading?.[`${index}_uploadDp`]}
               index={index}
-              disabled={docsUploaded["uploadDp"]?.[index]?.length > 0}
               formattedPermissions={formattedPermissions}
               requiredPermissions={requiredPermissions}
               access={access}
@@ -454,11 +526,11 @@ export const DependentPass = ({
               error={errors?.dependPass?.[index]?.uploadDr}
               deleteFile={(fileName) => deleteFile("uploadDr", fileName, index)}
               fileName={uploadedFileNames[`${index}_uploadDr`] || ""}
+              filePath={fileNames[`${index}_uploadDr`] || ""}
               docsUploaded={docsUploaded}
               fileType="uploadDr"
-              isUploading={isUploading}
+              isUploading={isUploading?.[`${index}_uploadDr`]}
               index={index}
-              disabled={docsUploaded["uploadDr"]?.[index]?.length > 0}
               formattedPermissions={formattedPermissions}
               requiredPermissions={requiredPermissions}
               access={access}
@@ -475,12 +547,9 @@ export const DependentPass = ({
           </div>
         );
       })}
-       {deletePopup && (
-                    <DeletePopup
-                      handleDeleteMsg={handleDeleteMsg}
-                      title1={deleteTitle1}
-                    />
-                  )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
+      )}
     </div>
   );
 };

@@ -102,32 +102,7 @@ export const LMTable = () => {
       
         return new Date(dateB) - new Date(dateA);
     });
-      // .sort((a, b) => {
-
-      //   if (userType === "SuperAdmin") {
-      //     const dateA = new Date(a.leaveStatusReceivedDate || a.leaveStatusCreatedAt);
-      //     const dateB = new Date(b.leaveStatusReceivedDate || b.leaveStatusCreatedAt);
-      
-      //     return dateB - dateA;
-      //   }
-
-      //   const isManagerPendingA = a.managerStatus === "Pending";
-      //   const isManagerPendingB = b.managerStatus === "Pending";
-      //   const isSupervisorPendingA = a.supervisorStatus === "Pending";
-      //   const isSupervisorPendingB = b.supervisorStatus === "Pending";
   
-      //   if (isManagerPendingA && !isManagerPendingB) return -1;
-      //   if (!isManagerPendingA && isManagerPendingB) return 1;       
-      //   if (isSupervisorPendingA && !isSupervisorPendingB) return -1;
-      //   if (!isSupervisorPendingA && isSupervisorPendingB) return 1;
-  
-      //   const dateA = new Date(a.leaveStatusCreatedAt || a.leaveStatusReceivedDate);
-      //   const dateB = new Date(b.leaveStatusCreatedAt || b.leaveStatusReceivedDate);
-      
-      //   return dateB - dateA ;
-
-      // });
-
     // Step 2: Apply status filter
     if (filterStatus !== "All") {
       filteredData = filteredData.filter((item) => {
@@ -262,6 +237,8 @@ export const LMTable = () => {
       </div>
     );
   }
+  console.log(errorState);
+  
 
   return (
     <section className="flex flex-col w-full mt-4">
@@ -401,7 +378,7 @@ export const LMTable = () => {
           </table>
         ) : (
           <div className="text-center mt-6 py-20">
-            <p>No matching results found for your search</p>
+            <p>No data available / No matching results found for your search</p>
           </div>
         )}
       </div>

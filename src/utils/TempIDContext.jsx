@@ -46,7 +46,7 @@ export const TempIDProvider = ({ children }) => {
 //___________________________________Logged in GM POSITION__________________________________________________________________________________________
     if (workInfoData && userType === "Manager") {
       const generalManagerPosition = workInfoData.filter((item) =>
-        item?.position?.includes("GENERAL MANAGER")
+        item?.position?.[item?.position?.length - 1] === "GENERAL MANAGER"
       );
 
       // console.log("General Manager Positions:", generalManagerPosition);

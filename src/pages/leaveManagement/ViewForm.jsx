@@ -792,7 +792,7 @@ export const ViewForm = ({
     const isApproved = supervisorStatus === "Approved";
     const isSupervisor = userType === "Supervisor";
     const isNotSuperAdminOrHR =
-      userType !== "SuperAdmin" && userType !== "HR" && HRMPosition !== HRM;
+      userType !== "SuperAdmin" && userType !== "HR";
 
     // Case 1: Supervisor approved, Manager pending, Supervisor not SuperAdmin/HR
     if (
@@ -802,6 +802,7 @@ export const ViewForm = ({
       isSupervisor &&
       isNotSuperAdminOrHR
     ) {
+      
       return (
         <div className="center w-full">
           {/* <button

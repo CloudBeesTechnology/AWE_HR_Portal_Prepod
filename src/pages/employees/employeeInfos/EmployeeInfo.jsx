@@ -127,6 +127,7 @@ export const EmployeeInfo = () => {
     },
   });
 
+  // console.log("eee");w
   // const contractTypes = watch("contractType");
   // const empTypes = watch("empType");
   const watchedEmpID = watch("empID");
@@ -292,9 +293,7 @@ export const EmployeeInfo = () => {
         return;
       }
       // console.log(`Deleted "${fileName}". Remaining files:`);
-      setdeleteTitle1(
-        `${fileName}`
-      );
+      setdeleteTitle1(`${fileName}`);
       handleDeleteMsg();
     } catch (error) {
       console.error("Error deleting file:", error);
@@ -330,11 +329,8 @@ export const EmployeeInfo = () => {
         );
         return;
       }
-      setdeleteTitle1(
-        `${fileName}`
-      );
+      setdeleteTitle1(`${fileName}`);
       handleDeleteMsg();
-   
     } catch (error) {
       console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
@@ -850,11 +846,9 @@ export const EmployeeInfo = () => {
       console.log(error);
     }
   };
-  const requiredPermissions = [
-    "Employee Info",
-  ];
+  const requiredPermissions = ["Employee Info"];
 
-  const access = "Employee"
+  const access = "Employee";
   return (
     <section
       className="bg-[#F5F6F1CC] mx-auto p-10"
@@ -1037,10 +1031,10 @@ export const EmployeeInfo = () => {
               formattedPermissions={formattedPermissions}
               requiredPermissions={requiredPermissions}
               access={access}
-              check={isUploadingString.inducBriefUp}         
+              check={isUploadingString.inducBriefUp}
             />
           </div>
-        
+
           <RowThirteen register={register} errors={errors} />
         </div>
 
@@ -1151,11 +1145,8 @@ export const EmployeeInfo = () => {
         )}
       </form>
       {deletePopup && (
-              <DeletePopup
-                handleDeleteMsg={handleDeleteMsg}
-                title1={deleteTitle1}
-              />
-            )}
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
+      )}
     </section>
   );
 };

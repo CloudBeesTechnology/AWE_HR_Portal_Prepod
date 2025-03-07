@@ -205,8 +205,8 @@ export const RequisitionReviewForm = ({
         isVisible ? "flex" : "hidden"
       } bg-grey bg-opacity-75 flex items-center justify-center z-50`}
     >
-      <div className="center min-h-screen overflow-y-auto ">
-        <header className="bg-white w-full max-w-[600px] rounded-lg relative p-5">
+      <div className="center">
+      <header className="bg-white w-full max-w-[600px] rounded-lg relative p-5 overflow-y-auto max-h-[90vh] min-h-[90vh] reqScroll">
           <div className="text-center p-2">
             <img
               src={AweLogo}
@@ -224,7 +224,7 @@ export const RequisitionReviewForm = ({
             </button>
           </div>
 
-          <form className="px-5 bg-white shadow-xl">
+          <form className="px-5 bg-white">
             {/* Replace this part with the actual form fields */}
             {[
               { label: "Requested Manager", value: request.reqName },
@@ -250,7 +250,7 @@ export const RequisitionReviewForm = ({
               </div>
             ))}
 
-            {gmPosition && (
+            {gmPosition === "GENERAL MANAGER" && (
               <>
                 {request.status !== "Approved" &&
                  request.status !== "Rejected" ? (
