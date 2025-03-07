@@ -1051,7 +1051,7 @@ export const EmployeeInfo = () => {
                     onClick={() => {
                       if (isUploading[field.title]) {
                         alert(
-                          "Delete already uploaded Files or save an uploaded file."
+                          "Please delete the previously uploaded file before uploading a new one."
                         );
                       }
                     }}

@@ -24,17 +24,10 @@ export const uploadDocString = async (
         setUploadedDocs((prev) => {
           const updatedUploads = { ...prev };
 
-          if (!updatedUploads[fileType]) {
-            updatedUploads[fileType] = [];
-          }
-          if (!Array.isArray(updatedUploads[fileType][index])) {
-            updatedUploads[fileType][index] = [];
-          }
-        
           // Initialize the array if it doesn't exist
-          // updatedUploads[fileType] = updatedUploads[fileType] || [];
-          // updatedUploads[fileType][index] =
-          //   updatedUploads[fileType][index] || [];
+          updatedUploads[fileType] = updatedUploads[fileType] || [];
+          updatedUploads[fileType][index] =
+            updatedUploads[fileType][index] || [];
 
           const existingUpload = updatedUploads[fileType][index].find(
             (item) => item.upload === fileUrl
@@ -49,18 +42,18 @@ export const uploadDocString = async (
 
           return updatedUploads;
         });
-      } 
+      }
       // else if (
       //   fileType === "profilePhoto" ||
       //   fileType === "inducBriefUp" ||
       //   fileType === "uploadJobDetails"||
       //   fileType === "loiFile"
       // ) {
-        setUploadedDocs((prevState) => ({
-          ...prevState,
-          [fileType]: fileUrl,
-        }));
-      // } 
+      setUploadedDocs((prevState) => ({
+        ...prevState,
+        [fileType]: fileUrl,
+      }));
+      // }
       // else {
       //   setUploadedDocs((prev) => ({
       //     ...prev,
@@ -92,17 +85,23 @@ export const uploadDocs = async (
         data: file,
       }).result;
       const fileUrl = result.path;
- 
+
       const uploadDate = new Date().toISOString().split("T")[0];
 
       if (typeof index === "number") {
         setUploadedDocs((prev) => {
           const updatedUploads = { ...prev };
 
+          if (!updatedUploads[fileType]) {
+            updatedUploads[fileType] = [];
+          }
+          if (!Array.isArray(updatedUploads[fileType][index])) {
+            updatedUploads[fileType][index] = [];
+          }
           // Initialize the array if it doesn't exist
-          updatedUploads[fileType] = updatedUploads[fileType] || [];
-          updatedUploads[fileType][index] =
-            updatedUploads[fileType][index] || [];
+          // updatedUploads[fileType] = updatedUploads[fileType] || [];
+          // updatedUploads[fileType][index] =
+          //   updatedUploads[fileType][index] || [];
 
           const existingUpload = updatedUploads[fileType][index].find(
             (item) => item.upload === fileUrl
@@ -117,7 +116,7 @@ export const uploadDocs = async (
 
           return updatedUploads;
         });
-      } 
+      }
       // else if (
       //   fileType === "profilePhoto" ||
       //   fileType === "inducBriefUp" ||
@@ -128,16 +127,16 @@ export const uploadDocs = async (
       //     ...prevState,
       //     [fileType]: fileUrl,
       //   }));
-      // } 
+      // }
       // else {
-        setUploadedDocs((prev) => ({
-          ...prev,
-          [fileType]: [
-            ...(prev[fileType] || []),
-            { upload: fileUrl, date: uploadDate },
-          ],
-        }));
-      }
+      setUploadedDocs((prev) => ({
+        ...prev,
+        [fileType]: [
+          ...(prev[fileType] || []),
+          { upload: fileUrl, date: uploadDate },
+        ],
+      }));
+    }
     // }
   } catch (error) {
     console.log(`Error uploading ${fileType}:, error`);
@@ -166,7 +165,10 @@ export const claimUploadDocs = async (
         const updatedUploads = { ...prev };
 
         // Ensure updatedUploads[fileType] is an object
-        if (!updatedUploads[fileType] || typeof updatedUploads[fileType] !== "object") {
+        if (
+          !updatedUploads[fileType] ||
+          typeof updatedUploads[fileType] !== "object"
+        ) {
           updatedUploads[fileType] = {};
         }
 
@@ -217,7 +219,10 @@ export const dependUploadDocs = async (
         const updatedUploads = { ...prev };
 
         // Ensure updatedUploads[fileType] is an object
-        if (!updatedUploads[fileType] || typeof updatedUploads[fileType] !== "object") {
+        if (
+          !updatedUploads[fileType] ||
+          typeof updatedUploads[fileType] !== "object"
+        ) {
           updatedUploads[fileType] = {};
         }
 
