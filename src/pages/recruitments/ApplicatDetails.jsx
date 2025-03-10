@@ -11,18 +11,12 @@ import { getUrl } from "@aws-amplify/storage";
 import { useTempID } from "../../utils/TempIDContext";
 import avatar from "../../assets/navabar/avatar.jpeg";
 
-import {
-  ContractTypeDD,
-  GenderDD, 
-  MaritalDD,
-} from "../../utils/DropDownMenus";
 
 export const ApplicantDetails = () => {
-  const { empPDData,dropDownVal} = useContext(DataSupply);
+  const { empPDData,dropDownVal,educDetailsData} = useContext(DataSupply);
   const { tempID } = useTempID();
   const location = useLocation();
   const navigate = useNavigate();
-console.log(dropDownVal);
 
   useEffect(() => {
     window.scrollTo({
@@ -50,6 +44,7 @@ console.log(dropDownVal);
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
   const [profilePreview, setProfilePreview] = useState("");
+  const [uploadedFileNames, setUploadedFileNames] = useState({ profilePhoto: null });
 
   const linkToImageFile = async (pathUrl) => {
     const result = await getUrl({
@@ -69,7 +64,6 @@ console.log(dropDownVal);
       Object.keys(savedData).forEach(async (key) => {
         if (key === "profilePhoto" && savedData[key]) {
           try {
-       
             const result = await getUrl({ path: savedData[key] });
             const imageUrl = result.url.toString();
             setProfilePreview(imageUrl);
@@ -173,20 +167,32 @@ console.log(dropDownVal);
     } 
   }, [tempID, setValue, empPDData]); 
 
-  const handleFileChange = async (e) => {
+  const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
 
-    if (selectedFile) {
-      
-      setProfilePhoto(selectedFile);
-      setValue("profilePhoto", selectedFile);
-      await uploadDocString(
-        selectedFile,
-        "profilePhoto",
-        setUploadedDocs,
-        "Employee"
-      );
+    if (!selectedFile) return;
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be an image (JPG, JPEG, PNG)");
+      return;
     }
+
+    setProfilePhoto(selectedFile);
+    setValue("profilePhoto", selectedFile);
+// console.log(selectedFile,"selectedFile");
+
+    setUploadedFileNames((prev) => ({
+      ...prev,
+      profilePhoto: selectedFile.name,
+    }));    
+
+    const savedData = JSON.parse(localStorage.getItem("applicantFormData")) || {};
+    savedData.profilePhoto = selectedFile.name;
+    // console.log( savedData.profilePhoto,"saveData");
+    // console.log(selectedFile.name,"selectedFile.name");
+    
+    
+    localStorage.setItem("applicantFormData", JSON.stringify(savedData));
   };
 
   useEffect(() => {
@@ -201,7 +207,8 @@ console.log(dropDownVal);
     try {
       const applicationUpdate = {
         ...data,
-        profilePhoto: uploadedDocs.profilePhoto,
+        profilePhoto:profilePhoto,
+        uploadedFileNames: uploadedFileNames.profilePhoto,
       };
 
       localStorage.setItem(

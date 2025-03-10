@@ -154,6 +154,9 @@ export const DependentPass = ({
     }
   }, [value, append, replace, setValue]);
 
+  console.log(fileNames);
+  
+
   const getFileName = (filePath) => {
     if (!filePath) {
       return "";
@@ -182,14 +185,6 @@ export const DependentPass = ({
     }
     const file = e.target.files?.[0];
     if (!file) return;
-
-    // if (docsUploaded?.fieldName?.[index]?.length > 0) {
-    //   alert(
-    //     "Only one file is allowed per index. Please delete the existing file before uploading a new one."
-    //   );
-    //   e.target.value = ""; // Clear the input
-    //   return;
-    // }
 
     // File type restriction (PDF only, similar to Method 1)
     const allowedTypes = [
@@ -238,6 +233,8 @@ export const DependentPass = ({
     }
   };
 
+  // console.log(uploadedFileNames);
+  
   const handleDeleteMsg = () => {
     setdeletePopup(!deletePopup);
   };
@@ -308,7 +305,7 @@ export const DependentPass = ({
   };
 
   const handleRemoveDependPass = async (index) => {
-    console.log(index);
+    // console.log(index);
 
     const dependPass = getValues("dependPass");
 
@@ -397,31 +394,12 @@ export const DependentPass = ({
       });
     
       console.log("Updated state:", updated);
-      return updated; // ✅ Preserves other indexes correctly
+      return updated; 
     });
     
-    // // Delete uploaded files if any
-    // if (removedItem.uploadDp && removedItem.uploadDp.length > 0) {
-    //   for (const file of removedItem.uploadDp) {
-    //     const fileName = getFileName(file.upload || file.name);
-    //     // console.log(fileName);
-    //     await handleDeleteFile("uploadDp", fileName, watchedEmpID); // Delete from S3 or server
-    //   }
-    // }
-
-    // if (removedItem.uploadDr && removedItem.uploadDr.length > 0) {
-    //   for (const file of removedItem.uploadDr) {
-    //     const fileName = getFileName(file.upload || file.name);
-    //     // console.log(fileName);
-    //     await handleDeleteFile("uploadDr", fileName, watchedEmpID); // Delete from S3 or server
-    //   }
-    // }
-
+   
     console.log("Updated dependPass:", updatedDependPass);
-    // // Remove the item from the form
-    // console.log("Before removal:", getValues("dependPass"));
-    // remove(index);
-    // console.log("After removal:", getValues("dependPass"));
+
   };
   // console.log(fileNames, "filePath");
   // console.log(docsUploaded, "uploaddocs");
@@ -432,7 +410,7 @@ export const DependentPass = ({
         <label className="text_size_3">Dependent Pass Info</label>
         <button
           type="button"
-          className="px-3 py-1 rounded"
+          className="px-3 py-1 rounded" 
           onClick={handleAddDependPass}
         >
           <CiSquarePlus className="text-xl" />

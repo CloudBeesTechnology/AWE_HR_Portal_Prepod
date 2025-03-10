@@ -49,8 +49,8 @@ export const ChangePasswordSchema = Yup.object({
 });
 
 export const ApplicantSchema = Yup.object().shape({
-  profilePhoto: Yup.mixed()
-  .notRequired("Upload Photo is mandatory"),
+  // profilePhoto: Yup.mixed()
+  // .notRequired("Upload Photo is mandatory"),
   agent: Yup.string().notRequired(),
   position: Yup.string().required("Position is mandatory"),
   contractType: Yup.string().required("Contract Type mandatory"),
@@ -224,7 +224,7 @@ export const EducationSchema = Yup.object({
 
 export const CandidatesSchema = Yup.object().shape({
   salaryExpectation: Yup.string().notRequired(),
-  noExperience: Yup.string().required("Experience is required"),
+  noExperience: Yup.string().notRequired(),
   noticePeriod: Yup.string().required("Notice period is required"),
   empStatement: Yup.string().required("Employee Statement is required"),
   perIS: Yup.string().required("Interview status is required"),

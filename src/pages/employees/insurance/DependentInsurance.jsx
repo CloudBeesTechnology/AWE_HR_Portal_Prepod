@@ -210,8 +210,8 @@ export const DependentInsurance = () => {
       console.error(err);
     }
   };
-// console.log(tempFilesName);
-
+  // console.log(tempFilesName);
+ 
   useEffect(() => {
     setValue("empID", depInsuData?.empID);
 
@@ -226,9 +226,9 @@ export const DependentInsurance = () => {
           return;
         }
 
-        setDepInsurance([]);
-        setUploadedDocs([]);
-        setTempFilesName({});
+        // setDepInsurance([]);
+        // setUploadedDocs([]);
+        // setTempFilesName({});
         setValue("depInsurance", []);
 
         if (parsedData && parsedData.length > 0) {
@@ -237,6 +237,8 @@ export const DependentInsurance = () => {
           setValue("depInsurance", parsedData);
 
           parsedData.forEach((item, idx) => {
+            // console.log(item);
+
             if (item?.depenInfUpload) {
               try {
                 const url = item.depenInfUpload;
@@ -333,7 +335,7 @@ export const DependentInsurance = () => {
         watchedEmpID,
         setUploadedFileNames,
         setTempFilesName,
-        index,
+        index
       );
       const updateEmpInsUpload = (prev, index) =>
         Array.isArray(prev)
@@ -360,26 +362,35 @@ export const DependentInsurance = () => {
       alert("Error processing the file deletion.");
     }
   };
-// console.log(uploadedFileNames,"dilesdf");
+  // console.log(uploadedFileNames,"dilesdf");
 
   const onSubmit = async (data) => {
     try {
       const checkingDITable = depInsuranceData.find(
         (match) => match.empID === data.empID
       );
-
-      // console.log("Table",checkingDITable);
-      // console.log("data : ", data);
+      
       if (checkingDITable) {
         const depValue = {
           ...data,
-          depInsurance: data?.depInsurance?.map((insurance, index) => {
-            return {
-              ...insurance,
-              depenInfUpload:
-                JSON.stringify(uploadedDocs?.depInsurance?.[index]) || [],
-            };
-          }),
+          depInsurance: data?.depInsurance
+            ?.filter((insurance, index) => {
+              return Object.values(insurance).some((val) => {
+                if (typeof val === "string") return val.trim() !== ""; // ✅ Non-empty strings
+                if (Array.isArray(val)) return val.length > 0; // ✅ Non-empty arrays
+                return val !== null && val !== undefined; // ✅ Non-null & valid values
+              });
+            })
+
+            ?.map((insurance, index) => {
+              return {
+                ...insurance,
+                depenInfUpload:
+                  uploadedDocs?.depInsurance?.[index]?.length > 0
+                    ? JSON.stringify(uploadedDocs?.depInsurance?.[index])
+                    : [],
+              };
+            }),
           id: checkingDITable.id,
         };
         // console.log("depValue : ", depValue);
@@ -409,7 +420,9 @@ export const DependentInsurance = () => {
     }
   };
 
-  // console.log("isUploading", tempUploadedDocs);
+  // console.log("tempFilesName", tempFilesName);
+  // console.log("FilesName", uploadedFileNames);
+  // console.log("uploadedDocs", uploadedDocs);
 
   return (
     <div className="bg-[#F5F6F1CC] mx-auto p-2 py-10">
