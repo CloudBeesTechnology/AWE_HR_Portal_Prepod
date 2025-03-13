@@ -74,14 +74,14 @@ export const uploadReqString = async (file, fileType, tempID) => {
     if (!file) return null; // Skip if no file is provided
 
     // Encode file name for URL safety
-    const encodedFileName = encodeURIComponent(file.name);
+    const encodedFileName = encodeURIComponent(file.name).replace(/%20/g, ' ');
 
     // Construct the upload URL for API Gateway
     const uploadUrl = `https://gnth2qx5cf.execute-api.ap-southeast-1.amazonaws.com/fileupload/aweadininprod2024954b8-prod/public%2F${fileType}%2F${tempID}%2F${encodedFileName}`;
 
     // Upload the file using axios
     await axios.put(uploadUrl, file)
-          .then((res) => {
+      .then((res) => {
         console.log(res.data.message);
       })
       .catch((err) => {
@@ -95,6 +95,33 @@ export const uploadReqString = async (file, fileType, tempID) => {
     throw error;
   }
 };
+// export const uploadReqString = async (file, fileType, tempID) => {
+//   try {
+//     if (!file) return null; // Skip if no file is provided
+
+//     // Encode file name for URL safety
+//     const encodedFileName = encodeURIComponent(file.name);
+
+//     // Construct the upload URL for API Gateway
+//     const uploadUrl = `https://gnth2qx5cf.execute-api.ap-southeast-1.amazonaws.com/fileupload/aweadininprod2024954b8-prod/public%2F${fileType}%2F${tempID}%2F${encodedFileName}`;
+
+//     // Upload the file using axios
+//     await axios.put(uploadUrl, file)
+//           .then((res) => {
+//         console.log(res.data.message);
+//       })
+//       .catch((err) => {
+//         console.error("Error uploading file:", err);
+//       });
+
+//     // Generate the uploaded file URL
+//     return `https://aweadininprod2024954b8-prod.s3.ap-southeast-1.amazonaws.com/public/${fileType}/${tempID}/${encodedFileName}`;
+//   } catch (error) {
+//     console.error(`Error uploading ${fileType}:`, error);
+//     throw error;
+//   }
+// };
+
 export const uploadDocs = async (
   file,
   fileType,
