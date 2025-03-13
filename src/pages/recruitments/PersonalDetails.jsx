@@ -491,12 +491,11 @@ console.log(applicationData);
               control={control}
               render={({ field }) => (
                 <div className="flex flex-col">
-                  <textarea
+                  <input
                     {...field}
                     placeholder="School / University / Professional Institute"
                     className="resize-none text_size_9 mt-2 p-2.5 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
                   />
-
                   {errors.eduDetails?.[index]?.university && (
                     <p className="text-[red] text-xs mt-1">
                       {errors.eduDetails[index].university.message}
@@ -510,12 +509,12 @@ console.log(applicationData);
               control={control}
               render={({ field }) => (
                 <div className="flex flex-col">
-                  <textarea
+                  <input
                     {...field}
                     type="date"
                     placeholder="From Date"
                     className="resize-none mt-2 p-2.5 text_size_9  bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
-                  ></textarea>
+                  />
                   {errors.eduDetails?.[index]?.fromDate && (
                     <p className="text-[red] text-xs mt-1">
                       {errors.eduDetails[index].fromDate.message}
@@ -529,12 +528,12 @@ console.log(applicationData);
               control={control}
               render={({ field }) => (
                 <div className="flex flex-col">
-                  <textarea
+                  <input
                     {...field}
                     type="date"
                     placeholder="To Date"
                     className="resize-none mt-2 p-2.5 text_size_9  bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
-                  ></textarea>
+                  />
                   {errors.eduDetails?.[index]?.toDate && (
                     <p className="text-[red] text-xs mt-1">
                       {errors.eduDetails[index].toDate.message}
@@ -548,7 +547,7 @@ console.log(applicationData);
               control={control}
               render={({ field }) => (
                 <div className="flex flex-col">
-                  <textarea
+                 <input
                     {...field}
                     placeholder="Highest Standard / Passed / Certificate / Degree / Professional Qualification"
                     className="resize-none mt-2 p-2.5  bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded text_size_9"

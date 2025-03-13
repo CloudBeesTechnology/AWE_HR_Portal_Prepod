@@ -110,10 +110,17 @@ export const EditTimeSheet = ({
 
       const updatedEditObject = {
         ...editObject,
-
-        [`formatted_${fieldToUpdate}`]: displayedDate,
-        [`formatted_${"ENTRANCEDATETIME"}`]: formattedEntranceDateTime,
-        [`formatted_${"EXITDATETIME"}`]: formattedExitDateTime,
+        [`formatted_${fieldToUpdate}`]: displayedDate.includes("NaN")
+          ? ""
+          : displayedDate,
+        [`formatted_${"ENTRANCEDATETIME"}`]: formattedEntranceDateTime.includes(
+          "NaN"
+        )
+          ? ""
+          : formattedEntranceDateTime,
+        [`formatted_${"EXITDATETIME"}`]: formattedExitDateTime.includes("NaN")
+          ? ""
+          : displayedDate,
       };
 
       setFormData(updatedEditObject);
@@ -255,106 +262,117 @@ export const EditTimeSheet = ({
 
   useEffect(() => {
     const formatTime = (decimalHours) => {
+    
       const hours = Math.floor(decimalHours);
       const minutes = Math.round((decimalHours - hours) * 60);
       return `${hours}:${minutes.toString().padStart(2, "0")}`;
     };
 
+    // From
     const updateFormData = (workingHoursKey, actualHoursKey) => {
       // };
-      const ConvertHours = (sections) => {
-        let totalMinutes = 0;
+      try {
+        const ConvertHours = (sections) => {
+          
 
-        if (sections) {
-          let time = sections.includes(".")
-            ? sections.replace(".", ":")
-            : sections;
+          let totalMinutes = 0;
 
-          if (!time.includes(":")) {
-            time = `${time}:00`;
-          }
-
-          const [hours, minutes] = time.split(":").map(Number);
-
-          if (isNaN(hours) || isNaN(minutes)) {
-            throw new Error("Invalid time format");
-          }
-
-          totalMinutes = hours * 60 + minutes;
-        }
-
-        const outputHours = Math.floor(totalMinutes / 60);
-        const outputMinutes = totalMinutes % 60;
-        return `${outputHours}:${outputMinutes.toString().padStart(2, "0")}`;
-      };
-
-      const sumHoursAndMinutes = (sections, key) => {
-        let totalMinutes = sections.reduce((total, sec) => {
-          if (sec[key]) {
-            let time = sec[key].includes(".")
-              ? sec[key].replace(".", ":")
-              : sec[key];
+          if (sections) {
+            let time = sections.includes(".")
+              ? sections.replace(".", ":")
+              : sections;
 
             if (!time.includes(":")) {
               time = `${time}:00`;
             }
 
             const [hours, minutes] = time.split(":").map(Number);
-            total += hours * 60 + (minutes || 0);
+
+            if (isNaN(hours) || isNaN(minutes)) {
+              throw new Error("Invalid time format");
+            }
+
+            totalMinutes = hours * 60 + minutes;
           }
-          return total;
-        }, 0);
 
-        const hours = Math.floor(totalMinutes / 60);
-        const minutes = totalMinutes % 60;
-        return `${hours}:${minutes.toString().padStart(2, "0")}`;
-      };
-
-      let totalWorkingHrs = sumHoursAndMinutes(sections, "WORKINGHRS");
-      let totalOvertimeHrs = sumHoursAndMinutes(sections, "OVERTIMEHRS");
-
-      setFormData((prevFormData) => {
-        const updatedWorkingHours =
-          parseFloat(totalWorkingHrs?.split(":")[0]) +
-          parseFloat(totalWorkingHrs?.split(":")[1]) / 60;
-        const normalWH = ConvertHours(prevFormData?.NORMALWORKINGHRSPERDAY);
-        const convertNWPD =
-          parseFloat(normalWH?.split(":")[0]) +
-          parseFloat(normalWH?.split(":")[1]) / 60;
-
-        const calculatedOT =
-          updatedWorkingHours - convertNWPD <= 0
-            ? 0
-            : updatedWorkingHours - convertNWPD;
-
-        setWarningMess(updatedWorkingHours > convertNWPD);
-        const adininWorks = ConvertHours(
-          prevFormData?.ADININWORKSENGINEERINGSDNBHD
-        );
-
-        const adinin =
-          parseFloat(adininWorks?.split(":")[0]) +
-          parseFloat(adininWorks?.split(":")[1]) / 60;
-
-        const updatedTotalOvertimeHrs =
-          parseFloat(totalOvertimeHrs?.split(":")[0]) +
-          parseFloat(totalOvertimeHrs?.split(":")[1]) / 60;
-
-        if (updatedWorkingHours + updatedTotalOvertimeHrs > adinin) {
-          setWarningMessForAdinin(
-            updatedWorkingHours + updatedTotalOvertimeHrs > adinin
-          );
-        } else {
-          setWarningMessForAdinin(false);
-        }
-
-        return {
-          ...prevFormData,
-          [actualHoursKey]: totalWorkingHrs,
-          OT: formatTime(calculatedOT),
+          const outputHours = Math.floor(totalMinutes / 60);
+          const outputMinutes = totalMinutes % 60;
+          return `${outputHours}:${outputMinutes.toString().padStart(2, "0")}`;
         };
-      });
+
+        const sumHoursAndMinutes = (sections, key) => {
+          let totalMinutes = sections?.reduce((total, sec) => {
+            if (sec[key]) {
+              let time = sec[key]?.includes(".")
+                ? sec[key]?.replace(".", ":")
+                : sec[key];
+
+              if (!time?.includes(":")) {
+                time = `${time}:00`;
+              }
+
+              const [hours, minutes] = time?.split(":")?.map(Number);
+              total += hours * 60 + (minutes || 0);
+            }
+            return total;
+          }, 0);
+
+          const hours = Math.floor(totalMinutes / 60);
+          const minutes = totalMinutes % 60;
+          return `${hours}:${minutes.toString().padStart(2, "0")}`;
+        };
+
+        let totalWorkingHrs = sumHoursAndMinutes(sections, "WORKINGHRS");
+        let totalOvertimeHrs = sumHoursAndMinutes(sections, "OVERTIMEHRS");
+
+        setFormData((prevFormData) => {
+          const updatedWorkingHours =
+            parseFloat(totalWorkingHrs?.split(":")[0]) +
+            parseFloat(totalWorkingHrs?.split(":")[1]) / 60;
+          const normalWH = ConvertHours(prevFormData?.NORMALWORKINGHRSPERDAY);
+          const convertNWPD =
+            parseFloat(normalWH?.split(":")[0]) +
+            parseFloat(normalWH?.split(":")[1]) / 60;
+
+          const calculatedOT =
+            updatedWorkingHours - convertNWPD <= 0
+              ? 0
+              : updatedWorkingHours - convertNWPD;
+
+          setWarningMess(updatedWorkingHours > convertNWPD);
+          const adininWorks = ConvertHours(
+            prevFormData?.ADININWORKSENGINEERINGSDNBHD
+          );
+          const adinin =
+            parseFloat(adininWorks?.split(":")[0]) +
+            parseFloat(adininWorks?.split(":")[1]) / 60;
+
+          const updatedTotalOvertimeHrs =
+            parseFloat(totalOvertimeHrs?.split(":")[0]) +
+            parseFloat(totalOvertimeHrs?.split(":")[1]) / 60;
+
+          if (updatedWorkingHours + updatedTotalOvertimeHrs > adinin) {
+            setWarningMessForAdinin(
+              updatedWorkingHours + updatedTotalOvertimeHrs > adinin
+            );
+          } else {
+            setWarningMessForAdinin(false);
+          }
+
+          return {
+            ...prevFormData,
+            [actualHoursKey]:
+              totalWorkingHrs.includes("NaN") || !totalWorkingHrs
+                ? "0:00"
+                : totalWorkingHrs,
+            OT: formatTime(calculatedOT).includes("NaN")
+              ? "0:00"
+              : formatTime(calculatedOT),
+          };
+        });
+      } catch (err) {}
     };
+    // End
 
     if (titleName === "HO") {
       updateFormData("TOTALACTUALHOURS", "TOTALACTUALHOURS");
@@ -367,16 +385,20 @@ export const EditTimeSheet = ({
 
   useEffect(() => {
     const totalOvertimeHrs = sections.reduce((total, sec) => {
-      let overtime = sec.OVERTIMEHRS || "0:00";
+      try {
+        let overtime = sec.OVERTIMEHRS || "0:00";
 
-      if (overtime.includes(".")) {
-        overtime = overtime.replace(".", ":");
-      } else if (!overtime.includes(":")) {
-        overtime = `${overtime}:00`;
+        if (overtime.includes(".")) {
+          overtime = overtime.replace(".", ":");
+        } else if (!overtime.includes(":")) {
+          overtime = `${overtime}:00`;
+        }
+
+        const [hrs, mins] = overtime.split(":").map(Number);
+        return total + hrs * 60 + mins;
+      } catch (err) {
+        return "0:00";
       }
-
-      const [hrs, mins] = overtime.split(":").map(Number);
-      return total + hrs * 60 + mins;
     }, 0);
 
     const hours = Math.floor(totalOvertimeHrs / 60);

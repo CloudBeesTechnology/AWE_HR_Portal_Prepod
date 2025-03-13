@@ -7,6 +7,7 @@ export const SbwTBody = ({
   message,
   assignObjectFun,
   toggleFunction,
+  editFormTitleFunc
 }) => {
   useEffect(() => {
     if (loading === false) {
@@ -47,6 +48,7 @@ export const SbwTBody = ({
                   onClick={() => {
                     assignObjectFun(m, "SBW");
                     toggleFunction();
+                    editFormTitleFunc("View Form");
                   }}
                 >
                   <td className="text-start px-4 flex-1">{index + 1}</td>

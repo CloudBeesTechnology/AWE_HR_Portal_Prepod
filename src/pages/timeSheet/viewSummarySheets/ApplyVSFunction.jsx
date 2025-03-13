@@ -100,7 +100,8 @@ export const ApplyVSFunction = ({
         });
 
         const leaveStatusData = leaveStatuses;
-      
+        // const leaveStatusData = dummyLeaveStatus;
+
         const approvedLeaveStatus = leaveStatusData?.filter(
           (fil) => fil.managerStatus === "Approved"
         );
@@ -209,23 +210,23 @@ export const ApplyVSFunction = ({
         const seperatedGroupedData =
           groupByEmpIdAndLocation(seperatedEmpByDate);
 
-        seperatedGroupedData.forEach((item) => {
-          if (Array.isArray(item.data)) {
-            item.data.forEach((dataEntry) => {
-              if (Array.isArray(dataEntry.empWorkInfo)) {
-                dataEntry.empWorkInfo.forEach((workInfo) => {
-                  if (!workInfo.WORKINGHRS) {
-                    workInfo.WORKINGHRS = "A";
-                  }
-                });
-              }
-            });
-          }
-        });
+        // seperatedGroupedData.forEach((item) => {
+        //   if (Array.isArray(item.data)) {
+        //     item.data.forEach((dataEntry) => {
+        //       if (Array.isArray(dataEntry.empWorkInfo)) {
+        //         dataEntry.empWorkInfo.forEach((workInfo) => {
+        //           if (!workInfo.WORKINGHRS) {
+        //             workInfo.WORKINGHRS = "A";
+        //           }
+        //         });
+        //       }
+        //     });
+        //   }
+        // });
 
         const merged = mergedData.flatMap((val) => {
           const matches = approvedLeaveStatus.filter(
-            (so) => val.empID === so.empID
+            (so) => String(val.empID) === String(so.empID)
           );
 
           if (matches.length > 0) {
@@ -249,6 +250,7 @@ export const ApplyVSFunction = ({
               leave.sapNo &&
               emp.fidNo &&
               String(leave.sapNo) === String(emp.fidNo);
+
             if (empBadgeNoMatch || sapNoMatch) {
               return emp.data.some((entry) => {
                 const leaveDate = new Date(leave.toDate);
@@ -264,15 +266,40 @@ export const ApplyVSFunction = ({
           });
         });
 
+        //         Annual Leave
+        // Sick Leave
+        // Hospitalisation Leave
+        // Compassionate Leave
+        // Marriage Leave
+        // Compensate Leave
+        // Paternity Leave      [Male]
+        // Maternity Leave     [Female]
+        // Unpaid Authorize - Sick
+        // Unpaid Authorize - Annual
+        // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        // Compassionate Leave - CL
+        // . Marriage Leave - CL
+        // . Hospitalization Leave -SL
+        // . Maternity Leave - CL
+        // . Paternity Leave - CL
+        // . Unpaid Unauthorised Sick Leave - UAL
+
         const leaveTypeAbbreviation = {
           "Annual Leave": "AL",
           "Compensate Leave": "CL",
           "Unpaid Authorize - Annual": "UAL",
           "Sick Leave": "SL",
+          "Hospitalisation Leave": "SL",
+          "Compassionate Leave": "CL",
+          "Marriage Leave": "CL",
+          "Paternity Leave": "CL",
+          "Maternity Leave": "CL",
+          "Unpaid Authorize - Sick": "UAL",
+          "Unpaid Unauthorised Sick Leave": "UAL",
         };
 
         const isHalfDayLeave = (abbreviation) =>
-          ["HAL", "HCL", "HUAL", "HSL"].some((prefix) =>
+          ["HAL", "HCL", "HUAL", "HSL", "HCL"].some((prefix) =>
             abbreviation?.startsWith?.(prefix)
           );
 
@@ -283,7 +310,7 @@ export const ApplyVSFunction = ({
             const {
               empID,
               empBadgeNo,
-              fidNo,
+              sapNo,
               leaveType,
               fromDate,
               toDate,
@@ -294,7 +321,7 @@ export const ApplyVSFunction = ({
             if (!result[empID]) {
               result[empID] = {
                 empBadgeNo: empBadgeNo,
-                fidNo: fidNo,
+                fidNo: sapNo,
                 leaveCounts: {},
                 dateDifferences: [],
               };
@@ -392,7 +419,7 @@ export const ApplyVSFunction = ({
               val.empBadgeNo === fi.empBadgeNo
             ) {
               return fi;
-            } else if (val.fidNo && fi.sapNo && val.fidNo === fi.sapNo) {
+            } else if (val.fidNo && fi.fidNo && val.fidNo === fi.fidNo) {
               return fi;
             }
           });
@@ -457,12 +484,27 @@ export const ApplyVSFunction = ({
             }
 
             if (checkEntry) {
+              const result = parseFloat(entry?.normalWorkHrs) / 2;
               if (isNaN(checkEntry) || !checkEntry) {
                 acc[dayStr] = checkEntry;
+              } else if (
+                dayOfWeek === "Saturday" &&
+                result === parseFloat(checkEntry)
+              ) {
+                const salaryType =
+                  workInfoData?.salaryType[
+                    workInfoData?.salaryType.length - 1
+                  ]?.toLowerCase();
+
+                const monthlyTypes = ["monthly", "month", "m"];
+
+                if (monthlyTypes.includes(salaryType)) {
+                  acc[dayStr] = "HPHD";
+                }
               } else {
                 const workingHrs = parseFloat(checkEntry);
-
-                if (workingHrs < (entry?.normalWorkHrs || 0)) {
+              
+                if (workingHrs <= (entry?.normalWorkHrs || 0)) {
                   const absence = (
                     (entry?.normalWorkHrs || 0) - workingHrs
                   ).toFixed(1);
@@ -477,7 +519,7 @@ export const ApplyVSFunction = ({
             } else if (leaveType) {
               acc[dayStr] = leaveType;
             } else if (dayOfWeek === "Saturday") {
-              const result = parseFloat(entry?.normalWorkHrs) / 2;
+              // const result = parseFloat(entry?.normalWorkHrs) / 2;
 
               const salaryType =
                 workInfoData?.salaryType[
@@ -491,8 +533,6 @@ export const ApplyVSFunction = ({
                 acc[dayStr] = "PHD";
               } else if (!checkEntry && dailyTypes.includes(salaryType)) {
                 acc[dayStr] = "OFF";
-              } else if (result === parseFloat(checkEntry)) {
-                acc[dayStr] = "HPHD";
               } else {
                 acc[dayStr] = checkEntry;
               }
@@ -566,6 +606,9 @@ export const ApplyVSFunction = ({
               data.workingHrs,
               keysToCount
             );
+            holidaysAndAbsent["PHD"] +=
+              Object.values(data.workingHrs).filter((value) => value === "HPHD")
+                .length * 0.5;
 
             const countLeaveTypes = () => {
               let newLeaveCount = {
@@ -612,23 +655,42 @@ export const ApplyVSFunction = ({
           addLeaveTypeCount
         );
 
+        const isDateInRange = (date, start, end) => {
+          const parsedDate = new Date(date);
+          const parsedStart = new Date(start);
+          const parsedEnd = new Date(end);
+
+          parsedDate.setHours(0, 0, 0, 0);
+          parsedStart.setHours(0, 0, 0, 0);
+          parsedEnd.setHours(0, 0, 0, 0);
+
+          return parsedDate >= parsedStart && parsedDate <= parsedEnd;
+        };
+        // getStartDate, getEndDate
         const getSummaryUpdaterName = async (updatedData) => {
+          const filteredData = updatedData
+            ?.map((item) => ({
+              ...item,
+              data: item.data.filter((fin) =>
+                isDateInRange(fin.date, getStartDate, getEndDate)
+              ), // Filtered by date
+            }))
+            .filter((item) => item.data.length > 0); // Remove empty objects after filtering
+
           const results = await Promise.all(
-            updatedData.map(async (val) => {
-              const getHisID = val.data.find((fin) => fin);
+            filteredData.map(async (val) => {
+              const timeKeeperNames = await Promise.all(
+                val.data.map(async (fin) => {
+                  const getHisName = await GetViewSummaryUpdater(fin?.assignBy);
+                  return getHisName?.name || null;
+                })
+              );
 
-              if (getHisID && getHisID.assignBy) {
-                const getHisName = await GetViewSummaryUpdater(
-                  getHisID.assignBy
-                );
-                return { ...val, timeKeeper: getHisName?.name || null };
-              }
-
-              return { ...val, timeKeeper: null };
+              return { ...val, timeKeeper: timeKeeperNames }; // Assign timeKeeperNames after filtering
             })
           );
 
-          return results;
+          return results; // Return filtered results with all names
         };
 
         const UpdaterNameAdded = await getSummaryUpdaterName(updatedData);
@@ -799,7 +861,7 @@ export const ApplyVSFunction = ({
             assignUpdaterDateTime: assignUpdaterDateTime,
           };
         }).filter(Boolean);
-
+        
         await ProcessedDataFunc(transformedData);
       };
       if (convertedStringToArrayObj && convertedStringToArrayObj.length > 0) {

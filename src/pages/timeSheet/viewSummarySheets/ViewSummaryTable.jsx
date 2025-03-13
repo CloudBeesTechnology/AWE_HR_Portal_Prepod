@@ -260,8 +260,21 @@ export const ViewSummaryTable = ({
                     (value) => value === "Yes"
                   );
 
-                 const totalOfALCL= parseFloat(employee?.empLeaveCount?.AL) +
-                    parseFloat(employee?.empLeaveCount?.CL) || 0
+                  const totalOfALCL =
+                    parseFloat(employee?.empLeaveCount?.AL) +
+                      parseFloat(employee?.empLeaveCount?.CL) || 0;
+
+                  const getTimeKeeperName = employee?.timeKeeper;
+
+                  const timeKeeperName = [...new Set(getTimeKeeperName)];
+                  // const uniqueTimeKeeperName =
+                  //   timeKeeperName.length > 1
+                  //     ? timeKeeperName.join(", ")
+                  //     : timeKeeperName;
+                  const uniqueTimeKeeperName = timeKeeperName
+                    .filter((name) => name !== null) // Remove null values
+                    .join(", ");
+
                   return (
                     <React.Fragment key={index}>
                       <tr>
@@ -361,6 +374,7 @@ export const ViewSummaryTable = ({
                                   workingHrsKey: currentDayKey,
                                   verify: employee?.getVerify?.[currentDayKey],
                                   firstFileType: employee.firstFileType || "",
+                                  index:index,
                                 };
 
                                 editViewSummaryObject(empDetails);
@@ -387,7 +401,7 @@ export const ViewSummaryTable = ({
                                ${employee?.empLeaveCount?.CL || 0} `} */}
                           {/* {parseInt(employee?.empLeaveCount?.AL) +
                             parseInt(employee?.empLeaveCount?.CL) || 0} */}
-                            {totalOfALCL}
+                          {totalOfALCL}
                         </td>
                         <td className="border px-2 py-1" rowSpan="2">
                           {employee.empLeaveCount?.SL || 0}
@@ -410,7 +424,8 @@ export const ViewSummaryTable = ({
                         </td>
                         {/* {employee} */}
                         <td className="border px-2 py-1" rowSpan="2">
-                          {employee?.timeKeeper}
+                          {/* {employee?.timeKeeper} */}
+                          {uniqueTimeKeeperName}
                         </td>
                       </tr>
                       <tr>
@@ -581,7 +596,7 @@ export const ViewSummaryTable = ({
                                ${employee?.empLeaveCount?.CL || 0}`} */}
                           {/* {parseFloat(employee?.empLeaveCount?.AL) +
                             parseFloat(employee?.empLeaveCount?.CL) || 0} */}
-                            {totalOfALCL}
+                          {totalOfALCL}
                         </td>
                         <td className="border px-2 py-1">
                           {employee.empLeaveCount?.SL || 0}
