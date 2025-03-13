@@ -274,7 +274,7 @@ export const ViewSummaryTable = ({
                   const uniqueTimeKeeperName = timeKeeperName
                     .filter((name) => name !== null) // Remove null values
                     .join(", ");
-                 
+
                   return (
                     <React.Fragment key={index}>
                       <tr>
@@ -374,6 +374,7 @@ export const ViewSummaryTable = ({
                                   workingHrsKey: currentDayKey,
                                   verify: employee?.getVerify?.[currentDayKey],
                                   firstFileType: employee.firstFileType || "",
+                                  index:index,
                                 };
 
                                 editViewSummaryObject(empDetails);

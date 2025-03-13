@@ -7,6 +7,7 @@ export const HoTBody = ({
   message,
   assignObjectFun,
   toggleFunction,
+  editFormTitleFunc
 }) => {
   useEffect(() => {
     if (loading === false) {
@@ -46,6 +47,7 @@ export const HoTBody = ({
                   onClick={() => {
                     assignObjectFun(m, "HO");
                     toggleFunction();
+                    editFormTitleFunc("View Form");
                   }}
                 >
                   {/* <td className="text-start px-4 flex-1">{index + 1}</td> */}

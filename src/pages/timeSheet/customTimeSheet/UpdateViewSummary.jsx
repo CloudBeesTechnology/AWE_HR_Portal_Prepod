@@ -4,11 +4,11 @@ import { createTimeSheet, updateTimeSheet } from "../../../graphql/mutations";
 
 const client = generateClient();
 
-export const UpdateViewSummary = async (object) => {
+export const UpdateViewSummary = async (object, updateGroupedData) => {
   try {
     let resData = [];
     let newresData = [];
-
+    let resDataForJobcode = [];
     const convertToISODate = async (dateString) => {
       const [day, month, year] = dateString.split("-");
       const formattedMonth = parseInt(month, 10);
@@ -28,7 +28,27 @@ export const UpdateViewSummary = async (object) => {
       ot: object?.overtimeHrs || "",
       normalWorkHrs: object?.NWHPD || "",
     };
+    const UpdateMethodForJobcode = async (finalData) => {
+      if (finalData) {
+        const { __typename, createdAt, updatedAt, ...validTimeSheet } =
+          finalData;
 
+        try {
+          const response = await client.graphql({
+            query: updateTimeSheet,
+            variables: { input: validTimeSheet },
+          });
+          const Responses = response?.data?.updateTimeSheet;
+
+          resDataForJobcode = [Responses] || [];
+          if (Responses) {
+            return true;
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    };
     async function findMatchingObject(inputData) {
       try {
         if (
@@ -46,16 +66,93 @@ export const UpdateViewSummary = async (object) => {
           const month = dateObj?.getMonth() + 1; // Months are zero-based in JS
           const year = dateObj?.getFullYear();
           const formattedDate = `${day}-${month}-${year}`;
-         
+
           return formattedDate === inputData?.workingHrsKey;
         });
 
-        return matchedObject ? matchedObject : null;
+        if (!matchedObject) {
+          const addEmpWorkInfo = await unMatchedObject(
+            inputData,
+            inputData.grouped
+          );
+
+          if (addEmpWorkInfo) {
+            const convertEmpWorkInfo = {
+              ...addEmpWorkInfo,
+              empWorkInfo: [JSON.stringify(addEmpWorkInfo.empWorkInfo)],
+            };
+
+            const result = await UpdateMethodForJobcode(convertEmpWorkInfo);
+
+            return result;
+          } else {
+            return false;
+          }
+        } else if (matchedObject) {
+          return matchedObject;
+        }
+        // return await unMatchedObject(inputData, inputData.grouped);
+
+        // return matchedObject ? matchedObject : null;
       } catch (err) {
+        // console.log("error : ", err);
         return null;
       }
     }
 
+    const dateFormatFunc = (date) => {
+      const dateObj = new Date(date);
+      const day = dateObj?.getDate();
+      const month = dateObj?.getMonth() + 1; // Months are zero-based in JS
+      const year = dateObj?.getFullYear();
+      return `${day}-${month}-${year}`;
+    };
+    const unMatchedObject = async (inputData, grouped) => {
+      const getEmpBadgeNo = inputData?.data[0].empBadgeNo;
+      const getFidNo = inputData?.data[0].fidNo;
+
+      const matchedEmp = grouped.find(
+        (emp) =>
+          (emp?.empBadgeNo &&
+            getEmpBadgeNo &&
+            String(emp?.empBadgeNo) === String(getEmpBadgeNo)) ||
+          (emp?.fidNo && getFidNo && String(emp?.fidNo) === String(getFidNo))
+      );
+
+      const filteredGroupData =
+        matchedEmp.data.find((record) => {
+          let formattedDate = dateFormatFunc(record.date);
+          return formattedDate === inputData?.workingHrsKey;
+        }) || null;
+
+      if (filteredGroupData) {
+        const updatedEmpWorkInfo = filteredGroupData.empWorkInfo.filter(
+          (info) => info.JOBCODE !== inputData?.jobcode
+        );
+
+        updatedEmpWorkInfo.push({
+          LOCATION: inputData?.location || "",
+          OVERTIMEHRS: inputData?.overtimeHrs || "",
+          JOBCODE: inputData?.jobcode || "",
+          WORKINGHRS: inputData?.workingHrs || "",
+          id: updatedEmpWorkInfo.length + 1,
+          verify: "Yes",
+        });
+
+        const addEmpWorkInfo = {
+          ...filteredGroupData,
+          empWorkInfo: updatedEmpWorkInfo,
+          status: "Verified",
+        };
+
+        if (addEmpWorkInfo && object) {
+          await updateGroupedData(addEmpWorkInfo, object);
+        }
+        return addEmpWorkInfo ? addEmpWorkInfo : null;
+      } else {
+        return null;
+      }
+    };
     const MatchingObject = async (existingObj, outputData) => {
       if (!existingObj?.grouped || !Array.isArray(existingObj.grouped)) {
         return null;
@@ -74,7 +171,7 @@ export const UpdateViewSummary = async (object) => {
       if (!matchedEmp?.data || !Array.isArray(matchedEmp.data)) {
         return null;
       }
-     
+
       return (
         matchedEmp.data.find((record) => record.date === outputData.date) ||
         null
@@ -130,7 +227,7 @@ export const UpdateViewSummary = async (object) => {
         status: "Verified",
         // verify: "Yes",
       };
-  
+
       try {
         const response = await client.graphql({
           query: createTimeSheet,
@@ -146,7 +243,7 @@ export const UpdateViewSummary = async (object) => {
       if (finalData) {
         const { __typename, createdAt, updatedAt, ...validTimeSheet } =
           finalData;
-        
+
         try {
           const response = await client.graphql({
             query: updateTimeSheet,
@@ -155,6 +252,9 @@ export const UpdateViewSummary = async (object) => {
           const Responses = response?.data?.updateTimeSheet;
 
           resData = [Responses];
+          if (Responses) {
+            return true;
+          }
         } catch (err) {
           console.error(err);
         }
@@ -168,6 +268,7 @@ export const UpdateViewSummary = async (object) => {
 
         return match ? match?.[match.length - 1] : null;
       }
+
       const assignUpdatedWorkHrs = async (val) => {
         if (Array.isArray(val?.empWorkInfo)) {
           const parsedEmpWorkInfo = val.empWorkInfo.map((info) =>
@@ -198,19 +299,23 @@ export const UpdateViewSummary = async (object) => {
           const parsedEmpWorkInfo = updatedObject.empWorkInfo.map((info) =>
             typeof info === "string" ? JSON.parse(info) : info
           );
-
+        
           const seperatedDataEmpWorkInfo = seperatedData.empWorkInfo.map(
             (info) => (typeof info === "string" ? JSON.parse(info) : info)
           );
 
+          
+
           const processedWorkInfo = parsedEmpWorkInfo.flat();
 
           const updatedWorkInfo = seperatedDataEmpWorkInfo.map((info) => {
+            
             const matchingInfo = processedWorkInfo.find(
               (seperatedInfo) => info.id === seperatedInfo.id
             );
-
+           
             if (matchingInfo) {
+             
               return {
                 ...info,
                 JOBCODE: obj.jobcode || "",
@@ -235,20 +340,20 @@ export const UpdateViewSummary = async (object) => {
       const updatedObject = await assignUpdatedWorkHrs(val);
 
       const seperatedData = await MatchingObject(object, updatedObject);
-
+   
       var finalData = await insertUpdatedObject(updatedObject, seperatedData);
 
       await UpdateMethod(finalData);
     }
 
     const empDetails = await findMatchingObject(object);
-
-    if (empDetails !== null) {
+ 
+    if (empDetails && empDetails !== true) {
       await fetchEmployeeData(empDetails);
-    } else if (!empDetails) {
+    } else if (empDetails === false) {
       await summaryCreateMethod();
     }
-
-    return { resData, object, newresData };
+  
+    return { resData, object, newresData, resDataForJobcode };
   } catch (err) {}
 };

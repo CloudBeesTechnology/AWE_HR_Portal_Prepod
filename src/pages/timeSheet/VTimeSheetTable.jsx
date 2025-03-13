@@ -183,6 +183,7 @@ export const VTimeSheetTable = () => {
                 message={message}
                 assignObjectFun={assignObjectFun}
                 toggleFunction={toggleFunction}
+                editFormTitleFunc={editFormTitleFunc}
               />
             )}
             {categoryFilters === "HO" && (
@@ -193,6 +194,7 @@ export const VTimeSheetTable = () => {
                 message={message}
                 assignObjectFun={assignObjectFun}
                 toggleFunction={toggleFunction}
+                editFormTitleFunc={editFormTitleFunc}
               />
             )}
             {categoryFilters === "SBW" && (
@@ -203,6 +205,7 @@ export const VTimeSheetTable = () => {
                 message={message}
                 assignObjectFun={assignObjectFun}
                 toggleFunction={toggleFunction}
+                editFormTitleFunc={editFormTitleFunc}
               />
             )}
             {categoryFilters === "ORMC" && (
@@ -213,6 +216,7 @@ export const VTimeSheetTable = () => {
                 message={message}
                 assignObjectFun={assignObjectFun}
                 toggleFunction={toggleFunction}
+                editFormTitleFunc={editFormTitleFunc}
               />
             )}
 
