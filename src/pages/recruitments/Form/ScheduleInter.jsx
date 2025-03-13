@@ -133,7 +133,7 @@ export const ScheduleInter = ({ candidate, onClose }) => {
         
         <p>This is to notify you that an interview has been scheduled for ${
           formData.interview.candyName
-        } the <strong> ${
+        } the <strong> ${ 
       formData.interview.candyPosition
     } </strong> position.</p>      
         <p><strong>Date:</strong> ${formattedDateString}</p>

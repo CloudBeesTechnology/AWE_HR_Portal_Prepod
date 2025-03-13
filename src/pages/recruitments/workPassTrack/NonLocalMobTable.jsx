@@ -7,20 +7,29 @@ import { listEmpPersonalInfos } from "../../../graphql/queries";
 import { CandiToEmp } from "../status/ConvertCandiToEmp";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { UpdateMobilization } from "../../../services/updateMethod/UpdateMobilization";
- 
+import { DateFormat } from "../../../utils/DateFormat";
+import { Pagination } from "../../leaveManagement/Pagination";
 
-export const NonLocalMobTable = ({ data, formatDate, fileUpload, urlValue }) => {
+export const NonLocalMobTable = ({
+  data,
+  formatDate,
+  fileUpload,
+  urlValue,
+}) => {
   const client = generateClient();
   const { SumbitCandiToEmp } = CandiToEmp();
-  const {submitMobilization}  = UpdateMobilization();
+  const { submitMobilization } = UpdateMobilization();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const [selectedCandi, setSelectedCandi] = useState([]);
   const [latestTempIDData, setLatesTempIDData] = useState("");
   const [showTitle, setShowTitle] = useState("");
   const [notification, setNotification] = useState(false);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [page, setPage] = useState(1);
 
   const heading = [
+    "S.No",
     "TempID",
     "Name",
     "Nationality",
@@ -36,6 +45,17 @@ export const NonLocalMobTable = ({ data, formatDate, fileUpload, urlValue }) => 
 
   // console.log(data);
 
+  const totalPages = Math.ceil(data.length / rowsPerPage);
+  const startIndex = (page - 1) * rowsPerPage;
+  const endIndex = page * rowsPerPage;
+  const paginatedData = data.slice(startIndex, endIndex);
+
+  const handlePageChange = (newPage) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setPage(newPage);
+    }
+  };
+
   const handleShowForm = (candi) => {
     setSelectedCandi(candi);
     setIsFormVisible(!isFormVisible);
@@ -47,48 +67,45 @@ export const NonLocalMobTable = ({ data, formatDate, fileUpload, urlValue }) => 
   };
 
   const getTotalCount = async () => {
-   
     let allEmpIDs = [];
     let nextToken = null;
-  
+
     try {
-      
       do {
         const result = await client.graphql({
           query: listEmpPersonalInfos,
           variables: { nextToken },
         });
-  
+
         const items = result?.data?.listEmpPersonalInfos?.items || [];
         // Extract empIDs from the fetched items
         const filteringData = items.map((val) => val.empID);
         allEmpIDs = [...allEmpIDs, ...filteringData];
-  
+
         // Update nextToken for the next iteration
         nextToken = result?.data?.listEmpPersonalInfos?.nextToken;
-      } while (nextToken); 
-  
+      } while (nextToken);
+
       // Step 2: Filter only empIDs that start with 'AWE'
       const filteredData = allEmpIDs.filter((empID) => empID.startsWith("AWE"));
-  
+
       // Step 3: Sort the empIDs numerically (based on the number part of the ID)
       const sortedData = filteredData.sort((a, b) => {
-        const numA = parseInt(a.replace(/[^\d]/g, ''), 10);
-        const numB = parseInt(b.replace(/[^\d]/g, ''), 10);
+        const numA = parseInt(a.replace(/[^\d]/g, ""), 10);
+        const numB = parseInt(b.replace(/[^\d]/g, ""), 10);
         return numA - numB;
       });
-  
+
       // Step 4: Get the last valid empID (maximum empID)
       const maxValue = sortedData[sortedData.length - 1];
-  
+
       return maxValue;
     } catch (error) {
       console.error("Error fetching total count:", error);
-      return 0; 
+      return 0;
     }
   };
-  
-  
+
   const generateNextTempID = (lastTempID) => {
     const prefixMatch = lastTempID.match(/[^\d]+/);
     const prefix = prefixMatch ? prefixMatch[0] : "";
@@ -116,105 +133,131 @@ export const NonLocalMobTable = ({ data, formatDate, fileUpload, urlValue }) => 
       empID: latestTempIDData,
     };
     // console.log("stored", storedData);
-    
+
     await SumbitCandiToEmp({ storedData });
-    await submitMobilization({ mob:storedData })
-    
+    await submitMobilization({ mob: storedData });
+
     // setShowTitle("Candidate conversion to employee has been completed successfully.");
     // setNotification(true);
   };
 
   return (
-    <div>
-      {data && data.length > 0 ? (
-        <table className="w-full rounded-lg overflow-hidden">
-          <thead className="bg-[#939393] text-white">
-            <tr>
-              {heading.map((header, index) => (
-                <th key={index} className="py-4 text-[15px] text-white">
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item, index) => {
-              return (
-                <tr
-                  key={index}
-                  className="text-center border-b-2 bg-white border-[#C7BCBC] text-[15px] text-[#303030] hover:bg-medium_blue"
-                >
-                  <td className="py-3">{item.tempID}</td>
-                  <td className="py-3">{item.name || "N/A"}</td>
-                  <td className="py-3">{item.nationality || "N/A"}</td>
-                  <td className="py-3">{item.interviewDetails_manager || "N/A"}</td>
-                  <td className="py-3">{item.WPTrackDetails_mobSignDate || "N/A"}</td>
-                  <td className="py-3">{item.WPTrackDetails_agentname || "N/A"}</td>
-                  <td className="py-3">{item.WPTrackDetails_remarkNLMob || "N/A"}</td>
-                  <td className="py-3">
-                    {item.WPTrackDetails_mobFile ? (
-                      <a
-                        href={urlValue}
-                        onClick={(e) => {
-                          if (!item.WPTrackDetails_mobFile) {
-                            e.preventDefault();
-                          } else {
-                            fileUpload(item.WPTrackDetails_mobFile);
+    <>
+      <div className="recruitmentTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl">
+        {paginatedData && paginatedData.length > 0 ? (
+          <table className="w-full rounded-lg">
+            <thead className="bg-[#939393] text-white sticky top-0">
+              <tr>
+                {heading.map((header, index) => (
+                  <th key={index} className="py-4 text-[15px] text-white">
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedData.map((item, index) => {
+                return (
+                  <tr
+                    key={index}
+                    className="text-center border-b-2 bg-white border-[#C7BCBC] text-[15px] text-[#303030] hover:bg-medium_blue"
+                  >
+                    <td className="py-3">{startIndex + index + 1}</td>
+                    <td className="py-3">{item.tempID}</td>
+                    <td className="py-3">{item.name || "N/A"}</td>
+                    <td className="py-3">{item.nationality || "N/A"}</td>
+                    <td className="py-3">
+                      {item.interviewDetails_manager || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {DateFormat(item.WPTrackDetails_mobSignDate) || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_agentname || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_remarkNLMob || "N/A"}
+                    </td>
+                    <td className="py-3">
+                      {item.WPTrackDetails_mobFile ? (
+                        <a
+                          href={urlValue}
+                          onClick={(e) => {
+                            if (!item.WPTrackDetails_mobFile) {
+                              e.preventDefault();
+                            } else {
+                              fileUpload(item.WPTrackDetails_mobFile);
+                            }
+                          }}
+                          download
+                          className={
+                            item.WPTrackDetails_mobFile
+                              ? "border-b-2 border-[orange] text-[orange]"
+                              : ""
                           }
-                        }}
-                        download
-                        className={item.WPTrackDetails_mobFile ? "border-b-2 border-[orange] text-[orange]" : ""}
-                      >
-                        {item.WPTrackDetails_mobFile ? "Download" : "N/A"}
-                      </a>
-                    ) : (
-                      <p>N/A</p>
-                    )}
-                  </td>
-                  <td
-                    className="py-3 text-center"
-                    onClick={() => handleShowReviewForm(item)}
-                  >
-                    View
-                  </td>
-                  <td
-                    className="text-2xl cursor-pointer py-3 center"
-                    onClick={() => handleShowForm(item)}
-                  >
-                    <RiFileEditLine />
-                  </td>
-                  <td
-                    className="text-sm text-[#EA4F4F] cursor-pointer py-3"
-                    onClick={() => OnSubmit(item)}
-                  >
-                    Convert Employee
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      ) : (
-        <div className="text-center mt-6 py-20">
-          <p className="text-lg text-dark_grey mt-2">No Data Available</p>
+                        >
+                          {item.WPTrackDetails_mobFile ? "Download" : "N/A"}
+                        </a>
+                      ) : (
+                        <p>N/A</p>
+                      )}
+                    </td>
+                    <td
+                      className="py-3 text-center"
+                      onClick={() => handleShowReviewForm(item)}
+                    >
+                      View
+                    </td>
+                    <td
+                      className="text-2xl cursor-pointer py-3 center"
+                      onClick={() => handleShowForm(item)}
+                    >
+                      <RiFileEditLine />
+                    </td>
+                    <td
+                      className="text-sm text-[#EA4F4F] cursor-pointer py-3"
+                      onClick={() => OnSubmit(item)}
+                    >
+                      Convert Employee
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        ) : (
+          <div className="text-center mt-6 py-20">
+            <p className="text-lg text-dark_grey mt-2">No Data Available</p>
+          </div>
+        )}
+        {isReviewFormVisible && (
+          <ReviewForm
+            candidate={selectedCandi}
+            onClose={handleShowReviewForm}
+          />
+        )}
+        {isFormVisible && (
+          <WorkpassForm candidate={selectedCandi} onClose={handleShowForm} />
+        )}
+        {notification && (
+          <SpinLogo
+            text={showTitle}
+            notification={notification}
+            path="/recrutiles/status"
+          />
+        )}
+      </div>
+      {paginatedData.length > 0 && (
+        <div className="ml-20 flex justify-center">
+          <div className="w-[60%] flex justify-start mt-10 px-10">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
         </div>
       )}
-      {isReviewFormVisible && (
-        <ReviewForm candidate={selectedCandi} onClose={handleShowReviewForm} />
-      )}
-      {isFormVisible && (
-        <WorkpassForm
-          candidate={selectedCandi}
-          onClose={handleShowForm}
-        />
-      )}
-      {notification && (
-        <SpinLogo
-          text={showTitle}
-          notification={notification}
-          path="/recrutiles/status"
-        />
-      )}
-    </div>
+    </>
   );
 };

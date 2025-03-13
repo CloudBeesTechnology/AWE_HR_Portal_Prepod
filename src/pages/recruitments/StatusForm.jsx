@@ -23,7 +23,7 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
 
         <article className="flex-1 flex gap-5 text-black mt-5">
           <h1
-            className={`  px-3 py-1 rounded-lg whitespace-nowrap  ${
+            className={`px-3 py-1 rounded-lg whitespace-nowrap  ${
               show ===0
                  ? "border-2 border-[#FEF116] bg-[#FFFEF4]"
                 : "bg-[#DDDDDD]"

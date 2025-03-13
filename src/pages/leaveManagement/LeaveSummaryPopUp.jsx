@@ -2,7 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import logo from "../../assets/logo/logo-with-name.svg";
 import { useReactToPrint } from "react-to-print";
-import { capitalizedLetter, DateFormat } from "../../utils/DateFormat";
+import {
+  capitalizedLetter,
+  DateFormat,
+  DateNewFormat,
+  FTDateFormat,
+} from "../../utils/DateFormat";
 
 export const LeaveSummaryPopUp = ({
   handleClosePopup,
@@ -53,190 +58,36 @@ export const LeaveSummaryPopUp = ({
 
   // console.log(mergedData);
   const formatToTwoDecimals = (num) => parseFloat(num.toFixed(2));
+ const dateNewFormate = (date) => {
+    if (!date) return "";
 
-  // useEffect(() => {
-  //   const fetchedData = async () => {
-  //     const result = mergedData.reduce((acc, val) => {
-  //       if (!acc[val.empID]) {
-  //         acc[val.empID] = {
-  //           gender: val.gender,
-  //           empId: val.empID,
-  //           employeeName: val.empName,
-  //           empBadgeNo: val.empBadgeNo,
-  //           position: val.position,
-  //           department: val.department,
-  //           doj: val.doj,
-  //           annualLeaveBal: val.empPervAnnualLeaveBal,
-  //           compassionateLeave: initializeLeaveType(0, true),
-  //           unPaidAuthorisedLeave: initializeLeaveType(0, true),
-  //           unPaidAuthorizeSick: initializeLeaveType(0, true),
-  //           unPaidAuthorizeAnnual: initializeLeaveType(0, true),
-  //           annualLeave: initializeLeaveType(
-  //             formatToTwoDecimals(
-  //               Number(
-  //                 Array.isArray(val.annualLeave) && val.annualLeave.length > 0
-  //                   ? val.annualLeave[val.annualLeave.length - 1]
-  //                   : typeof val.annualLeave === "string"
-  //                   ? parseFloat(val.annualLeave)
-  //                   : 0
-  //               ) + Number(val.empPervAnnualLeaveBal || 0)
-  //             )
-  //           ),
+    let dateStr = date.toString().trim();
+    let day, month, year;
 
-  //           // annualLeave: initializeLeaveType(
-  //           //   formatToTwoDecimals(
-  //           //     Number(
-  //           //       Array.isArray(val.annualLeave) && val.annualLeave.length > 0
-  //           //         ? val.annualLeave[val.annualLeave.length - 1]
-  //           //         : 0
-  //           //     ) + Number(val.empPervAnnualLeaveBal || 0)
-  //           //   )
-  //           // ),
-  //           marriageLeave: initializeLeaveType(Number(val.marriageLeave) || 0),
-  //           hospitalisationLeave: initializeLeaveType(
-  //             Number(val.hospitalLeave)
-  //           ),
-  //           maternityLeave: initializeLeaveType(Number(val.maternityLeave)),
-  //           sickLeave: initializeLeaveType(Number(val.sickLeave)),
-  //           paternityLeave: initializeLeaveType(
-  //             Number(val.paternityLeave) || 0
-  //           ),
-  //           compensateLeave: initializeLeaveType(0, true),
-  //         };
-  //       }
+    if (dateStr.includes("T")) {
+      // Convert to local time instead of UTC
+      const localDate = new Date(dateStr);
+      year = localDate.getFullYear();
+      month = (localDate.getMonth() + 1).toString().padStart(2, "0"); // Month is zero-based
+      day = localDate.getDate().toString().padStart(2, "0");
+    } else if (dateStr.includes("/")) {
+      // Handle DD/MM/YYYY format
+      [day, month, year] = dateStr.split("/");
+    } else if (dateStr.includes("-")) {
+      // Handle YYYY-MM-DD format
+      [year, month, day] = dateStr.split("-");
+    } else {
+      return "";
+    }
 
-  //       const leaveTypeKeyMap = {
-  //         "Compassionate Leave": "compassionateLeave",
-  //         "Annual Leave": "annualLeave",
-  //         "Marriage Leave": "marriageLeave",
-  //         "Hospitalisation Leave": "hospitalisationLeave",
-  //         "Maternity Leave": "maternityLeave",
-  //         "Sick Leave": "sickLeave",
-  //         "Paternity Leave": "paternityLeave",
-  //         "Unpaid Authorize Leave": "unPaidAuthorisedLeave",
-  //         "Compensate Leave": "compensateLeave",
-  //         "Unpaid Authorize - Sick": "unPaidAuthorizeSick",
-  //         "Unpaid Authorize - Annual": "unPaidAuthorizeAnnual",
-  //       };
-
-  //       const leaveKey = leaveTypeKeyMap[val.empLeaveType];
-  //       // console.log(leaveKey);
-
-  //       // const applicationStartDate =
-  //       //   val.empLeaveSelectedFrom || val.empLeaveStartDate || "";
-  //       // const applicationEndDate =
-  //       //   val.empLeaveSelectedTo || val.empLeaveEndDate || "";
-
-  //       // // Normalize the dates to midnight (ignoring time)
-  //       // const filterStartDate = DateFormat(startDate);
-  //       // const filterEndDate = DateFormat(endDate);
-  //       // const appStartDate = DateFormat(applicationStartDate);
-  //       // const appEndDate = DateFormat(applicationEndDate);
-
-  //       // Get the start and end dates from employee leave data
-  //       const applicationStartDate =
-  //         val.empLeaveSelectedFrom || DateFormat(val.empLeaveStartDate) || "";
-  //       const applicationEndDate =
-  //         val.empLeaveSelectedTo || DateFormat(val.empLeaveEndDate) || "";
-
-  //       // Log the application dates
-  //       // console.log("Application Start Date (Original):", applicationStartDate);
-  //       // console.log("Application End Date (Original):", applicationEndDate);
-
-  //       // Normalize the dates to midnight (ignoring time)
-  //       const filterStartDate = DateFormat(startDate);
-  //       // console.log("LOG 1",filterStartDate);
-        
-  //       const filterEndDate = DateFormat(endDate);
-  //       const appStartDate = applicationStartDate;
-  //       const appEndDate = applicationEndDate;
-
-  //       // Log the normalized dates
-  //       // console.log("Filter Start Date (Normalized):", filterStartDate);
-  //       // console.log("Filter End Date (Normalized):", filterEndDate);
-  //       // console.log("Application Start Date (Normalized):", appStartDate);
-  //       // console.log("Application End Date (Normalized):", appEndDate);
-
-  //       let shouldProcessLeave = false;
-
-  //       if (startDate && endDate) {
-  //         if (
-  //           appStartDate >= filterStartDate &&
-  //           appStartDate <= filterEndDate
-  //         ) {
-  //           shouldProcessLeave = true;
-  //         }
-
-  //         if (appEndDate >= filterStartDate && appEndDate <= filterEndDate) {
-  //           shouldProcessLeave = true;
-  //         }
-
-  //         if (appStartDate <= filterStartDate && appEndDate >= filterEndDate) {
-  //           shouldProcessLeave = true;
-  //         }
-  //       } else {
-  //         shouldProcessLeave = isCurrentYear(
-  //           val.empLeaveSelectedFrom || val.empLeaveStartDate
-  //         );
-  //       }
-
-  //       if (shouldProcessLeave && leaveKey) {
-  //         if (
-  //           val.managerStatus === "Approved" &&
-  //           val.empStatus !== "Cancelled"
-  //         ) {
-  //           acc[val.empID][leaveKey].taken += Number(val.leaveDays) || 0;
-  //         } else if (
-  //           val.managerStatus === "Pending" &&
-  //           val.supervisorStatus !== "Rejected" &&
-  //           val.empStatus !== "Cancelled"
-  //         ) {
-  //           acc[val.empID][leaveKey].waitingLeave += Number(val.leaveDays) || 0;
-  //         }
-
-  //         if (
-  //           ![
-  //             "compassionateLeave",
-  //             "unPaidAuthorisedLeave",
-  //             "compensateLeave",
-  //             "unPaidAuthorizeSick",
-  //             "unPaidAuthorizeAnnual",
-  //           ].includes(leaveKey)
-            
-  //         ) {
-  //           const total = acc[val.empID][leaveKey].total || 0;
-  //           const taken = acc[val.empID][leaveKey].taken || 0;
-  //           const waiting = acc[val.empID][leaveKey].waitingLeave || 0;
-
-  //           const remaining = total - (taken + waiting);
-  //           const formattedRemaining =
-  //             remaining < 5 ? Math.floor(remaining) : remaining;
-
-  //           acc[val.empID][leaveKey].remaining = formattedRemaining;
-  //         }
-  //       }
-
-  //       return acc;
-  //     }, {});
-
-  //     const summary = result[empDetails.empID];
-  //     // console.log(summary);
-
-  //     setLeaveSummary(summary);
-  //     // console.log(leaveSummary);
-  //   };
-
-  //   fetchedData();
-  // }, [mergedData, startDate, endDate, empDetails]);
-  // console.log(leaveSummary, "SM");
+    return `${year}-${month}-${day}`;
+  };
 
   useEffect(() => {
     const fetchedData = async () => {
       const result = mergedData.reduce((acc, val) => {
-        
-        console.log("Processing employee:", val); // Log employee data
-  
         if (!acc[val.empID]) {
+          // console.log(val.empSickLeaveDate,val.empID,"jii");
           acc[val.empID] = {
             gender: val.gender,
             empId: val.empID,
@@ -246,6 +97,8 @@ export const LeaveSummaryPopUp = ({
             department: val.department,
             doj: val.doj,
             annualLeaveBal: val.empPervAnnualLeaveBal,
+            empsickLeaveTaken: val.empsickLeaveTaken,
+            effectiveDate: val.empSickLeaveDate,
             compassionateLeave: initializeLeaveType(0, true),
             unPaidAuthorisedLeave: initializeLeaveType(0, true),
             unPaidAuthorizeSick: initializeLeaveType(0, true),
@@ -255,23 +108,28 @@ export const LeaveSummaryPopUp = ({
                 Number(
                   Array.isArray(val.annualLeave) && val.annualLeave.length > 0
                     ? val.annualLeave[val.annualLeave.length - 1]
+                    : typeof val.annualLeave === "string"
+                    ? parseFloat(val.annualLeave)
                     : 0
                 ) + Number(val.empPervAnnualLeaveBal || 0)
               )
             ),
+
             marriageLeave: initializeLeaveType(Number(val.marriageLeave) || 0),
             hospitalisationLeave: initializeLeaveType(
-              Number(val.hospitalLeave)
+              Number(val.hospitalLeave) || 0
             ),
-            maternityLeave: initializeLeaveType(Number(val.maternityLeave)),
-            sickLeave: initializeLeaveType(Number(val.sickLeave)),
+            maternityLeave: initializeLeaveType(
+              Number(val.maternityLeave) || 0
+            ),
+            sickLeave: initializeLeaveType(Number(val.sickLeave) || 0),
             paternityLeave: initializeLeaveType(
               Number(val.paternityLeave) || 0
             ),
             compensateLeave: initializeLeaveType(0, true),
           };
         }
-  
+
         const leaveTypeKeyMap = {
           "Compassionate Leave": "compassionateLeave",
           "Annual Leave": "annualLeave",
@@ -285,47 +143,209 @@ export const LeaveSummaryPopUp = ({
           "Unpaid Authorize - Sick": "unPaidAuthorizeSick",
           "Unpaid Authorize - Annual": "unPaidAuthorizeAnnual",
         };
-  
         const leaveKey = leaveTypeKeyMap[val.empLeaveType];
-        const applicationStartDate =
-          val.empLeaveSelectedFrom || DateFormat(val.empLeaveStartDate) || "";
-        const applicationEndDate =
-          val.empLeaveSelectedTo || DateFormat(val.empLeaveEndDate) || "";
-  
-        const filterStartDate = DateFormat(startDate);       
-        const filterEndDate = DateFormat(endDate);
-        const appStartDate = applicationStartDate;
-        const appEndDate = applicationEndDate;
-  
-        let shouldProcessLeave = false;
-  
+        const applicationStartDate = val.empLeaveSelectedFrom
+          ? new Date(dateNewFormate(val.empLeaveSelectedFrom))
+          : new Date(dateNewFormate(val.empLeaveStartDate));
+
+        const applicationEndDate = val.empLeaveSelectedTo
+          ? new Date(dateNewFormate(val.empLeaveSelectedTo))
+          : new Date(dateNewFormate(val.empLeaveEndDate));
+
+        const filterStartDate = new Date(startDate);
+        const filterEndDate = new Date(endDate);
+
+        let shouldProcessOtherLeave = false;
         if (startDate && endDate) {
+   
+
           if (
-            appStartDate >= filterStartDate &&
-            appStartDate <= filterEndDate
+            applicationStartDate >= filterStartDate &&
+            applicationStartDate <= filterEndDate
           ) {
-            shouldProcessLeave = true;
+            shouldProcessOtherLeave = true;
+            // console.log("First Condition");
           }
-  
-          if (appEndDate >= filterStartDate && appEndDate <= filterEndDate) {
-            shouldProcessLeave = true;
+
+          if (
+            applicationEndDate >= filterStartDate &&
+            applicationEndDate <= filterEndDate
+          ) {
+            shouldProcessOtherLeave = true;
+            // console.log("second Condition");
           }
-  
-          if (appStartDate <= filterStartDate && appEndDate >= filterEndDate) {
-            shouldProcessLeave = true;
+
+          if (
+            applicationStartDate <= filterStartDate &&
+            applicationEndDate >= filterEndDate
+          ) {
+            shouldProcessOtherLeave = true;
+            // console.log("Third Condition");
+          }
+          if (leaveKey !== "sickLeave") {
+            shouldProcessOtherLeave =
+              shouldProcessOtherLeave &&
+              isCurrentYear(dateNewFormate(val.empLeaveSelectedFrom));
           }
         } else {
-          shouldProcessLeave = isCurrentYear(
-            val.empLeaveSelectedFrom || val.empLeaveStartDate
-          );
+          if (leaveKey !== "sickLeave") {
+        
+            shouldProcessOtherLeave = isCurrentYear(
+              dateNewFormate(val.empLeaveSelectedFrom)
+            );
+ 
+          }
         }
-  
-        if (leaveKey) {
+
+        let shouldProcessLeave = false;
+
+        if (leaveKey === "sickLeave") {
+          let currentDate = new Date();
+          let startEffectiveDate = new Date(
+            dateNewFormate(val.empSickLeaveDate)
+          );
+          let endEffectiveDate = new Date(startEffectiveDate);
+          endEffectiveDate.setFullYear(endEffectiveDate.getFullYear() + 1);
+          endEffectiveDate.setDate(endEffectiveDate.getDate() - 1);
+
+          const leaveStartDate = val.empLeaveSelectedFrom
+            ? new Date(dateNewFormate(val.empLeaveSelectedFrom))
+            : new Date(dateNewFormate(val.empLeaveStartDate));
+
+          const leaveEndDate = val.empLeaveSelectedTo
+            ? new Date(dateNewFormate(val.empLeaveSelectedTo))
+            : new Date(dateNewFormate(val.empLeaveEndDate));
+
+          // Initialize sick leave record if not exists
+          if (!acc[val.empID][leaveKey]) {
+            acc[val.empID][leaveKey] = {
+              total: Number(val.sickLeave) || 0,
+              taken: 0,
+              waitingLeave: 0,
+              remaining: Number(val.sickLeave) || 0,
+            };
+          }
+
+          if (startDate && endDate) {
+
+            const filterStartDate = new Date(startDate);
+            const filterEndDate = new Date(endDate);
+
+            // Find the relevant period based on filter dates
+            let relevantStartDate = new Date(startEffectiveDate);
+            let relevantEndDate = new Date(endEffectiveDate);
+
+            if (filterStartDate < startEffectiveDate) {
+              relevantStartDate.setFullYear(
+                relevantStartDate.getFullYear() - 1
+              );
+              relevantEndDate.setFullYear(relevantEndDate.getFullYear() - 1);
+            }
+            if (filterStartDate > endEffectiveDate) {
+              relevantStartDate.setFullYear(
+                relevantStartDate.getFullYear() + 1
+              );
+              relevantEndDate.setFullYear(relevantEndDate.getFullYear() + 1);
+            }
+ 
+            if (
+              ((leaveStartDate >= filterStartDate &&
+                leaveStartDate <= filterEndDate) ||
+                (leaveEndDate >= filterStartDate &&
+                  leaveEndDate <= filterEndDate) ||
+                (leaveStartDate <= filterStartDate &&
+                  leaveEndDate >= filterEndDate)) &&
+              ((leaveStartDate >= relevantStartDate &&
+                leaveStartDate <= relevantEndDate) ||
+                (leaveEndDate >= relevantStartDate &&
+                  leaveEndDate <= relevantEndDate))
+           
+            ) {
+              if (
+                val.managerStatus === "Approved" &&
+                val.empStatus !== "Cancelled"
+              ) {
+                acc[val.empID][leaveKey].taken += Number(val.leaveDays) || 0;
+              } else if (
+                val.managerStatus === "Pending" &&
+                val.supervisorStatus !== "Rejected" &&
+                val.empStatus !== "Cancelled"
+              ) {
+                acc[val.empID][leaveKey].waitingLeave +=
+                  Number(val.leaveDays) || 0;
+              }
+
+              // Calculate remaining leave
+              const total = acc[val.empID][leaveKey].total || 0;
+              const taken = acc[val.empID][leaveKey].taken || 0;
+              const waiting = acc[val.empID][leaveKey].waitingLeave || 0;
+              const remaining = formatToTwoDecimals(total - (taken + waiting));
+              acc[val.empID][leaveKey].remaining =
+                remaining < 5 ? remaining : remaining;
+            }
+          } else {
+            // Default behavior: show current effective period data
+            let startED = new Date(dateNewFormate(val.empSickLeaveDate));
+            let endED = new Date(startED);
+            endED.setFullYear(endED.getFullYear() + 1);
+            endED.setDate(endED.getDate() - 1);
+            while (endED < currentDate) {
+              startED.setFullYear(startED.getFullYear() + 1);
+              endED.setFullYear(endED.getFullYear() + 1);
+            }
+         
+            if (
+              currentDate >= startED &&
+              leaveStartDate >= startED &&
+              leaveEndDate <= endED &&
+              currentDate <= endED
+            ) {
+
+
+              if (
+                val.managerStatus === "Approved" &&
+                val.empStatus !== "Cancelled"
+              ) {
+                acc[val.empID][leaveKey].taken += Number(val.leaveDays) || 0;
+              } else if (
+                val.managerStatus === "Pending" &&
+                val.supervisorStatus !== "Rejected" &&
+                val.empStatus !== "Cancelled"
+              ) {
+                acc[val.empID][leaveKey].waitingLeave +=
+                  Number(val.leaveDays) || 0;
+              }
+
+              // Calculate remaining leave
+              const total = acc[val.empID][leaveKey].total || 0;
+              const taken = acc[val.empID][leaveKey].taken || 0;
+              const waiting = acc[val.empID][leaveKey].waitingLeave || 0;
+              const remaining = formatToTwoDecimals(total - (taken + waiting));
+              acc[val.empID][leaveKey].remaining =
+                remaining < 5 ? remaining : remaining;
+            }
+          }
+        } else {
+          // For non-sick leave types, use the original shouldProcessOtherLeave logic
+          shouldProcessLeave = shouldProcessOtherLeave;
+        }
+      
+
+        if (leaveKey && shouldProcessLeave) {
+          if (!acc[val.empID][leaveKey]) {
+            acc[val.empID][leaveKey] = {
+              total: 0,
+              taken: 0,
+              waitingLeave: 0,
+              remaining: 0,
+            };
+          }
           if (
             val.managerStatus === "Approved" &&
             val.empStatus !== "Cancelled"
           ) {
             acc[val.empID][leaveKey].taken += Number(val.leaveDays) || 0;
+            // console.log(acc[val.empID][leaveKey].taken);
           } else if (
             val.managerStatus === "Pending" &&
             val.supervisorStatus !== "Rejected" &&
@@ -333,7 +353,7 @@ export const LeaveSummaryPopUp = ({
           ) {
             acc[val.empID][leaveKey].waitingLeave += Number(val.leaveDays) || 0;
           }
-  
+
           if (
             ![
               "compassionateLeave",
@@ -346,33 +366,24 @@ export const LeaveSummaryPopUp = ({
             const total = acc[val.empID][leaveKey].total || 0;
             const taken = acc[val.empID][leaveKey].taken || 0;
             const waiting = acc[val.empID][leaveKey].waitingLeave || 0;
-  
-            console.log(`For ${leaveKey}: total = ${total}, taken = ${taken}, waiting = ${waiting}`);
-  
-            const remaining = total - (taken + waiting);
-            console.log(`Remaining leave for ${leaveKey}: ${remaining}`);
-  
-            const formattedRemaining =
-              remaining < 5 ? Math.floor(remaining) : remaining;
-  
-            console.log(`Formatted Remaining leave for ${leaveKey}: ${formattedRemaining}`);
-  
-            acc[val.empID][leaveKey].remaining = formattedRemaining;
+
+            const remaining = formatToTwoDecimals(total - (taken + waiting));
+            acc[val.empID][leaveKey].remaining =
+              remaining < 5 ? remaining : remaining;
           }
         }
-  
+
         return acc;
       }, {});
-  
+
       const summary = result[empDetails.empID];
-      console.log("Final leave summary for employee:", summary); 
-  
+      // console.log("summary : ", summary);
       setLeaveSummary(summary);
     };
-  
+
     fetchedData();
   }, [mergedData, startDate, endDate, empDetails]);
-  
+
   const leaveTypes = [
     "annualLeave",
     "sickLeave",
@@ -422,9 +433,9 @@ export const LeaveSummaryPopUp = ({
 
   return (
     <section className="fixed top-0 left-0 bg-grey z-50 w-full h-full flex flex-col items-center justify-center">
-      <div className="bg-white w-[70%] max-h-[95vh] min-h-[95vh] flex flex-col overflow-y-auto rounded reqScroll">
+      <div className="bg-white w-[70%] flex flex-col overflow-y-auto">
         {/* Header Section */}
-        <div className="py-10 px-10 flex justify-between items-center gap-5 w-full">
+        <div className="py-10 px-10 flex justify-between items-center  gap-5 w-full">
           <section className="flex items-center gap-5 w-full ">
             <div>
               <label
@@ -568,6 +579,7 @@ export const LeaveSummaryPopUp = ({
                   ) {
                     return null;
                   }
+
                   // console.log(`Rendering row for ${leaveType} for ${leaveSummary?.gender}`);
                   return (
                     <tr key={leaveType}>
@@ -598,7 +610,8 @@ export const LeaveSummaryPopUp = ({
             </table>
 
             <p className="font-normal py-5">
-              Previous Year Annual Leave Balance {new Date().getFullYear() - 1} : {leaveSummary?.annualLeaveBal}
+              Previous Year Annual Leave Balance {new Date().getFullYear() - 1}{" "}
+              : {leaveSummary?.annualLeaveBal}
             </p>
           </div>
         </div>

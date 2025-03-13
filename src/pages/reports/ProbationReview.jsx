@@ -20,6 +20,7 @@ export const ProbationReview = () => {
     "Department",
     "Other Department",
     "Position",
+    "Other Position",
     "Probation Expiry Date",
     "Deadline to Return to HRD",
     "Probation Form",
@@ -61,7 +62,15 @@ export const ProbationReview = () => {
     const sortedData = data
       ?.filter((item) => {
         // Filter items where probStatus is falsy
-        if (!item.probStatus) {
+        if (!item.probStatus && Array.isArray(item.workStatus) && item.workStatus.length > 0) {
+          const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Get last element
+        
+          if (lastWorkStatus.toUpperCase() === "TERMINATION" || 
+          lastWorkStatus.toUpperCase() === "RESIGNATION" || 
+          lastWorkStatus.toUpperCase() === "ACTIVE") {
+            return false; // Exclude items with TERMINATION or RESIGNATION
+          }   
+        
           const probationEndDates = item.probationEnd || [];
           const lastDate = probationEndDates[probationEndDates.length - 1];
   
@@ -93,6 +102,9 @@ export const ProbationReview = () => {
           : "-",
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
+          : "-",
+          otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
           probationEndDate: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
@@ -148,8 +160,19 @@ export const ProbationReview = () => {
     const filtered = allData
       ?.filter((item) => {
         // Exclude items with probStatus true
-        if (item.probStatus) return false;
-  
+        // if (item.probStatus) return false;
+        if (!Array.isArray(item.workStatus) || item.workStatus.length === 0) {
+          return false; // Return early if workStatus is undefined or an empty array
+      }
+      
+      const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Now it's safe
+      
+      if (lastWorkStatus?.toUpperCase() === "TERMINATION" || 
+      lastWorkStatus?.toUpperCase() === "RESIGNATION"||
+      lastWorkStatus.toUpperCase() === "ACTIVE"
+    ) {
+          return false; // Exclude records with TERMINATION or RESIGNATION
+      }
         const probationEndDates = item.probationEnd || [];
         const lastDate =
           probationEndDates.length > 0
@@ -188,6 +211,9 @@ export const ProbationReview = () => {
           : "-",
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
+          : "-",
+          otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
           probationEnd: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",

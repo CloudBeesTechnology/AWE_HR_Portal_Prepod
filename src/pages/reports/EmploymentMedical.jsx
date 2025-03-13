@@ -22,6 +22,7 @@ export const EmploymentMedical = () => {
     "Department",
     "Other Department",
     "Position",
+    "Other Position",
     "Medical Expiry",
   ]);
 
@@ -97,9 +98,16 @@ export const EmploymentMedical = () => {
   };
 
   const medicalReviewMergedData = (data) => {
+    
     // console.log("Processing medical review data:", data);
 
     const filteringValue = data?.map((val) => {
+      if (Array.isArray(val.workStatus) && val.workStatus.length > 0) {
+        const lastWorkStatus = val.workStatus[val.workStatus.length - 1]; // Get last element
+      
+        if (lastWorkStatus.toUpperCase() === "TERMINATION" || lastWorkStatus.toUpperCase() === "RESIGNATION") {
+          return false; // Exclude vals with TERMINATION or RESIGNATION
+        }}
       if (!val.bruneiME || val?.bruneiME?.length === 0) {
         // console.log("Skipping entry due to missing bruneiME:", val);
         return false;
@@ -128,6 +136,9 @@ export const EmploymentMedical = () => {
       position: Array.isArray(val.position)
         ? val.position[val.position.length - 1]
         : "-",
+        otherPosition: Array.isArray(val.otherPosition)
+          ? val.otherPosition[val.otherPosition.length - 1]
+          : "-",
         medicalExpiryDate: formatDate(medicalExpiryDate) || "-",
       };
 
@@ -157,6 +168,17 @@ export const EmploymentMedical = () => {
     // Use the newly selected date (newDate) to filter data
     const filtered = allData
       .filter((data) => {
+
+        if (!Array.isArray(data.workStatus) || data.workStatus.length === 0) {
+            return false; // Return early if workStatus is undefined or an empty array
+        }
+        
+        const lastWorkStatus = data.workStatus[data.workStatus.length - 1]; // Now it's safe
+        
+        if (lastWorkStatus?.toUpperCase() === "TERMINATION" || lastWorkStatus?.toUpperCase() === "RESIGNATION") {
+            return false; // Exclude records with TERMINATION or RESIGNATION
+        }
+
         const expiryArray = data.bruneiME || [];
         const expiryDate = expiryArray.length ? parseDate(expiryArray[expiryArray.length - 1]) : null;
   
@@ -186,6 +208,9 @@ export const EmploymentMedical = () => {
           : "-",
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
+          : "-",
+          otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
           medicalExpiryDate: formatDate(lastValidDate),
         };

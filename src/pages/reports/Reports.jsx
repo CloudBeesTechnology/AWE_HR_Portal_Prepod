@@ -64,7 +64,7 @@ export const Reports = () => {
   }, []);
 
   // console.log(userType);
-
+  // console.log(userType);
   const reportTiles = [
     { title: "Recruitment & Mobilization", icon: rm, path: "/rm" },
     { title: "Resignation", icon: Resignation, path: "/resignation" },
@@ -108,7 +108,7 @@ export const Reports = () => {
 
     const mergedExampleData = IVSSDetails.map((item1) => {
       const { empID, tempID } = item1;
-
+//hello
       // Step 2: Find matching tempID data in WPTrackings and localMobiliz
       const matchingData2 =
         WPTrackings.find((item2) => item2.tempID === tempID) || {};

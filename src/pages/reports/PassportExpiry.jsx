@@ -18,6 +18,7 @@ export const PassportExpiry = () => {
     "Department",
     "Other Department",
     "Position",
+    "Ohter Position",
     "Passport Expiry",
   ]);
 
@@ -45,6 +46,12 @@ export const PassportExpiry = () => {
     const nextYear = today.getFullYear() + 1;
   
     return data.filter((item) => {
+      if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
+        const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Get last element
+      
+        if (lastWorkStatus.toUpperCase() === "TERMINATION" || lastWorkStatus.toUpperCase() === "RESIGNATION") {
+          return false; // Exclude items with TERMINATION or RESIGNATION
+        }}
       if (!Array.isArray(item.ppExpiry) || item.ppExpiry.length === 0) return false;
   
       const lastExpiryDate = new Date(item.ppExpiry[item.ppExpiry.length - 1]);
@@ -74,6 +81,9 @@ export const PassportExpiry = () => {
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
           : "-",
+          otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
+          : "-",
         ppExpiry: formatDate(item.ppExpiry[item.ppExpiry.length - 1]), // Format the expiry date
         rawExpiryDate: new Date(item.ppExpiry[item.ppExpiry.length - 1]) // Raw date for sorting
       }))
@@ -94,6 +104,15 @@ export const PassportExpiry = () => {
   
     const filtered = allData
       .filter((data) => {
+        if (!Array.isArray(data.workStatus) || data.workStatus.length === 0) {
+          return false; // Return early if workStatus is undefined or an empty array
+      }
+      
+      const lastWorkStatus = data.workStatus[data.workStatus.length - 1]; // Now it's safe
+      
+      if (lastWorkStatus?.toUpperCase() === "TERMINATION" || lastWorkStatus?.toUpperCase() === "RESIGNATION") {
+          return false; // Exclude records with TERMINATION or RESIGNATION
+      }
         const expiryArray = data.ppExpiry || [];
         const expiryDate = expiryArray.length
           ? new Date(expiryArray[expiryArray.length - 1])
@@ -121,6 +140,9 @@ export const PassportExpiry = () => {
           : "-",
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
+          : "-",
+          otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
         ppExpiry: formatDate(item.ppExpiry[item.ppExpiry.length - 1]),
         rawExpiryDate: new Date(item.ppExpiry[item.ppExpiry.length - 1]) // Raw date for sorting

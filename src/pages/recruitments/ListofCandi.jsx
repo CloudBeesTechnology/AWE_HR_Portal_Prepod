@@ -40,6 +40,9 @@ export const ListofCandi = () => {
       (candidate) => !tempIDsToExclude.includes(candidate.tempID) && candidate.status !=="Inactive"
     );
 
+    console.log(allCandidates);
+    
+
     setFilteredData(allCandidates);
     setLoading(false);
   }, [empPDData, IVSSDetails, searchTerm]);

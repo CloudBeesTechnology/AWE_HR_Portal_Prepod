@@ -22,6 +22,7 @@ export const ProbationPDF = ({ userID, userType }) => {
     "Department",
     "Other Department",
     "Position",
+    "Other Position",
     "Probation End Date",
     "Deadline to Return to HRD",
     "Probation Form",
@@ -63,7 +64,14 @@ export const ProbationPDF = ({ userID, userType }) => {
     const filteredData = data
       .filter((item) => {
         // console.log("Processing item:", item);  // Log each item being processed
-    
+        if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
+          const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Get last element
+        
+          if (lastWorkStatus.toUpperCase() === "TERMINATION" || 
+          lastWorkStatus.toUpperCase() === "RESIGNATION"||
+          lastWorkStatus.toUpperCase() === "ACTIVE") {
+            return false; // Exclude items with TERMINATION or RESIGNATION
+          }}
         const isProbationActive = 
           item.probStatus === true && item.probationEnd?.length > 0;
         // console.log("Is probation active:", isProbationActive);  // Log if probation is active
@@ -127,7 +135,12 @@ export const ProbationPDF = ({ userID, userType }) => {
       })
       .map((item) => {
         // console.log("Mapping item:", item);  // Log the item before mapping
-  
+        if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
+          const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Get last element
+        
+          if (lastWorkStatus.toUpperCase() === "TERMINATION" || lastWorkStatus.toUpperCase() === "RESIGNATION") {
+            return false; // Exclude items with TERMINATION or RESIGNATION
+          }   }
         const probationEndDates = item.probationEnd || [];
         const lastDate = probationEndDates[probationEndDates.length - 1];
         // console.log("Last probation end date:", lastDate);  // Log last probation end date
@@ -145,6 +158,9 @@ export const ProbationPDF = ({ userID, userType }) => {
           : "-",
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
+          : "-",
+          otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
           probationEndDate: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
@@ -204,6 +220,18 @@ export const ProbationPDF = ({ userID, userType }) => {
           item.probationEnd &&
           item.probationEnd.length > 0 &&
           (() => {
+            if (!Array.isArray(item.workStatus) || item.workStatus.length === 0) {
+              return false; // Return early if workStatus is undefined or an empty array
+          }
+          
+          const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Now it's safe
+          
+          if (lastWorkStatus?.toUpperCase() === "TERMINATION" || 
+          lastWorkStatus?.toUpperCase() === "RESIGNATION" ||
+          lastWorkStatus.toUpperCase() === "ACTIVE") {
+              return false; // Exclude records with TERMINATION or RESIGNATION
+          }
+         
             const expiryArray = item.probationEnd || [];
             const expiryDate = expiryArray.length
               ? new Date(expiryArray[expiryArray.length - 1])
@@ -235,6 +263,9 @@ export const ProbationPDF = ({ userID, userType }) => {
           : "-",
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
+          : "-",
+          otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
           probationEndDate: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",

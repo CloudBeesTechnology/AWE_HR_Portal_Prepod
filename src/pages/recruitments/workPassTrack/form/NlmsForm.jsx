@@ -23,7 +23,7 @@ export const NlmsForm = ({ candidate }) => {
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [formData, setFormData] = useState({
     interview: {
-      id: "",
+      id: "", 
       nlmssubmitdate: "",
       submissionrefrenceno: "",
       nlmsapprovedate: "",
