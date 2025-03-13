@@ -113,7 +113,7 @@ export const FileUploadField = ({
   const isUploading = isUploadingString?.[fileKey] ?? false;
   const recruitmentStatus = formattedPermissions?.deleteAccess?.[access];
 
-  console.log(isUploading);
+  // console.log(isUploading);
   // console.log("Str", isUploadingString.loiFile);
 
   return (
@@ -334,7 +334,7 @@ export const FileUploadNew = ({
 export const UploadingFiles = ({
   field,
   register,
-  handleFileChange,
+  handleFileChange, 
   uploadedFileNames,
   errors,
   watchedEmpID,
@@ -345,6 +345,7 @@ export const UploadingFiles = ({
   access,
   check,
 }) => {
+  
   // console.log(uploadedFileNames);
 
   return (
@@ -484,7 +485,7 @@ export const FileUploadFieldNew = ({
         <span className="w-full ml-2 text-grey font-normal flex justify-between items-center gap-20 text-sm">
           Upload File <GoUpload className="text-lg" />
         </span>
-      </label>
+      </label> 
       {fileName ? (
         <p className="text-grey text-sm my-1">
           {Array.isArray(fileName) &&

@@ -138,7 +138,7 @@ const LabourImmigration = () => {
     }
 
     setValue(label, [...currentFiles, selectedFile]);
-
+ 
     try {
       updateUploadingState(label, true);
       await uploadDocs(selectedFile, label, setDocsUploaded, watchedEmpID);
@@ -467,6 +467,9 @@ const LabourImmigration = () => {
   const requiredPermissions = ["Medical & Dependent Info"];
 
   const access = "Employee";
+
+  console.log("Up", isUploading);
+  
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}

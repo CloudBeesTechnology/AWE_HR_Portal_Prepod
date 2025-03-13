@@ -51,6 +51,7 @@ export const ListofCandi = () => {
   const EditedData = (editdata) => {
     setEditingData(editdata);
   };
+
   const handleDeleteMsg = () => {
     setdeletePopup(!deletePopup);
   };
@@ -70,6 +71,7 @@ export const ListofCandi = () => {
     setSelectedRows(updatedSelectedRows);
     const selectedTempIDs = updatedSelectedRows.map(
       (rowIndex) => filteredData[rowIndex]?.tempID
+      
     );
   };
 
@@ -90,7 +92,7 @@ export const ListofCandi = () => {
       setTempID(selectedTempID);
     }
   };
-  // console.log(filteredData);
+  console.log(filteredData,"kk6");
   
   const requiredPermissions = ["Candidate"];
 

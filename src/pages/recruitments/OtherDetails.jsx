@@ -9,11 +9,7 @@ import { listPersonalDetails } from "../../graphql/queries";
 import { RecODFunc } from "../../services/createMethod/RecODFunc";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { FileUploadField } from "../employees/medicalDep/FileUploadField";
-
-import {
-  uploadDocs,
-  uploadDocString,
-} from "../../services/uploadsDocsS3/UploadDocs";
+import { uploadReqString } from "../../services/uploadsDocsS3/UploadDocs";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { useTempID } from "../../utils/TempIDContext";
 import { CandyDetails } from "../../services/updateMethod/UpdatePersonalDetails";
@@ -32,10 +28,9 @@ export const OtherDetails = ({ fetchedData }) => {
   const { candyDetails } = CandyDetails();
   const location = useLocation();
   const navigatingEducationData = location.state?.FormData;
-  // console.log(navigatingEducationData);
-  const [deletePopup, setdeletePopup] = useState(false);
-  const [deleteTitle1, setdeleteTitle1] = useState("");
-  const [latestTempIDData, setLatesTempIDData] = useState("");
+  const [deletePopup, setDeletePopup] = useState(false);
+  const [deleteTitle1, setDeleteTitle1] = useState("");
+  const [latestTempIDData, setLatestTempIDData] = useState("");
   const [mergedData, setMergedData] = useState([]);
   const { tempID } = useTempID();
   const { empPDData, educDetailsData } = useContext(DataSupply);
@@ -45,6 +40,7 @@ export const OtherDetails = ({ fetchedData }) => {
     uploadCertificate: false,
     uploadPp: false,
   });
+
   const [uploadedFileNames, setUploadedFileNames] = useState({
     uploadResume: null,
     uploadCertificate: null,
@@ -147,14 +143,10 @@ export const OtherDetails = ({ fetchedData }) => {
               }
             } else if (interviewData[key]) {
               setValue(key, interviewData[key]);
-            } else {
-              // console.log(`No value for key ${key}`);
             }
           });
 
           if (interviewData) {
-            // console.log(interviewData.uploadPp, "poijhgh");
-
             setUploadedFileNames((prev) => ({
               ...prev,
               uploadCertificate: extractFileName(
@@ -170,8 +162,6 @@ export const OtherDetails = ({ fetchedData }) => {
               uploadResume: interviewData.uploadResume,
             }));
           }
-        } else {
-          // console.log("No interview data found for tempID:", tempID);
         }
       }
     }
@@ -179,9 +169,9 @@ export const OtherDetails = ({ fetchedData }) => {
 
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
-      const decodedUrl = decodeURIComponent(url); // Decode URL if it has encoded characters
-      const fileNameWithParams = decodedUrl.split("/").pop(); // Extract the last part after "/"
-      return fileNameWithParams.split("?")[0].split(",")[0].split("#")[0]; // Remove query params, fragments, and other unnecessary parts
+      const decodedUrl = decodeURIComponent(url);
+      const fileNameWithParams = decodedUrl.split("/").pop();
+      return fileNameWithParams.split("?")[0].split(",")[0].split("#")[0];
     }
     return "";
   };
@@ -199,8 +189,6 @@ export const OtherDetails = ({ fetchedData }) => {
 
     setValue(type, file);
 
-    const tempID = navigatingEducationData?.tempID;
-
     const fileTypeMapping = {
       uploadResume: "uploadResume",
       uploadCertificate: "uploadCertificate",
@@ -209,12 +197,6 @@ export const OtherDetails = ({ fetchedData }) => {
 
     if (fileTypeMapping[type]) {
       updateUploadingString(type, true);
-      await uploadDocString(
-        file,
-        fileTypeMapping[type],
-        setUploadedDocs,
-        tempID
-      );
 
       setUploadedFileNames((prev) => ({
         ...prev,
@@ -224,7 +206,7 @@ export const OtherDetails = ({ fetchedData }) => {
   };
 
   const handleDeleteMsg = () => {
-    setdeletePopup(!deletePopup);
+    setDeletePopup(!deletePopup);
   };
 
   const deletedStringUpload = async (fileType, fileName) => {
@@ -251,19 +233,18 @@ export const OtherDetails = ({ fetchedData }) => {
         );
         return;
       }
-      setdeleteTitle1(`${fileName}`);
+      setDeleteTitle1(`${fileName}`);
       handleDeleteMsg();
     } catch (error) {
-      // console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
     }
   };
 
   const getTotalCount = async () => {
-    let totalCount = 0;
-    let nextToken = null;
-
     try {
+      let allTempIDs = [];
+      let nextToken = null;
+
       do {
         const result = await client.graphql({
           query: listPersonalDetails,
@@ -271,37 +252,54 @@ export const OtherDetails = ({ fetchedData }) => {
         });
 
         const items = result?.data?.listPersonalDetails?.items || [];
-        totalCount += items.length;
+        const tempIDs = items.map((val) => val.tempID);
+        allTempIDs = [...allTempIDs, ...tempIDs];
 
         nextToken = result?.data?.listPersonalDetails?.nextToken;
       } while (nextToken);
 
-      return totalCount;
+      const sortedData = allTempIDs.sort((a, b) => {
+        const numA = a.match(/\d+/) ? parseInt(a.match(/\d+/)[0], 10) : 0;
+        const numB = b.match(/\d+/) ? parseInt(b.match(/\d+/)[0], 10) : 0;
+
+        const prefixA = a.replace(/\d+/g, "") || "";
+        const prefixB = b.replace(/\d+/g, "") || "";
+
+        if (prefixA === prefixB) {
+          return numA - numB;
+        }
+        return prefixA.localeCompare(prefixB);
+      });
+
+      return sortedData[sortedData.length - 1] || "TEMP0";
     } catch (error) {
       console.error("Error fetching total count:", error);
-      return 0;
+      return "TEMP0";
     }
   };
 
   const generateNextTempID = (totalCount) => {
-    const nextNumber = totalCount + 1;
-    return String(nextNumber);
+    const prefixMatch = totalCount.match(/[^\d]+/);
+    const prefix = prefixMatch ? prefixMatch[0] : "TEMP";
+    const numberMatch = totalCount.match(/\d+/);
+    const numberPart = numberMatch ? parseInt(numberMatch[0], 10) : 0;
+    const nextNumber = numberPart + 1;
+
+    const numberLength = numberMatch ? numberMatch[0].length : 1;
+    const paddedNextNumber = String(nextNumber).padStart(numberLength, "0");
+
+    return `${prefix}${paddedNextNumber}`;
   };
 
-  useEffect(() => {
-    const fetchNextTempID = async () => {
+  const onSubmit = async (data) => {
+    try {
       const totalCount = await getTotalCount();
       const nextTempID = generateNextTempID(totalCount);
-      setLatesTempIDData(nextTempID);
-    };
-    fetchNextTempID();
-  }, []);
-  // console.log(uploadedDocs);
+      setLatestTempIDData(nextTempID);
 
-  const onSubmit = async (data) => {
-    // console.log(data);
+      const personName = nextTempID;
+console.log(personName);
 
-    try {
       const formattedFamilyDetails = JSON.stringify(
         navigatingEducationData?.familyDetails
       );
@@ -321,6 +319,12 @@ export const OtherDetails = ({ fetchedData }) => {
         navigatingEducationData?.relatives
       );
 
+      const uploadedResume = await uploadReqString(data.uploadResume, "uploadResume", personName);
+      const uploadedCertificate = await uploadReqString(data.uploadCertificate, "uploadCertificate", personName);
+      const uploadedPp = await uploadReqString(data.uploadPp, "uploadPp", personName);
+      const UpProfilePhoto = await uploadReqString(navigatingEducationData.profilePhoto, "profilePhoto", personName);
+      const baseURL = "https://aweadininprod2024954b8-prod.s3.ap-southeast-1.amazonaws.com/";
+
       const reqValue = {
         ...data,
         ...navigatingEducationData,
@@ -330,10 +334,11 @@ export const OtherDetails = ({ fetchedData }) => {
         emgDetails: formattedEmgDetails,
         referees: formattedReferees,
         relatives: formattedRelatives,
-        uploadResume: uploadedDocs.uploadResume,
-        uploadCertificate: uploadedDocs.uploadCertificate,
-        uploadPp: uploadedDocs.uploadPp,
         status: "Active",
+        profilePhoto: UpProfilePhoto?.replace(baseURL, ""),
+        uploadResume: uploadedResume?.replace(baseURL, ""),
+        uploadCertificate: uploadedCertificate?.replace(baseURL, ""),
+        uploadPp: uploadedPp?.replace(baseURL, ""),
       };
 
       const checkingPDTable = empPDData.find(
@@ -349,12 +354,12 @@ export const OtherDetails = ({ fetchedData }) => {
           PDTableID: checkingPDTable.id,
           EDTableID: checkingEDTable.id,
         };
+// console.log({reqValue: updateReqValue});
 
-        // console.log("Updated VALUES", updateReqValue);
         await candyDetails({ reqValue: updateReqValue });
         setNotification(true);
       } else {
-        // console.log("Create VALUES", reqValue);
+        // console.log({reqValue, latestTempIDData});
         await submitODFunc({ reqValue, latestTempIDData });
         setNotification(true);
       }
@@ -364,13 +369,12 @@ export const OtherDetails = ({ fetchedData }) => {
   };
 
   const requiredPermissions = ["Candidate"];
-
   const access = "Recruitment";
 
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)} className="pt-5">
-        <div className=" grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-2 gap-5">
           <div className="mb-4">
             <label className="block text_size_6">
               Number of Years Experience in Applied Position
@@ -496,14 +500,13 @@ export const OtherDetails = ({ fetchedData }) => {
           ></textarea>
         </div>
 
-        {/* File Uploads */}
-        <div className="my-5 ">
+        <div className="my-5">
           <label className="text_size_6">Choose file</label>
-          <div className=" grid grid-cols-3  mt-3 mb-10 gap-5 w-full">
+          <div className="grid grid-cols-3 mt-3 mb-10 gap-5 w-full">
             <div>
               <FileUploadField
                 label="Upload Resume"
-                register={register} // Ensuring register is passed correctly
+                register={register}
                 fileKey="uploadResume"
                 handleFileUpload={handleFileUpload}
                 uploadedFileNames={uploadedFileNames}
@@ -519,7 +522,7 @@ export const OtherDetails = ({ fetchedData }) => {
             <div>
               <FileUploadField
                 label="Qualification Certificate"
-                register={register} // Ensuring register is passed correctly
+                register={register}
                 fileKey="uploadCertificate"
                 handleFileUpload={handleFileUpload}
                 uploadedFileNames={uploadedFileNames}
@@ -535,7 +538,7 @@ export const OtherDetails = ({ fetchedData }) => {
             <div>
               <FileUploadField
                 label="Upload IC / Passport"
-                register={register} // Ensuring register is passed correctly
+                register={register}
                 fileKey="uploadPp"
                 handleFileUpload={handleFileUpload}
                 uploadedFileNames={uploadedFileNames}

@@ -154,16 +154,18 @@ export const EmployeeInsurance = () => {
 
   const handleFileChange = async (e, type, index) => {
     const watchedEmpID = watch("empID");
+    
     if (!watchedEmpID) {
       alert("Please enter the Employee ID before uploading files.");
       window.location.href = "/insuranceAdd";
       return;
     }
+
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
 
     if (uploadedDocs?.empInsUpload?.[index]?.upload) {
-      alert("Please Select Add Upload + button to upload another file");
+      alert(`Please click Add Upload to upload a new one.`);
       e.target.value = "";
       return;
     }
@@ -189,6 +191,7 @@ export const EmployeeInsurance = () => {
         setUploadedDocs,
         watchedEmpID
       );
+
       if (fileUrl) {
         setUploadedDocs((prev) => {
           const updatedUploads = [...prev.empInsUpload];
@@ -202,7 +205,9 @@ export const EmployeeInsurance = () => {
 
         setValue(`empInsUpload[${index}]`, fileUrl);
       }
-    } catch (err) {
+
+    } 
+    catch (err) {
       console.error("Error uploading file:", err);
       alert("An error occurred while uploading the file. Please try again.");
     }
@@ -471,7 +476,7 @@ export const EmployeeInsurance = () => {
                 onClick={() => {
                   if (uploadedDocs?.empInsUpload?.[index]?.upload) {
                     alert(
-                      "Please Select Add Upload + button to upload another file"
+                      "Please click Add Upload to upload a new one."
                     );
                   }
                 }}
@@ -516,7 +521,7 @@ export const EmployeeInsurance = () => {
                 >
                   <MdCancel className="mr-1 text-[red]" />
                 </button>
-              ) : isUploading[index]?.empInsUpload === true &&
+              ) : isUploading[index]?.empInsUpload === true && uploadedDocs.empInsUpload[index]?.upload &&
                 isUploading &&
                 isUploading.length > 0 ? (
                 <button
@@ -554,3 +559,5 @@ export const EmployeeInsurance = () => {
     </section>
   );
 };
+
+

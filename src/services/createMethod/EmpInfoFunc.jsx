@@ -15,7 +15,6 @@ export const EmpInfoFunc = () => {
       }
       const {
         empID,
-
         aTQualify,
         alternateNo,
         agent,

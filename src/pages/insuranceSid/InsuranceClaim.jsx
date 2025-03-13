@@ -4,7 +4,7 @@ import { GoUpload } from "react-icons/go";
 import { ClaimInsuranceSchema } from "../../services/EmployeeValidation";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { claimUploadDocs } from "../../services/uploadsDocsS3/UploadDocs";
+import { uploadDocs, insClaim } from "../../services/uploadsDocsS3/UploadDocs";
 import { InsClaimFun } from "../../services/createMethod/InsClaimFun";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { DataSupply } from "../../utils/DataStoredContext";
@@ -40,7 +40,6 @@ export const InsuranceClaim = () => {
     formState: { errors },
     setValue,
     watch,
-    trigger
   } = useForm({
     resolver: yupResolver(ClaimInsuranceSchema),
     defaultValues: {
@@ -50,6 +49,7 @@ export const InsuranceClaim = () => {
 
   const [inputFields, setInputFields] = useState([{ id: Date.now() }]);
   const [uploadedFileDep, setUploadedFileDep] = useState({});
+  const [fileNames, setFileNames] = useState({});
   const [uploadedDocs, setUploadedDocs] = useState({
     insuranceClaims: [],
   });
@@ -90,65 +90,58 @@ export const InsuranceClaim = () => {
   };
   const watchedEmpID = watch("empID");
 
-const getInsurance = watch("insuranceClaims");
-
-  const handleRemoveFileClick = (index) => {
-    // Remove the insurance claim at the given index
-    const newFields = getInsurance
-    .filter((_, i) => i !== index) // Remove the item at the given index
-    .map((item) => ({ ...item }));
-    // const newFields = insuranceClaims.filter((_, i) => i !== index);
-    setinsuranceClaims(newFields);
-    setValue("insuranceClaims", newFields);
-
-    setUploadedDocs((prevDocs) => {
-      // if (!prevDocs?.insuranceClaims || !(index in prevDocs.insuranceClaims))
-      //   return prevDocs;
-
-      // Step 1: Create an array from the insuranceClaims object, filtering out the selected index
-      const filteredArray = Object.entries(prevDocs?.insuranceClaims)
-        .filter(([key]) => Number(key) !== index)
-        .map(([, value]) => value); // Keep only values (arrays of file objects)
-
-      // Step 2: Reconstruct the insuranceClaims object with new sequential keys
-      const reindexedInsuranceClaims = filteredArray?.reduce(
-        (acc, item, newIndex) => {
-          acc[newIndex] = item;
-          return acc;
-        },
-        {}
-      );
-    
-      // Step 3: Return the updated state
-      return { ...prevDocs, insuranceClaims: reindexedInsuranceClaims };
+  const handleRemoveFileClick = async (index) => {
+    setinsuranceClaims((prevClaims) => {
+      const newClaims = prevClaims.filter((_, i) => i !== index);
+      // console.log(newClaims, "Updated insuranceClaims");
+      return newClaims;
     });
-    trigger("insuranceClaims");
+    // console.log(newFields, "95462");
+    setValue("insuranceClaims", (prevClaims) =>
+      prevClaims.filter((_, i) => i !== index)
+    );
+    setUploadedFileDep((prev) => {
+      const updatedDepFiles = { ...prev };
+      Object.keys(updatedDepFiles).forEach((key) => {
+        if (key.startsWith(`${index}_`)) {
+          delete updatedDepFiles[key];
+        }
+      });
+      return updatedDepFiles;
+    });
 
+    // Remove from fileNames
+    setFileNames((prev) => {
+      const updatedFileNames = { ...prev };
+      Object.keys(updatedFileNames).forEach((key) => {
+        if (key.startsWith(`${index}_`)) {
+          delete updatedFileNames[key];
+        }
+      });
+      return updatedFileNames;
+    });
 
-    const fullPath = insuranceClaims[index]?.fileName;
-    if (fullPath) {
-      const fileName = fullPath.split("/").pop();
-      
-      handleDeleteFile("insuranceClaims", fileName, watchedEmpID);
-    }
-    const filterAndReindex = (prev, index) =>
-      Array.isArray(prev)
-        ? prev
-            .filter((item) => item?.ind !== index)
-            .map((val, inx) => ({ ...val, ind: inx }))
-        : [];
+    // Remove from uploadedDocs
+    setUploadedDocs((prev) => {
+      const updatedDocs = { ...prev };
 
-    setIsUploading((prev) => filterAndReindex(prev, index));
-    setUploadedFileDep((prev) => filterAndReindex(prev, index));
+      // Ensure `insuranceClaims` exists
+      if (updatedDocs.insuranceClaims) {
+        delete updatedDocs.insuranceClaims[index]; // Remove the specific index
+      }
+
+      return updatedDocs;
+    });
   };
 
   const updateUploadingState = (label, value, idx) => {
     setIsUploading((prev) => ({
       ...prev,
-      [idx]: value,
+      [`${idx}_${label}`]: value,
     }));
     // console.log(idx, value);
   };
+
   const handleFileChange = async (e, type, index) => {
     if (!watchedEmpID) {
       alert("Please enter the Employee ID before uploading files.");
@@ -167,31 +160,24 @@ const getInsurance = watch("insuranceClaims");
     if (!allowedTypes.includes(selectedFile.type)) {
       alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
       return;
-
-
     }
 
     setValue(`insuranceClaims[${index}].claimUpload`, selectedFile);
     try {
       updateUploadingState(type, true, index);
-      await claimUploadDocs(
-        selectedFile,
-        type,
-        setUploadedDocs,
-        watchedEmpID,
-        index
-      );
+      await insClaim(selectedFile, type, setUploadedDocs, watchedEmpID, index);
       setUploadedFileDep((prev) => ({
         ...prev,
-        [index]: selectedFile.name,
+        [`${index}_${type}`]: [selectedFile.name],
       }));
     } catch (err) {
       console.log(err);
     }
   };
+  const claimUp = "insuranceClaims";
   // console.log(isUploading);
   const searchResult = (result) => {
-    // console.log(result, "result");
+    console.log(result, "result");
     setValue("empID", result?.empID);
     const insuranceClaimsData = result?.insuranceClaims;
     // console.log(insuranceClaimsData);
@@ -259,12 +245,20 @@ const getInsurance = watch("insuranceClaims");
                 //   [idx]: parsedFiles,
                 // }));
 
-                setUploadedFileDep((prev) => ({
+                // setUploadedFileDep((prev) => ({
+                //   ...prev,
+                //   [idx]:
+                //     parsedFiles.length > 0
+                //       ? getFileName(parsedFiles[parsedFiles.length - 1].upload)
+                //       : "",
+                // }));
+                const fileNames = parsedFiles.map((file) =>
+                  file && file.upload ? getFileName(file.upload) : ""
+                );
+
+                setFileNames((prev) => ({
                   ...prev,
-                  [idx]:
-                    parsedFiles.length > 0
-                      ? getFileName(parsedFiles[parsedFiles.length - 1].upload)
-                      : "",
+                  [`${idx}_${claimUp}`]: fileNames,
                 }));
               } catch (innerError) {
                 console.error(
@@ -293,9 +287,7 @@ const getInsurance = watch("insuranceClaims");
   const handleDeleteMsg = () => {
     setdeletePopup(!deletePopup);
   };
-  const handleDeleteMethod = async (fileType, fileName, index) => {
-    // console.log(fileName, index);
-
+  const handleDeleteMethod = async (fileType, fileName, index, field) => {
     try {
       if (!watchedEmpID) {
         alert("Please provide the Employee ID before deleting files.");
@@ -314,9 +306,11 @@ const getInsurance = watch("insuranceClaims");
         fileName,
         watchedEmpID,
         setUploadedFileDep,
+        setFileNames,
         setUploadedDocs,
         uploadedDocs,
         index,
+        field,
         setIsUploading
       );
 
@@ -354,7 +348,7 @@ const getInsurance = watch("insuranceClaims");
             return {
               ...insurance,
               claimUpload:
-                JSON.stringify(uploadedDocs?.insuranceClaims?.[index]) || [], // Dynamically assign uploaded files for each index
+                JSON.stringify(uploadedDocs?.insuranceClaims?.[index]) || [], 
             };
           }),
           id: checkingDITable.id,
@@ -370,7 +364,7 @@ const getInsurance = watch("insuranceClaims");
             return {
               ...insurance,
               claimUpload:
-                JSON.stringify(uploadedDocs.insuranceClaims[index]) || [], // Dynamically assign uploaded files for each index
+                JSON.stringify(uploadedDocs.insuranceClaims[index]) || [], 
             };
           }),
         };
@@ -387,6 +381,45 @@ const getInsurance = watch("insuranceClaims");
   const requiredPermissions = ["Insurance"];
 
   const access = "Insurance";
+
+  // console.log("Unames", uploadedFileDep);
+  // console.log("Fnames", fileNames);
+  // console.log("upDoc", uploadedDocs);
+  // console.log("isUp",isUploading);
+  // const parsedClaims = insuranceClaims
+  //   ?.filter((item) => item !== null && item !== undefined) // Remove null/undefined
+  //   ?.flatMap((item) => {
+  //     try {
+  //       return typeof item === "string" ? JSON.parse(item) : item; // Parse JSON if string
+  //     } catch (error) {
+  //       console.error("Error parsing JSON:", error);
+  //       return []; // Return empty array if JSON parsing fails
+  //     }
+  //   })
+  //   ?.filter(
+  //     (field) =>
+  //       field &&
+  //       Object.values(field).some(
+  //         (value) =>
+  //           value !== "" &&
+  //           value !== null &&
+  //           value !== undefined &&
+  //           !(Array.isArray(value) && value?.length === 0)
+  //       )
+  //   );
+  const parsedClaims = insuranceClaims
+    ?.map((entry) => {
+      try {
+        // Parse only if entry is a string
+        return typeof entry === "string" ? JSON.parse(entry) : entry;
+      } catch (error) {
+        console.error("Error parsing claims:", error);
+        return null;
+      }
+    })
+    .flat() // Flatten if entries contain nested arrays
+    .filter((item) => item && typeof item === "object"); // Remove null values
+  console.log(parsedClaims);
 
   return (
     <div
@@ -430,145 +463,168 @@ const getInsurance = watch("insuranceClaims");
           <FiPlusSquare className="mr-1" />
         </button>
 
-        {insuranceClaims &&
-          insuranceClaims.length > 0 &&
-          insuranceClaims
-            .filter((field) =>
-              Object.values(field).some(
-                (value) =>
-                  value !== "" &&
-                  value !== null &&
-                  value !== undefined &&
-                  !(Array.isArray(value) && value.length === 0)
-              )
-            )
-            .map((field, index) => (
-              <div key={index} className="flex flex-col gap-5 border-b py-10">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <FormField
-                    label="Type of Insurance Claim"
-                    register={register}
-                    name={`insuranceClaims[${index}].claimType`}
-                    type="select"
-                    options={insuClaimDD}
-                    errors={errors.insuranceClaims?.[index]}
-                  />
-
-                  <div>
-                    <label className="mb-1 text_size_6">
-                      Insurance Claim For
-                    </label>
-                    <select
-                      {...register(`insuranceClaims[${index}].claimInfo`)}
-                      className="input-field select-custom"
-                    >
-                      <option value=""></option>
-                      <option value="Employee">Employee</option>
-                      <option value="Spouse">Spouse</option>
-                      <option value="Child">Child</option>
-                    </select>
-                    {errors.insuranceClaims?.[index]?.depenInfo && (
-                      <p className="text-[red] text-xs mt-1">
-                        {errors.insuranceClaims[index].depenInfo.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <InsClainOne
+        {parsedClaims?.length > 0 &&
+          parsedClaims?.map((field, index) => 
+         {
+          console.log(field);
+          
+          return   (
+            <div key={index} className="flex flex-col gap-5 border-b py-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <FormField
+                  label="Type of Insurance Claim"
                   register={register}
-                  errors={errors}
-                  index={index}
+                  name={`insuranceClaims[${index}].claimType`}
+                  type="select"
+                  options={insuClaimDD}
+                  errors={errors.insuranceClaims?.[index]}
                 />
 
-                <div className="grid grid-cols-3 gap-10">
-                  <div className="">
-                    <label
-                      onClick={() => {
-                        if (isUploading[index]) {
-                          alert(
-                            "Delete already uploaded Files or save an uploaded file."
-                          );
-                        }
-                      }}
-                      className="flex items-center  px-3 py-3 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer"
-                    >
-                      <input
-                        type="file"
-                        {...register(`insuranceClaims[${index}].claimUpload`)}
-                        onChange={(e) =>
-                          handleFileChange(e, "insuranceClaims", index)
-                        }
-                        accept="application/pdf"
-                        className="hidden"
-                        disabled={isUploading[index]}
-                      />
-                       <span className="ml-2  w-full font-normal flex justify-between items-center gap-10">
-                       Upload
+                <div>
+                  <label className="mb-1 text_size_6">
+                    Insurance Claim For
+                  </label>
+                  <select
+                    {...register(`insuranceClaims[${index}].claimInfo`)}
+                    className="input-field select-custom"
+                  >
+                    <option value=""></option>
+                    <option value="Employee">Employee</option>
+                    <option value="Spouse">Spouse</option>
+                    <option value="Child">Child</option>
+                  </select>
+                  {errors.insuranceClaims?.[index]?.depenInfo && (
+                    <p className="text-[red] text-xs mt-1">
+                      {errors.insuranceClaims[index].depenInfo.message}
+                    </p>
+                  )}
+                </div>
+              </div>
 
+              <InsClainOne register={register} errors={errors} index={index} />
+
+              <div className="grid grid-cols-3 gap-10">
+                <div className="">
+                  <label
+                    onClick={() => {
+                      if (isUploading?.[`${index}_insuranceClaims`]) {
+                        alert(
+                          "Please delete the previously uploaded file before uploading a new one."
+                        );
+                      }
+                    }}
+                    className="flex items-center  px-3 py-3 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer"
+                  >
+                    <input
+                      type="file"
+                      {...register(`insuranceClaims[${index}].claimUpload`)}
+                      onChange={(e) =>
+                        handleFileChange(e, "insuranceClaims", index)
+                      }
+                      accept="application/pdf"
+                      className="hidden"
+                      disabled={isUploading?.[`${index}_insuranceClaims`]}
+                    />
+                    <span className="ml-2  w-full font-normal flex justify-between items-center gap-10">
+                      Upload
                       <GoUpload />
                     </span>
-                                           
-                    </label>
-                    <div className="flex items-center justify-between">
-                      <p className="text-secondary text-xs pt-1">
-                        {uploadedFileDep[index]}
+                  </label>
+                  <div className="flex items-center justify-between ">
+                    {uploadedFileDep?.[`${index}_insuranceClaims`] ? (
+                      <p className="text-grey text-sm my-1">
+                        {Array.isArray(
+                          uploadedFileDep[`${index}_insuranceClaims`]
+                        ) &&
+                          uploadedFileDep[`${index}_insuranceClaims`]
+                            .slice()
+                            .reverse()
+                            .map((file, fileIndex) => (
+                              <span
+                                key={fileIndex}
+                                className="mt-2 flex justify-between items-center"
+                              >
+                                {file}
+                                {/* Optional console log for debugging */}
+                                {/* {console.log(formattedPermissions?.deleteAccess)} */}
+                                <button
+                                  type="button"
+                                  className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                                  onClick={() => {
+                                    handleDeleteMethod(
+                                      "insuranceClaims",
+                                      file,
+                                      index
+                                    );
+                                  }}
+                                >
+                                  <MdCancel />
+                                </button>
+                              </span>
+                            ))}
                       </p>
-                      {uploadedFileDep[index] &&
-                      formattedPermissions?.deleteAccess?.[access]?.some(
-                        (permission) => requiredPermissions.includes(permission)
-                      ) ? (
-                        <button
-                          type="button"
-                          className=" text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-                          onClick={() =>
-                            handleDeleteMethod(
-                              "insuranceClaims",
-                              uploadedFileDep[index],
-                              index
-                            )
-                          }
-                        >
-                          <MdCancel />
-                        </button>
-                      ) : isUploading[index] ? (
-                        <button
-                          type="button"
-                          className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-                          onClick={() =>
-                            handleDeleteMethod(
-                              "insuranceClaims",
-                              uploadedFileDep[index],
-                              index
-                            )
-                          }
-                        >
-                          <MdCancel />
-                        </button>
-                      ) : (
-                        ""
-                      )}
-                    </div>
-                    {errors?.claimUpload && (
-                      <p className="text-red text-sm">
-                        {errors.claimUpload.message}
-                      </p>
+                    ) : (
+                      fileNames?.[`${index}_insuranceClaims`] && (
+                        <p className="text-grey text-sm my-1">
+                          {Array.isArray(
+                            fileNames[`${index}_insuranceClaims`]
+                          ) &&
+                            fileNames[`${index}_insuranceClaims`]
+                              .slice()
+                              .reverse()
+                              .map((file, fileIndex) => (
+                                <span
+                                  key={fileIndex}
+                                  className="mt-2 flex justify-between items-center"
+                                >
+                                  {file}
+                                  {formattedPermissions?.deleteAccess?.[
+                                    access
+                                  ]?.some((permission) =>
+                                    requiredPermissions.includes(permission)
+                                  ) && (
+                                    <button
+                                      type="button"
+                                      className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                                      onClick={() => {
+                                        handleDeleteMethod(
+                                          "insuranceClaims",
+                                          file,
+                                          index
+                                        );
+                                      }}
+                                    >
+                                      <MdCancel />
+                                    </button>
+                                  )}
+                                </span>
+                              ))}
+                        </p>
+                      )
                     )}
                   </div>
-                </div>
 
-                {/* Remove button for individual fields */}
-                {index > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveFileClick(index)}
-                    className="text-red mt-2  flex justify-end items-end text-[25px]"
-                  >
-                    <FiMinusSquare />
-                  </button>
-                )}
+                  {errors?.claimUpload && (
+                    <p className="text-red text-sm">
+                      {errors.claimUpload.message}
+                    </p>
+                  )}
+                </div>
               </div>
-            ))}
+
+              {/* Remove button for individual fields */}
+              {index > 0 && (
+                <button
+                  type="button"
+                  onClick={() => handleRemoveFileClick(index)}
+                  className="text-red mt-2  flex justify-end items-end text-[25px]"
+                >
+                  <FiMinusSquare />
+                </button>
+              )}
+            </div>
+          )
+         })}
 
         <div className="md:col-span-2 flex justify-center mt-10">
           <button type="submit" className="primary_btn">

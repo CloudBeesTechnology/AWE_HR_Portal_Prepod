@@ -11,17 +11,9 @@ import { getUrl } from "@aws-amplify/storage";
 import { useTempID } from "../../utils/TempIDContext";
 import avatar from "../../assets/navabar/avatar.jpeg";
 
-import {
-  ContractTypeDD,
-  GenderDD, 
-  MaritalDD,
-  NationalityDD,
-  RaceDD,
-  ReligionDD,
-} from "../../utils/DropDownMenus";
 
 export const ApplicantDetails = () => {
-  const { empPDData } = useContext(DataSupply);
+  const { empPDData,dropDownVal,educDetailsData} = useContext(DataSupply);
   const { tempID } = useTempID();
   const location = useLocation();
   const navigate = useNavigate();
@@ -32,6 +24,12 @@ export const ApplicantDetails = () => {
       behavior: "smooth",
     });
   }, []);
+
+  const religionDD = dropDownVal[0]?.religionDD || [];
+  const raceDD = dropDownVal[0]?.raceDD || [];
+  const nationalityDD = dropDownVal[0]?.nationalityDD || [];
+  
+
   const {
     register,
     handleSubmit,
@@ -46,6 +44,7 @@ export const ApplicantDetails = () => {
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
   const [profilePreview, setProfilePreview] = useState("");
+  const [uploadedFileNames, setUploadedFileNames] = useState({ profilePhoto: null });
 
   const linkToImageFile = async (pathUrl) => {
     const result = await getUrl({
@@ -65,7 +64,6 @@ export const ApplicantDetails = () => {
       Object.keys(savedData).forEach(async (key) => {
         if (key === "profilePhoto" && savedData[key]) {
           try {
-       
             const result = await getUrl({ path: savedData[key] });
             const imageUrl = result.url.toString();
             setProfilePreview(imageUrl);
@@ -90,30 +88,6 @@ export const ApplicantDetails = () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [location, setValue]);
-  
-
-  // useEffect(() => {
-  //   if (tempID && empPDData.length > 0) {
-  //     const interviewData = empPDData.find((data) => data.tempID === tempID);
-  //     if (interviewData) {
-  //       console.log(interviewData);
-        
-  //       Object.keys(interviewData).forEach((key) => {
-  //         if (interviewData[key]) {
-  //           setValue(key, interviewData[key]);
-  //         }
-  //       });
-
-  //       if (interviewData.profilePhoto) {
-  //         setUploadedDocs((prev) => ({
-  //           ...prev,
-  //           profilePhoto: interviewData.profilePhoto,
-  //         }));
-  //         setValue("profilePhoto", interviewData.profilePhoto);
-  //       }
-  //     }
-  //   }
-  // }, [empPDData, tempID, setValue]);
 
   useEffect(() => {
     const parseDetails = (data) => {
@@ -193,20 +167,32 @@ export const ApplicantDetails = () => {
     } 
   }, [tempID, setValue, empPDData]); 
 
-  const handleFileChange = async (e) => {
+  const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
 
-    if (selectedFile) {
-      
-      setProfilePhoto(selectedFile);
-      setValue("profilePhoto", selectedFile);
-      await uploadDocString(
-        selectedFile,
-        "profilePhoto",
-        setUploadedDocs,
-        "Employee"
-      );
+    if (!selectedFile) return;
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be an image (JPG, JPEG, PNG)");
+      return;
     }
+
+    setProfilePhoto(selectedFile);
+    setValue("profilePhoto", selectedFile);
+// console.log(selectedFile,"selectedFile");
+
+    setUploadedFileNames((prev) => ({
+      ...prev,
+      profilePhoto: selectedFile.name,
+    }));    
+
+    const savedData = JSON.parse(localStorage.getItem("applicantFormData")) || {};
+    savedData.profilePhoto = selectedFile.name;
+    // console.log( savedData.profilePhoto,"saveData");
+    // console.log(selectedFile.name,"selectedFile.name");
+    
+    
+    localStorage.setItem("applicantFormData", JSON.stringify(savedData));
   };
 
   useEffect(() => {
@@ -221,7 +207,8 @@ export const ApplicantDetails = () => {
     try {
       const applicationUpdate = {
         ...data,
-        profilePhoto: uploadedDocs.profilePhoto,
+        profilePhoto:profilePhoto,
+        uploadedFileNames: uploadedFileNames.profilePhoto,
       };
 
       localStorage.setItem(
@@ -329,90 +316,42 @@ export const ApplicantDetails = () => {
             )}
           </div>
         </div>
-
-        <div className="grid grid-cols-2 gap-x-12 gap-y-5 mb-4 text_size_6">
+        
+<div className="grid  md:grid-cols-2 gap-x-12 gap-y-5 my-4 text_size_6">
           {[
-            {
-              label: "Contract Type",
-              name: "contractType",
-              type: "select",
-              options: ContractTypeDD,
-            },
-            { label: "CV Received From", name: "agent", type: "text" },
-
+            { label: "Contract Type", name: "contractType",  type: "select", options: ["Local","LPA","SAWP"]},
+            { label: "Agent", name: "agent", type: "text" },
             { label: "Name", name: "name", type: "text" },
-            {
-              label: "Chinese characters (if applicable)",
-              name: "chinese",
-              type: "text",
-            },
-            {
-              label: "Gender",
-              name: "gender",
-              type: "select",
-              options: GenderDD,
-            },
+            { label: "Chinese characters (if applicable)", name: "chinese", type: "text" },
+            { label: "Gender", name: "gender", type: "select", options: ["Male", "Female"] },
             { label: "Date of Birth", name: "dob", type: "date" },
-            { label: "Age", name: "age", type: "number", min: 20, max: 99 }, 
+            { label: "Age", name: "age", type: "number", min: 20, max: 99 },  // Modified for age input
             { label: "Email ID", name: "email", type: "email" },
-            {
-              label: "Marital Status",
-              name: "marital",
-              type: "select",
-              options: MaritalDD,
-            },
+            { label: "Marital Status", name: "marital", type: "select", options: ["Single", "Married", "Widow", "Separate", "Divorce"] },
             { label: "Country of Birth", name: "cob", type: "text" },
-            {
-              label: "Nationality",
-              name: "nationality",
-              type: "select",
-              options: NationalityDD,
-            },
-            {
-              label: "Other Nationality",
-              name: "otherNation",
-              type: "text",
-              disabled: watch("nationality")?.toLowerCase() !== "other",
-            },
-            {
-              label: "Race",
-              name: "race",
-              type: "select",
-              options: RaceDD,
-            },
-            {
-              label: "Other Race",
-              name: "otherRace",
-              type: "text",
-              disabled: watch("race")?.toLowerCase() !== "other",
-            },
-            {
-              label: "Religion",
-              name: "religion",
-              type: "select",
-              options: ReligionDD,
-            },
-            {
-              label: "Other Religion",
-              name: "otherReligion",
-              type: "text",
-              disabled: watch("religion")?.toLowerCase() !== "other",
-            },
+            { label: "Nationality", name: "nationality", type: "select", options: nationalityDD },
+            { label: "Other Nationality", name: "otherNation", type: "text", disabled: watch("nationality")?.toLowerCase() !== "other" },
+            { label: "Race", name: "race", type: "select", options: raceDD },
+            { label: "Other Race", name: "otherRace", type: "text", disabled: watch("race")?.toLowerCase() !== "other" },
+            { label: "Religion", name: "religion", type: "select", options: religionDD },
+            { label: "Other Religion", name: "otherReligion", type: "text", disabled: watch("religion")?.toLowerCase() !== "others" },
+
           ].map((field, index) => (
             <div key={index}>
               <label className="block">{field.label}</label>
               {field.type === "select" ? (
-                <select
-                  {...register(field.name)}
-                  className="mt-2 p-2.5 text_size_7 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full"
-                >
-                  <option value=""></option>
-                  {(field.options || []).map((option, i) => (
-                    <option key={i} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+               <select
+               {...register(field.name)}
+               className="input-field select-custom"
+             >
+               <option value="">Select</option> {/* Ensure default empty option */}
+               {(field.options || []).map((option, i) => (
+                 <option key={i} value={option}>
+                   {option}
+                 </option>
+               ))}
+             </select>             
+                
               ) : (
                 <input
                   {...register(field.name)}
@@ -420,13 +359,11 @@ export const ApplicantDetails = () => {
                   disabled={field.disabled}
                   min={field.min}
                   max={field.max}
-                  className="mt-2 p-2 text_size_7 bg-lite_skyBlue border border-[#dedddd] text-dark_grey   outline-none rounded w-full"
-                /> 
+                  className="input-field"
+                /> // border border-[#EAEAEA]
               )}
               {errors[field.name] && (
-                <p className="text-[red] text-[13px]">
-                  {errors[field.name]?.message}
-                </p>
+                <p className="text-[red] text-[13px]">{errors[field.name]?.message}</p>
               )}
             </div>
           ))}
