@@ -155,6 +155,7 @@ export const ViewSummary = () => {
     ProcessedDataFunc
   );
 
+
   useEffect(() => {
     if (startDate) {
       setGetStartDate(new Date(startDate.replace(/-/g, "/")));
