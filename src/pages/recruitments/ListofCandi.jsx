@@ -88,14 +88,33 @@ export const ListofCandi = () => {
     "Contact",
   ];
 
+  // const getTemp = () => {
+  //   if (selectedRows.length === 1) {
+  //     const selectedTempID = filteredData[selectedRows[0]]?.tempID;
+  //     setCandidate(selectedTempID);
+  //     setTempID(selectedTempID);
+  //   }
+  // };
+  // console.log(filteredData,"kk6");
   const getTemp = () => {
+    console.log("Function getTemp called.");
+    
     if (selectedRows.length === 1) {
+      console.log("Selected row length is 1.");
+      
       const selectedTempID = filteredData[selectedRows[0]]?.tempID;
+      console.log("Selected TempID:", selectedTempID);
+      
       setCandidate(selectedTempID);
+      console.log("Candidate set to:", selectedTempID);
+      
       setTempID(selectedTempID);
+      console.log("TempID set to:", selectedTempID);
+    } else {
+      console.log("Selected rows length is not 1. Length:", selectedRows.length);
     }
   };
-  console.log(filteredData,"kk6");
+  
   
   const requiredPermissions = ["Candidate"];
 

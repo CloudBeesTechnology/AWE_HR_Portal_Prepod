@@ -20,6 +20,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
   const [notification, setNotification] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [notiText, setNotiText] = useState("")
     // const {
     //   register,
     //   handleSubmit,
@@ -176,7 +177,8 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
               FROM_ADDRESS,
               TO_ADDRESS
             );
-            setIsLoading(false);
+            setNotiText("Canditate Rejected Successfully.")
+           
             setTimeout(() => {
               setNotification(true);
             }, 300);
@@ -200,13 +202,16 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             });
 
             // console.log("Res", response);
-            
+             setIsLoading(false);
             await sendEmail(
               REJECTED_CANDY_SUB,
               REJECTED_CANDY_MSG,
               FROM_ADDRESS,
               TO_ADDRESS
             );
+
+            setIsLoading(false);
+            setNotiText("Canditate Rejected Successfully.")
             setTimeout(() => {
               setNotification(true);
             }, 300);
@@ -280,6 +285,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
 
           setIsLoading(false);
 
+          setNotiText("Candidate Selected Successfully")
           setTimeout(() => {
             setNotification(true);
           }, 300);
@@ -604,7 +610,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
 
             {notification && (
               <SpinLogo
-                text="Candidate Selected Successfully"
+                text={notiText}
                 notification={notification}
                 path="/recrutiles/status"
               />
