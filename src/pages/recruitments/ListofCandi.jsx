@@ -101,6 +101,7 @@ export const ListofCandi = () => {
   const requiredPermissions = ["Candidate"];
 
   const access = "Recruitment";
+  
   return (
     <section className="screen-size min-h-screen w-full my-5">
       <div className="mb-8 flex justify-between items-center">
