@@ -1,16 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useForm } from "react-hook-form";
 import AweLogo from "../../assets/logo/logo-with-name.svg";
 import { ScheduleInter } from "./Form/ScheduleInter";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { updateInterviewSchedule, updatePersonalDetails } from "../../graphql/mutations";
 import { generateClient } from "@aws-amplify/api";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { getUrl } from "@aws-amplify/storage";
 import { sendEmail } from "../../services/EmailServices";
-import { ReviewFormSchema } from "../../services/Validation";
-
 
 const client = generateClient();
 
@@ -20,13 +16,8 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
   const [notification, setNotification] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-    // const {
-    //   register,
-    //   handleSubmit,
-    //   formState: { errors },
-    // } = useForm({
-    //   resolver: yupResolver(ReviewFormSchema),
-    // });
+  const [notiText, setNotiText] = useState("")
+  const [pathText, setPathText] = useState("");
 
   const handleScheduleInterview = () => {
     setIsScheduleOpen(true);
@@ -35,81 +26,6 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
   const closeScheduleInterview = () => {
     setIsScheduleOpen(false);
   };
-
-  // console.log("hey buddy", personalDetails);
-
-  // const handleRejected = async (dataCandi) => {
-  //   console.log(dataCandi);
-    
-  //   const REJECTED_CANDY_SUB = `Candidate Rejection Notification:`;
-  //   const REJECTED_CANDY_MSG = `
-  //   <html>
-  //     <body>
-  //       <p>Subject: Candidate Rejection Update Position:– ${dataCandi[0]?.position}</p>    
-  //       <p>Dear HR,</p>    
-  //       <p>After careful evaluation, the following candidates have been rejected for the position: <strong>${dataCandi[0]?.position}</strong>.</p>
-  //       <p>Candidate name: <strong>${dataCandi[0]?.name}.</strong></p>
-  //       <p>Best regards,<br>HR Team.</p>
-  //     </body>
-  //   </html>
-  // `;
-
-  //   const FROM_ADDRESS = "hr_no-reply@adininworks.com";
-  //   const TO_ADDRESS = "Hr-notification@adininworks.com";
-
-  //   try {
-  //     if (!Array.isArray(dataCandi)) {
-  //       throw new Error("dataCandi must be an array.");
-  //     }
-
-  //     const matchTempIDs = dataCandi.map((val) => {
-  //       return IVSSDetails?.find((match) => val.tempID === match?.tempID);
-  //     });
-
-  //     const validMatches = matchTempIDs.filter((item) => item?.id);
-
-  //     if (validMatches.length === 0) {
-  //       console.error("No matching candidates found.");
-  //       return;
-  //     }
-
-  //     for (const match of validMatches) {
-  //       const data = {
-  //         id: match.id,
-  //         candidateStatus: "Rejected",
-  //         status: "Rejected"
-  //       };
-
-  //       try {
-  //         setIsLoading(true);
-
-  //         const response = await client.graphql({
-  //           query: updateInterviewSchedule,
-  //           variables: { input: data },
-  //         });
-
-  //         await sendEmail(
-  //           REJECTED_CANDY_SUB,
-  //           REJECTED_CANDY_MSG,
-  //           FROM_ADDRESS,
-  //           TO_ADDRESS
-  //         );
-
-  //         setIsLoading(false);
-  //         setTimeout(() => {
-  //           setNotification(true);
-  //         }, 100);
-  //       } catch (err) {
-  //         console.error("Error updating candidate ID", match.id, ":", err);
-  //       }
-  //     }
-
-  //     onClose();
-  //   } catch (err) {
-  //     console.error("Error in handleRejected function:", err);
-  //     // setEmailSuccessMessage("Failed to send email. Please try again later.");
-  //   }
-  // };
 
   const handleRejected = async (dataCandi) => {
 
@@ -176,7 +92,9 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
               FROM_ADDRESS,
               TO_ADDRESS
             );
-            setIsLoading(false);
+            setNotiText("Canditate Rejected Successfully.")
+            setPathText("/recrutiles/status")
+           
             setTimeout(() => {
               setNotification(true);
             }, 300);
@@ -200,13 +118,18 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             });
 
             // console.log("Res", response);
-            
+             setIsLoading(false);
             await sendEmail(
               REJECTED_CANDY_SUB,
               REJECTED_CANDY_MSG,
               FROM_ADDRESS,
               TO_ADDRESS
             );
+
+            setIsLoading(false);
+            setNotiText("Canditate Rejected Successfully.");
+            setPathText("/recrutiles/listofcandi")
+
             setTimeout(() => {
               setNotification(true);
             }, 300);
@@ -280,6 +203,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
 
           setIsLoading(false);
 
+          setNotiText("Candidate Selected Successfully")
           setTimeout(() => {
             setNotification(true);
           }, 300);
@@ -604,9 +528,9 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
 
             {notification && (
               <SpinLogo
-                text="Candidate Selected Successfully"
+                text={notiText}
                 notification={notification}
-                path="/recrutiles/status"
+                path={pathText}
               />
             )}
           </div>

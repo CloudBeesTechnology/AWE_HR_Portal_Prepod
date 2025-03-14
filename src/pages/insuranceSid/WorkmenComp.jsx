@@ -82,8 +82,8 @@ export const WorkmenComp = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, "0"); // Adds leading zero if day is single digit
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // getMonth() returns 0-11, so we add 1
+    const day = date.getDate().toString().padStart(2, "0"); 
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
 
     return `${day}/${month}/${year}`;
@@ -92,9 +92,9 @@ export const WorkmenComp = () => {
   const linkToStorageFile = async (pathUrl) => {
     try {
       const result = await getUrl({ path: pathUrl });
-      //   console.log("File URL:", result.url.href); // Use .href to extract the URL as a string
-      setPPLastUP(result.url.href); // Store the URL as a string
-      setViewingDocument(pathUrl); // Update the state to show the selected document
+  
+      setPPLastUP(result.url.href); 
+      setViewingDocument(pathUrl); 
     } catch (error) {
       console.error("Error fetching the file URL:", error);
     }
@@ -106,7 +106,7 @@ export const WorkmenComp = () => {
       if (Array.isArray(parsedData)) {
         return parsedData.map((doc) => {
           if (doc.upload) {
-            doc.fileName = doc.upload.split("/").pop(); // Extract file name from path
+            doc.fileName = doc.upload.split("/").pop(); 
           }
           return doc;
         });
@@ -250,7 +250,6 @@ export const WorkmenComp = () => {
   }, []);
 
   const searchResult = (result) => {
-    console.log("RW", result);
     setSearchResultData(result);
   };
 
@@ -276,45 +275,43 @@ export const WorkmenComp = () => {
   };
 
   useEffect(() => {
-    setValue("id", searchResultData.id);
-    setValue("empStatusType", searchResultData.empStatusType);
-    setValue("workmenComUp", searchResultData.workmenComUp);
-    setValue("workmenCompExp", searchResultData.workmenCompExp);
-    setValue("workmenCompNo", searchResultData.workmenCompNo);
+    if (searchResultData) {
+   
+      const formattedEmpStatusType = searchResultData.empStatusType
+        ? searchResultData.empStatusType.toUpperCase()
+        : "";
+      setValue("id", searchResultData.id);
+      setValue("empStatusType", formattedEmpStatusType);
 
-    const fields = [
-      "empStatusType",
-      "workmenComUp",
-      "workmenCompExp",
-      "workmenCompNo",
-    ];
+      const fields = ["workmenComUp", "workmenCompExp", "workmenCompNo"];
 
-    fields.forEach((field) => setValue(field, searchResultData[field]));
+      fields.forEach((field) => setValue(field, searchResultData[field]));
 
-    if (searchResultData && searchResultData.workmenComUp) {
-      try {
-        const parsedArray = JSON.parse(searchResultData.workmenComUp[0]);
+      if (searchResultData && searchResultData.workmenComUp) {
+        try {
+          const parsedArray = JSON.parse(searchResultData.workmenComUp[0]);
 
-        const parsedFiles = parsedArray.map((item) =>
-          typeof item === "string" ? JSON.parse(item) : item
-        );
+          const parsedFiles = parsedArray.map((item) =>
+            typeof item === "string" ? JSON.parse(item) : item
+          );
 
-        setValue("workmenComUp", parsedFiles);
+          setValue("workmenComUp", parsedFiles);
 
-        setUploadWCU((prev) => ({
-          ...prev,
-          workmenComUp: parsedFiles,
-        }));
+          setUploadWCU((prev) => ({
+            ...prev,
+            workmenComUp: parsedFiles,
+          }));
 
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          workmenComUp: parsedFiles.map((file) => getFileName(file.upload)),
-        }));
-      } catch (error) {
-        console.error(
-          `Failed to parse ${searchResultData.workmenComUp}:`,
-          error
-        );
+          setUploadedFileNames((prev) => ({
+            ...prev,
+            workmenComUp: parsedFiles.map((file) => getFileName(file.upload)),
+          }));
+        } catch (error) {
+          console.error(
+            `Failed to parse ${searchResultData.workmenComUp}:`,
+            error
+          );
+        }
       }
     }
   }, [searchResultData, setValue]);

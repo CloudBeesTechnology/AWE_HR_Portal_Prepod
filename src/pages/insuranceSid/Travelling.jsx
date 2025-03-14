@@ -79,7 +79,7 @@ export const Travelling = () => {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // getMonth() returns 0-11, so we add 1
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); 
     const year = date.getFullYear();
 
     return `${day}/${month}/${year}`;
@@ -88,9 +88,9 @@ export const Travelling = () => {
   const linkToStorageFile = async (pathUrl) => {
     try {
       const result = await getUrl({ path: pathUrl });
-      //   console.log("File URL:", result.url.href); // Use .href to extract the URL as a string
-      setPPLastUP(result.url.href); // Store the URL as a string
-      setViewingDocument(pathUrl); // Update the state to show the selected document
+     
+      setPPLastUP(result.url.href); 
+      setViewingDocument(pathUrl); 
     } catch (error) {
       console.error("Error fetching the file URL:", error);
     }
@@ -102,7 +102,7 @@ export const Travelling = () => {
       if (Array.isArray(parsedData)) {
         return parsedData.map((doc) => {
           if (doc.upload) {
-            doc.fileName = doc.upload.split("/").pop(); // Extract file name from path
+            doc.fileName = doc.upload.split("/").pop(); 
           }
           return doc;
         });
@@ -239,7 +239,6 @@ export const Travelling = () => {
   }, []);
 
   const searchResult = (result) => {
-    console.log("RW", result);
     setSearchResultData(result);
   };
 

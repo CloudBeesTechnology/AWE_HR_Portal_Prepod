@@ -19,7 +19,7 @@ export const TicketsTable = () => {
   const [secondartyData, setSecondartyData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(30);
   const [data, setData] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
@@ -42,49 +42,8 @@ export const TicketsTable = () => {
 
   const GM = "GENERAL MANAGER";
   const HRM = "HR MANAGER"
-
   useEffect(() => {
-    // If no filters are active, show all data
-    // setLoading(true);
-    if (
-      !filters.date &&
-      filters.search.length === 0 &&
-      filters.status === "All"
-    ) {
-      const sortedData = [...ticketMerged].sort((a, b) => {
-        if (a.hrStatus === "Pending" && b.hrStatus !== "Pending" || a.gmStatus === "Pending" && b.gmStatus !== "Pending") {
-          return -1; 
-        }
-        if (a.hrStatus !== "Pending" && b.hrStatus === "Pending" || a.gmStatus !== "Pending" && b.gmStatus === "Pending") {
-          return 1; 
-        }
-        return new Date(b.createdAt) - new Date(a.createdAt);
-      });
-
-      if (gmPosition === "GENERAL MANAGER") {
-        const filterGMData = sortedData.filter(
-          (item) => item.hrStatus === "Verified" && item.hrStatus !== "Pending"
-        );
-     
-        setData(filterGMData);
-        setErrorState({
-          noResults: false,
-          searchError: false,
-          dateError: false,
-        });
-        
-      } else {
-        setData(sortedData);
-        setErrorState({
-          noResults: false,
-          searchError: false,
-          dateError: false,
-        });
-  
-      }
-      return;
-    }
-
+    // Step 1: Apply Filters (Status, Date, Search)
     let filteredResults = [...ticketMerged];
     let hasDateFilter = false;
     let hasSearchFilter = false;
@@ -100,19 +59,15 @@ export const TicketsTable = () => {
       );
     }
 
-    // Apply date filter if selected
+    // Apply date filter
     if (filters.date) {
       hasDateFilter = true;
       const selectedDateLocal = new Date(filters.date);
       selectedDateLocal.setHours(0, 0, 0, 0);
 
       filteredResults = filteredResults.filter((item) => {
-        const departureDate = item?.departureDate
-          ? new Date(item.departureDate)
-          : null;
-        const arrivalDate = item?.arrivalDate
-          ? new Date(item.arrivalDate)
-          : null;
+        const departureDate = item?.departureDate ? new Date(item.departureDate) : null;
+        const arrivalDate = item?.arrivalDate ? new Date(item.arrivalDate) : null;
         const createdDate = item?.createdAt ? new Date(item.createdAt) : null;
 
         if (departureDate) departureDate.setHours(0, 0, 0, 0);
@@ -127,7 +82,7 @@ export const TicketsTable = () => {
       });
     }
 
-    // Apply search filter if there are search results
+    // Apply search filter
     if (filters.search.length > 0) {
       hasSearchFilter = true;
       filteredResults = filteredResults.filter((item) => {
@@ -139,102 +94,109 @@ export const TicketsTable = () => {
       });
     }
 
-    const sortedFilteredData = filteredResults.sort((a, b) => {
-
-      if (a.hrStatus === "Pending" && b.hrStatus !== "Pending" || a.gmStatus === "Pending" && b.gmStatus !== "Pending") {
-        return -1; 
-      }
-      if (a.hrStatus !== "Pending" && b.hrStatus === "Pending" || a.gmStatus !== "Pending" && b.gmStatus === "Pending") {
-        return 1; 
-      }
-      return new Date(b.createdAt) - new Date(a.createdAt);
-    });
-    
-    if (gmPosition === "GENERAL MANAGER") {
-      const filterGMData = sortedFilteredData.filter(
-        (item) => item.hrStatus === "Verified" && item.hrStatus !== "Pending"
-      );
-
-      setData(filterGMData);
-      setFilteredData([]);
-      setCurrentPage(1);
-
-    } else {
-      setData(sortedFilteredData);
-      setFilteredData([]);
-      setCurrentPage(1);
-
-    }
-  
-    // Update the error message state or flag if needed
+    // Update error state
     const noResults = filteredResults.length === 0;
     const searchError = !searchMatches;
     const dateError = hasDateFilter && !dateMatches;
 
-    // You can use these flags to customize your error message in the render section
-    const errorState = {
+    setErrorState({
       noResults,
       searchError,
       dateError,
-    };
-    setErrorState(errorState);
-    // setLoading(false);
-  }, [filters, ticketMerged]);
-
-  // Separate useEffect for pagination to avoid race conditions
-  useEffect(() => {
-    // setLoading(true);
-    if (!data.length) {
-      setFilteredData([]);
-      return;
-    }
-
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const sortedData = [...data].sort((a, b) => {
-      const regex = /\d+$/;
-      const numPartA = a.empID.match(regex)
-        ? a.empID.match(regex)[0].padStart(5, "0")
-        : "";
-      const numPartB = b.empID.match(regex)
-        ? b.empID.match(regex)[0].padStart(5, "0")
-        : "";
-
-      const prefixA = a.empID.replace(regex, "").toLowerCase();
-      const prefixB = b.empID.replace(regex, "").toLowerCase();
-
-      return prefixA !== prefixB
-        ? prefixA.localeCompare(prefixB)
-        : numPartA.localeCompare(numPartB);
     });
 
-    const paginatedData = sortedData.slice(
-      startIndex,
-      startIndex + rowsPerPage
-    );
+    // Step 2: After Filters are Applied, set filtered data
+    setFilteredData(filteredResults);
 
-    setFilteredData(paginatedData);
-    // setLoading(false);
-  }, [currentPage, rowsPerPage, data]);
+  }, [filters, ticketMerged]);
 
+  // Step 3: Apply pagination on the filtered data
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * rowsPerPage;
   
-  // Update handlers to use new filters state
-  const handleDateChange = (event) => {
-    const date = event.target.value;
-    setSelectedDate(date);
-    setFilters((prev) => ({ ...prev, date }));
-  };
+    const filterPending = filteredData.sort((a, b) => {
+      // Step 1: Prioritize HR "Pending" status first
+      if (a.hrStatus === "Pending" && b.hrStatus !== "Pending") {
+        return -1; // a (with Pending) should come first
+      }
+      if (a.hrStatus !== "Pending" && b.hrStatus === "Pending") {
+        return 1; // b (with Pending) should come first
+      }
+  
+      // Step 2: If both HR statuses are the same, prioritize GM "Pending"
+      if (a.gmStatus === "Pending" && b.gmStatus !== "Pending") {
+        return -1; // a (with Pending GM) should come first
+      }
+      if (a.gmStatus !== "Pending" && b.gmStatus === "Pending") {
+        return 1; // b (with Pending GM) should come first
+      }
+  
+      // Step 3: If neither HR nor GM status is "Pending", fall back to createdAt (newest first)
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
 
-  const handleFilterChange = (status) => {
-    setFilterStatus(status);
-    setFilters((prev) => ({ ...prev, status }));
-  };
+    const paginatedData = filteredData.slice(startIndex, startIndex + rowsPerPage);
+    setData(paginatedData); // Set the paginated data
+  }, [currentPage, rowsPerPage, filteredData]);
 
+  // Calculate total pages based on filtered data
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const heading = [
+    "S.No",
+    "Emp ID",
+    "Name",
+    "Department",
+    "Position",
+    "Received Date", 
+    "Departure date",
+    "Arrival date",
+    "Submitted form",
+    userType !== "SuperAdmin" && "Status",
+  ];
+ 
+  useEffect(() => {
+    const sortedData = data.sort((a, b) => {
+      // Step 1: Prioritize HR "Pending" status first
+      if (a.hrStatus === "Pending" && b.hrStatus !== "Pending") {
+        return -1; // a (with Pending) should come first
+      }
+      if (a.hrStatus !== "Pending" && b.hrStatus === "Pending") {
+        return 1; // b (with Pending) should come first
+      }
+  
+      // Step 2: If both HR statuses are the same, prioritize GM "Pending"
+      if (a.gmStatus === "Pending" && b.gmStatus !== "Pending") {
+        return -1; // a (with Pending GM) should come first
+      }
+      if (a.gmStatus !== "Pending" && b.gmStatus === "Pending") {
+        return 1; // b (with Pending GM) should come first
+      }
+  
+      // Step 3: If neither HR nor GM status is "Pending", fall back to createdAt (newest first)
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+  
+    // Filter data based on GM position
+    if (gmPosition === "GENERAL MANAGER") {
+      const filterGMData = sortedData.filter(
+        (item) => item.hrStatus === "Verified" && item.hrStatus !== "Pending"
+      );
+      setSecondartyData(filterGMData);
+      setData(filterGMData);
+    } else {
+      setSecondartyData(sortedData);
+      setData(sortedData);
+    }
+  }, [ticketMerged, gmPosition]);
+  
+
+  // Search functionality
   const searchUserList = async (searchData) => {
     try {
       const result = await searchData;
       setSearchResults(result);
 
-      // If search result is empty, show no results message immediately
       if (result.length === 0) {
         setData([]);
         setFilteredData([]);
@@ -252,7 +214,6 @@ export const TicketsTable = () => {
         }));
       }
     } catch (error) {
-      // console.error("Error search data", error);
       setData([]);
       setFilteredData([]);
       setErrorState((prev) => ({
@@ -263,48 +224,17 @@ export const TicketsTable = () => {
     }
   };
 
-  // Update total pages calculation
-  const totalPages = Math.ceil(data.length / rowsPerPage);
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const heading = [
-    "S.No",
-    "Emp ID",
-    "Name",
-    "Department",
-    "Position",
-    "Received Date", 
-    "Departure date",
-    "Arrival date",
-    "Submitted form",
-    userType !== "SuperAdmin" && "Status",
-  ];
+  // Update handlers for filters
+  const handleDateChange = (event) => {
+    const date = event.target.value;
+    setSelectedDate(date);
+    setFilters((prev) => ({ ...prev, date }));
+  };
 
-  // console.log(ticketMerged);
-
-  useEffect(() => {
-
-    const sortedData = ticketMerged.sort((a, b) => {
-      if (a.hrStatus === "Pending" && b.hrStatus !== "Pending" || a.gmStatus === "Pending" && b.gmStatus !== "Pending") {
-        return -1; 
-      }
-      if (a.hrStatus !== "Pending" && b.hrStatus === "Pending" || a.gmStatus !== "Pending" && b.gmStatus === "Pending") {
-        return 1; 
-      }
-      return new Date(b.createdAt) - new Date(a.createdAt);
-    });
-  
-    // Filter data based on GM position
-    if (gmPosition === "GENERAL MANAGER") {
-      const filterGMData = sortedData.filter(
-        (item) => item.hrStatus === "Verified" && item.hrStatus !== "Pending"
-      );
-      setSecondartyData(filterGMData);
-      setData(filterGMData);
-    } else {
-      setSecondartyData(sortedData);
-      setData(sortedData);
-    }
-  }, [ticketMerged, gmPosition]);
+  const handleFilterChange = (status) => {
+    setFilterStatus(status);
+    setFilters((prev) => ({ ...prev, status }));
+  };
   
 
   if (loading) {
