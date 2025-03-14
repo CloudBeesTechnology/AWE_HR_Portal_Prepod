@@ -98,6 +98,7 @@ export const ListofCandi = () => {
     }
   };
 
+  
   const requiredPermissions = ["Candidate"];
 
   const access = "Recruitment";
