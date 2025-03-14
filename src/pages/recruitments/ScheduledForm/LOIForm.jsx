@@ -11,28 +11,28 @@ import { SpinLogo } from "../../../utils/SpinLogo";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadLOI } from "../deleteDocsRecruit/DeleteUploadLOI";
-export const LOIForm = ({ candidate }) => {
-  
+import { DeletePopup } from "../../../utils/DeletePopup";
+export const LOIForm = ({ candidate, formattedPermissions }) => {
   // Ensure candidate is passed as prop
-  const { localMobilization, isLoading, error } =
-    LocalMobilization();
+  const { localMobilization, isLoading, error } = LocalMobilization();
   const { loiDetails } = UpdateLoiData();
   const { interviewDetails } = UpdateInterviewData();
   const { mergedInterviewData } = useFetchInterview();
   const [notification, setNotification] = useState(false);
-
-    const [isUploadingString, setIsUploadingString] = useState({
-      loiFile: false,
-    });
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
+  const [isUploadingString, setIsUploadingString] = useState({
+    loiFile: false,
+  });
 
   const [uploadedFileNames, setUploadedFileNames] = useState({
     loiFile: null,
   });
-  
+
   const [uploadedLOI, setUploadedLOI] = useState({
     loiFile: null,
   });
-
+  // console.log(uploadedFileNames);
   const {
     register,
     handleSubmit,
@@ -52,80 +52,77 @@ export const LOIForm = ({ candidate }) => {
     },
   });
 
-
   const LOIFile = watch("loiFile", "");
-  
+
   const extractFileName = (url) => {
-  if (typeof url === "string" && url) {
-    const decodedUrl = decodeURIComponent(url); 
-    const fileNameWithParams = decodedUrl.split("/").pop(); 
-    return fileNameWithParams.split("?")[0].split(",")[0].split("#")[0]; 
-  }
-  return "";
-};
+    if (typeof url === "string" && url) {
+      const decodedUrl = decodeURIComponent(url);
+      const fileNameWithParams = decodedUrl.split("/").pop();
+      return fileNameWithParams.split("?")[0].split(",")[0].split("#")[0];
+    }
+    return "";
+  };
 
-   const updateUploadingString = (type, value) => {
-     setIsUploadingString((prev) => ({
-       ...prev,
-       [type]: value,
-     }));
-     // console.log(value);
-   };
- 
-   const handleFileUpload = async (e, type) => {
-     const tempID= candidate.tempID;
-     
-     if (!tempID
-) {
-       alert("Please enter the Employee ID before uploading files.");
-       window.location.href = "/employeeInfo";
-       return;
-     }
- 
-     let selectedFile = e.target.files[0];
- 
-     // Allowed file types
-     const allowedTypes = [
-       "application/pdf",
-       "image/jpeg",
-       "image/png",
-       "image/jpg",
-     ];
- 
-     if (!allowedTypes.includes(selectedFile.type)) {
-       alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-       return;
-     }
- 
-     setValue(type, selectedFile); 
- 
-     if (selectedFile) {
-       updateUploadingString(type, true);
-       await uploadDocString(selectedFile, type, setUploadedLOI, tempID);
-       setUploadedFileNames((prev) => ({
-         ...prev,
-         [type]: selectedFile.name, 
-       }));
-     }
-   };
+  const updateUploadingString = (type, value) => {
+    setIsUploadingString((prev) => ({
+      ...prev,
+      [type]: value,
+    }));
+    // console.log(value);
+  };
 
- const deletedStringUpload = async (fileType, fileName) => {
+  const handleFileUpload = async (e, type) => {
+    const tempID = candidate.tempID;
+
+    if (!tempID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
+    }
+
+    let selectedFile = e.target.files[0];
+
+    // Allowed file types
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
+
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
+    }
+
+    setValue(type, selectedFile);
+
+    if (selectedFile) {
+      updateUploadingString(type, true);
+      await uploadDocString(selectedFile, type, setUploadedLOI, tempID);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [type]: selectedFile.name,
+      }));
+    }
+  };
+
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
+  const deletedStringUpload = async (fileType, fileName) => {
     try {
-      const tempID= candidate.tempID;
+      const tempID = candidate.tempID;
 
-      const isDeleted = await handleDeleteFile(
-        fileType,
-        fileName,
-        tempID
-
-      );
+      const isDeleted = await handleDeleteFile(fileType, fileName, tempID);
       const isDeletedArrayUploaded = await DeleteUploadLOI(
         fileType,
         fileName,
         tempID,
         setUploadedFileNames,
         setUploadedLOI,
-        setIsUploadingString,
+        setIsUploadingString
       );
 
       if (!isDeleted || isDeletedArrayUploaded) {
@@ -135,6 +132,8 @@ export const LOIForm = ({ candidate }) => {
         return;
       }
       // console.log(`Deleted "${fileName}". Remaining files:`);
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
     } catch (error) {
       console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
@@ -162,9 +161,9 @@ export const LOIForm = ({ candidate }) => {
       loiFile: uploadedLOI.loiFile,
       tempID: candidate.tempID,
     };
-    
+
     const interStatus = {
-      id: interviewScheduleId, 
+      id: interviewScheduleId,
       department: formData.interview.department,
       otherDepartment: formData.interview.otherDepartment,
       status: formData.interview.status,
@@ -220,6 +219,12 @@ export const LOIForm = ({ candidate }) => {
       },
     }));
   };
+
+  const requiredPermissions = ["Status"];
+
+  const access = "Recruitment";
+
+  // console.log("String", isUploadingString);
 
   return (
     <form>
@@ -309,13 +314,17 @@ export const LOIForm = ({ candidate }) => {
               <FileUploadField
                 label="Upload File"
                 // label="Induction Form"
-                register={register} 
+                register={register}
                 fileKey="loiFile"
                 handleFileUpload={handleFileUpload}
                 uploadedFileNames={uploadedFileNames}
                 deletedStringUpload={deletedStringUpload}
                 isUploadingString={isUploadingString}
                 error={errors.loiFile}
+                formattedPermissions={formattedPermissions}
+                requiredPermissions={requiredPermissions}
+                access={access}
+                check={isUploadingString.loiFile}
               />
             </div>
           </div>
@@ -331,7 +340,7 @@ export const LOIForm = ({ candidate }) => {
         >
           {isLoading ? "Submitting..." : "Submit"}
         </button>
-       
+
         {error && <p className="text-red-500">{error.message}</p>}
       </div>
       {notification && (
@@ -340,6 +349,9 @@ export const LOIForm = ({ candidate }) => {
           notification={notification}
           path="/recrutiles/status"
         />
+      )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}
     </form>
   );

@@ -24,7 +24,7 @@ export const Profile = ({
   setLoading,
 }) => {
   const fileInputRef = useRef(null);
-  const watchedEmpID = localStorage.getItem("userID").toString().toUpperCase();
+  const watchedEmpID = localStorage.getItem("userID")?.toString().toUpperCase();
   const [changeProfilePhoto, setChangeProfilePhoto] = useState("");
 
   const [PPLastUP, setPPLastUP] = useState(null);

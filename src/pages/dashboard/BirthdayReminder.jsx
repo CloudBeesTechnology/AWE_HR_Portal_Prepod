@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext } from "react";
 import { format } from "date-fns";
 import { IoPersonCircleOutline } from "react-icons/io5";
-import { DataSupply } from '../../utils/DataStoredContext';
-import { VscClose } from 'react-icons/vsc';
+import { DataSupply } from "../../utils/DataStoredContext";
+import { VscClose } from "react-icons/vsc";
 import { getUrl } from "@aws-amplify/storage";
 
 export const BirthdayReminder = () => {
@@ -12,19 +12,19 @@ export const BirthdayReminder = () => {
   const [showModal, setShowModal] = useState(false);
 
   const filterTodayBirthdays = (data) => {
-    const today = format(new Date(), 'MM-dd');
+    const today = format(new Date(), "MM-dd");
     return data.filter((person) => {
       if (!person.dob) {
         return false;
       }
-      
+
       const dob = new Date(person.dob);
 
       if (isNaN(dob)) {
         return false;
       }
-      
-      return format(dob, 'MM-dd') === today;
+
+      return format(dob, "MM-dd") === today;
     });
   };
 
@@ -45,7 +45,7 @@ export const BirthdayReminder = () => {
             const result = await getUrl({ path: person.profilePhoto });
             newProfileImages[person.name] = result.url;
           } catch (error) {
-            console.error('Error fetching profile image:', error);
+            console.error("Error fetching profile image:", error);
           }
         }
       }
@@ -66,37 +66,39 @@ export const BirthdayReminder = () => {
         <div className="mt-4 grid grid-cols-2 gap-5 ">
           {birthdays.slice(0, 2).map((person, index) => (
             <div
-            key={index}
-            className="grid grid-cols-[auto,1fr] gap-2 items-center bg-[#F5F7FB] p-2  rounded-md shadow-sm"
-          >
-            {/* Profile Image */}
-            <div className="w-10 h-10">
-              {profileImages[person.name] ? (
-                <img
-                  src={profileImages[person.name]}
-                  alt={person.name}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-              ) : (
-                <IoPersonCircleOutline className="w-10 h-10 rounded-full" />
-              )}
+              key={index}
+              className="grid grid-cols-[auto,1fr] gap-2 items-center bg-[#F5F7FB] p-2  rounded-md shadow-sm"
+            >
+              {/* Profile Image */}
+              <div className="w-10 h-10">
+                {profileImages?.[person.name] ? (
+                  <img
+                    src={profileImages[person.name]}
+                    alt={person.name}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <IoPersonCircleOutline className="w-10 h-10 rounded-full" />
+                )}
+              </div>
+
+              {/* Text Content */}
+              <div className="p-1 min-w-0">
+                <p className="text-[10px] font-medium">{person.name}</p>
+                <p className="text-[10px] text-gray-600">
+                  {person.message || "Happy Birthday!"}
+                </p>
+                <p className="text-[10px] text-gray-500">
+                  {format(new Date(person.dob), "MMMM dd")}
+                </p>
+              </div>
             </div>
-          
-            {/* Text Content */}
-            <div className="p-1 min-w-0">
-              <p className="text-[10px] font-medium">{person.name}</p>
-              <p className="text-[10px] text-gray-600">
-                {person.message || "Happy Birthday!"}
-              </p>
-              <p className="text-[10px] text-gray-500">
-                {format(new Date(person.dob), "MMMM dd")}
-              </p>
-            </div>
-          </div>
-          
           ))}
           {birthdays.length > 0 && (
-            <button onClick={() => setShowModal(true)} className="text-[green] underline ">
+            <button
+              onClick={() => setShowModal(true)}
+              className="text-[blue] underline "
+            >
               View More
             </button>
           )}
@@ -108,13 +110,19 @@ export const BirthdayReminder = () => {
           <div className="bg-white rounded-lg p-6 max-w-4xl w-full h-[550px] overflow-y-auto scrollBar">
             <div className="flex justify-between items-center mb-5">
               <h2 className="text-lg font-semibold">All Birthdays Today</h2>
-              <button onClick={() => setShowModal(false)} className="text-[24px] rounded">
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-[24px] rounded"
+              >
                 <VscClose />
               </button>
             </div>
             <div className="grid grid-cols-2 gap-5">
               {birthdays.map((person, index) => (
-                <div key={index} className="flex justify-start flex-wrap items-center space-x-3 bg-[#F5F7FB] p-2 rounded-md shadow-sm mb-2 gap-5">
+                <div
+                  key={index}
+                  className="flex justify-start flex-wrap items-center space-x-3 bg-[#F5F7FB] p-2 rounded-md shadow-sm mb-2 gap-5"
+                >
                   <p className="w-10 h-10 text-[50px] rounded-full center">
                     {profileImages[person.name] ? (
                       <img
@@ -126,10 +134,14 @@ export const BirthdayReminder = () => {
                       <IoPersonCircleOutline />
                     )}
                   </p>
-                  <div className=' '>
+                  <div className=" ">
                     <p className="text-[14px] font-semibold">{person.name}</p>
-                    <p className="text-[10px] text-grey">{person.message || "Happy Birthday!"}</p>
-                    <p className="text-[10px] text-grey">{format(new Date(person.dob), 'MMMM dd')}</p>
+                    <p className="text-[10px] text-grey">
+                      {person.message || "Happy Birthday!"}
+                    </p>
+                    <p className="text-[10px] text-grey">
+                      {format(new Date(person.dob), "MMMM dd")}
+                    </p>
                   </div>
                 </div>
               ))}

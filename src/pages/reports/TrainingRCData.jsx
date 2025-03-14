@@ -51,6 +51,12 @@ export const TrainingRCData = () => {
   const resignationMergedData = (data) => {
     return data
       .filter((item) => {
+        if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
+          const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Get last element
+        
+          if (lastWorkStatus.toUpperCase() === "TERMINATION" || lastWorkStatus.toUpperCase() === "RESIGNATION") {
+            return false; // Exclude items with TERMINATION or RESIGNATION
+          }}
         const certifiExpiryDates = item.certifiExpiry || [];
         const lastDate = certifiExpiryDates[certifiExpiryDates.length - 1];
         if (!lastDate) return false;
@@ -114,6 +120,15 @@ export const TrainingRCData = () => {
 
     const filtered = allData
       .filter((data) => {
+        if (!Array.isArray(data.workStatus) || data.workStatus.length === 0) {
+          return false; // Return early if workStatus is undefined or an empty array
+      }
+      
+      const lastWorkStatus = data.workStatus[data.workStatus.length - 1]; // Now it's safe
+      
+      if (lastWorkStatus?.toUpperCase() === "TERMINATION" || lastWorkStatus?.toUpperCase() === "RESIGNATION") {
+          return false; // Exclude records with TERMINATION or RESIGNATION
+      }
         const expiryArray = data.certifiExpiry || [];
         const expiryDate = expiryArray.length
           ? new Date(expiryArray[expiryArray.length - 1])

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { uploadDocs } from "../../services/uploadsDocsS3/UploadDocs";
@@ -9,18 +9,30 @@ import "react-pdf/dist/esm/Page/TextLayer.css";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import { PersonalAcciSchema } from "../../services/EmployeeValidation";
 import { generateClient } from "@aws-amplify/api";
-import { createPersonalAccident } from "../../graphql/mutations";
+import {
+  createPersonalAccident,
+  updatePersonalAccident,
+} from "../../graphql/mutations";
 import { listPersonalAccidents } from "../../graphql/queries";
 import { FaDownload, FaPrint, FaTimes } from "react-icons/fa";
 import { Page } from "react-pdf";
-import { pdfjs } from "react-pdf"; 
+import { pdfjs } from "react-pdf";
 import { getUrl } from "@aws-amplify/storage";
 import { DeletePersonalAcciUp } from "./DeleteUpload/DeletePersonalAcciUp";
 import { handleDeleteFile } from "../../services/uploadsDocsS3/DeleteDocs";
+import { useReactToPrint } from "react-to-print";
+import { DeletePopup } from "../../utils/DeletePopup";
+import { IoSearch } from "react-icons/io5";
+import { FaArrowLeft } from "react-icons/fa";
+import { DataSupply } from "../../utils/DataStoredContext";
+import { Link } from "react-router-dom";
+import { InsSearch } from "./InsSearch";
+import { useDeleteAccess } from "../../hooks/useDeleteAccess";
+import { GoUpload } from "react-icons/go";
+import { MdCancel } from "react-icons/md";
+import { useOutletContext } from "react-router-dom";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
-import { useReactToPrint } from "react-to-print";
-
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
   import.meta.url
@@ -31,7 +43,7 @@ export const PersonalAcci = () => {
 
   const [isUploading, setIsUploading] = useState({
     perAccUp: false,
-      });
+  });
 
   const [uploadedFileNames, setUploadedFileNames] = useState({
     perAccUp: null,
@@ -39,6 +51,8 @@ export const PersonalAcci = () => {
   const [uploadPAU, setUploadPAU] = useState({
     perAccUp: [],
   });
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [pageHeight, setPageHeight] = useState("auto");
   const [insuranceData, setInsuranceData] = useState([]);
@@ -55,6 +69,12 @@ export const PersonalAcci = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [pdfHeight, setPdfHeight] = useState("");
   const [pdfWidth, setPdfWidth] = useState("");
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [searchResultData, setSearchResultData] = useState([]);
+  const { formattedPermissions } = useDeleteAccess();
+  const { personalAcciData } = useContext(DataSupply);
+  const { empID, requiredPermissions, access } = useOutletContext();
+
   const {
     register,
     handleSubmit,
@@ -66,7 +86,7 @@ export const PersonalAcci = () => {
     resolver: yupResolver(PersonalAcciSchema),
   });
 
-  console.log("J");
+  // console.log("J");
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -107,105 +127,89 @@ export const PersonalAcci = () => {
   };
 
   const updateUploadingState = (label, value) => {
-     setIsUploading((prev) => ({
-       ...prev,
-       [label]: value,
-     }));
-     console.log(value);
-   };
- 
-   const handleFileChange = async (e, label) => {
-     const perAccNo = watch("perAccNo");
-     if (!perAccNo) {
-         alert("Please enter the Policy Number before uploading files.");
-         window.location.href = "/insuranceHr";
-         return;
-     }
- 
-     const selectedFile = e.target.files[0];
-     if (!selectedFile) return;
- 
-     const allowedTypes = [
-       "application/pdf",
-      
-     ];
-     if (!allowedTypes.includes(selectedFile.type)) {
-         alert("Upload must be a PDF file.");
-         return;
-     }
- 
-     // Ensure no duplicate files are added
-     const currentFiles = watch(label) || [];
-     if (currentFiles.some((file) => file.name === selectedFile.name)) {
-         alert("This file has already been uploaded.");
-         return;
-     }
- 
-     setValue(label, [...currentFiles, selectedFile]);
- 
-     try {
-       updateUploadingState(label, true);
-       await uploadDocs(selectedFile, label, setUploadPAU, perAccNo);
-       setUploadedFileNames((prev) => ({
-         ...prev,
-         [label]: selectedFile.name,
-       }));
-     } catch (err) {
-         console.error(err);
-     }
-   };
- 
-   const deleteFile = async (fileType, fileName) => {
-     try {
-       const perAccNo = watch("perAccNo");
-       if (!perAccNo) {
-         alert("Please provide the Policy Number before deleting files.");
-         return;
-       }
- 
-       const isDeleted = await handleDeleteFile(
-         fileType,
-         fileName,
-         perAccNo
-       );
-       const isDeletedArrayUploaded = await DeletePersonalAcciUp(
-         fileType,
-         fileName,
-         perAccNo,
-         setUploadedFileNames,
-         setUploadPAU,
-         setIsUploading
-       );
- 
-       if (!isDeleted || isDeletedArrayUploaded) {
-         console.error(
-           `Failed to delete file: ${fileName}, skipping UI update.`
-         );
-         return;
-       }
-       // console.log(`Deleted "${fileName}". Remaining files:`);
-     } catch (error) {
-       console.error("Error deleting file:", error);
-       alert("Error processing the file deletion.");
-     }
-   };
+    setIsUploading((prev) => ({
+      ...prev,
+      [label]: value,
+    }));
+    // console.log(value);
+  };
 
-  const onSubmit = async (data) => {
+  const handleFileChange = async (e, label) => {
+    const perAccNo = watch("perAccNo");
+    if (!perAccNo) {
+      alert("Please enter the Policy Number before uploading files.");
+      window.location.href = "/insuranceHr/personalAcci";
+      return;
+    }
+
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
+    }
+
+    // Ensure no duplicate files are added
+    const currentFiles = watch(label) || [];
+    if (currentFiles.some((file) => file.name === selectedFile.name)) {
+      alert("This file has already been uploaded.");
+      return;
+    }
+
+    setValue(label, [...currentFiles, selectedFile]);
+
     try {
-      const PACreValue = {
-        ...data,
-        perAccUp: JSON.stringify(uploadPAU.perAccUp),
-      };
-      // console.log(PACreValue);
-      const response = await client.graphql({
-        query: createPersonalAccident,
-        variables: { input: PACreValue },
-      });
+      updateUploadingState(label, true);
+      await uploadDocs(selectedFile, label, setUploadPAU, perAccNo);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [label]: selectedFile.name,
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+  const deleteFile = async (fileType, fileName, fileIndex) => {
+    try {
+      const perAccNo = watch("perAccNo");
+      if (!perAccNo) {
+        alert("Please provide the Policy Number before deleting files.");
+        return;
+      }
 
-      // console.log("Successfully submitted data:", response);
-      setNotification(true);
+      const isDeleted = await handleDeleteFile(fileType, fileName, perAccNo);
+      const isDeletedArrayUploaded = await DeletePersonalAcciUp(
+        fileType,
+        fileName,
+        fileIndex,
+        perAccNo,
+        setUploadedFileNames,
+        setUploadPAU,
+        setIsUploading
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
+      // console.log(`Deleted "${fileName}". Remaining files:`);
     } catch (error) {
-      console.error("Error submitting data:", error);
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
     }
   };
 
@@ -214,7 +218,7 @@ export const PersonalAcci = () => {
       try {
         let allPersonalAccidents = [];
         let nextToken = null;
-  
+
         do {
           const response = await client.graphql({
             query: listPersonalAccidents,
@@ -222,19 +226,19 @@ export const PersonalAcci = () => {
               nextToken: nextToken,
             },
           });
-  
+
           const items = response?.data?.listPersonalAccidents?.items || [];
-  
+
           allPersonalAccidents = [...allPersonalAccidents, ...items];
-  
+
           nextToken = response?.data?.listPersonalAccidents?.nextToken;
         } while (nextToken);
-  
+
         const filteredData = allPersonalAccidents.filter((data) => {
           const expiryDate = new Date(data.perAccExp);
           return expiryDate >= new Date();
         });
-  
+
         setInsuranceData(filteredData);
         setLoading(false);
       } catch (error) {
@@ -243,26 +247,118 @@ export const PersonalAcci = () => {
         setLoading(false);
       }
     };
-  
+
     fetchInsuranceData();
   }, []);
-  
-  // useEffect(() => {
-  //   const fetchInsuranceData = async () => {
-  //     try {
-  //       const response = await client.graphql({
-  //         query: listPersonalAccidents,
-  //       });
-  //       setInsuranceData(response.data.listPersonalAccidents.items);
-  //       setLoading(false);
-  //     } catch (error) {
-  //       console.error("Error fetching insurance data:", error);
-  //       setError("insuranceData", { message: "Error fetching data" });
-  //       setLoading(false);
-  //     }
-  //   };
-  //   fetchInsuranceData();
-  // }, []);
+
+  const searchResult = (result) => {
+    console.log("RW", result);
+    setSearchResultData(result);
+  };
+
+  const getFileName = (input) => {
+    if (typeof input === "object" && input.upload) {
+      const filePath = input.upload;
+      const decodedUrl = decodeURIComponent(filePath);
+      return decodedUrl.substring(decodedUrl.lastIndexOf("/") + 1);
+    }
+
+    try {
+      const urlObj = new URL(input);
+      const filePath = urlObj.pathname;
+      const decodedUrl = decodeURIComponent(filePath);
+      return decodedUrl.substring(decodedUrl.lastIndexOf("/") + 1);
+    } catch (e) {
+      if (typeof input === "string") {
+        const decodedUrl = decodeURIComponent(input);
+        return decodedUrl.substring(decodedUrl.lastIndexOf("/") + 1);
+      }
+      return undefined;
+    }
+  };
+
+  useEffect(() => {
+    setValue("id", searchResultData.id);
+    setValue("perAccUp", searchResultData.perAccUp);
+    setValue("perAccExp", searchResultData.perAccExp);
+    setValue("perAccNo", searchResultData.perAccNo);
+
+    const fields = ["perAccExp", "perAccUp", "perAccNo"];
+
+    fields.forEach((field) => setValue(field, searchResultData[field]));
+
+    if (searchResultData && searchResultData.perAccUp) {
+      try {
+        const parsedArray = JSON.parse(searchResultData.perAccUp[0]);
+
+        const parsedFiles = parsedArray.map((item) =>
+          typeof item === "string" ? JSON.parse(item) : item
+        );
+
+        setValue("perAccUp", parsedFiles);
+
+        setUploadPAU((prev) => ({
+          ...prev,
+          perAccUp: parsedFiles,
+        }));
+
+        setUploadedFileNames((prev) => ({
+          ...prev,
+          perAccUp: parsedFiles.map((file) => getFileName(file.upload)),
+        }));
+      } catch (error) {
+        console.error(`Failed to parse ${searchResultData.perAccUp}:`, error);
+      }
+    }
+  }, [searchResultData, setValue]);
+
+  const onSubmit = async (data) => {
+    try {
+      const checkingDITable = personalAcciData.find(
+        (match) => match.id === searchResultData.id
+      );
+
+      if (checkingDITable) {
+        const PAUpValue = {
+          ...data,
+          perAccUp: JSON.stringify(uploadPAU.perAccUp),
+        };
+        // console.log(PACreValue);
+
+        const finalData = {
+          id: PAUpValue.id,
+          perAccUp: PAUpValue.perAccUp,
+          perAccExp: PAUpValue.perAccExp,
+          perAccNo: PAUpValue.perAccNo,
+        };
+
+        const response = await client.graphql({
+          query: updatePersonalAccident,
+          variables: { input: finalData },
+        });
+
+        // console.log("Successfully submitted data:", response);
+        setNotification(true);
+      } else {
+        const PACreValue = {
+          ...data,
+          perAccUp: JSON.stringify(uploadPAU.perAccUp),
+        };
+        // console.log(PACreValue);
+        const response = await client.graphql({
+          query: createPersonalAccident,
+          variables: { input: PACreValue },
+        });
+
+        // console.log("Successfully submitted data:", response);
+        setNotification(true);
+      }
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    }
+  };
+
+  //___________________________________-Printing section %% Pdf section___________________________________
 
   const openPopup = (fileUrl) => {
     setPopupImage(fileUrl); // Set the URL for the image or file
@@ -273,7 +369,7 @@ export const PersonalAcci = () => {
     const measureHeight = () => {
       if (personAcciPrint.current) {
         const measuredHeight = personAcciPrint.current.offsetHeight;
-        console.log("Measured PDF height:", measuredHeight);
+        // console.log("Measured PDF height:", measuredHeight);
         if (measuredHeight > 0) {
           setPdfHeight(`${measuredHeight}px`);
           setIsLoading(false);
@@ -460,16 +556,42 @@ export const PersonalAcci = () => {
       </div>
     );
   };
+
+  //___________________________________-Printing section %% Pdf section___________________________________
+
   return (
-    <section>
+    <section
+      onClick={() => {
+        setFilteredEmployees([]);
+      }}
+    >
+      <div className="w-full flex items-center justify-between gap-5 px-10">
+        <Link to="/dashboard" className="text-xl flex-1 text-grey">
+          <FaArrowLeft />
+        </Link>
+        <p className="flex-1 text-center mt-2 text_size_2 uppercase">
+          Personal Accident Insurance
+        </p>
+        <div className="flex-1">
+          <InsSearch
+            searchResult={searchResult}
+            newFormData={insuranceData}
+            searchIcon2={<IoSearch />}
+            placeholder="Policy Number"
+            rounded="rounded-lg"
+            empID={empID}
+            filteredEmployees={filteredEmployees}
+            setFilteredEmployees={setFilteredEmployees}
+          />
+        </div>{" "}
+      </div>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="mx-auto py-5 px-10 my-10 bg-[#F5F6F1CC]"
       >
-        {/* Personal Accident Insurance Fields */}
-        <h3 className="mb-5 text-lg font-bold">Personal Accident Insurance</h3>
+        {/* <h3 className="mb-5 text-lg font-bold">Personal Accident Insurance</h3> */}
         <div className="relative mb-5">
-          <div className="grid grid-cols-3 gap-4 items-center">
+          <div className="grid grid-cols-2 gap-4 items-center">
             {/* Personal Accident Policy Number */}
             <FormField
               name="perAccNo"
@@ -489,20 +611,88 @@ export const PersonalAcci = () => {
               errors={errors}
             />
 
-            {/* File Upload */}
             <div className="mb-2 relative">
-              <FileUpload
-                label="Upload File"
-                onChangeFunc={(e) => handleFileChange(e, "perAccUp")}
-                handleFileChange={handleFileChange}
-          uploadedFileNames={uploadedFileNames}
-          isUploading={isUploading}
-          deleteFile={deleteFile}
-                register={register}
-                name="perAccUp"
-                error={errors}
-              />
-             
+              <div className="flex flex-col">
+                {/* <label className="text_size_5">perAccUp</label> */}
+
+                {/* File Input Label */}
+                <label
+                  onClick={() => {
+                    if (isUploading["perAccUp"]) {
+                      alert(
+                        "Please delete the previously uploaded file before uploading a new one."
+                      );
+                    }
+                  }}
+                  className={`mt-2 flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer`}
+                >
+                  <input
+                    type="file"
+                    className="hidden"
+                    {...register}
+                    accept=".pdf, .jpg, .jpeg, .png"
+                    onChange={(e) => handleFileChange(e, "perAccUp")}
+                    disabled={isUploading["perAccUp"]}
+                  />
+                  <span className="ml-2  w-full font-normal flex justify-between items-center gap-10">
+                    Upload
+                    <GoUpload />
+                  </span>
+                </label>
+
+                {/* Display Uploaded File Names */}
+                {uploadedFileNames["perAccUp"] && (
+                  <p className="text-grey text-sm my-1">
+                    {Array.isArray(uploadedFileNames["perAccUp"]) ? (
+                      uploadedFileNames["perAccUp"]
+                        .slice()
+                        .map((fileName, fileIndex) => (
+                          <span
+                            key={fileIndex}
+                            className="mt-2 flex justify-between items-center"
+                          >
+                            {fileName}
+                            {formattedPermissions?.deleteAccess?.[access]?.some(
+                              (permission) =>
+                                requiredPermissions.includes(permission)
+                            ) && (
+                              <button
+                                type="button"
+                                className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                                onClick={() =>
+                                  deleteFile("perAccUp", fileName, fileIndex)
+                                }
+                              >
+                                <MdCancel />
+                              </button>
+                            )}
+                          </span>
+                        ))
+                    ) : (
+                      <span className="mt-2 flex justify-between items-center">
+                        {uploadedFileNames["perAccUp"]}
+                        <button
+                          type="button"
+                          className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                          onClick={
+                            () =>
+                              deleteFile(
+                                "perAccUp",
+                                uploadedFileNames["perAccUp"],
+                                0
+                              ) // Pass index 0 if only one file
+                          }
+                        >
+                          <MdCancel />
+                        </button>
+                      </span>
+                    )}
+                  </p>
+                )}
+
+                {/* Display Error Message */}
+                {/* {error && <p className="text-[red] text-[12px] mt-1">{error.message}</p>} */}
+              </div>
             </div>
           </div>
         </div>
@@ -531,7 +721,7 @@ export const PersonalAcci = () => {
         {insuranceData.length > 0 ? (
           <div className=" h-[400px] overflow-y-auto scrollBar">
             <table className="w-full text-center">
-              <thead className="bg-[#939393] text-white">
+              <thead className="bg-[#939393] text-white sticky top-0">
                 <tr>
                   <th className="pl-4 py-4 rounded-tl-lg">Policy Number</th>
                   <th className="pl-4 py-4">Expiry Date</th>
@@ -611,6 +801,9 @@ export const PersonalAcci = () => {
             )}
           </div>
         </div>
+      )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}
     </section>
   );

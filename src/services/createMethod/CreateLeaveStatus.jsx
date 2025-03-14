@@ -78,7 +78,7 @@ export const CRLeaveData = () => {
       : null;
     // console.log(timingchangeFromDate);
     const toValue = DateFormat(toDate);
-    const timingchangeToDate = toValue ? new Date(toValue).toISOString() : null;
+    const timingchangeToDate = toValue ? new Date(toValue)?.toISOString() : null;
     // console.log(timingchangeToDate);
     const supervisorDatevalue = DateFormat(supervisorDate);
     // console.log(supervisorDatevalue);
@@ -130,18 +130,18 @@ const creatingDate=DateFormat(receivedDate)
 
     console.log(totalData);
 
-    try {
-      const res = await Promise.all([
-        client.graphql({
-          query: createLeaveStatus,
-          variables: { input: totalData },
-        }),
-      ]);
-      console.log("Response", res);
-    } catch (error) {
-      console.error("Error executing GraphQL requests:", error);
-      throw error;
-    }
+    // try {
+    //   const res = await Promise.all([
+    //     client.graphql({
+    //       query: createLeaveStatus,
+    //       variables: { input: totalData },
+    //     }),
+    //   ]);
+    //   console.log("Response", res);
+    // } catch (error) {
+    //   console.error("Error executing GraphQL requests:", error);
+    //   throw error;
+    // }
   }, []);
 
   return { CRLeaveDetails };

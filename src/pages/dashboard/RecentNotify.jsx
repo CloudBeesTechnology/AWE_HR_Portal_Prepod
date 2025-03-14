@@ -31,7 +31,7 @@ export const RecentNotify = () => {
     "Contract Expiry",
   ];
   return (
-    <div className="flex justify-center  w-full h-full ">
+    <div className="flex justify-center p-2 w-full h-full ">
       <div className="rounded-lg shadow-md w-full h-full">
         <div className="bg-lite_grey rounded-t-2xl  font-semibold p-3">
           <h2 className="mx-2">Recent Notifications</h2>
@@ -100,7 +100,7 @@ export const RecentNotify = () => {
               );
             })}
 
-            <div className="underline text-[#8bb4f1] text-center px-16  my-5">
+            <div className="underline text-[blue] text-center px-16  my-5">
               <Link to="/notifications">View More</Link>
             </div>
           </section>

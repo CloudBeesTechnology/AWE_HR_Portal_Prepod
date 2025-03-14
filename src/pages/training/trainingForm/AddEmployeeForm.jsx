@@ -14,10 +14,12 @@ import { AddEmpReqUp } from "../../../services/updateMethod/AddEmpReqUp";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { sendEmail } from "../../../services/EmailServices";
 import { DateFormat } from "../../../utils/DateFormat";
-import { useCreateNotification } from "../../../hooks/useCreateNotification"; 
+import { useCreateNotification } from "../../../hooks/useCreateNotification";
 import useEmployeePersonalInfo from "../../../hooks/useEmployeePersonalInfo";
 import { DeleteDocsTriningEmpR } from "../../../services/uploadDocsDelete/DeleteDocsTriningEmpR";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
+import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../../utils/DeletePopup";
 
 export const AddEmployeeForm = () => {
   const { empPIData, workInfoData, AddCourseDetails, AddEmpReq } =
@@ -29,16 +31,19 @@ export const AddEmployeeForm = () => {
   const { createNotification } = useCreateNotification(); // Hook for creating notification
   const { AddEmpData } = AddEmpFun();
   const { TrReqUp } = AddEmpReqUp();
+  const { formattedPermissions } = useDeleteAccess();
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [userID, setUserID] = useState("");
   const [userType, setUserType] = useState("");
- 
+
   const [emailData, setEmailData] = useState({
     managerEmpID: "",
     managerOfficialMail: "",
     managerName: "",
     hrOfficialmail: "",
   });
-  
+
   const {
     register,
     handleSubmit,
@@ -59,10 +64,9 @@ export const AddEmployeeForm = () => {
     const userType = localStorage.getItem("userType");
     setUserType(userType);
   }, []);
-  const {personalInfo} = useEmployeePersonalInfo(userID);
+  const { personalInfo } = useEmployeePersonalInfo(userID);
 
   // console.log(personalInfo);
-  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -148,92 +152,100 @@ export const AddEmployeeForm = () => {
     return fileNameWithExtension;
   };
 
-const updateUploadingState = (label, value) => {
-       setIsUploading((prev) => ({
-         ...prev,
-         [label]: value,
-       }));
-       console.log(value);
-     };
-   
-     const handleFileChange = async (e, label) => {
-       const watchedEmpID = watch("empID");
-       if (!watchedEmpID) {
-           alert("Please enter the Employee ID before uploading files.");
-           window.location.href = "/employeeInfo";
-           return;
-       }
-   
-       const selectedFile = e.target.files[0];
-       if (!selectedFile) return;
-   
-       const allowedTypes = [
-         "application/pdf",
-         "image/jpeg",
-         "image/png",
-         "image/jpg",
-       ];
-       if (!allowedTypes.includes(selectedFile.type)) {
-           alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-           return;
-       }
-   
-       // Ensure no duplicate files are added
-       const currentFiles = watch(label) || [];
-       if (currentFiles?.some((file) => file.name === selectedFile.name)) {
-           alert("This file has already been uploaded.");
-           return;
-       }
-   
-   
-       setValue(label, [...currentFiles, selectedFile]);
-   
-       try {
-         updateUploadingState(label, true);
-         await uploadDocs(selectedFile, label, setUploadMedicalReports, watchedEmpID);
-         setUploadedFileNames((prev) => ({
-           ...prev,
-           [label]: selectedFile.name,
-         }));
-       } catch (err) {
-           console.error(err);
-       }
-     };
-   
-     const deleteFile = async (fileType, fileName) => {
-       try {
-         const watchedEmpID = watch("empID");
-         if (!watchedEmpID) {
-           alert("Please provide the Employee ID before deleting files.");
-           return;
-         }
-   
-         const isDeleted = await handleDeleteFile(
-           fileType,
-           fileName,
-           watchedEmpID
-         );
-         const isDeletedArrayUploaded = await DeleteDocsTriningEmpR(
-           fileType,
-           fileName,
-           watchedEmpID,
-           setUploadedFileNames,
-           setUploadMedicalReports,
-           setIsUploading
-         );
-   
-         if (!isDeleted || isDeletedArrayUploaded) {
-           console.error(
-             `Failed to delete file: ${fileName}, skipping UI update.`
-           );
-           return;
-         }
-         // console.log(`Deleted "${fileName}". Remaining files:`);
-       } catch (error) {
-         console.error("Error deleting file:", error);
-         alert("Error processing the file deletion.");
-       }
-     };
+  const updateUploadingState = (label, value) => {
+    setIsUploading((prev) => ({
+      ...prev,
+      [label]: value,
+    }));
+    // console.log(value);
+  };
+
+  const handleFileChange = async (e, label) => {
+    const watchedEmpID = watch("empID");
+    if (!watchedEmpID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
+    }
+
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
+    }
+
+    // Ensure no duplicate files are added
+    const currentFiles = watch(label) || [];
+    if (currentFiles?.some((file) => file.name === selectedFile.name)) {
+      alert("This file has already been uploaded.");
+      return;
+    }
+
+    setValue(label, [...currentFiles, selectedFile]);
+
+    try {
+      updateUploadingState(label, true);
+      await uploadDocs(
+        selectedFile,
+        label,
+        setUploadMedicalReports,
+        watchedEmpID
+      );
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [label]: selectedFile.name,
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+  const deleteFile = async (fileType, fileName) => {
+    try {
+      const watchedEmpID = watch("empID");
+      if (!watchedEmpID) {
+        alert("Please provide the Employee ID before deleting files.");
+        return;
+      }
+
+      const isDeleted = await handleDeleteFile(
+        fileType,
+        fileName,
+        watchedEmpID
+      );
+      const isDeletedArrayUploaded = await DeleteDocsTriningEmpR(
+        fileType,
+        fileName,
+        watchedEmpID,
+        setUploadedFileNames,
+        setUploadMedicalReports,
+        setIsUploading
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
+    }
+  };
 
   useEffect(() => {
     // Set initial showMedicalFields based on form state
@@ -244,18 +256,21 @@ const updateUploadingState = (label, value) => {
     Array.isArray(value) ? value[value.length - 1] : value;
 
   const searchResult = (result) => {
+    // Ensure result is defined
+    if (!result) {
+      console.warn("Search result is undefined or null");
+      return;
+    }
 
-    const workInfo = workInfoData.find(
-      (data) => data.empID === result.empID
-    );
+    // Find work info based on empID
+    const workInfo = workInfoData.find((data) => data.empID === result.empID);
 
     if (workInfo) {
-      // console.log("Work Info:", workInfo);
-      const managerEmpID = workInfo.manager[workInfo.manager.length - 1];
-      // console.log("Manager Employee ID:", managerEmpID);
+      const managerEmpID =
+        workInfo.manager?.[workInfo.manager.length - 1] || null;
 
-      const hrOfficialmail = "hr-training@adininworks.com";
       // Update HR email in emailData
+      const hrOfficialmail = "hr-training@adininworks.com";
       setEmailData((prevData) => ({
         ...prevData,
         hrOfficialmail,
@@ -268,29 +283,25 @@ const updateUploadingState = (label, value) => {
         );
 
         if (managerInfo) {
-          // console.log("Manager Info:", managerInfo);
-
           // Update manager's official email and name in emailData
           setEmailData((prevData) => ({
             ...prevData,
-            managerOfficialMail: managerInfo.officialEmail,
-            managerName: managerInfo.name,
-            managerEmpID: managerInfo.empID
+            managerOfficialMail: managerInfo.officialEmail || "",
+            managerName: managerInfo.name || "",
+            managerEmpID: managerInfo.empID || "",
           }));
         }
         // else {
-        //   console.warn(`Manager with empID ${managerEmpID} not found in empPIData`);
+        //   console.warn(
+        //     `Manager with empID ${managerEmpID} not found in empPIData`
+        //   );
         // }
       }
     } else {
-      console.warn(
-        `Work info for managerEmpID ${emailData.managerEmpID} not found`
-      );
+      console.warn(`Work info for empID ${result.empID} not found`);
     }
-    // console.log("Search result:", result);
 
-  
-
+    // Define keys to set
     const keysToSet = [
       "empID",
       "empBadgeNo",
@@ -304,65 +315,65 @@ const updateUploadingState = (label, value) => {
       "traineeStatus",
       "traineeCourseFee",
     ];
+
     const fields = ["department", "courseCode", "courseName", "company"];
     const uploadFields = ["medicalReport"];
 
-    // Set simple fields
+    // Set simple fields with fallback for undefined/null/empty values
     keysToSet.forEach((key) => {
-      if (result[key]) {
-        setValue(key, result[key]);
-      }
+      const value = result[key] || null; // Fallback to null if undefined, null, or empty string
+      setValue(key, value);
     });
 
+    // Set fields with the last value in the array
     fields.forEach((field) => {
-      const value = getLastValue(result[field]);
-      if (value) {
-        setValue(field, value);
+      const value = getLastValue(result[field]) || null; // Fallback to null if undefined, null, or empty array
+      setValue(field, value);
 
-        if (field === "courseName") {
-          setSelectedCourse((prev) => ({
-            ...prev,
-            courseName: Array.isArray(value) ? value : [value], // Ensure it is an array
-          }));
-        }
-
-        if (field === "company") {
-          setSelectedCourse((prev) => ({
-            ...prev,
-            company: Array.isArray(value) ? value : [value], // Ensure it is an array
-          }));
-        }
+      if (field === "courseName" || field === "company") {
+        setSelectedCourse((prev) => ({
+          ...prev,
+          [field]: Array.isArray(value) ? value : [value], // Ensure it is an array
+        }));
       }
     });
 
     // Handle upload fields
     uploadFields.forEach((field) => {
-      if (result[field]) {
+      const fieldData = result[field]?.[0] || null; // Fallback to null if undefined, null, or empty array
+
+      if (fieldData) {
         try {
-          const parsedArray = JSON.parse(result?.[field][0]);
+          const parsedArray = JSON.parse(fieldData);
           setValue(field, parsedArray);
-          setUploadMedicalReports((prev) => ({ ...prev, [field]: parsedArray }));
-    
+          setUploadMedicalReports((prev) => ({
+            ...prev,
+            [field]: parsedArray,
+          }));
+
           if (Array.isArray(parsedArray) && parsedArray.length > 0) {
             const fileNames = parsedArray.map((item) =>
               item?.upload ? getFileName(item.upload) : "Unknown file"
             );
-    
+
             setUploadedFileNames((prev) => ({
               ...prev,
-              [field]: fileNames, 
+              [field]: fileNames,
             }));
           }
         } catch (error) {
           console.error(`Error parsing upload field ${field}:`, error);
         }
+      } else {
+        setValue(field, null); // Set to null if no data
+        setUploadMedicalReports((prev) => ({ ...prev, [field]: null }));
+        setUploadedFileNames((prev) => ({ ...prev, [field]: [] }));
       }
     });
 
+    // Set medical required flag
     const mediRequired =
       result?.medicalName || result?.medicalExpiry ? true : false;
-
-    // Set the value for 'mediRequired'
     setValue("mediRequired", mediRequired);
     setShowMedicalFields(mediRequired);
   };
@@ -411,47 +422,52 @@ const updateUploadingState = (label, value) => {
           <strong>${DateFormat(data.traineeED)}</strong>.
         </p>`;
 
-          sendEmail(
-            emailSubject,
-            emailBody,
-            "hr_no-reply@adininworks.com", 
-            emailData.managerOfficialMail
-          );
+        sendEmail(
+          emailSubject,
+          emailBody,
+          "hr_no-reply@adininworks.com",
+          emailData.managerOfficialMail
+        );
 
-          sendEmail(
-            emailSubject,
-            emailBody1,
-            "hr_no-reply@adininworks.com", 
-            emailData.hrOfficialmail
-            
-          );
-          sendEmail(
-            emailSubject,
-            emailBody1,
-            "hr_no-reply@adininworks.com", 
-            "hr-training@adininworks.com"       
-          );
-          
+        sendEmail(
+          emailSubject,
+          emailBody1,
+          "hr_no-reply@adininworks.com",
+          emailData.hrOfficialmail
+        );
+        sendEmail(
+          emailSubject,
+          emailBody1,
+          "hr_no-reply@adininworks.com",
+          "hr-training@adininworks.com"
+        );
+
         await createNotification({
           empID: data.empID,
           leaveType: "Training Requestor",
-          message: `Employee Training Notification - ${data.name}. Dear Hr, Please be informed that ${data.name} is scheduled for training on 
+          message: `Employee Training Notification - ${
+            data.name
+          }. Dear Hr, Please be informed that ${
+            data.name
+          } is scheduled for training on 
           ${data.courseName} from 
           ${DateFormat(data.traineeSD)} to 
           ${DateFormat(data.traineeED)}.`,
-          senderEmail:"hr_no-reply@adininworks.com",
+          senderEmail: "hr_no-reply@adininworks.com",
           receipentEmail: emailData.hrOfficialmail,
           status: "Unread",
         });
-       
+
         await createNotification({
           empID: data.empID,
           leaveType: "Training Requestor",
-          message: `Employee Training Notification - ${data.name}. Dear ${emailData.managerName}, Please be informed that ${data.name} is scheduled for training on 
+          message: `Employee Training Notification - ${data.name}. Dear ${
+            emailData.managerName
+          }, Please be informed that ${data.name} is scheduled for training on 
           ${data.courseName} from 
           ${DateFormat(data.traineeSD)} to 
           ${DateFormat(data.traineeED)}.`,
-          senderEmail:"hr_no-reply@adininworks.com",
+          senderEmail: "hr_no-reply@adininworks.com",
           receipentEmail: emailData.managerOfficialMail,
           receipentEmpID: emailData.managerEmpID,
           status: "Unread",
@@ -464,6 +480,10 @@ const updateUploadingState = (label, value) => {
       console.log(err);
     }
   };
+
+  const requiredPermissions = ["Training Requestor"];
+
+  const access = "Training";
 
   return (
     <section className="bg-[#F8F8F8] p-10 center flex-col w-full ">
@@ -646,7 +666,7 @@ const updateUploadingState = (label, value) => {
                 className={`input-field `}
                 {...register("traineeSD")}
               />
-               {errors.traineeSD && (
+              {errors.traineeSD && (
                 <p className="text-[red] text-[13px] mt-1">
                   {errors.traineeSD.message}
                 </p>
@@ -660,7 +680,7 @@ const updateUploadingState = (label, value) => {
                 className={`input-field `}
                 {...register("traineeED")}
               />
-               {errors.traineeED && (
+              {errors.traineeED && (
                 <p className="text-[red] text-[13px] mt-1">
                   {errors.traineeED.message}
                 </p>
@@ -687,41 +707,45 @@ const updateUploadingState = (label, value) => {
           </div>
 
           <div className="col-span-2 flex items-center gap-5 my-5">
-  <div className="flex items-center gap-2 cursor-pointer">
-    {/* Visible Checkbox */}
-    <input
-      type="checkbox"
-      id="mediRequired"
-      {...register("mediRequired")}
-      checked={getValues("mediRequired")}
-      onChange={() => {
-        const newValue = !getValues("mediRequired");
-        setShowMedicalFields(newValue);
-        setValue("mediRequired", newValue);
-      }}
-      className="w-[18px] h-[18px] border border-grey rounded appearance-none flex items-center justify-center cursor-pointer"
-    />
-    
-    {/* Checkmark Icon inside Checkbox (only visible when checked) */}
-    {getValues("mediRequired") && (
-      <svg
-        className="w-5 h-5 text-[white] bg-green -ml-[26px] pointer-events-none rounded"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-      </svg>
-    )}
+            <div className="flex items-center gap-2 cursor-pointer">
+              {/* Visible Checkbox */}
+              <input
+                type="checkbox"
+                id="mediRequired"
+                {...register("mediRequired")}
+                checked={getValues("mediRequired")}
+                onChange={() => {
+                  const newValue = !getValues("mediRequired");
+                  setShowMedicalFields(newValue);
+                  setValue("mediRequired", newValue);
+                }}
+                className="w-[18px] h-[18px] border border-grey rounded appearance-none flex items-center justify-center cursor-pointer"
+              />
 
-    {/* Clickable Label */}
-    <label htmlFor="mediRequired" className="cursor-pointer">
-      If Medical Required
-    </label>
-  </div>
-</div>
+              {/* Checkmark Icon inside Checkbox (only visible when checked) */}
+              {getValues("mediRequired") && (
+                <svg
+                  className="w-5 h-5 text-[white] bg-green -ml-[26px] pointer-events-none rounded"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              )}
+
+              {/* Clickable Label */}
+              <label htmlFor="mediRequired" className="cursor-pointer">
+                If Medical Required
+              </label>
+            </div>
+          </div>
 
           {/* Conditionally render input fields if showMedicalFields is true */}
           {showMedicalFields && (
@@ -776,16 +800,19 @@ const updateUploadingState = (label, value) => {
                   </p>
                 )}
               </div>
-         <FileUpload
+              <FileUpload
                 label="Upload Medical Report"
                 name="medicalReport"
-  register={register}
-  uploadedFileNames={uploadedFileNames} // Ensure this exists
-  isUploading={isUploading} // Ensure this exists
-  handleFileChange={handleFileChange}
-  deleteFile={deleteFile}
-  error={errors?.medicalReport}
-/>
+                register={register}
+                uploadedFileNames={uploadedFileNames} // Ensure this exists
+                isUploading={isUploading} // Ensure this exists
+                handleFileChange={handleFileChange}
+                deleteFile={deleteFile}
+                error={errors?.medicalReport}
+                formattedPermissions={formattedPermissions}
+                requiredPermissions={requiredPermissions}
+                access={access}
+              />
               {/* <FileUploadField
                 label="Upload Medical Report"
                 onChangeFunc={(e) => handleFileChange(e, "medicalReport")}
@@ -814,6 +841,9 @@ const updateUploadingState = (label, value) => {
           notification={notification}
           path="/trainingReq/add"
         />
+      )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}
     </section>
   );

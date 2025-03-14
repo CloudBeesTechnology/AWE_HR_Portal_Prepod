@@ -216,79 +216,241 @@ export const WorkpassTracking = () => {
     return filtered;
   };
 
+  // const handleCandidateTypeSelect = (option) => {
+  //   let updatedOptions = [...selectedCandidateType];
+
+  //   // Disable SAWP and LPA based on selection
+  //   if (option === "SAWP" && !updatedOptions.includes("SAWP")) {
+  //     // Disable LPA if SAWP is selected
+  //     if (updatedOptions.includes("LPA")) {
+  //       updatedOptions = updatedOptions.filter((opt) => opt !== "LPA");
+  //     }
+  //     updatedOptions.push("SAWP");
+  //   } else if (option === "LPA" && !updatedOptions.includes("LPA")) {
+  //     // Disable SAWP if LPA is selected
+  //     if (updatedOptions.includes("SAWP")) {
+  //       updatedOptions = updatedOptions.filter((opt) => opt !== "SAWP");
+  //     }
+  //     updatedOptions.push("LPA");
+  //   } else if (option === "OnShore" || option === "OffShore") {
+  //     // If "OnShore" or "OffShore" is selected, allow only one of them
+  //     if (updatedOptions.includes("OnShore") && option === "OffShore") {
+  //       updatedOptions = updatedOptions.filter((opt) => opt !== "OnShore");
+  //     } else if (updatedOptions.includes("OffShore") && option === "OnShore") {
+  //       updatedOptions = updatedOptions.filter((opt) => opt !== "OffShore");
+  //     }
+  //     // Add the selected option
+  //     if (!updatedOptions.includes(option)) {
+  //       updatedOptions.push(option);
+  //     }
+  //   } else {
+  //     // Otherwise, toggle the option
+  //     if (updatedOptions.includes(option)) {
+  //       updatedOptions = updatedOptions.filter((opt) => opt !== option);
+  //     } else {
+  //       updatedOptions.push(option);
+  //     }
+  //   }
+
+  //   setSelectedCandidateType(updatedOptions);
+
+  //   // After updating candidate type selection, apply both candidate type and status filters together
+  //   let filtered = data;
+
+  //   // Apply the candidate type filter
+  //   if (updatedOptions.length > 0) {
+  //     filtered = data.filter((d) => {
+  //       return updatedOptions.some((opt) => {
+  //         if (opt === "SAWP") {
+  //           return d.contractType === "SAWP";
+  //         }
+  //         if (opt === "LPA") {
+  //           return (
+  //             d.contractType === "LPA" &&
+  //             (d.empType === "OnShore" || d.empType === "OffShore")
+  //           );
+  //         }
+  //         if (opt === "OnShore") {
+  //           return d.empType === "OnShore" && d.contractType !== "SAWP"; // Exclude SAWP for OnShore
+  //         }
+  //         if (opt === "OffShore") {
+  //           return d.empType === "OffShore" && d.contractType !== "SAWP"; // Exclude SAWP for OffShore
+  //         }
+  //         return true;
+  //       });
+  //     });
+  //   }
+
+  //   // Now apply the status filter (same as in handleFilterChange)
+  //   if (selectedFilters) {
+  //     filtered = applyFiltersBasedOnStatus(selectedFilters, filtered);
+  //   }
+
+  //   setFilteredData(filtered);
+  // };
+
+  // const handleCandidateTypeSelect = (option) => {
+  //   let updatedOptions = [...selectedCandidateType];
+  
+  //   // Handle SAWP and LPA conflicts
+  //   if (option === "SAWP" && !updatedOptions.includes("SAWP")) {
+  //     // If SAWP is selected, remove LPA
+  //     if (updatedOptions.includes("LPA")) {
+  //       updatedOptions = updatedOptions.filter((opt) => opt !== "LPA");
+  //     }
+  //     updatedOptions.push("SAWP");
+  //   } else if (option === "LPA" && !updatedOptions.includes("LPA")) {
+  //     // If LPA is selected, remove SAWP
+  //     if (updatedOptions.includes("SAWP")) {
+  //       updatedOptions = updatedOptions.filter((opt) => opt !== "SAWP");
+  //     }
+  //     updatedOptions.push("LPA");
+  //   } else if (option === "Onshore" || option === "Offshore") {
+  //     // If "OnShore" or "OffShore" is selected, ensure only one of them is selected
+  //     if (updatedOptions.includes("Onshore") && option === "Offshore") {
+  //       updatedOptions = updatedOptions.filter((opt) => opt !== "Onshore");
+  //     } else if (updatedOptions.includes("Offshore") && option === "Onshore") {
+  //       updatedOptions = updatedOptions.filter((opt) => opt !== "Offshore");
+  //     }
+  //     // Add the selected option if it's not already included
+  //     if (!updatedOptions.includes(option)) {
+  //       updatedOptions.push(option);
+  //     }
+  //   } else {
+  //     // Otherwise, toggle the option
+  //     if (updatedOptions.includes(option)) {
+  //       updatedOptions = updatedOptions.filter((opt) => opt !== option);
+  //     } else {
+  //       updatedOptions.push(option);
+  //     }
+  //   }
+  
+  //   // Update state with the selected candidate types
+  //   setSelectedCandidateType(updatedOptions);
+  
+  //   // Now apply both candidate type and status filters together
+  //   // Apply candidate type filter first
+  //   let filtered = data;
+  
+  //   if (updatedOptions.length > 0) {
+  //     filtered = data.filter((d) => {
+  //       return updatedOptions.some((opt) => {
+  //         if (opt === "SAWP") {
+  //           return d.contractType === "SAWP";
+  //         }
+  //         if (opt === "LPA") {
+  //           return (
+  //             d.contractType === "LPA" &&
+  //             (d.empType === "OnShore" || d.empType === "OffShore")
+  //           );
+  //         }
+  //         if (opt === "OnShore") {
+  //           return d.empType === "OnShore" && d.contractType !== "SAWP"; // Exclude SAWP for OnShore
+  //         }
+  //         if (opt === "OffShore") {
+  //           return d.empType === "OffShore" && d.contractType !== "SAWP"; // Exclude SAWP for OffShore
+  //         }
+  //         return true;
+  //       });
+  //     });
+  //   }
+  
+  //   // Now apply the status filter (same as in handleFilterChange)
+  //   if (selectedFilters) {
+  //     filtered = applyFiltersBasedOnStatus(selectedFilters, filtered);
+  //   }
+  
+  //   // Update the filtered data state
+  //   setFilteredData(filtered);
+  // };
+
   const handleCandidateTypeSelect = (option) => {
     let updatedOptions = [...selectedCandidateType];
-
-    // Disable SAWP and LPA based on selection
+  
+    console.log("Initial Selected Candidate Types:", selectedCandidateType);
+  
+    // Handle SAWP and LPA conflicts
     if (option === "SAWP" && !updatedOptions.includes("SAWP")) {
-      // Disable LPA if SAWP is selected
+      console.log("Selecting SAWP, removing LPA if it exists");
       if (updatedOptions.includes("LPA")) {
         updatedOptions = updatedOptions.filter((opt) => opt !== "LPA");
       }
       updatedOptions.push("SAWP");
     } else if (option === "LPA" && !updatedOptions.includes("LPA")) {
-      // Disable SAWP if LPA is selected
+      console.log("Selecting LPA, removing SAWP if it exists");
       if (updatedOptions.includes("SAWP")) {
         updatedOptions = updatedOptions.filter((opt) => opt !== "SAWP");
       }
       updatedOptions.push("LPA");
     } else if (option === "OnShore" || option === "OffShore") {
-      // If "OnShore" or "OffShore" is selected, allow only one of them
+      console.log("Selecting OnShore or OffShore:", option);
       if (updatedOptions.includes("OnShore") && option === "OffShore") {
         updatedOptions = updatedOptions.filter((opt) => opt !== "OnShore");
       } else if (updatedOptions.includes("OffShore") && option === "OnShore") {
         updatedOptions = updatedOptions.filter((opt) => opt !== "OffShore");
       }
-      // Add the selected option
       if (!updatedOptions.includes(option)) {
         updatedOptions.push(option);
       }
     } else {
-      // Otherwise, toggle the option
+      console.log("Toggling option:", option);
       if (updatedOptions.includes(option)) {
         updatedOptions = updatedOptions.filter((opt) => opt !== option);
       } else {
         updatedOptions.push(option);
       }
     }
-
+  
+    console.log("Updated Selected Candidate Types:", updatedOptions);
+  
     setSelectedCandidateType(updatedOptions);
-
-    // After updating candidate type selection, apply both candidate type and status filters together
+  
     let filtered = data;
-
-    // Apply the candidate type filter
+    console.log("Raw Data:", data);
+  
     if (updatedOptions.length > 0) {
+      console.log("Applying Candidate Type Filter...");
       filtered = data.filter((d) => {
         return updatedOptions.some((opt) => {
           if (opt === "SAWP") {
+            console.log("Filtering for SAWP:", d);
             return d.contractType === "SAWP";
           }
           if (opt === "LPA") {
+            console.log("Filtering for LPA:", d);
             return (
               d.contractType === "LPA" &&
-              (d.empType === "OnShore" || d.empType === "OffShore")
+              (d.empType === "Onshore" || d.empType === "Offshore") // Ensure empType is checked as Onshore/Offshore
             );
           }
           if (opt === "OnShore") {
-            return d.empType === "OnShore" && d.contractType !== "SAWP"; // Exclude SAWP for OnShore
+            console.log("Filtering for OnShore:", d);
+            // Exclude SAWP when filtering OnShore
+            return d.empType === "Onshore" && d.contractType !== "SAWP"; 
           }
           if (opt === "OffShore") {
-            return d.empType === "OffShore" && d.contractType !== "SAWP"; // Exclude SAWP for OffShore
+            console.log("Filtering for OffShore:", d);
+            // Exclude SAWP when filtering OffShore
+            return d.empType === "Offshore" && d.contractType !== "SAWP"; 
           }
-          return true;
+          console.log("No filter applied for option:", opt);
+          return true; 
         });
       });
     }
-
-    // Now apply the status filter (same as in handleFilterChange)
+  
+    console.log("Filtered Data after applying Candidate Type Filter:", filtered);
+  
     if (selectedFilters) {
+      console.log("Applying Status Filter:", selectedFilters);
       filtered = applyFiltersBasedOnStatus(selectedFilters, filtered);
     }
-
+  
+    console.log("Final Filtered Data after applying Status Filter:", filtered);
+  
     setFilteredData(filtered);
   };
-
+   
   const closeForm = () => setIsFormVisible(false);
   useEffect(() => {
     const handleClickOutside = (event) => {

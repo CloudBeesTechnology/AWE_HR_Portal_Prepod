@@ -32,7 +32,7 @@ export const EmpInsDataFun = () => {
         empInsUpload:[empInsValue.empInsUpload],
 
     };
-    console.log(totalData);
+    // console.log(totalData);
 
     try {
       const storedData=   await Promise.all([

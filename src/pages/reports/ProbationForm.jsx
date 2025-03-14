@@ -184,25 +184,34 @@ export const ProbationForm = forwardRef(() => {
         }
       }
 
-      const generalManagerPositions = workInfoData.filter((item) =>
-        item.position[item.position.length - 1]?.includes("General Manager")
+      const generalManagerPositions = workInfoData?.filter((item) =>
+        item?.position?.[item?.position?.length - 1]?.includes("GENERAL MANAGER")
       );
 
-      if (generalManagerPositions.length > 0) {
-        const gmInfo = empPIData.find(
-          (data) => data.empID === String(generalManagerPositions[0].empID)
-        );
+      // console.log("Filtered GENERAL MANAGER Positions:", generalManagerPositions);
 
+      if (generalManagerPositions?.length > 0) {
+        const gmEmails = [];
+        const gmName = [];
+
+          generalManagerPositions?.forEach((gmPosition) => {
+        const gmInfo = empPIData.find(
+          (data) => data.empID === String(gmPosition.empID)
+        );
         if (gmInfo) {
+          gmEmails.push(gmInfo.officialEmail)
+          gmName.push(gmInfo.name)
           setEmailData((prevData) => ({
             ...prevData,
-            gmOfficialMail: gmInfo.officialEmail,
-            gmName: gmInfo.name,
+            gmOfficialMail: gmEmails,
+            gmName: gmName,
           }));
           // console.log("Updated Email Data with GM Email:", gmInfo.officialEmail);
         } else {
           // console.log("GM Info not found.");
         }
+      });
+
       } else {
         // console.log("No General Manager positions found.");
       }
@@ -212,7 +221,7 @@ export const ProbationForm = forwardRef(() => {
   }, [workInfoData, employeeData?.empID, empPIData]);
 
   useEffect(() => {
-    // console.log("Email Data has changed:", emailData);
+    console.log("Email Data has changed:", emailData);
   }, [emailData]);
 
   useEffect(() => {
@@ -451,13 +460,13 @@ export const ProbationForm = forwardRef(() => {
         setTimeout(() => {
           setNotification(true);
           setShowTitle("Probation form updated successfully");
-        }, 600);
+        }, 300);
 
         // console.log("update", formattedData);
 
         setTimeout(() => {
           sendEmails(data, empPIRecord, probationEndFormatted, PFDataRecord, subject, notifyMessageSup, notifyMessageManager, notifyMessageGM);
-        }, 100);
+        }, 10);
       } else {
         const ProbValue = { ...data, ...formDataValues, probStatus: true };
 
@@ -493,12 +502,12 @@ export const ProbationForm = forwardRef(() => {
         setTimeout(() => {
           setNotification(true);
           setShowTitle("Probation form created successfully");
-        }, 600);
+        }, 300);
 
         // console.log("create");
         setTimeout(() => {
           sendEmails(data, empPIRecord, probationEndFormatted, subject, notifyMessageSup, notifyMessageManager, notifyMessageGM);
-        }, 100);
+        }, 10);
 
         // console.log("Created", ProbValue);
       }
@@ -546,7 +555,7 @@ export const ProbationForm = forwardRef(() => {
           leaveType: subject,
           message: notifyMessageSup,
           senderEmail: "hr_no-reply@adininworks.com",
-          receipentEmail: emailData.genManagerEmail,
+          receipentEmail: emailData.managerOfficialMail,
         });
 
         // If the email is sent successfully, the log will be visible, and you can trigger the alert here.
@@ -556,36 +565,43 @@ export const ProbationForm = forwardRef(() => {
       if (userType === "Manager" && !gmPosition) {
         // Sending email to GM if applicable
         if (emailData.skilledAndUnskilled === null) {
-          await sendEmail(
-            gmSubject,
-            `<html>
-            <body>
-              <p>Your Employee Mr./Ms. ${
-                empPIRecord?.name
-              }'s probation period ending on ${
-              probationEndFormatted || "Not Mentioned"
-            }</p>
-              <p>has been reviewed and ${
-                data?.managerApproved || PFDataRecord.managerApproved
-              } by the Manager, ${
-              emailData?.managerName || "Not Mentioned"
-            }.</p>
-              <p>Click here https://hr.adininworks.co to view the assessment form.</p>
-            </body>
-          </html>`,
-            from,
-            emailData.gmOfficialMail
-          );
+          if (Array.isArray(emailData.gmOfficialMail)) {
+            for (let email of emailData.gmOfficialMail) {
+              await sendEmail(
+                gmSubject,
+                `<html>
+                <body>
+                  <p>Your Employee Mr./Ms. ${
+                    empPIRecord?.name
+                  }'s probation period ending on ${
+                  probationEndFormatted || "Not Mentioned"
+                }</p>
+                  <p>has been reviewed and ${
+                    data?.managerApproved || PFDataRecord.managerApproved
+                  } by the Manager, ${
+                  emailData?.managerName || "Not Mentioned"
+                }.</p>
+                  <p>Click here https://hr.adininworks.co to view the assessment form.</p>
+                </body>
+              </html>`,
+                from,
+                email
+              );
+            }
+          }
+      if (Array.isArray(emailData.gmOfficialMail)) {
+        for (let email of emailData.gmOfficialMail) {
+          await createNotification({
+            empID: employeeData.empID,
+            leaveType: subject,
+            message: notifyMessageGM,
+            senderEmail: "hr_no-reply@adininworks.com",
+            receipentEmail: email,
+          });
 
-          
-        await createNotification({
-          empID: employeeData.empID,
-          leaveType: subject,
-          message: notifyMessageManager,
-          senderEmail: "hr_no-reply@adininworks.com",
-          receipentEmail: emailData.gmOfficialMail,
-        });
-
+        }
+      }
+        
           // alert(`Email sent successfully to GM's mail: ${emailData.gmOfficialMail}\n\nEmail Content:\nYour Employee Mr./Ms. ${empPIRecord?.name}'s probation period ending on ${probationEndFormatted || "Not Mentioned"}\n\nhas been reviewed and ${data?.managerApproved || PFDataRecord.managerApproved} by the Manager, ${emailData?.managerName || "Not Mentioned"}.`);
         } else {
           await sendEmail(

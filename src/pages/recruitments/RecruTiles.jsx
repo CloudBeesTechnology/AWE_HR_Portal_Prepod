@@ -17,24 +17,55 @@ export const RecruTiles = () => {
   const [selectedTile, setSelectedTile] = useState("");
   const recruitmentPermissions = usePermission("userID", "Recruitment");
   useEffect(() => {
-    if (location.pathname.includes("applyemployreq")) {
-      setSelectedTile("Apply Employee Requisition");
-    } else if (location.pathname.includes("employreq")) {
+    if (location.pathname.includes("/applyemployreq")) {
+      setSelectedTile("/Apply Employee Requisition");
+      setTempID(null);
+      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("profileStore");
+      localStorage.removeItem('personalFormData');
+      localStorage.removeItem('educationFormData');
+    } else if (location.pathname.includes("/employreq")) {
       setSelectedTile("Employee Requisition");
-    } else if (location.pathname.includes("candidate")) {
+      setTempID(null);
+      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("profileStore");
+      localStorage.removeItem('personalFormData');
+      localStorage.removeItem('educationFormData');
+    } else if (location.pathname.includes("/candidate")) {
       setSelectedTile("Candidate");
       setTempID(null);
       localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("profileStore");
       localStorage.removeItem('personalFormData');
       localStorage.removeItem('educationFormData');
-    } else if (location.pathname.includes("localcandi")) {
+    } else if (location.pathname.includes("/localcandi")) {
       setSelectedTile("Local CV");
-    } else if (location.pathname.includes("nonloccandi")) {
+      setTempID(null);
+      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("profileStore");
+      localStorage.removeItem('personalFormData');
+      localStorage.removeItem('educationFormData');
+    } else if (location.pathname.includes("/nonloccandi")) {
       setSelectedTile("Non Local CV");
-    } else if (location.pathname.includes("status")) {
+      setTempID(null);
+      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("profileStore");
+      localStorage.removeItem('personalFormData');
+      localStorage.removeItem('educationFormData');
+    } else if (location.pathname.includes("/status")) {
       setSelectedTile("Status");
-    } else if (location.pathname.includes("workpasstracking")) {
+      setTempID(null);
+      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("profileStore");
+      localStorage.removeItem('personalFormData');
+      localStorage.removeItem('educationFormData');
+    } else if (location.pathname.includes("/workpasstracking")) {
       setSelectedTile("WorkPass Tracking");
+      setTempID(null);
+      localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("profileStore");
+      localStorage.removeItem('personalFormData');
+      localStorage.removeItem('educationFormData');
     }
   }, [location.pathname]);
 

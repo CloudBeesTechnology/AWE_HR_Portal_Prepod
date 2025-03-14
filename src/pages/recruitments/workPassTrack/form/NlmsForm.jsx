@@ -11,15 +11,19 @@ import { statusOptions } from "../../../../utils/StatusDropdown";
 import { SpinLogo } from "../../../../utils/SpinLogo";
 import { handleDeleteFile } from "../../../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadNlms } from "../deleteUpload/DeleteUploadNlms";
-
+import { useDeleteAccess } from "../../../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../../../utils/DeletePopup";
 export const NlmsForm = ({ candidate }) => {
+  const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules } = useFetchCandy();
   const { interviewDetails } = UpdateInterviewData();
   const { wpTrackingDetails, isLoading, error } = useUpdateWPTracking();
   const [notification, setNotification] = useState(false);
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [formData, setFormData] = useState({
     interview: {
-      id: "",
+      id: "", 
       nlmssubmitdate: "",
       submissionrefrenceno: "",
       nlmsapprovedate: "",
@@ -58,9 +62,7 @@ export const NlmsForm = ({ candidate }) => {
         (data) => data.tempID === candidate.tempID
       );
 
-
       if (interviewData) {
-     
         setFormData({
           interview: {
             nlmssubmitdate: interviewData.nlmssubmitdate,
@@ -72,7 +74,7 @@ export const NlmsForm = ({ candidate }) => {
             status: interviewData.IDDetails.status,
           },
         });
-   
+
         if (interviewData.nlmsfile) {
           const fileName = extractFileName(interviewData.nlmsfile);
           setUploadedFileNames((prev) => ({
@@ -81,12 +83,8 @@ export const NlmsForm = ({ candidate }) => {
           }));
           // console.log("Uploaded file name set:", fileName);
         }
-      } else {
-        // console.log("No interviewData found for candidate:", candidate.tempID);
-      }
-    } else {
-      // console.log("No interview schedules available.");
-    }
+      } 
+    } 
   }, [interviewSchedules, candidate.tempID]);
 
   const extractFileName = (url) => {
@@ -141,6 +139,10 @@ export const NlmsForm = ({ candidate }) => {
     }
   };
 
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
   const deletedStringUpload = async (fileType, fileName) => {
     try {
       const tempID = candidate.tempID;
@@ -167,6 +169,8 @@ export const NlmsForm = ({ candidate }) => {
         return;
       }
       // console.log(`Deleted "${fileName}". Remaining files:`);
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
     } catch (error) {
       console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
@@ -232,6 +236,10 @@ export const NlmsForm = ({ candidate }) => {
       console.error("Error submitting interview details:", err);
     }
   };
+
+  const requiredPermissions = ["WorkPass Tracking"];
+
+  const access = "Recruitment";
 
   return (
     <>
@@ -332,6 +340,9 @@ export const NlmsForm = ({ candidate }) => {
                 deletedStringUpload={deletedStringUpload}
                 isUploadingString={isUploadingString}
                 error={errors.nlmsFile}
+                formattedPermissions={formattedPermissions}
+                requiredPermissions={requiredPermissions}
+                access={access}
               />
             </div>
           </div>
@@ -356,6 +367,9 @@ export const NlmsForm = ({ candidate }) => {
           notification={notification}
           path="/recrutiles/workpasstracking"
         />
+      )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}
     </>
   );

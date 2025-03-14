@@ -12,7 +12,7 @@ import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
 import { FormField } from "../../../utils/FormField";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import {leavePassDD,workInfoUploads} from "../../../utils/DropDownMenus";
-import { handleDeleteFile } from "../../../services/uploadDocsS3/DeleteDocsWI";
+import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 import { MdCancel } from "react-icons/md";
 import { UploadingFiles } from "../../employees/medicalDep/FileUploadField";
 import { SpinLogo } from "../../../utils/SpinLogo";
@@ -27,8 +27,11 @@ import { CreateLeaveData } from "../../../services/createMethod/CreateLeaveData"
 import { CreateTerminate } from "../../../services/createMethod/CreateTerminate";
 import { CreateSRData } from "../../../services/createMethod/CreateSRData";
 import { DeleteDocsWI } from "../../../services/uploadDocsDelete/DeleteDocsWI";
+import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../../utils/DeletePopup";
 
 export const WorkInfo = () => {
+  const { formattedPermissions } = useDeleteAccess();
   const { WIUpdateData } = UpdateWIData();
   const { WIUpdateSRData } = UpdateWISRData();
   const { WIUpdateLeaveData } = UpdateWILeaveData();
@@ -57,7 +60,8 @@ export const WorkInfo = () => {
     control,
     setValue,
     getValues,
-    watch,trigger,
+    watch,
+    trigger,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -69,7 +73,8 @@ export const WorkInfo = () => {
     },
     resolver: yupResolver(WorkInfoSchema),
   });
-
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
@@ -195,7 +200,7 @@ export const WorkInfo = () => {
       ...prev,
       [label]: value,
     }));
-    console.log(value);
+    // console.log(value);
   };
 
   const handleFileChange = async (e, label) => {
@@ -247,6 +252,10 @@ export const WorkInfo = () => {
     }
   };
 
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
   const deleteFile = async (fileType, fileName) => {
     try {
       const watchedEmpID = watch("empID");
@@ -275,7 +284,15 @@ export const WorkInfo = () => {
         );
         return;
       }
+      setdeleteTitle1(
+        `${fileName}`
+      );
+      handleDeleteMsg();
       // console.log(`Deleted "${fileName}". Remaining files:`);
+      setdeleteTitle1(
+        `${fileName}`
+      );
+      handleDeleteMsg();
     } catch (error) {
       console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
@@ -422,7 +439,6 @@ fieldValue.forEach((val) => {
     // console.log("key",arrayDateField);
 // console.log("res",result);
 
-
     setValue("hr", "Hr-notification@adininworks.com");
 
     const uploadFields = [
@@ -477,7 +493,7 @@ fieldValue.forEach((val) => {
   };
 
   const onSubmit = async (data) => {
-    console.log(data);
+    // console.log(data);
     
     try {
       const checkingPITable =
@@ -502,7 +518,7 @@ fieldValue.forEach((val) => {
           uploadAL: JSON.stringify(nameServiceUp.uploadAL),
           uploadDep: JSON.stringify(nameServiceUp.uploadDep),
         };
-        console.log("SR Data Update Value:", SRUpValue);
+        // console.log("SR Data Update Value:", SRUpValue);
         await WIUpdateSRData({ SRUpValue });
       } else {
         const SRValue = {
@@ -524,7 +540,7 @@ fieldValue.forEach((val) => {
           ...data,
           leaveDetailsDataRecord: leaveDetailsDataRecord,
         };
-        console.log("Leave Details Update Value:", LeaveUpValue);
+        // console.log("Leave Details Update Value:", LeaveUpValue);
         await WIUpdateLeaveData({ LeaveUpValue });
       } else {
         const LeaveValue = {
@@ -541,7 +557,7 @@ fieldValue.forEach((val) => {
           sapNo: checkingPITable?.sapNo,
           workInfoDataRecord: workInfoDataRecord,
         };
-        console.log("Work Info Update Value:", workInfoUpValue);
+        // console.log("Work Info Update Value:", workInfoUpValue);
         await WIUpdateData({ workInfoUpValue });
       } else {
         const workInfoValue = {
@@ -562,7 +578,7 @@ fieldValue.forEach((val) => {
           WITermination: JSON.stringify(nameServiceUp.WITermination),
           WILeaveEntitle: JSON.stringify(nameServiceUp.WILeaveEntitle),
         };
-        console.log("Terminate Update Value:", TerminateUpValue);
+        // console.log("Terminate Update Value:", TerminateUpValue);
         await WIUpdateTerminateData({ TerminateUpValue });
       } else {
         const TerminateValue = {
@@ -584,6 +600,13 @@ fieldValue.forEach((val) => {
       console.log("Error during submission:", err);
     }
   };
+
+  const requiredPermissions = [
+    "Work Info",
+  ];
+
+  const access = "Employee"
+
   return (
     <section
       className="bg-[#F5F6F1CC] mx-auto p-10"
@@ -854,7 +877,7 @@ fieldValue.forEach((val) => {
         </div>
 
         <div className="grid grid-cols-3 gap-5 form-group mt-5">
-        {workInfoUploads.map((field, index) => (
+          {workInfoUploads.map((field, index) => (
             <Controller
               key={index}
               name={field.title}
@@ -864,10 +887,9 @@ fieldValue.forEach((val) => {
                   <h2 className="text_size_5">Upload {field.label}</h2>
                   <label
                     onClick={() => {
-                      
                       if (isUploading[field.title]) {
                         alert(
-                          "Delete already uploaded Files or save an uploaded file."
+                          "Please delete the previously uploaded file before uploading a new one."
                         );
                       }
                     }}
@@ -886,51 +908,54 @@ fieldValue.forEach((val) => {
                     </span>
                   </label>
 
-                     <p className="text-xs mt-1 text-grey px-1">
-                                      {uploadedFileNames?.[field.title] ? (
-                                        Array.isArray(uploadedFileNames[field.title]) ? (
-                                          uploadedFileNames[field.title]
-                                            .slice() // Create a shallow copy to avoid mutating the original array
-                                            .reverse()
-                                            .map((fileName, fileIndex) => (
-                                              <span
-                                                key={fileIndex}
-                                                className="mt-2 flex justify-between items-center"
-                                              >
-                                                {fileName}
-                                                <button
-                                                  type="button"
-                                                  className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-                                                  onClick={() =>
-                                                    deleteFile(field.title, fileName)
-                                                  }
-                                                >
-                                                  <MdCancel />
-                                                </button>
-                                              </span>
-                                            ))
-                                        ) : (
-                                          <span className="mt-2 flex justify-between items-center">
-                                            {uploadedFileNames[field.title]}
-                                            <button
-                                              type="button"
-                                              className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-                                              onClick={() =>
-                                                deleteFile(
-                                                  field.title,
-                                                  uploadedFileNames[field.title]
-                                                )
-                                              }
-                                            >
-                                              <MdCancel />
-                                            </button>
-                                          </span>
-                                        )
-                                      ) : (
-                                        <span></span>
-                                      )}
-                      </p>
-                 
+                  <p className="text-xs mt-1 text-grey px-1">
+                    {uploadedFileNames?.[field.title] ? (
+                      Array.isArray(uploadedFileNames[field.title]) ? (
+                        uploadedFileNames[field.title]
+                          .slice() // Create a shallow copy to avoid mutating the original array
+                          .reverse()
+                          .map((fileName, fileIndex) => (
+                            <span
+                              key={fileIndex}
+                              className="mt-2 flex justify-between items-center"
+                            >
+                              {fileName}
+                              {formattedPermissions?.deleteAccess?.Employee?.includes(
+                              "Work Info") && (
+                              <button
+                                type="button"
+                                className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                                onClick={() =>
+                                  deleteFile(field.title, fileName)
+                                }
+                              >
+                                <MdCancel />
+                              </button>
+                              )}
+                            </span>
+                          ))
+                      ) : (
+                        <span className="mt-2 flex justify-between items-center">
+                          {uploadedFileNames[field.title]}
+                          <button
+                            type="button"
+                            className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                            onClick={() =>
+                              deleteFile(
+                                field.title,
+                                uploadedFileNames[field.title]
+                              )
+                            }
+                          >
+                            <MdCancel />
+                          </button>
+                        </span>
+                      )
+                    ) : (
+                      <span></span>
+                    )}
+                  </p>
+
                   {errors[field.title] && (
                     <p className="text-red text-xs mt-1">
                       {errors[field.title].message}
@@ -961,6 +986,10 @@ fieldValue.forEach((val) => {
                   deleteFile={deleteFile}
                   isUploading={isUploading}
                   errors={errors}
+                  formattedPermissions={formattedPermissions}
+                  requiredPermissions={requiredPermissions}
+                  access={access}
+                  check={isUploading}
                 />
               ) : (
                 <div key={index}>
@@ -1003,6 +1032,12 @@ fieldValue.forEach((val) => {
           path="/workInfo"
         />
       )}
+       {deletePopup && (
+                          <DeletePopup
+                            handleDeleteMsg={handleDeleteMsg}
+                            title1={deleteTitle1}
+                          />
+                        )}
     </section>
   );
 };

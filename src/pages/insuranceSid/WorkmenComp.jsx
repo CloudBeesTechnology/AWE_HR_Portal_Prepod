@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormField } from "../../utils/FormField";
@@ -7,7 +7,7 @@ import { FileUpload } from "../employees/medicalDep/FileUploadField";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { WorkmenCompSchema } from "../../services/EmployeeValidation";
 import { generateClient } from "@aws-amplify/api";
-import { createWorkMen } from "../../graphql/mutations";
+import { createWorkMen, updateWorkMen } from "../../graphql/mutations";
 import { listWorkMen } from "../../graphql/queries";
 import { FaTimes, FaDownload, FaPrint } from "react-icons/fa";
 import { Document, Page } from "react-pdf";
@@ -15,10 +15,19 @@ import { pdfjs } from "react-pdf";
 import { getUrl } from "@aws-amplify/storage";
 import { DeleteWorkComp } from "./DeleteUpload/DeleteWorkComp";
 import { handleDeleteFile } from "../../services/uploadsDocsS3/DeleteDocs";
+import { DeletePopup } from "../../utils/DeletePopup";
+import { IoSearch } from "react-icons/io5";
+import { FaArrowLeft } from "react-icons/fa";
+import { DataSupply } from "../../utils/DataStoredContext";
+import { Link } from "react-router-dom";
+import { InsSearch } from "./InsSearch";
+import { useDeleteAccess } from "../../hooks/useDeleteAccess";
+import { GoUpload } from "react-icons/go";
+import { MdCancel } from "react-icons/md";
+import { useOutletContext } from "react-router-dom";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
-import * as pdfjsLib from 'pdfjs-dist'; 
+import * as pdfjsLib from "pdfjs-dist";
 import "@react-pdf-viewer/core/lib/styles/index.css";
-import { useReactToPrint } from "react-to-print";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
   import.meta.url
@@ -30,10 +39,11 @@ export const WorkmenComp = () => {
   const [insuranceData, setInsuranceData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [isUploading, setIsUploading] = useState({
     workmenComUp: false,
-      });
+  });
 
   const [uploadedFileNames, setUploadedFileNames] = useState({
     workmenComUp: null,
@@ -52,6 +62,12 @@ export const WorkmenComp = () => {
   const [lastUploadUrl, setPPLastUP] = useState("");
   const [pdfHeight, setPdfHeight] = useState("");
   const [pdfWidth, setPdfWidth] = useState("");
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [searchResultData, setSearchResultData] = useState([]);
+  const { formattedPermissions } = useDeleteAccess();
+  const { workMenDetails } = useContext(DataSupply);
+  const { empID, requiredPermissions, access } = useOutletContext();
+
   const workmenPrint = useRef();
 
   const {
@@ -102,106 +118,96 @@ export const WorkmenComp = () => {
     }
   };
 
- const updateUploadingState = (label, value) => {
-      setIsUploading((prev) => ({
+  const updateUploadingState = (label, value) => {
+    setIsUploading((prev) => ({
+      ...prev,
+      [label]: value,
+    }));
+    // console.log(value);
+  };
+
+  const handleFileChange = async (e, label) => {
+    const workmenCompNo = watch("workmenCompNo");
+    if (!workmenCompNo) {
+      alert("Please enter the Policy Number before uploading files.");
+      window.location.href = "/insuranceHr/workmenComp";
+      return;
+    }
+
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
+    }
+
+    // Ensure no duplicate files are added
+    const currentFiles = watch(label) || [];
+    if (currentFiles.some((file) => file.name === selectedFile.name)) {
+      alert("This file has already been uploaded.");
+      return;
+    }
+
+    setValue(label, [...currentFiles, selectedFile]);
+
+    try {
+      updateUploadingState(label, true);
+      await uploadDocs(selectedFile, label, setUploadWCU, workmenCompNo);
+      setUploadedFileNames((prev) => ({
         ...prev,
-        [label]: value,
+        [label]: selectedFile.name,
       }));
-      console.log(value);
-    };
-  
-    const handleFileChange = async (e, label) => {
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
+  const deleteFile = async (fileType, fileName, fileIndex) => {
+    try {
       const workmenCompNo = watch("workmenCompNo");
       if (!workmenCompNo) {
-          alert("Please enter the Policy Number before uploading files.");
-          window.location.href = "/insuranceHr";
-          return;
+        alert("Please provide the Policy Number before deleting files.");
+        return;
       }
-  
-      const selectedFile = e.target.files[0];
-      if (!selectedFile) return;
-  
-      const allowedTypes = [
-        "application/pdf",
-       
-      ];
-      if (!allowedTypes.includes(selectedFile.type)) {
-          alert("Upload must be a PDF file.");
-          return;
-      }
-  
-      // Ensure no duplicate files are added
-      const currentFiles = watch(label) || [];
-      if (currentFiles.some((file) => file.name === selectedFile.name)) {
-          alert("This file has already been uploaded.");
-          return;
-      }
-  
-      setValue(label, [...currentFiles, selectedFile]);
-  
-      try {
-        updateUploadingState(label, true);
-        await uploadDocs(selectedFile, label, setUploadWCU, workmenCompNo);
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          [label]: selectedFile.name,
-        }));
-      } catch (err) {
-          console.error(err);
-      }
-    };
-  
-    const deleteFile = async (fileType, fileName) => {
-      try {
-        const workmenCompNo = watch("workmenCompNo");
-        if (!workmenCompNo) {
-          alert("Please provide the Policy Number before deleting files.");
-          return;
-        }
-  
-        const isDeleted = await handleDeleteFile(
-          fileType,
-          fileName,
-          workmenCompNo
-        );
-        const isDeletedArrayUploaded = await DeleteWorkComp(
-          fileType,
-          fileName,
-          workmenCompNo,
-          setUploadedFileNames,
-          setUploadWCU,
-          setIsUploading
-        );
-  
-        if (!isDeleted || isDeletedArrayUploaded) {
-          console.error(
-            `Failed to delete file: ${fileName}, skipping UI update.`
-          );
-          return;
-        }
-        // console.log(`Deleted "${fileName}". Remaining files:`);
-      } catch (error) {
-        console.error("Error deleting file:", error);
-        alert("Error processing the file deletion.");
-      }
-    };
 
-  const onSubmit = async (data) => {
-    try {
-      const WCCreValue = {
-        ...data,
-        workmenComUp: JSON.stringify(uploadWCU.workmenComUp),
-      };
-      // console.log(WCCreValue);
+      const isDeleted = await handleDeleteFile(
+        fileType,
+        fileName,
+        workmenCompNo
+      );
+      const isDeletedArrayUploaded = await DeleteWorkComp(
+        fileType,
+        fileName,
+        fileIndex,
+        workmenCompNo,
+        setUploadedFileNames,
+        setUploadWCU,
+        setIsUploading
+      );
 
-      const response = await client.graphql({
-        query: createWorkMen,
-        variables: { input: WCCreValue },
-      });
-      // console.log("Successfully submitted data:", response);
-      setNotification(true);
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
+      // console.log(`Deleted "${fileName}". Remaining files:`);
     } catch (error) {
-      console.error("Error submitting data:", error);
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
     }
   };
 
@@ -210,7 +216,7 @@ export const WorkmenComp = () => {
       try {
         let allWorkMen = [];
         let nextToken = null;
-  
+
         do {
           const response = await client.graphql({
             query: listWorkMen,
@@ -218,65 +224,184 @@ export const WorkmenComp = () => {
               nextToken: nextToken,
             },
           });
-  
+
           const items = response?.data?.listWorkMen?.items || [];
-  
+
           allWorkMen = [...allWorkMen, ...items];
-  
+
           nextToken = response?.data?.listWorkMen?.nextToken;
         } while (nextToken);
-  
+
         const filteredData = allWorkMen.filter((data) => {
           const expiryDate = new Date(data.workmenCompExp);
           return expiryDate >= new Date();
         });
-  
+
         setInsuranceData(filteredData);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching insurance data:", error);
+        // console.error("Error fetching insurance data:", error);
         setError("insuranceData", { message: "Error fetching data" });
         setLoading(false);
       }
     };
-  
+
     fetchInsuranceData();
   }, []);
-  
+
+  const searchResult = (result) => {
+    console.log("RW", result);
+    setSearchResultData(result);
+  };
+
+  const getFileName = (input) => {
+    if (typeof input === "object" && input.upload) {
+      const filePath = input.upload;
+      const decodedUrl = decodeURIComponent(filePath);
+      return decodedUrl.substring(decodedUrl.lastIndexOf("/") + 1);
+    }
+
+    try {
+      const urlObj = new URL(input);
+      const filePath = urlObj.pathname;
+      const decodedUrl = decodeURIComponent(filePath);
+      return decodedUrl.substring(decodedUrl.lastIndexOf("/") + 1);
+    } catch (e) {
+      if (typeof input === "string") {
+        const decodedUrl = decodeURIComponent(input);
+        return decodedUrl.substring(decodedUrl.lastIndexOf("/") + 1);
+      }
+      return undefined;
+    }
+  };
+
+  useEffect(() => {
+    setValue("id", searchResultData.id);
+    setValue("empStatusType", searchResultData.empStatusType);
+    setValue("workmenComUp", searchResultData.workmenComUp);
+    setValue("workmenCompExp", searchResultData.workmenCompExp);
+    setValue("workmenCompNo", searchResultData.workmenCompNo);
+
+    const fields = [
+      "empStatusType",
+      "workmenComUp",
+      "workmenCompExp",
+      "workmenCompNo",
+    ];
+
+    fields.forEach((field) => setValue(field, searchResultData[field]));
+
+    if (searchResultData && searchResultData.workmenComUp) {
+      try {
+        const parsedArray = JSON.parse(searchResultData.workmenComUp[0]);
+
+        const parsedFiles = parsedArray.map((item) =>
+          typeof item === "string" ? JSON.parse(item) : item
+        );
+
+        setValue("workmenComUp", parsedFiles);
+
+        setUploadWCU((prev) => ({
+          ...prev,
+          workmenComUp: parsedFiles,
+        }));
+
+        setUploadedFileNames((prev) => ({
+          ...prev,
+          workmenComUp: parsedFiles.map((file) => getFileName(file.upload)),
+        }));
+      } catch (error) {
+        console.error(
+          `Failed to parse ${searchResultData.workmenComUp}:`,
+          error
+        );
+      }
+    }
+  }, [searchResultData, setValue]);
+
+  // console.log(workMenDetails);
+
+  // console.log(searchResultData);
+
+  const onSubmit = async (data) => {
+    try {
+      const checkingDITable = workMenDetails.find(
+        (match) => match.id === searchResultData.id
+      );
+
+      if (checkingDITable) {
+        const WCUpValue = {
+          ...data,
+          workmenComUp: JSON.stringify(uploadWCU.workmenComUp),
+        };
+        console.log("Up Value", WCUpValue);
+
+        const totalData = {
+          id: WCUpValue.id,
+          empStatusType: WCUpValue.empStatusType,
+          workmenComUp: WCUpValue.workmenComUp,
+          workmenCompExp: WCUpValue.workmenCompExp,
+          workmenCompNo: WCUpValue.workmenCompNo,
+        };
+
+        const response = await client.graphql({
+          query: updateWorkMen,
+          variables: { input: totalData },
+        });
+
+        // console.log("Successfully updated data:", response);
+        setNotification(true);
+      } else {
+        const WCCreValue = {
+          ...data,
+          workmenComUp: JSON.stringify(uploadWCU.workmenComUp),
+        };
+        // console.log(WCCreValue);
+
+        const response = await client.graphql({
+          query: createWorkMen,
+          variables: { input: WCCreValue },
+        });
+        // console.log("Successfully submitted data:", response);
+        setNotification(true);
+      }
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    }
+  };
+
+  //___________________________________-Printing section %% Pdf section___________________________________
 
   const openPopup = (fileUrl) => {
-    setPopupImage(fileUrl); // Set the URL for the image or file
-    setPopupVisible(true); // Show the popup
+    setPopupImage(fileUrl);
+    setPopupVisible(true);
   };
 
   const onDocumentLoadSuccess = async ({ numPages, document }) => {
     let totalWidth = 0;
     let totalHeight = 0;
-  
+
     for (let i = 1; i <= numPages; i++) {
       const page = await document.getPage(i);
       const viewport = page.getViewport({ scale: 1 });
       totalWidth += viewport.width;
       totalHeight += viewport.height;
     }
-  
+
     const averageWidth = totalWidth / numPages;
     const averageHeight = totalHeight / numPages;
-  
+
     setPdfWidth(averageWidth);
     setPdfHeight(averageHeight);
-
   };
-  console.log("h")
-  console.log("hello");
 
   const handlePrint = async () => {
-    const pdfUrl = lastUploadUrl; // Path to your 10-page PDF
-  
+    const pdfUrl = lastUploadUrl;
+
     // Open a new window for the print view
-    const printWindow = window.open('', '', 'height=600,width=800');
-    printWindow.document.write('<html><head><title>Print PDF</title>');
-  
+    const printWindow = window.open("", "", "height=600,width=800");
+    printWindow.document.write("<html><head><title>Print PDF</title>");
+
     // Add styles for proper rendering and color handling
     printWindow.document.write(`
       <style>
@@ -292,55 +417,55 @@ export const WorkmenComp = () => {
         }
       </style>
     `);
-  
-    printWindow.document.write('</head><body>');
-  
+
+    printWindow.document.write("</head><body>");
+
     // Create a container to render each PDF page
-    const container = document.createElement('div');
-    container.id = 'container';
+    const container = document.createElement("div");
+    container.id = "container";
     printWindow.document.body.appendChild(container);
-  
+
     try {
       // Load the PDF using pdf.js
       const pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
-  
+
       // Render each page of the PDF
       for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
         const page = await pdfDoc.getPage(pageNum);
-        const viewport = page.getViewport({ scale: 1.5 }); // Adjust scale for better clarity
-  
+        const viewport = page.getViewport({ scale: 1.5 });
+
         // Create a canvas to render each page
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-  
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+
         // Set the canvas width and height based on the page's viewport
         canvas.width = viewport.width;
         canvas.height = viewport.height;
-  
+
         // Append the canvas to the container
         container.appendChild(canvas);
-  
+
         const renderContext = {
           canvasContext: context,
           viewport: viewport,
         };
-  
+
         // Render the page (this can handle colors)
         await page.render(renderContext).promise;
       }
-  
+
       // Close the HTML document after rendering the pages
-      printWindow.document.write('</body></html>');
+      printWindow.document.write("</body></html>");
       printWindow.document.close();
-  
+
       // Trigger the print dialog
       printWindow.print();
     } catch (error) {
-      console.error('Error printing PDF:', error);
+      console.error("Error printing PDF:", error);
     }
   };
-  
-  const isReadyToPrint = pdfHeight ;
+
+  const isReadyToPrint = pdfHeight;
 
   useEffect(() => {
     if (isReadyToPrint) {
@@ -348,19 +473,14 @@ export const WorkmenComp = () => {
       console.log("Ready to print, PDF dimensions are set.");
       // You can call handlePrint here or other actions related to print readiness
     }
-  }, [isReadyToPrint]); // Trigger the effect when dimensions are ready
-
+  }, [isReadyToPrint]);
   const openModal = (uploadUrl) => {
     setPPLastUP(uploadUrl);
     setViewingDocument(uploadUrl);
   };
-
   const closeModal = () => {
     setViewingDocument(null);
   };
-
-  console.log(pdfHeight);
-  
   const renderDocumentsUnderCategory = (documents) => {
     return (
       <>
@@ -384,48 +504,50 @@ export const WorkmenComp = () => {
             {/* Conditional rendering of PDF or image */}
             {viewingDocument === document.upload &&
               document.upload.endsWith(".pdf") && (
-                 <div className="py-6 fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
-                <div className="relative bg-white rounded-lg shadow-lg w-[40vw] max-h-full flex flex-col">
-                  {/* PDF Viewer */}
-                  <div className="flex-grow overflow-y-auto">
-                    <div ref={workmenPrint} >
-                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js" >
-                        <Viewer fileUrl={lastUploadUrl || ""} onLoadSuccess={onDocumentLoadSuccess} />
-                      </Worker>
+                <div className="py-6 fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="relative bg-white rounded-lg shadow-lg w-[40vw] max-h-full flex flex-col">
+                    {/* PDF Viewer */}
+                    <div className="flex-grow overflow-y-auto">
+                      <div ref={workmenPrint}>
+                        <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                          <Viewer
+                            fileUrl={lastUploadUrl || ""}
+                            onLoadSuccess={onDocumentLoadSuccess}
+                          />
+                        </Worker>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="absolute top-2 right-2">
-                    <button
-                      onClick={closeModal} // Close the modal
-                      className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
-                    >
-                      <FaTimes />
-                    </button>
-                  </div>
-
-                  <div className="flex items-center justify-center gap-6 py-4">
-                    <div className="mt-2 flex">
-                      <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
-                        <a href={lastUploadUrl} download>
-                          Download
-                        </a>
-                        <FaDownload className="ml-2 mt-1" />
-                      </button>
-                    </div>
-                    <div className="mt-2 flex">
+                    <div className="absolute top-2 right-2">
                       <button
-                        onClick={handlePrint}
-                       
-                        className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
+                        onClick={closeModal} // Close the modal
+                        className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
                       >
-                        Print
-                        <FaPrint className="ml-2 mt-1" />
+                        <FaTimes />
                       </button>
+                    </div>
+
+                    <div className="flex items-center justify-center gap-6 py-4">
+                      <div className="mt-2 flex">
+                        <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
+                          <a href={lastUploadUrl} download>
+                            Download
+                          </a>
+                          <FaDownload className="ml-2 mt-1" />
+                        </button>
+                      </div>
+                      <div className="mt-2 flex">
+                        <button
+                          onClick={handlePrint}
+                          className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
+                        >
+                          Print
+                          <FaPrint className="ml-2 mt-1" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
               )}
 
             {/* Image Viewer */}
@@ -496,18 +618,44 @@ export const WorkmenComp = () => {
       </div>
     );
   };
+  //___________________________________-Printing section %% Pdf section___________________________________________
+
   return (
-    <section>
+    <section
+      onClick={() => {
+        setFilteredEmployees([]);
+      }}
+    >
+      <div className="w-full flex items-center justify-between gap-5 px-10">
+        <Link to="/dashboard" className="text-xl flex-1 text-grey">
+          <FaArrowLeft />
+        </Link>
+        <p className="flex-1 text-center mt-2 text_size_2 uppercase">
+          Workmen Compensation Insurance
+        </p>
+        <div className="flex-1">
+          <InsSearch
+            searchResult={searchResult}
+            newFormData={insuranceData}
+            searchIcon2={<IoSearch />}
+            placeholder="Policy Number"
+            rounded="rounded-lg"
+            empID={empID}
+            filteredEmployees={filteredEmployees}
+            setFilteredEmployees={setFilteredEmployees}
+          />
+        </div>{" "}
+      </div>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="mx-auto py-5 px-10 my-10 bg-[#F5F6F1CC]"
       >
         {/* Workmen Compensation Insurance Fields */}
-        <h3 className="mb-5 text-lg font-bold">
+        {/* <h3 className="mb-5 text-lg font-bold">
           Workmen Compensation Insurance
-        </h3>
+        </h3> */}
         <div className="relative mb-5">
-          <div className="grid grid-cols-4 gap-4 items-center">
+          <div className="grid grid-cols-3 gap-4 items-center">
             {/* Employee Type - Dropdown */}
             <FormField
               name="empStatusType"
@@ -544,16 +692,93 @@ export const WorkmenComp = () => {
 
             {/* File Upload Field */}
             <div className="mb-2 relative">
-              <FileUpload                label="Upload File"
-                onChangeFunc={(e) => handleFileChange(e, "workmenComUp")}
-                handleFileChange={handleFileChange}
-                uploadedFileNames={uploadedFileNames}
-                isUploading={isUploading}
-                deleteFile={deleteFile}
-                register={register}
-                name="workmenComUp"
-                error={errors}
-              />
+              <div className="flex flex-col">
+                {/* <label className="text_size_5">workmenComUp</label> */}
+
+                {/* File Input Label */}
+                <label
+                  onClick={() => {
+                    if (isUploading["workmenComUp"]) {
+                      alert(
+                        "Please delete the previously uploaded file before uploading a new one."
+                      );
+                    }
+                  }}
+                  className={`mt-2 flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer`}
+                >
+                  <input
+                    type="file"
+                    className="hidden"
+                    {...register}
+                    accept=".pdf, .jpg, .jpeg, .png"
+                    onChange={(e) => handleFileChange(e, "workmenComUp")}
+                    disabled={isUploading["workmenComUp"]}
+                  />
+                  <span className="ml-2 w-full font-normal flex justify-between items-center gap-10">
+                    Upload
+                    <GoUpload />
+                  </span>
+                </label>
+
+                {/* Display Uploaded File Names */}
+                {uploadedFileNames["workmenComUp"] && (
+                  <p className="text-grey text-sm my-1">
+                    {Array.isArray(uploadedFileNames["workmenComUp"]) ? (
+                      uploadedFileNames["workmenComUp"]
+                        .slice() // Create a shallow copy to avoid mutating the original array
+
+                        .map((fileName, fileIndex) => (
+                          <span
+                            key={fileIndex}
+                            className="mt-2 flex justify-between items-center"
+                          >
+                            {fileName}
+                            {formattedPermissions?.deleteAccess?.[access]?.some(
+                              (permission) =>
+                                requiredPermissions.includes(permission)
+                            ) && (
+                              <button
+                                type="button"
+                                className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                                onClick={
+                                  () =>
+                                    deleteFile(
+                                      "workmenComUp",
+                                      fileName,
+                                      fileIndex
+                                    ) // Pass fileIndex
+                                }
+                              >
+                                <MdCancel />
+                              </button>
+                            )}
+                          </span>
+                        ))
+                    ) : (
+                      <span className="mt-2 flex justify-between items-center">
+                        {uploadedFileNames["workmenComUp"]}
+                        <button
+                          type="button"
+                          className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                          onClick={
+                            () =>
+                              deleteFile(
+                                "workmenComUp",
+                                uploadedFileNames["workmenComUp"],
+                                0
+                              ) // Pass index 0 if only one file
+                          }
+                        >
+                          <MdCancel />
+                        </button>
+                      </span>
+                    )}
+                  </p>
+                )}
+
+                {/* Display Error Message */}
+                {/* {error && <p className="text-[red] text-[12px] mt-1">{error.message}</p>} */}
+              </div>
             </div>
           </div>
         </div>
@@ -580,7 +805,7 @@ export const WorkmenComp = () => {
         {insuranceData.length > 0 ? (
           <div className=" h-[400px] overflow-y-auto scrollBar">
             <table className="w-full text-center">
-              <thead className="bg-[#939393] text-white">
+              <thead className="bg-[#939393] text-white sticky top-0">
                 <tr>
                   <th className="pl-4 py-4 rounded-tl-lg">Employee Type</th>
                   <th className="pl-4 py-4">Policy Number</th>
@@ -660,6 +885,9 @@ export const WorkmenComp = () => {
             )}
           </div>
         </div>
+      )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}
     </section>
   );

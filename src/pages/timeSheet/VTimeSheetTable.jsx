@@ -67,7 +67,7 @@ export const VTimeSheetTable = () => {
   const AllFieldData = useTableFieldData(categoryFilters);
 
   const safeData = data || [];
-  const itemsPerPage = 10;
+  const itemsPerPage = 25;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentData = safeData.slice(indexOfFirstItem, indexOfLastItem);
@@ -75,10 +75,8 @@ export const VTimeSheetTable = () => {
   const totalPages = Math.ceil(safeData.length / itemsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  currentData.sort((a, b) => a.empName.localeCompare(b.empName));
+  // currentData.sort((a, b) => a.empName.localeCompare(b.empName));
   let visibleData = currentData;
-
-  
 
   useEffect(() => {
     if (secondaryData && secondaryData.length > 0) {
@@ -185,6 +183,7 @@ export const VTimeSheetTable = () => {
                 message={message}
                 assignObjectFun={assignObjectFun}
                 toggleFunction={toggleFunction}
+                editFormTitleFunc={editFormTitleFunc}
               />
             )}
             {categoryFilters === "HO" && (
@@ -195,6 +194,7 @@ export const VTimeSheetTable = () => {
                 message={message}
                 assignObjectFun={assignObjectFun}
                 toggleFunction={toggleFunction}
+                editFormTitleFunc={editFormTitleFunc}
               />
             )}
             {categoryFilters === "SBW" && (
@@ -205,6 +205,7 @@ export const VTimeSheetTable = () => {
                 message={message}
                 assignObjectFun={assignObjectFun}
                 toggleFunction={toggleFunction}
+                editFormTitleFunc={editFormTitleFunc}
               />
             )}
             {categoryFilters === "ORMC" && (
@@ -215,6 +216,7 @@ export const VTimeSheetTable = () => {
                 message={message}
                 assignObjectFun={assignObjectFun}
                 toggleFunction={toggleFunction}
+                editFormTitleFunc={editFormTitleFunc}
               />
             )}
 

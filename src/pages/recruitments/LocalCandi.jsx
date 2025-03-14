@@ -7,10 +7,16 @@ import { useNavigate } from "react-router-dom";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { SearchLocalCandy } from "./Search/SearchLocalCandy";
 import { useTempID } from "../../utils/TempIDContext";
+import { useDeleteAccess } from "../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../utils/DeletePopup";
+import { CandyDelete } from "../../services/deleteMethod/CandyDelete";
 
 export const Localcandi = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const { formattedPermissions } = useDeleteAccess();
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [error, setError] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -19,6 +25,7 @@ export const Localcandi = () => {
   const { setTempID } = useTempID();
   const navigate = useNavigate();
   const [editingData, setEditingData] = useState([]);
+  const { handleDeletePDDetails } = CandyDelete();
 
   useEffect(() => {
     const bruneiCandidates = empPDData
@@ -29,7 +36,8 @@ export const Localcandi = () => {
       )
       .filter(
         (candidate) =>
-          !IVSSDetails.some((detail) => detail.tempID === candidate.tempID)
+          !IVSSDetails.some((detail) => detail.tempID === candidate.tempID) &&
+          candidate.status !== "Inactive"
       );
     setFilteredData(bruneiCandidates);
     setLoading(false);
@@ -42,11 +50,18 @@ export const Localcandi = () => {
   const EditedData = (editdata) => {
     setEditingData(editdata);
   };
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
 
-  const handleDeleteClick = () => {
-    const remainingCandidates = filteredData.filter(
-      (candidate) => !selectedRows.includes(candidate.sno)
-    );
+  const handleDeleteClick = async () => {
+    const selectedRowData = selectedRows.map((index) => filteredData[index]);
+    const deletingData = await selectedRowData.forEach(async (val, index) => {
+      await handleDeletePDDetails(val.id);
+      // console.log(ED);
+    });
+    setdeleteTitle1(`${selectedRowData.length} candidates.`);
+    await handleDeleteMsg();
     setSelectedRows([]);
   };
 
@@ -71,6 +86,9 @@ export const Localcandi = () => {
       setTempID(selectedTempID);
     }
   };
+  const requiredPermissions = ["Local CV"];
+
+  const access = "Recruitment";
 
   return (
     <section className="screen-size min-h-screen w-full my-5">
@@ -94,9 +112,9 @@ export const Localcandi = () => {
         </div>
       </div>
 
-      <div className="flex relative mb-8">
+      <div className="flex relative mb-3 gap-3 justify-end">
         <div
-          className=" absolute top-1/2 right-14 transform -translate-y-1/2 text-2xl hover:text-3xl flex items-center cursor-pointer"
+          className="text-2xl hover:text-3xl flex items-center cursor-pointer"
           onClick={() => {
             if (selectedRows.length === 1) {
               getTemp();
@@ -111,12 +129,16 @@ export const Localcandi = () => {
         >
           <FaEdit className="mr-2" />
         </div>
-        <div
-          className="absolute top-1/2 right-0 transform -translate-y-1/2 text-3xl hover:text-4xl cursor-pointer text-[#f42232cc] flex items-center"
-          onClick={handleDeleteClick}
-        >
-          <MdDelete className="mr-2" />
-        </div>
+        {formattedPermissions?.deleteAccess?.[access]?.some((permission) =>
+          requiredPermissions.includes(permission)
+        ) && (
+          <div
+            className="text-3xl hover:text-4xl cursor-pointer text-[#f42232cc] flex items-center"
+            onClick={handleDeleteClick}
+          >
+            <MdDelete className="mr-2" />
+          </div>
+        )}
       </div>
 
       {loading ? (
@@ -131,6 +153,13 @@ export const Localcandi = () => {
           selectedRows={selectedRows}
           onRowSelect={handleRowSelect}
           edited={EditedData}
+        />
+      )}
+      {deletePopup && (
+        <DeletePopup
+          handleDeleteMsg={handleDeleteMsg}
+          title1={deleteTitle1}
+          path="/recrutiles/localcandi"
         />
       )}
     </section>

@@ -5,33 +5,33 @@ import { FiMinusSquare, FiPlusSquare } from "react-icons/fi";
 import { GoUpload } from "react-icons/go";
 import { EmpInsuranceschema } from "../../../services/EmployeeValidation";
 import { SpinLogo } from "../../../utils/SpinLogo";
-import { uploadDocs } from "../../../services/uploadDocsS3/UploadDocs";
-import {
-  GenderDD,
-  MaritalDD,
-  NationalityDD,
-} from "../../../utils/DropDownMenus";
+import { uploadDocs } from "../../../services/uploadsDocsS3/UploadDocs";
 import { EmpInsDataFun } from "./EmpInsDataFun";
 import { useOutletContext } from "react-router-dom";
 import { FormField } from "../../../utils/FormField";
 import { UpdateEmpInsDataFun } from "../../../services/updateMethod/UpdateEmpInsurance";
 import { DataSupply } from "../../../utils/DataStoredContext";
+import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
+import { MdCancel } from "react-icons/md";
+import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../../utils/DeletePopup";
 
 export const EmployeeInsurance = () => {
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  const { formattedPermissions } = useDeleteAccess();
   const { searchResultData } = useOutletContext();
-  const { EmpInsuranceData , workMenDetails,dropDownVal } = useContext(DataSupply);
-  
+  const { EmpInsuranceData, workMenDetails, dropDownVal } = useContext(DataSupply);
   const { SubmitMPData } = EmpInsDataFun();
   const { UpdateEIDataSubmit } = UpdateEmpInsDataFun();
+  const [deletePopup, setDeletePopup] = useState(false);
+  const [deleteTitle1, setDeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [uploadedDocs, setUploadedDocs] = useState({ empInsUpload: [] });
-  const [inputFields, setInputFields] = useState([{}]); // Tracks each file input field
+  const [uploadedFile, setUploadedFile] = useState([]);
+  const [secondaryUploadedFile, setSecondaryUploadedFile] = useState([]);
+  const [inputFields, setInputFields] = useState([{}]);
   const [empInsUpload, setEmpInsUpload] = useState([]);
   const [showTitle, setShowTitle] = useState("");
-
+  const [isUploading, setIsUploading] = useState([]);
   const {
     register,
     handleSubmit,
@@ -40,7 +40,6 @@ export const EmployeeInsurance = () => {
     control,
     formState: { errors },
   } = useForm({
-    
     defaultValues: {
       empStatusType: "",
       workmenCompNo: "",
@@ -48,21 +47,19 @@ export const EmployeeInsurance = () => {
     },
     resolver: yupResolver(EmpInsuranceschema),
   });
+
   const insuHSDD = dropDownVal[0]?.insuHSDD.map((item) => ({
     value: item,
-    label: item.split(" ") // Split the string into words
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
-    .join(" "),
+    label: item
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" "),
   }));
-  const nationalityDD = dropDownVal[0]?.nationalityDD.map((item) => ({
-    value: item,
-    label: item.split(" ") // Split the string into words
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
-    .join(" "),
-  }));
+
   const otherNationValue = watch("otherNation");
   const [empStatusTypeValue, setEmpStatusTypeValue] = useState("");
   const [filteredWorkmenCompNo, setFilteredWorkmenCompNo] = useState([]);
+
   const formFields = [
     { label: "Employee Badge Number", key: "empBadgeNo", type: "text" },
     { label: "Employee Name", key: "name", type: "text" },
@@ -73,93 +70,146 @@ export const EmployeeInsurance = () => {
     { label: "Brunei I/C Number", key: "bwnIcNo", type: "text" },
     { label: "Passport Number for Non-Local", key: "ppNo", type: "text" },
     { label: "Date of Birth", key: "dob", type: "date" },
-    {
-      label: "Marital Status",
-      key: "marital",
-      type: "text",
-    },
-    {
-      label: "Nationality",
-      key: "nationality",
-      type: "text",
-    },
+    { label: "Marital Status", key: "marital", type: "text" },
+    { label: "Nationality", key: "nationality", type: "text" },
     { label: "Other Nationality", key: "otherNation", type: "text" },
-
-    {
-      label: "Group H&S Insurance",
-      key: "groupIns",
-      type: "select",
-      options:insuHSDD,
-    },
-    {
-      label: "Group H&S Insurance Enrollment Effective Date",
-      key: "groupInsEffectDate",
-      type: "date",
-    },
-    {
-      label: "Group H&S Insurance Enrollment End Date",
-      key: "groupInsEndDate",
-      type: "date",
-    },
-    {
-      label: "Travelling Insurance",
-      key: "travelIns",
-      type: "select",
-      options: ["Yes", "No"],
-    },
+    { label: "Group H&S Insurance", key: "groupIns", type: "select", options: insuHSDD },
+    { label: "Group H&S Insurance Enrollment Effective Date", key: "groupInsEffectDate", type: "date" },
+    { label: "Group H&S Insurance Enrollment End Date", key: "groupInsEndDate", type: "date" },
+    { label: "Travelling Insurance", key: "travelIns", type: "select", options: ["Yes", "No"] },
   ];
-  // const selectedNationality = watch("nationality");
+
   const handleAddFileClick = () => {
-    setInputFields((prevFields) => [...prevFields, {}]); // Add new input field
-    setEmpInsUpload((prevUpload) => [...prevUpload, []]);
+    setInputFields((prevFields) => [...prevFields, {}]);
+    setUploadedDocs((prevUploads) => ({
+      ...prevUploads,
+      empInsUpload: [...prevUploads.empInsUpload],
+    }));
   };
 
-  // Handle removing a file input field
   const handleRemoveField = (index) => {
+    const watchedEmpID = watch("empID");
     setInputFields((prevFields) => prevFields.filter((_, i) => i !== index));
-    setEmpInsUpload((prevUploads) => prevUploads.filter((_, i) => i !== index)); // Remove the corresponding file array
+
+    const fileToDelete = uploadedDocs.empInsUpload[index];
+    if (!fileToDelete) {
+      console.error("File not found at index:", index);
+      return;
+    }
+
+    const fileNameToDelete = fileToDelete.upload.split("/").pop();
+    const fileName = fileNameToDelete;
+    setUploadedDocs((prevUploads) => ({
+      ...prevUploads,
+      empInsUpload: prevUploads.empInsUpload.filter((_, i) => i !== index),
+    }));
+
+    setIsUploading((prev) =>
+      prev
+        ?.filter((item) => item?.ind !== index)
+        .map((val, inx) => ({ ...val, ind: inx }))
+    );
+
+    setUploadedFile((prev) =>
+      prev
+        ?.filter((fil) => fil?.ind !== index)
+        .map((val, inx) => ({ ...val, ind: inx }))
+    );
+
+    handleDeleteFile("empInsUpload", fileName, watchedEmpID);
+    setDeleteTitle1(`${fileName}`);
+    handleDeleteMsg();
   };
 
-  // const watchedEmpID=watch("empID")
+  const updateUploadingState = async (label, value, idx) => {
+    setUploadedFile([]);
+
+    setIsUploading((prev) => {
+      const isFirstUpdate = prev.length === 0;
+
+      let uploadedFileFalse = [];
+      if (isFirstUpdate) {
+        uploadedFileFalse =
+          secondaryUploadedFile?.map((val) => {
+            const result = formattedPermissions?.deleteAccess?.[access]?.some(
+              (permission) => requiredPermissions.includes(permission)
+            );
+            return {
+              ...val,
+              empInsUpload: result,
+            };
+          }) || [];
+      }
+
+      const updatedState = [
+        ...prev.filter((item) => item.ind !== idx),
+        { ind: idx, empInsUpload: value },
+      ];
+
+      return isFirstUpdate
+        ? [...uploadedFileFalse, ...updatedState]
+        : updatedState;
+    });
+  };
 
   const handleFileChange = async (e, type, index) => {
-    const selectedFile = e.target.files[0];
+    const watchedEmpID = watch("empID");
+    
+    if (!watchedEmpID) {
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/insuranceAdd";
+      return;
+    }
+
+    const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
+
+    if (uploadedDocs?.empInsUpload?.[index]?.upload) {
+      alert(`Please click Add Upload to upload a new one.`);
+      e.target.value = "";
+      return;
+    }
 
     const allowedTypes = [
       "application/pdf",
       "image/jpeg",
-      "image/png",
       "image/jpg",
+      "image/png",
     ];
+
     if (!allowedTypes.includes(selectedFile.type)) {
-        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-        return;
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
     }
 
-    setEmpInsUpload((prevUpload) => {
-      const updatedFiles = [...prevUpload];
-      updatedFiles[index] = { name: selectedFile.name, file: selectedFile };
-      return updatedFiles;
-    });
-
     try {
+      await updateUploadingState(type, true, index);
+
       const fileUrl = await uploadDocs(
         selectedFile,
         type,
         setUploadedDocs,
-        index
+        watchedEmpID
       );
+
       if (fileUrl) {
-        setEmpInsUpload((prevUpload) => {
-          const updatedUrls = [...prevUpload];
-          updatedUrls[index] = [fileUrl]; // Update with the URL instead of the file object
-          return updatedUrls; // Return the updated state
+        setUploadedDocs((prev) => {
+          const updatedUploads = [...prev.empInsUpload];
+          updatedUploads[index] = {
+            date: new Date().toISOString().split("T")[0],
+            upload: fileUrl,
+            value: true,
+          };
+          return { ...prev, empInsUpload: updatedUploads };
         });
-        // console.log("File uploaded successfully. URL:", fileUrl);
+
+        setValue(`empInsUpload[${index}]`, fileUrl);
       }
-    } catch (err) {
+
+    } 
+    catch (err) {
       console.error("Error uploading file:", err);
+      alert("An error occurred while uploading the file. Please try again.");
     }
   };
 
@@ -170,10 +220,13 @@ export const EmployeeInsurance = () => {
     return Array.isArray(value) ? value[value.length - 1] : value;
   };
 
+  const handleDeleteMsg = () => {
+    setDeletePopup(!deletePopup);
+  };
+
   useEffect(() => {
     if (!searchResultData) return;
 
-    // Set default values for specific fields
     setValue("empID", searchResultData.empID);
     const empStatusType = getLastValue(searchResultData.empStatusType);
     if (empStatusType) {
@@ -181,7 +234,6 @@ export const EmployeeInsurance = () => {
       setValue("empStatusType", empStatusType);
     }
 
-    // Set workmenCompNo value
     const workmenCompNo = getLastValue(searchResultData.workmenCompNo);
     if (workmenCompNo) {
       setValue("workmenCompNo", workmenCompNo);
@@ -194,28 +246,30 @@ export const EmployeeInsurance = () => {
     });
 
     const arrayDateField = ["accidentIns"];
-
     arrayDateField.forEach((field) => {
       setValue(field, getArrayDateValue(searchResultData[field]));
     });
 
-    // Parse uploaded documents
     const url = searchResultData?.empInsUpload;
-
     if (url) {
       try {
-        const parsedArray = JSON?.parse(url);
-        const parsedFiles = parsedArray?.map((item) =>
-          typeof item === "string" ? JSON?.parse(item) : item
-        );
-        setUploadedDocs((prev) => ({ ...prev, empInsUpload: parsedFiles }));
+        const parsedArray = JSON.parse(url);
+        setUploadedDocs((prev) => ({ ...prev, empInsUpload: parsedArray }));
+        setInputFields(parsedArray.map((file) => ({})));
+        const uploadingState = parsedArray.map((file, idx) => {
+          const result = formattedPermissions?.deleteAccess?.[access]?.some(
+            (permission) => requiredPermissions.includes(permission)
+          );
+          return {
+            ind: idx,
+            empInsUpload: result,
+          };
+        });
+        setUploadedFile(uploadingState);
+        setSecondaryUploadedFile(uploadingState);
       } catch (error) {
         console.error("Failed to parse JSON:", error);
       }
-    } else {
-      console.warn(
-        "searchResultData?.empInsUpload is undefined or not a valid JSON string."
-      );
     }
   }, [searchResultData, setValue]);
 
@@ -226,14 +280,14 @@ export const EmployeeInsurance = () => {
         .filter((item) => {
           const expiryDate = new Date(item.workmenCompExp);
           return (
-            item.empStatusType?.toUpperCase() === empStatusTypeValue && expiryDate > currentDate
+            item.empStatusType?.toUpperCase() === empStatusTypeValue &&
+            expiryDate > currentDate
           );
         })
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
       setFilteredWorkmenCompNo(filteredWorkMen);
 
-      // If workmenCompNo is not already set, default to the first filtered item
       const currentWorkmenCompNo = watch("workmenCompNo");
       if (!currentWorkmenCompNo && filteredWorkMen.length > 0) {
         setValue("workmenCompNo", filteredWorkMen[0].workmenCompNo);
@@ -242,126 +296,158 @@ export const EmployeeInsurance = () => {
   }, [empStatusTypeValue, setValue, watch, workMenDetails]);
 
   const defaultOptions = ["OFFSHORE", "ONSHORE", "GENERAL"];
+
   const onSubmit = async (data) => {
-    // console.log(data, "data");
+    const filteredUploads = uploadedDocs.empInsUpload.filter(
+      (upload) => upload.upload
+    );
+
+    setUploadedDocs((prev) => ({
+      ...prev,
+      empInsUpload: filteredUploads,
+    }));
+
+    setInputFields((prevFields) => prevFields.slice(0, filteredUploads.length));
+
     const existingEmpInsurance = EmpInsuranceData.find(
       (match) => match.empID === data.empID
     );
 
+    const empInsValue = {
+      ...data,
+      empInsUpload: JSON.stringify(filteredUploads),
+    };
+
     if (existingEmpInsurance) {
-      const empInsValue = {
-        ...data,
-        id: existingEmpInsurance.id,
-        empInsUpload: JSON.stringify(uploadedDocs.empInsUpload.flat()), // Flatten if necessary, otherwise keep as it is
-      };
-      // console.log("update", empInsValue);
-      await UpdateEIDataSubmit({empInsValue});
+      empInsValue.id = existingEmpInsurance.id;
+      await UpdateEIDataSubmit({ empInsValue });
       setShowTitle("Employee Insurance Info updated successfully");
-      setNotification(true);
     } else {
-      const empInsValue = {
-        ...data,
-        empInsUpload: JSON.stringify(uploadedDocs.empInsUpload.flat()), // Flatten if necessary, otherwise keep as it is
-      };
-      // console.log("create", empInsValue);
-      await SubmitMPData({empInsValue});
+      await SubmitMPData({ empInsValue });
       setShowTitle("Employee Insurance Info Saved successfully");
-        setNotification(true);
     }
+
+    setNotification(true);
   };
 
-  return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto p-2 my-10 bg-[#F5F6F1CC]"
-    >
-      <div className="flex justify-end items-center">
-        <div className="max-w-sm">
-          <FormField
-            label="Employee ID"
-            register={register}
-            name="empID"
-            type="text"
-            watch={watch("empID") || ""}
-            placeholder="Enter Employee ID"
-            errors={errors}
-          />
-        </div>
-      </div>
+  const requiredPermissions = ["Insurance"];
+  const access = "Employee";
 
-      <div className="grid grid-cols-2 gap-5 w-full ">
-      {formFields.map(({ label, key, type, options = [], className = "" }) => (
-        <div className="form-group" key={key}>
-          <label className="mb-1 text_size_5">{label}</label>
-          {type === "select" ? (
-            <select {...register(key)} className={`input-field select-custom ${className}`}>
-              <option value="">SELECT</option>
-              {options.map((option) => (
-                typeof option === "string" ? (
-                  <option key={option} value={option.toUpperCase()}>{option.toUpperCase()}</option>
+  return (
+    <section>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="mx-auto p-2 my-10 bg-[#F5F6F1CC]"
+      >
+        <div className="flex justify-end items-center">
+          <div className="max-w-sm">
+            <FormField
+              label="Employee ID"
+              register={register}
+              name="empID"
+              type="text"
+              watch={watch("empID") || ""}
+              placeholder="Enter Employee ID"
+              errors={errors}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-5 w-full ">
+          {formFields.map(
+            ({ label, key, type, options = [], className = "" }) => (
+              <div className="form-group" key={key}>
+                <label className="mb-1 text_size_5">{label}</label>
+                {type === "select" ? (
+                  <select
+                    {...register(key)}
+                    className={`input-field select-custom ${className}`}
+                  >
+                    <option value="">SELECT</option>
+                    {options.map((option) =>
+                      typeof option === "string" ? (
+                        <option key={option} value={option.toUpperCase()}>
+                          {option.toUpperCase()}
+                        </option>
+                      ) : (
+                        <option
+                          key={option.value}
+                          value={option.value.toUpperCase()}
+                        >
+                          {option.label.toUpperCase()}
+                        </option>
+                      )
+                    )}
+                  </select>
+                ) : key === "otherNation" ? (
+                  <input
+                    type={type}
+                    {...register(key)}
+                    className={`input-field ${className}`}
+                    value={otherNationValue || "N/A"}
+                  />
                 ) : (
-                  <option key={option.value} value={option.value.toUpperCase()}>{option.label.toUpperCase()}</option>
-                )
+                  <input
+                    type={type}
+                    {...register(key)}
+                    className={`input-field ${className}`}
+                  />
+                )}
+                {errors[key] && (
+                  <p className="text-[red] text-[13px] mt-1">
+                    {errors[key]?.message}
+                  </p>
+                )}
+              </div>
+            )
+          )}
+        </div>
+
+        <div className="grid grid-cols-2 gap-5 mt-5">
+          <div className="form-group">
+            <label className="mb-1 text_size_5">
+              Workmen Compensation Insurance
+            </label>
+            <select
+              {...register("empStatusType")}
+              className="input-field select-custom "
+              onChange={(e) => setEmpStatusTypeValue(e.target.value)}
+              value={empStatusTypeValue}
+            >
+              {" "}
+              <option value="">SELECT</option>
+              {defaultOptions.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
               ))}
             </select>
-          ) : key === "otherNation" ? (  // Specifically check for 'otherNation'
-            <input
-              type={type}
-              {...register(key)}
-              className={`input-field ${className}`}
-              value={otherNationValue || "N/A"}  // Display N/N if the field is empty
-            />
-          ) : (
-            <input
-              type={type}
-              {...register(key)}
-              className={`input-field ${className}`}
-            />
-          )}
-          {errors[key] && <p className="text-[red] text-[13px] mt-1">{errors[key]?.message}</p>}
+          </div>
+
+          <div className="form-group">
+            <label className="mb-1 text_size_5">
+              Workmen Compensation Policy Number
+            </label>
+            <select
+              {...register("workmenCompNo")}
+              className="input-field select-custom "
+              value={watch("workmenCompNo") || ""}
+              onChange={(e) => setValue("workmenCompNo", e.target.value)}
+            >
+              {filteredWorkmenCompNo.map((item) => (
+                <option key={item.id} value={item.workmenCompNo}>
+                  {item.workmenCompNo}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-      ))}
-    </div>
 
-<div className="grid grid-cols-2 gap-5 mt-5">
-      <div className="form-group">
-        <label className="mb-1 text_size_5">Workmen Compensation Insurance</label>
-        <select
-          {...register("empStatusType")}
-          className="input-field select-custom "
-          onChange={(e) => setEmpStatusTypeValue(e.target.value)} // Update empStatusTypeValue on change
-          value={empStatusTypeValue}
-        >              <option value="">SELECT</option>
-
-          {defaultOptions.map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* workmenCompNo Field */}
-      <div className="form-group">
-      <label className="mb-1 text_size_5">Workmen Compensation Policy Number</label>
-      <select
-        {...register("workmenCompNo")}
-        className="input-field select-custom "
-        value={watch("workmenCompNo") || ""}
-        onChange={(e) => setValue("workmenCompNo", e.target.value)} // Ensure value is updated when changed
-      >
-        {filteredWorkmenCompNo.map((item) => (
-          <option key={item.id} value={item.workmenCompNo}>
-            {item.workmenCompNo}
-          </option>
-        ))}
-      </select>
-    </div>
-    </div>
-
-<div className="grid grid-cols-2 gap-5 mt-5 ">
-           <div>
-           <label className="block text_size_5">Personal Accident Insurance</label>
+        <div className="grid grid-cols-2 gap-5 mt-5 ">
+          <div>
+            <label className="block text_size_5">
+              Personal Accident Insurance
+            </label>
             <select
               className="input-field select-custom"
               {...register("accidentIns")}
@@ -370,72 +456,108 @@ export const EmployeeInsurance = () => {
               <option value="YES">YES</option>
               <option value="NO">NO</option>
             </select>
-           </div>
-         
           </div>
+        </div>
 
-      <div className="grid grid-cols-3 gap-10 mt-12">
-        {inputFields.map((field, index) => (
-          <div key={index} className="form-group w-full relative">
-            <label className="w-full flex items-center px-3 py-3 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer">
-              Upload
-              <Controller
-                name={`empInsUpload[${index}]`}
-                control={control}
-                render={({ field }) => (
-                  <input
-                    type="file"
-                    onChange={(e) => {
-                      handleFileChange(e, "empInsUpload", index);
-                    }}
-                    className="hidden"
-                    accept=".pdf"
-                  />
-                )}
-              />
-              <span className="ml-2">
-                <GoUpload />
-              </span>
-            </label>
-            <p className="text-grey mt-1 text-xs">
-              {empInsUpload[index]?.name || ""}
-            </p>
-
-            {index === 0 && (
-              <button
-                type="button"
-                onClick={handleAddFileClick}
-                className="absolute top-1/2 -right-8 transform -translate-y-1/2 flex items-center text-medium_grey text-[20px]"
+        <div>
+          <button
+            type="button"
+            onClick={handleAddFileClick}
+            className=" flex items-center text-[#5d5d5d] text-[20px] mt-10 gap-3 bg-white  p-2 rounded-md cursor-pointer"
+          >
+            <p>Add Upload</p> <FiPlusSquare className="mr-1" />
+          </button>
+        </div>
+        <div className="grid grid-cols-3 gap-10 mt-7">
+          {inputFields.map((field, index) => (
+            <div key={index} className="form-group w-full relative">
+              <label
+                className="w-full flex items-center px-3 py-3 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] rounded-md cursor-pointer"
+                onClick={() => {
+                  if (uploadedDocs?.empInsUpload?.[index]?.upload) {
+                    alert(
+                      "Please click Add Upload to upload a new one."
+                    );
+                  }
+                }}
               >
-                <FiPlusSquare className="mr-1" />
-              </button>
-            )}
+                <Controller
+                  name={`empInsUpload[${index}]`}
+                  control={control}
+                  render={({ field }) => (
+                    <input
+                      type="file"
+                      onChange={(e) => {
+                        handleFileChange(e, "empInsUpload", index);
+                      }}
+                      className="hidden"
+                      disabled={uploadedDocs?.empInsUpload?.[index]?.upload}
+                    />
+                  )}
+                />
+                <span className="ml-2 w-full font-normal flex justify-between items-center gap-10">
+                  Upload
+                  <GoUpload />
+                </span>
+              </label>
+              <p className="text-grey mt-1 text-xs">
+                {uploadedDocs.empInsUpload[index]?.upload
+                  ? uploadedDocs.empInsUpload[index].upload.split("/").pop()
+                  : empInsUpload[index]?.name}
+              </p>
 
-            {index > 0 && (
-              <button
-                type="button"
-                onClick={() => handleRemoveField(index)}
-                className="absolute top-1/2 -right-8 transform -translate-y-1/2 flex items-center text-medium_grey text-[20px]"
-              >
-                <FiMinusSquare className="mr-1" />
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
+              {uploadedFile[index]?.empInsUpload === true &&
+              uploadedFile &&
+              uploadedFile.length > 0 &&
+              formattedPermissions?.deleteAccess?.[access]?.some((permission) =>
+                requiredPermissions.includes(permission)
+              ) ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleRemoveField(index);
+                  }}
+                  className="absolute top-1/2 -right-8 transform -translate-y-1/2 flex items-center text-medium_grey text-[20px]"
+                >
+                  <MdCancel className="mr-1 text-[red]" />
+                </button>
+              ) : isUploading[index]?.empInsUpload === true && uploadedDocs.empInsUpload[index]?.upload &&
+                isUploading &&
+                isUploading.length > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleRemoveField(index);
+                  }}
+                  className="absolute top-1/2 -right-8 transform -translate-y-1/2 flex items-center text-medium_grey text-[20px]"
+                >
+                  <MdCancel className="mr-1 text-[red]" />
+                </button>
+              ) : (
+                <span></span>
+              )}
+            </div>
+          ))}
+        </div>
 
-      <div className="center my-10">
-        <button type="submit" className="primary_btn">
-          Save
-        </button>
-      </div>
-      {notification && (
-        <SpinLogo
-          text={showTitle}
-          notification={notification}
-          path="/employee"
-        />
+        <div className="center my-10">
+          <button type="submit" className="primary_btn">
+            Save
+          </button>
+        </div>
+        {notification && (
+          <SpinLogo
+            text={showTitle}
+            notification={notification}
+            path="/insuranceAdd"
+          />
+        )}
+      </form>
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}
-    </form>
+    </section>
   );
 };
+
+

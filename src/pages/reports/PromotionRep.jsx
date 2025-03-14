@@ -17,6 +17,7 @@ export const PromotionRep = () => {
     "Department",
     "Other Department",
     "Position",
+    "other Position",
     "UPGRADE POSITION",
     "UPGRADE POSITION EFFECTIVE DATE",
   ]);
@@ -51,6 +52,15 @@ export const PromotionRep = () => {
           )
         );
       })
+      .filter((item) => {
+        if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
+            const lastWorkStatus = item.workStatus[item.workStatus.length - 1].toUpperCase();
+            if (lastWorkStatus === "TERMINATION" || lastWorkStatus === "RESIGNATION") {
+                return false; // Exclude items with TERMINATION or RESIGNATION
+            }
+        }
+        return true;
+    })
       .map((item) => {
         const lastPassExp = item.upgradeDate[item.upgradeDate.length - 1];
         return {
@@ -66,6 +76,9 @@ export const PromotionRep = () => {
           : "-",
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
+          : "-",
+        otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
           upgradePosition: Array.isArray(item.upgradePosition)
             ? item.upgradePosition[item.upgradePosition.length - 1]
@@ -96,6 +109,15 @@ export const PromotionRep = () => {
   
     const filtered = allData
       .filter((data) => {
+        if (!Array.isArray(data.workStatus) || data.workStatus.length === 0) {
+          return false; // Return early if workStatus is undefined or an empty array
+      }
+      
+      const lastWorkStatus = data.workStatus[data.workStatus.length - 1]; // Now it's safe
+      
+      if (lastWorkStatus?.toUpperCase() === "TERMINATION" || lastWorkStatus?.toUpperCase() === "RESIGNATION") {
+          return false; // Exclude records with TERMINATION or RESIGNATION
+      }
         const expiryArray = data.upgradeDate || [];
         const expiryDate = expiryArray.length
           ? new Date(expiryArray[expiryArray.length - 1])
@@ -122,6 +144,9 @@ export const PromotionRep = () => {
           : "-",
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
+          : "-",
+          otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
         upgradePosition: Array.isArray(item.upgradePosition)
           ? item.upgradePosition[item.upgradePosition.length - 1]

@@ -11,11 +11,15 @@ import { statusOptions } from "../../../../utils/StatusDropdown";
 import { SpinLogo } from "../../../../utils/SpinLogo";
 import { handleDeleteFile } from "../../../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadDoe } from "../deleteUpload/DeleteUploadDoe";
-
+import { useDeleteAccess } from "../../../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../../../utils/DeletePopup";
 export const DoeForm = ({ candidate }) => {
+  const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules } = useFetchCandy();
   const { interviewDetails } = UpdateInterviewData();
   const { wpTrackingDetails } = useUpdateWPTracking();
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [formData, setFormData] = useState({
     interview: {
@@ -78,12 +82,8 @@ export const DoeForm = ({ candidate }) => {
           }));
           // console.log("Uploaded file name set:", fileName);
         }
-      } else {
-        // console.log("No interviewData found for candidate:", candidate.tempID);
-      }
-    } else {
-      // console.log("No interview schedules available.");
-    }
+      } 
+    } 
   }, [interviewSchedules, candidate.tempID]);
 
   const extractFileName = (url) => {
@@ -138,6 +138,10 @@ export const DoeForm = ({ candidate }) => {
     }
   };
 
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
   const deletedStringUpload = async (fileType, fileName) => {
     try {
       const tempID = candidate.tempID;
@@ -163,9 +167,11 @@ export const DoeForm = ({ candidate }) => {
         );
         return;
       }
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
       // console.log(`Deleted "${fileName}". Remaining files:`);
     } catch (error) {
-      console.error("Error deleting file:", error);
+      // console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
     }
   };
@@ -218,7 +224,7 @@ export const DoeForm = ({ candidate }) => {
 
       await interviewDetails({ InterviewValue: interStatus });
 
-      // console.log("Interview status updated:", interStatus); 
+      // console.log("Interview status updated:", interStatus);
     } catch (err) {
       if (err?.response?.data?.errors) {
         console.error("API Errors:", err.response.data.errors);
@@ -237,6 +243,10 @@ export const DoeForm = ({ candidate }) => {
       },
     }));
   };
+
+  const requiredPermissions = ["WorkPass Tracking"];
+
+  const access = "Recruitment";
 
   return (
     <>
@@ -324,17 +334,19 @@ export const DoeForm = ({ candidate }) => {
             <div className="">
               <FileUploadField
                 label="Upload File"
-                register={register} 
+                register={register}
                 fileKey="doeFile"
                 handleFileUpload={handleFileUpload}
                 uploadedFileNames={uploadedFileNames}
                 deletedStringUpload={deletedStringUpload}
                 isUploadingString={isUploadingString}
                 error={errors.doeFile}
+                formattedPermissions={formattedPermissions}
+                requiredPermissions={requiredPermissions}
+                access={access}
               />
             </div>
           </div>
-
         </div>
 
         <div className="mt-5 flex justify-center">
@@ -352,6 +364,9 @@ export const DoeForm = ({ candidate }) => {
           notification={notification}
           path="/recrutiles/workpasstracking"
         />
+      )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}
     </>
   );

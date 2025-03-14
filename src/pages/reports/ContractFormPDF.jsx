@@ -29,7 +29,7 @@ export const ContractFormPDF = ({ contentRef }) => {
     managerOfficialMail: "",
     managerName: "",
     hrEmail: "hr-notification@adininworks.com",
-    genManagerEmail: "",
+    genManagerEmail: [],
   });
 
   const [formData, setFormData] = useState({
@@ -99,28 +99,36 @@ export const ContractFormPDF = ({ contentRef }) => {
         }
 
         // Step 6: Fetch GENERAL MANAGER's email (if applicable)
-        const generalManagerPositions = workInfoData.filter((item) =>
-          item.position[item.position.length - 1]?.includes("GENERAL MANAGER")
+        // const generalManagerPositions = workInfoData?.filter((item) =>
+        //   item?.position[item?.position?.length - 1]?.includes("GENERAL MANAGER")
+        // );
+        const generalManagerPositions = workInfoData?.filter((item) =>
+          item?.position?.[item?.position?.length - 1]?.includes("GENERAL MANAGER")
         );
 
         // console.log("Filtered GENERAL MANAGER Positions:", generalManagerPositions);
 
-        if (generalManagerPositions.length > 0) {
+        if (generalManagerPositions?.length > 0) {
+          const gmEmails = [];
+
+            generalManagerPositions?.forEach((gmPosition) => {
           const gmInfo = empPIData.find(
-            (data) => data.empID === String(generalManagerPositions[0].empID)
+            (data) => data.empID === String(gmPosition.empID)
           );
 
-          // console.log("GM Info:", gmInfo);
-
           if (gmInfo) {
+            gmEmails.push(gmInfo.officialEmail)
             setManagerData((prevData) => ({
               ...prevData,
-              genManagerEmail: gmInfo.officialEmail,
+              genManagerEmail: gmEmails,
             }));
             // console.log("Updated Email Data with GM Email:", gmInfo.officialEmail);
           } else {
             console.log("GM Info not found.");
           }
+        });
+
+          // console.log("GM Info:", gmInfo);
         } else {
           console.log("No GENERAL MANAGER positions found.");
         }
@@ -128,6 +136,8 @@ export const ContractFormPDF = ({ contentRef }) => {
     }
   }, [workInfoData, employeeData?.empID, empPIData]);
 
+  console.log(managerData);
+  
   useEffect(() => {
     if (contractForms.length > 0) {
       const contractData = contractForms.find(
@@ -242,33 +252,43 @@ export const ContractFormPDF = ({ contentRef }) => {
         setNotification(true);
 
         if (userType === "HR") {
-          sendEmail(
-            subject,
-            `<html>
-            <body>
-               <p> 
-                 Your Employee Mr./Ms. ${
-                   empPIRecord?.name || "Not mentioned"
-                 }'s contract period ending on ${
-                  probationEndFormatted || "Not Mentioned"
-                  },
-                 <br/>
-                  has been verified and checked by HR.
-               </p>
-              <p>Click here https://hr.adininworks.co" to view the updates.</p>
-           </body>
-         </html>`,
-            from,
-            managerData.genManagerEmail
-          );
+          if (Array.isArray(managerData.genManagerEmail)) {
+            for (let email of managerData.genManagerEmail) {
+              await sendEmail(
+                subject,
+                `<html>
+                  <body>
+                    <p>
+                      Your Employee Mr./Ms. ${
+                        empPIRecord?.name || "Not mentioned"
+                      }'s contract period ending on ${
+                        probationEndFormatted || "Not Mentioned"
+                      },
+                      <br/>
+                      has been verified and checked by HR.
+                    </p>
+                    <p>
+                      Click here <a href="https://hr.adininworks.co">to view the updates.</a>
+                    </p>
+                  </body>
+                </html>`,
+                from,
+                email
+              );
+            }
+          }
 
-          await createNotification({
-            empID: employeeData.empID,
-            leaveType: subject,
-            message: notifyMessageHR,
-            senderEmail: "hr_no-reply@adininworks.com",
-            receipentEmail: managerData.genManagerEmail,
-          });
+          if (Array.isArray(managerData.genManagerEmail)) {
+            for (let email of managerData.genManagerEmail) {
+              await createNotification({
+                empID: employeeData.empID,
+                leaveType: subject,
+                message: notifyMessageHR,
+                senderEmail: "hr_no-reply@adininworks.com",
+                receipentEmail: email, 
+              });
+            }
+          }
 
         } else if (userType === "Manager" && !gmPosition) {
           sendEmail(
@@ -341,7 +361,7 @@ export const ContractFormPDF = ({ contentRef }) => {
           return;
         }
 
-        // await contractForm(createFormattedData);
+        await contractForm(createFormattedData);
 
         if (userType === "Manager" && !gmPosition) {
           sendEmail(

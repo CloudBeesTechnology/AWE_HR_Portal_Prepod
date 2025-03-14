@@ -18,6 +18,7 @@ export const InsuranceNav = () => {
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [activeNavTab, setActiveNavTab] = useState("employeeInsurances");
   const [searchResultData, setSearchResultData] = useState([]);
+  const [depInsuData, setDepInsuData] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
@@ -97,8 +98,11 @@ export const InsuranceNav = () => {
 
   const searchResult = (result) => {
     // console.log(result);
-
     setSearchResultData(result);
+    
+  };
+  const depInsuDataFunc = (result) => {
+    setDepInsuData(result);
   };
 
   return (
@@ -129,7 +133,7 @@ export const InsuranceNav = () => {
               />
             ) : (
               <SearchDisplay
-                searchResult={searchResult}
+                searchResult={depInsuDataFunc}
                 newFormData={allEmpDetails}
                 searchIcon2={<IoSearch />}
                 placeholder="Employee Id"
@@ -169,10 +173,16 @@ export const InsuranceNav = () => {
             Dependent Insurance
           </button>
         </div>
-
         {/* Render Child Components */}
         <div>
-          <Outlet context={{ activeNavTab, handleNext, searchResultData }} />
+          <Outlet
+            context={{
+              activeNavTab,
+              handleNext,
+              searchResultData,
+              depInsuData,
+            }}
+          />
         </div>
       </div>
     </section>

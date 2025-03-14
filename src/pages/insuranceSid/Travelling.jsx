@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { uploadDocs } from "../../services/uploadsDocsS3/UploadDocs";
@@ -7,7 +7,7 @@ import { FileUpload } from "../employees/medicalDep/FileUploadField";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { TravellingSchema } from "../../services/EmployeeValidation";
 import { generateClient } from "@aws-amplify/api";
-import { createTravelIns } from "../../graphql/mutations";
+import { createTravelIns, updateTravelIns } from "../../graphql/mutations";
 import { listTravelIns } from "../../graphql/queries";
 import { FaTimes, FaDownload, FaPrint } from "react-icons/fa";
 import { Page } from "react-pdf";
@@ -15,20 +15,30 @@ import { pdfjs } from "react-pdf";
 import { getUrl } from "@aws-amplify/storage";
 import { DeleteTravellingUp } from "./DeleteUpload/DeleteTravellingUp";
 import { handleDeleteFile } from "../../services/uploadsDocsS3/DeleteDocs";
+import { useReactToPrint } from "react-to-print";
+import { DeletePopup } from "../../utils/DeletePopup";
+import { IoSearch } from "react-icons/io5";
+import { FaArrowLeft } from "react-icons/fa";
+import { DataSupply } from "../../utils/DataStoredContext";
+import { Link } from "react-router-dom";
+import { InsSearch } from "./InsSearch";
+import { useDeleteAccess } from "../../hooks/useDeleteAccess";
+import { GoUpload } from "react-icons/go";
+import { MdCancel } from "react-icons/md";
+import { useOutletContext } from "react-router-dom";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
-import { useReactToPrint } from "react-to-print";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
   import.meta.url
 ).toString();
 
-export const Travelling = () => { 
+export const Travelling = () => {
   const client = generateClient();
 
   const [isUploading, setIsUploading] = useState({
     travelUp: false,
-      });
+  });
 
   const [uploadedFileNames, setUploadedFileNames] = useState({
     travelUp: null,
@@ -37,7 +47,8 @@ export const Travelling = () => {
   const [uploadTU, setUploadTU] = useState({
     travelUp: [],
   });
-
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [insuranceData, setInsuranceData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -49,6 +60,11 @@ export const Travelling = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [numPages, setNumPages] = useState(null);
   const [lastUploadUrl, setPPLastUP] = useState("");
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [searchResultData, setSearchResultData] = useState([]);
+  const { formattedPermissions } = useDeleteAccess();
+  const { travelInsData } = useContext(DataSupply);
+  const { empID, requiredPermissions, access } = useOutletContext();
 
   const {
     register,
@@ -98,101 +114,244 @@ export const Travelling = () => {
     }
   };
 
-const updateUploadingState = (label, value) => {
-      setIsUploading((prev) => ({
-        ...prev,
-        [label]: value,
-      }));
-      console.log(value);
-    };
-  
-    const handleFileChange = async (e, label) => {
-      const travelNo = watch("travelNo");
-      if (!travelNo) {
-          alert("Please enter the Policy Number before uploading files.");
-          window.location.href = "/insuranceHr";
-          return;
-      }
-  
-      const selectedFile = e.target.files[0];
-      if (!selectedFile) return;
-  
-      const allowedTypes = [
-        "application/pdf",
-       
-      ];
-      if (!allowedTypes.includes(selectedFile.type)) {
-          alert("Upload must be a PDF file.");
-          return;
-      }
-  
-      // Ensure no duplicate files are added
-      const currentFiles = watch(label) || [];
-      if (currentFiles.some((file) => file.name === selectedFile.name)) {
-          alert("This file has already been uploaded.");
-          return;
-      }
-  
-      setValue(label, [...currentFiles, selectedFile]);
-  
-      try {
-        updateUploadingState(label, true);
-        await uploadDocs(selectedFile, label, setUploadTU, travelNo);
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          [label]: selectedFile.name,
-        }));
-      } catch (err) {
-          console.error(err);
-      }
-    };
-  
-    const deleteFile = async (fileType, fileName) => {
-      try {
-        const travelNo = watch("travelNo");
-        if (!travelNo) {
-          alert("Please provide the Policy Number before deleting files.");
-          return;
-        }
-  
-        const isDeleted = await handleDeleteFile(
-          fileType,
-          fileName,
-          travelNo
-        );
-        const isDeletedArrayUploaded = await DeleteTravellingUp(
-          fileType,
-          fileName,
-          travelNo,
-          setUploadedFileNames,
-          setUploadTU,
-          setIsUploading
-        );
-  
-        if (!isDeleted || isDeletedArrayUploaded) {
-          console.error(
-            `Failed to delete file: ${fileName}, skipping UI update.`
-          );
-          return;
-        }
-        // console.log(`Deleted "${fileName}". Remaining files:`);
-      } catch (error) {
-        console.error("Error deleting file:", error);
-        alert("Error processing the file deletion.");
-      }
-    };
-
-  const openPopup = (fileUrl) => {
-    setPopupImage(fileUrl); // Set the URL for the image or file
-    setPopupVisible(true); // Show the popup
+  const updateUploadingState = (label, value) => {
+    setIsUploading((prev) => ({
+      ...prev,
+      [label]: value,
+    }));
+    // console.log(value);
   };
 
-  // const handlePrint = useReactToPrint({
-  //     content: () => travelPrint.current,
-  //     onBeforePrint: () => console.log("Preparing print..."),
-  //     onAfterPrint: () => console.log("Print complete"),
-  //     pageStyle: "print", // This ensures the print view uses a different CSS style
-  //   });
+  const handleFileChange = async (e, label) => {
+    const travelNo = watch("travelNo");
+    if (!travelNo) {
+      alert("Please enter the Policy Number before uploading files.");
+      window.location.href = "/insuranceHr/travelling";
+      return;
+    }
+
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
+    }
+
+    // Ensure no duplicate files are added
+    const currentFiles = watch(label) || [];
+    if (currentFiles.some((file) => file.name === selectedFile.name)) {
+      alert("This file has already been uploaded.");
+      return;
+    }
+
+    setValue(label, [...currentFiles, selectedFile]);
+
+    try {
+      updateUploadingState(label, true);
+      await uploadDocs(selectedFile, label, setUploadTU, travelNo);
+      setUploadedFileNames((prev) => ({
+        ...prev,
+        [label]: selectedFile.name,
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+  const deleteFile = async (fileType, fileName, fileIndex) => {
+    try {
+      const travelNo = watch("travelNo");
+      if (!travelNo) {
+        alert("Please provide the Policy Number before deleting files.");
+        return;
+      }
+
+      const isDeleted = await handleDeleteFile(fileType, fileName, travelNo);
+      const isDeletedArrayUploaded = await DeleteTravellingUp(
+        fileType,
+        fileName,
+        fileIndex,
+        travelNo,
+        setUploadedFileNames,
+        setUploadTU,
+        setIsUploading
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
+        return;
+      }
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
+      // console.log(`Deleted "${fileName}". Remaining files:`);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      alert("Error processing the file deletion.");
+    }
+  };
+  useEffect(() => {
+    const fetchInsuranceData = async () => {
+      try {
+        let allTravelIns = [];
+        let nextToken = null;
+
+        do {
+          const response = await client.graphql({
+            query: listTravelIns,
+            variables: {
+              nextToken: nextToken,
+            },
+          });
+
+          const items = response?.data?.listTravelIns?.items || [];
+
+          allTravelIns = [...allTravelIns, ...items];
+
+          nextToken = response?.data?.listTravelIns?.nextToken;
+        } while (nextToken);
+
+        const filteredData = allTravelIns.filter((data) => {
+          const expiryDate = new Date(data.travelExp);
+          return expiryDate >= new Date();
+        });
+
+        setInsuranceData(filteredData);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching insurance data:", error);
+        setError("insuranceData", { message: "Error fetching data" });
+        setLoading(false);
+      }
+    };
+
+    fetchInsuranceData();
+  }, []);
+
+  const searchResult = (result) => {
+    console.log("RW", result);
+    setSearchResultData(result);
+  };
+
+  const getFileName = (input) => {
+    if (typeof input === "object" && input.upload) {
+      const filePath = input.upload;
+      const decodedUrl = decodeURIComponent(filePath);
+      return decodedUrl.substring(decodedUrl.lastIndexOf("/") + 1);
+    }
+
+    try {
+      const urlObj = new URL(input);
+      const filePath = urlObj.pathname;
+      const decodedUrl = decodeURIComponent(filePath);
+      return decodedUrl.substring(decodedUrl.lastIndexOf("/") + 1);
+    } catch (e) {
+      if (typeof input === "string") {
+        const decodedUrl = decodeURIComponent(input);
+        return decodedUrl.substring(decodedUrl.lastIndexOf("/") + 1);
+      }
+      return undefined;
+    }
+  };
+
+  useEffect(() => {
+    setValue("id", searchResultData.id);
+    setValue("travelExp", searchResultData.travelExp);
+    setValue("travelNo", searchResultData.travelNo);
+    setValue("travelUp", searchResultData.travelUp);
+
+    const fields = ["travelExp", "travelNo", "travelUp"];
+
+    fields.forEach((field) => setValue(field, searchResultData[field]));
+
+    if (searchResultData && searchResultData.travelUp) {
+      try {
+        const parsedArray = JSON.parse(searchResultData.travelUp[0]);
+
+        const parsedFiles = parsedArray.map((item) =>
+          typeof item === "string" ? JSON.parse(item) : item
+        );
+
+        setValue("travelUp", parsedFiles);
+
+        setUploadTU((prev) => ({
+          ...prev,
+          travelUp: parsedFiles,
+        }));
+
+        setUploadedFileNames((prev) => ({
+          ...prev,
+          travelUp: parsedFiles.map((file) => getFileName(file.upload)),
+        }));
+      } catch (error) {
+        console.error(`Failed to parse ${searchResultData.travelUp}:`, error);
+      }
+    }
+  }, [searchResultData, setValue]);
+
+  const onSubmit = async (data) => {
+    try {
+      const checkingDITable = travelInsData.find(
+        (match) => match.id === searchResultData.id
+      );
+
+      if (checkingDITable) {
+        const TravelUpValue = {
+          ...data,
+          travelUp: JSON.stringify(uploadTU.travelUp),
+        };
+        // console.log(TravellCreValue);
+
+        const finalData = {
+          id: TravelUpValue.id,
+          travelUp: TravelUpValue.travelUp,
+          travelExp: TravelUpValue.travelExp,
+          travelNo: TravelUpValue.travelNo,
+        };
+
+        const response = await client.graphql({
+          query: updateTravelIns,
+          variables: { input: finalData },
+        });
+
+        // console.log("Successfully submitted data:", response);
+        setNotification(true);
+      } else {
+        const TravellCreValue = {
+          ...data,
+          travelUp: JSON.stringify(uploadTU.travelUp),
+        };
+        // console.log(TravellCreValue);
+
+        const response = await client.graphql({
+          query: createTravelIns,
+          variables: { input: TravellCreValue },
+        });
+
+        // console.log("Successfully submitted data:", response);
+        setNotification(true);
+      }
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    }
+  };
+
+  //___________________________________-Printing section %% Pdf section___________________________________
+
+  const openPopup = (fileUrl) => {
+    setPopupImage(fileUrl);
+    setPopupVisible(true);
+  };
 
   const handlePrint = useReactToPrint({
     content: () => travelPrint.current,
@@ -246,7 +405,10 @@ const updateUploadingState = (label, value) => {
                 <div className="py-6 fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
                   <div className="relative bg-white rounded-lg shadow-lg w-[40vw] max-h-full flex flex-col">
                     {/* PDF Viewer */}
-                    <div ref={travelPrint} className="flex-grow overflow-y-auto">
+                    <div
+                      ref={travelPrint}
+                      className="flex-grow overflow-y-auto"
+                    >
                       <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
                         <Viewer fileUrl={lastUploadUrl || ""} />
                       </Worker>
@@ -353,75 +515,42 @@ const updateUploadingState = (label, value) => {
     );
   };
 
-  const onSubmit = async (data) => {
-    try {
-      const TravellCreValue = {
-        ...data,
-        travelUp: JSON.stringify(uploadTU.travelUp),
-      };
-      // console.log(TravellCreValue);
-
-      const response = await client.graphql({
-        query: createTravelIns,
-        variables: { input: TravellCreValue },
-      });
-
-      // console.log("Successfully submitted data:", response);
-      setNotification(true);
-    } catch (error) {
-      console.error("Error submitting data:", error);
-    }
-  };
-
-  useEffect(() => {
-    const fetchInsuranceData = async () => {
-      try {
-        let allTravelIns = [];
-        let nextToken = null;
-  
-        do {
-          const response = await client.graphql({
-            query: listTravelIns,
-            variables: {
-              nextToken: nextToken,
-            },
-          });
-  
-          const items = response?.data?.listTravelIns?.items || [];
-  
-          allTravelIns = [...allTravelIns, ...items];
-  
-          nextToken = response?.data?.listTravelIns?.nextToken;
-        } while (nextToken);
-  
-        const filteredData = allTravelIns.filter((data) => {
-          const expiryDate = new Date(data.travelExp);
-          return expiryDate >= new Date();
-        });
-  
-        setInsuranceData(filteredData);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching insurance data:", error);
-        setError("insuranceData", { message: "Error fetching data" });
-        setLoading(false);
-      }
-    };
-  
-    fetchInsuranceData();
-  }, []);
-  
+  //___________________________________-Printing section %% Pdf section___________________________________
 
   return (
-    <section>
+    <section
+      onClick={() => {
+        setFilteredEmployees([]);
+      }}
+    >
+      <div className="w-full flex items-center justify-between gap-5 px-10">
+        <Link to="/dashboard" className="text-xl flex-1 text-grey">
+          <FaArrowLeft />
+        </Link>
+        <p className="flex-1 text-center mt-2 text_size_2 uppercase">
+          Travelling Insurance
+        </p>
+        <div className="flex-1">
+          <InsSearch
+            searchResult={searchResult}
+            newFormData={insuranceData}
+            searchIcon2={<IoSearch />}
+            placeholder="Policy Number"
+            rounded="rounded-lg"
+            empID={empID}
+            filteredEmployees={filteredEmployees}
+            setFilteredEmployees={setFilteredEmployees}
+          />
+        </div>{" "}
+      </div>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="mx-auto py-5 px-10 my-10 bg-[#F5F6F1CC]"
       >
         {/* Travelling Insurance Fields */}
-        <h3 className="mb-5 text-lg font-bold">Travelling Insurance</h3>
+        {/* <h3 className="mb-5 text-lg font-bold">Travelling Insurance</h3> */}
         <div className="relative mb-10">
-          <div className="grid grid-cols-3 gap-4 items-center">
+          <div className="grid grid-cols-2 gap-4 items-center">
             <FormField
               name="travelNo"
               type="text"
@@ -444,24 +573,89 @@ const updateUploadingState = (label, value) => {
 
             {/* File Upload */}
             <div className="mb-2 relative">
-              <FileUpload
-                label="Upload File"
-                onChangeFunc={(e) => handleFileChange(e, "travelUp")}
-                handleFileChange={handleFileChange}
-                uploadedFileNames={uploadedFileNames}
-                isUploading={isUploading}
-                deleteFile={deleteFile}
-                register={register}
-                name="travelUp"
-                error={errors}
-              />
-              {/* <div className="absolute">
-                {uploadedFileNames.travelUp && (
-                  <span className="text-sm text-grey ">
-                    {uploadedFileNames.travelUp}
+              <div className="flex flex-col">
+                {/* <label className="text_size_5">travelUp</label> */}
+
+                {/* File Input Label */}
+                <label
+                  onClick={() => {
+                    if (isUploading["travelUp"]) {
+                      alert(
+                        "Please delete the previously uploaded file before uploading a new one."
+                      );
+                    }
+                  }}
+                  className={`mt-2 flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer`}
+                >
+                  <input
+                    type="file"
+                    className="hidden"
+                    {...register}
+                    accept=".pdf, .jpg, .jpeg, .png"
+                    onChange={(e) => handleFileChange(e, "travelUp")}
+                    disabled={isUploading["travelUp"]}
+                  />
+                  <span className="ml-2  w-full font-normal flex justify-between items-center gap-10">
+                    Upload
+                    <GoUpload />
                   </span>
+                </label>
+
+                {/* Display Uploaded File Names */}
+                {uploadedFileNames["travelUp"] && (
+                  <p className="text-grey text-sm my-1">
+                    {Array.isArray(uploadedFileNames["travelUp"]) ? (
+                      uploadedFileNames["travelUp"]
+                        .slice() // Create a shallow copy to avoid mutating the original array
+
+                        .map((fileName, fileIndex) => (
+                          <span
+                            key={fileIndex}
+                            className="mt-2 flex justify-between items-center"
+                          >
+                            {fileName}
+                            {formattedPermissions?.deleteAccess?.[access]?.some(
+                              (permission) =>
+                                requiredPermissions.includes(permission)
+                            ) && (
+                              <button
+                                type="button"
+                                className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                                onClick={
+                                  () =>
+                                    deleteFile("travelUp", fileName, fileIndex) // Pass fileIndex
+                                }
+                              >
+                                <MdCancel />
+                              </button>
+                            )}
+                          </span>
+                        ))
+                    ) : (
+                      <span className="mt-2 flex justify-between items-center">
+                        {uploadedFileNames["travelUp"]}
+                        <button
+                          type="button"
+                          className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                          onClick={
+                            () =>
+                              deleteFile(
+                                "travelUp",
+                                uploadedFileNames["travelUp"],
+                                0
+                              ) // Pass index 0 if only one file
+                          }
+                        >
+                          <MdCancel />
+                        </button>
+                      </span>
+                    )}
+                  </p>
                 )}
-              </div> */}
+
+                {/* Display Error Message */}
+                {/* {error && <p className="text-[red] text-[12px] mt-1">{error.message}</p>} */}
+              </div>
             </div>
           </div>
         </div>
@@ -492,7 +686,7 @@ const updateUploadingState = (label, value) => {
         ) : insuranceData.length > 0 ? (
           <div className=" h-[400px] overflow-y-auto scrollBar">
             <table className="w-full text-center">
-              <thead className="bg-[#939393] text-white">
+              <thead className="bg-[#939393] text-white sticky top-0">
                 <tr>
                   <th className="pl-4 py-4 rounded-tl-lg">Policy Number</th>
                   <th className="pl-4 py-4">Expiry Date</th>
@@ -571,6 +765,9 @@ const updateUploadingState = (label, value) => {
             )}
           </div>
         </div>
+      )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}
     </section>
   );

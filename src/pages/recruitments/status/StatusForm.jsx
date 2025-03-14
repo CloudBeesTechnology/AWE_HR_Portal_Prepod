@@ -6,10 +6,12 @@ import { LOIForm } from "../ScheduledForm/LOIForm";
 import { CVEVForm } from "../ScheduledForm/CVEVForm";
 import { PAAFForm } from "../ScheduledForm/PAAFForm";
 import { MobilizationForm } from "../ScheduledForm/MobilizationForm";
+import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
 // getLocalMobilization
- 
+
 export const StatusForm = ({ candidate, onClose, onSave }) => {
-  // const [activeTab, setActiveTab] = useState('Interview'); // Default active tab is 'Interview'
+  const { formattedPermissions } = useDeleteAccess();
+  // const [activeTab, setActiveTab] = useState('Interview'); 
   const [show, setShow] = useState(0);
   return (
     <div className="fixed inset-0 bg-grey bg-opacity-80 z-50 center">
@@ -23,7 +25,8 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
         <div className="p-4 shadow-md bg-[#FBFCFF]">
           <div className="flex gap-4 text-[13px] font-semibold">
             <div>
-              <span className="font-semibold">TEMP ID:</span> {candidate?.tempID}
+              <span className="font-semibold">TEMP ID:</span>{" "}
+              {candidate?.tempID}
             </div>
             <div>
               <span className="font-semibold">Name:</span> {candidate?.name}
@@ -110,13 +113,41 @@ export const StatusForm = ({ candidate, onClose, onSave }) => {
             </h6>
           )}
         </article>
-        {show === 0 && <InterviewForm candidate={candidate} />}
-        {show === 1 && <CandidateForm candidate={candidate} />}
-        {show === 2 && <LOIForm candidate={candidate} />}
-        {show === 3 && <CVEVForm candidate={candidate} />}
-        {show === 4 && <PAAFForm candidate={candidate} />}
+        {show === 0 && (
+          <InterviewForm
+            candidate={candidate}
+           
+          />
+        )}
+        {show === 1 && (
+          <CandidateForm
+            candidate={candidate}
+           
+          />
+        )}
+        {show === 2 && (
+          <LOIForm
+            candidate={candidate}
+            formattedPermissions={formattedPermissions}
+          />
+        )}
+        {show === 3 && (
+          <CVEVForm
+            candidate={candidate}
+            formattedPermissions={formattedPermissions}
+          />
+        )}
+        {show === 4 && (
+          <PAAFForm
+            candidate={candidate}
+            formattedPermissions={formattedPermissions}
+          />
+        )}
         {candidate?.contractType === "Local" && show === 5 && (
-          <MobilizationForm candidate={candidate} />
+          <MobilizationForm
+            candidate={candidate}
+            formattedPermissions={formattedPermissions}
+          />
         )}
       </div>
     </div>

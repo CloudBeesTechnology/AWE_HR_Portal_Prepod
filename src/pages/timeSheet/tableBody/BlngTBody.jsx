@@ -7,6 +7,7 @@ export const BlngTBody = ({
   message,
   assignObjectFun,
   toggleFunction,
+  editFormTitleFunc,
 }) => {
   useEffect(() => {
     if (loading === false) {
@@ -47,6 +48,7 @@ export const BlngTBody = ({
       return `${day}/${month}/${year} ${time}`;
     } catch {}
   };
+
   return (
     <tbody>
       {loading === false && data && data?.length > 0
@@ -59,6 +61,7 @@ export const BlngTBody = ({
                   onClick={() => {
                     assignObjectFun(rowData, "BLNG");
                     toggleFunction();
+                    editFormTitleFunc("View Form");
                   }}
                 >
                   <td className="text-start px-4 flex-1">{index + 1}</td>
@@ -72,12 +75,20 @@ export const BlngTBody = ({
                   <td className="text-center px-4 flex-1">
                     {ENTRANCEDATETIME(
                       rowData?.inTime?.replace(/[\[\]]/g, "") || 0
-                    )}
+                    ).includes("undefined")
+                      ? "0"
+                      : ENTRANCEDATETIME(
+                          rowData?.inTime?.replace(/[\[\]]/g, "") || 0
+                        )}
                   </td>
                   <td className="text-center px-4 flex-1">
                     {ENTRANCEDATETIME(
                       rowData?.outTime?.replace(/[\[\]]/g, "") || 0
-                    )}
+                    ).includes("undefined")
+                      ? "0"
+                      : ENTRANCEDATETIME(
+                          rowData?.outTime?.replace(/[\[\]]/g, "") || 0
+                        )}
                   </td>
 
                   <td className="text-center px-4 flex-1">
@@ -86,7 +97,9 @@ export const BlngTBody = ({
                   <td className="text-center px-4 flex-1">
                     {rowData?.totalHrs || 0}
                   </td>
-                  <td className="text-center px-4 flex-1">{rowData?.aweSDN || 0}</td>
+                  <td className="text-center px-4 flex-1">
+                    {rowData?.aweSDN || 0}
+                  </td>
 
                   <td className="text-center px-4 flex-1">
                     {rowData?.normalWorkHrs || 0}
@@ -95,7 +108,7 @@ export const BlngTBody = ({
                     {rowData?.actualWorkHrs || 0}
                   </td>
                   <td className="text-center px-4 flex-1">
-                    {rowData?.totalOT || 0}
+                    {rowData?.otTime || 0}
                   </td>
                   <td className="text-center px-4 flex-1">
                     {rowData?.remarks}

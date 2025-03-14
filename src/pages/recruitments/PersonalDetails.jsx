@@ -14,6 +14,7 @@ export const PersonalDetails = () => {
   const { empPDData } = useContext(DataSupply);
   const location = useLocation();
   const applicationData = location.state?.FormData;
+console.log(applicationData);
 
   useEffect(() => {
     window.scrollTo({
@@ -205,12 +206,8 @@ export const PersonalDetails = () => {
         } else {
           // console.log("No interview data found for tempID:", tempID);
         }
-      } else {
-        // console.log("empPDData is empty");
       }
-    } else {
-      // console.log("tempID is not set");
-    }
+    } 
   }, [tempID, setValue, empPDData]);
 
   return (
@@ -459,11 +456,11 @@ export const PersonalDetails = () => {
                 )}
               />
 
-              {familyDetails.isNew && (
+              {familyDetails[index].isNew && (
                 <button
                   type="button"
                   onClick={() => {
-                    console.log(`Removing family member at index: ${index}`);
+                    // console.log(`Removing family member at index: ${index}`);
                     removeFamily(index);
                   }}
                   className="absolute top-15 -right-7 text-medium_grey text-[18px]"
@@ -494,12 +491,11 @@ export const PersonalDetails = () => {
               control={control}
               render={({ field }) => (
                 <div className="flex flex-col">
-                  <textarea
+                  <input
                     {...field}
                     placeholder="School / University / Professional Institute"
                     className="resize-none text_size_9 mt-2 p-2.5 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
                   />
-
                   {errors.eduDetails?.[index]?.university && (
                     <p className="text-[red] text-xs mt-1">
                       {errors.eduDetails[index].university.message}
@@ -513,12 +509,12 @@ export const PersonalDetails = () => {
               control={control}
               render={({ field }) => (
                 <div className="flex flex-col">
-                  <textarea
+                  <input
                     {...field}
                     type="date"
                     placeholder="From Date"
                     className="resize-none mt-2 p-2.5 text_size_9  bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
-                  ></textarea>
+                  />
                   {errors.eduDetails?.[index]?.fromDate && (
                     <p className="text-[red] text-xs mt-1">
                       {errors.eduDetails[index].fromDate.message}
@@ -532,12 +528,12 @@ export const PersonalDetails = () => {
               control={control}
               render={({ field }) => (
                 <div className="flex flex-col">
-                  <textarea
+                  <input
                     {...field}
                     type="date"
                     placeholder="To Date"
                     className="resize-none mt-2 p-2.5 text_size_9  bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded"
-                  ></textarea>
+                  />
                   {errors.eduDetails?.[index]?.toDate && (
                     <p className="text-[red] text-xs mt-1">
                       {errors.eduDetails[index].toDate.message}
@@ -551,7 +547,7 @@ export const PersonalDetails = () => {
               control={control}
               render={({ field }) => (
                 <div className="flex flex-col">
-                  <textarea
+                 <input
                     {...field}
                     placeholder="Highest Standard / Passed / Certificate / Degree / Professional Qualification"
                     className="resize-none mt-2 p-2.5  bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded text_size_9"

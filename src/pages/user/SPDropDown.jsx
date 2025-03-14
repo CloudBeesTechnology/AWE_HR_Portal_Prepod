@@ -2,8 +2,14 @@ import { useEffect, useState } from "react";
 import { IoMdArrowDropright, IoMdArrowDropdown } from "react-icons/io";
 import { FaCheckCircle } from "react-icons/fa";
 import { MdOutlineRadioButtonUnchecked } from "react-icons/md";
+import { MdCheckBox } from "react-icons/md";
+import { RiCheckboxBlankLine } from "react-icons/ri";
 
-export const SPDropDown = ({ dropDownData, permissionData }) => {
+export const SPDropDown = ({
+  dropDownData,
+  permissionData, 
+  deletePermissionData,
+}) => {
   const [openSections, setOpenSections] = useState([]);
   const [selectedItems, setSelectedItems] = useState({
     Dashboard: [],
@@ -18,7 +24,7 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
     Report: [],
     BenefitsAndRewards: [],
   });
-
+  const [deleteSelectedItems, setDeleteSelectedItems] = useState({});
   const toggleMenu = (section) => {
     if (openSections.includes(section)) {
       setOpenSections(openSections.filter((item) => item !== section));
@@ -30,8 +36,10 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
   useEffect(() => {
     if (permissionData) {
       setSelectedItems(permissionData);
+      setDeleteSelectedItems(deletePermissionData?.deleteAccess);
+      // console.log("permissionData : ", permissionData);
     }
-  }, [permissionData]);
+  }, [permissionData, deletePermissionData]);
 
   const handleItemClick = (item, sectionTitle, sectionItems = []) => {
     // Select or deselect all items in the section
@@ -72,14 +80,28 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
     }
   };
 
+  const handleDeleteClick = (item, sectionTitle) => {
+    setDeleteSelectedItems((prev) => {
+      const isSelected = prev?.[sectionTitle]?.includes(item);
+      return {
+        ...prev,
+        [sectionTitle]: isSelected
+          ? prev?.[sectionTitle].filter((i) => i !== item)
+          : [...(prev?.[sectionTitle] || []), item],
+      };
+    });
+  };
+
   useEffect(() => {
     const nonEmptySelectedItems = Object.fromEntries(
       Object.entries(selectedItems).filter(
         ([sectionTitle, items]) => items.length > 0
       )
     );
-    dropDownData(nonEmptySelectedItems);
-  }, [selectedItems]);
+    // console.log("nonEmptySelectedItems : ", nonEmptySelectedItems);
+    dropDownData(nonEmptySelectedItems, deleteSelectedItems);
+    // console.log("deleteSelectedItems : ", deleteSelectedItems);
+  }, [selectedItems, deleteSelectedItems]);
 
   const permissions = [
     {
@@ -119,7 +141,10 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
       ],
     },
     {
-      Insurance: ["Insurance"],
+      Insurance: [
+        "Insurance",
+        //  "Insurance Info", "Insurance Claim"
+      ],
     },
     {
       Training: ["HR", "Training Requestor", "BLNG", "OME"],
@@ -137,12 +162,7 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
       ],
     },
     {
-      LeaveManagement: [
-        "Request Leave",
-        "History of leave",
-        "Employee Leave Balance",
-        "Request Tickets",
-      ],
+      LeaveManagement: ["LeaveManagement"],
     },
     {
       Notification: ["Notification"],
@@ -173,11 +193,40 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
     },
   ];
 
+  const deletableSubtopics = {
+    Recruitment: [
+      "Status",
+      "WorkPass Tracking",
+      "Candidate",
+      "Local CV",
+      "Non Local CV",
+      "Hiring Job",
+    ],
+    User: ["User"],
+    
+    Insurance: [
+      "Insurance",
+    ],
+    Employee: [
+      "Employee Info",
+      "Work Info",
+      "Work Pass",
+      "Medical & Dependent Info",
+      "Insurance",
+    ],
+    Training: ["HR", "Training Requestor"],
+  };
+
   return (
     <section className="w-full">
+      <div className="flex  text_size_3 p-3 ">
+        <div className="w-4/6 pl-5">Module</div>
+        <div className="w-1/6 text-right">Delete</div>
+        <div className="w-1/6 text-right">Access</div>
+      </div>
       {permissions.map((sectionObj, sectionIndex) => {
-        const sectionTitle = Object.keys(sectionObj)[0];
-        const sectionItems = sectionObj[sectionTitle];
+        const sectionTitle = Object.keys(sectionObj)[0] || [];
+        const sectionItems = sectionObj[sectionTitle] || [];
 
         const allItemsSelected = sectionItems.every(
           (item) =>
@@ -185,14 +234,12 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
               ? selectedItems[sectionTitle].includes(item)
               : false // Check if section exists
         );
-
         return (
           <div key={sectionIndex}>
             <div className="flex items-center cursor-pointer py-1 px-2 justify-between">
-              {/* Click to toggle the sub-items (open/close) */}
               <div
                 onClick={() => toggleMenu(sectionTitle)}
-                className="flex items-center"
+                className="flex items-center w-full"
               >
                 {openSections.includes(sectionTitle) ? (
                   <IoMdArrowDropdown className="text-2xl" />
@@ -203,11 +250,10 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
                   {sectionTitle}
                 </p>
               </div>
-
               {/* Click to select/deselect all sub-items */}
               {openSections.includes(sectionTitle) && (
                 <span
-                  className="text-dark_grey cursor-pointer"
+                  className="text-dark_grey cursor-pointer pr-7"
                   onClick={() =>
                     handleItemClick(null, sectionTitle, sectionItems)
                   } // Pass null for item when selecting all
@@ -220,17 +266,31 @@ export const SPDropDown = ({ dropDownData, permissionData }) => {
                 </span>
               )}
             </div>
-
-            {openSections.includes(sectionTitle) && (
-              <ul className="pl-6 space-y-1">
-                {sectionItems.map((item, itemIndex) => (
+            {openSections?.includes(sectionTitle) && (
+              <ul className="pl-6 space-y-1 pr-7">
+                {sectionItems?.map((item, itemIndex) => (
                   <li
                     key={itemIndex}
-                    onClick={() => handleItemClick(item, sectionTitle)} // Pass the sectionTitle to handleItemClick
-                    className="flex justify-between items-center cursor-pointer p-2"
+                    className="flex justify-between items-center cursor-pointer p-2 gap-20"
                   >
-                    <span>{item}</span>
-                    <span className="text-dark_grey">
+                    <span className="w-full">{item}</span>
+
+                    {deletableSubtopics?.[sectionTitle]?.includes(item) && (
+                      <span
+                        className="text-dark_grey cursor-pointer"
+                        onClick={() => handleDeleteClick(item, sectionTitle)}
+                      >
+                        {deleteSelectedItems?.[sectionTitle]?.includes(item) ? (
+                          <MdCheckBox />
+                        ) : (
+                          <RiCheckboxBlankLine className="text-lg" />
+                        )}
+                      </span>
+                    )}
+                    <span
+                      className="text-dark_grey w"
+                      onClick={() => handleItemClick(item, sectionTitle)}
+                    >
                       {selectedItems[sectionTitle] &&
                       selectedItems[sectionTitle].includes(item) ? ( // Check if section exists
                         <FaCheckCircle />

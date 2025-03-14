@@ -11,6 +11,7 @@ import { statusOptions } from "../../../utils/StatusDropdown";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadLOI } from "../deleteDocsRecruit/DeleteUploadLOI";
+import { DeletePopup } from "../../../utils/DeletePopup";
 // Define validation schema using Yup
 const MOBFormSchema = Yup.object().shape({
   mobSignDate: Yup.date().notRequired(),
@@ -22,10 +23,12 @@ const MOBFormSchema = Yup.object().shape({
     ),
 });
 
-export const MobilizationForm = ({ candidate }) => {
+export const MobilizationForm = ({ candidate, formattedPermissions }) => {
   const { loiDetails } = UpdateLoiData();
   const { mergedInterviewData } = useFetchInterview();
   const { interviewDetails } = UpdateInterviewData();
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [formData, setFormData] = useState({
     interview: {
@@ -101,7 +104,7 @@ export const MobilizationForm = ({ candidate }) => {
 
   const handleFileUpload = async (e, type) => {
     const tempID = candidate.tempID;
-    console.log(tempID);
+    // console.log(tempID);
 
     //      if (!tempID
     // ) {
@@ -137,6 +140,10 @@ export const MobilizationForm = ({ candidate }) => {
     }
   };
 
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
   const deletedStringUpload = async (fileType, fileName) => {
     try {
       const tempID = candidate.tempID;
@@ -163,6 +170,8 @@ export const MobilizationForm = ({ candidate }) => {
         return;
       }
       // console.log(`Deleted "${fileName}". Remaining files:`);
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
     } catch (error) {
       console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
@@ -196,7 +205,7 @@ export const MobilizationForm = ({ candidate }) => {
       });
       await interviewDetails({
         InterviewValue: {
-          id: interviewScheduleId, 
+          id: interviewScheduleId,
           status: formData.interview.status,
           // status: selectedInterviewData.contractType === "Local" ? "mobilization" : "workpass",
         },
@@ -205,7 +214,7 @@ export const MobilizationForm = ({ candidate }) => {
       // console.log("Data stored successfully...");
       setNotification(true);
     } catch (error) {
-      console.error("Error submitting interview details:", error);
+      // console.error("Error submitting interview details:", error);
       alert("Failed to update interview details. Please try again.");
     }
   };
@@ -220,6 +229,10 @@ export const MobilizationForm = ({ candidate }) => {
       },
     }));
   };
+
+  const requiredPermissions = ["Status"];
+
+  const access = "Recruitment";
 
   return (
     <form onSubmit={handleSubmitTwo} className="p-5">
@@ -236,7 +249,6 @@ export const MobilizationForm = ({ candidate }) => {
         </div>
 
         <div className="">
-
           <div className="">
             <FileUploadField
               label="Upload File"
@@ -247,6 +259,10 @@ export const MobilizationForm = ({ candidate }) => {
               deletedStringUpload={deletedStringUpload}
               isUploadingString={isUploadingString}
               error={errors.mobFile}
+              formattedPermissions={formattedPermissions}
+              requiredPermissions={requiredPermissions}
+              access={access}
+              check={isUploadingString.mobFile}
             />
           </div>
         </div>
@@ -282,6 +298,9 @@ export const MobilizationForm = ({ candidate }) => {
           notification={notification}
           path="/recrutiles/status"
         />
+      )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}
     </form>
   );

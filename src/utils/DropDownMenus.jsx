@@ -137,6 +137,7 @@ export const BwnIcColourDD = [
   { value: "Yellow", label: "Yellow" },
   { value: "Red", label: "Red" },
   { value: "Green", label: "Green" },
+  { value: "Purple", label: "Purple" },
 ];
 
 export const EducLevelDD = [

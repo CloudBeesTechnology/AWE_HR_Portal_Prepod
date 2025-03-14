@@ -18,6 +18,7 @@ export const Termination = () => {
     "Department",
     "Other Department",
     "Position",
+    "OTHER Position",
     "Date of Termination",
     "Reason of Termination",
   ]);
@@ -61,6 +62,9 @@ export const Termination = () => {
           : "-",
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
+          : "-",
+          otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
           terminateDate: formatDate(item.termiDate) || "-", // Display termination date
           reasonTerminate: item.reasonTerminate || "-", // Display termination note (if any)
@@ -118,6 +122,9 @@ export const Termination = () => {
       position: Array.isArray(item.position)
         ? item.position[item.position.length - 1]
         : "-",
+        otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
+          : "-",
         terminateDate: formatDate(item.termiDate) || "-", // Display formatted termination date
         reasonTerminate: item.reasonTerminate || "-", // Display termination reason
         rawTermiDate: new Date(item.termiDate), // Add raw date for sorting

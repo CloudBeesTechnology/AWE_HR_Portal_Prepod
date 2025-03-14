@@ -369,6 +369,8 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
           </div>
         </div>
       </div>
+
+    
     </div>
   );
 };

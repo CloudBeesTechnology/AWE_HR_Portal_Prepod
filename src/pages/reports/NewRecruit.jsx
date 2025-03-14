@@ -21,6 +21,7 @@ export const NewRecruit = () => {
     "Department",
     "Other Department",
     "Position",
+    "Other Position",
     "contactNo",
     "Brunei I/C No",
     "Passport No",
@@ -77,7 +78,11 @@ export const NewRecruit = () => {
         : "-",
       position: Array.isArray(item.position)
         ? item.position[item.position.length - 1]
-        : "-",        contactNo: item.contactNo || "-",
+        : "-",      
+        otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
+          : "-", 
+         contactNo: item.contactNo || "-",
         bruneiIcNo: item.bwnIcNo || "-",
         passportNo: item.ppNo || "-",
         passporExpiry: Array.isArray(item.ppExpiry)
@@ -112,6 +117,16 @@ export const NewRecruit = () => {
   
     const filtered = allData
       .filter((data) => {
+        if (!Array.isArray(data.workStatus) || data.workStatus.length === 0) {
+          return false; // Return early if workStatus is undefined or an empty array
+      }
+      
+      const lastWorkStatus = data.workStatus[data.workStatus.length - 1]; // Now it's safe
+      
+      if (lastWorkStatus?.toUpperCase() === "TERMINATION" || lastWorkStatus?.toUpperCase() === "RESIGNATION") {
+          return false; // Exclude records with TERMINATION or RESIGNATION
+      }
+        
         const doj = data.doj ? new Date(data.doj) : null;
   
         if (!doj || isNaN(doj.getTime())) return false;
@@ -138,7 +153,11 @@ export const NewRecruit = () => {
         : "-",
       position: Array.isArray(item.position)
         ? item.position[item.position.length - 1]
-        : "-",        contactNo: item.contactNo || "-",
+        : "-",    
+        otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
+          : "-",
+      contactNo: item.contactNo || "-",
         bruneiIcNo: item.bwnIcNo || "-",
         passportNo: item.ppNo || "-",
         passporExpiry: Array.isArray(item.ppExpiry)

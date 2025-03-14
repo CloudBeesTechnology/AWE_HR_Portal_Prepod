@@ -87,7 +87,7 @@ export const CandidateForm = ({ candidate }) => {
     const interviewScheduleId = selectedInterviewData?.interviewSchedules?.id;
 
     if (!interviewScheduleId) {
-      console.error("Interview schedule ID not found.");
+      // console.error("Interview schedule ID not found.");
       alert("Interview schedule ID not found.");
       return;
     }
@@ -101,7 +101,7 @@ export const CandidateForm = ({ candidate }) => {
         },
       });
 
-      console.log("Candidate Updated Successfully...");
+      // console.log("Candidate Updated Successfully...");
       setNotification(true);
     } catch (error) {
       console.error("Error submitting interview details:", error);

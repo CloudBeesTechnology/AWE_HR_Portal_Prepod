@@ -38,106 +38,116 @@ export const UploadHOfile = (
           tableBodyData.push(bodySlicedData);
           return headerSlicedData;
         });
+      if (checkTrueOrFalse === true) {
+        const convertDecimalToTime = (decimal, value) => {
+          if (value === "time") {
+            const totalHours = decimal * 24;
+            const hours = Math.floor(totalHours);
+            const totalMinutes = (totalHours - hours) * 60;
+            const minutes = Math.floor(totalMinutes);
+            const totalSeconds = (totalMinutes - minutes) * 60;
+            const seconds = Math.round(totalSeconds);
 
-      const convertDecimalToTime = (decimal, value) => {
-        if (value === "time") {
-          const totalHours = decimal * 24;
-          const hours = Math.floor(totalHours);
-          const totalMinutes = (totalHours - hours) * 60;
-          const minutes = Math.floor(totalMinutes);
-          const totalSeconds = (totalMinutes - minutes) * 60;
-          const seconds = Math.round(totalSeconds);
+            const formattedTime = `${hours
+              .toString()
+              .padStart(2, "0")}:${minutes
+              .toString()
+              .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 
-          const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
-            .toString()
-            .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+            return formattedTime;
+          } else if (value === "date") {
+            const baseDate = new Date(1899, 11, 30);
 
-          return formattedTime;
-        } else if (value === "date") {
-          const baseDate = new Date(1899, 11, 30);
+            const daysToAdd = decimal;
+            return new Date(
+              baseDate.getTime() + daysToAdd * 24 * 60 * 60 * 1000
+            );
+          }
+        };
 
-          const daysToAdd = decimal;
-          return new Date(baseDate.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
-        }
-      };
-
-      function cleanKey(key) {
-        if (typeof key !== "string") {
-          return key;
-        }
-        return key.replace(/[^a-zA-Z0-9]/g, "");
-      }
-
-      const data = tableBodyData.flat();
-      const formattedData = data.map((item) => {
-        const cleanedItem = {};
-
-        for (const key in item) {
-          const cleanedKey = cleanKey(key);
-          cleanedItem[cleanedKey] = item[key];
+        function cleanKey(key) {
+          if (typeof key !== "string") {
+            return key;
+          }
+          return key.replace(/[^a-zA-Z0-9]/g, "");
         }
 
-        return cleanedItem;
-      });
+        const data = tableBodyData.flat();
+        const formattedData = data.map((item) => {
+          const cleanedItem = {};
 
-      function convertDateFormat(dateStr) {
-        const parts = dateStr.split("/");
-
-        if (parts.length !== 3) {
-          throw new Error("Invalid date format. Expected DD/MM/YYYY");
-        }
-
-        const [day, month, year] = parts;
-
-        return `${day}/${month}/${year}`;
-      }
-
-      const updatedDataArray =
-        formattedData &&
-        formattedData.map((item) => {
-          if (typeof item.ONAM === "number") {
-            item.ONAM = convertDecimalToTime(item.ONAM, "time");
-          }
-          if (typeof item.OFFAM === "number") {
-            item.OFFAM = convertDecimalToTime(item.OFFAM, "time");
-          }
-          if (typeof item.ONPM === "number") {
-            item.ONPM = convertDecimalToTime(item.ONPM, "time");
-          }
-          if (typeof item.OFFPM === "number") {
-            item.OFFPM = convertDecimalToTime(item.OFFPM, "time");
-          }
-          if (typeof item.IN === "number") {
-            item.IN = convertDecimalToTime(item.IN, "time");
-          }
-          if (typeof item.OUT === "number") {
-            item.OUT = convertDecimalToTime(item.OUT, "time");
-          }
-  
-          if (typeof item.DATE === "number") {
-            const jsDate = convertDecimalToTime(item.DATE, "date");
-
-            const dateObject = new Date(jsDate).toLocaleDateString();
-
-            const formattedDate = convertDateFormat(dateObject);
-
-            item.DATE = formattedDate;
+          for (const key in item) {
+            const cleanedKey = cleanKey(key);
+            cleanedItem[cleanedKey] = item[key];
           }
 
-          return item;
+          return cleanedItem;
         });
 
-      try {
-      } catch {}
-      function filterDataByDateFormat(data) {
-        return data.filter((obj) => obj.IN && obj.OUT);
+        function convertDateFormat(dateStr) {
+          const parts = dateStr.split("/");
+
+          if (parts.length !== 3) {
+            throw new Error("Invalid date format. Expected DD/MM/YYYY");
+          }
+
+          const [day, month, year] = parts;
+
+          return `${day}/${month}/${year}`;
+        }
+
+        const updatedDataArray =
+          formattedData &&
+          formattedData.map((item) => {
+            if (typeof item.ONAM === "number") {
+              item.ONAM = convertDecimalToTime(item.ONAM, "time");
+            }
+            if (typeof item.OFFAM === "number") {
+              item.OFFAM = convertDecimalToTime(item.OFFAM, "time");
+            }
+            if (typeof item.ONPM === "number") {
+              item.ONPM = convertDecimalToTime(item.ONPM, "time");
+            }
+            if (typeof item.OFFPM === "number") {
+              item.OFFPM = convertDecimalToTime(item.OFFPM, "time");
+            }
+            if (typeof item.IN === "number") {
+              item.IN = convertDecimalToTime(item.IN, "time");
+            }
+            if (typeof item.OUT === "number") {
+              item.OUT = convertDecimalToTime(item.OUT, "time");
+            }
+
+            if (typeof item.DATE === "number") {
+              const jsDate = convertDecimalToTime(item.DATE, "date");
+
+              const dateObject = new Date(jsDate).toLocaleDateString();
+
+              const formattedDate = convertDateFormat(dateObject);
+
+              item.DATE = formattedDate;
+            }
+
+            return item;
+          });
+
+        try {
+        } catch {}
+        function filterDataByDateFormat(data) {
+          return data.filter((obj) => obj.IN && obj.OUT);
+        }
+
+        const filteredData = filterDataByDateFormat(updatedDataArray);
+
+        setExcelData(filteredData);
+        setLoading(false);
+
+        const theaderResult = getResult.flat();
+
+        return theaderResult;
+      } else {
+        return checkTrueOrFalse;
       }
-
-      const filteredData = filterDataByDateFormat(updatedDataArray);
-
-      setExcelData(filteredData);
-      setLoading(false);
-      return getResult.flat();
     }
 
     fileInputRef.current.value = "";

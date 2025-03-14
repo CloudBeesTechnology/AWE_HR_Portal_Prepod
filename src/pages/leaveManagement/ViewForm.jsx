@@ -18,7 +18,8 @@ export const ViewForm = ({
   personalInfo,
 }) => {
   const { empPIData } = useContext(DataSupply);
-  const { gmPosition, gmMail, GMEmpID } = useTempID();
+  const { gmPosition, gmMail, GMEmpID, HRMPosition, hrManagerMail } =
+    useTempID();
   const [remark, setRemark] = useState("");
   const [notification, setNotification] = useState(false);
   const [notificationText, setNotificationText] = useState("");
@@ -35,6 +36,8 @@ export const ViewForm = ({
     const findingSupervisorName = leaveData?.supervisorEmpID === val.empID;
     return findingSupervisorName;
   });
+
+  // console.log(hrManagerMail);
 
   const getStatusClass = (status) => {
     return status === "Rejected"
@@ -66,6 +69,9 @@ export const ViewForm = ({
       : "text-[#E8A317]";
   };
 
+  const GM = "GENERAL MANAGER";
+  const HRM = "HR MANAGER";
+
   const isValidDateFormat = (date) => {
     const datePatternSlash = /^\d{4}\/\d{1,2}\/\d{1,2}$/;
     const datePatternDash = /^\d{4}-\d{2}-\d{2}$/;
@@ -94,9 +100,9 @@ export const ViewForm = ({
         leaveData.empLeaveSelectedFrom && leaveData.empLeaveSelectedTo
           ? isValidDateFormat(leaveData.empLeaveSelectedFrom) &&
             isValidDateFormat(leaveData.empLeaveSelectedTo)
-            ? `${DateFormat(leaveData.empLeaveSelectedFrom)} to ${DateFormat(
-                leaveData.empLeaveSelectedTo
-              )}`
+            ? `${DateFormat(
+                leaveData.empLeaveSelectedFrom
+              )} to ${DateFormat(leaveData.empLeaveSelectedTo)}`
             : `${leaveData.empLeaveSelectedFrom} to ${leaveData.empLeaveSelectedTo}`
           : leaveData.empLeaveStartDate && leaveData.empLeaveEndDate
           ? `${DateFormat(leaveData.empLeaveStartDate)} to ${DateFormat(
@@ -517,7 +523,7 @@ export const ViewForm = ({
         })
         .catch((err) => console.log(err));
     } else if (source === "Tickets") {
-      if (userType === "HR") {
+      if (HRMPosition === HRM) {
         ticketUpdatedData.hrStatus = status;
         ticketUpdatedData.hrRemarks = remark;
         ticketUpdatedData.hrDate = currentDate;
@@ -546,20 +552,67 @@ export const ViewForm = ({
             (val) => val.empID === managerEmpID
           );
 
-          if (userType === "HR") {
-            //employee send email
+          if (HRMPosition === HRM && status === "Verified") {
+         
+            //GM send email
+            if (gmMail && Array.isArray(gmMail)) {
+              for (const email of gmMail) {
             await sendEmail(
-              `Ticket Request ${status}`,
+              `Ticket Request  ${
+                status === "Verified" ? "verified" : "marked as not eligible"
+              }`,
+              `Your employee  ${
+                ticketData.empName || "Not mention"
+              } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
+                status === "Verified" ? "verified" : "marked as not eligible"
+              } by HR Manager ${personalInfo.name || "Not mention"}.
+              <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
+               `,
+              "hr_no-reply@adininworks.com",
+              email
+            );
+          }
+        } else {
+          console.log("Invalid email list");
+        }
+            // console.log("gmemail", gmMail);
+
+            if (gmMail && Array.isArray(gmMail) && GMEmpID && Array.isArray(GMEmpID)) {
+              for (let i = 0; i < gmMail.length; i++) {
+                await createNotification({
+                  empID: ticketData.empID,
+                  leaveType: "Ticket Request",
+                  message: `Your employee ${
+                    ticketData.empName || "Not mentioned"
+                  }, your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
+                    status === "Verified" ? "verified" : "marked as not eligible"
+                  } by HR Manager ${personalInfo.name}`,
+                  senderEmail: "hr_no-reply@adininworks.com",
+                  receipentEmail: gmMail[i], 
+                  receipentEmpID: GMEmpID[i], 
+                  status: "Unread",
+                });
+              }
+            } else {
+              console.log("Invalid GM email or Employee ID list");
+            }
+          } else if (HRMPosition === HRM && status === "Not Eligible") {
+
+            await sendEmail(
+              `Ticket Request  ${
+                status === "Verified" ? "verified" : "marked as not eligible"
+              }`,
               `Dear  ${
                 ticketData.empName || "Not mention"
               } , Your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
                 status === "Verified" ? "verified" : "marked as not eligible"
-              } by HR ${
+              } by HR Manager ${
                 personalInfo.name || "Not mention"
               }. <p>View at : <a href="https://employee.adininworks.co">employee.adininworks.co</a></p> `,
               "hr_no-reply@adininworks.com",
               ticketData.empOfficialEmail
             );
+            // console.log("emp email", ticketData.empOfficialEmail);
 
             //manager send email
             await sendEmail(
@@ -569,43 +622,16 @@ export const ViewForm = ({
               `Your employee  ${
                 ticketData.empName || "Not mention"
               } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
-                status === "Verified" ? "verified" : "marked as not eligible"
-              } by HR ${personalInfo.name || "Not mention"}. 
+                status === "Verified" ? "Verified" : "marked as not eligible"
+              } by HR Manager ${personalInfo.name || "Not mention"}.
               <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
               `,
               "hr_no-reply@adininworks.com",
               findingManagerEmail.officialEmail
             );
-
-            //GM send email
-            await sendEmail(
-              `Ticket Request  ${
-                status === "" ? "verified" : "marked as not eligible"
-              }`,
-              `Your employee  ${
-                ticketData.empName || "Not mention"
-              } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
-                status === "Verified" ? "verified" : "marked as not eligible"
-              } by HR ${personalInfo.name || "Not mention"}.
-              <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
-               `,
-              "hr_no-reply@adininworks.com",
-              gmMail
-            );
+            // console.log("manageremail", findingManagerEmail.officialEmail);
 
             // Create notification for the ticket status update employee
-            // await createNotification({
-            //   empID: ticketData.empID,
-            //   leaveType: "Ticket Request",
-            //   message: `Ticket request for ${ticketData.empName} has been ${
-            //     status === "Verified" ? "verified" : "marked as not eligible"
-            //   } by HR ${personalInfo.name}`,
-            //   senderEmail: "hr_no-reply@adininworks.com",
-            //   receipentEmail: ticketData.empOfficialEmail,
-            //   receipentEmpID: ticketData.empID,
-            //   status: "Unread",
-            // });
-
             await createNotification({
               empID: ticketData.empID,
               leaveType: "Ticket Request",
@@ -613,7 +639,7 @@ export const ViewForm = ({
                 ticketData.empName || "Not mentioned"
               }, your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
                 status === "Verified" ? "verified" : "marked as not eligible"
-              } by HR ${personalInfo.name || "Not mentioned"}.`,
+              } by HR Manager ${personalInfo.name || "Not mentioned"}.`,
               senderEmail: "hr_no-reply@adininworks.com",
               receipentEmail: ticketData.empOfficialEmail,
               receipentEmpID: ticketData.empID,
@@ -628,27 +654,17 @@ export const ViewForm = ({
                 ticketData.empName || "Not mentioned"
               }, your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
                 status === "Verified" ? "verified" : "marked as not eligible"
-              } by HR ${personalInfo.name}`,
+              } by HR Manager ${personalInfo.name}`,
               senderEmail: "hr_no-reply@adininworks.com",
               receipentEmail: findingManagerEmail.officialEmail,
               receipentEmpID: ticketData.managerEmpID,
               status: "Unread",
             });
 
-            await createNotification({
-              empID: ticketData.empID,
-              leaveType: "Ticket Request",
-              message: `Your employee ${
-                ticketData.empName || "Not mentioned"
-              }, your ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${
-                status === "Verified" ? "verified" : "marked as not eligible"
-              } by HR ${personalInfo.name}`,
-              senderEmail: "hr_no-reply@adininworks.com",
-              receipentEmail: gmMail,
-              receipentEmpID: GMEmpID,
-              status: "Unread",
-            });
-          } else if (gmPosition === "GENERAL MANAGER") {
+          } 
+          
+          else if (gmPosition === "GENERAL MANAGER") {
+            //employee email
             await sendEmail(
               `Ticket Request ${status}`,
               `Dear  ${
@@ -660,32 +676,56 @@ export const ViewForm = ({
               ticketData.empOfficialEmail
             );
 
+            // console.log("empemail", ticketData.empOfficialEmail);
+
             //manager send email
             await sendEmail(
               `Ticket Request ${status}`,
               `Your employee  ${
                 ticketData.empName || "Not mention"
-              } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been  ${status} by GM ${
+              } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been ${status} by GM ${
                 personalInfo.name || "Not mention"
               }.
-                <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p> 
+                <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
               `,
               "hr_no-reply@adininworks.com",
               findingManagerEmail.officialEmail
             );
 
-            await sendEmail(
-              `Ticket Request ${status}`,
-              `Your employee  ${
-                ticketData.empName || "Not mention"
-              } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been  ${status} by GM ${
-                personalInfo.name || "Not mention"
-              }.
-                <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p> 
-              `,
-              "hr_no-reply@adininworks.com",
-              "hr-notification@adininworks.com"
-            );
+            // console.log("manager", findingManagerEmail.officialEmail);
+
+            //hr email
+            // HR email loop
+            if (hrManagerMail && Array.isArray(hrManagerMail)) {
+              for (const email of hrManagerMail) {
+                await sendEmail(
+                  `Ticket Request ${status}`,
+                  `Your employee ${
+                    ticketData.empName || "Not mention"
+                  } applied for a ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} and the request has been ${status} by GM ${
+                    personalInfo.name || "Not mention"
+                  }.<p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>`,
+                  "hr_no-reply@adininworks.com",
+                  email
+                );
+              }
+            } else {
+              console.log("Invalid email list");
+            }
+            
+            // await sendEmail(
+            //   `Ticket Request ${status}`,
+            //   `Your employee  ${
+            //     ticketData.empName || "Not mention"
+            //   } , Applied ticket request for the period ${formattedDatedeparture} to ${formattedDatearrival} has been  ${status} by GM ${
+            //     personalInfo.name || "Not mention"
+            //   }.
+            //     <p>Click here <a href="https://hr.adininworks.co">hr.adininworks.co</a> to view the updates.</p>
+            //   `,
+            //   "hr_no-reply@adininworks.com",
+            //   hrManagerMail
+            // );
+            // console.log("hremail", hrManagerMail);
 
             // Create notification for the ticket status update employee
             await createNotification({
@@ -727,7 +767,7 @@ export const ViewForm = ({
                 personalInfo.name
               }`,
               senderEmail: "hr_no-reply@adininworks.com",
-              receipentEmail: "hr-notification@adininworks.com",
+              receipentEmail: hrManagerMail,
               status: "Unread",
             });
           }
@@ -735,7 +775,7 @@ export const ViewForm = ({
           setTimeout(() => {
             setNotification(true);
             setPath("/leaveManagement/requestTickets");
-          }, 500);
+          }, 1000);
         })
         .catch((err) => console.log(err));
     }
@@ -751,7 +791,8 @@ export const ViewForm = ({
     const isPending = managerStatus === "Pending";
     const isApproved = supervisorStatus === "Approved";
     const isSupervisor = userType === "Supervisor";
-    const isNotSuperAdminOrHR = userType !== "SuperAdmin" && userType !== "HR";
+    const isNotSuperAdminOrHR =
+      userType !== "SuperAdmin" && userType !== "HR";
 
     // Case 1: Supervisor approved, Manager pending, Supervisor not SuperAdmin/HR
     if (
@@ -761,6 +802,7 @@ export const ViewForm = ({
       isSupervisor &&
       isNotSuperAdminOrHR
     ) {
+      
       return (
         <div className="center w-full">
           {/* <button
@@ -938,7 +980,8 @@ export const ViewForm = ({
                 {leaveData.managerStatus === "Pending" &&
                   leaveData.supervisorStatus === "Pending" &&
                   userType !== "SuperAdmin" &&
-                  userType !== "HR" && (
+                  userType !== "HR" &&
+                  HRMPosition !== HRM && (
                     <div className="grid grid-cols-[150px_auto_1fr] gap-2 items-center pt-1">
                       <label className="font-semibold" htmlFor="remark">
                         Remark
@@ -957,7 +1000,8 @@ export const ViewForm = ({
                   leaveData.supervisorStatus !== "Pending" &&
                   userType === "Manager" &&
                   userType !== "SuperAdmin" &&
-                  userType !== "HR" && (
+                  userType !== "HR" &&
+                  HRMPosition !== HRM && (
                     <div className="grid grid-cols-[150px_auto_1fr] gap-2 items-center pt-1">
                       <label className="font-semibold" htmlFor="remark">
                         Remark
@@ -982,7 +1026,9 @@ export const ViewForm = ({
                     </p>
                   </div>
                 )}
-                {userType === "SuperAdmin" || userType === "HR" ? (
+                {userType === "SuperAdmin" ||
+                userType === "HR" ||
+                HRMPosition ? (
                   <div className="font-medium">
                     <table className="w-full border-collapse">
                       <thead className="bg-gradient-to-r from-[#f5ee6ad7] via-[#faf362] to-[#f5ee6ad7] shadow-[0_4px_6px_rgba(255,250,150,0.5)]">
@@ -1222,7 +1268,7 @@ export const ViewForm = ({
                   ))}
 
                 {(userType === "SuperAdmin" ||
-                  userType === "HR" ||
+                  HRMPosition === HRM ||
                   gmPosition === "GENERAL MANAGER") &&
                   ticketData.hrStatus !== "Pending" && (
                     <table className="w-full mt-5 border-collapse">
@@ -1241,7 +1287,9 @@ export const ViewForm = ({
                         {/* HR Row */}
 
                         <tr className="border-b border-lite_grey">
-                          <td className="p-2 text-center font-semibold">HR</td>
+                          <td className="p-2 text-center font-semibold">
+                            HR Manager
+                          </td>
                           <td
                             className={`text-center font-bold p-2 ${getHrStatusClass(
                               ticketData.hrStatus
@@ -1277,22 +1325,21 @@ export const ViewForm = ({
                     </table>
                   )}
 
-                {ticketData.hrStatus === "Pending" &&
-                  userType !== "SuperAdmin" && (
-                    <div className="grid grid-cols-[150px_auto_1fr] gap-2 items-center">
-                      <label className="font-semibold" htmlFor="remark">
-                        Remark
-                      </label>
-                      <span className="text-center">:</span>
-                      <input
-                        id="remark"
-                        type="text"
-                        value={remark}
-                        onChange={(e) => setRemark(e.target.value)}
-                        className="border border-lite_grey h-9 outline-none pl-2"
-                      />
-                    </div>
-                  )}
+                {ticketData.hrStatus === "Pending" && HRMPosition === HRM && (
+                  <div className="grid grid-cols-[150px_auto_1fr] gap-2 items-center">
+                    <label className="font-semibold" htmlFor="remark">
+                      Remark
+                    </label>
+                    <span className="text-center">:</span>
+                    <input
+                      id="remark"
+                      type="text"
+                      value={remark}
+                      onChange={(e) => setRemark(e.target.value)}
+                      className="border border-lite_grey h-9 outline-none pl-2"
+                    />
+                  </div>
+                )}
 
                 {gmPosition === "GENERAL MANAGER" &&
                   ticketData.gmStatus === "Pending" &&
@@ -1314,7 +1361,7 @@ export const ViewForm = ({
                   )}
               </div>
               <div className="flex justify-evenly mt-7 ">
-                {ticketData.hrStatus === "Pending" && userType === "HR" && (
+                {ticketData.hrStatus === "Pending" && HRMPosition === HRM && (
                   <>
                     <button
                       className="hover:bg-medium_red hover:border-medium_red border-2 border-yellow px-4 py-1 shadow-xl rounded-lg"

@@ -11,6 +11,7 @@ import { statusOptions } from "../../../utils/StatusDropdown";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadCVEV } from "../deleteDocsRecruit/DeleteUploadCVEV";
+import { DeletePopup } from "../../../utils/DeletePopup";
 // Define validation schema using Yup
 const CVEVFormSchema = Yup.object().shape({
   cvecApproveDate: Yup.date().notRequired(),
@@ -22,10 +23,12 @@ const CVEVFormSchema = Yup.object().shape({
     ),
 });
 
-export const CVEVForm = ({ candidate }) => {
+export const CVEVForm = ({ candidate, formattedPermissions }) => {
   const { mergedInterviewData } = useFetchInterview();
   const { loiDetails } = UpdateLoiData();
   const { interviewDetails } = UpdateInterviewData();
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [formData, setFormData] = useState({
     interview: {
@@ -135,10 +138,14 @@ export const CVEVForm = ({ candidate }) => {
     }
   };
 
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+
   const deletedStringUpload = async (fileType, fileName) => {
     try {
       const tempID = candidate.tempID;
-      console.log(tempID);
+      // console.log(tempID);
 
       //       if (!tempID
       // ) {
@@ -163,6 +170,8 @@ export const CVEVForm = ({ candidate }) => {
         return;
       }
       // console.log(`Deleted "${fileName}". Remaining files:`);
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
     } catch (error) {
       console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
@@ -225,6 +234,10 @@ export const CVEVForm = ({ candidate }) => {
     }));
   };
 
+  const requiredPermissions = ["Status"];
+
+  const access = "Recruitment";
+
   return (
     <form onSubmit={handleSubmitTwo} className="p-5">
       <div className="grid grid-cols-2 gap-5 mt-5">
@@ -243,20 +256,23 @@ export const CVEVForm = ({ candidate }) => {
         </div>
 
         <div className="">
-          <div className="">
-            <FileUploadField
-              label="Upload File"
-              register={register}
-              fileKey="cvecFile"
-              handleFileUpload={handleFileUpload}
-              uploadedFileNames={uploadedFileNames}
-              deletedStringUpload={deletedStringUpload}
-              isUploadingString={isUploadingString}
-              error={errors.cvecFile}
-              className="p-4"
-            />
-          </div>
+          <FileUploadField
+            label="Upload File"
+            register={register}
+            fileKey="cvecFile"
+            handleFileUpload={handleFileUpload}
+            uploadedFileNames={uploadedFileNames}
+            deletedStringUpload={deletedStringUpload}
+            isUploadingString={isUploadingString}
+            error={errors.cvecFile}
+            className="p-4"
+            formattedPermissions={formattedPermissions}
+            requiredPermissions={requiredPermissions}
+            access={access}
+            check={isUploadingString.cvecFile}
+          />
         </div>
+
         <div>
           <label htmlFor="status">Status</label>
           <select
@@ -290,6 +306,9 @@ export const CVEVForm = ({ candidate }) => {
           notification={notification}
           path="/recrutiles/status"
         />
+      )}
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}
     </form>
   );

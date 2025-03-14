@@ -7,16 +7,26 @@ import { Link, useNavigate } from "react-router-dom";
 import { UserVF } from "./UserVF";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { UserDelete } from "../../services/deleteMethod/UserDelete";
+import { useDeleteAccess } from "../../hooks/useDeleteAccess";
+import { DeletePopup } from "../../utils/DeletePopup";
 
 export const User = () => {
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, []);
+
   const { empPIData, userData, workInfoData } = useContext(DataSupply);
   const { SubmitDeletedUser } = UserDelete();
-
+  const { formattedPermissions } = useDeleteAccess();
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [viewForm, setViewForm] = useState(false);
   const [sendData, setSendData] = useState([]);
-  const [workValue, setWorkValue] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
 
@@ -134,13 +144,25 @@ export const User = () => {
 
     navigate("/addNewForm", { state: { addUserData: allValue } });
   };
-  const handleDelete = (data) => {
+
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
+  };
+  const handleDelete = async (data) => {
     const deleteUserData = userData.find((item) => item.empID === data.empID);
     // console.log(deleteUserData);
-    SubmitDeletedUser({ deleteUserData });
+
+    await SubmitDeletedUser({ deleteUserData });
+ 
+    setdeleteTitle1(
+      `${deleteUserData.empID} deleted successfully.`
+    );
+    handleDeleteMsg();
   };
   const startIndex = (currentPage - 1) * rowsPerPage;
+  const requiredPermissions = ["User"];
 
+  const access = "User";
   return (
     <section
       className=" flex justify-center px-10 py-20 bg-[#F8F8F8] min-h-screen relative"
@@ -223,7 +245,7 @@ export const User = () => {
                             </span>
                           </td>
                           <td className="px-5 py-2">
-                            <div className="flex gap-5">
+                            <div className="flex gap-5 justify-center">
                               <span
                                 onClick={() => {
                                   handleTransferData(val);
@@ -231,13 +253,21 @@ export const User = () => {
                               >
                                 <RiEditLine />
                               </span>
-                              <span
-                                onClick={() => {
-                                  handleDelete(val);
-                                }}
-                              >
-                                <RiDeleteBin6Line />
-                              </span>
+                            
+                              {formattedPermissions?.deleteAccess?.[
+                                access
+                              ]?.some((permission) =>
+                                requiredPermissions.includes(permission)
+                              ) && (
+                                <span
+                                  onClick={() => {
+                                    handleDelete(val);
+                                  }}
+                                >
+                                  <RiDeleteBin6Line />
+                                </span>
+                              )}
+
                               {/* <div
                       className="h-3 w-3 bg-[#08A757] rounded-full "
                       onClick={() => {
@@ -269,9 +299,10 @@ export const User = () => {
             )}
           </div>
 
-          <div className="flex justify-center mt-auto">
+          <div className="flex justify-end items-end  ">
             {filteredData && filteredData.length > 0 && (
-              <div className="ml-[650px] flex justify-between px-10 py-8">
+              // <div className="ml-[650px] flex justify-between px-10 py-8">
+              <div className=" flex px-5 py-8 ">
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
@@ -294,6 +325,13 @@ export const User = () => {
           <StatusPopUp setPopUp={setPopUp} />
         </div>
       )} */}
+      
+            {deletePopup && (
+              <DeletePopup
+                handleDeleteMsg={handleDeleteMsg}
+                title1={deleteTitle1}
+              />
+            )}
     </section>
   );
 };

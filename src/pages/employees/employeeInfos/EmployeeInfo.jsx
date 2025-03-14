@@ -35,6 +35,8 @@ import { DeletedArrayUpload } from "./DeletedArrayUpload";
 import { DeletedStringUploaded } from "./DeletedStringUploaded";
 import { FileUploadField } from "../medicalDep/FileUploadField";
 import { MdCancel } from "react-icons/md";
+import { DeletePopup } from "../../../utils/DeletePopup";
+import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
 
 export const EmployeeInfo = () => {
   useEffect(() => {
@@ -43,6 +45,9 @@ export const EmployeeInfo = () => {
       behavior: "smooth",
     });
   }, []);
+  const { formattedPermissions } = useDeleteAccess();
+  const [deletePopup, setdeletePopup] = useState(false);
+  const [deleteTitle1, setdeleteTitle1] = useState("");
   const { SubmitEIData, errorEmpID } = EmpInfoFunc();
   const { UpdateEIValue } = UpdateEmpInfo();
   const { empPIData, IDData, dropDownVal } = useContext(DataSupply);
@@ -122,6 +127,7 @@ export const EmployeeInfo = () => {
     },
   });
 
+  // console.log("eee");w
   // const contractTypes = watch("contractType");
   // const empTypes = watch("empType");
   const watchedEmpID = watch("empID");
@@ -153,6 +159,7 @@ export const EmployeeInfo = () => {
 
     fetchData();
   }, [empPIData, IDData]);
+
   const updateUploadingString = (type, value) => {
     setIsUploadingString((prev) => ({
       ...prev,
@@ -201,15 +208,19 @@ export const EmployeeInfo = () => {
       ...prev,
       [label]: value,
     }));
-    console.log(value);
+    // console.log(value);
+  };
+
+  const handleDeleteMsg = () => {
+    setdeletePopup(!deletePopup);
   };
 
   const handleFileChange = async (e, label) => {
     const watchedEmpID = watch("empID");
     if (!watchedEmpID) {
-        alert("Please enter the Employee ID before uploading files.");
-        window.location.href = "/employeeInfo";
-        return;
+      alert("Please enter the Employee ID before uploading files.");
+      window.location.href = "/employeeInfo";
+      return;
     }
 
     const selectedFile = e.target.files[0];
@@ -222,21 +233,21 @@ export const EmployeeInfo = () => {
       "image/jpg",
     ];
     if (!allowedTypes.includes(selectedFile.type)) {
-        alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
-        return;
+      alert("Upload must be a PDF file or an image (JPG, JPEG, PNG)");
+      return;
     }
 
     // Ensure no duplicate files are added
     const currentFiles = watch(label) || [];
     if (currentFiles.some((file) => file.name === selectedFile.name)) {
-        alert("This file has already been uploaded.");
-        return;
+      alert("This file has already been uploaded.");
+      return;
     }
 
     // **Check if the file was previously deleted and prevent re-adding**
     if (deletedFiles[label]?.includes(selectedFile.name)) {
-        alert("This file was previously deleted and cannot be re-added.");
-        return;
+      alert("This file was previously deleted and cannot be re-added.");
+      return;
     }
 
     setValue(label, [...currentFiles, selectedFile]);
@@ -249,7 +260,7 @@ export const EmployeeInfo = () => {
         [label]: selectedFile.name,
       }));
     } catch (err) {
-        console.error(err);
+      console.error(err);
     }
   };
 
@@ -282,6 +293,8 @@ export const EmployeeInfo = () => {
         return;
       }
       // console.log(`Deleted "${fileName}". Remaining files:`);
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
     } catch (error) {
       console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
@@ -307,7 +320,7 @@ export const EmployeeInfo = () => {
         watchedEmpID,
         setUploadedFileNames,
         setUploadedDocs,
-        setIsUploadingString,
+        setIsUploadingString
       );
 
       if (!isDeleted || isDeletedArrayUploaded) {
@@ -316,7 +329,8 @@ export const EmployeeInfo = () => {
         );
         return;
       }
-      // console.log(`Deleted "${fileName}". Remaining files:`);
+      setdeleteTitle1(`${fileName}`);
+      handleDeleteMsg();
     } catch (error) {
       console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
@@ -426,9 +440,8 @@ export const EmployeeInfo = () => {
         '$1"$2":'
       );
 
-      // Handle potential single quotes around values
       // cleanedString = cleanedString.replace(/'([^']+)'/g, '"$1"');
-  
+
       // Remove unnecessary backslashes
       cleanedString = cleanedString.replace(/\\/g, "");
 
@@ -485,7 +498,8 @@ export const EmployeeInfo = () => {
   };
 
   const searchResult = async (result) => {
-    // console.log("Result", result);
+    // console.log(result);
+
     const fieldValue = [
       "empID",
       "email",
@@ -496,13 +510,11 @@ export const EmployeeInfo = () => {
     ];
 
     fieldValue.forEach((val) => {
-      const data = result[val];
-
-      // Ensure the data is a string before setting the value
+      const data = result[val] || "";
       setValue(val, typeof data === "string" ? data : "");
     });
+
     const keysToSet = [
-      // "empID",
       "driveLic",
       "inducBrief",
       "myIcNo",
@@ -524,56 +536,37 @@ export const EmployeeInfo = () => {
       "ctryOfOrigin",
       "chinese",
       "educLevel",
-      // "email",
       "eduDetails",
-      // "empBadgeNo",
       "bankName",
-      // "bankAccNo",
       "lang",
       "marital",
       "name",
       "oCOfOrigin",
       "position",
-      // "sapNo",
-      // "officialEmail",
       "bwnIcColour",
       "gender",
     ];
-    // Set values for other fields
-    keysToSet.forEach((key) => {
-      let valueToSet = result[key];
 
-      // Handle undefined or null values
-      if (valueToSet === undefined || valueToSet === null) {
-        valueToSet = "";
-      }
+    keysToSet.forEach((key) => {
+      let valueToSet = result[key] || "";
 
       if (typeof valueToSet === "string") {
-        // Trim and convert string to uppercase
-        const storedValue = valueToSet.trim().toUpperCase();
-        setValue(key, storedValue); // Set the processed string value
+        setValue(key, valueToSet.trim().toUpperCase());
       } else if (Array.isArray(valueToSet) && valueToSet.length > 0) {
-        // Get the last value from the array, trim, and convert to uppercase
-        const arrayData = valueToSet[valueToSet.length - 1]
-          .trim()
-          .toUpperCase();
-        setValue(key, [arrayData]);
+        setValue(key, [valueToSet[valueToSet.length - 1].trim().toUpperCase()]);
       } else {
-        // Set the value as is for non-string, non-array types
         setValue(key, valueToSet);
       }
     });
-    const arrayDateField = ["empType", "contractType"];
 
-    // Set values for date fields and handle salaryType condition
-    arrayDateField.forEach((field) => {
-      const valueToSet = result[field];
-
-      setValue(field, getArrayDateValue(valueToSet)); // Use getArrayDateValue for all fields
-    });
     const fieldsArray = ["bwnIcExpiry", "ppExpiry", "ppIssued"];
     fieldsArray.forEach((field) =>
       setValue(field, getLastArrayValue(result[field]))
+    );
+
+    const arrayDateField = ["empType", "contractType"];
+    arrayDateField.forEach((field) =>
+      setValue(field, getArrayDateValue(result[field]))
     );
 
     const changeString = [
@@ -583,20 +576,19 @@ export const EmployeeInfo = () => {
       "ppDestinate",
       "bwnIcNo",
     ];
+
     changeString.forEach((field) => {
       const value = result[field];
       if (Array.isArray(value)) {
-        // Join the array into a string and capitalize the first letter of each word
         const stringValue = value
           .join(", ")
-          .split(" ") // Split by spaces
+          .split(" ")
           .map(
             (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-          ) // Capitalize each word
-          .join(" "); // Rejoin with spaces
+          )
+          .join(" ");
         setValue(field, stringValue || "");
       } else if (typeof value === "string") {
-        // Capitalize the first letter of each word for a string
         const stringValue = value
           .split(" ")
           .map(
@@ -605,18 +597,16 @@ export const EmployeeInfo = () => {
           .join(" ");
         setValue(field, stringValue || "");
       } else {
-        // Set the value directly if not an array or string
         setValue(field, value || "");
       }
     });
 
-    // Handle familyDetails
     if (
       Array.isArray(result.familyDetails) &&
       result.familyDetails.length > 0
     ) {
       const cleanedFamilyDetails = cleanFamilyDetailsString(
-        result?.familyDetails[0]
+        result.familyDetails[0]
       );
       setFamilyData(cleanedFamilyDetails || []);
     } else {
@@ -630,14 +620,13 @@ export const EmployeeInfo = () => {
       profilePhoto: result.profilePhoto || "",
       inducBriefUp: result.inducBriefUp || "",
     }));
-    // Handle file uploads and names
+
     if (result.inducBriefUp && result.inducBriefUp !== null) {
       setUploadedFileNames((prev) => ({
         ...prev,
         inducBriefUp: getFileName(result.inducBriefUp) || "",
       }));
     } else {
-      // Clear the previous value if inducBriefUp is null
       setUploadedFileNames((prev) => ({
         ...prev,
         inducBriefUp: "",
@@ -650,10 +639,8 @@ export const EmployeeInfo = () => {
         if (!pathUrl) {
           setPPLastUP(avatar);
         }
-
         if (pathUrl) {
           const result = await getUrl({ path: pathUrl });
-
           setPPLastUP(result.url?.toString());
         }
       } catch (err) {
@@ -662,7 +649,6 @@ export const EmployeeInfo = () => {
     };
     linkToStorageFile(profilePhotoString);
 
-    // Handle multiple file uploads
     const uploadFields = [
       "bwnUpload",
       "applicationUpload",
@@ -676,18 +662,20 @@ export const EmployeeInfo = () => {
 
     uploadFields.forEach((field) => {
       const fieldData = result[field];
+
       if (!fieldData) {
-        setValue(field, []); // Clear the field value
+        setValue(field, []);
         setUploadedFiles((prev) => ({ ...prev, [field]: [] }));
-        setUploadedFileNames((prev) => ({ ...prev, [field]: "" })); 
+        setUploadedFileNames((prev) => ({ ...prev, [field]: "" }));
         return;
       }
-    
+
       try {
-        // Parse the field data
         const outerParsed = JSON.parse(fieldData);
-        const parsedArray = Array.isArray(outerParsed) ? outerParsed : [outerParsed];
-    
+        const parsedArray = Array.isArray(outerParsed)
+          ? outerParsed
+          : [outerParsed];
+
         const parsedFiles = parsedArray.map((item) => {
           if (typeof item === "string") {
             try {
@@ -699,24 +687,19 @@ export const EmployeeInfo = () => {
           }
           return item;
         });
-    
-        // Get the last file name
-        const lastFile = parsedFiles[parsedFiles.length - 1];
-        const lastFileName = lastFile?.upload
-          ? getFileName(lastFile.upload)
-          : Array.isArray(lastFile) && lastFile[0]?.upload
-          ? getFileName(lastFile[0].upload)
-          : "";
-    
-        // Update state
-        setValue(field, parsedFiles);
-        setUploadedFiles((prev) => ({ ...prev, [field]: parsedFiles }));
-        setUploadedFileNames((prev) => ({
-          ...prev,
-          [field]: lastFileName, // Assign the extracted file name
-        }));
+
+        // *Filter out deleted files before setting them back*
+        const filteredFiles = parsedFiles.filter(
+          (file) => !deletedFiles[field]?.includes(getFileName(file.upload))
+        );
+
+        const fileNames = filteredFiles.map((file) => getFileName(file.upload));
+
+        setValue(field, filteredFiles);
+        setUploadedFiles((prev) => ({ ...prev, [field]: filteredFiles }));
+        setUploadedFileNames((prev) => ({ ...prev, [field]: fileNames }));
       } catch (error) {
-        console.error(`Failed to parse ${field}:, error`);
+        console.error(`Failed to parse ${field}:`, error);
       }
     });
   };
@@ -744,15 +727,6 @@ export const EmployeeInfo = () => {
     const contractType = data.contractType;
     const empType = data.empType;
 
-    // const removeLeadingNulls = (array, newValue) => {
-    //   const newArray = [...(array || []), newValue]; // Combine old array and new value
-    //   let firstValidIndex = newArray.findIndex((item) => item !== null);
-    //   if (firstValidIndex !== -1) {
-    //     return newArray.map((item) => (item === null ? "N/A" : item));
-    //   } else {
-    //     return [];
-    //   }
-    // };
     const removeLeadingNulls = (array, newValue) => {
       const newArray = [...(array || []), newValue]; // Combine old array and new value
       let firstValidIndex = newArray.findIndex((item) => item !== null);
@@ -829,7 +803,7 @@ export const EmployeeInfo = () => {
           email: data.email.trim().toLowerCase(),
           officialEmail: data.officialEmail.trim().toLowerCase(),
         };
-// console.log("updated", collectValue);
+        // console.log("updated", collectValue);
 
         await UpdateEIValue({ collectValue });
         setShowTitle("Employee Personal Info updated successfully");
@@ -872,7 +846,9 @@ export const EmployeeInfo = () => {
       console.log(error);
     }
   };
+  const requiredPermissions = ["Employee Info"];
 
+  const access = "Employee";
   return (
     <section
       className="bg-[#F5F6F1CC] mx-auto p-10"
@@ -1043,22 +1019,27 @@ export const EmployeeInfo = () => {
           <RowTwelve register={register} errors={errors} />
 
           <div>
-  <FileUploadField
-        label="Upload Induction Form"
-        register={register}
-        fileKey="inducBriefUp"
-        handleFileUpload={handleFileUpload}
-        uploadedFileNames={uploadedFileNames}
-        deletedStringUpload={deletedStringUpload}
-        isUploadingString={isUploadingString}
-        error={errors?.inducBriefUp}
-      />
-</div>
+            <FileUploadField
+              label="Upload Induction Form"
+              register={register}
+              fileKey="inducBriefUp"
+              handleFileUpload={handleFileUpload}
+              uploadedFileNames={uploadedFileNames}
+              deletedStringUpload={deletedStringUpload}
+              isUploadingString={isUploadingString}
+              error={errors?.inducBriefUp}
+              formattedPermissions={formattedPermissions}
+              requiredPermissions={requiredPermissions}
+              access={access}
+              check={isUploadingString.inducBriefUp}
+            />
+          </div>
+
           <RowThirteen register={register} errors={errors} />
         </div>
 
         <div className="grid grid-cols-4 gap-5 form-group mt-5">
-        {uploadFields.map((field, index) => (
+          {uploadFields.map((field, index) => (
             <Controller
               key={index}
               name={field.title}
@@ -1070,7 +1051,7 @@ export const EmployeeInfo = () => {
                     onClick={() => {
                       if (isUploading[field.title]) {
                         alert(
-                          "Delete already uploaded Files or save an uploaded file."
+                          "Please delete the previously uploaded file before uploading a new one."
                         );
                       }
                     }}
@@ -1101,15 +1082,19 @@ export const EmployeeInfo = () => {
                               className="mt-2 flex justify-between items-center"
                             >
                               {fileName}
-                              <button
-                                type="button"
-                                className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
-                                onClick={() =>
-                                  deleteFile(field.title, fileName)
-                                }
-                              >
-                                <MdCancel />
-                              </button>
+                              {formattedPermissions?.deleteAccess?.Employee?.includes(
+                                "Employee Info"
+                              ) && (
+                                <button
+                                  type="button"
+                                  className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                                  onClick={() =>
+                                    deleteFile(field.title, fileName)
+                                  }
+                                >
+                                  <MdCancel />
+                                </button>
+                              )}
                             </span>
                           ))
                       ) : (
@@ -1134,15 +1119,15 @@ export const EmployeeInfo = () => {
                     )}
                   </p>
 
-                        {errors[field.title] && (
-                            <p className="text-red-500 text-xs mt-1">
-                                {errors[field.title].message}
-                            </p>
-                        )}
-                    </div>
-                )}
+                  {errors[field.title] && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors[field.title].message}
+                    </p>
+                  )}
+                </div>
+              )}
             />
-        ))}
+          ))}
         </div>
 
         {/* Button */}
@@ -1159,6 +1144,9 @@ export const EmployeeInfo = () => {
           />
         )}
       </form>
+      {deletePopup && (
+        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
+      )}
     </section>
   );
 };

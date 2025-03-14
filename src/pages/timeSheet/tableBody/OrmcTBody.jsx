@@ -7,6 +7,7 @@ export const OrmcTBody = ({
   message,
   assignObjectFun,
   toggleFunction,
+  editFormTitleFunc,
 }) => {
   useEffect(() => {
     if (loading === false) {
@@ -46,6 +47,7 @@ export const OrmcTBody = ({
                   onClick={() => {
                     assignObjectFun(m, "ORMC");
                     toggleFunction();
+                    editFormTitleFunc("View Form");
                   }}
                 >
                   <td className="text-start px-4 flex-1">{index + 1}</td>
@@ -57,8 +59,12 @@ export const OrmcTBody = ({
                   </td>
                   <td className="text-center px-4 flex-1">{m.inTime || 0}</td>
                   <td className="text-center px-4 flex-1">{m.outTime || 0}</td>
-                  <td className="text-center px-4 flex-1">{m.totalInOut || 0}</td>
-                  <td className="text-center px-4 flex-1">{m.allDayHrs || 0}</td>
+                  <td className="text-center px-4 flex-1">
+                    {m.totalInOut || 0}
+                  </td>
+                  <td className="text-center px-4 flex-1">
+                    {m.allDayHrs || 0}
+                  </td>
                   <td className="text-center px-4 flex-1">{m.netMins || 0}</td>
                   <td className="text-center px-4 flex-1">{m.totalHrs || 0}</td>
                   <td className="text-center px-4 flex-1">

@@ -134,17 +134,16 @@ export const useLeaveManage = () => {
       }, {});
 
       const leaveDetailsMap = allEmpLeaveDetails.reduce((acc, item) => {
-        
         acc[item.empID] = item;
         return acc;
       }, {});
       // Merge leave status data
       const mergedLeaveData = allLeaveStatuses.map((leaveStatus) => {
-        
         const empInfo = empInfoMap[leaveStatus.empID] || {};
         const workInfo = workInfoMap[leaveStatus.empID] || {};
         const leaveDetails = leaveDetailsMap[leaveStatus.empID] || {};
-
+        // console.log(leaveDetails,"sdfghjk");
+        
         return {
           id: leaveStatus.id,
           empID: leaveStatus.empID,
@@ -173,10 +172,13 @@ export const useLeaveManage = () => {
           empLeaveType: leaveStatus.leaveType,
           position: workInfo.position || "",
           department: workInfo.department || "",
-          empLeaveStartDate: leaveStatus.fromDate,
-          empLeaveSelectedFrom: leaveStatus.selectedFrom,
-          empLeaveEndDate: leaveStatus.toDate,
-          empLeaveSelectedTo: leaveStatus.selectedTo,
+
+          empLeaveStartDate: leaveStatus?.fromDate,
+          empLeaveEndDate: leaveStatus?.toDate,
+
+          empLeaveSelectedFrom: leaveStatus?.selectedFrom,
+          empLeaveSelectedTo: leaveStatus?.selectedTo,
+
           empLeaveUpdatedAt: leaveStatus.updatedAt,
           compassionateLeave: leaveDetails.compasLeave || 0,
           annualLeave: leaveDetails.annualLeave || 0,
@@ -188,7 +190,8 @@ export const useLeaveManage = () => {
           empPervAnnualLeaveBal: leaveDetails.pervAnnualLeaveBal || 0,
           leaveDetailsCreatedAt: leaveDetails.createdAt,
           leaveDetailsUpdatedAt: leaveDetails.updatedAt,
-
+          empsickLeaveTaken: leaveDetails.sickLeaveTaken,
+          empSickLeaveDate: leaveDetails.sickLeaveDate,
         };
       });
 
