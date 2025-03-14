@@ -1502,6 +1502,8 @@ export const getEmpLeaveDetails = /* GraphQL */ `
       sickLeaveDate
       hospLeave
       pervAnnualLeaveBal
+      sickLeaveTaken
+      remainAnnualLeave
       createdAt
       updatedAt
       __typename
@@ -1532,6 +1534,8 @@ export const listEmpLeaveDetails = /* GraphQL */ `
         sickLeaveDate
         hospLeave
         pervAnnualLeaveBal
+        sickLeaveTaken
+        remainAnnualLeave
         createdAt
         updatedAt
         __typename
