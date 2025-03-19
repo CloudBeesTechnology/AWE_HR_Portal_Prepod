@@ -14,7 +14,7 @@ export const TicketsTable = () => {
   const { handleViewClick, handleClickForToggle, userType } =
     useOutletContext();
 
-  const [searchResults, setSearchResults] = useState([]); 
+  const [searchResults, setSearchResults] = useState([]);
   // const [loading, setLoading] = useState(false);
   const [secondartyData, setSecondartyData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -23,7 +23,7 @@ export const TicketsTable = () => {
   const [data, setData] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
-  const { gmPosition, HRMPosition  } = useTempID();
+  const { gmPosition, HRMPosition } = useTempID();
   const { ticketMerged, loading } = useLeaveManage();
 
   // Add new state to track all filters
@@ -41,7 +41,7 @@ export const TicketsTable = () => {
   });
 
   const GM = "GENERAL MANAGER";
-  const HRM = "HR MANAGER"
+  const HRM = "HR MANAGER";
   useEffect(() => {
     // Step 1: Apply Filters (Status, Date, Search)
     let filteredResults = [...ticketMerged];
@@ -66,8 +66,12 @@ export const TicketsTable = () => {
       selectedDateLocal.setHours(0, 0, 0, 0);
 
       filteredResults = filteredResults.filter((item) => {
-        const departureDate = item?.departureDate ? new Date(item.departureDate) : null;
-        const arrivalDate = item?.arrivalDate ? new Date(item.arrivalDate) : null;
+        const departureDate = item?.departureDate
+          ? new Date(item.departureDate)
+          : null;
+        const arrivalDate = item?.arrivalDate
+          ? new Date(item.arrivalDate)
+          : null;
         const createdDate = item?.createdAt ? new Date(item.createdAt) : null;
 
         if (departureDate) departureDate.setHours(0, 0, 0, 0);
@@ -107,13 +111,12 @@ export const TicketsTable = () => {
 
     // Step 2: After Filters are Applied, set filtered data
     setFilteredData(filteredResults);
-
   }, [filters, ticketMerged]);
 
   // Step 3: Apply pagination on the filtered data
   useEffect(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
-  
+
     const filterPending = filteredData.sort((a, b) => {
       // Step 1: Prioritize HR "Pending" status first
       if (a.hrStatus === "Pending" && b.hrStatus !== "Pending") {
@@ -122,7 +125,7 @@ export const TicketsTable = () => {
       if (a.hrStatus !== "Pending" && b.hrStatus === "Pending") {
         return 1; // b (with Pending) should come first
       }
-  
+
       // Step 2: If both HR statuses are the same, prioritize GM "Pending"
       if (a.gmStatus === "Pending" && b.gmStatus !== "Pending") {
         return -1; // a (with Pending GM) should come first
@@ -130,12 +133,15 @@ export const TicketsTable = () => {
       if (a.gmStatus !== "Pending" && b.gmStatus === "Pending") {
         return 1; // b (with Pending GM) should come first
       }
-  
+
       // Step 3: If neither HR nor GM status is "Pending", fall back to createdAt (newest first)
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
-    const paginatedData = filteredData.slice(startIndex, startIndex + rowsPerPage);
+    const paginatedData = filteredData.slice(
+      startIndex,
+      startIndex + rowsPerPage
+    );
     setData(paginatedData); // Set the paginated data
   }, [currentPage, rowsPerPage, filteredData]);
 
@@ -148,13 +154,13 @@ export const TicketsTable = () => {
     "Name",
     "Department",
     "Position",
-    "Received Date", 
+    "Received Date",
     "Departure date",
     "Arrival date",
     "Submitted form",
     userType !== "SuperAdmin" && "Status",
   ];
- 
+
   useEffect(() => {
     const sortedData = data.sort((a, b) => {
       // Step 1: Prioritize HR "Pending" status first
@@ -164,7 +170,7 @@ export const TicketsTable = () => {
       if (a.hrStatus !== "Pending" && b.hrStatus === "Pending") {
         return 1; // b (with Pending) should come first
       }
-  
+
       // Step 2: If both HR statuses are the same, prioritize GM "Pending"
       if (a.gmStatus === "Pending" && b.gmStatus !== "Pending") {
         return -1; // a (with Pending GM) should come first
@@ -172,11 +178,11 @@ export const TicketsTable = () => {
       if (a.gmStatus !== "Pending" && b.gmStatus === "Pending") {
         return 1; // b (with Pending GM) should come first
       }
-  
+
       // Step 3: If neither HR nor GM status is "Pending", fall back to createdAt (newest first)
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
-  
+
     // Filter data based on GM position
     if (gmPosition === "GENERAL MANAGER") {
       const filterGMData = sortedData.filter(
@@ -189,7 +195,6 @@ export const TicketsTable = () => {
       setData(sortedData);
     }
   }, [ticketMerged, gmPosition]);
-  
 
   // Search functionality
   const searchUserList = async (searchData) => {
@@ -235,7 +240,6 @@ export const TicketsTable = () => {
     setFilterStatus(status);
     setFilters((prev) => ({ ...prev, status }));
   };
-  
 
   if (loading) {
     return (
@@ -259,7 +263,7 @@ export const TicketsTable = () => {
         <div className="flex  flex-wrap items-center gap-2">
           <div>
             <Searchbox
-              allEmpDetails={secondartyData}
+              allEmpDetails={ticketMerged}
               searchIcon2={<IoSearch />}
               placeholder="Employee ID"
               searchUserList={searchUserList}
@@ -411,15 +415,17 @@ export const TicketsTable = () => {
 
       <div className="center pt-10">
         <div>
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={(newPage) => {
-              if (newPage >= 1 && newPage <= totalPages) {
-                setCurrentPage(newPage);
-              }
-            }}
-          />
+          {data && data.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(newPage) => {
+                if (newPage >= 1 && newPage <= totalPages) {
+                  setCurrentPage(newPage);
+                }
+              }}
+            />
+          )}
         </div>
       </div>
     </section>
