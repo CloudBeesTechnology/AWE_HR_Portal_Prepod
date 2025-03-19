@@ -141,7 +141,9 @@ export const ViewBLNGsheet = ({
                 const mergedDatas = empInfo
                   .map((empInf) => {
                     const interviewDetails = sapNoRemoved.find(
-                      (item) => item?.empID === empInf?.empID
+                      (item) =>
+                        String(item?.empID).toUpperCase() ===
+                        String(empInf?.empID).toUpperCase()
                     );
 
                     if (!interviewDetails) {
@@ -157,7 +159,9 @@ export const ViewBLNGsheet = ({
 
                 const mergedData = fetchedData.map((item) => {
                   const workInfoItem = mergedDatas.find(
-                    (info) => info?.sapNo == item?.FID
+                    (info) =>
+                      String(info?.sapNo).toUpperCase() ===
+                      String(item?.FID).toUpperCase()
                   );
 
                   return {
@@ -277,14 +281,23 @@ export const ViewBLNGsheet = ({
 
   useEffect(() => {
     const checkKeys = async () => {
-      const cleanData = returnedTHeader.map((item) => {
-        const cleanedItem = {};
-        for (const key in item) {
-          cleanedItem[key] = cleanValue(item[key]);
-        }
+      // const cleanData = returnedTHeader.map((item) => {
+      //   const cleanedItem = {};
+      //   for (const key in item) {
+      //     cleanedItem[key] = cleanValue(item[key]);
+      //   }
 
-        return cleanedItem;
-      });
+      //   return cleanedItem;
+      // });
+      const convertKeys = (obj) => {
+        return Object.keys(obj).reduce((acc, key) => {
+          const newKey = key.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+          acc[newKey] = obj[key];
+          return acc;
+        }, {});
+      };
+
+      const convertedData = returnedTHeader.map(convertKeys);
 
       const requiredKeys = [
         "ADININWORKSENGINEERINGSDNBHD",
@@ -300,20 +313,36 @@ export const ViewBLNGsheet = ({
         // "OT",
         // "REMARKS",
       ];
-      const result = await new Promise((resolve) => {
-        const keyCheckResult =
-          cleanData &&
-          cleanData.every((m) => {
-            return requiredKeys.every((key) =>
-              Object.values(m)
-                .map((value) =>
-                  typeof value === "string" ? value.toUpperCase() : value
-                )
-                .includes(key.toUpperCase())
-            );
-          });
-        resolve(keyCheckResult);
-      });
+
+      const checkedKeys = () => {
+        return new Promise((resolve) => {
+          const keyCheckResult = convertedData.every((item) =>
+            requiredKeys.every((key) =>
+              Object.keys(item)
+                .map((k) => k.toLowerCase())
+                .includes(key.toLowerCase())
+            )
+          );
+          resolve(keyCheckResult);
+        });
+      };
+
+      // Usage
+      const result = await checkedKeys();
+      // const result = await new Promise((resolve) => {
+      //   const keyCheckResult =
+      //     cleanData &&
+      //     cleanData.every((m) => {
+      //       return requiredKeys.every((key) =>
+      //         Object.values(m)
+      //           .map((value) =>
+      //             typeof value === "string" ? value.toUpperCase() : value
+      //           )
+      //           .includes(key.toUpperCase())
+      //       );
+      //     });
+      //   resolve(keyCheckResult);
+      // });
 
       setClosePopup(true);
       setShowStatusCol(result);
@@ -916,6 +945,7 @@ export const ViewBLNGsheet = ({
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
   // currentData?.sort((a, b) => a.NAMEFLAST?.localeCompare(b.NAMEFLAST));
   visibleData = currentData;
+
   return (
     <div>
       <div>
@@ -1218,65 +1248,6 @@ export const ViewBLNGsheet = ({
                       } else if (excelData && excelData) {
                         storeInitialData();
                       }
-                      // const fetchDataAndDelete = async () => {
-                      //   try {
-                      //     console.log("Fetching and Deleting SBW Data...");
-                      //     // setIsDeleting(true); // Set loading state
-                      //     let nextToken = null; // Initialize nextToken for pagination
-                      //     do {
-                      //       // Define the filter for fetching SBW data
-                      //       const filter = {
-                      //         and: [{ fileType: { eq: "BLNG" } }],
-                      //       };
-                      //       // Fetch the BLNG data using GraphQL with pagination
-                      //       const response = await client.graphql({
-                      //         query: listTimeSheets,
-                      //         variables: {
-                      //           filter: filter,
-                      //           nextToken: nextToken,
-                      //         }, // Pass nextToken for pagination
-                      //       });
-                      //       // Extract data and nextToken
-                      //       const SBWdata =
-                      //         response?.data?.listTimeSheets?.items || [];
-                      //       nextToken =
-                      //         response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
-                      //       console.log("Fetched SBW Data:", SBWdata);
-                      //       // Delete each item in the current batch
-                      //       await Promise.all(
-                      //         SBWdata.map(async (item) => {
-                      //           try {
-                      //             const deleteResponse = await client.graphql({
-                      //               query: deleteTimeSheet,
-                      //               variables: { input: { id: item.id } },
-                      //             });
-                      //             console.log(
-                      //               "Deleted Item Response:",
-                      //               deleteResponse
-                      //             );
-                      //           } catch (deleteError) {
-                      //             console.error(
-                      //               `Error deleting item with ID ${item.id}:`,
-                      //               deleteError
-                      //             );
-                      //           }
-                      //         })
-                      //       );
-                      //       console.log("Batch deletion completed.");
-                      //     } while (nextToken); // Continue fetching until no more data
-                      //     console.log(
-                      //       "All SBW items deletion process completed."
-                      //     );
-                      //   } catch (fetchError) {
-                      //     console.error(
-                      //       "Error in fetchDataAndDelete:",
-                      //       fetchError
-                      //     );
-                      //   } finally {
-                      //     // setIsDeleting(false); // Reset loading state
-                      //   }
-                      // };
-                      // fetchDataAndDelete();
                     } else if (userIdentification === "Manager") {
                       renameKeysFunctionAndSubmit();
                       removeCheckedItem();
