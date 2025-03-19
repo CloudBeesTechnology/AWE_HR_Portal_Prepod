@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { FaPencilAlt } from "react-icons/fa";
 import { IoSearch } from "react-icons/io5";
-import { Searchbox } from "../../../utils/Searchbox";
+import { SearchListOfCandy } from "../Search/SearchListOfCandy";
 import { RequisitionReviewForm } from "../empRequisition/RequisitionReviewForm";
 import { RemarksDialog } from "../empRequisition/RemarksDialog";
 import { format } from "date-fns";
 import { listEmpRequisitions } from "../../../graphql/queries";
 import { generateClient } from "@aws-amplify/api";
-import { SearchListOfCandy } from "../Search/SearchListOfCandy";
 import { Pagination } from "../../leaveManagement/Pagination";
 
 const client = generateClient();
-export const EmployReq = ({}) => {
+
+export const EmployReq = () => {
   const [requisitionData, setRequisitionData] = useState([]);
   const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const [error, setError] = useState(null);
@@ -44,7 +44,6 @@ export const EmployReq = ({}) => {
       setRequisitionData(allRequisitions);
       setError(null);
     } catch (err) {
-      // console.error("Error fetching requisition data:", err);
       setError("Failed to fetch requisition data");
       setRequisitionData([]);
     }
@@ -115,10 +114,18 @@ export const EmployReq = ({}) => {
     };
   }, [isReviewFormVisible]);
 
-  const totalPages = Math.ceil(requisitionData.length / rowsPerPage);
+  // Sort all data by createdAt before pagination
+  const sortedRequisitionData = requisitionData
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  // Apply filtering if any
+  const dataToDisplay = filteredData.length > 0 ? filteredData : sortedRequisitionData;
+
+  // Pagination logic
+  const totalPages = Math.ceil(dataToDisplay.length / rowsPerPage);
   const startIndex = (page - 1) * rowsPerPage;
   const endIndex = page * rowsPerPage;
-  const paginatedData = requisitionData.slice(startIndex, endIndex);
+  const paginatedData = dataToDisplay.slice(startIndex, endIndex);
 
   const handlePageChange = (newPage) => {
     if (newPage > 0 && newPage <= totalPages) {
@@ -150,9 +157,7 @@ export const EmployReq = ({}) => {
                 <tr>
                   <th className="py-4">S.No</th>
                   <th className="pl-4 py-4">Manager</th>
-                  {/* <th className="py-4">Department</th> */}
                   <th className="py-4">Position</th>
-                  {/* <th className="py-4">Project</th> */}
                   <th className="py-4">Quantity</th>
                   <th className="py-4">Received Date</th>
                   <th className="py-4">Form</th>
@@ -161,57 +166,33 @@ export const EmployReq = ({}) => {
                 </tr>
               </thead>
               <tbody className="bg-white text-center">
-                {(filteredData.length > 0 ? filteredData : paginatedData)
-                  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                  .map((item, index) => (
-                    <tr key={item.id} className="text-center border-b-2 bg-white border-[#C7BCBC] text-[15px] text-[#303030] hover:bg-medium_blue">
-                      <td className="py-4">{startIndex + index + 1}</td>
-                      <td className="py-4 pl-4 max-w-[200px] text-ellipsis overflow-hidden">
-                        {item.reqName}
-                      </td>
-                      {/* <td className="py-4">{item.department}</td> */}
-                      <td className="py-4 max-w-[200px] text-ellipsis overflow-hidden">
-                        {item.position}
-                      </td>
-                      {/* <td className="py-4 max-w-[200px] text-ellipsis overflow-hidden">
-                    {item.project}
-                  </td> */}
-                      <td className="py-4">{item.quantity}</td>
-                      <td className="py-4">
-                        {format(new Date(item.createdAt), "dd-MM-yyyy")}
-                      </td>
-                      <td className="py-4 px-2">
-                        <a
-                          href="#"
-                          className="text-[blue] font-semibold border-b-2 cursor-pointer"
-                          onClick={() => handleViewClick(item)}
-                        >
-                          View
-                        </a>
-                      </td>
-                      <td
-                        className={`py-4 font-semibold ${getStatusClass(
-                          item.status
-                        )}`}
+                {paginatedData.map((item, index) => (
+                  <tr key={item.id} className="text-center border-b-2 bg-white border-[#C7BCBC] text-[15px] text-[#303030] hover:bg-medium_blue">
+                    <td className="py-4">{startIndex + index + 1}</td>
+                    <td className="py-4 pl-4 max-w-[200px] text-ellipsis overflow-hidden">{item.reqName}</td>
+                    <td className="py-4 max-w-[200px] text-ellipsis overflow-hidden">{item.position}</td>
+                    <td className="py-4">{item.quantity}</td>
+                    <td className="py-4">{format(new Date(item.createdAt), "dd-MM-yyyy")}</td>
+                    <td className="py-4 px-2">
+                      <a
+                        href="#"
+                        className="text-[blue] font-semibold border-b-2 cursor-pointer"
+                        onClick={() => handleViewClick(item)}
                       >
-                        {item.status ? item.status : "Pending"}
-                      </td>
-                      <td className="py-4 center gap-2">
-                        <span className="max-w-[200px] text-ellipsis overflow-hidden">
-                          {item.remarkReq}
-                        </span>
-                        <div className="w-6 h-6 flex justify-center items-center">
-                          {localStorage.getItem("userType") === "Manager" &&
-                            !item.remarkReq && (
-                              <FaPencilAlt
-                                className="text-[brown] cursor-pointer"
-                                onClick={() => setSelectedRemarksRequest(item)}
-                              />
-                            )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                        View
+                      </a>
+                    </td>
+                    <td className={`py-4 font-semibold ${getStatusClass(item.status)}`}>{item.status ? item.status : "Pending"}</td>
+                    <td className="py-4 center gap-2">
+                      <span className="max-w-[200px] text-ellipsis overflow-hidden">{item.remarkReq}</span>
+                      <div className="w-6 h-6 flex justify-center items-center">
+                        {localStorage.getItem("userType") === "Manager" && !item.remarkReq && (
+                          <FaPencilAlt className="text-[brown] cursor-pointer" onClick={() => setSelectedRemarksRequest(item)} />
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -234,6 +215,7 @@ export const EmployReq = ({}) => {
           onRemarkUpdated={saveRemarks}
         />
       </section>
+      
       {paginatedData.length > 0 && (
         <div className="ml-20 flex justify-center py-10">
           <div className="w-[60%] flex justify-start mt-10 px-10">
