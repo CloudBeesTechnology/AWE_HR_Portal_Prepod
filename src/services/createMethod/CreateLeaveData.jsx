@@ -26,6 +26,7 @@ export const CreateLeaveData = () => {
       mrageLeave,
       // compasLeave,
       pervAnnualLeaveBal,
+      remainAnnualLeave,
     } = LeaveValue;
 
     const formatDate = (date) =>
@@ -37,17 +38,10 @@ export const CreateLeaveData = () => {
     const uniqueValues1 = [
       annualLeave,
       annualLeaveDateValue,
-      // compasLeave,
       destinateLeavePass,
       durLeavePass,
       dateLeavePassValue,
       leavePass,
-      // materLeave,
-      // mrageLeave,
-      // paterLeave,
-      // sickLeave,
-      // sickLeaveDate,
-      // hospLeave,
     ].map((value) => {
       // If value is null, undefined, or an empty array, return an empty array
       if (value == null || (Array.isArray(value) && value.length === 0)) {
@@ -69,12 +63,6 @@ export const CreateLeaveData = () => {
       updatedDurLeavePass,
       updatedDateLeavePassValue,
       updatedLeavePass,
-      // updatedMaterLeave,
-      // updatedMrageLeave,
-      // updatedPaterLeave,
-      // updatedSickLeave,
-      // updatedSickLeaveDate,
-      // updatedHospLeave,
     ] = uniqueValues1;
 
     const totalData = {
@@ -93,6 +81,7 @@ export const CreateLeaveData = () => {
       sickLeave,
       sickLeaveDate,
       hospLeave,
+      remainAnnualLeave
     };
 
     try {

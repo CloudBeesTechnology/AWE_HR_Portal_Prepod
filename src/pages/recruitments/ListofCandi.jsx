@@ -42,7 +42,7 @@ export const ListofCandi = () => {
         candidate.status !== "Inactive"
     );
 
-    console.log(allCandidates);
+    // console.log(allCandidates);
 
     setFilteredData(allCandidates);
     setLoading(false);

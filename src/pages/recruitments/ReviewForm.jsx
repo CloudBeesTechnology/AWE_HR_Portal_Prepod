@@ -11,7 +11,7 @@ import { SpinLogo } from "../../utils/SpinLogo";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { getUrl } from "@aws-amplify/storage";
 import { sendEmail } from "../../services/EmailServices";
-import defaultAvatar from "../../assets/navabar/defaultAvatar.jpg"
+import defaultAvatar from "../../assets/navabar/defaultAvatar.jpg";
 
 const client = generateClient();
 
@@ -23,6 +23,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
   const [isLoading, setIsLoading] = useState("");
   const [notiText, setNotiText] = useState("");
   const [pathText, setPathText] = useState("");
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const handleScheduleInterview = () => {
     setIsScheduleOpen(true);
@@ -173,7 +174,6 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     }
   };
 
-  
   const handleSelected = async (dataCandi) => {
     const SELECTED_CANDY_SUB = `Candidate Selected Notification:`;
 
@@ -214,7 +214,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
         const data = {
           id: match.id,
           status: "Selected",
-          candidateStatus: "pending"
+          candidateStatus: "pending",
         };
 
         try {
@@ -230,7 +230,6 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             FROM_ADDRESS,
             TO_ADDRESS
           );
-
         } catch (err) {
           console.log("Error during update call: ", err);
         }
@@ -258,7 +257,6 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
       setTimeout(() => {
         setNotification(true);
       }, 300);
-
     } catch (err) {
       console.log(err);
       console.error("Error in handleSelected function:", err);
@@ -291,29 +289,60 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
   useEffect(() => {
     const linkToImageFile = async (pathUrl) => {
       try {
+        // console.log("Attempting to fetch image for path:", pathUrl); 
         const result = await getUrl({ path: pathUrl });
-        const fetchedUrl = result.url.toString();
 
-        // Check if the fetched URL contains 'undefined' or is invalid
-        if (fetchedUrl && !fetchedUrl.includes('undefined')) {
-          setImageUrl(fetchedUrl); // Set the fetched URL if valid
+        // Log the result to see what you're getting back
+        // console.log("Fetched result:", result);
+
+        const fetchedUrl = result.url.toString();
+        // console.log("Converted URL:", fetchedUrl);
+
+        // Check the URL before setting it
+        if (fetchedUrl && !fetchedUrl.includes("undefined")) {
+          // console.log("Valid image URL found:", fetchedUrl); 
+          setImageUrl(fetchedUrl); 
         } else {
-          setImageUrl(defaultAvatar); // Set the fallback image
+          // console.log("Invalid image URL, falling back to default"); 
+          setImageUrl(defaultAvatar); 
         }
       } catch (error) {
-        console.error('Error fetching image URL:', error);
-        setImageUrl(defaultAvatar); // Fallback in case of error
+        console.error("Error fetching image URL:", error);
+        setImageUrl(defaultAvatar); 
       }
     };
 
-    if (candidate?.profilePhoto) {
-      linkToImageFile(candidate.profilePhoto); // Fetch image URL based on profile photo
-    } else {
-      setImageUrl('../../assets/navabar/defaultAvatar.jpg'); // Fallback if no profile photo
-    }
-  }, [candidate?.profilePhoto]);
+    // Log the initial state of candidate.profilePhoto
+    // console.log("Candidate profile photo URL:", candidate?.profilePhoto);
 
-  console.log(imageUrl);
+    if (candidate?.profilePhoto) {
+      // console.log("Fetching image from candidate profile photo URL...");
+      linkToImageFile(candidate.profilePhoto); 
+    } else {
+      // console.log("No profile photo found, using default avatar...");
+      setImageUrl(defaultAvatar); 
+    }
+  }, [candidate?.profilePhoto]); 
+
+  useEffect(() => {
+    const img = new Image();
+    img.src = imageUrl;
+
+    // Log when the image starts loading
+    // console.log(`Loading image from: ${imageUrl}`);
+
+    img.onload = () => {
+      // console.log('Image loaded successfully');
+      setIsLoaded(true);
+    };
+
+    img.onerror = () => {
+      // console.log('Error loading image');
+      setIsLoaded(false);
+    };
+  }, [imageUrl]);
+
+
 
   const parseJson = (jsonString) => {
     try {
@@ -352,11 +381,19 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
           {/* Pre-filled Form Content */}
           <div className="mt-6 relative">
             <div className="flex justify-end absolute right-0 top-0 mt-4 mr-4">
-              <img
-                src={imageUrl}
+              {isLoaded ? (
+                <img
+                  src={imageUrl}
+                  alt={`${candidate.name}'s photo`}
+                  className="w-32 h-36 border-2 border-lite_grey shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)]"
+                />
+              ) : (
+                <img
+                src={defaultAvatar}
                 alt={`${candidate.name}'s photo`}
                 className="w-32 h-36 border-2 border-lite_grey shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)]"
               />
+              )}
             </div>
 
             {/* Section One */}
