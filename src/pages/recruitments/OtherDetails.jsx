@@ -25,13 +25,13 @@ export const OtherDetails = ({ fetchedData }) => {
   const { formattedPermissions } = useDeleteAccess();
   const { submitODFunc } = RecODFunc();
   const [notification, setNotification] = useState(false);
+  const [deletePopup, setDeletePopup] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [deleteTitle1, setDeleteTitle1] = useState("");
+  const [mergedData, setMergedData] = useState([]);
   const { candyDetails } = CandyDetails();
   const location = useLocation();
   const navigatingEducationData = location.state?.FormData;
-  const [deletePopup, setDeletePopup] = useState(false);
-  const [deleteTitle1, setDeleteTitle1] = useState("");
-  const [latestTempIDData, setLatestTempIDData] = useState("");
-  const [mergedData, setMergedData] = useState([]);
   const { tempID } = useTempID();
   const { empPDData, educDetailsData } = useContext(DataSupply);
 
@@ -291,14 +291,21 @@ export const OtherDetails = ({ fetchedData }) => {
     return `${prefix}${paddedNextNumber}`;
   };
 
+  const fetchNextTempID = async () => {
+    const totalCount = await getTotalCount();
+    const nextTempID = generateNextTempID(totalCount);
+    return nextTempID;
+  };
+
   const onSubmit = async (data) => {
     try {
-      const totalCount = await getTotalCount();
-      const nextTempID = generateNextTempID(totalCount);
-      setLatestTempIDData(nextTempID);
-
+      setIsLoading(true);
+      const nextTempID = await fetchNextTempID();
+    
       const personName = nextTempID;
-      console.log(personName);
+      // console.log(personName);
+   
+      const latestTempIDData = personName;
 
       const formattedFamilyDetails = JSON.stringify(
         navigatingEducationData?.familyDetails
@@ -342,6 +349,14 @@ export const OtherDetails = ({ fetchedData }) => {
       const baseURL =
         "https://aweadininprod2024954b8-prod.s3.ap-southeast-1.amazonaws.com/";
 
+        const safeReplace = (url) => {
+          if (url && !url.includes("undefined")) {
+            return url.replace(baseURL, "");
+          }
+      
+          return null;
+        };
+
       const reqValue = {
         ...data,
         ...navigatingEducationData,
@@ -352,10 +367,10 @@ export const OtherDetails = ({ fetchedData }) => {
         referees: formattedReferees,
         relatives: formattedRelatives,
         status: "Active",
-        profilePhoto: UpProfilePhoto?.replace(baseURL, ""),
-        uploadResume: uploadedResume?.replace(baseURL, ""),
-        uploadCertificate: uploadedCertificate?.replace(baseURL, ""),
-        uploadPp: uploadedPp?.replace(baseURL, ""),
+        profilePhoto: safeReplace(UpProfilePhoto?.replace(baseURL, "")),
+        uploadResume: safeReplace(uploadedResume?.replace(baseURL, "")),
+        uploadCertificate: safeReplace(uploadedCertificate?.replace(baseURL, "")),
+        uploadPp: safeReplace(uploadedPp?.replace(baseURL, "")),
       };
 
       const checkingPDTable = empPDData.find(
@@ -375,10 +390,12 @@ export const OtherDetails = ({ fetchedData }) => {
 
         await candyDetails({ reqValue: updateReqValue });
         setNotification(true);
+        setIsLoading(false);
       } else {
         // console.log({reqValue, latestTempIDData});
         await submitODFunc({ reqValue, latestTempIDData });
         setNotification(true);
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Error submitting data:", error);
@@ -591,8 +608,8 @@ export const OtherDetails = ({ fetchedData }) => {
         )}
 
         <div className="text-center my-10">
-          <button type="submit" className="primary_btn">
-            Submit
+          <button type="submit" className="primary_btn" disabled={isLoading}>
+            {isLoading ? "Submitting..." : "Submit"}
           </button>
         </div>
       </form>

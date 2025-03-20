@@ -259,7 +259,7 @@ export const ApplicantDetails = () => {
 
       localStorage.setItem("profileStore", JSON.stringify(profileStore));
 
-      console.log("APP", applicationUpdate);
+      // console.log("APP", applicationUpdate);
       navigate("/addCandidates/personalDetails", {
         state: { FormData: applicationUpdate },
       });
