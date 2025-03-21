@@ -16,6 +16,7 @@ export const BlastingData = ({ allData, typeOfReport, reportTitle }) => {
     "Remarks for Blasting/Painting Qualification",
   ]);
 
+  
   const formatDate = (date, type) => {
     if (Array.isArray(date)) {
       if (date.length === 0) return "-";

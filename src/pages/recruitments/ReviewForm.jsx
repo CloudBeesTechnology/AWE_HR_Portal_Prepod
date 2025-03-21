@@ -12,6 +12,7 @@ import { DataSupply } from "../../utils/DataStoredContext";
 import { getUrl } from "@aws-amplify/storage";
 import { sendEmail } from "../../services/EmailServices";
 import defaultAvatar from "../../assets/navabar/defaultAvatar.jpg";
+import { DateFormat } from "../../utils/DateFormat";
 
 const client = generateClient();
 
@@ -570,7 +571,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                     <div className="grid grid-cols-3 gap-4 mb-4">
                       <strong className="w-full">From</strong>
                       <span className="w-full col-span-2">
-                        : &nbsp;{item.from || "N/A"} - {item.to || "N/A"}
+                        : &nbsp;{DateFormat(item.from) || "N/A"} - {DateFormat(item.to) || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
@@ -613,8 +614,8 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                     <div className="grid grid-cols-3 gap-4 mb-4">
                       <strong className="w-full">From</strong>
                       <span className="w-full col-span-2">
-                        : &nbsp;{item.fromDate || "N/A"} -{" "}
-                        {item.toDate || "N/A"}
+                        : &nbsp;{DateFormat(item.fromDate) || "N/A"} -{" "}
+                        {DateFormat(item.toDate) || "N/A"}
                       </span>
                     </div>
                   </div>
