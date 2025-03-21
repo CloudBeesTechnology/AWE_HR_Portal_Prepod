@@ -7,6 +7,7 @@ export const DateFormat = (dateToString) => {
 
   let day, month, year;
 
+  
   if (dateStr?.includes("T")) {
     const localDate = new Date(dateStr);
     year = localDate.getFullYear();
