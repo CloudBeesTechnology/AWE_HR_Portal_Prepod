@@ -49,8 +49,20 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     </html>
     `;
 
+    const CANDIDATE_REJECTION_MSG = `
+    <html>
+      <body>
+         <p>Subject: Candidate Rejection Update Position:– ${dataCandi[0]?.position}</p>    
+         <p>Dear ${dataCandi[0]?.name},</p>    
+         <p>After careful evaluation, we regret to inform you that you have not been selected for <br/> the position: <strong>${dataCandi[0]?.position}</strong>.</p>
+         <p>Best regards,<br>HR Team.</p>
+     </body>
+   </html>
+`;
+
     const FROM_ADDRESS = "hr_no-reply@adininworks.com";
     const TO_ADDRESS = "Hr-notification@adininworks.com";
+    const TO_ADDRESS_CANDY = dataCandi[0]?.email;
 
     try {
       if (!Array.isArray(dataCandi)) {
@@ -105,6 +117,13 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
               TO_ADDRESS
             );
 
+            await sendEmail(
+              REJECTED_CANDY_SUB,
+              CANDIDATE_REJECTION_MSG,
+              FROM_ADDRESS,
+              TO_ADDRESS_CANDY
+            );
+
             setIsLoading("");
             setNotiText("Canditate Rejected Successfully.");
             setPathText("/recrutiles/status");
@@ -146,6 +165,13 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
               REJECTED_CANDY_MSG,
               FROM_ADDRESS,
               TO_ADDRESS
+            );
+
+            await sendEmail(
+              REJECTED_CANDY_SUB,
+              CANDIDATE_REJECTION_MSG,
+              FROM_ADDRESS,
+              TO_ADDRESS_CANDY
             );
 
             setIsLoading("");
@@ -190,8 +216,21 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
       </html>
     `;
 
+    const CANDIDATE_NOTIFICATION_MSG = `
+    <html>
+      <body>
+        <p>Subject: Congratulations on Your Selection!</p>
+        <p>Dear ${dataCandi[0]?.name},</p>
+        <p>We are pleased to inform you that you have been selected for <br/> the position of <strong>${dataCandi[0]?.position}</strong> with our company.</p>
+        <p>We are excited to have you join our team, and we will be in <br/> touch shortly with further details about the next steps in the hiring process.</p>
+        <p>Best regards,<br>HR Team.</p>
+      </body>
+    </html>
+    `;
+
     const FROM_ADDRESS = "hr_no-reply@adininworks.com";
     const TO_ADDRESS = "Hr-notification@adininworks.com";
+    const TO_ADDRESS_CANDY = dataCandi[0]?.email;
 
     try {
       if (!Array.isArray(dataCandi)) {
@@ -201,7 +240,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
       const ivssCandidates = IVSSDetails;
 
       const tempIdsCandi = dataCandi.map((val) => val?.tempID);
-      console.log(tempIdsCandi);
+      // console.log(tempIdsCandi);
 
       const matchTempIDs = ivssCandidates.filter((ivss) =>
         tempIdsCandi.includes(ivss?.tempID)
@@ -229,6 +268,13 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             SELECTED_CANDY_MSG,
             FROM_ADDRESS,
             TO_ADDRESS
+          );
+
+          await sendEmail(
+            SELECTED_CANDY_SUB,
+            CANDIDATE_NOTIFICATION_MSG,
+            FROM_ADDRESS,
+            TO_ADDRESS_CANDY
           );
         } catch (err) {
           console.log("Error during update call: ", err);
@@ -289,7 +335,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
   useEffect(() => {
     const linkToImageFile = async (pathUrl) => {
       try {
-        // console.log("Attempting to fetch image for path:", pathUrl); 
+        // console.log("Attempting to fetch image for path:", pathUrl);
         const result = await getUrl({ path: pathUrl });
 
         // Log the result to see what you're getting back
@@ -300,15 +346,15 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
 
         // Check the URL before setting it
         if (fetchedUrl && !fetchedUrl.includes("undefined")) {
-          // console.log("Valid image URL found:", fetchedUrl); 
-          setImageUrl(fetchedUrl); 
+          // console.log("Valid image URL found:", fetchedUrl);
+          setImageUrl(fetchedUrl);
         } else {
-          // console.log("Invalid image URL, falling back to default"); 
-          setImageUrl(defaultAvatar); 
+          // console.log("Invalid image URL, falling back to default");
+          setImageUrl(defaultAvatar);
         }
       } catch (error) {
         console.error("Error fetching image URL:", error);
-        setImageUrl(defaultAvatar); 
+        setImageUrl(defaultAvatar);
       }
     };
 
@@ -317,12 +363,12 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
 
     if (candidate?.profilePhoto) {
       // console.log("Fetching image from candidate profile photo URL...");
-      linkToImageFile(candidate.profilePhoto); 
+      linkToImageFile(candidate.profilePhoto);
     } else {
       // console.log("No profile photo found, using default avatar...");
-      setImageUrl(defaultAvatar); 
+      setImageUrl(defaultAvatar);
     }
-  }, [candidate?.profilePhoto]); 
+  }, [candidate?.profilePhoto]);
 
   useEffect(() => {
     const img = new Image();
@@ -342,8 +388,6 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     };
   }, [imageUrl]);
 
-
-
   const parseJson = (jsonString) => {
     try {
       return JSON.parse(jsonString);
@@ -356,6 +400,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
   const workExperience = parseJson(candidate.workExperience);
   const eduDetails = parseJson(candidate.eduDetails);
   const familyDetails = parseJson(candidate.familyDetails);
+  // console.log("Show", showDecisionButtons);
 
   return (
     <section>
@@ -389,10 +434,10 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                 />
               ) : (
                 <img
-                src={defaultAvatar}
-                alt={`${candidate.name}'s photo`}
-                className="w-32 h-36 border-2 border-lite_grey shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)]"
-              />
+                  src={defaultAvatar}
+                  alt={`${candidate.name}'s photo`}
+                  className="w-32 h-36 border-2 border-lite_grey shadow-[0_3px_6px_1px_rgba(0,0,0,0.2)]"
+                />
               )}
             </div>
 
@@ -586,7 +631,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                 {!showDecisionButtons && (
                   <div className="flex justify-between space-x-4 py-12 px-14">
                     <button
-                      className="hover:bg-rejectHover bg-rejectRed  font-semibold shadow-xl rounded-md px-4 py-2 min-w-[140px] max-w-[140px]"
+                      className="hover:bg-rejectHover bg-rejectRed text-white font-semibold shadow-xl rounded-md px-4 py-2 min-w-[140px] max-w-[140px]"
                       onClick={() => {
                         handleRejected([candidate]);
                       }}
@@ -596,14 +641,14 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                     </button>
 
                     <button
-                      className="hover:bg-[#ffe927] bg-yellow  font-semibold shadow-xl rounded-md px-4 py-2"
+                      className="hover:bg-[#3f4a54] bg-blue text-white  font-semibold shadow-xl rounded-md px-4 py-2"
                       onClick={handleScheduleInterview}
                     >
                       Schedule Interview
                     </button>
 
                     <button
-                      className="hover:bg-selectGreenHover bg-selectGreen  font-semibold shadow-xl rounded-md px-4 py-2 min-w-[140px] max-w-[140px]"
+                      className="hover:bg-selectGreenHover bg-selectGreen text-white  font-semibold shadow-xl rounded-md px-4 py-2 min-w-[140px] max-w-[140px]"
                       onClick={() => {
                         handleSelected([candidate]);
                       }}

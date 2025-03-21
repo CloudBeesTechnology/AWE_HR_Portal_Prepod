@@ -27,6 +27,26 @@ export const Localcandi = () => {
   const [editingData, setEditingData] = useState([]);
   const { handleDeletePDDetails } = CandyDelete();
 
+  // useEffect(() => {
+  //   const bruneiCandidates = empPDData
+  //     .filter(
+  //       (candidate) =>
+  //         candidate.nationality === "Bruneian" ||
+  //         candidate.nationality === "Brunei PR"
+  //     )
+  //     .filter(
+  //       (candidate) =>
+  //         !IVSSDetails.some((detail) => detail.tempID === candidate.tempID) &&
+  //         candidate.status !== "Inactive"
+  //     );
+  //   setFilteredData(bruneiCandidates);
+  //   setLoading(false);
+  // }, [empPDData, IVSSDetails, searchTerm]);
+
+  const matchedCandidates = IVSSDetails?.filter((ivssCandidate) => 
+    empPDData?.some((empCandidate) => empCandidate.tempID === ivssCandidate.tempID)
+  );
+
   useEffect(() => {
     const bruneiCandidates = empPDData
       .filter(
@@ -34,15 +54,22 @@ export const Localcandi = () => {
           candidate.nationality === "Bruneian" ||
           candidate.nationality === "Brunei PR"
       )
-      .filter(
-        (candidate) =>
-          !IVSSDetails.some((detail) => detail.tempID === candidate.tempID) &&
-          candidate.status !== "Inactive"
-      );
+      .filter((candidate) => {
+        const matchedIVSS =  matchedCandidates?.find(
+          (ivssCandidate) => ivssCandidate.tempID === candidate.tempID
+        );
+        const isStatusValid = matchedIVSS && matchedIVSS.status === "Candidate List";
+        return (
+          (!IVSSDetails.some((detail) => detail.tempID === candidate.tempID) && candidate.status !== "Inactive") ||
+          (isStatusValid)
+        )
+      });
+  
     setFilteredData(bruneiCandidates);
     setLoading(false);
   }, [empPDData, IVSSDetails, searchTerm]);
 
+  
   const handleRowClick = (row) => {
     setSelectedRow(row);
   };

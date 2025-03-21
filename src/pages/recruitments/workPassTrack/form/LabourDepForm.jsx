@@ -214,7 +214,7 @@ export const LabourDepForm = ({ candidate }) => {
       };
       setNotification(true);
 
-      // console.log("Submitting interview details with status:", interStatus);
+      // console.log("Submitting interview details with status:", interStatus); 034
 
       await interviewDetails({ InterviewValue: interStatus });
 
