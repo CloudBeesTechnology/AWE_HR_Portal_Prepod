@@ -18,6 +18,7 @@ export const UpdateProbForm = () => {
         commitment: PbFDataUp.commitment,
         communication: PbFDataUp.communication,
         deadline: PbFDataUp.deadline,
+        extendDate: PbFDataUp.extendDate,
         diligent: PbFDataUp.diligent,
         extendProbED: PbFDataUp.extendProbED,
         extensionPeriod: PbFDataUp.extensionPeriod,

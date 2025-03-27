@@ -56,6 +56,7 @@ export const ProbationForm = forwardRef(() => {
       commitment: "",
       communication: "",
       deadline: "",
+      extendDate:"",
       diligent: "",
       extensionPeriod: "",
       gmDate: "",
@@ -371,6 +372,7 @@ export const ProbationForm = forwardRef(() => {
         "commitment",
         "communication",
         "deadline",
+        "extendDate",
         "diligent",
         "extensionPeriod",
         "gmDate",
@@ -703,7 +705,7 @@ export const ProbationForm = forwardRef(() => {
 
       <div className="mb-10 mt-5">
         <p className="text-md mt-2">
-          For the attention of:{" "}
+          For the attention of :{" "}
           <input
             type="text"
             name="attention"
@@ -714,7 +716,7 @@ export const ProbationForm = forwardRef(() => {
           />
         </p>
         <p className="text-md mt-3">
-          Deadline submit to Human Resources Department by{" "}
+          Deadline submit to Human Resources Department by :{" "}
           <input
             type="text"
             name="deadline"
@@ -813,6 +815,21 @@ export const ProbationForm = forwardRef(() => {
                   defaultValue={employeeData?.probationEndDate || "-"}
                   className="w-full outline-none"
                 />
+              </td>
+            </tr>
+            <tr className="border">
+              <td className="p-2 border-r border-b font-semibold">
+                Extended Probation End Date
+              </td>
+              <td className="p-2 border-b">
+              <input
+            type="date"
+            name="extendDate"
+            {...register("extendDate")}
+            value={formData.probData.extendDate}
+            onChange={handleInputChange}
+            className=" px-1"
+          />
               </td>
             </tr>
             {/* <tr className="border">
