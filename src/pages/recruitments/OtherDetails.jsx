@@ -147,20 +147,18 @@ export const OtherDetails = ({ fetchedData }) => {
           });
 
           if (interviewData) {
-            setUploadedFileNames((prev) => ({
-              ...prev,
+            setUploadedFileNames({
               uploadCertificate: extractFileName(
                 interviewData.uploadCertificate
               ),
               uploadPp: extractFileName(interviewData.uploadPp),
               uploadResume: extractFileName(interviewData.uploadResume),
-            }));
-            setUploadedDocs((prev) => ({
-              ...prev,
+            });
+            setUploadedDocs({
               uploadCertificate: interviewData.uploadCertificate,
               uploadPp: interviewData.uploadPp,
               uploadResume: interviewData.uploadResume,
-            }));
+            });
           }
         }
       }
@@ -218,24 +216,33 @@ export const OtherDetails = ({ fetchedData }) => {
       }
 
       const isDeleted = await handleDeleteFile(fileType, fileName, tempID);
-      const isDeletedArrayUploaded = await DeleteUploadApplication(
-        fileType,
-        fileName,
-        tempID,
-        setUploadedFileNames,
-        setUploadedDocs,
-        setIsUploadingString
-      );
-
-      if (!isDeleted || isDeletedArrayUploaded) {
-        console.error(
-          `Failed to delete file: ${fileName}, skipping UI update.`
-        );
+      if (!isDeleted) {
+        console.error(`Failed to delete file: ${fileName}`);
         return;
       }
+
+      // Update the specific file type only
+      setUploadedFileNames(prev => ({
+        ...prev,
+        [fileType]: null
+      }));
+
+      setUploadedDocs(prev => ({
+        ...prev,
+        [fileType]: null
+      }));
+
+      setIsUploadingString(prev => ({
+        ...prev,
+        [fileType]: false
+      }));
+
+      setValue(fileType, null);
+
       setDeleteTitle1(`${fileName}`);
       handleDeleteMsg();
     } catch (error) {
+      console.error("Error processing the file deletion:", error);
       alert("Error processing the file deletion.");
     }
   };
@@ -303,7 +310,6 @@ export const OtherDetails = ({ fetchedData }) => {
       const nextTempID = await fetchNextTempID();
     
       const personName = nextTempID;
-      // console.log(personName);
    
       const latestTempIDData = personName;
 
@@ -326,21 +332,18 @@ export const OtherDetails = ({ fetchedData }) => {
         navigatingEducationData?.relatives
       );
 
-      const uploadedResume = await uploadReqString(
-        data.uploadResume,
-        "uploadResume",
-        personName
-      );
-      const uploadedCertificate = await uploadReqString(
-        data.uploadCertificate,
-        "uploadCertificate",
-        personName
-      );
-      const uploadedPp = await uploadReqString(
-        data.uploadPp,
-        "uploadPp",
-        personName
-      );
+      const uploadedResume = data.uploadResume instanceof File 
+        ? await uploadReqString(data.uploadResume, "uploadResume", personName)
+        : uploadedDocs.uploadResume;
+
+      const uploadedCertificate = data.uploadCertificate instanceof File 
+        ? await uploadReqString(data.uploadCertificate, "uploadCertificate", personName)
+        : uploadedDocs.uploadCertificate;
+
+      const uploadedPp = data.uploadPp instanceof File 
+        ? await uploadReqString(data.uploadPp, "uploadPp", personName)
+        : uploadedDocs.uploadPp;
+
       const UpProfilePhoto = await uploadReqString(
         navigatingEducationData.profilePhoto,
         "profilePhoto",
@@ -349,13 +352,12 @@ export const OtherDetails = ({ fetchedData }) => {
       const baseURL =
         "https://aweadininprod2024954b8-prod.s3.ap-southeast-1.amazonaws.com/";
 
-        const safeReplace = (url) => {
-          if (url && !url.includes("undefined")) {
-            return url.replace(baseURL, "");
-          }
-      
-          return null;
-        };
+      const safeReplace = (url) => {
+        if (url && !url.includes("undefined")) {
+          return url.replace(baseURL, "");
+        }
+        return null;
+      };
 
       const reqValue = {
         ...data,
@@ -386,19 +388,17 @@ export const OtherDetails = ({ fetchedData }) => {
           PDTableID: checkingPDTable.id,
           EDTableID: checkingEDTable.id,
         };
-        // console.log({reqValue: updateReqValue});
-
         await candyDetails({ reqValue: updateReqValue });
         setNotification(true);
         setIsLoading(false);
       } else {
-        // console.log({reqValue, latestTempIDData});
         await submitODFunc({ reqValue, latestTempIDData });
         setNotification(true);
         setIsLoading(false);
       }
     } catch (error) {
       console.error("Error submitting data:", error);
+      setIsLoading(false);
     }
   };
 
