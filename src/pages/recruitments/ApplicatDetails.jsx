@@ -21,7 +21,7 @@ import {
 } from "../../utils/DropDownMenus";
 
 export const ApplicantDetails = () => {
-  const { empPDData,dropDownVal,educDetailsData} = useContext(DataSupply);
+  const { empPDData, dropDownVal, educDetailsData } = useContext(DataSupply);
   const { tempID } = useTempID();
   const location = useLocation();
   const navigate = useNavigate();
@@ -36,7 +36,6 @@ export const ApplicantDetails = () => {
   const religionDD = dropDownVal[0]?.religionDD || [];
   const raceDD = dropDownVal[0]?.raceDD || [];
   const nationalityDD = dropDownVal[0]?.nationalityDD || [];
-  
 
   const {
     register,
@@ -154,6 +153,7 @@ export const ApplicantDetails = () => {
       if (empPDData.length > 0) {
         const interviewData = empPDData.find((data) => data.tempID === tempID);
         if (interviewData) {
+          // console.log("Interview Data", interviewData);
           selectedFields.forEach((key) => {
             if (
               key === "familyDetails" ||
@@ -257,12 +257,9 @@ export const ApplicantDetails = () => {
         profilePhoto: uploadedDocs.profilePhoto,
       };
 
-      localStorage.setItem(
-        "profileStore",
-        JSON.stringify(profileStore)
-      );
+      localStorage.setItem("profileStore", JSON.stringify(profileStore));
 
-      console.log("APP", applicationUpdate);
+      // console.log("APP", applicationUpdate);
       navigate("/addCandidates/personalDetails", {
         state: { FormData: applicationUpdate },
       });
@@ -370,42 +367,85 @@ export const ApplicantDetails = () => {
             )}
           </div>
         </div>
-        
-<div className="grid  md:grid-cols-2 gap-x-12 gap-y-5 my-4 text_size_6">
+
+        <div className="grid  md:grid-cols-2 gap-x-12 gap-y-5 my-4 text_size_6">
           {[
-            { label: "Contract Type", name: "contractType",  type: "select", options: ["Local","LPA","SAWP"]},
+            {
+              label: "Contract Type",
+              name: "contractType",
+              type: "select",
+              options: ["Local", "LPA", "SAWP"],
+            },
             { label: "Agent", name: "agent", type: "text" },
             { label: "Name", name: "name", type: "text" },
-            { label: "Chinese characters (if applicable)", name: "chinese", type: "text" },
-            { label: "Gender", name: "gender", type: "select", options: ["Male", "Female"] },
+            {
+              label: "Chinese characters (if applicable)",
+              name: "chinese",
+              type: "text",
+            },
+            {
+              label: "Gender",
+              name: "gender",
+              type: "select",
+              options: ["Male", "Female"],
+            },
             { label: "Date of Birth", name: "dob", type: "date" },
             { label: "Age", name: "age", type: "number", min: 20, max: 99 },
             { label: "Email ID", name: "email", type: "email" },
-            { label: "Marital Status", name: "marital", type: "select", options: ["Single", "Married", "Widow", "Separate", "Divorce"] },
+            {
+              label: "Marital Status",
+              name: "marital",
+              type: "select",
+              options: ["Single", "Married", "Widow", "Separate", "Divorce"],
+            },
             { label: "Country of Birth", name: "cob", type: "text" },
-            { label: "Nationality", name: "nationality", type: "select", options: nationalityDD },
-            { label: "Other Nationality", name: "otherNation", type: "text", disabled: watch("nationality")?.toLowerCase() !== "other" },
+            {
+              label: "Nationality",
+              name: "nationality",
+              type: "select",
+              options: nationalityDD,
+            },
+            {
+              label: "Other Nationality",
+              name: "otherNation",
+              type: "text",
+              disabled: watch("nationality")?.toLowerCase() !== "other",
+            },
             { label: "Race", name: "race", type: "select", options: raceDD },
-            { label: "Other Race", name: "otherRace", type: "text", disabled: watch("race")?.toLowerCase() !== "other" },
-            { label: "Religion", name: "religion", type: "select", options: religionDD },
-            { label: "Other Religion", name: "otherReligion", type: "text", disabled: watch("religion")?.toLowerCase() !== "others" },
-
+            {
+              label: "Other Race",
+              name: "otherRace",
+              type: "text",
+              disabled: watch("race")?.toLowerCase() !== "other",
+            },
+            {
+              label: "Religion",
+              name: "religion",
+              type: "select",
+              options: religionDD,
+            },
+            {
+              label: "Other Religion",
+              name: "otherReligion",
+              type: "text",
+              disabled: watch("religion")?.toLowerCase() !== "others",
+            },
           ].map((field, index) => (
             <div key={index}>
               <label className="block">{field.label}</label>
               {field.type === "select" ? (
-               <select
-               {...register(field.name)}
-               className="input-field select-custom"
-             >
-               <option value="">Select</option> {/* Ensure default empty option */}
-               {(field.options || []).map((option, i) => (
-                 <option key={i} value={option}>
-                   {option}
-                 </option>
-               ))}
-             </select>             
-                
+                <select
+                  {...register(field.name)}
+                  className="input-field select-custom"
+                >
+                  <option value="">Select</option>{" "}
+                  {/* Ensure default empty option */}
+                  {(field.options || []).map((option, i) => (
+                    <option key={i} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
               ) : (
                 <input
                   {...register(field.name)}
@@ -417,7 +457,9 @@ export const ApplicantDetails = () => {
                 />
               )}
               {errors[field.name] && (
-                <p className="text-[red] text-[13px]">{errors[field.name]?.message}</p>
+                <p className="text-[red] text-[13px]">
+                  {errors[field.name]?.message}
+                </p>
               )}
             </div>
           ))}

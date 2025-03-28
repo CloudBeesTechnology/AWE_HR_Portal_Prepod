@@ -85,8 +85,8 @@ export const LeavePassData = () => {
           : "-",
         contractStart: formatDate(item.contractStart) || "-",
         contractEnd: formatDate(item.contractEnd) || "-",
-        dateLeavePass: formatDate(item.dateLeavePass) || "-",
-        destinateLeavePass: item.destinateLeavePass || "-",
+        leavePassageEntitlement: formatDate(item.dateLeavePass) || "-",
+        leavePassageDestination: item.destinateLeavePass || "-",
         rawAld: new Date(item.dateLeavePass) || "-", // Raw date for sorting
       }))
       .sort((a, b) => a.rawAld - b.rawAld)
@@ -145,8 +145,8 @@ export const LeavePassData = () => {
       : "-",
       contractStart: formatDate(item.contractStart)|| "-",
       contractEnd: formatDate(item.contractEnd)|| "-",
-      dateLeavePass: formatDate(item.dateLeavePass)|| "-",
-      destinateLeavePass: item.destinateLeavePass || "-",
+      leavePassageEntitlement: formatDate(item.dateLeavePass)|| "-",
+      leavePassageDestination: item.destinateLeavePass || "-",
       rawAld: new Date(item.dateLeavePass)|| "-", // Raw date for sorting
       }))
       .sort((a, b) => a.rawAld - b.rawAld)

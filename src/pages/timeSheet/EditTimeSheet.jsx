@@ -383,6 +383,7 @@ export const EditTimeSheet = ({
     }
   }, [sections]);
 
+  
   useEffect(() => {
     const totalOvertimeHrs = sections.reduce((total, sec) => {
       try {

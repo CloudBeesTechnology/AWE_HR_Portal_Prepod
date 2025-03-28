@@ -24,6 +24,66 @@ export const HOLTable = () => {
 
   // console.log(mergedData);
 
+  // useEffect(() => {
+  //   // Step 1: Initial filtering based on user type
+  //   let filteredData = mergedData
+  //     .filter((items) => {
+  //       if (
+  //         userType === "Supervisor" &&
+  //         items?.empStatus !== "Cancelled" &&
+  //         items.managerStatus === "Approved"
+  //       ) {
+  //         return items.supervisorEmpID === userID;
+  //       } else if (
+  //         userType === "Manager" &&
+  //         (items.supervisorStatus === "Approved" || !items.supervisorEmpID) &&
+  //         items?.empStatus !== "Cancelled" &&
+  //         items.managerStatus === "Approved"
+  //       ) {
+  //         return items.managerEmpID === userID;
+  //       } else if (userType === "SuperAdmin" || userType === "HR") {
+  //         return true;
+  //       }
+  //       return false;
+  //     })
+  //     .sort(
+  //       (a, b) =>
+  //         new Date(b.leaveStatusCreatedAt) - new Date(a.leaveStatusCreatedAt)
+  //     );
+
+  //   if (selectedDate) {
+  //     filteredData = filteredData.filter((item) => {
+ 
+  //       const selectedDateObj = new Date(selectedDate);
+  //       const empLeaveEndDate =
+  //         item.empLeaveSelectedTo || item.empLeaveEndDate
+  //           ? new Date(item.empLeaveSelectedTo || item.empLeaveEndDate)
+  //           : null;
+  //       const empLeaveStartDate =
+  //         item.empLeaveSelectedFrom || item.empLeaveStartDate
+  //           ? new Date(item.empLeaveSelectedFrom || item.empLeaveStartDate)
+  //           : null;
+
+  //       const selectedDateFormatted = DateFormat(selectedDateObj);
+  //       const empLeaveEndDateFormatted = DateFormat(
+  //         empLeaveEndDate || item.empLeaveEndDate
+  //       );
+  //       const empLeaveStartDateFormatted = DateFormat(
+  //         empLeaveStartDate || item.empLeaveStartDate
+  //       );
+
+  //       return (
+  //         empLeaveEndDateFormatted === selectedDateFormatted ||
+  //         empLeaveStartDateFormatted === selectedDateFormatted
+  //       );
+  //     });
+  //   }
+  //   // console.log(filteredData);
+
+  //   setSecondartyData(filteredData);
+  //   setMatchData(filteredData);
+  // }, [mergedData, userType, userID, selectedDate]);
+
   useEffect(() => {
     // Step 1: Initial filtering based on user type
     let filteredData = mergedData
@@ -41,7 +101,10 @@ export const HOLTable = () => {
           items.managerStatus === "Approved"
         ) {
           return items.managerEmpID === userID;
-        } else if (userType === "SuperAdmin" || userType === "HR") {
+        } else if (
+          (userType === "SuperAdmin" || userType === "HR") &&
+          items.managerStatus === "Approved" 
+        ) {
           return true;
         }
         return false;
@@ -50,10 +113,10 @@ export const HOLTable = () => {
         (a, b) =>
           new Date(b.leaveStatusCreatedAt) - new Date(a.leaveStatusCreatedAt)
       );
-
+  
+    // Step 2: Additional filtering based on selected date
     if (selectedDate) {
       filteredData = filteredData.filter((item) => {
- 
         const selectedDateObj = new Date(selectedDate);
         const empLeaveEndDate =
           item.empLeaveSelectedTo || item.empLeaveEndDate
@@ -63,7 +126,7 @@ export const HOLTable = () => {
           item.empLeaveSelectedFrom || item.empLeaveStartDate
             ? new Date(item.empLeaveSelectedFrom || item.empLeaveStartDate)
             : null;
-
+  
         const selectedDateFormatted = DateFormat(selectedDateObj);
         const empLeaveEndDateFormatted = DateFormat(
           empLeaveEndDate || item.empLeaveEndDate
@@ -71,20 +134,19 @@ export const HOLTable = () => {
         const empLeaveStartDateFormatted = DateFormat(
           empLeaveStartDate || item.empLeaveStartDate
         );
-
+  
         return (
           empLeaveEndDateFormatted === selectedDateFormatted ||
           empLeaveStartDateFormatted === selectedDateFormatted
         );
       });
     }
-    // console.log(filteredData);
-
+  
     setSecondartyData(filteredData);
     setMatchData(filteredData);
   }, [mergedData, userType, userID, selectedDate]);
-  // console.log(matchData);
 
+  
   const heading = [
     "S.No",
     "Employee ID",
@@ -232,7 +294,7 @@ export const HOLTable = () => {
                       </td>
 
                       <td className="py-3 w-[20%] break-words overflow-hidden">
-                        {capitalizedLetter(item.reason)}
+                        {capitalizedLetter(item.reason) || "N/A"}
                       </td>
                       <td
                         className={`font-semibold ${getStatusClass(
@@ -246,7 +308,7 @@ export const HOLTable = () => {
                         {userType === "Manager"
                           ? item.managerStatus || "not found"
                           : userType === "Supervisor" || userType === "HR"
-                          ? item.supervisorStatus || "not found"
+                          ? item.managerStatus || "not found"
                           : ""}
                       </td>
                     </tr>

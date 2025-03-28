@@ -326,7 +326,6 @@ export const GroupHS = () => {
   }, [empPIData, groupHSData]);
 
   const searchResult = (result) => {
-    console.log(result);
     setSearchResultData(result);
   };
 
@@ -576,7 +575,7 @@ export const GroupHS = () => {
         <div className="flex-1">
           <InsSearch
             searchResult={searchResult}
-            newFormData={groupHSData}
+            newFormData={insuranceData}
             searchIcon2={<IoSearch />}
             placeholder="Policy Number"
             rounded="rounded-lg"

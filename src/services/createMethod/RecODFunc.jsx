@@ -5,12 +5,13 @@ import { generateClient } from "@aws-amplify/api";
 
 
 export const RecODFunc = () => {
-  const client=generateClient()
+  const client=generateClient() 
    const submitODFunc = useCallback(async ({
     reqValue,
     latestTempIDData,
   }) => {
-    if (!reqValue || !latestTempIDData) {
+    
+    if (!reqValue || !latestTempIDData) { 
       throw new Error("Missing required parameters");
     }
   

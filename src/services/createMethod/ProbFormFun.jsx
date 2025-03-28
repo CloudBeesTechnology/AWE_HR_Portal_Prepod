@@ -18,6 +18,7 @@ export const ProbFormFun = () => {
         commitment: ProbValue.commitment,
         communication: ProbValue.communication,
         deadline: ProbValue.deadline,
+        extendDate: ProbValue.extendDate,
         diligent: ProbValue.diligent,
         extendProbED: ProbValue.extendProbED,
         extensionPeriod: ProbValue.extensionPeriod,

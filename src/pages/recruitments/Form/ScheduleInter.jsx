@@ -36,6 +36,7 @@ export const ScheduleInter = ({ candidate, onClose }) => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(InterviewScheduleSchema),
@@ -44,12 +45,15 @@ export const ScheduleInter = ({ candidate, onClose }) => {
   const { createSchedule } = SubmitInterviewSchedule();
 
   const searchResult = (result) => {
+    console.log(result);
+    setValue("manager", result?.name);
+    setValue("empID", result?.empID);
     setFormData({
       interview: {
-        empID: result?.empID,
-        manager: result?.name,
-        managerEmail: result?.officialEmail,
         managerName: result?.name,
+        managerName: result?.name,  
+        empID: result?.empID,       
+        managerEmail: result?.officialEmail,    
         candyEmail: candidate?.email,
         hrEmail: "hr-recruitment@adininworks.com",
         candyName: candidate?.name,
@@ -69,6 +73,8 @@ export const ScheduleInter = ({ candidate, onClose }) => {
   };
 
   const onSubmit = handleSubmit(async (data) => {
+    // console.log("DATA", data);
+    
     const formattedData = {
       ...data,
       interDate: new Date(data.interDate),
@@ -86,12 +92,15 @@ export const ScheduleInter = ({ candidate, onClose }) => {
       // // Ensure the schedule is created first
       await createSchedule(formattedData);
       await localMobilization(mobilizationData);
+     
       // // Send emails sequentially
       await sendEmails(data);
+
       setIsLoading(false);
       setTimeout(() => {
         setNotification(true);
       }, 200);
+
     } catch (error) {
       console.log("Error scheduling interview:", error);
       setIsLoading(false);
@@ -132,7 +141,7 @@ export const ScheduleInter = ({ candidate, onClose }) => {
         <p>Dear ${MANAGER_NAME},</p>
         
         <p>This is to notify you that an interview has been scheduled for ${
-          formData.interview.candyName
+          CANDY_NAME
         } the <strong> ${ 
       formData.interview.candyPosition
     } </strong> position.</p>      
@@ -151,7 +160,7 @@ export const ScheduleInter = ({ candidate, onClose }) => {
     <body>
       <p>Subject: Interview Notification</p>
       
-      <p>Dear ${formData.interview.candyName},</p>
+      <p>Dear ${CANDY_NAME},</p>
       
       <p>This is to notify you that an interview has been scheduled for the <strong> ${
         formData.interview.candyPosition
@@ -291,8 +300,7 @@ export const ScheduleInter = ({ candidate, onClose }) => {
                 className="input-field border"
                 register={register}
                 errors={errors}
-                value={formData.interview.empID || ""}
-                onChange={(e) => handleInputChange("empID", e.target.value)}
+        
               />
               <FormField
                 name="manager"
@@ -302,8 +310,6 @@ export const ScheduleInter = ({ candidate, onClose }) => {
                 className="input-field border"
                 register={register}
                 errors={errors}
-                value={formData.interview.manager || ""}
-                onChange={(e) => handleInputChange("manager", e.target.value)}
               />
             </div>
           </div>
