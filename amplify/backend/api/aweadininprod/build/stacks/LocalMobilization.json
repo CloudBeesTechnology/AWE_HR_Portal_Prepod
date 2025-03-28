@@ -303,6 +303,50 @@
         }
       }
     },
+    "LocalMobilizationIAMRoleDefaultPolicy8E2DC97B": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:DescribeTable"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "LocalMobilizationTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "LocalMobilizationIAMRoleDefaultPolicy8E2DC97B",
+        "Roles": [
+          {
+            "Ref": "LocalMobilizationIAMRoleC407416E"
+          }
+        ]
+      }
+    },
     "LocalMobilizationDataSource": {
       "Type": "AWS::AppSync::DataSource",
       "Properties": {

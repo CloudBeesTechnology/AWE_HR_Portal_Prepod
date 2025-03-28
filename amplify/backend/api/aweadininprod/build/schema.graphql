@@ -206,6 +206,7 @@ type ProbForm @aws_iam @aws_api_key {
   commitmentDetails: String
   probStatus: Boolean
   gmName: String
+  extendDate: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -2376,6 +2377,7 @@ input ModelProbFormFilterInput {
   commitmentDetails: ModelStringInput
   probStatus: ModelBooleanInput
   gmName: ModelStringInput
+  extendDate: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelProbFormFilterInput]
@@ -2423,6 +2425,7 @@ input ModelProbFormConditionInput {
   commitmentDetails: ModelStringInput
   probStatus: ModelBooleanInput
   gmName: ModelStringInput
+  extendDate: ModelStringInput
   and: [ModelProbFormConditionInput]
   or: [ModelProbFormConditionInput]
   not: ModelProbFormConditionInput
@@ -2471,6 +2474,7 @@ input CreateProbFormInput {
   commitmentDetails: String
   probStatus: Boolean
   gmName: String
+  extendDate: String
 }
 
 input UpdateProbFormInput {
@@ -2514,6 +2518,7 @@ input UpdateProbFormInput {
   commitmentDetails: String
   probStatus: Boolean
   gmName: String
+  extendDate: String
 }
 
 input DeleteProbFormInput {
@@ -2561,6 +2566,7 @@ input ModelSubscriptionProbFormFilterInput {
   commitmentDetails: ModelSubscriptionStringInput
   probStatus: ModelSubscriptionBooleanInput
   gmName: ModelSubscriptionStringInput
+  extendDate: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionProbFormFilterInput]

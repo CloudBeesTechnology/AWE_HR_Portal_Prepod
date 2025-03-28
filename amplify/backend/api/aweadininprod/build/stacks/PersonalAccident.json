@@ -303,6 +303,50 @@
         }
       }
     },
+    "PersonalAccidentIAMRoleDefaultPolicy472699CD": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:DescribeTable"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "PersonalAccidentTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "PersonalAccidentIAMRoleDefaultPolicy472699CD",
+        "Roles": [
+          {
+            "Ref": "PersonalAccidentIAMRoleC49DB7E9"
+          }
+        ]
+      }
+    },
     "PersonalAccidentDataSource": {
       "Type": "AWS::AppSync::DataSource",
       "Properties": {
