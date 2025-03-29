@@ -205,7 +205,7 @@ export const Status = () => {
   }, [cvTypeDropdownOpen, isFilterBoxOpen]); // Added dependencies
 
   // Toggle Filter Box
-  const toggleFilterBox = (event) => {
+  const toggleFilterBox = (event) => { 
     event?.stopPropagation();
     setIsFilterBoxOpen((prevState) => !prevState);
   };
