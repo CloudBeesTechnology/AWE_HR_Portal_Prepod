@@ -103,7 +103,7 @@ export const HOLTable = () => {
           return items.managerEmpID === userID;
         } else if (
           (userType === "SuperAdmin" || userType === "HR") &&
-          items.managerStatus === "Approved" // Ensure only "Approved" Manager Status for SuperAdmin and HR
+          items.managerStatus === "Approved" 
         ) {
           return true;
         }

@@ -73,7 +73,7 @@ export const ScheduleInter = ({ candidate, onClose }) => {
   };
 
   const onSubmit = handleSubmit(async (data) => {
-    console.log("DATA", data);
+    // console.log("DATA", data);
     
     const formattedData = {
       ...data,
