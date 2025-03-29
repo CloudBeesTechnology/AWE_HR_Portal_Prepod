@@ -84,20 +84,28 @@ export const ContractFormPDF = ({ contentRef }) => {
           managerEmpID: managerEmpID,
         }));
 
-        // Step 2: If managerEmpID is set, fetch manager's official email from empPIData
         if (managerEmpID && managerEmpID.length > 0) {
+      
+          const lastManagerEmpID = managerEmpID[managerEmpID.length - 1];
+          console.log("Last managerEmpID:", lastManagerEmpID); 
+        
           const managerInfo = empPIData.find(
-            (data) => data.empID === String(managerEmpID[0])
+            (data) => data.empID === String(lastManagerEmpID)
           );
+        
           if (managerInfo) {
+            console.log("Found manager info:", managerInfo);
+        
             setManagerData((prevData) => ({
               ...prevData,
               managerOfficialMail: managerInfo.officialEmail,
               managerName: managerInfo.name,
             }));
+          } else {
+            console.log("Manager info not found in empPIData for last managerEmpID:", lastManagerEmpID);
           }
         }
-
+        
         const generalManagerPositions = workInfoData?.filter((item) =>
           item?.position?.[item?.position?.length - 1]?.includes(
             "GENERAL MANAGER"

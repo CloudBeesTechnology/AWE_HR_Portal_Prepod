@@ -24,7 +24,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 
 const client = generateClient();
 
-export const ReviewForm = React.forwardRef(
+export const ReviewForm = (
   ({ candidate, onClose, showDecisionButtons }) => {
     const { IVSSDetails, empPDData, educDetailsData } = useContext(DataSupply);
     const [isScheduleOpen, setIsScheduleOpen] = useState(false);
