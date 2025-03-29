@@ -14,6 +14,21 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
     }
   }, [formData]);
 
+  // const handleChange = (event) => {
+  //   event.persist(); // Prevent React from clearing the event
+
+  //   console.log(event.target.value);
+
+  //   if (!event.target) {
+  //     console.error("Event target is undefined");
+  //     return;
+  //   }
+  //   // console.log(event.target.name);
+    
+  //   setSelectedValue(event.target.value);
+  //   handleInputChange(event.target.name, event.target.value); // Ensure `name` is passed to update formData
+  // };
+
   return (
     <div className="w-full mx-auto mt-5">
       {/* Additional Information Section */}
@@ -354,6 +369,8 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
           </div>
         </div>
       </div>
+
+    
     </div>
   );
 };

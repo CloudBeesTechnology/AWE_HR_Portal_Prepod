@@ -21,6 +21,7 @@ export const LbdKpi = () => {
     "department",
     "Other Department",
     "Position",
+    "Other Position",
     "Upgrade Position",
     "contact No",
     "Brunei I/C No",
@@ -29,6 +30,8 @@ export const LbdKpi = () => {
     "Passport No",
     "IMMIGRATION REFERENCE NUMBER",
     "Pass Expiry",
+    "Company Name of Previous Employment",
+    "Previous Employment Period",
     "EDUCATION LEVEL",
     "CV RECEIVED FROM",
   ]);
@@ -56,7 +59,18 @@ export const LbdKpi = () => {
     // console.log(data);
 
     return data
-    .filter((item) => item.doj)
+    .filter((item) =>
+      {
+        if (!item.doj) return false; // Exclude items without DOJ
+        
+        if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
+            const lastWorkStatus = item.workStatus[item.workStatus.length - 1].toUpperCase();
+            if (lastWorkStatus === "TERMINATION" || lastWorkStatus === "RESIGNATION") {
+                return false; // Exclude items with TERMINATION or RESIGNATION
+            }
+        }
+        return true;
+    })
     .map((item) => ({
     
         empID: item.empID || "-",
@@ -76,6 +90,9 @@ export const LbdKpi = () => {
       position: Array.isArray(item.position)
         ? item.position[item.position.length - 1]
         : "-",
+        otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
+          : "-",
                 upgradePosition: Array.isArray(item.upgradePosition)
           ? formatDate(item.upgradePosition[item.upgradePosition.length - 1])
           : "-",
@@ -92,6 +109,8 @@ export const LbdKpi = () => {
         passExpiry: Array.isArray(item.empPassExp)
           ? formatDate(item.empPassExp[item.empPassExp.length - 1])
           : "-",
+          preEmp: item.preEmp || "-",
+      preEmpPeriod: item.preEmpPeriod || "-",
         educLevel: item.educLevel || "-",
         agent: item.agent || "-",
         rawDateOfJoin: new Date(item.doj), // Raw date for sorting
@@ -114,6 +133,15 @@ const handleDate = (e, type) => {
   
     const filtered = allData
       .filter((data) => {
+        if (!Array.isArray(data.workStatus) || data.workStatus.length === 0) {
+          return false; // Return early if workStatus is undefined or an empty array
+      }
+      
+      const lastWorkStatus = data.workStatus[data.workStatus.length - 1]; // Now it's safe
+      
+      if (lastWorkStatus?.toUpperCase() === "TERMINATION" || lastWorkStatus?.toUpperCase() === "RESIGNATION") {
+          return false; // Exclude records with TERMINATION or RESIGNATION
+      }
         const doj = data.doj ? new Date(data.doj) : null;
   
         if (!doj || isNaN(doj.getTime())) return false;
@@ -142,6 +170,9 @@ const handleDate = (e, type) => {
     position: Array.isArray(item.position)
       ? item.position[item.position.length - 1]
       : "-",
+      otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
+          : "-",
             upgradePosition: Array.isArray(item.upgradePosition)
         ? formatDate(item.upgradePosition[item.upgradePosition.length - 1])
         : "-",
@@ -155,6 +186,8 @@ const handleDate = (e, type) => {
       passExpiry: Array.isArray(item.empPassExp)
         ? formatDate(item.empPassExp[item.empPassExp.length - 1])
         : "-",
+      preEmp: item.preEmp || "-",
+      preEmpPeriod: item.preEmpPeriod || "-",
       educLevel: item.educLevel || "-",
       agent: item.agent || "-",
       // rawDateOfJoin: new Date(item.doj), // Raw date for sorting

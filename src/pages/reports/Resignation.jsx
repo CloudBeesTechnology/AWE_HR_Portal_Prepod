@@ -18,6 +18,7 @@ export const Resignation = () => {
     "Department",
     "Other Department",
     "Position",
+    "Other Position",
     "Date of Resignation",
     "Reason of Resignation",
   ]);
@@ -58,6 +59,9 @@ export const Resignation = () => {
           : "-",
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
+          : "-",
+          otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
         resignDate: formatDate(item.resignDate) || "-", // Display formatted resignDate
         rawResignDate: new Date(item.resignDate), // Add raw date for sorting
@@ -114,6 +118,9 @@ export const Resignation = () => {
           : "-",
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
+          : "-",
+          otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
         resignDate: formatDate(item.resignDate) || "-",
         rawResignDate: new Date(item.resignDate), // Add raw date for sorting

@@ -19,6 +19,7 @@ export const EmpPE = () => {
     "Department",
     "Other Department",
     "Position",
+    "Other Position",
     "Pass Expiry",
   ]);
 
@@ -61,6 +62,12 @@ export const EmpPE = () => {
         );
       })
       .filter((item) => {
+        if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
+          const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Get last element
+        
+          if (lastWorkStatus.toUpperCase() === "TERMINATION" || lastWorkStatus.toUpperCase() === "RESIGNATION") {
+            return false; // Exclude items with TERMINATION or RESIGNATION
+          }}
         const lastPassExp = item.empPassExp[item.empPassExp.length - 1];
         return isInNextMonth(lastPassExp);
       })
@@ -81,6 +88,9 @@ export const EmpPE = () => {
           : "-",
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
+          : "-",
+          otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
           passExpiry: DateFormat(lastPassExp) || "-",
         };
@@ -111,6 +121,15 @@ export const EmpPE = () => {
 
     const filtered = allData
       .filter((data) => {
+        if (!Array.isArray(data.workStatus) || data.workStatus.length === 0) {
+          return false; // Return early if workStatus is undefined or an empty array
+      }
+      
+      const lastWorkStatus = data.workStatus[data.workStatus.length - 1]; // Now it's safe
+      
+      if (lastWorkStatus?.toUpperCase() === "TERMINATION" || lastWorkStatus?.toUpperCase() === "RESIGNATION") {
+          return false; // Exclude records with TERMINATION or RESIGNATION
+      }
         const expiryArray = data.empPassExp || [];
         const expiryDate = expiryArray.length
           ? new Date(expiryArray[expiryArray.length - 1])
@@ -141,6 +160,9 @@ export const EmpPE = () => {
           : "-",
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
+          : "-",
+          otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
           passExpiry: DateFormat(lastPassExp) || "-",
         };

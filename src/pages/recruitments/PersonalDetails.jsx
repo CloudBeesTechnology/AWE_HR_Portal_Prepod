@@ -14,8 +14,7 @@ export const PersonalDetails = () => {
   const { empPDData } = useContext(DataSupply);
   const location = useLocation();
   const applicationData = location.state?.FormData;
-  console.log(applicationData,"11111111");
-  
+console.log(applicationData);
 
   useEffect(() => {
     window.scrollTo({
@@ -457,7 +456,7 @@ export const PersonalDetails = () => {
                 )}
               />
 
-              {familyDetails.isNew && (
+              {familyDetails[index].isNew && (
                 <button
                   type="button"
                   onClick={() => {

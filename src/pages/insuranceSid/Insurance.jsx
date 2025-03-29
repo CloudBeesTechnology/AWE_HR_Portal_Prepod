@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { FaRegMinusSquare } from "react-icons/fa";
+import { FaArrowLeft, FaRegMinusSquare } from "react-icons/fa";
 import { CiSquarePlus } from "react-icons/ci";
 import { FormField } from "../../utils/FormField";
 import { AddInsuranceSchema } from "../../services/EmployeeValidation";
@@ -9,6 +9,7 @@ import { SpinLogo } from "../../utils/SpinLogo";
 import { generateClient } from "@aws-amplify/api";
 import { createInsuranceType } from "../../graphql/mutations";
 import { listInsuranceTypes } from "../../graphql/queries";
+import { Link } from "react-router-dom";
 
 export const Insurance = () => {
   const client = generateClient();
@@ -114,6 +115,17 @@ export const Insurance = () => {
 
   return (
     <section>
+      <div className="w-full flex items-center justify-between gap-5 px-10">
+        <Link to="/dashboard" className="text-xl flex-1 text-grey">
+          <FaArrowLeft />
+        </Link>
+        <p className="flex-1 text-center mt-2 text_size_2 uppercase">
+          Insurance Type
+        </p>
+        <div className="flex-1">
+        
+        </div>
+      </div>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="mx-auto  pt-2 px-10 mt-10 bg-[#F5F6F1CC]"
@@ -188,14 +200,14 @@ export const Insurance = () => {
       {error && <p className="text-center mt-10 text-red-600">{error}</p>}
 
       <div className="mt-20">
-        <p className="text-xl font-bold mb-10 p-3 rounded-lg border-2 border-[#FEF116] bg-[#FFFEF4] w-[250px]">
+        <p className="text-xl font-bold mb-10 p-3 rounded-lg border-2 border-[#FEF116] bg-[#FFFEF4] w-[270px] text-center">
           View Insurance Info
         </p>
 
         {insuranceData.length > 0 ? (
           <div className=" h-[400px] overflow-y-auto scrollBar">
             <table className="w-full text-center">
-              <thead className=" bg-[#939393] text-white">
+              <thead className=" bg-[#939393] text-white sticky top-0">
                 <tr>
                   <th className="pl-4 py-4 rounded-tl-lg">Insurance Type</th>
                   <th className="pl-4 py-4 rounded-tr-lg">

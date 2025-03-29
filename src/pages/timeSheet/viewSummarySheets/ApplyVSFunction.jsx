@@ -99,7 +99,6 @@ export const ApplyVSFunction = ({
           }
         });
 
-        
         const leaveStatusData = leaveStatuses;
         // const leaveStatusData = dummyLeaveStatus;
 
@@ -211,19 +210,19 @@ export const ApplyVSFunction = ({
         const seperatedGroupedData =
           groupByEmpIdAndLocation(seperatedEmpByDate);
 
-        seperatedGroupedData.forEach((item) => {
-          if (Array.isArray(item.data)) {
-            item.data.forEach((dataEntry) => {
-              if (Array.isArray(dataEntry.empWorkInfo)) {
-                dataEntry.empWorkInfo.forEach((workInfo) => {
-                  if (!workInfo.WORKINGHRS) {
-                    workInfo.WORKINGHRS = "A";
-                  }
-                });
-              }
-            });
-          }
-        });
+        // seperatedGroupedData.forEach((item) => {
+        //   if (Array.isArray(item.data)) {
+        //     item.data.forEach((dataEntry) => {
+        //       if (Array.isArray(dataEntry.empWorkInfo)) {
+        //         dataEntry.empWorkInfo.forEach((workInfo) => {
+        //           if (!workInfo.WORKINGHRS) {
+        //             workInfo.WORKINGHRS = "A";
+        //           }
+        //         });
+        //       }
+        //     });
+        //   }
+        // });
 
         const merged = mergedData.flatMap((val) => {
           const matches = approvedLeaveStatus.filter(
@@ -267,15 +266,40 @@ export const ApplyVSFunction = ({
           });
         });
 
+        //         Annual Leave
+        // Sick Leave
+        // Hospitalisation Leave
+        // Compassionate Leave
+        // Marriage Leave
+        // Compensate Leave
+        // Paternity Leave      [Male]
+        // Maternity Leave     [Female]
+        // Unpaid Authorize - Sick
+        // Unpaid Authorize - Annual
+        // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        // Compassionate Leave - CL
+        // . Marriage Leave - CL
+        // . Hospitalization Leave -SL
+        // . Maternity Leave - CL
+        // . Paternity Leave - CL
+        // . Unpaid Unauthorised Sick Leave - UAL
+
         const leaveTypeAbbreviation = {
           "Annual Leave": "AL",
           "Compensate Leave": "CL",
           "Unpaid Authorize - Annual": "UAL",
           "Sick Leave": "SL",
+          "Hospitalisation Leave": "SL",
+          "Compassionate Leave": "CL",
+          "Marriage Leave": "CL",
+          "Paternity Leave": "CL",
+          "Maternity Leave": "CL",
+          "Unpaid Authorize - Sick": "UAL",
+          "Unpaid Unauthorised Sick Leave": "UAL",
         };
 
         const isHalfDayLeave = (abbreviation) =>
-          ["HAL", "HCL", "HUAL", "HSL"].some((prefix) =>
+          ["HAL", "HCL", "HUAL", "HSL", "HCL"].some((prefix) =>
             abbreviation?.startsWith?.(prefix)
           );
 
@@ -460,12 +484,27 @@ export const ApplyVSFunction = ({
             }
 
             if (checkEntry) {
+              const result = parseFloat(entry?.normalWorkHrs) / 2;
               if (isNaN(checkEntry) || !checkEntry) {
                 acc[dayStr] = checkEntry;
+              } else if (
+                dayOfWeek === "Saturday" &&
+                result === parseFloat(checkEntry)
+              ) {
+                const salaryType =
+                  workInfoData?.salaryType[
+                    workInfoData?.salaryType.length - 1
+                  ]?.toLowerCase();
+
+                const monthlyTypes = ["monthly", "month", "m"];
+
+                if (monthlyTypes.includes(salaryType)) {
+                  acc[dayStr] = "HPHD";
+                }
               } else {
                 const workingHrs = parseFloat(checkEntry);
-
-                if (workingHrs < (entry?.normalWorkHrs || 0)) {
+              
+                if (workingHrs <= (entry?.normalWorkHrs || 0)) {
                   const absence = (
                     (entry?.normalWorkHrs || 0) - workingHrs
                   ).toFixed(1);
@@ -480,7 +519,7 @@ export const ApplyVSFunction = ({
             } else if (leaveType) {
               acc[dayStr] = leaveType;
             } else if (dayOfWeek === "Saturday") {
-              const result = parseFloat(entry?.normalWorkHrs) / 2;
+              // const result = parseFloat(entry?.normalWorkHrs) / 2;
 
               const salaryType =
                 workInfoData?.salaryType[
@@ -494,8 +533,6 @@ export const ApplyVSFunction = ({
                 acc[dayStr] = "PHD";
               } else if (!checkEntry && dailyTypes.includes(salaryType)) {
                 acc[dayStr] = "OFF";
-              } else if (result === parseFloat(checkEntry)) {
-                acc[dayStr] = "HPHD";
               } else {
                 acc[dayStr] = checkEntry;
               }
@@ -569,6 +606,9 @@ export const ApplyVSFunction = ({
               data.workingHrs,
               keysToCount
             );
+            holidaysAndAbsent["PHD"] +=
+              Object.values(data.workingHrs).filter((value) => value === "HPHD")
+                .length * 0.5;
 
             const countLeaveTypes = () => {
               let newLeaveCount = {
@@ -821,7 +861,7 @@ export const ApplyVSFunction = ({
             assignUpdaterDateTime: assignUpdaterDateTime,
           };
         }).filter(Boolean);
-
+        
         await ProcessedDataFunc(transformedData);
       };
       if (convertedStringToArrayObj && convertedStringToArrayObj.length > 0) {

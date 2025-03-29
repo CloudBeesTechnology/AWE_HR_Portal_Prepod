@@ -25,10 +25,11 @@ export const ContractReview = () => {
     "Department",
     "Other Department",
     "Position",
+    "Other Position",
     "Contract Start Date",
     "Contract End Date",
     "LD Expiry",
-    "Duration of Renewal Contract",
+    // "Duration of Renewal Contract",
     "Form",
   ];
 
@@ -89,6 +90,12 @@ export const ContractReview = () => {
     // Process and sort the data
     const sortedData = data
       .filter((item) => {
+        if ( Array.isArray(item.workStatus) && item.workStatus.length > 0) {
+          const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Get last element
+        
+          if (lastWorkStatus.toUpperCase() === "TERMINATION" || lastWorkStatus.toUpperCase() === "RESIGNATION") {
+            return false; // Exclude items with TERMINATION or RESIGNATION
+          }   }
         const contractEndDates = item.contractEnd || [];
         if (!Array.isArray(contractEndDates) || contractEndDates.length === 0) {
           return false;
@@ -123,12 +130,15 @@ export const ContractReview = () => {
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
           : "-",
+          otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
+          : "-",
           contractStartDate: formatDate(startDate) || "-",
           contractEndDate: formatDate(lastDate) || "-",
           nlmsEmpApproval: Array.isArray(item.nlmsEmpValid)
           ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
           : "-",
-          contractRenewalDuration: calculateBalanceMonths(startDate, lastDate),
+          // contractRenewalDuration: calculateBalanceMonths(startDate, lastDate),
         };
       })
       .sort((a, b) => a.lastDate - b.lastDate); // Sort using lastDate
@@ -177,6 +187,17 @@ export const ContractReview = () => {
     // Filter the data based on the date range
     const filtered = allData
       .filter((item) => {
+
+        if (!Array.isArray(item.workStatus) || item.workStatus.length === 0) {
+          return false; // Return early if workStatus is undefined or an empty array
+      }
+      
+      const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Now it's safe
+      
+      if (lastWorkStatus?.toUpperCase() === "TERMINATION" || lastWorkStatus?.toUpperCase() === "RESIGNATION") {
+          return false; // Exclude records with TERMINATION or RESIGNATION
+      }
+
         if (!item.contStatus) {
           const expiryArray = item.contractEnd || [];
           const expiryDate = expiryArray.length
@@ -215,12 +236,15 @@ export const ContractReview = () => {
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
           : "-",
+          otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
+          : "-",
           contractStartDate: formatDate(startDate) || "-",
           contractEndDate: formatDate(lastDate) || "-",
           nlmsEmpApproval: Array.isArray(item.nlmsEmpValid)
           ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
           : "-",
-          contractRenewalDuration: calculateBalanceMonths(startDate, lastDate),
+          // contractRenewalDuration: calculateBalanceMonths(startDate, lastDate),
         };
       }) .sort((a, b) => a.lastDate - b.lastDate) // Sort by lastDate
       .map(({ lastDate, ...rest }) => rest); // Remove lastDate after sorting

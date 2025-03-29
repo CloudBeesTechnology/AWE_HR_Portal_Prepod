@@ -37,6 +37,111 @@ export const ViewSummary = () => {
     setData(data);
     setSecondaryData(data);
   };
+
+  const updateGroupedData = async (updatedData, object) => {
+    let ExcelfileType = ["BLNG", "Offshore", "Offshore's ORMC"];
+
+    const updatedGrouped = data?.map((val) => {
+      const today = new Date();
+      // Update 'grouped' array where 'fidNo' or 'empBadgeNo' matches
+      const updatedGroupedItems = val.grouped.map((group) => {
+        if (
+          (group.fidNo &&
+            updatedData.fidNo &&
+            String(group.fidNo) === String(updatedData.fidNo)) ||
+          (group.empBadgeNo &&
+            updatedData.empBadgeNo &&
+            String(group.empBadgeNo) === String(updatedData.empBadgeNo))
+        ) {
+          return {
+            ...group,
+            data: group.data.map((obj) =>
+              new Date(obj.date).toLocaleDateString() ===
+              new Date(updatedData.date).toLocaleDateString()
+                ? updatedData
+                : obj
+            ),
+          };
+        }
+        return group;
+      });
+
+      function separateByJobCode(data) {
+        let result = [];
+        data.forEach((entry) => {
+          entry.empWorkInfo.forEach((workInfo) => {
+            let newEntry = { ...entry, empWorkInfo: [workInfo] };
+            result.push(newEntry);
+          });
+        });
+        return result;
+      }
+
+      const separatedData = separateByJobCode([updatedData]);
+      let updatedDataArray = [...val.data]; // Preserve existing data
+      let getJobcode = val.jobcode;
+
+      const matchingEntries = separatedData.filter((entry) =>
+        entry.empWorkInfo.some((info) => info.JOBCODE === getJobcode)
+      );
+
+      if (matchingEntries.length > 0) {
+        updatedDataArray = [...updatedDataArray, ...matchingEntries]; // Add matching entries
+      }
+
+      let isSapNoMatch = false;
+      let isEmpBadgeNoMatch = false;
+
+      // Update working hrs
+      if (ExcelfileType.includes(val?.firstFileType)) {
+        isSapNoMatch =
+          object?.sapNo &&
+          val.sapNo &&
+          String(object?.sapNo) === String(val.sapNo);
+      } else {
+        isEmpBadgeNoMatch =
+          object?.badgeNo &&
+          val.empBadgeNo &&
+          String(object?.badgeNo) === String(val.empBadgeNo);
+      }
+
+      let updatedFields = {};
+
+      if (
+        (isEmpBadgeNoMatch || isSapNoMatch) &&
+        object.jobcode === val.jobcode &&
+        object.location === val.location
+      ) {
+        updatedFields = {
+          getVerify: { ...val.getVerify, [object.workingHrsKey]: "Yes" },
+          assignUpdaterDateTime: {
+            ...val.assignUpdaterDateTime,
+            [object.workingHrsKey]: today,
+          },
+          workingHrs: {
+            ...val.workingHrs,
+            [object.workingHrsKey]: object.workingHrs,
+          },
+          OVERTIMEHRS: {
+            ...val.OVERTIMEHRS,
+            [object.workingHrsKey]: object.overtimeHrs,
+          },
+        };
+      }
+
+      return {
+        ...val,
+        grouped: updatedGroupedItems,
+        data: updatedDataArray, // Assign updated data
+        ...updatedFields,
+      };
+    });
+
+    setData(updatedGrouped);
+    setSecondaryData(updatedGrouped);
+    setLoadingMess(true);
+  };
+
   const {
     convertedStringToArrayObj,
     loading,
@@ -49,6 +154,7 @@ export const ViewSummary = () => {
     selectedLocation,
     ProcessedDataFunc
   );
+
 
   useEffect(() => {
     if (startDate) {
@@ -83,20 +189,10 @@ export const ViewSummary = () => {
   };
 
   const assignWhrslocaly = async (responseData, object) => {
-   
     object?.data?.forEach((input) => {
       const [month, day, year] = input.date.split("/");
       const formattedDate = `${parseInt(day)}-${parseInt(month)}-${year}`;
 
-      // let existingObj = data?.filter(
-      //   (obj) =>
-      //     (obj.empBadgeNo &&
-      //       input.empBadgeNo &&
-      //       String(obj.empBadgeNo) === String(input.empBadgeNo)) ||
-      //     (obj.sapNo &&
-      //       input.fidNo &&
-      //       String(obj.sapNo) === String(input.fidNo))
-      // );
       let ExcelfileType = ["BLNG", "Offshore", "Offshore's ORMC"];
       let existingObj = data?.filter((obj) => {
         let result = ExcelfileType.includes(obj?.firstFileType);
@@ -111,9 +207,25 @@ export const ViewSummary = () => {
             const formattedWorkingHrsKey = `${parseInt(mDay)}/${parseInt(
               mMonth
             )}/${mYear}`;
+            let ExcelfileType = ["BLNG", "Offshore", "Offshore's ORMC"];
+            let result = ExcelfileType.includes(object?.firstFileType);
+            const matchedData =
+              result === true
+                ? entry?.sapNo &&
+                  object?.sapNo &&
+                  String(entry?.sapNo) === String(object?.sapNo)
+                : entry?.empBadgeNo &&
+                  object?.badgeNo &&
+                  String(entry?.empBadgeNo) === String(object?.badgeNo);
+            // new Date(m.date) === new Date(formattedWorkingHrsKey) &&
+            // new Date(formattedWorkingHrsKey) === new Date(input.date)
+
             if (
-              m.date === formattedWorkingHrsKey &&
-              formattedWorkingHrsKey === input.date
+              new Date(m.date).toLocaleDateString() ===
+                new Date(formattedWorkingHrsKey).toLocaleDateString() &&
+              new Date(formattedWorkingHrsKey).toLocaleDateString() ===
+                new Date(input.date).toLocaleDateString() &&
+              matchedData
             ) {
               if (Array.isArray(input.empWorkInfo)) {
                 const parsedEmpWorkInfo = input.empWorkInfo.flatMap((info) =>
@@ -146,8 +258,11 @@ export const ViewSummary = () => {
   const FinalEditedData = async (getObject) => {
     setLoadingMess(false);
 
-    const { resData, object, newresData } = await UpdateViewSummary(getObject);
+    const { resData, object, newresData, resDataForJobcode } =
+      await UpdateViewSummary(getObject, updateGroupedData);
 
+    // console.log("resData : ", resData);
+    // console.log("newresData : ", newresData);
     const {
       badgeNo,
       data: objectData,
@@ -191,7 +306,9 @@ export const ViewSummary = () => {
             const formattedDate = `${parseInt(day)}-${parseInt(month)}-${year}`;
 
             const isMatchingBadgeOrSap = isEmpBadgeNoMatch || isSapNoMatch;
-            const isMatchingDate = formattedDate === workingHrsKey;
+            const isMatchingDate =
+              new Date(formattedDate).toLocaleDateString() ===
+              new Date(workingHrsKey).toLocaleDateString();
             const isMatchingId = getId.id === pickObj.id;
             const isWorkingHrsPresent =
               obj.workingHrs?.hasOwnProperty(workingHrsKey);

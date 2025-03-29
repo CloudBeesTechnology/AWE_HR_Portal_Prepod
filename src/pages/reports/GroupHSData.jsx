@@ -19,6 +19,7 @@ export const GroupHSData = () => {
     "Department",
     "Other Department",
     "Position",
+    "Other Position",
     "Group H&S Insurance",
     "Group H&S Insurance Enrollment Effective Date",
     "Group H&S Insurance Enrollment End Date",
@@ -36,7 +37,13 @@ export const GroupHSData = () => {
   // Generate table body dynamically from mergedData
   const probationReviewMergedData = (data) => {
     return data
-    .filter((item) => {      
+    .filter((item) => {   
+      if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
+        const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Get last element
+      
+        if (lastWorkStatus.toUpperCase() === "TERMINATION" || lastWorkStatus.toUpperCase() === "RESIGNATION") {
+          return false; // Exclude items with TERMINATION or RESIGNATION
+        }}   
       // Ensure groupInsEffectDate is a valid array with non-empty and valid date entries
       return (
         Array.isArray(item.groupInsEffectDate) &&
@@ -62,6 +69,9 @@ export const GroupHSData = () => {
           : "-",
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
+          : "-",
+          otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
         groupIns: item.groupIns || "-",
         groupInsEffectDate: Array.isArray(item.groupInsEffectDate)
@@ -94,6 +104,15 @@ export const GroupHSData = () => {
      const end = type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
  
      const filtered = allData.filter((data) => {
+      if (!Array.isArray(data.workStatus) || data.workStatus.length === 0) {
+        return false; // Return early if workStatus is undefined or an empty array
+    }
+    
+    const lastWorkStatus = data.workStatus[data.workStatus.length - 1]; // Now it's safe
+    
+    if (lastWorkStatus?.toUpperCase() === "TERMINATION" || lastWorkStatus?.toUpperCase() === "RESIGNATION") {
+        return false; // Exclude records with TERMINATION or RESIGNATION
+    }
        const expiryArray = data.groupInsEffectDate || [];
        const expiryDate = expiryArray.length
          ? new Date(expiryArray[expiryArray.length - 1])
@@ -121,6 +140,9 @@ export const GroupHSData = () => {
           : "-",
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
+          : "-",
+          otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
         groupIns: item.groupIns || "-",
         groupInsEffectDate: Array.isArray(item.groupInsEffectDate)

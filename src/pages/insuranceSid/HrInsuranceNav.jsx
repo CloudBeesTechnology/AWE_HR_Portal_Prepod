@@ -2,11 +2,10 @@ import { useState, useEffect, useContext } from "react";
 import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
 
 export const HrInsuranceNav = () => {
-
-
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [activeNavTab, setActiveNavTab] = useState("insurance");
   const [searchResultData, setSearchResultData] = useState([]);
+  const [empID, setEmpID] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -17,7 +16,6 @@ export const HrInsuranceNav = () => {
     });
   }, []);
 
- 
   const handleNext = () => {
     switch (activeNavTab) {
       case "insurance":
@@ -74,10 +72,14 @@ export const HrInsuranceNav = () => {
     }
   }, [location]);
 
-//   const searchResult = (result) => {
-//     setSearchResultData(result);
-//   };
+  //   const searchResult = (result) => {
+  //     setSearchResultData(result);
+  //   };
 
+  const requiredPermissions = ["Insurance"];
+
+  const access = "Insurance";
+  
   return (
     <section className="w-full bg-[#F5F6F1]">
       <div className="relative mx-auto p-5 h-full">
@@ -89,72 +91,46 @@ export const HrInsuranceNav = () => {
         <div className="flex justify-between border-b m-4 text-[16px] font-semibold">
           <button
             className={`py-2 px-4 focus:outline-none ${
-              activeNavTab === "insurance"
-                ? "border-b-8 border-yellow"
-                : ""
+              activeNavTab === "insurance" ? "border-b-8 border-yellow" : ""
             }`}
-            onClick={() =>
-              handleTabClick("insurance", "/insuranceHr")
-            }
+            onClick={() => handleTabClick("insurance", "/insuranceHr")}
           >
             Insurance Type
           </button>
           <button
             className={`py-2 px-4 focus:outline-none ${
-              activeNavTab === "groupHS"
-                ? "border-b-8 border-yellow"
-                : ""
+              activeNavTab === "groupHS" ? "border-b-8 border-yellow" : ""
             }`}
-            onClick={() =>
-              handleTabClick(
-                "groupHS",
-                "/insuranceHr/groupHS"
-              )
-            }
+            onClick={() => handleTabClick("groupHS", "/insuranceHr/groupHS")}
           >
             GroupH&S
           </button>
           <button
             className={`py-2 px-4 focus:outline-none ${
-              activeNavTab === "workmenComp"
-                ? "border-b-8 border-yellow"
-                : ""
+              activeNavTab === "workmenComp" ? "border-b-8 border-yellow" : ""
             }`}
             onClick={() =>
-              handleTabClick(
-                "workmenComp",
-                "/insuranceHr/workmenComp"
-              )
+              handleTabClick("workmenComp", "/insuranceHr/workmenComp")
             }
           >
             Workmen Compensation
           </button>
           <button
             className={`py-2 px-4 focus:outline-none ${
-              activeNavTab === "travelling"
-                ? "border-b-8 border-yellow"
-                : ""
+              activeNavTab === "travelling" ? "border-b-8 border-yellow" : ""
             }`}
             onClick={() =>
-              handleTabClick(
-                "travelling",
-                "/insuranceHr/travelling"
-              )
+              handleTabClick("travelling", "/insuranceHr/travelling")
             }
           >
             Travelling
           </button>
           <button
             className={`py-2 px-4 focus:outline-none ${
-              activeNavTab === "personalAcci"
-                ? "border-b-8 border-yellow"
-                : ""
+              activeNavTab === "personalAcci" ? "border-b-8 border-yellow" : ""
             }`}
             onClick={() =>
-              handleTabClick(
-                "personalAcci",
-                "/insuranceHr/personalAcci"
-              )
+              handleTabClick("personalAcci", "/insuranceHr/personalAcci")
             }
           >
             Personal Accident
@@ -166,10 +142,7 @@ export const HrInsuranceNav = () => {
                 : ""
             }`}
             onClick={() =>
-              handleTabClick(
-                "insuranceClaim",
-                "/insuranceHr/insuranceClaim"
-              )
+              handleTabClick("insuranceClaim", "/insuranceHr/insuranceClaim")
             }
           >
             Insurance Claim
@@ -178,7 +151,16 @@ export const HrInsuranceNav = () => {
 
         {/* Render Child Components */}
         <div>
-          <Outlet context={{ activeNavTab, handleNext, searchResultData }} />
+          <Outlet
+            context={{
+              access,
+              requiredPermissions,
+              empID,
+              activeNavTab,
+              handleNext,
+              searchResultData,
+            }}
+          />
         </div>
       </div>
     </section>

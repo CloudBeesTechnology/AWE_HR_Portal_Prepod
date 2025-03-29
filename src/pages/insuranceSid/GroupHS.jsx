@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormField } from "../../utils/FormField";
@@ -7,9 +7,9 @@ import { SpinLogo } from "../../utils/SpinLogo";
 import { GroupHSSchema } from "../../services/EmployeeValidation";
 import { uploadDocs } from "../../services/uploadsDocsS3/UploadDocs";
 import { generateClient } from "@aws-amplify/api";
-import { createGroupHandS } from "../../graphql/mutations";
+import { createGroupHandS, updateGroupHandS } from "../../graphql/mutations";
 import { listGroupHandS } from "../../graphql/queries";
-import { FaTimes, FaDownload, FaPrint } from "react-icons/fa";
+import { FaTimes, FaDownload, FaPrint, FaEdit } from "react-icons/fa";
 import { Document, Page } from "react-pdf";
 import { pdfjs } from "react-pdf";
 import { getUrl } from "@aws-amplify/storage";
@@ -19,12 +19,21 @@ import { handleDeleteFile } from "../../services/uploadsDocsS3/DeleteDocs";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { DeletePopup } from "../../utils/DeletePopup";
+import { IoSearch } from "react-icons/io5";
+import { FaArrowLeft } from "react-icons/fa";
+import { DataSupply } from "../../utils/DataStoredContext";
+import { Link } from "react-router-dom";
+import { InsSearch } from "./InsSearch";
+import { useDeleteAccess } from "../../hooks/useDeleteAccess";
+import { GoUpload } from "react-icons/go";
+import { MdCancel } from "react-icons/md";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
   import.meta.url
 ).toString();
 export const GroupHS = () => {
+  const { empPIData, groupHSData } = useContext(DataSupply);
   const client = generateClient();
   const [isUploading, setIsUploading] = useState({
     groupHSUpload: false,
@@ -46,6 +55,11 @@ export const GroupHS = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [numPages, setNumPages] = useState(null);
   const [lastUploadUrl, setPPLastUP] = useState("");
+  const [allEmpDetails, setAllEmpDetails] = useState([]);
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [searchResultData, setSearchResultData] = useState([]);
+  const [empID, setEmpID] = useState("");
+  const { formattedPermissions } = useDeleteAccess();
 
   const {
     register,
@@ -147,11 +161,12 @@ export const GroupHS = () => {
       console.error(err);
     }
   };
+
   const handleDeleteMsg = () => {
     setdeletePopup(!deletePopup);
   };
 
-  const deleteFile = async (fileType, fileName) => {
+  const deleteFile = async (fileType, fileName, fileIndex) => {
     // console.log(fileType, fileName);
 
     try {
@@ -161,15 +176,17 @@ export const GroupHS = () => {
         return;
       }
 
-      const isDeleted = await handleDeleteFile(fileType, fileName, groupHSNo);
       const isDeletedArrayUploaded = await DeleteGroupUp(
         fileType,
         fileName,
+        fileIndex,
         groupHSNo,
         setUploadedFileNames,
         setUploadGHsU,
         setIsUploading
       );
+
+      const isDeleted = await handleDeleteFile(fileType, fileName, groupHSNo);
 
       if (!isDeleted || isDeletedArrayUploaded) {
         console.error(
@@ -187,17 +204,209 @@ export const GroupHS = () => {
     }
   };
 
+  useEffect(() => {
+    const userID = localStorage.getItem("userID");
+    setEmpID(userID);
+    // console.log("Navbar: User ID from localStorage:", userID);
+  }, []);
+
+  const onSubmit = async (data) => {
+    // console.log("data121", data);
+
+    try {
+      const checkingDITable = groupHSData.find(
+        (match) => match.id === searchResultData.id
+      );
+
+      console.log(checkingDITable);
+
+      if (checkingDITable) {
+        // Update case: Prepare the update data and perform the update
+        const updatedGHSValue = {
+          ...data,
+          id: checkingDITable.id,
+          groupHSUpload: JSON.stringify(uploadGHsU.groupHSUpload),
+        };
+        // console.log("update value logs:", updatedGHSValue);
+
+        const totalData = {
+          id: updatedGHSValue.id,
+          groupHSExp: updatedGHSValue.groupHSExp,
+          groupHSNo: updatedGHSValue.groupHSNo,
+          groupHSUpload: updatedGHSValue.groupHSUpload,
+        };
+        const response = await client.graphql({
+          query: updateGroupHandS,
+          variables: { input: totalData },
+        });
+
+        // Optionally, show a success notification
+        setNotification(true);
+      } else {
+        // Create case: Prepare the new data and perform the create
+        const GHSreValue = {
+          ...data,
+          groupHSUpload: JSON.stringify(uploadGHsU.groupHSUpload),
+        };
+
+        const response = await client.graphql({
+          query: createGroupHandS,
+          variables: { input: GHSreValue },
+        });
+
+        // console.log("Successfully submitted data:", GHSreValue);
+        // Optionally, show a success notification
+        setNotification(true);
+      }
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchInsuranceData = async () => {
+      try {
+        let allInsuranceData = [];
+        let nextToken = null;
+
+        do {
+          const response = await client.graphql({
+            query: listGroupHandS,
+            variables: {
+              nextToken: nextToken,
+            },
+          });
+
+          const items = response?.data?.listGroupHandS?.items || [];
+
+          allInsuranceData = [...allInsuranceData, ...items];
+
+          nextToken = response?.data?.listGroupHandS?.nextToken;
+        } while (nextToken);
+
+        const filteredData = allInsuranceData.filter((data) => {
+          const expiryDate = new Date(data.groupHSExp);
+          return expiryDate >= new Date();
+        });
+
+        setInsuranceData(filteredData);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching insurance data:", error);
+        setError("insuranceData", { message: "Error fetching data" });
+        setLoading(false);
+      }
+    };
+
+    fetchInsuranceData();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const mergedData = empPIData
+          .map((emp) => {
+            const groupHSDetails = groupHSData
+              ? groupHSData.find((user) => user.empID === emp.empID)
+              : {};
+            return {
+              ...emp,
+              ...groupHSDetails,
+            };
+          })
+          .filter(Boolean);
+
+        setAllEmpDetails(mergedData);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchData();
+  }, [empPIData, groupHSData]);
+
+  const searchResult = (result) => {
+    console.log(result);
+    setSearchResultData(result);
+  };
+
+  const getFileName = (input) => {
+    if (typeof input === "object" && input.upload) {
+      const filePath = input.upload;
+      const decodedUrl = decodeURIComponent(filePath);
+      return decodedUrl.substring(decodedUrl.lastIndexOf("/") + 1);
+    }
+
+    try {
+      const urlObj = new URL(input);
+      const filePath = urlObj.pathname;
+      const decodedUrl = decodeURIComponent(filePath);
+      return decodedUrl.substring(decodedUrl.lastIndexOf("/") + 1);
+    } catch (e) {
+      if (typeof input === "string") {
+        const decodedUrl = decodeURIComponent(input);
+        return decodedUrl.substring(decodedUrl.lastIndexOf("/") + 1);
+      }
+      return undefined;
+    }
+  };
+
+  useEffect(() => {
+    setValue("id", searchResultData.id);
+    setValue("groupHSNo", searchResultData.groupHSNo);
+    setValue("groupHSExp", searchResultData.groupHSExp);
+
+    const fields = [
+      "createdAt",
+      "updatedAt",
+      "groupHSExp",
+      "groupHSNo",
+      "groupHSUpload",
+    ];
+
+    fields.forEach((field) => setValue(field, searchResultData[field]));
+
+    if (searchResultData && searchResultData.groupHSUpload) {
+      try {
+        const parsedArray = JSON.parse(searchResultData.groupHSUpload[0]);
+
+        const parsedFiles = parsedArray.map((item) =>
+          typeof item === "string" ? JSON.parse(item) : item
+        );
+
+        setValue("groupHSUpload", parsedFiles);
+
+        setUploadGHsU((prev) => ({
+          ...prev,
+          groupHSUpload: parsedFiles,
+        }));
+
+        setUploadedFileNames((prev) => ({
+          ...prev,
+          groupHSUpload: parsedFiles.map((file) => getFileName(file.upload)),
+        }));
+      } catch (error) {
+        console.error(
+          `Failed to parse ${searchResultData.groupHSUpload}:`,
+          error
+        );
+      }
+    }
+  }, [searchResultData, setValue]);
+
+  //----------------------------------printing section-------------------------------------------------------------------
+
   const handlePrint = useReactToPrint({
     content: () => groupPrint.current,
     onBeforePrint: () => console.log("Preparing to print PDF..."),
     onAfterPrint: () => console.log("Print complete"),
     pageStyle: `
-        @page {
-            /* Adjust the margin as necessary */
-          height:  714px;
-          padding: 22px, 0px, 22px, 0px;     
-        }
-      `,
+          @page {
+              /* Adjust the margin as necessary */
+            height:  714px;
+            padding: 22px, 0px, 22px, 0px;     
+          }
+        `,
   });
 
   const openModal = (uploadUrl) => {
@@ -345,76 +554,46 @@ export const GroupHS = () => {
     );
   };
 
-  const onSubmit = async (data) => {
-    // console.log("data", data);
+  //-------------------------------printing section------------------------------------------------------------------------------
 
-    try {
-      const GHSreValue = {
-        ...data,
-        groupHSUpload: JSON.stringify(uploadGHsU.groupHSUpload),
-      };
-      // console.log(GHSreValue);
+  const requiredPermissions = ["Insurance"];
 
-      const response = await client.graphql({
-        query: createGroupHandS,
-        variables: { input: GHSreValue },
-      });
-
-      // console.log("Successfully submitted data:", response);
-      setNotification(true);
-    } catch (error) {
-      console.error("Error submitting data:", error);
-    }
-  };
-
-  useEffect(() => {
-    const fetchInsuranceData = async () => {
-      try {
-        let allInsuranceData = [];
-        let nextToken = null;
-
-        do {
-          const response = await client.graphql({
-            query: listGroupHandS,
-            variables: {
-              nextToken: nextToken,
-            },
-          });
-
-          const items = response?.data?.listGroupHandS?.items || [];
-
-          allInsuranceData = [...allInsuranceData, ...items];
-
-          nextToken = response?.data?.listGroupHandS?.nextToken;
-        } while (nextToken);
-
-        const filteredData = allInsuranceData.filter((data) => {
-          const expiryDate = new Date(data.groupHSExp);
-          return expiryDate >= new Date();
-        });
-
-        setInsuranceData(filteredData);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching insurance data:", error);
-        setError("insuranceData", { message: "Error fetching data" });
-        setLoading(false);
-      }
-    };
-
-    fetchInsuranceData();
-  }, []);
+  const access = "Insurance";
 
   return (
-    <section>
+    <section
+      onClick={() => {
+        setFilteredEmployees([]);
+      }}
+    >
+      <div className="w-full flex items-center justify-between gap-5 px-10">
+        <Link to="/dashboard" className="text-xl flex-1 text-grey">
+          <FaArrowLeft />
+        </Link>
+        <p className="flex-1 text-center mt-2 text_size_2 uppercase">
+          Group H&S Insurance
+        </p>
+        <div className="flex-1">
+          <InsSearch
+            searchResult={searchResult}
+            newFormData={groupHSData}
+            searchIcon2={<IoSearch />}
+            placeholder="Policy Number"
+            rounded="rounded-lg"
+            empID={empID}
+            filteredEmployees={filteredEmployees}
+            setFilteredEmployees={setFilteredEmployees}
+          />
+        </div>{" "}
+      </div>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="mx-auto py-5 px-10 my-10 bg-[#F5F6F1CC]"
       >
         {/* Group H&S Insurance Fields */}
-        <h3 className="mb-5 text-lg font-bold">Group H&S Insurance</h3>
+        {/* <h3 className="mb-5 text-lg font-bold">Group H&S Insurance</h3> */}
         <div className="relative mb-5">
-          <div className="grid grid-cols-3 gap-4 items-center">
+          <div className="grid grid-cols-2 gap-4 items-center">
             <FormField
               name="groupHSNo"
               type="text"
@@ -431,17 +610,91 @@ export const GroupHS = () => {
               errors={errors}
             />
             <div className="mb-2 relative">
-              <FileUpload
-                label="Upload File"
-                onChangeFunc={(e) => handleFileChange(e, "groupHSUpload")}
-                handleFileChange={handleFileChange}
-                uploadedFileNames={uploadedFileNames}
-                isUploading={isUploading}
-                deleteFile={deleteFile}
-                register={register}
-                name="groupHSUpload"
-                error={errors}
-              />
+              <div className="flex flex-col">
+                {/* <label className="text_size_5">groupHSUpload</label> */}
+
+                {/* File Input Label */}
+                <label
+                  onClick={() => {
+                    if (isUploading["groupHSUpload"]) {
+                      alert(
+                        "Please delete the previously uploaded file before uploading a new one."
+                      );
+                    }
+                  }}
+                  className={`mt-2 flex items-center px-3 py-3 text_size_7 bg-lite_skyBlue border border-[#dedddd] rounded cursor-pointer`}
+                >
+                  <input
+                    type="file"
+                    className="hidden"
+                    {...register}
+                    accept=".pdf, .jpg, .jpeg, .png"
+                    onChange={(e) => handleFileChange(e, "groupHSUpload")}
+                    disabled={isUploading["groupHSUpload"]}
+                  />
+                  <span className="ml-2  w-full font-normal flex justify-between items-center gap-10">
+                    Upload
+                    <GoUpload />
+                  </span>
+                </label>
+
+                {/* Display Uploaded File Names */}
+                {uploadedFileNames["groupHSUpload"] && (
+                  <p className="text-grey text-sm my-1">
+                    {Array.isArray(uploadedFileNames["groupHSUpload"]) ? (
+                      uploadedFileNames["groupHSUpload"]
+                        .slice()
+                        .map((fileName, fileIndex) => (
+                          <span
+                            key={fileIndex}
+                            className="mt-2 flex justify-between items-center"
+                          >
+                            {fileName}
+                            {formattedPermissions?.deleteAccess?.[access]?.some(
+                              (permission) =>
+                                requiredPermissions.includes(permission)
+                            ) && (
+                              <button
+                                type="button"
+                                className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                                onClick={() =>
+                                  deleteFile(
+                                    "groupHSUpload",
+                                    fileName,
+                                    fileIndex
+                                  )
+                                }
+                              >
+                                <MdCancel />
+                              </button>
+                            )}
+                          </span>
+                        ))
+                    ) : (
+                      <span className="mt-2 flex justify-between items-center">
+                        {uploadedFileNames["groupHSUpload"]}
+                        <button
+                          type="button"
+                          className="ml-2 text-[16px] font-bold text-[#F24646] hover:text-[#F24646] focus:outline-none"
+                          onClick={
+                            () =>
+                              deleteFile(
+                                "groupHSUpload",
+                                uploadedFileNames["groupHSUpload"],
+                                0
+                              ) // Pass index 0 if only one file
+                          }
+                        >
+                          <MdCancel />
+                        </button>
+                      </span>
+                    )}
+                  </p>
+                )}
+
+                {/* Display Error Message */}
+                {/* {error && <p className="text-[red] text-[12px] mt-1">{error.message}</p>} */}
+              </div>
             </div>
           </div>
         </div>
@@ -470,7 +723,7 @@ export const GroupHS = () => {
         ) : insuranceData.length > 0 ? (
           <div className=" h-[400px] overflow-y-auto scrollBar">
             <table className="w-full text-center ">
-              <thead className="bg-[#939393] text-white ">
+              <thead className="bg-[#939393] text-white sticky top-0">
                 <tr>
                   <th className="pl-4 py-4 rounded-tl-lg">Policy Number</th>
                   <th className="pl-4 py-4">Expiry Date</th>

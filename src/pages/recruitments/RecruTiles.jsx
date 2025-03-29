@@ -21,42 +21,49 @@ export const RecruTiles = () => {
       setSelectedTile("/Apply Employee Requisition");
       setTempID(null);
       localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("profileStore");
       localStorage.removeItem('personalFormData');
       localStorage.removeItem('educationFormData');
     } else if (location.pathname.includes("/employreq")) {
       setSelectedTile("Employee Requisition");
       setTempID(null);
       localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("profileStore");
       localStorage.removeItem('personalFormData');
       localStorage.removeItem('educationFormData');
     } else if (location.pathname.includes("/candidate")) {
       setSelectedTile("Candidate");
       setTempID(null);
       localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("profileStore");
       localStorage.removeItem('personalFormData');
       localStorage.removeItem('educationFormData');
     } else if (location.pathname.includes("/localcandi")) {
       setSelectedTile("Local CV");
       setTempID(null);
       localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("profileStore");
       localStorage.removeItem('personalFormData');
       localStorage.removeItem('educationFormData');
     } else if (location.pathname.includes("/nonloccandi")) {
       setSelectedTile("Non Local CV");
       setTempID(null);
       localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("profileStore");
       localStorage.removeItem('personalFormData');
       localStorage.removeItem('educationFormData');
     } else if (location.pathname.includes("/status")) {
       setSelectedTile("Status");
       setTempID(null);
       localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("profileStore");
       localStorage.removeItem('personalFormData');
       localStorage.removeItem('educationFormData');
     } else if (location.pathname.includes("/workpasstracking")) {
       setSelectedTile("WorkPass Tracking");
       setTempID(null);
       localStorage.removeItem('applicantFormData');
+      localStorage.removeItem("profileStore");
       localStorage.removeItem('personalFormData');
       localStorage.removeItem('educationFormData');
     }

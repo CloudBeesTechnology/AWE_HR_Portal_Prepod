@@ -18,6 +18,8 @@ import { DeleteClaim } from "./DeleteUpload/DeleteClaim";
 import { MdCancel } from "react-icons/md";
 import { useDeleteAccess } from "../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../utils/DeletePopup";
+import { Link } from "react-router-dom";
+import { FaArrowLeft } from "react-icons/fa";
 
 export const InsuranceClaim = () => {
   useEffect(() => {
@@ -422,46 +424,55 @@ export const InsuranceClaim = () => {
   console.log(parsedClaims);
 
   return (
-    <div
-      className="bg-[#F5F6F1CC] mx-auto p-2 py-10"
-      onClick={() => {
-        setFilteredEmployees([]);
-      }}
-    >
-      <div className="flex ">
-        <SearchDisplay
-          searchResult={searchResult}
-          newFormData={allEmpDetails}
-          searchIcon2={<IoSearch />}
-          placeholder="Employee Id"
-          rounded="rounded-lg"
-          filteredEmployees={filteredEmployees}
-          setFilteredEmployees={setFilteredEmployees}
-        />
-      </div>
-      <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex justify-end items-center">
-          <div className="max-w-sm">
-            <label className="text_size_6">Employee ID</label>
-            <input
-              type="text"
-              className="input-field"
-              placeholder="Enter Employee ID"
-              {...register("empID")}
-            />
-            {errors.empID && (
-              <p className="text-[red] text-[12px]">{errors.empID.message}</p>
-            )}
-          </div>
+    <>
+      <div className="w-full flex items-center justify-between gap-5 px-10">
+        <Link to="/dashboard" className="text-xl flex-1 text-grey">
+          <FaArrowLeft />
+        </Link>
+        <p className="flex-1 text-center mt-2 text_size_2 uppercase">
+          Insurance Claim
+        </p>
+        <div className="flex-1">
+          <SearchDisplay
+            searchResult={searchResult}
+            newFormData={allEmpDetails}
+            searchIcon2={<IoSearch />}
+            placeholder="Employee Id"
+            rounded="rounded-lg"
+            filteredEmployees={filteredEmployees}
+            setFilteredEmployees={setFilteredEmployees}
+          />
         </div>
+      </div>
+      <div
+        className="bg-[#F5F6F1CC] mx-auto p-2 py-10 px-10"
+        onClick={() => {
+          setFilteredEmployees([]);
+        }}
+      >
+        <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
+          <div className="flex justify-end items-center">
+            <div className="max-w-sm">
+              <label className="text_size_6">Employee ID</label>
+              <input
+                type="text"
+                className="w-full h-[45px] bg-lite_skyBlue pl-3 mt-2 border outline-none border-[#dedddd] rounded pr-10"
+                placeholder="Enter Employee ID"
+                {...register("empID")}
+              />
+              {errors.empID && (
+                <p className="text-[red] text-[12px]">{errors.empID.message}</p>
+              )}
+            </div>
+          </div>
 
-        <button
-          type="button"
-          onClick={handleAddFileClick}
-          className="absolute  right-3 mt-28 text-medium_grey text-[25px]"
-        >
-          <FiPlusSquare className="mr-1" />
-        </button>
+          <button
+            type="button"
+            onClick={handleAddFileClick}
+            className="absolute  right-3 mt-28 text-medium_grey text-[25px] px-10"
+          >
+            <FiPlusSquare className="mr-1" />
+          </button>
 
         {parsedClaims?.length > 0 &&
           parsedClaims?.map((field, index) => 
@@ -626,23 +637,27 @@ export const InsuranceClaim = () => {
           )
          })}
 
-        <div className="md:col-span-2 flex justify-center mt-10">
-          <button type="submit" className="primary_btn">
-            Save
-          </button>
-        </div>
+          <div className="md:col-span-2 flex justify-center mt-10">
+            <button type="submit" className="primary_btn">
+              Save
+            </button>
+          </div>
 
-        {notification && (
-          <SpinLogo
-            text={showTitle}
-            notification={notification}
-            path="/insuranceHr/insuranceClaim"
+          {notification && (
+            <SpinLogo
+              text={showTitle}
+              notification={notification}
+              path="/insuranceHr/insuranceClaim"
+            />
+          )}
+        </form>
+        {deletePopup && (
+          <DeletePopup
+            handleDeleteMsg={handleDeleteMsg}
+            title1={deleteTitle1}
           />
         )}
-      </form>
-      {deletePopup && (
-        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
-      )}
-    </div>
+      </div>
+    </>
   );
 };

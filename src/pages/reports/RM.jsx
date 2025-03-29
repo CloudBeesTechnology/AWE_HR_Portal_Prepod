@@ -22,6 +22,7 @@ export const RM = () => {
     "Date of Join",
     "Nationality",
     "Position",
+    "Other Position",
     "Department",
     "Other Department",
     "Contact No",
@@ -108,7 +109,9 @@ export const RM = () => {
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
           : "-",
-          
+          otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
+          : "-",
         department: Array.isArray(item.department)
           ? item.department[item.department.length - 1]
           : "-",
@@ -173,7 +176,7 @@ export const RM = () => {
         //   : "-",
         // PreviousEmployment: item.preEmp || "-",
       }));
-    // console.log(data.interDate);
+    console.log(data.interDate);
 
     return sortedData;
   };
@@ -231,6 +234,9 @@ export const RM = () => {
         nationality: item.nationality || "-",
         position: Array.isArray(item.position)
           ? item.position[item.position.length - 1]
+          : "-",
+          otherPosition: Array.isArray(item.otherPosition)
+          ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
         department: Array.isArray(item.department)
           ? item.department[item.department.length - 1]

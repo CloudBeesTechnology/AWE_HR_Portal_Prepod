@@ -11,6 +11,14 @@ import { getUrl } from "@aws-amplify/storage";
 import { useTempID } from "../../utils/TempIDContext";
 import avatar from "../../assets/navabar/avatar.jpeg";
 
+import {
+  ContractTypeDD,
+  GenderDD,
+  MaritalDD,
+  NationalityDD,
+  RaceDD,
+  ReligionDD,
+} from "../../utils/DropDownMenus";
 
 export const ApplicantDetails = () => {
   const { empPDData,dropDownVal,educDetailsData} = useContext(DataSupply);
@@ -37,14 +45,16 @@ export const ApplicantDetails = () => {
     watch,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(ApplicantSchema), 
-    defaultValues: {}, 
+    resolver: yupResolver(ApplicantSchema),
+    defaultValues: {},
   });
   const [uploadedDocs, setUploadedDocs] = useState({ profilePhoto: null });
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
   const [profilePreview, setProfilePreview] = useState("");
-  const [uploadedFileNames, setUploadedFileNames] = useState({ profilePhoto: null });
+  const [uploadedFileNames, setUploadedFileNames] = useState({
+    profilePhoto: null,
+  });
 
   const linkToImageFile = async (pathUrl) => {
     const result = await getUrl({
@@ -52,22 +62,20 @@ export const ApplicantDetails = () => {
     });
     setImageUrl(result.url.toString());
   };
-  
+
   const profile = watch("profilePhoto");
-// console.log(tempID);
+  // console.log(tempID);
 
   useEffect(() => {
- 
-    const savedData = JSON.parse(localStorage.getItem("applicantFormData"));
+    const savedData = JSON.parse(localStorage.getItem("profileStore"));
     if (savedData) {
-      
       Object.keys(savedData).forEach(async (key) => {
         if (key === "profilePhoto" && savedData[key]) {
           try {
             const result = await getUrl({ path: savedData[key] });
             const imageUrl = result.url.toString();
             setProfilePreview(imageUrl);
-            setValue(key, imageUrl); 
+            setValue(key, imageUrl);
           } catch (error) {
             console.error(`Error setting value for ${key}:`, error);
           }
@@ -78,11 +86,12 @@ export const ApplicantDetails = () => {
     } else {
       // console.log('No saved data in localStorage');
     }
-  
+
     const handleBeforeUnload = () => {
       localStorage.removeItem("applicantFormData");
+      localStorage.removeItem("profileStore");
     };
-  
+
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
@@ -120,9 +129,25 @@ export const ApplicantDetails = () => {
     };
 
     const selectedFields = [
-      "age", "agent", "chinese", "cob", "contractType", "dob", "email",
-      "empType", "gender", "marital", "name", "nationality", "otherNation",
-      "otherRace", "otherReligion", "position", "profilePhoto", "race", "religion"
+      "age",
+      "agent",
+      "chinese",
+      "cob",
+      "contractType",
+      "dob",
+      "email",
+      "empType",
+      "gender",
+      "marital",
+      "name",
+      "nationality",
+      "otherNation",
+      "otherRace",
+      "otherReligion",
+      "position",
+      "profilePhoto",
+      "race",
+      "religion",
     ];
 
     if (tempID) {
@@ -130,7 +155,6 @@ export const ApplicantDetails = () => {
         const interviewData = empPDData.find((data) => data.tempID === tempID);
         if (interviewData) {
           selectedFields.forEach((key) => {
-         
             if (
               key === "familyDetails" ||
               key === "workExperience" ||
@@ -142,7 +166,7 @@ export const ApplicantDetails = () => {
               ) {
                 let parsedData = parseDetails(interviewData[key][0]);
                 if (parsedData.length > 0) {
-                  setValue(key, parsedData);       
+                  setValue(key, parsedData);
                 }
               }
             } else if (interviewData[key]) {
@@ -159,55 +183,67 @@ export const ApplicantDetails = () => {
             }));
             setValue("profilePhoto", interviewData.profilePhoto);
           }
-
         } else {
           // console.log("No interview data found for tempID:", tempID);
         }
-      } 
-    } 
-  }, [tempID, setValue, empPDData]); 
+      }
+    }
+  }, [tempID, setValue, empPDData]);
 
-  const handleFileChange = (e) => {
+  //   const handleFileChange = (e) => {
+  //     const selectedFile = e.target.files[0];
+  //     const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+
+  //     if (!selectedFile) return;
+  //     if (!allowedTypes.includes(selectedFile.type)) {
+  //       alert("Upload must be an image (JPG, JPEG, PNG)");
+  //       return;
+  //     }
+
+  //     setProfilePhoto(selectedFile);
+  //     setValue("profilePhoto", selectedFile);
+  // // console.log(selectedFile,"selectedFile");
+
+  //     setUploadedFileNames((prev) => ({
+  //       ...prev,
+  //       profilePhoto: selectedFile.name,
+  //     }));
+
+  //     const savedData = JSON.parse(localStorage.getItem("applicantFormData")) || {};
+  //     savedData.profilePhoto = selectedFile.name;
+  //     // console.log( savedData.profilePhoto,"saveData");
+  //     // console.log(selectedFile.name,"selectedFile.name");
+
+  //     localStorage.setItem("applicantFormData", JSON.stringify(savedData));
+  //   };
+
+  const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
     const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
 
-    if (!selectedFile) return;
-    if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Upload must be an image (JPG, JPEG, PNG)");
-      return;
+    if (selectedFile) {
+      setProfilePhoto(selectedFile);
+      setValue("profilePhoto", selectedFile);
+      await uploadDocString(
+        selectedFile,
+        "profilePhoto",
+        setUploadedDocs,
+        "Employee"
+      );
     }
-
-    setProfilePhoto(selectedFile);
-    setValue("profilePhoto", selectedFile);
-// console.log(selectedFile,"selectedFile");
-
-    setUploadedFileNames((prev) => ({
-      ...prev,
-      profilePhoto: selectedFile.name,
-    }));    
-
-    const savedData = JSON.parse(localStorage.getItem("applicantFormData")) || {};
-    savedData.profilePhoto = selectedFile.name;
-    // console.log( savedData.profilePhoto,"saveData");
-    // console.log(selectedFile.name,"selectedFile.name");
-    
-    
-    localStorage.setItem("applicantFormData", JSON.stringify(savedData));
   };
 
   useEffect(() => {
-
     if (uploadedDocs.profilePhoto) {
-      linkToImageFile(uploadedDocs.profilePhoto); 
+      linkToImageFile(uploadedDocs.profilePhoto);
     }
   }, [uploadedDocs.profilePhoto]);
-
 
   const onSubmit = async (data) => {
     try {
       const applicationUpdate = {
         ...data,
-        profilePhoto:profilePhoto,
+        profilePhoto: profilePhoto,
         uploadedFileNames: uploadedFileNames.profilePhoto,
       };
 
@@ -216,10 +252,20 @@ export const ApplicantDetails = () => {
         JSON.stringify(applicationUpdate)
       );
 
+      const profileStore = {
+        ...data,
+        profilePhoto: uploadedDocs.profilePhoto,
+      };
+
+      localStorage.setItem(
+        "profileStore",
+        JSON.stringify(profileStore)
+      );
+
+      console.log("APP", applicationUpdate);
       navigate("/addCandidates/personalDetails", {
         state: { FormData: applicationUpdate },
       });
-
     } catch (error) {
       console.log(error);
     }
@@ -279,7 +325,9 @@ export const ApplicantDetails = () => {
                     ? imageUrl
                     : profilePhoto
                     ? URL.createObjectURL(profilePhoto)
-                    : uploadedDocs.profilePhoto ? profilePreview : profilePreview || avatar
+                    : uploadedDocs.profilePhoto
+                    ? profilePreview
+                    : profilePreview || avatar
                 }
                 id="previewImg"
                 alt="profile"
@@ -287,7 +335,10 @@ export const ApplicantDetails = () => {
                 onError={(e) => (e.target.src = avatar)}
               />
 
-              {(profilePreview || profilePhoto || uploadedDocs.profilePhoto || imageUrl) && (
+              {(profilePreview ||
+                profilePhoto ||
+                uploadedDocs.profilePhoto ||
+                imageUrl) && (
                 <div
                   className="absolute top-24 -right-3 bg-lite_grey p-[2px] rounded-full cursor-pointer"
                   onClick={() => document.getElementById("fileInput").click()}
@@ -297,17 +348,20 @@ export const ApplicantDetails = () => {
               )}
             </div>
 
-            {!profilePreview && !profilePhoto && !uploadedDocs.profilePhoto && !imageUrl && (
-              <div className="mt-1 rounded-lg text-center">
-                <button
-                  type="button"
-                  className="text_size_6"
-                  onClick={() => document.getElementById("fileInput").click()}
-                >
-                  Choose Image
-                </button>
-              </div>
-            )}
+            {!profilePreview &&
+              !profilePhoto &&
+              !uploadedDocs.profilePhoto &&
+              !imageUrl && (
+                <div className="mt-1 rounded-lg text-center">
+                  <button
+                    type="button"
+                    className="text_size_6"
+                    onClick={() => document.getElementById("fileInput").click()}
+                  >
+                    Choose Image
+                  </button>
+                </div>
+              )}
 
             {errors.profilePhoto && (
               <p className="text-[red] text-[13px] text-center">
@@ -325,7 +379,7 @@ export const ApplicantDetails = () => {
             { label: "Chinese characters (if applicable)", name: "chinese", type: "text" },
             { label: "Gender", name: "gender", type: "select", options: ["Male", "Female"] },
             { label: "Date of Birth", name: "dob", type: "date" },
-            { label: "Age", name: "age", type: "number", min: 20, max: 99 },  // Modified for age input
+            { label: "Age", name: "age", type: "number", min: 20, max: 99 },
             { label: "Email ID", name: "email", type: "email" },
             { label: "Marital Status", name: "marital", type: "select", options: ["Single", "Married", "Widow", "Separate", "Divorce"] },
             { label: "Country of Birth", name: "cob", type: "text" },
@@ -359,8 +413,8 @@ export const ApplicantDetails = () => {
                   disabled={field.disabled}
                   min={field.min}
                   max={field.max}
-                  className="input-field"
-                /> // border border-[#EAEAEA]
+                  className="mt-2 p-2 text_size_7 bg-lite_skyBlue border border-[#dedddd] text-dark_grey   outline-none rounded w-full"
+                />
               )}
               {errors[field.name] && (
                 <p className="text-[red] text-[13px]">{errors[field.name]?.message}</p>
@@ -374,7 +428,6 @@ export const ApplicantDetails = () => {
             Next
           </button>
         </div>
-
       </form>
     </section>
   );

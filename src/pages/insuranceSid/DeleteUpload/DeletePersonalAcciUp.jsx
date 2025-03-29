@@ -1,48 +1,60 @@
-import React from 'react'
+export const DeletePersonalAcciUp = (
+  fileType,
+  fileName,
+  fileIndex,
+  perAccNo,
+  setUploadedFileNames,
+  setUploadPAU,
+  setIsUploading
+) => {
+  try {
+    if (!perAccNo) {
+      return;
+    }
 
-export const DeletePersonalAcciUp = (fileType, fileName, groupHSNo,setUploadedFileNames,setUploadGHsU,setIsUploading) => {
-try{
-    
-    setUploadedFileNames((prev) => {
-        const updatedFiles = { ...prev };
-      
-        if (Array.isArray(updatedFiles[fileType])) {
-          updatedFiles[fileType] = updatedFiles[fileType].filter((name) => name !== fileName);
-        } else if (typeof updatedFiles[fileType] === "string") {
-          // Handle case where fileType is a single string instead of an array
-          if (updatedFiles[fileType] === fileName) {
-            updatedFiles[fileType] = [];
-          }
-        }
-      
-        // Ensure fileType always remains an array, even if empty
+    setUploadPAU((prev) => {
+      const updatedFiles = { ...prev };
+
+      if (Array.isArray(updatedFiles[fileType])) {
+        updatedFiles[fileType] = updatedFiles[fileType].filter(
+          (file, index) => index !== fileIndex
+        );
         if (!updatedFiles[fileType] || updatedFiles[fileType].length === 0) {
-          updatedFiles[fileType] = []; // Set empty array instead of deleting the key
+          updatedFiles[fileType] = [];
         }
-      
-        return updatedFiles;
-      });
-      
-      setUploadGHsU((prev) => {
-        const updatedFiles = { ...prev };
-        if (Array.isArray(updatedFiles[fileType])) {
-          updatedFiles[fileType] = updatedFiles[fileType].filter(
-            (file) =>
-              file.upload !== `public/${fileType}/${groupHSNo}/${fileName}`
-          );
-          if (!updatedFiles[fileType] || updatedFiles[fileType].length === 0) {
-            updatedFiles[fileType] = []; // Assign an empty array instead of deleting the key
-          }
+      }
+
+      return updatedFiles;
+    });
+
+    setUploadedFileNames((prev) => {
+      const updatedFiles = { ...prev };
+
+      if (Array.isArray(updatedFiles[fileType])) {
+        updatedFiles[fileType] = updatedFiles[fileType].filter(
+          (name, index) => index !== fileIndex
+        );
+      } else if (typeof updatedFiles[fileType] === "string") {
+        if (updatedFiles[fileType] === fileName) {
+          updatedFiles[fileType] = [];
         }
-        return updatedFiles;
-      });
-      setIsUploading((prev) => ({
-        ...prev,
-        [fileType]: false,
-      }));
-}catch(error){
-    console.log(error,"deletedarrayUpload in employe info");
-    
-}
-  
-}
+      }
+
+      if (!updatedFiles[fileType] || updatedFiles[fileType].length === 0) {
+        updatedFiles[fileType] = [];
+      }
+
+      return updatedFiles;
+    });
+
+    setIsUploading((prev) => {
+      const updatedState = { ...prev };
+      updatedState[fileType] = false;
+
+      return updatedState;
+    });
+
+  } catch (error) {
+    console.log("Error in delete Personal Accident Insurance function:", error);
+  }
+};
