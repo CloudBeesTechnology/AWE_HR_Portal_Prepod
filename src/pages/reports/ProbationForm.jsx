@@ -27,6 +27,7 @@ export const ProbationForm = forwardRef(() => {
   const [userType, setUserType] = useState("");
   const { ProbFormsData } = ProbFormFun();
   const { UpdateProb } = UpdateProbForm();
+  const [isLoading, setIsLoading] = useState(false);
   const { empPIData, workInfoData, ProbFData } = useContext(DataSupply);
 
   const [emailData, setEmailData] = useState({
@@ -56,7 +57,6 @@ export const ProbationForm = forwardRef(() => {
       commitment: "",
       communication: "",
       deadline: "",
-      extendDate:"",
       diligent: "",
       extensionPeriod: "",
       gmDate: "",
@@ -88,6 +88,7 @@ export const ProbationForm = forwardRef(() => {
       diligentDetails: "",
       createdAt: "",
       commitmentDetails: "",
+      extendDate: "",
     },
   });
   const [notification, setNotification] = useState(false);
@@ -186,7 +187,9 @@ export const ProbationForm = forwardRef(() => {
       }
 
       const generalManagerPositions = workInfoData?.filter((item) =>
-        item?.position?.[item?.position?.length - 1]?.includes("GENERAL MANAGER")
+        item?.position?.[item?.position?.length - 1]?.includes(
+          "GENERAL MANAGER"
+        )
       );
 
       // console.log("Filtered GENERAL MANAGER Positions:", generalManagerPositions);
@@ -195,24 +198,23 @@ export const ProbationForm = forwardRef(() => {
         const gmEmails = [];
         const gmName = [];
 
-          generalManagerPositions?.forEach((gmPosition) => {
-        const gmInfo = empPIData.find(
-          (data) => data.empID === String(gmPosition.empID)
-        );
-        if (gmInfo) {
-          gmEmails.push(gmInfo.officialEmail)
-          gmName.push(gmInfo.name)
-          setEmailData((prevData) => ({
-            ...prevData,
-            gmOfficialMail: gmEmails,
-            gmName: gmName,
-          }));
-          // console.log("Updated Email Data with GM Email:", gmInfo.officialEmail);
-        } else {
-          // console.log("GM Info not found.");
-        }
-      });
-
+        generalManagerPositions?.forEach((gmPosition) => {
+          const gmInfo = empPIData.find(
+            (data) => data.empID === String(gmPosition.empID)
+          );
+          if (gmInfo) {
+            gmEmails.push(gmInfo.officialEmail);
+            gmName.push(gmInfo.name);
+            setEmailData((prevData) => ({
+              ...prevData,
+              gmOfficialMail: gmEmails,
+              gmName: gmName,
+            }));
+            // console.log("Updated Email Data with GM Email:", gmInfo.officialEmail);
+          } else {
+            // console.log("GM Info not found.");
+          }
+        });
       } else {
         // console.log("No General Manager positions found.");
       }
@@ -324,6 +326,7 @@ export const ProbationForm = forwardRef(() => {
   // const to = "hariharanofficial2812@gmail.com"
 
   const onSubmit = async (data) => {
+    setIsLoading(true);
     try {
       const PFDataRecord = ProbFData.find(
         (match) => match.empID === data.empID
@@ -341,29 +344,30 @@ export const ProbationForm = forwardRef(() => {
               .join("/")
           : "Not mentioned";
 
-      
       const subject = "Probation Assessment Review";
-      
-      const notifyMessageSup = `Your Employee Mr./Ms. ${empPIRecord?.name
-      }'s probation period ending on ${probationEndFormatted || "Not Mentioned"} has been ${
-      data?.supervisorApproved || PFDataRecord.supervisorApproved
+
+      const notifyMessageSup = `Your Employee Mr./Ms. ${
+        empPIRecord?.name
+      }'s probation period ending on ${
+        probationEndFormatted || "Not Mentioned"
+      } has been ${
+        data?.supervisorApproved || PFDataRecord?.supervisorApproved
       } by Supervisor, ${emailData?.supervisorName || "Not Mentioned"}.`;
 
-      const notifyMessageManager = `Your Employee Mr./Ms. ${empPIRecord?.name}'s probation period ending on ${
-        probationEndFormatted || "Not Mentioned"
-      }
+      const notifyMessageManager = `Your Employee Mr./Ms. ${
+        empPIRecord?.name
+      }'s probation period ending on ${probationEndFormatted || "Not Mentioned"}
       has been reviewed and ${
-        data?.managerApproved || PFDataRecord.managerApproved
+        data?.managerApproved || PFDataRecord?.managerApproved
       } by the Manager, ${emailData?.managerName || "Not Mentioned"}.`;
-      
-      const notifyMessageGM = `Your Employee Mr./Ms. ${empPIRecord?.name}'s probation period ending on ${
-        probationEndFormatted || "Not Mentioned"
-      }
+
+      const notifyMessageGM = `Your Employee Mr./Ms. ${
+        empPIRecord?.name
+      }'s probation period ending on ${probationEndFormatted || "Not Mentioned"}
       has been reviewed and ${
-        data?.gmApproved || PFDataRecord.gmApproved
+        data?.gmApproved || PFDataRecord?.gmApproved
       } by the General Manager, ${emailData?.managerName || "Not Mentioned"}.`;
 
-      
       const probFields = [
         "adaptability",
         "additionalInfo",
@@ -458,6 +462,9 @@ export const ProbationForm = forwardRef(() => {
         }
 
         await UpdateProb({ PbFDataUp: formattedData });
+        console.log("update", formattedData);
+
+        setIsLoading(false);
 
         setTimeout(() => {
           setNotification(true);
@@ -466,29 +473,20 @@ export const ProbationForm = forwardRef(() => {
 
         // console.log("update", formattedData);
 
-        setTimeout(() => {
-          sendEmails(data, empPIRecord, probationEndFormatted, PFDataRecord, subject, notifyMessageSup, notifyMessageManager, notifyMessageGM);
-        }, 10);
+
+          sendEmails(
+            data,
+            empPIRecord,
+            probationEndFormatted,
+            PFDataRecord,
+            subject,
+            notifyMessageSup,
+            notifyMessageManager,
+            notifyMessageGM
+          );
+   
       } else {
         const ProbValue = { ...data, ...formDataValues, probStatus: true };
-
-        // Check if at least one of the specified fields is filled for supervisor
-        if (
-          userType === "Supervisor" &&
-          !formData.probData.adaptability &&
-          !formData.probData.attitude &&
-          !formData.probData.commitment &&
-          !formData.probData.communication &&
-          !formData.probData.diligent &&
-          !formData.probData.initiative &&
-          !formData.probData.pace &&
-          !formData.probData.quality &&
-          !formData.probData.responsibility &&
-          !formData.probData.teamwork
-        ) {
-          alert("Select at least one value in checkbox!");
-          return;
-        }
 
         if (
           userType === "Supervisor" &&
@@ -500,21 +498,32 @@ export const ProbationForm = forwardRef(() => {
         }
 
         await ProbFormsData({ ProbValue });
+        // console.log("CR");
+
+        setIsLoading(false);
 
         setTimeout(() => {
           setNotification(true);
           setShowTitle("Probation form created successfully");
         }, 300);
 
-        // console.log("create");
-        setTimeout(() => {
-          sendEmails(data, empPIRecord, probationEndFormatted, subject, notifyMessageSup, notifyMessageManager, notifyMessageGM);
-        }, 10);
+        console.log("create");
+          sendEmails(
+            data,
+            empPIRecord,
+            probationEndFormatted,
+            subject,
+            notifyMessageSup,
+            notifyMessageManager,
+            notifyMessageGM
+          );
+  
 
         // console.log("Created", ProbValue);
       }
     } catch (err) {
-      // console.error("Error submitting form:", err);
+      setIsLoading(false);
+      console.error("Error submitting form:", err);
     }
   };
 
@@ -591,19 +600,18 @@ export const ProbationForm = forwardRef(() => {
               );
             }
           }
-      if (Array.isArray(emailData.gmOfficialMail)) {
-        for (let email of emailData.gmOfficialMail) {
-          await createNotification({
-            empID: employeeData.empID,
-            leaveType: subject,
-            message: notifyMessageGM,
-            senderEmail: "hr_no-reply@adininworks.com",
-            receipentEmail: email,
-          });
+          if (Array.isArray(emailData.gmOfficialMail)) {
+            for (let email of emailData.gmOfficialMail) {
+              await createNotification({
+                empID: employeeData.empID,
+                leaveType: subject,
+                message: notifyMessageGM,
+                senderEmail: "hr_no-reply@adininworks.com",
+                receipentEmail: email,
+              });
+            }
+          }
 
-        }
-      }
-        
           // alert(`Email sent successfully to GM's mail: ${emailData.gmOfficialMail}\n\nEmail Content:\nYour Employee Mr./Ms. ${empPIRecord?.name}'s probation period ending on ${probationEndFormatted || "Not Mentioned"}\n\nhas been reviewed and ${data?.managerApproved || PFDataRecord.managerApproved} by the Manager, ${emailData?.managerName || "Not Mentioned"}.`);
         } else {
           await sendEmail(
@@ -651,7 +659,9 @@ export const ProbationForm = forwardRef(() => {
           }</p>
             <p>has been reviewed and ${
               data?.gmApproved || PFDataRecord.gmApproved
-            } by the General Manager, ${emailData?.managerName || "Not Mentioned"}.</p>
+            } by the General Manager, ${
+            emailData?.managerName || "Not Mentioned"
+          }.</p>
             <p>Please proceed with the necessary actions.</p>
             <p>Click here https://hr.adininworks.co to view the updates.</p>
           </body>
@@ -668,7 +678,6 @@ export const ProbationForm = forwardRef(() => {
           receipentEmail: emailData.hrOfficialmail,
         });
 
-
         // alert(`Email sent successfully to HR's mail: ${emailData.hrOfficialmail}\n\nEmail Content:\nYour Employee Mr./Ms. ${empPIRecord?.name || "Not mentioned"}'s probation period ending on ${probationEndFormatted || "Not Mentioned"}\n\nhas been reviewed and ${data?.gmApproved  || PFDataRecord.gmApproved} by the Manager, ${emailData?.managerName || "Not Mentioned"}.\n\nPlease proceed with the necessary actions.`);
       }
     } catch (error) {
@@ -677,6 +686,8 @@ export const ProbationForm = forwardRef(() => {
     }
   };
 
+  console.log(formData);
+  
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -705,7 +716,7 @@ export const ProbationForm = forwardRef(() => {
 
       <div className="mb-10 mt-5">
         <p className="text-md mt-2">
-          For the attention of :{" "}
+          For the attention of:{" "}
           <input
             type="text"
             name="attention"
@@ -716,7 +727,7 @@ export const ProbationForm = forwardRef(() => {
           />
         </p>
         <p className="text-md mt-3">
-          Deadline submit to Human Resources Department by :{" "}
+          Deadline submit to Human Resources Department by:{" "}
           <input
             type="text"
             name="deadline"
@@ -745,6 +756,7 @@ export const ProbationForm = forwardRef(() => {
                 />
               </td>
             </tr>
+
             <tr className="border">
               <td className="p-2 border-r border-b font-semibold">
                 Employee ID
@@ -822,26 +834,16 @@ export const ProbationForm = forwardRef(() => {
                 Extended Probation End Date
               </td>
               <td className="p-2 border-b">
-              <input
-            type="date"
-            name="extendDate"
-            {...register("extendDate")}
-            value={formData.probData.extendDate}
-            onChange={handleInputChange}
-            className=" px-1"
-          />
+                <input
+                  type="date"
+                  name="extendDate"
+                  {...register("extendDate")}
+                  value={formData.probData.extendDate}
+                  onChange={handleInputChange}
+                  className=" px-1"
+                />
               </td>
             </tr>
-            {/* <tr className="border">
-              <td className="p-2 border-r font-semibold">Extended Probation End Date</td>
-              <td className="p-2 border-b">
-              <input
-                {...register("extendedProbationEndDate")}
-                defaultValue={employeeData?.extendedPED || "-"}
-                className="w-full outline-none"
-              />
-            </td>
-            </tr> */}
           </tbody>
         </table>
       </div>
@@ -864,8 +866,13 @@ export const ProbationForm = forwardRef(() => {
       {/* Save Button */}
       <div className="flex items-center justify-center mt-8">
         {userType !== "SuperAdmin" && (
-          <button type="submit" className="primary_btn">
-            Save
+          <button
+            disabled={isLoading}
+            type="submit"
+            className="primary_btn"
+          >
+            {isLoading ? "Loading..." : "Save"}{" "}
+            {/* Show loading text when isLoading is true */}
           </button>
         )}
       </div>

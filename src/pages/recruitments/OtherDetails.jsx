@@ -13,12 +13,13 @@ import { uploadReqString } from "../../services/uploadsDocsS3/UploadDocs";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { useTempID } from "../../utils/TempIDContext";
 import { CandyDetails } from "../../services/updateMethod/UpdatePersonalDetails";
-import { handleDeleteFile } from "../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadApplication } from "../recruitments/deleteDocsRecruit/DeleteUploadApplication";
 import { useDeleteAccess } from "../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../utils/DeletePopup";
+import { handleDeleteFileTemp } from "../../services/uploadsDocsS3/DeleteTempDocs";
 
 const client = generateClient();
+
 export const OtherDetails = ({ fetchedData }) => {
   const { formattedPermissions } = useDeleteAccess();
   const { submitODFunc } = RecODFunc();
@@ -91,40 +92,57 @@ export const OtherDetails = ({ fetchedData }) => {
   useEffect(() => {
     const parseDetails = (data) => {
       try {
+     
         let cleanedData = data.replace(/\\/g, "");
+      
+  
         cleanedData = cleanedData.replace(/'/g, '"');
+       
+  
         cleanedData = cleanedData.replace(
           /([{,])(\s*)([a-zA-Z0-9_]+)(\s*):/g,
           '$1"$3":'
         );
+      
+  
         cleanedData = cleanedData.replace(
           /:([a-zA-Z0-9_/.\s]+)(?=\s|,|\})/g,
           ':"$1"'
         );
+
+  
         if (cleanedData.startsWith('"') && cleanedData.endsWith('"')) {
           cleanedData = cleanedData.slice(1, -1);
+        
         }
-
+  
         const parsedData = JSON.parse(cleanedData);
-
+       
+  
         if (!Array.isArray(parsedData)) {
+         
           return [];
         }
-
+  
         return parsedData;
       } catch (error) {
         console.error("Error parsing details:", error);
         return [];
       }
     };
-
+  
+    
     if (tempID) {
       if (educDetailsData.length > 0) {
         const interviewData = educDetailsData.find(
           (data) => data.tempID === tempID
         );
+  
+     
+  
         if (interviewData) {
-          Object.keys(interviewData).forEach((key) => {
+          Object.keys(interviewData).forEach((key) => {  
+  
             if (
               key === "emgDetails" ||
               key === "referees" ||
@@ -135,31 +153,41 @@ export const OtherDetails = ({ fetchedData }) => {
                 typeof interviewData[key][0] === "string"
               ) {
                 let parsedData = parseDetails(interviewData[key][0]);
+               
                 if (parsedData.length > 0) {
                   setValue(key, parsedData);
                 }
               }
             } else if (interviewData[key]) {
+            // Log value being set
               setValue(key, interviewData[key]);
             }
           });
-
+  
           if (interviewData) {
-            setUploadedFileNames({
-              uploadCertificate: extractFileName(
-                interviewData.uploadCertificate
-              ),
+           
+            setUploadedFileNames((prev) => ({
+              ...prev,
+              uploadCertificate: extractFileName(interviewData.uploadCertificate),
               uploadPp: extractFileName(interviewData.uploadPp),
               uploadResume: extractFileName(interviewData.uploadResume),
-            });
-            setUploadedDocs({
+            }));
+  
+            setUploadedDocs((prev) => ({
+              ...prev,
               uploadCertificate: interviewData.uploadCertificate,
               uploadPp: interviewData.uploadPp,
               uploadResume: interviewData.uploadResume,
-            });
+            }));
           }
+        } else {
+          // console.log("No interview data found for the given tempID.");
         }
+      } else {
+        // console.log("EducDetailsData is empty.");
       }
+    } else {
+      // console.log("TempID is not provided.");
     }
   }, [tempID, setValue, educDetailsData]);
 
@@ -213,37 +241,30 @@ export const OtherDetails = ({ fetchedData }) => {
         return;
       }
 
-      const isDeleted = await handleDeleteFile(fileType, fileName, tempID);
-      if (!isDeleted) {
-        console.error(`Failed to delete file: ${fileName}`);
+      const isDeleted = await handleDeleteFileTemp(fileType, fileName, tempID);
+      const isDeletedArrayUploaded = await DeleteUploadApplication(
+        fileType,
+        fileName,
+        tempID,
+        setUploadedFileNames,
+        setUploadedDocs,
+        setIsUploadingString
+      );
+
+      if (!isDeleted || isDeletedArrayUploaded) {
+        console.error(
+          `Failed to delete file: ${fileName}, skipping UI update.`
+        );
         return;
       }
-
-      // Update the specific file type only
-      setUploadedFileNames(prev => ({
-        ...prev,
-        [fileType]: null
-      }));
-
-      setUploadedDocs(prev => ({
-        ...prev,
-        [fileType]: null
-      }));
-
-      setIsUploadingString(prev => ({
-        ...prev,
-        [fileType]: false
-      }));
-
-      setValue(fileType, null);
-
       setDeleteTitle1(`${fileName}`);
       handleDeleteMsg();
     } catch (error) {
-      console.error("Error processing the file deletion:", error);
       alert("Error processing the file deletion.");
     }
   };
+
+
 
   const getTotalCount = async () => {
     try {
@@ -302,14 +323,26 @@ export const OtherDetails = ({ fetchedData }) => {
     return nextTempID;
   };
 
+  var latestTempIDData
+
   const onSubmit = async (data) => {
+   
+
     try {
       setIsLoading(true);
-      const nextTempID = await fetchNextTempID();
+
+      const isUpdate = data.tempID;
     
-      const personName = nextTempID;
-   
-      const latestTempIDData = personName;
+
+      if (!isUpdate) {
+        const nextTempID = await fetchNextTempID();
+        latestTempIDData = nextTempID
+      }
+
+      const personName = !data.tempID ? latestTempIDData : data.tempID;
+      console.log(personName);
+
+      // const latestTempIDData = personName;
 
       const formattedFamilyDetails = JSON.stringify(
         navigatingEducationData?.familyDetails
@@ -330,30 +363,40 @@ export const OtherDetails = ({ fetchedData }) => {
         navigatingEducationData?.relatives
       );
 
-      const uploadedResume = data.uploadResume instanceof File 
-        ? await uploadReqString(data.uploadResume, "uploadResume", personName)
-        : uploadedDocs.uploadResume;
+      // Initialize upload variables
+      // let uploadedResume = null;
+      // let uploadedCertificate = null;
+      // let uploadedPp = null;
 
-      const uploadedCertificate = data.uploadCertificate instanceof File 
-        ? await uploadReqString(data.uploadCertificate, "uploadCertificate", personName)
-        : uploadedDocs.uploadCertificate;
+      //  Conditional file upload check using isUp state
+    const uploadedResume = isUploadingString.uploadResume
+    ? await uploadReqString(data.uploadResume, "uploadResume", personName)
+    : uploadedDocs?.uploadResume; // Use existing value if no new upload
 
-      const uploadedPp = data.uploadPp instanceof File 
-        ? await uploadReqString(data.uploadPp, "uploadPp", personName)
-        : uploadedDocs.uploadPp;
+  const uploadedCertificate = isUploadingString.uploadCertificate
+    ? await uploadReqString(data.uploadCertificate, "uploadCertificate", personName)
+    : uploadedDocs?.uploadCertificate;
+
+  const uploadedPp = isUploadingString.uploadPp
+    ? await uploadReqString(data.uploadPp, "uploadPp", personName)
+    : uploadedDocs?.uploadPp;
 
       const UpProfilePhoto = await uploadReqString(
         navigatingEducationData.profilePhoto,
         "profilePhoto",
         personName
       );
+      //"Helpp"
       const baseURL =
-        "https://aweadininprod2024954b8-prod.s3.ap-southeast-1.amazonaws.com/";
+        "https://aweadininprod20240d7e6-dev.s3.ap-southeast-1.amazonaws.com/";
+      // const baseURL =
+      //   "https://aweadininprod2024954b8-prod.s3.ap-southeast-1.amazonaws.com/";
 
       const safeReplace = (url) => {
         if (url && !url.includes("undefined")) {
           return url.replace(baseURL, "");
         }
+
         return null;
       };
 
@@ -367,10 +410,10 @@ export const OtherDetails = ({ fetchedData }) => {
         referees: formattedReferees,
         relatives: formattedRelatives,
         status: "Active",
-        profilePhoto: safeReplace(UpProfilePhoto?.replace(baseURL, "")),
-        uploadResume: safeReplace(uploadedResume?.replace(baseURL, "")),
-        uploadCertificate: safeReplace(uploadedCertificate?.replace(baseURL, "")),
-        uploadPp: safeReplace(uploadedPp?.replace(baseURL, "")),
+        profilePhoto: UpProfilePhoto?.replace(baseURL, ""),
+        uploadResume: uploadedResume?.replace(baseURL, ""),
+        uploadCertificate: uploadedCertificate?.replace(baseURL, ""),
+        uploadPp: uploadedPp?.replace(baseURL, ""),
       };
 
       const checkingPDTable = empPDData.find(
@@ -386,17 +429,21 @@ export const OtherDetails = ({ fetchedData }) => {
           PDTableID: checkingPDTable.id,
           EDTableID: checkingEDTable.id,
         };
+       
+
         await candyDetails({ reqValue: updateReqValue });
         setNotification(true);
         setIsLoading(false);
       } else {
+
+
+        console.log({ reqValue, latestTempIDData });
         await submitODFunc({ reqValue, latestTempIDData });
         setNotification(true);
         setIsLoading(false);
       }
     } catch (error) {
       console.error("Error submitting data:", error);
-      setIsLoading(false);
     }
   };
 
