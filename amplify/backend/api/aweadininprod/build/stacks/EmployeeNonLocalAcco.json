@@ -303,6 +303,50 @@
         }
       }
     },
+    "EmployeeNonLocalAccoIAMRoleDefaultPolicy3F7B606E": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:DescribeTable"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "EmployeeNonLocalAccoTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "EmployeeNonLocalAccoIAMRoleDefaultPolicy3F7B606E",
+        "Roles": [
+          {
+            "Ref": "EmployeeNonLocalAccoIAMRole730F2A73"
+          }
+        ]
+      }
+    },
     "EmployeeNonLocalAccoDataSource": {
       "Type": "AWS::AppSync::DataSource",
       "Properties": {

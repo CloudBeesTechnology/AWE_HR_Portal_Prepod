@@ -13,11 +13,10 @@ import { uploadReqString } from "../../services/uploadsDocsS3/UploadDocs";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { useTempID } from "../../utils/TempIDContext";
 import { CandyDetails } from "../../services/updateMethod/UpdatePersonalDetails";
-import { handleDeleteFile } from "../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadApplication } from "../recruitments/deleteDocsRecruit/DeleteUploadApplication";
-import { MdCancel } from "react-icons/md";
 import { useDeleteAccess } from "../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../utils/DeletePopup";
+import { handleDeleteFileTemp } from "../../services/uploadsDocsS3/DeleteTempDocs";
 
 const client = generateClient();
 
@@ -25,13 +24,13 @@ export const OtherDetails = ({ fetchedData }) => {
   const { formattedPermissions } = useDeleteAccess();
   const { submitODFunc } = RecODFunc();
   const [notification, setNotification] = useState(false);
+  const [deletePopup, setDeletePopup] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [deleteTitle1, setDeleteTitle1] = useState("");
+  const [mergedData, setMergedData] = useState([]);
   const { candyDetails } = CandyDetails();
   const location = useLocation();
   const navigatingEducationData = location.state?.FormData;
-  const [deletePopup, setDeletePopup] = useState(false);
-  const [deleteTitle1, setDeleteTitle1] = useState("");
-  const [latestTempIDData, setLatestTempIDData] = useState("");
-  const [mergedData, setMergedData] = useState([]);
   const { tempID } = useTempID();
   const { empPDData, educDetailsData } = useContext(DataSupply);
 
@@ -93,40 +92,57 @@ export const OtherDetails = ({ fetchedData }) => {
   useEffect(() => {
     const parseDetails = (data) => {
       try {
+     
         let cleanedData = data.replace(/\\/g, "");
+      
+  
         cleanedData = cleanedData.replace(/'/g, '"');
+       
+  
         cleanedData = cleanedData.replace(
           /([{,])(\s*)([a-zA-Z0-9_]+)(\s*):/g,
           '$1"$3":'
         );
+      
+  
         cleanedData = cleanedData.replace(
           /:([a-zA-Z0-9_/.\s]+)(?=\s|,|\})/g,
           ':"$1"'
         );
+
+  
         if (cleanedData.startsWith('"') && cleanedData.endsWith('"')) {
           cleanedData = cleanedData.slice(1, -1);
+        
         }
-
+  
         const parsedData = JSON.parse(cleanedData);
-
+       
+  
         if (!Array.isArray(parsedData)) {
+         
           return [];
         }
-
+  
         return parsedData;
       } catch (error) {
         console.error("Error parsing details:", error);
         return [];
       }
     };
-
+  
+    
     if (tempID) {
       if (educDetailsData.length > 0) {
         const interviewData = educDetailsData.find(
           (data) => data.tempID === tempID
         );
+  
+     
+  
         if (interviewData) {
-          Object.keys(interviewData).forEach((key) => {
+          Object.keys(interviewData).forEach((key) => {  
+  
             if (
               key === "emgDetails" ||
               key === "referees" ||
@@ -137,24 +153,26 @@ export const OtherDetails = ({ fetchedData }) => {
                 typeof interviewData[key][0] === "string"
               ) {
                 let parsedData = parseDetails(interviewData[key][0]);
+               
                 if (parsedData.length > 0) {
                   setValue(key, parsedData);
                 }
               }
             } else if (interviewData[key]) {
+            // Log value being set
               setValue(key, interviewData[key]);
             }
           });
-
+  
           if (interviewData) {
+           
             setUploadedFileNames((prev) => ({
               ...prev,
-              uploadCertificate: extractFileName(
-                interviewData.uploadCertificate
-              ),
+              uploadCertificate: extractFileName(interviewData.uploadCertificate),
               uploadPp: extractFileName(interviewData.uploadPp),
               uploadResume: extractFileName(interviewData.uploadResume),
             }));
+  
             setUploadedDocs((prev) => ({
               ...prev,
               uploadCertificate: interviewData.uploadCertificate,
@@ -162,8 +180,14 @@ export const OtherDetails = ({ fetchedData }) => {
               uploadResume: interviewData.uploadResume,
             }));
           }
+        } else {
+          // console.log("No interview data found for the given tempID.");
         }
+      } else {
+        // console.log("EducDetailsData is empty.");
       }
+    } else {
+      // console.log("TempID is not provided.");
     }
   }, [tempID, setValue, educDetailsData]);
 
@@ -217,7 +241,7 @@ export const OtherDetails = ({ fetchedData }) => {
         return;
       }
 
-      const isDeleted = await handleDeleteFile(fileType, fileName, tempID);
+      const isDeleted = await handleDeleteFileTemp(fileType, fileName, tempID);
       const isDeletedArrayUploaded = await DeleteUploadApplication(
         fileType,
         fileName,
@@ -239,6 +263,8 @@ export const OtherDetails = ({ fetchedData }) => {
       alert("Error processing the file deletion.");
     }
   };
+
+
 
   const getTotalCount = async () => {
     try {
@@ -291,14 +317,32 @@ export const OtherDetails = ({ fetchedData }) => {
     return `${prefix}${paddedNextNumber}`;
   };
 
-  const onSubmit = async (data) => {
-    try {
-      const totalCount = await getTotalCount();
-      const nextTempID = generateNextTempID(totalCount);
-      setLatestTempIDData(nextTempID);
+  const fetchNextTempID = async () => {
+    const totalCount = await getTotalCount();
+    const nextTempID = generateNextTempID(totalCount);
+    return nextTempID;
+  };
 
-      const personName = nextTempID;
+  var latestTempIDData
+
+  const onSubmit = async (data) => {
+   
+
+    try {
+      setIsLoading(true);
+
+      const isUpdate = data.tempID;
+    
+
+      if (!isUpdate) {
+        const nextTempID = await fetchNextTempID();
+        latestTempIDData = nextTempID
+      }
+
+      const personName = !data.tempID ? latestTempIDData : data.tempID;
       console.log(personName);
+
+      // const latestTempIDData = personName;
 
       const formattedFamilyDetails = JSON.stringify(
         navigatingEducationData?.familyDetails
@@ -319,28 +363,42 @@ export const OtherDetails = ({ fetchedData }) => {
         navigatingEducationData?.relatives
       );
 
-      const uploadedResume = await uploadReqString(
-        data.uploadResume,
-        "uploadResume",
-        personName
-      );
-      const uploadedCertificate = await uploadReqString(
-        data.uploadCertificate,
-        "uploadCertificate",
-        personName
-      );
-      const uploadedPp = await uploadReqString(
-        data.uploadPp,
-        "uploadPp",
-        personName
-      );
+      // Initialize upload variables
+      // let uploadedResume = null;
+      // let uploadedCertificate = null;
+      // let uploadedPp = null;
+
+      //  Conditional file upload check using isUp state
+    const uploadedResume = isUploadingString.uploadResume
+    ? await uploadReqString(data.uploadResume, "uploadResume", personName)
+    : uploadedDocs?.uploadResume; // Use existing value if no new upload
+
+  const uploadedCertificate = isUploadingString.uploadCertificate
+    ? await uploadReqString(data.uploadCertificate, "uploadCertificate", personName)
+    : uploadedDocs?.uploadCertificate;
+
+  const uploadedPp = isUploadingString.uploadPp
+    ? await uploadReqString(data.uploadPp, "uploadPp", personName)
+    : uploadedDocs?.uploadPp;
+
       const UpProfilePhoto = await uploadReqString(
         navigatingEducationData.profilePhoto,
         "profilePhoto",
         personName
       );
+      //"Helpp"
       const baseURL =
-        "https://aweadininprod2024954b8-prod.s3.ap-southeast-1.amazonaws.com/";
+        "https://aweadininprod20240d7e6-dev.s3.ap-southeast-1.amazonaws.com/";
+      // const baseURL =
+      //   "https://aweadininprod2024954b8-prod.s3.ap-southeast-1.amazonaws.com/";
+
+      const safeReplace = (url) => {
+        if (url && !url.includes("undefined")) {
+          return url.replace(baseURL, "");
+        }
+
+        return null;
+      };
 
       const reqValue = {
         ...data,
@@ -371,14 +429,18 @@ export const OtherDetails = ({ fetchedData }) => {
           PDTableID: checkingPDTable.id,
           EDTableID: checkingEDTable.id,
         };
-        // console.log({reqValue: updateReqValue});
+       
 
         await candyDetails({ reqValue: updateReqValue });
         setNotification(true);
+        setIsLoading(false);
       } else {
-        // console.log({reqValue, latestTempIDData});
+
+
+        console.log({ reqValue, latestTempIDData });
         await submitODFunc({ reqValue, latestTempIDData });
         setNotification(true);
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Error submitting data:", error);
@@ -591,8 +653,8 @@ export const OtherDetails = ({ fetchedData }) => {
         )}
 
         <div className="text-center my-10">
-          <button type="submit" className="primary_btn">
-            Submit
+          <button type="submit" className="primary_btn" disabled={isLoading}>
+            {isLoading ? "Submitting..." : "Submit"}
           </button>
         </div>
       </form>

@@ -30,22 +30,45 @@ export const ListofCandi = () => {
 
   const empTempIDs = empPDData?.map((candidate) => candidate.tempID);
   const ivssTempIDs = IVSSDetails?.map((candidate) => candidate.tempID);
+  const matchedCandidates = IVSSDetails?.filter((ivssCandidate) => 
+    empPDData?.some((empCandidate) => empCandidate.tempID === ivssCandidate.tempID)
+  );
+  
+  // console.log("Matched", matchedCandidates);
+  
 
   const tempIDsToExclude = empTempIDs?.filter((tempID) =>
     ivssTempIDs?.includes(tempID)
   );
 
+  // useEffect(() => {
+  //   const allCandidates = empPDData?.filter(
+  //     (candidate) =>
+  //       !tempIDsToExclude.includes(candidate.tempID) &&
+  //       candidate.status !== "Inactive"
+  //   );
+
+  //   // console.log(allCandidates);
+
+  //   setFilteredData(allCandidates);
+  //   setLoading(false);
+  // }, [empPDData, IVSSDetails, searchTerm]);
+
   useEffect(() => {
-    const allCandidates = empPDData?.filter(
-      (candidate) =>
-        !tempIDsToExclude.includes(candidate.tempID) &&
-        candidate.status !== "Inactive"
-    );
-
-    console.log(allCandidates);
-
+    const allCandidates = empPDData?.filter((candidate) => {
+      const matchedIVSS = matchedCandidates?.find(
+        (ivssCandidate) => ivssCandidate.tempID === candidate.tempID
+      );
+      const isInMatchedCandidates = matchedIVSS && matchedIVSS.status === "Candidate List";
+      return (
+        (!tempIDsToExclude.includes(candidate.tempID) && candidate.status !== "Inactive") ||
+        (isInMatchedCandidates)
+      );
+    });
+  
     setFilteredData(allCandidates);
     setLoading(false);
+
   }, [empPDData, IVSSDetails, searchTerm]);
 
   const handleRowClick = (row) => {
@@ -119,6 +142,9 @@ export const ListofCandi = () => {
   
   const requiredPermissions = ["Candidate"];
   const access = "Recruitment";
+
+  // console.log("Filtered Data", filteredData);
+  
 
   return (
     <section className="screen-size min-h-screen w-full my-5">

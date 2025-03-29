@@ -5,7 +5,6 @@ export const statusOptions = [
   "PAAF",
   "MOBILIZATION",
   "SAWP",
-  "SAWP",
   "DOE",
   "NLMS",
   "Bank Guarantee",
@@ -14,4 +13,5 @@ export const statusOptions = [
   "Immigration",
   "Air Ticket",
   "NonLocal Mobilization",
+  "Candidate List"
 ];

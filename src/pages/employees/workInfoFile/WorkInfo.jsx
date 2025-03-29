@@ -545,9 +545,10 @@ fieldValue.forEach((val) => {
       } else {
         const LeaveValue = {
           ...data,
+          remainAnnualLeave: "0",
           empID: data.empID,
         };
-        // console.log("Create Leave Details Value:", LeaveValue);
+        console.log("Create Leave Details Value:", LeaveValue);
         await LeaveDataValue({ LeaveValue });
       }
 

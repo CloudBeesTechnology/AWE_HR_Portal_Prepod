@@ -149,6 +149,9 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
       (data) => data.tempID === candidate?.tempID
     );
 
+    console.log(selectedInterviewData);
+    
+
     const localMobilizationId = selectedInterviewData.localMobilization.id;
     const interviewScheduleId = selectedInterviewData.interviewSchedules.id;
 
@@ -180,8 +183,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
 
     try {
       if (localMobilizationId) {
-
-        // console.log("Update", selectedInterviewData);
+        // console.log("Update", interStatus);
         // If interview data exists, update the LOI and interview status    
         await loiDetails({ LoiValue: formattedData });
         await interviewDetails({ InterviewValue: interStatus });
@@ -190,6 +192,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
         // console.log("Create", createData);
         // If interview data doesn't exist, create new LOI and interview status
         await localMobilization(createData);
+        await interviewDetails({ InterviewValue: interStatus });
         setNotification(true);
       }
     } catch (error) {

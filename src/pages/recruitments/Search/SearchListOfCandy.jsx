@@ -26,13 +26,28 @@ export const SearchListOfCandy = ({
     ivssTempIDs?.includes(tempID)
   );
 
+  const matchedCandidates = IVSSDetails?.filter((ivssCandidate) =>
+    empPDData?.some(
+      (empCandidate) => empCandidate.tempID === ivssCandidate.tempID
+    )
+  );
+
   const filterDataByclickSearchIcon = useCallback(() => {
     if (allEmpDetails && allEmpDetails.length > 0) {
       const normalizedQuery = searchQuery.toLowerCase();
 
-      const bruneiCandidates = allEmpDetails?.filter(
-        (candidate) => !tempIDsToExclude.includes(candidate.tempID)
-      );
+      const bruneiCandidates = empPDData?.filter((candidate) => {
+        const matchedIVSS = matchedCandidates?.find(
+          (ivssCandidate) => ivssCandidate.tempID === candidate.tempID
+        );
+        const isInMatchedCandidates =
+          matchedIVSS && matchedIVSS.status === "Candidate List";
+        return (
+          (!tempIDsToExclude.includes(candidate.tempID) &&
+            candidate.status !== "Inactive") ||
+          isInMatchedCandidates
+        );
+      });
 
       const result = bruneiCandidates.find((emp) =>
         searchFields.some(
@@ -57,9 +72,18 @@ export const SearchListOfCandy = ({
     setSearchQuery(query);
 
     if (query.trim()) {
-      const bruneiCandidates = allEmpDetails?.filter(
-        (candidate) => !tempIDsToExclude.includes(candidate.tempID)
-      );
+      const bruneiCandidates = empPDData?.filter((candidate) => {
+        const matchedIVSS = matchedCandidates?.find(
+          (ivssCandidate) => ivssCandidate.tempID === candidate.tempID
+        );
+        const isInMatchedCandidates =
+          matchedIVSS && matchedIVSS.status === "Candidate List";
+        return (
+          (!tempIDsToExclude.includes(candidate.tempID) &&
+            candidate.status !== "Inactive") ||
+          isInMatchedCandidates
+        );
+      });
 
       const results = bruneiCandidates.filter((employee) => {
         return searchFields.some((field) => {
@@ -86,9 +110,18 @@ export const SearchListOfCandy = ({
 
       searchUserList(sortedResults);
     } else {
-      const bruneiCandidates = allEmpDetails?.filter(
-        (candidate) => !tempIDsToExclude.includes(candidate.tempID)
-      );
+      const bruneiCandidates = empPDData?.filter((candidate) => {
+        const matchedIVSS = matchedCandidates?.find(
+          (ivssCandidate) => ivssCandidate.tempID === candidate.tempID
+        );
+        const isInMatchedCandidates =
+          matchedIVSS && matchedIVSS.status === "Candidate List";
+        return (
+          (!tempIDsToExclude.includes(candidate.tempID) &&
+            candidate.status !== "Inactive") ||
+          isInMatchedCandidates
+        );
+      });
 
       searchUserList(bruneiCandidates);
     }

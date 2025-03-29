@@ -303,6 +303,50 @@
         }
       }
     },
+    "CandIToEMPIAMRoleDefaultPolicy02EC6856": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:DescribeTable"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "CandIToEMPTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "CandIToEMPIAMRoleDefaultPolicy02EC6856",
+        "Roles": [
+          {
+            "Ref": "CandIToEMPIAMRoleF7BEA328"
+          }
+        ]
+      }
+    },
     "CandIToEMPDataSource": {
       "Type": "AWS::AppSync::DataSource",
       "Properties": {

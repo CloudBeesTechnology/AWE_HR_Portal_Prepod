@@ -41,8 +41,6 @@ export const InterviewTable = ({ data, formatDate }) => {
   const handleShowReviewForm = (candi) => {
     setSelectedCandi(candi);
     setIsReviewFormVisible(!isReviewFormVisible);
-    console.log("candi");
-    console.log("Candy visbile");
   };
   return (
     <>

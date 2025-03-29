@@ -303,6 +303,50 @@
         }
       }
     },
+    "EducationDetailsIAMRoleDefaultPolicy1E1C9D2C": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:DescribeTable"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "EducationDetailsTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "EducationDetailsIAMRoleDefaultPolicy1E1C9D2C",
+        "Roles": [
+          {
+            "Ref": "EducationDetailsIAMRole7DA3D3FD"
+          }
+        ]
+      }
+    },
     "EducationDetailsDataSource": {
       "Type": "AWS::AppSync::DataSource",
       "Properties": {
