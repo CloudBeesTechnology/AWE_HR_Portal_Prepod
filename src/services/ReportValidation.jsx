@@ -9,6 +9,7 @@ export const probationFormSchema = Yup.object({
   // commitment: Yup.string().notRequired(),
   // communication: Yup.string().notRequired(),
   // deadline: Yup.string().notRequired(),
+  extendDate:Yup.string().notRequired(),
   // diligent: Yup.string().notRequired(),
   // extendProbED: Yup.string().notRequired(),
   // gmApproved: Yup.string().notRequired(),

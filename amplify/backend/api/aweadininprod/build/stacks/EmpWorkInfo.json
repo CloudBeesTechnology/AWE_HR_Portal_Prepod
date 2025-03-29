@@ -303,6 +303,50 @@
         }
       }
     },
+    "EmpWorkInfoIAMRoleDefaultPolicy62EE962D": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:DescribeTable"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "EmpWorkInfoTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "EmpWorkInfoIAMRoleDefaultPolicy62EE962D",
+        "Roles": [
+          {
+            "Ref": "EmpWorkInfoIAMRoleD28F29B1"
+          }
+        ]
+      }
+    },
     "EmpWorkInfoDataSource": {
       "Type": "AWS::AppSync::DataSource",
       "Properties": {

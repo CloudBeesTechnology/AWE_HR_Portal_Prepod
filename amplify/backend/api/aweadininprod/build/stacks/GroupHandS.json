@@ -303,6 +303,50 @@
         }
       }
     },
+    "GroupHandSIAMRoleDefaultPolicy4529A2B0": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:DescribeTable"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "GroupHandSTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "GroupHandSIAMRoleDefaultPolicy4529A2B0",
+        "Roles": [
+          {
+            "Ref": "GroupHandSIAMRole9CDDE027"
+          }
+        ]
+      }
+    },
     "GroupHandSDataSource": {
       "Type": "AWS::AppSync::DataSource",
       "Properties": {

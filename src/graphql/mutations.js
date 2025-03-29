@@ -779,6 +779,7 @@ export const createProbForm = /* GraphQL */ `
       commitmentDetails
       probStatus
       gmName
+      extendDate
       createdAt
       updatedAt
       __typename
@@ -831,6 +832,7 @@ export const updateProbForm = /* GraphQL */ `
       commitmentDetails
       probStatus
       gmName
+      extendDate
       createdAt
       updatedAt
       __typename
@@ -883,6 +885,7 @@ export const deleteProbForm = /* GraphQL */ `
       commitmentDetails
       probStatus
       gmName
+      extendDate
       createdAt
       updatedAt
       __typename

@@ -558,6 +558,7 @@ export const getProbForm = /* GraphQL */ `
       commitmentDetails
       probStatus
       gmName
+      extendDate
       createdAt
       updatedAt
       __typename
@@ -612,6 +613,7 @@ export const listProbForms = /* GraphQL */ `
         commitmentDetails
         probStatus
         gmName
+        extendDate
         createdAt
         updatedAt
         __typename
