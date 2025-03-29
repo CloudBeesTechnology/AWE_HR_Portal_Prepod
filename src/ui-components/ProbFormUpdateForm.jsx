@@ -70,6 +70,7 @@ export default function ProbFormUpdateForm(props) {
     commitmentDetails: "",
     probStatus: false,
     gmName: "",
+    extendDate: "",
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [adaptability, setAdaptability] = React.useState(
@@ -156,6 +157,7 @@ export default function ProbFormUpdateForm(props) {
   );
   const [probStatus, setProbStatus] = React.useState(initialValues.probStatus);
   const [gmName, setGmName] = React.useState(initialValues.gmName);
+  const [extendDate, setExtendDate] = React.useState(initialValues.extendDate);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = probFormRecord
@@ -200,6 +202,7 @@ export default function ProbFormUpdateForm(props) {
     setCommitmentDetails(cleanValues.commitmentDetails);
     setProbStatus(cleanValues.probStatus);
     setGmName(cleanValues.gmName);
+    setExtendDate(cleanValues.extendDate);
     setErrors({});
   };
   const [probFormRecord, setProbFormRecord] = React.useState(probFormModelProp);
@@ -258,6 +261,7 @@ export default function ProbFormUpdateForm(props) {
     commitmentDetails: [],
     probStatus: [],
     gmName: [],
+    extendDate: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -324,6 +328,7 @@ export default function ProbFormUpdateForm(props) {
           commitmentDetails: commitmentDetails ?? null,
           probStatus: probStatus ?? null,
           gmName: gmName ?? null,
+          extendDate: extendDate ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -423,6 +428,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -485,6 +491,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.adaptability ?? value;
@@ -547,6 +554,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.additionalInfo ?? value;
@@ -609,6 +617,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.attention ?? value;
@@ -671,6 +680,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.attitude ?? value;
@@ -733,6 +743,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.commitment ?? value;
@@ -795,6 +806,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.communication ?? value;
@@ -857,6 +869,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.deadline ?? value;
@@ -919,6 +932,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.diligent ?? value;
@@ -981,6 +995,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.extensionPeriod ?? value;
@@ -1043,6 +1058,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.gmDate ?? value;
@@ -1105,6 +1121,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.hrDate ?? value;
@@ -1167,6 +1184,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.hrName ?? value;
@@ -1229,6 +1247,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.initiative ?? value;
@@ -1291,6 +1310,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.managerDate ?? value;
@@ -1353,6 +1373,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.managerName ?? value;
@@ -1415,6 +1436,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.pace ?? value;
@@ -1477,6 +1499,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.quality ?? value;
@@ -1539,6 +1562,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.recommendation ?? value;
@@ -1601,6 +1625,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.responsibility ?? value;
@@ -1663,6 +1688,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.supervisorDate ?? value;
@@ -1725,6 +1751,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.supervisorName ?? value;
@@ -1787,6 +1814,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.teamwork ?? value;
@@ -1849,6 +1877,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.extendProbED ?? value;
@@ -1911,6 +1940,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.gmApproved ?? value;
@@ -1973,6 +2003,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.managerApproved ?? value;
@@ -2035,6 +2066,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.supervisorApproved ?? value;
@@ -2099,6 +2131,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.communicationDetails ?? value;
@@ -2163,6 +2196,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.qualityDetails ?? value;
@@ -2225,6 +2259,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.paceDetails ?? value;
@@ -2287,6 +2322,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.initiativeDetails ?? value;
@@ -2351,6 +2387,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.attitudeDetails ?? value;
@@ -2413,6 +2450,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.adaptabilityDetails ?? value;
@@ -2477,6 +2515,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.teamworkDetails ?? value;
@@ -2539,6 +2578,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.responsibilityDetails ?? value;
@@ -2603,6 +2643,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.diligentDetails ?? value;
@@ -2665,6 +2706,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails: value,
               probStatus,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.commitmentDetails ?? value;
@@ -2729,6 +2771,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus: value,
               gmName,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.probStatus ?? value;
@@ -2791,6 +2834,7 @@ export default function ProbFormUpdateForm(props) {
               commitmentDetails,
               probStatus,
               gmName: value,
+              extendDate,
             };
             const result = onChange(modelFields);
             value = result?.gmName ?? value;
@@ -2804,6 +2848,69 @@ export default function ProbFormUpdateForm(props) {
         errorMessage={errors.gmName?.errorMessage}
         hasError={errors.gmName?.hasError}
         {...getOverrideProps(overrides, "gmName")}
+      ></TextField>
+      <TextField
+        label="Extend date"
+        isRequired={false}
+        isReadOnly={false}
+        value={extendDate}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              adaptability,
+              additionalInfo,
+              attention,
+              attitude,
+              commitment,
+              communication,
+              deadline,
+              diligent,
+              extensionPeriod,
+              gmDate,
+              hrDate,
+              hrName,
+              initiative,
+              managerDate,
+              managerName,
+              pace,
+              quality,
+              recommendation,
+              responsibility,
+              supervisorDate,
+              supervisorName,
+              teamwork,
+              extendProbED,
+              gmApproved,
+              managerApproved,
+              supervisorApproved,
+              communicationDetails,
+              qualityDetails,
+              paceDetails,
+              initiativeDetails,
+              attitudeDetails,
+              adaptabilityDetails,
+              teamworkDetails,
+              responsibilityDetails,
+              diligentDetails,
+              commitmentDetails,
+              probStatus,
+              gmName,
+              extendDate: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.extendDate ?? value;
+          }
+          if (errors.extendDate?.hasError) {
+            runValidationTasks("extendDate", value);
+          }
+          setExtendDate(value);
+        }}
+        onBlur={() => runValidationTasks("extendDate", extendDate)}
+        errorMessage={errors.extendDate?.errorMessage}
+        hasError={errors.extendDate?.hasError}
+        {...getOverrideProps(overrides, "extendDate")}
       ></TextField>
       <Flex
         justifyContent="space-between"

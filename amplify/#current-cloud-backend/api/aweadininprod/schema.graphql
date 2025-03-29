@@ -729,6 +729,7 @@ type PersonalDetails @model @auth(rules: [{allow: public}]) {
   religion: String
   status: String
   workExperience: [AWSJSON]
+  otherLang: String
 }
 
 type User @model @auth(rules: [{allow: public}]) {

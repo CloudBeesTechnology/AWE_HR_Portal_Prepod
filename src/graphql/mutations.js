@@ -3120,6 +3120,7 @@ export const createPersonalDetails = /* GraphQL */ `
       religion
       status
       workExperience
+      otherLang
       createdAt
       updatedAt
       __typename
@@ -3170,6 +3171,7 @@ export const updatePersonalDetails = /* GraphQL */ `
       religion
       status
       workExperience
+      otherLang
       createdAt
       updatedAt
       __typename
@@ -3220,6 +3222,7 @@ export const deletePersonalDetails = /* GraphQL */ `
       religion
       status
       workExperience
+      otherLang
       createdAt
       updatedAt
       __typename
