@@ -20,7 +20,7 @@ export const RecODFunc = () => {
       liquor, liquorDesc, noticePeriod, perIS, perIDesc, referees, relatives, salaryExpectation,
       supportInfo, age, alternateNo, agent, bwnIcNo, bwnIcExpiry, bwnIcColour, contactNo, cob,
       contractType, chinese, dob, driveLic, email, empType, eduDetails, familyDetails, gender,
-      lang, marital, name, nationality, otherNation, otherRace, otherReligion, ppNo, ppIssued,
+      lang, otherLang, marital, name, nationality, otherNation, otherRace, otherReligion, ppNo, ppIssued,
       ppExpiry, ppDestinate, presentAddress, permanentAddress, profilePhoto, position, race,
       religion, workExperience,uploadResume,uploadCertificate,uploadPp,status
     } = reqValue;
@@ -35,7 +35,7 @@ export const RecODFunc = () => {
     const totalData1 = {
       tempID: latestTempIDData,
       age, alternateNo, agent, bwnIcNo, bwnIcExpiry, bwnIcColour, contactNo, cob, contractType,
-      chinese, dob, driveLic, email, empType, eduDetails, familyDetails, gender, lang, marital,
+      chinese, dob, driveLic, email, empType, eduDetails, familyDetails, gender, lang, otherLang, marital,
       name, nationality, otherNation, otherRace, otherReligion, ppNo, ppIssued, ppExpiry,
       ppDestinate, presentAddress, permanentAddress, profilePhoto, position, race, religion,status,
       workExperience
