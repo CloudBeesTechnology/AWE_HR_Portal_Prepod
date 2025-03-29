@@ -59,6 +59,7 @@ export declare type PersonalDetailsUpdateFormInputValues = {
     religion?: string;
     status?: string;
     workExperience?: string[];
+    otherLang?: string;
 };
 export declare type PersonalDetailsUpdateFormValidationValues = {
     tempID?: ValidationFunction<string>;
@@ -98,6 +99,7 @@ export declare type PersonalDetailsUpdateFormValidationValues = {
     religion?: ValidationFunction<string>;
     status?: ValidationFunction<string>;
     workExperience?: ValidationFunction<string>;
+    otherLang?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type PersonalDetailsUpdateFormOverridesProps = {
@@ -139,6 +141,7 @@ export declare type PersonalDetailsUpdateFormOverridesProps = {
     religion?: PrimitiveOverrideProps<TextFieldProps>;
     status?: PrimitiveOverrideProps<TextFieldProps>;
     workExperience?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    otherLang?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type PersonalDetailsUpdateFormProps = React.PropsWithChildren<{
     overrides?: PersonalDetailsUpdateFormOverridesProps | undefined | null;

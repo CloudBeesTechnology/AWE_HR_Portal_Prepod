@@ -61,6 +61,7 @@ export declare type ProbFormUpdateFormInputValues = {
     commitmentDetails?: string;
     probStatus?: boolean;
     gmName?: string;
+    extendDate?: string;
 };
 export declare type ProbFormUpdateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -102,6 +103,7 @@ export declare type ProbFormUpdateFormValidationValues = {
     commitmentDetails?: ValidationFunction<string>;
     probStatus?: ValidationFunction<boolean>;
     gmName?: ValidationFunction<string>;
+    extendDate?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type ProbFormUpdateFormOverridesProps = {
@@ -145,6 +147,7 @@ export declare type ProbFormUpdateFormOverridesProps = {
     commitmentDetails?: PrimitiveOverrideProps<TextFieldProps>;
     probStatus?: PrimitiveOverrideProps<SwitchFieldProps>;
     gmName?: PrimitiveOverrideProps<TextFieldProps>;
+    extendDate?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type ProbFormUpdateFormProps = React.PropsWithChildren<{
     overrides?: ProbFormUpdateFormOverridesProps | undefined | null;

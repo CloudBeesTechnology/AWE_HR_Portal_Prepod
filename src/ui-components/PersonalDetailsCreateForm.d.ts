@@ -59,6 +59,7 @@ export declare type PersonalDetailsCreateFormInputValues = {
     religion?: string;
     status?: string;
     workExperience?: string[];
+    otherLang?: string;
 };
 export declare type PersonalDetailsCreateFormValidationValues = {
     tempID?: ValidationFunction<string>;
@@ -98,6 +99,7 @@ export declare type PersonalDetailsCreateFormValidationValues = {
     religion?: ValidationFunction<string>;
     status?: ValidationFunction<string>;
     workExperience?: ValidationFunction<string>;
+    otherLang?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type PersonalDetailsCreateFormOverridesProps = {
@@ -139,6 +141,7 @@ export declare type PersonalDetailsCreateFormOverridesProps = {
     religion?: PrimitiveOverrideProps<TextFieldProps>;
     status?: PrimitiveOverrideProps<TextFieldProps>;
     workExperience?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    otherLang?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type PersonalDetailsCreateFormProps = React.PropsWithChildren<{
     overrides?: PersonalDetailsCreateFormOverridesProps | undefined | null;
