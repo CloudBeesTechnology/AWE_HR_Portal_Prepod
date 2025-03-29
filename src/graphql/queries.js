@@ -558,6 +558,7 @@ export const getProbForm = /* GraphQL */ `
       commitmentDetails
       probStatus
       gmName
+      extendDate
       createdAt
       updatedAt
       __typename
@@ -612,6 +613,7 @@ export const listProbForms = /* GraphQL */ `
         commitmentDetails
         probStatus
         gmName
+        extendDate
         createdAt
         updatedAt
         __typename
@@ -1502,6 +1504,8 @@ export const getEmpLeaveDetails = /* GraphQL */ `
       sickLeaveDate
       hospLeave
       pervAnnualLeaveBal
+      sickLeaveTaken
+      remainAnnualLeave
       createdAt
       updatedAt
       __typename
@@ -1532,6 +1536,8 @@ export const listEmpLeaveDetails = /* GraphQL */ `
         sickLeaveDate
         hospLeave
         pervAnnualLeaveBal
+        sickLeaveTaken
+        remainAnnualLeave
         createdAt
         updatedAt
         __typename
@@ -2200,6 +2206,7 @@ export const getPersonalDetails = /* GraphQL */ `
       religion
       status
       workExperience
+      otherLang
       createdAt
       updatedAt
       __typename
@@ -2252,6 +2259,7 @@ export const listPersonalDetails = /* GraphQL */ `
         religion
         status
         workExperience
+        otherLang
         createdAt
         updatedAt
         __typename

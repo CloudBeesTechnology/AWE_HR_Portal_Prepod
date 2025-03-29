@@ -4,7 +4,6 @@ import { DataSupply } from "../../../utils/DataStoredContext";
 import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
 import { SpinLogo } from "../../../utils/SpinLogo";
 
-
 export const InterviewForm = ({ candidate }) => {
   const { IVSSDetails } = useContext(DataSupply);
   const { interviewDetails } = UpdateInterviewData();
@@ -18,11 +17,23 @@ export const InterviewForm = ({ candidate }) => {
       venue: "",
       interviewType: "",
       interviewer: "",
-      message: "",  
+      message: "",
     },
   });
-  // console.log(candidate)
 
+  const formatDate = (dateToString) => {
+    if (!dateToString || isNaN(new Date(dateToString).getTime())) {
+      return "";
+    }
+
+    const date = new Date(dateToString);
+
+    const day = date.getDate().toString().padStart(2, "0"); // Local day
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Local month
+    const year = date.getFullYear();
+
+    return `${year}-${month}-${day}`;
+  };
   useEffect(() => {
     if (IVSSDetails.length > 0 && candidate?.tempID) {
       const interviewData = IVSSDetails.find(
@@ -30,9 +41,11 @@ export const InterviewForm = ({ candidate }) => {
       );
 
       if (interviewData) {
+        const interFormattedDate = formatDate(interviewData.interDate);
         setFormData({
+          // interviewData.interDate?.split("T")[0]
           interview: {
-            date: interviewData.interDate?.split("T")[0], 
+            date: interFormattedDate,
             time: interviewData.interTime,
             venue: interviewData.venue,
             interviewType: interviewData.interType,
@@ -42,7 +55,7 @@ export const InterviewForm = ({ candidate }) => {
         });
       }
     }
-  }, [IVSSDetails, candidate?.tempID]); 
+  }, [IVSSDetails, candidate?.tempID]);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -89,7 +102,7 @@ export const InterviewForm = ({ candidate }) => {
       // Use the interviewScheduleId to update the interview details
       await interviewDetails({
         InterviewValue: {
-          id: interviewScheduleId, 
+          id: interviewScheduleId,
           interDate: formData.interview.date,
           interTime: formData.interview.time,
           venue: formData.interview.venue,
@@ -98,7 +111,7 @@ export const InterviewForm = ({ candidate }) => {
           manager: formData.interview.interviewer,
         },
       });
-      // console.log("Data stored successfully...");
+   
       setNotification(true);
     } catch (error) {
       // console.error("Error submitting interview details:", error);
@@ -125,13 +138,13 @@ export const InterviewForm = ({ candidate }) => {
               <input
                 type={input.type}
                 className="w-full border p-2 rounded mt-1"
-                value={formData.interview[input.field]}
+                value={formData.interview[input.field] || ""}
                 onChange={(e) => handleInputChange(input.field, e.target.value)}
               />
             ) : input.type === "textarea" ? (
               <textarea
                 className="w-full border p-2 rounded mt-1 h-[42px]"
-                value={formData.interview[input.field]}
+                value={formData.interview[input.field] || ""}
                 onChange={(e) => handleInputChange(input.field, e.target.value)}
               />
             ) : (

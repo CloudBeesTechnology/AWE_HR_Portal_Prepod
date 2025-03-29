@@ -7,6 +7,7 @@ export const DateFormat = (dateToString) => {
 
   let day, month, year;
 
+  
   if (dateStr?.includes("T")) {
     const localDate = new Date(dateStr);
     year = localDate.getFullYear();
@@ -17,7 +18,7 @@ export const DateFormat = (dateToString) => {
   } else if (dateStr?.includes("-")) {
     [year, month, day] = dateStr?.split("-");
   } else {
-    return "";
+    return ""; 
   }
 
   const formattedDay = day?.padStart(2, "0");

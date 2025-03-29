@@ -149,6 +149,9 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
       (data) => data.tempID === candidate?.tempID
     );
 
+    console.log(selectedInterviewData);
+    
+
     const localMobilizationId = selectedInterviewData.localMobilization.id;
     const interviewScheduleId = selectedInterviewData.interviewSchedules.id;
 
@@ -169,13 +172,29 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
       status: formData.interview.status,
     };
 
+    const createData = {
+      loiIssueDate: formData.interview.loiIssueDate,
+      loiAcceptDate: formData.interview.loiAcceptDate,
+      loiDeclineDate: formData.interview.loiDeclineDate,
+      declineReason: formData.interview.declineReason,
+      loiFile: uploadedLOI.loiFile,
+      tempID: candidate.tempID,
+    };
+
     try {
-      // Call the update LOI API function
-      await loiDetails({ LoiValue: formattedData });
-      await interviewDetails({ InterviewValue: interStatus });
-      setNotification(true);
-      // console.log("status", interStatus);
-      // console.log("Data updated successfully...");
+      if (localMobilizationId) {
+        // console.log("Update", interStatus);
+        // If interview data exists, update the LOI and interview status    
+        await loiDetails({ LoiValue: formattedData });
+        await interviewDetails({ InterviewValue: interStatus });
+        setNotification(true);
+      } else {
+        // console.log("Create", createData);
+        // If interview data doesn't exist, create new LOI and interview status
+        await localMobilization(createData);
+        await interviewDetails({ InterviewValue: interStatus });
+        setNotification(true);
+      }
     } catch (error) {
       console.error("Error updating LOI:", error);
       alert("Failed to update LOI. Please try again.");

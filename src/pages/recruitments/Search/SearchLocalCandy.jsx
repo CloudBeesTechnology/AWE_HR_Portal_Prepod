@@ -12,24 +12,42 @@ export const SearchLocalCandy = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
-  const { IVSSDetails } = useContext(DataSupply);
+  const { IVSSDetails, empPDData } = useContext(DataSupply);
 
   useEffect(() => {
     setSearchQuery("");
   }, [allEmpDetails, location]);
 
+  var matchedCandidates = IVSSDetails?.filter((ivssCandidate) =>
+    empPDData?.some(
+      (empCandidate) => empCandidate.tempID === ivssCandidate.tempID
+    )
+  );
+
   const filterDataByclickSearchIcon = useCallback(() => {
     if (allEmpDetails && allEmpDetails.length > 0) {
       const normalizedQuery = searchQuery.toLowerCase();
 
-
-      const bruneiCandidates = allEmpDetails.filter(
-        (candidate) =>
-            candidate.nationality === "Bruneian" || candidate.nationality === "Brunei PR"
-      ).filter(
-        (candidate) =>
-          !IVSSDetails.some((detail) => detail.tempID === candidate.tempID)
-      );
+      const bruneiCandidates = allEmpDetails
+        .filter(
+          (candidate) =>
+            candidate.nationality === "Bruneian" ||
+            candidate.nationality === "Brunei PR"
+        )
+        .filter((candidate) => {
+          const matchedIVSS = matchedCandidates?.find(
+            (ivssCandidate) => ivssCandidate.tempID === candidate.tempID
+          );
+          const isStatusValid =
+            matchedIVSS && matchedIVSS.status === "Candidate List";
+          return (
+            (!IVSSDetails.some(
+              (detail) => detail.tempID === candidate.tempID
+            ) &&
+              candidate.status !== "Inactive") ||
+            isStatusValid
+          );
+        });
 
       const result = bruneiCandidates.find((emp) =>
         searchFields.some(
@@ -54,14 +72,26 @@ export const SearchLocalCandy = ({
     setSearchQuery(query);
 
     if (query.trim()) {
-  
-      const bruneiCandidates = allEmpDetails.filter(
-        (candidate) =>
-            candidate.nationality === "Bruneian" || candidate.nationality === "Brunei PR"
-      ).filter(
-        (candidate) =>
-          !IVSSDetails.some((detail) => detail.tempID === candidate.tempID)
-      );
+      const bruneiCandidates = allEmpDetails
+        .filter(
+          (candidate) =>
+            candidate.nationality === "Bruneian" ||
+            candidate.nationality === "Brunei PR"
+        )
+        .filter((candidate) => {
+          const matchedIVSS = matchedCandidates?.find(
+            (ivssCandidate) => ivssCandidate.tempID === candidate.tempID
+          );
+          const isStatusValid =
+            matchedIVSS && matchedIVSS.status === "Candidate List";
+          return (
+            (!IVSSDetails.some(
+              (detail) => detail.tempID === candidate.tempID
+            ) &&
+              candidate.status !== "Inactive") ||
+            isStatusValid
+          );
+        });
 
       const results = bruneiCandidates.filter((employee) => {
         return searchFields.some((field) => {
@@ -73,7 +103,6 @@ export const SearchLocalCandy = ({
         });
       });
 
-  
       const sortedResults = results?.sort((a, b) => {
         const isExactMatchA = searchFields.some(
           (field) => a[field]?.toString().toLowerCase() === query
@@ -89,14 +118,26 @@ export const SearchLocalCandy = ({
 
       searchUserList(sortedResults);
     } else {
-    
-      const bruneiCandidates = allEmpDetails.filter(
-        (candidate) =>
-            candidate.nationality === "Bruneian" || candidate.nationality === "Brunei PR"
-      ).filter(
-        (candidate) =>
-          !IVSSDetails.some((detail) => detail.tempID === candidate.tempID)
-      );
+      const bruneiCandidates = allEmpDetails
+        .filter(
+          (candidate) =>
+            candidate.nationality === "Bruneian" ||
+            candidate.nationality === "Brunei PR"
+        )
+        .filter((candidate) => {
+          const matchedIVSS = matchedCandidates?.find(
+            (ivssCandidate) => ivssCandidate.tempID === candidate.tempID
+          );
+          const isStatusValid =
+            matchedIVSS && matchedIVSS.status === "Candidate List";
+          return (
+            (!IVSSDetails.some(
+              (detail) => detail.tempID === candidate.tempID
+            ) &&
+              candidate.status !== "Inactive") ||
+            isStatusValid
+          );
+        });
 
       searchUserList(bruneiCandidates);
     }

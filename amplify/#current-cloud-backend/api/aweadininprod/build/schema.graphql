@@ -206,6 +206,7 @@ type ProbForm @aws_iam @aws_api_key {
   commitmentDetails: String
   probStatus: Boolean
   gmName: String
+  extendDate: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -522,6 +523,8 @@ type EmpLeaveDetails @aws_iam @aws_api_key {
   sickLeaveDate: String
   hospLeave: String
   pervAnnualLeaveBal: String
+  sickLeaveTaken: String
+  remainAnnualLeave: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -800,6 +803,7 @@ type PersonalDetails @aws_iam @aws_api_key {
   religion: String
   status: String
   workExperience: [AWSJSON]
+  otherLang: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -2374,6 +2378,7 @@ input ModelProbFormFilterInput {
   commitmentDetails: ModelStringInput
   probStatus: ModelBooleanInput
   gmName: ModelStringInput
+  extendDate: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelProbFormFilterInput]
@@ -2421,6 +2426,7 @@ input ModelProbFormConditionInput {
   commitmentDetails: ModelStringInput
   probStatus: ModelBooleanInput
   gmName: ModelStringInput
+  extendDate: ModelStringInput
   and: [ModelProbFormConditionInput]
   or: [ModelProbFormConditionInput]
   not: ModelProbFormConditionInput
@@ -2469,6 +2475,7 @@ input CreateProbFormInput {
   commitmentDetails: String
   probStatus: Boolean
   gmName: String
+  extendDate: String
 }
 
 input UpdateProbFormInput {
@@ -2512,6 +2519,7 @@ input UpdateProbFormInput {
   commitmentDetails: String
   probStatus: Boolean
   gmName: String
+  extendDate: String
 }
 
 input DeleteProbFormInput {
@@ -2559,6 +2567,7 @@ input ModelSubscriptionProbFormFilterInput {
   commitmentDetails: ModelSubscriptionStringInput
   probStatus: ModelSubscriptionBooleanInput
   gmName: ModelSubscriptionStringInput
+  extendDate: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionProbFormFilterInput]
@@ -4254,6 +4263,8 @@ input ModelEmpLeaveDetailsFilterInput {
   sickLeaveDate: ModelStringInput
   hospLeave: ModelStringInput
   pervAnnualLeaveBal: ModelStringInput
+  sickLeaveTaken: ModelStringInput
+  remainAnnualLeave: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelEmpLeaveDetailsFilterInput]
@@ -4277,6 +4288,8 @@ input ModelEmpLeaveDetailsConditionInput {
   sickLeaveDate: ModelStringInput
   hospLeave: ModelStringInput
   pervAnnualLeaveBal: ModelStringInput
+  sickLeaveTaken: ModelStringInput
+  remainAnnualLeave: ModelStringInput
   and: [ModelEmpLeaveDetailsConditionInput]
   or: [ModelEmpLeaveDetailsConditionInput]
   not: ModelEmpLeaveDetailsConditionInput
@@ -4301,6 +4314,8 @@ input CreateEmpLeaveDetailsInput {
   sickLeaveDate: String
   hospLeave: String
   pervAnnualLeaveBal: String
+  sickLeaveTaken: String
+  remainAnnualLeave: String
 }
 
 input UpdateEmpLeaveDetailsInput {
@@ -4320,6 +4335,8 @@ input UpdateEmpLeaveDetailsInput {
   sickLeaveDate: String
   hospLeave: String
   pervAnnualLeaveBal: String
+  sickLeaveTaken: String
+  remainAnnualLeave: String
 }
 
 input DeleteEmpLeaveDetailsInput {
@@ -4343,6 +4360,8 @@ input ModelSubscriptionEmpLeaveDetailsFilterInput {
   sickLeaveDate: ModelSubscriptionStringInput
   hospLeave: ModelSubscriptionStringInput
   pervAnnualLeaveBal: ModelSubscriptionStringInput
+  sickLeaveTaken: ModelSubscriptionStringInput
+  remainAnnualLeave: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionEmpLeaveDetailsFilterInput]
@@ -5664,6 +5683,7 @@ input ModelPersonalDetailsFilterInput {
   religion: ModelStringInput
   status: ModelStringInput
   workExperience: ModelStringInput
+  otherLang: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelPersonalDetailsFilterInput]
@@ -5709,6 +5729,7 @@ input ModelPersonalDetailsConditionInput {
   religion: ModelStringInput
   status: ModelStringInput
   workExperience: ModelStringInput
+  otherLang: ModelStringInput
   and: [ModelPersonalDetailsConditionInput]
   or: [ModelPersonalDetailsConditionInput]
   not: ModelPersonalDetailsConditionInput
@@ -5755,6 +5776,7 @@ input CreatePersonalDetailsInput {
   religion: String
   status: String
   workExperience: [AWSJSON]
+  otherLang: String
 }
 
 input UpdatePersonalDetailsInput {
@@ -5796,6 +5818,7 @@ input UpdatePersonalDetailsInput {
   religion: String
   status: String
   workExperience: [AWSJSON]
+  otherLang: String
 }
 
 input DeletePersonalDetailsInput {
@@ -5841,6 +5864,7 @@ input ModelSubscriptionPersonalDetailsFilterInput {
   religion: ModelSubscriptionStringInput
   status: ModelSubscriptionStringInput
   workExperience: ModelSubscriptionStringInput
+  otherLang: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionPersonalDetailsFilterInput]

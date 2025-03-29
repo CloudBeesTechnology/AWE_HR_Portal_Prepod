@@ -119,7 +119,7 @@ export const trainingCertificatesValidation = Yup.object().shape({
         return true;
       }
     ),
-    certifiExpiry: Yup.string().required('Certifi Expiry is required').test(
+    certifiExpiry: Yup.string().notRequired().test(
       'validDate',
       'Invalid date format or year must be a valid 4-digit year without leading zeros',
       (value) => {

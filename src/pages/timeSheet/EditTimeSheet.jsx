@@ -262,7 +262,6 @@ export const EditTimeSheet = ({
 
   useEffect(() => {
     const formatTime = (decimalHours) => {
-    
       const hours = Math.floor(decimalHours);
       const minutes = Math.round((decimalHours - hours) * 60);
       return `${hours}:${minutes.toString().padStart(2, "0")}`;
@@ -273,8 +272,6 @@ export const EditTimeSheet = ({
       // };
       try {
         const ConvertHours = (sections) => {
-          
-
           let totalMinutes = 0;
 
           if (sections) {
@@ -340,23 +337,64 @@ export const EditTimeSheet = ({
               : updatedWorkingHours - convertNWPD;
 
           setWarningMess(updatedWorkingHours > convertNWPD);
-          const adininWorks = ConvertHours(
-            prevFormData?.ADININWORKSENGINEERINGSDNBHD
-          );
-          const adinin =
-            parseFloat(adininWorks?.split(":")[0]) +
-            parseFloat(adininWorks?.split(":")[1]) / 60;
-
-          const updatedTotalOvertimeHrs =
-            parseFloat(totalOvertimeHrs?.split(":")[0]) +
-            parseFloat(totalOvertimeHrs?.split(":")[1]) / 60;
-
-          if (updatedWorkingHours + updatedTotalOvertimeHrs > adinin) {
-            setWarningMessForAdinin(
-              updatedWorkingHours + updatedTotalOvertimeHrs > adinin
+        
+          if (
+            typeof parseFloat(prevFormData?.ADININWORKSENGINEERINGSDNBHD) ===
+              "number" &&
+            prevFormData?.ADININWORKSENGINEERINGSDNBHD.includes(":")
+          ) {
+            
+            const adininWorks = ConvertHours(
+              prevFormData?.ADININWORKSENGINEERINGSDNBHD
             );
+            const adinin =
+              parseFloat(adininWorks?.split(":")[0]) +
+              parseFloat(adininWorks?.split(":")[1]) / 60;
+
+            const updatedTotalOvertimeHrs =
+              parseFloat(totalOvertimeHrs?.split(":")[0]) +
+              parseFloat(totalOvertimeHrs?.split(":")[1]) / 60;
+
+            if (updatedWorkingHours + updatedTotalOvertimeHrs > adinin) {
+              setWarningMessForAdinin(
+                updatedWorkingHours + updatedTotalOvertimeHrs > adinin
+              );
+            } else {
+              setWarningMessForAdinin(false);
+            }
+          } else if (prevFormData?.ADININWORKSENGINEERINGSDNBHD.includes("h")) {
+            try {
+              function convertToTimeFormat(timeStr) {
+                return timeStr.replace(/(\d+)h\s*(\d+)m/, "$1:$2");
+              }
+
+              // Example usage
+              const input = prevFormData?.ADININWORKSENGINEERINGSDNBHD;
+              const adininworksEngineering = convertToTimeFormat(input);
+
+              const adininWorks = ConvertHours(adininworksEngineering);
+              const adinin =
+                parseFloat(adininWorks?.split(":")[0]) +
+                parseFloat(adininWorks?.split(":")[1]) / 60;
+
+              const updatedTotalOvertimeHrs =
+                parseFloat(totalOvertimeHrs?.split(":")[0]) +
+                parseFloat(totalOvertimeHrs?.split(":")[1]) / 60;
+
+              if (updatedWorkingHours + updatedTotalOvertimeHrs > adinin) {
+                setWarningMessForAdinin(
+                  updatedWorkingHours + updatedTotalOvertimeHrs > adinin
+                );
+              } else {
+                setWarningMessForAdinin(false);
+              }
+            } catch (err) {}
           } else {
-            setWarningMessForAdinin(false);
+            if (updatedWorkingHours > convertNWPD) {
+              setWarningMess(updatedWorkingHours > convertNWPD);
+            } else {
+              setWarningMessForAdinin(false);
+            }
           }
 
           return {
@@ -383,6 +421,7 @@ export const EditTimeSheet = ({
     }
   }, [sections]);
 
+  
   useEffect(() => {
     const totalOvertimeHrs = sections.reduce((total, sec) => {
       try {

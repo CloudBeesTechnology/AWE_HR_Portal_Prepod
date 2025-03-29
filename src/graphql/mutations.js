@@ -779,6 +779,7 @@ export const createProbForm = /* GraphQL */ `
       commitmentDetails
       probStatus
       gmName
+      extendDate
       createdAt
       updatedAt
       __typename
@@ -831,6 +832,7 @@ export const updateProbForm = /* GraphQL */ `
       commitmentDetails
       probStatus
       gmName
+      extendDate
       createdAt
       updatedAt
       __typename
@@ -883,6 +885,7 @@ export const deleteProbForm = /* GraphQL */ `
       commitmentDetails
       probStatus
       gmName
+      extendDate
       createdAt
       updatedAt
       __typename
@@ -2132,6 +2135,8 @@ export const createEmpLeaveDetails = /* GraphQL */ `
       sickLeaveDate
       hospLeave
       pervAnnualLeaveBal
+      sickLeaveTaken
+      remainAnnualLeave
       createdAt
       updatedAt
       __typename
@@ -2160,6 +2165,8 @@ export const updateEmpLeaveDetails = /* GraphQL */ `
       sickLeaveDate
       hospLeave
       pervAnnualLeaveBal
+      sickLeaveTaken
+      remainAnnualLeave
       createdAt
       updatedAt
       __typename
@@ -2188,6 +2195,8 @@ export const deleteEmpLeaveDetails = /* GraphQL */ `
       sickLeaveDate
       hospLeave
       pervAnnualLeaveBal
+      sickLeaveTaken
+      remainAnnualLeave
       createdAt
       updatedAt
       __typename
@@ -3111,6 +3120,7 @@ export const createPersonalDetails = /* GraphQL */ `
       religion
       status
       workExperience
+      otherLang
       createdAt
       updatedAt
       __typename
@@ -3161,6 +3171,7 @@ export const updatePersonalDetails = /* GraphQL */ `
       religion
       status
       workExperience
+      otherLang
       createdAt
       updatedAt
       __typename
@@ -3211,6 +3222,7 @@ export const deletePersonalDetails = /* GraphQL */ `
       religion
       status
       workExperience
+      otherLang
       createdAt
       updatedAt
       __typename

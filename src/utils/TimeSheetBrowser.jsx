@@ -29,6 +29,7 @@ import { LoadingMessManagerTable } from "../pages/timeSheet/customTimeSheet/Load
 import { FiLoader } from "react-icons/fi";
 import { ViewOffshoreORMCsheet } from "../pages/timeSheet/ViewOffshoreORMCsheet";
 import { UploadEditedHO } from "../pages/timeSheet/uploadManuallyEditedExcel/UploadEditedHO";
+import { UploadBLNGnewFormat } from "../pages/timeSheet/UploadTimeSheet/UploadBLNGnewFormat";
 
 const client = generateClient();
 export const TimeSheetBrowser = ({
@@ -215,7 +216,7 @@ export const TimeSheetBrowser = ({
         setReturnedTHeader(result);
 
         if (result === false) {
-          const editedResult =  UploadEditedHO(
+          const editedResult = UploadEditedHO(
             excelFile,
             setExcelData,
             setExcelFile,
@@ -237,7 +238,27 @@ export const TimeSheetBrowser = ({
         );
 
         setReturnedTHeader(result);
+        let checkexcel = false;
 
+        result.forEach((obj) => {
+          Object.keys(obj).forEach((key) => {
+            if (Number.isInteger(Number(key))) {
+              checkexcel = true;
+            }
+          });
+        });
+
+        if (checkexcel === true) {
+          const editedResult = UploadBLNGnewFormat(
+            excelFile,
+            setExcelData,
+            setExcelFile,
+            fileInputRef,
+            setLoading
+          );
+
+          setReturnedTHeader(editedResult);
+        }
         fileInputRef.current.value = "";
         setExcelFile(null);
       }
@@ -256,39 +277,20 @@ export const TimeSheetBrowser = ({
   };
   const { setStartDate, setEndDate, setSearchQuery } = useTempID();
 
-  // if (loadingStateManager.isLoading && Position === "Manager") {
-  //   return (
-  //     <div className="flex items-center justify-center h-[82vh] bg-transparent">
-  //       <div className="flex justify-between gap-2">
-  //         {loadingState.message === "No Data Available" ? (
-  //           <p className="text-sm font-semibold">{loadingState.message}</p>
-  //         ) : (
-  //           <div className="flex justify-between gap-2">
-  //             <p className="text-sm font-semibold">Loading </p>
-  //             <p>
-  //               <FiLoader className="animate-spin mt-[4px]" size={15} />
-  //             </p>
-  //           </div>
-  //         )}
-  //       </div>
-  //     </div>
-  //   );
-  // }
+ 
 
   if (showing === 0 && Position !== "Manager") {
     return (
       <div className="flex items-center justify-center h-[82vh] bg-transparent">
         <div className="flex justify-between gap-2">
-          {/* {loadingState.message === "No Data Available" ? (
-            <p className="text-sm font-semibold">{loadingState.message}</p>
-          ) : ( */}
+       
           <div className="flex justify-between gap-2">
             <p className="text-sm font-semibold">Loading </p>
             <p>
               <FiLoader className="animate-spin mt-[4px]" size={15} />
             </p>
           </div>
-          {/* )} */}
+        
         </div>
       </div>
     );
@@ -410,22 +412,7 @@ export const TimeSheetBrowser = ({
                         >
                           Upload
                         </button>
-                        {/* {title === "Offshore" && (
-                          <div className="flex items-center space-x-3 m-5">
-                            <input
-                              type="checkbox"
-                              className="h-5 w-5 text-dark_grey rounded checked:bg-red checked:border-transparent"
-                              checked={isChecked}
-                              onChange={handleCheckboxChange}
-                            />
-                            <label
-                              htmlFor="custom-checkbox"
-                              className="text-dark_grey text_size_4 "
-                            >
-                              ORMC
-                            </label>
-                          </div>
-                        )} */}
+                     
                       </div>
                     )}
                     {fileName && (

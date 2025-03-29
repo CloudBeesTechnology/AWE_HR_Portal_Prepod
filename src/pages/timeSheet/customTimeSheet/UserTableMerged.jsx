@@ -41,7 +41,9 @@ export const useTableMerged = (excelData) => {
           const mergedData = candidates
             .map((candidate) => {
               const interviewDetails = interviews.find(
-                (item) => item.empID === candidate.empID
+                (item) =>
+                  String(item.empID).toUpperCase() ===
+                  String(candidate.empID).toUpperCase()
               );
 
               if (!interviewDetails) {
@@ -69,7 +71,9 @@ export const useTableMerged = (excelData) => {
           const fetchWorkInfo = async () => {
             const finalData = fetchedData?.map((item) => {
               const workInfoItem = mergedData?.find(
-                (info) => String(info.empBadgeNo) === String(item.BADGE)
+                (info) =>
+                  String(info.empBadgeNo).toUpperCase() ===
+                  String(item.BADGE).toUpperCase()
               );
 
               return {

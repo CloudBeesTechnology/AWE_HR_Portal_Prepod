@@ -100,9 +100,8 @@ export const PersonalAcci = () => {
   const linkToStorageFile = async (pathUrl) => {
     try {
       const result = await getUrl({ path: pathUrl });
-      //   console.log("File URL:", result.url.href); // Use .href to extract the URL as a string
-      setPPLastUP(result.url.href); // Store the URL as a string
-      setViewingDocument(pathUrl); // Update the state to show the selected document
+      setPPLastUP(result.url.href); 
+      setViewingDocument(pathUrl); 
     } catch (error) {
       console.error("Error fetching the file URL:", error);
     }
@@ -114,7 +113,7 @@ export const PersonalAcci = () => {
       if (Array.isArray(parsedData)) {
         return parsedData.map((doc) => {
           if (doc.upload) {
-            doc.fileName = doc.upload.split("/").pop(); // Extract file name from path
+            doc.fileName = doc.upload.split("/").pop(); 
           }
           return doc;
         });
@@ -252,7 +251,6 @@ export const PersonalAcci = () => {
   }, []);
 
   const searchResult = (result) => {
-    console.log("RW", result);
     setSearchResultData(result);
   };
 

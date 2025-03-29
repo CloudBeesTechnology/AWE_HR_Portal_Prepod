@@ -184,6 +184,7 @@ type ProbForm @model @auth(rules: [{allow: public}]) {
   commitmentDetails: String
   probStatus: Boolean
   gmName: String
+  extendDate: String
 }
 
 type EmailNotifi @model @auth(rules: [{allow: public}]) {
@@ -466,6 +467,8 @@ type EmpLeaveDetails @model @auth(rules: [{allow: public}]) {
   sickLeaveDate: String
   hospLeave: String
   pervAnnualLeaveBal: String
+  sickLeaveTaken: String
+  remainAnnualLeave: String
 }
 
 type TerminationInfo @model @auth(rules: [{allow: public}]) {
@@ -726,6 +729,7 @@ type PersonalDetails @model @auth(rules: [{allow: public}]) {
   religion: String
   status: String
   workExperience: [AWSJSON]
+  otherLang: String
 }
 
 type User @model @auth(rules: [{allow: public}]) {
