@@ -15,12 +15,10 @@ import { useTempID } from "../../utils/TempIDContext";
 import { CandyDetails } from "../../services/updateMethod/UpdatePersonalDetails";
 import { handleDeleteFile } from "../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadApplication } from "../recruitments/deleteDocsRecruit/DeleteUploadApplication";
-import { MdCancel } from "react-icons/md";
 import { useDeleteAccess } from "../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../utils/DeletePopup";
 
 const client = generateClient();
-
 export const OtherDetails = ({ fetchedData }) => {
   const { formattedPermissions } = useDeleteAccess();
   const { submitODFunc } = RecODFunc();
