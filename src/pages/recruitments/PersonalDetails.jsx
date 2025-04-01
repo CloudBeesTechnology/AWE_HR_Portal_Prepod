@@ -338,7 +338,7 @@ export const PersonalDetails = () => {
             <div className=" absolute right-5 top-5 cursor-pointer" onClick={() => setIsOpen(false)}>
            <FaRegWindowClose/>
             </div>
-            <ul className="p-2">
+            <ul className="p-2 bg-white rounded-md">
               {languageOptions.map((option) => (
                 <li key={option.value} className="flex items-center gap-2 p-2  rounded">
                   <input
@@ -360,7 +360,7 @@ export const PersonalDetails = () => {
                 </li>
               ))}
 
-              <li className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded">
+              <li className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded ">
                 <input
                   type="checkbox"
                   id="lang-other"
@@ -399,13 +399,6 @@ export const PersonalDetails = () => {
 {errors.lang && <p className="text-[red] text-[12px]">{errors.lang.message}</p>}
 {errors.otherLang && <p className="text-[red] text-[12px]">{errors.otherLang.message}</p>}
 
-
-  {errors.lang && (
-    <p className="text-[red] text-[12px]">{errors.lang.message}</p>
-  )}
-  {errors.otherLang && (
-    <p className="text-[red] text-[12px]">{errors.otherLang.message}</p>
-  )}
 </div>
       </div>
       <div className="grid grid-cols-3 gap-4 mb-4 text_size_6">
