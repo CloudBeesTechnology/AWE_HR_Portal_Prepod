@@ -1142,6 +1142,7 @@ export const onCreateTrainingCertificates = /* GraphQL */ `
       orgiCertifiDate
       poNo
       addDescretion
+      tcRemarks
       createdAt
       updatedAt
       __typename
@@ -1161,6 +1162,7 @@ export const onUpdateTrainingCertificates = /* GraphQL */ `
       orgiCertifiDate
       poNo
       addDescretion
+      tcRemarks
       createdAt
       updatedAt
       __typename
@@ -1180,6 +1182,7 @@ export const onDeleteTrainingCertificates = /* GraphQL */ `
       orgiCertifiDate
       poNo
       addDescretion
+      tcRemarks
       createdAt
       updatedAt
       __typename
