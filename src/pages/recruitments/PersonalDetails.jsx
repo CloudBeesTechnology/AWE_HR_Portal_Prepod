@@ -334,7 +334,7 @@ export const PersonalDetails = () => {
           <ChevronDown className="w-5 h-5 text-grey" />
         </div>
         {isOpen && (
-          <div className="absolute left-0 w-full mt-2  rounded-lg shadow-lg z-10">
+          <div className="absolute left-0 w-full mt-2  bg-lite_skyBlue rounded-lg shadow-lg z-10">
             <div className=" absolute right-5 top-5 cursor-pointer" onClick={() => setIsOpen(false)}>
            <FaRegWindowClose/>
             </div>

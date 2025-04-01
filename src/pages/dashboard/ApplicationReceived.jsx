@@ -1,7 +1,6 @@
 import { useContext } from "react";
 import { DataSupply } from "../../utils/DataStoredContext";
 
-// Function to parse date strings into Date objects
 const parseDate = (date) => {
   if (!date) return null;
   const dateParts = date.split("/");
@@ -30,7 +29,6 @@ export const ApplicationReceived = () => {
     return expiryDate >= currentDate; // Show if expiry is today or later
   });
 
-  // Sort by createdAt (descending) and get the last 4 entries
   const latestData = validData
     ?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .slice(0, 4);

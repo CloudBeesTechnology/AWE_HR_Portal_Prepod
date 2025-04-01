@@ -30,7 +30,7 @@ export const RecruDash = () => {
   const filteredCards = RecDashdetails.filter((card) =>
     recruitmentPermissions.includes(card.title)
   );
-  // console.log(filteredCards, "kjhg");
+
   return (
     <section className="min-h-screen p-10 bg-[#F5F6F1]">
       <div

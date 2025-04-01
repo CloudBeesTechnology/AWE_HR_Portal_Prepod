@@ -40,7 +40,7 @@ export const RowFour = ({
         onChange={handleRelegianChange}
         errors={errors}
       />
-   {(selectedReligion === "OTHER" || (otherReligion && religion === "OTHER")) && (
+   {(selectedReligion === "OTHERS" || (otherReligion && religion === "OTHERS")) && (
           <FormField
             label="Other Religion"
             register={register}
