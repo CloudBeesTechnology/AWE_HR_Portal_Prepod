@@ -844,6 +844,7 @@ export const getTrainingCertificates = /* GraphQL */ `
       orgiCertifiDate
       poNo
       addDescretion
+      tcRemarks
       createdAt
       updatedAt
       __typename
@@ -870,6 +871,7 @@ export const listTrainingCertificates = /* GraphQL */ `
         orgiCertifiDate
         poNo
         addDescretion
+        tcRemarks
         createdAt
         updatedAt
         __typename

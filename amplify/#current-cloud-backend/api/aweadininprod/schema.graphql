@@ -261,6 +261,7 @@ type TrainingCertificates @model @auth(rules: [{allow: public}]) {
   orgiCertifiDate: [String]
   poNo: [String]
   addDescretion: [String]
+  tcRemarks: String
 }
 
 type AddCourse @model @auth(rules: [{allow: public}]) {
