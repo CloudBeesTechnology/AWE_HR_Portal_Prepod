@@ -15,7 +15,8 @@ export const TCDataFun = () => {
       trainingUpCertifi: [JSON.stringify(TCValue.trainingUpCertifi)],
       orgiCertifiDate:[TCValue.orgiCertifiDate],
       poNo: [TCValue.poNo],
-      addDescretion: [TCValue.addDescretion]
+      addDescretion: [TCValue.addDescretion],
+      tcRemarks:TCValue.tcRemarks
     };
     // console.log(totalData);
 
