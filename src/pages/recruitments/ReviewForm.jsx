@@ -644,9 +644,13 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                 },
                 { label: "Religion", value: candidate.religion || "N/A" },
                 { label: "Country of Birth", value: candidate.cob || "N/A" },
-                {
-                  label: "Language Profiency",
-                  value: candidate.lang || "N/A",
+                { 
+                  label: "Language Proficiency", 
+                  value: candidate.lang 
+                    ? typeof candidate.lang === "string"
+                      ? candidate.lang.replace(/\[|\]/g, "") // Remove brackets
+                      : candidate.lang.join(", ") // If it's an array, join it
+                    : "N/A"
                 },
                 {
                   label: "Home Address",

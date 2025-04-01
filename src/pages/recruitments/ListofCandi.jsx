@@ -13,6 +13,8 @@ import { CandyDelete } from "../../services/deleteMethod/CandyDelete";
 
 export const ListofCandi = () => {
   const { empPDData, IVSSDetails } = useContext(DataSupply);
+  // console.log(empPDData);
+  
   const [selectedRow, setSelectedRow] = useState(null);
   const { setTempID } = useTempID();
   const { handleDeletePDDetails } = CandyDelete();
