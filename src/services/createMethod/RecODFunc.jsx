@@ -41,26 +41,27 @@ export const RecODFunc = () => {
       workExperience
     };
   
-    // console.log(totalData);
+    console.log(totalData);
+    console.log(totalData1);
   
-    try {
-       await Promise.all([
-        client.graphql({
-          query: createPersonalDetails,
-          variables: { input: totalData1 },
-        }),
-        client.graphql({
-          query: createEducationDetails,
-          variables: { input: totalData },
-        }),
-      ]);
-      // console.log("Response", res)
-      // localStorage.removeItem("applicantFormData");
-      // localStorage.removeItem("personalFormData");
-    } catch (error) {
-      console.error("Error executing GraphQL requests:", error);
-      throw error; // Rethrow error if needed
-    }
+    // try {
+    //    await Promise.all([
+    //     client.graphql({
+    //       query: createPersonalDetails,
+    //       variables: { input: totalData1 },
+    //     }),
+    //     client.graphql({
+    //       query: createEducationDetails,
+    //       variables: { input: totalData },
+    //     }),
+    //   ]);
+    //   // console.log("Response", res)
+    //   // localStorage.removeItem("applicantFormData");
+    //   // localStorage.removeItem("personalFormData");
+    // } catch (error) {
+    //   console.error("Error executing GraphQL requests:", error);
+    //   throw error; // Rethrow error if needed
+    // }
   },[])
  return {submitODFunc}     
 }

@@ -321,7 +321,7 @@ export const PersonalDetails = () => {
     return (
       <>
         <div
-          className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full flex items-center cursor-pointer"
+          className="mt-2 p-2.5 text_size_9 bg-white border border-[#dedddd] text-dark_grey outline-none rounded w-full flex items-center cursor-pointer"
           onClick={() => setIsOpen(!isOpen)}
         >
           <input
@@ -334,13 +334,13 @@ export const PersonalDetails = () => {
           <ChevronDown className="w-5 h-5 text-grey" />
         </div>
         {isOpen && (
-          <div className="absolute left-0 w-full mt-2 bg-white border-[#dedddd] border rounded-lg shadow-lg z-10">
+          <div className="absolute left-0 w-full mt-2  bg-lite_skyBlue rounded-lg shadow-lg z-10">
             <div className=" absolute right-5 top-5 cursor-pointer" onClick={() => setIsOpen(false)}>
            <FaRegWindowClose/>
             </div>
             <ul className="p-2">
               {languageOptions.map((option) => (
-                <li key={option.value} className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded">
+                <li key={option.value} className="flex items-center gap-2 p-2  rounded">
                   <input
                     type="checkbox"
                     id={`lang-${option.value}`}
