@@ -2206,6 +2206,7 @@ export const getPersonalDetails = /* GraphQL */ `
       religion
       status
       workExperience
+      otherLang
       createdAt
       updatedAt
       __typename
@@ -2258,6 +2259,7 @@ export const listPersonalDetails = /* GraphQL */ `
         religion
         status
         workExperience
+        otherLang
         createdAt
         updatedAt
         __typename

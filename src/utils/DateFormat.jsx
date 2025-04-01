@@ -18,7 +18,7 @@ export const DateFormat = (dateToString) => {
   } else if (dateStr?.includes("-")) {
     [year, month, day] = dateStr?.split("-");
   } else {
-    return "";
+    return ""; 
   }
 
   const formattedDay = day?.padStart(2, "0");

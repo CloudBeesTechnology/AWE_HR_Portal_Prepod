@@ -236,7 +236,16 @@ export const UploadBLNGfile = (
       setExcelData(transformedData);
       setLoading(false);
 
-      return getResult.flat();
+      const header = getResult.flat();
+      const correctedTHeader = header.map((obj) => {
+        let newObj = {};
+        Object.values(obj).forEach((value) => {
+          newObj[value] = value;
+        });
+        return newObj;
+      });
+
+      return correctedTHeader;
     }
     fileInputRef.current.value = "";
     setExcelFile(null);

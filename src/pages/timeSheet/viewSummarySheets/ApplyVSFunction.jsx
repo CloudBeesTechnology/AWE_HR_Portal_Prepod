@@ -503,7 +503,7 @@ export const ApplyVSFunction = ({
                 }
               } else {
                 const workingHrs = parseFloat(checkEntry);
-              
+
                 if (workingHrs <= (entry?.normalWorkHrs || 0)) {
                   const absence = (
                     (entry?.normalWorkHrs || 0) - workingHrs
@@ -861,7 +861,7 @@ export const ApplyVSFunction = ({
             assignUpdaterDateTime: assignUpdaterDateTime,
           };
         }).filter(Boolean);
-        
+
         await ProcessedDataFunc(transformedData);
       };
       if (convertedStringToArrayObj && convertedStringToArrayObj.length > 0) {

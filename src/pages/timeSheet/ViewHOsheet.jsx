@@ -1178,66 +1178,7 @@ export const ViewHOsheet = ({
                       } else if (excelData && excelData) {
                         storeInitialData();
                       }
-                      // const fetchDataAndDelete = async () => {
-                      //   try {
-                      //     console.log("Fetching and Deleting SBW Data...");
-                      //     // setIsDeleting(true); // Set loading state
-                      //     let nextToken = null; // Initialize nextToken for pagination
-                      //     do {
-                      //       // Define the filter for fetching SBW data
-                      //       const filter = {
-                      //         and: [{ fileType: { eq: "HO" } }],
-                      //       };
-                      //       // Fetch the BLNG data using GraphQL with pagination
-                      //       const response = await client.graphql({
-                      //         query: listTimeSheets,
-                      //         variables: {
-                      //           filter: filter,
-                      //           nextToken: nextToken,
-                      //         }, // Pass nextToken for pagination
-                      //       });
-                      //       // Extract data and nextToken
-                      //       const SBWdata =
-                      //         response?.data?.listTimeSheets?.items || [];
-                      //       nextToken =
-                      //         response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
-                      //       console.log("Fetched SBW Data:", SBWdata);
-                      //       // Delete each item in the current batch
-                      //       await Promise.all(
-                      //         SBWdata.map(async (item) => {
-                      //           try {
-                      //             const deleteResponse = await client.graphql({
-                      //               query: deleteTimeSheet,
-                      //               variables: { input: { id: item.id } },
-                      //             });
-                      //             console.log(
-                      //               "Deleted Item Response:",
-                      //               deleteResponse
-                      //             );
-                      //           } catch (deleteError) {
-                      //             console.error(
-                      //               `Error deleting item with ID ${item.id}:`,
-                      //               deleteError
-                      //             );
-                      //           }
-                      //         })
-                      //       );
-                      //       console.log("Batch deletion completed.");
-                      //     } while (nextToken); // Continue fetching until no more data
-                      //     console.log(
-                      //       "All HO items deletion process completed."
-                      //     );
-                      //   } catch (fetchError) {
-                      //     console.error(
-                      //       "Error in fetchDataAndDelete:",
-                      //       fetchError
-                      //     );
-                      //   } finally {
-                      //     // setIsDeleting(false); // Reset loading state
-                      //   }
-                      // };
-
-                      // fetchDataAndDelete();
+                    
                     } else if (userIdentification === "Manager") {
                       renameKeysFunctionAndSubmit();
                       removeCheckedItem();

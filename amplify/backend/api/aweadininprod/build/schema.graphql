@@ -803,6 +803,7 @@ type PersonalDetails @aws_iam @aws_api_key {
   religion: String
   status: String
   workExperience: [AWSJSON]
+  otherLang: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -5682,6 +5683,7 @@ input ModelPersonalDetailsFilterInput {
   religion: ModelStringInput
   status: ModelStringInput
   workExperience: ModelStringInput
+  otherLang: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelPersonalDetailsFilterInput]
@@ -5727,6 +5729,7 @@ input ModelPersonalDetailsConditionInput {
   religion: ModelStringInput
   status: ModelStringInput
   workExperience: ModelStringInput
+  otherLang: ModelStringInput
   and: [ModelPersonalDetailsConditionInput]
   or: [ModelPersonalDetailsConditionInput]
   not: ModelPersonalDetailsConditionInput
@@ -5773,6 +5776,7 @@ input CreatePersonalDetailsInput {
   religion: String
   status: String
   workExperience: [AWSJSON]
+  otherLang: String
 }
 
 input UpdatePersonalDetailsInput {
@@ -5814,6 +5818,7 @@ input UpdatePersonalDetailsInput {
   religion: String
   status: String
   workExperience: [AWSJSON]
+  otherLang: String
 }
 
 input DeletePersonalDetailsInput {
@@ -5859,6 +5864,7 @@ input ModelSubscriptionPersonalDetailsFilterInput {
   religion: ModelSubscriptionStringInput
   status: ModelSubscriptionStringInput
   workExperience: ModelSubscriptionStringInput
+  otherLang: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionPersonalDetailsFilterInput]

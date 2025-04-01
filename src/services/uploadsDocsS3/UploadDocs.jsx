@@ -81,7 +81,7 @@ export const uploadReqString = async (file, fileType, tempID) => {
 
     // Upload the file using axios
     await axios.put(uploadUrl, file)
-          .then((res) => {
+      .then((res) => {
         console.log(res.data.message);
       })
       .catch((err) => {
