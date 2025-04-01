@@ -23,7 +23,7 @@ export const RowFour = ({
     .join(" "),
   }));
   const race = watch("race" || "");
-  const religion = watch("Religion" || "");
+  const religion = watch("religion" || "");
   const otherRace = watch("otherRace" || "");
   const otherReligion = watch("otherReligion" || "");
   return (
