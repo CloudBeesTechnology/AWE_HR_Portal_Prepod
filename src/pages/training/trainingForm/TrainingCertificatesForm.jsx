@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { trainingCertificatesValidation } from "../../../services/TrainingValidation";
 import { uploadDocs } from "../../../services/uploadsDocsS3/UploadDocs";
@@ -84,6 +84,7 @@ export const TrainingCertificatesForm = () => {
     handleSubmit,
     setValue,
     watch,
+    control,
     reset,
     formState: { errors },
   } = useForm({
@@ -507,7 +508,7 @@ export const TrainingCertificatesForm = () => {
                     )}
                   />
                 </div> 
-                
+
           <div className="center py-5">
             <button type="submit" className="primary_btn">
               Submit
