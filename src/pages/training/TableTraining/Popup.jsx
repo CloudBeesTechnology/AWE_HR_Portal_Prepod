@@ -15,20 +15,24 @@ const Popup = ({ details, popupAll, onClose }) => {
   useEffect(() => {
     const fetchUrls = async () => {
       const urls = {};
-
+  
       for (const field of popupAll) {
         if (uploadFields.includes(field.key)) {
-          // Check if the field is an upload field
           const value = details[field.key];
           if (value) {
-            const fileKey = JSON.parse(value);
+            let fileKey = [];
+            try {
+              fileKey = typeof value === "string" ? JSON.parse(value) : [];
+            } catch (error) {
+              console.error(`Error parsing JSON for ${field.key}:`, error);
+              continue; // Skip this field if JSON parsing fails
+            }
+  
             if (Array.isArray(fileKey) && fileKey.length > 0) {
-              const lastUpload = fileKey[fileKey.length -1].upload;
+              const lastUpload = fileKey[fileKey.length - 1].upload;
               try {
-                // const trimmedPath = lastUpload?.replace(/^public\//, ""); // Remove 'public/' if it exists
                 const result = await getUrl({ path: lastUpload });
-
-                urls[field.key] = result.url.href; // Store resolved URL for the specific file
+                urls[field.key] = result.url.href;
               } catch (error) {
                 console.error(`Error fetching URL for ${field.key}:`, error);
               }
@@ -36,12 +40,13 @@ const Popup = ({ details, popupAll, onClose }) => {
           }
         }
       }
-
-      setFileUrls(urls); // Update state with the resolved URLs
+  
+      setFileUrls(urls);
     };
-
+  
     fetchUrls();
   }, [details, popupAll]);
+  
 
   return (
     <div className="fixed top-0 w-full left-0 bg-black bg-opacity-50 z-[9999] py-7 min-h-screen flex items-center justify-center ">
@@ -87,7 +92,7 @@ const Popup = ({ details, popupAll, onClose }) => {
      details[field.key] === undefined ||
      (Array.isArray(details[field.key]) && 
       (details[field.key].length === 0 || 
-       (details[field.key].length === 1 && details[field.key][0].trim() === "[]"))) ||
+       (details[field.key].length === 1 && details[field.key][0]?.trim() === "[]"))) ||
      details[field.key] === "[]")
       ? "N/A"
       : details[field.key]

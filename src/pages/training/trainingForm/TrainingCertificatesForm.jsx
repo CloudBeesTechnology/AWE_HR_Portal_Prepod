@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { trainingCertificatesValidation } from "../../../services/TrainingValidation";
 import { uploadDocs } from "../../../services/uploadsDocsS3/UploadDocs";
@@ -84,6 +84,7 @@ export const TrainingCertificatesForm = () => {
     handleSubmit,
     setValue,
     watch,
+    control,
     reset,
     formState: { errors },
   } = useForm({
@@ -204,7 +205,7 @@ export const TrainingCertificatesForm = () => {
     }
 
     // Define keys to set
-    const keysToSet = ["empID", "empBadgeNo", "name", "position"];
+    const keysToSet = ["empID", "empBadgeNo", "name", "position","tcRemarks"];
     const fields = [
       "department",
       "courseCode",
@@ -490,6 +491,24 @@ export const TrainingCertificatesForm = () => {
               access={access}
             />
           </div>
+
+          <div className=" my-5">
+                  <label className="text_size_6 my-3">
+                    Remarks
+                  </label>
+                  <Controller
+                    name="tcRemarks"
+                    control={control}
+                    render={({ field }) => (
+                      <textarea
+                        {...field}
+                        className="resize-none mt-2 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full"
+                        rows="3"
+                      ></textarea>
+                    )}
+                  />
+                </div> 
+
           <div className="center py-5">
             <button type="submit" className="primary_btn">
               Submit

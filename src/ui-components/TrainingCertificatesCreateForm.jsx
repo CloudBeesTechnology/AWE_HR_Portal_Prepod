@@ -197,6 +197,7 @@ export default function TrainingCertificatesCreateForm(props) {
     orgiCertifiDate: [],
     poNo: [],
     addDescretion: [],
+    tcRemarks: "",
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [certifiExpiry, setCertifiExpiry] = React.useState(
@@ -215,6 +216,7 @@ export default function TrainingCertificatesCreateForm(props) {
   const [addDescretion, setAddDescretion] = React.useState(
     initialValues.addDescretion
   );
+  const [tcRemarks, setTcRemarks] = React.useState(initialValues.tcRemarks);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setEmpID(initialValues.empID);
@@ -230,6 +232,7 @@ export default function TrainingCertificatesCreateForm(props) {
     setCurrentPoNoValue("");
     setAddDescretion(initialValues.addDescretion);
     setCurrentAddDescretionValue("");
+    setTcRemarks(initialValues.tcRemarks);
     setErrors({});
   };
   const [currentCertifiExpiryValue, setCurrentCertifiExpiryValue] =
@@ -257,6 +260,7 @@ export default function TrainingCertificatesCreateForm(props) {
     orgiCertifiDate: [],
     poNo: [],
     addDescretion: [],
+    tcRemarks: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -291,6 +295,7 @@ export default function TrainingCertificatesCreateForm(props) {
           orgiCertifiDate,
           poNo,
           addDescretion,
+          tcRemarks,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -360,6 +365,7 @@ export default function TrainingCertificatesCreateForm(props) {
               orgiCertifiDate,
               poNo,
               addDescretion,
+              tcRemarks,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -386,6 +392,7 @@ export default function TrainingCertificatesCreateForm(props) {
               orgiCertifiDate,
               poNo,
               addDescretion,
+              tcRemarks,
             };
             const result = onChange(modelFields);
             values = result?.certifiExpiry ?? values;
@@ -439,6 +446,7 @@ export default function TrainingCertificatesCreateForm(props) {
               orgiCertifiDate,
               poNo,
               addDescretion,
+              tcRemarks,
             };
             const result = onChange(modelFields);
             values = result?.eCertifiDate ?? values;
@@ -492,6 +500,7 @@ export default function TrainingCertificatesCreateForm(props) {
               orgiCertifiDate,
               poNo,
               addDescretion,
+              tcRemarks,
             };
             const result = onChange(modelFields);
             values = result?.trainingUpCertifi ?? values;
@@ -551,6 +560,7 @@ export default function TrainingCertificatesCreateForm(props) {
               orgiCertifiDate: values,
               poNo,
               addDescretion,
+              tcRemarks,
             };
             const result = onChange(modelFields);
             values = result?.orgiCertifiDate ?? values;
@@ -607,6 +617,7 @@ export default function TrainingCertificatesCreateForm(props) {
               orgiCertifiDate,
               poNo: values,
               addDescretion,
+              tcRemarks,
             };
             const result = onChange(modelFields);
             values = result?.poNo ?? values;
@@ -658,6 +669,7 @@ export default function TrainingCertificatesCreateForm(props) {
               orgiCertifiDate,
               poNo,
               addDescretion: values,
+              tcRemarks,
             };
             const result = onChange(modelFields);
             values = result?.addDescretion ?? values;
@@ -699,6 +711,37 @@ export default function TrainingCertificatesCreateForm(props) {
           {...getOverrideProps(overrides, "addDescretion")}
         ></TextField>
       </ArrayField>
+      <TextField
+        label="Tc remarks"
+        isRequired={false}
+        isReadOnly={false}
+        value={tcRemarks}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              certifiExpiry,
+              eCertifiDate,
+              trainingUpCertifi,
+              orgiCertifiDate,
+              poNo,
+              addDescretion,
+              tcRemarks: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.tcRemarks ?? value;
+          }
+          if (errors.tcRemarks?.hasError) {
+            runValidationTasks("tcRemarks", value);
+          }
+          setTcRemarks(value);
+        }}
+        onBlur={() => runValidationTasks("tcRemarks", tcRemarks)}
+        errorMessage={errors.tcRemarks?.errorMessage}
+        hasError={errors.tcRemarks?.hasError}
+        {...getOverrideProps(overrides, "tcRemarks")}
+      ></TextField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

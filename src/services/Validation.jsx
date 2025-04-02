@@ -119,7 +119,8 @@ export const PersonalSchema = (nationality) => {
     presentAddress: Yup.string().required("Present Address is mandatory"),
     permanentAddress: Yup.string().notRequired(),
     driveLic: Yup.string().notRequired(),
-    lang: Yup.string().required("Language is mandatory"),
+    // lang: Yup.string().required("Language is mandatory"),
+    OtherLang: Yup.string().notRequired(),
     familyDetails: Yup.array()
       .of(
         Yup.object().shape({
