@@ -92,57 +92,45 @@ export const OtherDetails = ({ fetchedData }) => {
   useEffect(() => {
     const parseDetails = (data) => {
       try {
-     
         let cleanedData = data.replace(/\\/g, "");
-      
-  
+
         cleanedData = cleanedData.replace(/'/g, '"');
-       
-  
+
         cleanedData = cleanedData.replace(
           /([{,])(\s*)([a-zA-Z0-9_]+)(\s*):/g,
           '$1"$3":'
         );
-      
-  
+
         cleanedData = cleanedData.replace(
           /:([a-zA-Z0-9_/.\s]+)(?=\s|,|\})/g,
           ':"$1"'
         );
 
-  
         if (cleanedData.startsWith('"') && cleanedData.endsWith('"')) {
           cleanedData = cleanedData.slice(1, -1);
-        
         }
-  
+
         const parsedData = JSON.parse(cleanedData);
-       
-  
+
         if (!Array.isArray(parsedData)) {
-         
           return [];
         }
-  
+
         return parsedData;
       } catch (error) {
         console.error("Error parsing details:", error);
         return [];
       }
     };
-  
-    
+
     if (tempID) {
       if (educDetailsData.length > 0) {
         const interviewData = educDetailsData.find(
           (data) => data.tempID === tempID
         );
-  
-     
-  
+
         if (interviewData) {
-          Object.keys(interviewData).forEach((key) => {  
-  
+          Object.keys(interviewData).forEach((key) => {
             if (
               key === "emgDetails" ||
               key === "referees" ||
@@ -153,26 +141,27 @@ export const OtherDetails = ({ fetchedData }) => {
                 typeof interviewData[key][0] === "string"
               ) {
                 let parsedData = parseDetails(interviewData[key][0]);
-               
+
                 if (parsedData.length > 0) {
                   setValue(key, parsedData);
                 }
               }
             } else if (interviewData[key]) {
-            // Log value being set
+              // Log value being set
               setValue(key, interviewData[key]);
             }
           });
-  
+
           if (interviewData) {
-           
             setUploadedFileNames((prev) => ({
               ...prev,
-              uploadCertificate: extractFileName(interviewData.uploadCertificate),
+              uploadCertificate: extractFileName(
+                interviewData.uploadCertificate
+              ),
               uploadPp: extractFileName(interviewData.uploadPp),
               uploadResume: extractFileName(interviewData.uploadResume),
             }));
-  
+
             setUploadedDocs((prev) => ({
               ...prev,
               uploadCertificate: interviewData.uploadCertificate,
@@ -264,8 +253,6 @@ export const OtherDetails = ({ fetchedData }) => {
     }
   };
 
-
-
   const getTotalCount = async () => {
     try {
       let allTempIDs = [];
@@ -323,20 +310,17 @@ export const OtherDetails = ({ fetchedData }) => {
     return nextTempID;
   };
 
-  var latestTempIDData
+  var latestTempIDData;
 
   const onSubmit = async (data) => {
-   
-
     try {
       setIsLoading(true);
 
       const isUpdate = data.tempID;
-    
 
       if (!isUpdate) {
         const nextTempID = await fetchNextTempID();
-        latestTempIDData = nextTempID
+        latestTempIDData = nextTempID;
       }
 
       const personName = !data.tempID ? latestTempIDData : data.tempID;
@@ -369,28 +353,34 @@ export const OtherDetails = ({ fetchedData }) => {
       // let uploadedPp = null;
 
       //  Conditional file upload check using isUp state
-    const uploadedResume = isUploadingString.uploadResume
-    ? await uploadReqString(data.uploadResume, "uploadResume", personName)
-    : uploadedDocs?.uploadResume; // Use existing value if no new upload
+      const uploadedResume = isUploadingString.uploadResume
+        ? await uploadReqString(data.uploadResume, "uploadResume", personName)
+        : uploadedDocs?.uploadResume; // Use existing value if no new upload
 
-  const uploadedCertificate = isUploadingString.uploadCertificate
-    ? await uploadReqString(data.uploadCertificate, "uploadCertificate", personName)
-    : uploadedDocs?.uploadCertificate;
+      const uploadedCertificate = isUploadingString.uploadCertificate
+        ? await uploadReqString(
+            data.uploadCertificate,
+            "uploadCertificate",
+            personName
+          )
+        : uploadedDocs?.uploadCertificate;
 
-  const uploadedPp = isUploadingString.uploadPp
-    ? await uploadReqString(data.uploadPp, "uploadPp", personName)
-    : uploadedDocs?.uploadPp;
+      const uploadedPp = isUploadingString.uploadPp
+        ? await uploadReqString(data.uploadPp, "uploadPp", personName)
+        : uploadedDocs?.uploadPp;
 
-      const UpProfilePhoto = await uploadReqString(
-        navigatingEducationData.profilePhoto,
-        "profilePhoto",
-        personName
-      );
+      const UpProfilePhoto =
+        navigatingEducationData.profilePhotoDoc &&
+        !navigatingEducationData.profilePhotoDoc.includes("Employee")
+          ? navigatingEducationData.profilePhotoDoc
+          : await uploadReqString(
+              navigatingEducationData.profilePhoto,
+              "profilePhoto",
+              personName
+            );
       //"Helpp"
       const baseURL =
-        "https://aweadininprod20240d7e6-dev.s3.ap-southeast-1.amazonaws.com/";
-      // const baseURL =
-      //   "https://aweadininprod2024954b8-prod.s3.ap-southeast-1.amazonaws.com/";
+        "https://aweadininprod2024954b8-prod.s3.ap-southeast-1.amazonaws.com/";
 
       const safeReplace = (url) => {
         if (url && !url.includes("undefined")) {
@@ -403,6 +393,13 @@ export const OtherDetails = ({ fetchedData }) => {
       const reqValue = {
         ...data,
         ...navigatingEducationData,
+        noExperience: data.noExperience,
+        salaryExpectation: data.salaryExpectation,
+        noticePeriod: data.noticePeriod,
+        perIS: data.perIS,
+        perIDesc: data.perIDesc,
+        supportInfo: data.supportInfo,
+        empStatement: data.empStatement,
         eduDetails: formattedEduDetails,
         familyDetails: formattedFamilyDetails,
         workExperience: formattedWorkExperience,
@@ -410,10 +407,12 @@ export const OtherDetails = ({ fetchedData }) => {
         referees: formattedReferees,
         relatives: formattedRelatives,
         status: "Active",
-        profilePhoto: UpProfilePhoto?.replace(baseURL, ""),
-        uploadResume: uploadedResume?.replace(baseURL, ""),
-        uploadCertificate: uploadedCertificate?.replace(baseURL, ""),
-        uploadPp: uploadedPp?.replace(baseURL, ""),
+        profilePhoto: safeReplace(UpProfilePhoto?.replace(baseURL, "")),
+        uploadResume: safeReplace(uploadedResume?.replace(baseURL, "")),
+        uploadCertificate: safeReplace(
+          uploadedCertificate?.replace(baseURL, "")
+        ),
+        uploadPp: safeReplace(uploadedPp?.replace(baseURL, "")),
       };
 
       const checkingPDTable = empPDData.find(
@@ -429,14 +428,11 @@ export const OtherDetails = ({ fetchedData }) => {
           PDTableID: checkingPDTable.id,
           EDTableID: checkingEDTable.id,
         };
-       
 
         await candyDetails({ reqValue: updateReqValue });
         setNotification(true);
         setIsLoading(false);
       } else {
-
-
         console.log({ reqValue, latestTempIDData });
         await submitODFunc({ reqValue, latestTempIDData });
         setNotification(true);

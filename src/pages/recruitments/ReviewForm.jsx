@@ -13,7 +13,6 @@ import { DataSupply } from "../../utils/DataStoredContext";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { pdfjs } from "react-pdf";
-import { useReactToPrint } from "react-to-print";
 import { getUrl } from "@aws-amplify/storage";
 import { sendEmail } from "../../services/EmailServices";
 import defaultAvatar from "../../assets/navabar/defaultAvatar.jpg";
@@ -281,7 +280,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             TO_ADDRESS_CANDY
           );
         } catch (err) {
-          // console.log("Error during update call: ", err);
+          console.log("Error during update call: ", err);
         }
       } else {
         const createData = {
@@ -295,7 +294,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             variables: { input: createData },
           });
         } catch (err) {
-          // console.log("Error during create call: ", err);
+          console.log("Error during create call: ", err);
         }
       }
 
@@ -447,7 +446,8 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     setIsScheduleOpen(false);
   };
 
-
+  console.log("Candy", candyEducDeatils);
+  
   const renderDocumentsUnderCategory = (documents) => {
     return (
       <>

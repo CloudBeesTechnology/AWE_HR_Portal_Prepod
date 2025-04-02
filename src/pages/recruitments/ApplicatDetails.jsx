@@ -21,7 +21,7 @@ import {
 } from "../../utils/DropDownMenus";
 
 export const ApplicantDetails = () => {
-  const { empPDData, dropDownVal, educDetailsData } = useContext(DataSupply);
+  const { empPDData } = useContext(DataSupply);
   const { tempID } = useTempID();
   const location = useLocation();
   const navigate = useNavigate();
@@ -32,11 +32,6 @@ export const ApplicantDetails = () => {
       behavior: "smooth",
     });
   }, []);
-
-  const religionDD = dropDownVal[0]?.religionDD || [];
-  const raceDD = dropDownVal[0]?.raceDD || [];
-  const nationalityDD = dropDownVal[0]?.nationalityDD || [];
-
   const {
     register,
     handleSubmit,
@@ -63,7 +58,7 @@ export const ApplicantDetails = () => {
   };
 
   const profile = watch("profilePhoto");
-  // console.log(tempID);
+ 
 
   useEffect(() => {
     const savedData = JSON.parse(localStorage.getItem("profileStore"));
@@ -83,7 +78,7 @@ export const ApplicantDetails = () => {
         }
       });
     } else {
-      // console.log('No saved data in localStorage');
+    
     }
 
     const handleBeforeUnload = () => {
@@ -153,7 +148,6 @@ export const ApplicantDetails = () => {
       if (empPDData.length > 0) {
         const interviewData = empPDData.find((data) => data.tempID === tempID);
         if (interviewData) {
-          // console.log("Interview Data", interviewData);
           selectedFields.forEach((key) => {
             if (
               key === "familyDetails" ||
@@ -172,7 +166,7 @@ export const ApplicantDetails = () => {
             } else if (interviewData[key]) {
               setValue(key, interviewData[key]);
             } else {
-              // console.log(`No value for key ${key}`);
+             
             }
           });
 
@@ -184,42 +178,16 @@ export const ApplicantDetails = () => {
             setValue("profilePhoto", interviewData.profilePhoto);
           }
         } else {
-          // console.log("No interview data found for tempID:", tempID);
+          
         }
       }
     }
   }, [tempID, setValue, empPDData]);
 
-  //   const handleFileChange = (e) => {
-  //     const selectedFile = e.target.files[0];
-  //     const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
-
-  //     if (!selectedFile) return;
-  //     if (!allowedTypes.includes(selectedFile.type)) {
-  //       alert("Upload must be an image (JPG, JPEG, PNG)");
-  //       return;
-  //     }
-
-  //     setProfilePhoto(selectedFile);
-  //     setValue("profilePhoto", selectedFile);
-  // // console.log(selectedFile,"selectedFile");
-
-  //     setUploadedFileNames((prev) => ({
-  //       ...prev,
-  //       profilePhoto: selectedFile.name,
-  //     }));
-
-  //     const savedData = JSON.parse(localStorage.getItem("applicantFormData")) || {};
-  //     savedData.profilePhoto = selectedFile.name;
-  //     // console.log( savedData.profilePhoto,"saveData");
-  //     // console.log(selectedFile.name,"selectedFile.name");
-
-  //     localStorage.setItem("applicantFormData", JSON.stringify(savedData));
-  //   };
+ 
 
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
-    const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
 
     if (selectedFile) {
       setProfilePhoto(selectedFile);
@@ -244,7 +212,8 @@ export const ApplicantDetails = () => {
       const applicationUpdate = {
         ...data,
         profilePhoto: profilePhoto,
-        uploadedFileNames: uploadedFileNames.profilePhoto,
+        uploadedFileNames: uploadedFileNames?.profilePhoto,
+        profilePhotoDoc: uploadedDocs?.profilePhoto
       };
 
       localStorage.setItem(
@@ -257,14 +226,17 @@ export const ApplicantDetails = () => {
         profilePhoto: uploadedDocs.profilePhoto,
       };
 
-      localStorage.setItem("profileStore", JSON.stringify(profileStore));
+      localStorage.setItem(
+        "profileStore",
+        JSON.stringify(profileStore)
+      );
 
-      // console.log("APP", applicationUpdate);
+    
       navigate("/addCandidates/personalDetails", {
         state: { FormData: applicationUpdate },
       });
     } catch (error) {
-      console.log(error);
+     
     }
   };
 
@@ -368,15 +340,16 @@ export const ApplicantDetails = () => {
           </div>
         </div>
 
-        <div className="grid  md:grid-cols-2 gap-x-12 gap-y-5 my-4 text_size_6">
+        <div className="grid grid-cols-2 gap-x-12 gap-y-5 mb-4 text_size_6">
           {[
             {
               label: "Contract Type",
               name: "contractType",
               type: "select",
-              options: ["Local", "LPA", "SAWP"],
+              options: ContractTypeDD,
             },
-            { label: "Agent", name: "agent", type: "text" },
+            { label: "CV Received From", name: "agent", type: "text" },
+
             { label: "Name", name: "name", type: "text" },
             {
               label: "Chinese characters (if applicable)",
@@ -387,7 +360,7 @@ export const ApplicantDetails = () => {
               label: "Gender",
               name: "gender",
               type: "select",
-              options: ["Male", "Female"],
+              options: GenderDD,
             },
             { label: "Date of Birth", name: "dob", type: "date" },
             { label: "Age", name: "age", type: "number", min: 20, max: 99 },
@@ -396,14 +369,14 @@ export const ApplicantDetails = () => {
               label: "Marital Status",
               name: "marital",
               type: "select",
-              options: ["Single", "Married", "Widow", "Separate", "Divorce"],
+              options: MaritalDD,
             },
             { label: "Country of Birth", name: "cob", type: "text" },
             {
               label: "Nationality",
               name: "nationality",
               type: "select",
-              options: nationalityDD,
+              options: NationalityDD,
             },
             {
               label: "Other Nationality",
@@ -411,7 +384,12 @@ export const ApplicantDetails = () => {
               type: "text",
               disabled: watch("nationality")?.toLowerCase() !== "other",
             },
-            { label: "Race", name: "race", type: "select", options: raceDD },
+            {
+              label: "Race",
+              name: "race",
+              type: "select",
+              options: RaceDD,
+            },
             {
               label: "Other Race",
               name: "otherRace",
@@ -422,13 +400,13 @@ export const ApplicantDetails = () => {
               label: "Religion",
               name: "religion",
               type: "select",
-              options: religionDD,
+              options: ReligionDD,
             },
             {
               label: "Other Religion",
               name: "otherReligion",
               type: "text",
-              disabled: watch("religion")?.toLowerCase() !== "others",
+              disabled: watch("religion")?.toLowerCase() !== "other",
             },
           ].map((field, index) => (
             <div key={index}>
@@ -436,13 +414,12 @@ export const ApplicantDetails = () => {
               {field.type === "select" ? (
                 <select
                   {...register(field.name)}
-                  className="input-field select-custom"
+                  className="mt-2 p-2.5 text_size_7 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full"
                 >
-                  <option value="">Select</option>{" "}
-                  {/* Ensure default empty option */}
+                  <option value=""></option>
                   {(field.options || []).map((option, i) => (
-                    <option key={i} value={option}>
-                      {option}
+                    <option key={i} value={option.value}>
+                      {option.label}
                     </option>
                   ))}
                 </select>
