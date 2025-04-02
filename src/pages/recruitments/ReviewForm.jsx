@@ -631,9 +631,9 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                   label: "Nationality",
                   value: candidate.nationality || "N/A",
                 },
-                { label: "Other Nationality", value: candidate.otherNation },
+                { label: "Other Nationality", value: candidate.otherNation || "N/A"},
                 { label: "Race", value: candidate.race || "N/A" },
-                { label: "Other Race", value: candidate.otherRace },
+                { label: "Other Race", value: candidate.otherRace || "N/A"},
                 { label: "Gender", value: candidate.gender || "N/A" },
                 {
                   label: "Date of Birth",
@@ -645,7 +645,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                   value: candidate.marital || "N/A",
                 },
                 { label: "Religion", value: candidate.religion || "N/A" },
-                { label: "Other Religion", value: candidate.otherReligion },
+                { label: "Other Religion", value: candidate.otherReligion || "N/A" },
                 { label: "Country of Birth", value: candidate.cob || "N/A" },
                 { 
                   label: "Language Proficiency", 
@@ -655,7 +655,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                       : candidate.lang.join(", ") // If it's an array, join it
                     : "N/A"
                 },
-                { label: "Other Language", value: candidate.otherLang },
+                { label: "Other Language", value: candidate.otherLang || "N/A"},
                 {
                   label: "Home Address",
                   value: candidate.permanentAddress || "N/A",
