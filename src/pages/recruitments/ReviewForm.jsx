@@ -280,7 +280,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             TO_ADDRESS_CANDY
           );
         } catch (err) {
-          // console.log("Error during update call: ", err);
+          console.log("Error during update call: ", err);
         }
       } else {
         const createData = {
@@ -294,7 +294,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             variables: { input: createData },
           });
         } catch (err) {
-          // console.log("Error during create call: ", err);
+          console.log("Error during create call: ", err);
         }
       }
 
@@ -446,7 +446,8 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     setIsScheduleOpen(false);
   };
 
-
+  console.log("Candy", candyEducDeatils);
+  
   const renderDocumentsUnderCategory = (documents) => {
     return (
       <>

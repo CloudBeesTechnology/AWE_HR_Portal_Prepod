@@ -389,8 +389,6 @@ export const OtherDetails = ({ fetchedData }) => {
       //"Helpp"
       const baseURL =
         "https://aweadininprod20240d7e6-dev.s3.ap-southeast-1.amazonaws.com/";
-      // const baseURL =
-      //   "https://aweadininprod2024954b8-prod.s3.ap-southeast-1.amazonaws.com/";
 
       const safeReplace = (url) => {
         if (url && !url.includes("undefined")) {
