@@ -189,7 +189,7 @@ export const App = () => {
                   className="mt-4 bg-yellow py-2 px-4 rounded" 
                   onClick={handleSessionExpiredClose}
                 >
-                  OK
+                  Ok
                 </button>
               </div>
             </Modal>
