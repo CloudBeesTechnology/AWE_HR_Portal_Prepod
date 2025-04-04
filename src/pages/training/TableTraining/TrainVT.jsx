@@ -64,10 +64,10 @@ export const TrainVT = ({ mergering, columns, popupAll }) => {
               <tr>
                 {columns.map((column, index) => (
                   <th key={index} className="py-4 px-2 text-white ">
-                    {column.header}
+                    {column.header} 
                   </th>
                 ))}
-                <th className="py-4 px-4 text-white">View</th>
+                <th className="py-4 px-4 text-white">View </th>
               </tr>
             </thead>
             <tbody className="bg-white text-center text-sm font-semibold text-dark_grey ">

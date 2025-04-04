@@ -50,7 +50,7 @@ const Popup = ({ details, popupAll, onClose }) => {
 
   return (
     <div className="fixed top-0 w-full left-0 bg-black bg-opacity-50 z-[9999] py-7 min-h-screen flex items-center justify-center ">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-[40%] h-[550px] overflow-y-auto scrollBar ">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-[40%] h-[550px] overflow-y-auto  ">
       <div className="flex justify-between items-center pb-3 ">
 <div className="w-full center">
 <img src={AweLogo} alt="Logo" className="max-w-[200px] " />
@@ -68,34 +68,34 @@ const Popup = ({ details, popupAll, onClose }) => {
         </h2>
         <div className=" shadow-md rounded-md px-10">
           <article className="flex flex-col">
-            {popupAll.map((field, index) => {
+            {popupAll?.map((field, index) => {
               // console.log(details[field.key]);
 
               return (
                 <article key={index} className="mb-2 flex flex-col">
                 <article className="flex justify-between text-[14px]">
                   <p className="flex-1 text-start font-medium">
-                    {field.header}
+                    {field?.header}
                   </p>
                   <p className="flex-1 text-center">:</p>
                   <p className="flex-1 text-start">
-  {uploadFields.includes(field.key) && fileUrls[field.key] ? (
+  {uploadFields?.includes(field?.key) && fileUrls[field?.key] ? (
     <a
-      href={fileUrls[field.key]}
+      href={fileUrls[field?.key]}
       rel="noopener noreferrer"
       className="text-blue underline"
     >
       Download
     </a>
   ) : (
-    (details[field.key] === null ||
-     details[field.key] === undefined ||
-     (Array.isArray(details[field.key]) && 
-      (details[field.key].length === 0 || 
-       (details[field.key].length === 1 && details[field.key][0]?.trim() === "[]"))) ||
-     details[field.key] === "[]")
+    (details[field?.key] === null ||
+     details[field?.key] === undefined ||
+     (Array.isArray(details[field?.key]) && 
+      (details[field?.key].length === 0 || 
+       (details[field?.key].length === 1 && details[field?.key][0]?.trim() === "[]"))) ||
+     details[field?.key] === "[]")
       ? "N/A"
-      : details[field.key]
+      : details[field?.key]
   )}
 </p>
                 </article>

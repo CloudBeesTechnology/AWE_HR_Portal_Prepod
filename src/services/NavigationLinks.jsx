@@ -118,6 +118,8 @@ import {LeaveStatus} from "../components/migratingData/LeaveStatus"
 import { AddDropDown } from "../components/migratingData/AddDropDown";
 import { OffshoreORMC } from "../pages/timeSheet/OffshoreORMC";
 import { OffshoreExcelSheets } from "../pages/timeSheet/OffshoreExcelSheets";
+import { TrainingCertifyMD } from "../components/migratingData/TrainingCertifyMD";
+import { TriningReqMD } from "../components/migratingData/TriningReqMD";
 const client = generateClient();
 
 const NavigationLinks = () => {
@@ -245,6 +247,8 @@ const NavigationLinks = () => {
         <Route path="/migrationLMInfo" element={<LabourMedicalInfoMD />} />
         <Route path="/migrationNlms" element={<NlmsMD />} />
         <Route path="/migrationLeaveData" element={<LeaveStatus/> } /> 
+        <Route path="/migrationTrainingCertify" element={<TrainingCertifyMD />} />
+        <Route path="/migrationTriningReq" element={<TriningReqMD />} />
         <Route
           path="/"
           element={<Navigate to={`/${firstCategory?.toLowerCase()}`} />}
