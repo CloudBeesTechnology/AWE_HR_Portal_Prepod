@@ -430,16 +430,22 @@ export const OtherDetails = ({ fetchedData }) => {
         };
 
         await candyDetails({ reqValue: updateReqValue });
+        // console.log("Update", updateReqValue);
+        
         setNotification(true);
         setIsLoading(false);
       } else {
         console.log({ reqValue, latestTempIDData });
         await submitODFunc({ reqValue, latestTempIDData });
+        // console.log("Create", reqValue);
+        // console.log("TempID", latestTempIDData);
+        
         setNotification(true);
         setIsLoading(false);
       }
     } catch (error) {
       console.error("Error submitting data:", error);
+      setIsLoading(false);
     }
   };
 
