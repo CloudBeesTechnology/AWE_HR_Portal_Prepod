@@ -214,8 +214,8 @@ export const GroupHS = () => {
     // console.log("data121", data);
 
     try {
-      const checkingDITable = groupHSData.find(
-        (match) => match.id === searchResultData.id
+      const checkingDITable = groupHSData?.find(
+        (match) => match?.id === searchResultData?.id
       );
 
       console.log(checkingDITable);
@@ -227,7 +227,7 @@ export const GroupHS = () => {
           id: checkingDITable.id,
           groupHSUpload: JSON.stringify(uploadGHsU.groupHSUpload),
         };
-        // console.log("update value logs:", updatedGHSValue);
+        console.log("update value logs:", updatedGHSValue);
 
         const totalData = {
           id: updatedGHSValue.id,
@@ -307,7 +307,7 @@ export const GroupHS = () => {
         const mergedData = empPIData
           .map((emp) => {
             const groupHSDetails = groupHSData
-              ? groupHSData.find((user) => user.empID === emp.empID)
+              ? groupHSData?.find((user) => user.empID === emp.empID)
               : {};
             return {
               ...emp,

@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { lazy, Suspense, useEffect, useState } from "react";
 import DataStoredContext from "./utils/DataStoredContext";
 import { TempIDProvider } from "./utils/TempIDContext";
-import { IdleTimerProvider } from 'react-idle-timer';
 import { signOut } from "@aws-amplify/auth";
 import { NotifiCenterProvider } from "./hooks/useNotifiCenter";
 
@@ -13,10 +12,7 @@ const Sidebar = lazy(() => import("./components/Sidebar"));
 const Login = lazy(() => import("./pages/login/Login"));
 
 const ForgotEmail = lazy(() => import("./pages/forgotPassword/ForgotEmail"));
-
-const ForgotPassword = lazy(() =>
-  import("./pages/forgotPassword/ForgotPassword")
-);
+const ForgotPassword = lazy(() => import("./pages/forgotPassword/ForgotPassword"));
 
 export const App = () => {
   const location = useLocation();
@@ -34,25 +30,37 @@ export const App = () => {
   const [fEmail, setFEmail] = useState("");
   const [fPswd, setFPswd] = useState("");
 
+  // SESSION TIMEOUT DURATION
+  const SESSION_TIMEOUT = 1000 * 60 * 10
 
-  const handleOnIdle = async (event) => {
-    console.log('User is idle', event);
-    try {
-      await signOut();
-      localStorage.removeItem("userID");
-      localStorage.removeItem("userType");
-      navigate("/login");
-      
-    } catch (error) {
-      console.log("Error signing out", error);
-    
+  // UPDATE ACTIVITY TIMESTAMP
+  const updateActivity = () => {
+    if (loginId && userType) {
+      localStorage.setItem("lastActivityTime", Date.now().toString());
+    }
+  }
+
+  // CHECK IF SESSION HAS EXPIRED 
+  const checkSession = () => {
+    const lastActivity = localStorage.getItem("lastActivityTime");
+    if (lastActivity && (Date.now() - Number(lastActivity) > SESSION_TIMEOUT)) {
+      handleSignOut();
     }
   };
 
-  const handleOnActive = event => {
-    // console.log('User is active', event);
-  };
-
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      localStorage.removeItem("UserID");
+      localStorage.removeItem("userType");
+      localStorage.removeItem("lastActivityTime");
+      setLoginId("");
+      setUserType("");
+      navigate("/login");
+    } catch (error) {
+      console.log("Error sigining out", error);
+    }
+  }
 
   useEffect(() => {
     const checkLoginStatus = () => {
@@ -64,6 +72,7 @@ export const App = () => {
       if (storedLoginId && storedUserType) {
         setLoginId(storedLoginId);
         setUserType(storedUserType);
+        updateActivity();
       } else if (getFEMail) {
         setFEmail(getFEMail);
         navigate("/forgotEmail");
@@ -77,51 +86,57 @@ export const App = () => {
       }
     };
     checkLoginStatus();
-  }, [navigate]);
+
+    //CHECK SESSION EVERY SECOND
+    const interval = setInterval(checkSession, 1000);
+
+    //ADD EVENT LISTENERS FOR USER ACTIVITY
+    const activityEvents = ["click", "scroll", "keypass", "mousemove"];
+    activityEvents.forEach(event => {
+      window.addEventListener(event, updateActivity);
+    });
+
+    return () => {
+      clearInterval(interval);
+      activityEvents.forEach(event => {
+        window.removeEventListener(event, updateActivity);
+      });
+    };
+  }, [navigate, loginId, userType]);
 
   return (
-    <IdleTimerProvider 
-    timeout={1000 * 60 * 10} 
-      onIdle={handleOnIdle}
-      onActive={handleOnActive}
-      onAction={handleOnActive}
-    >
-  
     <HelmetProvider>
       <Helmet>
         <link rel="canonical" href={window.location.href} />
       </Helmet>
       {/* fallback={<div>Loading...</div>} */}
       <NotifiCenterProvider>
+        <Suspense>
+          {!hideNavbar.includes(location.pathname) && loginId && userType && (
+            <>
+              <Navbar />
+              <Sidebar />
+            </>
+          )}
 
-      <Suspense>
-        {!hideNavbar.includes(location.pathname) && loginId && userType && (
-          <>
-            <Navbar />
-            <Sidebar />
-          </>
-        )}
-
-        {!hideLogin.includes(location.pathname) &&
-          !loginId &&
-          !userType &&
-          !fEmail &&
-          !fPswd && <Login />}
-        {fEmail && <ForgotEmail />}
-        {fPswd && <ForgotPassword/>}
-        {loginId && userType && (
-          <div className="mt-28 ml-64">
-            <DataStoredContext>
-              <TempIDProvider>
-                <NavigationLinks />
-              </TempIDProvider>
-            </DataStoredContext>
-          </div>
-        )}
-      </Suspense>
+          {!hideLogin.includes(location.pathname) &&
+            !loginId &&
+            !userType &&
+            !fEmail &&
+            !fPswd && <Login />}
+          {fEmail && <ForgotEmail />}
+          {fPswd && <ForgotPassword />}
+          {loginId && userType && (
+            <div className="mt-28 ml-64">
+              <DataStoredContext>
+                <TempIDProvider>
+                  <NavigationLinks />
+                </TempIDProvider>
+              </DataStoredContext>
+            </div>
+          )}
+        </Suspense>
       </NotifiCenterProvider>
-
     </HelmetProvider>
-    </IdleTimerProvider>
   );
 };
