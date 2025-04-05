@@ -179,6 +179,7 @@ export const App = () => {
             </Modal>
           )}
 
+
           {/* Session Expired Modal */}
           {showSessionExpired && (
             <Modal onClose={handleSessionExpiredClose}>
