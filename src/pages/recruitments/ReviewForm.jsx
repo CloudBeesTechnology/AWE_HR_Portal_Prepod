@@ -14,6 +14,7 @@ import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { pdfjs } from "react-pdf";
 import { getUrl } from "@aws-amplify/storage";
+import { DateFormat} from "../../utils/DateFormat"
 import { sendEmail } from "../../services/EmailServices";
 import defaultAvatar from "../../assets/navabar/defaultAvatar.jpg";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -616,10 +617,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             <div className="mt-6">
               {[
                 { label: "Applying For", value: candidate.position || "N/A" },
-                {
-                  label: "Experience",
-                  value: candidate.noExperience || "N/A",
-                },
+                { label: "Experience", value: candyEducDeatils.noExperience },
                 { label: "Contract", value: candidate.contractType || "N/A" },
                 { label: "Type", value: candidate.empType || "N/A" },
                 {
@@ -637,7 +635,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                 { label: "Gender", value: candidate.gender || "N/A" },
                 {
                   label: "Date of Birth",
-                  value: formatDate(candidate.dob) || "N/A",
+                  value: DateFormat(candidate.dob) || "N/A",
                 },
                 { label: "Age", value: candidate.age || "N/A" },
                 {
@@ -669,7 +667,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                 },
                 {
                   label: "Brunei IC Expiry",
-                  value: formatDate(candidate.bwnIcExpiry) || "N/A",
+                  value: DateFormat(candidate.bwnIcExpiry) || "N/A",
                 },
                 {
                   label: "Malaysia IC No.",
@@ -678,11 +676,11 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                 { label: "Passport No.", value: candidate.ppNo || "N/A" },
                 {
                   label: "Passport Issue Date",
-                  value: formatDate(candidate.ppIssued) || "N/A",
+                  value: DateFormat(candidate.ppIssued) || "N/A",
                 },
                 {
                   label: "Passport Expiry Date",
-                  value: formatDate(candidate.ppExpiry) || "N/A",
+                  value: DateFormat(candidate.ppExpiry) || "N/A",
                 },
                 {
                   label: "Passport Issued Place",
@@ -764,7 +762,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                     <div className="grid grid-cols-3 gap-4 mb-4">
                       <strong className="w-full">From</strong>
                       <span className="w-full col-span-2">
-                        : &nbsp;{item.from || "N/A"} - {item.to || "N/A"}
+                        : &nbsp;{DateFormat(item.from) || "N/A"} - {DateFormat(item.to) || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
