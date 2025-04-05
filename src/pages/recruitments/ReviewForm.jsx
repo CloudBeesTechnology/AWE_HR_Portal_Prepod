@@ -750,7 +750,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                     <div className="grid grid-cols-3 gap-4 mb-4">
                       <strong className="w-full">Company</strong>
                       <span className="w-full col-span-2">
-                        : &nbsp;{item.company || "N/A"}
+                        : &nbsp;{item.name|| "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
