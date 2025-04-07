@@ -765,6 +765,8 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                         : &nbsp;{DateFormat(item.from) || "N/A"} - {DateFormat(item.to) || "N/A"}
                       </span>
                     </div>
+
+
                     <div className="grid grid-cols-3 gap-4 mb-4">
                       <strong className="w-full">Reason For Leaving</strong>
                       <span className="w-full col-span-2">

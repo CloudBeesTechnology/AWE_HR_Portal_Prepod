@@ -27,6 +27,7 @@ export const NonLocalMobTable = ({
   const [notification, setNotification] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(1);
+  const [loadingItems, setLoadingItems] = useState({});
 
   const heading = [
     "S.No",
@@ -127,18 +128,45 @@ export const NonLocalMobTable = ({
     fetchNextTempID();
   }, []);
 
+  // const OnSubmit = async (candi) => {
+  //   const storedData = {
+  //     ...candi,
+  //     empID: latestTempIDData,
+  //   };
+  //   // console.log("stored", storedData);
+
+  //   await SumbitCandiToEmp({ storedData });
+  //   await submitMobilization({ mob: storedData });
+
+  //   // setShowTitle("Candidate conversion to employee has been completed successfully.");
+  //   // setNotification(true);
+  // };
+
   const OnSubmit = async (candi) => {
-    const storedData = {
-      ...candi,
-      empID: latestTempIDData,
-    };
-    // console.log("stored", storedData);
+    setLoadingItems((prev) => {
+      const newState = { ...prev, [candi.id]: true };
+      return newState;
+    });
 
-    await SumbitCandiToEmp({ storedData });
-    await submitMobilization({ mob: storedData });
+    try {
+      const storedData = {
+        ...candi,
+        empID: latestTempIDData,
+      };
 
-    // setShowTitle("Candidate conversion to employee has been completed successfully.");
-    // setNotification(true);
+      await SumbitCandiToEmp({ storedData });
+      await submitMobilization({ mob: storedData });
+      setShowTitle(
+        "Candidate conversion to employee has been completed successfully."
+      );
+      setNotification(true);
+    } catch (err) {
+      setLoadingItems((prev) => {
+        const newState = { ...prev, [candi.id]: false };
+        return newState;
+      });
+      alert("Error", err);
+    }
   };
 
   return (
@@ -215,10 +243,13 @@ export const NonLocalMobTable = ({
                       <RiFileEditLine />
                     </td>
                     <td
-                      className="text-sm text-[#EA4F4F] cursor-pointer py-3"
+                      className="text-sm cursor-pointer py-3"
                       onClick={() => OnSubmit(item)}
+                      disabled={loadingItems[item.id]}
                     >
-                      Convert Employee
+                      {loadingItems[item.id]
+                        ? "Loading..."
+                        : "Convert Employee"}
                     </td>
                   </tr>
                 );
@@ -243,7 +274,7 @@ export const NonLocalMobTable = ({
           <SpinLogo
             text={showTitle}
             notification={notification}
-            path="/recrutiles/status"
+             path="/recrutiles/workpasstracking"
           />
         )}
       </div>
