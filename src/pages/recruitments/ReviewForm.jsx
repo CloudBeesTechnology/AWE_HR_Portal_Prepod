@@ -805,8 +805,8 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                     <div className="grid grid-cols-3 gap-4 mb-4">
                       <strong className="w-full">From</strong>
                       <span className="w-full col-span-2">
-                        : &nbsp;{item.fromDate || "N/A"} -{" "}
-                        {item.toDate || "N/A"}
+                        : &nbsp;{DateFormat(item.fromDate) || "N/A"} -{" "}
+                        {DateFormat(item.toDate) || "N/A"}
                       </span>
                     </div>
                   </div>
