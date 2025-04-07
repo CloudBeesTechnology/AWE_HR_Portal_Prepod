@@ -212,7 +212,7 @@ export const NonLocalMobilizForm = ({ candidate }) => {
     }
 
     try {
-      const response = await wpTrackingDetails({
+       await wpTrackingDetails({
         WPTrackingValue: {
           id: interviewScheduleId,
           mobSignDate: formData.interview.mobSignDate,
@@ -235,10 +235,6 @@ export const NonLocalMobilizForm = ({ candidate }) => {
       // console.log("Interview status updated:", interStatus);
 
       // console.log("Response from WPTrackingDetails:", response);
-
-      if (response.errors && response.errors.length > 0) {
-        // console.error("Response errors:", response.errors);
-      }
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }
