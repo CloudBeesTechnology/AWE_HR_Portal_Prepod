@@ -69,12 +69,41 @@ export const uploadDocString = async (
     // console.log(Error uploading ${fileType}:, error);
   }
 };
+// export const uploadReqString = async (file, fileType, tempID) => {
+//   try {
+//     if (!file) return null; // Skip if no file is provided
+
+//     // Encode file name for URL safety
+//     const encodedFileName = encodeURIComponent(file.name).replace(/%20/g, ' ');
+
+//     // Construct the upload URL for API Gateway
+//     const uploadUrl = `https://gnth2qx5cf.execute-api.ap-southeast-1.amazonaws.com/fileupload/aweadininprod2024954b8-prod/public%2F${fileType}%2F${tempID}%2F${encodedFileName}`;
+
+//     // Upload the file using axios
+//     await axios.put(uploadUrl, file)
+//       .then((res) => {
+//         console.log(res.data.message);
+//       })
+//       .catch((err) => {
+//         console.error("Error uploading file:", err);
+//       });
+
+//     // Generate the uploaded file URL
+//     return `https://aweadininprod2024954b8-prod.s3.ap-southeast-1.amazonaws.com/public/${fileType}/${tempID}/${encodedFileName}`;
+//   } catch (error) {
+//     console.error(`Error uploading ${fileType}:`, error);
+//     throw error;
+//   }
+// };
+
 export const uploadReqString = async (file, fileType, tempID) => {
   try {
-    if (!file) return null; // Skip if no file is provided
+    if (!file) {
+      return null; 
+    }
 
-    // Encode file name for URL safety
-    const encodedFileName = encodeURIComponent(file.name).replace(/%20/g, ' ');
+    // Encode file name for URL safety using encodeURIComponent (handles all special characters)
+    const encodedFileName = encodeURIComponent(file.name);
 
     // Construct the upload URL for API Gateway
     const uploadUrl = `https://gnth2qx5cf.execute-api.ap-southeast-1.amazonaws.com/fileupload/aweadininprod2024954b8-prod/public%2F${fileType}%2F${tempID}%2F${encodedFileName}`;
@@ -82,16 +111,21 @@ export const uploadReqString = async (file, fileType, tempID) => {
     // Upload the file using axios
     await axios.put(uploadUrl, file)
       .then((res) => {
-        console.log(res.data.message);
+        console.log("Response from API after uploading:", res.data.message);
       })
       .catch((err) => {
         console.error("Error uploading file:", err);
       });
 
-    // Generate the uploaded file URL
-    return `https://aweadininprod2024954b8-prod.s3.ap-southeast-1.amazonaws.com/public/${fileType}/${tempID}/${encodedFileName}`;
+    // Decode the file name using decodeURIComponent (reverts encoding)
+    const decodedFileName = decodeURIComponent(encodedFileName);
+
+    // Generate the uploaded file URL with the decoded file name
+    const uploadedFileUrl = `https://aweadininprod2024954b8-prod.s3.ap-southeast-1.amazonaws.com/public/${fileType}/${tempID}/${decodedFileName}`;
+
+    return uploadedFileUrl;
   } catch (error) {
-    console.error(`Error uploading ${fileType}:`, error);
+    console.error("Error during file upload process:", error);
     throw error;
   }
 };

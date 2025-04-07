@@ -63,11 +63,11 @@ export const TrainVT = ({ mergering, columns, popupAll }) => {
             <thead className="bg-[#939393] text-center sticky top-0">
               <tr>
                 {columns.map((column, index) => (
-                  <th key={index} className="py-4 px-2 text-white">
-                    {column.header}
+                  <th key={index} className="py-4 px-2 text-white ">
+                    {column.header} 
                   </th>
                 ))}
-                <th className="py-4 px-4 text-white">View</th>
+                <th className="py-4 px-4 text-white">View </th>
               </tr>
             </thead>
             <tbody className="bg-white text-center text-sm font-semibold text-dark_grey ">
@@ -75,7 +75,7 @@ export const TrainVT = ({ mergering, columns, popupAll }) => {
                 paginatedData.map((candidate, index) => (
                   <tr key={index} className="shadow cursor-pointer">
                     {columns.map((column, idx) => (
-                      <td key={idx} className="py-4 px-4 break-words overflow-hidden w-full">
+                      <td key={idx} className="py-4 px-4 break-words overflow-hidden flex-1">
                         {candidate[column?.key] || "N/A"}
                       </td>
                     ))}

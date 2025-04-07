@@ -17,7 +17,8 @@ export const TCDataUpdate = () => {
       trainingUpCertifi: [JSON.stringify(TCDataUp.trainingUpCertifi)],
       orgiCertifiDate:[TCDataUp.orgiCertifiDate],
       poNo: [TCDataUp.poNo],
-      addDescretion: [TCDataUp.addDescretion]
+      addDescretion: [TCDataUp.addDescretion],
+      tcRemarks:TCDataUp.tcRemarks
     };
     // console.log(totalData);
 

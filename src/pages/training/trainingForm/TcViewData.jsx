@@ -31,6 +31,7 @@ export const TcViewData = () => {
     { header: "Date E-certificate", key: "eCertifiDate" },
     { header: "Training Certificate Expiry", key: "certifiExpiry" },
     { header: "Original Certificate", key: "orgiCertifiDate" },
+    { header: "Remarks", key: "tcRemarks" },
     { header: "Upload File", key: "trainingUpCertifi" },
   ];
 

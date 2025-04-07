@@ -26,12 +26,8 @@ export const Table = ({
   // Filter out rows where status is "Inactive"
   const filteredData = data.filter((row) => row.status !== "Inactive");
 
-  // Sort the filteredData based on tempID
-  const sortedData = filteredData.sort((a, b) => {
-    const numA = parseInt(a.tempID.replace(/\D/g, ""), 10) || 0;
-    const numB = parseInt(b.tempID.replace(/\D/g, ""), 10) || 0;
-    return numA - numB;
-  });
+  const sortedData = filteredData.sort((a, b) => a.tempID - b.tempID);
+
 
   // Calculate total pages and paginated data
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);

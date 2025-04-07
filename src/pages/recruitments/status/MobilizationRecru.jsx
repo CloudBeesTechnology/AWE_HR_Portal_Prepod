@@ -26,6 +26,7 @@ export const MobilizationRecru = ({
   const [notification, setNotification] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(1);
+  const [loadingItems, setLoadingItems] = useState({});
 
   const heading = [
     "S.No",
@@ -127,18 +128,52 @@ export const MobilizationRecru = ({
 
   // console.log(latestTempIDData);
 
+  // const OnSubmit = async (candi) => {
+  //   const storedData = {
+  //     ...candi,
+  //     empID: latestTempIDData,
+  //   };
+  //   await SumbitCandiToEmp({ storedData });
+  //   await submitMobilization({ mob: storedData });
+  //   setShowTitle(
+  //     "Candidate conversion to employee has been completed successfully."
+  //   );
+  //   setNotification(true);
+  // };
+
   const OnSubmit = async (candi) => {
-    const storedData = {
-      ...candi,
-      empID: latestTempIDData,
-    };
-    await SumbitCandiToEmp({ storedData });
-    await submitMobilization({ mob: storedData });
-    setShowTitle(
-      "Candidate conversion to employee has been completed successfully."
-    );
-    setNotification(true);
+    // Set the loading state for this candidate
+    setLoadingItems((prev) => {
+      const newState = { ...prev, [candi.id]: true };
+      console.log("Loading state after update (setLoadingItems):", newState);
+      return newState;
+    });
+
+    try {
+      const storedData = {
+        ...candi,
+        empID: latestTempIDData,
+      };
+
+      // Simulating async calls here, which you can uncomment when needed
+      await SumbitCandiToEmp({ storedData });
+      await submitMobilization({ mob: storedData });
+
+      setShowTitle(
+        "Candidate conversion to employee has been completed successfully."
+      );
+      setNotification(true);
+    } catch (err) {
+      console.error("Error during submission:", err);
+      setLoadingItems((prev) => {
+        const newState = { ...prev, [candi.id]: false };
+        console.log("Loading state after update (setLoadingItems):", newState);
+        return newState;
+      });
+      alert("Error", err);
+    }
   };
+
   return (
     <>
       <div className="recruitmentTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl">
@@ -215,10 +250,13 @@ export const MobilizationRecru = ({
                         <RiFileEditLine />
                       </td>
                       <td
-                        className="text-sm cursor-pointer py-3 "
+                        className="text-sm cursor-pointer py-3"
                         onClick={() => OnSubmit(item)}
+                        disabled={loadingItems[item.id]}
                       >
-                        Convert Employee
+                        {loadingItems[item.id]
+                          ? "Loading..."
+                          : "Convert Employee"}
                       </td>
                     </tr>
                   );

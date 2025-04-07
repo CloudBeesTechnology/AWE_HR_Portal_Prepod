@@ -13,8 +13,8 @@ import { DataSupply } from "../../utils/DataStoredContext";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { pdfjs } from "react-pdf";
-import { useReactToPrint } from "react-to-print";
 import { getUrl } from "@aws-amplify/storage";
+import { DateFormat} from "../../utils/DateFormat"
 import { sendEmail } from "../../services/EmailServices";
 import defaultAvatar from "../../assets/navabar/defaultAvatar.jpg";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -281,7 +281,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             TO_ADDRESS_CANDY
           );
         } catch (err) {
-          // console.log("Error during update call: ", err);
+          console.log("Error during update call: ", err);
         }
       } else {
         const createData = {
@@ -295,7 +295,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             variables: { input: createData },
           });
         } catch (err) {
-          // console.log("Error during create call: ", err);
+          console.log("Error during create call: ", err);
         }
       }
 
@@ -447,7 +447,8 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     setIsScheduleOpen(false);
   };
 
-
+  console.log("Candy", candyEducDeatils);
+  
   const renderDocumentsUnderCategory = (documents) => {
     return (
       <>
@@ -616,10 +617,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             <div className="mt-6">
               {[
                 { label: "Applying For", value: candidate.position || "N/A" },
-                {
-                  label: "Experience",
-                  value: candidate.noExperience || "N/A",
-                },
+                { label: "Experience", value: candyEducDeatils.noExperience },
                 { label: "Contract", value: candidate.contractType || "N/A" },
                 { label: "Type", value: candidate.empType || "N/A" },
                 {
@@ -631,11 +629,13 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                   label: "Nationality",
                   value: candidate.nationality || "N/A",
                 },
+                { label: "Other Nationality", value: candidate.otherNation || "N/A"},
                 { label: "Race", value: candidate.race || "N/A" },
+                { label: "Other Race", value: candidate.otherRace || "N/A"},
                 { label: "Gender", value: candidate.gender || "N/A" },
                 {
                   label: "Date of Birth",
-                  value: formatDate(candidate.dob) || "N/A",
+                  value: DateFormat(candidate.dob) || "N/A",
                 },
                 { label: "Age", value: candidate.age || "N/A" },
                 {
@@ -643,11 +643,17 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                   value: candidate.marital || "N/A",
                 },
                 { label: "Religion", value: candidate.religion || "N/A" },
+                { label: "Other Religion", value: candidate.otherReligion || "N/A" },
                 { label: "Country of Birth", value: candidate.cob || "N/A" },
-                {
-                  label: "Language Profiency",
-                  value: candidate.lang || "N/A",
+                { 
+                  label: "Language Proficiency", 
+                  value: candidate.lang 
+                    ? typeof candidate.lang === "string"
+                      ? candidate.lang.replace(/\[|\]/g, "") // Remove brackets
+                      : candidate.lang.join(", ") // If it's an array, join it
+                    : "N/A"
                 },
+                { label: "Other Language", value: candidate.otherLang || "N/A"},
                 {
                   label: "Home Address",
                   value: candidate.permanentAddress || "N/A",
@@ -661,7 +667,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                 },
                 {
                   label: "Brunei IC Expiry",
-                  value: formatDate(candidate.bwnIcExpiry) || "N/A",
+                  value: DateFormat(candidate.bwnIcExpiry) || "N/A",
                 },
                 {
                   label: "Malaysia IC No.",
@@ -670,11 +676,11 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                 { label: "Passport No.", value: candidate.ppNo || "N/A" },
                 {
                   label: "Passport Issue Date",
-                  value: formatDate(candidate.ppIssued) || "N/A",
+                  value: DateFormat(candidate.ppIssued) || "N/A",
                 },
                 {
                   label: "Passport Expiry Date",
-                  value: formatDate(candidate.ppExpiry) || "N/A",
+                  value: DateFormat(candidate.ppExpiry) || "N/A",
                 },
                 {
                   label: "Passport Issued Place",
@@ -744,7 +750,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                     <div className="grid grid-cols-3 gap-4 mb-4">
                       <strong className="w-full">Company</strong>
                       <span className="w-full col-span-2">
-                        : &nbsp;{item.company || "N/A"}
+                        : &nbsp;{item.name|| "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
@@ -756,7 +762,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                     <div className="grid grid-cols-3 gap-4 mb-4">
                       <strong className="w-full">From</strong>
                       <span className="w-full col-span-2">
-                        : &nbsp;{item.from || "N/A"} - {item.to || "N/A"}
+                        : &nbsp;{DateFormat(item.from) || "N/A"} - {DateFormat(item.to) || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
@@ -799,8 +805,8 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                     <div className="grid grid-cols-3 gap-4 mb-4">
                       <strong className="w-full">From</strong>
                       <span className="w-full col-span-2">
-                        : &nbsp;{item.fromDate || "N/A"} -{" "}
-                        {item.toDate || "N/A"}
+                        : &nbsp;{DateFormat(item.fromDate) || "N/A"} -{" "}
+                        {DateFormat(item.toDate) || "N/A"}
                       </span>
                     </div>
                   </div>
