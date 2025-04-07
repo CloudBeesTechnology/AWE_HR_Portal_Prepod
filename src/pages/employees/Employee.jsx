@@ -95,6 +95,7 @@ export const Employee = () => {
             <div
               className={`w-full h-full flex flex-col justify-center items-center  border-l-4 ${card.borderColor}`}
             >
+              
               <img
                 className="w-[100px] h-[100px] p-3"
                 src={card.img}
