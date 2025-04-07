@@ -400,6 +400,7 @@ export const EditTimeSheet = ({
           } catch (err) {
             console.log(err);
           }
+          
           return {
             ...prevFormData,
             [actualHoursKey]:
