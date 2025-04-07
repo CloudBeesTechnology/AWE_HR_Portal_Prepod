@@ -8,7 +8,6 @@ export const LanguageDD = [
   { value: "English", label: "English" },
   { value: "Mandarin", label: "Mandarin" },
   { value: "Malay", label: "Malay" },
-  { value: "Tamil", label: "Tamil" },
   { value: "Other", label: "Other" },
 ];
 
@@ -50,7 +49,7 @@ export const RaceDD = [
 export const ReligionDD = [
   { value: "Islam", label: "Islam" },
   { value: "Christian", label: "Christian" },
-  { value: "Hinduism", label: "Hinduism" },
+  { value: "Hindu", label: "Hindu" },
   { value: "Buddhist", label: "Buddhist" },
   { value: "Free Thinker", label: "Free Thinker" },
   { value: "Not Mentioned", label: "Not Mentioned" },

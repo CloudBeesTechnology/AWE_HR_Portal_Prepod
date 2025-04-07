@@ -56,7 +56,7 @@ export const PersonalDetails = () => {
     { value: "English", label: "English" },
     { value: "Mandarin", label: "Mandarin" },
     { value: "Malay", label: "Malay" },
-    { value: "Tamil", label: "Tamil" },
+    // { value: "Tamil", label: "Tamil" },
     // { value: "Other", label: "Other" },
   ];
   const [isOpen, setIsOpen] = useState(false); // For dropdown visibility

@@ -447,7 +447,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     setIsScheduleOpen(false);
   };
 
-  console.log("Candy", candyEducDeatils);
+
   
   const renderDocumentsUnderCategory = (documents) => {
     return (
@@ -616,75 +616,75 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             {/* Section One */}
             <div className="mt-6">
               {[
-                { label: "Applying For", value: candidate.position || "N/A" },
-                { label: "Experience", value: candyEducDeatils.noExperience },
-                { label: "Contract", value: candidate.contractType || "N/A" },
-                { label: "Type", value: candidate.empType || "N/A" },
+                { label: "Applying For", value: candidate?.position || "N/A" },
+                { label: "Experience", value: candyEducDeatils?.noExperience },
+                { label: "Contract", value: candidate?.contractType || "N/A" },
+                { label: "Type", value: candidate?.empType || "N/A" },
                 {
                   label: "CV Received From",
-                  value: candidate.agent || "N/A",
+                  value: candidate?.agent || "N/A",
                 },
-                { label: "Name", value: candidate.name || "N/A" },
+                { label: "Name", value: candidate?.name || "N/A" },
                 {
                   label: "Nationality",
-                  value: candidate.nationality || "N/A",
+                  value: candidate?.nationality || "N/A",
                 },
-                { label: "Other Nationality", value: candidate.otherNation || "N/A"},
-                { label: "Race", value: candidate.race || "N/A" },
-                { label: "Other Race", value: candidate.otherRace || "N/A"},
-                { label: "Gender", value: candidate.gender || "N/A" },
+                { label: "Other Nationality", value: candidate?.otherNation || "N/A"},
+                { label: "Race", value: candidate?.race || "N/A" },
+                { label: "Other Race", value: candidate?.otherRace || "N/A"},
+                { label: "Gender", value: candidate?.gender || "N/A" },
                 {
                   label: "Date of Birth",
-                  value: DateFormat(candidate.dob) || "N/A",
+                  value: DateFormat(candidate?.dob) || "N/A",
                 },
-                { label: "Age", value: candidate.age || "N/A" },
+                { label: "Age", value: candidate?.age || "N/A" },
                 {
                   label: "Marital Status",
-                  value: candidate.marital || "N/A",
+                  value: candidate?.marital || "N/A",
                 },
-                { label: "Religion", value: candidate.religion || "N/A" },
-                { label: "Other Religion", value: candidate.otherReligion || "N/A" },
-                { label: "Country of Birth", value: candidate.cob || "N/A" },
+                { label: "Religion", value: candidate?.religion || "N/A" },
+                { label: "Other Religion", value: candidate?.otherReligion || "N/A" },
+                { label: "Country of Birth", value: candidate?.cob || "N/A" },
                 { 
                   label: "Language Proficiency", 
-                  value: candidate.lang 
-                    ? typeof candidate.lang === "string"
-                      ? candidate.lang.replace(/\[|\]/g, "") // Remove brackets
-                      : candidate.lang.join(", ") // If it's an array, join it
+                  value: candidate?.lang 
+                    ? typeof candidate?.lang === "string"
+                      ? candidate?.lang.replace(/\[|\]/g, "") // Remove brackets
+                      : candidate?.lang.join(", ") // If it's an array, join it
                     : "N/A"
                 },
-                { label: "Other Language", value: candidate.otherLang || "N/A"},
+                { label: "Other Language", value: candidate?.otherLang || "N/A"},
                 {
                   label: "Home Address",
-                  value: candidate.permanentAddress || "N/A",
+                  value: candidate?.permanentAddress || "N/A",
                 },
-                { label: "Email", value: candidate.email || "N/A" },
-                { label: "Contact", value: candidate.contactNo || "N/A" },
-                { label: "Brunei IC No.", value: candidate.bwnIcNo || "N/A" },
+                { label: "Email", value: candidate?.email || "N/A" },
+                { label: "Contact", value: candidate?.contactNo || "N/A" },
+                { label: "Brunei IC No.", value: candidate?.bwnIcNo || "N/A" },
                 {
                   label: "Brunei IC Colour.",
-                  value: candidate.bwnIcColour || "N/A",
+                  value: candidate?.bwnIcColour || "N/A",
                 },
                 {
                   label: "Brunei IC Expiry",
-                  value: DateFormat(candidate.bwnIcExpiry) || "N/A",
+                  value: DateFormat(candidate?.bwnIcExpiry) || "N/A",
                 },
                 {
                   label: "Malaysia IC No.",
-                  value: candidate.alternateNo || "N/A",
+                  value: candidate?.alternateNo || "N/A",
                 },
-                { label: "Passport No.", value: candidate.ppNo || "N/A" },
+                { label: "Passport No.", value: candidate?.ppNo || "N/A" },
                 {
                   label: "Passport Issue Date",
-                  value: DateFormat(candidate.ppIssued) || "N/A",
+                  value: DateFormat(candidate?.ppIssued) || "N/A",
                 },
                 {
                   label: "Passport Expiry Date",
-                  value: DateFormat(candidate.ppExpiry) || "N/A",
+                  value: DateFormat(candidate?.ppExpiry) || "N/A",
                 },
                 {
                   label: "Passport Issued Place",
-                  value: candidate.ppDestinate || "N/A",
+                  value: candidate?.ppDestinate || "N/A",
                 },
               ].map((item, index) => (
                 <div key={index} className="grid grid-cols-3 gap-4 mb-4">
@@ -765,6 +765,8 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                         : &nbsp;{DateFormat(item.from) || "N/A"} - {DateFormat(item.to) || "N/A"}
                       </span>
                     </div>
+
+
                     <div className="grid grid-cols-3 gap-4 mb-4">
                       <strong className="w-full">Reason For Leaving</strong>
                       <span className="w-full col-span-2">
