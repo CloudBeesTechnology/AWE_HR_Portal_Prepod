@@ -30,15 +30,6 @@ export const OMEDataCertify = () => {
     { header: "Employee Badge No", key: "empBadgeNo" },
     { header: "Name", key: "name" },
     { header: "Department", key: "department" },
-    { header: "Course", key: "courseCode" },
-    { header: "Course Name", key: "courseName" },
-    { header: "Company", key: "company" },
-    { header: "Purchase Order No", key: "poNo" },
-    { header: "Expiry Condition", key: "addDescretion" },
-    { header: "Date E-certificate", key: "eCertifiDate" },
-    { header: "Training Certificate Expiry", key: "certifiExpiry" },
-    { header: "Original Certificate", key: "orgiCertifiDate" },
-    { header: "Upload File", key: "trainingUpCertifi" },
   ];
 
   const handleDate = (e, type) => {

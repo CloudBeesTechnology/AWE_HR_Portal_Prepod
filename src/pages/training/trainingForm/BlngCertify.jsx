@@ -31,15 +31,7 @@ export const BlngCertify = () => {
     { header: "Employee Badge No", key: "empBadgeNo" },
     { header: "Name", key: "name" },
     { header: "Department", key: "department" },
-    { header: "Course", key: "courseCode" },
-    { header: "Course Name", key: "courseName" },
-    { header: "Company", key: "company" },
-    { header: "Purchase Order No", key: "poNo" },
-    { header: "Expiry Condition", key: "addDescretion" },
-    { header: "Date E-certificate", key: "eCertifiDate" },
-    { header: "Training Certificate Expiry", key: "certifiExpiry" },
-    { header: "Original Certificate", key: "orgiCertifiDate" },
-    { header: "Upload File", key: "trainingUpCertifi" },
+
   ];
 
   const handleDate = (e, type) => {
@@ -102,6 +94,68 @@ export const BlngCertify = () => {
 
     setFilteredData(filtered);
   }, [startDate, endDate, mergeData]);
+
+  // useEffect(() => {
+  //   if (!mergeData.length) return;
+  
+  //   const start = startDate ? new Date(startDate) : null;
+  //   const end = endDate ? new Date(endDate) : null;
+  
+  //   if (!start && !end) {
+  //     setFilteredData(mergeData);
+  //     return;
+  //   }
+  
+  //   // First, expand the data (one record per certificate)
+  //   const expandedData = mergeData.flatMap((data) => {
+  //     try {
+  //       if (data.trainingProof && data.trainingProof[0]) {
+  //         const proof = JSON.parse(data.trainingProof[0]);
+  //         const proofsArray = Array.isArray(proof) ? proof : [proof];
+  
+  //         return proofsArray.map((cert) => ({
+  //           ...data,
+  //           empID: data.empID || "-",
+  //           empBadgeNo: data.empBadgeNo || "-",
+  //           name: data.name || "-",
+  //           certifiExpiry: cert.certifiExpiry ? new Date(cert.certifiExpiry) : null,
+  //           eCertifiDate: cert.eCertifiDate ? formatDate(cert.eCertifiDate) : "N/A",
+  //           orgiCertifiDate: cert.orgiCertifiDate ? formatDate(cert.orgiCertifiDate) : "N/A",
+  //           // Keep original certificate for reference if needed
+  //           originalCertificate: cert,
+  //         }));
+  //       }
+  //     } catch (e) {
+  //       console.error("Error parsing trainingProof:", e);
+  //     }
+  
+  //     // Fallback for records with no valid trainingProof
+  //     return [{
+  //       ...data,
+  //       empID: data.empID || "-",
+  //       empBadgeNo: data.empBadgeNo || "-",
+  //       name: data.name || "-",
+  //       certifiExpiry: null,
+  //       eCertifiDate: "N/A",
+  //       orgiCertifiDate: "N/A",
+  //     }];
+  //   });
+  
+  //   // Then filter based on certificate dates
+  //   const filtered = expandedData.filter((data) => {
+  //     if (!data.certifiExpiry) return true; // Keep records with no expiry date
+  
+  //     if (start && end) {
+  //       return data.certifiExpiry >= start && data.certifiExpiry <= end;
+  //     }
+  //     if (start) return data.certifiExpiry >= start;
+  //     if (end) return data.certifiExpiry <= end;
+  
+  //     return true;
+  //   });
+  
+  //   setFilteredData(filtered);
+  // }, [startDate, endDate, mergeData]);
 
   useEffect(() => {
     if (empPIData && workInfoData && trainingCertifi && AddEmpReq) {
@@ -198,6 +252,41 @@ export const BlngCertify = () => {
         orgiCertifiDate,
       };
     });
+
+    // const finalData = filteredData
+    // .sort((a, b) => new Date(b.CertifyCreatedAt) - new Date(a.CertifyCreatedAt))
+    // .flatMap((data) => {  // Using flatMap instead of map to expand arrays
+    //   try {
+    //     if (data.trainingProof && data.trainingProof[0]) {
+    //       const proof = JSON.parse(data.trainingProof[0]);
+    //       const proofsArray = Array.isArray(proof) ? proof : [proof];
+
+    //       // Create one record per certificate
+    //       return proofsArray.map((cert) => ({
+    //         ...data,  // Spread all original data
+    //         empID: data.empID || "-",
+    //         empBadgeNo: data.empBadgeNo || "-",
+    //         name: data.name || "-",
+    //         certifiExpiry: cert.certifiExpiry ? formatDate(cert.certifiExpiry) : "N/A",
+    //         eCertifiDate: cert.eCertifiDate ? formatDate(cert.eCertifiDate) : "N/A",
+    //         orgiCertifiDate: cert.orgiCertifiDate ? formatDate(cert.orgiCertifiDate) : "N/A",
+    //       }));
+    //     }
+    //   } catch (e) {
+    //     console.error("Error parsing trainingProof:", e);
+    //   }
+
+    //   // Fallback for records with no valid trainingProof
+    //   return [{
+    //     ...data,
+    //     empID: data.empID || "-",
+    //     empBadgeNo: data.empBadgeNo || "-",
+    //     name: data.name || "-",
+    //     certifiExpiry: "N/A",
+    //     eCertifiDate: "N/A",
+    //     orgiCertifiDate: "N/A",
+    //   }];
+    // });
 
   return (
     <section className="bg-[#F8F8F8] mx-auto p-5 h-full w-full">

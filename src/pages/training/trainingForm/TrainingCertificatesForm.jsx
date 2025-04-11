@@ -806,9 +806,9 @@ export const TrainingCertificatesForm = () => {
                   </p>
                 )}
               </div>
-           
+
               <div className="">
-              <label className="text_size_5">Upload Document</label>
+                <label className="text_size_5">Upload Document</label>
                 <div className="grid grid-cols-3 gap-10 py-2">
                   <div className="">
                     <label
