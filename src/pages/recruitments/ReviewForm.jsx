@@ -386,7 +386,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
   // Parse work experience, education details, and family details
   const workExperience = parseJson(candidate?.workExperience);
   const eduDetails = parseJson(candidate?.eduDetails);
-  console.log("EDuc", eduDetails);
+  // console.log("EDuc", eduDetails);
 
   const familyDetails = parseJson(candidate?.familyDetails);
   const emgDetails = parseJson(candyEducDeatils?.emgDetails);
@@ -401,8 +401,8 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     try {
       const result = await getUrl({ path: pathUrl });
 
-      setPPLastUP(result.url.href); // Store the URL as a string
-      setViewingDocument(pathUrl); // Update the state to show the selected document
+      setPPLastUP(result.url.href); 
+      setViewingDocument(pathUrl); 
       setLoading(false);
     } catch (error) {
       console.error("Error fetching the file URL:", error);
@@ -672,7 +672,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                   label: "Passport Issued Destination",
                   value: candidate.ppDestinate,
                 },
-                // { label: "Malaysia IC No.", value: candidate.alternateNo },
+                { label: "Malaysia IC No.", value: candidate.alternateNo },
                 {
                   label: "Brief Description of Present Duties",
                   value: candyEducDeatils.desc,

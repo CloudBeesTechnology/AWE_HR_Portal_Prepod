@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import searchIcon from "../../../assets/recruitment/search.svg";
 import Popup from "./Popup";
 import { Pagination } from "../../../pages/leaveManagement/Pagination";
-
+import AddEmpPopup from "./AddEmpPopup";
 export const TrainVT = ({ mergering, columns, popupAll }) => {
   
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -29,6 +29,8 @@ export const TrainVT = ({ mergering, columns, popupAll }) => {
   }, [filteredData, currentPage, rowsPerPage]); // No need to check against paginatedData here
 
   const handleViewClick = (details) => {
+    console.log(details,"details");
+    
     setSelectedDetails(details);
     setIsPopupOpen(true);
   };
@@ -41,6 +43,9 @@ export const TrainVT = ({ mergering, columns, popupAll }) => {
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
+
+  // console.log("MG", mergering);
+  
 
   return (
     <section >
@@ -58,16 +63,16 @@ export const TrainVT = ({ mergering, columns, popupAll }) => {
       </div>
 
       <div className="overflow-x-auto mt-16 w-full rounded-md">
-        <div className="w-full px-4 max-h-[calc(90vh-7rem)] overflow-y-auto scrollBar">
+        <div className="w-full px-4 max-h-[calc(90vh-7rem)] overflow-y-auto ">
           <table className="w-full rounded-xl table-auto">
             <thead className="bg-[#939393] text-center sticky top-0">
               <tr>
                 {columns.map((column, index) => (
-                  <th key={index} className="py-4 px-2 text-white ">
-                    {column.header} 
+                  <th key={index} className="py-4 px-2 text-white">
+                    {column.header}
                   </th>
                 ))}
-                <th className="py-4 px-4 text-white">View </th>
+                <th className="py-4 px-4 text-white">View</th>
               </tr>
             </thead>
             <tbody className="bg-white text-center text-sm font-semibold text-dark_grey ">
@@ -99,7 +104,7 @@ export const TrainVT = ({ mergering, columns, popupAll }) => {
         </div>
 
         {isPopupOpen && selectedDetails && (
-          <Popup
+          <AddEmpPopup
             details={selectedDetails}
             popupAll={popupAll}
             onClose={closePopup}

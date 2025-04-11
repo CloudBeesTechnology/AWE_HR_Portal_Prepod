@@ -6,7 +6,6 @@ import Group4 from "../../assets/Dashboard/Group4.svg";
 import { Link } from "react-router-dom";
 import { DataSupply } from "../../utils/DataStoredContext";
 
-
 export const PathHead = () => {
   const { empPIData, IDData } = useContext(DataSupply);
 
@@ -15,39 +14,48 @@ export const PathHead = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [LPACount, setLPACount] = useState(0);
   const [SAWPCount, setSAWPCount] = useState(0);
-  
-  
+
   // Function to merge and calculate counts
   const calculateCounts = () => {
     try {
       const candidates = [...empPIData, ...IDData];
 
       setMergeData(candidates);
-    
-      const bruneian = candidates.filter(
-        (item) =>
-          Array.isArray(item.contractType) &&
-          item.contractType.length > 0 &&
-          item.contractType[item.contractType.length - 1].toUpperCase() === "LOCAL"
-      ).length;
-      
+
+      const bruneian = candidates.filter((item) => {
+        const contractTypeArray = item?.contractType;
+        const lastContractType =
+          Array.isArray(contractTypeArray) && contractTypeArray.length > 0
+            ? contractTypeArray[contractTypeArray.length - 1]
+            : null;
+
+        return lastContractType?.toUpperCase() === "LOCAL";
+      }).length;
+
       setBruneianCount(bruneian);
-      
 
       // Calculate LPA count
-      const LPA = candidates.filter(
-        (item) => Array.isArray(item.contractType) &&
-        item.contractType.length > 0 &&
-        item.contractType[item.contractType.length - 1].toUpperCase() === ("LPA")
-      ).length;
+      const LPA = candidates.filter((item) => {
+        const contractTypeArray = item?.contractType;
+        const lastContractType =
+          Array.isArray(contractTypeArray) && contractTypeArray.length > 0
+            ? contractTypeArray[contractTypeArray.length - 1]
+            : null;
+
+        return lastContractType?.toUpperCase() === "LPA";
+      }).length;
       setLPACount(LPA);
 
       // Calculate SAWP count
-      const SAWP = candidates.filter(
-        (item) => Array.isArray(item.contractType) &&
-        item.contractType.length > 0 &&
-        item.contractType[item.contractType.length - 1].toUpperCase() ===("SAWP")
-      ).length;
+      const SAWP = candidates.filter((item) => {
+        const contractTypeArray = item?.contractType;
+        const lastContractType =
+          Array.isArray(contractTypeArray) && contractTypeArray.length > 0
+            ? contractTypeArray[contractTypeArray.length - 1]
+            : null;
+
+        return lastContractType?.toUpperCase() === "SAWP";
+      }).length;
       setSAWPCount(SAWP);
 
       // Total count
@@ -83,8 +91,9 @@ export const PathHead = () => {
 
         {/* LPA Card */}
         <Link
-          to="/allempDetails" 
-          className="p-4 bg-gradient-to-r from-[#DAFFA6] to-[#EBEBEB] rounded-lg shadow-lg flex items-center justify-between">
+          to="/allempDetails"
+          className="p-4 bg-gradient-to-r from-[#DAFFA6] to-[#EBEBEB] rounded-lg shadow-lg flex items-center justify-between"
+        >
           <div className="flex items-center">
             <div className="w-1 h-16 mr-4 border rounded-md bg-[#91A672] border-[#91A672]"></div>
             <div>
@@ -99,7 +108,9 @@ export const PathHead = () => {
 
         {/* SAWP Card */}
         <Link
-          to="/allempDetails"  className="p-4 bg-gradient-to-r from-[#C9DFFF] to-[#EBEBEB] rounded-lg shadow-lg flex items-center justify-between">
+          to="/allempDetails"
+          className="p-4 bg-gradient-to-r from-[#C9DFFF] to-[#EBEBEB] rounded-lg shadow-lg flex items-center justify-between"
+        >
           <div className="flex items-center">
             <div className="w-1 h-16 mr-4 border rounded-md bg-[#687FA4] border-[#B17A7A]"></div>
             <div>
@@ -114,7 +125,9 @@ export const PathHead = () => {
 
         {/* Bruneian Card */}
         <Link
-          to="/allempDetails"  className="p-4 bg-gradient-to-r from-[#FFDFAB] to-[#EBEBEB] rounded-lg shadow-lg flex items-center justify-between">
+          to="/allempDetails"
+          className="p-4 bg-gradient-to-r from-[#FFDFAB] to-[#EBEBEB] rounded-lg shadow-lg flex items-center justify-between"
+        >
           <div className="flex items-center">
             <div className="w-1 h-16 mr-4 border rounded-md bg-[#AB8851] border-[#B17A7A]"></div>
             <div>
@@ -133,5 +146,3 @@ export const PathHead = () => {
     </div>
   );
 };
-
-

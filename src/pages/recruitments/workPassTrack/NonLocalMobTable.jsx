@@ -108,9 +108,9 @@ export const NonLocalMobTable = ({
   };
 
   const generateNextTempID = (lastTempID) => {
-    const prefixMatch = lastTempID.match(/[^\d]+/);
+    const prefixMatch = lastTempID?.match(/[^\d]+/);
     const prefix = prefixMatch ? prefixMatch[0] : "";
-    const numberMatch = lastTempID.match(/\d+/);
+    const numberMatch = lastTempID?.match(/\d+/);
     const numberPart = numberMatch ? parseInt(numberMatch[0], 10) : 0;
     const nextNumber = numberPart + 1;
     const nextTempID = `${prefix}${nextNumber}`;
