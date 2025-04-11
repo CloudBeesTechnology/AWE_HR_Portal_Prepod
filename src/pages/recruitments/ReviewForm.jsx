@@ -444,7 +444,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     setIsScheduleOpen(false);
   };
 
-  console.log(candyEducDeatils);
+  // console.log(candyEducDeatils);
 
   const renderDocumentsUnderCategory = (documents) => {
     return (

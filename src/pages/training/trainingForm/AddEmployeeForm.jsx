@@ -591,52 +591,6 @@ export const AddEmployeeForm = () => {
             receipentEmail: "veda.thiyagarajane@gmail.com",
             status: "Unread",
           });
-          // sendEmail(
-          //   emailSubject,
-          //   emailBody,
-          //   "hr_no-reply@adininworks.com",
-          //   emailData.managerOfficialMail
-          // );
-
-          // sendEmail(
-          //   emailSubject,
-          //   emailBody1,
-          //   "hr_no-reply@adininworks.com",
-          //   emailData.hrOfficialmail
-          // );
-          // sendEmail(
-          //   emailSubject,
-          //   emailBody1,
-          //   "hr_no-reply@adininworks.com",
-          //   "hr-training@adininworks.com"
-          // );
-
-          // await createNotification({
-          //   empID: data.empID,
-          //   leaveType: "Training Requestor",
-          //   message: `Employee Training Notification - ${
-          //     data.name
-          //   }. Dear Hr, Please be informed that ${
-          //     data.name
-          //   } is scheduled for training on
-          //   ${data?.trainingreq}.`,
-          //   senderEmail: "hr_no-reply@adininworks.com",
-          //   receipentEmail: emailData.hrOfficialmail,
-          //   status: "Unread",
-          // });
-
-          // await createNotification({
-          //   empID: data.empID,
-          //   leaveType: "Training Requestor",
-          //   message: `Employee Training Notification - ${data.name}. Dear ${
-          //     emailData.managerName
-          //   }, Please be informed that ${data.name} is scheduled for training on
-          //   ${data?.trainingreq}.`,
-          //   senderEmail: "hr_no-reply@adininworks.com",
-          //   receipentEmail: emailData.managerOfficialMail,
-          //   receipentEmpID: emailData.managerEmpID,
-          //   status: "Unread",
-          // });
         }
         const TMRDataUp = {
           trainingTrack: data?.trainingreq?.map((trainee, index) => {
@@ -654,10 +608,10 @@ export const AddEmployeeForm = () => {
         };
 
         await TrReqUp({ TMRDataUp });
-        // console.log(TMRDataUp, "Training details Updated successfully");
+        console.log(TMRDataUp, "Training details Updated successfully");
 
-        setShowTitle("Training details Updated successfully");
-        setNotification(true);
+        // setShowTitle("Training details Updated successfully");
+        // setNotification(true);
       } else {
         const AddEmpValue = {
           trainingTrack: data?.trainingreq?.map((trainee, index) => {
@@ -673,7 +627,7 @@ export const AddEmployeeForm = () => {
           empID: data.empID,
         };
         await AddEmpData({ AddEmpValue });
-        // console.log(AddEmpValue, "Training details Saved successfully");
+        console.log(AddEmpValue, "Training details Saved successfully");
         const trainingRows = data?.trainingreq
           ?.map((item, idx) => {
             return `
@@ -737,55 +691,9 @@ export const AddEmployeeForm = () => {
           receipentEmail: "veda.thiyagarajane@gmail.com",
           status: "Unread",
         });
-        // sendEmail(
-        //   emailSubject,
-        //   emailBody,
-        //   "hr_no-reply@adininworks.com",
-        //   emailData.managerOfficialMail
-        // );
 
-        // sendEmail(
-        //   emailSubject,
-        //   emailBody1,
-        //   "hr_no-reply@adininworks.com",
-        //   emailData.hrOfficialmail
-        // );
-        // sendEmail(
-        //   emailSubject,
-        //   emailBody1,
-        //   "hr_no-reply@adininworks.com",
-        //   "hr-training@adininworks.com"
-        // );
-
-        // await createNotification({
-        //   empID: data.empID,
-        //   leaveType: "Training Requestor",
-        //   message: `Employee Training Notification - ${
-        //     data.name
-        //   }. Dear Hr, Please be informed that ${
-        //     data.name
-        //   } is scheduled for training on
-        //   ${data?.trainingreq}.`,
-        //   senderEmail: "hr_no-reply@adininworks.com",
-        //   receipentEmail: emailData.hrOfficialmail,
-        //   status: "Unread",
-        // });
-
-        // await createNotification({
-        //   empID: data.empID,
-        //   leaveType: "Training Requestor",
-        //   message: `Employee Training Notification - ${data.name}. Dear ${
-        //     emailData.managerName
-        //   }, Please be informed that ${data.name} is scheduled for training on
-        //   ${data?.trainingreq}.`,
-        //   senderEmail: "hr_no-reply@adininworks.com",
-        //   receipentEmail: emailData.managerOfficialMail,
-        //   receipentEmpID: emailData.managerEmpID,
-        //   status: "Unread",
-        // });
-
-        setShowTitle("Training details Saved successfully");
-        setNotification(true);
+        // setShowTitle("Training details Saved successfully");
+        // setNotification(true);
       }
     } catch (err) {
       console.log(err);
@@ -880,33 +788,36 @@ export const AddEmployeeForm = () => {
 
           {/* Dynamic Training Requirements */}
           {fields.map((field, index) => (
-            <div key={field.id} className="my-10 border border-[#E9E7E7] rounded-lg px-5  pt-6">
-                <div className="mb-6 flex justify-between ">
-                  <h3 className="col-span-2 text-lg font-semibold">
-                    Training Requirement #{index + 1}
-                  </h3>
-                  <div className="my-auto center">
-                    {index === 0 && (
-                      <button
-                        type="button"
-                        onClick={handleAddTrainingReq}
-                        className="text-grey text-xl"
-                      >
-                        <FaRegPlusSquare />
-                      </button>
-                    )}
+            <div
+              key={field.id}
+              className="my-10 border border-[#E9E7E7] rounded-lg px-5  pt-6"
+            >
+              <div className="mb-6 flex justify-between ">
+                <h3 className="col-span-2 text-lg font-semibold">
+                  Training Requirement #{index + 1}
+                </h3>
+                <div className="my-auto center">
+                  {index === 0 && (
+                    <button
+                      type="button"
+                      onClick={handleAddTrainingReq}
+                      className="text-grey text-xl"
+                    >
+                      <FaRegPlusSquare />
+                    </button>
+                  )}
 
-                    {index !== 0 && (
-                      <button
-                        type="button"
-                        onClick={() => handleMinusData(index)}
-                        className="text-xl text-grey"
-                      >
-                        <FaRegMinusSquare />
-                      </button>
-                    )}
-                  </div>
+                  {index !== 0 && (
+                    <button
+                      type="button"
+                      onClick={() => handleMinusData(index)}
+                      className="text-xl text-grey"
+                    >
+                      <FaRegMinusSquare />
+                    </button>
+                  )}
                 </div>
+              </div>
               <div className="grid grid-cols-2 gap-6 ">
                 <div className="mb-4">
                   <label htmlFor="courseSelect" className="font-semibold">
@@ -918,9 +829,9 @@ export const AddEmployeeForm = () => {
                     className="input-field select-custom"
                   >
                     <option value="">Training Course Select</option>
-                    {AddCourseDetails.map((course) => (
+                    {AddCourseDetails.map((course, index) => (
                       <option
-                        key={course.courseSelect}
+                        key={`${course.courseSelect}-${index}`} 
                         value={course.courseSelect}
                       >
                         {course.courseSelect}
