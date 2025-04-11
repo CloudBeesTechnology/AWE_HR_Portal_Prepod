@@ -35,9 +35,9 @@ export const AddEmployeeForm = () => {
   const { empPIData, workInfoData, AddCourseDetails, AddEmpReq } =
     useContext(DataSupply);
 
-  // useEffect(() => {
-  //   window.scrollTo({ top: 0, behavior: "smooth" });
-  // }, []);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   const { createNotification } = useCreateNotification();
   const { AddEmpData } = AddEmpFun();
@@ -87,9 +87,9 @@ export const AddEmployeeForm = () => {
       trainingreq: [
         {
           mediRequired: false,
-          // courseCode: "",
-          // courseName: "",
-          // company: "",
+          courseCode: "",
+          courseName: "",
+          company: "",
           traineeSD: "",
           traineeED: "",
           traineeStatus: "",
@@ -579,58 +579,84 @@ export const AddEmployeeForm = () => {
           sendEmail(
             emailSubject,
             emailBody,
-            "arthihari398@gmail.com",
-            "veda.thiyagarajane@gmail.com"
+            "hr_no-reply@adininworks.com",
+            emailData.managerOfficialMail
           );
+
+          sendEmail(
+            emailSubject,
+            emailBody1,
+            "hr_no-reply@adininworks.com",
+            emailData.hrOfficialmail
+          );
+          sendEmail(
+            emailSubject,
+            emailBody1,
+            "hr_no-reply@adininworks.com",
+            "hr-training@adininworks.com"
+          );
+
           await createNotification({
             empID: data.empID,
             leaveType: "Training Requestor",
             message: `Employee Training Notification - ${data.name}. Dear Hr, Please be informed that ${data.name} is scheduled for training on
             ${data?.trainingreq}.`,
             senderEmail: "hr_no-reply@adininworks.com",
-            receipentEmail: "veda.thiyagarajane@gmail.com",
+            receipentEmail: emailData.hrOfficialmail,
             status: "Unread",
           });
-        }
-        const TMRDataUp = {
-          trainingTrack: data?.trainingreq?.map((trainee, index) => {
-            return {
-              ...trainee,
-              medicalReport:
-                JSON.stringify(uploadMedicalReports?.medicalReport?.[index]) ||
-                [],
-            };
-          }),
-          department: data.department,
-          empBadgeNo: data.empBadgeNo,
-          empID: data.empID,
-          id: EmpReqDataRecord.id,
-        };
 
-        await TrReqUp({ TMRDataUp });
-        // console.log(TMRDataUp, "Training details Updated successfully");
+          await createNotification({
+            empID: data.empID,
+            leaveType: "Training Requestor",
+            message: `Employee Training Notification - ${data.name}. Dear ${emailData.managerName}, Please be informed that ${data.name} is scheduled for training on
+            ${data?.trainingreq}.`,
+            senderEmail: "hr_no-reply@adininworks.com",
+            receipentEmail: emailData.managerOfficialMail,
+            receipentEmpID: emailData.managerEmpID,
+            status: "Unread",
+          });
+          const TMRDataUp = {
+            trainingTrack: data?.trainingreq?.map((trainee, index) => {
+              return {
+                ...trainee,
+                medicalReport:
+                  JSON.stringify(
+                    uploadMedicalReports?.medicalReport?.[index]
+                  ) || [],
+              };
+            }),
+            department: data.department,
+            empBadgeNo: data.empBadgeNo,
+            empID: data.empID,
+            id: EmpReqDataRecord.id,
+          };
 
-        setShowTitle("Training details Updated successfully");
-        setNotification(true);
-      } else {
-        const AddEmpValue = {
-          trainingTrack: data?.trainingreq?.map((trainee, index) => {
-            return {
-              ...trainee,
-              medicalReport:
-                JSON.stringify(uploadMedicalReports?.medicalReport?.[index]) ||
-                [],
-            };
-          }),
-          department: data.department,
-          empBadgeNo: data.empBadgeNo,
-          empID: data.empID,
-        };
-        await AddEmpData({ AddEmpValue });
-        // console.log(AddEmpValue, "Training details Saved successfully");
-        const trainingRows = data?.trainingreq
-          ?.map((item, idx) => {
-            return `
+          await TrReqUp({ TMRDataUp });
+          // console.log(TMRDataUp, "Training details Updated successfully");
+
+          setShowTitle("Training details Updated successfully");
+          setNotification(true);
+        } else {
+          const AddEmpValue = {
+            trainingTrack: data?.trainingreq?.map((trainee, index) => {
+              return {
+                ...trainee,
+                medicalReport:
+                  JSON.stringify(
+                    uploadMedicalReports?.medicalReport?.[index]
+                  ) || [],
+              };
+            }),
+            department: data.department,
+            empBadgeNo: data.empBadgeNo,
+            empID: data.empID,
+          };
+          await AddEmpData({ AddEmpValue });
+          // console.log(AddEmpValue, "Training details Saved successfully");
+          const trainingRows = data?.trainingreq
+            ?.map((item, idx) => {
+              return `
             <tr>
               <td>${idx + 1}</td>
               <td>${item.courseName}</td>
@@ -640,11 +666,11 @@ export const AddEmployeeForm = () => {
               <td>${item.traineeStatus || "-"}</td>
             </tr>
           `;
-          })
-          .join("");
-        // console.log(trainingRows);
+            })
+            .join("");
+          // console.log(trainingRows);
 
-        const trainingTable = `
+          const trainingTable = `
   <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">
     <thead>
       <tr>
@@ -661,8 +687,8 @@ export const AddEmployeeForm = () => {
     </tbody>
   </table>
 `;
-        const emailSubject = `Employee Training Notification - ${data.name} `;
-        const emailBody = `
+          const emailSubject = `Employee Training Notification - ${data.name} `;
+          const emailBody = `
         <p>Dear ${emailData.managerName},</p>
         <p>
           Please be informed that ${data.name} is scheduled for the following training(s)
@@ -671,29 +697,55 @@ export const AddEmployeeForm = () => {
   <p>Regards,<br/>Training Team</p>
         </p>
       `;
-        const emailBody1 = `
+          const emailBody1 = `
 <p>Dear HR,</p>
  <p>Please be informed that ${data.name} is scheduled for the following training(s):</p>
   ${trainingTable}
   <p>Regards,<br/>Training Team</p>`;
-        sendEmail(
-          emailSubject,
-          emailBody,
-          "arthihari398@gmail.com",
-          "veda.thiyagarajane@gmail.com"
-        );
-        await createNotification({
-          empID: data.empID,
-          leaveType: "Training Requestor",
-          message: `Employee Training Notification - ${data.name}. Dear Hr, Please be informed that ${data.name} is scheduled for training on
-          ${data?.trainingreq}.`,
-          senderEmail: "hr_no-reply@adininworks.com",
-          receipentEmail: "veda.thiyagarajane@gmail.com",
-          status: "Unread",
-        });
+          sendEmail(
+            emailSubject,
+            emailBody,
+            "hr_no-reply@adininworks.com",
+            emailData.managerOfficialMail
+          );
 
-        setShowTitle("Training details Saved successfully");
-        setNotification(true);
+          sendEmail(
+            emailSubject,
+            emailBody1,
+            "hr_no-reply@adininworks.com",
+            emailData.hrOfficialmail
+          );
+          sendEmail(
+            emailSubject,
+            emailBody1,
+            "hr_no-reply@adininworks.com",
+            "hr-training@adininworks.com"
+          );
+
+          await createNotification({
+            empID: data.empID,
+            leaveType: "Training Requestor",
+            message: `Employee Training Notification - ${data.name}. Dear Hr, Please be informed that ${data.name} is scheduled for training on
+          ${data?.trainingreq}.`,
+            senderEmail: "hr_no-reply@adininworks.com",
+            receipentEmail: emailData.hrOfficialmail,
+            status: "Unread",
+          });
+
+          await createNotification({
+            empID: data.empID,
+            leaveType: "Training Requestor",
+            message: `Employee Training Notification - ${data.name}. Dear ${emailData.managerName}, Please be informed that ${data.name} is scheduled for training on
+          ${data?.trainingreq}.`,
+            senderEmail: "hr_no-reply@adininworks.com",
+            receipentEmail: emailData.managerOfficialMail,
+            receipentEmpID: emailData.managerEmpID,
+            status: "Unread",
+          });
+
+          setShowTitle("Training details Saved successfully");
+          setNotification(true);
+        }
       }
     } catch (err) {
       console.log(err);
@@ -831,7 +883,7 @@ export const AddEmployeeForm = () => {
                     <option value="">Training Course Select</option>
                     {AddCourseDetails.map((course, index) => (
                       <option
-                        key={`${course.courseSelect}-${index}`} 
+                        key={`${course.courseSelect}-${index}`}
                         value={course.courseSelect}
                       >
                         {course.courseSelect}
