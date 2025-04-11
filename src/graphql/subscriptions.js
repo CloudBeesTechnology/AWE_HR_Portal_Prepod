@@ -1071,6 +1071,7 @@ export const onCreateTrainingReq = /* GraphQL */ `
       courseName
       company
       mediRequired
+      traineeTrack
       createdAt
       updatedAt
       __typename
@@ -1097,6 +1098,7 @@ export const onUpdateTrainingReq = /* GraphQL */ `
       courseName
       company
       mediRequired
+      traineeTrack
       createdAt
       updatedAt
       __typename
@@ -1123,6 +1125,7 @@ export const onDeleteTrainingReq = /* GraphQL */ `
       courseName
       company
       mediRequired
+      traineeTrack
       createdAt
       updatedAt
       __typename
@@ -1143,6 +1146,7 @@ export const onCreateTrainingCertificates = /* GraphQL */ `
       poNo
       addDescretion
       tcRemarks
+      trainingProof
       createdAt
       updatedAt
       __typename
@@ -1163,6 +1167,7 @@ export const onUpdateTrainingCertificates = /* GraphQL */ `
       poNo
       addDescretion
       tcRemarks
+      trainingProof
       createdAt
       updatedAt
       __typename
@@ -1183,6 +1188,7 @@ export const onDeleteTrainingCertificates = /* GraphQL */ `
       poNo
       addDescretion
       tcRemarks
+      trainingProof
       createdAt
       updatedAt
       __typename

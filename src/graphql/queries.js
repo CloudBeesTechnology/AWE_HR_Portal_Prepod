@@ -795,6 +795,7 @@ export const getTrainingReq = /* GraphQL */ `
       courseName
       company
       mediRequired
+      traineeTrack
       createdAt
       updatedAt
       __typename
@@ -824,6 +825,7 @@ export const listTrainingReqs = /* GraphQL */ `
         courseName
         company
         mediRequired
+        traineeTrack
         createdAt
         updatedAt
         __typename
@@ -845,6 +847,7 @@ export const getTrainingCertificates = /* GraphQL */ `
       poNo
       addDescretion
       tcRemarks
+      trainingProof
       createdAt
       updatedAt
       __typename
@@ -872,6 +875,7 @@ export const listTrainingCertificates = /* GraphQL */ `
         poNo
         addDescretion
         tcRemarks
+        trainingProof
         createdAt
         updatedAt
         __typename
