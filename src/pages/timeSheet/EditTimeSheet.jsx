@@ -82,45 +82,50 @@ export const EditTimeSheet = ({
   useEffect(() => {
     if (editObject) {
       const formatDateTime = (getDate) => {
-        const inputDate = String(getDate);
-        const date = new Date(inputDate);
+        try {
+          const inputDate = String(getDate);
+          const date = new Date(inputDate);
 
-        const day = date.getDate();
-        const month = date.getMonth() + 1;
-        const year = date.getFullYear();
-        const time = inputDate?.split(" ")[1] + " " + inputDate?.split(" ")[2];
+          const day = date.getDate();
+          const month = date.getMonth() + 1;
+          const year = date.getFullYear();
+          const time =
+            inputDate?.split(" ")[1] + " " + inputDate?.split(" ")[2];
 
-        return `${day}/${month}/${year} ${time}`;
+          return `${day}/${month}/${year} ${time}`;
+        } catch (err) {
+          console.log("Error :", err);
+        }
       };
 
       const formattedEntranceDateTime = formatDateTime(
-        editObject.ENTRANCEDATETIME
+        editObject?.ENTRANCEDATETIME
       );
-      const formattedExitDateTime = formatDateTime(editObject.EXITDATETIME);
+      const formattedExitDateTime = formatDateTime(editObject?.EXITDATETIME);
 
       const isDateField = editObject.DATE !== undefined;
       const fieldToUpdate = isDateField ? "DATE" : "ENTRANCEDATEUSED";
       const originalDate = editObject[fieldToUpdate];
 
       const displayedDate = originalDate
-        ? `${originalDate.split("/")[1]}/${originalDate.split("/")[0]}/${
-            originalDate.split("/")[2]
+        ? `${originalDate?.split("/")[1]}/${originalDate?.split("/")[0]}/${
+            originalDate?.split("/")[2]
           }`
         : null;
 
+      console.log("displayedDate : ", displayedDate);
       const updatedEditObject = {
         ...editObject,
-        [`formatted_${fieldToUpdate}`]: displayedDate.includes("NaN")
+        [`formatted_${fieldToUpdate}`]: displayedDate?.includes("NaN")
           ? ""
           : displayedDate,
-        [`formatted_${"ENTRANCEDATETIME"}`]: formattedEntranceDateTime.includes(
-          "NaN"
-        )
+        [`formatted_${"ENTRANCEDATETIME"}`]:
+          formattedEntranceDateTime?.includes("NaN")
+            ? ""
+            : formattedEntranceDateTime,
+        [`formatted_${"EXITDATETIME"}`]: formattedExitDateTime?.includes("NaN")
           ? ""
-          : formattedEntranceDateTime,
-        [`formatted_${"EXITDATETIME"}`]: formattedExitDateTime.includes("NaN")
-          ? ""
-          : displayedDate,
+          : formattedExitDateTime,
       };
 
       setFormData(updatedEditObject);
@@ -400,7 +405,6 @@ export const EditTimeSheet = ({
           } catch (err) {
             console.log(err);
           }
-          
           return {
             ...prevFormData,
             [actualHoursKey]:
