@@ -11,21 +11,9 @@ export const AddEmpFun = () => {
 
     const totalData = {
       empID:AddEmpValue.empID,
-      MRNo: AddEmpValue.MRNo,
-      medicalName: AddEmpValue.medicalName,
-      medicalExpiry: AddEmpValue.medicalExpiry,
-      medicalAppointDate: AddEmpValue.medicalAppointDate,
-      medicalReport: [JSON.stringify(AddEmpValue.medicalReport)],
-      courseCode: [AddEmpValue.courseCode],
-      courseName: [AddEmpValue.courseName],
-      company: [AddEmpValue.company],
-      traineeSD: AddEmpValue.traineeSD,
-      traineeED: AddEmpValue.traineeED,
-      traineeStatus: AddEmpValue.traineeStatus,
-      traineeCourseFee: AddEmpValue.traineeCourseFee,
-      mediRequired: AddEmpValue.mediRequired,
+      traineeTrack:JSON.stringify(AddEmpValue.trainingTrack)
     };
-    console.log(totalData);
+    // console.log(totalData,"create");
 
     try {
       const storedData=   await Promise.all([

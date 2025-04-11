@@ -275,7 +275,77 @@ export const insClaim = async (
     console.log(`Error uploading ${fileType}:`, error);
   }
 };
+export const trainingUp = async (
+  file,
+  fileType,
+  setUploadedDocs,
 
+  empID,
+  index
+) => {
+  try {
+    // console.log("Starting upload process...");
+    const currentUser = await getCurrentUser();
+
+    if (currentUser) {
+      const result = await uploadData({
+        path: `public/${fileType}/${empID}/${file.name}`,
+        data: file,
+      }).result;
+      const fileUrl = result.path;
+      const uploadDate = new Date().toISOString().split("T")[0];
+
+      // console.log("File URL:", fileUrl);
+      // console.log("Upload Date:", uploadDate);
+
+      // Handling when index is provided
+      if (typeof index === "number") {
+        // console.log("Updating state at index:", index);
+
+        setUploadedDocs((prev) => {
+          const updatedUploads = { ...prev };
+          // console.log("Previous uploadedDocs:", prev);
+
+          if (!updatedUploads[fileType]) {
+            updatedUploads[fileType] = [];
+          }
+
+          if (!Array.isArray(updatedUploads[fileType][index])) {
+            updatedUploads[fileType][index] = [];
+          }
+
+          const existingUpload = updatedUploads[fileType][index].find(
+            (item) => item.upload === fileUrl
+          );
+          // console.log("Existing upload check:", existingUpload);
+
+          if (!existingUpload) {
+            updatedUploads[fileType][index].push({
+              upload: fileUrl,
+              date: uploadDate,
+            });
+          }
+
+          // console.log("Updated uploads:", updatedUploads);
+          return updatedUploads;
+        });
+      } else {
+        // When index is not provided, simpler structure update
+        // console.log("No index provided. Appending to the array.");
+
+        setUploadedDocs((prev) => ({
+          ...prev,
+          [fileType]: [
+            ...(prev[fileType] || []),
+            { upload: fileUrl, date: uploadDate },
+          ],
+        }));
+      }
+    }
+  } catch (error) {
+    console.log(`Error uploading ${fileType}:`, error);
+  }
+};
 
 export const claimUploadDocs = async (
   file,

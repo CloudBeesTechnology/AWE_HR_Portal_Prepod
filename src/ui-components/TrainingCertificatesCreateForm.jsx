@@ -198,6 +198,7 @@ export default function TrainingCertificatesCreateForm(props) {
     poNo: [],
     addDescretion: [],
     tcRemarks: "",
+    trainingProof: [],
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [certifiExpiry, setCertifiExpiry] = React.useState(
@@ -217,6 +218,9 @@ export default function TrainingCertificatesCreateForm(props) {
     initialValues.addDescretion
   );
   const [tcRemarks, setTcRemarks] = React.useState(initialValues.tcRemarks);
+  const [trainingProof, setTrainingProof] = React.useState(
+    initialValues.trainingProof
+  );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setEmpID(initialValues.empID);
@@ -233,6 +237,8 @@ export default function TrainingCertificatesCreateForm(props) {
     setAddDescretion(initialValues.addDescretion);
     setCurrentAddDescretionValue("");
     setTcRemarks(initialValues.tcRemarks);
+    setTrainingProof(initialValues.trainingProof);
+    setCurrentTrainingProofValue("");
     setErrors({});
   };
   const [currentCertifiExpiryValue, setCurrentCertifiExpiryValue] =
@@ -252,6 +258,9 @@ export default function TrainingCertificatesCreateForm(props) {
   const [currentAddDescretionValue, setCurrentAddDescretionValue] =
     React.useState("");
   const addDescretionRef = React.createRef();
+  const [currentTrainingProofValue, setCurrentTrainingProofValue] =
+    React.useState("");
+  const trainingProofRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
     certifiExpiry: [],
@@ -261,6 +270,7 @@ export default function TrainingCertificatesCreateForm(props) {
     poNo: [],
     addDescretion: [],
     tcRemarks: [],
+    trainingProof: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -296,6 +306,7 @@ export default function TrainingCertificatesCreateForm(props) {
           poNo,
           addDescretion,
           tcRemarks,
+          trainingProof,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -366,6 +377,7 @@ export default function TrainingCertificatesCreateForm(props) {
               poNo,
               addDescretion,
               tcRemarks,
+              trainingProof,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -393,6 +405,7 @@ export default function TrainingCertificatesCreateForm(props) {
               poNo,
               addDescretion,
               tcRemarks,
+              trainingProof,
             };
             const result = onChange(modelFields);
             values = result?.certifiExpiry ?? values;
@@ -447,6 +460,7 @@ export default function TrainingCertificatesCreateForm(props) {
               poNo,
               addDescretion,
               tcRemarks,
+              trainingProof,
             };
             const result = onChange(modelFields);
             values = result?.eCertifiDate ?? values;
@@ -501,6 +515,7 @@ export default function TrainingCertificatesCreateForm(props) {
               poNo,
               addDescretion,
               tcRemarks,
+              trainingProof,
             };
             const result = onChange(modelFields);
             values = result?.trainingUpCertifi ?? values;
@@ -561,6 +576,7 @@ export default function TrainingCertificatesCreateForm(props) {
               poNo,
               addDescretion,
               tcRemarks,
+              trainingProof,
             };
             const result = onChange(modelFields);
             values = result?.orgiCertifiDate ?? values;
@@ -618,6 +634,7 @@ export default function TrainingCertificatesCreateForm(props) {
               poNo: values,
               addDescretion,
               tcRemarks,
+              trainingProof,
             };
             const result = onChange(modelFields);
             values = result?.poNo ?? values;
@@ -670,6 +687,7 @@ export default function TrainingCertificatesCreateForm(props) {
               poNo,
               addDescretion: values,
               tcRemarks,
+              trainingProof,
             };
             const result = onChange(modelFields);
             values = result?.addDescretion ?? values;
@@ -728,6 +746,7 @@ export default function TrainingCertificatesCreateForm(props) {
               poNo,
               addDescretion,
               tcRemarks: value,
+              trainingProof,
             };
             const result = onChange(modelFields);
             value = result?.tcRemarks ?? value;
@@ -742,6 +761,61 @@ export default function TrainingCertificatesCreateForm(props) {
         hasError={errors.tcRemarks?.hasError}
         {...getOverrideProps(overrides, "tcRemarks")}
       ></TextField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              certifiExpiry,
+              eCertifiDate,
+              trainingUpCertifi,
+              orgiCertifiDate,
+              poNo,
+              addDescretion,
+              tcRemarks,
+              trainingProof: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.trainingProof ?? values;
+          }
+          setTrainingProof(values);
+          setCurrentTrainingProofValue("");
+        }}
+        currentFieldValue={currentTrainingProofValue}
+        label={"Training proof"}
+        items={trainingProof}
+        hasError={errors?.trainingProof?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("trainingProof", currentTrainingProofValue)
+        }
+        errorMessage={errors?.trainingProof?.errorMessage}
+        setFieldValue={setCurrentTrainingProofValue}
+        inputFieldRef={trainingProofRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Training proof"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentTrainingProofValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.trainingProof?.hasError) {
+              runValidationTasks("trainingProof", value);
+            }
+            setCurrentTrainingProofValue(value);
+          }}
+          onBlur={() =>
+            runValidationTasks("trainingProof", currentTrainingProofValue)
+          }
+          errorMessage={errors.trainingProof?.errorMessage}
+          hasError={errors.trainingProof?.hasError}
+          ref={trainingProofRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "trainingProof")}
+        ></TextAreaField>
+      </ArrayField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}
