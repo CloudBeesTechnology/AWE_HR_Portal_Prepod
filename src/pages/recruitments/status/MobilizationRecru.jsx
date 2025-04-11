@@ -26,6 +26,7 @@ export const MobilizationRecru = ({
   const [notification, setNotification] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(1);
+  const [loadingItems, setLoadingItems] = useState({});
 
   const heading = [
     "S.No",
