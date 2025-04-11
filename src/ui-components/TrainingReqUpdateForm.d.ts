@@ -36,6 +36,7 @@ export declare type TrainingReqUpdateFormInputValues = {
     courseName?: string[];
     company?: string[];
     mediRequired?: boolean;
+    traineeTrack?: string[];
 };
 export declare type TrainingReqUpdateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -52,6 +53,7 @@ export declare type TrainingReqUpdateFormValidationValues = {
     courseName?: ValidationFunction<string>;
     company?: ValidationFunction<string>;
     mediRequired?: ValidationFunction<boolean>;
+    traineeTrack?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type TrainingReqUpdateFormOverridesProps = {
@@ -70,6 +72,7 @@ export declare type TrainingReqUpdateFormOverridesProps = {
     courseName?: PrimitiveOverrideProps<TextFieldProps>;
     company?: PrimitiveOverrideProps<TextFieldProps>;
     mediRequired?: PrimitiveOverrideProps<SwitchFieldProps>;
+    traineeTrack?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type TrainingReqUpdateFormProps = React.PropsWithChildren<{
     overrides?: TrainingReqUpdateFormOverridesProps | undefined | null;

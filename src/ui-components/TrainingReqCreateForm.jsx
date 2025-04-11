@@ -205,6 +205,7 @@ export default function TrainingReqCreateForm(props) {
     courseName: [],
     company: [],
     mediRequired: false,
+    traineeTrack: [],
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [MRNo, setMRNo] = React.useState(initialValues.MRNo);
@@ -234,6 +235,9 @@ export default function TrainingReqCreateForm(props) {
   const [mediRequired, setMediRequired] = React.useState(
     initialValues.mediRequired
   );
+  const [traineeTrack, setTraineeTrack] = React.useState(
+    initialValues.traineeTrack
+  );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setEmpID(initialValues.empID);
@@ -254,6 +258,8 @@ export default function TrainingReqCreateForm(props) {
     setCompany(initialValues.company);
     setCurrentCompanyValue("");
     setMediRequired(initialValues.mediRequired);
+    setTraineeTrack(initialValues.traineeTrack);
+    setCurrentTraineeTrackValue("");
     setErrors({});
   };
   const [currentMedicalReportValue, setCurrentMedicalReportValue] =
@@ -267,6 +273,9 @@ export default function TrainingReqCreateForm(props) {
   const courseNameRef = React.createRef();
   const [currentCompanyValue, setCurrentCompanyValue] = React.useState("");
   const companyRef = React.createRef();
+  const [currentTraineeTrackValue, setCurrentTraineeTrackValue] =
+    React.useState("");
+  const traineeTrackRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
     MRNo: [],
@@ -282,6 +291,7 @@ export default function TrainingReqCreateForm(props) {
     courseName: [],
     company: [],
     mediRequired: [],
+    traineeTrack: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -323,6 +333,7 @@ export default function TrainingReqCreateForm(props) {
           courseName,
           company,
           mediRequired,
+          traineeTrack,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -399,6 +410,7 @@ export default function TrainingReqCreateForm(props) {
               courseName,
               company,
               mediRequired,
+              traineeTrack,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -436,6 +448,7 @@ export default function TrainingReqCreateForm(props) {
               courseName,
               company,
               mediRequired,
+              traineeTrack,
             };
             const result = onChange(modelFields);
             value = result?.MRNo ?? value;
@@ -473,6 +486,7 @@ export default function TrainingReqCreateForm(props) {
               courseName,
               company,
               mediRequired,
+              traineeTrack,
             };
             const result = onChange(modelFields);
             value = result?.medicalName ?? value;
@@ -510,6 +524,7 @@ export default function TrainingReqCreateForm(props) {
               courseName,
               company,
               mediRequired,
+              traineeTrack,
             };
             const result = onChange(modelFields);
             value = result?.medicalExpiry ?? value;
@@ -547,6 +562,7 @@ export default function TrainingReqCreateForm(props) {
               courseName,
               company,
               mediRequired,
+              traineeTrack,
             };
             const result = onChange(modelFields);
             value = result?.medicalAppointDate ?? value;
@@ -582,6 +598,7 @@ export default function TrainingReqCreateForm(props) {
               courseName,
               company,
               mediRequired,
+              traineeTrack,
             };
             const result = onChange(modelFields);
             values = result?.medicalReport ?? values;
@@ -646,6 +663,7 @@ export default function TrainingReqCreateForm(props) {
               courseName,
               company,
               mediRequired,
+              traineeTrack,
             };
             const result = onChange(modelFields);
             value = result?.traineeSD ?? value;
@@ -683,6 +701,7 @@ export default function TrainingReqCreateForm(props) {
               courseName,
               company,
               mediRequired,
+              traineeTrack,
             };
             const result = onChange(modelFields);
             value = result?.traineeED ?? value;
@@ -720,6 +739,7 @@ export default function TrainingReqCreateForm(props) {
               courseName,
               company,
               mediRequired,
+              traineeTrack,
             };
             const result = onChange(modelFields);
             value = result?.traineeStatus ?? value;
@@ -757,6 +777,7 @@ export default function TrainingReqCreateForm(props) {
               courseName,
               company,
               mediRequired,
+              traineeTrack,
             };
             const result = onChange(modelFields);
             value = result?.traineeCourseFee ?? value;
@@ -790,6 +811,7 @@ export default function TrainingReqCreateForm(props) {
               courseName,
               company,
               mediRequired,
+              traineeTrack,
             };
             const result = onChange(modelFields);
             values = result?.courseCode ?? values;
@@ -850,6 +872,7 @@ export default function TrainingReqCreateForm(props) {
               courseName: values,
               company,
               mediRequired,
+              traineeTrack,
             };
             const result = onChange(modelFields);
             values = result?.courseName ?? values;
@@ -910,6 +933,7 @@ export default function TrainingReqCreateForm(props) {
               courseName,
               company: values,
               mediRequired,
+              traineeTrack,
             };
             const result = onChange(modelFields);
             values = result?.company ?? values;
@@ -972,6 +996,7 @@ export default function TrainingReqCreateForm(props) {
               courseName,
               company,
               mediRequired: value,
+              traineeTrack,
             };
             const result = onChange(modelFields);
             value = result?.mediRequired ?? value;
@@ -986,6 +1011,67 @@ export default function TrainingReqCreateForm(props) {
         hasError={errors.mediRequired?.hasError}
         {...getOverrideProps(overrides, "mediRequired")}
       ></SwitchField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              MRNo,
+              medicalName,
+              medicalExpiry,
+              medicalAppointDate,
+              medicalReport,
+              traineeSD,
+              traineeED,
+              traineeStatus,
+              traineeCourseFee,
+              courseCode,
+              courseName,
+              company,
+              mediRequired,
+              traineeTrack: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.traineeTrack ?? values;
+          }
+          setTraineeTrack(values);
+          setCurrentTraineeTrackValue("");
+        }}
+        currentFieldValue={currentTraineeTrackValue}
+        label={"Trainee track"}
+        items={traineeTrack}
+        hasError={errors?.traineeTrack?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("traineeTrack", currentTraineeTrackValue)
+        }
+        errorMessage={errors?.traineeTrack?.errorMessage}
+        setFieldValue={setCurrentTraineeTrackValue}
+        inputFieldRef={traineeTrackRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Trainee track"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentTraineeTrackValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.traineeTrack?.hasError) {
+              runValidationTasks("traineeTrack", value);
+            }
+            setCurrentTraineeTrackValue(value);
+          }}
+          onBlur={() =>
+            runValidationTasks("traineeTrack", currentTraineeTrackValue)
+          }
+          errorMessage={errors.traineeTrack?.errorMessage}
+          hasError={errors.traineeTrack?.hasError}
+          ref={traineeTrackRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "traineeTrack")}
+        ></TextAreaField>
+      </ArrayField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

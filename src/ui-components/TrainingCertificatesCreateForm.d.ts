@@ -30,6 +30,7 @@ export declare type TrainingCertificatesCreateFormInputValues = {
     poNo?: string[];
     addDescretion?: string[];
     tcRemarks?: string;
+    trainingProof?: string[];
 };
 export declare type TrainingCertificatesCreateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -40,6 +41,7 @@ export declare type TrainingCertificatesCreateFormValidationValues = {
     poNo?: ValidationFunction<string>;
     addDescretion?: ValidationFunction<string>;
     tcRemarks?: ValidationFunction<string>;
+    trainingProof?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type TrainingCertificatesCreateFormOverridesProps = {
@@ -52,6 +54,7 @@ export declare type TrainingCertificatesCreateFormOverridesProps = {
     poNo?: PrimitiveOverrideProps<TextFieldProps>;
     addDescretion?: PrimitiveOverrideProps<TextFieldProps>;
     tcRemarks?: PrimitiveOverrideProps<TextFieldProps>;
+    trainingProof?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type TrainingCertificatesCreateFormProps = React.PropsWithChildren<{
     overrides?: TrainingCertificatesCreateFormOverridesProps | undefined | null;

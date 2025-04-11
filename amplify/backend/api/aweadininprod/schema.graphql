@@ -250,6 +250,7 @@ type TrainingReq @model @auth(rules: [{allow: public}]) {
   courseName: [String]
   company: [String]
   mediRequired: Boolean
+  traineeTrack: [AWSJSON]
 }
 
 type TrainingCertificates @model @auth(rules: [{allow: public}]) {
@@ -262,6 +263,7 @@ type TrainingCertificates @model @auth(rules: [{allow: public}]) {
   poNo: [String]
   addDescretion: [String]
   tcRemarks: String
+  trainingProof: [AWSJSON]
 }
 
 type AddCourse @model @auth(rules: [{allow: public}]) {
