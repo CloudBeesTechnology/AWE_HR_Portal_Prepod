@@ -13,7 +13,7 @@ export const AddEmpReqUp = () => {
       empID: TMRDataUp.empID,
       traineeTrack: JSON.stringify(TMRDataUp.trainingTrack),
     };
-    // console.log(totalData, "update method");
+    console.log(totalData, "update method");
 
     try {
       const storedData = await Promise.all([
