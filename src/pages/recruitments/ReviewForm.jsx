@@ -672,6 +672,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                   label: "Passport Issued Destination",
                   value: candidate.ppDestinate,
                 },
+                
                 {
                   label: "Brief Description of Present Duties",
                   value: candyEducDeatils.desc,
