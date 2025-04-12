@@ -21,6 +21,7 @@ export const TrainingRCData = () => {
     "Course Fee",
     "Department",
     "Other Department",
+    "Position",
     "START DATE",
     "END DATE",
     "CERT. EXP",
@@ -42,7 +43,7 @@ export const TrainingRCData = () => {
   };
 
   const checkExpiryStatus = (certifiExpiry) => {
-    if (!certifiExpiry) return "EXPIRED"; 
+    if (!certifiExpiry) return "EXPIRED";
     const expiryDate = new Date(certifiExpiry);
     const today = new Date();
     return expiryDate < today ? "EXPIRED" : "VALID";
@@ -52,13 +53,13 @@ export const TrainingRCData = () => {
     return data
       .filter((item) => {
         if (Array.isArray(item?.workStatus) && item?.workStatus.length > 0) {
-          const lastWorkStatus = item?.workStatus[item?.workStatus.length - 1]; 
+          const lastWorkStatus = item?.workStatus[item?.workStatus.length - 1];
 
           if (
             lastWorkStatus.toUpperCase() === "TERMINATION" ||
             lastWorkStatus.toUpperCase() === "RESIGNATION"
           ) {
-            return false; // Exclude items with TERMINATION or RESIGNATION
+            return false; 
           }
         }
         return true;
@@ -83,25 +84,28 @@ export const TrainingRCData = () => {
             empID: item.empID || "-",
             empBadgeNo: item.empBadgeNo || "-",
             name: item.name || "-",
-            MRNo: track.MRNo || "-",
-            PONo: proof.poNo || "-",
-            Code: track.courseCode || "-",
-            CourseProgramme: track.courseName || "-",
-            ConductedBy: track.company || "-",
-            CourseFee: track.traineeCourseFee || "-",
+            mrNo: track.MRNo || "-",
+            poNo: proof.poNo || "-",
+            code: track.courseCode || "-",
+            courseProgramme: track.courseName || "-",
+            conductedBy: track.company || "-",
+            courseFee: track.traineeCourseFee || "-",
             department: Array.isArray(item.department)
               ? item.department[item.department.length - 1]
               : "-",
             otherDepartment: Array.isArray(item.otherDepartment)
               ? item.otherDepartment[item.otherDepartment.length - 1]
               : "-",
-            StartDate: formatDate(track.traineeSD) || "-",
-            EndDate: formatDate(track.traineeED) || "-",
-            CertExp: formatDate(proof.certifiExpiry) || "-",
-            ExpiredValid: checkExpiryStatus(proof.certifiExpiry),
-            MandatorySupplementary: track.traineeStatus || "-",
-            ECertReceived: formatDate(proof.eCertifiDate) || "-",
-            OriginalCertReceived: formatDate(proof.orgiCertifiDate) || "-",
+            position: Array.isArray(item.position)
+              ? item.position[item.position.length - 1]
+              : "-",
+            startDate: formatDate(track.traineeSD) || "-",
+            endDate: formatDate(track.traineeED) || "-",
+            certExp: formatDate(proof.certifiExpiry) || "-",
+            expiredValid: checkExpiryStatus(proof.certifiExpiry),
+            mandatorySupplementary: track.traineeStatus || "-",
+            eCertReceived: formatDate(proof.eCertifiDate) || "-",
+            originalCertReceived: formatDate(proof.orgiCertifiDate) || "-",
             remarks: proof.tcRemarks || "-",
           };
         });
@@ -140,7 +144,7 @@ export const TrainingRCData = () => {
           return false; // Return early if workStatus is undefined or an empty array
         }
 
-        const lastWorkStatus = data.workStatus[data.workStatus.length - 1]; 
+        const lastWorkStatus = data.workStatus[data.workStatus.length - 1];
 
         if (
           lastWorkStatus?.toUpperCase() === "TERMINATION" ||
@@ -177,6 +181,10 @@ export const TrainingRCData = () => {
         otherDepartment: Array.isArray(item.otherDepartment)
           ? item.otherDepartment[item.otherDepartment.length - 1]
           : "-",
+        position: Array.isArray(item.position)
+          ? item.position[item.position.length - 1]
+          : "-",
+
         traineeSD: formatDate(item.traineeSD) || "-",
         traineeED: formatDate(item.traineeED) || "-",
         certifiExpiry: Array.isArray(item.certifiExpiry)
@@ -191,7 +199,7 @@ export const TrainingRCData = () => {
           ? formatDate(item.orgiCertifiDate[item.orgiCertifiDate.length - 1])
           : "-",
         remark: item.remark || "-",
-        rawCertifiExpiry: new Date(item.certifiExpiry), 
+        rawCertifiExpiry: new Date(item.certifiExpiry),
       }))
       .sort((a, b) => a.rawCertifiExpiry - b.rawCertifiExpiry)
       .map(({ rawCertifiExpiry, ...rest }) => rest);

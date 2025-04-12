@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { FaArrowLeft } from "react-icons/fa6";
 import { TrainVT } from "../TableTraining/TrainVT";
+import AddCertifyPopUp from "../TableTraining/AddCertifyPopUp";
+import { CertifyTable } from "../TableTraining/CertifyTable";
 
 export const BlngCertify = () => {
   const { empPIData, trainingCertifi, AddEmpReq, workInfoData } =
@@ -31,7 +33,7 @@ export const BlngCertify = () => {
     { header: "Employee Badge No", key: "empBadgeNo" },
     { header: "Name", key: "name" },
     { header: "Department", key: "department" },
-
+    { header: "Position", key: "position" },
   ];
 
   const handleDate = (e, type) => {
@@ -250,6 +252,12 @@ export const BlngCertify = () => {
         certifiExpiry,
         eCertifiDate,
         orgiCertifiDate,
+        department: Array.isArray(data.department)
+        ? data.department[data.department.length - 1]
+        : "-",
+        position: Array.isArray(data.position)
+        ? data.position[data.position.length - 1]
+        : "-",
       };
     });
 
@@ -337,7 +345,7 @@ export const BlngCertify = () => {
           </div>
         </div>
       </div>
-      <TrainVT
+      <CertifyTable
         mergering={finalData}
         columns={tableColumns?.trainCertifi}
         popupAll={addTCForm}
