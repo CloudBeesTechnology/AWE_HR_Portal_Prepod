@@ -19,8 +19,6 @@ export const FilterTable = ({
   endDate,
 }) => {
   const { dropDownVal } = useContext(DataSupply);
-  console.log(dropDownVal);
-
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [currentPage, setCurrentPage] = useState(1);

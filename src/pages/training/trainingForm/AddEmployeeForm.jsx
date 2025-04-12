@@ -662,7 +662,7 @@ export const AddEmployeeForm = () => {
           empID: data.empID,
         };
         await AddEmpData({ AddEmpValue });
-        // console.log(AddEmpValue, "Training details Saved successfully");
+        console.log(AddEmpValue, "Training details Saved successfully");
         const trainingRows = data?.trainingreq
           ?.map((item, idx) => {
             return `
@@ -677,7 +677,7 @@ export const AddEmployeeForm = () => {
         `;
           })
           .join("");
-        // console.log(trainingRows);
+        console.log(trainingRows);
 
         const trainingTable = `
 <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">

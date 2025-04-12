@@ -28,6 +28,7 @@ import { useRowSelection } from "./customTimeSheet/useRowSelection";
 import { useNavigate } from "react-router-dom";
 import { useCreateNotification } from "../../hooks/useCreateNotification";
 import { TimeSheetSpinner } from "./customTimeSheet/TimeSheetSpinner";
+import { UnlockVerifiedCellVS } from "./customTimeSheet/UnlockVerifiedCellVS";
 
 const client = generateClient();
 export const ViewORMCsheet = ({
@@ -64,6 +65,7 @@ export const ViewORMCsheet = ({
   const [userIdentification, setUserIdentification] = useState("");
   const [showStatusCol, setShowStatusCol] = useState(null);
   const [successMess, setSuccessMess] = useState(null);
+    const [loadingMessForDelay, setLoadingMessForDelay] = useState(null);
 
   const [toggleForRemark, setToggleForRemark] = useState(null);
   const [allApprovedData, setAllApprovedData] = useState([]);
@@ -312,7 +314,12 @@ export const ViewORMCsheet = ({
     return data.map((m) => ({
       id: m.id,
       data: m.data.map((val) => {
-        if (val.IN === getObject.IN && val.OUT === getObject.OUT) {
+        if (
+          val.IN === getObject.IN &&
+          val.OUT === getObject.OUT &&
+          val.BADGE === getObject.BADGE &&
+          val.DATE === getObject.DATE
+        ) {
           return getObject;
         } else {
           return val;
@@ -338,7 +345,12 @@ export const ViewORMCsheet = ({
 
   const editFlatData = (data, getObject) => {
     return data.map((val) => {
-      if (val.IN === getObject.IN && val.OUT === getObject.OUT) {
+      if (
+        val.IN === getObject.IN &&
+        val.OUT === getObject.OUT &&
+        val.BADGE === getObject.BADGE &&
+        val.DATE === getObject.DATE
+      ) {
         return getObject;
       } else {
         return val;
@@ -680,8 +692,22 @@ export const ViewORMCsheet = ({
         };
       });
 
-    let action = "create";
-    let finalResult = result;
+   let finalResult = result;
+       const { filteredResults, deleteDuplicateData } = await UnlockVerifiedCellVS(
+         {
+           finalResult,
+           setLoadingMessForDelay
+         }
+       );
+   
+       console.log("deleteDuplicateData : ", deleteDuplicateData);
+   
+       if (
+         (filteredResults && filteredResults.length === 0) ||
+         deleteDuplicateData === "DuplicateDataDeletedSuccessfully"
+       ) {
+         // Start
+         let action = "create";
 
     await TimeSheetsCRUDoperations({
       finalResult,
@@ -691,6 +717,9 @@ export const ViewORMCsheet = ({
       Position,
       action,
     });
+    // End
+    setLoadingMessForDelay(false);
+  }
   };
 
   const toggleForRemarkFunc = () => {
@@ -753,7 +782,7 @@ export const ViewORMCsheet = ({
   }, [allApprovedData, allRejectedData, data]);
   const convertToISODate = (dateString) => {
     try {
-      const [year, month, day] = dateString.split("/");
+      const [year, month, day] = dateString?.split("/");
 
       return `${month}/${year}/${day}`;
     } catch {}
@@ -1103,7 +1132,65 @@ export const ViewORMCsheet = ({
                       } else if (excelData && excelData) {
                         storeInitialData();
                       }
-                    
+                      // const fetchDataAndDelete = async () => {
+                      //   try {
+                      //     console.log("Fetching and Deleting SBW Data...");
+                      //     // setIsDeleting(true); // Set loading state
+                      //     let nextToken = null; // Initialize nextToken for pagination
+                      //     do {
+                      //       // Define the filter for fetching SBW data
+                      //       const filter = {
+                      //         and: [{ fileType: { eq: "ORMC" } }],
+                      //       };
+                      //       // Fetch the BLNG data using GraphQL with pagination
+                      //       const response = await client.graphql({
+                      //         query: listTimeSheets,
+                      //         variables: {
+                      //           filter: filter,
+                      //           nextToken: nextToken,
+                      //         }, // Pass nextToken for pagination
+                      //       });
+                      //       // Extract data and nextToken
+                      //       const SBWdata =
+                      //         response?.data?.listTimeSheets?.items || [];
+                      //       nextToken =
+                      //         response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
+                      //       console.log("Fetched SBW Data:", SBWdata);
+                      //       // Delete each item in the current batch
+                      //       await Promise.all(
+                      //         SBWdata.map(async (item) => {
+                      //           try {
+                      //             const deleteResponse = await client.graphql({
+                      //               query: deleteTimeSheet,
+                      //               variables: { input: { id: item.id } },
+                      //             });
+                      //             console.log(
+                      //               "Deleted Item Response:",
+                      //               deleteResponse
+                      //             );
+                      //           } catch (deleteError) {
+                      //             console.error(
+                      //               `Error deleting item with ID ${item.id}:`,
+                      //               deleteError
+                      //             );
+                      //           }
+                      //         })
+                      //       );
+                      //       console.log("Batch deletion completed.");
+                      //     } while (nextToken); // Continue fetching until no more data
+                      //     console.log(
+                      //       "All SBW items deletion process completed."
+                      //     );
+                      //   } catch (fetchError) {
+                      //     console.error(
+                      //       "Error in fetchDataAndDelete:",
+                      //       fetchError
+                      //     );
+                      //   } finally {
+                      //     // setIsDeleting(false); // Reset loading state
+                      //   }
+                      // };
+                      // fetchDataAndDelete();
                     } else if (userIdentification === "Manager") {
                       removeCheckedItem();
                       renameKeysFunctionAndSubmit();
@@ -1194,6 +1281,14 @@ export const ViewORMCsheet = ({
           // path="/timesheetSBW"
         />
       )}
+
+       {loadingMessForDelay && (
+              <TimeSheetSpinner
+                text={"Please wait a few seconds..."}
+                // notification={notification}
+                // path="/timesheetSBW"
+              />
+            )}
     </div>
   );
 };

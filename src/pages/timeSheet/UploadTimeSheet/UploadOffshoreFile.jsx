@@ -40,6 +40,7 @@ export const UploadOffshoreFile = (
 
     const tbodyHeader = [];
 
+    console.log("allSheets : ", allSheets);
     const processedSheets =
       allSheets &&
       allSheets.map((sheet) => {
@@ -124,22 +125,34 @@ export const UploadOffshoreFile = (
       return new Date(baseDate.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
     }
 
-    function convertDateFormat(dateStr) {
-      const parts = dateStr.split("/");
+    // function convertDateFormat(dateStr) {
+    //   const parts = dateStr.split("/");
 
-      if (parts.length !== 3) {
-        throw new Error("Invalid date format. Expected DD/MM/YYYY");
-      }
+    //   if (parts.length !== 3) {
+    //     throw new Error("Invalid date format. Expected DD/MM/YYYY");
+    //   }
 
-      const [day, month, year] = parts;
-      return `${day}/${month}/${year}`;
-    }
+    //   const [day, month, year] = parts;
+    //   return `${day}/${month}/${year}`;
+    // }
+
+    const convertDateFormat = (inputDateStr) => {
+      const [month, day, year] = inputDateStr?.split("/");
+
+      // Convert string to numbers to remove any leading zeros
+      const dayNum = parseInt(day, 10);
+      const monthNum = parseInt(month, 10);
+      console.log("Date : ", `${monthNum}/${dayNum}/${year} `);
+      return `${monthNum}/${dayNum}/${year}`;
+    };
+
     const result =
       finalFilterdData &&
       finalFilterdData.map((getDate) => {
         const dates = getDate.date.flat();
         let jsDate = excelDateToJSDate(dates);
         const dateObject = jsDate.toLocaleDateString();
+
         const formattedDate = convertDateFormat(dateObject);
 
         return {
@@ -166,6 +179,7 @@ export const UploadOffshoreFile = (
       return cleanedItem;
     });
 
+    console.log("tbodyHeader : ", tbodyHeader);
     setExcelData(formattedData);
     setLoading(false);
     return tbodyHeader;

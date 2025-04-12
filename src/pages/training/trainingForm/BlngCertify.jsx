@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { FaArrowLeft } from "react-icons/fa6";
 import { TrainVT } from "../TableTraining/TrainVT";
+import AddCertifyPopUp from "../TableTraining/AddCertifyPopUp";
+import { CertifyTable } from "../TableTraining/CertifyTable";
 
 export const BlngCertify = () => {
   const { empPIData, trainingCertifi, AddEmpReq, workInfoData } =
@@ -31,7 +33,7 @@ export const BlngCertify = () => {
     { header: "Employee Badge No", key: "empBadgeNo" },
     { header: "Name", key: "name" },
     { header: "Department", key: "department" },
-
+    { header: "Position", key: "position" },
   ];
 
   const handleDate = (e, type) => {
@@ -97,22 +99,22 @@ export const BlngCertify = () => {
 
   // useEffect(() => {
   //   if (!mergeData.length) return;
-  
+
   //   const start = startDate ? new Date(startDate) : null;
   //   const end = endDate ? new Date(endDate) : null;
-  
+
   //   if (!start && !end) {
   //     setFilteredData(mergeData);
   //     return;
   //   }
-  
+
   //   // First, expand the data (one record per certificate)
   //   const expandedData = mergeData.flatMap((data) => {
   //     try {
   //       if (data.trainingProof && data.trainingProof[0]) {
   //         const proof = JSON.parse(data.trainingProof[0]);
   //         const proofsArray = Array.isArray(proof) ? proof : [proof];
-  
+
   //         return proofsArray.map((cert) => ({
   //           ...data,
   //           empID: data.empID || "-",
@@ -128,7 +130,7 @@ export const BlngCertify = () => {
   //     } catch (e) {
   //       console.error("Error parsing trainingProof:", e);
   //     }
-  
+
   //     // Fallback for records with no valid trainingProof
   //     return [{
   //       ...data,
@@ -140,20 +142,20 @@ export const BlngCertify = () => {
   //       orgiCertifiDate: "N/A",
   //     }];
   //   });
-  
+
   //   // Then filter based on certificate dates
   //   const filtered = expandedData.filter((data) => {
   //     if (!data.certifiExpiry) return true; // Keep records with no expiry date
-  
+
   //     if (start && end) {
   //       return data.certifiExpiry >= start && data.certifiExpiry <= end;
   //     }
   //     if (start) return data.certifiExpiry >= start;
   //     if (end) return data.certifiExpiry <= end;
-  
+
   //     return true;
   //   });
-  
+
   //   setFilteredData(filtered);
   // }, [startDate, endDate, mergeData]);
 
@@ -185,10 +187,14 @@ export const BlngCertify = () => {
       );
 
       const filtered = sortedData.filter((data) => {
-        const departmentArray = Array.isArray(data.department) ? data.department : [];
-        const lastDepartment = departmentArray.length > 0 && typeof departmentArray[departmentArray.length - 1] === "string"
-          ? departmentArray[departmentArray.length - 1].trim().toLowerCase()
-          : "";
+        const departmentArray = Array.isArray(data.department)
+          ? data.department
+          : [];
+        const lastDepartment =
+          departmentArray.length > 0 &&
+          typeof departmentArray[departmentArray.length - 1] === "string"
+            ? departmentArray[departmentArray.length - 1].trim().toLowerCase()
+            : "";
         return lastDepartment === "blng";
       });
 
@@ -215,6 +221,7 @@ export const BlngCertify = () => {
       let certifiExpiry = "N/A";
       let eCertifiDate = "N/A";
       let orgiCertifiDate = "N/A";
+      let poNo = "N/A";
 
       try {
         if (data.trainingProof && data.trainingProof[0]) {
@@ -236,6 +243,7 @@ export const BlngCertify = () => {
             orgiCertifiDate = lastProof.orgiCertifiDate
               ? formatDate(lastProof.orgiCertifiDate)
               : "N/A";
+            poNo = lastProof.poNo || "N/A";
           }
         }
       } catch (e) {
@@ -250,43 +258,50 @@ export const BlngCertify = () => {
         certifiExpiry,
         eCertifiDate,
         orgiCertifiDate,
+        poNo,
+        department: Array.isArray(data.department)
+          ? data.department[data.department.length - 1]
+          : "-",
+        position: Array.isArray(data.position)
+          ? data.position[data.position.length - 1]
+          : "-",
       };
     });
 
-    // const finalData = filteredData
-    // .sort((a, b) => new Date(b.CertifyCreatedAt) - new Date(a.CertifyCreatedAt))
-    // .flatMap((data) => {  // Using flatMap instead of map to expand arrays
-    //   try {
-    //     if (data.trainingProof && data.trainingProof[0]) {
-    //       const proof = JSON.parse(data.trainingProof[0]);
-    //       const proofsArray = Array.isArray(proof) ? proof : [proof];
+  // const finalData = filteredData
+  // .sort((a, b) => new Date(b.CertifyCreatedAt) - new Date(a.CertifyCreatedAt))
+  // .flatMap((data) => {  // Using flatMap instead of map to expand arrays
+  //   try {
+  //     if (data.trainingProof && data.trainingProof[0]) {
+  //       const proof = JSON.parse(data.trainingProof[0]);
+  //       const proofsArray = Array.isArray(proof) ? proof : [proof];
 
-    //       // Create one record per certificate
-    //       return proofsArray.map((cert) => ({
-    //         ...data,  // Spread all original data
-    //         empID: data.empID || "-",
-    //         empBadgeNo: data.empBadgeNo || "-",
-    //         name: data.name || "-",
-    //         certifiExpiry: cert.certifiExpiry ? formatDate(cert.certifiExpiry) : "N/A",
-    //         eCertifiDate: cert.eCertifiDate ? formatDate(cert.eCertifiDate) : "N/A",
-    //         orgiCertifiDate: cert.orgiCertifiDate ? formatDate(cert.orgiCertifiDate) : "N/A",
-    //       }));
-    //     }
-    //   } catch (e) {
-    //     console.error("Error parsing trainingProof:", e);
-    //   }
+  //       // Create one record per certificate
+  //       return proofsArray.map((cert) => ({
+  //         ...data,  // Spread all original data
+  //         empID: data.empID || "-",
+  //         empBadgeNo: data.empBadgeNo || "-",
+  //         name: data.name || "-",
+  //         certifiExpiry: cert.certifiExpiry ? formatDate(cert.certifiExpiry) : "N/A",
+  //         eCertifiDate: cert.eCertifiDate ? formatDate(cert.eCertifiDate) : "N/A",
+  //         orgiCertifiDate: cert.orgiCertifiDate ? formatDate(cert.orgiCertifiDate) : "N/A",
+  //       }));
+  //     }
+  //   } catch (e) {
+  //     console.error("Error parsing trainingProof:", e);
+  //   }
 
-    //   // Fallback for records with no valid trainingProof
-    //   return [{
-    //     ...data,
-    //     empID: data.empID || "-",
-    //     empBadgeNo: data.empBadgeNo || "-",
-    //     name: data.name || "-",
-    //     certifiExpiry: "N/A",
-    //     eCertifiDate: "N/A",
-    //     orgiCertifiDate: "N/A",
-    //   }];
-    // });
+  //   // Fallback for records with no valid trainingProof
+  //   return [{
+  //     ...data,
+  //     empID: data.empID || "-",
+  //     empBadgeNo: data.empBadgeNo || "-",
+  //     name: data.name || "-",
+  //     certifiExpiry: "N/A",
+  //     eCertifiDate: "N/A",
+  //     orgiCertifiDate: "N/A",
+  //   }];
+  // });
 
   return (
     <section className="bg-[#F8F8F8] mx-auto p-5 h-full w-full">
@@ -337,7 +352,7 @@ export const BlngCertify = () => {
           </div>
         </div>
       </div>
-      <TrainVT
+      <CertifyTable
         mergering={finalData}
         columns={tableColumns?.trainCertifi}
         popupAll={addTCForm}

@@ -3,6 +3,8 @@ import { Link, useOutletContext } from "react-router-dom";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { TrainVT } from "../TableTraining/TrainVT";
 import { FaArrowLeft } from "react-icons/fa6";
+import AddCertifyPopUp from "../TableTraining/AddCertifyPopUp";
+import { CertifyTable } from "../TableTraining/CertifyTable";
 
 export const OMEDataCertify = () => {
   // const { tableColumns } = useOutletContext();
@@ -30,6 +32,7 @@ export const OMEDataCertify = () => {
     { header: "Employee Badge No", key: "empBadgeNo" },
     { header: "Name", key: "name" },
     { header: "Department", key: "department" },
+    { header: "Position", key: "position" },
   ];
 
   const handleDate = (e, type) => {
@@ -151,6 +154,7 @@ export const OMEDataCertify = () => {
       let certifiExpiry = "N/A";
       let eCertifiDate = "N/A";
       let orgiCertifiDate = "N/A";
+      let poNo = "N/A";
 
       try {
         if (data.trainingProof && data.trainingProof[0]) {
@@ -172,6 +176,7 @@ export const OMEDataCertify = () => {
             orgiCertifiDate = lastProof.orgiCertifiDate
               ? formatDate(lastProof.orgiCertifiDate)
               : "N/A";
+              poNo = lastProof.poNo || "N/A";
           }
         }
       } catch (e) {
@@ -186,6 +191,13 @@ export const OMEDataCertify = () => {
         certifiExpiry,
         eCertifiDate,
         orgiCertifiDate,
+        poNo,  
+        department: Array.isArray(data.department)
+        ? data.department[data.department.length - 1]
+        : "-",
+        position: Array.isArray(data.position)
+        ? data.position[data.position.length - 1]
+        : "-",
       };
     });
 
@@ -240,7 +252,7 @@ export const OMEDataCertify = () => {
         </div>
       </div>
 
-      <TrainVT
+      <CertifyTable
         mergering={finalData}
         columns={tableColumns?.trainCertifi}
         popupAll={addTCForm}

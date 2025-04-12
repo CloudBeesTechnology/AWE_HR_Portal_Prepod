@@ -30,6 +30,8 @@ import { FiLoader } from "react-icons/fi";
 import { ViewOffshoreORMCsheet } from "../pages/timeSheet/ViewOffshoreORMCsheet";
 import { UploadEditedHO } from "../pages/timeSheet/uploadManuallyEditedExcel/UploadEditedHO";
 import { UploadBLNGnewFormat } from "../pages/timeSheet/UploadTimeSheet/UploadBLNGnewFormat";
+import { CheckIsExcelUploaded } from "../pages/timeSheet/customTimeSheet/CheckIsExcelUploaded";
+import PopupForDuplicateFileAlert from "../pages/timeSheet/ModelForSuccessMess/PopupForDuplicateFileAlert";
 
 const client = generateClient();
 export const TimeSheetBrowser = ({
@@ -53,6 +55,7 @@ export const TimeSheetBrowser = ({
   const [loading, setLoading] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [assignPosition, setAssignPosition] = useState("");
+  const [restrictSameExcelUpload, setRestrictSameExcelUpload] = useState(false);
 
   const Position = localStorage.getItem("userType");
 
@@ -96,8 +99,27 @@ export const TimeSheetBrowser = ({
     }
   };
 
-  const handleFile = (e) => {
-    setFileNameForSuccessful(e.target.files[0].name);
+  const handleFileUploadFunc = async () => {
+    const { isExcelExitsOrNot } = await CheckIsExcelUploaded({
+      fileNameForSuccessful,
+      title,
+    });
+    console.log("isExcelExitsOrNot : ", isExcelExitsOrNot);
+    if (
+      isExcelExitsOrNot &&
+      typeof isExcelExitsOrNot === "object" &&
+      isExcelExitsOrNot.constructor === Object
+    ) {
+      console.log("Some one already uploaded the same excel sheet");
+      setLoading(false);
+      setRestrictSameExcelUpload(true);
+    } else if (isExcelExitsOrNot === "Not Matched") {
+      await UploadFile();
+    }
+  };
+
+  const handleFile = async (e) => {
+    setFileNameForSuccessful(e?.target?.files[0]?.name);
 
     let fileType = [
       "application/vnd.ms-excel",
@@ -108,6 +130,7 @@ export const TimeSheetBrowser = ({
 
     if (selectedFile) {
       setFileName(e.target.files[0].name);
+      const excelFileName = e.target.files[0].name;
       if (selectedFile && fileType.includes(selectedFile.type)) {
         var result = selectedFile && fileType.includes(selectedFile.type);
 
@@ -117,6 +140,8 @@ export const TimeSheetBrowser = ({
         reader.readAsArrayBuffer(selectedFile);
         reader.onload = (e) => {
           setExcelFile(e.target.result);
+
+          console.log("e.target.files[0].name : ", excelFileName);
         };
       } else {
         setTypeError("Please select only excel file types");
@@ -129,6 +154,10 @@ export const TimeSheetBrowser = ({
     fileInputRef.current.click();
   };
 
+  const handleDuplicateFileUploadFunc = () => {
+    setRestrictSameExcelUpload(false);
+    fileInputRef.current.value = "";
+  };
   const UploadFile = async () => {
     try {
       if (titleName === "Offshore") {
@@ -223,7 +252,7 @@ export const TimeSheetBrowser = ({
             fileInputRef,
             setLoading
           );
-
+          console.log("editedResult : ", editedResult);
           setReturnedTHeader(editedResult);
         }
         fileInputRef.current.value = "";
@@ -277,20 +306,16 @@ export const TimeSheetBrowser = ({
   };
   const { setStartDate, setEndDate, setSearchQuery } = useTempID();
 
- 
-
   if (showing === 0 && Position !== "Manager") {
     return (
       <div className="flex items-center justify-center h-[82vh] bg-transparent">
         <div className="flex justify-between gap-2">
-       
           <div className="flex justify-between gap-2">
             <p className="text-sm font-semibold">Loading </p>
             <p>
               <FiLoader className="animate-spin mt-[4px]" size={15} />
             </p>
           </div>
-        
         </div>
       </div>
     );
@@ -412,7 +437,6 @@ export const TimeSheetBrowser = ({
                         >
                           Upload
                         </button>
-                     
                       </div>
                     )}
                     {fileName && (
@@ -423,7 +447,7 @@ export const TimeSheetBrowser = ({
                             setLoading(true);
 
                             setTimeout(() => {
-                              UploadFile();
+                              handleFileUploadFunc(fileNameForSuccessful);
                             }, 1000);
                             setEnsureExcelFile();
                             setFileName();
@@ -823,6 +847,15 @@ export const TimeSheetBrowser = ({
             returnedTHeader={[]}
           />
         </div>
+      )}
+
+      {restrictSameExcelUpload && (
+        <PopupForDuplicateFileAlert
+          onClose={() => {
+            handleDuplicateFileUploadFunc();
+          }}
+          fileNameForSuccessful={fileNameForSuccessful}
+        />
       )}
     </div>
   );

@@ -83,7 +83,7 @@ export const TrainingCertificatesForm = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log("Tc", trainingCertifi);
+        // console.log("Tc", trainingCertifi);
         const mergedData = empPIData
           .map((emp) => {
             const WIDetails = workInfoData

@@ -15,6 +15,7 @@ export const TcViewData = () => {
       { header: "Employee ID", key: "empID" },
       { header: "Employee Badge No", key: "empBadgeNo" },
       { header: "Name", key: "name" },
+      { header: "Purchase Order", key: "poNo" },
       { header: "Certificate Expiry", key: "certifiExpiry" },
       { header: "E-certificate Date", key: "eCertifiDate" },
       { header: "Original Certificate Date", key: "orgiCertifiDate" },
@@ -78,10 +79,14 @@ export const TcViewData = () => {
       );
 
       const filtered = sortedData.filter((data) => {
-        const departmentArray = Array.isArray(data.department) ? data.department : [];
-        const lastDepartment = departmentArray.length > 0 && typeof departmentArray[departmentArray.length - 1] === "string"
-          ? departmentArray[departmentArray.length - 1].trim().toLowerCase()
-          : "";
+        const departmentArray = Array.isArray(data.department)
+          ? data.department
+          : [];
+        const lastDepartment =
+          departmentArray.length > 0 &&
+          typeof departmentArray[departmentArray.length - 1] === "string"
+            ? departmentArray[departmentArray.length - 1].trim().toLowerCase()
+            : "";
         return lastDepartment !== "blng" && lastDepartment !== "offshore";
       });
 
@@ -142,66 +147,36 @@ export const TcViewData = () => {
   }, [startDate, endDate, mergeData]);
 
   // Format data for display
-  // const finalData = filteredData
-  //   .sort((a, b) => new Date(b.CertifyCreatedAt) - new Date(a.CertifyCreatedAt))
-  //   .map((data) => {
-  //     let certifiExpiry = "N/A";
-  //     let eCertifiDate = "N/A";
-  //     let orgiCertifiDate = "N/A";
-
-  //     try {
-  //       if (data.trainingProof && data.trainingProof[0]) {
-  //         const proof = JSON.parse(data.trainingProof[0]);
-  //         let lastProof = proof;
-
-  //         // If proof is an array, get the last object
-  //         if (Array.isArray(proof)) {
-  //           lastProof = proof[proof.length - 1];
-  //         }
-
-  //         if (lastProof) {
-  //           certifiExpiry = lastProof.certifiExpiry
-  //             ? formatDate(lastProof.certifiExpiry)
-  //             : "N/A";
-  //           eCertifiDate = lastProof.eCertifiDate
-  //             ? formatDate(lastProof.eCertifiDate)
-  //             : "N/A";
-  //           orgiCertifiDate = lastProof.orgiCertifiDate
-  //             ? formatDate(lastProof.orgiCertifiDate)
-  //             : "N/A";
-  //         }
-  //       }
-  //     } catch (e) {
-  //       console.error("Error parsing trainingProof:", e);
-  //     }
-
-  //     return {
-  //       ...data,
-  //       empID: data.empID || "-",
-  //       empBadgeNo: data.empBadgeNo || "-",
-  //       name: data.name || "-",
-  //       certifiExpiry,
-  //       eCertifiDate,
-  //       orgiCertifiDate,
-  //     };
-  //   });
   const finalData = filteredData
   .sort((a, b) => new Date(b.CertifyCreatedAt) - new Date(a.CertifyCreatedAt))
   .map((data) => {
-    let allCertificates = [];
+    let certifiExpiry = "N/A";
+    let eCertifiDate = "N/A";
+    let orgiCertifiDate = "N/A";
+    let poNo = "N/A";
 
     try {
       if (data.trainingProof && data.trainingProof[0]) {
         const proof = JSON.parse(data.trainingProof[0]);
+        let lastProof = proof;
 
-        // Make sure it's an array
-        const proofsArray = Array.isArray(proof) ? proof : [proof];
+        // If proof is an array, get the last object
+        if (Array.isArray(proof)) {
+          lastProof = proof[proof.length - 1];
+        }
 
-        allCertificates = proofsArray.map((entry) => ({
-          certifiExpiry: entry.certifiExpiry ? formatDate(entry.certifiExpiry) : "N/A",
-          eCertifiDate: entry.eCertifiDate ? formatDate(entry.eCertifiDate) : "N/A",
-          orgiCertifiDate: entry.orgiCertifiDate ? formatDate(entry.orgiCertifiDate) : "N/A",
-        }));
+        if (lastProof) {
+          certifiExpiry = lastProof.certifiExpiry
+            ? formatDate(lastProof.certifiExpiry)
+            : "N/A";
+          eCertifiDate = lastProof.eCertifiDate
+            ? formatDate(lastProof.eCertifiDate)
+            : "N/A";
+          orgiCertifiDate = lastProof.orgiCertifiDate
+            ? formatDate(lastProof.orgiCertifiDate)
+            : "N/A";
+          poNo = lastProof.poNo || "N/A";  
+        }
       }
     } catch (e) {
       console.error("Error parsing trainingProof:", e);
@@ -212,10 +187,49 @@ export const TcViewData = () => {
       empID: data.empID || "-",
       empBadgeNo: data.empBadgeNo || "-",
       name: data.name || "-",
-      certificates: allCertificates, // 👈 Contains all certificate entries
+      certifiExpiry,
+      eCertifiDate,
+      orgiCertifiDate,
+      poNo,  
+      department: Array.isArray(data.department)
+        ? data.department[data.department.length - 1]
+        : "-",
+      position: Array.isArray(data.position)
+        ? data.position[data.position.length - 1]
+        : "-",
     };
   });
 
+  // const finalData = filteredData
+  // .sort((a, b) => new Date(b.CertifyCreatedAt) - new Date(a.CertifyCreatedAt))
+  // .map((data) => {
+  //   let allCertificates = [];
+
+  //   try {
+  //     if (data.trainingProof && data.trainingProof[0]) {
+  //       const proof = JSON.parse(data.trainingProof[0]);
+
+  //       // Make sure it's an array
+  //       const proofsArray = Array.isArray(proof) ? proof : [proof];
+
+  //       allCertificates = proofsArray.map((entry) => ({
+  //         certifiExpiry: entry.certifiExpiry ? formatDate(entry.certifiExpiry) : "N/A",
+  //         eCertifiDate: entry.eCertifiDate ? formatDate(entry.eCertifiDate) : "N/A",
+  //         orgiCertifiDate: entry.orgiCertifiDate ? formatDate(entry.orgiCertifiDate) : "N/A",
+  //       }));
+  //     }
+  //   } catch (e) {
+  //     console.error("Error parsing trainingProof:", e);
+  //   }
+
+  //   return {
+  //     ...data,
+  //     empID: data.empID || "-",
+  //     empBadgeNo: data.empBadgeNo || "-",
+  //     name: data.name || "-",
+  //     certificates: allCertificates, // 👈 Contains all certificate entries
+  //   };
+  // });
 
   return (
     <section className="bg-[#F8F8F8] mx-auto p-5 h-full w-full">

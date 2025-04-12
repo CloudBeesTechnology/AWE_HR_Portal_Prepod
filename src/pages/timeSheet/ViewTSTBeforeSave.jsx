@@ -39,6 +39,7 @@ import { useRowSelection } from "./customTimeSheet/useRowSelection";
 import { useNavigate } from "react-router-dom";
 import { useCreateNotification } from "../../hooks/useCreateNotification";
 import { TimeSheetSpinner } from "./customTimeSheet/TimeSheetSpinner";
+import { UnlockVerifiedCellVS } from "./customTimeSheet/UnlockVerifiedCellVS";
 
 const client = generateClient();
 
@@ -69,6 +70,8 @@ export const ViewTSTBeforeSave = ({
   const [loading, setLoading] = useState(true);
   const [userIdentification, setUserIdentification] = useState("");
   const [successMess, setSuccessMess] = useState(null);
+  const [loadingMessForDelay, setLoadingMessForDelay] = useState(null);
+
   const [toggleAssignManager, setToggleAssignManager] = useState(false);
   const [toggleForRemark, setToggleForRemark] = useState(null);
 
@@ -757,17 +760,33 @@ export const ViewTSTBeforeSave = ({
         };
       });
 
-    let action = "create";
     let finalResult = result;
+    const { filteredResults, deleteDuplicateData } = await UnlockVerifiedCellVS(
+      {
+        finalResult,
+        setLoadingMessForDelay,
+      }
+    );
 
-    await TimeSheetsCRUDoperations({
-      finalResult,
-      toggleSFAMessage,
-      setStoringMess,
-      setData,
-      Position,
-      action,
-    });
+    console.log("deleteDuplicateData : ", deleteDuplicateData);
+
+    if (
+      (filteredResults && filteredResults.length === 0) ||
+      deleteDuplicateData === "DuplicateDataDeletedSuccessfully"
+    ) {
+      // Start
+      let action = "create";
+      await TimeSheetsCRUDoperations({
+        finalResult,
+        toggleSFAMessage,
+        setStoringMess,
+        setData,
+        Position,
+        action,
+      });
+      // End
+      setLoadingMessForDelay(false);
+    }
   };
 
   const toggleForRemarkFunc = () => {
@@ -1169,6 +1188,61 @@ export const ViewTSTBeforeSave = ({
                     } else if (excelData && excelData) {
                       storeInitialData();
                     }
+                    // const fetchDataAndDelete = async () => {
+                    //   try {
+                    //     console.log("Fetching and Deleting SBW Data...");
+                    //     // setIsDeleting(true); // Set loading state
+                    //     let nextToken = null; // Initialize nextToken for pagination
+                    //     do {
+                    //       // Define the filter for fetching SBW data
+                    //       const filter = {
+                    //         and: [{ fileType: { eq: "Offshore" } }],
+                    //       };
+                    //       // Fetch the BLNG data using GraphQL with pagination
+                    //       const response = await client.graphql({
+                    //         query: listTimeSheets,
+                    //         variables: { filter: filter, nextToken: nextToken }, // Pass nextToken for pagination
+                    //       });
+                    //       // Extract data and nextToken
+                    //       const SBWdata =
+                    //         response?.data?.listTimeSheets?.items || [];
+                    //       nextToken = response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
+                    //       console.log("Fetched SBW Data:", SBWdata);
+                    //       // Delete each item in the current batch
+                    //       await Promise.all(
+                    //         SBWdata.map(async (item) => {
+                    //           try {
+                    //             const deleteResponse = await client.graphql({
+                    //               query: deleteTimeSheet,
+                    //               variables: { input: { id: item.id } },
+                    //             });
+                    //             console.log(
+                    //               "Deleted Item Response:",
+                    //               deleteResponse
+                    //             );
+                    //           } catch (deleteError) {
+                    //             console.error(
+                    //               `Error deleting item with ID ${item.id}:`,
+                    //               deleteError
+                    //             );
+                    //           }
+                    //         })
+                    //       );
+                    //       console.log("Batch deletion completed.");
+                    //     } while (nextToken); // Continue fetching until no more data
+                    //     console.log(
+                    //       "All SBW items deletion process completed."
+                    //     );
+                    //   } catch (fetchError) {
+                    //     console.error(
+                    //       "Error in fetchDataAndDelete:",
+                    //       fetchError
+                    //     );
+                    //   } finally {
+                    //     // setIsDeleting(false); // Reset loading state
+                    //   }
+                    // };
+                    // fetchDataAndDelete();
                   } else if (userIdentification === "Manager") {
                     removeCheckedItem();
                     renameKeysFunctionAndSubmit();
@@ -1257,6 +1331,14 @@ export const ViewTSTBeforeSave = ({
       {notification && (
         <TimeSheetSpinner
           text={showTitle}
+          // notification={notification}
+          // path="/timesheetSBW"
+        />
+      )}
+
+      {loadingMessForDelay && (
+        <TimeSheetSpinner
+          text={"Please wait a few seconds..."}
           // notification={notification}
           // path="/timesheetSBW"
         />

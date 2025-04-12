@@ -155,16 +155,19 @@ export const ViewSummaryTable = ({
           // setEmptyTableMess={setEmptyTableMess}
         />
         <div className="overflow-auto max-h-[60vh]">
-          <table className="min-w-full text-sm bg-white " id="downloadTable">
-            <thead className="bg-[#949393]">
-              <tr className=" text-white">
+          <table
+            className="min-w-full text-sm table-fixed border-collapse bg-white"
+            id="downloadTable"
+          >
+            <thead className="bg-[#949393] border">
+              <tr className="border bg-[#949393] text-white sticky -top-0.5"> 
                 <th
-                  className="border px-2 py-2 border-dark_grey min-w-[200px] max-w-[400px]"
+                  className="border px-2 py-2 border-dark_grey min-w-[200px] max-w-[400px] bg-[#949393]"
                   rowSpan="2"
                 >
                   Employee Name
                 </th>
-                <th className="border px-2 py-2 border-dark_grey" rowSpan="2">
+                <th className="border px-2 py-2 border-dark_grey bg-[#949393]" rowSpan="2">
                   PROJECT
                 </th>
 
@@ -173,7 +176,7 @@ export const ViewSummaryTable = ({
                   currentDay.setDate(getStartDate.getDate() + i); // Increment the date
                   return (
                     <th
-                      className="border px-2 py-2 border-dark_grey"
+                      className="border px-2 py-2 border-dark_grey "
                       key={currentDay.toDateString()} // Unique key for each column
                     >
                       {currentDay.getDate()}
@@ -181,19 +184,19 @@ export const ViewSummaryTable = ({
                   );
                 })}
 
-                <th className="border  px-2 py-2 border-dark_grey">NH</th>
-                <th className="border  px-2 py-2 border-dark_grey">ND</th>
-                <th className="border  px-2 py-2 border-dark_grey">PH</th>
-                <th className="border  px-2 py-2 border-dark_grey">PH-D</th>
-                <th className="border  px-2 py-2 border-dark_grey">AL/CL</th>
-                <th className="border  px-2 py-2 border-dark_grey">SL</th>
-                <th className="border  px-2 py-2 border-dark_grey">OFF</th>
-                <th className="border  px-2 py-2 border-dark_grey">A</th>
-                <th className="border  px-2 py-2 border-dark_grey">UAL</th>
-                <th className="border  px-2 py-2 border-dark_grey">OT</th>
+                <th className="border  px-2 py-2 border-dark_grey ">NH</th>
+                <th className="border  px-2 py-2 border-dark_grey ">ND</th>
+                <th className="border  px-2 py-2 border-dark_grey ">PH</th>
+                <th className="border  px-2 py-2 border-dark_grey ">PH-D</th>
+                <th className="border  px-2 py-2 border-dark_grey ">AL/CL</th>
+                <th className="border  px-2 py-2 border-dark_grey ">SL</th>
+                <th className="border  px-2 py-2 border-dark_grey ">OFF</th>
+                <th className="border  px-2 py-2 border-dark_grey ">A</th>
+                <th className="border  px-2 py-2 border-dark_grey ">UAL</th>
+                <th className="border  px-2 py-2 border-dark_grey ">OT</th>
 
-                <th className="border  px-2 py-2 border-dark_grey">Verified</th>
-                <th className="border  px-2 py-2 border-dark_grey">Updater</th>
+                <th className="border  px-2 py-2 border-dark_grey bg-[#949393]">Verified</th>
+                <th className="border  px-2 py-2 border-dark_grey bg-[#949393]">Updater</th>
               </tr>
             </thead>
 
@@ -337,7 +340,7 @@ export const ViewSummaryTable = ({
                           const isChecked = Boolean(isVerified);
                           return (
                             <td
-                              className={`border px-2 py-1 border-dark_grey cursor-pointer                      
+                              className={`border px-2 py-1 border-dark_grey cursor-pointer
                                ${
                                  isChecked
                                    ? "bg-[#f59a51] bg-opacity-50 z-0"
@@ -374,7 +377,7 @@ export const ViewSummaryTable = ({
                                   workingHrsKey: currentDayKey,
                                   verify: employee?.getVerify?.[currentDayKey],
                                   firstFileType: employee.firstFileType || "",
-                                  index:index,
+                                  index: index,
                                 };
 
                                 editViewSummaryObject(empDetails);
@@ -576,7 +579,7 @@ export const ViewSummaryTable = ({
 
                           return (
                             <td
-                              className={`${i === 0 ? "border" : "border-b"}`}
+                              className={`${i === 0 ? "border" : "border"}`}
                               key={currentDayIndex}
                             ></td>
                           );
@@ -686,3 +689,6 @@ export const ViewSummaryTable = ({
     </div>
   );
 };
+
+// ############################################################################################################
+// ############################################################################################################

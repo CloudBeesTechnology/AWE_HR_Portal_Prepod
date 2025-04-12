@@ -29,6 +29,7 @@ import { useRowSelection } from "./customTimeSheet/useRowSelection";
 import { useNavigate } from "react-router-dom";
 import { useCreateNotification } from "../../hooks/useCreateNotification";
 import { TimeSheetSpinner } from "./customTimeSheet/TimeSheetSpinner";
+import { UnlockVerifiedCellVS } from "./customTimeSheet/UnlockVerifiedCellVS";
 const client = generateClient();
 
 export const ViewHOsheet = ({
@@ -58,6 +59,7 @@ export const ViewHOsheet = ({
   const [userIdentification, setUserIdentification] = useState("");
   const [showStatusCol, setShowStatusCol] = useState(null);
   const [successMess, setSuccessMess] = useState(null);
+  const [loadingMessForDelay, setLoadingMessForDelay] = useState(null);
 
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedItemsTwo, setCheckedItemsTwo] = useState({});
@@ -732,17 +734,33 @@ export const ViewHOsheet = ({
         };
       });
 
-    let action = "create";
     let finalResult = result;
+    const { filteredResults, deleteDuplicateData } = await UnlockVerifiedCellVS(
+      {
+        finalResult,
+        setLoadingMessForDelay,
+      }
+    );
 
-    await TimeSheetsCRUDoperations({
-      finalResult,
-      toggleSFAMessage,
-      setStoringMess,
-      setData,
-      Position,
-      action,
-    });
+    console.log("deleteDuplicateData : ", deleteDuplicateData);
+
+    if (
+      (filteredResults && filteredResults.length === 0) ||
+      deleteDuplicateData === "DuplicateDataDeletedSuccessfully"
+    ) {
+      // Start
+      let action = "create";
+      await TimeSheetsCRUDoperations({
+        finalResult,
+        toggleSFAMessage,
+        setStoringMess,
+        setData,
+        Position,
+        action,
+      });
+      // End
+      setLoadingMessForDelay(false);
+    }
   };
 
   const toggleForRemarkFunc = () => {
@@ -807,9 +825,21 @@ export const ViewHOsheet = ({
   const convertToISODate = (dateString) => {
     try {
       const [year, month, day] = dateString.split("/");
-
+      console.log("ViewHOsheet : ", `${month}/${year}/${day}`);
       return `${month}/${year}/${day}`;
-    } catch (err) {}
+    } catch (err) {
+      console.log("Error : ", err);
+    }
+  };
+
+  const convertDateFormat = (inputDateStr) => {
+    const [day, month, year] = inputDateStr?.split("/");
+
+    // Convert string to numbers to remove any leading zeros
+    const dayNum = parseInt(day, 10);
+    const monthNum = parseInt(month, 10);
+    console.log("Date : ", `${monthNum}/${dayNum}/${year} `);
+    return `${monthNum}/${dayNum}/${year}`;
   };
 
   useEffect(() => {
@@ -972,7 +1002,9 @@ export const ViewHOsheet = ({
                                 {m?.NAME}
                               </td>
                               <td className="text-center px-4 flex-1">
-                                {convertToISODate(m?.DATE)}
+                                {/* {convertToISODate(m?.DATE)} */}
+                                {convertDateFormat(m?.DATE)}
+                                {/* {m?.DATE} */}
                               </td>
                               <td className="text-center px-4 flex-1">
                                 {m?.ONAM}
@@ -1178,7 +1210,67 @@ export const ViewHOsheet = ({
                       } else if (excelData && excelData) {
                         storeInitialData();
                       }
-                    
+
+                      // const fetchDataAndDelete = async () => {
+                      //   try {
+                      //     console.log("Fetching and Deleting SBW Data...");
+                      //     // setIsDeleting(true); // Set loading state
+                      //     let nextToken = null; // Initialize nextToken for pagination
+                      //     do {
+                      //       // Define the filter for fetching SBW data
+                      //       const filter = {
+                      //         and: [{ fileType: { eq: "HO" } }],
+                      //       };
+                      //       // Fetch the BLNG data using GraphQL with pagination
+                      //       const response = await client.graphql({
+                      //         query: listTimeSheets,
+                      //         variables: {
+                      //           filter: filter,
+                      //           nextToken: nextToken,
+                      //         }, // Pass nextToken for pagination
+                      //       });
+                      //       // Extract data and nextToken
+                      //       const SBWdata =
+                      //         response?.data?.listTimeSheets?.items || [];
+                      //       nextToken =
+                      //         response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
+                      //       console.log("Fetched SBW Data:", SBWdata);
+                      //       // Delete each item in the current batch
+                      //       await Promise.all(
+                      //         SBWdata.map(async (item) => {
+                      //           try {
+                      //             const deleteResponse = await client.graphql({
+                      //               query: deleteTimeSheet,
+                      //               variables: { input: { id: item.id } },
+                      //             });
+                      //             console.log(
+                      //               "Deleted Item Response:",
+                      //               deleteResponse
+                      //             );
+                      //           } catch (deleteError) {
+                      //             console.error(
+                      //               `Error deleting item with ID ${item.id}:`,
+                      //               deleteError
+                      //             );
+                      //           }
+                      //         })
+                      //       );
+                      //       console.log("Batch deletion completed.");
+                      //     } while (nextToken); // Continue fetching until no more data
+                      //     console.log(
+                      //       "All HO items deletion process completed."
+                      //     );
+                      //   } catch (fetchError) {
+                      //     console.error(
+                      //       "Error in fetchDataAndDelete:",
+                      //       fetchError
+                      //     );
+                      //   } finally {
+                      //     // setIsDeleting(false); // Reset loading state
+                      //   }
+                      // };
+
+                      // fetchDataAndDelete();
                     } else if (userIdentification === "Manager") {
                       renameKeysFunctionAndSubmit();
                       removeCheckedItem();
@@ -1265,6 +1357,13 @@ export const ViewHOsheet = ({
       {notification && (
         <TimeSheetSpinner
           text={showTitle}
+          // notification={notification}
+          // path="/timesheetSBW"
+        />
+      )}
+      {loadingMessForDelay && (
+        <TimeSheetSpinner
+          text={"Please wait a few seconds..."}
           // notification={notification}
           // path="/timesheetSBW"
         />
