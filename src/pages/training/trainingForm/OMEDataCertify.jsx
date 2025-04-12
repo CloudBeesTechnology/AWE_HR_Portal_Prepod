@@ -154,6 +154,7 @@ export const OMEDataCertify = () => {
       let certifiExpiry = "N/A";
       let eCertifiDate = "N/A";
       let orgiCertifiDate = "N/A";
+      let poNo = "N/A";
 
       try {
         if (data.trainingProof && data.trainingProof[0]) {
@@ -175,6 +176,7 @@ export const OMEDataCertify = () => {
             orgiCertifiDate = lastProof.orgiCertifiDate
               ? formatDate(lastProof.orgiCertifiDate)
               : "N/A";
+              poNo = lastProof.poNo || "N/A";
           }
         }
       } catch (e) {
@@ -189,6 +191,7 @@ export const OMEDataCertify = () => {
         certifiExpiry,
         eCertifiDate,
         orgiCertifiDate,
+        poNo,  
         department: Array.isArray(data.department)
         ? data.department[data.department.length - 1]
         : "-",
