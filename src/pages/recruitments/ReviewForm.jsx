@@ -672,7 +672,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                   label: "Passport Issued Destination",
                   value: candidate.ppDestinate,
                 },
-                { label: "Malaysia IC No.", value: candidate.alternateNo },
+                
                 {
                   label: "Brief Description of Present Duties",
                   value: candyEducDeatils.desc,

@@ -13,7 +13,7 @@ export const AddEmpFun = () => {
       empID:AddEmpValue.empID,
       traineeTrack:JSON.stringify(AddEmpValue.trainingTrack)
     };
-    // console.log(totalData,"create");
+    console.log(totalData,"create");
 
     try {
       const storedData=   await Promise.all([
