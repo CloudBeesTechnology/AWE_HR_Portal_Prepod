@@ -530,9 +530,11 @@ export const ApplyVSFunction = ({
               const dailyTypes = ["daily", "day", "d"];
 
               if (!checkEntry && monthlyTypes.includes(salaryType)) {
-                acc[dayStr] = "PHD";
+                // acc[dayStr] = "PHD";
+                acc[dayStr] = "A";
               } else if (!checkEntry && dailyTypes.includes(salaryType)) {
-                acc[dayStr] = "OFF";
+                // acc[dayStr] = "OFF";
+                acc[dayStr] = "A";
               } else {
                 acc[dayStr] = checkEntry;
               }
@@ -861,6 +863,8 @@ export const ApplyVSFunction = ({
             assignUpdaterDateTime: assignUpdaterDateTime,
           };
         }).filter(Boolean);
+
+        console.log("transformedData : ", transformedData);
 
         await ProcessedDataFunc(transformedData);
       };

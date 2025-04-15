@@ -35,7 +35,7 @@ export const UploadBLNGnewFormat = (
 
           checkTrueOrFalse = hasNameAndDate;
           var bodySlicedData = data.slice(0);
-        
+
           tableBodyData.push(bodySlicedData);
           return headerSlicedData;
         });
@@ -171,6 +171,7 @@ export const UploadBLNGnewFormat = (
 
             return item;
           });
+
         function groupAndMergeData(updatedDataArray) {
           try {
             const groupedData = {};
