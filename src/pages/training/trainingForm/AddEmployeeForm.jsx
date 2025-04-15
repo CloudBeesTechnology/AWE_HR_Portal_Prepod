@@ -514,14 +514,13 @@ export const AddEmployeeForm = () => {
 
   const onSubmit = async (data) => {
     console.log("Data", data);
-    
+
     try {
       const EmpReqDataRecord = AddEmpReq
         ? AddEmpReq.find((match) => match.empID === data.empID)
         : {};
-        
-      
-        if (EmpReqDataRecord) {
+
+      if (EmpReqDataRecord) {
         const oldTrainings = EmpReqDataRecord.trainingTrack || [];
         const newTrainings = data?.trainingreq || [];
         const newlyAddedTrainings = newTrainings.filter((newItem) => {
@@ -540,6 +539,7 @@ export const AddEmployeeForm = () => {
                   <td>${idx + 1}</td>
                   <td>${item.courseName}</td>
                   <td>${item.company}</td>
+                  <td>${item.MRNo}</td>
                   <td>${DateFormat(item.traineeSD)}</td>
                   <td>${DateFormat(item.traineeED)}</td>
                   <td>${item.traineeStatus || "-"}</td>
@@ -554,6 +554,7 @@ export const AddEmployeeForm = () => {
           <th>S.No</th>
           <th>Course Name</th>
           <th>Company</th>
+          <th>MR No</th>
           <th>Start Date</th>
           <th>End Date</th>
           <th>Status</th>
@@ -592,12 +593,6 @@ export const AddEmployeeForm = () => {
             emailBody1,
             "hr_no-reply@adininworks.com",
             emailData.hrOfficialmail
-          );
-          sendEmail(
-            emailSubject,
-            emailBody1,
-            "hr_no-reply@adininworks.com",
-            "hr-training@adininworks.com"
           );
 
           await createNotification({
@@ -641,20 +636,15 @@ export const AddEmployeeForm = () => {
 
           setShowTitle("Training details Updated successfully");
           setNotification(true);
-        } 
-      }
-      else {
-
-     
-        
+        }
+      } else {
         const AddEmpValue = {
           trainingTrack: data?.trainingreq?.map((trainee, index) => {
             return {
               ...trainee,
               medicalReport:
-                JSON.stringify(
-                  uploadMedicalReports?.medicalReport?.[index]
-                ) || [],
+                JSON.stringify(uploadMedicalReports?.medicalReport?.[index]) ||
+                [],
             };
           }),
           department: data.department,
@@ -670,6 +660,7 @@ export const AddEmployeeForm = () => {
             <td>${idx + 1}</td>
             <td>${item.courseName}</td>
             <td>${item.company}</td>
+            <td>${item.MRNo}</td>
             <td>${DateFormat(item.traineeSD)}</td>
             <td>${DateFormat(item.traineeED)}</td>
             <td>${item.traineeStatus || "-"}</td>
@@ -677,7 +668,7 @@ export const AddEmployeeForm = () => {
         `;
           })
           .join("");
-        console.log(trainingRows);
+        // console.log(trainingRows);
 
         const trainingTable = `
 <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">
@@ -686,6 +677,7 @@ export const AddEmployeeForm = () => {
       <th>S.No</th>
       <th>Course Name</th>
       <th>Company</th>
+      <th>MR No</th>
       <th>Start Date</th>
       <th>End Date</th>
       <th>Status</th>
@@ -723,12 +715,6 @@ ${trainingTable}
           emailBody1,
           "hr_no-reply@adininworks.com",
           emailData.hrOfficialmail
-        );
-        sendEmail(
-          emailSubject,
-          emailBody1,
-          "hr_no-reply@adininworks.com",
-          "hr-training@adininworks.com"
         );
 
         await createNotification({

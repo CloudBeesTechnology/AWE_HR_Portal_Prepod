@@ -197,7 +197,7 @@ export const TrainingCertificatesForm = () => {
   const handleFileChange = async (e, type, index) => {
     if (!watchedEmpID) {
       alert("Please enter the Employee ID before uploading files.");
-      window.location.href = "/training/hr";
+      window.location.href = "/training/trainingCertify";
       return;
     }
     const selectedFile = e.target.files[0];
@@ -949,7 +949,7 @@ export const TrainingCertificatesForm = () => {
         <SpinLogo
           text={showTitle}
           notification={notification}
-          path="/training/hr"
+          path="/training/trainingCertify"
         />
       )}
       {deletePopup && (
