@@ -95,7 +95,7 @@ export const UpdateViewSummary = async (object, updateGroupedData) => {
 
         // return matchedObject ? matchedObject : null;
       } catch (err) {
-        // console.log("error : ", err);
+        console.log("error : ", err);
         return null;
       }
     }

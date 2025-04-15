@@ -65,7 +65,7 @@ export const ViewORMCsheet = ({
   const [userIdentification, setUserIdentification] = useState("");
   const [showStatusCol, setShowStatusCol] = useState(null);
   const [successMess, setSuccessMess] = useState(null);
-    const [loadingMessForDelay, setLoadingMessForDelay] = useState(null);
+  const [loadingMessForDelay, setLoadingMessForDelay] = useState(null);
 
   const [toggleForRemark, setToggleForRemark] = useState(null);
   const [allApprovedData, setAllApprovedData] = useState([]);
@@ -448,46 +448,62 @@ export const ViewORMCsheet = ({
           untilDate: managerData.muntilDate,
         };
       });
-      let action = "updateStoredData";
-      const notifiyCenterData = await TimeSheetsCRUDoperations({
-        setNotification,
-        setShowTitle,
-        finalResult,
-        toggleSFAMessage,
-        setStoringMess,
 
-        Position,
-        action,
-        handleAssignManager,
-        selectedRows,
-      });
-
-      if (notifiyCenterData) {
-        const {
-          subject,
-          message,
-          fromAddress,
-          toAddress,
-          empID,
-          timeKeeperEmpID,
-          ManagerEmpID,
-          managerName,
-          fileType,
-          timeKeeperName,
-          fromDate,
-          untilDate,
-          senderEmail,
-        } = notifiyCenterData;
-        await createNotification({
-          empID: empID,
-          leaveType: `${fileType} excel sheet submitted for Approval`,
-          message: `The ${fileType} timesheet for the period from ${fromDate} until ${untilDate} has been submitted by Timekeeper : 
-          ${timeKeeperName}`,
-          senderEmail: senderEmail,
-          receipentEmail: toAddress,
-          receipentEmpID: empID,
-          status: "Unread",
+      const { filteredResults, deleteDuplicateData } =
+        await UnlockVerifiedCellVS({
+          finalResult,
+          setLoadingMessForDelay,
         });
+
+     
+
+      if (
+        (filteredResults && filteredResults.length > 0) ||
+        (filteredResults && filteredResults.length === 0) ||
+        deleteDuplicateData === "DuplicateDataDeletedSuccessfully"
+      ) {
+        setLoadingMessForDelay(false);
+        let action = "updateStoredData";
+        const notifiyCenterData = await TimeSheetsCRUDoperations({
+          setNotification,
+          setShowTitle,
+          finalResult,
+          toggleSFAMessage,
+          setStoringMess,
+
+          Position,
+          action,
+          handleAssignManager,
+          selectedRows,
+        });
+
+        if (notifiyCenterData) {
+          const {
+            subject,
+            message,
+            fromAddress,
+            toAddress,
+            empID,
+            timeKeeperEmpID,
+            ManagerEmpID,
+            managerName,
+            fileType,
+            timeKeeperName,
+            fromDate,
+            untilDate,
+            senderEmail,
+          } = notifiyCenterData;
+          await createNotification({
+            empID: empID,
+            leaveType: `${fileType} excel sheet submitted for Approval`,
+            message: `The ${fileType} timesheet for the period from ${fromDate} until ${untilDate} has been submitted by Timekeeper : 
+          ${timeKeeperName}`,
+            senderEmail: senderEmail,
+            receipentEmail: toAddress,
+            receipentEmpID: empID,
+            status: "Unread",
+          });
+        }
       }
     } else if (userIdentification === "Manager") {
       setNotification(false);
@@ -692,34 +708,39 @@ export const ViewORMCsheet = ({
         };
       });
 
-   let finalResult = result;
-       const { filteredResults, deleteDuplicateData } = await UnlockVerifiedCellVS(
-         {
-           finalResult,
-           setLoadingMessForDelay
-         }
-       );
-   
-       console.log("deleteDuplicateData : ", deleteDuplicateData);
-   
-       if (
-         (filteredResults && filteredResults.length === 0) ||
-         deleteDuplicateData === "DuplicateDataDeletedSuccessfully"
-       ) {
-         // Start
-         let action = "create";
+    let finalResult = result;
+    const { filteredResults, deleteDuplicateData } = await UnlockVerifiedCellVS(
+      {
+        finalResult,
+        setLoadingMessForDelay,
+      }
+    );
 
-    await TimeSheetsCRUDoperations({
-      finalResult,
-      toggleSFAMessage,
-      setStoringMess,
-      setData,
-      Position,
-      action,
-    });
-    // End
-    setLoadingMessForDelay(false);
-  }
+    
+
+    if (
+      (filteredResults && filteredResults.length > 0) ||
+      (filteredResults && filteredResults.length === 0) ||
+      deleteDuplicateData === "DuplicateDataDeletedSuccessfully"
+    ) {
+      let finalResult = filteredResults;
+      // Start
+      let action = "create";
+
+      await TimeSheetsCRUDoperations({
+        finalResult,
+        toggleSFAMessage,
+        setStoringMess,
+        setData,
+        Position,
+        action,
+      });
+      // End
+      setLoadingMessForDelay(false);
+    } else {
+      setLoadingMessForDelay(false);
+      
+    }
   };
 
   const toggleForRemarkFunc = () => {
@@ -1282,13 +1303,13 @@ export const ViewORMCsheet = ({
         />
       )}
 
-       {loadingMessForDelay && (
-              <TimeSheetSpinner
-                text={"Please wait a few seconds..."}
-                // notification={notification}
-                // path="/timesheetSBW"
-              />
-            )}
+      {loadingMessForDelay && (
+        <TimeSheetSpinner
+          text={"Please wait a few seconds..."}
+          // notification={notification}
+          // path="/timesheetSBW"
+        />
+      )}
     </div>
   );
 };

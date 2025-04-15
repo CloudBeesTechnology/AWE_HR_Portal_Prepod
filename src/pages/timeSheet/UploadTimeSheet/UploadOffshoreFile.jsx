@@ -142,7 +142,7 @@ export const UploadOffshoreFile = (
       // Convert string to numbers to remove any leading zeros
       const dayNum = parseInt(day, 10);
       const monthNum = parseInt(month, 10);
-      console.log("Date : ", `${monthNum}/${dayNum}/${year} `);
+     
       return `${monthNum}/${dayNum}/${year}`;
     };
 
@@ -179,7 +179,6 @@ export const UploadOffshoreFile = (
       return cleanedItem;
     });
 
-    console.log("tbodyHeader : ", tbodyHeader);
     setExcelData(formattedData);
     setLoading(false);
     return tbodyHeader;

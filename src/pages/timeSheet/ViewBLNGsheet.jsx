@@ -65,7 +65,7 @@ export const ViewBLNGsheet = ({
   const [toggleAssignManager, setToggleAssignManager] = useState(false);
   const [userIdentification, setUserIdentification] = useState("");
   const [successMess, setSuccessMess] = useState(null);
- const [loadingMessForDelay, setLoadingMessForDelay] = useState(null);
+  const [loadingMessForDelay, setLoadingMessForDelay] = useState(null);
 
   const [response, setResponse] = useState(null);
   const [showStatusCol, setShowStatusCol] = useState(null);
@@ -577,46 +577,61 @@ export const ViewBLNGsheet = ({
         };
       });
 
-      let action = "updateStoredData";
-      const notifiyCenterData = await TimeSheetsCRUDoperations({
-        setNotification,
-        setShowTitle,
-        finalResult,
-        toggleSFAMessage,
-        setStoringMess,
-
-        Position,
-        action,
-        handleAssignManager,
-        selectedRows,
-      });
-
-      if (notifiyCenterData) {
-        const {
-          subject,
-          message,
-          fromAddress,
-          toAddress,
-          empID,
-          timeKeeperEmpID,
-          ManagerEmpID,
-          managerName,
-          fileType,
-          timeKeeperName,
-          fromDate,
-          untilDate,
-          senderEmail,
-        } = notifiyCenterData;
-        await createNotification({
-          empID: empID,
-          leaveType: `${fileType} excel sheet submitted for Approval`,
-          message: `The ${fileType} timesheet for the period from ${fromDate} until ${untilDate} has been submitted by Timekeeper : 
-          ${timeKeeperName}`,
-          senderEmail: senderEmail,
-          receipentEmail: toAddress,
-          receipentEmpID: empID,
-          status: "Unread",
+      const { filteredResults, deleteDuplicateData } =
+        await UnlockVerifiedCellVS({
+          finalResult,
+          setLoadingMessForDelay,
         });
+
+      
+
+      if (
+        (filteredResults && filteredResults.length > 0) ||
+        (filteredResults && filteredResults.length === 0) ||
+        deleteDuplicateData === "DuplicateDataDeletedSuccessfully"
+      ) {
+        setLoadingMessForDelay(false);
+        let action = "updateStoredData";
+        const notifiyCenterData = await TimeSheetsCRUDoperations({
+          setNotification,
+          setShowTitle,
+          finalResult,
+          toggleSFAMessage,
+          setStoringMess,
+
+          Position,
+          action,
+          handleAssignManager,
+          selectedRows,
+        });
+
+        if (notifiyCenterData) {
+          const {
+            subject,
+            message,
+            fromAddress,
+            toAddress,
+            empID,
+            timeKeeperEmpID,
+            ManagerEmpID,
+            managerName,
+            fileType,
+            timeKeeperName,
+            fromDate,
+            untilDate,
+            senderEmail,
+          } = notifiyCenterData;
+          await createNotification({
+            empID: empID,
+            leaveType: `${fileType} excel sheet submitted for Approval`,
+            message: `The ${fileType} timesheet for the period from ${fromDate} until ${untilDate} has been submitted by Timekeeper : 
+          ${timeKeeperName}`,
+            senderEmail: senderEmail,
+            receipentEmail: toAddress,
+            receipentEmpID: empID,
+            status: "Unread",
+          });
+        }
       }
     } else if (userIdentification === "Manager") {
       const MergedData = [...allApprovedData, ...allRejectedData];
@@ -822,19 +837,19 @@ export const ViewBLNGsheet = ({
     const { filteredResults, deleteDuplicateData } = await UnlockVerifiedCellVS(
       {
         finalResult,
-        setLoadingMessForDelay
+        setLoadingMessForDelay,
       }
     );
 
-    console.log("deleteDuplicateData : ", deleteDuplicateData);
 
     if (
+      (filteredResults && filteredResults.length > 0) ||
       (filteredResults && filteredResults.length === 0) ||
       deleteDuplicateData === "DuplicateDataDeletedSuccessfully"
     ) {
+      let finalResult = filteredResults;
       // start
       let action = "create";
-
       await TimeSheetsCRUDoperations({
         finalResult,
         toggleSFAMessage,
@@ -845,6 +860,9 @@ export const ViewBLNGsheet = ({
       });
       // End
       setLoadingMessForDelay(false);
+    } else {
+      setLoadingMessForDelay(false);
+    
     }
   };
 
@@ -1069,7 +1087,7 @@ export const ViewBLNGsheet = ({
                     )}
                   </tr>
                 </thead>
-                {console.log("visibleData : ", visibleData)}
+               
                 <tbody>
                   {visibleData && visibleData?.length > 0 ? (
                     visibleData.map((value, index) => {
@@ -1445,13 +1463,13 @@ export const ViewBLNGsheet = ({
         />
       )}
 
-       {loadingMessForDelay && (
-              <TimeSheetSpinner
-                text={"Please wait a few seconds..."}
-                // notification={notification}
-                // path="/timesheetSBW"
-              />
-            )}
+      {loadingMessForDelay && (
+        <TimeSheetSpinner
+          text={"Please wait a few seconds..."}
+          // notification={notification}
+          // path="/timesheetSBW"
+        />
+      )}
     </div>
   );
 };

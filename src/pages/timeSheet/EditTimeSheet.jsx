@@ -113,7 +113,6 @@ export const EditTimeSheet = ({
           }`
         : null;
 
-      console.log("displayedDate : ", displayedDate);
       const updatedEditObject = {
         ...editObject,
         [`formatted_${fieldToUpdate}`]: displayedDate?.includes("NaN")

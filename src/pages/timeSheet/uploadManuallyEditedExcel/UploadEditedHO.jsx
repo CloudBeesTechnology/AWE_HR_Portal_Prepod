@@ -137,8 +137,6 @@ export const UploadEditedHO = (
           return item;
         });
 
-      console.log("updatedDataArray : ", updatedDataArray);
-
       const forStringDate = (inputData) => {
         try {
           // Step 1: Assign missing DATEs based on BADGE
@@ -170,7 +168,7 @@ export const UploadEditedHO = (
             // Convert string to numbers to remove any leading zeros
             const monthNum = parseInt(day, 10);
             const dayNum = parseInt(year, 10);
-            console.log("Date : ", `${dayNum}/${monthNum}/${month}`);
+
             return `${monthNum}/${dayNum}/${month}`;
           };
 
@@ -192,7 +190,6 @@ export const UploadEditedHO = (
         }
       };
       const getDateFromPrevRow = forStringDate(updatedDataArray);
-      console.log("getDateFromPrevRow : ", getDateFromPrevRow);
 
       const finalData =
         getDateFromPrevRow && getDateFromPrevRow.length > 0

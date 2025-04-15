@@ -469,45 +469,58 @@ export const ViewHOsheet = ({
         };
       });
 
-      let action = "updateStoredData";
-      const notifiyCenterData = await TimeSheetsCRUDoperations({
-        setNotification,
-        setShowTitle,
-        finalResult,
-        toggleSFAMessage,
-        setStoringMess,
-
-        Position,
-        action,
-        handleAssignManager,
-        selectedRows,
-      });
-      if (notifiyCenterData) {
-        const {
-          subject,
-          message,
-          fromAddress,
-          toAddress,
-          empID,
-          timeKeeperEmpID,
-          ManagerEmpID,
-          managerName,
-          fileType,
-          timeKeeperName,
-          fromDate,
-          untilDate,
-          senderEmail,
-        } = notifiyCenterData;
-        await createNotification({
-          empID: empID,
-          leaveType: `${fileType} excel sheet submitted for Approval`,
-          message: `The ${fileType} timesheet for the period from ${fromDate} until ${untilDate} has been submitted by Timekeeper : 
-          ${timeKeeperName}`,
-          senderEmail: senderEmail,
-          receipentEmail: toAddress,
-          receipentEmpID: empID,
-          status: "Unread",
+      const { filteredResults, deleteDuplicateData } =
+        await UnlockVerifiedCellVS({
+          finalResult,
+          setLoadingMessForDelay,
         });
+
+      if (
+        (filteredResults && filteredResults.length > 0) ||
+        (filteredResults && filteredResults.length === 0) ||
+        deleteDuplicateData === "DuplicateDataDeletedSuccessfully"
+      ) {
+        setLoadingMessForDelay(false);
+        let action = "updateStoredData";
+        const notifiyCenterData = await TimeSheetsCRUDoperations({
+          setNotification,
+          setShowTitle,
+          finalResult,
+          toggleSFAMessage,
+          setStoringMess,
+
+          Position,
+          action,
+          handleAssignManager,
+          selectedRows,
+        });
+        if (notifiyCenterData) {
+          const {
+            subject,
+            message,
+            fromAddress,
+            toAddress,
+            empID,
+            timeKeeperEmpID,
+            ManagerEmpID,
+            managerName,
+            fileType,
+            timeKeeperName,
+            fromDate,
+            untilDate,
+            senderEmail,
+          } = notifiyCenterData;
+          await createNotification({
+            empID: empID,
+            leaveType: `${fileType} excel sheet submitted for Approval`,
+            message: `The ${fileType} timesheet for the period from ${fromDate} until ${untilDate} has been submitted by Timekeeper : 
+          ${timeKeeperName}`,
+            senderEmail: senderEmail,
+            receipentEmail: toAddress,
+            receipentEmpID: empID,
+            status: "Unread",
+          });
+        }
       }
     } else if (userIdentification === "Manager") {
       const MergedData = [...allApprovedData, ...allRejectedData];
@@ -553,6 +566,7 @@ export const ViewHOsheet = ({
           : [];
 
       let finalResult = InitialBLNGUpdate;
+
       let storeApproveRej = [];
       let action = "update";
       const notifiyCenterData = await TimeSheetsCRUDoperations({
@@ -742,12 +756,12 @@ export const ViewHOsheet = ({
       }
     );
 
-    console.log("deleteDuplicateData : ", deleteDuplicateData);
-
     if (
+      (filteredResults && filteredResults.length > 0) ||
       (filteredResults && filteredResults.length === 0) ||
       deleteDuplicateData === "DuplicateDataDeletedSuccessfully"
     ) {
+      let finalResult = filteredResults;
       // Start
       let action = "create";
       await TimeSheetsCRUDoperations({
@@ -759,6 +773,8 @@ export const ViewHOsheet = ({
         action,
       });
       // End
+      setLoadingMessForDelay(false);
+    } else {
       setLoadingMessForDelay(false);
     }
   };
@@ -822,23 +838,13 @@ export const ViewHOsheet = ({
     // setAllRejectedData([]);
   }, [allApprovedData, allRejectedData, data]);
 
-  const convertToISODate = (dateString) => {
-    try {
-      const [year, month, day] = dateString.split("/");
-      console.log("ViewHOsheet : ", `${month}/${year}/${day}`);
-      return `${month}/${year}/${day}`;
-    } catch (err) {
-      console.log("Error : ", err);
-    }
-  };
-
   const convertDateFormat = (inputDateStr) => {
     const [day, month, year] = inputDateStr?.split("/");
 
     // Convert string to numbers to remove any leading zeros
     const dayNum = parseInt(day, 10);
     const monthNum = parseInt(month, 10);
-    console.log("Date : ", `${monthNum}/${dayNum}/${year} `);
+
     return `${monthNum}/${dayNum}/${year}`;
   };
 

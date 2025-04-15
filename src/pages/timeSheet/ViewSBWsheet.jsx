@@ -436,46 +436,59 @@ export const ViewSBWsheet = ({
         };
       });
 
-      // Start
-      let action = "updateStoredData";
-      const notifiyCenterData = await TimeSheetsCRUDoperations({
-        setNotification,
-        setShowTitle,
-        finalResult,
-        toggleSFAMessage,
-        setStoringMess,
-        Position,
-        action,
-        handleAssignManager,
-        selectedRows,
-      });
-
-      if (notifiyCenterData) {
-        const {
-          subject,
-          message,
-          fromAddress,
-          toAddress,
-          empID,
-          timeKeeperEmpID,
-          ManagerEmpID,
-          managerName,
-          fileType,
-          timeKeeperName,
-          fromDate,
-          untilDate,
-          senderEmail,
-        } = notifiyCenterData;
-        await createNotification({
-          empID: empID,
-          leaveType: `${fileType} excel sheet submitted for Approval`,
-          message: `The ${fileType} timesheet for the period from ${fromDate} until ${untilDate} has been submitted by Timekeeper :
-          ${timeKeeperName}`,
-          senderEmail: senderEmail,
-          receipentEmail: toAddress,
-          receipentEmpID: empID,
-          status: "Unread",
+      const { filteredResults, deleteDuplicateData } =
+        await UnlockVerifiedCellVS({
+          finalResult,
+          setLoadingMessForDelay,
         });
+
+      if (
+        (filteredResults && filteredResults.length > 0) ||
+        (filteredResults && filteredResults.length === 0) ||
+        deleteDuplicateData === "DuplicateDataDeletedSuccessfully"
+      ) {
+        setLoadingMessForDelay(false);
+        // Start
+        let action = "updateStoredData";
+        const notifiyCenterData = await TimeSheetsCRUDoperations({
+          setNotification,
+          setShowTitle,
+          finalResult,
+          toggleSFAMessage,
+          setStoringMess,
+          Position,
+          action,
+          handleAssignManager,
+          selectedRows,
+        });
+
+        if (notifiyCenterData) {
+          const {
+            subject,
+            message,
+            fromAddress,
+            toAddress,
+            empID,
+            timeKeeperEmpID,
+            ManagerEmpID,
+            managerName,
+            fileType,
+            timeKeeperName,
+            fromDate,
+            untilDate,
+            senderEmail,
+          } = notifiyCenterData;
+          await createNotification({
+            empID: empID,
+            leaveType: `${fileType} excel sheet submitted for Approval`,
+            message: `The ${fileType} timesheet for the period from ${fromDate} until ${untilDate} has been submitted by Timekeeper :
+          ${timeKeeperName}`,
+            senderEmail: senderEmail,
+            receipentEmail: toAddress,
+            receipentEmpID: empID,
+            status: "Unread",
+          });
+        }
       }
       // end
     } else if (userIdentification === "Manager") {
@@ -688,12 +701,14 @@ export const ViewSBWsheet = ({
       }
     );
 
-    console.log("deleteDuplicateData : ", deleteDuplicateData);
+    
 
     if (
+      (filteredResults && filteredResults.length > 0) ||
       (filteredResults && filteredResults.length === 0) ||
       deleteDuplicateData === "DuplicateDataDeletedSuccessfully"
     ) {
+      let finalResult = filteredResults;
       // Start
       let action = "create";
 
@@ -707,6 +722,9 @@ export const ViewSBWsheet = ({
       });
       // End
       setLoadingMessForDelay(false);
+    } else {
+      setLoadingMessForDelay(false);
+      console.log("waiting...");
     }
   };
 

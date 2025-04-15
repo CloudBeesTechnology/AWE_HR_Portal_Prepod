@@ -176,7 +176,7 @@ export const UploadSBWfile = (
 
         return theaderResult;
       } else {
-        console.log("Working");
+        
         return checkTrueOrFalse;
       }
     }

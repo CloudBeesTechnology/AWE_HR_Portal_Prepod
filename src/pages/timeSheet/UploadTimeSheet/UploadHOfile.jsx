@@ -164,7 +164,7 @@ export const UploadHOfile = (
               // Convert string to numbers to remove any leading zeros
               const monthNum = parseInt(day, 10);
               const dayNum = parseInt(year, 10);
-              console.log("Date : ", `${dayNum}/${monthNum}/${month} `);
+             
               return `${monthNum}/${dayNum}/${month}`;
             };
 
