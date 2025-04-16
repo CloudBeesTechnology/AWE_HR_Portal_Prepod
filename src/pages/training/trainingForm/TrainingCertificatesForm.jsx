@@ -241,6 +241,34 @@ export const TrainingCertificatesForm = () => {
     setdeletePopup(!deletePopup);
   };
 
+  const safeParseData = (data) => {
+    try {
+      let raw;
+
+      // CASE 1: data is an array like ['[{MRNo:...}]'] or ['[{"MRNo":"..."}]']
+      if (Array.isArray(data)) {
+        raw = data[0];
+      } else {
+        raw = data;
+      }
+
+      // Remove outer quotes if it's a stringified string (e.g. "\"[{...}]\"")
+      if (typeof raw === "string" && raw.startsWith('"') && raw.endsWith('"')) {
+        raw = JSON.parse(raw); // unescape once
+      }
+
+      // Now, handle unquoted keys: MRNo: -> "MRNo":
+      const fixedJSON = raw.replace(/([{,])\s*(\w+)\s*:/g, '$1"$2":');
+
+      const parsed = JSON.parse(fixedJSON);
+
+      return Array.isArray(parsed) ? parsed : [parsed];
+    } catch (error) {
+      console.error("Error normalizing traineeTrackData:", error);
+      return [];
+    }
+  };
+
   const searchResult = (result) => {
     if (!result) {
       console.warn("Search result is undefined or null");
@@ -298,8 +326,8 @@ export const TrainingCertificatesForm = () => {
 
     if (trainingProofData && trainingTrackData) {
       try {
-        const parsedProofData = JSON.parse(trainingProofData[0]);
-        const parsedTrackData = JSON.parse(trainingTrackData[0]);
+        const parsedProofData = safeParseData(trainingProofData);
+        const parsedTrackData = safeParseData(trainingTrackData);
 
         // First set values from trainingTrack (prioritize these)
         if (Array.isArray(parsedTrackData)) {

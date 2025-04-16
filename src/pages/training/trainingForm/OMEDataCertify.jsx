@@ -1,9 +1,7 @@
 import { useState, useEffect, useContext } from "react";
-import { Link, useOutletContext } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { DataSupply } from "../../../utils/DataStoredContext";
-import { TrainVT } from "../TableTraining/TrainVT";
 import { FaArrowLeft } from "react-icons/fa6";
-import AddCertifyPopUp from "../TableTraining/AddCertifyPopUp";
 import { CertifyTable } from "../TableTraining/CertifyTable";
 
 export const OMEDataCertify = () => {
@@ -53,24 +51,23 @@ export const OMEDataCertify = () => {
 
   useEffect(() => {
     if (!mergeData.length) return;
-
+  
     const start = startDate ? new Date(startDate) : null;
     const end = endDate ? new Date(endDate) : null;
-
+  
     if (!start && !end) {
       setFilteredData(mergeData);
       return;
     }
-
+  
     const filtered = mergeData.filter((data) => {
-      // Parse trainingProof to get the last certificate expiry date
       let certifiExpiryDate = null;
+  
       try {
         if (data.trainingProof && data.trainingProof.length > 0) {
-          // Get the last element of trainingProof array
-          const lastProofItem =
-            data.trainingProof[data.trainingProof.length - 1];
+          const lastProofItem = data.trainingProof[data.trainingProof.length - 1];
           const proof = JSON.parse(lastProofItem);
+  
           if (Array.isArray(proof)) {
             const lastProof = proof[proof.length - 1];
             if (lastProof?.certifiExpiry) {
@@ -81,18 +78,24 @@ export const OMEDataCertify = () => {
       } catch (e) {
         console.error("Error parsing trainingProof:", e);
       }
-
-      if (!certifiExpiryDate) return true;
-
+  
+      if (!certifiExpiryDate) return false; // no expiry date? exclude
+  
       if (start && end) {
-        return certifiExpiryDate >= start && certifiExpiryDate <= end;
+        if (start.getTime() === end.getTime()) {
+          // Single-day selection — match exact date
+          return certifiExpiryDate.toDateString() === start.toDateString();
+        } else {
+          // Date range selection
+          return certifiExpiryDate >= start && certifiExpiryDate <= end;
+        }
       }
       if (start) return certifiExpiryDate >= start;
       if (end) return certifiExpiryDate <= end;
-
+  
       return true;
     });
-
+  
     setFilteredData(filtered);
   }, [startDate, endDate, mergeData]);
 
@@ -147,25 +150,52 @@ export const OMEDataCertify = () => {
   if (error) {
     return <div>Error: {error}</div>;
   }
-
+  
+  const safeParseData = (data) => {
+    try {
+  
+      let raw;
+      if (Array.isArray(data)) {
+        raw = data[0];
+      } else {
+        raw = data;
+      }
+  
+      if (typeof raw === "string" && raw.startsWith('"') && raw.endsWith('"')) {
+        raw = JSON.parse(raw);
+      }
+  
+      const fixedJSON = raw.replace(/([{,])\s*(\w+)\s*:/g, '$1"$2":');
+  
+      const parsed = JSON.parse(fixedJSON);
+  
+      return Array.isArray(parsed) ? parsed : [parsed];
+    } catch (error) {
+      console.error("Error normalizing traineeTrackData:", error);
+      return [];
+    }
+  };
+  
   const finalData = filteredData
     .sort((a, b) => new Date(b.CertifyCreatedAt) - new Date(a.CertifyCreatedAt))
     .map((data) => {
+  
       let certifiExpiry = "N/A";
       let eCertifiDate = "N/A";
       let orgiCertifiDate = "N/A";
       let poNo = "N/A";
-
+  
       try {
         if (data.trainingProof && data.trainingProof[0]) {
-          const proof = JSON.parse(data.trainingProof[0]);
+  
+          const proof = safeParseData(data.trainingProof);
+  
           let lastProof = proof;
-
-          // If proof is an array, get the last object
+  
           if (Array.isArray(proof)) {
             lastProof = proof[proof.length - 1];
           }
-
+  
           if (lastProof) {
             certifiExpiry = lastProof.certifiExpiry
               ? formatDate(lastProof.certifiExpiry)
@@ -176,14 +206,16 @@ export const OMEDataCertify = () => {
             orgiCertifiDate = lastProof.orgiCertifiDate
               ? formatDate(lastProof.orgiCertifiDate)
               : "N/A";
-              poNo = lastProof.poNo || "N/A";
+            poNo = lastProof.poNo || "N/A";
           }
+        } else {
+          console.log("No valid trainingProof found for this entry.");
         }
       } catch (e) {
         console.error("Error parsing trainingProof:", e);
       }
-
-      return {
+  
+      const finalEntry = {
         ...data,
         empID: data.empID || "-",
         empBadgeNo: data.empBadgeNo || "-",
@@ -191,14 +223,16 @@ export const OMEDataCertify = () => {
         certifiExpiry,
         eCertifiDate,
         orgiCertifiDate,
-        poNo,  
+        poNo,
         department: Array.isArray(data.department)
-        ? data.department[data.department.length - 1]
-        : "-",
+          ? data.department[data.department.length - 1]
+          : "-",
         position: Array.isArray(data.position)
-        ? data.position[data.position.length - 1]
-        : "-",
+          ? data.position[data.position.length - 1]
+          : "-",
       };
+  
+      return finalEntry;
     });
 
   return (
