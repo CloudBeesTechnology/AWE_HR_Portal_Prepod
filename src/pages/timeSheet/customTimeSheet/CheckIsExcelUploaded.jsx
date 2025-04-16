@@ -1,63 +1,3 @@
-// import { generateClient } from "@aws-amplify/api";
-// import { listTimeSheets } from "../../../graphql/queries";
-
-// export const CheckIsExcelUploaded = async ({
-//   fileNameForSuccessful,
-//   title,
-// }) => {
-//   var isExcelExitsOrNot = null;
-//   const client = generateClient();
-
-//   const fetchData = async () => {
-//     let nextToken = null;
-
-//     try {
-//       do {
-//         const response = await client.graphql({
-//           query: listTimeSheets,
-//           variables: {
-//             filter: {
-//               and: [
-//                 { fileName: { eq: fileNameForSuccessful } },
-//                 { fileType: { eq: title } },
-//               ],
-//             },
-//             limit: 800, // Adjust as needed
-//             nextToken,
-//           },
-//         });
-
-//         const items = response?.data?.listTimeSheets?.items || [];
-//         nextToken = response?.data?.listTimeSheets?.nextToken;
-
-//         const validItem = items.find(
-//           (item) => item !== null && item !== undefined
-//         );
-//         console.log(validItem);
-//         if (validItem) {
-//           isExcelExitsOrNot = validItem;
-//           return;
-//         }
-//       } while (nextToken);
-
-//       // If nothing found after going through all pages
-//       isExcelExitsOrNot = "Not Matched";
-//     } catch (error) {
-//       isExcelExitsOrNot = "Not Matched";
-//       console.error("Error fetching timesheet by fileName:", error);
-//     }
-//   };
-
-//   if (fileNameForSuccessful) {
-//     await fetchData();
-//   }
-//   console.log("isExcelExitsOrNot : ", isExcelExitsOrNot);
-//   return { isExcelExitsOrNot };
-// };
-
-// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-
 import { generateClient } from "@aws-amplify/api";
 import { listTimeSheets } from "../../../graphql/queries";
 
@@ -66,6 +6,7 @@ export const CheckIsExcelUploaded = async ({
   title,
 }) => {
   let isExcelExitsOrNot = null;
+  let addData = [];
   const client = generateClient();
 
   const fetchData = async () => {
@@ -76,34 +17,28 @@ export const CheckIsExcelUploaded = async ({
         const response = await client.graphql({
           query: listTimeSheets,
           variables: {
-            limit: 800, // Fetching without any GraphQL-level filtering
+            limit: 800,
             nextToken,
           },
         });
 
         const items = response?.data?.listTimeSheets?.items || [];
         nextToken = response?.data?.listTimeSheets?.nextToken;
-
-        const filteredItems = items.filter(
-          (item) =>
-            item &&
-            item.fileName === fileNameForSuccessful &&
-            item.fileType === title
-        );
-
-        const validItem = filteredItems.find(
-          (item) => item !== null && item !== undefined
-        );
-
-        console.log(validItem);
-        if (validItem) {
-          isExcelExitsOrNot = validItem;
-          return;
-        }
+        addData = [...addData, ...items];
       } while (nextToken);
 
-      // If no match found after going through all pages
-      isExcelExitsOrNot = "Not Matched";
+      const addDataMap = new Map();
+      for (const item of addData) {
+        const key = `${item.fileName}|${item.fileType}`;
+        addDataMap.set(key, item);
+      }
+
+      const keyToCheck = `${fileNameForSuccessful}|${title}`;
+      if (addDataMap.has(keyToCheck)) {
+        isExcelExitsOrNot = "fileNameAlreadyExistsInDB";
+      } else {
+        isExcelExitsOrNot = "Not Matched";
+      }
     } catch (error) {
       isExcelExitsOrNot = "Not Matched";
       console.error("Error fetching timesheet:", error);
@@ -114,6 +49,5 @@ export const CheckIsExcelUploaded = async ({
     await fetchData();
   }
 
-  console.log("isExcelExitsOrNot:", isExcelExitsOrNot);
   return { isExcelExitsOrNot };
 };

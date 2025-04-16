@@ -107,8 +107,7 @@ export const TimeSheetBrowser = ({
     console.log("isExcelExitsOrNot : ", isExcelExitsOrNot);
     if (
       isExcelExitsOrNot &&
-      typeof isExcelExitsOrNot === "object" &&
-      isExcelExitsOrNot.constructor === Object
+      isExcelExitsOrNot === "fileNameAlreadyExistsInDB"
     ) {
       console.log("Some one already uploaded the same excel sheet");
       setLoading(false);

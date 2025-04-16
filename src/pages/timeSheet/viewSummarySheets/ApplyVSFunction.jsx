@@ -864,7 +864,7 @@ export const ApplyVSFunction = ({
           };
         }).filter(Boolean);
 
-        console.log("transformedData : ", transformedData);
+      
 
         await ProcessedDataFunc(transformedData);
       };
