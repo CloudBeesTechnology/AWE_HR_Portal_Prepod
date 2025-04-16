@@ -22,30 +22,79 @@ const AddEmpPopup = ({ details, popupAll, onClose }) => {
     { header: "Upload Report", key: "medicalReport" },
   ];
   useEffect(() => {
-    const parsedData = JSON.parse(details?.traineeTrack || "[]");
+    let parsedData = [];
 
-    setStoredData(parsedData);
-    const fetchUrls = async () => {
-      const urls = {};
-      for (let i = 0; i < parsedData.length; i++) {
-        const item = parsedData[i];
-        try {
-          const parsedReport = JSON.parse(item?.medicalReport || "[]");
-          if (parsedReport.length > 0) {
-            const filePath = parsedReport[0].upload;
-            const { url } = await getUrl({ path: filePath });
-            urls[i] = url; // index-based mapping
-          }
-        } catch (err) {
-          console.error("Invalid report format:", err);
-        }
+    try {
+      let raw = details?.traineeTrack || "[]";
+      let firstParse = JSON.parse(raw);
+
+      // If it's a string, and looks like invalid JSON, try fixing keys (very hacky!)
+      if (typeof firstParse === "string") {
+        let fixed = firstParse
+          .replace(/([{,])(\s*)(\w+)\s*:/g, '$1"$3":') // add quotes to keys
+          .replace(/:\s*'([^']+)'/g, ': "$1"'); // convert single quotes to double quotes
+
+        parsedData = JSON.parse(fixed);
+      } else {
+        parsedData = firstParse;
       }
-      setFileUrls(urls);
-    };
 
-    fetchUrls();
+      setStoredData(Array.isArray(parsedData) ? parsedData : [parsedData]);
+
+      const fetchUrls = async () => {
+        const urls = {};
+        for (let i = 0; i < parsedData.length; i++) {
+          const item = parsedData[i];
+          try {
+            const rawReport = item?.medicalReport;
+
+            // Log the raw value to inspect what's coming through
+            // console.log("Raw medicalReport:", rawReport);
+
+            // Check for empty, null, or non-JSON values
+            if (
+              !rawReport ||
+              rawReport === "[]" ||
+              rawReport === "null" ||
+              rawReport === ""
+            ) {
+              // console.log(`Skipping empty or invalid report at index ${i}`);
+              continue; // Skip empty or invalid reports
+            }
+            // console.log(rawReport);
+
+            // Try parsing the raw report string
+            let parsedReport = [];
+            if (Array.isArray(rawReport)) {
+              parsedReport = rawReport;
+            } else if (typeof rawReport === "string") {
+              // Parse the string only if it's a string
+              parsedReport = JSON.parse(rawReport);
+            } else {
+              // console.warn(`Unexpected rawReport type at index ${i}:`, typeof rawReport);
+              continue; // Skip if rawReport is neither an array nor a string
+            }
+
+            // Check if parsedReport is an array and contains data
+            if (Array.isArray(parsedReport) && parsedReport.length > 0) {
+              const filePath = parsedReport[0].upload;
+              const { url } = await getUrl({ path: filePath });
+              urls[i] = url;
+            }
+          } catch (err) {
+            console.error("Error processing report at index", i, err);
+          }
+        }
+        setFileUrls(urls);
+      };
+
+      fetchUrls();
+    } catch (error) {
+      console.error("Error parsing traineeTrack:", error);
+    }
   }, [details, popupAll]);
-  console.log(storedData);
+
+  // console.log(storedData);
 
   return (
     <div className="fixed top-0 w-full left-0 bg-black bg-opacity-50 z-[9999] py-7 min-h-screen flex items-center justify-center ">
@@ -63,7 +112,7 @@ const AddEmpPopup = ({ details, popupAll, onClose }) => {
         </h2>
         <div className=" shadow-md rounded-md px-10 py-5">
           <article className="flex flex-col mb-4">
-            {popupAll?.map((field, index) => {
+            {popupAll?.flatMap((field, index) => {
               // console.log(details[field.key]);
               return (
                 <article key={index} className="mb-2 flex flex-col">

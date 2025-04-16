@@ -10,7 +10,8 @@ export const TCDataFun = () => {
     }
     const totalData = {
       empID: TCValue.empID,
-      trainingProof: JSON.stringify(TCValue.trainingProof),
+      trainingProof: [JSON.stringify(TCValue.trainingProof)],
+      // trainingProof: JSON.stringify(TCValue.trainingProof),
     };
     console.log(totalData);
 
