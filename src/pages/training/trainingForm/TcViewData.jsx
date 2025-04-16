@@ -39,7 +39,7 @@ export const TcViewData = () => {
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
-    if (isNaN(date.getTime())) return "Invalid Date";
+    if (isNaN(date.getTime())) return "N/A";
     const day = date.getDate().toString().padStart(2, "0");
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
@@ -103,24 +103,23 @@ export const TcViewData = () => {
 
   useEffect(() => {
     if (!mergeData.length) return;
-
+  
     const start = startDate ? new Date(startDate) : null;
     const end = endDate ? new Date(endDate) : null;
-
+  
     if (!start && !end) {
       setFilteredData(mergeData);
       return;
     }
-
+  
     const filtered = mergeData.filter((data) => {
-      // Parse trainingProof to get the last certificate expiry date
       let certifiExpiryDate = null;
+  
       try {
         if (data.trainingProof && data.trainingProof.length > 0) {
-          // Get the last element of trainingProof array
-          const lastProofItem =
-            data.trainingProof[data.trainingProof.length - 1];
+          const lastProofItem = data.trainingProof[data.trainingProof.length - 1];
           const proof = JSON.parse(lastProofItem);
+  
           if (Array.isArray(proof)) {
             const lastProof = proof[proof.length - 1];
             if (lastProof?.certifiExpiry) {
@@ -131,106 +130,112 @@ export const TcViewData = () => {
       } catch (e) {
         console.error("Error parsing trainingProof:", e);
       }
-
-      if (!certifiExpiryDate) return true;
-
+  
+      if (!certifiExpiryDate) return false; 
+  
       if (start && end) {
-        return certifiExpiryDate >= start && certifiExpiryDate <= end;
+        if (start.getTime() === end.getTime()) {
+          // Single-day selection — match exact date
+          return certifiExpiryDate.toDateString() === start.toDateString();
+        } else {
+          // Date range selection
+          return certifiExpiryDate >= start && certifiExpiryDate <= end;
+        }
       }
       if (start) return certifiExpiryDate >= start;
       if (end) return certifiExpiryDate <= end;
-
+  
       return true;
     });
-
+  
     setFilteredData(filtered);
   }, [startDate, endDate, mergeData]);
 
-  // Format data for display
-  const finalData = filteredData
-  .sort((a, b) => new Date(b.CertifyCreatedAt) - new Date(a.CertifyCreatedAt))
-  .map((data) => {
-    let certifiExpiry = "N/A";
-    let eCertifiDate = "N/A";
-    let orgiCertifiDate = "N/A";
-    let poNo = "N/A";
-
+  
+  const safeParseData = (data) => {
     try {
-      if (data.trainingProof && data.trainingProof[0]) {
-        const proof = JSON.parse(data.trainingProof[0]);
-        let lastProof = proof;
-
-        // If proof is an array, get the last object
-        if (Array.isArray(proof)) {
-          lastProof = proof[proof.length - 1];
-        }
-
-        if (lastProof) {
-          certifiExpiry = lastProof.certifiExpiry
-            ? formatDate(lastProof.certifiExpiry)
-            : "N/A";
-          eCertifiDate = lastProof.eCertifiDate
-            ? formatDate(lastProof.eCertifiDate)
-            : "N/A";
-          orgiCertifiDate = lastProof.orgiCertifiDate
-            ? formatDate(lastProof.orgiCertifiDate)
-            : "N/A";
-          poNo = lastProof.poNo || "N/A";  
-        }
+  
+      let raw;
+      if (Array.isArray(data)) {
+        raw = data[0];
+      } else {
+        raw = data;
       }
-    } catch (e) {
-      console.error("Error parsing trainingProof:", e);
+  
+      if (typeof raw === "string" && raw.startsWith('"') && raw.endsWith('"')) {
+        raw = JSON.parse(raw);
+      }
+  
+      const fixedJSON = raw.replace(/([{,])\s*(\w+)\s*:/g, '$1"$2":');
+  
+      const parsed = JSON.parse(fixedJSON);
+  
+      return Array.isArray(parsed) ? parsed : [parsed];
+    } catch (error) {
+      console.error("Error normalizing traineeTrackData:", error);
+      return [];
     }
-
-    return {
-      ...data,
-      empID: data.empID || "-",
-      empBadgeNo: data.empBadgeNo || "-",
-      name: data.name || "-",
-      certifiExpiry,
-      eCertifiDate,
-      orgiCertifiDate,
-      poNo,  
-      department: Array.isArray(data.department)
-        ? data.department[data.department.length - 1]
-        : "-",
-      position: Array.isArray(data.position)
-        ? data.position[data.position.length - 1]
-        : "-",
-    };
-  });
-
-  // const finalData = filteredData
-  // .sort((a, b) => new Date(b.CertifyCreatedAt) - new Date(a.CertifyCreatedAt))
-  // .map((data) => {
-  //   let allCertificates = [];
-
-  //   try {
-  //     if (data.trainingProof && data.trainingProof[0]) {
-  //       const proof = JSON.parse(data.trainingProof[0]);
-
-  //       // Make sure it's an array
-  //       const proofsArray = Array.isArray(proof) ? proof : [proof];
-
-  //       allCertificates = proofsArray.map((entry) => ({
-  //         certifiExpiry: entry.certifiExpiry ? formatDate(entry.certifiExpiry) : "N/A",
-  //         eCertifiDate: entry.eCertifiDate ? formatDate(entry.eCertifiDate) : "N/A",
-  //         orgiCertifiDate: entry.orgiCertifiDate ? formatDate(entry.orgiCertifiDate) : "N/A",
-  //       }));
-  //     }
-  //   } catch (e) {
-  //     console.error("Error parsing trainingProof:", e);
-  //   }
-
-  //   return {
-  //     ...data,
-  //     empID: data.empID || "-",
-  //     empBadgeNo: data.empBadgeNo || "-",
-  //     name: data.name || "-",
-  //     certificates: allCertificates, // 👈 Contains all certificate entries
-  //   };
-  // });
-
+  };
+  
+  const finalData = filteredData
+    .sort((a, b) => new Date(b.CertifyCreatedAt) - new Date(a.CertifyCreatedAt))
+    .map((data) => {
+  
+      let certifiExpiry = "N/A";
+      let eCertifiDate = "N/A";
+      let orgiCertifiDate = "N/A";
+      let poNo = "N/A";
+  
+      try {
+        if (data.trainingProof && data.trainingProof) {
+  
+          const proof = safeParseData(data.trainingProof);
+  
+          let lastProof = proof;
+  
+          if (Array.isArray(proof)) {
+            lastProof = proof[proof.length - 1];
+          }
+  
+          if (lastProof) {
+            certifiExpiry = lastProof.certifiExpiry
+              ? formatDate(lastProof.certifiExpiry)
+              : "N/A";
+            eCertifiDate = lastProof.eCertifiDate
+              ? formatDate(lastProof.eCertifiDate)
+              : "N/A";
+            orgiCertifiDate = lastProof.orgiCertifiDate
+              ? formatDate(lastProof.orgiCertifiDate)
+              : "N/A";
+            poNo = lastProof.poNo || "N/A";
+          }
+        } else {
+          console.log("No valid trainingProof found for this entry.");
+        }
+      } catch (e) {
+        console.error("Error parsing trainingProof:", e);
+      }
+  
+      const finalEntry = {
+        ...data,
+        empID: data.empID || "-",
+        empBadgeNo: data.empBadgeNo || "-",
+        name: data.name || "-",
+        certifiExpiry,
+        eCertifiDate,
+        orgiCertifiDate,
+        poNo,
+        department: Array.isArray(data.department)
+          ? data.department[data.department.length - 1]
+          : "-",
+        position: Array.isArray(data.position)
+          ? data.position[data.position.length - 1]
+          : "-",
+      };
+  
+      return finalEntry;
+    });
+  
   return (
     <section className="bg-[#F8F8F8] mx-auto p-5 h-full w-full">
       <div className="w-full flex items-center justify-between gap-5 my-5">

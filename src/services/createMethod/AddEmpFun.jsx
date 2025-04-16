@@ -25,7 +25,7 @@ export const AddEmpFun = () => {
              },
            })
          ])
-         console.log(storedData,"successfully create data");
+        //  console.log(storedData,"successfully create data");
 
        } catch (error) {
          console.error("Error executing GraphQL requests:", error);
