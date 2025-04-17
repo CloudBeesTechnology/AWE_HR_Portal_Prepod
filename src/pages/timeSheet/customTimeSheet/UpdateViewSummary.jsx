@@ -145,6 +145,7 @@ export const UpdateViewSummary = async (object, updateGroupedData) => {
           status: "Verified",
         };
 
+        
         if (addEmpWorkInfo && object) {
           await updateGroupedData(addEmpWorkInfo, object);
         }
