@@ -54,54 +54,83 @@ export const BlngCertify = () => {
 
   useEffect(() => {
     if (!mergeData.length) return;
-  
+    
+    // Parse filter dates (input format is YYYY-MM-DD from date inputs)
     const start = startDate ? new Date(startDate) : null;
     const end = endDate ? new Date(endDate) : null;
-  
+    
     if (!start && !end) {
       setFilteredData(mergeData);
       return;
     }
   
     const filtered = mergeData.filter((data) => {
-      let certifiExpiryDate = null;
+      // First filter by work status (if needed)
+      if (Array.isArray(data?.workStatus) && data?.workStatus.length > 0) {
+        const lastWorkStatus = data.workStatus[data.workStatus.length - 1];
+        if (
+          lastWorkStatus.toUpperCase() === "TERMINATION" ||
+          lastWorkStatus.toUpperCase() === "RESIGNATION"
+        ) {
+          return false;
+        }
+      }
   
+      let certifiExpiryDate = null;
+    
       try {
         if (data.trainingProof && data.trainingProof.length > 0) {
           const lastProofItem = data.trainingProof[data.trainingProof.length - 1];
           const proof = JSON.parse(lastProofItem);
-  
+    
           if (Array.isArray(proof)) {
             const lastProof = proof[proof.length - 1];
             if (lastProof?.certifiExpiry) {
               certifiExpiryDate = new Date(lastProof.certifiExpiry);
             }
+          } else if (proof?.certifiExpiry) {
+            // Handle case where proof is not an array but has certifiExpiry
+            certifiExpiryDate = new Date(proof.certifiExpiry);
           }
         }
       } catch (e) {
         console.error("Error parsing trainingProof:", e);
       }
+    
+      if (!certifiExpiryDate || isNaN(certifiExpiryDate.getTime())) return false;
   
-      if (!certifiExpiryDate) return false; // no expiry date? exclude
+      // Normalize dates to midnight for accurate comparison
+      const normalizeDate = (date) => {
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0);
+        return d;
+      };
   
-      if (start && end) {
-        if (start.getTime() === end.getTime()) {
-          // Single-day selection — match exact date
-          return certifiExpiryDate.toDateString() === start.toDateString();
-        } else {
-          // Date range selection
-          return certifiExpiryDate >= start && certifiExpiryDate <= end;
-        }
+      const normalizedExpiry = normalizeDate(certifiExpiryDate);
+      const normalizedStart = start ? normalizeDate(start) : null;
+      const normalizedEnd = end ? normalizeDate(end) : null;
+  
+      // Single day selection
+      if (normalizedStart && normalizedEnd && normalizedStart.getTime() === normalizedEnd.getTime()) {
+        return normalizedExpiry.getTime() === normalizedStart.getTime();
       }
-      if (start) return certifiExpiryDate >= start;
-      if (end) return certifiExpiryDate <= end;
+      
+      // Date range selection
+      if (normalizedStart && normalizedEnd) {
+        return normalizedExpiry >= normalizedStart && normalizedExpiry <= normalizedEnd;
+      }
+      
+      // Only start date
+      if (normalizedStart) return normalizedExpiry >= normalizedStart;
+      
+      // Only end date
+      if (normalizedEnd) return normalizedExpiry <= normalizedEnd;
   
       return true;
     });
-  
+    
     setFilteredData(filtered);
   }, [startDate, endDate, mergeData]);
-
 
   useEffect(() => {
     if (empPIData && workInfoData && trainingCertifi && AddEmpReq) {

@@ -48,7 +48,7 @@ export const GroupHS = () => {
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [insuranceData, setInsuranceData] = useState([]);
-  const [loading, setLoading] = useState(true); // Track loading state
+  const [loading, setLoading] = useState(true); 
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupImage, setPopupImage] = useState("");
   const [viewingDocument, setViewingDocument] = useState(null);
@@ -227,7 +227,7 @@ export const GroupHS = () => {
           id: checkingDITable.id,
           groupHSUpload: JSON.stringify(uploadGHsU.groupHSUpload),
         };
-        console.log("update value logs:", updatedGHSValue);
+        // console.log("update value logs:", updatedGHSValue);
 
         const totalData = {
           id: updatedGHSValue.id,
@@ -240,12 +240,12 @@ export const GroupHS = () => {
           variables: { input: totalData },
         });
 
-        // Optionally, show a success notification
         setNotification(true);
       } else {
         // Create case: Prepare the new data and perform the create
         const GHSreValue = {
-          ...data,
+          groupHSNo: data.groupHSNo,
+          groupHSExp: data.groupHSExp,
           groupHSUpload: JSON.stringify(uploadGHsU.groupHSUpload),
         };
 
@@ -255,7 +255,6 @@ export const GroupHS = () => {
         });
 
         // console.log("Successfully submitted data:", GHSreValue);
-        // Optionally, show a success notification
         setNotification(true);
       }
     } catch (error) {
