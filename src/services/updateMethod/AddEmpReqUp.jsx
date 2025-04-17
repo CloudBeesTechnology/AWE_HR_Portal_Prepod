@@ -13,7 +13,7 @@ export const AddEmpReqUp = () => {
       empID: TMRDataUp.empID,
       traineeTrack: JSON.stringify(TMRDataUp.trainingTrack),
     };
-    console.log(totalData, "update method");
+    // console.log(totalData, "update method");
 
     try {
       const storedData = await Promise.all([
@@ -24,7 +24,7 @@ export const AddEmpReqUp = () => {
           },
         }),
       ]);
-      console.log(storedData, "successfully update data");
+      // console.log(storedData, "successfully update data");
     } catch (error) {
       console.error("Error executing GraphQL requests:", error);
       throw error; // Rethrow error if needed
