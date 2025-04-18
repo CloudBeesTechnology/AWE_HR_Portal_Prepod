@@ -583,8 +583,6 @@ export const ViewBLNGsheet = ({
           setLoadingMessForDelay,
         });
 
-      
-
       if (
         (filteredResults && filteredResults.length > 0) ||
         (filteredResults && filteredResults.length === 0) ||
@@ -841,7 +839,6 @@ export const ViewBLNGsheet = ({
       }
     );
 
-
     if (
       (filteredResults && filteredResults.length > 0) ||
       (filteredResults && filteredResults.length === 0) ||
@@ -862,7 +859,6 @@ export const ViewBLNGsheet = ({
       setLoadingMessForDelay(false);
     } else {
       setLoadingMessForDelay(false);
-    
     }
   };
 
@@ -1087,7 +1083,7 @@ export const ViewBLNGsheet = ({
                     )}
                   </tr>
                 </thead>
-               
+
                 <tbody>
                   {visibleData && visibleData?.length > 0 ? (
                     visibleData.map((value, index) => {
@@ -1361,7 +1357,7 @@ export const ViewBLNGsheet = ({
                       //       console.log("Batch deletion completed.");
                       //     } while (nextToken); // Continue fetching until no more data
                       //     console.log(
-                      //       "All SBW items deletion process completed."
+                      //       "All BLNG items deletion process completed."
                       //     );
                       //   } catch (fetchError) {
                       //     console.error(

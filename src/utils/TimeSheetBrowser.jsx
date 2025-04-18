@@ -321,7 +321,12 @@ export const TimeSheetBrowser = ({
   }
 
   return (
-    <div className="p-10 bg-[#fafaf6] min-h-screen  flex-col items-center">
+    <div
+      className="p-10 bg-[#fafaf6] min-h-screen  flex-col items-center"
+      // onClick={() => {
+      //   handleDuplicateFileUploadFunc();
+      // }}
+    >
       <div
         className={`flex ${
           Position === "Manager" ? "justify-start" : "justify-between"

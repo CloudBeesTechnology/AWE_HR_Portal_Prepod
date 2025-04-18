@@ -23,6 +23,8 @@ export const ApplyVSFunction = ({
 }) => {
   const { getStartDate, getEndDate } = useTempID();
 
+  const identifyFileType = convertedStringToArrayObj?.[0]?.fileType;
+
   try {
     const fetchAllData = async (queryName) => {
       let allData = [];
@@ -100,10 +102,12 @@ export const ApplyVSFunction = ({
         });
 
         const leaveStatusData = leaveStatuses;
+
         // const leaveStatusData = dummyLeaveStatus;
 
         const approvedLeaveStatus = leaveStatusData?.filter(
-          (fil) => fil.managerStatus === "Approved"
+          (fil) =>
+            fil.managerStatus === "Approved" && fil.empStatus !== "Cancelled"
         );
 
         const groupBySapNo = (data) => {
@@ -483,6 +487,13 @@ export const ApplyVSFunction = ({
               });
             }
 
+            const recognizeFileType = [
+              "Offshore",
+              "Offshore's ORMC",
+              "SBW",
+              "ORMC",
+            ]?.includes(identifyFileType);
+
             if (checkEntry) {
               const result = parseFloat(entry?.normalWorkHrs) / 2;
               if (isNaN(checkEntry) || !checkEntry) {
@@ -515,9 +526,25 @@ export const ApplyVSFunction = ({
                 }
               }
             } else if (isPublicHoliday) {
-              acc[dayStr] = "PH";
+              if (recognizeFileType === true) {
+                if (leaveType) {
+                  acc[dayStr] = leaveType;
+                } else {
+                  acc[dayStr] = "A";
+                }
+              } else if (recognizeFileType === false) {
+                acc[dayStr] = "PH";
+              }
             } else if (leaveType) {
-              acc[dayStr] = leaveType;
+              if (recognizeFileType === true) {
+                acc[dayStr] = leaveType;
+              } else if (recognizeFileType === false) {
+                if (dayOfWeek === "Sunday") {
+                  acc[dayStr] = "";
+                } else {
+                  acc[dayStr] = leaveType;
+                }
+              }
             } else if (dayOfWeek === "Saturday") {
               // const result = parseFloat(entry?.normalWorkHrs) / 2;
 
@@ -539,7 +566,11 @@ export const ApplyVSFunction = ({
                 acc[dayStr] = checkEntry;
               }
             } else if (dayOfWeek === "Sunday") {
-              acc[dayStr] = "";
+              if (recognizeFileType === true) {
+                acc[dayStr] = "A";
+              } else if (recognizeFileType === false) {
+                acc[dayStr] = "";
+              }
             } else {
               acc[dayStr] = "A";
             }
