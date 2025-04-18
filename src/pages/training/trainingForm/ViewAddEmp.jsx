@@ -76,6 +76,36 @@ export const ViewAddEmp = () => {
     { header: "Position", key: "position" },
   ];
 
+  
+  const safeParseData = (data) => {
+    try {
+      if (!data) {
+        console.warn("safeParseData: Received undefined or null data.");
+        return [];
+      }
+  
+      let raw;
+      if (Array.isArray(data)) {
+        raw = data[0];
+      } else {
+        raw = data;
+      }
+  
+      if (typeof raw === "string" && raw.startsWith('"') && raw.endsWith('"')) {
+        raw = JSON.parse(raw);
+      }
+  
+      const fixedJSON = raw.replace(/([{,])\s*(\w+)\s*:/g, '$1"$2":');
+  
+      const parsed = JSON.parse(fixedJSON);
+  
+      return Array.isArray(parsed) ? parsed : [parsed];
+    } catch (error) {
+      console.error("Error normalizing traineeTrackData:", error);
+      return [];
+    }
+  };
+
   const handleDate = (e, type) => {
     const value = e.target.value;
 
@@ -100,7 +130,7 @@ export const ViewAddEmp = () => {
         if (data.traineeTrack && data.traineeTrack.length > 0) {
           // Get the last element of traineeTrack array
           const lastTrackItem = data.traineeTrack[data.traineeTrack.length - 1];
-          const track = JSON.parse(lastTrackItem);
+          const track = safeParseData(lastTrackItem);
           
           // console.log(track[track.length - 1]);
           if (Array.isArray(track)) {
@@ -146,28 +176,61 @@ console.log(filtered);
 
   const exportTableToExcel = () => {
     const reportTitle = "Employee Report";
-  
-    // Prepare all rows including all traineeTrack records
+
     const allRows = [];
+  
+    // Helper function to safely parse traineeTrack
+    const parseTraineeTrack = (rawTrack) => {
+      try {
+        if (!rawTrack) return [];
     
+        // If it's an array like ['"..."]'], extract the first item
+        if (Array.isArray(rawTrack) && typeof rawTrack[0] === "string") {
+          rawTrack = rawTrack[0];
+        }
+    
+        // If it's a string, unescape and clean it
+        if (typeof rawTrack === "string") {
+          // Unescape and fix malformed JSON
+          let fixed = rawTrack
+            .replace(/^"+|"+$/g, "") // remove wrapping double quotes
+            .replace(/\\"/g, '"') // unescape inner quotes
+            .replace(/([{,])(\s*)(\w+)\s*:/g, '$1"$3":') // add quotes to keys
+            .replace(/:\s*'([^']+)'/g, ': "$1"'); // convert single to double quotes if any
+    
+          const parsed = JSON.parse(fixed);
+          return Array.isArray(parsed) ? parsed : [parsed];
+        }
+    
+        // If already an object/array
+        return Array.isArray(rawTrack) ? rawTrack : [rawTrack];
+      } catch (e) {
+        console.error("❌ Error parsing traineeTrack:", e, rawTrack);
+        return [];
+      }
+    };
+    
+  
+    // Loop through all filtered data
     filteredData.forEach((data) => {
-      // Get basic employee info
       const employeeInfo = {
         empID: data.empID || "N/A",
         empBadgeNo: data.empBadgeNo || "N/A",
         name: data.name || "N/A",
-        department: Array.isArray(data.department) 
-          ? data.department[data.department.length - 1] 
+        department: Array.isArray(data.department)
+          ? data.department[data.department.length - 1]
           : data.department || "N/A",
       };
   
       // Parse traineeTrack if it exists
       let trackRecords = [];
+ 
+      
       try {
         if (data.traineeTrack && data.traineeTrack.length > 0) {
           // Parse each traineeTrack item (some might be arrays)
           data.traineeTrack.forEach(trackItem => {
-            const parsed = JSON.parse(trackItem);
+            const parsed = safeParseData(trackItem);
             if (Array.isArray(parsed)) {
               trackRecords.push(...parsed); 
             } else {
@@ -196,8 +259,7 @@ console.log(filtered);
           traineeCourseFee: "N/A",
         });
       } else {
-        // Add a row for each track record
-        trackRecords.forEach(track => {
+        trackRecords.forEach((track) => {
           allRows.push({
             ...employeeInfo,
             MRNo: track.MRNo || "N/A",
@@ -215,6 +277,9 @@ console.log(filtered);
         });
       }
     });
+  
+    // You can now use allRows to generate your Excel export
+    console.log("Final data for Excel:", allRows);
   
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet(`${reportTitle}`);
@@ -271,65 +336,93 @@ console.log(filtered);
   if (error) return <div>Error: {error}</div>;
 
   const finalData = filteredData
-    .sort((a, b) => new Date(b.treqCreatedAt) - new Date(a.treqCreatedAt))
-    .map((data) => {
+  .sort((a, b) => new Date(b.treqCreatedAt) - new Date(a.treqCreatedAt))
+  .map((data) => {
+    // console.log(data);
 
-      // Parse traineeTrack to get the training details
-      let traineeDetails = {
-        MRNo: "N/A",
-        medicalName: "N/A",
-        medicalExpiry: "N/A",
-        medicalAppointDate: "N/A",
-        courseCode: "N/A",
-        courseName: "N/A",
-        company: "N/A",
-        traineeSD: "N/A",
-        traineeED: "N/A",
-        traineeStatus: "N/A",
-        traineeCourseFee: "N/A",
-      };
-// console.log(data.empID,data?.tcCreatedAt,filteredData);
+    // Default trainee details
+    let traineeDetails = {
+      MRNo: "N/A",
+      medicalName: "N/A",
+      medicalExpiry: "N/A",
+      medicalAppointDate: "N/A",
+      courseCode: "N/A",
+      courseName: "N/A",
+      company: "N/A",
+      traineeSD: "N/A",
+      traineeED: "N/A",
+      traineeStatus: "N/A",
+      traineeCourseFee: "N/A",
+    };
 
-      try {
-        if (data.traineeTrack && data.traineeTrack[0]) {
-          const track = JSON.parse(data.traineeTrack[0]);
-          let lastTrack = track;
+    try {
+      let parsedData = [];
+      let raw = data?.traineeTrack || "[]";
+      let firstParse = JSON.parse(raw);
 
-          if (Array.isArray(track)) {
-            lastTrack = track[track.length - 1];
-          }
+      // Handle potential issues if firstParse is a string (which needs to be fixed)
+      if (typeof firstParse === "string") {
+        let fixed = firstParse
+          .replace(/([{,])(\s*)(\w+)\s*:/g, '$1"$3":') // add quotes to keys
+          .replace(/:\s*'([^']+)'/g, ': "$1"'); // convert single quotes to double quotes
 
-          if (lastTrack) {
-            traineeDetails = {
-              MRNo: lastTrack.MRNo || "N/A",
-              medicalName: lastTrack.medicalName || "N/A",
-              medicalExpiry: formatDate(lastTrack.medicalExpiry),
-              medicalAppointDate: formatDate(lastTrack.medicalAppointDate),
-              courseCode: lastTrack.courseCode || "N/A",
-              courseName: lastTrack.courseName || "N/A",
-              company: lastTrack.company || "N/A",
-              traineeSD: formatDate(lastTrack.traineeSD),
-              traineeED: formatDate(lastTrack.traineeED),
-              traineeStatus: lastTrack.traineeStatus || "N/A",
-              traineeCourseFee: lastTrack.traineeCourseFee || "N/A",
-            };
-          }
-        }
-      } catch (e) {
-        console.error("Error parsing traineeTrack:", e);
+        parsedData = JSON.parse(fixed);
+      } else {
+        parsedData = firstParse;
       }
 
-      return {
-        ...data,
-        empID: data.empID || "-",
-        empBadgeNo: data.empBadgeNo || "-",
-        name: data.name || "-",
-        department: Array.isArray(data.department)
-          ? data.department[data.department.length - 1]
-          : "-",
-        ...traineeDetails,
-      };
-    });
+      // Check if parsedData[0] is an object, and only parse it if it's a string
+      if (parsedData && parsedData) {
+        let track = parsedData[parsedData.length - 1];
+
+        // If it's a stringified object, parse it
+        if (typeof track === 'string') {
+          try {
+            track = JSON.parse(track); // Try parsing it if it's a string
+          } catch (e) {
+            console.error("Error parsing track data:", e);
+          }
+        }
+
+        let lastTrack = track;
+
+        // If it's an array, get the last item (most recent record)
+        if (Array.isArray(track)) {
+          lastTrack = track[track.length - 1];
+        }
+
+        if (lastTrack) {
+          traineeDetails = {
+            MRNo: lastTrack.MRNo || "N/A",
+            medicalName: lastTrack.medicalName || "N/A",
+            medicalExpiry: formatDate(lastTrack.medicalExpiry),
+            medicalAppointDate: formatDate(lastTrack.medicalAppointDate),
+            courseCode: lastTrack.courseCode || "N/A",
+            courseName: lastTrack.courseName || "N/A",
+            company: lastTrack.company || "N/A",
+            traineeSD: formatDate(lastTrack.traineeSD),
+            traineeED: formatDate(lastTrack.traineeED),
+            traineeStatus: lastTrack.traineeStatus || "N/A",
+            traineeCourseFee: lastTrack.traineeCourseFee || "N/A",
+          };
+        }
+      }
+    } catch (e) {
+      console.error("Error parsing traineeTrack:", e);
+    }
+
+    return {
+      ...data,
+      empID: data.empID || "-",
+      empBadgeNo: data.empBadgeNo || "-",
+      name: data.name || "-",
+      department: Array.isArray(data.department)
+        ? data.department[data.department.length - 1]
+        : "-",
+      ...traineeDetails,
+    };
+  });
+
 
   return (
     <section className="bg-[#F8F8F8] w-full">

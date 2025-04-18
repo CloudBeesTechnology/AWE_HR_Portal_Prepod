@@ -54,110 +54,83 @@ export const BlngCertify = () => {
 
   useEffect(() => {
     if (!mergeData.length) return;
-
+    
+    // Parse filter dates (input format is YYYY-MM-DD from date inputs)
     const start = startDate ? new Date(startDate) : null;
     const end = endDate ? new Date(endDate) : null;
-
+    
     if (!start && !end) {
       setFilteredData(mergeData);
       return;
     }
-
+  
     const filtered = mergeData.filter((data) => {
-      // Parse trainingProof to get the last certificate expiry date
+      // First filter by work status (if needed)
+      if (Array.isArray(data?.workStatus) && data?.workStatus.length > 0) {
+        const lastWorkStatus = data.workStatus[data.workStatus.length - 1];
+        if (
+          lastWorkStatus.toUpperCase() === "TERMINATION" ||
+          lastWorkStatus.toUpperCase() === "RESIGNATION"
+        ) {
+          return false;
+        }
+      }
+  
       let certifiExpiryDate = null;
+    
       try {
         if (data.trainingProof && data.trainingProof.length > 0) {
-          // Get the last element of trainingProof array
-          const lastProofItem =
-            data.trainingProof[data.trainingProof.length - 1];
+          const lastProofItem = data.trainingProof[data.trainingProof.length - 1];
           const proof = JSON.parse(lastProofItem);
+    
           if (Array.isArray(proof)) {
             const lastProof = proof[proof.length - 1];
             if (lastProof?.certifiExpiry) {
               certifiExpiryDate = new Date(lastProof.certifiExpiry);
             }
+          } else if (proof?.certifiExpiry) {
+            // Handle case where proof is not an array but has certifiExpiry
+            certifiExpiryDate = new Date(proof.certifiExpiry);
           }
         }
       } catch (e) {
         console.error("Error parsing trainingProof:", e);
       }
-
-      if (!certifiExpiryDate) return true;
-
-      if (start && end) {
-        return certifiExpiryDate >= start && certifiExpiryDate <= end;
+    
+      if (!certifiExpiryDate || isNaN(certifiExpiryDate.getTime())) return false;
+  
+      // Normalize dates to midnight for accurate comparison
+      const normalizeDate = (date) => {
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0);
+        return d;
+      };
+  
+      const normalizedExpiry = normalizeDate(certifiExpiryDate);
+      const normalizedStart = start ? normalizeDate(start) : null;
+      const normalizedEnd = end ? normalizeDate(end) : null;
+  
+      // Single day selection
+      if (normalizedStart && normalizedEnd && normalizedStart.getTime() === normalizedEnd.getTime()) {
+        return normalizedExpiry.getTime() === normalizedStart.getTime();
       }
-      if (start) return certifiExpiryDate >= start;
-      if (end) return certifiExpiryDate <= end;
-
+      
+      // Date range selection
+      if (normalizedStart && normalizedEnd) {
+        return normalizedExpiry >= normalizedStart && normalizedExpiry <= normalizedEnd;
+      }
+      
+      // Only start date
+      if (normalizedStart) return normalizedExpiry >= normalizedStart;
+      
+      // Only end date
+      if (normalizedEnd) return normalizedExpiry <= normalizedEnd;
+  
       return true;
     });
-
+    
     setFilteredData(filtered);
   }, [startDate, endDate, mergeData]);
-
-  // useEffect(() => {
-  //   if (!mergeData.length) return;
-
-  //   const start = startDate ? new Date(startDate) : null;
-  //   const end = endDate ? new Date(endDate) : null;
-
-  //   if (!start && !end) {
-  //     setFilteredData(mergeData);
-  //     return;
-  //   }
-
-  //   // First, expand the data (one record per certificate)
-  //   const expandedData = mergeData.flatMap((data) => {
-  //     try {
-  //       if (data.trainingProof && data.trainingProof[0]) {
-  //         const proof = JSON.parse(data.trainingProof[0]);
-  //         const proofsArray = Array.isArray(proof) ? proof : [proof];
-
-  //         return proofsArray.map((cert) => ({
-  //           ...data,
-  //           empID: data.empID || "-",
-  //           empBadgeNo: data.empBadgeNo || "-",
-  //           name: data.name || "-",
-  //           certifiExpiry: cert.certifiExpiry ? new Date(cert.certifiExpiry) : null,
-  //           eCertifiDate: cert.eCertifiDate ? formatDate(cert.eCertifiDate) : "N/A",
-  //           orgiCertifiDate: cert.orgiCertifiDate ? formatDate(cert.orgiCertifiDate) : "N/A",
-  //           // Keep original certificate for reference if needed
-  //           originalCertificate: cert,
-  //         }));
-  //       }
-  //     } catch (e) {
-  //       console.error("Error parsing trainingProof:", e);
-  //     }
-
-  //     // Fallback for records with no valid trainingProof
-  //     return [{
-  //       ...data,
-  //       empID: data.empID || "-",
-  //       empBadgeNo: data.empBadgeNo || "-",
-  //       name: data.name || "-",
-  //       certifiExpiry: null,
-  //       eCertifiDate: "N/A",
-  //       orgiCertifiDate: "N/A",
-  //     }];
-  //   });
-
-  //   // Then filter based on certificate dates
-  //   const filtered = expandedData.filter((data) => {
-  //     if (!data.certifiExpiry) return true; // Keep records with no expiry date
-
-  //     if (start && end) {
-  //       return data.certifiExpiry >= start && data.certifiExpiry <= end;
-  //     }
-  //     if (start) return data.certifiExpiry >= start;
-  //     if (end) return data.certifiExpiry <= end;
-
-  //     return true;
-  //   });
-
-  //   setFilteredData(filtered);
-  // }, [startDate, endDate, mergeData]);
 
   useEffect(() => {
     if (empPIData && workInfoData && trainingCertifi && AddEmpReq) {
@@ -215,24 +188,51 @@ export const BlngCertify = () => {
     return <div>Error: {error}</div>;
   }
 
+  const safeParseData = (data) => {
+    try {
+  
+      let raw;
+      if (Array.isArray(data)) {
+        raw = data[0];
+      } else {
+        raw = data;
+      }
+  
+      if (typeof raw === "string" && raw.startsWith('"') && raw.endsWith('"')) {
+        raw = JSON.parse(raw);
+      }
+  
+      const fixedJSON = raw.replace(/([{,])\s*(\w+)\s*:/g, '$1"$2":');
+  
+      const parsed = JSON.parse(fixedJSON);
+  
+      return Array.isArray(parsed) ? parsed : [parsed];
+    } catch (error) {
+      console.error("Error normalizing traineeTrackData:", error);
+      return [];
+    }
+  };
+  
   const finalData = filteredData
     .sort((a, b) => new Date(b.CertifyCreatedAt) - new Date(a.CertifyCreatedAt))
     .map((data) => {
+  
       let certifiExpiry = "N/A";
       let eCertifiDate = "N/A";
       let orgiCertifiDate = "N/A";
       let poNo = "N/A";
-
+  
       try {
         if (data.trainingProof && data.trainingProof[0]) {
-          const proof = JSON.parse(data.trainingProof[0]);
+  
+          const proof = safeParseData(data.trainingProof);
+  
           let lastProof = proof;
-
-          // If proof is an array, get the last object
+  
           if (Array.isArray(proof)) {
             lastProof = proof[proof.length - 1];
           }
-
+  
           if (lastProof) {
             certifiExpiry = lastProof.certifiExpiry
               ? formatDate(lastProof.certifiExpiry)
@@ -245,12 +245,14 @@ export const BlngCertify = () => {
               : "N/A";
             poNo = lastProof.poNo || "N/A";
           }
+        } else {
+          console.log("No valid trainingProof found for this entry.");
         }
       } catch (e) {
         console.error("Error parsing trainingProof:", e);
       }
-
-      return {
+  
+      const finalEntry = {
         ...data,
         empID: data.empID || "-",
         empBadgeNo: data.empBadgeNo || "-",
@@ -266,42 +268,9 @@ export const BlngCertify = () => {
           ? data.position[data.position.length - 1]
           : "-",
       };
+  
+      return finalEntry;
     });
-
-  // const finalData = filteredData
-  // .sort((a, b) => new Date(b.CertifyCreatedAt) - new Date(a.CertifyCreatedAt))
-  // .flatMap((data) => {  // Using flatMap instead of map to expand arrays
-  //   try {
-  //     if (data.trainingProof && data.trainingProof[0]) {
-  //       const proof = JSON.parse(data.trainingProof[0]);
-  //       const proofsArray = Array.isArray(proof) ? proof : [proof];
-
-  //       // Create one record per certificate
-  //       return proofsArray.map((cert) => ({
-  //         ...data,  // Spread all original data
-  //         empID: data.empID || "-",
-  //         empBadgeNo: data.empBadgeNo || "-",
-  //         name: data.name || "-",
-  //         certifiExpiry: cert.certifiExpiry ? formatDate(cert.certifiExpiry) : "N/A",
-  //         eCertifiDate: cert.eCertifiDate ? formatDate(cert.eCertifiDate) : "N/A",
-  //         orgiCertifiDate: cert.orgiCertifiDate ? formatDate(cert.orgiCertifiDate) : "N/A",
-  //       }));
-  //     }
-  //   } catch (e) {
-  //     console.error("Error parsing trainingProof:", e);
-  //   }
-
-  //   // Fallback for records with no valid trainingProof
-  //   return [{
-  //     ...data,
-  //     empID: data.empID || "-",
-  //     empBadgeNo: data.empBadgeNo || "-",
-  //     name: data.name || "-",
-  //     certifiExpiry: "N/A",
-  //     eCertifiDate: "N/A",
-  //     orgiCertifiDate: "N/A",
-  //   }];
-  // });
 
   return (
     <section className="bg-[#F8F8F8] mx-auto p-5 h-full w-full">

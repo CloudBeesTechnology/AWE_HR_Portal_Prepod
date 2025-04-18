@@ -79,25 +79,20 @@ export const NonLocalMobTable = ({
         });
 
         const items = result?.data?.listEmpPersonalInfos?.items || [];
-        // Extract empIDs from the fetched items
+  
         const filteringData = items.map((val) => val.empID);
         allEmpIDs = [...allEmpIDs, ...filteringData];
 
-        // Update nextToken for the next iteration
         nextToken = result?.data?.listEmpPersonalInfos?.nextToken;
       } while (nextToken);
 
-      // Step 2: Filter only empIDs that start with 'AWE'
-      const filteredData = allEmpIDs.filter((empID) => empID.startsWith("AWE"));
 
-      // Step 3: Sort the empIDs numerically (based on the number part of the ID)
-      const sortedData = filteredData.sort((a, b) => {
+      const sortedData = allEmpIDs.sort((a, b) => {
         const numA = parseInt(a.replace(/[^\d]/g, ""), 10);
         const numB = parseInt(b.replace(/[^\d]/g, ""), 10);
         return numA - numB;
       });
 
-      // Step 4: Get the last valid empID (maximum empID)
       const maxValue = sortedData[sortedData.length - 1];
 
       return maxValue;
@@ -114,7 +109,7 @@ export const NonLocalMobTable = ({
     const numberPart = numberMatch ? parseInt(numberMatch[0], 10) : 0;
     const nextNumber = numberPart + 1;
     const nextTempID = `${prefix}${nextNumber}`;
-    // console.log("Next TempID", nextTempID);
+    console.log("Next TempID", nextTempID);
 
     return nextTempID;
   };

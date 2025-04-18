@@ -19,7 +19,7 @@ export const CertifyTable = ({ mergering, columns, popupAll }) => {
       const query = searchQuery.toLowerCase();
       return empID.includes(query) || name.includes(query);
     });
-  }, [mergering, searchQuery]);
+  }, [mergering, searchQuery]); 
 
   useEffect(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;

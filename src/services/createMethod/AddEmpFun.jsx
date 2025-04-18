@@ -11,9 +11,10 @@ export const AddEmpFun = () => {
 
     const totalData = {
       empID:AddEmpValue.empID,
+      // traineeTrack:[JSON.stringify(AddEmpValue.traineeTrack)]
       traineeTrack:JSON.stringify(AddEmpValue.trainingTrack)
     };
-    console.log(totalData,"create");
+    // console.log(totalData,"create");
 
     try {
       const storedData=   await Promise.all([
@@ -24,7 +25,7 @@ export const AddEmpFun = () => {
              },
            })
          ])
-         console.log(storedData,"successfully create data");
+        //  console.log(storedData,"successfully create data");
 
        } catch (error) {
          console.error("Error executing GraphQL requests:", error);

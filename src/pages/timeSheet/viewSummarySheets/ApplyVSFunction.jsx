@@ -596,9 +596,9 @@ export const ApplyVSFunction = ({
                     const regex = /^x\(\d+(\.\d+)?\)\d+(\.\d+)?$/;
 
                     if (regex.test(value) && !regex.test(compareValue)) {
-                      compareData.workingHrs[dateKey] = "0";
+                      compareData.workingHrs[dateKey] = "";
                     } else if (!regex.test(value) && regex.test(compareValue)) {
-                      data.workingHrs[dateKey] = "0";
+                      data.workingHrs[dateKey] = "";
                     }
                   });
                 }
@@ -863,8 +863,6 @@ export const ApplyVSFunction = ({
             assignUpdaterDateTime: assignUpdaterDateTime,
           };
         }).filter(Boolean);
-
-      
 
         await ProcessedDataFunc(transformedData);
       };

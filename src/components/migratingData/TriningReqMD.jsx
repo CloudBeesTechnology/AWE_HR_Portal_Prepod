@@ -9,7 +9,7 @@ export const TriningReqMD = () => {
 
 const { AddEmpData } = AddEmpFun();
   const { TrReqUp } = AddEmpReqUp();
-// console.log(AddEmpReq);
+console.log(AddEmpReq);
 
   const excelDateToJSDate = (serial) => {
     const excelEpoch = new Date(Date.UTC(1900, 0, 1));
@@ -17,13 +17,13 @@ const { AddEmpData } = AddEmpFun();
     return new Date(excelEpoch.getTime() + daysOffset * 24 * 60 * 60 * 1000);
   };
 
-// Link 1:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus+Dev/TrainingReq+1.csv"
+// Link 1:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus+Dev/TrainingReqprodtest.csv"
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus+Dev/TrainingReq+1.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus+Dev/TrainingReqprodtest.csv",
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
@@ -72,12 +72,12 @@ const { AddEmpData } = AddEmpFun();
             ...AddEmpValue,
             id: checkingBJLTable.id,
           };
-        //   console.log(TMRDataUp, "UPDATE");
+          console.log(TMRDataUp, "UPDATE");
 
-          await TrReqUp({ TMRDataUp });
+          // await TrReqUp({ TMRDataUp });
         } else {
           console.log(AddEmpValue, "create");
-        //   await AddEmpData({ AddEmpValue });
+          await AddEmpData({ AddEmpValue });
         }
       }
     } catch (error) {
