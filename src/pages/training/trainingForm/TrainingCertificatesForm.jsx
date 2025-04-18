@@ -61,6 +61,8 @@ export const TrainingCertificatesForm = () => {
           certifiExpiry: "",
           eCertifiDate: "",
           orgiCertifiDate: "",
+          traineeSD: "",
+          traineeED: "",
           poNo: "",
           addDescretion: [],
           tcRemarks: "",
@@ -270,6 +272,8 @@ export const TrainingCertificatesForm = () => {
   };
 
   const searchResult = (result) => {
+    console.log("Res", result);
+
     if (!result) {
       console.warn("Search result is undefined or null");
       return;
@@ -414,6 +418,8 @@ export const TrainingCertificatesForm = () => {
         console.error("Error parsing training data:", error);
       }
     } else if (trainingTrackData) {
+      console.log("TRack", trainingTrackData);
+
       setUploadedDocs({ trainingUpCertifi: { 0: [] } });
       setUploadedCertify({ "0_trainingUpCertifi": [] });
       setFileNames({ "0_trainingUpCertifi": [] });
@@ -428,10 +434,11 @@ export const TrainingCertificatesForm = () => {
           certifiExpiry: "",
           eCertifiDate: "",
           orgiCertifiDate: "",
+          traineeSD: trackItem?.traineeSD,
+          traineeED: trackItem?.traineeED,
           poNo: "",
           addDescretion: [],
           tcRemarks: "",
-          trainingUpCertifi: [],
         }));
 
         // Set the values from track data
@@ -441,6 +448,8 @@ export const TrainingCertificatesForm = () => {
           if (trackItem.courseCode)
             setValue("courseCode", trackItem.courseCode);
           if (trackItem.company) setValue("company", trackItem.company);
+          if (trackItem.traineeSD) setValue("traineeSD", trackItem?.traineeSD);
+          if (trackItem.traineeED) setValue("traineeED", trackItem?.traineeED);
         });
 
         // Set the complete training proof data with values from traineeTrack
@@ -461,6 +470,8 @@ export const TrainingCertificatesForm = () => {
             company: "",
             certifiExpiry: "",
             eCertifiDate: "",
+            traineeSD: "",
+            traineeED: "",
             orgiCertifiDate: "",
             poNo: "",
             addDescretion: [],
@@ -483,6 +494,8 @@ export const TrainingCertificatesForm = () => {
       certifiExpiry: "",
       eCertifiDate: "",
       orgiCertifiDate: "",
+      traineeSD: "",
+      traineeED: "",
       poNo: "",
       addDescretion: [],
       tcRemarks: "",
@@ -549,6 +562,8 @@ export const TrainingCertificatesForm = () => {
             tcRemarks,
             addDescretion,
             trainingUpCertifi,
+            traineeSD,
+            traineeED
           }) => ({
             certifiExpiry,
             eCertifiDate,
@@ -557,6 +572,8 @@ export const TrainingCertificatesForm = () => {
             tcRemarks,
             addDescretion,
             trainingUpCertifi,
+            traineeSD,
+            traineeED
           })
         );
       };
@@ -580,7 +597,7 @@ export const TrainingCertificatesForm = () => {
         await TCDataFunUp({ TCDataUp });
         setShowTitle("Training Certificate Details Updated successfully");
         setNotification(true);
-        // console.log("Update:", TCDataUp);
+        console.log("Update:", TCDataUp);
       } else {
         const TCValue = {
           ...data,
@@ -599,7 +616,7 @@ export const TrainingCertificatesForm = () => {
         await TCData({ TCValue });
         setShowTitle("Training Certificate Details Saved successfully");
         setNotification(true);
-        // console.log("Create:", TCValue);
+        console.log("Create:", TCValue);
       }
     } catch (err) {
       console.log(err);
@@ -817,6 +834,24 @@ export const TrainingCertificatesForm = () => {
                     {errors.orgiCertifiDate.message}
                   </p>
                 )}
+              </div>
+
+                            <div>
+                <label className="text_size_5">Start Date</label>
+                <input
+                  type="date"
+                  {...register(`trainingProof.${index}.traineeSD`)}
+                  className="input-field"
+                />
+              </div>
+
+              <div>
+                <label className="text_size_5">End Date</label>
+                <input
+                  type="date"
+                  {...register(`trainingProof.${index}.traineeED`)}
+                  className="input-field"
+                />
               </div>
 
               <div className="mb-2">

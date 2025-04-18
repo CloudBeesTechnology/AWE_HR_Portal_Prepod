@@ -16,6 +16,8 @@ export const TcViewData = () => {
       { header: "Employee Badge No", key: "empBadgeNo" },
       { header: "Name", key: "name" },
       { header: "Purchase Order", key: "poNo" },
+      { header: "Start Date", key: "traineeSD" },
+      { header: "End Date", key: "traineeED" },
       { header: "Certificate Expiry", key: "certifiExpiry" },
       { header: "E-certificate Date", key: "eCertifiDate" },
       { header: "Original Certificate Date", key: "orgiCertifiDate" },
@@ -29,12 +31,6 @@ export const TcViewData = () => {
     { header: "Department", key: "department" },
     { header: "Position", key: "position" },
   ];
-
-  const handleDate = (e, type) => {
-    const value = e.target.value;
-    if (type === "startDate") setStartDate(value);
-    if (type === "endDate") setEndDate(value);
-  };
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -101,274 +97,116 @@ export const TcViewData = () => {
 
   // Filter data when startDate or endDate changes
 
-  // useEffect(() => {
-  //   if (!mergeData.length) return;
-    
-  //   // Parse filter dates (input format is YYYY-MM-DD from date inputs)
-  //   const start = startDate ? new Date(startDate) : null;
-  //   const end = endDate ? new Date(endDate) : null;
-    
-  //   if (!start && !end) {
-  //     setFilteredData(mergeData);
-  //     return;
-  //   }
-  
-  //   const filtered = mergeData.filter((data) => {
-  //     // First filter by work status (if needed)
-  //     if (Array.isArray(data?.workStatus) && data?.workStatus.length > 0) {
-  //       const lastWorkStatus = data.workStatus[data.workStatus.length - 1];
-  //       if (
-  //         lastWorkStatus.toUpperCase() === "TERMINATION" ||
-  //         lastWorkStatus.toUpperCase() === "RESIGNATION"
-  //       ) {
-  //         return false;
-  //       }
-  //     }
-  
-  //     let certifiExpiryDate = null;
-    
-  //     try {
-  //       if (data.trainingProof && data.trainingProof.length > 0) {
-  //         const lastProofItem = data.trainingProof[data.trainingProof.length - 1];
-  //         const proof = JSON.parse(lastProofItem);
-    
-  //         if (Array.isArray(proof)) {
-  //           const lastProof = proof[proof.length - 1];
-  //           if (lastProof?.certifiExpiry) {
-  //             certifiExpiryDate = new Date(lastProof.certifiExpiry);
-  //           }
-  //         } else if (proof?.certifiExpiry) {
-  //           // Handle case where proof is not an array but has certifiExpiry
-  //           certifiExpiryDate = new Date(proof.certifiExpiry);
-  //         }
-  //       }
-  //     } catch (e) {
-  //       console.error("Error parsing trainingProof:", e);
-  //     }
-    
-  //     if (!certifiExpiryDate || isNaN(certifiExpiryDate.getTime())) return false;
-  
-  //     // Normalize dates to midnight for accurate comparison
-  //     const normalizeDate = (date) => {
-  //       const d = new Date(date);
-  //       d.setHours(0, 0, 0, 0);
-  //       return d;
-  //     };
-  
-  //     const normalizedExpiry = normalizeDate(certifiExpiryDate);
-  //     const normalizedStart = start ? normalizeDate(start) : null;
-  //     const normalizedEnd = end ? normalizeDate(end) : null;
-  
-  //     // Single day selection
-  //     if (normalizedStart && normalizedEnd && normalizedStart.getTime() === normalizedEnd.getTime()) {
-  //       return normalizedExpiry.getTime() === normalizedStart.getTime();
-  //     }
-      
-  //     // Date range selection
-  //     if (normalizedStart && normalizedEnd) {
-  //       return normalizedExpiry >= normalizedStart && normalizedExpiry <= normalizedEnd;
-  //     }
-      
-  //     // Only start date
-  //     if (normalizedStart) return normalizedExpiry >= normalizedStart;
-      
-  //     // Only end date
-  //     if (normalizedEnd) return normalizedExpiry <= normalizedEnd;
-  
-  //     return true;
-  //   });
-    
-  //   setFilteredData(filtered);
-  // }, [startDate, endDate, mergeData]);
+  const handleDate = (e, type) => {
+    const value = e.target.value;
 
-  useEffect(() => {
-    console.log('[Filter] Effect triggered', { startDate, endDate, mergeDataLength: mergeData.length });
-  
-    if (!mergeData.length) {
-      console.log('[Filter] No mergeData available');
-      return;
-    }
-    
-    // Parse filter dates
-    const start = startDate ? new Date(startDate) : null;
-    const end = endDate ? new Date(endDate) : null;
-    console.log('[Filter] Parsed dates', { 
-      start: start?.toISOString(), 
-      end: end?.toISOString() 
-    });
-    
-    if (!start && !end) {
-      console.log('[Filter] No date filters - returning all data');
-      setFilteredData(mergeData);
-      return;
-    }
-  
-    console.log('[Filter] Starting filtering process...');
-    const filtered = mergeData.filter((data, index) => {
-      console.group(`[Filter] Processing record ${index} - EmpID: ${data.empID}`);
-      
-      // Work status check
-      if (Array.isArray(data?.workStatus) && data?.workStatus.length > 0) {
-        const lastWorkStatus = data.workStatus[data.workStatus.length - 1];
-        console.log('[Filter] Work status:', lastWorkStatus);
-        
-        if (
-          lastWorkStatus.toUpperCase() === "TERMINATION" ||
-          lastWorkStatus.toUpperCase() === "RESIGNATION"
-        ) {
-          console.log('[Filter] Excluded - terminated/resigned');
-          console.groupEnd();
-          return false;
-        }
-      }
-  
-      // Parse training proof
-      let certifiExpiryDate = null;
+    if (type === "startDate") setStartDate(value);
+    if (type === "endDate") setEndDate(value);
+
+    const start =
+      type === "startDate"
+        ? new Date(value)
+        : startDate
+        ? new Date(startDate)
+        : null;
+    const end =
+      type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
+
+    const filtered = mergeData.filter((data) => {
+      // Get traineeSD from traineeTrack (using the LAST item in the array)
+      let traineeStartDate = null;
+      let traineeEndDate = null;
+
       try {
-        if (data.trainingProof && data.trainingProof.length > 0) {
-          console.log('[Filter] Training proof exists, length:', data.trainingProof.length);
-          const lastProofItem = data.trainingProof[data.trainingProof.length - 1];
-          console.log('[Filter] Last proof item:', lastProofItem);
-          
-          const proof = JSON.parse(lastProofItem);
-          console.log('[Filter] Parsed proof:', proof);
-  
-          if (Array.isArray(proof)) {
-            console.log('[Filter] Proof is array, length:', proof.length);
-            const lastProof = proof[proof.length - 1];
-            if (lastProof?.certifiExpiry) {
-              certifiExpiryDate = new Date(lastProof.certifiExpiry);
-              console.log('[Filter] Got expiry date from array proof:', certifiExpiryDate);
+        if (data.traineeTrack && data.traineeTrack.length > 0) {
+          // Get the last element of traineeTrack array
+          const lastTrackItem = data.traineeTrack[data.traineeTrack.length - 1];
+          const track = safeParseData(lastTrackItem);
+
+          // console.log(track[track.length - 1]);
+          if (Array.isArray(track)) {
+            const lastTrack = track[track.length - 1];
+            if (lastTrack?.traineeSD) {
+              traineeStartDate = new Date(lastTrack.traineeSD);
             }
-          } else if (proof?.certifiExpiry) {
-            certifiExpiryDate = new Date(proof.certifiExpiry);
-            console.log('[Filter] Got expiry date from object proof:', certifiExpiryDate);
+            if (lastTrack?.traineeED) {
+              traineeEndDate = new Date(lastTrack.traineeED); // Get end date
+            }
+          } else {
+            if (track.traineeSD) {
+              traineeStartDate = new Date(track.traineeSD); // Get start date
+            }
+            if (track.traineeED) {
+              traineeEndDate = new Date(track.traineeED); // Get end date
+            }
           }
-        } else {
-          console.log('[Filter] No training proof available');
         }
       } catch (e) {
-        console.error('[Filter] Error parsing trainingProof:', e);
+        console.error("Error parsing traineeTrack:", e);
       }
-      
-      if (!certifiExpiryDate || isNaN(certifiExpiryDate.getTime())) {
-        console.log('[Filter] No valid expiry date - excluding');
-        console.groupEnd();
-        return false;
+
+      if (!traineeStartDate || !traineeEndDate) return false;
+
+      if (start && end)
+        return traineeStartDate >= start && traineeEndDate <= end;
+      if (start) {
+        return traineeStartDate >= start && traineeEndDate >= start; // Ensure both dates are within the start date
       }
-  
-      // Date normalization and comparison
-      const normalizeDate = (date) => {
-        const d = new Date(date);
-        d.setHours(0, 0, 0, 0);
-        return d;
-      };
-  
-      const normalizedExpiry = normalizeDate(certifiExpiryDate);
-      const normalizedStart = start ? normalizeDate(start) : null;
-      const normalizedEnd = end ? normalizeDate(end) : null;
-      
-      console.log('[Filter] Normalized dates:', {
-        expiry: normalizedExpiry.toISOString(),
-        start: normalizedStart?.toISOString(),
-        end: normalizedEnd?.toISOString()
-      });
-  
-      // Single day selection
-      if (normalizedStart && normalizedEnd && normalizedStart.getTime() === normalizedEnd.getTime()) {
-        const isMatch = normalizedExpiry.getTime() === normalizedStart.getTime();
-        console.log('[Filter] Single day check:', isMatch);
-        console.groupEnd();
-        return isMatch;
+      if (end) {
+        return traineeStartDate <= end && traineeEndDate <= end; // Ensure both dates are within the end date
       }
-      
-      // Date range selection
-      if (normalizedStart && normalizedEnd) {
-        const isInRange = normalizedExpiry >= normalizedStart && normalizedExpiry <= normalizedEnd;
-        console.log('[Filter] Date range check:', isInRange);
-        console.groupEnd();
-        return isInRange;
-      }
-      
-      // Only start date
-      if (normalizedStart) {
-        const isAfterStart = normalizedExpiry >= normalizedStart;
-        console.log('[Filter] Start date only check:', isAfterStart);
-        console.groupEnd();
-        return isAfterStart;
-      }
-      
-      // Only end date
-      if (normalizedEnd) {
-        const isBeforeEnd = normalizedExpiry <= normalizedEnd;
-        console.log('[Filter] End date only check:', isBeforeEnd);
-        console.groupEnd();
-        return isBeforeEnd;
-      }
-  
-      console.log('[Filter] No date conditions - including');
-      console.groupEnd();
+
       return true;
     });
-    
-    console.log('[Filter] Filtering complete. Results:', {
-      totalRecords: mergeData.length,
-      filteredCount: filtered.length,
-      filteredRecords: filtered.map(f => ({
-        empID: f.empID,
-        name: f.name,
-        certifiExpiry: f.trainingProof?.[f.trainingProof.length - 1]?.certifiExpiry
-      }))
-    });
-    
+    console.log(filtered);
+
     setFilteredData(filtered);
-  }, [startDate, endDate, mergeData]);
-  
+  };
+
   const safeParseData = (data) => {
     try {
-  
       let raw;
       if (Array.isArray(data)) {
         raw = data[0];
       } else {
         raw = data;
       }
-  
+
       if (typeof raw === "string" && raw.startsWith('"') && raw.endsWith('"')) {
         raw = JSON.parse(raw);
       }
-  
+
       const fixedJSON = raw.replace(/([{,])\s*(\w+)\s*:/g, '$1"$2":');
-  
+
       const parsed = JSON.parse(fixedJSON);
-  
+
       return Array.isArray(parsed) ? parsed : [parsed];
     } catch (error) {
       console.error("Error normalizing traineeTrackData:", error);
       return [];
     }
   };
-  
+
   const finalData = filteredData
     .sort((a, b) => new Date(b.CertifyCreatedAt) - new Date(a.CertifyCreatedAt))
     .map((data) => {
-  
       let certifiExpiry = "N/A";
       let eCertifiDate = "N/A";
       let orgiCertifiDate = "N/A";
       let poNo = "N/A";
-  
+      let traineeSD = "N/A";
+      let traineeED = "N/A";
+
       try {
         if (data.trainingProof && data.trainingProof) {
-  
           const proof = safeParseData(data.trainingProof);
-  
+
           let lastProof = proof;
-  
+
           if (Array.isArray(proof)) {
             lastProof = proof[proof.length - 1];
           }
-  
+
           if (lastProof) {
             certifiExpiry = lastProof.certifiExpiry
               ? formatDate(lastProof.certifiExpiry)
@@ -384,10 +222,32 @@ export const TcViewData = () => {
         } else {
           console.log("No valid trainingProof found for this entry.");
         }
+
+        // Extract from traineeTrack
+        if (data.traineeTrack && data.traineeTrack) {
+          const track = safeParseData(data.traineeTrack);
+
+          let lastTrack = track;
+
+          if (Array.isArray(track)) {
+            lastTrack = track[track.length - 1];
+          }
+
+          if (lastTrack) {
+            traineeSD = lastTrack.traineeSD
+              ? formatDate(lastTrack.traineeSD)
+              : "N/A";
+            traineeED = lastTrack.traineeED
+              ? formatDate(lastTrack.traineeED)
+              : "N/A";
+          }
+        } else {
+          console.log("No valid traineeTrack found for this entry.");
+        }
       } catch (e) {
-        console.error("Error parsing trainingProof:", e);
+        console.error("Error parsing trainingProof or traineeTrack:", e);
       }
-  
+
       const finalEntry = {
         ...data,
         empID: data.empID || "-",
@@ -397,6 +257,8 @@ export const TcViewData = () => {
         eCertifiDate,
         orgiCertifiDate,
         poNo,
+        traineeSD,
+        traineeED,
         department: Array.isArray(data.department)
           ? data.department[data.department.length - 1]
           : "-",
@@ -404,10 +266,10 @@ export const TcViewData = () => {
           ? data.position[data.position.length - 1]
           : "-",
       };
-  
+
       return finalEntry;
     });
-  
+
   return (
     <section className="bg-[#F8F8F8] mx-auto p-5 h-full w-full">
       <div className="w-full flex items-center justify-between gap-5 my-5">
