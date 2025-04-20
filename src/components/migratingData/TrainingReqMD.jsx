@@ -18,12 +18,25 @@ console.log(AddEmpReq);
   };
 
 // Link 1:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus+Dev/TrainingReqprodtest.csv"
+// Link 2:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingReq+HO.csv"
+// Link 3:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingReq+Single+OME.csv"
+// Link 4:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingReq+BLNG+and+E%26I+Single+Prod.csv"
+// Link 5:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/traineeReq+Double+BLNG+and+E%26I.csv"
+// Link 6:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingReq_Data_Set1.csv"
+// Link 7:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/traininReq_Data_Set2.csv"
+// Link 8:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingReq_Data_Set3.csv"
+// Link 9:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq_Data_Set4.csv"
+// Link 10:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq_Data_Set5.csv"
+// Link 11:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq_Data_Set6.csv"
+// Link 12:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/Trainingreq_Data_Set7.csv"
+// Link 13:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq_Data_Set8.csv"
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus+Dev/TrainingReqprodtest.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq_Data_Set8.csv",
+   
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
@@ -72,11 +85,11 @@ console.log(AddEmpReq);
             ...AddEmpValue,
             id: checkingBJLTable.id,
           };
-          console.log(TMRDataUp, "UPDATE");
+          // console.log(TMRDataUp, "UPDATE");
 
-          // await TrReqUp({ TMRDataUp });
+          await TrReqUp({ TMRDataUp });
         } else {
-          console.log(AddEmpValue, "create");
+          // console.log(AddEmpValue, "create");
           await AddEmpData({ AddEmpValue });
         }
       }

@@ -1,4 +1,3 @@
-
 import React, { useContext, useState } from "react";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -47,13 +46,13 @@ export const FilterTable = ({
   filteredTableBody = filteredTableBody?.filter((row) => {
     const query = searchQuery?.toLowerCase();
     return (
-      String(row.name || "")
+      String(row?.name || "")
         ?.toLowerCase()
         ?.includes(query) ||
-      String(row.empID || "")
+      String(row?.empID || "")
         ?.toLowerCase()
         ?.includes(query) ||
-      String(row.empBadgeNo || "")
+      String(row?.empBadgeNo || "")
         ?.toLowerCase()
         ?.includes(query)
     );
@@ -125,11 +124,13 @@ export const FilterTable = ({
 
     const processedData = filteredTableBody.map((row) => {
       const processedRow = {};
-      for (const [key, value] of Object.entries(row)) {
-        const formattedKey = formatKey(key);
-        processedRow[formattedKey] = Array.isArray(value)
-          ? value.join(", ")
-          : value;
+      if (row && typeof row === "object") {
+        for (const [key, value] of Object.entries(row)) {
+          const formattedKey = formatKey(key);
+          processedRow[formattedKey] = Array.isArray(value)
+            ? value?.join(", ")
+            : value;
+        }
       }
       return processedRow;
     });
@@ -142,9 +143,9 @@ export const FilterTable = ({
     const headerRow = worksheet.addRow([title]);
     headerRow.font = { bold: true, size: 16 };
     headerRow.alignment = { horizontal: "center", vertical: "middle" };
-    
+
     worksheet.mergeCells(1, 1, 1, Object.keys(processedData[0]).length);
-  
+
     const dateRow = [];
     if (startDate) {
       dateRow.push(`Start Date: ${DateFormat(startDate)}`);
@@ -317,33 +318,49 @@ export const FilterTable = ({
                 </tr>
               </thead>
               <tbody className="bg-white">
-                {currentItems.map((row, rowIndex) => (
-                  <tr key={rowIndex} className="text-sm border-b-2 border-[#CECECE]">
-                    {Object.entries(row).map(([key, col], colIndex) => {
-                      const isExpired =
-                        key === "expAndValid" && col === "EXPIRED";
-                      const displayValue = col == null ? "N/A" : Array.isArray(col) ? `${col[col.length - 1]}` : `${col}`;
-                      return (
+                {currentItems?.map((row, rowIndex) =>
+                  row && typeof row === "object" ? (
+                    <tr
+                      key={rowIndex}
+                      className="text-sm border-b-2 border-[#CECECE]"
+                    >
+                      {Object.entries(row).map(([key, col], colIndex) => {
+                        const isExpired =
+                          key === "expAndValid" && col === "EXPIRED";
+                        const displayValue =
+                          col == null
+                            ? "N/A"
+                            : Array.isArray(col)
+                            ? `${col[col.length - 1]}`
+                            : `${col}`;
+                        return (
+                          <td
+                            key={colIndex}
+                            className={`border-b-2 text-center uppercase border-[#CECECE] p-2 ${
+                              isExpired ? "text-[red]" : ""
+                            }`}
+                          >
+                            {displayValue}
+                          </td>
+                        );
+                      })}
+                      {[
+                        "Probation Review",
+                        "Probation Form Update",
+                        "Recruitment & Mobilization",
+                        "Contract Expiry Review",
+                        "Contract Expiry Form Update",
+                      ].includes(title) && (
                         <td
-                          key={colIndex}
-                          className={`border-b-2 text-center uppercase border-[#CECECE] p-2 ${
-                            isExpired ? "text-[red]" : ""
-                          }`}
+                          className="underline text-center border-[#CECECE] p-2 cursor-pointer text-[blue]"
+                          onClick={() => handleViewDetails(row)}
                         >
-                          {displayValue}
+                          View Details
                         </td>
-                      );
-                    })}
-                    {["Probation Review", "Probation Form Update", "Recruitment & Mobilization", "Contract Expiry Review", "Contract Expiry Form Update"].includes(title) && (
-                      <td
-                        className="underline text-center border-[#CECECE] p-2 cursor-pointer text-[blue]"
-                        onClick={() => handleViewDetails(row)}
-                      >
-                        View Details
-                      </td>
-                    )}
-                  </tr>
-                ))}
+                      )}
+                    </tr>
+                  ) : null
+                )}
               </tbody>
             </table>
           </div>
@@ -453,7 +470,7 @@ export const FilterTable = ({
 //         ?.toLowerCase()
 //         ?.includes(query)
 //     );
-    
+
 //   });
 //   filteredTableBody = filteredTableBody?.filter((row) => {
 //     const workStatus = row?.workStatus?.toUpperCase(); // Convert to uppercase for case-insensitive comparison
@@ -527,9 +544,9 @@ export const FilterTable = ({
 //     const headerRow = worksheet.addRow([title]);
 //     headerRow.font = { bold: true, size: 16 };
 //     headerRow.alignment = { horizontal: "center", vertical: "middle" };
-    
+
 //     worksheet.mergeCells(1, 1, 1, Object.keys(processedData[0]).length);
-  
+
 //     const dateRow = [];
 //     if (startDate) {
 //       dateRow.push(`Start Date: ${DateFormat(startDate)}`);

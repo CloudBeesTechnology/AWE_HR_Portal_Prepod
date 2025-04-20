@@ -22,6 +22,7 @@ export const TrainingRCData = () => {
     "Department",
     "Other Department",
     "Position",
+    "Other Position",
     "START DATE",
     "END DATE",
     "CERT. EXP",
@@ -49,6 +50,34 @@ export const TrainingRCData = () => {
     return expiryDate < today ? "EXPIRED" : "VALID";
   };
 
+  const normalizeTraineeTrackData = (data) => {
+    try {
+      let raw;
+
+      // CASE 1: data is an array like ['[{MRNo:...}]'] or ['[{"MRNo":"..."}]']
+      if (Array.isArray(data)) {
+        raw = data[0];
+      } else {
+        raw = data;
+      }
+
+      // Remove outer quotes if it's a stringified string (e.g. "\"[{...}]\"")
+      if (typeof raw === "string" && raw.startsWith('"') && raw.endsWith('"')) {
+        raw = JSON.parse(raw); // unescape once
+      }
+
+      // Now, handle unquoted keys: MRNo: -> "MRNo":
+      const fixedJSON = raw.replace(/([{,])\s*(\w+)\s*:/g, '$1"$2":');
+
+      const parsed = JSON.parse(fixedJSON);
+
+      return Array.isArray(parsed) ? parsed : [parsed];
+    } catch (error) {
+      console.error("Error normalizing traineeTrackData:",data);
+      return [];
+    }
+  };
+
   const resignationMergedData = (data) => {
     return data
       .filter((item) => {
@@ -59,7 +88,7 @@ export const TrainingRCData = () => {
             lastWorkStatus.toUpperCase() === "TERMINATION" ||
             lastWorkStatus.toUpperCase() === "RESIGNATION"
           ) {
-            return false; 
+            return false;
           }
         }
         return true;
@@ -71,13 +100,24 @@ export const TrainingRCData = () => {
         // return certifiExpiry;
       })
       .flatMap((item) => {
-        const trainingTrack = JSON.parse(item.traineeTrack || "[]");
-        const trainingProofs = JSON.parse(item.trainingProof || "[]");
+        const trainingTrack = normalizeTraineeTrackData(
+          item.traineeTrack || "[]"
+        );
+        const trainingProofs = normalizeTraineeTrackData(
+          item.trainingProof || "[]"
+        );
+        // console.log(trainingTrack);
 
         return trainingTrack.map((track) => {
           // Match proof using MRNo or courseCode
           const proof =
-            trainingProofs.find((p) => p.empID === track.empID) || {};
+          trainingProofs.find(
+            (p) =>
+              p.empID === track.empID &&
+              p.MRNo === track.MRNo &&
+              p.traineeSD === track.traineeSD &&
+              p.traineeED === track.traineeED
+          ) || {};
           // console.log(proof, "proof");
 
           return {
@@ -98,6 +138,9 @@ export const TrainingRCData = () => {
               : "-",
             position: Array.isArray(item.position)
               ? item.position[item.position.length - 1]
+              : "-",
+            otherPosition: Array.isArray(item.otherPosition)
+              ? item.otherPosition[item.otherPosition.length - 1]
               : "-",
             startDate: formatDate(track.traineeSD) || "-",
             endDate: formatDate(track.traineeED) || "-",
@@ -140,71 +183,77 @@ export const TrainingRCData = () => {
 
     const filtered = allData
       .filter((data) => {
-        if (!Array.isArray(data.workStatus) || data.workStatus.length === 0) {
-          return false; // Return early if workStatus is undefined or an empty array
-        }
+        if (!Array.isArray(data.workStatus) || data.workStatus.length === 0)
+          return false;
 
         const lastWorkStatus = data.workStatus[data.workStatus.length - 1];
-
-        if (
-          lastWorkStatus?.toUpperCase() === "TERMINATION" ||
-          lastWorkStatus?.toUpperCase() === "RESIGNATION"
-        ) {
-          return false; // Exclude records with TERMINATION or RESIGNATION
-        }
-        const expiryArray = data.certifiExpiry || [];
-        const expiryDate = expiryArray.length
-          ? new Date(expiryArray[expiryArray.length - 1])
-          : null;
-
-        if (!expiryDate || isNaN(expiryDate.getTime())) return false;
-
-        if (start && end) return expiryDate >= start && expiryDate <= end;
-        if (start) return expiryDate >= start;
-        if (end) return expiryDate <= end;
-
-        return true;
+        return !["TERMINATION", "RESIGNATION"].includes(
+          lastWorkStatus?.toUpperCase()
+        );
       })
-      .map((item) => ({
-        empID: item.empID || "-",
-        empBadgeNo: item.empBadgeNo || "-",
-        name: item.name || "-",
-        MRNo: item.MRNo || "-",
-        poNo: item.poNo || "-",
-        courseCode: item.courseCode || "-",
-        courseName: item.courseName || "-",
-        company: item.company || "-",
-        traineeCourseFee: item.traineeCourseFee || "-",
-        department: Array.isArray(item.department)
-          ? item.department[item.department.length - 1]
-          : "-",
-        otherDepartment: Array.isArray(item.otherDepartment)
-          ? item.otherDepartment[item.otherDepartment.length - 1]
-          : "-",
-        position: Array.isArray(item.position)
-          ? item.position[item.position.length - 1]
-          : "-",
+      .flatMap((item) => {
+        const trainingTrack = normalizeTraineeTrackData(
+          item.traineeTrack || "[]"
+        );
 
-        traineeSD: formatDate(item.traineeSD) || "-",
-        traineeED: formatDate(item.traineeED) || "-",
-        certifiExpiry: Array.isArray(item.certifiExpiry)
-          ? formatDate(item.certifiExpiry[item.certifiExpiry.length - 1])
-          : "-",
-        expAndValid: checkExpiryStatus(item.certifiExpiry),
-        traineeStatus: item.traineeStatus || "-",
-        eCertifiDate: Array.isArray(item.eCertifiDate)
-          ? formatDate(item.eCertifiDate[item.eCertifiDate.length - 1])
-          : "-",
-        orgiCertifiDate: Array.isArray(item.orgiCertifiDate)
-          ? formatDate(item.orgiCertifiDate[item.orgiCertifiDate.length - 1])
-          : "-",
-        remark: item.remark || "-",
-        rawCertifiExpiry: new Date(item.certifiExpiry),
-      }))
-      .sort((a, b) => a.rawCertifiExpiry - b.rawCertifiExpiry)
-      .map(({ rawCertifiExpiry, ...rest }) => rest);
+        return trainingTrack
+          .filter((track) => {
+            const sd = new Date(track.traineeSD);
+            const ed = new Date(track.traineeED);
+
+            if (!sd || !ed || isNaN(sd) || isNaN(ed)) return false;
+
+            if (start && end) return sd >= start && ed <= end;
+            if (start) return sd >= start;
+            if (end) return ed <= end;
+
+            return true;
+          })
+          .map((track) => ({
+            empID: item.empID || "-",
+            empBadgeNo: item.empBadgeNo || "-",
+            name: item.name || "-",
+            MRNo: item.MRNo || "-",
+            poNo: item.poNo || "-",
+            courseCode: item.courseCode || "-",
+            courseName: item.courseName || "-",
+            company: item.company || "-",
+            traineeCourseFee: item.traineeCourseFee || "-",
+            department: Array.isArray(item.department)
+              ? item.department[item.department.length - 1]
+              : "-",
+            otherDepartment: Array.isArray(item.otherDepartment)
+              ? item.otherDepartment[item.otherDepartment.length - 1]
+              : "-",
+            position: Array.isArray(item.position)
+              ? item.position[item.position.length - 1]
+              : "-",
+            otherPosition: Array.isArray(item.otherPosition)
+              ? item.otherPosition[item.otherPosition.length - 1]
+              : "-",
+            traineeSD: formatDate(track.traineeSD),
+            traineeED: formatDate(track.traineeED),
+            certifiExpiry: Array.isArray(item.certifiExpiry)
+              ? formatDate(item.certifiExpiry[item.certifiExpiry.length - 1])
+              : "-",
+            expAndValid: checkExpiryStatus(item.certifiExpiry),
+            traineeStatus: item.traineeStatus || "-",
+            eCertifiDate: Array.isArray(item.eCertifiDate)
+              ? formatDate(item.eCertifiDate[item.eCertifiDate.length - 1])
+              : "-",
+            orgiCertifiDate: Array.isArray(item.orgiCertifiDate)
+              ? formatDate(
+                  item.orgiCertifiDate[item.orgiCertifiDate.length - 1]
+                )
+              : "-",
+            remark: item.remark || "-",
+            rawCertifiExpiry: new Date(item.certifiExpiry),
+          }));
+      });
+
     setFilteredData(filtered);
   };
+
   return (
     <div>
       <FilterTable

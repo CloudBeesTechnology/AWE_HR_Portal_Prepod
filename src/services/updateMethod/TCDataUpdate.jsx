@@ -12,7 +12,8 @@ export const TCDataUpdate = () => {
     const totalData = {
       id: TCDataUp.id,
       empID: TCDataUp.empID,
-      trainingProof: JSON.stringify(TCDataUp.trainingProof),
+      trainingProof: [JSON.stringify(TCDataUp.trainingProof)]
+      // trainingProof: JSON.stringify(TCDataUp.trainingProof),
     };
 
     try {
@@ -24,7 +25,7 @@ export const TCDataUpdate = () => {
           },
         }),
       ]);
-      // console.log(storedData, "successfully Updated data");
+      console.log(storedData, "successfully Updated data");
     } catch (error) {
       console.log(error);
 

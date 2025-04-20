@@ -87,11 +87,11 @@ export const NonLocalMobTable = ({
         nextToken = result?.data?.listEmpPersonalInfos?.nextToken;
       } while (nextToken);
 
-      // Step 2: Filter only empIDs that start with 'AWE'
-      const filteredData = allEmpIDs.filter((empID) => empID.startsWith("AWE"));
+      // // Step 2: Filter only empIDs that start with 'AWE'
+      // const filteredData = allEmpIDs.filter((empID) => empID);
 
       // Step 3: Sort the empIDs numerically (based on the number part of the ID)
-      const sortedData = filteredData.sort((a, b) => {
+      const sortedData = allEmpIDs.sort((a, b) => {
         const numA = parseInt(a.replace(/[^\d]/g, ""), 10);
         const numB = parseInt(b.replace(/[^\d]/g, ""), 10);
         return numA - numB;
@@ -127,6 +127,7 @@ export const NonLocalMobTable = ({
     };
     fetchNextTempID();
   }, []);
+console.log(latestTempIDData);
 
   // const OnSubmit = async (candi) => {
   //   const storedData = {

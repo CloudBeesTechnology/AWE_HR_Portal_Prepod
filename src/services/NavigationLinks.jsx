@@ -119,7 +119,7 @@ import { AddDropDown } from "../components/migratingData/AddDropDown";
 import { OffshoreORMC } from "../pages/timeSheet/OffshoreORMC";
 import { OffshoreExcelSheets } from "../pages/timeSheet/OffshoreExcelSheets";
 import { TrainingCertifyMD } from "../components/migratingData/TrainingCertifyMD";
-import { TriningReqMD } from "../components/migratingData/TriningReqMD";
+import { TriningReqMD } from "../components/migratingData/TrainingReqMD";
 const client = generateClient();
 
 const NavigationLinks = () => {

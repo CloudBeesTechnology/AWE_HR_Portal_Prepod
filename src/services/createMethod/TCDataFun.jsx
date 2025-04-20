@@ -13,7 +13,7 @@ export const TCDataFun = () => {
       trainingProof: [JSON.stringify(TCValue.trainingProof)],
       // trainingProof: JSON.stringify(TCValue.trainingProof),
     };
-    console.log(totalData);
+    // console.log(totalData);
 
     try {
       const storedData=   await Promise.all([
@@ -24,7 +24,7 @@ export const TCDataFun = () => {
              },
            })
          ])
-        //  console.log(storedData,"successfully create data");
+         console.log(storedData,"successfully create data");
 
        } catch (error) {
          console.error("Error executing GraphQL requests:", error);
