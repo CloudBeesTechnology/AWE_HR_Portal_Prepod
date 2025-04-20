@@ -701,8 +701,6 @@ export const ViewSBWsheet = ({
       }
     );
 
-    
-
     if (
       (filteredResults && filteredResults.length > 0) ||
       (filteredResults && filteredResults.length === 0) ||
@@ -724,7 +722,7 @@ export const ViewSBWsheet = ({
       setLoadingMessForDelay(false);
     } else {
       setLoadingMessForDelay(false);
-      console.log("waiting...");
+     
     }
   };
 
@@ -1138,6 +1136,7 @@ export const ViewSBWsheet = ({
                       } else if (excelData && excelData) {
                         storeInitialData();
                       }
+
                       // const fetchDataAndDelete = async () => {
                       //   try {
                       //     console.log("Fetching and Deleting SBW Data...");

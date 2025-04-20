@@ -6,14 +6,16 @@ import { getUrl } from "@aws-amplify/storage";
 import { DateFormat } from "../../../utils/DateFormat";
 
 const AddCertifyPopUp = ({ details, popupAll, onClose }) => {
-  const [fileUrls, setFileUrls] = useState({}); 
+  const [fileUrls, setFileUrls] = useState({});
   const [mergedData, setMergedData] = useState([]);
-  
+
   // Updated heading with new fields
   const heading = [
     { header: "Course Name", key: "courseName" },
     { header: "Course Code", key: "courseCode" },
     { header: "Company", key: "company" },
+    { header: "Training Start Date", key: "traineeSD" },
+    { header: "Training End Date", key: "traineeED" },
     { header: "Certificate Expiry", key: "certifiExpiry" },
     { header: "e-Certificate Date", key: "eCertifiDate" },
     { header: "Original Certificate Date", key: "orgiCertifiDate" },
@@ -23,30 +25,29 @@ const AddCertifyPopUp = ({ details, popupAll, onClose }) => {
     { header: "Upload Certificate", key: "trainingUpCertifi" },
   ];
 
+  const safeParseData = (data) => {
+    try {
+      let raw;
 
-    const safeParseData = (data) => {
-      try {
-        let raw;
-  
-        if (Array.isArray(data)) {
-          raw = data[0];
-        } else {
-          raw = data;
-        }
-  
-        if (typeof raw === "string" && raw.startsWith('"') && raw.endsWith('"')) {
-          raw = JSON.parse(raw);
-        }
-        
-        const fixedJSON = raw.replace(/([{,])\s*(\w+)\s*:/g, '$1"$2":');
-        const parsed = JSON.parse(fixedJSON);
-  
-        return Array.isArray(parsed) ? parsed : [parsed];
-      } catch (error) {
-        console.error("Error normalizing traineeTrackData:", error);
-        return [];
+      if (Array.isArray(data)) {
+        raw = data[0];
+      } else {
+        raw = data;
       }
-    };
+
+      if (typeof raw === "string" && raw.startsWith('"') && raw.endsWith('"')) {
+        raw = JSON.parse(raw);
+      }
+
+      const fixedJSON = raw.replace(/([{,])\s*(\w+)\s*:/g, '$1"$2":');
+      const parsed = JSON.parse(fixedJSON);
+
+      return Array.isArray(parsed) ? parsed : [parsed];
+    } catch (error) {
+      console.error("Error normalizing traineeTrackData:", error);
+      return [];
+    }
+  };
 
   useEffect(() => {
     const parsedTraineeTrack = safeParseData(details?.traineeTrack);
@@ -54,10 +55,10 @@ const AddCertifyPopUp = ({ details, popupAll, onClose }) => {
 
     // Merge the data by combining traineeTrack with each trainingProof item
     const merged = parsedTrainingProof.map((proofItem, index) => ({
-      ...(parsedTraineeTrack[index] || {}), 
-      ...proofItem
+      ...(parsedTraineeTrack[index] || {}),
+      ...proofItem,
     }));
-    
+
     setMergedData(merged);
 
     const fetchUrls = async () => {
@@ -69,7 +70,7 @@ const AddCertifyPopUp = ({ details, popupAll, onClose }) => {
           if (parsedCert.length > 0) {
             const filePath = parsedCert[0].upload;
             const { url } = await getUrl({ path: filePath });
-            urls[i] = url; 
+            urls[i] = url;
           }
         } catch (err) {
           console.error("Invalid certificate format:", err);
@@ -83,9 +84,9 @@ const AddCertifyPopUp = ({ details, popupAll, onClose }) => {
 
   // Function to handle array fields (department and position)
   const getDisplayValue = (key, value) => {
-    if (key === 'department' || key === 'position') {
+    if (key === "department" || key === "position") {
       if (Array.isArray(value)) {
-        return value[value.length - 1]; 
+        return value[value.length - 1];
       }
     }
     return value;
@@ -125,7 +126,9 @@ const AddCertifyPopUp = ({ details, popupAll, onClose }) => {
             mergedData?.map((val, idx) => {
               return (
                 <div key={idx} className="mb-4 pb-4">
-                  <h3 className="font-bold underline mb-2">{`Training ${idx + 1}`}</h3>
+                  <h3 className="font-bold underline mb-2">{`Training ${
+                    idx + 1
+                  }`}</h3>
                   {heading.map((item, index) => {
                     const value = val[item.key];
                     let formattedValue = value;
@@ -139,7 +142,10 @@ const AddCertifyPopUp = ({ details, popupAll, onClose }) => {
                     }
 
                     return (
-                      <article key={index} className="flex justify-between text-[14px] mb-1 leading-7">
+                      <article
+                        key={index}
+                        className="flex justify-between text-[14px] mb-1 leading-7"
+                      >
                         <p className="flex-1 text-start font-medium">
                           {item.header}
                         </p>

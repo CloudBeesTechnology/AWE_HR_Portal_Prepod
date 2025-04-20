@@ -36,7 +36,7 @@ export const UseFetchDataForSummary = (
         if (startDate && endDate && location) {
           const Position = localStorage.getItem("userType");
           setGetPosition(Position);
-
+          // console.log("Start Date : ", new Date());
           let nextToken = null;
           let allData = [];
 
@@ -74,6 +74,7 @@ export const UseFetchDataForSummary = (
             ];
           } while (nextToken);
 
+          // console.log("End Date : ", new Date());
           const filteredData = allData.filter((item) =>
             isDateInRange(item.date, startDate, endDate)
           );

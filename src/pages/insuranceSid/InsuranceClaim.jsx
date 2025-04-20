@@ -357,7 +357,7 @@ export const InsuranceClaim = () => {
         };
         // console.log(ICValuse, "update");
         await InsClaimUpData({ ICValuse });
-        setShowTitle("Dependent Insurance Info Updated successfully");
+        setShowTitle("Insurance claim Updated successfully");
         setNotification(true);
       } else {
         const ICValuse = {

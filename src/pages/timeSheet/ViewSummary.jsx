@@ -21,6 +21,7 @@ export const ViewSummary = () => {
   const [toggleForEVSummary, setToggleForEVSummary] = useState(null);
   const [loadingMess, setLoadingMess] = useState(true);
   const [summaryObject, setSummaryObject] = useState(null);
+  
   const {
     startDate,
     endDate,
@@ -260,8 +261,7 @@ export const ViewSummary = () => {
     const { resData, object, newresData, resDataForJobcode } =
       await UpdateViewSummary(getObject, updateGroupedData);
 
-    // console.log("resData : ", resData);
-    // console.log("newresData : ", newresData);
+  
     const {
       badgeNo,
       data: objectData,

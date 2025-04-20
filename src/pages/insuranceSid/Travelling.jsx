@@ -79,18 +79,20 @@ export const Travelling = () => {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); 
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
 
     return `${day}/${month}/${year}`;
   };
 
+  const groupPrint = useRef();
+
   const linkToStorageFile = async (pathUrl) => {
     try {
       const result = await getUrl({ path: pathUrl });
-     
-      setPPLastUP(result.url.href); 
-      setViewingDocument(pathUrl); 
+
+      setPPLastUP(result.url.href);
+      setViewingDocument(pathUrl);
     } catch (error) {
       console.error("Error fetching the file URL:", error);
     }
@@ -102,7 +104,7 @@ export const Travelling = () => {
       if (Array.isArray(parsedData)) {
         return parsedData.map((doc) => {
           if (doc.upload) {
-            doc.fileName = doc.upload.split("/").pop(); 
+            doc.fileName = doc.upload.split("/").pop();
           }
           return doc;
         });
@@ -402,16 +404,12 @@ export const Travelling = () => {
               </button>
             </div>
 
-            {/* Conditional rendering of PDF or image */}
             {viewingDocument === document.upload &&
               document.upload.endsWith(".pdf") && (
                 <div className="py-6 fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
                   <div className="relative bg-white rounded-lg shadow-lg w-[40vw] max-h-full flex flex-col">
                     {/* PDF Viewer */}
-                    <div
-                      ref={travelPrint}
-                      className="flex-grow overflow-y-auto"
-                    >
+                    <div ref={groupPrint} className="flex-grow overflow-y-auto">
                       <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
                         <Viewer fileUrl={lastUploadUrl || ""} />
                       </Worker>
@@ -452,41 +450,49 @@ export const Travelling = () => {
             {/* Image Viewer */}
             {viewingDocument === document.upload &&
               !document.upload.endsWith(".pdf") && (
-                <div className="relative mt-4">
-                  <div>
-                    <img
-                      src={lastUploadUrl} // Use the URL for the image
-                      alt="Document Preview"
-                      className="w-full h-auto"
-                    />
-                  </div>
-
-                  <div className="absolute top-2 right-2">
-                    <button
-                      onClick={() => setViewingDocument(null)} // Close the viewer
-                      className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
+                <div className="py-6 fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="relative bg-white rounded-lg shadow-lg w-[40vw] max-h-full flex flex-col">
+                    {/* Image Viewer */}
+                    <div
+                      ref={groupPrint}
+                      className="flex-grow overflow-y-auto p-4"
                     >
-                      <FaTimes />
-                    </button>
-                  </div>
+                      <img
+                        src={lastUploadUrl}
+                        alt="Document Preview"
+                        className="w-full h-auto rounded"
+                      />
+                    </div>
 
-                  <div className="flex items-center justify-center gap-6 py-4">
-                    <div className="mt-2 flex">
-                      <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
-                        <a href={lastUploadUrl} download>
-                          Download
-                        </a>
-                        <FaDownload className="ml-2 mt-1" />
+                    {/* Close button */}
+                    <div className="absolute top-2 right-2">
+                      <button
+                        onClick={() => setViewingDocument(null)}
+                        className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
+                      >
+                        <FaTimes />
                       </button>
                     </div>
-                    <div className="mt-2 flex">
-                      <button
-                        onClick={handlePrint}
-                        className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
-                      >
-                        Print
-                        <FaPrint className="ml-2 mt-1" />
-                      </button>
+
+                    {/* Footer buttons */}
+                    <div className="flex items-center justify-center gap-6 py-4">
+                      <div className="mt-2 flex">
+                        <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
+                          <a href={lastUploadUrl} download>
+                            Download
+                          </a>
+                          <FaDownload className="ml-2 mt-1" />
+                        </button>
+                      </div>
+                      <div className="mt-2 flex">
+                        <button
+                          onClick={handlePrint}
+                          className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
+                        >
+                          Print
+                          <FaPrint className="ml-2 mt-1" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

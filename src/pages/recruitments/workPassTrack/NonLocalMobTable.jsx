@@ -79,11 +79,10 @@ export const NonLocalMobTable = ({
         });
 
         const items = result?.data?.listEmpPersonalInfos?.items || [];
-        // Extract empIDs from the fetched items
+  
         const filteringData = items.map((val) => val.empID);
         allEmpIDs = [...allEmpIDs, ...filteringData];
 
-        // Update nextToken for the next iteration
         nextToken = result?.data?.listEmpPersonalInfos?.nextToken;
       } while (nextToken);
 
@@ -97,7 +96,6 @@ export const NonLocalMobTable = ({
         return numA - numB;
       });
 
-      // Step 4: Get the last valid empID (maximum empID)
       const maxValue = sortedData[sortedData.length - 1];
 
       return maxValue;
@@ -114,7 +112,7 @@ export const NonLocalMobTable = ({
     const numberPart = numberMatch ? parseInt(numberMatch[0], 10) : 0;
     const nextNumber = numberPart + 1;
     const nextTempID = `${prefix}${nextNumber}`;
-    // console.log("Next TempID", nextTempID);
+    console.log("Next TempID", nextTempID);
 
     return nextTempID;
   };
