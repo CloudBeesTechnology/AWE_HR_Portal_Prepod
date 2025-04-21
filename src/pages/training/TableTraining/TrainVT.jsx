@@ -1,36 +1,35 @@
-import { useEffect, useState, useMemo } from "react";
-import searchIcon from "../../../assets/recruitment/search.svg";
-import Popup from "./Popup";
+import { useEffect, useState, useCallback } from "react";
 import { Pagination } from "../../../pages/leaveManagement/Pagination";
+import { Searchbox } from "../../../utils/Searchbox";
+import { IoSearch } from "react-icons/io5";
 import AddEmpPopup from "./AddEmpPopup";
+
+
 export const TrainVT = ({ mergering, columns, popupAll }) => {
-  
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedDetails, setSelectedDetails] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(30);
   const [paginatedData, setPaginatedData] = useState([]);
-  // Memoize filteredData to avoid unnecessary recalculations on each render
-  const filteredData = useMemo(() => {
-    return mergering.filter((candidate) => {
-      const empID = candidate.empID ? candidate.empID.toLowerCase() : "";
-      const name = candidate.name ? candidate.name.toLowerCase() : "";
-      const query = searchQuery.toLowerCase();
-      return empID.includes(query) || name.includes(query);
-    });
-  }, [mergering, searchQuery]);
+  const [filteredData, setFilteredData] = useState(mergering);
+
+  // Keep filteredData in sync with mergering on load or when mergering changes
+  useEffect(() => {
+    setFilteredData(mergering);
+  }, [mergering]);
+
+  const handleSearchResults = useCallback((results) => {
+    setFilteredData(results);
+    setCurrentPage(1);
+  }, []);
 
   useEffect(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const paginated = filteredData.slice(startIndex, startIndex + rowsPerPage);
     setPaginatedData(paginated);
-  }, [filteredData, currentPage, rowsPerPage]); // No need to check against paginatedData here
-
+  }, [filteredData, currentPage, rowsPerPage]);
   const handleViewClick = (details) => {
-    console.log(details,"details");
-    
     setSelectedDetails(details);
     setIsPopupOpen(true);
   };
@@ -40,26 +39,19 @@ export const TrainVT = ({ mergering, columns, popupAll }) => {
     setSelectedDetails(null);
   };
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
   // console.log("MG", mergering);
-  
 
   return (
-    <section >
+    <section>
       <div className="relative flex justify-end items-end mt-14">
-        <input
-          type="text"
-          placeholder="Search by empID or name"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          className="py-2 px-4 mr-5 rounded-lg shadow-[0_1px_6px_1px_rgba(0,0,0,0.2)] outline-none"
+        <Searchbox
+          placeholder="Search by empID, name, badge no, etc."
+          allEmpDetails={mergering}
+          searchUserList={handleSearchResults}
+          searchIcon2={<IoSearch />}
+          // border="rounded-lg shadow-[0_1px_6px_1px_rgba(0,0,0,0.2)]"
         />
-        <div className="absolute top-1/2 right-8 transform -translate-y-1/2">
-          <img src={searchIcon} alt="Search Icon" className="w-4 h-4" />
-        </div>
+
       </div>
 
       <div className="overflow-x-auto mt-16 w-full rounded-md">
@@ -80,7 +72,10 @@ export const TrainVT = ({ mergering, columns, popupAll }) => {
                 paginatedData.map((candidate, index) => (
                   <tr key={index} className="shadow cursor-pointer">
                     {columns.map((column, idx) => (
-                      <td key={idx} className="py-4 px-4 break-words overflow-hidden flex-1">
+                      <td
+                        key={idx}
+                        className="py-4 px-4 break-words overflow-hidden flex-1"
+                      >
                         {candidate[column?.key] || "N/A"}
                       </td>
                     ))}

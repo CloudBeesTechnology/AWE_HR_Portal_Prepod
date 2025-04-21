@@ -301,8 +301,12 @@ export const Travelling = () => {
   }, [searchResultData, setValue]);
 
   const onSubmit = async (data) => {
+    console.log(searchResultData);
+    console.log(travelInsData);
+    
+    
     try {
-      const checkingDITable = travelInsData.find(
+      const checkingDITable = travelInsData?.find(
         (match) => match.id === searchResultData.id
       );
 

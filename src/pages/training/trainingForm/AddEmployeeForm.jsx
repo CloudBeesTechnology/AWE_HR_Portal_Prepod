@@ -648,16 +648,36 @@ export const AddEmployeeForm = () => {
         : {};
 
       if (EmpReqDataRecord) {
-        const oldTrainings = EmpReqDataRecord.trainingTrack || [];
+        const oldTrainings =  normalizeTraineeTrackData(EmpReqDataRecord?.traineeTrack) || [];
         const newTrainings = data?.trainingreq || [];
         const newlyAddedTrainings = newTrainings.filter((newItem) => {
-          return !oldTrainings.some(
-            (oldItem) =>
+          const isExisting = oldTrainings.some((oldItem) => {
+            const match =
               oldItem.courseCode === newItem.courseCode &&
               oldItem.traineeSD === newItem.traineeSD &&
-              oldItem.traineeED === newItem.traineeED
-          );
+              oldItem.traineeED === newItem.traineeED;
+
+            // if (!match) {
+            //   console.log("Not matched:", {
+            //     old: {
+            //       code: oldItem.courseCode,
+            //       sd: oldItem.traineeSD,
+            //       ed: oldItem.traineeED,
+            //     },
+            //     new: {
+            //       code: newItem.courseCode,
+            //       sd: newItem.traineeSD,
+            //       ed: newItem.traineeED,
+            //     },
+            //   });
+            // }
+
+            return match;
+          });
+
+          return !isExisting;
         });
+
         if (newlyAddedTrainings.length > 0) {
           const trainingRows = newlyAddedTrainings
             .map((item, idx) => {
@@ -748,6 +768,7 @@ export const AddEmployeeForm = () => {
             receipentEmpID: emailData.managerEmpID,
             status: "Unread",
           });
+        }
           const TMRDataUp = {
             trainingTrack: data?.trainingreq?.map((trainee, index) => {
               return {
@@ -769,7 +790,7 @@ export const AddEmployeeForm = () => {
 
           setShowTitle("Training details Updated successfully");
           setNotification(true);
-        }
+    
       } else {
         const AddEmpValue = {
           trainingTrack: data?.trainingreq?.map((trainee, index) => {

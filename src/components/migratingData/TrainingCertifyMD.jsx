@@ -12,7 +12,7 @@ export const TrainingCertifyMD = () => {
   const { TCData } = TCDataFun();
   const { TCDataFunUp } = TCDataUpdate();
 
-// console.log(trainingCertifi);
+console.log(trainingCertifi);
 
   const excelDateToJSDate = (serial) => {
     const excelEpoch = new Date(Date.UTC(1900, 0, 1));
@@ -20,13 +20,16 @@ export const TrainingCertifyMD = () => {
     return new Date(excelEpoch.getTime() + daysOffset * 24 * 60 * 60 * 1000);
   };
 
-// Link 1:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus+Dev/TrainingCertifiProdTestDatas.csv"
+// Link 1:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingCertifi%C2%A0HO.csv"
+// Link 2:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingCertifi+Single%C2%A0OME.csv"
+// Link 3:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingCertifi+Double+BLNG+and%C2%A0E%26I.csv"
+// Link 4:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingCertifi+BLNG+and+E%26I+Single+Prod.csv"
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus+Dev/TrainingCertifiProdTestDatas.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingCertifi+BLNG+and+E%26I+Single+Prod.csv",
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
@@ -60,6 +63,9 @@ export const TrainingCertifyMD = () => {
       });
       // console.log("All Data:", transformedData);
       for (const TCValue of transformedData) {
+        if (!TCValue.empID) {
+          continue;
+        }
         if (TCValue.empID) {
           TCValue.empID = String(TCValue.empID);
         }
@@ -75,11 +81,11 @@ export const TrainingCertifyMD = () => {
             ...TCValue,
             id: checkingBJLTable.id,
           };
-          console.log(TCDataUp, "UPDATE");
+          // console.log(TCDataUp, "UPDATE");
 
           await TCDataFunUp({ TCDataUp });
         } else {
-          console.log(TCValue, "create");
+          // console.log(TCValue, "create");
           await TCData({ TCValue });
         }
       }
