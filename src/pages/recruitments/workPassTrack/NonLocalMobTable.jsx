@@ -79,21 +79,24 @@ export const NonLocalMobTable = ({
         });
 
         const items = result?.data?.listEmpPersonalInfos?.items || [];
-  
+
         const filteringData = items.map((val) => val.empID);
         allEmpIDs = [...allEmpIDs, ...filteringData];
 
         nextToken = result?.data?.listEmpPersonalInfos?.nextToken;
       } while (nextToken);
 
-      // // Step 2: Filter only empIDs that start with 'AWE'
-      // const filteredData = allEmpIDs.filter((empID) => empID);
-
-      // Step 3: Sort the empIDs numerically (based on the number part of the ID)
       const sortedData = allEmpIDs.sort((a, b) => {
-        const numA = parseInt(a.replace(/[^\d]/g, ""), 10);
-        const numB = parseInt(b.replace(/[^\d]/g, ""), 10);
-        return numA - numB;
+        const numA = a.match(/\d+/) ? parseInt(a.match(/\d+/)[0], 10) : 0;
+        const numB = b.match(/\d+/) ? parseInt(b.match(/\d+/)[0], 10) : 0;
+
+        const prefixA = a.replace(/\d+/g, "") || "";
+        const prefixB = b.replace(/\d+/g, "") || "";
+
+        if (prefixA === prefixB) {
+          return numA - numB;
+        }
+        return prefixA.localeCompare(prefixB);
       });
 
       const maxValue = sortedData[sortedData.length - 1];
@@ -125,7 +128,7 @@ export const NonLocalMobTable = ({
     };
     fetchNextTempID();
   }, []);
-console.log(latestTempIDData);
+  console.log(latestTempIDData);
 
   // const OnSubmit = async (candi) => {
   //   const storedData = {
@@ -273,7 +276,7 @@ console.log(latestTempIDData);
           <SpinLogo
             text={showTitle}
             notification={notification}
-             path="/recrutiles/workpasstracking"
+            path="/recrutiles/workpasstracking"
           />
         )}
       </div>
