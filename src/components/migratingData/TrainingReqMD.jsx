@@ -32,12 +32,14 @@ console.log(AddEmpReq);
 // Link 13:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq_Data_Set8.csv"
 // Link 14:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq_Set6-1.csv"
 // Link 15:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq_Set6-2.csv"
+// Link 16:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq_Data_Set9.csv"
+// Link 17:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TraininReq_Data_Set10.csv"
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq_Set6-2.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TraininReq_Data_Set10.csv",
    
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
@@ -72,6 +74,9 @@ console.log(AddEmpReq);
       });
       // console.log("All Data:", transformedData);
       for (const AddEmpValue of transformedData) {
+        if (!AddEmpValue.empID) {
+          continue;
+        }
         if (AddEmpValue.empID) {
           AddEmpValue.empID = String(AddEmpValue.empID);
         }
