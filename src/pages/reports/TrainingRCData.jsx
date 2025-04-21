@@ -51,6 +51,9 @@ export const TrainingRCData = () => {
   };
 
   const normalizeTraineeTrackData = (data) => {
+    if (!data) {
+      return false;
+    }
     try {
       let raw;
 
@@ -73,7 +76,7 @@ export const TrainingRCData = () => {
 
       return Array.isArray(parsed) ? parsed : [parsed];
     } catch (error) {
-      console.error("Error normalizing traineeTrackData:",data);
+      console.error("Error normalizing traineeTrackData:", data);
       return [];
     }
   };
@@ -103,21 +106,24 @@ export const TrainingRCData = () => {
         const trainingTrack = normalizeTraineeTrackData(
           item.traineeTrack || "[]"
         );
+
+        if (!item.trainingProof) {
+          return false;
+        }
         const trainingProofs = normalizeTraineeTrackData(
           item.trainingProof || "[]"
         );
-        // console.log(trainingTrack);
+        // console.log(trainingProofs);
 
         return trainingTrack.map((track) => {
           // Match proof using MRNo or courseCode
           const proof =
-          trainingProofs.find(
-            (p) =>
-              p.empID === track.empID &&
-              p.MRNo === track.MRNo &&
-              p.traineeSD === track.traineeSD &&
-              p.traineeED === track.traineeED
-          ) || {};
+            trainingProofs.find(
+              (p) =>
+                p.empID === track.empID &&
+                p.traineeSD === track.traineeSD &&
+                p.traineeED === track.traineeED
+            ) || {};
           // console.log(proof, "proof");
 
           return {
