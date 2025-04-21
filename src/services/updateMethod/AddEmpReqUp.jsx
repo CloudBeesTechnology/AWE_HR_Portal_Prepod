@@ -11,8 +11,8 @@ export const AddEmpReqUp = () => {
     const totalData = {
       id: TMRDataUp.id,
       empID: TMRDataUp.empID,
-      traineeTrack:[JSON.stringify(TMRDataUp.traineeTrack)]
-      // traineeTrack: JSON.stringify(TMRDataUp.trainingTrack),
+      // traineeTrack:[JSON.stringify(TMRDataUp.traineeTrack)]
+      traineeTrack: JSON.stringify(TMRDataUp.trainingTrack),
     };
     // console.log(totalData, "update method");
 

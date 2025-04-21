@@ -30,12 +30,14 @@ console.log(AddEmpReq);
 // Link 11:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq_Data_Set6.csv"
 // Link 12:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/Trainingreq_Data_Set7.csv"
 // Link 13:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq_Data_Set8.csv"
+// Link 14:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq_Set6-1.csv"
+// Link 15:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq_Set6-2.csv"
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq_Data_Set8.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/TrainingReq_Set6-2.csv",
    
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
