@@ -73,11 +73,11 @@ export const MobilizationRecru = ({
           query: listEmpPersonalInfos,
           variables: {
             nextToken,
-          },
+          }, 
         });
 
         const items = result?.data?.listEmpPersonalInfos?.items || [];
-        const empIDs = items.map((val) => val.empID);
+        const empIDs = items.map((val) => val.empID); 
         allEmpIDs = [...allEmpIDs, ...empIDs];
 
         nextToken = result?.data?.listEmpPersonalInfos?.nextToken;
