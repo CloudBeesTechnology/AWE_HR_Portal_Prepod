@@ -15,16 +15,12 @@ export const UseFetchDataForSummary = (
     useState(null);
   const [getPosition, setGetPosition] = useState(null);
 
-  const isDateInRange = (date, start, end) => {
-    const parsedDate = new Date(date);
-    const parsedStart = new Date(start);
-    const parsedEnd = new Date(end);
-
-    parsedDate.setHours(0, 0, 0, 0);
-    parsedStart.setHours(0, 0, 0, 0);
-    parsedEnd.setHours(0, 0, 0, 0);
-
-    return parsedDate >= parsedStart && parsedDate <= parsedEnd;
+  // Date range filter
+  const isDateInRange = (dateStr, start, end) => {
+    const date = new Date(dateStr).setHours(0, 0, 0, 0);
+    const sDate = new Date(start).setHours(0, 0, 0, 0);
+    const eDate = new Date(end).setHours(0, 0, 0, 0);
+    return date >= sDate && date <= eDate;
   };
 
   useEffect(() => {
@@ -32,33 +28,21 @@ export const UseFetchDataForSummary = (
       setLoading(false);
       setEmptyTableMess(false);
       ProcessedDataFunc(null);
+
       try {
         if (startDate && endDate && location) {
           const Position = localStorage.getItem("userType");
           setGetPosition(Position);
-          // console.log("Start Date : ", new Date());
+
           let nextToken = null;
           let allData = [];
 
+          // Fetch all data without filters
           do {
-            const filter = {
-              and: [
-                // { status: { eq: "Approved" } },
-                {
-                  or: [
-                    { status: { eq: "Approved" } },
-                    { status: { eq: "Verified" } },
-                  ],
-                },
-                { companyName: { eq: location } },
-              ],
-            };
-
             const response = await client.graphql({
               query: listTimeSheets,
               variables: {
-                filter: filter,
-                limit: 100,
+                limit: 1000,
                 nextToken,
               },
             });
@@ -66,29 +50,39 @@ export const UseFetchDataForSummary = (
             const fetchedData = response?.data?.listTimeSheets?.items || [];
             nextToken = response?.data?.listTimeSheets?.nextToken;
 
-            allData = [
-              ...allData,
-              ...fetchedData.filter(
-                (item) => item !== null && item !== undefined
-              ),
-            ];
+            for (const item of fetchedData) {
+              if (item) allData.push(item);
+            }
           } while (nextToken);
 
-          // console.log("End Date : ", new Date());
-          const filteredData = allData.filter((item) =>
-            isDateInRange(item.date, startDate, endDate)
-          );
+          // Chunk processing for optimized filtering
+          const CHUNK_SIZE = 1000;
+          const filteredData = [];
+          for (let i = 0; i < allData.length; i += CHUNK_SIZE) {
+            const chunk = allData.slice(i, i + CHUNK_SIZE);
+            for (const item of chunk) {
+              if (
+                item?.status &&
+                (item.status === "Approved" || item.status === "Verified") &&
+                item?.companyName === location &&
+                item?.date &&
+                isDateInRange(item.date, startDate, endDate)
+              ) {
+                filteredData.push(item);
+              }
+            }
+          }
 
-          if (filteredData && filteredData.length > 0) {
-            setLoading(true);
+          if (filteredData.length > 0) {
             setConvertedStringToArrayObj(filteredData);
+            setLoading(true);
             setEmptyTableMess(false);
           } else {
             setEmptyTableMess(true);
           }
         }
       } catch (error) {
-      } finally {
+        console.error("Data fetch error:", error);
       }
     };
 

@@ -139,6 +139,7 @@ export const ApplyVSFunction = ({
             .map((entry) => {
               const groupedByMonthYear = entry?.data?.reduce((acc, record) => {
                 const date = new Date(record.date);
+
                 const monthYear = `${
                   date.getMonth() + 1
                 }/${date.getFullYear()}`;
@@ -261,8 +262,9 @@ export const ApplyVSFunction = ({
                 const empDate = new Date(entry.date);
 
                 return (
-                  leaveDate.getFullYear() === empDate.getFullYear() &&
-                  leaveDate.getMonth() === empDate.getMonth()
+                  leaveDate.getFullYear() === empDate.getFullYear()
+                  //  &&
+                  // leaveDate.getMonth() === empDate.getMonth()
                 );
               });
             }
@@ -487,12 +489,9 @@ export const ApplyVSFunction = ({
               });
             }
 
-            const recognizeFileType = [
-              "Offshore",
-              "Offshore's ORMC",
-              "SBW",
-              "ORMC",
-            ]?.includes(identifyFileType);
+            const recognizeFileType = ["Offshore", "Offshore's ORMC"]?.includes(
+              identifyFileType
+            );
 
             if (checkEntry) {
               const result = parseFloat(entry?.normalWorkHrs) / 2;
@@ -615,9 +614,18 @@ export const ApplyVSFunction = ({
           inputData.forEach((data, index) => {
             inputData.forEach((compareData, compareIndex) => {
               if (index !== compareIndex) {
+                const isSameBadgeNo =
+                  data.empBadgeNo &&
+                  compareData.empBadgeNo &&
+                  String(data.empBadgeNo) === String(compareData.empBadgeNo);
+
+                const isSameFidWithDifferentJobcode =
+                  data.fidNo &&
+                  compareData.fidNo &&
+                  String(data.fidNo) === String(compareData.fidNo);
+
                 if (
-                  data.empBadgeNo === compareData.empBadgeNo &&
-                  //   data.date === compareData.date &&
+                  (isSameBadgeNo || isSameFidWithDifferentJobcode) &&
                   data.jobcode !== compareData.jobcode
                 ) {
                   Object.keys(data.workingHrs).forEach((dateKey) => {
@@ -687,7 +695,7 @@ export const ApplyVSFunction = ({
         const updatedData = await updateFieldBasedOnConditions(
           addLeaveTypeCount
         );
-
+        console.log("addLeaveTypeCount : ", addLeaveTypeCount);
         const isDateInRange = (date, start, end) => {
           const parsedDate = new Date(date);
           const parsedStart = new Date(start);
