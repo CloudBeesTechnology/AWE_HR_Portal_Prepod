@@ -752,7 +752,7 @@ export const AddEmployeeForm = () => {
             empID: data.empID,
             leaveType: "Training Requestor",
             message: `Employee Training Notification - ${data.name}. Dear Hr, Please be informed that ${data.name} is scheduled for training on
-          ${data?.trainingreq}.`,
+          ${JSON.stringify(data?.trainingreq)}.`,
             senderEmail: "hr_no-reply@adininworks.com",
             receipentEmail: emailData.hrOfficialmail,
             status: "Unread",
@@ -762,7 +762,7 @@ export const AddEmployeeForm = () => {
             empID: data.empID,
             leaveType: "Training Requestor",
             message: `Employee Training Notification - ${data.name}. Dear ${emailData.managerName}, Please be informed that ${data.name} is scheduled for training on
-          ${data?.trainingreq}.`,
+          ${JSON.stringify(data?.trainingreq)}.`,
             senderEmail: "hr_no-reply@adininworks.com",
             receipentEmail: emailData.managerOfficialMail,
             receipentEmpID: emailData.managerEmpID,
@@ -806,7 +806,7 @@ export const AddEmployeeForm = () => {
           empID: data.empID,
         };
         await AddEmpData({ AddEmpValue });
-        console.log(AddEmpValue, "Training details Saved successfully");
+        // console.log(AddEmpValue, "Training details Saved successfully");
         const trainingRows = data?.trainingreq
           ?.map((item, idx) => {
             return `
@@ -881,7 +881,7 @@ ${trainingTable}
           empID: data.empID,
           leaveType: "Training Requestor",
           message: `Employee Training Notification - ${data.name}. Dear Hr, Please be informed that ${data.name} is scheduled for training on
-      ${data?.trainingreq}.`,
+      ${JSON.stringify(data?.trainingreq)}.`,
           senderEmail: "hr_no-reply@adininworks.com",
           receipentEmail: emailData.hrOfficialmail,
           status: "Unread",
@@ -891,7 +891,7 @@ ${trainingTable}
           empID: data.empID,
           leaveType: "Training Requestor",
           message: `Employee Training Notification - ${data.name}. Dear ${emailData.managerName}, Please be informed that ${data.name} is scheduled for training on
-      ${data?.trainingreq}.`,
+      ${JSON.stringify(data?.trainingreq)}.`,
           senderEmail: "hr_no-reply@adininworks.com",
           receipentEmail: emailData.managerOfficialMail,
           receipentEmpID: emailData.managerEmpID,
@@ -1024,15 +1024,7 @@ ${trainingTable}
                   )}
                 </div>
               </div>
-              {index !== 0 && (
-                <button
-                  type="button"
-                  onClick={() => handleMinusData(index)}
-                  className="text-xl text-grey"
-                >
-                  <FaRegMinusSquare />
-                </button>
-              )}
+            
 
               <div className="grid grid-cols-2 gap-6 ">
                 <div className="mb-4">

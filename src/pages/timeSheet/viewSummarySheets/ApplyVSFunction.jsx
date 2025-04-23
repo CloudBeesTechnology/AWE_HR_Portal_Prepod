@@ -489,6 +489,7 @@ export const ApplyVSFunction = ({
               });
             }
 
+            
             const recognizeFileType = ["Offshore", "Offshore's ORMC"]?.includes(
               identifyFileType
             );
