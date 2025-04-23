@@ -224,7 +224,7 @@ export const ProbationForm = forwardRef(() => {
   }, [workInfoData, employeeData?.empID, empPIData]);
 
   useEffect(() => {
-    console.log("Email Data has changed:", emailData);
+    // console.log("Email Data has changed:", emailData);
   }, [emailData]);
 
   useEffect(() => {
@@ -307,7 +307,7 @@ export const ProbationForm = forwardRef(() => {
 
   const handleInputChange = (e) => {
     if (!e.target) {
-      console.error("Event target is undefined");
+      // console.error("Event target is undefined");
       return;
     }
     const { name, value } = e.target;
@@ -462,7 +462,7 @@ export const ProbationForm = forwardRef(() => {
         }
 
         await UpdateProb({ PbFDataUp: formattedData });
-        console.log("update", formattedData);
+  
 
         setIsLoading(false);
 
@@ -686,7 +686,7 @@ export const ProbationForm = forwardRef(() => {
     }
   };
 
-  console.log(formData);
+
   
   return (
     <form
@@ -853,7 +853,9 @@ export const ProbationForm = forwardRef(() => {
         formData={formData}
         handleInputChange={handleInputChange}
       />
-      <ConfirmationForm
+       <ConfirmationForm
+        employeeData={employeeData}
+        workInfoData={workInfoData}
         register={register}
         formData={formData}
         handleInputChange={handleInputChange}

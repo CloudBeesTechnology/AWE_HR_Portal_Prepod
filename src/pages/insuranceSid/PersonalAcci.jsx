@@ -59,7 +59,6 @@ export const PersonalAcci = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   // Popup State
-  const personAcciPrint = useRef();
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupImage, setPopupImage] = useState("");
   const [viewingDocument, setViewingDocument] = useState(null);
@@ -102,8 +101,9 @@ export const PersonalAcci = () => {
   const linkToStorageFile = async (pathUrl) => {
     try {
       const result = await getUrl({ path: pathUrl });
-      setPPLastUP(result.url.href);
-      setViewingDocument(pathUrl);
+      //   console.log("File URL:", result.url.href); // Use .href to extract the URL as a string
+      setPPLastUP(result.url.href); // Store the URL as a string
+      setViewingDocument(pathUrl); // Update the state to show the selected document
     } catch (error) {
       console.error("Error fetching the file URL:", error);
     }
@@ -115,7 +115,7 @@ export const PersonalAcci = () => {
       if (Array.isArray(parsedData)) {
         return parsedData.map((doc) => {
           if (doc.upload) {
-            doc.fileName = doc.upload.split("/").pop();
+            doc.fileName = doc.upload.split("/").pop(); // Extract file name from path
           }
           return doc;
         });
@@ -253,6 +253,7 @@ export const PersonalAcci = () => {
   }, []);
 
   const searchResult = (result) => {
+    console.log("RW", result);
     setSearchResultData(result);
   };
 
@@ -360,74 +361,41 @@ export const PersonalAcci = () => {
 
   //___________________________________-Printing section %% Pdf section___________________________________
 
-  const openPopup = (fileUrl) => {
-    setPopupImage(fileUrl); // Set the URL for the image or file
-    setPopupVisible(true); // Show the popup
-  };
-
-  useEffect(() => {
-    const measureHeight = () => {
-      if (personAcciPrint.current) {
-        const measuredHeight = personAcciPrint.current.offsetHeight;
-        // console.log("Measured PDF height:", measuredHeight);
-        if (measuredHeight > 0) {
-          setPdfHeight(`${measuredHeight}px`);
-          setIsLoading(false);
-        }
-      }
-    };
-
-    // Set a timeout to allow the DOM to fully render
-    const timeoutId = setTimeout(measureHeight, 500); // Delay for rendering
-    return () => clearTimeout(timeoutId); // Cleanup timeout on component unmount
-  }, [personAcciPrint, isLoading, pdfHeight, pdfWidth]);
-
-  const handlePrint = () => {
-    if (isLoading) {
-      alert("PDF is still loading, please wait...");
-      return;
-    }
-    printDocument();
-  };
-
-  const printDocument = useReactToPrint({
-    content: () => personAcciPrint.current,
-    onBeforePrint: () => console.log("Preparing to print PDF..."),
-    onAfterPrint: () => console.log("Print complete"),
-    pageStyle: `
-      @page {
-        height: ${pdfHeight}; /* Dynamically set height */
-        margin: 0; /* Adjust margins as needed */
-      }
-    `,
-  });
-
-  const openModal = (uploadUrl) => {
-    setPPLastUP(uploadUrl);
-    setViewingDocument(uploadUrl);
-  };
-
   const closeModal = () => {
     setViewingDocument(null);
   };
+  const handlePrint = useReactToPrint({
+    content: () => groupPrint.current,
 
-  const onDocumentLoadSuccess = ({ numPages }) => {
-    setNumPages(numPages);
-  };
+    pageStyle: `
+    @page {
+      size: auto;
+      margin: 0mm;
+    }
+    body { 
+      margin: 0;
+      padding: 0;
+    }
+    .pdf-page {
+      page-break-after: always;
+    }
+  `,
+  });
+
   const renderDocumentsUnderCategory = (documents) => {
     return (
       <>
         {documents.map((document, index) => (
           <div
             key={index}
-            className="bg-white rounded-lg shadow-md p-4 mb-4 border border-gray-200"
+            className="bg-white rounded-lg p-4 mb-4 border border-gray-200"
           >
             <div className="flex justify-between items-center">
               <span className="uppercase font-semibold text-sm">
                 Uploaded on: {formatDate(document.date)}
               </span>
               <button
-                onClick={() => linkToStorageFile(document.upload)} // Fetch the URL for the document
+                onClick={() => linkToStorageFile(document.upload)}
                 className="text-dark_grey font-semibold text-sm"
               >
                 View Document
@@ -436,52 +404,82 @@ export const PersonalAcci = () => {
 
             {viewingDocument === document.upload &&
               document.upload.endsWith(".pdf") && (
-                <div className="py-6 fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
-                  <div className="relative bg-white rounded-lg shadow-lg w-[40vw] max-h-full flex flex-col">
-                    {/* PDF Viewer */}
-                    <div ref={groupPrint} className="flex-grow overflow-y-auto">
-                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-                        <Viewer fileUrl={lastUploadUrl || ""} />
-                      </Worker>
-                    </div>
-
-                    <div className="absolute top-2 right-2">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                  <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+                    {/* Modal header */}
+                    <div className="flex justify-between items-center p-4 border-b">
+                      <h3 className="text-lg font-semibold">PDF Viewer</h3>
                       <button
-                        onClick={closeModal} // Close the modal
-                        className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
+                        onClick={closeModal}
+                        className="text-gray-500 hover:text-gray-700"
                       >
-                        <FaTimes />
+                        <FaTimes size={20} />
                       </button>
                     </div>
 
-                    <div className="flex items-center justify-center gap-6 py-4">
-                      <div className="mt-2 flex">
-                        <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
+                    {/* PDF Viewer */}
+                    <div
+                      ref={groupPrint}
+                      className="flex-grow overflow-y-auto pdf-page"
+                    >
+                      {lastUploadUrl ? (
+                        <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                          <Viewer
+                            fileUrl={lastUploadUrl}
+                            renderError={(error) => (
+                              <div className="p-4 text-red-500">
+                                Failed to load PDF: {error.message}
+                                <div className="text-sm mt-2">
+                                  URL: {lastUploadUrl}
+                                </div>
+                              </div>
+                            )}
+                          />
+                        </Worker>
+                      ) : (
+                        <div className="p-4 text-center">
+                          No PDF file available
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Pagination Controls */}
+                    <div className="flex items-center justify-center p-4 border-t">
+                      <div className="flex gap-4">
+                        <button className="px-4 py-2 bg-primary  rounded flex items-center gap-2">
+                          <FaDownload />
                           <a href={lastUploadUrl} download>
                             Download
                           </a>
-                          <FaDownload className="ml-2 mt-1" />
                         </button>
-                      </div>
-                      <div className="mt-2 flex">
                         <button
                           onClick={handlePrint}
-                          className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
+                          className="px-4 py-2 bg-primary  rounded flex items-center gap-2"
                         >
+                          <FaPrint />
                           Print
-                          <FaPrint className="ml-2 mt-1" />
                         </button>
                       </div>
                     </div>
                   </div>
                 </div>
               )}
-
             {/* Image Viewer */}
             {viewingDocument === document.upload &&
               !document.upload.endsWith(".pdf") && (
-                <div className="py-6 fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
-                  <div className="relative bg-white rounded-lg shadow-lg w-[40vw] max-h-full flex flex-col">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                  <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+                    {/* Modal header */}
+                    <div className="flex justify-between items-center p-4 border-b">
+                      <h3 className="text-lg font-semibold">Image Viewer</h3>
+                      <button
+                        onClick={() => setViewingDocument(null)}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        <FaTimes size={20} />
+                      </button>
+                    </div>
+
                     {/* Image Viewer */}
                     <div
                       ref={groupPrint}
@@ -494,33 +492,21 @@ export const PersonalAcci = () => {
                       />
                     </div>
 
-                    {/* Close button */}
-                    <div className="absolute top-2 right-2">
-                      <button
-                        onClick={() => setViewingDocument(null)}
-                        className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
-                      >
-                        <FaTimes />
-                      </button>
-                    </div>
-
-                    {/* Footer buttons */}
-                    <div className="flex items-center justify-center gap-6 py-4">
-                      <div className="mt-2 flex">
-                        <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
+                    {/* Footer Controls */}
+                    <div className="flex items-center justify-center p-4 border-t">
+                      <div className="flex gap-4">
+                        <button className="px-4 py-2 bg-primary rounded flex items-center gap-2">
+                          <FaDownload />
                           <a href={lastUploadUrl} download>
                             Download
                           </a>
-                          <FaDownload className="ml-2 mt-1" />
                         </button>
-                      </div>
-                      <div className="mt-2 flex">
                         <button
                           onClick={handlePrint}
-                          className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
+                          className="px-4 py-2 bg-primary rounded flex items-center gap-2"
                         >
+                          <FaPrint />
                           Print
-                          <FaPrint className="ml-2 mt-1" />
                         </button>
                       </div>
                     </div>
@@ -532,6 +518,7 @@ export const PersonalAcci = () => {
       </>
     );
   };
+
   const renderDocumentCategory = (uploadArray, categoryName) => {
     const documents =
       uploadArray.length > 0 ? parseDocuments(uploadArray[0]) : [];
@@ -749,56 +736,7 @@ export const PersonalAcci = () => {
           </p>
         )}
       </div>
-
-      {/* Popup */}
-      {popupVisible && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-md p-4 mb-4 border border-gray-200">
-            <button
-              onClick={() => setPopupVisible(false)}
-              className="absolute top-2 right-2"
-            >
-              <FaTimes size={20} />
-            </button>
-            {popupImage.endsWith(".pdf") ? (
-              <Worker
-                workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
-                file={popupImage}
-                onLoadSuccess={onDocumentLoadSuccess}
-              >
-                <Page pageNumber={pageNumber} />
-                <div className="text-center mt-2">
-                  <button
-                    onClick={() =>
-                      setPageNumber((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={pageNumber <= 1}
-                  >
-                    Previous
-                  </button>
-                  <span>
-                    {pageNumber} / {numPages}
-                  </span>
-                  <button
-                    onClick={() =>
-                      setPageNumber((prev) => Math.min(prev + 1, numPages))
-                    }
-                    disabled={pageNumber >= numPages}
-                  >
-                    Next
-                  </button>
-                </div>
-              </Worker>
-            ) : (
-              <img
-                src={popupImage}
-                alt="popup view"
-                className="w-full h-auto"
-              />
-            )}
-          </div>
-        </div>
-      )}
+     
       {deletePopup && (
         <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}
