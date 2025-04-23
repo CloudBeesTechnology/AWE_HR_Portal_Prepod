@@ -104,12 +104,12 @@ export const TimeSheetBrowser = ({
       fileNameForSuccessful,
       title,
     });
-    console.log("isExcelExitsOrNot : ", isExcelExitsOrNot);
+ 
     if (
       isExcelExitsOrNot &&
       isExcelExitsOrNot === "fileNameAlreadyExistsInDB"
     ) {
-      console.log("Some one already uploaded the same excel sheet");
+      // console.log("Some one already uploaded the same excel sheet");
       setLoading(false);
       setRestrictSameExcelUpload(true);
     } else if (isExcelExitsOrNot === "Not Matched") {
@@ -140,7 +140,6 @@ export const TimeSheetBrowser = ({
         reader.onload = (e) => {
           setExcelFile(e.target.result);
 
-          console.log("e.target.files[0].name : ", excelFileName);
         };
       } else {
         setTypeError("Please select only excel file types");
@@ -251,7 +250,7 @@ export const TimeSheetBrowser = ({
             fileInputRef,
             setLoading
           );
-          console.log("editedResult : ", editedResult);
+          
           setReturnedTHeader(editedResult);
         }
         fileInputRef.current.value = "";
@@ -323,9 +322,9 @@ export const TimeSheetBrowser = ({
   return (
     <div
       className="p-10 bg-[#fafaf6] min-h-screen  flex-col items-center"
-      // onClick={() => {
-      //   handleDuplicateFileUploadFunc();
-      // }}
+      onClick={() => {
+        setRestrictSameExcelUpload(false);
+      }}
     >
       <div
         className={`flex ${

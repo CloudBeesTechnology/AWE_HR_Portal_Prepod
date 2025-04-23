@@ -136,7 +136,9 @@ const AddCertifyPopUp = ({ details, popupAll, onClose }) => {
                     if (
                       item.key === "certifiExpiry" ||
                       item.key === "eCertifiDate" ||
-                      item.key === "orgiCertifiDate"
+                      item.key === "orgiCertifiDate" ||
+                      item.key === "traineeSD" ||
+                      item.key === "traineeED"
                     ) {
                       formattedValue = DateFormat(value);
                     }

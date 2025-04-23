@@ -25,6 +25,7 @@ export const ViewSummaryTable = ({
   editViewSummaryObject,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [adjustTheaderDownload, setAdjustTheaderDownload] = useState(false);
   const {
     selectedLocation,
     getStartDate,
@@ -34,6 +35,11 @@ export const ViewSummaryTable = ({
     setStartDate,
     setEndDate,
   } = useTempID();
+
+  const toggleSticky = () => {
+    setAdjustTheaderDownload(true);
+    document.querySelector(".table-container-scroll").scrollTop = 0;
+  };
 
   function calculateTotalWorkingHours(data) {
     let totalHours = 0;
@@ -154,20 +160,27 @@ export const ViewSummaryTable = ({
           resetTableFunc={resetTableFunc}
           // setEmptyTableMess={setEmptyTableMess}
         />
-        <div className="overflow-auto max-h-[60vh]">
+        <div className="overflow-auto max-h-[60vh] table-container-scroll">
           <table
             className="min-w-full text-sm table-fixed border-collapse bg-white"
             id="downloadTable"
           >
             <thead className="bg-[#949393] border">
-              <tr className="border bg-[#949393] text-white sticky -top-0.5"> 
+              <tr
+                className={`border bg-[#949393] text-white ${
+                  adjustTheaderDownload === true ? "" : "sticky -top-0.5"
+                }`}
+              >
                 <th
                   className="border px-2 py-2 border-dark_grey min-w-[200px] max-w-[400px] bg-[#949393]"
                   rowSpan="2"
                 >
                   Employee Name
                 </th>
-                <th className="border px-2 py-2 border-dark_grey bg-[#949393]" rowSpan="2">
+                <th
+                  className="border px-2 py-2 border-dark_grey bg-[#949393]"
+                  rowSpan="2"
+                >
                   PROJECT
                 </th>
 
@@ -195,8 +208,12 @@ export const ViewSummaryTable = ({
                 <th className="border  px-2 py-2 border-dark_grey ">UAL</th>
                 <th className="border  px-2 py-2 border-dark_grey ">OT</th>
 
-                <th className="border  px-2 py-2 border-dark_grey bg-[#949393]">Verified</th>
-                <th className="border  px-2 py-2 border-dark_grey bg-[#949393]">Updater</th>
+                <th className="border  px-2 py-2 border-dark_grey bg-[#949393]">
+                  Verified
+                </th>
+                <th className="border  px-2 py-2 border-dark_grey bg-[#949393]">
+                  Updater
+                </th>
               </tr>
             </thead>
 
@@ -659,12 +676,14 @@ export const ViewSummaryTable = ({
             <button
               className="flex items-center space-x-2 rounded px-4 py-2  bg-[#FEF116] shadow-md"
               onClick={() => {
+                toggleSticky();
                 DownloadExcelPDF(
                   "downloadTable",
                   location,
                   formattedStartDate,
                   formattedEndDate
                 );
+                setAdjustTheaderDownload(false);
               }}
             >
               <span className="cursor-pointer text-dark_grey text_size_5">
@@ -689,6 +708,3 @@ export const ViewSummaryTable = ({
     </div>
   );
 };
-
-// ############################################################################################################
-// ############################################################################################################

@@ -1,31 +1,36 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { Pagination } from "../../../pages/leaveManagement/Pagination";
-import searchIcon from "../../../assets/recruitment/search.svg";
+import { Searchbox } from "../../../utils/Searchbox";
+import { IoSearch } from "react-icons/io5";
 import AddCertifyPopUp from "./AddCertifyPopUp";
+
 export const CertifyTable = ({ mergering, columns, popupAll }) => {
-  
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedDetails, setSelectedDetails] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(30);
   const [paginatedData, setPaginatedData] = useState([]);
-  // Memoize filteredData to avoid unnecessary recalculations on each render
-  const filteredData = useMemo(() => {
-    return mergering.filter((candidate) => {
-      const empID = candidate.empID ? candidate.empID.toLowerCase() : "";
-      const name = candidate.name ? candidate.name.toLowerCase() : "";
-      const query = searchQuery.toLowerCase();
-      return empID.includes(query) || name.includes(query);
-    });
-  }, [mergering, searchQuery]); 
+  const [filteredData, setFilteredData] = useState(mergering);
+
+  // Keep filteredData in sync with mergering on load or when mergering changes
+  useEffect(() => {
+    setFilteredData(mergering);
+  }, [mergering]);
+
+  const handleSearchResults = useCallback((results) => {
+    setFilteredData(results);
+    setCurrentPage(1); // Reset to first page when search changes
+  }, []);
+
 
   useEffect(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const paginated = filteredData.slice(startIndex, startIndex + rowsPerPage);
     setPaginatedData(paginated);
-  }, [filteredData, currentPage, rowsPerPage]); 
+  }, [filteredData, currentPage, rowsPerPage]);
 
   const handleViewClick = (details) => {
     setSelectedDetails(details);
@@ -37,27 +42,20 @@ export const CertifyTable = ({ mergering, columns, popupAll }) => {
     setSelectedDetails(null);
   };
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
   return (
-    <section >
+    <section>
       <div className="relative flex justify-end items-end mt-14">
-        <input
-          type="text"
-          placeholder="Search by empID or name"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          className="py-2 px-4 mr-5 rounded-lg shadow-[0_1px_6px_1px_rgba(0,0,0,0.2)] outline-none"
+        <Searchbox
+          placeholder="Search by empID, name, badge no, etc."
+          allEmpDetails={mergering}
+          searchUserList={handleSearchResults}
+          searchIcon2={<IoSearch />}
+          // border="rounded-lg shadow-[0_1px_6px_1px_rgba(0,0,0,0.2)]"
         />
-        <div className="absolute top-1/2 right-8 transform -translate-y-1/2">
-          <img src={searchIcon} alt="Search Icon" className="w-4 h-4" />
-        </div>
       </div>
 
       <div className="overflow-x-auto mt-16 w-full rounded-md">
-        <div className="w-full px-4 max-h-[calc(90vh-7rem)] overflow-y-auto ">
+        <div className="w-full px-4 max-h-[calc(90vh-7rem)] overflow-y-auto">
           <table className="w-full rounded-xl table-auto">
             <thead className="bg-[#939393] text-center sticky top-0">
               <tr>
@@ -69,12 +67,15 @@ export const CertifyTable = ({ mergering, columns, popupAll }) => {
                 <th className="py-4 px-4 text-white">View</th>
               </tr>
             </thead>
-            <tbody className="bg-white text-center text-sm font-semibold text-dark_grey ">
+            <tbody className="bg-white text-center text-sm font-semibold text-dark_grey">
               {paginatedData.length > 0 ? (
                 paginatedData.map((candidate, index) => (
                   <tr key={index} className="shadow cursor-pointer">
                     {columns.map((column, idx) => (
-                      <td key={idx} className="py-4 px-4 break-words overflow-hidden flex-1">
+                      <td
+                        key={idx}
+                        className="py-4 px-4 break-words overflow-hidden flex-1"
+                      >
                         {candidate[column?.key] || "N/A"}
                       </td>
                     ))}
