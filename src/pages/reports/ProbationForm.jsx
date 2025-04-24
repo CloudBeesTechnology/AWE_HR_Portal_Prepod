@@ -15,16 +15,14 @@ import { useContext } from "react";
 import { sendEmail } from "../../services/EmailServices";
 import { FaArrowLeft } from "react-icons/fa";
 import { useTempID } from "../../utils/TempIDContext";
-import { DateFormat } from "../../utils/DateFormat";
 import { useCreateNotification } from "../../hooks/useCreateNotification";
+import useEmployeePersonalInfo from "../../hooks/useEmployeePersonalInfo";
 
-export const ProbationForm = forwardRef(() => {
+export const ProbationForm = forwardRef(({ userID, userType }) => {
   const location = useLocation();
   const { gmPosition } = useTempID();
   const { createNotification } = useCreateNotification();
   const { employeeData } = location.state || {};
-  const [userID, setUserID] = useState("");
-  const [userType, setUserType] = useState("");
   const { ProbFormsData } = ProbFormFun();
   const { UpdateProb } = UpdateProbForm();
   const [isLoading, setIsLoading] = useState(false);
@@ -113,12 +111,28 @@ export const ProbationForm = forwardRef(() => {
   const year = currentDate.getFullYear();
   //email process start
 
+  // useEffect(() => {
+  //   const userID = localStorage.getItem("userID");
+  //   setUserID(userID);
+  //   const userType = localStorage.getItem("userType");
+  //   setUserType(userType);
+  // }, []);
+
+  const [personalInfo, setPersonalInfo] = useState(null);
+  const { personalInfo: fetchedPersonalInfo } = useEmployeePersonalInfo(userID);
+
   useEffect(() => {
-    const userID = localStorage.getItem("userID");
-    setUserID(userID);
-    const userType = localStorage.getItem("userType");
-    setUserType(userType);
-  }, []);
+    if (fetchedPersonalInfo) {
+      setPersonalInfo(fetchedPersonalInfo);
+
+      console.log("Personal Info updated:", fetchedPersonalInfo);
+    }
+  }, [fetchedPersonalInfo]);
+
+  console.log(userID);
+  console.log(userType);
+
+  console.log(personalInfo);
 
   useEffect(() => {
     if (!workInfoData.length || !empPIData.length || !employeeData?.empID) {
@@ -307,7 +321,7 @@ export const ProbationForm = forwardRef(() => {
 
   const handleInputChange = (e) => {
     if (!e.target) {
-      // console.error("Event target is undefined");
+      console.error("Event target is undefined");
       return;
     }
     const { name, value } = e.target;
@@ -462,29 +476,27 @@ export const ProbationForm = forwardRef(() => {
         }
 
         await UpdateProb({ PbFDataUp: formattedData });
-  
+        console.log("update", formattedData);
 
         setIsLoading(false);
 
         setTimeout(() => {
           setNotification(true);
           setShowTitle("Probation form updated successfully");
-        }, 300);
+        }, 1000);
 
         // console.log("update", formattedData);
 
-
-          sendEmails(
-            data,
-            empPIRecord,
-            probationEndFormatted,
-            PFDataRecord,
-            subject,
-            notifyMessageSup,
-            notifyMessageManager,
-            notifyMessageGM
-          );
-   
+        sendEmails(
+          data,
+          empPIRecord,
+          probationEndFormatted,
+          PFDataRecord,
+          subject,
+          notifyMessageSup,
+          notifyMessageManager,
+          notifyMessageGM
+        );
       } else {
         const ProbValue = { ...data, ...formDataValues, probStatus: true };
 
@@ -497,6 +509,24 @@ export const ProbationForm = forwardRef(() => {
           return;
         }
 
+        if (
+          userType === "Manager" &&
+          !gmPosition &&
+          !formData.probData.managerApproved
+        ) {
+          alert("Manager approval or Rejection is required!");
+          return;
+        }
+
+        if (
+          userType === "Manager" &&
+          !gmPosition &&
+          !formData.probData.managerDate
+        ) {
+          alert("Manager date is is required!");
+          return;
+        }
+
         await ProbFormsData({ ProbValue });
         // console.log("CR");
 
@@ -505,19 +535,18 @@ export const ProbationForm = forwardRef(() => {
         setTimeout(() => {
           setNotification(true);
           setShowTitle("Probation form created successfully");
-        }, 300);
+        }, 1000);
 
-        console.log("create");
-          sendEmails(
-            data,
-            empPIRecord,
-            probationEndFormatted,
-            subject,
-            notifyMessageSup,
-            notifyMessageManager,
-            notifyMessageGM
-          );
-  
+        // console.log("create");
+        sendEmails(
+          data,
+          empPIRecord,
+          probationEndFormatted,
+          subject,
+          notifyMessageSup,
+          notifyMessageManager,
+          notifyMessageGM
+        );
 
         // console.log("Created", ProbValue);
       }
@@ -573,7 +602,7 @@ export const ProbationForm = forwardRef(() => {
         // alert(`Email sent successfully to Manager's mail: ${emailData.managerOfficialMail}\n\nEmail Content:\nYour Employee Mr./Ms. ${empPIRecord?.name}'s probation period ending on ${probationEndFormatted || "Not Mentioned"}\n\nhas been ${data?.supervisorApproved || PFDataRecord.supervisorApproved} by Supervisor, ${emailData?.supervisorName || "Not Mentioned"}.`);
       }
 
-      if (userType === "Manager" && !gmPosition) {
+      if (userType === "Manager" && gmPosition !== "GENERAL MANAGER") {
         // Sending email to GM if applicable
         if (emailData.skilledAndUnskilled === null) {
           if (Array.isArray(emailData.gmOfficialMail)) {
@@ -646,7 +675,7 @@ export const ProbationForm = forwardRef(() => {
 
           // alert(`Email sent successfully to HR's mail: ${emailData.hrOfficialmail}\n\nEmail Content:\nYour Employee Mr./Ms. ${empPIRecord?.name || "Not mentioned"}'s probation period ending on ${probationEndFormatted || "Not Mentioned"}\n\nhas been reviewed and ${data?.managerApproved || PFDataRecord.managerApproved} by the Manager, ${emailData?.managerName || "Not Mentioned"}.\n\nPlease proceed with the necessary actions.`);
         }
-      } else if (gmPosition === "General Manager") {
+      } else if (gmPosition === "GENERAL MANAGER") {
         // Sending email to HR if GM position is set
         await sendEmail(
           hrSubject,
@@ -660,14 +689,15 @@ export const ProbationForm = forwardRef(() => {
             <p>has been reviewed and ${
               data?.gmApproved || PFDataRecord.gmApproved
             } by the General Manager, ${
-            emailData?.managerName || "Not Mentioned"
+            personalInfo?.name || "Not Mentioned"
           }.</p>
             <p>Please proceed with the necessary actions.</p>
             <p>Click here https://hr.adininworks.co to view the updates.</p>
           </body>
         </html>`,
           from,
-          emailData.hrOfficialmail
+          // emailData.hrOfficialmail
+          "veda.thiyagarajan@gmail.com"
         );
 
         await createNotification({
@@ -686,8 +716,6 @@ export const ProbationForm = forwardRef(() => {
     }
   };
 
-
-  
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -844,6 +872,16 @@ export const ProbationForm = forwardRef(() => {
                 />
               </td>
             </tr>
+            {/* <tr className="border">
+              <td className="p-2 border-r font-semibold">Extended Probation End Date</td>
+              <td className="p-2 border-b">
+              <input
+                {...register("extendedProbationEndDate")}
+                defaultValue={employeeData?.extendedPED || "-"}
+                className="w-full outline-none"
+              />
+            </td>
+            </tr> */}
           </tbody>
         </table>
       </div>
@@ -853,7 +891,7 @@ export const ProbationForm = forwardRef(() => {
         formData={formData}
         handleInputChange={handleInputChange}
       />
-       <ConfirmationForm
+      <ConfirmationForm
         employeeData={employeeData}
         workInfoData={workInfoData}
         register={register}
@@ -868,11 +906,7 @@ export const ProbationForm = forwardRef(() => {
       {/* Save Button */}
       <div className="flex items-center justify-center mt-8">
         {userType !== "SuperAdmin" && (
-          <button
-            disabled={isLoading}
-            type="submit"
-            className="primary_btn"
-          >
+          <button disabled={isLoading} type="submit" className="primary_btn">
             {isLoading ? "Loading..." : "Save"}{" "}
             {/* Show loading text when isLoading is true */}
           </button>

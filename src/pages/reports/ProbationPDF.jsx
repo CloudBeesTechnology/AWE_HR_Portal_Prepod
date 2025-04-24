@@ -118,7 +118,7 @@ export const ProbationPDF = ({ userID, userType }) => {
         }
   
         // General Manager: filter based on manager approval
-        if (userType === "General Manager" || gmPosition === "General Manager") {
+        if (gmPosition === "GENERAL MANAGER") {
           const gmFilter = isProbationActive && isManagerApproved;
           // console.log("GM filter result:", gmFilter);
           return gmFilter;
@@ -225,7 +225,8 @@ export const ProbationPDF = ({ userID, userType }) => {
           }
           
           const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Now it's safe
-          
+
+
           if (lastWorkStatus?.toUpperCase() === "TERMINATION" || 
           lastWorkStatus?.toUpperCase() === "RESIGNATION" ||
           lastWorkStatus.toUpperCase() === "ACTIVE") {

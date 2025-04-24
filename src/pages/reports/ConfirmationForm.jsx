@@ -21,6 +21,33 @@ export const ConfirmationForm = ({
     }
   }, [formData]);
 
+  // useEffect(() => {
+  //   if (!workInfoData.length || !employeeData?.empID) {
+  //     return;
+  //   }
+
+  //   const workInfo = workInfoData.find(
+  //     (data) => data.empID === employeeData.empID
+  //   );
+
+  //   if (workInfo) {
+  //     console.log(workInfo);
+
+  //     const supervisorExists =
+  //       workInfo.supervisor &&
+  //       workInfo.supervisor !== "null" &&
+  //       workInfo.supervisor !== null &&
+  //       workInfo.supervisor !== undefined &&
+  //       !(
+  //         Array.isArray(workInfo.supervisor) && workInfo.supervisor[0] === null
+  //       ) &&
+  //        !(
+  //         Array.isArray(workInfo.supervisor) && workInfo.supervisor[workInfo.supervisor.length - 1] === "N/A"
+  //       )
+  //     setHasSupervisor(supervisorExists);
+  //   }
+  // }, [workInfoData, employeeData?.empID]);
+
   useEffect(() => {
     if (!workInfoData.length || !employeeData?.empID) {
       return;
@@ -31,31 +58,44 @@ export const ConfirmationForm = ({
     );
 
     if (workInfo) {
-      const supervisorExists =
-        workInfo.supervisor &&
-        workInfo.supervisor !== "null" &&
-        workInfo.supervisor !== null &&
-        workInfo.supervisor !== undefined &&
-        !(
-          Array.isArray(workInfo.supervisor) && workInfo.supervisor[0] === null
-        ) &&
-         !(
-          Array.isArray(workInfo.supervisor) && workInfo.supervisor[workInfo.supervisor.length - 1] === "N/A"
+
+      const supervisorExists = (() => {
+        if (!workInfo.supervisor) return false; 
+        if (workInfo.supervisor === "null") return false;
+
+        if (Array.isArray(workInfo.supervisor)) {
+
+          if (workInfo.supervisor.length === 0) return false;
+
+          if (workInfo.supervisor[workInfo.supervisor.length - 1] === "N/A") {
+            return false;
+          }
+          return !!workInfo.supervisor[0] && workInfo.supervisor[0] !== "null";
+        }
+        return (
+          typeof workInfo.supervisor === "string" &&
+          workInfo.supervisor.trim() !== "" &&
+          workInfo.supervisor !== "null" &&
+          workInfo.supervisor !== "N/A"
         );
+      })();
+
       setHasSupervisor(supervisorExists);
     }
   }, [workInfoData, employeeData?.empID]);
 
-
+  console.log(hasSupervisor);
 
   const handleChange = (event) => {
     event.persist();
+
+    console.log(event.target.value);
 
     if (!event.target) {
       console.error("Event target is undefined");
       return;
     }
-    // console.log(event.target.name);
+
 
     setSelectedValue(event.target.value);
     handleInputChange(event.target.name, event.target.value);
