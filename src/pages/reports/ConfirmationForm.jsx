@@ -60,7 +60,6 @@ export const ConfirmationForm = ({
     }
   }, [workInfoData, employeeData?.empID]);
 
-  console.log(hasSupervisor);
 
   const handleChange = (event) => {
     event.persist();

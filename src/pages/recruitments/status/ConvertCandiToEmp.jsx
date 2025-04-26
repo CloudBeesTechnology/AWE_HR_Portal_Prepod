@@ -134,7 +134,6 @@ export const CandiToEmp = () => {
         input: {
           id: storedData.interviewDetails_id,
           status: "Employee",
-          empID: storedData.empID
         },
       },
     })
