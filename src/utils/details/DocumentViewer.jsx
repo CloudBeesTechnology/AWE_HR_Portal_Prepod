@@ -14,12 +14,11 @@ const DocumentViewer = ({
   handleCloseViewer
 }) => {
 
-     // Helper function to get the first element from the array if it's an array
   const getValidUrl = (url) => {
     if (Array.isArray(url)) {
-      return url[0]; // Extract the first URL from the array
+      return url[0]; 
     }
-    return url; // Return the URL directly if it's not an array
+    return url; 
   };
   
 

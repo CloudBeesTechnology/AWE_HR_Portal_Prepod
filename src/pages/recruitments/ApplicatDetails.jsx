@@ -55,10 +55,7 @@ export const ApplicantDetails = () => {
       path: pathUrl,
     });
     setImageUrl(result.url.toString());
-  };
-
-  const profile = watch("profilePhoto");
- 
+  }; 
 
   useEffect(() => {
     const savedData = JSON.parse(localStorage.getItem("profileStore"));

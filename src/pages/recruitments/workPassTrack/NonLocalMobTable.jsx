@@ -128,21 +128,6 @@ export const NonLocalMobTable = ({
     };
     fetchNextTempID();
   }, []);
-  console.log(latestTempIDData);
-
-  // const OnSubmit = async (candi) => {
-  //   const storedData = {
-  //     ...candi,
-  //     empID: latestTempIDData,
-  //   };
-  //   // console.log("stored", storedData);
-
-  //   await SumbitCandiToEmp({ storedData });
-  //   await submitMobilization({ mob: storedData });
-
-  //   // setShowTitle("Candidate conversion to employee has been completed successfully.");
-  //   // setNotification(true);
-  // };
 
   const OnSubmit = async (candi) => {
     setLoadingItems((prev) => {

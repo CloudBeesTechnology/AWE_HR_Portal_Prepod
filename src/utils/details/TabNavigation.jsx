@@ -3,14 +3,12 @@ import React from 'react';
 const TabNavigation = ({ activeTab, handleTabClick }) => {
   const tabs = [
     "Personal Details",
-    // "Educational Details",
     "Family Details",
     "Work Info",
     "Work Pass",
     "Medical Details",
     "Insurance Details",
     "Non-Local Accommodation Details",
-    // "Depend Pass"
   ];
 
   return (

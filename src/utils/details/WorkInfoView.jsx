@@ -3,9 +3,7 @@ import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { pdfjs } from "react-pdf";
 import { useReactToPrint } from "react-to-print";
-// import "react-pdf/dist/esm/Page/TextLayer.css";
-// import "react-pdf/dist/esm/Page/AnnotationLayer.css";
-import { FaTimes, FaPrint, FaDownload } from "react-icons/fa"; // Import "X" icon from react-icons
+import { FaTimes, FaPrint, FaDownload } from "react-icons/fa"; 
 import { getUrl } from "@aws-amplify/storage";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -15,12 +13,6 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 
 const WorkInfoView = ({
   workInfo,
-  isPdfOpen,
-  pageNumber,
-  numPages,
-  handleViewDocument,
-  onDocumentLoadSuccess,
-  setPageNumber,
   WIContract,
   WILeaveEntitle,
   WIProbation,
@@ -35,22 +27,18 @@ const WorkInfoView = ({
   formatDate,
   mainRef,
 }) => {
-  const [viewingDocument, setViewingDocument] = useState(null); // State to store the currently viewed document URL
+  const [viewingDocument, setViewingDocument] = useState(null); 
   const [lastUploadUrl, setPPLastUP] = useState("");
-  const [loading, setLoading] = useState(false);
   const workInfoRef = useRef();
 
   // Helper function to fetch the cloud URL
   const linkToStorageFile = async (pathUrl) => {
     try {
       const result = await getUrl({ path: pathUrl });
-      //  console.log("File URL:", result.url.href); // Use .href to extract the URL as a string
-      setPPLastUP(result.url.href); // Store the URL as a string
-      setViewingDocument(pathUrl); // Update the state to show the selected document
-      setLoading(false);
+      setPPLastUP(result.url.href); 
+      setViewingDocument(pathUrl); 
     } catch (error) {
       console.error("Error fetching the file URL:", error);
-      setLoading(false);
     }
   };
 
@@ -61,7 +49,7 @@ const WorkInfoView = ({
       if (Array.isArray(parsedData)) {
         return parsedData.map((doc) => {
           if (doc.upload) {
-            doc.fileName = doc.upload.split("/").pop(); // Extract file name from path
+            doc.fileName = doc.upload.split("/").pop();
           }
           return doc;
         });
@@ -74,8 +62,8 @@ const WorkInfoView = ({
   };
 
   const handleClose = (e) => {
-    e.preventDefault(); // Prevent default action
-    setViewingDocument(null); // Close the viewer
+    e.preventDefault(); 
+    setViewingDocument(null); 
   };
 
   const closeModal = () => {
@@ -108,7 +96,7 @@ const WorkInfoView = ({
                 Uploaded on: {formatDate(document.date)}
               </span>
               <button
-                onClick={() => linkToStorageFile(document.upload)} // Fetch the URL for the document
+                onClick={() => linkToStorageFile(document.upload)} 
                 className="text-dark_grey font-semibold text-sm"
               >
                 View Document
@@ -132,7 +120,7 @@ const WorkInfoView = ({
 
                     <div className="absolute top-2 right-2">
                       <button
-                        onClick={closeModal} // Close the modal
+                        onClick={closeModal} 
                         className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
                       >
                         <FaTimes />
@@ -167,7 +155,7 @@ const WorkInfoView = ({
                 <div className="relative mt-4">
                   <div ref={invoiceRef}>
                     <img
-                      src={lastUploadUrl} // Use the URL for the image
+                      src={lastUploadUrl} 
                       alt="Document Preview"
                       className="w-full h-auto"
                     />
@@ -178,7 +166,7 @@ const WorkInfoView = ({
                       onClick={handleClose}
                       className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
                     >
-                      <FaTimes /> {/* Close icon */}
+                      <FaTimes />
                     </button>
                   </div>
 
@@ -233,14 +221,16 @@ const WorkInfoView = ({
   };
   const renderDetails = (details) => {
     const capitalizeWords = (str) => {
-      if (!str || str === "N/A") {
-        return "N/A"; // Return "N/A" for null, undefined, or "N/A"
+      if (typeof str !== "string" || str === "N/A") {
+        return "N/A";
       }
-  
+
       return str
-        .split(' ') // Split by space if it's multi-word
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join(' '); // Rejoin the words
+        .split(" ") 
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join(" "); 
     };
   
     return (
@@ -252,19 +242,16 @@ const WorkInfoView = ({
             <span className="text-dark_grey">
               {
                 Array.isArray(value)
-                  ? value.length > 0 // Check if array is not empty
+                  ? value.length > 0 
                     ? value
-                        .map((v, idx, arr) => {
-                          // Replace null, undefined, or empty string with "N/A"
+                        .map((v, idx, arr) => {          
                           if (v === null || v === undefined || v === '') {
-                            return "N/A"; // Replace with "N/A"
-                          }
-                          // Remove consecutive duplicates, case-insensitive
+                            return "N/A"; 
+                          }               
                           return v.toLowerCase() === arr[idx - 1]?.toLowerCase() ? null : v;
                         })
-                        .filter((v, idx, arr) => v !== null) // Remove null values (duplicates and N/A's)
+                        .filter((v, idx, arr) => v !== null) 
                         .reduce((acc, item) => {
-                          // Consolidate consecutive "N/A"s into a single one
                           if (item === "N/A" && acc[acc.length - 1] !== "N/A") {
                             acc.push("N/A");
                           } else if (item !== "N/A") {
@@ -272,28 +259,27 @@ const WorkInfoView = ({
                           }
                           return acc;
                         }, [])
-                        .reverse() // Reverse the order to move the latest value to the front
+                        .reverse() 
                         .map((item, idx, arr) => {
-                          // Ensure the latest value is first
                           return (
                             <span key={idx}>
                               <span
                                  className={`${
                                   arr.length > 1 && idx === 0
                                     ? "rounded-md font-black italic"
-                                    : "" // Only highlight the latest value if there are multiple values lo
+                                    : ""
                                 }`}
                               >
-                                {capitalizeWords(item)} {/* Capitalize the words */}
+                                {capitalizeWords(item)} 
                               </span>
-                              {idx < arr.length - 1 && <span>,&nbsp;</span>} {/* Add a comma except for the last item */}
+                              {idx < arr.length - 1 && <span>,&nbsp;</span>} 
                             </span>
                           );
                         })
-                    : "N/A" // Show "N/A" if the array is empty or contains only null/empty values
+                    : "N/A" 
                   : value === null || value === undefined || value === ''
-                  ? "N/A" // Show "N/A" if the value is null, undefined, or empty string
-                  : capitalizeWords(value) // Capitalize the value if not an array
+                  ? "N/A" 
+                  : capitalizeWords(value) 
               }
             </span>
           </React.Fragment>

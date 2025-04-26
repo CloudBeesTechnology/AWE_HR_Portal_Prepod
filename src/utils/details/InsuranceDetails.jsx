@@ -21,12 +21,9 @@ const InsuranceDetails = ({
   InsuranceClaim,
 }) => {
   const [viewingDocument, setViewingDocument] = useState(null); 
-  const [pageNumber, setPageNumber] = useState(1); // For paginated PDF documents
-  const [numPages, setNumPages] = useState(null); // Total pages in the document
   const [dependInsurance, setDependInsurance] = useState([]);
   const [insClaim, setInsClaim] = useState([]);
-  const [lastUploadUrl, setPPLastUP] = useState(""); // State to store the last uploaded file's URL
-  const [loading, setLoading] = useState(false);
+  const [lastUploadUrl, setPPLastUP] = useState("");
   const insurance = useRef();
 
   const linkToStorageFile = async (pathUrl) => {
@@ -35,23 +32,9 @@ const InsuranceDetails = ({
 
       setPPLastUP(result.url.href); 
       setViewingDocument(pathUrl); 
-      setLoading(false);
     } catch (error) {
       console.error("Error fetching the file URL:", error);
-      setLoading(false);
     }
-  };
-
-  const onDocumentLoadSuccess = ({ numPages }) => {
-    setNumPages(numPages);
-    setPageNumber(1); 
-  };
-
-  const handleDocumentClick = (document) => {
-    // Toggle visibility of the document
-    setViewingDocument(
-      viewingDocument === lastUploadUrl() ? null : document.upload
-    );
   };
 
   useEffect(() => {
@@ -59,8 +42,7 @@ const InsuranceDetails = ({
     if (Array.isArray(depInsurance) && depInsurance.length > 0) {
 
       if (typeof depInsurance[0] === "string") {
-        try {
-    
+        try {   
           const parsedString = JSON.parse(depInsurance[0]);
           setDependInsurance(parsedString);
         } catch (error) {
@@ -271,14 +253,14 @@ const InsuranceDetails = ({
     );
   };
 
-     const  renderPersonalDetails = (details) => {
+     const renderPersonalDetails = (details) => {
         const capitalizeWords = (str) => {
           if (!str || str === "N/A") {
             return "N/A"; 
           }
       
           return str
-            .split(' ') // Split by space if it's multi-word
+            .split(' ') 
             .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
             .join(' ');
         };
@@ -292,19 +274,16 @@ const InsuranceDetails = ({
                 <span className="text-dark_grey">
                   {
                     Array.isArray(value)
-                      ? value.length > 0 // Check if array is not empty
+                      ? value.length > 0 
                         ? value
                             .map((v, idx, arr) => {
-                              // Replace null, undefined, or empty string with "N/A"
                               if (v === null || v === undefined || v === '') {
-                                return "N/A"; // Replace with "N/A"
+                                return "N/A"; 
                               }
-                              // Remove consecutive duplicates, case-insensitive
                               return v.toLowerCase() === arr[idx - 1]?.toLowerCase() ? null : v;
                             })
                             .filter((v, idx, arr) => v !== null) 
                             .reduce((acc, item) => {
-                              // Consolidate consecutive "N/A"s into a single one
                               if (item === "N/A" && acc[acc.length - 1] !== "N/A") {
                                 acc.push("N/A");
                               } else if (item !== "N/A") {
@@ -312,28 +291,27 @@ const InsuranceDetails = ({
                               }
                               return acc;
                             }, [])
-                            .reverse() // Reverse the order to move the latest value to the front
+                            .reverse() 
                             .map((item, idx, arr) => {
-                              // Ensure the latest value is first
                               return (
                                 <span key={idx}>
                                   <span
                                      className={`${
                                       arr.length > 1 && idx === 0
                                         ? "rounded-md font-black italic"
-                                        : "" // Only highlight the latest value if there are multiple values lo
+                                        : "" 
                                     }`}
                                   >
-                                    {capitalizeWords(item)} {/* Capitalize the words */}
+                                    {capitalizeWords(item)} 
                                   </span>
-                                  {idx < arr.length - 1 && <span>,&nbsp;</span>} {/* Add a comma except for the last item */}
+                                  {idx < arr.length - 1 && <span>,&nbsp;</span>} 
                                 </span>
                               );
                             })
-                        : "N/A" // Show "N/A" if the array is empty or contains only null/empty values
+                        : "N/A" 
                       : value === null || value === undefined || value === ''
-                      ? "N/A" // Show "N/A" if the value is null, undefined, or empty string
-                      : capitalizeWords(value) // Capitalize the value if not an array
+                      ? "N/A" 
+                      : capitalizeWords(value) 
                   }
                 </span>
               </React.Fragment>

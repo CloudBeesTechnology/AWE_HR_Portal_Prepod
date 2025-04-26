@@ -1,6 +1,7 @@
 import React from "react";
 import { useEffect } from "react";
 import { TiTick } from "react-icons/ti";
+import { useTempID } from "../../utils/TempIDContext";
 
 export const ConfirmationForm = ({
   register,
@@ -13,6 +14,7 @@ export const ConfirmationForm = ({
 }) => {
   const [selectedValue, setSelectedValue] = React.useState("");
   const [hasSupervisor, setHasSupervisor] = React.useState(true);
+  const { setSupervisorCheck } = useTempID();
 
   useEffect(() => {
     if (formData && formData.probData) {
@@ -20,33 +22,6 @@ export const ConfirmationForm = ({
       setSelectedValue(recommendation);
     }
   }, [formData]);
-
-  // useEffect(() => {
-  //   if (!workInfoData.length || !employeeData?.empID) {
-  //     return;
-  //   }
-
-  //   const workInfo = workInfoData.find(
-  //     (data) => data.empID === employeeData.empID
-  //   );
-
-  //   if (workInfo) {
-  //     console.log(workInfo);
-
-  //     const supervisorExists =
-  //       workInfo.supervisor &&
-  //       workInfo.supervisor !== "null" &&
-  //       workInfo.supervisor !== null &&
-  //       workInfo.supervisor !== undefined &&
-  //       !(
-  //         Array.isArray(workInfo.supervisor) && workInfo.supervisor[0] === null
-  //       ) &&
-  //        !(
-  //         Array.isArray(workInfo.supervisor) && workInfo.supervisor[workInfo.supervisor.length - 1] === "N/A"
-  //       )
-  //     setHasSupervisor(supervisorExists);
-  //   }
-  // }, [workInfoData, employeeData?.empID]);
 
   useEffect(() => {
     if (!workInfoData.length || !employeeData?.empID) {
@@ -81,6 +56,7 @@ export const ConfirmationForm = ({
       })();
 
       setHasSupervisor(supervisorExists);
+      setSupervisorCheck(supervisorExists);
     }
   }, [workInfoData, employeeData?.empID]);
 
