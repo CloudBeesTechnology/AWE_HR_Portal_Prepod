@@ -42,6 +42,8 @@ export const InsuranceClaim = () => {
     formState: { errors },
     setValue,
     watch,
+    getValues,
+    reset
   } = useForm({
     resolver: yupResolver(ClaimInsuranceSchema),
     defaultValues: {
@@ -179,7 +181,7 @@ export const InsuranceClaim = () => {
   const claimUp = "insuranceClaims";
   // console.log(isUploading);
   const searchResult = (result) => {
-    // console.log(result, "result");
+    // Reset the state before setting new data
     setValue("empID", result?.empID);
     const insuranceClaimsData = result?.insuranceClaims;
     // console.log(insuranceClaimsData);
@@ -197,12 +199,6 @@ export const InsuranceClaim = () => {
           return;
         }
 
-        // Reset the state before setting new data
-        setinsuranceClaims([]);
-        setUploadedDocs({});
-        setUploadedFileDep({});
-        setValue("insuranceClaims", []);
-
         if (parsedData.length > 0) {
           setinsuranceClaims(parsedData);
           setValue("insuranceClaims", parsedData);
@@ -211,7 +207,7 @@ export const InsuranceClaim = () => {
             if (item?.claimUpload) {
               try {
                 const url = item.claimUpload;
-                if (Array.isArray(url) && url.length === 0) return; // Skip empty uploads
+                if (Array.isArray(url) && url.length === 0) return;
 
                 const parsedArray =
                   typeof url === "string" ? JSON.parse(url) : url;
@@ -233,7 +229,7 @@ export const InsuranceClaim = () => {
                       return null;
                     }
                   })
-                  .filter(Boolean); // Remove null values
+                  .filter(Boolean);
                 setUploadedDocs((prev) => ({
                   ...prev,
                   insuranceClaims: {
@@ -242,18 +238,6 @@ export const InsuranceClaim = () => {
                   },
                 }));
 
-                // setUploadedDocs((prev) => ({
-                //   ...prev,
-                //   [idx]: parsedFiles,
-                // }));
-
-                // setUploadedFileDep((prev) => ({
-                //   ...prev,
-                //   [idx]:
-                //     parsedFiles.length > 0
-                //       ? getFileName(parsedFiles[parsedFiles.length - 1].upload)
-                //       : "",
-                // }));
                 const fileNames = parsedFiles.map((file) =>
                   file && file.upload ? getFileName(file.upload) : ""
                 );
@@ -278,6 +262,24 @@ export const InsuranceClaim = () => {
           insuranceClaimsData
         );
       }
+    } else {
+      reset({
+        empID: getValues("empID"),
+      });
+      setUploadedDocs({});
+      setUploadedFileDep({});
+      setFileNames({});
+      setinsuranceClaims([
+        {
+          claimantName: "",
+          dateReported: "",
+          paymentReceived: "",
+          datePaid: "",
+          claimType: "",
+          claimInfo: "",
+          claimUpload: [],
+        },
+      ]);
     }
   };
 

@@ -114,7 +114,7 @@ import { LabourMedicalInfoMD } from "../components/migratingData/LabourMedicalIn
 import { ContractFormPDF } from "../pages/reports/ContractFormPDF";
 import { ProbationPDF } from "../pages/reports/ProbationPDF";
 import { FiLoader } from "react-icons/fi";
-import {LeaveStatus} from "../components/migratingData/LeaveStatus"
+import { LeaveStatus } from "../components/migratingData/LeaveStatus";
 import { AddDropDown } from "../components/migratingData/AddDropDown";
 import { OffshoreORMC } from "../pages/timeSheet/OffshoreORMC";
 import { OffshoreExcelSheets } from "../pages/timeSheet/OffshoreExcelSheets";
@@ -146,7 +146,7 @@ const NavigationLinks = () => {
                 { selectType: { eq: userType } },
               ],
             },
-            limit:20000
+            limit: 20000,
           },
         });
 
@@ -227,130 +227,127 @@ const NavigationLinks = () => {
   );
 
   return (
-      <Routes>
-        {/* Change Password */}
-        <Route path="/changePassword" element={<ChangePassword />} />
-        <Route path="/dropdown" Component={AddDropDown} />
-        {/* Migration Data */}
-        <Route path="/migrationDataID" element={<IDDetailsMD />} />
-        <Route path="/migrationDataEPI" element={<EmpPersonalMD />} />
-        <Route path="/migrationDataWorkI" element={<WorkInfoMD />} />
-        <Route path="/migrationDataService" element={<ServiceRecordedMD />} />
-        <Route path="/migrationDataEmpInsu" element={<EmpInsuranceMD />} />
-        <Route path="/migrationDataLeaveDetails" element={<LeaveDetailsMD />} />
-        <Route path="/migrationDataNLA" element={<NonLocalAccMD />} />
-        <Route path="/migrationDataDN" element={<DNDetailsMD />} />
-        <Route path="/migrationDataTerminated" element={<TerminatedMD />} />
-        <Route path="/migrationDataBJL" element={<BJLDetailsMD />} />{" "}
-        {/* Redirect to the first matching allowed category */}
-        <Route path="/migrationPPValid" element={<PassportValidMD />} />
-        <Route path="/migrationLMInfo" element={<LabourMedicalInfoMD />} />
-        <Route path="/migrationNlms" element={<NlmsMD />} />
-        <Route path="/migrationLeaveData" element={<LeaveStatus/> } /> 
-        <Route path="/migrationTrainingCertify" element={<TrainingCertifyMD />} />
-        <Route path="/migrationTriningReq" element={<TriningReqMD />} />
-        <Route
-          path="/"
-          element={<Navigate to={`/${firstCategory?.toLowerCase()}`} />}
-        />
-        {/* Personal Information Route */}
-        <Route path="/personalInformation" element={<PersonalInformation />} />
-        {/* Only show the routes that are in allowedCategories */}
-        {allowedCategories.includes("Dashboard") && (
-          <Route path="/dashboard" element={<Dashboard />} />
-        )}
-        {allowedCategories.includes("User") && (
-          <>
-            <Route path="/user" element={<User />} />
-            <Route path="/addNewForm" element={<AddNewForm />} />
-          </>
-        )}
-        {allowedCategories.includes("Recruitment") && (
-          <>
-            <Route path="/recruitment" Component={Recruitments} />
-            {/* <Route path="/applyemployreq" Component={ApplyEmployReq}/> */}
-            <Route path="/recrutiles" Component={RecruTiles}>
-              <Route path="candidate" element={<Candidate />} />
-              <Route path="applyemployreq" element={<ApplyEmployReq />} />
-              <Route path="listofcandi" element={<ListofCandi />} />
-              <Route path="localcandi" element={<Localcandi />} />
-              <Route path="nonloccandi" element={<NonlocCandi />} />
-              <Route path="employreq" element={<EmployReq />} />
-              {/* <Route path="employreq" element={<EmployReq />} /> */}
-              <Route path="status" element={<Status />} />
-              <Route path="workpasstracking" element={<WorkpassTracking />} />
-            </Route>
-            <Route path="/hiringJob" element={<HiringJob />} />
-            <Route path="/postJob" element={<CreateJob />} />
-            <Route path="/addCandidates" Component={AddCandidates}>
-              <Route index element={<ApplicantDetails />} />
-              <Route path="personalDetails" element={<PersonalDetails />} />
-              <Route path="educationDetails" element={<EducationDetails />} />
-              <Route path="otherDetails" element={<OtherDetails />} />
-            </Route>
-          </>
-        )}
-        {allowedCategories.includes("Employee") && (
-          <>
-            <Route path="/insuranceAdd" Component={InsuranceNav}>
-              <Route index element={<EmployeeInsurance />} />
-              <Route
-                path="dependentInsurance"
-                element={<DependentInsurance />}
-              />
-            </Route>
+    <Routes>
+      {/* Change Password */}
+      <Route path="/changePassword" element={<ChangePassword />} />
+      <Route path="/dropdown" Component={AddDropDown} />
+      {/* Migration Data */}
+      <Route path="/migrationDataID" element={<IDDetailsMD />} />
+      <Route path="/migrationDataEPI" element={<EmpPersonalMD />} />
+      <Route path="/migrationDataWorkI" element={<WorkInfoMD />} />
+      <Route path="/migrationDataService" element={<ServiceRecordedMD />} />
+      <Route path="/migrationDataEmpInsu" element={<EmpInsuranceMD />} />
+      <Route path="/migrationDataLeaveDetails" element={<LeaveDetailsMD />} />
+      <Route path="/migrationDataNLA" element={<NonLocalAccMD />} />
+      <Route path="/migrationDataDN" element={<DNDetailsMD />} />
+      <Route path="/migrationDataTerminated" element={<TerminatedMD />} />
+      <Route path="/migrationDataBJL" element={<BJLDetailsMD />} />{" "}
+      {/* Redirect to the first matching allowed category */}
+      <Route path="/migrationPPValid" element={<PassportValidMD />} />
+      <Route path="/migrationLMInfo" element={<LabourMedicalInfoMD />} />
+      <Route path="/migrationNlms" element={<NlmsMD />} />
+      <Route path="/migrationLeaveData" element={<LeaveStatus />} />
+      <Route path="/migrationTrainingCertify" element={<TrainingCertifyMD />} />
+      <Route path="/migrationTriningReq" element={<TriningReqMD />} />
+      <Route
+        path="/"
+        element={<Navigate to={`/${firstCategory?.toLowerCase()}`} />}
+      />
+      {/* Personal Information Route */}
+      <Route path="/personalInformation" element={<PersonalInformation />} />
+      {/* Only show the routes that are in allowedCategories */}
+      {allowedCategories.includes("Dashboard") && (
+        <Route path="/dashboard" element={<Dashboard />} />
+      )}
+      {allowedCategories.includes("User") && (
+        <>
+          <Route path="/user" element={<User />} />
+          <Route path="/addNewForm" element={<AddNewForm />} />
+        </>
+      )}
+      {allowedCategories.includes("Recruitment") && (
+        <>
+          <Route path="/recruitment" Component={Recruitments} />
+          {/* <Route path="/applyemployreq" Component={ApplyEmployReq}/> */}
+          <Route path="/recrutiles" Component={RecruTiles}>
+            <Route path="candidate" element={<Candidate />} />
+            <Route path="applyemployreq" element={<ApplyEmployReq />} />
+            <Route path="listofcandi" element={<ListofCandi />} />
+            <Route path="localcandi" element={<Localcandi />} />
+            <Route path="nonloccandi" element={<NonlocCandi />} />
+            <Route path="employreq" element={<EmployReq />} />
+            {/* <Route path="employreq" element={<EmployReq />} /> */}
+            <Route path="status" element={<Status />} />
+            <Route path="workpasstracking" element={<WorkpassTracking />} />
+          </Route>
+          <Route path="/hiringJob" element={<HiringJob />} />
+          <Route path="/postJob" element={<CreateJob />} />
+          <Route path="/addCandidates" Component={AddCandidates}>
+            <Route index element={<ApplicantDetails />} />
+            <Route path="personalDetails" element={<PersonalDetails />} />
+            <Route path="educationDetails" element={<EducationDetails />} />
+            <Route path="otherDetails" element={<OtherDetails />} />
+          </Route>
+        </>
+      )}
+      {allowedCategories.includes("Employee") && (
+        <>
+          <Route path="/insuranceAdd" Component={InsuranceNav}>
+            <Route index element={<EmployeeInsurance />} />
+            <Route path="dependentInsurance" element={<DependentInsurance />} />
+          </Route>
 
-            <Route path="/sawp" Component={WorkPass}>
-              <Route index element={<Sawp />} />
-              <Route path="doe" element={<Doe />} />
-              <Route path="nlms" element={<Nlms />} />
-              <Route path="bankGuarantee" element={<BankGuarantee />} />
-              <Route path="jitpa" element={<Jitpa />} />
-              <Route path="labourDeposit" element={<LabourDeposit />} />
-              <Route path="immigration" element={<Immigration />} />
-            </Route>
+          <Route path="/sawp" Component={WorkPass}>
+            <Route index element={<Sawp />} />
+            <Route path="doe" element={<Doe />} />
+            <Route path="nlms" element={<Nlms />} />
+            <Route path="bankGuarantee" element={<BankGuarantee />} />
+            <Route path="jitpa" element={<Jitpa />} />
+            <Route path="labourDeposit" element={<LabourDeposit />} />
+            <Route path="immigration" element={<Immigration />} />
+          </Route>
 
-            <Route path="/allempDetails" Component={AllEmployee} />
-            <Route path="/employee" Component={Employee} />
-            <Route path="/empRequistion" Component={EmpRequisitionForm} />
+          <Route path="/allempDetails" Component={AllEmployee} />
+          <Route path="/employee" Component={Employee} />
+          <Route path="/empRequistion" Component={EmpRequisitionForm} />
 
-            <Route path="/employeeInfo" Component={EmployeeInfo} />
-            <Route path="/workInfo" Component={WorkInfo} />
-            <Route path="/workPass" Component={WorkPass} />
-            <Route path="/nonLocalAcco" Component={NonLocalAcco} />
-            <Route path="/labourImmigration" Component={LabourImmigration} />
-          </>
-        )}
-        {allowedCategories.includes("Insurance") && (
-          <>
-            <Route path="/insuranceHr" Component={HrInsuranceNav}>
-              <Route index element={<Insurance />} />
-              <Route path="groupHS" element={<GroupHS />} />
-              <Route path="workmenComp" element={<WorkmenComp />} />
-              <Route path="travelling" element={<Travelling />} />
-              <Route path="personalAcci" element={<PersonalAcci />} />
-              <Route path="insuranceClaim" element={<InsuranceClaim />} />
-            </Route>
-          </>
-        )}
-        {allowedCategories.includes("Training") && (
-          <>
-            <Route path="/training" Component={Training} />
-            <Route path="/training/AcTc" Component={AddCourse} />
-            <Route
-              path="/training/trainingCertify"
-              Component={TrainingCertificatesForm}
-            />
-            <Route path="/trainingReq" Component={AddEmpReq} />
-            <Route path="/trainingReq/add" Component={AddEmployeeForm} />
-            <Route path="/trainingReq/view" Component={ViewAddEmp} />
-            <Route path="/blngCertify" Component={BlngCertify} />
-            <Route path="/omgCertify" Component={OMEDataCertify} />
-            <Route path="/training/hr" Component={HRSplit} />
-            <Route path="/training/tcView" Component={TcViewData} />
-          </>
-        )}
-         {allowedCategories.includes("TimeSheet") && (
+          <Route path="/employeeInfo" Component={EmployeeInfo} />
+          <Route path="/workInfo" Component={WorkInfo} />
+          <Route path="/workPass" Component={WorkPass} />
+          <Route path="/nonLocalAcco" Component={NonLocalAcco} />
+          <Route path="/labourImmigration" Component={LabourImmigration} />
+        </>
+      )}
+      {allowedCategories.includes("Insurance") && (
+        <>
+          <Route path="/insuranceHr" Component={HrInsuranceNav}>
+            <Route index element={<Insurance />} />
+            <Route path="groupHS" element={<GroupHS />} />
+            <Route path="workmenComp" element={<WorkmenComp />} />
+            <Route path="travelling" element={<Travelling />} />
+            <Route path="personalAcci" element={<PersonalAcci />} />
+            <Route path="insuranceClaim" element={<InsuranceClaim />} />
+          </Route>
+        </>
+      )}
+      {allowedCategories.includes("Training") && (
+        <>
+          <Route path="/training" Component={Training} />
+          <Route path="/training/AcTc" Component={AddCourse} />
+          <Route
+            path="/training/trainingCertify"
+            Component={TrainingCertificatesForm}
+          />
+          <Route path="/trainingReq" Component={AddEmpReq} />
+          <Route path="/trainingReq/add" Component={AddEmployeeForm} />
+          <Route path="/trainingReq/view" Component={ViewAddEmp} />
+          <Route path="/blngCertify" Component={BlngCertify} />
+          <Route path="/omgCertify" Component={OMEDataCertify} />
+          <Route path="/training/hr" Component={HRSplit} />
+          <Route path="/training/tcView" Component={TcViewData} />
+        </>
+      )}
+      {allowedCategories.includes("TimeSheet") && (
         <>
           <Route path="/timeSheet" element={<TimeSheet />} />
           <Route path="/timesheetHO" element={<HO />} />
@@ -372,60 +369,66 @@ const NavigationLinks = () => {
           <Route path="/viewSummary" element={<ViewSummary />} />
         </>
       )}
-        {allowedCategories.includes("LeaveManagement") && (
-          <Route path="/leaveManagement" Component={LeaveManage}>
-            <Route index element={<LMTable />} />
-            <Route path="historyLeave" element={<HOLTable />} />
-            <Route path="leaveBalance" element={<EmpLeaveBalance />} />
-            <Route path="requestTickets" element={<TicketsTable />} />
-          </Route>
-        )}
-        {allowedCategories.includes("Notification") && (
-          <Route path="/notifications" Component={Notifications} />
-        )}
-        {allowedCategories.includes("Report") && (
-          <>
-            <Route path="/reports" Component={Reports} />
-            <Route path="/probForm" Component={ProbationForm} />
-            <Route path="/contractForms" Component={ContractFormPDF} />
+      {allowedCategories.includes("LeaveManagement") && (
+        <Route path="/leaveManagement" Component={LeaveManage}>
+          <Route index element={<LMTable />} />
+          <Route path="historyLeave" element={<HOLTable />} />
+          <Route path="leaveBalance" element={<EmpLeaveBalance />} />
+          <Route path="requestTickets" element={<TicketsTable />} />
+        </Route>
+      )}
+      {allowedCategories.includes("Notification") && (
+        <Route path="/notifications" Component={Notifications} />
+      )}
+      {allowedCategories.includes("Report") && (
+        <>
+          <Route path="/reports" Component={Reports} />
+          <Route
+            path="/probForm"
+            element={<ProbationForm userID={userID} userType={userType} />}
+          />
+          <Route path="/contractForms" Component={ContractFormPDF} />
 
-            <Route path="/rm" Component={RM} />
-            <Route path="/filterTable" Component={FilterTable} />
-            <Route path="/resignation" Component={Resignation} />
-            <Route path="/termination" Component={Termination} />
-            <Route path="/probationReview" Component={ProbationReview} />
-            <Route path="/contractReview" Component={ContractReview} />
-            <Route path="/empPassExpiry" Component={EmpPE} />
-            <Route path="/ldExpiry" Component={LDexpiry} />
-            <Route path="/passportExpiry" Component={PassportExpiry} />
-            <Route path="/empMedical" Component={EmploymentMedical} />
-            <Route path="/newRecruit" Component={NewRecruit} />
-            <Route path="/trainingRC" Component={TrainingRCData} />
-            <Route path="/lbdKpi" Component={LbdKpi} />
-            <Route path="/groupHS" Component={GroupHSData} />
-            <Route path="/leavePass" Component={LeavePassData} />
-            <Route
-              path="/contractForms"
-              element={<ContractPDF userID={userID} userType={userType} />}
-            /> 
-            <Route path="/promotion" Component={PromotionRep} />
-            <Route path="/probFormUpdate" element={<ProbationPDF userID={userID} userType={userType}/>} />
-            <Route
-              path="/ContractUp"
-              element={<ContractPDF userID={userID} userType={userType} />}
-            />
-          </>
-        )}
-        {allowedCategories.includes("BenefitsAndRewards") && (
-          <Route path="/benfitsAndrewards" Component={BenfitsAndRewards} />
-        )}
-        <Route path="/logout" Component={Logout} />
-        {/* Default redirect route if no category is matched */}
-        <Route
-          path="*"
-          element={<Navigate to={`/${firstCategory?.toLowerCase()}`} />}
-        />
-      </Routes>
+          <Route path="/rm" Component={RM} />
+          <Route path="/filterTable" Component={FilterTable} />
+          <Route path="/resignation" Component={Resignation} />
+          <Route path="/termination" Component={Termination} />
+          <Route path="/probationReview" Component={ProbationReview} />
+          <Route path="/contractReview" Component={ContractReview} />
+          <Route path="/empPassExpiry" Component={EmpPE} />
+          <Route path="/ldExpiry" Component={LDexpiry} />
+          <Route path="/passportExpiry" Component={PassportExpiry} />
+          <Route path="/empMedical" Component={EmploymentMedical} />
+          <Route path="/newRecruit" Component={NewRecruit} />
+          <Route path="/trainingRC" Component={TrainingRCData} />
+          <Route path="/lbdKpi" Component={LbdKpi} />
+          <Route path="/groupHS" Component={GroupHSData} />
+          <Route path="/leavePass" Component={LeavePassData} />
+          <Route
+            path="/contractForms"
+            element={<ContractPDF userID={userID} userType={userType} />}
+          />
+          <Route path="/promotion" Component={PromotionRep} />
+          <Route
+            path="/probFormUpdate"
+            element={<ProbationPDF userID={userID} userType={userType} />}
+          />
+          <Route
+            path="/ContractUp"
+            element={<ContractPDF userID={userID} userType={userType} />}
+          />
+        </>
+      )}
+      {allowedCategories.includes("BenefitsAndRewards") && (
+        <Route path="/benfitsAndrewards" Component={BenfitsAndRewards} />
+      )}
+      <Route path="/logout" Component={Logout} />
+      {/* Default redirect route if no category is matched */}
+      <Route
+        path="*"
+        element={<Navigate to={`/${firstCategory?.toLowerCase()}`} />}
+      />
+    </Routes>
   );
 };
 export default NavigationLinks;
