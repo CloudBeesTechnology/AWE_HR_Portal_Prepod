@@ -18,7 +18,6 @@ const FamilyDetails = ({ familyDetails, mainRef }) => {
           return [];
         }
       }
-
       let cleanedData = data.replace(/\\/g, "");
       
       try {

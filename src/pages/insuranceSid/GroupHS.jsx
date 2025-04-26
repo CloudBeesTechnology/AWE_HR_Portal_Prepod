@@ -47,11 +47,7 @@ export const GroupHS = () => {
   const [notification, setNotification] = useState(false);
   const [insuranceData, setInsuranceData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [popupVisible, setPopupVisible] = useState(false);
-  const [popupImage, setPopupImage] = useState("");
   const [viewingDocument, setViewingDocument] = useState(null);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [numPages, setNumPages] = useState(null);
   const [lastUploadUrl, setPPLastUP] = useState("");
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
@@ -71,8 +67,8 @@ export const GroupHS = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, "0"); // Adds leading zero if day is single digit
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // getMonth() returns 0-11, so we add 1
+    const day = date.getDate().toString().padStart(2, "0"); 
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); 
     const year = date.getFullYear();
 
     return `${day}/${month}/${year}`;
@@ -83,9 +79,8 @@ export const GroupHS = () => {
   const linkToStorageFile = async (pathUrl) => {
     try {
       const result = await getUrl({ path: pathUrl });
-      //   console.log("File URL:", result.url.href); // Use .href to extract the URL as a string
-      setPPLastUP(result.url.href); // Store the URL as a string
-      setViewingDocument(pathUrl); // Update the state to show the selected document
+      setPPLastUP(result.url.href); 
+      setViewingDocument(pathUrl);
     } catch (error) {
       console.error("Error fetching the file URL:", error);
     }

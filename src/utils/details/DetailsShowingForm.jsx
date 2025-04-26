@@ -11,14 +11,9 @@ import { FaWindowClose } from "react-icons/fa";
 import logo from "../../assets/logo/logo-with-name.svg";
 import { useReactToPrint } from "react-to-print";
 import { FaPrint } from "react-icons/fa";
-import { DateFormat } from "../DateFormat";
 
 export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
-  const [activeTab, setActiveTab] = useState(0); // Track active tab
-  const [currentPage, setCurrentPage] = useState(1);
-
-  // State for PDF viewing
-  const [showInBetweenData, setShowInBetweenData] = useState(true);
+  const [activeTab, setActiveTab] = useState(0); 
   const [viewingDocument, setViewingDocument] = useState(null);
   const [isPdfOpen, setIsPdfOpen] = useState(false);
   const [numPages, setNumPages] = useState(null);
@@ -57,22 +52,18 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
 
   const parseDocumentData = (data) => {
     if (!data || !Array.isArray(data) || typeof data[0] !== "string") {
-      return {}; // Return an empty object if data is invalid
+      return {}; 
     }
-    // Extract the first item from the array (which is the string with key-value pairs)
     let docString = data[0];
-    // Remove the surrounding curly braces if they exist
     if (docString.startsWith("{") && docString.endsWith("}")) {
-      docString = docString.slice(1, -1); // Remove the first and last characters (curly braces)
+      docString = docString.slice(1, -1);
     }
-    // Split the string by commas to get individual key-value pairs
     const docEntries = docString.split(",").map((item) => item.trim());
 
-    // Process the key-value pairs into an object
     const docObject = docEntries.reduce((acc, entry) => {
       const [label, url] = entry.split("=").map((part) => part.trim());
       if (label && url) {
-        acc[label] = decodeURIComponent(url); // Decode the URL properly
+        acc[label] = decodeURIComponent(url); 
       }
       return acc;
     }, {});
@@ -84,7 +75,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
   const handleViewDocument = (url) => {
     setViewingDocument(url);
     setIsPdfOpen(true);
-    setPageNumber(1); // Reset to page 1 when a new document is viewed
+    setPageNumber(1); 
   };
 
   // Close the PDF viewer
@@ -101,34 +92,30 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
   // Tab click handlers
   const handleTabClick = (tabIndex) => {
     setActiveTab(tabIndex);
-    setCurrentPage(1); // Reset page number when tab changes
   };
 
   const formatDate = (dateInput) => {
-    // Check if the input is null or undefined and return "N/A"
     if (dateInput === null || dateInput === undefined) {
       return "N/A";
     }
 
-    // If dateInput is an array, format each date in the array
     if (Array.isArray(dateInput)) {
       return dateInput.map((dateString) => {
-        // Handle the case where dateString is null
         if (dateString === null || dateString === undefined) {
           return "N/A";
         }
 
         const date = new Date(dateString);
-        if (isNaN(date.getTime())) return "N/A"; // Return "N/A" if the date is invalid
-        const day = date.getDate().toString().padStart(2, "0"); // Add leading zero if day is single digit
-        const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Add 1 to month since getMonth() returns 0-11
+        if (isNaN(date.getTime())) return "N/A"; 
+        const day = date.getDate().toString().padStart(2, "0");
+        const month = (date.getMonth() + 1).toString().padStart(2, "0"); 
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
       });
     }
 
     const date = new Date(dateInput);
-    if (isNaN(date.getTime())) return "N/A"; // Return "N/A" if the date is invalid
+    if (isNaN(date.getTime())) return "N/A"; 
     const day = date.getDate().toString().padStart(2, "0");
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
@@ -138,14 +125,12 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
 
   const {
     empStatusType,
-    workmenCompNo,
     bankAccNo,
     bankName,
     insuranceClaims,
     age,
     email,
     aTQualify,
-    address,
     agent,
     alternateNo,
     accidentIns,
@@ -261,8 +246,6 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     workWeek,
     annualLeave,
     annualLeaveDate,
-    compasLeave,
-    compasLeaveDate,
     dateLeavePass,
     destinateLeavePass,
     durLeavePass,
@@ -319,7 +302,6 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     groupInsEndDate,
     travelIns,
     workmePolicyNo,
-    workmenComp,
     empInsUpload,
     depInsurance,
     airTktStatus,
@@ -390,9 +372,6 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Bank account number": bankAccNo,
   };
 
-  const employeeDocument = {
-    EmpUpDocs: empUpDocs,
-  };
 
   const educationalDetails = {
     "Education Level": educLevel,
@@ -400,17 +379,13 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Academic / Technical qualification": aTQualify,
   };
 
-  const familyInfo = {
-    FamilyDetails: familyDetails,
-  };
-
   const medicalInfo = {
-    "Overseas Medical Fitness issued date": overMD, // overseas medical
-    "Overseas Medical Fitness Expiry": overME, // overseas expiry
-    "Date submitted of BruHims Registration": bruhimsRD, // registration date
-    "BruHims Registration Number": bruhimsRNo, // registration no
-    "Brunei Medical Appointment Date": bruneiMAD, // medical appointment date
-    "Brunei Medical Fitness Expiry": bruneiME, // medical expiry
+    "Overseas Medical Fitness issued date": overMD, 
+    "Overseas Medical Fitness Expiry": overME, 
+    "Date submitted of BruHims Registration": bruhimsRD, 
+    "BruHims Registration Number": bruhimsRNo, 
+    "Brunei Medical Appointment Date": bruneiMAD, 
+    "Brunei Medical Fitness Expiry": bruneiME, 
   };
   
 
@@ -434,9 +409,6 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Personal Accident Insurance": accidentIns,
     "Travelling Insurance": travelIns,
   };
-
-  // workmePolicyNo,
-  // workmenComp,
 
   const DependentInsurance = {
     "Dependent Insurance": depInsurance,
@@ -472,8 +444,6 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       "Normal Working Hours Per Day": workHrs,
       "Normal Working Day per Week": workWeek,
       "Normal Working Day per Month": workMonth,
-      // "Employee ID": empID,
-      // "SAP Number": sapNo,
       "Employment Work Status": workStatus,
       "Type of Salary Pay": salaryType,
     },
@@ -484,7 +454,6 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
         formatDate(dateLeavePass),
       "Duration Period of Leave Passage Entitlement": durLeavePass,
       "Destination of Leave Passage Entitlement": destinateLeavePass,
-      // "Employee ID": empID,     "Leave Passage Entitlement for Non-Local": leavePass,
       "Annual Leave Entitlement": annualLeave,
       "Annual Leave Effective Date": formatDate(annualLeaveDate),
       "Sick Leave Entitlement": sickLeave,
@@ -532,20 +501,17 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       "Date Of Approval": formatDate(doeEmpApproval),
       "Valid Until": formatDate(doeEmpValid),
       "DOE Reference Number": doeEmpRefNo,
-      // "DOE Employee Upload": doeEmpUpload,
     },
 
     labourDeposit: {
       "Labour Deposit Receipt Number": lbrReceiptNo,
       "Deposit Amount": lbrDepoAmt,
       "Date Endorsement Of Labour Deposit": formatDate(lbrDepoSubmit),
-      // "Employee Upload": lbrDepoUpload,
     },
 
     swap: {
       "Client Support Letter Requested Date": formatDate(sawpEmpLtrReq),
       "Client Support Letter Received Date": formatDate(sawpEmpLtrReci),
-      // "SAWP Employee Upload": sawpEmpUpload,
     },
 
     national: {
@@ -555,7 +521,6 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       "Date Of Approval": formatDate(nlmsEmpApproval),
       "LD Reference Number": nlmsRefNo,
       "Valid Until": formatDate(nlmsEmpValid),
-      // "Employee Upload": nlmsEmpUpload,
     },
 
     bank: {
@@ -564,7 +529,6 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       "BG Reference Number": bankRefNo,
       "Bank Guarantee Amount": bankAmt,
       "Bank Guarantee Valid Until": formatDate(bankValid),
-      // "Employee Upload": bankEmpUpload,
       "Date Endorsement Of BG": formatDate(bankEndorse),
     },
 
@@ -573,30 +537,25 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       "JITPA Amount": jitpaAmt,
       "Valid Until": formatDate(jpValid),
       "Date Endorsement Of JITPA": formatDate(jpEndorse),
-      // "Employee Upload": jpEmpUpload,
     },
 
     immigration: {
-      // "Passport no": ppNo,
       "Original Passport Location": ppLocation,
       "Date Of Arrival Stamping Expiry": formatDate(arrivStampExp),
       "Immigration Reference Number": immigRefNo,
       "Passport Submit Date To Immigration Dept": formatDate(ppSubmit),
       "Employment Pass Expiry": formatDate(empPassExp),
       "Employment Pass Status": empPassStatus,
-      //pdf
       "Air Ticket Status": airTktStatus,
       "Re-entry Visa Application": reEntryVisa,
       "Date Approved by Immigration Dept": formatDate(immigApproval),
       "Re-Entry Visa Expiry": formatDate(reEntryVisaExp),
       "Remarks for Immigration": remarkImmig,
-      //   airTktStatus,reEntryVisa,immigApproval,reEntryVisaExp,remarkImmig,
     },
   };
-  // const documents = parseDocumentData(passingValue.empUpDocs);
+
   const documentsTwo = parseDocumentData(passingValue.uploadBwn);
   const documentThree = parseDocumentData(passingValue.workInfoUploads);
-  // console.log(depInsurance, "2.o")
 
   return (
     <>
@@ -624,7 +583,6 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                   <PersonalDetailsView
                     personalDetails={personalDetails}
                     profilePhoto={profilePhoto}
-                    // documents={documents}
                     isPdfOpen={isPdfOpen}
                     viewingDocument={viewingDocument}
                     pageNumber={pageNumber}

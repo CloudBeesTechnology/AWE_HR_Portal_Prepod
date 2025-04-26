@@ -19,7 +19,6 @@ export const ContractFormPDF = ({ contentRef }) => {
   const location = useLocation();
   const { employeeData } = location.state || {};
   const { createNotification } = useCreateNotification();
-  const [userID, setUserID] = useState("");
   const [userType, setUserType] = useState("");
   const [showTitle, setShowTitle] = useState("");
   const [notification, setNotification] = useState(false);
@@ -65,8 +64,6 @@ export const ContractFormPDF = ({ contentRef }) => {
   const year = currentDate.getFullYear();
 
   useEffect(() => {
-    const userID = localStorage.getItem("userID");
-    setUserID(userID);
     const userType = localStorage.getItem("userType");
     setUserType(userType);
   }, []);
@@ -196,15 +193,11 @@ export const ContractFormPDF = ({ contentRef }) => {
     );
 
     const empName = empPIRecord?.name;
-
     // console.log("Name", empName);
-
     const WorkInfoRecord = workInfoData.find(
       (match) => match?.empID === employeeData?.empID
     );
-
     // console.log("EMPData",empPIRecord);
-
     const probationEndFormatted =
       Array.isArray(WorkInfoRecord?.probationEnd) &&
       WorkInfoRecord?.probationEnd?.length > 0
@@ -306,7 +299,7 @@ export const ContractFormPDF = ({ contentRef }) => {
               });
             }
           }
-        } else if (userType === "Manager" && !gmPosition) {
+        } else if (userType === "Manager" && gmPosition !== "GENERAL MANAGER") {
           sendEmail(
                      subject,
                     `<html>
@@ -369,14 +362,14 @@ export const ContractFormPDF = ({ contentRef }) => {
       } else {
         if (
           userType === "Manager" &&
-          !gmPosition &&
+          gmPosition !== "GENERAL MANAGER" &&
           !formData.contract.depHead
         ) {
           alert("Manager Name is is required!");
           return;
         }
 
-        if (userType === "Manager" && !gmPosition) {
+        if (userType === "Manager" && gmPosition !== "GENERAL MANAGER") {
           sendEmail(
                      subject,
                      `<html>
