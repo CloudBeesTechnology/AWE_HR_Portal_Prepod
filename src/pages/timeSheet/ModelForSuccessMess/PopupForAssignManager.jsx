@@ -65,14 +65,23 @@ export const PopupForAssignManager = ({
   };
 
   const searchResult = (result) => {
-   
+    console.log("result : ", result);
+    const lastDept =
+      Array.isArray(result?.department) && result?.department?.length > 0
+        ? result?.department[result?.department?.length - 1]
+        : "";
+
+    const mdepartment =
+      lastDept === "OTHER"
+        ? Array.isArray(result?.otherDepartment) &&
+          result?.otherDepartment?.length > 0
+          ? result?.otherDepartment[result?.otherDepartment?.length - 1]
+          : ""
+        : lastDept;
     setFormData({
       mbadgeNo: result?.empBadgeNo || "",
       mName: result?.name || "",
-      mdepartment:
-        Array.isArray(result?.department) && result?.department.length > 0
-          ? result.department[result.department.length - 1]
-          : "",
+      mdepartment: mdepartment,
     });
   };
 

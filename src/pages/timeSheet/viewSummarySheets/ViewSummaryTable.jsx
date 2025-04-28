@@ -11,6 +11,7 @@ import { BiSolidPrinter } from "react-icons/bi";
 import { DownloadExcelPDF } from "../timeSheetSearch/DownloadExcelPDF";
 import { PrintExcelSheet } from "../timeSheetSearch/PrintExcelSheet";
 import { Pagination } from "../timeSheetSearch/Pagination";
+import { HoursMinuAbsentCal } from "../customTimeSheet/HoursMinuAbsentCal";
 
 export const ViewSummaryTable = ({
   dayCounts,
@@ -41,58 +42,13 @@ export const ViewSummaryTable = ({
     document.querySelector(".table-container-scroll").scrollTop = 0;
   };
 
-  function calculateTotalWorkingHours(data) {
-    let totalHours = 0;
-    try {
-      for (const key in data) {
-        const value = data[key];
+  const {
+    calculateTotalWorkingHours,
+    calculateTotalAbsence,
+    convertNumToHours,
+    // convertNumToHours,
+  } = HoursMinuAbsentCal();
 
-        const xPattern = /^x\((\d+(\.\d+)?)\)(\d+(\.\d+)?)$/;
-        const xMatch = value?.match(xPattern);
-        if (xMatch) {
-          totalHours += parseFloat(xMatch[3]);
-          continue;
-        }
-
-        const numberPattern = /^\d+(\.\d+)?$/;
-        if (value?.match(numberPattern)) {
-          totalHours += parseFloat(value);
-          continue;
-        }
-
-        const halPattern = /^H[A-Z]*\d+$/;
-        if (value?.match(halPattern)) {
-          const hours = parseFloat(value?.replace(/[^0-9]/g, ""));
-
-          totalHours += hours;
-          continue;
-        }
-      }
-
-      return totalHours;
-    } catch (err) {}
-  }
-
-  function calculateTotalAbsence(inputData, getLastIndexOfNWhrs) {
-    try {
-      let totalAbsence = 0;
-
-      for (let date in inputData) {
-        const value = inputData[date];
-
-        if (value?.startsWith("x(")) {
-          const absenceMatch = value?.match(/x\(([\d.]+)\)/);
-          if (absenceMatch) {
-            totalAbsence += parseFloat(absenceMatch[1]);
-          }
-        } else if (value === "A") {
-          totalAbsence += parseFloat(getLastIndexOfNWhrs);
-        }
-      }
-
-      return totalAbsence;
-    } catch (err) {}
-  }
   const formatDate = (dateString) => {
     const date = new Date(dateString);
 
@@ -220,15 +176,30 @@ export const ViewSummaryTable = ({
             <tbody>
               {loading && data && data?.length > 0 ? (
                 data.map((employee, index) => {
-                  const floatTotalOT = Object.values(
+                  // const floatTotalOT = Object.values(
+                  //   employee?.OVERTIMEHRS || {}
+                  // ).reduce((acc, ot) => acc + parseFloat(ot || 0), 0);
+
+                  const totalMinutes = Object.values(
                     employee?.OVERTIMEHRS || {}
-                  ).reduce((acc, ot) => acc + parseFloat(ot || 0), 0);
-                  const totalOT = Number(floatTotalOT.toFixed(2));
+                  ).reduce((acc, ot) => {
+                    const num = parseFloat(ot || 0);
+                    const hours = Math.floor(num);
+                    const minutes = Math.round((num % 1) * 100); // Convert .30 as 30 minutes
+                    return acc + (hours * 60 + minutes);
+                  }, 0);
+
+                  const totalHoursOfOT = Math.floor(totalMinutes / 60);
+                  const remainingMinutes = totalMinutes % 60;
+                  const floatTotal = `${String(totalHoursOfOT).padStart(
+                    2,
+                    "0"
+                  )}.${String(remainingMinutes).padStart(2, "0")}`;
+
+                  const totalOT = Number(floatTotal);
                   const getTotalHours =
                     calculateTotalWorkingHours(employee?.workingHrs) || 0;
-                  const roundedNumberOfTotalHours = Number(
-                    getTotalHours.toFixed(2)
-                  );
+                  const roundedNumberOfTotalHours = Number(getTotalHours);
                   const totalHours = roundedNumberOfTotalHours;
 
                   const getLastIndexOfNWhrs =
@@ -236,20 +207,30 @@ export const ViewSummaryTable = ({
                       ? employee?.workHrs[employee?.workHrs?.length - 1]
                       : "";
 
-                  const getNormalDays =
-                    totalHours / parseFloat(getLastIndexOfNWhrs) || 0;
-                  const roundedNumber = Number(getNormalDays.toFixed(2));
+                  const getNormalDays = convertNumToHours(
+                    totalHours,
+                    getLastIndexOfNWhrs
+                  );
+
+                  // const getNormalDays =
+                  //   totalHours / parseFloat(getLastIndexOfNWhrs) || 0;
+                  const roundedNumber = Number(parseFloat(getNormalDays));
                   const NormalDays = roundedNumber;
 
                   const totalAbsence = calculateTotalAbsence(
                     employee?.workingHrs,
                     getLastIndexOfNWhrs
                   );
-                  const totalAbsentiesHrs =
-                    totalAbsence / parseFloat(getLastIndexOfNWhrs) || 0;
-                  const roundedTotalAbsentiesHrs = Number(
-                    totalAbsentiesHrs.toFixed(2)
+                  // const totalAbsentiesHrs =
+                  //   totalAbsence / parseFloat(getLastIndexOfNWhrs) || 0;
+
+                  console.log("totalAbsence : ", totalAbsence);
+
+                  const totalAbsentiesHrs = convertNumToHours(
+                    totalAbsence,
+                    getLastIndexOfNWhrs
                   );
+                  const roundedTotalAbsentiesHrs = Number(totalAbsentiesHrs);
 
                   const checkVerifiedAll = Array.from(
                     { length: dayCounts },
@@ -708,3 +689,6 @@ export const ViewSummaryTable = ({
     </div>
   );
 };
+
+// ############################################################################################################
+// ############################################################################################################

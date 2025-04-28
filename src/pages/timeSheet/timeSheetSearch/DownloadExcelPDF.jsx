@@ -10,8 +10,10 @@ export const DownloadExcelPDF = (
   elementID,
   location,
   formattedStartDate,
-  formattedEndDate
+  formattedEndDate,
+  
 ) => {
+
   const input = document.getElementById(elementID);
 
   if (!input) {
@@ -72,6 +74,7 @@ export const DownloadExcelPDF = (
       pdf.save(
         `TIMESHEET SUMMARY - ${location} DIVISION FOR THE PERIOD ${formattedStartDate} TO ${formattedEndDate}.pdf`
       );
+     
     })
     .catch((error) => {});
 };

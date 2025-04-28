@@ -28,6 +28,7 @@ export const UseFetchDataForSummary = (
       setLoading(false);
       setEmptyTableMess(false);
       ProcessedDataFunc(null);
+      setConvertedStringToArrayObj(null);
 
       try {
         if (startDate && endDate && location) {

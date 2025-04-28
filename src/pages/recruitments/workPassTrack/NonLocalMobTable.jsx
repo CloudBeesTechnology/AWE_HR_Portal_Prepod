@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { RiFileEditLine } from "react-icons/ri";
+import React, { useState } from "react";
+import { RiFileEditLine, RiCloseLine } from "react-icons/ri";
 import { ReviewForm } from "../ReviewForm";
 import { WorkpassForm } from "./WorkpassForm";
 import { generateClient } from "@aws-amplify/api";
@@ -12,7 +12,6 @@ import { Pagination } from "../../leaveManagement/Pagination";
 
 export const NonLocalMobTable = ({
   data,
-  formatDate,
   fileUpload,
   urlValue,
 }) => {
@@ -28,6 +27,9 @@ export const NonLocalMobTable = ({
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(1);
   const [loadingItems, setLoadingItems] = useState({});
+  const [showEmpIdPopup, setShowEmpIdPopup] = useState(false);
+  const [empIdLoading, setEmpIdLoading] = useState(false);
+  const [currentCandidate, setCurrentCandidate] = useState(null);
 
   const heading = [
     "S.No",
@@ -120,27 +122,47 @@ export const NonLocalMobTable = ({
     return nextTempID;
   };
 
-  useEffect(() => {
-    const fetchNextTempID = async () => {
+  const handleGenerateEmpId = async () => {
+    setEmpIdLoading(true);
+    try {
       const lastTempID = await getTotalCount();
       const nextTempID = generateNextTempID(lastTempID);
-      setLatesTempIDData(nextTempID); // Set the generated ID
-    };
-    fetchNextTempID();
-  }, []);
+      setLatesTempIDData(nextTempID);
+    } catch (error) {
+      console.error("Error generating employee ID:", error);
+      alert("Error generating employee ID");
+    } finally {
+      setEmpIdLoading(false);
+    }
+  };
 
-  const OnSubmit = async (candi) => {
+  const handleConvertClick = (candi) => {
+    setCurrentCandidate(candi);
+    setShowEmpIdPopup(true);
+    setLatesTempIDData("");
+  };
+
+  const OnSubmit = async () => {
+    if (!latestTempIDData) {
+      alert("Error: Missing employee ID.");
+      return;
+    }
+
+    if (!currentCandidate) {
+      alert("Error: No candidate selected.");
+      return;
+    }
     setLoadingItems((prev) => {
-      const newState = { ...prev, [candi.id]: true };
+      const newState = { ...prev, [currentCandidate.id]: true };
       return newState;
     });
 
     try {
       const storedData = {
-        ...candi,
+        ...currentCandidate,
         empID: latestTempIDData,
       };
-
+ 
       await SumbitCandiToEmp({ storedData });
       await submitMobilization({ mob: storedData });
       setShowTitle(
@@ -149,7 +171,7 @@ export const NonLocalMobTable = ({
       setNotification(true);
     } catch (err) {
       setLoadingItems((prev) => {
-        const newState = { ...prev, [candi.id]: false };
+        const newState = { ...prev, [currentCandidate.id]: false };
         return newState;
       });
       alert("Error", err);
@@ -159,6 +181,111 @@ export const NonLocalMobTable = ({
   return (
     <>
       <div className="recruitmentTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl">
+        {showEmpIdPopup && (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+              {/* Popup Header */}
+              <div className="px-6 py-4 flex justify-between items-center bg-[#939393] uppercase">
+                <h3 className="text-xl font-semibold text-white">
+                  Employee Conversion
+                </h3>
+                <button
+                  onClick={() => setShowEmpIdPopup(false)}
+                  className="text-white hover:text-borderGray transition-colors"
+                >
+                  <RiCloseLine size={24} />
+                </button>
+              </div>
+
+              {/* Popup Content */}
+              <div className="p-6">
+                {/* Candidate Info */}
+                <div className="mb-6 space-y-3">
+                  <div className="flex items-center">
+                    <span className="w-full font-medium text-labelText uppercase">
+                      Candidate Name:
+                    </span>
+                    <span className="text-darkText">
+                      {currentCandidate?.name}
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="w-full font-medium text-labelText uppercase">
+                      Temp ID:
+                    </span>
+                    <span className="font-mono text-darkText">
+                      {currentCandidate?.tempID}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Generated ID Display */}
+                <div className="mb-6 p-4 rounded-lg border border-borderGray bg-lightBg uppercase">
+                  <p className="text-sm font-medium text-mutedText mb-1">
+                    Employee ID
+                  </p>
+                  {latestTempIDData ? (
+                    <p className="text-xl font-bold font-mono text-mutedText">
+                      {latestTempIDData}
+                    </p>
+                  ) : (
+                    <p className="text-placeholderText italic">
+                      Not generated yet
+                    </p>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-4">
+                  {!latestTempIDData && (
+                    <button
+                      onClick={handleGenerateEmpId}
+                      disabled={empIdLoading}
+                      className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all flex items-center justify-center uppercase ${
+                        empIdLoading
+                          ? "bg-disabledBg text-mutedText cursor-not-allowed"
+                          : "bg-primary hover:hover:bg-yellow"
+                      }`}
+                    >
+                      {empIdLoading && (
+                        <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white mr-2"></div>
+                      )}
+                      {empIdLoading ? "Generating..." : "Generate EmpID"}
+                    </button>
+                  )}
+
+                  {latestTempIDData && (
+                    <button
+                      onClick={OnSubmit}
+                      disabled={
+                        !latestTempIDData || loadingItems[currentCandidate?.id]
+                      }
+                      className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all flex items-center justify-center uppercase ${
+                        !latestTempIDData || loadingItems[currentCandidate?.id]
+                          ? "bg-disabledBg text-mutedText cursor-not-allowed"
+                          : "bg-primary hover:hover:bg-yellow"
+                      }`}
+                    >
+                      {loadingItems[currentCandidate?.id] && (
+                        <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white mr-2"></div>
+                      )}
+                      {loadingItems[currentCandidate?.id]
+                        ? "Converting..."
+                        : "Convert to employee"}
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Help Text */}
+              <div className="px-6 py-3 bg-lightBg border-t border-borderGray">
+                <p className="text-xs text-mutedText text-center">
+                  Generate an Employee ID before conversion
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
         {paginatedData && paginatedData.length > 0 ? (
           <table className="w-full rounded-lg">
             <thead className="bg-[#939393] text-white sticky top-0">
@@ -231,7 +358,7 @@ export const NonLocalMobTable = ({
                     </td>
                     <td
                       className="text-sm cursor-pointer py-3"
-                      onClick={() => OnSubmit(item)}
+                      onClick={() => handleConvertClick(item)}
                       disabled={loadingItems[item.id]}
                     >
                       {loadingItems[item.id]
