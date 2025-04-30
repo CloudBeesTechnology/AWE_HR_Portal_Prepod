@@ -38,8 +38,7 @@ export const MobilizationRecru = ({
     "Nationality",
     "Position",
     "Signed Date",
-    "Contract PDF",
-    "Status Update",
+    "Mobilization PDF",
     "Form",
     "Edit Form",
     "Status",
@@ -348,9 +347,6 @@ export const MobilizationRecru = ({
                         ) : (
                           <p>N/A</p>
                         )}
-                      </td>
-                      <td className="py-3">
-                        {item.interviewDetails_status || "N/A"}
                       </td>
 
                       <td

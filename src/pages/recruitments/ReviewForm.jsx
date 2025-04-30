@@ -410,27 +410,56 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     }
   };
 
-  const parseDocuments = (docData) => {
-    // Check if docData is a string (single file path)
-    if (typeof docData === "string" && !docData.includes("undefined")) {
-      // If it's a string and does not contain the word 'undefined', return an array with one document object
-      return [{ upload: docData }];
-    }
+const parseDocuments = (docData) => {
 
-    // Check if docData is an array (array of file paths)
-    else if (Array.isArray(docData)) {
-      // If it's an array, filter out any undefined or invalid entries and map them into objects
-      return docData
-        .filter((doc) => doc && !doc.includes("undefined"))
-        .map((doc) => ({ upload: doc }));
-    }
+  // Handle null or undefined input
+  if (!docData) {
+    return [];
+  }
 
-    // If docData is neither a string nor an array, return an empty array
-    else {
-      console.error("Invalid document data format:", docData);
+  // Case: array with one JSON string element (e.g., ['[{"upload": "..."}]'])
+  if (Array.isArray(docData) && typeof docData[0] === "string" && docData[0].trim().startsWith("[{")) {
+    try {
+      const parsed = JSON.parse(docData[0]);
+      if (Array.isArray(parsed)) {
+        return parsed.filter(doc => doc.upload && !doc.upload.includes("undefined"));
+      }
+    } catch (err) {
+      // console.error("Failed to parse JSON string in array:", err);
       return [];
     }
-  };
+  }
+
+  // Case: JSON string directly (e.g., '{"upload":"..."}')
+  if (typeof docData === "string" && docData.trim().startsWith("[{")) {
+    try {
+      const parsed = JSON.parse(docData);
+      if (Array.isArray(parsed)) {
+        return parsed.filter(doc => doc.upload && !doc.upload.includes("undefined"));
+      }
+    } catch (err) {
+      // console.error("Failed to parse JSON string:", err);
+      return [];
+    }
+  }
+
+  // Case: string path
+  if (typeof docData === "string" && !docData.includes("undefined")) {
+    return [{ upload: docData }];
+  }
+
+  // Case: array of strings or objects
+  if (Array.isArray(docData)) {
+    return docData
+      .filter(doc => doc && typeof doc === "string" && !doc.includes("undefined"))
+      .map(doc => ({ upload: doc }));
+  }
+
+  // Unrecognized format
+  // console.error("Invalid document data format:", docData);
+  return [];
+};
+
 
   const closeModal = () => {
     setViewingDocument(null);
@@ -444,7 +473,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     setIsScheduleOpen(false);
   };
 
-  // console.log(candyEducDeatils);
+  // console.log("Candy",candyEducDeatils);
 
   const renderDocumentsUnderCategory = (documents) => {
     return (

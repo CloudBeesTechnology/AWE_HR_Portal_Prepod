@@ -18,7 +18,7 @@ export const CVEVRecru = ({ data, formatDate, fileUpload, urlValue }) => {
     "Position",
     "Approved Date",
     "CVEV PDF",
-    "Status Update",
+    "Status",
     "Form",
     "Edit Form",
   ];

@@ -13,9 +13,14 @@ import { handleDeleteFile } from "../../../../services/uploadsDocsS3/DeleteDocs"
 import { DeleteUploadImmi } from "../deleteUpload/DeleteUploadImmi";
 import { useDeleteAccess } from "../../../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../../../utils/DeletePopup";
+import { useCreateWPTracking } from "../../../../services/createMethod/CreateWPTracking";
+import { DataSupply } from "../../../../utils/DataStoredContext";
+
 export const ImmigrationForm = ({ candidate }) => {
+    const { IVSSDetails } = useContext(DataSupply);
   const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules } = useFetchCandy();
+  const { createWPTrackingHandler } = useCreateWPTracking();
   const { wpTrackingDetails } = useUpdateWPTracking();
   const { interviewDetails } = UpdateInterviewData();
   const [deletePopup, setdeletePopup] = useState(false);
@@ -82,8 +87,8 @@ export const ImmigrationForm = ({ candidate }) => {
           }));
           // console.log("Uploaded file name set:", fileName);
         }
-      } 
-    } 
+      }
+    }
   }, [interviewSchedules, candidate.tempID]);
 
   const extractFileName = (url) => {
@@ -183,12 +188,12 @@ export const ImmigrationForm = ({ candidate }) => {
       (data) => data.tempID === candidate?.tempID
     );
 
-    const selectedInterviewDataStatus = interviewSchedules.find(
-      (data) => data.IDDetails.tempID === candidate?.tempID
+    const selectedInterviewDataStatus = IVSSDetails.find(
+      (data) => data.tempID === candidate?.tempID
     );
 
     const interviewScheduleId = selectedInterviewData?.id;
-    const interviewScheduleStatusId = selectedInterviewDataStatus.IDDetails?.id;
+    const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
 
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
@@ -200,17 +205,33 @@ export const ImmigrationForm = ({ candidate }) => {
       return;
     }
 
+    const wpTrackingData = {
+      tempID: candidate.tempID,
+      immbdno: formData.interview.immbdno,
+      docsubmitdate: formData.interview.docsubmitdate,
+      visaapprovedate: formData.interview.visaapprovedate,
+      visareferenceno: formData.interview.visareferenceno,
+      visaFile: uploadedVisa.visaFile,
+    };
+
+    let response;
     try {
-      const response = await wpTrackingDetails({
-        WPTrackingValue: {
-          id: interviewScheduleId,
-          immbdno: formData.interview.immbdno,
-          docsubmitdate: formData.interview.docsubmitdate,
-          visaapprovedate: formData.interview.visaapprovedate,
-          visareferenceno: formData.interview.visareferenceno,
-          visaFile: uploadedVisa.visaFile,
-        },
-      });
+      if (interviewScheduleId) {
+        response = await wpTrackingDetails({
+          WPTrackingValue: {
+            id: interviewScheduleId,
+            immbdno: formData.interview.immbdno,
+            docsubmitdate: formData.interview.docsubmitdate,
+            visaapprovedate: formData.interview.visaapprovedate,
+            visareferenceno: formData.interview.visareferenceno,
+            visaFile: uploadedVisa.visaFile,
+          },
+        });
+      } else {
+        await createWPTrackingHandler({
+          reqValue: wpTrackingData,
+        });
+      }
 
       const interStatus = {
         id: interviewScheduleStatusId,

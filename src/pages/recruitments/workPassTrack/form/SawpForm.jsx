@@ -14,7 +14,10 @@ import { handleDeleteFile } from "../../../../services/uploadsDocsS3/DeleteDocs"
 import { DeleteUploadSawp } from "../deleteUpload/DeleteUploadSawp";
 import { useDeleteAccess } from "../../../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../../../utils/DeletePopup";
+import { DataSupply } from "../../../../utils/DataStoredContext";
+
 export const SawpForm = ({ candidate }) => {
+  const { IVSSDetails } = useContext(DataSupply);
   const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules } = useFetchCandy();
   const { wpTrackingDetails } = useUpdateWPTracking();
@@ -82,8 +85,8 @@ export const SawpForm = ({ candidate }) => {
           }));
           // console.log("Uploaded file name set:", fileName);
         }
-      } 
-    } 
+      }
+    }
   }, [interviewSchedules, candidate.tempID]);
 
   const extractFileName = (url) => {
@@ -184,6 +187,12 @@ export const SawpForm = ({ candidate }) => {
       (data) => data.tempID === candidate.tempID
     );
 
+    const selectedInterviewDataStatus = IVSSDetails.find(
+      (data) => data.tempID === candidate?.tempID
+    );
+
+    const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
+
     const requestData = {
       reqValue: {
         ...formData.interview,
@@ -206,17 +215,18 @@ export const SawpForm = ({ candidate }) => {
           },
         });
 
-        const interviewStatus = {
-          id: existingInterviewData.IDDetails.id,
-          status: formData.interview.status,
-        };
-
-        await interviewDetails({ InterviewValue: interviewStatus });
         // console.log("Update call");
       } else {
         await createWPTrackingHandler(requestData);
         // console.log("Create call", requestData);
       }
+
+      const interviewStatus = {
+        id: interviewScheduleStatusId,
+        status: formData.interview.status,
+      };
+
+      await interviewDetails({ InterviewValue: interviewStatus });
 
       setNotification(true);
       console.log("Form submitted successfully!");

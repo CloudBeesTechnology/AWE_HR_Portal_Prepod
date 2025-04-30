@@ -40,7 +40,7 @@ export const NonLocalMobTable = ({
     "Date of Mobilization",
     "Agent Name",
     "Recruitment Remarks",
-    "Non Local Mobilization",
+    "Non Local Mobilization PDF",
     "Form",
     "Edit Form",
     "Status",

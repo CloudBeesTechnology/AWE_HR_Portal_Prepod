@@ -13,11 +13,16 @@ import { handleDeleteFile } from "../../../../services/uploadsDocsS3/DeleteDocs"
 import { DeleteUploadAirTicket } from "../deleteUpload/DeleteUploadAirTicket";
 import { useDeleteAccess } from "../../../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../../../utils/DeletePopup";
+import { useCreateWPTracking } from "../../../../services/createMethod/CreateWPTracking";
+import { DataSupply } from "../../../../utils/DataStoredContext";
+
 export const AirTktForm = ({ candidate }) => {
+  const { IVSSDetails } = useContext(DataSupply);
   const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules } = useFetchCandy();
   const { wpTrackingDetails } = useUpdateWPTracking();
   const { interviewDetails } = UpdateInterviewData();
+  const { createWPTrackingHandler } = useCreateWPTracking();
   const [deletePopup, setdeletePopup] = useState(false);
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
@@ -81,7 +86,7 @@ export const AirTktForm = ({ candidate }) => {
           }));
           // console.log("Uploaded file name set:", fileName);
         }
-      } 
+      }
     } else {
       // console.log("No interview schedules available.");
     }
@@ -184,12 +189,12 @@ export const AirTktForm = ({ candidate }) => {
       (data) => data.tempID === candidate?.tempID
     );
 
-    const selectedInterviewDataStatus = interviewSchedules.find(
-      (data) => data.IDDetails.tempID === candidate?.tempID
+    const selectedInterviewDataStatus = IVSSDetails.find(
+      (data) => data.tempID === candidate?.tempID
     );
 
     const interviewScheduleId = selectedInterviewData?.id;
-    const interviewScheduleStatusId = selectedInterviewDataStatus.IDDetails?.id;
+    const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
 
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
@@ -201,17 +206,34 @@ export const AirTktForm = ({ candidate }) => {
       return;
     }
 
+    const wpTrackingData = {
+      tempID: candidate.tempID,
+      departuredate: formData.interview.departuredate,
+      arrivaldate: formData.interview.arrivaldate,
+      cityname: formData.interview.cityname,
+      airfare: formData.interview.airfare,
+      airticketfile: uploadedAirTkt.airTktFile,
+    };
+
+    let response;
+
     try {
-      const response = await wpTrackingDetails({
-        WPTrackingValue: {
-          id: interviewScheduleId,
-          departuredate: formData.interview.departuredate,
-          arrivaldate: formData.interview.arrivaldate,
-          cityname: formData.interview.cityname,
-          airfare: formData.interview.airfare,
-          airticketfile: uploadedAirTkt.airTktFile,
-        },
-      });
+      if (interviewScheduleId) {
+        response = await wpTrackingDetails({
+          WPTrackingValue: {
+            id: interviewScheduleId,
+            departuredate: formData.interview.departuredate,
+            arrivaldate: formData.interview.arrivaldate,
+            cityname: formData.interview.cityname,
+            airfare: formData.interview.airfare,
+            airticketfile: uploadedAirTkt.airTktFile,
+          },
+        });
+      } else {
+        await createWPTrackingHandler({
+          reqValue: wpTrackingData,
+        });
+      }
 
       const interStatus = {
         id: interviewScheduleStatusId,
@@ -219,13 +241,7 @@ export const AirTktForm = ({ candidate }) => {
       };
       setNotification(true);
 
-      // console.log("Submitting interview details with status:", interStatus);
-
       await interviewDetails({ InterviewValue: interStatus });
-
-      // console.log("Interview status updated:", interStatus);
-
-      // console.log("Response from WPTrackingDetails:", response);
 
       if (response.errors && response.errors.length > 0) {
         console.error("Response errors:", response.errors);

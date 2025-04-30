@@ -18,7 +18,7 @@ export const PAAFRecru = ({ data, formatDate, fileUpload, urlValue }) => {
     "Position",
     "Approved Date",
     "PAAF PDF",
-    "Status Update",
+    "Status",
     "Form",
     "Edit Form",
   ];

@@ -13,11 +13,15 @@ import { handleDeleteFile } from "../../../../services/uploadsDocsS3/DeleteDocs"
 import { DeleteUploadJitpa } from "../deleteUpload/DeleteUploadJitpa";
 import { useDeleteAccess } from "../../../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../../../utils/DeletePopup";
+import { useCreateWPTracking } from "../../../../services/createMethod/CreateWPTracking";
+import { DataSupply } from "../../../../utils/DataStoredContext";
 
 export const JitpaForm = ({ candidate }) => {
+  const { IVSSDetails } = useContext(DataSupply);
   const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules } = useFetchCandy();
   const { interviewDetails } = UpdateInterviewData();
+  const { createWPTrackingHandler } = useCreateWPTracking();
   const { wpTrackingDetails } = useUpdateWPTracking();
   const [deletePopup, setdeletePopup] = useState(false);
   const [deleteTitle1, setdeleteTitle1] = useState("");
@@ -82,8 +86,8 @@ export const JitpaForm = ({ candidate }) => {
           }));
           // console.log("Uploaded file name set:", fileName);
         }
-      } 
-    } 
+      }
+    }
   }, [interviewSchedules, candidate.tempID]);
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
@@ -184,12 +188,12 @@ export const JitpaForm = ({ candidate }) => {
       (data) => data.tempID === candidate?.tempID
     );
 
-    const selectedInterviewDataStatus = interviewSchedules.find(
-      (data) => data.IDDetails.tempID === candidate?.tempID
+    const selectedInterviewDataStatus = IVSSDetails.find(
+      (data) => data.tempID === candidate?.tempID
     );
 
     const interviewScheduleId = selectedInterviewData?.id;
-    const interviewScheduleStatusId = selectedInterviewDataStatus.IDDetails?.id;
+    const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
 
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
@@ -201,17 +205,34 @@ export const JitpaForm = ({ candidate }) => {
       return;
     }
 
+    const wpTrackingData = {
+      tempID: candidate.tempID,
+      tbapurchasedate: formData.interview.tbapurchasedate,
+      submitdateendorsement: formData.interview.submitdateendorsement,
+      jitpaexpirydate: formData.interview.jitpaexpirydate,
+      jitpaamount: formData.interview.jitpaamount,
+      jitpafile: uploadedJitpa.jitpaFile,
+    };
+
+    let response;
+
     try {
-      const response = await wpTrackingDetails({
-        WPTrackingValue: {
-          id: interviewScheduleId,
-          tbapurchasedate: formData.interview.tbapurchasedate,
-          submitdateendorsement: formData.interview.submitdateendorsement,
-          jitpaexpirydate: formData.interview.jitpaexpirydate,
-          jitpaamount: formData.interview.jitpaamount,
-          jitpafile: uploadedJitpa.jitpaFile,
-        },
-      });
+      if (interviewScheduleId) {
+        response = await wpTrackingDetails({
+          WPTrackingValue: {
+            id: interviewScheduleId,
+            tbapurchasedate: formData.interview.tbapurchasedate,
+            submitdateendorsement: formData.interview.submitdateendorsement,
+            jitpaexpirydate: formData.interview.jitpaexpirydate,
+            jitpaamount: formData.interview.jitpaamount,
+            jitpafile: uploadedJitpa.jitpaFile,
+          },
+        });
+      } else {
+        await createWPTrackingHandler({
+          reqValue: wpTrackingData,
+        });
+      }
 
       const interStatus = {
         id: interviewScheduleStatusId,
