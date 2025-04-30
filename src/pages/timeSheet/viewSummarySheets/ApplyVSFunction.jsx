@@ -489,13 +489,42 @@ export const ApplyVSFunction = ({
               });
             }
 
-            
             const recognizeFileType = ["Offshore", "Offshore's ORMC"]?.includes(
               identifyFileType
             );
 
+            const convertNumToHours = (NWHPD) => {
+              const hoursFloat = NWHPD / 2; // 3.75
+              const hours = Math.floor(hoursFloat); // 3 hours
+              const minutes = Math.round((hoursFloat - hours) * 100); // 0.75 * 60 = 45 minutes 
+
+              return `${String(hours).padStart(2, "0")}.${String(
+                minutes
+              ).padStart(2, "0")}`;
+            };
+
+            function toMinutes(decimalHour) {
+              let hours = Math.floor(decimalHour);
+              let minutes = Math.round((decimalHour - hours) * 100); // use 100 because .30 means 30 minutes
+              return hours * 60 + minutes;
+            }
+
+            const workHrsAbsentCal = (workingHrs) => {
+              let formattedWorkHrs = toMinutes(workingHrs);
+              let formattedNWHPD = toMinutes(entry?.normalWorkHrs);
+
+              let diffMinutes = formattedNWHPD - formattedWorkHrs;
+
+              let resultHours = Math.floor(diffMinutes / 60);
+              let resultMinutes = diffMinutes % 60;
+
+              return `${String(resultHours).padStart(2, "0")}.${String(
+                resultMinutes
+              ).padStart(2, "0")}`;
+            };
             if (checkEntry) {
-              const result = parseFloat(entry?.normalWorkHrs) / 2;
+              // const result = parseFloat(entry?.normalWorkHrs) / 2;
+              const result = convertNumToHours(entry?.normalWorkHrs);
               if (isNaN(checkEntry) || !checkEntry) {
                 acc[dayStr] = checkEntry;
               } else if (
@@ -516,10 +545,8 @@ export const ApplyVSFunction = ({
                 const workingHrs = parseFloat(checkEntry);
 
                 if (workingHrs <= (entry?.normalWorkHrs || 0)) {
-                  const absence = (
-                    (entry?.normalWorkHrs || 0) - workingHrs
-                  ).toFixed(1);
-
+                  const formattedAbsentHrs = workHrsAbsentCal(workingHrs);
+                  const absence = parseFloat(formattedAbsentHrs).toFixed(2);
                   acc[dayStr] = `x(${absence})${workingHrs}`;
                 } else {
                   acc[dayStr] = workingHrs.toString();
