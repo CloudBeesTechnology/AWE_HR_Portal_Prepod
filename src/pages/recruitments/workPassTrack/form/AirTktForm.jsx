@@ -73,7 +73,8 @@ export const AirTktForm = ({ candidate }) => {
             arrivaldate: interviewData.arrivaldate,
             cityname: interviewData.cityname,
             airfare: interviewData.airfare,
-            airticketfile: interviewData.airticketfile,
+            airticketfile:
+              interviewData.airticketfile || uploadedAirTkt.airTktFile,
             status: interviewData.IDDetails.status,
           },
         });
@@ -164,7 +165,8 @@ export const AirTktForm = ({ candidate }) => {
         tempID,
         setUploadedFileNames,
         setUploadedAirTkt,
-        setIsUploadingString
+        setIsUploadingString,
+        setFormData
       );
 
       if (!isDeleted || isDeletedArrayUploaded) {
@@ -180,6 +182,12 @@ export const AirTktForm = ({ candidate }) => {
       // console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
     }
+  };
+
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  const wrapUpload = (filePath) => {
+    return filePath ? [{ upload: filePath, date: currentDate }] : null;
   };
 
   const handleSubmitTwo = async (data) => {
@@ -212,7 +220,9 @@ export const AirTktForm = ({ candidate }) => {
       arrivaldate: formData.interview.arrivaldate,
       cityname: formData.interview.cityname,
       airfare: formData.interview.airfare,
-      airticketfile: uploadedAirTkt.airTktFile,
+      airticketfile: isUploadingString.airTktFile
+        ? JSON.stringify(wrapUpload(uploadedAirTkt.airTktFile))
+        : formData.interview.airticketfile,
     };
 
     let response;
@@ -226,7 +236,9 @@ export const AirTktForm = ({ candidate }) => {
             arrivaldate: formData.interview.arrivaldate,
             cityname: formData.interview.cityname,
             airfare: formData.interview.airfare,
-            airticketfile: uploadedAirTkt.airTktFile,
+            airticketfile: isUploadingString.airTktFile
+              ? JSON.stringify(wrapUpload(uploadedAirTkt.airTktFile))
+              : formData.interview.airticketfile,
           },
         });
       } else {
@@ -239,13 +251,14 @@ export const AirTktForm = ({ candidate }) => {
         id: interviewScheduleStatusId,
         status: formData.interview.status,
       };
+
       setNotification(true);
 
       await interviewDetails({ InterviewValue: interStatus });
 
-      if (response.errors && response.errors.length > 0) {
-        console.error("Response errors:", response.errors);
-      }
+      // if (response.errors && response.errors.length > 0) {
+      //   console.error("Response errors:", response.errors);
+      // }
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }

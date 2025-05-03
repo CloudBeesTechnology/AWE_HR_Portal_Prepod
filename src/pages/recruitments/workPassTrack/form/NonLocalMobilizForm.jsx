@@ -190,6 +190,12 @@ export const NonLocalMobilizForm = ({ candidate }) => {
     }));
   };
 
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  const wrapUpload = (filePath) => {
+    return filePath ? [{ upload: filePath, date: currentDate }] : null;
+  };
+
   const handleSubmitTwo = async (data) => {
     data.preventDefault();
 
@@ -219,7 +225,9 @@ export const NonLocalMobilizForm = ({ candidate }) => {
       mobSignDate: formData.interview.mobSignDate,
       agentname: formData.interview.agentname,
       remarkNLMob: formData.interview.remarkNLMob,
-      mobFile: uploadedMobiliz.mobFile,
+      mobFile: isUploadingString.mobFile
+        ? JSON.stringify(wrapUpload(uploadedMobiliz.mobFile))
+        : formData.interview.mobFile,
     };
 
     try {
@@ -230,7 +238,9 @@ export const NonLocalMobilizForm = ({ candidate }) => {
             mobSignDate: formData.interview.mobSignDate,
             agentname: formData.interview.agentname,
             remarkNLMob: formData.interview.remarkNLMob,
-            mobFile: uploadedMobiliz.mobFile,
+            mobFile: isUploadingString.mobFile
+              ? JSON.stringify(wrapUpload(uploadedMobiliz.mobFile))
+              : formData.interview.mobFile,
           },
         });
       } else {
@@ -246,7 +256,6 @@ export const NonLocalMobilizForm = ({ candidate }) => {
       setNotification(true);
 
       await interviewDetails({ InterviewValue: interStatus });
-
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }

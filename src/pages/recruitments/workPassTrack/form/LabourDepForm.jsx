@@ -160,7 +160,8 @@ export const LabourDepForm = ({ candidate }) => {
         tempID,
         setUploadedFileNames,
         setUploadedLabDep,
-        setIsUploadingString
+        setIsUploadingString,
+        setFormData
       );
 
       if (!isDeleted || isDeletedArrayUploaded) {
@@ -176,6 +177,12 @@ export const LabourDepForm = ({ candidate }) => {
       console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
     }
+  };
+
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  const wrapUpload = (filePath) => {
+    return filePath ? [{ upload: filePath, date: currentDate }] : null;
   };
 
   const handleSubmitTwo = async (data) => {
@@ -207,7 +214,9 @@ export const LabourDepForm = ({ candidate }) => {
       lbrDepoNum: formData.interview.lbrDepoNum,
       lbrEndroseDate: formData.interview.lbrEndroseDate,
       lbrDepoAmount: formData.interview.lbrDepoAmount,
-      lbrFile: uploadedLabDep.lbrFile,
+      lbrFile: isUploadingString.lbrFile
+        ? JSON.stringify(wrapUpload(uploadedLabDep.lbrFile))
+        : formData.interview.lbrFile,
     };
 
     let response;
@@ -220,7 +229,9 @@ export const LabourDepForm = ({ candidate }) => {
             lbrDepoNum: formData.interview.lbrDepoNum,
             lbrEndroseDate: formData.interview.lbrEndroseDate,
             lbrDepoAmount: formData.interview.lbrDepoAmount,
-            lbrFile: uploadedLabDep.lbrFile,
+            lbrFile: isUploadingString.lbrFile
+              ? JSON.stringify(wrapUpload(uploadedLabDep.lbrFile))
+              : formData.interview.lbrFile,
           },
         });
       } else {
@@ -237,9 +248,7 @@ export const LabourDepForm = ({ candidate }) => {
 
       await interviewDetails({ InterviewValue: interStatus });
 
-      if (response.errors && response.errors.length > 0) {
-        console.error("Response errors:", response.errors);
-      }
+  
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }

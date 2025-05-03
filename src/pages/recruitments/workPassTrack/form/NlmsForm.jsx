@@ -164,7 +164,8 @@ export const NlmsForm = ({ candidate }) => {
         tempID,
         setUploadedFileNames,
         setUploadedNlms,
-        setIsUploadingString
+        setIsUploadingString,
+        setFormData
       );
 
       if (!isDeleted || isDeletedArrayUploaded) {
@@ -190,6 +191,12 @@ export const NlmsForm = ({ candidate }) => {
         [field]: value,
       },
     }));
+  };
+
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  const wrapUpload = (filePath) => {
+    return filePath ? [{ upload: filePath, date: currentDate }] : null;
   };
 
   const handleSubmitTwo = async (data) => {
@@ -218,7 +225,9 @@ export const NlmsForm = ({ candidate }) => {
       nlmsapprovedate: formData.interview.nlmsapprovedate,
       nlmsexpirydate: formData.interview.nlmsexpirydate,
       ldreferenceno: formData.interview.ldreferenceno,
-      nlmsfile: uploadedNlms.nlmsFile,
+      nlmsfile: isUploadingString.nlmsFile
+        ? JSON.stringify(wrapUpload(uploadedNlms.nlmsFile))
+        : formData.interview.nlmsfile,
     };
 
     try {
@@ -231,7 +240,9 @@ export const NlmsForm = ({ candidate }) => {
             nlmsapprovedate: formData.interview.nlmsapprovedate,
             nlmsexpirydate: formData.interview.nlmsexpirydate,
             ldreferenceno: formData.interview.ldreferenceno,
-            nlmsfile: uploadedNlms.nlmsFile,
+            nlmsfile: isUploadingString.nlmsFile
+              ? JSON.stringify(wrapUpload(uploadedNlms.nlmsFile))
+              : formData.interview.nlmsfile,
           },
         });
       } else {
@@ -251,7 +262,7 @@ export const NlmsForm = ({ candidate }) => {
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }
-  }; 
+  };
 
   const requiredPermissions = ["WorkPass Tracking"];
 

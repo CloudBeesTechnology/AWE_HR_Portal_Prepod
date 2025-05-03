@@ -17,7 +17,7 @@ import { useCreateWPTracking } from "../../../../services/createMethod/CreateWPT
 import { DataSupply } from "../../../../utils/DataStoredContext";
 
 export const BankForm = ({ candidate }) => {
-    const { IVSSDetails } = useContext(DataSupply);
+  const { IVSSDetails } = useContext(DataSupply);
   const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules } = useFetchCandy();
   const { createWPTrackingHandler } = useCreateWPTracking();
@@ -75,7 +75,7 @@ export const BankForm = ({ candidate }) => {
             bgexpirydate: interviewData.bgexpirydate,
             referenceno: interviewData.referenceno,
             bgamount: interviewData.bgamount,
-            bgfile: interviewData.bgfile,
+            bgfile: interviewData.bgfile || uploadedBank.bgFile,
             status: interviewData.IDDetails.status,
           },
         });
@@ -164,7 +164,8 @@ export const BankForm = ({ candidate }) => {
         tempID,
         setUploadedFileNames,
         setUploadedBank,
-        setIsUploadingString
+        setIsUploadingString,
+        setFormData
       );
 
       if (!isDeleted || isDeletedArrayUploaded) {
@@ -180,6 +181,12 @@ export const BankForm = ({ candidate }) => {
       // console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
     }
+  };
+
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  const wrapUpload = (filePath) => {
+    return filePath ? [{ upload: filePath, date: currentDate }] : null;
   };
 
   const handleSubmitTwo = async (data) => {
@@ -213,7 +220,9 @@ export const BankForm = ({ candidate }) => {
       bgexpirydate: formData.interview.bgexpirydate,
       referenceno: formData.interview.referenceno,
       bgamount: formData.interview.bgamount,
-      bgfile: uploadedBank.bgFile,
+      bgfile: isUploadingString.bgFile
+        ? JSON.stringify(wrapUpload(uploadedBank.bgFile))
+        : formData.interview.bgfile,
     };
 
     let response;
@@ -227,7 +236,9 @@ export const BankForm = ({ candidate }) => {
             bgexpirydate: formData.interview.bgexpirydate,
             referenceno: formData.interview.referenceno,
             bgamount: formData.interview.bgamount,
-            bgfile: uploadedBank.bgFile,
+            bgfile: isUploadingString.bgFile
+              ? JSON.stringify(wrapUpload(uploadedBank.bgFile))
+              : formData.interview.bgfile,
           },
         });
       } else {

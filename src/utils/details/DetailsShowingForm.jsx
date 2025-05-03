@@ -13,7 +13,7 @@ import { useReactToPrint } from "react-to-print";
 import { FaPrint } from "react-icons/fa";
 
 export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
-  const [activeTab, setActiveTab] = useState(0); 
+  const [activeTab, setActiveTab] = useState(0);
   const [viewingDocument, setViewingDocument] = useState(null);
   const [isPdfOpen, setIsPdfOpen] = useState(false);
   const [numPages, setNumPages] = useState(null);
@@ -52,7 +52,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
 
   const parseDocumentData = (data) => {
     if (!data || !Array.isArray(data) || typeof data[0] !== "string") {
-      return {}; 
+      return {};
     }
     let docString = data[0];
     if (docString.startsWith("{") && docString.endsWith("}")) {
@@ -63,7 +63,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     const docObject = docEntries.reduce((acc, entry) => {
       const [label, url] = entry.split("=").map((part) => part.trim());
       if (label && url) {
-        acc[label] = decodeURIComponent(url); 
+        acc[label] = decodeURIComponent(url);
       }
       return acc;
     }, {});
@@ -75,7 +75,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
   const handleViewDocument = (url) => {
     setViewingDocument(url);
     setIsPdfOpen(true);
-    setPageNumber(1); 
+    setPageNumber(1);
   };
 
   // Close the PDF viewer
@@ -106,16 +106,16 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
         }
 
         const date = new Date(dateString);
-        if (isNaN(date.getTime())) return "N/A"; 
+        if (isNaN(date.getTime())) return "N/A";
         const day = date.getDate().toString().padStart(2, "0");
-        const month = (date.getMonth() + 1).toString().padStart(2, "0"); 
+        const month = (date.getMonth() + 1).toString().padStart(2, "0");
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
       });
     }
 
     const date = new Date(dateInput);
-    if (isNaN(date.getTime())) return "N/A"; 
+    if (isNaN(date.getTime())) return "N/A";
     const day = date.getDate().toString().padStart(2, "0");
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
@@ -323,6 +323,27 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     pervAnnualLeaveBal,
   } = passingValue;
 
+  const cleanLanguageData = (lang) => {
+    if (!lang || lang === "N/A") return "N/A";
+
+    // Handle array case
+    if (Array.isArray(lang)) {
+      return lang.filter((l) => l && l.trim()).join(", ");
+    }
+
+    // Handle string case (like "[, English, Mandarin]")
+    if (typeof lang === "string") {
+      return lang
+        .replace(/[\[\]]/g, "") // Remove brackets
+        .split(",") // Split by commas
+        .map((l) => l.trim()) // Trim whitespace
+        .filter((l) => l && l !== "N/A") // Remove empty
+        .join(", "); // Join with commas
+    }
+
+    return "N/A";
+  };
+
   const personalDetails = {
     Name: name,
     "Chinese character": chinese,
@@ -362,7 +383,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     Address: permanentAddress,
     "Contact No": contactNo,
     "Alternate Number": alternateNo,
-    Language: lang,
+    Language: cleanLanguageData(lang),
     "Driving License": driveLic,
     "Agent Name": agent,
     "Company Name of Previous Employment": preEmp,
@@ -372,22 +393,48 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Bank account number": bankAccNo,
   };
 
+  // const getDisplayValue = (value) => {
 
-  const educationalDetails = {
-    "Education Level": educLevel,
-    "Education Details": eduDetails,
-    "Academic / Technical qualification": aTQualify,
-  };
+  //   if (typeof value === "string" && value.trim().startsWith("[[")) {
+  //     return "N/A";
+  //   }
+  //   return value || "N/A";
+  // };
+
+  // const educationalDetails = {
+  //   "Education Level": educLevel,
+  //   "Education Details": eduDetails,
+  //   "Academic / Technical qualification": aTQualify,
+  // };
+
+  const isJsonLike = (val) =>
+    typeof val === "string" &&
+    val.trim().startsWith("[[") &&
+    val.trim().endsWith("]]");
+
+  let educationalDetails = {};
+
+  if (isJsonLike(educLevel)) {
+    educationalDetails["Education Details"] = educLevel;
+    educationalDetails["Education Level"] = eduDetails;
+  } else if (isJsonLike(eduDetails)) {
+    educationalDetails["Education Details"] = eduDetails;
+    educationalDetails["Education Level"] = educLevel;
+  } else {
+    educationalDetails["Education Level"] = educLevel;
+    educationalDetails["Education Details"] = eduDetails;
+  }
+
+  educationalDetails["Academic / Technical qualification"] = aTQualify;
 
   const medicalInfo = {
-    "Overseas Medical Fitness issued date": overMD, 
-    "Overseas Medical Fitness Expiry": overME, 
-    "Date submitted of BruHims Registration": bruhimsRD, 
-    "BruHims Registration Number": bruhimsRNo, 
-    "Brunei Medical Appointment Date": bruneiMAD, 
-    "Brunei Medical Fitness Expiry": bruneiME, 
+    "Overseas Medical Fitness issued date": overMD,
+    "Overseas Medical Fitness Expiry": overME,
+    "Date submitted of BruHims Registration": bruhimsRD,
+    "BruHims Registration Number": bruhimsRNo,
+    "Brunei Medical Appointment Date": bruneiMAD,
+    "Brunei Medical Fitness Expiry": bruneiME,
   };
-  
 
   const dependenPass = {
     DependPass: dependPass,
@@ -398,7 +445,6 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Accommodation Address": accommodationAddress,
   };
 
- 
   const insuranceInfo = {
     "Group H&S Insurance": groupIns,
     "Group H&S Insurance Enrollment Effective Date":
@@ -413,7 +459,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
   const DependentInsurance = {
     "Dependent Insurance": depInsurance,
   };
-  
+
   const InsuranceClaim = {
     "Insurance Claim": insuranceClaims,
   };

@@ -6,7 +6,8 @@ export const DeleteUploadSawp = (
   empID,
   setUploadedFileNames,
   setUploadedSawp,
-  setIsUploadingString
+  setIsUploadingString,
+  setFormData
 ) => {
   try {
     // console.log(fileType,fileName,"nduvgsd7679yt78");
@@ -43,6 +44,14 @@ export const DeleteUploadSawp = (
     setIsUploadingString((prev) => ({
       ...prev,
       [fileType]: false,
+    }));
+
+    setFormData((prev) => ({
+      ...prev,
+      interview: {
+        ...prev.interview,
+        [fileType]: "",
+      },
     }));
   } catch (error) {
     console.log(error, "DeleteUploadSawp in error");

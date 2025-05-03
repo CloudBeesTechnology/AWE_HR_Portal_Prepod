@@ -17,7 +17,7 @@ import { useCreateWPTracking } from "../../../../services/createMethod/CreateWPT
 import { DataSupply } from "../../../../utils/DataStoredContext";
 
 export const DoeForm = ({ candidate }) => {
-    const { IVSSDetails } = useContext(DataSupply);
+  const { IVSSDetails } = useContext(DataSupply);
   const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules } = useFetchCandy();
   const { interviewDetails } = UpdateInterviewData();
@@ -163,7 +163,8 @@ export const DoeForm = ({ candidate }) => {
         tempID,
         setUploadedFileNames,
         setUploadedDoe,
-        setIsUploadingString
+        setIsUploadingString,
+        setFormData
       );
 
       if (!isDeleted || isDeletedArrayUploaded) {
@@ -179,6 +180,12 @@ export const DoeForm = ({ candidate }) => {
       // console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
     }
+  };
+
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  const wrapUpload = (filePath) => {
+    return filePath ? [{ upload: filePath, date: currentDate }] : null;
   };
 
   const handleSubmitTwo = async (data) => {
@@ -212,7 +219,9 @@ export const DoeForm = ({ candidate }) => {
       doerefno: formData.interview.doerefno,
       doeapprovedate: formData.interview.doeapprovedate,
       doeexpirydate: formData.interview.doeexpirydate,
-      doefile: uploadedDoe.doeFile,
+      doefile: isUploadingString.doeFile
+        ? JSON.stringify(wrapUpload(uploadedDoe.doeFile))
+        : formData.interview.doefile,
     };
 
     try {
@@ -224,7 +233,9 @@ export const DoeForm = ({ candidate }) => {
             doerefno: formData.interview.doerefno,
             doeapprovedate: formData.interview.doeapprovedate,
             doeexpirydate: formData.interview.doeexpirydate,
-            doefile: uploadedDoe.doeFile,
+            doefile: isUploadingString.doeFile
+              ? JSON.stringify(wrapUpload(uploadedDoe.doeFile))
+              : formData.interview.doefile,
           },
         });
       } else {

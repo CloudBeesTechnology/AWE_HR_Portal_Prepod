@@ -161,7 +161,8 @@ export const JitpaForm = ({ candidate }) => {
         tempID,
         setUploadedFileNames,
         setUploadedJitpa,
-        setIsUploadingString
+        setIsUploadingString,
+        setFormData
       );
 
       if (!isDeleted || isDeletedArrayUploaded) {
@@ -179,6 +180,12 @@ export const JitpaForm = ({ candidate }) => {
       // console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
     }
+  };
+
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  const wrapUpload = (filePath) => {
+    return filePath ? [{ upload: filePath, date: currentDate }] : null;
   };
 
   const handleSubmitTwo = async (data) => {
@@ -211,7 +218,9 @@ export const JitpaForm = ({ candidate }) => {
       submitdateendorsement: formData.interview.submitdateendorsement,
       jitpaexpirydate: formData.interview.jitpaexpirydate,
       jitpaamount: formData.interview.jitpaamount,
-      jitpafile: uploadedJitpa.jitpaFile,
+      jitpafile: isUploadingString.jitpaFile
+        ? JSON.stringify(wrapUpload(uploadedJitpa.jitpaFile))
+        : formData.interview.jitpafile,
     };
 
     let response;
@@ -225,7 +234,9 @@ export const JitpaForm = ({ candidate }) => {
             submitdateendorsement: formData.interview.submitdateendorsement,
             jitpaexpirydate: formData.interview.jitpaexpirydate,
             jitpaamount: formData.interview.jitpaamount,
-            jitpafile: uploadedJitpa.jitpaFile,
+            jitpafile: isUploadingString.jitpaFile
+              ? JSON.stringify(wrapUpload(uploadedJitpa.jitpaFile))
+              : formData.interview.jitpafile,
           },
         });
       } else {
@@ -248,9 +259,6 @@ export const JitpaForm = ({ candidate }) => {
 
       // console.log("Response from WPTrackingDetails:", response);
 
-      if (response.errors && response.errors.length > 0) {
-        console.error("Response errors:", response.errors);
-      }
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }

@@ -17,7 +17,7 @@ import { useCreateWPTracking } from "../../../../services/createMethod/CreateWPT
 import { DataSupply } from "../../../../utils/DataStoredContext";
 
 export const ImmigrationForm = ({ candidate }) => {
-    const { IVSSDetails } = useContext(DataSupply);
+  const { IVSSDetails } = useContext(DataSupply);
   const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules } = useFetchCandy();
   const { createWPTrackingHandler } = useCreateWPTracking();
@@ -73,7 +73,7 @@ export const ImmigrationForm = ({ candidate }) => {
             docsubmitdate: interviewData.docsubmitdate,
             visaapprovedate: interviewData.visaapprovedate,
             visareferenceno: interviewData.visareferenceno,
-            visaFile: interviewData.visaFile,
+            visaFile: interviewData.visaFile || uploadedVisa.visaFile,
             status: interviewData.status,
             status: interviewData.IDDetails.status,
           },
@@ -163,7 +163,8 @@ export const ImmigrationForm = ({ candidate }) => {
         tempID,
         setUploadedFileNames,
         setUploadedVisa,
-        setIsUploadingString
+        setIsUploadingString,
+        setFormData
       );
 
       if (!isDeleted || isDeletedArrayUploaded) {
@@ -179,6 +180,12 @@ export const ImmigrationForm = ({ candidate }) => {
       console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
     }
+  };
+
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  const wrapUpload = (filePath) => {
+    return filePath ? [{ upload: filePath, date: currentDate }] : null;
   };
 
   const handleSubmitTwo = async (data) => {
@@ -211,7 +218,9 @@ export const ImmigrationForm = ({ candidate }) => {
       docsubmitdate: formData.interview.docsubmitdate,
       visaapprovedate: formData.interview.visaapprovedate,
       visareferenceno: formData.interview.visareferenceno,
-      visaFile: uploadedVisa.visaFile,
+      visaFile: isUploadingString.visaFile
+        ? JSON.stringify(wrapUpload(uploadedVisa.visaFile))
+        : formData.interview.visaFile,
     };
 
     let response;
@@ -224,7 +233,9 @@ export const ImmigrationForm = ({ candidate }) => {
             docsubmitdate: formData.interview.docsubmitdate,
             visaapprovedate: formData.interview.visaapprovedate,
             visareferenceno: formData.interview.visareferenceno,
-            visaFile: uploadedVisa.visaFile,
+            visaFile: isUploadingString.visaFile
+              ? JSON.stringify(wrapUpload(uploadedVisa.visaFile))
+              : formData.interview.visaFile,
           },
         });
       } else {
@@ -237,6 +248,7 @@ export const ImmigrationForm = ({ candidate }) => {
         id: interviewScheduleStatusId,
         status: formData.interview.status,
       };
+
       setNotification(true);
 
       // console.log("Submitting interview details with status:", interStatus);
@@ -245,9 +257,9 @@ export const ImmigrationForm = ({ candidate }) => {
 
       // console.log("Interview status updated:", interStatus);
 
-      if (response.errors && response.errors.length > 0) {
-        console.error("Response errors:", response.errors);
-      }
+      // if (response.errors && response.errors.length > 0) {
+      //   console.error("Response errors:", response.errors);
+      // }
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }

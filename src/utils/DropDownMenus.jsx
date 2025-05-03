@@ -28,7 +28,7 @@ export const RaceDD = [
   { value: "Iban Dayak", label: "Iban Dayak" },
   { value: "Iban Muslim", label: "Iban Muslim" },
   { value: "Indian", label: "Indian" },
-  { value: "Indonesia", label: "Indonesia" },
+  { value: "Indonesian", label: "Indonesian" },
   { value: "Java", label: "Java" },
   { value: "Kadazan", label: "Kadazan" },
   { value: "Kayan", label: "Kayan" },
@@ -43,8 +43,9 @@ export const RaceDD = [
   { value: "Srilankan", label: "Srilankan" },
   { value: "Thai", label: "Thai" },
   { value: "Ukit", label: "Ukit" },
+  { value: "Kiput", label: "Kiput" },
   { value: "Other", label: "Other" },
-
+  { value: "Not Mentioned", label: "Not Mentioned" },
 ];
 export const ReligionDD = [
   { value: "Islam", label: "Islam" },
@@ -99,7 +100,10 @@ export const ContractTypeDD = [
 export const RelationshipDD = [
   { value: "Single", label: "Single" },
   { value: "Employee & Spouse", label: "Employee & Spouse" },
-  { value: "Employee, Spouse & Children (max 2 pax below age 18)", label: "Employee, Spouse & Children (max 2 pax below age 18)" },
+  {
+    value: "Employee, Spouse & Children (max 2 pax below age 18)",
+    label: "Employee, Spouse & Children (max 2 pax below age 18)",
+  },
 ];
 export const WorkStatusDD = [
   { value: "Probationary", label: "Probationary" },
@@ -175,11 +179,13 @@ export const LabourTypeDD = [
   { value: "company", label: "Company" },
 ];
 
-
 export const leavePassDD = [
   { value: "Employee alone", label: "Employee alone" },
   { value: "Employee & Spouse", label: "Employee & Spouse" },
-  { value: "Employee, Spouse & Children (max 2 pax below age 18)", label: "Employee, Spouse & Children (max 2 pax below age 18)" },
+  {
+    value: "Employee, Spouse & Children (max 2 pax below age 18)",
+    label: "Employee, Spouse & Children (max 2 pax below age 18)",
+  },
 ];
 
 export const DepartmentDD = [
@@ -238,7 +244,6 @@ export const DepartmentDD = [
 //   { value: "Welder", label: "Welder" },
 //   { value: "Other", label: "Other" },
 // ];
-
 
 export const workInfoUploads = [
   { label: "Contract", icon: <GoUpload />, title: "WIContract" },

@@ -30,6 +30,7 @@ export const MobilizationRecru = ({
   const [showEmpIdPopup, setShowEmpIdPopup] = useState(false);
   const [empIdLoading, setEmpIdLoading] = useState(false);
   const [currentCandidate, setCurrentCandidate] = useState(null);
+  
 
   const heading = [
     "S.No",
@@ -43,7 +44,6 @@ export const MobilizationRecru = ({
     "Edit Form",
     "Status",
   ];
-  // console.log(data);
 
   const totalPages = Math.ceil(data.length / rowsPerPage);
   const startIndex = (page - 1) * rowsPerPage;
@@ -106,7 +106,6 @@ export const MobilizationRecru = ({
       return 0;
     }
   };
-
   const generateNextTempID = (totalCount) => {
     const prefixMatch = totalCount.match(/[^\d]+/);
     const prefix = prefixMatch ? prefixMatch[0] : "";
@@ -114,7 +113,6 @@ export const MobilizationRecru = ({
     const numberPart = numberMatch ? parseInt(numberMatch[0], 10) : 0;
     const nextNumber = numberPart + 1;
     const nextTempID = `${prefix}${nextNumber}`;
-    // console.log(nextTempID);
 
     return nextTempID;
   };
@@ -123,7 +121,9 @@ export const MobilizationRecru = ({
     setEmpIdLoading(true);
     try {
       const lastTempID = await getTotalCount();
+
       const nextTempID = generateNextTempID(lastTempID);
+
       setLatesTempIDData(nextTempID);
     } catch (error) {
       console.error("Error generating employee ID:", error);
@@ -149,9 +149,13 @@ export const MobilizationRecru = ({
       alert("Error: No candidate selected.");
       return;
     }
-    // Set the loading state for this candidate
+
+    console.log(`Submitting candidate: ${currentCandidate.id}`);
+
+    // Set the loading state for this currentCandidatedate
     setLoadingItems((prev) => {
       const newState = { ...prev, [currentCandidate.id]: true };
+      console.log("Loading state after update (setLoadingItems):", newState);
       return newState;
     });
 
@@ -160,6 +164,7 @@ export const MobilizationRecru = ({
         ...currentCandidate,
         empID: latestTempIDData,
       };
+      console.log("Stored Data", storedData);
 
       // Simulating async calls here, which you can uncomment when needed
       await SumbitCandiToEmp({ storedData });
@@ -169,15 +174,13 @@ export const MobilizationRecru = ({
         "Candidate conversion to employee has been completed successfully."
       );
       setNotification(true);
-
-      setLoadingItems((prev) => {
-        const newState = { ...prev, [currentCandidate.id]: false };
-        return newState;
-      });
+      
+      setShowEmpIdPopup(false);
     } catch (err) {
       console.error("Error during submission:", err);
       setLoadingItems((prev) => {
         const newState = { ...prev, [currentCandidate.id]: false };
+        console.log("Loading state after update (setLoadingItems):", newState);
         return newState;
       });
       alert("Error", err);
@@ -330,7 +333,7 @@ export const MobilizationRecru = ({
                               if (!item.mobilizationDetails_mobFile) {
                                 e.preventDefault();
                               } else {
-                                fileUpload(item.mobilizationDetails_mobFile); // Fetch URL when clicked
+                                fileUpload(item.mobilizationDetails_mobFile); 
                               }
                             }}
                             download
@@ -348,7 +351,7 @@ export const MobilizationRecru = ({
                           <p>N/A</p>
                         )}
                       </td>
-
+                 
                       <td
                         className="py-3 text-center"
                         onClick={() => handleShowReviewForm(item)}

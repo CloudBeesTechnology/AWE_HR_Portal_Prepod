@@ -163,7 +163,8 @@ export const SawpForm = ({ candidate }) => {
         tempID,
         setUploadedFileNames,
         setUploadedSawp,
-        setIsUploadingString
+        setIsUploadingString,
+        setFormData
       );
 
       if (!isDeleted || isDeletedArrayUploaded) {
@@ -181,6 +182,12 @@ export const SawpForm = ({ candidate }) => {
     }
   };
 
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  const wrapUpload = (filePath) => {
+    return filePath ? [{ upload: filePath, date: currentDate }] : null;
+  };
+
   const onSubmit = async (data) => {
     data.preventDefault();
     const existingInterviewData = interviewSchedules.find(
@@ -196,7 +203,10 @@ export const SawpForm = ({ candidate }) => {
     const requestData = {
       reqValue: {
         ...formData.interview,
-        sawpFile: uploadedSawp.sawpFile,
+        sawpFile: isUploadingString.sawpFile
+          ? JSON.stringify(wrapUpload(uploadedSawp.sawpFile))
+          : formData.interview.sawpFile,
+        tempID: candidate.tempID,
         sawpDate: formData.interview.sawpDate,
         sawpRecivedDate: formData.interview.sawpRecivedDate,
         tempID: candidate.tempID,
@@ -210,7 +220,9 @@ export const SawpForm = ({ candidate }) => {
             id: existingInterviewData.id,
             sawpDate: formData.interview.sawpDate,
             sawpRecivedDate: formData.interview.sawpRecivedDate,
-            sawpFile: uploadedSawp.sawpFile,
+            sawpFile: isUploadingString.sawpFile
+              ? JSON.stringify(wrapUpload(uploadedSawp.sawpFile))
+              : formData.interview.sawpFile,
             tempID: candidate.tempID,
           },
         });
@@ -254,7 +266,7 @@ export const SawpForm = ({ candidate }) => {
       <form onSubmit={onSubmit} className="p-5">
         <div className="grid grid-cols-2 gap-5 mt-5">
           <div>
-            <label htmlFor="sawpDate">Sawp Request Date</label>
+            <label htmlFor="sawpDate">SAWP Request Date</label>
             <input
               className="w-full border p-2 rounded mt-1 h-[46px]"
               type="date"
@@ -266,7 +278,7 @@ export const SawpForm = ({ candidate }) => {
           </div>
 
           <div>
-            <label htmlFor="sawpRecivedDate">Sawp Recieved Date</label>
+            <label htmlFor="sawpRecivedDate">SAWP Recieved Date</label>
             <input
               className="w-full border p-2 rounded mt-1 h-[46px]"
               type="date"

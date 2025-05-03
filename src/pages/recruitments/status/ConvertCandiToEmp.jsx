@@ -112,7 +112,7 @@ export const CandiToEmp = () => {
 
       const sawpDetails = {
         empID: storedData.empID,
-        // sawpEmpLtrReq: empty,
+        sawpEmpLtrReq: [storedData.WPTrackDetails_sawpDate],
         sawpEmpLtrReci: [storedData.WPTrackDetails_sawpRecivedDate],
         sawpEmpUpload: storedData.WPTrackDetails_sawpFile,
       };
@@ -130,10 +130,10 @@ export const CandiToEmp = () => {
         nlmsRefNo: [storedData.WPTrackDetails_ldreferenceno],
         nlmsEmpValid: [storedData.WPTrackDetails_nlmsexpirydate],
         nlmsEmpUpload: storedData.WPTrackDetails_nlmsfile,
-      };
+      }; 
 
       const BJLDetails = {
-        empID: [storedData.empID],
+        empID: storedData.empID,
         bankSubmit: [storedData.WPTrackDetails_bgsubmitdate],
         bankRece: [storedData.WPTrackDetails_bgreceivedate],
         bankRefNo: [storedData.WPTrackDetails_referenceno],
@@ -152,13 +152,14 @@ export const CandiToEmp = () => {
       };
 
       const PassportValid = {
+        empID: storedData.empID,
         // ppLocation: [String],
         arrivStampUpload: storedData.WPTrackDetails_airticketfile,
         immigEmpUpload: storedData.WPTrackDetails_visaFile,
         // reEntryUpload: [AWSJSON],
         // arrivStampExp: [String],
-        immigRefNo: [storedData.WPTrackDetails_visareferenceno],
-        ppSubmit: [storedData.WPTrackDetails_immbdno],
+        immigRefNo: [storedData.WPTrackDetails_immbdno],
+        ppSubmit: [storedData.WPTrackDetails_docsubmitdate],
         // empPassExp: [String],
         // empPassStatus: [String],
         // airTktStatus: [String],
@@ -213,14 +214,14 @@ export const CandiToEmp = () => {
           }),
         ]);
 
-        console.log("createEmpPersonalInfo response:", empPIResponse);
-        console.log("createIDDetails response:", IDResponse);
-        console.log("createCandIToEMP response:", candiResponse);
-        console.log("createEmpWorkInfo response:", workResponse);
-        console.log("createSawpDetails response:", sawpResponse);
-        console.log("createDNDetails response:", dnResponse);
-        console.log("createBJLDetails response:", bjlResponse);
-        console.log("createPassportValid response:", passportResponse);
+        // console.log("createEmpPersonalInfo response:", empPIResponse);
+        // console.log("createIDDetails response:", IDResponse);
+        // console.log("createCandIToEMP response:", candiResponse);
+        // console.log("createEmpWorkInfo response:", workResponse);
+        // console.log("createSawpDetails response:", sawpResponse);
+        // console.log("createDNDetails response:", dnResponse);
+        // console.log("createBJLDetails response:", bjlResponse);
+        // console.log("createPassportValid response:", passportResponse);
 
         const updatingStatus = await client
           .graphql({
