@@ -253,7 +253,7 @@ export const LabourImmigrationSchema = Yup.object().shape({
           (value) => {
             // If value is a file, check for valid file types
             if (value instanceof File) {
-              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(value.type);
+              return ["application/pdf", "image/jpeg","image/jpg", "image/png"].includes(value?.type);
             }
 
             // If value is a string, check if it's a valid URL
@@ -1707,7 +1707,8 @@ export const AddInsuranceSchema = Yup.object().shape({
 
 // Yup InsuranceInfoSchema validation schema
 export const GroupHSSchema = Yup.object().shape({
-  groupHSNo: Yup.string().required("Group HS Number is required"), // Adjusted to .notRequired() as per your initial code
+  groupHSNo: Yup.string().required("Group HS Number is required"),
+   // Adjusted to .notRequired() as per your initial code
   groupHSExp: Yup.string()
   .notRequired().test(
     'validDate',

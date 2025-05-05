@@ -214,7 +214,7 @@ export const GroupHS = () => {
     // console.log("data121", data);
 
     try {
-      const checkingDITable = groupHSData.find(
+      const checkingDITable = groupHSData?.find(
         (match) => match.id === searchResultData.id
       );
 
