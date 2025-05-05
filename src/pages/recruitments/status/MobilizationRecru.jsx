@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { RiFileEditLine } from "react-icons/ri";
+import React, { useState } from "react";
+import { RiCloseLine, RiFileEditLine } from "react-icons/ri";
 import { StatusForm } from "./StatusForm";
 import { ReviewForm } from "../ReviewForm";
 import { CandiToEmp } from "./ConvertCandiToEmp";
@@ -26,6 +26,11 @@ export const MobilizationRecru = ({
   const [notification, setNotification] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(1);
+  const [loadingItems, setLoadingItems] = useState({});
+  const [showEmpIdPopup, setShowEmpIdPopup] = useState(false);
+  const [empIdLoading, setEmpIdLoading] = useState(false);
+  const [currentCandidate, setCurrentCandidate] = useState(null);
+  
 
   const heading = [
     "S.No",
@@ -34,13 +39,11 @@ export const MobilizationRecru = ({
     "Nationality",
     "Position",
     "Signed Date",
-    "Contract PDF",
-    "Status Update",
+    "Mobilization PDF",
     "Form",
     "Edit Form",
     "Status",
   ];
-  // console.log(data);
 
   const totalPages = Math.ceil(data.length / rowsPerPage);
   const startIndex = (page - 1) * rowsPerPage;
@@ -103,7 +106,6 @@ export const MobilizationRecru = ({
       return 0;
     }
   };
-
   const generateNextTempID = (totalCount) => {
     const prefixMatch = totalCount.match(/[^\d]+/);
     const prefix = prefixMatch ? prefixMatch[0] : "";
@@ -111,37 +113,188 @@ export const MobilizationRecru = ({
     const numberPart = numberMatch ? parseInt(numberMatch[0], 10) : 0;
     const nextNumber = numberPart + 1;
     const nextTempID = `${prefix}${nextNumber}`;
-    // console.log(nextTempID);
 
     return nextTempID;
   };
 
-  useEffect(() => {
-    const fetchNextTempID = async () => {
-      const totalCount = await getTotalCount();
-      const nextTempID = generateNextTempID(totalCount);
+  const handleGenerateEmpId = async () => {
+    setEmpIdLoading(true);
+    try {
+      const lastTempID = await getTotalCount();
+
+      const nextTempID = generateNextTempID(lastTempID);
+
       setLatesTempIDData(nextTempID);
-    };
-    fetchNextTempID();
-  }, []);
-
-  // console.log(latestTempIDData);
-
-  const OnSubmit = async (candi) => {
-    const storedData = {
-      ...candi,
-      empID: latestTempIDData,
-    };
-    await SumbitCandiToEmp({ storedData });
-    await submitMobilization({ mob: storedData });
-    setShowTitle(
-      "Candidate conversion to employee has been completed successfully."
-    );
-    setNotification(true);
+    } catch (error) {
+      console.error("Error generating employee ID:", error);
+      alert("Error generating employee ID");
+    } finally {
+      setEmpIdLoading(false);
+    }
   };
+
+  const handleConvertClick = (candi) => {
+    setCurrentCandidate(candi);
+    setShowEmpIdPopup(true);
+    setLatesTempIDData("");
+  };
+
+  const OnSubmit = async () => {
+    if (!latestTempIDData) {
+      alert("Error: Missing employee ID.");
+      return;
+    }
+
+    if (!currentCandidate) {
+      alert("Error: No candidate selected.");
+      return;
+    }
+
+    console.log(`Submitting candidate: ${currentCandidate.id}`);
+
+    // Set the loading state for this currentCandidatedate
+    setLoadingItems((prev) => {
+      const newState = { ...prev, [currentCandidate.id]: true };
+      console.log("Loading state after update (setLoadingItems):", newState);
+      return newState;
+    });
+
+    try {
+      const storedData = {
+        ...currentCandidate,
+        empID: latestTempIDData,
+      };
+      console.log("Stored Data", storedData);
+
+      // Simulating async calls here, which you can uncomment when needed
+      await SumbitCandiToEmp({ storedData });
+      await submitMobilization({ mob: storedData });
+
+      setShowTitle(
+        "Candidate conversion to employee has been completed successfully."
+      );
+      setNotification(true);
+      
+      setShowEmpIdPopup(false);
+    } catch (err) {
+      console.error("Error during submission:", err);
+      setLoadingItems((prev) => {
+        const newState = { ...prev, [currentCandidate.id]: false };
+        console.log("Loading state after update (setLoadingItems):", newState);
+        return newState;
+      });
+      alert("Error", err);
+    }
+  };
+
   return (
     <>
       <div className="recruitmentTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl">
+        {showEmpIdPopup && (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+              {/* Popup Header */}
+              <div className="px-6 py-4 flex justify-between items-center bg-[#939393] uppercase">
+                <h3 className="text-xl font-semibold text-white">
+                  Employee Conversion
+                </h3>
+                <button
+                  onClick={() => setShowEmpIdPopup(false)}
+                  className="text-white hover:text-borderGray transition-colors"
+                >
+                  <RiCloseLine size={24} />
+                </button>
+              </div>
+
+              {/* Popup Content */}
+              <div className="p-6">
+                {/* Candidate Info */}
+                <div className="mb-6 space-y-3">
+                  <div className="flex items-center">
+                    <span className="w-full font-medium text-labelText uppercase">
+                      Candidate Name:
+                    </span>
+                    <span className="text-darkText">
+                      {currentCandidate?.name}
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="w-full font-medium text-labelText uppercase">
+                      Temp ID:
+                    </span>
+                    <span className="font-mono text-darkText">
+                      {currentCandidate?.tempID}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Generated ID Display */}
+                <div className="mb-6 p-4 rounded-lg border border-borderGray bg-lightBg uppercase">
+                  <p className="text-sm font-medium text-mutedText mb-1">
+                    Employee ID
+                  </p>
+                  {latestTempIDData ? (
+                    <p className="text-xl font-bold font-mono text-mutedText">
+                      {latestTempIDData}
+                    </p>
+                  ) : (
+                    <p className="text-placeholderText italic">
+                      Not generated yet
+                    </p>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-4">
+                  {!latestTempIDData && (
+                    <button
+                      onClick={handleGenerateEmpId}
+                      disabled={empIdLoading}
+                      className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all flex items-center justify-center uppercase ${
+                        empIdLoading
+                          ? "bg-disabledBg text-mutedText cursor-not-allowed"
+                          : "bg-primary hover:hover:bg-yellow"
+                      }`}
+                    >
+                      {empIdLoading && (
+                        <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white mr-2"></div>
+                      )}
+                      {empIdLoading ? "Generating..." : "Generate EmpID"}
+                    </button>
+                  )}
+
+                  {latestTempIDData && (
+                    <button
+                      onClick={OnSubmit}
+                      disabled={
+                        !latestTempIDData || loadingItems[currentCandidate?.id]
+                      }
+                      className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all flex items-center justify-center uppercase ${
+                        !latestTempIDData || loadingItems[currentCandidate?.id]
+                          ? "bg-disabledBg text-mutedText cursor-not-allowed"
+                          : "bg-primary hover:hover:bg-yellow"
+                      }`}
+                    >
+                      {loadingItems[currentCandidate?.id] && (
+                        <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white mr-2"></div>
+                      )}
+                      {loadingItems[currentCandidate?.id]
+                        ? "Converting..."
+                        : "Convert to employee"}
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Help Text */}
+              <div className="px-6 py-3 bg-lightBg border-t border-borderGray">
+                <p className="text-xs text-mutedText text-center">
+                  Generate an Employee ID before conversion
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
         {paginatedData && paginatedData.length > 0 ? (
           <table className=" w-full rounded-lg">
             <thead className="bg-[#939393] text-white sticky top-0">
@@ -180,7 +333,7 @@ export const MobilizationRecru = ({
                               if (!item.mobilizationDetails_mobFile) {
                                 e.preventDefault();
                               } else {
-                                fileUpload(item.mobilizationDetails_mobFile); // Fetch URL when clicked
+                                fileUpload(item.mobilizationDetails_mobFile); 
                               }
                             }}
                             download
@@ -198,10 +351,7 @@ export const MobilizationRecru = ({
                           <p>N/A</p>
                         )}
                       </td>
-                      <td className="py-3">
-                        {item.interviewDetails_status || "N/A"}
-                      </td>
-
+                 
                       <td
                         className="py-3 text-center"
                         onClick={() => handleShowReviewForm(item)}
@@ -215,10 +365,13 @@ export const MobilizationRecru = ({
                         <RiFileEditLine />
                       </td>
                       <td
-                        className="text-sm cursor-pointer py-3 "
-                        onClick={() => OnSubmit(item)}
+                        className="text-sm cursor-pointer py-3"
+                        onClick={() => handleConvertClick(item)}
+                        disabled={loadingItems[item.id]}
                       >
-                        Convert Employee
+                        {loadingItems[item.id]
+                          ? "Loading..."
+                          : "Convert Employee"}
                       </td>
                     </tr>
                   );

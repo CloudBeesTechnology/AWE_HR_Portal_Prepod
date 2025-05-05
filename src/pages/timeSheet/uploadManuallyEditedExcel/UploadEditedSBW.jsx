@@ -102,8 +102,10 @@ export const UploadEditedSBW = (
         if (typeof item.OUT === "number") {
           item.OUT = convertDecimalToTime(item.OUT, "time");
         }
+
         if (typeof item.DATE === "number") {
           const jsDate = convertDecimalToTime(item.DATE, "date");
+
           const dateObject = new Date(jsDate);
           item.DATE = dateObject.toLocaleDateString();
         }
@@ -111,7 +113,71 @@ export const UploadEditedSBW = (
         return item;
       });
 
-    const filteHighlightedData = updatedDataArray.filter(
+    const forStringDate = async (inputData) => {
+      try {
+        const badgeDateMap = {};
+
+        // Step 1: Assign missing DATEs based on BADGE
+        const updatedData = inputData?.reduce((acc, item) => {
+          const badge = item.BADGE?.trim();
+
+          if (item.DATE) {
+            badgeDateMap[badge] = item.DATE;
+          }
+
+          if (item.IN && item.OUT && !item.DATE) {
+            const storedDate = badgeDateMap[badge];
+            if (storedDate) {
+              item.DATE = storedDate;
+            }
+          }
+
+          acc.push(item);
+          return acc;
+        }, []);
+
+        // Helper to remove weekday (e.g., 5/6/2025(tue) → 5/6/2025)
+        const getCleanedDate = (dateStr) => {
+          return dateStr?.replace(/\(\w+\)/, "")?.trim();
+        };
+
+        const convertToDMY = (inputDateStr) => {
+          const [month, day, year] = inputDateStr.split("/");
+
+          // Convert string to numbers to remove any leading zeros
+          const dayNum = parseInt(day, 10);
+          const monthNum = parseInt(month, 10);
+
+          return `${monthNum}/${dayNum}/${year} `;
+        };
+
+        // Step 2: Clean and format each DATE in updatedData
+        updatedData.forEach((obj) => {
+          if (obj.DATE && typeof obj.DATE === "string") {
+            const cleanedDate = getCleanedDate(obj.DATE);
+
+            try {
+              obj.DATE = convertToDMY(cleanedDate);
+            } catch (error) {
+              console.error("Date format error in:", cleanedDate);
+            }
+          }
+        });
+
+        return updatedData;
+      } catch (err) {
+        console.log("Error : ", err);
+      }
+    };
+    const getDateFromPrevRow = forStringDate(updatedDataArray);
+    const finalData =
+      getDateFromPrevRow && getDateFromPrevRow.length > 0
+        ? getDateFromPrevRow
+        : updatedDataArray && updatedDataArray.length > 0
+        ? updatedDataArray
+        : [];
+
+    const filteHighlightedData = finalData?.filter(
       (item) => item.IN && item.OUT
     );
 

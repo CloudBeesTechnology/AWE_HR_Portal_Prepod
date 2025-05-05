@@ -280,6 +280,7 @@ type TrainingReq @aws_iam @aws_api_key {
   courseName: [String]
   company: [String]
   mediRequired: Boolean
+  traineeTrack: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -294,6 +295,7 @@ type TrainingCertificates @aws_iam @aws_api_key {
   poNo: [String]
   addDescretion: [String]
   tcRemarks: String
+  trainingProof: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -2897,6 +2899,7 @@ input ModelTrainingReqFilterInput {
   courseName: ModelStringInput
   company: ModelStringInput
   mediRequired: ModelBooleanInput
+  traineeTrack: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelTrainingReqFilterInput]
@@ -2919,6 +2922,7 @@ input ModelTrainingReqConditionInput {
   courseName: ModelStringInput
   company: ModelStringInput
   mediRequired: ModelBooleanInput
+  traineeTrack: ModelStringInput
   and: [ModelTrainingReqConditionInput]
   or: [ModelTrainingReqConditionInput]
   not: ModelTrainingReqConditionInput
@@ -2942,6 +2946,7 @@ input CreateTrainingReqInput {
   courseName: [String]
   company: [String]
   mediRequired: Boolean
+  traineeTrack: [AWSJSON]
 }
 
 input UpdateTrainingReqInput {
@@ -2960,6 +2965,7 @@ input UpdateTrainingReqInput {
   courseName: [String]
   company: [String]
   mediRequired: Boolean
+  traineeTrack: [AWSJSON]
 }
 
 input DeleteTrainingReqInput {
@@ -2982,6 +2988,7 @@ input ModelSubscriptionTrainingReqFilterInput {
   courseName: ModelSubscriptionStringInput
   company: ModelSubscriptionStringInput
   mediRequired: ModelSubscriptionBooleanInput
+  traineeTrack: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionTrainingReqFilterInput]
@@ -3003,6 +3010,7 @@ input ModelTrainingCertificatesFilterInput {
   poNo: ModelStringInput
   addDescretion: ModelStringInput
   tcRemarks: ModelStringInput
+  trainingProof: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelTrainingCertificatesFilterInput]
@@ -3019,6 +3027,7 @@ input ModelTrainingCertificatesConditionInput {
   poNo: ModelStringInput
   addDescretion: ModelStringInput
   tcRemarks: ModelStringInput
+  trainingProof: ModelStringInput
   and: [ModelTrainingCertificatesConditionInput]
   or: [ModelTrainingCertificatesConditionInput]
   not: ModelTrainingCertificatesConditionInput
@@ -3036,6 +3045,7 @@ input CreateTrainingCertificatesInput {
   poNo: [String]
   addDescretion: [String]
   tcRemarks: String
+  trainingProof: [AWSJSON]
 }
 
 input UpdateTrainingCertificatesInput {
@@ -3048,6 +3058,7 @@ input UpdateTrainingCertificatesInput {
   poNo: [String]
   addDescretion: [String]
   tcRemarks: String
+  trainingProof: [AWSJSON]
 }
 
 input DeleteTrainingCertificatesInput {
@@ -3064,6 +3075,7 @@ input ModelSubscriptionTrainingCertificatesFilterInput {
   poNo: ModelSubscriptionStringInput
   addDescretion: ModelSubscriptionStringInput
   tcRemarks: ModelSubscriptionStringInput
+  trainingProof: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionTrainingCertificatesFilterInput]

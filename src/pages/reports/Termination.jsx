@@ -46,9 +46,9 @@ export const Termination = () => {
     const sortedData = data
       ?.filter((item) => item.termiDate) // Only include items with termiDate
       .map((item) => {
-        const termiDate = new Date(item.termiDate); // Parse termiDate for sorting
+        const termiDate = new Date(item.termiDate); 
         return {
-          termiDate, // Keep raw date for sorting
+          termiDate,
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
@@ -66,13 +66,12 @@ export const Termination = () => {
           otherPosition: Array.isArray(item.otherPosition)
           ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
-          terminateDate: formatDate(item.termiDate) || "-", // Display termination date
-          reasonTerminate: item.reasonTerminate || "-", // Display termination note (if any)
+          terminateDate: formatDate(item.termiDate) || "-",
+          reasonTerminate: item.reasonTerminate || "-", 
         };
       })
-      .sort((a, b) => a.termiDate - b.termiDate) // Sort by termiDate in ascending order
-      .map(({ termiDate, ...rest }) => rest); // Remove termiDate after sorting
-  
+      .sort((a, b) => a.termiDate - b.termiDate) 
+      .map(({ termiDate, ...rest }) => rest); 
     return sortedData; // Return the sorted and formatted data
   };
   

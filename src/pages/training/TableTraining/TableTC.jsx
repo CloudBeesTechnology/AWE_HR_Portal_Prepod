@@ -49,7 +49,7 @@ export const TableTC = () => {
           })
           .filter(Boolean) // Remove nulls
           .sort((a, b) => a.empID.localeCompare(b.empID));
-          console.log(mergedData);
+          // console.log(mergedData);
 
         setMergeData(mergedData);
         setLoading(false);

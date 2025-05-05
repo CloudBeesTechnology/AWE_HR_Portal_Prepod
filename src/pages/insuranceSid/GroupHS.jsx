@@ -2,7 +2,6 @@ import { useEffect, useState, useRef, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormField } from "../../utils/FormField";
-import { FileUpload } from "../employees/medicalDep/FileUploadField";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { GroupHSSchema } from "../../services/EmployeeValidation";
 import { uploadDocs } from "../../services/uploadsDocsS3/UploadDocs";
@@ -10,7 +9,6 @@ import { generateClient } from "@aws-amplify/api";
 import { createGroupHandS, updateGroupHandS } from "../../graphql/mutations";
 import { listGroupHandS } from "../../graphql/queries";
 import { FaTimes, FaDownload, FaPrint, FaEdit } from "react-icons/fa";
-import { Document, Page } from "react-pdf";
 import { pdfjs } from "react-pdf";
 import { getUrl } from "@aws-amplify/storage";
 import { useReactToPrint } from "react-to-print";
@@ -48,12 +46,8 @@ export const GroupHS = () => {
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [notification, setNotification] = useState(false);
   const [insuranceData, setInsuranceData] = useState([]);
-  const [loading, setLoading] = useState(true); // Track loading state
-  const [popupVisible, setPopupVisible] = useState(false);
-  const [popupImage, setPopupImage] = useState("");
+  const [loading, setLoading] = useState(true);
   const [viewingDocument, setViewingDocument] = useState(null);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [numPages, setNumPages] = useState(null);
   const [lastUploadUrl, setPPLastUP] = useState("");
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
@@ -73,8 +67,8 @@ export const GroupHS = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, "0"); // Adds leading zero if day is single digit
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // getMonth() returns 0-11, so we add 1
+    const day = date.getDate().toString().padStart(2, "0"); 
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); 
     const year = date.getFullYear();
 
     return `${day}/${month}/${year}`;
@@ -85,9 +79,8 @@ export const GroupHS = () => {
   const linkToStorageFile = async (pathUrl) => {
     try {
       const result = await getUrl({ path: pathUrl });
-      //   console.log("File URL:", result.url.href); // Use .href to extract the URL as a string
-      setPPLastUP(result.url.href); // Store the URL as a string
-      setViewingDocument(pathUrl); // Update the state to show the selected document
+      setPPLastUP(result.url.href); 
+      setViewingDocument(pathUrl);
     } catch (error) {
       console.error("Error fetching the file URL:", error);
     }
@@ -215,7 +208,7 @@ export const GroupHS = () => {
 
     try {
       const checkingDITable = groupHSData?.find(
-        (match) => match.id === searchResultData.id
+        (match) => match?.id === searchResultData?.id
       );
 
       console.log(checkingDITable);
@@ -240,12 +233,12 @@ export const GroupHS = () => {
           variables: { input: totalData },
         });
 
-        // Optionally, show a success notification
         setNotification(true);
       } else {
         // Create case: Prepare the new data and perform the create
         const GHSreValue = {
-          ...data,
+          groupHSNo: data.groupHSNo,
+          groupHSExp: data.groupHSExp,
           groupHSUpload: JSON.stringify(uploadGHsU.groupHSUpload),
         };
 
@@ -255,7 +248,6 @@ export const GroupHS = () => {
         });
 
         // console.log("Successfully submitted data:", GHSreValue);
-        // Optionally, show a success notification
         setNotification(true);
       }
     } catch (error) {
@@ -307,7 +299,7 @@ export const GroupHS = () => {
         const mergedData = empPIData
           .map((emp) => {
             const groupHSDetails = groupHSData
-              ? groupHSData.find((user) => user.empID === emp.empID)
+              ? groupHSData?.find((user) => user.empID === emp.empID)
               : {};
             return {
               ...emp,
@@ -395,31 +387,26 @@ export const GroupHS = () => {
 
   //----------------------------------printing section-------------------------------------------------------------------
 
-  const handlePrint = useReactToPrint({
-    content: () => groupPrint.current,
-    onBeforePrint: () => console.log("Preparing to print PDF..."),
-    onAfterPrint: () => console.log("Print complete"),
-    pageStyle: `
-          @page {
-              /* Adjust the margin as necessary */
-            height:  714px;
-            padding: 22px, 0px, 22px, 0px;     
-          }
-        `,
-  });
-
-  const openModal = (uploadUrl) => {
-    setPPLastUP(uploadUrl);
-    setViewingDocument(uploadUrl);
-  };
-
   const closeModal = () => {
     setViewingDocument(null);
   };
+  const handlePrint = useReactToPrint({
+    content: () => groupPrint.current,
 
-  const onDocumentLoadSuccess = ({ numPages }) => {
-    setNumPages(numPages);
-  };
+    pageStyle: `
+    @page {
+      size: auto;
+      margin: 0mm;
+    }
+    body { 
+      margin: 0;
+      padding: 0;
+    }
+    .pdf-page {
+      page-break-after: always;
+    }
+  `,
+  });
 
   const renderDocumentsUnderCategory = (documents) => {
     return (
@@ -427,14 +414,14 @@ export const GroupHS = () => {
         {documents.map((document, index) => (
           <div
             key={index}
-            className="bg-white rounded-lg shadow-md p-4 mb-4 border border-gray-200"
+            className="bg-white rounded-lg p-4 mb-4 border border-gray-200"
           >
             <div className="flex justify-between items-center">
               <span className="uppercase font-semibold text-sm">
                 Uploaded on: {formatDate(document.date)}
               </span>
               <button
-                onClick={() => linkToStorageFile(document.upload)} // Fetch the URL for the document
+                onClick={() => linkToStorageFile(document.upload)}
                 className="text-dark_grey font-semibold text-sm"
               >
                 View Document
@@ -443,85 +430,111 @@ export const GroupHS = () => {
 
             {viewingDocument === document.upload &&
               document.upload.endsWith(".pdf") && (
-                <div className="py-6 fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
-                  <div className="relative bg-white rounded-lg shadow-lg w-[40vw] max-h-full flex flex-col">
-                    {/* PDF Viewer */}
-                    <div ref={groupPrint} className="flex-grow overflow-y-auto">
-                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-                        <Viewer fileUrl={lastUploadUrl || ""} />
-                      </Worker>
-                    </div>
-
-                    <div className="absolute top-2 right-2">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                  <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+                    {/* Modal header */}
+                    <div className="flex justify-between items-center p-4 border-b">
+                      <h3 className="text-lg font-semibold">PDF Viewer</h3>
                       <button
-                        onClick={closeModal} // Close the modal
-                        className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
+                        onClick={closeModal}
+                        className="text-gray-500 hover:text-gray-700"
                       >
-                        <FaTimes />
+                        <FaTimes size={20} />
                       </button>
                     </div>
 
-                    <div className="flex items-center justify-center gap-6 py-4">
-                      <div className="mt-2 flex">
-                        <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
+                    {/* PDF Viewer */}
+                    <div
+                      ref={groupPrint}
+                      className="flex-grow overflow-y-auto pdf-page"
+                    >
+                      {lastUploadUrl ? (
+                        <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                          <Viewer
+                            fileUrl={lastUploadUrl}
+                            renderError={(error) => (
+                              <div className="p-4 text-red-500">
+                                Failed to load PDF: {error.message}
+                                <div className="text-sm mt-2">
+                                  URL: {lastUploadUrl}
+                                </div>
+                              </div>
+                            )}
+                          />
+                        </Worker>
+                      ) : (
+                        <div className="p-4 text-center">
+                          No PDF file available
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Pagination Controls */}
+                    <div className="flex items-center justify-center p-4 border-t">
+                      <div className="flex gap-4">
+                        <button className="px-4 py-2 bg-primary  rounded flex items-center gap-2">
+                          <FaDownload />
                           <a href={lastUploadUrl} download>
                             Download
                           </a>
-                          <FaDownload className="ml-2 mt-1" />
                         </button>
-                      </div>
-                      <div className="mt-2 flex">
                         <button
                           onClick={handlePrint}
-                          className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
+                          className="px-4 py-2 bg-primary  rounded flex items-center gap-2"
                         >
+                          <FaPrint />
                           Print
-                          <FaPrint className="ml-2 mt-1" />
                         </button>
                       </div>
                     </div>
                   </div>
                 </div>
               )}
-
             {/* Image Viewer */}
             {viewingDocument === document.upload &&
               !document.upload.endsWith(".pdf") && (
-                <div className="relative mt-4">
-                  <div>
-                    <img
-                      src={lastUploadUrl} // Use the URL for the image
-                      alt="Document Preview"
-                      className="w-full h-auto"
-                    />
-                  </div>
-
-                  <div className="absolute top-2 right-2">
-                    <button
-                      onClick={() => setViewingDocument(null)} // Close the viewer
-                      className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
-                    >
-                      <FaTimes />
-                    </button>
-                  </div>
-
-                  <div className="flex items-center justify-center gap-6 py-4">
-                    <div className="mt-2 flex">
-                      <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
-                        <a href={lastUploadUrl} download>
-                          Download
-                        </a>
-                        <FaDownload className="ml-2 mt-1" />
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                  <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+                    {/* Modal header */}
+                    <div className="flex justify-between items-center p-4 border-b">
+                      <h3 className="text-lg font-semibold">Image Viewer</h3>
+                      <button
+                        onClick={() => setViewingDocument(null)}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        <FaTimes size={20} />
                       </button>
                     </div>
-                    <div className="mt-2 flex">
-                      <button
-                        onClick={handlePrint}
-                        className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
-                      >
-                        Print
-                        <FaPrint className="ml-2 mt-1" />
-                      </button>
+
+                    {/* Image Viewer */}
+                    <div
+                      ref={groupPrint}
+                      className="flex-grow overflow-y-auto p-4"
+                    >
+                      <img
+                        src={lastUploadUrl}
+                        alt="Document Preview"
+                        className="w-full h-auto rounded"
+                      />
+                    </div>
+
+                    {/* Footer Controls */}
+                    <div className="flex items-center justify-center p-4 border-t">
+                      <div className="flex gap-4">
+                        <button className="px-4 py-2 bg-primary rounded flex items-center gap-2">
+                          <FaDownload />
+                          <a href={lastUploadUrl} download>
+                            Download
+                          </a>
+                        </button>
+                        <button
+                          onClick={handlePrint}
+                          className="px-4 py-2 bg-primary rounded flex items-center gap-2"
+                        >
+                          <FaPrint />
+                          Print
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -531,6 +544,7 @@ export const GroupHS = () => {
       </>
     );
   };
+  
   const renderDocumentCategory = (uploadArray, categoryName) => {
     const documents =
       uploadArray.length > 0 ? parseDocuments(uploadArray[0]) : [];
@@ -753,55 +767,6 @@ export const GroupHS = () => {
           </p>
         )}
       </div>
-      {/* Popup */}
-      {popupVisible && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-md p-4 mb-4 border border-gray-200">
-            <button
-              onClick={() => setPopupVisible(false)}
-              className="absolute top-2 right-2"
-            >
-              <FaTimes size={20} />
-            </button>
-            {popupImage.endsWith(".pdf") ? (
-              <Worker
-                workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
-                file={popupImage}
-                onLoadSuccess={onDocumentLoadSuccess}
-              >
-                <Page pageNumber={pageNumber} />
-                <div className="text-center mt-2">
-                  <button
-                    onClick={() =>
-                      setPageNumber((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={pageNumber <= 1}
-                  >
-                    Previous
-                  </button>
-                  <span>
-                    {pageNumber} / {numPages}
-                  </span>
-                  <button
-                    onClick={() =>
-                      setPageNumber((prev) => Math.min(prev + 1, numPages))
-                    }
-                    disabled={pageNumber >= numPages}
-                  >
-                    Next
-                  </button>
-                </div>
-              </Worker>
-            ) : (
-              <img
-                src={popupImage}
-                alt="popup view"
-                className="w-full h-auto"
-              />
-            )}
-          </div>
-        </div>
-      )}
 
       {deletePopup && (
         <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />

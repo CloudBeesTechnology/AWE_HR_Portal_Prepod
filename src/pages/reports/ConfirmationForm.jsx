@@ -1,12 +1,21 @@
-
-
 import React from "react";
 import { useEffect } from "react";
 import { TiTick } from "react-icons/ti";
+import { useTempID } from "../../utils/TempIDContext";
 
-export const ConfirmationForm = ({ register, formData, handleInputChange, userType, gmPosition }) => {
-  const [selectedValue, setSelectedValue] = React.useState("");  
-  
+export const ConfirmationForm = ({
+  register,
+  formData,
+  handleInputChange,
+  userType,
+  gmPosition,
+  workInfoData,
+  employeeData,
+}) => {
+  const [selectedValue, setSelectedValue] = React.useState("");
+  const [hasSupervisor, setHasSupervisor] = React.useState(true);
+  const { setSupervisorCheck } = useTempID();
+
   useEffect(() => {
     if (formData && formData.probData) {
       const recommendation = formData.probData.recommendation || "";
@@ -14,20 +23,58 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
     }
   }, [formData]);
 
-  // const handleChange = (event) => {
-  //   event.persist(); // Prevent React from clearing the event
+  useEffect(() => {
+    if (!workInfoData.length || !employeeData?.empID) {
+      return;
+    }
 
-  //   console.log(event.target.value);
+    const workInfo = workInfoData.find(
+      (data) => data.empID === employeeData.empID
+    );
 
-  //   if (!event.target) {
-  //     console.error("Event target is undefined");
-  //     return;
-  //   }
-  //   // console.log(event.target.name);
-    
-  //   setSelectedValue(event.target.value);
-  //   handleInputChange(event.target.name, event.target.value); // Ensure `name` is passed to update formData
-  // };
+    if (workInfo) {
+
+      const supervisorExists = (() => {
+        if (!workInfo.supervisor) return false; 
+        if (workInfo.supervisor === "null") return false;
+
+        if (Array.isArray(workInfo.supervisor)) {
+
+          if (workInfo.supervisor.length === 0) return false;
+
+          if (workInfo.supervisor[workInfo.supervisor.length - 1] === "N/A") {
+            return false;
+          }
+          return !!workInfo.supervisor[0] && workInfo.supervisor[0] !== "null";
+        }
+        return (
+          typeof workInfo.supervisor === "string" &&
+          workInfo.supervisor.trim() !== "" &&
+          workInfo.supervisor !== "null" &&
+          workInfo.supervisor !== "N/A"
+        );
+      })();
+
+      setHasSupervisor(supervisorExists);
+      setSupervisorCheck(supervisorExists);
+    }
+  }, [workInfoData, employeeData?.empID]);
+
+
+  const handleChange = (event) => {
+    event.persist();
+
+    console.log(event.target.value);
+
+    if (!event.target) {
+      console.error("Event target is undefined");
+      return;
+    }
+
+
+    setSelectedValue(event.target.value);
+    handleInputChange(event.target.name, event.target.value);
+  };
 
   return (
     <div className="w-full mx-auto mt-5">
@@ -86,7 +133,8 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
               {selectedValue === "extended" && (
                 <TiTick className="text-[#4ad84a] text-[28px] absolute bottom-0 -left-0.5" />
               )}
-              The appointment to be extended for a further probationary period of
+              The appointment to be extended for a further probationary period
+              of
               <input
                 type="text"
                 name="extendProbED"
@@ -109,7 +157,6 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
               value="terminated"
               checked={selectedValue === "terminated"}
               onChange={handleInputChange}
-              
               className="mr-2 w-6 h-6 border-2 bg-white appearance-none rounded-none"
             />
             <span className="radio-label flex items-center">
@@ -146,196 +193,197 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
 
       {/* Signature Section */}
       <div className="mt-20 space-y-16">
-      {/* Supervisor Section */}
-      <div className="flex justify-between items-center space-x-8">
+        {/* Supervisor Section */}
+        {hasSupervisor && (
+          <div className="flex justify-between items-center space-x-8">
+            <div className="flex justify-center items-center w-[380px]">
+              <label className="text-sm font-medium">
+                Name of Supervisor :
+              </label>
+              <input
+                type="text"
+                name="supervisorName"
+                {...register("supervisorName")}
+                value={formData.probData.supervisorName || ""}
+                onChange={handleInputChange}
+                disabled={userType !== "Supervisor"}
+                className="border-b outline-none px-1 w-full"
+              />
+            </div>
 
-        <div className="flex justify-center items-center w-[380px]">
-          <label className="text-sm font-medium">Name of Supervisor :</label>
-          <input
-            type="text"
-            name="supervisorName"
-            {...register("supervisorName")}
-            value={formData.probData.supervisorName || ""}
-            onChange={handleInputChange}
-            disabled={userType !== "Supervisor"}
-            className="border-b outline-none px-1 w-full"
-          />
-        </div>
+            <div className="flex items-center space-x-10 border-b">
+              <div className="flex items-center space-x-2 ">
+                <input
+                  type="radio"
+                  name="supervisorApproved"
+                  value="Approved"
+                  {...register("supervisorApproved")}
+                  checked={formData.probData.supervisorApproved === "Approved"}
+                  onChange={handleInputChange}
+                  id="saApproved"
+                  disabled={userType !== "Supervisor"}
+                  className="h-4 w-4 form-checkbox"
+                />
+                <label htmlFor="saApproved" className="text-sm">
+                  Approved
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  name="supervisorApproved"
+                  value="Rejected"
+                  {...register("supervisorApproved")}
+                  checked={formData.probData.supervisorApproved === "Rejected"}
+                  onChange={handleInputChange}
+                  id="saReject"
+                  disabled={userType !== "Supervisor"}
+                  className="h-4 w-4 form-checkbox"
+                />
+                <label htmlFor="saReject" className="text-sm">
+                  Rejected
+                </label>
+              </div>
+            </div>
 
-        <div className="flex items-center space-x-10 border-b">
-          <div className="flex items-center space-x-2 ">
-            <input
-              type="radio"
-              name="supervisorApproved"
-              value="Approved"
-              {...register("supervisorApproved")}
-              checked={formData.probData.supervisorApproved === "Approved"}
-              onChange={handleInputChange}
-              id="saApproved"
-              disabled={userType !== "Supervisor"}
-              className="h-4 w-4 form-checkbox"
-            />
-            <label htmlFor="saApproved" className="text-sm">
-              Approved
-            </label>
+            <div className="flex items-center space-x-2 border-b">
+              <input
+                type="date"
+                name="supervisorDate"
+                {...register("supervisorDate")}
+                value={formData.probData.supervisorDate || ""}
+                onChange={handleInputChange}
+                disabled={userType !== "Supervisor"}
+                className="outline-none"
+              />
+            </div>
           </div>
-          <div className="flex items-center space-x-2">
+        )}
+
+        {/* Manager Section */}
+        <div className="flex justify-between items-center space-x-8">
+          <div className="flex justify-center items-center w-[380px]">
+            <label className="text-sm font-medium">Name of Manager :</label>
             <input
-              type="radio"
-              name="supervisorApproved"
-              value="Rejected"
-              {...register("supervisorApproved")}
-              checked={formData.probData.supervisorApproved === "Rejected"}
+              type="text"
+              name="managerName"
+              {...register("managerName")}
+              value={formData.probData.managerName || ""}
               onChange={handleInputChange}
-              id="saReject"
-              disabled={userType !== "Supervisor"}
-              className="h-4 w-4 form-checkbox"
-            />
-            <label htmlFor="saReject" className="text-sm">
-              Rejected
-            </label>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-2 border-b">
-          <input
-            type="date"
-            name="supervisorDate"
-            {...register("supervisorDate")}
-            value={formData.probData.supervisorDate || ""}
-            onChange={handleInputChange}
-            disabled={userType !== "Supervisor"}
-            className="outline-none"
-          />
-        </div>
-
-        
-      </div>
-
-      {/* Manager Section */}
-      <div className="flex justify-between items-center space-x-8">
-        <div className="flex justify-center items-center w-[380px]">
-          <label className="text-sm font-medium">Name of Manager :</label>
-          <input
-            type="text"
-            name="managerName"
-            {...register("managerName")}
-            value={formData.probData.managerName || ""}
-            onChange={handleInputChange}
-            disabled={userType !== "Manager"}
-            className="border-b outline-none px-1 w-full"
-          />
-        </div>
-        <div className="flex items-center space-x-10 border-b">
-          <div className="flex items-center space-x-2">
-            <input
-              type="radio"
-              value="Approved"
-              name="managerApproved"
-              {...register("managerApproved")}
-              checked={formData.probData.managerApproved === "Approved"}
-              onChange={handleInputChange}
-              id="managerApproved"
               disabled={userType !== "Manager"}
-              className="h-4 w-4 form-checkbox"
+              className="border-b outline-none px-1 w-full"
             />
-            <label htmlFor="managerApproved" className="text-sm">
-              Approved
-            </label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-10 border-b">
+            <div className="flex items-center space-x-2">
+              <input
+                type="radio"
+                value="Approved"
+                name="managerApproved"
+                {...register("managerApproved")}
+                checked={formData.probData.managerApproved === "Approved"}
+                onChange={handleInputChange}
+                id="managerApproved"
+                disabled={userType !== "Manager"}
+                className="h-4 w-4 form-checkbox"
+              />
+              <label htmlFor="managerApproved" className="text-sm">
+                Approved
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="radio"
+                value="Rejected"
+                name="managerApproved"
+                {...register("managerApproved")}
+                checked={formData.probData.managerApproved === "Rejected"}
+                onChange={handleInputChange}
+                id="managerReject"
+                disabled={userType !== "Manager"}
+                className="h-4 w-4 form-checkbox"
+              />
+              <label htmlFor="managerReject" className="text-sm">
+                Rejected
+              </label>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2 border-b">
             <input
-              type="radio"
-              value="Rejected"
-              name="managerApproved"
-              {...register("managerApproved")}
-              checked={formData.probData.managerApproved === "Rejected"}
+              type="date"
+              name="managerDate"
+              {...register("managerDate")}
+              value={formData.probData.managerDate || ""}
               onChange={handleInputChange}
-              id="managerReject"
               disabled={userType !== "Manager"}
-              className="h-4 w-4 form-checkbox"
+              className="outline-none"
             />
-            <label htmlFor="managerReject" className="text-sm">
-              Rejected
-            </label>
           </div>
         </div>
-        <div className="flex items-center space-x-2 border-b">
-          <input
-            type="date"
-            name="managerDate"
-            {...register("managerDate")}
-            value={formData.probData.managerDate || ""}
-            onChange={handleInputChange}
-            disabled={userType !== "Manager"}
-            className="outline-none"
-          />
+
+        {/* GM Section */}
+        <div className="flex justify-between items-center">
+          <div className="w-[380px]">
+            <label className="text-sm font-medium">Concurred By GM :</label>
+
+            <input
+              type="text"
+              name="gmName"
+              {...register("gmName")}
+              value={formData.probData.gmName || ""}
+              onChange={handleInputChange}
+              disabled={gmPosition !== "GENERAL MANAGER"}
+              className="border-b outline-none px-1 w-[250px]"
+            />
+            <p className="text-[12px]">(For Staff Category Only)</p>
+          </div>
+          <div className="flex items-center space-x-10 border-b">
+            <div className="flex items-center space-x-2 ">
+              <input
+                type="radio"
+                value="Approved"
+                name="gmApproved"
+                {...register("gmApproved")}
+                checked={formData.probData.gmApproved === "Approved"}
+                onChange={handleInputChange}
+                id="gmApproved"
+                disabled={gmPosition !== "GENERAL MANAGER"}
+                className="h-4 w-4 form-checkbox"
+              />
+              <label htmlFor="gmApproved" className="text-sm">
+                Approved
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="radio"
+                value="Rejected"
+                name="gmApproved"
+                {...register("gmApproved")}
+                checked={formData.probData.gmApproved === "Rejected"}
+                onChange={handleInputChange}
+                id="gmReject"
+                disabled={gmPosition !== "GENERAL MANAGER"}
+                className="h-4 w-4 form-checkbox"
+              />
+              <label htmlFor="gmReject" className="text-sm">
+                Rejected
+              </label>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2 border-b ">
+            <input
+              type="date"
+              name="gmDate"
+              {...register("gmDate")}
+              value={formData.probData.gmDate || ""}
+              onChange={handleInputChange}
+              disabled={gmPosition !== "GENERAL MANAGER"}
+              className="outline-none"
+            />
+          </div>
         </div>
       </div>
-
-      {/* GM Section */}
-      <div className="flex justify-between items-center">
-        <div className="w-[380px]">
-        <label className="text-sm font-medium">Concurred By GM :</label>
-
-          <input
-            type="text"
-            name="gmName"
-            {...register("gmName")}
-            value={formData.probData.gmName || ""}
-            onChange={handleInputChange}
-            disabled={gmPosition !== "GENERAL MANAGER"} 
-            className="border-b outline-none px-1 w-[250px]"
-          />
-          <p className="text-[12px]">(For Staff Category Only)</p>
-          </div>
-        <div className="flex items-center space-x-10 border-b">
-          <div className="flex items-center space-x-2 ">
-            <input
-              type="radio"
-              value="Approved"
-              name="gmApproved"
-              {...register("gmApproved")}
-              checked={formData.probData.gmApproved === "Approved"}
-              onChange={handleInputChange}
-              id="gmApproved"
-              disabled={gmPosition !== "GENERAL MANAGER"} 
-              className="h-4 w-4 form-checkbox"
-            />
-            <label htmlFor="gmApproved" className="text-sm">
-              Approved
-            </label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <input
-              type="radio"
-              value="Rejected"
-              name="gmApproved"
-              {...register("gmApproved")}
-              checked={formData.probData.gmApproved === "Rejected"}
-              onChange={handleInputChange}
-              id="gmReject"
-              disabled={gmPosition !== "GENERAL MANAGER"} 
-              className="h-4 w-4 form-checkbox"
-            />
-            <label htmlFor="gmReject" className="text-sm">
-              Rejected
-            </label>
-          </div>
-        </div>
-        <div className="flex items-center space-x-2 border-b ">
-          <input
-            type="date"
-            name="gmDate"
-            {...register("gmDate")}
-            value={formData.probData.gmDate || ""}
-            onChange={handleInputChange}
-            disabled={gmPosition !== "GENERAL MANAGER"} 
-            className="outline-none"
-          />
-        </div>
-      </div>
-    </div>
 
       {/* HR Section */}
       <div className="border pt-4 mt-5">
@@ -352,7 +400,7 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
               {...register("hrName")}
               value={formData.probData.hrName || ""}
               onChange={handleInputChange}
-              disabled={userType !== "HR"} 
+              disabled={userType !== "HR"}
               className="border-b outline-none px-1"
             />
           </div>
@@ -369,8 +417,6 @@ export const ConfirmationForm = ({ register, formData, handleInputChange, userTy
           </div>
         </div>
       </div>
-
-    
     </div>
   );
 };

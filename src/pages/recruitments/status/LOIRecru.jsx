@@ -20,7 +20,7 @@ export const LOIRecru = ({ data, formatDate, fileUpload, urlValue }) => {
     "LOI PDF",
     "Decline Date",
     "Decline Reason",
-    "Status Update",
+    "Status",
     "Form",
     "Edit Form",
   ];

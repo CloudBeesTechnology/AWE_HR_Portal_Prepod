@@ -39,6 +39,7 @@ import { useRowSelection } from "./customTimeSheet/useRowSelection";
 import { useNavigate } from "react-router-dom";
 import { useCreateNotification } from "../../hooks/useCreateNotification";
 import { TimeSheetSpinner } from "./customTimeSheet/TimeSheetSpinner";
+import { UnlockVerifiedCellVS } from "./customTimeSheet/UnlockVerifiedCellVS";
 
 const client = generateClient();
 
@@ -68,6 +69,7 @@ export const ViewOffshoreORMCsheet = ({
   const [loading, setLoading] = useState(true);
   const [userIdentification, setUserIdentification] = useState("");
   const [successMess, setSuccessMess] = useState(null);
+  const [loadingMessForDelay, setLoadingMessForDelay] = useState(null);
   const [toggleAssignManager, setToggleAssignManager] = useState(false);
   const [toggleForRemark, setToggleForRemark] = useState(null);
 
@@ -518,44 +520,59 @@ export const ViewOffshoreORMCsheet = ({
         };
       });
 
-      let action = "updateStoredData";
-      const notifiyCenterData = await TimeSheetsCRUDoperations({
-        setNotification,
-        setShowTitle,
-        finalResult,
-        toggleSFAMessage,
-        setStoringMess,
-        Position,
-        action,
-        handleAssignManager,
-        selectedRows,
-      });
-      if (notifiyCenterData) {
-        const {
-          subject,
-          message,
-          fromAddress,
-          toAddress,
-          empID,
-          timeKeeperEmpID,
-          ManagerEmpID,
-          managerName,
-          fileType,
-          timeKeeperName,
-          fromDate,
-          untilDate,
-          senderEmail,
-        } = notifiyCenterData;
-        await createNotification({
-          empID: empID,
-          leaveType: `${fileType} excel sheet submitted for Approval`,
-          message: `The ${fileType} timesheet for the period from ${fromDate} until ${untilDate} has been submitted by Timekeeper : 
-          ${timeKeeperName}`,
-          senderEmail: senderEmail,
-          receipentEmail: toAddress,
-          receipentEmpID: empID,
-          status: "Unread",
+      const { filteredResults, deleteDuplicateData } =
+        await UnlockVerifiedCellVS({
+          finalResult,
+          setLoadingMessForDelay,
         });
+
+
+
+      if (
+        (filteredResults && filteredResults.length > 0) ||
+        (filteredResults && filteredResults.length === 0) ||
+        deleteDuplicateData === "DuplicateDataDeletedSuccessfully"
+      ) {
+        setLoadingMessForDelay(false);
+        let action = "updateStoredData";
+        const notifiyCenterData = await TimeSheetsCRUDoperations({
+          setNotification,
+          setShowTitle,
+          finalResult,
+          toggleSFAMessage,
+          setStoringMess,
+          Position,
+          action,
+          handleAssignManager,
+          selectedRows,
+        });
+        if (notifiyCenterData) {
+          const {
+            subject,
+            message,
+            fromAddress,
+            toAddress,
+            empID,
+            timeKeeperEmpID,
+            ManagerEmpID,
+            managerName,
+            fileType,
+            timeKeeperName,
+            fromDate,
+            untilDate,
+            senderEmail,
+          } = notifiyCenterData;
+          await createNotification({
+            empID: empID,
+            leaveType: `${fileType} excel sheet submitted for Approval`,
+            message: `The ${fileType} timesheet for the period from ${fromDate} until ${untilDate} has been submitted by Timekeeper : 
+          ${timeKeeperName}`,
+            senderEmail: senderEmail,
+            receipentEmail: toAddress,
+            receipentEmpID: empID,
+            status: "Unread",
+          });
+        }
       }
     } else if (userIdentification === "Manager") {
       const MergedData = [...allApprovedData, ...allRejectedData];
@@ -753,17 +770,38 @@ export const ViewOffshoreORMCsheet = ({
         };
       });
 
-    let action = "create";
     let finalResult = result;
+    const { filteredResults, deleteDuplicateData } = await UnlockVerifiedCellVS(
+      {
+        finalResult,
+        setLoadingMessForDelay,
+      }
+    );
 
-    await TimeSheetsCRUDoperations({
-      finalResult,
-      toggleSFAMessage,
-      setStoringMess,
-      setData,
-      Position,
-      action,
-    });
+
+
+    if (
+      (filteredResults && filteredResults.length > 0) ||
+      (filteredResults && filteredResults.length === 0) ||
+      deleteDuplicateData === "DuplicateDataDeletedSuccessfully"
+    ) {
+      let finalResult = filteredResults;
+      // Start
+      let action = "create";
+      await TimeSheetsCRUDoperations({
+        finalResult,
+        toggleSFAMessage,
+        setStoringMess,
+        setData,
+        Position,
+        action,
+      });
+      // End
+      setLoadingMessForDelay(false);
+    } else {
+      setLoadingMessForDelay(false);
+   
+    }
   };
 
   const toggleForRemarkFunc = () => {
@@ -1168,7 +1206,61 @@ export const ViewOffshoreORMCsheet = ({
                       storeInitialData();
                     }
 
-                 
+                    // const fetchDataAndDelete = async () => {
+                    //   try {
+                    //     console.log("Fetching and Deleting SBW Data...");
+                    //     // setIsDeleting(true); // Set loading state
+                    //     let nextToken = null; // Initialize nextToken for pagination
+                    //     do {
+                    //       // Define the filter for fetching SBW data
+                    //       const filter = {
+                    //         and: [{ fileType: { eq: "Offshore's ORMC" } }],
+                    //       };
+                    //       // Fetch the BLNG data using GraphQL with pagination
+                    //       const response = await client.graphql({
+                    //         query: listTimeSheets,
+                    //         variables: { filter: filter, nextToken: nextToken }, // Pass nextToken for pagination
+                    //       });
+                    //       // Extract data and nextToken
+                    //       const SBWdata =
+                    //         response?.data?.listTimeSheets?.items || [];
+                    //       nextToken = response?.data?.listTimeSheets?.nextToken; // Update nextToken for the next fetch
+                    //       console.log("Fetched SBW Data:", SBWdata);
+                    //       // Delete each item in the current batch
+                    //       await Promise.all(
+                    //         SBWdata.map(async (item) => {
+                    //           try {
+                    //             const deleteResponse = await client.graphql({
+                    //               query: deleteTimeSheet,
+                    //               variables: { input: { id: item.id } },
+                    //             });
+                    //             console.log(
+                    //               "Deleted Item Response:",
+                    //               deleteResponse
+                    //             );
+                    //           } catch (deleteError) {
+                    //             console.error(
+                    //               `Error deleting item with ID ${item.id}:`,
+                    //               deleteError
+                    //             );
+                    //           }
+                    //         })
+                    //       );
+                    //       console.log("Batch deletion completed.");
+                    //     } while (nextToken); // Continue fetching until no more data
+                    //     console.log(
+                    //       "All SBW items deletion process completed."
+                    //     );
+                    //   } catch (fetchError) {
+                    //     console.error(
+                    //       "Error in fetchDataAndDelete:",
+                    //       fetchError
+                    //     );
+                    //   } finally {
+                    //     // setIsDeleting(false); // Reset loading state
+                    //   }
+                    // };
+                    // fetchDataAndDelete();
                   } else if (userIdentification === "Manager") {
                     removeCheckedItem();
                     renameKeysFunctionAndSubmit();
@@ -1255,6 +1347,14 @@ export const ViewOffshoreORMCsheet = ({
       {notification && (
         <TimeSheetSpinner
           text={showTitle}
+          // notification={notification}
+          // path="/timesheetSBW"
+        />
+      )}
+
+      {loadingMessForDelay && (
+        <TimeSheetSpinner
+          text={"Please wait a few seconds..."}
           // notification={notification}
           // path="/timesheetSBW"
         />

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import AweLogo from "../../assets/logo/logo-with-name.svg";
 import { ScheduleInter } from "./Form/ScheduleInter";
-import { FaTimes, FaPrint, FaDownload } from "react-icons/fa";
+import { FaTimes, FaDownload } from "react-icons/fa";
 import {
   createInterviewSchedule,
   updateInterviewSchedule,
@@ -15,6 +15,7 @@ import "@react-pdf-viewer/core/lib/styles/index.css";
 import { pdfjs } from "react-pdf";
 import { getUrl } from "@aws-amplify/storage";
 import { sendEmail } from "../../services/EmailServices";
+import { DateFormat } from "../../utils/DateFormat";
 import defaultAvatar from "../../assets/navabar/defaultAvatar.jpg";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
@@ -205,6 +206,8 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     }
   };
 
+  // console.log("Cnady", candidate);
+
   const handleSelected = async (dataCandi) => {
     const SELECTED_CANDY_SUB = `Candidate Selected Notification:`;
 
@@ -280,7 +283,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             TO_ADDRESS_CANDY
           );
         } catch (err) {
-          console.log("Error during update call: ", err);
+          // console.log("Error during update call: ", err);
         }
       } else {
         const createData = {
@@ -352,12 +355,9 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
       }
     };
 
-   
     if (candidate?.profilePhoto) {
-    
       linkToImageFile(candidate.profilePhoto);
     } else {
-      
       setImageUrl(defaultAvatar);
     }
   }, [candidate?.profilePhoto]);
@@ -366,14 +366,11 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     const img = new Image();
     img.src = imageUrl;
 
-
     img.onload = () => {
-    
       setIsLoaded(true);
     };
 
     img.onerror = () => {
-      
       setIsLoaded(false);
     };
   }, [imageUrl]);
@@ -387,10 +384,14 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
   };
 
   // Parse work experience, education details, and family details
-  const workExperience = parseJson(candidate.workExperience);
-  const eduDetails = parseJson(candidate.eduDetails);
-  const familyDetails = parseJson(candidate.familyDetails);
- 
+  const workExperience = parseJson(candidate?.workExperience);
+  const eduDetails = parseJson(candidate?.eduDetails);
+  // console.log("EDuc", eduDetails);
+
+  const familyDetails = parseJson(candidate?.familyDetails);
+  const emgDetails = parseJson(candyEducDeatils?.emgDetails);
+  const referees = parseJson(candyEducDeatils?.referees);
+  const relatives = parseJson(candyEducDeatils?.relatives);
 
   const linkToStorageFile = async (pathUrl) => {
     if (!pathUrl) {
@@ -399,10 +400,9 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     }
     try {
       const result = await getUrl({ path: pathUrl });
-     
 
-      setPPLastUP(result.url.href); // Store the URL as a string
-      setViewingDocument(pathUrl); // Update the state to show the selected document
+      setPPLastUP(result.url.href); 
+      setViewingDocument(pathUrl); 
       setLoading(false);
     } catch (error) {
       console.error("Error fetching the file URL:", error);
@@ -410,29 +410,56 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     }
   };
 
-  const parseDocuments = (docData) => {
-    
+const parseDocuments = (docData) => {
 
-    // Check if docData is a string (single file path)
-    if (typeof docData === "string" && !docData.includes("undefined")) {
-      // If it's a string and does not contain the word 'undefined', return an array with one document object
-      return [{ upload: docData }];
-    }
+  // Handle null or undefined input
+  if (!docData) {
+    return [];
+  }
 
-    // Check if docData is an array (array of file paths)
-    else if (Array.isArray(docData)) {
-      // If it's an array, filter out any undefined or invalid entries and map them into objects
-      return docData
-        .filter((doc) => doc && !doc.includes("undefined"))
-        .map((doc) => ({ upload: doc }));
-    }
-
-    // If docData is neither a string nor an array, return an empty array
-    else {
-      console.error("Invalid document data format:", docData);
+  // Case: array with one JSON string element (e.g., ['[{"upload": "..."}]'])
+  if (Array.isArray(docData) && typeof docData[0] === "string" && docData[0].trim().startsWith("[{")) {
+    try {
+      const parsed = JSON.parse(docData[0]);
+      if (Array.isArray(parsed)) {
+        return parsed.filter(doc => doc.upload && !doc.upload.includes("undefined"));
+      }
+    } catch (err) {
+      // console.error("Failed to parse JSON string in array:", err);
       return [];
     }
-  };
+  }
+
+  // Case: JSON string directly (e.g., '{"upload":"..."}')
+  if (typeof docData === "string" && docData.trim().startsWith("[{")) {
+    try {
+      const parsed = JSON.parse(docData);
+      if (Array.isArray(parsed)) {
+        return parsed.filter(doc => doc.upload && !doc.upload.includes("undefined"));
+      }
+    } catch (err) {
+      // console.error("Failed to parse JSON string:", err);
+      return [];
+    }
+  }
+
+  // Case: string path
+  if (typeof docData === "string" && !docData.includes("undefined")) {
+    return [{ upload: docData }];
+  }
+
+  // Case: array of strings or objects
+  if (Array.isArray(docData)) {
+    return docData
+      .filter(doc => doc && typeof doc === "string" && !doc.includes("undefined"))
+      .map(doc => ({ upload: doc }));
+  }
+
+  // Unrecognized format
+  // console.error("Invalid document data format:", docData);
+  return [];
+};
+
 
   const closeModal = () => {
     setViewingDocument(null);
@@ -446,8 +473,8 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     setIsScheduleOpen(false);
   };
 
-  console.log("Candy", candyEducDeatils);
-  
+  // console.log("Candy",candyEducDeatils);
+
   const renderDocumentsUnderCategory = (documents) => {
     return (
       <>
@@ -615,84 +642,126 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
             {/* Section One */}
             <div className="mt-6">
               {[
-                { label: "Applying For", value: candidate.position || "N/A" },
                 {
-                  label: "Experience",
-                  value: candidate.noExperience || "N/A",
+                  label: "Applying For The Position",
+                  value: candidate.position,
                 },
-                { label: "Contract", value: candidate.contractType || "N/A" },
-                { label: "Type", value: candidate.empType || "N/A" },
+                { label: "Type", value: candidate.empType },
+                { label: "Contract", value: candidate.contractType },
+                { label: "CV Received From", value: candidate.agent },
+                { label: "Name", value: candidate.name },
+                { label: "Chinese characters", value: candidate.chinese },
+                { label: "Gender", value: candidate.gender },
+                { label: "Date of Birth", value: DateFormat(candidate.dob) },
+                { label: "Age", value: candidate.age },
+                { label: "Email", value: candidate.email },
+                { label: "Marital Status", value: candidate.marital },
+                { label: "Country of Birth", value: candidate.cob },
+                { label: "Nationality", value: candidate.nationality },
+                { label: "Other Nationality", value: candidate.otherNation },
+                { label: "Race", value: candidate.race },
+                { label: "Other Race", value: candidate.otherRace },
+                { label: "Religion", value: candidate.religion },
+                { label: "Other Religion", value: candidate.otherReligion },
+
+                { label: "Contact Number", value: candidate.contactNo },
+                { label: "Alternate Number", value: candidate.alternateNo },
+                { label: "Present Address", value: candidate.presentAddress },
                 {
-                  label: "CV Received From",
-                  value: candidate.agent || "N/A",
+                  label: "Permanent Address",
+                  value: candidate.permanentAddress,
                 },
-                { label: "Name", value: candidate.name || "N/A" },
+                { label: "Driving License Class", value: candidate.driveLic },
+
                 {
-                  label: "Nationality",
-                  value: candidate.nationality || "N/A",
-                },
-                { label: "Other Nationality", value: candidate.otherNation || "N/A"},
-                { label: "Race", value: candidate.race || "N/A" },
-                { label: "Other Race", value: candidate.otherRace || "N/A"},
-                { label: "Gender", value: candidate.gender || "N/A" },
-                {
-                  label: "Date of Birth",
-                  value: formatDate(candidate.dob) || "N/A",
-                },
-                { label: "Age", value: candidate.age || "N/A" },
-                {
-                  label: "Marital Status",
-                  value: candidate.marital || "N/A",
-                },
-                { label: "Religion", value: candidate.religion || "N/A" },
-                { label: "Other Religion", value: candidate.otherReligion || "N/A" },
-                { label: "Country of Birth", value: candidate.cob || "N/A" },
-                { 
-                  label: "Language Proficiency", 
-                  value: candidate.lang 
+                  label: "Language Proficiency",
+                  value: candidate.lang
                     ? typeof candidate.lang === "string"
-                      ? candidate.lang.replace(/\[|\]/g, "") // Remove brackets
-                      : candidate.lang.join(", ") // If it's an array, join it
-                    : "N/A"
+                      ? candidate.lang.replace(/\[|\]/g, "")
+                      : candidate.lang.join(", ")
+                    : "N/A",
                 },
-                { label: "Other Language", value: candidate.otherLang || "N/A"},
-                {
-                  label: "Home Address",
-                  value: candidate.permanentAddress || "N/A",
-                },
-                { label: "Email", value: candidate.email || "N/A" },
-                { label: "Contact", value: candidate.contactNo || "N/A" },
-                { label: "Brunei IC No.", value: candidate.bwnIcNo || "N/A" },
-                {
-                  label: "Brunei IC Colour.",
-                  value: candidate.bwnIcColour || "N/A",
-                },
+                { label: "Other Language", value: candidate.otherLang },
+                { label: "Brunei IC No.", value: candidate.bwnIcNo },
+                { label: "Brunei IC Colour", value: candidate.bwnIcColour },
                 {
                   label: "Brunei IC Expiry",
-                  value: formatDate(candidate.bwnIcExpiry) || "N/A",
+                  value: DateFormat(candidate.bwnIcExpiry),
                 },
+                { label: "Passport No.", value: candidate.ppNo },
                 {
-                  label: "Malaysia IC No.",
-                  value: candidate.alternateNo || "N/A",
-                },
-                { label: "Passport No.", value: candidate.ppNo || "N/A" },
-                {
-                  label: "Passport Issue Date",
-                  value: formatDate(candidate.ppIssued) || "N/A",
+                  label: "Passport Issued Date",
+                  value: DateFormat(candidate.ppIssued),
                 },
                 {
                   label: "Passport Expiry Date",
-                  value: formatDate(candidate.ppExpiry) || "N/A",
+                  value: DateFormat(candidate.ppExpiry),
                 },
                 {
-                  label: "Passport Issued Place",
-                  value: candidate.ppDestinate || "N/A",
+                  label: "Passport Issued Destination",
+                  value: candidate.ppDestinate,
+                },
+                
+                {
+                  label: "Brief Description of Present Duties",
+                  value: candyEducDeatils.desc,
+                },
+                {
+                  label:
+                    "Have you ever suffered from any disease or received treatment",
+                  value: candyEducDeatils.disease,
+                },
+                {
+                  label: "If yes, Details ",
+                  value: candyEducDeatils.diseaseDesc,
+                },
+                {
+                  label: "Were you ever an alcoholic or substance abuser",
+                  value: candyEducDeatils.liquor,
+                },
+                {
+                  label: "If yes, Details",
+                  value: candyEducDeatils.liquorDesc,
+                },
+                {
+                  label: "Have you ever been convicted of a crime",
+                  value: candyEducDeatils.crime,
+                },
+                {
+                  label: "If yes, Details",
+                  value: candyEducDeatils.crimeDesc,
+                },
+                {
+                  label: "Number of Years Experience",
+                  value: candyEducDeatils.noExperience,
+                },
+                {
+                  label: "Salary Expected",
+                  value: candyEducDeatils.salaryExpectation,
+                },
+                {
+                  label: "Termination Notice For Present Job",
+                  value: candyEducDeatils.noticePeriod,
+                },
+                {
+                  label:
+                    "Have you been interviewed for a position at this company before",
+                  value: candyEducDeatils.perIS,
+                },
+                {
+                  label: "If yes, Details",
+                  value: candyEducDeatils.perIDesc,
+                },
+                {
+                  label: "Any other information you wish to provide",
+                  value: candyEducDeatils.supportInfo,
                 },
               ].map((item, index) => (
-                <div key={index} className="grid grid-cols-3 gap-4 mb-4">
-                  <strong className="w-full">{item.label}</strong>
-                  <span className="w-full col-span-2">
-                    : &nbsp;{item.value}
+                <div key={index} className="center  mb-4 leading-relaxed">
+                  <strong className="w-full max-w-[200px]">{item.label}</strong>
+                  <span className="w-[50px] text-center">:</span>
+                  <span className="w-full">
+                    {item.value || "N/A"}
                   </span>
                 </div>
               ))}
@@ -707,21 +776,9 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                       Family Details {idx + 1}
                     </h3>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Occupation</strong>
-                      <span className="w-full col-span-2">
-                        : &nbsp;{item.occupation || "N/A"}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-4 mb-4">
                       <strong className="w-full">Name</strong>
                       <span className="w-full col-span-2">
                         : &nbsp;{item.name || "N/A"}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Place of Occupation</strong>
-                      <span className="w-full col-span-2">
-                        : &nbsp;{item.placeOfOccupation || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
@@ -736,47 +793,16 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                         : &nbsp;{item.age || "N/A"}
                       </span>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Work Experience */}
-            {workExperience?.length > 0 && (
-              <div className="mt-6">
-                {workExperience.map((item, idx) => (
-                  <div key={idx} className="mb-6 border rounded p-4">
-                    <h3 className="font-bold underline mb-4">
-                      Work Experience {idx + 1}
-                    </h3>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Company</strong>
+                      <strong className="w-full">Place of Occupation</strong>
                       <span className="w-full col-span-2">
-                        : &nbsp;{item.company || "N/A"}
+                        : &nbsp;{item.placeOfOccupation || "N/A"}
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Position</strong>
+                      <strong className="w-full">Occupation</strong>
                       <span className="w-full col-span-2">
-                        : &nbsp;{item.position || "N/A"}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">From</strong>
-                      <span className="w-full col-span-2">
-                        : &nbsp;{item.from || "N/A"} - {item.to || "N/A"}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Reason For Leaving</strong>
-                      <span className="w-full col-span-2">
-                        : &nbsp;{item.reasonForLeaving || "N/A"}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">Salary</strong>
-                      <span className="w-full col-span-2">
-                        : &nbsp;{item.salary || "N/A"}
+                        : &nbsp;{item.occupation || "N/A"}
                       </span>
                     </div>
                   </div>
@@ -805,7 +831,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                       </span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <strong className="w-full">From</strong>
+                      <strong className="w-full">From - To</strong>
                       <span className="w-full col-span-2">
                         : &nbsp;{item.fromDate || "N/A"} -{" "}
                         {item.toDate || "N/A"}
@@ -816,26 +842,177 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
               </div>
             )}
 
+            {/* Work Experience */}
+            {workExperience?.length > 0 && (
+              <div className="mt-6">
+                {workExperience.map((item, idx) => (
+                  <div key={idx} className="mb-6 border rounded p-4">
+                    <h3 className="font-bold underline mb-4">
+                      Work Experience {idx + 1}
+                    </h3>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Company</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.name || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Position</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.position || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">From</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{DateFormat(item.from) || "N/A"} -{" "}
+                        {DateFormat(item.to) || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Salary</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.salary || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Reason For Leaving</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.reasonForLeaving || "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {referees?.length > 0 && (
+              <div className="mt-6">
+                {referees.map((item, idx) => (
+                  <div key={idx} className="mb-6 border rounded p-4">
+                    <h3 className="font-bold underline mb-4">
+                      Referees Details {idx + 1}
+                    </h3>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Name</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.name || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Address</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.address || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Phone Number</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.phoneNumber || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Profession</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.profession || "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {relatives?.length > 0 && (
+              <div className="mt-6">
+                {relatives.map((item, idx) => (
+                  <div key={idx} className="mb-6 border rounded p-4">
+                    <h3 className="font-bold underline mb-4">
+                      Relatives Employed by the company Details {idx + 1}
+                    </h3>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Name</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.name || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Position Held</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.positionHeld || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Relationship</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.relationship || "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {emgDetails?.length > 0 && (
+              <div className="mt-6">
+                {emgDetails.map((item, idx) => (
+                  <div key={idx} className="mb-6 border rounded p-4">
+                    <h3 className="font-bold underline mb-4">
+                      Emergency Details {idx + 1}
+                    </h3>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Name</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.name || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Relationship</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.relationship || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Address</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.address || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Phone Number</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.phoneNumber || "N/A"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <strong className="w-full">Blood Group</strong>
+                      <span className="w-full col-span-2">
+                        : &nbsp;{item.bloodGroup || "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
             {/* Document categories */}
 
-              <div className="mt-8">
-                <h6 className="uppercase text_size_5  my-3">
-                  Uploaded Documents:
-                </h6>
-                {renderDocumentCategory(
-                  [candyEducDeatils.uploadResume],
-                  "Resume"
-                )}
-                {renderDocumentCategory(
-                  [candyEducDeatils.uploadCertificate],
-                  "Qualification Certificate"
-                )}
-                {renderDocumentCategory(
-                  [candyEducDeatils.uploadPp],
-                  "IC / Passport"
-                )}
-              </div>
+            <div className="mt-8">
+              <h6 className="uppercase text_size_5  my-3">
+                Uploaded Documents:
+              </h6>
+              {renderDocumentCategory(
+                [candyEducDeatils.uploadResume],
+                "Resume"
+              )}
+              {renderDocumentCategory(
+                [candyEducDeatils.uploadCertificate],
+                "Qualification Certificate"
+              )}
+              {renderDocumentCategory(
+                [candyEducDeatils.uploadPp],
+                "IC / Passport"
+              )}
             </div>
+          </div>
 
           {/* Bottom Buttons: Reject and Schedule Interview */}
           <div className="">

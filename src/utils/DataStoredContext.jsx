@@ -35,6 +35,9 @@ import {
   listKeyValueStores,
   listContractForms,
   listLocalMobilizations,
+  listGroupHandS,
+  listTravelIns,
+  listPersonalAccidents,
 } from "../graphql/queries";
 
 export const DataSupply = createContext();
@@ -77,6 +80,9 @@ const DataStoredContext = ({ children }) => {
     dropDownVal: [],
     contractForms: [],
     localMobiliz: [],
+    groupHSData: [],
+    travelInsData: [],
+    personalAcciData: [],
   });
 
   useEffect(() => {
@@ -117,6 +123,9 @@ const DataStoredContext = ({ children }) => {
           { query: listKeyValueStores, key: "dropDownVal" },
           { query: listContractForms, key: "contractForms" },
           { query: listLocalMobilizations, key: "localMobiliz" },
+          { query: listGroupHandS, key: "groupHSData" },
+          { query: listTravelIns, key: "travelInsData" }, 
+          { query: listPersonalAccidents, key: "personalAcciData" }
         ];
         const responses = await Promise.all(
           queries.map(async ({ query, key }) => {

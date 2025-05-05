@@ -10,7 +10,6 @@ const AccommodationDetails = ({ accommodationInfo, mainRef }) => {
           {/* Accommodation Details */}
           <div className="grid grid-cols-3 gap-y-4 items-center font-semibold text-sm">
             {Object.entries(accommodationInfo).map(([key, value], index) => {
-              // console.log(value);
               let displayValue = "N/A";
               if (Array.isArray(value)) {
                 displayValue =
@@ -18,10 +17,8 @@ const AccommodationDetails = ({ accommodationInfo, mainRef }) => {
                     .filter((v) => v !== null && v !== "" && v !== undefined)
                     .join(", ") || "N/A";
               } else if (value !== null && value !== "" && value !== undefined) {
-                // Handle non-array values
                 displayValue = value;
               }
-
               return (
                 <React.Fragment key={index}>
                   <span className="text-dark_grey">{key}</span>

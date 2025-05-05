@@ -9,14 +9,9 @@ export const TCDataFun = () => {
       throw new Error("Missing required parameters");
     }
     const totalData = {
-      empID:TCValue.empID,
-      certifiExpiry:[TCValue.certifiExpiry],
-      eCertifiDate:[TCValue.eCertifiDate],
-      trainingUpCertifi: [JSON.stringify(TCValue.trainingUpCertifi)],
-      orgiCertifiDate:[TCValue.orgiCertifiDate],
-      poNo: [TCValue.poNo],
-      addDescretion: [TCValue.addDescretion],
-      tcRemarks:TCValue.tcRemarks
+      empID: TCValue.empID,
+      // trainingProof: [JSON.stringify(TCValue.trainingProof)],
+      trainingProof: JSON.stringify(TCValue.trainingProof),
     };
     // console.log(totalData);
 
@@ -29,11 +24,11 @@ export const TCDataFun = () => {
              },
            })
          ])
-        //  console.log(storedData,"successfully stored data");
+         console.log(storedData,"successfully create data");
 
        } catch (error) {
          console.error("Error executing GraphQL requests:", error);
-         throw error; // Rethrow error if needed
+         throw error; 
        }
   }, []);
   return { TCData };

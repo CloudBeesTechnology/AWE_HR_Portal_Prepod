@@ -151,7 +151,8 @@ export const SearchDisplayForTimeSheet = ({
           onClick={() => {
             if (identify === "viewSummary") {
               setSelectedLocation?.(searchQuery);
-              toggleDropdown();
+              // toggleDropdown();
+              setIsDropdownVisible(false);
             }
           }}
         >

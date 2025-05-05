@@ -35,7 +35,7 @@ export const UploadBLNGnewFormat = (
 
           checkTrueOrFalse = hasNameAndDate;
           var bodySlicedData = data.slice(0);
-        
+
           tableBodyData.push(bodySlicedData);
           return headerSlicedData;
         });
@@ -150,7 +150,19 @@ export const UploadBLNGnewFormat = (
               );
               const dateObject = new Date(entranceDate);
 
-              item.ENTRANCEDATEUSED = dateObject.toLocaleDateString();
+              let localDateObject = dateObject.toLocaleDateString();
+
+              const convertToDMY = (inputDateStr) => {
+                const [day, month, year] = inputDateStr.split("/");
+
+                // Convert string to numbers to remove any leading zeros
+                const dayNum = parseInt(day, 10);
+                const monthNum = parseInt(month, 10);
+
+                return `${dayNum}/${monthNum}/${year}`;
+              };
+
+              item.ENTRANCEDATEUSED = convertToDMY(localDateObject);
             }
             if (typeof item.AVGDAILYTOTALBYDAY === "number") {
               const entranceDate = excelSerialToDate(
@@ -171,6 +183,7 @@ export const UploadBLNGnewFormat = (
 
             return item;
           });
+
         function groupAndMergeData(updatedDataArray) {
           try {
             const groupedData = {};

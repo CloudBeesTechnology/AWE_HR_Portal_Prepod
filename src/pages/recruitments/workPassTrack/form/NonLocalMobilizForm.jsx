@@ -14,10 +14,13 @@ import { handleDeleteFile } from "../../../../services/uploadsDocsS3/DeleteDocs"
 import { DeleteUploadNonLocal } from "../deleteUpload/DeleteUploadNonLocal";
 import { useDeleteAccess } from "../../../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../../../utils/DeletePopup";
+import { useCreateWPTracking } from "../../../../services/createMethod/CreateWPTracking";
+
 export const NonLocalMobilizForm = ({ candidate }) => {
   const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules } = useFetchCandy();
   const { IVSSDetails } = useContext(DataSupply);
+  const { createWPTrackingHandler } = useCreateWPTracking();
   const { wpTrackingDetails } = useUpdateWPTracking();
   const { interviewDetails } = UpdateInterviewData();
   const [deletePopup, setdeletePopup] = useState(false);
@@ -82,8 +85,8 @@ export const NonLocalMobilizForm = ({ candidate }) => {
           }));
           // console.log("Uploaded file name set:", fileName);
         }
-      } 
-    } 
+      }
+    }
   }, [interviewSchedules, candidate.tempID]);
 
   const extractFileName = (url) => {
@@ -187,6 +190,12 @@ export const NonLocalMobilizForm = ({ candidate }) => {
     }));
   };
 
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  const wrapUpload = (filePath) => {
+    return filePath ? [{ upload: filePath, date: currentDate }] : null;
+  };
+
   const handleSubmitTwo = async (data) => {
     data.preventDefault();
 
@@ -194,12 +203,12 @@ export const NonLocalMobilizForm = ({ candidate }) => {
       (data) => data.tempID === candidate?.tempID
     );
 
-    const selectedInterviewDataStatus = interviewSchedules.find(
-      (data) => data.IDDetails?.tempID === candidate?.tempID
+    const selectedInterviewDataStatus = IVSSDetails.find(
+      (data) => data?.tempID === candidate?.tempID
     );
 
     const interviewScheduleId = selectedInterviewData?.id;
-    const interviewScheduleStatusId = selectedInterviewDataStatus.IDDetails?.id;
+    const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
 
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
@@ -211,16 +220,34 @@ export const NonLocalMobilizForm = ({ candidate }) => {
       return;
     }
 
+    const wpTrackingData = {
+      tempID: candidate.tempID,
+      mobSignDate: formData.interview.mobSignDate,
+      agentname: formData.interview.agentname,
+      remarkNLMob: formData.interview.remarkNLMob,
+      mobFile: isUploadingString.mobFile
+        ? JSON.stringify(wrapUpload(uploadedMobiliz.mobFile))
+        : formData.interview.mobFile,
+    };
+
     try {
-      const response = await wpTrackingDetails({
-        WPTrackingValue: {
-          id: interviewScheduleId,
-          mobSignDate: formData.interview.mobSignDate,
-          agentname: formData.interview.agentname,
-          remarkNLMob: formData.interview.remarkNLMob,
-          mobFile: uploadedMobiliz.mobFile,
-        },
-      });
+      if (interviewScheduleId) {
+        await wpTrackingDetails({
+          WPTrackingValue: {
+            id: interviewScheduleId,
+            mobSignDate: formData.interview.mobSignDate,
+            agentname: formData.interview.agentname,
+            remarkNLMob: formData.interview.remarkNLMob,
+            mobFile: isUploadingString.mobFile
+              ? JSON.stringify(wrapUpload(uploadedMobiliz.mobFile))
+              : formData.interview.mobFile,
+          },
+        });
+      } else {
+        await createWPTrackingHandler({
+          reqValue: wpTrackingData,
+        });
+      }
 
       const interStatus = {
         id: interviewScheduleStatusId,
@@ -228,17 +255,7 @@ export const NonLocalMobilizForm = ({ candidate }) => {
       };
       setNotification(true);
 
-      // console.log("Submitting interview details with status:", interStatus);
-
       await interviewDetails({ InterviewValue: interStatus });
-
-      // console.log("Interview status updated:", interStatus);
-
-      // console.log("Response from WPTrackingDetails:", response);
-
-      if (response.errors && response.errors.length > 0) {
-        // console.error("Response errors:", response.errors);
-      }
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }

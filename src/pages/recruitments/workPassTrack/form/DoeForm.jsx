@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { uploadDocString } from "../../../../services/uploadsDocsS3/UploadDocs";
@@ -13,10 +13,15 @@ import { handleDeleteFile } from "../../../../services/uploadsDocsS3/DeleteDocs"
 import { DeleteUploadDoe } from "../deleteUpload/DeleteUploadDoe";
 import { useDeleteAccess } from "../../../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../../../utils/DeletePopup";
+import { useCreateWPTracking } from "../../../../services/createMethod/CreateWPTracking";
+import { DataSupply } from "../../../../utils/DataStoredContext";
+
 export const DoeForm = ({ candidate }) => {
+  const { IVSSDetails } = useContext(DataSupply);
   const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules } = useFetchCandy();
   const { interviewDetails } = UpdateInterviewData();
+  const { createWPTrackingHandler } = useCreateWPTracking();
   const { wpTrackingDetails } = useUpdateWPTracking();
   const [deletePopup, setdeletePopup] = useState(false);
   const [deleteTitle1, setdeleteTitle1] = useState("");
@@ -82,8 +87,8 @@ export const DoeForm = ({ candidate }) => {
           }));
           // console.log("Uploaded file name set:", fileName);
         }
-      } 
-    } 
+      }
+    }
   }, [interviewSchedules, candidate.tempID]);
 
   const extractFileName = (url) => {
@@ -158,7 +163,8 @@ export const DoeForm = ({ candidate }) => {
         tempID,
         setUploadedFileNames,
         setUploadedDoe,
-        setIsUploadingString
+        setIsUploadingString,
+        setFormData
       );
 
       if (!isDeleted || isDeletedArrayUploaded) {
@@ -176,6 +182,12 @@ export const DoeForm = ({ candidate }) => {
     }
   };
 
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  const wrapUpload = (filePath) => {
+    return filePath ? [{ upload: filePath, date: currentDate }] : null;
+  };
+
   const handleSubmitTwo = async (data) => {
     data.preventDefault();
 
@@ -183,12 +195,12 @@ export const DoeForm = ({ candidate }) => {
       (data) => data.tempID === candidate?.tempID
     );
 
-    const selectedInterviewDataStatus = interviewSchedules.find(
-      (data) => data.IDDetails.tempID === candidate?.tempID
+    const selectedInterviewDataStatus = IVSSDetails.find(
+      (data) => data.tempID === candidate?.tempID
     );
 
     const interviewScheduleId = selectedInterviewData?.id;
-    const interviewScheduleStatusId = selectedInterviewDataStatus.IDDetails?.id;
+    const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
     console.log(selectedInterviewDataStatus);
 
     if (!formData?.interview) {
@@ -201,17 +213,37 @@ export const DoeForm = ({ candidate }) => {
       return;
     }
 
+    const wpTrackingData = {
+      tempID: candidate.tempID,
+      doesubmitdate: formData.interview.doesubmitdate,
+      doerefno: formData.interview.doerefno,
+      doeapprovedate: formData.interview.doeapprovedate,
+      doeexpirydate: formData.interview.doeexpirydate,
+      doefile: isUploadingString.doeFile
+        ? JSON.stringify(wrapUpload(uploadedDoe.doeFile))
+        : formData.interview.doefile,
+    };
+
     try {
-      const response = await wpTrackingDetails({
-        WPTrackingValue: {
-          id: interviewScheduleId,
-          doesubmitdate: formData.interview.doesubmitdate,
-          doerefno: formData.interview.doerefno,
-          doeapprovedate: formData.interview.doeapprovedate,
-          doeexpirydate: formData.interview.doeexpirydate,
-          doefile: uploadedDoe.doeFile,
-        },
-      });
+      if (interviewScheduleId) {
+        const response = await wpTrackingDetails({
+          WPTrackingValue: {
+            id: interviewScheduleId,
+            doesubmitdate: formData.interview.doesubmitdate,
+            doerefno: formData.interview.doerefno,
+            doeapprovedate: formData.interview.doeapprovedate,
+            doeexpirydate: formData.interview.doeexpirydate,
+            doefile: isUploadingString.doeFile
+              ? JSON.stringify(wrapUpload(uploadedDoe.doeFile))
+              : formData.interview.doefile,
+          },
+        });
+      } else {
+        await createWPTrackingHandler({
+          reqValue: wpTrackingData,
+        });
+      }
+
       // console.log("WPTracking response:", response);
 
       const interStatus = {
@@ -219,9 +251,7 @@ export const DoeForm = ({ candidate }) => {
         status: formData.interview.status,
       };
       setNotification(true);
-
       // console.log("Submitting interview details with status:", interStatus);
-
       await interviewDetails({ InterviewValue: interStatus });
 
       // console.log("Interview status updated:", interStatus);

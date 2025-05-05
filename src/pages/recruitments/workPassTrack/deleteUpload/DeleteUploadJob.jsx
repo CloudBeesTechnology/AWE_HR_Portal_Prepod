@@ -1,4 +1,3 @@
-
 import React from "react";
 
 export const DeleteUploadJob = (
@@ -7,7 +6,8 @@ export const DeleteUploadJob = (
   empID,
   setUploadedFileNames,
   setUploadedDocs,
-  setIsUploadingString
+  setIsUploadingString,
+  setFormData
 ) => {
   try {
     // console.log(fileType,fileName,"nduvgsd7679yt78");
@@ -44,6 +44,13 @@ export const DeleteUploadJob = (
     setIsUploadingString((prev) => ({
       ...prev,
       [fileType]: false,
+    }));
+    setFormData((prev) => ({
+      ...prev,
+      interview: {
+        ...prev.interview,
+        [fileType]: "",
+      },
     }));
   } catch (error) {
     console.log(error, "DeleteUploadJob in error");

@@ -11,6 +11,7 @@ import { BiSolidPrinter } from "react-icons/bi";
 import { DownloadExcelPDF } from "../timeSheetSearch/DownloadExcelPDF";
 import { PrintExcelSheet } from "../timeSheetSearch/PrintExcelSheet";
 import { Pagination } from "../timeSheetSearch/Pagination";
+import { HoursMinuAbsentCal } from "../customTimeSheet/HoursMinuAbsentCal";
 
 export const ViewSummaryTable = ({
   dayCounts,
@@ -25,6 +26,7 @@ export const ViewSummaryTable = ({
   editViewSummaryObject,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [adjustTheaderDownload, setAdjustTheaderDownload] = useState(false);
   const {
     selectedLocation,
     getStartDate,
@@ -35,58 +37,18 @@ export const ViewSummaryTable = ({
     setEndDate,
   } = useTempID();
 
-  function calculateTotalWorkingHours(data) {
-    let totalHours = 0;
-    try {
-      for (const key in data) {
-        const value = data[key];
+  const toggleSticky = () => {
+    setAdjustTheaderDownload(true);
+    document.querySelector(".table-container-scroll").scrollTop = 0;
+  };
 
-        const xPattern = /^x\((\d+(\.\d+)?)\)(\d+(\.\d+)?)$/;
-        const xMatch = value?.match(xPattern);
-        if (xMatch) {
-          totalHours += parseFloat(xMatch[3]);
-          continue;
-        }
+  const {
+    calculateTotalWorkingHours,
+    calculateTotalAbsence,
+    convertNumToHours,
+    // convertNumToHours,
+  } = HoursMinuAbsentCal();
 
-        const numberPattern = /^\d+(\.\d+)?$/;
-        if (value?.match(numberPattern)) {
-          totalHours += parseFloat(value);
-          continue;
-        }
-
-        const halPattern = /^H[A-Z]*\d+$/;
-        if (value?.match(halPattern)) {
-          const hours = parseFloat(value?.replace(/[^0-9]/g, ""));
-
-          totalHours += hours;
-          continue;
-        }
-      }
-
-      return totalHours;
-    } catch (err) {}
-  }
-
-  function calculateTotalAbsence(inputData, getLastIndexOfNWhrs) {
-    try {
-      let totalAbsence = 0;
-
-      for (let date in inputData) {
-        const value = inputData[date];
-
-        if (value?.startsWith("x(")) {
-          const absenceMatch = value?.match(/x\(([\d.]+)\)/);
-          if (absenceMatch) {
-            totalAbsence += parseFloat(absenceMatch[1]);
-          }
-        } else if (value === "A") {
-          totalAbsence += parseFloat(getLastIndexOfNWhrs);
-        }
-      }
-
-      return totalAbsence;
-    } catch (err) {}
-  }
   const formatDate = (dateString) => {
     const date = new Date(dateString);
 
@@ -154,17 +116,27 @@ export const ViewSummaryTable = ({
           resetTableFunc={resetTableFunc}
           // setEmptyTableMess={setEmptyTableMess}
         />
-        <div className="overflow-auto max-h-[60vh]">
-          <table className="min-w-full text-sm bg-white " id="downloadTable">
-            <thead className="bg-[#949393]">
-              <tr className=" text-white">
+        <div className="overflow-auto max-h-[60vh] table-container-scroll">
+          <table
+            className="min-w-full text-sm table-fixed border-collapse bg-white"
+            id="downloadTable"
+          >
+            <thead className="bg-[#949393] border">
+              <tr
+                className={`border bg-[#949393] text-white ${
+                  adjustTheaderDownload === true ? "" : "sticky -top-0.5"
+                }`}
+              >
                 <th
-                  className="border px-2 py-2 border-dark_grey min-w-[200px] max-w-[400px]"
+                  className="border px-2 py-2 border-dark_grey min-w-[200px] max-w-[400px] bg-[#949393]"
                   rowSpan="2"
                 >
                   Employee Name
                 </th>
-                <th className="border px-2 py-2 border-dark_grey" rowSpan="2">
+                <th
+                  className="border px-2 py-2 border-dark_grey bg-[#949393]"
+                  rowSpan="2"
+                >
                   PROJECT
                 </th>
 
@@ -173,7 +145,7 @@ export const ViewSummaryTable = ({
                   currentDay.setDate(getStartDate.getDate() + i); // Increment the date
                   return (
                     <th
-                      className="border px-2 py-2 border-dark_grey"
+                      className="border px-2 py-2 border-dark_grey "
                       key={currentDay.toDateString()} // Unique key for each column
                     >
                       {currentDay.getDate()}
@@ -181,34 +153,53 @@ export const ViewSummaryTable = ({
                   );
                 })}
 
-                <th className="border  px-2 py-2 border-dark_grey">NH</th>
-                <th className="border  px-2 py-2 border-dark_grey">ND</th>
-                <th className="border  px-2 py-2 border-dark_grey">PH</th>
-                <th className="border  px-2 py-2 border-dark_grey">PH-D</th>
-                <th className="border  px-2 py-2 border-dark_grey">AL/CL</th>
-                <th className="border  px-2 py-2 border-dark_grey">SL</th>
-                <th className="border  px-2 py-2 border-dark_grey">OFF</th>
-                <th className="border  px-2 py-2 border-dark_grey">A</th>
-                <th className="border  px-2 py-2 border-dark_grey">UAL</th>
-                <th className="border  px-2 py-2 border-dark_grey">OT</th>
+                <th className="border  px-2 py-2 border-dark_grey ">NH</th>
+                <th className="border  px-2 py-2 border-dark_grey ">ND</th>
+                <th className="border  px-2 py-2 border-dark_grey ">PH</th>
+                <th className="border  px-2 py-2 border-dark_grey ">PH-D</th>
+                <th className="border  px-2 py-2 border-dark_grey ">AL/CL</th>
+                <th className="border  px-2 py-2 border-dark_grey ">SL</th>
+                <th className="border  px-2 py-2 border-dark_grey ">OFF</th>
+                <th className="border  px-2 py-2 border-dark_grey ">A</th>
+                <th className="border  px-2 py-2 border-dark_grey ">UAL</th>
+                <th className="border  px-2 py-2 border-dark_grey ">OT</th>
 
-                <th className="border  px-2 py-2 border-dark_grey">Verified</th>
-                <th className="border  px-2 py-2 border-dark_grey">Updater</th>
+                <th className="border  px-2 py-2 border-dark_grey bg-[#949393]">
+                  Verified
+                </th>
+                <th className="border  px-2 py-2 border-dark_grey bg-[#949393]">
+                  Updater
+                </th>
               </tr>
             </thead>
 
             <tbody>
               {loading && data && data?.length > 0 ? (
                 data.map((employee, index) => {
-                  const floatTotalOT = Object.values(
+                  // const floatTotalOT = Object.values(
+                  //   employee?.OVERTIMEHRS || {}
+                  // ).reduce((acc, ot) => acc + parseFloat(ot || 0), 0);
+
+                  const totalMinutes = Object.values(
                     employee?.OVERTIMEHRS || {}
-                  ).reduce((acc, ot) => acc + parseFloat(ot || 0), 0);
-                  const totalOT = Number(floatTotalOT.toFixed(2));
+                  ).reduce((acc, ot) => {
+                    const num = parseFloat(ot || 0);
+                    const hours = Math.floor(num);
+                    const minutes = Math.round((num % 1) * 100); // Convert .30 as 30 minutes
+                    return acc + (hours * 60 + minutes);
+                  }, 0);
+
+                  const totalHoursOfOT = Math.floor(totalMinutes / 60);
+                  const remainingMinutes = totalMinutes % 60;
+                  const floatTotal = `${String(totalHoursOfOT).padStart(
+                    2,
+                    "0"
+                  )}.${String(remainingMinutes).padStart(2, "0")}`;
+
+                  const totalOT = Number(floatTotal);
                   const getTotalHours =
                     calculateTotalWorkingHours(employee?.workingHrs) || 0;
-                  const roundedNumberOfTotalHours = Number(
-                    getTotalHours.toFixed(2)
-                  );
+                  const roundedNumberOfTotalHours = Number(getTotalHours);
                   const totalHours = roundedNumberOfTotalHours;
 
                   const getLastIndexOfNWhrs =
@@ -216,20 +207,30 @@ export const ViewSummaryTable = ({
                       ? employee?.workHrs[employee?.workHrs?.length - 1]
                       : "";
 
-                  const getNormalDays =
-                    totalHours / parseFloat(getLastIndexOfNWhrs) || 0;
-                  const roundedNumber = Number(getNormalDays.toFixed(2));
+                  const getNormalDays = convertNumToHours(
+                    totalHours,
+                    getLastIndexOfNWhrs
+                  );
+
+                  // const getNormalDays =
+                  //   totalHours / parseFloat(getLastIndexOfNWhrs) || 0;
+                  const roundedNumber = Number(parseFloat(getNormalDays));
                   const NormalDays = roundedNumber;
 
                   const totalAbsence = calculateTotalAbsence(
                     employee?.workingHrs,
                     getLastIndexOfNWhrs
                   );
-                  const totalAbsentiesHrs =
-                    totalAbsence / parseFloat(getLastIndexOfNWhrs) || 0;
-                  const roundedTotalAbsentiesHrs = Number(
-                    totalAbsentiesHrs.toFixed(2)
+                  // const totalAbsentiesHrs =
+                  //   totalAbsence / parseFloat(getLastIndexOfNWhrs) || 0;
+
+                  console.log("totalAbsence : ", totalAbsence);
+
+                  const totalAbsentiesHrs = convertNumToHours(
+                    totalAbsence,
+                    getLastIndexOfNWhrs
                   );
+                  const roundedTotalAbsentiesHrs = Number(totalAbsentiesHrs);
 
                   const checkVerifiedAll = Array.from(
                     { length: dayCounts },
@@ -337,7 +338,7 @@ export const ViewSummaryTable = ({
                           const isChecked = Boolean(isVerified);
                           return (
                             <td
-                              className={`border px-2 py-1 border-dark_grey cursor-pointer                      
+                              className={`border px-2 py-1 border-dark_grey cursor-pointer
                                ${
                                  isChecked
                                    ? "bg-[#f59a51] bg-opacity-50 z-0"
@@ -374,7 +375,7 @@ export const ViewSummaryTable = ({
                                   workingHrsKey: currentDayKey,
                                   verify: employee?.getVerify?.[currentDayKey],
                                   firstFileType: employee.firstFileType || "",
-                                  index:index,
+                                  index: index,
                                 };
 
                                 editViewSummaryObject(empDetails);
@@ -576,7 +577,7 @@ export const ViewSummaryTable = ({
 
                           return (
                             <td
-                              className={`${i === 0 ? "border" : "border-b"}`}
+                              className={`${i === 0 ? "border" : "border"}`}
                               key={currentDayIndex}
                             ></td>
                           );
@@ -656,12 +657,14 @@ export const ViewSummaryTable = ({
             <button
               className="flex items-center space-x-2 rounded px-4 py-2  bg-[#FEF116] shadow-md"
               onClick={() => {
+                toggleSticky();
                 DownloadExcelPDF(
                   "downloadTable",
                   location,
                   formattedStartDate,
                   formattedEndDate
                 );
+                setAdjustTheaderDownload(false);
               }}
             >
               <span className="cursor-pointer text-dark_grey text_size_5">
@@ -686,3 +689,6 @@ export const ViewSummaryTable = ({
     </div>
   );
 };
+
+// ############################################################################################################
+// ############################################################################################################

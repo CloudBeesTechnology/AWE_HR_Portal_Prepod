@@ -23,6 +23,8 @@ export const ApplyVSFunction = ({
 }) => {
   const { getStartDate, getEndDate } = useTempID();
 
+  const identifyFileType = convertedStringToArrayObj?.[0]?.fileType;
+
   try {
     const fetchAllData = async (queryName) => {
       let allData = [];
@@ -100,10 +102,12 @@ export const ApplyVSFunction = ({
         });
 
         const leaveStatusData = leaveStatuses;
+
         // const leaveStatusData = dummyLeaveStatus;
 
         const approvedLeaveStatus = leaveStatusData?.filter(
-          (fil) => fil.managerStatus === "Approved"
+          (fil) =>
+            fil.managerStatus === "Approved" && fil.empStatus !== "Cancelled"
         );
 
         const groupBySapNo = (data) => {
@@ -135,6 +139,7 @@ export const ApplyVSFunction = ({
             .map((entry) => {
               const groupedByMonthYear = entry?.data?.reduce((acc, record) => {
                 const date = new Date(record.date);
+
                 const monthYear = `${
                   date.getMonth() + 1
                 }/${date.getFullYear()}`;
@@ -257,8 +262,9 @@ export const ApplyVSFunction = ({
                 const empDate = new Date(entry.date);
 
                 return (
-                  leaveDate.getFullYear() === empDate.getFullYear() &&
-                  leaveDate.getMonth() === empDate.getMonth()
+                  leaveDate.getFullYear() === empDate.getFullYear()
+                  //  &&
+                  // leaveDate.getMonth() === empDate.getMonth()
                 );
               });
             }
@@ -483,8 +489,42 @@ export const ApplyVSFunction = ({
               });
             }
 
+            const recognizeFileType = ["Offshore", "Offshore's ORMC"]?.includes(
+              identifyFileType
+            );
+
+            const convertNumToHours = (NWHPD) => {
+              const hoursFloat = NWHPD / 2; // 3.75
+              const hours = Math.floor(hoursFloat); // 3 hours
+              const minutes = Math.round((hoursFloat - hours) * 100); // 0.75 * 60 = 45 minutes 
+
+              return `${String(hours).padStart(2, "0")}.${String(
+                minutes
+              ).padStart(2, "0")}`;
+            };
+
+            function toMinutes(decimalHour) {
+              let hours = Math.floor(decimalHour);
+              let minutes = Math.round((decimalHour - hours) * 100); // use 100 because .30 means 30 minutes
+              return hours * 60 + minutes;
+            }
+
+            const workHrsAbsentCal = (workingHrs) => {
+              let formattedWorkHrs = toMinutes(workingHrs);
+              let formattedNWHPD = toMinutes(entry?.normalWorkHrs);
+
+              let diffMinutes = formattedNWHPD - formattedWorkHrs;
+
+              let resultHours = Math.floor(diffMinutes / 60);
+              let resultMinutes = diffMinutes % 60;
+
+              return `${String(resultHours).padStart(2, "0")}.${String(
+                resultMinutes
+              ).padStart(2, "0")}`;
+            };
             if (checkEntry) {
-              const result = parseFloat(entry?.normalWorkHrs) / 2;
+              // const result = parseFloat(entry?.normalWorkHrs) / 2;
+              const result = convertNumToHours(entry?.normalWorkHrs);
               if (isNaN(checkEntry) || !checkEntry) {
                 acc[dayStr] = checkEntry;
               } else if (
@@ -505,19 +545,33 @@ export const ApplyVSFunction = ({
                 const workingHrs = parseFloat(checkEntry);
 
                 if (workingHrs <= (entry?.normalWorkHrs || 0)) {
-                  const absence = (
-                    (entry?.normalWorkHrs || 0) - workingHrs
-                  ).toFixed(1);
-
+                  const formattedAbsentHrs = workHrsAbsentCal(workingHrs);
+                  const absence = parseFloat(formattedAbsentHrs).toFixed(2);
                   acc[dayStr] = `x(${absence})${workingHrs}`;
                 } else {
                   acc[dayStr] = workingHrs.toString();
                 }
               }
             } else if (isPublicHoliday) {
-              acc[dayStr] = "PH";
+              if (recognizeFileType === true) {
+                if (leaveType) {
+                  acc[dayStr] = leaveType;
+                } else {
+                  acc[dayStr] = "A";
+                }
+              } else if (recognizeFileType === false) {
+                acc[dayStr] = "PH";
+              }
             } else if (leaveType) {
-              acc[dayStr] = leaveType;
+              if (recognizeFileType === true) {
+                acc[dayStr] = leaveType;
+              } else if (recognizeFileType === false) {
+                if (dayOfWeek === "Sunday") {
+                  acc[dayStr] = "";
+                } else {
+                  acc[dayStr] = leaveType;
+                }
+              }
             } else if (dayOfWeek === "Saturday") {
               // const result = parseFloat(entry?.normalWorkHrs) / 2;
 
@@ -530,14 +584,20 @@ export const ApplyVSFunction = ({
               const dailyTypes = ["daily", "day", "d"];
 
               if (!checkEntry && monthlyTypes.includes(salaryType)) {
-                acc[dayStr] = "PHD";
+                // acc[dayStr] = "PHD";
+                acc[dayStr] = "A";
               } else if (!checkEntry && dailyTypes.includes(salaryType)) {
-                acc[dayStr] = "OFF";
+                // acc[dayStr] = "OFF";
+                acc[dayStr] = "A";
               } else {
                 acc[dayStr] = checkEntry;
               }
             } else if (dayOfWeek === "Sunday") {
-              acc[dayStr] = "";
+              if (recognizeFileType === true) {
+                acc[dayStr] = "A";
+              } else if (recognizeFileType === false) {
+                acc[dayStr] = "";
+              }
             } else {
               acc[dayStr] = "A";
             }
@@ -582,9 +642,18 @@ export const ApplyVSFunction = ({
           inputData.forEach((data, index) => {
             inputData.forEach((compareData, compareIndex) => {
               if (index !== compareIndex) {
+                const isSameBadgeNo =
+                  data.empBadgeNo &&
+                  compareData.empBadgeNo &&
+                  String(data.empBadgeNo) === String(compareData.empBadgeNo);
+
+                const isSameFidWithDifferentJobcode =
+                  data.fidNo &&
+                  compareData.fidNo &&
+                  String(data.fidNo) === String(compareData.fidNo);
+
                 if (
-                  data.empBadgeNo === compareData.empBadgeNo &&
-                  //   data.date === compareData.date &&
+                  (isSameBadgeNo || isSameFidWithDifferentJobcode) &&
                   data.jobcode !== compareData.jobcode
                 ) {
                   Object.keys(data.workingHrs).forEach((dateKey) => {
@@ -594,9 +663,9 @@ export const ApplyVSFunction = ({
                     const regex = /^x\(\d+(\.\d+)?\)\d+(\.\d+)?$/;
 
                     if (regex.test(value) && !regex.test(compareValue)) {
-                      compareData.workingHrs[dateKey] = "0";
+                      compareData.workingHrs[dateKey] = "";
                     } else if (!regex.test(value) && regex.test(compareValue)) {
-                      data.workingHrs[dateKey] = "0";
+                      data.workingHrs[dateKey] = "";
                     }
                   });
                 }
@@ -654,7 +723,7 @@ export const ApplyVSFunction = ({
         const updatedData = await updateFieldBasedOnConditions(
           addLeaveTypeCount
         );
-
+        console.log("addLeaveTypeCount : ", addLeaveTypeCount);
         const isDateInRange = (date, start, end) => {
           const parsedDate = new Date(date);
           const parsedStart = new Date(start);

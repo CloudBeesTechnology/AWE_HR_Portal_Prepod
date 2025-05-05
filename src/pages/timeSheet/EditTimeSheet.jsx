@@ -82,45 +82,49 @@ export const EditTimeSheet = ({
   useEffect(() => {
     if (editObject) {
       const formatDateTime = (getDate) => {
-        const inputDate = String(getDate);
-        const date = new Date(inputDate);
+        try {
+          const inputDate = String(getDate);
+          const date = new Date(inputDate);
 
-        const day = date.getDate();
-        const month = date.getMonth() + 1;
-        const year = date.getFullYear();
-        const time = inputDate?.split(" ")[1] + " " + inputDate?.split(" ")[2];
+          const day = date.getDate();
+          const month = date.getMonth() + 1;
+          const year = date.getFullYear();
+          const time =
+            inputDate?.split(" ")[1] + " " + inputDate?.split(" ")[2];
 
-        return `${day}/${month}/${year} ${time}`;
+          return `${day}/${month}/${year} ${time}`;
+        } catch (err) {
+          console.log("Error :", err);
+        }
       };
 
       const formattedEntranceDateTime = formatDateTime(
-        editObject.ENTRANCEDATETIME
+        editObject?.ENTRANCEDATETIME
       );
-      const formattedExitDateTime = formatDateTime(editObject.EXITDATETIME);
+      const formattedExitDateTime = formatDateTime(editObject?.EXITDATETIME);
 
       const isDateField = editObject.DATE !== undefined;
       const fieldToUpdate = isDateField ? "DATE" : "ENTRANCEDATEUSED";
       const originalDate = editObject[fieldToUpdate];
 
       const displayedDate = originalDate
-        ? `${originalDate.split("/")[1]}/${originalDate.split("/")[0]}/${
-            originalDate.split("/")[2]
+        ? `${originalDate?.split("/")[1]}/${originalDate?.split("/")[0]}/${
+            originalDate?.split("/")[2]
           }`
         : null;
 
       const updatedEditObject = {
         ...editObject,
-        [`formatted_${fieldToUpdate}`]: displayedDate.includes("NaN")
+        [`formatted_${fieldToUpdate}`]: displayedDate?.includes("NaN")
           ? ""
           : displayedDate,
-        [`formatted_${"ENTRANCEDATETIME"}`]: formattedEntranceDateTime.includes(
-          "NaN"
-        )
+        [`formatted_${"ENTRANCEDATETIME"}`]:
+          formattedEntranceDateTime?.includes("NaN")
+            ? ""
+            : formattedEntranceDateTime,
+        [`formatted_${"EXITDATETIME"}`]: formattedExitDateTime?.includes("NaN")
           ? ""
-          : formattedEntranceDateTime,
-        [`formatted_${"EXITDATETIME"}`]: formattedExitDateTime.includes("NaN")
-          ? ""
-          : displayedDate,
+          : formattedExitDateTime,
       };
 
       setFormData(updatedEditObject);
@@ -275,15 +279,15 @@ export const EditTimeSheet = ({
           let totalMinutes = 0;
 
           if (sections) {
-            let time = sections.includes(".")
-              ? sections.replace(".", ":")
+            let time = sections?.includes(".")
+              ? sections?.replace(".", ":")
               : sections;
 
             if (!time.includes(":")) {
               time = `${time}:00`;
             }
 
-            const [hours, minutes] = time.split(":").map(Number);
+            const [hours, minutes] = time?.split(":").map(Number);
 
             if (isNaN(hours) || isNaN(minutes)) {
               throw new Error("Invalid time format");
@@ -337,42 +341,15 @@ export const EditTimeSheet = ({
               : updatedWorkingHours - convertNWPD;
 
           setWarningMess(updatedWorkingHours > convertNWPD);
-        
-          if (
-            typeof parseFloat(prevFormData?.ADININWORKSENGINEERINGSDNBHD) ===
-              "number" &&
-            prevFormData?.ADININWORKSENGINEERINGSDNBHD.includes(":")
-          ) {
-            
-            const adininWorks = ConvertHours(
-              prevFormData?.ADININWORKSENGINEERINGSDNBHD
-            );
-            const adinin =
-              parseFloat(adininWorks?.split(":")[0]) +
-              parseFloat(adininWorks?.split(":")[1]) / 60;
-
-            const updatedTotalOvertimeHrs =
-              parseFloat(totalOvertimeHrs?.split(":")[0]) +
-              parseFloat(totalOvertimeHrs?.split(":")[1]) / 60;
-
-            if (updatedWorkingHours + updatedTotalOvertimeHrs > adinin) {
-              setWarningMessForAdinin(
-                updatedWorkingHours + updatedTotalOvertimeHrs > adinin
+          try {
+            if (
+              typeof parseFloat(prevFormData?.ADININWORKSENGINEERINGSDNBHD) ===
+                "number" &&
+              prevFormData?.ADININWORKSENGINEERINGSDNBHD?.includes(":")
+            ) {
+              const adininWorks = ConvertHours(
+                prevFormData?.ADININWORKSENGINEERINGSDNBHD
               );
-            } else {
-              setWarningMessForAdinin(false);
-            }
-          } else if (prevFormData?.ADININWORKSENGINEERINGSDNBHD.includes("h")) {
-            try {
-              function convertToTimeFormat(timeStr) {
-                return timeStr.replace(/(\d+)h\s*(\d+)m/, "$1:$2");
-              }
-
-              // Example usage
-              const input = prevFormData?.ADININWORKSENGINEERINGSDNBHD;
-              const adininworksEngineering = convertToTimeFormat(input);
-
-              const adininWorks = ConvertHours(adininworksEngineering);
               const adinin =
                 parseFloat(adininWorks?.split(":")[0]) +
                 parseFloat(adininWorks?.split(":")[1]) / 60;
@@ -388,27 +365,59 @@ export const EditTimeSheet = ({
               } else {
                 setWarningMessForAdinin(false);
               }
-            } catch (err) {}
-          } else {
-            if (updatedWorkingHours > convertNWPD) {
-              setWarningMess(updatedWorkingHours > convertNWPD);
-            } else {
-              setWarningMessForAdinin(false);
-            }
-          }
+            } else if (
+              prevFormData?.ADININWORKSENGINEERINGSDNBHD?.includes("h")
+            ) {
+              try {
+                function convertToTimeFormat(timeStr) {
+                  return timeStr.replace(/(\d+)h\s*(\d+)m/, "$1:$2");
+                }
 
+                // Example usage
+                const input = prevFormData?.ADININWORKSENGINEERINGSDNBHD;
+                const adininworksEngineering = convertToTimeFormat(input);
+
+                const adininWorks = ConvertHours(adininworksEngineering);
+                const adinin =
+                  parseFloat(adininWorks?.split(":")[0]) +
+                  parseFloat(adininWorks?.split(":")[1]) / 60;
+
+                const updatedTotalOvertimeHrs =
+                  parseFloat(totalOvertimeHrs?.split(":")[0]) +
+                  parseFloat(totalOvertimeHrs?.split(":")[1]) / 60;
+
+                if (updatedWorkingHours + updatedTotalOvertimeHrs > adinin) {
+                  setWarningMessForAdinin(
+                    updatedWorkingHours + updatedTotalOvertimeHrs > adinin
+                  );
+                } else {
+                  setWarningMessForAdinin(false);
+                }
+              } catch (err) {}
+            } else {
+              if (updatedWorkingHours > convertNWPD) {
+                setWarningMess(updatedWorkingHours > convertNWPD);
+              } else {
+                setWarningMessForAdinin(false);
+              }
+            }
+          } catch (err) {
+            console.log(err);
+          }
           return {
             ...prevFormData,
             [actualHoursKey]:
-              totalWorkingHrs.includes("NaN") || !totalWorkingHrs
+              totalWorkingHrs?.includes("NaN") || !totalWorkingHrs
                 ? "0:00"
                 : totalWorkingHrs,
-            OT: formatTime(calculatedOT).includes("NaN")
+            OT: formatTime(calculatedOT)?.includes("NaN")
               ? "0:00"
               : formatTime(calculatedOT),
           };
         });
-      } catch (err) {}
+      } catch (err) {
+        console.log("Error : ", err);
+      }
     };
     // End
 
@@ -421,19 +430,18 @@ export const EditTimeSheet = ({
     }
   }, [sections]);
 
-  
   useEffect(() => {
-    const totalOvertimeHrs = sections.reduce((total, sec) => {
+    const totalOvertimeHrs = sections?.reduce((total, sec) => {
       try {
         let overtime = sec.OVERTIMEHRS || "0:00";
 
-        if (overtime.includes(".")) {
-          overtime = overtime.replace(".", ":");
+        if (overtime?.includes(".")) {
+          overtime = overtime?.replace(".", ":");
         } else if (!overtime.includes(":")) {
           overtime = `${overtime}:00`;
         }
 
-        const [hrs, mins] = overtime.split(":").map(Number);
+        const [hrs, mins] = overtime?.split(":").map(Number);
         return total + hrs * 60 + mins;
       } catch (err) {
         return "0:00";
@@ -488,7 +496,7 @@ export const EditTimeSheet = ({
   };
 
   const removeItem = (id) => {
-    const result = sections.filter((sec) => {
+    const result = sections?.filter((sec) => {
       if (sec.id !== id) {
         return sec;
       }
@@ -497,7 +505,7 @@ export const EditTimeSheet = ({
   };
   const handleValidation = () => {
     const newErrors = {};
-    sections.forEach((section, index) => {
+    sections?.forEach((section, index) => {
       if (!section.LOCATION) {
         newErrors[`LOCATION-${index}`] = "Location is required.";
       }

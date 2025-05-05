@@ -9,13 +9,15 @@ export const UpdateMobilization = () => {
       throw new Error("Missing required parameters");
     }
     // console.log(mob);
+
     try {
       const totalValue = {
         id: mob.interviewDetails_id,
         empID: mob.empID,
+        status:"Employee"
       };
 
-      // console.log(totalValue);
+      console.log(totalValue);
       const result = await client.graphql({
         query: updateInterviewSchedule,
         variables: {

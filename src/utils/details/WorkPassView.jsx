@@ -1,10 +1,7 @@
 import React, { useState, useRef } from "react";
-// import { Document, Page } from "react-pdf";
-// import "react-pdf/dist/esm/Page/TextLayer.css";
-// import "react-pdf/dist/esm/Page/AnnotationLayer.css";
-import { FaTimes, FaPrint, FaDownload } from "react-icons/fa"; // Import "X" icon from react-icons
+import { FaTimes, FaPrint, FaDownload } from "react-icons/fa"; 
 import { getUrl } from "@aws-amplify/storage";
-import { Viewer, Worker, Page } from "@react-pdf-viewer/core";
+import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { pdfjs } from "react-pdf";
 import { useReactToPrint } from "react-to-print";
@@ -22,23 +19,15 @@ export const WorkPassView = ({
   nlmsEmpUpload,
   bankEmpUpload,
   jpEmpUpload,
-  isPdfOpen,
-  pageNumber,
-  numPages,
-  handleViewDocument,
   handleCloseViewer,
-  onDocumentLoadSuccess,
-  setPageNumber,
-  invoiceRef,
   formatDate,
   arrivStampUpload,
   immigEmpUpload,
   reEntryUpload,
   mainRef,
 }) => {
-  const [viewingDocument, setViewingDocument] = useState(null); // State to store the currently viewed document URL
-  const [lastUploadUrl, setLastUploadUrl] = useState(""); // To store the last uploaded file URL for handling
-  const [loading, setLoading] = useState(false);
+  const [viewingDocument, setViewingDocument] = useState(null); 
+  const [lastUploadUrl, setLastUploadUrl] = useState(""); 
   const workPassRef = useRef();
 
   // Helper function to parse and safely handle data
@@ -70,18 +59,11 @@ export const WorkPassView = ({
   const linkToStorageFile = async (pathUrl) => {
     try {
       const result = await getUrl({ path: pathUrl });
-      setLastUploadUrl(result.url.href); // Store the URL
-      setViewingDocument(pathUrl); // Update the state to display the document
-      setLoading(false);
+      setLastUploadUrl(result.url.href); 
+      setViewingDocument(pathUrl);
     } catch (error) {
       console.error("Error fetching the file URL:", error);
-      setLoading(false);
     }
-  };
-
-  const handleClose = (e) => {
-    e.preventDefault(); // Prevent default action
-    setViewingDocument(null); // Close the viewer
   };
 
   const closeModal = () => {
@@ -99,7 +81,6 @@ export const WorkPassView = ({
           }
         `,
   });
-  
 
   // Function to render documents under a single category
   const renderDocumentsUnderCategory = (documents) => {
@@ -115,7 +96,7 @@ export const WorkPassView = ({
                 Uploaded on: {formatDate(document.date)}
               </span>
               <button
-                onClick={() => linkToStorageFile(document.upload)} // Fetch the URL for the document
+                onClick={() => linkToStorageFile(document.upload)} 
                 className="text-dark_grey font-semibold text-sm"
               >
                 View Document
@@ -128,7 +109,10 @@ export const WorkPassView = ({
                 <div className="py-6 fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
                   <div className="relative bg-white rounded-lg shadow-lg w-[40vw] max-h-full flex flex-col">
                     {/* PDF Viewer */}
-                    <div ref={workPassRef} className="flex-grow overflow-y-auto">
+                    <div
+                      ref={workPassRef}
+                      className="flex-grow overflow-y-auto"
+                    >
                       <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
                         <Viewer fileUrl={lastUploadUrl || ""} />
                       </Worker>
@@ -219,7 +203,7 @@ export const WorkPassView = ({
     // Parse documents only if the uploadArray has valid data
     const documents =
       uploadArray && uploadArray.length > 0
-        ? parseDocuments(uploadArray[0]) // Parse the first element if it exists
+        ? parseDocuments(uploadArray[0]) 
         : [];
 
     return (
@@ -236,83 +220,83 @@ export const WorkPassView = ({
     );
   };
 
-   const renderDetails = (details) => {
-     const capitalizeWords = (str) => {
-       if (!str || str === "N/A") {
-         return "N/A"; // Return "N/A" for null, undefined, or "N/A"
-       }
-   
-       return str
-         .split(' ') // Split by space if it's multi-word
-         .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-         .join(' '); // Rejoin the words
-     };
-   
-     return (
-       <div className="grid grid-cols-3 gap-y-4 items-center font-semibold text-sm">
-         {Object.entries(details).map(([key, value], index) => (
-           <React.Fragment key={index}>
-             <span className="text-dark_grey">{key}</span>
-             <span className="text-center text-gray-700">:</span>
-             <span className="text-dark_grey">
-               {
-                 Array.isArray(value)
-                   ? value.length > 0 // Check if array is not empty
-                     ? value
-                         .map((v, idx, arr) => {
-                           // Replace null, undefined, or empty string with "N/A"
-                           if (v === null || v === undefined || v === '') {
-                             return "N/A"; // Replace with "N/A"
-                           }
-                           // Remove consecutive duplicates, case-insensitive
-                           return v.toLowerCase() === arr[idx - 1]?.toLowerCase() ? null : v;
-                         })
-                         .filter((v, idx, arr) => v !== null) // Remove null values (duplicates and N/A's)
-                         .reduce((acc, item) => {
-                           // Consolidate consecutive "N/A"s into a single one
-                           if (item === "N/A" && acc[acc.length - 1] !== "N/A") {
-                             acc.push("N/A");
-                           } else if (item !== "N/A") {
-                             acc.push(item);
-                           }
-                           return acc;
-                         }, [])
-                         .reverse() // Reverse the order to move the latest value to the front
-                         .map((item, idx, arr) => {
-                           // Ensure the latest value is first
-                           return (
-                             <span key={idx}>
-                               <span
-                                  className={`${
-                                   arr.length > 1 && idx === 0
-                                     ? "rounded-md font-black italic"
-                                     : "" // Only highlight the latest value if there are multiple values
-                                 }`}
-                               >
-                                 {capitalizeWords(item)} {/* Capitalize the words */}
-                               </span>
-                               {idx < arr.length - 1 && <span>,&nbsp;</span>} {/* Add a comma except for the last item */}
-                             </span>
-                           );
-                         })
-                     : "N/A" // Show "N/A" if the array is empty or contains only null/empty values
-                   : value === null || value === undefined || value === ''
-                   ? "N/A" // Show "N/A" if the value is null, undefined, or empty string
-                   : capitalizeWords(value) // Capitalize the value if not an array
-               }
-             </span>
-           </React.Fragment>
-         ))}
-       </div>
-     );
-   };
-  
+  const renderDetails = (details) => {
+    const capitalizeWords = (str) => {
+      if (typeof str !== "string" || str === "N/A") {
+        return "N/A";
+      }
+
+      return str
+        .split(" ")
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join(" ");
+    };
+
+    return (
+      <div className="grid grid-cols-3 gap-y-4 items-center font-semibold text-sm">
+        {Object.entries(details).map(([key, value], index) => (
+          <React.Fragment key={index}>
+            <span className="text-dark_grey">{key}</span>
+            <span className="text-center text-gray-700">:</span>
+            <span className="text-dark_grey">
+              {
+                Array.isArray(value)
+                  ? value.length > 0 
+                    ? value
+                        .map((v, idx, arr) => {
+                          if (v === null || v === undefined || v === "") {
+                            return "N/A"; 
+                          }
+                          return v.toLowerCase() === arr[idx - 1]?.toLowerCase()
+                            ? null
+                            : v;
+                        })
+                        .filter((v, idx, arr) => v !== null) 
+                        .reduce((acc, item) => {
+                          if (item === "N/A" && acc[acc.length - 1] !== "N/A") {
+                            acc.push("N/A");
+                          } else if (item !== "N/A") {
+                            acc.push(item);
+                          }
+                          return acc;
+                        }, [])
+                        .reverse() 
+                        .map((item, idx, arr) => {
+                          return (
+                            <span key={idx}>
+                              <span
+                                className={`${
+                                  arr.length > 1 && idx === 0
+                                    ? "rounded-md font-black italic"
+                                    : "" 
+                                }`}
+                              >
+                                {capitalizeWords(item)}{" "}
+                              </span>
+                              {idx < arr.length - 1 && <span>,&nbsp;</span>}{" "}
+                            </span>
+                          );
+                        })
+                    : "N/A"
+                  : value === null || value === undefined || value === ""
+                  ? "N/A" 
+                  : capitalizeWords(value) 
+              }
+            </span>
+          </React.Fragment>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <section>
       <div ref={mainRef} className="py-8 px-10 bg-gray-50 rounded-lg">
         <h6 className="uppercase text_size_5 mb-6">WorkPass Details:</h6>
         <div className="space-y-6">
-          {sections.map(({ name, data, upload }, index) => (
+          {sections.map(({ name, data }, index) => (
             <div key={index}>
               <h6 className="uppercase text_size_5 my-3">{name}</h6>
               {/* Render the section data */}

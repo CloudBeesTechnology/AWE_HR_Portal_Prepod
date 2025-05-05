@@ -3,15 +3,19 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { uploadDocs } from "../../services/uploadsDocsS3/UploadDocs";
 import { FormField } from "../../utils/FormField";
-import { FileUpload } from "../employees/medicalDep/FileUploadField";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { TravellingSchema } from "../../services/EmployeeValidation";
 import { generateClient } from "@aws-amplify/api";
 import { createTravelIns, updateTravelIns } from "../../graphql/mutations";
 import { listTravelIns } from "../../graphql/queries";
-import { FaTimes, FaDownload, FaPrint } from "react-icons/fa";
-import { Page } from "react-pdf";
-import { pdfjs } from "react-pdf";
+import {
+  FaTimes,
+  FaDownload,
+  FaPrint,
+  FaChevronLeft,
+  FaChevronRight,
+} from "react-icons/fa";
+
 import { getUrl } from "@aws-amplify/storage";
 import { DeleteTravellingUp } from "./DeleteUpload/DeleteTravellingUp";
 import { handleDeleteFile } from "../../services/uploadsDocsS3/DeleteDocs";
@@ -26,6 +30,7 @@ import { useDeleteAccess } from "../../hooks/useDeleteAccess";
 import { GoUpload } from "react-icons/go";
 import { MdCancel } from "react-icons/md";
 import { useOutletContext } from "react-router-dom";
+import { Document, Page, pdfjs } from "react-pdf";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -53,12 +58,10 @@ export const Travelling = () => {
   const [insuranceData, setInsuranceData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null); // To track error state
-  const travelPrint = useRef();
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupImage, setPopupImage] = useState("");
   const [viewingDocument, setViewingDocument] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
-  const [numPages, setNumPages] = useState(null);
   const [lastUploadUrl, setPPLastUP] = useState("");
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [searchResultData, setSearchResultData] = useState([]);
@@ -79,18 +82,20 @@ export const Travelling = () => {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); 
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
 
     return `${day}/${month}/${year}`;
   };
 
+  const groupPrint = useRef();
+
   const linkToStorageFile = async (pathUrl) => {
     try {
       const result = await getUrl({ path: pathUrl });
-     
-      setPPLastUP(result.url.href); 
-      setViewingDocument(pathUrl); 
+      //   console.log("File URL:", result.url.href); // Use .href to extract the URL as a string
+      setPPLastUP(result.url.href); // Store the URL as a string
+      setViewingDocument(pathUrl); // Update the state to show the selected document
     } catch (error) {
       console.error("Error fetching the file URL:", error);
     }
@@ -102,7 +107,7 @@ export const Travelling = () => {
       if (Array.isArray(parsedData)) {
         return parsedData.map((doc) => {
           if (doc.upload) {
-            doc.fileName = doc.upload.split("/").pop(); 
+            doc.fileName = doc.upload.split("/").pop();
           }
           return doc;
         });
@@ -239,6 +244,7 @@ export const Travelling = () => {
   }, []);
 
   const searchResult = (result) => {
+    console.log("RW", result);
     setSearchResultData(result);
   };
 
@@ -347,36 +353,26 @@ export const Travelling = () => {
 
   //___________________________________-Printing section %% Pdf section___________________________________
 
-  const openPopup = (fileUrl) => {
-    setPopupImage(fileUrl);
-    setPopupVisible(true);
-  };
-
-  const handlePrint = useReactToPrint({
-    content: () => travelPrint.current,
-    onBeforePrint: () => console.log("Preparing to print PDF..."),
-    onAfterPrint: () => console.log("Print complete"),
-    pageStyle: `
-      @page {
-          /* Adjust the margin as necessary */
-        height:  714px;
-        padding-top: 87px  
-      }
-    `,
-  });
-
-  const openModal = (uploadUrl) => {
-    setPPLastUP(uploadUrl);
-    setViewingDocument(uploadUrl);
-  };
-
   const closeModal = () => {
     setViewingDocument(null);
   };
+  const handlePrint = useReactToPrint({
+    content: () => groupPrint.current,
 
-  const onDocumentLoadSuccess = ({ numPages }) => {
-    setNumPages(numPages);
-  };
+    pageStyle: `
+    @page {
+      size: auto;
+      margin: 0mm;
+    }
+    body { 
+      margin: 0;
+      padding: 0;
+    }
+    .pdf-page {
+      page-break-after: always;
+    }
+  `,
+  });
 
   const renderDocumentsUnderCategory = (documents) => {
     return (
@@ -384,105 +380,127 @@ export const Travelling = () => {
         {documents.map((document, index) => (
           <div
             key={index}
-            className="bg-white rounded-lg shadow-md p-4 mb-4 border border-gray-200"
+            className="bg-white rounded-lg p-4 mb-4 border border-gray-200"
           >
             <div className="flex justify-between items-center">
               <span className="uppercase font-semibold text-sm">
                 Uploaded on: {formatDate(document.date)}
               </span>
               <button
-                onClick={() => linkToStorageFile(document.upload)} // Fetch the URL for the document
+                onClick={() => linkToStorageFile(document.upload)}
                 className="text-dark_grey font-semibold text-sm"
               >
                 View Document
               </button>
             </div>
 
-            {/* Conditional rendering of PDF or image */}
             {viewingDocument === document.upload &&
               document.upload.endsWith(".pdf") && (
-                <div className="py-6 fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
-                  <div className="relative bg-white rounded-lg shadow-lg w-[40vw] max-h-full flex flex-col">
-                    {/* PDF Viewer */}
-                    <div
-                      ref={travelPrint}
-                      className="flex-grow overflow-y-auto"
-                    >
-                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-                        <Viewer fileUrl={lastUploadUrl || ""} />
-                      </Worker>
-                    </div>
-
-                    <div className="absolute top-2 right-2">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                  <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+                    {/* Modal header */}
+                    <div className="flex justify-between items-center p-4 border-b">
+                      <h3 className="text-lg font-semibold">PDF Viewer</h3>
                       <button
-                        onClick={closeModal} // Close the modal
-                        className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
+                        onClick={closeModal}
+                        className="text-gray-500 hover:text-gray-700"
                       >
-                        <FaTimes />
+                        <FaTimes size={20} />
                       </button>
                     </div>
 
-                    <div className="flex items-center justify-center gap-6 py-4">
-                      <div className="mt-2 flex">
-                        <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
+                    {/* PDF Viewer */}
+                    <div
+                      ref={groupPrint}
+                      className="flex-grow overflow-y-auto pdf-page"
+                    >
+                      {lastUploadUrl ? (
+                        <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                          <Viewer
+                            fileUrl={lastUploadUrl}
+                            renderError={(error) => (
+                              <div className="p-4 text-red-500">
+                                Failed to load PDF: {error.message}
+                                <div className="text-sm mt-2">
+                                  URL: {lastUploadUrl}
+                                </div>
+                              </div>
+                            )}
+                          />
+                        </Worker>
+                      ) : (
+                        <div className="p-4 text-center">
+                          No PDF file available
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Pagination Controls */}
+                    <div className="flex items-center justify-center p-4 border-t">
+                      <div className="flex gap-4">
+                        <button className="px-4 py-2 bg-primary  rounded flex items-center gap-2">
+                          <FaDownload />
                           <a href={lastUploadUrl} download>
                             Download
                           </a>
-                          <FaDownload className="ml-2 mt-1" />
                         </button>
-                      </div>
-                      <div className="mt-2 flex">
                         <button
                           onClick={handlePrint}
-                          className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
+                          className="px-4 py-2 bg-primary  rounded flex items-center gap-2"
                         >
+                          <FaPrint />
                           Print
-                          <FaPrint className="ml-2 mt-1" />
                         </button>
                       </div>
                     </div>
                   </div>
                 </div>
               )}
-
             {/* Image Viewer */}
             {viewingDocument === document.upload &&
               !document.upload.endsWith(".pdf") && (
-                <div className="relative mt-4">
-                  <div>
-                    <img
-                      src={lastUploadUrl} // Use the URL for the image
-                      alt="Document Preview"
-                      className="w-full h-auto"
-                    />
-                  </div>
-
-                  <div className="absolute top-2 right-2">
-                    <button
-                      onClick={() => setViewingDocument(null)} // Close the viewer
-                      className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
-                    >
-                      <FaTimes />
-                    </button>
-                  </div>
-
-                  <div className="flex items-center justify-center gap-6 py-4">
-                    <div className="mt-2 flex">
-                      <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
-                        <a href={lastUploadUrl} download>
-                          Download
-                        </a>
-                        <FaDownload className="ml-2 mt-1" />
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                  <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+                    {/* Modal header */}
+                    <div className="flex justify-between items-center p-4 border-b">
+                      <h3 className="text-lg font-semibold">Image Viewer</h3>
+                      <button
+                        onClick={() => setViewingDocument(null)}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        <FaTimes size={20} />
                       </button>
                     </div>
-                    <div className="mt-2 flex">
-                      <button
-                        onClick={handlePrint}
-                        className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
-                      >
-                        Print
-                        <FaPrint className="ml-2 mt-1" />
-                      </button>
+
+                    {/* Image Viewer */}
+                    <div
+                      ref={groupPrint}
+                      className="flex-grow overflow-y-auto p-4"
+                    >
+                      <img
+                        src={lastUploadUrl}
+                        alt="Document Preview"
+                        className="w-full h-auto rounded"
+                      />
+                    </div>
+
+                    {/* Footer Controls */}
+                    <div className="flex items-center justify-center p-4 border-t">
+                      <div className="flex gap-4">
+                        <button className="px-4 py-2 bg-primary rounded flex items-center gap-2">
+                          <FaDownload />
+                          <a href={lastUploadUrl} download>
+                            Download
+                          </a>
+                        </button>
+                        <button
+                          onClick={handlePrint}
+                          className="px-4 py-2 bg-primary rounded flex items-center gap-2"
+                        >
+                          <FaPrint />
+                          Print
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -492,6 +510,7 @@ export const Travelling = () => {
       </>
     );
   };
+
   const renderDocumentCategory = (uploadArray, categoryName) => {
     const documents =
       uploadArray.length > 0 ? parseDocuments(uploadArray[0]) : [];
@@ -716,55 +735,7 @@ export const Travelling = () => {
           </p>
         )}
       </div>
-      {/* Popup */}
-      {popupVisible && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-md p-4 mb-4 border border-gray-200">
-            <button
-              onClick={() => setPopupVisible(false)}
-              className="absolute top-2 right-2"
-            >
-              <FaTimes size={20} />
-            </button>
-            {popupImage.endsWith(".pdf") ? (
-              <Worker
-                workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
-                file={popupImage}
-                onLoadSuccess={onDocumentLoadSuccess}
-              >
-                <Page pageNumber={pageNumber} />
-                <div className="text-center mt-2">
-                  <button
-                    onClick={() =>
-                      setPageNumber((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={pageNumber <= 1}
-                  >
-                    Previous
-                  </button>
-                  <span>
-                    {pageNumber} / {numPages}
-                  </span>
-                  <button
-                    onClick={() =>
-                      setPageNumber((prev) => Math.min(prev + 1, numPages))
-                    }
-                    disabled={pageNumber >= numPages}
-                  >
-                    Next
-                  </button>
-                </div>
-              </Worker>
-            ) : (
-              <img
-                src={popupImage}
-                alt="popup view"
-                className="w-full h-auto"
-              />
-            )}
-          </div>
-        </div>
-      )}
+
       {deletePopup && (
         <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
       )}

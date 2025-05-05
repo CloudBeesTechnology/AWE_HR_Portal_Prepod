@@ -25,9 +25,9 @@ export const UploadSBWfile = (
         allSheets &&
         allSheets.map((sheet) => {
           const data = sheet.data;
-         
+
           var headerSlicedData = data.slice(0, 1);
-   
+
           const hasNameAndDate = headerSlicedData.some((obj) =>
             ["NAME", "DATE"].every((key) => key in obj)
           );
@@ -102,38 +102,73 @@ export const UploadSBWfile = (
 
             return item;
           });
+        const forStringDate = async (inputData) => {
+          try {
+            const badgeDateMap = {};
 
-        const getCleanedDate = (obj) => {
-          const date = obj?.DATE?.trim() || "";
+            // Step 1: Assign missing DATEs based on BADGE
+            const updatedData = inputData?.reduce((acc, item) => {
+              const badge = item.BADGE?.trim();
 
-          return date.replace(/\(\w+\)/, "").trim();
-        };
+              if (item.DATE) {
+                badgeDateMap[badge] = item.DATE;
+              }
 
-        let dateValue = getCleanedDate(updatedDataArray[0]);
-        if (!dateValue) {
-          dateValue = getCleanedDate(updatedDataArray[1]);
-        }
+              if (item.IN && item.OUT && !item.DATE) {
+                const storedDate = badgeDateMap[badge];
+                if (storedDate) {
+                  item.DATE = storedDate;
+                }
+              }
 
-        function convertDateFormat(dateStr) {
-          const parts = dateStr.split("/");
+              acc.push(item);
+              return acc;
+            }, []);
 
-          if (parts.length !== 3) {
-            throw new Error("Invalid date format. Expected DD/MM/YYYY");
+            // Helper to remove weekday (e.g., 5/6/2025(tue) → 5/6/2025)
+            const getCleanedDate = (dateStr) => {
+              return dateStr?.replace(/\(\w+\)/, "")?.trim();
+            };
+
+            const convertToDMY = (inputDateStr) => {
+              const [month, day, year] = inputDateStr.split("/");
+
+              // Convert string to numbers to remove any leading zeros
+              const dayNum = parseInt(day, 10);
+              const monthNum = parseInt(month, 10);
+
+              return `${monthNum}/${dayNum}/${year} `;
+            };
+
+            // Step 2: Clean and format each DATE in updatedData
+            updatedData.forEach((obj) => {
+              if (obj.DATE && typeof obj.DATE === "string") {
+                const cleanedDate = getCleanedDate(obj.DATE);
+
+                try {
+                  obj.DATE = convertToDMY(cleanedDate);
+                } catch (error) {
+                  console.error("Date format error in:", cleanedDate);
+                }
+              }
+            });
+
+            return updatedData;
+          } catch (err) {
+            console.log("Error : ", err);
           }
+        };
+        const getDateFromPrevRow = forStringDate(updatedDataArray);
+        const finalData =
+          getDateFromPrevRow && getDateFromPrevRow.length > 0
+            ? getDateFromPrevRow
+            : updatedDataArray && updatedDataArray.length > 0
+            ? updatedDataArray
+            : [];
 
-          const [day, month, year] = parts;
-          return `${day}/${month}/${year}`;
-        }
-
-        const filteHighlightedData = updatedDataArray.filter(
+        const filteHighlightedData = finalData?.filter(
           (item) => item.IN && item.OUT
         );
-
-        const dateObject = new Date(dateValue).toLocaleDateString();
-        const formattedDate = convertDateFormat(dateObject);
-        filteHighlightedData.forEach((obj) => {
-          obj.DATE = formattedDate;
-        });
 
         setExcelData(filteHighlightedData);
         setLoading(false);
@@ -141,6 +176,7 @@ export const UploadSBWfile = (
 
         return theaderResult;
       } else {
+        
         return checkTrueOrFalse;
       }
     }

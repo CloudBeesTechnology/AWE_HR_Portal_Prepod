@@ -61,7 +61,7 @@ export const ListofCandi = () => {
       const matchedIVSS = matchedCandidates?.find(
         (ivssCandidate) => ivssCandidate.tempID === candidate.tempID
       );
-      const isInMatchedCandidates = matchedIVSS && matchedIVSS.status === "Candidate List";
+      const isInMatchedCandidates = matchedIVSS && matchedIVSS.status === "Candidate List" && candidate.status !== "Inactive";;
       return (
         (!tempIDsToExclude.includes(candidate.tempID) && candidate.status !== "Inactive") ||
         (isInMatchedCandidates)

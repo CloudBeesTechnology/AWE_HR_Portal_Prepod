@@ -2,55 +2,81 @@ import React from "react";
 
 const FamilyDetails = ({ familyDetails, mainRef }) => {
   let familyData = [];
-  console.log(familyDetails);
-  
 
   const parseFamilyDetails = (data) => {
     try {
-      // Log raw familyDetails data before any manipulation
-      // console.log("Raw familyDetails:", data);
+ 
+      if (Array.isArray(data)) return data;
+      
+      if (typeof data === 'object' && data !== null) return [data];
 
-      // Step 1: Remove backslashes
+      if (typeof data !== 'string') {
+        try {
+          data = JSON.stringify(data);
+        } catch (e) {
+          console.error("Could not stringify data:", data);
+          return [];
+        }
+      }
       let cleanedData = data.replace(/\\/g, "");
-      // console.log("Step 1: Remove backslashes:", cleanedData);
+      
+      try {
+        const directParse = JSON.parse(cleanedData);
+        return Array.isArray(directParse) ? directParse : [directParse];
+      } catch (e) {
+  
+      }
 
-      // Step 2: Replace single quotes with double quotes if any (JSON requires double quotes)
-      cleanedData = cleanedData.replace(/'/g, '"');
-      // console.log("Step 2: Replace single quotes with double quotes:", cleanedData);
-
-      // Step 3: Ensure keys are wrapped with double quotes if not already
-      cleanedData = cleanedData.replace(/([{,])(\s*)([a-zA-Z0-9_]+)(\s*):/g, '$1"$3":');
-      // console.log("Step 3: Ensure keys are wrapped with double quotes:", cleanedData);
-
-      // Step 4: Ensure values are quoted (e.g., for strings)
-      cleanedData = cleanedData.replace(/:([a-zA-Z0-9_/.\s]+)(?=\s|,|\})/g, ':"$1"');
-      // console.log("Step 4: Ensure values are quoted:", cleanedData);
-
-      // Step 5: Remove any surrounding quotes that could be around the whole string
-      if (cleanedData.startsWith('"') && cleanedData.endsWith('"')) {
+      if ((cleanedData.startsWith('"') && cleanedData.endsWith('"')) ||
+          (cleanedData.startsWith("'") && cleanedData.endsWith("'"))) {
         cleanedData = cleanedData.slice(1, -1);
       }
-      // console.log("Step 5: Remove surrounding quotes if any:", cleanedData);
 
-      // Step 6: Try parsing the cleaned string
-      const parsedData = JSON.parse(cleanedData);
-      // console.log("Step 6: Parsed data:", parsedData);
+      cleanedData = cleanedData.replace(/'/g, '"');
 
-      // Ensure the data is in array format
-      if (!Array.isArray(parsedData)) {
-        console.error("Parsed data is not an array:", parsedData);
+      cleanedData = cleanedData.replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)(\s*:)/g, '$1"$2"$3');
+
+      cleanedData = cleanedData.replace(/:\s*([^"{\[\d][^,}\]\s]*)([,\]}])/g, (match, p1, p2) => {
+        if (/^(true|false|null|\d+\.?\d*)$/.test(p1)) {
+          return `: ${p1}${p2}`;
+        }
+        return `: "${p1.trim()}"${p2}`;
+      });
+
+      cleanedData = cleanedData.replace(/,\s*([}\]])/g, '$1');
+
+      try {
+        const parsed = JSON.parse(cleanedData);
+        return Array.isArray(parsed) ? parsed : [parsed];
+      } catch (finalError) {
+        console.error("Final parsing attempt failed:", finalError);
+        console.error("Problematic data:", cleanedData);
         return [];
       }
-
-      return parsedData;
     } catch (error) {
-      console.error("Error parsing familyDetails:", error);
+      console.error("Unexpected error in parseFamilyDetails:", error);
       return [];
     }
   };
 
-  if (Array.isArray(familyDetails) && typeof familyDetails[0] === "string") {
-    familyData = parseFamilyDetails(familyDetails[0]);
+  if (familyDetails) {
+    if (Array.isArray(familyDetails)) {
+   
+      if (familyDetails.length > 0 && typeof familyDetails[0] === "string") {
+        familyData = parseFamilyDetails(familyDetails[0]);
+      } 
+
+      else if (familyDetails.length > 0 && typeof familyDetails[0] === "object") {
+        familyData = familyDetails;
+      }
+    } 
+ 
+    else if (typeof familyDetails === "string") {
+      familyData = parseFamilyDetails(familyDetails);
+    } 
+    else if (typeof familyDetails === "object" && familyDetails !== null) {
+      familyData = parseFamilyDetails(familyDetails);
+    }
   }
 
   return (

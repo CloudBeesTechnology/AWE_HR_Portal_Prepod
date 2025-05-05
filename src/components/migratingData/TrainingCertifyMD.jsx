@@ -1,5 +1,3 @@
-
-
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import * as XLSX from "xlsx";
@@ -12,7 +10,7 @@ export const TrainingCertifyMD = () => {
   const { TCData } = TCDataFun();
   const { TCDataFunUp } = TCDataUpdate();
 
-// console.log(trainingCertifi);
+  console.log(trainingCertifi);
 
   const excelDateToJSDate = (serial) => {
     const excelEpoch = new Date(Date.UTC(1900, 0, 1));
@@ -20,21 +18,26 @@ export const TrainingCertifyMD = () => {
     return new Date(excelEpoch.getTime() + daysOffset * 24 * 60 * 60 * 1000);
   };
 
-// Link 1:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus+Dev/TrainingCertifi.csv"
-// Link 2 Balance :https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus+Dev/TrainingCertificates+1.csv"
+  // Link 1:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingCertifi%C2%A0HO.csv"
+  // Link 2:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingCertifi+Single%C2%A0OME.csv"
+  // Link 3:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingCertifi+Double+BLNG+and%C2%A0E%26I.csv"
+  // Link 4:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingCertifi+BLNG+and+E%26I+Single+Prod.csv"
+  // Link 5:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingcertifi+OME+Set2.csv"
+  // Link 6:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingcertifi+OME+Set3.csv"
+  // Link 7:https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingcertifi+OME+Set1.csv"
 
   const fetchExcelFile = async () => {
     try {
       // Fetch the Excel file from the URL
       const response = await axios.get(
-        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/LeaveStatus+Dev/TrainingCertificates+1.csv",
+        "https://commonfiles.s3.ap-southeast-1.amazonaws.com/BulkDataFiles/Training+Data/trainingcertifi+OME+Set1.csv",
         {
           responseType: "arraybuffer", // Important to fetch as arraybuffer
         }
       );
       // Convert the response to an array buffer
       const data = new Uint8Array(response.data);
-    //   console.log(data);
+      //   console.log(data);
 
       // Parse the file using XLSX
       const workbook = XLSX.read(data, { type: "array" });
@@ -43,10 +46,8 @@ export const TrainingCertifyMD = () => {
 
       // Convert sheet data to JSON format
       const sheetData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-    
-      const dateKeys = [
-        "certifiExpiry","eCertifiDate","orgiCertifiDate"
-      ];
+
+      const dateKeys = ["certifiExpiry", "eCertifiDate", "orgiCertifiDate"];
       const transformedData = sheetData.slice(1).map((row) => {
         let result = {};
         sheetData[0].forEach((key, index) => {
@@ -61,6 +62,9 @@ export const TrainingCertifyMD = () => {
       });
       // console.log("All Data:", transformedData);
       for (const TCValue of transformedData) {
+        if (!TCValue.empID) {
+          continue;
+        }
         if (TCValue.empID) {
           TCValue.empID = String(TCValue.empID);
         }
@@ -71,17 +75,17 @@ export const TrainingCertifyMD = () => {
         );
 
         if (checkingBJLTable) {
-        //   console.log(TCValue, "update");
+          //   console.log(TCValue, "update");
           const TCDataUp = {
             ...TCValue,
             id: checkingBJLTable.id,
           };
-          console.log(TCDataUp, "UPDATE");
+          // console.log(TCDataUp, "UPDATE");
 
-        //   await TCDataFunUp({ TCDataUp });
+          await TCDataFunUp({ TCDataUp });
         } else {
-          console.log(TCValue, "create");
-        //   await TCData({ TCValue });
+          // console.log(TCValue, "create");
+          await TCData({ TCValue });
         }
       }
     } catch (error) {

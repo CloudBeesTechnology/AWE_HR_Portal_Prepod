@@ -3,7 +3,6 @@ import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { LuFilter } from "react-icons/lu";
 import { WorkpassForm } from "./WorkpassForm";
 import { SawpTable } from "./SawpTable";
-import { DateFormat } from "../../../utils/DateFormat";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { getUrl } from "@aws-amplify/storage";
 import { DoeTable } from "./DoeTable";
@@ -16,7 +15,6 @@ import { AirTKtTable } from "./AirTKtTable";
 import { NonLocalMobTable } from "./NonLocalMobTable";
 
 export const WorkpassTracking = () => {
-
   const [data, setData] = useState([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
@@ -29,9 +27,15 @@ export const WorkpassTracking = () => {
   const [candidateTypeDropdownOpen, setCandidateTypeDropdownOpen] =
     useState(false);
   const [urlValue, setURLValue] = useState("");
-  const { WPTrackings, empPDData, IVSSDetails } = useContext(DataSupply);
+  const { WPTrackings, empPDData, IVSSDetails, educDetailsData } = useContext(DataSupply);
 
   useEffect(() => {
+    // Create a map of education details for easy lookup
+    const educDetailsMap = educDetailsData.reduce((acc, item) => {
+      acc[item.tempID] = item;
+      return acc;
+    }, {});
+
     const empPDMap = empPDData.reduce((acc, item) => {
       acc[item.tempID] = item;
       return acc;
@@ -49,31 +53,30 @@ export const WorkpassTracking = () => {
     
     // Filter candidates where tempID is present in both empPDMap and IVSSMap
     const mergedInterviewData = Object.values(empPDMap)
-      .filter((candi) => IVSSMap[candi.tempID]) // Ensure tempID is in both empPDMap and IVSSMap
+      .filter((candi) => IVSSMap[candi.tempID]) 
       .map((candi) => {
         const IVSS = IVSSMap[candi.tempID] || {};
-        const WPTrack = WPTackingMap[candi.tempID] || null; // WPTrack may be null if not available
+        const WPTrack = WPTackingMap[candi.tempID] || null;
+        const educDetails = educDetailsMap[candi.tempID] || {}; 
     
         return {
           ...candi,
+          ...educDetails, 
           interviewDetails: IVSS,
-          WPTrackDetails: WPTrack, // WPTrackDetails is added only if available
+          WPTrackDetails: WPTrack, 
         };
       });
-    
     
     const flattenObject = mergedInterviewData.map((data) => {
       const result = { ...data };
 
-      // Flatten `interviewDetails`
       if (result.interviewDetails) {
         Object.entries(result.interviewDetails).forEach(([key, value]) => {
           result[`interviewDetails_${key}`] = value;
         });
-        delete result.interviewDetails; // Remove original nested object
+        delete result.interviewDetails; 
       }
 
-      // Flatten `WPTrackDetails`
       if (result.WPTrackDetails) {
         Object.entries(result.WPTrackDetails).forEach(([key, value]) => {
           result[`WPTrackDetails_${key}`] = value;
@@ -83,27 +86,18 @@ export const WorkpassTracking = () => {
 
       return result;
     });
-    // console.log(flattenObject, "FLAT");
+   
     if (flattenObject && flattenObject.length > 0) {
-      // console.log("flattenObject:", flattenObject);
-    
-      // Filter candidates based on approvalStatus
       const initialFiltered = flattenObject.filter((val) => {
-        // console.log("Checking item:", val); // Log the value being checked
-        // console.log("Status:", val?.interviewDetails_status); // Log the status
-    
         return val?.interviewDetails_status === "SAWP";
       });
     
-      // console.log("Filtered result:", initialFiltered);
-    
-      // Set the filtered data
       setFilteredData(initialFiltered);
       setData(flattenObject);
     } else {
       setData([]);
     }
-  }, [WPTrackings, empPDData, IVSSDetails]);
+  }, [WPTrackings, empPDData, IVSSDetails, educDetailsData]);
 
   const toggleFilterBox = (event) => {
     event?.stopPropagation();
@@ -122,10 +116,8 @@ export const WorkpassTracking = () => {
 
     if (!data) return;
 
-    // Apply the initial filter based on status
     let filtered = applyFiltersBasedOnStatus(selectedValue, data);
 
-    // Now apply the candidate type filters if any are selected
     if (selectedCandidateType.length > 0) {
       filtered = filtered.filter((candidate) => {
         return selectedCandidateType.some((opt) => {
@@ -162,6 +154,8 @@ export const WorkpassTracking = () => {
 
   const applyFiltersBasedOnStatus = (status, data) => {
     let filtered = [];
+    // console.log("Data", data);
+    
 
     switch (status) {
       case "SAWP":
@@ -216,175 +210,24 @@ export const WorkpassTracking = () => {
     return filtered;
   };
 
-  // const handleCandidateTypeSelect = (option) => {
-  //   let updatedOptions = [...selectedCandidateType];
-
-  //   // Disable SAWP and LPA based on selection
-  //   if (option === "SAWP" && !updatedOptions.includes("SAWP")) {
-  //     // Disable LPA if SAWP is selected
-  //     if (updatedOptions.includes("LPA")) {
-  //       updatedOptions = updatedOptions.filter((opt) => opt !== "LPA");
-  //     }
-  //     updatedOptions.push("SAWP");
-  //   } else if (option === "LPA" && !updatedOptions.includes("LPA")) {
-  //     // Disable SAWP if LPA is selected
-  //     if (updatedOptions.includes("SAWP")) {
-  //       updatedOptions = updatedOptions.filter((opt) => opt !== "SAWP");
-  //     }
-  //     updatedOptions.push("LPA");
-  //   } else if (option === "OnShore" || option === "OffShore") {
-  //     // If "OnShore" or "OffShore" is selected, allow only one of them
-  //     if (updatedOptions.includes("OnShore") && option === "OffShore") {
-  //       updatedOptions = updatedOptions.filter((opt) => opt !== "OnShore");
-  //     } else if (updatedOptions.includes("OffShore") && option === "OnShore") {
-  //       updatedOptions = updatedOptions.filter((opt) => opt !== "OffShore");
-  //     }
-  //     // Add the selected option
-  //     if (!updatedOptions.includes(option)) {
-  //       updatedOptions.push(option);
-  //     }
-  //   } else {
-  //     // Otherwise, toggle the option
-  //     if (updatedOptions.includes(option)) {
-  //       updatedOptions = updatedOptions.filter((opt) => opt !== option);
-  //     } else {
-  //       updatedOptions.push(option);
-  //     }
-  //   }
-
-  //   setSelectedCandidateType(updatedOptions);
-
-  //   // After updating candidate type selection, apply both candidate type and status filters together
-  //   let filtered = data;
-
-  //   // Apply the candidate type filter
-  //   if (updatedOptions.length > 0) {
-  //     filtered = data.filter((d) => {
-  //       return updatedOptions.some((opt) => {
-  //         if (opt === "SAWP") {
-  //           return d.contractType === "SAWP";
-  //         }
-  //         if (opt === "LPA") {
-  //           return (
-  //             d.contractType === "LPA" &&
-  //             (d.empType === "OnShore" || d.empType === "OffShore")
-  //           );
-  //         }
-  //         if (opt === "OnShore") {
-  //           return d.empType === "OnShore" && d.contractType !== "SAWP"; // Exclude SAWP for OnShore
-  //         }
-  //         if (opt === "OffShore") {
-  //           return d.empType === "OffShore" && d.contractType !== "SAWP"; // Exclude SAWP for OffShore
-  //         }
-  //         return true;
-  //       });
-  //     });
-  //   }
-
-  //   // Now apply the status filter (same as in handleFilterChange)
-  //   if (selectedFilters) {
-  //     filtered = applyFiltersBasedOnStatus(selectedFilters, filtered);
-  //   }
-
-  //   setFilteredData(filtered);
-  // };
-
-  // const handleCandidateTypeSelect = (option) => {
-  //   let updatedOptions = [...selectedCandidateType];
-  
-  //   // Handle SAWP and LPA conflicts
-  //   if (option === "SAWP" && !updatedOptions.includes("SAWP")) {
-  //     // If SAWP is selected, remove LPA
-  //     if (updatedOptions.includes("LPA")) {
-  //       updatedOptions = updatedOptions.filter((opt) => opt !== "LPA");
-  //     }
-  //     updatedOptions.push("SAWP");
-  //   } else if (option === "LPA" && !updatedOptions.includes("LPA")) {
-  //     // If LPA is selected, remove SAWP
-  //     if (updatedOptions.includes("SAWP")) {
-  //       updatedOptions = updatedOptions.filter((opt) => opt !== "SAWP");
-  //     }
-  //     updatedOptions.push("LPA");
-  //   } else if (option === "Onshore" || option === "Offshore") {
-  //     // If "OnShore" or "OffShore" is selected, ensure only one of them is selected
-  //     if (updatedOptions.includes("Onshore") && option === "Offshore") {
-  //       updatedOptions = updatedOptions.filter((opt) => opt !== "Onshore");
-  //     } else if (updatedOptions.includes("Offshore") && option === "Onshore") {
-  //       updatedOptions = updatedOptions.filter((opt) => opt !== "Offshore");
-  //     }
-  //     // Add the selected option if it's not already included
-  //     if (!updatedOptions.includes(option)) {
-  //       updatedOptions.push(option);
-  //     }
-  //   } else {
-  //     // Otherwise, toggle the option
-  //     if (updatedOptions.includes(option)) {
-  //       updatedOptions = updatedOptions.filter((opt) => opt !== option);
-  //     } else {
-  //       updatedOptions.push(option);
-  //     }
-  //   }
-  
-  //   // Update state with the selected candidate types
-  //   setSelectedCandidateType(updatedOptions);
-  
-  //   // Now apply both candidate type and status filters together
-  //   // Apply candidate type filter first
-  //   let filtered = data;
-  
-  //   if (updatedOptions.length > 0) {
-  //     filtered = data.filter((d) => {
-  //       return updatedOptions.some((opt) => {
-  //         if (opt === "SAWP") {
-  //           return d.contractType === "SAWP";
-  //         }
-  //         if (opt === "LPA") {
-  //           return (
-  //             d.contractType === "LPA" &&
-  //             (d.empType === "OnShore" || d.empType === "OffShore")
-  //           );
-  //         }
-  //         if (opt === "OnShore") {
-  //           return d.empType === "OnShore" && d.contractType !== "SAWP"; // Exclude SAWP for OnShore
-  //         }
-  //         if (opt === "OffShore") {
-  //           return d.empType === "OffShore" && d.contractType !== "SAWP"; // Exclude SAWP for OffShore
-  //         }
-  //         return true;
-  //       });
-  //     });
-  //   }
-  
-  //   // Now apply the status filter (same as in handleFilterChange)
-  //   if (selectedFilters) {
-  //     filtered = applyFiltersBasedOnStatus(selectedFilters, filtered);
-  //   }
-  
-  //   // Update the filtered data state
-  //   setFilteredData(filtered);
-  // };
 
   const handleCandidateTypeSelect = (option) => {
     let updatedOptions = [...selectedCandidateType];
   
-    console.log("Initial Selected Candidate Types:", selectedCandidateType);
-  
-    // Handle SAWP and LPA conflicts
     if (option === "SAWP" && !updatedOptions.includes("SAWP")) {
-      console.log("Selecting SAWP, removing LPA if it exists");
+      
       if (updatedOptions.includes("LPA")) {
         updatedOptions = updatedOptions.filter((opt) => opt !== "LPA");
       }
       updatedOptions.push("SAWP");
     } else if (option === "LPA" && !updatedOptions.includes("LPA")) {
-      console.log("Selecting LPA, removing SAWP if it exists");
+      
       if (updatedOptions.includes("SAWP")) {
         updatedOptions = updatedOptions.filter((opt) => opt !== "SAWP");
       }
       updatedOptions.push("LPA");
     } else if (option === "OnShore" || option === "OffShore") {
-      console.log("Selecting OnShore or OffShore:", option);
-      if (updatedOptions.includes("OnShore") && option === "OffShore") {
+         if (updatedOptions.includes("OnShore") && option === "OffShore") {
         updatedOptions = updatedOptions.filter((opt) => opt !== "OnShore");
       } else if (updatedOptions.includes("OffShore") && option === "OnShore") {
         updatedOptions = updatedOptions.filter((opt) => opt !== "OffShore");
@@ -393,7 +236,7 @@ export const WorkpassTracking = () => {
         updatedOptions.push(option);
       }
     } else {
-      console.log("Toggling option:", option);
+      
       if (updatedOptions.includes(option)) {
         updatedOptions = updatedOptions.filter((opt) => opt !== option);
       } else {
@@ -401,52 +244,50 @@ export const WorkpassTracking = () => {
       }
     }
   
-    console.log("Updated Selected Candidate Types:", updatedOptions);
-  
     setSelectedCandidateType(updatedOptions);
   
     let filtered = data;
-    console.log("Raw Data:", data);
+  
   
     if (updatedOptions.length > 0) {
-      console.log("Applying Candidate Type Filter...");
+   
       filtered = data.filter((d) => {
         return updatedOptions.some((opt) => {
           if (opt === "SAWP") {
-            console.log("Filtering for SAWP:", d);
+          
             return d.contractType === "SAWP";
           }
           if (opt === "LPA") {
-            console.log("Filtering for LPA:", d);
+           
             return (
               d.contractType === "LPA" &&
               (d.empType === "Onshore" || d.empType === "Offshore") // Ensure empType is checked as Onshore/Offshore
             );
           }
           if (opt === "OnShore") {
-            console.log("Filtering for OnShore:", d);
+           
             // Exclude SAWP when filtering OnShore
             return d.empType === "Onshore" && d.contractType !== "SAWP"; 
           }
           if (opt === "OffShore") {
-            console.log("Filtering for OffShore:", d);
+           
             // Exclude SAWP when filtering OffShore
             return d.empType === "Offshore" && d.contractType !== "SAWP"; 
           }
-          console.log("No filter applied for option:", opt);
+        
           return true; 
         });
       });
     }
   
-    console.log("Filtered Data after applying Candidate Type Filter:", filtered);
+    
   
     if (selectedFilters) {
-      console.log("Applying Status Filter:", selectedFilters);
+     
       filtered = applyFiltersBasedOnStatus(selectedFilters, filtered);
     }
   
-    console.log("Final Filtered Data after applying Status Filter:", filtered);
+    
   
     setFilteredData(filtered);
   };
@@ -703,41 +544,8 @@ export const WorkpassTracking = () => {
                 <span>{workpasstracking}</span>
               </label>
             ))}
-
-            {/* Reset Button */}
-            {/* <button 
-              className="mt-4 px-1 py-2 border-2 border-yellow rounded-lg shadow-lg hover:bg-[#faf362]"
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedFilters(''); // Clear the selected filter
-                setFilteredData(data);  // Reset to the original unfiltered data
-                setFilterBoxTitle('Check status'); // Reset filter box title
-                setIsFilterBoxOpen(false); // Close the filter box
-              }}
-            >
-              Reset
-            </button>  */}
           </div>
         )}
-
-        {/* {loading && !error ? (
-          filteredData.length > 0 ? (
-            <SawpTable
-              data={filteredData}
-              formatDate={DateFormat}
-              fileUpload={fileUpload}
-              urlValue={urlValue}
-            />
-          ) : (
-            <div className="text-center text-grey py-10">No data found</div>
-          )
-        ) : (
-          <div>
-            {loading
-              ? "Loading..."
-              : "Error fetching data. Check your Internet connection."}
-          </div>
-        )} */}
 
         {renderComponent()}
 

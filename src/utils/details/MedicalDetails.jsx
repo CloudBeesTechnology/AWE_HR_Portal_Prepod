@@ -1,11 +1,9 @@
-// export default MedicalDetails;
-import React, { useState, useRef } from "react";
-import { FaTimes, FaPrint, FaDownload } from "react-icons/fa"; // Icons for close, print, and download
+import React, { useState } from "react";
+import { FaTimes, FaPrint, FaDownload } from "react-icons/fa";
 import { getUrl } from "@aws-amplify/storage";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { pdfjs } from "react-pdf";
-// import { useReactToPrint } from "react-to-print";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
@@ -23,53 +21,39 @@ const MedicalDetails = ({
   formatDate,
   mainRef,
 }) => {
-  const [isPdfOpen, setIsPdfOpen] = useState(false);
-  const [viewingDocument, setViewingDocument] = useState(null); // Track which document is being viewed
-  const [pageNumber, setPageNumber] = useState(1);
-  const [numPages, setNumPages] = useState(1);
-  const [lastUploadUrl, setPPLastUP] = useState(""); // State to store the last uploaded file's URL
-  const [loading, setLoading] = useState(false);
-  const medicalRef = useRef();
+
+  const [viewingDocument, setViewingDocument] = useState(null);
+  const [lastUploadUrl, setPPLastUP] = useState("");
 
   // Helper function to fetch the cloud URL
   const linkToStorageFile = async (pathUrl) => {
     try {
       const result = await getUrl({ path: pathUrl });
-      //  console.log("File URL:", result.url.href);  Use .href to extract the URL as a string
-      setPPLastUP(result.url.href); // Store the URL as a string
-      setViewingDocument(pathUrl); // Update the state to show the selected document
-      setLoading(false);
+      setPPLastUP(result.url.href);
+      setViewingDocument(pathUrl);
     } catch (error) {
       console.error("Error fetching the file URL:", error);
-      setLoading(false);
     }
   };
 
   // Function to handle closing the viewer
   const handleCloseViewer = () => {
-    setIsPdfOpen(false);
     setViewingDocument(null);
   };
 
-  // Function to parse the uploaded document  r.}Y{44pFik2
   const parseDocuments = (docData) => {
     try {
-      // Check if docData is already an object or array
       if (typeof docData === "string") {
-        docData = JSON.parse(docData); // Parse only if it's a string
+        docData = JSON.parse(docData);
       }
-
-      // Proceed if docData is an array
       if (Array.isArray(docData)) {
         return docData.map((doc) => {
           if (doc.upload) {
-            doc.fileName = doc.upload.split("/").pop(); // Extract file name from path
+            doc.fileName = doc.upload.split("/").pop();
           }
           return doc;
         });
       }
-
-      // Return empty array if docData is not an array
       return [];
     } catch (error) {
       console.error("Error parsing document data:", error);
@@ -79,14 +63,11 @@ const MedicalDetails = ({
 
   let dependData = [];
 
-  // Check if dependPass is an array and not empty
   if (Array.isArray(dependPass) && dependPass.length > 0) {
-    // Check if the data at dependPass[0] is a stringified JSON array
     if (typeof dependPass[0] === "string") {
       try {
-        // Parse the string to remove escape characters
         const parsedString = JSON.parse(dependPass[0]);
-        // Now parse the resulting string as JSON
+
         dependData = JSON.parse(parsedString);
       } catch (error) {
         console.error("Error parsing dependPass:", error);
@@ -100,40 +81,14 @@ const MedicalDetails = ({
     return <p>There was an error processing the dependent data.</p>;
   }
 
-  // Parse the document data for uploads
   const parsedFitness = parseDocuments(uploadFitness);
   const parsedBwn = parseDocuments(uploadBwn);
   const parsedRegis = parseDocuments(uploadRegis);
-
-  const onPageChange = (newPageNumber) => {
-    if (newPageNumber >= 1 && newPageNumber <= numPages) {
-      setPageNumber(newPageNumber);
-    }
-  };
-
-  const onDocumentLoadSuccess = ({ numPages }) => {
-    setPageNumber(1); // Start from page 1
-  };
 
   const closeModal = () => {
     setViewingDocument(null);
   };
 
-  // const handlePrint = useReactToPrint({
-  //   content: () => medicalRef.current,
-  //   onBeforePrint: () => console.log("Preparing to print PDF..."),
-  //   onAfterPrint: () => console.log("Print complete"),
-  //   pageStyle: `
-  //       @page {    
-  //         height:  714px;
-  //         padding: 22px, 0px, 22px, 0px;    
-  //       }
-  //     `,
-  // });
-
-  // console.log(medicalInfo);
-
-  // Function to render documents
   const renderDocumentsUnderCategory = (documents, category) => {
     return (
       <>
@@ -168,7 +123,7 @@ const MedicalDetails = ({
 
                     <div className="absolute top-2 right-2">
                       <button
-                        onClick={closeModal} // Close the modal
+                        onClick={closeModal}
                         className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
                       >
                         <FaTimes />
@@ -268,76 +223,75 @@ const MedicalDetails = ({
     );
   };
 
-   const  renderPersonalDetails = (details) => {
-      const capitalizeWords = (str) => {
-        if (!str || str === "N/A") {
-          return "N/A"; // Return "N/A" for null, undefined, or "N/A"
-        }
-    
-        return str
-          .split(' ') // Split by space if it's multi-word
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-          .join(' '); // Rejoin the words
-      };
-    
-      return (
-        <div className="grid grid-cols-3 gap-y-4 items-center font-semibold text-sm">
-          {Object.entries(medicalInfo).map(([key, value], index) => (
-            <React.Fragment key={index}>
-              <span className="text-dark_grey">{key}</span>
-              <span className="text-center text-gray-700">:</span>
-              <span className="text-dark_grey">
-                {
-                  Array.isArray(value)
-                    ? value.length > 0 // Check if array is not empty
-                      ? value
-                          .map((v, idx, arr) => {
-                            // Replace null, undefined, or empty string with "N/A"
-                            if (v === null || v === undefined || v === '') {
-                              return "N/A"; // Replace with "N/A"
-                            }
-                            // Remove consecutive duplicates, case-insensitive
-                            return v.toLowerCase() === arr[idx - 1]?.toLowerCase() ? null : v;
-                          })
-                          .filter((v, idx, arr) => v !== null) // Remove null values (duplicates and N/A's)
-                          .reduce((acc, item) => {
-                            // Consolidate consecutive "N/A"s into a single one
-                            if (item === "N/A" && acc[acc.length - 1] !== "N/A") {
-                              acc.push("N/A");
-                            } else if (item !== "N/A") {
-                              acc.push(item);
-                            }
-                            return acc;
-                          }, [])
-                          .reverse() // Reverse the order to move the latest value to the front
-                          .map((item, idx, arr) => {
-                            // Ensure the latest value is first
-                            return (
-                              <span key={idx}>
-                                <span
-                                   className={`${
-                                    arr.length > 1 && idx === 0
-                                      ? "rounded-md font-black italic"
-                                      : "" // Only highlight the latest value if there are multiple values lo
-                                  }`}
-                                >
-                                  {capitalizeWords(item)} {/* Capitalize the words */}
-                                </span>
-                                {idx < arr.length - 1 && <span>,&nbsp;</span>} {/* Add a comma except for the last item */}
-                              </span>
-                            );
-                          })
-                      : "N/A" // Show "N/A" if the array is empty or contains only null/empty values
-                    : value === null || value === undefined || value === ''
-                    ? "N/A" // Show "N/A" if the value is null, undefined, or empty string
-                    : capitalizeWords(value) // Capitalize the value if not an array
-                }
-              </span>
-            </React.Fragment>
-          ))}
-        </div>
-      );
+  const renderPersonalDetails = (details) => {
+    const capitalizeWords = (str) => {
+      if (typeof str !== "string" || str === "N/A") {
+        return "N/A";
+      }
+
+      return str
+        .split(" ")
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join(" ");
     };
+
+    return (
+      <div className="grid grid-cols-3 gap-y-4 items-center font-semibold text-sm">
+        {Object.entries(medicalInfo).map(([key, value], index) => (
+          <React.Fragment key={index}>
+            <span className="text-dark_grey">{key}</span>
+            <span className="text-center text-gray-700">:</span>
+            <span className="text-dark_grey">
+              {Array.isArray(value)
+                ? value.length > 0
+                  ? value
+                      .map((v, idx, arr) => {
+                        if (v === null || v === undefined || v === "") {
+                          return "N/A";
+                        }
+
+                        return v.toLowerCase() === arr[idx - 1]?.toLowerCase()
+                          ? null
+                          : v;
+                      })
+                      .filter((v, idx, arr) => v !== null)
+                      .reduce((acc, item) => {
+                        if (item === "N/A" && acc[acc.length - 1] !== "N/A") {
+                          acc.push("N/A");
+                        } else if (item !== "N/A") {
+                          acc.push(item);
+                        }
+                        return acc;
+                      }, [])
+                      .reverse()
+                      .map((item, idx, arr) => {
+                        return (
+                          <span key={idx}>
+                            <span
+                              className={`${
+                                arr.length > 1 && idx === 0
+                                  ? "rounded-md font-black italic"
+                                  : ""
+                              }`}
+                            >
+                              {capitalizeWords(item)}
+                            </span>
+                            {idx < arr.length - 1 && <span>,&nbsp;</span>}
+                          </span>
+                        );
+                      })
+                  : "N/A"
+                : value === null || value === undefined || value === ""
+                ? "N/A"
+                : capitalizeWords(value)}
+            </span>
+          </React.Fragment>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <section ref={mainRef} className="py-8 bg-gray-50 rounded-lg">
