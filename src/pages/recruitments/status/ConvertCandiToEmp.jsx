@@ -43,6 +43,10 @@ export const CandiToEmp = () => {
         position: [storedData.position],
       };
 
+      const loiFile = storedData.mobilizationDetails_loiFile;
+      const paafFile = storedData.mobilizationDetails_paafFile;
+      const cvecFile = storedData.mobilizationDetails_cvecFile;
+      
       const IDDetailsTable = {
         empID: storedData.empID,
         bwnIcColour: storedData.bwnIcColour,
@@ -61,6 +65,29 @@ export const CandiToEmp = () => {
         ppUpload: storedData.uploadPp,
         race: storedData.race,
         religion: storedData.religion,
+      
+        loiUpload: loiFile
+          ? [
+              JSON.stringify([
+                {
+                  date: new Date().toISOString().split("T")[0],
+                  upload: loiFile,
+                },
+              ]),
+            ]
+          : [],
+      
+        paafCvevUpload:
+          cvecFile || paafFile
+            ? [
+                JSON.stringify([
+                  {
+                    date: new Date().toISOString().split("T")[0],
+                    upload: cvecFile || paafFile,
+                  },
+                ]),
+              ]
+            : [],
       };
 
       const CandiToEmpTable = {
