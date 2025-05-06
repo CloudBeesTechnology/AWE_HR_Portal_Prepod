@@ -481,54 +481,62 @@ const PersonalDetailsView = ({
       `,
   });
 
-  const parseEducationDetails = (eduString) => {
-    if (!eduString || eduString === "null" || eduString === "N/A") {
-      return null; // Indicates non-JSON content
-    }
+ const parseEducationDetails = (eduString) => {
+  if (eduString === null || eduString === undefined) return null;
 
-    // Check if it's a simple string (not JSON)
-    if (
-      !eduString.trim().startsWith("[") &&
-      !eduString.trim().startsWith("{")
-    ) {
-      return null;
-    }
+  // Coerce to string if it's not already
+  if (typeof eduString !== 'string') {
+    eduString = String(eduString);
+  }
 
+  if (!eduString || eduString === "null" || eduString === "N/A") {
+    return null; // Indicates non-JSON content
+  }
+
+  // Check if it's a simple string (not JSON)
+  if (
+    !eduString.trim().startsWith("[") &&
+    !eduString.trim().startsWith("{")
+  ) {
+    return null;
+  }
+
+  try {
+    // First try to parse directly
+    let parsed;
     try {
-      // First try to parse directly
-      let parsed;
-      try {
-        parsed = JSON.parse(eduString);
-      } catch (firstError) {
-        // If direct parse fails, try cleaning the string
-        const cleanString = eduString
-          .replace(/^\[+/, "[") // Remove extra opening brackets
-          .replace(/\]+$/, "]") // Remove extra closing brackets
-          .replace(/\\"/g, '"') // Unescape quotes
-          .trim();
+      parsed = JSON.parse(eduString);
+    } catch (firstError) {
+      // If direct parse fails, try cleaning the string
+      const cleanString = eduString
+        .replace(/^\[+/, "[") // Remove extra opening brackets
+        .replace(/\]+$/, "]") // Remove extra closing brackets
+        .replace(/\\"/g, '"') // Unescape quotes
+        .trim();
 
-        parsed = JSON.parse(cleanString);
-      }
-
-      // Handle nested array case ([[{...}]])
-      if (
-        Array.isArray(parsed) &&
-        parsed.length > 0 &&
-        Array.isArray(parsed[0])
-      ) {
-        return parsed[0];
-      }
-
-      // Handle single array case ([{...}])
-      if (Array.isArray(parsed)) return parsed;
-
-      // Handle single object case ({...})
-      return [parsed];
-    } catch (e) {
-      console.error("Error parsing education details:", e);
-      return null;
+      parsed = JSON.parse(cleanString);
     }
-  };
+
+    // Handle nested array case ([[{...}]])
+    if (
+      Array.isArray(parsed) &&
+      parsed.length > 0 &&
+      Array.isArray(parsed[0])
+    ) {
+      return parsed[0];
+    }
+
+    // Handle single array case ([{...}])
+    if (Array.isArray(parsed)) return parsed;
+
+    // Handle single object case ({...})
+    return [parsed];
+  } catch (e) {
+    console.error("Error parsing education details:", e);
+    return null;
+  }
+};
+
   // Function to render documents under a single category
   const renderDocumentsUnderCategory = (documents) => {
     return (
