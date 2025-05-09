@@ -23,7 +23,7 @@ export const CandiToEmp = () => {
       const empPersonalInfoTable = {
         empID: storedData.empID,
         age: storedData.age,
-        agent: [storedData.agent],
+        agent: [storedData.agentname],
         alternateNo: storedData.alternateNo,
         chinese: storedData.chinese,
         cob: storedData.cob,
@@ -36,6 +36,7 @@ export const CandiToEmp = () => {
         familyDetails: storedData.familyDetails,
         gender: storedData.gender,
         lang: storedData.lang,
+        otherLang: storedData.otherLang,
         marital: storedData.marital,
         name: storedData.name,
         profilePhoto: storedData.profilePhoto,
@@ -49,6 +50,7 @@ export const CandiToEmp = () => {
         bwnIcExpiry: [storedData.bwnIcExpiry],
         bwnIcNo: storedData.bwnIcNo,
         cvCertifyUpload: storedData.uploadResume,
+        qcCertifyUpload: storedData.uploadCertificate,
         driveLic: storedData.driveLic,
         nationality: storedData.nationality,
         otherNation: storedData.otherNation,
@@ -59,8 +61,15 @@ export const CandiToEmp = () => {
         ppIssued: [storedData.ppIssued],
         ppNo: [storedData.ppNo],
         ppUpload: storedData.uploadPp,
+        bwnUpload: storedData.uploadIc,
         race: storedData.race,
         religion: storedData.religion,
+        loiUpload: storedData.loiFile || storedData.mobilizationDetails_loiFile,
+        paafCvevUpload:
+          storedData.cvecFile ||
+          storedData.paafFile ||
+          storedData.mobilizationDetails_cvecFile ||
+          storedData.mobilizationDetails_paafFile,
       };
 
       const CandiToEmpTable = {
@@ -130,7 +139,7 @@ export const CandiToEmp = () => {
         nlmsRefNo: [storedData.WPTrackDetails_ldreferenceno],
         nlmsEmpValid: [storedData.WPTrackDetails_nlmsexpirydate],
         nlmsEmpUpload: storedData.WPTrackDetails_nlmsfile,
-      }; 
+      };
 
       const BJLDetails = {
         empID: storedData.empID,
@@ -153,20 +162,10 @@ export const CandiToEmp = () => {
 
       const PassportValid = {
         empID: storedData.empID,
-        // ppLocation: [String],
-        arrivStampUpload: storedData.WPTrackDetails_airticketfile,
         immigEmpUpload: storedData.WPTrackDetails_visaFile,
-        // reEntryUpload: [AWSJSON],
-        // arrivStampExp: [String],
         immigRefNo: [storedData.WPTrackDetails_immbdno],
         ppSubmit: [storedData.WPTrackDetails_docsubmitdate],
-        // empPassExp: [String],
-        // empPassStatus: [String],
-        // airTktStatus: [String],
-        // reEntryVisa: [String],
         immigApproval: [storedData.WPTrackDetails_visaapprovedate],
-        // reEntryVisaExp: [String],
-        // remarkImmig: [String],
       };
 
       try {
@@ -229,6 +228,7 @@ export const CandiToEmp = () => {
             variables: {
               input: {
                 id: storedData.interviewDetails_id,
+                empID: storedData.empID,
                 status: "Employee",
               },
             },

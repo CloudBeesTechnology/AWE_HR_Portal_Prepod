@@ -403,7 +403,7 @@ export const ApplicantDetails = () => {
               label: "Other Religion",
               name: "otherReligion",
               type: "text",
-              disabled: watch("religion")?.toLowerCase() !== "other",
+              disabled: watch("religion")?.toLowerCase() !== "others",
             },
           ].map((field, index) => (
             <div key={index}>

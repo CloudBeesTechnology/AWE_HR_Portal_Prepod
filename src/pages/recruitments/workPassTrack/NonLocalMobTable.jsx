@@ -117,7 +117,7 @@ export const NonLocalMobTable = ({
     const numberPart = numberMatch ? parseInt(numberMatch[0], 10) : 0;
     const nextNumber = numberPart + 1;
     const nextTempID = `${prefix}${nextNumber}`;
-    console.log("Next TempID", nextTempID);
+    // console.log("Next TempID", nextTempID);
 
     return nextTempID;
   };

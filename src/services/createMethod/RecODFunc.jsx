@@ -22,7 +22,7 @@ export const RecODFunc = () => {
       contractType, chinese, dob, driveLic, email, empType, eduDetails, familyDetails, gender,
       lang, otherLang, marital, name, nationality, otherNation, otherRace, otherReligion, ppNo, ppIssued,
       ppExpiry, ppDestinate, presentAddress, permanentAddress, profilePhoto, position, race,
-      religion, workExperience,uploadResume,uploadCertificate,uploadPp,status
+      religion, workExperience,uploadResume,uploadCertificate,uploadPp, status
     } = reqValue;
   
     const totalData = {

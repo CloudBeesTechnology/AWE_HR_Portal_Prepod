@@ -38,6 +38,7 @@ import {
   listGroupHandS,
   listTravelIns,
   listPersonalAccidents,
+  listCandIToEMPS,
 } from "../graphql/queries";
 
 export const DataSupply = createContext();
@@ -83,6 +84,7 @@ const DataStoredContext = ({ children }) => {
     groupHSData: [],
     travelInsData: [],
     personalAcciData: [],
+    candyToEmp: [],
   });
 
   useEffect(() => {
@@ -125,7 +127,8 @@ const DataStoredContext = ({ children }) => {
           { query: listLocalMobilizations, key: "localMobiliz" },
           { query: listGroupHandS, key: "groupHSData" },
           { query: listTravelIns, key: "travelInsData" }, 
-          { query: listPersonalAccidents, key: "personalAcciData" }
+          { query: listPersonalAccidents, key: "personalAcciData" },
+          { query: listCandIToEMPS, key: "candyToEmp"}
         ];
         const responses = await Promise.all(
           queries.map(async ({ query, key }) => {
@@ -139,78 +142,37 @@ const DataStoredContext = ({ children }) => {
                   variables: { limit: 100, nextToken },
                 })
                 .catch((error) => {
-                  // console.error(`GraphQL Error in ${key}:`, error);
-                  return { data: { items: [] } }; // Return empty array if query fails
+                
+                  return { data: { items: [] } }; 
                 });
 
-              // Extract the fetched items
               const items =
                 response?.data?.[Object.keys(response.data)[0]]?.items || [];
               allItems = [...allItems, ...items];
 
-              // Update nextToken for next iteration
+          
               nextToken =
                 response?.data?.[Object.keys(response.data)[0]]?.nextToken;
-            } while (nextToken); // Continue fetching until nextToken is null
+            } while (nextToken);
 
             return { key, items: allItems };
           })
         );
-        // console.log(responses);
-
+   
         const newData = responses.reduce((acc, { key, items }) => {
           return { ...acc, [key]: items };
         }, {});
 
         setDataState((prevState) => ({ ...prevState, ...newData }));
-        // const limit = 20000;
-        // const responses = await Promise.all(
-        //   queries.map(({ query }) =>
-        //     client.graphql({ query, variables: { limit } }).catch((error) => {
-        //       console.error("GraphQL Error:", error);
-        //       return { data: { items: [] } }; // fallback for failed query
-        //     })
-        //   )
-        // );
 
-        // const newData = queries.reduce((acc, { key }, index) => {
-        //   const items =
-        //     responses[index]?.data?.[Object.keys(responses[index].data)[0]]
-        //       ?.items || [];
-        //   return { ...acc, [key]: items };
-        // }, {});
-        // // console.log(newData);
-
-        // setDataState((prevState) => ({ ...prevState, ...newData }));
       } catch (error) {
         console.error("Data Fetch Error:", error);
       }
     };
 
-    // const employeeDatas=async()=>{
-    //   do {
-    //     const response = await client.graphql({
-    //       query: listEmpPersonalInfos,
-    //       variables: {
-    //         limit: 100, // Fetch in batches (max AppSync limit is usually 100)
-    //         nextToken: nextToken,
-    //       },
-    //     });
-
-    //     // Append fetched employees
-    //     allEmployees = [...allEmployees, ...response.data.listEmpPersonalInfos.items];
-
-    //     // Update nextToken for next iteration
-    //     nextToken = response.data.listEmpPersonalInfos.nextToken;
-    //   } while (nextToken); // Continue until nextToken is null
-
-    //   console.log(allEmployees, "All Employees Data");
-    //   return allEmployees;
-    // }
-    // employeeDatas()
     fetchData();
   }, []);
-  // console.log(dataState);
+
 
   return (
     <DataSupply.Provider value={dataState}>{children}</DataSupply.Provider>

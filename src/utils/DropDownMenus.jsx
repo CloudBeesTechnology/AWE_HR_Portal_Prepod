@@ -13,7 +13,7 @@ export const LanguageDD = [
 
 export const RaceDD = [
   { value: "Australian", label: "Australian" },
-  { value: "Bangladesi", label: "Bangladesi" },
+  { value: "Bangladeshi", label: "Bangladeshi" },
   { value: "Bidayuh", label: "Bidayuh" },
   { value: "British", label: "British" },
   { value: "Bisaya", label: "Bisaya" },
@@ -54,7 +54,7 @@ export const ReligionDD = [
   { value: "Buddhist", label: "Buddhist" },
   { value: "Free Thinker", label: "Free Thinker" },
   { value: "Not Mentioned", label: "Not Mentioned" },
-  { value: "Other", label: "Other" },
+  { value: "Others", label: "Others" },
 ];
 
 export const NationalCatDD = [
@@ -81,16 +81,6 @@ export const NationalityDD = [
   { value: "Filipino", label: "Filipino" },
   { value: "Other", label: "Other" },
 ];
-
-// export const ContractTypeDD = [
-//   { value: "Local", label: "LOCAL" },
-//   { value: "LPA", label: "LPA" },
-//   { value: "SAWP", label: "SAWP" },
-// ];
-// export const EmpTypeDD = [
-//   { value: "Onshore", label: "OnShore" },
-//   { value: "Offshore", label: "OffShore" },
-// ];
 
 export const ContractTypeDD = [
   { value: "Local", label: "Local" },
@@ -163,7 +153,8 @@ export const uploadFields = [
   { label: "Brunei IC Loc/Non-Loc", icon: <GoUpload />, title: "bwnUpload" },
   { label: "Malaysia IC", icon: <GoUpload />, title: "myIcUpload" },
   { label: "Passport Copy", icon: <GoUpload />, title: "ppUpload" },
-  { label: "CV & Certificates", icon: <GoUpload />, title: "cvCertifyUpload" },
+  { label: "CV", icon: <GoUpload />, title: "cvCertifyUpload" },
+  { label: "Certificates", icon: <GoUpload />, title: "qcCertifyUpload" },
   { label: "Application Form", icon: <GoUpload />, title: "applicationUpload" },
   { label: "LOI", icon: <GoUpload />, title: "loiUpload" },
   { label: "PAAF/CVEV Approval", icon: <GoUpload />, title: "paafCvevUpload" },
@@ -201,49 +192,6 @@ export const DepartmentDD = [
   { value: "Purchasing", label: "Purchasing" },
   { value: "Other", label: "Other" },
 ];
-
-// export const WorkPermitDD = [
-//   { value: "Foreign Worker License (LPA)", label: "Foreign Worker License (LPA)" },
-//   { value: "Foreign Worker License (SAWP)", label: "Foreign Worker License (SAWP)" },
-//   { value: "Foreign Worker License Additional (LPA)", label: "Foreign Worker License Additional (LPA)" },
-//   { value: "Foreign Worker License Additional (SAWP)", label: "Foreign Worker License Additional (SAWP)" },
-//   { value: "Foreign Worker License Renewal (LPA)", label: "Foreign Worker License Renewal (LPA)" },
-//   { value: "Foreign Worker License Renewal (SAWP)", label: "Foreign Worker License Renewal (SAWP)" },
-//   { value: "Foreign Worker License Change Salary/Job Title (LPA)", label: "Foreign Worker License Change Salary/Job Title (LPA)" },
-//   { value: "Foreign Worker License Cancellation (LPA)", label: "Foreign Worker License Cancellation (LPA)" },
-//   { value: "Foreign Worker License Cancellation (SAWP)", label: "Foreign Worker License Cancellation (SAWP)" },
-//   { value: "Foreign Worker License Cancellation SAWP To LPA", label: "Foreign Worker License Cancellation SAWP To LPA" },
-//   { value: "Foreign Worker License Transfer Of Contract (LPA)", label: "Foreign Worker License Transfer Of Contract (LPA)" }
-// ];
-
-// export const JobCatDD = [
-//   { value: "", label: "Select Category" },
-//   { value: "Blaster/Painter", label: "Blaster/Painter" },
-//   { value: "Clerical", label: "Clerical" },
-//   { value: "Coordinator", label: "Coordinator" },
-//   { value: "Director", label: "Director" },
-//   { value: "Driver", label: "Driver" },
-//   { value: "Driver/Operator", label: "Driver/Operator" },
-//   { value: "Electrician", label: "Electrician" },
-//   { value: "Engineer", label: "Engineer" },
-//   { value: "Fitter", label: "Fitter" },
-//   { value: "Helper/Store Assistant", label: "Helper/Store Assistant" },
-//   { value: "Inspector", label: "Inspector" },
-//   { value: "Insulator", label: "Insulator" },
-//   { value: "Leadman", label: "Leadman" },
-//   { value: "Machinist", label: "Machinist" },
-//   { value: "Manager", label: "Manager" },
-//   { value: "Mechanic", label: "Mechanic" },
-//   { value: "Rigger/Field Support", label: "Rigger/Field Support" },
-//   { value: "Safety", label: "Safety" },
-//   { value: "Scaffolder", label: "Scaffolder" },
-//   { value: "Storekeeper", label: "Storekeeper" },
-//   { value: "Superintendent", label: "Superintendent" },
-//   { value: "Supervisor", label: "Supervisor" },
-//   { value: "Technician", label: "Technician" },
-//   { value: "Welder", label: "Welder" },
-//   { value: "Other", label: "Other" },
-// ];
 
 export const workInfoUploads = [
   { label: "Contract", icon: <GoUpload />, title: "WIContract" },

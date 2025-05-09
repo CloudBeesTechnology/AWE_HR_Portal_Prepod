@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { uploadDocString } from "../../../services/uploadsDocsS3/UploadDocs";
 import { UpdateLoiData } from "../../../services/updateMethod/UpdateLoi";
 import { useFetchInterview } from "../../../hooks/useFetchInterview";
+import { LocalMobilization } from "../../../services/createMethod/CreateLOI";
 import { FileUploadField } from "../../employees/medicalDep/FileUploadField";
 import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
 import { statusOptions } from "../../../utils/StatusDropdown";
@@ -12,7 +13,8 @@ import { SpinLogo } from "../../../utils/SpinLogo";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadLOI } from "../deleteDocsRecruit/DeleteUploadLOI";
 import { DeletePopup } from "../../../utils/DeletePopup";
-// Define validation schema using Yup
+import { DataSupply } from "../../../utils/DataStoredContext";
+
 const MOBFormSchema = Yup.object().shape({
   mobSignDate: Yup.date().notRequired(),
   mobFile: Yup.mixed()
@@ -24,6 +26,8 @@ const MOBFormSchema = Yup.object().shape({
 });
 
 export const MobilizationForm = ({ candidate, formattedPermissions }) => {
+  const { localMobilization } = LocalMobilization();
+  const { IVSSDetails } = useContext(DataSupply);
   const { loiDetails } = UpdateLoiData();
   const { mergedInterviewData } = useFetchInterview();
   const { interviewDetails } = UpdateInterviewData();
@@ -38,8 +42,7 @@ export const MobilizationForm = ({ candidate, formattedPermissions }) => {
       status: "",
     },
   });
-  // const [uploadedFileName, setUploadedFileName] = useState(null);
-  // const [uploadedMOB, setUploadedMOB] = useState(null);
+
   const [isUploadingString, setIsUploadingString] = useState({
     mobFile: false,
   });
@@ -52,21 +55,17 @@ export const MobilizationForm = ({ candidate, formattedPermissions }) => {
   });
   const {
     register,
-    handleSubmit,
-    watch,
     formState: { errors },
     setValue,
   } = useForm({
     resolver: yupResolver(MOBFormSchema),
   });
 
-  const MOBUpload = watch("mobFile", "");
-
   useEffect(() => {
     if (mergedInterviewData.length > 0) {
       const interviewData = mergedInterviewData.find(
         (data) => data.tempID === candidate.tempID
-      ); // Assuming we want to take the first item
+      ); 
       if (interviewData) {
         setFormData({
           interview: {
@@ -99,23 +98,13 @@ export const MobilizationForm = ({ candidate, formattedPermissions }) => {
       ...prev,
       [type]: value,
     }));
-    // console.log(value);
+    
   };
 
   const handleFileUpload = async (e, type) => {
     const tempID = candidate.tempID;
-    // console.log(tempID);
-
-    //      if (!tempID
-    // ) {
-    //        alert("Please enter the Employee ID before uploading files.");
-    //        window.location.href = "/employeeInfo";
-    //        return;
-    //      }
 
     let selectedFile = e.target.files[0];
-
-    // Allowed file types
     const allowedTypes = [
       "application/pdf",
       "image/jpeg",
@@ -169,7 +158,7 @@ export const MobilizationForm = ({ candidate, formattedPermissions }) => {
         );
         return;
       }
-      // console.log(`Deleted "${fileName}". Remaining files:`);
+    
       setdeleteTitle1(`${fileName}`);
       handleDeleteMsg();
     } catch (error) {
@@ -178,34 +167,52 @@ export const MobilizationForm = ({ candidate, formattedPermissions }) => {
     }
   };
 
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  const wrapUpload = (filePath) => {
+    return filePath ? [{ upload: filePath, date: currentDate }] : null;
+  };
+
   const handleSubmitTwo = async (e) => {
     e.preventDefault();
 
-    // Check if mergedInterviewData is available for the candidate
     const selectedInterviewData = mergedInterviewData.find(
       (data) => data.tempID === candidate?.tempID
     );
 
-    // Ensure the candidate and their localMobilization details exist
-    if (!selectedInterviewData || !selectedInterviewData.localMobilization) {
-      alert("Candidate or LOI data not found.");
-      return;
-    }
+    const selectedInterviewDataStatus = IVSSDetails.find(
+      (data) => data.tempID === candidate?.tempID
+    );
 
     const localMobilizationId = selectedInterviewData.localMobilization.id;
-    const interviewScheduleId = selectedInterviewData.interviewSchedules.id;
+    const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
+
+    const createData = {
+      mobSignDate: formData.interview.mobSignDate,
+      mobFile: isUploadingString.mobFile
+        ? JSON.stringify(wrapUpload(uploadedMOB.mobFile))
+        : formData.interview.mobFile,
+      tempID: candidate.tempID,
+    };
 
     try {
-      await loiDetails({
-        LoiValue: {
-          id: localMobilizationId,
-          mobSignDate: formData.interview.mobSignDate,
-          mobFile: uploadedMOB.mobFile,
-        },
-      });
+      if (localMobilizationId) {
+        await loiDetails({
+          LoiValue: {
+            id: localMobilizationId,
+            mobSignDate: formData.interview.mobSignDate,
+            mobFile: isUploadingString.mobFile
+              ? JSON.stringify(wrapUpload(uploadedMOB.mobFile))
+              : formData.interview.mobFile,
+          },
+        });
+      } else {
+        await localMobilization(createData);
+      }
+
       await interviewDetails({
         InterviewValue: {
-          id: interviewScheduleId,
+          id: interviewScheduleStatusId,
           status: formData.interview.status,
           // status: selectedInterviewData.contractType === "Local" ? "mobilization" : "workpass",
         },
@@ -219,7 +226,6 @@ export const MobilizationForm = ({ candidate, formattedPermissions }) => {
     }
   };
 
-  // Function to handle changes for non-file fields
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,

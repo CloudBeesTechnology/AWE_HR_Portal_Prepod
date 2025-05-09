@@ -288,6 +288,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     applicationUpload,
     bwnUpload,
     cvCertifyUpload,
+    qcCertifyUpload,
     loiUpload,
     myIcUpload,
     paafCvevUpload,
@@ -302,7 +303,6 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     groupInsEffectDate,
     groupInsEndDate,
     travelIns,
-    workmePolicyNo,
     empInsUpload,
     depInsurance,
     airTktStatus,
@@ -322,6 +322,8 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     probDuration,
     hospLeave,
     pervAnnualLeaveBal,
+    workmenCompNo,
+    workExperience
   } = passingValue;
 
   const cleanLanguageData = (lang) => {
@@ -335,15 +337,36 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     // Handle string case (like "[, English, Mandarin]")
     if (typeof lang === "string") {
       return lang
-        .replace(/[\[\]]/g, "") // Remove brackets
-        .split(",") // Split by commas
-        .map((l) => l.trim()) // Trim whitespace
-        .filter((l) => l && l !== "N/A") // Remove empty
-        .join(", "); // Join with commas
+        .replace(/[\[\]]/g, "")
+        .split(",")
+        .map((l) => l.trim())
+        .filter((l) => l && l !== "N/A")
+        .join(", ");
     }
 
     return "N/A";
   };
+
+  let parsedWorkExperience = [];
+  try {
+    parsedWorkExperience = Array.isArray(workExperience)
+      ? JSON.parse(workExperience[0])
+      : [];
+  } catch (err) {
+    console.error("Failed to parse workExperience:", err);
+  }
+
+  const defaultPreEmp =
+    preEmp || (parsedWorkExperience[0]?.name ?? "Not Available");
+  const defaultPreEmpPeriod =
+    preEmpPeriod ||
+    (parsedWorkExperience[0]?.from
+      ? `${formatDate(parsedWorkExperience[0].from)} To ${
+          parsedWorkExperience[0]?.to
+            ? formatDate(parsedWorkExperience[0].to)
+            : "Present"
+        }`
+      : "Not Available");
 
   const personalDetails = {
     Name: name,
@@ -385,49 +408,21 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Contact No": contactNo,
     "Alternate Number": alternateNo,
     Language: cleanLanguageData(lang),
-        "Other Language": otherLang,
+    "Other Language": otherLang,
     "Driving License": driveLic,
     "Agent Name": agent,
-    "Company Name of Previous Employment": preEmp,
-    "Previous Employment Period": preEmpPeriod,
+    "Company Name of Previous Employment": defaultPreEmp,
+    "Previous Employment Period": defaultPreEmpPeriod,
     "Date of Induction Briefing": formatDate(inducBrief),
     "Bank name": bankName,
     "Bank account number": bankAccNo,
   };
 
-  // const getDisplayValue = (value) => {
-
-  //   if (typeof value === "string" && value.trim().startsWith("[[")) {
-  //     return "N/A";
-  //   }
-  //   return value || "N/A";
-  // };
-
-  // const educationalDetails = {
-  //   "Education Level": educLevel,
-  //   "Education Details": eduDetails,
-  //   "Academic / Technical qualification": aTQualify,
-  // };
-
-  const isJsonLike = (val) =>
-    typeof val === "string" &&
-    val.trim().startsWith("[[") &&
-    val.trim().endsWith("]]");
-
-  let educationalDetails = {};
-
-  if (isJsonLike(educLevel)) {
-    educationalDetails["Education Details"] = educLevel;
-    educationalDetails["Education Level"] = eduDetails;
-  } else if (isJsonLike(eduDetails)) {
-    educationalDetails["Education Details"] = eduDetails;
-    educationalDetails["Education Level"] = educLevel;
-  } else {
-    educationalDetails["Education Level"] = educLevel;
-    educationalDetails["Education Details"] = eduDetails;
-  }
-
-  educationalDetails["Academic / Technical qualification"] = aTQualify;
+  const educationalDetails = {
+    "Education Level": educLevel,
+    // "Education Details": eduDetails,
+    "Academic / Technical qualification": aTQualify,
+  };
 
   const medicalInfo = {
     "Overseas Medical Fitness issued date": overMD,
@@ -453,7 +448,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
       formatDate(groupInsEffectDate),
     "Group H&S Insurance Enrollment End Date": formatDate(groupInsEndDate),
     "Workmen Compensation Insurance": empStatusType,
-    "Workmen compensation insurance policy number": workmePolicyNo,
+    "Workmen compensation insurance policy number": workmenCompNo,
     "Personal Accident Insurance": accidentIns,
     "Travelling Insurance": travelIns,
   };
@@ -590,7 +585,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     immigration: {
       "Original Passport Location": ppLocation,
       "Date Of Arrival Stamping Expiry": formatDate(arrivStampExp),
-      "Immigration Reference Number": immigRefNo,
+      "Immigration Reference Number": cleanLanguageData(immigRefNo),
       "Passport Submit Date To Immigration Dept": formatDate(ppSubmit),
       "Employment Pass Expiry": formatDate(empPassExp),
       "Employment Pass Status": empPassStatus,
@@ -643,6 +638,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
                     applicationUpload={applicationUpload}
                     bwnUpload={bwnUpload}
                     cvCertifyUpload={cvCertifyUpload}
+                    qcCertifyUpload={qcCertifyUpload}
                     loiUpload={loiUpload}
                     myIcUpload={myIcUpload}
                     paafCvevUpload={paafCvevUpload}

@@ -38,18 +38,21 @@ export const OtherDetails = ({ fetchedData }) => {
     uploadResume: false,
     uploadCertificate: false,
     uploadPp: false,
+    uploadIc: false,
   });
 
   const [uploadedFileNames, setUploadedFileNames] = useState({
     uploadResume: null,
     uploadCertificate: null,
     uploadPp: null,
+    uploadIc: null,
   });
 
   const [uploadedDocs, setUploadedDocs] = useState({
     uploadResume: null,
     uploadCertificate: null,
     uploadPp: null,
+    uploadIc: null,
   });
 
   const {
@@ -160,6 +163,7 @@ export const OtherDetails = ({ fetchedData }) => {
               ),
               uploadPp: extractFileName(interviewData.uploadPp),
               uploadResume: extractFileName(interviewData.uploadResume),
+              uploadIc: extractFileName(interviewData.uploadIc),
             }));
 
             setUploadedDocs((prev) => ({
@@ -167,6 +171,7 @@ export const OtherDetails = ({ fetchedData }) => {
               uploadCertificate: interviewData.uploadCertificate,
               uploadPp: interviewData.uploadPp,
               uploadResume: interviewData.uploadResume,
+              uploadIc: interviewData.uploadIc,
             }));
           }
         } else {
@@ -212,6 +217,7 @@ export const OtherDetails = ({ fetchedData }) => {
       uploadResume: "uploadResume",
       uploadCertificate: "uploadCertificate",
       uploadPp: "uploadPp",
+      uploadIc: "uploadIc",
     };
 
     if (fileTypeMapping[type]) {
@@ -319,6 +325,8 @@ export const OtherDetails = ({ fetchedData }) => {
   var latestTempIDData;
 
   const onSubmit = async (data) => {
+    console.log("Navy", navigatingEducationData);
+    
     try {
       setIsLoading(true);
 
@@ -374,6 +382,10 @@ export const OtherDetails = ({ fetchedData }) => {
       const uploadedPp = isUploadingString.uploadPp
         ? await uploadReqString(data.uploadPp, "uploadPp", personName)
         : uploadedDocs?.uploadPp;
+
+      const uploadedIc = isUploadingString.uploadIc
+        ? await uploadReqString(data.uploadIc, "uploadIc", personName)
+        : uploadedDocs?.uploadIc;
 
       const UpProfilePhoto =
         navigatingEducationData.profilePhotoDoc &&
@@ -432,6 +444,10 @@ export const OtherDetails = ({ fetchedData }) => {
         uploadPp: isUploadingString.uploadPp
           ? JSON.stringify(wrapUpload(uploadedPp))
           : uploadedDocs?.uploadPp,
+
+        uploadIc: isUploadingString.uploadIc
+          ? JSON.stringify(wrapUpload(uploadedIc))
+          : uploadedDocs?.uploadIc,
       };
 
       const checkingPDTable = empPDData.find(
@@ -449,15 +465,15 @@ export const OtherDetails = ({ fetchedData }) => {
         };
 
         await candyDetails({ reqValue: updateReqValue });
-        console.log("Update", updateReqValue);
+        // console.log("Update", updateReqValue);
 
         setNotification(true);
         setIsLoading(false);
       } else {
         console.log({ reqValue, latestTempIDData });
         await submitODFunc({ reqValue, latestTempIDData });
-        console.log("Create", reqValue);
-        console.log("TempID", latestTempIDData);
+        // console.log("Create", reqValue);
+        // console.log("TempID", latestTempIDData);
 
         setNotification(true);
         setIsLoading(false);
@@ -637,7 +653,7 @@ export const OtherDetails = ({ fetchedData }) => {
 
             <div>
               <FileUploadField
-                label="Upload IC / Passport"
+                label="Upload Passport"
                 register={register}
                 fileKey="uploadPp"
                 handleFileUpload={handleFileUpload}
@@ -645,6 +661,22 @@ export const OtherDetails = ({ fetchedData }) => {
                 deletedStringUpload={deletedStringUpload}
                 isUploadingString={isUploadingString}
                 error={errors.uploadPp}
+                formattedPermissions={formattedPermissions}
+                requiredPermissions={requiredPermissions}
+                access={access}
+              />
+            </div>
+
+            <div>
+              <FileUploadField
+                label="Upload IC"
+                register={register}
+                fileKey="uploadIc"
+                handleFileUpload={handleFileUpload}
+                uploadedFileNames={uploadedFileNames}
+                deletedStringUpload={deletedStringUpload}
+                isUploadingString={isUploadingString}
+                error={errors.UploadIC}
                 formattedPermissions={formattedPermissions}
                 requiredPermissions={requiredPermissions}
                 access={access}

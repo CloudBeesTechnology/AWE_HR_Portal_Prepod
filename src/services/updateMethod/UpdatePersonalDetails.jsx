@@ -72,6 +72,7 @@ export const CandyDetails = () => {
       uploadResume,
       uploadCertificate,
       uploadPp,
+      uploadIc,
       status,
       PDTableID,
       EDTableID
@@ -143,6 +144,7 @@ export const CandyDetails = () => {
       uploadResume,
       uploadCertificate,
       uploadPp,
+      uploadIc
     };
 
   

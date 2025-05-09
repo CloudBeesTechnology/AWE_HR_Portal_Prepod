@@ -30,7 +30,7 @@ export const NonLocalMobilizForm = ({ candidate }) => {
   const [formData, setFormData] = useState({
     interview: {
       id: "",
-      mobSignDate: "",
+      mobSignDate: "", 
       agentname: "",
       remarkNLMob: "",
       mobFile: "",
@@ -66,6 +66,10 @@ export const NonLocalMobilizForm = ({ candidate }) => {
         (data) => data.tempID === candidate.tempID
       );
 
+      const interviewStatus = IVSSDetails.find(
+        (data) => data.tempID === candidate.tempID
+      );
+
       if (interviewData) {
         setFormData({
           interview: {
@@ -85,6 +89,12 @@ export const NonLocalMobilizForm = ({ candidate }) => {
           }));
           // console.log("Uploaded file name set:", fileName);
         }
+      } else {
+        setFormData({
+          interview: {
+            status: interviewStatus.status,
+          },
+        });
       }
     }
   }, [interviewSchedules, candidate.tempID]);

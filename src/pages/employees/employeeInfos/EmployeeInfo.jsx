@@ -36,6 +36,7 @@ import { FileUploadField } from "../medicalDep/FileUploadField";
 import { MdCancel } from "react-icons/md";
 import { DeletePopup } from "../../../utils/DeletePopup";
 import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
+import { DateFormat } from "../../../utils/DateFormat";
 
 export const EmployeeInfo = () => {
   useEffect(() => {
@@ -49,7 +50,7 @@ export const EmployeeInfo = () => {
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const { SubmitEIData, errorEmpID } = EmpInfoFunc();
   const { UpdateEIValue } = UpdateEmpInfo();
-  const { empPIData, IDData, dropDownVal } = useContext(DataSupply);
+  const { empPIData, IDData, dropDownVal, candyToEmp } = useContext(DataSupply);
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [selectedNationality, setSelectedNationality] = useState("");
@@ -140,10 +141,13 @@ export const EmployeeInfo = () => {
             const IDDetails = IDData
               ? IDData.find((user) => user.empID === emp.empID)
               : {};
+            const candyDetails =
+              candyToEmp?.find((item) => item.empID === emp.empID) || {};
 
             return {
               ...emp,
               ...IDDetails,
+              ...candyDetails,
             };
           })
           .filter(Boolean);
@@ -157,7 +161,7 @@ export const EmployeeInfo = () => {
     };
 
     fetchData();
-  }, [empPIData, IDData]);
+  }, [empPIData, IDData, candyToEmp]);
 
   const updateUploadingString = (type, value) => {
     setIsUploadingString((prev) => ({
@@ -558,6 +562,35 @@ export const EmployeeInfo = () => {
       }
     });
 
+    if (
+      Array.isArray(result.workExperience) &&
+      result.workExperience.length > 0
+    ) {
+      try {
+        const lastEntryRaw =
+          result.workExperience[result.workExperience.length - 1];
+        const parsedArray = JSON.parse(lastEntryRaw);
+
+        if (Array.isArray(parsedArray) && parsedArray.length > 0) {
+          const lastExperience = parsedArray[parsedArray.length - 1];
+          const name = (lastExperience.name || "").trim().toUpperCase();
+          const from = (lastExperience.from || "").trim();
+          const to = (lastExperience.to || "").trim();
+          const period = from && to ? `${DateFormat(from)} to ${DateFormat(to)}` : "";
+
+          setValue("preEmp", name);
+          setValue("preEmpPeriod", period);
+        }
+      } catch (e) {
+        console.warn("Failed to parse workExperience:", e);
+        setValue("preEmp", "");
+        setValue("preEmpPeriod", "");
+      }
+    } else {
+      setValue("preEmp", "");
+      setValue("preEmpPeriod", "");
+    }
+
     const fieldsArray = ["bwnIcExpiry", "ppExpiry", "ppIssued"];
     fieldsArray.forEach((field) =>
       setValue(field, getLastArrayValue(result[field]))
@@ -657,6 +690,7 @@ export const EmployeeInfo = () => {
       "paafCvevUpload",
       "ppUpload",
       "supportDocUpload",
+      "qcCertifyUpload"
     ];
 
     uploadFields.forEach((field) => {
@@ -745,7 +779,7 @@ export const EmployeeInfo = () => {
     const empType = data.empType;
 
     const removeLeadingNulls = (array, newValue) => {
-      const newArray = [...(array || []), newValue]; 
+      const newArray = [...(array || []), newValue];
       let firstValidIndex = newArray.findIndex((item) => item !== null);
 
       if (firstValidIndex !== -1) {
@@ -756,7 +790,7 @@ export const EmployeeInfo = () => {
         newArray.forEach((item) => {
           if (item !== null && item !== lastAdded) {
             result.push(item === null ? "N/A" : item);
-            lastAdded = item; 
+            lastAdded = item;
           } else if (item === null) {
             result.push("N/A");
           }
@@ -1084,7 +1118,7 @@ export const EmployeeInfo = () => {
                       type="file"
                       className="hidden"
                       accept=".pdf,image/jpeg,image/png"
-                      onChange={(e) => handleFileChange(e, field.title)} // Pass field title for dynamic handling
+                      onChange={(e) => handleFileChange(e, field.title)}
                       disabled={isUploading[field.title]}
                     />
                     <span className="ml-2 text-grey w-full font-normal flex justify-between items-center gap-10">
@@ -1097,7 +1131,7 @@ export const EmployeeInfo = () => {
                     {uploadedFileNames?.[field.title] ? (
                       Array.isArray(uploadedFileNames[field.title]) ? (
                         uploadedFileNames[field.title]
-                          .slice() // Create a shallow copy to avoid mutating the original array
+                          .slice() 
                           .reverse()
                           .map((fileName, fileIndex) => (
                             <span

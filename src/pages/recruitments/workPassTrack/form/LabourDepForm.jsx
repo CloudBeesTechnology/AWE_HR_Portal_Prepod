@@ -58,12 +58,17 @@ export const LabourDepForm = ({ candidate }) => {
   });
 
   const DepositUpload = watch("lbrFile");
-
+  
   useEffect(() => {
     if (interviewSchedules.length > 0) {
       const interviewData = interviewSchedules.find(
         (data) => data.tempID === candidate.tempID
       );
+
+      const interviewStatus = IVSSDetails.find(
+        (data) => data.tempID === candidate.tempID
+      );
+
       if (interviewData) {
         setFormData({
           interview: {
@@ -84,6 +89,13 @@ export const LabourDepForm = ({ candidate }) => {
           }));
           // console.log("Uploaded file name set:", fileName);
         }
+      } else {
+          setFormData({
+          interview: {
+            status: interviewStatus.status,
+          },
+        });
+
       }
     }
   }, [interviewSchedules, candidate.tempID]);
