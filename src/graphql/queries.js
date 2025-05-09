@@ -1738,6 +1738,7 @@ export const getEmpPersonalInfo = /* GraphQL */ `
       permanentAddress
       position
       sapNo
+      otherLang
       createdAt
       updatedAt
       __typename
@@ -1786,6 +1787,7 @@ export const listEmpPersonalInfos = /* GraphQL */ `
         permanentAddress
         position
         sapNo
+        otherLang
         createdAt
         updatedAt
         __typename
@@ -1828,6 +1830,7 @@ export const getIDDetails = /* GraphQL */ `
       race
       religion
       supportDocUpload
+      qcCertifyUpload
       createdAt
       updatedAt
       __typename
@@ -1872,6 +1875,7 @@ export const listIDDetails = /* GraphQL */ `
         race
         religion
         supportDocUpload
+        qcCertifyUpload
         createdAt
         updatedAt
         __typename
@@ -2122,6 +2126,7 @@ export const getEducationDetails = /* GraphQL */ `
       uploadResume
       uploadCertificate
       uploadPp
+      uploadIc
       createdAt
       updatedAt
       __typename
@@ -2162,6 +2167,7 @@ export const listEducationDetails = /* GraphQL */ `
         uploadResume
         uploadCertificate
         uploadPp
+        uploadIc
         createdAt
         updatedAt
         __typename

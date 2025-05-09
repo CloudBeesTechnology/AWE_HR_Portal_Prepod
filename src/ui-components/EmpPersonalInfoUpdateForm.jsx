@@ -221,6 +221,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
     permanentAddress: [],
     position: [],
     sapNo: "",
+    otherLang: "",
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [age, setAge] = React.useState(initialValues.age);
@@ -265,6 +266,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
   );
   const [position, setPosition] = React.useState(initialValues.position);
   const [sapNo, setSapNo] = React.useState(initialValues.sapNo);
+  const [otherLang, setOtherLang] = React.useState(initialValues.otherLang);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = empPersonalInfoRecord
@@ -307,6 +309,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
     setPosition(cleanValues.position ?? []);
     setCurrentPositionValue("");
     setSapNo(cleanValues.sapNo);
+    setOtherLang(cleanValues.otherLang);
     setErrors({});
   };
   const [empPersonalInfoRecord, setEmpPersonalInfoRecord] = React.useState(
@@ -377,6 +380,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
     permanentAddress: [],
     position: [],
     sapNo: [],
+    otherLang: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -433,6 +437,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
           permanentAddress: permanentAddress ?? null,
           position: position ?? null,
           sapNo: sapNo ?? null,
+          otherLang: otherLang ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -522,6 +527,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -578,6 +584,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.age ?? value;
@@ -630,6 +637,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.aTQualify ?? value;
@@ -682,6 +690,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.alternateNo ?? value;
@@ -730,6 +739,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             values = result?.agent ?? values;
@@ -807,6 +817,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.bankName ?? value;
@@ -859,6 +870,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.bankAccNo ?? value;
@@ -907,6 +919,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             values = result?.contactNo ?? values;
@@ -984,6 +997,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.cob ?? value;
@@ -1032,6 +1046,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             values = result?.contractType ?? values;
@@ -1111,6 +1126,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.ctryOfOrigin ?? value;
@@ -1163,6 +1179,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.chinese ?? value;
@@ -1215,6 +1232,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.dob ?? value;
@@ -1267,6 +1285,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.educLevel ?? value;
@@ -1319,6 +1338,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.email ?? value;
@@ -1367,6 +1387,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             values = result?.eduDetails ?? values;
@@ -1446,6 +1467,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.empBadgeNo ?? value;
@@ -1494,6 +1516,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             values = result?.empType ?? values;
@@ -1567,6 +1590,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             values = result?.familyDetails ?? values;
@@ -1646,6 +1670,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.gender ?? value;
@@ -1698,6 +1723,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.lang ?? value;
@@ -1750,6 +1776,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.marital ?? value;
@@ -1802,6 +1829,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -1854,6 +1882,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.officialEmail ?? value;
@@ -1906,6 +1935,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.oCOfOrigin ?? value;
@@ -1958,6 +1988,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.profilePhoto ?? value;
@@ -2006,6 +2037,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress: values,
               position,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             values = result?.permanentAddress ?? values;
@@ -2084,6 +2116,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position: values,
               sapNo,
+              otherLang,
             };
             const result = onChange(modelFields);
             values = result?.position ?? values;
@@ -2161,6 +2194,7 @@ export default function EmpPersonalInfoUpdateForm(props) {
               permanentAddress,
               position,
               sapNo: value,
+              otherLang,
             };
             const result = onChange(modelFields);
             value = result?.sapNo ?? value;
@@ -2174,6 +2208,59 @@ export default function EmpPersonalInfoUpdateForm(props) {
         errorMessage={errors.sapNo?.errorMessage}
         hasError={errors.sapNo?.hasError}
         {...getOverrideProps(overrides, "sapNo")}
+      ></TextField>
+      <TextField
+        label="Other lang"
+        isRequired={false}
+        isReadOnly={false}
+        value={otherLang}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              age,
+              aTQualify,
+              alternateNo,
+              agent,
+              bankName,
+              bankAccNo,
+              contactNo,
+              cob,
+              contractType,
+              ctryOfOrigin,
+              chinese,
+              dob,
+              educLevel,
+              email,
+              eduDetails,
+              empBadgeNo,
+              empType,
+              familyDetails,
+              gender,
+              lang,
+              marital,
+              name,
+              officialEmail,
+              oCOfOrigin,
+              profilePhoto,
+              permanentAddress,
+              position,
+              sapNo,
+              otherLang: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.otherLang ?? value;
+          }
+          if (errors.otherLang?.hasError) {
+            runValidationTasks("otherLang", value);
+          }
+          setOtherLang(value);
+        }}
+        onBlur={() => runValidationTasks("otherLang", otherLang)}
+        errorMessage={errors.otherLang?.errorMessage}
+        hasError={errors.otherLang?.hasError}
+        {...getOverrideProps(overrides, "otherLang")}
       ></TextField>
       <Flex
         justifyContent="space-between"
