@@ -13,9 +13,14 @@ import { handleDeleteFile } from "../../../../services/uploadsDocsS3/DeleteDocs"
 import { DeleteUploadBankG } from "../deleteUpload/DeleteUploadBankG";
 import { useDeleteAccess } from "../../../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../../../utils/DeletePopup";
+import { useCreateWPTracking } from "../../../../services/createMethod/CreateWPTracking";
+import { DataSupply } from "../../../../utils/DataStoredContext";
+
 export const BankForm = ({ candidate }) => {
+  const { IVSSDetails } = useContext(DataSupply);
   const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules } = useFetchCandy();
+  const { createWPTrackingHandler } = useCreateWPTracking();
   const { wpTrackingDetails } = useUpdateWPTracking();
   const { interviewDetails } = UpdateInterviewData();
   const [deletePopup, setdeletePopup] = useState(false);
@@ -62,6 +67,10 @@ export const BankForm = ({ candidate }) => {
         (data) => data.tempID === candidate.tempID
       );
 
+      const interviewStatus = IVSSDetails.find(
+        (data) => data.tempID === candidate.tempID
+      );
+
       if (interviewData) {
         setFormData({
           interview: {
@@ -70,7 +79,7 @@ export const BankForm = ({ candidate }) => {
             bgexpirydate: interviewData.bgexpirydate,
             referenceno: interviewData.referenceno,
             bgamount: interviewData.bgamount,
-            bgfile: interviewData.bgfile,
+            bgfile: interviewData.bgfile || uploadedBank.bgFile,
             status: interviewData.IDDetails.status,
           },
         });
@@ -83,9 +92,16 @@ export const BankForm = ({ candidate }) => {
           }));
           //  console.log("Uploaded file name set:", fileName);
         }
-      } 
-    } 
+      } else {
+        setFormData({
+          interview: {
+            status: interviewStatus.status,
+          },
+        });
+      }
+    }
   }, [interviewSchedules, candidate.tempID]);
+
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
       const decodedUrl = decodeURIComponent(url);
@@ -159,7 +175,8 @@ export const BankForm = ({ candidate }) => {
         tempID,
         setUploadedFileNames,
         setUploadedBank,
-        setIsUploadingString
+        setIsUploadingString,
+        setFormData
       );
 
       if (!isDeleted || isDeletedArrayUploaded) {
@@ -177,6 +194,12 @@ export const BankForm = ({ candidate }) => {
     }
   };
 
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  const wrapUpload = (filePath) => {
+    return filePath ? [{ upload: filePath, date: currentDate }] : null;
+  };
+
   const handleSubmitTwo = async (data) => {
     data.preventDefault();
 
@@ -184,12 +207,12 @@ export const BankForm = ({ candidate }) => {
       (data) => data.tempID === candidate?.tempID
     );
 
-    const selectedInterviewDataStatus = interviewSchedules.find(
-      (data) => data.IDDetails.tempID === candidate?.tempID
+    const selectedInterviewDataStatus = IVSSDetails.find(
+      (data) => data.tempID === candidate?.tempID
     );
 
     const interviewScheduleId = selectedInterviewData?.id;
-    const interviewScheduleStatusId = selectedInterviewDataStatus.IDDetails?.id;
+    const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
 
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
@@ -201,18 +224,39 @@ export const BankForm = ({ candidate }) => {
       return;
     }
 
+    const wpTrackingData = {
+      tempID: candidate.tempID,
+      bgsubmitdate: formData.interview.bgsubmitdate,
+      bgreceivedate: formData.interview.bgreceivedate,
+      bgexpirydate: formData.interview.bgexpirydate,
+      referenceno: formData.interview.referenceno,
+      bgamount: formData.interview.bgamount,
+      bgfile: isUploadingString.bgFile
+        ? JSON.stringify(wrapUpload(uploadedBank.bgFile))
+        : formData.interview.bgfile,
+    };
+
+    let response;
     try {
-      const response = await wpTrackingDetails({
-        WPTrackingValue: {
-          id: interviewScheduleId,
-          bgsubmitdate: formData.interview.bgsubmitdate,
-          bgreceivedate: formData.interview.bgreceivedate,
-          bgexpirydate: formData.interview.bgexpirydate,
-          referenceno: formData.interview.referenceno,
-          bgamount: formData.interview.bgamount,
-          bgfile: uploadedBank.bgFile,
-        },
-      });
+      if (interviewScheduleId) {
+        response = await wpTrackingDetails({
+          WPTrackingValue: {
+            id: interviewScheduleId,
+            bgsubmitdate: formData.interview.bgsubmitdate,
+            bgreceivedate: formData.interview.bgreceivedate,
+            bgexpirydate: formData.interview.bgexpirydate,
+            referenceno: formData.interview.referenceno,
+            bgamount: formData.interview.bgamount,
+            bgfile: isUploadingString.bgFile
+              ? JSON.stringify(wrapUpload(uploadedBank.bgFile))
+              : formData.interview.bgfile,
+          },
+        });
+      } else {
+        await createWPTrackingHandler({
+          reqValue: wpTrackingData,
+        });
+      }
 
       const interStatus = {
         id: interviewScheduleStatusId,

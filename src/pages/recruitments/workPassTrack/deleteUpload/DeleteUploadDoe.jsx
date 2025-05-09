@@ -6,7 +6,8 @@ export const DeleteUploadDoe = (
   empID,
   setUploadedFileNames,
   setUploadedDoe,
-  setIsUploadingString
+  setIsUploadingString,
+  setFormData
 ) => {
   try {
     // console.log(fileType,fileName,"nduvgsd7679yt78");
@@ -43,6 +44,13 @@ export const DeleteUploadDoe = (
     setIsUploadingString((prev) => ({
       ...prev,
       [fileType]: false,
+    }));
+    setFormData((prev) => ({
+      ...prev,
+      interview: {
+        ...prev.interview,
+        [fileType]: "",
+      },
     }));
   } catch (error) {
     console.log(error, "DeleteUploadDoe in error");

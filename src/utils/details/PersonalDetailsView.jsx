@@ -1,3 +1,4 @@
+// export default PersonalDetailsView;
 import React, { useState, useRef } from "react";
 import { FaTimes, FaPrint, FaDownload } from "react-icons/fa";
 import { getUrl } from "@aws-amplify/storage";
@@ -28,23 +29,27 @@ const PersonalDetailsView = ({
   invoiceRef,
   formatDate,
   mainRef,
+  qcCertifyUpload,
 }) => {
   const [viewingDocument, setViewingDocument] = useState(null);
-  const [lastUploadUrl, setPPLastUP] = useState(""); 
+  const [lastUploadUrl, setPPLastUP] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const personal = useRef();
+
+  console.log("PersonalDeatils:", personalDetails);
+
+  console.log("Education Details:", educationalDetails);
 
   // Helper function to fetch the cloud URL
   const linkToStorageFile = async (pathUrl) => {
     if (!pathUrl) {
       console.error("No URL provided for the file.");
-      return; 
+      return;
     }
     try {
       const result = await getUrl({ path: pathUrl });
-
-      setPPLastUP(result.url.href); 
-      setViewingDocument(pathUrl); 
+      setPPLastUP(result.url.href);
+      setViewingDocument(pathUrl);
     } catch (error) {
       console.error("Error fetching the file URL:", error);
     }
@@ -53,16 +58,12 @@ const PersonalDetailsView = ({
   const linkToImageFile = async (pathUrl) => {
     if (!pathUrl) {
       console.error("No URL provided for the file.");
-      return; 
+      return;
     }
-
-    const result = await getUrl({
-      path: pathUrl,
-    });
+    const result = await getUrl({ path: pathUrl });
     return setImageUrl(result.url.toString());
   };
   linkToImageFile(profilePhoto);
-
 
   // Function to parse the uploaded document
   const parseDocuments = (docData) => {
@@ -71,7 +72,7 @@ const PersonalDetailsView = ({
       if (Array.isArray(parsedData)) {
         return parsedData.map((doc) => {
           if (doc.upload) {
-            doc.fileName = doc.upload.split("/").pop(); 
+            doc.fileName = doc.upload.split("/").pop();
           }
           return doc;
         });
@@ -99,8 +100,63 @@ const PersonalDetailsView = ({
       `,
   });
 
-  // Function to render documents under a single category
+  const parseEducationDetails = (eduString) => {
+    if (eduString === null || eduString === undefined) return null;
 
+    // Coerce to string if it's not already
+    if (typeof eduString !== "string") {
+      eduString = String(eduString);
+    }
+
+    if (!eduString || eduString === "null" || eduString === "N/A") {
+      return null; 
+    }
+
+    // Check if it's a simple string (not JSON)
+    if (
+      !eduString.trim().startsWith("[") &&
+      !eduString.trim().startsWith("{")
+    ) {
+      return null;
+    }
+
+    try {
+      // First try to parse directly
+      let parsed;
+      try {
+        parsed = JSON.parse(eduString);
+      } catch (firstError) {
+        // If direct parse fails, try cleaning the string
+        const cleanString = eduString
+          .replace(/^\[+/, "[") 
+          .replace(/\]+$/, "]") 
+          .replace(/\\"/g, '"') 
+          .trim();
+
+        parsed = JSON.parse(cleanString);
+      }
+
+      // Handle nested array case ([[{...}]])
+      if (
+        Array.isArray(parsed) &&
+        parsed.length > 0 &&
+        Array.isArray(parsed[0])
+      ) {
+        return parsed[0];
+      }
+
+      // Handle single array case ([{...}])
+      if (Array.isArray(parsed)) return parsed;
+
+      // Handle single object case ({...})
+      return [parsed];
+    } catch (e) {
+      console.error("Error parsing education details:", e);
+      return null;
+    }
+  };
+
+  // Function to render documents under a single category
   const renderDocumentsUnderCategory = (documents) => {
     return (
       <>
@@ -114,7 +170,7 @@ const PersonalDetailsView = ({
                 Uploaded on: {formatDate(document.date)}
               </span>
               <button
-                onClick={() => linkToStorageFile(document.upload)} 
+                onClick={() => linkToStorageFile(document.upload)}
                 className="text-dark_grey font-semibold text-sm"
               >
                 View Document
@@ -135,7 +191,7 @@ const PersonalDetailsView = ({
 
                     <div className="absolute top-2 right-2">
                       <button
-                        onClick={closeModal} 
+                        onClick={closeModal}
                         className="text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
                       >
                         <FaTimes />
@@ -167,28 +223,25 @@ const PersonalDetailsView = ({
             {/* Image Viewer */}
             {viewingDocument === document.upload &&
               !document.upload.endsWith(".pdf") && (
-                <div className="mt-4">
-                  <div className="relative invoice-content bg-white max-w-3xl mx-auto p-6 rounded-lg shadow-lg">
-                    <div
-                      ref={invoiceRef}
-                      className="pdfViewerflex justify-center border h-auto"
-                    >
-                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-                        <Viewer fileUrl={lastUploadUrl || ""} />
-                      </Worker>
-                    </div>
-
-                    {/* Close Button */}
-                    <div className="absolute top-2 right-2">
-                      <button
-                        onClick={() => setViewingDocument(null)} 
-                        className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
-                      >
-                        <FaTimes />
-                      </button>
-                    </div>
+                <div className="relative mt-4">
+                  <div ref={invoiceRef}>
+                    <img
+                      src={lastUploadUrl}
+                      alt="Document Preview"
+                      className="w-full h-auto"
+                    />
                   </div>
 
+                  <div className="absolute top-2 right-2">
+                    <button
+                      onClick={closeModal}
+                      className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+
+                  {/* Print Button for Image */}
                   <div className="flex items-center justify-center gap-6 py-4">
                     <div className="mt-2 flex">
                       <button className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2">
@@ -198,9 +251,10 @@ const PersonalDetailsView = ({
                         <FaDownload className="ml-2 mt-1" />
                       </button>
                     </div>
+                    {/* Print Button */}
                     <div className="mt-2 flex">
                       <button
-                        onClick={handlePrint} 
+                        onClick={handlePrint}
                         className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex gap-2"
                       >
                         Print
@@ -245,19 +299,41 @@ const PersonalDetailsView = ({
     );
   };
 
-  // Updated rendering for personal details to handle arrays
   const renderDetails = (details) => {
-    const capitalizeWords = (str) => {
-      if (typeof str !== "string" || str === "N/A") {
-        return "N/A";
+    const formatValue = (value) => {
+      if (typeof value === "number") return value.toString();
+
+      if (value === null || value === undefined || value === "") return "N/A";
+
+      if (Array.isArray(value)) {
+        if (value.length === 0) return "N/A";
+
+        if (value.length === 1) return value[0];
+
+        return value.join(", ").trim();
       }
 
-      return str
-        .split(" ") 
+      // Handle string values
+      if (typeof value === "string") {
+        const cleaned = value.replace(/[\[\]"]/g, "").trim();
+        return cleaned === "N/A" || cleaned === "" ? "N/A" : cleaned;
+      }
+
+      return value.toString();
+    };
+
+    const capitalizeWords = (str) => {
+      const val = formatValue(str);
+      if (val === "N/A") return "N/A";
+
+      if (!isNaN(val)) return val;
+
+      return val
+        .split(" ")
         .map(
           (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
         )
-        .join(" "); 
+        .join(" ");
     };
 
     return (
@@ -265,64 +341,56 @@ const PersonalDetailsView = ({
         {Object.entries(details).map(([key, value], index) => (
           <React.Fragment key={index}>
             <span className="text-dark_grey">{key}</span>
-            <span className="text-center text-gray-700">:</span>
-            <span className="text-dark_grey">
-              {
-                Array.isArray(value)
-                  ? value.length > 0 
-                    ? value
-                        .map((v, idx, arr) => {
-          
-                          if (v === null || v === undefined || v === "") {
-                            return "N/A"; 
-                          }
-                     
-                          return v.toLowerCase() === arr[idx - 1]?.toLowerCase()
-                            ? null
-                            : v;
-                        })
-                        .filter((v, idx, arr) => v !== null) 
-                        .reduce((acc, item) => {
-                      
-                          if (item === "N/A" && acc[acc.length - 1] !== "N/A") {
-                            acc.push("N/A");
-                          } else if (item !== "N/A") {
-                            acc.push(item);
-                          }
-                          return acc;
-                        }, [])
-                        .reverse() 
-                        .map((item, idx, arr) => {
-              
-                          return (
-                            <span key={idx}>
-                              <span
-                                className={`${
-                                  arr.length > 1 && idx === 0
-                                    ? "rounded-md font-black italic"
-                                    : "" 
-                                }`}
-                              >
-                                {capitalizeWords(item)}{" "}
-                  
-                              </span>
-                              {idx < arr.length - 1 && <span>,&nbsp;</span>}{" "}
+            <span className="text-center">:</span>
 
-                            </span>
-                          );
-                        })
-                    : "N/A"
-                  : value === null || value === undefined || value === ""
-                  ? "N/A" 
-                  : capitalizeWords(value) 
-              }
-            </span>
+            {key === "Education Details" ? (
+              <span className="text-dark_grey col-span-1">
+                {(() => {
+                  if (!value || value === "null" || value === "N/A")
+                    return "N/A";
+
+                  if (
+                    typeof value === "string" &&
+                    !value.trim().startsWith("[") &&
+                    !value.trim().startsWith("{")
+                  ) {
+                    return "N/A";
+                  }
+
+                  const educationData = parseEducationDetails(value);
+
+                  if (!educationData || educationData.length === 0)
+                    return "N/A";
+
+                  return educationData.map((edu, idx) => {
+                    const education = typeof edu === "object" ? edu : {};
+
+                    return (
+                      <div key={idx} className="mb-2 last:mb-0">
+                        <div className="font-bold">Education {idx + 1}</div>
+                        <div>• University: {education.university || "N/A"}</div>
+                        <div>• Degree: {education.degree || "N/A"}</div>
+                        <div>
+                          • Period: {education.fromDate || "N/A"} to{" "}
+                          {education.toDate || "N/A"}
+                        </div>
+                      </div>
+                    );
+                  });
+                })()}
+              </span>
+            ) : (
+              <span className="text-dark_grey">
+                {value === null || value === undefined || value === ""
+                  ? "N/A"
+                  : capitalizeWords(value)}
+              </span>
+            )}
           </React.Fragment>
         ))}
       </div>
     );
   };
-
   return (
     <section ref={mainRef} className="page py-8 px-10 bg-gray-50 rounded-lg">
       <div>
@@ -341,37 +409,30 @@ const PersonalDetailsView = ({
 
         {/* Educational details */}
         <section className="py-8 bg-gray-50 rounded-lg">
-          <h6 className="uppercase text_size_5  my-3">Education Details:</h6>
+          <h6 className="uppercase text_size_5 my-3">Education Details:</h6>
           <div className="flex flex-col md:flex-row items-start justify-between gap-8">
             <div className="flex-1">{renderDetails(educationalDetails)}</div>
-            <div className="w-[138px] rounded-lg overflow-hidden "> </div>
+            <div className="w-[138px] rounded-lg overflow-hidden"> </div>
           </div>
         </section>
       </div>
 
       {/* Document categories */}
-
       <div className="mt-8">
-        <h6 className="uppercase text_size_5  my-3">Uploaded Documents:</h6>
+        <h6 className="uppercase text_size_5 my-3">Uploaded Documents:</h6>
         {renderDocumentCategory(inducBriefUp, "Induction Briefing")}
       </div>
 
       <div className="mt-8">
-        <h6 className="uppercase text_size_5  my-3">Uploaded Documents:</h6>
+        <h6 className="uppercase text_size_5 my-3">Uploaded Documents:</h6>
         {renderDocumentCategory([bwnUpload], "Brunei IC")}
-
         {renderDocumentCategory([myIcUpload], "Malaysian IC")}
-
         {renderDocumentCategory([ppUpload], "Passport Copy")}
-
-        {renderDocumentCategory([cvCertifyUpload], "CV & Certificates")}
-
+        {renderDocumentCategory([cvCertifyUpload], "CV")}
+        {renderDocumentCategory([qcCertifyUpload], "Certificates")}
         {renderDocumentCategory([applicationUpload], "Application Form")}
-
         {renderDocumentCategory([loiUpload], "LOI")}
-
         {renderDocumentCategory([paafCvevUpload], "PAAF/CVEV Approval")}
-
         {renderDocumentCategory([supportDocUpload], "Supporting Documents")}
       </div>
     </section>

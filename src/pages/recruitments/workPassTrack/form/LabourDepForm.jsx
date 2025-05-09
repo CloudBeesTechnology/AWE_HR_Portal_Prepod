@@ -13,10 +13,15 @@ import { handleDeleteFile } from "../../../../services/uploadsDocsS3/DeleteDocs"
 import { DeleteUploadLabourDep } from "../deleteUpload/DeleteUploadLabourDep";
 import { useDeleteAccess } from "../../../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../../../utils/DeletePopup";
+import { useCreateWPTracking } from "../../../../services/createMethod/CreateWPTracking";
+import { DataSupply } from "../../../../utils/DataStoredContext";
+
 export const LabourDepForm = ({ candidate }) => {
+  const { IVSSDetails } = useContext(DataSupply);
   const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules } = useFetchCandy();
   const { interviewDetails } = UpdateInterviewData();
+  const { createWPTrackingHandler } = useCreateWPTracking();
   const { wpTrackingDetails } = useUpdateWPTracking();
   const [deletePopup, setdeletePopup] = useState(false);
   const [deleteTitle1, setdeleteTitle1] = useState("");
@@ -53,12 +58,17 @@ export const LabourDepForm = ({ candidate }) => {
   });
 
   const DepositUpload = watch("lbrFile");
-
+  
   useEffect(() => {
     if (interviewSchedules.length > 0) {
       const interviewData = interviewSchedules.find(
         (data) => data.tempID === candidate.tempID
       );
+
+      const interviewStatus = IVSSDetails.find(
+        (data) => data.tempID === candidate.tempID
+      );
+
       if (interviewData) {
         setFormData({
           interview: {
@@ -79,8 +89,15 @@ export const LabourDepForm = ({ candidate }) => {
           }));
           // console.log("Uploaded file name set:", fileName);
         }
-      } 
-    } 
+      } else {
+          setFormData({
+          interview: {
+            status: interviewStatus.status,
+          },
+        });
+
+      }
+    }
   }, [interviewSchedules, candidate.tempID]);
 
   const extractFileName = (url) => {
@@ -155,7 +172,8 @@ export const LabourDepForm = ({ candidate }) => {
         tempID,
         setUploadedFileNames,
         setUploadedLabDep,
-        setIsUploadingString
+        setIsUploadingString,
+        setFormData
       );
 
       if (!isDeleted || isDeletedArrayUploaded) {
@@ -173,6 +191,12 @@ export const LabourDepForm = ({ candidate }) => {
     }
   };
 
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  const wrapUpload = (filePath) => {
+    return filePath ? [{ upload: filePath, date: currentDate }] : null;
+  };
+
   const handleSubmitTwo = async (data) => {
     data.preventDefault();
 
@@ -180,12 +204,12 @@ export const LabourDepForm = ({ candidate }) => {
       (data) => data.tempID === candidate?.tempID
     );
 
-    const selectedInterviewDataStatus = interviewSchedules.find(
-      (data) => data.IDDetails.tempID === candidate?.tempID
+    const selectedInterviewDataStatus = IVSSDetails.find(
+      (data) => data.tempID === candidate?.tempID
     );
 
     const interviewScheduleId = selectedInterviewData?.id;
-    const interviewScheduleStatusId = selectedInterviewDataStatus.IDDetails?.id;
+    const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
 
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
@@ -197,16 +221,36 @@ export const LabourDepForm = ({ candidate }) => {
       return;
     }
 
+    const wpTrackingData = {
+      tempID: candidate.tempID,
+      lbrDepoNum: formData.interview.lbrDepoNum,
+      lbrEndroseDate: formData.interview.lbrEndroseDate,
+      lbrDepoAmount: formData.interview.lbrDepoAmount,
+      lbrFile: isUploadingString.lbrFile
+        ? JSON.stringify(wrapUpload(uploadedLabDep.lbrFile))
+        : formData.interview.lbrFile,
+    };
+
+    let response;
+
     try {
-      const response = await wpTrackingDetails({
-        WPTrackingValue: {
-          id: interviewScheduleId,
-          lbrDepoNum: formData.interview.lbrDepoNum,
-          lbrEndroseDate: formData.interview.lbrEndroseDate,
-          lbrDepoAmount: formData.interview.lbrDepoAmount,
-          lbrFile: uploadedLabDep.lbrFile,
-        },
-      });
+      if (interviewScheduleId) {
+        response = await wpTrackingDetails({
+          WPTrackingValue: {
+            id: interviewScheduleId,
+            lbrDepoNum: formData.interview.lbrDepoNum,
+            lbrEndroseDate: formData.interview.lbrEndroseDate,
+            lbrDepoAmount: formData.interview.lbrDepoAmount,
+            lbrFile: isUploadingString.lbrFile
+              ? JSON.stringify(wrapUpload(uploadedLabDep.lbrFile))
+              : formData.interview.lbrFile,
+          },
+        });
+      } else {
+        await createWPTrackingHandler({
+          reqValue: wpTrackingData,
+        });
+      }
 
       const interStatus = {
         id: interviewScheduleStatusId,
@@ -214,17 +258,9 @@ export const LabourDepForm = ({ candidate }) => {
       };
       setNotification(true);
 
-      // console.log("Submitting interview details with status:", interStatus); 034
-
       await interviewDetails({ InterviewValue: interStatus });
 
-      // console.log("Interview status updated:", interStatus);
-
-      // console.log("Response from WPTrackingDetails:", response);
-
-      if (response.errors && response.errors.length > 0) {
-        console.error("Response errors:", response.errors);
-      }
+  
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }

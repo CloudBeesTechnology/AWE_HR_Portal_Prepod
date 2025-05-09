@@ -13,8 +13,8 @@ import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadLOI } from "../deleteDocsRecruit/DeleteUploadLOI";
 import { DeletePopup } from "../../../utils/DeletePopup";
 export const LOIForm = ({ candidate, formattedPermissions }) => {
-  // Ensure candidate is passed as prop
   const { localMobilization, isLoading, error } = LocalMobilization();
+  const { IVSSDetails } = useContext(DataSupply);
   const { loiDetails } = UpdateLoiData();
   const { interviewDetails } = UpdateInterviewData();
   const { mergedInterviewData } = useFetchInterview();
@@ -32,11 +32,8 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
   const [uploadedLOI, setUploadedLOI] = useState({
     loiFile: null,
   });
-  // console.log(uploadedFileNames);
   const {
     register,
-    handleSubmit,
-    watch,
     setValue,
     formState: { errors },
   } = useForm();
@@ -52,8 +49,6 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
     },
   });
 
-  const LOIFile = watch("loiFile", "");
-
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
       const decodedUrl = decodeURIComponent(url);
@@ -68,7 +63,6 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
       ...prev,
       [type]: value,
     }));
-    // console.log(value);
   };
 
   const handleFileUpload = async (e, type) => {
@@ -82,7 +76,6 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
 
     let selectedFile = e.target.files[0];
 
-    // Allowed file types
     const allowedTypes = [
       "application/pdf",
       "image/jpeg",
@@ -122,7 +115,8 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
         tempID,
         setUploadedFileNames,
         setUploadedLOI,
-        setIsUploadingString
+        setIsUploadingString,
+        setFormData
       );
 
       if (!isDeleted || isDeletedArrayUploaded) {
@@ -131,7 +125,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
         );
         return;
       }
-      // console.log(`Deleted "${fileName}". Remaining files:`);
+    
       setdeleteTitle1(`${fileName}`);
       handleDeleteMsg();
     } catch (error) {
@@ -140,20 +134,25 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
     }
   };
 
-  // Handle form submission for updating an existing LOI
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  const wrapUpload = (filePath) => {
+    return filePath ? [{ upload: filePath, date: currentDate }] : null;
+  };
+
   const handleSubmitTwo = async (e) => {
     e.preventDefault();
 
-    // Check if mergedInterviewData is available for the candidate
     const selectedInterviewData = mergedInterviewData.find(
       (data) => data.tempID === candidate?.tempID
     );
 
-    console.log(selectedInterviewData);
-    
+    const selectedInterviewDataStatus = IVSSDetails.find(
+      (data) => data.tempID === candidate?.tempID
+    );
 
     const localMobilizationId = selectedInterviewData.localMobilization.id;
-    const interviewScheduleId = selectedInterviewData.interviewSchedules.id;
+    const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
 
     const formattedData = {
       id: localMobilizationId,
@@ -161,12 +160,14 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
       loiAcceptDate: formData.interview.loiAcceptDate,
       loiDeclineDate: formData.interview.loiDeclineDate,
       declineReason: formData.interview.declineReason,
-      loiFile: uploadedLOI.loiFile,
+      loiFile: isUploadingString.loiFile
+        ? JSON.stringify(wrapUpload(uploadedLOI.loiFile))
+        : formData.interview.loiFile,
       tempID: candidate.tempID,
     };
 
     const interStatus = {
-      id: interviewScheduleId,
+      id: interviewScheduleStatusId,
       department: formData.interview.department,
       otherDepartment: formData.interview.otherDepartment,
       status: formData.interview.status,
@@ -177,14 +178,16 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
       loiAcceptDate: formData.interview.loiAcceptDate,
       loiDeclineDate: formData.interview.loiDeclineDate,
       declineReason: formData.interview.declineReason,
-      loiFile: uploadedLOI.loiFile,
+      loiFile: isUploadingString.loiFile
+        ? JSON.stringify(wrapUpload(uploadedLOI.loiFile))
+        : formData.interview.loiFile,
       tempID: candidate.tempID,
     };
 
     try {
       if (localMobilizationId) {
         // console.log("Update", interStatus);
-        // If interview data exists, update the LOI and interview status    
+        // If interview data exists, update the LOI and interview status
         await loiDetails({ LoiValue: formattedData });
         await interviewDetails({ InterviewValue: interStatus });
         setNotification(true);
@@ -205,7 +208,7 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
     if (mergedInterviewData.length > 0) {
       const interviewData = mergedInterviewData.find(
         (data) => data.tempID === candidate.tempID
-      ); // Assuming we want to take the first item
+      ); 
       if (interviewData) {
         setFormData({
           interview: {
@@ -227,7 +230,6 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
       }
     }
   }, [mergedInterviewData, candidate.tempID]);
-  // console.log(candidate);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -243,7 +245,6 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
 
   const access = "Recruitment";
 
-  // console.log("String", isUploadingString);
 
   return (
     <form>

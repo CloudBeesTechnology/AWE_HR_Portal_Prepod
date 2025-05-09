@@ -51,6 +51,7 @@ export declare type IDDetailsCreateFormInputValues = {
     race?: string;
     religion?: string;
     supportDocUpload?: string[];
+    qcCertifyUpload?: string[];
 };
 export declare type IDDetailsCreateFormValidationValues = {
     empID?: ValidationFunction<string>;
@@ -82,6 +83,7 @@ export declare type IDDetailsCreateFormValidationValues = {
     race?: ValidationFunction<string>;
     religion?: ValidationFunction<string>;
     supportDocUpload?: ValidationFunction<string>;
+    qcCertifyUpload?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type IDDetailsCreateFormOverridesProps = {
@@ -115,6 +117,7 @@ export declare type IDDetailsCreateFormOverridesProps = {
     race?: PrimitiveOverrideProps<TextFieldProps>;
     religion?: PrimitiveOverrideProps<TextFieldProps>;
     supportDocUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    qcCertifyUpload?: PrimitiveOverrideProps<TextAreaFieldProps>;
 } & EscapeHatchProps;
 export declare type IDDetailsCreateFormProps = React.PropsWithChildren<{
     overrides?: IDDetailsCreateFormOverridesProps | undefined | null;

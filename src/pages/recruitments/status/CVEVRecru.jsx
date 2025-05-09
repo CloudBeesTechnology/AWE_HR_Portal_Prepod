@@ -18,11 +18,11 @@ export const CVEVRecru = ({ data, formatDate, fileUpload, urlValue }) => {
     "Position",
     "Approved Date",
     "CVEV PDF",
-    "Status Update",
+    "Status",
     "Form",
     "Edit Form",
   ];
-  // console.log(data);
+  
 
   const totalPages = Math.ceil(data.length / rowsPerPage);
   const startIndex = (page - 1) * rowsPerPage;

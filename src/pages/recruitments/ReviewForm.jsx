@@ -401,8 +401,8 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     try {
       const result = await getUrl({ path: pathUrl });
 
-      setPPLastUP(result.url.href); 
-      setViewingDocument(pathUrl); 
+      setPPLastUP(result.url.href);
+      setViewingDocument(pathUrl);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching the file URL:", error);
@@ -411,25 +411,62 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
   };
 
   const parseDocuments = (docData) => {
-    // Check if docData is a string (single file path)
+    // Handle null or undefined input
+    if (!docData) {
+      return [];
+    }
+
+    // Case: array with one JSON string element (e.g., ['[{"upload": "..."}]'])
+    if (
+      Array.isArray(docData) &&
+      typeof docData[0] === "string" &&
+      docData[0].trim().startsWith("[{")
+    ) {
+      try {
+        const parsed = JSON.parse(docData[0]);
+        if (Array.isArray(parsed)) {
+          return parsed.filter(
+            (doc) => doc.upload && !doc.upload.includes("undefined")
+          );
+        }
+      } catch (err) {
+        // console.error("Failed to parse JSON string in array:", err);
+        return [];
+      }
+    }
+
+    // Case: JSON string directly (e.g., '{"upload":"..."}')
+    if (typeof docData === "string" && docData.trim().startsWith("[{")) {
+      try {
+        const parsed = JSON.parse(docData);
+        if (Array.isArray(parsed)) {
+          return parsed.filter(
+            (doc) => doc.upload && !doc.upload.includes("undefined")
+          );
+        }
+      } catch (err) {
+        // console.error("Failed to parse JSON string:", err);
+        return [];
+      }
+    }
+
+    // Case: string path
     if (typeof docData === "string" && !docData.includes("undefined")) {
-      // If it's a string and does not contain the word 'undefined', return an array with one document object
       return [{ upload: docData }];
     }
 
-    // Check if docData is an array (array of file paths)
-    else if (Array.isArray(docData)) {
-      // If it's an array, filter out any undefined or invalid entries and map them into objects
+    // Case: array of strings or objects
+    if (Array.isArray(docData)) {
       return docData
-        .filter((doc) => doc && !doc.includes("undefined"))
+        .filter(
+          (doc) => doc && typeof doc === "string" && !doc.includes("undefined")
+        )
         .map((doc) => ({ upload: doc }));
     }
 
-    // If docData is neither a string nor an array, return an empty array
-    else {
-      console.error("Invalid document data format:", docData);
-      return [];
-    }
+    // Unrecognized format
+    // console.error("Invalid document data format:", docData);
+    return [];
   };
 
   const closeModal = () => {
@@ -444,7 +481,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
     setIsScheduleOpen(false);
   };
 
-  // console.log(candyEducDeatils);
+  // console.log("Candy",candyEducDeatils);
 
   const renderDocumentsUnderCategory = (documents) => {
     return (
@@ -672,7 +709,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                   label: "Passport Issued Destination",
                   value: candidate.ppDestinate,
                 },
-                
+
                 {
                   label: "Brief Description of Present Duties",
                   value: candyEducDeatils.desc,
@@ -731,9 +768,7 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
                 <div key={index} className="center  mb-4 leading-relaxed">
                   <strong className="w-full max-w-[200px]">{item.label}</strong>
                   <span className="w-[50px] text-center">:</span>
-                  <span className="w-full">
-                    {item.value || "N/A"}
-                  </span>
+                  <span className="w-full">{item.value || "N/A"}</span>
                 </div>
               ))}
             </div>
@@ -980,7 +1015,11 @@ export const ReviewForm = ({ candidate, onClose, showDecisionButtons }) => {
               )}
               {renderDocumentCategory(
                 [candyEducDeatils.uploadPp],
-                "IC / Passport"
+                "Passport"
+              )}
+              {renderDocumentCategory(
+                [candyEducDeatils.uploadIc],
+                "IC"
               )}
             </div>
           </div>

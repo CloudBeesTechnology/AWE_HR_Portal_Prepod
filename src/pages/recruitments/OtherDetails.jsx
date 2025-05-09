@@ -38,18 +38,21 @@ export const OtherDetails = ({ fetchedData }) => {
     uploadResume: false,
     uploadCertificate: false,
     uploadPp: false,
+    uploadIc: false,
   });
 
   const [uploadedFileNames, setUploadedFileNames] = useState({
     uploadResume: null,
     uploadCertificate: null,
     uploadPp: null,
+    uploadIc: null,
   });
 
   const [uploadedDocs, setUploadedDocs] = useState({
     uploadResume: null,
     uploadCertificate: null,
     uploadPp: null,
+    uploadIc: null,
   });
 
   const {
@@ -160,6 +163,7 @@ export const OtherDetails = ({ fetchedData }) => {
               ),
               uploadPp: extractFileName(interviewData.uploadPp),
               uploadResume: extractFileName(interviewData.uploadResume),
+              uploadIc: extractFileName(interviewData.uploadIc),
             }));
 
             setUploadedDocs((prev) => ({
@@ -167,6 +171,7 @@ export const OtherDetails = ({ fetchedData }) => {
               uploadCertificate: interviewData.uploadCertificate,
               uploadPp: interviewData.uploadPp,
               uploadResume: interviewData.uploadResume,
+              uploadIc: interviewData.uploadIc,
             }));
           }
         } else {
@@ -181,12 +186,18 @@ export const OtherDetails = ({ fetchedData }) => {
   }, [tempID, setValue, educDetailsData]);
 
   const extractFileName = (url) => {
-    if (typeof url === "string" && url) {
-      const decodedUrl = decodeURIComponent(url);
-      const fileNameWithParams = decodedUrl.split("/").pop();
-      return fileNameWithParams.split("?")[0].split(",")[0].split("#")[0];
-    }
-    return "";
+    try {
+      if (!url || typeof url !== "string") return "";
+      let parsed = JSON.parse(url);
+
+      if (Array.isArray(parsed) && parsed[0]?.upload) {
+        url = parsed[0].upload;
+      }
+    } catch (e) {}
+
+    const decodedUrl = decodeURIComponent(url);
+    const fileNameWithParams = decodedUrl.split("/").pop();
+    return fileNameWithParams.split("?")[0].split(",")[0].split("#")[0];
   };
 
   const updateUploadingString = (type, value) => {
@@ -206,6 +217,7 @@ export const OtherDetails = ({ fetchedData }) => {
       uploadResume: "uploadResume",
       uploadCertificate: "uploadCertificate",
       uploadPp: "uploadPp",
+      uploadIc: "uploadIc",
     };
 
     if (fileTypeMapping[type]) {
@@ -313,6 +325,8 @@ export const OtherDetails = ({ fetchedData }) => {
   var latestTempIDData;
 
   const onSubmit = async (data) => {
+    console.log("Navy", navigatingEducationData);
+    
     try {
       setIsLoading(true);
 
@@ -324,7 +338,7 @@ export const OtherDetails = ({ fetchedData }) => {
       }
 
       const personName = !data.tempID ? latestTempIDData : data.tempID;
-      console.log(personName);
+      // console.log(personName);
 
       // const latestTempIDData = personName;
 
@@ -369,6 +383,10 @@ export const OtherDetails = ({ fetchedData }) => {
         ? await uploadReqString(data.uploadPp, "uploadPp", personName)
         : uploadedDocs?.uploadPp;
 
+      const uploadedIc = isUploadingString.uploadIc
+        ? await uploadReqString(data.uploadIc, "uploadIc", personName)
+        : uploadedDocs?.uploadIc;
+
       const UpProfilePhoto =
         navigatingEducationData.profilePhotoDoc &&
         !navigatingEducationData.profilePhotoDoc.includes("Employee")
@@ -390,6 +408,13 @@ export const OtherDetails = ({ fetchedData }) => {
         return null;
       };
 
+      const currentDate = new Date().toISOString().split("T")[0];
+
+      const wrapUpload = (filePath) => {
+        const safePath = safeReplace(filePath);
+        return safePath ? [{ upload: safePath, date: currentDate }] : null;
+      };
+
       const reqValue = {
         ...data,
         ...navigatingEducationData,
@@ -408,11 +433,21 @@ export const OtherDetails = ({ fetchedData }) => {
         relatives: formattedRelatives,
         status: "Active",
         profilePhoto: safeReplace(UpProfilePhoto?.replace(baseURL, "")),
-        uploadResume: safeReplace(uploadedResume?.replace(baseURL, "")),
-        uploadCertificate: safeReplace(
-          uploadedCertificate?.replace(baseURL, "")
-        ),
-        uploadPp: safeReplace(uploadedPp?.replace(baseURL, "")),
+        uploadResume: isUploadingString.uploadResume
+          ? JSON.stringify(wrapUpload(uploadedResume))
+          : uploadedDocs?.uploadResume,
+
+        uploadCertificate: isUploadingString.uploadCertificate
+          ? JSON.stringify(wrapUpload(uploadedCertificate))
+          : uploadedDocs?.uploadCertificate,
+
+        uploadPp: isUploadingString.uploadPp
+          ? JSON.stringify(wrapUpload(uploadedPp))
+          : uploadedDocs?.uploadPp,
+
+        uploadIc: isUploadingString.uploadIc
+          ? JSON.stringify(wrapUpload(uploadedIc))
+          : uploadedDocs?.uploadIc,
       };
 
       const checkingPDTable = empPDData.find(
@@ -431,7 +466,7 @@ export const OtherDetails = ({ fetchedData }) => {
 
         await candyDetails({ reqValue: updateReqValue });
         // console.log("Update", updateReqValue);
-        
+
         setNotification(true);
         setIsLoading(false);
       } else {
@@ -439,7 +474,7 @@ export const OtherDetails = ({ fetchedData }) => {
         await submitODFunc({ reqValue, latestTempIDData });
         // console.log("Create", reqValue);
         // console.log("TempID", latestTempIDData);
-        
+
         setNotification(true);
         setIsLoading(false);
       }
@@ -618,7 +653,7 @@ export const OtherDetails = ({ fetchedData }) => {
 
             <div>
               <FileUploadField
-                label="Upload IC / Passport"
+                label="Upload Passport"
                 register={register}
                 fileKey="uploadPp"
                 handleFileUpload={handleFileUpload}
@@ -626,6 +661,22 @@ export const OtherDetails = ({ fetchedData }) => {
                 deletedStringUpload={deletedStringUpload}
                 isUploadingString={isUploadingString}
                 error={errors.uploadPp}
+                formattedPermissions={formattedPermissions}
+                requiredPermissions={requiredPermissions}
+                access={access}
+              />
+            </div>
+
+            <div>
+              <FileUploadField
+                label="Upload IC"
+                register={register}
+                fileKey="uploadIc"
+                handleFileUpload={handleFileUpload}
+                uploadedFileNames={uploadedFileNames}
+                deletedStringUpload={deletedStringUpload}
+                isUploadingString={isUploadingString}
+                error={errors.UploadIC}
                 formattedPermissions={formattedPermissions}
                 requiredPermissions={requiredPermissions}
                 access={access}

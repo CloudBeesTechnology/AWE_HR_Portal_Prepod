@@ -40,7 +40,7 @@ export const NonLocalMobTable = ({
     "Date of Mobilization",
     "Agent Name",
     "Recruitment Remarks",
-    "Non Local Mobilization",
+    "Non Local Mobilization PDF",
     "Form",
     "Edit Form",
     "Status",
@@ -117,7 +117,7 @@ export const NonLocalMobTable = ({
     const numberPart = numberMatch ? parseInt(numberMatch[0], 10) : 0;
     const nextNumber = numberPart + 1;
     const nextTempID = `${prefix}${nextNumber}`;
-    console.log("Next TempID", nextTempID);
+    // console.log("Next TempID", nextTempID);
 
     return nextTempID;
   };
@@ -309,7 +309,7 @@ export const NonLocalMobTable = ({
                     <td className="py-3">{item.name || "N/A"}</td>
                     <td className="py-3">{item.nationality || "N/A"}</td>
                     <td className="py-3">
-                      {item.interviewDetails_manager || "N/A"}
+                      {item.position || "N/A"}
                     </td>
                     <td className="py-3">
                       {DateFormat(item.WPTrackDetails_mobSignDate) || "N/A"}

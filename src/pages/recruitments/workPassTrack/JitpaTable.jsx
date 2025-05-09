@@ -75,7 +75,7 @@ export const JitpaTable = ({ data, formatDate, fileUpload, urlValue }) => {
                       <td className="py-3">{item.nationality || "N/A"}</td>
 
                       <td className="py-3">
-                        {item.interviewDetails_manager || "N/A"}
+                        {item.position || "N/A"}
                       </td>
                       <td className="py-3">
                         {DateFormat(item.WPTrackDetails_tbapurchasedate) || "N/A"}

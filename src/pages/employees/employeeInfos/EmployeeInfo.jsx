@@ -6,7 +6,6 @@ import { Link } from "react-router-dom";
 import { employeeInfoSchema } from "../../../services/EmployeeValidation";
 import { SearchDisplay } from "../../../utils/SearchDisplay";
 import { IoSearch } from "react-icons/io5";
-import { GoUpload } from "react-icons/go";
 import avatar from "../../../assets/navabar/avatar.jpeg";
 import { IoCameraOutline } from "react-icons/io5";
 import { SpinLogo } from "../../../utils/SpinLogo";
@@ -37,6 +36,7 @@ import { FileUploadField } from "../medicalDep/FileUploadField";
 import { MdCancel } from "react-icons/md";
 import { DeletePopup } from "../../../utils/DeletePopup";
 import { useDeleteAccess } from "../../../hooks/useDeleteAccess";
+import { DateFormat } from "../../../utils/DateFormat";
 
 export const EmployeeInfo = () => {
   useEffect(() => {
@@ -50,7 +50,7 @@ export const EmployeeInfo = () => {
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const { SubmitEIData, errorEmpID } = EmpInfoFunc();
   const { UpdateEIValue } = UpdateEmpInfo();
-  const { empPIData, IDData, dropDownVal } = useContext(DataSupply);
+  const { empPIData, IDData, dropDownVal, candyToEmp } = useContext(DataSupply);
   const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [selectedNationality, setSelectedNationality] = useState("");
@@ -68,6 +68,7 @@ export const EmployeeInfo = () => {
     ppUpload: false,
     supportDocUpload: false,
     loiUpload: false,
+    qcCertifyUpload: false,
   });
   const [isUploadingString, setIsUploadingString] = useState({
     uploadProfilePhoto: false,
@@ -82,6 +83,7 @@ export const EmployeeInfo = () => {
     ppUpload: [],
     supportDocUpload: [],
     loiUpload: [],
+    qcCertifyUpload: [],
   });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     uploadProfilePhoto: null,
@@ -141,10 +143,13 @@ export const EmployeeInfo = () => {
             const IDDetails = IDData
               ? IDData.find((user) => user.empID === emp.empID)
               : {};
+            const candyDetails =
+              candyToEmp?.find((item) => item.empID === emp.empID) || {};
 
             return {
               ...emp,
               ...IDDetails,
+              ...candyDetails,
             };
           })
           .filter(Boolean);
@@ -158,7 +163,7 @@ export const EmployeeInfo = () => {
     };
 
     fetchData();
-  }, [empPIData, IDData]);
+  }, [empPIData, IDData, candyToEmp]);
 
   const updateUploadingString = (type, value) => {
     setIsUploadingString((prev) => ({
@@ -547,17 +552,60 @@ export const EmployeeInfo = () => {
       "gender",
     ];
 
+    // keysToSet.forEach((key) => {
+    //   let valueToSet = result[key] || "";
+
+    //   if (typeof valueToSet === "string") {
+    //     setValue(key, valueToSet.trim().toUpperCase());
+    //   } else if (Array.isArray(valueToSet) && valueToSet.length > 0) {
+    //     setValue(key, [valueToSet[valueToSet.length - 1].trim().toUpperCase()]);
+    //   } else {
+    //     setValue(key, valueToSet);
+    //   }
+    // });
+
     keysToSet.forEach((key) => {
       let valueToSet = result[key] || "";
 
       if (typeof valueToSet === "string") {
-        setValue(key, valueToSet.trim().toUpperCase());
+        setValue(key, valueToSet ? valueToSet.trim().toUpperCase() : "");
       } else if (Array.isArray(valueToSet) && valueToSet.length > 0) {
-        setValue(key, [valueToSet[valueToSet.length - 1].trim().toUpperCase()]);
+        const lastElement = valueToSet[valueToSet.length - 1];
+        setValue(key, [lastElement ? lastElement.trim().toUpperCase() : ""]);
       } else {
         setValue(key, valueToSet);
       }
     });
+
+    if (
+      Array.isArray(result.workExperience) &&
+      result.workExperience.length > 0
+    ) {
+      try {
+        const lastEntryRaw =
+          result.workExperience[result.workExperience.length - 1];
+        const parsedArray = JSON.parse(lastEntryRaw);
+
+        if (Array.isArray(parsedArray) && parsedArray.length > 0) {
+          const lastExperience = parsedArray[parsedArray.length - 1];
+          const name = (lastExperience.name || "").trim().toUpperCase();
+          const from = (lastExperience.from || "").trim();
+          const to = (lastExperience.to || "").trim();
+          const period =
+            from && to ? `${DateFormat(from)} to ${DateFormat(to)}` : "";
+
+          setValue("preEmp", name);
+          setValue("preEmpPeriod", period);
+        }
+      } catch (e) {
+        console.warn("Failed to parse workExperience:", e);
+        setValue("preEmp", "");
+        setValue("preEmpPeriod", "");
+      }
+    } else {
+      setValue("preEmp", "");
+      setValue("preEmpPeriod", "");
+    }
 
     const fieldsArray = ["bwnIcExpiry", "ppExpiry", "ppIssued"];
     fieldsArray.forEach((field) =>
@@ -658,6 +706,7 @@ export const EmployeeInfo = () => {
       "paafCvevUpload",
       "ppUpload",
       "supportDocUpload",
+      "qcCertifyUpload",
     ];
 
     uploadFields.forEach((field) => {
@@ -670,46 +719,64 @@ export const EmployeeInfo = () => {
         return;
       }
 
-      try {
-        const outerParsed = JSON.parse(fieldData);
-        const parsedArray = Array.isArray(outerParsed)
-          ? outerParsed
-          : [outerParsed];
+      let parsedArray;
 
-        const parsedFiles = parsedArray.map((item) => {
-          if (typeof item === "string") {
+      try {
+        parsedArray = JSON.parse(fieldData);
+      } catch (e1) {
+        try {
+          const cleaned = fieldData.replace(/^"+|"+$/g, "");
+          parsedArray = JSON.parse(cleaned);
+        } catch (e2) {
+          setValue(field, []);
+          setUploadedFiles((prev) => ({ ...prev, [field]: [] }));
+          setUploadedFileNames((prev) => ({ ...prev, [field]: "" }));
+          return;
+        }
+      }
+
+      if (!Array.isArray(parsedArray)) {
+        parsedArray = [parsedArray];
+      }
+
+      const parsedFiles = parsedArray.flatMap((item, index) => {
+        if (typeof item === "string") {
+          try {
+            const once = JSON.parse(item);
+            return Array.isArray(once) ? once : [once];
+          } catch (err1) {
             try {
-              const validJSON = preprocessJSONString(item);
-              return JSON.parse(validJSON);
-            } catch {
-              return item;
+              const cleaned = item.replace(/^"+|"+$/g, "");
+              const twice = JSON.parse(cleaned);
+
+              return Array.isArray(twice) ? twice : [twice];
+            } catch (err2) {
+              return [];
             }
           }
-          return item;
-        });
+        } else if (typeof item === "object" && item !== null) {
+          return [item];
+        }
+        return [];
+      });
 
-        // *Filter out deleted files before setting them back*
-        const filteredFiles = parsedFiles.filter(
-          (file) => !deletedFiles[field]?.includes(getFileName(file.upload))
-        );
+      const filteredFiles = parsedFiles.filter(
+        (file) => !deletedFiles[field]?.includes(getFileName(file.upload))
+      );
 
-        const fileNames = filteredFiles.map((file) => getFileName(file.upload));
-
-        setValue(field, filteredFiles);
-        setUploadedFiles((prev) => ({ ...prev, [field]: filteredFiles }));
-        setUploadedFileNames((prev) => ({ ...prev, [field]: fileNames }));
-      } catch (error) {
-        console.error(`Failed to parse ${field}:`, error);
-      }
+      const fileNames = filteredFiles.map((file) => getFileName(file.upload));
+      setValue(field, filteredFiles);
+      setUploadedFiles((prev) => ({ ...prev, [field]: filteredFiles }));
+      setUploadedFileNames((prev) => ({ ...prev, [field]: fileNames }));
     });
   };
 
   const getFileName = (filePath) => {
     if (!filePath || typeof filePath !== "string") {
-      return ""; // Return an empty string if the file path is invalid
+      return "";
     }
-    const fileNameWithExtension = filePath.split("/").pop(); // Get file name with extension
-    // const fileName = fileNameWithExtension.split(".").slice(0, -1).join("."); // Remove extension
+    const fileNameWithExtension = filePath.split("/").pop();
+
     return fileNameWithExtension;
   };
 
@@ -728,7 +795,7 @@ export const EmployeeInfo = () => {
     const empType = data.empType;
 
     const removeLeadingNulls = (array, newValue) => {
-      const newArray = [...(array || []), newValue]; // Combine old array and new value
+      const newArray = [...(array || []), newValue];
       let firstValidIndex = newArray.findIndex((item) => item !== null);
 
       if (firstValidIndex !== -1) {
@@ -739,7 +806,7 @@ export const EmployeeInfo = () => {
         newArray.forEach((item) => {
           if (item !== null && item !== lastAdded) {
             result.push(item === null ? "N/A" : item);
-            lastAdded = item; // Update lastAdded to the current item
+            lastAdded = item;
           } else if (item === null) {
             result.push("N/A");
           }
@@ -797,6 +864,7 @@ export const EmployeeInfo = () => {
           paafCvevUpload: JSON.stringify(uploadedFiles.paafCvevUpload),
           ppUpload: JSON.stringify(uploadedFiles.ppUpload),
           supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
+          qcCertifyUpload: JSON.stringify(uploadedFiles.qcCertifyUpload),
           familyDetails: JSON.stringify(data.familyDetails),
           PITableID: checkingPITable.id,
           IDTable: checkingIDTable.id,
@@ -832,6 +900,7 @@ export const EmployeeInfo = () => {
           paafCvevUpload: JSON.stringify(uploadedFiles.paafCvevUpload),
           ppUpload: JSON.stringify(uploadedFiles.ppUpload),
           supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
+          qcCertifyUpload: JSON.stringify(uploadedFiles.qcCertifyUpload),
           familyDetails: JSON.stringify(data.familyDetails),
           email: data.email.trim().toLowerCase(),
           officialEmail: data.officialEmail.trim().toLowerCase(),
@@ -938,6 +1007,12 @@ export const EmployeeInfo = () => {
                 {errors?.profilePhoto?.message}
               </p>
             )}
+
+            {/* {errors && (
+              <p className="text-[red] text-[13px] text-center">
+                {errors?.profilePhoto?.message}
+              </p>
+            )} */}
           </div>
           <div className="max-w-sm">
             <FormField
@@ -1061,7 +1136,7 @@ export const EmployeeInfo = () => {
                       type="file"
                       className="hidden"
                       accept=".pdf,image/jpeg,image/png"
-                      onChange={(e) => handleFileChange(e, field.title)} // Pass field title for dynamic handling
+                      onChange={(e) => handleFileChange(e, field.title)}
                       disabled={isUploading[field.title]}
                     />
                     <span className="ml-2 text-grey w-full font-normal flex justify-between items-center gap-10">
@@ -1074,7 +1149,7 @@ export const EmployeeInfo = () => {
                     {uploadedFileNames?.[field.title] ? (
                       Array.isArray(uploadedFileNames[field.title]) ? (
                         uploadedFileNames[field.title]
-                          .slice() // Create a shallow copy to avoid mutating the original array
+                          .slice()
                           .reverse()
                           .map((fileName, fileIndex) => (
                             <span
@@ -1119,9 +1194,9 @@ export const EmployeeInfo = () => {
                     )}
                   </p>
 
-                  {errors[field.title] && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors[field.title].message}
+                  {errors?.[field.title]?.[0]?.message && (
+                    <p className="text-[red] text-xs mt-1">
+                      {errors[field.title][0].message}
                     </p>
                   )}
                 </div>

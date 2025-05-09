@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { uploadDocString } from "../../../../services/uploadsDocsS3/UploadDocs";
@@ -13,17 +13,22 @@ import { handleDeleteFile } from "../../../../services/uploadsDocsS3/DeleteDocs"
 import { DeleteUploadNlms } from "../deleteUpload/DeleteUploadNlms";
 import { useDeleteAccess } from "../../../../hooks/useDeleteAccess";
 import { DeletePopup } from "../../../../utils/DeletePopup";
+import { DataSupply } from "../../../../utils/DataStoredContext";
+import { useCreateWPTracking } from "../../../../services/createMethod/CreateWPTracking";
+
 export const NlmsForm = ({ candidate }) => {
+  const { IVSSDetails } = useContext(DataSupply);
   const { formattedPermissions } = useDeleteAccess();
   const { interviewSchedules } = useFetchCandy();
   const { interviewDetails } = UpdateInterviewData();
+  const { createWPTrackingHandler } = useCreateWPTracking();
   const { wpTrackingDetails, isLoading, error } = useUpdateWPTracking();
   const [notification, setNotification] = useState(false);
   const [deletePopup, setdeletePopup] = useState(false);
   const [deleteTitle1, setdeleteTitle1] = useState("");
   const [formData, setFormData] = useState({
     interview: {
-      id: "", 
+      id: "",
       nlmssubmitdate: "",
       submissionrefrenceno: "",
       nlmsapprovedate: "",
@@ -62,6 +67,10 @@ export const NlmsForm = ({ candidate }) => {
         (data) => data.tempID === candidate.tempID
       );
 
+      const interviewStatus = IVSSDetails.find(
+        (data) => data.tempID === candidate.tempID
+      );
+
       if (interviewData) {
         setFormData({
           interview: {
@@ -83,8 +92,14 @@ export const NlmsForm = ({ candidate }) => {
           }));
           // console.log("Uploaded file name set:", fileName);
         }
-      } 
-    } 
+      } else {
+        setFormData({
+          interview: {
+            status: interviewStatus.status,
+          },
+        });
+      }
+    }
   }, [interviewSchedules, candidate.tempID]);
 
   const extractFileName = (url) => {
@@ -159,7 +174,8 @@ export const NlmsForm = ({ candidate }) => {
         tempID,
         setUploadedFileNames,
         setUploadedNlms,
-        setIsUploadingString
+        setIsUploadingString,
+        setFormData
       );
 
       if (!isDeleted || isDeletedArrayUploaded) {
@@ -187,6 +203,12 @@ export const NlmsForm = ({ candidate }) => {
     }));
   };
 
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  const wrapUpload = (filePath) => {
+    return filePath ? [{ upload: filePath, date: currentDate }] : null;
+  };
+
   const handleSubmitTwo = async (data) => {
     data.preventDefault();
 
@@ -194,44 +216,59 @@ export const NlmsForm = ({ candidate }) => {
       (data) => data.tempID === candidate?.tempID
     );
 
-    const selectedInterviewDataStatus = interviewSchedules.find(
-      (data) => data.IDDetails.tempID === candidate?.tempID
+    const selectedInterviewDataStatus = IVSSDetails.find(
+      (data) => data.tempID === candidate?.tempID
     );
 
     const interviewScheduleId = selectedInterviewData?.id;
-    const interviewScheduleStatusId = selectedInterviewDataStatus.IDDetails?.id;
+    const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
 
     if (!formData?.interview) {
       console.error("Error: formData.interview is undefined.");
       return;
     }
 
+    const wpTrackingData = {
+      tempID: candidate.tempID,
+      nlmssubmitdate: formData.interview.nlmssubmitdate,
+      submissionrefrenceno: formData.interview.submissionrefrenceno,
+      nlmsapprovedate: formData.interview.nlmsapprovedate,
+      nlmsexpirydate: formData.interview.nlmsexpirydate,
+      ldreferenceno: formData.interview.ldreferenceno,
+      nlmsfile: isUploadingString.nlmsFile
+        ? JSON.stringify(wrapUpload(uploadedNlms.nlmsFile))
+        : formData.interview.nlmsfile,
+    };
+
     try {
-      const response = await wpTrackingDetails({
-        WPTrackingValue: {
-          id: interviewScheduleId,
-          nlmssubmitdate: formData.interview.nlmssubmitdate,
-          submissionrefrenceno: formData.interview.submissionrefrenceno,
-          nlmsapprovedate: formData.interview.nlmsapprovedate,
-          nlmsexpirydate: formData.interview.nlmsexpirydate,
-          ldreferenceno: formData.interview.ldreferenceno,
-          nlmsfile: uploadedNlms.nlmsFile,
-        },
-      });
+      if (interviewScheduleId) {
+        const response = await wpTrackingDetails({
+          WPTrackingValue: {
+            id: interviewScheduleId,
+            nlmssubmitdate: formData.interview.nlmssubmitdate,
+            submissionrefrenceno: formData.interview.submissionrefrenceno,
+            nlmsapprovedate: formData.interview.nlmsapprovedate,
+            nlmsexpirydate: formData.interview.nlmsexpirydate,
+            ldreferenceno: formData.interview.ldreferenceno,
+            nlmsfile: isUploadingString.nlmsFile
+              ? JSON.stringify(wrapUpload(uploadedNlms.nlmsFile))
+              : formData.interview.nlmsfile,
+          },
+        });
+      } else {
+        await createWPTrackingHandler({
+          reqValue: wpTrackingData,
+        });
+      }
 
       const interStatus = {
         id: interviewScheduleStatusId,
         status: formData.interview.status,
       };
+
       setNotification(true);
 
-      // console.log("Submitting interview details with status:", interStatus);
-
       await interviewDetails({ InterviewValue: interStatus });
-
-      // console.log("Interview status updated:", interStatus);
-
-      // console.log("WPTracking response:", response);
     } catch (err) {
       console.error("Error submitting interview details:", err);
     }

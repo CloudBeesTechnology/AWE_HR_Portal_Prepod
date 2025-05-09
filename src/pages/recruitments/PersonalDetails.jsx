@@ -15,7 +15,7 @@ export const PersonalDetails = () => {
   const { empPDData } = useContext(DataSupply);
   const location = useLocation();
   const applicationData = location.state?.FormData;
-// console.log(applicationData);
+  // console.log(applicationData);
 
   useEffect(() => {
     window.scrollTo({
@@ -46,12 +46,12 @@ export const PersonalDetails = () => {
       ],
       eduDetails: [{ university: "", fromDate: "", toDate: "", degree: "" }],
       workExperience: [{ company: "", position: "", from: "", to: "" }],
-      lang:[]
+      lang: [],
     },
   });
 
   const navigate = useNavigate();
-  
+
   const languageOptions = [
     { value: "English", label: "English" },
     { value: "Mandarin", label: "Mandarin" },
@@ -62,7 +62,6 @@ export const PersonalDetails = () => {
   const [isOpen, setIsOpen] = useState(false); // For dropdown visibility
   const [showOtherLangInput, setShowOtherLangInput] = useState(false);
   const [otherLanguage, setOtherLanguage] = useState("");
-
 
   const {
     fields: familyDetails,
@@ -137,22 +136,19 @@ export const PersonalDetails = () => {
     };
   }, [location, setValue]);
 
-
   const onSubmit = (data) => {
- 
     const navigatingData = {
-      ...applicationData,  
-      ...data
+      ...applicationData,
+      ...data,
     };
-  
+
     localStorage.setItem("personalFormData", JSON.stringify(navigatingData));
-  
+
     navigate("/addCandidates/educationDetails", {
       state: { FormData: navigatingData },
     });
   };
 
-  
   useEffect(() => {
     const parseDetails = (data) => {
       try {
@@ -184,9 +180,23 @@ export const PersonalDetails = () => {
     };
 
     const selectedFields = [
-      "alternateNo", "bwnIcColour", "bwnIcExpiry", "bwnIcNo", "contactNo",
-      "driveLic", "eduDetails", "familyDetails", "lang","otherLang", "permanentAddress",
-      "ppDestinate", "ppExpiry", "ppIssued", "ppNo", "presentAddress", "workExperience"
+      "alternateNo",
+      "bwnIcColour",
+      "bwnIcExpiry",
+      "bwnIcNo",
+      "contactNo",
+      "driveLic",
+      "eduDetails",
+      "familyDetails",
+      "lang",
+      "otherLang",
+      "permanentAddress",
+      "ppDestinate",
+      "ppExpiry",
+      "ppIssued",
+      "ppNo",
+      "presentAddress",
+      "workExperience",
     ];
 
     if (tempID) {
@@ -196,7 +206,6 @@ export const PersonalDetails = () => {
           // console.log(interviewData, "1");
 
           selectedFields.forEach((key) => {
-         
             if (
               key === "familyDetails" ||
               key === "workExperience" ||
@@ -208,42 +217,42 @@ export const PersonalDetails = () => {
               ) {
                 let parsedData = parseDetails(interviewData[key][0]);
                 if (parsedData.length > 0) {
-                  setValue(key, parsedData);         
+                  setValue(key, parsedData);
                 }
               }
             } else if (interviewData[key]) {
               setValue(key, interviewData[key]);
-            } 
+            }
           });
 
           if (interviewData.lang) {
             // Convert to array if it's a string
-            let langData = Array.isArray(interviewData.lang) 
-              ? interviewData.lang 
-              : interviewData.lang.split(",").map(item => item.trim()); // Split by comma and trim spaces
-          
+            let langData = Array.isArray(interviewData.lang)
+              ? interviewData.lang
+              : interviewData.lang.split(",").map((item) => item.trim()); // Split by comma and trim spaces
+
             // Remove square brackets if they exist in any item
-            langData = langData.map(item => 
+            langData = langData.map((item) =>
               typeof item === "string" ? item.replace(/^\[|\]$/g, "") : item
             );
-          
+
             // Check for "Other" language
-            const otherItem = langData.find(item => 
-              typeof item === "string" && item.startsWith("Other:")
+            const otherItem = langData.find(
+              (item) => typeof item === "string" && item.startsWith("Other:")
             );
-          
+
             if (otherItem) {
               setShowOtherLangInput(true);
               setOtherLanguage(otherItem.replace("Other: ", "").trim());
             }
-          
+
             console.log(langData, "Processed Language Data");
-          
+
             setValue("lang", langData);
-          }  
-        } 
+          }
+        }
       }
-    } 
+    }
   }, [tempID, setValue, empPDData]);
 
   return (
@@ -310,96 +319,119 @@ export const PersonalDetails = () => {
           />
         </div>
         <div className="relative">
-  <label className="block mb-1">Language Proficiency</label>
-<Controller
-  name="lang"
-  control={control}
-  render={({ field: { onChange, value } }) => {
-    const normalizedValue = Array.isArray(value) ? value : [];
-    const isOtherSelected = normalizedValue.includes("Other");
+          <label className="block mb-1">Language Proficiency</label>
+          <Controller
+            name="lang"
+            control={control}
+            render={({ field: { onChange, value } }) => {
+              const normalizedValue = Array.isArray(value) ? value : [];
+              const isOtherSelected = normalizedValue.includes("Other");
 
-    return (
-      <>
-        <div
-          className="mt-2 p-2.5 text_size_9 bg-white border border-[#dedddd] text-dark_grey outline-none rounded w-full flex items-center cursor-pointer"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          <input
-            type="text"
-            className="w-full outline-none cursor-pointer bg-transparent"
-            value={normalizedValue.join(", ")}
-            readOnly
-            placeholder="Select options"
+              return (
+                <>
+                  <div
+                    className="mt-2 p-2.5 text_size_9 bg-white border border-[#dedddd] text-dark_grey outline-none rounded w-full flex items-center cursor-pointer"
+                    onClick={() => setIsOpen(!isOpen)}
+                  >
+                    <input
+                      type="text"
+                      className="w-full outline-none cursor-pointer bg-transparent"
+                      value={normalizedValue.join(", ")}
+                      readOnly
+                      placeholder="Select options"
+                    />
+                    <ChevronDown className="w-5 h-5 text-grey" />
+                  </div>
+                  {isOpen && (
+                    <div className="absolute left-0 w-full mt-2  bg-lite_skyBlue rounded-lg shadow-lg z-10">
+                      <div
+                        className=" absolute right-5 top-5 cursor-pointer"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <FaRegWindowClose />
+                      </div>
+                      <ul className="p-2 bg-white rounded-md">
+                        {languageOptions.map((option) => (
+                          <li
+                            key={option.value}
+                            className="flex items-center gap-2 p-2  rounded"
+                          >
+                            <input
+                              type="checkbox"
+                              id={`lang-${option.value}`}
+                              checked={normalizedValue.includes(option.value)}
+                              onChange={() => {
+                                let newValue = normalizedValue.includes(
+                                  option.value
+                                )
+                                  ? normalizedValue.filter(
+                                      (item) => item !== option.value
+                                    )
+                                  : [...normalizedValue, option.value];
+
+                                onChange(newValue); // Update form field
+                              }}
+                              className="w-4 h-4"
+                            />
+                            <label
+                              htmlFor={`lang-${option.value}`}
+                              className="cursor-pointer"
+                            >
+                              {option.label}
+                            </label>
+                          </li>
+                        ))}
+
+                        <li className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded ">
+                          <input
+                            type="checkbox"
+                            id="lang-other"
+                            checked={isOtherSelected}
+                            onChange={() => {
+                              if (isOtherSelected) {
+                                onChange(
+                                  normalizedValue.filter(
+                                    (item) => item !== "Other"
+                                  )
+                                );
+                                setOtherLanguage(""); // Reset input field
+                              } else {
+                                onChange([...normalizedValue, "Other"]);
+                              }
+                            }}
+                            className="w-4 h-4"
+                          />
+                          <label
+                            htmlFor="lang-other"
+                            className="cursor-pointer"
+                          >
+                            Other
+                          </label>
+                        </li>
+                      </ul>
+                    </div>
+                  )}
+                  {isOtherSelected && (
+                    <input
+                      {...register("otherLang")}
+                      type="text"
+                      className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full"
+                      placeholder="Specify other language"
+                      value={otherLanguage}
+                      onChange={(e) => setOtherLanguage(e.target.value)}
+                    />
+                  )}
+                </>
+              );
+            }}
           />
-          <ChevronDown className="w-5 h-5 text-grey" />
+          {errors.lang && (
+            <p className="text-[red] text-[12px]">{errors.lang.message}</p>
+          )}
+          {errors.otherLang && (
+            <p className="text-[red] text-[12px]">{errors.otherLang.message}</p>
+          )}
         </div>
-        {isOpen && (
-          <div className="absolute left-0 w-full mt-2  bg-lite_skyBlue rounded-lg shadow-lg z-10">
-            <div className=" absolute right-5 top-5 cursor-pointer" onClick={() => setIsOpen(false)}>
-           <FaRegWindowClose/>
-            </div>
-            <ul className="p-2 bg-white rounded-md">
-              {languageOptions.map((option) => (
-                <li key={option.value} className="flex items-center gap-2 p-2  rounded">
-                  <input
-                    type="checkbox"
-                    id={`lang-${option.value}`}
-                    checked={normalizedValue.includes(option.value)}
-                    onChange={() => {
-                      let newValue = normalizedValue.includes(option.value)
-                        ? normalizedValue.filter(item => item !== option.value)
-                        : [...normalizedValue, option.value];
-
-                      onChange(newValue); // Update form field
-                    }}
-                    className="w-4 h-4"
-                  />
-                  <label htmlFor={`lang-${option.value}`} className="cursor-pointer">
-                    {option.label}
-                  </label>
-                </li>
-              ))}
-
-              <li className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded ">
-                <input
-                  type="checkbox"
-                  id="lang-other"
-                  checked={isOtherSelected}
-                  onChange={() => {
-                    if (isOtherSelected) {
-                      onChange(normalizedValue.filter(item => item !== "Other"));
-                      setOtherLanguage(""); // Reset input field
-                    } else {
-                      onChange([...normalizedValue, "Other"]);
-                    }
-                  }}
-                  className="w-4 h-4"
-                />
-                <label htmlFor="lang-other" className="cursor-pointer">
-                  Other
-                </label>
-              </li>
-            </ul>
-          </div>
-        )}
-        {isOtherSelected && (
-          <input
-            {...register("otherLang")}
-            type="text"
-            className="mt-2 p-2.5 text_size_9 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full"
-            placeholder="Specify other language"
-            value={otherLanguage}
-            onChange={(e) => setOtherLanguage(e.target.value)}
-          />
-        )}
-      </>
-    );
-  }}
-/>
-{errors.lang && <p className="text-[red] text-[12px]">{errors.lang.message}</p>}
-{errors.otherLang && <p className="text-[red] text-[12px]">{errors.otherLang.message}</p>}
-
-</div>
       </div>
       <div className="grid grid-cols-3 gap-4 mb-4 text_size_6">
         <div>
@@ -471,7 +503,7 @@ export const PersonalDetails = () => {
         </div>
         <div>
           <label className="block mb-1">Passport Expiry</label>
-          <input 
+          <input
             type="date"
             {...register("ppExpiry")}
             className="mt-2 text_size_9 p-2.5 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full"
@@ -501,7 +533,6 @@ export const PersonalDetails = () => {
           Sisters)
         </label>
         {familyDetails.map((key, index) => {
-
           return (
             <div key={key.id} className="grid grid-cols-5 gap-4 mb-2">
               {/* Use Controller for each field */}
@@ -657,7 +688,7 @@ export const PersonalDetails = () => {
               control={control}
               render={({ field }) => (
                 <div className="flex flex-col">
-                 <input
+                  <input
                     {...field}
                     placeholder="Highest Standard / Passed / Certificate / Degree / Professional Qualification"
                     className="resize-none mt-2 p-2.5  bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded text_size_9"

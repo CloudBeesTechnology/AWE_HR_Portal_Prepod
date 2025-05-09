@@ -70,6 +70,7 @@ export const EmpInfoFunc = () => {
         paafCvevUpload,
         ppUpload,
         supportDocUpload,
+        qcCertifyUpload
       } = empValue;
 
       const totalData1 = {
@@ -102,6 +103,7 @@ export const EmpInfoFunc = () => {
         paafCvevUpload,
         ppUpload,
         supportDocUpload,
+        qcCertifyUpload
       };
       // console.log(totalData1,"totalData1 Create");
 

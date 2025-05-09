@@ -64,7 +64,7 @@ export const Status = () => {
       Object.entries(result.interviewDetails).forEach(([key, value]) => {
         result[`interviewDetails_${key}`] = value;
       });
-      delete result.interviewDetails; 
+      delete result.interviewDetails;
     }
 
     if (result.mobilizationDetails) {
@@ -202,10 +202,10 @@ export const Status = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [cvTypeDropdownOpen, isFilterBoxOpen]); // Added dependencies
+  }, [cvTypeDropdownOpen, isFilterBoxOpen]); 
 
   // Toggle Filter Box
-  const toggleFilterBox = (event) => { 
+  const toggleFilterBox = (event) => {
     event?.stopPropagation();
     setIsFilterBoxOpen((prevState) => !prevState);
   };
@@ -213,46 +213,52 @@ export const Status = () => {
   const handleFilterChange = (event) => {
     const selectedValue = event.target.value;
 
-
     setSelectedFilters(selectedValue);
     setFilterBoxTitle(selectedValue);
   };
 
-  
-  
   useEffect(() => {
     if (!mergeData) {
       setFilteredData([]);
       return;
     }
-  
+
     let result = [...mergeData];
-  
+
     // Apply status filter if selected
     if (selectedFilters) {
       result = result.filter((val) => {
         switch (selectedFilters) {
           case "Interview Scheduled":
-            return val?.interviewDetails_status?.toLowerCase() === "interviewscheduled";
+            return (
+              val?.interviewDetails_status?.toLowerCase() ===
+              "interviewscheduled"
+            );
           case "Selected Candidate":
             return val?.interviewDetails_status === "Selected";
           case "LOI":
             return val?.interviewDetails_status?.toUpperCase() === "LOI";
           case "CVEV_OffShore":
-            return val?.interviewDetails_status?.toUpperCase() === "CVEV" && 
-                   val?.empType === "Offshore";
+            return (
+              val?.interviewDetails_status?.toUpperCase() === "CVEV" &&
+              val?.empType === "Offshore"
+            );
           case "PAAF_OnShore":
-            return val?.interviewDetails_status?.toUpperCase() === "PAAF" && 
-                   val?.empType === "Onshore";
+            return (
+              val?.interviewDetails_status?.toUpperCase() === "PAAF" 
+              // val?.empType === "Onshore"
+            );
           case "Mobilization":
-            return val?.contractType === "Local" && 
-                   val?.interviewDetails_status?.toLowerCase() === "mobilization";
+            return (
+              val?.contractType === "Local" &&
+              val?.interviewDetails_status?.toLowerCase() === "mobilization"
+            );
           default:
             return val?.interviewDetails_status?.toLowerCase() === "pending";
         }
       });
     }
-  
+
     // Apply additional filters if any
     if (selectedOptions.length > 0) {
       result = result.filter((item) => {
@@ -276,105 +282,87 @@ export const Status = () => {
         });
       });
     }
-  
-    setFilteredData(result);
-  }, [selectedFilters, selectedOptions, mergeData]);   
 
+    setFilteredData(result);
+  }, [selectedFilters, selectedOptions, mergeData]);
 
   const handleOptionSelect = (option) => {
-   
-  
     setSelectedOptions((prevSelectedOptions) => {
-
-  
-      
       if (prevSelectedOptions.includes(option)) {
-       
-        const newSelectedOptions = prevSelectedOptions.filter((opt) => opt !== option);
-       
+        const newSelectedOptions = prevSelectedOptions.filter(
+          (opt) => opt !== option
+        );
+
         return newSelectedOptions;
       } else {
-       
-        
-      
         if (option === "LOCAL") {
-          
           const newSelectedOptions = [
             "LOCAL",
             ...prevSelectedOptions.filter(
               (opt) => opt !== "NON LOCAL" && opt !== "LPA" && opt !== "SAWP"
             ),
           ];
-          
+
           return newSelectedOptions;
         }
-        
+
         if (option === "NON LOCAL") {
-          
           const newSelectedOptions = [
             "NON LOCAL",
             ...prevSelectedOptions.filter((opt) => opt !== "LOCAL"),
           ];
-          
+
           return newSelectedOptions;
         }
-        
+
         if (option === "ONSHORE" || option === "OFFSHORE") {
-          
           const newSelectedOptions = [
             option,
             ...prevSelectedOptions.filter(
               (opt) => opt !== "ONSHORE" && opt !== "OFFSHORE"
             ),
           ];
-          
+
           return newSelectedOptions;
         }
-  
+
         if (option === "LPA" || option === "SAWP") {
-          
           const newSelectedOptions = [
             option,
             ...prevSelectedOptions.filter(
               (opt) => opt !== "LPA" && opt !== "SAWP"
             ),
           ];
-       
+
           return newSelectedOptions;
         }
-  
+
         // If none of the special rules apply, just add the option
         const newSelectedOptions = [...prevSelectedOptions, option];
-        
+
         return newSelectedOptions;
       }
     });
   };
-  
 
   const isOptionDisabled = (option) => {
-
-    
     if (selectedOptions.includes("LOCAL")) {
       // Disable NON LOCAL, LPA, SAWP if LOCAL is selected
       if (option === "NON LOCAL" || option === "LPA" || option === "SAWP") {
-        
         return true;
       }
     }
-  
+
     if (selectedOptions.includes("NON LOCAL")) {
       // Disable LOCAL if NON LOCAL is selected
       if (option === "LOCAL") {
-        
         return true;
       }
     }
-  
+
     return false;
   };
 
- 
   const handleEditClick = (candidate) => {
     setSelectedInterviewCandidate(candidate);
     setIsFormVisible(true);
@@ -383,7 +371,7 @@ export const Status = () => {
   // Close form
   const closeForm = () => {
     setIsFormVisible(false);
-    setSelectedInterviewCandidate(null); 
+    setSelectedInterviewCandidate(null);
   };
 
   const handleFormSave = (updatedCandidate) => {
@@ -391,16 +379,15 @@ export const Status = () => {
     const updateCandidates = (candidates) =>
       candidates.map((candidate) =>
         candidate.tempID === updatedCandidate.tempID
-          ? { ...candidate, ...updatedCandidate } 
+          ? { ...candidate, ...updatedCandidate }
           : candidate
       );
 
-    setMergeData((prevMergeData) => updateCandidates(prevMergeData)); 
+    setMergeData((prevMergeData) => updateCandidates(prevMergeData));
     setFilteredData((prevFilteredData) => updateCandidates(prevFilteredData));
 
     setIsFormVisible(false);
   };
-
 
   const formatDate = (dateToString) => {
     if (!dateToString || isNaN(new Date(dateToString).getTime())) {
@@ -409,8 +396,8 @@ export const Status = () => {
 
     const date = new Date(dateToString);
 
-    const day = date.getDate().toString().padStart(2, "0"); // Local day
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Local month
+    const day = date.getDate().toString().padStart(2, "0"); 
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); 
     const year = date.getFullYear();
 
     return `${day}-${month}-${year}`;
@@ -421,11 +408,11 @@ export const Status = () => {
       // Check if input is a string
       if (typeof files === "string") {
         let validJsonString = files
-          .replace(/=/g, ":") 
-          .replace(/([{,])(\s*[a-zA-Z0-9_]+)(?=\s*:)/g, '$1"$2"') 
+          .replace(/=/g, ":")
+          .replace(/([{,])(\s*[a-zA-Z0-9_]+)(?=\s*:)/g, '$1"$2"')
           .replace(/:\s*([^",}\]]+)/g, ': "$1"')
-          .replace(/"\s*[^"]+"\s*$/g, (match) => match.trim()) 
-          .replace(/(\w)(,|})/g, "$1$2"); 
+          .replace(/"\s*[^"]+"\s*$/g, (match) => match.trim())
+          .replace(/(\w)(,|})/g, "$1$2");
 
         const parsedArray = JSON.parse(validJsonString);
 
@@ -543,7 +530,7 @@ export const Status = () => {
                     className="mr-2"
                     checked={selectedOptions.includes(option)}
                     onChange={() => handleOptionSelect(option)}
-                    disabled={isOptionDisabled(option)} 
+                    disabled={isOptionDisabled(option)}
                   />
                   {option}
                 </label>

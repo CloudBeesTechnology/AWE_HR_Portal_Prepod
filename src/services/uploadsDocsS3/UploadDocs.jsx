@@ -113,7 +113,7 @@ export const uploadReqString = async (file, fileType, tempID) => {
       .put(uploadUrl, file)
       .then((res) => {
         console.log("Response from API after uploading:", res.data.message);
-        alert("File uploaded successfully!");
+        // alert("File uploaded successfully!");
       })
       .catch((err) => {
         console.error("Error uploading file:", err);
