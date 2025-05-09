@@ -168,7 +168,7 @@ export const MobilizationRecru = ({
 
       // Simulating async calls here, which you can uncomment when needed
       await SumbitCandiToEmp({ storedData });
-      await submitMobilization({ mob: storedData });
+      // await submitMobilization({ mob: storedData });
 
       setShowTitle(
         "Candidate conversion to employee has been completed successfully."

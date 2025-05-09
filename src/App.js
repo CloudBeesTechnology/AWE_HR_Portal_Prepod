@@ -186,12 +186,15 @@ export const App = () => {
               <div className="p-4">
                 <h3 className="text-lg font-bold mb-2">Session Expired</h3>
                 <p>Your session has expired. Please log in again to continue.</p>
-                <button 
-                  className="mt-4 bg-yellow py-2 px-4 rounded" 
-                  onClick={handleSessionExpiredClose}
-                >
-                  Ok
-                </button>
+                <div className="flex justify-end">
+                  <button
+                    className="mt-4 bg-yellow py-2 px-4 rounded font-semibold"
+                    onClick={handleSessionExpiredClose}
+                  >
+                    OK
+                  </button>
+
+                </div>
               </div>
             </Modal>
           )}

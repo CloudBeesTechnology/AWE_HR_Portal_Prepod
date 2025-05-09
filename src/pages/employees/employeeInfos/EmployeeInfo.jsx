@@ -68,6 +68,7 @@ export const EmployeeInfo = () => {
     ppUpload: false,
     supportDocUpload: false,
     loiUpload: false,
+    qcCertifyUpload: false,
   });
   const [isUploadingString, setIsUploadingString] = useState({
     uploadProfilePhoto: false,
@@ -82,6 +83,7 @@ export const EmployeeInfo = () => {
     ppUpload: [],
     supportDocUpload: [],
     loiUpload: [],
+    qcCertifyUpload: [],
   });
   const [uploadedFileNames, setUploadedFileNames] = useState({
     uploadProfilePhoto: null,
@@ -550,13 +552,26 @@ export const EmployeeInfo = () => {
       "gender",
     ];
 
+    // keysToSet.forEach((key) => {
+    //   let valueToSet = result[key] || "";
+
+    //   if (typeof valueToSet === "string") {
+    //     setValue(key, valueToSet.trim().toUpperCase());
+    //   } else if (Array.isArray(valueToSet) && valueToSet.length > 0) {
+    //     setValue(key, [valueToSet[valueToSet.length - 1].trim().toUpperCase()]);
+    //   } else {
+    //     setValue(key, valueToSet);
+    //   }
+    // });
+
     keysToSet.forEach((key) => {
       let valueToSet = result[key] || "";
 
       if (typeof valueToSet === "string") {
-        setValue(key, valueToSet.trim().toUpperCase());
+        setValue(key, valueToSet ? valueToSet.trim().toUpperCase() : "");
       } else if (Array.isArray(valueToSet) && valueToSet.length > 0) {
-        setValue(key, [valueToSet[valueToSet.length - 1].trim().toUpperCase()]);
+        const lastElement = valueToSet[valueToSet.length - 1];
+        setValue(key, [lastElement ? lastElement.trim().toUpperCase() : ""]);
       } else {
         setValue(key, valueToSet);
       }
@@ -576,7 +591,8 @@ export const EmployeeInfo = () => {
           const name = (lastExperience.name || "").trim().toUpperCase();
           const from = (lastExperience.from || "").trim();
           const to = (lastExperience.to || "").trim();
-          const period = from && to ? `${DateFormat(from)} to ${DateFormat(to)}` : "";
+          const period =
+            from && to ? `${DateFormat(from)} to ${DateFormat(to)}` : "";
 
           setValue("preEmp", name);
           setValue("preEmpPeriod", period);
@@ -690,7 +706,7 @@ export const EmployeeInfo = () => {
       "paafCvevUpload",
       "ppUpload",
       "supportDocUpload",
-      "qcCertifyUpload"
+      "qcCertifyUpload",
     ];
 
     uploadFields.forEach((field) => {
@@ -848,6 +864,7 @@ export const EmployeeInfo = () => {
           paafCvevUpload: JSON.stringify(uploadedFiles.paafCvevUpload),
           ppUpload: JSON.stringify(uploadedFiles.ppUpload),
           supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
+          qcCertifyUpload: JSON.stringify(uploadedFiles.qcCertifyUpload),
           familyDetails: JSON.stringify(data.familyDetails),
           PITableID: checkingPITable.id,
           IDTable: checkingIDTable.id,
@@ -883,6 +900,7 @@ export const EmployeeInfo = () => {
           paafCvevUpload: JSON.stringify(uploadedFiles.paafCvevUpload),
           ppUpload: JSON.stringify(uploadedFiles.ppUpload),
           supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
+          qcCertifyUpload: JSON.stringify(uploadedFiles.qcCertifyUpload),
           familyDetails: JSON.stringify(data.familyDetails),
           email: data.email.trim().toLowerCase(),
           officialEmail: data.officialEmail.trim().toLowerCase(),
@@ -1131,7 +1149,7 @@ export const EmployeeInfo = () => {
                     {uploadedFileNames?.[field.title] ? (
                       Array.isArray(uploadedFileNames[field.title]) ? (
                         uploadedFileNames[field.title]
-                          .slice() 
+                          .slice()
                           .reverse()
                           .map((fileName, fileIndex) => (
                             <span

@@ -450,7 +450,7 @@ export const AllEmployee = () => {
         />
       )}
       {/* Pagination Controls */}
-      <div className="flex justify-end items-end w-full">
+      <div className="flex justify-center items-center w-full">
         {paginatedData.length > 0 && (
           <div className="flex mt-12 px-8">
             <Pagination

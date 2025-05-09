@@ -323,7 +323,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     hospLeave,
     pervAnnualLeaveBal,
     workmenCompNo,
-    workExperience
+    workExperience,
   } = passingValue;
 
   const cleanLanguageData = (lang) => {
@@ -368,6 +368,18 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
         }`
       : "Not Available");
 
+  const formatValue = (value) => {
+    if (
+      value === null ||
+      value === undefined ||
+      value === "" ||
+      (Array.isArray(value) && (value.length === 0 || value[0] === ""))
+    ) {
+      return "N/A";
+    }
+    return value;
+  };
+
   const personalDetails = {
     Name: name,
     "Chinese character": chinese,
@@ -410,7 +422,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     Language: cleanLanguageData(lang),
     "Other Language": otherLang,
     "Driving License": driveLic,
-    "Agent Name": agent,
+    "Agent Name": formatValue(agent),
     "Company Name of Previous Employment": defaultPreEmp,
     "Previous Employment Period": defaultPreEmpPeriod,
     "Date of Induction Briefing": formatDate(inducBrief),

@@ -23,7 +23,7 @@ export const CandiToEmp = () => {
       const empPersonalInfoTable = {
         empID: storedData.empID,
         age: storedData.age,
-        agent: [storedData.agentname],
+        agent: storedData.agentname || storedData.agent,
         alternateNo: storedData.alternateNo,
         chinese: storedData.chinese,
         cob: storedData.cob,
@@ -167,6 +167,15 @@ export const CandiToEmp = () => {
         ppSubmit: [storedData.WPTrackDetails_docsubmitdate],
         immigApproval: [storedData.WPTrackDetails_visaapprovedate],
       };
+
+      // console.log("empPersonalInfoTable:", empPersonalInfoTable);
+      // console.log("IDDetailsTable:", IDDetailsTable);
+      // console.log("CandiToEmpTable:", CandiToEmpTable);
+      // console.log("workInfoTable:", workInfoTable);
+      // console.log("sawpDetails:", sawpDetails);
+      // console.log("DNDetails:", DNDetails);
+      // console.log("BJLDetails:", BJLDetails);
+      // console.log("PassportValid:", PassportValid);
 
       try {
         const [

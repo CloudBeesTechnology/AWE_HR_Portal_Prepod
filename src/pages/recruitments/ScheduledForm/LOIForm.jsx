@@ -115,7 +115,8 @@ export const LOIForm = ({ candidate, formattedPermissions }) => {
         tempID,
         setUploadedFileNames,
         setUploadedLOI,
-        setIsUploadingString
+        setIsUploadingString,
+        setFormData
       );
 
       if (!isDeleted || isDeletedArrayUploaded) {
