@@ -4,5 +4,5 @@
     "DynamoDBEnableServerSideEncryption": false,
     "AuthModeLastUpdated": "2024-12-08T04:45:06.805Z",
     "S3DeploymentBucket": "amplify-aweadininprod-prod-954b8-deployment",
-    "S3DeploymentRootKey": "amplify-appsync-files/23c13578fc3e09e8c5892c521db826ba5f5763ae"
+    "S3DeploymentRootKey": "amplify-appsync-files/879401bdc2d5344cd2b052a7b839c805000bde84"
 }

@@ -211,6 +211,7 @@ export default function EducationDetailsCreateForm(props) {
     uploadResume: "",
     uploadCertificate: "",
     uploadPp: "",
+    uploadIc: "",
   };
   const [tempID, setTempID] = React.useState(initialValues.tempID);
   const [crime, setCrime] = React.useState(initialValues.crime);
@@ -249,6 +250,7 @@ export default function EducationDetailsCreateForm(props) {
     initialValues.uploadCertificate
   );
   const [uploadPp, setUploadPp] = React.useState(initialValues.uploadPp);
+  const [uploadIc, setUploadIc] = React.useState(initialValues.uploadIc);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setTempID(initialValues.tempID);
@@ -275,6 +277,7 @@ export default function EducationDetailsCreateForm(props) {
     setUploadResume(initialValues.uploadResume);
     setUploadCertificate(initialValues.uploadCertificate);
     setUploadPp(initialValues.uploadPp);
+    setUploadIc(initialValues.uploadIc);
     setErrors({});
   };
   const [currentEmgDetailsValue, setCurrentEmgDetailsValue] =
@@ -306,6 +309,7 @@ export default function EducationDetailsCreateForm(props) {
     uploadResume: [],
     uploadCertificate: [],
     uploadPp: [],
+    uploadIc: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -354,6 +358,7 @@ export default function EducationDetailsCreateForm(props) {
           uploadResume,
           uploadCertificate,
           uploadPp,
+          uploadIc,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -437,6 +442,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume,
               uploadCertificate,
               uploadPp,
+              uploadIc,
             };
             const result = onChange(modelFields);
             value = result?.tempID ?? value;
@@ -481,6 +487,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume,
               uploadCertificate,
               uploadPp,
+              uploadIc,
             };
             const result = onChange(modelFields);
             value = result?.crime ?? value;
@@ -525,6 +532,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume,
               uploadCertificate,
               uploadPp,
+              uploadIc,
             };
             const result = onChange(modelFields);
             value = result?.crimeDesc ?? value;
@@ -565,6 +573,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume,
               uploadCertificate,
               uploadPp,
+              uploadIc,
             };
             const result = onChange(modelFields);
             values = result?.emgDetails ?? values;
@@ -636,6 +645,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume,
               uploadCertificate,
               uploadPp,
+              uploadIc,
             };
             const result = onChange(modelFields);
             value = result?.noExperience ?? value;
@@ -680,6 +690,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume,
               uploadCertificate,
               uploadPp,
+              uploadIc,
             };
             const result = onChange(modelFields);
             value = result?.empStatement ?? value;
@@ -724,6 +735,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume,
               uploadCertificate,
               uploadPp,
+              uploadIc,
             };
             const result = onChange(modelFields);
             value = result?.desc ?? value;
@@ -768,6 +780,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume,
               uploadCertificate,
               uploadPp,
+              uploadIc,
             };
             const result = onChange(modelFields);
             value = result?.disease ?? value;
@@ -812,6 +825,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume,
               uploadCertificate,
               uploadPp,
+              uploadIc,
             };
             const result = onChange(modelFields);
             value = result?.diseaseDesc ?? value;
@@ -856,6 +870,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume,
               uploadCertificate,
               uploadPp,
+              uploadIc,
             };
             const result = onChange(modelFields);
             value = result?.liquor ?? value;
@@ -900,6 +915,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume,
               uploadCertificate,
               uploadPp,
+              uploadIc,
             };
             const result = onChange(modelFields);
             value = result?.liquorDesc ?? value;
@@ -944,6 +960,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume,
               uploadCertificate,
               uploadPp,
+              uploadIc,
             };
             const result = onChange(modelFields);
             value = result?.noticePeriod ?? value;
@@ -988,6 +1005,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume,
               uploadCertificate,
               uploadPp,
+              uploadIc,
             };
             const result = onChange(modelFields);
             value = result?.perIS ?? value;
@@ -1032,6 +1050,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume,
               uploadCertificate,
               uploadPp,
+              uploadIc,
             };
             const result = onChange(modelFields);
             value = result?.perIDesc ?? value;
@@ -1072,6 +1091,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume,
               uploadCertificate,
               uploadPp,
+              uploadIc,
             };
             const result = onChange(modelFields);
             values = result?.referees ?? values;
@@ -1137,6 +1157,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume,
               uploadCertificate,
               uploadPp,
+              uploadIc,
             };
             const result = onChange(modelFields);
             values = result?.relatives ?? values;
@@ -1206,6 +1227,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume,
               uploadCertificate,
               uploadPp,
+              uploadIc,
             };
             const result = onChange(modelFields);
             value = result?.salaryExpectation ?? value;
@@ -1252,6 +1274,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume,
               uploadCertificate,
               uploadPp,
+              uploadIc,
             };
             const result = onChange(modelFields);
             value = result?.supportInfo ?? value;
@@ -1296,6 +1319,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume: value,
               uploadCertificate,
               uploadPp,
+              uploadIc,
             };
             const result = onChange(modelFields);
             value = result?.uploadResume ?? value;
@@ -1340,6 +1364,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume,
               uploadCertificate: value,
               uploadPp,
+              uploadIc,
             };
             const result = onChange(modelFields);
             value = result?.uploadCertificate ?? value;
@@ -1386,6 +1411,7 @@ export default function EducationDetailsCreateForm(props) {
               uploadResume,
               uploadCertificate,
               uploadPp: value,
+              uploadIc,
             };
             const result = onChange(modelFields);
             value = result?.uploadPp ?? value;
@@ -1399,6 +1425,51 @@ export default function EducationDetailsCreateForm(props) {
         errorMessage={errors.uploadPp?.errorMessage}
         hasError={errors.uploadPp?.hasError}
         {...getOverrideProps(overrides, "uploadPp")}
+      ></TextField>
+      <TextField
+        label="Upload ic"
+        isRequired={false}
+        isReadOnly={false}
+        value={uploadIc}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              tempID,
+              crime,
+              crimeDesc,
+              emgDetails,
+              noExperience,
+              empStatement,
+              desc,
+              disease,
+              diseaseDesc,
+              liquor,
+              liquorDesc,
+              noticePeriod,
+              perIS,
+              perIDesc,
+              referees,
+              relatives,
+              salaryExpectation,
+              supportInfo,
+              uploadResume,
+              uploadCertificate,
+              uploadPp,
+              uploadIc: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.uploadIc ?? value;
+          }
+          if (errors.uploadIc?.hasError) {
+            runValidationTasks("uploadIc", value);
+          }
+          setUploadIc(value);
+        }}
+        onBlur={() => runValidationTasks("uploadIc", uploadIc)}
+        errorMessage={errors.uploadIc?.errorMessage}
+        hasError={errors.uploadIc?.hasError}
+        {...getOverrideProps(overrides, "uploadIc")}
       ></TextField>
       <Flex
         justifyContent="space-between"

@@ -219,6 +219,7 @@ export default function IDDetailsCreateForm(props) {
     race: "",
     religion: "",
     supportDocUpload: [],
+    qcCertifyUpload: [],
   };
   const [empID, setEmpID] = React.useState(initialValues.empID);
   const [applicationUpload, setApplicationUpload] = React.useState(
@@ -275,6 +276,9 @@ export default function IDDetailsCreateForm(props) {
   const [supportDocUpload, setSupportDocUpload] = React.useState(
     initialValues.supportDocUpload
   );
+  const [qcCertifyUpload, setQcCertifyUpload] = React.useState(
+    initialValues.qcCertifyUpload
+  );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setEmpID(initialValues.empID);
@@ -319,6 +323,8 @@ export default function IDDetailsCreateForm(props) {
     setReligion(initialValues.religion);
     setSupportDocUpload(initialValues.supportDocUpload);
     setCurrentSupportDocUploadValue("");
+    setQcCertifyUpload(initialValues.qcCertifyUpload);
+    setCurrentQcCertifyUploadValue("");
     setErrors({});
   };
   const [currentApplicationUploadValue, setCurrentApplicationUploadValue] =
@@ -354,6 +360,9 @@ export default function IDDetailsCreateForm(props) {
   const [currentSupportDocUploadValue, setCurrentSupportDocUploadValue] =
     React.useState("");
   const supportDocUploadRef = React.createRef();
+  const [currentQcCertifyUploadValue, setCurrentQcCertifyUploadValue] =
+    React.useState("");
+  const qcCertifyUploadRef = React.createRef();
   const validations = {
     empID: [{ type: "Required" }],
     applicationUpload: [{ type: "JSON" }],
@@ -384,6 +393,7 @@ export default function IDDetailsCreateForm(props) {
     race: [],
     religion: [],
     supportDocUpload: [{ type: "JSON" }],
+    qcCertifyUpload: [{ type: "JSON" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -440,6 +450,7 @@ export default function IDDetailsCreateForm(props) {
           race,
           religion,
           supportDocUpload,
+          qcCertifyUpload,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -531,6 +542,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             value = result?.empID ?? value;
@@ -579,6 +591,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             values = result?.applicationUpload ?? values;
@@ -664,6 +677,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             value = result?.bwnIcNo ?? value;
@@ -716,6 +730,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             value = result?.bwnIcColour ?? value;
@@ -764,6 +779,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             values = result?.bwnIcExpiry ?? values;
@@ -839,6 +855,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             values = result?.bwnUpload ?? values;
@@ -912,6 +929,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             values = result?.cvCertifyUpload ?? values;
@@ -994,6 +1012,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             value = result?.driveLic ?? value;
@@ -1046,6 +1065,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             value = result?.inducBrief ?? value;
@@ -1098,6 +1118,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             value = result?.inducBriefUp ?? value;
@@ -1146,6 +1167,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             values = result?.loiUpload ?? values;
@@ -1223,6 +1245,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             value = result?.myIcNo ?? value;
@@ -1271,6 +1294,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             values = result?.myIcUpload ?? values;
@@ -1350,6 +1374,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             value = result?.nationality ?? value;
@@ -1402,6 +1427,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             value = result?.nationalCat ?? value;
@@ -1454,6 +1480,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             value = result?.otherNation ?? value;
@@ -1506,6 +1533,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             value = result?.otherRace ?? value;
@@ -1558,6 +1586,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             value = result?.otherReligion ?? value;
@@ -1606,6 +1635,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             values = result?.ppNo ?? values;
@@ -1679,6 +1709,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             values = result?.paafCvevUpload ?? values;
@@ -1754,6 +1785,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             values = result?.ppIssued ?? values;
@@ -1827,6 +1859,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             values = result?.ppExpiry ?? values;
@@ -1900,6 +1933,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             values = result?.ppUpload ?? values;
@@ -1973,6 +2007,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             values = result?.ppDestinate ?? values;
@@ -2052,6 +2087,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             value = result?.preEmp ?? value;
@@ -2104,6 +2140,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             value = result?.preEmpPeriod ?? value;
@@ -2156,6 +2193,7 @@ export default function IDDetailsCreateForm(props) {
               race: value,
               religion,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             value = result?.race ?? value;
@@ -2208,6 +2246,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion: value,
               supportDocUpload,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             value = result?.religion ?? value;
@@ -2256,6 +2295,7 @@ export default function IDDetailsCreateForm(props) {
               race,
               religion,
               supportDocUpload: values,
+              qcCertifyUpload,
             };
             const result = onChange(modelFields);
             values = result?.supportDocUpload ?? values;
@@ -2298,6 +2338,85 @@ export default function IDDetailsCreateForm(props) {
           ref={supportDocUploadRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "supportDocUpload")}
+        ></TextAreaField>
+      </ArrayField>
+      <ArrayField
+        onChange={async (items) => {
+          let values = items;
+          if (onChange) {
+            const modelFields = {
+              empID,
+              applicationUpload,
+              bwnIcNo,
+              bwnIcColour,
+              bwnIcExpiry,
+              bwnUpload,
+              cvCertifyUpload,
+              driveLic,
+              inducBrief,
+              inducBriefUp,
+              loiUpload,
+              myIcNo,
+              myIcUpload,
+              nationality,
+              nationalCat,
+              otherNation,
+              otherRace,
+              otherReligion,
+              ppNo,
+              paafCvevUpload,
+              ppIssued,
+              ppExpiry,
+              ppUpload,
+              ppDestinate,
+              preEmp,
+              preEmpPeriod,
+              race,
+              religion,
+              supportDocUpload,
+              qcCertifyUpload: values,
+            };
+            const result = onChange(modelFields);
+            values = result?.qcCertifyUpload ?? values;
+          }
+          setQcCertifyUpload(values);
+          setCurrentQcCertifyUploadValue("");
+        }}
+        currentFieldValue={currentQcCertifyUploadValue}
+        label={"Qc certify upload"}
+        items={qcCertifyUpload}
+        hasError={errors?.qcCertifyUpload?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks(
+            "qcCertifyUpload",
+            currentQcCertifyUploadValue
+          )
+        }
+        errorMessage={errors?.qcCertifyUpload?.errorMessage}
+        setFieldValue={setCurrentQcCertifyUploadValue}
+        inputFieldRef={qcCertifyUploadRef}
+        defaultFieldValue={""}
+      >
+        <TextAreaField
+          label="Qc certify upload"
+          isRequired={false}
+          isReadOnly={false}
+          value={currentQcCertifyUploadValue}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.qcCertifyUpload?.hasError) {
+              runValidationTasks("qcCertifyUpload", value);
+            }
+            setCurrentQcCertifyUploadValue(value);
+          }}
+          onBlur={() =>
+            runValidationTasks("qcCertifyUpload", currentQcCertifyUploadValue)
+          }
+          errorMessage={errors.qcCertifyUpload?.errorMessage}
+          hasError={errors.qcCertifyUpload?.hasError}
+          ref={qcCertifyUploadRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "qcCertifyUpload")}
         ></TextAreaField>
       </ArrayField>
       <Flex

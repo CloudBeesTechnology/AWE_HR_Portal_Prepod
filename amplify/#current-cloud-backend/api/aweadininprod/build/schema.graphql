@@ -621,6 +621,7 @@ type EmpPersonalInfo @aws_iam @aws_api_key {
   permanentAddress: [String]
   position: [String]
   sapNo: String
+  otherLang: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -656,6 +657,7 @@ type IDDetails @aws_iam @aws_api_key {
   race: String
   religion: String
   supportDocUpload: [AWSJSON]
+  qcCertifyUpload: [AWSJSON]
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -763,6 +765,7 @@ type EducationDetails @aws_iam @aws_api_key {
   uploadResume: String
   uploadCertificate: String
   uploadPp: String
+  uploadIc: String
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -4736,6 +4739,7 @@ input ModelEmpPersonalInfoFilterInput {
   permanentAddress: ModelStringInput
   position: ModelStringInput
   sapNo: ModelStringInput
+  otherLang: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelEmpPersonalInfoFilterInput]
@@ -4773,6 +4777,7 @@ input ModelEmpPersonalInfoConditionInput {
   permanentAddress: ModelStringInput
   position: ModelStringInput
   sapNo: ModelStringInput
+  otherLang: ModelStringInput
   and: [ModelEmpPersonalInfoConditionInput]
   or: [ModelEmpPersonalInfoConditionInput]
   not: ModelEmpPersonalInfoConditionInput
@@ -4811,6 +4816,7 @@ input CreateEmpPersonalInfoInput {
   permanentAddress: [String]
   position: [String]
   sapNo: String
+  otherLang: String
 }
 
 input UpdateEmpPersonalInfoInput {
@@ -4844,6 +4850,7 @@ input UpdateEmpPersonalInfoInput {
   permanentAddress: [String]
   position: [String]
   sapNo: String
+  otherLang: String
 }
 
 input DeleteEmpPersonalInfoInput {
@@ -4881,6 +4888,7 @@ input ModelSubscriptionEmpPersonalInfoFilterInput {
   permanentAddress: ModelSubscriptionStringInput
   position: ModelSubscriptionStringInput
   sapNo: ModelSubscriptionStringInput
+  otherLang: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionEmpPersonalInfoFilterInput]
@@ -4923,6 +4931,7 @@ input ModelIDDetailsFilterInput {
   race: ModelStringInput
   religion: ModelStringInput
   supportDocUpload: ModelStringInput
+  qcCertifyUpload: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelIDDetailsFilterInput]
@@ -4960,6 +4969,7 @@ input ModelIDDetailsConditionInput {
   race: ModelStringInput
   religion: ModelStringInput
   supportDocUpload: ModelStringInput
+  qcCertifyUpload: ModelStringInput
   and: [ModelIDDetailsConditionInput]
   or: [ModelIDDetailsConditionInput]
   not: ModelIDDetailsConditionInput
@@ -4998,6 +5008,7 @@ input CreateIDDetailsInput {
   race: String
   religion: String
   supportDocUpload: [AWSJSON]
+  qcCertifyUpload: [AWSJSON]
 }
 
 input UpdateIDDetailsInput {
@@ -5031,6 +5042,7 @@ input UpdateIDDetailsInput {
   race: String
   religion: String
   supportDocUpload: [AWSJSON]
+  qcCertifyUpload: [AWSJSON]
 }
 
 input DeleteIDDetailsInput {
@@ -5068,6 +5080,7 @@ input ModelSubscriptionIDDetailsFilterInput {
   race: ModelSubscriptionStringInput
   religion: ModelSubscriptionStringInput
   supportDocUpload: ModelSubscriptionStringInput
+  qcCertifyUpload: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionIDDetailsFilterInput]
@@ -5538,6 +5551,7 @@ input ModelEducationDetailsFilterInput {
   uploadResume: ModelStringInput
   uploadCertificate: ModelStringInput
   uploadPp: ModelStringInput
+  uploadIc: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
   and: [ModelEducationDetailsFilterInput]
@@ -5567,6 +5581,7 @@ input ModelEducationDetailsConditionInput {
   uploadResume: ModelStringInput
   uploadCertificate: ModelStringInput
   uploadPp: ModelStringInput
+  uploadIc: ModelStringInput
   and: [ModelEducationDetailsConditionInput]
   or: [ModelEducationDetailsConditionInput]
   not: ModelEducationDetailsConditionInput
@@ -5597,6 +5612,7 @@ input CreateEducationDetailsInput {
   uploadResume: String
   uploadCertificate: String
   uploadPp: String
+  uploadIc: String
 }
 
 input UpdateEducationDetailsInput {
@@ -5622,6 +5638,7 @@ input UpdateEducationDetailsInput {
   uploadResume: String
   uploadCertificate: String
   uploadPp: String
+  uploadIc: String
 }
 
 input DeleteEducationDetailsInput {
@@ -5651,6 +5668,7 @@ input ModelSubscriptionEducationDetailsFilterInput {
   uploadResume: ModelSubscriptionStringInput
   uploadCertificate: ModelSubscriptionStringInput
   uploadPp: ModelSubscriptionStringInput
+  uploadIc: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
   and: [ModelSubscriptionEducationDetailsFilterInput]
