@@ -6,18 +6,14 @@ import { generateClient } from "@aws-amplify/api";
 import { listEmpPersonalInfos } from "../../../graphql/queries";
 import { CandiToEmp } from "../status/ConvertCandiToEmp";
 import { SpinLogo } from "../../../utils/SpinLogo";
-import { UpdateMobilization } from "../../../services/updateMethod/UpdateMobilization";
+// import { UpdateMobilization } from "../../../services/updateMethod/UpdateMobilization";
 import { DateFormat } from "../../../utils/DateFormat";
 import { Pagination } from "../../leaveManagement/Pagination";
 
-export const NonLocalMobTable = ({
-  data,
-  fileUpload,
-  urlValue,
-}) => {
+export const NonLocalMobTable = ({ data, fileUpload, urlValue }) => {
   const client = generateClient();
-  const { SumbitCandiToEmp } = CandiToEmp();
-  const { submitMobilization } = UpdateMobilization();
+  // const { SumbitCandiToEmp } = CandiToEmp();
+  // const { submitMobilization } = UpdateMobilization();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const [selectedCandi, setSelectedCandi] = useState([]);
@@ -46,8 +42,6 @@ export const NonLocalMobTable = ({
     "Status",
   ];
 
-  // console.log(data);
-
   const totalPages = Math.ceil(data.length / rowsPerPage);
   const startIndex = (page - 1) * rowsPerPage;
   const endIndex = page * rowsPerPage;
@@ -69,11 +63,14 @@ export const NonLocalMobTable = ({
     setIsReviewFormVisible(!isReviewFormVisible);
   };
 
-  const getTotalCount = async () => {
-    let allEmpIDs = [];
-    let nextToken = null;
+  // console.log("Data", data);
 
+  const getTotalCount = async () => {
     try {
+      let allEmpIDs = [];
+      let nextToken = null;
+      let iteration = 0;
+
       do {
         const result = await client.graphql({
           query: listEmpPersonalInfos,
@@ -82,10 +79,12 @@ export const NonLocalMobTable = ({
 
         const items = result?.data?.listEmpPersonalInfos?.items || [];
 
-        const filteringData = items.map((val) => val.empID);
-        allEmpIDs = [...allEmpIDs, ...filteringData];
+        const empIDs = items.map((val) => val.empID);
 
+        allEmpIDs = [...allEmpIDs, ...empIDs];
         nextToken = result?.data?.listEmpPersonalInfos?.nextToken;
+
+        iteration++;
       } while (nextToken);
 
       const sortedData = allEmpIDs.sort((a, b) => {
@@ -111,13 +110,14 @@ export const NonLocalMobTable = ({
   };
 
   const generateNextTempID = (lastTempID) => {
-    const prefixMatch = lastTempID?.match(/[^\d]+/);
+    const prefixMatch = lastTempID.match(/[^\d]+/);
     const prefix = prefixMatch ? prefixMatch[0] : "";
-    const numberMatch = lastTempID?.match(/\d+/);
+
+    const numberMatch = lastTempID.match(/\d+/);
     const numberPart = numberMatch ? parseInt(numberMatch[0], 10) : 0;
+
     const nextNumber = numberPart + 1;
     const nextTempID = `${prefix}${nextNumber}`;
-    // console.log("Next TempID", nextTempID);
 
     return nextTempID;
   };
@@ -127,6 +127,7 @@ export const NonLocalMobTable = ({
     try {
       const lastTempID = await getTotalCount();
       const nextTempID = generateNextTempID(lastTempID);
+
       setLatesTempIDData(nextTempID);
     } catch (error) {
       console.error("Error generating employee ID:", error);
@@ -152,6 +153,7 @@ export const NonLocalMobTable = ({
       alert("Error: No candidate selected.");
       return;
     }
+
     setLoadingItems((prev) => {
       const newState = { ...prev, [currentCandidate.id]: true };
       return newState;
@@ -162,25 +164,36 @@ export const NonLocalMobTable = ({
         ...currentCandidate,
         empID: latestTempIDData,
       };
- 
-      await SumbitCandiToEmp({ storedData });
-      await submitMobilization({ mob: storedData });
-      setShowTitle(
-        "Candidate conversion to employee has been completed successfully."
-      );
-      setNotification(true);
+
+      if (storedData.empID && storedData.interviewDetails_id) {
+        const { success, message } = await CandiToEmp({ storedData });
+
+        console.log("NonLocalMobTable : ", success);
+
+        if (success === true) {
+          setShowTitle(
+            "Candidate conversion to employee has been completed successfully."
+          );
+          setNotification(true);
+          setShowEmpIdPopup(false);
+        }
+      } else {
+        alert("Employee ID not found, try again");
+      }
     } catch (err) {
+      console.error("Error during conversion:", err);
+      alert("Error during conversion");
+    } finally {
       setLoadingItems((prev) => {
         const newState = { ...prev, [currentCandidate.id]: false };
         return newState;
       });
-      alert("Error", err);
     }
   };
 
   return (
     <>
-      <div className="recruitmentTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl">
+      <div className="recruitmentTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl relative">
         {showEmpIdPopup && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
@@ -286,6 +299,7 @@ export const NonLocalMobTable = ({
             </div>
           </div>
         )}
+
         {paginatedData && paginatedData.length > 0 ? (
           <table className="w-full rounded-lg">
             <thead className="bg-[#939393] text-white sticky top-0">
@@ -308,9 +322,7 @@ export const NonLocalMobTable = ({
                     <td className="py-3">{item.tempID}</td>
                     <td className="py-3">{item.name || "N/A"}</td>
                     <td className="py-3">{item.nationality || "N/A"}</td>
-                    <td className="py-3">
-                      {item.position || "N/A"}
-                    </td>
+                    <td className="py-3">{item.position || "N/A"}</td>
                     <td className="py-3">
                       {DateFormat(item.WPTrackDetails_mobSignDate) || "N/A"}
                     </td>

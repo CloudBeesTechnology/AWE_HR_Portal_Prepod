@@ -65,7 +65,7 @@ export const PopupForAssignManager = ({
   };
 
   const searchResult = (result) => {
-    console.log("result : ", result);
+   
     const lastDept =
       Array.isArray(result?.department) && result?.department?.length > 0
         ? result?.department[result?.department?.length - 1]

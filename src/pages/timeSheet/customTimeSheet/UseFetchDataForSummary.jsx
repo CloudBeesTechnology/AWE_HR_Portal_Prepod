@@ -6,7 +6,8 @@ export const UseFetchDataForSummary = (
   startDate,
   endDate,
   location,
-  ProcessedDataFunc
+  ProcessedDataFunc,
+  offshoreType
 ) => {
   const [loading, setLoading] = useState(null);
   const [emptyTableMess, setEmptyTableMess] = useState(null);
@@ -58,7 +59,7 @@ export const UseFetchDataForSummary = (
 
           // Chunk processing for optimized filtering
           const CHUNK_SIZE = 1000;
-          const filteredData = [];
+          let filteredData = [];
           for (let i = 0; i < allData.length; i += CHUNK_SIZE) {
             const chunk = allData.slice(i, i + CHUNK_SIZE);
             for (const item of chunk) {
@@ -74,6 +75,21 @@ export const UseFetchDataForSummary = (
             }
           }
 
+         
+          if (offshoreType === "Direct" || offshoreType === "Indirect") {
+            // filteredData = filteredData.filter((fil) =>
+            //   fil.fileName.toUpperCase().includes(offshoreType.toUpperCase())
+            // );
+
+            filteredData = filteredData.filter((fil) => {
+              return fil.fileName
+                .toUpperCase()
+                .split(/[ .,\\-_]+/)
+                .includes(offshoreType.toUpperCase());
+            });
+
+          }
+
           if (filteredData.length > 0) {
             setConvertedStringToArrayObj(filteredData);
             setLoading(true);
@@ -81,6 +97,10 @@ export const UseFetchDataForSummary = (
           } else {
             setEmptyTableMess(true);
           }
+        } else {
+          console.log(
+            "startDate && endDate && location these are not have the data"
+          );
         }
       } catch (error) {
         console.error("Data fetch error:", error);
@@ -88,7 +108,7 @@ export const UseFetchDataForSummary = (
     };
 
     fetchData();
-  }, [startDate, endDate, location]);
+  }, [startDate, endDate, location, offshoreType]);
 
   return {
     convertedStringToArrayObj,

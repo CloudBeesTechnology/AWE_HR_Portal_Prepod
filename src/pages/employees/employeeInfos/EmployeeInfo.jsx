@@ -849,6 +849,7 @@ export const EmployeeInfo = () => {
         );
         const collectValue = {
           ...data,
+          empID: data?.empID?.trim(),
           profilePhoto: uploadedDocs.profilePhoto,
           inducBriefUp: uploadedDocs.inducBriefUp,
           bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
@@ -871,7 +872,6 @@ export const EmployeeInfo = () => {
           email: data.email.trim().toLowerCase(),
           officialEmail: data.officialEmail.trim().toLowerCase(),
         };
-        // console.log("updated", collectValue);
 
         await UpdateEIValue({ collectValue });
         setShowTitle("Employee Personal Info updated successfully");
@@ -885,6 +885,7 @@ export const EmployeeInfo = () => {
 
         const empValue = {
           ...data,
+          empID: data?.empID?.trim(),
           profilePhoto: uploadedDocs.profilePhoto,
           inducBriefUp: uploadedDocs.inducBriefUp,
           bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
@@ -905,7 +906,6 @@ export const EmployeeInfo = () => {
           email: data.email.trim().toLowerCase(),
           officialEmail: data.officialEmail.trim().toLowerCase(),
         };
-        // console.log("created", empValue);
 
         await SubmitEIData({ empValue });
         setShowTitle("Employee Personal Info saved successfully");

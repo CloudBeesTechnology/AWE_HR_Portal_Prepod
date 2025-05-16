@@ -104,7 +104,7 @@ export const TimeSheetBrowser = ({
       fileNameForSuccessful,
       title,
     });
- 
+
     if (
       isExcelExitsOrNot &&
       isExcelExitsOrNot === "fileNameAlreadyExistsInDB"
@@ -139,7 +139,6 @@ export const TimeSheetBrowser = ({
         reader.readAsArrayBuffer(selectedFile);
         reader.onload = (e) => {
           setExcelFile(e.target.result);
-
         };
       } else {
         setTypeError("Please select only excel file types");
@@ -250,7 +249,7 @@ export const TimeSheetBrowser = ({
             fileInputRef,
             setLoading
           );
-          
+
           setReturnedTHeader(editedResult);
         }
         fileInputRef.current.value = "";
@@ -858,6 +857,11 @@ export const TimeSheetBrowser = ({
             handleDuplicateFileUploadFunc();
           }}
           fileNameForSuccessful={fileNameForSuccessful}
+          title={"Duplicate Detection"}
+          message={
+            "This Excel sheet has already been uploaded by the Time Keeper."
+          }
+          buttonName={"OK"}
         />
       )}
     </div>
