@@ -54,7 +54,7 @@ export const ReligionDD = [
   { value: "Buddhist", label: "Buddhist" },
   { value: "Free Thinker", label: "Free Thinker" },
   { value: "Not Mentioned", label: "Not Mentioned" },
-  { value: "Other", label: "Other" },
+  { value: "Others", label: "Other" },
 ];
 
 export const NationalCatDD = [
