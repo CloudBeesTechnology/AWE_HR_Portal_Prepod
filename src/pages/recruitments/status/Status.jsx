@@ -202,7 +202,7 @@ export const Status = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [cvTypeDropdownOpen, isFilterBoxOpen]); // Added dependencies
+  }, [cvTypeDropdownOpen, isFilterBoxOpen]); 
 
   // Toggle Filter Box
   const toggleFilterBox = (event) => {
@@ -396,8 +396,8 @@ export const Status = () => {
 
     const date = new Date(dateToString);
 
-    const day = date.getDate().toString().padStart(2, "0"); // Local day
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Local month
+    const day = date.getDate().toString().padStart(2, "0"); 
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); 
     const year = date.getFullYear();
 
     return `${day}-${month}-${year}`;

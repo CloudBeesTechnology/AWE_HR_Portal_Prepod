@@ -2464,6 +2464,7 @@ export const createEmpPersonalInfo = /* GraphQL */ `
       permanentAddress
       position
       sapNo
+      otherLang
       createdAt
       updatedAt
       __typename
@@ -2506,6 +2507,7 @@ export const updateEmpPersonalInfo = /* GraphQL */ `
       permanentAddress
       position
       sapNo
+      otherLang
       createdAt
       updatedAt
       __typename
@@ -2548,6 +2550,7 @@ export const deleteEmpPersonalInfo = /* GraphQL */ `
       permanentAddress
       position
       sapNo
+      otherLang
       createdAt
       updatedAt
       __typename
@@ -2590,6 +2593,7 @@ export const createIDDetails = /* GraphQL */ `
       race
       religion
       supportDocUpload
+      qcCertifyUpload
       createdAt
       updatedAt
       __typename
@@ -2632,6 +2636,7 @@ export const updateIDDetails = /* GraphQL */ `
       race
       religion
       supportDocUpload
+      qcCertifyUpload
       createdAt
       updatedAt
       __typename
@@ -2674,6 +2679,7 @@ export const deleteIDDetails = /* GraphQL */ `
       race
       religion
       supportDocUpload
+      qcCertifyUpload
       createdAt
       updatedAt
       __typename
@@ -3011,6 +3017,7 @@ export const createEducationDetails = /* GraphQL */ `
       uploadResume
       uploadCertificate
       uploadPp
+      uploadIc
       createdAt
       updatedAt
       __typename
@@ -3045,6 +3052,7 @@ export const updateEducationDetails = /* GraphQL */ `
       uploadResume
       uploadCertificate
       uploadPp
+      uploadIc
       createdAt
       updatedAt
       __typename
@@ -3079,6 +3087,7 @@ export const deleteEducationDetails = /* GraphQL */ `
       uploadResume
       uploadCertificate
       uploadPp
+      uploadIc
       createdAt
       updatedAt
       __typename

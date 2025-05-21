@@ -6,7 +6,7 @@ import { CandiToEmp } from "./ConvertCandiToEmp";
 import { generateClient } from "@aws-amplify/api";
 import { listEmpPersonalInfos } from "../../../graphql/queries";
 import { SpinLogo } from "../../../utils/SpinLogo";
-import { UpdateMobilization } from "../../../services/updateMethod/UpdateMobilization";
+// import { UpdateMobilization } from "../../../services/updateMethod/UpdateMobilization";
 import { Pagination } from "../../leaveManagement/Pagination";
 
 const client = generateClient();
@@ -16,8 +16,7 @@ export const MobilizationRecru = ({
   fileUpload,
   urlValue,
 }) => {
-  const { SumbitCandiToEmp } = CandiToEmp();
-  const { submitMobilization } = UpdateMobilization();
+  // const { submitMobilization } = UpdateMobilization();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const [selectedCandi, setSelectedCandi] = useState([]);
@@ -30,7 +29,6 @@ export const MobilizationRecru = ({
   const [showEmpIdPopup, setShowEmpIdPopup] = useState(false);
   const [empIdLoading, setEmpIdLoading] = useState(false);
   const [currentCandidate, setCurrentCandidate] = useState(null);
-  
 
   const heading = [
     "S.No",
@@ -164,18 +162,23 @@ export const MobilizationRecru = ({
         ...currentCandidate,
         empID: latestTempIDData,
       };
-      console.log("Stored Data", storedData);
 
-      // Simulating async calls here, which you can uncomment when needed
-      await SumbitCandiToEmp({ storedData });
-      await submitMobilization({ mob: storedData });
+      if (storedData.empID && storedData.interviewDetails_id) {
+        const { success, message } = await CandiToEmp({ storedData });
+        console.log("Mobilizatioon : ", success);
+        if (success === true) {
+          setShowTitle(
+            "Candidate conversion to employee has been completed successfully."
+          );
+          setNotification(true);
 
-      setShowTitle(
-        "Candidate conversion to employee has been completed successfully."
-      );
-      setNotification(true);
-      
-      setShowEmpIdPopup(false);
+          setShowEmpIdPopup(false);
+        }
+      } else {
+        alert("Employee ID not found, try again");
+      }
+
+      // await submitMobilization({ mob: storedData });
     } catch (err) {
       console.error("Error during submission:", err);
       setLoadingItems((prev) => {
@@ -333,7 +336,7 @@ export const MobilizationRecru = ({
                               if (!item.mobilizationDetails_mobFile) {
                                 e.preventDefault();
                               } else {
-                                fileUpload(item.mobilizationDetails_mobFile); 
+                                fileUpload(item.mobilizationDetails_mobFile);
                               }
                             }}
                             download
@@ -351,7 +354,7 @@ export const MobilizationRecru = ({
                           <p>N/A</p>
                         )}
                       </td>
-                 
+
                       <td
                         className="py-3 text-center"
                         onClick={() => handleShowReviewForm(item)}

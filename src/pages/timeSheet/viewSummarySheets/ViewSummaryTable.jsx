@@ -35,6 +35,7 @@ export const ViewSummaryTable = ({
     endDate,
     setStartDate,
     setEndDate,
+    setOffshoreType,
   } = useTempID();
 
   const toggleSticky = () => {
@@ -86,6 +87,7 @@ export const ViewSummaryTable = ({
               onClick={() => {
                 setStartDate("");
                 setEndDate("");
+                setOffshoreType("");
               }}
             >
               <FaArrowLeft />
@@ -224,7 +226,7 @@ export const ViewSummaryTable = ({
                   // const totalAbsentiesHrs =
                   //   totalAbsence / parseFloat(getLastIndexOfNWhrs) || 0;
 
-                  console.log("totalAbsence : ", totalAbsence);
+               
 
                   const totalAbsentiesHrs = convertNumToHours(
                     totalAbsence,

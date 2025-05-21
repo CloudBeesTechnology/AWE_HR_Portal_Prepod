@@ -27,7 +27,8 @@ export const WorkpassTracking = () => {
   const [candidateTypeDropdownOpen, setCandidateTypeDropdownOpen] =
     useState(false);
   const [urlValue, setURLValue] = useState("");
-  const { WPTrackings, empPDData, IVSSDetails, educDetailsData } = useContext(DataSupply);
+  const { WPTrackings, empPDData, IVSSDetails, educDetailsData, localMobiliz } =
+    useContext(DataSupply);
 
   useEffect(() => {
     // Create a map of education details for easy lookup
@@ -40,33 +41,40 @@ export const WorkpassTracking = () => {
       acc[item.tempID] = item;
       return acc;
     }, {});
-    
+
     const IVSSMap = IVSSDetails.reduce((acc, item) => {
       acc[item.tempID] = item;
       return acc;
     }, {});
-    
+
     const WPTackingMap = WPTrackings.reduce((acc, item) => {
       acc[item.tempID] = item;
       return acc;
     }, {});
-    
+
+    const localMobilizMap = localMobiliz.reduce((acc, item) => {
+      acc[item.tempID] = item;
+      return acc;
+    }, {});
+
     // Filter candidates where tempID is present in both empPDMap and IVSSMap
     const mergedInterviewData = Object.values(empPDMap)
-      .filter((candi) => IVSSMap[candi.tempID]) 
+      .filter((candi) => IVSSMap[candi.tempID])
       .map((candi) => {
         const IVSS = IVSSMap[candi.tempID] || {};
         const WPTrack = WPTackingMap[candi.tempID] || null;
-        const educDetails = educDetailsMap[candi.tempID] || {}; 
-    
+        const educDetails = educDetailsMap[candi.tempID] || {};
+        const localMobilizeDetails = localMobilizMap[candi.tempID] || {};
+
         return {
           ...candi,
-          ...educDetails, 
+          ...educDetails,
+          ...localMobilizeDetails,
           interviewDetails: IVSS,
-          WPTrackDetails: WPTrack, 
+          WPTrackDetails: WPTrack,
         };
       });
-    
+
     const flattenObject = mergedInterviewData.map((data) => {
       const result = { ...data };
 
@@ -74,7 +82,7 @@ export const WorkpassTracking = () => {
         Object.entries(result.interviewDetails).forEach(([key, value]) => {
           result[`interviewDetails_${key}`] = value;
         });
-        delete result.interviewDetails; 
+        delete result.interviewDetails;
       }
 
       if (result.WPTrackDetails) {
@@ -86,18 +94,18 @@ export const WorkpassTracking = () => {
 
       return result;
     });
-   
+
     if (flattenObject && flattenObject.length > 0) {
       const initialFiltered = flattenObject.filter((val) => {
         return val?.interviewDetails_status === "SAWP";
       });
-    
+
       setFilteredData(initialFiltered);
       setData(flattenObject);
     } else {
       setData([]);
     }
-  }, [WPTrackings, empPDData, IVSSDetails, educDetailsData]);
+  }, [WPTrackings, empPDData, IVSSDetails, educDetailsData, localMobiliz]);
 
   const toggleFilterBox = (event) => {
     event?.stopPropagation();
@@ -155,7 +163,6 @@ export const WorkpassTracking = () => {
   const applyFiltersBasedOnStatus = (status, data) => {
     let filtered = [];
     // console.log("Data", data);
-    
 
     switch (status) {
       case "SAWP":
@@ -210,24 +217,21 @@ export const WorkpassTracking = () => {
     return filtered;
   };
 
-
   const handleCandidateTypeSelect = (option) => {
     let updatedOptions = [...selectedCandidateType];
-  
+
     if (option === "SAWP" && !updatedOptions.includes("SAWP")) {
-      
       if (updatedOptions.includes("LPA")) {
         updatedOptions = updatedOptions.filter((opt) => opt !== "LPA");
       }
       updatedOptions.push("SAWP");
     } else if (option === "LPA" && !updatedOptions.includes("LPA")) {
-      
       if (updatedOptions.includes("SAWP")) {
         updatedOptions = updatedOptions.filter((opt) => opt !== "SAWP");
       }
       updatedOptions.push("LPA");
     } else if (option === "OnShore" || option === "OffShore") {
-         if (updatedOptions.includes("OnShore") && option === "OffShore") {
+      if (updatedOptions.includes("OnShore") && option === "OffShore") {
         updatedOptions = updatedOptions.filter((opt) => opt !== "OnShore");
       } else if (updatedOptions.includes("OffShore") && option === "OnShore") {
         updatedOptions = updatedOptions.filter((opt) => opt !== "OffShore");
@@ -236,62 +240,50 @@ export const WorkpassTracking = () => {
         updatedOptions.push(option);
       }
     } else {
-      
       if (updatedOptions.includes(option)) {
         updatedOptions = updatedOptions.filter((opt) => opt !== option);
       } else {
         updatedOptions.push(option);
       }
     }
-  
+
     setSelectedCandidateType(updatedOptions);
-  
+
     let filtered = data;
-  
-  
+
     if (updatedOptions.length > 0) {
-   
       filtered = data.filter((d) => {
         return updatedOptions.some((opt) => {
           if (opt === "SAWP") {
-          
             return d.contractType === "SAWP";
           }
           if (opt === "LPA") {
-           
             return (
               d.contractType === "LPA" &&
               (d.empType === "Onshore" || d.empType === "Offshore") // Ensure empType is checked as Onshore/Offshore
             );
           }
           if (opt === "OnShore") {
-           
             // Exclude SAWP when filtering OnShore
-            return d.empType === "Onshore" && d.contractType !== "SAWP"; 
+            return d.empType === "Onshore" && d.contractType !== "SAWP";
           }
           if (opt === "OffShore") {
-           
             // Exclude SAWP when filtering OffShore
-            return d.empType === "Offshore" && d.contractType !== "SAWP"; 
+            return d.empType === "Offshore" && d.contractType !== "SAWP";
           }
-        
-          return true; 
+
+          return true;
         });
       });
     }
-  
-    
-  
+
     if (selectedFilters) {
-     
       filtered = applyFiltersBasedOnStatus(selectedFilters, filtered);
     }
-  
-    
-  
+
     setFilteredData(filtered);
   };
-   
+
   const closeForm = () => setIsFormVisible(false);
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -336,7 +328,6 @@ export const WorkpassTracking = () => {
 
     return `${day}-${month}-${year}`; // Format as DD/MM/YYYY
   };
-
 
   const fileUpload = async (files) => {
     try {

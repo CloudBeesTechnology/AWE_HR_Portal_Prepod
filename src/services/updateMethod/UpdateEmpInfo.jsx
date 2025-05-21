@@ -72,6 +72,7 @@ export const UpdateEmpInfo = () => {
       sapNo,
       bankName,
       bankAccNo,
+      qcCertifyUpload
     } = collectValue;
 
     const totalData = {
@@ -137,6 +138,7 @@ export const UpdateEmpInfo = () => {
       paafCvevUpload,
       ppUpload,
       supportDocUpload,
+      qcCertifyUpload
     };
 
     try {

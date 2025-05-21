@@ -5,13 +5,17 @@ import { deleteTimeSheet } from "../../../graphql/mutations";
 export const UnlockVerifiedCellVS = async ({
   finalResult,
   setLoadingMessForDelay,
+  identifier,
+  setShowDuplicateAlert,
+  setCancelAction,
 }) => {
   const client = generateClient();
   let allData = [];
+  let notMatchedResult = [];
   let filteredResult = [];
   let successCount = 0;
   let deleteDuplicateData = "";
-
+  let alreadyShown = false;
   setLoadingMessForDelay?.(true);
 
   // Step 1️⃣: Fetch all data at once (with pagination)
@@ -43,7 +47,13 @@ export const UnlockVerifiedCellVS = async ({
         ? item.fidNo
         : item.empBadgeNo;
 
-    if (item.status === "Verified") {
+    if (identifier === "create") {
+      const key = `${item.fileType}|${item.date.trim()}|${badgeNoOrFidNo}`;
+      timeSheetMap.set(key, item);
+    } else if (
+      item.status === "Verified" &&
+      identifier === "updateStoredData"
+    ) {
       const key = `${item.fileType}|${item.date.trim()}|${badgeNoOrFidNo}`;
       timeSheetMap.set(key, item);
     }
@@ -59,8 +69,30 @@ export const UnlockVerifiedCellVS = async ({
         : record.empBadgeNo;
 
     const key = `${record.fileType}|${record.date.trim()}|${badgeNoOrFidNo}`;
-    if (timeSheetMap.has(key)) {
+    // if (timeSheetMap.has(key)) {
+    //   filteredResult.push(timeSheetMap.get(key));
+    // }
+
+    if (timeSheetMap.has(key) && identifier === "updateStoredData") {
       filteredResult.push(timeSheetMap.get(key));
+      notMatchedResult.push(record);
+      // alert(
+      //   "Deleted existing 'Verified' data and updated with the latest edited data."
+      // );
+    }
+    if (!timeSheetMap.has(key) && identifier === "updateStoredData") {
+      notMatchedResult.push(record);
+      // alert("The newly edited data has been assigned to the Manager.");
+    }
+
+    if (timeSheetMap.has(key) && identifier === "create" && !alreadyShown) {
+      alreadyShown = true;
+      setShowDuplicateAlert?.(true);
+      setCancelAction?.(true);
+    }
+
+    if (!timeSheetMap.has(key) && identifier === "create") {
+      notMatchedResult.push(record); // Store unmatched record
     }
   }
 
@@ -97,6 +129,11 @@ export const UnlockVerifiedCellVS = async ({
       })
     );
   }
+
   setLoadingMessForDelay?.(false);
-  return { filteredResults: finalResult, deleteDuplicateData };
+
+  return {
+    filteredResults: notMatchedResult,
+    deleteDuplicateData,
+  };
 };

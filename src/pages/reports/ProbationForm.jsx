@@ -23,6 +23,8 @@ export const ProbationForm = ({ userID, userType }) => {
   const { gmPosition, supervisorCheck } = useTempID();
   const { createNotification } = useCreateNotification();
   const { employeeData } = location.state || {};
+  const probationEndDateStr = employeeData?.probationEndDate;
+  // console.log(probationEndDateStr);
   const { ProbFormsData } = ProbFormFun();
   const { UpdateProb } = UpdateProbForm();
   const [isLoading, setIsLoading] = useState(false);
@@ -102,8 +104,21 @@ export const ProbationForm = ({ userID, userType }) => {
   }, []);
 
   const currentDate = new Date();
-  const monthName = currentDate.toLocaleString("en-US", { month: "long" });
-  const year = currentDate.getFullYear();
+ // Parse "DD-MM-YYYY" into a proper Date object
+let probationMonthYear = "Invalid Date";
+
+if (probationEndDateStr) {
+  const [day, month, year] = probationEndDateStr.split("-");
+  const parsedDate = new Date(`${year}-${month}-${day}`); // Format to YYYY-MM-DD
+
+  if (!isNaN(parsedDate)) {
+    probationMonthYear = parsedDate.toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric",
+    });
+  }
+}
+
   const [personalInfo, setPersonalInfo] = useState(null);
   const { personalInfo: fetchedPersonalInfo } = useEmployeePersonalInfo(userID);
 
@@ -693,16 +708,11 @@ export const ProbationForm = ({ userID, userType }) => {
         </div>
       </section>
 
-      <div className="text-center text-lg font-bold uppercase w-full my-10">
-        {formData.probData?.createdAt
-          ? `Probation Completion Form for the Month of ${new Date(
-              formData.probData?.createdAt
-            ).toLocaleDateString("en-US", {
-              month: "long",
-              year: "numeric",
-            })}`
-          : `Probation Completion Form for the Month of ${monthName} ${year}`}
-      </div>
+
+<div className="text-center text-lg font-bold uppercase w-full my-10">
+  {`Probation Completion Form for the Month of ${probationMonthYear}`}
+</div>
+
 
       <div className="mb-10 mt-5">
         <p className="text-md mt-2">
@@ -722,7 +732,7 @@ export const ProbationForm = ({ userID, userType }) => {
             type="text"
             name="deadline"
             {...register("deadline")}
-            value={formData.probData.deadline}
+         value={formData.probData.deadline || employeeData?.deadline }
             onChange={handleInputChange}
             className="border-b border-black outline-none px-1"
           />

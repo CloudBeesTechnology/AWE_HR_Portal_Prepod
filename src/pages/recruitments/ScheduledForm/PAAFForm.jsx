@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -6,13 +6,15 @@ import { FileUploadField } from "../../employees/medicalDep/FileUploadField";
 import { uploadDocString } from "../../../services/uploadsDocsS3/UploadDocs";
 import { UpdateLoiData } from "../../../services/updateMethod/UpdateLoi";
 import { useFetchInterview } from "../../../hooks/useFetchInterview";
+import { LocalMobilization } from "../../../services/createMethod/CreateLOI";
 import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
 import { statusOptions } from "../../../utils/StatusDropdown";
 import { SpinLogo } from "../../../utils/SpinLogo";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadPAAF } from "../deleteDocsRecruit/DeleteUploadPAAF";
 import { DeletePopup } from "../../../utils/DeletePopup";
-// Define validation schema using Yup
+import { DataSupply } from "../../../utils/DataStoredContext";
+
 const PAAFFormSchema = Yup.object().shape({
   paafApproveDate: Yup.date().notRequired(),
   paafFile: Yup.mixed()
@@ -24,6 +26,8 @@ const PAAFFormSchema = Yup.object().shape({
 });
 
 export const PAAFForm = ({ candidate, formattedPermissions }) => {
+  const { localMobilization } = LocalMobilization();
+  const { IVSSDetails } = useContext(DataSupply);
   const { loiDetails } = UpdateLoiData();
   const { mergedInterviewData } = useFetchInterview();
   const { interviewDetails } = UpdateInterviewData();
@@ -51,18 +55,15 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
     register,
     formState: { errors },
     setValue,
-    watch,
   } = useForm({
     resolver: yupResolver(PAAFFormSchema),
   });
-
-  const PAAFUpload = watch("paafFile", "");
 
   useEffect(() => {
     if (mergedInterviewData.length > 0) {
       const interviewData = mergedInterviewData.find(
         (data) => data.tempID === candidate.tempID
-      ); // Assuming we want to take the first item
+      );
       if (interviewData) {
         setFormData({
           interview: {
@@ -95,7 +96,6 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
       ...prev,
       [type]: value,
     }));
-    // console.log(value);
   };
 
   const handleFileUpload = async (e, type) => {
@@ -109,7 +109,6 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
 
     let selectedFile = e.target.files[0];
 
-    // Allowed file types
     const allowedTypes = [
       "application/pdf",
       "image/jpeg",
@@ -163,13 +162,18 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
         );
         return;
       }
-      // console.log(`Deleted "${fileName}". Remaining files:`);
       setdeleteTitle1(`${fileName}`);
       handleDeleteMsg();
     } catch (error) {
       console.error("Error deleting file:", error);
       alert("Error processing the file deletion.");
     }
+  };
+
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  const wrapUpload = (filePath) => {
+    return filePath ? [{ upload: filePath, date: currentDate }] : null;
   };
 
   const handleSubmitTwo = async (e) => {
@@ -179,33 +183,45 @@ export const PAAFForm = ({ candidate, formattedPermissions }) => {
       (data) => data.tempID === candidate?.tempID
     );
 
-    if (!selectedInterviewData || !selectedInterviewData.localMobilization) {
-      alert("Candidate or LOI data not found.");
-      return;
-    }
+    const selectedInterviewDataStatus = IVSSDetails.find(
+      (data) => data.tempID === candidate?.tempID
+    );
 
-    const localMobilizationId = selectedInterviewData.localMobilization.id;
-    const interviewScheduleId = selectedInterviewData.interviewSchedules.id;
+    const localMobilizationId = selectedInterviewData?.localMobilization.id;
+    const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
+
+    const createData = {
+      paafApproveDate: formData.interview.paafApproveDate,
+      paafFile: isUploadingString.paafFile
+        ? JSON.stringify(wrapUpload(uploadedPAAF.paafFile))
+        : formData.interview.paafFile,
+      tempID: candidate.tempID,
+    };
 
     try {
-      await loiDetails({
-        LoiValue: {
-          id: localMobilizationId,
-          paafApproveDate: formData.interview.paafApproveDate,
-          paafFile: uploadedPAAF.paafFile,
-        },
-      });
+      if (localMobilizationId) {
+        await loiDetails({
+          LoiValue: {
+            id: localMobilizationId,
+            paafApproveDate: formData.interview.paafApproveDate,
+            paafFile: isUploadingString.paafFile
+              ? JSON.stringify(wrapUpload(uploadedPAAF.paafFile))
+              : formData.interview.paafFile,
+          },
+        });
+      } else {
+        await localMobilization(createData);
+      }
 
       await interviewDetails({
         InterviewValue: {
-          id: interviewScheduleId,
+          id: interviewScheduleStatusId,
           status: formData.interview.status,
           // status: selectedInterviewData.empType === "Offshore" ? "CVEV" : "PAAF",
           // status: selectedInterviewData.contractType === "Local" ? "mobilization" : "workpass",
         },
       });
 
-      // console.log("Data stored successfully...");
       setNotification(true);
     } catch (error) {
       // console.error("Error submitting interview details:", error);

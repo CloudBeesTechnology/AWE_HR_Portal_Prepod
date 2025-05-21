@@ -67,6 +67,10 @@ export const BankForm = ({ candidate }) => {
         (data) => data.tempID === candidate.tempID
       );
 
+      const interviewStatus = IVSSDetails.find(
+        (data) => data.tempID === candidate.tempID
+      );
+
       if (interviewData) {
         setFormData({
           interview: {
@@ -88,9 +92,16 @@ export const BankForm = ({ candidate }) => {
           }));
           //  console.log("Uploaded file name set:", fileName);
         }
+      } else {
+        setFormData({
+          interview: {
+            status: interviewStatus.status,
+          },
+        });
       }
     }
   }, [interviewSchedules, candidate.tempID]);
+
   const extractFileName = (url) => {
     if (typeof url === "string" && url) {
       const decodedUrl = decodeURIComponent(url);

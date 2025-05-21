@@ -14,7 +14,7 @@ export const UpdateMobilization = () => {
       const totalValue = {
         id: mob.interviewDetails_id,
         empID: mob.empID,
-        status:"Employee"
+        // status:"Employee"
       };
 
       console.log(totalValue);

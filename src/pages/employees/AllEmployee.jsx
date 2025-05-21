@@ -17,7 +17,7 @@ export const AllEmployee = () => {
     IDData,
     workInfoData,
     terminateData,
-    leaveDetailsData, 
+    leaveDetailsData,
     SRData,
     DNData,
     BJLData,
@@ -28,16 +28,16 @@ export const AllEmployee = () => {
     NLAData,
     SawpDetails,
     insuranceClaimsData,
+    candyToEmp,
   } = useContext(DataSupply);
- 
-  const [mergeData, setMergeData] = useState([]); 
-  const [filteredData, setFilteredData] = useState([]); 
-  const [loading, setLoading] = useState(true); 
+
+  const [mergeData, setMergeData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [passingValue, setPassingValue] = useState([]);
   const [paginateLoading, setPaginateLoading] = useState(true);
-
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -57,7 +57,7 @@ export const AllEmployee = () => {
       );
       setFilteredData(results);
     } else {
-      setFilteredData(mergeData); 
+      setFilteredData(mergeData);
     }
   };
 
@@ -94,7 +94,8 @@ export const AllEmployee = () => {
       depInsuranceData &&
       NLAData &&
       SawpDetails &&
-      insuranceClaimsData
+      insuranceClaimsData &&
+      candyToEmp
     ) {
       // Merging all data based on empID
       const allDataValues = empPIData
@@ -142,6 +143,8 @@ export const AllEmployee = () => {
             insuranceClaimsData.find(
               (item) => item.empID === empPIItem.empID
             ) || {};
+          const candyMatch =
+            candyToEmp.find((item) => item.empID === empPIItem.empID) || {};
           return {
             ...idMatch,
             ...empPDMatch,
@@ -162,16 +165,17 @@ export const AllEmployee = () => {
             ...swapMatch,
             ...insClaimMatch,
             ...empPIItem,
-            position:workInfoMatch.position,
+            ...candyMatch,
+            position: workInfoMatch.position,
           };
         })
-        .filter((item) => item?.empID) 
+        .filter((item) => item?.empID)
         .reduce((unique, item) => {
           if (!unique.some((emp) => emp.empID === item.empID)) {
             unique.push(item);
           }
           return unique;
-        }, []); 
+        }, []);
       const sorted = allDataValues.sort((a, b) =>
         a.empID.localeCompare(b.empID)
       );
@@ -208,12 +212,11 @@ export const AllEmployee = () => {
     insuranceClaimsData,
     empPDData,
     empPIData,
+    candyToEmp,
   ]);
 
-
-  
   const handleFilterChange = (e) => {
-    const selectedStatus = e.target.value.toLowerCase(); 
+    const selectedStatus = e.target.value.toLowerCase();
 
     if (selectedStatus === "all") {
       setFilteredData(mergeData);
@@ -280,7 +283,7 @@ export const AllEmployee = () => {
       </div>
     );
   }
-  
+
   const handleFormShow = (value) => {
     setShowForm(!showForm);
     setPassingValue(value);
@@ -295,7 +298,7 @@ export const AllEmployee = () => {
   };
 
   const getStatusClass = (workStatus) => {
-    const normalizedStatus = workStatus?.toLowerCase(); 
+    const normalizedStatus = workStatus?.toLowerCase();
 
     return (
       {
@@ -311,160 +314,160 @@ export const AllEmployee = () => {
 
   return (
     <section className="bg-[#F5F6F1CC] w-full flex items-center flex-col h-screen pt-14">
-    <div className="w-full px-10 flex justify-between items-center mb-10">
-      <div className="bg-[#faf362] py-2 px-3 rounded-lg text-[18px] font-semibold">
-        All Employee Details
-      </div>
-      <div className="flex items-center space-x-4 ">
-        <div className="relative">
-          <Searchbox
-            type="text"
-            placeholder="Emp ID or Badge No or Name"
-            allEmpDetails={mergeData}
-            searchUserList={setFilteredData}
-            className="py-2 px-4"
-            // searchIcon2={<FiSearch />}
-            searchIcon2={<IoSearch />}
-          />
-          {/* <img
+      <div className="w-full px-10 flex justify-between items-center mb-10">
+        <div className="bg-[#faf362] py-2 px-3 rounded-lg text-[18px] font-semibold">
+          All Employee Details
+        </div>
+        <div className="flex items-center space-x-4 ">
+          <div className="relative">
+            <Searchbox
+              type="text"
+              placeholder="Emp ID or Badge No or Name"
+              allEmpDetails={mergeData}
+              searchUserList={setFilteredData}
+              className="py-2 px-4"
+              // searchIcon2={<FiSearch />}
+              searchIcon2={<IoSearch />}
+            />
+            {/* <img
             src={searchIcon}
             alt="Search Icon"
             className="absolute top-1/2 right-2 transform -translate-y-1/2 w-4 h-4"
           /> */}
+          </div>
+          <select
+            className="py-2.5 px-2 border border-lite_grey focus:outline-none focus:ring-0"
+            onChange={handleFilterChange}
+          >
+            <option value="All">All</option>
+            <option value="Local">Local</option>
+            <option value="Foreigner">Foreigner</option>
+            <option value="LPA">LPA</option>
+            <option value="SAWP">SAWP</option>
+            <option value="OnShore">OnShore</option>
+            <option value="OffShore">OffShore</option>
+            <option value="Active">Active</option>
+            <option value="Probationary">Probationary</option>
+            <option value="Resignation">Resignation</option>
+            <option value="Termination">Termination</option>
+          </select>
         </div>
-        <select
-          className="py-2.5 px-2 border border-lite_grey focus:outline-none focus:ring-0"
-          onChange={handleFilterChange}
-        >
-          <option value="All">All</option>
-          <option value="Local">Local</option>
-          <option value="Foreigner">Foreigner</option>
-          <option value="LPA">LPA</option>
-          <option value="SAWP">SAWP</option>
-          <option value="OnShore">OnShore</option>
-          <option value="OffShore">OffShore</option>
-          <option value="Active">Active</option>
-          <option value="Probationary">Probationary</option>
-          <option value="Resignation">Resignation</option>
-          <option value="Termination">Termination</option>
-        </select>
       </div>
-    </div>
-    <div className="overflow-x-auto mt-8 max-w-[100%] px-6">
-      <div className="allEmployeeTable w-full max-h-[calc(70vh-7rem)] overflow-y-auto rounded-xl">
-        <table className="w-full rounded-xl table-auto">
-          <thead className="bg-[#939393] text-center text-white sticky top-0">
-            <tr className="">
-              <th className="py-4 px-2">S.No</th>
-              <th className="py-4 px-2">Employee ID</th>
-              <th className="py-4 px-2">Badge No</th>
-              <th className="py-4 px-2">Name</th>
-              <th className="py-4 px-2">DOB</th>
-              <th className="py-4 px-2">Nationality</th>
-              <th className="py-4 px-2">Contract</th>
-              <th className="py-4 px-2">Type</th>
-              <th className="py-4 px-2">Email</th>
-              <th className="py-4 px-2">Contact No</th>
-              <th className="py-4 px-2">Status</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white text-center text-sm font-semibold text-dark_grey cursor-pointer">
-            {paginatedData.length > 0 ? (
-              paginatedData.map((candidate, index) => {
-                const serialNumber =
-                  (currentPage - 1) * rowsPerPage + index + 1;
-                return (
-                  <tr
-                    key={index}
-                    className="border-b-2 bg-white border-[#C7BCBC] text-[13px] text-[#303030] hover:bg-medium_blue"
-                    onClick={() => {
-                      handleFormShow(candidate);
-                    }}
-                  >
-                    <td className="py-4 px-4 max-w-[50px] min-w-[50px]  overflow-hidden">
-                      {serialNumber}
-                    </td>
-                    <td className="py-4 px-4 max-w-[150px] min-w-[150px]  overflow-hidden">
-                      {candidate?.empID || "N/A"}
-                    </td>
-                    <td className="py-4 px-4 max-w-[150px] min-w-[150px]  overflow-hidden">
-                      {candidate?.empBadgeNo || "N/A"}
-                    </td>
-                    <td className="py-4 px-4 max-w-[150px] min-w-[150px] break-words overflow-hidden ">
-                      {candidate?.name || "N/A"}
-                    </td>
-                    <td className="py-4 px-4 max-w-[150px] min-w-[150px]  overflow-hidden">
-                      {formatDate(candidate?.dob || "N/A")}
-                    </td>
-                    <td className="py-4 px-4 max-w-[150px] min-w-[150px]  overflow-hidden">
-                      {candidate?.nationality || "N/A"}
-                    </td>
-                    <td className="py-4 px-4 max-w-[150px] min-w-[150px]  overflow-hidden">
-                      {candidate?.contractType?.[
-                        candidate.contractType.length - 1
-                      ] || "N/A"}
-                    </td>
-                    <td className="py-4 px-4 max-w-[150px] min-w-[150px]  overflow-hidden">
-                      {candidate?.empType?.[candidate.empType.length - 1] ||
-                        "N/A"}
-                    </td>
-                    <td className="py-4 px-4 max-w-[150px] min-w-[150px] break-words  overflow-hidden">
-                      {candidate?.email || "N/A"}
-                    </td>
-
-                    <td className="py-4 px-4 max-w-[150px] min-w-[150px]  overflow-hidden">
-                      {candidate?.contactNo || "N/A"}
-                    </td>
-                    <td
-                      className={`uppercase py-4 px-4 font-bold max-w-[150px] min-w-[150px] ${getStatusClass(
-                        candidate?.workStatus?.[
-                          candidate?.workStatus.length - 1
-                        ] || "N/A"
-                      )}`}
-                    >
-                      {candidate?.workStatus?.[
-                        candidate?.workStatus.length - 1
-                      ] || "N/A"}
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td colSpan="11" className="py-4 px-4 text-center">
-                  No data available
-                </td>
+      <div className="overflow-x-auto mt-8 max-w-[100%] px-6">
+        <div className="allEmployeeTable w-full max-h-[calc(70vh-7rem)] overflow-y-auto rounded-xl">
+          <table className="w-full rounded-xl table-auto">
+            <thead className="bg-[#939393] text-center text-white sticky top-0">
+              <tr className="">
+                <th className="py-4 px-2">S.No</th>
+                <th className="py-4 px-2">Employee ID</th>
+                <th className="py-4 px-2">Badge No</th>
+                <th className="py-4 px-2">Name</th>
+                <th className="py-4 px-2">DOB</th>
+                <th className="py-4 px-2">Nationality</th>
+                <th className="py-4 px-2">Contract</th>
+                <th className="py-4 px-2">Type</th>
+                <th className="py-4 px-2">Email</th>
+                <th className="py-4 px-2">Contact No</th>
+                <th className="py-4 px-2">Status</th>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
-    {showForm && (
-      <DetailsShowingForm
-        passingValue={passingValue}
-        handleFormShow={handleFormShow}
-      />
-    )}
-    {/* Pagination Controls */}
-    <div className="flex justify-end items-end w-full">
-      {paginatedData.length > 0 && (
-        <div className="flex mt-12 px-8">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={Math.ceil(filteredData.length / rowsPerPage)}
-            onPageChange={(newPage) => {
-              if (
-                newPage >= 1 &&
-                newPage <= Math.ceil(filteredData.length / rowsPerPage)
-              ) {
-                setCurrentPage(newPage);
-              }
-            }}
-          />
+            </thead>
+            <tbody className="bg-white text-center text-sm font-semibold text-dark_grey cursor-pointer">
+              {paginatedData.length > 0 ? (
+                paginatedData.map((candidate, index) => {
+                  const serialNumber =
+                    (currentPage - 1) * rowsPerPage + index + 1;
+                  return (
+                    <tr
+                      key={index}
+                      className="border-b-2 bg-white border-[#C7BCBC] text-[13px] text-[#303030] hover:bg-medium_blue"
+                      onClick={() => {
+                        handleFormShow(candidate);
+                      }}
+                    >
+                      <td className="py-4 px-4 max-w-[50px] min-w-[50px]  overflow-hidden">
+                        {serialNumber}
+                      </td>
+                      <td className="py-4 px-4 max-w-[150px] min-w-[150px]  overflow-hidden">
+                        {candidate?.empID || "N/A"}
+                      </td>
+                      <td className="py-4 px-4 max-w-[150px] min-w-[150px]  overflow-hidden">
+                        {candidate?.empBadgeNo || "N/A"}
+                      </td>
+                      <td className="py-4 px-4 max-w-[150px] min-w-[150px] break-words overflow-hidden ">
+                        {candidate?.name || "N/A"}
+                      </td>
+                      <td className="py-4 px-4 max-w-[150px] min-w-[150px]  overflow-hidden">
+                        {formatDate(candidate?.dob || "N/A")}
+                      </td>
+                      <td className="py-4 px-4 max-w-[150px] min-w-[150px]  overflow-hidden">
+                        {candidate?.nationality || "N/A"}
+                      </td>
+                      <td className="py-4 px-4 max-w-[150px] min-w-[150px]  overflow-hidden">
+                        {candidate?.contractType?.[
+                          candidate.contractType.length - 1
+                        ] || "N/A"}
+                      </td>
+                      <td className="py-4 px-4 max-w-[150px] min-w-[150px]  overflow-hidden">
+                        {candidate?.empType?.[candidate.empType.length - 1] ||
+                          "N/A"}
+                      </td>
+                      <td className="py-4 px-4 max-w-[150px] min-w-[150px] break-words  overflow-hidden">
+                        {candidate?.email || "N/A"}
+                      </td>
+
+                      <td className="py-4 px-4 max-w-[150px] min-w-[150px]  overflow-hidden">
+                        {candidate?.contactNo || "N/A"}
+                      </td>
+                      <td
+                        className={`uppercase py-4 px-4 font-bold max-w-[150px] min-w-[150px] ${getStatusClass(
+                          candidate?.workStatus?.[
+                            candidate?.workStatus.length - 1
+                          ] || "N/A"
+                        )}`}
+                      >
+                        {candidate?.workStatus?.[
+                          candidate?.workStatus.length - 1
+                        ] || "N/A"}
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan="11" className="py-4 px-4 text-center">
+                    No data available
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
+      </div>
+      {showForm && (
+        <DetailsShowingForm
+          passingValue={passingValue}
+          handleFormShow={handleFormShow}
+        />
       )}
-    </div>
-  </section>
+      {/* Pagination Controls */}
+      <div className="flex justify-center items-center w-full">
+        {paginatedData.length > 0 && (
+          <div className="flex mt-12 px-8">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.ceil(filteredData.length / rowsPerPage)}
+              onPageChange={(newPage) => {
+                if (
+                  newPage >= 1 &&
+                  newPage <= Math.ceil(filteredData.length / rowsPerPage)
+                ) {
+                  setCurrentPage(newPage);
+                }
+              }}
+            />
+          </div>
+        )}
+      </div>
+    </section>
   );
 };

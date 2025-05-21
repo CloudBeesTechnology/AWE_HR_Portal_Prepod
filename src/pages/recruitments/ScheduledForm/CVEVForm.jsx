@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -9,10 +9,12 @@ import { useFetchInterview } from "../../../hooks/useFetchInterview";
 import { UpdateInterviewData } from "../../../services/updateMethod/UpdateInterview";
 import { statusOptions } from "../../../utils/StatusDropdown";
 import { SpinLogo } from "../../../utils/SpinLogo";
+import { LocalMobilization } from "../../../services/createMethod/CreateLOI";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
 import { DeleteUploadCVEV } from "../deleteDocsRecruit/DeleteUploadCVEV";
 import { DeletePopup } from "../../../utils/DeletePopup";
-// Define validation schema using Yup
+import { DataSupply } from "../../../utils/DataStoredContext";
+
 const CVEVFormSchema = Yup.object().shape({
   cvecApproveDate: Yup.date().notRequired(),
   cvecFile: Yup.mixed()
@@ -24,6 +26,8 @@ const CVEVFormSchema = Yup.object().shape({
 });
 
 export const CVEVForm = ({ candidate, formattedPermissions }) => {
+  const { localMobilization } = LocalMobilization();
+  const { IVSSDetails } = useContext(DataSupply);
   const { mergedInterviewData } = useFetchInterview();
   const { loiDetails } = UpdateLoiData();
   const { interviewDetails } = UpdateInterviewData();
@@ -49,22 +53,17 @@ export const CVEVForm = ({ candidate, formattedPermissions }) => {
   });
   const {
     register,
-    watch,
     formState: { errors },
     setValue,
   } = useForm({
     resolver: yupResolver(CVEVFormSchema),
   });
 
-  const CVECUpload = watch("cvecFile");
-
-  // console.log("DATA 3.0", mergedInterviewData);
-
   useEffect(() => {
     if (mergedInterviewData.length > 0 && candidate?.tempID) {
       const interviewData = mergedInterviewData.find(
         (data) => data.tempID === candidate.tempID
-      ); // Use the candidate's tempID to filter the data
+      );
       if (interviewData) {
         setFormData({
           interview: {
@@ -97,19 +96,10 @@ export const CVEVForm = ({ candidate, formattedPermissions }) => {
       ...prev,
       [type]: value,
     }));
-    // console.log(value);
   };
 
   const handleFileUpload = async (e, type) => {
     const tempID = candidate.tempID;
-    console.log(tempID);
-
-    //      if (!tempID
-    // ) {
-    //        alert("Please enter the Employee ID before uploading files.");
-    //        window.location.href = "/employeeInfo";
-    //        return;
-    //      }
 
     let selectedFile = e.target.files[0];
 
@@ -126,14 +116,14 @@ export const CVEVForm = ({ candidate, formattedPermissions }) => {
       return;
     }
 
-    setValue(type, selectedFile); // Update form state with the selected file
+    setValue(type, selectedFile);
 
     if (selectedFile) {
       updateUploadingString(type, true);
       await uploadDocString(selectedFile, type, setUploadedCVEC, tempID);
       setUploadedFileNames((prev) => ({
         ...prev,
-        [type]: selectedFile.name, // Dynamically store file name
+        [type]: selectedFile.name,
       }));
     }
   };
@@ -145,14 +135,6 @@ export const CVEVForm = ({ candidate, formattedPermissions }) => {
   const deletedStringUpload = async (fileType, fileName) => {
     try {
       const tempID = candidate.tempID;
-      // console.log(tempID);
-
-      //       if (!tempID
-      // ) {
-      //         alert("Please provide the Employee ID before deleting files.");
-      //         return;
-      //       }
-
       const isDeleted = await handleDeleteFile(fileType, fileName, tempID);
       const isDeletedArrayUploaded = await DeleteUploadCVEV(
         fileType,
@@ -169,7 +151,7 @@ export const CVEVForm = ({ candidate, formattedPermissions }) => {
         );
         return;
       }
-      // console.log(`Deleted "${fileName}". Remaining files:`);
+
       setdeleteTitle1(`${fileName}`);
       handleDeleteMsg();
     } catch (error) {
@@ -178,44 +160,56 @@ export const CVEVForm = ({ candidate, formattedPermissions }) => {
     }
   };
 
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  const wrapUpload = (filePath) => {
+    return filePath ? [{ upload: filePath, date: currentDate }] : null;
+  };
+
   const handleSubmitTwo = async (e) => {
     e.preventDefault();
 
-    // Find the correct interview data using the tempID of the selected candidate
     const selectedInterviewData = mergedInterviewData.find(
       (data) => data.tempID === candidate?.tempID
     );
 
-    if (!selectedInterviewData) {
-      console.error("No interview data found for the selected candidate.");
-      alert("No interview data found for the selected candidate.");
-      return;
-    }
-    const localMobilizationId = selectedInterviewData?.localMobilization?.id;
-    const interviewScheduleId = selectedInterviewData.interviewSchedules.id;
+    const selectedInterviewDataStatus = IVSSDetails.find(
+      (data) => data.tempID === candidate?.tempID
+    );
 
-    if (!localMobilizationId) {
-      console.error("Interview schedule ID not found.");
-      alert("Interview schedule ID not found.");
-      return;
-    }
+    const localMobilizationId = selectedInterviewData?.localMobilization?.id;
+    const interviewScheduleStatusId = selectedInterviewDataStatus?.id;
+
+    const createData = {
+      cvecApproveDate: formData.interview.cvecApproveDate,
+      cvecFile: isUploadingString.cvecFile
+        ? JSON.stringify(wrapUpload(uploadedCVEC.cvecFile))
+        : formData.interview.cvecFile,
+      tempID: candidate.tempID,
+    };
 
     try {
-      await loiDetails({
-        LoiValue: {
-          id: localMobilizationId,
-          cvecApproveDate: formData.interview.cvecApproveDate,
-          cvecFile: uploadedCVEC.cvecFile,
-        },
-      });
+      if (localMobilizationId) {
+        await loiDetails({
+          LoiValue: {
+            id: localMobilizationId,
+            cvecApproveDate: formData.interview.cvecApproveDate,
+            cvecFile: isUploadingString.cvecFile
+              ? JSON.stringify(wrapUpload(uploadedCVEC.cvecFile))
+              : formData.interview.cvecFile,
+          },
+        });
+      } else {
+        await localMobilization(createData);
+      }
 
       await interviewDetails({
         InterviewValue: {
-          id: interviewScheduleId, // Dynamically use the correct id
+          id: interviewScheduleStatusId,
           status: formData.interview.status,
         },
       });
-      // console.log("Data stored successfully...");
+
       setNotification(true);
     } catch (error) {
       console.error("Error submitting interview details:", error);
@@ -223,7 +217,6 @@ export const CVEVForm = ({ candidate, formattedPermissions }) => {
     }
   };
 
-  // Function to handle changes for non-file fields
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,

@@ -37,6 +37,9 @@ const InsuranceDetails = ({
     }
   };
 
+  console.log("WK", insuranceInfo);
+  
+
   useEffect(() => {
 
     if (Array.isArray(depInsurance) && depInsurance.length > 0) {

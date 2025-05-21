@@ -17,11 +17,11 @@ export const LMTable = () => {
     userType,
     mergedData,
     userID,
-    loading
+    loading,
   } = useOutletContext();
 
-  const {empPIData}=useContext(DataSupply);
-  const [lastUploadUrl, setPPLastUP] = useState(""); 
+  const { empPIData } = useContext(DataSupply);
+  const [lastUploadUrl, setPPLastUP] = useState("");
   const [matchData, setMatchData] = useState([]);
   const [secondartyData, setSecondartyData] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
@@ -36,7 +36,6 @@ export const LMTable = () => {
   });
 
   useEffect(() => {
-
     let filteredData = mergedData
       .filter((items) => {
         if (userType === "Supervisor" && items?.empStatus !== "Cancelled") {
@@ -47,62 +46,72 @@ export const LMTable = () => {
           items?.empStatus !== "Cancelled"
         ) {
           return items.managerEmpID === userID;
-        } else if ((userType === "SuperAdmin" || userType === "HR" ) && items?.empStatus !== "Cancelled") {
+        } else if (
+          (userType === "SuperAdmin" || userType === "HR") &&
+          items?.empStatus !== "Cancelled"
+        ) {
           return true;
         }
         return false;
       })
       .sort((a, b) => {
-     
         function toISODate(dateString) {
-            // console.log("Original date string:", dateString); 
-  
-            const ddmmyyyyRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-            const iso8601Regex = /^\d{4}-\d{2}-\d{2}$/;
-    
-            if (ddmmyyyyRegex.test(dateString)) {
-                const [, day, month, year] = ddmmyyyyRegex.exec(dateString);
-                const formattedDate = `${year}-${month}-${day}`;
-                // console.log("Converted DD/MM/YYYY to ISO:", formattedDate); 
-                return formattedDate;  
-            }
-    
-            if (iso8601Regex.test(dateString)) {
-                const formattedDate = `${dateString}T00:00:00.000Z`;  
-                // console.log("Converted YYYY-MM-DD to ISO 8601:", formattedDate);  
-                return formattedDate; 
-            }
-    
-            const isoDate = new Date(dateString).toISOString();  
-            // console.log("Converted to full ISO 8601:", isoDate);  
-            return isoDate;  
+          // console.log("Original date string:", dateString);
+
+          const ddmmyyyyRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+          const iso8601Regex = /^\d{4}-\d{2}-\d{2}$/;
+
+          if (ddmmyyyyRegex.test(dateString)) {
+            const [, day, month, year] = ddmmyyyyRegex.exec(dateString);
+            const formattedDate = `${year}-${month}-${day}`;
+            // console.log("Converted DD/MM/YYYY to ISO:", formattedDate);
+            return formattedDate;
+          }
+
+          if (iso8601Regex.test(dateString)) {
+            const formattedDate = `${dateString}T00:00:00.000Z`;
+            // console.log("Converted YYYY-MM-DD to ISO 8601:", formattedDate);
+            return formattedDate;
+          }
+
+          const isoDate = new Date(dateString).toISOString();
+          // console.log("Converted to full ISO 8601:", isoDate);
+          return isoDate;
         }
-    
+
         if (userType === "SuperAdmin") {
-            const dateA = toISODate(a.leaveStatusReceivedDate || a.leaveStatusCreatedAt);
-            const dateB = toISODate(b.leaveStatusReceivedDate || b.leaveStatusCreatedAt);
-    
-            return new Date(dateB) - new Date(dateA);
+          const dateA = toISODate(
+            a.leaveStatusReceivedDate || a.leaveStatusCreatedAt
+          );
+          const dateB = toISODate(
+            b.leaveStatusReceivedDate || b.leaveStatusCreatedAt
+          );
+
+          return new Date(dateB) - new Date(dateA);
         }
-    
+
         const isManagerPendingA = a.managerStatus === "Pending";
         const isManagerPendingB = b.managerStatus === "Pending";
         const isSupervisorPendingA = a.supervisorStatus === "Pending";
         const isSupervisorPendingB = b.supervisorStatus === "Pending";
-    
+
         if (isManagerPendingA && !isManagerPendingB) return -1;
-        if (!isManagerPendingA && isManagerPendingB) return 1;       
+        if (!isManagerPendingA && isManagerPendingB) return 1;
         if (isSupervisorPendingA && !isSupervisorPendingB) return -1;
         if (!isSupervisorPendingA && isSupervisorPendingB) return 1;
-      
-        const dateA = toISODate(a.leaveStatusCreatedAt || a.leaveStatusReceivedDate);
-        const dateB = toISODate(b.leaveStatusCreatedAt || b.leaveStatusReceivedDate);
-    
-        // console.log("Final DateA:", dateA, "Final DateB:", dateB);  
-      
+
+        const dateA = toISODate(
+          a.leaveStatusCreatedAt || a.leaveStatusReceivedDate
+        );
+        const dateB = toISODate(
+          b.leaveStatusCreatedAt || b.leaveStatusReceivedDate
+        );
+
+        // console.log("Final DateA:", dateA, "Final DateB:", dateB);
+
         return new Date(dateB) - new Date(dateA);
-    });
-  
+      });
+
     // Step 2: Apply status filter
     if (filterStatus !== "All") {
       filteredData = filteredData.filter((item) => {
@@ -119,26 +128,35 @@ export const LMTable = () => {
     if (selectedDate) {
       filteredData = filteredData.filter((item) => {
         const selectedDateObj = new Date(selectedDate);
-        const supervisorDate = item.supervisorDate ? new Date(item.supervisorDate) : null;
-        const managerDate = item.managerDate ? new Date(item.managerDate) : null;
-        const selectedDateFormatted = selectedDateObj.toISOString().split('T')[0];  
-        const supervisorDateFormatted = supervisorDate ? supervisorDate.toISOString().split('T')[0] : null;
-        const managerDateFormatted = managerDate ? managerDate.toISOString().split('T')[0] : null;
-    
+        const supervisorDate = item.supervisorDate
+          ? new Date(item.supervisorDate)
+          : null;
+        const managerDate = item.managerDate
+          ? new Date(item.managerDate)
+          : null;
+        const selectedDateFormatted = selectedDateObj
+          .toISOString()
+          .split("T")[0];
+        const supervisorDateFormatted = supervisorDate
+          ? supervisorDate.toISOString().split("T")[0]
+          : null;
+        const managerDateFormatted = managerDate
+          ? managerDate.toISOString().split("T")[0]
+          : null;
+
         return (
           supervisorDateFormatted === selectedDateFormatted ||
           managerDateFormatted === selectedDateFormatted
         );
       });
     }
-    
+
     setSecondartyData(filteredData);
     setMatchData(filteredData);
   }, [mergedData, userType, userID, filterStatus, selectedDate]);
 
   // Logic to get the URL of the uploaded file
 
-  
   const linkToStorageFile = async (pathUrl) => {
     try {
       const result = await getUrl({ path: pathUrl });
@@ -195,7 +213,7 @@ export const LMTable = () => {
       noResults: false,
     });
   };
-  
+
   useEffect(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
 
@@ -225,7 +243,6 @@ export const LMTable = () => {
   );
 
   if (loading) {
-
     return (
       <div className="flex items-center justify-center h-[60vh] bg-transparent">
         <div className="flex justify-between gap-2">
@@ -237,8 +254,7 @@ export const LMTable = () => {
       </div>
     );
   }
-  console.log(errorState);
-  
+  console.log(matchData, "matchedData");
 
   return (
     <section className="flex flex-col w-full mt-4">
@@ -286,8 +302,21 @@ export const LMTable = () => {
               {matchData && matchData.length > 0 ? (
                 matchData.map((item, index) => {
                   const displayIndex = startIndex + index + 1;
-                  const managerName=empPIData.filter((val)=> val.empID === item.managerEmpID)
-                  const supervisorName=empPIData.filter((val)=> val.empID === item.supervisorEmpID)
+                  let managerName = "";
+                  let supervisorName = "";
+                  if (item.managerEmpID) {
+                    managerName = empPIData.filter(
+                      (val) => val.empID === item.managerEmpID
+                    );
+                  }
+                  if (item.supervisorEmpID) {
+                    supervisorName = empPIData.filter(
+                      (val) => val.empID === item.supervisorEmpID
+                    );
+                  }
+
+                  console.log(item.empID, item.supervisorEmpID);
+
                   return (
                     <tr
                       key={index}
@@ -295,12 +324,17 @@ export const LMTable = () => {
                     >
                       <td className="py-3">{displayIndex}</td>
                       <td className="py-3">{item.empID}</td>
-                      <td className="py-3">{capitalizedLetter(item.empName) || "N/A"}</td>
                       <td className="py-3">
-                        {DateFormat(item?.leaveStatusReceivedDate) || DateFormat(item?.leaveStatusCreatedAt)}
+                        {capitalizedLetter(item.empName) || "N/A"}
+                      </td>
+                      <td className="py-3">
+                        {DateFormat(item?.leaveStatusReceivedDate) ||
+                          DateFormat(item?.leaveStatusCreatedAt)}
                       </td>
                       {userType !== "Supervisor" && userType !== "Manager" && (
-                        <td className="py-3">{capitalizedLetter(supervisorName[0]?.name) || "N/A"}</td>
+                        <td className="py-3">
+                          {capitalizedLetter(supervisorName[0]?.name) || "N/A"}
+                        </td>
                       )}
                       {userType !== "Manager" && (
                         <td className="py-3">
@@ -308,7 +342,9 @@ export const LMTable = () => {
                         </td>
                       )}
                       {userType !== "Manager" && userType !== "Supervisor" && (
-                        <td className="py-3">{capitalizedLetter(managerName[0]?.name) || "N/A"}</td>
+                        <td className="py-3">
+                          {capitalizedLetter(managerName[0]?.name) || "N/A"}
+                        </td>
                       )}
                       {userType !== "Supervisor" && (
                         <td className="py-3">
@@ -342,9 +378,8 @@ export const LMTable = () => {
                           className="border-b-2 border-[blue] text-[blue]"
                           onClick={() => {
                             handleClickForToggle();
-                            handleViewClick(item, "LM");  
+                            handleViewClick(item, "LM");
                             // console.log("item", item);
-                    
                           }}
                         >
                           {item["submitted Form"] || "View"}
