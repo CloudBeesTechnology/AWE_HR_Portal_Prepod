@@ -741,7 +741,7 @@ export const ProbationForm = ({ userID, userType }) => {
               <td className="p-2 border-b">
                 <input
                   {...register("name")}
-                  defaultValue={employeeData?.name || "-"}
+                  defaultValue={employeeData?.name}
                   className="w-full outline-none"
                 />
               </td>
@@ -755,7 +755,7 @@ export const ProbationForm = ({ userID, userType }) => {
                 {/* Displaying employee name and registering the input */}
                 <input
                   {...register("empID")}
-                  defaultValue={employeeData?.empID || ""}
+                  defaultValue={employeeData?.empID}
                   className="w-full outline-none"
                 />
               </td>
@@ -768,7 +768,7 @@ export const ProbationForm = ({ userID, userType }) => {
                 {/* Displaying employee name and registering the input */}
                 <input
                   {...register("empBadgeNo")}
-                  defaultValue={employeeData?.empBadgeNo || ""}
+                  defaultValue={employeeData?.empBadgeNo}
                   className="w-full outline-none"
                 />
               </td>
@@ -780,7 +780,7 @@ export const ProbationForm = ({ userID, userType }) => {
               <td className="p-2 border-b">
                 <input
                   {...register("department")}
-                  defaultValue={employeeData?.department || ""}
+                  defaultValue={employeeData?.department}
                   className="w-full outline-none"
                 />
               </td>
@@ -790,7 +790,7 @@ export const ProbationForm = ({ userID, userType }) => {
               <td className="p-2 border-b">
                 <input
                   {...register("position")}
-                  defaultValue={employeeData?.position || ""}
+                  defaultValue={employeeData?.position}
                   className="w-full outline-none"
                 />
               </td>
@@ -802,7 +802,7 @@ export const ProbationForm = ({ userID, userType }) => {
               <td className="p-2 border-b">
                 <input
                   {...register("doj")}
-                  defaultValue={employeeData?.dateOfJoin || ""}
+                  defaultValue={employeeData?.dateOfJoin}
                   className="w-full outline-none"
                 />
               </td>
@@ -814,7 +814,7 @@ export const ProbationForm = ({ userID, userType }) => {
               <td className="p-2 border-b">
                 <input
                   {...register("probationEnd")}
-                  defaultValue={employeeData?.probationEndDate || "-"}
+                  defaultValue={employeeData?.probationEndDate}
                   className="w-full outline-none"
                 />
               </td>

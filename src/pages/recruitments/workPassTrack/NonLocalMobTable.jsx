@@ -1,27 +1,25 @@
-import React, { useState } from "react";
+import { useState, useContext } from "react";
 import { RiFileEditLine, RiCloseLine } from "react-icons/ri";
 import { ReviewForm } from "../ReviewForm";
 import { WorkpassForm } from "./WorkpassForm";
 import { generateClient } from "@aws-amplify/api";
 import { listEmpPersonalInfos } from "../../../graphql/queries";
 import { CandiToEmp } from "../status/ConvertCandiToEmp";
-import { SpinLogo } from "../../../utils/SpinLogo";
 import { UpdateMobilization } from "../../../services/updateMethod/UpdateMobilization";
 import { DateFormat } from "../../../utils/DateFormat";
 import { Pagination } from "../../leaveManagement/Pagination";
+import { DataSupply } from "../../../utils/DataStoredContext";
+import { sendEmail } from "../../../services/EmailServices";
 
-export const NonLocalMobTable = ({
-  data,
-  fileUpload,
-  urlValue,
-}) => {
+export const NonLocalMobTable = ({ data, fileUpload, urlValue }) => {
   const client = generateClient();
-  const { SumbitCandiToEmp } = CandiToEmp();
+  const { IVSSDetails } = useContext(DataSupply);
+  // const { SumbitCandiToEmp } = CandiToEmp();
   const { submitMobilization } = UpdateMobilization();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const [selectedCandi, setSelectedCandi] = useState([]);
-  const [latestTempIDData, setLatesTempIDData] = useState("");
+  const [latestEmployeeID, setLatestEmployeeID] = useState("");
   const [showTitle, setShowTitle] = useState("");
   const [notification, setNotification] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -46,8 +44,6 @@ export const NonLocalMobTable = ({
     "Status",
   ];
 
-  // console.log(data);
-
   const totalPages = Math.ceil(data.length / rowsPerPage);
   const startIndex = (page - 1) * rowsPerPage;
   const endIndex = page * rowsPerPage;
@@ -69,11 +65,14 @@ export const NonLocalMobTable = ({
     setIsReviewFormVisible(!isReviewFormVisible);
   };
 
-  const getTotalCount = async () => {
-    let allEmpIDs = [];
-    let nextToken = null;
+  // console.log("Data", data);
 
+  const getTotalCount = async () => {
     try {
+      let allEmpIDs = [];
+      let nextToken = null;
+      let iteration = 0;
+
       do {
         const result = await client.graphql({
           query: listEmpPersonalInfos,
@@ -82,10 +81,12 @@ export const NonLocalMobTable = ({
 
         const items = result?.data?.listEmpPersonalInfos?.items || [];
 
-        const filteringData = items.map((val) => val.empID);
-        allEmpIDs = [...allEmpIDs, ...filteringData];
+        const empIDs = items.map((val) => val.empID);
 
+        allEmpIDs = [...allEmpIDs, ...empIDs];
         nextToken = result?.data?.listEmpPersonalInfos?.nextToken;
+
+        iteration++;
       } while (nextToken);
 
       const sortedData = allEmpIDs.sort((a, b) => {
@@ -110,14 +111,15 @@ export const NonLocalMobTable = ({
     }
   };
 
-  const generateNextTempID = (lastTempID) => {
-    const prefixMatch = lastTempID?.match(/[^\d]+/);
+  const generateNextTempID = (lastEmpID) => {
+    const prefixMatch = lastEmpID.match(/[^\d]+/);
     const prefix = prefixMatch ? prefixMatch[0] : "";
-    const numberMatch = lastTempID?.match(/\d+/);
+
+    const numberMatch = lastEmpID.match(/\d+/);
     const numberPart = numberMatch ? parseInt(numberMatch[0], 10) : 0;
+
     const nextNumber = numberPart + 1;
     const nextTempID = `${prefix}${nextNumber}`;
-    // console.log("Next TempID", nextTempID);
 
     return nextTempID;
   };
@@ -125,9 +127,10 @@ export const NonLocalMobTable = ({
   const handleGenerateEmpId = async () => {
     setEmpIdLoading(true);
     try {
-      const lastTempID = await getTotalCount();
-      const nextTempID = generateNextTempID(lastTempID);
-      setLatesTempIDData(nextTempID);
+      const lastEmpID = await getTotalCount();
+      const nextTempID = generateNextTempID(lastEmpID);
+
+      setLatestEmployeeID(nextTempID);
     } catch (error) {
       console.error("Error generating employee ID:", error);
       alert("Error generating employee ID");
@@ -139,19 +142,15 @@ export const NonLocalMobTable = ({
   const handleConvertClick = (candi) => {
     setCurrentCandidate(candi);
     setShowEmpIdPopup(true);
-    setLatesTempIDData("");
+    setLatestEmployeeID("");
   };
 
   const OnSubmit = async () => {
-    if (!latestTempIDData) {
-      alert("Error: Missing employee ID.");
-      return;
-    }
-
     if (!currentCandidate) {
       alert("Error: No candidate selected.");
       return;
     }
+
     setLoadingItems((prev) => {
       const newState = { ...prev, [currentCandidate.id]: true };
       return newState;
@@ -160,27 +159,82 @@ export const NonLocalMobTable = ({
     try {
       const storedData = {
         ...currentCandidate,
-        empID: latestTempIDData,
+        empID: latestEmployeeID,
       };
- 
-      await SumbitCandiToEmp({ storedData });
-      await submitMobilization({ mob: storedData });
-      setShowTitle(
-        "Candidate conversion to employee has been completed successfully."
-      );
-      setNotification(true);
+
+      if (!storedData.empID) {
+        alert("Error: Missing employee ID.");
+        return;
+      }
+
+      if (storedData.empID && storedData.interviewDetails_id) {
+        await submitMobilization({ mob: storedData });
+        const { success, message } = await CandiToEmp({ storedData });
+
+        console.log("NonLocalMobTable : ", success, message);
+
+        if (success) {
+          setShowTitle(
+            "Candidate conversion to employee has been completed successfully."
+          );
+          setShowEmpIdPopup(false);
+        } else {
+          setShowEmpIdPopup(false);
+          setShowTitle("Candidate conversion to employee has been failed.");
+        }
+      } 
     } catch (err) {
       setLoadingItems((prev) => {
         const newState = { ...prev, [currentCandidate.id]: false };
         return newState;
       });
-      alert("Error", err);
+      setShowEmpIdPopup(false);
+      console.error("Error during conversion:", err);
+      setShowTitle("Candidate conversion to employee has been failed.");
+    } finally {
+      setLoadingItems((prev) => {
+        const newState = { ...prev, [currentCandidate.id]: false };
+        return newState;
+      });
+      setShowEmpIdPopup(false);
     }
   };
 
   return (
     <>
-      <div className="recruitmentTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl">
+      {showTitle && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+            {/* Header */}
+            {/* <div className="px-6 py-4 flex justify-end items-center bg-green-600 uppercase">
+              <h3 className="text-xl font-semibold text-white">Success</h3>
+              <button
+                onClick={() => {
+                  setShowTitle("");
+                  setNotification(true);
+                }}
+                className=" hover:text-grey transition-colors"
+              >
+                <RiCloseLine size={24} />
+              </button>
+            </div> */}
+
+            {/* Message */}
+            <div className="p-6 text-center">
+              <p className="text-darkText text-lg">{showTitle}</p>
+            </div>
+
+            {/* OK Button */}
+            <div className="px-6 py-3 bg-lightBg border-t border-borderGray flex justify-center">
+              <button className="bg-primary px-6 py-2 rounded-lg font-semibold uppercase hover:bg-yellow transition">
+                <a href={"/recrutiles/workpasstracking"}>Okay</a>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="recruitmentTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl relative">
         {showEmpIdPopup && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
@@ -224,9 +278,9 @@ export const NonLocalMobTable = ({
                   <p className="text-sm font-medium text-mutedText mb-1">
                     Employee ID
                   </p>
-                  {latestTempIDData ? (
+                  {latestEmployeeID ? (
                     <p className="text-xl font-bold font-mono text-mutedText">
-                      {latestTempIDData}
+                      {latestEmployeeID}
                     </p>
                   ) : (
                     <p className="text-placeholderText italic">
@@ -237,7 +291,7 @@ export const NonLocalMobTable = ({
 
                 {/* Action Buttons */}
                 <div className="flex gap-4">
-                  {!latestTempIDData && (
+                  {!latestEmployeeID && (
                     <button
                       onClick={handleGenerateEmpId}
                       disabled={empIdLoading}
@@ -254,14 +308,14 @@ export const NonLocalMobTable = ({
                     </button>
                   )}
 
-                  {latestTempIDData && (
+                  {latestEmployeeID && (
                     <button
                       onClick={OnSubmit}
                       disabled={
-                        !latestTempIDData || loadingItems[currentCandidate?.id]
+                        !latestEmployeeID || loadingItems[currentCandidate?.id]
                       }
                       className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all flex items-center justify-center uppercase ${
-                        !latestTempIDData || loadingItems[currentCandidate?.id]
+                        !latestEmployeeID || loadingItems[currentCandidate?.id]
                           ? "bg-disabledBg text-mutedText cursor-not-allowed"
                           : "bg-primary hover:hover:bg-yellow"
                       }`}
@@ -286,6 +340,7 @@ export const NonLocalMobTable = ({
             </div>
           </div>
         )}
+
         {paginatedData && paginatedData.length > 0 ? (
           <table className="w-full rounded-lg">
             <thead className="bg-[#939393] text-white sticky top-0">
@@ -308,9 +363,7 @@ export const NonLocalMobTable = ({
                     <td className="py-3">{item.tempID}</td>
                     <td className="py-3">{item.name || "N/A"}</td>
                     <td className="py-3">{item.nationality || "N/A"}</td>
-                    <td className="py-3">
-                      {item.position || "N/A"}
-                    </td>
+                    <td className="py-3">{item.position || "N/A"}</td>
                     <td className="py-3">
                       {DateFormat(item.WPTrackDetails_mobSignDate) || "N/A"}
                     </td>
@@ -383,13 +436,6 @@ export const NonLocalMobTable = ({
         )}
         {isFormVisible && (
           <WorkpassForm candidate={selectedCandi} onClose={handleShowForm} />
-        )}
-        {notification && (
-          <SpinLogo
-            text={showTitle}
-            notification={notification}
-            path="/recrutiles/workpasstracking"
-          />
         )}
       </div>
       {paginatedData.length > 0 && (

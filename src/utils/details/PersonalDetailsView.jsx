@@ -67,6 +67,9 @@ const PersonalDetailsView = ({
 
   // Function to parse the uploaded document
   const parseDocuments = (docData) => {
+    if (!docData || docData === "undefined" || docData === "null") {
+      return [];
+    }
     try {
       const parsedData = JSON.parse(docData);
       if (Array.isArray(parsedData)) {
@@ -83,6 +86,54 @@ const PersonalDetailsView = ({
       return [];
     }
   };
+
+  //   const parseDocuments = (docData) => {
+  //   // Handle undefined/null/empty cases first
+  //   if (!docData || docData === "undefined" || docData === "null") {
+  //     return [];
+  //   }
+
+  //   // If it's already an array (might happen if data is pre-parsed)
+  //   if (Array.isArray(docData)) {
+  //     return docData.map(doc => ({
+  //       ...doc,
+  //       fileName: doc.upload ? doc.upload.split("/").pop() : undefined
+  //     }));
+  //   }
+
+  //   // If it's a string that doesn't look like JSON
+  //   if (typeof docData === "string" &&
+  //       !docData.trim().startsWith("[") &&
+  //       !docData.trim().startsWith("{")) {
+  //     return [];
+  //   }
+
+  //   try {
+  //     // Attempt to parse JSON
+  //     const parsedData = typeof docData === 'string' ? JSON.parse(docData) : docData;
+
+  //     // Handle different possible structures
+  //     if (Array.isArray(parsedData)) {
+  //       return parsedData.map(doc => ({
+  //         ...doc,
+  //         fileName: doc.upload ? doc.upload.split("/").pop() : undefined
+  //       }));
+  //     }
+
+  //     // If it's a single document object
+  //     if (typeof parsedData === 'object' && parsedData !== null) {
+  //       return [{
+  //         ...parsedData,
+  //         fileName: parsedData.upload ? parsedData.upload.split("/").pop() : undefined
+  //       }];
+  //     }
+
+  //     return [];
+  //   } catch (error) {
+  //     console.error("Error parsing document data:", error);
+  //     return [];
+  //   }
+  // };
 
   const closeModal = () => {
     setViewingDocument(null);
@@ -109,7 +160,7 @@ const PersonalDetailsView = ({
     }
 
     if (!eduString || eduString === "null" || eduString === "N/A") {
-      return null; 
+      return null;
     }
 
     // Check if it's a simple string (not JSON)
@@ -128,9 +179,9 @@ const PersonalDetailsView = ({
       } catch (firstError) {
         // If direct parse fails, try cleaning the string
         const cleanString = eduString
-          .replace(/^\[+/, "[") 
-          .replace(/\]+$/, "]") 
-          .replace(/\\"/g, '"') 
+          .replace(/^\[+/, "[")
+          .replace(/\]+$/, "]")
+          .replace(/\\"/g, '"')
           .trim();
 
         parsed = JSON.parse(cleanString);

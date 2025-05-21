@@ -599,12 +599,7 @@ export const EmployeeInfo = () => {
         }
       } catch (e) {
         console.warn("Failed to parse workExperience:", e);
-        setValue("preEmp", "");
-        setValue("preEmpPeriod", "");
       }
-    } else {
-      setValue("preEmp", "");
-      setValue("preEmpPeriod", "");
     }
 
     const fieldsArray = ["bwnIcExpiry", "ppExpiry", "ppIssued"];
@@ -825,6 +820,11 @@ export const EmployeeInfo = () => {
       const checkingIDTable = IDData.find(
         (match) => match.empID === data.empID
       );
+      // console.log("PITABLE", checkingPITable);
+      // console.log("IDTABLE", checkingIDTable);
+      // const filtered = IDData.filter((item) => item.empID.trim() === "8715");
+
+      // console.log("Filtered empID === 8715", filtered);
 
       if (checkingIDTable && checkingPITable) {
         const updatedbwnIcExpiry = removeLeadingNulls(
@@ -871,7 +871,7 @@ export const EmployeeInfo = () => {
           email: data.email.trim().toLowerCase(),
           officialEmail: data.officialEmail.trim().toLowerCase(),
         };
-        // console.log("updated", collectValue);
+        console.log("updated", collectValue);
 
         await UpdateEIValue({ collectValue });
         setShowTitle("Employee Personal Info updated successfully");
@@ -905,7 +905,7 @@ export const EmployeeInfo = () => {
           email: data.email.trim().toLowerCase(),
           officialEmail: data.officialEmail.trim().toLowerCase(),
         };
-        // console.log("created", empValue);
+        console.log("created", empValue);
 
         await SubmitEIData({ empValue });
         setShowTitle("Employee Personal Info saved successfully");

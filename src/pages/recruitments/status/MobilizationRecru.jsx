@@ -16,21 +16,19 @@ export const MobilizationRecru = ({
   fileUpload,
   urlValue,
 }) => {
-  const { SumbitCandiToEmp } = CandiToEmp();
   const { submitMobilization } = UpdateMobilization();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
   const [selectedCandi, setSelectedCandi] = useState([]);
-  const [latestTempIDData, setLatesTempIDData] = useState("");
+  const [latestEmployeeID, setLatestEmployeeID] = useState("");
   const [showTitle, setShowTitle] = useState("");
-  const [notification, setNotification] = useState(false);
+  // const [notification, setNotification] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(1);
   const [loadingItems, setLoadingItems] = useState({});
   const [showEmpIdPopup, setShowEmpIdPopup] = useState(false);
   const [empIdLoading, setEmpIdLoading] = useState(false);
   const [currentCandidate, setCurrentCandidate] = useState(null);
-  
 
   const heading = [
     "S.No",
@@ -120,11 +118,11 @@ export const MobilizationRecru = ({
   const handleGenerateEmpId = async () => {
     setEmpIdLoading(true);
     try {
-      const lastTempID = await getTotalCount();
+      const lastEmpID = await getTotalCount();
 
-      const nextTempID = generateNextTempID(lastTempID);
+      const nextTempID = generateNextTempID(lastEmpID);
 
-      setLatesTempIDData(nextTempID);
+      setLatestEmployeeID(nextTempID);
     } catch (error) {
       console.error("Error generating employee ID:", error);
       alert("Error generating employee ID");
@@ -136,59 +134,84 @@ export const MobilizationRecru = ({
   const handleConvertClick = (candi) => {
     setCurrentCandidate(candi);
     setShowEmpIdPopup(true);
-    setLatesTempIDData("");
+    setLatestEmployeeID("");
   };
 
   const OnSubmit = async () => {
-    if (!latestTempIDData) {
-      alert("Error: Missing employee ID.");
-      return;
-    }
-
     if (!currentCandidate) {
       alert("Error: No candidate selected.");
       return;
     }
 
-    console.log(`Submitting candidate: ${currentCandidate.id}`);
-
-    // Set the loading state for this currentCandidatedate
     setLoadingItems((prev) => {
       const newState = { ...prev, [currentCandidate.id]: true };
-      console.log("Loading state after update (setLoadingItems):", newState);
       return newState;
     });
 
     try {
       const storedData = {
         ...currentCandidate,
-        empID: latestTempIDData,
+        empID: latestEmployeeID,
       };
-      console.log("Stored Data", storedData);
 
-      // Simulating async calls here, which you can uncomment when needed
-      await SumbitCandiToEmp({ storedData });
-      // await submitMobilization({ mob: storedData });
+      if (!storedData.empID) {
+        alert("Error: Missing employee ID.");
+        return;
+      }
 
-      setShowTitle(
-        "Candidate conversion to employee has been completed successfully."
-      );
-      setNotification(true);
-      
-      setShowEmpIdPopup(false);
+      if (storedData.empID && storedData.interviewDetails_id) {
+        await submitMobilization({ mob: storedData });
+        const { success, message } = await CandiToEmp({ storedData });
+
+        console.log("Mobilizatioon : ", success, message);
+
+        if (success) {
+          setShowTitle(
+            "Candidate conversion to employee has been completed successfully."
+          );
+          setShowEmpIdPopup(false);
+        } else {
+          setShowEmpIdPopup(false);
+          setShowTitle("Candidate conversion to employee has been failed.");
+        }
+      }
     } catch (err) {
-      console.error("Error during submission:", err);
       setLoadingItems((prev) => {
         const newState = { ...prev, [currentCandidate.id]: false };
-        console.log("Loading state after update (setLoadingItems):", newState);
         return newState;
       });
-      alert("Error", err);
+      setShowEmpIdPopup(false);
+      console.error("Error during conversion:", err);
+      setShowTitle("Candidate conversion to employee has been failed.");
+    } finally {
+      setLoadingItems((prev) => {
+        const newState = { ...prev, [currentCandidate.id]: false };
+        return newState;
+      });
+      setShowEmpIdPopup(false);
     }
   };
 
   return (
     <>
+      {showTitle && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+            {/* Message */}
+            <div className="p-6 text-center">
+              <p className="text-darkText text-lg">{showTitle}</p>
+            </div>
+
+            {/* OK Button */}
+            <div className="px-6 py-3 bg-lightBg border-t border-borderGray flex justify-center">
+              <button className="bg-primary px-6 py-2 rounded-lg font-semibold uppercase hover:bg-yellow transition">
+                <a href={"/recrutiles/status"}>Okay</a>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="recruitmentTable h-[70vh] max-h-[calc(70vh-7rem)] w-full overflow-y-auto rounded-xl">
         {showEmpIdPopup && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
@@ -233,9 +256,9 @@ export const MobilizationRecru = ({
                   <p className="text-sm font-medium text-mutedText mb-1">
                     Employee ID
                   </p>
-                  {latestTempIDData ? (
+                  {latestEmployeeID ? (
                     <p className="text-xl font-bold font-mono text-mutedText">
-                      {latestTempIDData}
+                      {latestEmployeeID}
                     </p>
                   ) : (
                     <p className="text-placeholderText italic">
@@ -246,7 +269,7 @@ export const MobilizationRecru = ({
 
                 {/* Action Buttons */}
                 <div className="flex gap-4">
-                  {!latestTempIDData && (
+                  {!latestEmployeeID && (
                     <button
                       onClick={handleGenerateEmpId}
                       disabled={empIdLoading}
@@ -263,14 +286,14 @@ export const MobilizationRecru = ({
                     </button>
                   )}
 
-                  {latestTempIDData && (
+                  {latestEmployeeID && (
                     <button
                       onClick={OnSubmit}
                       disabled={
-                        !latestTempIDData || loadingItems[currentCandidate?.id]
+                        !latestEmployeeID || loadingItems[currentCandidate?.id]
                       }
                       className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all flex items-center justify-center uppercase ${
-                        !latestTempIDData || loadingItems[currentCandidate?.id]
+                        !latestEmployeeID || loadingItems[currentCandidate?.id]
                           ? "bg-disabledBg text-mutedText cursor-not-allowed"
                           : "bg-primary hover:hover:bg-yellow"
                       }`}
@@ -333,7 +356,7 @@ export const MobilizationRecru = ({
                               if (!item.mobilizationDetails_mobFile) {
                                 e.preventDefault();
                               } else {
-                                fileUpload(item.mobilizationDetails_mobFile); 
+                                fileUpload(item.mobilizationDetails_mobFile);
                               }
                             }}
                             download
@@ -351,7 +374,7 @@ export const MobilizationRecru = ({
                           <p>N/A</p>
                         )}
                       </td>
-                 
+
                       <td
                         className="py-3 text-center"
                         onClick={() => handleShowReviewForm(item)}
@@ -398,13 +421,6 @@ export const MobilizationRecru = ({
             candidate={selectedCandi}
             //   onSave={handleFormSave}
             onClose={handleShowForm}
-          />
-        )}
-        {notification && (
-          <SpinLogo
-            text={showTitle}
-            notification={notification}
-            path="/recrutiles/status"
           />
         )}
       </div>

@@ -325,8 +325,7 @@ export const OtherDetails = ({ fetchedData }) => {
   var latestTempIDData;
 
   const onSubmit = async (data) => {
-    console.log("Navy", navigatingEducationData);
-    
+    console.log("data", data);
     try {
       setIsLoading(true);
 
@@ -337,7 +336,7 @@ export const OtherDetails = ({ fetchedData }) => {
         latestTempIDData = nextTempID;
       }
 
-      const personName = !data.tempID ? latestTempIDData : data.tempID;
+      const personName = !data?.tempID ? latestTempIDData : data?.tempID;
       // console.log(personName);
 
       // const latestTempIDData = personName;
@@ -361,15 +360,10 @@ export const OtherDetails = ({ fetchedData }) => {
         navigatingEducationData?.relatives
       );
 
-      // Initialize upload variables
-      // let uploadedResume = null;
-      // let uploadedCertificate = null;
-      // let uploadedPp = null;
-
       //  Conditional file upload check using isUp state
       const uploadedResume = isUploadingString.uploadResume
         ? await uploadReqString(data.uploadResume, "uploadResume", personName)
-        : uploadedDocs?.uploadResume; // Use existing value if no new upload
+        : uploadedDocs?.uploadResume;
 
       const uploadedCertificate = isUploadingString.uploadCertificate
         ? await uploadReqString(
@@ -387,24 +381,31 @@ export const OtherDetails = ({ fetchedData }) => {
         ? await uploadReqString(data.uploadIc, "uploadIc", personName)
         : uploadedDocs?.uploadIc;
 
-      const UpProfilePhoto =
+      let UpProfilePhoto;
+
+      if (
         navigatingEducationData.profilePhotoDoc &&
         !navigatingEducationData.profilePhotoDoc.includes("Employee")
-          ? navigatingEducationData.profilePhotoDoc
-          : await uploadReqString(
-              navigatingEducationData.profilePhoto,
-              "profilePhoto",
-              personName
-            );
+      ) {
+        UpProfilePhoto = navigatingEducationData.profilePhotoDoc;
+      } else {
+        UpProfilePhoto = await uploadReqString(
+          navigatingEducationData.profilePhoto,
+          "profilePhoto",
+          personName
+        );
+      }
+
       //"Helpp"
       const baseURL =
-        "https://aweadininprod2024954b8-prod.s3.ap-southeast-1.amazonaws.com/";
+        "https://aweadininprod20240d7e6-dev.s3.ap-southeast-1.amazonaws.com/";
+      // const baseURL =
+      //   "https://aweadininprod2024954b8-prod.s3.ap-southeast-1.amazonaws.com/";
 
       const safeReplace = (url) => {
         if (url && !url.includes("undefined")) {
           return url.replace(baseURL, "");
         }
-
         return null;
       };
 
@@ -449,12 +450,13 @@ export const OtherDetails = ({ fetchedData }) => {
           ? JSON.stringify(wrapUpload(uploadedIc))
           : uploadedDocs?.uploadIc,
       };
+      // console.log(reqValue);
 
       const checkingPDTable = empPDData.find(
-        (match) => match.tempID === data.tempID
+        (match) => match.tempID === personName
       );
       const checkingEDTable = educDetailsData.find(
-        (match) => match.tempID === data.tempID
+        (match) => match.tempID === personName
       );
 
       if (checkingPDTable && checkingEDTable) {
@@ -464,19 +466,27 @@ export const OtherDetails = ({ fetchedData }) => {
           EDTableID: checkingEDTable.id,
         };
 
-        await candyDetails({ reqValue: updateReqValue });
-        // console.log("Update", updateReqValue);
+        console.log("Update call", { updateReqValue, latestTempIDData });
 
-        setNotification(true);
-        setIsLoading(false);
+        await candyDetails({ reqValue: updateReqValue })
+          .then(() => {
+            setNotification(true);
+            setIsLoading(false);
+          })
+          .catch((err) => {
+            console.log("Application Details Update Call Error", err);
+          });
       } else {
-        console.log({ reqValue, latestTempIDData });
-        await submitODFunc({ reqValue, latestTempIDData });
-        // console.log("Create", reqValue);
-        // console.log("TempID", latestTempIDData);
+        console.log("Create call", { reqValue, latestTempIDData });
 
-        setNotification(true);
-        setIsLoading(false);
+        await submitODFunc({ reqValue, latestTempIDData })
+          .then(() => {
+            setNotification(true);
+            setIsLoading(false);
+          })
+          .catch((err) => {
+            console.log("Application Details Create Call Error", err);
+          });
       }
     } catch (error) {
       console.error("Error submitting data:", error);
