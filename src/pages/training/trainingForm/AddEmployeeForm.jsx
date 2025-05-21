@@ -546,7 +546,7 @@ export const AddEmployeeForm = () => {
         );
       }
     } else {
-      console.log("reset");
+      // console.log("reset");
       reset({
         empID: getValues("empID"),
         empBadgeNo: getValues("empBadgeNo"),
