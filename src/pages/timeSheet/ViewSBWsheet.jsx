@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { SearchBoxForTimeSheet } from "../../utils/SearchBoxForTimeSheet";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
 
@@ -30,6 +30,7 @@ import { useCreateNotification } from "../../hooks/useCreateNotification";
 import { TimeSheetSpinner } from "./customTimeSheet/TimeSheetSpinner";
 
 import { UnlockVerifiedCellVS } from "./customTimeSheet/UnlockVerifiedCellVS";
+import PopupForDuplicateFileAlert from "./ModelForSuccessMess/PopupForDuplicateFileAlert";
 
 export const ViewSBWsheet = ({
   excelData,
@@ -44,6 +45,9 @@ export const ViewSBWsheet = ({
   wholeData,
   ManagerData,
 }) => {
+  const cancelActionRef = useRef(false);
+  const showDuplicateAlertRef = useRef(false);
+
   const nav = useNavigate();
   const uploaderID = localStorage.getItem("userID")?.toUpperCase();
 
@@ -67,6 +71,9 @@ export const ViewSBWsheet = ({
 
   const [notification, setNotification] = useState(false);
   const [showTitle, setShowTitle] = useState("");
+  const [showDuplicateAlert, setShowDuplicateAlert] = useState(false);
+  const [cancelAction, setCancelAction] = useState(false);
+  const [storePreSubmitData, setStorePreSubmitData] = useState(null);
   const [rejectTab, setRejectTab] = useState(false);
 
   const [toggleForRemark, setToggleForRemark] = useState(null);
@@ -74,6 +81,9 @@ export const ViewSBWsheet = ({
   const [allRejectedData, setAllRejectedData] = useState([]);
   const [passSelectedData, setPassSelectedData] = useState(null);
   const [storingMess, setStoringMess] = useState(null);
+
+  const [changePopupMessage, setChangePopupMessage] = useState(null);
+  const [popupMess, setPopupMess] = useState({});
 
   const [currentPage, setCurrentPage] = useState(1);
   const client = generateClient();
@@ -436,10 +446,12 @@ export const ViewSBWsheet = ({
         };
       });
 
+      let identifier = "updateStoredData";
       const { filteredResults, deleteDuplicateData } =
         await UnlockVerifiedCellVS({
           finalResult,
           setLoadingMessForDelay,
+          identifier,
         });
 
       if (
@@ -450,6 +462,7 @@ export const ViewSBWsheet = ({
         setLoadingMessForDelay(false);
         // Start
         let action = "updateStoredData";
+        let finalResult = filteredResults;
         const notifiyCenterData = await TimeSheetsCRUDoperations({
           setNotification,
           setShowTitle,
@@ -664,6 +677,22 @@ export const ViewSBWsheet = ({
     }
   };
 
+  useEffect(() => {
+    if (changePopupMessage && changePopupMessage.length > 0) {
+      setPopupMess({
+        message:
+          "Some data in the uploaded Excel sheet has already been submitted by the Time Keeper. You may proceed to submit only the remaining unmatched data.",
+        buttonName: "Save",
+      });
+    } else if (changePopupMessage && changePopupMessage.length === 0) {
+      setPopupMess({
+        message:
+          "All data in the uploaded Excel sheet has already been submitted by the Time Keeper.",
+        buttonName: "OK",
+      });
+    }
+  }, [changePopupMessage]);
+
   const storeInitialData = async () => {
     const result =
       data &&
@@ -693,13 +722,26 @@ export const ViewSBWsheet = ({
         };
       });
 
+    let identifier = "create";
     let finalResult = result;
     const { filteredResults, deleteDuplicateData } = await UnlockVerifiedCellVS(
       {
         finalResult,
         setLoadingMessForDelay,
+        identifier,
+        setShowDuplicateAlert: (val) => {
+          showDuplicateAlertRef.current = val;
+          setShowDuplicateAlert(val); // for UI
+        },
+        setCancelAction: (val) => {
+          cancelActionRef.current = val;
+          setCancelAction(val); // for UI
+        },
       }
     );
+    setChangePopupMessage(filteredResults);
+
+    if (filteredResults.length === finalResult.length) setCancelAction(false);
 
     if (
       (filteredResults && filteredResults.length > 0) ||
@@ -707,10 +749,8 @@ export const ViewSBWsheet = ({
       deleteDuplicateData === "DuplicateDataDeletedSuccessfully"
     ) {
       let finalResult = filteredResults;
-      // Start
       let action = "create";
-
-      await TimeSheetsCRUDoperations({
+      setStorePreSubmitData({
         finalResult,
         toggleSFAMessage,
         setStoringMess,
@@ -718,17 +758,72 @@ export const ViewSBWsheet = ({
         Position,
         action,
       });
+      // if (
+      //   (Array.isArray(finalResult) && finalResult.length === 0) ||
+      //   showDuplicateAlertRef.current ||
+      //   cancelActionRef.current
+      // )
+      //   return;
+
+      // console.log("I passed the condition successfully");
+      // // Start
+
+      // await saveNonMatchesData({
+      //   finalResult,
+      //   toggleSFAMessage,
+      //   setStoringMess,
+      //   setData,
+      //   Position,
+      //   action,
+      // });
+
       // End
-      setLoadingMessForDelay(false);
+      // setLoadingMessForDelay(false);
     } else {
       setLoadingMessForDelay(false);
-     
     }
   };
 
+  const saveNonMatchesData = async ({ storePreSubmitData }) => {
+    const {
+      finalResult,
+      toggleSFAMessage,
+      setStoringMess,
+      setData,
+      Position,
+      action,
+    } = storePreSubmitData;
+
+    if (Array.isArray(finalResult) && finalResult.length === 0) return;
+
+   
+
+    await TimeSheetsCRUDoperations({
+      finalResult,
+      toggleSFAMessage,
+      setStoringMess,
+      setData,
+      Position,
+      action,
+    });
+    setLoadingMessForDelay(false);
+    setStorePreSubmitData(null);
+  };
   const toggleForRemarkFunc = () => {
     setToggleForRemark(!toggleForRemark);
   };
+
+  useEffect(() => {
+    if (showDuplicateAlert || cancelAction) return;
+    if (
+      Array.isArray(storePreSubmitData?.finalResult) &&
+      storePreSubmitData?.finalResult.length > 0
+    ) {
+      saveNonMatchesData({
+        storePreSubmitData,
+      });
+    }
+  }, [showDuplicateAlert, cancelAction, storePreSubmitData]);
 
   const storeOnlySelectedItem = (data, action) => {
     if (action === "Approved") {
@@ -1294,6 +1389,32 @@ export const ViewSBWsheet = ({
           // notification={notification}
           // path="/timesheetSBW"
         />
+      )}
+
+      {showDuplicateAlert && popupMess ? (
+        <PopupForDuplicateFileAlert
+          onClose={() => {
+            showDuplicateAlertRef.current = false;
+            setShowDuplicateAlert(false);
+          }}
+          setCancelAction={(val) => {
+            cancelActionRef.current = val;
+            setCancelAction(val);
+            setCurrentStatus(null);
+          }}
+          fileNameForSuccessful={fileName}
+          title={"Duplicate Detection"}
+          message={popupMess.message}
+          buttonName={popupMess.buttonName}
+          popupIdentification="duplicateRecords"
+          onClearData={() => {
+            setCurrentStatus(null);
+            setData(null);
+            setExcelData(null);
+          }}
+        />
+      ) : (
+        ""
       )}
     </div>
   );

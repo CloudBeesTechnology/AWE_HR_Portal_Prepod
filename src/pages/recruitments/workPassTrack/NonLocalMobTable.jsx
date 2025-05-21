@@ -8,13 +8,10 @@ import { CandiToEmp } from "../status/ConvertCandiToEmp";
 import { UpdateMobilization } from "../../../services/updateMethod/UpdateMobilization";
 import { DateFormat } from "../../../utils/DateFormat";
 import { Pagination } from "../../leaveManagement/Pagination";
-import { DataSupply } from "../../../utils/DataStoredContext";
-import { sendEmail } from "../../../services/EmailServices";
+
 
 export const NonLocalMobTable = ({ data, fileUpload, urlValue }) => {
   const client = generateClient();
-  const { IVSSDetails } = useContext(DataSupply);
-  // const { SumbitCandiToEmp } = CandiToEmp();
   const { submitMobilization } = UpdateMobilization();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);

@@ -496,7 +496,7 @@ export const ApplyVSFunction = ({
             const convertNumToHours = (NWHPD) => {
               const hoursFloat = NWHPD / 2; // 3.75
               const hours = Math.floor(hoursFloat); // 3 hours
-              const minutes = Math.round((hoursFloat - hours) * 100); // 0.75 * 60 = 45 minutes 
+              const minutes = Math.round((hoursFloat - hours) * 100); // 0.75 * 60 = 45 minutes
 
               return `${String(hours).padStart(2, "0")}.${String(
                 minutes
@@ -723,7 +723,7 @@ export const ApplyVSFunction = ({
         const updatedData = await updateFieldBasedOnConditions(
           addLeaveTypeCount
         );
-        console.log("addLeaveTypeCount : ", addLeaveTypeCount);
+       
         const isDateInRange = (date, start, end) => {
           const parsedDate = new Date(date);
           const parsedStart = new Date(start);
@@ -930,7 +930,7 @@ export const ApplyVSFunction = ({
             assignUpdaterDateTime: assignUpdaterDateTime,
           };
         }).filter(Boolean);
-
+       
         await ProcessedDataFunc(transformedData);
       };
       if (convertedStringToArrayObj && convertedStringToArrayObj.length > 0) {

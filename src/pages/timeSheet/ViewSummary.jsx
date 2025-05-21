@@ -21,7 +21,7 @@ export const ViewSummary = () => {
   const [toggleForEVSummary, setToggleForEVSummary] = useState(null);
   const [loadingMess, setLoadingMess] = useState(true);
   const [summaryObject, setSummaryObject] = useState(null);
-  
+
   const {
     startDate,
     endDate,
@@ -30,6 +30,7 @@ export const ViewSummary = () => {
     setGetStartDate,
     getEndDate,
     setGetEndDate,
+    offshoreType,
   } = useTempID();
 
   const publicHoliday = GetHolidayList();
@@ -153,7 +154,8 @@ export const ViewSummary = () => {
     startDate,
     endDate,
     selectedLocation,
-    ProcessedDataFunc
+    ProcessedDataFunc,
+    offshoreType
   );
 
   useEffect(() => {
@@ -261,7 +263,6 @@ export const ViewSummary = () => {
     const { resData, object, newresData, resDataForJobcode } =
       await UpdateViewSummary(getObject, updateGroupedData);
 
-  
     const {
       badgeNo,
       data: objectData,

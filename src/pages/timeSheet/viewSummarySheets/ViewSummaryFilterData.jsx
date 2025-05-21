@@ -5,6 +5,7 @@ import { useTempID } from "../../../utils/TempIDContext";
 import { SearchDisplayForTimeSheet } from "../timeSheetSearch/SearchDisplayForTS";
 import { SearchBoxForTimeSheet } from "../../../utils/SearchBoxForTimeSheet";
 import { FiSearch } from "react-icons/fi";
+import SelectOffshoreType from "../timeSheetSearch/SelectOffshoreType";
 
 export const ViewSummaryFilterData = ({
   LocationData,
@@ -14,8 +15,14 @@ export const ViewSummaryFilterData = ({
   //   setEmptyTableMess
   resetTableFunc,
 }) => {
-  const { setStartDate, startDate, setEndDate, endDate, setSelectedLocation } =
-    useTempID();
+  const {
+    setStartDate,
+    startDate,
+    setEndDate,
+    endDate,
+    setSelectedLocation,
+    setOffshoreType,
+  } = useTempID();
   const selectLocationFunc = async (data) => {
     resetTableFunc();
     if (data.location) {
@@ -46,6 +53,14 @@ export const ViewSummaryFilterData = ({
       }
     }
   };
+
+  const handleTypeSelect = (value) => {
+    if (value) {
+      setOffshoreType(value);
+      
+    }
+  };
+
   return (
     <div className="flex  justify-between items-center w-full mb-5">
       <div className="flex justify-start gap-4 ">
@@ -80,6 +95,11 @@ export const ViewSummaryFilterData = ({
             setSelectedLocation={setSelectedLocation}
           />
         </div>
+
+        <SelectOffshoreType
+          options={["Direct", "Indirect"]}
+          handleTypeSelect={handleTypeSelect}
+        />
 
         <SearchBoxForTimeSheet
           allEmpDetails={data}

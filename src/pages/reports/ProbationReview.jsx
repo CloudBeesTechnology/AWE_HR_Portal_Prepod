@@ -215,7 +215,7 @@ export const ProbationReview = () => {
           otherPosition: Array.isArray(item.otherPosition)
           ? item.otherPosition[item.otherPosition.length - 1]
           : "-",
-          probationEnd: formatDate(lastDate) || "-",
+          probationEndDate: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
         };
       })

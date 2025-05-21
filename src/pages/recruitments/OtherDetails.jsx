@@ -3,7 +3,6 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CandidatesSchema } from "../../services/Validation";
 import { generateClient } from "aws-amplify/api";
-import { GoUpload } from "react-icons/go";
 import { useLocation } from "react-router-dom";
 import { listPersonalDetails } from "../../graphql/queries";
 import { RecODFunc } from "../../services/createMethod/RecODFunc";
@@ -325,7 +324,7 @@ export const OtherDetails = ({ fetchedData }) => {
   var latestTempIDData;
 
   const onSubmit = async (data) => {
-    console.log("data", data);
+    // console.log("data", data);
     try {
       setIsLoading(true);
 
@@ -466,7 +465,7 @@ export const OtherDetails = ({ fetchedData }) => {
           EDTableID: checkingEDTable.id,
         };
 
-        console.log("Update call", { updateReqValue, latestTempIDData });
+        // console.log("Update call", { updateReqValue, latestTempIDData });
 
         await candyDetails({ reqValue: updateReqValue })
           .then(() => {
@@ -477,7 +476,7 @@ export const OtherDetails = ({ fetchedData }) => {
             console.log("Application Details Update Call Error", err);
           });
       } else {
-        console.log("Create call", { reqValue, latestTempIDData });
+        // console.log("Create call", { reqValue, latestTempIDData });
 
         await submitODFunc({ reqValue, latestTempIDData })
           .then(() => {

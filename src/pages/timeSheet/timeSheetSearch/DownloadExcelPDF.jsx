@@ -13,7 +13,6 @@ export const DownloadExcelPDF = (
   formattedEndDate,
   
 ) => {
-
   const input = document.getElementById(elementID);
 
   if (!input) {

@@ -18,6 +18,7 @@ export const ContractFormPDF = ({ contentRef }) => {
   const { contractForms, workInfoData, empPIData } = useContext(DataSupply);
   const location = useLocation();
   const { employeeData } = location.state || {};
+   const contractEndDateStr = employeeData?.contractEndDate;
   const { createNotification } = useCreateNotification();
   const [userType, setUserType] = useState("");
   const [showTitle, setShowTitle] = useState("");
@@ -58,11 +59,7 @@ export const ContractFormPDF = ({ contentRef }) => {
       },
     }));
   };
-
-  const currentDate = new Date();
-  const monthName = currentDate.toLocaleString("en-US", { month: "long" });
-  const year = currentDate.getFullYear();
-
+  
   useEffect(() => {
     const userType = localStorage.getItem("userType");
     setUserType(userType);
@@ -416,6 +413,21 @@ export const ContractFormPDF = ({ contentRef }) => {
     }
   };
 
+   // Parse "DD-MM-YYYY" into a proper Date object
+let ContractMonthYear = "Invalid Date";
+
+if (contractEndDateStr) {
+  const [day, month, year] = contractEndDateStr.split("-");
+  const parsedDate = new Date(`${year}-${month}-${day}`); // Format to YYYY-MM-DD
+
+  if (!isNaN(parsedDate)) {
+    ContractMonthYear = parsedDate.toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric",
+    });
+  }
+} 
+
   const handleDownloadClick = () => {
     // Hide buttons before download 7590
     const editButton = document.getElementById("edit-button");
@@ -451,16 +463,10 @@ export const ContractFormPDF = ({ contentRef }) => {
             Contract Completion Form for the Month of January 2024
           </div> */}
 
-          <div className="text-center text-lg font-bold uppercase w-full">
-            {formData.contract?.createdAt
-              ? `Contract Completion Form for the Month of ${new Date(
-                  formData.contract.createdAt
-                ).toLocaleDateString("en-US", {
-                  month: "long",
-                  year: "numeric",
-                })}`
-              : `Contract Completion Form for the Month of ${monthName} ${year}`}
-          </div>
+
+          <div className="text-center text-lg font-bold uppercase w-full my-10">
+  {`Contract Completion Form for the Month of ${ContractMonthYear}`}
+</div>
         </div>
 
         <div className="mb-16 mt-16">

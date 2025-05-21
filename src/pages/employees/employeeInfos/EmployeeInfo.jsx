@@ -849,6 +849,7 @@ export const EmployeeInfo = () => {
         );
         const collectValue = {
           ...data,
+          empID: data?.empID?.trim(),
           profilePhoto: uploadedDocs.profilePhoto,
           inducBriefUp: uploadedDocs.inducBriefUp,
           bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
@@ -885,6 +886,7 @@ export const EmployeeInfo = () => {
 
         const empValue = {
           ...data,
+          empID: data?.empID?.trim(),
           profilePhoto: uploadedDocs.profilePhoto,
           inducBriefUp: uploadedDocs.inducBriefUp,
           bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
