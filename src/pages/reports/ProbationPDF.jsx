@@ -93,7 +93,7 @@ export const ProbationPDF = ({ userID, userType }) => {
   
         if (lastManager === userID) {
           managerCount++;
-          // console.log("Manager count increased:", managerCount);
+          console.log("Manager count increased:", managerCount);
         }
   
         const isSupervisorApproved = item.supervisorApproved === "Approved";

@@ -3,7 +3,6 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CandidatesSchema } from "../../services/Validation";
 import { generateClient } from "aws-amplify/api";
-import { GoUpload } from "react-icons/go";
 import { useLocation } from "react-router-dom";
 import { listPersonalDetails } from "../../graphql/queries";
 import { RecODFunc } from "../../services/createMethod/RecODFunc";
@@ -23,10 +22,10 @@ const client = generateClient();
 export const OtherDetails = ({ fetchedData }) => {
   const { formattedPermissions } = useDeleteAccess();
   const { submitODFunc } = RecODFunc();
-  const [notification, setNotification] = useState(false);
   const [deletePopup, setDeletePopup] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [deleteTitle1, setDeleteTitle1] = useState("");
+  const [showTitle, setShowTitle] = useState("");
   const [mergedData, setMergedData] = useState([]);
   const { candyDetails } = CandyDetails();
   const location = useLocation();
@@ -325,8 +324,7 @@ export const OtherDetails = ({ fetchedData }) => {
   var latestTempIDData;
 
   const onSubmit = async (data) => {
-    console.log("Navy", navigatingEducationData);
-    
+    // console.log("data", data);
     try {
       setIsLoading(true);
 
@@ -337,7 +335,7 @@ export const OtherDetails = ({ fetchedData }) => {
         latestTempIDData = nextTempID;
       }
 
-      const personName = !data.tempID ? latestTempIDData : data.tempID;
+      const personName = !data?.tempID ? latestTempIDData : data?.tempID;
       // console.log(personName);
 
       // const latestTempIDData = personName;
@@ -361,15 +359,10 @@ export const OtherDetails = ({ fetchedData }) => {
         navigatingEducationData?.relatives
       );
 
-      // Initialize upload variables
-      // let uploadedResume = null;
-      // let uploadedCertificate = null;
-      // let uploadedPp = null;
-
       //  Conditional file upload check using isUp state
       const uploadedResume = isUploadingString.uploadResume
         ? await uploadReqString(data.uploadResume, "uploadResume", personName)
-        : uploadedDocs?.uploadResume; // Use existing value if no new upload
+        : uploadedDocs?.uploadResume;
 
       const uploadedCertificate = isUploadingString.uploadCertificate
         ? await uploadReqString(
@@ -387,24 +380,31 @@ export const OtherDetails = ({ fetchedData }) => {
         ? await uploadReqString(data.uploadIc, "uploadIc", personName)
         : uploadedDocs?.uploadIc;
 
-      const UpProfilePhoto =
+      let UpProfilePhoto;
+
+      if (
         navigatingEducationData.profilePhotoDoc &&
         !navigatingEducationData.profilePhotoDoc.includes("Employee")
-          ? navigatingEducationData.profilePhotoDoc
-          : await uploadReqString(
-              navigatingEducationData.profilePhoto,
-              "profilePhoto",
-              personName
-            );
+      ) {
+        UpProfilePhoto = navigatingEducationData.profilePhotoDoc;
+      } else {
+        UpProfilePhoto = await uploadReqString(
+          navigatingEducationData.profilePhoto,
+          "profilePhoto",
+          personName
+        );
+      }
+
       //"Helpp"
       const baseURL =
-        "https://aweadininprod2024954b8-prod.s3.ap-southeast-1.amazonaws.com/";
+        "https://aweadininprod20240d7e6-dev.s3.ap-southeast-1.amazonaws.com/";
+      // const baseURL =
+      //   "https://aweadininprod2024954b8-prod.s3.ap-southeast-1.amazonaws.com/";
 
       const safeReplace = (url) => {
         if (url && !url.includes("undefined")) {
           return url.replace(baseURL, "");
         }
-
         return null;
       };
 
@@ -449,12 +449,13 @@ export const OtherDetails = ({ fetchedData }) => {
           ? JSON.stringify(wrapUpload(uploadedIc))
           : uploadedDocs?.uploadIc,
       };
+      // console.log(reqValue);
 
       const checkingPDTable = empPDData.find(
-        (match) => match.tempID === data.tempID
+        (match) => match.tempID === personName
       );
       const checkingEDTable = educDetailsData.find(
-        (match) => match.tempID === data.tempID
+        (match) => match.tempID === personName
       );
 
       if (checkingPDTable && checkingEDTable) {
@@ -464,19 +465,29 @@ export const OtherDetails = ({ fetchedData }) => {
           EDTableID: checkingEDTable.id,
         };
 
-        await candyDetails({ reqValue: updateReqValue });
-        // console.log("Update", updateReqValue);
+        // console.log("Update call", { updateReqValue, latestTempIDData });
 
-        setNotification(true);
-        setIsLoading(false);
+        await candyDetails({ reqValue: updateReqValue })
+          .then(() => {
+            // setNotification(true);
+            setShowTitle("Your Application Submitted Successfully")
+            setIsLoading(false);
+          })
+          .catch((err) => {
+            console.log("Application Details Update Call Error", err);
+          });
       } else {
-        console.log({ reqValue, latestTempIDData });
-        await submitODFunc({ reqValue, latestTempIDData });
-        // console.log("Create", reqValue);
-        // console.log("TempID", latestTempIDData);
+        // console.log("Create call", { reqValue, latestTempIDData });
 
-        setNotification(true);
-        setIsLoading(false);
+        await submitODFunc({ reqValue, latestTempIDData })
+          .then(() => {
+            // setNotification(true);
+            setShowTitle("Your Application Submitted Successfully")
+            setIsLoading(false);
+          })
+          .catch((err) => {
+            console.log("Application Details Create Call Error", err);
+          });
       }
     } catch (error) {
       console.error("Error submitting data:", error);
@@ -488,239 +499,264 @@ export const OtherDetails = ({ fetchedData }) => {
   const access = "Recruitment";
 
   return (
-    <div>
-      <form onSubmit={handleSubmit(onSubmit)} className="pt-5">
-        <div className="grid grid-cols-2 gap-5">
+    <>
+      {showTitle && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+            {/* Message */}
+            <div className="p-6 text-center">
+              <p className="text-darkText text-lg">{showTitle}</p>
+            </div>
+
+            {/* OK Button */}
+            <div className="px-6 py-3 bg-lightBg border-t border-borderGray flex justify-center">
+              <button className="bg-primary px-6 py-2 rounded-lg font-semibold uppercase hover:bg-yellow transition">
+                <a href={"/recrutiles/candidate"}>Okay</a>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div>
+        <form onSubmit={handleSubmit(onSubmit)} className="pt-5">
+          <div className="grid grid-cols-2 gap-5">
+            <div className="mb-4">
+              <label className="block text_size_6">
+                Number of Years Experience in Applied Position
+              </label>
+              <input
+                label="Number of Years Experience in Applied Position"
+                {...register("noExperience")}
+                className="input-field border"
+                name="noExperience"
+                type="text"
+                errors={errors}
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block text_size_6">Salary Expected</label>
+              <input
+                label="Salary Expected"
+                {...register("salaryExpectation")}
+                className="input-field border"
+                name="salaryExpectation"
+                type="text"
+                errors={errors}
+              />
+            </div>
+          </div>
+
           <div className="mb-4">
             <label className="block text_size_6">
-              Number of Years Experience in Applied Position
+              Termination Notice for Present job (month/Date)
             </label>
             <input
-              label="Number of Years Experience in Applied Position"
-              {...register("noExperience")}
+              label="Termination Notice for Present job (month/Date)"
+              {...register("noticePeriod")}
               className="input-field border"
-              name="noExperience"
+              name="noticePeriod"
               type="text"
               errors={errors}
             />
           </div>
 
           <div className="mb-4">
-            <label className="block text_size_6">Salary Expected</label>
+            <label className="text_size_6">
+              Have you been interviewed for a position at this company before?
+            </label>
+            <div className="flex justify-between items-center mt-2 mb-4">
+              <div>
+                <Controller
+                  name="perIS"
+                  control={control}
+                  render={({ field }) => (
+                    <>
+                      <input
+                        type="radio"
+                        id="yes"
+                        {...field}
+                        value="yes"
+                        checked={field.value === "yes"}
+                        onChange={() => field.onChange("yes")}
+                        className="mr-2 p-3"
+                      />
+                      <label htmlFor="yes" className="mr-4 text_size_6">
+                        Yes
+                      </label>
+
+                      <input
+                        type="radio"
+                        id="no"
+                        {...field}
+                        value="no"
+                        checked={field.value === "no"}
+                        onChange={() => field.onChange("no")}
+                        className="mr-2 p-3"
+                      />
+                      <label htmlFor="no" className="text_size_6">
+                        No
+                      </label>
+                    </>
+                  )}
+                />
+                {errors.perIS && (
+                  <p className="text-[red] text-xs mt-1">
+                    {errors.perIS.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="w-[350px] text_size_7">
+                  If yes, please give Details
+                </label>
+                <Controller
+                  name="perIDesc"
+                  control={control}
+                  render={({ field }) => (
+                    <input
+                      {...field}
+                      disabled={watch("perIS") !== "yes"}
+                      className={`mt-2 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full ${
+                        errors.perIDesc ? "border-[red]" : ""
+                      }`}
+                    />
+                  )}
+                />
+                {errors.perIDesc && (
+                  <p className="text-[red] text-xs mt-4">
+                    {errors.perIDesc.message}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <label className="text_size_6 mb-2">
+              Any other information you wish to provide?
+            </label>
+            <textarea
+              name="supportInfo"
+              {...register("supportInfo")}
+              className="resize-none mt-2 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full"
+              rows="4"
+            ></textarea>
+          </div>
+
+          <div className="my-5">
+            <label className="text_size_6">Choose file</label>
+            <div className="grid grid-cols-3 mt-3 mb-10 gap-5 w-full">
+              <div>
+                <FileUploadField
+                  label="Upload Resume"
+                  register={register}
+                  fileKey="uploadResume"
+                  handleFileUpload={handleFileUpload}
+                  uploadedFileNames={uploadedFileNames}
+                  deletedStringUpload={deletedStringUpload}
+                  isUploadingString={isUploadingString}
+                  error={errors.uploadResume}
+                  formattedPermissions={formattedPermissions}
+                  requiredPermissions={requiredPermissions}
+                  access={access}
+                />
+              </div>
+
+              <div>
+                <FileUploadField
+                  label="Qualification Certificate"
+                  register={register}
+                  fileKey="uploadCertificate"
+                  handleFileUpload={handleFileUpload}
+                  uploadedFileNames={uploadedFileNames}
+                  deletedStringUpload={deletedStringUpload}
+                  isUploadingString={isUploadingString}
+                  error={errors.uploadCertificate}
+                  formattedPermissions={formattedPermissions}
+                  requiredPermissions={requiredPermissions}
+                  access={access}
+                />
+              </div>
+
+              <div>
+                <FileUploadField
+                  label="Upload Passport"
+                  register={register}
+                  fileKey="uploadPp"
+                  handleFileUpload={handleFileUpload}
+                  uploadedFileNames={uploadedFileNames}
+                  deletedStringUpload={deletedStringUpload}
+                  isUploadingString={isUploadingString}
+                  error={errors.uploadPp}
+                  formattedPermissions={formattedPermissions}
+                  requiredPermissions={requiredPermissions}
+                  access={access}
+                />
+              </div>
+
+              <div>
+                <FileUploadField
+                  label="Upload IC"
+                  register={register}
+                  fileKey="uploadIc"
+                  handleFileUpload={handleFileUpload}
+                  uploadedFileNames={uploadedFileNames}
+                  deletedStringUpload={deletedStringUpload}
+                  isUploadingString={isUploadingString}
+                  error={errors.UploadIC}
+                  formattedPermissions={formattedPermissions}
+                  requiredPermissions={requiredPermissions}
+                  access={access}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-start mb-4">
             <input
-              label="Salary Expected"
-              {...register("salaryExpectation")}
-              className="input-field border"
-              name="salaryExpectation"
-              type="text"
-              errors={errors}
+              type="checkbox"
+              id="employeeStatement"
+              {...register("empStatement", {
+                required: "This field is required",
+              })}
+              className="w-5 h-5 border-medium_grey rounded"
             />
+            <label htmlFor="empStatement" className="ml-2 text-gray-700">
+              I Hereby Declare that every statement made by me in this form is
+              true and correct and I understand and agree that any false
+              declaration made by me may be ground for termination of my
+              contract of employment without notice.
+            </label>
           </div>
-        </div>
+          {errors.empStatement && (
+            <p className="text-[red] text-sm">
+              {errors?.empStatement?.message}
+            </p>
+          )}
 
-        <div className="mb-4">
-          <label className="block text_size_6">
-            Termination Notice for Present job (month/Date)
-          </label>
-          <input
-            label="Termination Notice for Present job (month/Date)"
-            {...register("noticePeriod")}
-            className="input-field border"
-            name="noticePeriod"
-            type="text"
-            errors={errors}
+          <div className="text-center my-10">
+            <button type="submit" className="primary_btn" disabled={isLoading}>
+              {isLoading ? "Submitting..." : "Submit"}
+            </button>
+          </div>
+        </form>
+        {/* {notification && (
+          <SpinLogo
+            text="Your Application Submitted Successfully"
+            notification={notification}
+            path="/recrutiles/candidate"
           />
-        </div>
-
-        <div className="mb-4">
-          <label className="text_size_6">
-            Have you been interviewed for a position at this company before?
-          </label>
-          <div className="flex justify-between items-center mt-2 mb-4">
-            <div>
-              <Controller
-                name="perIS"
-                control={control}
-                render={({ field }) => (
-                  <>
-                    <input
-                      type="radio"
-                      id="yes"
-                      {...field}
-                      value="yes"
-                      checked={field.value === "yes"}
-                      onChange={() => field.onChange("yes")}
-                      className="mr-2 p-3"
-                    />
-                    <label htmlFor="yes" className="mr-4 text_size_6">
-                      Yes
-                    </label>
-
-                    <input
-                      type="radio"
-                      id="no"
-                      {...field}
-                      value="no"
-                      checked={field.value === "no"}
-                      onChange={() => field.onChange("no")}
-                      className="mr-2 p-3"
-                    />
-                    <label htmlFor="no" className="text_size_6">
-                      No
-                    </label>
-                  </>
-                )}
-              />
-              {errors.perIS && (
-                <p className="text-[red] text-xs mt-1">
-                  {errors.perIS.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="w-[350px] text_size_7">
-                If yes, please give Details
-              </label>
-              <Controller
-                name="perIDesc"
-                control={control}
-                render={({ field }) => (
-                  <input
-                    {...field}
-                    disabled={watch("perIS") !== "yes"}
-                    className={`mt-2 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full ${
-                      errors.perIDesc ? "border-[red]" : ""
-                    }`}
-                  />
-                )}
-              />
-              {errors.perIDesc && (
-                <p className="text-[red] text-xs mt-4">
-                  {errors.perIDesc.message}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <label className="text_size_6 mb-2">
-            Any other information you wish to provide?
-          </label>
-          <textarea
-            name="supportInfo"
-            {...register("supportInfo")}
-            className="resize-none mt-2 text_size_7 p-2.5 bg-lite_skyBlue border border-[#dedddd] text-dark_grey outline-none rounded w-full"
-            rows="4"
-          ></textarea>
-        </div>
-
-        <div className="my-5">
-          <label className="text_size_6">Choose file</label>
-          <div className="grid grid-cols-3 mt-3 mb-10 gap-5 w-full">
-            <div>
-              <FileUploadField
-                label="Upload Resume"
-                register={register}
-                fileKey="uploadResume"
-                handleFileUpload={handleFileUpload}
-                uploadedFileNames={uploadedFileNames}
-                deletedStringUpload={deletedStringUpload}
-                isUploadingString={isUploadingString}
-                error={errors.uploadResume}
-                formattedPermissions={formattedPermissions}
-                requiredPermissions={requiredPermissions}
-                access={access}
-              />
-            </div>
-
-            <div>
-              <FileUploadField
-                label="Qualification Certificate"
-                register={register}
-                fileKey="uploadCertificate"
-                handleFileUpload={handleFileUpload}
-                uploadedFileNames={uploadedFileNames}
-                deletedStringUpload={deletedStringUpload}
-                isUploadingString={isUploadingString}
-                error={errors.uploadCertificate}
-                formattedPermissions={formattedPermissions}
-                requiredPermissions={requiredPermissions}
-                access={access}
-              />
-            </div>
-
-            <div>
-              <FileUploadField
-                label="Upload Passport"
-                register={register}
-                fileKey="uploadPp"
-                handleFileUpload={handleFileUpload}
-                uploadedFileNames={uploadedFileNames}
-                deletedStringUpload={deletedStringUpload}
-                isUploadingString={isUploadingString}
-                error={errors.uploadPp}
-                formattedPermissions={formattedPermissions}
-                requiredPermissions={requiredPermissions}
-                access={access}
-              />
-            </div>
-
-            <div>
-              <FileUploadField
-                label="Upload IC"
-                register={register}
-                fileKey="uploadIc"
-                handleFileUpload={handleFileUpload}
-                uploadedFileNames={uploadedFileNames}
-                deletedStringUpload={deletedStringUpload}
-                isUploadingString={isUploadingString}
-                error={errors.UploadIC}
-                formattedPermissions={formattedPermissions}
-                requiredPermissions={requiredPermissions}
-                access={access}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-start mb-4">
-          <input
-            type="checkbox"
-            id="employeeStatement"
-            {...register("empStatement", {
-              required: "This field is required",
-            })}
-            className="w-5 h-5 border-medium_grey rounded"
+        )} */}
+        {deletePopup && (
+          <DeletePopup
+            handleDeleteMsg={handleDeleteMsg}
+            title1={deleteTitle1}
           />
-          <label htmlFor="empStatement" className="ml-2 text-gray-700">
-            I Hereby Declare that every statement made by me in this form is
-            true and correct and I understand and agree that any false
-            declaration made by me may be ground for termination of my contract
-            of employment without notice.
-          </label>
-        </div>
-        {errors.empStatement && (
-          <p className="text-[red] text-sm">{errors?.empStatement?.message}</p>
         )}
-
-        <div className="text-center my-10">
-          <button type="submit" className="primary_btn" disabled={isLoading}>
-            {isLoading ? "Submitting..." : "Submit"}
-          </button>
-        </div>
-      </form>
-      {notification && (
-        <SpinLogo
-          text="Your Application Submitted Successfully"
-          notification={notification}
-          path="/recrutiles/candidate"
-        />
-      )}
-      {deletePopup && (
-        <DeletePopup handleDeleteMsg={handleDeleteMsg} title1={deleteTitle1} />
-      )}
-    </div>
+      </div>
+    </>
   );
 };

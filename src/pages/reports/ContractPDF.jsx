@@ -98,7 +98,7 @@ export const ContractPDF = ({ userID, userType }) => {
           const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Get last element
         
           if (lastWorkStatus.toUpperCase() === "TERMINATION" || lastWorkStatus.toUpperCase() === "RESIGNATION"
-        || lastWorkStatus.toUpperCase() === "PROBATIONARY") {
+        ) {
             return false; // Exclude items with TERMINATION or RESIGNATION
           }   }
         const contractEndDates = item.contractEnd || [];
@@ -222,7 +222,7 @@ export const ContractPDF = ({ userID, userType }) => {
       const lastWorkStatus = data.workStatus[data.workStatus.length - 1]; // Now it's safe
       
       if (lastWorkStatus?.toUpperCase() === "TERMINATION" || lastWorkStatus?.toUpperCase() === "RESIGNATION"
-    || lastWorkStatus.toUpperCase() === "PROBATIONARY") {
+    ) {
           return false; // Exclude records with TERMINATION or RESIGNATION
       }
         const expiryArray = data?.contractEnd || [];

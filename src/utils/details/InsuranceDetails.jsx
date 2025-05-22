@@ -20,7 +20,7 @@ const InsuranceDetails = ({
   mainRef,
   InsuranceClaim,
 }) => {
-  const [viewingDocument, setViewingDocument] = useState(null); 
+  const [viewingDocument, setViewingDocument] = useState(null);
   const [dependInsurance, setDependInsurance] = useState([]);
   const [insClaim, setInsClaim] = useState([]);
   const [lastUploadUrl, setPPLastUP] = useState("");
@@ -30,22 +30,19 @@ const InsuranceDetails = ({
     try {
       const result = await getUrl({ path: pathUrl });
 
-      setPPLastUP(result.url.href); 
-      setViewingDocument(pathUrl); 
+      setPPLastUP(result.url.href);
+      setViewingDocument(pathUrl);
     } catch (error) {
       console.error("Error fetching the file URL:", error);
     }
   };
 
   console.log("WK", insuranceInfo);
-  
 
   useEffect(() => {
-
     if (Array.isArray(depInsurance) && depInsurance.length > 0) {
-
       if (typeof depInsurance[0] === "string") {
-        try {   
+        try {
           const parsedString = JSON.parse(depInsurance[0]);
           setDependInsurance(parsedString);
         } catch (error) {
@@ -58,12 +55,9 @@ const InsuranceDetails = ({
   }, [depInsurance]);
 
   useEffect(() => {
-
     if (Array.isArray(InsuranceClaim) && InsuranceClaim.length > 0) {
-
       if (typeof InsuranceClaim[0] === "string") {
         try {
-
           const parsedString = JSON.parse(InsuranceClaim[0]);
           setInsClaim(parsedString);
         } catch (error) {
@@ -81,7 +75,7 @@ const InsuranceDetails = ({
       if (Array.isArray(parsedData)) {
         return parsedData.map((doc) => {
           if (doc.upload) {
-            doc.fileName = doc.upload.split("/").pop(); 
+            doc.fileName = doc.upload.split("/").pop();
           }
           return doc;
         });
@@ -94,8 +88,8 @@ const InsuranceDetails = ({
   };
 
   const handleClose = (e) => {
-    e.preventDefault(); 
-    setViewingDocument(null); 
+    e.preventDefault();
+    setViewingDocument(null);
   };
 
   const closeModal = () => {
@@ -134,7 +128,7 @@ const InsuranceDetails = ({
                 Uploaded on: {formatDate(document.date)}
               </span>
               <button
-                onClick={() => linkToStorageFile(document.upload)} 
+                onClick={() => linkToStorageFile(document.upload)}
                 className="text-dark_grey font-semibold text-sm"
               >
                 View Document
@@ -155,7 +149,7 @@ const InsuranceDetails = ({
 
                     <div className="absolute top-2 right-2">
                       <button
-                        onClick={closeModal} 
+                        onClick={closeModal}
                         className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
                       >
                         <FaTimes />
@@ -191,7 +185,7 @@ const InsuranceDetails = ({
                 <div className="relative mt-4">
                   <div ref={invoiceRef}>
                     <img
-                      src={lastUploadUrl} 
+                      src={lastUploadUrl}
                       alt="Document Preview"
                       className="w-full h-auto"
                     />
@@ -199,7 +193,7 @@ const InsuranceDetails = ({
 
                   <div className="absolute top-2 right-2">
                     <button
-                      onClick={handleClose} 
+                      onClick={handleClose}
                       className="bg-red-600 text-black px-3 py-1 rounded-full text-sm hover:bg-red-800"
                     >
                       <FaTimes />
@@ -233,7 +227,6 @@ const InsuranceDetails = ({
     );
   };
 
-
   const renderDocumentCategory = (uploadArray, categoryName) => {
     const documents =
       uploadArray && uploadArray.length > 0
@@ -248,81 +241,85 @@ const InsuranceDetails = ({
         {documents.length > 0 ? (
           renderDocumentsUnderCategory(documents)
         ) : (
-          <p className="text-dark_grey font-semibold text-sm">
-            No documents available
-          </p>
+          <div className="bg-white rounded-lg shadow-md p-4 mb-4 border border-gray-200">
+            <p className="text-dark_grey font-semibold text-sm">
+              No documents available
+            </p>
+          </div>
         )}
       </div>
     );
   };
 
-     const renderPersonalDetails = (details) => {
-        const capitalizeWords = (str) => {
-          if (!str || str === "N/A") {
-            return "N/A"; 
-          }
-      
-          return str
-            .split(' ') 
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-            .join(' ');
-        };
-      
-        return (
-          <div className="grid grid-cols-3 gap-y-4 items-center font-semibold text-sm">
-            {Object.entries(insuranceInfo).map(([key, value], index) => (
-              <React.Fragment key={index}>
-                <span className="text-dark_grey">{key}</span>
-                <span className="text-center text-gray-700">:</span>
-                <span className="text-dark_grey">
-                  {
-                    Array.isArray(value)
-                      ? value.length > 0 
-                        ? value
-                            .map((v, idx, arr) => {
-                              if (v === null || v === undefined || v === '') {
-                                return "N/A"; 
-                              }
-                              return v.toLowerCase() === arr[idx - 1]?.toLowerCase() ? null : v;
-                            })
-                            .filter((v, idx, arr) => v !== null) 
-                            .reduce((acc, item) => {
-                              if (item === "N/A" && acc[acc.length - 1] !== "N/A") {
-                                acc.push("N/A");
-                              } else if (item !== "N/A") {
-                                acc.push(item);
-                              }
-                              return acc;
-                            }, [])
-                            .reverse() 
-                            .map((item, idx, arr) => {
-                              return (
-                                <span key={idx}>
-                                  <span
-                                     className={`${
-                                      arr.length > 1 && idx === 0
-                                        ? "rounded-md font-black italic"
-                                        : "" 
-                                    }`}
-                                  >
-                                    {capitalizeWords(item)} 
-                                  </span>
-                                  {idx < arr.length - 1 && <span>,&nbsp;</span>} 
-                                </span>
-                              );
-                            })
-                        : "N/A" 
-                      : value === null || value === undefined || value === ''
-                      ? "N/A" 
-                      : capitalizeWords(value) 
-                  }
-                </span>
-              </React.Fragment>
-            ))}
-          </div>
-        );
-      };
-  
+  const renderPersonalDetails = (details) => {
+    const capitalizeWords = (str) => {
+      if (!str || str === "N/A") {
+        return "N/A";
+      }
+
+      return str
+        .split(" ")
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join(" ");
+    };
+
+    return (
+      <div className="grid grid-cols-3 gap-y-4 items-center font-semibold text-sm">
+        {Object.entries(insuranceInfo).map(([key, value], index) => (
+          <React.Fragment key={index}>
+            <span className="text-dark_grey">{key}</span>
+            <span className="text-center text-gray-700">:</span>
+            <span className="text-dark_grey">
+              {Array.isArray(value)
+                ? value.length > 0
+                  ? value
+                      .map((v, idx, arr) => {
+                        if (v === null || v === undefined || v === "") {
+                          return "N/A";
+                        }
+                        return v.toLowerCase() === arr[idx - 1]?.toLowerCase()
+                          ? null
+                          : v;
+                      })
+                      .filter((v, idx, arr) => v !== null)
+                      .reduce((acc, item) => {
+                        if (item === "N/A" && acc[acc.length - 1] !== "N/A") {
+                          acc.push("N/A");
+                        } else if (item !== "N/A") {
+                          acc.push(item);
+                        }
+                        return acc;
+                      }, [])
+                      .reverse()
+                      .map((item, idx, arr) => {
+                        return (
+                          <span key={idx}>
+                            <span
+                              className={`${
+                                arr.length > 1 && idx === 0
+                                  ? "rounded-md font-black italic"
+                                  : ""
+                              }`}
+                            >
+                              {capitalizeWords(item)}
+                            </span>
+                            {idx < arr.length - 1 && <span>,&nbsp;</span>}
+                          </span>
+                        );
+                      })
+                  : "N/A"
+                : value === null || value === undefined || value === ""
+                ? "N/A"
+                : capitalizeWords(value)}
+            </span>
+          </React.Fragment>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <section ref={mainRef} className="py-3 px-10">
       <h6 className="uppercase text_size_5 my-3">Insurance Details:</h6>
