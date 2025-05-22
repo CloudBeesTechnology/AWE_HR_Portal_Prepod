@@ -342,9 +342,11 @@ const PersonalDetailsView = ({
         {documents.length > 0 ? (
           renderDocumentsUnderCategory(documents)
         ) : (
-          <p className="text-dark_grey font-semibold text-sm">
-            No documents available
-          </p>
+          <div className="bg-white rounded-lg shadow-md p-4 mb-4 border border-gray-200">
+            <p className="text-dark_grey font-semibold text-sm">
+              No documents available
+            </p>
+          </div>
         )}
       </div>
     );

@@ -49,8 +49,7 @@ export const ChangePasswordSchema = Yup.object({
 });
 
 export const ApplicantSchema = Yup.object().shape({
-  // profilePhoto: Yup.mixed()
-  // .notRequired("Upload Photo is mandatory"),
+  profilePhoto: Yup.string().required("Profile Photo is mandatory"),
   agent: Yup.string().notRequired(),
   position: Yup.string().required("Position is mandatory"),
   contractType: Yup.string().notRequired(),

@@ -21,7 +21,6 @@ const MedicalDetails = ({
   formatDate,
   mainRef,
 }) => {
-
   const [viewingDocument, setViewingDocument] = useState(null);
   const [lastUploadUrl, setPPLastUP] = useState("");
 
@@ -215,9 +214,11 @@ const MedicalDetails = ({
         {isValidDocumentsArray ? (
           renderDocumentsUnderCategory(documents, categoryName)
         ) : (
-          <p className="text-dark_grey font-semibold text-sm">
-            No documents and images available
-          </p>
+          <div className="bg-white rounded-lg shadow-md p-4 mb-4 border border-gray-200">
+            <p className="text-dark_grey font-semibold text-sm">
+              No documents available
+            </p>
+          </div>
         )}
       </div>
     );

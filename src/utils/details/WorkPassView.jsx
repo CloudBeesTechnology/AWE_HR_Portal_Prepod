@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { FaTimes, FaPrint, FaDownload } from "react-icons/fa"; 
+import { FaTimes, FaPrint, FaDownload } from "react-icons/fa";
 import { getUrl } from "@aws-amplify/storage";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
@@ -26,8 +26,8 @@ export const WorkPassView = ({
   reEntryUpload,
   mainRef,
 }) => {
-  const [viewingDocument, setViewingDocument] = useState(null); 
-  const [lastUploadUrl, setLastUploadUrl] = useState(""); 
+  const [viewingDocument, setViewingDocument] = useState(null);
+  const [lastUploadUrl, setLastUploadUrl] = useState("");
   const workPassRef = useRef();
 
   // Helper function to parse and safely handle data
@@ -59,7 +59,7 @@ export const WorkPassView = ({
   const linkToStorageFile = async (pathUrl) => {
     try {
       const result = await getUrl({ path: pathUrl });
-      setLastUploadUrl(result.url.href); 
+      setLastUploadUrl(result.url.href);
       setViewingDocument(pathUrl);
     } catch (error) {
       console.error("Error fetching the file URL:", error);
@@ -96,7 +96,7 @@ export const WorkPassView = ({
                 Uploaded on: {formatDate(document.date)}
               </span>
               <button
-                onClick={() => linkToStorageFile(document.upload)} 
+                onClick={() => linkToStorageFile(document.upload)}
                 className="text-dark_grey font-semibold text-sm"
               >
                 View Document
@@ -203,7 +203,7 @@ export const WorkPassView = ({
     // Parse documents only if the uploadArray has valid data
     const documents =
       uploadArray && uploadArray.length > 0
-        ? parseDocuments(uploadArray[0]) 
+        ? parseDocuments(uploadArray[0])
         : [];
 
     return (
@@ -212,9 +212,11 @@ export const WorkPassView = ({
         {documents.length > 0 ? (
           renderDocumentsUnderCategory(documents)
         ) : (
-          <p className="text-dark_grey font-semibold text-sm">
-            No documents available
-          </p>
+          <div className="bg-white rounded-lg shadow-md p-4 mb-4 border border-gray-200">
+            <p className="text-dark_grey font-semibold text-sm">
+              No documents available
+            </p>
+          </div>
         )}
       </div>
     );
@@ -241,49 +243,47 @@ export const WorkPassView = ({
             <span className="text-dark_grey">{key}</span>
             <span className="text-center text-gray-700">:</span>
             <span className="text-dark_grey">
-              {
-                Array.isArray(value)
-                  ? value.length > 0 
-                    ? value
-                        .map((v, idx, arr) => {
-                          if (v === null || v === undefined || v === "") {
-                            return "N/A"; 
-                          }
-                          return v.toLowerCase() === arr[idx - 1]?.toLowerCase()
-                            ? null
-                            : v;
-                        })
-                        .filter((v, idx, arr) => v !== null) 
-                        .reduce((acc, item) => {
-                          if (item === "N/A" && acc[acc.length - 1] !== "N/A") {
-                            acc.push("N/A");
-                          } else if (item !== "N/A") {
-                            acc.push(item);
-                          }
-                          return acc;
-                        }, [])
-                        .reverse() 
-                        .map((item, idx, arr) => {
-                          return (
-                            <span key={idx}>
-                              <span
-                                className={`${
-                                  arr.length > 1 && idx === 0
-                                    ? "rounded-md font-black italic"
-                                    : "" 
-                                }`}
-                              >
-                                {capitalizeWords(item)}{" "}
-                              </span>
-                              {idx < arr.length - 1 && <span>,&nbsp;</span>}{" "}
+              {Array.isArray(value)
+                ? value.length > 0
+                  ? value
+                      .map((v, idx, arr) => {
+                        if (v === null || v === undefined || v === "") {
+                          return "N/A";
+                        }
+                        return v.toLowerCase() === arr[idx - 1]?.toLowerCase()
+                          ? null
+                          : v;
+                      })
+                      .filter((v, idx, arr) => v !== null)
+                      .reduce((acc, item) => {
+                        if (item === "N/A" && acc[acc.length - 1] !== "N/A") {
+                          acc.push("N/A");
+                        } else if (item !== "N/A") {
+                          acc.push(item);
+                        }
+                        return acc;
+                      }, [])
+                      .reverse()
+                      .map((item, idx, arr) => {
+                        return (
+                          <span key={idx}>
+                            <span
+                              className={`${
+                                arr.length > 1 && idx === 0
+                                  ? "rounded-md font-black italic"
+                                  : ""
+                              }`}
+                            >
+                              {capitalizeWords(item)}{" "}
                             </span>
-                          );
-                        })
-                    : "N/A"
-                  : value === null || value === undefined || value === ""
-                  ? "N/A" 
-                  : capitalizeWords(value) 
-              }
+                            {idx < arr.length - 1 && <span>,&nbsp;</span>}{" "}
+                          </span>
+                        );
+                      })
+                  : "N/A"
+                : value === null || value === undefined || value === ""
+                ? "N/A"
+                : capitalizeWords(value)}
             </span>
           </React.Fragment>
         ))}

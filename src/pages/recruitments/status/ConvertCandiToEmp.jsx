@@ -10,22 +10,14 @@ import {
   createPassportValid,
   createSawpDetails,
 } from "../../../graphql/mutations";
-import { DataSupply } from "../../../utils/DataStoredContext";
 
 export const CandiToEmp = async ({ storedData }) => {
-  // const { IVSSDetails } = useContext(DataSupply);
+
   const client = generateClient();
-  // const SumbitCandiToEmp = useCallback(
-  //   async ({ storedData }) => {
+
   if (!storedData) {
     throw new Error("Missing required parameters");
   }
-
-  // const selectedInterviewDataStatus = IVSSDetails.find(
-  //   (data) => data.tempID ===  storedData?.tempID
-  // );
-
-  // console.log("INt ID", selectedInterviewDataStatus);
 
   console.log("Stored", storedData);
 
