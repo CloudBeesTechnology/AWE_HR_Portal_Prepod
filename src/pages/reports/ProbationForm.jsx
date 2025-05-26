@@ -104,20 +104,20 @@ export const ProbationForm = ({ userID, userType }) => {
   }, []);
 
   const currentDate = new Date();
- // Parse "DD-MM-YYYY" into a proper Date object
-let probationMonthYear = "Invalid Date";
+  // Parse "DD-MM-YYYY" into a proper Date object
+  let probationMonthYear = "Invalid Date";
 
-if (probationEndDateStr) {
-  const [day, month, year] = probationEndDateStr.split("-");
-  const parsedDate = new Date(`${year}-${month}-${day}`); // Format to YYYY-MM-DD
+  if (probationEndDateStr) {
+    const [day, month, year] = probationEndDateStr.split("-");
+    const parsedDate = new Date(`${year}-${month}-${day}`); // Format to YYYY-MM-DD
 
-  if (!isNaN(parsedDate)) {
-    probationMonthYear = parsedDate.toLocaleDateString("en-US", {
-      month: "long",
-      year: "numeric",
-    });
+    if (!isNaN(parsedDate)) {
+      probationMonthYear = parsedDate.toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+      });
+    }
   }
-}
 
   const [personalInfo, setPersonalInfo] = useState(null);
   const { personalInfo: fetchedPersonalInfo } = useEmployeePersonalInfo(userID);
@@ -708,11 +708,9 @@ if (probationEndDateStr) {
         </div>
       </section>
 
-
-<div className="text-center text-lg font-bold uppercase w-full my-10">
-  {`Probation Completion Form for the Month of ${probationMonthYear}`}
-</div>
-
+      <div className="text-center text-lg font-bold uppercase w-full my-10">
+        {`Probation Completion Form for the Month of ${probationMonthYear}`}
+      </div>
 
       <div className="mb-10 mt-5">
         <p className="text-md mt-2">
@@ -732,7 +730,7 @@ if (probationEndDateStr) {
             type="text"
             name="deadline"
             {...register("deadline")}
-         value={formData.probData.deadline || employeeData?.deadline }
+            value={formData.probData.deadline || employeeData?.deadline}
             onChange={handleInputChange}
             className="border-b border-black outline-none px-1"
           />

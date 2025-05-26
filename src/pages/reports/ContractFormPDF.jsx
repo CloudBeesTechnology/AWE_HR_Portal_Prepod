@@ -12,6 +12,7 @@ import { useTempID } from "../../utils/TempIDContext";
 import { useCreateNotification } from "../../hooks/useCreateNotification";
 
 export const ContractFormPDF = ({ contentRef }) => {
+  const location = useLocation();
   const { contractForm } = ContractForm();
   const { gmPosition, PDInfo } = useTempID();
   const { contractDetails } = UpdateContractData();
@@ -23,7 +24,6 @@ export const ContractFormPDF = ({ contentRef }) => {
   const [notification, setNotification] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const contractEndDateStr = employeeData?.contractEndDate;
-  const location = useLocation();
 
   const [managerData, setManagerData] = useState({
     managerEmpID: "",
@@ -490,7 +490,8 @@ export const ContractFormPDF = ({ contentRef }) => {
       </body>
     </html>`,
       "hr_no-reply@adininworks.com",
-      "hariharanofficial2812@gmail.com"
+      managerData.hrEmail
+      // "hariharanofficial2812@gmail.com"
     );
 
     await createNotification({
@@ -543,7 +544,7 @@ export const ContractFormPDF = ({ contentRef }) => {
     });
   };
 
-  console.log("Name", PDInfo);
+  // console.log("Name", PDInfo);
 
   // Main submission handler
   const handleSubmit = async () => {
@@ -616,11 +617,8 @@ export const ContractFormPDF = ({ contentRef }) => {
 
       // Send appropriate notifications
       if (userType === "HR") {
-        console.log("HR BLOCK");
-
         await sendHRNotification(empName, probationEndFormatted, managerData);
       } else if (userType === "Manager" && gmPosition !== "GENERAL MANAGER") {
-        console.log("Manager BLOCK");
         await sendManagerNotification(
           empName,
           probationEndFormatted,
@@ -628,7 +626,6 @@ export const ContractFormPDF = ({ contentRef }) => {
           managerData
         );
       } else if (gmPosition === "GENERAL MANAGER") {
-        console.log("GM BLOCK");
         await sendGMNotification(empName, probationEndFormatted, managerData);
       }
 
