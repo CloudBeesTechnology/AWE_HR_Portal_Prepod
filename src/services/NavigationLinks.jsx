@@ -120,6 +120,8 @@ import { OffshoreORMC } from "../pages/timeSheet/OffshoreORMC";
 import { OffshoreExcelSheets } from "../pages/timeSheet/OffshoreExcelSheets";
 import { TrainingCertifyMD } from "../components/migratingData/TrainingCertifyMD";
 import { TriningReqMD } from "../components/migratingData/TrainingReqMD";
+import { useTempID } from "../utils/TempIDContext";
+import { usePersonalDetails } from "../hooks/usePersonalDetails";
 const client = generateClient();
 
 const NavigationLinks = () => {
@@ -128,9 +130,19 @@ const NavigationLinks = () => {
   const [userID, setUserID] = useState("");
   const [userType, setUserType] = useState("");
   // const [defaultRoute, setDefaultRoute] = useState("");
-  const [firstCategory, setFirstCategory] = useState(null); // To hold the first matching category
-
+  const [firstCategory, setFirstCategory] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { setPDInfo } = useTempID();
+  const { personalInfo } = usePersonalDetails();
+
+  useEffect(() => {
+    if (personalInfo?.name) {
+      setPDInfo(personalInfo.name);
+    }
+  }, [personalInfo, setPDInfo]);
+
+  // console.log("From Nav", PDInfo);
+
   useEffect(() => {
     async function fetchUserData() {
       try {
@@ -151,10 +163,8 @@ const NavigationLinks = () => {
         });
 
         const result = res?.data?.listUsers?.items[0];
-        // console.log(result);
         const permissionsString = result?.setPermissions[0];
         const categories = extractMainCategories(permissionsString);
-        // console.log(categories.includes("Dashboard"));
         setUserID(userID);
         setUserType(userType);
         setMainCategories(categories);

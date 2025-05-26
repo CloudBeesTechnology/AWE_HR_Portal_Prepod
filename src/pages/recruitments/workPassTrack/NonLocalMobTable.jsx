@@ -18,7 +18,6 @@ export const NonLocalMobTable = ({ data, fileUpload, urlValue }) => {
   const [selectedCandi, setSelectedCandi] = useState([]);
   const [latestEmployeeID, setLatestEmployeeID] = useState("");
   const [showTitle, setShowTitle] = useState("");
-  const [notification, setNotification] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(1);
   const [loadingItems, setLoadingItems] = useState({});
@@ -142,6 +141,8 @@ export const NonLocalMobTable = ({ data, fileUpload, urlValue }) => {
     setLatestEmployeeID("");
   };
 
+  // console.log("Stored Data", currentCandidate)
+
   const OnSubmit = async () => {
     if (!currentCandidate) {
       alert("Error: No candidate selected.");
@@ -202,20 +203,6 @@ export const NonLocalMobTable = ({ data, fileUpload, urlValue }) => {
       {showTitle && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
-            {/* Header */}
-            {/* <div className="px-6 py-4 flex justify-end items-center bg-green-600 uppercase">
-              <h3 className="text-xl font-semibold text-white">Success</h3>
-              <button
-                onClick={() => {
-                  setShowTitle("");
-                  setNotification(true);
-                }}
-                className=" hover:text-grey transition-colors"
-              >
-                <RiCloseLine size={24} />
-              </button>
-            </div> */}
-
             {/* Message */}
             <div className="p-6 text-center">
               <p className="text-darkText text-lg">{showTitle}</p>

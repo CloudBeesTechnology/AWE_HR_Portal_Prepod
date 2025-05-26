@@ -186,8 +186,8 @@ if (probationEndDateStr) {
 
       if (workInfo.skillPool) {
         if (
-          workInfo.skillPool.includes("Skilled") ||
-          workInfo.skillPool.includes("UnSkilled")
+          workInfo.skillPool.includes("SKILLED") ||
+          workInfo.skillPool.includes("UNSKILLED")
         ) {
           setEmailData((prevData) => ({
             ...prevData,

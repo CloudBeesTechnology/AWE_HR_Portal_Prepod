@@ -12,14 +12,40 @@ import {
 } from "../../../graphql/mutations";
 
 export const CandiToEmp = async ({ storedData }) => {
-
   const client = generateClient();
 
   if (!storedData) {
     throw new Error("Missing required parameters");
   }
 
-  console.log("Stored", storedData);
+  // console.log("Stored", storedData);
+
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  const wrapUpload = (filePath) => {
+    return filePath ? [{ upload: filePath, date: currentDate }] : null;
+  };
+
+  const isJSONStringWithUpload = (str) => {
+    try {
+      const parsed = JSON.parse(str);
+      return Array.isArray(parsed) && parsed[0]?.upload;
+    } catch (e) {
+      return false;
+    }
+  };
+
+  const wrapUploadSmart = (value) => {
+    if (!value) return [];
+
+    // Already a JSON string in desired format
+    if (typeof value === "string" && isJSONStringWithUpload(value)) {
+      return [value];
+    }
+
+    // Assume it's a raw path
+    return [JSON.stringify(wrapUpload(value))];
+  };
 
   const empPersonalInfoTable = {
     empID: storedData.empID,
@@ -65,10 +91,6 @@ export const CandiToEmp = async ({ storedData }) => {
     bwnIcColour: storedData.bwnIcColour || "",
     bwnIcExpiry: storedData.bwnIcExpiry ? [storedData.bwnIcExpiry] : [],
     bwnIcNo: storedData.bwnIcNo || "",
-    cvCertifyUpload: storedData.uploadResume ? [storedData.uploadResume] : [],
-    qcCertifyUpload: storedData.uploadCertificate
-      ? [storedData.uploadCertificate]
-      : [],
     driveLic: storedData.driveLic || "",
     nationality: storedData.nationality || "",
     otherNation: storedData.otherNation || "",
@@ -78,24 +100,22 @@ export const CandiToEmp = async ({ storedData }) => {
     ppExpiry: storedData.ppExpiry ? [storedData.ppExpiry] : [],
     ppIssued: storedData.ppIssued ? [storedData.ppIssued] : [],
     ppNo: storedData.ppNo ? [storedData.ppNo] : [],
-    ppUpload: storedData.uploadPp ? [storedData.uploadPp] : [],
-    bwnUpload: storedData.uploadIc ? [storedData.uploadIc] : [],
     race: storedData.race || "",
     religion: storedData.religion || "",
+    cvCertifyUpload: wrapUploadSmart(storedData.uploadResume),
+    qcCertifyUpload: wrapUploadSmart(storedData.uploadCertificate),
+    ppUpload: wrapUploadSmart(storedData.uploadPp),
+    bwnUpload: wrapUploadSmart(storedData.uploadIc),
     loiUpload: storedData.loiFile
-      ? [storedData.loiFile]
-      : storedData.mobilizationDetails_loiFile
-      ? [storedData.mobilizationDetails_loiFile]
-      : [],
+      ? wrapUploadSmart(storedData.loiFile)
+      : wrapUploadSmart(storedData.mobilizationDetails_loiFile),
     paafCvevUpload: storedData.cvecFile
-      ? [storedData.cvecFile]
+      ? wrapUploadSmart(storedData.cvecFile)
       : storedData.paafFile
-      ? [storedData.paafFile]
+      ? wrapUploadSmart(storedData.paafFile)
       : storedData.mobilizationDetails_cvecFile
-      ? [storedData.mobilizationDetails_cvecFile]
-      : storedData.mobilizationDetails_paafFile
-      ? [storedData.mobilizationDetails_paafFile]
-      : [],
+      ? wrapUploadSmart(storedData.mobilizationDetails_cvecFile)
+      : wrapUploadSmart(storedData.mobilizationDetails_paafFile),
   };
 
   const CandiToEmpTable = {
@@ -127,13 +147,13 @@ export const CandiToEmp = async ({ storedData }) => {
     loiAcceptDate: storedData.mobilizationDetails_loiAcceptDate || "",
     loiDeclineDate: storedData.mobilizationDetails_loiDeclineDate || "",
     loiFile: storedData.loiFile
-      ? [storedData.loiFile]
+      ? wrapUploadSmart(storedData.loiFile)
       : storedData.mobilizationDetails_loiFile
-      ? [storedData.mobilizationDetails_loiFile]
+      ? wrapUploadSmart(storedData.mobilizationDetails_loiFile)
       : [],
     loiIssueDate: storedData.mobilizationDetails_loiIssueDate || "",
     uploadCertificate: storedData.uploadCertificate
-      ? [storedData.uploadCertificate]
+      ? wrapUploadSmart(storedData.uploadCertificate)
       : [],
     pcNoticePeriod: storedData.noticePeriod || "",
     venue: storedData.interviewDetails_venue || "",
@@ -164,7 +184,7 @@ export const CandiToEmp = async ({ storedData }) => {
       ? [storedData.WPTrackDetails_sawpRecivedDate]
       : [],
     sawpEmpUpload: storedData.WPTrackDetails_sawpFile
-      ? [storedData.WPTrackDetails_sawpFile]
+      ? wrapUploadSmart(storedData.WPTrackDetails_sawpFile)
       : [],
   };
 
@@ -183,7 +203,7 @@ export const CandiToEmp = async ({ storedData }) => {
       ? [storedData.WPTrackDetails_doerefno]
       : [],
     doeEmpUpload: storedData.WPTrackDetails_doefile
-      ? [storedData.WPTrackDetails_doefile]
+      ? wrapUploadSmart(storedData.WPTrackDetails_doefile)
       : [],
     nlmsEmpSubmit: storedData.WPTrackDetails_nlmssubmitdate
       ? [storedData.WPTrackDetails_nlmssubmitdate]
@@ -201,7 +221,7 @@ export const CandiToEmp = async ({ storedData }) => {
       ? [storedData.WPTrackDetails_nlmsexpirydate]
       : [],
     nlmsEmpUpload: storedData.WPTrackDetails_nlmsfile
-      ? [storedData.WPTrackDetails_nlmsfile]
+      ? wrapUploadSmart(storedData.WPTrackDetails_nlmsfile)
       : [],
     permitType: [],
   };
@@ -227,7 +247,7 @@ export const CandiToEmp = async ({ storedData }) => {
       ? [storedData.WPTrackDetails_bgendorsedate]
       : [],
     bankEmpUpload: storedData.WPTrackDetails_bgfile
-      ? [storedData.WPTrackDetails_bgfile]
+      ? wrapUploadSmart(storedData.WPTrackDetails_bgfile)
       : [],
     tbaPurchase: storedData.WPTrackDetails_tbapurchasedate
       ? [storedData.WPTrackDetails_tbapurchasedate]
@@ -242,7 +262,7 @@ export const CandiToEmp = async ({ storedData }) => {
       ? [storedData.WPTrackDetails_submitdateendorsement]
       : [],
     jpEmpUpload: storedData.WPTrackDetails_jitpafile
-      ? [storedData.WPTrackDetails_jitpafile]
+      ? wrapUploadSmart(storedData.WPTrackDetails_jitpafile)
       : [],
     lbrReceiptNo: storedData.WPTrackDetails_lbrDepoNum
       ? [storedData.WPTrackDetails_lbrDepoNum]
@@ -254,14 +274,14 @@ export const CandiToEmp = async ({ storedData }) => {
       ? [storedData.WPTrackDetails_lbrEndroseDate]
       : [],
     lbrDepoUpload: storedData.WPTrackDetails_lbrFile
-      ? [storedData.WPTrackDetails_lbrFile]
+      ? wrapUploadSmart(storedData.WPTrackDetails_lbrFile)
       : [],
   };
 
   const PassportValid = {
     empID: storedData.empID,
     immigEmpUpload: storedData.WPTrackDetails_visaFile
-      ? [storedData.WPTrackDetails_visaFile]
+      ? wrapUploadSmart(storedData.WPTrackDetails_visaFile)
       : [],
     immigRefNo: storedData.WPTrackDetails_immbdno || "",
     ppSubmit: storedData.WPTrackDetails_docsubmitdate
@@ -272,87 +292,14 @@ export const CandiToEmp = async ({ storedData }) => {
       : [],
   };
 
-
-
-  console.log("empPersonalInfoTable:", empPersonalInfoTable);
-  console.log("IDDetailsTable:", IDDetailsTable);
-  console.log("CandiToEmpTable:", CandiToEmpTable);
-  console.log("workInfoTable:", workInfoTable);
-  console.log("sawpDetails:", sawpDetails);
-  console.log("DNDetails:", DNDetails);
-  console.log("BJLDetails:", BJLDetails);
-  console.log("PassportValid:", PassportValid);
-
-  // try {
-
-  //   const empPIResponse = await client.graphql({
-  //     query: createEmpPersonalInfo,
-  //     variables: { input: empPersonalInfoTable },
-  //   });
-
-  //   console.log("createEmpPersonalInfo response:", empPIResponse);
-
-  //   const IDResponse = await client.graphql({
-  //     query: createIDDetails,
-  //     variables: { input: IDDetailsTable },
-  //   });
-
-  //   console.log("createIDDetails response:", IDResponse);
-
-  //   const candiResponse = await client.graphql({
-  //     query: createCandIToEMP,
-  //     variables: { input: CandiToEmpTable },
-  //   });
-
-  //   console.log("createCandIToEMP response:", candiResponse);
-
-  //   const workResponse = await client.graphql({
-  //     query: createEmpWorkInfo,
-  //     variables: { input: workInfoTable },
-  //   });
-
-  //   console.log("createEmpWorkInfo response:", workResponse);
-
-  //   const sawpResponse = await client.graphql({
-  //     query: createSawpDetails,
-  //     variables: { input: sawpDetails },
-  //   });
-
-  //   console.log("createSawpDetails response:", sawpResponse);
-
-  //   const dnResponse = await client.graphql({
-  //     query: createDNDetails,
-  //     variables: { input: DNDetails },
-  //   });
-
-  //   console.log("createDNDetails response:", dnResponse);
-
-  //   const bjlResponse = await client.graphql({
-  //     query: createBJLDetails,
-  //     variables: { input: BJLDetails },
-  //   });
-
-  //   console.log("createBJLDetails response:", bjlResponse);
-
-  //   const passportResponse = await client.graphql({
-  //     query: createPassportValid,
-  //     variables: { input: PassportValid },
-  //   });
-
-  //   console.log("createPassportValid response:", passportResponse);
-
-  // return {
-  //   success: true,
-  //   message: "All operations completed successfully",
-  // };
-  // } catch (err) {
-  //   console.log(err);
-  //   return {
-  //     success: false,
-  //     message: "An error occurred during submission",
-  //     error: err.message,
-  //   };
-  // }
+  // console.log("empPersonalInfoTable:", empPersonalInfoTable);
+  // console.log("IDDetailsTable:", IDDetailsTable);
+  // console.log("CandiToEmpTable:", CandiToEmpTable);
+  // console.log("workInfoTable:", workInfoTable);
+  // console.log("sawpDetails:", sawpDetails);
+  // console.log("DNDetails:", DNDetails);
+  // console.log("BJLDetails:", BJLDetails);
+  // console.log("PassportValid:", PassportValid);
 
   return client
     .graphql({
@@ -415,7 +362,6 @@ export const CandiToEmp = async ({ storedData }) => {
         variables: { input: PassportValid },
       });
     })
- 
     .then((passportResponse) => {
       console.log("createPassportValid response:", passportResponse);
       return {

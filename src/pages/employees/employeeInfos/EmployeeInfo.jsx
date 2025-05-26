@@ -564,19 +564,6 @@ export const EmployeeInfo = () => {
     //   }
     // });
 
-    keysToSet.forEach((key) => {
-      let valueToSet = result[key] || "";
-
-      if (typeof valueToSet === "string") {
-        setValue(key, valueToSet ? valueToSet.trim().toUpperCase() : "");
-      } else if (Array.isArray(valueToSet) && valueToSet.length > 0) {
-        const lastElement = valueToSet[valueToSet.length - 1];
-        setValue(key, [lastElement ? lastElement.trim().toUpperCase() : ""]);
-      } else {
-        setValue(key, valueToSet);
-      }
-    });
-
     if (
       Array.isArray(result.workExperience) &&
       result.workExperience.length > 0
@@ -601,6 +588,19 @@ export const EmployeeInfo = () => {
         console.warn("Failed to parse workExperience:", e);
       }
     }
+
+    keysToSet.forEach((key) => {
+      let valueToSet = result[key] || "";
+
+      if (typeof valueToSet === "string") {
+        setValue(key, valueToSet ? valueToSet.trim().toUpperCase() : "");
+      } else if (Array.isArray(valueToSet) && valueToSet.length > 0) {
+        const lastElement = valueToSet[valueToSet.length - 1];
+        setValue(key, [lastElement ? lastElement.trim().toUpperCase() : ""]);
+      } else {
+        setValue(key, valueToSet);
+      }
+    });
 
     const fieldsArray = ["bwnIcExpiry", "ppExpiry", "ppIssued"];
     fieldsArray.forEach((field) =>
