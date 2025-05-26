@@ -17,9 +17,11 @@ import { FaArrowLeft } from "react-icons/fa";
 import { useTempID } from "../../utils/TempIDContext";
 import { useCreateNotification } from "../../hooks/useCreateNotification";
 import useEmployeePersonalInfo from "../../hooks/useEmployeePersonalInfo";
+import { usePersonalInformation } from "../../hooks/usePersonalInformation";
 
 export const ProbationForm = ({ userID, userType }) => {
   const location = useLocation();
+  const { personalInfo: empPersonalInfo } = usePersonalInformation(userID);
   const { gmPosition, supervisorCheck } = useTempID();
   const { createNotification } = useCreateNotification();
   const { employeeData } = location.state || {};
@@ -559,7 +561,8 @@ export const ProbationForm = ({ userID, userType }) => {
             <p>has been ${
               data?.supervisorApproved || PFDataRecord.supervisorApproved
             } by Supervisor, ${
-            emailData?.supervisorName || "Not Mentioned"
+            // emailData?.supervisorName
+            empPersonalInfo?.name || "Not Mentioned"
           }.</p>
             <p>Click here https://hr.adininworks.co to view the assessment form.</p>
           </body>
