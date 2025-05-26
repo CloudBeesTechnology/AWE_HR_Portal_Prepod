@@ -123,6 +123,7 @@ export const AddEmployeeForm = () => {
   // console.log("flieNames", uploadedFileNames);
   // console.log("File 2", fileNames);
 
+
   useEffect(() => {
     const fetchData = async () => {
       try {

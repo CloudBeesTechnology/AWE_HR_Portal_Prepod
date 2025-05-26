@@ -36,9 +36,6 @@ const PersonalDetailsView = ({
   const [imageUrl, setImageUrl] = useState("");
   const personal = useRef();
 
-  console.log("PersonalDeatils:", personalDetails);
-
-  console.log("Education Details:", educationalDetails);
 
   // Helper function to fetch the cloud URL
   const linkToStorageFile = async (pathUrl) => {
