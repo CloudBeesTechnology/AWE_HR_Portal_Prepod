@@ -50,7 +50,6 @@ export const SawpForm = ({ candidate }) => {
 
   const {
     register,
-    handleSubmit,
     watch,
     formState: { errors },
     setValue,

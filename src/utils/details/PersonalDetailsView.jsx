@@ -365,7 +365,7 @@ const PersonalDetailsView = ({
 
       // Handle string values
       if (typeof value === "string") {
-        const cleaned = value.replace(/[\[\]"]/g, "").trim();
+        const cleaned = value.replace(/[\]"]/g, "").trim();
         return cleaned === "N/A" || cleaned === "" ? "N/A" : cleaned;
       }
 
