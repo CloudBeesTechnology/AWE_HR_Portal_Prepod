@@ -254,7 +254,7 @@ export const LMTable = () => {
       </div>
     );
   }
-  console.log(matchData, "matchedData");
+  // console.log(matchData, "matchedData");
 
   return (
     <section className="flex flex-col w-full mt-4">
@@ -315,7 +315,7 @@ export const LMTable = () => {
                     );
                   }
 
-                  console.log(item.empID, item.supervisorEmpID);
+                  // console.log(item.empID, item.supervisorEmpID);
 
                   return (
                     <tr

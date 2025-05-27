@@ -1,13 +1,9 @@
 import { generateClient } from "@aws-amplify/api";
-import { useCallback, useState } from "react";
-import {
-  createEmpPersonalInfo,
-  createIDDetails,
-} from "../../graphql/mutations";
+import { useCallback } from "react";
+import { createEmpPersonalInfo } from "../../graphql/mutations";
 
 export const EmpInfoFunc = () => {
   const client = generateClient();
-  const [errorEmpID, setErrorEmpID] = useState("");
   const SubmitEIData = useCallback(
     async ({ empValue }) => {
       if (!empValue) {
@@ -26,7 +22,6 @@ export const EmpInfoFunc = () => {
         dob,
         educLevel,
         email,
-
         empBadgeNo,
         empType,
         familyDetails,
@@ -41,75 +36,13 @@ export const EmpInfoFunc = () => {
         sapNo,
         bankName,
         bankAccNo,
-        bwnIcNo,
-        bwnIcColour,
-        bwnIcExpiry,
-        driveLic,
-        inducBrief,
-        inducBriefUp,
-        myIcNo,
-        nationality,
-        nationalCat,
-        otherNation,
-        otherRace,
-        otherReligion,
-        ppNo,
-        ppIssued,
-        ppExpiry,
-        ppDestinate,
-        preEmp,
-        preEmpPeriod,
         profilePhoto,
-        race,
-        religion,
-        bwnUpload,
-        applicationUpload,
-        cvCertifyUpload,
-        loiUpload,
-        myIcUpload,
-        paafCvevUpload,
-        ppUpload,
-        supportDocUpload,
-        qcCertifyUpload
       } = empValue;
 
-      const totalData1 = {
-        empID,
-        bwnIcNo,
-        bwnIcColour,
-        bwnIcExpiry,
-        driveLic,
-        inducBrief,
-        inducBriefUp,
-        myIcNo,
-        nationality,
-        nationalCat,
-        otherNation,
-        otherRace,
-        otherReligion,
-        ppNo,
-        ppIssued,
-        ppExpiry,
-        ppDestinate,
-        preEmp,
-        preEmpPeriod,
-        race,
-        religion,
-        bwnUpload,
-        applicationUpload,
-        cvCertifyUpload,
-        loiUpload,
-        myIcUpload,
-        paafCvevUpload,
-        ppUpload,
-        supportDocUpload,
-        qcCertifyUpload
-      };
       // console.log(totalData1,"totalData1 Create");
 
       const totalData = {
         empID,
-
         aTQualify,
         alternateNo,
         agent,
@@ -122,7 +55,6 @@ export const EmpInfoFunc = () => {
         educLevel,
         email,
         officialEmail,
-
         empBadgeNo,
         empType,
         familyDetails,
@@ -138,16 +70,11 @@ export const EmpInfoFunc = () => {
         bankName,
         bankAccNo,
       };
-      // console.log(totalData,"totalData");
+
+      console.log("Create Call Recived TotalData EmpInfo", totalData);
 
       try {
-        const [idResponse, empInfoResponse] = await Promise.all([
-          client.graphql({
-            query: createIDDetails,
-            variables: {
-              input: totalData1,
-            },
-          }),
+        const empInfoResponse = await Promise.all([
           client.graphql({
             query: createEmpPersonalInfo,
             variables: {
@@ -158,13 +85,13 @@ export const EmpInfoFunc = () => {
           }),
         ]);
 
-        // console.log(empInfoResponse);
+        console.log("Create Call EmpInfo Server Response", empInfoResponse);
       } catch (error) {
         console.error("Error executing GraphQL requests:", error);
-        throw error; // Rethrow error if needed
+        throw error;
       }
     },
     [client]
   );
-  return { SubmitEIData, errorEmpID };
+  return { SubmitEIData };
 };

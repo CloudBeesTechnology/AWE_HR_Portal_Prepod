@@ -18,8 +18,6 @@ export const CandiToEmp = async ({ storedData }) => {
     throw new Error("Missing required parameters");
   }
 
-  // console.log("Stored", storedData);
-
   const currentDate = new Date().toISOString().split("T")[0];
 
   const wrapUpload = (filePath) => {

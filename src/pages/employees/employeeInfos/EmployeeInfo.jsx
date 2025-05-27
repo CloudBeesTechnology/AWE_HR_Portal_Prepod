@@ -24,9 +24,11 @@ import { RowTen } from "./RowTen";
 import { RowEleven } from "./RowEleven";
 import { RowTwelve } from "./RowTwelve";
 import { EmpInfoFunc } from "../../../services/createMethod/EmpInfoFunc";
+import { IDDetailsFunc } from "../../../services/createMethod/IDDetailsFunc";
 import { FormField } from "../../../utils/FormField";
 import { DataSupply } from "../../../utils/DataStoredContext";
 import { UpdateEmpInfo } from "../../../services/updateMethod/UpdateEmpInfo";
+import { UpdateIDDetails } from "../../../services/updateMethod/UpdateIDDetails";
 import { getUrl } from "@aws-amplify/storage";
 import { RowThirteen } from "./RowThirteen";
 import { handleDeleteFile } from "../../../services/uploadsDocsS3/DeleteDocs";
@@ -46,12 +48,13 @@ export const EmployeeInfo = () => {
     });
   }, []);
   const { formattedPermissions } = useDeleteAccess();
+  const { SubmitEIData } = EmpInfoFunc();
+  const { SubmitIDData } = IDDetailsFunc();
+  const { UpdateEIValue } = UpdateEmpInfo();
+  const { UpdateIDValue } = UpdateIDDetails();
+  const { empPIData, IDData, dropDownVal, candyToEmp } = useContext(DataSupply);
   const [deletePopup, setdeletePopup] = useState(false);
   const [deleteTitle1, setdeleteTitle1] = useState("");
-  const { SubmitEIData, errorEmpID } = EmpInfoFunc();
-  const { UpdateEIValue } = UpdateEmpInfo();
-  const { empPIData, IDData, dropDownVal, candyToEmp } = useContext(DataSupply);
-  const [userDetails, setUserDetails] = useState([]);
   const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [selectedNationality, setSelectedNationality] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("");
@@ -155,7 +158,7 @@ export const EmployeeInfo = () => {
           .filter(Boolean);
         // console.log(mergedData);
 
-        setUserDetails(mergedData);
+        // setUserDetails(mergedData);
         setAllEmpDetails(mergedData);
       } catch (err) {
         console.log(err);
@@ -776,10 +779,7 @@ export const EmployeeInfo = () => {
   };
 
   const onSubmit = async (data) => {
-    // data.contractType = contractTypes;
-    // data.empType = empTypes;
-    // console.log(data);
-
+    // Helper function to format dates
     const formatDate = (date) =>
       date ? new Date(date).toLocaleDateString("en-CA") : null;
 
@@ -794,7 +794,6 @@ export const EmployeeInfo = () => {
       let firstValidIndex = newArray.findIndex((item) => item !== null);
 
       if (firstValidIndex !== -1) {
-        // Map through the newArray and remove consecutive duplicates
         const result = [];
         let lastAdded = null;
 
@@ -820,81 +819,70 @@ export const EmployeeInfo = () => {
       const checkingIDTable = IDData.find(
         (match) => match.empID === data.empID
       );
-      // console.log("PITABLE", checkingPITable);
-      // console.log("IDTABLE", checkingIDTable);
-      // const filtered = IDData.filter((item) => item.empID.trim() === "8715");
 
-      // console.log("Filtered empID === 8715", filtered);
+      const updateContract = removeLeadingNulls(
+        checkingPITable?.contractType,
+        contractType
+      );
+      const updateEmpType = removeLeadingNulls(
+        checkingPITable?.empType,
+        empType
+      );
 
-      if (checkingIDTable && checkingPITable) {
-        const updatedbwnIcExpiry = removeLeadingNulls(
-          checkingIDTable.bwnIcExpiry,
-          bwnIcExpiry
-        );
-        const updatedppExpiry = removeLeadingNulls(
-          checkingIDTable.ppExpiry,
-          ppExpiry
-        );
-        const updatedppIssued = removeLeadingNulls(
-          checkingIDTable.ppIssued,
-          ppIssued
-        );
-        const updateContract = removeLeadingNulls(
-          checkingPITable.contractType,
-          contractType
-        );
-        const updateEmpType = removeLeadingNulls(
-          checkingPITable.empType,
-          empType
-        );
+      const updatedbwnIcExpiry = removeLeadingNulls(
+        checkingIDTable?.bwnIcExpiry,
+        bwnIcExpiry
+      );
+      const updatedppExpiry = removeLeadingNulls(
+        checkingIDTable?.ppExpiry,
+        ppExpiry
+      );
+      const updatedppIssued = removeLeadingNulls(
+        checkingIDTable?.ppIssued,
+        ppIssued
+      );
+
+      if (checkingPITable) {
         const collectValue = {
           ...data,
-          empID: data?.empID?.trim(),
+          PITableID: checkingPITable.id,
+          empID: data.empID.trim(),
           profilePhoto: uploadedDocs.profilePhoto,
-          inducBriefUp: uploadedDocs.inducBriefUp,
-          bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
-          bwnIcExpiry: updatedbwnIcExpiry,
-          ppIssued: updatedppIssued,
-          ppExpiry: updatedppExpiry,
           contractType: updateContract,
           empType: updateEmpType,
-          applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
-          cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
-          loiUpload: JSON.stringify(uploadedFiles.loiUpload),
-          myIcUpload: JSON.stringify(uploadedFiles.myIcUpload),
-          paafCvevUpload: JSON.stringify(uploadedFiles.paafCvevUpload),
-          ppUpload: JSON.stringify(uploadedFiles.ppUpload),
-          supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
-          qcCertifyUpload: JSON.stringify(uploadedFiles.qcCertifyUpload),
           familyDetails: JSON.stringify(data.familyDetails),
-          PITableID: checkingPITable.id,
-          IDTable: checkingIDTable.id,
           email: data.email.trim().toLowerCase(),
           officialEmail: data.officialEmail.trim().toLowerCase(),
         };
-        console.log("updated", collectValue);
 
         await UpdateEIValue({ collectValue });
-        setShowTitle("Employee Personal Info updated successfully");
-        setNotification(true);
+        // console.log("Update EmpInfo", collectValue);
       } else {
-        const updatedbwnIcExpiry = removeLeadingNulls([], bwnIcExpiry);
-        const updatedppExpiry = removeLeadingNulls([], ppExpiry);
-        const updatedppIssued = removeLeadingNulls([], ppIssued);
-        const updateContract = removeLeadingNulls([], contractType);
-        const updateEmpType = removeLeadingNulls([], empType);
-
         const empValue = {
           ...data,
-          empID: data?.empID?.trim(),
+          empID: data.empID.trim(),
           profilePhoto: uploadedDocs.profilePhoto,
+          contractType: updateContract,
+          empType: updateEmpType,
+          familyDetails: JSON.stringify(data.familyDetails),
+          email: data.email.trim().toLowerCase(),
+          officialEmail: data.officialEmail.trim().toLowerCase(),
+        };
+
+        await SubmitEIData({ empValue });
+        // console.log("Create EmpInfo:", empValue);
+      }
+
+      if (checkingIDTable) {
+        const collectValue = {
+          ...data,
+          IDTable: checkingIDTable.id,
+          empID: data.empID.trim(),
           inducBriefUp: uploadedDocs.inducBriefUp,
           bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
           bwnIcExpiry: updatedbwnIcExpiry,
           ppIssued: updatedppIssued,
           ppExpiry: updatedppExpiry,
-          contractType: updateContract,
-          empType: updateEmpType,
           applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
           cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
           loiUpload: JSON.stringify(uploadedFiles.loiUpload),
@@ -903,20 +891,39 @@ export const EmployeeInfo = () => {
           ppUpload: JSON.stringify(uploadedFiles.ppUpload),
           supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
           qcCertifyUpload: JSON.stringify(uploadedFiles.qcCertifyUpload),
-          familyDetails: JSON.stringify(data.familyDetails),
-          email: data.email.trim().toLowerCase(),
-          officialEmail: data.officialEmail.trim().toLowerCase(),
         };
-        console.log("created", empValue);
 
-        await SubmitEIData({ empValue });
-        setShowTitle("Employee Personal Info saved successfully");
-        setNotification(true);
+        await UpdateIDValue({ collectValue });
+        // console.log("Update IDDetails", collectValue);
+      } else {
+        const empValue = {
+          ...data,
+          empID: data.empID.trim(),
+          inducBriefUp: uploadedDocs.inducBriefUp,
+          bwnUpload: JSON.stringify(uploadedFiles.bwnUpload),
+          bwnIcExpiry: updatedbwnIcExpiry,
+          ppIssued: updatedppIssued,
+          ppExpiry: updatedppExpiry,
+          applicationUpload: JSON.stringify(uploadedFiles.applicationUpload),
+          cvCertifyUpload: JSON.stringify(uploadedFiles.cvCertifyUpload),
+          loiUpload: JSON.stringify(uploadedFiles.loiUpload),
+          myIcUpload: JSON.stringify(uploadedFiles.myIcUpload),
+          paafCvevUpload: JSON.stringify(uploadedFiles.paafCvevUpload),
+          ppUpload: JSON.stringify(uploadedFiles.ppUpload),
+          supportDocUpload: JSON.stringify(uploadedFiles.supportDocUpload),
+          qcCertifyUpload: JSON.stringify(uploadedFiles.qcCertifyUpload),
+        };
+
+        await SubmitIDData({ empValue });
+        // console.log("Create IDDetails:", empValue);
       }
+      setShowTitle("Employee Personal Info saved successfully");
+      setNotification(true);
     } catch (error) {
-      console.log(error);
+      console.error("Error processing form submission:", error);
     }
   };
+
   const requiredPermissions = ["Employee Info"];
 
   const access = "Employee";
@@ -1026,9 +1033,9 @@ export const EmployeeInfo = () => {
               placeholder="Enter Employee ID"
               errors={errors}
             />
-            {errorEmpID && (
+            {/* {errorEmpID && (
               <p className="text-[red] text-[13px] text-center">{errorEmpID}</p>
-            )}
+            )} */}
           </div>
         </div>
         {/* Row2 */}

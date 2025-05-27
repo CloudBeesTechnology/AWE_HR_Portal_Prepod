@@ -1,13 +1,9 @@
 import { generateClient } from "@aws-amplify/api";
-import { useCallback, useState } from "react";
-import {
-  updateEmpPersonalInfo,
-  updateIDDetails,
-} from "../../graphql/mutations";
+import { useCallback } from "react";
+import { updateEmpPersonalInfo } from "../../graphql/mutations";
 
 export const UpdateEmpInfo = () => {
   const client = generateClient();
-  const [errorEmpID, setErrorEmpID] = useState("");
   const UpdateEIValue = useCallback(async ({ collectValue }) => {
     if (!collectValue) {
       throw new Error("Missing required parameters");
@@ -16,37 +12,7 @@ export const UpdateEmpInfo = () => {
     const {
       empID,
       PITableID,
-      IDTable,
-      bwnIcNo,
-      bwnIcColour,
-      bwnIcExpiry,
-      driveLic,
-      inducBrief,
-      inducBriefUp,
-      myIcNo,
-      nationality,
-      nationalCat,
-      otherNation,
-      otherRace,
-      otherReligion,
-      ppNo,
-      ppIssued,
-      ppExpiry,
-      ppDestinate,
-      preEmp,
-      preEmpPeriod,
       profilePhoto,
-      race,
-      religion,
-      bwnUpload,
-      applicationUpload,
-      cvCertifyUpload,
-      loiUpload,
-      myIcUpload,
-      paafCvevUpload,
-      ppUpload,
-      supportDocUpload,
-  
       aTQualify,
       alternateNo,
       agent,
@@ -72,13 +38,11 @@ export const UpdateEmpInfo = () => {
       sapNo,
       bankName,
       bankAccNo,
-      qcCertifyUpload
     } = collectValue;
 
     const totalData = {
       id: PITableID,
       empID,
- 
       aTQualify,
       alternateNo,
       agent,
@@ -107,75 +71,23 @@ export const UpdateEmpInfo = () => {
       bankAccNo,
     };
 
-    const totalData1 = {
-      id: IDTable,
-      empID,
-      bwnIcNo,
-      bwnIcColour,
-      bwnIcExpiry,
-      driveLic,
-      inducBrief,
-      inducBriefUp,
-      myIcNo,
-      nationality,
-      nationalCat,
-      otherNation,
-      otherRace,
-      otherReligion,
-      ppNo,
-      ppIssued,
-      ppExpiry,
-      ppDestinate,
-      preEmp,
-      preEmpPeriod,
-      race,
-      religion,
-      bwnUpload,
-      applicationUpload,
-      cvCertifyUpload,
-      loiUpload,
-      myIcUpload,
-      paafCvevUpload,
-      ppUpload,
-      supportDocUpload,
-      qcCertifyUpload
-    };
+    console.log("Update Call Recived TotalData EmpInfo", totalData);
 
     try {
-      const [
-        empInfoResponse,
-         idResponse
-        ] = await Promise.all([
+      const empInfoResponse = await Promise.all([
         client.graphql({
           query: updateEmpPersonalInfo,
           variables: {
             input: totalData,
           },
         }),
-        client.graphql({
-          query: updateIDDetails,
-          variables: {
-            input: totalData1,
-          },
-        }),
       ]);
-      // console.log(idResponse);
-      // console.log(empInfoResponse);
-      // if (idResponse.errors) {
-      //   console.error("Error in idResponse:", idResponse.errors);
-      // } else {
-      //   console.log("idResponse:", idResponse);
-      // }
 
-      // if (empInfoResponse.errors) {
-      //   console.error("Error in empInfoResponse:", empInfoResponse.errors);
-      // } else {
-      //   console.log("empInfoResponse:", empInfoResponse);
-      // }
+      console.log("Update Call EmpInfo Server Response", empInfoResponse);
     } catch (error) {
       console.error("Error executing GraphQL requests:", error);
-      throw error; // Rethrow error if needed
+      throw error;
     }
   }, []);
-  return { UpdateEIValue, errorEmpID };
+  return { UpdateEIValue };
 };
