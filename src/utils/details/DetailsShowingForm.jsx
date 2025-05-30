@@ -380,6 +380,19 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     return value;
   };
 
+  function formatEmployeeType(empType) {
+  if (!Array.isArray(empType) || empType.length === 0) {
+    return "Employee type not available";
+  }
+
+  // Remove duplicates
+  const uniqueTypes = [...new Set(empType.map(type => type.toUpperCase()))];
+
+  // Return the appropriate result
+  return uniqueTypes.length === 1 ? uniqueTypes[0] : uniqueTypes.join(", ");
+}
+
+
   const personalDetails = {
     Name: name,
     "Chinese character": chinese,
@@ -387,7 +400,7 @@ export const DetailsShowingForm = ({ passingValue, handleFormShow }) => {
     "Employee Badge Number": empBadgeNo,
     "Sap Number": sapNo,
     "Contract Type": contractType,
-    "Employee Type": empType,
+    "Employee Type": formatEmployeeType(empType),
     Position:
       Array.isArray(position) && position.length > 0
         ? position[0]
