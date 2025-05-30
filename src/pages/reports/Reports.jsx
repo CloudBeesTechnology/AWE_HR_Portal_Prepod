@@ -132,7 +132,6 @@ export const Reports = () => {
       return {
         ...piData,
         ...(IDData?.find((item) => item.empID === empID) || {}),
-        ...(workInfoData?.find((item) => item.empID === empID) || {}),
         ...(terminateData?.find((item) => item.empID === empID) || {}),
         ...(DNData?.find((item) => item.empID === empID) || {}),
         ...(PPValidsData?.find((item) => item.empID === empID) || {}),
@@ -147,6 +146,7 @@ export const Reports = () => {
         ...(contractForms?.find((item) => item.empID === empID) || {}),
         ...(IVSSDetails?.find((item) => item.empID === empID) || {}),
         ...additionalData, // Add the merged example data
+        ...(workInfoData?.find((item) => item.empID === empID) || {}),
       };
     });
 
