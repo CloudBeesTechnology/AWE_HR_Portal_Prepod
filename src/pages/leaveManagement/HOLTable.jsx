@@ -227,7 +227,7 @@ export const HOLTable = () => {
             allEmpDetails={secondartyData}
             searchIcon2={<IoSearch />}
             placeholder="Employee ID"
-            searchUserList={setMatchData}
+            searchUserList={setSearchResults}
             border="rounded-md"
           />
 

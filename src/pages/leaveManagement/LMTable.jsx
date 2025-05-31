@@ -35,6 +35,8 @@ export const LMTable = () => {
     noResults: false,
   });
 
+  console.log("SEARCH",searchResults);
+  
   useEffect(() => {
     let filteredData = mergedData
       .filter((items) => {
@@ -254,9 +256,8 @@ export const LMTable = () => {
       </div>
     );
   }
-  // console.log(matchData, "matchedData");
 
-  console.log("Code updated.");
+  // console.log("Code updated.");
 
   return (
     <section className="flex flex-col w-full mt-4">
@@ -270,7 +271,7 @@ export const LMTable = () => {
             allEmpDetails={secondartyData}
             searchIcon2={<IoSearch />}
             placeholder="Employee ID"
-            searchUserList={setMatchData}
+            searchUserList={setSearchResults}
             border="rounded-md"
           />
 
@@ -307,17 +308,15 @@ export const LMTable = () => {
                   let managerName = "";
                   let supervisorName = "";
                   if (item.managerEmpID) {
-                    managerName = empPIData.filter(
+                    managerName = empPIData.find(
                       (val) => val.empID === item.managerEmpID
                     );
                   }
                   if (item.supervisorEmpID) {
-                    supervisorName = empPIData.filter(
+                    supervisorName = empPIData.find(
                       (val) => val.empID === item.supervisorEmpID
                     );
                   }
-
-                  // console.log(item.empID, item.supervisorEmpID);
 
                   return (
                     <tr
@@ -335,7 +334,7 @@ export const LMTable = () => {
                       </td>
                       {userType !== "Supervisor" && userType !== "Manager" && (
                         <td className="py-3">
-                          {capitalizedLetter(supervisorName[0]?.name) || "N/A"}
+                          {capitalizedLetter(supervisorName?.name) || "N/A"}
                         </td>
                       )}
                       {userType !== "Manager" && (
@@ -345,7 +344,7 @@ export const LMTable = () => {
                       )}
                       {userType !== "Manager" && userType !== "Supervisor" && (
                         <td className="py-3">
-                          {capitalizedLetter(managerName[0]?.name) || "N/A"}
+                          {capitalizedLetter(managerName?.name) || "N/A"}
                         </td>
                       )}
                       {userType !== "Supervisor" && (
@@ -381,7 +380,6 @@ export const LMTable = () => {
                           onClick={() => {
                             handleClickForToggle();
                             handleViewClick(item, "LM");
-                            // console.log("item", item);
                           }}
                         >
                           {item["submitted Form"] || "View"}

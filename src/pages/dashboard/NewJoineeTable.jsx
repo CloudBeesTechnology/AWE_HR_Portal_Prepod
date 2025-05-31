@@ -124,7 +124,7 @@ export const NewJoineeTable = () => {
                   {joinee?.position?.[0]?.trim() ? joinee.position : "N/A"}
                 </td>
                 <td className="py-4 px-6 text-grey">
-                  {joinee.empType || "N/A"}
+                  {joinee.empType?.[0]?.trim() ? joinee.empType : "N/A"}
                 </td>
               </tr>
             );
