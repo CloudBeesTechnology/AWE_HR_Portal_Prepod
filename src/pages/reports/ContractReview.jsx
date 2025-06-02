@@ -3,8 +3,7 @@ import { FilterTable } from "./FilterTable";
 import { useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo/logo-with-name.svg";
 import { VscClose } from "react-icons/vsc";
-// import { formatDate } from "../../utils/formatDate";
-
+import { useTempID } from "../../utils/TempIDContext";
 export const ContractReview = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -15,6 +14,7 @@ export const ContractReview = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const { gmPosition } = useTempID();
 
   const tableHead = [
     "Emp ID",
@@ -29,9 +29,14 @@ export const ContractReview = () => {
     "Contract Start Date",
     "Contract End Date",
     "LD Expiry",
+    "Status",
     // "Duration of Renewal Contract",
     "Form",
   ];
+
+  const userID = localStorage.getItem("userID");
+  const userType = localStorage.getItem("userType");
+ 
 
   const formatDate = (date, type) => {
     if (Array.isArray(date)) {
@@ -81,80 +86,137 @@ export const ContractReview = () => {
     return balanceMonths > 0 ? `${balanceMonths} months` : "Few days more";
   };
 
+
   const contractExpiryMergedData = (data) => {
+    // const AWE87901 = data.find((item) => item.empID === "AWE87901");
+    // console.log("Full record for employee AWE87901:", AWE87901);
+
     const today = new Date();
-    const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-    const endOfTwoMonthsAfter = new Date(today.getFullYear(), today.getMonth() + 3, 1);
+    const startOfNextMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() + 1,
+      1
+    );
+    const endOfTwoMonthsAfter = new Date(
+      today.getFullYear(),
+      today.getMonth() + 3,
+      1
+    );
     endOfTwoMonthsAfter.setMilliseconds(-1);
-  
-    // Process and sort the data
+
     const sortedData = data
       .filter((item) => {
-        if ( Array.isArray(item.workStatus) && item.workStatus.length > 0) {
-          const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Get last element
-        
-          if (lastWorkStatus.toUpperCase() === "TERMINATION" || lastWorkStatus.toUpperCase() === "RESIGNATION"
-        ) {
-            return false; // Exclude items with TERMINATION or RESIGNATION
-          }   }
+        if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
+          const lastWorkStatus = item.workStatus[item.workStatus.length - 1];
+          if (
+            lastWorkStatus.toUpperCase() === "TERMINATION" ||
+            lastWorkStatus.toUpperCase() === "RESIGNATION"
+          ) {
+            return false;
+          }
+        }
+
         const contractEndDates = item.contractEnd || [];
         if (!Array.isArray(contractEndDates) || contractEndDates.length === 0) {
           return false;
         }
+
         const lastDate = contractEndDates[contractEndDates.length - 1];
-  
         if (!lastDate || item.contStatus) return false;
+
         const contractEnd = new Date(lastDate);
-  
-        return contractEnd >= startOfNextMonth && contractEnd <= endOfTwoMonthsAfter;
+        return (
+          contractEnd >= startOfNextMonth && contractEnd <= endOfTwoMonthsAfter
+        );
       })
       .map((item) => {
         const contractEndDates = item.contractEnd || [];
         const lastDate = contractEndDates[contractEndDates.length - 1];
-  
+
         const contractStartDates = item.contractStart || [];
         const startDate = contractStartDates[contractStartDates.length - 1];
-  
+
+        const lastSupervisor =
+          item.supervisor && item.supervisor.length > 0
+            ? item.supervisor[item.supervisor.length - 1]
+            : null;
+        const lastManager =
+          item.manager && item.manager.length > 0
+            ? item.manager[item.manager.length - 1]
+            : null;
+
+        const isDepartmentHead = item.depHead !== null;
+        const isHr = item.hrManager !== null;
+
+        // console.log("last",lastManager)
+
+        if (userType === "Supervisor") {
+          return null;
+        }
+
+        if (userType === "HR") {
+          return null;
+        }
+
+        if (userType === "Manager") {
+          if (lastManager !== userID) return null;
+        }
+
+        if (gmPosition === "GENERAL MANAGER") {
+          return null;
+        }
+
         return {
-          lastDate: new Date(lastDate), // Keep for sorting only
+          lastDate: new Date(lastDate) || null,
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
           nationality: item.nationality || "-",
           dateOfJoin: formatDate(item.doj) || "-",
           department: Array.isArray(item.department)
-          ? item.department[item.department.length - 1]
-          : "-",
-          otherDepartment:Array.isArray(item.otherDepartment)
-          ? item.otherDepartment[item.otherDepartment.length - 1]
-          : "-",
-        position: Array.isArray(item.position)
-          ? item.position[item.position.length - 1]
-          : "-",
+            ? item.department[item.department.length - 1]
+            : "-",
+          otherDepartment: Array.isArray(item.otherDepartment)
+            ? item.otherDepartment[item.otherDepartment.length - 1]
+            : "-",
+          position: Array.isArray(item.position)
+            ? item.position[item.position.length - 1]
+            : "-",
           otherPosition: Array.isArray(item.otherPosition)
-          ? item.otherPosition[item.otherPosition.length - 1]
-          : "-",
+            ? item.otherPosition[item.otherPosition.length - 1]
+            : "-",
           contractStartDate: formatDate(startDate) || "-",
           contractEndDate: formatDate(lastDate) || "-",
           nlmsEmpApproval: Array.isArray(item.nlmsEmpValid)
-          ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
-          : "-",
-          // contractRenewalDuration: calculateBalanceMonths(startDate, lastDate),
+            ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
+            : "-",
+          ...(userType === "SuperAdmin" ||
+            (userType === "Manager" && {
+              status: item.depHead ? "Approved" : "Pending",
+            })),
+          ...(userType === "HR" ||
+            (userType === "SuperAdmin" && {
+              status: item.hrManager ? "Approved" : "Pending",
+            })),
+          ...(gmPosition === "GENERAL MANAGER" && {
+            status: item.genManager ? "Approved" : "Pending",
+          }),
         };
       })
-      .sort((a, b) => a.lastDate - b.lastDate); // Sort using lastDate
-  
-    // Remove lastDate after sorting
+      .filter(Boolean)
+      .sort((a, b) => a.lastDate - b.lastDate);
+
     return sortedData.map(({ lastDate, ...rest }) => rest);
   };
-  
-  
 
   useEffect(() => {
     if (allData) {
       setTableBody(contractExpiryMergedData(allData));
     }
   }, [allData]);
+
+  // console.log("All Data", allData);
+  // console.log("Table body", tableBody);
 
   const handleViewDetails = (personData) => {
     setSelectedPerson(personData);
@@ -173,45 +235,46 @@ export const ContractReview = () => {
 
   const handleDate = (e, type) => {
     const value = e.target.value;
-  
-    // Update the respective date states
+
     if (type === "startDate") setStartDate(value);
     if (type === "endDate") setEndDate(value);
-  
-    // Use the updated value directly instead of relying on the state
 
-    const start = type === "startDate" ? new Date(value) : startDate
+    const start =
+      type === "startDate"
+        ? new Date(value)
+        : startDate
         ? new Date(startDate)
         : null;
     const end =
       type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
-    // Filter the data based on the date range
+
     const filtered = allData
       .filter((item) => {
-
         if (!Array.isArray(item.workStatus) || item.workStatus.length === 0) {
-          return false; // Return early if workStatus is undefined or an empty array
-      }
-      
-      const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Now it's safe
-      
-      if (lastWorkStatus?.toUpperCase() === "TERMINATION" || lastWorkStatus?.toUpperCase() === "RESIGNATION" 
-    ) {
-          return false; // Exclude records with TERMINATION or RESIGNATION
-      }
+          return false;
+        }
+
+        const lastWorkStatus = item.workStatus[item.workStatus.length - 1];
+
+        if (
+          lastWorkStatus?.toUpperCase() === "TERMINATION" ||
+          lastWorkStatus?.toUpperCase() === "RESIGNATION"
+        ) {
+          return false;
+        }
 
         if (!item.contStatus) {
           const expiryArray = item.contractEnd || [];
           const expiryDate = expiryArray.length
             ? new Date(expiryArray[expiryArray.length - 1])
             : null;
-  
+
           if (!expiryDate || isNaN(expiryDate.getTime())) return false;
-  
+
           if (start && end) return expiryDate >= start && expiryDate <= end;
           if (start) return expiryDate >= start;
           if (end) return expiryDate <= end;
-  
+
           return true;
         }
         return false;
@@ -221,39 +284,49 @@ export const ContractReview = () => {
         const lastDate = contractEndDates[contractEndDates.length - 1];
         const contractStartDates = item.contractStart || [];
         const startDate = contractStartDates[contractStartDates.length - 1];
-  
+
         return {
-          lastDate: new Date(lastDate), // Keep for sorting
+          lastDate: new Date(lastDate),
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
           nationality: item.nationality || "-",
           dateOfJoin: formatDate(item.doj) || "-",
           department: Array.isArray(item.department)
-          ? item.department[item.department.length - 1]
-          : "-",
-          otherDepartment:Array.isArray(item.otherDepartment)
-          ? item.otherDepartment[item.otherDepartment.length - 1]
-          : "-",
-        position: Array.isArray(item.position)
-          ? item.position[item.position.length - 1]
-          : "-",
+            ? item.department[item.department.length - 1]
+            : "-",
+          otherDepartment: Array.isArray(item.otherDepartment)
+            ? item.otherDepartment[item.otherDepartment.length - 1]
+            : "-",
+          position: Array.isArray(item.position)
+            ? item.position[item.position.length - 1]
+            : "-",
           otherPosition: Array.isArray(item.otherPosition)
-          ? item.otherPosition[item.otherPosition.length - 1]
-          : "-",
+            ? item.otherPosition[item.otherPosition.length - 1]
+            : "-",
           contractStartDate: formatDate(startDate) || "-",
           contractEndDate: formatDate(lastDate) || "-",
           nlmsEmpApproval: Array.isArray(item.nlmsEmpValid)
-          ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
-          : "-",
-          // contractRenewalDuration: calculateBalanceMonths(startDate, lastDate),
+            ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
+            : "-",
+          ...(userType === "SuperAdmin" ||
+            (userType === "Manager" && {
+              status: item.depHead ? "Approved" : "Pending",
+            })),
+          ...(userType === "HR" ||
+            (userType === "SuperAdmin" && {
+              status: item.hrManager ? "Approved" : "Pending",
+            })),
+          ...(gmPosition === "GENERAL MANAGER" && {
+            status: item.genManager ? "Approved" : "Pending",
+          }),
         };
-      }) .sort((a, b) => a.lastDate - b.lastDate) // Sort by lastDate
-      .map(({ lastDate, ...rest }) => rest); // Remove lastDate after sorting
-  
+      })
+      .sort((a, b) => a.lastDate - b.lastDate)
+      .map(({ lastDate, ...rest }) => rest);
+
     setFilteredData(filtered);
   };
-  
 
   return (
     <div>
@@ -304,10 +377,7 @@ export const ContractReview = () => {
             </p>
 
             <div className="flex justify-evenly items-center p-3">
-              <button
-                className="primary_btn"
-                onClick={handleNavigate}
-              >
+              <button className="primary_btn" onClick={handleNavigate}>
                 Go to Contract Form
               </button>
             </div>

@@ -22,7 +22,7 @@ import { usePersonalInformation } from "../../hooks/usePersonalInformation";
 export const ProbationForm = ({ userID, userType }) => {
   const location = useLocation();
   const { personalInfo: empPersonalInfo } = usePersonalInformation(userID);
-  const { gmPosition, supervisorCheck } = useTempID();
+  const { gmPosition, supervisorCheck, PDInfo } = useTempID();
   const { createNotification } = useCreateNotification();
   const { employeeData } = location.state || {};
   const probationEndDateStr = employeeData?.probationEndDate;
@@ -305,7 +305,7 @@ export const ProbationForm = ({ userID, userType }) => {
         probationEndFormatted || "Not Mentioned"
       } has been ${
         data?.supervisorApproved || PFDataRecord?.supervisorApproved
-      } by Supervisor, ${emailData?.supervisorName || "Not Mentioned"}.`;
+      } by Supervisor, ${PDInfo || "Not Mentioned"}.`;
 
       const notifyMessageManager = `Your Employee Mr./Ms. ${
         empPIRecord?.name

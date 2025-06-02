@@ -325,6 +325,7 @@ export const FilterTable = ({
                       className="text-sm border-b-2 border-[#CECECE]"
                     >
                       {Object.entries(row).map(([key, col], colIndex) => {
+                        //  console.log("Key", key + "Col", col);
                         const isExpired =
                           key === "expAndValid" && col === "EXPIRED";
                         const displayValue =
@@ -336,8 +337,18 @@ export const FilterTable = ({
                         return (
                           <td
                             key={colIndex}
-                            className={`border-b-2 text-center uppercase border-[#CECECE] p-2 ${
+                            className={`font-semibold border-b-2 text-center uppercase border-[#CECECE] p-2 ${
                               isExpired ? "text-[red]" : ""
+                            } ${
+                              key === "status"
+                                ? col?.toLowerCase() === "approved"
+                                  ? "text-[#339933]"
+                                  : col?.toLowerCase() === "reject"
+                                  ? "text-[red]"
+                                  : col?.toLowerCase() === "pending"
+                                  ? "text-[#E8A317]"
+                                  : ""
+                                : ""
                             }`}
                           >
                             {displayValue}
