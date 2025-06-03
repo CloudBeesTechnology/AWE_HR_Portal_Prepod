@@ -622,9 +622,9 @@ export const EmployeeInfo = () => {
       "ppDestinate",
       "bwnIcNo",
     ];
-
     changeString.forEach((field) => {
       const value = result[field];
+
       if (Array.isArray(value)) {
         const stringValue = value
           .join(", ")
@@ -855,8 +855,8 @@ export const EmployeeInfo = () => {
           officialEmail: data.officialEmail.trim().toLowerCase(),
         };
 
-        await UpdateEIValue({ collectValue });
-        // console.log("Update EmpInfo", collectValue);
+        // await UpdateEIValue({ collectValue });
+        console.log("Update EmpInfo", collectValue);
       } else {
         const empValue = {
           ...data,
@@ -869,8 +869,8 @@ export const EmployeeInfo = () => {
           officialEmail: data.officialEmail.trim().toLowerCase(),
         };
 
-        await SubmitEIData({ empValue });
-        // console.log("Create EmpInfo:", empValue);
+        // await SubmitEIData({ empValue });
+        console.log("Create EmpInfo:", empValue);
       }
 
       if (checkingIDTable) {
@@ -893,8 +893,8 @@ export const EmployeeInfo = () => {
           qcCertifyUpload: JSON.stringify(uploadedFiles.qcCertifyUpload),
         };
 
-        await UpdateIDValue({ collectValue });
-        // console.log("Update IDDetails", collectValue);
+        // await UpdateIDValue({ collectValue });
+        console.log("Update IDDetails", collectValue);
       } else {
         const empValue = {
           ...data,
@@ -914,8 +914,8 @@ export const EmployeeInfo = () => {
           qcCertifyUpload: JSON.stringify(uploadedFiles.qcCertifyUpload),
         };
 
-        await SubmitIDData({ empValue });
-        // console.log("Create IDDetails:", empValue);
+        // await SubmitIDData({ empValue });
+        console.log("Create IDDetails:", empValue);
       }
       setShowTitle("Employee Personal Info saved successfully");
       setNotification(true);

@@ -32,7 +32,7 @@ export const RowNine = ({register,errors,dropDownVal}) => {
       label="Contact Number"
       register={register}
       name="contactNo"
-      type="number"
+      type="text"
       errors={errors}
     />
   </div>
