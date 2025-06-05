@@ -132,10 +132,7 @@ export const EmployeeInfo = () => {
     },
   });
 
-  // console.log("eee");w
-  // const contractTypes = watch("contractType");
-  // const empTypes = watch("empType");
-  const watchedEmpID = watch("empID");
+
   const watchedProfilePhoto = watch("profilePhoto" || "");
 
   useEffect(() => {
@@ -199,14 +196,14 @@ export const EmployeeInfo = () => {
       return;
     }
 
-    setValue(type, selectedFile); // Update form state with the selected file
+    setValue(type, selectedFile); 
 
     if (selectedFile) {
       updateUploadingString(type, true);
       await uploadDocString(selectedFile, type, setUploadedDocs, watchedEmpID);
       setUploadedFileNames((prev) => ({
         ...prev,
-        [type]: selectedFile.name, // Dynamically store file name
+        [type]: selectedFile.name, 
       }));
     }
   };
@@ -387,7 +384,7 @@ export const EmployeeInfo = () => {
   // Utility function to check if a date is valid
   const isValidDate = (value) => {
     const date = new Date(value);
-    return !isNaN(date.getTime()); // Return true if the date is valid
+    return !isNaN(date.getTime()); 
   };
   const formatDate = (date) => {
     if (!date) {
@@ -396,7 +393,7 @@ export const EmployeeInfo = () => {
     const d = new Date(date);
     // Ensure the date is formatted as yyyy-MM-dd
     const year = d.getFullYear();
-    const month = (d.getMonth() + 1).toString().padStart(2, "0"); // Months are 0-indexed, so add 1
+    const month = (d.getMonth() + 1).toString().padStart(2, "0"); 
     const day = d.getDate().toString().padStart(2, "0");
 
     // Return the formatted date in yyyy-MM-dd format
@@ -442,16 +439,16 @@ export const EmployeeInfo = () => {
         cleanedString = cleanedString.slice(1, -1);
       }
 
-      // Ensure property names are wrapped in double quotes (fix malformed JSON)
-      cleanedString = cleanedString.replace(
-        /([{,])\s*([a-zA-Z0-9_]+)\s*:/g,
-        '$1"$2":'
-      );
+      // First remove surrounding quotes
+      cleanedString = cleanedString.replace(/^"+|"+$/g, "");
 
-      // cleanedString = cleanedString.replace(/'([^']+)'/g, '"$1"');
-
-      // Remove unnecessary backslashes
-      cleanedString = cleanedString.replace(/\\/g, "");
+      // Then check if property names are properly quoted
+      if (!/"\s*:/.test(cleanedString)) {
+        // Only apply these if properties aren't properly quoted
+        cleanedString = cleanedString.replace(/([a-zA-Z0-9_]+)(:)/g, '"$1"$2');
+        cleanedString = cleanedString.replace(/"(?!\\)/g, '\\"');
+        cleanedString = cleanedString.replace(/\\/g, "");
+      }
 
       // Capitalize words utility function
       const capitalizeWords = (str) =>
@@ -494,7 +491,7 @@ export const EmployeeInfo = () => {
       }
     } catch (error) {
       console.error("Error cleaning and parsing familyDetails:", error);
-      return []; // Return empty array if parsing fails
+      return [];
     }
   };
 
@@ -567,6 +564,19 @@ export const EmployeeInfo = () => {
     //   }
     // });
 
+    keysToSet.forEach((key) => {
+      let valueToSet = result[key] || "";
+
+      if (typeof valueToSet === "string") {
+        setValue(key, valueToSet ? valueToSet.trim().toUpperCase() : "");
+      } else if (Array.isArray(valueToSet) && valueToSet.length > 0) {
+        const lastElement = valueToSet[valueToSet.length - 1];
+        setValue(key, [lastElement ? lastElement.trim().toUpperCase() : ""]);
+      } else {
+        setValue(key, valueToSet);
+      }
+    });
+
     if (
       Array.isArray(result.workExperience) &&
       result.workExperience.length > 0
@@ -591,19 +601,6 @@ export const EmployeeInfo = () => {
         console.warn("Failed to parse workExperience:", e);
       }
     }
-
-    keysToSet.forEach((key) => {
-      let valueToSet = result[key] || "";
-
-      if (typeof valueToSet === "string") {
-        setValue(key, valueToSet ? valueToSet.trim().toUpperCase() : "");
-      } else if (Array.isArray(valueToSet) && valueToSet.length > 0) {
-        const lastElement = valueToSet[valueToSet.length - 1];
-        setValue(key, [lastElement ? lastElement.trim().toUpperCase() : ""]);
-      } else {
-        setValue(key, valueToSet);
-      }
-    });
 
     const fieldsArray = ["bwnIcExpiry", "ppExpiry", "ppIssued"];
     fieldsArray.forEach((field) =>
@@ -843,6 +840,7 @@ export const EmployeeInfo = () => {
       );
 
       if (checkingPITable) {
+
         const collectValue = {
           ...data,
           PITableID: checkingPITable.id,

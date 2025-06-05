@@ -77,7 +77,7 @@ export const UpdateIDDetails = () => {
       qcCertifyUpload,
     };
 
-    console.log("Update Call Recived TotalData IDDetails", totalData);
+    // console.log("Update Call Recived TotalData IDDetails", totalData);
 
     try {
       const idResponse = await Promise.all([
@@ -89,7 +89,7 @@ export const UpdateIDDetails = () => {
         }),
       ]);
 
-      console.log("Update Call IDetails Server Response", idResponse);
+      // console.log("Update Call IDetails Server Response", idResponse);
 
     } catch (error) {
       console.error("Error executing GraphQL requests:", error);

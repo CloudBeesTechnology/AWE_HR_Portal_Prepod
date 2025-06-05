@@ -196,8 +196,8 @@ export const AddNewForm = () => {
   }
 
   const onSubmit = handleSubmit(async (data) => {
-    console.log(data, "Data  checking");
-console.log(dropDownVal,"setpermission");
+//     console.log(data, "Data  checking");
+// console.log(dropDownVal,"setpermission");
 
     try {
       const desideCreateOrUpdate = userDataDetails.some((m) => {
@@ -215,9 +215,9 @@ console.log(dropDownVal,"setpermission");
           password: data.password,
           selectType: data.selectType,
           setPermissions: dropDownVal,
-          status: "Active",
+          // status: "Active",
         };
-        console.log("updateUserObject : ", updateUserObject);
+        // console.log("updateUserObject : ", updateUserObject);
         await client
           .graphql({
             query: updateUser,
@@ -251,30 +251,6 @@ console.log(dropDownVal,"setpermission");
           },
         })
           .then(async (res) => {
-            sendEmail(
-              `Verify Your Email to Activate Your Account`,
-              `
-              <html>
-                <body>
-                  <p>Dear ${nameperson},</p>
-                  <p>Please verify your email to activate your account before attempting to log in or change your password. <br/>
-                  You must complete the email verification process using the verification email sent to you earlier. <br/>
-                  Once verified, you can log in using the credentials provided below:
-                  </p>
-                  <p><strong>Username:</strong> ${username} <br /><strong>Temporary Password:</strong> ${password}</p>
-                
-                  <p>Visit <a href="http://employee.adininworks.co"> http://employee.adininworks.co </a> to log in. <br />Please note that changing your password is mandatory for account security. <br />Update your password immediately after logging in for the first time.</p>
-                  <p><strong>Important:</strong> Ensure you verify your email first to avoid any issues during login or password changes.</p>
-                
-                  <p>Best regards,</p>
-                  <p>AWE Team</p>
-                </body>
-              </html>
-            `,
-              "hr_no-reply@adininworks.com",
-              email
-            );
-
             const createNewUser = {
               empID: data.empID,
               password: data.password,
@@ -283,13 +259,36 @@ console.log(dropDownVal,"setpermission");
               status: "Active",
             };
             await client
-              .graphql({
-                query: createUser,
-                variables: {
-                  input: createNewUser,
-                },
-              })
-              .then((res) => {
+            .graphql({
+              query: createUser,
+              variables: {
+                input: createNewUser,
+              },
+            })
+            .then(async(res) => {
+             await sendEmail(
+                  `Verify Your Email to Activate Your Account`,
+                  `
+                  <html>
+                    <body>
+                      <p>Dear ${nameperson},</p>
+                      <p>Please verify your email to activate your account before attempting to log in or change your password. <br/>
+                      You must complete the email verification process using the verification email sent to you earlier. <br/>
+                      Once verified, you can log in using the credentials provided below:
+                      </p>
+                      <p><strong>Username:</strong> ${username} <br /><strong>Temporary Password:</strong> ${password}</p>
+                    
+                      <p>Visit <a href="http://employee.adininworks.co"> http://employee.adininworks.co </a> to log in. <br />Please note that changing your password is mandatory for account security. <br />Update your password immediately after logging in for the first time.</p>
+                      <p><strong>Important:</strong> Ensure you verify your email first to avoid any issues during login or password changes.</p>
+                    
+                      <p>Best regards,</p>
+                      <p>AWE Team</p>
+                    </body>
+                  </html>
+                `,
+                  "hr_no-reply@adininworks.com",
+                  email
+                );
                 setShowTitle("Created a User Successfully");
                 setNotification(true);
               })

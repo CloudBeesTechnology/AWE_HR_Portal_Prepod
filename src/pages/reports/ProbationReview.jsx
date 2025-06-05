@@ -2,16 +2,20 @@ import React, { useEffect, useState } from "react";
 import { FilterTable } from "./FilterTable";
 import logo from "../../assets/logo/logo-with-name.svg";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ProbationForm } from "./ProbationForm";
 import { VscClose } from "react-icons/vsc";
+import { useTempID } from "../../utils/TempIDContext";
 
 export const ProbationReview = () => {
   const location = useLocation();
   const { allData, title } = location.state || {};
+  const { gmPosition } = useTempID();
   const [tableBody, setTableBody] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  
+  const userID = localStorage.getItem("userID");
+  const userType = localStorage.getItem("userType");
   const [tableHead] = useState([
     "Emp ID",
     "Badge no",
@@ -23,11 +27,14 @@ export const ProbationReview = () => {
     "Other Position",
     "Probation Expiry Date",
     "Deadline to Return to HRD",
+    userType !== "SuperAdmin" && "Status",
     "Probation Form",
-  ]);
+  ].filter(Boolean));
 
   const [selectedPerson, setSelectedPerson] = useState(null);
   const navigate = useNavigate();
+
+  // console.log("UserType", userType);
 
   const formatDate = (date) => {
     if (Array.isArray(date)) {
@@ -55,68 +62,93 @@ export const ProbationReview = () => {
 
   const probationReviewMergedData = (data) => {
     const today = new Date();
-    const firstDayOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-    const lastDayOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 1);
-    lastDayOfNextMonth.setMilliseconds(-1); // Set to the end of the next month
-  
+    const firstDayOfNextMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() + 1,
+      1
+    );
+    const lastDayOfNextMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() + 2,
+      1
+    );
+    lastDayOfNextMonth.setMilliseconds(-1);
+
     const sortedData = data
       ?.filter((item) => {
-        // Filter items where probStatus is falsy
-        if (!item.probStatus && Array.isArray(item.workStatus) && item.workStatus.length > 0) {
-          const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Get last element
-        
-          if (lastWorkStatus.toUpperCase() === "TERMINATION" || 
-          lastWorkStatus.toUpperCase() === "RESIGNATION" || 
-          lastWorkStatus.toUpperCase() === "ACTIVE") {
-            return false; // Exclude items with TERMINATION or RESIGNATION
-          }   
-        
+        if (
+          !item.probStatus &&
+          Array.isArray(item.workStatus) &&
+          item.workStatus.length > 0
+        ) {
+          const lastWorkStatus = item.workStatus[item.workStatus.length - 1];
+
+          if (
+            lastWorkStatus.toUpperCase() === "TERMINATION" ||
+            lastWorkStatus.toUpperCase() === "RESIGNATION" ||
+            lastWorkStatus.toUpperCase() === "ACTIVE"
+          ) {
+            return false;
+          }
+
           const probationEndDates = item.probationEnd || [];
           const lastDate = probationEndDates[probationEndDates.length - 1];
-  
-          if (!lastDate) return false; // Skip items without a probation end date
-  
+
+          if (!lastDate) return false;
+
           const probationEnd = new Date(lastDate);
-          return probationEnd >= firstDayOfNextMonth && probationEnd <= lastDayOfNextMonth;
+          return (
+            probationEnd >= firstDayOfNextMonth &&
+            probationEnd <= lastDayOfNextMonth
+          );
         }
-        return false; // Exclude items with probStatus true
+        return false;
       })
       .map((item) => {
         const probationEndDates = item.probationEnd || [];
         const lastDate = probationEndDates[probationEndDates.length - 1];
-  
+
         const contractStartDates = item.contractStart || [];
         const startDate = contractStartDates[contractStartDates.length - 1];
-  
+
+        if (userType === "Manager") {
+          return null;
+        }
+
+        if (userType === "HR") {
+          return null;
+        }
+
         return {
-          lastDate: new Date(lastDate), // Keep for sorting only
+          lastDate: new Date(lastDate),
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
           dateOfJoin: formatDate(item.doj) || "-",
           department: Array.isArray(item.department)
-          ? item.department[item.department.length - 1]
-          : "-",
-          otherDepartment:Array.isArray(item.otherDepartment)
-          ? item.otherDepartment[item.otherDepartment.length - 1]
-          : "-",
-        position: Array.isArray(item.position)
-          ? item.position[item.position.length - 1]
-          : "-",
+            ? item.department[item.department.length - 1]
+            : "-",
+          otherDepartment: Array.isArray(item.otherDepartment)
+            ? item.otherDepartment[item.otherDepartment.length - 1]
+            : "-",
+          position: Array.isArray(item.position)
+            ? item.position[item.position.length - 1]
+            : "-",
           otherPosition: Array.isArray(item.otherPosition)
-          ? item.otherPosition[item.otherPosition.length - 1]
-          : "-",
+            ? item.otherPosition[item.otherPosition.length - 1]
+            : "-",
           probationEndDate: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
+          ...(userType === "Supervisor" && {
+            status: item.supervisorApproved ? "Approved" : "Pending",
+          }),
         };
       })
-      .sort((a, b) => a.lastDate - b.lastDate); // Sort using lastDate
-  
-    // Remove lastDate after sorting
+      .filter(Boolean)
+      .sort((a, b) => a.lastDate - b.lastDate);
+
     return sortedData.map(({ lastDate, ...rest }) => rest);
   };
-  
-    
 
   useEffect(() => {
     const mergedData = probationReviewMergedData(allData);
@@ -124,16 +156,16 @@ export const ProbationReview = () => {
   }, [allData]);
 
   const handleViewDetails = (personData) => {
-    // console.log("Person State:", personData);
-    setSelectedPerson(personData); // Set selected person's data
+    console.log("Person State:", personData);
+    setSelectedPerson(personData);
   };
 
   const closeModal = () => {
-    setSelectedPerson(null); // Close modal
+    setSelectedPerson(null);
   };
 
   const handleDownload = () => {
-    closeModal(); // Close modal
+    closeModal();
     if (selectedPerson) {
       navigate("/probForm", { state: { employeeData: selectedPerson } });
     }
@@ -141,12 +173,10 @@ export const ProbationReview = () => {
 
   const handleDate = (e, type) => {
     const value = e.target.value;
-  
-    // Update the appropriate date state
+
     if (type === "startDate") setStartDate(value);
     if (type === "endDate") setEndDate(value);
-  
-    // Parse start and end dates
+
     const start =
       type === "startDate"
         ? new Date(value)
@@ -155,39 +185,34 @@ export const ProbationReview = () => {
         : null;
     const end =
       type === "endDate" ? new Date(value) : endDate ? new Date(endDate) : null;
-  
-    // Filter and sort the data
+
     const filtered = allData
       ?.filter((item) => {
-        // Exclude items with probStatus true
-        // if (item.probStatus) return false;
         if (!Array.isArray(item.workStatus) || item.workStatus.length === 0) {
-          return false; // Return early if workStatus is undefined or an empty array
-      }
-      
-      const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Now it's safe
-      
-      if (lastWorkStatus?.toUpperCase() === "TERMINATION" || 
-      lastWorkStatus?.toUpperCase() === "RESIGNATION"||
-      lastWorkStatus.toUpperCase() === "ACTIVE"
-    ) {
-          return false; // Exclude records with TERMINATION or RESIGNATION
-      }
+          return false;
+        }
+
+        const lastWorkStatus = item.workStatus[item.workStatus.length - 1];
+
+        if (
+          lastWorkStatus?.toUpperCase() === "TERMINATION" ||
+          lastWorkStatus?.toUpperCase() === "RESIGNATION" ||
+          lastWorkStatus.toUpperCase() === "ACTIVE"
+        ) {
+          return false;
+        }
         const probationEndDates = item.probationEnd || [];
         const lastDate =
           probationEndDates.length > 0
             ? new Date(probationEndDates[probationEndDates.length - 1])
             : null;
-  
-        // If lastDate is invalid, exclude the item
+
         if (!lastDate || isNaN(lastDate.getTime())) return false;
-  
-        // Apply date range filters
+
         if (start && end) return lastDate >= start && lastDate <= end;
         if (start) return lastDate >= start;
         if (end) return lastDate <= end;
-  
-        // If no filters, include the item
+
         return true;
       })
       .map((item) => {
@@ -196,36 +221,35 @@ export const ProbationReview = () => {
           probationEndDates.length > 0
             ? probationEndDates[probationEndDates.length - 1]
             : null;
-  
+
         return {
-          lastDate: new Date(lastDate), // Keep for sorting
+          lastDate: new Date(lastDate),
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
           dateOfJoin: formatDate(item.doj) || "-",
           department: Array.isArray(item.department)
-          ? item.department[item.department.length - 1]
-          : "-",
-          otherDepartment:Array.isArray(item.otherDepartment)
-          ? item.otherDepartment[item.otherDepartment.length - 1]
-          : "-",
-        position: Array.isArray(item.position)
-          ? item.position[item.position.length - 1]
-          : "-",
+            ? item.department[item.department.length - 1]
+            : "-",
+          otherDepartment: Array.isArray(item.otherDepartment)
+            ? item.otherDepartment[item.otherDepartment.length - 1]
+            : "-",
+          position: Array.isArray(item.position)
+            ? item.position[item.position.length - 1]
+            : "-",
           otherPosition: Array.isArray(item.otherPosition)
-          ? item.otherPosition[item.otherPosition.length - 1]
-          : "-",
+            ? item.otherPosition[item.otherPosition.length - 1]
+            : "-",
           probationEndDate: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
         };
       })
-      .sort((a, b) => a.lastDate - b.lastDate) // Sort by lastDate
-      .map(({ lastDate, ...rest }) => rest); // Remove lastDate after sorting
-  
-    // Update filtered data state
+      .sort((a, b) => a.lastDate - b.lastDate)
+      .map(({ lastDate, ...rest }) => rest);
+
     setFilteredData(filtered);
   };
-  
+
   return (
     <div>
       <FilterTable
@@ -235,7 +259,7 @@ export const ProbationReview = () => {
         startDate={startDate}
         endDate={endDate}
         handleDate={handleDate}
-        handleViewDetails={handleViewDetails} // Pass the function to FilterTable
+        handleViewDetails={handleViewDetails}
       />
 
       {selectedPerson && (
@@ -274,15 +298,9 @@ export const ProbationReview = () => {
               <strong>Probation End Date:</strong>{" "}
               {selectedPerson.probationEndDate}
             </p>
-            {/* <p className="flex justify-between mb-2">
-              <strong>Contract End Date:</strong> {selectedPerson.probationEnd || '-' }
-            </p> */}
 
             <div className="flex justify-evenly items-center p-3">
-              <button
-                className="primary_btn"
-                onClick={handleDownload} // Handle the download action by navigating to the form
-              >
+              <button className="primary_btn" onClick={handleDownload}>
                 Go to Probation Form
               </button>
             </div>

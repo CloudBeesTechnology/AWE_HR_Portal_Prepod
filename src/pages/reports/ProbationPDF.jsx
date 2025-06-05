@@ -13,20 +13,23 @@ export const ProbationPDF = ({ userID, userType }) => {
   const [filteredData, setFilteredData] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [loading, setLoading] = useState(true); 
-  const [tableHead] = useState([
-    "Emp ID",
-    "Badge no",
-    "Name",
-    "Date of Join",
-    "Department",
-    "Other Department",
-    "Position",
-    "Other Position",
-    "Probation End Date",
-    "Deadline to Return to HRD",
-    "Probation Form",
-  ]);
+  const [loading, setLoading] = useState(true);
+  const [tableHead] = useState(
+    [
+      "Emp ID",
+      "Badge no",
+      "Name",
+      "Date of Join",
+      "Department",
+      "Other Department",
+      "Position",
+      "Other Position",
+      "Probation End Date",
+      "Deadline to Return to HRD",
+      userType !== "SuperAdmin" && "Status",
+      "Probation Form",
+    ].filter(Boolean)
+  );
 
   const [selectedPerson, setSelectedPerson] = useState(null);
   const navigate = useNavigate();
@@ -55,133 +58,145 @@ export const ProbationPDF = ({ userID, userType }) => {
     return date.toISOString().split("T")[0];
   };
 
-  const probationReviewMergedData = (data) => {
-    let supervisorCount = 0;
-    let managerCount = 0;  // Add manager count
-  
-    // console.log("Initial data:", data);  // Log the raw data
-  
+
+  const probationReviewMergedData = (data, userType, gmPosition, userID) => {
+    // const AWE87865 = data.find((item) => item.empID === "AWE87865");
+    // console.log("Full record for employee AWE87865:", AWE87865);
     const filteredData = data
       .filter((item) => {
-        // console.log("Processing item:", item);  // Log each item being processed
+        // Work status check
         if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
-          const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Get last element
-        
-          if (lastWorkStatus.toUpperCase() === "TERMINATION" || 
-          lastWorkStatus.toUpperCase() === "RESIGNATION"||
-          lastWorkStatus.toUpperCase() === "ACTIVE") {
-            return false; // Exclude items with TERMINATION or RESIGNATION
-          }}
-        const isProbationActive = 
+          const lastWorkStatus =
+            item.workStatus[item.workStatus.length - 1]?.toUpperCase();
+          if (
+            ["TERMINATION", "RESIGNATION", "ACTIVE"].includes(lastWorkStatus)
+          ) {
+            return false;
+          }
+        }
+
+        const isProbationActive =
           item.probStatus === true && item.probationEnd?.length > 0;
-        // console.log("Is probation active:", isProbationActive);  // Log if probation is active
-  
-        const lastSupervisor = 
+
+        const lastSupervisor =
           Array.isArray(item.supervisor) && item.supervisor.length > 0
             ? item.supervisor[item.supervisor.length - 1]
             : null;
-        // console.log("Last supervisor:", lastSupervisor);  // Log the last supervisor
-  
-        if (lastSupervisor === userID) {
-          supervisorCount++;
-          // console.log("Supervisor count increased:", supervisorCount);
-        }
-  
-        const lastManager = 
-          item.manager?.length > 0 ? item.manager[item.manager.length - 1] : null;
-        // console.log("Last manager:", lastManager);  // Log the last manager
-  
-        if (lastManager === userID) {
-          managerCount++;
-          console.log("Manager count increased:", managerCount);
-        }
-  
-        const isSupervisorApproved = item.supervisorApproved === "Approved";
-        const isManagerApproved = item.managerApproved === "Approved";
-        const isGmApproved = item.gmApproved === "Approved";
-        // console.log("Supervisor approved:", isSupervisorApproved);
-        // console.log("Manager approved:", isManagerApproved);
-        // console.log("GM approved:", isGmApproved);
-  
-        // Supervisor: filter based on last supervisor
+
+        const lastManager =
+          Array.isArray(item.manager) && item.manager.length > 0
+            ? item.manager[item.manager.length - 1]
+            : null;
+
+        const isSupervisorApproved =
+          item.supervisorApproved?.toUpperCase() === "APPROVED";
+        const isManagerApproved =
+          item.managerApproved?.toUpperCase() === "APPROVED";
+        const isGmApproved = item.gmApproved?.toUpperCase() === "APPROVED";
+
+        // Conditional filters by user role
         if (userType === "Supervisor") {
-          const supervisorFilter = isProbationActive && lastSupervisor === userID;
-          // console.log("Supervisor filter result:", supervisorFilter);
-          return supervisorFilter;
+          const result = isProbationActive;
+
+          return result;
         }
-  
-        // Manager: filter based on last manager, supervisor must have approved
-        if (userType === "Manager" && !gmPosition) {
-          const managerFilter = isProbationActive && lastManager === userID && isSupervisorApproved;
-          // console.log("Manager filter result:", managerFilter);
-          return managerFilter;
+
+        if (userType === "Manager" && gmPosition !== "GENERAL MANAGER") {
+          const result =
+            isProbationActive && lastManager === userID && isSupervisorApproved;
+
+          return result;
         }
-  
-        // General Manager: filter based on manager approval
+
         if (gmPosition === "GENERAL MANAGER") {
-          const gmFilter = isProbationActive && isManagerApproved;
-          // console.log("GM filter result:", gmFilter);
-          return gmFilter;
+          const result = isProbationActive && isManagerApproved;
+
+          return result;
         }
-  
-        // HR: filter based on GM approval
+
         if (userType === "HR") {
-          const hrFilter = isProbationActive && isGmApproved;
-          // console.log("HR filter result:", hrFilter);
-          return hrFilter;
+          const result = isProbationActive && isGmApproved;
+
+          return result;
         }
-  
+
         return isProbationActive;
       })
       .map((item) => {
-        // console.log("Mapping item:", item);  // Log the item before mapping
         if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
-          const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Get last element
-        
-          if (lastWorkStatus.toUpperCase() === "TERMINATION" || lastWorkStatus.toUpperCase() === "RESIGNATION") {
-            return false; // Exclude items with TERMINATION or RESIGNATION
-          }   }
+          const lastWorkStatus = item.workStatus[item.workStatus.length - 1];
+          if (
+            lastWorkStatus.toUpperCase() === "TERMINATION" ||
+            lastWorkStatus.toUpperCase() === "RESIGNATION"
+          ) {
+            return false;
+          }
+        }
+
         const probationEndDates = item.probationEnd || [];
         const lastDate = probationEndDates[probationEndDates.length - 1];
-        // console.log("Last probation end date:", lastDate);  // Log last probation end date
-  
+
         const formattedData = {
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
           name: item.name || "-",
           dateOfJoin: formatDate(item.doj) || "-",
           department: Array.isArray(item.department)
-          ? item.department[item.department.length - 1]
-          : "-",
-          otherDepartment:Array.isArray(item.otherDepartment)
-          ? item.otherDepartment[item.otherDepartment.length - 1]
-          : "-",
-        position: Array.isArray(item.position)
-          ? item.position[item.position.length - 1]
-          : "-",
+            ? item.department[item.department.length - 1]
+            : "-",
+          otherDepartment: Array.isArray(item.otherDepartment)
+            ? item.otherDepartment[item.otherDepartment.length - 1]
+            : "-",
+          position: Array.isArray(item.position)
+            ? item.position[item.position.length - 1]
+            : "-",
           otherPosition: Array.isArray(item.otherPosition)
-          ? item.otherPosition[item.otherPosition.length - 1]
-          : "-",
+            ? item.otherPosition[item.otherPosition.length - 1]
+            : "-",
           probationEndDate: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
+          ...(userType === "Supervisor" && {
+            status: item.supervisorApproved || "Pending",
+          }),
+          ...(userType === "Manager" &&
+            gmPosition !== "GENERAL MANAGER" && {
+              status: item.managerApproved || "Pending",
+            }),
+          ...(userType === "HR" && {
+            status: item.hrName ? "Approved" : "Pending",
+          }),
+          ...(gmPosition === "GENERAL MANAGER" && {
+            status: item.gmApproved || "Pending"
+          }) 
         };
-  
-        // console.log("Formatted data:", formattedData);  // Log the formatted data
-  
+
         return formattedData;
       });
-  
-    // console.log("Filtered and formatted data:", filteredData);  // Log the final filtered and formatted data
+
+    // console.log("✅ Total Employees After Filter:", filteredData.length);
     return filteredData;
   };
-  
+
+  // console.log("User Type:", userType);
+
+  // useEffect(() => {
+  //   setLoading(true);
+  //   const mergedData = probationReviewMergedData(allData);
+  //   setTableBody(mergedData);
+  //   setLoading(false);
+  // }, [allData]);
 
   useEffect(() => {
     setLoading(true);
-    const mergedData = probationReviewMergedData(allData);
+    const mergedData = probationReviewMergedData(
+      allData,
+      userType,
+      gmPosition,
+      userID
+    );
     setTableBody(mergedData);
     setLoading(false);
-  }, [allData]);
+  }, [allData, userType, gmPosition, userID]);
 
   const handleViewDetails = (personData) => {
     setSelectedPerson(personData);
@@ -220,19 +235,23 @@ export const ProbationPDF = ({ userID, userType }) => {
           item.probationEnd &&
           item.probationEnd.length > 0 &&
           (() => {
-            if (!Array.isArray(item.workStatus) || item.workStatus.length === 0) {
-              return false; // Return early if workStatus is undefined or an empty array
-          }
-          
-          const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Now it's safe
+            if (
+              !Array.isArray(item.workStatus) ||
+              item.workStatus.length === 0
+            ) {
+              return false;
+            }
 
+            const lastWorkStatus = item.workStatus[item.workStatus.length - 1];
 
-          if (lastWorkStatus?.toUpperCase() === "TERMINATION" || 
-          lastWorkStatus?.toUpperCase() === "RESIGNATION" ||
-          lastWorkStatus.toUpperCase() === "ACTIVE") {
-              return false; // Exclude records with TERMINATION or RESIGNATION
-          }
-         
+            if (
+              lastWorkStatus?.toUpperCase() === "TERMINATION" ||
+              lastWorkStatus?.toUpperCase() === "RESIGNATION" ||
+              lastWorkStatus.toUpperCase() === "ACTIVE"
+            ) {
+              return false;
+            }
+
             const expiryArray = item.probationEnd || [];
             const expiryDate = expiryArray.length
               ? new Date(expiryArray[expiryArray.length - 1])
@@ -257,19 +276,26 @@ export const ProbationPDF = ({ userID, userType }) => {
           name: item.name || "-",
           dateOfJoin: formatDate(item.doj) || "-",
           department: Array.isArray(item.department)
-          ? item.department[item.department.length - 1]
-          : "-",
-          otherDepartment:Array.isArray(item.otherDepartment)
-          ? item.otherDepartment[item.otherDepartment.length - 1]
-          : "-",
-        position: Array.isArray(item.position)
-          ? item.position[item.position.length - 1]
-          : "-",
+            ? item.department[item.department.length - 1]
+            : "-",
+          otherDepartment: Array.isArray(item.otherDepartment)
+            ? item.otherDepartment[item.otherDepartment.length - 1]
+            : "-",
+          position: Array.isArray(item.position)
+            ? item.position[item.position.length - 1]
+            : "-",
           otherPosition: Array.isArray(item.otherPosition)
-          ? item.otherPosition[item.otherPosition.length - 1]
-          : "-",
+            ? item.otherPosition[item.otherPosition.length - 1]
+            : "-",
           probationEndDate: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
+          ...(userType === "Supervisor" && {
+            supervisorStatus: item.supervisorApproved || "Pending",
+          }),
+          ...(userType === "Manager" &&
+            gmPosition !== "GENERAL MANAGER" && {
+              managerStatus: item.managerApproved || "Pending",
+            }),
         };
       });
 
@@ -284,6 +310,8 @@ export const ProbationPDF = ({ userID, userType }) => {
     );
   }
 
+  // console.log("Log 1", tableBody);
+  // console.log("Log 2", filteredData);
   return (
     <div>
       <FilterTable
@@ -334,10 +362,7 @@ export const ProbationPDF = ({ userID, userType }) => {
             </p>
 
             <div className="flex justify-evenly items-center p-3">
-              <button
-                className="primary_btn"
-                onClick={handleDownload}
-              >
+              <button className="primary_btn" onClick={handleDownload}>
                 Go to Probation Form
               </button>
             </div>

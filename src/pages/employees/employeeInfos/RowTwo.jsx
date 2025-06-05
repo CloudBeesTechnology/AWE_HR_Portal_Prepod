@@ -24,23 +24,23 @@ export const RowTwo = ({ register, errors, watch, setValue, control }) => {
         name="sapNo"
         errors={errors}
       />
-      
- <FormField
-            label="Contract Type"
-            register={register}
-            name="contractType"
-            type="select"
-            options={ContractTypeDD}
-            errors={errors}
-          />
-           <FormField
-            label="Employee Type"
-            register={register}
-            name="empType"
-            type="select"
-            options={EmpTypeDD}
-            errors={errors}
-          />
+
+      <FormField
+        label="Contract Type"
+        register={register}
+        name="contractType"
+        type="select"
+        options={ContractTypeDD}
+        errors={errors}
+      />
+      <FormField
+        label="Employee Type"
+        register={register}
+        name="empType"
+        type="select"
+        options={EmpTypeDD}
+        errors={errors}
+      />
       {/* Contract Type Field
       <Controller
         name="contractType"

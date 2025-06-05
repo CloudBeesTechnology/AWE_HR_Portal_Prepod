@@ -29,9 +29,12 @@ export const ContractPDF = ({ userID, userType }) => {
     "Contract Start Date",
     "Contract End Date",
     "LD Expiry",
+    "Status",
     // "Duration of Renewal Contract",
     "Form",
   ]);
+
+  // console.log("UserType", userType);
 
   const formatDate = (date) => {
     if (Array.isArray(date)) {
@@ -81,33 +84,26 @@ export const ContractPDF = ({ userID, userType }) => {
       ? `${balanceMonths} months`
       : "Few days more";
   };
-  
 
   const contractExpiryMergedData = (data) => {
-    const today = new Date();
-    const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-    const endOfTwoMonthsAfter = new Date(today.getFullYear(), today.getMonth() + 3, 0);
-  
-    // console.log("Today:", today);
-    // console.log("Start of Next Month:", startOfNextMonth);
-    // console.log("End of Two Months After:", endOfTwoMonthsAfter);
-  
+    //     const AWE87901 = data.find((item) => item.empID === "AWE87901");
+    // console.log("Full record for employee AWE87901:", AWE87901);
     const filteredData = data
       .filter((item) => {
-        if ( Array.isArray(item.workStatus) && item.workStatus.length > 0) {
-          const lastWorkStatus = item.workStatus[item.workStatus.length - 1]; // Get last element
-        
-          if (lastWorkStatus.toUpperCase() === "TERMINATION" || lastWorkStatus.toUpperCase() === "RESIGNATION"
-        ) {
-            return false; // Exclude items with TERMINATION or RESIGNATION
-          }   }
+        if (Array.isArray(item.workStatus) && item.workStatus.length > 0) {
+          const lastWorkStatus = item.workStatus[item.workStatus.length - 1];
+
+          if (
+            lastWorkStatus.toUpperCase() === "TERMINATION" ||
+            lastWorkStatus.toUpperCase() === "RESIGNATION"
+          ) {
+            return false;
+          }
+        }
         const contractEndDates = item.contractEnd || [];
         const lastDate = contractEndDates[contractEndDates.length - 1];
         const isContractActive = lastDate && item.contStatus === true;
-  
-        // console.log("Contract End Date:", lastDate);
-        // console.log("Is Contract Active:", isContractActive);
-  
+
         return isContractActive;
       })
       .map((item) => {
@@ -115,44 +111,50 @@ export const ContractPDF = ({ userID, userType }) => {
         const lastDate = contractEndDates[contractEndDates.length - 1];
         const contractStartDates = item.contractStart || [];
         const startDate = contractStartDates[contractStartDates.length - 1];
-  
-        const balanceMonths = calculateBalanceMonths(startDate, lastDate);
-        // console.log("Balance Months:", balanceMonths);
-  
-        const lastSupervisor = item.supervisor && item.supervisor.length > 0
-          ? item.supervisor[item.supervisor.length - 1]
-          : null;
-        const lastManager = item.manager && item.manager.length > 0
-          ? item.manager[item.manager.length - 1]
-          : null;
-  
-        const isDepartmentHead = item.depHead !== null;
-        const isHr = item.hrManager !== null;
-  
 
-         // Filtering logic based on user role
-         if (userType === "Supervisor" && lastSupervisor !== userID) {
-          // console.log("Skipping item, Supervisor does not match.");
-          return null; // Skip item if supervisor doesn't match
-        }
-  
-        // HR userType check
-        if (userType === "HR" && !isDepartmentHead) {
-          // console.log("Skipping item, HR userType and Department Head exists:", item);
-          return null; // Skip item if department head exists for HR
-        }
-  
-        if (userType === "Manager" && !gmPosition && lastManager !== userID) {
-          // console.log("Skipping item, Manager does not match or Supervisor not approved.");
+        const lastSupervisor =
+          item.supervisor && item.supervisor.length > 0
+            ? item.supervisor[item.supervisor.length - 1]
+            : null;
+        const lastManager =
+          item.manager && item.manager.length > 0
+            ? item.manager[item.manager.length - 1]
+            : null;
+
+        const isDepartmentHead = item.depHead;
+        const isHr = item.hrManager;
+
+        // console.log("Manager", isDepartmentHead);
+        // console.log("HR", isHr);
+
+        if (userType === "Supervisor") {
           return null;
         }
-  
-        // Check gmPosition value and log
-        if (gmPosition === "General Manager" && !isHr) {
-          // console.log("GM Position is General Manager and HR approval is missing:", item);
-          return null; // Skip item if GM has not approved
+
+        if (userType === "HR" && !isDepartmentHead) {
+          return null;
         }
-  
+
+        if (gmPosition === "GENERAL MANAGER" && !isHr) {
+          return null;
+        }
+
+        // if (gmPosition === "GENERAL MANAGER" && !isHr) {
+        //   return null;
+        // }
+
+        // if (
+        //   userType === "Manager" &&
+        //   gmPosition !== "GENERAL MANAGER" &&
+        //   lastManager !== userID
+        // ) {
+        //   return null;
+        // }
+
+        if (userType === "Manager" && gmPosition !== "GENERAL MANAGER") {
+          if (lastManager !== userID) return null;
+        }
+
         return {
           empID: item.empID || "-",
           empBadgeNo: item.empBadgeNo || "-",
@@ -160,42 +162,48 @@ export const ContractPDF = ({ userID, userType }) => {
           nationality: item.nationality || "-",
           dateOfJoin: formatDate(item.doj) || "-",
           department: Array.isArray(item.department)
-          ? item.department[item.department.length - 1]
-          : "-",
-          otherDepartment:Array.isArray(item.otherDepartment)
-          ? item.otherDepartment[item.otherDepartment.length - 1]
-          : "-",
-        position: Array.isArray(item.position)
-          ? item.position[item.position.length - 1]
-          : "-",
+            ? item.department[item.department.length - 1]
+            : "-",
+          otherDepartment: Array.isArray(item.otherDepartment)
+            ? item.otherDepartment[item.otherDepartment.length - 1]
+            : "-",
+          position: Array.isArray(item.position)
+            ? item.position[item.position.length - 1]
+            : "-",
           otherPosition: Array.isArray(item.otherPosition)
-          ? item.otherPosition[item.otherPosition.length - 1]
-          : "-",
+            ? item.otherPosition[item.otherPosition.length - 1]
+            : "-",
           contractStartDate: formatDate(startDate) || "-",
           contractEndDate: formatDate(lastDate) || "-",
           nlmsEmpApproval: Array.isArray(item.nlmsEmpValid)
-          ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
-          : "-",
-          // contractRenewalDuration: balanceMonths,
+            ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
+            : "-",
+          ...(userType === "SuperAdmin" ||
+            (userType === "Manager" &&
+              gmPosition !== "GENERAL MANAGER" && {
+                status: item.depHead ? "Approved" : "Pending",
+              })),
+          ...((userType === "HR" || userType === "SuperAdmin") && {
+            status: item.hrManager ? "Approved" : "Pending",
+          }),
+          ...(gmPosition === "GENERAL MANAGER" && {
+            status: item.genManager ? "Approved" : "Pending",
+          }),
         };
       })
       .filter((item) => item !== null);
-  
-    // console.log("Filtered Data for HR:", filteredData);
-  
+
     setStoreData(filteredData);
     return filteredData;
   };
-  
-
-  // console.log("stored data", storedData);
+  // console.log("GM", gmPosition);
 
   useEffect(() => {
-    const data = contractExpiryMergedData(allData);
-    // console.log("Processed Data to set:", data);
+    // if (!allData || !userType) return;
 
+    const data = contractExpiryMergedData(allData);
     setTableBody(data);
-  }, [allData]);
+  }, [allData, userType, gmPosition]);
 
   const handleDate = (e, type) => {
     const value = e.target.value;
@@ -214,17 +222,18 @@ export const ContractPDF = ({ userID, userType }) => {
 
     const filtered = tableBody
       .filter((data) => {
-        
         if (!Array.isArray(data.workStatus) || data.workStatus.length === 0) {
-          return false; // Return early if workStatus is undefined or an empty array
-      }
-      
-      const lastWorkStatus = data.workStatus[data.workStatus.length - 1]; // Now it's safe
-      
-      if (lastWorkStatus?.toUpperCase() === "TERMINATION" || lastWorkStatus?.toUpperCase() === "RESIGNATION"
-    ) {
-          return false; // Exclude records with TERMINATION or RESIGNATION
-      }
+          return false;
+        }
+
+        const lastWorkStatus = data.workStatus[data.workStatus.length - 1];
+
+        if (
+          lastWorkStatus?.toUpperCase() === "TERMINATION" ||
+          lastWorkStatus?.toUpperCase() === "RESIGNATION"
+        ) {
+          return false;
+        }
         const expiryArray = data?.contractEnd || [];
         const expiryDate = expiryArray.length
           ? new Date(expiryArray[expiryArray.length - 1])
@@ -251,32 +260,44 @@ export const ContractPDF = ({ userID, userType }) => {
           nationality: item.nationality || "-",
           dateOfJoin: formatDate(item.doj) || "-",
           department: Array.isArray(item.department)
-          ? item.department[item.department.length - 1]
-          : "-",
-          otherDepartment:Array.isArray(item.otherDepartment)
-          ? item.otherDepartment[item.otherDepartment.length - 1]
-          : "-",
-        position: Array.isArray(item.position)
-          ? item.position[item.position.length - 1]
-          : "-",
+            ? item.department[item.department.length - 1]
+            : "-",
+          otherDepartment: Array.isArray(item.otherDepartment)
+            ? item.otherDepartment[item.otherDepartment.length - 1]
+            : "-",
+          position: Array.isArray(item.position)
+            ? item.position[item.position.length - 1]
+            : "-",
           otherPosition: Array.isArray(item.otherPosition)
-          ? item.otherPosition[item.otherPosition.length - 1]
-          : "-",
+            ? item.otherPosition[item.otherPosition.length - 1]
+            : "-",
           contractStartDate: formatDate(startDate) || "-",
           contractEndDate: formatDate(lastDate) || "-",
           nlmsEmpApproval: Array.isArray(item.nlmsEmpValid)
-          ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
-          : "-",
+            ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
+            : "-",
+          ...(userType === "SuperAdmin" ||
+            (userType === "Manager" &&
+              gmPosition !== "GENERAL MANAGER" && {
+                managerStatus: item.depHead ? "Approved" : "Pending",
+              })),
+          ...(userType === "HR" ||
+            (userType === "SuperAdmin" && {
+              hrStatus: item.hrManager ? "Approved" : "Pending",
+            })),
+          ...(gmPosition === "GENERAL MANAGER" && {
+            hrStatus: item.genManager ? "Approved" : "Pending",
+          }),
         };
       });
 
     setFilteredData(filtered);
   };
+  // console.log("GM", gmPosition);
 
   const handleViewDetails = (personData) => {
     setSelectedPerson(personData);
     // console.log(personData);
-    
   };
 
   const closeModal = () => {
@@ -286,6 +307,8 @@ export const ContractPDF = ({ userID, userType }) => {
   const handleNavigate = () => {
     closeModal();
     if (selectedPerson) {
+      // console.log("Current", selectedPerson);
+
       navigate("/contractForms", { state: { employeeData: selectedPerson } });
     }
   };
@@ -340,10 +363,7 @@ export const ContractPDF = ({ userID, userType }) => {
             </p>
 
             <div className="flex justify-evenly items-center p-3">
-              <button
-                className="primary_btn"
-                onClick={handleNavigate}
-              >
+              <button className="primary_btn" onClick={handleNavigate}>
                 Go to Contract Form
               </button>
             </div>

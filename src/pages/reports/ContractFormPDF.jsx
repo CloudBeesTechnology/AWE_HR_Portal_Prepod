@@ -161,268 +161,17 @@ export const ContractFormPDF = ({ contentRef }) => {
   const subject = "Contract Completion Form Review";
   const from = "hr_no-reply@adininworks.com";
 
-  // const handleSubmit = async () => {
-  //   setIsLoading(true);
-  //   // console.log("SAVE", isLoading);
-
-  //   const selectedData = contractForms.find(
-  //     (data) => data.empID === employeeData?.empID
-  //   );
-
-  //   // console.log("SELECTED DATA", selectedData);
-
-  //   const createFormattedData = {
-  //     empID: employeeData.empID,
-  //     conAttn: formData.contract.conAttn,
-  //     depHead: formData.contract.depHead,
-  //     hrManager: formData.contract.hrManager,
-  //     genManager: formData.contract.genManager,
-  //     remarks: formData.contract.remarks,
-  //     remarkHr: formData.contract.remarkHr,
-  //     remarkGm: formData.contract.remarkGm,
-  //     renewalContract: formData.contract.renewalContract,
-  //     contStatus: true,
-  //   };
-
-  //   const empPIRecord = empPIData.find(
-  //     (match) => match?.empID === employeeData?.empID
-  //   );
-
-  //   const empName = empPIRecord?.name;
-  //   // console.log("Name", empName);
-  //   const WorkInfoRecord = workInfoData.find(
-  //     (match) => match?.empID === employeeData?.empID
-  //   );
-  //   // console.log("EMPData",empPIRecord);
-  //   const probationEndFormatted =
-  //     Array.isArray(WorkInfoRecord?.probationEnd) &&
-  //     WorkInfoRecord?.probationEnd?.length > 0
-  //       ? WorkInfoRecord?.probationEnd[WorkInfoRecord?.probationEnd?.length - 1]
-  //           .split("-")
-  //           .reverse()
-  //           .join("/")
-  //       : "Not mentioned";
-
-  //   console.log("date", probationEndFormatted);
-
-  //   const notifyMessageGM = `Your Employee Mr./Ms. ${
-  //     empName || "Not mentioned"
-  //   }'s contract period ending on ${probationEndFormatted || "Not Mentioned"},
-  //     has been confirmed by the GENERAL MANAGER.
-  //     `;
-
-  //   const notifyMessageHR = `Your Employee Mr./Ms. ${
-  //     empName || "Not mentioned"
-  //   }'s contract period ending on ${probationEndFormatted || "Not Mentioned"},
-  //     has been verified and checked by HR.`;
-
-  //   const notifyMessageManager = `Your Employee Mr./Ms. ${
-  //     empName || "Not mentioned"
-  //   }'s contract period ending on ${probationEndFormatted || "Not Mentioned"},
-  //     has been reviewed and added remarks by Manager, ${
-  //       managerData?.managerName || "Not Mentioned"
-  //     }.`;
-
-  //   try {
-  //     if (selectedData) {
-  //       const formattedData = {
-  //         id: selectedData.id,
-  //         conAttn: formData.contract.conAttn,
-  //         depHead: formData.contract.depHead,
-  //         hrManager: formData.contract.hrManager,
-  //         genManager: formData.contract.genManager,
-  //         remarks: formData.contract.remarks,
-  //         remarkHr: formData.contract.remarkHr,
-  //         remarkGm: formData.contract.remarkGm,
-  //         renewalContract: formData.contract.renewalContract,
-  //         contStatus: true,
-  //       };
-
-  //       if (userType === "HR" && !formData.contract.hrManager) {
-  //         alert("HR Name is is required!");
-  //         return;
-  //       }
-
-  //       if (gmPosition === "GENERAL MANAGER" && !formData.contract.genManager) {
-  //         alert("GM Name is is required!");
-  //         return;
-  //       }
-
-  //       await contractDetails({ ContractValue: formattedData });
-
-  //       // console.log("Updated Data", formattedData);
-  //       setTimeout(() => {
-  //         setShowTitle("Contract Form Updated Successfully");
-  //         setNotification(true);
-  //         setIsLoading(false);
-  //       }, 2000);
-
-  //       if (userType === "HR") {
-  //         if (Array.isArray(managerData?.genManagerEmail)) {
-  //           for (let email of managerData?.genManagerEmail) {
-  //             await sendEmail(
-  //               subject,
-  //               `<html>
-  //                 <body>
-  //                   <p>
-  //                     Your Employee Mr./Ms. ${
-  //                       empName || "Not mentioned"
-  //                     }'s contract period ending on ${
-  //                      probationEndFormatted || "Not Mentioned"
-  //                      },
-  //                      <br/>
-  //                     has been verified and checked by HR.
-  //                   </p>
-  //                   <p>
-  //                     Click here <a href="https://hr.adininworks.co">to view the updates.</a>
-  //                   </p>
-  //                 </body>
-  //               </html>`,
-  //               from,
-  //               email
-  //             );
-  //           }
-  //         }
-
-  //         if (Array.isArray(managerData.genManagerEmail)) {
-  //           for (let email of managerData.genManagerEmail) {
-  //             await createNotification({
-  //               empID: employeeData?.empID,
-  //               leaveType: subject,
-  //               message: notifyMessageHR,
-  //               senderEmail: "hr_no-reply@adininworks.com",
-  //               receipentEmail: email,
-  //             });
-  //           }
-  //         }
-  //       } else if (userType === "Manager" && gmPosition !== "GENERAL MANAGER") {
-  //         sendEmail(
-  //                    subject,
-  //                   `<html>
-  //                       <body>
-  //                          <p>
-  //                            Your Employee Mr./Ms. ${
-  //                              empName || "Not mentioned"
-  //                             }'s contract period ending on ${
-  //                             probationEndFormatted || "Not Mentioned"
-  //                             },
-  //                             <br/>
-  //                             has been reviewed and added remarks by Manager, ${
-  //                               managerData?.managerName || "Not Mentioned"
-  //                             }.
-  //                          </p>
-  //                         <p>Click here https://hr.adininworks.co" to view the updates.</p>
-  //                      </body>
-  //                    </html>`,
-  //                    from,
-  //                    managerData.hrEmail
-  //         );
-
-  //         await createNotification({
-  //           empID: employeeData?.empID,
-  //           leaveType: subject,
-  //           message: notifyMessageManager,
-  //           senderEmail: "hr_no-reply@adininworks.com",
-  //           receipentEmail: managerData?.hrEmail,
-  //         });
-  //       } else if (gmPosition === "GENERAL MANAGER") {
-  //         sendEmail(
-  //           subject,
-  //           `<html>
-  //           <body>
-  //              <p>
-  //                Your Employee Mr./Ms. ${
-  //                  empName || "Not mentioned"
-  //                }'s contract period ending on ${
-  //                 probationEndFormatted || "Not Mentioned"
-  //                },
-  //                <br/>
-  //                has been confirmed by the GENERAL MANAGER,
-  //              </p>
-  //              <p>Please proceed with the necessary actions.</p>
-  //             <p>Click here https://hr.adininworks.co to view the updates.</p>
-  //          </body>
-  //        </html>`,
-  //           from,
-  //           managerData.hrEmail
-  //         );
-
-  //         await createNotification({
-  //           empID: employeeData?.empID,
-  //           leaveType: subject,
-  //           message: notifyMessageGM,
-  //           senderEmail: "hr_no-reply@adininworks.com",
-  //           receipentEmail: managerData?.hrEmail,
-  //         });
-  //       }
-  //     } else {
-  //       if (
-  //         userType === "Manager" &&
-  //         gmPosition !== "GENERAL MANAGER" &&
-  //         !formData.contract.depHead
-  //       ) {
-  //         alert("Manager Name is is required!");
-  //         return;
-  //       }
-
-  //       if (userType === "Manager" && gmPosition !== "GENERAL MANAGER") {
-  //         sendEmail(
-  //                    subject,
-  //                    `<html>
-  //                       <body>
-  //                          <p>
-  //                            Your Employee Mr./Ms. ${
-  //                              empName || "Not mentioned"
-  //                            }'s contract period ending on ${
-  //                            probationEndFormatted || "Not Mentioned"
-  //                            },
-  //                             <br/>
-  //                             has been reviewed and added remarks by Manager, ${
-  //                               managerData?.managerName || "Not Mentioned"
-  //                             }.
-  //                          </p>
-  //                         <p>Click here https://hr.adininworks.co to view the contract completion  form.</p>
-  //                      </body>
-  //                    </html>`,
-  //                    from,
-  //                    managerData.hrEmail
-  //         );
-  //         await createNotification({
-  //           empID: employeeData?.empID,
-  //           leaveType: subject,
-  //           message: notifyMessageManager,
-  //           senderEmail: "hr_no-reply@adininworks.com",
-  //           receipentEmail: managerData?.hrEmail,
-  //         });
-  //       }
-
-  //       await contractForm(createFormattedData);
-
-  //       // console.log("Create Data", createFormattedData);
-  //       setTimeout(() => {
-  //         setShowTitle("Contract Form Created Successfully");
-  //         setNotification(true);
-  //           setIsLoading(false);
-
-  //       }, 2000);
-  //     }
-  //   } catch (err) {
-  //     console.log("error", err);
-  //     setIsLoading(false);
-  //   }
-  // };
-
   // Parse "DD-MM-YYYY" into a proper Date object
   const sendHRNotification = async (
     empName,
-    probationEndFormatted,
+    contractEndFormatted,
     managerData
   ) => {
     const subject = "Contract Verification by HR";
     const notifyMessageHR = `Your Employee Mr./Ms. ${
       empName || "Not mentioned"
     }'s contract period ending on ${
-      probationEndFormatted || "Not Mentioned"
+      contractEndFormatted || "Not Mentioned"
     }, has been verified and checked by HR.`;
 
     if (Array.isArray(managerData?.genManagerEmail)) {
@@ -434,7 +183,7 @@ export const ContractFormPDF = ({ contentRef }) => {
             <p>Your Employee Mr./Ms. ${
               empName || "Not mentioned"
             }'s contract period ending on ${
-            probationEndFormatted || "Not Mentioned"
+            contractEndFormatted || "Not Mentioned"
           },
               <br/>
               has been verified and checked by HR.
@@ -459,7 +208,7 @@ export const ContractFormPDF = ({ contentRef }) => {
 
   const sendManagerNotification = async (
     empName,
-    probationEndFormatted,
+    contractEndFormatted,
     PDInfo,
     managerData
   ) => {
@@ -467,7 +216,7 @@ export const ContractFormPDF = ({ contentRef }) => {
     const notifyMessageManager = `Your Employee Mr./Ms. ${
       empName || "Not mentioned"
     }'s contract period ending on ${
-      probationEndFormatted || "Not Mentioned"
+      contractEndFormatted || "Not Mentioned"
     }, has been reviewed and added remarks by Manager, ${
       PDInfo || "Not Mentioned"
     }.`;
@@ -479,7 +228,7 @@ export const ContractFormPDF = ({ contentRef }) => {
         <p>Your Employee Mr./Ms. ${
           empName || "Not mentioned"
         }'s contract period ending on ${
-        probationEndFormatted || "Not Mentioned"
+        contractEndFormatted || "Not Mentioned"
       },
           <br/>
           has been reviewed and added remarks by Manager, ${
@@ -505,14 +254,14 @@ export const ContractFormPDF = ({ contentRef }) => {
 
   const sendGMNotification = async (
     empName,
-    probationEndFormatted,
+    contractEndFormatted,
     managerData
   ) => {
     const subject = "Contract Confirmation by General Manager";
     const notifyMessageGM = `Your Employee Mr./Ms. ${
       empName || "Not mentioned"
     }'s contract period ending on ${
-      probationEndFormatted || "Not Mentioned"
+      contractEndFormatted || "Not Mentioned"
     }, has been confirmed by the GENERAL MANAGER.`;
 
     await sendEmail(
@@ -522,7 +271,7 @@ export const ContractFormPDF = ({ contentRef }) => {
         <p>Your Employee Mr./Ms. ${
           empName || "Not mentioned"
         }'s contract period ending on ${
-        probationEndFormatted || "Not Mentioned"
+        contractEndFormatted || "Not Mentioned"
       },
           <br/>
           has been confirmed by the GENERAL MANAGER,
@@ -584,10 +333,11 @@ export const ContractFormPDF = ({ contentRef }) => {
 
       // Prepare common data
       const empName = empPIRecord?.name;
-      const probationEndFormatted =
-        Array.isArray(WorkInfoRecord?.probationEnd) &&
-        WorkInfoRecord?.probationEnd?.length > 0
-          ? WorkInfoRecord.probationEnd[WorkInfoRecord.probationEnd.length - 1]
+
+      const contractEndFormatted =
+        Array.isArray(WorkInfoRecord?.contractEnd) &&
+        WorkInfoRecord?.contractEnd?.length > 0
+          ? WorkInfoRecord.contractEnd[WorkInfoRecord.contractEnd.length - 1]
               .split("-")
               .reverse()
               .join("/")
@@ -617,16 +367,16 @@ export const ContractFormPDF = ({ contentRef }) => {
 
       // Send appropriate notifications
       if (userType === "HR") {
-        await sendHRNotification(empName, probationEndFormatted, managerData);
+        await sendHRNotification(empName, contractEndFormatted, managerData);
       } else if (userType === "Manager" && gmPosition !== "GENERAL MANAGER") {
         await sendManagerNotification(
           empName,
-          probationEndFormatted,
+          contractEndFormatted,
           PDInfo,
           managerData
         );
       } else if (gmPosition === "GENERAL MANAGER") {
-        await sendGMNotification(empName, probationEndFormatted, managerData);
+        await sendGMNotification(empName, contractEndFormatted, managerData);
       }
 
       // Show success message
