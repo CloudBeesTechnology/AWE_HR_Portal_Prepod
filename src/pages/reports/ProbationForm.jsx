@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import logo from "../../assets/logo/logo-with-name.svg";
@@ -6,6 +6,7 @@ import { ConfirmationForm } from "./ConfirmationForm";
 import { ContractChoose } from "./ContractChoose";
 import { Link, useLocation } from "react-router-dom";
 import { SpinLogo } from "../../utils/SpinLogo";
+import { ProbDownload } from "../../utils/ProbDownload";
 import { useState } from "react";
 import { ProbFormFun } from "../../services/createMethod/ProbFormFun";
 import { UpdateProbForm } from "../../services/updateMethod/UpdateProbForm";
@@ -13,23 +14,22 @@ import { probationFormSchema } from "../../services/ReportValidation";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { useContext } from "react";
 import { sendEmail } from "../../services/EmailServices";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaSave, FaPrint, FaDownload } from "react-icons/fa";
 import { useTempID } from "../../utils/TempIDContext";
 import { useCreateNotification } from "../../hooks/useCreateNotification";
+import { useReactToPrint } from "react-to-print";
 import useEmployeePersonalInfo from "../../hooks/useEmployeePersonalInfo";
-import { usePersonalInformation } from "../../hooks/usePersonalInformation";
 
 export const ProbationForm = ({ userID, userType }) => {
   const location = useLocation();
-  const { personalInfo: empPersonalInfo } = usePersonalInformation(userID);
   const { gmPosition, supervisorCheck, PDInfo } = useTempID();
   const { createNotification } = useCreateNotification();
   const { employeeData } = location.state || {};
   const probationEndDateStr = employeeData?.probationEndDate;
-  // console.log(probationEndDateStr);
   const { ProbFormsData } = ProbFormFun();
   const { UpdateProb } = UpdateProbForm();
   const [isLoading, setIsLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const { empPIData, workInfoData, ProbFData } = useContext(DataSupply);
 
   const [emailData, setEmailData] = useState({
@@ -45,6 +45,11 @@ export const ProbationForm = ({ userID, userType }) => {
     skilledAndUnskilled: null,
   });
 
+  // console.log(ProbFData);
+  // console.log("Date",gmPosition);
+
+  const [userDetails, setUserDetails] = useState([]);
+  const [allEmpDetails, setAllEmpDetails] = useState([]);
   const [formData, setFormData] = useState({
     probData: {
       adaptability: "",
@@ -95,6 +100,7 @@ export const ProbationForm = ({ userID, userType }) => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(probationFormSchema),
@@ -105,8 +111,6 @@ export const ProbationForm = ({ userID, userType }) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const currentDate = new Date();
-  // Parse "DD-MM-YYYY" into a proper Date object
   let probationMonthYear = "Invalid Date";
 
   if (probationEndDateStr) {
@@ -127,8 +131,6 @@ export const ProbationForm = ({ userID, userType }) => {
   useEffect(() => {
     if (fetchedPersonalInfo) {
       setPersonalInfo(fetchedPersonalInfo);
-
-      // console.log("Personal Info updated:", fetchedPersonalInfo);
     }
   }, [fetchedPersonalInfo]);
 
@@ -187,6 +189,7 @@ export const ProbationForm = ({ userID, userType }) => {
       }
 
       if (workInfo.skillPool) {
+        // console.log("Work info",workInfo)
         if (
           workInfo.skillPool.includes("SKILLED") ||
           workInfo.skillPool.includes("UNSKILLED")
@@ -204,6 +207,8 @@ export const ProbationForm = ({ userID, userType }) => {
         )
       );
 
+      // console.log("Filtered GENERAL MANAGER Positions:", generalManagerPositions);
+
       if (generalManagerPositions?.length > 0) {
         const gmEmails = [];
         const gmName = [];
@@ -220,15 +225,16 @@ export const ProbationForm = ({ userID, userType }) => {
               gmOfficialMail: gmEmails,
               gmName: gmName,
             }));
+            // console.log("Updated Email Data with GM Email:", gmInfo.officialEmail);
           } else {
-            console.log("GM Info not found.");
+            // console.log("GM Info not found.");
           }
         });
       } else {
-        console.log("No General Manager positions found.");
+        // console.log("No General Manager positions found.");
       }
     } else {
-      console.log("No work info found for employee ID:", employeeData?.empID);
+      // console.log("No work info found for employee ID:", employeeData?.empID);
     }
   }, [workInfoData, employeeData?.empID, empPIData]);
 
@@ -236,9 +242,64 @@ export const ProbationForm = ({ userID, userType }) => {
     // console.log("Email Data has changed:", emailData);
   }, [emailData]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const mergedData = empPIData
+          .map((emp) => {
+            const WIDetails = workInfoData
+              ? workInfoData.find((user) => user.empID === emp.empID)
+              : {};
+            const provDetails = ProbFData
+              ? ProbFData.find((user) => user.empID === emp.empID)
+              : {};
+
+            return {
+              ...emp,
+              ...WIDetails,
+              ...provDetails,
+            };
+          })
+          .filter(Boolean);
+
+        setUserDetails(mergedData);
+        setAllEmpDetails(mergedData);
+      } catch (err) {
+        // console.log(err);
+      }
+    };
+    fetchData();
+  }, [empPIData, workInfoData, ProbFData]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const mergedData = empPIData.map((emp) => {
+          const WIDetails =
+            workInfoData?.find((user) => user.empID === emp.empID) || {};
+          const provDetails =
+            ProbFData?.find((user) => user.empID === emp.empID) || {};
+
+          return {
+            ...emp,
+            ...WIDetails,
+            ...provDetails,
+          };
+        });
+        setUserDetails(mergedData);
+      } catch (err) {
+        // console.error("Error fetching data:", err);
+      }
+    };
+    fetchData();
+  }, [empPIData, workInfoData, ProbFData]);
+
   // auto fetch
   useEffect(() => {
     if (ProbFData.length === 0 || !employeeData?.empID) {
+      // console.log(
+      //   ProbFData.length === 0 ? "No data in ProbFData" : "No employee ID found"
+      // );
       return;
     }
 
@@ -247,6 +308,7 @@ export const ProbationForm = ({ userID, userType }) => {
     );
 
     if (!fetchedProbData) {
+      // console.log("No matching contract data found");
       return;
     }
 
@@ -277,6 +339,8 @@ export const ProbationForm = ({ userID, userType }) => {
   const gmSubject = "Probation Assessment Review";
   const hrSubject = "Probation Period Expiry Notification";
   // const to = "hariharanofficial2812@gmail.com"
+
+  // console.log("EmailData", emailData);
 
   const onSubmit = async (data) => {
     setIsLoading(true);
@@ -453,6 +517,8 @@ export const ProbationForm = ({ userID, userType }) => {
           setShowTitle("Probation form updated successfully");
         }, 1000);
 
+        // console.log("update", formattedData);
+
         sendEmails(
           data,
           empPIRecord,
@@ -509,6 +575,7 @@ export const ProbationForm = ({ userID, userType }) => {
         }
 
         await ProbFormsData({ ProbValue });
+        // console.log("CR");
 
         setIsLoading(false);
 
@@ -536,6 +603,8 @@ export const ProbationForm = ({ userID, userType }) => {
     }
   };
 
+  // console.log("EmailData", emailData)
+
   const sendEmails = async (
     data,
     empPIRecord,
@@ -560,10 +629,7 @@ export const ProbationForm = ({ userID, userType }) => {
           }</p>
             <p>has been ${
               data?.supervisorApproved || PFDataRecord.supervisorApproved
-            } by Supervisor, ${
-            // emailData?.supervisorName
-            empPersonalInfo?.name || "Not Mentioned"
-          }.</p>
+            } by Supervisor, ${PDInfo || "Not Mentioned"}.</p>
             <p>Click here https://hr.adininworks.co to view the assessment form.</p>
           </body>
         </html>`,
@@ -584,6 +650,8 @@ export const ProbationForm = ({ userID, userType }) => {
       }
 
       if (userType === "Manager" && gmPosition !== GM) {
+        // console.log("GM block");
+
         // Sending email to GM if applicable
         if (emailData.skilledAndUnskilled === null) {
           if (Array.isArray(emailData.gmOfficialMail)) {
@@ -599,9 +667,7 @@ export const ProbationForm = ({ userID, userType }) => {
                 }</p>
                   <p>has been reviewed and ${
                     data?.managerApproved || PFDataRecord.managerApproved
-                  } by the Manager, ${
-                  emailData?.managerName || "Not Mentioned"
-                }.</p>
+                  } by the Manager, ${PDInfo || "Not Mentioned"}.</p>
                   <p>Click here https://hr.adininworks.co to view the assessment form.</p>
                 </body>
               </html>`,
@@ -635,9 +701,7 @@ export const ProbationForm = ({ userID, userType }) => {
             }</p>
               <p>has been reviewed and ${
                 data?.managerApproved || PFDataRecord.managerApproved
-              } by the Manager, ${
-              emailData?.managerName || "Not Mentioned"
-            }.</p>
+              } by the Manager, ${PDInfo || "Not Mentioned"}.</p>
               <p>Please proceed with the necessary actions.</p>
               <p>Click here https://hr.adininworks.co to view the updates.</p>
             </body>
@@ -657,6 +721,8 @@ export const ProbationForm = ({ userID, userType }) => {
           // alert(`Email sent successfully to HR's mail: ${emailData.hrOfficialmail}\n\nEmail Content:\nYour Employee Mr./Ms. ${empPIRecord?.name || "Not mentioned"}'s probation period ending on ${probationEndFormatted || "Not Mentioned"}\n\nhas been reviewed and ${data?.managerApproved || PFDataRecord.managerApproved} by the Manager, ${emailData?.managerName || "Not Mentioned"}.\n\nPlease proceed with the necessary actions.`);
         }
       } else if (gmPosition === GM) {
+        // console.log("HR Block");
+
         // Sending email to HR if GM position is set
         await sendEmail(
           hrSubject,
@@ -669,9 +735,7 @@ export const ProbationForm = ({ userID, userType }) => {
           }</p>
             <p>has been reviewed and ${
               data?.gmApproved || PFDataRecord.gmApproved
-            } by the General Manager, ${
-            personalInfo?.name || "Not Mentioned"
-          }.</p>
+            } by the General Manager, ${PDInfo || "Not Mentioned"}.</p>
             <p>Please proceed with the necessary actions.</p>
             <p>Click here https://hr.adininworks.co to view the updates.</p>
           </body>
@@ -696,192 +760,354 @@ export const ProbationForm = ({ userID, userType }) => {
     }
   };
 
+  const probationFormRef = useRef();
+
+  const handlePrint = useReactToPrint({
+    content: () => probationFormRef.current,
+    onBeforePrint: () => console.log("Preparing to print PDF..."),
+    onAfterPrint: () => console.log("Print complete"),
+  });
+
+  const handleDownloadClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDownloading(true);
+    // Hide buttons before download
+    const editButton = document.getElementById("left-button");
+    const downloadButton = document.getElementById("download-button");
+    const printButton = document.getElementById("print-button");
+    const saveButton = document.getElementById("save-button");
+
+    if (editButton) editButton.style.visibility = "hidden";
+    if (downloadButton) downloadButton.style.visibility = "hidden";
+    if (printButton) printButton.style.visibility = "hidden";
+    if (saveButton) saveButton.style.visibility = "hidden";
+
+    // Wait for the PDF to be generated, then restore the buttons.
+    ProbDownload("capture-section");
+
+    setTimeout(() => {
+      if (editButton) editButton.style.visibility = "visible";
+      if (downloadButton) downloadButton.style.visibility = "visible";
+      if (printButton) printButton.style.visibility = "visible";
+      if (saveButton) saveButton.style.visibility = "visible";
+      setIsDownloading(false);
+    }, 500);
+  };
+
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="p-10 bg-white shadow-md w-full px-20 mx-auto"
-    >
-      {/* Header */}
-      <section className="flex items-center mb-16">
-        <Link to="/reports" className="text-xl text-start w-[50px] text-grey">
-          <FaArrowLeft />
-        </Link>
-        <div className=" w-full center pr-10">
-          <img className=" max-w-[400px]" src={logo} alt="Logo not found" />
-        </div>
-      </section>
+    <>
+      <div id="capture-section" ref={probationFormRef}>
+        <style>
+          <style>
+            {`
+      @media print {
+        @page {
+          size: A4 portrait;
+          margin: 0.2cm;
+        }
+        
+        body {
+          zoom: 85%;
+        }
+        
+        #capture-section {
+          page-break-inside: avoid;
+        }
+        
+        form {
+          padding: 10px !important;
+        }
+        
+        .mb-10, .my-10, .mt-5 {
+          margin: 0.5rem !important;
+        }
+        
+        table {
+          font-size: 12px;
+          page-break-inside: avoid;
+        }
+        
+        .no-print, .no-print-parent {
+          display: none !important;
+        }
+        
+        /* Reduce logo size for printing */
+        img {
+          max-width: 300px !important;
+        }
+        
+        /* Compact form sections */
+        .text-lg {
+          font-size: 16px;
+        }
+      }
+    `}
+          </style>
+        </style>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="p-10 bg-white shadow-md w-full px-20 mx-auto"
+        >
+          {/* Header */}
+          <section className="flex items-center mb-6">
+            <Link
+              to="/reports"
+              id="left-button"
+              className="no-print left-button text-xl text-start w-[50px] text-grey"
+            >
+              <FaArrowLeft />
+            </Link>
+            <div className=" w-full center pr-10">
+              <img className=" max-w-[400px]" src={logo} alt="Logo not found" />
+            </div>
+          </section>
 
-      <div className="text-center text-lg font-bold uppercase w-full my-10">
-        {`Probation Completion Form for the Month of ${probationMonthYear}`}
-      </div>
+          <div className="text-center text-lg font-bold uppercase w-full">
+            {`Probation Completion Form for the Month of ${probationMonthYear}`}
+          </div>
 
-      <div className="mb-10 mt-5">
-        <p className="text-md mt-2">
-          For the attention of:{" "}
-          <input
-            type="text"
-            name="attention"
-            {...register("attention")}
-            value={formData.probData.attention}
-            onChange={handleInputChange}
-            className="border-b border-black focus:outline-none px-1"
+          <div className="mb-10 mt-6">
+            <p className="text-md mt-2">
+              For the attention of:{" "}
+              <input
+                type="text"
+                name="attention"
+                {...register("attention")}
+                value={formData.probData.attention}
+                onChange={handleInputChange}
+                className="border-b border-black focus:outline-none px-1"
+              />
+            </p>
+            <p className="text-md mt-3">
+              Deadline submit to Human Resources Department by:{" "}
+              <input
+                type="text"
+                name="deadline"
+                {...register("deadline")}
+                value={formData.probData.deadline || employeeData?.deadline}
+                // {...register("deadline")}
+                // value={formData.probData.deadline}
+                onChange={handleInputChange}
+                className="border-b border-black outline-none px-1"
+              />
+            </p>
+          </div>
+
+          {/* Employee Details */}
+          <div className="w-full mx-auto mb-10">
+            <h2 className="text-lg font-semibold mb-4">Employee Details:</h2>
+            <table className="w-full border border-black">
+              <tbody>
+                <tr className="border">
+                  <td className="p-2 border-r border-b font-semibold">
+                    Employee Name
+                  </td>
+                  <td className="p-2 border-b">
+                    <input
+                      {...register("name")}
+                      defaultValue={employeeData?.name || "-"}
+                      className="w-full outline-none"
+                    />
+                  </td>
+                </tr>
+
+                <tr className="border">
+                  <td className="p-2 border-r border-b font-semibold">
+                    Employee ID
+                  </td>
+                  <td className="p-2 border-b">
+                    {/* Displaying employee name and registering the input */}
+                    <input
+                      {...register("empID")}
+                      defaultValue={employeeData?.empID || ""}
+                      className="w-full outline-none"
+                    />
+                  </td>
+                </tr>
+                <tr className="border">
+                  <td className="p-2 border-r border-b font-semibold">
+                    Badge Number
+                  </td>
+                  <td className="p-2 border-b">
+                    {/* Displaying employee name and registering the input */}
+                    <input
+                      {...register("empBadgeNo")}
+                      defaultValue={employeeData?.empBadgeNo || ""}
+                      className="w-full outline-none"
+                    />
+                  </td>
+                </tr>
+                <tr className="border">
+                  <td className="p-2 border-r border-b font-semibold">
+                    Department
+                  </td>
+                  <td className="p-2 border-b">
+                    <input
+                      {...register("department")}
+                      defaultValue={employeeData?.department || ""}
+                      className="w-full outline-none"
+                    />
+                  </td>
+                </tr>
+                <tr className="border">
+                  <td className="p-2 border-r border-b font-semibold">
+                    Position
+                  </td>
+                  <td className="p-2 border-b">
+                    <input
+                      {...register("position")}
+                      defaultValue={employeeData?.position || ""}
+                      className="w-full outline-none"
+                    />
+                  </td>
+                </tr>
+                <tr className="border">
+                  <td className="p-2 border-r border-b font-semibold">
+                    Date Joined
+                  </td>
+                  <td className="p-2 border-b">
+                    <input
+                      {...register("doj")}
+                      defaultValue={employeeData?.dateOfJoin || ""}
+                      className="w-full outline-none"
+                    />
+                  </td>
+                </tr>
+                <tr className="border">
+                  <td className="p-2 border-r border-b font-semibold">
+                    Probation End Date
+                  </td>
+                  <td className="p-2 border-b">
+                    <input
+                      {...register("probationEnd")}
+                      defaultValue={employeeData?.probationEndDate || "-"}
+                      className="w-full outline-none"
+                    />
+                  </td>
+                </tr>
+                <tr className="border">
+                  <td className="p-2 border-r border-b font-semibold">
+                    Extended Probation End Date
+                  </td>
+                  <td className="p-2 border-b">
+                    <input
+                      type="date"
+                      name="extendDate"
+                      {...register("extendDate")}
+                      value={formData.probData.extendDate}
+                      onChange={handleInputChange}
+                      className=" px-1"
+                    />
+                  </td>
+                </tr>
+                {/* <tr className="border">
+              <td className="p-2 border-r font-semibold">Extended Probation End Date</td>
+              <td className="p-2 border-b">
+              <input
+                {...register("extendedProbationEndDate")}
+                defaultValue={employeeData?.extendedPED || "-"}
+                className="w-full outline-none"
+              />
+            </td>
+            </tr> */}
+              </tbody>
+            </table>
+          </div>
+
+          <ContractChoose
+            register={register}
+            formData={formData}
+            handleInputChange={handleInputChange}
           />
-        </p>
-        <p className="text-md mt-3">
-          Deadline submit to Human Resources Department by:{" "}
-          <input
-            type="text"
-            name="deadline"
-            {...register("deadline")}
-            value={formData.probData.deadline || employeeData?.deadline}
-            onChange={handleInputChange}
-            className="border-b border-black outline-none px-1"
+          <ConfirmationForm
+            employeeData={employeeData}
+            workInfoData={workInfoData}
+            register={register}
+            formData={formData}
+            handleInputChange={handleInputChange}
+            skillPool={emailData.skilledAndUnskilled}
+            errors={errors}
+            userType={userType}
+            gmPosition={gmPosition}
           />
-        </p>
-      </div>
 
-      {/* Employee Details */}
-      <div className="w-full mx-auto mb-10">
-        <h2 className="text-lg font-semibold mb-4">Employee Details:</h2>
-        <table className="w-full border border-black">
-          <tbody>
-            <tr className="border">
-              <td className="p-2 border-r border-b font-semibold">
-                Employee Name
-              </td>
-              <td className="p-2 border-b">
-                <input
-                  {...register("name")}
-                  defaultValue={employeeData?.name}
-                  className="w-full outline-none"
-                />
-              </td>
-            </tr>
-
-            <tr className="border">
-              <td className="p-2 border-r border-b font-semibold">
-                Employee ID
-              </td>
-              <td className="p-2 border-b">
-                {/* Displaying employee name and registering the input */}
-                <input
-                  {...register("empID")}
-                  defaultValue={employeeData?.empID}
-                  className="w-full outline-none"
-                />
-              </td>
-            </tr>
-            <tr className="border">
-              <td className="p-2 border-r border-b font-semibold">
-                Badge Number
-              </td>
-              <td className="p-2 border-b">
-                {/* Displaying employee name and registering the input */}
-                <input
-                  {...register("empBadgeNo")}
-                  defaultValue={employeeData?.empBadgeNo}
-                  className="w-full outline-none"
-                />
-              </td>
-            </tr>
-            <tr className="border">
-              <td className="p-2 border-r border-b font-semibold">
-                Department
-              </td>
-              <td className="p-2 border-b">
-                <input
-                  {...register("department")}
-                  defaultValue={employeeData?.department}
-                  className="w-full outline-none"
-                />
-              </td>
-            </tr>
-            <tr className="border">
-              <td className="p-2 border-r border-b font-semibold">Position</td>
-              <td className="p-2 border-b">
-                <input
-                  {...register("position")}
-                  defaultValue={employeeData?.position}
-                  className="w-full outline-none"
-                />
-              </td>
-            </tr>
-            <tr className="border">
-              <td className="p-2 border-r border-b font-semibold">
-                Date Joined
-              </td>
-              <td className="p-2 border-b">
-                <input
-                  {...register("doj")}
-                  defaultValue={employeeData?.dateOfJoin}
-                  className="w-full outline-none"
-                />
-              </td>
-            </tr>
-            <tr className="border">
-              <td className="p-2 border-r border-b font-semibold">
-                Probation End Date
-              </td>
-              <td className="p-2 border-b">
-                <input
-                  {...register("probationEnd")}
-                  defaultValue={employeeData?.probationEndDate}
-                  className="w-full outline-none"
-                />
-              </td>
-            </tr>
-            <tr className="border">
-              <td className="p-2 border-r border-b font-semibold">
-                Extended Probation End Date
-              </td>
-              <td className="p-2 border-b">
-                <input
-                  type="date"
-                  name="extendDate"
-                  {...register("extendDate")}
-                  value={formData.probData.extendDate}
-                  onChange={handleInputChange}
-                  className=" px-1"
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <ContractChoose
-        register={register}
-        formData={formData}
-        handleInputChange={handleInputChange}
-      />
-      <ConfirmationForm
-        employeeData={employeeData}
-        workInfoData={workInfoData}
-        register={register}
-        formData={formData}
-        handleInputChange={handleInputChange}
-        skillPool={emailData.skilledAndUnskilled}
-        errors={errors}
-        userType={userType}
-        gmPosition={gmPosition}
-      />
-
-      {/* Save Button */}
-      <div className="flex items-center justify-center mt-8">
+          {/* Save Button */}
+          {/* <div className="flex items-center justify-center mt-8">
         {userType !== "SuperAdmin" && (
           <button disabled={isLoading} type="submit" className="primary_btn">
             {isLoading ? "Loading..." : "Save"}{" "}
-            {/* Show loading text when isLoading is true */}
+        
           </button>
         )}
+      </div> */}
+          {userType !== "SuperAdmin" && (
+            <div className="flex justify-center gap-4 py-8 no-print-parent text-center">
+              {isDownloading ? (
+                // Show Downloading text
+                <p className="text-lg font-semibold">Downloading...</p>
+              ) : (
+                <>
+                  {/* Save Button */}
+                  <button
+                    id="save-button"
+                    onClick={() => handleSubmit()}
+                    disabled={isLoading}
+                    className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex items-center justify-center gap-2 min-w-[160px] h-[40px] no-print"
+                  >
+                    {isLoading ? (
+                      <>
+                        <span>Submitting</span>
+                        <span className="ml-1 animate-spin border-2 border-t-2 border-t-white border-gray-300 rounded-full w-4 h-4"></span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Submit</span>
+                        <FaSave className="ml-2 mt-1" />
+                      </>
+                    )}
+                  </button>
+
+                  {/* Print & Download only if genManager is not set */}
+
+                  <>
+                    {/* Download Button */}
+                    <button
+                      id="download-button"
+                      onClick={(e) => handleDownloadClick(e)}
+                      className="border-yellow border-2 text-dark_grey text_size_3 rounded-md px-4 py-2 flex items-center justify-center gap-2 min-w-[160px] h-[40px] no-print"
+                    >
+                      <span>Download</span>
+                      <FaDownload className="ml-2 mt-1" />
+                    </button>
+
+                    {/* Print Button */}
+                    <button
+                      id="print-button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handlePrint();
+                      }}
+                      className="border-yellow border-2 text-dark_grey text_size_3 rounded-md px-4 py-2 flex items-center justify-center gap-2 min-w-[160px] h-[40px] no-print"
+                    >
+                      <span>Print</span>
+                      <FaPrint className="ml-2 mt-1" />
+                    </button>
+                  </>
+                </>
+              )}
+            </div>
+          )}
+          {notification && (
+            <SpinLogo
+              text={showTitle}
+              notification={notification}
+              path="/reports"
+            />
+          )}
+        </form>
       </div>
-      {notification && (
-        <SpinLogo
-          text={showTitle}
-          notification={notification}
-          path="/reports"
-        />
-      )}
-    </form>
+    </>
   );
 };

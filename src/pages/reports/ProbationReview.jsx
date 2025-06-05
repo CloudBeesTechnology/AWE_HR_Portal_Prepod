@@ -8,33 +8,36 @@ import { useTempID } from "../../utils/TempIDContext";
 export const ProbationReview = () => {
   const location = useLocation();
   const { allData, title } = location.state || {};
-  const { gmPosition } = useTempID();
+  const { gmPosition, HRMPosition } = useTempID();
   const [tableBody, setTableBody] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  
+
   const userID = localStorage.getItem("userID");
   const userType = localStorage.getItem("userType");
-  const [tableHead] = useState([
-    "Emp ID",
-    "Badge no",
-    "Name",
-    "Date of Join",
-    "Department",
-    "Other Department",
-    "Position",
-    "Other Position",
-    "Probation Expiry Date",
-    "Deadline to Return to HRD",
-    userType !== "SuperAdmin" && "Status",
-    "Probation Form",
-  ].filter(Boolean));
+  const [tableHead] = useState(
+    [
+      "Emp ID",
+      "Badge no",
+      "Name",
+      "Date of Join",
+      "Department",
+      "Other Department",
+      "Position",
+      "Other Position",
+      "Probation Expiry Date",
+      "Deadline to Return to HRD",
+      userType !== "SuperAdmin" && "Status",
+      "Probation Form",
+    ].filter(Boolean)
+  );
 
   const [selectedPerson, setSelectedPerson] = useState(null);
   const navigate = useNavigate();
 
   // console.log("UserType", userType);
+  console.log("HR", HRMPosition);
 
   const formatDate = (date) => {
     if (Array.isArray(date)) {
@@ -111,11 +114,11 @@ export const ProbationReview = () => {
         const contractStartDates = item.contractStart || [];
         const startDate = contractStartDates[contractStartDates.length - 1];
 
-        if (userType === "Manager") {
+        if (userType === "Manager" && HRMPosition !== "HR MANAGER") {
           return null;
-        }
-
-        if (userType === "HR") {
+        } else if (userType === "HR" && HRMPosition !== "HR MANAGER") {
+          return null;
+        } else if (gmPosition === "GENERAL MANAGER") {
           return null;
         }
 
@@ -139,6 +142,9 @@ export const ProbationReview = () => {
             : "-",
           probationEndDate: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
+          ...(HRMPosition === "HR MANAGER" && {
+            status: item.hrName ? "Approved" : "Pending",
+          }),
           ...(userType === "Supervisor" && {
             status: item.supervisorApproved ? "Approved" : "Pending",
           }),
@@ -150,10 +156,20 @@ export const ProbationReview = () => {
     return sortedData.map(({ lastDate, ...rest }) => rest);
   };
 
+  // useEffect(() => {
+  //   const mergedData = probationReviewMergedData(allData);
+  //   setTableBody(mergedData);
+  // }, [allData]);
   useEffect(() => {
-    const mergedData = probationReviewMergedData(allData);
+    const mergedData = probationReviewMergedData(
+      allData,
+      userType,
+      gmPosition,
+      userID,
+      HRMPosition
+    );
     setTableBody(mergedData);
-  }, [allData]);
+  }, [allData, userType, gmPosition, userID, HRMPosition]);
 
   const handleViewDetails = (personData) => {
     console.log("Person State:", personData);
@@ -242,6 +258,12 @@ export const ProbationReview = () => {
             : "-",
           probationEndDate: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
+          ...(HRMPosition === "HR MANAGER" && {
+            status: item.hrName ? "Approved" : "Pending",
+          }),
+          ...(userType === "Supervisor" && {
+            status: item.supervisorApproved ? "Approved" : "Pending",
+          }),
         };
       })
       .sort((a, b) => a.lastDate - b.lastDate)
@@ -249,6 +271,7 @@ export const ProbationReview = () => {
 
     setFilteredData(filtered);
   };
+  // console.log("TableBody", tableBody);
 
   return (
     <div>

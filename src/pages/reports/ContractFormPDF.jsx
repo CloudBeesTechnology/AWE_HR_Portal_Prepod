@@ -1,28 +1,32 @@
-import React, { useState, useEffect, useContext } from "react";
-import "jspdf-autotable";
+import React, { useState, useEffect, useContext, useRef } from "react";
+import "jspdf-autotable"; // Ensure this is imported
 import { useLocation, Link } from "react-router-dom";
 import { downloadPDF } from "../../utils/DownloadPDF";
 import { ContractForm } from "../../services/createMethod/CreateContract";
 import { DataSupply } from "../../utils/DataStoredContext";
 import { UpdateContractData } from "../../services/updateMethod/UpdateContractForm";
 import { sendEmail } from "../../services/EmailServices";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaSave, FaPrint, FaDownload } from "react-icons/fa";
 import { SpinLogo } from "../../utils/SpinLogo";
 import { useTempID } from "../../utils/TempIDContext";
 import { useCreateNotification } from "../../hooks/useCreateNotification";
+import { useReactToPrint } from "react-to-print";
+import logo from "../../assets/logo/logo-with-name.svg";
 
 export const ContractFormPDF = ({ contentRef }) => {
-  const location = useLocation();
   const { contractForm } = ContractForm();
-  const { gmPosition, PDInfo } = useTempID();
+  const { gmPosition, PDInfo, HRMPosition } = useTempID();
   const { contractDetails } = UpdateContractData();
   const { contractForms, workInfoData, empPIData } = useContext(DataSupply);
+  const location = useLocation();
   const { employeeData } = location.state || {};
   const { createNotification } = useCreateNotification();
   const [userType, setUserType] = useState("");
   const [showTitle, setShowTitle] = useState("");
   const [notification, setNotification] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+
   const contractEndDateStr = employeeData?.contractEndDate;
 
   const [managerData, setManagerData] = useState({
@@ -61,6 +65,8 @@ export const ContractFormPDF = ({ contentRef }) => {
   };
 
   useEffect(() => {
+    // const userID = localStorage.getItem("userID");
+    // setUserID(userID);
     const userType = localStorage.getItem("userType");
     setUserType(userType);
   }, []);
@@ -78,24 +84,17 @@ export const ContractFormPDF = ({ contentRef }) => {
           managerEmpID: managerEmpID,
         }));
 
+        // Step 2: If managerEmpID is set, fetch manager's official email from empPIData
         if (managerEmpID && managerEmpID.length > 0) {
-          const lastManagerEmpID = managerEmpID[managerEmpID.length - 1];
-          // console.log("Last managerEmpID:", lastManagerEmpID);
-
           const managerInfo = empPIData.find(
-            (data) => data.empID === String(lastManagerEmpID)
+            (data) => data.empID === String(managerEmpID[0])
           );
-
           if (managerInfo) {
-            // console.log("Found manager info:", managerInfo);
-
             setManagerData((prevData) => ({
               ...prevData,
               managerOfficialMail: managerInfo.officialEmail,
               managerName: managerInfo.name,
             }));
-          } else {
-            // console.log("Manager info not found in empPIData for last managerEmpID:", lastManagerEmpID);
           }
         }
 
@@ -161,7 +160,6 @@ export const ContractFormPDF = ({ contentRef }) => {
   const subject = "Contract Completion Form Review";
   const from = "hr_no-reply@adininworks.com";
 
-  // Parse "DD-MM-YYYY" into a proper Date object
   const sendHRNotification = async (
     empName,
     contractEndFormatted,
@@ -172,11 +170,11 @@ export const ContractFormPDF = ({ contentRef }) => {
       empName || "Not mentioned"
     }'s contract period ending on ${
       contractEndFormatted || "Not Mentioned"
-    }, has been verified and checked by HR.`;
+    }, has been verified by HR.`;
 
     if (Array.isArray(managerData?.genManagerEmail)) {
       for (let email of managerData.genManagerEmail) {
-        await sendEmail(
+        const result = await sendEmail(
           subject,
           `<html>
           <body>
@@ -186,7 +184,7 @@ export const ContractFormPDF = ({ contentRef }) => {
             contractEndFormatted || "Not Mentioned"
           },
               <br/>
-              has been verified and checked by HR.
+              has been verified by HR.
             </p>
             <p>Click here <a href="https://hr.adininworks.co">to view the updates.</a></p>
           </body>
@@ -202,6 +200,7 @@ export const ContractFormPDF = ({ contentRef }) => {
           senderEmail: "hr_no-reply@adininworks.com",
           receipentEmail: email,
         });
+        return result;
       }
     }
   };
@@ -217,11 +216,9 @@ export const ContractFormPDF = ({ contentRef }) => {
       empName || "Not mentioned"
     }'s contract period ending on ${
       contractEndFormatted || "Not Mentioned"
-    }, has been reviewed and added remarks by Manager, ${
-      PDInfo || "Not Mentioned"
-    }.`;
+    }, has been reviewed by Manager, ${PDInfo || "Not Mentioned"}.`;
 
-    await sendEmail(
+    const result = await sendEmail(
       subject,
       `<html>
       <body>
@@ -231,16 +228,13 @@ export const ContractFormPDF = ({ contentRef }) => {
         contractEndFormatted || "Not Mentioned"
       },
           <br/>
-          has been reviewed and added remarks by Manager, ${
-            PDInfo || "Not Mentioned"
-          }.
+          has been reviewed by Manager, ${PDInfo || "Not Mentioned"}.
         </p>
         <p>Click here <a href="https://hr.adininworks.co">to view the updates.</a></p>
       </body>
     </html>`,
       "hr_no-reply@adininworks.com",
-      managerData.hrEmail
-      // "hariharanofficial2812@gmail.com"
+      managerData?.hrEmail
     );
 
     await createNotification({
@@ -250,6 +244,8 @@ export const ContractFormPDF = ({ contentRef }) => {
       senderEmail: "hr_no-reply@adininworks.com",
       receipentEmail: managerData?.hrEmail,
     });
+
+    return result;
   };
 
   const sendGMNotification = async (
@@ -264,7 +260,7 @@ export const ContractFormPDF = ({ contentRef }) => {
       contractEndFormatted || "Not Mentioned"
     }, has been confirmed by the GENERAL MANAGER.`;
 
-    await sendEmail(
+    const result = await sendEmail(
       subject,
       `<html>
       <body>
@@ -291,6 +287,8 @@ export const ContractFormPDF = ({ contentRef }) => {
       senderEmail: "hr_no-reply@adininworks.com",
       receipentEmail: managerData?.hrEmail,
     });
+
+    return result;
   };
 
   // console.log("Name", PDInfo);
@@ -298,6 +296,9 @@ export const ContractFormPDF = ({ contentRef }) => {
   // Main submission handler
   const handleSubmit = async () => {
     setIsLoading(true);
+    let HRResult = null;
+    let managerResult = null;
+    let GMResult = null;
 
     try {
       // Validate required fields based on user type
@@ -365,27 +366,66 @@ export const ContractFormPDF = ({ contentRef }) => {
         await contractForm(formPayload);
       }
 
-      // Send appropriate notifications
-      if (userType === "HR") {
-        await sendHRNotification(empName, contractEndFormatted, managerData);
-      } else if (userType === "Manager" && gmPosition !== "GENERAL MANAGER") {
-        await sendManagerNotification(
+      // Send appropriate notifications --before
+      // if (userType === "HR") {
+      //   // console.log("HR BLOCK");
+
+      //   HRResult = await sendHRNotification(
+      //     empName,
+      //     contractEndFormatted,
+      //     managerData
+      //   );
+
+      // -after
+
+      if (HRMPosition === "HR MANAGER") {
+        // console.log("HR BLOCK");
+
+        HRResult = await sendHRNotification(
+          empName,
+          contractEndFormatted,
+          managerData
+        );
+
+        // console.log("HRResult", HRResult);
+      } else if (
+        userType === "Manager" &&
+        gmPosition !== "GENERAL MANAGER" &&
+        HRMPosition !== "HR MANAGER"
+      ) {
+        // console.log("Manager BLOCK");
+        managerResult = await sendManagerNotification(
           empName,
           contractEndFormatted,
           PDInfo,
           managerData
         );
+        // console.log("Result : ", managerResult);
       } else if (gmPosition === "GENERAL MANAGER") {
-        await sendGMNotification(empName, contractEndFormatted, managerData);
+        // console.log("GM BLOCK");
+        GMResult = await sendGMNotification(
+          empName,
+          contractEndFormatted,
+          managerData
+        );
+        // console.log("GMResult", GMResult);
       }
 
-      // Show success message
-      setShowTitle(
-        selectedData
-          ? "Contract Form Updated Successfully"
-          : "Contract Form Created Successfully"
-      );
-      setNotification(true);
+      const notificationRes =
+        managerResult === "success" ||
+        HRResult === "success" ||
+        GMResult === "success";
+
+      // console.log("NO", notificationRes);
+
+      if (notificationRes) {
+        setShowTitle(
+          selectedData
+            ? "Contract Form Updated Successfully"
+            : "Contract Form Created Successfully"
+        );
+        setNotification(true);
+      }
     } catch (err) {
       console.error("Submission error:", err);
       setShowTitle("Error occurred during submission");
@@ -409,250 +449,294 @@ export const ContractFormPDF = ({ contentRef }) => {
     }
   }
 
-  const handleDownloadClick = () => {
-    // Hide buttons before download 7590
-    const editButton = document.getElementById("edit-button");
-    const downloadButton = document.getElementById("download-button");
+  const contractFormRef = useRef();
 
-    if (editButton) editButton.style.display = "none";
-    if (downloadButton) downloadButton.style.display = "none";
+  const handlePrint = useReactToPrint({
+    content: () => contractFormRef.current,
+    onBeforePrint: () => console.log("Preparing to print PDF..."),
+    onAfterPrint: () => console.log("Print complete"),
+  });
+
+  const handleDownloadClick = () => {
+    setIsDownloading(true);
+    // Hide buttons before download
+    const editButton = document.getElementById("left-button");
+    const downloadButton = document.getElementById("download-button");
+    const printButton = document.getElementById("print-button");
+    const saveButton = document.getElementById("save-button");
+
+    if (editButton) editButton.style.visibility = "hidden";
+    if (downloadButton) downloadButton.style.visibility = "hidden";
+    if (printButton) printButton.style.visibility = "hidden";
+    if (saveButton) saveButton.style.visibility = "hidden";
 
     // Wait for the PDF to be generated, then restore the buttons.
     downloadPDF("capture-section");
 
     setTimeout(() => {
-      if (editButton) editButton.style.display = "block";
-      if (downloadButton) downloadButton.style.display = "block";
+      if (editButton) editButton.style.visibility = "visible";
+      if (downloadButton) downloadButton.style.visibility = "visible";
+      if (printButton) printButton.style.visibility = "visible";
+      if (saveButton) saveButton.style.visibility = "visible";
+      setIsDownloading(false);
     }, 500);
   };
 
   return (
-    <div
-      id="capture-section"
-      className="container mx-auto p-8"
-      ref={contentRef}
-    >
-      <div className="relative">
-        {/* Edit Icon or Close Icon */}
-
-        <div className="flex items-center">
-          <Link to="/reports" className="text-xl text-start w-[50px] text-grey">
-            <FaArrowLeft />
-          </Link>
-
-          {/* <div className="text-center text-lg font-bold uppercase  flel-1 w-full">
-            Contract Completion Form for the Month of January 2024
-          </div> */}
-
-          <div className="text-center text-lg font-bold uppercase w-full my-10">
+    <>
+      <div
+        id="capture-section"
+        className="container mx-auto px-8"
+        ref={contractFormRef}
+      >
+        <div className="relative">
+          <style>
+            {`
+              @media print {
+                   .no-print, .no-print-parent {
+                      display: none !important;
+                   }
+                }
+           `}
+          </style>
+          <section className="flex items-center pt-4">
+            <Link
+              to="/reports"
+              id="left-button"
+              className="no-print left-button text-xl text-start w-[50px] text-grey"
+            >
+              <FaArrowLeft />
+            </Link>
+            <div className=" w-full center pr-10">
+              <img className=" max-w-[300px]" src={logo} alt="Logo not found" />
+            </div>
+          </section>
+          <div className="text-center text-sm font-bold uppercase w-full py-6">
             {`Contract Completion Form for the Month of ${ContractMonthYear}`}
           </div>
-        </div>
 
-        <div className="mb-16 mt-16">
-          <label className="font-semibold">Attention:</label>
-          <input
-            type="text"
-            name="conAttn"
-            value={formData.contract.conAttn}
-            onChange={handleInputChange}
-            className="ml-2 border-b-2 border-black focus:outline-none"
-          />
-        </div>
-
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-center table-auto border-collapse border border-black">
-            <thead>
-              <tr>
-                <th className="border border-black p-2">No.</th>
-                <th className="border border-black p-2 py-2 px-[30px]">
-                  Employee Name
-                </th>
-                <th className="border border-black p-2 py-2 px-[30px]">
-                  Emp ID
-                </th>
-                <th className="border border-black py-2 px-[40px]">
-                  Badge No.
-                </th>
-                <th className="border border-black p-2">Position</th>
-                <th className="border border-black p-2">Department</th>
-                <th className="border border-black p-2">Nationality</th>
-                <th className="border border-black py-2 px-[40px]">
-                  Date Of Join
-                </th>
-                <th className="border border-black py-2 px-[30px]">
-                  Contract Start Date
-                </th>
-                <th className="border border-black py-2 px-[30px]">
-                  Contract End Date
-                </th>
-                <th className="border border-black py-2 px-[30px]">
-                  LD Expiry
-                </th>
-                <th className="border border-black py-2 px-[30px]">
-                  Duration of Renewal Contract
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {[...Array(1)].map((_, i) => (
-                <tr key={i}>
-                  <td className="border border-black p-2">{i + 1}</td>
-                  <td className="border border-black p-2">
-                    {employeeData?.name}
-                  </td>
-                  <td className="border border-black p-2">
-                    {employeeData?.empID}
-                  </td>
-                  <td className="border border-black p-2">
-                    {employeeData?.empBadgeNo}
-                  </td>
-                  <td className="border border-black p-2">
-                    {employeeData?.position || "N/A"}
-                  </td>
-                  <td className="border border-black p-2">
-                    {employeeData?.department || "N/A"}
-                  </td>
-                  <td className="border border-black p-2">
-                    {employeeData?.nationality || "N/A"}
-                  </td>
-                  <td className="border border-black p-2">
-                    {employeeData?.dateOfJoin}
-                  </td>
-                  <td className="border border-black p-2">
-                    {employeeData?.contractStartDate || "N/A"}
-                  </td>
-                  <td className="border border-black p-2">
-                    {employeeData?.contractEndDate || "N/A"}
-                  </td>
-                  <td className="border border-black p-2">
-                    {employeeData?.nlmsEmpApproval || "N/A"}
-                  </td>
-                  <td className="border border-black p-2 h-full ">
-                    <input
-                      type="text"
-                      className="border outline-none border-none p-1 w-full h-full"
-                      name="renewalContract"
-                      value={formData.contract.renewalContract}
-                      onChange={handleInputChange}
-                      disabled={userType !== "Manager"}
-                      // defaultValue={employeeData?.contract || ""}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Notes */}
-        <div className="mt-7">
-          <p className="font-semibold">
-            Notes: Deadline return to HRD after one week from the date received
-            of Contract Completion Report
-          </p>
-        </div>
-
-        {/* Remarks Section */}
-        <div className="mt-7">
-          <label className="text-sm font-semibold">Remarks Manager:</label>
-          <textarea
-            type="text"
-            name="remarks"
-            value={formData.contract.remarks}
-            onChange={handleInputChange}
-            disabled={userType !== "Manager"}
-            className="border w-full text-sm font-semibold rounded resize-none outline-none p-2"
-          />
-        </div>
-        <div className="mt-7">
-          <label className="text-sm font-semibold">Remarks HR:</label>
-          <textarea
-            type="text"
-            name="remarkHr"
-            value={formData.contract.remarkHr}
-            onChange={handleInputChange}
-            disabled={userType !== "HR"}
-            className="border w-full text-sm font-semibold rounded resize-none outline-none p-2"
-          />
-        </div>
-        <div className="mt-7">
-          <label className="text-sm font-semibold">Remarks GM:</label>
-          <textarea
-            type="text"
-            name="remarkGm"
-            value={formData.contract.remarkGm}
-            onChange={handleInputChange}
-            disabled={gmPosition !== "GENERAL MANAGER"}
-            className="border w-full text-sm font-semibold rounded resize-none outline-none p-2"
-          />
-        </div>
-
-        {/* Footer */}
-        <div className="mt-20 flex justify-between items-center">
-          <div className="text-center">
-            <p className="font-semibold mb-5">Recommended By:</p>
+          <div className="mb-6">
+            <label className="text-sm">Attention:</label>
             <input
               type="text"
-              name="depHead"
-              value={formData.contract.depHead}
+              name="conAttn"
+              value={formData.contract.conAttn}
+              onChange={handleInputChange}
+              className="ml-2 border-b border-black focus:outline-none"
+            />
+          </div>
+
+          <div className="w-full">
+            <table className="min-w-full table-fixed text-xs text-center border-collapse border">
+              <thead>
+                <tr>
+                  <th className="border p-1 py-4">No.</th>
+                  <th className="border p-1 py-4">Employee Name</th>
+                  <th className="border p-1 py-4">Emp ID</th>
+                  <th className="border p-1 py-4">Badge No.</th>
+                  <th className="border p-1 py-4">Position</th>
+                  <th className="border p-1 py-4">Department</th>
+                  <th className="border p-1 py-4">Nationality</th>
+                  <th className="border p-1 py-4">Date Of Join</th>
+                  <th className="border p-1 py-4">Contract Start Date</th>
+                  <th className="border p-1 py-4">Contract End Date</th>
+                  <th className="border p-1 py-4">LD Expiry</th>
+                  <th className="border p-1 py-4">Renewal Duration</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[...Array(1)].map((_, i) => (
+                  <tr key={i}>
+                    <td className="border p-1 py-4">{i + 1}</td>
+                    <td className="border p-1 py-4">{employeeData?.name}</td>
+                    <td className="border p-1 py-4">{employeeData?.empID}</td>
+                    <td className="border p-1 py-4">
+                      {employeeData?.empBadgeNo}
+                    </td>
+                    <td className="border p-1 py-4">
+                      {employeeData?.position || "N/A"}
+                    </td>
+                    <td className="border p-1 py-4">
+                      {employeeData?.department || "N/A"}
+                    </td>
+                    <td className="border p-1 py-4">
+                      {employeeData?.nationality || "N/A"}
+                    </td>
+                    <td className="border p-1 py-4">
+                      {employeeData?.dateOfJoin}
+                    </td>
+                    <td className="border p-1 py-4">
+                      {employeeData?.contractStartDate || "N/A"}
+                    </td>
+                    <td className="border p-1 py-4">
+                      {employeeData?.contractEndDate || "N/A"}
+                    </td>
+                    <td className="border p-1 py-4">
+                      {employeeData?.nlmsEmpApproval || "N/A"}
+                    </td>
+                    <td className="border p-1 py-4">
+                      <input
+                        type="text"
+                        className="border-none outline-none p-1 py-4 w-full text-xs"
+                        name="renewalContract"
+                        value={formData.contract.renewalContract}
+                        onChange={handleInputChange}
+                        disabled={userType !== "Manager"}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Notes */}
+          <div className="mt-7 text-sm">
+            <p>
+              Notes: Deadline return to HRD after one week from the date
+              received of Contract Completion Report
+            </p>
+          </div>
+
+          {/* Remarks Section */}
+          <div className="mt-7">
+            <label className="text-sm block py-4">Remarks Manager:</label>
+            <textarea
+              type="text"
+              name="remarks"
+              value={formData.contract.remarks}
               onChange={handleInputChange}
               disabled={userType !== "Manager"}
-              className="border-b-2 border-black w-56 mx-auto outline-none text-center"
+              className="border w-full text-sm  rounded resize-none outline-none p-2"
             />
-
-            <p className="mt-3">Department Head</p>
           </div>
-
-          <div className="text-center">
-            <p className="font-semibold mb-5">Acknowledged & Checked By:</p>
-            <input
+          <div className="mt-7">
+            <label className="text-sm block py-4">Remarks HR:</label>
+            <textarea
               type="text"
-              name="hrManager"
-              value={formData.contract.hrManager}
+              name="remarkHr"
+              value={formData.contract.remarkHr}
               onChange={handleInputChange}
               disabled={userType !== "HR"}
-              className="border-b-2 border-black w-56 mx-auto outline-none text-center"
+              className="border w-full text-sm  rounded resize-none outline-none p-2"
             />
-
-            <p className="mt-3">HRM</p>
           </div>
-          <div className="text-center">
-            <p className="font-semibold mb-5">Approved By:</p>
-            <input
+          <div className="mt-7">
+            <label className="text-sm block py-4">Remarks GM:</label>
+            <textarea
               type="text"
-              name="genManager"
-              value={formData.contract.genManager}
+              name="remarkGm"
+              value={formData.contract.remarkGm}
               onChange={handleInputChange}
               disabled={gmPosition !== "GENERAL MANAGER"}
-              className="border-b-2 border-black w-56 mx-auto outline-none text-center"
+              className="border w-full text-sm  rounded resize-none outline-none p-2"
             />
-
-            <p className="mt-3">GM</p>
           </div>
-        </div>
 
-        {/* Save Button */}
-        <div className="mt-8 text-center">
-          <button
-            onClick={() => handleSubmit()}
-            disabled={isLoading}
-            className="primary_btn"
-          >
-            {isLoading ? "Loading..." : "Save"}
-          </button>
-        </div>
+          {/* Footer */}
+          <div className="mt-20 flex justify-between items-center">
+            <div className="text-center">
+              <p className=" mb-5 text-sm">Recommended By:</p>
+              <input
+                type="text"
+                name="depHead"
+                value={formData.contract.depHead}
+                onChange={handleInputChange}
+                disabled={userType !== "Manager"}
+                className="border-b border-black w-56 mx-auto outline-none text-center"
+              />
 
-        {/* Download Button */}
+              <p className="mt-3 text-sm">Department Head</p>
+            </div>
+
+            <div className="text-center">
+              <p className=" mb-5 text-sm">Acknowledged & Checked By:</p>
+              <input
+                type="text"
+                name="hrManager"
+                value={formData.contract.hrManager}
+                onChange={handleInputChange}
+                disabled={userType !== "HR"}
+                className="border-b border-black w-56 mx-auto outline-none text-center"
+              />
+
+              <p className="mt-3 text-sm">HRM</p>
+            </div>
+            <div className="text-center">
+              <p className=" mb-5 text-sm">Approved By:</p>
+              <input
+                type="text"
+                name="genManager"
+                value={formData.contract.genManager}
+                onChange={handleInputChange}
+                disabled={gmPosition !== "GENERAL MANAGER"}
+                className="border-b border-black w-56 mx-auto outline-none text-center"
+              />
+
+              <p className="mt-3 text-sm">GM</p>
+            </div>
+          </div>
+
+          {userType !== "SuperAdmin" && (
+            <div className="flex justify-center gap-4 py-8 no-print-parent text-center">
+              {isDownloading ? (
+                <p className="text-lg font-semibold">Downloading...</p>
+              ) : (
+                <>
+                  <>
+                    {/* Save Button */}
+                    <button
+                      id="save-button"
+                      onClick={() => handleSubmit()}
+                      disabled={isLoading}
+                      className="bg-primary text-dark_grey text_size_3 rounded-md px-4 py-2 flex items-center justify-center gap-2 min-w-[160px] h-[40px] no-print"
+                    >
+                      {isLoading ? (
+                        <>
+                          <span>Submiting</span>
+                          <span className="ml-1 animate-spin border-2 border-t-2 border-t-white border-gray-300 rounded-full w-4 h-4"></span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Submit</span>
+                          <FaSave className="ml-2 mt-1" />
+                        </>
+                      )}
+                    </button>
+                  </>
+
+                  {/* Download Button */}
+                  <button
+                    id="download-button"
+                    onClick={handleDownloadClick}
+                    className="border-yellow border-2 text-dark_grey text_size_3 rounded-md px-4 py-2 flex items-center justify-center gap-2 min-w-[160px] h-[40px] no-print"
+                  >
+                    <span>Download</span>
+                    <FaDownload className="ml-2 mt-1" />
+                  </button>
+
+                  {/* Print Button */}
+                  <button
+                    id="print-button"
+                    onClick={handlePrint}
+                    className="border-yellow border-2 text-dark_grey text_size_3 rounded-md px-4 py-2 flex items-center justify-center gap-2 min-w-[160px] h-[40px] no-print"
+                  >
+                    <span>Print</span>
+                    <FaPrint className="ml-2 mt-1" />
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+        {notification && (
+          <SpinLogo
+            text={showTitle}
+            notification={notification}
+            path="/reports"
+          />
+        )}
       </div>
-      {notification && (
-        <SpinLogo
-          text={showTitle}
-          notification={notification}
-          path="/reports"
-        />
-      )}
-    </div>
+    </>
   );
 };

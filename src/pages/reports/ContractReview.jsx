@@ -14,7 +14,9 @@ export const ContractReview = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const { gmPosition } = useTempID();
+  const { gmPosition, HRMPosition } = useTempID();
+  const userID = localStorage.getItem("userID");
+  const userType = localStorage.getItem("userType");
 
   const tableHead = [
     "Emp ID",
@@ -29,14 +31,12 @@ export const ContractReview = () => {
     "Contract Start Date",
     "Contract End Date",
     "LD Expiry",
-    "Status",
+    userType !== "SuperAdmin" && "Status",
     // "Duration of Renewal Contract",
     "Form",
-  ];
+  ].filter(Boolean);
 
-  const userID = localStorage.getItem("userID");
-  const userType = localStorage.getItem("userType");
- 
+  console.log("UserType", userType);
 
   const formatDate = (date, type) => {
     if (Array.isArray(date)) {
@@ -86,10 +86,9 @@ export const ContractReview = () => {
     return balanceMonths > 0 ? `${balanceMonths} months` : "Few days more";
   };
 
-
   const contractExpiryMergedData = (data) => {
-    // const AWE87901 = data.find((item) => item.empID === "AWE87901");
-    // console.log("Full record for employee AWE87901:", AWE87901);
+    const AWE87901 = data.find((item) => item.empID === "AWE87901");
+    console.log("Full record for employee AWE87901:", AWE87901);
 
     const today = new Date();
     const startOfNextMonth = new Date(
@@ -148,21 +147,51 @@ export const ContractReview = () => {
         const isDepartmentHead = item.depHead !== null;
         const isHr = item.hrManager !== null;
 
-        // console.log("last",lastManager)
+        // console.log("last", lastManager);
 
-        if (userType === "Supervisor") {
+        // if (userType === "Supervisor") {
+        //   return null;
+        // }
+
+        // if (gmPosition === "GENERAL MANAGER") {
+        //   return null;
+        // }
+
+        // if (userType === "Manager") {
+        //   if (lastManager !== userID) return null;
+        // }
+
+        // if (userType === "Manager") {
+        //   return null;
+        // }
+
+        // if (userType === "HR") {
+        //   return null;
+        // }
+
+        // Allow if HR and HRMPosition is HR MANAGER
+        // if (userType === "HR" && HRMPosition === "HR MANAGER") {
+        //   // allow
+        // }
+        // Allow if Manager and HRMPosition exists
+        if (HRMPosition === "HR MANAGER") {
+          // allow
+        }
+        // Deny if GM (unless other logic elsewhere handles exceptions)
+        else if (gmPosition === "GENERAL MANAGER") {
+          return null;
+        }
+        // Deny if Manager is not the lastManager
+        else if (userType === "Manager" && lastManager !== userID) {
+          return null;
+        }
+        // Deny all other HR
+        else if (userType === "HR" && HRMPosition !== "HR MANAGER") {
           return null;
         }
 
-        if (userType === "HR") {
-          return null;
-        }
-
-        if (userType === "Manager") {
-          if (lastManager !== userID) return null;
-        }
-
-        if (gmPosition === "GENERAL MANAGER") {
+        // Deny if Supervisor
+        else if (userType === "Supervisor") {
           return null;
         }
 
@@ -190,14 +219,14 @@ export const ContractReview = () => {
           nlmsEmpApproval: Array.isArray(item.nlmsEmpValid)
             ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
             : "-",
-          ...(userType === "SuperAdmin" ||
-            (userType === "Manager" && {
-              status: item.depHead ? "Approved" : "Pending",
-            })),
-          ...(userType === "HR" ||
-            (userType === "SuperAdmin" && {
-              status: item.hrManager ? "Approved" : "Pending",
-            })),
+          ...(HRMPosition === "HR MANAGER" && {
+            status: item.hrManager ? "Approved" : "Pending",
+          }),
+
+          ...(userType === "Manager" && {
+            status: item.depHead ? "Approved" : "Pending",
+          }),
+
           ...(gmPosition === "GENERAL MANAGER" && {
             status: item.genManager ? "Approved" : "Pending",
           }),
@@ -211,9 +240,17 @@ export const ContractReview = () => {
 
   useEffect(() => {
     if (allData) {
-      setTableBody(contractExpiryMergedData(allData));
+      const mergedData = contractExpiryMergedData(
+        allData,
+        userType,
+        gmPosition,
+        userID,
+        HRMPosition
+      );
+
+      setTableBody(mergedData);
     }
-  }, [allData]);
+  }, [allData, userType, gmPosition, userID, HRMPosition]);
 
   // console.log("All Data", allData);
   // console.log("Table body", tableBody);
@@ -309,14 +346,14 @@ export const ContractReview = () => {
           nlmsEmpApproval: Array.isArray(item.nlmsEmpValid)
             ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
             : "-",
-          ...(userType === "SuperAdmin" ||
-            (userType === "Manager" && {
-              status: item.depHead ? "Approved" : "Pending",
-            })),
-          ...(userType === "HR" ||
-            (userType === "SuperAdmin" && {
-              status: item.hrManager ? "Approved" : "Pending",
-            })),
+          ...(HRMPosition === "HR MANAGER" && {
+            status: item.hrManager ? "Approved" : "Pending",
+          }),
+
+          ...(userType === "Manager" && {
+            status: item.depHead ? "Approved" : "Pending",
+          }),
+
           ...(gmPosition === "GENERAL MANAGER" && {
             status: item.genManager ? "Approved" : "Pending",
           }),
