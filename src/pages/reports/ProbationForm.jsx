@@ -22,7 +22,7 @@ import useEmployeePersonalInfo from "../../hooks/useEmployeePersonalInfo";
 
 export const ProbationForm = ({ userID, userType }) => {
   const location = useLocation();
-  const { gmPosition, supervisorCheck, PDInfo } = useTempID();
+  const { gmPosition, supervisorCheck, PDInfo, HRMPosition } = useTempID();
   const { createNotification } = useCreateNotification();
   const { employeeData } = location.state || {};
   const probationEndDateStr = employeeData?.probationEndDate;

@@ -24,33 +24,6 @@ export const ConfirmationForm = ({
     }
   }, [formData]);
 
-  // useEffect(() => {
-  //   if (!workInfoData.length || !employeeData?.empID) {
-  //     return;
-  //   }
-
-  //   const workInfo = workInfoData.find(
-  //     (data) => data.empID === employeeData.empID
-  //   );
-
-  //   if (workInfo) {
-  //     console.log(workInfo);
-
-  //     const supervisorExists =
-  //       workInfo.supervisor &&
-  //       workInfo.supervisor !== "null" &&
-  //       workInfo.supervisor !== null &&
-  //       workInfo.supervisor !== undefined &&
-  //       !(
-  //         Array.isArray(workInfo.supervisor) && workInfo.supervisor[0] === null
-  //       ) &&
-  //        !(
-  //         Array.isArray(workInfo.supervisor) && workInfo.supervisor[workInfo.supervisor.length - 1] === "N/A"
-  //       )
-  //     setHasSupervisor(supervisorExists);
-  //   }
-  // }, [workInfoData, employeeData?.empID]);
-
   useEffect(() => {
     if (!workInfoData.length || !employeeData?.empID) {
       return;
