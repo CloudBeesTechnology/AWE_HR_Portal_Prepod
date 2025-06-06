@@ -454,6 +454,7 @@ export const ProbationForm = ({ userID, userType }) => {
         if (
           userType === "Manager" &&
           gmPosition !== GM &&
+          HRMPosition !== "HR MANAGER" &&
           formData.probData.managerApproved === null
         ) {
           alert("Manager Approval or Rejection is required!");
@@ -464,6 +465,7 @@ export const ProbationForm = ({ userID, userType }) => {
         if (
           userType === "Manager" &&
           gmPosition !== GM &&
+          HRMPosition !== "HR MANAGER" &&
           formData.probData.managerDate === null
         ) {
           alert("Manager date is is required!");
@@ -489,19 +491,22 @@ export const ProbationForm = ({ userID, userType }) => {
           return;
         }
 
-        if (userType === "HR" && formData.probData.gmApproved === null) {
+        if (
+          HRMPosition === "HR MANAGER" &&
+          formData.probData.gmApproved === null
+        ) {
           alert("GM Approval or Rejection is required!");
           setIsLoading(false);
           return;
         }
 
-        if (userType === "HR" && formData.probData.hrName === null) {
+        if (HRMPosition === "HR MANAGER" && formData.probData.hrName === null) {
           alert("HR name is required!");
           setIsLoading(false);
           return;
         }
 
-        if (userType === "HR" && formData.probData.hrDate === null) {
+        if (HRMPosition === "HR MANAGER" && formData.probData.hrDate === null) {
           alert("HR date is is required!");
           setIsLoading(false);
           return;
@@ -545,6 +550,7 @@ export const ProbationForm = ({ userID, userType }) => {
         if (
           userType === "Manager" &&
           gmPosition !== GM &&
+          HRMPosition !== "HR MANAGER" &&
           formData.probData.supervisorApproved === null &&
           supervisorCheck === true
         ) {
@@ -557,6 +563,7 @@ export const ProbationForm = ({ userID, userType }) => {
         if (
           userType === "Manager" &&
           gmPosition !== GM &&
+          HRMPosition !== "HR MANAGER" &&
           !formData.probData.managerApproved
         ) {
           alert("Manager approval or Rejection is required!");
@@ -567,6 +574,7 @@ export const ProbationForm = ({ userID, userType }) => {
         if (
           userType === "Manager" &&
           gmPosition !== GM &&
+          HRMPosition !== "HR MANAGER" &&
           !formData.probData.managerDate
         ) {
           alert("Manager date is is required!");

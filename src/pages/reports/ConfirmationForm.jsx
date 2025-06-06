@@ -11,6 +11,7 @@ export const ConfirmationForm = ({
   gmPosition,
   workInfoData,
   employeeData,
+  HRMPosition
 }) => {
   const [selectedValue, setSelectedValue] = React.useState("");
   const [hasSupervisor, setHasSupervisor] = React.useState(true);
@@ -23,6 +24,33 @@ export const ConfirmationForm = ({
     }
   }, [formData]);
 
+  // useEffect(() => {
+  //   if (!workInfoData.length || !employeeData?.empID) {
+  //     return;
+  //   }
+
+  //   const workInfo = workInfoData.find(
+  //     (data) => data.empID === employeeData.empID
+  //   );
+
+  //   if (workInfo) {
+  //     console.log(workInfo);
+
+  //     const supervisorExists =
+  //       workInfo.supervisor &&
+  //       workInfo.supervisor !== "null" &&
+  //       workInfo.supervisor !== null &&
+  //       workInfo.supervisor !== undefined &&
+  //       !(
+  //         Array.isArray(workInfo.supervisor) && workInfo.supervisor[0] === null
+  //       ) &&
+  //        !(
+  //         Array.isArray(workInfo.supervisor) && workInfo.supervisor[workInfo.supervisor.length - 1] === "N/A"
+  //       )
+  //     setHasSupervisor(supervisorExists);
+  //   }
+  // }, [workInfoData, employeeData?.empID]);
+
   useEffect(() => {
     if (!workInfoData.length || !employeeData?.empID) {
       return;
@@ -33,13 +61,11 @@ export const ConfirmationForm = ({
     );
 
     if (workInfo) {
-
       const supervisorExists = (() => {
-        if (!workInfo.supervisor) return false; 
+        if (!workInfo.supervisor) return false;
         if (workInfo.supervisor === "null") return false;
 
         if (Array.isArray(workInfo.supervisor)) {
-
           if (workInfo.supervisor.length === 0) return false;
 
           if (workInfo.supervisor[workInfo.supervisor.length - 1] === "N/A") {
@@ -60,6 +86,7 @@ export const ConfirmationForm = ({
     }
   }, [workInfoData, employeeData?.empID]);
 
+  // console.log(hasSupervisor);
 
   const handleChange = (event) => {
     event.persist();
@@ -70,7 +97,6 @@ export const ConfirmationForm = ({
       console.error("Event target is undefined");
       return;
     }
-
 
     setSelectedValue(event.target.value);
     handleInputChange(event.target.name, event.target.value);
@@ -224,7 +250,7 @@ export const ConfirmationForm = ({
                   disabled={userType !== "Supervisor"}
                   className="h-4 w-4 form-checkbox"
                 />
-                <label htmlFor="saApproved" className="text-sm">
+                <label htmlFor="saApproved" className="text-sm py-2">
                   Approved
                 </label>
               </div>
@@ -240,7 +266,7 @@ export const ConfirmationForm = ({
                   disabled={userType !== "Supervisor"}
                   className="h-4 w-4 form-checkbox"
                 />
-                <label htmlFor="saReject" className="text-sm">
+                <label htmlFor="saReject" className="text-sm py-2">
                   Rejected
                 </label>
               </div>
@@ -270,7 +296,10 @@ export const ConfirmationForm = ({
               {...register("managerName")}
               value={formData.probData.managerName || ""}
               onChange={handleInputChange}
-              disabled={userType !== "Manager"}
+              disabled={
+                (userType !== "Manager" && gmPosition === "GENERAL MANAGER") ||
+                HRMPosition === "HR MANAGER"
+              }
               className="border-b outline-none px-1 w-full"
             />
           </div>
@@ -284,10 +313,14 @@ export const ConfirmationForm = ({
                 checked={formData.probData.managerApproved === "Approved"}
                 onChange={handleInputChange}
                 id="managerApproved"
-                disabled={userType !== "Manager"}
+                disabled={
+                  (userType !== "Manager" &&
+                    gmPosition === "GENERAL MANAGER") ||
+                  HRMPosition === "HR MANAGER"
+                }
                 className="h-4 w-4 form-checkbox"
               />
-              <label htmlFor="managerApproved" className="text-sm">
+              <label htmlFor="managerApproved" className="text-sm py-2">
                 Approved
               </label>
             </div>
@@ -300,10 +333,14 @@ export const ConfirmationForm = ({
                 checked={formData.probData.managerApproved === "Rejected"}
                 onChange={handleInputChange}
                 id="managerReject"
-                disabled={userType !== "Manager"}
+                disabled={
+                  (userType !== "Manager" &&
+                    gmPosition === "GENERAL MANAGER") ||
+                  HRMPosition === "HR MANAGER"
+                }
                 className="h-4 w-4 form-checkbox"
               />
-              <label htmlFor="managerReject" className="text-sm">
+              <label htmlFor="managerReject" className="text-sm py-2">
                 Rejected
               </label>
             </div>
@@ -315,7 +352,10 @@ export const ConfirmationForm = ({
               {...register("managerDate")}
               value={formData.probData.managerDate || ""}
               onChange={handleInputChange}
-              disabled={userType !== "Manager"}
+              disabled={
+                (userType !== "Manager" && gmPosition === "GENERAL MANAGER") ||
+                HRMPosition === "HR MANAGER"
+              }
               className="outline-none"
             />
           </div>
@@ -350,7 +390,7 @@ export const ConfirmationForm = ({
                 disabled={gmPosition !== "GENERAL MANAGER"}
                 className="h-4 w-4 form-checkbox"
               />
-              <label htmlFor="gmApproved" className="text-sm">
+              <label htmlFor="gmApproved" className="text-sm py-2">
                 Approved
               </label>
             </div>
@@ -366,7 +406,7 @@ export const ConfirmationForm = ({
                 disabled={gmPosition !== "GENERAL MANAGER"}
                 className="h-4 w-4 form-checkbox"
               />
-              <label htmlFor="gmReject" className="text-sm">
+              <label htmlFor="gmReject" className="text-sm py-2">
                 Rejected
               </label>
             </div>
@@ -400,7 +440,7 @@ export const ConfirmationForm = ({
               {...register("hrName")}
               value={formData.probData.hrName || ""}
               onChange={handleInputChange}
-              disabled={userType !== "HR"}
+              disabled={HRMPosition !== "HR MANAGER"}
               className="border-b outline-none px-1"
             />
           </div>
@@ -411,7 +451,7 @@ export const ConfirmationForm = ({
               {...register("hrDate")}
               value={formData.probData.hrDate || ""}
               onChange={handleInputChange}
-              disabled={userType !== "HR"}
+              disabled={HRMPosition !== "HR MANAGER"}
               className="outline-none"
             />
           </div>

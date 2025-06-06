@@ -302,8 +302,8 @@ export const ContractFormPDF = ({ contentRef }) => {
 
     try {
       // Validate required fields based on user type
-      if (userType === "HR" && !formData.contract.hrManager) {
-        alert("HR Name is required!");
+      if (HRMPosition === "HR MANAGER" && !formData.contract.hrManager) {
+        alert("HRM Name is required!");
         return;
       }
 
@@ -315,6 +315,7 @@ export const ContractFormPDF = ({ contentRef }) => {
       if (
         userType === "Manager" &&
         gmPosition !== "GENERAL MANAGER" &&
+        HRMPosition !== "HR MANAGER" &&
         !formData.contract.depHead
       ) {
         alert("Manager Name is required!");
@@ -581,7 +582,11 @@ export const ContractFormPDF = ({ contentRef }) => {
                         name="renewalContract"
                         value={formData.contract.renewalContract}
                         onChange={handleInputChange}
-                        disabled={userType !== "Manager"}
+                        disabled={
+                          (userType !== "Manager" &&
+                            gmPosition === "GENERAL MANAGER") ||
+                          HRMPosition === "HR MANAGER"
+                        }
                       />
                     </td>
                   </tr>
@@ -600,29 +605,32 @@ export const ContractFormPDF = ({ contentRef }) => {
 
           {/* Remarks Section */}
           <div className="mt-7">
-            <label className="text-sm block py-4">Remarks Manager:</label>
+            <label className="text-sm block py-4">Manager Remarks:</label>
             <textarea
               type="text"
               name="remarks"
               value={formData.contract.remarks}
               onChange={handleInputChange}
-              disabled={userType !== "Manager"}
+              disabled={
+                (userType !== "Manager" && gmPosition === "GENERAL MANAGER") ||
+                HRMPosition === "HR MANAGER"
+              }
               className="border w-full text-sm  rounded resize-none outline-none p-2"
             />
           </div>
           <div className="mt-7">
-            <label className="text-sm block py-4">Remarks HR:</label>
+            <label className="text-sm block py-4">HRM Remarks:</label>
             <textarea
               type="text"
               name="remarkHr"
               value={formData.contract.remarkHr}
               onChange={handleInputChange}
-              disabled={userType !== "HR"}
+              disabled={HRMPosition !== "HR MANAGER"}
               className="border w-full text-sm  rounded resize-none outline-none p-2"
             />
           </div>
           <div className="mt-7">
-            <label className="text-sm block py-4">Remarks GM:</label>
+            <label className="text-sm block py-4">GM Remarks:</label>
             <textarea
               type="text"
               name="remarkGm"
@@ -642,7 +650,11 @@ export const ContractFormPDF = ({ contentRef }) => {
                 name="depHead"
                 value={formData.contract.depHead}
                 onChange={handleInputChange}
-                disabled={userType !== "Manager"}
+                disabled={
+                  (userType !== "Manager" &&
+                    gmPosition === "GENERAL MANAGER") ||
+                  HRMPosition === "HR MANAGER"
+                }
                 className="border-b border-black w-56 mx-auto outline-none text-center"
               />
 
@@ -656,7 +668,7 @@ export const ContractFormPDF = ({ contentRef }) => {
                 name="hrManager"
                 value={formData.contract.hrManager}
                 onChange={handleInputChange}
-                disabled={userType !== "HR"}
+                disabled={HRMPosition !== "HR MANAGER"}
                 className="border-b border-black w-56 mx-auto outline-none text-center"
               />
 
