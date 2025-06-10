@@ -101,4 +101,6 @@ export const ReportPaths = [
   "/leavePass",
   "/contractForms",
   "/promotion",
+  "/probFormUpdate",
+  "/ContractUp"
 ];

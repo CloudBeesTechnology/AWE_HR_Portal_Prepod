@@ -42,6 +42,7 @@ useEffect(() => {
   const recentDataMap = new Map();
 
   mergedData.forEach((val) => {
+   
     const uniqueKey = val.empID;
 
     // Determine the most recent timestamp (created or updated)
@@ -76,6 +77,7 @@ useEffect(() => {
 
   // Step 3: Filter data based on userType and userID
   const result = uniqueData.filter((item) => {
+
     if (userType === "Manager") {
       return item.managerEmpID === userID;
     } else if (userType === "Supervisor") {
@@ -213,6 +215,7 @@ useEffect(() => {
               {filteredData && filteredData.length > 0 ? (
                 filteredData.map((item, index) => {
                   const displayIndex = startIndex + index + 1;
+               
                   return (
                     <tr
                       key={index}

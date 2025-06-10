@@ -323,10 +323,14 @@ export const ContractReview = () => {
         };
       })
       .sort((a, b) => a.lastDate - b.lastDate)
+      .sort((a, b) => a.lastDate - b.lastDate)
       .map(({ lastDate, ...rest }) => rest);
+
+
 
     setFilteredData(filtered);
   };
+
 
   return (
     <div>
