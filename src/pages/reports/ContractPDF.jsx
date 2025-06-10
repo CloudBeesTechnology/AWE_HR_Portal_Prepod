@@ -30,7 +30,7 @@ export const ContractPDF = ({ userID, userType }) => {
       "Contract Start Date",
       "Contract End Date",
       "LD Expiry",
-      userType !== "SuperAdmin" && "Status",
+      userType === "SuperAdmin" && "Status",
       // "Duration of Renewal Contract",
       "Form",
     ].filter(Boolean)
@@ -214,12 +214,12 @@ export const ContractPDF = ({ userID, userType }) => {
           }),
         };
       })
+      .filter((item) => item !== null)
       .sort((a, b) => {
         if (a.status === "Pending" && b.status !== "Pending") return -1;
         if (a.status !== "Pending" && b.status === "Pending") return 1;
         return 0;
       })
-      .filter((item) => item !== null);
     // console.log(filteredData, "azsdxcfgvbhnj");
     setStoreData(filteredData);
     return filteredData;
