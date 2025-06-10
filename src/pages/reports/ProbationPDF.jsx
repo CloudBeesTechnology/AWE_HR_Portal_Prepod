@@ -8,7 +8,7 @@ import { useTempID } from "../../utils/TempIDContext";
 export const ProbationPDF = ({ userID, userType }) => {
   const location = useLocation();
   const { allData, title } = location.state || {};
-  const { gmPosition } = useTempID();
+  const { gmPosition, HRMPosition } = useTempID();
   const [tableBody, setTableBody] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [startDate, setStartDate] = useState("");
@@ -58,6 +58,8 @@ export const ProbationPDF = ({ userID, userType }) => {
     return date.toISOString().split("T")[0];
   };
 
+  // console.log("GM", gmPosition);
+  // console.log("User", userType);
 
   const probationReviewMergedData = (data, userType, gmPosition, userID) => {
     // const AWE87865 = data.find((item) => item.empID === "AWE87865");
@@ -101,7 +103,11 @@ export const ProbationPDF = ({ userID, userType }) => {
           return result;
         }
 
-        if (userType === "Manager" && gmPosition !== "GENERAL MANAGER") {
+        if (
+          userType === "Manager" &&
+          gmPosition !== "GENERAL MANAGER" &&
+          HRMPosition !== "HR MANAGER"
+        ) {
           const result =
             isProbationActive && lastManager === userID && isSupervisorApproved;
 
@@ -159,15 +165,19 @@ export const ProbationPDF = ({ userID, userType }) => {
             status: item.supervisorApproved || "Pending",
           }),
           ...(userType === "Manager" &&
-            gmPosition !== "GENERAL MANAGER" && {
+            gmPosition !== "GENERAL MANAGER" &&
+            HRMPosition !== "HR MANAGER" && {
               status: item.managerApproved || "Pending",
             }),
-          ...(userType === "HR" && {
+          // ...(userType === "HR" && {
+          //   status: item.hrName ? "Approved" : "Pending",
+          // }),
+          ...(HRMPosition === "HR MANAGER" && {
             status: item.hrName ? "Approved" : "Pending",
           }),
           ...(gmPosition === "GENERAL MANAGER" && {
-            status: item.gmApproved || "Pending"
-          }) 
+            status: item.gmApproved || "Pending",
+          }),
         };
 
         return formattedData;
@@ -188,15 +198,18 @@ export const ProbationPDF = ({ userID, userType }) => {
 
   useEffect(() => {
     setLoading(true);
-    const mergedData = probationReviewMergedData(
-      allData,
-      userType,
-      gmPosition,
-      userID
-    );
-    setTableBody(mergedData);
-    setLoading(false);
-  }, [allData, userType, gmPosition, userID]);
+
+      const mergedData = probationReviewMergedData(
+        allData,
+        userType,
+        gmPosition,
+        userID,
+        HRMPosition
+      );
+      setTableBody(mergedData);
+      setLoading(false);
+    
+  }, [allData, userType, gmPosition, userID, HRMPosition]);
 
   const handleViewDetails = (personData) => {
     setSelectedPerson(personData);
@@ -290,12 +303,22 @@ export const ProbationPDF = ({ userID, userType }) => {
           probationEndDate: formatDate(lastDate) || "-",
           deadline: lastDate ? formatDate(calculateDeadline(lastDate)) : "-",
           ...(userType === "Supervisor" && {
-            supervisorStatus: item.supervisorApproved || "Pending",
+            status: item.supervisorApproved || "Pending",
           }),
           ...(userType === "Manager" &&
-            gmPosition !== "GENERAL MANAGER" && {
-              managerStatus: item.managerApproved || "Pending",
+            gmPosition !== "GENERAL MANAGER" &&
+            HRMPosition !== "HR MANAGER" && {
+              status: item.managerApproved || "Pending",
             }),
+          // ...(userType === "HR" && {
+          //   status: item.hrName ? "Approved" : "Pending",
+          // }),
+          ...(HRMPosition === "HR MANAGER" && {
+            status: item.hrName ? "Approved" : "Pending",
+          }),
+          ...(gmPosition === "GENERAL MANAGER" && {
+            status: item.gmApproved || "Pending",
+          }),
         };
       });
 
@@ -310,7 +333,9 @@ export const ProbationPDF = ({ userID, userType }) => {
     );
   }
 
-  // console.log("Log 1", tableBody);
+  // console.log("HRM", HRMPosition);
+
+  // console.log("Log 6", tableBody);
   // console.log("Log 2", filteredData);
   return (
     <div>

@@ -14,8 +14,8 @@ const Performance = ({ title, name, register, formData, handleInputChange }) => 
       setSelectedPerformance(formData.probData[name] || "");
       setDetails(formData.probData[`${name}Details`] || "");
     } else {
-      setSelectedPerformance(""); // Reset for create method
-      setDetails(""); // Reset for create method
+      setSelectedPerformance(""); 
+      setDetails(""); 
     }
   }, [formData, name]);
 
@@ -40,46 +40,52 @@ const Performance = ({ title, name, register, formData, handleInputChange }) => 
   };
 
   return (
-    <div className="mb-6">
-      <h3 className="font-semibold">{title}</h3>
-      <div className="mt-2">
-        {performanceOptions.map((option) => (
-          <label
-            key={option.value}
-            htmlFor={`${name}_${option.value}`}
-            className="flex items-center relative mt-2"
-          >
-            <input
-              id={`${name}_${option.value}`}
-              type="radio"
-              name={name}
-              {...register(name)}
-              value={option.value}
-              checked={selectedPerformance === option.value}
-              onChange={handleRadioChange}
-              className="mr-2 appearance-none w-5 h-5 border rounded-sm"
-            />
-            {option.label}
-            {selectedPerformance === option.value && (
-              <TiTick className="text-[#4ad84a] text-[28px] absolute -bottom-0.5 -left-0.5" />
-            )}
-          </label>
-        ))}
+  <div className="mb-6">
+  <h3 className="font-semibold">{title}</h3>
 
-        {selectedPerformance === "notMeeting" && (
-          <div className="mt-4">
-            <textarea
-              {...register(`${name}Details`, { required: selectedPerformance === "notMeeting" })}
-              value={details}
-              onChange={handleDetailsChange}
-              placeholder="Please provide details"
-              name={`${name}Details`}
-              className="w-1/3 border p-2 rounded resize-none outline-none scrollBar"
-            ></textarea>
-          </div>
-        )}
-      </div>
+  <div className="mt-2 flex flex-wrap items-start justify-between">
+    {/* Radio Buttons Group */}
+    <div className="flex flex-col space-y-2">
+      {performanceOptions.map((option) => (
+        <label
+          key={option.value}
+          htmlFor={`${name}_${option.value}`}
+          className="flex items-center relative"
+        >
+          <input
+            id={`${name}_${option.value}`}
+            type="radio"
+            name={name}
+            {...register(name)}
+            value={option.value}
+            checked={selectedPerformance === option.value}
+            onChange={handleRadioChange}
+            className="mr-2 appearance-none w-5 h-5 border rounded-sm"
+          />
+          {option.label}
+          {selectedPerformance === option.value && (
+            <TiTick className="text-[#4ad84a] text-[28px] absolute -bottom-0.5 -left-0.5" />
+          )}
+        </label>
+      ))}
     </div>
+
+    {/* Conditional Textarea on the Right */}
+    {selectedPerformance === "notMeeting" && (
+      <div className="ml-6 w-1/2">
+        <textarea
+          {...register(`${name}Details`, { required: true })}
+          value={details}
+          onChange={handleDetailsChange}
+          placeholder="Please provide details"
+          name={`${name}Details`}
+          className="w-full border p-4 rounded resize-none outline-none scrollBar"
+        ></textarea>
+      </div>
+    )}
+  </div>
+</div>
+
   );
 };
 

@@ -8,7 +8,7 @@ import { useTempID } from "../../utils/TempIDContext";
 export const ContractPDF = ({ userID, userType }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { gmPosition } = useTempID();
+  const { gmPosition, HRMPosition } = useTempID();
   const { allData, title } = location.state || {};
   const [tableBody, setTableBody] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -16,23 +16,25 @@ export const ContractPDF = ({ userID, userType }) => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selectedPerson, setSelectedPerson] = useState(null);
-  const [tableHead] = useState([
-    "Emp ID",
-    "Badge No",
-    "Name",
-    "Nationality",
-    "Date of Join",
-    "Department",
-    "other Department",
-    "Position",
-    "Other Position",
-    "Contract Start Date",
-    "Contract End Date",
-    "LD Expiry",
-    "Status",
-    // "Duration of Renewal Contract",
-    "Form",
-  ]);
+  const [tableHead] = useState(
+    [
+      "Emp ID",
+      "Badge No",
+      "Name",
+      "Nationality",
+      "Date of Join",
+      "Department",
+      "other Department",
+      "Position",
+      "Other Position",
+      "Contract Start Date",
+      "Contract End Date",
+      "LD Expiry",
+      userType !== "SuperAdmin" && "Status",
+      // "Duration of Renewal Contract",
+      "Form",
+    ].filter(Boolean)
+  );
 
   // console.log("UserType", userType);
 
@@ -127,32 +129,53 @@ export const ContractPDF = ({ userID, userType }) => {
         // console.log("Manager", isDepartmentHead);
         // console.log("HR", isHr);
 
-        if (userType === "Supervisor") {
-          return null;
-        }
+        // if (userType === "Supervisor") {
+        //   return null;
+        // }
 
-        if (userType === "HR" && !isDepartmentHead) {
-          return null;
-        }
+        // if (HRMPosition === "HR MANAGER" && !isDepartmentHead) {
+        //   return null;
+        // }
 
-        if (gmPosition === "GENERAL MANAGER" && !isHr) {
-          return null;
-        }
+        // if (userType === "Manager" && gmPosition !== "GENERAL MANAGER") {
+        //   if (lastManager !== userID) return null;
+        // }
+
+        // if (userType === "HR" && HRMPosition !== "HR MANAGER") {
+        //   return null;
+        // }
+
+        // if (userType === "Manager" && HRMPosition !== "HR MANAGER") {
+        //   return null;
+        // }
 
         // if (gmPosition === "GENERAL MANAGER" && !isHr) {
         //   return null;
         // }
 
-        // if (
-        //   userType === "Manager" &&
-        //   gmPosition !== "GENERAL MANAGER" &&
-        //   lastManager !== userID
-        // ) {
-        //   return null;
-        // }
-
-        if (userType === "Manager" && gmPosition !== "GENERAL MANAGER") {
+        // Allow HR user with HR MANAGER role
+        if (userType === "HR" && HRMPosition === "HR MANAGER") {
+          // allow
+        }
+        // Allow Manager with any HRMPosition defined
+        else if (userType === "Manager" && HRMPosition === "HR MANAGER") {
+          // allow
+        }
+        // Deny if Supervisor
+        else if (userType === "Supervisor") {
+          return null;
+        }
+        // Deny if HR MANAGER but not department head
+        else if (HRMPosition === "HR MANAGER" && !isDepartmentHead) {
+          return null;
+        }
+        // Deny if Manager not GM and not last manager
+        else if (userType === "Manager" && gmPosition !== "GENERAL MANAGER") {
           if (lastManager !== userID) return null;
+        }
+        // Deny if GM but not HR
+        else if (gmPosition === "GENERAL MANAGER" && !isHr) {
+          return null;
         }
 
         return {
@@ -178,12 +201,12 @@ export const ContractPDF = ({ userID, userType }) => {
           nlmsEmpApproval: Array.isArray(item.nlmsEmpValid)
             ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
             : "-",
-          ...(userType === "SuperAdmin" ||
-            (userType === "Manager" &&
-              gmPosition !== "GENERAL MANAGER" && {
-                status: item.depHead ? "Approved" : "Pending",
-              })),
-          ...((userType === "HR" || userType === "SuperAdmin") && {
+          ...(userType === "Manager" &&
+            gmPosition !== "GENERAL MANAGER" &&
+            HRMPosition !== "HR MANAGER" && {
+              status: item.depHead ? "Approved" : "Pending",
+            }),
+          ...(HRMPosition === "HR MANAGER" && {
             status: item.hrManager ? "Approved" : "Pending",
           }),
           ...(gmPosition === "GENERAL MANAGER" && {
@@ -204,11 +227,16 @@ export const ContractPDF = ({ userID, userType }) => {
   // console.log("GM", gmPosition);
 
   useEffect(() => {
-    // if (!allData || !userType) return;
 
-    const data = contractExpiryMergedData(allData);
+    const data = contractExpiryMergedData(
+      allData,
+      userType,
+      gmPosition,
+      userID,
+      HRMPosition
+    );
     setTableBody(data);
-  }, [allData, userType, gmPosition]);
+  }, [allData, userType, gmPosition, userID, HRMPosition]);
 
   const handleDate = (e, type) => {
     const value = e.target.value;
@@ -281,17 +309,16 @@ export const ContractPDF = ({ userID, userType }) => {
           nlmsEmpApproval: Array.isArray(item.nlmsEmpValid)
             ? formatDate(item.nlmsEmpValid[item.nlmsEmpValid.length - 1])
             : "-",
-          ...(userType === "SuperAdmin" ||
-            (userType === "Manager" &&
-              gmPosition !== "GENERAL MANAGER" && {
-                managerStatus: item.depHead ? "Approved" : "Pending",
-              })),
-          ...(userType === "HR" ||
-            (userType === "SuperAdmin" && {
-              hrStatus: item.hrManager ? "Approved" : "Pending",
-            })),
+          ...(userType === "Manager" &&
+            gmPosition !== "GENERAL MANAGER" &&
+            HRMPosition !== "HR MANAGER" && {
+              status: item.depHead ? "Approved" : "Pending",
+            }),
+          ...(HRMPosition === "HR MANAGER" && {
+            status: item.hrManager ? "Approved" : "Pending",
+          }),
           ...(gmPosition === "GENERAL MANAGER" && {
-            hrStatus: item.genManager ? "Approved" : "Pending",
+            status: item.genManager ? "Approved" : "Pending",
           }),
         };
       });
